@@ -14,7 +14,7 @@ function PlayerTased:enter(state_data, enter_data)
 		managers.enemy:add_delayed_clbk(self._recover_delayed_clbk, callback(self, self, "clbk_exit_to_std"), recover_time)
 	else
 		self._fatal_delayed_clbk = "PlayerTased_fatal_delayed_clbk"
-		managers.enemy:add_delayed_clbk(self._fatal_delayed_clbk, callback(self, self, "clbk_exit_to_fatal"), managers.player:player_timer():time() + tweak_data.player.damage.TASED_TIME)
+		managers.enemy:add_delayed_clbk(self._fatal_delayed_clbk, callback(self, self, "clbk_exit_to_fatal"), TimerManager:game():time() + tweak_data.player.damage.TASED_TIME)
 	end
 	self._next_shock = 0.5
 	self._taser_value = 1
@@ -178,7 +178,7 @@ function PlayerTased:_check_action_primary_attack(t, input)
 						if not self._state_data.in_steelsight then
 						elseif weap_tweak_data.animations.recoil_steelsight then
 						end
-						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier()
+						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier() + weap_base:recoil_addend()
 						local up, down, left, right = unpack(weap_tweak_data.kick[self._state_data.in_steelsight and "steelsight" or self._state_data.ducking and "crouching" or "standing"])
 						self._camera_unit:base():recoil_kick(up * recoil_multiplier, down * recoil_multiplier, left * recoil_multiplier, right * recoil_multiplier)
 						local spread_multiplier = weap_base:spread_multiplier()
@@ -301,7 +301,7 @@ function PlayerTased:on_tase_ended()
 	end
 	if not self._recover_delayed_clbk and game_state_machine:last_queued_state_name() == "ingame_electrified" and managers.network:session() then
 		self._recover_delayed_clbk = "PlayerTased_recover_delayed_clbk"
-		managers.enemy:add_delayed_clbk(self._recover_delayed_clbk, callback(self, self, "clbk_exit_to_std"), managers.player:player_timer():time() + tweak_data.player.damage.TASED_RECOVER_TIME)
+		managers.enemy:add_delayed_clbk(self._recover_delayed_clbk, callback(self, self, "clbk_exit_to_std"), TimerManager:game():time() + tweak_data.player.damage.TASED_RECOVER_TIME)
 	end
 end
 

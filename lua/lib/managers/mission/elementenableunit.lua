@@ -7,7 +7,6 @@ function ElementEnableUnit:init(...)
 end
 
 function ElementEnableUnit:on_script_activated()
-	print(inspect(self._values.unit_ids))
 	for _, id in ipairs(self._values.unit_ids) do
 		if Global.running_simulation then
 			table.insert(self._units, managers.editor:unit_with_id(id))

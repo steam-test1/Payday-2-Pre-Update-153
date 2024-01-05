@@ -4,7 +4,7 @@ core:import("CoreCode")
 core:import("CoreEvent")
 core:import("CoreManagerBase")
 core:import("CoreScriptViewport")
-core:import("CoreEnvironmentCache")
+core:import("CoreEnvironmentManager")
 ViewportManager = ViewportManager or class(CoreManagerBase.ManagerBase)
 
 function ViewportManager:init(aspect_ratio)
@@ -12,9 +12,12 @@ function ViewportManager:init(aspect_ratio)
 	assert(type(aspect_ratio) == "number")
 	self._aspect_ratio = aspect_ratio
 	self._resolution_changed_event_handler = CoreEvent.CallbackEventHandler:new()
-	self._environment_cache = CoreEnvironmentCache.EnvironmentCache:new()
+	self._env_manager = CoreEnvironmentManager.EnvironmentManager:new()
 	Global.render_debug.render_sky = true
 	self._current_camera_position = Vector3()
+	if Application:editor() then
+		self:preload_environment("core/environments/default")
+	end
 end
 
 function ViewportManager:update(t, dt)
@@ -55,6 +58,7 @@ function ViewportManager:destroy()
 	for _, svp in pairs(self:_all_ao()) do
 		svp:destroy()
 	end
+	self._env_manager:destroy()
 end
 
 function ViewportManager:new_vp(x, y, width, height, name, priority)
@@ -111,19 +115,53 @@ function ViewportManager:resolution_changed()
 end
 
 function ViewportManager:preload_environment(name)
-	self._environment_cache:preload_environment(name)
+	self._env_manager:preload(name)
 end
 
-function ViewportManager:get_environment_cache()
-	return self._environment_cache
+function ViewportManager:get_predefined_environment_filter_map()
+	return self._env_manager:get_predefined_environment_filter_map()
+end
+
+function ViewportManager:get_environment_value(path, data_path_key)
+	return self._env_manager:get_value(path, data_path_key)
+end
+
+function ViewportManager:has_data_path_key(data_path_key)
+	return self._env_manager:has_data_path_key(data_path_key)
+end
+
+function ViewportManager:is_deprecated_data_path(data_path)
+	return self._env_manager:is_deprecated_data_path(data_path)
+end
+
+function ViewportManager:create_global_environment_modifier(data_path_key, is_override, modifier_func)
+	for _, vp in ipairs(self:viewports()) do
+		vp:create_environment_modifier(data_path_key, is_override, modifier_func)
+	end
+	self._env_manager:set_global_environment_modifier(data_path_key, is_override, modifier_func)
+	return data_path_key
+end
+
+function ViewportManager:destroy_global_environment_modifier(data_path_key)
+	for _, vp in ipairs(self:viewports()) do
+		vp:destroy_environment_modifier(data_path_key)
+	end
+	self._env_manager:set_global_environment_modifier(data_path_key, nil, nil)
+end
+
+function ViewportManager:update_global_environment_value(data_path_key)
+	for _, vp in ipairs(self:viewports()) do
+		vp:update_environment_value(data_path_key)
+	end
 end
 
 function ViewportManager:_viewport_destroyed(vp)
 	self:_del_accessobj(vp)
+	self._current_camera = nil
 end
 
-function ViewportManager:_get_environment_cache()
-	return self._environment_cache
+function ViewportManager:_get_environment_manager()
+	return self._env_manager
 end
 
 function ViewportManager:first_active_world_viewport()

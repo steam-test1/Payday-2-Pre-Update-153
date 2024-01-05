@@ -18,16 +18,17 @@ end
 function GrenadeCrateBase:init(unit)
 	UnitBase.init(self, unit, false)
 	self._unit = unit
+	self._is_attachable = true
 	self._max_grenade_amount = tweak_data.upgrades.grenade_crate_base
 	self._unit:sound_source():post_event("ammo_bag_drop")
 	self:setup()
 end
 
 function GrenadeCrateBase:setup()
-	self._grenade_amount = tweak_data.upgrades.grenade_crate_base
+	self._grenade_amount = self._max_grenade_amount or tweak_data.upgrades.grenade_crate_base
 	self._empty = false
 	self:_set_visual_stage()
-	if Network:is_server() then
+	if Network:is_server() and self._is_attachable then
 		local from_pos = self._unit:position() + self._unit:rotation():z() * 10
 		local to_pos = self._unit:position() + self._unit:rotation():z() * -10
 		local ray = self._unit:raycast("ray", from_pos, to_pos, "slot_mask", managers.slot:get_mask("world_geometry"))
@@ -163,6 +164,26 @@ function GrenadeCrateBase:load(data)
 end
 
 function GrenadeCrateBase:destroy()
+end
+
+CustomGrenadeCrateBase = CustomGrenadeCrateBase or class(GrenadeCrateBase)
+
+function CustomGrenadeCrateBase:init(unit)
+	UnitBase.init(self, unit, false)
+	self._unit = unit
+	self._is_attachable = self.is_attachable or false
+	self._max_grenade_amount = self.max_grenade_amount or tweak_data.upgrades.grenade_crate_base
+	self:setup()
+end
+
+function CustomGrenadeCrateBase:_set_empty()
+	self._empty = true
+	if alive(self._unit) then
+		self._unit:interaction():set_active(false)
+	end
+	if self._unit:damage():has_sequence("empty") then
+		self._unit:damage():run_sequence_simple("empty")
+	end
 end
 
 GrenadeCrateSync = GrenadeCrateSync or class()

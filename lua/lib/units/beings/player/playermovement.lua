@@ -51,6 +51,7 @@ function PlayerMovement:init(unit)
 			morale_boost_cooldown_t = tweak_data.upgrades.morale_boost_base_cooldown * managers.player:upgrade_value("player", "morale_boost_cooldown_multiplier", 1)
 		}
 	end
+	self:set_friendly_fire(true)
 end
 
 function PlayerMovement:post_init()
@@ -635,7 +636,7 @@ end
 
 function PlayerMovement:on_morale_boost(benefactor_unit)
 	if self._morale_boost then
-		managers.enemy:reschedule_delayed_clbk(self._morale_boost.expire_clbk_id, managers.player:player_timer():time() + tweak_data.upgrades.morale_boost_time)
+		managers.enemy:reschedule_delayed_clbk(self._morale_boost.expire_clbk_id, TimerManager:game():time() + tweak_data.upgrades.morale_boost_time)
 	else
 		self._morale_boost = {
 			expire_clbk_id = "PlayerMovement_morale_boost" .. tostring(self._unit:key()),
@@ -643,7 +644,7 @@ function PlayerMovement:on_morale_boost(benefactor_unit)
 			suppression_resistance = tweak_data.upgrades.morale_boost_suppression_resistance,
 			reload_speed_bonus = tweak_data.upgrades.morale_boost_reload_speed_bonus
 		}
-		managers.enemy:add_delayed_clbk(self._morale_boost.expire_clbk_id, callback(self, self, "clbk_morale_boost_expire"), managers.player:player_timer():time() + tweak_data.upgrades.morale_boost_time)
+		managers.enemy:add_delayed_clbk(self._morale_boost.expire_clbk_id, callback(self, self, "clbk_morale_boost_expire"), TimerManager:game():time() + tweak_data.upgrades.morale_boost_time)
 	end
 end
 
@@ -698,7 +699,7 @@ function PlayerMovement:set_friendly_fire(state)
 	end
 end
 
-function PlayerMovement:friendly_fire()
+function PlayerMovement:friendly_fire(unit)
 	return self._friendly_fire and true or false
 end
 

@@ -206,6 +206,9 @@ end
 
 function CustomAmmoBagBase:_set_empty()
 	self._empty = true
+	if alive(self._unit) then
+		self._unit:interaction():set_active(false)
+	end
 	if self._unit:damage():has_sequence("empty") then
 		self._unit:damage():run_sequence_simple("empty")
 	end

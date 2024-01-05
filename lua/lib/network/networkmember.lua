@@ -133,9 +133,6 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 		unit = World:spawn_unit(unit_name, pos_rot[1], pos_rot[2])
 	else
 		unit = Network:spawn_unit_on_client(self._peer:rpc(), unit_name, pos_rot[1], pos_rot[2])
-		local con_mul, index = managers.blackmarket:get_concealment_of_peer(self._peer)
-		unit:base():set_suspicion_multiplier("equipment", 1 / con_mul)
-		unit:base():set_detection_multiplier("equipment", 1 / con_mul)
 	end
 	local team_id = tweak_data.levels:get_default_team_ID("player")
 	self:set_unit(unit, character_name, team_id)
@@ -176,14 +173,34 @@ function NetworkMember:set_unit(unit, character_name, team_id)
 	end
 	if is_new_unit then
 		unit:movement():set_team(managers.groupai:state():team_data(tweak_data.levels:get_default_team_ID("player")))
+		self._equipped_armor_id = nil
+		self:update_equipped_armor()
 		if unit:damage() then
 			local sequence = managers.blackmarket:character_sequence_by_character_id(self._peer:character_id(), self._peer:id())
 			unit:damage():run_sequence_simple(sequence)
-			unit:damage():run_sequence_simple(tweak_data.blackmarket.armors[self._peer:armor_id()].sequence)
 		end
 		unit:movement():set_character_anim_variables()
 		if self ~= Global.local_member then
 		end
+	end
+end
+
+function NetworkMember:update_equipped_armor()
+	if not alive(self._unit) then
+		return
+	end
+	local new_armor_id = self._peer:armor_id(true) or self._peer:armor_id()
+	print("[NetworkMember:update_equipped_armor]", "equipped_armor", self._equipped_armor_id, "new_armor", new_armor_id)
+	if self._equipped_armor_id ~= new_armor_id then
+		self._equipped_armor_id = new_armor_id
+		local armor_sequence = tweak_data.blackmarket.armors[new_armor_id].sequence
+		if armor_sequence and self._unit:damage() and self._unit:damage():has_sequence(armor_sequence) then
+			self._unit:damage():run_sequence_simple(armor_sequence)
+		end
+		local con_mul, index = managers.blackmarket:get_concealment_of_peer(self._peer)
+		self._unit:base():set_suspicion_multiplier("equipment", 1 / con_mul)
+		self._unit:base():set_detection_multiplier("equipment", 1 / con_mul)
+		self._unit:base():setup_hud_offset(self._peer)
 	end
 end
 
@@ -254,6 +271,11 @@ function NetworkMember:place_deployable(id)
 			return true
 		elseif self._deployable == id and self._depolyable_count < tweak_data.equipments.max_amount[id] then
 			self._depolyable_count = self._depolyable_count + 1
+			return true
+		elseif not self._deployable_swap and (self._deployable == "sentry_gun" and id == "trip_mine" or self._deployable == "trip_mine" and id == "sentry_gun") then
+			self._deployable_swap = true
+			self._deployable = id
+			self._depolyable_count = 1
 			return true
 		end
 	end

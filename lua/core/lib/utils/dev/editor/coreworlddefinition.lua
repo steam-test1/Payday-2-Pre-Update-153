@@ -3,6 +3,7 @@ core:import("CoreUnit")
 core:import("CoreMath")
 core:import("CoreEditorUtils")
 core:import("CoreEngineAccess")
+local sky_orientation_data_key = Idstring("sky_orientation/rotation"):key()
 WorldDefinition = WorldDefinition or class()
 
 function WorldDefinition:init(params)
@@ -521,8 +522,8 @@ function WorldDefinition:_create_massunit(data, offset)
 	MassUnitManager:load(path:id(), offset, self._massunit_replace_names)
 end
 
-function WorldDefinition:sky_rotation_modifier(interface)
-	return self._environment.sky_rot
+function WorldDefinition:sky_rotation_modifier()
+	return self._environment.sky_rot, true
 end
 
 function WorldDefinition:_set_environment(environment_name)
@@ -548,10 +549,10 @@ end
 function WorldDefinition:_create_environment(data, offset)
 	self:_set_environment(data.environment_values.environment)
 	self:_set_default_color_grading(data.environment_values.color_grading)
-	if not Application:editor() then
-		self._environment_modifier_id = self._environment_modifier_id or managers.viewport:viewports()[1]:create_environment_modifier(false, function(interface)
-			return self:sky_rotation_modifier(interface)
-		end, "sky_orientation")
+	if not self._environment_modifier_id and not Application:editor() then
+		self._environment_modifier_id = managers.viewport:create_global_environment_modifier(sky_orientation_data_key, true, function()
+			return self:sky_rotation_modifier()
+		end)
 	end
 	self._environment = {
 		sky_rot = data.environment_values.sky_rot
@@ -574,6 +575,7 @@ function WorldDefinition:_create_environment(data, offset)
 		end
 	end
 	for _, environment_area in ipairs(data.environment_areas) do
+		managers.viewport:preload_environment(environment_area.environment)
 		managers.environment_area:add_area(environment_area)
 	end
 	if Application:editor() then

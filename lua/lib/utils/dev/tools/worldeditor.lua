@@ -97,12 +97,18 @@ end
 
 function WorldEditor:_init_mission_difficulties()
 	self._mission_difficulties = {
-		"easy",
-		"normal",
-		"hard",
-		"overkill",
-		"overkill_145",
-		"overkill_290"
+		{"easy", "Easy"},
+		{"normal", "Normal"},
+		{"hard", "Hard"},
+		{"overkill", "Very Hard"},
+		{
+			"overkill_145",
+			"Overkill"
+		},
+		{
+			"overkill_290",
+			"Death Wish"
+		}
 	}
 	self._mission_difficulty = "normal"
 end

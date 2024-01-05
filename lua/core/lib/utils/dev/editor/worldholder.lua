@@ -2,6 +2,7 @@ core:import("CoreWorldDefinition")
 core:import("CoreEditorUtils")
 core:import("CoreEngineAccess")
 core:import("CoreUnit")
+local sky_orientation_data_key = Idstring("sky_orientation/rotation"):key()
 CoreOldWorldDefinition = CoreOldWorldDefinition or class()
 CoreMissionElementUnit = CoreMissionElementUnit or class()
 WorldHolder = WorldHolder or class()
@@ -715,9 +716,9 @@ end
 
 function CoreOldWorldDefinition:create_environment(data, offset)
 	managers.environment_area:set_default_environment(data.environment, nil)
-	self._environment_modifier_id = managers.viewport:viewports()[1]:create_environment_modifier(false, function()
+	self._environment_modifier_id = managers.viewport:create_global_environment_modifier(sky_orientation_data_key, true, function()
 		return data.sky_rot
-	end, "sky_orientation")
+	end)
 	local wind = data.wind
 	Wind:set_direction(wind.angle, wind.angle_var, 5)
 	Wind:set_tilt(wind.tilt, wind.tilt_var, 5)
@@ -1090,7 +1091,7 @@ end
 
 function CoreEnvironment:release_sky_orientation_modifier()
 	if self._environment_modifier_id then
-		managers.viewport:viewports()[1]:destroy_environment_modifier(self._environment_modifier_id)
+		managers.viewport:destroy_global_environment_modifier(self._environment_modifier_id)
 		self._environment_modifier_id = nil
 	end
 end
@@ -1146,7 +1147,7 @@ function CoreEnvironment:parse_unit(node)
 	table.insert(self._units_data, t)
 end
 
-function CoreEnvironment:sky_rotation_modifier(interface)
+function CoreEnvironment:sky_rotation_modifier()
 	return self._values.sky_rot
 end
 
@@ -1155,9 +1156,9 @@ function CoreEnvironment:create(offset)
 		managers.environment_area:set_default_environment(self._values.environment)
 	end
 	if not Application:editor() then
-		self._environment_modifier_id = self._environment_modifier_id or managers.viewport:viewports()[1]:create_environment_modifier(false, function(interface)
-			return self:sky_rotation_modifier(interface)
-		end, "sky_orientation")
+		self._environment_modifier_id = self._environment_modifier_id or managers.viewport:create_global_environment_modifier(sky_orientation_data_key, true, function()
+			return self:sky_rotation_modifier()
+		end)
 	end
 	if self._wind then
 		Wind:set_direction(self._wind.wind_angle, self._wind.wind_dir_var, 5)

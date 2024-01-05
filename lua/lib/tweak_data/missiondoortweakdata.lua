@@ -94,6 +94,56 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
 		}
 	}
+	self.keycard_door_single = {}
+	self.keycard_door_single.devices = {}
+	self.keycard_door_single.devices.c4 = {
+		{
+			align = "a_shp_charge_1",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
+		},
+		{
+			align = "a_shp_charge_2",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
+		},
+		{
+			align = "a_shp_charge_3",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
+		}
+	}
+	self.keycard_door_single.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 90
+		}
+	}
+	self.keycard_door_single.devices.key = {
+		{
+			align = "a_keycard",
+			unit = Idstring("units/payday2/equipment/gen_interactable_panel_keycard/gen_interactable_panel_keycard")
+		}
+	}
+	self.keycard_door_single.devices.ecm = {
+		{
+			align = "a_ecm_hack",
+			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
+		}
+	}
+	self.keycard_ecm = {}
+	self.keycard_ecm.devices = {}
+	self.keycard_ecm.devices.key = {
+		{
+			align = "a_keycard",
+			unit = Idstring("units/payday2/equipment/gen_interactable_panel_keycard/gen_interactable_panel_keycard")
+		}
+	}
+	self.keycard_ecm.devices.ecm = {
+		{
+			align = "a_ecm_hack",
+			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
+		}
+	}
 	self.atm = {}
 	self.atm.devices = {}
 	self.atm.devices.ecm = {
@@ -424,6 +474,14 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_c4_placement_3",
 			unit = Idstring("units/equipment/c4_charge/c4_mission_door")
+		}
+	}
+	self.gov_d_int_door_shape = {}
+	self.gov_d_int_door_shape.devices = {}
+	self.gov_d_int_door_shape.devices.c4 = {
+		{
+			align = "a_c4_placement",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
 end

@@ -170,7 +170,6 @@ function NetworkPeer:load(data)
 	self._streaming_status = data.streaming_status
 	self._ticket_wait_response = data.wait_ticket_response
 	self._loading_outfit_assets = data.loading_outfit_assets
-	self._dlc_missing = data.dlc_missing
 	if self._loading_outfit_assets then
 		self._outfit_assets = Global.peer_loading_outfit_assets[self._id]
 		Global.peer_loading_outfit_assets[self._id] = nil
@@ -221,7 +220,6 @@ function NetworkPeer:save(data)
 	data.wait_ticket_response = self._ticket_wait_response
 	data.other_peer_outfits_loaded = self._other_peer_outfits_loaded
 	data.outfit_version = self._outfit_version
-	data.dlc_missing = self._dlc_missing
 	if self._loading_outfit_assets then
 		data.loading_outfit_assets = true
 		Global.peer_loading_outfit_assets = Global.peer_loading_outfit_assets or {}
@@ -727,6 +725,10 @@ function NetworkPeer:set_outfit_string(outfit_string, outfit_version)
 	if old_outfit_string ~= outfit_string then
 		self:_reload_outfit()
 	end
+	local member = managers.network and managers.network:game() and managers.network:game():member_peer(self)
+	if member then
+		member:update_equipped_armor()
+	end
 	if self == managers.network:session():local_peer() then
 		self:_increment_outfit_version()
 	else
@@ -756,10 +758,12 @@ function NetworkPeer:mask_blueprint()
 	return managers.blackmarket:mask_blueprint_from_outfit_string(outfit_string)
 end
 
-function NetworkPeer:armor_id()
+function NetworkPeer:armor_id(get_current)
 	local outfit_string = self:profile("outfit_string")
 	local data = string.split(outfit_string, " ")
-	return data[managers.blackmarket:outfit_string_index("armor")]
+	local armor_string = data[managers.blackmarket:outfit_string_index("armor")]
+	local armor_data = string.split(armor_string, "-")
+	return get_current and armor_data[2] or armor_data[1]
 end
 
 function NetworkPeer:melee_id()

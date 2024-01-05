@@ -72,6 +72,26 @@ ContourExt._types = {
 		priority = 1,
 		material_swap_required = true,
 		color = tweak_data.contour.character_interactable.standard_color
+	},
+	deployable_selected = {
+		priority = 1,
+		color = tweak_data.contour.deployable.selected_color,
+		unique = true
+	},
+	deployable_disabled = {
+		priority = 2,
+		color = tweak_data.contour.deployable.disabled_color,
+		unique = true
+	},
+	deployable_active = {
+		priority = 3,
+		color = tweak_data.contour.deployable.active_color,
+		unique = true
+	},
+	deployable_interactable = {
+		priority = 4,
+		color = tweak_data.contour.deployable.interact_color,
+		unique = true
 	}
 }
 ContourExt.indexed_types = {}
@@ -111,7 +131,7 @@ function ContourExt:add(type, sync, multiplier)
 		if setup.type == type then
 			if fadeout then
 				setup.fadeout_t = TimerManager:game():time() + fadeout
-			else
+			elseif not self._types[setup.type].unique then
 				setup.ref_c = (setup.ref_c or 0) + 1
 			end
 			return setup

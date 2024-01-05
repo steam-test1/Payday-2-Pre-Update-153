@@ -6,11 +6,25 @@ CoreChangeShadowCutsceneKey:register_serialized_attribute("name", "")
 
 function CoreChangeShadowCutsceneKey:init(keycollection)
 	self.super.init(self, keycollection)
-	self._mixer = managers.viewport:first_active_viewport():environment_mixer()
-	self._shadow_interface_id = nil
-	
-	function self._modify_func(interface)
-		return managers.viewport:first_active_viewport():environment_mixer():static_parameters(self:name(), "post_effect", "shadow_processor", "shadow_rendering", "shadow_modifier")
+	self._modify_func_map = {}
+	self._shadow_interface_id_map = nil
+	local list = {
+		"slice0",
+		"slice1",
+		"slice2",
+		"slice3",
+		"shadow_slice_overlap",
+		"shadow_slice_depths"
+	}
+	local suffix = "post_effect/shadow_processor/shadow_rendering/shadow_modifier/"
+	for _, var in ipairs(list) do
+		local data_path_key = Idstring(suffix .. var):key()
+		
+		local function func()
+			return managers.viewport:get_environment_value(self:name(), data_path_key), true
+		end
+		
+		self._modify_func_map[data_path_key] = func
 	end
 end
 
@@ -26,7 +40,10 @@ function CoreChangeShadowCutsceneKey:evaluate(player, fast_forward)
 	if preceeding_key then
 		preceeding_key:revert()
 	end
-	self._shadow_interface_id = self._mixer:create_modifier(true, "shared_shadow", self._modify_func)
+	self._shadow_interface_id_map = {}
+	for data_path_key, func in pairs(self._modify_func_map) do
+		self._shadow_interface_id_map[data_path_key] = managers.viewport:first_active_viewport():create_environment_modifier(data_path_key, true, func)
+	end
 end
 
 function CoreChangeShadowCutsceneKey:revert()
@@ -61,8 +78,10 @@ function CoreChangeShadowCutsceneKey:refresh_control_for_name(control)
 end
 
 function CoreChangeShadowCutsceneKey:_reset_interface()
-	if self._shadow_interface_id then
-		self._mixer:destroy_modifier(self._shadow_interface_id)
-		self._shadow_interface_id = nil
+	if self._shadow_interface_id_map then
+		for data_path_key, id in pairs(self._shadow_interface_id_map) do
+			managers.viewport:first_active_viewport():destroy_modifier(id)
+		end
+		self._shadow_interface_id_map = nil
 	end
 end

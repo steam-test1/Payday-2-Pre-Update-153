@@ -547,7 +547,11 @@ function WINDLCManager:init()
 			gage_pack_assault = {app_id = "320030", no_install = true},
 			big_bank = {app_id = "306690", no_install = true},
 			hl_miami = {app_id = "323500", no_install = true},
-			hlm_game = {app_id = "219150", no_install = true},
+			hlm_game = {
+				app_id = "219150",
+				no_install = true,
+				external = true
+			},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			pd2_clan = {

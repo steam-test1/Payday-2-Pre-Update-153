@@ -46,6 +46,9 @@ function GenericDialog:set_title(text, no_upper)
 end
 
 function GenericDialog:mouse_moved(o, x, y)
+	if not self._panel_script or not alive(self._panel_script._text_box_buttons_panel) then
+		return false, "arrow"
+	end
 	local used, pointer = self._panel_script:moved_scroll_bar(x, y)
 	if used then
 		return used, pointer

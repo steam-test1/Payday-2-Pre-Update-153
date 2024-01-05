@@ -35,8 +35,8 @@ function CoreUnitDamage:init(unit, default_body_extension_class, body_extension_
 		end
 	end
 	for trigger_name in pairs(self._unit_element:get_trigger_name_map()) do
-		self._trigger_func_list = self._trigger_func_list or {}
-		self._trigger_func_list[trigger_name] = {}
+		self._trigger_data_list = self._trigger_data_list or {}
+		self._trigger_data_list[trigger_name] = {}
 	end
 	self._mover_collision_ignore_duration = mover_collision_ignore_duration
 	body_extension_class_map = body_extension_class_map or {}
@@ -77,12 +77,12 @@ function CoreUnitDamage:init(unit, default_body_extension_class, body_extension_
 	end
 	self._startup_sequence_map = self._unit_element:get_startup_sequence_map(self._unit, self)
 	if self._startup_sequence_map then
-		self._startup_sequence_callback_id = managers.sequence:add_time_callback(callback(self, self, "run_startup_sequences"))
+		self._startup_sequence_callback_id = managers.sequence:add_startup_callback(callback(self, self, "run_startup_sequences"))
 	end
 	if Application:editor() then
 		self._editor_startup_sequence_map = self._unit_element:get_editor_startup_sequence_map(self._unit, self)
 		if self._editor_startup_sequence_map then
-			self._editor_startup_sequence_callback_id = managers.sequence:add_time_callback(callback(self, self, "run_editor_startup_sequences"))
+			self._editor_startup_sequence_callback_id = managers.sequence:add_startup_callback(callback(self, self, "run_editor_startup_sequences"))
 		end
 	end
 end
@@ -562,6 +562,18 @@ function CoreUnitDamage:save(data)
 		changed = true
 		state.queued_sequences = self._queued_sequences
 	end
+	if self._trigger_start_time_list then
+		state.trigger_start_time_list = managers.sequence:safe_save_map(self._trigger_start_time_list)
+		changed = true
+	end
+	if self._startup_sequence_callback_id then
+		state.trigger_startup_sequence_callback = true
+		changed = true
+	end
+	if self._editor_startup_sequence_callback_id then
+		state.trigger_editor_startup_sequence_callback = true
+		changed = true
+	end
 	if changed then
 		data.CoreUnitDamage = state
 	end
@@ -574,14 +586,29 @@ end
 function CoreUnitDamage:load(data)
 	local state = data.CoreUnitDamage
 	if self._startup_sequence_callback_id then
-		managers.sequence:remove_time_callback(self._startup_sequence_callback_id)
-		self:run_startup_sequences()
+		managers.sequence:remove_startup_callback(self._startup_sequence_callback_id)
+		self._startup_sequence_callback_id = nil
 	end
 	if self._editor_startup_sequence_callback_id then
-		managers.sequence:remove_time_callback(self._editor_startup_sequence_callback_id)
-		self:run_editor_startup_sequences()
+		managers.sequence:remove_startup_callback(self._editor_startup_sequence_callback_id)
+		self._editor_startup_sequence_callback_id = nil
+	end
+	if self._trigger_start_time_list then
+		self:set_update_callback("_check_trigger_start_time", nil)
+		self._trigger_start_time_list = nil
 	end
 	if state then
+		if state.trigger_startup_sequence_callback then
+			self._startup_sequence_callback_id = managers.sequence:add_startup_callback(callback(self, self, "run_startup_sequences"))
+		end
+		if state.trigger_editor_startup_sequence_callback then
+			self._editor_startup_sequence_callback_id = managers.sequence:add_startup_callback(callback(self, self, "run_editor_startup_sequences"))
+		end
+		if state.trigger_start_time_list then
+			for _, trigger_data in ipairs(state.trigger_start_time_list) do
+				self:safe_load_trigger_data(trigger_data)
+			end
+		end
 		if state.runned_sequences then
 			self._runned_sequences = table.map_copy(state.runned_sequences)
 		end
@@ -642,8 +669,28 @@ function CoreUnitDamage:load(data)
 	self:_process_sequence_queue()
 end
 
+function CoreUnitDamage:safe_load_trigger_data(trigger_data)
+	local wait_unit_load_map = {}
+	local data = {}
+	local done_callback_func = callback(self, self, "safe_load_trigger_data_done", data)
+	data.trigger_data = managers.sequence:safe_load_map(trigger_data, wait_unit_load_map, done_callback_func)
+	if not next(wait_unit_load_map) then
+		done_callback_func()
+	end
+end
+
+function CoreUnitDamage:safe_load_trigger_data_done(data)
+	if not self._trigger_start_time_list then
+		self._trigger_start_time_list = {}
+		self:set_update_callback("_check_trigger_start_time", true)
+	end
+	managers.sequence:replace_all_loaded_env(data.trigger_data)
+	table.insert(self._trigger_start_time_list, data.trigger_data)
+end
+
 function CoreUnitDamage:run_startup_sequences()
 	local nil_vector = Vector3(0, 0, 0)
+	managers.sequence:remove_startup_callback(self._startup_sequence_callback_id)
 	self._startup_sequence_callback_id = nil
 	for name in pairs(self._startup_sequence_map) do
 		if alive(self._unit) then
@@ -656,6 +703,7 @@ end
 
 function CoreUnitDamage:run_editor_startup_sequences()
 	local nil_vector = Vector3(0, 0, 0)
+	managers.sequence:remove_startup_callback(self._editor_startup_sequence_callback_id)
 	self._editor_startup_sequence_callback_id = nil
 	for name in pairs(self._editor_startup_sequence_map) do
 		if alive(self._unit) then
@@ -666,9 +714,9 @@ function CoreUnitDamage:run_editor_startup_sequences()
 	end
 end
 
-function CoreUnitDamage:remove_trigger_func(trigger_name, id, is_editor)
+function CoreUnitDamage:remove_trigger_data(trigger_name, id, is_editor)
 	if self:verify_trigger_name(trigger_name) then
-		self._trigger_func_list[trigger_name][id] = nil
+		self._trigger_data_list[trigger_name][id] = nil
 		if is_editor then
 			for index, data in ipairs(self._editor_trigger_data) do
 				if data.id == id then
@@ -680,9 +728,9 @@ function CoreUnitDamage:remove_trigger_func(trigger_name, id, is_editor)
 	end
 end
 
-function CoreUnitDamage:clear_trigger_func_list(trigger_name, is_editor)
-	if trigger_name and self._trigger_func_list then
-		self._trigger_func_list[trigger_name] = {}
+function CoreUnitDamage:clear_trigger_data_list(trigger_name, is_editor)
+	if trigger_name and self._trigger_data_list then
+		self._trigger_data_list[trigger_name] = {}
 		if self._editor_trigger_data then
 			for i = #self._editor_trigger_data, 1 do
 				local data = self._editor_trigger_data[i]
@@ -696,13 +744,13 @@ function CoreUnitDamage:clear_trigger_func_list(trigger_name, is_editor)
 	end
 end
 
-function CoreUnitDamage:add_trigger_sequence(trigger_name, notify_unit_sequence, notify_unit, time, repeat_nr, params, is_editor)
+function CoreUnitDamage:add_trigger_sequence(trigger_name, notify_unit_sequence, notify_unit, start_time, repeat_nr, params, is_editor)
 	self._last_trigger_id = (self._last_trigger_id or 0) + 1
-	return self:set_trigger_sequence(self._last_trigger_id, trigger_name, notify_unit_sequence, notify_unit, time, repeat_nr, params, is_editor)
+	return self:set_trigger_sequence(self._last_trigger_id, trigger_name, notify_unit_sequence, notify_unit, start_time, repeat_nr, params, is_editor)
 end
 
 function CoreUnitDamage:set_trigger_sequence_name(id, trigger_name, notify_unit_sequence)
-	if self._trigger_func_list and self._trigger_func_list[trigger_name][id] then
+	if self._trigger_data_list and self._trigger_data_list[trigger_name][id] then
 		for _, data in ipairs(self._editor_trigger_data) do
 			if data.id == id then
 				return self:set_trigger_sequence(id, trigger_name, notify_unit_sequence, data.notify_unit, data.time, data.repeat_nr, data.params, true)
@@ -713,7 +761,7 @@ function CoreUnitDamage:set_trigger_sequence_name(id, trigger_name, notify_unit_
 end
 
 function CoreUnitDamage:set_trigger_sequence_unit(id, trigger_name, notify_unit)
-	if self._trigger_func_list and self._trigger_func_list[trigger_name][id] then
+	if self._trigger_data_list and self._trigger_data_list[trigger_name][id] then
 		for _, data in ipairs(self._editor_trigger_data) do
 			if data.id == id then
 				return self:set_trigger_sequence(id, trigger_name, data.notify_unit_sequence, notify_unit, data.time, data.repeat_nr, data.params, true)
@@ -723,11 +771,11 @@ function CoreUnitDamage:set_trigger_sequence_unit(id, trigger_name, notify_unit)
 	return nil
 end
 
-function CoreUnitDamage:set_trigger_sequence_time(id, trigger_name, time)
-	if self._trigger_func_list and self._trigger_func_list[trigger_name][id] then
+function CoreUnitDamage:set_trigger_sequence_time(id, trigger_name, start_time)
+	if self._trigger_data_list and self._trigger_data_list[trigger_name][id] then
 		for _, data in ipairs(self._editor_trigger_data) do
 			if data.id == id then
-				return self:set_trigger_sequence(id, trigger_name, data.notify_unit_sequence, data.notify_unit, time, data.repeat_nr, data.params, true)
+				return self:set_trigger_sequence(id, trigger_name, data.notify_unit_sequence, data.notify_unit, start_time, data.repeat_nr, data.params, true)
 			end
 		end
 	end
@@ -735,7 +783,7 @@ function CoreUnitDamage:set_trigger_sequence_time(id, trigger_name, time)
 end
 
 function CoreUnitDamage:set_trigger_sequence_repeat_nr(id, trigger_name, repeat_nr)
-	if self._trigger_func_list and self._trigger_func_list[trigger_name][id] then
+	if self._trigger_data_list and self._trigger_data_list[trigger_name][id] then
 		for _, data in ipairs(self._editor_trigger_data) do
 			if data.id == id then
 				return self:set_trigger_sequence(id, trigger_name, data.notify_unit_sequence, data.notify_unit, data.time, repeat_nr, data.params, true)
@@ -746,7 +794,7 @@ function CoreUnitDamage:set_trigger_sequence_repeat_nr(id, trigger_name, repeat_
 end
 
 function CoreUnitDamage:set_trigger_sequence_params(id, trigger_name, params)
-	if self._trigger_func_list and self._trigger_func_list[trigger_name][id] then
+	if self._trigger_data_list and self._trigger_data_list[trigger_name][id] then
 		for _, data in ipairs(self._editor_trigger_data) do
 			if data.id == id then
 				return self:set_trigger_sequence(id, trigger_name, data.notify_unit_sequence, data.notify_unit, data.time, data.repeat_nr, params, true)
@@ -756,34 +804,19 @@ function CoreUnitDamage:set_trigger_sequence_params(id, trigger_name, params)
 	return nil
 end
 
-function CoreUnitDamage:set_trigger_sequence(id, trigger_name, notify_unit_sequence, notify_unit, time, repeat_nr, params, is_editor)
-	local function func(params2)
-		if params2 then
-			if params and getmetatable(params2) ~= CoreSequenceManager.SequenceEnvironment then
-				if getmetatable(params) == CoreSequenceManager.SequenceEnvironment then
-					for k, v in pairs(params2) do
-						params.params[k] = v
-					end
-				else
-					for k, v in pairs(params2) do
-						params[k] = v
-					end
-				end
-			else
-				params = params2
-			end
-		end
-		if getmetatable(params) == CoreSequenceManager.SequenceEnvironment then
-			managers.sequence:run_sequence(notify_unit_sequence, "trigger", self._unit, notify_unit, nil, params.dest_normal, params.pos, params.dir, params.damage, params.velocity, params.params)
-		else
-			managers.sequence:run_sequence_simple3(notify_unit_sequence, "trigger", self._unit, notify_unit, params)
-		end
-	end
-	
+function CoreUnitDamage:set_trigger_sequence(id, trigger_name, notify_unit_sequence, notify_unit, start_time, repeat_nr, params, is_editor)
+	local trigger_data = {}
+	trigger_data.id = id
+	trigger_data.notify_unit_sequence = notify_unit_sequence
+	trigger_data.notify_unit = notify_unit
+	trigger_data.start_time = tonumber(start_time) or 0
+	trigger_data.delay = trigger_data.start_time
+	trigger_data.repeat_nr = tonumber(repeat_nr) or 1
+	trigger_data.params = params
 	if is_editor then
 		local data
 		self._editor_trigger_data = self._editor_trigger_data or {}
-		if self._trigger_func_list and self._trigger_func_list[trigger_name] and self._trigger_func_list[trigger_name][id] then
+		if self._trigger_data_list and self._trigger_data_list[trigger_name] and self._trigger_data_list[trigger_name][id] then
 			for _, data2 in ipairs(self._editor_trigger_data) do
 				if data2.id == id then
 					data = data2
@@ -799,11 +832,15 @@ function CoreUnitDamage:set_trigger_sequence(id, trigger_name, notify_unit_seque
 		data.trigger_name = trigger_name
 		data.notify_unit_sequence = notify_unit_sequence
 		data.notify_unit = notify_unit
-		data.time = time
+		data.time = start_time
 		data.repeat_nr = repeat_nr
 		data.params = params
 	end
-	return self:set_trigger_func(id, trigger_name, func, time, repeat_nr, is_editor)
+	if self:verify_trigger_name(trigger_name) then
+		self._trigger_data_list[trigger_name][id] = trigger_data
+		return id
+	end
+	return nil
 end
 
 function CoreUnitDamage:get_editor_trigger_data()
@@ -811,50 +848,96 @@ function CoreUnitDamage:get_editor_trigger_data()
 		for i = #self._editor_trigger_data, 1, -1 do
 			local data = self._editor_trigger_data[i]
 			if not alive(data.notify_unit) then
-				self:remove_trigger_func(data.trigger_name, data.id, true)
+				self:remove_trigger_data(data.trigger_name, data.id, true)
 			end
 		end
 	end
 	return self._editor_trigger_data
 end
 
-function CoreUnitDamage:add_trigger_func(trigger_name, func, time, repeat_nr, is_editor)
-	self._last_trigger_id = (self._last_trigger_id or 0) + 1
-	return self:set_trigger_func(self._last_trigger_id, trigger_name, func, time, repeat_nr, is_editor)
+function CoreUnitDamage:activate_trigger(trigger_name, params2)
+	if self:verify_trigger_name(trigger_name) then
+		for _, trigger_data in pairs(self._trigger_data_list[trigger_name]) do
+			self:_activate_trigger_data(trigger_data, params2)
+		end
+	end
 end
 
-function CoreUnitDamage:set_trigger_func(id, trigger_name, func, time, repeat_nr, is_editor)
-	if self:verify_trigger_name(trigger_name) then
-		local trigger_func
-		if time then
-			function trigger_func(params2)
-				managers.sequence:add_time_callback(func, time, repeat_nr, params2)
+function CoreUnitDamage:_check_trigger_start_time(unit, t, dt)
+	local remove_trigger_start_time_list
+	for check_index, trigger_data in ipairs(self._trigger_start_time_list) do
+		trigger_data.start_time = trigger_data.start_time - dt
+		if trigger_data.start_time <= 0 then
+			self:_activate_trigger_sequence(trigger_data, trigger_data.params2)
+			if trigger_data.repeat_nr > 1 then
+				trigger_data.start_time = trigger_data.delay
+				trigger_data.repeat_nr = trigger_data.repeat_nr - 1
+			else
+				remove_trigger_start_time_list = remove_trigger_start_time_list or {}
+				table.insert(remove_trigger_start_time_list, check_index)
 			end
-		elseif repeat_nr and 1 < repeat_nr then
-			function trigger_func(params2)
-				for i = 1, repeat_nr do
-					func(params2)
+			if not alive(self._unit) then
+				return
+			end
+		end
+	end
+	if remove_trigger_start_time_list then
+		for i, remove_index in ipairs(remove_trigger_start_time_list) do
+			table.remove(self._trigger_start_time_list, remove_index - i + 1)
+		end
+		if #self._trigger_start_time_list == 0 then
+			self._trigger_start_time_list = nil
+			self:set_update_callback("_check_trigger_start_time", nil)
+		end
+	end
+end
+
+function CoreUnitDamage:_activate_trigger_data(trigger_data, params2)
+	managers.sequence:flush_startup_callbacks()
+	if trigger_data.start_time > 0 then
+		local trigger_data_copy = table.map_copy(trigger_data)
+		trigger_data_copy.params2 = params2
+		if not self._trigger_start_time_list then
+			self._trigger_start_time_list = {}
+			self:set_update_callback("_check_trigger_start_time", true)
+		end
+		table.insert(self._trigger_start_time_list, trigger_data_copy)
+	elseif trigger_data.repeat_nr > 1 then
+		for i = 1, trigger_data.repeat_nr do
+			self:_activate_trigger_sequence(trigger_data, params2)
+		end
+	else
+		self:_activate_trigger_sequence(trigger_data, params2)
+	end
+end
+
+function CoreUnitDamage:_activate_trigger_sequence(trigger_data, params2)
+	if params2 then
+		if trigger_data.params and getmetatable(params2) ~= CoreSequenceManager.SequenceEnvironment then
+			if getmetatable(trigger_data.params) == CoreSequenceManager.SequenceEnvironment then
+				local env = trigger_data.params
+				for k, v in pairs(params2) do
+					env.params[k] = v
+				end
+			else
+				for k, v in pairs(params2) do
+					trigger_data.params[k] = v
 				end
 			end
 		else
-			trigger_func = func
+			trigger_data.params = params2
 		end
-		self._trigger_func_list[trigger_name][id] = trigger_func
-		return id
 	end
-	return nil
-end
-
-function CoreUnitDamage:activate_trigger(trigger_name, params2)
-	if self:verify_trigger_name(trigger_name) then
-		for _, func in pairs(self._trigger_func_list[trigger_name]) do
-			func(params2)
-		end
+	if getmetatable(trigger_data.params) == CoreSequenceManager.SequenceEnvironment then
+		local env = trigger_data.params
+		managers.sequence:run_sequence(trigger_data.notify_unit_sequence, "trigger", self._unit, trigger_data.notify_unit, nil, env.dest_normal, env.pos, env.dir, env.damage, env.velocity, env.params)
+	else
+		managers.sequence:run_sequence_simple3(trigger_data.notify_unit_sequence, "trigger", self._unit, trigger_data.notify_unit, trigger_data.params)
 	end
 end
 
 function CoreUnitDamage:verify_trigger_name(trigger_name)
-	if trigger_name and self._trigger_func_list and self._trigger_func_list[trigger_name] then
+	if trigger_name and self._trigger_data_list and self._trigger_data_list[trigger_name] then
 		return true
 	else
 		Application:error("Trigger \"" .. tostring(trigger_name) .. "\" doesn't exist. Only the following triggers are available: " .. managers.sequence:get_keys_as_string(self._unit_element:get_trigger_name_map(), "[None]", true))
@@ -1400,6 +1483,7 @@ end
 function CoreUnitDamage:set_variable(key, val)
 	self._variables = self._variables or {}
 	self._variables[key] = val
+	return self._variables
 end
 
 function CoreUnitDamage:anim_clbk_set_sequence_block_state(unit, state)

@@ -706,7 +706,7 @@ end
 
 function AiLayer:_init_ai_settings()
 	self._ai_settings = {}
-	self._ai_settings.group_state = "empty"
+	self._ai_settings.group_state = "besiege"
 	managers.groupai:set_state(self._ai_settings.group_state)
 end
 

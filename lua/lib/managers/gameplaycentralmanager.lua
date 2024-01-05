@@ -540,7 +540,7 @@ function GamePlayCentralManager:_flush_queue_fire_raycast()
 	end
 end
 
-function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades)
+function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades, use_trip_mine_upgrades)
 	self._auto_highlighted_enemies = self._auto_highlighted_enemies or {}
 	if self._auto_highlighted_enemies[unit:key()] and self._auto_highlighted_enemies[unit:key()] > Application:time() then
 		return false
@@ -549,8 +549,14 @@ function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades)
 	if not unit:contour() then
 		debug_pause_unit(unit, "[GamePlayCentralManager:auto_highlight_enemy]: Unit doesn't have Contour Extension")
 	end
-	local contour_type = use_player_upgrades and managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy"
-	local time_multiplier = use_player_upgrades and managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1) or 1
+	local contour_type = "mark_enemy"
+	local time_multiplier = 1
+	if use_player_upgrades then
+		contour_type = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
+		time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
+	else
+		contour_type = use_trip_mine_upgrades and managers.player:has_category_upgrade("trip_mine", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
+	end
 	unit:contour():add(contour_type, true, time_multiplier)
 	return true
 end

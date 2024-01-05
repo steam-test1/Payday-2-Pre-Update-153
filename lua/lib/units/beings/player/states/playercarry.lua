@@ -27,7 +27,8 @@ function PlayerCarry:_enter(enter_data)
 		if not self._state_data.mask_equipped then
 			self._state_data.mask_equipped = true
 			local equipped_mask = managers.blackmarket:equipped_mask()
-			local equipped_mask_type = tweak_data.blackmarket.masks[equipped_mask.mask_id].type
+			local mask_id = managers.blackmarket:get_real_mask_id(equipped_mask.mask_id)
+			local equipped_mask_type = tweak_data.blackmarket.masks[mask_id].type
 			if not equipped_mask_type then
 				self._camera_unit:anim_state_machine():set_global("mask_equip", 1)
 			elseif equipped_mask_type == "glasses" then
@@ -100,6 +101,7 @@ function PlayerCarry:_update_check_actions(t, dt)
 	self:_update_equip_weapon_timers(t, input)
 	self:_update_running_timers(t)
 	self:_update_zipline_timers(t, dt)
+	self:_update_steelsight_timers(t, dt)
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
 	elseif input.btn_stats_screen_release then

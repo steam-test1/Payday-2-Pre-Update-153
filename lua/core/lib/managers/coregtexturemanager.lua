@@ -90,6 +90,8 @@ end
 
 function GTextureManager:_retrieve()
 	self:_unretrieve()
-	self._texture = TextureCache:retrieve(self._texture_name, self._texture_type)
-	GlobalTextureManager:set_texture("current_global_texture", self._texture)
+	if self._texture_name and self._texture_name ~= "" then
+		self._texture = TextureCache:retrieve(self._texture_name, self._texture_type)
+		GlobalTextureManager:set_texture("current_global_texture", self._texture)
+	end
 end

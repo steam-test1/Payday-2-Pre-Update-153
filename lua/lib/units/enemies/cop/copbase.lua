@@ -105,6 +105,8 @@ do
 		"ene_fbi_1",
 		"ene_fbi_2",
 		"ene_fbi_3",
+		"ene_fbi_female_1",
+		"ene_fbi_female_2",
 		"ene_fbi_heavy_1",
 		"ene_fbi_office_1",
 		"ene_fbi_office_2",

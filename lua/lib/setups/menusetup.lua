@@ -62,6 +62,7 @@ end
 
 function MenuSetup:gather_packages_to_unload()
 	Setup.unload_packages(self)
+	self._started_unloading_packages = true
 	self._packages_to_unload = self._packages_to_unload or {}
 	if not Global.load_start_menu then
 		if PackageManager:loaded("packages/start_menu") then

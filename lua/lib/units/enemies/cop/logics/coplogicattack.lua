@@ -83,6 +83,9 @@ function CopLogicAttack.update(data)
 	if CopLogicIdle._chk_relocate(data) then
 		return
 	end
+	if CopLogicAttack._chk_exit_non_walkable_area(data) then
+		return
+	end
 	CopLogicAttack._process_pathing_results(data, my_data)
 	if not data.attention_obj or data.attention_obj.reaction < AIAttentionObject.REACT_AIM then
 		CopLogicAttack._upd_enemy_detection(data, true)
@@ -95,7 +98,7 @@ function CopLogicAttack.update(data)
 		CopLogicAttack._update_cover(data)
 		CopLogicAttack._upd_combat_movement(data)
 	end
-	if data.is_converted and (not data.objective or data.objective.type == "free") and (not data.path_fail_t or data.t - data.path_fail_t > 6) then
+	if data.team.id == "criminal1" and (not data.objective or data.objective.type == "free") and (not data.path_fail_t or data.t - data.path_fail_t > 6) then
 		managers.groupai:state():on_criminal_jobless(data.unit)
 		if my_data ~= data.internal_data then
 			return
@@ -1324,5 +1327,24 @@ function CopLogicAttack._upd_pose(data, my_data)
 		end
 	elseif (not (unit_can_crouch and (not (my_data.cover_test_step > 2) or crouch_objective)) or stand_objective) and data.unit:anim_data().crouch and unit_can_stand then
 		return CopLogicAttack._chk_request_action_stand(data)
+	end
+end
+
+function CopLogicAttack._chk_exit_non_walkable_area(data)
+	local my_data = data.internal_data
+	if not (not my_data.advancing and CopLogicAttack._can_move(data)) or data.unit:movement():chk_action_forbidden("walk") then
+		return
+	end
+	local my_tracker = data.unit:movement():nav_tracker()
+	if not my_tracker:obstructed() then
+		return
+	end
+	if data.objective and data.objective.nav_seg then
+		local nav_seg_id = my_tracker:nav_segment()
+		if not managers.navigation._nav_segments[nav_seg_id].disabled then
+			data.objective.in_place = nil
+			data.logic.on_new_objective(data, data.objective)
+			return true
+		end
 	end
 end

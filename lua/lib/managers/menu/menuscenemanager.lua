@@ -1,4 +1,5 @@
 local ids_unit = Idstring("unit")
+local sky_orientation_data_key = Idstring("sky_orientation/rotation"):key()
 MenuSceneManager = MenuSceneManager or class()
 
 function MenuSceneManager:init()
@@ -40,9 +41,6 @@ function MenuSceneManager:init()
 	self._global_poses.snp = {
 		"husk_bullpup"
 	}
-	self._global_poses.lmg = {
-		"husk_bullpup"
-	}
 	self._global_poses.infamous = {
 		"husk_infamous1",
 		"husk_infamous2"
@@ -56,6 +54,10 @@ function MenuSceneManager:init()
 	self._global_poses.m95 = {"husk_m95"}
 	self._global_poses.r93 = {"husk_r93"}
 	self._global_poses.huntsman = {
+		"husk_mosconi",
+		"husk_bullpup"
+	}
+	self._global_poses.gre_m79 = {
 		"husk_mosconi"
 	}
 	self._mask_units = {}
@@ -345,9 +347,6 @@ function MenuSceneManager:update(t, dt)
 		for _, light in ipairs(self._active_lights) do
 			light:set_multiplier(0.8)
 		end
-	end
-	if alive(self._vp) then
-		self._vp:feed_params()
 	end
 end
 
@@ -669,6 +668,7 @@ function MenuSceneManager:set_lobby_character_out_fit(i, outfit_string, rank)
 end
 
 function MenuSceneManager:set_character_mask_by_id(mask_id, blueprint, unit, peer_id)
+	mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id)
 	local unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id)
 	self:set_character_mask(unit_name, unit, peer_id, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
 end
@@ -1023,9 +1023,9 @@ function MenuSceneManager:setup_camera()
 	self:_set_dimensions()
 	self._shaker:play("breathing", 0.2)
 	self._resolution_changed_callback_id = managers.viewport:add_resolution_changed_func(callback(self, self, "_resolution_changed"))
-	self._environment_modifier_id = managers.viewport:viewports()[1]:create_environment_modifier(false, function(interface)
-		return self:_sky_rotation_modifier(interface)
-	end, "sky_orientation")
+	self._environment_modifier_id = managers.viewport:viewports()[1]:create_environment_modifier(sky_orientation_data_key, true, function()
+		return self:_sky_rotation_modifier()
+	end)
 end
 
 function MenuSceneManager:_resolution_changed()
@@ -1255,6 +1255,9 @@ function MenuSceneManager:remove_item()
 					end
 				end
 			end
+			if alive(self._item_unit.second_unit) then
+				World:delete_unit(self._item_unit.second_unit)
+			end
 			World:delete_unit(self._item_unit.unit)
 		end
 		if managers.dyn_resource:has_resource(ids_unit, self._item_unit.name, DynamicResourceManager.DYN_RESOURCES_PACKAGE) then
@@ -1333,26 +1336,33 @@ function MenuSceneManager:spawn_item_weapon(factory_id, blueprint, texture_switc
 	local factory_weapon = tweak_data.weapon.factory[factory_id]
 	local ids_unit_name = Idstring(factory_weapon.unit)
 	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
-	self._item_pos = Vector3(0, 0, 0)
+	self._item_pos = Vector3(0, 0, 200)
 	mrotation.set_zero(self._item_rot_mod)
 	self._item_yaw = 0
 	self._item_pitch = 0
 	self._item_roll = 0
 	mrotation.set_zero(self._item_rot)
-	local new_unit = World:spawn_unit(ids_unit_name, self._item_pos, self._item_rot)
-	new_unit:base():set_factory_data(factory_id)
-	new_unit:base():set_texture_switches(texture_switches)
-	if blueprint then
-		new_unit:base():assemble_from_blueprint(factory_id, blueprint, true)
-	else
-		new_unit:base():assemble(factory_id, true)
+	
+	local function spawn_weapon(pos, rot)
+		local w_unit = World:spawn_unit(ids_unit_name, pos, rot)
+		w_unit:base():set_factory_data(factory_id)
+		w_unit:base():set_texture_switches(texture_switches)
+		if blueprint then
+			w_unit:base():assemble_from_blueprint(factory_id, blueprint, true)
+		else
+			w_unit:base():assemble(factory_id, true)
+		end
+		return w_unit
 	end
-	self:_set_item_unit(new_unit)
+	
+	local new_unit = spawn_weapon(self._item_pos, self._item_rot)
+	local second_unit
+	self:_set_item_unit(new_unit, nil, nil, nil, second_unit)
 	mrotation.set_yaw_pitch_roll(self._item_rot_mod, -90, 0, 0)
 	return new_unit
 end
 
-function MenuSceneManager:_set_item_unit(unit, oobb_object, max_mod, type)
+function MenuSceneManager:_set_item_unit(unit, oobb_object, max_mod, type, second_unit)
 	self:remove_item()
 	self._current_weapon_id = nil
 	local scene_template = type == "mask" and self._scene_templates.blackmarket_mask or self._scene_templates.blackmarket_item
@@ -1364,7 +1374,8 @@ function MenuSceneManager:_set_item_unit(unit, oobb_object, max_mod, type)
 	mrotation.multiply(self._item_rot, self._item_rot_mod)
 	self._item_unit = {
 		unit = unit,
-		name = unit:name()
+		name = unit:name(),
+		second_unit = second_unit
 	}
 	unit:set_position(self._item_pos)
 	unit:set_rotation(self._item_rot)
@@ -1429,6 +1440,9 @@ end
 
 function MenuSceneManager:_set_item_offset(oobb, instant)
 	local center = oobb:center()
+	if self._item_unit.second_unit then
+		center = math.lerp(self._item_unit.second_unit:oobb():center(), oobb:center(), 0.5)
+	end
 	local offset = (self._item_unit.unit:orientation_object():position() - center):rotate_with(self._item_rot:inverse())
 	self._weapon_transition_time = self._weapon_transition_time and (self._weapon_transition_time == 1 and 0 or 1 - self._weapon_transition_time) or 0
 	if instant then

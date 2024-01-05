@@ -344,8 +344,8 @@ function UnitNetworkHandler:to_server_access_camera_trigger(id, trigger, instiga
 	managers.mission:to_server_access_camera_trigger(id, trigger, instigator)
 end
 
-function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, normal_pitch, position, direction_yaw, direction_pitch, damage)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, normal_pitch, position, direction_yaw, direction_pitch, damage, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
 	if not alive(body) then
@@ -373,8 +373,8 @@ function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, 
 	body:extension().damage:damage_damage(attacker, normal, position, direction, damage / 163.84)
 end
 
-function UnitNetworkHandler:sync_body_damage_lock(body, damage)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+function UnitNetworkHandler:sync_body_damage_lock(body, damage, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
 	if not alive(body) then
@@ -395,8 +395,8 @@ function UnitNetworkHandler:sync_body_damage_lock(body, damage)
 	body:extension().damage:damage_lock(nil, nil, nil, nil, damage)
 end
 
-function UnitNetworkHandler:sync_body_damage_explosion(body, attacker, normal, position, direction, damage)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+function UnitNetworkHandler:sync_body_damage_explosion(body, attacker, normal, position, direction, damage, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
 	if not alive(body) then
@@ -418,12 +418,12 @@ function UnitNetworkHandler:sync_body_damage_explosion(body, attacker, normal, p
 	body:extension().damage:damage_damage(attacker, normal, position, direction, damage / 163.84)
 end
 
-function UnitNetworkHandler:sync_body_damage_explosion_no_attacker(body, normal, position, direction, damage)
-	self:sync_body_damage_explosion(body, nil, normal, position, direction, damage)
+function UnitNetworkHandler:sync_body_damage_explosion_no_attacker(body, normal, position, direction, damage, sender)
+	self:sync_body_damage_explosion(body, nil, normal, position, direction, damage, sender)
 end
 
-function UnitNetworkHandler:sync_body_damage_melee(body, attacker, normal, position, direction, damage)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+function UnitNetworkHandler:sync_body_damage_melee(body, attacker, normal, position, direction, damage, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
 	if not alive(body) then
@@ -818,13 +818,16 @@ function UnitNetworkHandler:alert(alerted_unit, aggressor)
 	})
 end
 
-function UnitNetworkHandler:revive_player(revive_health_level, sender)
+function UnitNetworkHandler:revive_player(revive_health_level, revive_damage_reduction, sender)
 	local peer = self._verify_sender(sender)
 	if not self._verify_gamestate(self._gamestate_filter.need_revive) or not peer then
 		return
 	end
 	if 0 < revive_health_level then
 		managers.player:player_unit():character_damage():set_revive_boost(revive_health_level)
+	end
+	if 0 < revive_damage_reduction then
+		managers.player:activate_temporary_upgrade_by_level("temporary", "passive_revive_damage_reduction", revive_damage_reduction)
 	end
 	managers.player:player_unit():character_damage():revive()
 end
@@ -1057,6 +1060,7 @@ function UnitNetworkHandler:from_server_sentry_gun_place_result(owner_peer_id, e
 		end
 		return
 	end
+	sentry_gun_unit:base():set_owner_id(owner_peer_id)
 	if owner_peer_id == managers.network:session():local_peer():id() and alive(Global.local_member:unit()) then
 		managers.player:from_server_equipment_place_result(equipment_selection_index, Global.local_member:unit())
 	end
@@ -1118,7 +1122,8 @@ function UnitNetworkHandler:place_deployable_bag(class_name, pos, rot, upgrade_l
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	if not managers.player:verify_equipment(peer:id(), class_name == "AmmoBagBase" and "ammo_bag" or class_name == "DoctorBagBase" and "doctor_bag") then
+	local class_name_to_deployable_id = tweak_data.equipments.class_name_to_deployable_id
+	if not managers.player:verify_equipment(peer:id(), class_name_to_deployable_id[class_name]) then
 		return
 	end
 	local class = CoreSerialize.string_to_classtable(class_name)
@@ -1126,6 +1131,14 @@ function UnitNetworkHandler:place_deployable_bag(class_name, pos, rot, upgrade_l
 		local unit = class.spawn(pos, rot, upgrade_lvl, peer:id())
 		unit:base():set_server_information(peer:id())
 	end
+end
+
+function UnitNetworkHandler:used_deployable(rpc)
+	local peer = self._verify_sender(rpc)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	peer:set_used_deployable(true)
 end
 
 function UnitNetworkHandler:sync_doctor_bag_taken(unit, amount, sender)
@@ -1484,11 +1497,11 @@ function UnitNetworkHandler:server_secure_loot(carry_id, multiplier_level, sende
 	managers.loot:server_secure_loot(carry_id, multiplier_level)
 end
 
-function UnitNetworkHandler:sync_secure_loot(carry_id, carry_multiplier, silent, sender)
+function UnitNetworkHandler:sync_secure_loot(carry_id, multiplier_level, silent, sender)
 	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) or self._verify_gamestate(self._gamestate_filter.any_end_game)) or not self._verify_sender(sender) then
 		return
 	end
-	managers.loot:sync_secure_loot(carry_id, carry_multiplier, silent)
+	managers.loot:sync_secure_loot(carry_id, multiplier_level, silent)
 end
 
 function UnitNetworkHandler:sync_small_loot_taken(unit, multiplier_level, sender)
@@ -1923,12 +1936,17 @@ function UnitNetworkHandler:group_ai_event(event_id, blame_id, sender)
 	managers.groupai:state():sync_event(event_id, blame_id)
 end
 
-function UnitNetworkHandler:start_timespeed_effect(effect_id, timer_name, speed, fade_in, sustain, fade_out, sender)
+function UnitNetworkHandler:start_timespeed_effect(effect_id, timer_name, affect_timer_names_str, speed, fade_in, sustain, fade_out, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
+	local affect_timer_names
+	if affect_timer_names_str ~= "" then
+		affect_timer_names = string.split(affect_timer_names_str, ";")
+	end
 	local effect_desc = {
 		timer = timer_name,
+		affect_timer = affect_timer_names,
 		speed = speed,
 		fade_in = fade_in,
 		sustain = sustain,
@@ -1976,8 +1994,16 @@ function UnitNetworkHandler:suppression(unit, ratio, sender)
 		return
 	end
 	local amount_max = (sup_tweak.brown_point or sup_tweak.react_point)[2]
-	local amount = 0 < amount_max and amount_max * ratio / 15 or "max"
-	unit:character_damage():build_suppression(amount)
+	local amount, panic_chance
+	if ratio == 16 then
+		amount = "max"
+		panic_chance = -1
+	elseif ratio == 15 then
+		amount = "max"
+	else
+		amount = 0 < amount_max and amount_max * ratio / 15 or "max"
+	end
+	unit:character_damage():build_suppression(amount, panic_chance)
 end
 
 function UnitNetworkHandler:suppressed_state(unit, state, sender)

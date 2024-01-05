@@ -454,7 +454,7 @@ function CharacterTweakData:_init_mobster_boss(presets)
 	self:_process_weapon_usage_table(self.mobster_boss.weapon)
 	self.mobster_boss.detection = presets.detection.normal
 	self.mobster_boss.HEALTH_INIT = 350
-	self.mobster_boss.headshot_dmg_mul = 4
+	self.mobster_boss.headshot_dmg_mul = 2
 	self.mobster_boss.damage.explosion_damage_mul = 1
 	self.mobster_boss.move_speed = presets.move_speed.very_slow
 	self.mobster_boss.allowed_poses = {stand = true}
@@ -1148,7 +1148,7 @@ function CharacterTweakData:_init_german(presets)
 	self.german.crouch_move = false
 	self.german.speech_prefix = "rb2"
 	self.german.weapon_voice = "2"
-	self.german.access = "teamAI2"
+	self.german.access = "teamAI1"
 	self.german.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
@@ -1169,7 +1169,7 @@ function CharacterTweakData:_init_spanish(presets)
 	self.spanish.crouch_move = false
 	self.spanish.speech_prefix = "rb2"
 	self.spanish.weapon_voice = "3"
-	self.spanish.access = "teamAI3"
+	self.spanish.access = "teamAI1"
 	self.spanish.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
@@ -1190,7 +1190,7 @@ function CharacterTweakData:_init_american(presets)
 	self.american.crouch_move = false
 	self.american.speech_prefix = "rb2"
 	self.american.weapon_voice = "3"
-	self.american.access = "teamAI4"
+	self.american.access = "teamAI1"
 	self.american.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
@@ -4682,22 +4682,26 @@ function CharacterTweakData:_presets(tweak_data)
 		easy = {
 			duration = {10, 15},
 			react_point = {0, 2},
-			brown_point = {3, 5}
+			brown_point = {3, 5},
+			panic_chance_mul = 1
 		},
 		hard_def = {
 			duration = {5, 10},
 			react_point = {0, 2},
-			brown_point = {5, 6}
+			brown_point = {5, 6},
+			panic_chance_mul = 0.7
 		},
 		hard_agg = {
 			duration = {5, 8},
 			react_point = {2, 5},
-			brown_point = {5, 6}
+			brown_point = {5, 6},
+			panic_chance_mul = 0.7
 		},
 		no_supress = {
 			duration = {0.1, 0.15},
 			react_point = {100, 200},
-			brown_point = {400, 500}
+			brown_point = {400, 500},
+			panic_chance_mul = 0
 		}
 	}
 	presets.enemy_chatter = {

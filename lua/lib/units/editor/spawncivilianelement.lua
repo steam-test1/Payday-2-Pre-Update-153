@@ -167,6 +167,14 @@ function SpawnCivilianUnitElement:add_to_mission_package()
 	end
 end
 
+function SpawnCivilianUnitElement:_resolve_team(unit)
+	if self._hed.team == "default" then
+		return tweak_data.levels:get_default_team_ID("non_combatant")
+	else
+		return self._hed.team
+	end
+end
+
 function SpawnCivilianUnitElement:destroy(...)
 	SpawnCivilianUnitElement.super.destroy(self, ...)
 	self:stop_test_element()

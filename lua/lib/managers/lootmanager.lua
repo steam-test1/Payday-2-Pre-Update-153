@@ -93,20 +93,21 @@ function LootManager:on_job_deactivated()
 	self:clear()
 end
 
-function LootManager:secure(carry_id, multiplier, silent)
+function LootManager:secure(carry_id, multiplier_level, silent)
 	if Network:is_server() then
-		self:server_secure_loot(carry_id, multiplier, silent)
+		self:server_secure_loot(carry_id, multiplier_level, silent)
 	else
-		managers.network:session():send_to_host("server_secure_loot", carry_id, multiplier)
+		managers.network:session():send_to_host("server_secure_loot", carry_id, multiplier_level)
 	end
 end
 
-function LootManager:server_secure_loot(carry_id, multiplier, silent)
-	managers.network:session():send_to_peers_synched("sync_secure_loot", carry_id, multiplier, silent)
-	self:sync_secure_loot(carry_id, multiplier, silent)
+function LootManager:server_secure_loot(carry_id, multiplier_level, silent)
+	managers.network:session():send_to_peers_synched("sync_secure_loot", carry_id, multiplier_level, silent)
+	self:sync_secure_loot(carry_id, multiplier_level, silent)
 end
 
-function LootManager:sync_secure_loot(carry_id, multiplier, silent)
+function LootManager:sync_secure_loot(carry_id, multiplier_level, silent)
+	local multiplier = tweak_data.carry.small_loot[carry_id] and managers.player:upgrade_value_by_level("player", "small_loot_multiplier", multiplier_level, 1) or 1
 	table.insert(self._global.secured, {carry_id = carry_id, multiplier = multiplier})
 	managers.hud:loot_value_updated()
 	self:_check_triggers("amount")
@@ -120,8 +121,8 @@ function LootManager:sync_secure_loot(carry_id, multiplier, silent)
 	end
 end
 
-function LootManager:secure_small_loot(type, multiplier)
-	self:secure(type, multiplier)
+function LootManager:secure_small_loot(type, multiplier_level)
+	self:secure(type, multiplier_level)
 end
 
 function LootManager:show_small_loot_taken_hint(type, multiplier)

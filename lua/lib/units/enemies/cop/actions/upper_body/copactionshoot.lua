@@ -360,7 +360,7 @@ function CopActionShoot:update(t)
 		end
 		if shoot then
 			local melee
-			if autotarget and target_dis < 130 and self._w_usage_tweak.melee_speed and t > self._melee_timeout_t then
+			if autotarget and (not self._common_data.melee_countered_t or t - self._common_data.melee_countered_t > 15) and target_dis < 130 and self._w_usage_tweak.melee_speed and t > self._melee_timeout_t then
 				melee = self:_chk_start_melee(target_vec, target_dis, autotarget, target_pos)
 			end
 			if not melee then
@@ -734,5 +734,22 @@ function CopActionShoot:anim_clbk_melee_strike()
 		}
 	}
 	local defense_data = self._attention.unit:character_damage():damage_melee(action_data)
-	self._common_data.unit:sound():play("melee_hit_body", nil, nil)
+	if defense_data == "countered" then
+		self._common_data.melee_countered_t = TimerManager:game():time()
+		local action_data = {
+			variant = "counter_spooc",
+			damage = 0,
+			damage_effect = 1,
+			attacker_unit = self._strike_unit,
+			col_ray = {
+				body = self._unit:body("body"),
+				position = self._common_data.pos + math.UP * 100
+			},
+			attack_dir = -1 * target_vec:normalized()
+		}
+		self._unit:character_damage():damage_melee(action_data)
+		return
+	elseif defense_data then
+		self._common_data.unit:sound():play("melee_hit_body", nil, nil)
+	end
 end

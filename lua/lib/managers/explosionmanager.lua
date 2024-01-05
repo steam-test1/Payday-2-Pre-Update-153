@@ -389,13 +389,16 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 		local material_name, _, _ = World:pick_decal_material(ray.unit, decal_ray_from, decal_ray_to, slotmask_world_geometry)
 		sound_switch_name = material_name ~= empty_idstr and material_name
 	end
-	local sound_source = SoundDevice:create_source("ExplosionManager")
-	sound_source:set_position(position)
-	if sound_switch_name then
-		sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
+	sound_event = sound_event or "trip_mine_explode"
+	if sound_event ~= "no_sound" then
+		local sound_source = SoundDevice:create_source("ExplosionManager")
+		sound_source:set_position(position)
+		if sound_switch_name then
+			sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
+		end
+		sound_source:post_event(sound_event)
+		managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
 	end
-	sound_source:post_event(sound_event or "trip_mine_explode")
-	managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
 	self:project_decal(ray, decal_ray_from, decal_ray_to, on_unit and ray and ray.unit, idstr_decal, idstr_effect)
 end
 

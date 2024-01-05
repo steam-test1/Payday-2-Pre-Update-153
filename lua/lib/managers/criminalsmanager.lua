@@ -99,12 +99,12 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 			data.peer_id = peer_id
 			data.data.ai = ai or false
 			data.data.mask_obj = tweak_data.blackmarket.masks[data.static_data.ai_mask_id].unit
-			data.data.mask_id = nil
+			data.data.mask_id = data.static_data.ai_mask_id
 			data.data.mask_blueprint = nil
 			if not ai and unit then
 				local mask_id = managers.network:session():peer(peer_id):mask_id()
 				data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id)
-				data.data.mask_id = mask_id
+				data.data.mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id)
 				data.data.mask_blueprint = managers.network:session():peer(peer_id):mask_blueprint()
 			end
 			managers.hud:remove_mugshot_by_character_name(name)
@@ -138,12 +138,12 @@ function CriminalsManager:set_unit(name, unit)
 			managers.hud:remove_mugshot_by_character_name(data.name)
 			data.data.mugshot_id = managers.hud:add_mugshot_by_unit(unit)
 			data.data.mask_obj = tweak_data.blackmarket.masks[data.static_data.ai_mask_id].unit
-			data.data.mask_id = nil
+			data.data.mask_id = data.static_data.ai_mask_id
 			data.data.mask_blueprint = nil
 			if not data.data.ai then
 				local mask_id = managers.network:session():peer(data.peer_id):mask_id()
 				data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, data.peer_id)
-				data.data.mask_id = mask_id
+				data.data.mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id)
 				data.data.mask_blueprint = managers.network:session():peer(data.peer_id):mask_blueprint()
 			end
 			if unit:base().is_local_player then

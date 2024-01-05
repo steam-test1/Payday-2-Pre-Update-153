@@ -90,7 +90,7 @@ function CopDamage:damage_bullet(attack_data)
 		return
 	end
 	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
-		return
+		return "friendly_fire"
 	end
 	if self._has_plate and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name then
 		local armor_pierce_roll = math.rand(1)
@@ -317,6 +317,18 @@ function CopDamage:_type_gangster(type)
 	return type == "gangster"
 end
 
+function CopDamage.is_civilian(type)
+	return type == "civilian" or type == "civilian_female" or type == "bank_manager"
+end
+
+function CopDamage.is_gangster(type)
+	return type == "gangster" or type == "biker_escape" or type == "mobster" or type == "mobster_boss"
+end
+
+function CopDamage.is_cop(type)
+	return not CopDamage.is_civilian(type) and not CopDamage.is_gangster(type)
+end
+
 function CopDamage:_show_death_hint(type)
 	if not self:_type_civilian(type) or not self._unit:base().enemy then
 	end
@@ -357,7 +369,7 @@ function CopDamage:damage_explosion(attack_data)
 	if attack_data.attacker_unit == managers.player:player_unit() then
 		local critical_hit, crit_damage = self:roll_critical_hit(damage)
 		damage = crit_damage
-		if attack_data.weapon_unit then
+		if attack_data.weapon_unit and attack_data.variant ~= "stun" then
 			if critical_hit then
 				managers.hud:on_crit_confirmed()
 			else
@@ -456,12 +468,11 @@ function CopDamage:roll_critical_hit(damage)
 end
 
 function CopDamage:damage_melee(attack_data)
-	print(attack_data.attacker_unit, managers.player:player_unit())
 	if self._dead or self._invulnerable then
 		return
 	end
 	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
-		return
+		return "friendly_fire"
 	end
 	local result
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
@@ -500,7 +511,7 @@ function CopDamage:damage_melee(attack_data)
 		damage_effect = math.clamp(damage_effect, self._HEALTH_INIT_PRECENT, self._HEALTH_INIT)
 		damage_effect_percent = math.ceil(damage_effect / self._HEALTH_INIT_PRECENT)
 		damage_effect_percent = math.clamp(damage_effect_percent, 1, self._HEALTH_GRANULARITY)
-		local result_type = attack_data.shield_knock and self._char_tweak.damage.shield_knocked and "shield_knock" or attack_data.variant == "counter_tased" and "counter_tased" or self:get_damage_type(damage_effect_percent, "melee")
+		local result_type = attack_data.shield_knock and self._char_tweak.damage.shield_knocked and "shield_knock" or attack_data.variant == "counter_tased" and "counter_tased" or attack_data.variant == "counter_spooc" and "expl_hurt" or self:get_damage_type(damage_effect_percent, "melee")
 		result = {
 			type = result_type,
 			variant = attack_data.variant
@@ -543,7 +554,7 @@ function CopDamage:damage_melee(attack_data)
 					diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 					health_pass = not achievement_data.health or health_ratio <= achievement_data.health
 					level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
-					job_pass = not achievement_data.job_id or managers.job:current_job_id() == achievement_data.job_id
+					job_pass = not achievement_data.job_id or managers.job:current_real_job_id() == achievement_data.job_id
 					cop_pass = not achievement_data.is_cop or is_cop
 					gangster_pass = not achievement_data.is_gangster or is_gangster
 					civilian_pass = not achievement_data.is_civlian or is_civlian
@@ -583,6 +594,8 @@ function CopDamage:damage_melee(attack_data)
 		variant = 1
 	elseif result.type == "counter_tased" then
 		variant = 2
+	elseif result.type == "expl_hurt" then
+		variant = 4
 	elseif snatch_pager then
 		variant = 3
 	else
@@ -932,7 +945,7 @@ function CopDamage:sync_damage_melee(attacker_unit, damage_percent, damage_effec
 		}
 		managers.statistics:killed_by_anyone(data)
 	else
-		local result_type = variant == 1 and "shield_knock" or variant == 2 and "counter_tased" or self:get_damage_type(damage_effect_percent, "bullet")
+		local result_type = variant == 1 and "shield_knock" or variant == 2 and "counter_tased" or variant == 4 and "expl_hurt" or self:get_damage_type(damage_effect_percent, "bullet")
 		result = {type = result_type, variant = "melee"}
 		self._health = self._health - damage
 		self._health_ratio = self._health / self._HEALTH_INIT
@@ -989,7 +1002,7 @@ function CopDamage:sync_death(damage)
 end
 
 function CopDamage:_on_damage_received(damage_info)
-	self:build_suppression("max")
+	self:build_suppression("max", nil)
 	self:_call_listeners(damage_info)
 	if damage_info.result.type == "death" then
 		managers.enemy:on_enemy_died(self._unit, damage_info)
@@ -1046,36 +1059,49 @@ function CopDamage:set_invulnerable(state)
 	end
 end
 
-function CopDamage:build_suppression(amount)
+function CopDamage:build_suppression(amount, panic_chance)
 	if self._dead or not self._char_tweak.suppression then
 		return
 	end
 	local t = TimerManager:game():time()
 	local sup_tweak = self._char_tweak.suppression
-	if amount == "max" then
-		amount = (sup_tweak.brown_point or sup_tweak.react_point)[2]
+	if panic_chance and (panic_chance == -1 or 0 < panic_chance and 0 < sup_tweak.panic_chance_mul and math.random() < panic_chance * sup_tweak.panic_chance_mul) then
+		amount = "panic"
+	end
+	local amount_val
+	if amount == "max" or amount == "panic" then
+		amount_val = (sup_tweak.brown_point or sup_tweak.react_point)[2]
 	elseif Network:is_server() and self._suppression_hardness_t and t < self._suppression_hardness_t then
-		amount = amount * 0.5
+		amount_val = amount * 0.5
+	else
+		amount_val = amount
 	end
 	if not Network:is_server() then
-		local sync_amount_ratio
-		if sup_tweak.brown_point then
-			if sup_tweak.brown_point[2] <= 0 then
+		local sync_amount
+		if amount == "panic" then
+			sync_amount = 16
+		elseif amount == "max" then
+			sync_amount = 15
+		else
+			local sync_amount_ratio
+			if sup_tweak.brown_point then
+				if 0 >= sup_tweak.brown_point[2] then
+					sync_amount_ratio = 1
+				else
+					sync_amount_ratio = amount_val / sup_tweak.brown_point[2]
+				end
+			elseif 0 >= sup_tweak.react_point[2] then
 				sync_amount_ratio = 1
 			else
-				sync_amount_ratio = amount / sup_tweak.brown_point[2]
+				sync_amount_ratio = amount_val / sup_tweak.react_point[2]
 			end
-		elseif sup_tweak.react_point[2] <= 0 then
-			sync_amount_ratio = 1
-		else
-			sync_amount_ratio = amount / sup_tweak.react_point[2]
+			sync_amount = math.clamp(math.ceil(sync_amount_ratio * 15), 1, 15)
 		end
-		local sync_amount = math.min(15, math.ceil(sync_amount_ratio * 15))
 		managers.network:session():send_to_host("suppression", self._unit, sync_amount)
 		return
 	end
 	if self._suppression_data then
-		self._suppression_data.value = math.min(self._suppression_data.brown_point or self._suppression_data.react_point, self._suppression_data.value + amount)
+		self._suppression_data.value = math.min(self._suppression_data.brown_point or self._suppression_data.react_point, self._suppression_data.value + amount_val)
 		self._suppression_data.last_build_t = t
 		self._suppression_data.decay_t = t + self._suppression_data.duration
 		managers.enemy:reschedule_delayed_clbk(self._suppression_data.decay_clbk_id, self._suppression_data.decay_t)
@@ -1083,7 +1109,7 @@ function CopDamage:build_suppression(amount)
 		local duration = math.lerp(sup_tweak.duration[1], sup_tweak.duration[2], math.random())
 		local decay_t = t + duration
 		self._suppression_data = {
-			value = amount,
+			value = amount_val,
 			last_build_t = t,
 			decay_t = decay_t,
 			duration = duration,
@@ -1095,11 +1121,15 @@ function CopDamage:build_suppression(amount)
 	end
 	if not self._suppression_data.brown_zone and self._suppression_data.brown_point and self._suppression_data.value >= self._suppression_data.brown_point then
 		self._suppression_data.brown_zone = true
-		self._unit:brain():on_suppressed(true)
+		self._unit:brain():on_suppressed(amount == "panic" and "panic" or true)
+	elseif amount == "panic" then
+		self._unit:brain():on_suppressed("panic")
 	end
 	if not self._suppression_data.react_zone and self._suppression_data.react_point and self._suppression_data.value >= self._suppression_data.react_point then
 		self._suppression_data.react_zone = true
-		self._unit:movement():on_suppressed(true)
+		self._unit:movement():on_suppressed(amount == "panic" and "panic" or true)
+	elseif amount == "panic" then
+		self._unit:movement():on_suppressed("panic")
 	end
 end
 

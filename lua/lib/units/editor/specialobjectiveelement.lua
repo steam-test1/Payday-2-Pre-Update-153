@@ -115,6 +115,7 @@ function SpecialObjectiveUnitElement:test_element()
 	spawn_unit_name = spawn_unit_name or Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
 	local enemy = safe_spawn_unit(spawn_unit_name, self._unit:position(), self._unit:rotation())
 	table.insert(self._enemies, enemy)
+	managers.groupai:state():set_char_team(enemy, tweak_data.levels:get_default_team_ID("non_combatant"))
 	local t = {
 		id = self._unit:unit_data().unit_id,
 		editor_name = self._unit:unit_data().name_id

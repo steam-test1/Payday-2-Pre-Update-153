@@ -449,7 +449,7 @@ function JobManager:last_known_heat()
 end
 
 function JobManager:current_job_heat_color()
-	local job_id = self:current_job_wrapper_id() or self:current_job_id()
+	local job_id = self:current_real_job_id()
 	return job_id and self:get_job_heat_color(job_id) or tweak_data.screen_colors.heat_standard_color
 end
 
@@ -484,7 +484,7 @@ function JobManager:current_job_heat_multipliers()
 	if not self:has_active_job() then
 		return
 	end
-	local job_id = self:current_job_wrapper_id() or self:current_job_id()
+	local job_id = self:current_real_job_id()
 	return self:get_job_heat_multipliers(job_id)
 end
 
@@ -532,7 +532,7 @@ function JobManager:_check_add_heat_to_jobs(debug_job_id, ignore_debug_prints)
 	if not self._global.heat then
 		self:_setup_job_heat()
 	end
-	local current_job = debug_job_id or self:current_job_wrapper_id() or self:current_job_id()
+	local current_job = debug_job_id or self:current_real_job_id()
 	if not current_job then
 		Application:error("[JobManager:_check_add_heat_to_jobs] No current job.")
 		return
@@ -627,7 +627,7 @@ function JobManager:get_job_heat(job_id)
 end
 
 function JobManager:current_job_heat()
-	local current_job = self:current_job_wrapper_id() or self:current_job_id()
+	local current_job = self:current_real_job_id()
 	if not current_job then
 		Application:error("[JobManager:current_job_heat] No current job.")
 		return 0
@@ -1013,6 +1013,10 @@ function JobManager:current_job_chain_data()
 	return tweak_data.narrative:job_chain(self._global.current_job.job_id)
 end
 
+function JobManager:current_real_job_id()
+	return self:current_job_wrapper_id() or self:current_job_id()
+end
+
 function JobManager:current_job_wrapper_id()
 	if not self._global.current_job then
 		return
@@ -1224,7 +1228,7 @@ function JobManager:_check_add_to_cooldown()
 		local cooldown_time = self._global.start_time + tweak_data.narrative.CONTRACT_COOLDOWN_TIME - TimerManager:wall_running():time()
 		if 0 < cooldown_time then
 			self._global.cooldown = self._global.cooldown or {}
-			self._global.cooldown[self:current_job_wrapper_id() or self:current_job_id()] = cooldown_time + TimerManager:wall_running():time()
+			self._global.cooldown[self:current_real_job_id()] = cooldown_time + TimerManager:wall_running():time()
 		end
 	end
 end

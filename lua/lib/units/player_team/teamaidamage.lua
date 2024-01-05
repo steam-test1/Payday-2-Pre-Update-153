@@ -720,12 +720,16 @@ function TeamAIDamage:clbk_exit_to_incapacitated()
 end
 
 function TeamAIDamage:on_incapacitated()
-	if self._fatal then
+	if self:_cannot_take_damage() then
 		return
 	end
 	if self._tase_effect then
 		World:effect_manager():fade_kill(self._tase_effect)
 		self._tase_effect = nil
+	end
+	if self._to_incapacitated_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._to_incapacitated_clbk_id)
+		self._to_incapacitated_clbk_id = nil
 	end
 	self._regenerate_t = nil
 	local dmg_info = {

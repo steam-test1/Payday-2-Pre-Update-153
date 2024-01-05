@@ -79,6 +79,8 @@ function TripMineBase:setup(sensor_upgrade)
 	self._sensor_upgrade = sensor_upgrade
 	self:set_active(false)
 	self._unit:sound_source():post_event("trip_mine_attach")
+	local upgrade = managers.player:has_category_upgrade("trip_mine", "can_switch_on_off") or managers.player:has_category_upgrade("trip_mine", "sensor_toggle")
+	self._unit:contour():add(upgrade and "deployable_interactable" or "deployable_active")
 end
 
 function TripMineBase:set_active(active, owner)
@@ -161,6 +163,14 @@ function TripMineBase:sync_trip_mine_set_armed(armed, length)
 	self:_set_armed(armed)
 end
 
+function TripMineBase:contour_selected()
+	self._unit:contour():add("deployable_selected")
+end
+
+function TripMineBase:contour_unselected()
+	self._unit:contour():remove("deployable_selected")
+end
+
 function TripMineBase:_update_draw_laser()
 	if self._use_draw_laser and self._first_armed and (self._armed or self._sensor_upgrade) then
 		self._laser_brush:cylinder(self._ray_from_pos, self._ray_to_pos, 0.5)
@@ -220,9 +230,12 @@ function TripMineBase:_sensor(t)
 		self._sensor_units_detected = self._sensor_units_detected or {}
 		if not self._sensor_units_detected[ray.unit:key()] then
 			self._sensor_units_detected[ray.unit:key()] = true
-			self:_emit_sensor_sound_and_effect()
-			if managers.network:session() then
-				managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", TripMineBase.EVENT_IDS.sensor_beep)
+			if managers.player:has_category_upgrade("trip_mine", "sensor_highlight") and (managers.groupai:state():whisper_mode() and tweak_data.character[ray.unit:base()._tweak_table].silent_priority_shout or tweak_data.character[ray.unit:base()._tweak_table].priority_shout) then
+				managers.game_play_central:auto_highlight_enemy(ray.unit, false, true)
+				self:_emit_sensor_sound_and_effect()
+				if managers.network:session() then
+					managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", TripMineBase.EVENT_IDS.sensor_beep)
+				end
 			end
 			self._sensor_last_unit_time = t + 5
 		end
@@ -285,7 +298,7 @@ function TripMineBase:_explode(col_ray)
 	if not managers.network:session() then
 		return
 	end
-	local damage_size = tweak_data.weapon.trip_mines.damage_size * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier", 1) * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
+	local damage_size = tweak_data.weapon.trip_mines.damage_size * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier_1", 1) * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier_2", 1) * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
 	local player = managers.player:player_unit()
 	if alive(player) then
 		player:character_damage():damage_explosion({

@@ -39,7 +39,8 @@ function ObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		"complete",
 		"update",
 		"remove",
-		"complete_and_activate"
+		"complete_and_activate",
+		"remove_and_activate"
 	})
 	self:_build_value_combobox(panel, panel_sizer, "objective", table.list_add({"none"}, managers.objectives:objectives_by_name()))
 	local options = self._hed.objective ~= "none" and managers.objectives:sub_objectives_by_name(self._hed.objective) or {}

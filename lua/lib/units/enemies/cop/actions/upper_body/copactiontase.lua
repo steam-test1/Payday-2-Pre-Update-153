@@ -289,7 +289,7 @@ function CopActionTase:clbk_malfunction()
 		variant = "melee",
 		damage = 0,
 		damage_effect = self._unit:character_damage()._HEALTH_INIT * 10,
-		attacker_unit = self._unit,
+		attacker_unit = managers.player:player_unit() or self._unit,
 		attack_dir = -self._common_data.fwd,
 		col_ray = {
 			position = mvector3.copy(self._ext_movement:m_head_pos()),

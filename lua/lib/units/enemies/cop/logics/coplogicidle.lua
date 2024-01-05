@@ -113,11 +113,14 @@ function CopLogicIdle.queued_update(data)
 		CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicIdle.queued_update, data, data.t + delay, data.important and true)
 		return
 	end
-	if data.is_converted and (not data.objective or data.objective.type == "free") and (not data.path_fail_t or data.t - data.path_fail_t > 6) then
+	if data.team.id == "criminal1" and (not data.objective or data.objective.type == "free") and (not data.path_fail_t or data.t - data.path_fail_t > 6) then
 		managers.groupai:state():on_criminal_jobless(data.unit)
 		if my_data ~= data.internal_data then
 			return
 		end
+	end
+	if CopLogicIdle._chk_exit_non_walkable_area(data) then
+		return
 	end
 	if CopLogicIdle._chk_relocate(data) then
 		return
@@ -294,9 +297,6 @@ function CopLogicIdle.damage_clbk(data, damage_info)
 					data.detected_attention_objects[enemy_key] = enemy_data
 					data.logic.on_attention_obj_identified(data, enemy_key, enemy_data)
 				end
-			else
-				debug_pause_unit(data.unit, "[CopLogicIdle.damage_clbk] missing attention", data.unit, enemy)
-				Application:draw_cylinder(data.m_pos, enemy:position(), 20, 0.85, 0.5, 0)
 			end
 		end
 	end
@@ -767,7 +767,7 @@ function CopLogicIdle._chk_relocate(data)
 		if data.objective.relocated_to and mvector3.equal(data.objective.relocated_to, follow_unit_pos) then
 			return
 		end
-		if mvector3.distance(data.m_pos, follow_unit_pos) > data.objective.distance then
+		if data.objective.distance and mvector3.distance(data.m_pos, follow_unit_pos) > data.objective.distance then
 			relocate = true
 		end
 		if not relocate then
@@ -785,6 +785,25 @@ function CopLogicIdle._chk_relocate(data)
 			data.objective.nav_seg = follow_unit:movement():nav_tracker():nav_segment()
 			data.objective.relocated_to = mvector3.copy(follow_unit_pos)
 			data.logic._exit(data.unit, "travel")
+			return true
+		end
+	end
+end
+
+function CopLogicIdle._chk_exit_non_walkable_area(data)
+	local my_data = data.internal_data
+	if not (not my_data.advancing and not my_data.old_action_advancing and CopLogicAttack._can_move(data)) or data.unit:movement():chk_action_forbidden("walk") then
+		return
+	end
+	local my_tracker = data.unit:movement():nav_tracker()
+	if not my_tracker:obstructed() then
+		return
+	end
+	if data.objective and data.objective.nav_seg then
+		local nav_seg_id = my_tracker:nav_segment()
+		if not managers.navigation._nav_segments[nav_seg_id].disabled then
+			data.objective.in_place = nil
+			data.logic.on_new_objective(data, data.objective)
 			return true
 		end
 	end

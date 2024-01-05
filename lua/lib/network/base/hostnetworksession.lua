@@ -191,6 +191,11 @@ function HostNetworkSession:on_peer_save_received(event, event_data)
 		cat_print("multiplayer_base", "[HostNetworkSession:on_peer_save_received]", peer, peer:id())
 		peer:set_synched(true)
 		peer:send("set_peer_synched", 1)
+		for old_peer_id, old_peer in pairs(self._peers) do
+			if old_peer ~= peer and old_peer:synched() then
+				peer:send("set_peer_synched", old_peer_id)
+			end
+		end
 		for _, old_peer in pairs(self._peers) do
 			if old_peer ~= peer then
 				old_peer:send_after_load("set_peer_synched", peer:id())
@@ -752,8 +757,4 @@ function HostNetworkSession:_inc_load_counter()
 	else
 		self._load_counter = self._load_counter + 1
 	end
-end
-
-function HostNetworkSession:load_counter()
-	return self._load_counter
 end

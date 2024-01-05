@@ -6,10 +6,12 @@ function ExplosionUnitElement:init(unit)
 	self._hed.player_damage = 10
 	self._hed.explosion_effect = "effects/particles/explosions/explosion_grenade_launcher"
 	self._hed.no_raycast_check_characters = nil
+	self._hed.sound_event = "trip_mine_explode"
 	table.insert(self._save_values, "damage")
 	table.insert(self._save_values, "player_damage")
 	table.insert(self._save_values, "explosion_effect")
 	table.insert(self._save_values, "no_raycast_check_characters")
+	table.insert(self._save_values, "sound_event")
 end
 
 function ExplosionUnitElement:update_selected(...)
@@ -91,6 +93,10 @@ function ExplosionUnitElement:_build_panel(panel, panel_sizer)
 	toolbar:connect("SELECT_EXPLOSION_EFFECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_explosion_effect_btn"), nil)
 	toolbar:realize()
 	explosion_effect_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	self:_build_value_combobox(panel, panel_sizer, "sound_event", {
+		"no_sound",
+		"trip_mine_explode"
+	})
 	local no_raycast_check_characters = EWS:CheckBox(panel, "No raycast check against characters", "")
 	no_raycast_check_characters:set_value(self._hed.no_raycast_check_characters)
 	no_raycast_check_characters:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {

@@ -1,9 +1,9 @@
 TextBoxGui = TextBoxGui or class()
 TextBoxGui.PRESETS = {}
-TextBoxGui.PRESETS.system_menu = {w = 540, h = 260}
+TextBoxGui.PRESETS.system_menu = {w = 540, h = 270}
 TextBoxGui.PRESETS.weapon_stats = {
 	w = 700,
-	h = 260,
+	h = 270,
 	x = 60,
 	bottom = 620
 }
@@ -117,6 +117,7 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	local x = preset and preset.x or config and config.x or 0
 	local y = preset and preset.y or config and config.y or 0
 	local bottom = preset and preset.bottom or config and config.bottom
+	local forced_h = preset and preset.forced_h or config and config.forced_h or false
 	local title_font = preset and preset.title_font or config and config.title_font or tweak_data.menu.pd2_large_font
 	local title_font_size = preset and preset.title_font_size or config and config.title_font_size or 28
 	local font = preset and preset.font or config and config.font or tweak_data.menu.pd2_medium_font
@@ -160,8 +161,8 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 		y = 10
 	})
 	local _, _, tw, th = title_text:text_rect()
-	th = th + 10
 	title_text:set_size(tw, th)
+	th = th + 10
 	if is_title_outside then
 		th = 0
 	end
@@ -309,7 +310,7 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	text:set_w(scroll_panel:w())
 	local _, _, ttw, tth = text:text_rect()
 	text:set_h(tth)
-	scroll_panel:set_h(math.min(h - th, tth))
+	scroll_panel:set_h(forced_h or math.min(h - th, tth))
 	info_area:set_h(scroll_panel:bottom() + buttons_panel:h() + 10 + 5)
 	buttons_panel:set_bottom(info_area:h() - 10)
 	if not preset_or_config_y then
@@ -434,7 +435,7 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	self._text_box = main
 	self:_set_scroll_indicator()
 	if is_title_outside then
-		title_text:set_bottom(-5)
+		title_text:set_bottom(0)
 		title_text:set_rotation(360)
 		self._is_title_outside = is_title_outside
 	end

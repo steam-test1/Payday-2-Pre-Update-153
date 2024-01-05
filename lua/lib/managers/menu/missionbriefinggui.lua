@@ -1605,7 +1605,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		color = slot_color,
 		x = 5,
 		y = 5,
-		text = utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(criminal_name) or criminal_name)
+		text = managers.localization:to_upper_text("menu_" .. tostring(criminal_name))
 	})
 	if SystemInfo:platform() == Idstring("WIN32") then
 		criminal_text:move(5, 5)
@@ -2876,6 +2876,13 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 	return self._selected_item
 end
 
+function MissionBriefingGui:set_enabled(state)
+	self._enabled = state
+	if self._jukebox_item then
+		self._jukebox_item:set_enabled(state)
+	end
+end
+
 function MissionBriefingGui:mouse_moved(x, y)
 	if not (alive(self._panel) and alive(self._fullscreen_panel)) or not self._enabled then
 		return false, "arrow"
@@ -3262,4 +3269,16 @@ function JukeboxItem:deselect()
 	self.displayed = nil
 	managers.music:track_listen_stop()
 	JukeboxItem.super.deselect(self)
+end
+
+function JukeboxItem:set_enabled(state)
+	if not self.displayed then
+		return
+	end
+	if managers.menu:active_menu() and managers.menu:active_menu().logic:selected_node() then
+		local item_list = managers.menu:active_menu().logic:selected_node():items()
+		for _, item_data in ipairs(item_list) do
+			item_data:set_enabled(state)
+		end
+	end
 end

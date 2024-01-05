@@ -94,9 +94,10 @@ function SentryGunBrain:_choose_focus_enemy(t)
 	local my_tracker = self._unit:movement():nav_tracker()
 	local chk_vis_func = my_tracker.check_visibility
 	local my_pos = self._m_head_object_pos
+	local my_team = self._unit:movement():team()
 	for e_key, enemy_data in pairs(enemies) do
 		local enemy_unit = enemy_data.unit
-		if enemy_data.is_converted or enemy_unit:brain()._current_logic_name == "trade" then
+		if not my_team.foes[enemy_data.unit:movement():team().id] or enemy_unit:brain()._current_logic_name == "trade" then
 			self._AI_data.detected_enemies[e_key] = nil
 		elseif self._AI_data.detected_enemies[e_key] then
 			local enemy_data = self._AI_data.detected_enemies[e_key]

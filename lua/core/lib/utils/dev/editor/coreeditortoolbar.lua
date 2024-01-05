@@ -3,18 +3,18 @@ function CoreEditor:build_toolbar()
 	
 	self._toolbar = EWS:ToolBar(Global.frame, "", "TB_FLAT,TB_NODIVIDER")
 	Global.frame:set_tool_bar(self._toolbar)
-	self._toolbar:add_tool("TB NEW WORLD", "New World", CoreEWS.image_path("toolbar\\new_16x16.png"), "New World")
+	self._toolbar:add_tool("TB NEW WORLD", "New World (" .. self:ctrl_menu_binding("new") .. ")", CoreEWS.image_path("toolbar\\new_16x16.png"), "New World")
 	self._toolbar:connect("TB NEW WORLD", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_new"), "")
-	self._toolbar:add_tool("TB OPEN WORLD", "Open World", CoreEWS.image_path("toolbar\\open_16x16.png"), "Open World")
+	self._toolbar:add_tool("TB OPEN WORLD", "Open World (" .. self:ctrl_menu_binding("open") .. ")", CoreEWS.image_path("toolbar\\open_16x16.png"), "Open World")
 	self._toolbar:connect("TB OPEN WORLD", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_open"), "")
-	self._toolbar:add_tool("TB SAVE WORLD", "Save World", CoreEWS.image_path("toolbar\\save_16x16.png"), "Save World")
+	self._toolbar:add_tool("TB SAVE WORLD", "Save World (" .. self:ctrl_menu_binding("save") .. ")", CoreEWS.image_path("toolbar\\save_16x16.png"), "Save World")
 	self._toolbar:connect("TB SAVE WORLD", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_save"), "")
 	self._toolbar:add_separator()
-	self._toolbar:add_tool("TB SELECT BY NAME", "Select by name", icons_path .. "select_by_name.bmp", "Select by name")
+	self._toolbar:add_tool("TB SELECT BY NAME", "Select by name (" .. self:ctrl_menu_binding("select_by_name") .. ")", icons_path .. "select_by_name.bmp", "Select by name")
 	self._toolbar:connect("TB SELECT BY NAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_select_by_name"), "")
 	self._toolbar:add_tool("TB PREVIEW UNITS", "Browse and preview all availible units", icons_path .. "browse_units.bmp", "Browse and preview all availible units")
 	self._toolbar:connect("TB PREVIEW UNITS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_unit_tree_browser"), "")
-	self._toolbar:add_tool("TB GLOBAL SELECT UNITS", "Global select unit", icons_path .. "global_select_unit.bmp", "Global select unit")
+	self._toolbar:add_tool("TB GLOBAL SELECT UNITS", "Global select unit (" .. self:ctrl_menu_binding("global_select_unit") .. ")", icons_path .. "global_select_unit.bmp", "Global select unit")
 	self._toolbar:connect("TB GLOBAL SELECT UNITS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_global_select_unit"), "")
 	self._toolbar:add_tool("TB_UNHIDE_BY_NAME", "Unhide by name", CoreEWS.image_path("world_editor\\unhide_by_name_16x16.png"), "Opens the unhide by name dialog")
 	self._toolbar:connect("TB_UNHIDE_BY_NAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_unhide_by_name"), "")
@@ -24,20 +24,20 @@ function CoreEditor:build_toolbar()
 	self._toolbar:add_tool("TB_SELECT_GROUP_BY_NAME", "Select group by name", icons_path .. "select_group_by_name.bmp", "Select group by name")
 	self._toolbar:connect("TB_SELECT_GROUP_BY_NAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_select_group_by_name"), "")
 	self._toolbar:add_separator()
-	self._toolbar:add_radio_tool("TB WIDGET SELECT", "Select Unit", icons_path .. "widget_select.bmp", "Select Unit")
+	self._toolbar:add_radio_tool("TB WIDGET SELECT", "Select Unit (" .. self:ctrl_menu_binding("select") .. ")", icons_path .. "widget_select.bmp", "Select Unit")
 	Global.frame:connect("TB WIDGET SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "set_widget"), {
 		select = true,
 		move = false,
 		rotate = false
 	})
-	self._toolbar:add_radio_tool("TB WIDGET MOVE", "Select and Move", icons_path .. "widget_move.bmp", "Select and Move")
+	self._toolbar:add_radio_tool("TB WIDGET MOVE", "Select and Move (" .. self:ctrl_menu_binding("move") .. ")", icons_path .. "widget_move.bmp", "Select and Move")
 	Global.frame:connect("TB WIDGET MOVE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "set_widget"), {
 		select = false,
 		move = true,
 		rotate = false
 	})
 	Global.frame:connect("TB WIDGET MOVE", "EVT_COMMAND_TOOL_RCLICKED", callback(self, self, "on_move_transform_type_in"), nil)
-	self._toolbar:add_radio_tool("TB WIDGET ROTATE", "Select and Rotate", icons_path .. "widget_rotation.bmp", "Select and Rotate")
+	self._toolbar:add_radio_tool("TB WIDGET ROTATE", "Select and Rotate (" .. self:ctrl_menu_binding("rotate") .. ")", icons_path .. "widget_rotation.bmp", "Select and Rotate")
 	Global.frame:connect("TB WIDGET ROTATE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "set_widget"), {
 		select = false,
 		move = false,
@@ -45,7 +45,7 @@ function CoreEditor:build_toolbar()
 	})
 	Global.frame:connect("TB WIDGET ROTATE", "EVT_COMMAND_TOOL_RCLICKED", callback(self, self, "on_rotate_transform_type_in"), nil)
 	self:build_ref_coordinate_system()
-	self._toolbar:add_check_tool("TB_SURFACE_MOVE", "Surface move", CoreEWS.image_path("world_editor\\surface_move_16x16.png"), "Toggle surface move on and off")
+	self._toolbar:add_check_tool("TB_SURFACE_MOVE", "Surface move (" .. self:ctrl_binding("surface_move_toggle") .. ")", CoreEWS.image_path("world_editor\\surface_move_16x16.png"), "Toggle surface move on and off")
 	self._toolbar:set_tool_state("TB_SURFACE_MOVE", self._use_surface_move)
 	self._toolbar:connect("TB_SURFACE_MOVE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "toolbar_toggle"), {
 		value = "_use_surface_move",
@@ -56,7 +56,7 @@ function CoreEditor:build_toolbar()
 		id = "TB_SURFACE_MOVE",
 		menu = "_edit_menu"
 	})
-	self._toolbar:add_check_tool("TB_SNAPPOINTS", "Use Snappoints", CoreEWS.image_path("world_editor\\snappoints_16x16.png"), "Toggle use of snappoints on and off")
+	self._toolbar:add_check_tool("TB_SNAPPOINTS", "Use Snappoints (" .. self:ctrl_binding("use_snappoints_toggle") .. ")", CoreEWS.image_path("world_editor\\snappoints_16x16.png"), "Toggle use of snappoints on and off")
 	self._toolbar:set_tool_state("TB_SNAPPOINTS", self._use_snappoints)
 	self._toolbar:connect("TB_SNAPPOINTS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "toolbar_toggle"), {
 		value = "_use_snappoints",

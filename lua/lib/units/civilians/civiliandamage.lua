@@ -44,14 +44,10 @@ function CivilianDamage:_unregister_from_enemy_manager(damage_info)
 end
 
 function CivilianDamage:damage_bullet(attack_data)
-	if managers.player:has_category_upgrade("player", "civ_harmless_bullets") then
-		print("self._survive_shot_t", self._survive_shot_t, "TimerManager:game():time()", TimerManager:game():time())
-		if not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t then
-			print("good")
-			self._survive_shot_t = TimerManager:game():time() + 2.5
-			self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
-			return
-		end
+	if managers.player:has_category_upgrade("player", "civ_harmless_bullets") and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
+		self._survive_shot_t = TimerManager:game():time() + 2.5
+		self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
+		return
 	end
 	attack_data.damage = 10
 	return CopDamage.damage_bullet(self, attack_data)
@@ -65,14 +61,10 @@ function CivilianDamage:damage_explosion(attack_data)
 end
 
 function CivilianDamage:damage_melee(attack_data)
-	if managers.player:has_category_upgrade("player", "civ_harmless_melee") then
-		print("self._survive_shot_t", self._survive_shot_t, "TimerManager:game():time()", TimerManager:game():time())
-		if not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t then
-			print("good")
-			self._survive_shot_t = TimerManager:game():time() + 2.5
-			self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
-			return
-		end
+	if managers.player:has_category_upgrade("player", "civ_harmless_melee") and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
+		self._survive_shot_t = TimerManager:game():time() + 2.5
+		self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
+		return
 	end
 	attack_data.damage = 10
 	return CopDamage.damage_melee(self, attack_data)

@@ -439,6 +439,7 @@ function CoreSetup:__end_frame(t, dt)
 		if managers.sound_environment then
 			managers.sound_environment:destroy()
 		end
+		TextureCache:abort_all_script_requests()
 		self:start_loading_screen()
 		managers.dyn_resource:set_file_streaming_chunk_size_mul(0.1, 10)
 		if managers.worlddefinition then

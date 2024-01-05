@@ -771,31 +771,31 @@ function InteractionTweakData:init()
 	self.hostage_stay.interaction_obj = Idstring("Spine2")
 	self.trip_mine = {}
 	self.trip_mine.icon = "equipment_trip_mine"
-	self.trip_mine.contour = "deployable"
 	self.trip_mine.requires_upgrade = {
 		category = "trip_mine",
 		upgrade = "can_switch_on_off"
 	}
+	self.trip_mine.no_contour = true
 	self.sentry_gun_refill = {}
 	self.sentry_gun_refill.icon = "equipment_ammo_bag"
-	self.sentry_gun_refill.contour = "deployable"
 	self.sentry_gun_refill.requires_upgrade = {category = "sentry_gun", upgrade = "can_reload"}
 	self.sentry_gun_refill.timer = 1.5
-	self.sentry_gun_refill.blocked_hint = "full_grenades"
-	self.sentry_gun_refill.sound_start = "bar_bag_generic"
-	self.sentry_gun_refill.sound_interupt = "bar_bag_generic_cancel"
-	self.sentry_gun_refill.sound_done = "bar_bag_generic_finished"
-	self.sentry_gun_refill.action_text_id = "hud_action_taking_grenades"
+	self.sentry_gun_refill.blocked_hint = "hint_reload_sentry"
+	self.sentry_gun_refill.sound_start = "bar_turret_ammo"
+	self.sentry_gun_refill.sound_interupt = "bar_turret_ammo_cancel"
+	self.sentry_gun_refill.sound_done = "bar_turret_ammo_finished"
+	self.sentry_gun_refill.action_text_id = "hud_action_reload_sentry"
+	self.sentry_gun_refill.no_contour = true
 	self.sentry_gun_revive = {}
 	self.sentry_gun_revive.icon = "equipment_ammo_bag"
-	self.sentry_gun_revive.contour = "deployable"
 	self.sentry_gun_revive.requires_upgrade = {category = "sentry_gun", upgrade = "can_revive"}
 	self.sentry_gun_revive.timer = 3.5
-	self.sentry_gun_revive.blocked_hint = "full_grenades"
+	self.sentry_gun_revive.blocked_hint = "hint_reload_sentry"
 	self.sentry_gun_revive.sound_start = "bar_bag_generic"
 	self.sentry_gun_revive.sound_interupt = "bar_bag_generic_cancel"
 	self.sentry_gun_revive.sound_done = "bar_bag_generic_finished"
-	self.sentry_gun_revive.action_text_id = "hud_action_taking_grenades"
+	self.sentry_gun_revive.action_text_id = "hud_action_reload_sentry"
+	self.sentry_gun_revive.no_contour = true
 	self.bodybags_bag = {}
 	self.bodybags_bag.icon = "equipment_ammo_bag"
 	self.bodybags_bag.text_id = "debug_interact_bodybags_bag_take_bodybag"
@@ -843,7 +843,6 @@ function InteractionTweakData:init()
 	self.ecm_jammer = {}
 	self.ecm_jammer.icon = "equipment_ecm_jammer"
 	self.ecm_jammer.text_id = "hud_int_equipment_ecm_feedback"
-	self.ecm_jammer.contour = "deployable"
 	self.ecm_jammer.requires_upgrade = {
 		category = "ecm_jammer",
 		upgrade = "can_activate_feedback"
@@ -853,6 +852,7 @@ function InteractionTweakData:init()
 		upgrade = "interaction_speed_multiplier"
 	}
 	self.ecm_jammer.timer = 2
+	self.ecm_jammer.no_contour = true
 	self.laptop_objective = {}
 	self.laptop_objective.icon = "laptop_objective"
 	self.laptop_objective.start_active = false
@@ -1044,6 +1044,10 @@ function InteractionTweakData:init()
 	self.diamond_pickup.text_id = "hud_int_take_jewelry"
 	self.diamond_pickup.sound_event = "money_grab"
 	self.diamond_pickup.start_active = false
+	self.diamond_pickup.requires_mask_off_upgrade = {
+		category = "player",
+		upgrade = "mask_off_pickup"
+	}
 	self.safe_loot_pickup = deep_clone(self.diamond_pickup)
 	self.safe_loot_pickup.start_active = true
 	self.safe_loot_pickup.text_id = "hud_int_take"
@@ -1159,6 +1163,10 @@ function InteractionTweakData:init()
 	self.money_wrap_single_bundle.text_id = "debug_interact_money_wrap_single_bundle_take_money"
 	self.money_wrap_single_bundle.start_active = false
 	self.money_wrap_single_bundle.interact_distance = 110
+	self.money_wrap_single_bundle.requires_mask_off_upgrade = {
+		category = "player",
+		upgrade = "mask_off_pickup"
+	}
 	self.christmas_present = {}
 	self.christmas_present.icon = "interaction_christmas_present"
 	self.christmas_present.text_id = "debug_interact_take_christmas_present"
@@ -1384,6 +1392,7 @@ function InteractionTweakData:init()
 	self.keyboard_hox_1 = deep_clone(self.security_station_keyboard)
 	self.keyboard_hox_1.timer = 2.5
 	self.keyboard_hox_1.text_id = "hud_int_keyboard_hox_1"
+	self.keyboard_hox_1.action_text_id = "hud_action_keyboard_hox_1"
 	self.hold_use_computer = {}
 	self.hold_use_computer.start_active = false
 	self.hold_use_computer.text_id = "hud_int_hold_use_computer"
@@ -1410,6 +1419,11 @@ function InteractionTweakData:init()
 	self.pickup_keycard = {}
 	self.pickup_keycard.text_id = "hud_int_pickup_keycard"
 	self.pickup_keycard.sound_done = "pick_up_key_card"
+	self.pickup_keycard.requires_mask_off_upgrade = {
+		category = "player",
+		upgrade = "mask_off_pickup"
+	}
+	self.pickup_keycard.blocked_hint = "full_keycard"
 	self.open_from_inside = {}
 	self.open_from_inside.text_id = "hud_int_invisible_interaction_open"
 	self.open_from_inside.start_active = true
@@ -1934,12 +1948,19 @@ function InteractionTweakData:init()
 	self.invisible_interaction_searching.timer = 6
 	self.invisible_interaction_searching.axis = "x"
 	self.invisible_interaction_searching.contour = "interactable_icon"
+	self.invisible_interaction_searching.special_equipment_block = "files"
+	self.invisible_interaction_searching.interact_distance = 200
+	self.invisible_interaction_searching.start_active = false
+	self.invisible_interaction_searching.sound_start = "bar_shuffle_papers"
+	self.invisible_interaction_searching.sound_interupt = "bar_shuffle_papers_cancel"
+	self.invisible_interaction_searching.sound_done = "bar_shuffle_papers_finished"
 	self.invisible_interaction_gathering = {}
 	self.invisible_interaction_gathering.icon = "equipment_crowbar"
 	self.invisible_interaction_gathering.text_id = "hud_int_hold_gather_evidence"
 	self.invisible_interaction_gathering.action_text_id = "hud_action_gathering_evidence"
 	self.invisible_interaction_gathering.timer = 2
 	self.invisible_interaction_gathering.special_equipment_block = "evidence"
+	self.invisible_interaction_gathering.start_active = false
 	self.invisible_interaction_checking = {}
 	self.invisible_interaction_checking.icon = "equipment_crowbar"
 	self.invisible_interaction_checking.text_id = "hud_int_hold_check_evidence"
@@ -1948,6 +1969,7 @@ function InteractionTweakData:init()
 	self.invisible_interaction_checking.special_equipment = "evidence"
 	self.invisible_interaction_checking.equipment_consume = true
 	self.invisible_interaction_checking.timer = 2
+	self.invisible_interaction_checking.start_active = false
 	self.take_medical_supplies = {}
 	self.take_medical_supplies.text_id = "hud_int_take_supplies"
 	self.take_medical_supplies.action_text_id = "hud_int_taking_supplies"

@@ -27,6 +27,24 @@ function SentryGunBase:sync_setup(upgrade_lvl, peer_id)
 		self._validate_clbk_id = nil
 	end
 	managers.player:verify_equipment(peer_id, "sentry_gun")
+	self:_setup_contour()
+end
+
+function SentryGunBase:set_owner_id(owner_id)
+	self._owner_id = owner_id
+	self:_setup_contour()
+end
+
+function SentryGunBase:is_owner()
+	return self._owner_id and self._owner_id == managers.network:session():local_peer():id()
+end
+
+function SentryGunBase:_setup_contour()
+	if managers.player:has_category_upgrade("sentry_gun", "can_reload") then
+		self._unit:contour():add("deployable_interactable")
+	elseif self:is_owner() then
+		self._unit:contour():add("deployable_active")
+	end
 end
 
 function SentryGunBase:post_init()
@@ -88,6 +106,7 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 	local armor_amount = tweak_data.upgrades.sentry_gun_base_armor * armor_multiplier
 	self._unit:character_damage():set_health(armor_amount)
 	self._owner = owner
+	self._owner_id = owner and managers.network:game():member_from_unit(owner):peer():id()
 	self._unit:movement():setup(rot_speed_multiplier)
 	self._unit:brain():setup(1 / rot_speed_multiplier)
 	self._unit:movement():set_team(owner:movement():team())
@@ -104,6 +123,7 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 	setup_data.spread_mul = spread_multiplier
 	self._unit:weapon():setup(setup_data, damage_multiplier)
 	self._unit:set_extension_update_enabled(Idstring("base"), true)
+	self:_setup_contour()
 	return true
 end
 
@@ -177,6 +197,14 @@ function SentryGunBase:set_visibility_state(stage)
 		self._visibility_state = state
 	end
 	self._lod_stage = stage
+end
+
+function SentryGunBase:contour_selected()
+	self._unit:contour():add("deployable_selected")
+end
+
+function SentryGunBase:contour_unselected()
+	self._unit:contour():remove("deployable_selected")
 end
 
 function SentryGunBase:weapon_tweak_data()
@@ -297,9 +325,13 @@ function SentryGunBase:refill(ammo_ratio)
 	end
 	self._unit:brain():switch_on()
 	self._unit:interaction():set_dirty(true)
+	self:_setup_contour()
+	self._unit:contour():remove("deployable_disabled")
 end
 
 function SentryGunBase:on_death()
+	self._unit:contour():remove("deployable_active")
+	self._unit:contour():remove("deployable_interactable")
 	self._unit:set_extension_update_enabled(Idstring("base"), false)
 	if self._registered then
 		self._registered = nil

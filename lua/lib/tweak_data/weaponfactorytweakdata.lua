@@ -5835,7 +5835,7 @@ function WeaponFactoryTweakData:_init_mp5()
 			value = 3,
 			spread_moving = 4,
 			recoil = -3,
-			concealment = 5
+			concealment = 4
 		}
 	}
 	self.parts.wpn_fps_smg_mp5_s_solid = {
@@ -7374,7 +7374,9 @@ function WeaponFactoryTweakData:_init_b92fs()
 	}
 	self.wpn_fps_pis_beretta.override = {
 		wpn_upg_o_marksmansight_front = {a_obj = "a_os"},
-		wpn_fps_upg_o_rmr = {parent = "slide"},
+		wpn_fps_upg_o_rmr = {
+			parent = "upper_reciever"
+		},
 		wpn_fps_upg_pis_ns_flash = {
 			parent = "lower_reciever"
 		},
@@ -7805,6 +7807,10 @@ function WeaponFactoryTweakData:_init_saw()
 	self.parts.wpn_fps_saw_b_normal.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_b_normal"
 	self.parts.wpn_fps_saw_body_standard.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_body_standard"
 	self.parts.wpn_fps_saw_m_blade.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_m_blade"
+	self.wpn_fps_saw_secondary = deep_clone(self.wpn_fps_saw)
+	self.wpn_fps_saw_secondary.unit = "units/payday2/weapons/wpn_fps_saw/wpn_fps_saw_secondary"
+	self.wpn_fps_saw_secondary_npc = deep_clone(self.wpn_fps_saw)
+	self.wpn_fps_saw_secondary_npc.unit = "units/payday2/weapons/wpn_fps_saw/wpn_fps_saw_secondary_npc"
 end
 
 function WeaponFactoryTweakData:_init_usp()
@@ -8393,7 +8399,7 @@ function WeaponFactoryTweakData:_init_m45()
 		stats = {
 			value = 2,
 			recoil = -2,
-			concealment = 6
+			concealment = 3
 		},
 		dlc = "armored_transport"
 	}
@@ -9914,6 +9920,9 @@ function WeaponFactoryTweakData:_init_hk21()
 		"wpn_fps_upg_ns_ass_smg_firepig",
 		"wpn_fps_upg_ns_ass_smg_stubby",
 		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
 		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
 		"wpn_fps_upg_fl_ass_smg_sho_surefire",
 		"wpn_fps_upg_ass_ns_jprifles",
@@ -10095,6 +10104,9 @@ function WeaponFactoryTweakData:_init_m249()
 		"wpn_fps_upg_ns_ass_smg_firepig",
 		"wpn_fps_upg_ns_ass_smg_stubby",
 		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
 		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
 		"wpn_fps_upg_fl_ass_smg_sho_surefire",
 		"wpn_fps_upg_m4_s_crane",
@@ -10252,6 +10264,9 @@ function WeaponFactoryTweakData:_init_rpk()
 		"wpn_fps_upg_ns_ass_smg_firepig",
 		"wpn_fps_upg_ns_ass_smg_stubby",
 		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
 		"wpn_fps_upg_vg_ass_smg_verticalgrip",
 		"wpn_fps_upg_m4_s_crane",
 		"wpn_fps_upg_m4_s_mk46",
@@ -10300,7 +10315,7 @@ function WeaponFactoryTweakData:_init_m95()
 		is_a_unlockable = true,
 		stats = {
 			value = 1,
-			concealment = 8,
+			concealment = 3,
 			spread = -3,
 			spread_moving = 3
 		}
@@ -10322,7 +10337,7 @@ function WeaponFactoryTweakData:_init_m95()
 			damage = -4,
 			recoil = 2,
 			spread_moving = 1,
-			concealment = 2
+			concealment = 0
 		},
 		perks = {"silencer"},
 		sound_switch = {
@@ -10372,6 +10387,15 @@ function WeaponFactoryTweakData:_init_m95()
 	self.wpn_fps_snp_m95 = {}
 	self.wpn_fps_snp_m95.unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_m95/wpn_fps_snp_m95"
 	self.wpn_fps_snp_m95.optional_types = {"gadget", "sight"}
+	self.wpn_fps_snp_m95.override = {
+		wpn_fps_upg_m4_g_mgrip = {
+			stats = {
+				value = 2,
+				spread_moving = 2,
+				concealment = 1
+			}
+		}
+	}
 	self.wpn_fps_snp_m95.default_blueprint = {
 		"wpn_fps_snp_m95_barrel_standard",
 		"wpn_fps_snp_m95_bipod",
@@ -10485,7 +10509,7 @@ function WeaponFactoryTweakData:_init_msr()
 		is_a_unlockable = true,
 		stats = {
 			value = 8,
-			concealment = 6,
+			concealment = 5,
 			recoil = -2
 		},
 		animations = {
@@ -12729,7 +12753,6 @@ function WeaponFactoryTweakData:_init_famas()
 		stats = {value = 2},
 		animations = {
 			reload = "reload",
-			reload_not_empty = "reload_not_empty",
 			fire = "recoil",
 			fire_steelsight = "recoil"
 		}
@@ -13128,7 +13151,7 @@ function WeaponFactoryTweakData:_init_scorpion()
 		stats = {
 			value = 1,
 			recoil = -1,
-			concealment = 2
+			concealment = 1
 		},
 		dlc = "hl_miami",
 		texture_bundle_folder = "hl_miami",

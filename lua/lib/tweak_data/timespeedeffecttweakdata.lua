@@ -21,7 +21,7 @@ function TimeSpeedEffectTweakData:_init_base_effects()
 		sustain = self.mask_on.sustain,
 		fade_out = self.mask_on.fade_out,
 		timer = self.mask_on.timer,
-		affect_timer = Idstring("player")
+		affect_timer = "player"
 	}
 	self.downed = {
 		speed = 0.3,
@@ -36,7 +36,7 @@ function TimeSpeedEffectTweakData:_init_base_effects()
 		sustain = self.downed.sustain,
 		fade_out = self.downed.fade_out,
 		timer = self.downed.timer,
-		affect_timer = Idstring("player")
+		affect_timer = "player"
 	}
 end
 
@@ -58,7 +58,7 @@ function TimeSpeedEffectTweakData:_init_mission_effects()
 		sustain = self.mission_effects.quickdraw.sustain,
 		fade_out = self.mission_effects.quickdraw.fade_out,
 		timer = "pausable",
-		affect_timer = Idstring("player"),
+		affect_timer = "player",
 		sync = true
 	}
 end

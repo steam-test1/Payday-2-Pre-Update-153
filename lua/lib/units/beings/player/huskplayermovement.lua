@@ -351,7 +351,13 @@ function HuskPlayerMovement:set_visual_deployable_equipment(deployable, amount)
 	local visible = 0 < amount
 	local tweak_data = tweak_data.equipments[deployable]
 	local object_name = tweak_data.visual_object
-	self._unit:get_object(Idstring(object_name)):set_visibility(visible)
+	local object_name_ids = Idstring(object_name)
+	self._current_visual_deployable_equipment = self._current_visual_deployable_equipment or object_name_ids
+	if self._current_visual_deployable_equipment ~= object_name_ids then
+		self._unit:get_object(self._current_visual_deployable_equipment):set_visibility(false)
+		self._current_visual_deployable_equipment = object_name_ids
+	end
+	self._unit:get_object(object_name_ids):set_visibility(visible)
 end
 
 function HuskPlayerMovement:set_visual_carry(carry_id)

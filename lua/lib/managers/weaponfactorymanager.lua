@@ -1005,12 +1005,13 @@ end
 
 function WeaponFactoryManager:get_stance_mod(factory_id, blueprint, using_second_sight)
 	local factory = tweak_data.weapon.factory
-	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
-	local override = self:_get_override_parts(factory_id, blueprint)
+	local assembled_blueprint = self:get_assembled_blueprint(factory_id, blueprint)
+	local forbidden = self:_get_forbidden_parts(factory_id, assembled_blueprint)
+	local override = self:_get_override_parts(factory_id, assembled_blueprint)
 	local part
 	local translation = Vector3()
 	local rotation = Rotation()
-	for _, part_id in ipairs(blueprint) do
+	for _, part_id in ipairs(assembled_blueprint) do
 		if not forbidden[part_id] then
 			part = self:_part_data(part_id, factory_id, override)
 			if part.stance_mod and (part.type ~= "sight" and part.type ~= "gadget" or using_second_sight and part.type == "gadget" or not using_second_sight and part.type == "sight") and part.stance_mod[factory_id] then

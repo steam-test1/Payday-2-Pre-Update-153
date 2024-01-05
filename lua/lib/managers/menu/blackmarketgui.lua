@@ -1606,7 +1606,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 	self._panel:child("back_button"):set_visible(managers.menu:is_pc_controller())
 	self._pages = #self._data > 1 or self._data.show_tabs
 	local grid_panel_w = self._panel:w() * WIDTH_MULTIPLIER
-	local grid_panel_h = (self._panel:h() - (medium_font_size + 10) - 70) * GRID_H_MUL
+	local grid_panel_h = (self._panel:h() - (medium_font_size + 10) - 60) * GRID_H_MUL
 	grid_panel_w = math.round(grid_panel_w / 3) * 3
 	grid_panel_h = math.round(grid_panel_h / 3) * 3
 	local square_w = grid_panel_w / 3
@@ -1614,7 +1614,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 	local padding_w = 0
 	local padding_h = 0
 	local left_padding = 0
-	local top_padding = 70
+	local top_padding = 60
 	local size_data = {}
 	size_data.grid_w = math.floor(grid_panel_w)
 	size_data.grid_h = math.floor(grid_panel_h)
@@ -2990,6 +2990,9 @@ function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo, total_ammo_m
 		if not upgrade_blocked("weapon", "clip_ammo_increase") then
 			clip_skill = clip_skill + managers.player:upgrade_value("weapon", "clip_ammo_increase", 0)
 		end
+		if not upgrade_blocked(weapon_tweak_data.category, "clip_ammo_increase") then
+			clip_skill = clip_skill + managers.player:upgrade_value(weapon_tweak_data.category, "clip_ammo_increase", 0)
+		end
 		return clip_base + clip_mod + clip_skill
 	end
 	
@@ -3025,6 +3028,9 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 				if not (weapon_tweak.upgrade_blocks and weapon_tweak.upgrade_blocks.weapon) or not table.contains(weapon_tweak.upgrade_blocks.weapon, "clip_ammo_increase") then
 					skill_stats[stat.name].value = skill_stats[stat.name].value + managers.player:upgrade_value("weapon", "clip_ammo_increase", 0)
 				end
+				if not (weapon_tweak.upgrade_blocks and weapon_tweak.upgrade_blocks[weapon_tweak.category]) or not table.contains(weapon_tweak.upgrade_blocks[weapon_tweak.category], "clip_ammo_increase") then
+					skill_stats[stat.name].value = skill_stats[stat.name].value + managers.player:upgrade_value(weapon_tweak.category, "clip_ammo_increase", 0)
+				end
 				skill_stats[stat.name].skill_in_effect = managers.player:has_category_upgrade(name, "clip_ammo_increase") or managers.player:has_category_upgrade("weapon", "clip_ammo_increase")
 			elseif stat.name == "totalammo" then
 			else
@@ -3040,6 +3046,7 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, fire_mode, blueprint)
 				elseif stat.name == "recoil" then
 					multiplier = managers.blackmarket:recoil_multiplier(name, weapon_tweak.category, silencer, blueprint)
+					modifier = -managers.blackmarket:recoil_addend(name, weapon_tweak.category, silencer, blueprint) * tweak_data.gui.stats_present_multiplier
 				elseif stat.name == "suppression" then
 					multiplier = managers.blackmarket:threat_multiplier(name, weapon_tweak.category, silencer)
 				elseif stat.name == "concealment" then
@@ -5122,7 +5129,7 @@ function BlackMarketGui:set_selected_tab(tab, no_sound)
 	self._slot_data = self._selected_slot._data
 	local x, y = self._tabs[self._selected]:selected_slot_center()
 	local grid_panel_w = self._panel:w() * WIDTH_MULTIPLIER
-	local grid_panel_h = (self._panel:h() - (self._real_medium_font_size + 10) - 70) * GRID_H_MUL
+	local grid_panel_h = (self._panel:h() - (self._real_medium_font_size + 10) - 60) * GRID_H_MUL
 	local square_w = grid_panel_w / 3
 	local square_h = grid_panel_h / 3
 	local slot_dim_x = self._tabs[self._selected].my_slots_dimensions[1]
@@ -5776,6 +5783,9 @@ function BlackMarketGui:populate_melee_weapons(data)
 		if not xd.is_favorite ~= not yd.is_favorite then
 			return xd.is_favorite
 		end
+		if xd.unlocked ~= yd.unlocked then
+			return xd.unlocked
+		end
 		if x_td.instant ~= y_td.instant then
 			return x_td.instant
 		end
@@ -5961,7 +5971,7 @@ end
 function BlackMarketGui:populate_masks(data)
 	local new_data = {}
 	local crafted_category = managers.blackmarket:get_crafted_category("masks") or {}
-	local mini_icon_helper = math.round((self._panel:h() - (tweak_data.menu.pd2_medium_font_size + 10) - 70) * GRID_H_MUL / 3) - 16
+	local mini_icon_helper = math.round((self._panel:h() - (tweak_data.menu.pd2_medium_font_size + 10) - 60) * GRID_H_MUL / 3) - 16
 	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
 	local start_crafted_item = data.start_crafted_item or 1
 	local hold_crafted_item = managers.blackmarket:get_hold_crafted_item()

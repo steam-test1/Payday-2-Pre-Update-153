@@ -47,7 +47,7 @@ function HUDMissionBriefing:init(hud, workspace)
 				font_size = text_font_size,
 				font = text_font,
 				color = color,
-				text = "HOXTON",
+				text = tweak_data.gui.LONGEST_CHAR_NAME,
 				blend_mode = "add",
 				align = "left",
 				vertical = "center"
@@ -330,7 +330,7 @@ function HUDMissionBriefing:init(hud, workspace)
 			color = tweak_data.screen_colors.ghost_color
 		})
 		ghost:set_center(day_text:center_x(), day_text:center_y() + day_text:h() * 0.25)
-		local ghost_visible = i <= num_stages and managers.job:is_job_stage_ghostable(managers.job:current_job_id(), i)
+		local ghost_visible = i <= num_stages and managers.job:is_job_stage_ghostable(managers.job:current_real_job_id(), i)
 		ghost:set_visible(ghost_visible)
 		if ghost_visible then
 			self:_apply_ghost_color(ghost, i, not Network:is_server())
@@ -475,7 +475,7 @@ function HUDMissionBriefing:set_player_slot(nr, params)
 	slot:child("name"):set_color(slot:child("name"):color():with_alpha(1))
 	slot:child("name"):set_text(params.name)
 	slot:child("criminal"):set_color(slot:child("criminal"):color():with_alpha(1))
-	slot:child("criminal"):set_text(utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(params.character) or params.character))
+	slot:child("criminal"):set_text(managers.localization:to_upper_text("menu_" .. tostring(params.character)))
 	local name_len = utf8.len(slot:child("name"):text())
 	local experience = (params.rank > 0 and managers.experience:rank_string(params.rank) .. "-" or "") .. tostring(params.level)
 	slot:child("name"):set_text(slot:child("name"):text() .. " (" .. experience .. ")  ")
@@ -502,7 +502,7 @@ function HUDMissionBriefing:set_slot_joining(peer, peer_id)
 	slot:child("status"):set_alpha(1)
 	slot:child("status"):set_color(slot:child("status"):color():with_alpha(1))
 	slot:child("criminal"):set_color(slot:child("criminal"):color():with_alpha(1))
-	slot:child("criminal"):set_text(utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(peer:character()) or peer:character()))
+	slot:child("criminal"):set_text(managers.localization:to_upper_text("menu_" .. tostring(peer:character())))
 	slot:child("name"):set_text(peer:name() .. "  ")
 	slot:child("status"):set_visible(true)
 	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_joining"))

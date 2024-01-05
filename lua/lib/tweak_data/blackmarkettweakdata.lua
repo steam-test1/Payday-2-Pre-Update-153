@@ -21,7 +21,8 @@ function BlackMarketTweakData:print_missing_strings(skip_print_id)
 		local ignore_desc = {
 			"xp",
 			"cash",
-			"weapon_mods"
+			"weapon_mods",
+			"melee_weapons"
 		}
 		for id, data in pairs(self) do
 			for i, d in pairs(data) do
@@ -86,10 +87,10 @@ function BlackMarketTweakData:_init_masks()
 	self.masks = {}
 	self.masks.character_locked = {}
 	self.masks.character_locked.name_id = "bm_msk_character_locked"
-	self.masks.character_locked.dallas = "units/payday2/masks/msk_dallas/msk_dallas"
-	self.masks.character_locked.wolf = "units/payday2/masks/msk_wolf/msk_wolf"
-	self.masks.character_locked.hoxton = "units/payday2/masks/msk_hoxton/msk_hoxton"
-	self.masks.character_locked.chains = "units/payday2/masks/msk_chains/msk_chains"
+	self.masks.character_locked.dallas = "dallas"
+	self.masks.character_locked.wolf = "wolf"
+	self.masks.character_locked.hoxton = "hoxton"
+	self.masks.character_locked.chains = "chains"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -635,6 +636,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.pumpkin_king.global_value = "halloween"
 	self.masks.pumpkin_king.value = 5
 	self.masks.pumpkin_king.qlvl = 0
+	self.masks.pumpkin_king.sort_number = 1
 	self.masks.witch = {}
 	self.masks.witch.unit = "units/payday2/masks/msk_witch/msk_witch"
 	self.masks.witch.name_id = "bm_msk_witch"
@@ -643,6 +645,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.witch.global_value = "halloween"
 	self.masks.witch.value = 5
 	self.masks.witch.qlvl = 0
+	self.masks.witch.sort_number = 1
 	self.masks.venomorph = {}
 	self.masks.venomorph.unit = "units/payday2/masks/msk_venomorph/msk_venomorph"
 	self.masks.venomorph.name_id = "bm_msk_venomorph"
@@ -651,6 +654,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.venomorph.global_value = "halloween"
 	self.masks.venomorph.value = 5
 	self.masks.venomorph.qlvl = 0
+	self.masks.venomorph.sort_number = 1
 	self.masks.frank = {}
 	self.masks.frank.unit = "units/payday2/masks/msk_frank/msk_frank"
 	self.masks.frank.name_id = "bm_msk_frank"
@@ -659,30 +663,35 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.frank.global_value = "halloween"
 	self.masks.frank.value = 5
 	self.masks.frank.qlvl = 0
+	self.masks.frank.sort_number = 1
 	self.masks.brazil_baby = {}
 	self.masks.brazil_baby.unit = "units/payday2/masks/msk_brazil_baby/msk_brazil_baby"
 	self.masks.brazil_baby.name_id = "bm_msk_brazil_baby"
 	self.masks.brazil_baby.global_value = "halloween"
 	self.masks.brazil_baby.value = 8
 	self.masks.brazil_baby.qlvl = 0
+	self.masks.brazil_baby.sort_number = 2
 	self.masks.baby_angry = {}
 	self.masks.baby_angry.unit = "units/payday2/masks/msk_baby_angry/msk_baby_angry"
 	self.masks.baby_angry.name_id = "bm_msk_baby_angry"
 	self.masks.baby_angry.global_value = "halloween"
 	self.masks.baby_angry.value = 8
 	self.masks.baby_angry.qlvl = 0
+	self.masks.baby_angry.sort_number = 2
 	self.masks.baby_cry = {}
 	self.masks.baby_cry.unit = "units/payday2/masks/msk_baby_cry/msk_baby_cry"
 	self.masks.baby_cry.name_id = "bm_msk_baby_cry"
 	self.masks.baby_cry.global_value = "halloween"
 	self.masks.baby_cry.value = 8
 	self.masks.baby_cry.qlvl = 0
+	self.masks.baby_cry.sort_number = 2
 	self.masks.baby_happy = {}
 	self.masks.baby_happy.unit = "units/payday2/masks/msk_baby_happy/msk_baby_happy"
 	self.masks.baby_happy.name_id = "bm_msk_baby_happy"
 	self.masks.baby_happy.global_value = "halloween"
 	self.masks.baby_happy.value = 8
 	self.masks.baby_happy.qlvl = 0
+	self.masks.baby_happy.sort_number = 2
 	self.masks.heat = {}
 	self.masks.heat.unit = "units/pd2_dlc1/masks/msk_hockey_b/msk_hockey_b"
 	self.masks.heat.name_id = "bm_msk_heat"
@@ -694,7 +703,7 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.heat.value = 6
 	self.masks.heat.dlc = "pd2_clan"
-	self.masks.heat.sort_number = 1
+	self.masks.heat.sort_number = 2
 	self.masks.bear = {}
 	self.masks.bear.unit = "units/payday2/masks/msk_bear/msk_bear"
 	self.masks.bear.name_id = "bm_msk_bear"
@@ -707,7 +716,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.bear.value = 3
 	self.masks.bear.qlvl = 0
 	self.masks.bear.dlcs = {"pd2_clan"}
-	self.masks.bear.sort_number = 3
+	self.masks.bear.sort_number = 1
 	self.masks.clinton = {}
 	self.masks.clinton.unit = "units/pd2_dlc1/masks/msk_clinton/msk_clinton"
 	self.masks.clinton.name_id = "bm_msk_clinton"
@@ -817,7 +826,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.santa_happy.value = 4
 	self.masks.santa_happy.dlc = "pd2_clan"
 	self.masks.santa_happy.global_value = "pd2_clan"
-	self.masks.santa_happy.sort_number = 2
+	self.masks.santa_happy.sort_number = 3
 	self.masks.santa_mad = {}
 	self.masks.santa_mad.unit = "units/pd2_dlc_xmas/masks/msk_santa_mad/msk_santa_mad"
 	self.masks.santa_mad.name_id = "bm_msk_santa_mad"
@@ -1049,6 +1058,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.twitch_orc.qlvl = 0
 	self.masks.twitch_orc.texture_bundle_folder = "twitch_pack"
 	self.masks.twitch_orc.dlc = "twitch_pack"
+	self.masks.twitch_orc.sort_number = 3
 	self.masks.ancient = {}
 	self.masks.ancient.unit = "units/pd2_twitch_pack/masks/msk_ancient/msk_ancient"
 	self.masks.ancient.name_id = "bm_msk_ancient"
@@ -1057,6 +1067,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.ancient.qlvl = 0
 	self.masks.ancient.texture_bundle_folder = "twitch_pack"
 	self.masks.ancient.dlc = "twitch_pack"
+	self.masks.ancient.sort_number = 3
 	self.masks.unicorn = {}
 	self.masks.unicorn.unit = "units/payday2/masks/msk_unicorn/msk_unicorn"
 	self.masks.unicorn.name_id = "bm_msk_unicorn"
@@ -1210,14 +1221,14 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.tiger.dlc = "hlm_game"
 	self.masks.tiger.texture_bundle_folder = "hl_miami"
 	self.masks.combusto = {}
-	self.masks.combusto.unit = "units/payday2/masks/combusto/msk_combusto"
+	self.masks.combusto.unit = "units/pd2_crimefest_2014/oct19/masks/combusto/msk_combusto"
 	self.masks.combusto.name_id = "bm_msk_combusto"
 	self.masks.combusto.pcs = {}
 	self.masks.combusto.dlc = "pd2_clan"
 	self.masks.combusto.value = 0
 	self.masks.combusto.sort_number = 5
 	self.masks.spackle = {}
-	self.masks.spackle.unit = "units/payday2/masks/spackle/msk_spackle"
+	self.masks.spackle.unit = "units/pd2_crimefest_2014/oct19/masks/spackle/msk_spackle"
 	self.masks.spackle.name_id = "bm_msk_spackle"
 	self.masks.spackle.pcs = {}
 	self.masks.spackle.dlc = "pd2_clan"
@@ -4814,6 +4825,8 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.sentry_gun.name_id = "bm_equipment_sentry_gun"
 	self.deployables.trip_mine = {}
 	self.deployables.trip_mine.name_id = "bm_equipment_trip_mine"
+	self.deployables.armor_kit = {}
+	self.deployables.armor_kit.name_id = "bm_equipment_armor_kit"
 	self:_add_desc_from_name_macro(self.deployables)
 end
 

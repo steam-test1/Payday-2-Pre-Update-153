@@ -53,7 +53,73 @@ function PlayerMaskOff:exit(state_data, new_state_name)
 end
 
 function PlayerMaskOff:interaction_blocked()
-	return true
+	return false
+end
+
+function PlayerMaskOff:_start_action_interact(t, input, timer, interact_object)
+	self:_interupt_action_reload(t)
+	self:_interupt_action_steelsight(t)
+	self:_interupt_action_running(t)
+	self._interact_expire_t = t + timer
+	self._interact_params = {
+		object = interact_object,
+		timer = timer,
+		tweak_data = interact_object:interaction().tweak_data
+	}
+	managers.hud:show_interaction_bar(0, timer)
+	self._unit:base():set_detection_multiplier("interact", 0.5)
+	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, timer, false)
+end
+
+function PlayerMaskOff:_interupt_action_interact(t, input, complete)
+	if self._interact_expire_t then
+		self._interact_expire_t = nil
+		if alive(self._interact_params.object) then
+			self._interact_params.object:interaction():interact_interupt(self._unit, complete)
+		end
+		self._ext_camera:camera_unit():base():remove_limits()
+		managers.interaction:interupt_action_interact(self._unit)
+		managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, false, self._interact_params.tweak_data, 0, complete and true or false)
+		self._interact_params = nil
+		managers.hud:hide_interaction_bar(complete)
+		self._unit:base():set_detection_multiplier("interact", nil)
+	end
+end
+
+function PlayerMaskOff:_end_action_interact()
+	self:_interupt_action_interact(nil, nil, true)
+	managers.interaction:end_action_interact(self._unit)
+	self._unit:base():set_detection_multiplier("interact", nil)
+end
+
+function PlayerMaskOff:_start_action_use_item(t)
+	self:_interupt_action_reload(t)
+	self:_interupt_action_steelsight(t)
+	self:_interupt_action_running(t)
+	local deploy_timer = managers.player:selected_equipment_deploy_timer()
+	self._use_item_expire_t = t + deploy_timer
+	managers.hud:show_progress_timer_bar(0, deploy_timer)
+	local text = managers.player:selected_equipment_deploying_text() or managers.localization:text("hud_deploying_equipment", {
+		EQUIPMENT = managers.player:selected_equipment_name()
+	})
+	managers.hud:show_progress_timer({text = text, icon = nil})
+	local equipment_id = managers.player:selected_equipment_id()
+	managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, true, equipment_id, deploy_timer, false)
+end
+
+function PlayerMaskOff:_end_action_use_item(valid)
+	local result = managers.player:use_selected_equipment(self._unit)
+	self:_interupt_action_use_item(nil, nil, valid)
+end
+
+function PlayerMaskOff:_interupt_action_use_item(t, input, complete)
+	if self._use_item_expire_t then
+		self._use_item_expire_t = nil
+		managers.hud:hide_progress_timer_bar(complete)
+		managers.hud:remove_progress_timer()
+		self._unit:equipment():on_deploy_interupted()
+		managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, false, "", 0, complete and true or false)
+	end
 end
 
 function PlayerMaskOff:update(t, dt)
@@ -74,6 +140,7 @@ function PlayerMaskOff:_update_check_actions(t, dt)
 		local cam_flat_rot = Rotation(self._cam_fwd_flat, math.UP)
 		mvector3.rotate_with(self._move_dir, cam_flat_rot)
 	end
+	self:_update_interaction_timers(t)
 	self:_update_start_standard_timers(t)
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
@@ -96,12 +163,32 @@ function PlayerMaskOff:_get_walk_headbob()
 end
 
 function PlayerMaskOff:_check_action_interact(t, input)
-	if input.btn_interact_press and (not self._intimidate_t or t - self._intimidate_t > tweak_data.player.movement_state.interaction_delay) then
-		self._intimidate_t = t
-		if not self:mark_units("f11", t, true) then
+	local new_action, timer, interact_object
+	local interaction_wanted = input.btn_interact_press
+	if interaction_wanted then
+		local action_forbidden = self:chk_action_forbidden("interact") or self._unit:base():stats_screen_visible() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_grenade() or self:_is_meleeing() or self:_on_zipline()
+		if not action_forbidden then
+			new_action, timer, interact_object = managers.interaction:interact(self._unit)
+			if new_action then
+			end
+			if timer then
+				new_action = true
+				self._ext_camera:camera_unit():base():set_limits(80, 50)
+				self:_start_action_interact(t, input, timer, interact_object)
+			end
+			if not new_action and (not self._intimidate_t or t - self._intimidate_t > tweak_data.player.movement_state.interaction_delay) then
+				self._intimidate_t = t
+				new_action = self:mark_units("f11", t, true)
+			end
+		end
+		if not new_action then
 			managers.hint:show_hint("mask_off_block_interact")
 		end
 	end
+	if input.btn_interact_release then
+		self:_interupt_action_interact()
+	end
+	return true
 end
 
 function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)

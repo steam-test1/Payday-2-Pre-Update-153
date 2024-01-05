@@ -153,6 +153,10 @@ function RaycastWeaponBase:setup(setup_data)
 		self._spread_moving = 1
 	end
 	self._bullet_slotmask = setup_data.hit_slotmask or self._bullet_slotmask
+	self._panic_suppression_chance = setup_data.panic_suppression_skill and self:weapon_tweak_data().panic_suppression_chance
+	if self._panic_suppression_chance == 0 then
+		self._panic_suppression_chance = false
+	end
 	self._setup = setup_data
 	self._fire_mode = self._fire_mode or tweak_data.weapon[self._name_id].FIRE_MODE or "single"
 	if self._setup.timer then
@@ -197,7 +201,7 @@ end
 
 function RaycastWeaponBase:trigger_pressed(...)
 	local fired
-	if self._next_fire_allowed <= self._unit:timer():time() then
+	if self:start_shooting_allowed() then
 		fired = self:fire(...)
 		if fired then
 			local next_fire = (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
@@ -228,7 +232,8 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	local consume_ammo = self:weapon_tweak_data().category == "grenade_launcher"
 	consume_ammo = consume_ammo or not managers.player:has_activate_temporary_upgrade("temporary", "no_ammo_cost") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost"))
 	if consume_ammo then
-		if self:get_ammo_remaining_in_clip() == 0 then
+		local base = self.parent_weapon and self.parent_weapon:base() or self
+		if base:get_ammo_remaining_in_clip() == 0 then
 			return
 		end
 		local ammo_usage = 1
@@ -240,8 +245,8 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 				print("NO AMMO COST")
 			end
 		end
-		self:set_ammo_remaining_in_clip(self:get_ammo_remaining_in_clip() - ammo_usage)
-		self:set_ammo_total(self:get_ammo_total() - ammo_usage)
+		base:set_ammo_remaining_in_clip(base:get_ammo_remaining_in_clip() - ammo_usage)
+		base:set_ammo_total(base:get_ammo_total() - ammo_usage)
 	end
 	local user_unit = self._setup.user_unit
 	self:_check_ammo_total(user_unit)
@@ -258,7 +263,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	if ray_res.enemies_in_cone then
 		for enemy_data, dis_error in pairs(ray_res.enemies_in_cone) do
 			if not enemy_data.unit:movement():cool() then
-				enemy_data.unit:character_damage():build_suppression(suppr_mul * dis_error * self._suppression)
+				enemy_data.unit:character_damage():build_suppression(suppr_mul * dis_error * self._suppression, self._panic_suppression_chance)
 			end
 		end
 	end
@@ -754,6 +759,9 @@ function RaycastWeaponBase:calculate_ammo_max_per_clip()
 	if not self:upgrade_blocked("weapon", "clip_ammo_increase") then
 		ammo = ammo + managers.player:upgrade_value("weapon", "clip_ammo_increase", 0)
 	end
+	if not self:upgrade_blocked(tweak_data.weapon[self._name_id].category, "clip_ammo_increase") then
+		ammo = ammo + managers.player:upgrade_value(tweak_data.weapon[self._name_id].category, "clip_ammo_increase", 0)
+	end
 	return ammo
 end
 
@@ -803,6 +811,10 @@ function RaycastWeaponBase:exit_run_speed_multiplier()
 	local multiplier = managers.player:upgrade_value(self:weapon_tweak_data().category, "exit_run_speed_multiplier", 1)
 	multiplier = multiplier * managers.player:upgrade_value(self._name_id, "exit_run_speed_multiplier", 1)
 	return multiplier
+end
+
+function RaycastWeaponBase:recoil_addend()
+	return 0
 end
 
 function RaycastWeaponBase:recoil_multiplier()
@@ -989,6 +1001,10 @@ function RaycastWeaponBase:on_disabled()
 	self._enabled = false
 end
 
+function RaycastWeaponBase:enabled()
+	return self._enabled
+end
+
 function RaycastWeaponBase:play_tweak_data_sound(event, alternative_event)
 	local sounds = tweak_data.weapon[self._name_id].sounds
 	local event = sounds and (sounds[event] or sounds[alternative_event])
@@ -1048,10 +1064,7 @@ InstantBulletBase = InstantBulletBase or class()
 
 function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
 	local hit_unit = col_ray.unit
-	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
-		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
-		self:play_impact_sound_and_effects(col_ray)
-	end
+	local play_impact_flesh = not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood
 	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
 		local sync_damage = not blank and hit_unit:id() ~= -1
 		local network_damage = math.ceil(damage * 163.84)
@@ -1067,17 +1080,25 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 		end
 	end
+	local result
 	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
 		local is_alive = not hit_unit:character_damage():dead()
-		local result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage)
-		local is_dead = hit_unit:character_damage():dead()
-		local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
-		managers.game_play_central:physics_push(col_ray, push_multiplier)
-		return result
+		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage)
+		if result ~= "friendly_fire" then
+			local is_dead = hit_unit:character_damage():dead()
+			local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
+			managers.game_play_central:physics_push(col_ray, push_multiplier)
+		else
+			play_impact_flesh = false
+		end
 	else
+		managers.game_play_central:physics_push(col_ray)
 	end
-	managers.game_play_central:physics_push(col_ray)
-	return nil
+	if play_impact_flesh then
+		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
+		self:play_impact_sound_and_effects(col_ray)
+	end
+	return result
 end
 
 function InstantBulletBase:_get_character_push_multiplier(weapon_unit, died)

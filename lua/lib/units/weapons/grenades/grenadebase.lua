@@ -85,9 +85,9 @@ function GrenadeBase:add_damage_result(unit, is_dead, damage_percent)
 		return
 	end
 	local unit_type = unit:base()._tweak_table
-	local is_civlian = unit:character_damage():_type_civilian(unit_type)
-	local is_gangster = unit:character_damage():_type_gangster(unit_type)
-	local is_cop = not is_civlian and not is_gangster
+	local is_civlian = unit:character_damage().is_civilian(unit_type)
+	local is_gangster = unit:character_damage().is_gangster(unit_type)
+	local is_cop = unit:character_damage().is_cop(unit_type)
 	if is_civlian then
 		return
 	end

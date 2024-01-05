@@ -46,6 +46,7 @@ require("lib/managers/menu/CircleGuiObject")
 require("lib/managers/menu/BoxGuiObject")
 require("lib/managers/menu/NewsFeedGui")
 require("lib/managers/menu/ImageBoxGui")
+require("lib/managers/menu/SpecializationBoxGui")
 require("lib/managers/menu/ProfileBoxGui")
 require("lib/managers/menu/ContractBoxGui")
 require("lib/managers/menu/ServerStatusBoxGui")
@@ -98,6 +99,7 @@ function Setup:init_category_print()
 		"george",
 		"qa",
 		"bob",
+		"jansve",
 		"sound_placeholder",
 		"spam"
 	}
@@ -263,61 +265,10 @@ end
 
 function Setup:_setup_loading_environment()
 	local env_map = {
-		hdr_post_processor = {
-			tone_mapping = {
-				disable_tone_mapping = 1,
-				copy_luminance_target = 0,
-				luminance_clamp = Vector3(0, 0, 0),
-				white_luminance = 0,
-				middle_grey = 0,
-				dark_to_bright_adaption_speed = 0,
-				bright_to_dark_adaption_speed = 0
-			},
-			radial_blur = {
-				world_pos = Vector3(0, 0, 0),
-				kernel_size = 16,
-				falloff_exponent = 1,
-				opacity = 0
-			},
-			light_adaption = {
-				disable_tone_mapping = 1,
-				copy_luminance_target = 0,
-				luminance_clamp = Vector3(0, 0, 0),
-				white_luminance = 0,
-				middle_grey = 0,
-				dark_to_bright_adaption_speed = 0,
-				bright_to_dark_adaption_speed = 0
-			},
-			bloom_brightpass = {
-				disable_tone_mapping = 1,
-				middle_grey = 0,
-				white_luminance = 0,
-				threshold = 0
-			},
-			exposure_sepia_levels = {
-				disable_tone_mapping = 1,
-				copy_luminance_target = 0,
-				luminance_clamp = Vector3(0, 0, 0),
-				white_luminance = 0,
-				middle_grey = 0,
-				dark_to_bright_adaption_speed = 0,
-				bright_to_dark_adaption_speed = 0
-			},
-			bloom_apply = {opacity = 0},
-			dof = {
-				near_focus_distance_min = 0,
-				near_focus_distance_max = 0,
-				far_focus_distance_min = 50000,
-				far_focus_distance_max = 50000,
-				clamp = 0
-			}
-		},
 		deferred = {
 			shadow = {
-				fadeout_blend = 1,
 				shadow_slice_depths = Vector3(800, 1600, 5500),
 				shadow_slice_overlap = Vector3(150, 300, 400),
-				shadow_fadeout = Vector3(16000, 17500, 0),
 				slice0 = Vector3(0, 800, 0),
 				slice1 = Vector3(650, 1600, 0),
 				slice2 = Vector3(1300, 5500, 0),
@@ -325,33 +276,12 @@ function Setup:_setup_loading_environment()
 			},
 			apply_ambient = {
 				ambient_color = Vector3(1, 1, 1),
+				ambient_color_scale = 0.32,
 				ambient_scale = 1,
 				ambient_falloff_scale = 0,
-				ambient_view_falloff_sharpness = 0,
 				sky_top_color = Vector3(0, 0, 0),
 				sky_bottom_color = Vector3(0, 0, 0),
-				sky_reflection_top_color = Vector3(0, 0, 0),
-				sky_reflection_bottom_color = Vector3(0, 0, 0),
-				sun_specular_color = Vector3(0, 0, 0),
-				height_fade = Vector3(25000, 25000, 0),
-				height_fade_intesity_clamp = Vector3(1, 1, 0),
-				environment_map_intensity = 0,
-				environment_map_intensity_shadow = 0,
-				effect_light_scale = 0
-			}
-		},
-		fog_processor = {
-			fog = {
-				start_color = Vector3(0, 0, 0),
-				color0 = Vector3(0, 0, 0),
-				alpha0 = 0,
-				color1 = Vector3(0, 0, 0),
-				alpha1 = 0,
-				color2 = Vector3(0, 0, 0),
-				start = 0,
-				end0 = 1000000,
-				end1 = 1000000,
-				end2 = 1000000
+				effect_light_scale = 1
 			}
 		},
 		shadow_processor = {
@@ -361,8 +291,7 @@ function Setup:_setup_loading_environment()
 				slice2 = Vector3(1300, 5500, 0),
 				slice3 = Vector3(5100, 17500, 0),
 				shadow_slice_depths = Vector3(800, 1600, 5500),
-				shadow_slice_overlap = Vector3(150, 300, 400),
-				shadow_fadeout = Vector3(16000, 17500, 0)
+				shadow_slice_overlap = Vector3(150, 300, 400)
 			}
 		}
 	}
@@ -417,6 +346,7 @@ function Setup:update(t, dt)
 end
 
 function Setup:paused_update(t, dt)
+	self:_upd_unload_packages()
 	managers.platform:paused_update(t, dt)
 	managers.dyn_resource:update()
 	managers.system_menu:paused_update(t, dt)
@@ -582,4 +512,8 @@ function Setup:_upd_unload_packages()
 			self._packages_to_unload = nil
 		end
 	end
+end
+
+function Setup:is_unloading()
+	return self._started_unloading_packages and true
 end

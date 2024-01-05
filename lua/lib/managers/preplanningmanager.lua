@@ -32,6 +32,15 @@ function PrePlanningManager:register_element(element)
 	end
 end
 
+function PrePlanningManager:unregister_element(element)
+	for _, type in ipairs(element:value("allowed_types")) do
+		table.delete(self._mission_elements_by_type[type], element)
+		if not next(self._mission_elements_by_type[type]) then
+			self._mission_elements_by_type[type] = nil
+		end
+	end
+end
+
 function PrePlanningManager:is_type_disabled(type)
 	return not not self._disabled_types[type]
 end

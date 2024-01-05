@@ -112,6 +112,7 @@ action_variants.mobster_boss = security_variant
 action_variants.dealer = security_variant
 action_variants.biker_escape = security_variant
 action_variants.city_swat = security_variant
+action_variants.old_hoxton_mission = security_variant
 action_variants.shield = clone(security_variant)
 action_variants.shield.hurt = ShieldActionHurt
 action_variants.tank = clone(security_variant)
@@ -621,14 +622,7 @@ function CopMovement:set_attention(attention)
 			return
 		end
 	end
-	if self._attention and self._attention.destroy_listener_key then
-		if alive(self._attention.unit) and self._attention.unit:base() then
-			self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
-			self._attention.destroy_listener_key = nil
-		else
-			debug_pause_unit(self._unit, "[CopMovement:set_attention] could not remove destroy listener. self._attention.unit", self._attention.unit, "base", alive(self._attention.unit) and self._attention.unit:base())
-		end
-	end
+	self:_remove_attention_destroy_listener(self._attention)
 	if attention then
 		if attention.unit then
 			local attention_unit
@@ -645,12 +639,7 @@ function CopMovement:set_attention(attention)
 					self._ext_network:send("set_attention", attention_unit, AIAttentionObject.REACT_IDLE)
 				end
 			end
-			if attention.unit:base() and attention.unit:base().add_destroy_listener then
-				local attention_unit = attention.unit
-				local listener_key = "CopMovement" .. tostring(self._unit:key())
-				attention.destroy_listener_key = listener_key
-				attention_unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
-			end
+			self:_add_attention_destroy_listener(attention)
 		else
 			self._ext_network:send("cop_set_attention_pos", attention.pos)
 		end
@@ -832,6 +821,9 @@ function CopMovement:set_cool(state, giveaway)
 	self._action_common_data.is_cool = state
 	if not state and old_state then
 		self._not_cool_t = TimerManager:game():time()
+		if Network:is_server() and self._stance.name == "ntl" then
+			self:set_stance("hos", nil, nil)
+		end
 		if self._unit:unit_data().mission_element and not self._unit:unit_data().alerted_event_called then
 			self._unit:unit_data().alerted_event_called = true
 			self._unit:unit_data().mission_element:event("alerted", self._unit)
@@ -867,19 +859,12 @@ function CopMovement:not_cool_t()
 end
 
 function CopMovement:synch_attention(attention)
-	if self._attention and self._attention.destroy_listener_key then
-		if alive(self._attention.unit) and self._attention.unit:base() then
-			self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
-		else
-			debug_pause_unit(self._unit, "[CopMovement:synch_attention] destroyed unit", self._attention.debug_unit_name)
-		end
-		self._attention.destroy_listener_key = nil
-	end
-	if attention and attention.unit and attention.unit:base() and attention.unit:base().add_destroy_listener then
-		local listener_key = "CopMovement" .. tostring(self._unit:key())
-		attention.destroy_listener_key = listener_key
-		attention.unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
-		attention.debug_unit_name = attention.unit:name()
+	self:_remove_attention_destroy_listener(self._attention)
+	self:_add_attention_destroy_listener(attention)
+	if attention and attention.unit and not attention.destroy_listener_key then
+		debug_pause_unit(attention.unit, "[CopMovement:synch_attention] problematic attention unit", attention.unit)
+		self:synch_attention(nil)
+		return
 	end
 	self._attention = attention
 	self._action_common_data.attention = attention
@@ -887,6 +872,27 @@ function CopMovement:synch_attention(attention)
 		if action and action.on_attention then
 			action:on_attention(attention)
 		end
+	end
+end
+
+function CopMovement:_add_attention_destroy_listener(attention)
+	if attention and attention.unit then
+		local listener_class = (not (attention.unit:base() and attention.unit:base().add_destroy_listener) or not attention.unit:base()) and attention.unit:unit_data() and attention.unit:unit_data().add_destroy_listener and attention.unit:unit_data()
+		if not listener_class then
+			return
+		end
+		local listener_key = "CopMovement" .. tostring(self._unit:key())
+		attention.destroy_listener_key = listener_key
+		listener_class:add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
+		attention.debug_unit_name = attention.unit:name()
+	end
+end
+
+function CopMovement:_remove_attention_destroy_listener(attention)
+	if attention and attention.destroy_listener_key then
+		local listener_class = (not (attention.unit:base() and attention.unit:base().remove_destroy_listener) or not attention.unit:base()) and attention.unit:unit_data() and attention.unit:unit_data().remove_destroy_listener and attention.unit:unit_data()
+		listener_class:remove_destroy_listener(attention.destroy_listener_key)
+		attention.destroy_listener_key = nil
 	end
 end
 
@@ -1027,13 +1033,23 @@ function CopMovement:on_suppressed(state)
 		suppression.value = end_value
 		self._machine:set_global("sup", end_value)
 	end
-	self._action_common_data.is_suppressed = state or nil
+	self._action_common_data.is_suppressed = state and true or nil
 	if Network:is_server() and state and (not self._tweak_data.allowed_poses or self._tweak_data.allowed_poses.crouch) and (not self._tweak_data.allowed_poses or self._tweak_data.allowed_poses.stand) and not self:chk_action_forbidden("walk") then
-		if self._ext_anim.idle and (not self._active_actions[2] or self._active_actions[2]:type() == "idle") then
+		if state == "panic" and not self:chk_action_forbidden("act") then
+			local action_desc = {
+				type = "act",
+				body_part = 1,
+				variant = self._ext_anim.run and self._ext_anim.move_fwd and "e_so_sup_fumble_run_fwd" or "e_so_sup_fumble_inplace",
+				clamp_to_graph = true,
+				blocks = {walk = -1, action = -1}
+			}
+			self:action_request(action_desc)
+		elseif self._ext_anim.idle and (not self._active_actions[2] or self._active_actions[2]:type() == "idle") then
 			local action_desc = {
 				type = "act",
 				body_part = 1,
 				variant = "suppressed_reaction",
+				clamp_to_graph = true,
 				blocks = {walk = -1}
 			}
 			self:action_request(action_desc)
@@ -1097,7 +1113,7 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		block_type = hurt_type
 	end
 	local client_interrupt
-	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "expl_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "death" or hurt_type == "hurt_sick") then
+	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "expl_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "counter_spooc" or hurt_type == "death" or hurt_type == "hurt_sick") then
 		client_interrupt = true
 	end
 	local tweak = self._tweak_data
@@ -1910,12 +1926,7 @@ function CopMovement:pre_destroy()
 		end
 	end
 	if self._attention and self._attention.destroy_listener_key then
-		if alive(self._attention.unit) then
-			self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
-		else
-			debug_pause_unit(self._unit, "[CopMovement:pre_destroy] destroyed unit did not remove attention: ", self._attention.debug_unit_name)
-		end
-		self._attention.destroy_listener_key = nil
+		self:_remove_attention_destroy_listener(self._attention)
 	end
 end
 

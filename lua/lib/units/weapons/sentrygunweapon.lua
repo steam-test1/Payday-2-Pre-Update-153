@@ -69,10 +69,20 @@ function SentryGunWeapon:set_ammo(amount)
 	self._ammo_max = math.max(self._ammo_max, amount)
 end
 
+function SentryGunWeapon:_setup_contour()
+	if self:out_of_ammo() then
+		self._unit:contour():remove("deployable_active")
+		if self._unit:base():is_owner() or managers.player:has_category_upgrade("sentry_gun", "can_reload") then
+			self._unit:contour():add("deployable_disabled")
+		end
+	end
+end
+
 function SentryGunWeapon:change_ammo(amount)
 	self._ammo_total = math.min(math.ceil(self._ammo_total + amount), self._ammo_max)
 	local ammo_percent = self._ammo_total / self._ammo_max
 	local resolution_step = math.ceil(ammo_percent / self._ammo_sync_resolution)
+	self:_setup_contour()
 	if ammo_percent == 0 or resolution_step ~= self._ammo_sync then
 		self._ammo_sync = resolution_step
 		self._unit:network():send("sentrygun_ammo", self._ammo_sync)
@@ -83,6 +93,7 @@ end
 function SentryGunWeapon:sync_ammo(ammo_ratio)
 	self._ammo_ratio = ammo_ratio * self._ammo_sync_resolution
 	self._unit:interaction():set_dirty(true)
+	self:_setup_contour()
 end
 
 function SentryGunWeapon:set_spread_mul(spread_mul)

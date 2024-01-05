@@ -196,8 +196,11 @@ function ConnectionNetworkHandler:set_menu_sync_state_index(index, sender)
 	end
 end
 
-function ConnectionNetworkHandler:enter_ingame_lobby_menu(sender)
+function ConnectionNetworkHandler:enter_ingame_lobby_menu(load_counter, sender)
 	if not self._verify_sender(sender) then
+		return
+	end
+	if load_counter ~= managers.network:session():load_counter() then
 		return
 	end
 	if managers.menu_component then
@@ -485,7 +488,7 @@ function ConnectionNetworkHandler:sync_outfit(outfit_string, outfit_version, sen
 		managers.network:session():chk_request_peer_outfit_load_status()
 	end
 	local local_peer = managers.network:session() and managers.network:session():local_peer()
-	local in_lobby = local_peer and local_peer:in_lobby() and game_state_machine:current_state_name() ~= "ingame_lobby_menu"
+	local in_lobby = local_peer and local_peer:in_lobby() and game_state_machine:current_state_name() ~= "ingame_lobby_menu" and not setup:is_unloading()
 	if managers.menu_scene and in_lobby then
 		managers.menu_scene:set_lobby_character_out_fit(peer:id(), outfit_string, peer:rank())
 	end

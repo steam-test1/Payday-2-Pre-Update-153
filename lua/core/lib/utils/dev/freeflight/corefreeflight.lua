@@ -252,8 +252,10 @@ function FreeFlight:enable()
 	if self._gsm:current_state():allow_freeflight() then
 		local active_vp = self._vpm:first_active_viewport()
 		if active_vp then
-			local env = active_vp:environment_mixer():current_environment()
-			self._vp:environment_mixer():set_environment(env)
+			local env_path = active_vp:get_environment_path()
+			if env_path then
+				self._vp:set_environment(env_path)
+			end
 			self._start_cam = active_vp:camera()
 			if self._start_cam then
 				local pos = self._start_cam:position() - (alive(self._attached_to_unit) and self._attached_to_unit:position() or Vector3())

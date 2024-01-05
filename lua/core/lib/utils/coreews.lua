@@ -226,7 +226,7 @@ function combobox(params)
 	local options = params.options or {}
 	local value = params.value or options[1]
 	local name_proportions = params.name_proportions or 1
-	local ctrlr_proportions = params.ctrlr_proportions or 1
+	local ctrlr_proportions = params.ctrlr_proportions or 2
 	params.sizer_proportions = params.sizer_proportions or 0
 	local tooltip = params.tooltip
 	local styles = params.styles or "CB_DROPDOWN,CB_READONLY"
@@ -263,6 +263,9 @@ end
 function _set_combobox_value(params)
 	params.value = params.ctrlr:get_value()
 	params.value = params.numbers and tonumber(params.value) or params.value
+	if params.value_changed_cb then
+		params.value_changed_cb(params)
+	end
 end
 
 function update_combobox_options(params, options)
@@ -283,6 +286,9 @@ function change_combobox_value(params, value)
 	params.value = value
 	params.value = params.numbers and tonumber(params.value) or params.value
 	params.ctrlr:set_value(value)
+	if params.value_changed_cb then
+		params.value_changed_cb(params)
+	end
 end
 
 function slider_and_number_controller(params)
@@ -502,6 +508,37 @@ function _list_selector_updated_callback(params)
 	if params.updated_callback then
 		params.updated_callback(_list_selector_get_value(params))
 	end
+end
+
+function combobox_and_list(params)
+	local horizontal_sizer = EWS:BoxSizer("HORIZONTAL")
+	params.sizer:add(horizontal_sizer, 0, 1, "EXPAND,LEFT")
+	params.sizer = horizontal_sizer
+	params.sizer_proportions = params.sizer_proportions or 1
+	params.tooltip = params.tooltip or "Select an option from the combobox"
+	local ctrlr = combobox(params)
+	local toolbar = EWS:ToolBar(params.panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("SELECT_NAME_LIST", "Select from list", image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("SELECT_NAME_LIST", "EVT_COMMAND_MENU_SELECTED", callback(nil, _G, "_on_gui_value_combobox_toolbar_select_dialog"), {combobox_params = params})
+	toolbar:realize()
+	horizontal_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	params.toolbar = toolbar
+	return ctrlr, params
+end
+
+function _on_gui_value_combobox_toolbar_select_dialog(params)
+	local dialog = _G.SelectNameModal:new("Select name", params.combobox_params.options)
+	if dialog:cancelled() then
+		return
+	end
+	for _, name in ipairs(dialog:_selected_item_assets()) do
+		change_combobox_value(params.combobox_params, name)
+	end
+end
+
+function set_combobox_and_list_enabled(params, enabled)
+	params.ctrlr:set_enabled(enabled)
+	params.toolbar:set_enabled(enabled)
 end
 
 function get_notebook_current_page_index(notebook)

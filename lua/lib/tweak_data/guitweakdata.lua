@@ -278,6 +278,7 @@ function GuiTweakData:init()
 	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
 	self.armor_damage_shake_base = 1.1
+	self.LONGEST_CHAR_NAME = "HOXTON"
 	self.crime_net.regions = {
 		{
 			closed = true,

@@ -76,6 +76,16 @@ function MissionScriptElement:on_executed(instigator, alternative, skip_execute_
 	self._last_orientation_index = nil
 	self:_print_debug_on_executed(instigator)
 	self:_reduce_trigger_times()
+	if Application:production_build() then
+		self._on_executed_counter = (self._on_executed_counter or 0) + 1
+		if math.mod(self._on_executed_counter, 500) == 0 then
+			_G.debug_pause("Mission element " .. self._editor_name .. " has been executed " .. self._on_executed_counter .. [[
+ times. Endless loop suspected. Loop will be terminated.
+
+]])
+			return
+		end
+	end
 	if not skip_execute_on_executed or CoreClass.type_name(skip_execute_on_executed) ~= "boolean" then
 		self:_trigger_execute_on_executed(instigator, alternative)
 	end

@@ -6,8 +6,21 @@ function ElementPrePlanning:init(...)
 end
 
 function ElementPrePlanning:on_script_activated()
+	self._mission_script:add_save_state_cb(self._id)
 	if self._values.enabled then
+		self._has_registered = true
 		managers.preplanning:register_element(self)
+	end
+end
+
+function ElementPrePlanning:set_enabled(enabled)
+	ElementPrePlanning.super.set_enabled(self, enabled)
+	if enabled and not self._has_registered then
+		self._has_registered = true
+		managers.preplanning:register_element(self)
+	elseif not enabled and self._has_registered then
+		self._has_registered = nil
+		managers.preplanning:unregister_element(self)
 	end
 end
 
@@ -16,4 +29,12 @@ function ElementPrePlanning:on_executed(instigator, ...)
 		return
 	end
 	ElementPrePlanning.super.on_executed(self, instigator, ...)
+end
+
+function ElementPrePlanning:save(data)
+	data.enabled = self._values.enabled
+end
+
+function ElementPrePlanning:load(data)
+	self:set_enabled(data.enabled)
 end

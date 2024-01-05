@@ -74,6 +74,22 @@ function EquipmentsTweakData:init()
 		deploy_time = 2,
 		visual_object = "g_toolbag"
 	}
+	self.armor_kit = {
+		icon = "equipment_armor_kit",
+		quantity = 1,
+		text_id = "debug_equipment_armor_kit",
+		deploying_text_id = "hud_equipment_equipping_armor_kit",
+		description_id = "des_armor_kit",
+		use_function_name = "use_armor_kit",
+		dropin_penalty_function_name = "use_armor_kit_dropin_penalty",
+		action_timer = 2,
+		deploy_time = 2,
+		visual_object = "g_toolbag",
+		limit_movement = true,
+		sound_start = "bar_armor",
+		sound_interupt = "bar_armor_cancel",
+		sound_done = "bar_armor_finished"
+	}
 	self.specials = {}
 	self.specials.cable_tie = {
 		text_id = "debug_equipment_cable_tie",
@@ -303,6 +319,26 @@ function EquipmentsTweakData:init()
 		icon = "equipment_crowbar",
 		sync_possession = true
 	}
+	self.specials.harddrive = {
+		text_id = "hud_equipment_harddrive",
+		icon = "equipment_crowbar",
+		sync_possession = true
+	}
+	self.specials.files = {
+		text_id = "hud_equipment_files",
+		icon = "equipment_crowbar",
+		sync_possession = true
+	}
+	self.specials.ticket = {
+		text_id = "hud_equipment_take_ticket",
+		icon = "equipment_crowbar",
+		sync_possession = true
+	}
+	self.specials.bridge = {
+		text_id = "hud_equipment_take_bridge",
+		icon = "equipment_crowbar",
+		sync_possession = true
+	}
 	self.max_amount = {
 		ammo_bag = 2,
 		doctor_bag = 2,
@@ -315,4 +351,5 @@ function EquipmentsTweakData:init()
 		asset_grenade_crate = 3,
 		asset_bodybags_bag = 3
 	}
+	self.class_name_to_deployable_id = {AmmoBagBase = "ammo_bag", DoctorBagBase = "doctor_bag"}
 end

@@ -1,3 +1,4 @@
+core:import("CoreEnvironmentFeeder")
 ShadowBlock = ShadowBlock or CoreClass.class()
 
 function ShadowBlock:init()
@@ -28,16 +29,21 @@ end
 
 function CoreEnvEditor:load_shadow_data(block)
 	for k, v in pairs(block:map()) do
-		self._shadow_params[k]:set_value(v)
+		local param = self._shadow_params[k]
+		if param then
+			param:set_value(v)
+		end
 	end
 end
 
 function CoreEnvEditor:parse_shadow_data()
 	local values = {}
-	local data = managers.viewport:get_environment_cache():environment(self._env_path):data_root().post_effect.shadow_processor.shadow_rendering.shadow_modifier
-	for key, value in pairs(data) do
-		values[key] = value
-	end
+	values.slice0 = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSlice0Feeder.DATA_PATH_KEY)
+	values.slice1 = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSlice1Feeder.DATA_PATH_KEY)
+	values.slice2 = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSlice2Feeder.DATA_PATH_KEY)
+	values.slice3 = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSlice3Feeder.DATA_PATH_KEY)
+	values.shadow_slice_overlap = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSliceOverlapFeeder.DATA_PATH_KEY)
+	values.shadow_slice_depths = managers.viewport:get_environment_value(self._env_path, CoreEnvironmentFeeder.PostShadowSliceDepthsFeeder.DATA_PATH_KEY)
 	local block = self:convert_to_block(values)
 	self._shadow_blocks[self._env_path] = block
 	self:load_shadow_data(block)
@@ -71,7 +77,6 @@ function CoreEnvEditor:convert_to_block(values)
 	block:set("o1", values.shadow_slice_overlap.x)
 	block:set("o2", values.shadow_slice_overlap.y)
 	block:set("o3", values.shadow_slice_overlap.z)
-	block:set("f", values.shadow_fadeout.x - block:get("d3"))
 	return block
 end
 
@@ -89,7 +94,6 @@ function CoreEnvEditor:shadow_feed_params(feed_params)
 	feed_params.slice3 = s3
 	feed_params.shadow_slice_depths = shadow_slice_depths
 	feed_params.shadow_slice_overlap = shadow_slice_overlaps
-	feed_params.shadow_fadeout = Vector3(interface_params.d3:get_value() - interface_params.f:get_value(), interface_params.d3:get_value(), 0)
 	return feed_params
 end
 
@@ -116,11 +120,15 @@ function CoreEnvEditor:create_shadow_tab()
 	settings_box:add(self._shadow_params.o2._box, 0, 0, "EXPAND")
 	self._shadow_params.o3 = self:add_post_processors_param("shadow_processor", "shadow_modifier", "o3", SingelSlider:new(self, scrolled_window, "Blend overlap between third and forth shadow slice", nil, 1, 10000, 1, 1, true))
 	settings_box:add(self._shadow_params.o3._box, 0, 0, "EXPAND")
-	self._shadow_params.f = self:add_post_processors_param("shadow_processor", "shadow_modifier", "f", SingelSlider:new(self, scrolled_window, "Fadeout distance", nil, 1, 10000, 1, 1, true))
-	settings_box:add(self._shadow_params.f._box, 0, 0, "EXPAND")
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "slice0", DummyWidget:new())
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "slice1", DummyWidget:new())
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "slice2", DummyWidget:new())
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "slice3", DummyWidget:new())
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "shadow_slice_overlap", DummyWidget:new())
+	self:add_post_processors_param("shadow_processor", "shadow_modifier", "shadow_slice_depths", DummyWidget:new())
 	box:add(settings_box, 0, 0, "EXPAND")
 	scrolled_window:set_sizer(box)
 	panel_box:add(scrolled_window, 1, 0, "EXPAND")
 	panel:set_sizer(panel_box)
-	self._main_notebook:add_page(panel, "Shadow Slices", false)
+	self._main_notebook:add_page(panel, "Shadow slices", false)
 end

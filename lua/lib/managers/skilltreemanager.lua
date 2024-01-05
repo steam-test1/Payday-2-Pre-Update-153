@@ -1,5 +1,5 @@
 SkillTreeManager = SkillTreeManager or class()
-SkillTreeManager.VERSION = 4
+SkillTreeManager.VERSION = 5
 
 function SkillTreeManager:init()
 	self:_setup()
@@ -24,8 +24,38 @@ function SkillTreeManager:_setup(reset)
 				total = #data
 			}
 		end
+		self:_setup_specialization()
 	end
 	self._global = Global.skilltree_manager
+end
+
+function SkillTreeManager:_setup_specialization()
+	self._global.specializations = {
+		points_present = self:digest_value(0, true),
+		points = self:digest_value(0, true),
+		total_points = self:digest_value(0, true),
+		xp_present = self:digest_value(0, true),
+		xp_leftover = self:digest_value(0, true),
+		current_specialization = self:digest_value(1, true)
+	}
+	local max_specialization_points = 0
+	for tree, data in ipairs(tweak_data.skilltree.specializations or {}) do
+		self._global.specializations[tree] = {
+			points_spent = self:digest_value(0, true),
+			tiers = {
+				current_tier = self:digest_value(0, true),
+				max_tier = self:digest_value(#data, true),
+				next_tier_data = {
+					current_points = self:digest_value(0, true),
+					points = self:digest_value(data[1].cost, true)
+				}
+			}
+		}
+		for _, tier in ipairs(data) do
+			max_specialization_points = max_specialization_points + tier.cost
+		end
+	end
+	self._global.specializations.max_points = self:digest_value(max_specialization_points, true)
 end
 
 function SkillTreeManager:all_skilltree_ids()
@@ -355,6 +385,44 @@ function SkillTreeManager:get_times_respeced()
 	return self._global.times_respeced
 end
 
+function SkillTreeManager:reset_skilltrees_and_specialization(points_aquired_during_load)
+	self:reset_skilltrees()
+	self:reset_specializations()
+	local level_points = managers.experience:current_level()
+	local assumed_points = level_points + points_aquired_during_load
+	self:_set_points(assumed_points)
+	self._global.VERSION = SkillTreeManager.VERSION
+	self._global.reset_message = true
+	self._global.times_respeced = 1
+	if SystemInfo:platform() == Idstring("WIN32") then
+		managers.statistics:publish_skills_to_steam()
+	end
+end
+
+function SkillTreeManager:reset_specializations()
+	local current_specialization = self:digest_value(self._global.specializations.current_specialization, false)
+	local tree_data = self._global.specializations[current_specialization]
+	if tree_data then
+		local tier_data = tree_data.tiers
+		if tier_data then
+			local current_tier = self:digest_value(tier_data.current_tier, false)
+			local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
+			for i = 1, current_tier do
+				for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
+					managers.upgrades:unaquire(upgrade, true)
+				end
+			end
+		end
+	end
+	local max_points = self:digest_value(self._global.specializations.max_points, false)
+	local total_points = self:digest_value(self._global.specializations.total_points, false)
+	local points_to_retain = math.min(max_points, total_points)
+	self:_setup_specialization()
+	self._global.specializations.total_points = self:digest_value(points_to_retain, true)
+	self._global.specializations.points = self:digest_value(points_to_retain, true)
+	self._global.specializations.points_present = self:digest_value(points_to_retain, true)
+end
+
 function SkillTreeManager:reset_skilltrees()
 	if self._global.VERSION < 5 then
 		for tree_id, tree_data in pairs(self._global.trees) do
@@ -365,9 +433,29 @@ function SkillTreeManager:reset_skilltrees()
 			self:_respec_tree_version5(tree_id, 1)
 		end
 	end
-	self._global.VERSION = SkillTreeManager.VERSION
-	self._global.reset_message = true
-	self._global.times_respeced = 1
+end
+
+function SkillTreeManager:infamy_reset()
+	local saved_specialization = self._global.specializations
+	Global.skilltree_manager = nil
+	self:_setup()
+	self._global.specializations = saved_specialization
+	local current_specialization = self:digest_value(self._global.specializations.current_specialization, false)
+	local tree_data = self._global.specializations[current_specialization]
+	if not tree_data then
+		return
+	end
+	local tier_data = tree_data.tiers
+	if not tier_data then
+		return
+	end
+	local current_tier = self:digest_value(tier_data.current_tier, false)
+	local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
+	for i = 1, current_tier do
+		for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
+			managers.upgrades:aquire(upgrade, false)
+		end
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		managers.statistics:publish_skills_to_steam()
 	end
@@ -458,6 +546,7 @@ function SkillTreeManager:save(data)
 		points = self._global.points,
 		trees = self._global.trees,
 		skills = self._global.skills,
+		specializations = self._global.specializations,
 		VERSION = self._global.VERSION or 0,
 		reset_message = self._global.reset_message,
 		times_respeced = self._global.times_respeced or 1
@@ -478,12 +567,25 @@ function SkillTreeManager:load(data, version)
 				self._global.skills[skill_id].unlocked = skill_data.unlocked
 			end
 		end
+		if state.specializations then
+			self._global.specializations.total_points = state.specializations.total_points or self._global.specializations.total_points
+			self._global.specializations.points = state.specializations.points or self._global.specializations.points
+			self._global.specializations.points_present = state.specializations.points_present or self._global.specializations.points_present
+			self._global.specializations.xp_present = state.specializations.xp_present or self._global.specializations.xp_present
+			self._global.specializations.xp_leftover = state.specializations.xp_leftover or self._global.specializations.xp_leftover
+			self._global.specializations.current_specialization = state.specializations.current_specialization or self._global.specializations.current_specialization
+			for tree, data in ipairs(state.specializations) do
+				if self._global.specializations[tree] then
+					self._global.specializations[tree].points_spent = data.points_spent or self._global.specializations[tree].points_spent
+				end
+			end
+		end
 		self:_verify_loaded_data(points_aquired_during_load)
 		self._global.VERSION = state.VERSION
 		self._global.reset_message = state.reset_message
 		self._global.times_respeced = state.times_respeced
 		if not self._global.VERSION or self._global.VERSION ~= SkillTreeManager.VERSION then
-			managers.savefile:add_load_done_callback(callback(self, self, "reset_skilltrees"))
+			managers.savefile:add_load_done_callback(callback(self, self, "reset_skilltrees_and_specialization", points_aquired_during_load))
 		end
 	end
 end
@@ -502,6 +604,12 @@ function SkillTreeManager:_verify_loaded_data(points_aquired_during_load)
 	end
 	if assumed_points > points then
 		self:_set_points(self:points() + (assumed_points - points))
+	end
+	for skill_id, data in pairs(clone(self._global.skills)) do
+		if not tweak_data.skilltree.skills[skill_id] then
+			print("[SkillTreeManager:_verify_loaded_data] Skill doesn't exists", skill_id, ", removing loaded data.")
+			self._global.skills[skill_id] = nil
+		end
 	end
 	for tree_id, data in pairs(clone(self._global.trees)) do
 		if not tweak_data.skilltree.trees[tree_id] then
@@ -526,6 +634,288 @@ function SkillTreeManager:_verify_loaded_data(points_aquired_during_load)
 					end
 				end
 			end
+		end
+	end
+	local specialization_tweak = tweak_data.skilltree.specializations
+	local points, points_left, data
+	local total_points_spent = 0
+	local current_specialization = self:digest_value(self._global.specializations.current_specialization, false)
+	for tree, data in ipairs(self._global.specializations) do
+		if specialization_tweak[tree] then
+			points = self:digest_value(data.points_spent, false)
+			points_left = points
+			for tier, spec_data in ipairs(specialization_tweak[tree]) do
+				if points_left >= spec_data.cost then
+					points_left = points_left - spec_data.cost
+					if tree == current_specialization then
+						for _, upgrade in ipairs(spec_data.upgrades) do
+							managers.upgrades:aquire(upgrade, true)
+						end
+					end
+					if tier == #specialization_tweak[tree] then
+						data.tiers.current_tier = self:digest_value(tier, true)
+						data.tiers.max_tier = self:digest_value(#specialization_tweak[tree], true)
+						data.tiers.next_tier_data = false
+					end
+				else
+					data.tiers.current_tier = self:digest_value(tier - 1, true)
+					data.tiers.max_tier = self:digest_value(#specialization_tweak[tree], true)
+					data.tiers.next_tier_data = {
+						current_points = self:digest_value(points_left, true),
+						points = self:digest_value(spec_data.cost, true)
+					}
+					points_left = 0
+					break
+				end
+			end
+			data.points_spent = self:digest_value(points - points_left, true)
+			total_points_spent = total_points_spent + (points - points_left)
+		end
+	end
+	total_points_spent = total_points_spent + self:digest_value(self._global.specializations.points, false)
+	if self:digest_value(self._global.specializations.total_points, false) ~= total_points_spent then
+		Application:error("[SkillTreeManager] Specialization points do not match up, reseting everything!!!")
+		self:reset_specializations()
+	else
+		local max_points = self:digest_value(self._global.specializations.max_points, false)
+		local points = self:digest_value(self._global.specializations.points, false)
+		if total_points_spent > max_points or max_points < points then
+			self._global.specializations.total_points = self:digest_value(max_points, true)
+			self._global.specializations.points = self:digest_value(math.max(total_points_spent - max_points, 0), true)
+			self._global.specializations.points_present = self:digest_value(0, true)
+			self._global.specializations.xp_present = self:digest_value(0, true)
+			self._global.specializations.xp_leftover = self:digest_value(0, true)
+		end
+	end
+end
+
+function SkillTreeManager:digest_value(value, digest)
+	if digest then
+		if type(value) == "string" then
+			return value
+		else
+			return Application:digest_value(value, true)
+		end
+	elseif type(value) == "number" then
+		return value
+	else
+		return Application:digest_value(value, false)
+	end
+	return Application:digest_value(value, digest)
+end
+
+function SkillTreeManager:get_specialization_value(...)
+	local value = self._global.specializations
+	for _, index in ipairs({
+		...
+	}) do
+		value = value[index]
+	end
+	if type(value) == "table" then
+		return value
+	end
+	return self:digest_value(value, false) or 0
+end
+
+function SkillTreeManager:specialization_points()
+	return self._global.specializations.points and self:digest_value(self._global.specializations.points, false) or 0
+end
+
+function SkillTreeManager:get_specialization_present()
+	local points_present = self:digest_value(self._global.specializations.points_present, false)
+	local xp_present = self:digest_value(self._global.specializations.xp_present, false)
+	local xp_leftover = self:digest_value(self._global.specializations.xp_leftover, false)
+	if points_present ~= 0 and xp_present - xp_leftover ~= 0 then
+		self._global.specializations.points_present = self:digest_value(0, true)
+		self._global.specializations.xp_present = self:digest_value(xp_leftover, true)
+		return xp_present - xp_leftover, points_present
+	end
+	return false, false
+end
+
+function SkillTreeManager:give_specialization_points(xp)
+	local total_points = self:digest_value(self._global.specializations.total_points, false)
+	local max_points = self:digest_value(self._global.specializations.max_points, false)
+	local points = self:digest_value(self._global.specializations.points, false)
+	local xp_leftover = self:digest_value(self._global.specializations.xp_leftover, false)
+	local points_present = self:digest_value(self._global.specializations.points_present, false)
+	local xp_present = self:digest_value(self._global.specializations.xp_present, false)
+	local pstar = managers.experience:level_to_stars()
+	local static_conversion = tweak_data.skilltree.specialization_convertion_rate[pstar] or 1000
+	local points_gained = math.floor((xp + xp_leftover) / static_conversion)
+	local xp_remainder = (xp + xp_leftover) % static_conversion
+	if max_points < total_points + points_gained then
+		points_gained = math.max(0, max_points - total_points)
+		xp_remainder = 0
+		xp = 0
+	end
+	total_points = total_points + points_gained
+	points = points + points_gained
+	points_present = points_present + points_gained
+	xp_present = xp_present + xp
+	xp_leftover = xp_remainder
+	self._global.specializations.total_points = self:digest_value(total_points, true)
+	self._global.specializations.points = self:digest_value(points, true)
+	self._global.specializations.xp_leftover = self:digest_value(xp_leftover, true)
+	self._global.specializations.points_present = self:digest_value(points_present, true)
+	self._global.specializations.xp_present = self:digest_value(xp_present, true)
+end
+
+function SkillTreeManager:refund_specialization_points(points_to_refund, tree)
+	points_to_refund = math.round(points_to_refund)
+	local tree_data = self._global.specializations[tree]
+	if not tree_data then
+		return
+	end
+	local tier_data = tree_data.tiers
+	if not tier_data then
+		return
+	end
+	local next_tier_data = tier_data.next_tier_data
+	if not next_tier_data then
+		return
+	end
+	local points = self:digest_value(self._global.specializations.points, false)
+	local current_points = self:digest_value(next_tier_data.current_points, false)
+	points_to_refund = math.min(points_to_refund, current_points)
+	next_tier_data.current_points = self:digest_value(current_points - points_to_refund, true)
+	tree_data.points_spent = self:digest_value(self:digest_value(tree_data.points_spent, false) - points_to_refund, true)
+	self._global.specializations.points = self:digest_value(points + points_to_refund, true)
+end
+
+function SkillTreeManager:spend_specialization_points(points_to_spend, tree)
+	points_to_spend = math.round(points_to_spend)
+	if points_to_spend < 0 then
+		return
+	end
+	local points = self:digest_value(self._global.specializations.points, false)
+	if points_to_spend > points then
+		return
+	end
+	local tree_data = self._global.specializations[tree]
+	if not tree_data then
+		return
+	end
+	local tier_data = tree_data.tiers
+	if not tier_data then
+		return
+	end
+	local next_tier_data = tier_data.next_tier_data
+	if not next_tier_data then
+		return
+	end
+	local current_points = self:digest_value(next_tier_data.current_points, false)
+	local tier_points = self:digest_value(next_tier_data.points, false)
+	local next_level_points = tier_points - current_points
+	local points_spent = 0
+	while points_to_spend >= next_level_points do
+		points_to_spend = points_to_spend - next_level_points
+		points_spent = points_spent + next_level_points
+		if not self:_increase_specialization_tier(tree) then
+			break
+		end
+		next_tier_data = tier_data.next_tier_data
+		if not next_tier_data then
+			break
+		end
+		current_points = self:digest_value(next_tier_data.current_points, false)
+		tier_points = self:digest_value(next_tier_data.points, false)
+		next_level_points = tier_points - current_points
+	end
+	next_tier_data = tier_data.next_tier_data
+	if 0 < points_to_spend and next_tier_data then
+		points_spent = points_spent + points_to_spend
+		current_points = self:digest_value(next_tier_data.current_points, false)
+		next_tier_data.current_points = self:digest_value(current_points + points_to_spend, true)
+		points_to_spend = 0
+	end
+	tree_data.points_spent = self:digest_value(self:digest_value(tree_data.points_spent, false) + points_spent, true)
+	self._global.specializations.points = self:digest_value(self:digest_value(self._global.specializations.points, false) - points_spent, true)
+end
+
+function SkillTreeManager:_increase_specialization_tier(tree)
+	local tree_data = self._global.specializations[tree]
+	if not tree_data then
+		return
+	end
+	local tier_data = tree_data.tiers
+	if not tier_data then
+		return
+	end
+	local current_tier = self:digest_value(tier_data.current_tier, false)
+	local max_tier = self:digest_value(tier_data.max_tier, false)
+	if current_tier >= max_tier then
+		return
+	end
+	current_tier = current_tier + 1
+	local specialization_tweak = tweak_data.skilltree.specializations[tree]
+	if not specialization_tweak then
+		return
+	end
+	if self:digest_value(self._global.specializations.current_specialization, false) == tree then
+		local spec_data = specialization_tweak[current_tier]
+		if not spec_data then
+			return
+		end
+		for _, upgrade in ipairs(spec_data.upgrades) do
+			managers.upgrades:aquire(upgrade, false)
+		end
+	end
+	tier_data.current_tier = self:digest_value(current_tier, true)
+	if current_tier == max_tier then
+		tier_data.next_tier_data = false
+	else
+		local spec_data = specialization_tweak[current_tier + 1]
+		tier_data.next_tier_data = {
+			current_points = self:digest_value(0, true),
+			points = self:digest_value(spec_data.cost, true)
+		}
+	end
+	return true
+end
+
+function SkillTreeManager:set_current_specialization(tree)
+	local current_specialization = self:digest_value(self._global.specializations.current_specialization, false)
+	if current_specialization == tree then
+		return
+	end
+	local tree_data = self._global.specializations[current_specialization]
+	if tree_data then
+		local tier_data = tree_data.tiers
+		if tier_data then
+			local current_tier = self:digest_value(tier_data.current_tier, false)
+			local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
+			for i = 1, current_tier do
+				for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
+					managers.upgrades:unaquire(upgrade, true)
+				end
+			end
+		end
+	end
+	local tree_data = self._global.specializations[tree]
+	if not tree_data then
+		return
+	end
+	local tier_data = tree_data.tiers
+	if not tier_data then
+		return
+	end
+	self._global.specializations.current_specialization = self:digest_value(tree, true)
+	local current_tier = self:digest_value(tier_data.current_tier, false)
+	local specialization_tweak = tweak_data.skilltree.specializations[tree]
+	for i = 1, current_tier do
+		for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
+			managers.upgrades:aquire(upgrade, false)
+		end
+	end
+end
+
+function SkillTreeManager:debug_print_specialization_data(data, times)
+	data = data or self._global.specializations
+	times = times or 0
+	for i, d in pairs(data) do
+		if type(d) == "string" then
+			print(i, self:digest_value(d, false))
 		end
 	end
 end

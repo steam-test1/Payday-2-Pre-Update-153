@@ -316,6 +316,10 @@ function NewRaycastWeaponBase:spread_multiplier()
 	return multiplier
 end
 
+function NewRaycastWeaponBase:recoil_addend()
+	return managers.blackmarket:recoil_addend(self._name_id, self:weapon_tweak_data().category, self._silencer, self._blueprint)
+end
+
 function NewRaycastWeaponBase:recoil_multiplier()
 	local multiplier = NewRaycastWeaponBase.super.recoil_multiplier(self)
 	multiplier = multiplier * managers.player:upgrade_value("weapon", "passive_recoil_multiplier", 1)

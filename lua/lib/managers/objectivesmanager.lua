@@ -120,6 +120,16 @@ function ObjectivesManager:complete_and_activate_objective(id, load_data, data)
 	self:activate_objective(id, nil, data)
 end
 
+function ObjectivesManager:remove_and_activate_objective(id, load_data, data)
+	local delay_presentation = next(self._active_objectives) and true or nil
+	for name, data in pairs(clone(self._active_objectives)) do
+		self:remove_objective(name)
+	end
+	data = data or {}
+	data.delay_presentation = delay_presentation or nil
+	self:activate_objective(id, nil, data)
+end
+
 function ObjectivesManager:activate_objective(id, load_data, data)
 	if not id or not self._objectives[id] then
 		Application:stack_dump_error("Bad id to activate objective, " .. tostring(id) .. ".")

@@ -197,6 +197,17 @@ function PlayerProfileGuiObject:init(ws)
 		skill_glow:set_center_x(skill_text and skill_text:center_x() or 0)
 		skill_glow:animate(animate_new_skillpoints)
 	end
+	self:_rec_round_object(panel)
+end
+
+function PlayerProfileGuiObject:_rec_round_object(object)
+	local x, y, w, h = object:shape()
+	object:set_shape(math.round(x), math.round(y), math.round(w), math.round(h))
+	if object.children then
+		for i, d in ipairs(object:children()) do
+			self:_rec_round_object(d)
+		end
+	end
 end
 
 function PlayerProfileGuiObject:get_text(text, macros)

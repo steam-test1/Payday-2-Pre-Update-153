@@ -307,7 +307,7 @@ function StatisticsManager:start_session(data)
 	self._global.session = deep_clone(self._defaults)
 	self._global.sessions.count = self._global.sessions.count + 1
 	self._start_session_time = Application:time()
-	self._start_session_from_beginning = data.from_beginning
+	self._start_session_from_beginning = Global.statistics_manager.playing_from_start
 	self._start_session_drop_in = data.drop_in
 	self._session_started = true
 end
@@ -359,7 +359,7 @@ function StatisticsManager:stop_session(data)
 	self._global.session.sessions.time = session_time
 	self._global.last_session = deep_clone(self._global.session)
 	self:_calculate_average()
-	if managers.job:on_last_stage() or data and data.quit then
+	if data and (managers.job:on_last_stage() and data.type == "victory" or data.quit) then
 		Global.statistics_manager.playing_from_start = nil
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -728,7 +728,8 @@ function StatisticsManager:_get_stat_tables()
 		"level_6",
 		"level_7"
 	}
-	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list
+	local character_list = {}
+	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end
 
 function StatisticsManager:publish_to_steam(session, success, completion)
@@ -742,7 +743,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	if session_time_seconds == 0 or session_time_minutes == 0 or session_time == 0 then
 		return
 	end
-	local level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list = self:_get_stat_tables()
+	local level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list = self:_get_stat_tables()
 	local stats = {}
 	self._global.play_time.minutes = math.ceil(self._global.play_time.minutes + session_time_minutes)
 	local current_time = math.floor(self._global.play_time.minutes / 60)
@@ -871,6 +872,10 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	local armor_id = managers.blackmarket:equipped_armor()
 	if table.contains(armor_list, armor_id) then
 		stats["armor_used_" .. armor_id] = {type = "int", value = 1}
+	end
+	local character_id = managers.network:session() and managers.network:session():local_peer():character()
+	if table.contains(character_list, character_id) then
+		stats["character_used_" .. character_id] = {type = "int", value = 1}
 	end
 	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	for weapon_name, weapon_data in pairs(session.killed_by_weapon) do

@@ -16,7 +16,7 @@ function MissionLayer:init(owner)
 	self._editing_mission_element = false
 	self._update_all = false
 	self._simulate_with_current_script = false
-	self._only_draw_selected_connections = false
+	self._only_draw_selected_connections = true
 	self._visualize_flow = false
 	self._use_colored_links = true
 	self._show_all_scripts = false

@@ -13,6 +13,7 @@ function FeatureManager:_setup()
 	self._default.announcements.dlc_gage_pack_jobs = 1
 	self._default.announcements.blackmarket_rename = 1
 	self._default.announcements.join_pd2_clan = 50
+	self._default.announcements.perk_deck = 3
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -146,5 +147,14 @@ function FeatureManager:join_pd2_clan()
 	params.button_list = {joining_pd2_clan_button, ok_button}
 	params.focus_button = 1
 	managers.menu:show_video_message_dialog(params)
+	return true
+end
+
+function FeatureManager:perk_deck()
+	print("FeatureManager:perk_deck()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_perk_deck",
+		text = "menu_feature_perk_deck_desc"
+	})
 	return true
 end

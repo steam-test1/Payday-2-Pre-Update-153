@@ -2137,7 +2137,7 @@ function MacroDebug:effect(effect)
 	end
 	effect_manager:spawn({
 		effect = effect:id(),
-		position = cam:position() + cam:rotation():y() * 200,
+		position = (cam and cam:position() or Vector3()) + (cam and cam:rotation():y() or math.Y) * 200,
 		normal = math.UP
 	})
 end
@@ -2216,7 +2216,7 @@ end
 
 function MacroDebug:multi_spawn(unit_name, unit_offset, count_x, count_y, count_z, pos, rot)
 	local cam = managers.viewport:get_current_camera()
-	local cam_rot = cam:rotation()
+	local cam_rot = cam and cam:rotation() or Rotation()
 	local pos = pos or cam:position() + cam_rot:y() * self._default_spawn_cam_offset
 	unit_offset = unit_offset or self._default_multi_spawn_unit_offset
 	count_x = (count_x or self._default_multi_spawn_unit_count) - 1
@@ -2352,6 +2352,65 @@ function MacroDebug:toggle_fps_paused()
 	end
 end
 
+function MacroDebug:test_spawn_all(layer_name, sub_type)
+	if not managers.editor then
+		cat_error("debug", "Need to run this in the editor.")
+	elseif not layer_name then
+		local allowed_layer_name_map = {Statics = true}
+		for next_layer_name, layer in pairs(managers.editor._layers) do
+			if allowed_layer_name_map[next_layer_name] then
+				layer:test_spawn(sub_type)
+			end
+		end
+	else
+		local layer = managers.editor._layers[layer_name]
+		if not layer then
+			cat_error("debug", "Layer name \"" .. tostring(layer_name) .. "\" doesn't exists.")
+		else
+			layer:test_spawn(sub_type)
+		end
+	end
+end
+
+function MacroDebug:set_draw_unit_enabled(unit_name, is_enabled, draw_camera_line, draw_on_top, red, green, blue)
+	local unit_name_id
+	if type(unit_name) == "string" then
+		unit_name_id = Idstring(unit_name)
+	else
+		unit_name_id = unit_name
+	end
+	local unit_name_id_key = unit_name_id:key()
+	if is_enabled then
+		local unit_list = World:find_units_quick("all")
+		local draw_unit_list = {}
+		for _, unit in ipairs(unit_list) do
+			if unit:name() == unit_name_id then
+				table.insert(draw_unit_list, unit)
+			end
+		end
+		if not next(draw_unit_list) then
+			cat_error("debug", "No unit found.")
+			return
+		end
+		managers.debug:set_enabled(true)
+		managers.debug:set_enabled_paused(true)
+		self:set_enabled(true)
+		local pen = Draw:pen(Color(red or 1, green or 1, blue or 1), draw_on_top and "no_z" or "normal")
+		local data = {
+			draw_unit_list = draw_unit_list,
+			draw_camera_line = draw_camera_line,
+			pen = pen
+		}
+		self._draw_unit_map = self._draw_unit_map or {}
+		self._draw_unit_map[unit_name_id_key] = data
+	elseif self._draw_unit_map and self._draw_unit_map[unit_name_id_key] then
+		self._draw_unit_map[unit_name_id_key] = nil
+		if not next(self._draw_unit_map) then
+			self._draw_unit_map = nil
+		end
+	end
+end
+
 function MacroDebug:update(t, dt)
 	if self._check_fps then
 		local wall_time = TimerManager:wall():time()
@@ -2403,12 +2462,49 @@ function MacroDebug:update(t, dt)
 			end
 		end
 	end
+	if self._draw_unit_map then
+		local remove_data_map
+		for unit_name_id_key, data in pairs(self._draw_unit_map) do
+			local remove_unit_list
+			for i, unit in ipairs(data.draw_unit_list) do
+				if not alive(unit) then
+					remove_unit_list = remove_unit_list or {}
+					table.insert(remove_unit_list, i)
+				else
+					data.pen:draw(unit)
+					if data.draw_camera_line then
+						local cam = managers.viewport:get_current_camera()
+						local rot = cam and cam:rotation() or Rotation()
+						data.pen:line(unit:position(), (cam and cam:position() or Vector3()) + rot:y() * 10 - rot:z() * 1)
+					end
+				end
+			end
+			if remove_unit_list then
+				for i, remove_index in ipairs(remove_unit_list) do
+					table.remove(data.draw_unit_list, remove_index - i + 1)
+				end
+				if not next(data.draw_unit_list) then
+					remove_data_map = remove_data_map or {}
+					remove_data_map[unit_name_id_key] = true
+				end
+			end
+		end
+		if remove_data_map then
+			for remove_unit_name_id_key in pairs(remove_data_map) do
+				self._draw_unit_map[remove_unit_name_id_key] = nil
+			end
+			if not next(self._draw_unit_map) then
+				self._draw_unit_map = nil
+			end
+		end
+	end
 end
 
 function MacroDebug:clear()
 	if self._check_fps then
 		self:fps()
 	end
+	self._draw_unit_map = nil
 end
 
 function MacroDebug:toggle_endurance_damage_hook(skip_print, line_duration)

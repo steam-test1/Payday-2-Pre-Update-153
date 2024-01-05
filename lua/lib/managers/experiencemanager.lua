@@ -119,6 +119,7 @@ function ExperienceManager:give_experience(xp)
 	table.remove(self._experience_progress_data, #self._experience_progress_data)
 	local return_data = deep_clone(self._experience_progress_data)
 	self._experience_progress_data = nil
+	managers.skilltree:give_specialization_points(xp)
 	return return_data
 end
 

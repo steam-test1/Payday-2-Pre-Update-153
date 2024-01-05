@@ -29,6 +29,8 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_fbi_1/ene_fbi_1",
 	"units/payday2/characters/ene_fbi_2/ene_fbi_2",
 	"units/payday2/characters/ene_fbi_3/ene_fbi_3",
+	"units/payday2/characters/ene_fbi_female_1/ene_fbi_female_1",
+	"units/payday2/characters/ene_fbi_female_2/ene_fbi_female_2",
 	"units/payday2/characters/ene_fbi_heavy_1/ene_fbi_heavy_1",
 	"units/payday2/characters/ene_fbi_office_1/ene_fbi_office_1",
 	"units/payday2/characters/ene_fbi_office_2/ene_fbi_office_2",
@@ -74,6 +76,8 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_biker_escape/ene_biker_escape",
 	"units/pd2_dlc1/characters/ene_security_gensec_1/ene_security_gensec_1",
 	"units/pd2_dlc1/characters/ene_security_gensec_2/ene_security_gensec_2",
+	"units/payday2/characters/npc_old_hoxton_bikini_1/npc_old_hoxton_bikini_1",
+	"units/payday2/characters/npc_old_hoxton_bikini_2/npc_old_hoxton_bikini_2",
 	"units/payday2/characters/ene_guard_national_1/ene_guard_national_1",
 	"units/payday2/characters/ene_murkywater_1/ene_murkywater_1",
 	"units/payday2/characters/ene_murkywater_2/ene_murkywater_2",
@@ -115,6 +119,8 @@ function SpawnEnemyUnitElement:test_element()
 	if self._hed.enemy ~= "none" then
 		local unit = safe_spawn_unit(Idstring(self._hed.enemy), self._unit:position(), self._unit:rotation())
 		table.insert(self._enemies, unit)
+		local team_id = self:_resolve_team(unit)
+		managers.groupai:state():set_char_team(unit, team_id)
 		local action_desc = ElementSpawnEnemyDummy._create_action_data(self:get_spawn_anim())
 		unit:movement():action_request(action_desc)
 		unit:movement():set_position(unit:position())
@@ -192,6 +198,14 @@ function SpawnEnemyUnitElement:add_to_mission_package()
 				init = true
 			})
 		end
+	end
+end
+
+function SpawnEnemyUnitElement:_resolve_team(unit)
+	if self._hed.team == "default" then
+		return tweak_data.levels:get_default_team_ID(unit:base():char_tweak().access == "gangster" and "gangster" or "combatant")
+	else
+		return self._hed.team
 	end
 end
 

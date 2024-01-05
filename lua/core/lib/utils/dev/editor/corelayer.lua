@@ -350,7 +350,8 @@ function Layer:build_units(params)
 		self._notebook:set_min_size(params.units_notebook_min_size)
 	end
 	notebook_sizer:add(self._notebook, 1, 0, "EXPAND")
-	for c, names in pairs(self._category_map) do
+	for _, c in ipairs(table.map_keys(self._category_map)) do
+		local names = self._category_map[c]
 		local panel = EWS:Panel(self._notebook, "", "TAB_TRAVERSAL")
 		local units_sizer = EWS:BoxSizer("VERTICAL")
 		panel:set_sizer(units_sizer)

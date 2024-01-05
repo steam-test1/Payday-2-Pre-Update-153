@@ -243,7 +243,11 @@ function CopLogicTravel.queued_update(data)
 					my_data.advance_path_search_id = tostring(unit:key()) .. "advance"
 					my_data.processing_advance_path = true
 					local nav_segs = CopLogicTravel._get_allowed_travel_nav_segs(data, my_data, to_pos)
-					unit:brain():search_for_path(my_data.advance_path_search_id, to_pos, nil, nil, nav_segs)
+					local prio
+					if objective.follow_unit and objective.follow_unit == managers.player:player_unit() then
+						prio = 5
+					end
+					unit:brain():search_for_path(my_data.advance_path_search_id, to_pos, prio, nil, nav_segs)
 				end
 			end
 		else

@@ -122,6 +122,23 @@ function PlayerEquipment:use_doctor_bag()
 	return false
 end
 
+function PlayerEquipment:use_armor_kit()
+	local redirect = function()
+		if Network:is_client() then
+			managers.network:session():send_to_host("used_deployable")
+		else
+			managers.network:session():local_peer():set_used_deployable(true)
+		end
+		MenuCallbackHandler:_update_outfit_information()
+	end
+	return true, redirect
+end
+
+function PlayerEquipment:use_armor_kit_dropin_penalty()
+	MenuCallbackHandler:_update_outfit_information()
+	return true
+end
+
 function PlayerEquipment:use_ecm_jammer()
 	if self._ecm_jammer_placement_requested then
 		return

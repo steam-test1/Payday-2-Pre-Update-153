@@ -45,6 +45,7 @@ logic_variants.mobster_boss = security_variant
 logic_variants.dealer = security_variant
 logic_variants.biker_escape = security_variant
 logic_variants.city_swat = security_variant
+logic_variants.old_hoxton_mission = security_variant
 for _, tweak_table_name in pairs({
 	"shield",
 	"tank",
@@ -1051,6 +1052,7 @@ function CopBrain:pre_destroy(unit)
 	self:set_active(false)
 	self._reload_clbks[unit:key()] = nil
 	self._attention_handler:set_attention(nil)
+	self._unit:movement():set_attention(nil)
 	self:rem_all_pos_rsrv()
 	self:end_alarm_pager()
 	if self._current_logic.pre_destroy then

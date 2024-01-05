@@ -4,6 +4,7 @@ core:import("CoreEngineAccess")
 core:import("CoreEws")
 core:import("CoreEditorSave")
 core:import("CoreShapeManager")
+core:import("CoreEnvironmentFeeder")
 EnvironmentLayer = EnvironmentLayer or class(CoreStaticLayer.StaticLayer)
 
 function EnvironmentLayer:init(owner)
@@ -87,9 +88,10 @@ function EnvironmentLayer:init(owner)
 	self._cubemap_unit = "core/units/cubemap_gizmo/cubemap_gizmo"
 	self._dome_occ_shape_unit = "core/units/dome_occ_shape/dome_occ_shape"
 	self._position_as_slot_mask = self._position_as_slot_mask + managers.slot:get_mask("statics")
-	self._environment_modifier_id = self._owner:viewport():create_environment_modifier(false, function(interface)
-		return self:sky_rotation_modifier(interface)
-	end, "sky_orientation")
+	self._owner:viewport():set_environment("core/environments/default")
+	self._environment_modifier_id = managers.viewport:create_global_environment_modifier(CoreEnvironmentFeeder.SkyRotationFeeder.DATA_PATH_KEY, true, function()
+		return self:sky_rotation_modifier()
+	end)
 end
 
 function EnvironmentLayer:get_layer_name()
@@ -100,9 +102,9 @@ function EnvironmentLayer:load(world_holder, offset)
 	local environment = world_holder:create_world("world", self._save_name, offset)
 	if not self:old_load(environment) then
 		self._environment_values = environment.environment_values
-		self._environments:set_value(self._environment_values.environment)
+		CoreEws.change_combobox_value(self._environments_combobox, self._environment_values.environment)
 		self._sky_rotation:set_value(self._environment_values.sky_rot)
-		self._color_gradings:set_value(self._environment_values.color_grading)
+		CoreEws.change_combobox_value(self._color_grading_combobox, self._environment_values.color_grading)
 		self._dome_occ_resolution_ctrlr:set_value(self._environment_values.dome_occ_resolution)
 		self:_load_wind(environment.wind)
 		self:_load_effects(environment.effects)
@@ -167,7 +169,7 @@ function EnvironmentLayer:old_load(environment)
 	for name, value in pairs(environment._values) do
 		self._environment_values[name] = value
 	end
-	self._environments:set_value(self._environment_values.environment)
+	CoreEws.change_combobox_value(self._environments_combobox, self._environment_values.environment)
 	self._sky_rotation:set_value(self._environment_values.sky_rot)
 	if environment._wind then
 		local wind_angle = environment._wind.wind_angle
@@ -210,6 +212,8 @@ end
 function EnvironmentLayer:save()
 	local effects = {}
 	local environment_areas = {}
+	local environment_paths = {}
+	local environment_scenes = {}
 	local cubemap_gizmos = {}
 	local dome_occ_shapes = {}
 	for _, unit in ipairs(self._created_units) do
@@ -223,7 +227,12 @@ function EnvironmentLayer:save()
 			self:_save_to_world_package("effects", effect)
 		elseif unit:name() == Idstring(self._environment_area_unit) then
 			local area = unit:unit_data().environment_area
+			local environment_path = area:environment()
 			table.insert(environment_areas, area:save_level_data())
+			table.insert(environment_paths, environment_path)
+			if area:permanent() or table.contains(area:filter_list(), CoreEnvironmentFeeder.UnderlayPathFeeder.DATA_PATH_KEY) then
+				table.insert(environment_scenes, managers.viewport:get_environment_value(environment_path, CoreEnvironmentFeeder.UnderlayPathFeeder.DATA_PATH_KEY))
+			end
 		elseif unit:name() == Idstring(self._cubemap_unit) then
 			table.insert(cubemap_gizmos, CoreEditorSave.save_data_table(unit))
 		elseif unit:name() == Idstring(self._dome_occ_shape_unit) then
@@ -254,8 +263,14 @@ function EnvironmentLayer:save()
 		data = data
 	}
 	managers.editor:add_save_data(t)
-	self:_save_to_world_package("scenes", managers.viewport:first_active_viewport():environment_mixer():internal_output("others", "underlay"))
-	self:_save_to_world_package("script_data", self._environment_values.environment .. ".environment")
+	table.insert(environment_paths, self._environment_values.environment)
+	table.insert(environment_scenes, managers.viewport:get_environment_value(self._environment_values.environment, CoreEnvironmentFeeder.UnderlayPathFeeder.DATA_PATH_KEY))
+	for _, environment_path in ipairs(environment_paths) do
+		self:_save_to_world_package("script_data", environment_path .. ".environment")
+	end
+	for _, environment_scene in ipairs(environment_scenes) do
+		self:_save_to_world_package("scenes", environment_scene)
+	end
 end
 
 function EnvironmentLayer:_save_to_world_package(category, name)
@@ -309,6 +324,20 @@ function EnvironmentLayer:draw_wind(pos)
 	self._wind_pen:arc(pos, pos + rot:x() * 100, -self._wind_tilt_var, rot:y(), 32)
 end
 
+function EnvironmentLayer:_build_environment_combobox_and_list()
+	local ctrlr, combobox_params = CoreEws.combobox_and_list({
+		name = "Default",
+		panel = self._env_panel,
+		sizer = self._environment_sizer,
+		options = managers.database:list_entries_of_type("environment"),
+		value = self._environment_values.environment,
+		value_changed_cb = function(params)
+			self:change_environment(params.ctrlr)
+		end
+	})
+	self._environments_combobox = combobox_params
+end
+
 function EnvironmentLayer:build_panel(notebook)
 	EnvironmentLayer.super.build_panel(self, notebook)
 	cat_print("editor", "EnvironmentLayer:build_panel")
@@ -324,17 +353,7 @@ function EnvironmentLayer:build_panel(notebook)
 	create_selected_cube_map:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "create_cube_map"), "selected")
 	self._env_sizer:add(cubemap_sizer, 0, 0, "EXPAND")
 	self._environment_sizer = EWS:StaticBoxSizer(self._env_panel, "VERTICAL", "Environment")
-	local env_dd_sizer = EWS:BoxSizer("HORIZONTAL")
-	env_dd_sizer:add(EWS:StaticText(self._env_panel, "Default", 0, ""), 1, 0, "ALIGN_CENTER_VERTICAL")
-	self._environments = EWS:ComboBox(self._env_panel, "", "", "CB_DROPDOWN,CB_READONLY")
-	local envs = managers.database:list_entries_of_type("environment")
-	table.sort(envs)
-	for _, env in pairs(envs) do
-		self._environments:append(env)
-	end
-	self._environments:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "change_environment"), self._environments)
-	env_dd_sizer:add(self._environments, 2, 0, "EXPAND")
-	self._environment_sizer:add(env_dd_sizer, 0, 0, "EXPAND")
+	self:_build_environment_combobox_and_list()
 	local sky_sizer = EWS:BoxSizer("HORIZONTAL")
 	sky_sizer:add(EWS:StaticText(self._env_panel, "Rotation", 0, ""), 1, 0, "ALIGN_CENTER_VERTICAL")
 	self._sky_rotation = EWS:Slider(self._env_panel, 0, 0, 360, "", "SL_LABELS")
@@ -342,39 +361,57 @@ function EnvironmentLayer:build_panel(notebook)
 	self._sky_rotation:connect("EVT_SCROLL_THUMBTRACK", callback(self, self, "change_sky_rotation"), self._sky_rotation)
 	sky_sizer:add(self._sky_rotation, 4, 0, "EXPAND")
 	self._environment_sizer:add(sky_sizer, 0, 0, "EXPAND")
-	local env_cc_sizer = EWS:BoxSizer("HORIZONTAL")
-	env_cc_sizer:add(EWS:StaticText(self._env_panel, "Color grading", 0, ""), 1, 0, "ALIGN_CENTER_VERTICAL")
-	self._color_gradings = EWS:ComboBox(self._env_panel, "", "", "CB_DROPDOWN,CB_READONLY")
-	local gradings = {
-		"color_off",
-		"color_payday",
-		"color_heat",
-		"color_nice",
-		"color_sin",
-		"color_bhd",
-		"color_xgen",
-		"color_xxxgen",
-		"color_matrix"
-	}
-	for _, grading in ipairs(gradings) do
-		self._color_gradings:append(grading)
-	end
-	self._color_gradings:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "change_color_grading"), self._color_gradings)
-	env_cc_sizer:add(self._color_gradings, 2, 0, "EXPAND")
-	self._environment_sizer:add(env_cc_sizer, 0, 0, "EXPAND")
+	local _, color_grading_params = CoreEws.combobox_and_list({
+		name = "Color grading",
+		panel = self._env_panel,
+		sizer = self._environment_sizer,
+		options = {
+			"color_off",
+			"color_payday",
+			"color_heat",
+			"color_nice",
+			"color_sin",
+			"color_bhd",
+			"color_xgen",
+			"color_xxxgen",
+			"color_matrix"
+		},
+		value = self._environment_values.color_grading,
+		value_changed_cb = function(params)
+			self:change_color_grading(params.ctrlr)
+		end
+	})
+	self._color_grading_combobox = color_grading_params
 	self._environment_sizer:add(EWS:StaticLine(self._env_panel, "", "LI_HORIZONTAL"), 0, 0, "EXPAND")
 	self._environment_area_ctrls = {}
-	local env_area_sizer = EWS:BoxSizer("HORIZONTAL")
-	env_area_sizer:add(EWS:StaticText(self._env_panel, "Area:", 0, ""), 2, 0, "ALIGN_CENTER_VERTICAL")
-	local environment = EWS:ComboBox(self._env_panel, "", "", "CB_DROPDOWN,CB_READONLY")
-	for _, env in pairs(managers.database:list_entries_of_type("environment")) do
-		environment:append(env)
+	local ctrlr, combobox_params = CoreEws.combobox_and_list({
+		name = "Area:",
+		panel = self._env_panel,
+		sizer = self._environment_sizer,
+		options = managers.database:list_entries_of_type("environment"),
+		value = managers.environment_area:game_default_environment(),
+		value_changed_cb = function(params)
+			self:set_environment_area(params.ctrlr)
+		end
+	})
+	self._environment_area_ctrls.environment_combobox = combobox_params
+	local environment_filter_sizer = EWS:StaticBoxSizer(self._env_panel, "HORIZONTAL", "Filter")
+	self._environment_area_ctrls.env_filter_cb_map = {}
+	local filter_count = 0
+	local environment_filter_row_sizer
+	for name in table.sorted_map_iterator(managers.viewport:get_predefined_environment_filter_map()) do
+		local env_filter_cb = EWS:CheckBox(self._env_panel, name, "")
+		if filter_count % 3 == 0 then
+			environment_filter_row_sizer = EWS:BoxSizer("VERTICAL")
+			environment_filter_sizer:add(environment_filter_row_sizer, 0, 0, "EXPAND")
+		end
+		env_filter_cb:set_value(true)
+		env_filter_cb:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_env_filter", name), nil)
+		environment_filter_row_sizer:add(env_filter_cb, 0, 0, "EXPAND")
+		self._environment_area_ctrls.env_filter_cb_map[name] = env_filter_cb
+		filter_count = filter_count + 1
 	end
-	environment:set_value(managers.environment_area:game_default_environment())
-	environment:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_environment_area"), environment)
-	env_area_sizer:add(environment, 3, 0, "EXPAND")
-	self._environment_area_ctrls.environment = environment
-	self._environment_sizer:add(env_area_sizer, 0, 0, "EXPAND")
+	self._environment_sizer:add(environment_filter_sizer, 0, 0, "EXPAND")
 	local transition_sizer = EWS:BoxSizer("HORIZONTAL")
 	transition_sizer:add(EWS:StaticText(self._env_panel, "Fade Time [sec]: ", "", ""), 2, 0, "ALIGN_CENTER_VERTICAL")
 	local transition = EWS:TextCtrl(self._env_panel, "0.10", "", "TE_CENTRE")
@@ -545,7 +582,7 @@ end
 
 function EnvironmentLayer:set_environment_area()
 	local area = self._selected_unit:unit_data().environment_area
-	area:set_environment(self._environment_area_ctrls.environment:get_value())
+	area:set_environment(self._environment_area_ctrls.environment_combobox.value)
 end
 
 function EnvironmentLayer:set_permanent()
@@ -559,6 +596,20 @@ function EnvironmentLayer:set_transition_time()
 	value = math.clamp(value, 0, 100000000)
 	self._environment_area_ctrls.transition_time:change_value(string.format("%.2f", value))
 	area:set_transition_time(value)
+end
+
+function EnvironmentLayer:set_env_filter(name)
+	local area = self._selected_unit:unit_data().environment_area
+	local filter_list = {}
+	local filter_map = managers.viewport:get_predefined_environment_filter_map()
+	for name, env_filter_cb in pairs(self._environment_area_ctrls.env_filter_cb_map) do
+		if env_filter_cb:get_value() then
+			for _, data_path_key in ipairs(filter_map[name]) do
+				table.insert(filter_list, data_path_key)
+			end
+		end
+	end
+	area:set_filter_list(filter_list)
 end
 
 function EnvironmentLayer:generate_dome_occ()
@@ -633,13 +684,13 @@ function EnvironmentLayer:update_wind_speed_labels()
 	self._speed_variation_text:set_value(string.format("%.3g", self._wind_speed_variation) .. " m/s")
 end
 
-function EnvironmentLayer:sky_rotation_modifier(interface)
-	return self._environment_values.sky_rot
+function EnvironmentLayer:sky_rotation_modifier()
+	return self._environment_values.sky_rot, true
 end
 
 function EnvironmentLayer:change_sky_rotation(ctrlr)
 	self._environment_values.sky_rot = ctrlr:get_value()
-	self._owner:viewport():feed_params()
+	managers.viewport:update_global_environment_value(CoreEnvironmentFeeder.SkyRotationFeeder.DATA_PATH_KEY)
 end
 
 function EnvironmentLayer:unit_ok(unit)
@@ -675,6 +726,9 @@ function EnvironmentLayer:clone_edited_values(unit, source)
 		local area = unit:unit_data().environment_area
 		local source_area = source:unit_data().environment_area
 		area:set_environment(source_area:environment())
+		area:set_filter_list(source_area:filter_list() and table.list_copy(source_area:filter_list()))
+		area:set_bezier_curve(source_area:bezier_curve() and table.list_copy(source_area:bezier_curve()))
+		area:set_transition_time(source_area:transition_time())
 		area:set_permanent(source_area:permanent())
 		area:set_property("width", source_area:property("width"))
 		area:set_property("depth", source_area:property("depth"))
@@ -742,9 +796,12 @@ function EnvironmentLayer:update_unit_settings()
 end
 
 function EnvironmentLayer:set_environment_area_parameters()
-	self._environment_area_ctrls.environment:set_enabled(false)
+	CoreEws.set_combobox_and_list_enabled(self._environment_area_ctrls.environment_combobox, false)
 	self._environment_area_ctrls.permanent_cb:set_enabled(false)
 	self._environment_area_ctrls.transition_time:set_enabled(false)
+	for _, env_filter_cb in pairs(self._environment_area_ctrls.env_filter_cb_map) do
+		env_filter_cb:set_enabled(false)
+	end
 	if self._current_shape_panel then
 		self._current_shape_panel:set_visible(false)
 	end
@@ -753,12 +810,18 @@ function EnvironmentLayer:set_environment_area_parameters()
 		if area then
 			self._current_shape_panel = area:panel(self._env_panel, self._environment_sizer)
 			self._current_shape_panel:set_visible(true)
-			self._environment_area_ctrls.environment:set_enabled(true)
-			self._environment_area_ctrls.environment:set_value(area:environment())
+			CoreEws.set_combobox_and_list_enabled(self._environment_area_ctrls.environment_combobox, true)
+			CoreEws.change_combobox_value(self._environment_area_ctrls.environment_combobox, area:environment())
 			self._environment_area_ctrls.permanent_cb:set_enabled(true)
 			self._environment_area_ctrls.permanent_cb:set_value(area:permanent())
 			self._environment_area_ctrls.transition_time:set_enabled(true)
 			self._environment_area_ctrls.transition_time:set_value(string.format("%.2f", area:transition_time()))
+			local filter_map = managers.viewport:get_predefined_environment_filter_map()
+			local filter_list = area:filter_list()
+			for name, env_filter_cb in pairs(self._environment_area_ctrls.env_filter_cb_map) do
+				env_filter_cb:set_enabled(true)
+				env_filter_cb:set_value(filter_list and table.is_list_value_union(filter_map[name], filter_list))
+			end
 		end
 	end
 	if alive(self._selected_unit) and self._selected_unit:name() == Idstring(self._dome_occ_shape_unit) then
@@ -798,6 +861,7 @@ end
 function EnvironmentLayer:reset_environment_values()
 	self._environment_values.environment = managers.environment_area:game_default_environment()
 	self._environment_values.sky_rot = 0
+	managers.viewport:update_global_environment_value(CoreEnvironmentFeeder.SkyRotationFeeder.DATA_PATH_KEY)
 	self._environment_values.color_grading = managers.environment_controller:game_default_color_grading()
 	self._environment_values.dome_occ_resolution = 256
 end
@@ -806,10 +870,10 @@ function EnvironmentLayer:clear()
 	managers.environment_area:set_to_default()
 	self:reset_environment_values()
 	managers.environment_area:set_default_environment(self._environment_values.environment)
-	self._environments:set_value(self._environment_values.environment)
+	CoreEws.change_combobox_value(self._environments_combobox, self._environment_values.environment)
 	self._sky_rotation:set_value(self._environment_values.sky_rot)
-	self._color_gradings:set_value(self._environment_values.color_grading)
-	self:change_color_grading(self._color_gradings)
+	CoreEws.change_combobox_value(self._color_grading_combobox, self._environment_values.color_grading)
+	self:change_color_grading(self._color_grading_combobox.ctrlr)
 	self._dome_occ_resolution_ctrlr:set_value(self._environment_values.dome_occ_resolution)
 	self._wind_rot = Rotation(0, 0, 0)
 	self._wind_dir_var = 0

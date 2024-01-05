@@ -984,7 +984,7 @@ function GroupAIStateStreet:_upd_assault_task(t)
 					if self._smoke_grenade_queued and self._smoke_grenade_queued[3] then
 						ignore_ctrl = true
 					end
-					managers.network:session():send_to_peers("sync_smoke_grenade", detonate_pos, shooter_pos, 0)
+					managers.network:session():send_to_peers_synched("sync_smoke_grenade", detonate_pos, shooter_pos, 0)
 					self:sync_smoke_grenade(detonate_pos, shooter_pos, 0)
 					if ignore_ctrl then
 						self._smoke_grenade_ignore_control = true
@@ -1162,7 +1162,7 @@ function GroupAIStateStreet:_end_regroup_task(regroup_task)
 		managers.trade:set_trade_countdown(true)
 		self:set_assault_mode(false)
 		if not self._smoke_grenade_ignore_control then
-			managers.network:session():send_to_peers("sync_smoke_grenade_kill")
+			managers.network:session():send_to_peers_synched("sync_smoke_grenade_kill")
 			self:sync_smoke_grenade_kill()
 		end
 		local dmg = self._downs_during_assault

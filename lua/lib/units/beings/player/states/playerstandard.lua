@@ -119,7 +119,8 @@ function PlayerStandard:_enter(enter_data)
 		if not self._state_data.mask_equipped then
 			self._state_data.mask_equipped = true
 			local equipped_mask = managers.blackmarket:equipped_mask()
-			local equipped_mask_type = tweak_data.blackmarket.masks[equipped_mask.mask_id].type
+			local mask_id = managers.blackmarket:get_real_mask_id(equipped_mask.mask_id)
+			local equipped_mask_type = tweak_data.blackmarket.masks[mask_id].type
 			if not equipped_mask_type then
 				self._camera_unit:anim_state_machine():set_global("mask_equip", 1)
 			elseif equipped_mask_type == "glasses" then
@@ -201,6 +202,7 @@ function PlayerStandard:update(t, dt)
 	self:_update_movement(t, dt)
 	self:_upd_nav_data()
 	managers.hud:_update_crosshair_offset(t, dt)
+	self:_update_omniscience(t, dt)
 end
 
 function PlayerStandard:in_air()
@@ -383,7 +385,7 @@ function PlayerStandard:_determine_move_direction()
 	if self._state_data.on_zipline then
 		return
 	end
-	if mvector3.length(self._stick_move) < 0.1 or self:_interacting() then
+	if mvector3.length(self._stick_move) < 0.1 or self:_interacting() or self:_does_deploying_limit_movement() then
 		self._move_dir = nil
 		self._normal_move_dir = nil
 	else
@@ -433,6 +435,7 @@ function PlayerStandard:_update_check_actions(t, dt)
 	if self._change_weapon_pressed_expire_t and t >= self._change_weapon_pressed_expire_t then
 		self._change_weapon_pressed_expire_t = nil
 	end
+	self:_update_steelsight_timers(t, dt)
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
 	elseif input.btn_stats_screen_release then
@@ -579,7 +582,7 @@ function PlayerStandard:_get_walk_headbob()
 	elseif self._state_data.ducking then
 		return 0.0125
 	elseif self._running then
-		return 0.1
+		return 0.1 * (self.RUN_AND_SHOOT and 0.5 or 1)
 	end
 	return 0.025
 end
@@ -701,10 +704,9 @@ function PlayerStandard:_get_max_walk_speed(t)
 	local speed_tweak = self._tweak_data.movement.speed
 	local movement_speed = speed_tweak.STANDARD_MAX
 	local speed_state = "walk"
-	if self._state_data.in_steelsight then
-		local has_normal_speed_upgrade = managers.player:has_category_upgrade("player", "steelsight_normal_movement_speed")
-		movement_speed = has_normal_speed_upgrade and speed_tweak.STANDARD_MAX or speed_tweak.STEELSIGHT_MAX
-		speed_state = has_normal_speed_upgrade and "walk" or "steelsight"
+	if self._state_data.in_steelsight and not managers.player:has_category_upgrade("player", "steelsight_normal_movement_speed") then
+		movement_speed = speed_tweak.STEELSIGHT_MAX
+		speed_state = "steelsight"
 	elseif self:on_ladder() then
 		movement_speed = speed_tweak.CLIMBING_MAX
 		speed_state = "climb"
@@ -741,13 +743,18 @@ function PlayerStandard:_start_action_steelsight(t)
 		self._steelsight_wanted = true
 		return
 	end
-	self:_break_intimidate_redirect()
+	self:_break_intimidate_redirect(t)
 	self._steelsight_wanted = false
 	self._state_data.in_steelsight = true
 	self:_update_crosshair_offset()
 	self:_stance_entered()
 	self:_interupt_action_running(t)
 	self._equipped_unit:base():play_tweak_data_sound("enter_steelsight")
+	if self._equipped_unit:base():weapon_tweak_data().animations.has_steelsight_stance then
+		self:_need_to_play_idle_redirect()
+		self._state_data.steelsight_weight_target = 1
+		self._camera_unit:base():set_steelsight_anim_enabled(true)
+	end
 	if managers.controller:get_default_wrapper_type() ~= "pc" and managers.user:get_setting("aim_assist") then
 		local closest_ray = self._equipped_unit:base():check_autoaim(self._ext_camera:position(), self._ext_camera:forward(), nil, true)
 		self._camera_unit:base():clbk_aim_assist(closest_ray)
@@ -761,13 +768,36 @@ function PlayerStandard:_end_action_steelsight(t)
 	self:_update_crosshair_offset()
 	self._equipped_unit:base():play_tweak_data_sound("leave_steelsight")
 	self._camera_unit:base():clbk_stop_aim_assist()
+	if self._equipped_unit:base():weapon_tweak_data().animations.has_steelsight_stance then
+		self:_need_to_play_idle_redirect()
+		self._state_data.steelsight_weight_target = 0
+		self._camera_unit:base():set_steelsight_anim_enabled(true)
+	end
 	self._ext_network:send("set_stance", 2, false, false)
+end
+
+function PlayerStandard:_need_to_play_idle_redirect()
+	if not self._camera_unit:base():anims_enabled() or self._camera_unit:base():playing_empty_state() then
+		self._ext_camera:play_redirect(self.IDS_IDLE)
+	end
 end
 
 function PlayerStandard:_interupt_action_steelsight(t)
 	self._steelsight_wanted = false
 	if self._state_data.in_steelsight then
 		self:_end_action_steelsight(t)
+	end
+end
+
+function PlayerStandard:_update_steelsight_timers(t, dt)
+	if self._state_data.steelsight_weight_target then
+		self._state_data.steelsight_weight = self._state_data.steelsight_weight or 0
+		self._state_data.steelsight_weight = math.step(self._state_data.steelsight_weight, self._state_data.steelsight_weight_target, dt * 5)
+		self._camera_unit:anim_state_machine():set_global("steelsight_weight", self._state_data.steelsight_weight)
+		if self._state_data.steelsight_weight == self._state_data.steelsight_weight_target then
+			self._camera_unit:base():set_steelsight_anim_enabled(false)
+			self._state_data.steelsight_weight_target = nil
+		end
 	end
 end
 
@@ -1104,13 +1134,13 @@ function PlayerStandard:_check_action_melee(t, input)
 end
 
 function PlayerStandard:_start_action_melee(t, input, instant)
-	self._state_data.melee_charge_wanted = nil
-	self._state_data.meleeing = true
-	self._state_data.melee_start_t = nil
 	self._equipped_unit:base():tweak_data_anim_stop("fire")
 	self:_interupt_action_reload(t)
 	self:_interupt_action_steelsight(t)
 	self:_interupt_action_running(t)
+	self._state_data.melee_charge_wanted = nil
+	self._state_data.meleeing = true
+	self._state_data.melee_start_t = nil
 	if instant then
 		self:_do_action_melee(t, input)
 		return
@@ -1141,6 +1171,14 @@ function PlayerStandard:_is_meleeing()
 	return not self._state_data.meleeing and self._state_data.melee_expire_t and true
 end
 
+function PlayerStandard:in_melee()
+	return self._state_data.meleeing and true
+end
+
+function PlayerStandard:discharge_melee()
+	self:_do_action_melee(managers.player:player_timer():time(), nil, true)
+end
+
 function PlayerStandard:_melee_repeat_allowed()
 	return not self._state_data.meleeing and not self._state_data.melee_repeat_expire_t
 end
@@ -1160,14 +1198,14 @@ local melee_vars = {
 	"player_melee_var2"
 }
 
-function PlayerStandard:_do_action_melee(t, input)
+function PlayerStandard:_do_action_melee(t, input, skip_damage)
 	self._state_data.meleeing = nil
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
 	self._state_data.melee_expire_t = t + tweak_data.blackmarket.melee_weapons[melee_entry].expire_t
 	self._state_data.melee_repeat_expire_t = t + math.min(tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t, tweak_data.blackmarket.melee_weapons[melee_entry].expire_t)
-	if not instant_hit then
+	if not instant_hit and not skip_damage then
 		self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
 	end
 	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, instant_hit and "melee" or "melee_item")
@@ -1176,7 +1214,7 @@ function PlayerStandard:_do_action_melee(t, input)
 		self._state_data.melee_charge_shake = nil
 	end
 	if instant_hit then
-		local hit = self:_do_melee_damage(t)
+		local hit = skip_damage or self:_do_melee_damage(t)
 		if hit then
 			self._ext_camera:play_redirect(self.IDS_MELEE)
 		else
@@ -1445,6 +1483,10 @@ function PlayerStandard:_update_use_item_timers(t, input)
 	end
 end
 
+function PlayerStandard:_does_deploying_limit_movement()
+	return self:is_deploying() and managers.player:selected_equipment_limit_movement() or false
+end
+
 function PlayerStandard:is_deploying()
 	return self._use_item_expire_t and true or false
 end
@@ -1458,17 +1500,25 @@ function PlayerStandard:_start_action_use_item(t)
 	self._ext_camera:play_redirect(self.IDS_UNEQUIP)
 	self._equipped_unit:base():tweak_data_anim_play("unequip")
 	managers.hud:show_progress_timer_bar(0, deploy_timer)
-	local text = managers.localization:text("hud_deploying_equipment", {
+	local text = managers.player:selected_equipment_deploying_text() or managers.localization:text("hud_deploying_equipment", {
 		EQUIPMENT = managers.player:selected_equipment_name()
 	})
 	managers.hud:show_progress_timer({text = text, icon = nil})
+	local post_event = managers.player:selected_equipment_sound_start()
+	if post_event then
+		self._unit:sound_source():post_event(post_event)
+	end
 	local equipment_id = managers.player:selected_equipment_id()
 	managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, true, equipment_id, deploy_timer, false)
 end
 
 function PlayerStandard:_end_action_use_item(valid)
+	local post_event = managers.player:selected_equipment_sound_done()
 	local result = managers.player:use_selected_equipment(self._unit)
 	self:_interupt_action_use_item(nil, nil, valid)
+	if valid and post_event then
+		self._unit:sound_source():post_event(post_event)
+	end
 end
 
 function PlayerStandard:_interupt_action_use_item(t, input, complete)
@@ -1480,6 +1530,10 @@ function PlayerStandard:_interupt_action_use_item(t, input, complete)
 		self._equipped_unit:base():tweak_data_anim_stop("unequip")
 		managers.hud:hide_progress_timer_bar(complete)
 		managers.hud:remove_progress_timer()
+		local post_event = managers.player:selected_equipment_sound_interupt()
+		if not complete and post_event then
+			self._unit:sound_source():post_event(post_event)
+		end
 		self._unit:equipment():on_deploy_interupted()
 		managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, false, "", 0, complete and true or false)
 	end
@@ -1728,7 +1782,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	if intimidate_enemies then
 		local enemies = managers.enemy:all_enemies()
 		for u_key, u_data in pairs(enemies) do
-			if not u_data.is_converted and not u_data.unit:anim_data().hands_tied and (u_data.char_tweak.priority_shout or not only_special_enemies) then
+			if u_data.unit:movement():team() ~= self._unit:movement():team() and not u_data.unit:anim_data().hands_tied and (u_data.char_tweak.priority_shout or not only_special_enemies) then
 				if managers.groupai:state():whisper_mode() then
 					if u_data.char_tweak.silent_priority_shout and u_data.unit:movement():cool() then
 						self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_enemy, highlight_range, false, false, 0.01, my_head_pos, cam_fwd)
@@ -1936,6 +1990,7 @@ function PlayerStandard:_play_distance_interact_redirect(t, variant)
 	if self._running then
 		return
 	end
+	self._state_data.interact_redirect_t = t + 1
 	self._ext_camera:play_redirect(Idstring(variant))
 end
 
@@ -1943,7 +1998,9 @@ function PlayerStandard:_break_intimidate_redirect(t)
 	if self._shooting then
 		return
 	end
-	self._ext_camera:play_redirect(self.IDS_IDLE)
+	if self._state_data.interact_redirect_t and t < self._state_data.interact_redirect_t then
+		self._ext_camera:play_redirect(self.IDS_IDLE)
+	end
 end
 
 function PlayerStandard:_play_interact_redirect(t)
@@ -1956,6 +2013,7 @@ function PlayerStandard:_play_interact_redirect(t)
 	if self._running then
 		return
 	end
+	self._state_data.interact_redirect_t = t + 1
 	self._ext_camera:play_redirect(self.IDS_USE)
 end
 
@@ -1984,7 +2042,7 @@ function PlayerStandard:_check_action_jump(t, input)
 	local action_wanted = input.btn_jump_press
 	if action_wanted then
 		local action_forbidden = self._jump_t and t < self._jump_t + 0.55
-		action_forbidden = action_forbidden or self._unit:base():stats_screen_visible() or self._state_data.in_air or self:_interacting() or self:_on_zipline()
+		action_forbidden = action_forbidden or self._unit:base():stats_screen_visible() or self._state_data.in_air or self:_interacting() or self:_on_zipline() or self:_does_deploying_limit_movement()
 		if not action_forbidden then
 			if self._state_data.ducking then
 				self:_interupt_action_ducking(t)
@@ -2116,6 +2174,31 @@ end
 
 function PlayerStandard:_on_zipline()
 	return self._state_data.on_zipline
+end
+
+function PlayerStandard:_update_omniscience(t, dt)
+	local action_forbidden = self._unit:base():stats_screen_visible() or not managers.player:has_category_upgrade("player", "standstill_omniscience") or self:_interacting() or self._ext_movement:has_carry_restriction() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_grenade() or self:_is_meleeing() or self:_on_zipline() or self._moving or self:running() or self:_is_reloading() or self:in_air() or self:in_steelsight() or self:is_equipping() or self:shooting() or not managers.groupai:state():whisper_mode() or not tweak_data.player.omniscience
+	if action_forbidden then
+		if self._state_data.omniscience_t then
+			self._state_data.omniscience_t = nil
+		end
+		return
+	end
+	self._state_data.omniscience_t = self._state_data.omniscience_t or t + tweak_data.player.omniscience.start_t
+	if t >= self._state_data.omniscience_t then
+		local sensed_targets = World:find_units_quick("sphere", self._unit:movement():m_pos(), tweak_data.player.omniscience.sense_radius, managers.slot:get_mask("trip_mine_targets"))
+		for _, unit in ipairs(sensed_targets) do
+			if alive(unit) and not tweak_data.character[unit:base()._tweak_table].is_escort then
+				self._state_data.omniscience_units_detected = self._state_data.omniscience_units_detected or {}
+				if not self._state_data.omniscience_units_detected[unit:key()] or t >= self._state_data.omniscience_units_detected[unit:key()] then
+					self._state_data.omniscience_units_detected[unit:key()] = t + tweak_data.player.omniscience.target_resense_t
+					managers.game_play_central:auto_highlight_enemy(unit, true)
+					break
+				end
+			end
+		end
+		self._state_data.omniscience_t = t + tweak_data.player.omniscience.interval_t
+	end
 end
 
 function PlayerStandard:_check_action_run(t, input)
@@ -2353,7 +2436,8 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 								self._ext_camera:play_redirect(weap_base:is_second_sight_on() and self.IDS_RECOIL or self.IDS_RECOIL_STEELSIGHT, 1)
 							end
 						end
-						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier()
+						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier() + weap_base:recoil_addend()
+						cat_print("jansve", "[PlayerStandard] Weapon Recoil Multiplier: " .. tostring(recoil_multiplier))
 						local up, down, left, right = unpack(weap_tweak_data.kick[self._state_data.in_steelsight and "steelsight" or self._state_data.ducking and "crouching" or "standing"])
 						self._camera_unit:base():recoil_kick(up * recoil_multiplier, down * recoil_multiplier, left * recoil_multiplier, right * recoil_multiplier)
 						if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then

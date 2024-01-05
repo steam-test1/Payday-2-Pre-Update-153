@@ -18,7 +18,7 @@ function IngameIncapacitatedState:update(t, dt)
 		player:character_damage():set_invulnerable(true)
 		player:character_damage():set_health(0)
 		player:base():_unregister()
-		player:base():set_slot(player, 0)
+		World:delete_unit(player)
 	end
 end
 

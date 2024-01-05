@@ -145,7 +145,7 @@ function BaseInteractionExt:_btn_interact()
 end
 
 function BaseInteractionExt:can_select(player)
-	if not self:_has_required_upgrade() then
+	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if not self:_has_required_deployable() then
@@ -212,7 +212,18 @@ function BaseInteractionExt:unselect()
 	end
 end
 
-function BaseInteractionExt:_has_required_upgrade()
+function BaseInteractionExt:_has_required_upgrade(movement_state)
+	if not movement_state then
+		return true
+	end
+	if movement_state == "mask_off" then
+		if self._tweak_data.requires_mask_off_upgrade then
+			local category = self._tweak_data.requires_mask_off_upgrade.category
+			local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
+			return managers.player:has_category_upgrade(category, upgrade)
+		end
+		return false
+	end
 	if self._tweak_data.requires_upgrade then
 		local category = self._tweak_data.requires_upgrade.category
 		local upgrade = self._tweak_data.requires_upgrade.upgrade
@@ -224,6 +235,13 @@ end
 function BaseInteractionExt:_has_required_deployable()
 	if self._tweak_data.required_deployable then
 		return managers.player:has_deployable_left(self._tweak_data.required_deployable)
+	end
+	return true
+end
+
+function BaseInteractionExt:_allowed_in_movement_state(movement_state)
+	if not movement_state then
+		return false
 	end
 	return true
 end
@@ -338,7 +356,7 @@ function BaseInteractionExt:interact(player)
 end
 
 function BaseInteractionExt:can_interact(player)
-	if not self:_has_required_upgrade() then
+	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if not self:_has_required_deployable() then
@@ -538,7 +556,7 @@ end
 MultipleChoiceInteractionExt = MultipleChoiceInteractionExt or class(UseInteractionExt)
 
 function MultipleChoiceInteractionExt:can_interact(player)
-	if not self:_has_required_upgrade() then
+	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if not self:_has_required_deployable() then
@@ -603,6 +621,19 @@ function TripMineInteractionExt:interact(player)
 	self._unit:base():set_armed(armed)
 end
 
+function TripMineInteractionExt:selected(player)
+	local result = TripMineInteractionExt.super.selected(self, player)
+	if result then
+		self._unit:base():contour_selected()
+	end
+	return result
+end
+
+function TripMineInteractionExt:unselect()
+	TripMineInteractionExt.super.unselect(self)
+	self._unit:base():contour_unselected()
+end
+
 ECMJammerInteractionExt = ECMJammerInteractionExt or class(UseInteractionExt)
 
 function ECMJammerInteractionExt:interact(player)
@@ -622,7 +653,21 @@ function ECMJammerInteractionExt:selected(player)
 	if not self:can_interact(player) then
 		return
 	end
-	return ECMJammerInteractionExt.super.selected(self, player)
+	local result = ECMJammerInteractionExt.super.selected(self, player)
+	if result then
+		self._unit:base():contour_selected()
+	end
+	return result
+end
+
+function ECMJammerInteractionExt:unselect()
+	ECMJammerInteractionExt.super.unselect(self)
+	self._unit:base():contour_unselected()
+end
+
+function ECMJammerInteractionExt:set_active(active, sync, ...)
+	ECMJammerInteractionExt.super.set_active(self, active, sync, ...)
+	self._unit:base():contour_interaction()
 end
 
 ReviveInteractionExt = ReviveInteractionExt or class(BaseInteractionExt)
@@ -803,7 +848,8 @@ function ReviveInteractionExt:interact(reviving_unit)
 	if self._unit:base().is_husk_player then
 		local revive_rpc_params = {
 			"revive_player",
-			managers.player:upgrade_value("player", "revive_health_boost", 0)
+			managers.player:upgrade_value("player", "revive_health_boost", 0),
+			managers.player:upgrade_value("player", "revive_damage_reduction_level", 0)
 		}
 		managers.statistics:revived({npc = false, reviving_unit = reviving_unit})
 		self._unit:network():send_to_unit(revive_rpc_params)
@@ -892,7 +938,7 @@ end
 BodyBagsBagInteractionExt = BodyBagsBagInteractionExt or class(UseInteractionExt)
 
 function BodyBagsBagInteractionExt:_interact_blocked(player)
-	return managers.player:has_total_body_bags()
+	return managers.player:has_max_body_bags()
 end
 
 function BodyBagsBagInteractionExt:interact(player)
@@ -1541,6 +1587,21 @@ function EventIDInteractionExt:can_interact(player)
 		return false
 	end
 	return alive(self._unit) and self._unit:base() and self._unit:base().can_interact and self._unit:base():can_interact(player)
+end
+
+function EventIDInteractionExt:selected(player)
+	local result = EventIDInteractionExt.super.selected(self, player)
+	if result and self._unit:base().contour_selected then
+		self._unit:base():contour_selected()
+	end
+	return result
+end
+
+function EventIDInteractionExt:unselect()
+	EventIDInteractionExt.super.unselect(self)
+	if self._unit:base().contour_unselected then
+		self._unit:base():contour_unselected()
+	end
 end
 
 function EventIDInteractionExt:sync_net_event(event_id, peer)

@@ -305,8 +305,6 @@ function GroupAIStateBase:_init_team_tables()
 			team.id = id
 		end
 	end
-	print("[GroupAIStateBase:_init_team_tables]", inspect(self._teams))
-	Application:stack_dump()
 	self:_call_listeners("team_def")
 end
 
@@ -1383,7 +1381,7 @@ function GroupAIStateBase:_gameover_clbk_func()
 	self._gameover_clbk = nil
 	local govr = self:check_gameover_conditions()
 	if govr then
-		managers.network:session():send_to_peers("begin_gameover_fadeout")
+		managers.network:session():send_to_peers_synched("begin_gameover_fadeout")
 		self:begin_gameover_fadeout()
 	end
 end
@@ -1401,7 +1399,7 @@ function GroupAIStateBase:report_criminal_downed(unit)
 	if unit ~= managers.player:player_unit() then
 		managers.dialog:queue_dialog(bain_line, {})
 	end
-	managers.network:session():send_to_peers("bain_comment", bain_line)
+	managers.network:session():send_to_peers_synched("bain_comment", bain_line)
 end
 
 function GroupAIStateBase:on_criminal_disabled(unit, custom_status)
@@ -1744,9 +1742,7 @@ function GroupAIStateBase:on_objective_failed(unit, objective)
 		debug_pause_unit(unit, "[GroupAIStateBase:on_objective_failed] error in extension order", unit)
 		local fail_clbk = objective.fail_clbk
 		objective.fail_clbk = nil
-		if new_objective then
-			unit:brain():set_objective(new_objective)
-		end
+		unit:brain():set_objective(nil)
 		if fail_clbk then
 			fail_clbk(unit)
 		end
@@ -2826,6 +2822,7 @@ function GroupAIStateBase:sync_hostage_headcount(nr_hostages)
 	managers.hud:set_control_info({
 		nr_hostages = self._hostage_headcount
 	})
+	managers.player:update_hostage_skills()
 end
 
 function GroupAIStateBase:_set_rescue_state(state)
@@ -3627,7 +3624,7 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 		passive_convert_enemies_health_multiplier_level = managers.player:upgrade_level("player", "passive_convert_enemies_health_multiplier")
 	end
 	local owner_peer_id = managers.network:game():member_from_unit(player_unit):peer():id()
-	managers.network:session():send_to_peers("mark_minion", unit, owner_peer_id, convert_enemies_health_multiplier_level, passive_convert_enemies_health_multiplier_level)
+	managers.network:session():send_to_peers_synched("mark_minion", unit, owner_peer_id, convert_enemies_health_multiplier_level, passive_convert_enemies_health_multiplier_level)
 	if not peer_unit then
 		managers.player:count_up_player_minions()
 	end

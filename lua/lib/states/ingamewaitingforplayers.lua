@@ -58,6 +58,7 @@ function IngameWaitingForPlayersState:_start()
 end
 
 function IngameWaitingForPlayersState:sync_start(variant, soundtrack)
+	managers.menu_component:disable_mission_briefing_gui()
 	self._kit_menu.renderer:set_all_items_enabled(false)
 	self._briefing_start_t = nil
 	managers.briefing:stop_event()

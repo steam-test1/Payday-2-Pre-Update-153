@@ -178,11 +178,6 @@ local mugshot_stencil = {
 
 function MenuRenderer:highlight_item(item, ...)
 	MenuRenderer.super.highlight_item(self, item, ...)
-	if self:active_node_gui().name == "play_single_player" then
-		local character = managers.network:session():local_peer():character()
-		managers.menu:active_menu().renderer:set_stencil_image(mugshot_stencil[character][1])
-		managers.menu:active_menu().renderer:set_stencil_align("manual", mugshot_stencil[character][2])
-	end
 	self:post_event("highlight")
 end
 

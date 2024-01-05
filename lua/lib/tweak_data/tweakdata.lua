@@ -84,6 +84,9 @@ end
 function TweakData:_init_wip_equipments()
 end
 
+function TweakData:_init_wip_player()
+end
+
 function TweakData:_init_wip_criminals(tweak_data)
 end
 
@@ -352,6 +355,7 @@ function TweakData:init()
 	self.equipments = EquipmentsTweakData:new()
 	self._init_wip_equipments(self.equipments)
 	self.player = PlayerTweakData:new()
+	self._init_wip_player(self.player)
 	self.character = CharacterTweakData:new(self)
 	self._init_wip_character(self.character, self)
 	self.statistics = StatisticsTweakData:new()
@@ -585,6 +589,7 @@ function TweakData:init()
 	self.screen_colors.skill_color = Color(255, 77, 198, 255) / 255
 	self.screen_colors.ghost_color = Color("4ca6ff")
 	self.screen_colors.extra_bonus_color = Color(255, 255, 255, 255) / 255
+	self.screen_colors.community_color = Color(255, 59, 174, 254) / 255
 	self.screen_colors.heat_cold_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.heat_warm_color = Color("ff7f00")
 	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
@@ -2134,6 +2139,9 @@ function TweakData:init()
 	self.contour.deployable = {}
 	self.contour.deployable.standard_color = Vector3(0.1, 1, 0.5)
 	self.contour.deployable.selected_color = Vector3(1, 1, 1)
+	self.contour.deployable.active_color = Vector3(0.1, 0.5, 1)
+	self.contour.deployable.interact_color = Vector3(0.1, 1, 0.1)
+	self.contour.deployable.disabled_color = Vector3(1, 0.1, 0.1)
 	self.contour.upgradable = {}
 	self.contour.upgradable.standard_color = Vector3(0.1, 0.5, 1)
 	self.contour.upgradable.selected_color = Vector3(1, 1, 1)

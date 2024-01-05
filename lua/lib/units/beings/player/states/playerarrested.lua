@@ -31,7 +31,7 @@ function PlayerArrested:enter(state_data, enter_data)
 	self._unit:character_damage():on_arrested()
 	self._unit:character_damage():set_invulnerable(true)
 	self._entry_speech_clbk = "PlayerArrested_entryspeech"
-	managers.enemy:add_delayed_clbk(self._entry_speech_clbk, callback(self, self, "clbk_entry_speech"), managers.player:player_timer():time() + 5 + 2 * math.random())
+	managers.enemy:add_delayed_clbk(self._entry_speech_clbk, callback(self, self, "clbk_entry_speech"), TimerManager:game():time() + 5 + 2 * math.random())
 	managers.network:session():send_to_peers_synched("sync_contour_state", self._unit, -1, table.index_of(ContourExt.indexed_types, "teammate_cuffed"), true, 1)
 end
 

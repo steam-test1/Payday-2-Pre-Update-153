@@ -5,12 +5,15 @@ ECMJammerBase._NET_EVENTS = {
 	battery_empty = 2,
 	feedback_start = 3,
 	feedback_stop = 4,
-	jammer_active = 5
+	jammer_active = 5,
+	feedback_flash = 6,
+	feedback_restart = 7
 }
 
 function ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner, peer_id)
+	battery_life_upgrade_lvl = math.min(battery_life_upgrade_lvl, tweak_data.upgrades.values.ecm_jammer.duration_multiplier[1] * tweak_data.upgrades.values.ecm_jammer.duration_multiplier_2[1])
 	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_jammer/gen_equipment_jammer"), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, battery_life_upgrade_lvl, peer_id or 0)
 	unit:base():setup(battery_life_upgrade_lvl, owner)
 	return unit
 end
@@ -60,6 +63,8 @@ function ECMJammerBase:sync_setup(upgrade_lvl, peer_id)
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
+	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * upgrade_lvl
+	self._battery_life = self._max_battery_life
 	managers.player:verify_equipment(peer_id, "ecm_jammer")
 end
 
@@ -69,6 +74,8 @@ end
 
 function ECMJammerBase:set_owner(owner)
 	self._owner = owner
+	self._owner_id = owner and managers.network:game():member_from_unit(owner):peer():id()
+	self:contour_interaction()
 end
 
 function ECMJammerBase:owner()
@@ -91,6 +98,10 @@ function ECMJammerBase:sync_net_event(event_id)
 		self:_set_feedback_active(false)
 	elseif event_id == net_events.jammer_active then
 		self:set_active(true)
+	elseif event_id == net_events.feedback_flash then
+		self._unit:contour():flash("deployable_active", 0.15)
+	elseif event_id == net_events.feedback_restart then
+		self._unit:sound_source():post_event("ecm_jammer_ready")
 	end
 end
 
@@ -107,6 +118,7 @@ function ECMJammerBase:setup(battery_life_upgrade_lvl, owner)
 	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * battery_life_upgrade_lvl
 	self._battery_life = self._max_battery_life
 	self._owner = owner
+	self._owner_id = owner and managers.network:game():member_from_unit(owner):peer():id()
 end
 
 function ECMJammerBase:set_active(active)
@@ -116,7 +128,6 @@ function ECMJammerBase:set_active(active)
 	end
 	if Network:is_server() then
 		if active then
-			self._owner_peer_id = managers.network:session():local_peer():id()
 			local from_pos = self._unit:position() + self._unit:rotation():y() * 10
 			local to_pos = self._unit:position() + self._unit:rotation():y() * -10
 			local ray = self._unit:raycast("ray", from_pos, to_pos, "slot_mask", managers.slot:get_mask("trip_mine_placeables"))
@@ -133,6 +144,7 @@ function ECMJammerBase:set_active(active)
 			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
 				jam_cameras = managers.player:has_category_upgrade("ecm_jammer", "affects_cameras")
 				jam_pagers = managers.player:has_category_upgrade("ecm_jammer", "affects_pagers")
+				self:contour_interaction()
 			else
 				jam_cameras = self._owner:base():upgrade_value("ecm_jammer", "affects_cameras")
 				jam_pagers = self._owner:base():upgrade_value("ecm_jammer", "affects_pagers")
@@ -151,10 +163,16 @@ function ECMJammerBase:set_active(active)
 		if not self._jam_sound_event then
 			self._jam_sound_event = self._unit:sound_source():post_event("ecm_jammer_jam_signal")
 		end
-	elseif self._jam_sound_event then
-		self._jam_sound_event:stop()
-		self._jam_sound_event = nil
-		self._unit:sound_source():post_event("ecm_jammer_jam_signal_stop")
+		self._unit:contour():add("deployable_active")
+	else
+		if self._jam_sound_event then
+			self._jam_sound_event:stop()
+			self._jam_sound_event = nil
+			self._unit:sound_source():post_event("ecm_jammer_jam_signal_stop")
+		end
+		if self._unit:contour() then
+			self._unit:contour():remove("deployable_active")
+		end
 	end
 	self._jammer_active = active
 end
@@ -167,6 +185,19 @@ function ECMJammerBase:update(unit, t, dt)
 	if self._battery_life > 0 then
 		self._battery_life = self._battery_life - dt
 		self:check_battery()
+	end
+	if Network:is_server() and not self._feedback_active and self._chk_feedback_retrigger_t then
+		self._chk_feedback_retrigger_t = self._chk_feedback_retrigger_t - dt
+		if 0 >= self._chk_feedback_retrigger_t then
+			if math.random() < (tweak_data.upgrades.ecm_feedback_retrigger_chance or 0) then
+				self:_send_net_event(self._NET_EVENTS.feedback_restart)
+				self._unit:sound_source():post_event("ecm_jammer_ready")
+				self._unit:interaction():set_active(true, true)
+				self._chk_feedback_retrigger_t = nil
+			else
+				self._chk_feedback_retrigger_t = tweak_data.upgrades.ecm_feedback_retrigger_interval or 60
+			end
+		end
 	end
 	self:_check_body()
 end
@@ -208,6 +239,9 @@ end
 function ECMJammerBase:_set_battery_low()
 	self._battery_low = true
 	self._g_glow_jammer_red:set_visibility(true)
+	if not self._unit:contour():is_flashing() then
+		self._unit:contour():flash("deployable_active", 0.15)
+	end
 	if Network:is_server() then
 		self:_send_net_event(self._NET_EVENTS.battery_low)
 	end
@@ -282,6 +316,17 @@ function ECMJammerBase:_set_feedback_active(state)
 				self._feedback_clbk_id = nil
 			end
 			self:_send_net_event(self._NET_EVENTS.feedback_stop)
+			if alive(self._owner) then
+				local retrigger = false
+				if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
+					retrigger = managers.player:has_category_upgrade("ecm_jammer", "can_retrigger")
+				else
+					retrigger = self._owner:base():upgrade_value("ecm_jammer", "can_retrigger")
+				end
+				if retrigger then
+					self._chk_feedback_retrigger_t = tweak_data.upgrades.ecm_feedback_retrigger_interval or 60
+				end
+			end
 		end
 	end
 	if state then
@@ -290,13 +335,18 @@ function ECMJammerBase:_set_feedback_active(state)
 		if not self._puke_sound_event then
 			self._puke_sound_event = self._unit:sound_source():post_event("ecm_jammer_puke_signal")
 		end
+		self._unit:contour():remove("deployable_interactable")
+		self._unit:contour():add("deployable_active")
 	else
 		self._g_glow_feedback_green:set_visibility(false)
 		self._g_glow_feedback_red:set_visibility(false)
 		if self._puke_sound_event then
 			self._puke_sound_event:stop()
 			self._puke_sound_event = nil
-			self._unit:sound_source():post_event("ecm_jammer_puke_stop")
+			self._unit:sound_source():post_event("ecm_jammer_puke_signal_stop")
+		end
+		if self._unit:contour() then
+			self._unit:contour():remove("deployable_active")
 		end
 	end
 	self._feedback_active = state
@@ -326,8 +376,28 @@ function ECMJammerBase:clbk_feedback()
 		if self._feedback_expire_t - t < self._feedback_duration * 0.1 then
 			self._g_glow_feedback_red:set_visibility(true)
 			self._g_glow_feedback_green:set_visibility(false)
+			if not self._unit:contour():is_flashing() then
+				self._unit:contour():flash("deployable_active", 0.15)
+				if Network:is_server() then
+					self:_send_net_event(self._NET_EVENTS.feedback_flash)
+				end
+			end
 		end
 		managers.enemy:add_delayed_clbk(self._feedback_clbk_id, callback(self, self, "clbk_feedback"), t + self._feedback_interval + math.random() * 0.3)
+	end
+end
+
+function ECMJammerBase:contour_selected()
+	self._unit:contour():add("deployable_selected")
+end
+
+function ECMJammerBase:contour_unselected()
+	self._unit:contour():remove("deployable_selected")
+end
+
+function ECMJammerBase:contour_interaction()
+	if managers.player:has_category_upgrade("ecm_jammer", "can_activate_feedback") and managers.network:session() and self._unit:contour() and self._owner_id == managers.network:session():local_peer():id() then
+		self._unit:contour():add("deployable_interactable")
 	end
 end
 

@@ -1,14 +1,16 @@
 BodyBagsBagBase = BodyBagsBagBase or class(UnitBase)
 
-function BodyBagsBagBase.spawn(pos, rot)
+function BodyBagsBagBase.spawn(pos, rot, upgrade_lvl, peer_id)
 	local unit_name = "units/payday2/equipment/gen_equipment_bodybags_bag/gen_equipment_bodybags_bag"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, 0)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, upgrade_lvl, peer_id or 0)
+	unit:base():setup(upgrade_lvl)
 	return unit
 end
 
 function BodyBagsBagBase:set_server_information(peer_id)
 	self._server_information = {owner_peer_id = peer_id}
+	managers.network:game():member(peer_id):peer():set_used_deployable(true)
 end
 
 function BodyBagsBagBase:server_information()
@@ -18,13 +20,13 @@ end
 function BodyBagsBagBase:init(unit)
 	UnitBase.init(self, unit, false)
 	self._unit = unit
+	self._is_attachable = true
 	self._max_bodybag_amount = tweak_data.upgrades.bodybag_crate_base
 	self._unit:sound_source():post_event("ammo_bag_drop")
 	if Network:is_client() then
 		self._validate_clbk_id = "bodybags_bag_validate" .. tostring(unit:key())
 		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
 	end
-	self:setup()
 end
 
 function BodyBagsBagBase:_clbk_validate()
@@ -43,14 +45,15 @@ function BodyBagsBagBase:sync_setup(upgrade_lvl, peer_id)
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
-	managers.player:verify_equipment(0, "bodybags_bag")
+	managers.player:verify_equipment(peer_id, "bodybags_bag")
+	self:setup(upgrade_lvl)
 end
 
 function BodyBagsBagBase:setup()
 	self._bodybag_amount = tweak_data.upgrades.bodybag_crate_base
 	self._empty = false
 	self:_set_visual_stage()
-	if Network:is_server() then
+	if Network:is_server() and self._is_attachable then
 		local from_pos = self._unit:position() + self._unit:rotation():z() * 10
 		local to_pos = self._unit:position() + self._unit:rotation():z() * -10
 		local ray = self._unit:raycast("ray", from_pos, to_pos, "slot_mask", managers.slot:get_mask("world_geometry"))
@@ -122,7 +125,6 @@ function BodyBagsBagBase:take_bodybag(unit)
 		managers.player:add_body_bags_amount(1)
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", 1)
 		self._bodybag_amount = self._bodybag_amount - 1
-		print("[BodyBagsBagBase] Took " .. 1 .. " bodybags, " .. self._bodybag_amount .. " left")
 	end
 	if 0 >= self._bodybag_amount then
 		self:_set_empty()
@@ -149,7 +151,7 @@ function BodyBagsBagBase:sync_bodybag_taken(amount)
 end
 
 function BodyBagsBagBase:_can_take_bodybag(unit)
-	if self._empty or self._bodybag_amount < 1 or managers.player:has_total_body_bags() then
+	if self._empty or self._bodybag_amount < 1 or managers.player:has_max_body_bags() then
 		return false
 	end
 	return true
@@ -186,5 +188,27 @@ function BodyBagsBagBase:destroy()
 	if self._validate_clbk_id then
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
+	end
+end
+
+CustomBodyBagsBagBase = CustomBodyBagsBagBase or class(BodyBagsBagBase)
+
+function CustomBodyBagsBagBase:init(unit)
+	CustomBodyBagsBagBase.super.init(self, unit)
+	self._is_attachable = self.is_attachable or false
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	self:setup(self.upgrade_lvl or 0)
+end
+
+function CustomBodyBagsBagBase:_set_empty()
+	self._empty = true
+	if alive(self._unit) then
+		self._unit:interaction():set_active(false)
+	end
+	if self._unit:damage():has_sequence("empty") then
+		self._unit:damage():run_sequence_simple("empty")
 	end
 end

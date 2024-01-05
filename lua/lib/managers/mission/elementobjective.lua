@@ -35,6 +35,8 @@ function ElementObjective:on_executed(instigator)
 			managers.objectives:update_objective(objective)
 		elseif self._values.state == "remove" then
 			managers.objectives:remove_objective(objective)
+		elseif self._values.state == "remove_and_activate" then
+			managers.objectives:remove_and_activate_objective(objective, nil, {amount = amount})
 		end
 	elseif Application:editor() then
 		managers.editor:output_error("Cant operate on objective " .. objective .. " in element " .. self._editor_name .. ".")

@@ -878,7 +878,7 @@ function HUDStageEndScreen:in_custody(panel, delay, bonus)
 end
 
 function HUDStageEndScreen:heat_xp(panel, delay, bonus)
-	local heat = managers.job:last_known_heat() or managers.job:current_job_id() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
+	local heat = managers.job:last_known_heat() or managers.job:has_active_job() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
 	local heat_color = managers.job:get_heat_color(heat)
 	local text = panel:text({
 		font = tweak_data.menu.pd2_small_font,
@@ -979,6 +979,7 @@ function HUDStageEndScreen:clear_stage()
 	self._lp_sp_gain:hide()
 	self._lp_text:set_text(tostring(self._data and self._data.start_t.level or 0))
 	self:reset_skill_points()
+	self._endgame_setup = false
 	if self._background_layer_full:child("money_video") then
 		self._background_layer_full:child("money_video"):stop()
 		self._background_layer_full:remove(self._background_layer_full:child("money_video"))
@@ -1311,17 +1312,20 @@ end
 
 function HUDStageEndScreen:stage_init(t, dt)
 	local data = self._data
-	self._lp_text:show()
-	self._lp_circle:show()
-	self._lp_backpanel:child("bg_progress_circle"):show()
-	self._lp_forepanel:child("level_progress_text"):show()
-	if managers.experience:reached_level_cap() then
-		self._lp_text:set_text(tostring(data.start_t.level))
-		self._lp_circle:set_color(Color(1, 1, 1))
-		managers.menu_component:post_event("box_tick")
-		self:step_stage_to_end()
-		return
-	end
+	repeat
+		self._lp_text:show()
+		self._lp_circle:show()
+		self._lp_backpanel:child("bg_progress_circle"):show()
+		self._lp_forepanel:child("level_progress_text"):show()
+		do break end -- pseudo-goto
+		if managers.experience:reached_level_cap() then
+			self._lp_text:set_text(tostring(data.start_t.level))
+			self._lp_circle:set_color(Color(1, 1, 1))
+			managers.menu_component:post_event("box_tick")
+			self:step_stage_to_end()
+			return
+		end
+	until true
 	self._lp_circle:set_alpha(0)
 	self._lp_backpanel:child("bg_progress_circle"):set_alpha(0)
 	self._lp_text:set_alpha(0)
@@ -1349,10 +1353,6 @@ function HUDStageEndScreen:stage_init(t, dt)
 	stage:set_right(0)
 	stage:set_top(exp:bottom())
 	self._bonuses = {}
-	table.insert(self._bonuses, {
-		stage,
-		bonus_params.bonus
-	})
 	local job
 	if data.bonuses.last_stage and data.bonuses.job_xp ~= 0 then
 		bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_job")
@@ -1366,7 +1366,7 @@ function HUDStageEndScreen:stage_init(t, dt)
 		})
 	end
 	local heat_xp = self._bonuses.heat_xp or 0
-	local heat = managers.job:last_known_heat() or managers.job:current_job_id() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
+	local heat = managers.job:last_known_heat() or managers.job:has_active_job() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
 	local heat_color = managers.job:get_heat_color(heat)
 	local bonuses_list = {
 		"bonus_days",
@@ -1572,12 +1572,13 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 			self._lp_xp_gain:set_text("")
 			self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(data.start_t.total - data.start_t.current))))
 			local clbk = callback(self, self, "spawn_animation")
-			self._lp_curr_xp:show()
+			local start_max_level = data.start_t.level == managers.experience:level_cap()
 			self._lp_xp_gained:show()
-			self._lp_next_level:show()
+			self._lp_curr_xp:set_visible(not start_max_level)
+			self._lp_next_level:set_visible(not start_max_level)
 			self._lp_xp_gain:show()
-			self._lp_xp_curr:show()
-			self._lp_xp_nl:show()
+			self._lp_xp_curr:set_visible(not start_max_level)
+			self._lp_xp_nl:set_visible(not start_max_level)
 			self._lp_curr_xp:animate(clbk, 0)
 			self._lp_xp_gained:animate(clbk, 0)
 			self._lp_next_level:animate(clbk, 0)
@@ -1591,13 +1592,14 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 end
 
 function HUDStageEndScreen:stage_show_all(t, dt)
-	self._lp_curr_xp:show()
+	local start_max_level = data.start_t.level == managers.experience:level_cap()
 	self._lp_xp_gained:show()
-	self._lp_next_level:show()
+	self._lp_curr_xp:set_visible(not start_max_level)
+	self._lp_next_level:set_visible(not start_max_level)
 	self._lp_xp_gain:show()
-	self._lp_xp_curr:show()
-	self._lp_xp_nl:show()
-	self._sum_text:show()
+	self._lp_xp_curr:set_visible(not start_max_level)
+	self._lp_xp_nl:set_visible(not start_max_level)
+	self._sum_text:set_visible(not start_max_level)
 	self:step_stage_up()
 end
 
@@ -1627,7 +1629,7 @@ function HUDStageEndScreen:stage_spin_levels(t, dt)
 			if data[self._csl] then
 				self._next_level_xp = data[self._csl].total
 			else
-				self._next_level_xp = data.end_t.total
+				self._next_level_xp = false
 			end
 			self._static_current_xp = self._static_current_xp + current_level_data.total - self._static_start_xp
 			self._static_gained_xp = self._static_gained_xp + current_level_data.total - self._static_start_xp
@@ -1649,10 +1651,11 @@ function HUDStageEndScreen:stage_spin_levels(t, dt)
 		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
 		self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
 		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
-		if current_level_data.level < managers.experience:level_cap() then
+		if self._next_level_xp then
 			self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._next_level_xp))))
 		else
 			self._lp_xp_nl:set_text("")
+			self._next_level_xp = current_level_data.level < managers.experience:level_cap() and data.end_t.total or 0
 		end
 	else
 		self._speed = math.max(1.55, self._speed * 0.55)
@@ -1665,13 +1668,37 @@ function HUDStageEndScreen:stage_spin_slowdown(t, dt)
 	local data = self._data
 	local xp_gained_frame = dt * self._speed * math.max(data.end_t.total * 0.1, 450)
 	local total_xp = data.end_t.total - data.end_t.current
+	if data.end_t.level == managers.experience:level_cap() then
+		if not self._endgame_setup then
+			self._endgame_setup = true
+			self._experience_text_panel:show()
+			self._lp_xp_gained:show()
+			self._lp_curr_xp:show()
+			self._lp_next_level:show()
+			self._lp_xp_gain:show()
+			self._lp_xp_curr:show()
+			self._lp_xp_nl:show()
+			self._sum_text:hide()
+			self._lp_circle:set_color(Color(1, 1, 1))
+		end
+		self._gained_xp = self._gained_xp + xp_gained_frame
+		local countdown_xp = math.max(self._experience_added - math.floor(self._gained_xp), 0)
+		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(countdown_xp)))
+		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._gained_xp))))
+		self._next_level_xp = total_xp
+		if countdown_xp == 0 then
+			self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._experience_added))))
+			self:step_stage_up()
+		end
+		return
+	end
 	self._next_level_xp = self._next_level_xp - xp_gained_frame
 	if total_xp > self._next_level_xp then
 		xp_gained_frame = xp_gained_frame + (self._next_level_xp - total_xp)
 		self._next_level_xp = total_xp
 		self:step_stage_up()
-		managers.menu_component:post_event("count_1_finished")
 	end
+	xp_gained_frame = math.min(xp_gained_frame, self._next_level_xp)
 	self._current_xp = self._current_xp + xp_gained_frame
 	self._gained_xp = self._gained_xp + xp_gained_frame
 	if data.end_t.current ~= 0 then
@@ -1682,7 +1709,7 @@ function HUDStageEndScreen:stage_spin_slowdown(t, dt)
 	local ratio = 1 - self._next_level_xp / data.end_t.total
 	self._lp_circle:set_color(Color(ratio, 1, 1))
 	if data.end_t.level < managers.experience:level_cap() then
-		local floored_gained = math.floor(self._gained_xp)
+		local floored_gained = math.max(math.floor(self._gained_xp), 0)
 		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
 		self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
 		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
@@ -1700,17 +1727,18 @@ function HUDStageEndScreen:stage_end(t, dt)
 	self._current_xp = self._static_current_xp
 	self._gained_xp = self._static_gained_xp
 	local floored_gained = math.floor(self._gained_xp)
-	self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
-	self._experience_text_panel:hide()
-	self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
-	self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
 	if data.end_t.level < managers.experience:level_cap() then
+		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
+		self._experience_text_panel:hide()
+		self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
+		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
 		self._lp_circle:set_color(Color(ratio, 1, 1))
 		self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(data.end_t.total - data.end_t.current))))
 	else
 		self._lp_circle:set_color(Color(1, 1, 1))
 		self._lp_xp_nl:set_text("")
 	end
+	managers.menu_component:post_event("count_1_finished")
 	self._wait_t = t
 	self:step_stage_up()
 end
@@ -1843,7 +1871,7 @@ function HUDStageEndScreen:level_up(level)
 		rotation = 360
 	})
 	ding_text:animate(text_ding_func)
-	self._lp_circle:set_color(Color(0, 1, 1))
+	self._lp_circle:set_color(Color(level == managers.experience:level_cap() and 1 or 0, 1, 1))
 	self._lp_text:stop()
 	self._lp_text:animate(level_text_func, 1, tostring(level))
 	local package_unlocked = tweak_data.upgrades.level_tree[level]

@@ -53,13 +53,6 @@ function DOFManager:update(t, dt)
 		new_data = self:check_dof_allowed() and self._queued_effects[self._current_effect]
 	end
 	if new_data then
-		if self._env_dof_enabled then
-			assert(not self._dof_modifier)
-			self._dof_modifier = assert(managers.viewport:viewports()[1]:environment_mixer():create_modifier(false, "shared_dof", function(...)
-				return self:modifier_callback(...)
-			end))
-			self._env_dof_enabled = nil
-		end
 		new_data = new_data.prog_data
 		new_clamp = new_data.dirty and new_data.clamp
 		new_data = new_clamp and new_data.cur_values
@@ -70,8 +63,6 @@ function DOFManager:update(t, dt)
 			self:feed_dof(new_data.near_min, new_data.near_max, new_data.far_min, new_data.far_max, new_clamp)
 		end
 	elseif not self._env_dof_enabled and managers.viewport:get_active_vp() then
-		assert(self._dof_modifier)
-		managers.viewport:viewports()[1]:environment_mixer():destroy_modifier(self._dof_modifier)
 		self._env_dof_enabled = true
 	end
 end

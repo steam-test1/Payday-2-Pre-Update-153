@@ -256,7 +256,7 @@ end
 
 function MenuInput:create_controller()
 	if not self._controller then
-		local controller = managers.controller:create_controller("" .. tostring(TimerManager:wall():time()), nil, false)
+		local controller = managers.controller:create_controller(nil, nil, false)
 		controller:add_trigger("cancel", callback(self, self, "back"))
 		controller:set_enabled(true)
 		self._controller = controller

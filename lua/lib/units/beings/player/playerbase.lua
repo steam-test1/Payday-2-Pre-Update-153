@@ -56,11 +56,18 @@ function PlayerBase:_setup_suspicion_and_detection_data()
 	self._suspicion_settings.multipliers = {}
 	self._suspicion_settings.init_buildup_mul = self._suspicion_settings.buildup_mul
 	self._suspicion_settings.init_range_mul = self._suspicion_settings.range_mul
-	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(Global.local_member:peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
+	self:setup_hud_offset()
 	self._detection_settings = {}
 	self._detection_settings.multipliers = {}
 	self._detection_settings.init_delay_mul = 1
 	self._detection_settings.init_range_mul = 1
+end
+
+function PlayerBase:setup_hud_offset(peer)
+	if not self._suspicion_settings then
+		return
+	end
+	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(peer or Global.local_member:peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 end
 
 function PlayerBase:_chk_set_unit_upgrades()
@@ -207,6 +214,9 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("sentry_gun", "armor_piercing_chance_2") then
 			local level = managers.player:upgrade_level("sentry_gun", "armor_piercing_chance_2")
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_piercing_chance_2", level)
+		end
+		if managers.player:has_category_upgrade("ecm_jammer", "can_retrigger") then
+			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "can_retrigger", 1)
 		end
 	end
 end

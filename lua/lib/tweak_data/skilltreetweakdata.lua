@@ -25,50 +25,35 @@ function SkillTreeTweakData:init()
 		digest(0),
 		digest(0)
 	}
+	self.HIDE_TIER_BONUS = true
 	self.skills = {}
 	self.skills.mastermind = {
 		name_id = "menu_mastermind",
 		desc_id = "menu_mastermind_desc",
 		icon_xy = {2, 7},
 		[1] = {
-			upgrades = {
-				"doctor_bag",
-				"passive_doctor_bag_interaction_speed_multiplier"
-			},
+			upgrades = {"doctor_bag"},
 			cost = self.costs.unlock_tree,
 			desc_id = "menu_mastermind_tier_1"
 		},
 		[2] = {
-			upgrades = {
-				"team_passive_stamina_multiplier_1"
-			},
+			upgrades = {},
 			desc_id = "menu_mastermind_tier_2"
 		},
 		[3] = {
-			upgrades = {
-				"player_passive_intimidate_range_mul"
-			},
+			upgrades = {},
 			desc_id = "menu_mastermind_tier_3"
 		},
 		[4] = {
-			upgrades = {
-				"team_passive_health_multiplier",
-				"player_passive_convert_enemies_health_multiplier",
-				"player_passive_convert_enemies_damage_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_mastermind_tier_4"
 		},
 		[5] = {
-			upgrades = {
-				"player_convert_enemies_interaction_speed_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_mastermind_tier_5"
 		},
 		[6] = {
-			upgrades = {
-				"player_passive_empowered_intimidation",
-				"passive_player_assets_cost_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_mastermind_tier_6"
 		}
 	}
@@ -77,41 +62,28 @@ function SkillTreeTweakData:init()
 		desc_id = "menu_enforcer_desc",
 		icon_xy = {1, 0},
 		[1] = {
-			upgrades = {
-				"ammo_bag",
-				"player_passive_suppression_bonus_1"
-			},
+			upgrades = {"ammo_bag"},
 			cost = self.costs.unlock_tree,
 			desc_id = "menu_menu_enforcer_tier_1"
 		},
 		[2] = {
-			upgrades = {
-				"player_passive_health_multiplier_1"
-			},
+			upgrades = {},
 			desc_id = "menu_menu_enforcer_tier_2"
 		},
 		[3] = {
-			upgrades = {
-				"player_passive_suppression_bonus_2"
-			},
+			upgrades = {},
 			desc_id = "menu_menu_enforcer_tier_3"
 		},
 		[4] = {
-			upgrades = {
-				"player_passive_health_multiplier_2"
-			},
+			upgrades = {},
 			desc_id = "menu_menu_enforcer_tier_4"
 		},
 		[5] = {
-			upgrades = {
-				"weapon_passive_damage_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_menu_enforcer_tier_5"
 		},
 		[6] = {
-			upgrades = {
-				"player_passive_health_multiplier_3"
-			},
+			upgrades = {},
 			desc_id = "menu_menu_enforcer_tier_6"
 		}
 	}
@@ -120,46 +92,28 @@ function SkillTreeTweakData:init()
 		desc_id = "menu_technician_desc",
 		icon_xy = {7, 4},
 		[1] = {
-			upgrades = {
-				"trip_mine",
-				"player_passive_crafting_weapon_multiplier_1",
-				"player_passive_crafting_mask_multiplier_1"
-			},
+			upgrades = {"trip_mine"},
 			cost = self.costs.unlock_tree,
 			desc_id = "menu_technician_tier_1"
 		},
 		[2] = {
-			upgrades = {
-				"weapon_passive_recoil_multiplier_1"
-			},
+			upgrades = {},
 			desc_id = "menu_technician_tier_2"
 		},
 		[3] = {
-			upgrades = {
-				"player_passive_crafting_weapon_multiplier_2",
-				"player_passive_crafting_mask_multiplier_2"
-			},
+			upgrades = {},
 			desc_id = "menu_technician_tier_3"
 		},
 		[4] = {
-			upgrades = {
-				"weapon_passive_headshot_damage_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_technician_tier_4"
 		},
 		[5] = {
-			upgrades = {
-				"player_passive_crafting_weapon_multiplier_3",
-				"player_passive_crafting_mask_multiplier_3"
-			},
+			upgrades = {},
 			desc_id = "menu_technician_tier_5"
 		},
 		[6] = {
-			upgrades = {
-				"weapon_passive_recoil_multiplier_2",
-				"player_passive_armor_multiplier_1",
-				"team_passive_armor_regen_time_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_technician_tier_6"
 		}
 	}
@@ -170,59 +124,45 @@ function SkillTreeTweakData:init()
 		[1] = {
 			upgrades = {
 				"ecm_jammer",
-				"ecm_jammer_affects_cameras",
-				"player_passive_dodge_chance_1"
+				"ecm_jammer_affects_cameras"
 			},
 			cost = self.costs.unlock_tree,
 			desc_id = "menu_ghost_tier_1"
 		},
 		[2] = {
-			upgrades = {
-				"weapon_passive_swap_speed_multiplier_1"
-			},
+			upgrades = {},
 			desc_id = "menu_ghost_tier_2"
 		},
 		[3] = {
-			upgrades = {
-				"player_passive_dodge_chance_2"
-			},
+			upgrades = {},
 			desc_id = "menu_ghost_tier_3"
 		},
 		[4] = {
-			upgrades = {
-				"player_passive_suspicion_bonus",
-				"player_passive_armor_movement_penalty_multiplier"
-			},
+			upgrades = {},
 			desc_id = "menu_ghost_tier_4"
 		},
 		[5] = {
-			upgrades = {
-				"weapon_passive_swap_speed_multiplier_2"
-			},
+			upgrades = {},
 			desc_id = "menu_ghost_tier_5"
 		},
 		[6] = {
-			upgrades = {
-				"player_passive_loot_drop_multiplier",
-				"weapon_passive_armor_piercing_chance"
-			},
+			upgrades = {},
 			desc_id = "menu_ghost_tier_6"
 		}
 	}
 	self.skills.black_marketeer = {
 		name_id = "menu_black_marketeer",
 		desc_id = "menu_black_marketeer_desc",
-		icon_xy = {4, 8},
+		icon_xy = {2, 10},
 		[1] = {
 			upgrades = {
-				"player_buy_cost_multiplier_1"
+				"player_hostage_health_regen_addend_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_buy_cost_multiplier_2",
-				"player_sell_cost_multiplier_1"
+				"player_hostage_health_regen_addend_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -264,16 +204,17 @@ function SkillTreeTweakData:init()
 	self.skills.control_freak = {
 		name_id = "menu_control_freak",
 		desc_id = "menu_control_freak_desc",
-		icon_xy = {6, 7},
+		icon_xy = {1, 10},
+		prerequisites = {"joker"},
 		[1] = {
 			upgrades = {
-				"player_civ_calming_alerts"
+				"minion_master_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_civ_intimidation_mul"
+				"minion_master_health_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -298,10 +239,11 @@ function SkillTreeTweakData:init()
 	self.skills.inside_man = {
 		name_id = "menu_inside_man",
 		desc_id = "menu_inside_man_desc",
-		icon_xy = {0, 8},
+		icon_xy = {6, 7},
 		[1] = {
 			upgrades = {
-				"player_assets_cost_multiplier"
+				"player_civ_calming_alerts",
+				"player_civ_intimidation_mul"
 			},
 			cost = self.costs.default
 		},
@@ -345,16 +287,16 @@ function SkillTreeTweakData:init()
 	self.skills.fast_learner = {
 		name_id = "menu_fast_learner",
 		desc_id = "menu_fast_learner_desc",
-		icon_xy = {7, 8},
+		icon_xy = {0, 10},
 		[1] = {
 			upgrades = {
-				"player_xp_multiplier"
+				"player_revive_damage_reduction_level_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"team_xp_multiplier"
+				"player_revive_damage_reduction_level_2"
 			},
 			cost = self.costs.pro
 		}
@@ -508,7 +450,8 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"player_convert_enemies_health_multiplier",
-				"player_convert_enemies_damage_multiplier"
+				"player_convert_enemies_damage_multiplier",
+				"player_convert_enemies_interaction_speed_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -624,7 +567,7 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_pick_up_ammo_multiplier"
+				"player_pick_up_ammo_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -821,7 +764,8 @@ function SkillTreeTweakData:init()
 			upgrades = {
 				"player_saw_speed_multiplier_2",
 				"saw_lock_damage_multiplier_2",
-				"saw_enemy_slicer"
+				"saw_enemy_slicer",
+				"saw_secondary"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -933,16 +877,16 @@ function SkillTreeTweakData:init()
 	self.skills.blast_radius = {
 		name_id = "menu_blast_radius",
 		desc_id = "menu_blast_radius_desc",
-		icon_xy = {1, 5},
+		icon_xy = {7, 9},
 		[1] = {
 			upgrades = {
-				"trip_mine_explosion_size_multiplier_1"
+				"trip_mine_explosion_size_multiplier_2"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"trip_mine_explosion_size_multiplier_2"
+				"player_carry_sentry_and_trip"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -995,7 +939,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"trip_mine_sensor_toggle"
+				"trip_mine_sensor_toggle",
+				"trip_mine_sensor_highlight"
 			},
 			cost = self.costs.pro
 		}
@@ -1046,7 +991,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"sentry_gun_rot_speed_multiplier"
+				"sentry_gun_rot_speed_multiplier",
+				"sentry_gun_extra_ammo_multiplier_1"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1058,7 +1004,7 @@ function SkillTreeTweakData:init()
 		prerequisites = {"sentry_gun"},
 		[1] = {
 			upgrades = {
-				"sentry_gun_extra_ammo_multiplier_1"
+				"sentry_gun_can_reload"
 			},
 			cost = self.costs.hightier
 		},
@@ -1189,16 +1135,16 @@ function SkillTreeTweakData:init()
 	self.skills.master_craftsman = {
 		name_id = "menu_master_craftsman",
 		desc_id = "menu_master_craftsman_desc",
-		icon_xy = {1, 7},
+		icon_xy = {6, 9},
 		[1] = {
 			upgrades = {
-				"player_crafting_weapon_multiplier"
+				"trip_mine_explosion_size_multiplier_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_crafting_mask_multiplier"
+				"trip_mine_marked_enemy_extra_damage"
 			},
 			cost = self.costs.pro
 		}
@@ -1447,7 +1393,8 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"ecm_jammer_feedback_duration_boost",
-				"ecm_jammer_interaction_speed_multiplier"
+				"ecm_jammer_interaction_speed_multiplier",
+				"ecm_jammer_can_retrigger"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1499,25 +1446,7 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"weapon_silencer_damage_multiplier_2",
-				"weapon_silencer_armor_piercing_chance"
-			},
-			cost = self.costs.hightierpro
-		}
-	}
-	self.skills.silence = {
-		name_id = "menu_silence",
-		desc_id = "menu_silence_desc",
-		icon_xy = {4, 4},
-		[1] = {
-			upgrades = {
-				"weapon_silencer_recoil_multiplier"
-			},
-			cost = self.costs.hightier
-		},
-		[2] = {
-			upgrades = {
-				"weapon_silencer_enter_steelsight_speed_multiplier",
-				"weapon_silencer_spread_multiplier"
+				"weapon_silencer_armor_piercing_chance_1"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1528,14 +1457,15 @@ function SkillTreeTweakData:init()
 		icon_xy = {4, 4},
 		[1] = {
 			upgrades = {
-				"weapon_silencer_recoil_multiplier"
+				"weapon_silencer_recoil_multiplier",
+				"weapon_silencer_enter_steelsight_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"weapon_silencer_enter_steelsight_speed_multiplier",
-				"weapon_silencer_spread_multiplier"
+				"weapon_silencer_spread_multiplier",
+				"weapon_silencer_armor_piercing_chance_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1633,12 +1563,12 @@ function SkillTreeTweakData:init()
 		"joker"
 	}
 	self.trees[1].tiers[5] = {
-		"black_marketeer",
+		"kilmer",
 		"gun_fighter",
-		"kilmer"
+		"control_freak"
 	}
 	self.trees[1].tiers[6] = {
-		"control_freak",
+		"black_marketeer",
 		"pistol_messiah",
 		"inspire"
 	}
@@ -1741,5 +1671,386 @@ function SkillTreeTweakData:init()
 		"player_corpse_dispose_amount_1",
 		"player_civ_harmless_melee",
 		"striker_reload_speed_default"
+	}
+	self.specialization_convertion_rate = {
+		100,
+		200,
+		300,
+		400,
+		500,
+		600,
+		700,
+		800,
+		900,
+		1000
+	}
+	self.specializations = {
+		{
+			name_id = "menu_st_spec_1",
+			desc_id = "menu_st_spec_1_desc",
+			{
+				upgrades = {
+					"player_passive_health_multiplier_1"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				name_id = "menu_deck1_1",
+				desc_id = "menu_deck1_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck1_2",
+				desc_id = "menu_deck1_2_desc"
+			},
+			{
+				upgrades = {
+					"team_passive_stamina_multiplier_1",
+					"player_passive_intimidate_range_mul"
+				},
+				cost = 400,
+				icon_xy = {2, 0},
+				name_id = "menu_deck1_3",
+				desc_id = "menu_deck1_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck1_4",
+				desc_id = "menu_deck1_4_desc"
+			},
+			{
+				upgrades = {
+					"team_passive_health_multiplier"
+				},
+				cost = 1000,
+				icon_xy = {4, 0},
+				name_id = "menu_deck1_5",
+				desc_id = "menu_deck1_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck1_6",
+				desc_id = "menu_deck1_6_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_armor_multiplier_1",
+					"team_passive_armor_multiplier"
+				},
+				cost = 2400,
+				icon_xy = {6, 0},
+				name_id = "menu_deck1_7",
+				desc_id = "menu_deck1_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck1_8",
+				desc_id = "menu_deck1_8_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_loot_drop_multiplier",
+					"team_hostage_health_multiplier",
+					"team_hostage_stamina_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				name_id = "menu_deck1_9",
+				desc_id = "menu_deck1_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_2",
+			desc_id = "menu_st_spec_2_desc",
+			{
+				upgrades = {
+					"player_passive_health_multiplier_1"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				name_id = "menu_deck2_1",
+				desc_id = "menu_deck2_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck2_2",
+				desc_id = "menu_deck2_2_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_health_multiplier_2",
+					"player_uncover_multiplier"
+				},
+				cost = 400,
+				icon_xy = {1, 1},
+				name_id = "menu_deck2_3",
+				desc_id = "menu_deck2_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck2_4",
+				desc_id = "menu_deck2_4_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_health_multiplier_3"
+				},
+				cost = 1000,
+				icon_xy = {2, 1},
+				name_id = "menu_deck2_5",
+				desc_id = "menu_deck2_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck2_6",
+				desc_id = "menu_deck2_6_desc"
+			},
+			{
+				upgrades = {
+					"player_panic_suppression",
+					"player_passive_suppression_bonus_2"
+				},
+				cost = 2400,
+				icon_xy = {3, 1},
+				name_id = "menu_deck2_7",
+				desc_id = "menu_deck2_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck2_8",
+				desc_id = "menu_deck2_8_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_health_multiplier_4",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {4, 1},
+				name_id = "menu_deck2_9",
+				desc_id = "menu_deck2_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_3",
+			desc_id = "menu_st_spec_3_desc",
+			{
+				upgrades = {
+					"player_tier_armor_multiplier_2"
+				},
+				cost = 200,
+				icon_xy = {6, 0},
+				name_id = "menu_deck3_1",
+				desc_id = "menu_deck3_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck3_2",
+				desc_id = "menu_deck3_2_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_armor_multiplier_3"
+				},
+				cost = 400,
+				icon_xy = {5, 1},
+				name_id = "menu_deck3_3",
+				desc_id = "menu_deck3_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck3_4",
+				desc_id = "menu_deck3_4_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_armor_multiplier_4"
+				},
+				cost = 1000,
+				icon_xy = {7, 1},
+				name_id = "menu_deck3_5",
+				desc_id = "menu_deck3_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck3_6",
+				desc_id = "menu_deck3_6_desc"
+			},
+			{
+				upgrades = {
+					"player_armor_regen_timer_multiplier_passive"
+				},
+				cost = 2400,
+				icon_xy = {6, 1},
+				name_id = "menu_deck3_7",
+				desc_id = "menu_deck3_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck3_8",
+				desc_id = "menu_deck3_8_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_armor_multiplier_6",
+					"team_passive_armor_regen_time_multiplier",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {0, 2},
+				name_id = "menu_deck3_9",
+				desc_id = "menu_deck3_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_4",
+			desc_id = "menu_st_spec_4_desc",
+			{
+				upgrades = {
+					"player_passive_dodge_chance_1"
+				},
+				cost = 200,
+				icon_xy = {1, 2},
+				name_id = "menu_deck4_1",
+				desc_id = "menu_deck4_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck4_2",
+				desc_id = "menu_deck4_2_desc"
+			},
+			{
+				upgrades = {
+					"player_camouflage_multiplier"
+				},
+				cost = 400,
+				icon_xy = {4, 2},
+				name_id = "menu_deck4_3",
+				desc_id = "menu_deck4_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck4_4",
+				desc_id = "menu_deck4_4_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_dodge_chance_2"
+				},
+				cost = 1000,
+				icon_xy = {2, 2},
+				name_id = "menu_deck4_5",
+				desc_id = "menu_deck4_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck4_6",
+				desc_id = "menu_deck4_6_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_dodge_chance_3"
+				},
+				cost = 2400,
+				icon_xy = {3, 2},
+				name_id = "menu_deck4_7",
+				desc_id = "menu_deck4_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck4_8",
+				desc_id = "menu_deck4_8_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_loot_drop_multiplier",
+					"weapon_passive_armor_piercing_chance",
+					"weapon_passive_swap_speed_multiplier_2"
+				},
+				cost = 4000,
+				icon_xy = {5, 2},
+				name_id = "menu_deck4_9",
+				desc_id = "menu_deck4_9_desc"
+			}
+		}
 	}
 end

@@ -231,6 +231,11 @@ function PlayerTweakData:init()
 	self.camera = {}
 	self.camera.MIN_SENSITIVITY = 0.3
 	self.camera.MAX_SENSITIVITY = 1.7
+	self.omniscience = {}
+	self.omniscience.start_t = 3.5
+	self.omniscience.interval_t = 1
+	self.omniscience.sense_radius = 1000
+	self.omniscience.target_resense_t = 15
 end
 
 function PlayerTweakData:_init_new_stances()
@@ -952,8 +957,8 @@ function PlayerTweakData:_init_serbu()
 	self.stances.serbu.steelsight.vel_overshot.yaw_pos = -4
 	self.stances.serbu.steelsight.vel_overshot.pitch_neg = -5
 	self.stances.serbu.steelsight.vel_overshot.pitch_pos = 5
-	local pivot_head_translation = Vector3(4, 17, -2)
-	local pivot_head_rotation = Rotation(-2, -2, 0)
+	local pivot_head_translation = Vector3(6, 17, -4)
+	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.serbu.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.serbu.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
 	self.stances.serbu.crouched.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
@@ -1715,7 +1720,7 @@ function PlayerTweakData:_init_famas()
 	self.stances.famas = deep_clone(self.stances.default)
 	local pivot_shoulder_translation = Vector3(12.4978, 36.9949, -1.6971)
 	local pivot_shoulder_rotation = Rotation(2.58401, -0.0831424, 0.629405)
-	local pivot_head_translation = Vector3(10, 35, -3)
+	local pivot_head_translation = Vector3(9, 34, -2.5)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.famas.standard.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.famas.standard.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
@@ -1724,7 +1729,7 @@ function PlayerTweakData:_init_famas()
 	self.stances.famas.standard.vel_overshot.yaw_pos = -10
 	self.stances.famas.standard.vel_overshot.pitch_neg = -10
 	self.stances.famas.standard.vel_overshot.pitch_pos = 10
-	local pivot_head_translation = Vector3(0, 20, 0)
+	local pivot_head_translation = Vector3(0, 30, 0)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.famas.steelsight.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.famas.steelsight.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
@@ -1733,7 +1738,7 @@ function PlayerTweakData:_init_famas()
 	self.stances.famas.steelsight.vel_overshot.yaw_pos = -10
 	self.stances.famas.steelsight.vel_overshot.pitch_neg = -10
 	self.stances.famas.steelsight.vel_overshot.pitch_pos = 10
-	local pivot_head_translation = Vector3(9, 33, -2)
+	local pivot_head_translation = Vector3(8, 33, -3)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.famas.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.famas.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()

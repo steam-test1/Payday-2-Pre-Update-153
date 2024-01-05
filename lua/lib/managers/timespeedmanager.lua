@@ -84,12 +84,12 @@ function TimeSpeedManager:play_effect(id, effect_desc)
 	if effect_desc.affect_timer then
 		if type(effect_desc.affect_timer) == "table" then
 			effect.affect_timers = {}
-			for _, ids_timer_name in ipairs(effect_desc.affect_timer) do
-				local timer = TimerManager:timer(ids_timer_name)
+			for _, timer_name in ipairs(effect_desc.affect_timer) do
+				local timer = TimerManager:timer(Idstring(timer_name))
 				effect.affect_timers[timer:key()] = timer
 			end
 		else
-			local timer = TimerManager:timer(effect_desc.affect_timer)
+			local timer = TimerManager:timer(Idstring(effect_desc.affect_timer))
 			effect.affect_timers = {
 				[timer:key()] = timer
 			}
@@ -115,7 +115,17 @@ function TimeSpeedManager:play_effect(id, effect_desc)
 	self._playing_effects = self._playing_effects or {}
 	self._playing_effects[id] = effect
 	if effect_desc.sync and managers.network:session() and not managers.network:session():closing() then
-		managers.network:session():send_to_peers_synched("start_timespeed_effect", id, effect_desc.timer, effect_desc.speed, effect_desc.fade_in or 0, effect_desc.sustain or 0, effect_desc.fade_out or 0)
+		local affect_timers_str = ""
+		if effect_desc.affect_timer then
+			if type(effect_desc.affect_timer) == "table" then
+				for _, timer_name in ipairs(effect_desc.affect_timer) do
+					affect_timers_str = affect_timers_str .. timer_name .. ";"
+				end
+			else
+				affect_timers_str = effect_desc.affect_timer .. ";"
+			end
+		end
+		managers.network:session():send_to_peers_synched("start_timespeed_effect", id, effect_desc.timer, affect_timers_str, effect_desc.speed, effect_desc.fade_in or 0, effect_desc.sustain or 0, effect_desc.fade_out or 0)
 	end
 end
 

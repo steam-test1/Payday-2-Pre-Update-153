@@ -73,6 +73,10 @@ function MenuInput:deactivate_controller_mouse()
 	end
 end
 
+function MenuInput:get_controller_class()
+	return self._controller
+end
+
 function MenuInput:get_controller()
 	return self._controller:get_controller()
 end
@@ -507,20 +511,22 @@ function MenuInput:update(t, dt)
 			if self._accept_input and self._controller and self._controller:get_input_pressed("cancel") and managers.menu:active_menu().renderer:back_pressed() then
 				managers.menu:active_menu().renderer:disable_input(0.2)
 			end
-			local special_btns = {
-				"menu_respec_tree",
-				"menu_modify_item",
-				"menu_preview_item",
-				"menu_remove_item",
-				"menu_preview_item_alt",
-				"menu_toggle_legends",
-				"menu_toggle_filters",
-				"menu_toggle_ready",
-				"toggle_chat",
-				"menu_toggle_pp_drawboard",
-				"menu_toggle_pp_breakdown"
-			}
 			if self._controller then
+				local special_btns = {
+					"menu_respec_tree",
+					"menu_modify_item",
+					"menu_preview_item",
+					"menu_remove_item",
+					"menu_preview_item_alt",
+					"menu_toggle_legends",
+					"menu_toggle_filters",
+					"menu_toggle_ready",
+					"toggle_chat",
+					"menu_toggle_pp_drawboard",
+					"menu_toggle_pp_breakdown",
+					"trigger_left",
+					"trigger_right"
+				}
 				for _, button in ipairs(special_btns) do
 					if self._accept_input and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
 						managers.menu:active_menu().renderer:disable_input(0.2)

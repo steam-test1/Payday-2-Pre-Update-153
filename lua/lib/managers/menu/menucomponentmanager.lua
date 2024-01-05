@@ -22,6 +22,7 @@ function MenuComponentManager:init()
 	managers.gui_data:layout_workspace(self._ws)
 	self._main_panel = self._ws:panel():panel()
 	self._requested_textures = {}
+	self._block_texture_requests = false
 	self._REFRESH_FRIENDS_TIME = 5
 	self._refresh_friends_t = TimerManager:main():time() + self._REFRESH_FRIENDS_TIME
 	self._sound_source = SoundDevice:create_source("MenuComponentManager")
@@ -148,6 +149,16 @@ end
 
 function MenuComponentManager:load(data)
 	self:on_whisper_mode_changed()
+end
+
+function MenuComponentManager:get_controller_input_bool(button)
+	if not managers.menu or not managers.menu:active_menu() then
+		return
+	end
+	local controller = managers.menu:active_menu().input:get_controller_class()
+	if managers.menu:active_menu().input:get_accept_input() then
+		return controller:get_input_bool(button)
+	end
 end
 
 function MenuComponentManager:_setup_controller_input()
@@ -314,6 +325,9 @@ function MenuComponentManager:update(t, dt)
 	end
 	if self._menuscene_info_gui then
 		self._menuscene_info_gui:update(t, dt)
+	end
+	if self._skilltree_gui then
+		self._skilltree_gui:update(t, dt)
 	end
 	if self._crimenet_contract_gui then
 		self._crimenet_contract_gui:update(t, dt)
@@ -952,11 +966,17 @@ function MenuComponentManager:mouse_clicked(o, button, x, y)
 	if self._blackmarket_gui then
 		return self._blackmarket_gui:mouse_clicked(o, button, x, y)
 	end
+	if self._skilltree_gui then
+		return self._skilltree_gui:mouse_clicked(o, button, x, y)
+	end
 end
 
 function MenuComponentManager:mouse_double_click(o, button, x, y)
 	if self._blackmarket_gui then
 		return self._blackmarket_gui:mouse_double_click(o, button, x, y)
+	end
+	if self._skilltree_gui then
+		return self._skilltree_gui:mouse_double_click(o, button, x, y)
 	end
 end
 
@@ -1754,6 +1774,12 @@ function MenuComponentManager:on_points_spent(...)
 	end
 end
 
+function MenuComponentManager:on_skilltree_reset(...)
+	if self._skilltree_gui then
+		self._skilltree_gui:on_skilltree_reset(...)
+	end
+end
+
 function MenuComponentManager:_create_infamytree_gui()
 	self:create_infamytree_gui()
 end
@@ -1922,6 +1948,12 @@ end
 function MenuComponentManager:on_ready_pressed_mission_briefing_gui(ready)
 	if self._mission_briefing_gui then
 		self._mission_briefing_gui:on_ready_pressed(ready)
+	end
+end
+
+function MenuComponentManager:disable_mission_briefing_gui()
+	if self._mission_briefing_gui then
+		self._mission_briefing_gui:set_enabled(false)
 	end
 end
 
@@ -2900,6 +2932,7 @@ function MenuComponentManager:_request_done_callback(texture_ids)
 end
 
 function MenuComponentManager:request_texture(texture, done_cb)
+	assert(not self._block_texture_requests, string.format("[MenuComponentManager:request_texture] Requesting texture is blocked! %s", texture))
 	local texture_ids = Idstring(texture)
 	local key = texture_ids:key()
 	local entry = self._requested_textures[key]
@@ -3073,6 +3106,7 @@ function MenuComponentManager:close()
 		end
 	end
 	self._requested_textures = {}
+	self._block_texture_requests = true
 end
 
 function MenuComponentManager:play_transition(run_in_pause)

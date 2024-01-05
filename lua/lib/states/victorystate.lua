@@ -50,7 +50,7 @@ function VictoryState:continue()
 		return
 	end
 	if Network:is_server() and not managers.dlc:is_trial() then
-		managers.network:session():send_to_peers_loaded("enter_ingame_lobby_menu")
+		managers.network:session():send_to_peers_loaded("enter_ingame_lobby_menu", managers.network:session():load_counter())
 	end
 	if managers.dlc:is_trial() then
 		self:gsm():change_state_by_name("empty")

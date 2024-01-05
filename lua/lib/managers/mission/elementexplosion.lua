@@ -26,7 +26,7 @@ function ElementExplosion:on_executed(instigator)
 			damage = self._values.player_damage
 		})
 	end
-	managers.explosion:spawn_sound_and_effects(pos, rot:z(), self._values.range, self._values.explosion_effect)
+	managers.explosion:spawn_sound_and_effects(pos, rot:z(), self._values.range, self._values.explosion_effect, self._values.sound_event)
 	if Network:is_server() then
 		managers.explosion:detect_and_give_dmg({
 			hit_pos = pos,

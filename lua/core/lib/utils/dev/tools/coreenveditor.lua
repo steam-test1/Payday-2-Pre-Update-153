@@ -12,7 +12,7 @@ CoreEnvEditor.MIX_MUL = 200
 CoreEnvEditor.REMOVE_DEPRECATED_DURING_LOAD = true
 
 function CoreEnvEditor:init(env_file_name)
-	self._env_path = assert(managers.viewport:first_active_viewport():environment_mixer():current_environment()) or "core/environments/default"
+	self._env_path = assert(managers.viewport:first_active_viewport():get_environment_path()) or "core/environments/default"
 	self._env_name = self._env_path
 	self:read_mode()
 	self:create_main_frame()
@@ -29,27 +29,20 @@ function CoreEnvEditor:init(env_file_name)
 	self._posteffect = {}
 	self._underlayeffect = {}
 	self._sky = {}
+	self._reported_data_path_map = {}
 	if self._simple_mode then
 		self:read_templates()
-		self:create_tab("Global Illumination")
-		self:create_tab("Post Processor")
+		self:create_tab("Global illumination")
 		self:create_tab("Skydome")
-		self:create_tab("Flare")
 		self:create_simple_interface()
-		self:build_tab("Global Illumination")
-		self:build_tab("Post Processor")
+		self:build_tab("Global illumination")
 		self:build_tab("Skydome")
-		self:build_tab("Flare")
 	else
-		self:create_tab("Global Illumination")
-		self:create_tab("Post Processor")
+		self:create_tab("Global illumination")
 		self:create_tab("Skydome")
-		self:create_tab("Flare")
 		self:create_interface()
-		self:build_tab("Global Illumination")
-		self:build_tab("Post Processor")
+		self:build_tab("Global illumination")
 		self:build_tab("Skydome")
-		self:build_tab("Flare")
 	end
 	self._skies_to_remove = {}
 	self._posteffects_to_remove = {}
@@ -60,10 +53,7 @@ function CoreEnvEditor:init(env_file_name)
 	Global.render_debug.draw_enabled = true
 	self._prev_environment = self._env_path
 	self:database_load_env(self._env_path)
-	managers.viewport:first_active_viewport():editor_callback(function(data)
-		self:feed(data)
-	end)
-	managers.viewport:first_active_viewport():reset_network_cache()
+	managers.viewport:first_active_viewport():set_environment_editor_callback(callback(self, self, "feed"))
 	self:check_news(true)
 end
 
@@ -118,43 +108,38 @@ function CoreEnvEditor:check_news(new_only)
 	end
 end
 
-function CoreEnvEditor:feed(data)
-	for k, v in pairs(data:data_root()) do
-		if k == "post_effect" then
-			for kpro, vpro in pairs(v) do
-				if kpro == "shadow_processor" then
-					self:shadow_feed_params(vpro.shadow_rendering.shadow_modifier)
-				else
-					for keffect, veffect in pairs(vpro) do
-						for kmod, vmod in pairs(veffect) do
-							for kpar, vpar in pairs(vmod) do
-								vmod[kpar] = assert(self._posteffect.post_processors[kpro].modifiers[kmod].params[kpar]:get_value(), kpar)
-							end
-						end
-					end
-				end
-			end
-		elseif k == "underlay_effect" then
-			for kmat, vmat in pairs(v) do
-				for kpar, vpar in pairs(vmat) do
-					vmat[kpar] = assert(self._underlayeffect.materials[kmat].params[kpar]:get_value(), kpar)
-				end
-			end
-		elseif k == "others" then
-			for kpar, vpar in pairs(v) do
-				if kpar ~= "underlay" or self._sky.params[kpar]:get_value() ~= "" then
-					v[kpar] = assert(self._sky.params[kpar]:get_value(), kpar)
-				end
-			end
-		elseif k == "sky_orientation" then
-			for kpar, vpar in pairs(v) do
+function CoreEnvEditor:feed(handler, viewport, scene)
+	for kpro, vpro in pairs(self._posteffect.post_processors) do
+		if kpro == "shadow_processor" then
+			local shadow_param_map = {}
+			self:shadow_feed_params(shadow_param_map)
+			for kpar, vpar in pairs(shadow_param_map) do
+				self:set_data_path("post_effect/" .. kpro .. "/shadow_rendering/shadow_modifier/" .. kpar, handler, vpar)
 			end
 		else
-			error("Corrupt environment!")
+			for kmod, vmod in pairs(vpro.modifiers) do
+				for kpar, vpar in pairs(vmod.params) do
+					self:set_data_path("post_effect/" .. kpro .. "/deferred_lighting/" .. kmod .. "/" .. kpar, handler, vpar:get_value())
+				end
+			end
 		end
 	end
-	managers.viewport:first_active_viewport():feed_params()
-	return data
+	for kmat, vmat in pairs(self._underlayeffect.materials) do
+		for kpar, vpar in pairs(vmat.params) do
+			self:set_data_path("underlay_effect/" .. kmat .. "/" .. kpar, handler, vpar:get_value())
+		end
+	end
+	for kpar, vpar in pairs(self._sky.params) do
+		self:set_data_path("others/" .. kpar, handler, vpar:get_value())
+	end
+end
+
+function CoreEnvEditor:set_data_path(data_path, handler, value)
+	local data_path_key = Idstring(data_path):key()
+	if not self._reported_data_path_map[data_path_key] and not handler:editor_set_value(data_path_key, value) then
+		self._reported_data_path_map[data_path_key] = true
+		Application:error("Data path is not supported: " .. data_path)
+	end
 end
 
 function CoreEnvEditor:create_main_frame()
@@ -213,9 +198,7 @@ function CoreEnvEditor:add_post_processors_param(pro, mod, param, gui)
 	end
 	self._posteffect.post_processors[pro].modifiers[mod].params[param] = gui
 	local e = "default"
-	if pro == "fog_processor" then
-		e = "fog"
-	elseif pro == "deferred" then
+	if pro == "deferred" then
 		e = "deferred_lighting"
 	end
 	local processor = managers.viewport:first_active_viewport():vp():get_post_processor_effect("World", Idstring(pro))
@@ -394,7 +377,6 @@ end
 
 function CoreEnvEditor:value_is_changed()
 	self._value_is_changed = true
-	managers.viewport:first_active_viewport():feed_params()
 end
 
 function CoreEnvEditor:add_updator(upd)
@@ -448,35 +430,37 @@ end
 function CoreEnvEditor:write_posteffect(file)
 	file:print("\t\t<post_effect>\n")
 	for post_processor_name, post_processor in pairs(self._posteffect.post_processors) do
-		file:print("\t\t\t<" .. post_processor_name .. ">\n")
-		if post_processor_name == "shadow_processor" then
-			self:write_shadow_params(file)
-		else
-			local e = "default"
-			if post_processor_name == "fog_processor" then
-				e = "fog"
-			elseif post_processor_name == "deferred" then
-				e = "deferred_lighting"
-			elseif post_processor_name == "shadow_processor" then
-				e = "shadow_rendering"
-			end
-			file:print("\t\t\t\t<" .. e .. ">\n")
-			for modifier_name, mod in pairs(post_processor.modifiers) do
-				file:print("\t\t\t\t\t<" .. modifier_name .. ">\n")
-				for param_name, param in pairs(mod.params) do
-					local v = param:get_value()
-					if getmetatable(v) == _G.Vector3 then
-						v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
-					else
-						v = tostring(param:get_value())
-					end
-					file:print("\t\t\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
+		if next(post_processor.modifiers) then
+			file:print("\t\t\t<" .. post_processor_name .. ">\n")
+			if post_processor_name == "shadow_processor" then
+				self:write_shadow_params(file)
+			else
+				local e = "default"
+				if post_processor_name == "deferred" then
+					e = "deferred_lighting"
+				elseif post_processor_name == "shadow_processor" then
+					e = "shadow_rendering"
 				end
-				file:print("\t\t\t\t\t</" .. modifier_name .. ">\n")
+				file:print("\t\t\t\t<" .. e .. ">\n")
+				for modifier_name, mod in pairs(post_processor.modifiers) do
+					if next(mod.params) then
+						file:print("\t\t\t\t\t<" .. modifier_name .. ">\n")
+						for param_name, param in pairs(mod.params) do
+							local v = param:get_value()
+							if getmetatable(v) == _G.Vector3 then
+								v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
+							else
+								v = tostring(param:get_value())
+							end
+							file:print("\t\t\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
+						end
+						file:print("\t\t\t\t\t</" .. modifier_name .. ">\n")
+					end
+				end
+				file:print("\t\t\t\t</" .. e .. ">\n")
 			end
-			file:print("\t\t\t\t</" .. e .. ">\n")
+			file:print("\t\t\t</" .. post_processor_name .. ">\n")
 		end
-		file:print("\t\t\t</" .. post_processor_name .. ">\n")
 	end
 	file:print("\t\t</post_effect>\n")
 end
@@ -501,17 +485,19 @@ end
 function CoreEnvEditor:write_underlayeffect(file)
 	file:print("\t\t<underlay_effect>\n")
 	for underlay_name, material in pairs(self._underlayeffect.materials) do
-		file:print("\t\t\t<" .. underlay_name .. ">\n")
-		for param_name, param in pairs(material.params) do
-			local v = param:get_value()
-			if getmetatable(v) == _G.Vector3 then
-				v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
-			else
-				v = tostring(param:get_value())
+		if next(material.params) then
+			file:print("\t\t\t<" .. underlay_name .. ">\n")
+			for param_name, param in pairs(material.params) do
+				local v = param:get_value()
+				if getmetatable(v) == _G.Vector3 then
+					v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
+				else
+					v = tostring(param:get_value())
+				end
+				file:print("\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
 			end
-			file:print("\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
+			file:print("\t\t\t</" .. underlay_name .. ">\n")
 		end
-		file:print("\t\t\t</" .. underlay_name .. ">\n")
 	end
 	file:print("\t\t</underlay_effect>\n")
 end
@@ -557,9 +543,18 @@ function CoreEnvEditor:database_load_posteffect(post_effect_node)
 						local l = string.len(k)
 						local parameter = mod.params[k]
 						local remove_param = false
-						if not parameter and not remove_param then
-							mod.params[k] = DummyWidget:new()
-							parameter = mod.params[k]
+						if not parameter then
+							local data_path = "post_effect/" .. post_processor:name() .. "/" .. effect:name() .. "/" .. modifier:name() .. "/" .. k
+							remove_param = not managers.viewport:has_data_path_key(Idstring(data_path):key())
+							if not remove_param then
+								Application:error("Editor doesn't handle value but should: " .. data_path)
+								mod.params[k] = DummyWidget:new()
+								parameter = mod.params[k]
+							elseif managers.viewport:is_deprecated_data_path(data_path) then
+								Application:error("Deprecated value will be removed next time you save: " .. data_path)
+							else
+								Application:stack_dump_error("Invalid value: " .. data_path)
+							end
 						end
 						if not remove_param then
 							local value = param:parameter("value")
@@ -595,17 +590,16 @@ function CoreEnvEditor:database_load_underlay(underlay_effect_node)
 					local parameter = mat.params[k]
 					local remove_param = false
 					if not parameter then
-						if string.sub(k, l - 5, l) ~= "_scale" or not mat.params[string.sub(k, 1, l - 6)] then
-							cat_print("debug", "[CoreEnvEditor] [Underlay] Deprecated in: " .. self._env_path .. " " .. material:parameter("name") .. " " .. k)
-							if self.REMOVE_DEPRECATED_DURING_LOAD then
-								cat_print("debug", "[CoreEnvEditor] Removing it!")
-								mat.params[k] = nil
-								remove_param = true
-							end
-						end
+						local data_path = "underlay_effect/" .. material:name() .. "/" .. k
+						remove_param = not managers.viewport:has_data_path_key(Idstring(data_path):key())
 						if not remove_param then
+							Application:error("Editor doesn't handle value but should: " .. data_path)
 							mat.params[k] = DummyWidget:new()
 							parameter = mat.params[k]
+						elseif managers.viewport:is_deprecated_data_path(data_path) then
+							Application:error("Deprecated value will be removed next time you save: " .. data_path)
+						else
+							Application:stack_dump_error("Invalid value: " .. data_path)
 						end
 					end
 					if not remove_param then
@@ -636,16 +630,15 @@ function CoreEnvEditor:database_load_sky(sky_node)
 				local parameter = self._sky.params[k]
 				local remove_param = false
 				if not self._sky.params[k] then
-					if string.sub(k, l - 5, l) ~= "_scale" or not self._sky.params[string.sub(k, 1, l - 6)] then
-						cat_print("debug", "[CoreEnvEditor] [Sky] Deprecated in: " .. self._env_path .. " " .. k)
-						if self.REMOVE_DEPRECATED_DURING_LOAD then
-							cat_print("debug", "[CoreEnvEditor] Removig it!")
-							self._sky.params[k] = nil
-							remove_param = true
-						end
-					end
+					local data_path = "others/" .. k
+					remove_param = not managers.viewport:has_data_path_key(Idstring(data_path):key())
 					if not remove_param then
+						Application:error("Editor doesn't handle value but should: " .. data_path)
 						self._sky.params[k] = DummyWidget:new()
+					elseif managers.viewport:is_deprecated_data_path(data_path) then
+						Application:error("Deprecated value will be removed next time you save: " .. data_path)
+					else
+						Application:stack_dump_error("Invalid value: " .. data_path)
 					end
 				end
 				if not remove_param then
@@ -732,9 +725,8 @@ function CoreEnvEditor:close()
 		self._environment_frame:destroy()
 		self._environment_frame = nil
 	end
-	managers.viewport:first_active_viewport():editor_callback(nil)
-	managers.viewport:first_active_viewport():environment_mixer():set_environment(self._prev_environment)
-	managers.viewport:first_active_viewport():reset_network_cache()
+	managers.viewport:first_active_viewport():set_environment_editor_callback(nil)
+	managers.viewport:first_active_viewport():set_environment(managers.viewport:first_active_viewport():get_environment_path())
 end
 
 function CoreEnvEditor:set_position(newpos)
@@ -942,9 +934,7 @@ function CoreEnvEditor:sync()
 						undo_struct._posteffect.post_processors[post_processor].modifiers[modifier].params[key] = out
 					end
 					local e = "default"
-					if post_processor == "fog_processor" then
-						e = "fog"
-					elseif post_processor == "deferred" then
+					if post_processor == "deferred" then
 						e = "deferred_lighting"
 					end
 					self._out_posteffect._post_processors[post_processor]._effect = e

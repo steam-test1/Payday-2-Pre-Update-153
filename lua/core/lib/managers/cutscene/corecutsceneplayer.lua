@@ -14,9 +14,6 @@ end
 function CoreCutscenePlayer:init(cutscene, optional_shared_viewport, optional_shared_cast)
 	self._cutscene = assert(cutscene, "No cutscene supplied.")
 	self._viewport = optional_shared_viewport or self:_create_viewport()
-	self._dof_environment_modifier = assert(self._viewport:environment_mixer():create_modifier(false, "dof", function(...)
-		return self:_dof_modifier_cb(...)
-	end), "[CoreCutscenePlayer] Environment modifier alredy created by: " .. tostring(self._viewport:environment_mixer():modifier_owner("dof")))
 	self._cast = optional_shared_cast or self:_create_cast()
 	self._owned_cutscene_keys = {}
 	self._time = 0
@@ -187,7 +184,6 @@ function CoreCutscenePlayer:destroy()
 	end
 	self._owned_gui_objects = nil
 	self:unload()
-	self._viewport:environment_mixer():destroy_modifier(self._dof_environment_modifier)
 	if self._listener_id and managers.listener then
 		managers.listener:remove_listener(self._listener_id)
 	end
@@ -352,18 +348,6 @@ function CoreCutscenePlayer:set_camera_depth_of_field(near, far)
 	self._dof_attributes.near_focus_distance_max = math.max(1.0E-6, near)
 	self._dof_attributes.far_focus_distance_min = far
 	self._dof_attributes.far_focus_distance_max = far + range * 0.67
-end
-
-function CoreCutscenePlayer:_dof_modifier_cb(interface)
-	local output = interface:parameters()
-	if self._dof_attributes then
-		output.clamp = 1
-		output.near_focus_distance_min = self._dof_attributes.near_focus_distance_min
-		output.near_focus_distance_max = self._dof_attributes.near_focus_distance_max
-		output.far_focus_distance_min = self._dof_attributes.far_focus_distance_min
-		output.far_focus_distance_max = self._dof_attributes.far_focus_distance_max
-	end
-	return output
 end
 
 function CoreCutscenePlayer:play_camera_shake(shake_name, amplitude, frequency, offset)

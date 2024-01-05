@@ -397,12 +397,33 @@ function table.list_union(...)
 	return result
 end
 
+function table.is_list_value_union(list1, list2)
+	for _, value1 in ipairs(list1) do
+		for _, value2 in ipairs(list2) do
+			if value1 == value2 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function table.list_append(t, ...)
 	for _, list_table in ipairs({
 		...
 	}) do
 		for _, value in ipairs(list_table) do
 			table.insert(t, value)
+		end
+	end
+end
+
+function table.map_append(t, ...)
+	for _, list_table in ipairs({
+		...
+	}) do
+		for key, value in pairs(list_table) do
+			t[key] = value
 		end
 	end
 end

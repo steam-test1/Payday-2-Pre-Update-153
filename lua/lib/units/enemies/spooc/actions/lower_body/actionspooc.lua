@@ -867,7 +867,7 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			end
 		end
 		self._strike_unit = self._target_unit
-		local spooc_res = self._strike_unit:movement():on_SPOOCed(self._unit)
+		local spooc_res = self._strike_unit:movement():on_SPOOCed(self._unit, self:is_flying_strike() and "flying_strike" or "sprint_attack")
 		if not self:is_flying_strike() then
 			if spooc_res and self._strike_unit:character_damage():is_downed() then
 				self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
@@ -1006,6 +1006,13 @@ function ActionSpooc:_upd_flying_strike_first_frame(t)
 	}
 	local speed_mul = math.lerp(3, 1, math.min(1, self._flying_strike_data.travel_dis_scaling_xy))
 	self._machine:set_speed(redir_result, speed_mul)
+	if self._target_unit:base().is_local_player then
+		local enemy_vec = mvector3.copy(self._common_data.pos)
+		mvector3.subtract(enemy_vec, self._target_unit:movement():m_pos())
+		mvector3.set_z(enemy_vec, 0)
+		mvector3.normalize(enemy_vec)
+		self._target_unit:camera():camera_unit():base():clbk_aim_assist({ray = enemy_vec})
+	end
 	self:_set_updator("_upd_flying_strike")
 end
 

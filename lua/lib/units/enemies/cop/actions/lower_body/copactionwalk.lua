@@ -428,7 +428,7 @@ function CopActionWalk:_init()
 			self._simplified_path = self._nav_path
 		end
 	else
-		local good_pos = common_data.nav_tracker:lost() and common_data.nav_tracker:field_position() or common_data.nav_tracker:position()
+		local good_pos = mvector3.copy(common_data.pos)
 		self._simplified_path = self._calculate_simplified_path(good_pos, self._nav_path, (not self._sync or self._common_data.stance.name == "ntl") and 2 or 1, self._sync, true)
 	end
 	if not self._simplified_path[2].x then

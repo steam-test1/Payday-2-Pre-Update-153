@@ -575,6 +575,8 @@ function WeaponTweakData:_init_data_saw_npc()
 	self.saw_npc.hold = "rifle"
 	self.saw_npc.alert_size = 4500
 	self.saw_npc.suppression = 1.8
+	self.saw_secondary_npc = deep_clone(self.saw_npc)
+	self.saw_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_sentry_gun_npc()
@@ -1598,13 +1600,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.animations = {}
 	self.mp9.animations.equip_id = "equip_mac11_rifle"
 	self.mp9.animations.recoil_steelsight = true
+	self.mp9.panic_suppression_chance = 0.05
 	self.mp9.stats = {
 		damage = 9,
 		spread = 7,
 		recoil = 7,
 		spread_moving = 8,
 		zoom = 3,
-		concealment = 24,
+		concealment = 26,
 		suppression = 16,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -2033,6 +2036,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.animations.reload_not_empty = "reload_not_empty"
 	self.olympic.animations.equip_id = "equip_mp5"
 	self.olympic.animations.recoil_steelsight = true
+	self.olympic.panic_suppression_chance = 0.05
 	self.olympic.stats = {
 		damage = 8,
 		spread = 8,
@@ -2374,6 +2378,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.challenges = {}
 	self.akmsu.challenges.group = "rifle"
 	self.akmsu.challenges.weapon = "ak47"
+	self.akmsu.panic_suppression_chance = 0.05
 	self.akmsu.stats = {
 		damage = 11,
 		spread = 5,
@@ -2787,13 +2792,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.animations = {}
 	self.p90.animations.equip_id = "equip_mac11_rifle"
 	self.p90.animations.recoil_steelsight = true
+	self.p90.panic_suppression_chance = 0.05
 	self.p90.stats = {
 		damage = 9,
 		spread = 8,
 		recoil = 9,
 		spread_moving = 9,
 		zoom = 3,
-		concealment = 23,
+		concealment = 25,
 		suppression = 12,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -2875,7 +2881,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		recoil = 2,
 		spread_moving = 5,
 		zoom = 3,
-		concealment = 6,
+		concealment = 8,
 		suppression = 4,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -3029,6 +3035,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.animations = {}
 	self.new_mp5.animations.equip_id = "equip_mp5_rifle"
 	self.new_mp5.animations.recoil_steelsight = true
+	self.new_mp5.panic_suppression_chance = 0.05
 	self.new_mp5.stats = {
 		damage = 8,
 		spread = 7,
@@ -3192,6 +3199,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.animations = {}
 	self.mac10.animations.equip_id = "equip_mac11_rifle"
 	self.mac10.animations.recoil_steelsight = true
+	self.mac10.panic_suppression_chance = 0.05
 	self.mac10.stats = {
 		damage = 11,
 		spread = 5,
@@ -3278,7 +3286,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		recoil = 3,
 		spread_moving = 6,
 		zoom = 3,
-		concealment = 26,
+		concealment = 23,
 		suppression = 5,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -3640,6 +3648,13 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21
 	}
 	self.saw.hit_alert_size_increase = 4
+	self.saw_secondary = deep_clone(self.saw)
+	self.saw_secondary.parent_weapon_id = "saw"
+	self.saw_secondary.use_data.selection_index = 1
+	self.saw_secondary.animations.reload_name_id = "saw"
+	self.saw_secondary.use_stance = "saw"
+	self.saw_secondary.texture_name = "saw"
+	self.saw_secondary.weapon_hold = "saw"
 	self.usp = {}
 	self.usp.category = "pistol"
 	self.usp.damage_melee = damage_melee_default
@@ -3975,6 +3990,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m45.animations.recoil_steelsight = true
 	self.m45.global_value = "armored_transport"
 	self.m45.texture_bundle_folder = "dlc1"
+	self.m45.panic_suppression_chance = 0.05
 	self.m45.stats = {
 		damage = 12,
 		spread = 6,
@@ -4225,6 +4241,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.animations.recoil_steelsight = true
 	self.mp7.global_value = "gage_pack"
 	self.mp7.texture_bundle_folder = "gage_pack"
+	self.mp7.panic_suppression_chance = 0.05
 	self.mp7.stats = {
 		damage = 12,
 		spread = 7,
@@ -4479,6 +4496,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hk21.animations.recoil_steelsight = true
 	self.hk21.global_value = "gage_pack_lmg"
 	self.hk21.texture_bundle_folder = "gage_pack_lmg"
+	self.hk21.panic_suppression_chance = 0.1
 	self.hk21.stats = {
 		damage = 14,
 		spread = 6,
@@ -4568,6 +4586,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m249.animations.recoil_steelsight = true
 	self.m249.global_value = "gage_pack_lmg"
 	self.m249.texture_bundle_folder = "gage_pack_lmg"
+	self.m249.panic_suppression_chance = 0.1
 	self.m249.stats = {
 		damage = 12,
 		spread = 4,
@@ -4657,6 +4676,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpk.animations.recoil_steelsight = true
 	self.rpk.global_value = "gage_pack_lmg"
 	self.rpk.texture_bundle_folder = "gage_pack_lmg"
+	self.rpk.panic_suppression_chance = 0.1
 	self.rpk.stats = {
 		damage = 13,
 		spread = 5,
@@ -4750,13 +4770,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m95.can_shoot_through_enemy = true
 	self.m95.can_shoot_through_shield = true
 	self.m95.can_shoot_through_wall = true
+	self.m95.panic_suppression_chance = 0.1
 	self.m95.stats = {
 		damage = 35,
 		spread = 9,
 		recoil = 1,
 		spread_moving = 8,
 		zoom = 1,
-		concealment = 2,
+		concealment = 1,
 		suppression = 2,
 		alert_size = 9,
 		extra_ammo = 6,
@@ -4851,6 +4872,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.can_shoot_through_enemy = true
 	self.msr.can_shoot_through_shield = true
 	self.msr.can_shoot_through_wall = true
+	self.msr.panic_suppression_chance = 0.1
 	self.msr.stats = {
 		damage = 21,
 		spread = 9,
@@ -4952,6 +4974,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r93.can_shoot_through_enemy = true
 	self.r93.can_shoot_through_shield = true
 	self.r93.can_shoot_through_wall = true
+	self.r93.panic_suppression_chance = 0.1
 	self.r93.stats = {
 		damage = 21,
 		spread = 9,
@@ -5400,6 +5423,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.gre_m79.animations.recoil_steelsight = true
 	self.gre_m79.global_value = "gage_pack_assault"
 	self.gre_m79.texture_bundle_folder = "gage_pack_assault"
+	self.gre_m79.panic_suppression_chance = 0.3
 	self.gre_m79.ignore_damage_upgrades = true
 	self.gre_m79.stats = {
 		damage = 31,
@@ -5738,13 +5762,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scorpion.animations.recoil_steelsight = true
 	self.scorpion.global_value = "hl_miami"
 	self.scorpion.texture_bundle_folder = "hl_miami"
+	self.scorpion.panic_suppression_chance = 0.05
 	self.scorpion.stats = {
 		damage = 8,
 		spread = 6,
 		recoil = 7,
 		spread_moving = 7,
 		zoom = 1,
-		concealment = 29,
+		concealment = 28,
 		suppression = 17,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -5823,6 +5848,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.tec9.animations.recoil_steelsight = true
 	self.tec9.global_value = "hl_miami"
 	self.tec9.texture_bundle_folder = "hl_miami"
+	self.tec9.panic_suppression_chance = 0.05
 	self.tec9.stats = {
 		damage = 11,
 		spread = 7,
@@ -5908,6 +5934,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.uzi.animations.recoil_steelsight = true
 	self.uzi.global_value = "hl_miami"
 	self.uzi.texture_bundle_folder = "hl_miami"
+	self.uzi.panic_suppression_chance = 0.05
 	self.uzi.stats = {
 		damage = 12,
 		spread = 8,
@@ -6124,6 +6151,7 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
+	self.saw_secondary_npc = deep_clone(self.saw_npc)
 	self.sentry_gun = {
 		sounds = {},
 		auto = {}

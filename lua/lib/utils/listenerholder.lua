@@ -79,3 +79,7 @@ end
 function ListenerHolder:_not_trash(key)
 	return not self._trash or not self._trash[key]
 end
+
+function ListenerHolder:is_empty()
+	return not self._listeners
+end

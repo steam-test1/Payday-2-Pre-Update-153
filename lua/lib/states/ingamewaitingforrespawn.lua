@@ -369,6 +369,9 @@ function IngameWaitingForRespawnState:_refresh_teammate_list()
 	if lost_teammate_at_i then
 		self._spectator_data.watch_u_key = teammate_list[math.clamp(lost_teammate_at_i, 1, #teammate_list)]
 	end
+	if not self._spectator_data.watch_u_key and 0 < #teammate_list then
+		self._spectator_data.watch_u_key = teammate_list[1]
+	end
 end
 
 function IngameWaitingForRespawnState:_get_teammate_index_by_unit_key(u_key)

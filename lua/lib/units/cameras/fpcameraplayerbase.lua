@@ -519,6 +519,7 @@ end
 
 function FPCameraPlayerBase:play_redirect(redirect_name, speed, offset_time)
 	self:set_anims_enabled(true)
+	self._anim_empty_state_wanted = false
 	local result = self._unit:play_redirect(redirect_name, offset_time)
 	if result == self.IDS_NOSTRING then
 		return false
@@ -529,8 +530,14 @@ function FPCameraPlayerBase:play_redirect(redirect_name, speed, offset_time)
 	return result
 end
 
+function FPCameraPlayerBase:set_steelsight_anim_enabled(enabled)
+	self._steelsight_anims_enabled = enabled
+	self:_check_play_empty_state()
+end
+
 function FPCameraPlayerBase:play_state(state_name)
 	self:set_anims_enabled(true)
+	self._anim_empty_state_wanted = false
 	local result = self._unit:play_state(Idstring(state_name))
 	return result ~= self.IDS_NOSTRING and result
 end
@@ -697,13 +704,37 @@ function FPCameraPlayerBase:animate_fov(new_fov, duration_multiplier)
 end
 
 function FPCameraPlayerBase:anim_clbk_idle_full_blend()
+	self._anim_empty_state_wanted = true
+	self:_check_play_empty_state()
+end
+
+function FPCameraPlayerBase:_check_play_empty_state()
+	if not self._anim_empty_state_wanted then
+		return
+	end
+	if self._steelsight_anims_enabled then
+		return
+	end
 	self:play_redirect(self.IDS_EMPTY)
 end
 
 function FPCameraPlayerBase:anim_clbk_idle_exit()
 end
 
+function FPCameraPlayerBase:anim_clbk_empty_enter()
+	self._playing_empty_state = true
+end
+
+function FPCameraPlayerBase:anim_clbk_empty_exit()
+	self._playing_empty_state = false
+end
+
+function FPCameraPlayerBase:playing_empty_state()
+	return self._playing_empty_state
+end
+
 function FPCameraPlayerBase:anim_clbk_empty_full_blend()
+	self._playing_empty_state = false
 	self:set_anims_enabled(false)
 end
 
@@ -750,6 +781,10 @@ function FPCameraPlayerBase:set_anims_enabled(state)
 		self._unit:set_animations_enabled(state)
 		self._anims_enabled = state
 	end
+end
+
+function FPCameraPlayerBase:anims_enabled()
+	return self._anims_enabled
 end
 
 function FPCameraPlayerBase:play_sound(unit, event)
@@ -880,8 +915,9 @@ function FPCameraPlayerBase:spawn_mask()
 		local equipped_mask = managers.blackmarket:equipped_mask()
 		local peer_id = managers.network:session():local_peer():id()
 		local blueprint
-		if equipped_mask.mask_id then
-			mask_unit_name = managers.blackmarket:mask_unit_name_by_mask_id(equipped_mask.mask_id, peer_id)
+		local mask_id = equipped_mask.mask_id and managers.blackmarket:get_real_mask_id(equipped_mask.mask_id, peer_id)
+		if mask_id then
+			mask_unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id)
 			blueprint = equipped_mask.blueprint
 		else
 			mask_unit_name = tweak_data.blackmarket.masks[equipped_mask].unit
@@ -913,7 +949,7 @@ function FPCameraPlayerBase:spawn_mask()
 		self._mask_unit:set_timer(managers.player:player_timer())
 		self._mask_unit:set_animation_timer(managers.player:player_timer())
 		self._mask_unit:anim_stop()
-		if not tweak_data.blackmarket.masks[equipped_mask.mask_id].type then
+		if not tweak_data.blackmarket.masks[mask_id].type then
 			local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), align_obj_r:position(), align_obj_r:rotation())
 			for _, material in ipairs(backside:get_objects_by_type(Idstring("material"))) do
 				material:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:NORMALMAP:SKINNED_3WEIGHTS"))

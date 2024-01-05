@@ -394,6 +394,9 @@ function NewRaycastWeaponBase:calculate_ammo_max_per_clip()
 	if not self:upgrade_blocked("weapon", "clip_ammo_increase") then
 		ammo = ammo + managers.player:upgrade_value("weapon", "clip_ammo_increase", 0)
 	end
+	if not self:upgrade_blocked(tweak_data.weapon[self._name_id].category, "clip_ammo_increase") then
+		ammo = ammo + managers.player:upgrade_value(tweak_data.weapon[self._name_id].category, "clip_ammo_increase", 0)
+	end
 	ammo = ammo + (self._extra_ammo or 0)
 	return ammo
 end
@@ -696,6 +699,10 @@ end
 
 function NewRaycastWeaponBase:spread_multiplier(current_state)
 	return managers.blackmarket:accuracy_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, current_state, self:fire_mode(), self._blueprint)
+end
+
+function NewRaycastWeaponBase:recoil_addend()
+	return managers.blackmarket:recoil_addend(self._name_id, self:weapon_tweak_data().category, self._silencer, self._blueprint)
 end
 
 function NewRaycastWeaponBase:recoil_multiplier()

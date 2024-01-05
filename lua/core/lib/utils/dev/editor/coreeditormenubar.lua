@@ -104,13 +104,13 @@ function CoreEditor:build_menubar()
 		self._grid_sizes_menu:append_radio_item("TB_GRIDSIZE" .. g, g, "Set gridsize to " .. g)
 	end
 	self._grid_sizes_menu:set_checked("TB_GRIDSIZE" .. self._grid_size, true)
-	self._edit_menu:append_menu("GRID_SIZES_MENU", "Grid sizes", self._grid_sizes_menu, "Grid Sizes")
+	self._edit_menu:append_menu("GRID_SIZES_MENU", "Grid sizes\t(" .. self:ctrl_binding("change_grid_size") .. ")", self._grid_sizes_menu, "Grid Sizes")
 	self._snap_rotations_menu = EWS:Menu("")
 	for _, r in ipairs(self._snap_rotations) do
 		self._snap_rotations_menu:append_radio_item("TB_SNAPROTATION" .. r, r, "Set snap rotation to " .. r)
 	end
 	self._snap_rotations_menu:set_checked("TB_SNAPROTATION" .. self._snap_rotation, true)
-	self._edit_menu:append_menu("SNAP_ROTATION_MENU", "Snap Rotations", self._snap_rotations_menu, "Snap Rotations")
+	self._edit_menu:append_menu("SNAP_ROTATION_MENU", "Snap Rotations\t(" .. self:ctrl_binding("change_snaprot") .. ")", self._snap_rotations_menu, "Snap Rotations")
 	self._snap_rotations_axis_menu = EWS:Menu("")
 	self._snap_rotations_axis_menu:append_radio_item("TB_SNAPROTATE_X", "X", "Snap rotate axis X")
 	self._snap_rotations_axis_menu:append_radio_item("TB_SNAPROTATE_Y", "Y", "Snap rotate axis Y")
@@ -155,8 +155,8 @@ function CoreEditor:build_menubar()
 	self._mission_menu:append_item("RUN GAMEPLAY SIMULATION", "Run Gameplay Simulation\t" .. self:ctrl_menu_binding("run_gameplay_simulation"), "Run Gameplay Simulation")
 	local difficulty_menu = EWS:Menu("")
 	for _, difficulty in ipairs(self._mission_difficulties) do
-		difficulty_menu:append_radio_item(difficulty, difficulty, "")
-		Global.frame:connect(difficulty, "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_difficulty"), difficulty)
+		difficulty_menu:append_radio_item(difficulty[1], difficulty[2], "")
+		Global.frame:connect(difficulty[1], "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_difficulty"), difficulty[1])
 	end
 	difficulty_menu:set_checked(self._mission_difficulty, true)
 	self._mission_menu:append_menu("DIFFICULTY MENU", "Difficulty", difficulty_menu, "Difficulties")

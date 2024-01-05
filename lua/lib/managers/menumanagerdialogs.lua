@@ -1317,6 +1317,19 @@ function MenuManager:show_confirm_become_infamous(params)
 	managers.system_menu:show_new_unlock(dialog_data)
 end
 
+function MenuManager:show_specialization_xp_convert(xp_present, points_present)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_xp_to_specialization")
+	dialog_data.xp_present = xp_present
+	dialog_data.points_present = points_present
+	local no_button = {}
+	no_button.cancel_button = true
+	no_button.text = managers.localization:text("dialog_ok")
+	dialog_data.focus_button = 1
+	dialog_data.button_list = {no_button}
+	managers.system_menu:show_specialization_convert(dialog_data)
+end
+
 function MenuManager:show_infamous_message(can_become_infamous)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_infamous_info_title")

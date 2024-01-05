@@ -1036,7 +1036,8 @@ function HUDManager:teammate_progress(peer_id, type_index, enabled, tweak_data_i
 		elseif type_index == 2 then
 			if enabled then
 				local equipment_name = managers.localization:text(tweak_data.equipments[tweak_data_id].text_id)
-				action_text = managers.localization:text("hud_deploying_equipment", {EQUIPMENT = equipment_name})
+				local deploying_text = tweak_data.equipments[tweak_data_id].deploying_text_id and managers.localization:text(tweak_data.equipments[tweak_data_id].deploying_text_id) or false
+				action_text = deploying_text or managers.localization:text("hud_deploying_equipment", {EQUIPMENT = equipment_name})
 			end
 		elseif type_index == 3 then
 			action_text = managers.localization:text("hud_starting_heist")

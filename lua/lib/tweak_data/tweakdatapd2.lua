@@ -146,6 +146,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.equipment_armor_kit = {
+		texture = "guis/textures/pd2/equipment",
+		texture_rect = {
+			32,
+			64,
+			32,
+			32
+		}
+	}
 	self.hud_icons.equipment_generic_key = {
 		texture = "guis/textures/pd2/hud_pickups",
 		texture_rect = {

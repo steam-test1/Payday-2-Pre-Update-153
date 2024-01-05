@@ -277,7 +277,13 @@ function BlackMarketManager:equipped_mask_slot()
 	end
 end
 
-function BlackMarketManager:equipped_armor()
+function BlackMarketManager:equipped_armor(chk_armor_kit)
+	if chk_armor_kit then
+		local equipped_deployable = Global.player_manager.kit.equipment_slots[1]
+		if equipped_deployable == "armor_kit" and (not managers.player:has_equipment(equipped_deployable) or managers.player:has_deployable_left(equipped_deployable)) then
+			return self._defaults.armor
+		end
+	end
 	local armor
 	for armor_id, data in pairs(tweak_data.blackmarket.armors) do
 		armor = Global.blackmarket_manager.armors[armor_id]
@@ -634,7 +640,10 @@ function BlackMarketManager:unpack_outfit_from_string(outfit_string)
 	outfit.mask = {}
 	outfit.mask.mask_id = data[self:outfit_string_index("mask")] or self._defaults.mask
 	outfit.mask.blueprint = self:mask_blueprint_from_outfit_string(outfit_string)
-	outfit.armor = data[self:outfit_string_index("armor")] or self._defaults.armor
+	local armor_string = data[self:outfit_string_index("armor")] or tostring(self._defaults.armor)
+	local armor_data = string.split(armor_string, "-")
+	outfit.armor = armor_data[1]
+	outfit.armor_current = armor_data[2] or outfit.armor
 	outfit.primary = {}
 	outfit.primary.factory_id = data[self:outfit_string_index("primary")] or "wpn_fps_ass_amcar"
 	local primary_blueprint_string = data[self:outfit_string_index("primary_blueprint")]
@@ -663,11 +672,9 @@ end
 function BlackMarketManager:outfit_string()
 	local s = ""
 	s = s .. self:_outfit_string_mask()
-	for armor_id, data in pairs(tweak_data.blackmarket.armors) do
-		if Global.blackmarket_manager.armors[armor_id].equipped then
-			s = s .. " " .. armor_id
-		end
-	end
+	local armor_id = tostring(self:equipped_armor(false))
+	local current_armor_id = tostring(self:equipped_armor(true))
+	s = s .. " " .. armor_id .. "-" .. current_armor_id
 	for character_id, data in pairs(tweak_data.blackmarket.characters) do
 		if Global.blackmarket_manager.characters[character_id].equipped then
 			s = s .. " " .. character_id
@@ -1462,7 +1469,7 @@ function BlackMarketManager:calculate_weapon_visibility(weapon)
 end
 
 function BlackMarketManager:calculate_armor_visibility(armor)
-	return #tweak_data.weapon.stats.concealment - self:_calculate_armor_concealment(armor or self:equipped_armor())
+	return #tweak_data.weapon.stats.concealment - self:_calculate_armor_concealment(armor or self:equipped_armor(true))
 end
 
 function BlackMarketManager:calculate_melee_weapon_visibility(melee_weapon)
@@ -1477,7 +1484,7 @@ function BlackMarketManager:calculate_weapon_concealment(weapon)
 end
 
 function BlackMarketManager:calculate_armor_concealment(armor)
-	return self:_calculate_armor_concealment(armor or self:equipped_armor())
+	return self:_calculate_armor_concealment(armor or self:equipped_armor(true))
 end
 
 function BlackMarketManager:_calculate_weapon_concealment(weapon)
@@ -1516,16 +1523,16 @@ function BlackMarketManager:_get_concealment(primary, secondary, armor, melee_we
 end
 
 function BlackMarketManager:_get_concealment_from_local_player()
-	return self:_get_concealment(self:equipped_primary(), self:equipped_secondary(), self:equipped_armor(), self:equipped_melee_weapon(), self:visibility_modifiers())
+	return self:_get_concealment(self:equipped_primary(), self:equipped_secondary(), self:equipped_armor(true), self:equipped_melee_weapon(), self:visibility_modifiers())
 end
 
 function BlackMarketManager:_get_concealment_from_outfit_string(outfit_string)
-	return self:_get_concealment(outfit_string.primary, outfit_string.secondary, outfit_string.armor, outfit_string.melee_weapon, -outfit_string.concealment_modifier)
+	return self:_get_concealment(outfit_string.primary, outfit_string.secondary, outfit_string.armor_current or outfit_string.armor, outfit_string.melee_weapon, -outfit_string.concealment_modifier)
 end
 
 function BlackMarketManager:_get_concealment_from_peer(peer)
 	local outfit = peer:blackmarket_outfit()
-	return self:_get_concealment(outfit.primary, outfit.secondary, outfit.armor, outfit.melee_weapon, -outfit.concealment_modifier)
+	return self:_get_concealment(outfit.primary, outfit.secondary, outfit.armor_current or outfit.armor, outfit.melee_weapon, -outfit.concealment_modifier)
 end
 
 function BlackMarketManager:get_real_visibility_index_from_custom_data(data)
@@ -3099,12 +3106,12 @@ function BlackMarketManager:set_mask_blueprint(slot, blueprint)
 	self._global.crafted_items[category][slot].blueprint = blueprint
 end
 
-function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
+function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
 	if mask_id ~= "character_locked" then
 		if not tweak_data.blackmarket.masks[mask_id] then
 			print("Missing mask:" .. mask_id)
 		end
-		return tweak_data.blackmarket.masks[mask_id].unit
+		return mask_id
 	end
 	local character = self:get_preferred_character()
 	if managers.network and managers.network:session() and peer_id then
@@ -3113,6 +3120,10 @@ function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)
 	return tweak_data.blackmarket.masks[mask_id][character]
+end
+
+function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
+	return tweak_data.blackmarket.masks[self:get_real_mask_id(mask_id, peer_id)].unit
 end
 
 function BlackMarketManager:character_sequence_by_character_id(character_id, peer_id)
@@ -4106,9 +4117,15 @@ function BlackMarketManager:accuracy_multiplier(name, category, silencer, curren
 	return self:_convert_add_to_mul(multiplier)
 end
 
+function BlackMarketManager:recoil_addend(name, category, silencer, blueprint)
+	local addend = 0
+	return addend
+end
+
 function BlackMarketManager:recoil_multiplier(name, category, silencer, blueprint)
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "recoil_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "passive_recoil_multiplier", 1))
 	if managers.player:player_unit() and managers.player:player_unit():character_damage():is_suppressed() then
 		if managers.player:has_team_category_upgrade(category, "suppression_recoil_multiplier") then
 			multiplier = multiplier + (1 - managers.player:team_upgrade_value(category, "suppression_recoil_multiplier", 1))
