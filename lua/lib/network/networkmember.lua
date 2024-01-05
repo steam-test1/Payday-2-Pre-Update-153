@@ -48,7 +48,8 @@ function NetworkMember:_get_old_entry()
 	local member_downed
 	local health = 1
 	local used_deployable = false
-	local used_cable_ties, member_dead
+	local used_cable_ties = 0
+	local member_dead
 	if old_plr_entry and old_plr_entry.t + 180 > Application:time() then
 		member_downed = old_plr_entry.member_downed
 		health = old_plr_entry.health
