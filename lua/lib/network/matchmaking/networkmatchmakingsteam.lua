@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.20.0"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.21.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -509,11 +509,11 @@ function NetworkMatchMakingSTEAM:join_server(room_id, skip_showing_dialog)
 					managers.network.voice_chat:destroy_voice()
 					managers.network:queue_stop_network()
 					managers.menu:show_wrong_version_message()
-				elseif res == "AUTH_FAILED" then
+				elseif res == "AUTH_FAILED" or res == "AUTH_HOST_FAILED" then
 					managers.network.matchmake:leave_game()
 					managers.network.voice_chat:destroy_voice()
 					managers.network:queue_stop_network()
-					Global.on_remove_peer_message = "dialog_authentication_fail"
+					Global.on_remove_peer_message = res == "AUTH_HOST_FAILED" and "dialog_authentication_host_fail" or "dialog_authentication_fail"
 					managers.menu:show_peer_kicked_dialog()
 				else
 					Application:error("[NetworkMatchMakingSTEAM:join_server] FAILED TO START MULTIPLAYER!", res)

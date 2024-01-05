@@ -427,7 +427,7 @@ function NetworkMatchMakingXBL:join_server(session_id, server, skip_showing_dial
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()
-			elseif res == "FAILED_CONNECT" or res == "AUTH_FAILED" then
+			elseif res == "FAILED_CONNECT" or res == "AUTH_FAILED" or res == "AUTH_HOST_FAILED" then
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()
@@ -766,7 +766,7 @@ function NetworkMatchMakingXBL:_test_join(xs_info, skip_showing_dialog)
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()
-			elseif res == "FAILED_CONNECT" or res == "AUTH_FAILED" then
+			elseif res == "FAILED_CONNECT" or res == "AUTH_FAILED" or res == "AUTH_HOST_FAILED" then
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()

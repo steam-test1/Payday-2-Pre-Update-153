@@ -243,6 +243,14 @@ function GenericDLCManager:has_sweettooth()
 	return Global.dlc_manager.all_dlc_data.sweettooth and Global.dlc_manager.all_dlc_data.sweettooth.verified
 end
 
+function GenericDLCManager:has_alienware_alpha()
+	return Global.dlc_manager.all_dlc_data.alienware_alpha and Global.dlc_manager.all_dlc_data.alienware_alpha.verified
+end
+
+function GenericDLCManager:has_alienware_alpha_promo()
+	return Global.dlc_manager.all_dlc_data.alienware_alpha_promo and Global.dlc_manager.all_dlc_data.alienware_alpha_promo.verified
+end
+
 function GenericDLCManager:has_armored_transport()
 	return Global.dlc_manager.all_dlc_data.armored_transport and Global.dlc_manager.all_dlc_data.armored_transport.verified
 end
@@ -548,6 +556,8 @@ function WINDLCManager:init()
 			full_game = {app_id = "218620", verified = true},
 			preorder = {app_id = "247450", no_install = true},
 			career_criminal_edition = {app_id = "218630", no_install = true},
+			alienware_alpha = {app_id = "328861", no_install = true},
+			alienware_alpha_promo = {app_id = "318720", no_install = true},
 			soundtrack = {app_id = "254260", no_install = true},
 			pdth_soundtrack = {app_id = "207816", no_install = true},
 			armored_transport = {app_id = "264610", no_install = true},

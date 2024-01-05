@@ -1183,7 +1183,7 @@ function NetworkMatchMakingPSN:cb_connection_established(info)
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()
 				managers.menu:show_peer_kicked_dialog()
-			elseif res == "TIMED_OUT" or res == "FAILED_CONNECT" or res == "AUTH_FAILED" then
+			elseif res == "TIMED_OUT" or res == "FAILED_CONNECT" or res == "AUTH_FAILED" or res == "AUTH_HOST_FAILED" then
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
 				managers.network:queue_stop_network()

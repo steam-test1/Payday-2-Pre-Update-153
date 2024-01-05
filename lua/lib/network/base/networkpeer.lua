@@ -118,9 +118,7 @@ function NetworkPeer:on_verify_ticket(result, reason)
 				managers.network:session():on_peer_kicked(self, self._id, 2)
 			end
 		else
-			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_failed", {
-				name = self._name
-			}))
+			managers.network:session():on_peer_kicked(managers.network:session():local_peer(), managers.network:session():local_peer():id(), 3)
 		end
 	else
 		print("[NetworkPeer:on_verify_ticket] Steam ID Authentication succeeded for peer '" .. tostring(self._name) .. "' (ID: " .. tostring(self._id) .. ").")
@@ -194,7 +192,12 @@ function NetworkPeer:_verify_outfit_data()
 			end
 			for mask_type, mask_item in pairs(item.blueprint) do
 				local mask_type_lookup = mask_blueprint_lookup[mask_type]
-				if not self:_verify_content(mask_type_lookup, mask_item.id) then
+				local skip_default = false
+				local mask_tweak = tweak_data.blackmarket.masks[item.mask_id]
+				if mask_tweak and mask_tweak.default_blueprint and mask_tweak.default_blueprint[mask_type_lookup] == mask_item.id then
+					skip_default = true
+				end
+				if not skip_default and not self:_verify_content(mask_type_lookup, mask_item.id) then
 					return self:_verify_cheated_outfit(mask_type_lookup, mask_item.id, 1)
 				end
 			end
@@ -202,8 +205,9 @@ function NetworkPeer:_verify_outfit_data()
 			if not self:_verify_content("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(item.factory_id)) then
 				return self:_verify_cheated_outfit("weapon", item.factory_id, 2)
 			end
+			local blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(item.factory_id)
 			for _, mod_item in pairs(item.blueprint) do
-				if not self:_verify_content("weapon_mods", mod_item) then
+				if not table.contains(blueprint, mod_item) and not self:_verify_content("weapon_mods", mod_item) then
 					return self:_verify_cheated_outfit("weapon_mods", mod_item, 2)
 				end
 			end
@@ -970,6 +974,10 @@ end
 
 function NetworkPeer:user_id()
 	return self._user_id
+end
+
+function NetworkPeer:is_host()
+	return self._id == 1
 end
 
 function NetworkPeer:next_steam_p2p_send_t()

@@ -1410,7 +1410,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[48] = {
 		name_id = "weapons",
-		upgrades = {"dingdong"}
+		upgrades = {"dingdong", "alien_maul"}
 	}
 	self.level_tree[50] = {
 		name_id = "lvl_50",
@@ -5798,6 +5798,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.swagger = {
 		category = "melee_weapon",
 		dlc = "gage_pack_historical"
+	}
+	self.definitions.alien_maul = {
+		category = "melee_weapon",
+		dlc = "alienware_alpha_promo"
 	}
 end
 

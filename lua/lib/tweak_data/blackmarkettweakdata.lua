@@ -1329,6 +1329,28 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.de_gaulle.value = 0
 	self.masks.de_gaulle.dlc = "gage_pack_historical"
 	self.masks.de_gaulle.texture_bundle_folder = "gage_pack_historical"
+	self.masks.area51 = {}
+	self.masks.area51.unit = "units/pd2_dlc_alienware/masks/area51/msk_area51"
+	self.masks.area51.name_id = "bm_msk_area51"
+	self.masks.area51.texture_bundle_folder = "alienware_alpha"
+	self.masks.area51.pcs = {}
+	self.masks.area51.value = 0
+	self.masks.area51.dlc = "alienware_alpha"
+	self.masks.area51.type = "helmet"
+	self.masks.area51.sort_number = 5
+	self.masks.alien_helmet = {}
+	self.masks.alien_helmet.unit = "units/pd2_dlc_alienware/masks/alien_helmet/msk_alien_helmet"
+	self.masks.alien_helmet.name_id = "bm_msk_alien_helmet"
+	self.masks.alien_helmet.texture_bundle_folder = "alienware_alpha"
+	self.masks.alien_helmet.pcs = {}
+	self.masks.alien_helmet.value = 0
+	self.masks.alien_helmet.dlc = "alienware_alpha"
+	self.masks.alien_helmet.type = "helmet"
+	self.masks.alien_helmet.default_blueprint = {
+		textures = "no_color_full_material",
+		materials = "gunmetal"
+	}
+	self.masks.alien_helmet.sort_number = 5
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -5656,6 +5678,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.freedom.repeat_expire_t = 0.9
 	self.melee_weapons.freedom.expire_t = 1.3
 	self.melee_weapons.freedom.stats.concealment = 18
+	self.melee_weapons.freedom.melee_damage_delay = 0.35
 	self.melee_weapons.model24 = deep_clone(self.melee_weapons.kabar)
 	self.melee_weapons.model24.name_id = "bm_melee_model24"
 	self.melee_weapons.model24.dlc = "gage_pack_historical"
@@ -5710,5 +5733,35 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.swagger.sounds.charge = "bat_charge"
 	self.melee_weapons.swagger.repeat_expire_t = 0.8
 	self.melee_weapons.swagger.stats.concealment = 27
+	self.melee_weapons.alien_maul = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.alien_maul.name_id = "bm_melee_alien_maul"
+	self.melee_weapons.alien_maul.anim_global_param = "melee_baseballbat"
+	self.melee_weapons.alien_maul.type = "axe"
+	self.melee_weapons.alien_maul.texture_bundle_folder = "alienware_alpha"
+	self.melee_weapons.alien_maul.dlc = "alienware_alpha_promo"
+	self.melee_weapons.alien_maul.free = nil
+	self.melee_weapons.alien_maul.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.alien_maul.unit = "units/pd2_dlc_alienware/weapons/wpn_fps_mel_maul/wpn_fps_mel_maul"
+	self.melee_weapons.alien_maul.third_unit = "units/pd2_dlc_alienware/weapons/wpn_fps_mel_maul/wpn_third_mel_maul"
+	self.melee_weapons.alien_maul.stats.weapon_type = "blunt"
+	self.melee_weapons.alien_maul.stats.min_damage = 2.9
+	self.melee_weapons.alien_maul.stats.max_damage = 6
+	self.melee_weapons.alien_maul.stats.min_damage_effect = 3.9
+	self.melee_weapons.alien_maul.stats.max_damage_effect = 3.1
+	self.melee_weapons.alien_maul.stats.charge_time = 2
+	self.melee_weapons.alien_maul.stats.range = 275
+	self.melee_weapons.alien_maul.stats.weapon_type = "blunt"
+	self.melee_weapons.alien_maul.sounds = {}
+	self.melee_weapons.alien_maul.repeat_expire_t = 1
+	self.melee_weapons.alien_maul.expire_t = 1.2
+	self.melee_weapons.alien_maul.sounds.equip = "ding_dong_equip"
+	self.melee_weapons.alien_maul.sounds.hit_air = "ding_dong_hit_air"
+	self.melee_weapons.alien_maul.sounds.hit_gen = "ding_dong_hit_gen"
+	self.melee_weapons.alien_maul.sounds.hit_body = "ding_dong_hit_body"
+	self.melee_weapons.alien_maul.sounds.charge = "knife_charge"
+	self.melee_weapons.alien_maul.melee_damage_delay = 0.2
+	self.melee_weapons.alien_maul.stats.concealment = 20
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

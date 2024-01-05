@@ -5809,8 +5809,12 @@ function BlackMarketGui:populate_melee_weapons(data)
 	local xd, yd, x_td, y_td, x_sn, y_sn, x_gv, y_gv
 	local m_tweak_data = tweak_data.blackmarket.melee_weapons
 	local l_tweak_data = tweak_data.lootdrop.global_values
+	local global_value
 	for id, d in pairs(Global.blackmarket_manager.melee_weapons) do
-		table.insert(sort_data, {id, d})
+		global_value = tweak_data.blackmarket.melee_weapons[id].dlc or tweak_data.blackmarket.melee_weapons[id].global_value or "normal"
+		if d.unlocked or d.equipped or not tweak_data:get_raw_value("lootdrop", "global_values", global_value, "hide_unavailable") then
+			table.insert(sort_data, {id, d})
+		end
 	end
 	table.sort(sort_data, function(x, y)
 		xd = x[2]

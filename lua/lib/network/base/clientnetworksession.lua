@@ -85,7 +85,11 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 		self._local_peer:set_id(my_peer_id)
 		self._local_peer:set_character(my_character)
 		self._server_peer:set_id(1)
-		self._server_peer:begin_ticket_session(auth_ticket)
+		if not self._server_peer:begin_ticket_session(auth_ticket) then
+			self:remove_peer(self._server_peer, 1)
+			cb("AUTH_HOST_FAILED")
+			return
+		end
 		self._server_peer:set_in_lobby_soft(state_index == 1)
 		self._server_peer:set_synched_soft(state_index ~= 1)
 		if SystemInfo:platform() == Idstring("PS3") then
