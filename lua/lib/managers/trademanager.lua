@@ -136,7 +136,7 @@ function TradeManager:update(t, dt)
 			end
 		end
 	end
-	if self._trade_countdown and Network:is_server() and not self._trading_hostage and not self._hostage_trade_clbk and #self._criminals_to_respawn > 0 and not managers.groupai:state():whisper_mode() then
+	if self._trade_countdown and Network:is_server() and not self._trading_hostage and not self._hostage_trade_clbk and #self._criminals_to_respawn > 0 and not managers.groupai:state():whisper_mode() and not self._speaker_snd_event then
 		local trade = self:get_criminal_to_trade()
 		if trade and Global.game_settings.single_player and not trade.ai then
 			trade = nil
@@ -461,8 +461,14 @@ function TradeManager:cancel_trade()
 		self:_send_cancel_trade(self._criminals_to_respawn[1])
 	end
 	if self._hostage_to_trade then
-		if alive(self._hostage_to_trade.unit) then
+		if alive(self._hostage_to_trade.unit) and not self._hostage_to_trade.unit:character_damage():dead() then
 			self._hostage_to_trade.unit:brain():cancel_trade()
+		end
+		if self._hostage_to_trade.death_clbk_key then
+			self._hostage_to_trade.unit:character_damage():remove_listener(self._hostage_to_trade.death_clbk_key)
+		end
+		if self._hostage_to_trade.destroyed_clbk_key then
+			self._hostage_to_trade.unit:base():remove_destroy_listener(self._hostage_to_trade.destroyed_clbk_key)
 		end
 		self._hostage_to_trade = nil
 	end
@@ -508,6 +514,7 @@ function TradeManager:clbk_vo_end_begin_hostage_trade_dialog(data)
 	if data.hostage_trade_index ~= self._hostage_trade_index then
 		return
 	end
+	self._speaker_snd_event = nil
 	self:clbk_begin_hostage_trade_dialog(data.i)
 end
 
@@ -519,11 +526,11 @@ function TradeManager:clbk_begin_hostage_trade_dialog(i)
 	end
 	if i == 1 then
 		self._megaphone_sound_source = self:_get_megaphone_sound_source()
-		if not self._megaphone_sound_source:post_event("mga_t01a_con_plu", callback(self, self, "clbk_begin_hostage_trade_dialog", {
+		self._speaker_snd_event = self._megaphone_sound_source:post_event("mga_t01a_con_plu", callback(self, self, "clbk_vo_end_begin_hostage_trade_dialog", {
 			i = 2,
 			hostage_trade_index = self._hostage_trade_index
-		}), nil, "end_of_event") then
-			self._hostage_trade_clbk = "TradeManager"
+		}), nil, "end_of_event")
+		if not self._speaker_snd_event then
 			self:clbk_begin_hostage_trade_dialog(2)
 			print("Megaphone fail")
 		end
@@ -595,9 +602,30 @@ function TradeManager:clbk_begin_hostage_trade()
 		self._trading_hostage = true
 		self._hostage_to_trade = best_hostage
 		best_hostage.unit:brain():set_logic("trade")
+		local clbk_key = "TradeManager"
+		self._hostage_to_trade.death_clbk_key = clbk_key
+		self._hostage_to_trade.destroyed_clbk_key = clbk_key
+		best_hostage.unit:character_damage():add_listener(clbk_key, {"death"}, callback(self, self, "clbk_hostage_died"))
+		best_hostage.unit:base():add_destroy_listener(clbk_key, callback(self, self, "clbk_hostage_destroyed"))
 		if not rescuing_criminal then
 		end
 	end
+end
+
+function TradeManager:clbk_hostage_destroyed(hostage_unit)
+	if not self._hostage_to_trade or not self._hostage_to_trade.destroyed_clbk_key then
+		return
+	end
+	self._hostage_to_trade.destroyed_clbk_key = nil
+	self:cancel_trade()
+end
+
+function TradeManager:clbk_hostage_died(hostage_unit, damage_info)
+	if not self._hostage_to_trade or not self._hostage_to_trade.death_clbk_key then
+		return
+	end
+	self._hostage_to_trade.death_clbk_key = nil
+	self:cancel_trade()
 end
 
 function TradeManager:on_hostage_traded(trading_unit)

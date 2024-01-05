@@ -7,9 +7,13 @@ function MissionBriefingTabItem:init(panel, text, i)
 	self._index = i
 	local prev_item_title_text = self._main_panel:child("tab_text_" .. tostring(i - 1))
 	local offset = prev_item_title_text and prev_item_title_text:right() + 5 or 0
+	self._tab_string = text
+	self._tab_string_prefix = ""
+	self._tab_string_suffix = ""
+	local tab_string = self._tab_string_prefix .. self._tab_string .. self._tab_string_suffix
 	self._tab_text = self._main_panel:text({
 		name = "tab_text_" .. tostring(self._index),
-		text = text,
+		text = tab_string,
 		h = 32,
 		x = offset,
 		align = "center",
@@ -50,6 +54,37 @@ function MissionBriefingTabItem:reduce_to_small_font()
 	self._panel:grow(0, -(self._panel:top() + 70 + tweak_data.menu.pd2_small_font_size * 4 + 35))
 end
 
+function MissionBriefingTabItem:update_tab_position()
+	local prev_item_title_text = self._main_panel:child("tab_text_" .. tostring(self._index - 1))
+	local offset = prev_item_title_text and prev_item_title_text:right() or 0
+	self._tab_text:set_x(offset + 5)
+	self._tab_select_rect:set_shape(self._tab_text:shape())
+end
+
+function MissionBriefingTabItem:set_tab_text(text)
+	self._tab_string = text
+	self:_set_tab_text()
+end
+
+function MissionBriefingTabItem:set_tab_prefix(text)
+	self._tab_string_prefix = text
+	self:_set_tab_text()
+end
+
+function MissionBriefingTabItem:set_tab_suffix(text)
+	self._tab_string_suffix = text
+	self:_set_tab_text()
+end
+
+function MissionBriefingTabItem:_set_tab_text()
+	local tab_string = self._tab_string_prefix .. self._tab_string .. self._tab_string_suffix
+	self._tab_text:set_text(tab_string)
+	local _, _, tw, th = self._tab_text:text_rect()
+	self._tab_text:set_size(tw + 15, th + 10)
+	self._tab_select_rect:set_shape(self._tab_text:shape())
+	managers.menu_component:update_mission_briefing_tab_positions()
+end
+
 function MissionBriefingTabItem:show()
 	self._panel:show()
 end
@@ -80,7 +115,7 @@ function MissionBriefingTabItem:select(no_sound)
 	if no_sound then
 		return
 	end
-	managers.menu_component:post_event("highlight")
+	managers.menu_component:post_event("menu_enter")
 end
 
 function MissionBriefingTabItem:deselect()
@@ -466,8 +501,9 @@ function AssetsItem:create_assets(assets_names, max_assets)
 	self._assets_names = assets_names
 	self._unlock_cost = assets_names[3] or false
 	local center_y = math.round(self._panel:h() / 2) - tweak_data.menu.pd2_small_font_size
-	local rect
-	local w = self._panel:w() / (max_assets or 6)
+	local first_rect, rect
+	local w = self._panel:w() / 4
+	local step = w * 0.5
 	for i = 1, #assets_names do
 		local center_x = i * w - w * 0.5
 		rect = self._panel:rect({
@@ -475,58 +511,57 @@ function AssetsItem:create_assets(assets_names, max_assets)
 			w = 85,
 			h = 85
 		})
+		rect:hide()
+		first_rect = first_rect or rect
+		local center_x = math.ceil(i / 2) * w - step
+		local center_y = self._panel:h() * (i % 2 > 0 and 0.25 or 0.75)
+		local texture = assets_names[i][1]
+		local asset
+		if texture and DB:has(Idstring("texture"), texture) then
+			asset = self._panel:bitmap({
+				name = "asset_" .. tostring(i),
+				texture = texture,
+				w = 65,
+				h = 65,
+				rotation = math.random(2) - 1.5,
+				layer = 1,
+				valign = "top"
+			})
+		else
+			asset = self._panel:bitmap({
+				name = "asset_" .. tostring(i),
+				texture = "guis/textures/pd2/endscreen/what_is_this",
+				rotation = math.random(2) - 1.5,
+				alpha = 0,
+				w = 65,
+				h = 65,
+				layer = 1,
+				valign = "top"
+			})
+		end
+		local aspect = asset:texture_width() / math.max(1, asset:texture_height())
+		asset:set_w(asset:h() * aspect)
+		rect:set_w(rect:h() * aspect)
 		rect:set_center(center_x, center_y)
 		rect:set_position(math.round(rect:x()), math.round(rect:y()))
-		rect:hide()
-		if i <= #assets_names then
-			local texture = assets_names[i][1]
-			local asset
-			if texture and DB:has(Idstring("texture"), texture) then
-				asset = self._panel:bitmap({
-					name = "asset_" .. tostring(i),
-					texture = texture,
-					w = 65,
-					h = 65,
-					rotation = math.random(2) - 1.5,
-					layer = 1,
-					valign = "top"
-				})
-			else
-				asset = self._panel:bitmap({
-					name = "asset_" .. tostring(i),
-					texture = "guis/textures/pd2/endscreen/what_is_this",
-					rotation = math.random(2) - 1.5,
-					alpha = 0,
-					w = 65,
-					h = 65,
-					layer = 1,
-					valign = "top"
-				})
-			end
-			local aspect = asset:texture_width() / math.max(1, asset:texture_height())
-			asset:set_w(asset:h() * aspect)
-			rect:set_w(rect:h() * aspect)
-			rect:set_center(center_x, center_y)
-			rect:set_position(math.round(rect:x()), math.round(rect:y()))
-			asset:set_center(rect:center())
-			asset:set_position(math.round(asset:x()), math.round(asset:y()))
-			asset:set_rotation(0.5)
-			if not assets_names[i][3] then
-				local lock = self._panel:bitmap({
-					name = "asset_lock_" .. tostring(i),
-					texture = assets_names[i][5] and "guis/textures/pd2/blackmarket/money_lock" or "guis/textures/pd2/skilltree/padlock",
-					color = tweak_data.screen_colors.item_stage_1,
-					layer = 3
-				})
-				lock:set_center(rect:center())
-				asset:set_color(Color.black:with_alpha(0.6))
-				self._asset_locked[i] = true
-			end
-			table.insert(self._assets_list, asset)
+		asset:set_center(rect:center())
+		asset:set_position(math.round(asset:x()), math.round(asset:y()))
+		asset:set_rotation(0.5)
+		if not assets_names[i][3] then
+			local lock = self._panel:bitmap({
+				name = "asset_lock_" .. tostring(i),
+				texture = assets_names[i][5] and "guis/textures/pd2/blackmarket/money_lock" or "guis/textures/pd2/skilltree/padlock",
+				color = tweak_data.screen_colors.item_stage_1,
+				layer = 3
+			})
+			lock:set_center(rect:center())
+			asset:set_color(Color.black:with_alpha(0.6))
+			self._asset_locked[i] = true
 		end
+		table.insert(self._assets_list, asset)
 	end
 	self._text_strings_localized = false
-	if rect then
+	if first_rect then
 		self._asset_text = self._panel:text({
 			name = "asset_text",
 			text = "",
@@ -538,11 +573,11 @@ function AssetsItem:create_assets(assets_names, max_assets)
 			layer = 4,
 			color = tweak_data.screen_colors.text
 		})
-		self._asset_text:set_top(rect:bottom() + tweak_data.menu.pd2_small_font_size * 0.5 - 6)
+		self._asset_text:set_top(first_rect:bottom() + tweak_data.menu.pd2_small_font_size * 0.5 - 6)
 	end
 	self._my_asset_space = w
 	self._my_left_i = self._my_menu_component_data.my_left_i or 1
-	if #self._assets_list > 6 then
+	if 1 < math.ceil(#self._assets_list / 8) then
 		self._move_left_rect = self._panel:bitmap({
 			texture = "guis/textures/pd2/hud_arrow",
 			color = tweak_data.screen_colors.button_stage_3,
@@ -554,6 +589,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		})
 		self._move_left_rect:set_center(0, self._panel:h() / 2)
 		self._move_left_rect:set_position(math.round(self._move_left_rect:x()), math.round(self._move_left_rect:y()))
+		self._move_left_rect:set_visible(false)
 		self._move_right_rect = self._panel:bitmap({
 			texture = "guis/textures/pd2/hud_arrow",
 			color = tweak_data.screen_colors.button_stage_3,
@@ -565,6 +601,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		})
 		self._move_right_rect:set_center(self._panel:w(), self._panel:h() / 2)
 		self._move_right_rect:set_position(math.round(self._move_right_rect:x()), math.round(self._move_right_rect:y()))
+		self._move_right_rect:set_visible(false)
 	end
 	if not managers.menu:is_pc_controller() then
 		local legends = {
@@ -625,7 +662,7 @@ function AssetsItem:move_assets_left()
 end
 
 function AssetsItem:move_assets_right()
-	self._my_left_i = math.min(self._my_left_i + 1, #self._assets_list - 5)
+	self._my_left_i = math.min(self._my_left_i + 1, math.ceil(#self._assets_list / 8))
 	self:update_asset_positions_and_text()
 	managers.menu_component:post_event("menu_enter")
 end
@@ -649,7 +686,7 @@ function AssetsItem:update_asset_positions()
 	self._my_menu_component_data.my_left_i = self._my_left_i
 	local w = self._my_asset_space
 	for i, asset in pairs(self._assets_list) do
-		local cx = (i - (self._my_left_i - 1)) * w - w / 2
+		local cx = (math.ceil(i / 2) - (self._my_left_i - 1) * 4) * w - w / 2
 		local lock = self._panel:child("asset_lock_" .. tostring(i))
 		if alive(lock) then
 			lock:set_center_x(cx)
@@ -659,18 +696,18 @@ function AssetsItem:update_asset_positions()
 		asset:set_center_x(cx)
 		asset:set_left(math.round(asset:left()))
 	end
-	self._move_left_rect:set_visible(self._my_left_i ~= 1)
-	self._move_right_rect:set_visible(self._my_left_i + 5 ~= #self._assets_list)
+	self._move_left_rect:set_visible(self._my_left_i > 1)
+	self._move_right_rect:set_visible(self._my_left_i < math.ceil(#self._assets_list / 8))
+	if 1 < math.ceil(#self._assets_list / 8) then
+		self:set_tab_suffix(" (" .. tostring(self._my_left_i) .. "/" .. tostring(math.ceil(#self._assets_list / 8)) .. ")")
+	end
 end
 
 function AssetsItem:select_asset(i, instant)
-	if #self._assets_list > 6 then
+	if #self._assets_list > 8 then
 		if i then
-			if i < self._my_left_i then
-				self._my_left_i = i
-			elseif i > self._my_left_i + 5 then
-				self._my_left_i = i - 5
-			end
+			local page = math.ceil(i / 8)
+			self._my_left_i = page
 		end
 		self:update_asset_positions()
 	end
@@ -713,9 +750,9 @@ function AssetsItem:select_asset(i, instant)
 		local can_unlock = self._assets_names[i][5]
 		text_string = self._assets_names[i][6] and text_string or ""
 		if is_server and can_unlock then
-			extra_string = extra_string .. managers.localization:text("st_menu_cost") .. " " .. managers.experience:cash_string(managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4])) .. "\n"
+			extra_string = extra_string .. managers.localization:text("st_menu_cost") .. " " .. managers.experience:cash_string(managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4]))
 			if not managers.money:can_afford_mission_asset(self._assets_names[i][4]) then
-				extra_string = extra_string .. managers.localization:text("bm_menu_not_enough_cash")
+				extra_string = extra_string .. "\n" .. managers.localization:text("bm_menu_not_enough_cash")
 				extra_color = tweak_data.screen_colors.important_1
 			end
 		else
@@ -734,18 +771,30 @@ function AssetsItem:select_asset(i, instant)
 		local _, _, w, _ = self._asset_text:text_rect()
 		self._asset_text:set_w(w)
 		self._asset_text:set_center_x(bg:center_x())
+		self._asset_text:set_position(math.round(self._asset_text:x()), math.round(self._asset_text:y()))
 		if self._asset_text:left() < 10 then
 			self._asset_text:set_left(10)
 			local len_to_left = math.abs(self._assets_list[i]:center_x() - self._asset_text:left())
 			local len_to_center = math.abs(self._assets_list[i]:center_x() - self._asset_text:center_x())
-			self._asset_text:set_align(len_to_left < len_to_center and "left" or "center")
+			self._asset_text:set_align("left")
 		elseif self._asset_text:right() > self._panel:w() - 10 then
 			self._asset_text:set_right(self._panel:w() - 10)
 			local len_to_right = math.abs(self._assets_list[i]:center_x() - self._asset_text:right())
 			local len_to_center = math.abs(self._assets_list[i]:center_x() - self._asset_text:center_x())
-			self._asset_text:set_align(len_to_right < len_to_center and "right" or "center")
+			self._asset_text:set_align("right")
 		else
 			self._asset_text:set_align("center")
+		end
+		local _, _, w, h = self._asset_text:text_rect()
+		self._asset_text:set_size(w, h)
+	end
+	if rect then
+		if i % 2 > 0 then
+			self._asset_text:set_center_y(rect:bottom() + 10)
+			self._asset_text:set_y(math.round(self._asset_text:y()))
+		else
+			self._asset_text:set_center_y(rect:top() - 10)
+			self._asset_text:set_y(math.round(self._asset_text:y()))
 		end
 	end
 end
@@ -830,13 +879,39 @@ function AssetsItem:mouse_pressed(button, x, y)
 			return
 		end
 	end
-	if self._asset_selected and self._panel:child("bg_rect_" .. tostring(self._asset_selected)):inside(x, y) then
+	if self._asset_selected and alive(self._panel:child("bg_rect_" .. tostring(self._asset_selected))) and self._panel:child("bg_rect_" .. tostring(self._asset_selected)):inside(x, y) then
 		return self:_return_asset_info(self._asset_selected)
 	end
 	return inside
 end
 
+function AssetsItem:move(x, y)
+	if #self._assets_list == 0 then
+		return
+	end
+	local asset_selected = self._asset_selected
+	local new_selected = self._my_left_i and (self._my_left_i - 1) * 8 + 1 or 1
+	if asset_selected then
+		local is_top = 0 < asset_selected % 2
+		local step = 2 * x + (is_top and math.max(y, 0) or math.min(y, 0))
+		new_selected = asset_selected + step
+		if new_selected > #self._assets_list then
+			local old_page = math.ceil(asset_selected / 8)
+			local new_page = math.ceil(new_selected / 8)
+			if old_page < new_page then
+				new_selected = #self._assets_list
+			end
+		end
+	end
+	if 1 <= new_selected and new_selected <= #self._assets_list then
+		self._asset_selected = asset_selected
+		self:select_asset(new_selected)
+	end
+end
+
 function AssetsItem:move_left()
+	self:move(-1, 0)
+	do return end
 	if #self._assets_list == 0 then
 		return
 	end
@@ -846,7 +921,17 @@ function AssetsItem:move_left()
 	return
 end
 
+function AssetsItem:move_up()
+	self:move(0, -1)
+end
+
+function AssetsItem:move_down()
+	self:move(0, 1)
+end
+
 function AssetsItem:move_right()
+	self:move(1, 0)
+	do return end
 	if #self._assets_list == 0 then
 		return
 	end
@@ -2899,6 +2984,12 @@ function MissionBriefingGui:show()
 	self._enabled = true
 	self._panel:set_alpha(1)
 	self._fullscreen_panel:set_alpha(1)
+end
+
+function MissionBriefingGui:update_tab_positions()
+	for i, item in ipairs(self._items) do
+		item:update_tab_position()
+	end
 end
 
 function MissionBriefingGui:close()

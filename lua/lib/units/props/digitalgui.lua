@@ -281,6 +281,7 @@ function DigitalGui:save(data)
 	state.timer_count_down = self._timer_count_down
 	state.COLOR_TYPE = self.COLOR_TYPE
 	state.BG_COLOR_TYPE = self.BG_COLOR_TYPE
+	state.visible = self._visible
 	data.DigitalGui = state
 end
 
@@ -301,4 +302,7 @@ function DigitalGui:load(data)
 	end
 	self:set_color_type(state.COLOR_TYPE)
 	self:set_bg_color_type(state.BG_COLOR_TYPE)
+	if state.visible ~= self._visible then
+		self:set_visible(state.visible)
+	end
 end

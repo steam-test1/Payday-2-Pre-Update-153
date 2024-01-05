@@ -1,5 +1,6 @@
 require("lib/managers/menu/WalletGuiObject")
-local WIDTH_MULTIPLIER = SystemInfo:platform() == Idstring("WIN32") and 0.6 or 0.5
+local is_win_32 = SystemInfo:platform() == Idstring("WIN32")
+local WIDTH_MULTIPLIER = is_win_32 and 0.6 or 0.5
 InfamyTreeGui = InfamyTreeGui or class()
 
 function InfamyTreeGui:init(ws, fullscreen_ws, node)
@@ -448,10 +449,10 @@ function InfamyTreeGui:_update_description(name, unlocked)
 	desc_title:set_size(self._description_panel:w() - 20, h)
 	local _, _, _, h = desc_warning:text_rect()
 	desc_warning:set_size(self._description_panel:w() - 20, h)
-	desc_warning:set_top(desc_title:bottom() + 20)
+	desc_warning:set_top(desc_title:bottom() + (is_win_32 and 20 or 0))
 	local _, _, _, h = desc_text:text_rect()
 	desc_text:set_size(self._description_panel:w() - 20, h)
-	desc_text:set_top(desc_warning:bottom() + 10)
+	desc_text:set_top(desc_warning:bottom() + (is_win_32 and 10 or 0))
 	if name then
 		desc_upgrade = self._description_panel:panel({
 			name = "description_upgrade"
@@ -464,7 +465,7 @@ function InfamyTreeGui:_update_description(name, unlocked)
 			color = "colors"
 		}
 		local icon_size = 64
-		local y = desc_text:bottom() + 10
+		local y = desc_text:bottom() + (is_win_32 and 10 or 0)
 		for bonus, item in ipairs(infamy_tweak.upgrades) do
 			local global_value = item[1]
 			local category = item[2]

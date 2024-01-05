@@ -1268,9 +1268,9 @@ function HUDManager:set_statistics_endscreen_hud(criminals_completed, success)
 	end
 end
 
-function HUDManager:set_ghost_bonus_endscreen_hud(bonus)
+function HUDManager:set_special_packages_endscreen_hud(params)
 	if self._hud_stage_endscreen then
-		self._hud_stage_endscreen:set_ghost_bonus(bonus)
+		self._hud_stage_endscreen:set_special_packages(params)
 	end
 end
 

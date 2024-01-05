@@ -50,6 +50,10 @@ function MenuComponentManager:init()
 		create = callback(self, self, "_create_lobby_chat_gui"),
 		close = callback(self, self, "hide_lobby_chat_gui")
 	}
+	self._active_components.crimenet_chats = {
+		create = callback(self, self, "_create_crimenet_chats_gui"),
+		close = callback(self, self, "hide_crimenet_chat_gui")
+	}
 	self._active_components.contract = {
 		create = callback(self, self, "_create_contract_gui"),
 		close = callback(self, self, "_disable_contract_gui")
@@ -280,6 +284,9 @@ function MenuComponentManager:update(t, dt)
 			self._crimenet_gui:disable_crimenet()
 		end
 		self._set_crimenet_enabled = nil
+	end
+	if self._mission_briefing_update_tab_wanted then
+		self:update_mission_briefing_tab_positions()
 	end
 	if table.size(self._removing_textures) > 0 then
 		for key, texture_ids in pairs(self._removing_textures) do
@@ -635,6 +642,9 @@ function MenuComponentManager:back_pressed()
 end
 
 function MenuComponentManager:special_btn_pressed(...)
+	if self._game_chat_gui and self._game_chat_gui:special_btn_pressed(...) then
+		return true
+	end
 	if self._skilltree_gui and self._skilltree_gui:special_btn_pressed(...) then
 		return true
 	end
@@ -662,6 +672,9 @@ function MenuComponentManager:special_btn_pressed(...)
 end
 
 function MenuComponentManager:mouse_pressed(o, button, x, y)
+	if self._game_chat_gui and self._game_chat_gui:mouse_pressed(button, x, y) then
+		return true
+	end
 	if self._skilltree_gui and self._skilltree_gui:mouse_pressed(button, x, y) then
 		return true
 	end
@@ -669,9 +682,6 @@ function MenuComponentManager:mouse_pressed(o, button, x, y)
 		return true
 	end
 	if self._blackmarket_gui and self._blackmarket_gui:mouse_pressed(button, x, y) then
-		return true
-	end
-	if self._game_chat_gui and self._game_chat_gui:mouse_pressed(button, x, y) then
 		return true
 	end
 	if self._newsfeed_gui and self._newsfeed_gui:mouse_pressed(button, x, y) then
@@ -963,6 +973,13 @@ end
 
 function MenuComponentManager:mouse_moved(o, x, y)
 	local wanted_pointer = "arrow"
+	if self._game_chat_gui then
+		local used, pointer = self._game_chat_gui:mouse_moved(x, y)
+		wanted_pointer = pointer or wanted_pointer
+		if used then
+			return true, wanted_pointer
+		end
+	end
 	if self._skilltree_gui then
 		local used, pointer = self._skilltree_gui:mouse_moved(o, x, y)
 		wanted_pointer = pointer or wanted_pointer
@@ -1015,13 +1032,6 @@ function MenuComponentManager:mouse_moved(o, x, y)
 			return true, pointer
 		end
 		local used, pointer = self._debug_strings_book:mouse_moved(x, y)
-		wanted_pointer = pointer or wanted_pointer
-		if used then
-			return true, wanted_pointer
-		end
-	end
-	if self._game_chat_gui then
-		local used, pointer = self._game_chat_gui:mouse_moved(x, y)
 		wanted_pointer = pointer or wanted_pointer
 		if used then
 			return true, wanted_pointer
@@ -1378,6 +1388,7 @@ end
 function MenuComponentManager:_create_chat_gui()
 	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() and managers.network:session() then
 		self._lobby_chat_gui_active = false
+		self._crimenet_chat_gui_active = false
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
 			return
@@ -1389,11 +1400,26 @@ end
 function MenuComponentManager:_create_lobby_chat_gui()
 	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() and managers.network:session() then
 		self._lobby_chat_gui_active = true
+		self._crimenet_chat_gui_active = false
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
-			return
+		else
+			self:add_game_chat()
 		end
-		self:add_game_chat()
+		self._game_chat_gui:set_params("lobby")
+	end
+end
+
+function MenuComponentManager:_create_crimenet_chats_gui()
+	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() and managers.network:session() then
+		self._crimenet_chat_gui_active = true
+		self._lobby_chat_gui_active = false
+		if self._game_chat_gui then
+			self:show_game_chat_gui()
+		else
+			self:add_game_chat()
+		end
+		self._game_chat_gui:set_params("crimenet")
 	end
 end
 
@@ -1458,6 +1484,12 @@ function MenuComponentManager:hide_lobby_chat_gui()
 	end
 end
 
+function MenuComponentManager:hide_crimenet_chat_gui()
+	if self._game_chat_gui and self._crimenet_chat_gui_active then
+		self._game_chat_gui:hide()
+	end
+end
+
 function MenuComponentManager:hide_game_chat_gui()
 	if self._game_chat_gui then
 		self._game_chat_gui:hide()
@@ -1471,7 +1503,7 @@ function MenuComponentManager:show_game_chat_gui()
 end
 
 function MenuComponentManager:_disable_chat_gui()
-	if self._game_chat_gui and not self._lobby_chat_gui_active then
+	if self._game_chat_gui and not self._lobby_chat_gui_active and not self._crimenet_chat_gui_active then
 		self._game_chat_gui:set_enabled(false)
 	end
 end
@@ -1487,6 +1519,7 @@ function MenuComponentManager:close_chat_gui()
 	end
 	self._game_chat_bottom = nil
 	self._lobby_chat_gui_active = nil
+	self._crimenet_chat_gui_active = nil
 end
 
 function MenuComponentManager:_create_friends_gui()
@@ -1746,6 +1779,15 @@ function MenuComponentManager:close_mission_briefing_gui()
 			managers.groupai:state():remove_listener(self._whisper_listener)
 			self._whisper_listener = nil
 		end
+	end
+end
+
+function MenuComponentManager:update_mission_briefing_tab_positions()
+	if self._mission_briefing_gui then
+		self._mission_briefing_gui:update_tab_positions()
+		self._mission_briefing_update_tab_wanted = nil
+	else
+		self._mission_briefing_update_tab_wanted = true
 	end
 end
 

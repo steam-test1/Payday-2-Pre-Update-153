@@ -304,6 +304,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.gage_pack_lmg.track = true
 	self.global_values.gage_pack_lmg.sort_number = 81
 	self.global_values.gage_pack_lmg.category = "dlc"
+	self.global_values.gage_pack_jobs = {}
+	self.global_values.gage_pack_jobs.name_id = "bm_global_value_gage_pack_jobs"
+	self.global_values.gage_pack_jobs.desc_id = "menu_l_global_value_gage_pack_jobs"
+	self.global_values.gage_pack_jobs.unlock_id = "bm_global_value_gage_pack_jobs_unlock"
+	self.global_values.gage_pack_jobs.color = Color(255, 255, 212, 0) / 255
+	self.global_values.gage_pack_jobs.dlc = true
+	self.global_values.gage_pack_jobs.chance = 1
+	self.global_values.gage_pack_jobs.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "gage_pack_jobs")
+	self.global_values.gage_pack_jobs.durability_multiplier = 1
+	self.global_values.gage_pack_jobs.drops = true
+	self.global_values.gage_pack_jobs.track = true
+	self.global_values.gage_pack_jobs.sort_number = 82
+	self.global_values.gage_pack_jobs.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -338,7 +351,8 @@ function LootDropTweakData:init(tweak_data)
 		"xmas",
 		"armored_transport",
 		"gage_pack",
-		"gage_pack_lmg"
+		"gage_pack_lmg",
+		"gage_pack_jobs"
 	}
 	self.global_value_list_map = {}
 	for i, d in ipairs(self.global_value_list_index) do

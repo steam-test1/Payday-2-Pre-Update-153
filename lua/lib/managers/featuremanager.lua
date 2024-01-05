@@ -9,12 +9,16 @@ function FeatureManager:_setup()
 	self._default.announcements = {}
 	self._default.announcements.crimenet_heat = 3
 	self._default.announcements.election_changes = 1
+	self._default.announcements.crimenet_welcome = 0
+	self._default.announcements.dlc_gage_pack_jobs = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
 		for id, _ in pairs(self._default.announcements) do
 			Global.feature_manager.announcements[id] = 0
 		end
+		Global.feature_manager.announcements.crimenet_welcome = 3
+		Global.feature_manager.announcements.dlc_gage_pack_jobs = 1
 		Global.feature_manager.announced = {}
 	end
 	self._global = Global.feature_manager
@@ -84,6 +88,24 @@ function FeatureManager:election_changes()
 	managers.menu:show_new_message_dialog({
 		title = "menu_feature_election_changes_title",
 		text = "menu_feature_election_changes_desc"
+	})
+	return true
+end
+
+function FeatureManager:crimenet_welcome()
+	print("FeatureManager:crimenet_welcome()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_crimenet_welcome_title",
+		text = "menu_feature_crimenet_welcome_desc"
+	})
+	return true
+end
+
+function FeatureManager:dlc_gage_pack_jobs()
+	print("FeatureManager:dlc_gage_pack_jobs()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_crimenet_thanks_gagemod",
+		text = "menu_feature_crimenet_thanks_gagemod_desc"
 	})
 	return true
 end

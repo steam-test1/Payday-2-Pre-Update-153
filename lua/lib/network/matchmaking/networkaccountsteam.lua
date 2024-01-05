@@ -162,15 +162,22 @@ function NetworkAccountSTEAM:get_stat(key)
 end
 
 function NetworkAccountSTEAM:get_global_stat(key, days)
+	local value = 0
 	local global_stat
-	if days then
-		global_stat = Steam:sa_handler():get_global_stat(key, days)
+	if days < 0 then
+		local day = math.abs(days) + 1
+		global_stat = Steam:sa_handler():get_global_stat(key, day)
+		return global_stat[day] or 0
+	elseif days then
+		global_stat = Steam:sa_handler():get_global_stat(key, days == 1 and 1 or days + 1)
+		for i = 1 < days and 2 or 1, #global_stat do
+			value = value + global_stat[i]
+		end
 	else
 		global_stat = Steam:sa_handler():get_global_stat(key)
-	end
-	local value = 0
-	for _, day in ipairs(global_stat) do
-		value = value + day
+		for _, day in ipairs(global_stat) do
+			value = value + day
+		end
 	end
 	return value
 end

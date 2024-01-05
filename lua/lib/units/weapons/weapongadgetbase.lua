@@ -1,4 +1,5 @@
 WeaponGadgetBase = WeaponGadgetBase or class(UnitBase)
+WeaponGadgetBase.GADGET_TYPE = ""
 
 function WeaponGadgetBase:init(unit)
 	WeaponGadgetBase.super.init(self, unit)

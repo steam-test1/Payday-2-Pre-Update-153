@@ -15,6 +15,7 @@ NewRaycastWeaponBase = NewRaycastWeaponBase or class(RaycastWeaponBase)
 
 function NewRaycastWeaponBase:init(unit)
 	NewRaycastWeaponBase.super.init(self, unit)
+	self._has_gadget = false
 end
 
 function NewRaycastWeaponBase:is_npc()
@@ -219,6 +220,7 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._recoil = self._current_stats.recoil or self._recoil
 	self._spread_moving = self._current_stats.spread_moving or self._spread_moving
 	self._extra_ammo = self._current_stats.extra_ammo or self._extra_ammo
+	self._has_gadget = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	self:replenish()
 end
 
@@ -270,14 +272,21 @@ function NewRaycastWeaponBase:stance_mod()
 		return nil
 	end
 	local translation = Vector3()
+	local rotation = Rotation()
 	local factory = tweak_data.weapon.factory
 	for part_id, data in pairs(self._parts) do
 		if factory.parts[part_id].stance_mod and factory.parts[part_id].stance_mod[self._factory_id] then
 			local part_translation = factory.parts[part_id].stance_mod[self._factory_id].translation
-			mvector3.add(translation, part_translation)
+			if part_translation then
+				mvector3.add(translation, part_translation)
+			end
+			local part_rotation = factory.parts[part_id].stance_mod[self._factory_id].rotation
+			if part_rotation then
+				mrotation.multiply(rotation, part_rotation)
+			end
 		end
 	end
-	return {translation = translation}
+	return {translation = translation, rotation = rotation}
 end
 
 function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
@@ -398,54 +407,80 @@ function NewRaycastWeaponBase:_update_bullet_objects(ammo)
 end
 
 function NewRaycastWeaponBase:has_gadget()
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
-	return 0 < #gadgets and true or false
+	return self._has_gadget
 end
 
 function NewRaycastWeaponBase:is_gadget_on()
-	return self._gadget_on
+	return self._gadget_on and self._gadget_on > 0 and self._gadget_on or false
 end
 
 function NewRaycastWeaponBase:gadget_on()
-	self._gadget_on = true
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
-	if gadgets then
-		for _, gadget in ipairs(gadgets) do
-			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
-		end
-	end
+	self:set_gadget_on(1, true)
 end
 
 function NewRaycastWeaponBase:gadget_off()
-	self._gadget_on = false
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	self:set_gadget_on(0, true)
+end
+
+function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
+	if not ignore_enable and not self._enabled then
+		return
+	end
+	self._gadget_on = gadget_on or self._gadget_on
+	gadgets = gadgets or managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	if gadgets then
-		for _, gadget in ipairs(gadgets) do
-			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+		local xd, yd
+		local part_factory = tweak_data.weapon.factory.parts
+		table.sort(gadgets, function(x, y)
+			xd = self._parts[x]
+			yd = self._parts[y]
+			if not xd then
+				return false
+			end
+			if not yd then
+				return true
+			end
+			return xd.unit:base().GADGET_TYPE > yd.unit:base().GADGET_TYPE
+		end)
+		local gadget
+		for i, id in ipairs(gadgets) do
+			gadget = self._parts[id]
+			if gadget then
+				gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
+			end
 		end
 	end
 end
 
 function NewRaycastWeaponBase:toggle_gadget()
 	if not self._enabled then
+		return false
+	end
+	local gadget_on = self._gadget_on or 0
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
+	if gadgets then
+		gadget_on = (gadget_on + 1) % (#gadgets + 1)
+		self:set_gadget_on(gadget_on, false, gadgets)
+		return true
+	end
+	do return false end
+	if not self._enabled then
 		return
 	end
-	self._gadget_on = not self._gadget_on
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	self._gadget_on = self._gadget_on or 0
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	if gadgets then
-		for _, gadget in ipairs(gadgets) do
-			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+		self._gadget_on = ((self._gadget_on or 0) + 1) % (#gadgets + 1)
+		local gadget
+		for _, i in ipairs(gadgets) do
+			gadget = self._parts[i]
+			gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
 		end
 	end
 end
 
 function NewRaycastWeaponBase:gadget_update()
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
-	if gadgets then
-		for _, gadget in ipairs(gadgets) do
-			gadget.unit:base():set_state(self._enabled and self._gadget_on, self._sound_fire)
-		end
-	end
+	self:set_gadget_on(false, true)
 end
 
 function NewRaycastWeaponBase:check_stats()

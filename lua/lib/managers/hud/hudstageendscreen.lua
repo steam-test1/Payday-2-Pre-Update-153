@@ -23,9 +23,12 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 	local announcement = params.announcement
 	local upgrade = params.upgrade
 	local ghost_bonus = params.ghost_bonus
+	local gage_assignment = params.gage_assignment
 	local bitmap_texture = "guis/textures/pd2/endscreen/test_icon_package"
 	local text_string = ""
 	local blend_mode = "normal"
+	local post_event = "stinger_new_weapon"
+	local wait_time = 0
 	if announcement then
 		bitmap_texture = "guis/textures/pd2/endscreen/announcement"
 		text_string = managers.localization:to_upper_text("menu_es_announcement") .. "\n" .. managers.localization:to_upper_text(announcement)
@@ -90,6 +93,19 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 		local string_id = on_last_stage and "menu_es_ghost_bonus_job" or "menu_es_ghost_bonus_day"
 		text_string = managers.localization:to_upper_text(string_id, {bonus = ghost_bonus})
 		blend_mode = "add"
+	elseif gage_assignment then
+		local completed, progressed = managers.gage_assignment:get_latest_data()
+		bitmap_texture = "guis/dlcs/gage_pack_jobs/textures/pd2/endscreen/gage_assignment"
+		blend_mode = "add"
+		local string_id = ""
+		if 0 < table.size(completed) then
+			string_id = "menu_es_gage_assignment_package_complete"
+			post_event = "gage_package_win"
+			wait_time = 0.6
+		else
+			string_id = "menu_es_gage_assignment_package"
+		end
+		text_string = managers.localization:to_upper_text(string_id, {})
 	else
 		Application:debug("HUDPackageUnlockedItem: Something something unknown")
 	end
@@ -124,11 +140,12 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 		text:set_position(math.round(text:x()), math.round(text:y()))
 		managers.menu_component:make_color_text(text, tweak_data.screen_colors.ghost_color)
 	end
-	self._panel:animate(callback(self, self, "create_animation"))
+	self._panel:animate(callback(self, self, "create_animation", {post_event = post_event, wait_time = wait_time}))
 end
 
-function HUDPackageUnlockedItem:create_animation()
-	managers.menu_component:post_event("stinger_new_weapon")
+function HUDPackageUnlockedItem:create_animation(params)
+	managers.menu_component:post_event(params.post_event)
+	wait(params.wait_time or 0)
 	over(0.3, function(p)
 		self._panel:set_alpha(math.lerp(0, 1, p))
 	end)
@@ -978,22 +995,38 @@ function HUDStageEndScreen:clear_stage()
 	WalletGuiObject.set_object_visible("wallet_skillpoint_text", false)
 end
 
-function HUDStageEndScreen:_check_ghost_bonus()
+function HUDStageEndScreen:_check_special_packages()
 	local ghost_bonus_mul = self._ghost_bonus
+	local ghost_string
+	local got_ghost = false
+	local row = 1
+	local ghost_package, gage_package
 	if ghost_bonus_mul and 0 < ghost_bonus_mul then
 		local ghost_bonus = math.round(ghost_bonus_mul * 100)
-		local ghost_string
 		if ghost_bonus == 0 then
 			ghost_string = string.format("%0.2f", math.abs(ghost_bonus_mul * 100))
 		else
 			ghost_string = tostring(math.abs(ghost_bonus))
 		end
+		ghost_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {ghost_bonus = ghost_string}, self)
+		row = row + 1
+	end
+	if self._gage_assignment then
+		gage_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {gage_assignment = true}, self)
+		row = row + 1
+	end
+	local package_items = {}
+	if ghost_package then
+		table.insert(package_items, ghost_package)
+	end
+	if gage_package then
+		table.insert(package_items, gage_package)
+	end
+	if 0 < #package_items then
 		for _, item in ipairs(self._package_items) do
 			item:close()
 		end
-		self._package_items = {
-			HUDPackageUnlockedItem:new(self._package_forepanel, 1, {ghost_bonus = ghost_string}, self)
-		}
+		self._package_items = package_items
 	end
 end
 
@@ -1046,7 +1079,7 @@ end
 
 function HUDStageEndScreen:create_money_counter(t, dt)
 	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
-	self:_check_ghost_bonus()
+	self:_check_special_packages()
 	self._is_fail_video = not is_success
 	if SystemInfo:platform() ~= Idstring("X360") then
 		if self._is_fail_video then
@@ -1344,6 +1377,7 @@ function HUDStageEndScreen:stage_init(t, dt)
 		"bonus_num_players",
 		"bonus_skill",
 		"bonus_infamy",
+		"bonus_gage_assignment",
 		"bonus_extra",
 		"bonus_ghost",
 		"heat_xp"
@@ -1380,6 +1414,10 @@ function HUDStageEndScreen:stage_init(t, dt)
 	bonuses_params.bonus_infamy = {
 		color = tweak_data.lootdrop.global_values.infamy.color,
 		title = managers.localization:to_upper_text("menu_es_infamy_bonus")
+	}
+	bonuses_params.bonus_gage_assignment = {
+		color = tweak_data.screen_colors.button_stage_2,
+		title = managers.localization:to_upper_text("menu_es_gage_assignment_bonus")
 	}
 	bonuses_params.bonus_extra = {
 		color = tweak_data.screen_colors.button_stage_2,
@@ -1933,9 +1971,10 @@ function HUDStageEndScreen:set_success(success, server_left)
 	self._background_layer_full:child("stage_text"):set_text(self._stage_name .. ": " .. stage_status)
 end
 
-function HUDStageEndScreen:set_ghost_bonus(ghost_bonus)
-	self._ghost_bonus = ghost_bonus
-	self:_check_ghost_bonus()
+function HUDStageEndScreen:set_special_packages(params)
+	self._gage_assignment = params.gage_assignment
+	self._ghost_bonus = params.ghost_bonus
+	self:_check_special_packages()
 end
 
 function HUDStageEndScreen:set_statistics(criminals_completed, success)

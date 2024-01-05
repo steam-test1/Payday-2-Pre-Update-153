@@ -1269,6 +1269,10 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	end
 	self._special_contracts_id = {}
 	self:add_special_contracts(node:parameters().no_casino)
+	managers.features:announce_feature("crimenet_welcome")
+	if managers.dlc:is_dlc_unlocked("gage_pack_jobs") then
+		managers.features:announce_feature("dlc_gage_pack_jobs")
+	end
 	managers.features:announce_feature("crimenet_heat")
 	managers.features:announce_feature("election_changes")
 	return
@@ -1504,6 +1508,7 @@ function CrimeNetGui:add_special_contracts(no_casino)
 			local gui_data = self:_create_job_gui(special_contract, "special")
 			gui_data.server = true
 			gui_data.special_node = special_contract.menu_node
+			gui_data.dlc = special_contract.dlc
 			if special_contract.pulse then
 				local animate_pulse = function(o)
 					while true do
@@ -2151,6 +2156,7 @@ function CrimeNetGui:remove_job(id, instant)
 		if self._deleting_jobs[id] then
 			self._deleting_jobs[id].marker_panel:stop()
 			self:_remove_gui_job(self._deleting_jobs[id])
+			self._deleting_jobs[id] = nil
 		end
 		return false
 	end
@@ -2508,11 +2514,20 @@ function CrimeNetGui:check_job_pressed(x, y)
 				num_plrs = job.num_plrs or 0,
 				state = job.state,
 				host_name = job.host_name,
-				special_node = job.special_node
+				special_node = job.special_node,
+				dlc = job.dlc
 			}
 			managers.menu_component:post_event("menu_enter")
-			local node = job.special_node or Global.game_settings.single_player and "crimenet_contract_singleplayer" or job.server and "crimenet_contract_join" or "crimenet_contract_host"
-			managers.menu:open_node(node, {data})
+			if not data.dlc or managers.dlc:is_dlc_unlocked(data.dlc) then
+				local node = job.special_node or Global.game_settings.single_player and "crimenet_contract_singleplayer" or job.server and "crimenet_contract_join" or "crimenet_contract_host"
+				managers.menu:open_node(node, {data})
+			elseif is_win32 then
+				local dlc_data = Global.dlc_manager.all_dlc_data[data.dlc]
+				local app_id = dlc_data and dlc_data.app_id
+				if app_id then
+					Steam:overlay_activate("store", app_id)
+				end
+			end
 			if job.expanded then
 				for id2, job2 in pairs(self._jobs) do
 					if job2 ~= job then

@@ -51,8 +51,11 @@ function LocalizationManager:_setup_macros()
 		swap_accept = true
 	end
 	if swap_accept then
-		btn_accept = btn_b
-		btn_cancel = btn_a
+		local btn_tmp = btn_a
+		btn_a = btn_b
+		btn_b = btn_tmp
+		btn_accept = btn_a
+		btn_cancel = btn_b
 	end
 	if SystemInfo:platform() ~= Idstring("PS3") then
 		btn_stick_r = stick_r

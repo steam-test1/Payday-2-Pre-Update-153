@@ -72,11 +72,6 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 			CivilianLogicSurrender._do_initial_act(data, data.objective.amount, data.objective.aggressor_unit, data.objective.initial_act)
 		end
 	end
-	for u_key, attention_info in pairs(data.detected_attention_objects) do
-		if attention_info.identified and attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
-			managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, true)
-		end
-	end
 end
 
 function CivilianLogicSurrender.exit(data, new_logic_name, enter_params)
@@ -186,6 +181,9 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 			end
 			data.unit:character_damage():drop_pickup()
 			data.unit:character_damage():set_pickup(nil)
+			if data.unit:unit_data().mission_element then
+				data.unit:unit_data().mission_element:event("tied", data.unit)
+			end
 			CivilianLogicFlee._chk_add_delayed_rescue_SO(data, my_data)
 			if aggressor_unit == managers.player:player_unit() then
 				managers.statistics:tied({
@@ -197,6 +195,7 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 					data.unit:base()._tweak_table
 				})
 			end
+			managers.groupai:state():on_criminal_suspicion_progress(nil, data.unit, nil)
 		end
 	end
 end

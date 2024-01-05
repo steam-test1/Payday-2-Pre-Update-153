@@ -2178,6 +2178,21 @@ function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, 
 end
 
 function BlackMarketManager:_on_modified_weapon(category, slot)
+	local crafted = self:get_crafted_category_slot(category, slot)
+	local blueprint = crafted and crafted.blueprint or {}
+	local pass_achievement
+	for achievement, parts in pairs(tweak_data.achievement.weapon_blueprints) do
+		pass_achievement = true
+		for _, part_id in ipairs(parts) do
+			if not table.contains(blueprint, part_id) then
+				pass_achievement = false
+				break
+			end
+		end
+		if pass_achievement then
+			managers.achievment:award(achievement)
+		end
+	end
 	if self:equipped_weapon_slot(category) ~= slot then
 		return
 	end
@@ -2342,7 +2357,7 @@ function BlackMarketManager:get_part_texture_switch_data(category, slot, part_id
 	local crafted_category = self._global.crafted_items[category]
 	local crafted_item = crafted_category and crafted_category[slot]
 	local texture_switches = crafted_item and crafted_item.texture_switches
-	local data_string = texture_switches and texture_switches[part_id] or ""
+	local data_string = texture_switches and texture_switches[part_id] or "1 1"
 	local color_index, type_index = unpack(string.split(data_string, " "))
 	color_index = tonumber(color_index)
 	type_index = tonumber(type_index)
@@ -2356,7 +2371,7 @@ function BlackMarketManager:get_part_texture_switch(category, slot, part_id)
 	if not texture_switches then
 		return
 	end
-	local data_string = texture_switches and texture_switches[part_id] or ""
+	local data_string = texture_switches and texture_switches[part_id] or "1 1"
 	return self:get_texture_switch_from_data(data_string, part_id)
 end
 
@@ -2370,15 +2385,15 @@ function BlackMarketManager:get_texture_switch_from_data(data_string, part_id)
 		return
 	end
 	local color_index, type_index = unpack(string.split(data_string, " "))
-	color_index = tonumber(color_index)
-	type_index = tonumber(type_index)
+	color_index = tonumber(color_index) or 1
+	type_index = tonumber(type_index) or 1
 	local switch_data = tweak_data.gui.weapon_texture_switches.types[part_data.type]
 	local weapon_texture_switch = switch_data and switch_data[type_index]
 	weapon_texture_switch = weapon_texture_switch and weapon_texture_switch.texture_path or ""
 	if color_index == 1 then
 		return weapon_texture_switch
 	end
-	local color = tweak_data.gui.weapon_texture_switches.color_indexes[color_index]
+	local color = tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes", color_index, "color")
 	if not color then
 		return
 	end

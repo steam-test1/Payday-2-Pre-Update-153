@@ -5765,6 +5765,7 @@ function BlackMarketGui:populate_mods(data)
 			new_data.equipped = false
 			new_data.stream = true
 			new_data.default_mod = default_mod
+			new_data.is_internal = tweak_data.weapon.factory:is_part_internal(new_data.name)
 			if tweak_data.lootdrop.global_values[mod_global_value] and tweak_data.lootdrop.global_values[mod_global_value].dlc and not tweak_data.dlc[mod_global_value].free and not managers.dlc:has_dlc(mod_global_value) then
 				new_data.unlocked = -math.abs(new_data.unlocked)
 				new_data.unlocked = new_data.unlocked ~= 0 and new_data.unlocked or false
@@ -5787,7 +5788,7 @@ function BlackMarketGui:populate_mods(data)
 				local forbid = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
 				if forbid then
 					if type(new_data.unlocked) == "number" then
-						new_data.unlocked = -new_data.unlocked
+						new_data.unlocked = -math.abs(new_data.unlocked)
 					else
 						new_data.unlocked = false
 					end
@@ -5844,9 +5845,11 @@ function BlackMarketGui:populate_mods(data)
 						table.insert(new_data, "wm_buy")
 					end
 					table.insert(new_data, "wm_preview")
-					table.insert(new_data, "wm_preview_mod")
+					if not new_data.is_internal then
+						table.insert(new_data, "wm_preview_mod")
+					end
 				else
-					table.insert(new_data, "wm_remove_preview")
+					table.insert(new_data, "wm_preview")
 				end
 			end
 			data[index] = new_data
@@ -5884,8 +5887,12 @@ function BlackMarketGui:populate_mods(data)
 			data[equipped].price = 0
 			data[equipped].can_afford = true
 			table.insert(data[equipped], "wm_remove_buy")
-			table.insert(data[equipped], "wm_remove_preview_mod")
-			table.insert(data[equipped], "wm_remove_preview")
+			if not data[equipped].is_internal then
+				table.insert(data[equipped], "wm_remove_preview_mod")
+				table.insert(data[equipped], "wm_remove_preview")
+			else
+				table.insert(data[equipped], "wm_preview")
+			end
 			local factory = tweak_data.weapon.factory.parts[data[equipped].name]
 			if data.name == "sight" and factory and factory.texture_switch then
 				table.insert(data[equipped], "wm_reticle_switch_menu")
@@ -7635,7 +7642,8 @@ function BlackMarketGui:buy_mod_callback(data)
 	params.weapon_name = managers.weapon_factory:get_weapon_name_by_factory_id(managers.blackmarket:get_crafted_category(data.category)[data.slot].factory_id)
 	params.add = true
 	local weapon_id = managers.blackmarket:get_crafted_category(data.category)[data.slot].weapon_id
-	params.money = managers.experience:cash_string(managers.money:get_weapon_modify_price(weapon_id, data.name, data.global_value))
+	local cost = managers.money:get_weapon_modify_price(weapon_id, data.name, data.global_value) or 0
+	params.money = 0 < cost and managers.experience:cash_string(cost)
 	local replaces, removes = managers.blackmarket:get_modify_weapon_consequence(data.category, data.slot, data.name)
 	params.replaces = replaces or {}
 	params.removes = removes or {}
@@ -7677,7 +7685,8 @@ function BlackMarketGui:remove_mod_callback(data)
 	end
 	local replaces, removes = managers.blackmarket:get_modify_weapon_consequence(data.category, data.slot, data.default_mod or data.name, true)
 	local weapon_id = managers.blackmarket:get_crafted_category(data.category)[data.slot].weapon_id
-	params.money = managers.experience:cash_string(managers.money:get_weapon_modify_price(weapon_id, data.name, data.global_value))
+	local cost = managers.money:get_weapon_modify_price(weapon_id, data.name, data.global_value) or 0
+	params.money = 0 < cost and managers.experience:cash_string(cost)
 	params.replaces = replaces
 	params.removes = removes
 	params.yes_func = callback(self, self, "_dialog_yes", callback(self, self, "_remove_mod_callback", data))

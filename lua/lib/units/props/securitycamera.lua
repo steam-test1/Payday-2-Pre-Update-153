@@ -657,6 +657,7 @@ function SecurityCamera:_send_net_event(event_id)
 end
 
 function SecurityCamera:clbk_call_the_police()
+	managers.groupai:state():on_criminal_suspicion_progress(nil, self._unit, "called")
 	self._call_police_clbk_id = nil
 	managers.groupai:state():on_police_called(self._reason_called)
 end

@@ -871,6 +871,24 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.wp_calling_in = {
+		texture = "guis/textures/pd2/hud_stealth_alarm01",
+		texture_rect = {
+			0,
+			0,
+			64,
+			32
+		}
+	}
+	self.wp_calling_in_hazard = {
+		texture = "guis/textures/pd2/hud_stealth_alarm02",
+		texture_rect = {
+			0,
+			0,
+			64,
+			32
+		}
+	}
 	self.equipment_trip_mine = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {

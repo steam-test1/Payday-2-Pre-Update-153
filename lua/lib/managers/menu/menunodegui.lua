@@ -1062,7 +1062,7 @@ function MenuNodeGui:reload_item(item)
 	local type = item:type()
 	local row_item = self:row_item(item)
 	if row_item then
-		row_item.color = item:enabled() and (row_item.highlighted and self.row_item_hightlight_color or self.row_item_color) or row_item.disabled_color
+		row_item.color = item:enabled() and (row_item.highlighted and (row_item.hightlight_color or self.row_item_hightlight_color) or row_item.row_item_color or self.row_item_color) or row_item.disabled_color
 	end
 	if not item:reload(row_item, self) then
 		if type == "weapon_expand" or type == "weapon_upgrade_expand" then

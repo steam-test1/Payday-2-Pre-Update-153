@@ -1,6 +1,22 @@
 GuiTweakData = GuiTweakData or class()
 
 function GuiTweakData:init()
+	local soundtrack = {
+		id = "soundtrack",
+		name_id = "menu_content_soundtrack",
+		desc_id = "menu_content_soundtrack_desc",
+		date_id = "menu_content_soundtrack_date",
+		store = 254260,
+		image = "guis/textures/pd2/content_updates/soundtrack"
+	}
+	local diamond_store = {
+		id = "diamond_store",
+		name_id = "menu_content_diamond_store",
+		desc_id = "menu_content_diamond_store_desc",
+		date_id = "menu_content_diamond_store_date",
+		store = 274160,
+		image = "guis/textures/pd2/content_updates/diamond_store"
+	}
 	local birthday = {
 		id = "birthday",
 		name_id = "menu_content_birthday",
@@ -78,8 +94,16 @@ function GuiTweakData:init()
 		name_id = "menu_content_election_day",
 		desc_id = "menu_content_election_day_desc",
 		date_id = "menu_content_election_day_date",
-		store = 284430,
+		store = 288900,
 		image = "guis/textures/pd2/content_updates/election_day"
+	}
+	local gage_pack_jobs = {
+		id = "gage_pack_jobs",
+		name_id = "menu_content_gage_pack_jobs",
+		desc_id = "menu_content_gage_pack_jobs_desc",
+		date_id = "menu_content_gage_pack_jobs_date",
+		store = 259381,
+		image = "guis/textures/pd2/content_updates/gage_pack_jobs"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -88,6 +112,8 @@ function GuiTweakData:init()
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.content_updates.item_list = {
+			soundtrack,
+			diamond_store,
 			birthday,
 			halloween,
 			armored_transport,
@@ -97,7 +123,8 @@ function GuiTweakData:init()
 			infamy,
 			gage_pack_lmg,
 			deathwish,
-			election_day
+			election_day,
+			gage_pack_jobs
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -183,6 +210,8 @@ function GuiTweakData:init()
 	self.crime_net.debug_options.mass_spawn = false
 	self.crime_net.debug_options.mass_spawn_limit = 100
 	self.crime_net.debug_options.mass_spawn_timer = 0.04
+	self.mod_preview_min_fov = -20
+	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
 	self.crime_net.regions = {
 		{
@@ -1124,6 +1153,16 @@ function GuiTweakData:init()
 	}
 	self.crime_net.special_contracts = {
 		{
+			id = "gage_assignment",
+			name_id = "menu_cn_gage_assignment",
+			desc_id = "menu_cn_gage_assignment_desc",
+			menu_node = "crimenet_gage_assignment",
+			x = 425,
+			y = 910,
+			icon = "guis/textures/pd2/crimenet_marker_gage",
+			dlc = "gage_pack_jobs"
+		},
+		{
 			id = "premium_buy",
 			name_id = "menu_cn_premium_buy",
 			desc_id = "menu_cn_premium_buy_desc",
@@ -1140,6 +1179,18 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
+		},
+		{
+			id = "casino",
+			name_id = "menu_cn_casino",
+			desc_id = "menu_cn_casino_desc",
+			menu_node = "crimenet_contract_casino",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_casino",
+			unlock = "unlock_level",
+			pulse = true,
+			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {
@@ -3624,10 +3675,19 @@ function GuiTweakData:init()
 	local wts = {}
 	local dlc_1_folder = "units/pd2_dlc1/weapons/wpn_effects_textures/"
 	wts.color_indexes = {
-		"red",
-		"blue",
-		"green",
-		"yellow"
+		{color = "red"},
+		{
+			color = "blue",
+			dlc = "gage_pack_jobs"
+		},
+		{
+			color = "green",
+			dlc = "gage_pack_jobs"
+		},
+		{
+			color = "yellow",
+			dlc = "gage_pack_jobs"
+		}
 	}
 	wts.types = {}
 	wts.types.sight = {
@@ -3650,27 +3710,33 @@ function GuiTweakData:init()
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_5_il",
-			name_id = "menu_reticle_5"
+			name_id = "menu_reticle_5",
+			dlc = "gage_pack_jobs"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_6_il",
-			name_id = "menu_reticle_6"
+			name_id = "menu_reticle_6",
+			dlc = "gage_pack_jobs"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_7_il",
-			name_id = "menu_reticle_7"
+			name_id = "menu_reticle_7",
+			dlc = "gage_pack_jobs"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_8_il",
-			name_id = "menu_reticle_8"
+			name_id = "menu_reticle_8",
+			dlc = "gage_pack_jobs"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_9_il",
-			name_id = "menu_reticle_9"
+			name_id = "menu_reticle_9",
+			dlc = "gage_pack_jobs"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_10_il",
-			name_id = "menu_reticle_10"
+			name_id = "menu_reticle_10",
+			dlc = "gage_pack_jobs"
 		}
 	}
 	self.weapon_texture_switches = wts

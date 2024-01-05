@@ -199,13 +199,16 @@ function MissionEndState:at_enter(old_state, params)
 		ghost_bonus = managers.job:accumulate_ghost_bonus(ghost_bonus)
 	end
 	if self._success then
+		local gage_assignment_state = managers.gage_assignment:on_mission_completed()
+		local hud_ghost_bonus = 0
 		if managers.job:on_last_stage() then
 			managers.job:check_add_heat_to_jobs()
 			managers.job:activate_accumulated_ghost_bonus()
-			managers.hud:set_ghost_bonus_endscreen_hud(managers.job:get_saved_ghost_bonus())
+			hud_ghost_bonus = managers.job:get_saved_ghost_bonus()
 		else
-			managers.hud:set_ghost_bonus_endscreen_hud(ghost_bonus)
+			hud_ghost_bonus = ghost_bonus
 		end
+		managers.hud:set_special_packages_endscreen_hud({ghost_bonus = hud_ghost_bonus, gage_assignment = gage_assignment_state})
 	end
 	if Network:is_server() then
 		managers.network:session():set_state("game_end")

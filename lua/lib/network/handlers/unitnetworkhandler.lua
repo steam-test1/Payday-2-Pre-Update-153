@@ -66,9 +66,7 @@ function UnitNetworkHandler:action_walk_start(unit, first_nav_point, nav_link_ya
 	if end_yaw ~= 0 then
 		end_rot = Rotation(360 * (end_yaw - 1) / 254, 0, 0)
 	end
-	local nav_path = {
-		unit:position()
-	}
+	local nav_path = {}
 	if nav_link_act_index ~= 0 then
 		local nav_link_rot = 360 * nav_link_yaw / 255
 		local nav_link = unit:movement()._actions.walk.synthesize_nav_link(first_nav_point, nav_link_rot, unit:movement()._actions.act:_get_act_name_from_index(nav_link_act_index), from_idle)
@@ -484,24 +482,23 @@ function UnitNetworkHandler:sync_interaction_reply(status)
 	managers.player:from_server_interaction_reply(status)
 end
 
-function UnitNetworkHandler:sync_interaction_set_active(unit, active, tweak_data, sender)
-	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
-		return
-	end
-	unit:interaction():set_tweak_data(tweak_data)
-	unit:interaction():set_active(active)
-end
-
-function UnitNetworkHandler:sync_interaction_set_active_by_id(u_id, active, tweak_data, sender)
+function UnitNetworkHandler:interaction_set_active(unit, u_id, active, tweak_data, flash, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
-	local u_data = managers.enemy:get_corpse_unit_data_from_id(u_id)
-	if not u_data then
-		debug_pause("no unit!")
-		return
+	if not alive(unit) then
+		local u_data = managers.enemy:get_corpse_unit_data_from_id(u_id)
+		if not u_data then
+			debug_pause("[UnitNetworkHandler:sync_interaction_set_active] could not resolve unit.")
+			return
+		end
+		unit = u_data.unit
 	end
-	self:sync_interaction_set_active(u_data.unit, active, tweak_data, sender)
+	unit:interaction():set_tweak_data(tweak_data)
+	unit:interaction():set_active(active)
+	if flash then
+		unit:interaction():set_outline_flash_state(true, nil)
+	end
 end
 
 function UnitNetworkHandler:sync_teammate_progress(type_index, enabled, tweak_data_id, timer, success, sender)
@@ -600,11 +597,11 @@ function UnitNetworkHandler:cop_forbid_fire(unit)
 	unit:movement():synch_allow_fire(false)
 end
 
-function UnitNetworkHandler:set_stance(unit, stance_code, sender)
+function UnitNetworkHandler:set_stance(unit, stance_code, instant, execute_queued, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
 		return
 	end
-	unit:movement():sync_stance(stance_code)
+	unit:movement():sync_stance(stance_code, instant, execute_queued)
 end
 
 function UnitNetworkHandler:set_pose(unit, pose_code, sender)
@@ -732,11 +729,11 @@ function UnitNetworkHandler:action_idle_start(unit, body_part, sender)
 	unit:movement():action_request({type = "idle", body_part = body_part})
 end
 
-function UnitNetworkHandler:action_act_start(unit, act_index, blocks_hurt)
-	self:action_act_start_align(unit, act_index, blocks_hurt, nil, nil)
+function UnitNetworkHandler:action_act_start(unit, act_index, blocks_hurt, clamp_to_graph)
+	self:action_act_start_align(unit, act_index, blocks_hurt, clamp_to_graph, nil, nil)
 end
 
-function UnitNetworkHandler:action_act_start_align(unit, act_index, blocks_hurt, start_yaw, start_pos)
+function UnitNetworkHandler:action_act_start_align(unit, act_index, blocks_hurt, clamp_to_graph, start_yaw, start_pos)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
 		return
 	end
@@ -744,7 +741,7 @@ function UnitNetworkHandler:action_act_start_align(unit, act_index, blocks_hurt,
 	if start_yaw and start_yaw ~= 0 then
 		start_rot = Rotation(360 * (start_yaw - 1) / 254, 0, 0)
 	end
-	unit:movement():sync_action_act_start(act_index, blocks_hurt, start_rot, start_pos)
+	unit:movement():sync_action_act_start(act_index, blocks_hurt, clamp_to_graph, start_rot, start_pos)
 end
 
 function UnitNetworkHandler:action_act_end(unit)
@@ -1131,11 +1128,11 @@ function UnitNetworkHandler:sync_money_wrap_money_taken(unit, sender)
 	unit:base():sync_money_taken()
 end
 
-function UnitNetworkHandler:sync_pickup(unit)
+function UnitNetworkHandler:sync_pickup(unit, sender)
 	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	unit:base():sync_pickup()
+	unit:base():sync_pickup(self._verify_sender(sender))
 end
 
 function UnitNetworkHandler:unit_sound_play(unit, event_id, source, sender)
@@ -1913,10 +1910,16 @@ function UnitNetworkHandler:suspicion_hud(observer_unit, status)
 		status = false
 	elseif status == 1 then
 		status = 1
-	else
+	elseif status == 2 then
 		status = true
+	elseif status == 3 then
+		status = "calling"
+	elseif status == 4 then
+		status = "called"
+	elseif status == 5 then
+		status = "call_interrupted"
 	end
-	managers.groupai:state():sync_suspicion_hud(observer_unit, status)
+	managers.groupai:state():on_criminal_suspicion_progress(nil, observer_unit, status)
 end
 
 function UnitNetworkHandler:group_ai_event(event_id, blame_id, sender)

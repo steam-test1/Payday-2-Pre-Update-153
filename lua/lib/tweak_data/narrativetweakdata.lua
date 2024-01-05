@@ -993,7 +993,7 @@ function NarrativeTweakData:init()
 		360000,
 		430000
 	}
-	self.jobs.election_day.heat = {this_job = -2, other_jobs = 2}
+	self.jobs.election_day.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.election_day_prof = deep_clone(self.jobs.election_day)
 	self.jobs.election_day_prof.jc = 70
 	self.jobs.election_day_prof.professional = true
@@ -1666,6 +1666,44 @@ function NarrativeTweakData:init()
 		40000,
 		80000
 	}
+	self.jobs.kosugi = {}
+	self.jobs.kosugi.name_id = "heist_kosugi"
+	self.jobs.kosugi.briefing_id = "heist_kosugi_crimenet"
+	self.jobs.kosugi.contact = "bain"
+	self.jobs.kosugi.region = "street"
+	self.jobs.kosugi.jc = 10
+	self.jobs.kosugi.chain = {
+		{
+			level_id = "kosugi",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.kosugi.briefing_event = nil
+	self.jobs.kosugi.debrief_event = nil
+	self.jobs.kosugi.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.kosugi.payout = {
+		10000,
+		20000,
+		30000,
+		40000,
+		80000
+	}
+	self.jobs.kosugi_prof = deep_clone(self.jobs.kosugi)
+	self.jobs.kosugi_prof.jc = 40
+	self.jobs.kosugi_prof.professional = true
+	self.jobs.kosugi_prof.region = "professional"
+	self.jobs.kosugi_prof.payout = {
+		10000,
+		20000,
+		30000,
+		40000,
+		80000
+	}
 	self.jobs.escape_hell = {}
 	self.jobs.escape_hell.name_id = "heist_escape_hell"
 	self.jobs.escape_hell.briefing_id = "heist_escape_hell_crimenet"
@@ -1698,32 +1736,32 @@ function NarrativeTweakData:init()
 		70000,
 		80000
 	}
-	self.jobs.hot = {}
-	self.jobs.hot.name_id = "heist_hot"
-	self.jobs.hot.briefing_id = "heist_hot_crimenet"
-	self.jobs.hot.contact = "bain"
-	self.jobs.hot.region = "street"
-	self.jobs.hot.jc = 40
-	self.jobs.hot.chain = {
+	self.jobs.mia = {}
+	self.jobs.mia.name_id = "heist_mia"
+	self.jobs.mia.briefing_id = "heist_mia_crimenet"
+	self.jobs.mia.contact = "bain"
+	self.jobs.mia.region = "street"
+	self.jobs.mia.jc = 40
+	self.jobs.mia.chain = {
 		{
-			level_id = "hot",
+			level_id = "mia",
 			type_id = "heist_type_assault",
 			type = "d"
 		}
 	}
-	self.jobs.hot.briefing_event = "pln_fj1_cbf_01"
-	self.jobs.hot.debrief_event = nil
-	self.jobs.hot.crimenet_callouts = {
+	self.jobs.mia.briefing_event = "pln_fj1_cbf_01"
+	self.jobs.mia.debrief_event = nil
+	self.jobs.mia.crimenet_callouts = {
 		"pln_fj1_cnc_01_01",
 		"pln_fj1_cnc_01_02",
 		"pln_fj1_cnc_01_03"
 	}
-	self.jobs.hot.crimenet_videos = {
+	self.jobs.mia.crimenet_videos = {
 		"cn_jewel1",
 		"cn_jewel2",
 		"cn_jewel3"
 	}
-	self.jobs.hot.payout = {
+	self.jobs.mia.payout = {
 		37000,
 		43000,
 		60000,

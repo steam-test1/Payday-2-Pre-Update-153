@@ -112,9 +112,12 @@ function PlayerTweakData:init()
 		buildup_mul = 1
 	}
 	self.alarm_pager = {
-		ring_delay = {2, 5},
-		ring_reminder = {4, 4},
-		ring_duration = {12, 12},
+		first_call_delay = {2, 4},
+		call_duration = {
+			{6, 6},
+			{6, 6}
+		},
+		nr_of_calls = {2, 2},
 		bluff_success_chance = {
 			1,
 			1,
@@ -715,8 +718,8 @@ function PlayerTweakData:_init_new_stances()
 	self.stances.colt_1911.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
 	self.stances.colt_1911.crouched.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
 	self.stances.mac10 = deep_clone(self.stances.default)
-	local pivot_shoulder_translation = Vector3(8.66929, 32.8934, -2.84433)
-	local pivot_shoulder_rotation = Rotation(0.110003, -0.898575, 0.630293)
+	local pivot_shoulder_translation = Vector3(8.66375, 35.7106, -2.84375)
+	local pivot_shoulder_rotation = Rotation(0.110006, -0.898579, 0.630296)
 	local pivot_head_translation = Vector3(8, 25, -2)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.mac10.standard.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)

@@ -391,6 +391,10 @@ function MenuManager:show_new_message_dialog(params)
 	dialog_data.image_w = 64
 	dialog_data.image_h = 64
 	dialog_data.image_valign = "top"
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
 	managers.system_menu:show_new_unlock(dialog_data)
 end
 
@@ -411,6 +415,10 @@ function MenuManager:show_announce_crimenet_heat()
 	dialog_data.image_w = 64
 	dialog_data.image_h = 64
 	dialog_data.image_valign = "top"
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
 	managers.system_menu:show_new_unlock(dialog_data)
 end
 
@@ -858,10 +866,11 @@ function MenuManager:show_confirm_blackmarket_mod(params)
 	if warn_lost_mods or not params.add then
 		dialog_data.text = dialog_data.text .. "\n" .. l_local:text("dialog_blackmarket_lost_mods_warning")
 	end
-	if params.add then
+	if params.add and params.money then
 		dialog_data.text = dialog_data.text .. "\n" .. l_local:text("dialog_blackmarket_mod_cost", {
 			money = params.money
 		})
+	else
 	end
 	local yes_button = {}
 	yes_button.text = managers.localization:text("dialog_yes")
@@ -960,7 +969,6 @@ function MenuManager:show_confirm_mission_asset_buy(params)
 end
 
 function MenuManager:show_confirm_buy_premium_contract(params)
-	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_premium_buy_title")
 	dialog_data.text = managers.localization:text("menu_cn_premium_buy_fee", {
@@ -980,7 +988,6 @@ function MenuManager:show_confirm_buy_premium_contract(params)
 end
 
 function MenuManager:show_confirm_pay_casino_fee(params)
-	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_casino_pay_title")
 	dialog_data.text = managers.localization:text("menu_cn_casino_pay_fee", {
@@ -1169,7 +1176,6 @@ function MenuManager:show_abort_mission_dialog(params)
 end
 
 function MenuManager:show_confirm_become_infamous(params)
-	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_become_infamous")
 	local no_button = {}
@@ -1241,4 +1247,32 @@ function MenuManager:show_infamous_message(can_become_infamous)
 	dialog_data.focus_button = 1
 	dialog_data.button_list = {no_button}
 	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:dialog_gage_assignment_completed(params)
+	params = {
+		player = params.player or tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()),
+		time = params.time or Application:date("%H:%M"),
+		date = params.date or Application:date("%Y-%m-%d"),
+		completed = params.completed or ""
+	}
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_gage_assignment_completed_title")
+	dialog_data.text = managers.localization:text("dialog_gage_assignment_completed", params)
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	dialog_data.texture = "guis/textures/pd2/feature_crimenet_heat"
+	dialog_data.text_blend_mode = "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 620
+	dialog_data.h = 532
+	dialog_data.image_w = 64
+	dialog_data.image_h = 64
+	dialog_data.image_valign = "top"
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
+	managers.system_menu:show_new_unlock(dialog_data)
 end

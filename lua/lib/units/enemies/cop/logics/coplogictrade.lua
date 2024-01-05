@@ -38,8 +38,10 @@ function CopLogicTrade.hostage_trade(unit, enable, trade_success)
 			unit:brain():on_hostage_move_interaction(nil, "stay")
 		end
 		unit:character_damage():set_invulnerable(true)
-		unit:interaction():set_tweak_data("hostage_trade")
-		unit:interaction():set_active(true, false)
+		if Network:is_server() then
+			unit:interaction():set_tweak_data("hostage_trade")
+			unit:interaction():set_active(true, true)
+		end
 		if Network:is_server() and not unit:anim_data().hands_tied and not unit:anim_data().tied then
 			local action_data
 			if managers.enemy:all_civilians()[unit:key()] then
@@ -119,7 +121,10 @@ function CopLogicTrade.on_trade(data, trading_unit)
 	data.internal_data._trade_enabled = false
 	data.unit:network():send("hostage_trade", false, true)
 	CopLogicTrade.hostage_trade(data.unit, false, true)
-	managers.groupai:state():on_hostage_state(false, data.key)
+	managers.groupai:state():on_hostage_state(false, data.key, managers.enemy:all_enemies()[data.key] and true or false)
+	if data.is_converted then
+		managers.groupai:state():remove_minion(data.key, nil)
+	end
 	local flee_pos = managers.groupai:state():flee_point(data.unit:movement():nav_tracker():nav_segment())
 	if flee_pos then
 		data.internal_data.fleeing = true

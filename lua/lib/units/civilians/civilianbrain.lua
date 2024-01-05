@@ -50,6 +50,9 @@ function CivilianBrain:is_available_for_assignment(objective)
 end
 
 function CivilianBrain:cancel_trade()
+	if not self._active then
+		return
+	end
 	self:set_logic("surrender")
 end
 
@@ -115,7 +118,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 		if not action then
 			return
 		end
-		self._unit:movement():set_stance("cbt")
+		self._unit:movement():set_stance("cbt", nil, true)
 		local follow_objective = {
 			type = "follow",
 			follow_unit = interacting_unit,
@@ -155,7 +158,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 		if not action then
 			return
 		end
-		self._unit:movement():set_stance("hos")
+		self._unit:movement():set_stance("hos", nil, true)
 		self._unit:interaction():set_tweak_data("hostage_move")
 		self._unit:interaction():set_active(true, true)
 		if alive(interacting_unit) then
@@ -169,6 +172,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 	elseif command == "release" then
 		self._logic_data.is_tied = nil
 		self:set_objective(nil)
+		self._unit:movement():set_stance("hos", nil, true)
 		local stand_action_desc = {
 			type = "act",
 			variant = "panic",

@@ -528,6 +528,7 @@ function ExperienceManager:get_xp_by_params(params)
 	local ghost_risk_dissect = 0
 	local infamy_dissect = 0
 	local extra_bonus_dissect = 0
+	local gage_assignment_dissect = 0
 	if success and on_last_stage then
 		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars)
 		level_limit_dissect = level_limit_dissect + managers.experience:get_job_xp_by_stars(job_stars)
@@ -576,6 +577,9 @@ function ExperienceManager:get_xp_by_params(params)
 		alive_crew_dissect = math.round(total_contract_xp * num_players_bonus - total_contract_xp)
 		total_xp = total_xp + alive_crew_dissect
 	end
+	bonus_xp = managers.gage_assignment:get_current_experience_multiplier()
+	gage_assignment_dissect = math.round(total_contract_xp * bonus_xp - total_contract_xp)
+	total_xp = total_xp + gage_assignment_dissect
 	ghost_dissect = math.round(total_xp * ghost_multiplier - total_xp)
 	total_xp = total_xp + ghost_dissect
 	local heat_xp_mul = ignore_heat and 1 or math.max(managers.job:get_job_heat_multipliers(job_id), 0)
@@ -593,6 +597,7 @@ function ExperienceManager:get_xp_by_params(params)
 		in_custody = math.round(personal_win_dissect),
 		heat_xp = math.round(job_heat_dissect),
 		bonus_ghost = math.round(ghost_dissect),
+		bonus_gage_assignment = math.round(gage_assignment_dissect),
 		stage_xp = math.round(stage_xp_dissect),
 		job_xp = math.round(job_xp_dissect),
 		base = math.round(base_xp),
@@ -600,7 +605,7 @@ function ExperienceManager:get_xp_by_params(params)
 		last_stage = on_last_stage
 	}
 	if Application:production_build() then
-		local rounding_error = dissection_table.total - (dissection_table.stage_xp + dissection_table.job_xp + dissection_table.bonus_risk + dissection_table.bonus_num_players + dissection_table.bonus_failed + dissection_table.bonus_skill + dissection_table.bonus_days + dissection_table.heat_xp)
+		local rounding_error = dissection_table.total - (dissection_table.stage_xp + dissection_table.job_xp + dissection_table.bonus_risk + dissection_table.bonus_num_players + dissection_table.bonus_failed + dissection_table.bonus_skill + dissection_table.bonus_days + dissection_table.heat_xp + dissection_table.bonus_ghost + dissection_table.bonus_gage_assignment)
 		dissection_table.rounding_error = rounding_error
 	else
 		dissection_table.rounding_error = 0

@@ -718,19 +718,28 @@ function LevelsTweakData:init()
 	self.blueharvest_3.music = "heist"
 	self.blueharvest_3.package = "packages/level_debug"
 	self.blueharvest_3.cube = "cube_apply_heist_bank"
-	self.hot = {}
-	self.hot.name_id = "heist_hot_hl"
-	self.hot.briefing_id = "heist_hot_briefing"
-	self.hot.briefing_dialog = "Play_pln_hot_brief"
-	self.hot.world_name = "wip/hm"
-	self.hot.intro_event = "Play_pln_firestarter_stage3_intro_a"
-	self.hot.outro_event = {
+	self.mia = {}
+	self.mia.name_id = "heist_mia_hl"
+	self.mia.briefing_id = "heist_mia_briefing"
+	self.mia.briefing_dialog = "Play_pln_mia_brief"
+	self.mia.world_name = "wip/hm"
+	self.mia.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.mia.outro_event = {
 		"Play_pln_firestarter_stage3_end_a",
 		"Play_pln_firestarter_stage3_end_b"
 	}
-	self.hot.music = "heist"
-	self.hot.package = "packages/level_debug"
-	self.hot.cube = "cube_apply_heist_bank"
+	self.mia.music = "heist"
+	self.mia.package = "packages/narr_mia"
+	self.mia.cube = "cube_apply_heist_bank"
+	self.kosugi = {}
+	self.kosugi.name_id = "heist_kosugi_hl"
+	self.kosugi.briefing_id = "heist_kosugi_briefing"
+	self.kosugi.world_name = "wip/kosugi"
+	self.kosugi.intro_event = "lol"
+	self.kosugi.outro_event = {"lol", "lolo"}
+	self.kosugi.music = "heist"
+	self.kosugi.package = "packages/level_debug"
+	self.kosugi.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -1270,7 +1279,8 @@ function LevelsTweakData:init()
 		"blueharvest_1",
 		"blueharvest_2",
 		"blueharvest_3",
-		"hot",
+		"mia",
+		"kosugi",
 		"test01",
 		"test02",
 		"test03",

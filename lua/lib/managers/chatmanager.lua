@@ -85,8 +85,8 @@ function ChatGui:init(ws)
 	self._ws = ws
 	self._hud_panel = ws:panel()
 	self:set_channel_id(ChatManager.GAME)
-	self._panel_width = self._hud_panel:w() * 0.5 - 10
-	self._output_width = self._panel_width - 20
+	self._panel_width = self._hud_panel:w() * 0.5
+	self._output_width = self._panel_width - 15
 	self._panel_height = 500
 	self._max_lines = 15
 	self._lines = {}
@@ -94,6 +94,17 @@ function ChatGui:init(ws)
 	self._enter_callback = callback(self, self, "enter_key_callback")
 	self._typing_callback = 0
 	self._skip_first = false
+	self._hud_blur = self._hud_panel:bitmap({
+		name = "hud_blur",
+		texture = "guis/textures/test_blur_df",
+		render_template = "VertexColorTexturedBlur3D",
+		layer = -2,
+		valign = "grow",
+		halign = "grow"
+	})
+	self._hud_blur:set_shape(self._hud_panel:shape())
+	self._hud_blur:set_alpha(0)
+	self._hud_blur:hide()
 	self._panel = self._hud_panel:panel({
 		name = "chat_panel",
 		x = 0,
@@ -102,13 +113,51 @@ function ChatGui:init(ws)
 		valign = "bottom"
 	})
 	self:set_leftbottom(0, 70)
-	self._panel:set_layer(20)
+	local chat_blur = self._panel:panel({name = "chat_blur"})
+	local blur = chat_blur:bitmap({
+		name = "chat_blur",
+		texture = "guis/textures/test_blur_df",
+		render_template = "VertexColorTexturedBlur3D",
+		layer = -2,
+		valign = "grow",
+		halign = "grow"
+	})
+	blur:set_size(chat_blur:size())
+	chat_blur:set_shape(self._panel:shape())
+	chat_blur:set_h(math.round(ChatGui.line_height * self._max_lines) + 24)
+	chat_blur:set_bottom(self._panel:h())
+	chat_blur:hide()
+	self._chat_blur_box = BoxGuiObject:new(chat_blur, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	local chat_bg = self._panel:rect({
+		name = "chat_bg",
+		color = Color.black,
+		alpha = 0,
+		layer = -1,
+		valign = "grow",
+		halign = "grow"
+	})
+	chat_bg:set_shape(chat_blur:shape())
 	local output_panel = self._panel:panel({
 		name = "output_panel",
 		x = 20,
 		h = 10,
 		w = self._output_width,
 		layer = 1
+	})
+	local output_bg = output_panel:rect({
+		name = "output_bg",
+		color = Color.black,
+		alpha = 0,
+		layer = -1,
+		valign = "grow",
+		halign = "grow"
 	})
 	local scroll_panel = output_panel:panel({
 		name = "scroll_panel",
@@ -182,10 +231,97 @@ function ChatGui:init(ws)
 		}
 	})
 	self._enabled = true
+	if MenuCallbackHandler:is_win32() then
+		local chat_button_panel = self._hud_panel:panel({
+			name = "chat_button_panel"
+		})
+		local chat_button = chat_button_panel:text({
+			name = "chat_button",
+			text = managers.localization:to_upper_text("menu_cn_chat_show", {
+				BTN_BACK = managers.localization:btn_macro("toggle_chat")
+			}),
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = tweak_data.screen_colors.button_stage_3,
+			layer = 40,
+			blend_mode = "add"
+		})
+		local _, _, w, h = chat_button:text_rect()
+		chat_button:set_size(w, h)
+		chat_button:set_right(chat_button_panel:w() / 2)
+		chat_button:set_bottom(chat_button_panel:h() - 11)
+		do
+			local blur_object = chat_button_panel:bitmap({
+				name = "chat_button_blur",
+				texture = "guis/textures/test_blur_df",
+				render_template = "VertexColorTexturedBlur3D",
+				layer = chat_button:layer() - 2
+			})
+			blur_object:set_shape(chat_button:shape())
+		end
+		chat_button_panel:hide()
+		local new_msg_flash = chat_button_panel:bitmap({
+			name = "new_msg_flash",
+			texture = "guis/textures/pd2/crimenet_marker_glow",
+			rotation = 360,
+			w = (chat_button:w() + 20) * 2,
+			h = (chat_button:h() + 10) * 2,
+			alpha = 0,
+			layer = chat_button:layer() - 1,
+			color = tweak_data.screen_colors.button_stage_3,
+			blend_mode = "add"
+		})
+		new_msg_flash:set_center(chat_button:center())
+	end
 	output_panel:set_x(scroll_down_indicator_arrow:w() + 4)
 	self:_create_input_panel()
 	self:_layout_input_panel()
 	self:_layout_output_panel(true)
+	self:set_layer(20)
+end
+
+function ChatGui:start_hud_blur()
+	local func = function(o)
+		over(0.6, function(p)
+			o:set_alpha(math.lerp(0, 1, p))
+		end)
+	end
+	self._hud_blur:animate(func)
+end
+
+function ChatGui:stop_hud_blur()
+	self._hud_blur:stop()
+	self._hud_blur:set_alpha(0)
+end
+
+function ChatGui:start_notify_new_message()
+	if MenuCallbackHandler:is_win32() and not self._crimenet_chat_state and not self._notifying_new_msg then
+		self._notifying_new_msg = true
+		local func = function(o)
+			over(0.1, function(p)
+				o:set_alpha(math.lerp(0, 0.6, p))
+			end)
+			while true do
+				over(2, function(p)
+					o:set_alpha(math.abs(math.cos(p * 360)) * 0.4 + 0.2)
+				end)
+			end
+		end
+		local chat_button_panel = self._hud_panel:child("chat_button_panel")
+		local new_msg_flash = chat_button_panel:child("new_msg_flash")
+		new_msg_flash:stop()
+		new_msg_flash:animate(func)
+	end
+end
+
+function ChatGui:stop_notify_new_message()
+	if MenuCallbackHandler:is_win32() and self._notifying_new_msg then
+		self._notifying_new_msg = false
+		local chat_button_panel = self._hud_panel:child("chat_button_panel")
+		local new_msg_flash = chat_button_panel:child("new_msg_flash")
+		new_msg_flash:stop()
+		new_msg_flash:set_alpha(0)
+	end
 end
 
 function ChatGui:set_leftbottom(left, bottom)
@@ -196,15 +332,144 @@ end
 function ChatGui:set_max_lines(max_lines)
 	self._max_lines = max_lines
 	self:_layout_output_panel(true)
+	local chat_blur = self._panel:child("chat_blur")
+	chat_blur:set_shape(self._panel:shape())
+	chat_blur:set_h(math.round(ChatGui.line_height * self._max_lines) + 24)
+	chat_blur:set_bottom(self._panel:h())
+	self._chat_blur_box:create_sides(chat_blur, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	local chat_bg = self._panel:child("chat_bg")
+	chat_bg:set_shape(chat_blur:shape())
 end
 
+ChatGui.PRESETS = {}
+ChatGui.PRESETS.lobby = {
+	left = 0,
+	bottom = 50,
+	layer = 20
+}
+ChatGui.PRESETS.crimenet = {
+	left = 0,
+	bottom = 0,
+	layer = tweak_data.gui.MOUSE_LAYER - 100,
+	chat_blur = true,
+	chat_bg_alpha = 0.25,
+	is_crimenet_chat = true
+}
+
 function ChatGui:set_params(params)
+	if type(params) == "string" then
+		params = self.PRESETS[params] or {}
+	end
 	if params.max_lines then
 		self:set_max_lines(params.max_lines)
 	end
 	if params.left and params.bottom then
 		self:set_leftbottom(params.left, params.bottom)
 	end
+	if params.layer then
+		self._layer = params.layer
+		self:set_layer(params.layer)
+	end
+	local chat_bg = self._panel:child("chat_bg")
+	local chat_blur = self._panel:child("chat_blur")
+	local hud_blur = self._hud_blur
+	local output_bg = self._panel:child("output_panel"):child("output_bg")
+	output_bg:set_alpha(params.output_bg_alpha or 0)
+	chat_bg:set_alpha(params.chat_bg_alpha or 0)
+	chat_blur:set_visible(params.chat_blur)
+	hud_blur:set_visible(params.hud_blur)
+	if params.is_crimenet_chat then
+		self:enable_crimenet_chat()
+	else
+		self:disable_crimenet_chat()
+	end
+end
+
+function ChatGui:enable_crimenet_chat()
+	if MenuCallbackHandler:is_win32() then
+		self._is_crimenet_chat = true
+		self:_hide_crimenet_chat()
+		local chat_button_panel = self._hud_panel:child("chat_button_panel")
+		chat_button_panel:show()
+	end
+end
+
+function ChatGui:disable_crimenet_chat()
+	if MenuCallbackHandler:is_win32() then
+		self._is_crimenet_chat = false
+		local chat_button_panel = self._hud_panel:child("chat_button_panel")
+		chat_button_panel:hide()
+		self._panel:child("output_panel"):stop()
+		self._panel:child("output_panel"):animate(callback(self, self, "_animate_fade_output"))
+	end
+end
+
+function ChatGui:toggle_crimenet_chat()
+	if MenuCallbackHandler:is_win32() then
+		self._crimenet_chat_state = not self._crimenet_chat_state
+		if self._crimenet_chat_state then
+			self:_show_crimenet_chat()
+		else
+			self:_hide_crimenet_chat()
+		end
+		managers.menu_component:post_event("menu_enter")
+	end
+end
+
+function ChatGui:_show_crimenet_chat()
+	local chat_bg = self._panel:child("chat_bg")
+	local chat_blur = self._panel:child("chat_blur")
+	local hud_blur = self._hud_blur
+	local output_bg = self._panel:child("output_panel"):child("output_bg")
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	local chat_button = chat_button_panel:child("chat_button")
+	chat_button:set_text(managers.localization:to_upper_text("menu_cn_chat_hide", {
+		BTN_BACK = managers.localization:btn_macro("toggle_chat")
+	}))
+	local _, _, w, h = chat_button:text_rect()
+	chat_button:set_size(w, h)
+	chat_button:set_right(chat_button_panel:w() / 2)
+	chat_button:set_bottom(chat_button_panel:h() - 11)
+	local blur_object = chat_button_panel:child("chat_button_blur")
+	blur_object:set_shape(chat_button:shape())
+	local new_msg_flash = chat_button_panel:child("new_msg_flash")
+	new_msg_flash:set_center(chat_button:center())
+	self:set_output_alpha(1)
+	self._panel:child("output_panel"):stop()
+	self._panel:child("output_panel"):animate(callback(self, self, "_animate_fade_output"))
+	self:stop_notify_new_message()
+	self._crimenet_chat_state = true
+	self._panel:set_bottom(self._hud_panel:child("chat_button_panel"):child("chat_button"):top())
+end
+
+function ChatGui:_hide_crimenet_chat()
+	local chat_bg = self._panel:child("chat_bg")
+	local chat_blur = self._panel:child("chat_blur")
+	local hud_blur = self._hud_blur
+	local output_bg = self._panel:child("output_panel"):child("output_bg")
+	self:_loose_focus()
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	local chat_button = chat_button_panel:child("chat_button")
+	chat_button:set_text(managers.localization:to_upper_text("menu_cn_chat_show", {
+		BTN_BACK = managers.localization:btn_macro("toggle_chat")
+	}))
+	local _, _, w, h = chat_button:text_rect()
+	chat_button:set_size(w, h)
+	chat_button:set_right(chat_button_panel:w() / 2)
+	chat_button:set_bottom(chat_button_panel:h() - 11)
+	local blur_object = chat_button_panel:child("chat_button_blur")
+	blur_object:set_shape(chat_button:shape())
+	local new_msg_flash = chat_button_panel:child("new_msg_flash")
+	new_msg_flash:set_center(chat_button:center())
+	self._crimenet_chat_state = false
+	self._panel:set_top(self._hud_panel:h())
 end
 
 function ChatGui:enabled()
@@ -220,6 +485,8 @@ end
 
 function ChatGui:hide()
 	self._panel:hide()
+	self._hud_blur:hide()
+	self._hud_panel:child("chat_button_panel"):hide()
 	self:set_enabled(false)
 	local text = self._input_panel:child("input_text")
 	text:set_text("")
@@ -233,6 +500,10 @@ end
 
 function ChatGui:set_layer(layer)
 	self._panel:set_layer(layer)
+	self._hud_blur:set_layer(layer - 2)
+	if self._hud_panel:child("chat_button_panel") then
+		self._hud_panel:child("chat_button_panel"):set_layer(layer + 1)
+	end
 end
 
 function ChatGui:set_channel_id(channel_id)
@@ -351,11 +622,11 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 		local line = self._lines[i][1]
 		local line_bg = self._lines[i][2]
 		local icon = self._lines[i][3]
-		line:set_w(output_panel:w() - line:left())
+		line:set_w(scroll_panel:w() - line:left())
 		local _, _, w, h = line:text_rect()
 		line:set_h(h)
 		line_bg:set_w(w + line:left() + 2)
-		line_bg:set_h(h)
+		line_bg:set_h(line_height * line:number_of_lines())
 		lines = lines + line:number_of_lines()
 	end
 	local scroll_at_bottom = scroll_panel:bottom() == output_panel:h()
@@ -376,7 +647,7 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 		else
 			line:set_left(line:left())
 		end
-		y = y + h
+		y = y + line_height * line:number_of_lines()
 	end
 	output_panel:set_bottom(math.round(self._input_panel:top()))
 	if max_lines >= lines or scroll_at_bottom then
@@ -475,15 +746,40 @@ function ChatGui:input_focus()
 	return self._focus
 end
 
+function ChatGui:special_btn_pressed(button)
+	if MenuCallbackHandler:is_win32() and button == Idstring("toggle_chat") and not self._focus and self._is_crimenet_chat then
+		self:toggle_crimenet_chat()
+	end
+end
+
 function ChatGui:mouse_moved(x, y)
 	if not self._enabled then
-		return false
+		return false, false
+	end
+	if self:moved_scroll_bar(x, y) then
+		return true, "grab"
+	end
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	if chat_button_panel and chat_button_panel:visible() then
+		local chat_button = chat_button_panel:child("chat_button")
+		if chat_button:inside(x, y) then
+			if not self._chat_button_highlight then
+				self._chat_button_highlight = true
+				managers.menu_component:post_event("highlight")
+				chat_button:set_color(tweak_data.screen_colors.button_stage_2)
+			end
+			return true, "link"
+		elseif self._chat_button_highlight then
+			self._chat_button_highlight = false
+			chat_button:set_color(tweak_data.screen_colors.button_stage_3)
+		end
+	end
+	if self._is_crimenet_chat and not self._crimenet_chat_state then
+		return false, false
 	end
 	local inside = self._input_panel:inside(x, y)
 	self._input_panel:child("focus_indicator"):set_visible(inside or self._focus)
-	if self:moved_scroll_bar(x, y) then
-		return true, "grab"
-	elseif self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) then
+	if self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) then
 		return true, "hand"
 	elseif self._panel:child("scroll_down_indicator_arrow"):visible() and self._panel:child("scroll_down_indicator_arrow"):inside(x, y) or self._panel:child("scroll_up_indicator_arrow"):visible() and self._panel:child("scroll_up_indicator_arrow"):inside(x, y) then
 		return true, "link"
@@ -491,7 +787,7 @@ function ChatGui:mouse_moved(x, y)
 	if self._focus then
 		inside = not inside
 	end
-	return inside, inside and "link"
+	return inside or self._focus, inside and "link" or "arrow"
 end
 
 function ChatGui:moved_scroll_bar(x, y)
@@ -508,9 +804,12 @@ function ChatGui:scroll_with_bar(target_y, current_y)
 	if diff == 0 then
 		return current_y
 	end
+	local output_panel = self._panel:child("output_panel")
+	local scroll_panel = output_panel:child("scroll_panel")
+	local scroll_ratio = output_panel:h() / scroll_panel:h()
 	local dir = diff / math.abs(diff)
 	while line_height <= math.abs(current_y - target_y) do
-		current_y = current_y - line_height * dir
+		current_y = current_y - line_height * dir * scroll_ratio
 		if 0 < dir then
 			self:scroll_up()
 			self:set_scroll_indicators()
@@ -533,6 +832,17 @@ function ChatGui:mouse_pressed(button, x, y)
 	if not self._enabled then
 		return
 	end
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	if button == Idstring("0") and chat_button_panel and chat_button_panel:visible() then
+		local chat_button = chat_button_panel:child("chat_button")
+		if chat_button:inside(x, y) then
+			self:toggle_crimenet_chat()
+			return true
+		end
+	end
+	if self._is_crimenet_chat and not self._crimenet_chat_state then
+		return false, false
+	end
 	local inside = self._input_panel:inside(x, y)
 	if inside then
 		self:_on_focus()
@@ -541,17 +851,21 @@ function ChatGui:mouse_pressed(button, x, y)
 	if self._panel:child("output_panel"):inside(x, y) then
 		if button == Idstring("mouse wheel down") then
 			if self:mouse_wheel_down(x, y) then
+				self:set_scroll_indicators()
 				self:_on_focus()
+				return true
 			end
 		elseif button == Idstring("mouse wheel up") then
 			if self:mouse_wheel_up(x, y) then
+				self:set_scroll_indicators()
 				self:_on_focus()
+				return true
 			end
 		elseif button == Idstring("0") and self:check_grab_scroll_panel(x, y) then
+			self:set_scroll_indicators()
 			self:_on_focus()
+			return true
 		end
-		self:set_scroll_indicators()
-		return true
 	elseif button == Idstring("0") and self:check_grab_scroll_bar(x, y) then
 		self:set_scroll_indicators()
 		self:_on_focus()
@@ -622,6 +936,9 @@ function ChatGui:mouse_wheel_up(x, y)
 	if not self._enabled then
 		return
 	end
+	if self._is_crimenet_chat and not self._crimenet_chat_state then
+		return false, false
+	end
 	local output_panel = self._panel:child("output_panel")
 	local scroll_panel = output_panel:child("scroll_panel")
 	if self._one_scroll_up_delay then
@@ -634,6 +951,9 @@ end
 function ChatGui:mouse_wheel_down(x, y)
 	if not self._enabled then
 		return
+	end
+	if self._is_crimenet_chat and not self._crimenet_chat_state then
+		return false, false
 	end
 	local output_panel = self._panel:child("output_panel")
 	local scroll_panel = output_panel:child("scroll_panel")
@@ -659,6 +979,7 @@ function ChatGui:_on_focus()
 	if self._focus then
 		return
 	end
+	self:start_hud_blur()
 	local output_panel = self._panel:child("output_panel")
 	output_panel:stop()
 	output_panel:animate(callback(self, self, "_animate_show_component"), output_panel:alpha())
@@ -679,6 +1000,7 @@ function ChatGui:_loose_focus()
 	if not self._focus then
 		return false
 	end
+	self:stop_hud_blur()
 	self._one_scroll_up_delay = nil
 	self._one_scroll_dn_delay = nil
 	self._focus = false
@@ -694,7 +1016,7 @@ function ChatGui:_loose_focus()
 	local text = self._input_panel:child("input_text")
 	text:stop()
 	self._input_panel:child("input_bg"):stop()
-	self:set_layer(20)
+	self:set_layer(self._layer or 20)
 	self:update_caret()
 	return true
 end
@@ -923,6 +1245,7 @@ function ChatGui:receive_message(name, message, color, icon)
 		blend_mode = "normal",
 		wrap = true,
 		word_wrap = true,
+		w = scroll_panel:w() - x,
 		color = color,
 		layer = 0
 	})
@@ -949,10 +1272,14 @@ function ChatGui:receive_message(name, message, color, icon)
 		output_panel:stop()
 		output_panel:animate(callback(self, self, "_animate_show_component"), output_panel:alpha())
 		output_panel:animate(callback(self, self, "_animate_fade_output"))
+		self:start_notify_new_message()
 	end
 end
 
 function ChatGui:_animate_fade_output()
+	if self._is_crimenet_chat then
+		return
+	end
 	local wait_t = 10
 	local fade_t = 1
 	local t = 0
@@ -1017,5 +1344,7 @@ function ChatGui:close(...)
 	self._panel:child("output_panel"):stop()
 	self._input_panel:stop()
 	self._hud_panel:remove(self._panel)
+	self._hud_panel:remove(self._hud_blur)
+	self._hud_panel:remove(self._hud_panel:child("chat_button_panel"))
 	managers.chat:unregister_receiver(self._channel_id, self)
 end

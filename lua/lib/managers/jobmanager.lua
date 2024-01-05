@@ -1058,6 +1058,33 @@ function JobManager:current_job_and_difficulty_stars()
 	return math.clamp(self:current_job_stars() + difficulty_id, 1, 10)
 end
 
+function JobManager:calculate_job_class(job_id, difficulty_id)
+	local job = tweak_data.narrative:get_job_name_from_index(job_id)
+	if job then
+		local job_jc = tweak_data.narrative.jobs[job].jc or 10
+		local difficulty_jc = math.max((difficulty_id or 1) - 2, 0) * 10
+		Application:debug("[calculate_job_class]", job_jc + difficulty_jc)
+		return job_jc + difficulty_jc
+	end
+	return 10
+end
+
+function JobManager:get_min_jc_for_player()
+	local data = tweak_data.narrative.STARS[math.clamp(managers.experience:level_to_stars(), 1, 10)]
+	if not data then
+		return
+	end
+	local jcs = data.jcs
+	if not jcs then
+		return
+	end
+	local min_jc = 100
+	for _, jc in ipairs(jcs) do
+		min_jc = math.min(min_jc, jc)
+	end
+	return min_jc
+end
+
 function JobManager:get_max_jc_for_player()
 	local data = tweak_data.narrative.STARS[math.clamp(managers.experience:level_to_stars(), 1, 10)]
 	if not data then

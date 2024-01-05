@@ -126,6 +126,11 @@ function EquipmentsTweakData:init()
 		action_message = "bank_manager_key_obtained",
 		sync_possession = true
 	}
+	self.specials.keychain = {
+		text_id = "hud_int_equipment_pickup_keychain",
+		icon = "equipment_generic_key",
+		sync_possession = true
+	}
 	self.specials.chavez_key = {
 		text_id = "debug_equipment_chavez_key",
 		icon = "equipment_chavez_key",
@@ -140,6 +145,11 @@ function EquipmentsTweakData:init()
 	}
 	self.specials.lance = {
 		text_id = "hud_equipment_lance",
+		icon = "equipment_drill",
+		sync_possession = true
+	}
+	self.specials.lance_part = {
+		text_id = "hud_equipment_lance_part",
 		icon = "equipment_drill",
 		sync_possession = true
 	}
@@ -195,10 +205,10 @@ function EquipmentsTweakData:init()
 		sync_possession = true
 	}
 	self.specials.c4 = {
-		text_id = "debug_equipment_c4",
-		icon = "equipment_c4",
+		text_id = "hud_equipment_pickup_c4",
+		icon = "pd2_c4",
 		action_message = "c4_obtained",
-		quantity = 3,
+		quantity = 4,
 		sync_possession = true
 	}
 	self.specials.organs = {

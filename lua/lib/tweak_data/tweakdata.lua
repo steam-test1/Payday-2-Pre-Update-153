@@ -27,6 +27,7 @@ require("lib/tweak_data/MoneyTweakData")
 require("lib/tweak_data/AssetsTweakData")
 require("lib/tweak_data/DLCTweakData")
 require("lib/tweak_data/InfamyTweakData")
+require("lib/tweak_data/GageAssignmentTweakData")
 TweakData = TweakData or class()
 require("lib/tweak_data/TweakDataPD2")
 TweakData.RELOAD = true
@@ -65,6 +66,22 @@ function TweakData:get_value(...)
 	elseif type(value) == "table" then
 		Application:debug("TweakData:get_value() value was a table, is this correct? returning false!", inspect(arg), inspect(value))
 		return false
+	end
+	return value
+end
+
+function TweakData:get_raw_value(...)
+	local arg = {
+		...
+	}
+	local value = self
+	local v
+	for i = 1, #arg do
+		v = arg[i]
+		if not value[v] then
+			return nil, v, i
+		end
+		value = value[v]
 	end
 	return value
 end
@@ -290,6 +307,7 @@ function TweakData:init()
 	self.assets = AssetsTweakData:new(self)
 	self.dlc = DLCTweakData:new(self)
 	self.infamy = InfamyTweakData:new(self)
+	self.gage_assignment = GageAssignmentTweakData:new(self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -855,6 +873,8 @@ function TweakData:init()
 	self.interaction.open_door_with_keys.sound_start = "bar_pick_lock"
 	self.interaction.open_door_with_keys.sound_interupt = "bar_pick_lock_cancel"
 	self.interaction.open_door_with_keys.sound_done = "bar_pick_lock_finished"
+	self.interaction.open_door_with_keys.special_equipment = "keychain"
+	self.interaction.open_door_with_keys.equipment_text_id = "hud_action_try_keys_no_key"
 	self.interaction.cant_pick_lock = {}
 	self.interaction.cant_pick_lock.icon = "equipment_bank_manager_key"
 	self.interaction.cant_pick_lock.text_id = "hud_int_pick_lock"
@@ -1028,6 +1048,38 @@ function TweakData:init()
 	self.interaction.security_station_keyboard.sound_start = "bar_keyboard"
 	self.interaction.security_station_keyboard.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.security_station_keyboard.sound_done = "bar_keyboard_finished"
+	self.interaction.big_computer_hackable = {}
+	self.interaction.big_computer_hackable.icon = "interaction_keyboard"
+	self.interaction.big_computer_hackable.text_id = "hud_int_big_computer_hackable"
+	self.interaction.big_computer_hackable.timer = 6
+	self.interaction.big_computer_hackable.axis = "z"
+	self.interaction.big_computer_hackable.start_active = false
+	self.interaction.big_computer_hackable.interact_distance = 150
+	self.interaction.big_computer_hackable.sound_start = "bar_keyboard"
+	self.interaction.big_computer_hackable.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.big_computer_hackable.sound_done = "bar_keyboard_finished"
+	self.interaction.big_computer_not_hackable = {}
+	self.interaction.big_computer_not_hackable.icon = "interaction_keyboard"
+	self.interaction.big_computer_not_hackable.text_id = "hud_int_big_computer_hackable"
+	self.interaction.big_computer_not_hackable.timer = 6
+	self.interaction.big_computer_not_hackable.axis = "z"
+	self.interaction.big_computer_not_hackable.start_active = false
+	self.interaction.big_computer_not_hackable.interact_distance = 150
+	self.interaction.big_computer_not_hackable.sound_start = "bar_keyboard"
+	self.interaction.big_computer_not_hackable.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.big_computer_not_hackable.sound_done = "bar_keyboard_finished"
+	self.interaction.big_computer_not_hackable.equipment_text_id = "hud_int_big_computer_unhackable"
+	self.interaction.big_computer_not_hackable.special_equipment = "nothing"
+	self.interaction.big_computer_server = {}
+	self.interaction.big_computer_server.icon = "interaction_keyboard"
+	self.interaction.big_computer_server.text_id = "hud_int_big_computer_server"
+	self.interaction.big_computer_server.timer = 6
+	self.interaction.big_computer_server.axis = "z"
+	self.interaction.big_computer_server.start_active = false
+	self.interaction.big_computer_server.interact_distance = 150
+	self.interaction.big_computer_server.sound_start = "bar_keyboard"
+	self.interaction.big_computer_server.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.big_computer_server.sound_done = "bar_keyboard_finished"
 	self.interaction.security_station_jammed = {}
 	self.interaction.security_station_jammed.icon = "interaction_keyboard"
 	self.interaction.security_station_jammed.text_id = "debug_interact_security_station_jammed"
@@ -1570,9 +1622,8 @@ function TweakData:init()
 	self.interaction.c4_special.axis = "z"
 	self.interaction.c4_special.action_text_id = "hud_action_placing_c4"
 	self.interaction.c4_bag = {}
-	self.interaction.c4_bag.icon = "equipment_c4"
 	self.interaction.c4_bag.text_id = "debug_interact_c4_bag"
-	self.interaction.c4_bag.timer = 2
+	self.interaction.c4_bag.timer = 8
 	self.interaction.c4_bag.contour = "interactable"
 	self.interaction.c4_bag.axis = "z"
 	self.interaction.c4_bag.sound_start = "bar_bag_generic"
@@ -1686,6 +1737,7 @@ function TweakData:init()
 	self.interaction.corpse_alarm_pager.action_text_id = "hud_action_disabling_alarm_pager"
 	self.interaction.corpse_alarm_pager.contour_preset = "generic_interactable"
 	self.interaction.corpse_alarm_pager.contour_preset_selected = "generic_interactable_selected"
+	self.interaction.corpse_alarm_pager.contour_flash_interval = 0.15
 	self.interaction.corpse_dispose = {}
 	self.interaction.corpse_dispose.icon = "develop"
 	self.interaction.corpse_dispose.text_id = "hud_int_dispose_corpse"
@@ -1888,6 +1940,13 @@ function TweakData:init()
 	self.interaction.exit_to_crimenet.text_id = "hud_int_exit_to_crimenet"
 	self.interaction.exit_to_crimenet.start_active = false
 	self.interaction.exit_to_crimenet.timer = 0.5
+	self.interaction.gage_assignment = {}
+	self.interaction.gage_assignment.icon = "develop"
+	self.interaction.gage_assignment.text_id = "debug_interact_gage_assignment_take"
+	self.interaction.gage_assignment.start_active = true
+	self.interaction.gage_assignment.timer = 1
+	self.interaction.gage_assignment.action_text_id = "hud_action_taking_gage_assignment"
+	self.interaction.gage_assignment.blocked_hint = "hint_gage_mods_dlc_block"
 	self.interaction.gen_pku_fusion_reactor = {}
 	self.interaction.gen_pku_fusion_reactor.text_id = "hud_int_hold_take_reaktor"
 	self.interaction.gen_pku_fusion_reactor.action_text_id = "hud_action_taking_reaktor"
@@ -2043,6 +2102,51 @@ function TweakData:init()
 	self.interaction.money_small.sound_start = "bar_bag_pour_money"
 	self.interaction.money_small.sound_interupt = "bar_bag_pour_money_cancel"
 	self.interaction.money_small.sound_done = "bar_bag_pour_money_finished"
+	self.interaction.shape_charge_plantable = {}
+	self.interaction.shape_charge_plantable.text_id = "debug_interact_c4"
+	self.interaction.shape_charge_plantable.action_text_id = "hud_action_placing_c4"
+	self.interaction.shape_charge_plantable.equipment_text_id = "debug_interact_equipment_c4"
+	self.interaction.shape_charge_plantable.special_equipment = "c4"
+	self.interaction.shape_charge_plantable.contour = "interactable_icon"
+	self.interaction.shape_charge_plantable.equipment_consume = true
+	self.interaction.shape_charge_plantable.timer = 4
+	self.interaction.shape_charge_plantable.sound_start = "bar_c4_apply"
+	self.interaction.shape_charge_plantable.sound_interupt = "bar_c4_apply_cancel"
+	self.interaction.shape_charge_plantable.sound_done = "bar_c4_apply_finished"
+	self.interaction.huge_lance = {}
+	self.interaction.huge_lance.contour = "contour_off"
+	self.interaction.huge_lance.text_id = "hud_int_equipment_lance"
+	self.interaction.huge_lance.action_text_id = "hud_action_placing_lance"
+	self.interaction.huge_lance.timer = 3
+	self.interaction.huge_lance.sound_start = "bar_huge_lance_fix"
+	self.interaction.huge_lance.sound_interupt = "bar_huge_lance_fix_cancel"
+	self.interaction.huge_lance.sound_done = "bar_huge_lance_fix_finished"
+	self.interaction.huge_lance_jammed = {}
+	self.interaction.huge_lance_jammed.text_id = "hud_int_equipment_huge_lance_jammed"
+	self.interaction.huge_lance_jammed.action_text_id = "hud_action_fixing_huge_lance"
+	self.interaction.huge_lance_jammed.special_equipment = "lance_part"
+	self.interaction.huge_lance_jammed.equipment_text_id = "hud_int_equipment_no_lance_part"
+	self.interaction.huge_lance_jammed.blocked_hint = "no_lance"
+	self.interaction.huge_lance_jammed.equipment_consume = true
+	self.interaction.huge_lance_jammed.timer = 10
+	self.interaction.huge_lance_jammed.sound_start = "bar_huge_lance_fix"
+	self.interaction.huge_lance_jammed.sound_interupt = "bar_huge_lance_fix_cancel"
+	self.interaction.huge_lance_jammed.sound_done = "bar_huge_lance_fix_finished"
+	self.interaction.gen_pku_lance_part = {}
+	self.interaction.gen_pku_lance_part.text_id = "hud_int_take_lance_part"
+	self.interaction.gen_pku_lance_part.special_equipment_block = "lance_part"
+	self.interaction.crane_joystick_left = {}
+	self.interaction.crane_joystick_left.text_id = "hud_int_crane_left"
+	self.interaction.crane_joystick_left.start_active = false
+	self.interaction.crane_joystick_lift = {}
+	self.interaction.crane_joystick_lift.text_id = "hud_int_crane_lift"
+	self.interaction.crane_joystick_lift.start_active = false
+	self.interaction.crane_joystick_right = {}
+	self.interaction.crane_joystick_right.text_id = "hud_int_crane_right"
+	self.interaction.crane_joystick_right.start_active = false
+	self.interaction.crane_joystick_release = {}
+	self.interaction.crane_joystick_release.text_id = "hud_int_crane_release"
+	self.interaction.crane_joystick_release.start_active = false
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2303,7 +2407,7 @@ function TweakData:init()
 		4000
 	}
 	self.experience_manager.stage_failed_multiplier = 0.1
-	self.experience_manager.in_custody_multiplier = 0.25
+	self.experience_manager.in_custody_multiplier = 0.7
 	self.experience_manager.difficulty_multiplier = {
 		2,
 		5,
@@ -2475,6 +2579,38 @@ function TweakData:init()
 	self.achievement.finally = {award = "gage2_8"}
 	self.achievement.demise_knuckles = "brass_knuckles"
 	self.achievement.vote_for_change = "g22c"
+	self.achievement.gage_assignments = {
+		green_mantis = "gmod_1_stats",
+		yellow_bull = "gmod_2_stats",
+		red_spider = "gmod_3_stats",
+		blue_eagle = "gmod_4_stats",
+		purple_snake = "gmod_5_stats"
+	}
+	self.achievement.gonna_find_them_all = 1
+	self.achievement.weapon_blueprints = {
+		gmod_7 = {
+			"wpn_fps_upg_fg_jp",
+			"wpn_fps_upg_m4_m_quad",
+			"wpn_fps_upg_ass_ns_jprifles"
+		},
+		gmod_8 = {
+			"wpn_fps_upg_o_rmr",
+			"wpn_fps_upg_pis_ns_flash"
+		},
+		gmod_9 = {
+			"wpn_fps_upg_fg_smr",
+			"wpn_fps_upg_ass_ns_surefire",
+			"wpn_fps_upg_o_eotech_xps",
+			"wpn_fps_upg_m4_s_crane",
+			"wpn_fps_upg_fl_ass_peq15"
+		},
+		gmod_10 = {
+			"wpn_fps_upg_fg_midwest",
+			"wpn_fps_upg_ak_b_draco",
+			"wpn_fps_upg_ak_m_quad",
+			"wpn_fps_upg_ass_ns_linear"
+		}
+	}
 	self.achievement.enemy_kill_achievements = {
 		try_out_your_usp = {
 			weapon = "usp",

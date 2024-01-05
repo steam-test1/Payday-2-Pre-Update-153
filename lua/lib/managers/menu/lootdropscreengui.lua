@@ -117,6 +117,7 @@ function LootDropScreenGui:close_network()
 		managers.menu_component:remove_game_chat()
 		managers.menu_component:close_chat_gui()
 		managers.job:deactivate_current_job()
+		managers.gage_assignment:deactivate_assignments()
 	end
 end
 

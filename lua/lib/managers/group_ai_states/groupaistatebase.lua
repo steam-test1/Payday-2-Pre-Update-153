@@ -1113,11 +1113,11 @@ end
 
 function GroupAIStateBase:on_enemy_unregistered(unit)
 	self._police_force = self._police_force - 1
-	self:sync_suspicion_hud(unit, false)
+	local u_key = unit:key()
+	self:_clear_character_criminal_suspicion_data(u_key)
 	if not Network:is_server() then
 		return
 	end
-	local u_key = unit:key()
 	local e_data = self._police[u_key]
 	if e_data.importance > 0 then
 		for c_key, c_data in pairs(self._player_criminals) do
@@ -1184,8 +1184,9 @@ function GroupAIStateBase:on_enemy_unregistered(unit)
 end
 
 function GroupAIStateBase:on_civilian_unregistered(unit)
-	self:sync_suspicion_hud(unit, false)
-	local u_data = managers.enemy:all_civilians()[unit:key()]
+	local u_key = unit:key()
+	self:_clear_character_criminal_suspicion_data(u_key)
+	local u_data = managers.enemy:all_civilians()[u_key]
 	if u_data and u_data.hostage_following then
 		self:on_hostage_follow(u_data.hostage_following, unit, false)
 	end
@@ -1275,10 +1276,11 @@ function GroupAIStateBase:unregister_criminal(unit)
 		end
 	end
 	if is_server and record.minions then
-		for u_key, minion_unit in pairs(record.minions) do
-			if alive(minion_unit) and not minion_unit:character_damage():dead() then
-				minion_unit:character_damage():damage_mission({damage = 1000})
-			end
+		local minions = clone(record.minions)
+		for u_key, u_data in pairs(minions) do
+			u_data.unit:character_damage():damage_mission({
+				damage = u_data.unit:character_damage()._HEALTH_INIT + 1
+			})
 		end
 		record.minions = nil
 	end
@@ -2487,6 +2489,9 @@ function GroupAIStateBase:set_whisper_mode(enabled)
 		managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_clbk_switch_enemies_to_not_cool"), self._t + 1)
 	end
 	self:_call_listeners("whisper_mode", enabled)
+	if not enabled then
+		self:_clear_criminal_suspicion_data()
+	end
 end
 
 function GroupAIStateBase:set_blackscreen_variant(variant)
@@ -3545,21 +3550,25 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 		return
 	end
 	local group = u_data.group
+	u_data.group = nil
 	if group then
 		self:_remove_group_member(group, u_key, nil)
 	end
 	self:set_enemy_assigned(nil, u_key)
 	u_data.is_converted = true
 	unit:brain():convert_to_criminal(peer_unit)
-	unit:character_damage():add_listener("Converted" .. tostring(player_unit:key()), {"death"}, callback(self, self, "clbk_minion_dies", player_unit:key()))
-	unit:base():add_destroy_listener("Converted" .. tostring(player_unit:key()), callback(self, self, "clbk_minion_destroyed", player_unit:key()))
+	local clbk_key = "Converted" .. tostring(player_unit:key())
+	u_data.minion_death_clbk_key = clbk_key
+	u_data.minion_destroyed_clbk_key = clbk_key
+	unit:character_damage():add_listener(clbk_key, {"death"}, callback(self, self, "clbk_minion_dies", player_unit:key()))
+	unit:base():add_destroy_listener(clbk_key, callback(self, self, "clbk_minion_destroyed", player_unit:key()))
 	if not unit:contour() then
 		debug_pause_unit(unit, "[GroupAIStateBase:convert_hostage_to_criminal]: Unit doesn't have Contour Extension")
 	end
 	unit:contour():add("friendly")
 	u_data.so_access = unit:brain():SO_access()
 	self._converted_police[u_key] = unit
-	minions[u_key] = unit
+	minions[u_key] = u_data
 	local convert_enemies_health_multiplier_level = 0
 	local passive_convert_enemies_health_multiplier_level = 0
 	if alive(peer_unit) then
@@ -3576,31 +3585,65 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	end
 end
 
-function GroupAIStateBase:clbk_minion_destroyed(player_key, my_unit)
-	if not self._converted_police[my_unit:key()] then
-		return
-	end
-	self:clbk_minion_dies(player_key, my_unit)
+function GroupAIStateBase:clbk_minion_destroyed(player_key, minion_unit)
+	local minion_key = minion_unit:key()
+	local owner_data = self._player_criminals[player_key]
+	local minion_data = owner_data.minions[minion_key]
+	minion_data.minion_destroyed_clbk_key = nil
+	self:remove_minion(minion_key, player_key)
 end
 
-function GroupAIStateBase:clbk_minion_dies(player_key, my_unit, damage_info)
-	if not self._converted_police[my_unit:key()] then
-		return
-	end
-	self._converted_police[my_unit:key()] = nil
+function GroupAIStateBase:clbk_minion_dies(player_key, minion_unit, damage_info)
 	if not self._criminals[player_key] then
-		Application:error("GroupAIStateBase:clbk_minion_dies", "Minion dies, but master do not exists", player_key, my_unit:key(), inspect(damage_info))
+		Application:error("GroupAIStateBase:clbk_minion_dies", "Minion dies, but master do not exist", player_key, minion_unit:key(), inspect(damage_info))
 		return
 	end
 	if not self._criminals[player_key].minions then
-		Application:error("GroupAIStateBase:clbk_minion_dies", "Master of minion do not have any minions", player_key, my_unit:key(), inspect(damage_info))
+		Application:error("GroupAIStateBase:clbk_minion_dies", "Master of minion do not have any minions", player_key, minion_unit:key(), inspect(damage_info))
 		return
 	end
-	if not self._criminals[player_key].minions[my_unit:key()] then
-		Application:error("GroupAIStateBase:clbk_minion_dies", "Master do no have this minion", player_key, my_unit:key(), inspect(damage_info))
+	if not self._criminals[player_key].minions[minion_unit:key()] then
+		Application:error("GroupAIStateBase:clbk_minion_dies", "Master does not have this minion", player_key, minion_unit:key(), inspect(damage_info))
 		return
 	end
-	self._criminals[player_key].minions[my_unit:key()] = nil
+	local minion_key = minion_unit:key()
+	local owner_data = self._player_criminals[player_key]
+	local minion_data = owner_data.minions[minion_key]
+	minion_data.minion_death_clbk_key = nil
+	self:remove_minion(minion_key, player_key)
+end
+
+function GroupAIStateBase:remove_minion(minion_key, player_key)
+	local minion_unit = self._converted_police[minion_key]
+	if not minion_unit then
+		return
+	end
+	if not player_key then
+		for u_key, u_data in pairs(self._player_criminals) do
+			if u_data.minions and u_data.minions[minion_key] then
+				player_key = u_key
+				break
+			end
+		end
+		if not player_key then
+			debug_pause_unit(minion_unit, "[GroupAIStateBase:remove_minion] could not find minion owner", minion_unit)
+		end
+	end
+	local owner_data = self._player_criminals[player_key]
+	local minion_data = owner_data.minions[minion_key]
+	if minion_data.minion_death_clbk_key then
+		minion_unit:character_damage():remove_listener(minion_data.minion_death_clbk_key)
+		minion_data.minion_death_clbk_key = nil
+	end
+	if minion_data.minion_destroyed_clbk_key then
+		minion_unit:base():remove_destroy_listener(minion_data.minion_destroyed_clbk_key)
+		minion_data.minion_destroyed_clbk_key = nil
+	end
+	self._converted_police[minion_key] = nil
+	self._criminals[player_key].minions[minion_key] = nil
+	if not next(self._criminals[player_key].minions) then
+		self._criminals[player_key].minions = nil
+	end
 	local member = managers.network:game():member_from_unit_key(player_key)
 	if member then
 		if member == Global.local_member then
@@ -4116,56 +4159,174 @@ function GroupAIStateBase:unregister_rescueable_hostage(u_key)
 	end
 end
 
+function GroupAIStateBase._create_hud_suspicion_icon(obs_key, u_observer, icon_name, color, icon_id)
+	local icon_pos = mvector3.copy(math.UP)
+	mvector3.multiply(icon_pos, 28)
+	mvector3.add(icon_pos, u_observer:movement() and u_observer:movement():m_head_pos() or u_observer:position())
+	local icon = managers.hud:add_waypoint(icon_id, {
+		icon = icon_name,
+		distance = false,
+		position = icon_pos,
+		no_sync = true,
+		present_timer = 0,
+		state = "sneak_present",
+		radius = 100,
+		color = color,
+		blend_mode = "add"
+	})
+	return icon_pos
+end
+
 function GroupAIStateBase:on_criminal_suspicion_progress(u_suspect, u_observer, status)
-	local susp_data = self._suspicion_hud_data
-	local obs_key = u_observer:key()
-	local obs_susp_data = susp_data[obs_key]
-	if not obs_susp_data and status and self._whisper_mode then
-		local icon_id = "susp" .. tostring(obs_key)
-		local icon_name = status == true and "wp_detected" or "wp_suspicious"
-		local color = status == true and tweak_data.hud.detected_color or tweak_data.hud.suspicion_color
-		local icon_pos = mvector3.copy(math.UP)
-		mvector3.multiply(icon_pos, 28)
-		mvector3.add(icon_pos, u_observer:movement() and u_observer:movement():m_head_pos() or u_observer:position())
-		local icon = managers.hud:add_waypoint(icon_id, {
-			icon = icon_name,
-			distance = false,
-			position = icon_pos,
-			no_sync = true,
-			present_timer = 0,
-			state = "sneak_present",
-			radius = 100,
-			color = color,
-			blend_mode = "add"
-		})
-		obs_susp_data = {
-			u_observer = u_observer,
-			icon_id = icon_id,
-			suspects = {},
-			icon_pos = icon_pos
-		}
-		susp_data[obs_key] = obs_susp_data
-		if managers.network:session() then
-			managers.network:session():send_to_peers_synched("suspicion_hud", u_observer, status == true and 2 or 1)
-		end
-	elseif not obs_susp_data then
+	if not self._ai_enabled or not self._whisper_mode then
 		return
 	end
-	local susp_key = u_suspect:key()
-	if status then
-		obs_susp_data.suspects[susp_key] = {
-			status = status,
-			u_suspect = u_suspect,
-			last_status_t = self._t
-		}
-	else
-		obs_susp_data.suspects[susp_key] = nil
+	local susp_data = self._suspicion_hud_data
+	local obs_key = u_observer:key()
+	local susp_key = u_suspect and u_suspect:key()
+	
+	local function _sync_status(sync_status_code)
+		if Network:is_server() and managers.network:session() then
+			managers.network:session():send_to_peers_synched("suspicion_hud", u_observer, sync_status_code)
+		end
 	end
-	if not next(obs_susp_data.suspects) then
-		managers.hud:remove_waypoint(obs_susp_data.icon_id)
-		susp_data[obs_key] = nil
-		if managers.network:session() then
-			managers.network:session():send_to_peers_synched("suspicion_hud", u_observer, 0)
+	
+	local obs_susp_data = susp_data[obs_key]
+	if status == "called" then
+		if obs_susp_data then
+			if status == obs_susp_data.status then
+				return
+			else
+				obs_susp_data.suspects = nil
+			end
+		else
+			local icon_id = "susp1" .. tostring(obs_key)
+			local icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_calling_in", tweak_data.hud.suspicion_color, icon_id)
+			obs_susp_data = {
+				u_observer = u_observer,
+				icon_id = icon_id,
+				icon_pos = icon_pos
+			}
+			susp_data[obs_key] = obs_susp_data
+		end
+		managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_calling_in")
+		managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.detected_color)
+		if obs_susp_data.icon_id2 then
+			managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+			obs_susp_data.icon_id2 = nil
+			obs_susp_data.icon_pos2 = nil
+		end
+		obs_susp_data.status = "called"
+		obs_susp_data.alerted = true
+		obs_susp_data.expire_t = self._t + 8
+		obs_susp_data.persistent = true
+		_sync_status(4)
+	elseif status == "calling" then
+		if obs_susp_data then
+			if status == obs_susp_data.status then
+				return
+			else
+				obs_susp_data.suspects = nil
+			end
+		else
+			local icon_id = "susp1" .. tostring(obs_key)
+			local icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_calling_in", tweak_data.hud.detected_color, icon_id)
+			obs_susp_data = {
+				u_observer = u_observer,
+				icon_id = icon_id,
+				icon_pos = icon_pos
+			}
+			susp_data[obs_key] = obs_susp_data
+		end
+		if not obs_susp_data.icon_id2 then
+			local hazard_icon_id = "susp2" .. tostring(obs_key)
+			local hazard_icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_calling_in_hazard", tweak_data.hud.detected_color, hazard_icon_id)
+			obs_susp_data.icon_id2 = hazard_icon_id
+			obs_susp_data.icon_pos2 = hazard_icon_pos
+		end
+		managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_calling_in")
+		managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.detected_color)
+		managers.hud:change_waypoint_icon(obs_susp_data.icon_id2, "wp_calling_in_hazard")
+		managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id2, tweak_data.hud.detected_color)
+		obs_susp_data.status = "calling"
+		obs_susp_data.alerted = true
+		_sync_status(3)
+	elseif status == true or status == "call_interrupted" then
+		if obs_susp_data then
+			if obs_susp_data.status == status then
+				return
+			else
+				obs_susp_data.suspects = nil
+			end
+		else
+			local icon_id = "susp1" .. tostring(obs_key)
+			local icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_detected", tweak_data.hud.detected_color, icon_id)
+			obs_susp_data = {
+				u_observer = u_observer,
+				icon_id = icon_id,
+				icon_pos = icon_pos
+			}
+			susp_data[obs_key] = obs_susp_data
+		end
+		managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_detected")
+		managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.detected_color)
+		if obs_susp_data.icon_id2 then
+			managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+			obs_susp_data.icon_id2 = nil
+			obs_susp_data.icon_pos2 = nil
+		end
+		obs_susp_data.status = status
+		obs_susp_data.alerted = true
+		_sync_status(2)
+	elseif not status then
+		if obs_susp_data then
+			if obs_susp_data.suspects and susp_key then
+				obs_susp_data.suspects[susp_key] = nil
+				if not next(obs_susp_data.suspects) then
+					obs_susp_data.suspects = nil
+				end
+			end
+			if not susp_key or not obs_susp_data.alerted and (not obs_susp_data.suspects or not next(obs_susp_data.suspects)) then
+				managers.hud:remove_waypoint(obs_susp_data.icon_id)
+				if obs_susp_data.icon_id2 then
+					managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+				end
+				if susp_key then
+					susp_data[obs_key] = nil
+				end
+				_sync_status(0)
+			end
+		end
+	else
+		if obs_susp_data then
+			if obs_susp_data.alerted then
+				return
+			end
+		elseif not obs_susp_data then
+			local icon_id = "susp1" .. tostring(obs_key)
+			local icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_suspicious", tweak_data.hud.suspicion_color, icon_id)
+			obs_susp_data = {
+				u_observer = u_observer,
+				icon_id = icon_id,
+				suspects = {},
+				icon_pos = icon_pos
+			}
+			susp_data[obs_key] = obs_susp_data
+			managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_suspicious")
+			managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.suspicion_color)
+			if obs_susp_data.icon_id2 then
+				managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+				obs_susp_data.icon_id2 = nil
+				obs_susp_data.icon_pos2 = nil
+			end
+			_sync_status(1)
+		end
+		if susp_key then
+			if obs_susp_data.suspects[susp_key] then
+				obs_susp_data.suspects[susp_key].status = status
+			else
+				obs_susp_data.suspects[susp_key] = {status = status, u_suspect = u_suspect}
+			end
 		end
 	end
 end
@@ -4175,100 +4336,47 @@ function GroupAIStateBase:_upd_criminal_suspicion_progress()
 	if not next(susp_data) or not self._ai_enabled then
 		return
 	end
-	local t = self._t
 	for obs_key, obs_susp_data in pairs(susp_data) do
-		if Network:is_server() then
-			local critical_icon, to_remove
-			for susp_key, suspect_data in pairs(obs_susp_data.suspects) do
-				if not self._whisper_mode then
-					to_remove = to_remove or {}
-					table.insert(to_remove, susp_key)
-				elseif suspect_data.status == true then
-					repeat
-						do break end -- pseudo-goto
-						if t - suspect_data.last_status_t > 8 then
-							to_remove = to_remove or {}
-							table.insert(to_remove, susp_key)
-					until true
-					else
-						critical_icon = true
-					end
-				end
-			end
-			if to_remove then
-				for _, susp_key in ipairs(to_remove) do
-					obs_susp_data.suspects[susp_key] = nil
-				end
-			end
-			if not next(obs_susp_data.suspects) then
-				managers.hud:remove_waypoint(obs_susp_data.icon_id)
-				susp_data[obs_key] = nil
-				managers.network:session():send_to_peers_synched("suspicion_hud", obs_susp_data.u_observer, 0)
-			else
-				if critical_icon then
-					if not obs_susp_data.critical_icon then
-						obs_susp_data.critical_icon = true
-						managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_detected")
-						managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.detected_color)
-						managers.network:session():send_to_peers_synched("suspicion_hud", obs_susp_data.u_observer, 2)
-					end
-				elseif obs_susp_data.critical_icon then
-					obs_susp_data.critical_icon = nil
-					managers.hud:change_waypoint_icon(obs_susp_data.icon_id, "wp_suspicious")
-					managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, tweak_data.hud.suspicion_color)
-					managers.network:session():send_to_peers_synched("suspicion_hud", obs_susp_data.u_observer, 1)
-				end
-				if obs_susp_data.u_observer:movement() then
-					mvector3.set(obs_susp_data.icon_pos, math.UP)
-					mvector3.multiply(obs_susp_data.icon_pos, 28)
-					mvector3.add(obs_susp_data.icon_pos, obs_susp_data.u_observer:movement():m_head_pos())
-				end
-			end
-		elseif obs_susp_data.u_observer:movement() then
+		if obs_susp_data.u_observer:movement() then
 			mvector3.set(obs_susp_data.icon_pos, math.UP)
 			mvector3.multiply(obs_susp_data.icon_pos, 28)
 			mvector3.add(obs_susp_data.icon_pos, obs_susp_data.u_observer:movement():m_head_pos())
+			if obs_susp_data.icon_pos2 then
+				mvector3.set(obs_susp_data.icon_pos2, obs_susp_data.icon_pos)
+			end
+		end
+		if obs_susp_data.status == "calling" and obs_susp_data.icon_pos2 then
+			local alpha = math.sin(self._t * 180 * 4.5)
+			managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id2, tweak_data.hud.detected_color:with_alpha(alpha))
+			managers.hud:change_waypoint_icon_alpha(obs_susp_data.icon_id2, alpha)
+		elseif obs_susp_data.expire_t and self._t > obs_susp_data.expire_t then
+			self:_clear_character_criminal_suspicion_data(obs_key)
 		end
 	end
 end
 
-function GroupAIStateBase:sync_suspicion_hud(u_observer, status)
-	local susp_data = self._suspicion_hud_data
-	local obs_key = u_observer:key()
-	local obs_susp_data = susp_data[obs_key]
-	if status then
-		local icon_name = status == true and "wp_detected" or "wp_suspicious"
-		local color = status == true and tweak_data.hud.detected_color or tweak_data.hud.suspicion_color
-		if not obs_susp_data then
-			local icon_id = "susp" .. tostring(obs_key)
-			local icon_pos = mvector3.copy(math.UP)
-			mvector3.multiply(icon_pos, 28)
-			mvector3.add(icon_pos, u_observer:movement() and u_observer:movement():m_head_pos() or u_observer:position())
-			local icon = managers.hud:add_waypoint(icon_id, {
-				icon = icon_name,
-				distance = false,
-				position = icon_pos,
-				no_sync = true,
-				present_timer = 0,
-				state = "sneak_present",
-				radius = 100,
-				color = color,
-				blend_mode = "add"
-			})
-			obs_susp_data = {
-				u_observer = u_observer,
-				icon_id = icon_id,
-				icon_pos = icon_pos
-			}
-			susp_data[obs_key] = obs_susp_data
-		else
-			managers.hud:change_waypoint_icon(obs_susp_data.icon_id, icon_name)
-			managers.hud:change_waypoint_arrow_color(obs_susp_data.icon_id, color)
+function GroupAIStateBase:_clear_criminal_suspicion_data()
+	for obs_key, obs_susp_data in pairs(self._suspicion_hud_data) do
+		if not obs_susp_data.persistent then
+			managers.hud:remove_waypoint(obs_susp_data.icon_id)
+			if obs_susp_data.icon_id2 then
+				managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+			end
+			self._suspicion_hud_data[obs_key] = nil
 		end
-	elseif obs_susp_data then
-		managers.hud:remove_waypoint(obs_susp_data.icon_id)
-		susp_data[obs_key] = nil
 	end
+end
+
+function GroupAIStateBase:_clear_character_criminal_suspicion_data(obs_key)
+	local obs_susp_data = self._suspicion_hud_data[obs_key]
+	if not obs_susp_data then
+		return
+	end
+	managers.hud:remove_waypoint(obs_susp_data.icon_id)
+	if obs_susp_data.icon_id2 then
+		managers.hud:remove_waypoint(obs_susp_data.icon_id2)
+	end
+	self._suspicion_hud_data[obs_key] = nil
 end
 
 function GroupAIStateBase:get_nr_successful_alarm_pager_bluffs()

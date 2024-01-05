@@ -690,9 +690,9 @@ function CopActionAct:_sync_anim_play()
 					yaw = 360 + yaw
 				end
 				local sync_yaw = 1 + math.ceil(yaw * 254 / 360)
-				self._common_data.ext_network:send("action_act_start_align", action_index, self._blocks.heavy_hurt and true or false, sync_yaw, mvector3.copy(self._common_data.pos))
+				self._common_data.ext_network:send("action_act_start_align", action_index, self._blocks.heavy_hurt and true or false, self._action_desc.clamp_to_graph or false, sync_yaw, mvector3.copy(self._common_data.pos))
 			else
-				self._common_data.ext_network:send("action_act_start", action_index, self._blocks.heavy_hurt and true or false)
+				self._common_data.ext_network:send("action_act_start", action_index, self._blocks.heavy_hurt and true or false, self._action_desc.clamp_to_graph or false)
 			end
 		else
 			print("[CopActionAct:_sync_anim_play] redirect", self._action_desc.variant, "not found")

@@ -45,6 +45,7 @@ function MenuManager:on_leave_active_job()
 	managers.statistics:stop_session()
 	managers.savefile:save_progress()
 	managers.job:deactivate_current_job()
+	managers.gage_assignment:deactivate_assignments()
 	if managers.groupai then
 		managers.groupai:state():set_AI_enabled(false)
 	end

@@ -1419,9 +1419,9 @@ end
 function MenuSceneManager:change_fov(zoom, amount)
 	if self._current_scene_template == "blackmarket_item" or self._current_scene_template == "blackmarket_mask" then
 		if zoom == "in" then
-			self._fov_mod = math.clamp((self._fov_mod or 0) + (amount or 0.45), -20, 1)
+			self._fov_mod = math.clamp((self._fov_mod or 0) + (amount or 0.45), tweak_data.gui.mod_preview_min_fov, tweak_data.gui.mod_preview_max_fov)
 		elseif zoom == "out" then
-			self._fov_mod = math.clamp((self._fov_mod or 0) - (amount or 0.45), -20, 1)
+			self._fov_mod = math.clamp((self._fov_mod or 0) - (amount or 0.45), tweak_data.gui.mod_preview_min_fov, tweak_data.gui.mod_preview_max_fov)
 		end
 	end
 end

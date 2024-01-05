@@ -286,8 +286,8 @@ end
 
 function PlayerTased:clbk_exit_to_std()
 	self._recover_delayed_clbk = nil
-	Application:debug("PlayerTased:clbk_exit_to_std(), game_state_machine:current_state_name()", game_state_machine:current_state_name())
-	if game_state_machine:current_state_name() == "ingame_electrified" then
+	Application:debug("PlayerTased:clbk_exit_to_std(), game_state_machine:last_queued_state_name()", game_state_machine:last_queued_state_name())
+	if game_state_machine:last_queued_state_name() == "ingame_electrified" and managers.network:session() then
 		managers.player:set_player_state("standard")
 	end
 end
@@ -298,7 +298,7 @@ function PlayerTased:on_tase_ended()
 		managers.enemy:remove_delayed_clbk(self._fatal_delayed_clbk)
 		self._fatal_delayed_clbk = nil
 	end
-	if not self._recover_delayed_clbk then
+	if not self._recover_delayed_clbk and game_state_machine:last_queued_state_name() == "ingame_electrified" and managers.network:session() then
 		self._recover_delayed_clbk = "PlayerTased_recover_delayed_clbk"
 		managers.enemy:add_delayed_clbk(self._recover_delayed_clbk, callback(self, self, "clbk_exit_to_std"), managers.player:player_timer():time() + tweak_data.player.damage.TASED_RECOVER_TIME)
 	end

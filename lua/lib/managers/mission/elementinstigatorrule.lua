@@ -7,7 +7,7 @@ function ElementInstigatorRule:init(...)
 		for rule, data in pairs(rules) do
 			local restructured_data = {}
 			for _, value in ipairs(data) do
-				if rule == "enemy_names" then
+				if rule == "enemy_names" or rule == "civilian_names" then
 					restructured_data[Idstring(value):key()] = true
 				else
 					restructured_data[value] = true
@@ -89,6 +89,9 @@ end
 
 function ElementInstigatorRule:_check_civilians_rules(rules, instigator)
 	for rule, data in pairs(rules) do
+		if rule == "civilian_names" and not data[instigator:name():key()] then
+			return false
+		end
 		if rule == "pickup" and not data[instigator:character_damage():pickup()] then
 			return false
 		end

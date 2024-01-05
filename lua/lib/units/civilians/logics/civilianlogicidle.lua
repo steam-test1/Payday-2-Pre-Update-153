@@ -162,14 +162,16 @@ function CivilianLogicIdle.on_alert(data, alert_data)
 	if alert_data[5] then
 		local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, alert_data[5]:key())
 	end
-	my_dis = my_dis or alert_epicenter and mvector3.distance(my_listen_pos, alert_epicenter) or 3000
-	alert_delay = math.lerp(1, 4, math.min(1, my_dis / 2000)) * math.random()
-	if not my_data.delayed_alert_id then
-		my_data.delayed_alert_id = "alert" .. tostring(data.key)
-		CopLogicBase.add_delayed_clbk(my_data, my_data.delayed_alert_id, callback(CivilianLogicIdle, CivilianLogicIdle, "_delayed_alert_clbk", {
-			data = data,
-			alert_data = clone(alert_data)
-		}), TimerManager:game():time() + alert_delay)
+	if my_data == data.internal_data then
+		my_dis = my_dis or alert_epicenter and mvector3.distance(my_listen_pos, alert_epicenter) or 3000
+		alert_delay = math.lerp(1, 4, math.min(1, my_dis / 2000)) * math.random()
+		if not my_data.delayed_alert_id then
+			my_data.delayed_alert_id = "alert" .. tostring(data.key)
+			CopLogicBase.add_delayed_clbk(my_data, my_data.delayed_alert_id, callback(CivilianLogicIdle, CivilianLogicIdle, "_delayed_alert_clbk", {
+				data = data,
+				alert_data = clone(alert_data)
+			}), TimerManager:game():time() + alert_delay)
+		end
 	end
 end
 

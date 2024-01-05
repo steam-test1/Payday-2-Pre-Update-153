@@ -34,6 +34,7 @@ do
 		"civ_female_casual_3",
 		"civ_female_casual_4",
 		"civ_female_casual_5",
+		"civ_female_casual_6",
 		"civ_female_crackwhore_1",
 		"civ_female_hostess_apron_1",
 		"civ_female_hostess_jacket_1",

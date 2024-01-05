@@ -30,6 +30,7 @@ end
 
 function WeaponFactoryManager:_read_factory_data()
 	self._parts_by_type = {}
+	local weapon_data = tweak_data.weapon
 	for id, data in pairs(tweak_data.weapon.factory.parts) do
 		self._parts_by_type[data.type] = self._parts_by_type[data.type] or {}
 		self._parts_by_type[data.type][id] = true
@@ -43,13 +44,40 @@ function WeaponFactoryManager:_read_factory_data()
 				local type = tweak_data.weapon.factory.parts[part_id].type
 				self._parts_by_weapon[factory_id][type] = self._parts_by_weapon[factory_id][type] or {}
 				table.insert(self._parts_by_weapon[factory_id][type], part_id)
-				if not string.match(factory_id, "_npc") then
+				if not string.match(factory_id, "_npc") and weapon_data[self:get_weapon_id_by_factory_id(factory_id)] then
 					self._part_used_by_weapons[part_id] = self._part_used_by_weapons[part_id] or {}
 					table.insert(self._part_used_by_weapons[part_id], factory_id)
 				end
 			end
 		end
 	end
+end
+
+function WeaponFactoryManager:get_all_weapon_categories()
+	local weapon_categories = {}
+	local weapon_data = tweak_data.weapon
+	local category
+	for factory_id, data in pairs(tweak_data.weapon.factory) do
+		if factory_id ~= "parts" and not string.match(factory_id, "_npc") and weapon_data[self:get_weapon_id_by_factory_id(factory_id)] then
+			category = weapon_data[self:get_weapon_id_by_factory_id(factory_id)].category
+			weapon_categories[category] = weapon_categories[category] or {}
+			table.insert(weapon_categories[category], factory_id)
+		end
+	end
+	return weapon_categories
+end
+
+function WeaponFactoryManager:get_all_weapon_families()
+	local weapon_families = {}
+	local weapon_data = tweak_data.weapon
+	for factory_id, data in pairs(tweak_data.weapon.factory) do
+		if factory_id ~= "parts" and not string.match(factory_id, "_npc") and weapon_data[self:get_weapon_id_by_factory_id(factory_id)] and data.family then
+			weapon_families[data.family] = weapon_families[data.family] or {}
+			table.insert(weapon_families[data.family], factory_id)
+		else
+		end
+	end
+	return weapon_families
 end
 
 function WeaponFactoryManager:get_weapons_uses_part(part_id)
@@ -63,6 +91,13 @@ function WeaponFactoryManager:get_weapon_id_by_factory_id(factory_id)
 		return
 	end
 	return upgrade.weapon_id
+end
+
+function WeaponFactoryManager:get_weapon_name_by_weapon_id(weapon_id)
+	if not tweak_data.weapon[weapon_id] then
+		return
+	end
+	return managers.localization:text(tweak_data.weapon[weapon_id].name_id)
 end
 
 function WeaponFactoryManager:get_weapon_name_by_factory_id(factory_id)
@@ -200,6 +235,38 @@ function WeaponFactoryManager:_preload_parts(factory_id, factory_weapon, bluepri
 	end
 	done_cb(parts, blueprint)
 	return parts, blueprint
+end
+
+function WeaponFactoryManager:get_assembled_blueprint(factory_id, blueprint)
+	local assembled_blueprint = {}
+	local factory = tweak_data.weapon.factory
+	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	local override = self:_get_override_parts(factory_id, blueprint)
+	for _, part_id in ipairs(blueprint) do
+		if not forbidden[part_id] then
+			local part = self:_part_data(part_id, factory_id, override)
+			local original_part = factory.parts[part_id] or part
+			if factory[factory_id].adds and factory[factory_id].adds[part_id] then
+				local add_blueprint = self:get_assembled_blueprint(factory_id, factory[factory_id].adds[part_id]) or {}
+				for i, d in ipairs(add_blueprint) do
+					table.insert(assembled_blueprint, d)
+				end
+			end
+			if part.adds_type then
+				for _, add_type in ipairs(part.adds_type) do
+					local add_id = factory[factory_id][add_type]
+					table.insert(assembled_blueprint, add_id)
+				end
+			end
+			if part.adds then
+				for _, add_id in ipairs(part.adds) do
+					table.insert(assembled_blueprint, add_id)
+				end
+			end
+			table.insert(assembled_blueprint, part_id)
+		end
+	end
+	return assembled_blueprint
 end
 
 function WeaponFactoryManager:_preload_part(factory_id, part_id, forbidden, override, parts, third_person, need_parent, only_record)
@@ -425,16 +492,19 @@ function WeaponFactoryManager:_add_part(p_unit, factory_id, part_id, forbidden, 
 	local ids_unit_name = Idstring(unit_name)
 	local package
 	if not third_person then
-		package = "packages/fps_weapon_parts/" .. part_id
-		if DB:has(Idstring("package"), Idstring(package)) then
-			print("HAS PART AS PACKAGE")
-			self:load_package(package)
-		else
-			Application:error("Expected weapon part packages for", part_id)
-			package = nil
+		local tweak_unit_name = tweak_data:get_raw_value("weapon", "factory", "parts", part_id, "unit")
+		local ids_tweak_unit_name = tweak_unit_name and Idstring(tweak_unit_name)
+		if ids_tweak_unit_name and ids_tweak_unit_name == ids_unit_name then
+			package = "packages/fps_weapon_parts/" .. part_id
+			if DB:has(Idstring("package"), Idstring(package)) then
+				print("HAS PART AS PACKAGE")
+				self:load_package(package)
+			else
+				Application:error("Expected weapon part packages for", part_id)
+				package = nil
+			end
 		end
 	end
-	print(package, ids_unit, ids_unit_name)
 	if not package then
 		managers.dyn_resource:load(ids_unit, ids_unit_name, "packages/dyn_resources", false)
 	end
@@ -477,12 +547,13 @@ function WeaponFactoryManager:unload_package(package)
 	end
 end
 
-function WeaponFactoryManager:get_parts_from_weapon_by_type_or_perk(type_or_perk, parts)
+function WeaponFactoryManager:get_parts_from_weapon_by_type_or_perk(type_or_perk, factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local type_parts = {}
-	for id, data in pairs(parts) do
-		if factory.parts[id].type == type_or_perk or factory.parts[id].perks and table.contains(factory.parts[id].perks, type_or_perk) then
-			table.insert(type_parts, parts[id])
+	for _, id in ipairs(self:get_assembled_blueprint(factory_id, blueprint)) do
+		local part = self:_part_data(id, factory_id)
+		if part.type == type_or_perk or part.perks and table.contains(part.perks, type_or_perk) then
+			table.insert(type_parts, id)
 		end
 	end
 	return type_parts

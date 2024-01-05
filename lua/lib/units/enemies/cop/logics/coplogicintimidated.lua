@@ -10,7 +10,7 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.aggressor_unit = enter_params.aggressor_unit
+	my_data.aggressor_unit = enter_params and enter_params.aggressor_unit
 	if data.attention_obj then
 		CopLogicBase._set_attention_obj(data, nil, nil)
 	end
@@ -309,6 +309,9 @@ function CopLogicIntimidated._do_tied(data, aggressor_unit)
 		data.unit:interaction():set_tweak_data("hostage_convert")
 		data.unit:interaction():set_active(true, true, false)
 	end
+	if data.unit:unit_data().mission_element then
+		data.unit:unit_data().mission_element:event("tied", data.unit)
+	end
 	if aggressor_unit then
 		data.unit:character_damage():drop_pickup()
 		data.unit:character_damage():set_pickup(nil)
@@ -323,6 +326,7 @@ function CopLogicIntimidated._do_tied(data, aggressor_unit)
 			})
 		end
 	end
+	managers.groupai:state():on_criminal_suspicion_progress(nil, data.unit, nil)
 end
 
 function CopLogicIntimidated.on_enemy_weapons_hot(data)

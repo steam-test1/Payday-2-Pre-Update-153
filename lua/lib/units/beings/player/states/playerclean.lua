@@ -32,7 +32,7 @@ function PlayerClean:_enter(enter_data)
 			"enemy_weapons_hot"
 		}, callback(self, self, "clbk_enemy_weapons_hot"))
 	end
-	self._ext_network:send("set_stance", 1)
+	self._ext_network:send("set_stance", 1, false, false)
 end
 
 function PlayerClean:exit(state_data, new_state_name)

@@ -63,6 +63,11 @@ function HUDManager:init()
 	HUDManager.HIDEABLE_HUDS[PlayerBase.PLAYER_DOWNED_HUD:key()] = true
 	HUDManager.HIDEABLE_HUDS[IngameWaitingForRespawnState.GUI_SPECTATOR:key()] = true
 	HUDManager.HIDEABLE_HUDS[Idstring("guis/mask_off_hud"):key()] = true
+	if Global.debug_show_coords then
+		self:debug_show_coordinates()
+	else
+		self:debug_hide_coordinates()
+	end
 	self._visible_huds_states = {}
 end
 
@@ -1128,6 +1133,17 @@ function HUDManager:change_waypoint_icon(id, icon)
 		32
 	})
 	wp_data.bitmap:set_image(texture, rect[1], rect[2], rect[3], rect[4])
+	wp_data.bitmap:set_size(rect[3], rect[4])
+	wp_data.size = Vector3(rect[3], rect[4])
+end
+
+function HUDManager:change_waypoint_icon_alpha(id, alpha)
+	if not self._hud.waypoints[id] then
+		Application:error("[HUDManager:change_waypoint_icon] no waypoint with id", id)
+		return
+	end
+	local wp_data = self._hud.waypoints[id]
+	wp_data.bitmap:set_alpha(alpha)
 end
 
 function HUDManager:change_waypoint_arrow_color(id, color)

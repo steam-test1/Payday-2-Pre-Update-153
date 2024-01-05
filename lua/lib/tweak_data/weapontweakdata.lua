@@ -1993,7 +1993,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.use_data.selection_index = 1
 	self.akmsu.DAMAGE = 1
 	self.akmsu.CLIP_AMMO_MAX = 30
-	self.akmsu.NR_CLIPS_MAX = math.round(total_damage_secondary / 2.75 / self.akmsu.CLIP_AMMO_MAX)
+	self.akmsu.NR_CLIPS_MAX = math.round(total_damage_secondary / 2 / self.akmsu.CLIP_AMMO_MAX)
 	self.akmsu.AMMO_MAX = self.akmsu.CLIP_AMMO_MAX * self.akmsu.NR_CLIPS_MAX
 	self.akmsu.AMMO_PICKUP = self:_pickup_chance(self.akmsu.AMMO_MAX, 1)
 	self.akmsu.FIRE_MODE = "auto"
@@ -2042,7 +2042,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.challenges.weapon = "ak47"
 	self.akmsu.stats = {
 		damage = 11,
-		spread = 7,
+		spread = 5,
 		recoil = 6,
 		spread_moving = 9,
 		zoom = 3,

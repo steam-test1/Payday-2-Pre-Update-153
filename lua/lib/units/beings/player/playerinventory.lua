@@ -429,7 +429,7 @@ function PlayerInventory:show_equipped_unit()
 		self._available_selections[self._equipped_selection].unit:set_visible(true)
 		self._available_selections[self._equipped_selection].unit:base():on_enabled()
 		if self._was_gadget_on then
-			self._available_selections[self._equipped_selection].unit:base():gadget_on()
+			self._available_selections[self._equipped_selection].unit:base():set_gadget_on(self._was_gadget_on)
 			self._was_gadget_on = nil
 		end
 	end

@@ -1569,7 +1569,7 @@ function NavigationManager:draw_path(path, color_link, color_node, duration)
 		color_link = color_link and Color(unpack(color_link)) or Color(0.1, math.random(), math.random(), math.random())
 		local brush_node = Draw:brush(color_node, duration)
 		local brush_link = Draw:brush(color_link, duration)
-		brush_node:sphere(path[1], 15)
+		brush_node:sphere(CopActionWalk._nav_point_pos(path[1]), 15)
 		for i = 2, #path do
 			if path[i].x then
 				brush_node:sphere(path[i], 8)
@@ -1580,7 +1580,7 @@ function NavigationManager:draw_path(path, color_link, color_node, duration)
 				end
 			else
 				local start_pos = CopActionWalk._nav_point_pos(path[i])
-				local end_pos = start_pos + path[i].element:value("rotation"):y() * 100
+				local end_pos = start_pos + Rotation(path[i].element:value("rotation"), 0, 0):y() * 100
 				brush_node:sphere(start_pos, 8)
 				brush_node:sphere(end_pos, 8)
 				brush_link:cone(end_pos, start_pos, 30)
@@ -1826,6 +1826,7 @@ function NavigationManager:send_nav_field_to_engine()
 	end
 	local nav_field = World:quad_field()
 	nav_field:set_navfield(send_data, callback(self, self, "clbk_navfield"))
+	nav_field:set_nav_link_filter(NavigationManager.ACCESS_FLAGS)
 end
 
 function NavigationManager:_strip_nav_field_for_gameplay()

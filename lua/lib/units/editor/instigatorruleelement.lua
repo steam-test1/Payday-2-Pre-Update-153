@@ -107,6 +107,16 @@ function InstigatorRuleUnitElement:_update_rules_panel(panel, panel_sizer)
 		}
 		local pickup = CoreEws.list_selector(pickups_params)
 	elseif instigator == "civilians" then
+		local civilian_names_params = {
+			name = "Civilian name:",
+			panel = panel,
+			sizer = panel_sizer,
+			options = SpawnCivilianUnitElement._options,
+			value = self._hed.rules[instigator] and self._hed.rules[instigator].civilian_names,
+			tooltip = "Select civilian names rules",
+			updated_callback = callback(self, self, "_rule_updated", "civilian_names")
+		}
+		local states = CoreEws.list_selector(civilian_names_params)
 		local pickups_params = {
 			name = "Pickup:",
 			panel = panel,

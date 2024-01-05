@@ -147,14 +147,28 @@ function ContourExt:change_color(type, color)
 	end
 end
 
-function ContourExt:flash(type, frequency)
+function ContourExt:flash(type_or_id, frequency)
+	if not self._contour_list then
+		return
+	end
 	for i, setup in ipairs(self._contour_list) do
-		if setup.type == type then
+		if setup.type == type_or_id or setup == type_or_id then
 			setup.flash_frequency = frequency and 0 < frequency and frequency or nil
 			setup.flash_t = setup.flash_frequency and TimerManager:game():time() + setup.flash_frequency or nil
 			setup.flash_on = nil
 			self:_chk_update_state()
 			break
+		end
+	end
+end
+
+function ContourExt:is_flashing()
+	if not self._contour_list then
+		return
+	end
+	for i, setup in ipairs(self._contour_list) do
+		if setup.flash_frequency then
+			return true
 		end
 	end
 end
@@ -303,6 +317,8 @@ function ContourExt:_apply_top_preset()
 			managers.occlusion:remove_occlusion(self._unit)
 			self._unit:base():set_allow_invisible(false)
 		end
+		self._materials = nil
+		self._last_opacity = nil
 	else
 		managers.occlusion:remove_occlusion(self._unit)
 	end

@@ -334,7 +334,7 @@ function BaseInteractionExt:active()
 	return self._active
 end
 
-function BaseInteractionExt:set_active(active, sync, sync_by_id)
+function BaseInteractionExt:set_active(active, sync)
 	if not active and self._active then
 		managers.interaction:remove_object(self._unit)
 		if self._tweak_data.contour_preset or self._tweak_data.contour_preset_selected then
@@ -365,16 +365,24 @@ function BaseInteractionExt:set_active(active, sync, sync_by_id)
 		self:set_contour("standard_color")
 	end
 	if sync and managers.network:session() then
-		if self._unit:id() == -1 then
+		local u_id = self._unit:id()
+		if u_id == -1 then
 			local u_data = managers.enemy:get_corpse_unit_data_from_key(self._unit:key())
 			if u_data then
-				managers.network:session():send_to_peers_synched("sync_interaction_set_active_by_id", u_data.u_id, active, self.tweak_data)
+				u_id = u_data.u_id
+			else
+				debug_pause_unit(self._unit, "[BaseInteractionExt:set_active] could not sync interaction state.", self._unit)
+				return
 			end
-		elseif sync_by_id then
-			managers.network:session():send_to_peers_synched("sync_interaction_set_active_by_id", self._unit:id(), active, self.tweak_data)
-		else
-			managers.network:session():send_to_peers_synched("sync_interaction_set_active", self._unit, active, self.tweak_data)
 		end
+		managers.network:session():send_to_peers_synched("interaction_set_active", self._unit, u_id, active, self.tweak_data, self._unit:contour() and self._unit:contour():is_flashing() or false)
+	end
+end
+
+function BaseInteractionExt:set_outline_flash_state(state, sync)
+	if self._contour_id then
+		self._unit:contour():flash(self._contour_id, state and self._tweak_data.contour_flash_interval or nil)
+		self:set_active(self._active, sync)
 	end
 end
 
@@ -405,6 +413,9 @@ function BaseInteractionExt:save(data)
 	if self.drop_in_sync_tweak_data then
 		state.tweak_data = self.tweak_data
 	end
+	if self._unit:contour() and self._unit:contour():is_flashing() then
+		state.is_flashing = true
+	end
 	data.InteractionExt = state
 end
 
@@ -414,6 +425,9 @@ function BaseInteractionExt:load(data)
 		self:set_active(state.active)
 		if state.tweak_data then
 			self:set_tweak_data(state.tweak_data)
+		end
+		if state.is_flashing and self._contour_id then
+			self._unit:contour():flash(self._contour_id, self._tweak_data.contour_flash_interval)
 		end
 	end
 end
@@ -746,6 +760,31 @@ function ReviveInteractionExt:load(data)
 		self._wp_id = state.wp_id
 	end
 	ReviveInteractionExt.super.load(self, data)
+end
+
+GageAssignmentInteractionExt = GageAssignmentInteractionExt or class(UseInteractionExt)
+
+function GageAssignmentInteractionExt:init(unit)
+	GageAssignmentInteractionExt.super.init(self, unit)
+end
+
+function GageAssignmentInteractionExt:_interact_blocked(player)
+	if self._unit:base() and self._unit:base().interact_blocked then
+		return self._unit:base() and self._unit:base():interact_blocked()
+	end
+	return GageAssignmentInteractionExt.super._interact_blocked(self, player)
+end
+
+function GageAssignmentInteractionExt:can_select(player)
+	return GageAssignmentInteractionExt.super.can_select(self, player)
+end
+
+function GageAssignmentInteractionExt:interact(player)
+	GageAssignmentInteractionExt.super.super.interact(self, player)
+	if alive(player) and player:sound() then
+		player:sound():say("g92", false, true)
+	end
+	return self._unit:base():pickup(player)
 end
 
 AmmoBagInteractionExt = AmmoBagInteractionExt or class(UseInteractionExt)

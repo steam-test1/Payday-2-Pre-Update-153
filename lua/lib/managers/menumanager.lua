@@ -848,6 +848,7 @@ function MenuManager:on_leave_lobby()
 		Global.game_settings.difficulty = "overkill"
 	end
 	managers.job:deactivate_current_job()
+	managers.gage_assignment:deactivate_assignments()
 end
 
 function MenuManager:show_global_success(node)
@@ -939,6 +940,7 @@ function MenuManager:do_clear_progress()
 	managers.job:reset_job_heat()
 	managers.job:reset_ghost_bonus()
 	managers.infamy:reset()
+	managers.gage_assignment:reset()
 	managers.crimenet:reset_seed()
 	if Global.game_settings.difficulty == "overkill_145" then
 		Global.game_settings.difficulty = "overkill"
@@ -1443,10 +1445,11 @@ function MenuCallbackHandler:toggle_team_AI(item)
 end
 
 function MenuCallbackHandler:toggle_coordinates(item)
-	if item:value() == "off" then
-		managers.hud:debug_hide_coordinates()
-	else
+	Global.debug_show_coords = item:value() == "on"
+	if Global.debug_show_coords then
 		managers.hud:debug_show_coordinates()
+	else
+		managers.hud:debug_hide_coordinates()
 	end
 end
 
@@ -1553,6 +1556,12 @@ function MenuCallbackHandler:choice_kicking_allowed(item)
 		return
 	end
 	managers.network.matchmake:add_lobby_filter("kicking_allowed", kicking_filter, "equal")
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
+function MenuCallbackHandler:choice_job_appropriate_filter(item)
+	local diff_appropriate = item:value()
+	Global.game_settings.search_appropriate_jobs = diff_appropriate == "on" and true or false
 	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 end
 
@@ -1758,6 +1767,16 @@ function MenuCallbackHandler:choice_lobby_difficulty(item)
 	self:update_matchmake_attributes()
 end
 
+function MenuCallbackHandler:lobby_start_campaign(item)
+	MenuCallbackHandler:choice_lobby_campaign(item)
+	MenuCallbackHandler:lobby_start_the_game(item)
+end
+
+function MenuCallbackHandler:lobby_create_campaign(item)
+	MenuCallbackHandler:choice_lobby_campaign(item)
+	MenuCallbackHandler:create_lobby(item)
+end
+
 function MenuCallbackHandler:choice_lobby_campaign(item)
 	if not item:enabled() then
 		return
@@ -1872,8 +1891,7 @@ function MenuCallbackHandler:get_matchmake_attributes()
 	local min_lvl = Global.game_settings.reputation_permission or 0
 	local drop_in = Global.game_settings.drop_in_allowed and 1 or 0
 	local job_id = tweak_data.narrative:get_index_from_job_id(managers.job:current_job_id())
-	local kicking_allowed = Global.game_settings.kicking_allowed and 1 or 0
-	return {
+	local attributes = {
 		numbers = {
 			level_id + 1000 * job_id,
 			difficulty_id,
@@ -1881,10 +1899,16 @@ function MenuCallbackHandler:get_matchmake_attributes()
 			nil,
 			nil,
 			drop_in,
-			min_lvl,
-			kicking_allowed
+			min_lvl
 		}
 	}
+	if self:is_win32() then
+		local kicking_allowed = Global.game_settings.kicking_allowed and 1 or 0
+		table.insert(attributes.numbers, kicking_allowed)
+		local job_class = managers.job:calculate_job_class(job_id, difficulty_id)
+		table.insert(attributes.numbers, job_class)
+	end
+	return attributes
 end
 
 function MenuCallbackHandler:update_matchmake_attributes()
@@ -2469,6 +2493,7 @@ function MenuCallbackHandler:_dialog_end_game_yes()
 	managers.statistics:stop_session()
 	managers.savefile:save_progress()
 	managers.job:deactivate_current_job()
+	managers.gage_assignment:deactivate_assignments()
 	if Network:multiplayer() then
 		Network:set_multiplayer(false)
 		local peer_id = managers.network:session():local_peer():id()
@@ -2682,6 +2707,10 @@ end
 
 function MenuCallbackHandler:print_global_steam_stats()
 	managers.statistics:debug_print_stats(true, 1)
+end
+
+function MenuCallbackHandler:print_global_steam_stats_yesterday()
+	managers.statistics:debug_print_stats(true, -1)
 end
 
 function MenuCallbackHandler:print_global_steam_stats_7days()
@@ -3229,7 +3258,12 @@ function MenuSTEAMHostBrowser:add_filter(node)
 		{
 			_meta = "option",
 			text_id = "menu_dist_filter_close",
-			value = -1
+			value = 0
+		},
+		{
+			_meta = "option",
+			text_id = "menu_dist_filter_default",
+			value = 1
 		},
 		{
 			_meta = "option",
@@ -3592,10 +3626,8 @@ function MenuManager.refresh_level_select(node, verify_dlc_owned)
 		local level_id = item:parameter("level_id")
 		if level_id then
 			if level_id == Global.game_settings.level_id then
-				item:set_value("on")
 				min_difficulty = tonumber(item:parameter("difficulty"))
 			elseif item:visible() then
-				item:set_value("off")
 			end
 		end
 	end
@@ -3811,61 +3843,12 @@ function DynamicLevelCreator:modify_node(node)
 			name = "pick_" .. level_id,
 			level_id = level_id,
 			text_id = managers.localization:text(level_data.name_id),
+			help_id = single_player and "menu_start_the_game_help" or "menu_start_lobby_help",
 			difficulty = 1,
 			localize = "false",
-			callback = "choice_lobby_campaign",
+			callback = single_player and "lobby_start_campaign" or "lobby_create_campaign",
 			info_panel = "lobby_campaign",
 			title_id = "menu_campaign"
-		}
-		local data = {
-			type = "CoreMenuItemToggle.ItemToggle",
-			{
-				_meta = "option",
-				icon = "guis/textures/menu_radiobutton",
-				value = "on",
-				x = 24,
-				y = 0,
-				w = 24,
-				h = 24,
-				s_icon = "guis/textures/menu_radiobutton",
-				s_x = 24,
-				s_y = 24,
-				s_w = 24,
-				s_h = 24
-			},
-			{
-				_meta = "option",
-				icon = "guis/textures/menu_radiobutton",
-				value = "off",
-				x = 0,
-				y = 0,
-				w = 24,
-				h = 24,
-				s_icon = "guis/textures/menu_radiobutton",
-				s_x = 0,
-				s_y = 24,
-				s_w = 24,
-				s_h = 24
-			}
-		}
-		local new_item = new_node:create_item(data, params)
-		new_node:add_item(new_item)
-	end
-	if single_player then
-		local params = {
-			name = "start_the_game",
-			text_id = "menu_start_the_game",
-			help_id = "menu_start_the_game_help",
-			callback = "lobby_start_the_game"
-		}
-		local new_item = new_node:create_item(nil, params)
-		new_node:add_item(new_item)
-	else
-		local params = {
-			name = "create_lobby",
-			text_id = "menu_create_lobby",
-			help_id = "menu_start_lobby_help",
-			callback = "create_lobby"
 		}
 		local new_item = new_node:create_item(nil, params)
 		new_node:add_item(new_item)
@@ -4177,6 +4160,67 @@ function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
 	node:add_item(new_item)
 end
 
+MenuCrimeNetGageAssignmentInitiator = MenuCrimeNetGageAssignmentInitiator or class(MenuCrimeNetContactInfoInitiator)
+
+function MenuCrimeNetGageAssignmentInitiator:modify_node(original_node, data)
+	local node = original_node
+	node:clean_items()
+	self:create_divider(node, 1, managers.localization:text("menu_gage_assignment_div_menu"), nil, tweak_data.screen_colors.text)
+	self:create_item(node, {
+		id = "_introduction",
+		name_lozalized = managers.localization:text("menu_gage_assignment_introduction_title")
+	})
+	self:create_item(node, {
+		id = "_summary",
+		name_lozalized = managers.localization:text("menu_gage_assignment_summary_title")
+	})
+	self:create_item(node, {
+		id = "_video",
+		name_lozalized = managers.localization:text("menu_gage_assignment_video_title")
+	})
+	self:create_divider(node, 2)
+	self:create_divider(node, 3, managers.localization:text("menu_gage_assignment_div_packages"), nil, tweak_data.screen_colors.text)
+	local node_data = {}
+	for assignment, data in pairs(tweak_data.gage_assignment:get_assignments()) do
+		table.insert(node_data, {
+			id = assignment,
+			name_lozalized = managers.localization:text(data.name_id),
+			aquire = data.aquire or 1
+		})
+	end
+	table.sort(node_data, function(x, y)
+		return x.aquire < y.aquire
+	end)
+	for assignment, data in ipairs(node_data) do
+		self:create_item(node, data)
+	end
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		previous_node = "true",
+		visible_callback = "is_pc_controller",
+		align = "left",
+		last_item = "true",
+		gui_node_custom = "true",
+		pd2_corner = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	if not managers.gage_assignment:visited_gage_crimenet() then
+		node:set_default_item_name("_introduction")
+		node:select_item("_introduction")
+		managers.menu:active_menu().logic:trigger_item(false, node:item("_introduction"))
+		managers.gage_assignment:visit_gage_crimenet()
+	else
+		node:set_default_item_name("_summary")
+		node:select_item("_summary")
+		managers.menu:active_menu().logic:trigger_item(false, node:item("_summary"))
+	end
+	managers.gage_assignment:dialog_show_completed_assignments()
+	return node
+end
+
 MenuCrimeNetSpecialInitiator = MenuCrimeNetSpecialInitiator or class()
 
 function MenuCrimeNetSpecialInitiator:modify_node(original_node, data)
@@ -4338,6 +4382,10 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 			}
 		}
 	end
+	local ghostable = managers.job:is_job_ghostable(id)
+	if ghostable then
+		text_id = text_id .. " " .. managers.localization:get_default_macro("BTN_GHOST")
+	end
 	local params = {
 		name = "job_" .. id,
 		text_id = text_id,
@@ -4362,6 +4410,7 @@ end
 
 function MenuReticleSwitchInitiator:setup_node(node, data)
 	node:clean_items()
+	data = data or node:parameters().menu_component_data
 	local part_id = data.name
 	local slot = data.slot
 	local category = data.category
@@ -4376,11 +4425,14 @@ function MenuReticleSwitchInitiator:setup_node(node, data)
 		local data_node = {
 			type = "MenuItemMultiChoice"
 		}
+		local pass_dlc
 		for index, reticle_data in ipairs(tweak_data.gui.weapon_texture_switches.types.sight) do
+			pass_dlc = not reticle_data.dlc or managers.dlc:is_dlc_unlocked(reticle_data.dlc)
 			table.insert(data_node, {
 				_meta = "option",
 				text_id = reticle_data.name_id,
-				value = index
+				value = index,
+				color = not pass_dlc and tweak_data.screen_colors.important_1
 			})
 		end
 		local new_item = node:create_item(data_node, params)
@@ -4395,11 +4447,13 @@ function MenuReticleSwitchInitiator:setup_node(node, data)
 		local data_node = {
 			type = "MenuItemMultiChoice"
 		}
-		for index, color in ipairs(tweak_data.gui.weapon_texture_switches.color_indexes) do
+		for index, color_data in ipairs(tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes") or {}) do
+			pass_dlc = not color_data.dlc or managers.dlc:is_dlc_unlocked(color_data.dlc)
 			table.insert(data_node, {
 				_meta = "option",
-				text_id = "menu_recticle_color_" .. color,
-				value = index
+				text_id = "menu_recticle_color_" .. color_data.color,
+				value = index,
+				color = not pass_dlc and tweak_data.screen_colors.important_1
 			})
 		end
 		local new_item = node:create_item(data_node, params)
@@ -4407,12 +4461,14 @@ function MenuReticleSwitchInitiator:setup_node(node, data)
 		new_item:set_value(color_index)
 		self:create_divider(node, "end", nil, 256)
 	end
+	local enabled = MenuCallbackHandler:is_reticle_applicable(node)
 	local params = {
 		name = "confirm",
-		text_id = "dialog_ok",
-		previous_node = "true",
+		text_id = "dialog_apply",
 		callback = "set_weapon_texture_switch",
-		align = "right"
+		align = "right",
+		enabled = enabled,
+		disabled_color = tweak_data.screen_colors.important_1
 	}
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
@@ -4434,7 +4490,32 @@ function MenuReticleSwitchInitiator:setup_node(node, data)
 	return node
 end
 
+function MenuReticleSwitchInitiator:refresh_node(node, data)
+	local confirm = node:item("confirm")
+	local active_node_gui = managers.menu:active_menu().renderer:active_node_gui()
+	if active_node_gui and active_node_gui.update_item_dlc_locks then
+		local enabled = active_node_gui:update_item_dlc_locks()
+		confirm:set_enabled(enabled)
+	end
+end
+
 function MenuReticleSwitchInitiator:create_multichoice()
+end
+
+function MenuCallbackHandler:is_reticle_applicable(node)
+	local type = node:item("reticle_type"):value()
+	local color = node:item("reticle_color"):value()
+	local type_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "types", "sight", type)
+	local color_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes", color)
+	if Application:production_build() then
+		assert(type_data, "Missing sight type in tweak data", type)
+		assert(color_data, "Missing sight color in tweak data", color)
+	end
+	local type_dlc = type_data and type_data.dlc or false
+	local color_dlc = color_data and color_data.dlc or false
+	local pass_type = not type_dlc or managers.dlc:is_dlc_unlocked(type_dlc)
+	local pass_color = not color_dlc or managers.dlc:is_dlc_unlocked(color_dlc)
+	return pass_type and pass_color
 end
 
 function MenuCallbackHandler:update_weapon_texture_switch(item)
@@ -4475,6 +4556,9 @@ function MenuCallbackHandler:set_weapon_texture_switch(item)
 		return false
 	end
 	local node = managers.menu:active_menu().logic:selected_node()
+	if not MenuCallbackHandler:is_reticle_applicable(node) then
+		return
+	end
 	local color = node:item("reticle_color"):value()
 	local type = node:item("reticle_type"):value()
 	local data = node:parameters().menu_component_data
@@ -4483,6 +4567,7 @@ function MenuCallbackHandler:set_weapon_texture_switch(item)
 	local category = data.category
 	local data_string = tostring(color) .. " " .. tostring(type)
 	managers.blackmarket:set_part_texture_switch(category, slot, part_id, data_string)
+	managers.menu:back()
 end
 
 MenuCrimeNetCasinoInitiator = MenuCrimeNetCasinoInitiator or class()
@@ -5151,6 +5236,11 @@ function MenuOptionInitiator:modify_debug_options(node)
 	if team_AI_mode_item then
 		local team_AI_mode_value = managers.groupai:state():team_ai_enabled() and "on" or "off"
 		team_AI_mode_item:set_value(team_AI_mode_value)
+	end
+	local toggle_coordinates_item = node:item("toggle_coordinates")
+	if toggle_coordinates_item then
+		local toggle_coordinates_value = Global.debug_show_coords and "on" or "off"
+		toggle_coordinates_item:set_value(toggle_coordinates_value)
 	end
 	return node
 end

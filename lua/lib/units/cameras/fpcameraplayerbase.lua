@@ -601,12 +601,13 @@ function FPCameraPlayerBase:clbk_stance_entered(new_shoulder_stance, new_head_st
 	if new_shoulder_stance then
 		local transition = {}
 		self._shoulder_stance.transition = transition
-		transition.end_translation = new_shoulder_stance.translation + stance_mod.translation
-		transition.end_rotation = new_shoulder_stance.rotation
+		transition.end_translation = new_shoulder_stance.translation + (stance_mod.translation or Vector3())
+		transition.end_rotation = new_shoulder_stance.rotation * (stance_mod.rotation or Rotation())
 		transition.start_translation = mvector3.copy(self._shoulder_stance.translation)
 		transition.start_rotation = self._shoulder_stance.rotation
 		transition.start_t = t
 		transition.duration = duration * duration_multiplier
+		print(transition.end_rotation)
 	end
 	if new_head_stance then
 		local transition = {}

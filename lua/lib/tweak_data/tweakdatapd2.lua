@@ -146,13 +146,22 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
-	self.hud_icons.equipment_chavez_key = {
-		texture = "guis/textures/pd2/mission_equipment",
+	self.hud_icons.equipment_generic_key = {
+		texture = "guis/textures/pd2/hud_pickups",
 		texture_rect = {
-			0,
-			0,
-			42,
-			42
+			32,
+			64,
+			32,
+			32
+		}
+	}
+	self.hud_icons.equipment_chavez_key = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			32,
+			64,
+			32,
+			32
 		}
 	}
 	self.hud_icons.equipment_bank_manager_key = {

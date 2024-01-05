@@ -151,13 +151,16 @@ function AchievmentManager:_give_reward(id, skip_exp)
 	end
 end
 
-function AchievmentManager:award_progress(stat)
+function AchievmentManager:award_progress(stat, value)
 	if Application:editor() then
 		return
 	end
-	print("[AchievmentManager:award_progress]: ", stat .. " increased with 1")
+	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
 	local stats = {}
-	stats[stat] = {type = "int", value = 1}
+	stats[stat] = {
+		type = "int",
+		value = value or 1
+	}
 	managers.network.account:publish_statistics(stats, true)
 end
 

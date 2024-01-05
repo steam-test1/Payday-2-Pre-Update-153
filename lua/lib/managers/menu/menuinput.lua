@@ -508,7 +508,8 @@ function MenuInput:update(t, dt)
 				"menu_preview_item_alt",
 				"menu_toggle_legends",
 				"menu_toggle_filters",
-				"menu_toggle_ready"
+				"menu_toggle_ready",
+				"toggle_chat"
 			}
 			if self._controller then
 				for _, button in ipairs(special_btns) do

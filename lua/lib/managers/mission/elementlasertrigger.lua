@@ -39,6 +39,7 @@ function ElementLaserTrigger:init(...)
 	end
 	if not self._values.skip_dummies then
 		self._dummy_units = {}
+		self._dummies_visible = true
 		for _, point in pairs(self._values.points) do
 			local unit = World:spawn_unit(Idstring("units/payday2/props/gen_prop_lazer_blaster_dome/gen_prop_lazer_blaster_dome"), point.pos, point.rot)
 			local materials = unit:get_objects_by_type(Idstring("material"))
@@ -309,11 +310,30 @@ function ElementLaserTrigger:_client_check_state(unit)
 	end
 end
 
+function ElementLaserTrigger:operation_add()
+	self:_set_dummies_visible(true)
+end
+
+function ElementLaserTrigger:operation_remove()
+	self:_set_dummies_visible(false)
+end
+
+function ElementLaserTrigger:_set_dummies_visible(visible)
+	if not self._dummy_units then
+		return
+	end
+	self._dummies_visible = visible
+	for _, unit in ipairs(self._dummy_units) do
+		unit:set_enabled(self._dummies_visible)
+	end
+end
+
 function ElementLaserTrigger:save(data)
 	data.enabled = self._values.enabled
 	data.cycle_order = self._cycle_order
 	data.cycle_index = self._cycle_index
 	data.next_cycle_t = self._next_cycle_t
+	data.dummies_visible = self._dummies_visible
 end
 
 function ElementLaserTrigger:load(data)
@@ -321,4 +341,5 @@ function ElementLaserTrigger:load(data)
 	self._cycle_order = data.cycle_order
 	self._cycle_index = data.cycle_index
 	self._next_cycle_t = data.next_cycle_t
+	self:_set_dummies_visible(data.dummies_visible)
 end

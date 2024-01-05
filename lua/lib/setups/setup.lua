@@ -60,9 +60,10 @@ require("lib/managers/LootDropManager")
 require("lib/managers/ChatManager")
 require("lib/managers/LootManager")
 require("lib/managers/JobManager")
-require("lib/managers/MissionAssetsManager")
 require("lib/managers/VoiceBriefingManager")
 require("lib/managers/FeatureManager")
+require("lib/managers/MissionAssetsManager")
+require("lib/managers/GageAssignmentManager")
 require("lib/units/UnitDamage")
 require("lib/units/MaskExt")
 script_data = script_data or {}
@@ -119,7 +120,8 @@ function Setup:init_managers(managers)
 		team_ai = true,
 		reputation_permission = 0,
 		drop_in_allowed = true,
-		kicking_allowed = true
+		kicking_allowed = true,
+		search_appropriate_jobs = false
 	}
 	managers.dyn_resource = DynamicResourceManager:new()
 	managers.gui_data = CoreGuiDataManager.GuiDataManager:new()
@@ -144,10 +146,11 @@ function Setup:init_managers(managers)
 	managers.menu_component = MenuComponentManager:new()
 	managers.loot = LootManager:new()
 	managers.job = JobManager:new()
-	managers.assets = MissionAssetsManager:new()
 	managers.briefing = VoiceBriefingManager:new()
 	managers.infamy = InfamyManager:new()
 	managers.features = FeatureManager:new()
+	managers.gage_assignment = GageAssignmentManager:new()
+	managers.assets = MissionAssetsManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 
@@ -390,7 +393,6 @@ function Setup:init_finalize()
 	end
 	managers.player:aquire_default_upgrades()
 	managers.blackmarket:init_finalize()
-	managers.assets:init_finalize()
 end
 
 function Setup:update(t, dt)
@@ -477,6 +479,7 @@ end
 
 function Setup:load_start_menu()
 	managers.job:deactivate_current_job()
+	managers.gage_assignment:deactivate_assignments()
 	managers.menu:close_all_menus()
 	managers.mission:pre_destroy()
 	Global.load_level = false

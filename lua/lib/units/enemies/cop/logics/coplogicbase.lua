@@ -859,7 +859,6 @@ function CopLogicBase._upd_suspicion(data, my_data, attention_obj)
 	local susp_settings = attention_obj.unit:base():suspicion_settings()
 	if attention_obj.settings.uncover_range and dis < math.min(attention_obj.settings.max_range, attention_obj.settings.uncover_range) * susp_settings.range_mul then
 		attention_obj.unit:movement():on_suspicion(data.unit, true)
-		managers.groupai:state():on_criminal_suspicion_progress(attention_obj.unit, data.unit, true)
 		managers.groupai:state():criminal_spotted(attention_obj.unit)
 		return _exit_func()
 	elseif attention_obj.verified and attention_obj.settings.suspicion_range and dis < math.min(attention_obj.settings.max_range, attention_obj.settings.suspicion_range) * susp_settings.range_mul then
@@ -875,7 +874,6 @@ function CopLogicBase._upd_suspicion(data, my_data, attention_obj)
 				managers.groupai:state():on_criminal_suspicion_progress(attention_obj.unit, data.unit, attention_obj.uncover_progress)
 			else
 				attention_obj.unit:movement():on_suspicion(data.unit, true)
-				managers.groupai:state():on_criminal_suspicion_progress(attention_obj.unit, data.unit, true)
 				managers.groupai:state():criminal_spotted(attention_obj.unit)
 				return _exit_func()
 			end
@@ -990,9 +988,6 @@ function CopLogicBase.identify_attention_obj_instant(data, att_u_key)
 				data.logic.on_attention_obj_identified(data, att_u_key, att_obj_data)
 			end
 		end
-	end
-	if (data.cool or data.t - data.unit:movement():not_cool_t() < 1) and att_obj_data then
-		managers.groupai:state():on_criminal_suspicion_progress(att_obj_data.unit, data.unit, true)
 	end
 	return att_obj_data, is_new
 end
@@ -1146,12 +1141,13 @@ function CopLogicBase.on_attention_obj_identified(data, attention_u_key, attenti
 	if data.group then
 		for u_key, u_data in pairs(data.group.units) do
 			if u_key ~= data.key then
-				u_data.unit:brain():clbk_group_member_attention_identified(data.unit, attention_u_key)
+				if alive(u_data.unit) then
+					u_data.unit:brain():clbk_group_member_attention_identified(data.unit, attention_u_key)
+				else
+					debug_pause_unit(data.unit, "[CopLogicBase.on_attention_obj_identified] destroyed group member", data.unit, inspect(data.group), inspect(u_data), u_key)
+				end
 			end
 		end
-	end
-	if data.cool and attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
-		managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, true)
 	end
 end
 

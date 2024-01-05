@@ -144,7 +144,7 @@ function PlayerStandard:_enter(enter_data)
 	end
 	self._ext_inventory:set_mask_visibility(true)
 	self:_upd_attention()
-	self._ext_network:send("set_stance", 2)
+	self._ext_network:send("set_stance", 2, false, false)
 end
 
 function PlayerStandard:exit(state_data, new_state_name)
@@ -724,7 +724,7 @@ function PlayerStandard:_start_action_steelsight(t)
 		local closest_ray = self._equipped_unit:base():check_autoaim(self._ext_camera:position(), self._ext_camera:forward(), nil, true)
 		self._camera_unit:base():clbk_aim_assist(closest_ray)
 	end
-	self._ext_network:send("set_stance", 3)
+	self._ext_network:send("set_stance", 3, false, false)
 end
 
 function PlayerStandard:_end_action_steelsight(t)
@@ -733,7 +733,7 @@ function PlayerStandard:_end_action_steelsight(t)
 	self:_update_crosshair_offset()
 	self._equipped_unit:base():play_tweak_data_sound("leave_steelsight")
 	self._camera_unit:base():clbk_stop_aim_assist()
-	self._ext_network:send("set_stance", 2)
+	self._ext_network:send("set_stance", 2, false, false)
 end
 
 function PlayerStandard:_interupt_action_steelsight(t)
@@ -1032,8 +1032,7 @@ function PlayerStandard:_check_action_weapon_firemode(t, input)
 end
 
 function PlayerStandard:_check_action_weapon_gadget(t, input)
-	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() then
-		self._equipped_unit:base():toggle_gadget()
+	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() and self._equipped_unit:base():toggle_gadget() then
 		self._unit:network():send("set_weapon_gadget_state", self._equipped_unit:base()._gadget_on)
 	end
 end
@@ -1709,7 +1708,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	if intimidate_civilians then
 		local civilians = managers.enemy:all_civilians()
 		for u_key, u_data in pairs(civilians) do
-			if u_data.unit:in_slot(21) then
+			if u_data.unit:in_slot(21) and not u_data.unit:movement():cool() then
 				local is_escort = u_data.char_tweak.is_escort
 				if not is_escort or intimidate_escorts then
 					local dist = is_escort and 300 or intimidate_range_civ
@@ -1852,6 +1851,7 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "mark_camera" then
 			sound_name = "quiet"
 			interact_type = "cmd_point"
+			sound_name = "f39_any"
 			prime_target.unit:contour():add("mark_unit", true)
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
