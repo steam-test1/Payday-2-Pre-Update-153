@@ -24,7 +24,7 @@ function UpgradesTweakData:_init_pd2_values()
 		0.95,
 		0.75,
 		0.65,
-		0.5
+		0.575
 	}
 	self.values.player.body_armor.concealment = {
 		30,
@@ -36,21 +36,21 @@ function UpgradesTweakData:_init_pd2_values()
 		1
 	}
 	self.values.player.body_armor.dodge = {
-		0.2,
-		0.1,
+		0.09,
 		0.05,
-		-0.05,
+		0.03,
+		-0.03,
 		-0.1,
-		-0.25,
-		-0.75
+		-0.3,
+		-0.5
 	}
 	self.values.player.body_armor.damage_shake = {
 		1,
 		0.96,
 		0.92,
 		0.85,
-		0.75,
-		0.65,
+		0.8,
+		0.7,
 		0.5
 	}
 	self.values.player.body_armor.stamina = {
@@ -58,16 +58,16 @@ function UpgradesTweakData:_init_pd2_values()
 		1,
 		0.95,
 		0.9,
-		0.75,
-		0.65,
-		0.5
+		0.85,
+		0.8,
+		0.7
 	}
 	self.values.player.special_enemy_highlight = {true}
 	self.values.player.hostage_trade = {true}
 	self.values.player.sec_camera_highlight = {true}
 	self.values.player.sec_camera_highlight_mask_off = {true}
 	self.values.player.special_enemy_highlight_mask_off = {true}
-	self.ammo_bag_base = 4
+	self.ammo_bag_base = 3
 	self.ecm_jammer_base_battery_life = 20
 	self.ecm_jammer_base_low_battery_life = 8
 	self.ecm_jammer_base_range = 2500
@@ -86,6 +86,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.moral_boost_speed_bonus = 1.2
 	self.moral_boost_suppression_resistance = 1
 	self.moral_boost_time = 10
+	self.max_weapon_dmg_mul_stacks = 5
 	self.values.player.crime_net_deal = {0.9, 0.8}
 	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
@@ -287,7 +288,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.can_strafe_run = {true}
 	self.values.player.can_free_run = {true}
 	self.values.ecm_jammer.affects_cameras = {true}
-	self.values.player.passive_dodge_chance = {0.05, 0.15}
+	self.values.player.passive_dodge_chance = {0.15, 0.35}
 	self.values.weapon.passive_swap_speed_multiplier = {1.2, 2}
 	self.values.player.passive_concealment_modifier = {5}
 	self.values.player.passive_armor_movement_penalty_multiplier = {0.75}
@@ -329,6 +330,23 @@ function UpgradesTweakData:_init_pd2_values()
 			35
 		}
 	}
+	self.values.player.detection_risk_damage_multiplier = {
+		{
+			0.05,
+			7,
+			"above",
+			40
+		}
+	}
+	self.values.player.overkill_health_to_damage_multiplier = {0.66}
+	self.values.player.tased_recover_multiplier = {0.5}
+	self.values.player.armor_regen_timer_stand_still_multiplier = {10}
+	self.values.player.secured_bags_speed_multiplier = {1.02}
+	self.values.temporary.no_ammo_cost_buff = {
+		{true, 60}
+	}
+	self.values.player.secured_bags_money_multiplier = {1.02}
+	self.values.pistol.stacking_hit_damage_multiplier = {0.1}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1028,6 +1046,9 @@ function UpgradesTweakData:init()
 	self:_new_raging_bull_definitions()
 	self:_saw_definitions()
 	self:_usp_definitions()
+	self:_m45_definitions()
+	self:_s552_definitions()
+	self:_ppk_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1262,6 +1283,15 @@ function UpgradesTweakData:_player_definitions()
 			}
 		}
 	end
+	self.definitions.player_overkill_health_to_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_player_overkill_health_to_damage_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "overkill_health_to_damage_multiplier",
+			value = 1
+		}
+	}
 	self.definitions.player_detection_risk_add_crit_chance = {
 		category = "feature",
 		name_id = "menu_player_detection_risk_add_crit_chance",
@@ -1277,6 +1307,15 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "detection_risk_add_dodge_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_detection_risk_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_player_detection_risk_damage_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "detection_risk_damage_multiplier",
 			value = 1
 		}
 	}
@@ -1540,6 +1579,15 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "armor_regen_timer_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_armor_regen_timer_stand_still_multiplier = {
+		category = "feature",
+		name_id = "menu_player_armor_regen_timer_stand_still_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_regen_timer_stand_still_multiplier",
 			value = 1
 		}
 	}
@@ -1921,6 +1969,33 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "electrocution_resistance_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_tased_recover_multiplier = {
+		category = "feature",
+		name_id = "menu_player_tased_recover_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "tased_recover_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_secured_bags_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_player_secured_bags_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "secured_bags_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_secured_bags_money_multiplier = {
+		category = "feature",
+		name_id = "menu_secured_bags_money_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "secured_bags_money_multiplier",
 			value = 1
 		}
 	}
@@ -3517,6 +3592,11 @@ function UpgradesTweakData:_olympic_definitions()
 		weapon_id = "olympic",
 		factory_id = "wpn_fps_smg_olympic"
 	}
+	self.definitions.olympic_primary = {
+		category = "weapon",
+		weapon_id = "olympic_primary",
+		factory_id = "wpn_fps_smg_olympic_primary"
+	}
 end
 
 function UpgradesTweakData:_amcar_definitions()
@@ -3542,6 +3622,11 @@ function UpgradesTweakData:_new_m4_definitions()
 		weapon_id = "new_m4",
 		factory_id = "wpn_fps_ass_m4"
 	}
+	self.definitions.m4_secondary = {
+		category = "weapon",
+		weapon_id = "m4_secondary",
+		factory_id = "wpn_fps_ass_m4_secondary"
+	}
 end
 
 function UpgradesTweakData:_glock_18c_definitions()
@@ -3549,6 +3634,11 @@ function UpgradesTweakData:_glock_18c_definitions()
 		category = "weapon",
 		weapon_id = "glock_18c",
 		factory_id = "wpn_fps_pis_g18c"
+	}
+	self.definitions.glock_18c_primary = {
+		category = "weapon",
+		weapon_id = "glock_18c_primary",
+		factory_id = "wpn_fps_pis_g18c_primary"
 	}
 end
 
@@ -3566,6 +3656,11 @@ function UpgradesTweakData:_akmsu_definitions()
 		weapon_id = "akmsu",
 		factory_id = "wpn_fps_smg_akmsu"
 	}
+	self.definitions.akmsu_primary = {
+		category = "weapon",
+		weapon_id = "akmsu_primary",
+		factory_id = "wpn_fps_smg_akmsu_primary"
+	}
 end
 
 function UpgradesTweakData:_ak74_definitions()
@@ -3573,6 +3668,11 @@ function UpgradesTweakData:_ak74_definitions()
 		category = "weapon",
 		weapon_id = "ak74",
 		factory_id = "wpn_fps_ass_74"
+	}
+	self.definitions.ak74_secondary = {
+		category = "weapon",
+		weapon_id = "ak74_secondary",
+		factory_id = "wpn_fps_ass_74_secondary"
 	}
 end
 
@@ -3597,6 +3697,11 @@ function UpgradesTweakData:_aug_definitions()
 		category = "weapon",
 		weapon_id = "aug",
 		factory_id = "wpn_fps_ass_aug"
+	}
+	self.definitions.aug_secondary = {
+		category = "weapon",
+		weapon_id = "aug_secondary",
+		factory_id = "wpn_fps_ass_aug_secondary"
 	}
 end
 
@@ -3638,6 +3743,11 @@ function UpgradesTweakData:_deagle_definitions()
 		weapon_id = "deagle",
 		factory_id = "wpn_fps_pis_deagle"
 	}
+	self.definitions.deagle_primary = {
+		category = "weapon",
+		weapon_id = "deagle_primary",
+		factory_id = "wpn_fps_pis_deagle_primary"
+	}
 end
 
 function UpgradesTweakData:_new_mp5_definitions()
@@ -3653,6 +3763,11 @@ function UpgradesTweakData:_colt_1911_definitions()
 		category = "weapon",
 		weapon_id = "colt_1911",
 		factory_id = "wpn_fps_pis_1911"
+	}
+	self.definitions.colt_1911_primary = {
+		category = "weapon",
+		weapon_id = "colt_1911_primary",
+		factory_id = "wpn_fps_pis_1911_primary"
 	}
 end
 
@@ -3678,6 +3793,11 @@ function UpgradesTweakData:_b92fs_definitions()
 		category = "weapon",
 		weapon_id = "b92fs",
 		factory_id = "wpn_fps_pis_beretta"
+	}
+	self.definitions.b92fs_primary = {
+		category = "weapon",
+		weapon_id = "b92fs_primary",
+		factory_id = "wpn_fps_pis_beretta_primary"
 	}
 end
 
@@ -3711,6 +3831,11 @@ function UpgradesTweakData:_new_raging_bull_definitions()
 		weapon_id = "new_raging_bull",
 		factory_id = "wpn_fps_pis_rage"
 	}
+	self.definitions.raging_bull_primary = {
+		category = "weapon",
+		weapon_id = "raging_bull_primary",
+		factory_id = "wpn_fps_pis_rage_primary"
+	}
 end
 
 function UpgradesTweakData:_saw_definitions()
@@ -3718,6 +3843,11 @@ function UpgradesTweakData:_saw_definitions()
 		category = "weapon",
 		weapon_id = "saw",
 		factory_id = "wpn_fps_saw"
+	}
+	self.definitions.saw_secondary = {
+		category = "weapon",
+		weapon_id = "saw_secondary",
+		factory_id = "wpn_fps_saw_secondary"
 	}
 	self.definitions.saw_extra_ammo_multiplier = {
 		category = "feature",
@@ -3824,7 +3954,41 @@ function UpgradesTweakData:_usp_definitions()
 	self.definitions.usp = {
 		category = "weapon",
 		weapon_id = "usp",
-		factory_id = "wpn_fps_pis_usp"
+		factory_id = "wpn_fps_pis_usp",
+		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_m45_definitions()
+	self.definitions.m45 = {
+		category = "weapon",
+		weapon_id = "m45",
+		factory_id = "wpn_fps_smg_m45",
+		dlc = "armored_transport"
+	}
+end
+
+function UpgradesTweakData:_s552_definitions()
+	self.definitions.s552 = {
+		category = "weapon",
+		weapon_id = "s552",
+		factory_id = "wpn_fps_ass_s552",
+		dlc = "armored_transport"
+	}
+	self.definitions.s552_secondary = {
+		category = "weapon",
+		weapon_id = "s552_secondary",
+		factory_id = "wpn_fps_ass_s552_secondary",
+		dlc = "armored_transport"
+	}
+end
+
+function UpgradesTweakData:_ppk_definitions()
+	self.definitions.ppk = {
+		category = "weapon",
+		weapon_id = "ppk",
+		factory_id = "wpn_fps_pis_ppk",
+		dlc = "armored_transport"
 	}
 end
 
@@ -4063,6 +4227,15 @@ function UpgradesTweakData:_pistol_definitions()
 		upgrade = {
 			category = "pistol",
 			upgrade = "swap_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.pistol_stacking_hit_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_pistol_stacking_hit_damage_multiplier",
+		upgrade = {
+			category = "pistol",
+			upgrade = "stacking_hit_damage_multiplier",
 			value = 1
 		}
 	}
@@ -4425,6 +4598,15 @@ function UpgradesTweakData:_temporary_definitions()
 		upgrade = {
 			category = "temporary",
 			upgrade = "revive_health_boost",
+			value = 1
+		}
+	}
+	self.definitions.temporary_no_ammo_cost_buff = {
+		category = "temporary",
+		name_id = "menu_temporary_no_ammo_cost_buff",
+		upgrade = {
+			category = "temporary",
+			upgrade = "no_ammo_cost_buff",
 			value = 1
 		}
 	}

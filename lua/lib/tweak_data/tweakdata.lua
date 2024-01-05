@@ -34,6 +34,7 @@ function TweakData:digest_tweak_data()
 	Application:debug("TweakData: Digesting tweak_data. <('O'<)")
 	self:digest_recursive(self.money_manager)
 	self:digest_recursive(self.experience_manager)
+	self:digest_recursive(self.rank_manager)
 	self:digest_recursive(self.casino)
 end
 
@@ -802,6 +803,7 @@ function TweakData:init()
 	self.interaction.pick_lock_deposit_transport = deep_clone(self.interaction.pick_lock_hard_no_skill)
 	self.interaction.pick_lock_deposit_transport.timer = 15
 	self.interaction.pick_lock_deposit_transport.axis = "y"
+	self.interaction.pick_lock_deposit_transport.interact_distance = 80
 	self.interaction.cant_pick_lock = {}
 	self.interaction.cant_pick_lock.icon = "equipment_bank_manager_key"
 	self.interaction.cant_pick_lock.text_id = "hud_int_pick_lock"
@@ -1818,6 +1820,21 @@ function TweakData:init()
 	self.interaction.crate_loot.sound_done = "bar_crowbar_end"
 	self.interaction.halloween_trick = {}
 	self.interaction.halloween_trick.text_id = "hud_int_trick_treat"
+	self.interaction.disassemble_turret = {}
+	self.interaction.disassemble_turret.text_id = "hud_int_hold_disassemble_turret"
+	self.interaction.disassemble_turret.action_text_id = "hud_action_disassemble_turret"
+	self.interaction.disassemble_turret.blocked_hint = "carry_block"
+	self.interaction.disassemble_turret.start_active = false
+	self.interaction.disassemble_turret.timer = 3
+	self.interaction.disassemble_turret.sound_start = "bar_steal_circuit"
+	self.interaction.disassemble_turret.sound_interupt = "bar_steal_circuit_cancel"
+	self.interaction.disassemble_turret.sound_done = "bar_steal_circuit_finished"
+	self.interaction.take_ammo = {}
+	self.interaction.take_ammo.text_id = "hud_int_hold_pack_shells"
+	self.interaction.take_ammo.action_text_id = "hud_action_packing_shells"
+	self.interaction.take_ammo.blocked_hint = "carry_block"
+	self.interaction.take_ammo.start_active = false
+	self.interaction.take_ammo.timer = 2
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2174,6 +2191,9 @@ function TweakData:init()
 			points = math.round(22000 * (exp_step * (i - exp_step_start)) - 6000) * multiplier
 		}
 	end
+	self.rank_manager = {}
+	self.rank_manager.max_rank = 13
+	self.rank_manager.become_infamous_cost = 200000000
 	self.achievement = {}
 	self.achievement.im_a_healer_tank_damage_dealer = 10
 	self.achievement.iron_man = "level_7"
@@ -2214,6 +2234,47 @@ function TweakData:init()
 		weapon = "usp",
 		stat = "halloween_8_stats"
 	}
+	self.achievement.i_take_scores = {
+		mask = "heat",
+		stat = "armored_4_stat",
+		heists = {
+			"arm_cro",
+			"arm_cro_prof",
+			"arm_und",
+			"arm_und_prof",
+			"arm_hcm",
+			"arm_hcm_prof",
+			"arm_par",
+			"arm_par_prof",
+			"arm_fac",
+			"arm_fac_prof"
+		}
+	}
+	self.achievement.license_to_kill = {
+		weapon = "ppk",
+		stat = "armored_5_stat"
+	}
+	self.achievement.im_not_a_crook = {
+		mask = "nixon",
+		weapon = "s552",
+		enemy = "sniper",
+		stat = "armored_7_stat"
+	}
+	self.achievement.relation_with_bulldozer = {
+		mask = "clinton",
+		stat = "armored_8_stat"
+	}
+	self.achievement.fool_me_once = {
+		mask = "bush",
+		weapon = "m45",
+		enemy = "shield",
+		stat = "armored_9_stat"
+	}
+	self.achievement.no_we_cant = {
+		mask = "obama",
+		stat = "armored_10_stat"
+	}
+	self.achievement.heat_around_the_corner = "heat"
 	self.pickups = {}
 	self.pickups.ammo = {
 		unit = Idstring("units/pickups/ammo/ammo_pickup")
@@ -2297,7 +2358,9 @@ function TweakData:init()
 		"track_04",
 		"track_05",
 		"track_06",
-		"track_07"
+		"track_07",
+		"track_08",
+		"track_09"
 	}
 	self.music.default = deep_clone(self.music.heist)
 	self.blame = {}

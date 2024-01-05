@@ -102,8 +102,18 @@ function MissionEndState:at_enter(old_state, params)
 	self._sound_listener = SoundDevice:create_listener("lobby_menu")
 	self._sound_listener:set_position(Vector3(0, -50000, 0))
 	self._sound_listener:activate(true)
-	if self._success and Global.game_settings.difficulty == "overkill_145" and managers.job:current_contact_id() == "vlad" and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.in_soviet_russia.mask then
-		managers.achievment:award_progress(tweak_data.achievement.in_soviet_russia.stat)
+	if self._success and Global.game_settings.difficulty == "overkill_145" then
+		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.in_soviet_russia.mask and managers.job:current_contact_id() == "vlad" then
+			managers.achievment:award_progress(tweak_data.achievement.in_soviet_russia.stat)
+		end
+		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.i_take_scores.mask then
+			for _, job_id in ipairs(tweak_data.achievement.i_take_scores.heists) do
+				if managers.job:current_job_id() == job_id then
+					managers.achievment:award_progress(tweak_data.achievement.i_take_scores.stat)
+					break
+				end
+			end
+		end
 	end
 	if self._success then
 		if params.personal_win then
@@ -281,14 +291,22 @@ end
 
 function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_score, best_special_kills_peer_id, best_special_kills_score, best_accuracy_peer_id, best_accuracy_score, most_downs_peer_id, most_downs_score, total_kills, total_specials_kills, total_head_shots, group_accuracy, group_downs)
 	print("on_statistics_result begin")
-	if managers.network and managers.network:session() and managers.network:session():peer(best_kills_peer_id) then
-		local best_kills = managers.network:session():peer(best_kills_peer_id):name()
-		local best_special_kills = managers.network:session():peer(best_special_kills_peer_id):name()
-		local best_accuracy = managers.network:session():peer(best_accuracy_peer_id):name()
-		local most_downs = managers.network:session():peer(most_downs_peer_id):name()
+	if managers.network and managers.network:session() then
+		local best_kills_peer = managers.network:session():peer(best_kills_peer_id)
+		local best_special_kills_peer = managers.network:session():peer(best_special_kills_peer_id)
+		local best_accuracy_peer = managers.network:session():peer(best_accuracy_peer_id)
+		local most_downs_peer = managers.network:session():peer(most_downs_peer_id)
+		local best_kills = best_kills_peer and best_kills_peer:name() or "N/A"
+		local best_special_kills = best_special_kills_peer and best_special_kills_peer:name() or "N/A"
+		local best_accuracy = best_accuracy_peer and best_accuracy_peer:name() or "N/A"
+		local most_downs = most_downs_peer and most_downs_peer:name() or "N/A"
 		local stage_cash_summary_string
 		if self._success and managers.job._global.next_interupt_stage then
-			stage_cash_summary_string = managers.localization:text("victory_cash_postponed")
+			local victory_cash_postponed_id = "victory_cash_postponed"
+			if tweak_data.levels[managers.job._global.next_interupt_stage].bonus_escape then
+				victory_cash_postponed_id = "victory_cash_postponed_bonus"
+			end
+			stage_cash_summary_string = managers.localization:text(victory_cash_postponed_id)
 		elseif self._success then
 			local stage_payout, job_payout, bag_payout, small_loot_payout, crew_payout = managers.money:get_payouts()
 			local bonus_bags = managers.loot:get_secured_bonus_bags_amount() + managers.loot:get_secured_mandatory_bags_amount()

@@ -381,7 +381,7 @@ function StaticLayer:draw_units(t, dt)
 	Application:draw(self._selected_unit, 0, 1, 0)
 end
 
-function StaticLayer:build_panel(notebook)
+function StaticLayer:build_panel(notebook, settings)
 	cat_print("editor", "StaticLayer:build_panel")
 	self._ews_panel = EWS:ScrolledWindow(notebook, "", "VSCROLL")
 	self._ews_panel:set_scroll_rate(Vector3(0, 1, 0))
@@ -396,7 +396,7 @@ function StaticLayer:build_panel(notebook)
 	self:add_btns_to_toolbar()
 	self._btn_toolbar:realize()
 	self._sizer:add(self._btn_toolbar, 0, 1, "EXPAND,BOTTOM")
-	self._sizer:add(self:build_units(), 1, 0, "EXPAND")
+	self._sizer:add(self:build_units(settings), settings and settings.units_noteboook_proportion or 1, 0, "EXPAND")
 	self._main_sizer:add(self._sizer, 1, 0, "EXPAND")
 	return self._ews_panel
 end

@@ -4,6 +4,7 @@ function AssetsTweakData:init(tweak_data)
 	self:_init_empty_asset(tweak_data)
 	self:_init_assets(tweak_data)
 	self:_init_risk_assets(tweak_data)
+	self:_init_safehouse_assets(tweak_data)
 end
 
 function AssetsTweakData:_init_empty_asset(tweak_data)
@@ -20,6 +21,11 @@ function AssetsTweakData:_init_empty_asset(tweak_data)
 	self.none.money_lock = nil
 	self.none.upgrade_lock = nil
 	self.none.achievment_lock = nil
+	self.none.set_saved_job_value = nil
+	self.none.set_job_value = nil
+end
+
+function AssetsTweakData:_init_safehouse_assets(tweak_data)
 end
 
 function AssetsTweakData:_init_risk_assets(tweak_data)
@@ -668,6 +674,68 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.four_stores_overview.stages = {
 		"four_stores"
 	}
+	self.arm_for_info = {}
+	self.arm_for_info.name_id = "menu_asset_arm_info"
+	self.arm_for_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_01"
+	self.arm_for_info.stages = {"arm_for"}
+	self.arm_for_lance = {}
+	self.arm_for_lance.name_id = "menu_asset_arm_for_lance"
+	self.arm_for_lance.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_03"
+	self.arm_for_lance.stages = {"arm_for"}
+	self.arm_for_lance.visible_if_locked = true
+	self.arm_for_lance.unlock_desc_id = "menu_asset_arm_for_lance_desc"
+	self.arm_for_lance.no_mystery = true
+	self.arm_for_lance.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.arm_for_ammo = {}
+	self.arm_for_ammo.name_id = "menu_asset_ammo"
+	self.arm_for_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
+	self.arm_for_ammo.stages = {
+		"arm_for",
+		"arm_cro",
+		"arm_und",
+		"arm_par",
+		"arm_fac",
+		"arm_hcm"
+	}
+	self.arm_for_ammo.visible_if_locked = true
+	self.arm_for_ammo.unlock_desc_id = "menu_asset_ammo_desc"
+	self.arm_for_ammo.no_mystery = true
+	self.arm_for_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
+	self.arm_for_health = {}
+	self.arm_for_health.name_id = "menu_asset_health"
+	self.arm_for_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
+	self.arm_for_health.stages = {
+		"arm_for",
+		"arm_cro",
+		"arm_und",
+		"arm_par",
+		"arm_fac",
+		"arm_hcm"
+	}
+	self.arm_for_health.visible_if_locked = true
+	self.arm_for_health.unlock_desc_id = "menu_asset_health_desc"
+	self.arm_for_health.no_mystery = true
+	self.arm_for_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.arm_cro_info = {}
+	self.arm_cro_info.name_id = "menu_asset_arm_location"
+	self.arm_cro_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/crossroads"
+	self.arm_cro_info.stages = {"arm_cro"}
+	self.arm_fac_info = {}
+	self.arm_fac_info.name_id = "menu_asset_arm_location"
+	self.arm_fac_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/harbor"
+	self.arm_fac_info.stages = {"arm_fac"}
+	self.arm_par_info = {}
+	self.arm_par_info.name_id = "menu_asset_arm_location"
+	self.arm_par_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/park"
+	self.arm_par_info.stages = {"arm_par"}
+	self.arm_hcm_info = {}
+	self.arm_hcm_info.name_id = "menu_asset_arm_location"
+	self.arm_hcm_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/downtown"
+	self.arm_hcm_info.stages = {"arm_hcm"}
+	self.arm_und_info = {}
+	self.arm_und_info.name_id = "menu_asset_arm_location"
+	self.arm_und_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/underpass"
+	self.arm_und_info.stages = {"arm_und"}
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

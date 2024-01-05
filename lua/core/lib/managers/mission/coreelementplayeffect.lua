@@ -31,8 +31,9 @@ function ElementPlayEffect:play_effect()
 	if self._values.effect ~= "none" then
 		local params = {}
 		params.effect = Idstring(self._values.effect)
-		params.position = self._values.screen_space and Vector3() or self._values.position
-		params.rotation = self._values.screen_space and Rotation() or self._values.rotation
+		local pos, rot = self:get_orientation()
+		params.position = self._values.screen_space and Vector3() or pos
+		params.rotation = self._values.screen_space and Rotation() or rot
 		params.base_time = self._values.base_time or 0
 		params.random_time = self._values.random_time or 0
 		params.max_amount = self._values.max_amount ~= 0 and self._values.max_amount or nil

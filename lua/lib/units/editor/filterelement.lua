@@ -59,14 +59,14 @@ function FilterUnitElement:_build_panel(panel, panel_sizer)
 		value = "difficulty_hard"
 	})
 	difficulty_sizer:add(difficulty_hard, 0, 0, "EXPAND")
-	local difficulty_overkill = EWS:CheckBox(panel, "Overkill", "")
+	local difficulty_overkill = EWS:CheckBox(panel, "Very Hard", "")
 	difficulty_overkill:set_value(self._hed.difficulty_overkill)
 	difficulty_overkill:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
 		ctrlr = difficulty_overkill,
 		value = "difficulty_overkill"
 	})
 	difficulty_sizer:add(difficulty_overkill, 0, 0, "EXPAND")
-	local difficulty_overkill_145 = EWS:CheckBox(panel, "Overkill 145+", "")
+	local difficulty_overkill_145 = EWS:CheckBox(panel, "Overkill", "")
 	difficulty_overkill_145:set_value(self._hed.difficulty_overkill_145)
 	difficulty_overkill_145:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
 		ctrlr = difficulty_overkill_145,

@@ -36,7 +36,6 @@ end
 
 function BlackMarketManager:init_finalize()
 	print("BlackMarketManager:init_finalize()")
-	managers.savefile:add_load_sequence_done_callback_handler(callback(self, self, "_load_done"))
 end
 
 function BlackMarketManager:_setup_armors()
@@ -147,9 +146,9 @@ function BlackMarketManager:_setup_weapons()
 				factory_id = factory_id,
 				selection_index = selection_index
 			}
-			local is_default, weapon_level = managers.upgrades:get_value(weapon)
+			local is_default, weapon_level, got_parent = managers.upgrades:get_value(weapon)
 			weapons[weapon].level = weapon_level
-			weapons[weapon].skill_based = not is_default and weapon_level == 0
+			weapons[weapon].skill_based = got_parent or not is_default and weapon_level == 0 and not tweak_data.weapon[weapon].global_value
 		end
 	end
 end
@@ -305,6 +304,16 @@ function BlackMarketManager:equip_deployable(deployable_id)
 	MenuCallbackHandler:_update_outfit_information()
 end
 
+function BlackMarketManager:equip_character(character_id)
+	for s, data in pairs(Global.blackmarket_manager.characters) do
+		data.equipped = s == character_id
+	end
+	if managers.menu_scene then
+		managers.menu_scene:set_character(character_id)
+	end
+	MenuCallbackHandler:_update_outfit_information()
+end
+
 function BlackMarketManager:equip_armor(armor_id)
 	for s, data in pairs(Global.blackmarket_manager.armors) do
 		data.equipped = s == armor_id
@@ -354,6 +363,9 @@ function BlackMarketManager:equip_mask(slot)
 	local equipped = new_mask_data and new_mask_data.mask_id
 	if equipped == tweak_data.achievement.like_an_angry_bear then
 		managers.achievment:award("like_an_angry_bear")
+	end
+	if equipped == tweak_data.achievement.heat_around_the_corner then
+		managers.achievment:award("armored_11")
 	end
 	if managers.menu_scene then
 		managers.menu_scene:set_character_mask_by_id(new_mask_data.mask_id, new_mask_data.blueprint)
@@ -1339,7 +1351,12 @@ function BlackMarketManager:get_dropable_mods_by_weapon_id(weapon_id, weapon_dat
 				local is_infamous = part.infamous
 				local part_dropable = true
 				if not is_infamous then
-					local dlcs = part.dlcs or {}
+					local dlcs = {}
+					if part.dlcs then
+						for i, dlc in ipairs(part.dlcs) do
+							table.insert(dlcs, dlc)
+						end
+					end
 					if part.dlc then
 						table.insert(dlcs, part.dlc)
 					end
@@ -2426,7 +2443,7 @@ function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
 end
 
 function BlackMarketManager:character_sequence_by_character_id(character_id, peer_id)
-	if character_id ~= "locked" then
+	if not peer_id and character_id ~= "locked" then
 		return tweak_data.blackmarket.characters[character_id].sequence
 	end
 	local character = self:get_preferred_character()
@@ -2443,7 +2460,70 @@ function BlackMarketManager:character_sequence_by_character_id(character_id, pee
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)
 	print("character_sequence_by_character_id", "character", character, "character_id", character_id)
-	return tweak_data.blackmarket.characters[character_id][character].sequence
+	if tweak_data.blackmarket.characters.locked[character] then
+		return tweak_data.blackmarket.characters.locked[character].sequence
+	end
+	return tweak_data.blackmarket.characters[character].sequence
+end
+
+function BlackMarketManager:character_sequence_by_character_name(character, peer_id)
+	if managers.network and managers.network:session() and peer_id then
+		print("character_sequence_by_character_name", managers.network:session(), peer_id, character_name)
+		local peer = managers.network:session():peer(peer_id)
+		if peer then
+			character = peer:character() or character
+			if not peer:character() then
+				Application:error("character_sequence_by_character_name: Peer missing character", "peer_id", peer_id)
+				print(inspect(peer))
+			end
+		end
+	end
+	character = CriminalsManager.convert_old_to_new_character_workname(character)
+	if tweak_data.blackmarket.characters.locked[character] then
+		return tweak_data.blackmarket.characters.locked[character].sequence
+	end
+	return tweak_data.blackmarket.characters[character].sequence
+end
+
+function BlackMarketManager:character_mask_on_sequence_by_character_id(character_id, peer_id)
+	if not peer_id and character_id ~= "locked" then
+		return tweak_data.blackmarket.characters[character_id].mask_on_sequence
+	end
+	local character = self:get_preferred_character()
+	if managers.network and managers.network:session() and peer_id then
+		local peer = managers.network:session():peer(peer_id)
+		if peer then
+			character = peer:character() or character
+			if not peer:character() then
+				Application:error("character_sequence_by_character_id: Peer missing character", "peer_id", peer_id)
+				print(inspect(peer))
+			end
+		end
+	end
+	character = CriminalsManager.convert_old_to_new_character_workname(character)
+	print("character_sequence_by_character_id", "character", character, "character_id", character_id)
+	if tweak_data.blackmarket.characters.locked[character] then
+		return tweak_data.blackmarket.characters.locked[character].mask_on_sequence
+	end
+	return tweak_data.blackmarket.characters[character].mask_on_sequence
+end
+
+function BlackMarketManager:character_mask_on_sequence_by_character_name(character, peer_id)
+	if managers.network and managers.network:session() and peer_id then
+		local peer = managers.network:session():peer(peer_id)
+		if peer then
+			character = peer:character() or character
+			if not peer:character() then
+				Application:error("character_sequence_by_character_id: Peer missing character", "peer_id", peer_id)
+				print(inspect(peer))
+			end
+		end
+	end
+	character = CriminalsManager.convert_old_to_new_character_workname(character)
+	if tweak_data.blackmarket.characters.locked[character] then
+		return tweak_data.blackmarket.characters.locked[character].mask_on_sequence
+	end
+	return tweak_data.blackmarket.characters[character].mask_on_sequence
 end
 
 function BlackMarketManager:reset()
@@ -2512,9 +2592,9 @@ function BlackMarketManager:load(data)
 			end
 		end
 		for weapon, data in pairs(self._global.weapons) do
-			local is_default, weapon_level = managers.upgrades:get_value(weapon)
+			local is_default, weapon_level, got_parent = managers.upgrades:get_value(weapon)
 			self._global.weapons[weapon].level = weapon_level
-			self._global.weapons[weapon].skill_based = not is_default and weapon_level == 0
+			self._global.weapons[weapon].skill_based = got_parent or not is_default and weapon_level == 0 and not tweak_data.weapon[weapon].global_value
 		end
 		self._global._preferred_character = self._global._preferred_character or self._defaults.preferred_character
 		for character, _ in pairs(tweak_data.blackmarket.characters) do
@@ -2549,9 +2629,9 @@ end
 
 function BlackMarketManager:_load_done()
 	Application:debug("BlackMarketManager:_load_done()")
+	self:_verfify_equipped()
 	self:aquire_default_weapons()
 	self:aquire_default_masks()
-	self:_verfify_equipped()
 	if managers.menu_scene then
 		managers.menu_scene:set_character(self:equipped_character())
 		managers.menu_scene:on_set_preferred_character()
@@ -2574,7 +2654,9 @@ function BlackMarketManager:_load_done()
 end
 
 function BlackMarketManager:verify_dlc_items()
+	self:_cleanup_blackmarket()
 	self:_verify_dlc_items()
+	self:_load_done()
 end
 
 function BlackMarketManager:_cleanup_blackmarket()
@@ -2595,8 +2677,8 @@ function BlackMarketManager:_cleanup_blackmarket()
 				end
 			end
 			if cleanup_mask then
+				Application:debug("Mask of component of mask no longer exists, Selling it!", mask.mask_id, inspect(blueprint))
 				self:on_sell_mask(i)
-				print("selling mask", cleanup_mask)
 			end
 		end
 	end
@@ -2606,25 +2688,65 @@ function BlackMarketManager:_cleanup_blackmarket()
 		"secondaries"
 	}) do
 		local crafted_category = self._global.crafted_items[category]
-		local invalid_items = {}
+		local invalid_weapons = {}
+		local invalid_parts = {}
 		for slot, item in pairs(crafted_category) do
 			local factory_id = item.factory_id
 			local blueprint = item.blueprint
 			local index_table = {}
-			for i, part_id in ipairs(factory[factory_id].uses_parts) do
-				index_table[part_id] = i
-			end
-			for _, part_id in ipairs(blueprint) do
-				if not index_table[part_id] then
-					Application:error("BlackMarketManager:_cleanup_blackmarket() Weapon part no longer in uses part", "part_id", part_id, "weapon_id", item.weapon_id)
-					table.insert(invalid_items, slot)
-					break
+			if not tweak_data.weapon[item.weapon_id] then
+				table.insert(invalid_weapons, slot)
+			else
+				for i, part_id in ipairs(factory[factory_id].uses_parts) do
+					index_table[part_id] = i
+				end
+				for i, part_id in ipairs(blueprint) do
+					if not index_table[part_id] then
+						Application:error("BlackMarketManager:_cleanup_blackmarket() Weapon part no longer in uses parts", "part_id", part_id, "weapon_id", item.weapon_id)
+						local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
+						if table.contains(default_blueprint, part_id) then
+							print("part is default part")
+							table.insert(invalid_weapons, slot)
+						else
+							local default_mod
+							local ids_id = Idstring(tweak_data.weapon.factory.parts[part_id].type)
+							for i, d_mod in ipairs(default_blueprint) do
+								if Idstring(tweak_data.weapon.factory.parts[d_mod].type) == ids_id then
+									default_mod = d_mod
+									break
+								end
+							end
+							if default_mod then
+								table.insert(invalid_parts, {
+									slot = slot,
+									global_value = "normal",
+									default_mod = default_mod,
+									part_id = part_id
+								})
+							else
+								table.insert(invalid_parts, {
+									slot = slot,
+									global_value = item.global_values[part_id] or "normal",
+									part_id = part_id
+								})
+							end
+						end
+					end
 				end
 			end
 		end
-		for _, slot in ipairs(invalid_items) do
+		for _, slot in ipairs(invalid_weapons) do
 			Application:debug("Invalid Weapon", "slot", slot, "inspect", inspect(crafted_category[slot]))
 			self:on_sell_weapon(category, slot)
+		end
+		for _, data in ipairs(invalid_parts) do
+			Application:debug("Invalid Weapon part", "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
+			if data.default_mod then
+				self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true)
+			else
+				self:remove_weapon_part(category, data.slot, data.global_value, data.part_id)
+			end
+			managers.money:refund_weapon_part(crafted_category[data.slot].weapon_id, data.part_id, data.global_value)
 		end
 	end
 end
@@ -2634,8 +2756,8 @@ function BlackMarketManager:_verify_dlc_items()
 	local owns_dlc
 	for package_id, data in pairs(tweak_data.dlc) do
 		if tweak_data.lootdrop.global_values[package_id] then
-			owns_dlc = tweak_data.lootdrop.global_values[package_id].dlc and (data.free or managers.dlc:has_dlc(package_id))
-			print("owns_dlc", owns_dlc, "dlc", tweak_data.lootdrop.global_values[package_id].dlc, "not free", not data.free, "not has_dlc", not managers.dlc:has_dlc(package_id))
+			owns_dlc = tweak_data.lootdrop.global_values[package_id].dlc and (data.free or managers.dlc:has_dlc(package_id)) or false
+			print("owns_dlc", owns_dlc, "dlc", package_id, "not free", not data.free, "not has_dlc", not managers.dlc:has_dlc(package_id))
 			if owns_dlc then
 			elseif self._global.global_value_items[package_id] then
 				print("You do not own " .. package_id .. ", will lock all related items.")
@@ -2801,7 +2923,7 @@ function BlackMarketManager:_convert_add_to_mul(value)
 	end
 end
 
-function BlackMarketManager:damage_multiplier(name, category, silencer)
+function BlackMarketManager:damage_multiplier(name, category, silencer, detection_risk)
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "damage_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "damage_multiplier", 1))
@@ -2809,6 +2931,12 @@ function BlackMarketManager:damage_multiplier(name, category, silencer)
 	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "passive_damage_multiplier", 1))
 	if silencer then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_damage_multiplier", 1))
+	end
+	local detection_risk_damage_multiplier = managers.player:upgrade_value("player", "detection_risk_damage_multiplier")
+	multiplier = multiplier - managers.player:get_value_from_risk_upgrade(detection_risk_damage_multiplier, detection_risk)
+	if managers.player:has_category_upgrade("player", "overkill_health_to_damage_multiplier") then
+		local damage_ratio = managers.player:upgrade_value("player", "overkill_health_to_damage_multiplier", 1) - 1
+		multiplier = multiplier + damage_ratio
 	end
 	return self:_convert_add_to_mul(multiplier)
 end

@@ -21,6 +21,9 @@ function CoreMissionElement:init(unit)
 	self._save_values = {}
 	self._update_selected_on = false
 	self:_add_default_saves()
+	if self.USES_POINT_ORIENTATION then
+		self.base_update_editing = callback(self, self, "__update_editing")
+	end
 	self._parent_panel = managers.editor:mission_element_panel()
 	self._parent_sizer = managers.editor:mission_element_sizer()
 	self._panels = {}
@@ -89,6 +92,14 @@ function CoreMissionElement:_add_default_saves()
 	self._hed.base_delay = 0
 	self._hed.trigger_times = 0
 	self._hed.on_executed = {}
+	if self.USES_POINT_ORIENTATION then
+		self._hed.orientation_elements = nil
+		self._hed.use_orientation_sequenced = nil
+		self._hed.disable_orientation_on_use = nil
+	end
+	if self.USES_INSTIGATOR_RULES then
+		self._hed.rules_elements = nil
+	end
 	table.insert(self._save_values, "unit:position")
 	table.insert(self._save_values, "unit:rotation")
 	table.insert(self._save_values, "enabled")
@@ -96,6 +107,10 @@ function CoreMissionElement:_add_default_saves()
 	table.insert(self._save_values, "base_delay")
 	table.insert(self._save_values, "trigger_times")
 	table.insert(self._save_values, "on_executed")
+	table.insert(self._save_values, "orientation_elements")
+	table.insert(self._save_values, "use_orientation_sequenced")
+	table.insert(self._save_values, "disable_orientation_on_use")
+	table.insert(self._save_values, "rules_elements")
 end
 
 function CoreMissionElement:build_default_gui(panel, sizer)
@@ -171,6 +186,22 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 	self._elements_toolbar:connect("DELETE_SELECTED", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_toolbar_remove"), nil)
 	self._elements_toolbar:realize()
 	element_sizer:add(self._elements_toolbar, 0, 1, "EXPAND,LEFT")
+	if self.ON_EXECUTED_ALTERNATIVES then
+		local on_executed_alternatives_params = {
+			name = "Alternative:",
+			panel = panel,
+			sizer = on_executed_sizer,
+			options = self.ON_EXECUTED_ALTERNATIVES,
+			value = self.ON_EXECUTED_ALTERNATIVES[1],
+			tooltip = "Select am alternative on executed from the combobox",
+			name_proportions = 1,
+			ctrlr_proportions = 2,
+			sorted = false
+		}
+		local on_executed_alternatives_types = CoreEWS.combobox(on_executed_alternatives_params)
+		on_executed_alternatives_types:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "on_executed_alternatives_types"), nil)
+		self._on_executed_alternatives_params = on_executed_alternatives_params
+	end
 	self._element_delay_params = {
 		name = "Delay:",
 		panel = panel,
@@ -186,9 +217,79 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 	element_delay:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "on_executed_element_delay"), nil)
 	element_delay:connect("EVT_KILL_FOCUS", callback(self, self, "on_executed_element_delay"), nil)
 	sizer:add(on_executed_sizer, 0, 0, "EXPAND")
+	if self.USES_POINT_ORIENTATION then
+		sizer:add(self:_build_point_orientation(panel), 0, 0, "EXPAND")
+	end
 	sizer:add(EWS:StaticLine(panel, "", "LI_HORIZONTAL"), 0, 5, "EXPAND,TOP,BOTTOM")
 	self:append_elements_sorted()
 	self:set_on_executed_element()
+end
+
+function CoreMissionElement:_build_point_orientation(panel)
+	local sizer = EWS:StaticBoxSizer(panel, "HORIZONTAL", "Point orientation")
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("ADD_ELEMENT", "Add an element", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("ADD_ELEMENT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_add_unit_to_orientation_elements"), nil)
+	toolbar:add_tool("DELETE_ELEMENT", "Remove selected element", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("DELETE_ELEMENT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_remove_unit_from_orientation_elements"), nil)
+	toolbar:realize()
+	sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	local use_orientation_sequenced = EWS:CheckBox(panel, "Use sequenced", "")
+	use_orientation_sequenced:set_value(self._hed.use_orientation_sequenced)
+	use_orientation_sequenced:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = use_orientation_sequenced,
+		value = "use_orientation_sequenced"
+	})
+	sizer:add(use_orientation_sequenced, 0, 4, "EXPAND,LEFT")
+	local disable_orientation_on_use = EWS:CheckBox(panel, "Disable on use", "")
+	disable_orientation_on_use:set_value(self._hed.disable_orientation_on_use)
+	disable_orientation_on_use:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = disable_orientation_on_use,
+		value = "disable_orientation_on_use"
+	})
+	sizer:add(disable_orientation_on_use, 0, 4, "EXPAND,LEFT")
+	return sizer
+end
+
+function CoreMissionElement:_add_unit_to_orientation_elements()
+	local script = self._unit:mission_element_data().script
+	
+	local function f(unit)
+		if not string.find(unit:name():s(), "point_orientation", 1, true) then
+			return
+		end
+		if not unit:mission_element_data() or unit:mission_element_data().script ~= script then
+			return
+		end
+		local id = unit:unit_data().unit_id
+		if self._hed.orientation_elements and table.contains(self._hed.orientation_elements, id) then
+			return false
+		end
+		return managers.editor:layer("Mission"):category_map()[unit:type():s()]
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Add Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		self:_add_orientation_unit_id(unit:unit_data().unit_id)
+	end
+end
+
+function CoreMissionElement:_remove_unit_from_orientation_elements()
+	if not self._hed.orientation_elements then
+		return
+	end
+	
+	local function f(unit)
+		return table.contains(self._hed.orientation_elements, unit:unit_data().unit_id)
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Remove Unit", f)
+	if dialog:cancelled() then
+		return
+	end
+	for _, unit in ipairs(dialog:selected_units()) do
+		self:_remove_orientation_unit_id(unit:unit_data().unit_id)
+	end
 end
 
 function CoreMissionElement:_create_panel()
@@ -259,7 +360,25 @@ function CoreMissionElement:set_element_data(data)
 	if data.value then
 		self._hed[data.value] = data.ctrlr:get_value()
 		self._hed[data.value] = tonumber(self._hed[data.value]) or self._hed[data.value]
+		if EWS:get_key_state("K_CONTROL") then
+			local value = data.ctrlr:get_value()
+			value = tonumber(self._hed[data.value]) or self._hed[data.value]
+			for _, unit in ipairs(managers.editor:layer("Mission"):selected_units()) do
+				if unit ~= self._unit and unit:mission_element_data() then
+					unit:mission_element_data()[data.value] = value
+					unit:mission_element():set_panel_dirty()
+				end
+			end
+		end
 	end
+end
+
+function CoreMissionElement:set_panel_dirty()
+	if not alive(self._panel) then
+		return
+	end
+	self._panel:destroy()
+	self._panel = nil
 end
 
 function CoreMissionElement:selected()
@@ -270,6 +389,10 @@ function CoreMissionElement:update_selected()
 end
 
 function CoreMissionElement:update_unselected()
+end
+
+function CoreMissionElement:can_edit()
+	return self.update_editing or self.base_update_editing
 end
 
 function CoreMissionElement:begin_editing()
@@ -377,7 +500,63 @@ function CoreMissionElement:timeline_color()
 	return self._timeline_color
 end
 
-function CoreMissionElement:add_triggers()
+function CoreMissionElement:add_triggers(vc)
+end
+
+function CoreMissionElement:base_add_triggers(vc)
+	if self.USES_POINT_ORIENTATION then
+		vc:add_trigger(Idstring("lmb"), callback(self, self, "_on_use_point_orientation"))
+	end
+	if self.USES_INSTIGATOR_RULES then
+		vc:add_trigger(Idstring("lmb"), callback(self, self, "_on_use_instigator_rule"))
+	end
+end
+
+function CoreMissionElement:_on_use_point_orientation()
+	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
+	if ray and ray.unit and string.find(ray.unit:name():s(), "point_orientation", 1, true) then
+		local id = ray.unit:unit_data().unit_id
+		if self._hed.orientation_elements and table.contains(self._hed.orientation_elements, id) then
+			self:_remove_orientation_unit_id(id)
+		else
+			self:_add_orientation_unit_id(id)
+		end
+	end
+end
+
+function CoreMissionElement:_add_orientation_unit_id(id)
+	self._hed.orientation_elements = self._hed.orientation_elements or {}
+	table.insert(self._hed.orientation_elements, id)
+end
+
+function CoreMissionElement:_remove_orientation_unit_id(id)
+	table.delete(self._hed.orientation_elements, id)
+	self._hed.orientation_elements = #self._hed.orientation_elements > 0 and self._hed.orientation_elements or nil
+end
+
+function CoreMissionElement:_on_use_instigator_rule()
+	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
+	if ray and ray.unit and string.find(ray.unit:name():s(), "data_instigator_rule", 1, true) then
+		local id = ray.unit:unit_data().unit_id
+		if self._hed.rules_elements and table.contains(self._hed.rules_elements, id) then
+			self:_remove_instigator_rule_unit_id(id)
+		else
+			self:_add_instigator_rule_unit_id(id)
+		end
+	end
+end
+
+function CoreMissionElement:_add_instigator_rule_unit_id(id)
+	self._hed.rules_elements = self._hed.rules_elements or {}
+	table.insert(self._hed.rules_elements, id)
+end
+
+function CoreMissionElement:_remove_instigator_rule_unit_id(id)
+	table.delete(self._hed.rules_elements, id)
+	self._hed.rules_elements = #self._hed.rules_elements > 0 and self._hed.rules_elements or nil
+end
+
+function CoreMissionElement:__update_editing(_, t, dt, current_pos)
 end
 
 function CoreMissionElement:clear_triggers()
@@ -443,8 +622,63 @@ function CoreMissionElement:destroy()
 	end
 end
 
-function CoreMissionElement:draw_links(t, dt, selected_unit)
+function CoreMissionElement:draw_links(t, dt, selected_unit, all_units)
+	self:_base_check_removed_units(all_units)
 	self:draw_link_on_executed(t, dt, selected_unit)
+	self:_draw_elements(t, dt, self._hed.orientation_elements, selected_unit, all_units)
+	self:_draw_elements(t, dt, self._hed.rules_elements, selected_unit, all_units)
+end
+
+function CoreMissionElement:_base_check_removed_units(all_units)
+	if self._hed.orientation_elements then
+		for _, id in ipairs(clone(self._hed.orientation_elements)) do
+			local unit = all_units[id]
+			if not alive(unit) then
+				self:_remove_orientation_unit_id(id)
+			end
+		end
+	end
+	if self._hed.rules_elements then
+		for _, id in ipairs(clone(self._hed.rules_elements)) do
+			local unit = all_units[id]
+			if not alive(unit) then
+				self:_remove_instigator_rule_unit_id(id)
+			end
+		end
+	end
+end
+
+function CoreMissionElement:_draw_elements(t, dt, elements, selected_unit, all_units)
+	if not elements then
+		return
+	end
+	for _, id in ipairs(elements) do
+		local unit = all_units[id]
+		if self:_should_draw_link(selected_unit, unit) then
+			local r, g, b = unit:mission_element():get_link_color()
+			self:_draw_link({
+				from_unit = unit,
+				to_unit = self._unit,
+				r = r,
+				g = g,
+				b = b
+			})
+		end
+	end
+end
+
+function CoreMissionElement:_should_draw_link(selected_unit, unit)
+	return not selected_unit or unit == selected_unit or self._unit == selected_unit
+end
+
+function CoreMissionElement:get_link_color(unit)
+	local r, g, b = 1, 1, 1
+	if self._iconcolor and managers.editor:layer("Mission"):use_colored_links() then
+		r = self._iconcolor_c.r
+		g = self._iconcolor_c.g
+		b = self._iconcolor_c.b
+	end
+	return r, g, b
 end
 
 function CoreMissionElement:draw_link_on_executed(t, dt, selected_unit)
@@ -458,14 +692,14 @@ function CoreMissionElement:draw_link_on_executed(t, dt, selected_unit)
 			local offset = math.min(50, vec_len)
 			mvector3.multiply(dir, offset)
 			if self._distance_to_camera < 1000000 then
-				CoreMissionElement.editor_link_brush:center_text(self._unit:position() + dir, string.format("%.2f", self:_get_on_executed(unit:unit_data().unit_id).delay), managers.editor:camera_rotation():x(), -managers.editor:camera_rotation():z())
+				local text = string.format("%.2f", self:_get_on_executed(unit:unit_data().unit_id).delay)
+				local alternative = self:_get_on_executed(unit:unit_data().unit_id).alternative
+				if alternative then
+					text = text .. " - " .. alternative .. ""
+				end
+				CoreMissionElement.editor_link_brush:center_text(self._unit:position() + dir, text, managers.editor:camera_rotation():x(), -managers.editor:camera_rotation():z())
 			end
-			local r, g, b = 1, 1, 1
-			if self._iconcolor and managers.editor:layer("Mission"):use_colored_links() then
-				r = self._iconcolor_c.r
-				g = self._iconcolor_c.g
-				b = self._iconcolor_c.b
-			end
+			local r, g, b = self:get_link_color()
 			self:_draw_link({
 				from_unit = self._unit,
 				to_unit = unit,
@@ -485,6 +719,7 @@ function CoreMissionElement:add_on_executed(unit)
 		id = unit:unit_data().unit_id,
 		delay = 0
 	}
+	params.alternative = self.ON_EXECUTED_ALTERNATIVES and self.ON_EXECUTED_ALTERNATIVES[1] or nil
 	table.insert(self._on_executed_units, unit)
 	table.insert(self._hed.on_executed, params)
 	if self._timeline then
@@ -539,6 +774,9 @@ function CoreMissionElement:set_on_executed_data()
 	local id = self:combobox_id(self._elements_params.value)
 	local params = self:_get_on_executed(id)
 	CoreEWS.change_entered_number(self._element_delay_params, params.delay)
+	if self._on_executed_alternatives_params then
+		CoreEWS.change_combobox_value(self._on_executed_alternatives_params, params.alternative)
+	end
 	if self._timeline then
 		self._timeline:select_element(params)
 	end
@@ -557,6 +795,9 @@ function CoreMissionElement:_set_on_execute_ctrlrs_enabled(enabled)
 	self._elements_params.ctrlr:set_enabled(enabled)
 	self._element_delay_params.number_ctrlr:set_enabled(enabled)
 	self._elements_toolbar:set_enabled(enabled)
+	if self._on_executed_alternatives_params then
+		self._on_executed_alternatives_params.ctrlr:set_enabled(enabled)
+	end
 end
 
 function CoreMissionElement:on_executed_element_selected()
@@ -597,6 +838,13 @@ function CoreMissionElement:on_executed_element_delay()
 	if self._timeline then
 		self._timeline:delay_updated(params)
 	end
+end
+
+function CoreMissionElement:on_executed_alternatives_types()
+	local id = self:combobox_id(self._elements_params.value)
+	local params = self:_get_on_executed(id)
+	print("self._on_executed_alternatives_params.value", self._on_executed_alternatives_params.value)
+	params.alternative = self._on_executed_alternatives_params.value
 end
 
 function CoreMissionElement:append_elements_sorted()

@@ -17,13 +17,15 @@ function BlackMarketTweakData:print_missing_strings()
 	if Application:production_build() then
 		for id, data in pairs(self) do
 			for i, d in pairs(data) do
-				local name_id = d.name_id
-				if name_id and not managers.localization:exists(name_id) then
-					Application:debug(name_id, "", "", id)
-				end
-				local desc_id = d.desc_id
-				if desc_id and not managers.localization:exists(desc_id) then
-					Application:debug(desc_id, "", "", id)
+				if id ~= "weapon_mods" or tweak_data.weapon.factory.parts[i].pc or tweak_data.weapon.factory.parts[i].pcs then
+					local name_id = d.name_id
+					if name_id and not managers.localization:exists(name_id) then
+						Application:debug(name_id, "", "", id)
+					end
+					local desc_id = d.desc_id
+					if desc_id and not managers.localization:exists(desc_id) then
+						Application:debug(desc_id, "", "", id)
+					end
 				end
 			end
 		end
@@ -712,6 +714,17 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.baby_happy.global_value = "halloween"
 	self.masks.baby_happy.value = 8
 	self.masks.baby_happy.qlvl = 0
+	self.masks.heat = {}
+	self.masks.heat.unit = "units/pd2_dlc1/masks/msk_hockey_b/msk_hockey_b"
+	self.masks.heat.name_id = "bm_msk_heat"
+	self.masks.heat.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.heat.value = 6
+	self.masks.heat.dlc = "pd2_clan"
 	self.masks.bear = {}
 	self.masks.bear.unit = "units/payday2/masks/msk_bear/msk_bear"
 	self.masks.bear.name_id = "bm_msk_bear"
@@ -724,6 +737,67 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.bear.value = 3
 	self.masks.bear.qlvl = 0
 	self.masks.bear.dlcs = {"pd2_clan"}
+	self.masks.clinton = {}
+	self.masks.clinton.unit = "units/pd2_dlc1/masks/msk_clinton/msk_clinton"
+	self.masks.clinton.name_id = "bm_msk_clinton"
+	self.masks.clinton.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.clinton.value = 6
+	self.masks.clinton.dlc = "armored_transport"
+	self.masks.clinton.texture_bundle_folder = "dlc1"
+	self.masks.bush = {}
+	self.masks.bush.unit = "units/pd2_dlc1/masks/msk_bush/msk_bush"
+	self.masks.bush.name_id = "bm_msk_bush"
+	self.masks.bush.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.bush.value = 6
+	self.masks.bush.dlc = "armored_transport"
+	self.masks.bush.texture_bundle_folder = "dlc1"
+	self.masks.obama = {}
+	self.masks.obama.unit = "units/pd2_dlc1/masks/msk_obama/msk_obama"
+	self.masks.obama.name_id = "bm_msk_obama"
+	self.masks.obama.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.obama.value = 6
+	self.masks.obama.dlc = "armored_transport"
+	self.masks.obama.texture_bundle_folder = "dlc1"
+	self.masks.nixon = {}
+	self.masks.nixon.unit = "units/pd2_dlc1/masks/msk_nixon/msk_nixon"
+	self.masks.nixon.name_id = "bm_msk_nixon"
+	self.masks.nixon.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.nixon.value = 6
+	self.masks.nixon.dlc = "armored_transport"
+	self.masks.nixon.texture_bundle_folder = "dlc1"
+	if SystemInfo:platform() == Idstring("PS3") then
+		self.masks.sweettooth = {}
+		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
+		self.masks.sweettooth.name_id = "bm_msk_sweettooth"
+		self.masks.sweettooth.pcs = {
+			10,
+			20,
+			30,
+			40
+		}
+		self.masks.sweettooth.dlc = "sweettooth"
+		self.masks.sweettooth.value = 1
+	end
 	self:_add_desc_from_name_macro(self.masks)
 end
 
@@ -2244,6 +2318,51 @@ function BlackMarketTweakData:_init_materials()
 	}
 	self.materials.orchish.texture = "units/payday2/matcaps/matcap_orcish_df"
 	self.materials.orchish.value = 5
+	self.materials.cash = {}
+	self.materials.cash.name_id = "bm_mtl_cash"
+	self.materials.cash.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.cash.texture = "units/pd2_dlc1/matcaps/matcap_cash_df"
+	self.materials.cash.material_amount = 0
+	self.materials.cash.value = 5
+	self.materials.cash.dlc = "armored_transport"
+	self.materials.jade = {}
+	self.materials.jade.name_id = "bm_mtl_jade"
+	self.materials.jade.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.jade.texture = "units/pd2_dlc1/matcaps/matcap_jade_df"
+	self.materials.jade.value = 5
+	self.materials.jade.dlc = "armored_transport"
+	self.materials.redwhiteblue = {}
+	self.materials.redwhiteblue.name_id = "bm_mtl_redwhiteblue"
+	self.materials.redwhiteblue.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.redwhiteblue.texture = "units/pd2_dlc1/matcaps/matcap_redwhiteblue_df"
+	self.materials.redwhiteblue.value = 5
+	self.materials.redwhiteblue.dlc = "armored_transport"
+	self.materials.marble = {}
+	self.materials.marble.name_id = "bm_mtl_marble"
+	self.materials.marble.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.marble.texture = "units/pd2_dlc1/matcaps/matcap_marble_df"
+	self.materials.marble.value = 5
+	self.materials.marble.dlc = "armored_transport"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -3386,6 +3505,50 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.doomweaver.texture = "units/payday2/masks/shared_textures/patterns/pattern_doomweaver_df"
 	self.textures.doomweaver.global_value = "halloween"
 	self.textures.doomweaver.value = 4
+	self.textures.racestripes = {}
+	self.textures.racestripes.name_id = "bm_txt_racestripes"
+	self.textures.racestripes.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.racestripes.texture = "units/pd2_dlc1/masks/patterns/pattern_racestripes_df"
+	self.textures.racestripes.value = 4
+	self.textures.racestripes.dlc = "armored_transport"
+	self.textures.americaneagle = {}
+	self.textures.americaneagle.name_id = "bm_txt_americaneagle"
+	self.textures.americaneagle.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.americaneagle.texture = "units/pd2_dlc1/masks/patterns/pattern_americaneagle_df"
+	self.textures.americaneagle.value = 4
+	self.textures.americaneagle.dlc = "armored_transport"
+	self.textures.stars = {}
+	self.textures.stars.name_id = "bm_txt_stars"
+	self.textures.stars.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.stars.texture = "units/pd2_dlc1/masks/patterns/pattern_stars_df"
+	self.textures.stars.value = 4
+	self.textures.stars.dlc = "armored_transport"
+	self.textures.forestcamo = {}
+	self.textures.forestcamo.name_id = "bm_txt_forestcamo"
+	self.textures.forestcamo.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.forestcamo.texture = "units/pd2_dlc1/masks/patterns/pattern_forestcamo_df"
+	self.textures.forestcamo.value = 4
+	self.textures.forestcamo.dlc = "armored_transport"
 end
 
 function BlackMarketTweakData:_init_cash()

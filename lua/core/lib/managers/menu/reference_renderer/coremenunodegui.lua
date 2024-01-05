@@ -95,6 +95,7 @@ function NodeGui:_setup_item_rows(node)
 			row_item.halign = params.halign or self.halign or "left"
 			row_item.vertical = params.vertical or self.vertical or "center"
 			row_item.to_upper = params.to_upper == nil and self.to_upper or params.to_upper or false
+			row_item.color_ranges = params.color_ranges or self.color_ranges or nil
 			self:_create_menu_item(row_item)
 			self:reload_item(item)
 			i = i + 1
@@ -142,6 +143,7 @@ function NodeGui:_insert_row_item(item, node, i)
 		row_item.halign = params.halign or self.halign or "left"
 		row_item.vertical = params.vertical or self.vertical or "center"
 		row_item.to_upper = params.to_upper or false
+		row_item.color_ranges = params.color_ranges or self.color_ranges or nil
 		self:_create_menu_item(row_item)
 		self:reload_item(item)
 	end

@@ -62,6 +62,8 @@ function MoneyTweakData:init()
 	self.bag_values.meth = 1000
 	self.bag_values.weapon = 950
 	self.bag_values.weapons = 950
+	self.bag_values.shells = 2100
+	self.bag_values.turret = 10000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
@@ -118,6 +120,8 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.overkill = 0.01
 	self.global_value_multipliers.pd2_clan = 1
 	self.global_value_multipliers.halloween = 1
+	self.global_value_multipliers.armored_transport = 1.2
+	self.global_value_multipliers.sweettooth = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -125,8 +129,10 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.infamous = 1
 	self.global_value_bonus_multiplier.preorder = 0
 	self.global_value_bonus_multiplier.overkill = 20
-	self.global_value_bonus_multiplier.pd2_clan = 1
-	self.global_value_bonus_multiplier.halloween = 1
+	self.global_value_bonus_multiplier.pd2_clan = 0
+	self.global_value_bonus_multiplier.halloween = 0
+	self.global_value_bonus_multiplier.armored_transport = 0.5
+	self.global_value_bonus_multiplier.sweettooth = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)

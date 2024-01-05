@@ -25,8 +25,10 @@ function ElementFeedback:on_executed(instigator)
 		self._feedback:set_enabled("camera_shake", self._values.use_camera_shake)
 		local multiplier = self:_calc_multiplier(player)
 		local params = {}
+		self:_check_value(params, "camera_shake", "name", self._values.camera_shake_effect)
 		self:_check_value(params, "camera_shake", "multiplier", multiplier)
 		self:_check_value(params, "camera_shake", "amplitude", self._values.camera_shake_amplitude)
+		self:_check_value(params, "camera_shake", "frequency", self._values.camera_shake_frequency)
 		self:_check_value(params, "camera_shake", "attack", self._values.camera_shake_attack)
 		self:_check_value(params, "camera_shake", "sustain", self._values.camera_shake_sustain)
 		self:_check_value(params, "camera_shake", "decay", self._values.camera_shake_decay)
@@ -45,7 +47,10 @@ function ElementFeedback:on_executed(instigator)
 end
 
 function ElementFeedback:_check_value(params, cat, setting, value)
-	if 0 <= value then
+	if not value then
+		return
+	end
+	if type_name(value) == "string" or 0 <= value then
 		table.insert(params, cat)
 		table.insert(params, setting)
 		table.insert(params, value)
@@ -56,7 +61,8 @@ function ElementFeedback:_calc_multiplier(player)
 	if self._values.range == 0 then
 		return 1
 	end
-	local distance = (self._values.position - player:position()):length()
+	local pos, _ = self:get_orientation(true)
+	local distance = (pos - player:position()):length()
 	local mul = math.clamp(1 - distance / self._values.range, 0, 1)
 	return mul
 end

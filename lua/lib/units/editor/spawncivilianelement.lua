@@ -1,6 +1,7 @@
 core:import("CoreEditorUtils")
 core:import("CoreUnit")
 SpawnCivilianUnitElement = SpawnCivilianUnitElement or class(MissionElement)
+SpawnCivilianUnitElement.USES_POINT_ORIENTATION = true
 
 function SpawnCivilianUnitElement:init(unit)
 	SpawnCivilianUnitElement.super.init(self, unit)
@@ -55,7 +56,12 @@ function SpawnCivilianUnitElement:init(unit)
 		"units/payday2/characters/npc_getaway_driver_1/npc_getaway_driver_1",
 		"units/pd2_dlc1/characters/civ_male_paramedic_1/civ_male_paramedic_1",
 		"units/pd2_dlc1/characters/civ_male_paramedic_2/civ_male_paramedic_2",
-		"units/pd2_dlc1/characters/civ_male_firefighter_1/civ_male_firefighter_1"
+		"units/pd2_dlc1/characters/civ_male_firefighter_1/civ_male_firefighter_1",
+		"units/pd2_dlc1/characters/civ_male_casual_10/civ_male_casual_10",
+		"units/pd2_dlc1/characters/civ_male_casual_11/civ_male_casual_11",
+		"units/pd2_dlc1/characters/civ_male_bank_manager_2/civ_male_bank_manager_2",
+		"units/pd2_dlc2/characters/civ_female_bank_assistant_1/civ_female_bank_assistant_1",
+		"units/pd2_dlc2/characters/civ_female_bank_assistant_2/civ_female_bank_assistant_2"
 	}
 	self._hed.state = "none"
 	self._hed.enemy = "units/payday2/characters/civ_male_casual_1/civ_male_casual_1"

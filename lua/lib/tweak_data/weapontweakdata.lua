@@ -36,6 +36,9 @@ function WeaponTweakData:init()
 	self:_init_data_saw_npc()
 	self:_init_data_sentry_gun_npc()
 	self:_init_data_usp_npc()
+	self:_init_data_m45_npc()
+	self:_init_data_s552_npc()
+	self:_init_data_ppk_npc()
 	self:_precalculate_values()
 end
 
@@ -52,6 +55,8 @@ function WeaponTweakData:_init_data_c45_npc()
 	self.c45_npc.hud_icon = "c45"
 	self.c45_npc.alert_size = 2500
 	self.c45_npc.suppression = 1
+	self.colt_1911_primary_npc = deep_clone(self.c45_npc)
+	self.colt_1911_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_beretta92_npc()
@@ -67,6 +72,8 @@ function WeaponTweakData:_init_data_beretta92_npc()
 	self.beretta92_npc.hud_icon = "beretta92"
 	self.beretta92_npc.alert_size = 300
 	self.beretta92_npc.suppression = 0.3
+	self.beretta92_primary_npc = deep_clone(self.beretta92_npc)
+	self.beretta92_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_glock_18_npc()
@@ -82,6 +89,8 @@ function WeaponTweakData:_init_data_glock_18_npc()
 	self.glock_18_npc.hud_icon = "glock"
 	self.glock_18_npc.alert_size = 2500
 	self.glock_18_npc.suppression = 0.45
+	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
+	self.glock_18c_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_raging_bull_npc()
@@ -97,6 +106,8 @@ function WeaponTweakData:_init_data_raging_bull_npc()
 	self.raging_bull_npc.hud_icon = "raging_bull"
 	self.raging_bull_npc.alert_size = 5000
 	self.raging_bull_npc.suppression = 1.8
+	self.raging_bull_primary_npc = deep_clone(self.raging_bull_npc)
+	self.raging_bull_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_m4_npc()
@@ -112,6 +123,8 @@ function WeaponTweakData:_init_data_m4_npc()
 	self.m4_npc.hud_icon = "m4"
 	self.m4_npc.alert_size = 5000
 	self.m4_npc.suppression = 1
+	self.m4_secondary_npc = deep_clone(self.m4_npc)
+	self.m4_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_ak47_npc()
@@ -156,6 +169,7 @@ function WeaponTweakData:_init_data_m14_sniper_npc()
 	self.m14_sniper_npc.hud_icon = "m14"
 	self.m14_sniper_npc.alert_size = 5000
 	self.m14_sniper_npc.suppression = 1
+	self.m14_sniper_npc.armor_piercing = true
 end
 
 function WeaponTweakData:_init_data_r870_npc()
@@ -221,7 +235,7 @@ end
 function WeaponTweakData:_init_data_g36_npc()
 	self.g36_npc.sounds.prefix = "g36_npc"
 	self.g36_npc.use_data.selection_index = 2
-	self.g36_npc.DAMAGE = 2
+	self.g36_npc.DAMAGE = 3
 	self.g36_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
 	self.g36_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
 	self.g36_npc.CLIP_AMMO_MAX = 20
@@ -278,6 +292,8 @@ function WeaponTweakData:_init_data_olympic_npc()
 	self.olympic_npc.hud_icon = "mac11"
 	self.olympic_npc.alert_size = 1000
 	self.olympic_npc.suppression = 1
+	self.olympic_primary_npc = deep_clone(self.olympic_npc)
+	self.olympic_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_m16_npc()
@@ -308,6 +324,8 @@ function WeaponTweakData:_init_data_aug_npc()
 	self.aug_npc.hud_icon = "m4"
 	self.aug_npc.alert_size = 5000
 	self.aug_npc.suppression = 1
+	self.aug_secondary_npc = deep_clone(self.aug_npc)
+	self.aug_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_ak74_npc()
@@ -323,6 +341,8 @@ function WeaponTweakData:_init_data_ak74_npc()
 	self.ak74_npc.hud_icon = "ak"
 	self.ak74_npc.alert_size = 5000
 	self.ak74_npc.suppression = 1
+	self.ak74_secondary_npc = deep_clone(self.ak74_npc)
+	self.ak74_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_ak5_npc()
@@ -401,6 +421,8 @@ function WeaponTweakData:_init_data_akmsu_npc()
 	self.akmsu_npc.hud_icon = "mac11"
 	self.akmsu_npc.alert_size = 1000
 	self.akmsu_npc.suppression = 1
+	self.akmsu_primary_npc = deep_clone(self.akmsu_npc)
+	self.akmsu_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_akm_npc()
@@ -431,6 +453,8 @@ function WeaponTweakData:_init_data_deagle_npc()
 	self.deagle_npc.hud_icon = "c45"
 	self.deagle_npc.alert_size = 2500
 	self.deagle_npc.suppression = 1
+	self.deagle_primary_npc = deep_clone(self.deagle_npc)
+	self.deagle_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_serbu_npc()
@@ -490,6 +514,8 @@ function WeaponTweakData:_init_data_saw_npc()
 	self.saw_npc.hud_icon = "r870_shotgun"
 	self.saw_npc.alert_size = 4500
 	self.saw_npc.suppression = 1.8
+	self.saw_secondary_npc = deep_clone(self.saw_npc)
+	self.saw_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_sentry_gun_npc()
@@ -535,7 +561,7 @@ function WeaponTweakData:_init_data_sentry_gun_npc()
 end
 
 function WeaponTweakData:_init_data_usp_npc()
-	self.usp_npc.sounds.prefix = "c45_npc"
+	self.usp_npc.sounds.prefix = "usp45_npc"
 	self.usp_npc.use_data.selection_index = 1
 	self.usp_npc.DAMAGE = 3
 	self.usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
@@ -548,6 +574,54 @@ function WeaponTweakData:_init_data_usp_npc()
 	self.usp_npc.hud_icon = "mac11"
 	self.usp_npc.alert_size = 1800
 	self.usp_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_m45_npc()
+	self.m45_npc.sounds.prefix = "mac10_npc"
+	self.m45_npc.use_data.selection_index = 1
+	self.m45_npc.DAMAGE = 2
+	self.m45_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m45_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m45_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m45_npc.CLIP_AMMO_MAX = 40
+	self.m45_npc.NR_CLIPS_MAX = 5
+	self.m45_npc.auto.fire_rate = 0.1
+	self.m45_npc.hold = "rifle"
+	self.m45_npc.hud_icon = "mac11"
+	self.m45_npc.alert_size = 2800
+	self.m45_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_s552_npc()
+	self.s552_npc.sounds.prefix = "g36_npc"
+	self.s552_npc.use_data.selection_index = 2
+	self.s552_npc.DAMAGE = 2
+	self.s552_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.s552_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.s552_npc.CLIP_AMMO_MAX = 20
+	self.s552_npc.NR_CLIPS_MAX = 5
+	self.s552_npc.auto.fire_rate = 0.15
+	self.s552_npc.hold = "rifle"
+	self.s552_npc.hud_icon = "m4"
+	self.s552_npc.alert_size = 5000
+	self.s552_npc.suppression = 1
+	self.s552_secondary_npc = deep_clone(self.s552_npc)
+	self.s552_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_ppk_npc()
+	self.ppk_npc.sounds.prefix = "g17_npc"
+	self.ppk_npc.use_data.selection_index = 1
+	self.ppk_npc.DAMAGE = 1
+	self.ppk_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.ppk_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.ppk_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.ppk_npc.CLIP_AMMO_MAX = 10
+	self.ppk_npc.NR_CLIPS_MAX = 5
+	self.ppk_npc.hold = "pistol"
+	self.ppk_npc.hud_icon = "c45"
+	self.ppk_npc.alert_size = 2500
+	self.ppk_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons()
@@ -843,15 +917,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.sounds = {}
 	self.new_m4.sounds.fire = "m4_fire"
 	self.new_m4.sounds.stop_fire = "m4_stop"
-	self.new_m4.sounds.dryfire = "m4_dryfire"
+	self.new_m4.sounds.dryfire = "primary_dryfire"
 	self.new_m4.sounds.enter_steelsight = "m4_tighten"
 	self.new_m4.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.new_m4.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.new_m4.timers = {}
 	self.new_m4.timers.reload_not_empty = 2.25
 	self.new_m4.timers.reload_empty = 3
-	self.new_m4.timers.unequip = 0.7
-	self.new_m4.timers.equip = 0.66
+	self.new_m4.timers.unequip = 0.75
+	self.new_m4.timers.equip = 0.7
 	self.new_m4.name_id = "bm_w_m4"
 	self.new_m4.desc_id = "bm_w_m4_desc"
 	self.new_m4.hud_icon = "m4"
@@ -869,7 +943,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.fire_mode_data = {}
 	self.new_m4.fire_mode_data.fire_rate = 0.11
 	self.new_m4.auto = {}
-	self.new_m4.auto.fire_rate = 0.11
+	self.new_m4.auto.fire_rate = 0.12
 	self.new_m4.spread = {}
 	self.new_m4.spread.standing = 3.5
 	self.new_m4.spread.crouching = self.new_m4.spread.standing
@@ -901,8 +975,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.stats = {
 		damage = 10,
 		spread = 7,
-		recoil = 8,
-		spread_moving = 6,
+		recoil = 7,
+		spread_moving = 7,
 		zoom = 3,
 		concealment = 20,
 		suppression = 10,
@@ -916,7 +990,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_17.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.glock_17.sounds = {}
 	self.glock_17.sounds.fire = "g17_fire"
-	self.glock_17.sounds.dryfire = "g17_dryfire"
+	self.glock_17.sounds.dryfire = "secondary_dryfire"
 	self.glock_17.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.glock_17.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.glock_17.FIRE_MODE = "single"
@@ -1004,14 +1078,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.sounds = {}
 	self.mp9.sounds.fire = "mp9_fire"
 	self.mp9.sounds.stop_fire = "mp9_stop"
-	self.mp9.sounds.dryfire = "mk11_dryfire"
+	self.mp9.sounds.dryfire = "secondary_dryfire"
 	self.mp9.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.mp9.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.mp9.timers = {}
 	self.mp9.timers.reload_not_empty = 1.51
 	self.mp9.timers.reload_empty = 2.48
-	self.mp9.timers.unequip = 0.75
-	self.mp9.timers.equip = 0.5
+	self.mp9.timers.unequip = 0.7
+	self.mp9.timers.equip = 0.55
 	self.mp9.name_id = "bm_w_mp9"
 	self.mp9.desc_id = "bm_w_mp9_desc"
 	self.mp9.hud_icon = "mac11"
@@ -1089,12 +1163,12 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r870.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.r870.sounds = {}
 	self.r870.sounds.fire = "remington_fire"
-	self.r870.sounds.dryfire = "remington_dryfire"
+	self.r870.sounds.dryfire = "shotgun_dryfire"
 	self.r870.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.r870.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.r870.timers = {}
-	self.r870.timers.unequip = 0.7
-	self.r870.timers.equip = 0.6
+	self.r870.timers.unequip = 0.85
+	self.r870.timers.equip = 0.85
 	self.r870.name_id = "bm_w_r870"
 	self.r870.desc_id = "bm_w_r870_desc"
 	self.r870.hud_icon = "r870_shotgun"
@@ -1182,7 +1256,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_18c.sounds = {}
 	self.glock_18c.sounds.fire = "g18c_fire"
 	self.glock_18c.sounds.stop_fire = "g18c_stop"
-	self.glock_18c.sounds.dryfire = "stryk_dryfire"
+	self.glock_18c.sounds.dryfire = "secondary_dryfire"
 	self.glock_18c.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.glock_18c.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.glock_18c.timers = {}
@@ -1253,12 +1327,12 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_18c.transition_duration = 0
 	self.glock_18c.statistics = true
 	self.glock_18c.stats = {
-		damage = 8,
+		damage = 9,
 		spread = 5,
 		recoil = 6,
 		spread_moving = 9,
 		zoom = 1,
-		concealment = 25,
+		concealment = 29,
 		suppression = 16,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -1271,7 +1345,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.amcar.sounds = {}
 	self.amcar.sounds.fire = "amcar_fire"
 	self.amcar.sounds.stop_fire = "amcar_stop"
-	self.amcar.sounds.dryfire = "m4_dryfire"
+	self.amcar.sounds.dryfire = "primary_dryfire"
 	self.amcar.sounds.enter_steelsight = "m4_tighten"
 	self.amcar.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.amcar.sounds.leave_steelsight = "primary_steel_sight_exit"
@@ -1354,15 +1428,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.sounds = {}
 	self.m16.sounds.fire = "m16_fire"
 	self.m16.sounds.stop_fire = "m16_stop"
-	self.m16.sounds.dryfire = "m4_dryfire"
+	self.m16.sounds.dryfire = "primary_dryfire"
 	self.m16.sounds.enter_steelsight = "m4_tighten"
 	self.m16.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.m16.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.m16.timers = {}
 	self.m16.timers.reload_not_empty = 2.25
 	self.m16.timers.reload_empty = 3
-	self.m16.timers.unequip = 0.85
-	self.m16.timers.equip = 0.75
+	self.m16.timers.unequip = 0.8
+	self.m16.timers.equip = 0.8
 	self.m16.name_id = "bm_w_m16"
 	self.m16.desc_id = "bm_w_m16_desc"
 	self.m16.hud_icon = "m4"
@@ -1422,7 +1496,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		damage = 13,
 		spread = 7,
 		recoil = 10,
-		spread_moving = 6,
+		spread_moving = 5,
 		zoom = 4,
 		concealment = 17,
 		suppression = 10,
@@ -1437,7 +1511,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.sounds = {}
 	self.olympic.sounds.fire = "m4_olympic_fire"
 	self.olympic.sounds.stop_fire = "m4_olympic_stop"
-	self.olympic.sounds.dryfire = "m4_dryfire"
+	self.olympic.sounds.dryfire = "primary_dryfire"
 	self.olympic.sounds.enter_steelsight = "m4_tighten"
 	self.olympic.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.olympic.sounds.leave_steelsight = "primary_steel_sight_exit"
@@ -1520,14 +1594,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.sounds = {}
 	self.ak74.sounds.fire = "ak74_fire"
 	self.ak74.sounds.stop_fire = "ak74_stop"
-	self.ak74.sounds.dryfire = "ak47_dryfire"
+	self.ak74.sounds.dryfire = "primary_dryfire"
 	self.ak74.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.ak74.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.ak74.timers = {}
 	self.ak74.timers.reload_not_empty = 2.3
 	self.ak74.timers.reload_empty = 3.4
-	self.ak74.timers.unequip = 0.7
-	self.ak74.timers.equip = 0.5
+	self.ak74.timers.unequip = 0.8
+	self.ak74.timers.equip = 0.8
 	self.ak74.name_id = "bm_w_ak74"
 	self.ak74.desc_id = "bm_w_ak74_desc"
 	self.ak74.hud_icon = "ak"
@@ -1603,14 +1677,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm.sounds = {}
 	self.akm.sounds.fire = "akm_fire"
 	self.akm.sounds.stop_fire = "akm_stop"
-	self.akm.sounds.dryfire = "ak47_dryfire"
+	self.akm.sounds.dryfire = "primary_dryfire"
 	self.akm.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.akm.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.akm.timers = {}
 	self.akm.timers.reload_not_empty = 2.3
 	self.akm.timers.reload_empty = 3.4
 	self.akm.timers.unequip = 0.8
-	self.akm.timers.equip = 0.5
+	self.akm.timers.equip = 0.8
 	self.akm.name_id = "bm_w_akm"
 	self.akm.desc_id = "bm_w_akm_desc"
 	self.akm.hud_icon = "ak"
@@ -1686,14 +1760,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.sounds = {}
 	self.akmsu.sounds.fire = "akmsu_fire"
 	self.akmsu.sounds.stop_fire = "akmsu_stop"
-	self.akmsu.sounds.dryfire = "ak47_dryfire"
+	self.akmsu.sounds.dryfire = "primary_dryfire"
 	self.akmsu.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.akmsu.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.akmsu.timers = {}
 	self.akmsu.timers.reload_not_empty = 2.3
 	self.akmsu.timers.reload_empty = 3.4
 	self.akmsu.timers.unequip = 0.65
-	self.akmsu.timers.equip = 0.5
+	self.akmsu.timers.equip = 0.6
 	self.akmsu.name_id = "bm_w_akmsu"
 	self.akmsu.desc_id = "bm_w_akmsu_desc"
 	self.akmsu.hud_icon = "ak"
@@ -1711,7 +1785,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.fire_mode_data = {}
 	self.akmsu.fire_mode_data.fire_rate = 0.1
 	self.akmsu.auto = {}
-	self.akmsu.auto.fire_rate = 0.1
+	self.akmsu.auto.fire_rate = 0.09
 	self.akmsu.spread = {}
 	self.akmsu.spread.standing = self.new_m4.spread.standing
 	self.akmsu.spread.crouching = self.new_m4.spread.standing
@@ -1768,15 +1842,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.saiga.sounds = {}
 	self.saiga.sounds.fire = "saiga_play"
-	self.saiga.sounds.dryfire = "remington_dryfire"
+	self.saiga.sounds.dryfire = "shotgun_dryfire"
 	self.saiga.sounds.stop_fire = "saiga_stop"
 	self.saiga.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.saiga.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.saiga.timers = {}
 	self.saiga.timers.reload_not_empty = 2.3
 	self.saiga.timers.reload_empty = 3.4
-	self.saiga.timers.unequip = 0.8
-	self.saiga.timers.equip = 0.8
+	self.saiga.timers.unequip = 0.85
+	self.saiga.timers.equip = 0.85
 	self.saiga.name_id = "bm_w_saiga"
 	self.saiga.desc_id = "bm_w_saiga_desc"
 	self.saiga.hud_icon = "r870_shotgun"
@@ -1836,7 +1910,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.animations.recoil_steelsight = true
 	self.saiga.statistics = true
 	self.saiga.stats = {
-		damage = 18,
+		damage = 15,
 		spread = 6,
 		recoil = 4,
 		spread_moving = 7,
@@ -1854,15 +1928,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.sounds = {}
 	self.ak5.sounds.fire = "ak5_fire"
 	self.ak5.sounds.stop_fire = "ak5_stop"
-	self.ak5.sounds.dryfire = "m4_dryfire"
+	self.ak5.sounds.dryfire = "primary_dryfire"
 	self.ak5.sounds.enter_steelsight = "m4_tighten"
 	self.ak5.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.ak5.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.ak5.timers = {}
 	self.ak5.timers.reload_not_empty = 2.25
 	self.ak5.timers.reload_empty = 3.47
-	self.ak5.timers.unequip = 0.7
-	self.ak5.timers.equip = 0.5
+	self.ak5.timers.unequip = 0.8
+	self.ak5.timers.equip = 0.8
 	self.ak5.name_id = "bm_w_ak5"
 	self.ak5.desc_id = "bm_w_ak5_desc"
 	self.ak5.hud_icon = "m4"
@@ -1937,14 +2011,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aug.sounds = {}
 	self.aug.sounds.fire = "aug_fire"
 	self.aug.sounds.stop_fire = "aug_stop"
-	self.aug.sounds.dryfire = "mp5_dryfire"
+	self.aug.sounds.dryfire = "secondary_dryfire"
 	self.aug.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.aug.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.aug.timers = {}
 	self.aug.timers.reload_not_empty = 2.5
 	self.aug.timers.reload_empty = 3.3
-	self.aug.timers.unequip = 0.72
-	self.aug.timers.equip = 0.6
+	self.aug.timers.unequip = 0.8
+	self.aug.timers.equip = 0.8
 	self.aug.name_id = "bm_w_aug"
 	self.aug.desc_id = "bm_w_aug_desc"
 	self.aug.hud_icon = "mp5"
@@ -2002,7 +2076,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		damage = 12,
 		spread = 8,
 		recoil = 5,
-		spread_moving = 6,
+		spread_moving = 7,
 		zoom = 3,
 		concealment = 20,
 		suppression = 10,
@@ -2017,15 +2091,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.sounds = {}
 	self.g36.sounds.fire = "g36_fire"
 	self.g36.sounds.stop_fire = "g36_stop"
-	self.g36.sounds.dryfire = "m4_dryfire"
+	self.g36.sounds.dryfire = "primary_dryfire"
 	self.g36.sounds.enter_steelsight = "m4_tighten"
 	self.g36.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.g36.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.g36.timers = {}
 	self.g36.timers.reload_not_empty = 2.5
 	self.g36.timers.reload_empty = 3.45
-	self.g36.timers.unequip = 0.75
-	self.g36.timers.equip = 0.5
+	self.g36.timers.unequip = 0.85
+	self.g36.timers.equip = 0.85
 	self.g36.name_id = "bm_w_g36"
 	self.g36.desc_id = "bm_w_g36_desc"
 	self.g36.hud_icon = "m4"
@@ -2082,7 +2156,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		damage = 11,
 		spread = 7,
 		recoil = 8,
-		spread_moving = 7,
+		spread_moving = 8,
 		zoom = 3,
 		concealment = 19,
 		suppression = 11,
@@ -2097,14 +2171,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.sounds = {}
 	self.p90.sounds.fire = "p90_fire"
 	self.p90.sounds.stop_fire = "p90_stop"
-	self.p90.sounds.dryfire = "m4_dryfire"
+	self.p90.sounds.dryfire = "secondary_dryfire"
 	self.p90.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.p90.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.p90.timers = {}
 	self.p90.timers.reload_not_empty = 2.9
 	self.p90.timers.reload_empty = 3.9
-	self.p90.timers.unequip = 0.7
-	self.p90.timers.equip = 0.5
+	self.p90.timers.unequip = 0.68
+	self.p90.timers.equip = 0.65
 	self.p90.name_id = "bm_w_p90"
 	self.p90.desc_id = "bm_w_p90_desc"
 	self.p90.hud_icon = "mac11"
@@ -2176,14 +2250,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m14.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.new_m14.sounds = {}
 	self.new_m14.sounds.fire = "m14_fire"
-	self.new_m14.sounds.dryfire = "m14_dryfire"
+	self.new_m14.sounds.dryfire = "primary_dryfire"
 	self.new_m14.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.new_m14.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.new_m14.timers = {}
 	self.new_m14.timers.reload_not_empty = 1.97
-	self.new_m14.timers.reload_empty = 3.1
-	self.new_m14.timers.unequip = 0.8
-	self.new_m14.timers.equip = 0.65
+	self.new_m14.timers.reload_empty = 3.2
+	self.new_m14.timers.unequip = 0.9
+	self.new_m14.timers.equip = 0.9
 	self.new_m14.name_id = "bm_w_m14"
 	self.new_m14.desc_id = "bm_w_m14_desc"
 	self.new_m14.hud_icon = "m14"
@@ -2255,7 +2329,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.deagle.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.deagle.sounds = {}
 	self.deagle.sounds.fire = "deagle_fire"
-	self.deagle.sounds.dryfire = "c45_dryfire"
+	self.deagle.sounds.dryfire = "secondary_dryfire"
 	self.deagle.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.deagle.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.deagle.FIRE_MODE = "single"
@@ -2335,14 +2409,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.sounds = {}
 	self.new_mp5.sounds.fire = "mp5_fire"
 	self.new_mp5.sounds.stop_fire = "mp5_stop"
-	self.new_mp5.sounds.dryfire = "mp5_dryfire"
+	self.new_mp5.sounds.dryfire = "secondary_dryfire"
 	self.new_mp5.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.new_mp5.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.new_mp5.timers = {}
 	self.new_mp5.timers.reload_not_empty = 2.4
 	self.new_mp5.timers.reload_empty = 3.3
-	self.new_mp5.timers.unequip = 0.7
-	self.new_mp5.timers.equip = 0.5
+	self.new_mp5.timers.unequip = 0.75
+	self.new_mp5.timers.equip = 0.7
 	self.new_mp5.name_id = "bm_w_mp5"
 	self.new_mp5.desc_id = "bm_w_mp5_desc"
 	self.new_mp5.hud_icon = "mp5"
@@ -2404,7 +2478,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		recoil = 11,
 		spread_moving = 8,
 		zoom = 3,
-		concealment = 24,
+		concealment = 23,
 		suppression = 17,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -2416,7 +2490,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.colt_1911.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.colt_1911.sounds = {}
 	self.colt_1911.sounds.fire = "c45_fire"
-	self.colt_1911.sounds.dryfire = "c45_dryfire"
+	self.colt_1911.sounds.dryfire = "secondary_dryfire"
 	self.colt_1911.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.colt_1911.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.colt_1911.FIRE_MODE = "single"
@@ -2427,8 +2501,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.colt_1911.timers = {}
 	self.colt_1911.timers.reload_not_empty = 1.47
 	self.colt_1911.timers.reload_empty = 2.12
-	self.colt_1911.timers.unequip = 0.5
-	self.colt_1911.timers.equip = 0.5
+	self.colt_1911.timers.unequip = 0.55
+	self.colt_1911.timers.equip = 0.55
 	self.colt_1911.name_id = "bm_w_colt_1911"
 	self.colt_1911.desc_id = "bm_w_colt_1911_desc"
 	self.colt_1911.hud_icon = "c45"
@@ -2499,7 +2573,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.sounds = {}
 	self.mac10.sounds.fire = "mac10_fire"
 	self.mac10.sounds.stop_fire = "mac10_stop"
-	self.mac10.sounds.dryfire = "mk11_dryfire"
+	self.mac10.sounds.dryfire = "secondary_dryfire"
 	self.mac10.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.mac10.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.mac10.timers = {}
@@ -2563,9 +2637,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.animations.recoil_steelsight = false
 	self.mac10.statistics = true
 	self.mac10.stats = {
-		damage = 12,
-		spread = 4,
-		recoil = 5,
+		damage = 11,
+		spread = 5,
+		recoil = 6,
 		spread_moving = 8,
 		zoom = 3,
 		concealment = 27,
@@ -2580,7 +2654,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.serbu.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.serbu.sounds = {}
 	self.serbu.sounds.fire = "serbu_fire"
-	self.serbu.sounds.dryfire = "remington_dryfire"
+	self.serbu.sounds.dryfire = "shotgun_dryfire"
 	self.serbu.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.serbu.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.serbu.timers = {}
@@ -2667,14 +2741,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.huntsman.sounds = {}
 	self.huntsman.sounds.fire = "huntsman_fire"
-	self.huntsman.sounds.dryfire = "remington_dryfire"
+	self.huntsman.sounds.dryfire = "shotgun_dryfire"
 	self.huntsman.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.huntsman.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.huntsman.timers = {}
 	self.huntsman.timers.reload_not_empty = 2.5
 	self.huntsman.timers.reload_empty = self.huntsman.timers.reload_not_empty
-	self.huntsman.timers.unequip = 0.7
-	self.huntsman.timers.equip = 0.6
+	self.huntsman.timers.unequip = 0.85
+	self.huntsman.timers.equip = 0.85
 	self.huntsman.name_id = "bm_w_huntsman"
 	self.huntsman.desc_id = "bm_w_huntsman_desc"
 	self.huntsman.hud_icon = "m79"
@@ -2736,14 +2810,11 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.autohit = autohit_rifle_default
 	self.huntsman.aim_assist = aim_assist_rifle_default
 	self.huntsman.animations = {}
-	self.huntsman.animations.fire = "recoil"
-	self.huntsman.animations.reload = "reload"
-	self.huntsman.animations.reload_not_empty = "reload"
 	self.huntsman.animations.equip_id = "equip_huntsman"
 	self.huntsman.animations.recoil_steelsight = true
 	self.huntsman.statistics = true
 	self.huntsman.stats = {
-		damage = 30,
+		damage = 28,
 		spread = 7,
 		recoil = 2,
 		spread_moving = 6,
@@ -2762,7 +2833,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b92fs.sounds.fire = "beretta_fire"
 	self.b92fs.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.b92fs.sounds.leave_steelsight = "pistol_steel_sight_exit"
-	self.b92fs.sounds.dryfire = "beretta_dryfire"
+	self.b92fs.sounds.dryfire = "secondary_dryfire"
 	self.b92fs.timers = {}
 	self.b92fs.timers.reload_not_empty = 1.47
 	self.b92fs.timers.reload_empty = 2.12
@@ -2846,14 +2917,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_raging_bull.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.new_raging_bull.sounds = {}
 	self.new_raging_bull.sounds.fire = "rbull_fire"
-	self.new_raging_bull.sounds.dryfire = "rbull_dryfire"
+	self.new_raging_bull.sounds.dryfire = "secondary_dryfire"
 	self.new_raging_bull.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.new_raging_bull.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.new_raging_bull.timers = {}
 	self.new_raging_bull.timers.reload_not_empty = 2.25
 	self.new_raging_bull.timers.reload_empty = 2.25
-	self.new_raging_bull.timers.unequip = 0.5
-	self.new_raging_bull.timers.equip = 0.5
+	self.new_raging_bull.timers.unequip = 0.65
+	self.new_raging_bull.timers.equip = 0.65
 	self.new_raging_bull.FIRE_MODE = "single"
 	self.new_raging_bull.fire_mode_data = {}
 	self.new_raging_bull.fire_mode_data.fire_rate = 0.21
@@ -2932,14 +3003,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saw.sounds = {}
 	self.saw.sounds.fire = "Play_saw_handheld_start"
 	self.saw.sounds.stop_fire = "Play_saw_handheld_end"
-	self.saw.sounds.dryfire = "mp5_dryfire"
+	self.saw.sounds.dryfire = "secondary_dryfire"
 	self.saw.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.saw.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.saw.timers = {}
 	self.saw.timers.reload_not_empty = 3.2
 	self.saw.timers.reload_empty = 3.2
-	self.saw.timers.unequip = 0.7
-	self.saw.timers.equip = 0.5
+	self.saw.timers.unequip = 0.8
+	self.saw.timers.equip = 0.8
 	self.saw.name_id = "bm_w_saw"
 	self.saw.desc_id = "bm_w_saw_desc"
 	self.saw.hud_icon = "equipment_saw"
@@ -3027,13 +3098,13 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.usp.damage_melee = damage_melee_default
 	self.usp.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.usp.sounds = {}
-	self.usp.sounds.fire = "c45_fire"
+	self.usp.sounds.fire = "usp45_fire"
 	self.usp.sounds.enter_steelsight = "pistol_steel_sight_enter"
 	self.usp.sounds.leave_steelsight = "pistol_steel_sight_exit"
-	self.usp.sounds.dryfire = "c45_dryfire"
+	self.usp.sounds.dryfire = "secondary_dryfire"
 	self.usp.timers = {}
 	self.usp.timers.reload_not_empty = 1.47
-	self.usp.timers.reload_empty = 2.12
+	self.usp.timers.reload_empty = 2.2
 	self.usp.timers.unequip = 0.55
 	self.usp.timers.equip = 0.55
 	self.usp.name_id = "bm_w_usp"
@@ -3099,9 +3170,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.usp.statistics = false
 	self.usp.stats = {
 		damage = 9,
-		spread = 8,
-		recoil = 7,
-		spread_moving = 6,
+		spread = 7,
+		recoil = 9,
+		spread_moving = 8,
 		zoom = 1,
 		concealment = 29,
 		suppression = 16,
@@ -3109,6 +3180,360 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		value = 1
 	}
+	self.m45 = {}
+	self.m45.category = "smg"
+	self.m45.damage_melee = damage_melee_default
+	self.m45.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m45.sounds = {}
+	self.m45.sounds.fire = "m45_fire"
+	self.m45.sounds.stop_fire = "m45_stop"
+	self.m45.sounds.dryfire = "secondary_dryfire"
+	self.m45.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.m45.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.m45.timers = {}
+	self.m45.timers.reload_not_empty = 2.85
+	self.m45.timers.reload_empty = 3.9
+	self.m45.timers.unequip = 0.75
+	self.m45.timers.equip = 0.75
+	self.m45.name_id = "bm_w_m45"
+	self.m45.desc_id = "bm_w_m45_desc"
+	self.m45.hud_icon = "mac11"
+	self.m45.description_id = "des_m45"
+	self.m45.hud_ammo = "guis/textures/ammo_small_9mm"
+	self.m45.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.m45.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.m45.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m45.use_data = {}
+	self.m45.use_data.selection_index = 1
+	self.m45.DAMAGE = 1
+	self.m45.CLIP_AMMO_MAX = 40
+	self.m45.NR_CLIPS_MAX = math.round(total_damage_secondary / 2.2 / self.m45.CLIP_AMMO_MAX)
+	self.m45.AMMO_MAX = self.m45.CLIP_AMMO_MAX * self.m45.NR_CLIPS_MAX
+	self.m45.AMMO_PICKUP = self:_pickup_chance(self.m45.AMMO_MAX, 1)
+	self.m45.FIRE_MODE = "auto"
+	self.m45.fire_mode_data = {}
+	self.m45.fire_mode_data.fire_rate = 0.1
+	self.m45.auto = {}
+	self.m45.auto.fire_rate = 0.1
+	self.m45.spread = {}
+	self.m45.spread.standing = self.new_m4.spread.standing * 0.75
+	self.m45.spread.crouching = self.new_m4.spread.standing * 0.75
+	self.m45.spread.steelsight = self.new_m4.spread.steelsight
+	self.m45.spread.moving_standing = self.new_m4.spread.standing * 0.75
+	self.m45.spread.moving_crouching = self.new_m4.spread.standing * 0.75
+	self.m45.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.m45.kick = {}
+	self.m45.kick.standing = self.mp9.kick.standing
+	self.m45.kick.crouching = self.m45.kick.standing
+	self.m45.kick.steelsight = self.m45.kick.standing
+	self.m45.crosshair = {}
+	self.m45.crosshair.standing = {}
+	self.m45.crosshair.crouching = {}
+	self.m45.crosshair.steelsight = {}
+	self.m45.crosshair.standing.offset = 0.4
+	self.m45.crosshair.standing.moving_offset = 0.7
+	self.m45.crosshair.standing.kick_offset = 0.6
+	self.m45.crosshair.crouching.offset = 0.3
+	self.m45.crosshair.crouching.moving_offset = 0.6
+	self.m45.crosshair.crouching.kick_offset = 0.4
+	self.m45.crosshair.steelsight.hidden = true
+	self.m45.crosshair.steelsight.offset = 0
+	self.m45.crosshair.steelsight.moving_offset = 0
+	self.m45.crosshair.steelsight.kick_offset = 0.4
+	self.m45.shake = {}
+	self.m45.shake.fire_multiplier = 1
+	self.m45.shake.fire_steelsight_multiplier = -1
+	self.m45.autohit = autohit_pistol_default
+	self.m45.aim_assist = aim_assist_pistol_default
+	self.m45.weapon_hold = "m45"
+	self.m45.animations = {}
+	self.m45.animations.equip_id = "equip_m45"
+	self.m45.animations.recoil_steelsight = false
+	self.m45.global_value = "armored_transport"
+	self.m45.texture_bundle_folder = "dlc1"
+	self.m45.statistics = false
+	self.m45.stats = {
+		damage = 12,
+		spread = 6,
+		recoil = 7,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 24,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 5
+	}
+	self.s552 = {}
+	self.s552.category = "ass"
+	self.s552.damage_melee = damage_melee_default
+	self.s552.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.s552.sounds = {}
+	self.s552.sounds.fire = "sig552_fire"
+	self.s552.sounds.stop_fire = "sig552_stop"
+	self.s552.sounds.dryfire = "primary_dryfire"
+	self.s552.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.s552.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.s552.timers = {}
+	self.s552.timers.reload_not_empty = 2.5
+	self.s552.timers.reload_empty = 3.45
+	self.s552.timers.unequip = 0.9
+	self.s552.timers.equip = 0.9
+	self.s552.name_id = "bm_w_s552"
+	self.s552.desc_id = "bm_w_s552_desc"
+	self.s552.hud_icon = "m4"
+	self.s552.description_id = "des_s552"
+	self.s552.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.s552.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.s552.use_data = {}
+	self.s552.use_data.selection_index = 2
+	self.s552.DAMAGE = 1
+	self.s552.CLIP_AMMO_MAX = 30
+	self.s552.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.1 / self.s552.CLIP_AMMO_MAX)
+	self.s552.AMMO_MAX = self.s552.CLIP_AMMO_MAX * self.s552.NR_CLIPS_MAX
+	self.s552.AMMO_PICKUP = self:_pickup_chance(self.s552.AMMO_MAX, 2)
+	self.s552.FIRE_MODE = "auto"
+	self.s552.fire_mode_data = {}
+	self.s552.fire_mode_data.fire_rate = 0.1175
+	self.s552.auto = {}
+	self.s552.auto.fire_rate = 0.1175
+	self.s552.spread = {}
+	self.s552.spread.standing = self.new_m4.spread.standing * 0.8
+	self.s552.spread.crouching = self.new_m4.spread.standing * 0.8
+	self.s552.spread.steelsight = self.new_m4.spread.steelsight
+	self.s552.spread.moving_standing = self.new_m4.spread.standing * 0.8
+	self.s552.spread.moving_crouching = self.new_m4.spread.standing * 0.8
+	self.s552.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.s552.kick = {}
+	self.s552.kick.standing = self.new_m4.kick.standing
+	self.s552.kick.crouching = self.s552.kick.standing
+	self.s552.kick.steelsight = self.s552.kick.standing
+	self.s552.crosshair = {}
+	self.s552.crosshair.standing = {}
+	self.s552.crosshair.crouching = {}
+	self.s552.crosshair.steelsight = {}
+	self.s552.crosshair.standing.offset = 0.16
+	self.s552.crosshair.standing.moving_offset = 0.9
+	self.s552.crosshair.standing.kick_offset = 0.7
+	self.s552.crosshair.crouching.offset = 0.1
+	self.s552.crosshair.crouching.moving_offset = 0.8
+	self.s552.crosshair.crouching.kick_offset = 0.5
+	self.s552.crosshair.steelsight.hidden = true
+	self.s552.crosshair.steelsight.offset = 0
+	self.s552.crosshair.steelsight.moving_offset = 0
+	self.s552.crosshair.steelsight.kick_offset = 0.15
+	self.s552.shake = {}
+	self.s552.shake.fire_multiplier = 1
+	self.s552.shake.fire_steelsight_multiplier = -1
+	self.s552.autohit = autohit_rifle_default
+	self.s552.aim_assist = aim_assist_rifle_default
+	self.s552.weapon_hold = "ak47"
+	self.s552.animations = {}
+	self.s552.animations.equip_id = "equip_ak47"
+	self.s552.animations.recoil_steelsight = false
+	self.s552.global_value = "armored_transport"
+	self.s552.texture_bundle_folder = "dlc1"
+	self.s552.statistics = false
+	self.s552.stats = {
+		damage = 12,
+		spread = 6,
+		recoil = 9,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 22,
+		suppression = 12,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 1
+	}
+	self.ppk = {}
+	self.ppk.category = "pistol"
+	self.ppk.damage_melee = damage_melee_default
+	self.ppk.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.ppk.sounds = {}
+	self.ppk.sounds.fire = "w_ppk_fire"
+	self.ppk.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.ppk.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.ppk.sounds.dryfire = "secondary_dryfire"
+	self.ppk.timers = {}
+	self.ppk.timers.reload_not_empty = 1.47
+	self.ppk.timers.reload_empty = 2.12
+	self.ppk.timers.unequip = 0.5
+	self.ppk.timers.equip = 0.5
+	self.ppk.name_id = "bm_w_ppk"
+	self.ppk.desc_id = "bm_w_ppk_desc"
+	self.ppk.hud_icon = "beretta92"
+	self.ppk.description_id = "des_ppk"
+	self.ppk.hud_ammo = "guis/textures/ammo_9mm"
+	self.ppk.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.ppk.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.ppk.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.ppk.use_data = {}
+	self.ppk.use_data.selection_index = 1
+	self.ppk.DAMAGE = 1
+	self.ppk.CLIP_AMMO_MAX = 14
+	self.ppk.NR_CLIPS_MAX = math.round(total_damage_secondary / 1 / self.ppk.CLIP_AMMO_MAX)
+	self.ppk.AMMO_MAX = self.ppk.CLIP_AMMO_MAX * self.ppk.NR_CLIPS_MAX
+	self.ppk.AMMO_PICKUP = self:_pickup_chance(self.ppk.AMMO_MAX, 1)
+	self.ppk.FIRE_MODE = "single"
+	self.ppk.fire_mode_data = {}
+	self.ppk.fire_mode_data.fire_rate = 0.09
+	self.ppk.single = {}
+	self.ppk.single.fire_rate = 0.09
+	self.ppk.spread = {}
+	self.ppk.spread.standing = self.new_m4.spread.standing * 0.5
+	self.ppk.spread.crouching = self.new_m4.spread.standing * 0.5
+	self.ppk.spread.steelsight = self.new_m4.spread.steelsight
+	self.ppk.spread.moving_standing = self.new_m4.spread.standing * 0.5
+	self.ppk.spread.moving_crouching = self.new_m4.spread.standing * 0.5
+	self.ppk.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.ppk.kick = {}
+	self.ppk.kick.standing = self.glock_17.kick.standing
+	self.ppk.kick.crouching = self.ppk.kick.standing
+	self.ppk.kick.steelsight = self.ppk.kick.standing
+	self.ppk.crosshair = {}
+	self.ppk.crosshair.standing = {}
+	self.ppk.crosshair.crouching = {}
+	self.ppk.crosshair.steelsight = {}
+	self.ppk.crosshair.standing.offset = 0.2
+	self.ppk.crosshair.standing.moving_offset = 0.6
+	self.ppk.crosshair.standing.kick_offset = 0.4
+	self.ppk.crosshair.crouching.offset = 0.1
+	self.ppk.crosshair.crouching.moving_offset = 0.6
+	self.ppk.crosshair.crouching.kick_offset = 0.3
+	self.ppk.crosshair.steelsight.hidden = true
+	self.ppk.crosshair.steelsight.offset = 0
+	self.ppk.crosshair.steelsight.moving_offset = 0
+	self.ppk.crosshair.steelsight.kick_offset = 0.1
+	self.ppk.shake = {}
+	self.ppk.shake.fire_multiplier = 1
+	self.ppk.shake.fire_steelsight_multiplier = -1
+	self.ppk.autohit = autohit_pistol_default
+	self.ppk.aim_assist = aim_assist_pistol_default
+	self.ppk.weapon_hold = "glock"
+	self.ppk.animations = {}
+	self.ppk.animations.equip_id = "equip_glock"
+	self.ppk.animations.recoil_steelsight = true
+	self.ppk.statistics = false
+	self.ppk.global_value = "armored_transport"
+	self.ppk.texture_bundle_folder = "dlc1"
+	self.ppk.stats = {
+		damage = 8,
+		spread = 9,
+		recoil = 9,
+		spread_moving = 9,
+		zoom = 3,
+		concealment = 30,
+		suppression = 18,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 1
+	}
+end
+
+function WeaponTweakData:_init_data_offhand_weapons()
+	self.b92fs_primary = deep_clone(self.b92fs)
+	self.b92fs_primary.parent_weapon_id = "b92fs"
+	self.b92fs_primary.use_data.selection_index = 2
+	self.b92fs_primary.animations.reload_name_id = "b92fs"
+	self.b92fs_primary.use_stance = "b92fs"
+	self.b92fs_primary.statistics = false
+	self.b92fs_primary.texture_name = "b92fs"
+	self.b92fs_primary.AMMO_MAX = math.round(self.b92fs_primary.AMMO_MAX * 0.75)
+	self.glock_18c_primary = deep_clone(self.glock_18c)
+	self.glock_18c_primary.parent_weapon_id = "glock_18c"
+	self.glock_18c_primary.use_data.selection_index = 2
+	self.glock_18c_primary.animations.reload_name_id = "glock_18c"
+	self.glock_18c_primary.use_stance = "glock_18c"
+	self.glock_18c_primary.statistics = false
+	self.glock_18c_primary.texture_name = "glock_18c"
+	self.glock_18c_primary.AMMO_MAX = math.round(self.glock_18c_primary.AMMO_MAX * 0.75)
+	self.olympic_primary = deep_clone(self.olympic)
+	self.olympic_primary.parent_weapon_id = "olympic"
+	self.olympic_primary.use_data.selection_index = 2
+	self.olympic_primary.animations.reload_name_id = "olympic"
+	self.olympic_primary.use_stance = "olympic"
+	self.olympic_primary.statistics = false
+	self.olympic_primary.texture_name = "olympic"
+	self.olympic_primary.AMMO_MAX = math.round(self.olympic_primary.AMMO_MAX * 0.75)
+	self.akmsu_primary = deep_clone(self.akmsu)
+	self.akmsu_primary.parent_weapon_id = "akmsu"
+	self.akmsu_primary.use_data.selection_index = 2
+	self.akmsu_primary.animations.reload_name_id = "akmsu"
+	self.akmsu_primary.use_stance = "akmsu"
+	self.akmsu_primary.statistics = false
+	self.akmsu_primary.texture_name = "akmsu"
+	self.akmsu_primary.AMMO_MAX = math.round(self.akmsu_primary.AMMO_MAX * 0.75)
+	self.deagle_primary = deep_clone(self.deagle)
+	self.deagle_primary.parent_weapon_id = "deagle"
+	self.deagle_primary.use_data.selection_index = 2
+	self.deagle_primary.animations.reload_name_id = "deagle"
+	self.deagle_primary.use_stance = "deagle"
+	self.deagle_primary.statistics = false
+	self.deagle_primary.texture_name = "deagle"
+	self.deagle_primary.weapon_hold = "deagle"
+	self.deagle_primary.AMMO_MAX = math.round(self.deagle_primary.AMMO_MAX * 0.75)
+	self.colt_1911_primary = deep_clone(self.colt_1911)
+	self.colt_1911_primary.parent_weapon_id = "colt_1911"
+	self.colt_1911_primary.use_data.selection_index = 2
+	self.colt_1911_primary.animations.reload_name_id = "colt_1911"
+	self.colt_1911_primary.use_stance = "colt_1911"
+	self.colt_1911_primary.statistics = false
+	self.colt_1911_primary.texture_name = "colt_1911"
+	self.colt_1911_primary.weapon_hold = "colt_1911"
+	self.colt_1911_primary.AMMO_MAX = math.round(self.colt_1911_primary.AMMO_MAX * 0.75)
+	self.raging_bull_primary = deep_clone(self.new_raging_bull)
+	self.raging_bull_primary.parent_weapon_id = "new_raging_bull"
+	self.raging_bull_primary.use_data.selection_index = 2
+	self.raging_bull_primary.animations.reload_name_id = "new_raging_bull"
+	self.raging_bull_primary.use_stance = "new_raging_bull"
+	self.raging_bull_primary.statistics = false
+	self.raging_bull_primary.texture_name = "new_raging_bull"
+	self.raging_bull_primary.AMMO_MAX = math.round(self.raging_bull_primary.AMMO_MAX * 0.75)
+	self.ak74_secondary = deep_clone(self.ak74)
+	self.ak74_secondary.parent_weapon_id = "ak74"
+	self.ak74_secondary.use_data.selection_index = 1
+	self.ak74_secondary.animations.reload_name_id = "ak74"
+	self.ak74_secondary.use_stance = "ak74"
+	self.ak74_secondary.statistics = false
+	self.ak74_secondary.texture_name = "ak74"
+	self.ak74_secondary.AMMO_MAX = math.round(self.ak74_secondary.AMMO_MAX * 0.75)
+	self.aug_secondary = deep_clone(self.aug)
+	self.aug_secondary.parent_weapon_id = "aug"
+	self.aug_secondary.use_data.selection_index = 1
+	self.aug_secondary.animations.reload_name_id = "aug"
+	self.aug_secondary.use_stance = "aug"
+	self.aug_secondary.statistics = false
+	self.aug_secondary.texture_name = "aug"
+	self.aug_secondary.weapon_hold = "aug"
+	self.aug_secondary.AMMO_MAX = math.round(self.aug_secondary.AMMO_MAX * 0.75)
+	self.saw_secondary = deep_clone(self.saw)
+	self.saw_secondary.parent_weapon_id = "saw"
+	self.saw_secondary.use_data.selection_index = 1
+	self.saw_secondary.animations.reload_name_id = "saw"
+	self.saw_secondary.use_stance = "saw"
+	self.saw_secondary.statistics = false
+	self.saw_secondary.texture_name = "saw"
+	self.saw_secondary.weapon_hold = "saw"
+	self.saw_secondary.AMMO_MAX = math.round(self.saw_secondary.AMMO_MAX * 0.75)
+	self.s552_secondary = deep_clone(self.s552)
+	self.s552_secondary.parent_weapon_id = "s552"
+	self.s552_secondary.use_data.selection_index = 1
+	self.s552_secondary.animations.reload_name_id = "s552"
+	self.s552_secondary.use_stance = "s552"
+	self.s552_secondary.statistics = false
+	self.s552_secondary.texture_name = "s552"
+	self.s552_secondary.weapon_hold = "s552"
+	self.s552_secondary.AMMO_MAX = math.round(self.s552_secondary.AMMO_MAX * 0.75)
+	self.m4_secondary = deep_clone(self.new_m4)
+	self.m4_secondary.parent_weapon_id = "new_m4"
+	self.m4_secondary.use_data.selection_index = 1
+	self.m4_secondary.animations.reload_name_id = "new_m4"
+	self.m4_secondary.use_stance = "new_m4"
+	self.m4_secondary.statistics = false
+	self.m4_secondary.texture_name = "new_m4"
+	self.m4_secondary.weapon_hold = "new_m4"
+	self.m4_secondary.AMMO_MAX = math.round(self.m4_secondary.AMMO_MAX * 0.75)
 end
 
 function WeaponTweakData:_create_table_structure()
@@ -3117,22 +3542,26 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
+	self.colt_1911_primary_npc = deep_clone(self.c45_npc)
 	self.beretta92_npc = {
 		usage = "beretta92",
 		sounds = {},
 		use_data = {}
 	}
+	self.beretta92_primary_npc = deep_clone(self.beretta92_npc)
 	self.raging_bull_npc = {
 		usage = "raging_bull",
 		sounds = {},
 		use_data = {}
 	}
+	self.raging_bull_primary_npc = deep_clone(self.raging_bull_npc)
 	self.m4_npc = {
 		usage = "m4",
 		sounds = {},
 		use_data = {},
 		auto = {}
 	}
+	self.m4_secondary_npc = deep_clone(self.m4_npc)
 	self.m14_npc = {
 		usage = "m4",
 		sounds = {},
@@ -3179,6 +3608,7 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
 	self.ak47_npc = {
 		usage = "ak47",
 		sounds = {},
@@ -3208,6 +3638,7 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.olympic_primary_npc = deep_clone(self.olympic_npc)
 	self.m16_npc = {
 		usage = "m4",
 		sounds = {},
@@ -3220,12 +3651,14 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.aug_secondary_npc = deep_clone(self.aug_npc)
 	self.ak74_npc = {
 		usage = "ak47",
 		sounds = {},
 		use_data = {},
 		auto = {}
 	}
+	self.ak74_secondary_npc = deep_clone(self.ak74_npc)
 	self.ak5_npc = {
 		usage = "m4",
 		sounds = {},
@@ -3256,6 +3689,7 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.akmsu_primary_npc = deep_clone(self.akmsu_npc)
 	self.akm_npc = {
 		usage = "m4",
 		sounds = {},
@@ -3267,6 +3701,7 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
+	self.deagle_primary_npc = deep_clone(self.deagle_npc)
 	self.serbu_npc = {
 		usage = "r870",
 		sounds = {},
@@ -3288,11 +3723,31 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
+	self.saw_secondary_npc = deep_clone(self.saw_npc)
 	self.sentry_gun = {
 		sounds = {},
 		auto = {}
 	}
 	self.usp_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m45_npc = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.s552_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.s552_secondary_npc = deep_clone(self.s552_npc)
+	self.ppk_npc = {
 		usage = "c45",
 		sounds = {},
 		use_data = {},
@@ -3332,4 +3787,7 @@ function WeaponTweakData:_precalculate_values()
 	self.huntsman_npc.AMMO_MAX = self.huntsman_npc.CLIP_AMMO_MAX * self.huntsman_npc.NR_CLIPS_MAX
 	self.saw_npc.AMMO_MAX = self.saw_npc.CLIP_AMMO_MAX * self.saw_npc.NR_CLIPS_MAX
 	self.usp_npc.AMMO_MAX = self.usp_npc.CLIP_AMMO_MAX * self.usp_npc.NR_CLIPS_MAX
+	self.m45_npc.AMMO_MAX = self.m45_npc.CLIP_AMMO_MAX * self.m45_npc.NR_CLIPS_MAX
+	self.s552_npc.AMMO_MAX = self.s552_npc.CLIP_AMMO_MAX * self.s552_npc.NR_CLIPS_MAX
+	self.ppk_npc.AMMO_MAX = self.ppk_npc.CLIP_AMMO_MAX * self.ppk_npc.NR_CLIPS_MAX
 end

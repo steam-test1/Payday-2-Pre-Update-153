@@ -2,7 +2,7 @@ IngameContractGui = IngameContractGui or class()
 
 function IngameContractGui:init(ws)
 	self._panel = ws:panel():panel({
-		w = math.round(ws:panel():w() / 2.6),
+		w = math.round(ws:panel():w() / 2.2),
 		h = math.round(ws:panel():h() / 1.2)
 	})
 	self._panel:set_y(CoreMenuRenderer.Renderer.border_height + tweak_data.menu.pd2_large_font_size)

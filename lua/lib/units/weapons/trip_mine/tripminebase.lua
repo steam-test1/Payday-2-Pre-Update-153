@@ -302,13 +302,16 @@ function TripMineBase:_explode(col_ray)
 			mvector3.direction(dir, self._ray_from_pos, dir)
 			if apply_dmg then
 				local normal = dir
-				hit_body:extension().damage:damage_explosion(player, normal, hit_body:position(), dir, damage)
-				hit_body:extension().damage:damage_damage(player, normal, hit_body:position(), dir, damage)
+				local prop_damage = math.min(damage, 200)
+				local network_damage = math.ceil(prop_damage * 163.84)
+				prop_damage = network_damage / 163.84
+				hit_body:extension().damage:damage_explosion(player, normal, hit_body:position(), dir, prop_damage)
+				hit_body:extension().damage:damage_damage(player, normal, hit_body:position(), dir, prop_damage)
 				if hit_body:unit():id() ~= -1 then
 					if player then
-						managers.network:session():send_to_peers_synched("sync_body_damage_explosion", hit_body, player, normal, hit_body:position(), dir, damage)
+						managers.network:session():send_to_peers_synched("sync_body_damage_explosion", hit_body, player, normal, hit_body:position(), dir, math.min(32768, network_damage))
 					else
-						managers.network:session():send_to_peers_synched("sync_body_damage_explosion_no_attacker", hit_body, normal, hit_body:position(), dir, damage)
+						managers.network:session():send_to_peers_synched("sync_body_damage_explosion_no_attacker", hit_body, normal, hit_body:position(), dir, math.min(32768, network_damage))
 					end
 				end
 			end

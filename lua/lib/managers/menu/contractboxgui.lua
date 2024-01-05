@@ -102,6 +102,9 @@ function ContractBoxGui:create_contract_box()
 	if self._contract_text_header and alive(self._contract_text_header) then
 		self._panel:remove(self._contract_text_header)
 	end
+	if alive(self._panel:child("pro_text")) then
+		self._panel:remove(self._panel:child("pro_text"))
+	end
 	self._contract_panel = nil
 	self._contract_text_header = nil
 	local contact_data = managers.job:current_contact_data()
@@ -321,6 +324,19 @@ function ContractBoxGui:create_contract_box()
 			self._contract_text_header:move(0, -(wfs:h() + 5))
 		end
 		wfs:set_world_rightbottom(self._contract_panel:world_right() - 5, self._contract_panel:world_bottom())
+	end
+	if self._contract_text_header and managers.job:is_current_job_professional() then
+		local pro_text = self._panel:text({
+			name = "pro_text",
+			text = managers.localization:to_upper_text("cn_menu_pro_job"),
+			font_size = tweak_data.menu.pd2_medium_font_size,
+			font = tweak_data.menu.pd2_medium_font,
+			color = tweak_data.screen_colors.pro_color,
+			blend_mode = "add"
+		})
+		local x, y, w, h = pro_text:text_rect()
+		pro_text:set_size(w, h)
+		pro_text:set_position(self._contract_text_header:right() + 10, self._contract_text_header:y())
 	end
 	BoxGuiObject:new(self._contract_panel, {
 		sides = {

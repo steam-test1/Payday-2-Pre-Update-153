@@ -797,6 +797,9 @@ function IntimitateInteractionExt:interact(player)
 		self._unit:brain():on_tied(player, true)
 	elseif self.tweak_data == "hostage_trade" then
 		self._unit:brain():on_trade(player)
+		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.relation_with_bulldozer.mask then
+			managers.achievment:award_progress(tweak_data.achievement.relation_with_bulldozer.stat)
+		end
 		managers.challenges:set_flag("diplomatic")
 		managers.statistics:trade({
 			name = self._unit:base()._tweak_table
@@ -1009,6 +1012,7 @@ end
 function CarryInteractionExt:register_collision_callbacks()
 	self._unit:set_body_collision_callback(callback(self, self, "_collision_callback"))
 	self._has_modified_timer = true
+	self._air_start_time = Application:time()
 	for i = 0, self._unit:num_bodies() - 1 do
 		local body = self._unit:body(i)
 		body:set_collision_script_tag(Idstring("throw"))
@@ -1017,11 +1021,20 @@ function CarryInteractionExt:register_collision_callbacks()
 	end
 end
 
-function CarryInteractionExt:_collision_callback(tag, unit, body, other_unit, other_body)
+function CarryInteractionExt:_collision_callback(tag, unit, body, other_unit, other_body, position, normal, velocity, ...)
 	if self._has_modified_timer then
 		self._has_modified_timer = nil
 	end
-	body:set_collision_script_tag(Idstring(""))
+	local air_time = Application:time() - self._air_start_time
+	self._unit:carry_data():check_explodes_on_impact(velocity, air_time)
+	self._air_start_time = Application:time()
+	if self._unit:carry_data():can_explode() and not self._unit:carry_data():explode_sequence_started() then
+		return
+	end
+	for i = 0, self._unit:num_bodies() - 1 do
+		local body = self._unit:body(i)
+		body:set_collision_script_tag(Idstring(""))
+	end
 end
 
 LootBankInteractionExt = LootBankInteractionExt or class(UseInteractionExt)

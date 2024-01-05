@@ -37,6 +37,7 @@ function ElementCarry:on_executed(instigator)
 	elseif self._values.operation == "secure" or self._values.operation == "secure_silent" then
 		if instigator:carry_data() then
 			local carry_ext = instigator:carry_data()
+			carry_ext:disarm()
 			if Network:is_server() then
 				local silent = self._values.operation == "secure_silent"
 				local carry_id = carry_ext:carry_id()

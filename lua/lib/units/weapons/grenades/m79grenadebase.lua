@@ -100,7 +100,7 @@ function M79GrenadeBase:_detonate()
 	else
 		mvector3.add(expl_pos, self._new_pos)
 	end
-	GrenadeBase._play_sound_and_effects(expl_pos, expl_normal, self._range)
+	managers.explosion:play_sound_and_effects(expl_pos, expl_normal, self._range)
 	self._unit:set_slot(0)
 	if not alive(self._owner) or not alive(self._user) then
 		return

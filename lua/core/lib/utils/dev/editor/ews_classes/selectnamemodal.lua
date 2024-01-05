@@ -1,6 +1,6 @@
 SelectNameModal = SelectNameModal or class(CoreEditorEwsDialog)
 
-function SelectNameModal:init(name, assets_list, ...)
+function SelectNameModal:init(name, assets_list, settings, ...)
 	Global.world_editor = Global.world_editor or {}
 	Global.world_editor.filter = Global.world_editor.filter or ""
 	self._dialog_name = self._dialog_name or name or "Assets"
@@ -17,7 +17,8 @@ function SelectNameModal:init(name, assets_list, ...)
 	self._filter = EWS:TextCtrl(panel, Global.world_editor.filter, "", "TE_CENTRE")
 	list_sizer:add(self._filter, 0, 0, "EXPAND")
 	self._filter:connect("EVT_COMMAND_TEXT_UPDATED", callback(self, self, "update_filter"), nil)
-	self._list = EWS:ListCtrl(panel, "", "LC_SINGLE_SEL,LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING")
+	local list_style = settings and settings.list_style or "LC_SINGLE_SEL,LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING"
+	self._list = EWS:ListCtrl(panel, "", list_style)
 	self._list:clear_all()
 	self._list:append_column("Name")
 	list_sizer:add(self._list, 1, 0, "EXPAND")

@@ -806,7 +806,6 @@ function MenuManager:exit_online_menues()
 	end
 	self:open_menu("menu_main")
 	if not managers.menu:is_pc_controller() then
-		managers.menu:active_menu().input:deactivate_controller_mouse()
 	end
 end
 
@@ -973,6 +972,11 @@ function MenuCallbackHandler:dlc_buy_pc()
 	Steam:overlay_activate("store", 218620)
 end
 
+function MenuCallbackHandler:dlc_buy_armadillo_pc()
+	print("[MenuCallbackHandler:dlc_buy_armadillo_pc]")
+	Steam:overlay_activate("store", 264610)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1006,6 +1010,14 @@ function MenuCallbackHandler:not_has_all_dlcs()
 	return not self:has_all_dlcs()
 end
 
+function MenuCallbackHandler:has_armored_transport()
+	return managers.dlc:has_armored_transport()
+end
+
+function MenuCallbackHandler:not_has_armored_transport()
+	return not self:has_armored_transport()
+end
+
 function MenuCallbackHandler:reputation_check(data)
 	return managers.experience:current_level() >= data:value()
 end
@@ -1016,6 +1028,10 @@ end
 
 function MenuCallbackHandler:is_level_145()
 	return managers.experience:current_level() >= 145
+end
+
+function MenuCallbackHandler:is_level_100()
+	return managers.experience:current_level() >= 100
 end
 
 function MenuCallbackHandler:is_level_50()
@@ -1096,6 +1112,10 @@ end
 
 function MenuCallbackHandler:is_normal_job()
 	return not self:is_prof_job()
+end
+
+function MenuCallbackHandler:is_not_max_rank()
+	return managers.experience:current_rank() < tweak_data:get_value("rank_manager", "max_rank")
 end
 
 function MenuCallbackHandler:singleplayer_restart()
@@ -1823,6 +1843,30 @@ function MenuCallbackHandler:play_safehouse(params)
 	managers.menu:show_play_safehouse_question({yes_func = yes_func})
 end
 
+function MenuCallbackHandler:become_infamous(params)
+	if managers.experience:current_level() < 100 or managers.experience:current_rank() >= tweak_data:get_value("rank_manager", "max_rank") then
+		return
+	end
+	local infamous_cost = tweak_data:get_value("rank_manager", "become_infamous_cost") * (managers.experience:current_rank() + 1)
+	local params = {}
+	params.cost = managers.experience:cash_string(infamous_cost)
+	if infamous_cost <= managers.money:offshore() then
+		function params.yes_func()
+			local rank = managers.experience:current_rank()
+			
+			managers.menu:do_clear_progress()
+			managers.experience:set_current_rank(rank + 1)
+			if managers.menu_component then
+				managers.menu_component:refresh_player_profile_gui()
+			end
+			self:refresh_node()
+			managers.savefile:save_progress()
+			managers.savefile:save_setting(true)
+		end
+	end
+	managers.menu:show_confirm_become_infamous(params)
+end
+
 function MenuCallbackHandler:choice_choose_character(item)
 	local character = item:value()
 	local peer_id = managers.network:session():local_peer():id()
@@ -2419,8 +2463,8 @@ function MenuCallbackHandler:debug_next_stage()
 end
 
 function MenuCallbackHandler:debug_give_alot_of_lootdrops()
-	for i = 1, 10 do
-		managers.lootdrop:new_debug_drop(1000, true, i)
+	for i = 1, 4 do
+		managers.lootdrop:new_debug_drop(100, true, i)
 	end
 end
 
@@ -2545,6 +2589,10 @@ end
 
 function MenuCallbackHandler:print_global_steam_stats_30days()
 	managers.statistics:debug_print_stats(true, 30)
+end
+
+function MenuCallbackHandler:print_global_steam_stats_alltime()
+	managers.statistics:debug_print_stats(true)
 end
 
 MenuChallenges = MenuChallenges or class()
@@ -3926,23 +3974,29 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 			local contact = tweak_data.narrative.jobs[job_id].contact
 			if table.contains(contacts, contact) then
 				jobs[contact] = jobs[contact] or {}
-				table.insert(jobs[contact], {
-					id = job_id,
-					enabled = max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0) and not tweak_data.narrative.jobs[job_id].wrapped_to_job
-				})
+				if not tweak_data.narrative.jobs[job_id].dlc or managers.dlc:has_dlc(tweak_data.narrative.jobs[job_id].dlc) then
+					table.insert(jobs[contact], {
+						id = job_id,
+						enabled = max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0) and not tweak_data.narrative.jobs[job_id].wrapped_to_job
+					})
+				end
 			end
 		end
 		local job_tweak = tweak_data.narrative.jobs
 		for _, contracts in pairs(jobs) do
 			table.sort(contracts, function(x, y)
-				if job_tweak[x.id].jc < job_tweak[y.id].jc then
-					return true
+				if x.enabled ~= y.enabled then
+					return x.enabled
 				end
-				if job_tweak[x.id].jc > job_tweak[y.id].jc then
-					return false
+				local string_x = managers.localization:to_upper_text(job_tweak[x.id].name_id)
+				local string_y = managers.localization:to_upper_text(job_tweak[y.id].name_id)
+				local ids_x = Idstring(string_x)
+				local ids_y = Idstring(string_y)
+				if ids_x ~= ids_y then
+					return string_x < string_y
 				end
-				if managers.localization:text(job_tweak[x.id].name_id) < managers.localization:text(job_tweak[y.id].name_id) then
-					return true
+				if job_tweak[x.id].jc ~= job_tweak[y.id].jc then
+					return job_tweak[x.id].jc <= job_tweak[y.id].jc
 				end
 				return false
 			end)
@@ -3989,18 +4043,17 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		end
 		self:create_divider(node, "end")
 	end
-	if MenuCallbackHandler:is_win32() then
-		local params = {
-			name = "back",
-			text_id = "menu_back",
-			previous_node = "true",
-			align = "right",
-			last_item = "true"
-		}
-		local data_node = {}
-		local new_item = node:create_item(data_node, params)
-		node:add_item(new_item)
-	end
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		previous_node = "true",
+		visible_callback = "is_pc_controller",
+		align = "right",
+		last_item = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
 	node:set_default_item_name("contact_filter")
 	node:select_item("contact_filter")
 	return node

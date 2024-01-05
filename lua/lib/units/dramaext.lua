@@ -10,42 +10,31 @@ function DramaExt:name()
 	return self.character_name
 end
 
-function DramaExt:play_cue(id)
-	self._cue = managers.drama:cue(id)
-	if not self._cue then
-		Application:throw_exception("The drama script tries to access a cue id '" .. tostring(id) .. "' which doesn't seem to exist!")
+function DramaExt:play_sound(sound, sound_source)
+	self._cue = self._cue or {}
+	self._cue.sound = sound
+	self._cue.sound_source = sound_source
+	local playing = self._unit:sound_source(sound_source):post_event(sound, self.sound_callback, self._unit, "marker", "end_of_event")
+	if not playing then
+		Application:error("[DramaExt:play_cue] Wasn't able to play sound event " .. sound)
+		Application:stack_dump()
+		self:sound_callback(nil, "end_of_event", self._unit, sound_source, nil, nil, nil)
 	end
-	local duration = self._cue.duration
-	if duration == "sound" then
-		duration = 0
-		managers.dialog:pause_dialog()
-	elseif duration == "animation" then
-		duration = tweak_data.dialog.MINIMUM_DURATION
-	end
-	if self._cue.string_id then
-		managers.subtitle:set_visible(true)
-		managers.subtitle:set_enabled(true)
-		if duration == 0 then
-			managers.subtitle:show_subtitle(self._cue.string_id, 100000)
-		else
-			managers.subtitle:show_subtitle(self._cue.string_id, duration)
-		end
-	end
-	if self._cue.sound then
-		managers.hud:set_mugshot_talk(self._unit:unit_data().mugshot_id, true)
-		local playing = self._unit:sound_source(self._cue.sound_source):post_event(self._cue.sound, self.sound_callback, self._unit, "marker", "end_of_event")
-		if not playing then
-			self:sound_callback(nil, "end_of_event", self._unit, self._cue.sound_source, nil, nil, nil)
-			Application:error("[DramaExt:play_cue] Wasn't able to play sound event " .. self._cue.sound)
-			Application:stack_dump()
-		end
-	end
-	if self._cue.animation then
-	end
-	return duration
 end
 
-function DramaExt:stop_cue(id)
+function DramaExt:play_subtitle(string_id, duration)
+	self._cue = self._cue or {}
+	self._cue.string_id = string_id
+	managers.subtitle:set_visible(true)
+	managers.subtitle:set_enabled(true)
+	if not duration or duration == 0 then
+		managers.subtitle:show_subtitle(string_id, 100000)
+	else
+		managers.subtitle:show_subtitle(string_id, duration)
+	end
+end
+
+function DramaExt:stop_cue()
 	if self._cue then
 		if self._cue.string_id then
 			managers.subtitle:set_visible(false)
@@ -62,8 +51,7 @@ function DramaExt:sound_callback(instance, event_type, unit, sound_source, label
 	if event_type == "end_of_event" then
 		managers.subtitle:set_visible(false)
 		managers.subtitle:set_enabled(false)
-		managers.hud:set_mugshot_talk(unit:unit_data().mugshot_id, false)
-		managers.dialog:play_dialog()
+		managers.dialog:finished()
 	elseif event_type == "marker" and sound_source then
 		managers.subtitle:set_visible(true)
 		managers.subtitle:set_enabled(true)

@@ -29,7 +29,7 @@ local logic_variants = {
 	}
 }
 local security_variant = logic_variants.security
-logic_variants.patrol = security_variant
+logic_variants.gensec = security_variant
 logic_variants.cop = security_variant
 logic_variants.fbi = security_variant
 logic_variants.swat = security_variant

@@ -466,7 +466,7 @@ function CopLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	local surrender = false
 	local my_data = data.internal_data
 	data.t = TimerManager:game():time()
-	if managers.groupai:state():police_hostage_count() < 1 then
+	if managers.groupai:state():has_room_for_police_hostage() then
 		local i_am_special = managers.groupai:state():is_enemy_special(data.unit)
 		local required_skill = i_am_special and "intimidate_specials" or "intimidate_enemies"
 		local aggressor_can_intimidate

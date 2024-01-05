@@ -19,6 +19,12 @@ function SkillTreeTweakData:init()
 		hightier = digest(4),
 		hightierpro = digest(8)
 	}
+	self.tree_multiplier = {
+		digest(1),
+		digest(1),
+		digest(1),
+		digest(1)
+	}
 	self.skills = {}
 	self.skills.mastermind = {
 		name_id = "menu_mastermind",

@@ -219,7 +219,7 @@ function GroupAITweakData:_init_unit_categories()
 		},
 		spooc = {
 			units = {
-				Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
+				Idstring("units/payday2/characters/ene_tazer_1/ene_tazer_1")
 			},
 			access = access_type_all,
 			max_amount = 2,
@@ -353,7 +353,7 @@ function GroupAITweakData:_init_unit_categories()
 		},
 		FBI_spooc = {
 			units = {
-				Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
+				Idstring("units/payday2/characters/ene_tazer_1/ene_tazer_1")
 			},
 			max_amount = 4,
 			access = access_type_all,
@@ -460,20 +460,22 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		"murder"
 	}
 	local tactics_CS_sniper = {
-		"smoke_grenade",
-		"shield_cover",
 		"ranged_fire",
 		"provide_coverfire",
 		"provide_support"
 	}
 	local tactics_FBI_suit = {
-		"provide_coverfire",
-		"provide_support",
-		"ranged_fire"
+		"flank",
+		"deathguard",
+		"ranged_fire",
+		"flash_grenade"
 	}
 	local tactics_FBI_suit_stealth = {
 		"provide_coverfire",
-		"provide_support"
+		"provide_support",
+		"flash_grenade",
+		"flank",
+		"deathguard"
 	}
 	local tactics_FBI_swat_rifle = {
 		"smoke_grenade",
@@ -542,7 +544,6 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		"shield"
 	}
 	local tactics_FBI_spooc = {
-		"flank",
 		"smoke_grenade",
 		"flash_grenade",
 		"charge"
@@ -609,6 +610,13 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				amount_min = 1,
 				tactics = tactics_CS_cop_stealth,
 				rank = 1
+			},
+			{
+				unit = "FBI_spooc",
+				freq = 0.25,
+				amount_max = 1,
+				tactics = tactics_FBI_spooc,
+				rank = 2
 			}
 		}
 	}
@@ -692,7 +700,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				rank = 2
 			},
 			{
-				unit = "CS_cop_stealth_MP5",
+				unit = "CS_swat_MP5",
 				freq = 1,
 				amount_max = 2,
 				tactics = tactics_CS_cop_stealth,
@@ -720,7 +728,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_defend_a = {
-		amount = {3, 4},
+		amount = {3, 3},
 		spawn = {
 			{
 				unit = "FBI_suit_C45_M4",
@@ -738,7 +746,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_defend_b = {
-		amount = {3, 4},
+		amount = {3, 3},
 		spawn = {
 			{
 				unit = "FBI_suit_M4_MP5",
@@ -756,7 +764,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_defend_c = {
-		amount = {3, 4},
+		amount = {3, 3},
 		spawn = {
 			{
 				unit = "FBI_swat_M4",
@@ -767,7 +775,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_defend_d = {
-		amount = {3, 4},
+		amount = {2, 3},
 		spawn = {
 			{
 				unit = "FBI_heavy_G36",
@@ -786,11 +794,25 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				amount_min = 1,
 				tactics = tactics_FBI_suit_stealth,
 				rank = 1
+			},
+			{
+				unit = "CS_tazer",
+				freq = 1,
+				amount_max = 2,
+				tactics = tactics_CS_tazer,
+				rank = 2
+			},
+			{
+				unit = "FBI_spooc",
+				freq = 0.5,
+				amount_max = 1,
+				tactics = tactics_FBI_spooc,
+				rank = 2
 			}
 		}
 	}
 	self.enemy_spawn_groups.FBI_stealth_b = {
-		amount = {2, 4},
+		amount = {2, 3},
 		spawn = {
 			{
 				unit = "FBI_suit_stealth_MP5",
@@ -798,11 +820,24 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				amount_min = 1,
 				tactics = tactics_FBI_suit_stealth,
 				rank = 1
+			},
+			{
+				unit = "FBI_suit_M4_MP5",
+				freq = 0.75,
+				tactics = tactics_FBI_suit,
+				rank = 2
+			},
+			{
+				unit = "FBI_spooc",
+				freq = 1,
+				amount_min = 1,
+				tactics = tactics_FBI_spooc,
+				rank = 1
 			}
 		}
 	}
 	self.enemy_spawn_groups.FBI_swats = {
-		amount = {3, 4},
+		amount = {2, 3},
 		spawn = {
 			{
 				unit = "FBI_swat_M4",
@@ -827,7 +862,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_heavys = {
-		amount = {3, 4},
+		amount = {2, 3},
 		spawn = {
 			{
 				unit = "FBI_heavy_G36",
@@ -837,9 +872,16 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 			},
 			{
 				unit = "FBI_heavy_G36",
-				freq = 0.5,
+				freq = 0.75,
 				tactics = tactics_FBI_swat_rifle_flank,
 				rank = 2
+			},
+			{
+				unit = "CS_tazer",
+				freq = 0.25,
+				amount_max = 1,
+				tactics = tactics_CS_tazer,
+				rank = 3
 			}
 		}
 	}
@@ -878,6 +920,12 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				freq = 1,
 				amount_min = 1,
 				tactics = tactics_FBI_suit_stealth,
+				rank = 1
+			},
+			{
+				unit = "FBI_spooc",
+				freq = 1,
+				tactics = tactics_FBI_spooc,
 				rank = 1
 			}
 		}
@@ -993,7 +1041,7 @@ function GroupAITweakData:_init_task_data()
 		}
 	else
 		self.besiege.assault.force_balance_mul = {
-			1,
+			0.9,
 			1.5,
 			2,
 			2.25
@@ -1091,6 +1139,7 @@ function GroupAITweakData:_set_hard()
 	print("-------------\\//> Difficulty set to : Hard <\\//-------------")
 	print("-------------//\\//\\//\\//\\//\\//\\//\\//\\//\\-------------")
 	print("-------------\\//\\//\\//\\//\\//\\//\\//\\//\\//-------------")
+	local is_console = SystemInfo:platform() ~= Idstring("WIN32")
 	self.besiege.assault.groups = {
 		CS_swats = {
 			0,
@@ -1178,18 +1227,33 @@ function GroupAITweakData:_set_hard()
 			0.1
 		}
 	}
-	self.besiege.assault.force_balance_mul = {
-		1.5,
-		1.6,
-		1.7,
-		1.8
-	}
-	self.besiege.assault.force_pool_balance_mul = {
-		1.2,
-		1.4,
-		1.6,
-		1.8
-	}
+	if is_console then
+		self.besiege.assault.force_balance_mul = {
+			1.2,
+			1.4,
+			1.6,
+			1.8
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			1.2,
+			1.4,
+			1.6,
+			1.8
+		}
+	else
+		self.besiege.assault.force_balance_mul = {
+			1,
+			1.4,
+			1.6,
+			1.9
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			1.2,
+			1.4,
+			1.6,
+			1.9
+		}
+	end
 end
 
 function GroupAITweakData:_set_overkill()
@@ -1198,31 +1262,32 @@ function GroupAITweakData:_set_overkill()
 	print("-------------\\//> Difficulty set to : Overkill <\\//-------------")
 	print("-------------//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\-------------")
 	print("-------------\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//-------------")
+	local is_console = SystemInfo:platform() ~= Idstring("WIN32")
 	self.besiege.assault.groups = {
 		FBI_swats = {
 			0.1,
 			1,
-			0.5
+			1
 		},
 		FBI_heavys = {
 			0.05,
-			0.4,
-			0.5
+			0.25,
+			0.25
 		},
 		FBI_shields = {
 			0.1,
 			0.2,
-			0.35
+			0.275
 		},
 		FBI_tanks = {
 			0,
 			0.15,
-			0.2
+			0.3
 		},
 		CS_tazers = {
 			0.05,
 			0.15,
-			0.25
+			0.2
 		}
 	}
 	self.besiege.reenforce.interval = {
@@ -1285,18 +1350,33 @@ function GroupAITweakData:_set_overkill()
 			1
 		}
 	}
-	self.besiege.assault.force_balance_mul = {
-		1.6,
-		1.8,
-		2,
-		2.1
-	}
-	self.besiege.assault.force_pool_balance_mul = {
-		1.6,
-		1.8,
-		2,
-		2.2
-	}
+	if is_console then
+		self.besiege.assault.force_balance_mul = {
+			1.6,
+			1.8,
+			2,
+			2.2
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			1.7,
+			2,
+			2.2,
+			2.4
+		}
+	else
+		self.besiege.assault.force_balance_mul = {
+			1.4,
+			1.8,
+			2,
+			2.4
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			1.7,
+			2,
+			2.2,
+			2.5
+		}
+	end
 end
 
 function GroupAITweakData:_set_overkill_145()
@@ -1305,16 +1385,17 @@ function GroupAITweakData:_set_overkill_145()
 	print("-------------//\\> Difficulty set to : Overkill_145 <//\\-------------")
 	print("-------------\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//-------------")
 	print("-------------//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\-------------")
+	local is_console = SystemInfo:platform() ~= Idstring("WIN32")
 	self.besiege.assault.groups = {
 		FBI_swats = {
 			0.2,
-			0.5,
-			0.5
+			1,
+			1
 		},
 		FBI_heavys = {
-			0.2,
-			0.75,
-			1
+			0.1,
+			0.5,
+			0.25
 		},
 		FBI_shields = {
 			0.1,
@@ -1323,13 +1404,13 @@ function GroupAITweakData:_set_overkill_145()
 		},
 		FBI_tanks = {
 			0,
-			0.5,
-			0.75
+			0.25,
+			0.35
 		},
 		CS_tazers = {
 			0.1,
-			0.35,
-			0.6
+			0.25,
+			0.25
 		}
 	}
 	self.besiege.reenforce.interval = {
@@ -1377,28 +1458,43 @@ function GroupAITweakData:_set_overkill_145()
 	self.besiege.recon.interval_variation = 40
 	self.besiege.recon.groups = {
 		FBI_stealth_a = {
+			0.5,
 			1,
-			1,
-			0
+			1
 		},
 		FBI_stealth_b = {
 			0.25,
-			1,
+			0.5,
 			1
 		}
 	}
-	self.besiege.assault.force_balance_mul = {
-		1.7,
-		1.9,
-		2.1,
-		2.3
-	}
-	self.besiege.assault.force_pool_balance_mul = {
-		2,
-		2.2,
-		2.4,
-		2.6
-	}
+	if is_console then
+		self.besiege.assault.force_balance_mul = {
+			1.8,
+			2.1,
+			2.4,
+			2.8
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			2.2,
+			2.4,
+			2.6,
+			2.8
+		}
+	else
+		self.besiege.assault.force_balance_mul = {
+			2,
+			2.5,
+			2.9,
+			3.2
+		}
+		self.besiege.assault.force_pool_balance_mul = {
+			2.2,
+			2.4,
+			2.6,
+			3
+		}
+	end
 end
 
 function GroupAITweakData:_read_mission_preset(tweak_data)

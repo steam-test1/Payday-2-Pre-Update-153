@@ -40,11 +40,29 @@ function MissionAssetsManager:_setup_mission_assets()
 				can_unlock = true
 			end
 			if asset.saved_job_lock then
-				requirements.saved_job_lock = managers.mission:get_saved_job_value(asset.saved_job_lock) or false
+				local saved_job_lock = asset.saved_job_lock
+				if type(saved_job_lock) == "table" then
+					local saved_job_value = managers.mission:get_saved_job_value(saved_job_lock[1]) or 0
+					local operator = saved_job_lock[2] or "=="
+					local check_value = saved_job_lock[3] or 0
+					local function_string = "return " .. tostring(tonumber(saved_job_value) or 0) .. operator .. tostring(tonumber(check_value) or 0)
+					requirements.saved_job_lock = loadstring(function_string)() or false
+				else
+					requirements.saved_job_lock = managers.mission:get_saved_job_value(saved_job_lock) or false
+				end
 				can_unlock = requirements.saved_job_lock and can_unlock or false
 			end
 			if asset.job_lock then
-				requirements.job_lock = managers.mission:get_job_value(asset.job_lock) or false
+				local job_lock = asset.job_lock
+				if type(job_lock) == "table" then
+					local job_value = managers.mission:get_job_value(job_lock[1]) or 0
+					local operator = job_lock[2] or "=="
+					local check_value = job_lock[3] or 0
+					local function_string = "return " .. tostring(tonumber(job_value) or 0) .. operator .. tostring(tonumber(check_value) or 0)
+					requirements.job_lock = loadstring(function_string)() or false
+				else
+					requirements.job_lock = managers.mission:get_job_value(job_lock) or false
+				end
 				can_unlock = requirements.job_lock and can_unlock or false
 			end
 			if asset.upgrade_lock then
@@ -150,8 +168,24 @@ function MissionAssetsManager:_check_triggers(type)
 			cb_data.callback()
 			if asset then
 				asset.is_triggered = true
+				self:trigger_asset_tweak(cb_data.id)
 			end
 		end
+	end
+end
+
+function MissionAssetsManager:trigger_asset_tweak(asset_id)
+	local asset_tweak_data = tweak_data.assets[asset_id]
+	if not asset_tweak_data then
+		return
+	end
+	local set_job_value = asset_tweak_data.set_job_value
+	if set_job_value then
+		managers.mission:set_job_value(set_job_value[1], set_job_value[2])
+	end
+	local set_saved_job_value = asset_tweak_data.set_saved_job_value
+	if set_saved_job_value then
+		managers.mission:set_saved_job_value(set_saved_job_value[1], set_saved_job_value[2])
 	end
 end
 
@@ -193,6 +227,7 @@ function MissionAssetsManager:sync_unlock_asset(asset_id)
 	end
 	asset.unlocked = true
 	managers.menu_component:unlock_asset_mission_briefing_gui(asset_id)
+	self:trigger_asset_tweak(asset_id)
 end
 
 function MissionAssetsManager:get_every_asset_ids()

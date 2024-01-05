@@ -654,6 +654,9 @@ function CopLogicArrest._say_scary_stuff_discovered(data)
 end
 
 function CopLogicArrest.death_clbk(data, damage_info)
+	if not alive(damage_info.attacker_unit) then
+		return
+	end
 	local my_data = data.internal_data
 	local attacker_u_key = damage_info.attacker_unit:key()
 	local arrest_data = my_data.arrest_targets[attacker_u_key]

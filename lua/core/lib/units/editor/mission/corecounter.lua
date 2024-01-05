@@ -9,7 +9,7 @@ end
 
 function CoreCounterUnitElement:init(unit)
 	MissionElement.init(self, unit)
-	self._hed.counter_target = 1
+	self._hed.counter_target = 0
 	table.insert(self._save_values, "counter_target")
 end
 
@@ -368,7 +368,8 @@ function CoreCounterFilterUnitElement:_build_panel(panel, panel_sizer)
 			"greater_than",
 			"less_or_equal",
 			"greater_or_equal",
-			"counters_equal"
+			"counters_equal",
+			"counters_not_equal"
 		},
 		value = self._hed.check_type,
 		tooltip = "Select which check operation to berform",

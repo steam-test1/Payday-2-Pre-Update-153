@@ -134,7 +134,7 @@ function PlayerMovement:set_character_anim_variables()
 			spanish = "_chains"
 		}
 	end
-	local mesh_name = Idstring("g_fps_hand" .. mesh_names[char_name] .. managers.player._player_mesh_suffix)
+	local mesh_name = Idstring("g_fps_hand" .. (mesh_names[char_name] or "") .. managers.player._player_mesh_suffix)
 	local mesh_obj = self._unit:camera():camera_unit():get_object(mesh_name)
 	if mesh_obj then
 		if self._plr_mesh_name then
@@ -148,9 +148,10 @@ function PlayerMovement:set_character_anim_variables()
 	end
 	local camera_unit = self._unit:camera():camera_unit()
 	if camera_unit:damage() then
-		local character = CriminalsManager.convert_old_to_new_character_workname(char_name)
-		local sequence = tweak_data.blackmarket.characters.locked[character].sequence
-		camera_unit:damage():run_sequence_simple(sequence)
+		local sequence = managers.blackmarket:character_sequence_by_character_name(char_name)
+		if camera_unit:damage():has_sequence(sequence) then
+			camera_unit:damage():run_sequence_simple(sequence)
+		end
 	end
 end
 

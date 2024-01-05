@@ -344,4 +344,26 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.train_cargo_door = {}
+	self.train_cargo_door.devices = {}
+	self.train_cargo_door.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 180
+		}
+	}
+	self.train_cargo_door.devices.key = {
+		{
+			align = "a_keycard",
+			unit = Idstring("units/payday2/equipment/gen_interactable_panel_keycard/gen_interactable_panel_keycard")
+		}
+	}
+	self.train_cargo_door.devices.ecm = {
+		{
+			align = "a_ecm_hack",
+			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
+		}
+	}
 end

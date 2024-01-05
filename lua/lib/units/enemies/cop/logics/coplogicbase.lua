@@ -520,6 +520,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 					attention_info.verified = verified
 				end
 				attention_info.dis = dis
+				attention_info.vis_ray = vis_ray and vis_ray.dis or nil
 				if verified then
 					attention_info.release_t = nil
 					attention_info.verified_t = t

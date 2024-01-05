@@ -270,30 +270,37 @@ function NewRaycastWeaponBase:on_disabled(...)
 end
 
 function NewRaycastWeaponBase:has_gadget()
-	return managers.weapon_factory:get_part_from_weapon_by_type("gadget", self._parts) and true or false
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	return 0 < #gadgets and true or false
 end
 
 function NewRaycastWeaponBase:gadget_on()
 	self._gadget_on = true
-	local gadget = managers.weapon_factory:get_part_from_weapon_by_type("gadget", self._parts)
-	if gadget then
-		gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	if gadgets then
+		for _, gadget in ipairs(gadgets) do
+			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+		end
 	end
 end
 
 function NewRaycastWeaponBase:gadget_off()
 	self._gadget_on = false
-	local gadget = managers.weapon_factory:get_part_from_weapon_by_type("gadget", self._parts)
-	if gadget then
-		gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	if gadgets then
+		for _, gadget in ipairs(gadgets) do
+			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+		end
 	end
 end
 
 function NewRaycastWeaponBase:toggle_gadget()
 	self._gadget_on = not self._gadget_on
-	local gadget = managers.weapon_factory:get_part_from_weapon_by_type("gadget", self._parts)
-	if gadget then
-		gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	if gadgets then
+		for _, gadget in ipairs(gadgets) do
+			gadget.unit:base():set_state(self._gadget_on, self._sound_fire)
+		end
 	end
 end
 

@@ -235,7 +235,7 @@ function IngameWaitingForPlayersState:at_enter()
 		Global.local_member:sync_lobby_data(managers.network:session():server_peer())
 		Global.local_member:sync_data(managers.network:session():server_peer())
 	end
-	if managers.job:interupt_stage() then
+	if managers.job:interupt_stage() and not tweak_data.levels[managers.job:interupt_stage()].bonus_escape then
 		managers.menu_component:post_event("escape_menu")
 	end
 end

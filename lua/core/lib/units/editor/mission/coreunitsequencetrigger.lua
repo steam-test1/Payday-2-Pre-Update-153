@@ -107,17 +107,20 @@ function CoreUnitSequenceTriggerUnitElement:select_unit()
 		ray_type = "body editor"
 	})
 	if ray and ray.unit then
-		local unit = ray.unit
-		local sequences = managers.sequence:get_sequence_list(unit:name())
-		if 0 < #sequences then
-			self._sequence_units[unit:unit_data().unit_id] = unit
-			local sequence_list_data = {
-				unit_id = unit:unit_data().unit_id,
-				sequence = "none"
-			}
-			table.insert(self._hed.sequence_list, sequence_list_data)
-			self:_add_unit(unit, sequences, sequence_list_data)
-		end
+		self:_check_add_unit(ray.unit)
+	end
+end
+
+function CoreUnitSequenceTriggerUnitElement:_check_add_unit(unit)
+	local sequences = managers.sequence:get_sequence_list(unit:name())
+	if 0 < #sequences then
+		self._sequence_units[unit:unit_data().unit_id] = unit
+		local sequence_list_data = {
+			unit_id = unit:unit_data().unit_id,
+			sequence = "none"
+		}
+		table.insert(self._hed.sequence_list, sequence_list_data)
+		self:_add_unit(unit, sequences, sequence_list_data)
 	end
 end
 
@@ -125,11 +128,30 @@ function CoreUnitSequenceTriggerUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "select_unit"))
 end
 
+function CoreUnitSequenceTriggerUnitElement:select_unit_list_btn()
+	local f = function(unit)
+		if not managers.editor:layer("Statics"):category_map()[unit:type():s()] then
+			return false
+		end
+		local sequences = managers.sequence:get_sequence_list(unit:name())
+		return 0 < #sequences
+	end
+	local dialog = SelectUnitByNameModal:new("Select Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		self:_check_add_unit(unit)
+	end
+end
+
 function CoreUnitSequenceTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_check_alive_units()
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	self._btn_toolbar:add_tool("SELECT_UNIT_LIST", "Select unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	self._btn_toolbar:connect("SELECT_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_unit_list_btn"), nil)
+	self._btn_toolbar:realize()
+	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
 	for _, data in pairs(clone(self._hed.sequence_list)) do
 		local unit = self._sequence_units[data.unit_id]
 		if not alive(unit) then

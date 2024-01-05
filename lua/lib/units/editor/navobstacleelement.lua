@@ -33,15 +33,15 @@ function NavObstacleElement:load_unit(unit)
 	end
 end
 
-function NavObstacleElement:update_selected()
-	self:_check_alive_units_and_draw("selected")
+function NavObstacleElement:update_selected(t, dt, selected_unit, all_units)
+	self:_check_alive_units_and_draw("selected", selected_unit, all_units)
 end
 
 function NavObstacleElement:update_unselected(t, dt, selected_unit, all_units)
-	self:_check_alive_units_and_draw("unselected")
+	self:_check_alive_units_and_draw("unselected", selected_unit, all_units)
 end
 
-function NavObstacleElement:_check_alive_units_and_draw(type)
+function NavObstacleElement:_check_alive_units_and_draw(type, selected_unit, all_units)
 	local r = type == "selected" and 1 or 0.5
 	local g = 0
 	local b = 0
@@ -49,7 +49,7 @@ function NavObstacleElement:_check_alive_units_and_draw(type)
 		if not alive(unit) then
 			self:_remove_by_unit_id(id)
 			self._obstacle_units[id] = nil
-		else
+		elseif self:_should_draw_link(selected_unit, unit) then
 			local params = {
 				from_unit = self._unit,
 				to_unit = unit,
@@ -93,16 +93,19 @@ function NavObstacleElement:select_unit()
 		ray_type = "body editor"
 	})
 	if ray and ray.unit then
-		local unit = ray.unit
-		local all_object_names = self:_get_objects_by_unit(unit)
-		self._obstacle_units[unit:unit_data().unit_id] = unit
-		local obstacle_list_data = {
-			unit_id = unit:unit_data().unit_id,
-			obj_name = Idstring(self._unindent_obj_name(all_object_names[1]))
-		}
-		table.insert(self._hed.obstacle_list, obstacle_list_data)
-		self:_add_unit(unit, all_object_names, obstacle_list_data)
+		self:_check_add_unit(ray.unit)
 	end
+end
+
+function NavObstacleElement:_check_add_unit(unit)
+	local all_object_names = self:_get_objects_by_unit(unit)
+	self._obstacle_units[unit:unit_data().unit_id] = unit
+	local obstacle_list_data = {
+		unit_id = unit:unit_data().unit_id,
+		obj_name = Idstring(self._unindent_obj_name(all_object_names[1]))
+	}
+	table.insert(self._hed.obstacle_list, obstacle_list_data)
+	self:_add_unit(unit, all_object_names, obstacle_list_data)
 end
 
 function NavObstacleElement:_remove_by_unit_id(unit_id)
@@ -207,6 +210,19 @@ function NavObstacleElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "select_unit"))
 end
 
+function NavObstacleElement:select_unit_list_btn()
+	local f = function(unit)
+		if not managers.editor:layer("Statics"):category_map()[unit:type():s()] then
+			return false
+		end
+		return true
+	end
+	local dialog = SelectUnitByNameModal:new("Select Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		self:_check_add_unit(unit)
+	end
+end
+
 function NavObstacleElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
@@ -224,6 +240,11 @@ function NavObstacleElement:_build_panel(panel, panel_sizer)
 	}
 	local operation = CoreEWS.combobox(operation_params)
 	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
+	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	self._btn_toolbar:add_tool("SELECT_UNIT_LIST", "Select unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	self._btn_toolbar:connect("SELECT_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_unit_list_btn"), nil)
+	self._btn_toolbar:realize()
+	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
 	for _, data in pairs(clone(self._hed.obstacle_list)) do
 		local unit = self._obstacle_units[data.unit_id]
 		if not alive(unit) then

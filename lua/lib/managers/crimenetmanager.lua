@@ -34,7 +34,11 @@ end
 function CrimeNetManager:_get_jobs_by_jc()
 	local t = {}
 	for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		if managers.job:check_ok_with_cooldown(job_id) and not tweak_data.narrative.jobs[job_id].wrapped_to_job then
+		local is_cooldown_ok = managers.job:check_ok_with_cooldown(job_id)
+		local is_not_wrapped = not tweak_data.narrative.jobs[job_id].wrapped_to_job
+		local is_not_dlc_or_got = not tweak_data.narrative.jobs[job_id].dlc or managers.dlc:has_dlc(tweak_data.narrative.jobs[job_id].dlc)
+		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got
+		if pass_all_tests then
 			local job_data = tweak_data.narrative.jobs[job_id]
 			for i = job_data.professional and 1 or 0, 3 do
 				t[job_data.jc + i * 10] = t[job_data.jc + i * 10] or {}
@@ -97,7 +101,8 @@ function CrimeNetManager:_setup()
 				else
 					job_data = table.remove(jobs_by_jc[jcs[i]], math.random(#jobs_by_jc[jcs[i]]))
 				end
-				job_data.chance = chance
+				local chance_multiplier = tweak_data.narrative.jobs[job_data.job_id] and tweak_data.narrative.jobs[job_data.job_id].spawn_chance_multiplier or 1
+				job_data.chance = chance * chance_multiplier
 				table.insert(self._presets, job_data)
 				j = j + 1
 				break
@@ -555,7 +560,6 @@ end
 CrimeNetGui = CrimeNetGui or class()
 
 function CrimeNetGui:init(ws, fullscreeen_ws, node)
-	managers.menu_component:test_camera_shutter_tech()
 	self._tweak_data = tweak_data.gui.crime_net
 	self._crimenet_enabled = true
 	managers.menu_component:post_event("crime_net_startup")

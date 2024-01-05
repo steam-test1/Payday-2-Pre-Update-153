@@ -14,18 +14,11 @@ function QuickFlashGrenade:_play_sound_and_effects()
 		mvector3.lerp(bounce_point, self._shoot_position, self._unit:position(), 0.65)
 		local sound_source = SoundDevice:create_source("grenade_bounce_source")
 		sound_source:set_position(bounce_point)
-		sound_source:post_event("flashbang_bounce")
+		sound_source:post_event("flashbang_bounce", callback(self, self, "sound_playback_complete_clbk"), sound_source, "end_of_event")
 	elseif self._state == 3 then
 		self._unit:sound_source():post_event("flashbang_explosion")
-		local parent = self._unit:orientation_object()
 		local detonate_pos = self._unit:position()
-		local range = 1000
-		local affected, line_of_sight, travel_dis, linear_dis = self:_chk_dazzle_local_player(detonate_pos, range)
-		if affected then
-			managers.environment_controller:set_flashbang(detonate_pos, line_of_sight, travel_dis, linear_dis, tweak_data.character.flashbang_multiplier)
-			local sound_eff_mul = math.clamp(1 - (travel_dis or linear_dis) / range, 0.3, 1)
-			managers.player:player_unit():character_damage():on_flashbanged(sound_eff_mul)
-		end
+		self:make_flash(detonate_pos)
 		managers.groupai:state():propagate_alert({
 			"aggression",
 			detonate_pos,
@@ -36,7 +29,17 @@ function QuickFlashGrenade:_play_sound_and_effects()
 	end
 end
 
-function QuickFlashGrenade:_chk_dazzle_local_player(detonate_pos, range)
+function QuickFlashGrenade:make_flash(detonate_pos, range, ignore_units)
+	local range = range or 1000
+	local affected, line_of_sight, travel_dis, linear_dis = self:_chk_dazzle_local_player(detonate_pos, range, ignore_units)
+	if affected then
+		managers.environment_controller:set_flashbang(detonate_pos, line_of_sight, travel_dis, linear_dis, tweak_data.character.flashbang_multiplier)
+		local sound_eff_mul = math.clamp(1 - (travel_dis or linear_dis) / range, 0.3, 1)
+		managers.player:player_unit():character_damage():on_flashbanged(sound_eff_mul)
+	end
+end
+
+function QuickFlashGrenade:_chk_dazzle_local_player(detonate_pos, range, ignore_units)
 	local player = managers.player:player_unit()
 	if not alive(player) then
 		return
@@ -50,7 +53,11 @@ function QuickFlashGrenade:_chk_dazzle_local_player(detonate_pos, range)
 	local slotmask = managers.slot:get_mask("bullet_impact_targets")
 	
 	local function _vis_ray_func(from, to, boolean)
-		return World:raycast("ray", from, to, "slot_mask", slotmask, boolean and "report" or nil)
+		if ignore_units then
+			return World:raycast("ray", from, to, "ignore_unit", ignore_units, "slot_mask", slotmask, boolean and "report" or nil)
+		else
+			return World:raycast("ray", from, to, "slot_mask", slotmask, boolean and "report" or nil)
+		end
 	end
 	
 	if not _vis_ray_func(m_pl_head_pos, detonate_pos, true) then
@@ -86,6 +93,9 @@ function QuickFlashGrenade:_chk_dazzle_local_player(detonate_pos, range)
 			end
 		end
 	end
+end
+
+function QuickFlashGrenade:sound_playback_complete_clbk(event_instance, sound_source, event_type, sound_source_again)
 end
 
 function QuickFlashGrenade:destroy()

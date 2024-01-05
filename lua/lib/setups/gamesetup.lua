@@ -7,7 +7,6 @@ require("lib/managers/MissionManager")
 require("lib/utils/dev/editor/WorldDefinition")
 require("lib/managers/ObjectInteractionManager")
 require("lib/managers/LocalizationManager")
-require("lib/managers/DramaManager")
 require("lib/managers/DialogManager")
 require("lib/managers/EnemyManager")
 require("lib/managers/SpawnManager")
@@ -31,6 +30,7 @@ require("lib/managers/TradeManager")
 require("lib/managers/CriminalsManager")
 require("lib/managers/FeedBackManager")
 require("lib/managers/TimeSpeedManager")
+require("lib/managers/ExplosionManager")
 core:import("SequenceManager")
 if Application:editor() then
 	require("lib/utils/dev/tools/WorldEditor")
@@ -186,7 +186,15 @@ function GameSetup:load_packages()
 		end
 	end
 	local job_tweak_data = Global.job_manager and Global.job_manager.current_job and Global.job_manager.current_job.job_id and tweak_data.narrative.jobs[Global.job_manager.current_job.job_id]
-	local contact = Global.job_manager and Global.job_manager.interupt_stage and "interupt" or job_tweak_data and job_tweak_data.contact
+	local contact
+	if Global.job_manager and Global.job_manager.interupt_stage then
+		contact = "interupt"
+		if tweak_data.levels[Global.job_manager.interupt_stage].bonus_escape then
+			contact = "bain"
+		end
+	else
+		contact = job_tweak_data and job_tweak_data.contact
+	end
 	local contact_tweak_data = tweak_data.narrative.contacts[contact]
 	local contact_package = contact_tweak_data and contact_tweak_data.package
 	if contact_package and not PackageManager:loaded(contact_package) then
@@ -232,7 +240,6 @@ end
 function GameSetup:init_managers(managers)
 	Setup.init_managers(self, managers)
 	managers.interaction = ObjectInteractionManager:new()
-	managers.drama = DramaManager:new()
 	managers.dialog = DialogManager:new()
 	managers.enemy = EnemyManager:new()
 	managers.spawn = SpawnManager:new()
@@ -254,6 +261,7 @@ function GameSetup:init_managers(managers)
 	managers.trade = TradeManager:new()
 	managers.feedback = FeedBackManager:new()
 	managers.time_speed = TimeSpeedManager:new()
+	managers.explosion = ExplosionManager:new()
 	if SystemInfo:platform() == Idstring("X360") then
 		managers.blackmarket:load_equipped_weapons()
 	end
@@ -325,7 +333,6 @@ end
 function GameSetup:update(t, dt)
 	Setup.update(self, t, dt)
 	managers.interaction:update(t, dt)
-	managers.dialog:update(t, dt)
 	managers.enemy:update(t, dt)
 	managers.groupai:update(t, dt)
 	managers.spawn:update(t, dt)
@@ -338,6 +345,7 @@ function GameSetup:update(t, dt)
 	managers.statistics:update(t, dt)
 	managers.time_speed:update()
 	managers.objectives:update(t, dt)
+	managers.explosion:update(t, dt)
 	if script_data.level_script and script_data.level_script.update then
 		script_data.level_script:update(t, dt)
 	end

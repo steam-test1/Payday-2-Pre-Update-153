@@ -763,9 +763,30 @@ function FPCameraPlayerBase:remove_limits()
 	self._limits = nil
 end
 
-function FPCameraPlayerBase:throw_flash_grenade(unit)
+function FPCameraPlayerBase:throw_grenade(unit)
+	self:unspawn_grenade()
 	if alive(self._parent_unit) then
-		self._parent_unit:equipment():throw_flash_grenade()
+		self._parent_unit:equipment():throw_grenade()
+	end
+end
+
+function FPCameraPlayerBase:spawn_grenade()
+	if alive(self._grenade_unit) then
+		return
+	end
+	local align_obj_l_name = Idstring("a_weapon_left")
+	local align_obj_r_name = Idstring("a_weapon_right")
+	local align_obj_l = self._unit:get_object(align_obj_l_name)
+	local align_obj_r = self._unit:get_object(align_obj_r_name)
+	self._grenade_unit = World:spawn_unit(Idstring("units/weapons/frag_grenade/frag_grenade_husk"), align_obj_r:position(), align_obj_r:rotation())
+	self._unit:link(align_obj_r:name(), self._grenade_unit, self._grenade_unit:orientation_object():name())
+end
+
+function FPCameraPlayerBase:unspawn_grenade()
+	if alive(self._grenade_unit) then
+		self._grenade_unit:unlink()
+		World:delete_unit(self._grenade_unit)
+		self._grenade_unit = nil
 	end
 end
 

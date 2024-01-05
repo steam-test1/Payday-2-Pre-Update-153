@@ -306,7 +306,7 @@ function HuskPlayerMovement:set_character_anim_variables()
 	if not char_name then
 		return
 	end
-	local mesh_name = self._char_model_names[char_name] .. (managers.player._player_mesh_suffix or "")
+	local mesh_name = (self._char_model_names[char_name] or "") .. (managers.player._player_mesh_suffix or "")
 	local mesh_obj = self._unit:get_object(Idstring(mesh_name))
 	if mesh_obj then
 		self._unit:get_object(Idstring(self._plr_mesh_name or self._char_model_names.german)):set_visibility(false)

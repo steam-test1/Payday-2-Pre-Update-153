@@ -35,6 +35,22 @@ function SkillTreeManager:_create_tree_data(tree_id)
 	}
 end
 
+function SkillTreeManager:get_skill_points(skill, index)
+	local points = tweak_data.skilltree.skills[skill][index] and tweak_data.skilltree.skills[skill][index].cost and Application:digest_value(tweak_data.skilltree.skills[skill][index].cost, false)
+	if points then
+		for _, tree in ipairs(tweak_data.skilltree.trees) do
+			if tree.skill == skill then
+				local unlocked = self:trees_unlocked()
+				if unlocked < #tweak_data.skilltree.tree_multiplier then
+					points = points * Application:digest_value(tweak_data.skilltree.tree_multiplier[unlocked + 1], false)
+				end
+				break
+			end
+		end
+	end
+	return points
+end
+
 function SkillTreeManager:unlock_tree(tree)
 	if self._global.trees[tree].unlocked then
 		Application:error("Tree", tree, "allready unlocked")
@@ -42,8 +58,8 @@ function SkillTreeManager:unlock_tree(tree)
 	end
 	local skill_id = tweak_data.skilltree.trees[tree].skill
 	local to_unlock = managers.skilltree:next_skill_step(skill_id)
+	local points = managers.skilltree:get_skill_points(skill_id, to_unlock) or 0
 	local skill = tweak_data.skilltree.skills[skill_id][to_unlock]
-	local points = skill.cost and Application:digest_value(skill.cost, false) or Application:digest_value(tweak_data.skilltree.costs.unlock_tree, false)
 	if not skill or not skill.cost then
 		print("[SkillTreeManager:unlock_tree] skill tree: \"" .. tostring(skill_id) .. "\" is missing cost!")
 	end
@@ -144,7 +160,7 @@ function SkillTreeManager:unlock(tree, skill_id)
 	end
 	local to_unlock = managers.skilltree:next_skill_step(skill_id)
 	local skill = talent[to_unlock]
-	local points = Application:digest_value(skill.cost, false)
+	local points = managers.skilltree:get_skill_points(skill_id, to_unlock)
 	if points > self:points() then
 		return
 	end
@@ -218,6 +234,16 @@ end
 
 function SkillTreeManager:tree_unlocked(tree)
 	return self._global.trees[tree].unlocked
+end
+
+function SkillTreeManager:trees_unlocked()
+	local amount = 0
+	for _, tree in pairs(self._global.trees) do
+		if tree.unlocked then
+			amount = amount + 1
+		end
+	end
+	return amount
 end
 
 function SkillTreeManager:_unlock(tree, skill_id)

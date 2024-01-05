@@ -2475,6 +2475,29 @@ function MenuComponentManager:close()
 	self._requested_textures = {}
 end
 
+function MenuComponentManager:play_transition()
+	if self._transition_panel then
+		self._transition_panel:parent():remove(self._transition_panel)
+	end
+	self._transition_panel = self._fullscreen_ws:panel():panel({
+		name = "transition_panel",
+		layer = 10000
+	})
+	self._transition_panel:rect({
+		name = "fade1",
+		color = Color.black,
+		halign = "scale",
+		valign = "scale "
+	})
+	local animate_transition = function(o)
+		local fade1 = o:child("fade1")
+		over(0.5, function(p)
+			fade1:set_alpha(1 - p)
+		end)
+	end
+	self._transition_panel:animate(animate_transition)
+end
+
 function MenuComponentManager:test_camera_shutter_tech()
 	if not self._tcst then
 		self._tcst = managers.gui_data:create_fullscreen_16_9_workspace()

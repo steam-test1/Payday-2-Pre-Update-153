@@ -513,6 +513,17 @@ function PlayerManager:activate_temporary_upgrade(category, upgrade)
 	self._temporary_upgrades[category][upgrade].expire_time = Application:time() + time
 end
 
+function PlayerManager:deactivate_temporary_upgrade(category, upgrade)
+	local upgrade_value = self:upgrade_value(category, upgrade)
+	if upgrade_value == 0 then
+		return
+	end
+	if not self._temporary_upgrades[category] then
+		return
+	end
+	self._temporary_upgrades[category][upgrade] = nil
+end
+
 function PlayerManager:has_activate_temporary_upgrade(category, upgrade)
 	local upgrade_value = self:upgrade_value(category, upgrade)
 	if upgrade_value == 0 then
@@ -615,6 +626,12 @@ function PlayerManager:movement_speed_multiplier(speed_state, bonus_multiplier)
 	if self:num_local_minions() > 0 then
 		multiplier = multiplier + self:upgrade_value("player", "minion_master_speed_multiplier", 1) - 1
 	end
+	if self:has_category_upgrade("player", "secured_bags_speed_multiplier") then
+		local bags = 0
+		bags = bags + (managers.loot:get_secured_mandatory_bags_amount() or 0)
+		bags = bags + (managers.loot:get_secured_bonus_bags_amount() or 0)
+		multiplier = multiplier + bags * (self:upgrade_value("player", "secured_bags_speed_multiplier", 1) - 1)
+	end
 	return multiplier
 end
 
@@ -641,24 +658,8 @@ function PlayerManager:skill_dodge_chance(running, detection_risk)
 	if running then
 		chance = chance + self:upgrade_value("player", "run_dodge_chance", 0)
 	end
-	if not detection_risk then
-		detection_risk = managers.blackmarket:get_suspicion_offset_of_local(tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
-		detection_risk = math.round(detection_risk * 100)
-	end
 	local detection_risk_add_dodge_chance = managers.player:upgrade_value("player", "detection_risk_add_dodge_chance")
-	if type(detection_risk_add_dodge_chance) == "table" then
-		local value = detection_risk_add_dodge_chance[1]
-		local step = detection_risk_add_dodge_chance[2]
-		local operator = detection_risk_add_dodge_chance[3]
-		local threshold = detection_risk_add_dodge_chance[4]
-		local num_steps = 0
-		if operator == "above" then
-			num_steps = math.max(math.floor((detection_risk - threshold) / step), 0)
-		elseif operator == "below" then
-			num_steps = math.max(math.floor((threshold - detection_risk) / step), 0)
-		end
-		chance = chance + num_steps * value
-	end
+	chance = chance + self:get_value_from_risk_upgrade(detection_risk_add_dodge_chance, detection_risk)
 	return chance
 end
 
@@ -677,23 +678,31 @@ function PlayerManager:critical_hit_chance()
 	multiplier = multiplier + self:upgrade_value("weapon", "critical_hit_chance", 0)
 	multiplier = multiplier + self:team_upgrade_value("critical_hit", "chance", 0)
 	multiplier = multiplier + self:get_hostage_bonus_multiplier("critical_hit") - 1
-	local detection_risk = managers.blackmarket:get_suspicion_offset_of_local(tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
-	detection_risk = math.round(detection_risk * 100)
 	local detection_risk_add_crit_chance = managers.player:upgrade_value("player", "detection_risk_add_crit_chance")
-	if type(detection_risk_add_crit_chance) == "table" then
-		local value = detection_risk_add_crit_chance[1]
-		local step = detection_risk_add_crit_chance[2]
-		local operator = detection_risk_add_crit_chance[3]
-		local threshold = detection_risk_add_crit_chance[4]
+	multiplier = multiplier + self:get_value_from_risk_upgrade(detection_risk_add_crit_chance)
+	return multiplier
+end
+
+function PlayerManager:get_value_from_risk_upgrade(risk_upgrade, detection_risk)
+	local risk_value = 0
+	if not detection_risk then
+		detection_risk = managers.blackmarket:get_suspicion_offset_of_local(tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
+		detection_risk = math.round(detection_risk * 100)
+	end
+	if risk_upgrade and type(risk_upgrade) == "table" then
+		local value = risk_upgrade[1]
+		local step = risk_upgrade[2]
+		local operator = risk_upgrade[3]
+		local threshold = risk_upgrade[4]
 		local num_steps = 0
 		if operator == "above" then
 			num_steps = math.max(math.floor((detection_risk - threshold) / step), 0)
 		elseif operator == "below" then
 			num_steps = math.max(math.floor((threshold - detection_risk) / step), 0)
 		end
-		multiplier = multiplier + num_steps * value
+		risk_value = num_steps * value
 	end
-	return multiplier
+	return risk_value
 end
 
 function PlayerManager:health_skill_multiplier()
@@ -706,6 +715,12 @@ function PlayerManager:health_skill_multiplier()
 		multiplier = multiplier + self:upgrade_value("player", "minion_master_health_multiplier", 1) - 1
 	end
 	return multiplier
+end
+
+function PlayerManager:max_health()
+	local base_health = PlayerDamage._HEALTH_INIT
+	local health = (base_health + self:thick_skin_value()) * self:health_skill_multiplier()
+	return health
 end
 
 function PlayerManager:thick_skin_value()

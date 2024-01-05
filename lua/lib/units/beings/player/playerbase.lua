@@ -41,7 +41,7 @@ function PlayerBase:_setup_suspicion_and_detection_data()
 	self._suspicion_settings.multipliers = {}
 	self._suspicion_settings.init_buildup_mul = self._suspicion_settings.buildup_mul
 	self._suspicion_settings.init_range_mul = self._suspicion_settings.range_mul
-	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(Global.local_member:peer(), 0.75)
+	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(Global.local_member:peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 	self._detection_settings = {}
 	self._detection_settings.multipliers = {}
 	self._detection_settings.init_delay_mul = 1

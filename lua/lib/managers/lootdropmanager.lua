@@ -15,24 +15,16 @@ end
 
 function LootDropManager:add_qlvl_to_weapon_mods(override_tweak_data)
 	local weapon_mods_tweak_data = override_tweak_data or tweak_data.blackmarket.weapon_mods
-	local weapon_level_data = {}
-	for level, data in pairs(tweak_data.upgrades.level_tree) do
-		if data.upgrades then
-			for _, upgrade in ipairs(data.upgrades) do
-				local def = tweak_data.upgrades.definitions[upgrade]
-				if def.weapon_id then
-					local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(def.weapon_id)
-					weapon_level_data[factory_id] = level
-				end
-			end
-		end
+	local weapons_data = {}
+	for weapon_id, data in pairs(Global.blackmarket_manager.weapons) do
+		weapons_data[data.factory_id] = data.level
 	end
 	for part_id, data in pairs(tweak_data.weapon.factory.parts) do
 		local weapon_uses_part = managers.weapon_factory:get_weapons_uses_part(part_id) or {}
 		local min_level = managers.experience:level_cap()
 		for _, factory_id in ipairs(weapon_uses_part) do
 			if not table.contains(tweak_data.weapon.factory[factory_id].default_blueprint, part_id) then
-				min_level = math.min(min_level, weapon_level_data[factory_id] or 0)
+				min_level = math.min(min_level, weapons_data[factory_id] or 0)
 			end
 		end
 		weapon_mods_tweak_data[part_id].qlvl = min_level

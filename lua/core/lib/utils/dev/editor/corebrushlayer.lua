@@ -301,7 +301,7 @@ function BrushLayer:build_panel(notebook)
 	ctrl_sizer:add(self:create_slider("Pressure", "_brush_pressure", 1, 20), 0, 0, "EXPAND")
 	ctrl_sizer:add(self:create_slider("Height [cm]", "_brush_height", 10, 1000), 0, 0, "EXPAND")
 	ctrl_sizer:add(self:create_slider("Angle [deg]", "_angle_override", 0, 360), 0, 0, "EXPAND")
-	ctrl_sizer:add(self:create_slider("Offset [cm]", "_offset", 0, 1000), 0, 0, "EXPAND")
+	ctrl_sizer:add(self:create_slider("Offset [cm]", "_offset", -30, 1000, 0), 0, 0, "EXPAND")
 	local pressure_cb = EWS:CheckBox(self._ews_panel, "Use Pressure when Erasing", "")
 	pressure_cb:set_value(self._erase_with_pressure)
 	ctrl_sizer:add(pressure_cb, 0, 5, "SHAPED,TOP")
@@ -449,13 +449,13 @@ function BrushLayer:load_brushes()
 	end
 end
 
-function BrushLayer:create_slider(name, value, s_value, e_value)
+function BrushLayer:create_slider(name, value, s_value, e_value, default_value)
 	local slider_sizer = EWS:BoxSizer("VERTICAL")
 	slider_sizer:add(EWS:StaticText(self._ews_panel, name, "", "ALIGN_LEFT"), 0, 0, "EXPAND")
 	local slider_params = {
 		panel = self._ews_panel,
 		sizer = slider_sizer,
-		value = s_value,
+		value = default_value or s_value,
 		floats = 0,
 		min = s_value,
 		max = e_value,

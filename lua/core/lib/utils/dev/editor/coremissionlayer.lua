@@ -270,7 +270,12 @@ function MissionLayer:update(time, rel_time)
 			if selected_unit then
 				unit:mission_element():draw_links_selected(time, rel_time, self._only_draw_selected_connections and self._selected_unit)
 				if self._editing_mission_element then
-					unit:mission_element():update_editing(time, rel_time, self._current_pos)
+					if unit:mission_element().base_update_editing then
+						unit:mission_element():base_update_editing(time, rel_time, self._current_pos)
+					end
+					if unit:mission_element().update_editing then
+						unit:mission_element():update_editing(time, rel_time, self._current_pos)
+					end
 				end
 			end
 			if not unit:mission_element_data().enabled then
@@ -319,13 +324,11 @@ function MissionLayer:update_unit_settings()
 		if self._selected_unit:mission_element().stop_test_element then
 			self._element_toolbar:set_tool_enabled("STOP_ELEMENT", true)
 		end
-		if self._selected_unit:mission_element().update_editing then
+		if self._selected_unit:mission_element():can_edit() then
 			self._element_toolbar:set_tool_enabled("EDIT_ELEMENT", true)
 		end
 	end
-	self._missionelement_panel:layout()
-	self._ews_panel:fit_inside()
-	self._ews_panel:refresh()
+	self:do_layout()
 end
 
 function MissionLayer:set_current_panel_visible(visible)
@@ -367,7 +370,7 @@ function MissionLayer:toolbar_toggle(data, event)
 end
 
 function MissionLayer:toolbar_toggle_trg(data)
-	if data.value == "_editing_mission_element" and (not alive(self._selected_unit) or not self._selected_unit:mission_element().update_editing) then
+	if data.value == "_editing_mission_element" and (not alive(self._selected_unit) or not self._selected_unit:mission_element():can_edit()) then
 		return
 	end
 	CoreEditorUtils.toolbar_toggle_trg(data)
@@ -390,8 +393,17 @@ function MissionLayer:missionelement_sizer()
 	return self._missionelement_sizer
 end
 
+function MissionLayer:do_layout()
+	self._missionelement_panel:layout()
+	self._ews_panel:fit_inside()
+	self._ews_panel:refresh()
+end
+
 function MissionLayer:build_panel(notebook)
-	MissionLayer.super.build_panel(self, notebook)
+	MissionLayer.super.build_panel(self, notebook, {
+		units_noteboook_proportion = 0,
+		units_notebook_min_size = Vector3(-1, 240, 0)
+	})
 	cat_print("editor", "MissionLayer:build_panel")
 	self:_build_scripts()
 	local btn_sizer = EWS:BoxSizer("HORIZONTAL")
@@ -761,6 +773,7 @@ function MissionLayer:add_triggers()
 	vc:add_trigger(Idstring("show_element_timeline"), callback(self, self, "show_timeline"))
 	local vc = self._editor_data.virtual_controller
 	if self._editing_mission_element and self._selected_unit then
+		self._selected_unit:mission_element():base_add_triggers(vc)
 		self._selected_unit:mission_element():add_triggers(vc)
 		return
 	end

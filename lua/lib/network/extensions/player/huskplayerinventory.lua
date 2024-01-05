@@ -38,7 +38,22 @@ HuskPlayerInventory._index_to_weapon_list = {
 	"wpn_fps_pis_rage_npc",
 	"wpn_fps_saw_npc",
 	"wpn_fps_shot_serbu_npc",
-	"wpn_fps_pis_usp_npc"
+	"wpn_fps_pis_usp_npc",
+	"wpn_fps_smg_m45_npc",
+	"wpn_fps_ass_s552_npc",
+	"wpn_fps_pis_ppk_npc",
+	"wpn_fps_pis_beretta_primary_npc",
+	"wpn_fps_ass_m4_secondary_npc",
+	"wpn_fps_ass_aug_secondary_npc",
+	"wpn_fps_ass_74_secondary_npc",
+	"wpn_fps_ass_s552_secondary_npc",
+	"wpn_fps_saw_secondary_npc",
+	"wpn_fps_pis_rage_primary_npc",
+	"wpn_fps_pis_deagle_primary_npc",
+	"wpn_fps_pis_1911_primary_npc",
+	"wpn_fps_pis_g18c_primary_npc",
+	"wpn_fps_smg_olympic_primary_npc",
+	"wpn_fps_smg_akmsu_primary_npc"
 }
 
 function HuskPlayerInventory:init(unit)

@@ -1,5 +1,6 @@
 core:import("CoreEngineAccess")
 CorePlayEffectUnitElement = CorePlayEffectUnitElement or class(MissionElement)
+CorePlayEffectUnitElement.USES_POINT_ORIENTATION = true
 PlayEffectUnitElement = PlayEffectUnitElement or class(CorePlayEffectUnitElement)
 
 function PlayEffectUnitElement:init(...)

@@ -679,7 +679,7 @@ end
 GlobalSelectUnit = GlobalSelectUnit or class(CoreEditorEwsDialog)
 
 function GlobalSelectUnit:init(...)
-	CoreEditorEwsDialog.init(self, nil, "Global select unit", "", Vector3(525, 160, 0), Vector3(560, 680, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP", ...)
+	CoreEditorEwsDialog.init(self, nil, "Global select unit", "", Vector3(525, 160, 0), Vector3(560, 680, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,MINIMIZE_BOX,MAXIMIZE_BOX", ...)
 	self:create_panel("VERTICAL")
 	self._only_list_used_units = false
 	local horizontal_ctrlr_sizer = EWS:BoxSizer("HORIZONTAL")

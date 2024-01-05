@@ -92,7 +92,7 @@ local action_variants = {
 	}
 }
 local security_variant = action_variants.security
-action_variants.patrol = security_variant
+action_variants.gensec = security_variant
 action_variants.cop = security_variant
 action_variants.fbi = security_variant
 action_variants.swat = security_variant
@@ -212,6 +212,7 @@ function CopMovement:post_init()
 	end
 	self._unit:kill_mover()
 	self._unit:set_driving("script")
+	self._unit:unit_data().has_alarm_pager = self._tweak_data.has_alarm_pager
 	self._unit:character_damage():add_listener("movement", {
 		"bleedout",
 		"light_hurt",
@@ -1426,7 +1427,7 @@ function CopMovement:_chk_start_queued_action()
 			self._need_upd = true
 			break
 		else
-			if action_desc.type == "walk" or action_desc.type == "spooc" then
+			if action_desc.type == "spooc" then
 				action_desc.nav_path[action_desc.path_index or 1] = mvector3.copy(self._m_pos)
 			end
 			table.remove(queued_actions, 1)
@@ -1523,9 +1524,6 @@ end
 function CopMovement:sync_action_walk_stop(pos)
 	local walk_action, is_queued = self:_get_latest_walk_action()
 	if is_queued then
-		if not walk_action.nav_path[#walk_action.nav_path].x then
-			walk_action.nav_path[#walk_action.nav_path] = self._actions.walk._nav_point_pos(walk_action.nav_path[#walk_action.nav_path])
-		end
 		table.insert(walk_action.nav_path, pos)
 		walk_action.persistent = nil
 	elseif walk_action then

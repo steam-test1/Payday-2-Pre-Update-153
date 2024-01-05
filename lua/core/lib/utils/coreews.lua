@@ -364,3 +364,130 @@ function update_number_from_slider(params)
 	params.value = params.slider_ctrlr:get_value() / params.slider_multiplier
 	change_entered_number(params, params.value)
 end
+
+function list_selector(params)
+	params.title = params.title or ""
+	params.options = params.options or {}
+	params.value = params.value or {}
+	params.height = params.height or 100
+	params.ctrl_sizer = EWS:BoxSizer("VERTICAL")
+	params.ctrl_sizer:add(EWS:StaticLine(params.panel, "", ""), 0, 4, "EXPAND,TOP,BOTTOM")
+	_name_ctrlr(params)
+	local toolbar_sizer = EWS:BoxSizer("HORIZONTAL")
+	params.left_toolbar = EWS:ToolBar(params.panel, "", "TB_FLAT,TB_NODIVIDER")
+	params.left_toolbar:add_tool("ADD_LIST", "Add from list", image_path("world_editor\\unit_by_name_list.png"), nil)
+	params.left_toolbar:connect("ADD_LIST", "EVT_COMMAND_MENU_SELECTED", callback(nil, _G, "_list_selector_add_from_list"), params)
+	params.left_toolbar:realize()
+	toolbar_sizer:add(params.left_toolbar, 1, 1, "EXPAND,LEFT")
+	params.right_toolbar = EWS:ToolBar(params.panel, "", "TB_FLAT,TB_NODIVIDER")
+	params.right_toolbar:add_tool("REMOVE_LIST", "Remove from list", image_path("toolbar\\delete_16x16.png"), nil)
+	params.right_toolbar:connect("REMOVE_LIST", "EVT_COMMAND_MENU_SELECTED", callback(nil, _G, "_list_selector_remove_from_list"), params)
+	params.right_toolbar:realize()
+	toolbar_sizer:add(params.right_toolbar, 1, 1, "EXPAND,LEFT")
+	params.ctrl_sizer:add(toolbar_sizer, 0, 1, "EXPAND,LEFT")
+	local lb_box = EWS:BoxSizer("HORIZONTAL")
+	params.left_list_box = EWS:ListBox(params.panel, "", "LB_SORT,LB_EXTENDED")
+	params.left_list_box:connect("", "EVT_COMMAND_LISTBOX_DOUBLECLICKED", callback(nil, _G, "_list_selector_on_left_box"), params)
+	params.left_list_box:set_min_size(Vector3(-1, params.height, 0))
+	lb_box:add(params.left_list_box, 1, 4, "ALL,EXPAND")
+	params.right_list_box = EWS:ListBox(params.panel, "", "LB_SORT,LB_EXTENDED")
+	params.right_list_box:connect("", "EVT_COMMAND_LISTBOX_DOUBLECLICKED", callback(nil, _G, "_list_selector_on_right_box"), params)
+	params.right_list_box:set_min_size(Vector3(-1, params.height, 0))
+	lb_box:add(params.right_list_box, 1, 4, "ALL,EXPAND")
+	params.ctrl_sizer:add(lb_box, 1, 0, "EXPAND")
+	params.sizer:add(params.ctrl_sizer, params.sizer_proportions or 0, 0, "EXPAND")
+	for _, option in ipairs(params.options) do
+		if table.contains(params.value, option) then
+			params.right_list_box:append(option)
+		else
+			params.left_list_box:append(option)
+		end
+	end
+	return params
+end
+
+function _list_selector_add_from_list(params)
+	local dialog = _G.SelectNameModal:new("Add", _list_selector_get_left_box_value(params), {
+		list_style = "LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING"
+	})
+	if dialog:cancelled() then
+		return
+	end
+	for i = 0, params.left_list_box:nr_items() - 1 do
+		params.left_list_box:deselect_index(i)
+		for _, selected in ipairs(dialog:_selected_item_assets()) do
+			if selected == params.left_list_box:get_string(i) then
+				params.left_list_box:select_index(i)
+				break
+			end
+		end
+	end
+	_list_selector_on_left_box(params)
+end
+
+function _list_selector_remove_from_list(params)
+	local dialog = _G.SelectNameModal:new("Remove", _list_selector_get_value(params), {
+		list_style = "LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING"
+	})
+	if dialog:cancelled() then
+		return
+	end
+	for i = 0, params.right_list_box:nr_items() - 1 do
+		params.right_list_box:deselect_index(i)
+		for _, selected in ipairs(dialog:_selected_item_assets()) do
+			if selected == params.right_list_box:get_string(i) then
+				params.right_list_box:select_index(i)
+				break
+			end
+		end
+	end
+	_list_selector_on_right_box(params)
+end
+
+function _list_selector_on_left_box(params)
+	local selected_indices = params.left_list_box:selected_indices()
+	for _, index in ipairs(selected_indices) do
+		local selected = params.left_list_box:get_string(index)
+		params.right_list_box:append(selected)
+		params.left_list_box:deselect_index(index)
+	end
+	for i, index in ipairs(selected_indices) do
+		params.left_list_box:remove(index - (i - 1))
+	end
+	_list_selector_updated_callback(params)
+end
+
+function _list_selector_on_right_box(params)
+	local selected_indices = params.right_list_box:selected_indices()
+	for _, index in ipairs(selected_indices) do
+		local selected = params.right_list_box:get_string(index)
+		params.left_list_box:append(selected)
+		params.right_list_box:deselect_index(index)
+	end
+	for i, index in ipairs(selected_indices) do
+		params.right_list_box:remove(index - (i - 1))
+	end
+	_list_selector_updated_callback(params)
+end
+
+function _list_selector_get_left_box_value(params)
+	local value = {}
+	for i = 0, params.left_list_box:nr_items() - 1 do
+		table.insert(value, params.left_list_box:get_string(i))
+	end
+	return value
+end
+
+function _list_selector_get_value(params)
+	local value = {}
+	for i = 0, params.right_list_box:nr_items() - 1 do
+		table.insert(value, params.right_list_box:get_string(i))
+	end
+	return value
+end
+
+function _list_selector_updated_callback(params)
+	if params.updated_callback then
+		params.updated_callback(_list_selector_get_value(params))
+	end
+end

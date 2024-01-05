@@ -136,8 +136,9 @@ function PlayerArrested:call_teammate(line, t, no_gesture, skip_alert, skip_mark
 			queue_name = shout_sound .. "y_any"
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
 				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
-				managers.game_play_central:add_enemy_contour(prime_target.unit, marked_extra_damage)
-				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage)
+				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
+				managers.game_play_central:add_enemy_contour(prime_target.unit, marked_extra_damage, time_multiplier)
+				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
 				managers.challenges:set_flag("eagle_eyes")
 			end
 		end

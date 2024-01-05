@@ -472,12 +472,13 @@ function MenuManager:show_new_item_gained(params)
 		if bundle_folder then
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 		end
-		texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. weapon_id
+		local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
+		texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 	elseif category == "textures" then
 		texture = _G.tweak_data.blackmarket.textures[id].texture
 		render_template = Idstring("VertexColorTexturedPatterns")
 	else
-		local bundle_folder = tweak_data.blackmarket[category][id] and tweak_data.blackmarket[category][id].texture_bundle_folder
+		local bundle_folder = tweak_data.blackmarket[category] and tweak_data.blackmarket[category][id] and tweak_data.blackmarket[category][id].texture_bundle_folder
 		if bundle_folder then
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 		end
@@ -517,7 +518,8 @@ function MenuManager:show_weapon_mods_available(params)
 	if bundle_folder then
 		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 	end
-	dialog_data.texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(weapon_id)
+	local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
+	dialog_data.texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 	dialog_data.text_blend_mode = "add"
 	dialog_data.use_text_formating = true
 	dialog_data.text_formating_color = Color.white
@@ -1010,5 +1012,33 @@ function MenuManager:show_abort_mission_dialog(params)
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_no")
 	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_confirm_become_infamous(params)
+	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_become_infamous")
+	local no_button = {}
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	if params.yes_func then
+		no_button.text = managers.localization:text("dialog_no")
+		local yes_button = {}
+		yes_button.text = managers.localization:text("dialog_yes")
+		yes_button.callback_func = params.yes_func
+		dialog_data.text = managers.localization:text("menu_become_infamous", {
+			cash = params.cost
+		})
+		dialog_data.focus_button = 2
+		dialog_data.button_list = {yes_button, no_button}
+	else
+		no_button.text = managers.localization:text("dialog_ok")
+		dialog_data.text = managers.localization:text("menu_become_infamous_no_cash", {
+			cash = params.cost
+		})
+		dialog_data.focus_button = 1
+		dialog_data.button_list = {no_button}
+	end
 	managers.system_menu:show(dialog_data)
 end

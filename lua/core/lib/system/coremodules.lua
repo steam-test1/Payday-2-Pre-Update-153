@@ -128,6 +128,7 @@ core:register_module("core/lib/managers/mission/CoreElementExecuteInOtherMission
 core:register_module("core/lib/managers/mission/CoreElementLogicChance")
 core:register_module("core/lib/managers/mission/CoreElementGlobalEventTrigger")
 core:register_module("core/lib/managers/mission/CoreElementTimer")
+core:register_module("core/lib/managers/mission/CoreElementShape")
 core:register_module("core/lib/utils/dev/editor/CoreWorldDefinition")
 core:register_module("core/lib/utils/dev/editor/CoreLayer")
 core:register_module("core/lib/utils/dev/editor/CoreStaticLayer")

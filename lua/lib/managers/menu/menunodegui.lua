@@ -260,10 +260,6 @@ function MenuNodeGui:_create_marker(node)
 	end
 end
 
-function MenuNodeGui:_setup_item_rows(node)
-	MenuNodeGui.super._setup_item_rows(self, node)
-end
-
 function MenuNodeGui:_setup_item_panel_parent(safe_rect, shape)
 	local res = RenderSettings.resolution
 	shape = shape or {}
@@ -595,11 +591,8 @@ function MenuNodeGui:_create_menu_item(row_item)
 end
 
 function MenuNodeGui:_setup_trial_buy(row_item)
-	local font_size = SystemInfo:language() == Idstring("italian") and 25 or 28
 	row_item.row_item_color = Color(1, 1, 0.65882355, 0)
-	row_item.font_size = font_size * tweak_data.scale.default_font_multiplier
 	row_item.gui_panel:set_color(row_item.row_item_color)
-	row_item.gui_panel:set_font_size(row_item.font_size)
 end
 
 function MenuNodeGui:_setup_fake_disabled(row_item)
@@ -1025,7 +1018,7 @@ function MenuNodeGui:_cb_lock()
 end
 
 function MenuNodeGui:_text_item_part(row_item, panel, align_x, text_align)
-	return panel:text({
+	local new_text = panel:text({
 		font_size = self.font_size,
 		x = align_x,
 		y = 0,
@@ -1039,6 +1032,13 @@ function MenuNodeGui:_text_item_part(row_item, panel, align_x, text_align)
 		text = row_item.to_upper and utf8.to_upper(row_item.text) or row_item.text,
 		render_template = Idstring("VertexColorTextured")
 	})
+	local color_ranges = row_item.color_ranges
+	if color_ranges then
+		for _, color_range in ipairs(color_ranges) do
+			new_text:set_range_color(color_range.start, color_range.stop, color_range.color)
+		end
+	end
+	return new_text
 end
 
 function MenuNodeGui:scroll_update(dt)
@@ -1508,4 +1508,23 @@ function MenuNodeGui:close(...)
 		end
 	end
 	MenuNodeGui.super.close(self, ...)
+end
+
+MenuNodeMainGui = MenuNodeMainGui or class(MenuNodeGui)
+
+function MenuNodeMainGui:_setup_item_rows(node)
+	MenuNodeMainGui.super._setup_item_rows(self, node)
+	if alive(self._version_string) then
+		self._version_string:parent():remove(self._version_string)
+		self._version_string = nil
+	end
+	self._version_string = self.ws:panel():text({
+		name = "version_string",
+		text = tostring(Global.version),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		align = SystemInfo:platform() == Idstring("WIN32") and "right" or "left",
+		vertical = "bottom",
+		alpha = 0.5
+	})
 end

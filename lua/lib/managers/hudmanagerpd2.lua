@@ -767,6 +767,20 @@ function HUDManager:on_hit_confirmed()
 	self._hud_hit_confirm:on_hit_confirmed()
 end
 
+function HUDManager:on_headshot_confirmed()
+	if not managers.user:get_setting("hit_indicator") then
+		return
+	end
+	self._hud_hit_confirm:on_headshot_confirmed()
+end
+
+function HUDManager:on_crit_confirmed()
+	if not managers.user:get_setting("hit_indicator") then
+		return
+	end
+	self._hud_hit_confirm:on_crit_confirmed()
+end
+
 function HUDManager:_create_hit_direction(hud)
 	hud = hud or managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2)
 	self._hud_hit_direction = HUDHitDirection:new(hud)

@@ -18,8 +18,8 @@ function MissionManager:init()
 	self._workspace = Overlay:newgui():create_screen_workspace()
 	self._workspace:set_timer(TimerManager:main())
 	self._fading_debug_output = self._workspace:panel():gui(Idstring("core/guis/core_fading_debug_output"))
-	self._fading_debug_output:set_leftbottom(0, self._workspace:height() / 2)
-	self._fading_debug_output:script().configure({font_size = 24})
+	self._fading_debug_output:set_leftbottom(0, self._workspace:height() / 3)
+	self._fading_debug_output:script().configure({font_size = 20, max_rows = 20})
 	self._persistent_debug_output = self._workspace:panel():gui(Idstring("core/guis/core_persistent_debug_output"))
 	self._persistent_debug_output:set_righttop(self._workspace:width(), 0)
 	self:set_persistent_debug_enabled(false)
@@ -212,14 +212,54 @@ function MissionManager:set_fading_debug_enabled(enabled)
 	end
 end
 
-function MissionManager:add_fading_debug_output(debug, color)
+function MissionManager:add_fading_debug_output(debug, color, as_subtitle)
 	if not Application:production_build() then
 		return
 	end
 	if not self._fading_debug_enabled then
 		return
 	end
-	self._fading_debug_output:script().log(debug, color)
+	if as_subtitle then
+		self:_show_debug_subtitle(debug, color)
+	else
+		local stuff = {
+			" -",
+			" \\",
+			" |",
+			" /"
+		}
+		self._fade_index = (self._fade_index or 0) + 1
+		self._fade_index = self._fade_index > #stuff and self._fade_index and 1 or self._fade_index
+		self._fading_debug_output:script().log(stuff[self._fade_index] .. " " .. debug, color, nil)
+	end
+end
+
+function MissionManager:_show_debug_subtitle(debug, color)
+	self._debug_subtitle_text = self._debug_subtitle_text or self._workspace:panel():text({
+		font = "core/fonts/diesel",
+		font_size = 24,
+		text = debug,
+		word_wrap = true,
+		wrap = true,
+		align = "center",
+		halign = "center",
+		valign = "center",
+		color = color or Color.white
+	})
+	self._debug_subtitle_text:set_size(self._workspace:panel():w() / 2, 24)
+	self._debug_subtitle_text:set_text(debug)
+	local subtitle_time = math.max(4, utf8.len(debug) * 0.04)
+	local _, _, w, h = self._debug_subtitle_text:text_rect()
+	self._debug_subtitle_text:set_size(w, h)
+	self._debug_subtitle_text:set_center_x(self._workspace:panel():w() / 2)
+	self._debug_subtitle_text:set_bottom(self._workspace:panel():h() / 1.4)
+	self._debug_subtitle_text:set_color(color or Color.white)
+	self._debug_subtitle_text:set_alpha(1)
+	self._debug_subtitle_text:stop()
+	self._debug_subtitle_text:animate(function(o)
+		_G.wait(subtitle_time)
+		self._debug_subtitle_text:set_alpha(0)
+	end)
 end
 
 function MissionManager:get_element_by_id(id)

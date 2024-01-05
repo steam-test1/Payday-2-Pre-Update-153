@@ -124,6 +124,7 @@ function CoreEditor:set_widget(data, event)
 	self._toolbar:set_tool_state(id, true)
 	self._use_move_widget = data.move
 	self._use_rotate_widget = data.rotate
+	self._current_layer:release_widget()
 	self._current_layer:use_move_widget(self._use_move_widget)
 	self._current_layer:use_rotate_widget(self._use_rotate_widget)
 end

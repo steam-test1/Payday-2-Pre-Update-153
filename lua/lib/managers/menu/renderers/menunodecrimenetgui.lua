@@ -17,7 +17,7 @@ function MenuNodeCrimenetGui:_setup_item_panel(safe_rect, res)
 	local width = 900
 	local height = 580
 	if SystemInfo:platform() ~= Idstring("WIN32") then
-		width = 800
+		width = 850
 		height = 500
 	end
 	self.item_panel:set_rightbottom(self.item_panel:parent():w() * 0.5 + width / 2 - 10, self.item_panel:parent():h() * 0.5 + height / 2 - 10)

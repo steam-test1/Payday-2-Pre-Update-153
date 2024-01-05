@@ -63,7 +63,18 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_down_16m_left",
 	"e_sp_up_1_down_9m_var2",
 	"e_sp_down_8m_var3",
-	"e_sp_over_3_35m"
+	"e_sp_over_3_35m",
+	"e_sp_armored_truck_1st",
+	"e_sp_armored_truck_2nd",
+	"e_sp_armored_truck_3rd",
+	"e_sp_dizzy_stand",
+	"e_sp_dizzy_get_up",
+	"e_sp_dizzy_walk_left",
+	"e_sp_dizzy_walk_right",
+	"e_sp_dizzy_fall_get_up",
+	"e_sp_dizzy_stand_v2",
+	"e_sp_dizzy_walk_inplace",
+	"e_sp_dizzy_look_around"
 }
 CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_dj_loop",
@@ -110,6 +121,9 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_wounded_lying",
 	"cm_sp_accident_scene",
 	"cm_sp_firefighter",
+	"cm_sp_investigate_hi",
+	"cm_sp_investigate_low",
+	"cm_sp_take_cover_hide",
 	"cf_sp_accident_scene",
 	"cf_sp_stand_idle_var1",
 	"cf_sp_stand_desk_1m",
@@ -196,6 +210,14 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_up_5_down_1m_var2",
 	"e_nl_up_9_down_1m",
 	"e_nl_up_7_down_1m_var2",
+	"e_nl_up_2_down_8_2m",
+	"e_nl_down_3_35m",
+	"e_nl_down_8m_var2",
+	"e_nl_up_5m",
+	"e_nl_up_1_down_7_1m",
+	"e_nl_down_5m_var2",
+	"e_nl_down_5m_var3",
+	"e_nl_down_4m_var2",
 	"e_so_ntl_idle_tired",
 	"e_so_ntl_idle_kickpebble",
 	"e_so_ntl_idle_look",
@@ -209,6 +231,8 @@ CopActionAct._act_redirects.SO = {
 	"e_so_ntl_leanwall",
 	"e_so_ntl_talk_phone",
 	"e_so_plant_c4_low",
+	"e_so_plant_c4_hi",
+	"e_so_plant_c4_floor",
 	"e_so_ntl_look_up_wall",
 	"e_so_alarm_under_table",
 	"e_so_std_alarm",
@@ -224,6 +248,12 @@ CopActionAct._act_redirects.SO = {
 	"e_so_ntl_bouncer_step_right",
 	"e_so_investigate_truck",
 	"e_so_investigate_truck_slope",
+	"e_so_container_impact_01",
+	"e_so_container_impact_02",
+	"e_so_container_impact_03",
+	"e_so_container_kick",
+	"e_so_not_dizzy_look_v2",
+	"e_so_not_dizzy_look",
 	"cmf_so_lean_r_wall",
 	"cmf_so_lean_bar",
 	"cmf_so_call_police",
@@ -241,7 +271,10 @@ CopActionAct._act_redirects.SO = {
 	"cmf_so_talk",
 	"cmf_so_idle",
 	"cmf_so_press_alarm_wall",
-	"cmf_so_press_alarm_table"
+	"cmf_so_press_alarm_table",
+	"cm_so_investigate_hi",
+	"cm_so_investigate_low",
+	"cm_so_hide"
 }
 
 function CopActionAct:init(action_desc, common_data)

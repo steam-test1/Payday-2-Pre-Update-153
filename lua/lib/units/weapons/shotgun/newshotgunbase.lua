@@ -99,26 +99,28 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 	for _, col_ray in pairs(hit_enemies) do
 		local dist = mvector3.distance(col_ray.unit:position(), user_unit:position())
 		damage = (1 - math.min(1, math.max(0, dist - self._damage_near) / self._damage_far)) * damage
-		local result = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
-		if result and result.type == "death" and col_ray.distance < 500 then
-			if col_ray.unit:movement()._active_actions[1] and col_ray.unit:movement()._active_actions[1]:type() == "hurt" then
-				col_ray.unit:movement()._active_actions[1]:force_ragdoll()
-			end
-			local scale = math.clamp(1 - col_ray.distance / 500, 0.5, 1)
-			local unit = col_ray.unit
-			local height = mvector3.distance(col_ray.position, col_ray.unit:position()) - 100
-			local twist_dir = math.random(2) == 1 and 1 or -1
-			local rot_acc = (col_ray.ray:cross(math.UP) + math.UP * (0.5 * twist_dir)) * (-1000 * math.sign(height))
-			local rot_time = 1 + math.rand(2)
-			local nr_u_bodies = unit:num_bodies()
-			local i_u_body = 0
-			while nr_u_bodies > i_u_body do
-				local u_body = unit:body(i_u_body)
-				if u_body:enabled() and u_body:dynamic() then
-					local body_mass = u_body:mass()
-					World:play_physic_effect(Idstring("physic_effects/shotgun_hit"), u_body, Vector3(col_ray.ray.x, col_ray.ray.y, col_ray.ray.z + 0.5) * 600 * scale, 4 * body_mass / math.random(2), rot_acc, rot_time)
+		if 0 < damage then
+			local result = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+			if result and result.type == "death" and col_ray.distance < 500 then
+				if col_ray.unit:movement()._active_actions[1] and col_ray.unit:movement()._active_actions[1]:type() == "hurt" then
+					col_ray.unit:movement()._active_actions[1]:force_ragdoll()
 				end
-				i_u_body = i_u_body + 1
+				local scale = math.clamp(1 - col_ray.distance / 500, 0.5, 1)
+				local unit = col_ray.unit
+				local height = mvector3.distance(col_ray.position, col_ray.unit:position()) - 100
+				local twist_dir = math.random(2) == 1 and 1 or -1
+				local rot_acc = (col_ray.ray:cross(math.UP) + math.UP * (0.5 * twist_dir)) * (-1000 * math.sign(height))
+				local rot_time = 1 + math.rand(2)
+				local nr_u_bodies = unit:num_bodies()
+				local i_u_body = 0
+				while nr_u_bodies > i_u_body do
+					local u_body = unit:body(i_u_body)
+					if u_body:enabled() and u_body:dynamic() then
+						local body_mass = u_body:mass()
+						World:play_physic_effect(Idstring("physic_effects/shotgun_hit"), u_body, Vector3(col_ray.ray.x, col_ray.ray.y, col_ray.ray.z + 0.5) * 600 * scale, 4 * body_mass / math.random(2), rot_acc, rot_time)
+					end
+					i_u_body = i_u_body + 1
+				end
 			end
 		end
 	end

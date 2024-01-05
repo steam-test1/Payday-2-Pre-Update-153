@@ -182,15 +182,10 @@ end
 
 function ElementCounterFilter:_values_ok()
 	if self._values.check_type == "counters_equal" then
-		local test_value
-		for _, id in ipairs(self._values.elements) do
-			local element = self:get_mission_element(id)
-			test_value = test_value or element:counter_value()
-			if test_value ~= element:counter_value() then
-				return false
-			end
-		end
-		return true
+		return self:_all_counter_values_equal()
+	end
+	if self._values.check_type == "counters_not_equal" then
+		return not self:_all_counter_values_equal()
 	end
 	if self._values.needed_to_execute == "all" then
 		return self:_all_counters_ok()
@@ -198,6 +193,18 @@ function ElementCounterFilter:_values_ok()
 	if self._values.needed_to_execute == "any" then
 		return self:_any_counters_ok()
 	end
+end
+
+function ElementCounterFilter:_all_counter_values_equal()
+	local test_value
+	for _, id in ipairs(self._values.elements) do
+		local element = self:get_mission_element(id)
+		test_value = test_value or element:counter_value()
+		if test_value ~= element:counter_value() then
+			return false
+		end
+	end
+	return true
 end
 
 function ElementCounterFilter:_all_counters_ok()

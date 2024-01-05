@@ -27,7 +27,7 @@ function ElementSpawnEnemyDummy:produce(params)
 		return
 	end
 	if params then
-		local unit = safe_spawn_unit(params.name, self._values.position, self._values.rotation)
+		local unit = safe_spawn_unit(params.name, self:get_orientation())
 		unit:base():add_destroy_listener(self._unit_destroy_clbk_key, callback(self, self, "clbk_unit_destroyed"))
 		unit:unit_data().mission_element = self
 		local spawn_ai = self:_create_spawn_AI_parametric(params.stance, params.objective, self._values)
@@ -38,7 +38,7 @@ function ElementSpawnEnemyDummy:produce(params)
 			unit:character_damage():set_pickup(self._values.force_pickup)
 		end
 	else
-		local unit = safe_spawn_unit(self._enemy_name, self._values.position, self._values.rotation)
+		local unit = safe_spawn_unit(self._enemy_name, self:get_orientation())
 		unit:base():add_destroy_listener(self._unit_destroy_clbk_key, callback(self, self, "clbk_unit_destroyed"))
 		unit:unit_data().mission_element = self
 		local objective

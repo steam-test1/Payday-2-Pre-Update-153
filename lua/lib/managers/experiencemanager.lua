@@ -223,8 +223,16 @@ function ExperienceManager:current_level()
 	return self._global.level and Application:digest_value(self._global.level, false) or 0
 end
 
+function ExperienceManager:current_rank()
+	return self._global.rank and Application:digest_value(self._global.rank, false) or 0
+end
+
 function ExperienceManager:_set_current_level(value)
 	self._global.level = Application:digest_value(value, true)
+end
+
+function ExperienceManager:set_current_rank(value)
+	self._global.rank = Application:digest_value(value, true)
 end
 
 function ExperienceManager:level_to_stars()
@@ -369,6 +377,7 @@ function ExperienceManager:get_xp_by_params(params)
 	local num_winners = params.num_winners or 1
 	local on_last_stage = params.on_last_stage
 	local player_stars = params.player_stars or managers.experience:level_to_stars() or 0
+	local level_id = params.level_id or false
 	local current_job_stage = params.current_stage or 1
 	local days_multiplier = params.professional and tweak_data:get_value("experience_manager", "pro_day_multiplier", current_job_stage) or tweak_data:get_value("experience_manager", "day_multiplier", current_job_stage)
 	local total_stars = math.min(job_stars, player_stars)
@@ -389,8 +398,10 @@ function ExperienceManager:get_xp_by_params(params)
 		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars)
 		level_limit_dissect = level_limit_dissect + managers.experience:get_job_xp_by_stars(job_stars)
 	end
-	stage_xp_dissect = managers.experience:get_stage_xp_by_stars(total_stars)
-	level_limit_dissect = level_limit_dissect + managers.experience:get_stage_xp_by_stars(job_stars)
+	local static_stage_experience = level_id and tweak_data.levels[level_id].static_experience
+	static_stage_experience = static_stage_experience and static_stage_experience[difficulty_stars + 1]
+	stage_xp_dissect = static_stage_experience or managers.experience:get_stage_xp_by_stars(total_stars)
+	level_limit_dissect = level_limit_dissect + (static_stage_experience or managers.experience:get_stage_xp_by_stars(job_stars))
 	contract_xp = job_xp_dissect + stage_xp_dissect
 	local is_level_limited = job_stars > player_stars
 	if is_level_limited and 0 < stage_xp_dissect then
@@ -476,6 +487,7 @@ function ExperienceManager:get_xp_dissected(success, num_winners)
 	local difficulty_stars = job_and_difficulty_stars - job_stars
 	local current_stage = has_active_job and managers.job:current_stage() or 1
 	local is_professional = has_active_job and managers.job:is_current_job_professional() or false
+	local current_level_id = has_active_job and managers.job:current_level_id() or false
 	local on_last_stage = has_active_job and managers.job:on_last_stage()
 	return self:get_xp_by_params({
 		job_stars = job_stars,
@@ -484,7 +496,8 @@ function ExperienceManager:get_xp_dissected(success, num_winners)
 		professional = is_professional,
 		success = success,
 		num_winners = num_winners,
-		on_last_stage = on_last_stage
+		on_last_stage = on_last_stage,
+		level_id = current_level_id
 	})
 end
 
@@ -501,7 +514,8 @@ function ExperienceManager:save(data)
 		total = self._global.total,
 		xp_gained = self._global.xp_gained,
 		next_level_data = self._global.next_level_data,
-		level = self._global.level
+		level = self._global.level,
+		rank = self._global.rank
 	}
 	data.ExperienceManager = state
 end
@@ -513,6 +527,7 @@ function ExperienceManager:load(data)
 		self._global.xp_gained = state.xp_gained or state.total
 		self._global.next_level_data = state.next_level_data
 		self._global.level = state.level or Application:digest_value(0, true)
+		self._global.rank = state.rank or Application:digest_value(0, true)
 		self:_set_current_level(math.min(self:current_level(), self:level_cap()))
 		for level = 1, self:current_level() do
 			managers.upgrades:aquire_from_level_tree(level, true)

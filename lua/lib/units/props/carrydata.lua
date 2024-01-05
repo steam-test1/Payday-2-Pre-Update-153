@@ -1,4 +1,5 @@
 CarryData = CarryData or class()
+CarryData.EVENT_IDS = {will_explode = 1, explode = 2}
 
 function CarryData:init(unit)
 	self._unit = unit
@@ -30,6 +31,10 @@ function CarryData:update(unit, t, dt)
 	if self._dye_risk and t > self._dye_risk.next_t then
 		self:_check_dye_explode()
 	end
+	if self._explode_t and t > self._explode_t then
+		self._explode_t = nil
+		self:_explode()
+	end
 end
 
 function CarryData:_check_dye_explode()
@@ -56,6 +61,140 @@ function CarryData:_dye_exploded()
 		effect = Idstring("effects/payday2/particles/dye_pack/dye_pack_smoke"),
 		parent = self._unit:orientation_object()
 	})
+end
+
+function CarryData:check_explodes_on_impact(velocity, air_time)
+	if not Network:is_server() then
+		return
+	end
+	if self._explode_t then
+		return
+	end
+	if self:can_explode() then
+		if air_time < 0.5 then
+			return
+		end
+		local vel = mvector3.length(velocity)
+		local vel_limit = 500
+		if vel < vel_limit then
+			return
+		end
+		local chance = math.lerp(0, 0.9, math.min((vel - vel_limit) / (1200 - vel_limit), 1))
+		if chance >= math.rand(1) then
+			self:start_explosion()
+			return true
+		end
+	end
+end
+
+function CarryData:explode_sequence_started()
+	return self._explode_t and true or false
+end
+
+function CarryData:can_explode()
+	if self._disarmed then
+		return false
+	end
+	local tweak_info = tweak_data.carry[self._carry_id]
+	return tweak_data.carry.types[tweak_info.type].can_explode
+end
+
+function CarryData:start_explosion()
+	if self._explode_t then
+		return
+	end
+	if not self:can_explode() then
+		return
+	end
+	self:_unregister_steal_SO()
+	self:_start_explosion()
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "carry_data", CarryData.EVENT_IDS.will_explode)
+	self._explode_t = Application:time() + 1 + math.rand(3)
+end
+
+function CarryData:_start_explosion()
+	self._unit:interaction():set_active(false)
+end
+
+function CarryData:disarm()
+	self._explode_t = nil
+	self._disarmed = true
+end
+
+CarryData.EXPLOSION_SETTINGS = {
+	range = 1000,
+	player_damage = 20,
+	damage = 40,
+	curve_pow = 3,
+	effect = "effects/payday2/particles/explosions/bag_explosion"
+}
+CarryData.EXPLOSION_CUSTOM_PARAMS = {
+	effect = CarryData.EXPLOSION_SETTINGS.effect,
+	camera_shake_mul = 4
+}
+local mvec1 = Vector3()
+
+function CarryData:_explode()
+	managers.mission:call_global_event("loot_exploded")
+	local pos = self._unit:position()
+	local normal = math.UP
+	local range = CarryData.EXPLOSION_SETTINGS.range
+	local effect = CarryData.EXPLOSION_SETTINGS.effect
+	local slot_mask = managers.slot:get_mask("bullet_impact_targets")
+	self:_local_player_explosion_damage()
+	managers.explosion:play_sound_and_effects(pos, normal, range, CarryData.EXPLOSION_CUSTOM_PARAMS)
+	local hit_units, splinters = managers.explosion:detect_and_give_dmg({
+		hit_pos = pos,
+		range = range,
+		collision_slotmask = slot_mask,
+		curve_pow = CarryData.EXPLOSION_SETTINGS.curve_pow,
+		damage = CarryData.EXPLOSION_SETTINGS.damage,
+		player_damage = 0,
+		ignore_unit = self._unit
+	})
+	for _, unit in pairs(hit_units) do
+		if unit ~= self._unit and unit:carry_data() then
+			mvector3.set(mvec1, unit:position())
+			local distance = mvector3.distance(pos, mvec1)
+			local chance = math.lerp(1, 0, math.max(distance - range / 2, 0) / range)
+			if chance > math.rand(1) then
+				for i_splinter, s_pos in ipairs(splinters) do
+					local ray_hit = not World:raycast("ray", s_pos, mvec1, "slot_mask", slot_mask, "ignore_unit", {
+						self._unit,
+						unit
+					}, "report")
+					if ray_hit then
+						unit:carry_data():start_explosion(0)
+						break
+					end
+				end
+			end
+		end
+	end
+	QuickFlashGrenade:make_flash(pos, range, {
+		self._unit
+	})
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "carry_data", CarryData.EVENT_IDS.explode)
+	self._unit:set_slot(0)
+end
+
+function CarryData:_local_player_explosion_damage()
+	local pos = self._unit:position()
+	local range = CarryData.EXPLOSION_SETTINGS.range
+	managers.explosion:give_local_player_dmg(pos, range, CarryData.EXPLOSION_SETTINGS.player_damage)
+end
+
+function CarryData:sync_net_event(event_id)
+	if event_id == CarryData.EVENT_IDS.explode then
+		local range = CarryData.EXPLOSION_SETTINGS.range
+		self:_local_player_explosion_damage()
+		QuickFlashGrenade:make_flash(self._unit:position(), range, {
+			self._unit
+		})
+		managers.explosion:explode_on_client(self._unit:position(), math.UP, nil, CarryData.EXPLOSION_SETTINGS.damage, range, CarryData.EXPLOSION_SETTINGS.curve_pow, CarryData.EXPLOSION_CUSTOM_PARAMS)
+	elseif event_id == CarryData.EVENT_IDS.will_explode then
+		self:_start_explosion()
+	end
 end
 
 function CarryData:clbk_out_of_world()

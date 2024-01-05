@@ -1,4 +1,5 @@
 LootBagUnitElement = LootBagUnitElement or class(MissionElement)
+LootBagUnitElement.USES_POINT_ORIENTATION = true
 
 function LootBagUnitElement:init(unit)
 	MissionElement.init(self, unit)

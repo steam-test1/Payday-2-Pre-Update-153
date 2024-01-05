@@ -476,6 +476,18 @@ function WeaponFactoryManager:get_parts_from_weapon_by_type_or_perk(type_or_perk
 	return type_parts
 end
 
+function WeaponFactoryManager:get_parts_from_weapon_by_perk(perk, parts)
+	local factory = tweak_data.weapon.factory
+	local type_parts = {}
+	for id, data in pairs(parts) do
+		local perks = factory.parts[id].perks
+		if perks and table.contains(perks, perk) then
+			table.insert(type_parts, parts[id])
+		end
+	end
+	return type_parts
+end
+
 function WeaponFactoryManager:get_part_from_weapon_by_type(type, parts)
 	local factory = tweak_data.weapon.factory
 	for id, data in pairs(parts) do

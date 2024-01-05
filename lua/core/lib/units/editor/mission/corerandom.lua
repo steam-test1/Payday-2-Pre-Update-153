@@ -10,7 +10,7 @@ end
 function CoreRandomUnitElement:init(unit)
 	CoreRandomUnitElement.super.init(self, unit)
 	self._hed.amount = 1
-	self._hed.ignore_disabled = false
+	self._hed.ignore_disabled = true
 	self._hed.counter_id = nil
 	table.insert(self._save_values, "amount")
 	table.insert(self._save_values, "ignore_disabled")

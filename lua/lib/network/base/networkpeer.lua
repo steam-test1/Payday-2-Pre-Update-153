@@ -41,7 +41,11 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 	if self._rpc and not self._loading and managers.network.voice_chat.on_member_added and self._rpc:ip_at_index(0) ~= Network:self("TCP_IP"):ip_at_index(0) then
 		managers.network.voice_chat:on_member_added(self)
 	end
-	self._profile = {level = nil, outfit_string = ""}
+	self._profile = {
+		level = nil,
+		rank = nil,
+		outfit_string = ""
+	}
 	self._handshakes = {}
 end
 
@@ -564,8 +568,9 @@ function NetworkPeer:level()
 	return self._level
 end
 
-function NetworkPeer:set_profile(level)
+function NetworkPeer:set_profile(level, rank)
 	self._profile.level = level
+	self._profile.rank = rank
 end
 
 function NetworkPeer:set_outfit_string(outfit_string)

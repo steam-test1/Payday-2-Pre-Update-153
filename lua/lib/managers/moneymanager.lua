@@ -213,6 +213,7 @@ function MoneyManager:get_money_by_params(params)
 	local money_multiplier = self:get_contract_difficulty_multiplier(total_difficulty_stars)
 	local contract_money_multiplier = 1 + money_multiplier / 10
 	local small_loot_multiplier = managers.money:get_small_loot_difficulty_multiplier(total_difficulty_stars) or 0
+	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
 	local bonus_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value()
 	local mandatory_bags = params.secured_bags or managers.loot:get_secured_mandatory_bags_value()
 	local real_small_value = params.small_value or math.round(managers.loot:get_real_total_small_loot_value())
@@ -232,8 +233,8 @@ function MoneyManager:get_money_by_params(params)
 		small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
 		if on_last_stage then
 			bag_value = bonus_bags * total_stages
-			bag_risk = math.round(bag_value * money_multiplier)
-			bag_value = bag_value + mandatory_bags
+			bag_risk = math.round(bag_value * money_multiplier * bag_skill_bonus)
+			bag_value = (bag_value + mandatory_bags) * bag_skill_bonus
 			total_payout = math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value)
 			stage_value = math.round(static_value / offshore_rate)
 			bag_value = math.round(bag_value / offshore_rate)
@@ -290,8 +291,8 @@ function MoneyManager:get_money_by_params(params)
 			local job_ratio = job_value / total_payout
 			stage_value = math.round(new_total_payout * stage_ratio)
 			small_value = math.round(new_total_payout * small_ratio)
-			bonus_bag_value = math.round(new_total_payout * bonus_bag_ratio)
-			mandatory_bag_value = math.round(new_total_payout * mandatory_bag_ratio)
+			bonus_bag_value = math.round(new_total_payout * bonus_bag_ratio * bag_skill_bonus)
+			mandatory_bag_value = math.round(new_total_payout * mandatory_bag_ratio * bag_skill_bonus)
 			job_value = math.round(new_total_payout * job_ratio)
 			local rounding_error = new_total_payout - (stage_value + small_value + bonus_bag_value + mandatory_bag_value + job_value)
 			job_value = job_value + rounding_error
@@ -350,28 +351,34 @@ function MoneyManager:get_secured_bonus_bags_money()
 	local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 	local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
+	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
 	local bonus_bags = managers.loot:get_secured_bonus_bags_value()
-	local bag_value = bonus_bags * money_multiplier * total_stages
-	return math.round(bag_value / tweak_data:get_value("money_manager", "offshore_rate"))
+	local bag_value = bonus_bags * total_stages
+	local bag_risk = math.round(bag_value * money_multiplier)
+	return math.round((bag_value + bag_risk) * bag_skill_bonus / tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
 function MoneyManager:get_secured_mandatory_bags_money()
 	local mandatory_value = managers.loot:get_secured_mandatory_bags_value()
-	return math.round(mandatory_value / tweak_data:get_value("money_manager", "offshore_rate"))
+	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
+	return math.round(mandatory_value * bag_skill_bonus / tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
-function MoneyManager:get_secured_bonus_bag_value(value)
+function MoneyManager:get_secured_bonus_bag_value(carry_id, value)
 	local bag_value = 0
-	if managers.loot:is_bonus_bag() then
+	local bag_risk = 0
+	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
+	if managers.loot:is_bonus_bag(carry_id) then
 		local job_id = managers.job:current_job_id()
 		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 		local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 		local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
-		bag_value = value * money_multiplier * total_stages
+		bag_value = value * total_stages
+		bag_risk = math.round(bag_value * money_multiplier)
 	else
 		bag_value = value
 	end
-	return math.round(bag_value / tweak_data:get_value("money_manager", "offshore_rate"))
+	return math.round((bag_value + bag_risk) * bag_skill_bonus / tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
 function MoneyManager:get_job_bag_value()
@@ -535,7 +542,7 @@ function MoneyManager:on_respec_skilltree(tree, forced_respec_multiplier)
 end
 
 function MoneyManager:refund_weapon_part(weapon_id, part_id, global_value)
-	local pc_value = tweak_data.blackmarket.weapon_mods[part_id].value or 1
+	local pc_value = tweak_data.blackmarket.weapon_mods[part_id] and tweak_data.blackmarket.weapon_mods[part_id].value or 1
 	local mod_price = tweak_data:get_value("money_manager", "modify_weapon_cost", pc_value)
 	local global_value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", global_value or "normal")
 	self:_add_to_total(math.round(mod_price * global_value_multiplier), {no_offshore = true})
@@ -716,9 +723,8 @@ function MoneyManager:get_skilltree_tree_respec_cost(tree, forced_respec_multipl
 		for _, skill_id in ipairs(tier) do
 			local step = managers.skilltree:skill_step(skill_id)
 			if 0 < step then
-				local skill_tweak_data = tweak_data.skilltree.skills[skill_id]
 				for i = 1, step do
-					value = value + base_point_cost + Application:digest_value(skill_tweak_data[i].cost, false) * tweak_data:get_value("money_manager", "skilltree", "respec", "point_tier_cost", id)
+					value = value + base_point_cost + managers.skilltree:get_skill_points(skill_id, i) * tweak_data:get_value("money_manager", "skilltree", "respec", "point_tier_cost", id)
 				end
 			end
 		end

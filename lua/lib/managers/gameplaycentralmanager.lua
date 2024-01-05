@@ -280,7 +280,7 @@ function GamePlayCentralManager:update(t, dt)
 	end
 end
 
-function GamePlayCentralManager:add_enemy_contour(unit, marking_strength)
+function GamePlayCentralManager:add_enemy_contour(unit, marking_strength, time_multiplier)
 	if not self._enemy_contour_units[unit:key()] then
 		unit:base():swap_material_config()
 		managers.occlusion:remove_occlusion(unit)
@@ -300,7 +300,7 @@ function GamePlayCentralManager:add_enemy_contour(unit, marking_strength)
 		materials = materials,
 		color = color,
 		target_color = color,
-		opacity = tweak_data.character[unit:base()._tweak_table].silent_priority_shout and 4.5 or 1.5,
+		opacity = (tweak_data.character[unit:base()._tweak_table].silent_priority_shout and 4.5 or 1.5) * (time_multiplier or 1),
 		target_opacity = 0
 	}
 end

@@ -2,9 +2,56 @@ FragGrenade = FragGrenade or class(GrenadeBase)
 
 function FragGrenade:init(unit)
 	FragGrenade.super.init(self, unit)
+	self._range = 1000
+	self._effect_name = "effects/payday2/particles/explosions/grenade_explosion"
+	self._curve_pow = 3
+	self._damage = 20
+	self._player_damage = 10
+	self._custom_params = {
+		effect = self._effect_name,
+		feedback_range = self._range * 2,
+		camera_shake_max_mul = 4,
+		sound_muffle_effect = true
+	}
 end
 
 function FragGrenade:_detonate()
+	local pos = self._unit:position()
+	local normal = math.UP
+	local range = self._range
+	local slot_mask = managers.slot:get_mask("bullet_impact_targets")
+	managers.explosion:give_local_player_dmg(pos, range, self._player_damage)
+	managers.explosion:play_sound_and_effects(pos, normal, range, self._custom_params)
+	local hit_units, splinters = managers.explosion:detect_and_give_dmg({
+		hit_pos = pos,
+		range = range,
+		collision_slotmask = slot_mask,
+		curve_pow = self._curve_pow,
+		damage = self._damage,
+		player_damage = 0,
+		ignore_unit = self._unit
+	})
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
+	self._unit:set_slot(0)
+end
+
+function FragGrenade:_detonate_on_client()
+	local pos = self._unit:position()
+	local range = self._range
+	managers.explosion:give_local_player_dmg(pos, range, self._player_damage)
+	managers.explosion:explode_on_client(pos, math.UP, nil, self._damage, range, self._curve_pow, self._custom_params)
+end
+
+function FragGrenade:bullet_hit()
+	if not Network:is_server() then
+		return
+	end
+	print("FragGrenade:bullet_hit()")
+	self._timer = nil
+	self:_detonate()
+end
+
+function FragGrenade:OLD_detonate()
 	local units = World:find_units("sphere", self._unit:position(), 400, self._slotmask)
 	for _, unit in ipairs(units) do
 		local col_ray = {}
@@ -17,7 +64,7 @@ function FragGrenade:_detonate()
 	self._unit:set_slot(0)
 end
 
-function FragGrenade:_play_sound_and_effects()
+function FragGrenade:OLD_play_sound_and_effects()
 	World:effect_manager():spawn({
 		effect = Idstring("effects/particles/explosions/explosion_grenade"),
 		position = self._unit:position(),
@@ -26,7 +73,7 @@ function FragGrenade:_play_sound_and_effects()
 	self._unit:sound_source():post_event("trip_mine_explode")
 end
 
-function FragGrenade:_give_explosion_damage(col_ray, unit, damage)
+function FragGrenade:OLD_give_explosion_damage(col_ray, unit, damage)
 	local action_data = {}
 	action_data.variant = "explosion"
 	action_data.damage = damage

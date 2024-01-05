@@ -1,4 +1,5 @@
 FeedbackUnitElement = FeedbackUnitElement or class(MissionElement)
+FeedbackUnitElement.USES_POINT_ORIENTATION = true
 
 function FeedbackUnitElement:init(unit)
 	FeedbackUnitElement.super.init(self, unit)
@@ -6,7 +7,9 @@ function FeedbackUnitElement:init(unit)
 	self._hed.range = 0
 	self._hed.use_camera_shake = true
 	self._hed.use_rumble = true
+	self._hed.camera_shake_effect = "mission_triggered"
 	self._hed.camera_shake_amplitude = 1
+	self._hed.camera_shake_frequency = 1
 	self._hed.camera_shake_attack = 0.1
 	self._hed.camera_shake_sustain = 0.3
 	self._hed.camera_shake_decay = 2.1
@@ -20,7 +23,9 @@ function FeedbackUnitElement:init(unit)
 	table.insert(self._save_values, "range")
 	table.insert(self._save_values, "use_camera_shake")
 	table.insert(self._save_values, "use_rumble")
+	table.insert(self._save_values, "camera_shake_effect")
 	table.insert(self._save_values, "camera_shake_amplitude")
+	table.insert(self._save_values, "camera_shake_frequency")
 	table.insert(self._save_values, "camera_shake_attack")
 	table.insert(self._save_values, "camera_shake_sustain")
 	table.insert(self._save_values, "camera_shake_decay")
@@ -32,16 +37,27 @@ function FeedbackUnitElement:init(unit)
 	table.insert(self._save_values, "above_camera_effect_distance")
 end
 
-function FeedbackUnitElement:update_selected()
+function FeedbackUnitElement:update_selected(t, dt, selected_unit, all_units)
+	if self._hed.orientation_elements then
+		for _, id in ipairs(self._hed.orientation_elements) do
+			local unit = all_units[id]
+			self:_draw_ranges(unit:position())
+		end
+	else
+		self:_draw_ranges(self._unit:position())
+	end
+end
+
+function FeedbackUnitElement:_draw_ranges(pos)
 	local brush = Draw:brush()
 	brush:set_color(Color(0.15, 1, 1, 1))
 	local pen = Draw:pen(Color(0.15, 0.5, 0.5, 0.5))
-	brush:sphere(self._unit:position(), self._hed.range, 4)
-	pen:sphere(self._unit:position(), self._hed.range)
+	brush:sphere(pos, self._hed.range, 4)
+	pen:sphere(pos, self._hed.range)
 	brush:set_color(Color(0.15, 0, 1, 0))
 	pen:set(Color(0.15, 0, 1, 0))
-	brush:sphere(self._unit:position(), self._hed.range * self._hed.above_camera_effect_distance, 4)
-	pen:sphere(self._unit:position(), self._hed.range * self._hed.above_camera_effect_distance)
+	brush:sphere(pos, self._hed.range * self._hed.above_camera_effect_distance, 4)
+	pen:sphere(pos, self._hed.range * self._hed.above_camera_effect_distance)
 end
 
 function FeedbackUnitElement:_build_panel(panel, panel_sizer)
@@ -71,6 +87,28 @@ function FeedbackUnitElement:_build_panel(panel, panel_sizer)
 		value = "use_camera_shake"
 	})
 	camera_shaker_sizer:add(use_camera_shake, 0, 0, "EXPAND")
+	local camera_shake_effect_params = {
+		name = "Effect:",
+		panel = panel,
+		sizer = camera_shaker_sizer,
+		options = {
+			"mission_triggered",
+			"headbob",
+			"player_land",
+			"breathing"
+		},
+		value = self._hed.camera_shake_effect,
+		tooltip = "Select a camera shake effect from the combobox",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sizer_proportions = 1,
+		sorted = true
+	}
+	local camera_shake_effect = CoreEWS.combobox(camera_shake_effect_params)
+	camera_shake_effect:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
+		ctrlr = camera_shake_effect,
+		value = "camera_shake_effect"
+	})
 	local camera_shake_amplitude_params = {
 		name = "Amplitude:",
 		panel = panel,
@@ -90,6 +128,26 @@ function FeedbackUnitElement:_build_panel(panel, panel_sizer)
 	camera_shake_amplitude:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
 		ctrlr = camera_shake_amplitude,
 		value = "camera_shake_amplitude"
+	})
+	local camera_shake_frequency_params = {
+		name = "Frequency:",
+		panel = panel,
+		sizer = camera_shaker_sizer,
+		value = self._hed.camera_shake_frequency,
+		floats = 2,
+		tooltip = "Changes the frequency of the shake",
+		min = -1,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local camera_shake_frequency = CoreEws.number_controller(camera_shake_frequency_params)
+	camera_shake_frequency:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = camera_shake_frequency,
+		value = "camera_shake_frequency"
+	})
+	camera_shake_frequency:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = camera_shake_frequency,
+		value = "camera_shake_frequency"
 	})
 	local camera_shake_attack_params = {
 		name = "Attack:",
