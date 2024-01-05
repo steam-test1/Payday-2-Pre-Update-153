@@ -113,7 +113,8 @@ function Setup:init_managers(managers)
 		permission = "public",
 		team_ai = true,
 		reputation_permission = 0,
-		drop_in_allowed = true
+		drop_in_allowed = true,
+		kicking_allowed = true
 	}
 	managers.dyn_resource = DynamicResourceManager:new()
 	managers.gui_data = CoreGuiDataManager.GuiDataManager:new()

@@ -470,6 +470,7 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 				local difficulty_id = attributes_numbers[2]
 				local difficulty = tweak_data:index_to_difficulty(difficulty_id)
 				local job_id = tweak_data.narrative:get_job_name_from_index(math.floor(attributes_numbers[1] / 1000))
+				local kick_option = attributes_numbers[8] == 0 and 0 or 1
 				local state_string_id = tweak_data:index_to_server_state(attributes_numbers[4])
 				local state_name = state_string_id and managers.localization:text("menu_lobby_server_state_" .. state_string_id) or "UNKNOWN"
 				local state = attributes_numbers[4]
@@ -499,7 +500,8 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 								state = state,
 								level_name = level_name,
 								job_id = job_id,
-								is_friend = is_friend
+								is_friend = is_friend,
+								kick_option = kick_option
 							})
 						end
 					else
@@ -515,7 +517,8 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 							state = state,
 							level_name = level_name,
 							job_id = job_id,
-							is_friend = is_friend
+							is_friend = is_friend,
+							kick_option = kick_option
 						})
 					end
 				end
@@ -868,7 +871,21 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			blend_mode = "add"
 		})
 		mw = math.max(mw, self:make_fine_text(pro_text))
-		legend_panel:set_size(host_text:left() + mw + 10, pro_text:bottom() + 10)
+		local kick_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/cn_kick_marker",
+			x = 10,
+			y = pro_text:bottom() + 2
+		})
+		local kick_text = legend_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			x = host_text:left(),
+			y = pro_text:bottom(),
+			text = managers.localization:to_upper_text("menu_cn_kick_disabled"),
+			blend_mode = "add"
+		})
+		mw = math.max(mw, self:make_fine_text(kick_text))
+		legend_panel:set_size(host_text:left() + mw + 10, kick_text:bottom() + 10)
 		legend_panel:rect({
 			color = Color.black,
 			alpha = 0.4,
@@ -1326,6 +1343,7 @@ function CrimeNetGui:add_special_contracts()
 		local id = special_contract.id
 		if id and not self._jobs[id] then
 			local gui_data = self:_create_job_gui(special_contract, "special")
+			gui_data.server = true
 			gui_data.special_index = index
 			self._jobs[id] = gui_data
 		end
@@ -1426,8 +1444,8 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	local info_string = managers.localization:to_upper_text("cn_menu_contract_short_" .. (1 < job_num and "plural" or "singular"), {days = job_num, money = job_cash})
 	info_string = info_string .. (data.state_name and " / " .. data.state_name or "")
 	if is_special then
-		job_string = data.name_id and managers.localization:text(data.name_id) or ""
-		info_string = data.desc_id and managers.localization:text(data.desc_id) or ""
+		job_string = data.name_id and managers.localization:to_upper_text(data.name_id) or ""
+		info_string = data.desc_id and managers.localization:to_upper_text(data.desc_id) or ""
 	end
 	local host_name = side_panel:text({
 		name = "host_name",
@@ -1616,7 +1634,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			blend_mode = "add"
 		})
 	end
-	local timer_rect, peers_panel
+	local timer_rect, peers_panel, icon_panel
 	if is_server then
 		peers_panel = self._pan_panel:panel({
 			layer = 11 + self._num_layer_jobs * 3,
@@ -1642,7 +1660,17 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			})
 			player_marker:set_position(cx, cy)
 		end
-	else
+		icon_panel = self._pan_panel:panel({
+			layer = 26,
+			alpha = 0,
+			h = 18,
+			w = 18
+		})
+		local kick_icon = icon_panel:bitmap({
+			name = "kick_icon",
+			texture = "guis/textures/pd2/cn_kick_marker"
+		})
+	elseif not is_special then
 		timer_rect = marker_panel:bitmap({
 			name = "timer_rect",
 			texture = "guis/textures/pd2/crimenet_timer",
@@ -1677,6 +1705,14 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		side_panel:set_right(marker_panel:left())
 	end
 	side_panel:set_center_y(marker_panel:top() + 11)
+	if icon_panel then
+		if text_on_right then
+			icon_panel:set_right(marker_panel:left())
+		else
+			icon_panel:set_left(marker_panel:right())
+		end
+		icon_panel:set_center_y(marker_panel:top() + 11)
+	end
 	if peers_panel then
 		peers_panel:set_center_x(marker_panel:center_x())
 		peers_panel:set_center_y(marker_panel:center_y())
@@ -1699,8 +1735,10 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		level_data = level_data,
 		marker_panel = marker_panel,
 		peers_panel = peers_panel,
+		kick_option = data.kick_option,
 		timer_rect = timer_rect,
 		side_panel = side_panel,
+		icon_panel = icon_panel,
 		focus = focus,
 		difficulty = data.difficulty,
 		difficulty_id = data.difficulty_id,
@@ -1730,6 +1768,9 @@ function CrimeNetGui:remove_job(id)
 	self._pan_panel:remove(data.glow_panel)
 	self._pan_panel:remove(data.side_panel)
 	self._pan_panel:remove(data.focus)
+	if data.icon_panel then
+		self._pan_panel:remove(data.icon_panel)
+	end
 	if data.location then
 		data.location[3] = nil
 	end
@@ -2206,6 +2247,14 @@ function CrimeNetGui:_set_zoom(zoom, x, y)
 			job.side_panel:set_right(job.marker_panel:left())
 		end
 		job.side_panel:set_center_y(job.marker_panel:top() + 11)
+		if job.icon_panel then
+			if job.text_on_right then
+				job.icon_panel:set_right(job.marker_panel:left())
+			else
+				job.icon_panel:set_left(job.marker_panel:right())
+			end
+			job.icon_panel:set_center_y(job.marker_panel:top() + 11)
+		end
 		if job.peers_panel then
 			job.peers_panel:set_center_x(job.marker_panel:center_x())
 			job.peers_panel:set_center_y(job.marker_panel:center_y())
@@ -2223,6 +2272,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 		local function animate_alpha(o, objects, job, alphas, inside)
 			local wanted_alpha = alphas[1]
 			local wanted_text_alpha = alphas[2]
+			local wanted_icon_alpha = inside and (job.kick_option == 0 and 1 or 0) or 0
 			local start_h = job.side_panel:h()
 			local h = start_h
 			local host_name = job.side_panel:child("host_name")
@@ -2231,6 +2281,10 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local info_name = job.side_panel:child("info_name")
 			local difficulty_name = job.side_panel:child("difficulty_name")
 			local stars_panel = job.side_panel:child("stars_panel")
+			local kick_icon
+			if job.icon_panel then
+				kick_icon = job.icon_panel:child("kick_icon")
+			end
 			local base_h = math.round(host_name:h() + job_name:h() + stars_panel:h())
 			local expand_h = math.round(base_h + info_name:h() + difficulty_name:h() + math.max(contact_name:h() - job_name:h(), 0))
 			local start_x = 0
@@ -2243,6 +2297,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local x = start_x
 			local object_alpha = {}
 			local text_alpha = job.side_panel:alpha()
+			local icon_alpha = job.icon_panel and job.icon_panel:alpha() or 0
 			local alpha_met = false
 			local glow_met = false
 			local expand_met = false
@@ -2262,7 +2317,11 @@ function CrimeNetGui:update_job_gui(job, inside)
 					end
 					text_alpha = math.step(text_alpha, wanted_text_alpha, dt * 2)
 					job.side_panel:set_alpha(text_alpha)
-					alpha_met = alpha_met and text_alpha == wanted_text_alpha
+					if job.icon_panel then
+						icon_alpha = math.step(icon_alpha, wanted_icon_alpha, dt * 2)
+						job.icon_panel:set_alpha(icon_alpha)
+					end
+					alpha_met = alpha_met and text_alpha == wanted_text_alpha and icon_alpha == wanted_icon_alpha
 					if not alpha_met or inside then
 					end
 				end
@@ -2327,6 +2386,9 @@ function CrimeNetGui:update_job_gui(job, inside)
 			job.side_panel:child("contact_name"):set_blend_mode("normal")
 			job.side_panel:child("info_name"):set_blend_mode("normal")
 			job.side_panel:child("difficulty_name"):set_blend_mode("normal")
+			if job.icon_panel then
+				job.icon_panel:child("kick_icon"):set_blend_mode("add")
+			end
 		else
 			job.side_panel:child("job_name"):set_blend_mode("add")
 			job.side_panel:child("contact_name"):set_blend_mode("add")

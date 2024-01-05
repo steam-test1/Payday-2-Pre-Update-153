@@ -46,6 +46,35 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 end
 
 function AssetsTweakData:_init_assets(tweak_data)
+	self.safe_escape = {}
+	self.safe_escape.name_id = "menu_asset_safe_escape"
+	self.safe_escape.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/generic_escape"
+	self.safe_escape.stages = {
+		"welcome_to_the_jungle_1",
+		"framing_frame_1",
+		"framing_frame_2",
+		"ukrainian_job",
+		"jewelry_store",
+		"four_stores",
+		"mallcrasher",
+		"nightclub",
+		"branchbank",
+		"arm_fac",
+		"arm_par",
+		"arm_hcm",
+		"arm_bri",
+		"arm_cro",
+		"arm_und",
+		"family"
+	}
+	self.safe_escape.visible_if_locked = true
+	self.safe_escape.unlock_desc_id = "menu_asset_safe_escape_desc"
+	self.safe_escape.no_mystery = true
+	self.safe_escape.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_medium", 10)
+	self.safe_escape.upgrade_lock = {
+		category = "player",
+		upgrade = "additional_assets"
+	}
 	self.ukrainian_job_tiara = {}
 	self.ukrainian_job_tiara.name_id = "menu_asset_test_jewelry_store_tiara"
 	self.ukrainian_job_tiara.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset01"
