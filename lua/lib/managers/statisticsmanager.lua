@@ -644,7 +644,9 @@ function StatisticsManager:_get_stat_tables()
 		"smiley",
 		"gumbo",
 		"crazy_lion",
-		"old_hoxton"
+		"old_hoxton",
+		"the_one_below",
+		"lycan"
 	}
 	local weapon_list = {
 		"ak5",
@@ -731,7 +733,8 @@ function StatisticsManager:_get_stat_tables()
 		"machete",
 		"briefcase",
 		"kabartanto",
-		"toothbrush"
+		"toothbrush",
+		"chef"
 	}
 	local enemy_list = {
 		"civilian",
@@ -1004,11 +1007,13 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	managers.network.account:publish_statistics(stats)
 end
 
-function StatisticsManager:publish_skills_to_steam()
+function StatisticsManager:publish_skills_to_steam(skip_version_check)
 	if Application:editor() then
 		return
 	end
-	self:check_version()
+	if not skip_version_check then
+		self:check_version()
+	end
 	local stats = {}
 	local skill_amount = {}
 	local skill_data = tweak_data.skilltree.skills
@@ -1072,18 +1077,10 @@ function StatisticsManager:publish_skills_to_steam()
 end
 
 function StatisticsManager:check_version()
-	local CURRENT_VERSION = 1
+	local CURRENT_VERSION = 2
 	if CURRENT_VERSION > managers.network.account:get_stat("stat_version") then
 		local stats = {}
-		for tree_index, tree in ipairs(tweak_data.skilltree.trees) do
-			if tree.statistics ~= false then
-				stats["skill_" .. tree.skill .. "_unlocked"] = {
-					type = "int",
-					method = "set",
-					value = managers.skilltree:tree_unlocked(tree_index) and 1 or 0
-				}
-			end
-		end
+		self:publish_skills_to_steam(true)
 		stats.stat_version = {
 			type = "int",
 			method = "set",

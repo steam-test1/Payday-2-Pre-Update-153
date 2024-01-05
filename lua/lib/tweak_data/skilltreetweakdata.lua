@@ -1900,8 +1900,7 @@ function SkillTreeTweakData:init()
 		name_id = "st_menu_hoxton_pack",
 		skill = "hoxton",
 		background_texture = "guis/textures/pd2/skilltree/bg_fugitive",
-		tiers = {},
-		statistics = false
+		tiers = {}
 	}
 	self.trees[1].tiers[1] = {
 		"cable_guy",
@@ -2505,7 +2504,7 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"armor_kit",
-					"player_pick_up_ammo_multiplier_2"
+					"player_pick_up_ammo_multiplier"
 				},
 				cost = 1600,
 				icon_xy = {5, 0},
@@ -2569,7 +2568,6 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
-					"passive_player_xp_multiplier",
 					"player_level_2_dodge_addend_1",
 					"player_level_3_dodge_addend_1",
 					"player_level_4_dodge_addend_1"
@@ -2592,7 +2590,6 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
-					"passive_player_xp_multiplier",
 					"player_level_2_dodge_addend_2",
 					"player_level_3_dodge_addend_2",
 					"player_level_4_dodge_addend_2"
@@ -2604,7 +2601,8 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
-					"player_pick_up_ammo_multiplier_2"
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
 				},
 				cost = 1600,
 				icon_xy = {5, 0},
@@ -2613,7 +2611,6 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
-					"passive_player_xp_multiplier",
 					"player_level_2_dodge_addend_3",
 					"player_level_3_dodge_addend_3",
 					"player_level_4_dodge_addend_3"

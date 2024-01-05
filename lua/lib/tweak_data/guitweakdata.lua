@@ -30,7 +30,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_halloween",
 		desc_id = "menu_content_halloween_desc",
 		date_id = "menu_content_halloween_date",
-		webpage = "http://www.overkillsoftware.com/halloween/",
+		webpage = "http://www.overkillsoftware.com/helltopay/",
 		image = "guis/textures/pd2/content_updates/halloween"
 	}
 	local armored_transport = {
@@ -161,6 +161,46 @@ function GuiTweakData:init()
 		store = 323500,
 		image = "guis/dlcs/hl_miami/textures/pd2/content_updates/hl_miami"
 	}
+	local crimefest = {
+		id = "hl_crimefest",
+		name_id = "menu_content_crimefest",
+		desc_id = "menu_content_crimefest_desc",
+		date_id = "menu_content_crimefest_date",
+		webpage = "http://www.overkillsoftware.com/crimefest/mrated.html",
+		image = "guis/textures/pd2/content_updates/crimefest"
+	}
+	local jowi = {
+		id = "hl_jowi",
+		name_id = "menu_content_jowi",
+		desc_id = "menu_content_jowi_desc",
+		date_id = "menu_content_jowi_date",
+		store = 330010,
+		image = "guis/textures/pd2/content_updates/jowi"
+	}
+	local hoxton_char = {
+		id = "hl_hoxton_char",
+		name_id = "menu_content_hoxton_char",
+		desc_id = "menu_content_hoxton_char_desc",
+		date_id = "menu_content_hoxton_char_date",
+		store = 330490,
+		image = "guis/textures/pd2/content_updates/hoxton_char"
+	}
+	local hoxton_job = {
+		id = "hl_hoxton_job",
+		name_id = "menu_content_hoxton_job",
+		desc_id = "menu_content_hoxton_job_desc",
+		date_id = "menu_content_hoxton_job_date",
+		store = 330491,
+		image = "guis/textures/pd2/content_updates/hoxton_job"
+	}
+	local halloween_2014 = {
+		id = "hl_halloween_2014",
+		name_id = "menu_content_halloween_2014",
+		desc_id = "menu_content_halloween_2014_desc",
+		date_id = "menu_content_halloween_2014_date",
+		webpage = "http://www.overkillsoftware.com/halloween/",
+		image = "guis/textures/pd2/content_updates/halloween_2014"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -187,7 +227,12 @@ function GuiTweakData:init()
 			gage_pack_shotgun,
 			gage_pack_assault,
 			jukebox,
-			hl_miami
+			hl_miami,
+			crimefest,
+			jowi,
+			hoxton_char,
+			hoxton_job,
+			halloween_2014
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

@@ -2113,8 +2113,7 @@ function NarrativeTweakData:init()
 		"mia_prof",
 		"gallery",
 		"hox",
-		"hox_prof",
-		"haunted"
+		"hox_prof"
 	}
 	self:set_job_wrappers()
 end
