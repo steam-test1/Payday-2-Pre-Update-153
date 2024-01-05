@@ -54,8 +54,7 @@ function SkillTreeTweakData:init()
 		},
 		[5] = {
 			upgrades = {
-				"player_convert_enemies_interaction_speed_multiplier",
-				"player_wolverine_health_regen"
+				"player_convert_enemies_interaction_speed_multiplier"
 			},
 			desc_id = "menu_mastermind_tier_5"
 		},
