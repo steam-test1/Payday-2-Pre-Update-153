@@ -14,8 +14,8 @@ end
 
 function MenuNodeCrimenetGui:_setup_item_panel(safe_rect, res)
 	MenuNodeHiddenGui.super._setup_item_panel(self, safe_rect, res)
-	local width = 760
-	local height = 540
+	local width = 900
+	local height = 580
 	if SystemInfo:platform() ~= Idstring("WIN32") then
 		width = 800
 		height = 500
@@ -63,10 +63,18 @@ function MenuNodeCrimenetFiltersGui:_setup_item_panel(safe_rect, res)
 	self.item_panel:set_position(math.round(self.item_panel:x()), math.round(self.item_panel:y()))
 	self:_rec_round_object(self.item_panel)
 	self.box_panel = self.item_panel:parent():panel()
-	self.box_panel:set_shape(self.item_panel:shape())
-	self.box_panel:set_layer(51)
+	self.box_panel:set_x(self.item_panel:x())
+	self.box_panel:set_w(self.item_panel:w())
+	if self.item_panel:h() > self._align_data.panel:h() then
+		self.box_panel:set_y(0)
+		self.box_panel:set_h(self.item_panel:parent():h())
+	else
+		self.box_panel:set_y(self.item_panel:top())
+		self.box_panel:set_h(self.item_panel:h())
+	end
 	self.box_panel:grow(20, 20)
 	self.box_panel:move(-10, -10)
+	self.box_panel:set_layer(51)
 	self.boxgui = BoxGuiObject:new(self.box_panel, {
 		sides = {
 			1,
@@ -75,10 +83,19 @@ function MenuNodeCrimenetFiltersGui:_setup_item_panel(safe_rect, res)
 			1
 		}
 	})
+	self.boxgui:set_clipping(false)
 	self.box_panel:rect({
 		color = Color.black,
-		alpha = 0.6
+		alpha = 0.6,
+		rotation = 360
 	})
+	self._align_data.panel:set_left(self.box_panel:left())
+	self._list_arrows.up:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.up:set_world_top(self._align_data.panel:world_top() - 10)
+	self._list_arrows.up:set_width(self.box_panel:width())
+	self._list_arrows.down:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.down:set_world_bottom(self._align_data.panel:world_bottom() + 10)
+	self._list_arrows.down:set_width(self.box_panel:width())
 end
 
 function MenuNodeCrimenetFiltersGui:_rec_round_object(object)

@@ -109,7 +109,8 @@ function MissionManager:init(...)
 		"special_event_e",
 		"special_event_f",
 		"special_event_g",
-		"loot_bag"
+		"loot_bag",
+		"atm"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

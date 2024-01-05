@@ -26,8 +26,9 @@ function NodeGui:init(node, layer, parameters)
 	self.layers.items = layer + 2
 	self.layers.last = self.layers.items
 	self.localize_strings = true
-	self.row_item_color = Color(1, 0.5529412, 0.6901961, 0.827451)
-	self.row_item_hightlight_color = Color(1, 0.5529412, 0.6901961, 0.827451)
+	self.row_item_color = self.row_item_color or Color(1, 0.5529412, 0.6901961, 0.827451)
+	self.row_item_hightlight_color = self.row_item_hightlight_color or Color(1, 0.5529412, 0.6901961, 0.827451)
+	self.row_item_disabled_text_color = self.row_item_disabled_text_color or Color(1, 0.5, 0.5, 0.5)
 	if parameters then
 		for param_name, param_value in pairs(parameters) do
 			self[param_name] = param_value
@@ -84,7 +85,8 @@ function NodeGui:_setup_item_rows(node)
 				x = 0,
 				y = self.font_size * i + self.spacing * (i - 1)
 			}
-			row_item.color = self.row_item_color
+			row_item.color = params.color or self.row_item_color
+			row_item.disabled_color = params.disabled_color or self.row_item_disabled_text_color
 			row_item.font = self.font
 			row_item.font_size = self.font_size
 			row_item.text = item_text
@@ -131,7 +133,8 @@ function NodeGui:_insert_row_item(item, node, i)
 			x = 0,
 			y = self.font_size * i + self.spacing * (i - 1)
 		}
-		row_item.color = self.row_item_color
+		row_item.color = params.color or self.row_item_color
+		row_item.disabled_color = params.disabled_color or self.row_item_disabled_text_color
 		row_item.font = self.font
 		row_item.text = item_text
 		row_item.help_text = help_text
@@ -228,6 +231,7 @@ function NodeGui:_reload_item(item)
 		row_item.text = item_text
 		if row_item.gui_panel.set_text then
 			row_item.gui_panel:set_text(row_item.to_upper and utf8.to_upper(row_item.text) or row_item.text)
+			row_item.gui_panel:set_color(row_item.color)
 		end
 	end
 end
@@ -239,11 +243,11 @@ function NodeGui:_reposition_items(highlighted_row_item)
 	local safe_rect = managers.viewport:get_safe_rect_pixels()
 	local dy = 0
 	if highlighted_row_item then
-		if highlighted_row_item.item:parameters().back then
+		if highlighted_row_item.item:parameters().back or highlighted_row_item.item:parameters().pd2_corner then
 			return
 		end
 		local first = self.row_items[1].gui_panel == highlighted_row_item.gui_panel
-		local last = self.row_items[#self.row_items].item:parameters().back and self.row_items[#self.row_items - 1] or self.row_items[#self.row_items]
+		local last = (self.row_items[#self.row_items].item:parameters().back or self.row_items[#self.row_items].item:parameters().pd2_corner) and self.row_items[#self.row_items - 1] or self.row_items[#self.row_items]
 		last = last.gui_panel == highlighted_row_item.gui_panel
 		local h = highlighted_row_item.item:get_h(highlighted_row_item, self) or highlighted_row_item.gui_panel:h()
 		local offset = (first or last) and 0 or h
@@ -335,7 +339,8 @@ end
 
 function NodeGui:_highlight_row_item(row_item, mouse_over)
 	if row_item then
-		row_item.color = row_item_hightlight_color or self.row_item_hightlight_color
+		row_item.highlighted = true
+		row_item.color = row_item.item:enabled() and (row_item.hightlight_color or self.row_item_hightlight_color) or row_item.disabled_color
 		row_item.gui_panel:set_color(row_item.color)
 	end
 end
@@ -348,7 +353,8 @@ end
 
 function NodeGui:_fade_row_item(row_item)
 	if row_item then
-		row_item.color = row_item.row_item_color or self.row_item_color
+		row_item.highlighted = false
+		row_item.color = row_item.item:enabled() and (row_item.row_item_color or self.row_item_color) or row_item.disabled_color
 		row_item.gui_panel:set_color(row_item.color)
 	end
 end
@@ -391,7 +397,7 @@ end
 function NodeGui:_item_panel_height()
 	local height = 0
 	for _, row_item in pairs(self.row_items) do
-		if not row_item.item:parameters().back then
+		if not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
 			local x, y, w, h = row_item.gui_panel:shape()
 			height = height + h + self.spacing
 		end
@@ -429,7 +435,7 @@ function NodeGui:_set_item_positions()
 		end
 	end
 	for _, row_item in pairs(self.row_items) do
-		if not row_item.item:parameters().back then
+		if not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
 			row_item.item:on_item_positions_done(row_item, self)
 		end
 	end

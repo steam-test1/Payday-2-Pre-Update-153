@@ -549,7 +549,7 @@ function NarrativeTweakData:init()
 		"cn_branchbank3"
 	}
 	self.jobs.branchbank_prof = deep_clone(self.jobs.branchbank)
-	self.jobs.branchbank_prof.jc = 40
+	self.jobs.branchbank_prof.jc = 50
 	self.jobs.branchbank_prof.professional = true
 	self.jobs.branchbank_prof.region = "professional"
 	self.jobs.branchbank_deposit = {}
@@ -721,6 +721,32 @@ function NarrativeTweakData:init()
 	self.jobs.safehouse.briefing_event = nil
 	self.jobs.safehouse.debrief_event = nil
 	self.jobs.safehouse.crimenet_callouts = {}
+	self.jobs.arm_wrapper = {}
+	self.jobs.arm_wrapper = {}
+	self.jobs.arm_wrapper.name_id = "heist_arm"
+	self.jobs.arm_wrapper.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_wrapper.contact = "bain"
+	self.jobs.arm_wrapper.jc = 40
+	self.jobs.arm_wrapper.chain = {
+		{}
+	}
+	self.jobs.arm_wrapper.job_wrapper = {
+		"arm_cro",
+		"arm_und",
+		"arm_bri",
+		"arm_hcm",
+		"arm_par",
+		"arm_fac"
+	}
+	self.jobs.arm_wrapper.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_wrapper.crimenet_videos = nil
 	self.jobs.arm_cro = {}
 	self.jobs.arm_cro.name_id = "heist_arm"
 	self.jobs.arm_cro.briefing_id = "heist_arm_crimenet"
@@ -901,6 +927,35 @@ function NarrativeTweakData:init()
 	self.jobs.arm_fac_prof.jc = 40
 	self.jobs.arm_fac_prof.professional = true
 	self.jobs.arm_fac_prof.region = "professional"
+	self.jobs.family = {}
+	self.jobs.family.name_id = "heist_family"
+	self.jobs.family.briefing_id = "heist_family_crimenet"
+	self.jobs.family.contact = "bain"
+	self.jobs.family.region = "street"
+	self.jobs.family.jc = 10
+	self.jobs.family.chain = {
+		{
+			level_id = "family",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.family.briefing_event = "pln_jewelrystore_stage1_brf_speak"
+	self.jobs.family.debrief_event = nil
+	self.jobs.family.crimenet_callouts = {
+		"pln_jewelrystore_stage1_cnc_01",
+		"pln_jewelrystore_stage1_cnc_02",
+		"pln_jewelrystore_stage1_cnc_03"
+	}
+	self.jobs.family.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.family_prof = deep_clone(self.jobs.family)
+	self.jobs.family_prof.jc = 20
+	self.jobs.family_prof.professional = true
+	self.jobs.family_prof.region = "professional"
 	self.jobs.escape_chain_test = {}
 	self.jobs.escape_chain_test.name_id = "heist_escape_chain_test"
 	self.jobs.escape_chain_test.briefing_id = "heist_escape_chain_test_briefing"
@@ -944,6 +999,18 @@ function NarrativeTweakData:init()
 		"branchbank_gold_prof",
 		"branchbank_prof"
 	}
+end
+
+function NarrativeTweakData:set_job_wrappers()
+	for _, job_id in ipairs(self._jobs_index) do
+		local job_wrapper = self.jobs[job_id].job_wrapper
+		if job_wrapper then
+			for _, wrapped_job_id in ipairs(job_wrapper) do
+				self.jobs[wrapped_job_id].wrapped_to_job = self.jobs[wrapped_job_id].wrapped_to_job or {}
+				table.insert(self.jobs[wrapped_job_id].wrapped_to_job, job_id)
+			end
+		end
+	end
 end
 
 function NarrativeTweakData:get_jobs_index()

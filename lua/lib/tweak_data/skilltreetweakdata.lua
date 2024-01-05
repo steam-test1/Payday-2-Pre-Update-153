@@ -432,7 +432,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_move_spread_multiplier"
+				"assault_rifle_move_spread_multiplier",
+				"player_run_and_reload"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -713,7 +714,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_shield_knock"
+				"player_shield_knock",
+				"player_run_and_shoot"
 			},
 			cost = self.costs.hightierpro
 		}

@@ -301,7 +301,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						return
 					end
 				elseif row_item.type == "multi_choice" then
-					local item = self._logic:selected_item()
+					local item = row_item.item
 					if row_item.arrow_right:inside(x, y) then
 						if item:next() then
 							self:post_event("selection_next")

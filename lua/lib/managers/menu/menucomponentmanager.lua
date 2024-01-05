@@ -201,6 +201,17 @@ function MenuComponentManager:on_job_updated()
 end
 
 function MenuComponentManager:update(t, dt)
+	if self._set_crimenet_enabled == true then
+		if self._crimenet_gui then
+			self._crimenet_gui:enable_crimenet()
+		end
+		self._set_crimenet_enabled = nil
+	elseif self._set_crimenet_enabled == false then
+		if self._crimenet_gui then
+			self._crimenet_gui:disable_crimenet()
+		end
+		self._set_crimenet_enabled = nil
+	end
 	if table.size(self._removing_textures) > 0 then
 		for key, texture_ids in pairs(self._removing_textures) do
 			if self._cached_textures[key] and self._cached_textures[key] ~= 0 then
@@ -1014,6 +1025,12 @@ function MenuComponentManager:close_crimenet_contract_gui(...)
 	end
 end
 
+function MenuComponentManager:set_crimenet_contract_difficulty_id(difficulty_id)
+	if self._crimenet_contract_gui then
+		self._crimenet_contract_gui:set_difficulty_id(difficulty_id)
+	end
+end
+
 function MenuComponentManager:_create_crimenet_filters_gui(node)
 	self:close_crimenet_filters_gui()
 	self._crimenet_filters_gui = CrimeNetFiltersGui:new(self._ws, self._fullscreen_ws, node)
@@ -1043,15 +1060,11 @@ function MenuComponentManager:start_crimenet_job()
 end
 
 function MenuComponentManager:enable_crimenet()
-	if self._crimenet_gui then
-		self._crimenet_gui:enable_crimenet()
-	end
+	self._set_crimenet_enabled = self._set_crimenet_enabled == nil and true
 end
 
 function MenuComponentManager:disable_crimenet()
-	if self._crimenet_gui then
-		self._crimenet_gui:disable_crimenet()
-	end
+	self._set_crimenet_enabled = self._set_crimenet_enabled == nil and false
 end
 
 function MenuComponentManager:update_crimenet_gui(t, dt)

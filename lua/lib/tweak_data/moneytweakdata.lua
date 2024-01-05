@@ -88,6 +88,20 @@ function MoneyTweakData:init()
 	self.sell_weapon_multiplier = 0.25
 	self.sell_mask_multiplier = 0.25
 	self.killing_civilian_deduction = self._create_value_table(2000, 20000, 10, true, 2)
+	self.buy_premium_multiplier = {
+		easy = 1.725,
+		normal = 1.725,
+		hard = 3.45,
+		overkill = 5.175,
+		overkill_145 = 6.9
+	}
+	self.buy_premium_static_fee = {
+		easy = 500000,
+		normal = 500000,
+		hard = 1000000,
+		overkill = 1500000,
+		overkill_145 = 2000000
+	}
 	self.global_value_multipliers = {}
 	self.global_value_multipliers.normal = 1
 	self.global_value_multipliers.superior = 1

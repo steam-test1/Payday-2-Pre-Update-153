@@ -716,6 +716,33 @@ function MoneyManager:get_mission_asset_cost_by_id(id)
 	return math.round(value * managers.player:upgrade_value("player", "assets_cost_multiplier", 1) * managers.player:upgrade_value("player", "passive_assets_cost_multiplier", 1) * managers.player:upgrade_value("player", "buy_cost_multiplier", 1) * managers.player:upgrade_value("player", "crime_net_deal", 1))
 end
 
+function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
+	local job_data = tweak_data.narrative.jobs[job_id]
+	if not job_data then
+		return 0
+	end
+	local stars = job_data.jc / 10
+	local total_payout, stage_payout_table, job_payout_table = self:get_contract_money_by_stars(stars, difficulty_id - 2, #job_data.chain)
+	local diffs = {
+		"easy",
+		"normal",
+		"hard",
+		"overkill",
+		"overkill_145"
+	}
+	return total_payout * tweak_data:get_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + tweak_data:get_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
+end
+
+function MoneyManager:can_afford_buy_premium_contract(job_id, difficulty_id)
+	local amount = self:get_cost_of_premium_contract(job_id, difficulty_id)
+	return amount <= self:offshore()
+end
+
+function MoneyManager:on_buy_premium_contract(job_id, difficulty_id)
+	local amount = self:get_cost_of_premium_contract(job_id, difficulty_id)
+	self:deduct_from_offshore(amount)
+end
+
 function MoneyManager:total()
 	return Application:digest_value(self._global.total, false)
 end
@@ -777,6 +804,18 @@ function MoneyManager:_deduct_from_total(amount)
 	self:_set_total(math.max(0, self:total() - amount))
 	self:_set_total_spent(self:total_spent() + amount)
 	self:_on_total_changed(-amount, -amount, 0)
+end
+
+function MoneyManager:deduct_from_offshore(amount)
+	amount = math.round(amount)
+	print("MoneyManager:deduct_from_offshore", amount)
+	self:_deduct_from_offshore(amount)
+end
+
+function MoneyManager:_deduct_from_offshore(amount)
+	amount = math.min(amount, self:offshore())
+	self:_set_offshore(math.max(0, self:offshore() - amount))
+	self:_on_total_changed(0, 0, -amount)
 end
 
 function MoneyManager:_on_total_changed(amount, spending_cash, offshore)

@@ -766,6 +766,26 @@ function MenuManager:show_confirm_mission_asset_buy(params)
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_confirm_buy_premium_contract(params)
+	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_premium_buy_title")
+	dialog_data.text = managers.localization:text("menu_cn_premium_buy_fee", {
+		contract_fee = params.contract_fee,
+		offshore = params.offshore
+	})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("menu_cn_premium_buy_accept")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_accept_crime_net_job(params)
 	local dialog_data = {}
 	dialog_data.title = params.title

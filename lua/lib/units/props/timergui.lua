@@ -1,4 +1,7 @@
 TimerGui = TimerGui or class()
+TimerGui.EVENT_IDS = {}
+TimerGui.EVENT_IDS.jammed = 1
+TimerGui.EVENT_IDS.unjammed = 2
 
 function TimerGui:init(unit)
 	self._unit = unit
@@ -163,8 +166,12 @@ function TimerGui:set_visible(visible)
 	self._gui:set_visible(visible)
 end
 
-function TimerGui:sync_set_jammed(jammed)
-	self:_set_jammed(jammed)
+function TimerGui:sync_net_event(event_id)
+	if event_id == TimerGui.EVENT_IDS.jammed then
+		self:_set_jammed(true)
+	elseif event_id == TimerGui.EVENT_IDS.unjammed then
+		self:_set_jammed(false)
+	end
 end
 
 function TimerGui:set_jammed(jammed)
@@ -172,7 +179,8 @@ function TimerGui:set_jammed(jammed)
 		self._unit:damage():run_sequence_simple("jammed_trigger")
 	end
 	if managers.network:session() then
-		managers.network:session():send_to_peers_synched("set_jammed_timer_gui", self._unit, jammed)
+		local event_id = jammed and TimerGui.EVENT_IDS.jammed or TimerGui.EVENT_IDS.unjammed
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "timer_gui", event_id)
 	end
 	self:_set_jammed(jammed)
 end

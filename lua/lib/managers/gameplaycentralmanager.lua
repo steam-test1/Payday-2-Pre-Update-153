@@ -30,6 +30,7 @@ function GamePlayCentralManager:init()
 	}
 	self._enemy_contour_units = {}
 	self._friendly_contour_units = {}
+	self._marked_contour_units = {}
 	self:_init_impact_sources()
 	local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	self._flashlights_on = lvl_tweak_data and lvl_tweak_data.flashlights_on
@@ -195,7 +196,11 @@ function GamePlayCentralManager:update(t, dt)
 				end
 			end
 			if data.opacity ~= data.target_opacity then
-				data.opacity = math.step(data.opacity, data.target_opacity, 0.3 * dt)
+				if unit:character_damage():dead() then
+					data.opacity = data.target_opacity
+				else
+					data.opacity = math.step(data.opacity, data.target_opacity, 0.3 * dt)
+				end
 				for _, material in ipairs(data.materials) do
 					material:set_variable(idstr_contour_opacity, math.min(1.5, data.opacity))
 				end
@@ -206,6 +211,30 @@ function GamePlayCentralManager:update(t, dt)
 				unit:base():swap_material_config()
 				unit:base():set_allow_invisible(true)
 				unit:character_damage():on_marked_state(false)
+			end
+		end
+	end
+	for key, data in pairs(self._marked_contour_units) do
+		local unit = data.unit
+		if not alive(unit) then
+			self._marked_contour_units[key] = nil
+			managers.occlusion:add_occlusion(unit)
+		else
+			if data.color ~= data.target_color then
+				data.color = math.step(data.color, data.target_color, 0.3 * dt)
+				for _, material in ipairs(data.materials) do
+					material:set_variable(idstr_contour_color, data.color)
+				end
+			end
+			if data.opacity ~= data.target_opacity then
+				data.opacity = math.step(data.opacity, data.target_opacity, 0.3 * dt)
+				for _, material in ipairs(data.materials) do
+					material:set_variable(idstr_contour_opacity, math.min(1.5, data.opacity))
+				end
+			end
+			if data.opacity == data.target_opacity then
+				self._marked_contour_units[key] = nil
+				managers.occlusion:add_occlusion(unit)
 			end
 		end
 	end
@@ -289,6 +318,24 @@ function GamePlayCentralManager:add_friendly_contour(unit)
 		m:set_variable(idstr_contour_opacity, 1)
 	end
 	self._friendly_contour_units[unit:key()] = {unit = unit, materials = materials}
+end
+
+function GamePlayCentralManager:add_marked_contour_unit(unit)
+	managers.occlusion:remove_occlusion(unit)
+	local color = tweak_data.contour.character.dangerous_color
+	local materials = unit:get_objects_by_type(idstr_material)
+	for _, m in ipairs(materials) do
+		m:set_variable(idstr_contour_color, color)
+		m:set_variable(idstr_contour_opacity, 0)
+	end
+	self._marked_contour_units[unit:key()] = {
+		unit = unit,
+		materials = materials,
+		color = color,
+		target_color = color,
+		opacity = 1.5,
+		target_opacity = 0
+	}
 end
 
 function GamePlayCentralManager:add_contour_unit(unit, type)

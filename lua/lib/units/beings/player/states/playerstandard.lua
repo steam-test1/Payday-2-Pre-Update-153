@@ -51,6 +51,8 @@ function PlayerStandard:init(unit)
 	self._last_sent_pos = unit:position()
 	self._last_sent_pos_t = 0
 	self._state_data = unit:movement()._state_data
+	self.RUN_AND_SHOOT = managers.player:has_category_upgrade("player", "run_and_shoot")
+	self.RUN_AND_RELOAD = managers.player:has_category_upgrade("player", "run_and_reload")
 end
 
 function PlayerStandard:enter(state_data, enter_data)
@@ -667,7 +669,7 @@ function PlayerStandard:_start_action_running(t)
 		self._running_wanted = true
 		return
 	end
-	if self._shooting or self:_changing_weapon() or self._melee_expire_t or self._use_item_expire_t or self._state_data.in_air then
+	if not (not self._shooting or self.RUN_AND_SHOOT) or self:_changing_weapon() or self._melee_expire_t or self._use_item_expire_t or self._state_data.in_air then
 		self._running_wanted = true
 		return
 	end
@@ -688,8 +690,16 @@ function PlayerStandard:_start_action_running(t)
 	self:set_running(true)
 	self._end_running_expire_t = nil
 	self._start_running_t = t
-	self._ext_camera:play_redirect(self.IDS_START_RUNNING)
-	self:_interupt_action_reload(t)
+	if not self:_is_reloading() or not self.RUN_AND_RELOAD then
+		if not self.RUN_AND_SHOOT then
+			self._ext_camera:play_redirect(self.IDS_START_RUNNING)
+		else
+			self._ext_camera:play_redirect(self.IDS_IDLE)
+		end
+	end
+	if not self.RUN_AND_RELOAD then
+		self:_interupt_action_reload(t)
+	end
 	self:_interupt_action_steelsight(t)
 	self:_interupt_action_ducking(t)
 end
@@ -698,7 +708,9 @@ function PlayerStandard:_end_action_running(t)
 	if not self._end_running_expire_t then
 		local speed_multiplier = self._equipped_unit:base():exit_run_speed_multiplier()
 		self._end_running_expire_t = t + 0.4 / speed_multiplier
-		self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, speed_multiplier)
+		if not self.RUN_AND_SHOOT and (not self.RUN_AND_RELOAD or not self:_is_reloading()) then
+			self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, speed_multiplier)
+		end
 	end
 end
 
@@ -1013,6 +1025,8 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 				managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 				if input.btn_steelsight_state then
 					self._steelsight_wanted = true
+				elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not self.RUN_AND_SHOOT then
+					self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 				end
 			end
 		end
@@ -1024,6 +1038,8 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 			managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 			if input.btn_steelsight_state then
 				self._steelsight_wanted = true
+			elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not self.RUN_AND_SHOOT then
+				self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 			end
 		end
 	end
@@ -1133,11 +1149,11 @@ function PlayerStandard:is_equipping()
 	return self._equip_weapon_expire_t
 end
 
-function PlayerStandard:_add_unit_to_char_table(char_table, unit, unit_type, interaction_dist, interaction_through_walls, tight_area, priority, my_head_pos, cam_fwd)
+function PlayerStandard:_add_unit_to_char_table(char_table, unit, unit_type, interaction_dist, interaction_through_walls, tight_area, priority, my_head_pos, cam_fwd, ray_ignore_units)
 	if unit:unit_data().disable_shout and not unit:brain():interaction_voice() then
 		return
 	end
-	local u_head_pos = unit:movement():m_head_pos() + math.UP * 30
+	local u_head_pos = unit_type == 3 and unit:base():get_mark_check_position() or unit:movement():m_head_pos() + math.UP * 30
 	local vec = u_head_pos - my_head_pos
 	local dis = mvector3.normalize(vec)
 	local max_dis = interaction_dist
@@ -1153,7 +1169,7 @@ function PlayerStandard:_add_unit_to_char_table(char_table, unit, unit_type, int
 					unit_type = unit_type
 				})
 			else
-				local ray = World:raycast("ray", my_head_pos, u_head_pos, "slot_mask", self._slotmask_AI_visibility, "ray_type", "ai_vision")
+				local ray = World:raycast("ray", my_head_pos, u_head_pos, "slot_mask", self._slotmask_AI_visibility, "ray_type", "ai_vision", "ignore_unit", ray_ignore_units or {})
 				if not ray or 30 > mvector3.distance(ray.position, u_head_pos) then
 					table.insert(char_table, {
 						unit = unit,
@@ -1195,6 +1211,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 	local unit_type_enemy = 0
 	local unit_type_civilian = 1
 	local unit_type_teammate = 2
+	local unit_type_camera = 3
 	local is_whisper_mode = managers.groupai:state():whisper_mode()
 	if prime_target then
 		if prime_target.unit_type == unit_type_teammate then
@@ -1258,6 +1275,9 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 				else
 					voice_type = "stop_cop"
 				end
+			elseif prime_target.unit_type == unit_type_camera then
+				plural = false
+				voice_type = "mark_camera"
 			elseif tweak_data.character[prime_target.unit:base()._tweak_table].is_escort then
 				plural = false
 				local e_guy = prime_target.unit
@@ -1303,7 +1323,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 				voice_type = "come"
 			else
 				for _, char in pairs(char_table) do
-					if char.unit_type ~= unit_type_teammate and (not is_whisper_mode or not char.unit:movement():cool()) then
+					if char.unit_type ~= unit_type_camera and char.unit_type ~= unit_type_teammate and (not is_whisper_mode or not char.unit:movement():cool()) then
 						if char.unit_type == unit_type_civilian then
 							amount = (amount or tweak_data.player.long_dis_interaction.intimidate_strength) * managers.player:upgrade_value("player", "civ_intimidation_mul", 1)
 						end
@@ -1325,6 +1345,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	local unit_type_enemy = 0
 	local unit_type_civilian = 1
 	local unit_type_teammate = 2
+	local unit_type_camera = 3
 	local cam_fwd = self._ext_camera:forward()
 	local my_head_pos = self._ext_movement:m_head_pos()
 	local range_mul = managers.player:upgrade_value("player", "intimidate_range_mul", 1) * managers.player:upgrade_value("player", "passive_intimidate_range_mul", 1)
@@ -1383,6 +1404,15 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 			end
 			if not added and not u_data.is_deployable and not u_data.unit:movement():downed() and not u_data.unit:base().is_local_player then
 				self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_teammate, 100000, true, true, 0.01, my_head_pos, cam_fwd)
+			end
+		end
+	end
+	if managers.groupai:state():whisper_mode() then
+		for _, unit in ipairs(SecurityCamera.cameras) do
+			if alive(unit) and unit:enabled() and not unit:base():destroyed() then
+				local dist = 2000
+				local prio = 0.001
+				self:_add_unit_to_char_table(char_table, unit, unit_type_camera, dist, false, false, prio, my_head_pos, cam_fwd, {unit})
 			end
 		end
 	end
@@ -1484,6 +1514,11 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "undercover_interrogate" then
 			sound_name = "und_18"
 			interact_type = "cmd_point"
+		elseif voice_type == "mark_camera" then
+			sound_name = "quiet"
+			interact_type = "cmd_point"
+			managers.game_play_central:add_marked_contour_unit(prime_target.unit)
+			managers.network:session():send_to_peers_synched("mark_contour_unit", prime_target.unit)
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
 	end
@@ -1734,7 +1769,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						new_action = true
 						self:_start_action_reload_enter(t)
 					end
-				elseif self._running then
+				elseif self._running and not self.RUN_AND_SHOOT then
 					self:_interupt_action_running(t)
 				else
 					if not self._shooting then
@@ -1826,7 +1861,9 @@ end
 function PlayerStandard:_start_action_reload_enter(t)
 	if self._equipped_unit:base():can_reload() then
 		self:_interupt_action_steelsight(t)
-		self:_interupt_action_running(t)
+		if not self.RUN_AND_RELOAD then
+			self:_interupt_action_running(t)
+		end
 		if self._equipped_unit:base():reload_enter_expire_t() then
 			local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier()
 			self._ext_camera:play_redirect(Idstring("reload_enter_" .. self._equipped_unit:base().name_id), speed_multiplier)

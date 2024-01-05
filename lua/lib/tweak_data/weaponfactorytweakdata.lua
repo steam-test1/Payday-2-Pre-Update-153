@@ -51,7 +51,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_ass_smg_large/wpn_fps_upg_ns_ass_smg_large",
 		stats = {
 			value = 5,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 3,
 			spread_moving = -3,
@@ -76,7 +76,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_ass_smg_medium/wpn_fps_upg_ns_ass_smg_medium",
 		stats = {
 			value = 2,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 1,
 			spread_moving = -2,
@@ -101,7 +101,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_ass_smg_small/wpn_fps_upg_ns_ass_smg_small",
 		stats = {
 			value = 3,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 0,
 			spread_moving = -1,
@@ -126,7 +126,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_pis_large/wpn_fps_upg_ns_pis_large",
 		stats = {
 			value = 5,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 2,
 			spread_moving = -2,
@@ -151,7 +151,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_pis_medium/wpn_fps_upg_ns_pis_medium",
 		stats = {
 			value = 1,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 1,
 			spread_moving = -2,
@@ -176,7 +176,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_pis_small/wpn_fps_upg_ns_pis_small",
 		stats = {
 			value = 3,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 0,
 			spread_moving = -1,
@@ -201,7 +201,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		unit = "units/payday2/weapons/wpn_fps_upg_ns_shot_thick/wpn_fps_upg_ns_shot_thick",
 		stats = {
 			value = 7,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 1,
 			spread_moving = -2,

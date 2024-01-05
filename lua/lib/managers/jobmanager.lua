@@ -282,6 +282,22 @@ function JobManager:current_job_and_difficulty_stars()
 	return self:current_job_stars() + difficulty_id
 end
 
+function JobManager:get_max_jc_for_player()
+	local data = tweak_data.narrative.STARS[math.clamp(managers.experience:level_to_stars(), 1, 10)]
+	if not data then
+		return
+	end
+	local jcs = data.jcs
+	if not jcs then
+		return
+	end
+	local max_jc = 0
+	for _, jc in ipairs(jcs) do
+		max_jc = math.max(max_jc, jc)
+	end
+	return max_jc
+end
+
 function JobManager:set_stage_success(success)
 	self._stage_success = success
 end

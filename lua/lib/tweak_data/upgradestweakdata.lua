@@ -110,7 +110,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.damage_shake_multiplier = {0.5}
 	self.values.player.bleed_out_health_multiplier = {1.25}
 	self.values.shotgun.recoil_multiplier = {0.75}
-	self.values.shotgun.damage_multiplier = {1.2}
+	self.values.shotgun.damage_multiplier = {1.33}
 	self.values.ammo_bag.ammo_increase = {2}
 	self.values.ammo_bag.quantity = {1}
 	self.values.shotgun.reload_speed_multiplier = {1.5}
@@ -122,7 +122,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.assault_rifle.hip_fire_spread_multiplier = {0.8}
 	self.values.smg.hip_fire_spread_multiplier = {0.8}
 	self.values.saw.hip_fire_spread_multiplier = {0.8}
-	self.values.player.saw_speed_multiplier = {0.9, 0.7}
+	self.values.player.saw_speed_multiplier = {0.95, 0.65}
 	self.values.saw.lock_damage_multiplier = {1.2, 1.4}
 	self.values.saw.enemy_slicer = {true}
 	self.values.player.melee_damage_health_ratio_multiplier = {5}
@@ -232,9 +232,11 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.passive_dodge_chance = {0.05, 0.15}
 	self.values.weapon.passive_swap_speed_multiplier = {1.2, 2}
 	self.values.player.passive_suspicion_multiplier = {0.75}
-	self.values.player.passive_armor_movement_penalty_multiplier = {0.5}
+	self.values.player.passive_armor_movement_penalty_multiplier = {0.75}
 	self.values.player.passive_loot_drop_multiplier = {1.1}
 	self.values.weapon.armor_piercing_chance = {0.15}
+	self.values.player.run_and_shoot = {true}
+	self.values.player.run_and_reload = {true}
 end
 
 function UpgradesTweakData:init()
@@ -1999,6 +2001,24 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "revive_health_boost",
+			value = 1
+		}
+	}
+	self.definitions.player_run_and_shoot = {
+		category = "feature",
+		name_id = "menu_player_run_and_shoot",
+		upgrade = {
+			category = "player",
+			upgrade = "run_and_shoot",
+			value = 1
+		}
+	}
+	self.definitions.player_run_and_reload = {
+		category = "feature",
+		name_id = "menu_player_run_and_reload",
+		upgrade = {
+			category = "player",
+			upgrade = "run_and_reload",
 			value = 1
 		}
 	}

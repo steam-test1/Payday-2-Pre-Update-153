@@ -1215,13 +1215,6 @@ function UnitNetworkHandler:start_timer_gui(unit, timer, sender)
 	unit:timer_gui():sync_start(timer)
 end
 
-function UnitNetworkHandler:set_jammed_timer_gui(unit, bool)
-	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
-		return
-	end
-	unit:timer_gui():sync_set_jammed(bool)
-end
-
 function UnitNetworkHandler:give_equipment(equipment, amount, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
@@ -1646,6 +1639,16 @@ function UnitNetworkHandler:set_contour(unit, state)
 		return
 	end
 	unit:base():set_contour(state)
+end
+
+function UnitNetworkHandler:mark_contour_unit(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	managers.game_play_central:add_marked_contour_unit(unit)
 end
 
 function UnitNetworkHandler:mark_enemy(unit, marking_strength, sender)

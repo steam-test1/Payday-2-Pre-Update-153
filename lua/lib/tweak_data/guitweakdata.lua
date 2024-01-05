@@ -11,6 +11,11 @@ function GuiTweakData:init()
 	self.suspicion_to_visibility[3] = {}
 	self.suspicion_to_visibility[3].name_id = "bm_menu_concealment_high"
 	self.suspicion_to_visibility[3].max_index = 30
+	self.mouse_pointer = {}
+	self.mouse_pointer.controller = {}
+	self.mouse_pointer.controller.acceleration_speed = 4
+	self.mouse_pointer.controller.max_acceleration = 3
+	self.mouse_pointer.controller.mouse_pointer_speed = 125
 	self.crime_net = {}
 	self.crime_net.controller = {}
 	self.crime_net.controller.snap_distance = 50
@@ -18,7 +23,7 @@ function GuiTweakData:init()
 	self.crime_net.job_vars = {}
 	self.crime_net.job_vars.max_active_jobs = 10
 	self.crime_net.job_vars.active_job_time = 25
-	self.crime_net.job_vars.new_job_min_time = 0.5
+	self.crime_net.job_vars.new_job_min_time = 1.5
 	self.crime_net.job_vars.new_job_max_time = 3.5
 	self.crime_net.job_vars.refresh_servers_time = 5
 	self.crime_net.job_vars.total_active_jobs = 40
@@ -28,12 +33,6 @@ function GuiTweakData:init()
 	self.crime_net.debug_options.mass_spawn = false
 	self.crime_net.debug_options.mass_spawn_limit = 100
 	self.crime_net.debug_options.mass_spawn_timer = 0.04
-	self.crime_net.locations = {}
-	self.mouse_pointer = {}
-	self.mouse_pointer.controller = {}
-	self.mouse_pointer.controller.acceleration_speed = 4
-	self.mouse_pointer.controller.max_acceleration = 3
-	self.mouse_pointer.controller.mouse_pointer_speed = 125
 	self.crime_net.regions = {
 		{
 			closed = true,
@@ -972,6 +971,17 @@ function GuiTweakData:init()
 			zoom = 4
 		}
 	}
+	self.crime_net.special_contracts = {
+		{
+			id = "premium_buy",
+			name_id = "menu_cn_premium_buy",
+			desc_id = "menu_cn_premium_buy_desc",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_marker_buy"
+		}
+	}
+	self.crime_net.locations = {}
 	if not Application:production_build() or SystemInfo:platform() ~= Idstring("WIN32") then
 		self.crime_net.locations = {
 			{

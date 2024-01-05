@@ -737,7 +737,6 @@ function TweakData:init()
 	self.interaction.pick_lock_hard.text_id = "hud_int_pick_lock"
 	self.interaction.pick_lock_hard.start_active = true
 	self.interaction.pick_lock_hard.timer = 45
-	self.interaction.pick_lock_hard.interact_distance = 100
 	self.interaction.pick_lock_hard.requires_upgrade = {
 		category = "player",
 		upgrade = "pick_lock_hard"

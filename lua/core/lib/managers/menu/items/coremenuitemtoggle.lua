@@ -81,7 +81,7 @@ function ItemToggle:setup_gui(node, row_item)
 		row_item.gui_title:set_text(managers.localization:text(self:parameter("title_id")))
 	end
 	if not self:enabled() then
-		row_item.color = _G.tweak_data.menu.default_disabled_text_color
+		row_item.color = row_item.disabled_color
 		row_item.row_item_color = row_item.color
 		row_item.gui_text:set_color(row_item.color)
 	end
@@ -100,9 +100,10 @@ function ItemToggle:setup_gui(node, row_item)
 				24,
 				24
 			},
-			texture = self:selected_option():parameters().icon
+			texture = self:selected_option():parameters().icon,
+			blend_mode = node.row_item_blend_mode
 		})
-		row_item.gui_icon:set_color(_G.tweak_data.menu.default_disabled_text_color)
+		row_item.gui_icon:set_color(row_item.disabled_color)
 	end
 	if row_item.help_text then
 	end
@@ -116,6 +117,7 @@ local xl_pad = 64
 
 function ItemToggle:reload(row_item, node)
 	local safe_rect = managers.gui_data:scaled_size()
+	row_item.gui_text:set_color(row_item.color)
 	row_item.gui_text:set_font_size(node.font_size)
 	local x, y, w, h = row_item.gui_text:text_rect()
 	row_item.gui_text:set_height(h)
@@ -190,9 +192,9 @@ function ItemToggle:_set_toggle_item_image(row_item)
 			row_item.gui_icon:set_image(self:selected_option():parameters().icon, x, y, w, h)
 		end
 		if self:enabled() then
-			row_item.gui_icon:set_color(Color.white)
+			row_item.gui_icon:set_color(row_item.color or Color.white)
 		else
-			row_item.gui_icon:set_color(_G.tweak_data.menu.default_disabled_text_color)
+			row_item.gui_icon:set_color(row_item.disabled_color)
 		end
 	end
 end

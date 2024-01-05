@@ -338,8 +338,8 @@ function ExperienceManager:get_contract_xp_by_stars(job_stars, risk_stars, profe
 		params.current_stage = i
 		params.on_last_stage = i == job_days
 		local total_xp, dissection_table = self:get_xp_by_params(params)
-		total_base_xp = total_base_xp + dissection_table.base + dissection_table.bonus_days
-		total_risk_xp = total_risk_xp + dissection_table.bonus_risk
+		total_base_xp = total_base_xp + dissection_table.base + dissection_table.bonus_days_job
+		total_risk_xp = total_risk_xp + dissection_table.bonus_risk + dissection_table.bonus_days_risk
 	end
 	total_xp = total_base_xp + total_risk_xp
 	return total_xp, total_base_xp, total_risk_xp
@@ -412,6 +412,8 @@ function ExperienceManager:get_xp_by_params(params)
 	total_xp = total_xp + skill_dissect
 	days_dissect = math.round(contract_xp * days_multiplier - contract_xp)
 	total_xp = total_xp + days_dissect
+	local days_dissect_risk = math.round(days_dissect * (risk_dissect / (base_xp + risk_dissect)))
+	local days_dissect_job = days_dissect - days_dissect_risk
 	local dissection_table = {
 		bonus_risk = math.round(risk_dissect),
 		bonus_num_players = math.round(alive_crew_dissect),
@@ -419,6 +421,8 @@ function ExperienceManager:get_xp_by_params(params)
 		bonus_low_level = math.round(level_limit_dissect),
 		bonus_skill = math.round(skill_dissect),
 		bonus_days = math.round(days_dissect),
+		bonus_days_job = math.round(days_dissect_job),
+		bonus_days_risk = math.round(days_dissect_risk),
 		stage_xp = math.round(stage_xp_dissect),
 		job_xp = math.round(job_xp_dissect),
 		base = math.round(base_xp),

@@ -626,13 +626,13 @@ function WeaponTweakData:_init_stats()
 		1500,
 		1200,
 		1000,
-		900,
-		800,
+		850,
 		700,
-		600,
 		500,
-		400,
-		200
+		350,
+		200,
+		100,
+		0
 	}
 	self.stats.suppression = {
 		4.5,
