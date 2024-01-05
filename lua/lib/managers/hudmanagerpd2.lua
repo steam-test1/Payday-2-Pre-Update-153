@@ -766,12 +766,10 @@ end
 
 function HUDManager:temp_show_carry_bag(carry_id, value)
 	self._hud_temp:show_carry_bag(carry_id, value)
-	self._sound_source:post_event("Play_bag_generic_pickup")
 end
 
 function HUDManager:temp_hide_carry_bag()
 	self._hud_temp:hide_carry_bag()
-	self._sound_source:post_event("Play_bag_generic_throw")
 end
 
 function HUDManager:set_stamina_value(value)
@@ -1253,8 +1251,8 @@ function HUDManager:set_slot_not_ready(peer, peer_id)
 	self._hud_mission_briefing:set_slot_not_ready(peer, peer_id)
 end
 
-function HUDManager:set_dropin_progress(peer_id, progress_percentage)
-	self._hud_mission_briefing:set_dropin_progress(peer_id, progress_percentage)
+function HUDManager:set_dropin_progress(peer_id, progress_percentage, mode)
+	self._hud_mission_briefing:set_dropin_progress(peer_id, progress_percentage, mode)
 end
 
 function HUDManager:set_player_slots_kit(slot)
@@ -1411,4 +1409,8 @@ function HUDManager:_create_test_circle()
 		total = 10
 	})
 	self._test_circle._circle:animate(callback(self, self, "_animate_test_circle"))
+end
+
+function HUDManager:set_blackscreen_loading_text_status(status)
+	self._hud_blackscreen:set_loading_text_status(status)
 end

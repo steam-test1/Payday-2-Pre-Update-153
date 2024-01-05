@@ -943,9 +943,6 @@ end
 
 function GroupAIStateBase:on_tase_start(cop_key, criminal_key)
 	self._criminals[criminal_key].being_tased = cop_key
-	if managers.player:player_unit() and alive(self._criminals[criminal_key].unit) and self._criminals[criminal_key].unit:key() == managers.player:player_unit():key() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.its_alive_its_alive.mask then
-		managers.achievment:award_progress(tweak_data.achievement.its_alive_its_alive.stat)
-	end
 end
 
 function GroupAIStateBase:on_tase_end(criminal_key)
@@ -2105,7 +2102,7 @@ function GroupAIStateBase:_update_point_of_no_return(t, dt)
 		self._is_inside_point_of_no_return = is_inside
 		if managers.network:session() then
 			if not Network:is_server() then
-				managers.network:session():send_to_host("is_inside_point_of_no_return", is_inside, managers.network:session():local_peer():id())
+				managers.network:session():send_to_host("is_inside_point_of_no_return", is_inside)
 			else
 				self:set_is_inside_point_of_no_return(managers.network:session():local_peer():id(), is_inside)
 			end
@@ -2429,6 +2426,7 @@ end
 function GroupAIStateBase:set_assault_mode(enabled)
 	if self._assault_mode ~= enabled then
 		self._assault_mode = enabled
+		self:set_ambience_flag()
 		SoundDevice:set_state("wave_flag", enabled and "assault" or "control")
 		managers.network:session():send_to_peers_synched("sync_assault_mode", enabled)
 		if not enabled then
@@ -2452,6 +2450,7 @@ end
 function GroupAIStateBase:sync_assault_mode(enabled)
 	if self._assault_mode ~= enabled then
 		self._assault_mode = enabled
+		self:set_ambience_flag()
 		SoundDevice:set_state("wave_flag", enabled and "assault" or "control")
 	end
 	if SystemInfo:platform() == Idstring("WIN32") and managers.network and managers.network.account:has_alienware() then
@@ -2467,6 +2466,7 @@ function GroupAIStateBase:set_fake_assault_mode(enabled)
 	if self._fake_assault_mode ~= enabled then
 		self._fake_assault_mode = enabled
 		if self._assault_mode ~= enabled or not self._assault_mode then
+			self:set_ambience_flag()
 			SoundDevice:set_state("wave_flag", enabled and "assault" or "control")
 			managers.music:post_event(tweak_data.levels:get_music_event(enabled and "fake_assault" or "control"))
 		end
@@ -2477,12 +2477,23 @@ function GroupAIStateBase:whisper_mode()
 	return self._whisper_mode
 end
 
+function GroupAIStateBase:set_ambience_flag()
+	if self._whisper_mode then
+		SoundDevice:set_state("ambience_flag", "whisper")
+	elseif self._assault_mode or self._fake_assault_mode then
+		SoundDevice:set_state("ambience_flag", "assault")
+	else
+		SoundDevice:set_state("ambience_flag", "control")
+	end
+end
+
 function GroupAIStateBase:set_whisper_mode(enabled)
 	enabled = enabled and true or false
 	if enabled == self._whisper_mode then
 		return
 	end
 	self._whisper_mode = enabled
+	self:set_ambience_flag()
 	if Network:is_server() and not enabled and not self._switch_to_not_cool_clbk_id then
 		self._switch_to_not_cool_clbk_id = "GroupAI_delayed_not_cool"
 		managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_clbk_switch_enemies_to_not_cool"), self._t + 1)
@@ -3528,6 +3539,9 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	end
 	local u_key = unit:key()
 	local u_data = self._police[u_key]
+	if not u_data then
+		return
+	end
 	local minions = self._criminals[player_unit:key()].minions or {}
 	self._criminals[player_unit:key()].minions = minions
 	local max_minions = 0
@@ -4290,9 +4304,7 @@ function GroupAIStateBase:on_criminal_suspicion_progress(u_suspect, u_observer, 
 				if obs_susp_data.icon_id2 then
 					managers.hud:remove_waypoint(obs_susp_data.icon_id2)
 				end
-				if susp_key then
-					susp_data[obs_key] = nil
-				end
+				susp_data[obs_key] = nil
 				_sync_status(0)
 			end
 		end
@@ -4301,13 +4313,13 @@ function GroupAIStateBase:on_criminal_suspicion_progress(u_suspect, u_observer, 
 			if obs_susp_data.alerted then
 				return
 			end
+			_sync_status(1)
 		elseif not obs_susp_data then
 			local icon_id = "susp1" .. tostring(obs_key)
 			local icon_pos = self._create_hud_suspicion_icon(obs_key, u_observer, "wp_suspicious", tweak_data.hud.suspicion_color, icon_id)
 			obs_susp_data = {
 				u_observer = u_observer,
 				icon_id = icon_id,
-				suspects = {},
 				icon_pos = icon_pos
 			}
 			susp_data[obs_key] = obs_susp_data
@@ -4321,6 +4333,7 @@ function GroupAIStateBase:on_criminal_suspicion_progress(u_suspect, u_observer, 
 			_sync_status(1)
 		end
 		if susp_key then
+			obs_susp_data.suspects = obs_susp_data.suspects or {}
 			if obs_susp_data.suspects[susp_key] then
 				obs_susp_data.suspects[susp_key].status = status
 			else

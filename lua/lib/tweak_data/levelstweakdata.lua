@@ -678,7 +678,7 @@ function LevelsTweakData:init()
 		"Play_pln_bb1_end_04"
 	}
 	self.big.music = "heist"
-	self.big.package = "packages/level_debug"
+	self.big.package = "packages/narr_big"
 	self.big.cube = "cube_apply_heist_bank"
 	self.roberts = {}
 	self.roberts.name_id = "heist_roberts_hl"
@@ -714,6 +714,15 @@ function LevelsTweakData:init()
 	self.heat.music = "heist"
 	self.heat.package = "packages/narr_heat"
 	self.heat.cube = "cube_apply_heist_bank"
+	self.hoxton = {}
+	self.hoxton.name_id = "heist_hoxton_hl"
+	self.hoxton.briefing_id = "heist_hoxton_briefing"
+	self.hoxton.world_name = "wip/hox_2"
+	self.hoxton.intro_event = "lol"
+	self.hoxton.outro_event = {"lol", "lolo"}
+	self.hoxton.music = "heist"
+	self.hoxton.package = "packages/narr_heat"
+	self.hoxton.cube = "cube_apply_heist_bank"
 	self.monolithic_1 = {}
 	self.monolithic_1.name_id = "heist_monolithic_1_hl"
 	self.monolithic_1.briefing_id = "heist_monolithic_1_briefing"
@@ -750,32 +759,47 @@ function LevelsTweakData:init()
 	self.blueharvest_3.music = "heist"
 	self.blueharvest_3.package = "packages/level_debug"
 	self.blueharvest_3.cube = "cube_apply_heist_bank"
-	self.mia = {}
-	self.mia.name_id = "heist_mia_hl"
-	self.mia.briefing_id = "heist_mia_briefing"
-	self.mia.briefing_dialog = "Play_pln_mia_brief"
-	self.mia.world_name = "wip/hm"
-	self.mia.intro_event = "Play_pln_firestarter_stage3_intro_a"
-	self.mia.outro_event = {
+	self.mia_1 = {}
+	self.mia_1.name_id = "heist_mia_1_hl"
+	self.mia_1.briefing_id = "heist_mia_1_briefing"
+	self.mia_1.briefing_dialog = "Play_pln_mia_brief"
+	self.mia_1.world_name = "wip/hm_stage1"
+	self.mia_1.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.mia_1.outro_event = {
 		"Play_pln_firestarter_stage3_end_a",
 		"Play_pln_firestarter_stage3_end_b"
 	}
-	self.mia.music = "heist"
-	self.mia.package = "packages/narr_mia"
-	self.mia.cube = "cube_apply_heist_bank"
+	self.mia_1.music = "heist"
+	self.mia_1.package = "packages/narr_mia_1"
+	self.mia_1.cube = "cube_apply_heist_bank"
+	self.mia_2 = {}
+	self.mia_2.name_id = "heist_mia_2_hl"
+	self.mia_2.briefing_id = "heist_mia_2_briefing"
+	self.mia_2.briefing_dialog = "Play_pln_mia_brief"
+	self.mia_2.world_name = "wip/hm_stage2"
+	self.mia_2.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.mia_2.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.mia_2.music = "heist"
+	self.mia_2.package = "packages/narr_mia_2"
+	self.mia_2.cube = "cube_apply_heist_bank"
 	self.kosugi = {}
 	self.kosugi.name_id = "heist_kosugi_hl"
 	self.kosugi.briefing_id = "heist_kosugi_briefing"
 	self.kosugi.briefing_dialog = "Play_pln_ko1_brf_01"
-	self.kosugi.world_name = "wip/kosugi"
+	self.kosugi.world_name = "narratives/bain/shadow_raid"
 	self.kosugi.intro_event = "Play_pln_ko1_intro_01"
 	self.kosugi.outro_event = {
 		"Play_pln_ko1_end_01"
 	}
-	self.kosugi.music = "heist"
-	self.kosugi.package = "packages/level_debug"
+	self.kosugi.music = "no_music"
+	self.kosugi.music_ext = "kosugi_music"
+	self.kosugi.music_ext_start = "suspense_1"
+	self.kosugi.package = "packages/kosugi"
 	self.kosugi.cube = "cube_apply_heist_bank"
-	self.kosugi.ghost_bonus = 0.2
+	self.kosugi.ghost_bonus = 0.1
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -1315,8 +1339,10 @@ function LevelsTweakData:init()
 		"blueharvest_1",
 		"blueharvest_2",
 		"blueharvest_3",
-		"mia",
+		"mia_1",
+		"mia_2",
 		"kosugi",
+		"hoxton",
 		"test01",
 		"test02",
 		"test03",
@@ -1427,6 +1453,9 @@ function LevelsTweakData:get_music_switches()
 	end
 	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	local music_id = level_data and level_data.music or "default"
+	if music_id == "no_music" then
+		return nil
+	end
 	local switches = deep_clone(tweak_data.music[music_id].switches)
 	if infamous and tweak_data.music[music_id].switches_infamous then
 		for _, data in pairs(tweak_data.music[music_id].switches_infamous) do
@@ -1439,5 +1468,15 @@ end
 function LevelsTweakData:get_music_event(stage)
 	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	local music_id = level_data and level_data.music or "default"
+	if music_id == "no_music" then
+		return nil
+	end
 	return tweak_data.music[music_id][stage]
+end
+
+function LevelsTweakData:get_music_event_ext()
+	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
+	local music = level_data and level_data.music_ext
+	local music_start = level_data and level_data.music_ext_start
+	return music, music_start
 end

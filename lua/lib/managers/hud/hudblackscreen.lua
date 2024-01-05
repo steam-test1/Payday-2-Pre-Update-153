@@ -46,10 +46,25 @@ function HUDBlackScreen:init(hud)
 		font_size = nil,
 		font = tweak_data.hud.medium_font_noshadow
 	})
+	local loading_text = utf8.to_upper(managers.localization:text("menu_loading_progress", {prog = 0}))
+	local loading_text_object = self._blackscreen_panel:text({
+		name = "loading_text",
+		visible = false,
+		text = loading_text,
+		layer = 1,
+		color = Color.white,
+		y = 0,
+		align = "right",
+		vertical = "bottom",
+		font_size = nil,
+		font = tweak_data.hud.medium_font_noshadow
+	})
 	self._circle_radius = 16
 	self._sides = 64
 	skip_text:set_x(skip_text:x() - self._circle_radius * 3)
 	skip_text:set_y(skip_text:y() - self._circle_radius)
+	loading_text_object:set_x(loading_text_object:x() - self._circle_radius * 3)
+	loading_text_object:set_y(loading_text_object:y() - self._circle_radius)
 	self._skip_circle = CircleBitmapGuiObject:new(self._blackscreen_panel, {
 		image = "guis/textures/pd2/hud_progress_32px",
 		radius = self._circle_radius,
@@ -65,6 +80,31 @@ end
 
 function HUDBlackScreen:set_skip_circle(current, total)
 	self._skip_circle:set_current(current / total)
+end
+
+function HUDBlackScreen:set_loading_text_status(status)
+	if status then
+		self._blackscreen_panel:child("skip_text"):set_visible(false)
+		self._blackscreen_panel:child("loading_text"):set_visible(true)
+		if status == "allow_skip" then
+			self._blackscreen_panel:child("loading_text"):set_visible(false)
+			if Network:is_server() then
+				self._blackscreen_panel:child("skip_text"):set_visible(true)
+			end
+		elseif status == "wait_for_peers" then
+			local peer_name, peer_status = managers.network:session():peer_streaming_status()
+			local loading_text = utf8.to_upper(managers.localization:text("menu_waiting_for_players_progress", {player_name = peer_name, prog = peer_status}))
+			self._blackscreen_panel:child("loading_text"):set_text(loading_text)
+		else
+			local loading_text = utf8.to_upper(managers.localization:text("menu_loading_progress", {prog = status}))
+			self._blackscreen_panel:child("loading_text"):set_text(loading_text)
+		end
+	else
+		self._blackscreen_panel:child("loading_text"):set_visible(false)
+		if Network:is_server() then
+			self._blackscreen_panel:child("skip_text"):set_visible(true)
+		end
+	end
 end
 
 function HUDBlackScreen:skip_circle_done()

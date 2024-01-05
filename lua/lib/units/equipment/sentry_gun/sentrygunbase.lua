@@ -17,7 +17,7 @@ function SentryGunBase:_clbk_validate()
 		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
 			name = peer:name()
 		}))
-		managers.hud:mark_cheater(peer:id())
+		peer:mark_cheater()
 	end
 end
 

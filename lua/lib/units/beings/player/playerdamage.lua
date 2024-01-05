@@ -291,6 +291,9 @@ function PlayerDamage:damage_tase(attack_data)
 		self:_call_listeners(damage_info)
 		if attack_data.attacker_unit and attack_data.attacker_unit:alive() and attack_data.attacker_unit:base()._tweak_table == "taser" then
 			attack_data.attacker_unit:sound():say("post_tasing_taunt")
+			if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.its_alive_its_alive.mask then
+				managers.achievment:award_progress(tweak_data.achievement.its_alive_its_alive.stat)
+			end
 		end
 	end
 end

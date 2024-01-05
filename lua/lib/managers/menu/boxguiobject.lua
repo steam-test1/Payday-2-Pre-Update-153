@@ -18,11 +18,12 @@ function BoxGuiObject:create_sides(panel, config)
 		self._panel = nil
 	end
 	self._panel = panel:panel({
+		name = config.name,
 		halign = "grow",
 		valign = "grow",
 		layer = 1
 	})
-	self._color = Color.white
+	self._color = config.color or self._color or Color.white
 	local left_side = config.sides and config.sides[1] or config.left or 0
 	local right_side = config.sides and config.sides[2] or config.right or 0
 	local top_side = config.sides and config.sides[3] or config.top or 0

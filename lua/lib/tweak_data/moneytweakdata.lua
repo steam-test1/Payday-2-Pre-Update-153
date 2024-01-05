@@ -62,6 +62,10 @@ function MoneyTweakData:init()
 	self.bag_values.meth = 1000
 	self.bag_values.weapon = 950
 	self.bag_values.weapons = 950
+	self.bag_values.painting = 900
+	self.bag_values.samurai_suit = 1750
+	self.bag_values.artifact_statue = 1750
+	self.bag_values.circuit = 1000
 	self.bag_values.shells = 2100
 	self.bag_values.turret = 10000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)

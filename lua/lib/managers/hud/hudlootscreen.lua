@@ -578,7 +578,7 @@ function HUDLootScreen:feed_lootdrop(lootdrop_data)
 		end
 		Application:debug("Requesting Texture", texture_path, "PEER", peer_id)
 		if DB:has(Idstring("texture"), texture_path) then
-			TextureCache:request(texture_path, "NORMAL", texture_loaded_clbk)
+			TextureCache:request(texture_path, "NORMAL", texture_loaded_clbk, 100)
 		else
 			Application:error("[HUDLootScreen]", "Texture not in DB", texture_path, peer_id)
 			item_panel:rect({

@@ -201,7 +201,7 @@ function NetworkMember:sync_lobby_data(peer)
 	local menu_state_index = tweak_data:menu_sync_state_to_index(menu_state)
 	cat_print("multiplayer_base", "NetworkMember:sync_lobby_data to", peer:id(), " : ", peer_id, level)
 	local_peer:set_outfit_string(managers.blackmarket:outfit_string())
-	peer:send_after_load("lobby_info", peer_id, level, rank, character, mask_set, progress[1], progress[2], progress[3], progress[4] or -1)
+	peer:send_after_load("lobby_info", level, rank, character, mask_set)
 	peer:send_after_load("sync_profile", level, rank)
 	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string())
 	if menu_state_index then
@@ -269,7 +269,7 @@ function NetworkMember:place_deployable(id)
 			name = peer:name()
 		}))
 	end
-	managers.hud:mark_cheater(peer:id())
+	peer:mark_cheater()
 	print("[NetworkMember:place_deployable]: Failed to deploy equipment", self._peer:id(), id, self._deployable, self._depolyable_count)
 	return false
 end
@@ -302,7 +302,7 @@ function NetworkMember:place_bag(carry_id, amount)
 				name = peer:name()
 			}))
 		end
-		managers.hud:mark_cheater(peer:id())
+		peer:mark_cheater()
 		print("[NetworkMember:place_bag]: Failed to place bag", self._peer:id(), self._carry_id, carry_id, amount)
 		return false
 	end
@@ -315,7 +315,7 @@ function NetworkMember:set_grenade(value)
 		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_many_grenades_server" or "menu_chat_peer_cheated_many_grenades", {
 			name = peer:name()
 		}))
-		managers.hud:mark_cheater(peer:id())
+		peer:mark_cheater()
 		print("[NetworkMember:set_grenade]: Failed to use grenade", self._peer:id(), self._grenades, value)
 		return false
 	end

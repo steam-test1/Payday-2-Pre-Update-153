@@ -3,7 +3,7 @@ require("lib/managers/menu/MenuNodeKitGui")
 MenuKitRenderer = MenuKitRenderer or class(MenuLobbyRenderer)
 
 function MenuKitRenderer:init(logic)
-	local parameters = {layer = 0}
+	local parameters = {layer = 200}
 	MenuRenderer.init(self, logic, parameters)
 end
 
@@ -11,13 +11,22 @@ function MenuKitRenderer:_setup_bg()
 end
 
 function MenuKitRenderer:show_node(node)
+	local gui_class = MenuNodeKitGui
+	if node:parameters().gui_class then
+		gui_class = CoreSerialize.string_to_classtable(node:parameters().gui_class)
+	end
 	local parameters = {
+		row_item_color = tweak_data.screen_colors.button_stage_3,
+		row_item_hightlight_color = tweak_data.screen_colors.button_stage_2,
+		row_item_blend_mode = "add",
 		font = tweak_data.menu.pd2_medium_font,
-		row_item_color = tweak_data.menu.default_font_row_item_color,
-		row_item_hightlight_color = tweak_data.menu.default_hightlight_row_item_color,
-		node_gui_class = MenuNodeKitGui,
 		font_size = tweak_data.menu.pd2_medium_font_size,
-		spacing = node:parameters().spacing
+		node_gui_class = gui_class,
+		spacing = node:parameters().spacing,
+		marker_alpha = 0.6,
+		marker_color = tweak_data.screen_colors.button_stage_3:with_alpha(0.2),
+		align = "right",
+		to_upper = true
 	}
 	MenuKitRenderer.super.super.show_node(self, node, parameters)
 end

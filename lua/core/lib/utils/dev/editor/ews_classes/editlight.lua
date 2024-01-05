@@ -363,7 +363,7 @@ function EditUnitLight:update_spot_projection_texture()
 		if alive(unit) then
 			local light = unit:get_object(Idstring(self._lights_params.ctrlr:get_value()))
 			if light then
-				light:set_projection_texture(value, false)
+				light:set_projection_texture(Idstring(value), false, false)
 				unit:unit_data().projection_textures = unit:unit_data().projection_textures or {}
 				unit:unit_data().projection_textures[light:name():s()] = value
 			end

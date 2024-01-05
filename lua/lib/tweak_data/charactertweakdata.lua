@@ -282,15 +282,16 @@ function CharacterTweakData:_init_city_swat(presets)
 	}
 	self.city_swat.weapon_voice = "2"
 	self.city_swat.experience.cable_tie = "tie_swat"
+	self.city_swat.silent_priority_shout = "f37"
 	self.city_swat.speech_prefix_p1 = "l"
 	self.city_swat.speech_prefix_p2 = "n"
 	self.city_swat.speech_prefix_count = 4
 	self.city_swat.access = "swat"
 	self.city_swat.dodge = presets.dodge.athletic
-	self.city_swat.no_arrest = true
 	self.city_swat.chatter = presets.enemy_chatter.swat
 	self.city_swat.melee_weapon = "knife_1"
 	self.city_swat.steal_loot = true
+	self.city_swat.has_alarm_pager = true
 end
 
 function CharacterTweakData:_init_sniper(presets)
@@ -4447,7 +4448,7 @@ function CharacterTweakData:_presets(tweak_data)
 				[0.35] = 0.5
 			},
 			weapon_down = 0.2,
-			pants_down = 0.25
+			pants_down = 0.8
 		},
 		factors = {
 			isolated = 0.1,
@@ -4470,7 +4471,7 @@ function CharacterTweakData:_presets(tweak_data)
 				[0.2] = 0.25
 			},
 			weapon_down = 0.02,
-			pants_down = 0.2
+			pants_down = 0.6
 		},
 		factors = {
 			isolated = 0.05,

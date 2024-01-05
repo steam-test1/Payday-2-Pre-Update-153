@@ -40,17 +40,7 @@ end
 
 function NetworkManager:init(game_class)
 	self.OVERWRITEABLE_MSGS = {
-		request_character = {
-			clbk = NetworkManager.clbk_msg_overwrite
-		},
 		set_look_dir = {
-			clbk = NetworkManager.clbk_msg_overwrite
-		},
-		set_kit_selection = {
-			clbk = MenuItemKitSlot.clbk_msg_set_kit_selection,
-			categories = {}
-		},
-		set_mask_set = {
 			clbk = NetworkManager.clbk_msg_overwrite
 		},
 		criminal_hurt = {

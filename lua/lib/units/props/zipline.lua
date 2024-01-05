@@ -259,6 +259,14 @@ function ZipLine:speed()
 	return self._speed
 end
 
+function ZipLine:set_ai_ignores_bag(ai_ignores_bag)
+	self._ai_ignores_bag = ai_ignores_bag
+end
+
+function ZipLine:ai_ignores_bag()
+	return self._ai_ignores_bag
+end
+
 function ZipLine:set_slack(slack)
 	if not slack then
 		return

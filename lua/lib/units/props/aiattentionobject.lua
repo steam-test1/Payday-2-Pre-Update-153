@@ -101,6 +101,7 @@ function AIAttentionObject:remove_attention(id)
 		self._attention_data[id] = nil
 		if not next(self._attention_data) then
 			managers.groupai:state():unregister_AI_attention_object((self._parent_unit or self._unit):key())
+			self._attention_data = nil
 		end
 		self:_call_listeners()
 	end

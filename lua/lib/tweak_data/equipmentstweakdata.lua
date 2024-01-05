@@ -193,9 +193,14 @@ function EquipmentsTweakData:init()
 		sync_possession = true
 	}
 	self.specials.thermite = {
-		text_id = "debug_equipment_thermite",
+		text_id = "hud_equipment_thermite",
 		icon = "equipment_thermite",
 		action_message = "thermite_obtained",
+		sync_possession = true
+	}
+	self.specials.thermite_paste = {
+		text_id = "hud_equipment_thermite_paste",
+		icon = "equipment_thermite",
 		sync_possession = true
 	}
 	self.specials.gas = {

@@ -349,6 +349,11 @@ function ChatGui:set_max_lines(max_lines)
 end
 
 ChatGui.PRESETS = {}
+ChatGui.PRESETS.default = {
+	left = 0,
+	bottom = 70,
+	layer = 20
+}
 ChatGui.PRESETS.lobby = {
 	left = 0,
 	bottom = 50,
@@ -361,6 +366,15 @@ ChatGui.PRESETS.crimenet = {
 	chat_blur = true,
 	chat_bg_alpha = 0.25,
 	is_crimenet_chat = true
+}
+ChatGui.PRESETS.preplanning = {
+	left = 10,
+	bottom = 0,
+	layer = tweak_data.gui.MOUSE_LAYER - 100,
+	chat_blur = true,
+	chat_bg_alpha = 0.25,
+	is_crimenet_chat = true,
+	chat_button_align = "left"
 }
 
 function ChatGui:set_params(params)
@@ -385,6 +399,10 @@ function ChatGui:set_params(params)
 	chat_bg:set_alpha(params.chat_bg_alpha or 0)
 	chat_blur:set_visible(params.chat_blur)
 	hud_blur:set_visible(params.hud_blur)
+	self._chat_button_align = nil
+	if params.chat_button_align then
+		self._chat_button_align = params.chat_button_align
+	end
 	if params.is_crimenet_chat then
 		self:enable_crimenet_chat()
 	else
@@ -435,7 +453,13 @@ function ChatGui:_show_crimenet_chat()
 	}))
 	local _, _, w, h = chat_button:text_rect()
 	chat_button:set_size(w, h)
-	chat_button:set_right(chat_button_panel:w() / 2)
+	if self._chat_button_align == "left" then
+		chat_button:set_left(self._panel:left())
+	elseif self._chat_button_align == "right" then
+		chat_button:set_right(self._panel:right())
+	else
+		chat_button:set_right(chat_button_panel:w() / 2)
+	end
 	chat_button:set_bottom(chat_button_panel:h() - 11)
 	local blur_object = chat_button_panel:child("chat_button_blur")
 	blur_object:set_shape(chat_button:shape())
@@ -462,7 +486,13 @@ function ChatGui:_hide_crimenet_chat()
 	}))
 	local _, _, w, h = chat_button:text_rect()
 	chat_button:set_size(w, h)
-	chat_button:set_right(chat_button_panel:w() / 2)
+	if self._chat_button_align == "left" then
+		chat_button:set_left(self._panel:left())
+	elseif self._chat_button_align == "right" then
+		chat_button:set_right(self._panel:right())
+	else
+		chat_button:set_right(chat_button_panel:w() / 2)
+	end
 	chat_button:set_bottom(chat_button_panel:h() - 11)
 	local blur_object = chat_button_panel:child("chat_button_blur")
 	blur_object:set_shape(chat_button:shape())
@@ -740,15 +770,24 @@ function ChatGui:input_focus()
 		return 1
 	end
 	if self._enter_loose_focus_delay then
-		self._enter_loose_focus_delay = nil
+		if not self._enter_loose_focus_delay_end then
+			self._enter_loose_focus_delay_end = true
+			setup:add_end_frame_clbk(callback(self, self, "enter_loose_focus_delay_end"))
+		end
 		return true
 	end
 	return self._focus
 end
 
+function ChatGui:enter_loose_focus_delay_end()
+	self._enter_loose_focus_delay = nil
+	self._enter_loose_focus_delay_end = nil
+end
+
 function ChatGui:special_btn_pressed(button)
 	if MenuCallbackHandler:is_win32() and button == Idstring("toggle_chat") and not self._focus and self._is_crimenet_chat then
 		self:toggle_crimenet_chat()
+		return true
 	end
 end
 

@@ -73,6 +73,9 @@ function EditZipLine:init(editor)
 	}
 	CoreEws.combobox(self._type_params)
 	self._type_params.ctrlr:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_change_type"), nil)
+	self._ai_ignores_bag = EWS:CheckBox(panel, "AI ignores bag", "")
+	self._ai_ignores_bag:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_ai_ignores_bag"), nil)
+	sizer:add(self._ai_ignores_bag, 0, 1, "EXPAND")
 	panel:layout()
 	panel:set_enabled(false)
 end
@@ -126,6 +129,14 @@ function EditZipLine:_change_type()
 	end
 end
 
+function EditZipLine:set_ai_ignores_bag()
+	for _, unit in ipairs(self._selected_units) do
+		if alive(unit) and unit:zipline() then
+			unit:zipline():set_ai_ignores_bag(self._ai_ignores_bag:get_value())
+		end
+	end
+end
+
 function EditZipLine:is_editable(unit, units)
 	if alive(unit) and unit:zipline() then
 		self._reference_unit = unit
@@ -135,6 +146,7 @@ function EditZipLine:is_editable(unit, units)
 		CoreEws.change_entered_number(self._speed_params, unit:zipline():speed())
 		CoreEws.change_entered_number(self._slack_params, unit:zipline():slack())
 		CoreEws.change_combobox_value(self._type_params, unit:zipline():usage_type())
+		self._ai_ignores_bag:set_value(unit:zipline():ai_ignores_bag())
 		self._no_event = false
 		return true
 	end

@@ -36,7 +36,11 @@ function CopActionIdle:init(action_desc, common_data)
 			print("[CopActionIdle:init] state", state_name, "failed in", self._machine:segment_state(Idstring("base")), common_data.unit)
 		end
 	elseif not self._ext_anim.idle then
-		res = self._ext_movement:play_redirect("idle")
+		if self._common_data.stance.code == 1 then
+			res = self._ext_movement:play_redirect("exit")
+		else
+			res = self._ext_movement:play_redirect("idle")
+		end
 		self._ext_movement:enable_update()
 	end
 	if res == false then

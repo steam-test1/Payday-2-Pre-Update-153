@@ -168,12 +168,26 @@ function IngameManualGui:open_manual_page(page)
 	self._current_page = new_page
 	self._page_counter:set_text(tostring(self._current_page) .. "/" .. tostring(self.PAGES))
 	local new_page = path .. tostring(page) .. (files[lang_key] or "")
-	print(new_page)
-	if DB:has(Idstring("texture"), new_page) then
-		self._loading = new_page
-		TextureCache:request(new_page, "NORMAL", callback(managers.menu_component, managers.menu_component, "ingame_manual_texture_done"))
+	self:create_page(new_page)
+end
+
+function IngameManualGui:remove_page(unretrieve_texture)
+	if alive(self._page_panel) then
+		self._page_panel:parent():remove(self._page_panel)
+		self._page_panel = nil
+		self._page = nil
 	end
-	self:remove_page()
+	if alive(self._page) then
+		self._page:parent():remove(self._page)
+		self._page = nil
+	end
+	if unretrieve_texture then
+		self:unretrieve_texture()
+	end
+end
+
+function IngameManualGui:create_page(texture_path)
+	self:remove_page(true)
 	self._page = self._manual_panel:panel()
 	local loading_text = self._page:text({
 		font = tweak_data.menu.pd2_large_font,
@@ -198,33 +212,32 @@ function IngameManualGui:open_manual_page(page)
 		end
 	end
 	spinning_item:animate(spin_anim)
-end
-
-function IngameManualGui:remove_page()
-	if self._page_panel then
-		self._page_panel:parent():remove(self._page_panel)
-		self._page_panel = nil
-		self._page = nil
+	self._loading = true
+	if not managers.menu_component then
+		return
 	end
-	if self._page then
-		self._page:parent():remove(self._page)
-		self._page = nil
+	if DB:has(Idstring("texture"), texture_path) then
+		local texture_count = managers.menu_component:request_texture(texture_path, callback(self, self, "texture_done_clbk"))
+		self._requested_texture = {texture_count = texture_count, texture = texture_path}
 	end
 end
 
-function IngameManualGui:create_page(texture_ids)
+function IngameManualGui:unretrieve_texture()
+	if self._requested_texture then
+		managers.menu_component:unretrieve_texture(self._requested_texture.texture, self._requested_texture.texture_count)
+		self._requested_texture = nil
+	end
+end
+
+function IngameManualGui:texture_done_clbk(texture_ids)
 	local new_page_panel = self._manual_panel:panel({visible = false})
 	local texture = new_page_panel:bitmap({
 		name = "texture",
 		texture = texture_ids,
 		layer = 1
 	})
-	if not self._loading or Idstring(self._loading) ~= texture_ids then
-		new_page_panel:parent():remove(new_page_panel)
-		return
-	end
 	new_page_panel:show()
-	self:remove_page()
+	self:remove_page(false)
 	self._page_panel = new_page_panel
 	self._page = texture
 	local aspect = self._page:texture_height() / math.max(self._page:texture_width(), 1)
@@ -243,6 +256,7 @@ function IngameManualGui:set_layer(layer)
 end
 
 function IngameManualGui:close()
+	self:remove_page(true)
 	self._ws:panel():remove(self._manual_panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
 end

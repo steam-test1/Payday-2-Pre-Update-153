@@ -180,7 +180,7 @@ function ExperienceManager:_level_up()
 	managers.challenges:check_active_challenges()
 	self:_check_achievements()
 	if managers.network:session() then
-		managers.network:session():send_to_peers_synched("sync_level_up", managers.network:session():local_peer():id(), self:current_level())
+		managers.network:session():send_to_peers_synched("sync_level_up", self:current_level())
 	end
 	if self:current_level() >= 145 then
 		managers.challenges:set_flag("president")

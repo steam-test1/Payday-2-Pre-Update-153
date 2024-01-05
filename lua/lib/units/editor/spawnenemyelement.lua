@@ -56,7 +56,9 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_biker_escape/ene_biker_escape",
 	"units/pd2_dlc1/characters/ene_security_gensec_1/ene_security_gensec_1",
 	"units/pd2_dlc1/characters/ene_security_gensec_2/ene_security_gensec_2",
-	"units/payday2/characters/ene_guard_national_1/ene_guard_national_1"
+	"units/payday2/characters/ene_guard_national_1/ene_guard_national_1",
+	"units/payday2/characters/ene_murkywater_1/ene_murkywater_1",
+	"units/payday2/characters/ene_murkywater_2/ene_murkywater_2"
 }
 
 function SpawnEnemyUnitElement:init(unit)

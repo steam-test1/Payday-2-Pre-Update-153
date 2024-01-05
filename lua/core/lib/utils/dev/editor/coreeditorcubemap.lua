@@ -175,7 +175,7 @@ function CoreEditor:cube_map_done()
 		for _, cube in ipairs(self._cubemap_params.cubes) do
 			cube.light:set_enable(cube.enabled)
 			local texture_path = managers.database:entry_path(self._cubemap_params.output_path .. cube.output_name)
-			cube.light:set_projection_texture(texture_path, not cube.spot)
+			cube.light:set_projection_texture(Idstring(texture_path), not cube.spot, false)
 		end
 	end
 	self:set_show_camera_info(true)

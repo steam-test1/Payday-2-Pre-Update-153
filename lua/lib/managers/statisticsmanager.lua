@@ -1756,7 +1756,7 @@ function StatisticsManager:send_statistics()
 	if Network:is_server() then
 		managers.network:game():on_statistics_recieved(peer_id, total_kills, total_specials_kills, total_head_shots, accuracy, downs)
 	else
-		managers.network:session():send_to_host("send_statistics", peer_id, total_kills, total_specials_kills, total_head_shots, accuracy, downs)
+		managers.network:session():send_to_host("send_statistics", total_kills, total_specials_kills, total_head_shots, accuracy, downs)
 	end
 end
 

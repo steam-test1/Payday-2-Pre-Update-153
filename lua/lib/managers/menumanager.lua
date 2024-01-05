@@ -21,8 +21,8 @@ core:import("CoreEvent")
 MenuManager = MenuManager or class(CoreMenuManager.Manager)
 MenuCallbackHandler = MenuCallbackHandler or class(CoreMenuCallbackHandler.CallbackHandler)
 require("lib/managers/MenuManagerPD2")
-MenuManager.ONLINE_AGE = 17
 MenuManager.IS_NORTH_AMERICA = true
+MenuManager.ONLINE_AGE = SystemInfo:platform() == Idstring("PS3") and MenuManager.IS_NORTH_AMERICA and 17 or 18
 require("lib/managers/MenuManagerDialogs")
 
 function MenuManager:init(is_start_menu)
@@ -103,6 +103,7 @@ function MenuManager:init(is_start_menu)
 	managers.user:add_setting_changed_callback("effect_quality", callback(self, self, "effect_quality_changed"), true)
 	managers.user:add_setting_changed_callback("dof_setting", callback(self, self, "dof_setting_changed"), true)
 	managers.user:add_setting_changed_callback("fps_cap", callback(self, self, "fps_limit_changed"), true)
+	managers.user:add_setting_changed_callback("max_streaming_chunk", callback(self, self, "max_streaming_chunk_changed"), true)
 	managers.user:add_active_user_state_changed_callback(callback(self, self, "on_user_changed"))
 	managers.user:add_storage_changed_callback(callback(self, self, "on_storage_changed"))
 	managers.savefile:add_active_changed_callback(callback(self, self, "safefile_manager_active_changed"))
@@ -111,6 +112,7 @@ function MenuManager:init(is_start_menu)
 	self:brightness_changed(nil, nil, managers.user:get_setting("brightness"))
 	self:effect_quality_changed(nil, nil, managers.user:get_setting("effect_quality"))
 	self:fps_limit_changed(nil, nil, managers.user:get_setting("fps_cap"))
+	self:max_streaming_chunk_changed(nil, nil, managers.user:get_setting("max_streaming_chunk"))
 	self:invert_camera_y_changed("invert_camera_y", nil, managers.user:get_setting("invert_camera_y"))
 	self:southpaw_changed("southpaw", nil, managers.user:get_setting("southpaw"))
 	self:dof_setting_changed("dof_setting", nil, managers.user:get_setting("dof_setting"))
@@ -516,6 +518,10 @@ function MenuManager:fps_limit_changed(name, old_value, new_value)
 		return
 	end
 	setup:set_fps_cap(new_value)
+end
+
+function MenuManager:max_streaming_chunk_changed(name, old_value, new_value)
+	managers.dyn_resource:set_max_streaming_chunk(new_value)
 end
 
 function MenuManager:subtitle_changed(name, old_value, new_value)
@@ -1491,22 +1497,6 @@ function MenuCallbackHandler:choice_test(item)
 	print("MenuCallbackHandler", test)
 end
 
-function MenuCallbackHandler:choice_mask(item)
-	local mask_set = item:value()
-	print("[MenuCallbackHandler:choice_mask]", mask_set)
-	managers.user:set_setting("mask_set", mask_set)
-	local peer = managers.network:session():local_peer()
-	peer:set_mask_set(mask_set)
-	if Global.game_settings.single_player then
-		if managers.menu:active_menu().renderer.set_character then
-			managers.menu:active_menu().renderer:set_character(peer:id(), peer:character())
-		end
-	else
-		managers.menu:active_menu().renderer:set_character(peer:id(), peer:character())
-		managers.network:session():send_to_peers("set_mask_set", peer:id(), mask_set)
-	end
-end
-
 function MenuCallbackHandler:choice_premium_contact(item)
 	if not managers.menu:active_menu() then
 		return false
@@ -2012,16 +2002,6 @@ function MenuCallbackHandler:become_infamous(params)
 	managers.menu:show_confirm_become_infamous(params)
 end
 
-function MenuCallbackHandler:choice_choose_character(item)
-	local character = item:value()
-	local peer_id = managers.network:session():local_peer():id()
-	if Network:is_server() then
-		managers.network:game():on_peer_request_character(peer_id, character)
-	elseif managers.network:session():server_peer() and not managers.network:session():server_peer():loading() then
-		managers.network:session():send_to_host("request_character", peer_id, character)
-	end
-end
-
 function MenuCallbackHandler:choice_choose_texture_quality(item)
 	RenderSettings.texture_quality_default = item:value()
 	Application:apply_render_settings()
@@ -2081,6 +2061,11 @@ end
 
 function MenuCallbackHandler:toggle_lightfx(item)
 	managers.user:set_setting("use_lightfx", item:value() == "on")
+end
+
+function MenuCallbackHandler:choice_max_streaming_chunk(item)
+	managers.dyn_resource:set_max_streaming_chunk(item:value())
+	managers.user:set_setting("max_streaming_chunk", item:value())
 end
 
 function MenuCallbackHandler:set_fov_multiplier(item)
@@ -2172,8 +2157,7 @@ end
 function MenuCallbackHandler:_dialog_leave_lobby_yes()
 	if managers.network:session() then
 		managers.network:session():local_peer():set_in_lobby(false)
-		local peer_id = managers.network:session():local_peer():id()
-		managers.network:session():send_to_peers("set_peer_left", peer_id)
+		managers.network:session():send_to_peers("set_peer_left")
 	end
 	managers.menu:on_leave_lobby()
 end
@@ -2331,8 +2315,8 @@ function MenuCallbackHandler:kick_player(item)
 	
 	function yes_button.callback_func()
 		local peer = item:parameters().peer
-		managers.network:session():send_to_peers("kick_peer", peer:id())
-		managers.network:session():on_peer_kicked(peer, peer:id())
+		managers.network:session():send_to_peers("kick_peer", peer:id(), 0)
+		managers.network:session():on_peer_kicked(peer, peer:id(), 0)
 		managers.menu:back(true)
 	end
 	
@@ -2520,8 +2504,7 @@ function MenuCallbackHandler:_dialog_end_game_yes()
 	managers.gage_assignment:deactivate_assignments()
 	if Network:multiplayer() then
 		Network:set_multiplayer(false)
-		local peer_id = managers.network:session():local_peer():id()
-		managers.network:session():send_to_peers("set_peer_left", peer_id)
+		managers.network:session():send_to_peers("set_peer_left")
 		managers.network:queue_stop_network()
 	end
 	managers.network.matchmake:destroy_game()
@@ -2614,10 +2597,14 @@ function MenuCallbackHandler:give_max_experience()
 end
 
 function MenuCallbackHandler:debug_next_stage()
-	game_state_machine:change_state_by_name("victoryscreen", {
-		num_winners = 2,
-		personal_win = alive(managers.player:player_unit())
-	})
+	if managers.platform:presence() == "Playing" then
+		local num_winners = managers.network:game():amount_of_alive_players()
+		managers.network:session():send_to_peers("mission_ended", true, num_winners)
+		game_state_machine:change_state_by_name("victoryscreen", {
+			num_winners = num_winners,
+			personal_win = alive(managers.player:player_unit())
+		})
+	end
 end
 
 function MenuCallbackHandler:debug_give_alot_of_lootdrops()
@@ -2656,6 +2643,10 @@ end
 
 function MenuCallbackHandler:toggle_mission_fading_debug_enabled(item)
 	managers.mission:set_fading_debug_enabled(item:value() == "off")
+end
+
+function MenuCallbackHandler:menu_back()
+	managers.menu:back()
 end
 
 function MenuCallbackHandler:clear_progress()
@@ -3716,19 +3707,6 @@ function GlobalSuccessRateInitiator:modify_node(node)
 	return node
 end
 
-SinglePlayerOptionInitiator = SinglePlayerOptionInitiator or class()
-
-function SinglePlayerOptionInitiator:modify_node(node)
-	MenuManager.refresh_level_select(node, true)
-	local item_lobby_toggle_ai = node:item("toggle_ai")
-	item_lobby_toggle_ai:set_value(Global.game_settings.team_ai and "on" or "off")
-	local character_item = node:item("choose_character")
-	if character_item then
-		managers.network:game():on_peer_request_character(1, character_item:value())
-	end
-	return node
-end
-
 LobbyOptionInitiator = LobbyOptionInitiator or class()
 
 function LobbyOptionInitiator:modify_node(node)
@@ -3762,96 +3740,6 @@ VerifyLevelOptionInitiator = VerifyLevelOptionInitiator or class()
 
 function VerifyLevelOptionInitiator:modify_node(node)
 	MenuManager.refresh_level_select(node, true)
-	return node
-end
-
-MaskOptionInitiator = MaskOptionInitiator or class()
-
-function MaskOptionInitiator:modify_node(node)
-	local choose_mask = node:item("choose_mask")
-	if not choose_mask then
-		return node
-	end
-	local params = {
-		name = "choose_mask",
-		text_id = "menu_choose_mask",
-		callback = "choice_mask"
-	}
-	if choose_mask:parameters().help_id then
-		params.help_id = choose_mask:parameters().help_id
-	end
-	local data_node = {
-		type = "MenuItemMultiChoice"
-	}
-	table.insert(data_node, {
-		_meta = "option",
-		text_id = "menu_mask_clowns",
-		value = "clowns"
-	})
-	if managers.network.account:has_mask("developer") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_developer",
-			value = "developer"
-		})
-	end
-	if managers.network.account:has_mask("hockey_com") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_hockey_com",
-			value = "hockey_com"
-		})
-	end
-	if managers.network.account:has_mask("alienware") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_alienware",
-			value = "alienware"
-		})
-	end
-	table.insert(data_node, {
-		_meta = "option",
-		text_id = "menu_mask_bf3",
-		value = "bf3"
-	})
-	if managers.network.account:has_mask("santa") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_santa",
-			value = "santa"
-		})
-	end
-	if managers.experience:current_level() >= 145 or managers.network.account:has_mask("president") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_president",
-			value = "president"
-		})
-	end
-	if managers.challenges:is_completed("golden_boy") or managers.network.account:has_mask("gold") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_gold",
-			value = "gold"
-		})
-	end
-	if SystemInfo:platform() == Idstring("WIN32") and (Steam:is_product_owned(500) or Steam:is_product_owned(550)) then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_zombie",
-			value = "zombie"
-		})
-	end
-	if managers.network.account:has_mask("troll") then
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = "menu_mask_troll",
-			value = "troll"
-		})
-	end
-	choose_mask:init(data_node, params)
-	choose_mask:set_callback_handler(MenuCallbackHandler:new())
-	choose_mask:set_value(managers.user:get_setting("mask_set"))
 	return node
 end
 
@@ -4182,6 +4070,149 @@ function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
 	node:add_item(new_item)
+end
+
+MenuPrePlanningInitiator = MenuPrePlanningInitiator or class(MenuCrimeNetContactInfoInitiator)
+
+function MenuPrePlanningInitiator:modify_node(node, category, type)
+	node:clean_items()
+	local first_in_line
+	if category then
+		self:create_divider(node, 1, managers.preplanning:get_category_name(category), nil, tweak_data.screen_colors.text)
+		local types = managers.preplanning:types_with_mission_elements(category)
+		if not types or #types == 0 then
+			return node
+		end
+		local params = {
+			name = nil,
+			text_id = nil,
+			color_ranges = nil,
+			localize = "false",
+			callback = "set_preplanning_type_filter"
+		}
+		local type_data
+		for _, type in pairs(types) do
+			params.name = type
+			params.text_id = managers.preplanning:get_type_name(type)
+			self:create_item(node, params)
+			first_in_line = first_in_line or params.name
+		end
+	elseif type then
+		local params = {
+			name = nil,
+			text_id = nil,
+			color_ranges = nil,
+			localize = "false",
+			callback = "reserve_preplanning_mission_element_by_item"
+		}
+		local mission_elements = managers.preplanning:get_mission_elements_by_type(type)
+		local locations = managers.preplanning:sort_mission_elements_into_locations(mission_elements)
+		for index, elements in pairs(locations) do
+			self:create_divider(node, "div_" .. tostring(index), managers.preplanning:get_location_name_by_index(index), nil, tweak_data.screen_colors.text)
+			for i, data in ipairs(elements) do
+				params.name = data.element:id()
+				params.text_id = managers.localization:text("menu_pp_point", {point = i})
+				params.index = data.index
+				self:create_item(node, params)
+				first_in_line = first_in_line or params.name
+			end
+		end
+	else
+		local categories = managers.preplanning:categories_with_mission_elements()
+		if not categories or #categories == 0 then
+			return node
+		end
+		local params = {
+			name = nil,
+			text_id = nil,
+			color_ranges = nil,
+			localize = "false",
+			callback = "set_preplanning_category_filter"
+		}
+		local category_data
+		for _, category in pairs(categories) do
+			params.name = category
+			params.text_id = managers.preplanning:get_category_name(category)
+			self:create_item(node, params)
+			first_in_line = first_in_line or params.name
+		end
+	end
+	node:parameters().current_category = category
+	node:parameters().current_type = type
+	node:set_default_item_name(first_in_line)
+	node:select_item(first_in_line)
+	return node
+end
+
+function MenuPrePlanningInitiator:refresh_node(node)
+	return node
+end
+
+function MenuPrePlanningInitiator:create_item(node, params)
+	local data_node = {}
+	local new_item = node:create_item(data_node, deep_clone(params))
+	node:add_item(new_item)
+end
+
+function MenuCallbackHandler:set_preplanning_category_filter(item)
+	managers.menu:open_node("preplanning_category", {
+		item:name(),
+		false
+	})
+end
+
+function MenuCallbackHandler:set_preplanning_type_filter(item)
+	managers.menu_component:set_preplanning_type_filter(item:name())
+	managers.menu:open_node("preplanning_type", {
+		false,
+		item:name()
+	})
+end
+
+function MenuCallbackHandler:reserve_preplanning_mission_element(type, id)
+	print("[reserve_preplanning_mission_element]", "type", type, "id", id)
+	managers.preplanning:reserve_mission_element(type, id)
+end
+
+function MenuCallbackHandler:reserve_preplanning_mission_element_by_id(id)
+	local logic = managers.menu:active_menu().logic
+	if logic then
+		if not logic:selected_node() then
+			return false
+		end
+		local type = logic:selected_node():parameters().current_type
+		assert(type and id, "[MenuCallbackHandler:reserve_preplanning_mission_element_by_id] Mission element is missing!", "type", type, "id", id)
+		MenuCallbackHandler:reserve_preplanning_mission_element(type, id)
+	end
+end
+
+function MenuCallbackHandler:reserve_preplanning_mission_element_by_item(item)
+	MenuCallbackHandler:reserve_preplanning_mission_element_by_id(item:name())
+end
+
+function MenuCallbackHandler:select_preplanning_item_by_id(id)
+	local logic = managers.menu:active_menu().logic
+	if logic then
+		if not logic:selected_node() then
+			return false
+		end
+		if not logic:selected_node():selected_item() or logic:selected_node():selected_item():name() ~= id then
+			logic:selected_node():select_item(id)
+			logic:refresh_node()
+		end
+	end
+end
+
+function MenuCallbackHandler:chk_preplanning_type(item)
+	return managers.menu_component:get_preplanning_filter() == item:name()
+end
+
+function MenuCallbackHandler:chk_preplanning_point(item)
+	return false
+end
+
+function MenuCallbackHandler:clear_preplanning_type_filter(item)
+	managers.menu_component:set_preplanning_type_filter(false)
 end
 
 MenuCrimeNetGageAssignmentInitiator = MenuCrimeNetGageAssignmentInitiator or class(MenuCrimeNetContactInfoInitiator)
@@ -5098,6 +5129,7 @@ function MenuOptionInitiator:modify_adv_video(node)
 	end
 	node:item("choose_fps_cap"):set_value(managers.user:get_setting("fps_cap"))
 	node:item("use_headbob"):set_value(managers.user:get_setting("use_headbob") and "on" or "off")
+	node:item("max_streaming_chunk"):set_value(managers.user:get_setting("max_streaming_chunk"))
 	local option_value = "off"
 	local dof_setting_item = node:item("toggle_dof")
 	if dof_setting_item then

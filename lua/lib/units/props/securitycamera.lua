@@ -693,7 +693,9 @@ function SecurityCamera:_start_tape_loop(tape_loop_t)
 	self._tape_loop_end_t = Application:time() + tape_loop_t
 	SecurityCamera.active_tape_loop_unit = self._unit
 	self._unit:contour():add("mark_unit_friendly")
-	self._unit:interaction():set_active(false)
+	if self._unit:interaction() then
+		self._unit:interaction():set_active(false)
+	end
 	if self._camera_wrong_image_sound then
 		self._camera_wrong_image_sound:stop()
 	end
@@ -710,7 +712,9 @@ function SecurityCamera:_clbk_tape_loop_expired(...)
 	self._tape_loop_expired_clbk_id = nil
 	self._tape_loop_end_t = nil
 	self._unit:contour():remove("mark_unit_friendly")
-	self._unit:interaction():set_active(true)
+	if self._unit:interaction() then
+		self._unit:interaction():set_active(true)
+	end
 	if self._destroyed then
 		return
 	end
@@ -752,7 +756,9 @@ function SecurityCamera:_deactivate_tape_loop()
 	if self._tape_loop_restarting_t then
 		self:_deactivate_tape_loop_restart()
 	end
-	self._unit:interaction():set_active(false)
+	if self._unit:interaction() then
+		self._unit:interaction():set_active(false)
+	end
 end
 
 function SecurityCamera:_deactivate_tape_loop_restart()
@@ -778,7 +784,9 @@ function SecurityCamera:on_unit_set_enabled(enabled)
 	if self._destroyed then
 		return
 	end
-	self._unit:interaction():set_active(enabled)
+	if self._unit:interaction() then
+		self._unit:interaction():set_active(enabled)
+	end
 end
 
 function SecurityCamera:save(data)

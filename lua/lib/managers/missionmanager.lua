@@ -123,7 +123,8 @@ function MissionManager:init(...)
 		"pku_folder",
 		"pku_poster",
 		"pku_artifact_statue",
-		"pku_server"
+		"pku_server",
+		"pku_samurai"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

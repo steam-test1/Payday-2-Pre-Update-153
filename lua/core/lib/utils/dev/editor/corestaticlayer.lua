@@ -69,6 +69,7 @@ function StaticLayer:do_spawn_unit(name, pos, rot)
 	local unit = StaticLayer.super.do_spawn_unit(self, name, pos, rot)
 	if unit then
 		table.insert(self._created_units, unit)
+		self._created_units_pairs[unit:unit_data().unit_id] = unit
 		self:set_bodies_keyframed(unit)
 	end
 	return unit

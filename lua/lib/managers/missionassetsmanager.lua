@@ -438,7 +438,7 @@ function MissionAssetsManager:create_asset_textures()
 	for _, asset_id in ipairs(all_visible_assets) do
 		texture = self._tweak_data[asset_id].texture
 		self._asset_textures_in_loading[Idstring(texture):key()] = {asset_id, texture}
-		TextureCache:request(texture, "NORMAL", texture_loaded_clbk)
+		TextureCache:request(texture, "NORMAL", texture_loaded_clbk, 100)
 	end
 end
 

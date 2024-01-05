@@ -54,6 +54,9 @@ function CoreMusicManager:_check_music_switch()
 end
 
 function CoreMusicManager:post_event(name)
+	if not name then
+		return
+	end
 	if Global.music_manager.current_event ~= name then
 		Global.music_manager.source:post_event(name)
 		Global.music_manager.current_event = name

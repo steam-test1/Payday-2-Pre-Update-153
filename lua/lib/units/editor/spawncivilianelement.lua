@@ -40,6 +40,8 @@ SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_male_casual_7/civ_male_casual_7",
 	"units/payday2/characters/civ_male_casual_8/civ_male_casual_8",
 	"units/payday2/characters/civ_male_casual_9/civ_male_casual_9",
+	"units/payday2/characters/civ_male_casual_12/civ_male_casual_12",
+	"units/payday2/characters/civ_male_casual_14/civ_male_casual_14",
 	"units/payday2/characters/civ_male_dj_1/civ_male_dj_1",
 	"units/payday2/characters/civ_male_italian_robe_1/civ_male_italian_robe_1",
 	"units/payday2/characters/civ_male_janitor_1/civ_male_janitor_1",

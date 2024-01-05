@@ -35,19 +35,19 @@ function ConnectionNetworkHandler:discover_host_reply(sender_name, level_id, lev
 	managers.network:on_discover_host_reply(sender, sender_name, level_name, my_ip, state, difficulty)
 end
 
-function ConnectionNetworkHandler:request_join(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
+function ConnectionNetworkHandler:request_join(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 	if not self._verify_in_server_session() then
 		return
 	end
-	managers.network:session():on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
+	managers.network:session():on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 end
 
-function ConnectionNetworkHandler:join_request_reply(reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, sender)
-	print(" 1 ConnectionNetworkHandler:join_request_reply", reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, sender)
+function ConnectionNetworkHandler:join_request_reply(reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
+	print(" 1 ConnectionNetworkHandler:join_request_reply", reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
 	if not self._verify_in_client_session() then
 		return
 	end
-	managers.network:session():on_join_request_reply(reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, sender)
+	managers.network:session():on_join_request_reply(reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
 end
 
 function ConnectionNetworkHandler:peer_handshake(name, peer_id, ip, in_lobby, loading, synched, character, slot, mask_set, xuid, xnaddr)
@@ -110,21 +110,7 @@ function ConnectionNetworkHandler:mutual_connection(other_peer_id)
 	managers.network:session():on_mutual_connection(other_peer_id)
 end
 
-function ConnectionNetworkHandler:remove_dead_peer(peer_id, sender)
-	print("[ConnectionNetworkHandler:remove_dead_peer]", peer_id, sender:ip_at_index(0))
-	if not self._verify_sender(sender) then
-		return
-	end
-	sender:remove_peer_confirmation(peer_id)
-	local peer = managers.network:session():peer(peer_id)
-	if not peer then
-		print("[ConnectionNetworkHandler:remove_dead_peer] unknown peer", peer_id)
-		return
-	end
-	managers.network:session():on_remove_dead_peer(peer, peer_id)
-end
-
-function ConnectionNetworkHandler:kick_peer(peer_id, sender)
+function ConnectionNetworkHandler:kick_peer(peer_id, message_id, sender)
 	if not self._verify_sender(sender) then
 		return
 	end
@@ -134,7 +120,7 @@ function ConnectionNetworkHandler:kick_peer(peer_id, sender)
 		print("[ConnectionNetworkHandler:kick_peer] unknown peer", peer_id)
 		return
 	end
-	managers.network:session():on_peer_kicked(peer, peer_id)
+	managers.network:session():on_peer_kicked(peer, peer_id, message_id)
 end
 
 function ConnectionNetworkHandler:remove_peer_confirmation(removed_peer_id, sender)
@@ -189,16 +175,12 @@ function ConnectionNetworkHandler:ok_to_load_lobby(sender)
 	managers.network:session():ok_to_load_lobby()
 end
 
-function ConnectionNetworkHandler:set_peer_left(peer_id, sender)
-	if not self._verify_sender(sender) then
-		return
-	end
-	local peer = managers.network:session():peer(peer_id)
+function ConnectionNetworkHandler:set_peer_left(sender)
+	local peer = self._verify_sender(sender)
 	if not peer then
-		print("[ConnectionNetworkHandler:set_peer_left] unknown peer", peer_id)
 		return
 	end
-	managers.network:session():on_peer_left(peer, peer_id)
+	managers.network:session():on_peer_left(peer, peer:id())
 end
 
 function ConnectionNetworkHandler:set_menu_sync_state_index(index, sender)
@@ -307,41 +289,31 @@ function ConnectionNetworkHandler:lobby_sync_update_difficulty(difficulty)
 	end
 end
 
-function ConnectionNetworkHandler:lobby_info(peer_id, level, rank, character, mask_set, ass_progress, sha_progress, sup_progress, tech_progress, sender)
-	print("ConnectionNetworkHandler:lobby_info", peer_id, level, rank)
+function ConnectionNetworkHandler:lobby_info(level, rank, character, mask_set, sender)
 	local peer = self._verify_sender(sender)
+	print("ConnectionNetworkHandler:lobby_info", peer and peer:id(), level, rank)
 	print("  IS THIS AN OK PEER?", peer and peer:id())
 	if peer then
 		peer:set_level(level)
 		peer:set_rank(rank)
-		local progress = {
-			ass_progress,
-			sha_progress,
-			sup_progress
-		}
-		if tech_progress ~= -1 then
-			table.insert(progress, tech_progress)
-		end
 		local lobby_menu = managers.menu:get_menu("lobby_menu")
 		if lobby_menu and lobby_menu.renderer:is_open() then
-			lobby_menu.renderer:_set_player_slot(peer_id, {
+			lobby_menu.renderer:_set_player_slot(peer:id(), {
 				name = peer:name(),
-				peer_id = peer_id,
+				peer_id = peer:id(),
 				level = level,
 				rank = rank,
-				character = character,
-				progress = progress
+				character = character
 			})
 		end
 		local kit_menu = managers.menu:get_menu("kit_menu")
 		if kit_menu and kit_menu.renderer:is_open() then
-			kit_menu.renderer:_set_player_slot(peer_id, {
+			kit_menu.renderer:_set_player_slot(peer:id(), {
 				name = peer:name(),
-				peer_id = peer_id,
+				peer_id = peer:id(),
 				level = level,
 				rank = rank,
-				character = character,
-				progress = progress
+				character = character
 			})
 		end
 	end
@@ -354,51 +326,6 @@ function ConnectionNetworkHandler:sync_chat_message(message, sender)
 	end
 	print("sync_chat_message peer", peer, peer:id())
 	managers.menu:relay_chat_message(message, peer:id())
-end
-
-function ConnectionNetworkHandler:request_character(peer_id, character, sender)
-	if not self._verify_sender(sender) then
-		return
-	end
-	managers.network:game():on_peer_request_character(peer_id, character)
-end
-
-function ConnectionNetworkHandler:set_mask_set(peer_id, mask_set, sender)
-	local peer = self._verify_sender(sender)
-	if not peer then
-		return
-	end
-	if not self._verify_gamestate(self._gamestate_filter.lobby) then
-		return
-	end
-	peer:set_mask_set(mask_set)
-	local lobby_menu = managers.menu:get_menu("lobby_menu")
-	if lobby_menu and lobby_menu.renderer:is_open() then
-		lobby_menu.renderer:set_character(peer_id, peer:character())
-	end
-	local kit_menu = managers.menu:get_menu("kit_menu")
-	if kit_menu and kit_menu.renderer:is_open() then
-		kit_menu.renderer:set_character(peer_id, peer:character())
-	end
-end
-
-function ConnectionNetworkHandler:request_character_response(peer_id, character, sender)
-	if not self._verify_sender(sender) then
-		return
-	end
-	local peer = managers.network:session():peer(peer_id)
-	if not peer then
-		return
-	end
-	peer:set_character(character)
-	local lobby_menu = managers.menu:get_menu("lobby_menu")
-	if lobby_menu and lobby_menu.renderer:is_open() then
-		lobby_menu.renderer:set_character(peer_id, character)
-	end
-	local kit_menu = managers.menu:get_menu("kit_menu")
-	if kit_menu and kit_menu.renderer:is_open() then
-		kit_menu.renderer:set_character(peer_id, character)
-	end
 end
 
 function ConnectionNetworkHandler:begin_trade()
@@ -422,11 +349,15 @@ function ConnectionNetworkHandler:finish_trade()
 	game_state_machine:current_state():finish_trade()
 end
 
-function ConnectionNetworkHandler:request_spawn_member(peer_id)
+function ConnectionNetworkHandler:request_spawn_member(sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	IngameWaitingForRespawnState.request_player_spawn(peer_id)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	IngameWaitingForRespawnState.request_player_spawn(peer:id())
 end
 
 function ConnectionNetworkHandler:hostage_trade_dialog(i)
@@ -505,7 +436,7 @@ function ConnectionNetworkHandler:dropin_progress(dropin_peer_id, progress_perce
 	managers.network:game():on_dropin_progress_received(dropin_peer_id, progress_percentage)
 end
 
-function ConnectionNetworkHandler:set_member_ready(ready, sender)
+function ConnectionNetworkHandler:set_member_ready(ready, mode, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
@@ -514,12 +445,18 @@ function ConnectionNetworkHandler:set_member_ready(ready, sender)
 		return
 	end
 	local peer_id = peer:id()
-	local ready_state = peer:waiting_for_player_ready()
-	peer:set_waiting_for_player_ready(ready)
-	managers.network:game():on_set_member_ready(peer_id, ready, ready_state ~= ready)
-	if not Network:is_server() or game_state_machine:current_state().start_game_intro then
-	elseif ready then
-		managers.network:session():chk_spawn_member_unit(peer, peer_id)
+	if mode == 1 then
+		ready = ready ~= 0 and true or false
+		local ready_state = peer:waiting_for_player_ready()
+		peer:set_waiting_for_player_ready(ready)
+		managers.network:game():on_set_member_ready(peer_id, ready, ready_state ~= ready)
+		if not Network:is_server() or game_state_machine:current_state().start_game_intro then
+		elseif ready then
+			managers.network:session():chk_spawn_member_unit(peer, peer_id)
+		end
+	elseif mode == 2 then
+		peer:set_streaming_status(ready)
+		managers.network:game():on_streaming_progress_received(peer, ready)
 	end
 end
 
@@ -633,5 +570,29 @@ function ConnectionNetworkHandler:choose_lootcard(card_id, sender)
 	end
 	if managers.hud then
 		managers.hud:confirm_choose_lootcard(peer:id(), card_id)
+	end
+end
+
+function ConnectionNetworkHandler:preplanning_reserved(type, id, peer_id, unreserve, sender)
+	if not self._verify_sender(sender) then
+		return
+	end
+	if unreserve then
+		managers.preplanning:client_unreserve_mission_element(id)
+	else
+		managers.preplanning:client_reserve_mission_element(type, id, peer_id)
+	end
+end
+
+function ConnectionNetworkHandler:reserve_preplanning(type, id, unreserve, sender)
+	print("A")
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	if unreserve then
+		managers.preplanning:server_unreserve_mission_element(id, peer:id())
+	else
+		managers.preplanning:server_reserve_mission_element(type, id, peer:id())
 	end
 end

@@ -60,16 +60,26 @@ function IngameWaitingForPlayersState:_start()
 end
 
 function IngameWaitingForPlayersState:sync_start(variant)
+	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
 	self._kit_menu.renderer:set_all_items_enabled(false)
 	self._briefing_start_t = nil
 	managers.briefing:stop_event()
 	managers.music:post_event(tweak_data.levels:get_music_event("intro"))
+	local music, start_switch = tweak_data.levels:get_music_event_ext()
+	if music then
+		managers.music:post_event(music)
+		managers.music:post_event(start_switch)
+	end
 	self._fade_out_id = managers.overlay_effect:play_effect(tweak_data.overlay_effects.fade_out_permanent)
 	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	self._intro_text_id = level_data and level_data.intro_text_id
 	self._intro_event = level_data and (variant == 0 and level_data.intro_event or level_data.intro_event[variant])
 	self._blackscreen_started = true
 	managers.menu_component:close_asset_mission_briefing_gui()
+	if Network:is_server() then
+		managers.preplanning:execute_reserved_mission_elements()
+	end
+	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
 	if self._intro_event then
 		self._delay_audio_t = Application:time() + 1
 	else
@@ -126,6 +136,9 @@ function IngameWaitingForPlayersState:_briefing_callback(event_type, label, cook
 end
 
 function IngameWaitingForPlayersState:update(t, dt)
+	if not managers.network:session() then
+		return
+	end
 	if t > self._camera_data.next_t then
 		self:_next_camera()
 	end
@@ -155,13 +168,17 @@ function IngameWaitingForPlayersState:update(t, dt)
 		self._delay_audio_t = nil
 		self:_start_audio()
 	end
-	if self._delay_start_t and t > self._delay_start_t then
-		self._delay_start_t = nil
-		managers.hud:blackscreen_fade_out_mid_text()
-		if Network:is_server() then
-			self._delay_spawn_t = Application:time() + 1
+	if self._delay_start_t then
+		if self._file_streamer_max_workload or not managers.network:session():are_peers_done_streaming() then
+			self._delay_start_t = Application:time() + 1
+		elseif t > self._delay_start_t then
+			self._delay_start_t = nil
+			managers.hud:blackscreen_fade_out_mid_text()
+			if Network:is_server() then
+				self._delay_spawn_t = Application:time() + 1
+			end
+			FadeoutGuiObject:new(tweak_data.overlay_effects.level_fade_in)
 		end
-		FadeoutGuiObject:new(tweak_data.overlay_effects.level_fade_in)
 	end
 	if self._delay_spawn_t and t > self._delay_spawn_t then
 		self._delay_spawn_t = nil
@@ -170,8 +187,8 @@ function IngameWaitingForPlayersState:update(t, dt)
 		end
 	end
 	local in_foucs = managers.menu:active_menu() == self._kit_menu
-	local in_focus = not managers.menu:active_menu() and Network:is_server()
-	if in_focus then
+	self:_chk_show_skip_prompt()
+	if self._skip_promt_shown and Network:is_server() then
 		if self._audio_started and not self._skipped then
 			if self._controller then
 				local btn_skip_press = self._controller:get_input_bool("confirm")
@@ -239,6 +256,56 @@ function IngameWaitingForPlayersState:at_enter()
 		managers.menu_component:post_event("escape_menu")
 	end
 	managers.music:post_event("loadout_music")
+	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 2)
+	if managers.dyn_resource:is_file_streamer_idle() then
+		managers.network:session():send_to_peers_loaded("set_member_ready", 100, 2)
+	else
+		self._last_sent_streaming_status = 0
+		self._file_streamer_max_workload = 0
+		managers.hud:set_blackscreen_loading_text_status(0)
+		managers.network:session():send_to_peers_loaded("set_member_ready", 0, 2)
+		managers.dyn_resource:add_listener(self, {
+			DynamicResourceManager.listener_events.file_streamer_workload
+		}, callback(self, self, "clbk_file_streamer_status"))
+	end
+end
+
+function IngameWaitingForPlayersState:clbk_file_streamer_status(workload)
+	if not managers.network:session() then
+		self._file_streamer_max_workload = nil
+		managers.dyn_resource:remove_listener(self)
+		return
+	end
+	self._file_streamer_max_workload = math.max(self._file_streamer_max_workload, workload)
+	local progress = self._file_streamer_max_workload > 0 and 1 - workload / self._file_streamer_max_workload or 1
+	progress = math.ceil(progress * 100)
+	local local_peer = managers.network:session():local_peer()
+	local_peer:set_streaming_status(progress)
+	managers.network:game():on_streaming_progress_received(local_peer, progress)
+	managers.hud:set_blackscreen_loading_text_status(progress)
+	if self._last_sent_streaming_status ~= progress then
+		managers.network:session():send_to_peers_loaded("set_member_ready", progress, 2)
+		self._last_sent_streaming_status = progress
+	end
+	if workload == 0 then
+		self._file_streamer_max_workload = nil
+		managers.dyn_resource:remove_listener(self)
+	end
+end
+
+function IngameWaitingForPlayersState:_chk_show_skip_prompt()
+	if not self._skip_promt_shown and not self._file_streamer_max_workload and not managers.menu:active_menu() and managers.network:session() then
+		if managers.network:session():are_peers_done_streaming() then
+			self._skip_promt_shown = true
+			if Network:is_server() then
+				managers.hud:set_blackscreen_loading_text_status("allow_skip")
+			else
+				managers.hud:set_blackscreen_loading_text_status(false)
+			end
+		else
+			managers.hud:set_blackscreen_loading_text_status("wait_for_peers")
+		end
+	end
 end
 
 function IngameWaitingForPlayersState:start_game_intro()
@@ -260,6 +327,11 @@ end
 
 function IngameWaitingForPlayersState:at_exit()
 	print("[IngameWaitingForPlayersState:at_exit()]")
+	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk() * 0.25, 5)
+	if self._file_streamer_max_workload then
+		self._file_streamer_max_workload = nil
+		managers.dyn_resource:remove_listener(self)
+	end
 	managers.briefing:stop_event(true)
 	managers.assets:clear_asset_textures()
 	managers.menu:close_menu("kit_menu")
@@ -281,6 +353,13 @@ function IngameWaitingForPlayersState:at_exit()
 	managers.hud:hide(self.LEVEL_INTRO_GUI)
 	if self._started_from_beginning then
 		managers.music:post_event(tweak_data.levels:get_music_event("intro"))
+	else
+		local music = tweak_data.levels:get_music_event_ext()
+		if music then
+			local music_ext = Global.music_manager.current_event
+			managers.music:post_event(music)
+			managers.music:post_event(music_ext)
+		end
 	end
 	managers.platform:set_presence("Playing")
 	managers.platform:set_rich_presence(Global.game_settings.single_player and "SPPlaying" or "MPPlaying")

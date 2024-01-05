@@ -111,7 +111,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"branchbank",
 		"arm_for",
 		"family",
-		"big",
 		"roberts",
 		"kosugi"
 	}
@@ -133,7 +132,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"framing_frame_1",
 		"framing_frame_3",
 		"firestarter_2",
-		"big",
 		"kosugi"
 	}
 	self.spotter.visible_if_locked = true
@@ -164,8 +162,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3",
 		"election_day_3_skip1",
 		"election_day_3_skip2",
-		"mia",
-		"big"
+		"mia_1"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -184,8 +181,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3",
 		"election_day_3_skip1",
 		"election_day_3_skip2",
-		"mia",
-		"big"
+		"mia_1"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -201,8 +197,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3",
 		"election_day_3_skip1",
 		"election_day_3_skip2",
-		"mia",
-		"big"
+		"mia_1"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -211,7 +206,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.camera_access = {}
 	self.camera_access.name_id = "menu_asset_cam"
 	self.camera_access.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day2/asset03"
-	self.camera_access.stages = {"big"}
+	self.camera_access.stages = {
+		"example_level"
+	}
 	self.camera_access.visible_if_locked = true
 	self.camera_access.unlock_desc_id = "menu_asset_cam_desc"
 	self.camera_access.no_mystery = true
@@ -946,46 +943,30 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.roberts_plan_b.stages = {"roberts"}
 	self.roberts_plan_b.visible_if_locked = true
 	self.roberts_plan_b.no_mystery = true
-	self.big_thermite = {}
-	self.big_thermite.name_id = "menu_asset_big_thermite"
-	self.big_thermite.texture = "guis/textures/pd2/mission_briefing/assets/rat/day3/asset01"
-	self.big_thermite.stages = {"big"}
-	self.big_thermite.visible_if_locked = true
-	self.big_thermite.unlock_desc_id = "menu_asset_big_thermite_desc"
-	self.big_thermite.no_mystery = true
-	self.big_thermite.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.big_escape_elevator = {}
-	self.big_escape_elevator.name_id = "menu_asset_big_escape_elevator"
-	self.big_escape_elevator.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_03"
-	self.big_escape_elevator.stages = {"big"}
-	self.big_escape_elevator.visible_if_locked = true
-	self.big_escape_elevator.unlock_desc_id = "menu_asset_big_escape_elevator_desc"
-	self.big_escape_elevator.no_mystery = true
-	self.big_escape_elevator.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.big_escape_fwb = {}
-	self.big_escape_fwb.name_id = "menu_asset_big_escape_fwb"
-	self.big_escape_fwb.texture = "guis/textures/pd2/mission_briefing/assets/nightclub/asset02"
-	self.big_escape_fwb.stages = {"big"}
-	self.big_escape_fwb.visible_if_locked = true
-	self.big_escape_fwb.unlock_desc_id = "menu_asset_big_escape_fwb_desc"
-	self.big_escape_fwb.no_mystery = true
-	self.big_escape_fwb.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.big_escape_bus = {}
-	self.big_escape_bus.name_id = "menu_asset_big_escape_bus"
-	self.big_escape_bus.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/asset01"
-	self.big_escape_bus.stages = {"big"}
-	self.big_escape_bus.visible_if_locked = true
-	self.big_escape_bus.unlock_desc_id = "menu_asset_big_escape_bus_desc"
-	self.big_escape_bus.no_mystery = true
-	self.big_escape_bus.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
 	self.kosugi_speedboat = {}
 	self.kosugi_speedboat.name_id = "menu_asset_kosugi_speedboat"
-	self.kosugi_speedboat.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_kosugispeedboat"
+	self.kosugi_speedboat.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_lootdrop"
 	self.kosugi_speedboat.stages = {"kosugi"}
 	self.kosugi_speedboat.visible_if_locked = true
 	self.kosugi_speedboat.unlock_desc_id = "menu_asset_kosugi_speedboat_desc"
 	self.kosugi_speedboat.no_mystery = true
 	self.kosugi_speedboat.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.kosugi_zipline = {}
+	self.kosugi_zipline.name_id = "menu_asset_kosugi_zipline"
+	self.kosugi_zipline.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_zipline"
+	self.kosugi_zipline.stages = {"kosugi"}
+	self.kosugi_zipline.visible_if_locked = true
+	self.kosugi_zipline.unlock_desc_id = "menu_asset_kosugi_zipline_desc"
+	self.kosugi_zipline.no_mystery = true
+	self.kosugi_zipline.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.kosugi_thermite = {}
+	self.kosugi_thermite.name_id = "menu_asset_kosugi_thermite"
+	self.kosugi_thermite.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_thermite"
+	self.kosugi_thermite.stages = {"kosugi"}
+	self.kosugi_thermite.visible_if_locked = true
+	self.kosugi_thermite.unlock_desc_id = "menu_asset_kosugi_thermite_desc"
+	self.kosugi_thermite.no_mystery = true
+	self.kosugi_thermite.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

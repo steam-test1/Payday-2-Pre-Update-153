@@ -56,8 +56,10 @@ function ElementInventoryDummy:_spawn_mask(category, slot, position, rotation)
 	local mask_unit_name = managers.blackmarket:mask_unit_name_by_mask_id(slot_data.mask_id)
 	managers.dyn_resource:load(Idstring("unit"), Idstring(mask_unit_name), DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 	self._mask_unit = World:spawn_unit(Idstring(mask_unit_name), position, rotation)
-	local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), position, rotation, position, rotation)
-	self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
+	if not tweak_data.blackmarket.masks[slot_data.mask_id].type then
+		local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), position, rotation, position, rotation)
+		self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
+	end
 	self._mask_unit:base():apply_blueprint(slot_data.blueprint)
 	self._mask_unit:set_moving(true)
 end

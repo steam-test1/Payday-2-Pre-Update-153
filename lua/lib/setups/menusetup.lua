@@ -35,6 +35,9 @@ function MenuSetup:load_packages()
 			PackageManager:load(package)
 		end
 	end
+	if not PackageManager:loaded("packages/game_base_streamed") then
+		PackageManager:load("packages/game_base_streamed")
+	end
 end
 
 function MenuSetup:unload_packages()
@@ -137,6 +140,9 @@ function MenuSetup:init_finalize()
 	end
 	if managers.music then
 		managers.music:init_finalize()
+	end
+	if not Application:editor() then
+		TextureCache:set_streaming_enabled(true)
 	end
 end
 

@@ -36,7 +36,7 @@ function EnvironmentOthersFeeder:feed(nr, scene, vp, data, block, ...)
 			if Application:editor() or CoreApp.arg_value("-slave") then
 				CoreEngineAccess._editor_load(Idstring("scene"), entry_path:id())
 			end
-			Underlay:load(entry_path)
+			Underlay:load(entry_path, false)
 			managers.environment_controller:feed_params()
 		end
 		if not CoreCode.alive(Global._global_light) then

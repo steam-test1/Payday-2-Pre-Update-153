@@ -88,7 +88,9 @@ end
 
 function NetworkGame:on_load_complete()
 	local local_peer = managers.network:session():local_peer()
-	local_peer:set_synched(true)
+	if Network:is_server() then
+		local_peer:set_synched(true)
+	end
 	local id = local_peer:id()
 	local my_member = NetworkMember:new(local_peer)
 	self._members[id] = my_member
@@ -180,45 +182,7 @@ function NetworkGame:check_peer_preferred_character(preferred_character)
 	return character
 end
 
-function NetworkGame:on_peer_request_character(peer_id, character)
-	if Global.game_settings.single_player then
-		local peer = managers.network:session():peer(peer_id)
-		peer:set_character(character)
-		local lobby_menu = managers.menu:get_menu("lobby_menu")
-		if lobby_menu and lobby_menu.renderer:is_open() then
-			lobby_menu.renderer:set_character(peer_id, character)
-		end
-		local kit_menu = managers.menu:get_menu("kit_menu")
-		if kit_menu and kit_menu.renderer:is_open() then
-			kit_menu.renderer:set_character(peer_id, character)
-		end
-		return
-	end
-	if not managers.network:session():local_peer():in_lobby() then
-	end
-	if character ~= "random" then
-		for pid, member in pairs(self._members) do
-			if member:peer():character() == character then
-				print("Deny", peer_id, "cause peer", member:peer():id(), "has character", character)
-				return
-			end
-		end
-	end
-	print("[NetworkGame:on_peer_request_character] peer", peer_id, "character", character)
-	managers.network:session():peer(peer_id):set_character(character)
-	local lobby_menu = managers.menu:get_menu("lobby_menu")
-	if lobby_menu and lobby_menu.renderer:is_open() then
-		lobby_menu.renderer:set_character(peer_id, character)
-	end
-	local kit_menu = managers.menu:get_menu("kit_menu")
-	if kit_menu and kit_menu.renderer:is_open() then
-		kit_menu.renderer:set_character(peer_id, character)
-	end
-	managers.network:session():send_to_peers("request_character_response", peer_id, character)
-end
-
 function NetworkGame:on_peer_sync_complete(peer, peer_id)
-	cat_print("multiplayer_base", "[NetworkGame:on_peer_sync_complete]", peer_id)
 	if not Global.local_member then
 		return
 	end
@@ -231,16 +195,23 @@ function NetworkGame:on_peer_sync_complete(peer, peer_id)
 		Global.local_member:sync_lobby_data(peer)
 		Global.local_member:sync_data(peer)
 	end
+	self:_update_peer_ready_gui(peer)
+	if Network:is_server() then
+		self:_check_start_game_intro()
+	end
+end
+
+function NetworkGame:_update_peer_ready_gui(peer)
+	if not peer:synched() or not peer:is_streaming_complete() then
+		return
+	end
 	local kit_menu = managers.menu:get_menu("kit_menu")
 	if kit_menu and kit_menu.renderer:is_open() then
 		if peer:waiting_for_player_ready() then
-			kit_menu.renderer:set_slot_ready(peer, peer_id)
+			kit_menu.renderer:set_slot_ready(peer, peer:id())
 		else
-			kit_menu.renderer:set_slot_not_ready(peer, peer_id)
+			kit_menu.renderer:set_slot_not_ready(peer, peer:id())
 		end
-	end
-	if Network:is_server() then
-		self:_check_start_game_intro()
 	end
 end
 
@@ -263,7 +234,7 @@ function NetworkGame:on_set_member_ready(peer_id, ready, state_changed)
 	end
 end
 
-function NetworkGame:_check_start_game_intro()
+function NetworkGame:_check_start_game_intro(skip_streamer_check)
 	if not managers.network:session():chk_all_handshakes_complete() then
 		return
 	end
@@ -367,6 +338,10 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 				}))
 			elseif reason == "kicked" then
 				managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_kicked", {
+					name = peer:name()
+				}))
+			elseif reason == "auth_fail" then
+				managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_failed", {
 					name = peer:name()
 				}))
 			else
@@ -693,9 +668,26 @@ function NetworkGame:on_dropin_progress_received(dropin_peer_id, progress_percen
 	if not old_drop_in_prog or progress_percentage > old_drop_in_prog then
 		dropin_member:set_drop_in_progress(progress_percentage)
 		if game_state_machine:last_queued_state_name() == "ingame_waiting_for_players" then
-			managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(dropin_peer_id, progress_percentage)
+			managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(dropin_peer_id, progress_percentage, "join")
 		else
 			managers.menu:update_person_joining(dropin_peer_id, progress_percentage)
+		end
+	end
+end
+
+function NetworkGame:on_streaming_progress_received(peer, progress)
+	if not peer:synched() then
+		return
+	end
+	if progress == 100 then
+		self:_update_peer_ready_gui(peer)
+		if Network:is_server() then
+			managers.network:session():chk_spawn_member_unit(peer, peer:id())
+		end
+	else
+		local kit_menu = managers.menu:get_menu("kit_menu")
+		if kit_menu and kit_menu.renderer:is_open() then
+			kit_menu.renderer:set_dropin_progress(peer:id(), peer:streaming_status(), "load")
 		end
 	end
 end

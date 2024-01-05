@@ -188,16 +188,16 @@ end
 
 function LootManager:get_secured_bonus_bags_value(level_id)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
-	local amoung_bags = tweak_data.levels[level_id] and tweak_data.levels[level_id].max_bags or 20
+	local amount_bags = tweak_data.levels[level_id] and tweak_data.levels[level_id].max_bags or 20
 	local value = 0
 	for _, data in ipairs(self._global.secured) do
 		if not tweak_data.carry.small_loot[data.carry_id] then
 			if 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 				mandatory_bags_amount = mandatory_bags_amount - 1
-			elseif 0 < amoung_bags then
+			elseif 0 < amount_bags then
 				value = value + managers.money:get_bag_value(data.carry_id, data.multiplier)
 			end
-			amoung_bags = amoung_bags - 1
+			amount_bags = amount_bags - 1
 		end
 	end
 	return value
@@ -249,9 +249,16 @@ end
 
 function LootManager:get_real_total_loot_value()
 	local value = 0
+	local loot_value
 	for _, data in ipairs(self._global.secured) do
 		if not tweak_data.carry.small_loot[data.carry_id] then
-			value = value + self:get_real_value(data.carry_id, data.multiplier)
+			loot_value = self:get_real_value(data.carry_id, data.multiplier)
+			if value + loot_value < tweak_data:get_value("money_manager", "max_small_loot_value") then
+				value = value + loot_value
+			else
+				value = tweak_data:get_value("money_manager", "max_small_loot_value")
+				break
+			end
 		end
 	end
 	return value
@@ -259,9 +266,16 @@ end
 
 function LootManager:get_real_total_small_loot_value()
 	local value = 0
+	local loot_value
 	for _, data in ipairs(self._global.secured) do
 		if tweak_data.carry.small_loot[data.carry_id] then
-			value = value + self:get_real_value(data.carry_id, data.multiplier)
+			loot_value = self:get_real_value(data.carry_id, data.multiplier)
+			if value + loot_value < tweak_data:get_value("money_manager", "max_small_loot_value") then
+				value = value + loot_value
+			else
+				value = tweak_data:get_value("money_manager", "max_small_loot_value")
+				break
+			end
 		end
 	end
 	return value

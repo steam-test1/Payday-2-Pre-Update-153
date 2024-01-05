@@ -546,8 +546,7 @@ function HUDMissionBriefing:set_slot_not_ready(peer, peer_id)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 end
 
-function HUDMissionBriefing:set_dropin_progress(peer_id, progress_percentage)
-	print("set_dropin_progress( peer_id, progress_percentage )", peer_id, progress_percentage)
+function HUDMissionBriefing:set_dropin_progress(peer_id, progress_percentage, mode)
 	local slot = self._ready_slot_panel:child("slot_" .. tostring(peer_id))
 	if not slot or not alive(slot) then
 		return
@@ -555,7 +554,8 @@ function HUDMissionBriefing:set_dropin_progress(peer_id, progress_percentage)
 	slot:child("status"):stop()
 	slot:child("status"):set_visible(true)
 	slot:child("status"):set_alpha(1)
-	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_joining") .. " " .. tostring(progress_percentage) .. "%")
+	local status_text = mode == "join" and "menu_waiting_is_joining" or "debug_loading_level"
+	slot:child("status"):set_text(utf8.to_upper(managers.localization:text(status_text) .. " " .. tostring(progress_percentage) .. "%"))
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 end
 

@@ -1,6 +1,6 @@
 HostStateInLobby = HostStateInLobby or class(HostStateBase)
 
-function HostStateInLobby:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
+function HostStateInLobby:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 	print("HostStateInLobby:on_join_request_received peer_level", peer_level, join_attempt_identifier, gameversion)
 	if self:_has_peer_left_PSN(peer_name) then
 		print("this CLIENT has left us from PSN, ignore his request", peer_name)
@@ -62,6 +62,12 @@ function HostStateInLobby:on_join_request_received(data, peer_name, client_prefe
 	new_peer:set_rpc(new_peer_rpc)
 	new_peer:set_ip_verified(true)
 	Network:add_client(new_peer:rpc())
+	if not new_peer:begin_ticket_session(auth_ticket) then
+		data.session:remove_peer(new_peer, new_peer:id(), "auth_fail")
+		self:_send_request_denied(sender, 8, my_user_id)
+		return
+	end
+	local ticket = new_peer:create_ticket()
 	new_peer:set_entering_lobby(true)
 	local level_index = tweak_data.levels:get_index_from_level_id(Global.game_settings.level_id)
 	local difficulty_index = tweak_data:difficulty_to_index(Global.game_settings.difficulty)
@@ -77,7 +83,7 @@ function HostStateInLobby:on_join_request_received(data, peer_name, client_prefe
 		interupt_job_stage_level_index = interupt_stage_level and tweak_data.levels:get_index_from_level_id(interupt_stage_level) or 0
 	end
 	local server_xuid = SystemInfo:platform() == Idstring("X360") and managers.network.account:player_id() or ""
-	new_peer:send("join_request_reply", 1, new_peer_id, character, level_index, difficulty_index, 1, data.local_peer:character(), my_user_id, Global.game_settings.mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, server_xuid)
+	new_peer:send("join_request_reply", 1, new_peer_id, character, level_index, difficulty_index, 1, data.local_peer:character(), my_user_id, Global.game_settings.mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, server_xuid, ticket)
 	new_peer:send("set_loading_state", false)
 	if SystemInfo:platform() == Idstring("X360") then
 		new_peer:send("request_player_name_reply", managers.network:session():local_peer():name())

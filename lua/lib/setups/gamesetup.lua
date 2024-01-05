@@ -153,6 +153,7 @@ require("lib/units/props/OffshoreGui")
 require("lib/units/props/Ladder")
 require("lib/units/vehicles/SimpleVehicle")
 require("lib/units/props/ZipLine")
+require("lib/units/props/TextTemplateBase")
 require("lib/managers/menu/FadeoutGuiObject")
 GameSetup = GameSetup or class(Setup)
 
@@ -160,6 +161,9 @@ function GameSetup:load_packages()
 	Setup.load_packages(self)
 	if not PackageManager:loaded("packages/game_base") then
 		PackageManager:load("packages/game_base")
+	end
+	if not PackageManager:loaded("packages/game_base_streamed") then
+		PackageManager:load("packages/game_base_streamed")
 	end
 	local prefix = "packages/dlcs/"
 	local sufix = "/game_base"
@@ -218,6 +222,9 @@ function GameSetup:unload_packages()
 	if not Global.load_level then
 		if PackageManager:loaded("packages/game_base") then
 			PackageManager:unload("packages/game_base")
+		end
+		if PackageManager:loaded("packages/game_base_streamed") then
+			PackageManager:unload("packages/game_base_streamed")
 		end
 		local prefix = "packages/dlcs/"
 		local sufix = "/game_base"

@@ -116,9 +116,16 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 		result.rays = 0 < #col_rays and col_rays
 	end
 	managers.statistics:shot_fired({
-		hit = result.hit_enemy,
+		hit = false,
 		weapon_unit = self._unit
 	})
+	for _, _ in pairs(hit_enemies) do
+		managers.statistics:shot_fired({
+			hit = true,
+			weapon_unit = self._unit,
+			skip_bullet_count = true
+		})
+	end
 	return result
 end
 

@@ -25,8 +25,8 @@ function HostNetworkSession:init()
 	self:set_state("in_lobby")
 end
 
-function HostNetworkSession:on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
-	return self._state.on_join_request_received and self._state:on_join_request_received(self._state_data, peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
+function HostNetworkSession:on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
+	return self._state.on_join_request_received and self._state:on_join_request_received(self._state_data, peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 end
 
 function HostNetworkSession:send_to_host(...)
@@ -180,7 +180,7 @@ function HostNetworkSession:on_peer_save_received(event, event_data)
 		if is_playing then
 			managers.menu:update_person_joining(peer:id(), progress_percentage)
 		elseif BaseNetworkHandler._gamestate_filter.any_ingame[game_state_machine:last_queued_state_name()] then
-			managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(peer:id(), progress_percentage)
+			managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(peer:id(), progress_percentage, "join")
 		end
 		self:send_to_peers_synched_except(peer:id(), "dropin_progress", peer:id(), progress_percentage)
 	else
@@ -379,20 +379,23 @@ function HostNetworkSession:remove_peer(peer, peer_id, reason)
 			self:chk_spawn_member_unit(other_peer, other_peer_id)
 		end
 	end
-	local info_msg_type
+	local info_msg_type = "kick_peer"
+	local info_msg_id
 	if reason == "kicked" then
-		info_msg_type = "kick_peer"
+		info_msg_id = 0
+	elseif reason == "auth_fail" then
+		info_msg_id = 2
 	else
-		info_msg_type = "remove_dead_peer"
+		info_msg_id = 1
 	end
 	for other_peer_id, other_peer in pairs(self._peers) do
 		if other_peer:handshakes()[peer_id] == true or other_peer:handshakes()[peer_id] == "asked" or other_peer:handshakes()[peer_id] == "exchanging_info" then
-			other_peer:send_after_load(info_msg_type, peer_id)
+			other_peer:send_after_load(info_msg_type, peer_id, info_msg_id)
 			other_peer:set_handshake_status(peer_id, "removing")
 		end
 	end
-	if reason ~= "left" and reason ~= "kicked" then
-		peer:send(info_msg_type, peer_id)
+	if reason ~= "left" and reason ~= "kicked" and reason ~= "auth_fail" then
+		peer:send(info_msg_type, peer_id, info_msg_id)
 	end
 	self:chk_server_joinable_state()
 end
@@ -442,7 +445,7 @@ function HostNetworkSession:process_dead_con_reports()
 				print("[HostNetworkSession:process_dead_con_reports] kicking reported ", reporter_peer:id(), reported_peer:id(), reporter_peer:creation_t(), reported_peer:creation_t())
 				kick_peer = reported_peer
 			end
-			self:on_remove_dead_peer(kick_peer, kick_peer:id())
+			self:on_peer_kicked(kick_peer, kick_peer:id(), 1)
 		end
 	end
 end
@@ -454,7 +457,7 @@ function HostNetworkSession:chk_spawn_member_unit(peer, peer_id)
 		print("Game not started yet")
 		return
 	end
-	if not member or member:spawn_unit_called() or not peer:waiting_for_player_ready() then
+	if not (member and not member:spawn_unit_called() and peer:waiting_for_player_ready()) or not peer:is_streaming_complete() then
 		print("not ready to spawn unit: member", member, "member:spawn_unit_called()", member:spawn_unit_called(), "peer:waiting_for_player_ready()", peer:waiting_for_player_ready())
 		return
 	end

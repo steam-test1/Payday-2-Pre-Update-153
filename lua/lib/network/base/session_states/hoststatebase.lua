@@ -6,7 +6,7 @@ end
 function HostStateBase:exit(data, name, enter_params)
 end
 
-function HostStateBase:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender)
+function HostStateBase:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 	print("[HostStateBase:on_join_request_received]", data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender:ip_at_index(0))
 	local my_user_id = data.local_peer:user_id() or ""
 	if not managers.network.matchmake:is_server_joinable() then
@@ -18,7 +18,7 @@ end
 
 function HostStateBase:_send_request_denied(sender, reason, my_user_id)
 	local xuid = SystemInfo:platform() == Idstring("X360") and managers.network.account:player_id() or ""
-	sender:join_request_reply(reason, 0, "", 1, 1, 0, "", my_user_id, "", 0, 0, 0, 0, xuid)
+	sender:join_request_reply(reason, 0, "", 1, 1, 0, "", my_user_id, "", 0, 0, 0, 0, xuid, 0)
 end
 
 function HostStateBase:_has_peer_left_PSN(peer_name)

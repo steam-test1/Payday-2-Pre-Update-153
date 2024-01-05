@@ -229,7 +229,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.poetry_soundtrack.name_id = "bm_global_value_poetry_soundtrack"
 	self.global_values.poetry_soundtrack.desc_id = "menu_l_global_value_poetry_soundtrack"
 	self.global_values.poetry_soundtrack.unlock_id = "bm_global_value_poetry_soundtrack_unlock"
-	self.global_values.poetry_soundtrack.color = Color(255, 59, 174, 254) / 255
+	self.global_values.poetry_soundtrack.color = Color(255, 255, 212, 0) / 255
 	self.global_values.poetry_soundtrack.dlc = true
 	self.global_values.poetry_soundtrack.chance = 1
 	self.global_values.poetry_soundtrack.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "poetry_sountrack")

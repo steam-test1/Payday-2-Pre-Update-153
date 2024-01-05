@@ -762,6 +762,18 @@ function DLCTweakData:init(tweak_data)
 	self.gage_pack_jobs.content = {}
 	self.gage_pack_jobs.dlc = "has_gage_pack_jobs"
 	self.gage_pack_jobs.content.loot_drops = {}
+	self.kosugi_4 = {}
+	self.kosugi_4.dlc = "has_achievement"
+	self.kosugi_4.achievement_id = "kosugi_4"
+	self.kosugi_4.content = {}
+	self.kosugi_4.content.loot_global_value = "infamous"
+	self.kosugi_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "samurai",
+			amount = 1
+		}
+	}
 	self.sweettooth = {}
 	self.sweettooth.content = {}
 	self.sweettooth.dlc = "has_sweettooth"

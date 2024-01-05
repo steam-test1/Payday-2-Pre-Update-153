@@ -38,7 +38,12 @@ function CopLogicAttack.enter(data, new_logic_name, enter_params)
 	my_data.attitude = data.objective and data.objective.attitude or "avoid"
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
 	data.unit:brain():set_update_enabled_state(true)
-	data.unit:movement():set_cool(false)
+	if data.cool then
+		data.unit:movement():set_cool(false)
+	end
+	if (not data.objective or not data.objective.stance) and data.unit:movement():stance_code() == 1 then
+		data.unit:movement():set_stance("hos")
+	end
 	if my_data ~= data.internal_data then
 		return
 	end
@@ -453,7 +458,7 @@ function CopLogicAttack._chk_request_action_walk_to_cover_shoot_pos(data, my_dat
 end
 
 function CopLogicAttack._chk_request_action_crouch(data)
-	if data.unit:movement():chk_action_forbidden("crouch") then
+	if data.unit:anim_data().crouch or data.unit:movement():chk_action_forbidden("crouch") then
 		return
 	end
 	local new_action_data = {type = "crouch", body_part = 4}
@@ -462,7 +467,7 @@ function CopLogicAttack._chk_request_action_crouch(data)
 end
 
 function CopLogicAttack._chk_request_action_stand(data)
-	if data.unit:movement():chk_action_forbidden("stand") then
+	if data.unit:anim_data().stand or data.unit:movement():chk_action_forbidden("stand") then
 		return
 	end
 	local new_action_data = {type = "stand", body_part = 4}

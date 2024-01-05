@@ -67,6 +67,7 @@ require("lib/managers/GageAssignmentManager")
 require("lib/managers/PrePlanningManager")
 require("lib/units/UnitDamage")
 require("lib/units/props/DigitalGui")
+require("lib/units/props/TextGui")
 require("lib/units/MaskExt")
 script_data = script_data or {}
 game_state_machine = game_state_machine or nil
@@ -191,7 +192,7 @@ function Setup:_start_loading_screen()
 	cat_print("loading_environment", "[LoadingEnvironment] Start.")
 	local setup
 	if not LoadingEnvironmentScene:loaded() then
-		LoadingEnvironmentScene:load("levels/zone")
+		LoadingEnvironmentScene:load("levels/zone", false)
 	end
 	local load_level_data
 	if Global.load_level then

@@ -89,6 +89,7 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(38, "dof_setting", "standard")
 	self:setup_setting(39, "fps_cap", 135)
 	self:setup_setting(40, "use_headbob", true)
+	self:setup_setting(41, "max_streaming_chunk", 4096)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)
@@ -529,6 +530,7 @@ function GenericUserManager:load(data, cache_version)
 	else
 		Global.debug_post_effects_enabled = true
 	end
+	managers.dyn_resource:set_max_streaming_chunk(self:get_setting("max_streaming_chunk"))
 end
 
 Xbox360UserManager = Xbox360UserManager or class(GenericUserManager)

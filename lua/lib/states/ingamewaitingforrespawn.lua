@@ -110,8 +110,7 @@ end
 
 function IngameWaitingForRespawnState.request_player_spawn(peer_to_spawn)
 	if Network:is_client() then
-		local peer_id = managers.network:session():local_peer():id()
-		managers.network:session():server_peer():send("request_spawn_member", peer_id)
+		managers.network:session():server_peer():send("request_spawn_member")
 	else
 		local possible_criminals = {}
 		for u_key, u_data in pairs(managers.groupai:state():all_player_criminals()) do

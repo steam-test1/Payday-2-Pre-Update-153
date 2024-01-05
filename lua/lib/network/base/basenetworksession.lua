@@ -164,6 +164,7 @@ end
 function BaseNetworkSession:remove_peer(peer, peer_id, reason)
 	print("[BaseNetworkSession:remove_peer]", inspect(peer), peer_id, reason)
 	Application:stack_dump()
+	peer:end_ticket_session()
 	if peer_id == 1 then
 		self._server_peer = nil
 	end
@@ -241,12 +242,25 @@ function BaseNetworkSession:on_peer_lost(peer, peer_id)
 	end
 end
 
-function BaseNetworkSession:on_peer_kicked(peer, peer_id)
+function BaseNetworkSession:on_peer_kicked(peer, peer_id, message_id)
 	if peer ~= self._local_peer then
-		local ident = self._ids_WIN32 == SystemInfo:platform() and peer:user_id() or peer:name()
-		self._kicked_list[ident] = true
-		self:remove_peer(peer, peer_id, "kicked")
+		if message_id == 0 then
+			local ident = self._ids_WIN32 == SystemInfo:platform() and peer:user_id() or peer:name()
+			self._kicked_list[ident] = true
+		end
+		local reason = "kicked"
+		if message_id == 1 then
+			reason = "removed_dead"
+		elseif message_id == 2 then
+			reason = "auth_fail"
+		end
+		self:remove_peer(peer, peer_id, reason)
 	else
+		if message_id == 1 then
+			Global.on_remove_peer_message = "dialog_remove_dead_peer"
+		elseif message_id == 2 then
+			Global.on_remove_peer_message = "dialog_authentication_fail"
+		end
 		print("IVE BEEN KICKED!")
 		if self:_local_peer_in_lobby() then
 			print("KICKED FROM LOBBY")
@@ -258,31 +272,6 @@ function BaseNetworkSession:on_peer_kicked(peer, peer_id)
 			managers.network.voice_chat:destroy_voice()
 			if game_state_machine:current_state().on_kicked then
 				game_state_machine:current_state():on_kicked()
-			end
-		end
-	end
-end
-
-function BaseNetworkSession:on_remove_dead_peer(peer, peer_id)
-	if peer ~= self._local_peer then
-		self:remove_peer(peer, peer_id, "removed_dead")
-	else
-		print("IVE BEEN REMOVED DEAD!")
-		if self._recieved_ok_to_load_level then
-			print("ignoring due to self._received_ok_to_load_level")
-		else
-			Global.on_remove_dead_peer_message = "dialog_remove_dead_peer"
-			if self:_local_peer_in_lobby() then
-				print("REMOVED FROM LOBBY")
-				managers.menu:on_leave_lobby()
-				managers.menu:show_peer_kicked_dialog()
-			else
-				print("REMOVED FROM INGAME")
-				managers.network.matchmake:destroy_game()
-				managers.network.voice_chat:destroy_voice()
-				if game_state_machine:current_state().on_kicked then
-					game_state_machine:current_state():on_kicked()
-				end
 			end
 		end
 	end
@@ -476,7 +465,7 @@ function BaseNetworkSession:set_peer_loading_state(peer, state)
 		if peer:ip_verified() then
 			Global.local_member:sync_lobby_data(peer)
 			Global.local_member:sync_data(peer)
-			peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready())
+			peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready() and 1 or 0, 1)
 		end
 		peer:flush_overwriteable_msgs()
 	end
@@ -554,10 +543,13 @@ end
 
 function BaseNetworkSession:chk_send_local_player_ready()
 	local state = self._local_peer:waiting_for_player_ready()
-	managers.network:session():send_to_peers_loaded("set_member_ready", state)
+	self:send_to_peers_loaded("set_member_ready", state and 1 or 0, 1)
 end
 
 function BaseNetworkSession:destroy()
+	for _, peer in pairs(self._peers) do
+		peer:end_ticket_session()
+	end
 	if self._dropin_complete_event_manager_id then
 		EventManager:unregister_listener(self._dropin_complete_event_manager_id)
 		self._dropin_complete_event_manager_id = nil
@@ -690,4 +682,26 @@ function BaseNetworkSession:resolve_new_peer_rpc(new_peer, incomming_rpc)
 		Application:error("[BaseNetworkSession:resolve_new_peer_rpc] could not resolve IP address!!!")
 		return incomming_rpc
 	end
+end
+
+function BaseNetworkSession:are_peers_done_streaming()
+	for peer_id, peer in pairs(self._peers) do
+		if peer:synched() and not peer:is_streaming_complete() then
+			return
+		end
+	end
+	return true
+end
+
+function BaseNetworkSession:peer_streaming_status()
+	local status = 100
+	local peer_name
+	for peer_id, peer in pairs(self._peers) do
+		local peer_status = peer:streaming_status()
+		if status >= peer_status then
+			peer_name = peer:name()
+			status = peer_status
+		end
+	end
+	return peer_name, status
 end

@@ -308,7 +308,9 @@ CopActionAct._act_redirects.SO = {
 	"cmf_so_stand_type",
 	"cmf_so_window_observer",
 	"cmf_so_sit_table_right",
+	"cmf_so_sit_table_right2",
 	"cmf_so_sit_table_left",
+	"cmf_so_sit_table_left2",
 	"cmf_so_sit_high_chair",
 	"cmf_so_talk",
 	"cmf_so_idle",
@@ -654,6 +656,9 @@ function CopActionAct:_play_anim()
 		self._unit:movement():set_position(self._unit:movement():m_pos():with_z(self._action_desc.pos_z))
 	else
 		redir_name = self._action_desc.variant
+		if redir_name == "idle" and self._common_data.stance.code == 1 then
+			redir_name = "exit"
+		end
 		redir_res = self._ext_movement:play_redirect(redir_name, self._action_desc.start_anim_time)
 	end
 	if not redir_res then

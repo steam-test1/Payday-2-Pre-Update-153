@@ -105,7 +105,8 @@ function _editable_zipline_table(unit)
 			end_pos = unit:zipline():end_pos(),
 			speed = unit:zipline():speed(),
 			slack = unit:zipline():slack(),
-			usage_type = unit:zipline():usage_type()
+			usage_type = unit:zipline():usage_type(),
+			ai_ignores_bag = unit:zipline():ai_ignores_bag()
 		}
 	end
 	return t

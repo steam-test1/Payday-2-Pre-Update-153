@@ -256,12 +256,12 @@ function MoneyManager:get_money_by_params(params)
 			bag_value = bonus_bags * total_stages
 			bag_risk = math.round(bag_value * money_multiplier * bag_skill_bonus)
 			bag_value = (bag_value + mandatory_bags) * bag_skill_bonus
-			total_payout = math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value)
+			total_payout = math.max(0, math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value))
 			stage_value = 0
-			bag_value = math.round(bag_value / offshore_rate)
-			bag_risk = math.round(bag_risk / offshore_rate)
+			bag_value = math.max(0, math.round(bag_value / offshore_rate))
+			bag_risk = math.max(0, math.round(bag_risk / offshore_rate))
 			crew_value = total_payout
-			total_payout = math.round(total_payout * self:get_tweak_value("money_manager", "alive_humans_multiplier", num_winners))
+			total_payout = math.max(0, math.round(total_payout * self:get_tweak_value("money_manager", "alive_humans_multiplier", num_winners)))
 			crew_value = total_payout - crew_value
 		else
 			total_payout = small_value
@@ -278,8 +278,8 @@ function MoneyManager:get_money_by_params(params)
 			total_payout = total_payout * limited_bonus
 		end
 		if on_last_stage then
-			job_risk = math.round(risk_static_value / offshore_rate)
-			job_value = math.round(static_value / offshore_rate) - job_risk
+			job_risk = math.max(0, math.round(risk_static_value / offshore_rate))
+			job_value = math.max(0, math.round(static_value / offshore_rate) - job_risk)
 		end
 	else
 		stage_value = self:get_stage_payout_by_stars(total_stars) or 0
@@ -1111,8 +1111,8 @@ end
 
 function MoneyManager:load(data)
 	local state = data.MoneyManager
-	self._global.total = state.total
-	self._global.total_collected = state.total_collected or Application:digest_value(0, true)
-	self._global.offshore = state.offshore or Application:digest_value(0, true)
-	self._global.total_spent = state.total_spent or Application:digest_value(0, true)
+	self._global.total = state.total and Application:digest_value(math.max(0, Application:digest_value(state.total, false)), true)
+	self._global.total_collected = state.total_collected and Application:digest_value(math.max(0, Application:digest_value(state.total_collected, false)), true) or Application:digest_value(0, true)
+	self._global.offshore = state.offshore and Application:digest_value(math.max(0, Application:digest_value(state.offshore, false)), true) or Application:digest_value(0, true)
+	self._global.total_spent = state.total_spent and Application:digest_value(math.max(0, Application:digest_value(state.total_spent, false)), true) or Application:digest_value(0, true)
 end

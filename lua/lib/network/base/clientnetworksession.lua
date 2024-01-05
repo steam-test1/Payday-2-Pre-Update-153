@@ -11,6 +11,7 @@ function ClientNetworkSession:request_join_host(host_rpc, result_cb)
 	if SystemInfo:platform() == self._ids_WIN32 then
 		peer:set_steam_rpc(host_rpc)
 	end
+	local ticket = peer:create_ticket()
 	self._server_peer = peer
 	Network:set_multiplayer(true)
 	Network:set_client(host_rpc)
@@ -28,14 +29,15 @@ function ClientNetworkSession:request_join_host(host_rpc, result_cb)
 			xuid,
 			lvl,
 			gameversion,
-			join_req_id
+			join_req_id,
+			ticket
 		}
 	}
 	request_rpc:request_join(unpack(self._join_request_params.params))
 	self._last_join_request_t = TimerManager:wall():time()
 end
 
-function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_character, level_index, difficulty_index, state_index, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, sender)
+function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_character, level_index, difficulty_index, state_index, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
 	print("[ClientNetworkSession:on_join_request_reply] ", self._server_peer and self._server_peer:user_id(), user_id, sender:ip_at_index(0), sender:protocol_at_index(0))
 	if not self._server_peer or not self._cb_find_game then
 		return
@@ -83,6 +85,7 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 		self._local_peer:set_id(my_peer_id)
 		self._local_peer:set_character(my_character)
 		self._server_peer:set_id(1)
+		self._server_peer:begin_ticket_session(auth_ticket)
 		self._server_peer:set_in_lobby_soft(state_index == 1)
 		self._server_peer:set_synched_soft(state_index ~= 1)
 		if SystemInfo:platform() == Idstring("PS3") then
@@ -120,6 +123,9 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 	elseif reply == 7 then
 		self:remove_peer(self._server_peer, 1)
 		cb("WRONG_VERSION")
+	elseif reply == 8 then
+		self:remove_peer(self._server_peer, 1)
+		cb("AUTH_FAILED")
 	end
 end
 
@@ -299,7 +305,7 @@ function ClientNetworkSession:on_mutual_connection(other_peer_id)
 		return
 	end
 	if self._local_peer:loaded() and other_peer:ip_verified() then
-		other_peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready())
+		other_peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready() and 1 or 0, 1)
 	end
 end
 
@@ -352,10 +358,11 @@ function ClientNetworkSession:on_peer_save_received(event, event_data)
 		else
 			kit_menu.renderer:set_slot_not_ready(self._local_peer, self._local_peer:id())
 		end
+		self._local_peer:set_synched(true)
 	else
 		local progress_ratio = packet_index / total_nr_packets
 		local progress_percentage = math.floor(math.clamp(progress_ratio * 100, 0, 100))
-		managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(self._local_peer:id(), progress_percentage)
+		managers.menu:get_menu("kit_menu").renderer:set_dropin_progress(self._local_peer:id(), progress_percentage, "join")
 	end
 end
 

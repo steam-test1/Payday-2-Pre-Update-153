@@ -119,22 +119,6 @@ function PlayerManager:aquire_default_upgrades()
 	self:_verify_equipment_kit()
 end
 
-function PlayerManager:update_kit_to_peer(peer)
-	local peer_id = managers.network:session():local_peer():id()
-	for i = 1, PlayerManager.WEAPON_SLOTS do
-		local weapon = self:weapon_in_slot(i)
-		if weapon then
-			peer:send_after_load("set_kit_selection", peer_id, "weapon", weapon, i)
-		end
-	end
-	for i = 1, 3 do
-		local equipment = self:equipment_in_slot(i)
-		if equipment then
-			peer:send_after_load("set_kit_selection", peer_id, "equipment", equipment, i)
-		end
-	end
-end
-
 function PlayerManager:update(t, dt)
 	if self:has_category_upgrade("player", "close_to_hostage_boost") and (not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t) then
 		local local_player = self:local_player()
@@ -982,13 +966,13 @@ function PlayerManager:update_deployable_equipment_to_peer(peer)
 	if self._global.synced_deployables[peer_id] then
 		local deployable = self._global.synced_deployables[peer_id].deployable
 		local amount = self._global.synced_deployables[peer_id].amount
-		peer:send_after_load("sync_deployable_equipment", peer_id, deployable, amount)
+		peer:send_after_load("sync_deployable_equipment", deployable, amount)
 	end
 end
 
 function PlayerManager:update_deployable_equipment_amount_to_peers(equipment, amount)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_deployable_equipment", peer_id, equipment, amount)
+	managers.network:session():send_to_peers("sync_deployable_equipment", equipment, amount)
 	self:set_synced_deployable_equipment(peer_id, equipment, amount)
 end
 
@@ -1021,13 +1005,13 @@ function PlayerManager:update_cable_ties_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_cable_ties[peer_id] then
 		local amount = self._global.synced_cable_ties[peer_id].amount
-		peer:send_after_load("sync_cable_ties", peer_id, amount)
+		peer:send_after_load("sync_cable_ties", amount)
 	end
 end
 
 function PlayerManager:update_synced_cable_ties_to_peers(amount)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_cable_ties", peer_id, amount)
+	managers.network:session():send_to_peers("sync_cable_ties", amount)
 	self:set_synced_cable_ties(peer_id, amount)
 end
 
@@ -1057,14 +1041,14 @@ function PlayerManager:update_ammo_info_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_ammo_info[peer_id] then
 		for selection_index, ammo_info in pairs(self._global.synced_ammo_info[peer_id]) do
-			peer:send_after_load("sync_ammo_amount", peer_id, selection_index, unpack(ammo_info))
+			peer:send_after_load("sync_ammo_amount", selection_index, unpack(ammo_info))
 		end
 	end
 end
 
 function PlayerManager:update_synced_ammo_info_to_peers(selection_index, max_clip, current_clip, current_left, max)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers_loaded("sync_ammo_amount", peer_id, selection_index, max_clip, current_clip, current_left, max)
+	managers.network:session():send_to_peers_loaded("sync_ammo_amount", selection_index, max_clip, current_clip, current_left, max)
 	self:set_synced_ammo_info(peer_id, selection_index, max_clip, current_clip, current_left, max)
 end
 
@@ -1094,13 +1078,13 @@ function PlayerManager:update_carry_to_peer(peer)
 		local dye_initiated = self._global.synced_carry[peer_id].dye_initiated
 		local has_dye_pack = self._global.synced_carry[peer_id].has_dye_pack
 		local dye_value_multiplier = self._global.synced_carry[peer_id].dye_value_multiplier
-		peer:send_after_load("sync_carry", peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+		peer:send_after_load("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	end
 end
 
 function PlayerManager:update_synced_carry_to_peers(carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_carry", peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.network:session():send_to_peers("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	self:set_synced_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 end
 
@@ -1132,7 +1116,7 @@ end
 
 function PlayerManager:update_removed_synced_carry_to_peers()
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_remove_carry", peer_id)
+	managers.network:session():send_to_peers("sync_remove_carry")
 	self:remove_synced_carry(peer_id)
 end
 
@@ -1593,7 +1577,7 @@ function PlayerManager:verify_equipment(peer_id, equipment_id)
 			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
 				name = peer:name()
 			}))
-			managers.hud:mark_cheater(peer:id())
+			peer:mark_cheater()
 			return false
 		end
 		self._asset_equipment[id] = (self._asset_equipment[id] or 0) + 1
@@ -1634,7 +1618,7 @@ function PlayerManager:verify_carry(peer_id, carry_id)
 			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_bags", {
 				name = peer:name()
 			}))
-			managers.hud:mark_cheater(peer:id())
+			peer:mark_cheater()
 			return false
 		end
 	end
@@ -1806,13 +1790,13 @@ function PlayerManager:update_grenades_to_peer(peer)
 	if self._global.synced_grenades[peer_id] then
 		local grenade = self._global.synced_grenades[peer_id].grenade
 		local amount = self._global.synced_grenades[peer_id].amount
-		peer:send_after_load("sync_grenades", peer_id, grenade, Application:digest_value(amount, false))
+		peer:send_after_load("sync_grenades", grenade, Application:digest_value(amount, false))
 	end
 end
 
 function PlayerManager:update_grenades_amount_to_peers(grenade, amount)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_grenades", peer_id, grenade, amount)
+	managers.network:session():send_to_peers("sync_grenades", grenade, amount)
 	self:set_synced_grenades(peer_id, grenade, amount)
 end
 
@@ -1894,6 +1878,7 @@ function PlayerManager:set_carry(carry_id, carry_multiplier, dye_initiated, has_
 		return
 	end
 	player:movement():current_state():set_tweak_data(carry_type)
+	player:sound():play("Play_bag_generic_pickup", nil, false)
 end
 
 function PlayerManager:bank_carry()
@@ -1912,6 +1897,9 @@ function PlayerManager:drop_carry(zipline_unit)
 	end
 	self._carry_blocked_cooldown_t = Application:time() + (1.2 + math.rand(0.3))
 	local player = self:player_unit()
+	if player then
+		player:sound():play("Play_bag_generic_throw", nil, false)
+	end
 	local camera_ext = player:camera()
 	local dye_initiated = carry_data.dye_initiated
 	local has_dye_pack = carry_data.has_dye_pack

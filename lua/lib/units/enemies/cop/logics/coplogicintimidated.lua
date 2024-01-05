@@ -466,7 +466,7 @@ function CopLogicIntimidated.on_rescue_SO_administered(ignore_this, data, receiv
 end
 
 function CopLogicIntimidated.rescue_SO_verification(ignore_this, unit)
-	return tweak_data.character[unit:base()._tweak_table].rescue_hostages
+	return unit:base():char_tweak().rescue_hostages and not unit:movement():cool()
 end
 
 function CopLogicIntimidated.on_rescue_SO_failed(ignore_this, data)

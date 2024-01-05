@@ -238,7 +238,7 @@ function MissionLayer:update(time, rel_time)
 	update_selected_on_brush:set_color(Color(0.25, 0, 0, 1))
 	local unit_disabled = Draw:brush()
 	unit_disabled:set_color(Color(0.15, 1, 0, 0))
-	local all_units = self:_units_as_pairs(self._created_units)
+	local all_units = self._created_units_pairs
 	local current_continent_locked = managers.editor:continent(self._scripts[self:current_script()].continent):value("locked")
 	local current_script = self:current_script()
 	local cam_pos = managers.editor:camera():position()
