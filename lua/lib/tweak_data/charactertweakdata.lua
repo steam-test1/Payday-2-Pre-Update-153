@@ -3465,7 +3465,6 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		}
 	}
-	presets.weapon.deathwish.raging_bull = presets.weapon.expert.c45
 	presets.weapon.deathwish.ak47 = presets.weapon.deathwish.m4
 	presets.weapon.deathwish.mossberg = presets.weapon.deathwish.r870
 	presets.weapon.gang_member = {

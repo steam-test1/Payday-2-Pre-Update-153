@@ -104,7 +104,7 @@ function MoneyTweakData:init()
 		hard = 1.25,
 		overkill = 1.5,
 		overkill_145 = 2,
-		overkill_290 = 4
+		overkill_290 = 2.5
 	}
 	self.buy_premium_static_fee = {
 		easy = 100000,
@@ -112,7 +112,7 @@ function MoneyTweakData:init()
 		hard = 150000,
 		overkill = 200000,
 		overkill_145 = 300000,
-		overkill_290 = 600000
+		overkill_290 = 360000
 	}
 	self.global_value_multipliers = {}
 	self.global_value_multipliers.normal = 1

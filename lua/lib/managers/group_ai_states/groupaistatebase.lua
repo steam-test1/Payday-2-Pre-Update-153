@@ -188,6 +188,14 @@ function GroupAIStateBase:set_AI_enabled(state)
 		end
 		self._editor_sim_rem_units = nil
 	end
+	if not state then
+		local all_deployed_equipment = World:find_units_quick("all", 14)
+		for _, unit in ipairs(all_deployed_equipment) do
+			if alive(unit) then
+				World:delete_unit(unit)
+			end
+		end
+	end
 end
 
 function GroupAIStateBase:_init_misc_data()

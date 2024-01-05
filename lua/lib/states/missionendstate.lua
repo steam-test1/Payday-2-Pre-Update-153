@@ -106,7 +106,7 @@ function MissionEndState:at_enter(old_state, params)
 		if not managers.statistics:is_dropin() then
 			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
-				diff_pass = not achievement_data.difficulty or Global.game_settings.difficulty == achievement_data.difficulty
+				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 				mask_pass = not achievement_data.mask or managers.blackmarket:equipped_mask().mask_id == achievement_data.mask
 				job_pass = not achievement_data.job or managers.job:on_last_stage() and managers.job:current_job_id() == achievement_data.job
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract

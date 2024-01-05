@@ -2473,7 +2473,10 @@ function TweakData:init()
 				"fbi_heavy_swat"
 			},
 			melee_type = "knife",
-			difficulty = "overkill_145",
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
 			health = 25
 		}
 	}
@@ -2481,13 +2484,19 @@ function TweakData:init()
 		in_soviet_russia = {
 			stat = "halloween_10_stats",
 			mask = "bear",
-			difficulty = "overkill_145",
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
 			contract = "vlad"
 		},
 		i_take_scores = {
 			stat = "armored_4_stat",
 			mask = "heat",
-			difficulty = "overkill_145",
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
 			jobs = {
 				"arm_cro",
 				"arm_und",
@@ -2499,137 +2508,192 @@ function TweakData:init()
 		eco_round = {
 			award = "charliesierra_7",
 			no_shots = "primaries",
-			difficulty = "overkill_145",
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
 			job = "roberts"
 		},
 		death_ukranian = {
 			award = "death_1",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "ukrainian_job_prof"
 		},
 		death_mallcrasher = {
 			award = "death_2",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "mallcrasher"
 		},
 		death_four_stores = {
 			award = "death_3",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "four_stores"
 		},
 		death_nightclub = {
 			award = "death_4",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "nightclub"
 		},
 		death_watchdogs = {
 			award = "death_34",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "watchdogs"
 		},
 		death_watchdogs_prof = {
 			award = "death_6",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "watchdogs_prof"
 		},
 		death_rats = {
 			award = "death_33",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "alex"
 		},
 		death_rats_prof = {
 			award = "death_7",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "alex_prof"
 		},
 		death_firestarter = {
 			award = "death_32",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "firestarter"
 		},
 		death_firestarter_prof = {
 			award = "death_8",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "firestarter_prof"
 		},
 		death_framing_frame = {
 			award = "death_35",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "framing_frame"
 		},
 		death_framing_frame_prof = {
 			award = "death_10",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "framing_frame_prof"
 		},
 		death_big_oil = {
 			award = "death_11",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "welcome_to_the_jungle_prof"
 		},
 		death_jewelry_store = {
 			award = "death_13",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "jewelry_store"
 		},
 		death_diamond_store = {
 			award = "death_14",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "family"
 		},
 		death_go_bank = {
 			award = "death_15",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "roberts"
 		},
 		death_bank_heist = {
 			award = "death_16",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "branchbank_prof"
 		},
 		death_bank_heist_gold = {
 			award = "death_17",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "branchbank_gold_prof"
 		},
 		death_bank_heist_cash = {
 			award = "death_18",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "branchbank_cash"
 		},
 		death_bank_heist_deposit = {
 			award = "death_19",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "branchbank_deposit"
 		},
 		death_transport_crossroads = {
 			award = "death_20",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_cro"
 		},
 		death_transport_downtown = {
 			award = "death_21",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_hcm"
 		},
 		death_transport_harbor = {
 			award = "death_22",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_fac"
 		},
 		death_transport_park = {
 			award = "death_23",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_par"
 		},
 		death_transport_underpass = {
 			award = "death_24",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_und"
 		},
 		death_transport_train = {
 			award = "death_25",
-			difficulty = "overkill_290",
+			difficulty = {
+				"overkill_290"
+			},
 			job = "arm_for"
 		}
 	}
@@ -2665,8 +2729,7 @@ function TweakData:init()
 		"arm_hcm",
 		"arm_fac",
 		"arm_par",
-		"arm_und",
-		"arm_for"
+		"arm_und"
 	}
 	self.achievement.complete_heist_stats_achievements = {
 		death_vlad = {

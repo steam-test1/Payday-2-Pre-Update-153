@@ -468,7 +468,7 @@ function CopDamage:damage_melee(attack_data)
 				for achievement, achievement_data in pairs(achievements) do
 					type_pass = not achievement_data.melee_type or melee_type == achievement_data.melee_type
 					enemy_pass = not achievement_data.enemy or enemy_type == achievement_data.enemy
-					diff_pass = not achievement_data.difficulty or Global.game_settings.difficulty == achievement_data.difficulty
+					diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 					health_pass = not achievement_data.health or health_ratio <= achievement_data.health
 					if achievement_data.enemies then
 						enemy_pass = false
