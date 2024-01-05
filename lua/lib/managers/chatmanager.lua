@@ -1027,6 +1027,9 @@ end
 
 function ChatGui:open_page()
 	self:_on_focus()
+	if self._is_crimenet_chat then
+		self:_show_crimenet_chat()
+	end
 end
 
 function ChatGui:close_page()
@@ -1053,7 +1056,7 @@ function ChatGui:_on_focus()
 	self._input_panel:key_release(callback(self, self, "key_release"))
 	self._enter_text_set = false
 	self._input_panel:child("input_bg"):animate(callback(self, self, "_animate_input_bg"))
-	self:set_layer(tweak_data.gui.MOUSE_LAYER - 100)
+	self:set_layer(tweak_data.gui.CRIMENET_CHAT_LAYER)
 	self:update_caret()
 end
 

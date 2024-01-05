@@ -52,7 +52,8 @@ function MenuNodePrePlanningGui:_setup_item_panel_parent(safe_rect, shape)
 	self._align_data.panel:set_h(self._item_panel_parent:h())
 	self._list_arrows.up:hide()
 	self._list_arrows.down:hide()
-	self._legends_panel:set_bottom(self.ws:panel():bottom())
+	self._legends_panel:set_right(self.ws:panel():right() - 10)
+	self._legends_panel:set_bottom(self.ws:panel():bottom() - 5)
 end
 
 function MenuNodePrePlanningGui:_setup_item_panel(safe_rect, res)

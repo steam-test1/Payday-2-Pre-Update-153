@@ -2447,6 +2447,10 @@ function MenuComponentManager:create_preplanning_map_gui(node)
 	if #self._preplanning_saved_draws > 0 then
 		self:_set_preplanning_saved_draws(self._preplanning_saved_draws)
 	end
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(true)
+	end
 end
 
 function MenuComponentManager:_create_preplanning_map_gui(node)
@@ -2459,6 +2463,10 @@ end
 
 function MenuComponentManager:close_preplanning_map_gui()
 	self:_close_preplanning_map_gui()
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(false)
+	end
 end
 
 function MenuComponentManager:kill_preplanning_map_gui()
@@ -3099,7 +3107,7 @@ function MenuComponentManager:close()
 	self._removing_textures = {}
 end
 
-function MenuComponentManager:play_transition()
+function MenuComponentManager:play_transition(run_in_pause)
 	if self._transition_panel then
 		self._transition_panel:parent():remove(self._transition_panel)
 	end
@@ -3113,12 +3121,23 @@ function MenuComponentManager:play_transition()
 		halign = "scale",
 		valign = "scale "
 	})
-	local animate_transition = function(o)
+	
+	local function animate_transition(o)
 		local fade1 = o:child("fade1")
-		over(0.5, function(p)
+		local seconds = 0.5
+		local t = 0
+		local dt, p
+		while seconds > t do
+			dt = coroutine.yield()
+			if dt == 0 and run_in_pause then
+				dt = TimerManager:main():delta_time()
+			end
+			t = t + dt
+			p = t / seconds
 			fade1:set_alpha(1 - p)
-		end)
+		end
 	end
+	
 	self._transition_panel:animate(animate_transition)
 end
 

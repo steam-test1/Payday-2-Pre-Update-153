@@ -59,7 +59,7 @@ function PrePlanningPoint:init(map_panel, element, shape, rotation, active_node,
 		halign = "center",
 		valign = "center"
 	})
-	self._info_box:set_left(self._panel:w())
+	self._info_box:set_left(self._panel:w() + 5)
 	self._info_box:set_center_y(self._panel:h() / 2)
 	self._extras_panel = map_panel:panel({
 		layer = 11,
@@ -186,7 +186,7 @@ function PrePlanningPoint:add_properties(category, type, index)
 			halign = "scale",
 			valign = "scale",
 			layer = 3,
-			rotation = 0,
+			rotation = 360,
 			blend_mode = "add"
 		})
 		local type_data = tweak_data:get_raw_value("preplanning", "types", type)
@@ -274,11 +274,26 @@ function PrePlanningPoint:flash()
 			local start_color = tweak_data.screen_colors.text
 			
 			local s = 0
-			over(0.5, function(t)
+			
+			local function f(t)
 				s = math.min(1, math.sin(t * 180) * 2)
 				self._box:set_color(math.lerp(start_color, tweak_data.screen_colors.important_1, s))
 				self._bg:set_color(math.lerp(start_color, tweak_data.screen_colors.important_1, s))
-			end)
+			end
+			
+			local seconds = 0.5
+			local t = 0
+			while true do
+				local dt = coroutine.yield()
+				if dt == 0 then
+					dt = TimerManager:main():delta_time()
+				end
+				t = t + dt
+				if seconds <= t then
+					break
+				end
+				f(t / seconds, t)
+			end
 			self._box:set_color(start_color)
 			self._bg:set_color(start_color)
 		end
@@ -463,6 +478,9 @@ function PrePlanningPoint:animate_size_mod(o)
 	local done = false
 	while not done do
 		dt = coroutine.yield()
+		if dt == 0 then
+			dt = TimerManager:main():delta_time()
+		end
 		step = dt * 7.5
 		if self._current_size_mod ~= self._size_mod then
 			diff = self._size_mod - self._current_size_mod
@@ -926,10 +944,15 @@ function PrePlanningCustomPoint:start_custom_talk()
 		self._talk_icon:show()
 		self._talk_icon:set_rotation(0)
 		self._talk_icon:animate(function(o)
+			local dt
+			local rotation = 0
 			while true do
-				over(1.44, function(p)
-					self._talk_icon:set_rotation(p * 360)
-				end)
+				dt = coroutine.yield()
+				if dt == 0 then
+					dt = TimerManager:main():delta_time()
+				end
+				rotation = (rotation + 249.99998 * dt) % 360
+				self._talk_icon:set_rotation(rotation)
 			end
 		end)
 	end
@@ -1583,18 +1606,16 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		layer = 15
 	})
 	local cx, cy, cw, ch = managers.menu_component:get_game_chat_button_shape()
-	if self._is_pc_controller then
-		self._drawboard_button = self:create_text_button({
-			left = cx and cx + cw + 5 or 10,
-			bottom = self._panel:h() - 10,
-			clbk = callback(self, self, "toggle_drawboard"),
-			special_button = "menu_toggle_pp_drawboard",
-			text = managers.localization:to_upper_text("menu_pp_show_drawboard", {
-				BTN_Y = managers.localization:btn_macro("menu_toggle_pp_drawboard")
-			})
+	self._drawboard_button = self:create_text_button({
+		left = cx and cx + cw + 5 or 10,
+		bottom = self._panel:h() - 10,
+		clbk = callback(self, self, "toggle_drawboard"),
+		special_button = "menu_toggle_pp_drawboard",
+		text = managers.localization:to_upper_text("menu_pp_show_drawboard", {
+			BTN_Y = managers.localization:btn_macro("menu_toggle_pp_drawboard")
 		})
-		self._drawboard_button:hide()
-	end
+	})
+	self._drawboard_button:hide()
 	local drawing_tooltip = self._drawing_panel:text({
 		name = "tooltip",
 		text = " ",
@@ -2232,10 +2253,26 @@ function PrePlanningMapGui:flash_error(element_id, budget, money, ...)
 	local flash_anim = function(text)
 		local start_color = tweak_data.screen_colors.text
 		local s = 0
-		over(0.5, function(t)
+		
+		local function f(t)
 			s = math.min(1, math.sin(t * 180) * 2)
 			text:set_color(math.lerp(start_color, tweak_data.screen_colors.important_1, s))
-		end)
+		end
+		
+		local seconds = 0.5
+		local t = 0
+		while true do
+			local dt = coroutine.yield()
+			if dt == 0 then
+				dt = TimerManager:main():delta_time()
+			end
+			t = t + dt
+			if seconds <= t then
+				break
+			end
+			f(t / seconds, t)
+		end
+		f(1, seconds)
 		text:set_color(start_color)
 	end
 	if budget then
@@ -2294,7 +2331,7 @@ function PrePlanningMapGui:stop_event()
 end
 
 function PrePlanningMapGui:set_location(group)
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return
 	end
 	if not self._locations[group] then
@@ -2449,6 +2486,7 @@ function PrePlanningMapGui:set_active_node(node)
 		self._active_node.current_plan = node:parameters().current_plan or false
 		self._active_node.current_custom = node:parameters().current_custom or false
 		self._active_node.current_viewing = node:parameters().current_viewing or false
+		self._one_frame_input_delay = true
 		self._panel:show()
 		self._fullscreen_panel:show()
 		self._blackborder_workspace:show()
@@ -2457,7 +2495,7 @@ function PrePlanningMapGui:set_active_node(node)
 			self._in_viewing_mode = not not self._active_node.current_viewing
 			self._panel:child("budget_text"):set_visible(not self._active_node.current_viewing)
 			self._panel:child("total_cost"):set_visible(not self._active_node.current_viewing)
-			self._drawboard_button:set_visible(not self._active_node.current_viewing)
+			self._drawboard_button:set_visible(self._is_pc_controller and not self._active_node.current_viewing)
 			self._breakdown_button:set_visible(not self._active_node.current_viewing)
 			if self._in_viewing_mode then
 				self._panel:text({
@@ -2472,7 +2510,7 @@ function PrePlanningMapGui:set_active_node(node)
 					alpha = 0.9
 				})
 			end
-			managers.menu_component:play_transition()
+			managers.menu_component:play_transition(true)
 			managers.music:post_event("preplanning_music")
 			self:post_event("gus_preplan_01")
 			local location_data = managers.preplanning:current_location_data()
@@ -2556,6 +2594,15 @@ end
 function PrePlanningMapGui:update(t, dt)
 	if not self._enabled then
 		return
+	end
+	if not self._is_pc_controller and (not (managers.system_menu and managers.system_menu:is_active()) or not not managers.system_menu:is_closing()) then
+		local axis_x, axis_y = managers.menu_component:get_right_controller_axis()
+		if axis_x ~= 0 or axis_y ~= 0 then
+			local speed = dt * 500
+			self:_move_map_position(-axis_x * speed, axis_y * speed)
+			self._lerp_map = nil
+			self._lerp_zoom = nil
+		end
 	end
 	if self._rasteroverlay then
 		self._rasteroverlay:set_texture_rect(0, -math.mod(Application:time() * 5, 32), 32, 640)
@@ -2670,6 +2717,7 @@ function PrePlanningMapGui:update(t, dt)
 		end
 	end
 	self:update_drawing(t, dt)
+	self._one_frame_input_delay = false
 end
 
 function PrePlanningMapGui:set_map_position_to_item(item)
@@ -2794,7 +2842,7 @@ function PrePlanningMapGui:zoom_in(x, y)
 end
 
 function PrePlanningMapGui:mouse_moved(o, x, y)
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return false, "arrow"
 	end
 	self._mouse_moved = not self._last_x or not self._last_y or self._last_x ~= x or self._last_y ~= y
@@ -2881,21 +2929,21 @@ function PrePlanningMapGui:mouse_moved(o, x, y)
 end
 
 function PrePlanningMapGui:mouse_pressed(button, x, y)
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return
-	end
-	if not self._active_node or not self._active_node.current_viewing then
-		if ctrl() then
-			self:start_drawing()
-			return
-		elseif alt() then
-		elseif shift() then
-		end
 	end
 	local fx, fy = managers.gui_data:safe_to_full_16_9(x, y)
 	local inside = self._panel:inside(x, y)
 	if inside then
 		if button == Idstring("0") then
+			if not self._active_node or not self._active_node.current_viewing then
+				if ctrl() then
+					self:start_drawing()
+					return
+				elseif alt() then
+				elseif shift() then
+				end
+			end
 			for _, button in ipairs(self._text_buttons) do
 				if alive(button.panel) and button.panel:tree_visible() and button.panel:inside(x, y) then
 					if button.clbk and button.clbk(button) then
@@ -2934,7 +2982,7 @@ function PrePlanningMapGui:mouse_pressed(button, x, y)
 end
 
 function PrePlanningMapGui:mouse_released(button, x, y)
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return
 	end
 	if button ~= Idstring("0") then
@@ -2967,6 +3015,9 @@ function PrePlanningMapGui:mouse_released(button, x, y)
 end
 
 function PrePlanningMapGui:special_btn_pressed(button)
+	if not self._enabled or self._one_frame_input_delay then
+		return
+	end
 	for _, text_button in ipairs(self._text_buttons) do
 		if text_button.panel and text_button.panel:visible() and text_button.special_button and Idstring(text_button.special_button) == button and text_button.clbk and text_button.clbk(text_button) then
 			managers.menu_component:post_event("menu_enter")
@@ -2978,14 +3029,14 @@ function PrePlanningMapGui:confirm_pressed()
 end
 
 function PrePlanningMapGui:next_page()
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return
 	end
 	self:zoom_in(self._panel:w() / 2, self._panel:h() / 2)
 end
 
 function PrePlanningMapGui:previous_page()
-	if not self._enabled then
+	if not self._enabled or self._one_frame_input_delay then
 		return
 	end
 	self:zoom_out(self._panel:w() / 2, self._panel:h() / 2)
