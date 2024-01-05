@@ -13,6 +13,7 @@ function SpawnEnemyUnitElement:init(unit)
 		"units/payday2/characters/ene_biker_3/ene_biker_3",
 		"units/payday2/characters/ene_biker_4/ene_biker_4",
 		"units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1",
+		"units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2",
 		"units/payday2/characters/ene_cop_1/ene_cop_1",
 		"units/payday2/characters/ene_cop_2/ene_cop_2",
 		"units/payday2/characters/ene_cop_3/ene_cop_3",

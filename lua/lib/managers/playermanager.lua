@@ -599,6 +599,11 @@ function PlayerManager:body_armor_movement_penalty()
 	return movement_penalty
 end
 
+function PlayerManager:body_armor_dodge_penalty()
+	local armor_data = tweak_data.blackmarket.armors[managers.blackmarket:equipped_armor()]
+	return self:upgrade_value_by_level("player", "armor_dodge_penalty", armor_data.upgrade_level, 1, 1)
+end
+
 function PlayerManager:thick_skin_value()
 	if not self:has_category_upgrade("player", "thick_skin") then
 		return 0

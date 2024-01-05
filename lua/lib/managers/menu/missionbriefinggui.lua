@@ -833,16 +833,19 @@ function LoadoutItem:init(panel, text, i, assets_names, menu_component_data)
 		if 0 < table.size(perks) then
 			local perk_index = 1
 			for perk in pairs(perks) do
-				local perk_object = self._panel:bitmap({
-					texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
-					w = 16,
-					h = 16,
-					rotation = math.random(2) - 1.5,
-					alpha = 0.8,
-					layer = 2
-				})
-				perk_object:set_rightbottom(math.round(self._assets_list[i]:right() - perk_index * 16), math.round(self._assets_list[i]:bottom() - 5))
-				perk_index = perk_index + 1
+				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
+				if DB:has(Idstring("texture"), texture) then
+					local perk_object = self._panel:bitmap({
+						texture = texture,
+						w = 16,
+						h = 16,
+						rotation = math.random(2) - 1.5,
+						alpha = 0.8,
+						layer = 2
+					})
+					perk_object:set_rightbottom(math.round(self._assets_list[i]:right() - perk_index * 16), math.round(self._assets_list[i]:bottom() - 5))
+					perk_index = perk_index + 1
+				end
 			end
 		end
 	end
@@ -918,7 +921,13 @@ function LoadoutItem:populate_category(category, data)
 	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
 	local new_data = {}
 	local index = 0
+	local guis_catalog = "guis/"
 	for i, crafted in pairs(crafted_category) do
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.weapon[crafted.weapon_id] and tweak_data.weapon[crafted.weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		new_data = {}
 		new_data.name = crafted.weapon_id
 		new_data.name_localized = managers.weapon_factory:get_weapon_name_by_factory_id(crafted.factory_id)
@@ -929,7 +938,7 @@ function LoadoutItem:populate_category(category, data)
 		new_data.equipped = crafted.equipped
 		new_data.level = not new_data.unlocked and 0
 		new_data.skill_name = new_data.level == 0 and "bm_menu_skill_locked_" .. new_data.name
-		new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(crafted.weapon_id)
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(crafted.weapon_id)
 		new_data.comparision_data = managers.blackmarket:get_weapon_stats(category, i)
 		new_data.stream = false
 		if new_data.comparision_data and new_data.comparision_data.alert_size then
@@ -938,22 +947,21 @@ function LoadoutItem:populate_category(category, data)
 		if not new_data.equipped and new_data.unlocked then
 			table.insert(new_data, "lo_w_equip")
 		end
-		local perks = managers.blackmarket:get_perks_from_weapon_blueprint(crafted.factory_id, crafted.blueprint)
-		if 0 < table.size(perks) then
-			new_data.mini_icons = {}
-			local perk_index = 1
-			for perk in pairs(perks) do
-				table.insert(new_data.mini_icons, {
-					texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
-					right = (perk_index - 1) * 18,
-					bottom = 0,
-					layer = 1,
-					w = 16,
-					h = 16,
-					stream = false
-				})
-				perk_index = perk_index + 1
-			end
+		local icon_list = managers.menu_component:create_weapon_mod_icon_list(crafted.weapon_id, category, crafted.factory_id, i)
+		local icon_index = 1
+		new_data.mini_icons = {}
+		for _, icon in pairs(icon_list) do
+			table.insert(new_data.mini_icons, {
+				texture = icon.texture,
+				right = (icon_index - 1) * 18,
+				bottom = 0,
+				layer = 1,
+				w = 16,
+				h = 16,
+				stream = false,
+				alpha = icon.equipped and 1 or 0.25
+			})
+			icon_index = icon_index + 1
 		end
 		data[i] = new_data
 		index = i
@@ -986,8 +994,14 @@ end
 function LoadoutItem:populate_armors(data)
 	local new_data = {}
 	local index = 0
+	local guis_catalog = "guis/"
 	for armor_id, armor_data in pairs(tweak_data.blackmarket.armors) do
 		local bm_data = Global.blackmarket_manager.armors[armor_id]
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[armor_id] and tweak_data.blackmarket.armors[armor_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		if bm_data.owned then
 			index = index + 1
 			new_data = {}
@@ -997,7 +1011,7 @@ function LoadoutItem:populate_armors(data)
 			new_data.unlocked = bm_data.unlocked
 			new_data.lock_texture = not new_data.unlocked and "guis/textures/pd2/lock_level"
 			new_data.equipped = bm_data.equipped
-			new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/armors/" .. armor_id
+			new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. armor_id
 			if not new_data.equipped then
 				table.insert(new_data, "a_equip")
 			end
@@ -1022,12 +1036,18 @@ function LoadoutItem:populate_deployables(data)
 	local deployables = managers.player:availible_equipment(1) or {}
 	local new_data = {}
 	local index = 0
+	local guis_catalog = "guis/"
 	for i, deployable in ipairs(deployables) do
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		new_data = {}
 		new_data.name = deployable
 		new_data.name_localized = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
 		new_data.category = "deployables"
-		new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		new_data.slot = i
 		new_data.unlocked = true
 		new_data.equipped = managers.player:equipment_in_slot(1) == deployable
@@ -1196,8 +1216,13 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 	})
 	if outfit.primary.factory_id then
 		local primary_id = managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.weapon[primary_id] and tweak_data.weapon[primary_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		local primary_bitmap = player_slot.panel:bitmap({
-			texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. primary_id,
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. primary_id,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1211,22 +1236,30 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		if table.size(perks) > 0 then
 			local perk_index = 0
 			for perk in pairs(perks) do
-				local perk_object = player_slot.panel:bitmap({
-					texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
-					w = 16,
-					h = 16,
-					rotation = math.random(2) - 1.5,
-					alpha = 0.8
-				})
-				perk_object:set_rightbottom(math.round(primary_bitmap:right() - perk_index * 16), math.round(primary_bitmap:bottom() - 5))
-				perk_index = perk_index + 1
+				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
+				if DB:has(Idstring("texture"), texture) then
+					local perk_object = player_slot.panel:bitmap({
+						texture = texture,
+						w = 16,
+						h = 16,
+						rotation = math.random(2) - 1.5,
+						alpha = 0.8
+					})
+					perk_object:set_rightbottom(math.round(primary_bitmap:right() - perk_index * 16), math.round(primary_bitmap:bottom() - 5))
+					perk_index = perk_index + 1
+				end
 			end
 		end
 	end
 	if outfit.secondary.factory_id then
 		local secondary_id = managers.weapon_factory:get_weapon_id_by_factory_id(outfit.secondary.factory_id)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.weapon[secondary_id] and tweak_data.weapon[secondary_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		local secondary_bitmap = player_slot.panel:bitmap({
-			texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. secondary_id,
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. secondary_id,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1240,21 +1273,29 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		if table.size(perks) > 0 then
 			local perk_index = 0
 			for perk in pairs(perks) do
-				local perk_object = player_slot.panel:bitmap({
-					texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
-					w = 16,
-					h = 16,
-					rotation = math.random(2) - 1.5,
-					alpha = 0.8
-				})
-				perk_object:set_rightbottom(secondary_bitmap:right() - perk_index * 16, secondary_bitmap:bottom() - 5)
-				perk_index = perk_index + 1
+				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
+				if DB:has(Idstring("texture"), texture) then
+					local perk_object = player_slot.panel:bitmap({
+						texture = texture,
+						w = 16,
+						h = 16,
+						rotation = math.random(2) - 1.5,
+						alpha = 0.8
+					})
+					perk_object:set_rightbottom(secondary_bitmap:right() - perk_index * 16, secondary_bitmap:bottom() - 5)
+					perk_index = perk_index + 1
+				end
 			end
 		end
 	end
 	if outfit.armor then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[outfit.armor] and tweak_data.blackmarket.armors[outfit.armor].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		local armor_bitmap = player_slot.panel:bitmap({
-			texture = "guis/textures/pd2/blackmarket/icons/armors/" .. outfit.armor,
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. outfit.armor,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1266,8 +1307,13 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		armor_bitmap:set_center_y(y * 9)
 	end
 	if outfit.deployable and outfit.deployable ~= "nil" then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[outfit.deployable] and tweak_data.blackmarket.deployables[outfit.deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		local deployable_bitmap = player_slot.panel:bitmap({
-			texture = "guis/textures/pd2/blackmarket/icons/deployables/" .. outfit.deployable,
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. outfit.deployable,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1366,21 +1412,43 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	local deployable = managers.player:equipment_in_slot(1)
 	local armor = managers.blackmarket:equipped_armor()
 	if primary then
-		primary_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(primary.weapon_id)
+		local guis_catalog = "guis/"
+		local weapon_id = primary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		primary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(weapon_id)
 		primary_string = managers.weapon_factory:get_weapon_name_by_factory_id(primary.factory_id)
 		primary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(primary.factory_id, primary.blueprint)
 	end
 	if secondary then
-		secondary_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(secondary.weapon_id)
+		local guis_catalog = "guis/"
+		local weapon_id = secondary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		secondary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(secondary.weapon_id)
 		secondary_string = managers.weapon_factory:get_weapon_name_by_factory_id(secondary.factory_id)
 		secondary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(secondary.factory_id, secondary.blueprint)
 	end
 	if deployable then
-		deployable_texture = "guis/textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
 	end
 	if armor then
-		armor_texture = "guis/textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		armor_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
 		armor_string = managers.localization:text(tweak_data.blackmarket.armors[armor].name_id)
 	end
 	local loadout = {
@@ -2049,21 +2117,43 @@ function MissionBriefingGui:reload_loadout()
 	local deployable = managers.player:equipment_in_slot(1)
 	local armor = managers.blackmarket:equipped_armor()
 	if primary then
-		primary_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(primary.weapon_id)
+		local guis_catalog = "guis/"
+		local weapon_id = primary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		primary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(weapon_id)
 		primary_string = managers.weapon_factory:get_weapon_name_by_factory_id(primary.factory_id)
 		primary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(primary.factory_id, primary.blueprint)
 	end
 	if secondary then
-		secondary_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(secondary.weapon_id)
+		local guis_catalog = "guis/"
+		local weapon_id = secondary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		secondary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(weapon_id)
 		secondary_string = managers.weapon_factory:get_weapon_name_by_factory_id(secondary.factory_id)
 		secondary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(secondary.factory_id, secondary.blueprint)
 	end
 	if deployable then
-		deployable_texture = "guis/textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
 	end
 	if armor then
-		armor_texture = "guis/textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		armor_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
 		armor_string = managers.localization:text(tweak_data.blackmarket.armors[armor].name_id)
 	end
 	local loadout = {

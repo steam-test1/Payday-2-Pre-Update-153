@@ -276,6 +276,12 @@ function NarrativeTweakData:init()
 		20000,
 		30000
 	}
+	self.jobs.alex.contract_cost = {
+		121000,
+		170000,
+		250000,
+		500000
+	}
 	self.jobs.alex_prof = deep_clone(self.jobs.alex)
 	self.jobs.alex_prof.jc = 70
 	self.jobs.alex_prof.professional = true
@@ -285,6 +291,12 @@ function NarrativeTweakData:init()
 		15000,
 		30000,
 		40000
+	}
+	self.jobs.alex_prof.contract_cost = {
+		131000,
+		188000,
+		263000,
+		530000
 	}
 	self.jobs.welcome_to_the_jungle = {}
 	self.jobs.welcome_to_the_jungle.name_id = "heist_welcome_to_the_jungle"
@@ -323,6 +335,12 @@ function NarrativeTweakData:init()
 		400000,
 		500000
 	}
+	self.jobs.welcome_to_the_jungle.contract_cost = {
+		20000,
+		36000,
+		50000,
+		90000
+	}
 	self.jobs.welcome_to_the_jungle_prof = deep_clone(self.jobs.welcome_to_the_jungle)
 	self.jobs.welcome_to_the_jungle_prof.jc = 70
 	self.jobs.welcome_to_the_jungle_prof.professional = true
@@ -332,6 +350,12 @@ function NarrativeTweakData:init()
 		300000,
 		450000,
 		550000
+	}
+	self.jobs.welcome_to_the_jungle_prof.contract_cost = {
+		-100000,
+		-300000,
+		-550000,
+		-850000
 	}
 	self.jobs.framing_frame = {}
 	self.jobs.framing_frame.name_id = "heist_framing_frame"

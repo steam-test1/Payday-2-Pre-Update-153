@@ -28,10 +28,16 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 		if upgrade_def then
 			local category = Idstring(upgrade_def.category)
 			if category == Idstring("weapon") then
+				local guis_catalog = "guis/"
+				local weapon_id = upgrade_def.weapon_id
+				local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+				if bundle_folder then
+					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+				end
 				local weapon_name = managers.weapon_factory:get_weapon_name_by_factory_id(upgrade_def.factory_id)
 				local weapon_class = managers.localization:text("menu_" .. tweak_data.weapon[upgrade_def.weapon_id].category)
 				local weapon_category = managers.localization:text("bm_menu_" .. (tweak_data.weapon[upgrade_def.weapon_id].use_data.selection_index == 2 and "primaries" or "secondaries"))
-				bitmap_texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. upgrade_def.weapon_id
+				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. weapon_id
 				text_string = managers.localization:text("menu_es_package_weapon", {
 					weapon = utf8.to_upper(weapon_name),
 					type = utf8.to_upper(weapon_class),
@@ -39,7 +45,12 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 					INVENTORY_MENU = managers.localization:text("menu_inventory")
 				})
 			elseif category == Idstring("armor") then
-				bitmap_texture = "guis/textures/pd2/blackmarket/icons/armors/" .. upgrade_def.armor_id
+				local guis_catalog = "guis/"
+				local bundle_folder = tweak_data.blackmarket.armors[upgrade_def.armor_id] and tweak_data.blackmarket.armors[upgrade_def.armor_id].texture_bundle_folder
+				if bundle_folder then
+					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+				end
+				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. upgrade_def.armor_id
 				text_string = managers.localization:text("menu_es_package_armor", {
 					armor = managers.localization:to_upper_text(upgrade_def.name_id)
 				})
@@ -1647,7 +1658,13 @@ function HUDStageEndScreen:animate_level_progress(o, data)
 					end
 					local first_upgrade = tweak_data.upgrades.definitions[data.upgrades[1]]
 					if first_upgrade and first_upgrade.category == "weapon" then
-						self._package_picture:set_image("guis/textures/pd2/blackmarket/icons/weapons/" .. first_upgrade.weapon_id)
+						local guis_catalog = "guis/"
+						local weapon_id = first_upgrade.weapon_id
+						local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+						if bundle_folder then
+							guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+						end
+						self._package_picture:set_image(guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. weapon_id)
 					else
 						self._package_picture:set_image("guis/textures/pd2/endscreen/test_icon_package")
 					end

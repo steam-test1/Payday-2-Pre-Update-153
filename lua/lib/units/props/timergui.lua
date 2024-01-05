@@ -39,37 +39,39 @@ function TimerGui:add_workspace(gui_object)
 end
 
 function TimerGui:setup()
-	self._gui_script.panel:set_alpha(0.6)
 	self._gui_script.working_text:set_render_template(Idstring("VertexColorTextured"))
 	self._gui_script.time_header_text:set_render_template(Idstring("VertexColorTextured"))
 	self._gui_script.time_text:set_render_template(Idstring("VertexColorTextured"))
 	self._gui_script.drill_screen_background:set_size(self._gui_script.drill_screen_background:parent():size())
 	self._gui_script.timer:set_h(120 * self._size_multiplier)
 	self._gui_script.timer:set_w(self._gui_script.timer:parent():w() - self._gui_script.timer:parent():w() / 5)
-	self._gui_script.timer:set_center_x(self._gui_script.timer:parent():w() / 2)
-	self._gui_script.timer:set_center_y(self._gui_script.timer:parent():h() / 2)
+	self._gui_script.timer:set_center_x(self._gui_script.timer:parent():w() * 0.5)
+	self._gui_script.timer:set_center_y(self._gui_script.timer:parent():h() * 0.5 + 45 * self._size_multiplier)
+	self._gui_script.timer:set_y(math.round(self._gui_script.timer:y()))
 	self._timer_lenght = self._gui_script.timer:w()
 	self._gui_script.timer_background:set_h(self._gui_script.timer:h() + 20 * self._size_multiplier)
 	self._gui_script.timer_background:set_w(self._gui_script.timer:w() + 20 * self._size_multiplier)
 	self._gui_script.timer_background:set_center(self._gui_script.timer:center())
 	self._gui_script.timer:set_w(0)
 	self._gui_script.working_text:set_center_x(self._gui_script.working_text:parent():w() / 2)
-	self._gui_script.working_text:set_center_y(self._gui_script.working_text:parent():h() / 4)
+	self._gui_script.working_text:set_center_y(self._gui_script.working_text:parent():h() / 2.75)
 	self._gui_script.working_text:set_font_size(110 * self._size_multiplier)
 	self._gui_script.working_text:set_text(managers.localization:text(self._gui_start))
 	self._gui_script.working_text:set_visible(true)
 	self._gui_script.time_header_text:set_font_size(80 * self._size_multiplier)
 	self._gui_script.time_header_text:set_visible(false)
 	self._gui_script.time_header_text:set_center_x(self._gui_script.working_text:parent():w() / 2)
-	self._gui_script.time_header_text:set_center_y(self._gui_script.working_text:parent():h() / 1.35)
+	self._gui_script.time_header_text:set_center_y(self._gui_script.working_text:parent():h() / 1.325)
 	self._gui_script.time_text:set_font_size(110 * self._size_multiplier)
 	self._gui_script.time_text:set_visible(false)
 	self._gui_script.time_text:set_center_x(self._gui_script.working_text:parent():w() / 2)
-	self._gui_script.time_text:set_center_y(self._gui_script.working_text:parent():h() / 1.15)
+	self._gui_script.time_text:set_center_y(self._gui_script.working_text:parent():h() / 1.125)
 	self._original_colors = {}
+	self._gui_script.panel:set_alpha(1)
 	for _, child in ipairs(self._gui_script.panel:children()) do
 		self._original_colors[child:key()] = child:color()
 	end
+	self._gui_script.panel:set_alpha(0.6)
 end
 
 function TimerGui:_start(timer, current_timer)
@@ -77,6 +79,7 @@ function TimerGui:_start(timer, current_timer)
 	self._done = false
 	self._timer = timer or 5
 	self._current_timer = current_timer or self._timer
+	self._time_left = self._current_timer * math.max(self._timer_multiplier or 1, 0.01)
 	self._gui_script.timer:set_w(self._timer_lenght * (1 - self._current_timer / self._timer))
 	self._gui_script.working_text:set_text(managers.localization:text(self._gui_working))
 	self._unit:set_extension_update_enabled(Idstring("timer_gui"), true)
@@ -84,7 +87,7 @@ function TimerGui:_start(timer, current_timer)
 	self:post_event(self._start_event)
 	self._gui_script.time_header_text:set_visible(true)
 	self._gui_script.time_text:set_visible(true)
-	self._gui_script.time_text:set_text(math.floor(self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
+	self._gui_script.time_text:set_text(math.floor(self._time_left or self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
 	self._unit:base():start()
 	if Network:is_client() then
 		return
@@ -111,13 +114,32 @@ function TimerGui:set_timer_multiplier(multiplier)
 end
 
 function TimerGui:set_skill(skill)
-	if self._skill == nil then
+	if self._skill == nil or skill > self._skill then
 		self._skill = skill
 	end
 end
 
+function TimerGui:set_background_icons(background_icons)
+	local panel = self._gui_script.panel
+	local background_icons_panel = panel:child("background_icons_panel") or panel:panel({
+		name = "background_icons_panel"
+	})
+	for _, child in ipairs(background_icons_panel:children()) do
+		self._original_colors[child:key()] = nil
+	end
+	background_icons_panel:clear()
+	local alpha = self._gui_script.panel:alpha()
+	self._gui_script.panel:set_alpha(1)
+	self._original_colors = self._original_colors or {}
+	for i, icon_data in ipairs(background_icons) do
+		local icon = background_icons_panel:bitmap(icon_data)
+		self._original_colors[icon:key()] = icon_data.color or icon:color()
+	end
+	self._gui_script.panel:set_alpha(alpha)
+end
+
 function TimerGui:start(timer)
-	timer = (self._override_timer or timer) * (self._timer_multiplier or 1)
+	timer = self._override_timer or timer
 	if self._jammed then
 		self:_set_jammed(false)
 		return
@@ -147,16 +169,18 @@ function TimerGui:update(unit, t, dt)
 	if not self._powered then
 		return
 	end
+	local dt_mod = math.max(self._timer_multiplier or 1, 0.01)
 	if self._current_jam_timer then
-		self._current_jam_timer = self._current_jam_timer - dt
+		self._current_jam_timer = self._current_jam_timer - dt / dt_mod
 		if self._current_jam_timer <= 0 then
 			self:set_jammed(true)
 			self._current_jam_timer = table.remove(self._jamming_intervals, 1)
 			return
 		end
 	end
-	self._current_timer = self._current_timer - dt
-	self._gui_script.time_text:set_text(math.floor(self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
+	self._current_timer = self._current_timer - dt / dt_mod
+	self._time_left = self._current_timer * dt_mod
+	self._gui_script.time_text:set_text(math.floor(self._time_left or self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
 	self._gui_script.timer:set_w(self._timer_lenght * (1 - self._current_timer / self._timer))
 	if 0 >= self._current_timer then
 		self._unit:set_extension_update_enabled(Idstring("timer_gui"), false)
@@ -181,9 +205,6 @@ function TimerGui:sync_net_event(event_id)
 end
 
 function TimerGui:set_jammed(jammed)
-	if jammed and self._unit:damage() and self._unit:damage():has_sequence("jammed_trigger") then
-		self._unit:damage():run_sequence_simple("jammed_trigger")
-	end
 	if managers.network:session() then
 		local event_id = jammed and TimerGui.EVENT_IDS.jammed or TimerGui.EVENT_IDS.unjammed
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "timer_gui", event_id)
@@ -194,13 +215,26 @@ end
 function TimerGui:_set_jammed(jammed)
 	self._jammed = jammed
 	if self._jammed then
-		if self._unit:damage():has_sequence("set_is_jammed") then
-			self._unit:damage():run_sequence_simple("set_is_jammed")
+		if self._unit:damage() then
+			if self._unit:damage():has_sequence("set_is_jammed") then
+				self._unit:damage():run_sequence_simple("set_is_jammed")
+			end
+			if self._unit:damage():has_sequence("jammed_trigger") then
+				self._unit:damage():run_sequence_simple("jammed_trigger")
+			end
 		end
 		for _, child in ipairs(self._gui_script.panel:children()) do
-			local color = self._original_colors[child:key()]
-			local c = Color(color.a, 1, 0, 0)
-			child:set_color(c)
+			if child.children then
+				for _, grandchild in ipairs(child:children()) do
+					local color = self._original_colors[grandchild:key()]
+					local c = Color(color.a, 1, 0, 0)
+					grandchild:set_color(c)
+				end
+			else
+				local color = self._original_colors[child:key()]
+				local c = Color(color.a, 1, 0, 0)
+				child:set_color(c)
+			end
 		end
 		self._gui_script.working_text:set_text(managers.localization:text(self._gui_malfunction))
 		self._gui_script.time_text:set_text(managers.localization:text("prop_timer_gui_error"))
@@ -213,10 +247,16 @@ function TimerGui:_set_jammed(jammed)
 		self:post_event(self._jam_event)
 	else
 		for _, child in ipairs(self._gui_script.panel:children()) do
-			child:set_color(self._original_colors[child:key()])
+			if child.children then
+				for _, grandchild in ipairs(child:children()) do
+					grandchild:set_color(self._original_colors[grandchild:key()])
+				end
+			else
+				child:set_color(self._original_colors[child:key()])
+			end
 		end
 		self._gui_script.working_text:set_text(managers.localization:text(self._gui_working))
-		self._gui_script.time_text:set_text(math.floor(self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
+		self._gui_script.time_text:set_text(math.floor(self._time_left or self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
 		self._gui_script.drill_screen_background:set_color(self._gui_script.drill_screen_background:color():with_alpha(1))
 		self:post_event(self._resume_event)
 	end
@@ -234,9 +274,17 @@ function TimerGui:_set_powered(powered, enable_interaction)
 	self._powered = powered
 	if not self._powered then
 		for _, child in ipairs(self._gui_script.panel:children()) do
-			local color = self._original_colors[child:key()]
-			local c = Color(color.a, color.r * 0, color.g * 0, color.b * 0.25)
-			child:set_color(c)
+			if child.children then
+				for _, grandchild in ipairs(child:children()) do
+					local color = self._original_colors[grandchild:key()]
+					local c = Color(color.a, 1, 0, 0)
+					grandchild:set_color(c)
+				end
+			else
+				local color = self._original_colors[child:key()]
+				local c = Color(color.a, 1, 0, 0)
+				child:set_color(c)
+			end
 		end
 		self:post_event(self._jam_event)
 		if enable_interaction and self._unit:interaction() then
@@ -249,7 +297,13 @@ function TimerGui:_set_powered(powered, enable_interaction)
 		self:post_event(self._jam_event)
 	else
 		for _, child in ipairs(self._gui_script.panel:children()) do
-			child:set_color(self._original_colors[child:key()])
+			if child.children then
+				for _, grandchild in ipairs(child:children()) do
+					grandchild:set_color(self._original_colors[grandchild:key()])
+				end
+			else
+				child:set_color(self._original_colors[child:key()])
+			end
 		end
 		self:post_event(self._resume_event)
 		if self._powered_interaction_enabled then
@@ -290,6 +344,13 @@ function TimerGui:post_event(event)
 	self._unit:sound_source():post_event(event)
 end
 
+function TimerGui:update_sound_event()
+	if self._done or not self._started then
+		return
+	end
+	self:post_event(self._resume_event)
+end
+
 function TimerGui:lock_gui()
 	self._ws:set_cull_distance(self._cull_distance)
 	self._ws:set_frozen(true)
@@ -313,11 +374,14 @@ function TimerGui:save(data)
 	state.powered_interaction_enabled = self._powered_interaction_enabled
 	state.done = self._done
 	state.visible = self._visible
+	state.timer_multiplier = self._timer_multiplier
+	state.skill = self._skill
 	data.TimerGui = state
 end
 
 function TimerGui:load(data)
 	local state = data.TimerGui
+	self:set_skill(state.skill or 1)
 	if state.done then
 		self:_set_done()
 	elseif state.update_enabled then
@@ -330,6 +394,7 @@ function TimerGui:load(data)
 		end
 	end
 	self:set_visible(state.visible)
+	self:set_timer_multiplier(state.timer_multiplier or 1)
 end
 
 DrillTimerGui = DrillTimerGui or class(TimerGui)

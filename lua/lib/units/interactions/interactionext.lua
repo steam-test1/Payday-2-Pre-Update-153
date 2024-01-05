@@ -3,6 +3,16 @@ BaseInteractionExt.SKILL_IDS = {}
 BaseInteractionExt.SKILL_IDS.none = 1
 BaseInteractionExt.SKILL_IDS.basic = 2
 BaseInteractionExt.SKILL_IDS.aced = 3
+BaseInteractionExt.INFO_IDS = {
+	1,
+	2,
+	4,
+	8,
+	16,
+	32,
+	64,
+	128
+}
 
 function BaseInteractionExt:init(unit)
 	self._unit = unit
@@ -362,23 +372,6 @@ function UseInteractionExt:interact(player)
 	if self._tweak_data.sound_event then
 		player:sound():play(self._tweak_data.sound_event)
 	end
-	if self._unit:base() and self._unit:base().set_alert_radius then
-		if managers.player:has_category_upgrade("player", "silent_drill") then
-			self._unit:base():set_alert_radius(nil)
-		elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
-			local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
-			self._unit:base():set_alert_radius(radius)
-		else
-			self._unit:base():set_alert_radius(2500)
-		end
-		local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
-		if 0 < autorepair_chance and autorepair_chance > math.random() then
-			self._unit:base():set_autorepair(true)
-		else
-			self._unit:base():set_autorepair(nil)
-		end
-		self._unit:timer_gui():set_timer_multiplier(managers.player:upgrade_value("player", "drill_speed_multiplier", 1))
-	end
 	self:remove_interact()
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
@@ -397,23 +390,6 @@ function UseInteractionExt:sync_interacted(peer, skip_alive_check)
 	local player = managers.network:game():member(peer:id()):unit()
 	if not skip_alive_check and not alive(player) then
 		return
-	end
-	if Network:is_server() and self._unit:base() and self._unit:base().set_alert_radius then
-		if player:base():upgrade_value("player", "silent_drill") then
-			self._unit:base():set_alert_radius(nil)
-		elseif player:base():upgrade_value("player", "drill_alert_rad") then
-			self._unit:base():set_alert_radius(player:base():upgrade_value("player", "drill_alert_rad"))
-		end
-		if player:base():upgrade_value("player", "drill_autorepair") then
-			self._unit:base():set_autorepair(true)
-		end
-		local autorepair_chance = player:base():upgrade_value("player", "drill_autorepair")
-		if autorepair_chance and autorepair_chance > math.random() then
-			self._unit:base():set_autorepair(true)
-		end
-		if player:base():upgrade_value("player", "drill_speed_multiplier") then
-			self._unit:timer_gui():set_timer_multiplier(player:base():upgrade_value("player", "drill_speed_multiplier") or 1)
-		end
 	end
 	self:remove_interact()
 	self:set_active(false)
@@ -1074,98 +1050,56 @@ function MissionDoorDeviceInteractionExt:interact(player)
 		return
 	end
 	MissionDoorDeviceInteractionExt.super.super.interact(self, player)
-	local is_drill = self._unit:base() and self._unit:base().set_alert_radius
 	if Network:is_client() then
-		if is_drill then
-			if managers.player:has_category_upgrade("player", "silent_drill") then
-				self._unit:timer_gui():set_skill(BaseInteractionExt.SKILL_IDS.aced)
-			elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
-				self._unit:timer_gui():set_skill(BaseInteractionExt.SKILL_IDS.basic)
-			end
-		end
 		managers.network:session():send_to_host("server_place_mission_door_device", self._unit, player)
 	else
 		local result = self:server_place_mission_door_device(player)
 		self:result_place_mission_door_device(result)
-		if is_drill then
-			if managers.player:has_category_upgrade("player", "silent_drill") then
-				self._unit:base():set_alert_radius(nil)
-			elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
-				local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
-				self._unit:base():set_alert_radius(radius)
-			else
-				self._unit:base():set_alert_radius(2500)
-			end
-			local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
-			if 0 < autorepair_chance and autorepair_chance > math.random() then
-				self._unit:base():set_autorepair(true)
-			else
-				self._unit:base():set_autorepair(nil)
-			end
-		end
 	end
 end
 
 function MissionDoorDeviceInteractionExt:sync_interacted(peer)
 	MissionDoorDeviceInteractionExt.super.sync_interacted(self, peer, true)
-	local player = managers.network:game():member(peer:id()):unit()
-	if not alive(player) then
-		return
-	end
-	local is_drill = self._unit:base() and self._unit:base().set_alert_radius
-	if is_drill then
-		if player:base():upgrade_value("player", "silent_drill") then
-			self._unit:base():set_alert_radius(nil)
-		elseif player:base():upgrade_value("player", "drill_alert_rad") then
-			self._unit:base():set_alert_radius(player:base():upgrade_value("player", "drill_alert_rad"))
-		end
-		if player:base():upgrade_value("player", "drill_autorepair") then
-			self._unit:base():set_autorepair(true)
-		end
-		local autorepair_chance = player:base():upgrade_value("player", "drill_autorepair")
-		if autorepair_chance and autorepair_chance > math.random() then
-			self._unit:base():set_autorepair(true)
+	if self._unit:timer_gui() and self._unit:base() and self._unit:timer_gui()._upgrade_tweak_data and self._unit:base().get_skill_upgrades then
+		local player_info_id = self:get_player_info_id()
+		local player_info_table = self:split_info_id(player_info_id)
+		local unit_info_table = self._unit:base():get_skill_upgrades()
+		for i in pairs(player_info_table) do
+			if not unit_info_table[i] then
+				self:set_tweak_data(self._unit:timer_gui()._upgrade_tweak_data)
+				self:set_active(true)
+				break
+			end
 		end
 	end
 end
 
 function MissionDoorDeviceInteractionExt:server_place_mission_door_device(player)
-	local can_place = self._unit:mission_door_device():can_place()
-	local is_saw = self._unit:base() and self._unit:base().is_saw
-	local is_drill = self._unit:base() and self._unit:base().set_alert_radius
-	local skill = BaseInteractionExt.SKILL_IDS.none
-	if is_saw then
-		if player:base().is_local_player then
-			self._unit:timer_gui():set_timer_multiplier(managers.player:upgrade_value("player", "saw_speed_multiplier", 1))
-		elseif player:base():upgrade_value("player", "saw_speed_multiplier") then
-			self._unit:timer_gui():set_timer_multiplier(player:base():upgrade_value("player", "saw_speed_multiplier") or 1)
-		end
-	elseif is_drill then
-		if player:base().is_local_player then
-			self._unit:timer_gui():set_timer_multiplier(managers.player:upgrade_value("player", "drill_speed_multiplier", 1))
-			if managers.player:has_category_upgrade("player", "silent_drill") then
-				skill = BaseInteractionExt.SKILL_IDS.aced
-			elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
-				skill = BaseInteractionExt.SKILL_IDS.basic
-			end
-		elseif player:base():upgrade_value("player", "drill_speed_multiplier") then
-			self._unit:timer_gui():set_timer_multiplier(player:base():upgrade_value("player", "drill_speed_multiplier") or 1)
-			if player:base():upgrade_level("player", "silent_drill") == 1 then
-				skill = BaseInteractionExt.SKILL_IDS.aced
-			elseif player:base():upgrade_level("player", "drill_alert_rad") == 1 then
-				skill = BaseInteractionExt.SKILL_IDS.basic
-			end
-		end
-		self._unit:timer_gui():set_skill(skill)
-	end
+	local can_place = not self._unit:mission_door_device() or self._unit:mission_door_device():can_place()
+	local info_id = self:get_player_info_id(player)
 	self:remove_interact()
+	self:set_info_id(info_id)
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
 	end
+	managers.network:session():send_to_peers_synched("sync_interaction_info_id", self._unit, info_id)
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, -2, self.tweak_data)
-	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "interaction", skill)
 	self:set_active(false)
-	self._unit:mission_door_device():placed()
+	if self._unit:timer_gui() and self._unit:base() and self._unit:timer_gui()._upgrade_tweak_data and self._unit:base().get_skill_upgrades then
+		local player_info_id = self:get_player_info_id()
+		local player_info_table = self:split_info_id(player_info_id)
+		local unit_info_table = self._unit:base():get_skill_upgrades()
+		for i in pairs(player_info_table) do
+			if not unit_info_table[i] then
+				self:set_tweak_data(self._unit:timer_gui()._upgrade_tweak_data)
+				self:set_active(true)
+				break
+			end
+		end
+	end
+	if self._unit:mission_door_device() then
+		self._unit:mission_door_device():placed()
+	end
 	if self._tweak_data.sound_event then
 		player:sound():play(self._tweak_data.sound_event)
 	end
@@ -1181,6 +1115,102 @@ function MissionDoorDeviceInteractionExt:result_place_mission_door_device(placed
 			managers.player:remove_equipment(self._tweak_data.required_deployable)
 		else
 		end
+	end
+end
+
+function MissionDoorDeviceInteractionExt:get_player_info_id(player)
+	local INFO_IDS = BaseInteractionExt.INFO_IDS
+	local info_id = 0
+	local is_saw = self._unit:base() and self._unit:base().is_saw
+	local is_hacking = self._unit:base() and self._unit:base().is_hacking_device
+	local is_drill = self._unit:base() and self._unit:base().is_drill
+	local is_local_player = not player or player:base().is_local_player
+	if is_saw then
+		local saw_speed_upgrade_level = 0
+		if is_local_player then
+			saw_speed_upgrade_level = managers.player:upgrade_level("player", "saw_speed_multiplier", 0)
+		else
+			saw_speed_upgrade_level = player:base():upgrade_level("player", "saw_speed_multiplier") or 0
+		end
+		if saw_speed_upgrade_level == 1 then
+			info_id = info_id + INFO_IDS[1]
+		elseif saw_speed_upgrade_level == 2 then
+			info_id = info_id + INFO_IDS[1] + INFO_IDS[2]
+		elseif 3 <= saw_speed_upgrade_level then
+			info_id = info_id + INFO_IDS[1] + INFO_IDS[2]
+			Application:debug("MissionDoorDeviceInteractionExt:set_player_info_id", "saw speed upgrade level is above 2, syncing only supports 2 upgrade levels")
+		end
+	elseif is_hacking then
+	else
+		if is_drill then
+			local drill_speed_upgrade_level = 0
+			local got_reduced_alert = false
+			local got_silent_drill = false
+			local got_auto_repair = false
+			if is_local_player then
+				drill_speed_upgrade_level = managers.player:upgrade_level("player", "drill_speed_multiplier", 0)
+				got_reduced_alert = managers.player:has_category_upgrade("player", "drill_alert_rad")
+				got_silent_drill = managers.player:has_category_upgrade("player", "silent_drill")
+				got_auto_repair = managers.player:has_category_upgrade("player", "drill_autorepair")
+			else
+				drill_speed_upgrade_level = player:base():upgrade_level("player", "drill_speed_multiplier") or 0
+				got_reduced_alert = player:base():upgrade_level("player", "drill_alert_rad") == 1
+				got_silent_drill = player:base():upgrade_level("player", "silent_drill") == 1
+				got_auto_repair = player:base():upgrade_level("player", "drill_autorepair") == 1
+			end
+			if drill_speed_upgrade_level == 1 then
+				info_id = info_id + INFO_IDS[1]
+			elseif drill_speed_upgrade_level == 2 then
+				info_id = info_id + INFO_IDS[1] + INFO_IDS[2]
+			elseif 3 <= drill_speed_upgrade_level then
+				info_id = info_id + INFO_IDS[1] + INFO_IDS[2]
+				Application:debug("MissionDoorDeviceInteractionExt:set_player_info_id", "drill speed upgrade level is above 2, syncing only supports 2 upgrade levels")
+			end
+			if got_reduced_alert then
+				info_id = info_id + INFO_IDS[3]
+			end
+			if got_silent_drill then
+				info_id = info_id + INFO_IDS[4]
+			end
+			if got_auto_repair then
+				info_id = info_id + INFO_IDS[5]
+			end
+		else
+		end
+	end
+	return info_id
+end
+
+function MissionDoorDeviceInteractionExt:split_info_id(info_id)
+	local INFO_IDS = BaseInteractionExt.INFO_IDS
+	local info_table = {}
+	local ids_left = info_id
+	for i = #INFO_IDS, 1, -1 do
+		local id = INFO_IDS[i]
+		if ids_left >= id then
+			ids_left = ids_left - id
+			info_table[i] = true
+		end
+	end
+	return info_table
+end
+
+function MissionDoorDeviceInteractionExt:set_info_id(info_id)
+	local upgrades_gotten = self:split_info_id(info_id)
+	local is_saw = self._unit:base() and self._unit:base().is_saw
+	local is_hacking = self._unit:base() and self._unit:base().is_hacking_device
+	local is_drill = self._unit:base() and self._unit:base().is_drill
+	if is_saw then
+		local saw_speed_tweak_data = tweak_data.upgrades.values.player.saw_speed_multiplier
+		local timer_multiplier = 1
+		if upgrades_gotten[2] then
+			timer_multiplier = saw_speed_tweak_data[2]
+		elseif upgrades_gotten[1] then
+			timer_multiplier = saw_speed_tweak_data[1]
+		end
+		self._unit:timer_gui():set_timer_multiplier(timer_multiplier)
+	elseif is_drill or is_hacking then
+		self._unit:base():set_skill_upgrades(upgrades_gotten)
 	end
 end
 

@@ -37,13 +37,11 @@ function PlayerBase:update(unit, t, dt)
 end
 
 function PlayerBase:_setup_suspicion_and_detection_data()
-	if not Network:is_server() then
-		return
-	end
 	self._suspicion_settings = deep_clone(tweak_data.player.suspicion)
 	self._suspicion_settings.multipliers = {}
 	self._suspicion_settings.init_buildup_mul = self._suspicion_settings.buildup_mul
 	self._suspicion_settings.init_range_mul = self._suspicion_settings.range_mul
+	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(Global.local_member:peer(), 0.75)
 	self._detection_settings = {}
 	self._detection_settings.multipliers = {}
 	self._detection_settings.init_delay_mul = 1
@@ -51,15 +49,11 @@ function PlayerBase:_setup_suspicion_and_detection_data()
 end
 
 function PlayerBase:_chk_set_unit_upgrades()
-	local multiplier = 1
+	local sus_multiplier = 1
+	local det_multiplier = 1
 	if managers.player:has_category_upgrade("player", "suspicion_multiplier") then
-		multiplier = multiplier * managers.player:upgrade_value("player", "suspicion_multiplier", 1)
-	end
-	if managers.player:has_category_upgrade("player", "passive_suspicion_multiplier") then
-		multiplier = multiplier * managers.player:upgrade_value("player", "passive_suspicion_multiplier", 1)
-	end
-	if multiplier and multiplier ~= 1 then
-		self:set_suspicion_multiplier("upgrade", multiplier)
+		local mul = managers.player:upgrade_value("player", "suspicion_multiplier", 1)
+		self:set_suspicion_multiplier("suspicion_multiplier", mul)
 	end
 	managers.environment_controller:set_flashbang_multiplier(managers.player:upgrade_value("player", "flashbang_multiplier"))
 	local is_client = Network:is_client()
@@ -68,9 +62,9 @@ function PlayerBase:_chk_set_unit_upgrades()
 			local level = managers.player:upgrade_level("player", "suspicion_multiplier")
 			managers.network:session():send_to_host("sync_upgrade", "player", "suspicion_multiplier", level)
 		end
-		if managers.player:has_category_upgrade("player", "passive_suspicion_multiplier") then
-			local level = managers.player:upgrade_level("player", "passive_suspicion_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "passive_suspicion_multiplier", level)
+		if managers.player:has_category_upgrade("player", "passive_concealment_modifier") then
+			local level = managers.player:upgrade_level("player", "passive_concealment_modifier")
+			managers.network:session():send_to_host("sync_upgrade", "player", "passive_concealment_modifier", level)
 		end
 		if managers.player:has_category_upgrade("player", "silent_kill") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "silent_kill", 1)
@@ -182,6 +176,9 @@ function PlayerBase:_chk_set_unit_upgrades()
 			local level = managers.player:upgrade_level("player", "convert_enemies_max_minions")
 			managers.network:session():send_to_host("sync_upgrade", "player", "convert_enemies_max_minions", level)
 		end
+		if managers.player:has_category_upgrade("player", "ene_hostage_lim_1") then
+			managers.network:session():send_to_host("sync_upgrade", "player", "ene_hostage_lim_1", 1)
+		end
 	end
 end
 
@@ -239,11 +236,9 @@ function PlayerBase:post_init()
 		self._unregistered = true
 	end
 	self._unit:character_damage():post_init()
-	if Network:is_server() then
-		local suspicion_mul, max_index = managers.blackmarket:get_suspicion_of_peer(Global.local_member:peer())
-		self:set_suspicion_multiplier("equipment", suspicion_mul)
-		self:set_detection_multiplier("equipment", 1 / suspicion_mul)
-	end
+	local con_mul, index = managers.blackmarket:get_concealment_of_peer(Global.local_member:peer())
+	self:set_suspicion_multiplier("equipment", 1 / con_mul)
+	self:set_detection_multiplier("equipment", 1 / con_mul)
 end
 
 function PlayerBase:_setup_controller()
@@ -309,29 +304,26 @@ function PlayerBase:detection_settings()
 end
 
 function PlayerBase:set_suspicion_multiplier(reason, multiplier)
-	if not Network:is_server() then
-		return
-	end
 	self._suspicion_settings.multipliers[reason] = multiplier
 	local buildup_mul = self._suspicion_settings.init_buildup_mul
 	local range_mul = self._suspicion_settings.init_range_mul
 	for reason, mul in pairs(self._suspicion_settings.multipliers) do
 		buildup_mul = buildup_mul * mul
+		if 1 < mul then
+			range_mul = range_mul * math.sqrt(mul)
+		end
 	end
 	self._suspicion_settings.buildup_mul = buildup_mul
 	self._suspicion_settings.range_mul = range_mul
 end
 
 function PlayerBase:set_detection_multiplier(reason, multiplier)
-	if not Network:is_server() then
-		return
-	end
 	self._detection_settings.multipliers[reason] = multiplier
 	local delay_mul = self._detection_settings.init_delay_mul
 	local range_mul = self._detection_settings.init_range_mul
 	for reason, mul in pairs(self._detection_settings.multipliers) do
-		delay_mul = delay_mul * mul
-		range_mul = range_mul * mul
+		delay_mul = delay_mul * 1 / mul
+		range_mul = range_mul * math.sqrt(mul)
 	end
 	self._detection_settings.delay_mul = delay_mul
 	self._detection_settings.range_mul = range_mul

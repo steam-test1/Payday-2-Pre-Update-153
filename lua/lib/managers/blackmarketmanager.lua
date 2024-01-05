@@ -479,7 +479,7 @@ function BlackMarketManager:outfit_string()
 	else
 		s = s .. " " .. "nil"
 	end
-	local concealment_modifier = self:concealment_modifiers() or 0
+	local concealment_modifier = -self:visibility_modifiers() or 0
 	s = s .. " " .. tostring(concealment_modifier)
 	return s
 end
@@ -1111,6 +1111,14 @@ function BlackMarketManager:get_weapon_stats_with_mod(category, slot, part_id, r
 	return weapon_stats
 end
 
+function BlackMarketManager:calculate_weapon_visibility(weapon)
+	return math.max(#tweak_data.weapon.stats.concealment - self:calculate_weapon_concealment(weapon), 0)
+end
+
+function BlackMarketManager:calculate_armor_visibility(armor)
+	return math.max(#tweak_data.weapon.stats.concealment - self:_calculate_armor_concealment(armor or self:equipped_armor()), 0)
+end
+
 function BlackMarketManager:calculate_weapon_concealment(weapon)
 	if type(weapon) == "string" then
 		weapon = weapon == "primaries" and self:equipped_primary() or weapon == "secondaries" and self:equipped_secondary()
@@ -1131,61 +1139,87 @@ function BlackMarketManager:_calculate_weapon_concealment(weapon)
 		return 0
 	end
 	local parts_stats = managers.weapon_factory:get_stats(factory_id, blueprint)
-	local stats_tweak_data = tweak_data.weapon.stats
-	local concealment = math.max(#stats_tweak_data.concealment - (base_stats.concealment + (parts_stats.concealment or 0)), 0)
-	return concealment
+	return base_stats.concealment + (parts_stats.concealment or 0)
 end
 
 function BlackMarketManager:_calculate_armor_concealment(armor)
-	local stats_tweak_data = tweak_data.weapon.stats
-	return math.max(#stats_tweak_data.concealment - tweak_data.blackmarket.armors[armor].concealment, 0)
+	return tweak_data.blackmarket.armors[armor].concealment
 end
 
 function BlackMarketManager:_get_concealment(primary, secondary, armor, modifier)
 	local stats_tweak_data = tweak_data.weapon.stats
-	local primary_concealment = self:_calculate_weapon_concealment(primary)
-	local secondary_concealment = self:_calculate_weapon_concealment(secondary)
-	local armor_concealment = self:_calculate_armor_concealment(armor)
+	local primary_visibility = self:calculate_weapon_visibility(primary)
+	local secondary_visibility = self:calculate_weapon_visibility(secondary)
+	local armor_visibility = self:calculate_armor_visibility(armor)
 	local modifier = modifier or 0
-	local total_concealment = math.clamp(primary_concealment + secondary_concealment + armor_concealment + modifier + 3, 1, #stats_tweak_data.concealment)
+	local total_visibility = math.clamp(primary_visibility + secondary_visibility + armor_visibility + modifier, 1, #stats_tweak_data.concealment)
+	local total_concealment = math.clamp(#stats_tweak_data.concealment - total_visibility, 1, #stats_tweak_data.concealment)
 	return stats_tweak_data.concealment[total_concealment], total_concealment
 end
 
 function BlackMarketManager:_get_concealment_from_local_player()
-	return self:_get_concealment(self:equipped_primary(), self:equipped_secondary(), self:equipped_armor(), self:concealment_modifiers())
+	return self:_get_concealment(self:equipped_primary(), self:equipped_secondary(), self:equipped_armor(), self:visibility_modifiers())
 end
 
 function BlackMarketManager:_get_concealment_from_peer(peer)
 	local outfit = peer:blackmarket_outfit()
-	return self:_get_concealment(outfit.primary, outfit.secondary, outfit.armor, outfit.concealment_modifier)
+	return self:_get_concealment(outfit.primary, outfit.secondary, outfit.armor, -outfit.concealment_modifier)
 end
 
-function BlackMarketManager:get_real_concealment_index_from_custom_data(data)
-	local primary_concealment = self:calculate_weapon_concealment(data.primaries or "primaries")
-	local secondary_concealment = self:calculate_weapon_concealment(data.secondaries or "secondaries")
-	local armor_concealment = self:calculate_armor_concealment(data.armors)
-	local modifier = self:concealment_modifiers()
-	return primary_concealment + secondary_concealment + armor_concealment + modifier + 3
+function BlackMarketManager:get_real_visibility_index_from_custom_data(data)
+	local stats_tweak_data = tweak_data.weapon.stats
+	local primary_visibility = self:calculate_weapon_visibility(data.primaries or "primaries")
+	local secondary_visibility = self:calculate_weapon_visibility(data.secondaries or "secondaries")
+	local armor_visibility = self:calculate_armor_visibility(data.armors)
+	local modifier = self:visibility_modifiers()
+	local total_visibility = primary_visibility + secondary_visibility + armor_visibility + modifier
+	local total_concealment = #stats_tweak_data.concealment - total_visibility
+	return total_concealment
 end
 
-function BlackMarketManager:get_real_concealment_index_of_local_player()
-	local primary_concealment = self:calculate_weapon_concealment("primaries")
-	local secondary_concealment = self:calculate_weapon_concealment("secondaries")
-	local armor_concealment = self:calculate_armor_concealment()
-	local modifier = self:concealment_modifiers()
-	return primary_concealment + secondary_concealment + armor_concealment + modifier + 3
+function BlackMarketManager:get_real_visibility_index_of_local_player()
+	local stats_tweak_data = tweak_data.weapon.stats
+	local primary_visibility = self:calculate_weapon_visibility("primaries")
+	local secondary_visibility = self:calculate_weapon_visibility("secondaries")
+	local armor_visibility = self:calculate_armor_visibility()
+	local modifier = self:visibility_modifiers()
+	local total_visibility = primary_visibility + secondary_visibility + armor_visibility + modifier
+	local total_concealment = #stats_tweak_data.concealment - total_visibility
+	return total_concealment
 end
 
 function BlackMarketManager:get_suspicion_of_local_player()
 	return self:_get_concealment_from_local_player()
 end
 
-function BlackMarketManager:get_suspicion_of_peer(peer)
+function BlackMarketManager:get_concealment_of_peer(peer)
 	return self:_get_concealment_from_peer(peer)
 end
 
-function BlackMarketManager:concealment_modifiers()
+function BlackMarketManager:_calculate_suspicion_offset(index, lerp)
+	local con_val = tweak_data.weapon.stats.concealment[index]
+	local min_val = tweak_data.weapon.stats.concealment[1]
+	local max_val = tweak_data.weapon.stats.concealment[#tweak_data.weapon.stats.concealment]
+	local max_ratio = max_val / min_val
+	local mul_ratio = math.max(1, con_val / min_val)
+	local susp_lerp = math.clamp(1 - (con_val - min_val) / (max_val - min_val), 0, 1)
+	return math.lerp(0, lerp, susp_lerp)
+end
+
+function BlackMarketManager:get_suspicion_offset_of_peer(peer, lerp)
+	local con_mul, index = self:get_concealment_of_peer(peer)
+	return self:_calculate_suspicion_offset(index, lerp)
+end
+
+function BlackMarketManager:get_suspicion_offset_of_local(lerp)
+	local con_mul, index = self:_get_concealment_from_local_player()
+	local val = self:_calculate_suspicion_offset(index, lerp or 1)
+	return val, index == 1
+end
+
+function BlackMarketManager:visibility_modifiers()
 	local skill_bonuses = 0
+	skill_bonuses = skill_bonuses - managers.player:upgrade_value("player", "passive_concealment_modifier", 0)
 	return skill_bonuses
 end
 
@@ -2178,9 +2212,10 @@ function BlackMarketManager:on_sell_inventory_mask(mask_id, global_value)
 		global_value = "normal"
 	}
 	blueprint.material = {id = "plastic", global_value = "normal"}
-	managers.money:on_sell_mask(mask_id, global_value, blueprint)
-	self:remove_item(global_value, "masks", mask_id)
-	self:alter_global_value_item(global_value, "masks", nil, mask_id, INV_REMOVE)
+	if self:remove_item(global_value, "masks", mask_id) then
+		managers.money:on_sell_mask(mask_id, global_value, blueprint)
+		self:alter_global_value_item(global_value, "masks", nil, mask_id, INV_REMOVE)
+	end
 end
 
 function BlackMarketManager:on_sell_mask(slot)
@@ -2270,7 +2305,11 @@ function BlackMarketManager:character_sequence_by_character_id(character_id, pee
 		print("character_sequence_by_character_id", managers.network:session(), peer_id, character)
 		local peer = managers.network:session():peer(peer_id)
 		if peer then
-			character = peer:character()
+			character = peer:character() or character
+			if not peer:character() then
+				Application:error("character_sequence_by_character_id: Peer missing character", "peer_id", peer_id)
+				print(inspect(peer))
+			end
 		end
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)
@@ -2398,6 +2437,31 @@ end
 
 function BlackMarketManager:verify_dlc_items()
 	self:_verify_dlc_items()
+end
+
+function BlackMarketManager:_cleanup_blackmarket()
+	local crafted_items = self._global.crafted_items
+	local crafted_masks = crafted_items.masks
+	local cleanup_mask = false
+	for i, mask in pairs(crafted_masks) do
+		if i ~= 1 then
+			cleanup_mask = tweak_data.blackmarket.masks[mask.mask_id] == nil
+			local blueprint = mask.blueprint or {}
+			if not cleanup_mask then
+				for part_type, data in pairs(blueprint) do
+					local converted_category = part_type == "color" and "colors" or part_type == "material" and "materials" or part_type == "pattern" and "textures" or part_type
+					cleanup_mask = tweak_data.blackmarket[converted_category][data.id] == nil
+					if cleanup_mask then
+						break
+					end
+				end
+			end
+			if cleanup_mask then
+				self:on_sell_mask(i)
+				print("selling mask", cleanup_mask)
+			end
+		end
+	end
 end
 
 function BlackMarketManager:_verify_dlc_items()
@@ -2560,6 +2624,97 @@ function BlackMarketManager:_verfify_equipped_category(category)
 		managers.money:on_buy_weapon_platform(weapon_id, true)
 		return
 	end
+end
+
+function BlackMarketManager:_convert_add_to_mul(value)
+	if 1 < value then
+		return 1 / value
+	elseif value < 1 then
+		return math.abs(value - 1) + 1
+	else
+		return 1
+	end
+end
+
+function BlackMarketManager:damage_multiplier(name, category, silencer)
+	local multiplier = 1
+	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "damage_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "damage_multiplier", 1))
+	if silencer then
+		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_damage_multiplier", 1))
+	end
+	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:threat_multiplier(name, category, silencer)
+	local multiplier = 1
+	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "suppression_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "suppression_multiplier2", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "passive_suppression_multiplier", 1))
+	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:accuracy_multiplier(name, category, silencer, current_state, fire_mode)
+	local multiplier = 1
+	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "spread_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "spread_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", fire_mode .. "_spread_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "spread_multiplier", 1))
+	if silencer then
+		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_spread_multiplier", 1))
+		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "silencer_spread_multiplier", 1))
+	end
+	if current_state then
+		if current_state._moving then
+			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "move_spread_multiplier", 1))
+			multiplier = multiplier + (1 - (self._spread_moving or 1))
+		end
+		if current_state:in_steelsight() then
+			multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_steelsight" or "steelsight"])
+		else
+			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "hip_fire_spread_multiplier", 1))
+			if current_state._state_data.ducking then
+				multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_crouching" or "crouching"])
+			else
+				multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_standing" or "standing"])
+			end
+		end
+	end
+	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:recoil_multiplier(name, category, silencer)
+	local multiplier = 1
+	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "recoil_multiplier", 1))
+	if managers.player:player_unit() and managers.player:player_unit():character_damage():is_suppressed() then
+		if managers.player:has_team_category_upgrade(category, "suppression_recoil_multiplier") then
+			multiplier = multiplier + (1 - managers.player:team_upgrade_value(category, "suppression_recoil_multiplier", 1))
+		end
+		if managers.player:has_team_category_upgrade("weapon", "suppression_recoil_multiplier") then
+			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "suppression_recoil_multiplier", 1))
+		end
+	else
+		if managers.player:has_team_category_upgrade(category, "recoil_multiplier") then
+			multiplier = multiplier + (1 - managers.player:team_upgrade_value(category, "recoil_multiplier", 1))
+		end
+		if managers.player:has_team_category_upgrade("weapon", "recoil_multiplier") then
+			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "recoil_multiplier", 1))
+		end
+	end
+	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "recoil_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "passive_recoil_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "recoil_multiplier", 1))
+	if silencer then
+		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_recoil_multiplier", 1))
+		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "silencer_recoil_multiplier", 1))
+	end
+	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:concealment_modifier()
+	local modifier = 0
+	modifier = modifier + managers.player:upgrade_value("player", "passive_concealment_modifier", 0)
+	return modifier
 end
 
 function BlackMarketManager:debug_inventory()

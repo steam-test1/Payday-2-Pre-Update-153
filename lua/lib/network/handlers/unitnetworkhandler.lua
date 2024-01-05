@@ -446,6 +446,19 @@ function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, sender
 	end
 end
 
+function UnitNetworkHandler:sync_interaction_info_id(unit, info_id, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	if alive(unit) and unit:interaction().set_info_id then
+		unit:interaction():set_info_id(info_id)
+	end
+end
+
 function UnitNetworkHandler:sync_interacted_by_id(unit_id, tweak_setting, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) and not self._verify_sender(sender) then
 		return
@@ -1097,13 +1110,16 @@ function UnitNetworkHandler:sync_ammo_bag_ammo_taken(unit, amount, sender)
 	unit:base():sync_ammo_taken(amount)
 end
 
-function UnitNetworkHandler:place_doctor_bag(pos, rot, amount_upgrade_lvl, rpc)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(rpc) then
+function UnitNetworkHandler:place_deployable_bag(class_name, pos, rot, upgrade_lvl, rpc)
+	local peer = self._verify_sender(rpc)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	local peer = self._verify_sender(rpc)
-	local unit = DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl)
-	unit:base():set_server_information(peer:id())
+	local class = CoreSerialize.string_to_classtable(class_name)
+	if class then
+		local unit = class.spawn(pos, rot, upgrade_lvl)
+		unit:base():set_server_information(peer:id())
+	end
 end
 
 function UnitNetworkHandler:sync_doctor_bag_setup(unit, amount_upgrade_lvl)

@@ -612,6 +612,9 @@ function CopBrain:on_cool_state_changed(state)
 	else
 		alert_listen_filter = managers.groupai:state():get_unit_type_filter("criminal")
 		alert_types = {bullet = true, aggression = true}
+		if self._logic_data then
+			self:terminate_all_suspicion()
+		end
 	end
 	managers.groupai:state():add_alert_listener(self._alert_listen_key, callback(self, self, "on_alert"), alert_listen_filter, alert_types, self._unit:movement():m_head_pos())
 end
@@ -620,6 +623,9 @@ function CopBrain:on_suppressed(state)
 	self._logic_data.is_suppressed = state or nil
 	if self._current_logic.on_suppressed_state then
 		self._current_logic.on_suppressed_state(self._logic_data)
+		if self._logic_data.char_tweak.chatter.suppress then
+			self._unit:sound():say("hlp", true)
+		end
 	end
 end
 
@@ -733,6 +739,16 @@ function CopBrain:on_surrender_chance()
 		chance_mul = 0.05
 	}
 	managers.enemy:add_delayed_clbk(self._logic_data.surrender_window.expire_clbk_id, callback(self, self, "clbk_surrender_chance_expired"), self._logic_data.surrender_window.expire_t)
+end
+
+function CopBrain:terminate_all_suspicion()
+	for u_key, u_data in pairs(self._logic_data.detected_attention_objects) do
+		if u_data.uncover_progress then
+			u_data.uncover_progress = nil
+			u_data.last_suspicion_t = nil
+			u_data.unit:movement():on_suspicion(self._unit, false)
+		end
+	end
 end
 
 function CopBrain:clbk_surrender_chance_expired()

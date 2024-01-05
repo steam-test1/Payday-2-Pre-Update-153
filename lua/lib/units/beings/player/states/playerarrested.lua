@@ -121,14 +121,14 @@ function PlayerArrested:_start_action_distance_interact(t)
 	end
 end
 
-function PlayerArrested:call_teammate(line, t, no_gesture, skip_alert)
+function PlayerArrested:call_teammate(line, t, no_gesture, skip_alert, skip_mark_cop)
 	local voice_type, plural, prime_target = self:_get_unit_intimidation_action(true, false, true, true, false)
 	local interact_type, queue_name
 	if voice_type == "come" then
 		interact_type = "cmd_come"
 		local character_code = managers.criminals:character_static_data_by_unit(prime_target.unit).ssuffix
 		queue_name = line .. character_code .. "_sin"
-	elseif voice_type == "stop_cop" then
+	elseif voice_type == "mark_cop" and not skip_mark_cop then
 		local shout_sound = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout
 		shout_sound = managers.groupai:state():whisper_mode() and tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout or shout_sound
 		if shout_sound then

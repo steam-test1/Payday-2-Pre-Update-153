@@ -53,7 +53,8 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 			desc_id = data.desc_id,
 			infamous = data.infamous,
 			value = data.stats and data.stats.value or 1,
-			weight = data.weight
+			weight = data.weight,
+			texture_bundle_folder = data.texture_bundle_folder
 		}
 	end
 	self:_add_desc_from_name_macro(self.weapon_mods)
@@ -3463,25 +3464,25 @@ function BlackMarketTweakData:_init_armors()
 	self.armors.level_2.name_id = "bm_armor_level_2"
 	self.armors.level_2.sequence = "var_model_02"
 	self.armors.level_2.upgrade_level = 1
-	self.armors.level_2.concealment = 27
+	self.armors.level_2.concealment = 26
 	self.armors.level_2.movement_penalty = 1
 	self.armors.level_3 = {}
 	self.armors.level_3.name_id = "bm_armor_level_3"
 	self.armors.level_3.sequence = "var_model_03"
 	self.armors.level_3.upgrade_level = 2
-	self.armors.level_3.concealment = 21
+	self.armors.level_3.concealment = 23
 	self.armors.level_3.movement_penalty = 2
 	self.armors.level_4 = {}
 	self.armors.level_4.name_id = "bm_armor_level_4"
 	self.armors.level_4.sequence = "var_model_04"
 	self.armors.level_4.upgrade_level = 3
-	self.armors.level_4.concealment = 18
+	self.armors.level_4.concealment = 21
 	self.armors.level_4.movement_penalty = 3
 	self.armors.level_5 = {}
 	self.armors.level_5.name_id = "bm_armor_level_5"
 	self.armors.level_5.sequence = "var_model_05"
 	self.armors.level_5.upgrade_level = 4
-	self.armors.level_5.concealment = 15
+	self.armors.level_5.concealment = 18
 	self.armors.level_5.movement_penalty = 4
 	self.armors.level_6 = {}
 	self.armors.level_6.name_id = "bm_armor_level_6"
@@ -3493,7 +3494,7 @@ function BlackMarketTweakData:_init_armors()
 	self.armors.level_7.name_id = "bm_armor_level_7"
 	self.armors.level_7.sequence = "var_model_07"
 	self.armors.level_7.upgrade_level = 6
-	self.armors.level_7.concealment = 6
+	self.armors.level_7.concealment = 1
 	self.armors.level_7.movement_penalty = 6
 	self:_add_desc_from_name_macro(self.armors)
 end

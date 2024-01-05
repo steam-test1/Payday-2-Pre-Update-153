@@ -33,6 +33,7 @@ function GuiTweakData:init()
 	self.crime_net.debug_options.mass_spawn = false
 	self.crime_net.debug_options.mass_spawn_limit = 100
 	self.crime_net.debug_options.mass_spawn_timer = 0.04
+	self.stats_present_multiplier = 10
 	self.crime_net.regions = {
 		{
 			closed = true,

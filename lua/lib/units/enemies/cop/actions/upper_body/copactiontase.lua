@@ -231,7 +231,7 @@ function CopActionTase:update(t)
 					self._shoot_t = nil
 					if managers.player:has_category_upgrade("player", "taser_malfunction") then
 						self._malfunction_clbk_id = "tase_malf" .. tostring(self._unit:key())
-						local delay = math.random() * 2 + 1
+						local delay = math.rand(tweak_data.upgrades.taser_malfunction_min or 1, tweak_data.upgrades.taser_malfunction_max or 3)
 						managers.enemy:add_delayed_clbk(self._malfunction_clbk_id, callback(self, self, "clbk_malfunction"), t + delay)
 					end
 				end
@@ -280,10 +280,15 @@ function CopActionTase:clbk_malfunction()
 	if self._expired then
 		return
 	end
+	World:effect_manager():spawn({
+		effect = Idstring("effects/payday2/particles/character/taser_stop"),
+		position = self._ext_movement:m_head_pos(),
+		normal = math.UP
+	})
 	local action_data = {
 		variant = "melee",
 		damage = 0,
-		damage_effect = self._unit:character_damage()._HEALTH_INIT * 0.2,
+		damage_effect = self._unit:character_damage()._HEALTH_INIT * 10,
 		attacker_unit = self._unit,
 		attack_dir = -self._common_data.fwd,
 		col_ray = {

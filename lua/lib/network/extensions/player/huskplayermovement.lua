@@ -1704,12 +1704,10 @@ function HuskPlayerMovement:_feed_suspicion_to_hud()
 end
 
 function HuskPlayerMovement:_apply_attention_setting_modifications(setting)
-	local mul = self._unit:base():upgrade_value("player", "camouflage_bonus")
-	if mul then
-		setting.notice_delay_mul = (setting.notice_delay_mul or 1) * mul
-		if setting.uncover_range then
-			setting.uncover_range = setting.uncover_range * 0.5
-		end
+	setting.detection = self._unit:base():detection_settings()
+	local weight_mul = self._unit:base():upgrade_value("player", "camouflage_bonus", 1)
+	if weight_mul and weight_mul ~= 1 then
+		setting.weight_mul = (setting.weight_mul or 1) * weight_mul
 	end
 end
 

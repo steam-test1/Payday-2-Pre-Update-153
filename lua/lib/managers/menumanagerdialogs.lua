@@ -433,11 +433,16 @@ function MenuManager:show_new_item_gained(params)
 	ok_button.text = managers.localization:text("dialog_ok")
 	dialog_data.button_list = {ok_button}
 	local texture, render_template, shapes
+	local guis_catalog = "guis/"
 	local category = params.data[1]
 	local id = params.data[2]
 	if category == "weapon_mods" then
 		local part_id = id
-		texture = "guis/textures/pd2/blackmarket/icons/mods/" .. tostring(part_id)
+		local bundle_folder = tweak_data.blackmarket.weapon_mods[part_id] and tweak_data.blackmarket.weapon_mods[part_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		texture = guis_catalog .. "textures/pd2/blackmarket/icons/mods/" .. tostring(part_id)
 	elseif category == "colors" then
 		local color_tweak_data = _G.tweak_data.blackmarket.colors[id]
 		local shape_template = {
@@ -462,12 +467,21 @@ function MenuManager:show_new_item_gained(params)
 		shape_template.texture = "guis/textures/pd2/blackmarket/icons/colors/color_02"
 		table.insert(shapes, shape_template)
 	elseif category == "primaries" or category == "secondaries" then
-		texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. managers.weapon_factory:get_weapon_id_by_factory_id(id)
+		local weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(id)
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. weapon_id
 	elseif category == "textures" then
 		texture = _G.tweak_data.blackmarket.textures[id].texture
 		render_template = Idstring("VertexColorTexturedPatterns")
 	else
-		texture = "guis/textures/pd2/blackmarket/icons/" .. tostring(category) .. "/" .. tostring(id)
+		local bundle_folder = tweak_data.blackmarket[category][id] and tweak_data.blackmarket[category][id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		texture = guis_catalog .. "textures/pd2/blackmarket/icons/" .. tostring(category) .. "/" .. tostring(id)
 	end
 	dialog_data.texture = texture
 	dialog_data.render_template = render_template
@@ -497,7 +511,13 @@ function MenuManager:show_weapon_mods_available(params)
 	local ok_button = {}
 	ok_button.text = managers.localization:text("dialog_ok")
 	dialog_data.button_list = {ok_button}
-	dialog_data.texture = "guis/textures/pd2/blackmarket/icons/weapons/" .. tostring(params.weapon_id)
+	local guis_catalog = "guis/"
+	local weapon_id = params.weapon_id
+	local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	dialog_data.texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(weapon_id)
 	dialog_data.text_blend_mode = "add"
 	dialog_data.use_text_formating = true
 	dialog_data.text_formating_color = Color.white

@@ -84,7 +84,7 @@ end
 function PlayerIncapacitated:_check_action_interact(t, input)
 	if input.btn_interact_press and (not self._intimidate_t or t - self._intimidate_t > tweak_data.player.movement_state.interaction_delay) then
 		self._intimidate_t = t
-		PlayerArrested.call_teammate(self, "f11", t, true, true)
+		PlayerArrested.call_teammate(self, "f11", t, true, true, true)
 	end
 end
 

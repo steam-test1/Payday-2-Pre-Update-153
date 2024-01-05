@@ -162,9 +162,13 @@ function NetworkAccountSTEAM:get_stat(key)
 	return Steam:sa_handler():get_stat(key)
 end
 
-function NetworkAccountSTEAM:get_global_stat(key, day)
-	local global_stat = Steam:sa_handler():get_global_stat(key, 60)
-	return global_stat[day]
+function NetworkAccountSTEAM:get_global_stat(key, days)
+	local global_stat = Steam:sa_handler():get_global_stat(key, days)
+	local value = 0
+	for _, day in ipairs(global_stat) do
+		value = value + day
+	end
+	return value
 end
 
 function NetworkAccountSTEAM:publish_statistics(stats)

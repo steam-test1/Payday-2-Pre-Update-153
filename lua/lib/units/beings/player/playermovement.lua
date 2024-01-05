@@ -66,9 +66,6 @@ function PlayerMovement:post_init()
 	managers.groupai:state():add_listener(self._enemy_weapons_hot_listen_id, {
 		"enemy_weapons_hot"
 	}, callback(self, self, "clbk_enemy_weapons_hot"))
-	if managers.player:has_category_upgrade("player", "camouflage_bonus") then
-		self._unit:base():set_detection_multiplier("camouflage_bonus", managers.player:upgrade_value("player", "camouflage_bonus", 1))
-	end
 end
 
 function PlayerMovement:attention_handler()
@@ -373,6 +370,9 @@ end
 
 function PlayerMovement:_apply_attention_setting_modifications(setting)
 	setting.detection = self._unit:base():detection_settings()
+	if managers.player:has_category_upgrade("player", "camouflage_bonus") then
+		setting.weight_mul = (setting.weight_mul or 1) * managers.player:upgrade_value("player", "camouflage_bonus", 1)
+	end
 end
 
 function PlayerMovement:set_attention_settings(setting_names)
@@ -474,7 +474,12 @@ function PlayerMovement:on_suspicion(observer_unit, status)
 end
 
 function PlayerMovement:_feed_suspicion_to_hud()
-	managers.hud:set_suspicion(self._suspicion_ratio)
+	local susp_ratio = self._suspicion_ratio
+	if type(susp_ratio) == "number" then
+		local offset = self._unit:base():suspicion_settings().hud_offset
+		susp_ratio = susp_ratio * (1 - offset) + offset
+	end
+	managers.hud:set_suspicion(susp_ratio)
 end
 
 function PlayerMovement:_calc_suspicion_ratio_and_sync(observer_unit, status)
@@ -631,14 +636,14 @@ end
 
 function PlayerMovement:on_morale_boost(benefactor_unit)
 	if self._morale_boost then
-		managers.enemy:reschedule_delayed_clbk(self._morale_boost.expire_clbk_id, managers.player:player_timer():time() + 30)
+		managers.enemy:reschedule_delayed_clbk(self._morale_boost.expire_clbk_id, managers.player:player_timer():time() + tweak_data.upgrades.moral_boost_time)
 	else
 		self._morale_boost = {
 			expire_clbk_id = "PlayerMovement_morale_boost" .. tostring(self._unit:key()),
-			move_speed_bonus = 1.1,
-			suppression_resistance = 0.9
+			move_speed_bonus = tweak_data.upgrades.moral_boost_speed_bonus,
+			suppression_resistance = tweak_data.upgrades.moral_boost_suppression_resistance
 		}
-		managers.enemy:add_delayed_clbk(self._morale_boost.expire_clbk_id, callback(self, self, "clbk_morale_boost_expire"), managers.player:player_timer():time() + 30)
+		managers.enemy:add_delayed_clbk(self._morale_boost.expire_clbk_id, callback(self, self, "clbk_morale_boost_expire"), managers.player:player_timer():time() + tweak_data.upgrades.moral_boost_time)
 	end
 end
 

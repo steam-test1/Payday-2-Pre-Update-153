@@ -786,7 +786,7 @@ function SkillTreeGui:_setup()
 	local tree_tabs_panel = self._panel:panel({
 		name = "tree_tabs_panel",
 		h = tree_tab_h,
-		y = 70
+		y = 71
 	})
 	local skill_title_panel = self._panel:panel({
 		name = "skill_title_panel",
@@ -1056,7 +1056,8 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 		end
 	end
 	self._prerequisites_links = {}
-	local can_afford = {}
+	local skill_stat_color = tweak_data.screen_colors.resource
+	local color_replace_table = {}
 	local tier_bonus_text = ""
 	if self._selected_item and self._selected_item._skill_panel then
 		local skill_id = self._selected_item._skill_id
@@ -1069,24 +1070,33 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 		local completed = managers.skilltree:skill_completed(skill_id)
 		local points = managers.skilltree:points()
 		local spending_money = managers.money:total()
+		local skill_descs = tweak_data.upgrades.skill_descs[skill_id] or {0, 0}
+		local basic_color_index = 1
+		local pro_color_index = 2 + (skill_descs[1] or 0)
 		if 1 < step then
 			basic_cost = utf8.to_upper(managers.localization:text("st_menu_skill_owned"))
-			can_afford[1] = true
+			color_replace_table[basic_color_index] = tweak_data.screen_colors.resource
 		else
 			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, tweak_data_skill[1] and tweak_data_skill[1].cost and Application:digest_value(tweak_data_skill[1].cost, false) or 0)
-			can_afford[1] = points >= basic_cost and spending_money >= money_cost
+			local can_afford = points >= basic_cost and spending_money >= money_cost
+			color_replace_table[basic_color_index] = can_afford and tweak_data.screen_colors.resource or tweak_data.screen_colors.important_1
 			basic_cost = managers.localization:text(basic_cost == 1 and "st_menu_point" or "st_menu_point_plural", {points = basic_cost}) .. " / " .. managers.experience:cash_string(money_cost)
 		end
 		if 2 < step then
 			pro_cost = utf8.to_upper(managers.localization:text("st_menu_skill_owned"))
-			can_afford[2] = true
+			color_replace_table[pro_color_index] = tweak_data.screen_colors.resource
 		else
 			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, tweak_data_skill[2] and tweak_data_skill[2].cost and Application:digest_value(tweak_data_skill[2].cost, false) or 0)
-			can_afford[2] = points >= pro_cost and spending_money >= money_cost
+			local can_afford = points >= pro_cost and spending_money >= money_cost
+			color_replace_table[pro_color_index] = can_afford and tweak_data.screen_colors.resource or tweak_data.screen_colors.important_1
 			pro_cost = managers.localization:text(pro_cost == 1 and "st_menu_point" or "st_menu_point_plural", {points = pro_cost}) .. " / " .. managers.experience:cash_string(money_cost)
 		end
+		local macroes = {basic = basic_cost, pro = pro_cost}
+		for i, d in pairs(skill_descs) do
+			macroes[i] = d
+		end
 		title_text = utf8.to_upper(managers.localization:text(tweak_data.skilltree.skills[skill_id].name_id))
-		text = managers.localization:text(tweak_data_skill.desc_id, {basic = basic_cost, pro = pro_cost})
+		text = managers.localization:text(tweak_data_skill.desc_id, macroes)
 		if self._selected_item._tier then
 			if not unlocked then
 				local point_spent = managers.skilltree:points_spent(self._selected_item._tree) or 0
@@ -1096,11 +1106,14 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 					tier = self._selected_item._tier
 				}) .. "\n"
 			end
+			local skilltree = tweak_data.skilltree.trees[self._active_tree] and tweak_data.skilltree.trees[self._active_tree].skill or "NIL"
+			local tier_descs = tweak_data.upgrades.skill_descs[tostring(skilltree) .. "_tier" .. tostring(self._selected_item._tier)]
 			tier_bonus_text = [[
 
 
-]] .. utf8.to_upper(managers.localization:text(unlocked and "st_menu_tier_unlocked" or "st_menu_tier_locked")) .. "\n" .. managers.localization:text(tweak_data.skilltree.skills[tweak_data.skilltree.trees[self._selected_item._tree].skill][self._selected_item._tier].desc_id)
+]] .. utf8.to_upper(managers.localization:text(unlocked and "st_menu_tier_unlocked" or "st_menu_tier_locked")) .. "\n" .. managers.localization:text(tweak_data.skilltree.skills[tweak_data.skilltree.trees[self._selected_item._tree].skill][self._selected_item._tier].desc_id, tier_descs)
 		end
+		text = text .. tier_bonus_text
 		local prerequisites = talent.prerequisites or {}
 		local add_prerequisite = true
 		for _, prerequisite in ipairs(prerequisites) do
@@ -1160,7 +1173,6 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 		end
 	end
 	text = string.gsub(text, "##", "")
-	text = text .. tier_bonus_text
 	local desc_text = self._skill_description_panel:child("text")
 	desc_text:set_text(text)
 	desc_text:set_y(math.round(desc_pre_text:h() * 1.15))
@@ -1169,7 +1181,7 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 		Application:error("SkillTreeGui: Not even amount of ##'s in skill description string!", #start_ci, #end_ci)
 	else
 		for i = 1, #start_ci do
-			desc_text:set_range_color(start_ci[i], end_ci[i], can_afford[i] and tweak_data.screen_colors.resource or tweak_data.screen_colors.important_1)
+			desc_text:set_range_color(start_ci[i], end_ci[i], color_replace_table[i] or skill_stat_color)
 		end
 	end
 end

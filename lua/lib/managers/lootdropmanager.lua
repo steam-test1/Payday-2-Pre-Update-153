@@ -118,6 +118,7 @@ function LootDropManager:_new_make_drop(debug, add_to_inventory, debug_stars, re
 	local plvl = managers.experience:current_level()
 	local pstars = managers.experience:level_to_stars()
 	local difficulty_stars = managers.job:current_difficulty_stars() or 0
+	local xp_no_next_lv = managers.experience:next_level_data_points() - managers.experience:next_level_data_current_points()
 	local stars = debug_stars or pstars
 	local pc = stars * 10
 	if not debug then
@@ -177,6 +178,7 @@ function LootDropManager:_new_make_drop(debug, add_to_inventory, debug_stars, re
 			local pass_dlc = true
 			local pass_qlvl = not got_qlvl or plvl >= got_qlvl
 			local pass_max_in_inventory
+			local pass_xp_card = type ~= "xp" or xp_no_next_lv > (tweak_data:get_value("experience_manager", "loot_drop_value", item_tweak.value_id) or 0)
 			local global_value = "normal"
 			if is_infamous then
 				global_value = "infamous"
@@ -199,7 +201,7 @@ function LootDropManager:_new_make_drop(debug, add_to_inventory, debug_stars, re
 			end
 			local amount_in_inventory = managers.blackmarket:get_item_amount(global_value, type, item, true)
 			pass_max_in_inventory = not item_tweak.max_in_inventory or amount_in_inventory < item_tweak.max_in_inventory
-			if pass_infamous and pass_dlc and pass_qlvl and pass_max_in_inventory then
+			if pass_infamous and pass_dlc and pass_qlvl and pass_max_in_inventory and pass_xp_card then
 				local weight = item_tweak.weight or tweak_data.lootdrop.DEFAULT_WEIGHT
 				local type_weight_mod_func = tweak_data.lootdrop.type_weight_mod_funcs[type]
 				if type_weight_mod_func then

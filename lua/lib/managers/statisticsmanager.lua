@@ -711,15 +711,15 @@ function StatisticsManager:clear_skills_statistics()
 	managers.network.account:publish_statistics(stats)
 end
 
-function StatisticsManager:debug_print_stats(global_flag, day)
+function StatisticsManager:debug_print_stats(global_flag, days)
 	local key
 	local stats = {}
 	local account = managers.network.account
-	day = day or 1
+	days = days or 1
 	table.insert(stats, {
 		name = "player_time",
 		loc = account:get_stat("player_time"),
-		glo = account:get_global_stat("player_time", day)
+		glo = account:get_global_stat("player_time", days)
 	})
 	local play_times = {
 		0,
@@ -739,31 +739,31 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
+			glo = account:get_global_stat(key, days)
 		})
 	end
 	table.insert(stats, {
 		name = "player_level",
 		loc = account:get_stat("player_level"),
-		glo = account:get_global_stat("player_level", day)
+		glo = account:get_global_stat("player_level", days)
 	})
 	for i = 0, 100, 10 do
 		key = "player_level_" .. i
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
+			glo = account:get_global_stat(key, days)
 		})
 	end
 	table.insert(stats, {
 		name = "player_cash",
 		loc = account:get_stat("player_cash"),
-		glo = account:get_global_stat("player_cash", day)
+		glo = account:get_global_stat("player_cash", days)
 	})
 	table.insert(stats, {
 		name = "player_cash_0k",
 		loc = account:get_stat("player_cash_0k"),
-		glo = account:get_global_stat("player_cash_0k", day)
+		glo = account:get_global_stat("player_cash_0k", days)
 	})
 	local cash_amount = 1
 	for i = 0, 9 do
@@ -771,7 +771,7 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
+			glo = account:get_global_stat(key, days)
 		})
 		cash_amount = cash_amount * 10
 	end
@@ -783,13 +783,13 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 				table.insert(stats, {
 					name = key,
 					loc = account:get_stat(key),
-					glo = account:get_global_stat(key, day)
+					glo = account:get_global_stat(key, days)
 				})
 				key = "skill_" .. tree.skill .. "_" .. skill .. "_ace"
 				table.insert(stats, {
 					name = key,
 					loc = account:get_stat(key),
-					glo = account:get_global_stat(key, day)
+					glo = account:get_global_stat(key, days)
 				})
 			end
 		end
@@ -799,14 +799,14 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
+			glo = account:get_global_stat(key, days)
 		})
 		for i = 0, 35, 5 do
 			key = "skill_" .. tree.skill .. "_" .. i
 			table.insert(stats, {
 				name = key,
 				loc = account:get_stat(key),
-				glo = account:get_global_stat(key, day)
+				glo = account:get_global_stat(key, days)
 			})
 		end
 	end
@@ -816,34 +816,34 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 			table.insert(stats, {
 				name = key,
 				loc = account:get_stat(key),
-				glo = account:get_global_stat(key, day)
+				glo = account:get_global_stat(key, days)
 			})
 		end
 	end
 	table.insert(stats, {
 		name = "gadget_used_ammo_bag",
 		loc = account:get_stat("gadget_used_ammo_bag"),
-		glo = account:get_global_stat("gadget_used_ammo_bag", day)
+		glo = account:get_global_stat("gadget_used_ammo_bag", days)
 	})
 	table.insert(stats, {
 		name = "gadget_used_doctor_bag",
 		loc = account:get_stat("gadget_used_doctor_bag"),
-		glo = account:get_global_stat("gadget_used_doctor_bag", day)
+		glo = account:get_global_stat("gadget_used_doctor_bag", days)
 	})
 	table.insert(stats, {
 		name = "gadget_used_trip_mine",
 		loc = account:get_stat("gadget_used_trip_mine"),
-		glo = account:get_global_stat("gadget_used_trip_mine", day)
+		glo = account:get_global_stat("gadget_used_trip_mine", days)
 	})
 	table.insert(stats, {
 		name = "gadget_used_sentry_gun",
 		loc = account:get_stat("gadget_used_sentry_gun"),
-		glo = account:get_global_stat("gadget_used_sentry_gun", day)
+		glo = account:get_global_stat("gadget_used_sentry_gun", days)
 	})
 	table.insert(stats, {
 		name = "gadget_used_ecm_jammer",
 		loc = account:get_stat("gadget_used_ecm_jammer"),
-		glo = account:get_global_stat("gadget_used_ecm_jammer", day)
+		glo = account:get_global_stat("gadget_used_ecm_jammer", days)
 	})
 	for mask_name, mask in pairs(tweak_data.blackmarket.masks) do
 		if tweak_data.blackmarket.masks[mask_name].statistics then
@@ -851,7 +851,7 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 			table.insert(stats, {
 				name = key,
 				loc = account:get_stat(key),
-				glo = account:get_global_stat(key, day)
+				glo = account:get_global_stat(key, days)
 			})
 		end
 	end
@@ -860,21 +860,21 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
+			glo = account:get_global_stat(key, days)
 		})
 	end
 	table.insert(stats, {
 		name = "heist_success",
 		loc = account:get_stat("heist_success"),
-		glo = account:get_global_stat("heist_success", day)
+		glo = account:get_global_stat("heist_success", days)
 	})
 	table.insert(stats, {
 		name = "heist_failed",
 		loc = account:get_stat("heist_failed"),
-		glo = account:get_global_stat("heist_failed", day)
+		glo = account:get_global_stat("heist_failed", days)
 	})
 	print("----------------------------------")
-	print((global_flag and "GLOBAL" or "LOCAL") .. " STEAM STATISTICS\n")
+	print((global_flag and "GLOBAL" or "LOCAL") .. " STEAM STATISTICS FOR " .. (days == 1 and "TODAY" or "LAST " .. days .. " DAYS\n"))
 	for key, data in pairs(stats) do
 		print(data.name, global_flag and data.glo or data.loc)
 	end

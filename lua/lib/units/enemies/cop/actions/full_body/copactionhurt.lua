@@ -377,10 +377,10 @@ function CopActionHurt:init(action_desc, common_data)
 				radius = managers.player:upgrade_value("player", "silent_kill", nil)
 			end
 			if managers.groupai:state():whisper_mode() then
-				radius = radius or 600
+				radius = radius or tweak_data.upgrades.cop_hurt_alert_radius_whisper or 600
 				filter_name = "civilians_enemies"
 			else
-				radius = radius or 400
+				radius = radius or tweak_data.upgrades.cop_hurt_alert_radius or 400
 				filter_name = "enemies"
 			end
 			local new_alert = {

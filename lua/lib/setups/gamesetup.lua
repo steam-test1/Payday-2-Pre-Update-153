@@ -156,6 +156,15 @@ function GameSetup:load_packages()
 	if not PackageManager:loaded("packages/game_base") then
 		PackageManager:load("packages/game_base")
 	end
+	local prefix = "packages/dlcs/"
+	local sufix = "/game_base"
+	local package = ""
+	for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+		package = prefix .. tostring(dlc_package) .. sufix
+		if bundled and not PackageManager:loaded(package) then
+			PackageManager:load(package)
+		end
+	end
 	local level_package
 	if not Global.level_data or not Global.level_data.level_id then
 		level_package = "packages/level_debug"
@@ -188,8 +197,19 @@ end
 
 function GameSetup:unload_packages()
 	Setup.unload_packages(self)
-	if not Global.load_level and PackageManager:loaded("packages/game_base") then
-		PackageManager:unload("packages/game_base")
+	if not Global.load_level then
+		if PackageManager:loaded("packages/game_base") then
+			PackageManager:unload("packages/game_base")
+		end
+		local prefix = "packages/dlcs/"
+		local sufix = "/game_base"
+		local package = ""
+		for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+			package = prefix .. tostring(dlc_package) .. sufix
+			if bundled and PackageManager:loaded(package) then
+				PackageManager:unload(package)
+			end
+		end
 	end
 	if self._loaded_level_package then
 		if type(self._loaded_level_package) == "table" then

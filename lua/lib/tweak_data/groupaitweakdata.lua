@@ -124,7 +124,7 @@ function GroupAITweakData:_init_unit_categories()
 		cop = {
 			units = {
 				Idstring("units/payday2/characters/ene_cop_1/ene_cop_1"),
-				Idstring("units/payday2/characters/ene_cop_2/ene_cop_2"),
+				Idstring("units/payday2/characters/ene_cop_3/ene_cop_3"),
 				Idstring("units/payday2/characters/ene_cop_4/ene_cop_4")
 			},
 			access = access_type_walk_only
@@ -256,14 +256,14 @@ function GroupAITweakData:_init_unit_categories()
 		CS_cop_C45_R870 = {
 			units = {
 				Idstring("units/payday2/characters/ene_cop_1/ene_cop_1"),
-				Idstring("units/payday2/characters/ene_cop_2/ene_cop_2"),
+				Idstring("units/payday2/characters/ene_cop_3/ene_cop_3"),
 				Idstring("units/payday2/characters/ene_cop_4/ene_cop_4")
 			},
 			access = access_type_walk_only
 		},
 		CS_cop_stealth_MP5 = {
 			units = {
-				Idstring("units/payday2/characters/ene_cop_3/ene_cop_3")
+				Idstring("units/payday2/characters/ene_cop_2/ene_cop_2")
 			},
 			access = access_type_walk_only
 		},
@@ -355,7 +355,7 @@ function GroupAITweakData:_init_unit_categories()
 			units = {
 				Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
 			},
-			max_amount = 6,
+			max_amount = 4,
 			access = access_type_all,
 			special_type = "spooc"
 		},
@@ -369,7 +369,8 @@ function GroupAITweakData:_init_unit_categories()
 		},
 		FBI_tank = {
 			units = {
-				Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1")
+				Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1"),
+				Idstring("units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2")
 			},
 			access = access_type_walk_only,
 			max_amount = 2,
@@ -455,7 +456,15 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		"flank",
 		"charge",
 		"flash_grenade",
-		"shield_cover"
+		"shield_cover",
+		"murder"
+	}
+	local tactics_CS_sniper = {
+		"smoke_grenade",
+		"shield_cover",
+		"ranged_fire",
+		"provide_coverfire",
+		"provide_support"
 	}
 	local tactics_FBI_suit = {
 		"provide_coverfire",
@@ -541,7 +550,8 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 	local tactics_FBI_tank = {
 		"charge",
 		"deathguard",
-		"shield"
+		"shield_cover",
+		"smoke_grenade"
 	}
 	self.enemy_spawn_groups.CS_defend_a = {
 		amount = {3, 4},
@@ -650,7 +660,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				unit = "CS_shield",
 				freq = 1,
 				amount_min = 1,
-				amount_max = 1,
+				amount_max = 2,
 				tactics = tactics_CS_shield,
 				rank = 3
 			},
@@ -659,14 +669,14 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				freq = 0.1,
 				amount_max = 1,
 				tactics = tactics_CS_shield,
-				rank = 2
+				rank = 3
 			},
 			{
 				unit = "CS_heavy_M4_w",
 				freq = 1,
-				amount_min = 1,
+				amount_max = 1,
 				tactics = tactics_CS_swat_heavy,
-				rank = 1
+				rank = 2
 			}
 		}
 	}
@@ -689,16 +699,16 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 			{
 				unit = "FBI_tank",
 				freq = 1,
+				amount_min = 1,
 				tactics = tactics_FBI_tank,
-				rank = 1
+				rank = 2
 			},
 			{
 				unit = "CS_tazer",
 				freq = 0.5,
-				amount_min = 1,
 				amount_max = 1,
 				tactics = tactics_CS_tazer,
-				rank = 2
+				rank = 1
 			}
 		}
 	}
@@ -831,18 +841,18 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		spawn = {
 			{
 				unit = "FBI_shield",
-				freq = 0.3,
-				amount_min = 1,
-				amount_max = 2,
+				freq = 1,
+				amount_min = 2,
+				amount_max = 3,
 				tactics = tactics_FBI_shield_flank,
 				rank = 3
 			},
 			{
-				unit = "FBI_heavy_G36_w",
+				unit = "CS_tazer",
 				freq = 1,
-				amount_min = 1,
-				tactics = tactics_FBI_heavy_flank,
-				rank = 1
+				amount_max = 1,
+				tactics = tactics_CS_tazer,
+				rank = 2
 			}
 		}
 	}
@@ -1178,7 +1188,7 @@ function GroupAITweakData:_set_overkill()
 		FBI_swats = {
 			0.1,
 			1,
-			0.3
+			0.5
 		},
 		FBI_heavys = {
 			0.05,
@@ -1188,7 +1198,7 @@ function GroupAITweakData:_set_overkill()
 		FBI_shields = {
 			0.1,
 			0.2,
-			1
+			0.5
 		},
 		FBI_tanks = {
 			0,
@@ -1284,16 +1294,16 @@ function GroupAITweakData:_set_overkill_145()
 	self.besiege.assault.groups = {
 		FBI_swats = {
 			0.2,
-			1,
-			0
+			0.5,
+			0.75
 		},
 		FBI_heavys = {
 			0.1,
-			1,
-			1
+			0.5,
+			0.5
 		},
 		FBI_shields = {
-			0.2,
+			0.1,
 			0.5,
 			0.75
 		},

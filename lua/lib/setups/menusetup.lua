@@ -24,12 +24,33 @@ function MenuSetup:load_packages()
 	if not PackageManager:loaded("packages/start_menu") then
 		PackageManager:load("packages/start_menu")
 	end
+	local prefix = "packages/dlcs/"
+	local sufix = "/start_menu"
+	local package = ""
+	for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+		package = prefix .. tostring(dlc_package) .. sufix
+		Application:debug("DLC PACKAGE LOCATION: " .. package, "IS PACKAGE OK TO LOAD?: " .. tostring(bundled))
+		if bundled and not PackageManager:loaded(package) then
+			PackageManager:load(package)
+		end
+	end
 end
 
 function MenuSetup:unload_packages()
 	Setup.unload_packages(self)
-	if not Global.load_start_menu and PackageManager:loaded("packages/start_menu") then
-		PackageManager:unload("packages/start_menu")
+	if not Global.load_start_menu then
+		if PackageManager:loaded("packages/start_menu") then
+			PackageManager:unload("packages/start_menu")
+		end
+		local prefix = "packages/dlcs/"
+		local sufix = "/start_menu"
+		local package = ""
+		for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+			package = prefix .. tostring(dlc_package) .. sufix
+			if bundled and PackageManager:loaded(package) then
+				PackageManager:unload(package)
+			end
+		end
 	end
 end
 

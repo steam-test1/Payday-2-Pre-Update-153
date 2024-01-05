@@ -108,6 +108,7 @@ end
 function NewRaycastWeaponBase:_update_stats_values()
 	self:_check_sound_switch()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
+	self._fire_mode = managers.weapon_factory:has_perk("fire_mode_auto", self._factory_id, self._blueprint) and "auto" or managers.weapon_factory:has_perk("fire_mode_single", self._factory_id, self._blueprint) and "single" or tweak_data.weapon[self._name_id].FIRE_MODE or "single"
 	if self._silencer then
 		self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash_silenced or "effects/payday2/particles/weapons/9mm_auto_silence_fps")
 	else
@@ -129,15 +130,19 @@ function NewRaycastWeaponBase:_update_stats_values()
 		stats.zoom = math.min(stats.zoom + managers.player:upgrade_value(self:weapon_tweak_data().category, "zoom_increase", 0), #tweak_data.zoom)
 	end
 	for stat, _ in pairs(stats) do
+		if stats[stat] < 1 or stats[stat] > #tweak_data[stat] then
+			Application:error("[NewRaycastWeaponBase] Base weapon stat is out of bound!", "stat: " .. stat, "index: " .. stats[stat], "max_index: " .. #tweak_data[stat], "This stat will be clamped!")
+		end
 		if parts_stats[stat] then
 			stats[stat] = math_clamp(stats[stat] + parts_stats[stat], 1, #tweak_data[stat])
 		end
+		stats[stat] = math_clamp(stats[stat], 1, #tweak_data[stat])
 	end
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
 	end
-	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.suppression, 1, #tweak_data.alert_size)]
+	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.alert_size, 1, #tweak_data.alert_size)]
 	if stats.concealment then
 		stats.suspicion = math.clamp(#tweak_data.concealment - base_stats.concealment - (parts_stats.concealment or 0), 1, #tweak_data.concealment)
 		self._current_stats.suspicion = tweak_data.concealment[stats.suspicion]
@@ -311,7 +316,7 @@ function NewRaycastWeaponBase:check_stats()
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
 	end
-	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.suppression, 1, #tweak_data.alert_size)]
+	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.alert_size, 1, #tweak_data.alert_size)]
 	return stats
 end
 
@@ -332,13 +337,7 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 end
 
 function NewRaycastWeaponBase:damage_multiplier()
-	local multiplier = 1
-	multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "damage_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value(self._name_id, "damage_multiplier", 1))
-	if self._silencer then
-		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_damage_multiplier", 1))
-	end
-	return self:_convert_add_to_mul(multiplier)
+	return managers.blackmarket:damage_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer)
 end
 
 function NewRaycastWeaponBase:melee_damage_multiplier()
@@ -346,61 +345,11 @@ function NewRaycastWeaponBase:melee_damage_multiplier()
 end
 
 function NewRaycastWeaponBase:spread_multiplier(current_state)
-	local multiplier = 1
-	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "spread_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "spread_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", self:fire_mode() .. "_spread_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value(self._name_id, "spread_multiplier", 1))
-	if self._silencer then
-		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_spread_multiplier", 1))
-		multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_spread_multiplier", 1))
-	end
-	if current_state then
-		if current_state._moving then
-			multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "move_spread_multiplier", 1))
-			multiplier = multiplier + (1 - (self._spread_moving or 1))
-		end
-		if current_state:in_steelsight() then
-			multiplier = multiplier + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_steelsight" or "steelsight"])
-		else
-			multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "hip_fire_spread_multiplier", 1))
-			if current_state._state_data.ducking then
-				multiplier = multiplier + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_crouching" or "crouching"])
-			else
-				multiplier = multiplier + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_standing" or "standing"])
-			end
-		end
-	end
-	return self:_convert_add_to_mul(multiplier)
+	return managers.blackmarket:accuracy_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, current_state, self:fire_mode())
 end
 
 function NewRaycastWeaponBase:recoil_multiplier()
-	local category = self:weapon_tweak_data().category
-	local multiplier = 1
-	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "recoil_multiplier", 1))
-	if managers.player:player_unit() and managers.player:player_unit():character_damage():is_suppressed() then
-		if managers.player:has_team_category_upgrade(category, "suppression_recoil_multiplier") then
-			multiplier = multiplier + (1 - managers.player:team_upgrade_value(category, "suppression_recoil_multiplier", 1))
-		end
-		if managers.player:has_team_category_upgrade("weapon", "suppression_recoil_multiplier") then
-			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "suppression_recoil_multiplier", 1))
-		end
-	else
-		if managers.player:has_team_category_upgrade(category, "recoil_multiplier") then
-			multiplier = multiplier + (1 - managers.player:team_upgrade_value(category, "recoil_multiplier", 1))
-		end
-		if managers.player:has_team_category_upgrade("weapon", "recoil_multiplier") then
-			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "recoil_multiplier", 1))
-		end
-	end
-	multiplier = multiplier + (1 - managers.player:upgrade_value(self._name_id, "recoil_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "passive_recoil_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "recoil_multiplier", 1))
-	if self._silencer then
-		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_recoil_multiplier", 1))
-		multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_recoil_multiplier", 1))
-	end
-	return self:_convert_add_to_mul(multiplier)
+	return managers.blackmarket:recoil_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer)
 end
 
 function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()

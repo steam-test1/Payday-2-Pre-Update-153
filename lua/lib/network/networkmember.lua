@@ -120,9 +120,9 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 		unit = World:spawn_unit(unit_name, pos_rot[1], pos_rot[2])
 	else
 		unit = Network:spawn_unit_on_client(self._peer:rpc(), unit_name, pos_rot[1], pos_rot[2])
-		local suspicion_mul, max_index = managers.blackmarket:get_suspicion_of_peer(self._peer)
-		unit:base():set_suspicion_multiplier("equipment", suspicion_mul)
-		unit:base():set_detection_multiplier("equipment", 1 / suspicion_mul)
+		local con_mul, index = managers.blackmarket:get_concealment_of_peer(self._peer)
+		unit:base():set_suspicion_multiplier("equipment", 1 / con_mul)
+		unit:base():set_detection_multiplier("equipment", 1 / con_mul)
 	end
 	self:set_unit(unit, character_name)
 	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, peer_id)

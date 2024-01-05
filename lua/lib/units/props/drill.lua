@@ -12,6 +12,7 @@ function Drill:init(unit)
 	self._use_effect = true
 	self._active_effect_name = "effects/payday2/environment/drill"
 	self._pos = unit:position()
+	self._skill_upgrades = {}
 	managers.groupai:state():on_editor_sim_unit_spawned(unit)
 end
 
@@ -159,6 +160,17 @@ function Drill:_drill_remind_clbk()
 		managers.dialog:queue_dialog("Play_ban_d01", {})
 	end
 	managers.enemy:add_delayed_clbk(Drill._drill_remind_clbk_id, Drill._drll_remind_clbk, Application:time() + 45)
+end
+
+function Drill:save(data)
+	local state = {}
+	state.skill_upgrades = self._skill_upgrades
+	data.Drill = state
+end
+
+function Drill:load(data)
+	local state = data.Drill
+	self:set_skill_upgrades(state.skill_upgrades)
 end
 
 function Drill:set_powered(powered)
@@ -332,7 +344,85 @@ function Drill:clbk_enemy_weapons_hot()
 	self:_set_alert_state(false)
 end
 
+function Drill:set_skill_upgrades(upgrades)
+	local background_icons = {}
+	local timer_gui_ext = self._unit:timer_gui()
+	if self.is_hacking_device then
+	else
+		local drill_speed_multiplier = tweak_data.upgrades.values.player.drill_speed_multiplier
+		local drill_alert_rad = tweak_data.upgrades.values.player.drill_alert_rad[1]
+		local drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[1]
+		local timer_multiplier = 1
+		local background_icon_template = {
+			texture = "guis/textures/pd2/skilltree/",
+			w = 128,
+			h = 128,
+			x = 30,
+			y = 100,
+			alpha = 0.6,
+			layer = 2
+		}
+		local background_icon_x = 30
+		
+		local function add_bg_icon_func(bg_icon_table, texture_name, color)
+			local icon_data = deep_clone(background_icon_template)
+			icon_data.texture = icon_data.texture .. texture_name
+			icon_data.color = color
+			icon_data.x = background_icon_x
+			table.insert(bg_icon_table, icon_data)
+			background_icon_x = background_icon_x + icon_data.w + 2
+		end
+		
+		if self._skill_upgrades[2] or upgrades[2] then
+			timer_multiplier = drill_speed_multiplier[2]
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", tweak_data.hud.prime_color)
+		elseif self._skill_upgrades[1] or upgrades[1] then
+			timer_multiplier = drill_speed_multiplier[1]
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", tweak_data.screen_colors.text)
+		else
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", tweak_data.screen_colors.item_stage_3)
+		end
+		local got_reduced_alert = self._skill_upgrades[3] or upgrades[3] or false
+		local got_silent_drill = self._skill_upgrades[4] or upgrades[4] or false
+		local got_auto_repair = self._skill_upgrades[5] or upgrades[5] or false
+		timer_gui_ext:set_timer_multiplier(timer_multiplier)
+		if got_silent_drill then
+			self:set_alert_radius(nil)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.aced)
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", tweak_data.hud.prime_color)
+		elseif got_reduced_alert then
+			self:set_alert_radius(drill_alert_rad)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.basic)
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", tweak_data.screen_colors.text)
+		else
+			self:set_alert_radius(tweak_data.upgrades.drill_alert_radius or 2500)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", tweak_data.screen_colors.item_stage_3)
+		end
+		if got_auto_repair then
+			if Network:is_server() and drill_autorepair_chance > math.random() then
+				self:set_autorepair(true)
+			end
+			add_bg_icon_func(background_icons, "drillgui_icon_restarter", tweak_data.screen_colors.text)
+		else
+			add_bg_icon_func(background_icons, "drillgui_icon_restarter", tweak_data.screen_colors.item_stage_3)
+		end
+	end
+	for i in pairs(upgrades) do
+		self._skill_upgrades[i] = true
+	end
+	timer_gui_ext:set_background_icons(background_icons)
+	timer_gui_ext:update_sound_event()
+end
+
+function Drill:get_skill_upgrades()
+	return self._skill_upgrades or {}
+end
+
 function Drill:set_autorepair(state)
+	if self._skill_upgrades[5] then
+		return
+	end
 	self._autorepair = state
 	if state then
 		if self._jammed and not self._autorepair_clbk_id then

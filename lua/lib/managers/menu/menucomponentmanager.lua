@@ -1882,6 +1882,60 @@ function MenuComponentManager:close_view_character_profile_gui()
 	end
 end
 
+function MenuComponentManager:get_texture_from_mod_type(type, gadget, silencer)
+	local texture
+	if silencer then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_silencer"
+	elseif type == "gadget" then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. (gadget or "flashlight")
+	elseif type == "upper_reciever" then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_custom"
+	elseif type == "sight" then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_scope"
+	else
+		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. type
+	end
+	return texture
+end
+
+function MenuComponentManager:create_weapon_mod_icon_list(weapon, category, factory_id, slot)
+	local icon_list = {}
+	local mods_all = managers.blackmarket:get_dropable_mods_by_weapon_id(weapon)
+	if table.size(mods_all) > 0 then
+		local weapon_factory_tweak_data = tweak_data.weapon.factory.parts
+		local mods_equip = deep_clone(managers.blackmarket:get_weapon_blueprint(category, slot))
+		local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
+		for _, default_part in ipairs(default_blueprint) do
+			table.delete(mods_equip, default_part)
+		end
+		local mods_sorted = {}
+		for id, _ in pairs(mods_all) do
+			table.insert(mods_sorted, id)
+		end
+		table.sort(mods_sorted, function(x, y)
+			return y < x
+		end)
+		for _, name in pairs(mods_sorted) do
+			local gadget, silencer, equipped
+			for _, name_equip in pairs(mods_equip) do
+				if name == weapon_factory_tweak_data[name_equip].type then
+					equipped = true
+					if name == "gadget" then
+						gadget = weapon_factory_tweak_data[name_equip].sub_type
+					end
+					silencer = tweak_data.weapon.factory.parts[name_equip].sub_type == "silencer" and true
+					break
+				end
+			end
+			local texture = self:get_texture_from_mod_type(name, gadget, silencer)
+			if DB:has(Idstring("texture"), texture) then
+				table.insert(icon_list, {texture = texture, equipped = equipped})
+			end
+		end
+	end
+	return icon_list
+end
+
 function MenuComponentManager:_create_newsfeed_gui()
 	if self._newsfeed_gui then
 		return

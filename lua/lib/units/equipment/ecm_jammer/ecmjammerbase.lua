@@ -237,7 +237,7 @@ function ECMJammerBase:_set_feedback_active(state)
 			self._unit:interaction():set_active(false, true)
 			local t = TimerManager:game():time()
 			self._feedback_clbk_id = "ecm_feedback" .. tostring(self._unit:key())
-			self._feedback_interval = 1.5
+			self._feedback_interval = tweak_data.upgrades.ecm_feedback_interval or 1.5
 			self._feedback_range = tweak_data.upgrades.ecm_jammer_base_range
 			local duration_mul = 1
 			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
@@ -247,7 +247,7 @@ function ECMJammerBase:_set_feedback_active(state)
 				duration_mul = duration_mul * (self._owner:base():upgrade_value("ecm_jammer", "feedback_duration_boost") or 1)
 				duration_mul = duration_mul * (self._owner:base():upgrade_value("ecm_jammer", "feedback_duration_boost_2") or 1)
 			end
-			self._feedback_duration = math.lerp(15, 20, math.random()) * duration_mul
+			self._feedback_duration = math.lerp(tweak_data.upgrades.ecm_feedback_min_duration or 15, tweak_data.upgrades.ecm_feedback_max_duration or 20, math.random()) * duration_mul
 			self._feedback_expire_t = t + self._feedback_duration
 			local first_impact_t = t + math.lerp(0.1, 1, math.random())
 			managers.enemy:add_delayed_clbk(self._feedback_clbk_id, callback(self, self, "clbk_feedback"), first_impact_t)

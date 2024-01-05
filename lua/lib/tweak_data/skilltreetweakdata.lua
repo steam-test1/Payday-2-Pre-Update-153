@@ -46,6 +46,7 @@ function SkillTreeTweakData:init()
 		},
 		[4] = {
 			upgrades = {
+				"team_passive_health_multiplier",
 				"player_passive_convert_enemies_health_multiplier",
 				"player_passive_convert_enemies_damage_multiplier"
 			},
@@ -53,7 +54,8 @@ function SkillTreeTweakData:init()
 		},
 		[5] = {
 			upgrades = {
-				"player_convert_enemies_interaction_speed_multiplier"
+				"player_convert_enemies_interaction_speed_multiplier",
+				"player_wolverine_health_regen"
 			},
 			desc_id = "menu_mastermind_tier_5"
 		},
@@ -330,7 +332,8 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"player_intimidate_range_mul",
-				"player_intimidate_aura"
+				"player_intimidate_aura",
+				"player_ene_hostage_lim_1"
 			},
 			cost = self.costs.pro
 		}
@@ -510,7 +513,8 @@ function SkillTreeTweakData:init()
 		icon_xy = {4, 9},
 		[1] = {
 			upgrades = {
-				"player_revive_interaction_speed_multiplier"
+				"player_revive_interaction_speed_multiplier",
+				"player_morale_boost"
 			},
 			cost = self.costs.hightier
 		},
@@ -1428,7 +1432,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"ecm_jammer_feedback_duration_boost"
+				"ecm_jammer_feedback_duration_boost",
+				"ecm_jammer_interaction_speed_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}

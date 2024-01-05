@@ -56,7 +56,9 @@ end
 function CrimeNetManager:_number_of_jobs(jcs, jobs_by_jc)
 	local amount = 0
 	for _, jc in ipairs(jcs) do
-		amount = amount + #jobs_by_jc[jc]
+		if jobs_by_jc[jc] then
+			amount = amount + #jobs_by_jc[jc]
+		end
 	end
 	return amount
 end

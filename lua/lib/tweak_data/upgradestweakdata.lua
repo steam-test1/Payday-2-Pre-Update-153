@@ -11,17 +11,25 @@ function UpgradesTweakData:_init_pd2_values()
 		1,
 		2,
 		3,
-		4,
 		5,
-		10
+		7,
+		15
 	}
 	self.values.player.armor_movement_penalty = {
 		0.96,
 		0.92,
-		0.88,
-		0.84,
-		0.76,
-		0.64
+		0.85,
+		0.75,
+		0.65,
+		0.5
+	}
+	self.values.player.armor_dodge_penalty = {
+		1,
+		1,
+		0.8,
+		0.5,
+		0.25,
+		0
 	}
 	self.values.player.special_enemy_highlight = {true}
 	self.values.player.hostage_trade = {true}
@@ -29,15 +37,27 @@ function UpgradesTweakData:_init_pd2_values()
 	self.ammo_bag_base = 4
 	self.ecm_jammer_base_battery_life = 20
 	self.ecm_jammer_base_low_battery_life = 8
-	self.ecm_jammer_base_range = 2000
+	self.ecm_jammer_base_range = 2500
+	self.ecm_feedback_min_duration = 15
+	self.ecm_feedback_max_duration = 20
+	self.ecm_feedback_interval = 1.5
 	self.sentry_gun_base_ammo = 150
 	self.sentry_gun_base_armor = 10
 	self.doctor_bag_base = 2
+	self.cop_hurt_alert_radius_whisper = 600
+	self.cop_hurt_alert_radius = 400
+	self.drill_alert_radius = 2500
+	self.taser_malfunction_min = 1
+	self.taser_malfunction_max = 3
+	self.counter_taser_damage = 0.5
+	self.moral_boost_speed_bonus = 1.2
+	self.moral_boost_suppression_resistance = 1
+	self.moral_boost_time = 10
 	self.values.player.crime_net_deal = {0.9, 0.8}
-	self.values.weapon.special_damage_taken_multiplier = {1.05}
+	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
 	self.values.player.marked_enemy_damage_mul = 1.15
-	self.values.cable_tie.interact_speed_multiplier = {0.5}
+	self.values.cable_tie.interact_speed_multiplier = {0.25}
 	self.values.cable_tie.quantity = {4}
 	self.values.cable_tie.can_cable_tie_doors = {true}
 	self.values.temporary.combat_medic_damage_multiplier = {
@@ -45,11 +65,11 @@ function UpgradesTweakData:_init_pd2_values()
 		{1.25, 15}
 	}
 	self.values.player.revive_health_boost = {1}
-	self.revive_health_multiplier = {1.35}
+	self.revive_health_multiplier = {1.3}
 	self.values.player.civ_harmless_bullets = {true}
 	self.values.player.civ_harmless_melee = {true}
 	self.values.player.civ_calming_alerts = {true}
-	self.values.player.civ_intimidation_mul = {10}
+	self.values.player.civ_intimidation_mul = {1.5}
 	self.values.team.pistol.recoil_multiplier = {0.75}
 	self.values.team.weapon.recoil_multiplier = {0.5}
 	self.values.player.assets_cost_multiplier = {0.5}
@@ -59,34 +79,36 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.intimidate_enemies = {true}
 	self.values.player.intimidate_range_mul = {1.5}
 	self.values.player.intimidate_aura = {700}
+	self.values.player.ene_hostage_lim_1 = {3}
 	self.values.player.civilian_reviver = {true}
 	self.values.player.civilian_gives_ammo = {true}
-	self.values.player.buy_cost_multiplier = {0.95, 0.8}
+	self.values.player.buy_cost_multiplier = {0.9, 0.8}
 	self.values.player.sell_cost_multiplier = {1.25}
 	self.values.doctor_bag.quantity = {1}
 	self.values.doctor_bag.amount_increase = {2}
 	self.values.player.convert_enemies = {true}
 	self.values.player.convert_enemies_max_minions = {1, 2}
 	self.values.player.convert_enemies_health_multiplier = {0.65}
-	self.values.player.convert_enemies_damage_multiplier = {1.43}
-	self.values.player.xp_multiplier = {1.1}
-	self.values.team.xp.multiplier = {1.1}
-	self.values.pistol.reload_speed_multiplier = {1.33}
-	self.values.pistol.damage_multiplier = {1.25}
-	self.values.assault_rifle.reload_speed_multiplier = {1.33}
+	self.values.player.convert_enemies_damage_multiplier = {1.45}
+	self.values.player.xp_multiplier = {1.15}
+	self.values.team.xp.multiplier = {1.3}
+	self.values.pistol.reload_speed_multiplier = {1.5}
+	self.values.pistol.damage_multiplier = {1.5}
+	self.values.assault_rifle.reload_speed_multiplier = {1.25}
 	self.values.assault_rifle.move_spread_multiplier = {0.5}
 	self.values.player.pistol_revive_from_bleed_out = {1, 3}
 	self.values.pistol.spread_multiplier = {0.9}
 	self.values.pistol.swap_speed_multiplier = {1.5}
 	self.values.pistol.fire_rate_multiplier = {2}
 	self.values.player.revive_interaction_speed_multiplier = {0.5}
-	self.values.player.long_dis_revive = {0.5}
+	self.values.player.long_dis_revive = {0.75}
 	self.values.doctor_bag.interaction_speed_multiplier = {0.8}
 	self.values.team.stamina.passive_multiplier = {1.15, 1.3}
 	self.values.player.passive_intimidate_range_mul = {1.25}
+	self.values.team.health.passive_multiplier = {1.1}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.25}
 	self.values.player.passive_convert_enemies_damage_multiplier = {1.15}
-	self.values.player.convert_enemies_interaction_speed_multiplier = {0.33}
+	self.values.player.convert_enemies_interaction_speed_multiplier = {0.35}
 	self.values.player.empowered_intimidation_mul = {3}
 	self.values.player.passive_assets_cost_multiplier = {0.5}
 	self.values.player.suppression_multiplier = {1.25, 1.75}
@@ -96,8 +118,8 @@ function UpgradesTweakData:_init_pd2_values()
 		{true, 5},
 		{true, 10}
 	}
-	self.values.player.non_special_melee_multiplier = {2}
-	self.values.player.melee_damage_multiplier = {2}
+	self.values.player.non_special_melee_multiplier = {1.5}
+	self.values.player.melee_damage_multiplier = {1.5}
 	self.values.player.primary_weapon_when_downed = {true}
 	self.values.player.armor_regen_timer_multiplier = {0.85}
 	self.values.temporary.dmg_multiplier_outnumbered = {
@@ -111,13 +133,13 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.damage_shake_multiplier = {0.5}
 	self.values.player.bleed_out_health_multiplier = {1.25}
 	self.values.shotgun.recoil_multiplier = {0.75}
-	self.values.shotgun.damage_multiplier = {1.33}
-	self.values.ammo_bag.ammo_increase = {2}
+	self.values.shotgun.damage_multiplier = {1.35}
 	self.values.ammo_bag.quantity = {1}
+	self.values.ammo_bag.ammo_increase = {2}
 	self.values.shotgun.reload_speed_multiplier = {1.5}
 	self.values.shotgun.enter_steelsight_speed_multiplier = {2.25}
 	self.values.saw.extra_ammo_multiplier = {1.5}
-	self.values.player.flashbang_multiplier = {0.5, 0.25}
+	self.values.player.flashbang_multiplier = {0.75, 0.25}
 	self.values.shotgun.hip_fire_spread_multiplier = {0.8}
 	self.values.pistol.hip_fire_spread_multiplier = {0.8}
 	self.values.assault_rifle.hip_fire_spread_multiplier = {0.8}
@@ -126,19 +148,19 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.saw_speed_multiplier = {0.95, 0.65}
 	self.values.saw.lock_damage_multiplier = {1.2, 1.4}
 	self.values.saw.enemy_slicer = {true}
-	self.values.player.melee_damage_health_ratio_multiplier = {5}
+	self.values.player.melee_damage_health_ratio_multiplier = {2.5}
 	self.values.player.damage_health_ratio_multiplier = {1}
-	self.player_damage_health_ratio_threshold = 0.4
+	self.player_damage_health_ratio_threshold = 0.25
 	self.values.player.shield_knock = {true}
 	self.values.temporary.overkill_damage_multiplier = {
-		{2, 6}
+		{1.75, 5}
 	}
 	self.values.player.overkill_all_weapons = {true}
 	self.values.player.passive_suppression_multiplier = {1.1, 1.2}
 	self.values.player.passive_health_multiplier = {
 		1.1,
 		1.2,
-		1.4
+		1.5
 	}
 	self.values.weapon.passive_damage_multiplier = {1.05}
 	self.values.assault_rifle.enter_steelsight_speed_multiplier = {2}
@@ -148,12 +170,12 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.trip_mine.quantity_1 = {1}
 	self.values.trip_mine.can_switch_on_off = {true}
 	self.values.player.drill_speed_multiplier = {0.85, 0.7}
-	self.values.player.trip_mine_deploy_time_multiplier = {0.8, 0.5}
+	self.values.player.trip_mine_deploy_time_multiplier = {0.8, 0.6}
 	self.values.trip_mine.sensor_toggle = {true}
 	self.values.player.drill_fix_interaction_speed_multiplier = {0.75}
 	self.values.player.drill_autorepair = {0.3}
 	self.values.player.sentry_gun_deploy_time_multiplier = {0.5}
-	self.values.sentry_gun.armor_multiplier = {2}
+	self.values.sentry_gun.armor_multiplier = {2.5}
 	self.values.weapon.single_spread_multiplier = {0.5}
 	self.values.assault_rifle.recoil_multiplier = {0.75}
 	self.values.player.taser_malfunction = {true}
@@ -172,17 +194,17 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.sentry_gun.quantity = {1}
 	self.values.sentry_gun.damage_multiplier = {4}
 	self.values.weapon.clip_ammo_increase = {5, 15}
-	self.values.player.armor_multiplier = {2}
+	self.values.player.armor_multiplier = {1.5}
 	self.values.team.armor.regen_time_multiplier = {0.75}
 	self.values.player.passive_crafting_weapon_multiplier = {
 		0.99,
-		0.97,
-		0.95
+		0.96,
+		0.91
 	}
 	self.values.player.passive_crafting_mask_multiplier = {
 		0.99,
-		0.97,
-		0.95
+		0.96,
+		0.91
 	}
 	self.values.weapon.passive_recoil_multiplier = {0.95, 0.9}
 	self.values.weapon.passive_headshot_damage_multiplier = {1.25}
@@ -193,32 +215,32 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.stamina_regen_multiplier = {1.25}
 	self.values.player.run_dodge_chance = {0.25}
 	self.values.player.run_speed_multiplier = {1.25}
-	self.values.player.fall_damage_multiplier = {0.5}
+	self.values.player.fall_damage_multiplier = {0.25}
 	self.values.player.fall_health_damage_multiplier = {0}
 	self.values.player.respawn_time_multiplier = {0.5}
-	self.values.player.corpse_alarm_pager_bluff = {true}
+	self.values.weapon.special_damage_taken_multiplier = {1.05}
 	self.values.player.corpse_dispose = {true}
-	self.values.carry.interact_speed_multiplier = {0.6, 0.25}
+	self.values.carry.interact_speed_multiplier = {0.75, 0.25}
 	self.values.player.suspicion_multiplier = {0.75}
-	self.values.player.camouflage_bonus = {1.25}
+	self.values.player.camouflage_bonus = {0.85}
 	self.values.player.walk_speed_multiplier = {1.25}
 	self.values.player.crouch_speed_multiplier = {1.1}
 	self.values.player.silent_kill = {25}
 	self.values.player.melee_knockdown_mul = {1.5}
 	self.values.player.damage_dampener = {0.5}
-	self.values.smg.reload_speed_multiplier = {1.33}
+	self.values.smg.reload_speed_multiplier = {1.35}
 	self.values.smg.fire_rate_multiplier = {1.2}
 	self.values.player.additional_lives = {1, 3}
 	self.values.player.cheat_death_chance = {0.1}
 	self.values.ecm_jammer.can_activate_feedback = {true}
 	self.values.ecm_jammer.feedback_duration_boost = {1.25}
-	self.values.ecm_jammer.affects_pagers = {true}
+	self.values.ecm_jammer.interaction_speed_multiplier = {0}
 	self.values.weapon.silencer_damage_multiplier = {1.15, 1.3}
 	self.values.weapon.armor_piercing_chance_silencer = {0.15}
 	self.values.ecm_jammer.duration_multiplier = {1.25}
 	self.values.ecm_jammer.can_open_sec_doors = {true}
 	self.values.player.pick_lock_easy = {true}
-	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.65}
+	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.5}
 	self.values.player.pick_lock_hard = {true}
 	self.values.weapon.silencer_recoil_multiplier = {0.5}
 	self.values.weapon.silencer_spread_multiplier = {0.5}
@@ -227,17 +249,436 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.ecm_jammer.quantity = {1, 3}
 	self.values.ecm_jammer.duration_multiplier_2 = {1.25}
 	self.values.ecm_jammer.feedback_duration_boost_2 = {1.25}
+	self.values.ecm_jammer.affects_pagers = {true}
 	self.values.player.can_strafe_run = {true}
 	self.values.player.can_free_run = {true}
 	self.values.ecm_jammer.affects_cameras = {true}
 	self.values.player.passive_dodge_chance = {0.05, 0.15}
 	self.values.weapon.passive_swap_speed_multiplier = {1.2, 2}
-	self.values.player.passive_suspicion_multiplier = {0.75}
+	self.values.player.passive_concealment_modifier = {5}
 	self.values.player.passive_armor_movement_penalty_multiplier = {0.75}
 	self.values.player.passive_loot_drop_multiplier = {1.1}
 	self.values.weapon.armor_piercing_chance = {0.15}
 	self.values.player.run_and_shoot = {true}
 	self.values.player.run_and_reload = {true}
+	self.values.player.morale_boost = {true}
+	self.values.player.electrocution_resistance_multiplier = {0.25}
+	self.values.player.concealment_addition = {
+		2,
+		4,
+		6
+	}
+	self.values.sentry_gun.armor_multiplier2 = {1.25}
+	local editable_skill_descs = {
+		ammo_2x = {
+			{"2"},
+			{"200%"}
+		},
+		ammo_reservoir = {
+			{"5"},
+			{"5"}
+		},
+		assassin = {
+			{"25%", "10%"},
+			{"95%"}
+		},
+		bandoliers = {
+			{"25%"},
+			{"75%"}
+		},
+		black_marketeer = {
+			{"10%"},
+			{"20%", "25%"}
+		},
+		blast_radius = {
+			{"25%"},
+			{"50%"}
+		},
+		cable_guy = {
+			{"75%"},
+			{"4"}
+		},
+		carbon_blade = {
+			{"20%"},
+			{"50%", "20%"}
+		},
+		cat_burglar = {
+			{"75%"},
+			{"50%"}
+		},
+		chameleon = {
+			{"25%"},
+			{"15%"}
+		},
+		cleaner = {
+			{"5%"},
+			{}
+		},
+		combat_medic = {
+			{"25%", "10"},
+			{"30%"}
+		},
+		control_freak = {
+			{},
+			{"50%"}
+		},
+		discipline = {
+			{"50%"},
+			{}
+		},
+		dominator = {
+			{},
+			{"50%"}
+		},
+		drill_expert = {
+			{"15%"},
+			{"15%"}
+		},
+		ecm_2x = {
+			{"2"},
+			{"25%", "25%"}
+		},
+		ecm_booster = {
+			{"25%"},
+			{}
+		},
+		ecm_feedback = {
+			{
+				"50%-100%",
+				"25",
+				"1.5",
+				"15-20"
+			},
+			{"25%"}
+		},
+		enforcer = {
+			{"400%"},
+			{}
+		},
+		equilibrium = {
+			{"10%", "50%"},
+			{"100%"}
+		},
+		fast_learner = {
+			{"15%"},
+			{"30%"}
+		},
+		from_the_hip = {
+			{"20%"},
+			{"20%"}
+		},
+		ghost = {
+			{"1", "20"},
+			{}
+		},
+		good_luck_charm = {
+			{"50%"},
+			{"200%"}
+		},
+		gun_fighter = {
+			{"50%"},
+			{"50%"}
+		},
+		hardware_expert = {
+			{"25%", "20%"},
+			{"30%", "50%"}
+		},
+		hitman = {
+			{"15%"},
+			{"15%", "15%"}
+		},
+		inside_man = {
+			{"50%"},
+			{}
+		},
+		inspire = {
+			{
+				"50%",
+				"20%",
+				"10"
+			},
+			{"75%"}
+		},
+		insulation = {
+			{},
+			{"50%"}
+		},
+		iron_man = {
+			{"50%"},
+			{"25%"}
+		},
+		joker = {
+			{},
+			{"55%", "45%"}
+		},
+		juggernaut = {
+			{},
+			{}
+		},
+		kilmer = {
+			{"25%"},
+			{"50%"}
+		},
+		leadership = {
+			{"25%"},
+			{"50%"}
+		},
+		mag_plus = {
+			{"5"},
+			{"10"}
+		},
+		magic_touch = {
+			{"25%"},
+			{"25%"}
+		},
+		martial_arts = {
+			{"50%"},
+			{"50%"}
+		},
+		master_craftsman = {
+			{"10%"},
+			{"10%"}
+		},
+		mastermind = {
+			{"2"},
+			{}
+		},
+		medic_2x = {
+			{"2"},
+			{"2"}
+		},
+		nine_lives = {
+			{"1"},
+			{"10%"}
+		},
+		oppressor = {
+			{"25%"},
+			{"50%"}
+		},
+		overkill = {
+			{"75%", "5"},
+			{}
+		},
+		pack_mule = {
+			{"50%"},
+			{"50%"}
+		},
+		pistol_messiah = {
+			{"1"},
+			{"2"}
+		},
+		portable_saw = {
+			{},
+			{"1"}
+		},
+		rifleman = {
+			{"100%"},
+			{"25%"}
+		},
+		scavenger = {
+			{"10%"},
+			{"20%"}
+		},
+		sentry_2_0 = {
+			{"50%"},
+			{}
+		},
+		sentry_gun = {
+			{},
+			{"150%"}
+		},
+		sentry_gun_2x = {
+			{"2"},
+			{"300%"}
+		},
+		sentry_targeting_package = {
+			{"100%"},
+			{"150%"}
+		},
+		shades = {
+			{"25%"},
+			{"50%"}
+		},
+		shaped_charge = {
+			{"3"},
+			{}
+		},
+		sharpshooter = {
+			{"50%"},
+			{"25%"}
+		},
+		shotgun_cqb = {
+			{"50%"},
+			{"125%"}
+		},
+		shotgun_impact = {
+			{"25%"},
+			{"35%"}
+		},
+		show_of_force = {
+			{},
+			{"15%"}
+		},
+		silence = {
+			{},
+			{}
+		},
+		silence_expert = {
+			{"50%"},
+			{"50%", "100%"}
+		},
+		silent_drilling = {
+			{"65%"},
+			{}
+		},
+		smg_master = {
+			{"35%"},
+			{"20%"}
+		},
+		smg_training = {
+			{},
+			{}
+		},
+		sprinter = {
+			{"25%", "25%"},
+			{"25%", "25%"}
+		},
+		steroids = {
+			{"50%"},
+			{"50%"}
+		},
+		stockholm_syndrome = {
+			{"100%"},
+			{"100%"}
+		},
+		tactician = {
+			{"4", "2"},
+			{"15%"}
+		},
+		target_mark = {
+			{},
+			{}
+		},
+		technician = {
+			{"2"},
+			{}
+		},
+		tough_guy = {
+			{"50%"},
+			{"25%"}
+		},
+		transporter = {
+			{"25%"},
+			{"50%"}
+		},
+		triathlete = {
+			{"100%"},
+			{"50%"}
+		},
+		trip_mine_expert = {
+			{},
+			{}
+		},
+		trip_miner = {
+			{"1"},
+			{"20%"}
+		},
+		underdog = {
+			{"15%"},
+			{"15%"}
+		},
+		wolverine = {
+			{"25%", "250%"},
+			{"25%", "100%"}
+		},
+		mastermind_tier1 = {
+			{"20%"}
+		},
+		mastermind_tier2 = {
+			{"15%"}
+		},
+		mastermind_tier3 = {
+			{"25%"}
+		},
+		mastermind_tier4 = {
+			{"10%"}
+		},
+		mastermind_tier5 = {
+			{"65%"}
+		},
+		mastermind_tier6 = {
+			{"200%", "50%"}
+		},
+		enforcer_tier1 = {
+			{"10%"}
+		},
+		enforcer_tier2 = {
+			{"10%"}
+		},
+		enforcer_tier3 = {
+			{"10%"}
+		},
+		enforcer_tier4 = {
+			{"10%"}
+		},
+		enforcer_tier5 = {
+			{"5%"}
+		},
+		enforcer_tier6 = {
+			{"30%"}
+		},
+		technician_tier1 = {
+			{"1%"}
+		},
+		technician_tier2 = {
+			{"5%"}
+		},
+		technician_tier3 = {
+			{"3%"}
+		},
+		technician_tier4 = {
+			{"25%"}
+		},
+		technician_tier5 = {
+			{"5%"}
+		},
+		technician_tier6 = {
+			{
+				"5%",
+				"10%",
+				"10%"
+			}
+		},
+		ghost_tier1 = {
+			{"5%"}
+		},
+		ghost_tier2 = {
+			{"20%"}
+		},
+		ghost_tier3 = {
+			{"10%"}
+		},
+		ghost_tier4 = {
+			{"+5", "15%"}
+		},
+		ghost_tier5 = {
+			{"80%"}
+		},
+		ghost_tier6 = {
+			{"10%", "15%"}
+		}
+	}
+	self.skill_descs = {}
+	for skill_id, skill_desc in pairs(editable_skill_descs) do
+		self.skill_descs[skill_id] = {}
+		for index, skill_version in ipairs(skill_desc) do
+			local version = index == 1 and "multibasic" or "multipro"
+			self.skill_descs[skill_id][index] = #skill_version
+			for i, desc in ipairs(skill_version) do
+				self.skill_descs[skill_id][version .. (i == 1 and "" or tostring(i))] = desc
+			end
+		end
+	end
 end
 
 function UpgradesTweakData:init()
@@ -403,7 +844,6 @@ function UpgradesTweakData:init()
 	}
 	self.values.player.primary_weapon_when_carrying = {true}
 	self.values.player.health_multiplier = {1.1}
-	self.values.player.electrocution_resistance_multiplier = {0.25}
 	self.values.player.passive_xp_multiplier = {1.05}
 	self.values.player.dye_pack_chance_multiplier = {0.5}
 	self.values.player.dye_pack_cash_loss_multiplier = {0.4}
@@ -418,7 +858,6 @@ function UpgradesTweakData:init()
 	self.values.player.suppressed_multiplier = {0.5}
 	self.values.player.intimidate_specials = {true}
 	self.values.player.intimidation_multiplier = {1.25}
-	self.values.player.morale_boost = {true}
 	self.steps.player = {}
 	self.steps.player.thick_skin = {
 		nil,
@@ -598,6 +1037,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.team.xp = {}
 	self.values.team.armor = {}
 	self.values.team.stamina = {}
+	self.values.team.health = {}
 end
 
 function UpgradesTweakData:_init_values()
@@ -1153,7 +1593,37 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_passive_suspicion_bonus",
 		upgrade = {
 			category = "player",
-			upgrade = "passive_suspicion_multiplier",
+			upgrade = "passive_concealment_modifier",
+			value = 1
+		}
+	}
+	self.definitions.player_concealment_bonus_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_passive_suspicion_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "concealment_addition",
+			value = 1
+		}
+	}
+	self.definitions.player_concealment_bonus_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_passive_suspicion_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "concealment_addition",
+			value = 1
+		}
+	}
+	self.definitions.player_concealment_bonus_3 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_passive_suspicion_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "concealment_addition",
 			value = 1
 		}
 	}
@@ -1708,6 +2178,15 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_ene_hostage_lim_1 = {
+		category = "feature",
+		name_id = "menu_player_intimidate_aura",
+		upgrade = {
+			category = "player",
+			upgrade = "ene_hostage_lim_1",
+			value = 1
+		}
+	}
 	self.definitions.player_civilian_gives_ammo = {
 		category = "feature",
 		name_id = "menu_player_civilian_gives_ammo",
@@ -2257,6 +2736,15 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 			value = 1
 		}
 	}
+	self.definitions.ecm_jammer_interaction_speed_multiplier = {
+		category = "equipment_upgrade",
+		name_id = "menu_ecm_jammer_interaction_speed_multiplier",
+		upgrade = {
+			category = "ecm_jammer",
+			upgrade = "interaction_speed_multiplier",
+			value = 1
+		}
+	}
 end
 
 function UpgradesTweakData:_ammo_bag_definitions()
@@ -2529,6 +3017,15 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "armor_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.sentry_gun_armor_multiplier2 = {
+		category = "feature",
+		name_id = "menu_sentry_gun_armor_multiplier",
+		upgrade = {
+			category = "sentry_gun",
+			upgrade = "armor_multiplier2",
 			value = 1
 		}
 	}
@@ -3664,6 +4161,15 @@ function UpgradesTweakData:_team_definitions()
 			category = "stamina",
 			upgrade = "passive_multiplier",
 			value = 2
+		}
+	}
+	self.definitions.team_passive_health_multiplier = {
+		category = "team",
+		name_id = "menu_team_health_multiplier",
+		upgrade = {
+			category = "health",
+			upgrade = "passive_multiplier",
+			value = 1
 		}
 	}
 end

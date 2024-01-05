@@ -101,14 +101,25 @@ function AttentionTweakData:_init_player()
 		notice_delay_mul = 2,
 		notice_requires_FOV = true
 	}
+	self.settings.pl_enemy_stand_mask_on = {
+		reaction = "REACT_COMBAT",
+		filter = "all_enemy",
+		verification_interval = 0.1,
+		uncover_range = 200,
+		release_delay = 1,
+		notice_delay_mul = 2,
+		max_range = 2000,
+		notice_clbk = "clbk_attention_notice_sneak",
+		notice_requires_FOV = true
+	}
 	self.settings.pl_enemy_sneak = {
 		reaction = "REACT_COMBAT",
 		filter = "all_enemy",
 		verification_interval = 0.1,
-		uncover_range = 350,
+		uncover_range = 200,
 		release_delay = 1,
 		notice_delay_mul = 2,
-		max_range = 1500,
+		max_range = 1200,
 		notice_clbk = "clbk_attention_notice_sneak",
 		notice_requires_FOV = true
 	}

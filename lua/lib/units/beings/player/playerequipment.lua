@@ -90,7 +90,7 @@ function PlayerEquipment:use_ammo_bag()
 		managers.challenges:count_up("deploy_ammobag")
 		local ammo_upgrade_lvl = managers.player:upgrade_level("ammo_bag", "ammo_increase")
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_ammo_bag", pos, rot, ammo_upgrade_lvl)
+			managers.network:session():send_to_host("place_deployable_bag", "AmmoBagBase", pos, rot, ammo_upgrade_lvl)
 		else
 			local unit = AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl)
 		end
@@ -112,7 +112,7 @@ function PlayerEquipment:use_doctor_bag()
 		managers.statistics:use_doctor_bag()
 		local amount_upgrade_lvl = managers.player:upgrade_level("doctor_bag", "amount_increase")
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_doctor_bag", pos, rot, amount_upgrade_lvl)
+			managers.network:session():send_to_host("place_deployable_bag", "DoctorBagBase", pos, rot, amount_upgrade_lvl)
 		else
 			local unit = DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl)
 		end

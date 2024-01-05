@@ -16,6 +16,7 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/payday2/weapons/wpn_npc_smg_mp9/wpn_npc_smg_mp9"),
 	Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11"),
 	Idstring("units/payday2/weapons/wpn_npc_sniper/wpn_npc_sniper"),
+	Idstring("units/payday2/weapons/wpn_npc_saiga/wpn_npc_saiga"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_g18c/wpn_fps_pis_g18c"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_amcar/wpn_fps_ass_amcar"),
@@ -153,7 +154,9 @@ function PlayerInventory:clbk_weapon_unit_destroyed(weap_unit)
 	local weapon_key = weap_unit:key()
 	for i_sel, sel_data in pairs(self._available_selections) do
 		if sel_data.unit:key() == weapon_key then
-			managers.dyn_resource:unload(Idstring("unit"), weap_unit:name(), "packages/dyn_resources", false)
+			if managers.dyn_resource:has_resource(Idstring("unit"), weap_unit:name(), "packages/dyn_resources") then
+				managers.dyn_resource:unload(Idstring("unit"), weap_unit:name(), "packages/dyn_resources", false)
+			end
 			self:remove_selection(i_sel, true)
 			break
 		end

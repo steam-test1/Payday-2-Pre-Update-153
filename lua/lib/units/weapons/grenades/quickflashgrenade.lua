@@ -14,7 +14,7 @@ function QuickFlashGrenade:_play_sound_and_effects()
 		mvector3.lerp(bounce_point, self._shoot_position, self._unit:position(), 0.65)
 		local sound_source = SoundDevice:create_source("grenade_bounce_source")
 		sound_source:set_position(bounce_point)
-		sound_source:post_event("grenade_gas_bounce")
+		sound_source:post_event("flashbang_bounce")
 	elseif self._state == 3 then
 		self._unit:sound_source():post_event("flashbang_explosion")
 		local parent = self._unit:orientation_object()

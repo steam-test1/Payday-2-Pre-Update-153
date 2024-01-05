@@ -82,7 +82,7 @@ function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, save
 	local panel = self._peers_panel:child("peer" .. tostring(local_peer_id))
 	local peer_info_panel = panel:child("peer_info")
 	local peer_name = peer_info_panel:child("peer_name")
-	peer_name:set_text(tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()))
+	peer_name:set_text(tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()) .. " (" .. managers.experience:current_level() .. ")")
 	self:make_fine_text(peer_name)
 	peer_name:set_right(peer_info_panel:w())
 	panel:set_alpha(1)
@@ -465,7 +465,7 @@ function HUDLootScreen:feed_lootdrop(lootdrop_data)
 	local peer_info_panel = panel:child("peer_info")
 	local peer_name = peer_info_panel:child("peer_name")
 	local max_quality = peer_info_panel:child("max_quality")
-	peer_name:set_text(peer_name_string)
+	peer_name:set_text(peer_name_string .. " (" .. player_level .. ")")
 	max_quality:set_text(managers.localization:to_upper_text("menu_l_max_quality", {quality = max_pc}))
 	self:make_fine_text(peer_name)
 	self:make_fine_text(max_quality)
@@ -532,7 +532,13 @@ function HUDLootScreen:feed_lootdrop(lootdrop_data)
 		elseif category == "xp" then
 			texture_path = "guis/textures/pd2/blackmarket/xp_drop"
 		else
-			texture_path = "guis/textures/pd2/blackmarket/icons/" .. tostring(category) .. "/" .. tostring(item_id)
+			local guis_catalog = "guis/"
+			local tweak_data_category = category == "mods" and "weapon_mods" or category
+			local bundle_folder = tweak_data.blackmarket[tweak_data_category][item_id] and tweak_data.blackmarket[tweak_data_category][item_id].texture_bundle_folder
+			if bundle_folder then
+				guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+			end
+			texture_path = guis_catalog .. "textures/pd2/blackmarket/icons/" .. tostring(category) .. "/" .. tostring(item_id)
 		end
 		Application:debug("Requesting Texture", texture_path, "PEER", peer_id)
 		if DB:has(Idstring("texture"), texture_path) then

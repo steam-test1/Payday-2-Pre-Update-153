@@ -206,8 +206,8 @@ function MoneyTweakData:init()
 	self.skilltree.respec.tier_cost[5] = 100000
 	self.skilltree.respec.tier_cost[6] = 400000
 	self.skilltree.respec.base_point_cost = 500
-	self.skilltree.respec.point_tier_cost = self._create_value_table(4000, self.biggest_cashout * 0.25, 6, true, 1.1)
-	self.skilltree.respec.respec_refund_multiplier = 0.5
+	self.skilltree.respec.point_tier_cost = self._create_value_table(4000, self.biggest_cashout * 0.18, 6, true, 1.1)
+	self.skilltree.respec.respec_refund_multiplier = 0.6
 	self.skilltree.respec.point_cost = 0
 	self.skilltree.respec.point_multiplier_cost = 1
 	local loot_drop_value = 10000

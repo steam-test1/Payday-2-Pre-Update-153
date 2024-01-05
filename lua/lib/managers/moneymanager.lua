@@ -336,7 +336,7 @@ end
 
 function MoneyManager:get_secured_bonus_bags_money()
 	local job_id = managers.job:current_job_id()
-	local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars()
+	local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 	local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
 	local bonus_bags = managers.loot:get_secured_bonus_bags_value()
@@ -353,7 +353,7 @@ function MoneyManager:get_secured_bonus_bag_value(value)
 	local bag_value = 0
 	if managers.loot:is_bonus_bag() then
 		local job_id = managers.job:current_job_id()
-		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars()
+		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 		local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 		local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
 		bag_value = value * money_multiplier * total_stages
@@ -744,7 +744,10 @@ function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
 	}
 	local value = total_payout * tweak_data:get_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + tweak_data:get_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
 	value = value + (tweak_data.narrative.jobs[job_id].payout and tweak_data.narrative.jobs[job_id].payout[difficulty_id - 1] / tweak_data:get_value("money_manager", "offshore_rate") or 0)
-	return value
+	local multiplier = 1 * managers.player:upgrade_value("player", "buy_cost_multiplier", 1) * managers.player:upgrade_value("player", "crime_net_deal", 1)
+	local total_value = math.round(value * multiplier)
+	total_value = total_value + (tweak_data.narrative.jobs[job_id].contract_cost and tweak_data.narrative.jobs[job_id].contract_cost[difficulty_id - 1] / tweak_data:get_value("money_manager", "offshore_rate") or 0)
+	return total_value
 end
 
 function MoneyManager:can_afford_buy_premium_contract(job_id, difficulty_id)

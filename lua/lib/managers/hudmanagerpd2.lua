@@ -745,6 +745,7 @@ end
 function HUDManager:set_suspicion(status)
 	if type(status) == "boolean" then
 		if status then
+			self._hud_suspicion:feed_value(1)
 			self._hud_suspicion:discovered()
 		else
 			self._hud_suspicion:back_to_stealth()

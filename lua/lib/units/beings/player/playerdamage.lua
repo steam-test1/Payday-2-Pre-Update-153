@@ -205,7 +205,7 @@ function PlayerDamage:health_ratio()
 end
 
 function PlayerDamage:_max_health()
-	return (self._HEALTH_INIT + managers.player:thick_skin_value()) * managers.player:upgrade_value("player", "health_multiplier", 1) * managers.player:upgrade_value("player", "passive_health_multiplier", 1)
+	return (self._HEALTH_INIT + managers.player:thick_skin_value()) * managers.player:upgrade_value("player", "health_multiplier", 1) * managers.player:upgrade_value("player", "passive_health_multiplier", 1) * managers.player:team_upgrade_value("health", "passive_multiplier", 1)
 end
 
 function PlayerDamage:_total_armor()
@@ -291,7 +291,11 @@ function PlayerDamage:damage_bullet(attack_data)
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
 	}
-	if managers.player:upgrade_value("player", "passive_dodge_chance", 0) >= math.rand(1) or self._unit:movement():running() and managers.player:upgrade_value("player", "run_dodge_chance", 0) >= math.rand(1) then
+	local dodge_value = math.rand(1)
+	local armor_penalty = managers.player:body_armor_dodge_penalty()
+	local passive_dodge_chance = managers.player:upgrade_value("player", "passive_dodge_chance", 0) * armor_penalty
+	local run_dodge_chance = managers.player:upgrade_value("player", "run_dodge_chance", 0) * armor_penalty
+	if dodge_value <= passive_dodge_chance or self._unit:movement():running() and dodge_value <= run_dodge_chance then
 		if 0 < attack_data.damage then
 			self:_send_damage_drama(attack_data, attack_data.damage)
 		end
@@ -1073,6 +1077,7 @@ function PlayerDamage:_start_tinnitus(sound_eff_mul)
 			snd_event = self._unit:sound():play("tinnitus_beep")
 		}
 	end
+	self._unit:sound():play("flashbang_explode_sfx_player")
 end
 
 function PlayerDamage:_stop_tinnitus()
