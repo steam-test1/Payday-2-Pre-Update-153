@@ -171,6 +171,9 @@ function NetworkAccountSTEAM._on_stats_stored(status)
 end
 
 function NetworkAccountSTEAM:publish_statistics(stats, success)
+	repeat
+		break -- pseudo-goto
+	until true
 	if managers.dlc:is_trial() then
 		return
 	end
