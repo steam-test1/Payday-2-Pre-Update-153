@@ -84,7 +84,7 @@ function EquipmentsTweakData:init()
 		dropin_penalty_function_name = "use_armor_kit_dropin_penalty",
 		action_timer = 2,
 		deploy_time = 2,
-		visual_object = "g_toolbag",
+		visual_object = "g_armorbag",
 		limit_movement = true,
 		sound_start = "bar_armor",
 		sound_interupt = "bar_armor_cancel",

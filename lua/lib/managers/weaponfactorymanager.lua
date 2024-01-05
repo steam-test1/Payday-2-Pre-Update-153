@@ -472,6 +472,10 @@ end
 
 function WeaponFactoryManager:_part_data(part_id, factory_id, override)
 	local factory = tweak_data.weapon.factory
+	if not factory.parts[part_id] then
+		Application:error("[WeaponFactoryManager:_part_data] Part do not exist!", part_id, "factory_id", factory_id)
+		return
+	end
 	local part = deep_clone(factory.parts[part_id])
 	if factory[factory_id].override and factory[factory_id].override[part_id] then
 		for d, v in pairs(factory[factory_id].override[part_id]) do
@@ -762,6 +766,12 @@ function WeaponFactoryManager:get_part_desc_by_part_id_from_weapon(part_id, fact
 	return desc_id and managers.localization:text(desc_id, {
 		BTN_GADGET = managers.localization:btn_macro("weapon_gadget", true)
 	}) or Application:production_build() and "Add ##desc_id## to ##" .. part_id .. "## in tweak_data.blackmarket.weapon_mods" or ""
+end
+
+function WeaponFactoryManager:get_part_data_by_part_id_from_weapon(part_id, factory_id, blueprint)
+	local factory = tweak_data.weapon.factory
+	local override = self:_get_override_parts(factory_id, blueprint)
+	return self:_part_data(part_id, factory_id, override)
 end
 
 function WeaponFactoryManager:get_part_name_by_part_id_from_weapon(part_id, factory_id, blueprint)

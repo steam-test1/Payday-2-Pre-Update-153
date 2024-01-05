@@ -510,6 +510,29 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.trip_mine.marked_enemy_extra_damage = {true}
 	self.values.ecm_jammer.can_retrigger = {true}
 	self.values.player.panic_suppression = {true}
+	self.values.akimbo.extra_ammo_multiplier = {1.25, 1.5}
+	self.values.akimbo.damage_multiplier = {1.5, 3}
+	self.values.akimbo.spread_multiplier = {0.5, 0.25}
+	self.values.akimbo.recoil_multiplier = {
+		2.5,
+		2,
+		1.5
+	}
+	self.values.akimbo.passive_recoil_multiplier = {2.5, 2}
+	self.values.akimbo.clip_ammo_increase = self.values.weapon.clip_ammo_increase
+	self.values.player.perk_armor_regen_timer_multiplier = {
+		0.95,
+		0.9,
+		0.8,
+		0.7,
+		0.6
+	}
+	self.values.player.perk_armor_loss_multiplier = {
+		0.9,
+		0.8,
+		0.7,
+		0.6
+	}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -528,7 +551,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"175%"}
 		},
 		black_marketeer = {
-			{"0.03%", "5"},
+			{"0.3%", "5"},
 			{"1%", "5"}
 		},
 		blast_radius = {
@@ -934,7 +957,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%"},
 			{"50%", "25%"},
 			{
-				"+5",
+				"+1",
 				"15%",
 				"45%"
 			},
@@ -969,7 +992,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%"},
 			{"5%"},
 			{
-				"+5",
+				"+1",
 				"15%",
 				"45%"
 			},
@@ -988,7 +1011,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%"},
 			{"15%", "45%"},
 			{
-				"+5",
+				"+1",
 				"15%",
 				"45%"
 			},
@@ -999,6 +1022,31 @@ function UpgradesTweakData:_init_pd2_values()
 			{
 				"25%",
 				"80%",
+				"10%"
+			}
+		},
+		{
+			{"5%"},
+			{"25%"},
+			{
+				"10%",
+				"10%",
+				"75%"
+			},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"10%", "10%"},
+			{"135%"},
+			{"10%", "10%"},
+			{"5%", "20%"},
+			{
+				"10%",
+				"10%",
+				"50%",
+				"125%",
 				"10%"
 			}
 		}
@@ -1120,7 +1168,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[27] = {
 		name_id = "weapons",
-		upgrades = {"famas"}
+		upgrades = {"famas", "g26"}
 	}
 	self.level_tree[29] = {
 		name_id = "weapons",
@@ -1374,6 +1422,13 @@ function UpgradesTweakData:init()
 	self:_sentry_gun_definitions()
 	self:_armor_kit_definitions()
 	self:_rep_definitions()
+	self:_jowi_definitions()
+	self:_x_1911_definitions()
+	self:_x_b92fs_definitions()
+	self:_x_deagle_definitions()
+	self:_g26_definitions()
+	self:_akimbo_definitions()
+	self:_kabartanto_definitions()
 	self:_olympic_definitions()
 	self:_amcar_definitions()
 	self:_m16_definitions()
@@ -1495,6 +1550,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.saw = {}
 	self.values.lmg = {}
 	self.values.snp = {}
+	self.values.akimbo = {}
 	self.values.temporary = {}
 	self.values.team = {}
 	self.values.team.player = {}
@@ -2149,6 +2205,28 @@ function UpgradesTweakData:_player_definitions()
 			value = 3
 		}
 	}
+	for i, value in ipairs(self.values.player.perk_armor_regen_timer_multiplier) do
+		self.definitions["player_perk_armor_regen_timer_multiplier_" .. tostring(i)] = {
+			category = "feature",
+			name_id = "menu_player_perk_armor_regen_timer_multiplier",
+			upgrade = {
+				category = "player",
+				upgrade = "perk_armor_regen_timer_multiplier",
+				value = i
+			}
+		}
+	end
+	for i, value in ipairs(self.values.player.perk_armor_loss_multiplier) do
+		self.definitions["player_perk_armor_loss_multiplier_" .. tostring(i)] = {
+			category = "feature",
+			name_id = "menu_player_perk_armor_loss_multiplier",
+			upgrade = {
+				category = "player",
+				upgrade = "perk_armor_loss_multiplier",
+				value = i
+			}
+		}
+	end
 	self.definitions.player_passive_armor_multiplier_1 = {
 		category = "feature",
 		name_id = "menu_player_passive_armor_multiplier",
@@ -7197,4 +7275,185 @@ function UpgradesTweakData:_m79_definitions()
 			}
 		}
 	end
+end
+
+function UpgradesTweakData:_akimbo_definitions()
+	self.definitions.akimbo_damage_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_damage_multiplier",
+		incremental = true,
+		upgrade = {
+			category = "akimbo",
+			upgrade = "damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_damage_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_damage_multiplier",
+		incremental = true,
+		upgrade = {
+			category = "akimbo",
+			upgrade = "damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_spread_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_spread_multiplier",
+		incremental = true,
+		upgrade = {
+			category = "akimbo",
+			upgrade = "spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_spread_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_spread_multiplier",
+		incremental = true,
+		upgrade = {
+			category = "akimbo",
+			upgrade = "spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_extra_ammo_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_extra_ammo_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "extra_ammo_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_extra_ammo_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_extra_ammo_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "extra_ammo_multiplier",
+			value = 2
+		}
+	}
+	self.definitions.akimbo_recoil_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_recoil_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "recoil_multiplier",
+			value = 2
+		}
+	}
+	self.definitions.akimbo_recoil_multiplier_3 = {
+		category = "feature",
+		name_id = "menu_akimbo_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "recoil_multiplier",
+			value = 3
+		}
+	}
+	self.definitions.akimbo_passive_recoil_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_passive_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "passive_recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_passive_recoil_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_passive_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "passive_recoil_multiplier",
+			value = 2
+		}
+	}
+	self.definitions.akimbo_passive_recoil_multiplier_3 = {
+		category = "feature",
+		name_id = "menu_akimbo_passive_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "passive_recoil_multiplier",
+			value = 3
+		}
+	}
+	self.definitions.akimbo_clip_ammo_increase_1 = {
+		category = "feature",
+		name_id = "menu_akimbo_clip_ammo_increase_1",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "clip_ammo_increase",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_clip_ammo_increase_2 = {
+		category = "feature",
+		name_id = "menu_akimbo_clip_ammo_increase_2",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "clip_ammo_increase",
+			value = 2
+		}
+	}
+end
+
+function UpgradesTweakData:_jowi_definitions()
+	self.definitions.jowi = {
+		category = "weapon",
+		weapon_id = "jowi",
+		factory_id = "wpn_fps_jowi"
+	}
+end
+
+function UpgradesTweakData:_x_1911_definitions()
+	self.definitions.x_1911 = {
+		category = "weapon",
+		weapon_id = "x_1911",
+		factory_id = "wpn_fps_x_1911"
+	}
+end
+
+function UpgradesTweakData:_x_b92fs_definitions()
+	self.definitions.x_b92fs = {
+		category = "weapon",
+		weapon_id = "x_b92fs",
+		factory_id = "wpn_fps_x_b92fs"
+	}
+end
+
+function UpgradesTweakData:_x_deagle_definitions()
+	self.definitions.x_deagle = {
+		category = "weapon",
+		weapon_id = "x_deagle",
+		factory_id = "wpn_fps_x_deagle"
+	}
+end
+
+function UpgradesTweakData:_g26_definitions()
+	self.definitions.g26 = {
+		category = "weapon",
+		weapon_id = "g26",
+		factory_id = "wpn_fps_pis_g26",
+		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_kabartanto_definitions()
+	self.definitions.kabartanto = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
+	}
 end

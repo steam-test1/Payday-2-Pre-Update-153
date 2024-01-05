@@ -3075,19 +3075,23 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 	if equipped_mods then
 		local tweak_stats = tweak_data.weapon.stats
 		local tweak_factory = tweak_data.weapon.factory.parts
+		local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(name)
+		local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
+		local part_data
 		for _, mod in ipairs(equipped_mods) do
-			if tweak_factory[mod] then
+			part_data = managers.weapon_factory:get_part_data_by_part_id_from_weapon(mod, factory_id, default_blueprint)
+			if part_data then
 				for _, stat in pairs(self._stats_shown) do
-					if tweak_factory[mod].stats then
+					if part_data.stats then
 						if stat.name == "magazine" then
-							local ammo = tweak_factory[mod].stats.extra_ammo
+							local ammo = part_data.stats.extra_ammo
 							ammo = ammo and ammo + (tweak_data.weapon[name].stats.extra_ammo or 0)
 							mods_stats[stat.name].value = mods_stats[stat.name].value + (ammo and tweak_data.weapon.stats.extra_ammo[ammo] or 0)
 						elseif stat.name == "totalammo" then
-							local ammo = tweak_factory[mod].stats.total_ammo_mod
+							local ammo = part_data.stats.total_ammo_mod
 							mods_stats[stat.name].index = mods_stats[stat.name].index + (ammo or 0)
 						else
-							mods_stats[stat.name].index = mods_stats[stat.name].index + (tweak_factory[mod].stats[stat.name] or 0)
+							mods_stats[stat.name].index = mods_stats[stat.name].index + (part_data.stats[stat.name] or 0)
 						end
 					end
 				end
@@ -3458,6 +3462,9 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 	local tweak_stats = tweak_data.weapon.stats
 	local tweak_factory = tweak_data.weapon.factory.parts
 	local modifier_stats = tweak_data.weapon[weapon_name].stats_modifiers
+	local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(weapon_name)
+	local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
+	local part_data
 	local mod_stats = {}
 	mod_stats.chosen = {}
 	mod_stats.equip = {}
@@ -3477,18 +3484,22 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 	local curr_stats = base_stats
 	local index
 	for _, mod in pairs(mod_stats) do
+		part_data = nil
+		if mod.name then
+			part_data = managers.weapon_factory:get_part_data_by_part_id_from_weapon(mod.name, factory_id, default_blueprint)
+		end
 		for _, stat in pairs(self._stats_shown) do
-			if mod.name then
+			if part_data and part_data.stats then
 				if stat.name == "magazine" then
-					local ammo = tweak_factory[mod.name].stats.extra_ammo
+					local ammo = part_data.stats.extra_ammo
 					ammo = ammo and ammo + (tweak_data.weapon[weapon_name].stats.extra_ammo or 0)
 					mod[stat.name] = ammo and tweak_data.weapon.stats.extra_ammo[ammo] or 0
 				elseif stat.name == "totalammo" then
-					local chosen_index = tweak_factory[mod.name].stats.total_ammo_mod or 0
+					local chosen_index = part_data.stats.total_ammo_mod or 0
 					chosen_index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats.total_ammo_mod)
 					mod[stat.name] = math.round(base_stats[stat.name].value * tweak_stats.total_ammo_mod[chosen_index])
 				else
-					local chosen_index = tweak_factory[mod.name].stats[stat.name] or 0
+					local chosen_index = part_data.stats[stat.name] or 0
 					if tweak_stats[stat.name] then
 						index = math.clamp(curr_stats[stat.name].index + chosen_index, 1, #tweak_stats[stat.name])
 						mod[stat.name] = math.round(stat.index and index or tweak_stats[stat.name][index] * tweak_data.gui.stats_present_multiplier)
@@ -4467,8 +4478,9 @@ function BlackMarketGui:update_info_text()
 			})
 		end
 		local part_id = slot_data.name
-		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget"
-		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo"
+		local perks = part_id and tweak_data.weapon.factory.parts[part_id].perks
+		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget" or perks and table.contains(perks, "gadget")
+		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo" or perks and table.contains(perks, "ammo")
 		if is_gadget or is_ammo then
 			local crafted = managers.blackmarket:get_crafted_category_slot(prev_data.category, prev_data.slot)
 			updated_texts[4].text = managers.weapon_factory:get_part_desc_by_part_id_from_weapon(part_id, crafted.factory_id, crafted.blueprint)
@@ -4638,6 +4650,11 @@ function BlackMarketGui:update_info_text()
 		})
 	elseif identifier == self.identifiers.character then
 		updated_texts[1].text = slot_data.name_localized
+		if not slot_data.unlocked then
+			local dlc_text_id = slot_data.dlc_locked
+			local text = managers.localization:to_upper_text(dlc_text_id, {}) .. "\n"
+			updated_texts[3].text = text
+		end
 		updated_texts[4].text = managers.localization:text(slot_data.name .. "_desc")
 	end
 	if self._desc_mini_icons then
@@ -5731,8 +5748,9 @@ function BlackMarketGui:populate_characters(data)
 	local guis_catalog = "guis/"
 	for i = 1, CriminalsManager.get_num_characters() do
 		local character = CriminalsManager.character_names()[i]
+		local character_name = CriminalsManager.convert_old_to_new_character_workname(character)
 		guis_catalog = "guis/"
-		local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character]
+		local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character_name]
 		local bundle_folder = character_table and character_table.texture_bundle_folder
 		if bundle_folder then
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
@@ -5742,12 +5760,14 @@ function BlackMarketGui:populate_characters(data)
 		new_data.name_localized = managers.localization:text("menu_" .. new_data.name)
 		new_data.category = "characters"
 		new_data.slot = i
-		new_data.unlocked = true
+		new_data.unlocked = not character_table or not character_table.dlc or managers.dlc:is_dlc_unlocked(character_table.dlc)
 		new_data.equipped = managers.blackmarket:get_preferred_character() == character
 		new_data.equipped_text = managers.localization:text("bm_menu_preferred")
-		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. CriminalsManager.convert_old_to_new_character_workname(new_data.name)
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
 		new_data.stream = false
-		if not new_data.equipped then
+		new_data.lock_texture = self:get_lock_icon(new_data)
+		new_data.dlc_locked = character_table and character_table.dlc and tweak_data.lootdrop.global_values[character_table.dlc].unlock_id or "bm_menu_dlc_locked"
+		if not new_data.equipped and new_data.unlocked then
 			table.insert(new_data, "c_equip")
 		end
 		data[i] = new_data
@@ -7125,7 +7145,7 @@ function BlackMarketGui:_start_page_data()
 			name = "bm_menu_characters",
 			category = "characters",
 			on_create_func_name = "populate_characters",
-			override_slots = {2, 2},
+			override_slots = {3, 2},
 			identifier = self.identifiers.character
 		})
 	end

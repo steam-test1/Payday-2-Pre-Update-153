@@ -171,6 +171,9 @@ function PlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, 
 	setup_data.panic_suppression_skill = not managers.weapon_factory:has_perk("silencer", factory_name, blueprint) and managers.player:has_category_upgrade("player", "panic_suppression") or false
 	new_unit:base():setup(setup_data)
 	self:add_unit(new_unit, equip, instant)
+	if new_unit:base().AKIMBO then
+		new_unit:base():create_second_gun()
+	end
 end
 
 function PlayerInventory:remove_selection(selection_index, instant)

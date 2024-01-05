@@ -91,6 +91,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.wolf = "wolf"
 	self.masks.character_locked.hoxton = "hoxton"
 	self.masks.character_locked.chains = "chains"
+	self.masks.character_locked.jowi = "jw_shades"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1234,6 +1235,30 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.spackle.dlc = "pd2_clan"
 	self.masks.spackle.value = 0
 	self.masks.spackle.sort_number = 5
+	self.masks.jw_shades = {}
+	self.masks.jw_shades.unit = "units/pd2_crimefest_2014/oct22/masks/jw_shades/msk_jw_shades"
+	self.masks.jw_shades.name_id = "bm_msk_jw_shades"
+	self.masks.jw_shades.value = 0
+	self.masks.jw_shades.type = "glasses"
+	self.masks.jw_shades.skip_mask_on_sequence = true
+	self.masks.stoneface = {}
+	self.masks.stoneface.unit = "units/pd2_crimefest_2014/oct22/masks/stoneface/msk_stoneface"
+	self.masks.stoneface.name_id = "bm_msk_stoneface"
+	self.masks.stoneface.pcs = {}
+	self.masks.stoneface.value = 0
+	self.masks.stoneface.dlc = "pd2_clan"
+	self.masks.stoneface.type = "glasses"
+	self.masks.stoneface.skip_mask_on_sequence = true
+	self.masks.stoneface.sort_number = 7
+	self.masks.wayfarer = {}
+	self.masks.wayfarer.unit = "units/pd2_crimefest_2014/oct22/masks/wayfarer/msk_wayfarer"
+	self.masks.wayfarer.name_id = "bm_msk_wayfarer"
+	self.masks.wayfarer.pcs = {}
+	self.masks.wayfarer.value = 0
+	self.masks.wayfarer.dlc = "pd2_clan"
+	self.masks.wayfarer.type = "glasses"
+	self.masks.wayfarer.skip_mask_on_sequence = true
+	self.masks.wayfarer.sort_number = 7
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -1270,6 +1295,10 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.locked.chains = {
 		sequence = "var_mtr_chains"
 	}
+	self.characters.locked.jowi = {
+		sequence = "var_mtr_john_wick",
+		dlc = "pd2_clan"
+	}
 	self.characters.ai_hoxton = {}
 	self.characters.ai_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/hoxton/npc_criminal_suit_hoxton"
 	self.characters.ai_hoxton.sequence = "var_mtr_hoxton"
@@ -1286,6 +1315,10 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_wolf.npc_unit = "units/payday2/characters/npc_criminals_suit_1/wolf/npc_criminal_suit_wolf"
 	self.characters.ai_wolf.sequence = "var_mtr_wolf"
 	self.characters.ai_wolf.name_id = "bm_character_ai_/wolf"
+	self.characters.ai_jowi = {}
+	self.characters.ai_jowi.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jowi/npc_criminal_suit_jowi"
+	self.characters.ai_jowi.sequence = "var_mtr_john_wick"
+	self.characters.ai_jowi.name_id = "bm_character_ai_jowi"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -5366,5 +5399,19 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.briefcase.repeat_expire_t = 1
 	self.melee_weapons.briefcase.expire_t = 1.2
 	self.melee_weapons.briefcase.melee_damage_delay = 0.2
+	self.melee_weapons.kabartanto = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.kabartanto.name_id = "bm_melee_kabar_tanto"
+	self.melee_weapons.kabartanto.dlc = "pd2_clan"
+	self.melee_weapons.kabartanto.texture_bundle_folder = nil
+	self.melee_weapons.kabartanto.type = "knife"
+	self.melee_weapons.kabartanto.unit = "units/pd2_crimefest_2014/oct22/weapons/wpn_fps_mel_kabar_tanto/wpn_fps_mel_kabar_tanto"
+	self.melee_weapons.kabartanto.third_unit = "units/pd2_crimefest_2014/oct22/weapons/wpn_fps_mel_kabar_tanto/wpn_third_mel_kabar_tanto"
+	self.melee_weapons.kabartanto.stats.min_damage = 2
+	self.melee_weapons.kabartanto.stats.max_damage = 8
+	self.melee_weapons.kabartanto.stats.min_damage_effect = 0.8
+	self.melee_weapons.kabartanto.stats.max_damage_effect = 0.5
+	self.melee_weapons.kabartanto.stats.charge_time = 1.7
+	self.melee_weapons.kabartanto.stats.range = 185
+	self.melee_weapons.kabartanto.stats.concealment = 30
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

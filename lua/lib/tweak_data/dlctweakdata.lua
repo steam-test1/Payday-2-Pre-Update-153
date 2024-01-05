@@ -169,6 +169,58 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan_johnwick = {}
+	self.pd2_clan_johnwick.content = {}
+	self.pd2_clan_johnwick.dlc = "has_pd2_clan"
+	self.pd2_clan_johnwick.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_johnwick.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_g26_b_custom",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_g26_body_custom",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_g26_m_contour",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_g26_g_gripforce",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_fl_pis_crimson",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_pis_ipsccomp",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_pis_medium_gem",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "stoneface",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "wayfarer",
+			amount = 1
+		}
+	}
+	self.pd2_clan_johnwick.content.upgrades = {"kabartanto"}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

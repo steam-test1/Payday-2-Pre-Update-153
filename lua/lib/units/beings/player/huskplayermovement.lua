@@ -568,6 +568,9 @@ function HuskPlayerMovement:anim_cbk_spawn_melee_item(unit)
 	if unit_name then
 		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj_l:position(), align_obj_l:rotation())
 		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+		if alive(self._unit:inventory():equipped_unit()) and self._unit:inventory():equipped_unit():base().AKIMBO then
+			self._unit:inventory():equipped_unit():base():on_melee_item_shown()
+		end
 	end
 end
 
@@ -576,6 +579,9 @@ function HuskPlayerMovement:anim_cbk_unspawn_melee_item(unit)
 		self._melee_item_unit:unlink()
 		World:delete_unit(self._melee_item_unit)
 		self._melee_item_unit = nil
+		if alive(self._unit:inventory():equipped_unit()) and self._unit:inventory():equipped_unit():base().AKIMBO then
+			self._unit:inventory():equipped_unit():base():on_melee_item_hidden()
+		end
 	end
 end
 

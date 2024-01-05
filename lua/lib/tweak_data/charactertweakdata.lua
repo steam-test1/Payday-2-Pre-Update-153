@@ -29,6 +29,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_german(presets)
 	self:_init_spanish(presets)
 	self:_init_american(presets)
+	self:_init_jowi(presets)
 end
 
 function CharacterTweakData:_init_security(presets)
@@ -1195,6 +1196,14 @@ function CharacterTweakData:_init_american(presets)
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_jowi(presets)
+	self.jowi = deep_clone(self.spanish)
+	self.jowi.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45")
 	}
 end
 

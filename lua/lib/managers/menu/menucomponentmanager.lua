@@ -2932,7 +2932,10 @@ function MenuComponentManager:_request_done_callback(texture_ids)
 end
 
 function MenuComponentManager:request_texture(texture, done_cb)
-	assert(not self._block_texture_requests, string.format("[MenuComponentManager:request_texture] Requesting texture is blocked! %s", texture))
+	if self._block_texture_requests then
+		debug_pause(string.format("[MenuComponentManager:request_texture] Requesting texture is blocked! %s", texture))
+		return
+	end
 	local texture_ids = Idstring(texture)
 	local key = texture_ids:key()
 	local entry = self._requested_textures[key]

@@ -827,13 +827,15 @@ function SkillTreeTweakData:init()
 		icon_xy = {2, 0},
 		[1] = {
 			upgrades = {
-				"weapon_clip_ammo_increase_1"
+				"weapon_clip_ammo_increase_1",
+				"akimbo_clip_ammo_increase_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"weapon_clip_ammo_increase_2"
+				"weapon_clip_ammo_increase_2",
+				"akimbo_clip_ammo_increase_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -2050,6 +2052,107 @@ function SkillTreeTweakData:init()
 				icon_xy = {5, 2},
 				name_id = "menu_deck4_9",
 				desc_id = "menu_deck4_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_5",
+			desc_id = "menu_st_spec_5_desc",
+			{
+				upgrades = {
+					"player_perk_armor_regen_timer_multiplier_1"
+				},
+				cost = 200,
+				icon_xy = {6, 2},
+				name_id = "menu_deck5_1",
+				desc_id = "menu_deck5_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck5_2",
+				desc_id = "menu_deck5_2_desc"
+			},
+			{
+				upgrades = {
+					"player_perk_armor_regen_timer_multiplier_2",
+					"player_perk_armor_loss_multiplier_1",
+					"akimbo_recoil_multiplier_1",
+					"jowi",
+					"x_1911",
+					"x_b92fs",
+					"x_deagle"
+				},
+				cost = 400,
+				icon_xy = {7, 2},
+				name_id = "menu_deck5_3",
+				desc_id = "menu_deck5_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck5_4",
+				desc_id = "menu_deck5_4_desc"
+			},
+			{
+				upgrades = {
+					"player_perk_armor_regen_timer_multiplier_3",
+					"player_perk_armor_loss_multiplier_2"
+				},
+				cost = 1000,
+				icon_xy = {0, 3},
+				name_id = "menu_deck5_5",
+				desc_id = "menu_deck5_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier_2"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck5_6",
+				desc_id = "menu_deck5_6_desc"
+			},
+			{
+				upgrades = {
+					"player_perk_armor_regen_timer_multiplier_4",
+					"player_perk_armor_loss_multiplier_3"
+				},
+				cost = 2400,
+				icon_xy = {1, 3},
+				name_id = "menu_deck5_7",
+				desc_id = "menu_deck5_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck5_8",
+				desc_id = "menu_deck5_8_desc"
+			},
+			{
+				upgrades = {
+					"player_perk_armor_regen_timer_multiplier_5",
+					"player_perk_armor_loss_multiplier_4",
+					"player_passive_loot_drop_multiplier",
+					"akimbo_recoil_multiplier_2",
+					"akimbo_extra_ammo_multiplier_1"
+				},
+				cost = 4000,
+				icon_xy = {3, 3},
+				name_id = "menu_deck5_9",
+				desc_id = "menu_deck5_9_desc"
 			}
 		}
 	}

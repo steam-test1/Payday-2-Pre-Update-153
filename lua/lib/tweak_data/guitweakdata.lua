@@ -278,7 +278,7 @@ function GuiTweakData:init()
 	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
 	self.armor_damage_shake_base = 1.1
-	self.LONGEST_CHAR_NAME = "HOXTON"
+	self.LONGEST_CHAR_NAME = "JOHN WICK"
 	self.crime_net.regions = {
 		{
 			closed = true,
@@ -1378,6 +1378,20 @@ function GuiTweakData:init()
 						"hoxton3"
 					},
 					post_event = "pln_contact_hoxton"
+				}
+			},
+			{
+				id = "jowi",
+				name_id = "menu_jowi",
+				{
+					desc_id = "jowi_desc_codex",
+					videos = {
+						"jowi1",
+						"jowi2",
+						"jowi3",
+						"jowi4"
+					},
+					post_event = "pln_contact_wick"
 				}
 			}
 		}

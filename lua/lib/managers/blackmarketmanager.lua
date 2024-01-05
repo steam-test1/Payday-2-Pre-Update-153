@@ -3909,6 +3909,12 @@ function BlackMarketManager:_verify_dlc_items()
 			end
 		end
 	end
+	self._global._preferred_character = self._global._preferred_character or self._defaults.preferred_character
+	local character_name = CriminalsManager.convert_old_to_new_character_workname(self._global._preferred_character)
+	local char_tweak = tweak_data.blackmarket.characters.locked[character_name] or tweak_data.blackmarket.characters[character_name]
+	if char_tweak.dlc and not managers.dlc:is_dlc_unlocked(char_tweak.dlc) then
+		self:set_preferred_character(self._defaults.preferred_character)
+	end
 	local player_level = managers.experience:current_level()
 	local unlocked, level, skill_based, weapon_def, weapon_dlc, has_dlc
 	for weapon_id, weapon in pairs(Global.blackmarket_manager.weapons) do

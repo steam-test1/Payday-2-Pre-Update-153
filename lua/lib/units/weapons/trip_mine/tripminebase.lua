@@ -318,45 +318,47 @@ function TripMineBase:_explode(col_ray)
 	local amount = 0
 	local characters_hit = {}
 	for _, hit_body in ipairs(bodies) do
-		local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion
-		local apply_dmg = hit_body:extension() and hit_body:extension().damage
-		local dir, ray_hit
-		if character and not characters_hit[hit_body:unit():key()] then
-			local com = hit_body:center_of_mass()
-			local ray_from = math.point_on_line(self._ray_from_pos, self._ray_to_pos, com)
-			ray_hit = not World:raycast("ray", ray_from, com, "slot_mask", slotmask, "ignore_unit", {
-				hit_body:unit()
-			}, "report")
-			if ray_hit then
-				characters_hit[hit_body:unit():key()] = true
+		if alive(hit_body) then
+			local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion
+			local apply_dmg = hit_body:extension() and hit_body:extension().damage
+			local dir, ray_hit
+			if character and not characters_hit[hit_body:unit():key()] then
+				local com = hit_body:center_of_mass()
+				local ray_from = math.point_on_line(self._ray_from_pos, self._ray_to_pos, com)
+				ray_hit = not World:raycast("ray", ray_from, com, "slot_mask", slotmask, "ignore_unit", {
+					hit_body:unit()
+				}, "report")
+				if ray_hit then
+					characters_hit[hit_body:unit():key()] = true
+				end
+			elseif apply_dmg or hit_body:dynamic() then
+				ray_hit = true
 			end
-		elseif apply_dmg or hit_body:dynamic() then
-			ray_hit = true
-		end
-		if ray_hit then
-			dir = hit_body:center_of_mass()
-			mvector3.direction(dir, self._ray_from_pos, dir)
-			if apply_dmg then
-				local normal = dir
-				local prop_damage = math.min(damage, 200)
-				local network_damage = math.ceil(prop_damage * 163.84)
-				prop_damage = network_damage / 163.84
-				hit_body:extension().damage:damage_explosion(player, normal, hit_body:position(), dir, prop_damage)
-				hit_body:extension().damage:damage_damage(player, normal, hit_body:position(), dir, prop_damage)
-				if hit_body:unit():id() ~= -1 then
-					if player then
-						managers.network:session():send_to_peers_synched("sync_body_damage_explosion", hit_body, player, normal, hit_body:position(), dir, math.min(32768, network_damage))
-					else
-						managers.network:session():send_to_peers_synched("sync_body_damage_explosion_no_attacker", hit_body, normal, hit_body:position(), dir, math.min(32768, network_damage))
+			if ray_hit then
+				dir = hit_body:center_of_mass()
+				mvector3.direction(dir, self._ray_from_pos, dir)
+				if apply_dmg then
+					local normal = dir
+					local prop_damage = math.min(damage, 200)
+					local network_damage = math.ceil(prop_damage * 163.84)
+					prop_damage = network_damage / 163.84
+					hit_body:extension().damage:damage_explosion(player, normal, hit_body:position(), dir, prop_damage)
+					hit_body:extension().damage:damage_damage(player, normal, hit_body:position(), dir, prop_damage)
+					if hit_body:unit():id() ~= -1 then
+						if player then
+							managers.network:session():send_to_peers_synched("sync_body_damage_explosion", hit_body, player, normal, hit_body:position(), dir, math.min(32768, network_damage))
+						else
+							managers.network:session():send_to_peers_synched("sync_body_damage_explosion_no_attacker", hit_body, normal, hit_body:position(), dir, math.min(32768, network_damage))
+						end
 					end
 				end
-			end
-			if hit_body:unit():in_slot(managers.game_play_central._slotmask_physics_push) then
-				hit_body:unit():push(5, dir * 500)
-			end
-			if character then
-				self:_give_explosion_damage(col_ray, hit_body:unit(), damage)
-				amount = amount + 1
+				if hit_body:unit():in_slot(managers.game_play_central._slotmask_physics_push) then
+					hit_body:unit():push(5, dir * 500)
+				end
+				if character then
+					self:_give_explosion_damage(col_ray, hit_body:unit(), damage)
+					amount = amount + 1
+				end
 			end
 		end
 	end

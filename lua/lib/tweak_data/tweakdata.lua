@@ -400,7 +400,8 @@ function TweakData:init()
 		"russian",
 		"german",
 		"spanish",
-		"american"
+		"american",
+		"jowi"
 	}
 	self.criminals.characters = {
 		{
@@ -444,6 +445,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb1",
 				ai_mask_id = "chains",
+				mask_id = 4
+			}
+		},
+		{
+			name = "jowi",
+			static_data = {
+				ai_character_id = "ai_jowi",
+				ssuffix = "m",
+				color_id = 4,
+				voice = "rb6",
+				ai_mask_id = "jw_shades",
 				mask_id = 4
 			}
 		}
@@ -1400,6 +1412,10 @@ function TweakData:init()
 		hurting_people = {
 			stat = "pig_3_stats",
 			melee_id = "baseballbat",
+			enemies = {
+				"mobster",
+				"mobster_boss"
+			},
 			job_id = "mia"
 		}
 	}

@@ -129,6 +129,7 @@ require("lib/units/equipment/repel_rope/RepelRopeBase")
 require("lib/units/weapons/GrenadeLauncherBase")
 require("lib/units/weapons/NPCGrenadeLauncherBase")
 require("lib/units/weapons/grenades/M79GrenadeBase")
+require("lib/units/weapons/AkimboWeaponBase")
 require("lib/units/weapons/SentryGunWeapon")
 require("lib/units/weapons/WeaponGadgetBase")
 require("lib/units/weapons/WeaponFlashLight")
@@ -177,7 +178,9 @@ function GameSetup:load_packages()
 	end
 	local level_package
 	if not Global.level_data or not Global.level_data.level_id then
-		level_package = "packages/level_debug"
+		if not Application:editor() then
+			level_package = "packages/level_debug"
+		end
 	else
 		local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 		level_package = lvl_tweak_data and lvl_tweak_data.package
