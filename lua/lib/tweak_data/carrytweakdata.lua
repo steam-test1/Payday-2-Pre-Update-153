@@ -92,6 +92,12 @@ function CarryTweakData:init(tweak_data)
 	self.lance_bag.visual_object = "g_toolsbag"
 	self.lance_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
 	self.lance_bag.AI_carry = {SO_category = "enemies"}
+	self.cage_bag = {}
+	self.cage_bag.type = "medium"
+	self.cage_bag.name_id = "hud_carry_cage_bag"
+	self.cage_bag.skip_exit_secure = true
+	self.cage_bag.visual_object = "g_cagebag"
+	self.cage_bag.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 	self.weapon = {}
 	self.weapon.type = "heavy"
 	self.weapon.name_id = "hud_carry_weapon"

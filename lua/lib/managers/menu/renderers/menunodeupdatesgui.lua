@@ -1,4 +1,5 @@
 MenuNodeUpdatesGui = MenuNodeUpdatesGui or class(MenuNodeGui)
+MenuNodeUpdatesGui.PADDING = 10
 
 function MenuNodeUpdatesGui:init(node, layer, parameters)
 	MenuNodeUpdatesGui.super.init(self, node, layer, parameters)
@@ -63,7 +64,7 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 	local content_updates = tweak_data.gui.content_updates or {}
 	local previous_updates = {}
 	local latest_update = content_updates[#content_updates]
-	for i = #content_updates - 1, math.max(#content_updates - num_previous_updates, 1), -1 do
+	for i = #content_updates, math.max(#content_updates - num_previous_updates, 1), -1 do
 		table.insert(previous_updates, content_updates[i])
 	end
 	self._lastest_content_update = latest_update
@@ -93,15 +94,8 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 	})
 	self._selects = {}
 	self._selects[latest_update.id] = selected
-	self._select_x = 0
-	self._select_y = 0
-	local texture_count = managers.menu_component:request_texture(latest_update.image, callback(self, self, "texture_done_clbk", latest_update_panel))
-	table.insert(self._requested_textures, {
-		count = texture_count,
-		texture = latest_update.image
-	})
-	local w = latest_update_panel:w()
-	local padding = 10
+	self._select_x = 1
+	local w = panel:w()
 	local latest_desc_panel = panel:panel({
 		name = "latest_description",
 		w = panel:w() - latest_update_panel:w() - 30,
@@ -126,10 +120,8 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 		font = tweak_data.menu.pd2_large_font,
 		font_size = tweak_data.menu.pd2_large_font_size,
 		color = tweak_data.screen_colors.text,
-		x = padding,
-		y = padding,
-		wrap = true,
-		word_wrap = true
+		x = self.PADDING,
+		y = self.PADDING
 	})
 	local date_text = latest_desc_panel:text({
 		name = "date_text",
@@ -137,9 +129,7 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 		font = tweak_data.menu.pd2_medium_font,
 		font_size = tweak_data.menu.pd2_medium_font_size,
 		color = tweak_data.screen_colors.text,
-		x = padding,
-		wrap = true,
-		word_wrap = true
+		x = self.PADDING
 	})
 	local desc_text = latest_desc_panel:text({
 		name = "desc_text",
@@ -147,7 +137,7 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		color = tweak_data.screen_colors.text,
-		x = padding,
+		x = self.PADDING,
 		wrap = true,
 		word_wrap = true
 	})
@@ -158,18 +148,15 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 	do
 		local x, y, w, h = date_text:text_rect()
 		date_text:set_size(w, h)
+		date_text:set_top(title_text:bottom())
 	end
-	do
-		local x, y, w, h = desc_text:text_rect()
-		desc_text:set_size(w, h)
-	end
-	date_text:set_top(title_text:bottom())
 	desc_text:set_top(date_text:bottom())
-	local small_width = w / num_previous_updates - padding * 2
+	desc_text:set_size(latest_desc_panel:w() - self.PADDING * 2, latest_desc_panel:h() - desc_text:top() - self.PADDING)
+	local small_width = w / num_previous_updates - self.PADDING * 2
 	local previous_updates_panel = panel:panel({
 		name = "previous_content_updates",
-		w = latest_update_panel:w(),
-		h = small_width / 2 + padding * 2,
+		w = w,
+		h = small_width / 2 + self.PADDING * 2,
 		x = 0,
 		y = latest_update_panel:bottom() + 40
 	})
@@ -186,8 +173,8 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 	for index, data in ipairs(previous_updates) do
 		local w = small_width
 		local h = small_width / 2
-		local x = padding + (index - 1) * (w + padding * 2)
-		local y = padding
+		local x = self.PADDING + (index - 1) * (w + self.PADDING * 2)
+		local y = self.PADDING
 		local content_panel = previous_updates_panel:panel({
 			name = data.id,
 			w = w,
@@ -209,10 +196,10 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 		})
 		self:make_fine_text(text)
 		if index == 1 then
-			previous_updates_panel:grow(0, text:h() + padding * 0.5)
+			previous_updates_panel:grow(0, text:h() + self.PADDING * 0.5)
 		end
 		text:set_world_x(content_panel:world_x())
-		text:set_bottom(previous_updates_panel:bottom() - padding + 1)
+		text:set_bottom(previous_updates_panel:bottom() - self.PADDING + 1)
 		local selected = BoxGuiObject:new(content_panel, {
 			sides = {
 				2,
@@ -234,6 +221,7 @@ function MenuNodeUpdatesGui:init(node, layer, parameters)
 	for i, box in pairs(self._selects) do
 		box:hide()
 	end
+	self:set_latest_content(latest_update, true)
 end
 
 function MenuNodeUpdatesGui:make_fine_text(text)
@@ -244,6 +232,7 @@ end
 
 function MenuNodeUpdatesGui:texture_done_clbk(panel, texture_ids)
 	panel:bitmap({
+		name = "texture",
 		texture = texture_ids,
 		w = panel:w(),
 		h = panel:h()
@@ -257,7 +246,6 @@ function MenuNodeUpdatesGui:check_inside(x, y)
 	local latest_update_panel = panel:child("lastest_content_update")
 	local previous_updates_panel = panel:child("previous_content_updates")
 	if latest_update_panel:inside(x, y) then
-		self._select_y = 1
 		return self._lastest_content_update
 	elseif previous_updates_panel:inside(x, y) then
 		local child
@@ -265,7 +253,6 @@ function MenuNodeUpdatesGui:check_inside(x, y)
 			child = previous_updates_panel:child(data.id)
 			if alive(child) and child:inside(x, y) then
 				self._select_x = index
-				self._select_y = 2
 				return data
 			end
 		end
@@ -293,17 +280,8 @@ function MenuNodeUpdatesGui:mouse_moved(o, x, y)
 		back_button:set_color(tweak_data.screen_colors.button_stage_3)
 	end
 	local content_highlighted = self:check_inside(x, y)
-	for id, box in pairs(self._selects) do
-		box:set_visible(content_highlighted and content_highlighted.id == id)
-	end
-	if content_highlighted then
-		if moved and self._content_highlighted ~= content_highlighted then
-			self._content_highlighted = content_highlighted
-			managers.menu_component:post_event("highlight")
-		end
+	if self:set_latest_content(content_highlighted, moved) then
 		return true, self._pressed and (self._pressed == content_highlighted and "link" or "arrow") or "link"
-	elseif self._content_highlighted then
-		self._content_highlighted = false
 	end
 	return true, "arrow"
 end
@@ -347,6 +325,56 @@ function MenuNodeUpdatesGui:input_focus()
 	return 1
 end
 
+function MenuNodeUpdatesGui:set_latest_content(content_highlighted, moved)
+	local result = false
+	if content_highlighted then
+		if moved and self._content_highlighted ~= content_highlighted then
+			self._content_highlighted = content_highlighted
+			self._lastest_content_update = content_highlighted
+			managers.menu_component:post_event("highlight")
+			local ws = self.ws
+			local panel = ws:panel()
+			local latest_update_panel = panel:child("lastest_content_update")
+			if alive(latest_update_panel:child("texture")) then
+				latest_update_panel:remove(latest_update_panel:child("texture"))
+			end
+			if self._lastest_texture_request then
+				managers.menu_component:unretrieve_texture(self._lastest_texture_request.texture, self._lastest_texture_request.texture_count)
+			end
+			local texture = content_highlighted.image
+			local texture_count = managers.menu_component:request_texture(texture, callback(self, self, "texture_done_clbk", latest_update_panel))
+			self._lastest_texture_request = {count = texture_count, texture = texture}
+			local latest_desc_panel = panel:child("latest_description")
+			local title_string = managers.localization:to_upper_text(self._content_highlighted.name_id)
+			local date_string = managers.localization:to_upper_text(self._content_highlighted.date_id)
+			local desc_string = managers.localization:text(self._content_highlighted.desc_id)
+			local title_text = latest_desc_panel:child("title_text")
+			local date_text = latest_desc_panel:child("date_text")
+			local desc_text = latest_desc_panel:child("desc_text")
+			title_text:set_text(title_string)
+			do
+				local x, y, w, h = title_text:text_rect()
+				title_text:set_size(w, h)
+			end
+			date_text:set_text(date_string)
+			do
+				local x, y, w, h = date_text:text_rect()
+				date_text:set_size(w, h)
+				date_text:set_top(title_text:bottom())
+			end
+			desc_text:set_text(desc_string)
+			desc_text:set_top(date_text:bottom())
+			desc_text:set_size(latest_desc_panel:w() - self.PADDING * 2, latest_desc_panel:h() - desc_text:top() - self.PADDING)
+		end
+		result = true
+	elseif self._content_highlighted then
+	end
+	for id, box in pairs(self._selects) do
+		box:set_visible(self._content_highlighted and self._content_highlighted.id == id)
+	end
+	return result
+end
+
 function MenuNodeUpdatesGui:move_highlight(x, y)
 	local ws = self.ws
 	local panel = ws:panel()
@@ -354,38 +382,18 @@ function MenuNodeUpdatesGui:move_highlight(x, y)
 	local previous_updates_panel = panel:child("previous_content_updates")
 	local content_highlighted = self._content_highlighted
 	if not content_highlighted then
-		content_highlighted = self._lastest_content_update
-		self._select_y = 1
 	else
-		self._select_x = math.clamp(self._select_x + x, 1, #self._previous_content_updates)
-		self._select_y = math.clamp(self._select_y + y, 1, 2)
-		if self._select_y == 1 then
-			content_highlighted = self._lastest_content_update
-		else
-			content_highlighted = self._previous_content_updates[self._select_x]
-		end
+		self._select_x = self._select_x + x
 	end
-	for id, box in pairs(self._selects) do
-		box:set_visible(content_highlighted and content_highlighted.id == id)
-	end
-	if content_highlighted then
-		if self._content_highlighted ~= content_highlighted then
-			self._content_highlighted = content_highlighted
-			managers.menu_component:post_event("highlight")
-		end
-	elseif self._content_highlighted then
-		self._content_highlighted = false
-	end
+	self._select_x = math.clamp(self._select_x, 1, #self._previous_content_updates)
+	content_highlighted = self._previous_content_updates[self._select_x]
+	self:set_latest_content(content_highlighted, true)
 end
 
 function MenuNodeUpdatesGui:move_up()
-	self:move_highlight(0, -1)
-	return true
 end
 
 function MenuNodeUpdatesGui:move_down()
-	self:move_highlight(0, 1)
-	return true
 end
 
 function MenuNodeUpdatesGui:move_left()
@@ -401,6 +409,9 @@ end
 function MenuNodeUpdatesGui:close()
 	for i, data in pairs(self._requested_textures) do
 		managers.menu_component:unretrieve_texture(data.texture, data.texture_count)
+	end
+	if self._lastest_texture_request then
+		managers.menu_component:unretrieve_texture(self._lastest_texture_request.texture, self._lastest_texture_request.texture_count)
 	end
 	MenuNodeUpdatesGui.super.close(self)
 end

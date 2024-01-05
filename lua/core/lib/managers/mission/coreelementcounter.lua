@@ -5,8 +5,35 @@ ElementCounter = ElementCounter or class(CoreMissionScriptElement.MissionScriptE
 
 function ElementCounter:init(...)
 	ElementCounter.super.init(self, ...)
+	self._digital_gui_units = {}
 	self._original_value = self._values.counter_target
 	self._triggers = {}
+end
+
+function ElementCounter:on_script_activated()
+	if not Network:is_server() then
+		return
+	end
+	if self._values.digital_gui_unit_ids then
+		for _, id in ipairs(self._values.digital_gui_unit_ids) do
+			if Global.running_simulation then
+				local unit = managers.editor:unit_with_id(id)
+				table.insert(self._digital_gui_units, unit)
+				unit:digital_gui():number_set(self._values.counter_target)
+			else
+				local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "_load_unit"))
+				if unit then
+					table.insert(self._digital_gui_units, unit)
+					unit:digital_gui():number_set(self._values.counter_target)
+				end
+			end
+		end
+	end
+end
+
+function ElementCounter:_load_unit(unit)
+	table.insert(self._digital_gui_units, unit)
+	unit:digital_gui():number_set(self._values.counter_target)
 end
 
 function ElementCounter:on_executed(instigator)
@@ -15,6 +42,7 @@ function ElementCounter:on_executed(instigator)
 	end
 	if self._values.counter_target > 0 then
 		self._values.counter_target = self._values.counter_target - 1
+		self:_update_digital_guis_number()
 		if self:is_debug() then
 			self._mission_script:debug_output("Counter " .. self._editor_name .. ": " .. self._values.counter_target .. " Previous value: " .. self._values.counter_target + 1, Color(1, 0, 0.75, 0))
 		end
@@ -28,28 +56,33 @@ end
 
 function ElementCounter:reset_counter_target(counter_target)
 	self._values.counter_target = counter_target
+	self:_update_digital_guis_number()
 end
 
 function ElementCounter:counter_operation_add(amount)
 	self._values.counter_target = self._values.counter_target + amount
+	self:_update_digital_guis_number()
 	self:_check_triggers("add")
 	self:_check_triggers("value")
 end
 
 function ElementCounter:counter_operation_subtract(amount)
 	self._values.counter_target = self._values.counter_target - amount
+	self:_update_digital_guis_number()
 	self:_check_triggers("subtract")
 	self:_check_triggers("value")
 end
 
 function ElementCounter:counter_operation_reset(amount)
 	self._values.counter_target = self._original_value
+	self:_update_digital_guis_number()
 	self:_check_triggers("reset")
 	self:_check_triggers("value")
 end
 
 function ElementCounter:counter_operation_set(amount)
 	self._values.counter_target = amount
+	self:_update_digital_guis_number()
 	self:_check_triggers("set")
 	self:_check_triggers("value")
 end
@@ -70,6 +103,14 @@ end
 
 function ElementCounter:counter_value()
 	return self._values.counter_target
+end
+
+function ElementCounter:_update_digital_guis_number()
+	for _, unit in ipairs(self._digital_gui_units) do
+		if alive(unit) then
+			unit:digital_gui():number_set(self._values.counter_target, true)
+		end
+	end
 end
 
 function ElementCounter:_check_triggers(type)

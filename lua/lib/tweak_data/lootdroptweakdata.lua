@@ -207,6 +207,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.halloween.drops = true
 	self.global_values.halloween.track = true
 	self.global_values.halloween.sort_number = 200
+	self.global_values.halloween.hide_unavailable = true
+	self.global_values.xmas = {}
+	self.global_values.xmas.name_id = "bm_global_value_xmas"
+	self.global_values.xmas.desc_id = "menu_l_global_value_xmas"
+	self.global_values.xmas.color = Color(255, 247, 26, 45) / 255
+	self.global_values.xmas.dlc = false
+	self.global_values.xmas.chance = 1
+	self.global_values.xmas.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "xmas")
+	self.global_values.xmas.durability_multiplier = 1
+	self.global_values.xmas.drops = true
+	self.global_values.xmas.track = true
+	self.global_values.xmas.sort_number = 201
+	self.global_values.xmas.hide_unavailable = true
 	self.global_values.armored_transport = {}
 	self.global_values.armored_transport.name_id = "bm_global_value_armored_transport"
 	self.global_values.armored_transport.desc_id = "menu_l_global_value_armored_transport"
@@ -260,7 +273,9 @@ function LootDropTweakData:init(tweak_data)
 		"pre_order",
 		"pd2_clan",
 		"halloween",
-		"armored_transport"
+		"xmas",
+		"armored_transport",
+		"gage_pack"
 	}
 	self.global_value_list_map = {}
 	for i, d in ipairs(self.global_value_list_index) do

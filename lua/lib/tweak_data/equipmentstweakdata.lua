@@ -172,6 +172,11 @@ function EquipmentsTweakData:init()
 		icon = "equipment_planks",
 		sync_possession = true
 	}
+	self.specials.boards = {
+		text_id = "hud_equipment_boards",
+		icon = "equipment_planks",
+		sync_possession = true
+	}
 	self.specials.gold_bag_equip = {
 		text_id = "debug_equipment_gold_bag",
 		icon = "equipment_gold",

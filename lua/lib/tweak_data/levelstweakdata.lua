@@ -619,9 +619,9 @@ function LevelsTweakData:init()
 	self.roberts.world_name = "narratives/bain/roberts"
 	self.roberts.intro_event = "Play_pln_cs1_intro_01"
 	self.roberts.outro_event = {
-		"pln_cs1_end_01",
-		"pln_cs1_end_02",
-		"pln_cs1_end_03"
+		"Play_pln_cs1_end_01",
+		"Play_pln_cs1_end_02",
+		"Play_pln_cs1_end_03"
 	}
 	self.roberts.music = "heist"
 	self.roberts.package = "packages/narr_roberts"
@@ -644,6 +644,15 @@ function LevelsTweakData:init()
 	self.heat.music = "heist"
 	self.heat.package = "packages/narr_heat"
 	self.heat.cube = "cube_apply_heist_bank"
+	self.monolithic_1 = {}
+	self.monolithic_1.name_id = "heist_monolithic_1_hl"
+	self.monolithic_1.briefing_id = "heist_monolithic_1_briefing"
+	self.monolithic_1.world_name = "wip/monolithic/stage_1"
+	self.monolithic_1.intro_event = "lol"
+	self.monolithic_1.outro_event = {"lol", "lolo"}
+	self.monolithic_1.music = "heist"
+	self.monolithic_1.package = "packages/level_debug"
+	self.monolithic_1.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -1178,6 +1187,7 @@ function LevelsTweakData:init()
 		"haunted",
 		"branchbank_cloaker",
 		"heat",
+		"monolithic_1",
 		"test01",
 		"test02",
 		"test03",

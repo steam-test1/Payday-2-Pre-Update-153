@@ -379,6 +379,7 @@ function TweakData:init()
 		"mrorange",
 		"mrai"
 	}
+	self.system_chat_color = Color(255, 255, 212, 0) / 255
 	self.chat_colors = {
 		Color(self.peer_vector_colors[1]:unpack()),
 		Color(self.peer_vector_colors[2]:unpack()),
@@ -402,6 +403,7 @@ function TweakData:init()
 	self.screen_colors.friend_color = Color(255, 41, 204, 122) / 255
 	self.screen_colors.regular_color = Color(255, 41, 150, 240) / 255
 	self.screen_colors.pro_color = Color(255, 255, 51, 51) / 255
+	self.screen_colors.dlc_color = Color(255, 255, 212, 0) / 255
 	self.screen_colors.stats_positive = Color(255, 191, 221, 125) / 255
 	self.screen_colors.stats_negative = Color(255, 254, 93, 99) / 255
 	self.screen_colors.stats_mods = Color(255, 229, 229, 76) / 255
@@ -731,6 +733,14 @@ function TweakData:init()
 	self.interaction.numpad_keycard.equipment_consume = true
 	self.interaction.numpad_keycard.start_active = false
 	self.interaction.numpad_keycard.axis = "z"
+	self.interaction.timelock_panel = {}
+	self.interaction.timelock_panel.icon = "equipment_bank_manager_key"
+	self.interaction.timelock_panel.text_id = "hud_int_timelock_panel"
+	self.interaction.timelock_panel.equipment_text_id = "hud_int_timelock_panel_no_keycard"
+	self.interaction.timelock_panel.special_equipment = "bank_manager_key"
+	self.interaction.timelock_panel.equipment_consume = true
+	self.interaction.timelock_panel.start_active = false
+	self.interaction.timelock_panel.axis = "z"
 	self.interaction.take_weapons = {}
 	self.interaction.take_weapons.icon = "develop"
 	self.interaction.take_weapons.text_id = "hud_int_take_weapons"
@@ -1773,6 +1783,8 @@ function TweakData:init()
 	self.interaction.open_slash_close.start_active = false
 	self.interaction.open_slash_close_act = {}
 	self.interaction.open_slash_close_act.text_id = "hud_int_open_slash_close"
+	self.interaction.open_slash_close_act.action_text_id = "hud_action_open_slash_close"
+	self.interaction.open_slash_close_act.timer = 1
 	self.interaction.open_slash_close_act.start_active = true
 	self.interaction.raise_balloon = {}
 	self.interaction.raise_balloon.text_id = "hud_int_hold_raise_balloon"
@@ -1855,6 +1867,33 @@ function TweakData:init()
 	self.interaction.take_ammo.blocked_hint = "carry_block"
 	self.interaction.take_ammo.start_active = false
 	self.interaction.take_ammo.timer = 2
+	self.interaction.bank_note = {}
+	self.interaction.bank_note.text_id = "hud_int_bank_note"
+	self.interaction.bank_note.start_active = false
+	self.interaction.bank_note.timer = 3
+	self.interaction.pickup_boards = {}
+	self.interaction.pickup_boards.text_id = "hud_int_hold_pickup_boards"
+	self.interaction.pickup_boards.action_text_id = "hud_action_picking_up"
+	self.interaction.pickup_boards.start_active = false
+	self.interaction.pickup_boards.timer = 2
+	self.interaction.pickup_boards.axis = "z"
+	self.interaction.pickup_boards.special_equipment_block = "boards"
+	self.interaction.pickup_boards.sound_start = "bar_pick_up_planks"
+	self.interaction.pickup_boards.sound_interupt = "bar_pick_up_planks_cancel"
+	self.interaction.pickup_boards.sound_done = "bar_pick_up_planks_finished"
+	self.interaction.need_boards = {}
+	self.interaction.need_boards.contour = "interactable_icon"
+	self.interaction.need_boards.text_id = "debug_interact_stash_planks"
+	self.interaction.need_boards.action_text_id = "hud_action_barricading"
+	self.interaction.need_boards.start_active = false
+	self.interaction.need_boards.timer = 2.5
+	self.interaction.need_boards.equipment_text_id = "hud_equipment_need_boards"
+	self.interaction.need_boards.special_equipment = "boards"
+	self.interaction.need_boards.equipment_consume = true
+	self.interaction.need_boards.sound_start = "bar_barricade_window"
+	self.interaction.need_boards.sound_interupt = "bar_barricade_window_cancel"
+	self.interaction.need_boards.sound_done = "bar_barricade_window_finished"
+	self.interaction.need_boards.axis = "z"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2227,6 +2266,7 @@ function TweakData:init()
 	self.achievement.arms_dealer = 72
 	self.achievement.how_do_you_like_me_now = "level_1"
 	self.achievement.like_an_angry_bear = "bear"
+	self.achievement.merry_christmas = "santa_happy"
 	self.achievement.witch_doctor = {
 		mask = "witch",
 		stat = "halloween_4_stats"
@@ -2243,27 +2283,7 @@ function TweakData:init()
 		mask = "venomorph",
 		stat = "halloween_7_stats"
 	}
-	self.achievement.in_soviet_russia = {
-		mask = "bear",
-		stat = "halloween_10_stats"
-	}
 	self.achievement.unique_selling_point = "usp"
-	self.achievement.i_take_scores = {
-		mask = "heat",
-		stat = "armored_4_stat",
-		heists = {
-			"arm_cro",
-			"arm_cro_prof",
-			"arm_und",
-			"arm_und_prof",
-			"arm_hcm",
-			"arm_hcm_prof",
-			"arm_par",
-			"arm_par_prof",
-			"arm_fac",
-			"arm_fac_prof"
-		}
-	}
 	self.achievement.relation_with_bulldozer = {
 		mask = "clinton",
 		stat = "armored_8_stat"
@@ -2329,6 +2349,48 @@ function TweakData:init()
 		above_the_law = {
 			weapon = "p226",
 			stat = "gage_7_stats"
+		}
+	}
+	self.achievement.complete_heist_achievements = {
+		in_soviet_russia = {
+			stat = "halloween_10_stats",
+			mask = "bear",
+			difficulty = "overkill_145",
+			contracts = {"vlad"}
+		},
+		i_take_scores = {
+			stat = "armored_4_stat",
+			mask = "heat",
+			difficulty = "overkill_145",
+			jobs = {
+				"arm_cro",
+				"arm_cro_prof",
+				"arm_und",
+				"arm_und_prof",
+				"arm_hcm",
+				"arm_hcm_prof",
+				"arm_par",
+				"arm_par_prof",
+				"arm_fac",
+				"arm_fac_prof"
+			}
+		},
+		eco_round = {
+			award = "charliesierra_7",
+			no_shots = "primaries",
+			difficulty = "overkill_145",
+			jobs = {"roberts"}
+		}
+	}
+	self.achievement.four_mask_achievements = {
+		reindeer_games = {
+			award = "charliesierra_9",
+			masks = {
+				"A",
+				"B",
+				"C",
+				"D"
+			}
 		}
 	}
 	self.pickups = {}
@@ -2416,7 +2478,8 @@ function TweakData:init()
 		"track_06",
 		"track_07",
 		"track_08",
-		"track_09"
+		"track_09",
+		"track_10"
 	}
 	self.music.default = deep_clone(self.music.heist)
 	self.blame = {}
@@ -2484,6 +2547,10 @@ function TweakData:init()
 	self.blame.cop_explosion = "hint_alert_explosion"
 	self.blame.gan_explosion = "hint_alert_explosion"
 	self.blame.cam_explosion = "hint_alert_explosion"
+	self.blame.sys_blackmailer = "hint_blame_blackmailer"
+	self.blame.sys_gensec = "hint_blame_gensec"
+	self.blame.sys_police_alerted = "hint_blame_police_alerted"
+	self.blame.sys_csgo_gunfire = "hint_blame_csgo_gunfire"
 	self.blame.met_criminal = "hint_met_criminal"
 	self.blame.mot_criminal = "hint_mot_criminal"
 	self.blame.gls_alarm = "hint_alarm_glass"
@@ -2531,6 +2598,11 @@ function TweakData:init()
 	}
 	self.casino.infamous_cost = 30000000
 	self.casino.infamous_chance = 3
+	self.grenades = {}
+	self.grenades.frag = {}
+	self.grenades.frag.damage = 30
+	self.grenades.frag.player_damage = 10
+	self.grenades.frag.range = 1000
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()

@@ -57,3 +57,10 @@ function UnitDamage:play_collision_sfx(other_unit, position, normal, collision_v
 	ss:set_position(position)
 	ss:post_event(self._collision_event)
 end
+
+function UnitDamage:set_update_callback(func_name, ...)
+	if func_name == "update_proximity_list" and not Network:is_server() and self._unit:id() ~= -1 then
+		return
+	end
+	UnitDamage.super.set_update_callback(self, func_name, ...)
+end

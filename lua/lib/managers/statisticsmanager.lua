@@ -1569,6 +1569,12 @@ function StatisticsManager:session_total_kills()
 	return self._global.session.killed.total.count
 end
 
+function StatisticsManager:session_total_shots(weapon_type)
+	local weapon = weapon_type == "primaries" and managers.blackmarket:equipped_primary() or managers.blackmarket:equipped_secondary()
+	local weapon_data = weapon and self._global.session.shots_by_weapon[weapon.weapon_id]
+	return weapon_data and weapon_data.total or 0
+end
+
 function StatisticsManager:session_total_specials_kills()
 	return self._global.session.killed.shield.count + self._global.session.killed.spooc.count + self._global.session.killed.tank.count + self._global.session.killed.taser.count
 end

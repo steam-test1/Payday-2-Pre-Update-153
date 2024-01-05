@@ -51,7 +51,7 @@ function MissionScriptElement:_check_instigator(instigator)
 	return managers.player:player_unit()
 end
 
-function MissionScriptElement:on_executed(instigator, alternative)
+function MissionScriptElement:on_executed(instigator, alternative, skip_execute_on_executed)
 	if not self._values.enabled then
 		return
 	end
@@ -66,7 +66,13 @@ function MissionScriptElement:on_executed(instigator, alternative)
 	self._last_orientation_index = nil
 	self:_print_debug_on_executed(instigator)
 	self:_reduce_trigger_times()
-	if 0 < self._values.base_delay then
+	if not skip_execute_on_executed or CoreClass.type_name(skip_execute_on_executed) ~= "boolean" then
+		self:_trigger_execute_on_executed(instigator, alternative)
+	end
+end
+
+function MissionScriptElement:_trigger_execute_on_executed(instigator, alternative)
+	if self._values.base_delay > 0 then
 		self._mission_script:add(callback(self, self, "_execute_on_executed", {instigator = instigator, alternative = alternative}), self._values.base_delay, 1)
 	else
 		self:execute_on_executed({instigator = instigator, alternative = alternative})

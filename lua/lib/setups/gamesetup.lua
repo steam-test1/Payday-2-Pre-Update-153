@@ -150,6 +150,8 @@ require("lib/units/props/SmallLootBase")
 require("lib/units/props/SafehouseMoneyStack")
 require("lib/units/props/OffshoreGui")
 require("lib/units/props/Ladder")
+require("lib/units/props/DigitalGui")
+require("lib/units/vehicles/SimpleVehicle")
 require("lib/managers/menu/FadeoutGuiObject")
 GameSetup = GameSetup or class(Setup)
 

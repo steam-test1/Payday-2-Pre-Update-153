@@ -4,11 +4,35 @@ ElementTimer = ElementTimer or class(CoreMissionScriptElement.MissionScriptEleme
 
 function ElementTimer:init(...)
 	ElementTimer.super.init(self, ...)
+	self._digital_gui_units = {}
 	self._timer = self._values.timer
 	self._triggers = {}
 end
 
 function ElementTimer:on_script_activated()
+	if not Network:is_server() then
+		return
+	end
+	if self._values.digital_gui_unit_ids then
+		for _, id in ipairs(self._values.digital_gui_unit_ids) do
+			if Global.running_simulation then
+				local unit = managers.editor:unit_with_id(id)
+				table.insert(self._digital_gui_units, unit)
+				unit:digital_gui():timer_set(self._timer)
+			else
+				local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "_load_unit"))
+				if unit then
+					table.insert(self._digital_gui_units, unit)
+					unit:digital_gui():timer_set(self._timer)
+				end
+			end
+		end
+	end
+end
+
+function ElementTimer:_load_unit(unit)
+	table.insert(self._digital_gui_units, unit)
+	unit:digital_gui():timer_set(self._timer)
 end
 
 function ElementTimer:set_enabled(enabled)
@@ -58,26 +82,64 @@ end
 
 function ElementTimer:timer_operation_pause()
 	self:remove_updator()
+	self:_pause_digital_guis()
 end
 
 function ElementTimer:timer_operation_start()
 	self:add_updator()
+	self:_start_digital_guis_count_down()
 end
 
 function ElementTimer:timer_operation_add_time(time)
 	self._timer = self._timer + time
+	self:_update_digital_guis_timer()
 end
 
 function ElementTimer:timer_operation_subtract_time(time)
 	self._timer = self._timer - time
+	self:_update_digital_guis_timer()
 end
 
 function ElementTimer:timer_operation_reset()
 	self._timer = self._values.timer
+	self:_update_digital_guis_timer()
 end
 
 function ElementTimer:timer_operation_set_time(time)
 	self._timer = time
+	self:_update_digital_guis_timer()
+end
+
+function ElementTimer:_update_digital_guis_timer()
+	for _, unit in ipairs(self._digital_gui_units) do
+		if alive(unit) then
+			unit:digital_gui():timer_set(self._timer, true)
+		end
+	end
+end
+
+function ElementTimer:_start_digital_guis_count_down()
+	for _, unit in ipairs(self._digital_gui_units) do
+		if alive(unit) then
+			unit:digital_gui():timer_start_count_down(true)
+		end
+	end
+end
+
+function ElementTimer:_start_digital_guis_count_up()
+	for _, unit in ipairs(self._digital_gui_units) do
+		if alive(unit) then
+			unit:digital_gui():timer_start_count_up(true)
+		end
+	end
+end
+
+function ElementTimer:_pause_digital_guis()
+	for _, unit in ipairs(self._digital_gui_units) do
+		if alive(unit) then
+			unit:digital_gui():timer_pause(true)
+		end
+	end
 end
 
 function ElementTimer:add_trigger(id, time, callback)

@@ -1355,7 +1355,7 @@ function NarrativeTweakData:init()
 	self.jobs.roberts.briefing_id = "heist_roberts_crimenet"
 	self.jobs.roberts.contact = "bain"
 	self.jobs.roberts.region = "street"
-	self.jobs.roberts.jc = 40
+	self.jobs.roberts.jc = 30
 	self.jobs.roberts.chain = {
 		{
 			level_id = "roberts",
@@ -1363,7 +1363,7 @@ function NarrativeTweakData:init()
 			type = "d"
 		}
 	}
-	self.jobs.roberts.briefing_event = "Play_pln_cs1_brf"
+	self.jobs.roberts.briefing_event = "pln_cs1_cbf_01"
 	self.jobs.roberts.debrief_event = nil
 	self.jobs.roberts.crimenet_callouts = {
 		"pln_cs1_cnc_01",
@@ -1376,10 +1376,10 @@ function NarrativeTweakData:init()
 		"cn_jewel3"
 	}
 	self.jobs.roberts.payout = {
+		26000,
 		37000,
-		43000,
-		60000,
-		70000
+		81000,
+		101000
 	}
 	self.jobs.roberts_prof = deep_clone(self.jobs.roberts)
 	self.jobs.roberts_prof.jc = 40
@@ -1458,6 +1458,42 @@ function NarrativeTweakData:init()
 	self.jobs.haunted_prof.professional = true
 	self.jobs.haunted_prof.region = "professional"
 	self.jobs.haunted_prof.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.monolithic_1 = {}
+	self.jobs.monolithic_1.name_id = "heist_monolithic_1"
+	self.jobs.monolithic_1.briefing_id = "heist_monolithic_1_crimenet"
+	self.jobs.monolithic_1.contact = "bain"
+	self.jobs.monolithic_1.region = "street"
+	self.jobs.monolithic_1.jc = 10
+	self.jobs.monolithic_1.chain = {
+		{
+			level_id = "monolithic_1",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.monolithic_1.briefing_event = nil
+	self.jobs.monolithic_1.debrief_event = nil
+	self.jobs.monolithic_1.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.monolithic_1.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.monolithic_1 = deep_clone(self.jobs.monolithic_1)
+	self.jobs.monolithic_1.jc = 40
+	self.jobs.monolithic_1.professional = true
+	self.jobs.monolithic_1.region = "professional"
+	self.jobs.monolithic_1.payout = {
 		10000,
 		20000,
 		30000,
@@ -1545,6 +1581,7 @@ function NarrativeTweakData:init()
 		"branchbank_gold_prof",
 		"branchbank_prof",
 		"family",
+		"roberts",
 		"arm_fac",
 		"arm_par",
 		"arm_hcm",

@@ -166,6 +166,7 @@ function CoreUnitDamage:populate_proximity_range_data(data, sub_data_name, eleme
 		data[sub_data_name].activation_count = 0
 		data[sub_data_name].max_activation_count = element:get_max_activation_count()
 		data[sub_data_name].delay = element:get_delay()
+		data[sub_data_name].last_check_time = TimerManager:game():time() + math.rand(math.min(data[sub_data_name].delay, 0))
 		data[sub_data_name].range = element:get_range()
 		data[sub_data_name].count = element:get_count()
 		data[sub_data_name].is_within = sub_data_name == "within_data"
@@ -196,37 +197,60 @@ function CoreUnitDamage:update_proximity_list(unit, t, dt)
 	if managers.sequence:is_proximity_enabled() then
 		for name, data in pairs(self._proximity_map) do
 			if data.enabled and t >= data.last_check_time + data.interval then
-				local range_data, reversed
+				local range_data, reversed, range_data_string
 				if data.is_within then
 					range_data = data.outside_data
+					range_data_string = "outside_data"
 					if not range_data then
 						range_data = data.within_data
+						range_data_string = "within_data"
 						reversed = true
 					else
 						reversed = false
 					end
 				else
 					range_data = data.within_data
+					range_data_string = "within_data"
 					if not range_data then
 						range_data = data.outside_data
+						range_data_string = "outside_data"
 						reversed = true
 					else
 						reversed = false
 					end
 				end
-				if self:check_proximity_activation_count(data) and t >= data.last_check_time + range_data.delay and self:update_proximity(unit, t, dt, data, range_data) ~= reversed then
-					data.last_check_time = t
+				data.last_check_time = t
+				if self:check_proximity_activation_count(data) and t >= range_data.last_check_time + range_data.delay and self:update_proximity(unit, t, dt, data, range_data) ~= reversed then
+					range_data.last_check_time = t
 					data.is_within = not data.is_within
 					if not reversed and self:is_proximity_range_active(range_data) then
 						range_data.activation_count = range_data.activation_count + 1
-						self._proximity_env = self._proximity_env or CoreSequenceManager.SequenceEnvironment:new("proximity", self._unit, self._unit, nil, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, Vector3(0, 0, 0), nil, self._unit_element)
-						range_data.element:activate_elements(self._proximity_env)
+						self:_do_proximity_activation(range_data)
+						self:_check_send_sync_proximity_activation(name, range_data_string)
 						self:check_proximity_activation_count(data)
 					end
 				end
 			end
 		end
 	end
+end
+
+function CoreUnitDamage:_do_proximity_activation(range_data)
+	self._proximity_env = self._proximity_env or CoreSequenceManager.SequenceEnvironment:new("proximity", self._unit, self._unit, nil, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, Vector3(0, 0, 0), nil, self._unit_element)
+	range_data.element:activate_elements(self._proximity_env)
+end
+
+function CoreUnitDamage:_check_send_sync_proximity_activation(name, range_data_string)
+	if not Network:is_server() or self._unit:id() == -1 then
+		return
+	end
+	managers.network:session():send_to_peers_synched("sync_proximity_activation", self._unit, name, range_data_string)
+end
+
+function CoreUnitDamage:sync_proximity_activation(name, range_data_string)
+	local data = self._proximity_map[name]
+	local range_data = data[range_data_string]
+	self:_do_proximity_activation(range_data)
 end
 
 function CoreUnitDamage:is_proximity_range_active(range_data)
@@ -249,11 +273,12 @@ function CoreUnitDamage:update_proximity(unit, t, dt, data, range_data)
 	else
 		pos = self._unit:position()
 	end
-	local unit_list
-	if range_data.quick then
-		unit_list = self._unit:find_units_quick("sphere", pos, range_data.range, data.slotmask)
-	else
-		unit_list = self._unit:find_units("sphere", pos, range_data.range, data.slotmask)
+	local unit_list = {}
+	local units = self._unit:find_units_quick("all", data.slotmask)
+	for _, unit in ipairs(units) do
+		if mvector3.distance(pos, unit:movement():m_newest_pos()) < range_data.range then
+			table.insert(unit_list, unit)
+		end
 	end
 	if data.is_within and range_data.is_within ~= data.is_within or not data.is_within and range_data.is_within == data.is_within then
 		return #unit_list <= range_data.count
@@ -573,14 +598,16 @@ function CoreUnitDamage:load(data)
 				self._proximity_map = self._proximity_map or {}
 				for attribute_name, attribute_value in pairs(data) do
 					if attribute_name == "ref_object" then
-						self._proximity_map[name][attribute_name] = attribute_value and self._unit:get_object(Idstring(attribute_value))
+						self._proximity_map[name][attribute_name] = attribute_value and self._unit:get_object(attribute_value)
 					elseif attribute_name == "slotmask" then
 						self._proximity_map[name][attribute_name] = managers.slot:get_mask(attribute_value)
 					elseif attribute_name == "last_check_time" then
 						self._proximity_map[name][attribute_name] = TimerManager:game():time() - attribute_value
 					elseif attribute_name == "within_data" or attribute_name == "outside_data" then
 						for range_attribute_name, range_attribute_value in pairs(attribute_value) do
-							self._proximity_map[name][attribute_name][range_attribute_name] = range_attribute_value
+							if range_attribute_name ~= "last_check_time" then
+								self._proximity_map[name][attribute_name][range_attribute_name] = range_attribute_value
+							end
 						end
 					else
 						self._proximity_map[name][attribute_name] = attribute_value

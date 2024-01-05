@@ -5,6 +5,8 @@ function CoreEditor:build_left_toolbar()
 	local left_upper_panel_sizer = EWS:BoxSizer("VERTICAL")
 	left_upper_panel:set_sizer(left_upper_panel_sizer)
 	self._left_upper_toolbar = EWS:ToolBar(left_upper_panel, "", "TB_FLAT,TB_VERTICAL,TB_NODIVIDER")
+	self._left_upper_toolbar:add_tool("TB_OPEN_WORLD_FOLDER", "Open world folder", CoreEWS.image_path("folder_open_16x16.png"), "Open world folder")
+	self._left_upper_toolbar:connect("TB_OPEN_WORLD_FOLDER", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_open_world_folder"), nil)
 	self._left_upper_toolbar:add_separator()
 	self._left_upper_toolbar:add_check_tool("TB_PERFORMANCE_HUD", "Performance Hud", icons_path .. "prefhud.bmp", "Performance Hud")
 	self._left_upper_toolbar:connect("TB_PERFORMANCE_HUD", "EVT_COMMAND_MENU_SELECTED", callback(managers.prefhud, managers.prefhud, "toggle"), managers.prefhud)
@@ -96,4 +98,10 @@ function CoreEditor:on_list_units()
 	end
 	self:output("", true)
 	self:output("Total units: " .. total .. " Total Unique: " .. table.size(amount))
+end
+
+function CoreEditor:on_open_world_folder()
+	if self._opendir then
+		os.execute("explorer " .. self._opendir)
+	end
 end

@@ -133,7 +133,7 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 						end
 					end
 					if 0 < #dlc_global_values then
-						global_value = dlc_global_values[math.random(#dlc_global_values)]
+						global_value = fixed_global_value or dlc_global_values[math.random(#dlc_global_values)]
 					else
 						pass_dlc = false
 					end

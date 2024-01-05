@@ -9,8 +9,152 @@ end
 
 function CoreCounterUnitElement:init(unit)
 	MissionElement.init(self, unit)
+	self._digital_gui_units = {}
 	self._hed.counter_target = 0
+	self._hed.digital_gui_unit_ids = {}
 	table.insert(self._save_values, "counter_target")
+	table.insert(self._save_values, "digital_gui_unit_ids")
+end
+
+function CoreCounterUnitElement:layer_finished()
+	MissionElement.layer_finished(self)
+	for _, id in pairs(self._hed.digital_gui_unit_ids) do
+		local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "load_unit"))
+		if unit then
+			self._digital_gui_units[unit:unit_data().unit_id] = unit
+		end
+	end
+end
+
+function CoreCounterUnitElement:load_unit(unit)
+	if unit then
+		self._digital_gui_units[unit:unit_data().unit_id] = unit
+	end
+end
+
+function CoreCounterUnitElement:update_selected()
+	for _, id in pairs(self._hed.digital_gui_unit_ids) do
+		if not alive(self._digital_gui_units[id]) then
+			table.delete(self._hed.digital_gui_unit_ids, id)
+			self._digital_gui_units[id] = nil
+		end
+	end
+	for id, unit in pairs(self._digital_gui_units) do
+		if not alive(unit) then
+			table.delete(self._hed.digital_gui_unit_ids, id)
+			self._digital_gui_units[id] = nil
+		else
+			local params = {
+				from_unit = self._unit,
+				to_unit = unit,
+				r = 0,
+				g = 1,
+				b = 0
+			}
+			self:_draw_link(params)
+			Application:draw(unit, 0, 1, 0)
+		end
+	end
+end
+
+function CoreCounterUnitElement:update_unselected(t, dt, selected_unit, all_units)
+	for _, id in pairs(self._hed.digital_gui_unit_ids) do
+		if not alive(self._digital_gui_units[id]) then
+			table.delete(self._hed.digital_gui_unit_ids, id)
+			self._digital_gui_units[id] = nil
+		end
+	end
+	for id, unit in pairs(self._digital_gui_units) do
+		if not alive(unit) then
+			table.delete(self._hed.digital_gui_unit_ids, id)
+			self._digital_gui_units[id] = nil
+		end
+	end
+end
+
+function CoreCounterUnitElement:draw_links_unselected(...)
+	CoreCounterUnitElement.super.draw_links_unselected(self, ...)
+	for id, unit in pairs(self._digital_gui_units) do
+		local params = {
+			from_unit = self._unit,
+			to_unit = unit,
+			r = 0,
+			g = 0.5,
+			b = 0
+		}
+		self:_draw_link(params)
+		Application:draw(unit, 0, 0.5, 0)
+	end
+end
+
+function CoreCounterUnitElement:update_editing()
+	local ray = managers.editor:unit_by_raycast({
+		sample = true,
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
+	if ray and ray.unit and ray.unit:digital_gui() and ray.unit:digital_gui():is_number() then
+		Application:draw(ray.unit, 0, 1, 0)
+	end
+end
+
+function CoreCounterUnitElement:select_unit()
+	local ray = managers.editor:unit_by_raycast({
+		sample = true,
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
+	if ray and ray.unit and ray.unit:digital_gui() and ray.unit:digital_gui():is_number() then
+		local unit = ray.unit
+		if self._digital_gui_units[unit:unit_data().unit_id] then
+			self:_remove_unit(unit)
+		else
+			self:_add_unit(unit)
+		end
+	end
+end
+
+function CoreCounterUnitElement:_remove_unit(unit)
+	self._digital_gui_units[unit:unit_data().unit_id] = nil
+	table.delete(self._hed.digital_gui_unit_ids, unit:unit_data().unit_id)
+end
+
+function CoreCounterUnitElement:_add_unit(unit)
+	self._digital_gui_units[unit:unit_data().unit_id] = unit
+	table.insert(self._hed.digital_gui_unit_ids, unit:unit_data().unit_id)
+end
+
+function CoreCounterUnitElement:add_triggers(vc)
+	vc:add_trigger(Idstring("lmb"), callback(self, self, "select_unit"))
+end
+
+function CoreCounterUnitElement:add_unit_list_btn()
+	local function f(unit)
+		if self._digital_gui_units[unit:unit_data().unit_id] then
+			return false
+		end
+		return unit:digital_gui() and unit:digital_gui():is_number()
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Add Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		if not self._digital_gui_units[unit:unit_data().unit_id] then
+			self:_add_unit(unit)
+		end
+	end
+end
+
+function CoreCounterUnitElement:remove_unit_list_btn()
+	local function f(unit)
+		return self._digital_gui_units[unit:unit_data().unit_id]
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Remove Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		if self._digital_gui_units[unit:unit_data().unit_id] then
+			self:_remove_unit(unit)
+		end
+	end
 end
 
 function CoreCounterUnitElement:_build_panel(panel, panel_sizer)
@@ -38,6 +182,13 @@ function CoreCounterUnitElement:_build_panel(panel, panel_sizer)
 		ctrlr = counter_target,
 		value = "counter_target"
 	})
+	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	self._btn_toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	self._btn_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
+	self._btn_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	self._btn_toolbar:realize()
+	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
 end
 
 CoreCounterOperatorUnitElement = CoreCounterOperatorUnitElement or class(MissionElement)

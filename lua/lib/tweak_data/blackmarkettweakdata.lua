@@ -867,6 +867,18 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.eagle.qlvl = 0
 	self.masks.eagle.texture_bundle_folder = "gage_pack"
 	self.masks.eagle.dlc = "gage_pack"
+	self.masks.santa_happy = {}
+	self.masks.santa_happy.unit = "units/pd2_dlc2/masks/msk_santa_happy/msk_santa_happy"
+	self.masks.santa_happy.name_id = "bm_msk_santa_happy"
+	self.masks.santa_happy.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.santa_happy.value = 4
+	self.masks.santa_happy.dlc = "pd2_clan"
+	self.masks.santa_happy.global_value = "pd2_clan"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

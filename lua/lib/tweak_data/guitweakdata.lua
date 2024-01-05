@@ -33,9 +33,17 @@ function GuiTweakData:init()
 			date_id = "menu_content_gage_pack_date",
 			store = 267380,
 			image = "guis/textures/pd2/content_updates/gage_pack"
+		},
+		{
+			id = "charliesierra",
+			name_id = "menu_content_charliesierra",
+			desc_id = "menu_content_charliesierra_desc",
+			date_id = "menu_content_charliesierra_date",
+			webpage = "http://www.overkillsoftware.com/charliesanta/",
+			image = "guis/textures/pd2/content_updates/charliesierra"
 		}
 	}
-	self.num_previous_updates = 3
+	self.num_previous_updates = 6
 	self.suspicion_to_visibility = {}
 	self.suspicion_to_visibility[1] = {}
 	self.suspicion_to_visibility[1].name_id = "bm_menu_concealment_low"
@@ -1027,6 +1035,18 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
+		},
+		{
+			id = "casino",
+			name_id = "menu_cn_casino",
+			desc_id = "menu_cn_casino_desc",
+			menu_node = "crimenet_contract_casino",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_casino",
+			unlock = "unlock_level",
+			pulse = true,
+			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {

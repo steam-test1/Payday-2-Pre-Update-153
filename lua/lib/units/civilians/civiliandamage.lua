@@ -11,6 +11,9 @@ function CivilianDamage:die(variant)
 	if self._unit:unit_data().mission_element then
 		self._unit:unit_data().mission_element:event("death", self._unit)
 	end
+	if alive(managers.interaction:active_object()) then
+		managers.interaction:active_object():interaction():selected()
+	end
 	variant = variant or "bullet"
 	self._health = 0
 	self._health_ratio = 0

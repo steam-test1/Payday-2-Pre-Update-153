@@ -413,6 +413,9 @@ function BlackMarketManager:equip_mask(slot)
 	if equipped == tweak_data.achievement.like_an_angry_bear then
 		managers.achievment:award("like_an_angry_bear")
 	end
+	if equipped == tweak_data.achievement.merry_christmas then
+		managers.achievment:award("charliesierra_3")
+	end
 	if equipped == tweak_data.achievement.heat_around_the_corner then
 		managers.achievment:award("armored_11")
 	end

@@ -112,6 +112,15 @@ function PlayerStandard:_enter(enter_data)
 	if not self:_changing_weapon() and not skip_equip then
 		if not self._state_data.mask_equipped then
 			self._state_data.mask_equipped = true
+			local equipped_mask = managers.blackmarket:equipped_mask()
+			local equipped_mask_type = tweak_data.blackmarket.masks[equipped_mask.mask_id].type
+			if not equipped_mask_type then
+				self._camera_unit:anim_state_machine():set_global("mask_equip", 1)
+			elseif equipped_mask_type == "glasses" then
+				self._camera_unit:anim_state_machine():set_global("glasses_equip", 1)
+			elseif equipped_mask_type == "helmet" then
+				self._camera_unit:anim_state_machine():set_global("helmet_equip", 1)
+			end
 			self:_start_action_equip(self.IDS_MASK_EQUIP, 1.6)
 		else
 			self:_start_action_equip(self.IDS_EQUIP)

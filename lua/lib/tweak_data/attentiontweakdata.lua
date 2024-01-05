@@ -627,6 +627,16 @@ function AttentionTweakData:_init_prop()
 		release_delay = 1,
 		notice_requires_FOV = true
 	}
+	self.settings.no_staff_ene_ntl = {
+		reaction = "REACT_AIM",
+		filter = "law_enforcer",
+		verification_interval = 0.4,
+		uncover_range = 100,
+		suspicion_range = 1000,
+		max_range = 1200,
+		release_delay = 1,
+		notice_requires_FOV = true
+	}
 end
 
 function AttentionTweakData:get_attention_index(setting_name)

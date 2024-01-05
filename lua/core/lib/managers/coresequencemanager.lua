@@ -1640,7 +1640,7 @@ function UnitElement:init(node, name, is_global)
 				table.insert(water_node_list, child_node)
 			elseif element_name == "proximities" then
 				if not self._proximity_element then
-					self._proximity_element = ProximityElement:new(child_node, self)
+					self._proximity_element = ProximityElement:new(data, self)
 				else
 					Application:throw_exception("\"" .. tostring(node:name()) .. "\" element for unit \"" .. tostring(unit_element._name) .. "\" has more than one \"proximity\" element.")
 				end
@@ -2098,17 +2098,13 @@ ProximityElement = ProximityElement or class(BaseElement)
 function ProximityElement:init(node, unit_element)
 	BaseElement.init(self, node, unit_element)
 	self._element_map = {}
-	for child_node in node:children() do
-		if child_node:name() == "proximity" then
-			local element = ProximityTypeElement:new(child_node, unit_element)
-			local proximity_name = element:get_name()
-			if not self._element_map[proximity_name:key()] then
-				self._element_map[proximity_name:key()] = element
-			else
-				element:print_error("Proximity with name \"" .. proximity_name:t() .. "\" has already been defined.", false, nil)
-			end
+	for _, child_node in ipairs(node) do
+		local element = ProximityTypeElement:new(child_node, unit_element)
+		local proximity_name = element:get_name()
+		if not self._element_map[proximity_name] then
+			self._element_map[proximity_name] = element
 		else
-			self:check_invalid_node(child_node, {"proximity"})
+			element:print_error("Proximity with name \"" .. proximity_name:t() .. "\" has already been defined.", false, nil)
 		end
 	end
 end
@@ -2145,7 +2141,7 @@ function ProximityTypeElement:init(node, unit_element)
 	end
 	self._interval = self:get("interval")
 	self._interval = self._interval and tonumber(self._interval(SequenceEnvironment))
-	self._interval = math.min(tonumber(self._interval) or 0, self.MIN_INTERVAL)
+	self._interval = math.max(tonumber(self._interval) or 0, self.MIN_INTERVAL)
 	self._quick = self:get("quick")
 	self._quick = self._quick and self._quick(SequenceEnvironment) or true
 	self._start_within = self:get("start_within")
@@ -2155,22 +2151,23 @@ function ProximityTypeElement:init(node, unit_element)
 	end
 	self._within_element = nil
 	self._outside_element = nil
-	for child_node in node:children() do
-		local name = child_node:name()
+	for _, child_node in ipairs(node) do
+		local name = child_node._meta
 		if name == "within" then
 			if not self._within_element then
 				self._within_element = ProximityRangeElement:new(child_node, unit_element, true)
 			else
 				Application:throw_exception("Unit \"" .. tostring(unit_element._name) .. "\" have defined more than one \"within\" element.")
 			end
-		elseif name == "outside" then
-			if not self._outside_element then
-				self._outside_element = ProximityRangeElement:new(child_node, unit_element, false)
-			else
-				Application:throw_exception("Unit \"" .. tostring(unit_element._name) .. "\" have defined more than one \"outside\" element.")
-			end
 		else
-			self:check_invalid_node(child_node, {"within", "outside"})
+			if name == "outside" then
+				if not self._outside_element then
+					self._outside_element = ProximityRangeElement:new(child_node, unit_element, false)
+				else
+					Application:throw_exception("Unit \"" .. tostring(unit_element._name) .. "\" have defined more than one \"outside\" element.")
+				end
+			else
+			end
 		end
 	end
 	if (not self._within_element or #self._within_element._elements == 0) and (not self._outside_element or #self._outside_element._elements == 0) then
@@ -2231,8 +2228,8 @@ function ProximityRangeElement:init(node, unit_element, within)
 	if not self._range or 0 >= self._range then
 		Application:throw_exception("\"" .. tostring(name) .. "\" element on unit \"" .. tostring(unit_element._name) .. "\" doesn't have a range specified or it is not more than zero (specified range: " .. tostring(self._range) .. ").")
 	end
-	for child_node in node:children() do
-		local name = child_node:name()
+	for _, child_node in ipairs(node) do
+		local name = child_node._meta
 		if name == "run_sequence" then
 			local element = managers.sequence:parse_event(child_node, unit_element)
 			if element then

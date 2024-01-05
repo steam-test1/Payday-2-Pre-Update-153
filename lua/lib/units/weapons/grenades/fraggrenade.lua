@@ -3,11 +3,11 @@ FragGrenade = FragGrenade or class(GrenadeBase)
 function FragGrenade:init(unit)
 	self._init_timer = 2.5
 	FragGrenade.super.init(self, unit)
-	self._range = 1000
+	self._range = tweak_data.grenades.frag.range
 	self._effect_name = "effects/payday2/particles/explosions/grenade_explosion"
 	self._curve_pow = 3
-	self._damage = 20
-	self._player_damage = 10
+	self._damage = tweak_data.grenades.frag.damage
+	self._player_damage = tweak_data.grenades.frag.player_damage
 	self._custom_params = {
 		effect = self._effect_name,
 		sound_event = "grenade_explode",

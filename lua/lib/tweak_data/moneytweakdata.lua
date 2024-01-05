@@ -120,6 +120,7 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.overkill = 0.01
 	self.global_value_multipliers.pd2_clan = 1
 	self.global_value_multipliers.halloween = 1
+	self.global_value_multipliers.xmas = 1
 	self.global_value_multipliers.armored_transport = 1.2
 	self.global_value_multipliers.gage_pack = 1.4
 	self.global_value_multipliers.sweettooth = 1
@@ -133,6 +134,7 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.overkill = 20
 	self.global_value_bonus_multiplier.pd2_clan = 0
 	self.global_value_bonus_multiplier.halloween = 0
+	self.global_value_bonus_multiplier.xmas = 0
 	self.global_value_bonus_multiplier.armored_transport = 0.5
 	self.global_value_bonus_multiplier.gage_pack = 0.5
 	self.global_value_bonus_multiplier.sweettooth = 0
