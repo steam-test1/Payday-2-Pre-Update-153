@@ -355,17 +355,27 @@ function MusicManager:jukebox_default_tracks()
 		heist_alex1 = "track_08",
 		heist_alex2 = "track_07",
 		heist_alex3 = "track_02",
-		heist_big = "track_14",
-		heist_arm_cro = "track_09",
-		heist_arm_hcm = "track_09",
-		heist_arm_fac = "track_09",
-		heist_arm_par = "track_09",
-		heist_arm_und = "track_09",
+		heist_big = "all",
+		heist_arm_cro = "all",
+		heist_arm_hcm = "all",
+		heist_arm_fac = "all",
+		heist_arm_par = "all",
+		heist_arm_und = "all",
 		heist_ukrainian_job = "track_07",
 		heist_watchdogs1 = "track_02",
 		heist_watchdogs2 = "track_06",
 		escape = "track_16"
 	}
+	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_big = "track_14"
+	end
+	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_arm_cro = "track_09"
+		default_options.heist_arm_hcm = "track_09"
+		default_options.heist_arm_fac = "track_09"
+		default_options.heist_arm_par = "track_09"
+		default_options.heist_arm_und = "track_09"
+	end
 	return default_options
 end
 
@@ -422,6 +432,7 @@ function MusicManager:jukebox_menu_tracks()
 		"resultscreen_lose",
 		"preplanning_music",
 		"preplanning_music_old",
+		"lets_go_shopping_menu",
 		"criminals_ambition"
 	}
 	local pd2_tracks = {

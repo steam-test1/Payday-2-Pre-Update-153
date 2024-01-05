@@ -2967,14 +2967,19 @@ function MissionBriefingGui:on_ready_pressed(ready)
 end
 
 function MissionBriefingGui:input_focus()
-	if self._jukebox_item and self._jukebox_item.displayed then
-		return false
+	if self._jukebox_item then
+		if self._jukebox_item.displayed and not managers.menu:get_controller():get_input_bool("previous_page") then
+			return false
+		end
+		if self._jukebox_item.closing then
+			self._jukebox_item.closing = nil
+			return false
+		end
 	end
 	return self._displaying_asset and 1 or self._enabled
 end
 
 function MissionBriefingGui:scroll_up()
-	print("MissionBriefingGui:scroll_up")
 	if not (alive(self._panel) and alive(self._fullscreen_panel)) or not self._enabled then
 		return
 	end
@@ -2987,7 +2992,6 @@ function MissionBriefingGui:scroll_up()
 end
 
 function MissionBriefingGui:scroll_down()
-	print("MissionBriefingGui:scroll_down")
 	if not (alive(self._panel) and alive(self._fullscreen_panel)) or not self._enabled then
 		return
 	end
@@ -3246,6 +3250,7 @@ function JukeboxItem:select(no_sound)
 end
 
 function JukeboxItem:deselect()
+	self.closing = true
 	if managers.menu:active_menu() and managers.menu:active_menu().logic:selected_node() then
 		managers.menu:active_menu().logic:selected_node():parameters().block_back = false
 		managers.menu:back(true)

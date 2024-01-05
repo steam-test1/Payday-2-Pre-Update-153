@@ -145,6 +145,14 @@ function GuiTweakData:init()
 		store = 320030,
 		image = "guis/dlcs/gage_pack_assault/textures/pd2/content_updates/gage_pack_assault"
 	}
+	local jukebox = {
+		id = "jukebox",
+		name_id = "menu_content_jukebox",
+		desc_id = "menu_content_jukebox_desc",
+		date_id = "menu_content_jukebox_date",
+		webpage = "http://www.overkillsoftware.com/bigfatmusicupdate/",
+		image = "guis/textures/pd2/content_updates/jukebox"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -169,7 +177,8 @@ function GuiTweakData:init()
 			kosugi,
 			big_bank,
 			gage_pack_shotgun,
-			gage_pack_assault
+			gage_pack_assault,
+			jukebox
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

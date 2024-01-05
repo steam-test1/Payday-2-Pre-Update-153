@@ -789,7 +789,11 @@ function LevelsTweakData:get_music_switches()
 			table.insert(switches, track)
 		end
 	elseif Global.music_manager.loadout_selection == "server" then
-		table.insert(switches, Global.music_manager.synced_track)
+		if Network:is_server() then
+			switches = managers.music:jukebox_random_all()
+		else
+			table.insert(switches, Global.music_manager.synced_track)
+		end
 	else
 		table.insert(switches, Global.music_manager.loadout_selection)
 	end
