@@ -14,6 +14,7 @@ function FeatureManager:_setup()
 	self._default.announcements.blackmarket_rename = 1
 	self._default.announcements.join_pd2_clan = 50
 	self._default.announcements.perk_deck = 3
+	self._default.announcements.freed_old_hoxton = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -23,6 +24,7 @@ function FeatureManager:_setup()
 		Global.feature_manager.announcements.crimenet_welcome = 3
 		Global.feature_manager.announcements.dlc_gage_pack_jobs = 1
 		Global.feature_manager.announcements.join_pd2_clan = 50
+		Global.feature_manager.announcements.freed_old_hoxton = 1
 		Global.feature_manager.announced = {}
 	end
 	self._global = Global.feature_manager
@@ -155,6 +157,15 @@ function FeatureManager:perk_deck()
 	managers.menu:show_new_message_dialog({
 		title = "menu_feature_perk_deck",
 		text = "menu_feature_perk_deck_desc"
+	})
+	return true
+end
+
+function FeatureManager:freed_old_hoxton()
+	print("FeatureManager:freed_old_hoxton()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_freed_old_hoxton",
+		text = "menu_feature_freed_old_hoxton_desc"
 	})
 	return true
 end

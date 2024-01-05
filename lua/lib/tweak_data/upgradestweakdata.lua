@@ -535,6 +535,29 @@ function UpgradesTweakData:_init_pd2_values()
 		0.85,
 		0.8
 	}
+	self.values.player.headshot_regen_armor_bonus = {0.8, 1.6}
+	self.values.pistol.stacking_hit_damage_multiplier = {0.1}
+	self.max_weapon_dmg_mul_stacks = 4
+	self.values.bodybags_bag.quantity = {1}
+	self.values.first_aid_kit.quantity = {3, 10}
+	self.values.first_aid_kit.deploy_time_multiplier = {0.5}
+	self.values.first_aid_kit.damage_reduction_upgrade = {true}
+	self.values.first_aid_kit.downs_restore_chance = {0.1}
+	self.values.temporary.first_aid_damage_reduction = {
+		{0.8, 10}
+	}
+	self.values.player.extra_corpse_dispose_amount = {1}
+	self.values.player.standstill_omniscience = {true}
+	self.values.player.mask_off_pickup = {true}
+	self.values.player.cleaner_cost_multiplier = {0.75}
+	self.values.player.counter_strike_melee = {true}
+	self.values.player.counter_strike_spooc = {true}
+	self.values.temporary.passive_revive_damage_reduction = {
+		{0.9, 5},
+		{0.7, 5}
+	}
+	self.values.player.passive_convert_enemies_health_multiplier = {0.4, 0.2}
+	self.values.player.hostage_health_regen_addend = {0.8, 0.02}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -553,8 +576,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{"175%"}
 		},
 		black_marketeer = {
-			{"0.3%", "5"},
-			{"1%", "5"}
+			{"0.6%", "5"},
+			{"2%", "5"}
 		},
 		blast_radius = {
 			{"70%"},
@@ -585,8 +608,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{"30%"}
 		},
 		control_freak = {
-			{"10%"},
-			{"20%"}
+			{"10%", "40%"},
+			{"20%", "40%"}
 		},
 		discipline = {
 			{"50%"},
@@ -865,6 +888,110 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%", "250%"},
 			{"25%", "100%"}
 		},
+		hoxton = {
+			{"4"},
+			{}
+		},
+		freedom_call = {
+			{"20%"},
+			{"15%"}
+		},
+		hidden_blade = {
+			{"2"},
+			{"95%"}
+		},
+		tea_time = {
+			{"50%"},
+			{"20%", "10"}
+		},
+		awareness = {
+			{"10%"},
+			{}
+		},
+		alpha_dog = {
+			{"5%"},
+			{"10%"}
+		},
+		tea_cookies = {
+			{"3"},
+			{"7"}
+		},
+		cell_mates = {
+			{"10%"},
+			{"25%"}
+		},
+		thug_life = {
+			{"1"},
+			{"75%"}
+		},
+		thick_skin = {
+			{"10"},
+			{"20"}
+		},
+		backstab = {
+			{
+				"3%",
+				"3",
+				"35",
+				"30%"
+			},
+			{
+				"3%",
+				"1",
+				"35",
+				"30%"
+			}
+		},
+		drop_soap = {
+			{},
+			{}
+		},
+		second_chances = {
+			{},
+			{"2"}
+		},
+		trigger_happy = {
+			{
+				"10%",
+				"2",
+				"4"
+			},
+			{"8"}
+		},
+		perseverance = {
+			{
+				"0",
+				"3",
+				"60%"
+			},
+			{"6"}
+		},
+		jail_workout = {
+			{"3.5", "10"},
+			{}
+		},
+		akimbo = {
+			{"50%"},
+			{"25%", "150%"}
+		},
+		jail_diet = {
+			{
+				"1%",
+				"3",
+				"35",
+				"10%"
+			},
+			{
+				"1%",
+				"1",
+				"35",
+				"10%"
+			}
+		},
+		prison_wife = {
+			{"16", "3"},
+			{"16", "3"}
+		},
 		mastermind_tier1 = {
 			{"20%"}
 		},
@@ -940,6 +1067,24 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		ghost_tier6 = {
 			{"10%", "15%"}
+		},
+		hoxton_tier1 = {
+			{}
+		},
+		hoxton_tier2 = {
+			{}
+		},
+		hoxton_tier3 = {
+			{}
+		},
+		hoxton_tier4 = {
+			{}
+		},
+		hoxton_tier5 = {
+			{}
+		},
+		hoxton_tier6 = {
+			{}
 		}
 	}
 	self.skill_descs = {}
@@ -1051,6 +1196,21 @@ function UpgradesTweakData:_init_pd2_values()
 				"125%",
 				"10%"
 			}
+		},
+		{
+			{"10%"},
+			{"25%"},
+			{"10%"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"10%"},
+			{"135%"},
+			{"15%"},
+			{"5%", "20%"},
+			{"10%", "10%"}
 		}
 	}
 	self.specialization_descs = {}
@@ -1389,6 +1549,7 @@ function UpgradesTweakData:init()
 		30
 	}
 	self.values.ecm_jammer = self.values.ecm_jammer or {}
+	self.values.first_aid_kit = self.values.first_aid_kit or {}
 	self.values.sentry_gun = self.values.sentry_gun or {}
 	self.steps.sentry_gun = {}
 	self.values.doctor_bag = self.values.doctor_bag or {}
@@ -1423,6 +1584,8 @@ function UpgradesTweakData:init()
 	self:_cable_tie_definitions()
 	self:_sentry_gun_definitions()
 	self:_armor_kit_definitions()
+	self:_first_aid_kit_definitions()
+	self:_bodybags_bag_definitions()
 	self:_rep_definitions()
 	self:_jowi_definitions()
 	self:_x_1911_definitions()
@@ -1431,6 +1594,7 @@ function UpgradesTweakData:init()
 	self:_g26_definitions()
 	self:_akimbo_definitions()
 	self:_kabartanto_definitions()
+	self:_toothbrush_definitions()
 	self:_olympic_definitions()
 	self:_amcar_definitions()
 	self:_m16_definitions()
@@ -1545,6 +1709,8 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.sentry_gun = {}
 	self.values.doctor_bag = {}
 	self.values.cable_tie = {}
+	self.values.bodybags_bag = {}
+	self.values.first_aid_kit = {}
 	self.values.weapon = {}
 	self.values.pistol = {}
 	self.values.assault_rifle = {}
@@ -2206,6 +2372,215 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "tier_armor_multiplier",
 			value = 3
+		}
+	}
+	self.definitions.player_passive_convert_enemies_health_multiplier_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_passive_convert_enemies_health_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "passive_convert_enemies_health_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_passive_convert_enemies_health_multiplier_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_passive_convert_enemies_health_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "passive_convert_enemies_health_multiplier",
+			value = 2
+		}
+	}
+	self.definitions.player_counter_strike_melee = {
+		category = "feature",
+		name_id = "menu_player_counter_strike_melee",
+		upgrade = {
+			category = "player",
+			upgrade = "counter_strike_melee",
+			value = 1
+		}
+	}
+	self.definitions.player_counter_strike_spooc = {
+		category = "feature",
+		name_id = "menu_player_counter_strike_spooc",
+		upgrade = {
+			category = "player",
+			upgrade = "counter_strike_spooc",
+			value = 1
+		}
+	}
+	self.definitions.player_extra_corpse_dispose_amount = {
+		category = "feature",
+		name_id = "menu_player_extra_corpse_dispose_amount",
+		upgrade = {
+			category = "player",
+			upgrade = "extra_corpse_dispose_amount",
+			value = 1
+		}
+	}
+	self.definitions.player_armor_regen_timer_multiplier_tier = {
+		category = "feature",
+		name_id = "menu_player_armor_regen_timer_multiplier_tier",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_regen_timer_multiplier_tier",
+			value = 1
+		}
+	}
+	self.definitions.player_standstill_omniscience = {
+		category = "feature",
+		name_id = "menu_player_standstill_omniscience",
+		upgrade = {
+			category = "player",
+			upgrade = "standstill_omniscience",
+			value = 1
+		}
+	}
+	self.definitions.player_mask_off_pickup = {
+		category = "feature",
+		name_id = "menu_player_mask_off_pickup",
+		upgrade = {
+			category = "player",
+			upgrade = "mask_off_pickup",
+			value = 1
+		}
+	}
+	self.definitions.player_cleaner_cost_multiplier = {
+		category = "feature",
+		name_id = "menu_player_cleaner_cost_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "cleaner_cost_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_level_2_armor_addend = {
+		category = "feature",
+		name_id = "menu_player_level_2_armor_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_2_armor_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_3_armor_addend = {
+		category = "feature",
+		name_id = "menu_player_level_3_armor_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_3_armor_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_4_armor_addend = {
+		category = "feature",
+		name_id = "menu_player_level_4_armor_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_4_armor_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_2_dodge_addend_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_2_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_2_dodge_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_3_dodge_addend_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_3_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_3_dodge_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_4_dodge_addend_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_4_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_4_dodge_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_level_2_dodge_addend_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_2_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_2_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_level_3_dodge_addend_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_3_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_3_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_level_4_dodge_addend_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_4_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_4_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_level_2_dodge_addend_3 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_2_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_2_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_level_3_dodge_addend_3 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_3_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_3_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_level_4_dodge_addend_3 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_level_4_dodge_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "level_4_dodge_addend",
+			value = 2
+		}
+	}
+	self.definitions.player_damage_shake_addend = {
+		category = "feature",
+		name_id = "menu_player_damage_shake_addend",
+		upgrade = {
+			category = "player",
+			upgrade = "damage_shake_addend",
+			value = 1
 		}
 	}
 	for i, value in ipairs(self.values.player.perk_armor_regen_timer_multiplier) do
@@ -6311,6 +6686,33 @@ function UpgradesTweakData:_temporary_definitions()
 			value = 2
 		}
 	}
+	self.definitions.temporary_first_aid_damage_reduction = {
+		category = "temporary",
+		name_id = "menu_temporary_first_aid_damage_reduction",
+		upgrade = {
+			category = "temporary",
+			upgrade = "first_aid_damage_reduction",
+			value = 1
+		}
+	}
+	self.definitions.temporary_passive_revive_damage_reduction_1 = {
+		category = "feature",
+		name_id = "menu_passive_revive_damage_reduction_1",
+		upgrade = {
+			category = "temporary",
+			upgrade = "passive_revive_damage_reduction_1",
+			value = 1
+		}
+	}
+	self.definitions.temporary_passive_revive_damage_reduction_2 = {
+		category = "feature",
+		name_id = "menu_passive_revive_damage_reduction",
+		upgrade = {
+			category = "temporary",
+			upgrade = "passive_revive_damage_reduction",
+			value = 2
+		}
+	}
 end
 
 function UpgradesTweakData:_shape_charge_definitions()
@@ -7422,6 +7824,83 @@ function UpgradesTweakData:_akimbo_definitions()
 	}
 end
 
+function UpgradesTweakData:_first_aid_kit_definitions()
+	self.definitions.first_aid_kit = {
+		category = "equipment",
+		equipment_id = "first_aid_kit",
+		name_id = "menu_equipment_first_aid_kit",
+		slot = 1
+	}
+	self.definitions.first_aid_kit_quantity_increase_1 = {
+		category = "equipment_upgrade",
+		incremental = true,
+		name_id = "menu_first_aid_kit_quantity_1",
+		upgrade = {
+			category = "first_aid_kit",
+			upgrade = "quantity",
+			value = 1
+		}
+	}
+	self.definitions.first_aid_kit_quantity_increase_2 = {
+		category = "equipment_upgrade",
+		incremental = true,
+		name_id = "menu_first_aid_kit_quantity_2",
+		upgrade = {
+			category = "first_aid_kit",
+			upgrade = "quantity",
+			value = 1
+		}
+	}
+	self.definitions.first_aid_kit_deploy_time_multiplier = {
+		category = "equipment_upgrade",
+		incremental = true,
+		name_id = "menu_first_aid_kit_deploy_time_multiplier",
+		upgrade = {
+			category = "first_aid_kit",
+			upgrade = "deploy_time_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.first_aid_kit_damage_reduction_upgrade = {
+		category = "equipment_upgrade",
+		incremental = true,
+		name_id = "menu_first_aid_kit_damage_reduction_upgrade",
+		upgrade = {
+			category = "first_aid_kit",
+			upgrade = "damage_reduction_upgrade",
+			value = 1
+		}
+	}
+	self.definitions.first_aid_kit_downs_restore_chance = {
+		category = "equipment_upgrade",
+		incremental = true,
+		name_id = "menu_first_aid_kit_downs_restore_chance",
+		upgrade = {
+			category = "first_aid_kit",
+			upgrade = "downs_restore_chance",
+			value = 1
+		}
+	}
+end
+
+function UpgradesTweakData:_bodybags_bag_definitions()
+	self.definitions.bodybags_bag = {
+		category = "equipment",
+		equipment_id = "bodybags_bag",
+		name_id = "menu_equipment_bodybags_bag",
+		slot = 1
+	}
+	self.definitions.bodybags_bag_quantity = {
+		category = "equipment_upgrade",
+		name_id = "menu_bodybags_bag_quantity",
+		upgrade = {
+			category = "bodybags_bag",
+			upgrade = "quantity",
+			value = 1
+		}
+	}
+end
+
 function UpgradesTweakData:_jowi_definitions()
 	self.definitions.jowi = {
 		category = "weapon",
@@ -7465,6 +7944,13 @@ end
 
 function UpgradesTweakData:_kabartanto_definitions()
 	self.definitions.kabartanto = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_toothbrush_definitions()
+	self.definitions.toothbrush = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
 	}

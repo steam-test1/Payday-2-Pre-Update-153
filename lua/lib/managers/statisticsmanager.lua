@@ -437,10 +437,13 @@ function StatisticsManager:_get_stat_tables()
 		"alex_3",
 		"watchdogs_1",
 		"watchdogs_2",
+		"watchdogs_1_night",
+		"watchdogs_2_day",
 		"firestarter_1",
 		"firestarter_2",
 		"firestarter_3",
 		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
 		"escape_cafe_day",
 		"escape_park_day",
@@ -464,7 +467,8 @@ function StatisticsManager:_get_stat_tables()
 		"kosugi",
 		"big",
 		"mia_1",
-		"mia_2"
+		"mia_2",
+		"gallery"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -497,7 +501,8 @@ function StatisticsManager:_get_stat_tables()
 		"kosugi",
 		"big",
 		"mia",
-		"mia_prof"
+		"mia_prof",
+		"gallery"
 	}
 	local mask_list = {
 		"character_locked",
@@ -622,7 +627,11 @@ function StatisticsManager:_get_stat_tables()
 		"combusto",
 		"spackle",
 		"stoneface",
-		"wayfarer"
+		"wayfarer",
+		"smiley",
+		"gumbo",
+		"crazy_lion",
+		"old_hoxton"
 	}
 	local weapon_list = {
 		"ak5",
@@ -682,7 +691,8 @@ function StatisticsManager:_get_stat_tables()
 		"x_1911",
 		"x_b92fs",
 		"x_deagle",
-		"g26"
+		"g26",
+		"spas12"
 	}
 	local melee_list = {
 		"weapon",
@@ -707,7 +717,8 @@ function StatisticsManager:_get_stat_tables()
 		"fireaxe",
 		"machete",
 		"briefcase",
-		"kabartanto"
+		"kabartanto",
+		"toothbrush"
 	}
 	local enemy_list = {
 		"cop",
@@ -743,7 +754,8 @@ function StatisticsManager:_get_stat_tables()
 		"german",
 		"spanish",
 		"american",
-		"jowi"
+		"jowi",
+		"old_hoxton"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end
@@ -853,13 +865,19 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		value = cash_found and 0 or 1
 	}
 	for weapon_name, weapon_data in pairs(session.shots_by_weapon) do
-		if 0 < weapon_data.total and table.contains(weapon_list, weapon_name) then
-			stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
+		if 0 < weapon_data.total then
+			if table.contains(weapon_list, weapon_name) then
+				stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
+			else
+				Application:error("Statistics Missing: weapon_used_" .. weapon_name)
+			end
 		end
 	end
 	local melee_name = managers.blackmarket:equipped_melee_weapon()
 	if table.contains(melee_list, melee_name) then
 		stats["melee_used_" .. melee_name] = {type = "int", value = 1}
+	elseif melee_name then
+		Application:error("Statistics Missing: melee_used_" .. melee_name)
 	end
 	stats.gadget_used_ammo_bag = {
 		type = "int",
@@ -884,35 +902,53 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	local mask_id = managers.blackmarket:equipped_mask().mask_id
 	if table.contains(mask_list, mask_id) then
 		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
+	elseif mask_id then
+		Application:error("Statistics Missing: mask_used_" .. mask_id)
 	end
 	local armor_id = managers.blackmarket:equipped_armor()
 	if table.contains(armor_list, armor_id) then
 		stats["armor_used_" .. armor_id] = {type = "int", value = 1}
+	elseif armor_id then
+		Application:error("Statistics Missing: armor_used_" .. armor_id)
 	end
 	local character_id = managers.network:session() and managers.network:session():local_peer():character()
 	if table.contains(character_list, character_id) then
 		stats["character_used_" .. character_id] = {type = "int", value = 1}
+	elseif character_id then
+		Application:error("Statistics Missing: character_used_" .. character_id)
 	end
 	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	for weapon_name, weapon_data in pairs(session.killed_by_weapon) do
-		if 0 < weapon_data.count and table.contains(weapon_list, weapon_name) then
-			stats["weapon_kills_" .. weapon_name] = {
-				type = "int",
-				value = weapon_data.count
-			}
+		if 0 < weapon_data.count then
+			if table.contains(weapon_list, weapon_name) then
+				stats["weapon_kills_" .. weapon_name] = {
+					type = "int",
+					value = weapon_data.count
+				}
+			else
+				Application:error("Statistics Missing: weapon_kills_" .. weapon_name)
+			end
 		end
 	end
 	for melee_name, melee_kill in pairs(session.killed_by_melee) do
-		if 0 < melee_kill and table.contains(melee_list, melee_name) then
-			stats["melee_kills_" .. melee_name] = {type = "int", value = melee_kill}
+		if 0 < melee_kill then
+			if table.contains(melee_list, melee_name) then
+				stats["melee_kills_" .. melee_name] = {type = "int", value = melee_kill}
+			else
+				Application:error("Statistics Missing: melee_kills_" .. melee_name)
+			end
 		end
 	end
 	for enemy_name, enemy_data in pairs(session.killed) do
-		if 0 < enemy_data.count and table.contains(enemy_list, enemy_name) then
-			stats["enemy_kills_" .. enemy_name] = {
-				type = "int",
-				value = enemy_data.count
-			}
+		if 0 < enemy_data.count then
+			if table.contains(enemy_list, enemy_name) then
+				stats["enemy_kills_" .. enemy_name] = {
+					type = "int",
+					value = enemy_data.count
+				}
+			else
+				Application:error("Statistics Missing: enemy_kills_" .. enemy_name)
+			end
 		end
 	end
 	stats.heist_success = {
@@ -926,6 +962,8 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	local level_id = managers.job:current_level_id()
 	if table.contains(level_list, level_id) then
 		stats["level_" .. level_id] = {type = "int", value = 1}
+	elseif level_id then
+		Application:error("Statistics Missing: level_" .. level_id)
 	end
 	local job_id = managers.job:current_job_id()
 	if table.contains(job_list, job_id) then
@@ -937,6 +975,10 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		elseif completion == "fail" then
 			stats["contract_" .. job_id .. "_fail"] = {type = "int", value = 1}
 		end
+	elseif job_id then
+		Application:error("Statistics Missing: contract_" .. job_id .. "_win")
+		Application:error("Statistics Missing: contract_" .. job_id .. "_win_dropin")
+		Application:error("Statistics Missing: contract_" .. job_id .. "_fail")
 	end
 	if level_id == "election_day_2" then
 		local stealth = managers.groupai and managers.groupai:state():whisper_mode()

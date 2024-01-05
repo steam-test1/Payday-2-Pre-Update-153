@@ -650,9 +650,7 @@ function LevelsTweakData:init()
 	self.mia_1.briefing_dialog = "Play_pln_hm1_brf_01"
 	self.mia_1.world_name = "narratives/dentist/mia/stage1"
 	self.mia_1.intro_event = "Play_pln_hm1_intro_01"
-	self.mia_1.outro_event = {
-		"pln_hm1_end_01_01"
-	}
+	self.mia_1.outro_event = "Play_pln_hm1_end_01"
 	self.mia_1.music = "heist"
 	self.mia_1.package = "packages/narr_mia_1"
 	self.mia_1.cube = "cube_apply_heist_bank"
@@ -727,6 +725,32 @@ function LevelsTweakData:init()
 		"Play_pln_art_end"
 	}
 	self.gallery.briefing_dialog = "Play_pln_art_brf"
+	self.hox_1 = {}
+	self.hox_1.name_id = "heist_hox_1_hl"
+	self.hox_1.briefing_id = "heist_hox_1_briefing"
+	self.hox_1.briefing_dialog = "Play_pln_hb1_brf_01"
+	self.hox_1.world_name = "narratives/dentist/hox/stage_1"
+	self.hox_1.intro_event = "Play_pln_hb1_intro_01"
+	self.hox_1.outro_event = {
+		"Play_pln_hb1_end_01"
+	}
+	self.hox_1.music = "heist"
+	self.hox_1.package = "packages/narr_hox_1"
+	self.hox_1.cube = "cube_apply_heist_bank"
+	self.hox_1.block_AIs = {old_hoxton = true}
+	self.hox_2 = {}
+	self.hox_2.name_id = "heist_hox_2_hl"
+	self.hox_2.briefing_id = "heist_hox_2_briefing"
+	self.hox_2.briefing_dialog = "Play_rb5_hb2_brf_01"
+	self.hox_2.world_name = "narratives/dentist/hox/stage_2"
+	self.hox_2.intro_event = "Play_rb5_hb2_intro_01"
+	self.hox_2.outro_event = {
+		"Play_rb5_hb2_end_01"
+	}
+	self.hox_2.music = "heist"
+	self.hox_2.package = "packages/narr_hox_2"
+	self.hox_2.cube = "cube_apply_heist_bank"
+	self.hox_2.block_AIs = {old_hoxton = true}
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -777,7 +801,9 @@ function LevelsTweakData:init()
 		"mia_2",
 		"mia2_new",
 		"kosugi",
-		"gallery"
+		"gallery",
+		"hox_1",
+		"hox_2"
 	}
 	self.escape_levels = {
 		"escape_cafe",

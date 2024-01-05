@@ -868,7 +868,25 @@ function ActionSpooc:anim_act_clbk(anim_act)
 		end
 		self._strike_unit = self._target_unit
 		local spooc_res = self._strike_unit:movement():on_SPOOCed(self._unit, self:is_flying_strike() and "flying_strike" or "sprint_attack")
-		if not self:is_flying_strike() then
+		if spooc_res == "countered" then
+			if not Network:is_server() then
+				self._ext_network:send_to_host("action_spooc_stop", self._ext_movement:m_pos(), 1, self._action_id)
+			end
+			self._blocks = {}
+			local action_data = {
+				variant = "counter_spooc",
+				damage = 0,
+				damage_effect = 1,
+				attacker_unit = self._strike_unit,
+				col_ray = {
+					body = self._unit:body("body"),
+					position = self._common_data.pos + math.UP * 100
+				},
+				attack_dir = -1 * target_vec:normalized()
+			}
+			self._unit:character_damage():damage_melee(action_data)
+			return
+		elseif not self:is_flying_strike() then
 			if spooc_res and self._strike_unit:character_damage():is_downed() then
 				self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
 			elseif Network:is_server() then

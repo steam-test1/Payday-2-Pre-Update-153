@@ -53,7 +53,7 @@ function GenericDLCManager:give_dlc_package()
 				print("[DLC] Allready been given dlc package", package_id)
 			end
 			for _, upgrade in ipairs(data.content.upgrades or {}) do
-				managers.upgrades:aquire_default(upgrade)
+				managers.upgrades:aquire_default(upgrade, UpgradesManager.AQUIRE_STRINGS[1])
 			end
 		else
 			print("[DLC] Didn't own DLC package", package_id)
@@ -233,6 +233,10 @@ end
 
 function GenericDLCManager:has_pd2_clan()
 	return Global.dlc_manager.all_dlc_data.pd2_clan and Global.dlc_manager.all_dlc_data.pd2_clan.verified
+end
+
+function GenericDLCManager:has_freed_old_hoxton(data)
+	return self:has_pd2_clan() and self:has_achievement(data)
 end
 
 function GenericDLCManager:has_sweettooth()
@@ -571,13 +575,8 @@ function WINDLCManager:_check_dlc_data(dlc_data)
 		elseif Steam:is_product_installed(dlc_data.app_id) then
 			return true
 		end
-	elseif dlc_data.source_id then
-		if not Steam.is_user_in_source then
-			Application:error("EXE OUT OF DATE!")
-		end
-		if Steam:is_user_in_source(Steam:userid(), dlc_data.source_id) then
-			return true
-		end
+	elseif dlc_data.source_id and Steam:is_user_in_source(Steam:userid(), dlc_data.source_id) then
+		return true
 	end
 end
 

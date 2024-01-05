@@ -1994,6 +1994,85 @@ function NarrativeTweakData:init()
 		70000,
 		140000
 	}
+	self.jobs.hox = {}
+	self.jobs.hox.name_id = "heist_hox"
+	self.jobs.hox.briefing_id = "heist_hox_crimenet"
+	self.jobs.hox.contact = "the_dentist"
+	self.jobs.hox.region = "street"
+	self.jobs.hox.jc = 60
+	self.jobs.hox.chain = {
+		{
+			level_id = "hox_1",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "hox_2",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.hox.briefing_event = "dentist_hb1_cbf_01"
+	self.jobs.hox.debrief_event = nil
+	self.jobs.hox.crimenet_callouts = {
+		"dentist_hb1_cnc_01"
+	}
+	self.jobs.hox.crimenet_videos = {
+		"cn_hox1",
+		"cn_hox2",
+		"cn_hox3",
+		"cn_hox4",
+		"cn_big1",
+		"cn_big2",
+		"cn_big3"
+	}
+	self.jobs.hox.payout = {
+		250000,
+		500000,
+		1250000,
+		2500000,
+		3200000
+	}
+	self.jobs.hox.dlc = "pd2_clan"
+	self.jobs.hox.experience_mul = {
+		2.14,
+		2.14,
+		2.14,
+		2.14,
+		2.14
+	}
+	self.jobs.hox.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.hox_prof = deep_clone(self.jobs.hox)
+	self.jobs.hox_prof.jc = 70
+	self.jobs.hox_prof.professional = true
+	self.jobs.hox_prof.region = "professional"
+	self.jobs.hox_prof.payout = {
+		290000,
+		580000,
+		1450000,
+		2900000,
+		3800000
+	}
+	self.jobs.hox_prof.experience_mul = {
+		2,
+		2,
+		2,
+		2,
+		2
+	}
+	self.jobs.hox_prof.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -2032,7 +2111,9 @@ function NarrativeTweakData:init()
 		"big",
 		"mia",
 		"mia_prof",
-		"gallery"
+		"gallery",
+		"hox",
+		"hox_prof"
 	}
 	self:set_job_wrappers()
 end

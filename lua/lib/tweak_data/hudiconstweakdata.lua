@@ -1043,7 +1043,7 @@ function HudIconsTweakData:init()
 		}
 	}
 	self.equipment_c4 = {
-		texture = "guis/textures/hud_icons",
+		texture = "guis/textures/pd2/pickups",
 		texture_rect = {
 			336,
 			96,
@@ -1112,6 +1112,42 @@ function HudIconsTweakData:init()
 			336,
 			48,
 			48
+		}
+	}
+	self.equipment_ticket = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			64,
+			96,
+			32,
+			32
+		}
+	}
+	self.equipment_files = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			96,
+			96,
+			32,
+			32
+		}
+	}
+	self.equipment_harddrive = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			0,
+			128,
+			32,
+			32
+		}
+	}
+	self.equipment_evidence = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			32,
+			128,
+			32,
+			32
 		}
 	}
 	self.interaction_free = {

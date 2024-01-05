@@ -716,13 +716,17 @@ end
 
 function TeamAIDamage:clbk_exit_to_incapacitated()
 	self._to_incapacitated_clbk_id = nil
-	self:on_incapacitated()
+	self:_on_incapacitated()
 end
 
 function TeamAIDamage:on_incapacitated()
 	if self:_cannot_take_damage() then
 		return
 	end
+	self:_on_incapacitated()
+end
+
+function TeamAIDamage:_on_incapacitated()
 	if self._tase_effect then
 		World:effect_manager():fade_kill(self._tase_effect)
 		self._tase_effect = nil

@@ -69,6 +69,10 @@ function _ScriptViewport:width_mul_enabled()
 	return self._width_mul_enabled
 end
 
+function _ScriptViewport:set_first_viewport(set_first_viewport)
+	self._env_handler:set_first_viewport(set_first_viewport)
+end
+
 function _ScriptViewport:get_environment_value(data_path_key)
 	return self._env_handler:get_value(data_path_key)
 end
@@ -78,7 +82,11 @@ function _ScriptViewport:get_environment_path()
 end
 
 function _ScriptViewport:set_environment(environment_path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
-	self._env_handler:set(environment_path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
+	self._env_handler:set_environment(environment_path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
+end
+
+function _ScriptViewport:on_default_environment_changed(environment_path, blend_duration, blend_bezier_curve)
+	self._env_handler:on_default_environment_changed(environment_path, blend_duration, blend_bezier_curve)
 end
 
 function _ScriptViewport:create_environment_modifier(data_path_key, is_override, modifier_func)
@@ -91,6 +99,27 @@ end
 
 function _ScriptViewport:update_environment_value(data_path_key)
 	return self._env_handler:update_value(data_path_key)
+end
+
+local mvec1 = Vector3()
+local mvec2 = Vector3()
+
+function _ScriptViewport:update_environment_area(area_list, position_offset)
+	local camera = self._vp:camera()
+	if not camera then
+		return
+	end
+	local check_pos = mvec1
+	local c_fwd = mvec2
+	camera:m_position(check_pos)
+	mrotation.y(camera:rotation(), c_fwd)
+	mvector3.multiply(c_fwd, position_offset)
+	mvector3.add(check_pos, c_fwd)
+	self._env_handler:update_environment_area(check_pos, area_list)
+end
+
+function _ScriptViewport:on_environment_area_removed(area)
+	self._env_handler:on_environment_area_removed(area)
 end
 
 function _ScriptViewport:set_camera(camera)

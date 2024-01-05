@@ -108,6 +108,9 @@ function ContourExt:init(unit)
 	self._unit = unit
 	self._unit:set_extension_update_enabled(idstr_contour, false)
 	ContourExt._slotmask_world_geometry = ContourExt._slotmask_world_geometry or managers.slot:get_mask("world_geometry")
+	if self.init_contour then
+		self:add(self.init_contour, nil, nil)
+	end
 end
 
 function ContourExt:add(type, sync, multiplier)

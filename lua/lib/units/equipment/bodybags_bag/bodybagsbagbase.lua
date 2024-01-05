@@ -135,7 +135,7 @@ end
 
 function BodyBagsBagBase:_set_visual_stage()
 	if alive(self._unit) and self._unit:damage() then
-		local state = "state_" .. tostring(math.clamp(self._max_bodybag_amount - self._bodybag_amount, 1, self._max_bodybag_amount))
+		local state = "state_" .. tostring(math.clamp(self._max_bodybag_amount - self._bodybag_amount, 0, self._max_bodybag_amount))
 		if self._unit:damage():has_sequence(state) then
 			self._unit:damage():run_sequence_simple(state)
 		end

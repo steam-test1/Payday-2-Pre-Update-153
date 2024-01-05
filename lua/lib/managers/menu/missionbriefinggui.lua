@@ -1484,7 +1484,7 @@ function LoadoutItem:create_deployable_loadout()
 		name = "bm_menu_deployables",
 		category = "deployables",
 		on_create_func_name = "populate_deployables",
-		override_slots = {3, 2},
+		override_slots = {4, 2},
 		identifier = Idstring("deployable")
 	})
 	data.topic_id = "menu_loadout_blackmarket"
@@ -2377,7 +2377,7 @@ function NewLoadoutTab:create_deployable_loadout()
 		name = "bm_menu_deployables",
 		category = "deployables",
 		on_create_func_name = "populate_deployables",
-		override_slots = {3, 2},
+		override_slots = {4, 2},
 		identifier = Idstring("deployable")
 	})
 	data.topic_id = "menu_loadout_blackmarket"

@@ -90,6 +90,34 @@ function EquipmentsTweakData:init()
 		sound_interupt = "bar_armor_cancel",
 		sound_done = "bar_armor_finished"
 	}
+	self.first_aid_kit = {
+		icon = "equipment_first_aid_kit",
+		use_function_name = "use_first_aid_kit",
+		quantity = 4,
+		text_id = "debug_equipment_first_aid_kit",
+		description_id = "des_first_aid_kit",
+		dummy_unit = "units/pd2_dlc_old_hoxton/equipment/gen_equipment_first_aid_kit/gen_equipment_first_aid_kit_dummy",
+		deploy_time = 1,
+		upgrade_deploy_time_multiplier = {
+			category = "player",
+			upgrade = "first_aid_kit_deploy_time_multiplier"
+		},
+		visual_object = "g_firstaidbag"
+	}
+	self.bodybags_bag = {
+		icon = "equipment_bodybags_bag",
+		use_function_name = "use_bodybags_bag",
+		quantity = 1,
+		text_id = "debug_equipment_bodybags_bag",
+		description_id = "des_bodybags_bag",
+		dummy_unit = "units/payday2/equipment/gen_equipment_bodybags_bag/gen_equipment_bodybags_bag_dummy",
+		deploy_time = 2,
+		upgrade_deploy_time_multiplier = {
+			category = "player",
+			upgrade = "bodybags_bag_deploy_time_multiplier"
+		},
+		visual_object = "g_bodybagsbag"
+	}
 	self.specials = {}
 	self.specials.cable_tie = {
 		text_id = "debug_equipment_cable_tie",
@@ -316,27 +344,27 @@ function EquipmentsTweakData:init()
 	}
 	self.specials.evidence = {
 		text_id = "hud_equipment_evidence",
-		icon = "equipment_crowbar",
+		icon = "equipment_evidence",
 		sync_possession = true
 	}
 	self.specials.harddrive = {
 		text_id = "hud_equipment_harddrive",
-		icon = "equipment_crowbar",
+		icon = "equipment_harddrive",
 		sync_possession = true
 	}
 	self.specials.files = {
 		text_id = "hud_equipment_files",
-		icon = "equipment_crowbar",
+		icon = "equipment_files",
 		sync_possession = true
 	}
 	self.specials.ticket = {
 		text_id = "hud_equipment_take_ticket",
-		icon = "equipment_crowbar",
+		icon = "equipment_ticket",
 		sync_possession = true
 	}
 	self.specials.bridge = {
 		text_id = "hud_equipment_take_bridge",
-		icon = "equipment_crowbar",
+		icon = "equipment_planks",
 		sync_possession = true
 	}
 	self.max_amount = {
@@ -345,11 +373,18 @@ function EquipmentsTweakData:init()
 		ecm_jammer = 2,
 		sentry_gun = 2,
 		trip_mine = 6,
+		first_aid_kit = 14,
+		bodybags_bag = 2,
 		grenades = 3,
 		asset_ammo_bag = 4,
 		asset_doctor_bag = 3,
 		asset_grenade_crate = 3,
 		asset_bodybags_bag = 3
 	}
-	self.class_name_to_deployable_id = {AmmoBagBase = "ammo_bag", DoctorBagBase = "doctor_bag"}
+	self.class_name_to_deployable_id = {
+		AmmoBagBase = "ammo_bag",
+		DoctorBagBase = "doctor_bag",
+		FirstAidKitBase = "first_aid_kit",
+		BodyBagsBagBase = "bodybags_bag"
+	}
 end

@@ -57,7 +57,6 @@ function TrailerCamera:start()
 	if game_state_machine:current_state_name() ~= "editor" then
 		self._old_game_state_name = game_state_machine:current_state_name()
 	end
-	self._viewport:set_environment(managers.environment_area:default_environment())
 	game_state_machine:change_state_by_name("world_camera")
 	managers.enemy:set_gfx_lod_enabled(false)
 	self._playing = true

@@ -107,6 +107,7 @@ function PlayerProfileGuiObject:init(ws)
 		})
 		skill_glow:set_center_y(skill_icon:center_y())
 	end
+	local font_scale = 1
 	local mastermind_ponts, num_skills = managers.skilltree:get_tree_progress("mastermind")
 	mastermind_ponts = string.format("%02d", mastermind_ponts)
 	local mastermind_text = panel:text({
@@ -115,7 +116,7 @@ function PlayerProfileGuiObject:init(ws)
 			progress = mastermind_ponts,
 			num_skills = num_skills
 		}),
-		font_size = font_size,
+		font_size = font_size * font_scale,
 		font = font,
 		color = tweak_data.screen_colors.text,
 		y = 10
@@ -130,7 +131,7 @@ function PlayerProfileGuiObject:init(ws)
 			progress = enforcer_ponts,
 			num_skills = num_skills
 		}),
-		font_size = font_size,
+		font_size = font_size * font_scale,
 		font = font,
 		color = tweak_data.screen_colors.text
 	})
@@ -145,7 +146,7 @@ function PlayerProfileGuiObject:init(ws)
 			progress = technician_ponts,
 			num_skills = num_skills
 		}),
-		font_size = font_size,
+		font_size = font_size * font_scale,
 		font = font,
 		color = tweak_data.screen_colors.text
 	})
@@ -160,15 +161,30 @@ function PlayerProfileGuiObject:init(ws)
 			progress = ghost_ponts,
 			num_skills = num_skills
 		}),
-		font_size = font_size,
+		font_size = font_size * font_scale,
 		font = font,
 		color = tweak_data.screen_colors.text
 	})
 	self:_make_fine_text(ghost_text)
 	ghost_text:set_top(math.round(technician_text:bottom()))
 	max_right_len = math.max(max_right_len, ghost_text:w())
+	local hoxton_ponts, num_skills = managers.skilltree:get_tree_progress("hoxton")
+	hoxton_ponts = string.format("%02d", hoxton_ponts)
+	local hoxton_text = panel:text({
+		text = self:get_text("menu_profession_progress", {
+			profession = self:get_text("st_menu_hoxton_pack"),
+			progress = hoxton_ponts,
+			num_skills = num_skills
+		}),
+		font_size = font_size * font_scale,
+		font = font,
+		color = tweak_data.screen_colors.text
+	})
+	self:_make_fine_text(hoxton_text)
+	hoxton_text:set_top(math.round(ghost_text:bottom()))
+	max_right_len = math.max(max_right_len, hoxton_text:w())
 	self._panel = panel
-	self._panel:set_size(exp_ring:w() + max_left_len + 15 + max_right_len + 10, (skill_text and skill_text:bottom() or ghost_text:bottom()) + 10)
+	self._panel:set_size(exp_ring:w() + max_left_len + 15 + max_right_len + 10, math.max(skill_text and skill_text:bottom() or total_money_text:bottom(), hoxton_text:bottom()) + 8)
 	self._panel:set_bottom(self._panel:parent():h() - 70)
 	BoxGuiObject:new(self._panel, {
 		sides = {
@@ -182,6 +198,7 @@ function PlayerProfileGuiObject:init(ws)
 	enforcer_text:set_right(self._panel:w() - 10)
 	technician_text:set_right(self._panel:w() - 10)
 	ghost_text:set_right(self._panel:w() - 10)
+	hoxton_text:set_right(self._panel:w() - 10)
 	bg_ring:move(-5, 0)
 	exp_ring:move(-5, 0)
 	level_text:set_center(exp_ring:center())

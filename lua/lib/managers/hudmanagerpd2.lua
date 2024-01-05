@@ -156,6 +156,14 @@ function HUDManager:set_teammate_health(i, data)
 	self._teammate_panels[i]:set_health(data)
 end
 
+function HUDManager:set_player_custom_radial(data)
+	self:set_teammate_custom_radial(HUDManager.PLAYER_PANEL, data)
+end
+
+function HUDManager:set_teammate_custom_radial(i, data)
+	self._teammate_panels[i]:set_custom_radial(data)
+end
+
 function HUDManager:set_player_armor(data)
 	if data.current == 0 and not data.no_hint then
 		managers.hint:show_hint("damage_pad")

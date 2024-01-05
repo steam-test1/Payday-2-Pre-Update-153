@@ -40,7 +40,6 @@ function PlayerCamera:setup_viewport(data)
 		self._shakers.breathing = self._shaker:play("breathing", 0.3)
 		self._shakers.headbob = self._shaker:play("headbob", 0)
 		vp:set_camera(self._camera_object)
-		vp:set_environment(managers.environment_area:default_environment())
 		self._vp = vp
 		do break end -- pseudo-goto
 		vp:set_width_mul_enabled()

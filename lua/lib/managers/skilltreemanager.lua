@@ -1,5 +1,5 @@
 SkillTreeManager = SkillTreeManager or class()
-SkillTreeManager.VERSION = 5
+SkillTreeManager.VERSION = 6
 
 function SkillTreeManager:init()
 	self:_setup()
@@ -142,8 +142,16 @@ function SkillTreeManager:tier_cost(tree, tier)
 	if managers.experience:current_rank() > 0 then
 		local tree_name = tweak_data.skilltree.trees[tree].skill
 		for infamy, item in pairs(tweak_data.infamy.items) do
-			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.skilltree and item.upgrades.skilltree.tree == tree_name then
-				points = math.round(points * item.upgrades.skilltree.multiplier or 1)
+			if managers.infamy:owned(infamy) then
+				local skilltree = item.upgrades and item.upgrades.skilltree
+				if skilltree then
+					local tree = skilltree.tree
+					local trees = skilltree.trees
+					if tree and tree == tree_name or trees and table.contains(trees, tree_name) then
+						points = math.round(points * item.upgrades.skilltree.multiplier or 1)
+						break
+					end
+				end
 			end
 		end
 	end
@@ -309,7 +317,7 @@ end
 function SkillTreeManager:_aquire_skill(skill, skill_id, loading)
 	if skill.upgrades then
 		for _, upgrade in ipairs(skill.upgrades) do
-			managers.upgrades:aquire(upgrade, loading)
+			managers.upgrades:aquire(upgrade, loading, UpgradesManager.AQUIRE_STRINGS[2] .. "_" .. tostring(skill_id))
 		end
 	end
 end
@@ -323,7 +331,7 @@ function SkillTreeManager:_unaquire_skill(skill_id)
 		if upgrades then
 			for i = #upgrades, 1, -1 do
 				local upgrade = upgrades[i]
-				managers.upgrades:unaquire(upgrade)
+				managers.upgrades:unaquire(upgrade, UpgradesManager.AQUIRE_STRINGS[2] .. "_" .. tostring(skill_id))
 			end
 		end
 	end
@@ -409,7 +417,7 @@ function SkillTreeManager:reset_specializations()
 			local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
 			for i = 1, current_tier do
 				for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
-					managers.upgrades:unaquire(upgrade, true)
+					managers.upgrades:unaquire(upgrade, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(current_specialization))
 				end
 			end
 		end
@@ -420,7 +428,6 @@ function SkillTreeManager:reset_specializations()
 	self:_setup_specialization()
 	self._global.specializations.total_points = self:digest_value(points_to_retain, true)
 	self._global.specializations.points = self:digest_value(points_to_retain, true)
-	self._global.specializations.points_present = self:digest_value(points_to_retain, true)
 end
 
 function SkillTreeManager:reset_skilltrees()
@@ -453,7 +460,7 @@ function SkillTreeManager:infamy_reset()
 	local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
 	for i = 1, current_tier do
 		for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
-			managers.upgrades:aquire(upgrade, false)
+			managers.upgrades:aquire(upgrade, false, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(current_specialization))
 		end
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -476,7 +483,8 @@ function SkillTreeManager:get_tree_progress(tree)
 			mastermind = 1,
 			enforcer = 2,
 			technician = 3,
-			ghost = 4
+			ghost = 4,
+			hoxton = 5
 		}
 		tree = string_to_number[tree]
 	end
@@ -649,7 +657,7 @@ function SkillTreeManager:_verify_loaded_data(points_aquired_during_load)
 					points_left = points_left - spec_data.cost
 					if tree == current_specialization then
 						for _, upgrade in ipairs(spec_data.upgrades) do
-							managers.upgrades:aquire(upgrade, true)
+							managers.upgrades:aquire(upgrade, true, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(current_specialization))
 						end
 					end
 					if tier == #specialization_tweak[tree] then
@@ -719,6 +727,14 @@ end
 
 function SkillTreeManager:specialization_points()
 	return self._global.specializations.points and self:digest_value(self._global.specializations.points, false) or 0
+end
+
+function SkillTreeManager:debug_specialization()
+	for i, d in pairs(self._global.specializations) do
+		if type(d) == "string" then
+			print(i, self:digest_value(d, false))
+		end
+	end
 end
 
 function SkillTreeManager:get_specialization_present()
@@ -858,7 +874,7 @@ function SkillTreeManager:_increase_specialization_tier(tree)
 			return
 		end
 		for _, upgrade in ipairs(spec_data.upgrades) do
-			managers.upgrades:aquire(upgrade, false)
+			managers.upgrades:aquire(upgrade, false, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(tree))
 		end
 	end
 	tier_data.current_tier = self:digest_value(current_tier, true)
@@ -887,7 +903,7 @@ function SkillTreeManager:set_current_specialization(tree)
 			local specialization_tweak = tweak_data.skilltree.specializations[current_specialization]
 			for i = 1, current_tier do
 				for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
-					managers.upgrades:unaquire(upgrade, true)
+					managers.upgrades:unaquire(upgrade, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(current_specialization))
 				end
 			end
 		end
@@ -905,7 +921,7 @@ function SkillTreeManager:set_current_specialization(tree)
 	local specialization_tweak = tweak_data.skilltree.specializations[tree]
 	for i = 1, current_tier do
 		for _, upgrade in ipairs(specialization_tweak[i].upgrades) do
-			managers.upgrades:aquire(upgrade, false)
+			managers.upgrades:aquire(upgrade, false, UpgradesManager.AQUIRE_STRINGS[3] .. tostring(tree))
 		end
 	end
 end

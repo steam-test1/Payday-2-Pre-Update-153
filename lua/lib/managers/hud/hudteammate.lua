@@ -197,6 +197,24 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		layer = 1
 	})
 	damage_indicator:set_color(Color(1, 1, 1, 1))
+	local radial_custom = radial_health_panel:bitmap({
+		name = "radial_custom",
+		texture = "guis/textures/pd2/hud_swansong",
+		texture_rect = {
+			0,
+			0,
+			64,
+			64
+		},
+		render_template = "VertexColorTexturedRadial",
+		blend_mode = "add",
+		alpha = 1,
+		w = radial_health_panel:w(),
+		h = radial_health_panel:h(),
+		layer = 2
+	})
+	radial_custom:set_color(Color(1, 0, 0, 0))
+	radial_custom:hide()
 	local x, y, w, h = radial_health_panel:shape()
 	teammate_panel:bitmap({
 		name = "condition_icon",
@@ -937,6 +955,15 @@ function HUDTeammate:set_armor(data)
 		self:_damage_taken()
 	end
 	radial_shield:set_color(Color(1, red, 1, 1))
+end
+
+function HUDTeammate:set_custom_radial(data)
+	local teammate_panel = self._panel:child("player")
+	local radial_health_panel = teammate_panel:child("radial_health_panel")
+	local radial_custom = radial_health_panel:child("radial_custom")
+	local red = data.current / data.total
+	radial_custom:set_color(Color(1, red, 1, 1))
+	radial_custom:set_visible(0 < red)
 end
 
 function HUDTeammate:_damage_taken()

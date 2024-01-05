@@ -23,6 +23,7 @@ function SkillTreeTweakData:init()
 		digest(0),
 		digest(0),
 		digest(0),
+		digest(0),
 		digest(0)
 	}
 	self.HIDE_TIER_BONUS = true
@@ -150,6 +151,38 @@ function SkillTreeTweakData:init()
 			desc_id = "menu_ghost_tier_6"
 		}
 	}
+	self.skills.hoxton = {
+		name_id = "menu_hoxton_pack",
+		desc_id = "menu_hoxton_pack_desc",
+		icon_xy = {3, 10},
+		[1] = {
+			upgrades = {
+				"first_aid_kit"
+			},
+			cost = self.costs.unlock_tree,
+			desc_id = "menu_hoxton_tier_1"
+		},
+		[2] = {
+			upgrades = {},
+			desc_id = "menu_hoxton_tier_2"
+		},
+		[3] = {
+			upgrades = {},
+			desc_id = "menu_hoxton_tier_3"
+		},
+		[4] = {
+			upgrades = {},
+			desc_id = "menu_hoxton_tier_4"
+		},
+		[5] = {
+			upgrades = {},
+			desc_id = "menu_hoxton_tier_5"
+		},
+		[6] = {
+			upgrades = {},
+			desc_id = "menu_hoxton_tier_6"
+		}
+	}
 	self.skills.black_marketeer = {
 		name_id = "menu_black_marketeer",
 		desc_id = "menu_black_marketeer_desc",
@@ -208,13 +241,15 @@ function SkillTreeTweakData:init()
 		prerequisites = {"joker"},
 		[1] = {
 			upgrades = {
-				"minion_master_speed_multiplier"
+				"minion_master_speed_multiplier",
+				"player_passive_convert_enemies_health_multiplier_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"minion_master_health_multiplier"
+				"minion_master_health_multiplier",
+				"player_passive_convert_enemies_health_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1519,6 +1554,323 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightierpro
 		}
 	}
+	self.skills.freedom_call = {
+		name_id = "menu_freedom_call",
+		desc_id = "menu_freedom_call_desc",
+		icon_xy = {5, 10},
+		[1] = {
+			upgrades = {
+				"player_climb_speed_multiplier_1"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_on_zipline_dodge_chance"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.hidden_blade = {
+		name_id = "menu_hidden_blade",
+		desc_id = "menu_hidden_blade_desc",
+		icon_xy = {4, 10},
+		[1] = {
+			upgrades = {
+				"player_melee_concealment_modifier"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_silent_kill"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.tea_time = {
+		name_id = "menu_tea_time",
+		desc_id = "menu_tea_time_desc",
+		icon_xy = {1, 11},
+		[1] = {
+			upgrades = {
+				"first_aid_kit_deploy_time_multiplier"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"first_aid_kit_damage_reduction_upgrade"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.awareness = {
+		name_id = "menu_awareness",
+		desc_id = "menu_awareness_desc",
+		icon_xy = {7, 10},
+		[1] = {
+			upgrades = {
+				"player_movement_speed_multiplier"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_steelsight_normal_movement_speed"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.alpha_dog = {
+		name_id = "menu_alpha_dog",
+		desc_id = "menu_alpha_dog_desc",
+		icon_xy = {0, 11},
+		[1] = {
+			upgrades = {
+				"player_crouch_dodge_chance_1"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_crouch_dodge_chance_2"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.tea_cookies = {
+		name_id = "menu_tea_cookies",
+		desc_id = "menu_tea_cookies_desc",
+		icon_xy = {2, 11},
+		[1] = {
+			upgrades = {
+				"first_aid_kit_quantity_increase_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"first_aid_kit_quantity_increase_2"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.cell_mates = {
+		name_id = "menu_cell_mates",
+		desc_id = "menu_cell_mates_desc",
+		icon_xy = {4, 11},
+		[1] = {
+			upgrades = {
+				"player_gangster_damage_dampener_1"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_gangster_damage_dampener_2"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.thug_life = {
+		name_id = "menu_thug_life",
+		desc_id = "menu_thug_life_desc",
+		icon_xy = {3, 12},
+		[1] = {
+			upgrades = {
+				"player_extra_corpse_dispose_amount"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_cleaner_cost_multiplier"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.thick_skin = {
+		name_id = "menu_thick_skin",
+		desc_id = "menu_thick_skin_desc",
+		icon_xy = {2, 12},
+		[1] = {
+			upgrades = {
+				"player_damage_shake_addend"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_level_2_armor_addend",
+				"player_level_3_armor_addend",
+				"player_level_4_armor_addend"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.backstab = {
+		name_id = "menu_backstab",
+		desc_id = "menu_backstab_desc",
+		icon_xy = {0, 12},
+		[1] = {
+			upgrades = {
+				"player_detection_risk_add_crit_chance_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_detection_risk_add_crit_chance_2"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.drop_soap = {
+		name_id = "menu_drop_soap",
+		desc_id = "menu_drop_soap_desc",
+		icon_xy = {4, 12},
+		[1] = {
+			upgrades = {
+				"player_counter_strike_melee"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_counter_strike_spooc"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.second_chances = {
+		name_id = "menu_second_chances",
+		desc_id = "menu_second_chances_desc",
+		icon_xy = {5, 11},
+		[1] = {
+			upgrades = {
+				"bodybags_bag"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"bodybags_bag_quantity"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.trigger_happy = {
+		name_id = "menu_trigger_happy",
+		desc_id = "menu_trigger_happy_desc",
+		icon_xy = {7, 11},
+		[1] = {
+			upgrades = {
+				"pistol_stacking_hit_expire_t_1",
+				"pistol_stacking_hit_damage_multiplier"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"pistol_stacking_hit_expire_t_2"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.perseverance = {
+		name_id = "menu_perseverance",
+		desc_id = "menu_perseverance_desc",
+		icon_xy = {5, 12},
+		[1] = {
+			upgrades = {
+				"temporary_berserker_damage_multiplier_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"temporary_berserker_damage_multiplier_2",
+				"player_berserker_no_ammo_cost"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.jail_workout = {
+		name_id = "menu_jail_workout",
+		desc_id = "menu_jail_workout_desc",
+		icon_xy = {6, 10},
+		[1] = {
+			upgrades = {
+				"player_standstill_omniscience"
+			},
+			cost = self.costs.default
+		},
+		[2] = {
+			upgrades = {
+				"player_mask_off_pickup"
+			},
+			cost = self.costs.pro
+		}
+	}
+	self.skills.akimbo = {
+		name_id = "menu_akimbo_skill",
+		desc_id = "menu_akimbo_skill_desc",
+		icon_xy = {3, 11},
+		[1] = {
+			upgrades = {
+				"jowi",
+				"x_1911",
+				"x_b92fs",
+				"x_deagle",
+				"akimbo_recoil_multiplier_1",
+				"akimbo_recoil_multiplier_2"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"akimbo_extra_ammo_multiplier_1",
+				"akimbo_extra_ammo_multiplier_2",
+				"akimbo_recoil_multiplier_3"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.jail_diet = {
+		name_id = "menu_jail_diet",
+		desc_id = "menu_jail_diet_desc",
+		icon_xy = {1, 12},
+		[1] = {
+			upgrades = {
+				"player_detection_risk_add_dodge_chance_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_detection_risk_add_dodge_chance_2"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
+	self.skills.prison_wife = {
+		name_id = "menu_prison_wife",
+		desc_id = "menu_prison_wife_desc",
+		icon_xy = {6, 11},
+		[1] = {
+			upgrades = {
+				"player_headshot_regen_armor_bonus_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_headshot_regen_armor_bonus_2"
+			},
+			cost = self.costs.hightierpro
+		}
+	}
 	self.trees = {}
 	self.trees[1] = {
 		name_id = "st_menu_mastermind",
@@ -1543,6 +1895,13 @@ function SkillTreeTweakData:init()
 		skill = "ghost",
 		background_texture = "guis/textures/pd2/skilltree/bg_ghost",
 		tiers = {}
+	}
+	self.trees[5] = {
+		name_id = "st_menu_hoxton_pack",
+		skill = "hoxton",
+		background_texture = "guis/textures/pd2/skilltree/bg_fugitive",
+		tiers = {},
+		statistics = false
 	}
 	self.trees[1].tiers[1] = {
 		"cable_guy",
@@ -1664,6 +2023,36 @@ function SkillTreeTweakData:init()
 		"ecm_feedback",
 		"moving_target"
 	}
+	self.trees[5].tiers[1] = {
+		"freedom_call",
+		"hidden_blade",
+		"thick_skin"
+	}
+	self.trees[5].tiers[2] = {
+		"awareness",
+		"jail_workout",
+		"alpha_dog"
+	}
+	self.trees[5].tiers[3] = {
+		"cell_mates",
+		"thug_life",
+		"tea_time"
+	}
+	self.trees[5].tiers[4] = {
+		"perseverance",
+		"second_chances",
+		"tea_cookies"
+	}
+	self.trees[5].tiers[5] = {
+		"trigger_happy",
+		"backstab",
+		"drop_soap"
+	}
+	self.trees[5].tiers[6] = {
+		"prison_wife",
+		"jail_diet",
+		"akimbo"
+	}
 	self.default_upgrades = {
 		"cable_tie",
 		"player_special_enemy_highlight",
@@ -1672,7 +2061,9 @@ function SkillTreeTweakData:init()
 		"player_corpse_dispose",
 		"player_corpse_dispose_amount_1",
 		"player_civ_harmless_melee",
-		"striker_reload_speed_default"
+		"striker_reload_speed_default",
+		"temporary_first_aid_damage_reduction",
+		"temporary_passive_revive_damage_reduction_2"
 	}
 	self.specialization_convertion_rate = {
 		100,
@@ -2153,6 +2544,104 @@ function SkillTreeTweakData:init()
 				icon_xy = {3, 3},
 				name_id = "menu_deck5_9",
 				desc_id = "menu_deck5_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_6",
+			desc_id = "menu_st_spec_6_desc",
+			{
+				upgrades = {
+					"player_passive_dodge_chance_1"
+				},
+				cost = 200,
+				icon_xy = {1, 2},
+				name_id = "menu_deck6_1",
+				desc_id = "menu_deck6_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck6_2",
+				desc_id = "menu_deck6_2_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_level_2_dodge_addend_1",
+					"player_level_3_dodge_addend_1",
+					"player_level_4_dodge_addend_1"
+				},
+				cost = 400,
+				icon_xy = {4, 3},
+				name_id = "menu_deck6_3",
+				desc_id = "menu_deck6_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck6_4",
+				desc_id = "menu_deck6_4_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_level_2_dodge_addend_2",
+					"player_level_3_dodge_addend_2",
+					"player_level_4_dodge_addend_2"
+				},
+				cost = 1000,
+				icon_xy = {5, 3},
+				name_id = "menu_deck6_5",
+				desc_id = "menu_deck6_5_desc"
+			},
+			{
+				upgrades = {
+					"player_pick_up_ammo_multiplier_2"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck6_6",
+				desc_id = "menu_deck6_6_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_level_2_dodge_addend_3",
+					"player_level_3_dodge_addend_3",
+					"player_level_4_dodge_addend_3"
+				},
+				cost = 2400,
+				icon_xy = {6, 3},
+				name_id = "menu_deck6_7",
+				desc_id = "menu_deck6_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck6_8",
+				desc_id = "menu_deck6_8_desc"
+			},
+			{
+				upgrades = {
+					"player_passive_loot_drop_multiplier",
+					"player_armor_regen_timer_multiplier_tier"
+				},
+				cost = 4000,
+				icon_xy = {6, 2},
+				name_id = "menu_deck6_9",
+				desc_id = "menu_deck6_9_desc"
 			}
 		}
 	}

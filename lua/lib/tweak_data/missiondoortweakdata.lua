@@ -104,18 +104,14 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_shp_charge_2",
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
-		},
-		{
-			align = "a_shp_charge_3",
-			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
 		}
 	}
 	self.keycard_door_single.devices.drill = {
 		{
 			align = "a_drill",
-			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small_jam_once"),
 			can_jam = true,
-			timer = 90
+			timer = 60
 		}
 	}
 	self.keycard_door_single.devices.key = {
@@ -135,13 +131,13 @@ function MissionDoorTweakData:init()
 	self.keycard_ecm.devices.key = {
 		{
 			align = "a_keycard",
-			unit = Idstring("units/payday2/equipment/gen_interactable_panel_keycard/gen_interactable_panel_keycard")
+			unit = Idstring("units/payday2/equipment/gen_interactable_panel_keycard/item_panel_keycard_double")
 		}
 	}
 	self.keycard_ecm.devices.ecm = {
 		{
 			align = "a_ecm_hack",
-			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
+			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/item_door_keycard_jammer_double")
 		}
 	}
 	self.atm = {}
@@ -480,7 +476,11 @@ function MissionDoorTweakData:init()
 	self.gov_d_int_door_shape.devices = {}
 	self.gov_d_int_door_shape.devices.c4 = {
 		{
-			align = "a_c4_placement",
+			align = "a_c4_placement_1",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_c4_placement_2",
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}

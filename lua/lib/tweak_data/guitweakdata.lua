@@ -1368,14 +1368,13 @@ function GuiTweakData:init()
 				}
 			},
 			{
-				id = "hoxton",
-				name_id = "menu_american",
+				id = "old_hoxton",
+				name_id = "menu_old_hoxton",
 				{
-					desc_id = "american_desc_codex",
+					desc_id = "old_hoxton_desc_codex",
 					videos = {
-						"hoxton1",
-						"hoxton2",
-						"hoxton3"
+						"old_hoxton1",
+						"old_hoxton2"
 					},
 					post_event = "pln_contact_hoxton"
 				}
@@ -1392,6 +1391,28 @@ function GuiTweakData:init()
 						"jowi4"
 					},
 					post_event = "pln_contact_wick"
+				}
+			},
+			{
+				id = "hoxton",
+				name_id = "menu_american",
+				{
+					desc_id = "american_desc_codex",
+					videos = {
+						"hoxton1",
+						"hoxton2",
+						"hoxton3"
+					},
+					post_event = "pln_contact_houston"
+				},
+				{
+					desc_id = "houston_desc_codex",
+					videos = {
+						"hoxton1",
+						"hoxton2",
+						"hoxton3"
+					},
+					post_event = "pln_contact_houston"
 				}
 			}
 		}

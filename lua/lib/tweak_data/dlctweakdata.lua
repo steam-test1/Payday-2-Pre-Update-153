@@ -259,6 +259,32 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.pd2_clan_lgl.content.upgrades = {"spas12"}
+	self.pd2_clan_hoxton = {}
+	self.pd2_clan_hoxton.content = {}
+	self.pd2_clan_hoxton.dlc = "has_pd2_clan"
+	self.pd2_clan_hoxton.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_hoxton.content.loot_drops = {}
+	self.ach_bulldog_1 = {}
+	self.ach_bulldog_1.dlc = "has_achievement"
+	self.ach_bulldog_1.achievement_id = "bulldog_1"
+	self.ach_bulldog_1.use_custom_func = true
+	self.ach_bulldog_1.content = {}
+	self.ach_bulldog_1.content.loot_global_value = "infamous"
+	self.ach_bulldog_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "old_hoxton",
+			amount = 1
+		}
+	}
+	self.freed_old_hoxton = {}
+	self.freed_old_hoxton.dlc = "has_freed_old_hoxton"
+	self.freed_old_hoxton.achievement_id = "bulldog_1"
+	self.freed_old_hoxton.use_custom_func = true
+	self.freed_old_hoxton.content = {}
+	self.freed_old_hoxton.content.loot_global_value = "pd2_clan"
+	self.freed_old_hoxton.content.loot_drops = {}
+	self.freed_old_hoxton.content.upgrades = {"toothbrush"}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

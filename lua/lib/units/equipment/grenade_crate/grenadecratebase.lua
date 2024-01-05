@@ -115,7 +115,7 @@ end
 
 function GrenadeCrateBase:_set_visual_stage()
 	if alive(self._unit) and self._unit:damage() then
-		local state = "state_" .. tostring(math.clamp(self._max_grenade_amount - self._grenade_amount, 1, self._max_grenade_amount))
+		local state = "state_" .. tostring(math.clamp(self._max_grenade_amount - self._grenade_amount, 0, self._max_grenade_amount))
 		if self._unit:damage():has_sequence(state) then
 			self._unit:damage():run_sequence_simple(state)
 		end

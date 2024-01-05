@@ -281,6 +281,7 @@ UnderlaySkyBottomColorScaleFeeder.apply = UnderlaySkyBottomColorFeeder.apply
 PostAmbientFalloffScaleFeeder = PostAmbientFalloffScaleFeeder or CoreClass.class(Feeder)
 PostAmbientFalloffScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/ambient_falloff_scale"):key()
 PostAmbientFalloffScaleFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostAmbientFalloffScaleFeeder.IS_GLOBAL = nil
 PostAmbientFalloffScaleFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostAmbientFalloffScaleFeeder:apply(handler, viewport, scene)
@@ -291,6 +292,7 @@ end
 PostAmbientColorFeeder = PostAmbientColorFeeder or CoreClass.class(Vector3Feeder)
 PostAmbientColorFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/ambient_color"):key()
 PostAmbientColorFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostAmbientColorFeeder.IS_GLOBAL = nil
 PostAmbientColorFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostAmbientColorFeeder:apply(handler, viewport, scene)
@@ -309,11 +311,13 @@ end
 PostAmbientColorScaleFeeder = PostAmbientColorScaleFeeder or CoreClass.class(Feeder)
 PostAmbientColorScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/ambient_color_scale"):key()
 PostAmbientColorScaleFeeder.APPLY_GROUP_ID = PostAmbientColorFeeder.APPLY_GROUP_ID
+PostAmbientColorScaleFeeder.IS_GLOBAL = PostAmbientColorFeeder.IS_GLOBAL
 PostAmbientColorScaleFeeder.FILTER_CATEGORY = PostAmbientColorFeeder.FILTER_CATEGORY
 PostAmbientColorScaleFeeder.apply = PostAmbientColorFeeder.apply
 PostSkyTopColorFeeder = PostSkyTopColorFeeder or CoreClass.class(Vector3Feeder)
 PostSkyTopColorFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/sky_top_color"):key()
 PostSkyTopColorFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostSkyTopColorFeeder.IS_GLOBAL = nil
 PostSkyTopColorFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostSkyTopColorFeeder:apply(handler, viewport, scene)
@@ -332,11 +336,13 @@ end
 PostSkyTopColorScaleFeeder = PostSkyTopColorScaleFeeder or CoreClass.class(Feeder)
 PostSkyTopColorScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/sky_top_color_scale"):key()
 PostSkyTopColorScaleFeeder.APPLY_GROUP_ID = PostSkyTopColorFeeder.APPLY_GROUP_ID
+PostSkyTopColorScaleFeeder.IS_GLOBAL = PostSkyTopColorFeeder.IS_GLOBAL
 PostSkyTopColorScaleFeeder.FILTER_CATEGORY = PostSkyTopColorFeeder.FILTER_CATEGORY
 PostSkyTopColorScaleFeeder.apply = PostSkyTopColorFeeder.apply
 PostSkyBottomColorFeeder = PostSkyBottomColorFeeder or CoreClass.class(Vector3Feeder)
 PostSkyBottomColorFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/sky_bottom_color"):key()
 PostSkyBottomColorFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostSkyBottomColorFeeder.IS_GLOBAL = nil
 PostSkyBottomColorFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostSkyBottomColorFeeder:apply(handler, viewport, scene)
@@ -355,11 +361,13 @@ end
 PostSkyBottomColorScaleFeeder = PostSkyBottomColorScaleFeeder or CoreClass.class(Feeder)
 PostSkyBottomColorScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/sky_bottom_color_scale"):key()
 PostSkyBottomColorScaleFeeder.APPLY_GROUP_ID = PostSkyBottomColorFeeder.APPLY_GROUP_ID
+PostSkyBottomColorScaleFeeder.IS_GLOBAL = PostSkyBottomColorFeeder.IS_GLOBAL
 PostSkyBottomColorScaleFeeder.FILTER_CATEGORY = PostSkyBottomColorFeeder.FILTER_CATEGORY
 PostSkyBottomColorScaleFeeder.apply = PostSkyBottomColorFeeder.apply
 PostFogStartColorFeeder = PostFogStartColorFeeder or CoreClass.class(Vector3Feeder)
 PostFogStartColorFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/fog_start_color"):key()
 PostFogStartColorFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostFogStartColorFeeder.IS_GLOBAL = nil
 PostFogStartColorFeeder.FILTER_CATEGORY = "Fog"
 
 function PostFogStartColorFeeder:apply(handler, viewport, scene)
@@ -372,6 +380,7 @@ end
 PostFogFarLowColorFeeder = PostFogFarLowColorFeeder or CoreClass.class(Vector3Feeder)
 PostFogFarLowColorFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/fog_far_low_color"):key()
 PostFogFarLowColorFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostFogFarLowColorFeeder.IS_GLOBAL = nil
 PostFogFarLowColorFeeder.FILTER_CATEGORY = "Fog"
 
 function PostFogFarLowColorFeeder:apply(handler, viewport, scene)
@@ -384,6 +393,7 @@ end
 PostFogMinRangeFeeder = PostFogMinRangeFeeder or CoreClass.class(Feeder)
 PostFogMinRangeFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/fog_min_range"):key()
 PostFogMinRangeFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostFogMinRangeFeeder.IS_GLOBAL = nil
 PostFogMinRangeFeeder.FILTER_CATEGORY = "Fog"
 
 function PostFogMinRangeFeeder:apply(handler, viewport, scene)
@@ -394,6 +404,7 @@ end
 PostFogMaxRangeFeeder = PostFogMaxRangeFeeder or CoreClass.class(Feeder)
 PostFogMaxRangeFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/fog_max_range"):key()
 PostFogMaxRangeFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostFogMaxRangeFeeder.IS_GLOBAL = nil
 PostFogMaxRangeFeeder.FILTER_CATEGORY = "Fog"
 
 function PostFogMaxRangeFeeder:apply(handler, viewport, scene)
@@ -404,6 +415,7 @@ end
 PostAmbientScaleFeeder = PostAmbientScaleFeeder or CoreClass.class(Feeder)
 PostAmbientScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/ambient_scale"):key()
 PostAmbientScaleFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostAmbientScaleFeeder.IS_GLOBAL = nil
 PostAmbientScaleFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostAmbientScaleFeeder:apply(handler, viewport, scene)
@@ -414,6 +426,7 @@ end
 PostEffectLightScaleFeeder = PostEffectLightScaleFeeder or CoreClass.class(Feeder)
 PostEffectLightScaleFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/effect_light_scale"):key()
 PostEffectLightScaleFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostEffectLightScaleFeeder.IS_GLOBAL = nil
 PostEffectLightScaleFeeder.FILTER_CATEGORY = "Ambient"
 
 function PostEffectLightScaleFeeder:apply(handler, viewport, scene)
@@ -424,6 +437,7 @@ end
 PostShadowSlice0Feeder = PostShadowSlice0Feeder or CoreClass.class(Vector3Feeder)
 PostShadowSlice0Feeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/slice0"):key()
 PostShadowSlice0Feeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSlice0Feeder.IS_GLOBAL = nil
 PostShadowSlice0Feeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSlice0Feeder:apply(handler, viewport, scene)
@@ -434,6 +448,7 @@ end
 PostShadowSlice1Feeder = PostShadowSlice1Feeder or CoreClass.class(Vector3Feeder)
 PostShadowSlice1Feeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/slice1"):key()
 PostShadowSlice1Feeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSlice1Feeder.IS_GLOBAL = nil
 PostShadowSlice1Feeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSlice1Feeder:apply(handler, viewport, scene)
@@ -444,6 +459,7 @@ end
 PostShadowSlice2Feeder = PostShadowSlice2Feeder or CoreClass.class(Vector3Feeder)
 PostShadowSlice2Feeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/slice2"):key()
 PostShadowSlice2Feeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSlice2Feeder.IS_GLOBAL = nil
 PostShadowSlice2Feeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSlice2Feeder:apply(handler, viewport, scene)
@@ -454,6 +470,7 @@ end
 PostShadowSlice3Feeder = PostShadowSlice3Feeder or CoreClass.class(Vector3Feeder)
 PostShadowSlice3Feeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/slice3"):key()
 PostShadowSlice3Feeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSlice3Feeder.IS_GLOBAL = nil
 PostShadowSlice3Feeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSlice3Feeder:apply(handler, viewport, scene)
@@ -464,6 +481,7 @@ end
 PostShadowSliceDepthsFeeder = PostShadowSliceDepthsFeeder or CoreClass.class(Vector3Feeder)
 PostShadowSliceDepthsFeeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/shadow_slice_depths"):key()
 PostShadowSliceDepthsFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSliceDepthsFeeder.IS_GLOBAL = nil
 PostShadowSliceDepthsFeeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSliceDepthsFeeder:apply(handler, viewport, scene)
@@ -474,6 +492,7 @@ end
 PostShadowSliceOverlapFeeder = PostShadowSliceOverlapFeeder or CoreClass.class(Vector3Feeder)
 PostShadowSliceOverlapFeeder.DATA_PATH_KEY = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier/shadow_slice_overlap"):key()
 PostShadowSliceOverlapFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostShadowSliceOverlapFeeder.IS_GLOBAL = nil
 PostShadowSliceOverlapFeeder.FILTER_CATEGORY = "Shadow"
 
 function PostShadowSliceOverlapFeeder:apply(handler, viewport, scene)

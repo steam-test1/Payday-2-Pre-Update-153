@@ -106,7 +106,6 @@ function CinematicStateCamera:start()
 	if Application:editor() then
 		managers.editor:layer("WorldCamera"):set_gui_visible(true, true)
 	end
-	self._viewport:set_environment(managers.environment_area:default_environment())
 	game_state_machine:change_state_by_name("world_camera")
 	managers.enemy:set_gfx_lod_enabled(false)
 	self._playing = true

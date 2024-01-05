@@ -5,7 +5,7 @@ function CoreEditor:init_create_dome_occlusion(shape, res)
 	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("empty"))
 	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
 	self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("render_dome_occ"))
-	local saved_environment = managers.environment_area:default_environment()
+	local saved_environment = managers.viewport:default_environment()
 	local params = {
 		res = res,
 		shape = shape,
@@ -129,7 +129,7 @@ function CoreEditor:dome_occlusion_done()
 		return
 	end
 	if self._dome_occlusion_params.saved_environment then
-		managers.environment_area:set_default_environment(self._dome_occlusion_params.saved_environment)
+		managers.viewport:set_default_environment(self._dome_occlusion_params.saved_environment, nil, nil)
 	end
 	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), self._default_post_processor_effect)
 	local bloom_combine_effect = self._default_post_processor_effect == Idstring("empty") and Idstring("bloom_combine_empty") or Idstring("bloom_combine")

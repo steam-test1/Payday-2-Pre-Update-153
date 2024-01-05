@@ -106,14 +106,14 @@ end
 function PlayerManager:aquire_default_upgrades()
 	local default_upgrades = tweak_data.skilltree.default_upgrades or {}
 	for _, upgrade in ipairs(default_upgrades) do
-		managers.upgrades:aquire_default(upgrade)
+		managers.upgrades:aquire_default(upgrade, UpgradesManager.AQUIRE_STRINGS[1])
 	end
 	for i = 1, PlayerManager.WEAPON_SLOTS do
 		if not managers.player:weapon_in_slot(i) then
 			self._global.kit.weapon_slots[i] = managers.player:availible_weapons(i)[1]
 		end
 	end
-	self:_verify_equipment_kit()
+	self:_verify_equipment_kit(true)
 end
 
 function PlayerManager:update(t, dt)
@@ -425,25 +425,25 @@ end
 function PlayerManager:unaquire_melee_weapon(upgrade, id)
 end
 
-function PlayerManager:_verify_equipment_kit()
+function PlayerManager:_verify_equipment_kit(loading)
 	if not managers.player:equipment_in_slot(1) then
 		if managers.blackmarket then
-			managers.blackmarket:equip_deployable(managers.player:availible_equipment(1)[1])
+			managers.blackmarket:equip_deployable(managers.player:availible_equipment(1)[1], loading)
 		else
 			self._global.kit.equipment_slots[1] = managers.player:availible_equipment(1)[1]
 		end
 	end
 end
 
-function PlayerManager:aquire_equipment(upgrade, id)
+function PlayerManager:aquire_equipment(upgrade, id, loading)
 	if self._global.equipment[id] then
 		return
 	end
 	self._global.equipment[id] = upgrade
 	if upgrade.aquire then
-		managers.upgrades:aquire_default(upgrade.aquire.upgrade)
+		managers.upgrades:aquire_default(upgrade.aquire.upgrade, UpgradesManager.AQUIRE_STRINGS[1])
 	end
-	self:_verify_equipment_kit()
+	self:_verify_equipment_kit(loading)
 end
 
 function PlayerManager:on_headshot_dealt()
@@ -471,10 +471,10 @@ function PlayerManager:unaquire_equipment(upgrade, id)
 	self._global.equipment[id] = nil
 	if is_equipped then
 		self._global.kit.equipment_slots[upgrade.slot] = nil
-		self:_verify_equipment_kit()
+		self:_verify_equipment_kit(false)
 	end
 	if upgrade.aquire then
-		managers.upgrades:unaquire(upgrade.aquire.upgrade)
+		managers.upgrades:unaquire(upgrade.aquire.upgrade, UpgradesManager.AQUIRE_STRINGS[1])
 	end
 end
 
@@ -595,6 +595,20 @@ function PlayerManager:has_activate_temporary_upgrade(category, upgrade)
 		return false
 	end
 	return self._temporary_upgrades[category][upgrade].expire_time > Application:time()
+end
+
+function PlayerManager:get_activate_temporary_expire_time(category, upgrade)
+	local upgrade_value = self:upgrade_value(category, upgrade)
+	if upgrade_value == 0 then
+		return 0
+	end
+	if not self._temporary_upgrades[category] then
+		return 0
+	end
+	if not self._temporary_upgrades[category][upgrade] then
+		return 0
+	end
+	return self._temporary_upgrades[category][upgrade].expire_time or 0
 end
 
 function PlayerManager:temporary_upgrade_value(category, upgrade, default)
@@ -1678,7 +1692,7 @@ function PlayerManager:check_selected_equipment_placement_valid(player)
 	end
 	if equipment_data.equipment == "trip_mine" or equipment_data.equipment == "ecm_jammer" then
 		return player:equipment():valid_look_at_placement(tweak_data.equipments[equipment_data.equipment]) and true or false
-	elseif equipment_data.equipment == "sentry_gun" or equipment_data.equipment == "ammo_bag" or equipment_data.equipment == "doctor_bag" then
+	elseif equipment_data.equipment == "sentry_gun" or equipment_data.equipment == "ammo_bag" or equipment_data.equipment == "doctor_bag" or equipment_data.equipment == "first_aid_kit" or equipment_data.equipment == "bodybags_bag" then
 		return player:equipment():valid_shape_placement(equipment_data.equipment, tweak_data.equipments[equipment_data.equipment]) and true or false
 	elseif equipment_data.equipment == "armor_kit" then
 		return true
@@ -2329,7 +2343,7 @@ function PlayerManager:_verify_loaded_data()
 	if id and not self._global.equipment[id] then
 		print("PlayerManager:_verify_loaded_data()", inspect(self._global.equipment))
 		self._global.kit.equipment_slots[1] = nil
-		self:_verify_equipment_kit()
+		self:_verify_equipment_kit(true)
 	end
 end
 

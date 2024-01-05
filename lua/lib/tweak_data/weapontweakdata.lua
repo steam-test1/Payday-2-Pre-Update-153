@@ -6559,6 +6559,99 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 end
 
+function WeaponTweakData:_init_data_offhand_weapons()
+	self.b92fs_primary = deep_clone(self.b92fs)
+	self.b92fs_primary.parent_weapon_id = "b92fs"
+	self.b92fs_primary.use_data.selection_index = 2
+	self.b92fs_primary.animations.reload_name_id = "b92fs"
+	self.b92fs_primary.use_stance = "b92fs"
+	self.b92fs_primary.texture_name = "b92fs"
+	self.b92fs_primary.AMMO_MAX = math.round(self.b92fs_primary.AMMO_MAX * 0.75)
+	self.glock_18c_primary = deep_clone(self.glock_18c)
+	self.glock_18c_primary.parent_weapon_id = "glock_18c"
+	self.glock_18c_primary.use_data.selection_index = 2
+	self.glock_18c_primary.animations.reload_name_id = "glock_18c"
+	self.glock_18c_primary.use_stance = "glock_18c"
+	self.glock_18c_primary.texture_name = "glock_18c"
+	self.glock_18c_primary.AMMO_MAX = math.round(self.glock_18c_primary.AMMO_MAX * 0.75)
+	self.olympic_primary = deep_clone(self.olympic)
+	self.olympic_primary.parent_weapon_id = "olympic"
+	self.olympic_primary.use_data.selection_index = 2
+	self.olympic_primary.animations.reload_name_id = "olympic"
+	self.olympic_primary.use_stance = "olympic"
+	self.olympic_primary.texture_name = "olympic"
+	self.olympic_primary.AMMO_MAX = math.round(self.olympic_primary.AMMO_MAX * 0.75)
+	self.akmsu_primary = deep_clone(self.akmsu)
+	self.akmsu_primary.parent_weapon_id = "akmsu"
+	self.akmsu_primary.use_data.selection_index = 2
+	self.akmsu_primary.animations.reload_name_id = "akmsu"
+	self.akmsu_primary.use_stance = "akmsu"
+	self.akmsu_primary.texture_name = "akmsu"
+	self.akmsu_primary.AMMO_MAX = math.round(self.akmsu_primary.AMMO_MAX * 0.75)
+	self.deagle_primary = deep_clone(self.deagle)
+	self.deagle_primary.parent_weapon_id = "deagle"
+	self.deagle_primary.use_data.selection_index = 2
+	self.deagle_primary.animations.reload_name_id = "deagle"
+	self.deagle_primary.use_stance = "deagle"
+	self.deagle_primary.texture_name = "deagle"
+	self.deagle_primary.weapon_hold = "deagle"
+	self.deagle_primary.AMMO_MAX = math.round(self.deagle_primary.AMMO_MAX * 0.75)
+	self.colt_1911_primary = deep_clone(self.colt_1911)
+	self.colt_1911_primary.parent_weapon_id = "colt_1911"
+	self.colt_1911_primary.use_data.selection_index = 2
+	self.colt_1911_primary.animations.reload_name_id = "colt_1911"
+	self.colt_1911_primary.use_stance = "colt_1911"
+	self.colt_1911_primary.texture_name = "colt_1911"
+	self.colt_1911_primary.weapon_hold = "colt_1911"
+	self.colt_1911_primary.AMMO_MAX = math.round(self.colt_1911_primary.AMMO_MAX * 0.75)
+	self.raging_bull_primary = deep_clone(self.new_raging_bull)
+	self.raging_bull_primary.parent_weapon_id = "new_raging_bull"
+	self.raging_bull_primary.use_data.selection_index = 2
+	self.raging_bull_primary.animations.reload_name_id = "new_raging_bull"
+	self.raging_bull_primary.use_stance = "new_raging_bull"
+	self.raging_bull_primary.texture_name = "new_raging_bull"
+	self.raging_bull_primary.AMMO_MAX = math.round(self.raging_bull_primary.AMMO_MAX * 0.75)
+	self.ak74_secondary = deep_clone(self.ak74)
+	self.ak74_secondary.parent_weapon_id = "ak74"
+	self.ak74_secondary.use_data.selection_index = 1
+	self.ak74_secondary.animations.reload_name_id = "ak74"
+	self.ak74_secondary.use_stance = "ak74"
+	self.ak74_secondary.texture_name = "ak74"
+	self.ak74_secondary.AMMO_MAX = math.round(self.ak74_secondary.AMMO_MAX * 0.75)
+	self.aug_secondary = deep_clone(self.aug)
+	self.aug_secondary.parent_weapon_id = "aug"
+	self.aug_secondary.use_data.selection_index = 1
+	self.aug_secondary.animations.reload_name_id = "aug"
+	self.aug_secondary.use_stance = "aug"
+	self.aug_secondary.texture_name = "aug"
+	self.aug_secondary.weapon_hold = "aug"
+	self.aug_secondary.AMMO_MAX = math.round(self.aug_secondary.AMMO_MAX * 0.75)
+	self.saw_secondary = deep_clone(self.saw)
+	self.saw_secondary.parent_weapon_id = "saw"
+	self.saw_secondary.use_data.selection_index = 1
+	self.saw_secondary.animations.reload_name_id = "saw"
+	self.saw_secondary.use_stance = "saw"
+	self.saw_secondary.texture_name = "saw"
+	self.saw_secondary.weapon_hold = "saw"
+	self.saw_secondary.AMMO_MAX = math.round(self.saw_secondary.AMMO_MAX * 0.75)
+	self.s552_secondary = deep_clone(self.s552)
+	self.s552_secondary.parent_weapon_id = "s552"
+	self.s552_secondary.use_data.selection_index = 1
+	self.s552_secondary.animations.reload_name_id = "s552"
+	self.s552_secondary.use_stance = "s552"
+	self.s552_secondary.texture_name = "s552"
+	self.s552_secondary.weapon_hold = "s552"
+	self.s552_secondary.AMMO_MAX = math.round(self.s552_secondary.AMMO_MAX * 0.75)
+	self.m4_secondary = deep_clone(self.new_m4)
+	self.m4_secondary.parent_weapon_id = "new_m4"
+	self.m4_secondary.use_data.selection_index = 1
+	self.m4_secondary.animations.reload_name_id = "new_m4"
+	self.m4_secondary.use_stance = "new_m4"
+	self.m4_secondary.texture_name = "new_m4"
+	self.m4_secondary.weapon_hold = "new_m4"
+	self.m4_secondary.AMMO_MAX = math.round(self.m4_secondary.AMMO_MAX * 0.75)
+end
+
 function WeaponTweakData:_create_table_structure_wip()
 end
 

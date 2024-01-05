@@ -2870,6 +2870,9 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		if managers.menu:is_pc_controller() then
 			managers.features:announce_feature("blackmarket_rename")
 		end
+		if managers.dlc:is_dlc_unlocked("ach_bulldog_1") then
+			managers.features:announce_feature("freed_old_hoxton")
+		end
 		local new_givens = managers.blackmarket:fetch_new_items_unlocked()
 		local params = {}
 		params.sound_event = "stinger_new_weapon"
@@ -4322,7 +4325,7 @@ function BlackMarketGui:update_info_text()
 		if not slot_data.unlocked then
 			local skill_based = slot_data.skill_based
 			local level_based = slot_data.level and 0 < slot_data.level
-			local dlc_based = tweak_data.lootdrop.global_values[slot_data.global_value] and tweak_data.lootdrop.global_values[slot_data.global_value].dlc and not tweak_data.dlc[slot_data.global_value].free and not managers.dlc:has_dlc(slot_data.global_value)
+			local dlc_based = slot_data.dlc_based or tweak_data.lootdrop.global_values[slot_data.global_value] and tweak_data.lootdrop.global_values[slot_data.global_value].dlc and not tweak_data.dlc[slot_data.global_value].free and not managers.dlc:has_dlc(slot_data.global_value)
 			local skill_text_id = skill_based and (slot_data.skill_name or "bm_menu_skilltree_locked") or false
 			local level_text_id = level_based and "bm_menu_level_req" or false
 			local dlc_text_id = dlc_based and slot_data.dlc_locked or false
@@ -4651,7 +4654,7 @@ function BlackMarketGui:update_info_text()
 	elseif identifier == self.identifiers.character then
 		updated_texts[1].text = slot_data.name_localized
 		if not slot_data.unlocked then
-			local dlc_text_id = slot_data.dlc_locked
+			local dlc_text_id = slot_data.dlc_locked or "ERR"
 			local text = managers.localization:to_upper_text(dlc_text_id, {}) .. "\n"
 			updated_texts[3].text = text
 		end
@@ -5765,8 +5768,20 @@ function BlackMarketGui:populate_characters(data)
 		new_data.equipped_text = managers.localization:text("bm_menu_preferred")
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
 		new_data.stream = false
-		new_data.lock_texture = self:get_lock_icon(new_data)
-		new_data.dlc_locked = character_table and character_table.dlc and tweak_data.lootdrop.global_values[character_table.dlc].unlock_id or "bm_menu_dlc_locked"
+		new_data.lock_texture = self:get_lock_icon(new_data, "guis/textures/pd2/lock_community")
+		if character_table and character_table.locks then
+			local dlc = character_table.locks.dlc
+			local achievement = character_table.locks.achievement
+			local saved_job_value = character_table.locks.saved_job_value
+			local level = character_table.locks.level
+			if achievement and managers.achievment:get_info(achievement) and not managers.achievment:get_info(achievement).awarded then
+				new_data.dlc_locked = "menu_bm_achievement_locked_" .. tostring(achievement)
+			elseif dlc and not managers.dlc:is_dlc_unlocked(dlc) then
+				new_data.dlc_locked = tweak_data.lootdrop.global_values[dlc] and tweak_data.lootdrop.global_values[dlc].unlock_id or "bm_menu_dlc_locked"
+			end
+		else
+			new_data.dlc_locked = character_table and character_table.dlc and tweak_data.lootdrop.global_values[character_table.dlc] and tweak_data.lootdrop.global_values[character_table.dlc].unlock_id or "bm_menu_dlc_locked"
+		end
 		if not new_data.equipped and new_data.unlocked then
 			table.insert(new_data, "c_equip")
 		end
@@ -5855,8 +5870,24 @@ function BlackMarketGui:populate_melee_weapons(data)
 		new_data.global_value = m_tweak_data.dlc or "normal"
 		new_data.skill_based = melee_weapon_data[2].skill_based
 		new_data.skill_name = "bm_menu_skill_locked_" .. new_data.name
-		new_data.lock_texture = self:get_lock_icon(new_data)
-		new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
+		if m_tweak_data and m_tweak_data.locks then
+			local dlc = m_tweak_data.locks.dlc
+			local achievement = m_tweak_data.locks.achievement
+			local saved_job_value = m_tweak_data.locks.saved_job_value
+			local level = m_tweak_data.locks.level
+			new_data.dlc_based = true
+			new_data.lock_texture = self:get_lock_icon(new_data, "guis/textures/pd2/lock_community")
+			if achievement and managers.achievment:get_info(achievement) and not managers.achievment:get_info(achievement).awarded then
+				new_data.dlc_locked = "menu_bm_achievement_locked_" .. tostring(achievement)
+			elseif dlc and not managers.dlc:is_dlc_unlocked(dlc) then
+				new_data.dlc_locked = tweak_data.lootdrop.global_values[dlc] and tweak_data.lootdrop.global_values[dlc].unlock_id or "bm_menu_dlc_locked"
+			else
+				new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
+			end
+		else
+			new_data.lock_texture = self:get_lock_icon(new_data)
+			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
+		end
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. tostring(new_data.name)
 		if melee_weapon_id == "weapon" then
 			new_data.extra_bitmaps = {}
@@ -7129,7 +7160,7 @@ function BlackMarketGui:_start_page_data()
 		name = "bm_menu_deployables",
 		category = "deployables",
 		on_create_func_name = "populate_deployables",
-		override_slots = {3, 2},
+		override_slots = {4, 2},
 		identifier = Idstring("deployable")
 	})
 	table.insert(data, {

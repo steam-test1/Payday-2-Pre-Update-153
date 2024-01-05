@@ -105,6 +105,7 @@ do
 		"ene_fbi_1",
 		"ene_fbi_2",
 		"ene_fbi_3",
+		"ene_fbi_boss_1",
 		"ene_fbi_female_1",
 		"ene_fbi_female_2",
 		"ene_fbi_female_3",
@@ -157,7 +158,9 @@ do
 		"ene_swat_2",
 		"ene_swat_heavy_1",
 		"ene_tazer_1",
-		"ene_veteran_cop_1"
+		"ene_veteran_cop_1",
+		"npc_old_hoxton_prisonsuit_1",
+		"npc_old_hoxton_prisonsuit_2"
 	}
 	local path_string = "units/payday2/characters/"
 	local character_path = ""

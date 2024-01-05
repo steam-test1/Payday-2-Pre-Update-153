@@ -968,7 +968,7 @@ end
 function WeaponFactoryManager:blueprint_to_string(factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local index_table = {}
-	for i, part_id in ipairs(factory[factory_id].uses_parts) do
+	for i, part_id in ipairs(factory[factory_id] and factory[factory_id].uses_parts or {}) do
 		index_table[part_id] = i
 	end
 	local s = ""

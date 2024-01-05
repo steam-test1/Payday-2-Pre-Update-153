@@ -12,7 +12,7 @@ HostNetworkSession._STATES = {
 	game_end = HostStateGameEnd,
 	closing = HostStateClosing
 }
-HostNetworkSession._DEAD_CONNECTION_REPORT_PROCESS_DELAY = 5
+HostNetworkSession._DEAD_CONNECTION_REPORT_PROCESS_DELAY = math.max(HostNetworkSession.CONNECTION_TIMEOUT, HostNetworkSession.LOADING_CONNECTION_TIMEOUT) + 1.5
 HostNetworkSession._LOAD_COUNTER_LIMITS = {1, 1024}
 
 function HostNetworkSession:init()

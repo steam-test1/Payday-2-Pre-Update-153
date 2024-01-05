@@ -11,6 +11,8 @@ function EnvironmentManager:init()
 	self._global_feeder_map = {}
 	self._predefined_environment_filter_map = {}
 	self._global_environment_modifier_map = {}
+	self._game_default_environment_path = "core/environments/default"
+	self._default_environment_path = self._game_default_environment_path
 	local feeder_class_list = {
 		CoreEnvironmentFeeder.UnderlayPathFeeder,
 		CoreEnvironmentFeeder.GlobalLightColorFeeder,
@@ -169,6 +171,7 @@ function EnvironmentManager:init()
 			self._deprecated_data_path_map[data_path] = true
 		end
 	end
+	self:preload_environment(self._game_default_environment_path)
 end
 
 function EnvironmentManager:destroy()
@@ -180,7 +183,7 @@ function EnvironmentManager:destroy()
 	self._deprecated_data_path_map = nil
 end
 
-function EnvironmentManager:preload(path)
+function EnvironmentManager:preload_environment(path)
 	if not self._env_data_map[path] then
 		self._env_data_map[path] = self:_load(path)
 	end
@@ -219,9 +222,21 @@ function EnvironmentManager:set_global_environment_modifier(data_path_key, is_ov
 	self._global_environment_modifier_map[data_path_key] = global_modifier_data
 end
 
-function EnvironmentManager:_set_global_feeder(data_path_key, feeder)
-	local old_feeder = self._global_feeder_map[data_path_key]
-	self._global_feeder_map[data_path_key] = feeder
+function EnvironmentManager:set_default_environment(default_environment_path)
+	self._default_environment_path = default_environment_path
+end
+
+function EnvironmentManager:default_environment()
+	return self._default_environment_path
+end
+
+function EnvironmentManager:game_default_environment()
+	return self._game_default_environment_path
+end
+
+function EnvironmentManager:_set_global_feeder(feeder)
+	local old_feeder = self._global_feeder_map[feeder.DATA_PATH_KEY]
+	self._global_feeder_map[feeder.DATA_PATH_KEY] = feeder
 	return old_feeder
 end
 

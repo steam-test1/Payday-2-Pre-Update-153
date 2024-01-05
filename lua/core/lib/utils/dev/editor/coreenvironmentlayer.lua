@@ -6,6 +6,7 @@ core:import("CoreEditorSave")
 core:import("CoreShapeManager")
 core:import("CoreEnvironmentFeeder")
 EnvironmentLayer = EnvironmentLayer or class(CoreStaticLayer.StaticLayer)
+EnvironmentLayer.ENABLE_PERMANENT = false
 
 function EnvironmentLayer:init(owner)
 	EnvironmentLayer.super.init(self, owner, "environment", {
@@ -389,7 +390,7 @@ function EnvironmentLayer:build_panel(notebook)
 		panel = self._env_panel,
 		sizer = self._environment_sizer,
 		options = managers.database:list_entries_of_type("environment"),
-		value = managers.environment_area:game_default_environment(),
+		value = managers.viewport:game_default_environment(),
 		value_changed_cb = function(params)
 			self:set_environment_area(params.ctrlr)
 		end
@@ -422,6 +423,8 @@ function EnvironmentLayer:build_panel(notebook)
 	self._environment_sizer:add(transition_sizer, 0, 0, "EXPAND")
 	local permanent_cb = EWS:CheckBox(self._env_panel, "Permanent", "")
 	permanent_cb:set_value(false)
+	permanent_cb:set_tool_tip("This is only useful when it's a linear single player game.")
+	permanent_cb:set_enabled(self.ENABLE_PERMANENT)
 	self._environment_sizer:add(permanent_cb, 0, 0, "EXPAND")
 	permanent_cb:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_permanent"), nil)
 	self._environment_area_ctrls.transition_time = transition
@@ -571,7 +574,7 @@ end
 
 function EnvironmentLayer:change_environment(ctrlr)
 	self._environment_values.environment = ctrlr:get_value()
-	managers.environment_area:set_default_environment(self._environment_values.environment)
+	managers.viewport:set_default_environment(self._environment_values.environment, nil, nil)
 end
 
 function EnvironmentLayer:change_color_grading(ctrlr)
@@ -812,8 +815,8 @@ function EnvironmentLayer:set_environment_area_parameters()
 			self._current_shape_panel:set_visible(true)
 			CoreEws.set_combobox_and_list_enabled(self._environment_area_ctrls.environment_combobox, true)
 			CoreEws.change_combobox_value(self._environment_area_ctrls.environment_combobox, area:environment())
-			self._environment_area_ctrls.permanent_cb:set_enabled(true)
-			self._environment_area_ctrls.permanent_cb:set_value(area:permanent())
+			self._environment_area_ctrls.permanent_cb:set_enabled(self.ENABLE_PERMANENT)
+			self._environment_area_ctrls.permanent_cb:set_value(self.ENABLE_PERMANENT and area:permanent())
 			self._environment_area_ctrls.transition_time:set_enabled(true)
 			self._environment_area_ctrls.transition_time:set_value(string.format("%.2f", area:transition_time()))
 			local filter_map = managers.viewport:get_predefined_environment_filter_map()
@@ -859,7 +862,7 @@ function EnvironmentLayer:wind_beaufort(speed)
 end
 
 function EnvironmentLayer:reset_environment_values()
-	self._environment_values.environment = managers.environment_area:game_default_environment()
+	self._environment_values.environment = managers.viewport:game_default_environment()
 	self._environment_values.sky_rot = 0
 	managers.viewport:update_global_environment_value(CoreEnvironmentFeeder.SkyRotationFeeder.DATA_PATH_KEY)
 	self._environment_values.color_grading = managers.environment_controller:game_default_color_grading()
@@ -867,9 +870,9 @@ function EnvironmentLayer:reset_environment_values()
 end
 
 function EnvironmentLayer:clear()
-	managers.environment_area:set_to_default()
+	managers.viewport:editor_reset_environment()
 	self:reset_environment_values()
-	managers.environment_area:set_default_environment(self._environment_values.environment)
+	managers.viewport:set_default_environment(self._environment_values.environment, nil, nil)
 	CoreEws.change_combobox_value(self._environments_combobox, self._environment_values.environment)
 	self._sky_rotation:set_value(self._environment_values.sky_rot)
 	CoreEws.change_combobox_value(self._color_grading_combobox, self._environment_values.color_grading)

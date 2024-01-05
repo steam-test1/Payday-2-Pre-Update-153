@@ -5308,7 +5308,9 @@ function WeaponFactoryTweakData:_init_deagle()
 		},
 		forbids = {
 			"wpn_fps_pis_deagle_co_long",
-			"wpn_fps_pis_deagle_co_short"
+			"wpn_fps_pis_deagle_co_short",
+			"wpn_fps_upg_ns_pis_meatgrinder",
+			"wpn_fps_upg_ns_pis_ipsccomp"
 		},
 		override = {
 			wpn_upg_o_marksmansight_front = {a_obj = "a_ol"}
@@ -12162,11 +12164,7 @@ function WeaponFactoryTweakData:_init_galil()
 		texture_bundle_folder = "big_bank",
 		dlc = "big_bank",
 		is_a_unlockable = true,
-		animations = {
-			reload = "reload",
-			fire = "recoil",
-			fire_steelsight = "recoil"
-		}
+		animations = {reload = "reload"}
 	}
 	self.parts.wpn_fps_ass_galil_fg_fab = {
 		pcs = {},

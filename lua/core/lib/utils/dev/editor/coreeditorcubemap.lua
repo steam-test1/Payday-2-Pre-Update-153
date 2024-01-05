@@ -55,8 +55,8 @@ function CoreEditor:create_projection_light(type)
 	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
 	self:viewport():vp():set_post_processor_effect("World", Idstring("deferred"), Idstring("projection_generation"))
 	self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("depth_project"))
-	local saved_environment = managers.environment_area:default_environment()
-	managers.environment_area:set_default_environment("core/environments/default_depthlight")
+	local saved_environment = managers.viewport:default_environment()
+	managers.viewport:set_default_environment("core/environments/default_depthlight", nil, nil)
 	self:_create_cube_light({
 		cubes = lights,
 		simple_postfix = true,
@@ -157,7 +157,7 @@ function CoreEditor:cube_map_done()
 		return
 	end
 	if self._cubemap_params.saved_environment then
-		managers.environment_area:set_default_environment(self._cubemap_params.saved_environment)
+		managers.viewport:set_default_environment(self._cubemap_params.saved_environment, nil, nil)
 	end
 	if self._saved_all_lights then
 		for _, data in ipairs(self._saved_all_lights) do

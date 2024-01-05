@@ -451,15 +451,17 @@ function CopDamage:damage_explosion(attack_data)
 end
 
 function CopDamage:roll_critical_hit(damage)
+	local critical_hits = self._char_tweak.critical_hits or {}
 	local critical_hit = false
-	local critical_value = 0 + managers.player:critical_hit_chance()
+	local critical_value = (critical_hits.base_chance or 0) + managers.player:critical_hit_chance() * (critical_hits.player_chance_multiplier or 1)
 	if 0 < critical_value then
 		local critical_roll = math.rand(1)
 		critical_hit = critical_value > critical_roll
 	end
 	if critical_hit then
-		if self._char_tweak.headshot_dmg_mul then
-			damage = damage * self._char_tweak.headshot_dmg_mul
+		local critical_damage_mul = critical_hits.damage_mul or self._char_tweak.headshot_dmg_mul
+		if critical_damage_mul then
+			damage = damage * critical_damage_mul
 		else
 			damage = self._health * 10
 		end
@@ -477,13 +479,16 @@ function CopDamage:damage_melee(attack_data)
 	local result
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local damage = attack_data.damage
-	if attack_data.attacker_unit == managers.player:player_unit() then
+	if attack_data.attacker_unit and attack_data.attacker_unit == managers.player:player_unit() then
 		local critical_hit, crit_damage = self:roll_critical_hit(damage)
 		if critical_hit then
 			managers.hud:on_crit_confirmed()
 			damage = crit_damage
 		else
 			managers.hud:on_hit_confirmed()
+		end
+		if tweak_data.achievement.cavity.melee_type == attack_data.name_id and not self:_type_civilian(self._unit:base()._tweak_table) then
+			managers.achievment:award(tweak_data.achievement.cavity.award)
 		end
 	end
 	damage = damage * (self._marked_dmg_mul or 1)

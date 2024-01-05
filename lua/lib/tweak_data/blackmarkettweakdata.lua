@@ -92,6 +92,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.hoxton = "hoxton"
 	self.masks.character_locked.chains = "chains"
 	self.masks.character_locked.jowi = "jw_shades"
+	self.masks.character_locked.old_hoxton = "old_hoxton"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -151,6 +152,12 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.chains_clean.infamous = true
 	self.masks.chains_clean.value = 9
 	self.masks.chains_clean.qlvl = 0
+	self.masks.old_hoxton = {}
+	self.masks.old_hoxton.unit = "units/pd2_dlc_old_hoxton/masks/old_hoxton/msk_old_hoxton"
+	self.masks.old_hoxton.name_id = "bm_msk_old_hoxton"
+	self.masks.old_hoxton.pcs = {}
+	self.masks.old_hoxton.value = 0
+	self.masks.old_hoxton.global_value = "infamous"
 	self.masks.dallas = {}
 	self.masks.dallas.unit = "units/payday2/masks/msk_dallas/msk_dallas"
 	self.masks.dallas.name_id = "bm_msk_dallas"
@@ -1320,6 +1327,11 @@ function BlackMarketTweakData:_init_characters()
 		sequence = "var_mtr_john_wick",
 		dlc = "pd2_clan"
 	}
+	self.characters.locked.old_hoxton = {
+		sequence = "var_mtr_old_hoxton",
+		dlc = "freed_old_hoxton",
+		locks = {dlc = "pd2_clan", achievement = "bulldog_1"}
+	}
 	self.characters.ai_hoxton = {}
 	self.characters.ai_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/hoxton/npc_criminal_suit_hoxton"
 	self.characters.ai_hoxton.sequence = "var_mtr_hoxton"
@@ -1340,6 +1352,10 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_jowi.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jowi/npc_criminal_suit_jowi"
 	self.characters.ai_jowi.sequence = "var_mtr_john_wick"
 	self.characters.ai_jowi.name_id = "bm_character_ai_jowi"
+	self.characters.ai_old_hoxton = {}
+	self.characters.ai_old_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/old_hoxton/npc_criminal_suit_old_hoxton"
+	self.characters.ai_old_hoxton.sequence = "var_mtr_old_hoxton"
+	self.characters.ai_old_hoxton.name_id = "bm_character_ai_old_hoxton"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -4881,6 +4897,10 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.trip_mine.name_id = "bm_equipment_trip_mine"
 	self.deployables.armor_kit = {}
 	self.deployables.armor_kit.name_id = "bm_equipment_armor_kit"
+	self.deployables.first_aid_kit = {}
+	self.deployables.first_aid_kit.name_id = "bm_equipment_first_aid_kit"
+	self.deployables.bodybags_bag = {}
+	self.deployables.bodybags_bag.name_id = "bm_equipment_bodybags_bag"
 	self:_add_desc_from_name_macro(self.deployables)
 end
 
@@ -5434,5 +5454,33 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.kabartanto.stats.charge_time = 1.7
 	self.melee_weapons.kabartanto.stats.range = 185
 	self.melee_weapons.kabartanto.stats.concealment = 30
+	self.melee_weapons.toothbrush = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.toothbrush.name_id = "bm_melee_toothbrush"
+	self.melee_weapons.toothbrush.dlc = "pd2_clan"
+	self.melee_weapons.toothbrush.locks = {dlc = "pd2_clan", achievement = "bulldog_1"}
+	self.melee_weapons.toothbrush.texture_bundle_folder = nil
+	self.melee_weapons.toothbrush.free = nil
+	self.melee_weapons.toothbrush.anim_global_param = "melee_stab"
+	self.melee_weapons.toothbrush.type = "knife"
+	self.melee_weapons.toothbrush.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.toothbrush.unit = "units/pd2_crimefest_2014/oct27/weapons/wpn_fps_mel_toothbrush_shiv/wpn_fps_mel_toothbrush_shiv"
+	self.melee_weapons.toothbrush.third_unit = "units/pd2_crimefest_2014/oct27/weapons/wpn_fps_mel_toothbrush_shiv/wpn_third_mel_toothbrush_shiv"
+	self.melee_weapons.toothbrush.stats.weapon_type = "sharp"
+	self.melee_weapons.toothbrush.stats.min_damage = 2.5
+	self.melee_weapons.toothbrush.stats.max_damage = 4
+	self.melee_weapons.toothbrush.stats.min_damage_effect = 0.1
+	self.melee_weapons.toothbrush.stats.max_damage_effect = 1
+	self.melee_weapons.toothbrush.stats.charge_time = 1.5
+	self.melee_weapons.toothbrush.stats.range = 150
+	self.melee_weapons.toothbrush.sounds = {}
+	self.melee_weapons.toothbrush.sounds.equip = "toothbrush_equip"
+	self.melee_weapons.toothbrush.sounds.hit_air = "toothbrush_hit_air"
+	self.melee_weapons.toothbrush.sounds.hit_gen = "toothbrush_hit_gen"
+	self.melee_weapons.toothbrush.sounds.hit_body = "toothbrush_hit_body"
+	self.melee_weapons.toothbrush.sounds.charge = "toothbrush_charge"
+	self.melee_weapons.toothbrush.repeat_expire_t = 0.3
+	self.melee_weapons.toothbrush.stats.concealment = 30
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

@@ -404,14 +404,15 @@ function TweakData:init()
 		"german",
 		"spanish",
 		"american",
-		"jowi"
+		"jowi",
+		"old_hoxton"
 	}
 	self.criminals.characters = {
 		{
 			name = "american",
 			static_data = {
 				ai_character_id = "ai_hoxton",
-				ssuffix = "d",
+				ssuffix = "l",
 				color_id = 1,
 				voice = "rb2",
 				ai_mask_id = "hoxton",
@@ -459,6 +460,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb6",
 				ai_mask_id = "jw_shades",
+				mask_id = 4
+			}
+		},
+		{
+			name = "old_hoxton",
+			static_data = {
+				ai_character_id = "ai_old_hoxton",
+				ssuffix = "d",
+				color_id = 4,
+				voice = "rb5",
+				ai_mask_id = "old_hoxton",
 				mask_id = 4
 			}
 		}
@@ -1112,6 +1124,7 @@ function TweakData:init()
 		kill_type = "melee",
 		count = 50
 	}
+	self.achievement.cavity = {award = "bulldog_4", melee_type = "toothbrush"}
 	self.achievement.one_man_army = {
 		award = "gage5_3",
 		equipped = {
@@ -1699,6 +1712,24 @@ function TweakData:init()
 			},
 			job = "gallery"
 		},
+		death_hoxton = {
+			award = "bulldog_2",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "hox"
+		},
+		death_hoxton_prof = {
+			award = "bulldog_3",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "hox_prof"
+		},
+		complete_hoxton = {
+			award = "bulldog_1",
+			jobs = {"hox", "hox_prof"}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -1753,12 +1784,15 @@ function TweakData:init()
 		"arm_fac",
 		"arm_par",
 		"arm_und",
-		"kosugi"
+		"kosugi",
+		"gallery"
 	}
 	self.achievement.job_list.dentist = {
 		"big",
 		"mia",
-		"mia_prof"
+		"mia_prof",
+		"hox",
+		"hox_prof"
 	}
 	self.achievement.complete_heist_stats_achievements = {
 		death_vlad = {

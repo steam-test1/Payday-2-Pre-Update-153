@@ -1,4 +1,10 @@
 UpgradesManager = UpgradesManager or class()
+UpgradesManager.AQUIRE_STRINGS = {
+	"Default",
+	"SkillTree",
+	"SpecializationTree",
+	"LevelTree"
+}
 
 function UpgradesManager:init()
 	self:_setup()
@@ -85,7 +91,7 @@ function UpgradesManager:aquire_from_level_tree(level, loading)
 		return
 	end
 	for _, upgrade in ipairs(tree_data.upgrades) do
-		self:aquire(upgrade, loading)
+		self:aquire(upgrade, loading, UpgradesManager.AQUIRE_STRINGS[4] .. tostring(level))
 	end
 end
 
@@ -126,31 +132,43 @@ function UpgradesManager:_autochange_tree(exlude_tree)
 end
 
 function UpgradesManager:aquired(id)
-	if self._global.aquired[id] then
-		return true
+	local count = 0
+	for key, aquired in pairs(self._global.aquired[id] or {}) do
+		if aquired then
+			count = count + 1
+		end
 	end
+	return 0 < count
 end
 
-function UpgradesManager:aquire_default(id)
+function UpgradesManager:aquire_default(id, identifier)
 	if not tweak_data.upgrades.definitions[id] then
 		Application:error("Tried to aquire an upgrade that doesn't exist: " .. id .. "")
 		return
 	end
-	if self._global.aquired[id] then
+	local upgrade = tweak_data.upgrades.definitions[id]
+	if upgrade.dlc and (tweak_data.dlc[upgrade.dlc] and tweak_data.dlc[upgrade.dlc].free or not managers.dlc:has_dlc(upgrade.dlc)) then
+		Application:error("Tried to aquire an upgrade locked to a dlc you do not have: " .. id .. " DLC: ", upgrade.dlc)
 		return
 	end
-	self._global.aquired[id] = true
+	if not identifier then
+		debug_pause(identifier, "[UpgradesManager:aquire_default] No identifier for upgrade aquire", "id", id)
+		identifier = UpgradesManager.AQUIRE_STRINGS[1]
+	end
+	local identify_key = Idstring(identifier):key()
+	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
+		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id, "identifier", identifier)
+		return
+	end
+	self._global.aquired[id] = self._global.aquired[id] or {}
+	self._global.aquired[id][identify_key] = identifier
 	local upgrade = tweak_data.upgrades.definitions[id]
 	self:_aquire_upgrade(upgrade, id, true)
 end
 
-function UpgradesManager:enable_weapon(id)
+function UpgradesManager:enable_weapon(id, identifier)
 	if not tweak_data.upgrades.definitions[id] then
 		Application:error("Tried to aquire an upgrade that doesn't exist: " .. (id or "nil") .. "")
-		return
-	end
-	if self._global.aquired[id] then
-		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id .. "")
 		return
 	end
 	local upgrade = tweak_data.upgrades.definitions[id]
@@ -158,42 +176,69 @@ function UpgradesManager:enable_weapon(id)
 		Application:error("Tried to aquire an upgrade locked to a dlc you do not have: " .. id .. " DLC: ", upgrade.dlc)
 		return
 	end
-	self._global.aquired[id] = true
-	managers.player:aquire_weapon(upgrade, id)
+	if not identifier then
+		debug_pause(identifier, "[UpgradesManager:aquire_default] No identifier for upgrade aquire", "id", id)
+		identifier = UpgradesManager.AQUIRE_STRINGS[1]
+	end
+	local identify_key = Idstring(identifier):key()
+	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
+		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id .. "")
+		return
+	end
+	self._global.aquired[id] = self._global.aquired[id] or {}
+	self._global.aquired[id][identify_key] = identifier
+	managers.player:aquire_weapon(upgrade, id, UpgradesManager.AQUIRE_STRINGS[1])
 end
 
-function UpgradesManager:aquire(id, loading)
+function UpgradesManager:aquire(id, loading, identifier)
 	if not tweak_data.upgrades.definitions[id] then
 		Application:error("Tried to aquire an upgrade that doesn't exist: " .. (id or "nil") .. "")
 		return
 	end
-	if self._global.aquired[id] then
-		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id .. "")
-		return
-	end
 	local upgrade = tweak_data.upgrades.definitions[id]
-	if upgrade.dlc and (tweak_data.dlc[upgrade.dlc] and tweak_data.dlc[upgrade.dlc].free or not managers.dlc:has_dlc(upgrade.dlc)) then
+	if upgrade.dlc and not managers.dlc:is_dlc_unlocked(upgrade.dlc) then
 		Application:error("Tried to aquire an upgrade locked to a dlc you do not have: " .. id .. " DLC: ", upgrade.dlc)
 		return
 	end
-	local level = managers.experience:current_level() + 1
-	self._global.aquired[id] = true
+	if not identifier then
+		debug_pause(identifier, "[UpgradesManager:aquire] No identifier for upgrade aquire", "id", id, "loading", loading)
+		identifier = UpgradesManager.AQUIRE_STRINGS[1]
+	end
+	local identify_key = Idstring(identifier):key()
+	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
+		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id, "identifier", identifier)
+		return
+	end
+	self._global.aquired[id] = self._global.aquired[id] or {}
+	self._global.aquired[id][identify_key] = identifier
 	self:_aquire_upgrade(upgrade, id, loading)
 	self:setup_current_weapon()
 end
 
-function UpgradesManager:unaquire(id)
+function UpgradesManager:unaquire(id, identifier)
 	if not tweak_data.upgrades.definitions[id] then
 		Application:error("Tried to unaquire an upgrade that doesn't exist: " .. (id or "nil") .. "")
 		return
 	end
-	if not self._global.aquired[id] then
-		Application:error("Tried to unaquire an upgrade that hasn't benn aquired: " .. id .. "")
+	if not identifier then
+		debug_pause(identifier, "[UpgradesManager:unaquire] No identifier for upgrade aquire", "id", id)
+		identifier = UpgradesManager.AQUIRE_STRINGS[1]
+	end
+	local identify_key = Idstring(identifier):key()
+	if not self._global.aquired[id] or not self._global.aquired[id][identify_key] then
+		Application:error("Tried to unaquire an upgrade that hasn't benn aquired: " .. id, "identifier", identifier)
 		return
 	end
-	self._global.aquired[id] = nil
-	local upgrade = tweak_data.upgrades.definitions[id]
-	self:_unaquire_upgrade(upgrade, id)
+	self._global.aquired[id][identify_key] = nil
+	local count = 0
+	for key, aquired in pairs(self._global.aquired[id]) do
+		count = count + 1
+	end
+	if count == 0 then
+		self._global.aquired[id] = nil
+		local upgrade = tweak_data.upgrades.definitions[id]
+		self:_unaquire_upgrade(upgrade, id)
+	end
 end
 
 function UpgradesManager:_aquire_upgrade(upgrade, id, loading)
@@ -274,8 +319,8 @@ function UpgradesManager:_unaquire_feature(feature)
 	end
 end
 
-function UpgradesManager:_aquire_equipment(equipment, id)
-	managers.player:aquire_equipment(equipment, id)
+function UpgradesManager:_aquire_equipment(equipment, id, loading)
+	managers.player:aquire_equipment(equipment, id, loading)
 end
 
 function UpgradesManager:_unaquire_equipment(equipment, id)
@@ -532,7 +577,7 @@ end
 function UpgradesManager:aquired_by_category(category)
 	local t = {}
 	for name, _ in pairs(self._global.aquired) do
-		if tweak_data.upgrades.definitions[name].category == category then
+		if tweak_data.upgrades.definitions[name].category == category and self:aquired(name) then
 			table.insert(t, name)
 		end
 	end

@@ -5,6 +5,7 @@ local dummy_material = {
 	end
 }
 EnvironmentHandler = EnvironmentHandler or CoreClass.class()
+EnvironmentHandler.AREAS_PER_FRAME = 1
 
 function EnvironmentHandler:init(env_manager, is_first_viewport)
 	self._env_manager = env_manager
@@ -14,6 +15,8 @@ function EnvironmentHandler:init(env_manager, is_first_viewport)
 	self._apply_prio_feeder_map = {}
 	self._apply_feeder_map = {}
 	self._post_processor_modifier_material_map = {}
+	self._area_iterator = 1
+	self:set_environment(self._env_manager:default_environment(), nil, nil, nil, nil)
 end
 
 function EnvironmentHandler:destroy()
@@ -32,7 +35,7 @@ function EnvironmentHandler:destroy()
 	self._post_processor_modifier_material_map = nil
 end
 
-function EnvironmentHandler:set(path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
+function EnvironmentHandler:set_environment(path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
 	local env_data = self._env_manager:_get_data(path)
 	local filtered_env_data
 	self._path = path
@@ -168,7 +171,7 @@ function EnvironmentHandler:update(is_first_viewport, viewport, dt)
 	else
 		scale = 1
 	end
-	self:_check_first_viewport(is_first_viewport)
+	self:set_first_viewport(is_first_viewport)
 	local remove_update_list
 	for data_path_key, feeder in pairs(self._update_feeder_map) do
 		local is_done, is_not_changed = feeder:update(self, scale)
@@ -188,19 +191,97 @@ function EnvironmentHandler:update(is_first_viewport, viewport, dt)
 end
 
 function EnvironmentHandler:apply(is_first_viewport, viewport, scene)
-	self:_check_first_viewport(is_first_viewport)
+	self:set_first_viewport(is_first_viewport)
 	if next(self._apply_prio_feeder_map) then
 		for _, feeder in pairs(self._apply_prio_feeder_map) do
-			feeder:apply(self, viewport, scene)
+			if not feeder.IS_GLOBAL or is_first_viewport then
+				feeder:apply(self, viewport, scene)
+			end
 		end
 		self._apply_prio_feeder_map = {}
 	end
 	if next(self._apply_feeder_map) then
 		for _, feeder in pairs(self._apply_feeder_map) do
-			feeder:apply(self, viewport, scene)
+			if not feeder.IS_GLOBAL or is_first_viewport then
+				feeder:apply(self, viewport, scene)
+			end
 		end
 		self._apply_feeder_map = {}
 	end
+end
+
+function EnvironmentHandler:update_environment_area(check_pos, area_list)
+	if self._current_area then
+		if self._current_area:still_inside(check_pos) then
+			return
+		end
+		if self:_check_inside(check_pos, area_list) then
+			return
+		end
+		self:_leave_current_area()
+	end
+	self:_check_inside(check_pos, area_list)
+end
+
+function EnvironmentHandler:on_environment_area_removed(area)
+	if area == self._current_area then
+		self:_leave_current_area()
+	end
+	self._area_iterator = 1
+end
+
+function EnvironmentHandler:on_default_environment_changed(default_environment_path, blend_duration, blend_bezier_curve)
+	if not self._current_area then
+		self:set_environment(default_environment_path, blend_duration, blend_bezier_curve, nil, nil)
+	end
+end
+
+function EnvironmentHandler:set_first_viewport(is_first_viewport)
+	if self._is_first_viewport ~= is_first_viewport then
+		self._is_first_viewport = is_first_viewport
+		if is_first_viewport then
+			for data_path_key, feeder in pairs(self._feeder_map) do
+				local old_feeder = self._env_manager:_set_global_feeder(feeder)
+				if not old_feeder or not feeder:equals(old_feeder:get_current()) then
+					self:_add_apply_feeder(feeder)
+				end
+			end
+		end
+	end
+end
+
+function EnvironmentHandler:_check_inside(check_pos, area_list)
+	local area_count = #area_list
+	if 0 < area_count then
+		for i = 1, self.AREAS_PER_FRAME do
+			local area = area_list[self._area_iterator]
+			self._area_iterator = math.mod(self._area_iterator, area_count) + 1
+			if area:is_inside(check_pos) then
+				if self._current_area ~= area then
+					local environment = area:environment()
+					local blend_duration = area:transition_time()
+					local blend_bezier_curve = area:bezier_curve()
+					local filter_list = area:filter_list()
+					if area:permanent() then
+						managers.viewport:set_default_environment(environment, blend_duration, blend_bezier_curve)
+						if self._current_area then
+							self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._env_manager:default_environment())
+						end
+					else
+						self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._current_area ~= nil and self._env_manager:default_environment())
+					end
+				end
+				self._current_area = area
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function EnvironmentHandler:_leave_current_area()
+	self:set_environment(self._env_manager:default_environment(), self._current_area:transition_time(), self._current_area:bezier_curve(), nil, nil)
+	self._current_area = nil
 end
 
 function EnvironmentHandler:_get_post_processor_modifier_material(viewport, scene, id, ids_processor_name, ids_effect_name, ids_modifier)
@@ -229,22 +310,6 @@ function EnvironmentHandler:_get_post_processor_modifier_material(viewport, scen
 		scene_map[id] = material
 	end
 	return material
-end
-
-function EnvironmentHandler:_check_first_viewport(is_first_viewport)
-	if self._is_first_viewport ~= is_first_viewport then
-		self._is_first_viewport = is_first_viewport
-		if is_first_viewport then
-			for data_path_key, feeder in pairs(self._feeder_map) do
-				if feeder.IS_GLOBAL then
-					local old_feeder = self._env_manager:_set_global_feeder(feeder)
-					if not old_feeder or not feeder:equals(old_feeder:get_current()) then
-						self:_add_apply_feeder(feeder)
-					end
-				end
-			end
-		end
-	end
 end
 
 function EnvironmentHandler:_add_apply_feeder(feeder)

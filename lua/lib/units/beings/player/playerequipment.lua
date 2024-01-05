@@ -122,6 +122,24 @@ function PlayerEquipment:use_doctor_bag()
 	return false
 end
 
+function PlayerEquipment:use_first_aid_kit()
+	local ray = self:valid_shape_placement("first_aid_kit")
+	if ray then
+		local pos = ray.position
+		local rot = self._unit:movement():m_head_rot()
+		rot = Rotation(rot:yaw(), 0, 0)
+		PlayerStandard.say_line(self, "s12")
+		local upgrade_lvl = managers.player:has_category_upgrade("first_aid_kit", "damage_reduction_upgrade") and 1 or 0
+		if Network:is_client() then
+			managers.network:session():send_to_host("place_deployable_bag", "FirstAidKitBase", pos, rot, upgrade_lvl)
+		else
+			local unit = FirstAidKitBase.spawn(pos, rot, upgrade_lvl, managers.network:session():local_peer():id())
+		end
+		return true
+	end
+	return false
+end
+
 function PlayerEquipment:use_armor_kit()
 	local redirect = function()
 		if Network:is_client() then
@@ -137,6 +155,24 @@ end
 function PlayerEquipment:use_armor_kit_dropin_penalty()
 	MenuCallbackHandler:_update_outfit_information()
 	return true
+end
+
+function PlayerEquipment:use_bodybags_bag()
+	local ray = self:valid_shape_placement("bodybags_bag")
+	if ray then
+		local pos = ray.position
+		local rot = self._unit:movement():m_head_rot()
+		rot = Rotation(rot:yaw(), 0, 0)
+		PlayerStandard.say_line(self, "s13")
+		local amount_upgrade_lvl = 0
+		if Network:is_client() then
+			managers.network:session():send_to_host("place_deployable_bag", "BodyBagsBagBase", pos, rot, amount_upgrade_lvl)
+		else
+			local unit = BodyBagsBagBase.spawn(pos, rot, amount_upgrade_lvl, managers.network:session():local_peer():id())
+		end
+		return true
+	end
+	return false
 end
 
 function PlayerEquipment:use_ecm_jammer()

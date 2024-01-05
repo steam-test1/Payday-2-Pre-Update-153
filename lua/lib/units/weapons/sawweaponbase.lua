@@ -90,6 +90,7 @@ function SawWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spread_m
 				ammo_usage = 0
 			end
 		end
+		ammo_usage = math.min(ammo_usage, self:get_ammo_remaining_in_clip())
 		self:set_ammo_remaining_in_clip(math.max(self:get_ammo_remaining_in_clip() - ammo_usage, 0))
 		self:set_ammo_total(math.max(self:get_ammo_total() - ammo_usage, 0))
 		self:_check_ammo_total(user_unit)

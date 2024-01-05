@@ -18,9 +18,9 @@ end
 function SpecializationBoxGui:_create_text_box(ws, title, text, content_data, config)
 	local panel = SpecializationBoxGui.super._create_text_box(self, ws, title, text, content_data, config)
 	local xp_present = content_data.xp_present
-	local points_present = content_data.points_present
+	local available_points = managers.skilltree:get_specialization_value("points")
+	local points_present = math.min(content_data.points_present, available_points)
 	local conversion_rate_number = math.round(xp_present / points_present)
-	local total_points = managers.skilltree:get_specialization_value("points")
 	local small_text = {
 		text = "",
 		layer = 1,
@@ -118,14 +118,14 @@ function SpecializationBoxGui:_create_text_box(ws, title, text, content_data, co
 	points_gained_count_text:set_position(points_gained_title_text:left() + 10, points_gained_title_text:bottom())
 	points_gained_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(0)))
 	make_fine_text(points_gained_count_text)
-	local total_points_title_text = points_panel:text(small_text)
-	total_points_title_text:set_position(points_gained_title_text:left(), points_gained_count_text:bottom() + 2)
-	total_points_title_text:set_text(managers.localization:to_upper_text("menu_st_spec_xp_perk_total"))
-	make_fine_text(total_points_title_text)
-	local total_points_count_text = points_panel:text(medium_text)
-	total_points_count_text:set_position(total_points_title_text:left() + 10, total_points_title_text:bottom())
-	total_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(total_points - points_present)))
-	make_fine_text(total_points_count_text)
+	local available_points_title_text = points_panel:text(small_text)
+	available_points_title_text:set_position(points_gained_title_text:left(), points_gained_count_text:bottom() + 2)
+	available_points_title_text:set_text(managers.localization:to_upper_text("menu_st_spec_xp_perk_total"))
+	make_fine_text(available_points_title_text)
+	local available_points_count_text = points_panel:text(medium_text)
+	available_points_count_text:set_position(available_points_title_text:left() + 10, available_points_title_text:bottom())
+	available_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(available_points - points_present)))
+	make_fine_text(available_points_count_text)
 	self._panel:set_y(math.round(self._panel:y()))
 	self._scroll_panel:set_y(math.round(self._scroll_panel:y()))
 	self._anim_data = {
@@ -135,16 +135,16 @@ function SpecializationBoxGui:_create_text_box(ws, title, text, content_data, co
 		end_progress_width = progress_end:right() - progress_bar:left(),
 		exp_count_text = exp_count_text,
 		points_gained_count_text = points_gained_count_text,
-		total_points_count_text = total_points_count_text,
+		available_points_count_text = available_points_count_text,
 		start_xp_present = xp_present,
 		end_xp_present = 0,
 		xp_present = xp_present,
 		start_points_present = 0,
 		end_points_present = points_present,
 		points_present = 0,
-		start_total_points_present = total_points - points_present,
-		end_total_points_present = total_points,
-		total_points_present = total_points - points_present,
+		start_available_points_present = available_points - points_present,
+		end_available_points_present = available_points,
+		available_points_present = available_points - points_present,
 		conversion_rate = conversion_rate_number,
 		goto_end = false
 	}
@@ -175,13 +175,13 @@ function SpecializationBoxGui._update(o, self)
 		dt = coroutine.yield()
 		self._anim_data.xp_present = math.step(self._anim_data.xp_present, self._anim_data.end_xp_present, self._anim_data.conversion_rate * dt * speed)
 		self._anim_data.points_present = math.step(self._anim_data.points_present, self._anim_data.end_points_present, dt * speed)
-		self._anim_data.total_points_present = self._anim_data.start_total_points_present + self._anim_data.points_present
+		self._anim_data.available_points_present = self._anim_data.start_available_points_present + self._anim_data.points_present
 		self._anim_data.exp_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.xp_present))))
 		make_fine_text(self._anim_data.exp_count_text)
 		self._anim_data.points_gained_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.points_present))))
 		make_fine_text(self._anim_data.points_gained_count_text)
-		self._anim_data.total_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.total_points_present))))
-		make_fine_text(self._anim_data.total_points_count_text)
+		self._anim_data.available_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.available_points_present))))
+		make_fine_text(self._anim_data.available_points_count_text)
 		self._anim_data.progress_width = math.lerp(self._anim_data.start_progress_width, self._anim_data.end_progress_width, self._anim_data.points_present / self._anim_data.end_points_present)
 		self._anim_data.progress_bar:set_width(self._anim_data.progress_width)
 		speed = speed + speed * 0.2 * dt
@@ -191,8 +191,8 @@ function SpecializationBoxGui._update(o, self)
 	make_fine_text(self._anim_data.exp_count_text)
 	self._anim_data.points_gained_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.end_points_present))))
 	make_fine_text(self._anim_data.points_gained_count_text)
-	self._anim_data.total_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.end_total_points_present))))
-	make_fine_text(self._anim_data.total_points_count_text)
+	self._anim_data.available_points_count_text:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(self._anim_data.end_available_points_present))))
+	make_fine_text(self._anim_data.available_points_count_text)
 	self._anim_data.progress_bar:set_width(self._anim_data.end_progress_width)
 	self._anim_data.conversion_ended = true
 end

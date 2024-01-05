@@ -486,9 +486,16 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 		if 0 < managers.experience:current_rank() then
 			local tree_name = tweak_data.skilltree.trees[tree].skill
 			for infamy, item in pairs(tweak_data.infamy.items) do
-				if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.skilltree and item.upgrades.skilltree.tree == tree_name then
-					add_infamy_glow = true
-					break
+				if managers.infamy:owned(infamy) then
+					local skilltree = item.upgrades and item.upgrades.skilltree
+					if skilltree then
+						local tree = skilltree.tree
+						local trees = skilltree.trees
+						if tree and tree == tree_name or trees and table.contains(trees, tree_name) then
+							add_infamy_glow = true
+							break
+						end
+					end
 				end
 			end
 		end
@@ -1692,20 +1699,20 @@ function SkillTreeGui:_set_selected_spec_item(item, no_sound)
 			item:select(no_sound)
 			self._selected_spec_item = item
 			self:update_spec_descriptions()
-			local btns = {}
-			if item.tree then
-				if item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") then
-					table.insert(btns, "activate_spec")
-				end
-				if not managers.menu:is_pc_controller() then
+			if not managers.menu:is_pc_controller() then
+				local btns = {}
+				if item.tree then
+					if item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") then
+						table.insert(btns, "activate_spec")
+					end
 					local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
 					if item.tier and item:tier() == current_tier + 1 then
 						table.insert(btns, "add_points")
 						table.insert(btns, "remove_points")
 					end
 				end
+				self:show_btns(unpack(btns))
 			end
-			self:show_btns(unpack(btns))
 		end
 	end
 end

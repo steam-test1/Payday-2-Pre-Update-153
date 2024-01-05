@@ -73,7 +73,10 @@ function InfamyTweakData:init()
 				"dark_leather"
 			},
 			infamous_xp = infamous_xp_multiplier,
-			skilltree = {tree = "mastermind", multiplier = skilltree_multiplier}
+			skilltree = {
+				trees = {"mastermind", "hoxton"},
+				multiplier = skilltree_multiplier
+			}
 		}
 	}
 	self.items.infamy_enforcer = {
@@ -100,7 +103,10 @@ function InfamyTweakData:init()
 				"copper"
 			},
 			infamous_xp = infamous_xp_multiplier,
-			skilltree = {tree = "enforcer", multiplier = skilltree_multiplier}
+			skilltree = {
+				trees = {"enforcer", "hoxton"},
+				multiplier = skilltree_multiplier
+			}
 		}
 	}
 	self.items.infamy_technician = {
@@ -127,7 +133,10 @@ function InfamyTweakData:init()
 				"electric"
 			},
 			infamous_xp = infamous_xp_multiplier,
-			skilltree = {tree = "technician", multiplier = skilltree_multiplier}
+			skilltree = {
+				trees = {"technician", "hoxton"},
+				multiplier = skilltree_multiplier
+			}
 		}
 	}
 	self.items.infamy_ghost = {
@@ -154,7 +163,10 @@ function InfamyTweakData:init()
 				"sinister"
 			},
 			infamous_xp = infamous_xp_multiplier,
-			skilltree = {tree = "ghost", multiplier = skilltree_multiplier}
+			skilltree = {
+				trees = {"ghost", "hoxton"},
+				multiplier = skilltree_multiplier
+			}
 		}
 	}
 	self.items.infamy_secret_9 = {

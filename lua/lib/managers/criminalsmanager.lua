@@ -275,7 +275,7 @@ function CriminalsManager:get_free_character_name()
 				end
 			end
 		end
-		if not taken then
+		if not taken and not self:is_character_as_AI_level_blocked(data.name) then
 			table.insert(available, data.name)
 		end
 	end
@@ -375,4 +375,12 @@ function CriminalsManager:nr_taken_criminals()
 		end
 	end
 	return nr_taken_criminals
+end
+
+function CriminalsManager:is_character_as_AI_level_blocked(name)
+	if not Global.game_settings.level_id then
+		return false
+	end
+	local block_AIs = tweak_data.levels[Global.game_settings.level_id].block_AIs
+	return block_AIs and block_AIs[name] or false
 end

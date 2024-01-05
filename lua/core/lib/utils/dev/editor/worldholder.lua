@@ -715,7 +715,7 @@ function CoreOldWorldDefinition:create_sounds(path)
 end
 
 function CoreOldWorldDefinition:create_environment(data, offset)
-	managers.environment_area:set_default_environment(data.environment, nil)
+	managers.viewport:set_default_environment(data.environment, nil, nil)
 	self._environment_modifier_id = managers.viewport:create_global_environment_modifier(sky_orientation_data_key, true, function()
 		return data.sky_rot
 	end)
@@ -1153,7 +1153,7 @@ end
 
 function CoreEnvironment:create(offset)
 	if self._values.environment ~= "none" then
-		managers.environment_area:set_default_environment(self._values.environment)
+		managers.viewport:set_default_environment(self._values.environment, nil, nil)
 	end
 	if not Application:editor() then
 		self._environment_modifier_id = self._environment_modifier_id or managers.viewport:create_global_environment_modifier(sky_orientation_data_key, true, function()

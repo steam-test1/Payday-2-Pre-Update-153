@@ -533,7 +533,7 @@ function WorldDefinition:_set_environment(environment_name)
 	end
 	if environment_name ~= "none" then
 		managers.viewport:preload_environment(environment_name)
-		managers.environment_area:set_default_environment(environment_name)
+		managers.viewport:set_default_environment(environment_name, nil, nil)
 	end
 end
 

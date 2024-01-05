@@ -455,9 +455,11 @@ function BlackMarketManager:equip_weapon(category, slot)
 	end
 end
 
-function BlackMarketManager:equip_deployable(deployable_id)
+function BlackMarketManager:equip_deployable(deployable_id, loading)
 	Global.player_manager.kit.equipment_slots[1] = deployable_id
-	MenuCallbackHandler:_update_outfit_information()
+	if not loading then
+		MenuCallbackHandler:_update_outfit_information()
+	end
 end
 
 function BlackMarketManager:equip_character(character_id)
@@ -2057,21 +2059,21 @@ end
 
 function BlackMarketManager:aquire_default_weapons(only_enable)
 	local glock_17 = self._global and self._global.weapons and self._global.weapons.glock_17
-	if glock_17 and (not self._global.crafted_items.secondaries or not glock_17.unlocked) and not managers.upgrades:aquired("glock_17") then
+	if glock_17 and (not self._global.crafted_items.secondaries or not glock_17.unlocked) and not managers.upgrades:aquired("glock_17", UpgradesManager.AQUIRE_STRINGS[1]) then
 		if only_enable then
-			managers.upgrades:enable_weapon("glock_17")
+			managers.upgrades:enable_weapon("glock_17", UpgradesManager.AQUIRE_STRINGS[1])
 			self._global.weapons.glock_17.unlocked = true
 		else
-			managers.upgrades:aquire("glock_17")
+			managers.upgrades:aquire("glock_17", nil, UpgradesManager.AQUIRE_STRINGS[1])
 		end
 	end
 	local amcar = self._global and self._global.weapons and self._global.weapons.amcar
-	if amcar and (not self._global.crafted_items.primaries or not amcar.unlocked) and not managers.upgrades:aquired("amcar") then
+	if amcar and (not self._global.crafted_items.primaries or not amcar.unlocked) and not managers.upgrades:aquired("amcar", UpgradesManager.AQUIRE_STRINGS[1]) then
 		if only_enable then
-			managers.upgrades:enable_weapon("amcar")
+			managers.upgrades:enable_weapon("amcar", UpgradesManager.AQUIRE_STRINGS[1])
 			self._global.weapons.amcar.unlocked = true
 		else
-			managers.upgrades:aquire("amcar")
+			managers.upgrades:aquire("amcar", nil, UpgradesManager.AQUIRE_STRINGS[1])
 		end
 	end
 	local melee_weapon = self._global and self._global.melee_weapons and self._global.melee_weapons[self._defaults.melee_weapon]
@@ -2079,7 +2081,7 @@ function BlackMarketManager:aquire_default_weapons(only_enable)
 		if only_enable then
 			self._global.melee_weapons[self._defaults.melee_weapon].unlocked = true
 		else
-			managers.upgrades:aquire(self._defaults.melee_weapon)
+			managers.upgrades:aquire(self._defaults.melee_weapon, nil, UpgradesManager.AQUIRE_STRINGS[1])
 		end
 	end
 end
@@ -2457,6 +2459,10 @@ end
 function BlackMarketManager:set_preferred_character(character)
 	self._global._preferred_character = character
 	local new_name = CriminalsManager.convert_old_to_new_character_workname(character)
+	local char_tweak = tweak_data.blackmarket.characters.locked[new_name] or tweak_data.blackmarket.characters[new_name]
+	if char_tweak.dlc and not managers.dlc:is_dlc_unlocked(char_tweak.dlc) then
+		return
+	end
 	if tweak_data.blackmarket.characters.locked[new_name] then
 		if self:equipped_character() ~= "locked" then
 			self:equip_character("locked")
@@ -3548,6 +3554,7 @@ function BlackMarketManager:_load_done()
 			managers.menu_scene:set_character_equipped_weapon(nil, primary.factory_id, primary.blueprint, "primary")
 		end
 	end
+	MenuCallbackHandler:_update_outfit_information()
 end
 
 function BlackMarketManager:verify_dlc_items()
@@ -3926,7 +3933,7 @@ function BlackMarketManager:_verify_dlc_items()
 			if weapon_def then
 				weapon_dlc = weapon_def.dlc
 				if weapon_dlc then
-					managers.upgrades:aquire(weapon_id)
+					managers.upgrades:aquire(weapon_id, nil, UpgradesManager.AQUIRE_STRINGS[1])
 					Global.blackmarket_manager.weapons[weapon_id].unlocked = managers.dlc:is_dlc_unlocked(weapon_dlc) or false
 				else
 					Application:error("[BlackMarketManager] Weapon locked by unknown source: " .. tostring(weapon_id))

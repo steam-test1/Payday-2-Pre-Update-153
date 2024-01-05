@@ -51,7 +51,6 @@ function IngameWaitingForRespawnState:_setup_camera()
 	self._camera_object:set_fov(75)
 	self._viewport = managers.viewport:new_vp(0, 0, 1, 1, "spectator", CoreManagerBase.PRIO_WORLDCAMERA)
 	self._viewport:set_camera(self._camera_object)
-	self._viewport:set_environment(managers.environment_area:default_environment())
 	self._viewport:set_active(true)
 end
 

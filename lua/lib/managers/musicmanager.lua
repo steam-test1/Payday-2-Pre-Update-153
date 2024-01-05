@@ -338,7 +338,9 @@ function MusicManager:jukebox_music_tracks()
 		"track_16",
 		"track_17",
 		"track_18",
-		"track_19"
+		"track_19",
+		"track_20",
+		"track_21"
 	}
 	local pdth_tracks = {
 		"track_pth_01",

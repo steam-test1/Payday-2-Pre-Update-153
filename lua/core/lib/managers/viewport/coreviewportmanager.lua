@@ -115,7 +115,7 @@ function ViewportManager:resolution_changed()
 end
 
 function ViewportManager:preload_environment(name)
-	self._env_manager:preload(name)
+	self._env_manager:preload_environment(name)
 end
 
 function ViewportManager:get_predefined_environment_filter_map()
@@ -155,6 +155,27 @@ function ViewportManager:update_global_environment_value(data_path_key)
 	end
 end
 
+function ViewportManager:set_default_environment(default_environment_path, blend_duration, blend_bezier_curve)
+	self._env_manager:set_default_environment(default_environment_path)
+	for _, viewport in ipairs(self:viewports()) do
+		viewport:on_default_environment_changed(default_environment_path, blend_duration, blend_bezier_curve)
+	end
+end
+
+function ViewportManager:default_environment()
+	return self._env_manager:default_environment()
+end
+
+function ViewportManager:game_default_environment()
+	return self._env_manager:game_default_environment()
+end
+
+function ViewportManager:editor_reset_environment()
+	for _, vp in ipairs(self:active_viewports()) do
+		vp:set_environment(self:game_default_environment(), nil, nil, nil, nil)
+	end
+end
+
 function ViewportManager:_viewport_destroyed(vp)
 	self:_del_accessobj(vp)
 	self._current_camera = nil
@@ -162,6 +183,20 @@ end
 
 function ViewportManager:_get_environment_manager()
 	return self._env_manager
+end
+
+function ViewportManager:_prioritize_and_activate()
+	local old_first_vp = self:first_active_viewport()
+	ViewportManager.super._prioritize_and_activate(self)
+	local first_vp = self:first_active_viewport()
+	if old_first_vp ~= first_vp then
+		if old_first_vp then
+			old_first_vp:set_first_viewport(false)
+		end
+		if first_vp then
+			first_vp:set_first_viewport(true)
+		end
+	end
 end
 
 function ViewportManager:first_active_world_viewport()

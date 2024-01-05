@@ -30,6 +30,8 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_spanish(presets)
 	self:_init_american(presets)
 	self:_init_jowi(presets)
+	self:_init_old_hoxton(presets)
+	self:_init_old_hoxton_mission(presets)
 end
 
 function CharacterTweakData:_init_security(presets)
@@ -674,6 +676,9 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.deathguard = true
 	self.tank.melee_weapon = "fists"
 	self.tank.melee_weapon_dmg_multiplier = 2.5
+	self.tank.critical_hits = {
+		damage_mul = self.tank.headshot_dmg_mul * 0.5
+	}
 	self.tank.damage.hurt_severity = presets.hurt_severities.only_light_hurt
 	self.tank.chatter = {
 		aggressive = true,
@@ -1116,6 +1121,30 @@ function CharacterTweakData:_init_bank_manager(presets)
 	self.bank_manager.outline_on_discover = true
 end
 
+function CharacterTweakData:_init_old_hoxton_mission(presets)
+	self.old_hoxton_mission = deep_clone(presets.base)
+	self.old_hoxton_mission.experience = {}
+	self.old_hoxton_mission.weapon = presets.weapon.normal
+	self.old_hoxton_mission.detection = presets.detection.normal
+	self.old_hoxton_mission.HEALTH_INIT = 8
+	self.old_hoxton_mission.headshot_dmg_mul = self.old_hoxton_mission.HEALTH_INIT / 2
+	self.old_hoxton_mission.move_speed = presets.move_speed.fast
+	self.old_hoxton_mission.surrender_break_time = {6, 10}
+	self.old_hoxton_mission.suppression = presets.suppression.hard_def
+	self.old_hoxton_mission.surrender = false
+	self.old_hoxton_mission.ecm_vulnerability = false
+	self.old_hoxton_mission.weapon_voice = "1"
+	self.old_hoxton_mission.experience.cable_tie = "tie_swat"
+	self.old_hoxton_mission.speech_prefix_p1 = "rb2"
+	self.old_hoxton_mission.access = "teamAI4"
+	self.old_hoxton_mission.dodge = presets.dodge.athletic
+	self.old_hoxton_mission.no_arrest = true
+	self.old_hoxton_mission.chatter = presets.enemy_chatter.no_chatter
+	self.old_hoxton_mission.melee_weapon = "fists"
+	self.old_hoxton_mission.melee_weapon_dmg_multiplier = 3
+	self.old_hoxton_mission.steal_loot = false
+end
+
 function CharacterTweakData:_init_russian(presets)
 	self.russian = {}
 	self.russian.damage = presets.gang_member_damage
@@ -1200,10 +1229,44 @@ function CharacterTweakData:_init_american(presets)
 end
 
 function CharacterTweakData:_init_jowi(presets)
-	self.jowi = deep_clone(self.spanish)
+	self.jowi = {}
+	self.jowi.damage = presets.gang_member_damage
+	self.jowi.weapon = deep_clone(presets.weapon.gang_member)
 	self.jowi.weapon.weapons_of_choice = {
 		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
 		secondary = Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45")
+	}
+	self.jowi.detection = presets.detection.gang_member
+	self.jowi.move_speed = presets.move_speed.fast
+	self.jowi.crouch_move = false
+	self.jowi.speech_prefix = "rb2"
+	self.jowi.weapon_voice = "3"
+	self.jowi.access = "teamAI1"
+	self.jowi.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_old_hoxton(presets)
+	self.old_hoxton = {}
+	self.old_hoxton.damage = presets.gang_member_damage
+	self.old_hoxton.weapon = deep_clone(presets.weapon.gang_member)
+	self.old_hoxton.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11")
+	}
+	self.old_hoxton.detection = presets.detection.gang_member
+	self.old_hoxton.move_speed = presets.move_speed.fast
+	self.old_hoxton.crouch_move = false
+	self.old_hoxton.speech_prefix = "rb2"
+	self.old_hoxton.weapon_voice = "3"
+	self.old_hoxton.access = "teamAI1"
+	self.old_hoxton.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
 	}
 end
 

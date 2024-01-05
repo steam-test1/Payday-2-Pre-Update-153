@@ -222,6 +222,7 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_up_3_down_1m",
 	"e_nl_up_6m",
 	"e_nl_up_12m",
+	"e_nl_jump_over_0_5m",
 	"e_nl_up_rats_roof",
 	"e_nl_up_6m_var2",
 	"e_nl_up_6m_var3",

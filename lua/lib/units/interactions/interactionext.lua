@@ -949,7 +949,9 @@ end
 DoctorBagBaseInteractionExt = DoctorBagBaseInteractionExt or class(UseInteractionExt)
 
 function DoctorBagBaseInteractionExt:_interact_blocked(player)
-	return player:character_damage():full_health()
+	local full_health = player:character_damage():full_health()
+	local is_berserker = player:character_damage():is_berserker()
+	return full_health or is_berserker, false, is_berserker and "hint_health_berserking" or false
 end
 
 function DoctorBagBaseInteractionExt:interact(player)
