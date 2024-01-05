@@ -96,6 +96,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.bodybags_bag.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/bodybags_bag"
 	self.bodybags_bag.stages = {
 		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
 		"framing_frame_3",
 		"election_day_1",
@@ -145,8 +146,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.grenade_crate.texture = "guis/dlcs/gage_pack/textures/pd2/mission_briefing/assets/grenade_crate"
 	self.grenade_crate.stages = {
 		"watchdogs_1",
+		"watchdogs_1_night",
 		"watchdogs_2",
+		"watchdogs_2_day",
 		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
 		"alex_1",
 		"firestarter_1",
@@ -405,7 +409,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_1_ammo.name_id = "menu_asset_ammo"
 	self.watchdogs_1_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
 	self.watchdogs_1_ammo.stages = {
-		"watchdogs_1"
+		"watchdogs_1",
+		"watchdogs_1_night"
 	}
 	self.watchdogs_1_ammo.visible_if_locked = true
 	self.watchdogs_1_ammo.unlock_desc_id = "menu_asset_ammo_desc"
@@ -415,7 +420,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_1_health.name_id = "menu_asset_health"
 	self.watchdogs_1_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
 	self.watchdogs_1_health.stages = {
-		"watchdogs_1"
+		"watchdogs_1",
+		"watchdogs_1_night"
 	}
 	self.watchdogs_1_health.visible_if_locked = true
 	self.watchdogs_1_health.unlock_desc_id = "menu_asset_health_desc"
@@ -425,7 +431,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_1_escape_car.name_id = "menu_asset_watchdogs_escape"
 	self.watchdogs_1_escape_car.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/escapecar"
 	self.watchdogs_1_escape_car.stages = {
-		"watchdogs_1"
+		"watchdogs_1",
+		"watchdogs_1_night"
 	}
 	self.watchdogs_1_escape_car.visible_if_locked = true
 	self.watchdogs_1_escape_car.unlock_desc_id = "menu_asset_watchdogs_escape_desc"
@@ -435,7 +442,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_2_ammo.name_id = "menu_asset_ammo"
 	self.watchdogs_2_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day2/assets_watchdogs2_ammo"
 	self.watchdogs_2_ammo.stages = {
-		"watchdogs_2"
+		"watchdogs_2",
+		"watchdogs_2_day"
 	}
 	self.watchdogs_2_ammo.visible_if_locked = true
 	self.watchdogs_2_ammo.unlock_desc_id = "menu_asset_ammo_desc"
@@ -445,7 +453,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_2_health.name_id = "menu_asset_health"
 	self.watchdogs_2_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day2/assets_watchdogs2_medic"
 	self.watchdogs_2_health.stages = {
-		"watchdogs_2"
+		"watchdogs_2",
+		"watchdogs_2_day"
 	}
 	self.watchdogs_2_health.visible_if_locked = true
 	self.watchdogs_2_health.unlock_desc_id = "menu_asset_health_desc"
@@ -455,7 +464,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.watchdogs_2_sniper.name_id = "menu_asset_sniper"
 	self.watchdogs_2_sniper.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day2/assets_watchdogs_sniper"
 	self.watchdogs_2_sniper.stages = {
-		"watchdogs_2"
+		"watchdogs_2",
+		"watchdogs_2_day"
 	}
 	self.watchdogs_2_sniper.visible_if_locked = true
 	self.watchdogs_2_sniper.unlock_desc_id = "menu_asset_sniper_desc"
@@ -584,7 +594,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.jungle_1_bikers.name_id = "menu_asset_big_oil_1_bikers"
 	self.jungle_1_bikers.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day1/big_oil_1_biker_gang"
 	self.jungle_1_bikers.stages = {
-		"welcome_to_the_jungle_1"
+		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_1_night"
 	}
 	self.jungle_1_bikers.visible_if_locked = true
 	self.jungle_1_bikers.unlock_desc_id = "menu_asset_big_oil_1_bikers_desc"

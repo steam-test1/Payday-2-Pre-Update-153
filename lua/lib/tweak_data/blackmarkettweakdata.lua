@@ -1273,6 +1273,13 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.gumbo.dlc = "pd2_clan"
 	self.masks.gumbo.value = 0
 	self.masks.gumbo.sort_number = 6
+	self.masks.crazy_lion = {}
+	self.masks.crazy_lion.unit = "units/pd2_crimefest_2014/oct26/masks/msk_crazy_lion/crazy_lion_mask"
+	self.masks.crazy_lion.name_id = "bm_msk_crazy_lion"
+	self.masks.crazy_lion.pcs = {}
+	self.masks.crazy_lion.dlc = "pd2_clan"
+	self.masks.crazy_lion.value = 0
+	self.masks.crazy_lion.sort_number = 8
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

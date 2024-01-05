@@ -530,10 +530,10 @@ function UpgradesTweakData:_init_pd2_values()
 		0.6
 	}
 	self.values.player.perk_armor_loss_multiplier = {
+		0.95,
 		0.9,
-		0.8,
-		0.7,
-		0.6
+		0.85,
+		0.8
 	}
 	local editable_skill_descs = {
 		ammo_2x = {
@@ -1032,7 +1032,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%"},
 			{
 				"10%",
-				"10%",
+				"5%",
 				"75%"
 			},
 			{
@@ -1040,13 +1040,13 @@ function UpgradesTweakData:_init_pd2_values()
 				"15%",
 				"45%"
 			},
-			{"10%", "10%"},
+			{"10%", "5%"},
 			{"135%"},
-			{"10%", "10%"},
+			{"10%", "5%"},
 			{"5%", "20%"},
 			{
 				"10%",
-				"10%",
+				"5%",
 				"50%",
 				"125%",
 				"10%"
@@ -1484,6 +1484,7 @@ function UpgradesTweakData:init()
 	self:_g3_definitions()
 	self:_galil_definitions()
 	self:_famas_definitions()
+	self:_spas12_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -5252,6 +5253,15 @@ function UpgradesTweakData:_famas_definitions()
 		weapon_id = "famas",
 		factory_id = "wpn_fps_ass_famas",
 		dlc = "gage_pack_assault"
+	}
+end
+
+function UpgradesTweakData:_spas12_definitions()
+	self.definitions.spas12 = {
+		category = "weapon",
+		weapon_id = "spas12",
+		factory_id = "wpn_fps_sho_spas12",
+		dlc = "pd2_clan"
 	}
 end
 

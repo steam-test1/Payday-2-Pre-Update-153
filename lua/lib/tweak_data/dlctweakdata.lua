@@ -237,6 +237,28 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan_lgl = {}
+	self.pd2_clan_lgl.content = {}
+	self.pd2_clan_lgl.dlc = "has_pd2_clan"
+	self.pd2_clan_lgl.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_lgl.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "crazy_lion",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_s_spas12_folded",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_s_spas12_nostock",
+			amount = 1
+		}
+	}
+	self.pd2_clan_lgl.content.upgrades = {"spas12"}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

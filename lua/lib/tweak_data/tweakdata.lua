@@ -30,6 +30,9 @@ require("lib/tweak_data/PrePlanningTweakData")
 require("lib/tweak_data/InteractionTweakData")
 TweakData = TweakData or class()
 
+function TweakData:_init_wip_tweak_data()
+end
+
 function TweakData:_init_wip_hud_icons()
 end
 
@@ -1487,6 +1490,7 @@ function TweakData:init()
 				"overkill_290"
 			},
 			jobs = {
+				"watchdogs_wrapper",
 				"watchdogs_night",
 				"watchdogs"
 			}
@@ -1497,6 +1501,7 @@ function TweakData:init()
 				"overkill_290"
 			},
 			jobs = {
+				"watchdogs_wrapper_prof",
 				"watchdogs_night_prof",
 				"watchdogs_prof"
 			}
@@ -1549,6 +1554,7 @@ function TweakData:init()
 				"overkill_290"
 			},
 			jobs = {
+				"welcome_to_the_jungle_wrapper_prof",
 				"welcome_to_the_jungle_night_prof",
 				"welcome_to_the_jungle_prof"
 			}
@@ -1857,6 +1863,8 @@ function TweakData:init()
 		guy_with_gun_now_with_night_jobs = {
 			award = "gage5_6",
 			jobs = {
+				"watchdogs_wrapper",
+				"watchdogs_wrapper_prof",
 				"watchdogs",
 				"watchdogs_prof",
 				"watchdogs_night",
@@ -2348,6 +2356,7 @@ function TweakData:init()
 	self.grenades.launcher_frag.init_timer = 2.5
 	self.grenades.launcher_frag.mass_look_up_modifier = 1
 	self.grenades.launcher_frag.sound_event = "gl_explode"
+	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()
