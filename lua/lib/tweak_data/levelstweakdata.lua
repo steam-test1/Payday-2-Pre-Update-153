@@ -167,6 +167,13 @@ function LevelsTweakData:init()
 	}
 	self.watchdogs_1.cube = "cube_apply_heist_bank"
 	self.watchdogs_1.max_bags = 16
+	self.watchdogs_1_night = deep_clone(self.watchdogs_1)
+	self.watchdogs_1_night.env_params = {
+		environment = "environments/pd2_env_night/pd2_env_night"
+	}
+	self.watchdogs_1_night.package = {
+		"packages/narr_watchdogs1_night"
+	}
 	self.watchdogs_2 = {}
 	self.watchdogs_2.name_id = "heist_watchdogs_2_hl"
 	self.watchdogs_2.briefing_id = "heist_watchdogs_2_briefing"
@@ -187,6 +194,13 @@ function LevelsTweakData:init()
 	}
 	self.watchdogs_2.cube = "cube_apply_heist_bank"
 	self.watchdogs_2.max_bags = 16
+	self.watchdogs_2_day = deep_clone(self.watchdogs_2)
+	self.watchdogs_2_day.env_params = {
+		environment = "environments/pd2_env_wd2_evening/pd2_env_wd2_evening"
+	}
+	self.watchdogs_2_day.package = {
+		"packages/narr_watchdogs2_day"
+	}
 	self.firestarter_1 = {}
 	self.firestarter_1.name_id = "heist_firestarter_1_hl"
 	self.firestarter_1.briefing_id = "heist_firestarter_1_briefing"
@@ -252,6 +266,13 @@ function LevelsTweakData:init()
 	self.welcome_to_the_jungle_1.cube = "cube_apply_heist_bank"
 	self.welcome_to_the_jungle_1.ghost_bonus = 0.15
 	self.welcome_to_the_jungle_1.max_bags = 14
+	self.welcome_to_the_jungle_1_night = deep_clone(self.welcome_to_the_jungle_1)
+	self.welcome_to_the_jungle_1_night.env_params = {
+		environment = "environments/pd2_env_night/pd2_env_night"
+	}
+	self.welcome_to_the_jungle_1_night.package = {
+		"packages/narr_jungle1_night"
+	}
 	self.welcome_to_the_jungle_2 = {}
 	self.welcome_to_the_jungle_2.name_id = "heist_welcome_to_the_jungle_2_hl"
 	self.welcome_to_the_jungle_2.briefing_id = "heist_welcome_to_the_jungle_2_briefing"
@@ -698,8 +719,17 @@ function LevelsTweakData:init()
 	self.kosugi.cube = "cube_apply_heist_bank"
 	self.kosugi.ghost_bonus = 0.05
 	self.kosugi.max_bags = 25
+	self.gallery = deep_clone(self.framing_frame_1)
+	self.gallery.name_id = "heist_gallery_hl"
+	self.gallery.briefing_id = "heist_gallery_briefing"
+	self.gallery.intro_event = "Play_pln_art_intro"
+	self.gallery.outro_event = {
+		"Play_pln_art_end"
+	}
+	self.gallery.briefing_dialog = "Play_pln_art_brf"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
 		"framing_frame_1",
 		"framing_frame_2",
@@ -711,6 +741,8 @@ function LevelsTweakData:init()
 		"election_day_3_skip2",
 		"watchdogs_1",
 		"watchdogs_2",
+		"watchdogs_1_night",
+		"watchdogs_2_day",
 		"alex_1",
 		"alex_2",
 		"alex_3",
@@ -744,7 +776,8 @@ function LevelsTweakData:init()
 		"mia_1",
 		"mia_2",
 		"mia2_new",
-		"kosugi"
+		"kosugi",
+		"gallery"
 	}
 	self.escape_levels = {
 		"escape_cafe",

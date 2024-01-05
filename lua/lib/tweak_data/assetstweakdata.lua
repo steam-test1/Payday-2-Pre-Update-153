@@ -69,7 +69,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.safe_escape.name_id = "menu_asset_safe_escape"
 	self.safe_escape.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/generic_escape"
 	self.safe_escape.stages = {
-		"framing_frame_1",
 		"framing_frame_2",
 		"ukrainian_job",
 		"jewelry_store",
@@ -98,7 +97,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.bodybags_bag.stages = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_2",
-		"framing_frame_1",
 		"framing_frame_3",
 		"election_day_1",
 		"election_day_2",
@@ -129,7 +127,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.spotter.stages = {
 		"election_day_1",
 		"election_day_2",
-		"framing_frame_1",
 		"framing_frame_3",
 		"firestarter_2",
 		"kosugi"
@@ -513,76 +510,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.firestarter_3_map_basic.visible_if_locked = true
 	self.firestarter_3_map_basic.unlock_desc_id = "menu_asset_branchbank_blueprint_unlock_desc"
 	self.firestarter_3_map_basic.no_mystery = true
-	self.framing_frame_1_blueprint = {}
-	self.framing_frame_1_blueprint.name_id = "menu_asset_framing_frame_1_blueprint"
-	self.framing_frame_1_blueprint.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_blueprint"
-	self.framing_frame_1_blueprint.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_ammo = {}
-	self.framing_frame_1_ammo.name_id = "menu_asset_ammo"
-	self.framing_frame_1_ammo.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_ammo"
-	self.framing_frame_1_ammo.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_ammo.visible_if_locked = true
-	self.framing_frame_1_ammo.unlock_desc_id = "menu_asset_framing_frame_1_ammo_desc"
-	self.framing_frame_1_ammo.no_mystery = true
-	self.framing_frame_1_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.framing_frame_1_health = {}
-	self.framing_frame_1_health.name_id = "menu_asset_health"
-	self.framing_frame_1_health.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_medic"
-	self.framing_frame_1_health.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_health.visible_if_locked = true
-	self.framing_frame_1_health.unlock_desc_id = "menu_asset_framing_frame_1_health_desc"
-	self.framing_frame_1_health.no_mystery = true
-	self.framing_frame_1_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.framing_frame_1_cam = {}
-	self.framing_frame_1_cam.name_id = "menu_asset_cam"
-	self.framing_frame_1_cam.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_cam"
-	self.framing_frame_1_cam.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_cam.visible_if_locked = true
-	self.framing_frame_1_cam.unlock_desc_id = "menu_asset_cam_desc"
-	self.framing_frame_1_cam.no_mystery = true
-	self.framing_frame_1_cam.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 6)
-	self.framing_frame_1_keycard = {}
-	self.framing_frame_1_keycard.name_id = "menu_asset_framing_frame_1_keycard"
-	self.framing_frame_1_keycard.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_keycard"
-	self.framing_frame_1_keycard.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_keycard.visible_if_locked = true
-	self.framing_frame_1_keycard.unlock_desc_id = "menu_asset_framing_frame_1_keycard_desc"
-	self.framing_frame_1_keycard.no_mystery = true
-	self.framing_frame_1_keycard.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 10)
-	self.framing_frame_1_keycard.upgrade_lock = {
-		category = "player",
-		upgrade = "additional_assets"
-	}
-	self.framing_frame_1_art = {}
-	self.framing_frame_1_art.name_id = "menu_asset_framing_frame_art"
-	self.framing_frame_1_art.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_art"
-	self.framing_frame_1_art.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_art.visible_if_locked = true
-	self.framing_frame_1_art.unlock_desc_id = "menu_asset_framing_frame_art_desc"
-	self.framing_frame_1_art.no_mystery = true
-	self.framing_frame_1_art.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.framing_frame_1_truck = {}
-	self.framing_frame_1_truck.name_id = "menu_asset_framing_frame_truck"
-	self.framing_frame_1_truck.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day1/assets_framingframe_roofaccess"
-	self.framing_frame_1_truck.stages = {
-		"framing_frame_1"
-	}
-	self.framing_frame_1_truck.visible_if_locked = true
-	self.framing_frame_1_truck.unlock_desc_id = "menu_asset_framing_frame_truck_desc"
-	self.framing_frame_1_truck.no_mystery = true
-	self.framing_frame_1_truck.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
 	self.framing_frame_2_sniper = {}
 	self.framing_frame_2_sniper.name_id = "menu_asset_sniper"
 	self.framing_frame_2_sniper.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day2/asset01"

@@ -1486,14 +1486,20 @@ function TweakData:init()
 			difficulty = {
 				"overkill_290"
 			},
-			job = "watchdogs"
+			jobs = {
+				"watchdogs_night",
+				"watchdogs"
+			}
 		},
 		death_watchdogs_prof = {
 			award = "death_6",
 			difficulty = {
 				"overkill_290"
 			},
-			job = "watchdogs_prof"
+			jobs = {
+				"watchdogs_night_prof",
+				"watchdogs_prof"
+			}
 		},
 		death_rats = {
 			award = "death_33",
@@ -1542,7 +1548,10 @@ function TweakData:init()
 			difficulty = {
 				"overkill_290"
 			},
-			job = "welcome_to_the_jungle_prof"
+			jobs = {
+				"welcome_to_the_jungle_night_prof",
+				"welcome_to_the_jungle_prof"
+			}
 		},
 		death_jewelry_store = {
 			award = "death_13",
@@ -1677,6 +1686,13 @@ function TweakData:init()
 			},
 			job = "mia_prof"
 		},
+		death_artgallery = {
+			award = "squek",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "gallery"
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -1704,8 +1720,8 @@ function TweakData:init()
 		"nightclub"
 	}
 	self.achievement.job_list.hector = {
-		"watchdogs",
-		"watchdogs_prof",
+		"watchdogs_wrapper",
+		"watchdogs_wrapper_prof",
 		"alex",
 		"alex_prof",
 		"firestarter",
@@ -1714,7 +1730,7 @@ function TweakData:init()
 	self.achievement.job_list.elephant = {
 		"framing_frame",
 		"framing_frame_prof",
-		"welcome_to_the_jungle_prof",
+		"welcome_to_the_jungle_wrapper_prof",
 		"election_day",
 		"election_day_prof"
 	}
@@ -1838,11 +1854,13 @@ function TweakData:init()
 				"pig"
 			}
 		},
-		guy_with_gun = {
+		guy_with_gun_now_with_night_jobs = {
 			award = "gage5_6",
 			jobs = {
 				"watchdogs",
-				"watchdogs_prof"
+				"watchdogs_prof",
+				"watchdogs_night",
+				"watchdogs_night_prof"
 			},
 			difficulties = {
 				"overkill_145",

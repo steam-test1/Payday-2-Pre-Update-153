@@ -651,6 +651,26 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.thermal_paste.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_thermal_paste")
 	self.types.thermal_paste.budget_cost = 3
 	self.types.thermal_paste.spawn_unit = "units/payday2/equipment/gen_equipment_thermal_paste_crate/gen_equipment_thermal_paste_crate"
+	self.types.framing_frame_1_truck = {}
+	self.types.framing_frame_1_truck.name_id = "menu_pp_asset_framing_frame_1_truck"
+	self.types.framing_frame_1_truck.desc_id = "menu_pp_asset_framing_frame_1_truck_desc"
+	self.types.framing_frame_1_truck.category = "mission_equipment"
+	self.types.framing_frame_1_truck.icon = 23
+	self.types.framing_frame_1_truck.total = 1
+	self.types.framing_frame_1_truck.post_event = "gus_preplan_07"
+	self.types.framing_frame_1_truck.prio = 1
+	self.types.framing_frame_1_truck.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_framing_frame_1_truck")
+	self.types.framing_frame_1_truck.budget_cost = 2
+	self.types.framing_frame_1_entry_point = {}
+	self.types.framing_frame_1_entry_point.name_id = "menu_pp_asset_framing_frame_1_entry_point"
+	self.types.framing_frame_1_entry_point.desc_id = "menu_pp_asset_framing_frame_1_entry_point_desc"
+	self.types.framing_frame_1_entry_point.category = "mission_equipment"
+	self.types.framing_frame_1_entry_point.icon = 23
+	self.types.framing_frame_1_entry_point.total = 1
+	self.types.framing_frame_1_entry_point.post_event = "gus_preplan_07"
+	self.types.framing_frame_1_entry_point.prio = 1
+	self.types.framing_frame_1_entry_point.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_framing_frame_1_entry_point")
+	self.types.framing_frame_1_entry_point.budget_cost = 2
 end
 
 function PrePlanningTweakData:_create_locations(tweak_data)
@@ -1117,6 +1137,44 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			}
 		}
 	}
+	self.locations.framing_frame_1 = {
+		default_plans = {},
+		total_budget = 8,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_framingframe1",
+		start_location = {
+			group = "a",
+			x = 512,
+			y = 512,
+			zoom = 1
+		},
+		{
+			name_id = "menu_pp_framing_frame_1_loc_a",
+			texture = "guis/textures/pd2/pre_planning/framing_frame_1_1",
+			map_x = -0.6,
+			map_y = 0,
+			map_size = 1,
+			x1 = -2750,
+			y1 = -2750,
+			x2 = 2750,
+			y2 = 2750,
+			rotation = 90,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_framing_frame_1_loc_b",
+			texture = "guis/textures/pd2/pre_planning/framing_frame_1_2",
+			map_x = 0.6,
+			map_y = 0,
+			map_size = 1,
+			x1 = -2700,
+			y1 = -5300,
+			x2 = 6300,
+			y2 = 3700,
+			rotation = 90,
+			custom_points = {}
+		}
+	}
+	self.locations.gallery = deep_clone(self.locations.framing_frame_1)
 end
 
 function PrePlanningTweakData:get_level_data(level_id)

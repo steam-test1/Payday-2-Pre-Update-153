@@ -618,7 +618,11 @@ function StatisticsManager:_get_stat_tables()
 		"panther",
 		"rooster",
 		"horse",
-		"tiger"
+		"tiger",
+		"combusto",
+		"spackle",
+		"stoneface",
+		"wayfarer"
 	}
 	local weapon_list = {
 		"ak5",
@@ -673,7 +677,12 @@ function StatisticsManager:_get_stat_tables()
 		"famas",
 		"scorpion",
 		"tec9",
-		"uzi"
+		"uzi",
+		"jowi",
+		"x_1911",
+		"x_b92fs",
+		"x_deagle",
+		"g26"
 	}
 	local melee_list = {
 		"weapon",
@@ -697,7 +706,8 @@ function StatisticsManager:_get_stat_tables()
 		"cleaver",
 		"fireaxe",
 		"machete",
-		"briefcase"
+		"briefcase",
+		"kabartanto"
 	}
 	local enemy_list = {
 		"cop",
@@ -728,7 +738,13 @@ function StatisticsManager:_get_stat_tables()
 		"level_6",
 		"level_7"
 	}
-	local character_list = {}
+	local character_list = {
+		"russian",
+		"german",
+		"spanish",
+		"american",
+		"jowi"
+	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end
 

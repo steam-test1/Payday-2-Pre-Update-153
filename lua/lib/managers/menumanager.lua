@@ -6340,3 +6340,148 @@ function MenuOptionInitiator:modify_network_options(node)
 	end
 	return node
 end
+
+function MenuCallbackHandler:has_installed_mods()
+	return table.size(DB:mods()) > 0
+end
+
+ModMenuCreator = ModMenuCreator or class()
+
+function ModMenuCreator:modify_node(original_node, data)
+	local node = original_node
+	self:create_mod_menu(node)
+	return node
+end
+
+function ModMenuCreator:create_mod_menu(node)
+	node:clean_items()
+	local sorted_mods = {}
+	local mods = {}
+	local conflicted_content = {}
+	local modded_content = {}
+	local id_key = function(path)
+		return Idstring(path):key()
+	end
+	for mod_name, mod_data in pairs(DB:mods()) do
+		table.insert(sorted_mods, mod_name)
+		mods[mod_name] = {
+			content = {},
+			conflicted = {}
+		}
+		for _, path in ipairs(mod_data.files or {}) do
+			table.insert(mods[mod_name].content, path)
+			modded_content[id_key(path)] = modded_content[id_key(path)] or {}
+			table.insert(modded_content[id_key(path)], mod_name)
+			if #modded_content[id_key(path)] == 2 then
+				conflicted_content[id_key(path)] = modded_content[id_key(path)]
+			end
+		end
+		table.sort(mods[mod_name].content)
+	end
+	for idk, conflicted_mods in pairs(conflicted_content) do
+		for _, mod_name in ipairs(conflicted_mods) do
+			mods[mod_name].conflicted[idk] = conflicted_mods
+		end
+	end
+	table.sort(sorted_mods)
+	local list_of_mods = {}
+	local mod_item
+	for _, mod_name in ipairs(sorted_mods) do
+		local conflicts = table.size(mods[mod_name].conflicted) > 0
+		mod_item = self:create_item(node, {
+			name = mod_name,
+			text_id = mod_name,
+			localize = false,
+			enabled = true,
+			hightlight_color = conflicts and tweak_data.screen_colors.important_1,
+			row_item_color = conflicts and tweak_data.screen_colors.important_2
+		})
+	end
+	self:add_back_button(node)
+	node:parameters().mods = mods
+	node:parameters().sorted_mods = sorted_mods
+	node:parameters().conflicted_content = conflicted_content
+	node:parameters().modded_content = modded_content
+end
+
+function ModMenuCreator:create_divider(node, id, text_id, size, color)
+	local params = {
+		name = "divider_" .. id,
+		no_text = not text_id,
+		text_id = text_id,
+		size = size or 8,
+		color = color
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+function ModMenuCreator:create_item(node, params)
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	new_item:set_enabled(params.enabled)
+	node:add_item(new_item)
+end
+
+function ModMenuCreator:create_toggle(node, params)
+	local data_node = {
+		type = "MenuItemToggleWithIcon",
+		{
+			_meta = "option",
+			icon = "guis/textures/menu_tickbox",
+			value = "on",
+			x = 24,
+			y = 0,
+			w = 24,
+			h = 24,
+			s_icon = "guis/textures/menu_tickbox",
+			s_x = 24,
+			s_y = 24,
+			s_w = 24,
+			s_h = 24
+		},
+		{
+			_meta = "option",
+			icon = "guis/textures/menu_tickbox",
+			value = "off",
+			x = 0,
+			y = 0,
+			w = 24,
+			h = 24,
+			s_icon = "guis/textures/menu_tickbox",
+			s_x = 0,
+			s_y = 24,
+			s_w = 24,
+			s_h = 24
+		}
+	}
+	local new_item = node:create_item(data_node, params)
+	new_item:set_enabled(params.enabled)
+	node:add_item(new_item)
+	return new_item
+end
+
+function ModMenuCreator:add_back_button(node)
+	node:delete_item("back")
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		visible_callback = "is_pc_controller",
+		back = true,
+		previous_node = true
+	}
+	local new_item = node:create_item(nil, params)
+	node:add_item(new_item)
+end
+
+function MenuCallbackHandler:save_mod_changes(node)
+end
+
+function MenuCallbackHandler:mod_option_toggle_enabled(item)
+	print("mod_option_toggle_enabled", "mod", item:name(), "status", item:value())
+	local enabled = item:value() == "on"
+	DB:set_mod_enabled(item:name(), enabled)
+end
