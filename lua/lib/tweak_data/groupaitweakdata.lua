@@ -455,8 +455,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		"flank",
 		"charge",
 		"flash_grenade",
-		"provide_coverfire",
-		"provide_support"
+		"shield_cover"
 	}
 	local tactics_FBI_suit = {
 		"provide_coverfire",
@@ -537,13 +536,10 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		"flank",
 		"smoke_grenade",
 		"flash_grenade",
-		"charge",
-		"provide_coverfire"
+		"charge"
 	}
 	local tactics_FBI_tank = {
 		"charge",
-		"provide_coverfire",
-		"provide_support",
 		"deathguard",
 		"shield"
 	}
@@ -688,13 +684,21 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.CS_tanks = {
-		amount = {1, 1},
+		amount = {1, 2},
 		spawn = {
 			{
 				unit = "FBI_tank",
 				freq = 1,
 				tactics = tactics_FBI_tank,
 				rank = 1
+			},
+			{
+				unit = "CS_tazer",
+				freq = 0.5,
+				amount_min = 1,
+				amount_max = 1,
+				tactics = tactics_CS_tazer,
+				rank = 2
 			}
 		}
 	}
@@ -855,12 +859,28 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 		}
 	}
 	self.enemy_spawn_groups.FBI_tanks = {
-		amount = {1, 1},
+		amount = {3, 4},
 		spawn = {
 			{
 				unit = "FBI_tank",
 				freq = 1,
+				amount_max = 1,
 				tactics = tactics_FBI_tank,
+				rank = 1
+			},
+			{
+				unit = "FBI_shield",
+				freq = 0.5,
+				amount_min = 1,
+				amount_max = 2,
+				tactics = tactics_FBI_shield_flank,
+				rank = 3
+			},
+			{
+				unit = "FBI_heavy_G36_w",
+				freq = 0.5,
+				amount_min = 1,
+				tactics = tactics_FBI_heavy_flank,
 				rank = 1
 			}
 		}
@@ -1065,13 +1085,13 @@ function GroupAITweakData:_set_hard()
 		},
 		CS_tazers = {
 			0,
-			0.01,
+			0.1,
 			0.25
 		},
 		CS_tanks = {
 			0,
 			0.02,
-			0.2
+			0.1
 		}
 	}
 	self.besiege.reenforce.interval = {
@@ -1158,7 +1178,7 @@ function GroupAITweakData:_set_overkill()
 		FBI_swats = {
 			0.1,
 			1,
-			0.25
+			0.3
 		},
 		FBI_heavys = {
 			0.05,
@@ -1171,7 +1191,7 @@ function GroupAITweakData:_set_overkill()
 			1
 		},
 		FBI_tanks = {
-			0.05,
+			0,
 			0.15,
 			0.2
 		},
@@ -1273,12 +1293,12 @@ function GroupAITweakData:_set_overkill_145()
 			1
 		},
 		FBI_shields = {
-			0.1,
+			0.2,
 			0.5,
 			0.75
 		},
 		FBI_tanks = {
-			0.2,
+			0,
 			0.5,
 			1
 		},

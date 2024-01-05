@@ -39,6 +39,7 @@ function CoreEnvironmentControllerManager:init()
 	self._current_flashbang = 0
 	self._current_flashbang_flash = 0
 	self._flashbang_multiplier = 1
+	self._flashbang_duration = 1
 	self._HE_blinding = 0
 	self._downed_value = 0
 	self._last_life = false
@@ -341,7 +342,8 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 	local flashbang = 0
 	local flashbang_flash = 0
 	if 0 < self._current_flashbang then
-		self._current_flashbang = math.max(self._current_flashbang - dt * 0.08 * self._flashbang_multiplier, 0)
+		local flsh = self._current_flashbang
+		self._current_flashbang = math.max(self._current_flashbang - dt * 0.08 * self._flashbang_multiplier * self._flashbang_duration, 0)
 		flashbang = math.min(self._current_flashbang, 1)
 		self._current_flashbang_flash = math.max(self._current_flashbang_flash - dt * 0.9, 0)
 		flashbang_flash = math.min(self._current_flashbang_flash, 1)
@@ -483,13 +485,13 @@ function CoreEnvironmentControllerManager:_update_dof(t, dt)
 	end
 end
 
-function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_sight, travel_dis, linear_dis, multiplier)
+function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_sight, travel_dis, linear_dis, duration)
 	local flash = self.test_line_of_sight(flashbang_pos + flashbang_test_offset, 200, 1000, 3000)
+	self._flashbang_duration = duration
 	if 0 < flash then
-		self._current_flashbang = math.min(self._current_flashbang + flash, 1.5) * multiplier
-		self._current_flashbang_flash = math.min(self._current_flashbang_flash + flash, 1.5) * multiplier
+		self._current_flashbang = math.min(self._current_flashbang + flash, 1.5) * self._flashbang_duration
+		self._current_flashbang_flash = math.min(self._current_flashbang_flash + flash, 1.5) * self._flashbang_duration
 	end
-	self._flashbang_multiplier = self._flashbang_multiplier * multiplier
 	World:effect_manager():spawn({
 		effect = Idstring("effects/particles/explosions/explosion_grenade"),
 		position = flashbang_pos,

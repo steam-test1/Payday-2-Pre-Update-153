@@ -204,7 +204,7 @@ end
 function WeaponTweakData:_init_data_mac11_npc()
 	self.mac11_npc.sounds.prefix = "mp5_npc"
 	self.mac11_npc.use_data.selection_index = 1
-	self.mac11_npc.DAMAGE = 2
+	self.mac11_npc.DAMAGE = 1
 	self.mac11_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.mac11_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
 	self.mac11_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -266,7 +266,7 @@ end
 function WeaponTweakData:_init_data_olympic_npc()
 	self.olympic_npc.sounds.prefix = "m4_olympic_npc"
 	self.olympic_npc.use_data.selection_index = 1
-	self.olympic_npc.DAMAGE = 2
+	self.olympic_npc.DAMAGE = 1.5
 	self.olympic_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.olympic_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
 	self.olympic_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -373,13 +373,13 @@ end
 function WeaponTweakData:_init_data_mac10_npc()
 	self.mac10_npc.sounds.prefix = "mac10_npc"
 	self.mac10_npc.use_data.selection_index = 1
-	self.mac10_npc.DAMAGE = 2
+	self.mac10_npc.DAMAGE = 1
 	self.mac10_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.mac10_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
 	self.mac10_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.mac10_npc.CLIP_AMMO_MAX = 32
 	self.mac10_npc.NR_CLIPS_MAX = 5
-	self.mac10_npc.auto.fire_rate = 0.1
+	self.mac10_npc.auto.fire_rate = 0.9
 	self.mac10_npc.hold = "pistol"
 	self.mac10_npc.hud_icon = "mac11"
 	self.mac10_npc.alert_size = 1000
@@ -1726,8 +1726,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.use_data.selection_index = 2
 	self.saiga.use_data.align_place = "right_hand"
 	self.saiga.DAMAGE = 6
-	self.saiga.damage_near = 50
-	self.saiga.damage_far = 2000
+	self.saiga.damage_near = 600
+	self.saiga.damage_far = 1800
 	self.saiga.rays = 5
 	self.saiga.CLIP_AMMO_MAX = 7
 	self.saiga.NR_CLIPS_MAX = math.round(total_damage_primary / 4.5 / self.saiga.CLIP_AMMO_MAX)
@@ -2495,7 +2495,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.serbu.use_data.selection_index = 1
 	self.serbu.use_data.align_place = "right_hand"
 	self.serbu.DAMAGE = 6
-	self.serbu.damage_near = 100
+	self.serbu.damage_near = 300
 	self.serbu.damage_far = 1000
 	self.serbu.rays = 6
 	self.serbu.CLIP_AMMO_MAX = 6

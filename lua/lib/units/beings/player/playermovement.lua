@@ -47,7 +47,7 @@ function PlayerMovement:init(unit)
 			range_sq = 490000,
 			morale_boost_delay_t = managers.player:has_category_upgrade("player", "morale_boost") and 0 or nil,
 			long_dis_revive = managers.player:has_category_upgrade("player", "long_dis_revive"),
-			revive_chance = 0.5
+			revive_chance = managers.player:upgrade_value("player", "long_dis_revive", 1)
 		}
 	end
 end

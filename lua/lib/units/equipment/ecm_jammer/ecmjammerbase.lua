@@ -238,7 +238,7 @@ function ECMJammerBase:_set_feedback_active(state)
 			local t = TimerManager:game():time()
 			self._feedback_clbk_id = "ecm_feedback" .. tostring(self._unit:key())
 			self._feedback_interval = 1.5
-			self._feedback_range = 1200
+			self._feedback_range = tweak_data.upgrades.ecm_jammer_base_range
 			local duration_mul = 1
 			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
 				duration_mul = duration_mul * managers.player:upgrade_value("ecm_jammer", "feedback_duration_boost", 1)

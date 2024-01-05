@@ -29,6 +29,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.ammo_bag_base = 4
 	self.ecm_jammer_base_battery_life = 20
 	self.ecm_jammer_base_low_battery_life = 8
+	self.ecm_jammer_base_range = 2000
 	self.sentry_gun_base_ammo = 150
 	self.sentry_gun_base_armor = 10
 	self.doctor_bag_base = 2
@@ -79,7 +80,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.pistol.swap_speed_multiplier = {1.5}
 	self.values.pistol.fire_rate_multiplier = {2}
 	self.values.player.revive_interaction_speed_multiplier = {0.5}
-	self.values.player.long_dis_revive = {true}
+	self.values.player.long_dis_revive = {0.5}
 	self.values.doctor_bag.interaction_speed_multiplier = {0.8}
 	self.values.team.stamina.passive_multiplier = {1.15, 1.3}
 	self.values.player.passive_intimidate_range_mul = {1.25}
@@ -171,7 +172,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.sentry_gun.quantity = {1}
 	self.values.sentry_gun.damage_multiplier = {4}
 	self.values.weapon.clip_ammo_increase = {5, 15}
-	self.values.player.armor_multiplier = {1.5}
+	self.values.player.armor_multiplier = {2}
 	self.values.team.armor.regen_time_multiplier = {0.75}
 	self.values.player.passive_crafting_weapon_multiplier = {
 		0.99,

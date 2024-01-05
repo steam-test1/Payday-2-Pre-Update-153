@@ -91,6 +91,9 @@ function BaseInteractionExt:can_select(player)
 	if not self:_has_required_deployable() then
 		return false
 	end
+	if not self:_is_in_required_state() then
+		return false
+	end
 	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
 		return false
 	end
@@ -134,6 +137,10 @@ function BaseInteractionExt:_has_required_deployable()
 	if self._tweak_data.required_deployable then
 		return managers.player:has_deployable_left(self._tweak_data.required_deployable)
 	end
+	return true
+end
+
+function BaseInteractionExt:_is_in_required_state()
 	return true
 end
 
@@ -940,6 +947,13 @@ function IntimitateInteractionExt:_interact_blocked(player)
 	elseif self.tweak_data == "hostage_convert" then
 		return not managers.player:has_category_upgrade("player", "convert_enemies") or not not managers.player:chk_minion_limit_reached()
 	end
+end
+
+function IntimitateInteractionExt:_is_in_required_state()
+	if self.tweak_data == "corpse_dispose" and not managers.groupai:state():whisper_mode() then
+		return false
+	end
+	return true
 end
 
 CarryInteractionExt = CarryInteractionExt or class(UseInteractionExt)

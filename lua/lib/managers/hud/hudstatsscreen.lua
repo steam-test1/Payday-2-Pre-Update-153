@@ -100,7 +100,7 @@ function HUDStatsScreen:init()
 		name = "mission_bags_panel",
 		x = 0,
 		y = 0,
-		h = 22,
+		h = 44,
 		w = left_panel:w()
 	})
 	mission_bags_panel:set_lefttop(mission_bags_title:leftbottom())
@@ -137,14 +137,14 @@ function HUDStatsScreen:init()
 		w = 512,
 		h = 32
 	})
-	bonus_bags_title:set_position(math.round(x + pad), mission_bags_payout:bottom() + 6)
+	bonus_bags_title:set_position(math.round(x + pad), mission_bags_payout:bottom() + 4)
 	managers.hud:make_fine_text(bonus_bags_title)
 	local bonus_bags_panel = loot_wrapper_panel:panel({
 		visible = true,
 		name = "bonus_bags_panel",
 		x = 0,
 		y = 0,
-		h = 22,
+		h = 44,
 		w = left_panel:w()
 	})
 	bonus_bags_panel:set_lefttop(bonus_bags_title:leftbottom())
@@ -182,7 +182,7 @@ function HUDStatsScreen:init()
 		w = 512,
 		h = 32
 	})
-	instant_cash_title:set_position(math.round(x + pad), bonus_bags_payout:bottom() + 6)
+	instant_cash_title:set_position(math.round(x + pad), bonus_bags_payout:bottom() + 4)
 	managers.hud:make_fine_text(instant_cash_title)
 	local instant_cash_text = loot_wrapper_panel:text({
 		layer = 1,
@@ -667,32 +667,75 @@ function HUDStatsScreen:_update_stats_screen_loot(loot_wrapper_panel)
 	print("HUDStatsScreen:_update_stats_screen_loot")
 	local mandatory_bags_data = managers.loot:get_mandatory_bags_data()
 	local secured_amount = managers.loot:get_secured_mandatory_bags_amount()
+	local x
+	local bag_texture, bag_rect = tweak_data.hud_icons:get_icon_data("bag_icon")
+	local mission_amount = managers.loot:get_secured_mandatory_bags_amount()
+	local mission_vis = 0 < mission_amount or 0 < secured_amount
 	local mission_bags_panel = loot_wrapper_panel:child("mission_bags_panel")
 	mission_bags_panel:clear()
-	local bag_texture, bag_rect = tweak_data.hud_icons:get_icon_data("bag_icon")
 	if mandatory_bags_data and mandatory_bags_data.amount then
-		for i = 1, mandatory_bags_data.amount do
-			local x = (i - 1) * 32
-			local alpha = i <= secured_amount and 1 or 0.25
-			mission_bags_panel:bitmap({
-				name = "bag" .. i,
+		if mandatory_bags_data.amount > 18 then
+			local x = 0
+			local bag = mission_bags_panel:bitmap({
+				name = "bag1",
 				texture = bag_texture,
 				texture_rect = bag_rect,
 				x = x,
-				alpha = alpha
+				alpha = 0.25
 			})
+			local bag_text = mission_bags_panel:text({
+				name = "bag_amount",
+				text = " x" .. tostring(mandatory_bags_data.amount - mission_amount),
+				font_size = tweak_data.menu.pd2_small_font_size,
+				font = tweak_data.menu.pd2_small_font
+			})
+			managers.hud:make_fine_text(bag_text)
+			bag_text:set_left(bag:right())
+			bag_text:set_center_y(math.round(bag:center_y()))
+			local bag_gotten = mission_bags_panel:bitmap({
+				name = "bag1",
+				texture = bag_texture,
+				texture_rect = bag_rect,
+				x = x
+			})
+			local bag_text_gotten = mission_bags_panel:text({
+				name = "bag_amount",
+				text = " x" .. tostring(mission_amount),
+				font_size = tweak_data.menu.pd2_small_font_size,
+				font = tweak_data.menu.pd2_small_font
+			})
+			managers.hud:make_fine_text(bag_text_gotten)
+			bag_gotten:set_left(bag_text:right() + 10)
+			bag_text_gotten:set_left(bag_gotten:right())
+			bag_text_gotten:set_center_y(math.round(bag_gotten:center_y()))
+		else
+			local x = 0
+			local y = 0
+			for i = 1, mandatory_bags_data.amount do
+				local alpha = secured_amount >= i and 1 or 0.25
+				mission_bags_panel:bitmap({
+					name = "bag" .. i,
+					texture = bag_texture,
+					texture_rect = bag_rect,
+					x = x,
+					y = y,
+					alpha = alpha
+				})
+				x = x + 32
+				if 288 <= x then
+					x = 0
+					y = 22
+				end
+			end
 		end
 	end
-	local mission_amount = managers.loot:get_secured_mandatory_bags_amount()
-	local mission_vis = 0 < mission_amount or 0 < secured_amount
 	local bonus_amount = managers.loot:get_secured_bonus_bags_amount()
 	local bonus_vis = 0 < bonus_amount or 0 < secured_amount
 	local bonus_bags_title = loot_wrapper_panel:child("bonus_bags_title")
 	bonus_bags_title:set_alpha(bonus_vis and 1 or 0.5)
 	local bonus_bags_panel = loot_wrapper_panel:child("bonus_bags_panel")
 	bonus_bags_panel:clear()
-	local x = 10
-	if bonus_amount >= x then
+	if 10 <= bonus_amount then
 		local x = 0
 		local bag = bonus_bags_panel:bitmap({
 			name = "bag1",

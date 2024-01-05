@@ -243,7 +243,7 @@ function MissionDoorTweakData:init()
 			align = "a_drill",
 			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
 			can_jam = true,
-			timer = 600
+			timer = 360
 		}
 	}
 	self.safe_deposit_titan = {}

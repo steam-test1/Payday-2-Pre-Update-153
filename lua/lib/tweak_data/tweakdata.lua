@@ -477,6 +477,14 @@ function TweakData:init()
 	self.interaction.gasoline.special_equipment = "gas"
 	self.interaction.gasoline.equipment_consume = true
 	self.interaction.gasoline.interact_distance = 300
+	self.interaction.gasoline_engine = {}
+	self.interaction.gasoline_engine.icon = "equipment_thermite"
+	self.interaction.gasoline_engine.text_id = "debug_interact_gas"
+	self.interaction.gasoline_engine.equipment_text_id = "debug_interact_equipment_gas"
+	self.interaction.gasoline_engine.special_equipment = "gas"
+	self.interaction.gasoline_engine.equipment_consume = true
+	self.interaction.gasoline_engine.interact_distance = 300
+	self.interaction.gasoline_engine.timer = 20
 	self.interaction.train_car = {}
 	self.interaction.train_car.icon = "develop"
 	self.interaction.train_car.text_id = "debug_interact_train_car"
@@ -1664,6 +1672,12 @@ function TweakData:init()
 	self.interaction.hold_place_gps_tracker.interact_distance = 300
 	self.interaction.keyboard_no_time = deep_clone(self.interaction.security_station_keyboard)
 	self.interaction.keyboard_no_time.timer = 2.5
+	self.interaction.keyboard_eday_1 = deep_clone(self.interaction.security_station_keyboard)
+	self.interaction.keyboard_eday_1.timer = 2.5
+	self.interaction.keyboard_eday_1.text_id = "hud_int_keyboard_eday_1"
+	self.interaction.keyboard_eday_2 = deep_clone(self.interaction.security_station_keyboard)
+	self.interaction.keyboard_eday_2.timer = 2.5
+	self.interaction.keyboard_eday_2.text_id = "hud_int_keyboard_eday_2"
 	self.interaction.hold_use_computer = {}
 	self.interaction.hold_use_computer.start_active = false
 	self.interaction.hold_use_computer.text_id = "hud_int_hold_use_computer"
@@ -2027,8 +2041,8 @@ function TweakData:init()
 	self.experience_manager.stage_failed_multiplier = 0.15
 	self.experience_manager.difficulty_multiplier = {
 		1.5,
-		2.5,
-		5
+		4,
+		8
 	}
 	self.experience_manager.alive_humans_multiplier = {
 		1,
