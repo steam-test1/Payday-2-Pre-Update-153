@@ -974,6 +974,10 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"gerber"}
 	}
+	self.level_tree[42] = {
+		name_id = "weapons",
+		upgrades = {"fal"}
+	}
 	self.level_tree[45] = {
 		name_id = "weapons",
 		upgrades = {"m249"}
@@ -1183,6 +1187,7 @@ function UpgradesTweakData:init()
 	self:_m95_definitions()
 	self:_msr_definitions()
 	self:_r93_definitions()
+	self:_fal_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -4518,6 +4523,15 @@ function UpgradesTweakData:_r93_definitions()
 		weapon_id = "r93",
 		factory_id = "wpn_fps_snp_r93",
 		dlc = "gage_pack_snp"
+	}
+end
+
+function UpgradesTweakData:_fal_definitions()
+	self.definitions.fal = {
+		category = "weapon",
+		weapon_id = "fal",
+		factory_id = "wpn_fps_ass_fal",
+		dlc = "big_bank"
 	}
 end
 

@@ -8,6 +8,7 @@ DLCManager.BUNDLED_DLC_PACKAGES = {
 	gage_pack_lmg = true,
 	gage_pack_jobs = true,
 	gage_pack_snp = true,
+	big_bank = true,
 	season_pass = false,
 	animal = false
 }
@@ -179,6 +180,10 @@ end
 
 function GenericDLCManager:has_gage_pack_snp()
 	return Global.dlc_manager.all_dlc_data.gage_pack_snp and Global.dlc_manager.all_dlc_data.gage_pack_snp.verified
+end
+
+function GenericDLCManager:has_big_bank()
+	return Global.dlc_manager.all_dlc_data.big_bank and Global.dlc_manager.all_dlc_data.big_bank.verified
 end
 
 function GenericDLCManager:has_xmas_soundtrack()
@@ -444,6 +449,7 @@ function WINDLCManager:init()
 			gage_pack_lmg = {app_id = "275590", no_install = true},
 			gage_pack_jobs = {app_id = "259381", no_install = true},
 			gage_pack_snp = {app_id = "259380", no_install = true},
+			big_bank = {app_id = "306690", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			pd2_clan = {

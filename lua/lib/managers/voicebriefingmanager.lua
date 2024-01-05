@@ -133,6 +133,7 @@ function VoiceBriefingManager:post_event(event_name, params)
 	self:_set_parameters(params)
 	self._event_name = event_name
 	self._event_instance = self._sound_source:post_event(event_name, callback(self, self, "_sound_callback"), params and params.cookie or nil, "marker", "duration", "end_of_event")
+	self._event_cookie = params and params.cookie
 	return self:_check_event_ok()
 end
 
@@ -144,11 +145,12 @@ function VoiceBriefingManager:stop_event(skip_end_of_event)
 	if self._event_instance then
 		self._event_instance:stop()
 		if not skip_end_of_event then
-			self:_end_of_event()
+			self:_end_of_event(self._event_cookie)
 		else
 			self:_clear_event()
 		end
 	end
+	self._event_cookie = nil
 end
 
 function VoiceBriefingManager:add_listener(listener)

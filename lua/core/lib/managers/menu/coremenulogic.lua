@@ -6,6 +6,7 @@ function Logic:init(menu_data)
 	self._node_stack = {}
 	self._callback_map = {}
 	self._callback_map.renderer_show_node = nil
+	self._callback_map.renderer_refresh_node_stack = nil
 	self._callback_map.renderer_refresh_node = nil
 	self._callback_map.renderer_update_node = nil
 	self._callback_map.renderer_select_item = nil
@@ -23,6 +24,7 @@ function Logic:init(menu_data)
 	self._action_callback_map.select_item = callback(self, self, "_select_item")
 	self._action_callback_map.trigger_item = callback(self, self, "_trigger_item")
 	self._action_callback_map.refresh_node = callback(self, self, "_refresh_node")
+	self._action_callback_map.refresh_node_stack = callback(self, self, "_refresh_node_stack")
 	self._action_callback_map.update_node = callback(self, self, "_update_node")
 end
 
@@ -81,6 +83,23 @@ function Logic:_select_node(node_name, ...)
 		self:_call_callback("renderer_select_item", node:selected_item())
 		self:_call_callback("menu_manager_select_node", node)
 	end
+end
+
+function Logic:refresh_node_stack(queue, ...)
+	self:_queue_action("refresh_node_stack", ...)
+end
+
+function Logic:_refresh_node_stack(...)
+	for i, node in ipairs(self._node_stack) do
+		if node:parameters().refresh then
+			for _, refresh_func in ipairs(node:parameters().refresh) do
+				node = refresh_func(node, ...)
+			end
+		end
+		local selected_item = node:selected_item()
+		node:select_item(selected_item and selected_item:name())
+	end
+	self:_call_callback("renderer_refresh_node_stack")
 end
 
 function Logic:refresh_node(node_name, queue, ...)

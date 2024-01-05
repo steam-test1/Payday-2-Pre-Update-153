@@ -12,6 +12,9 @@ function DialogManager:init_finalize()
 end
 
 function DialogManager:queue_dialog(id, params)
+	if not params.skip_idle_check and managers.platform:presence() == "Idle" then
+		return
+	end
 	if not self._dialog_list[id] then
 		debug_pause("The dialog script tries to queue a dialog with id '" .. tostring(id) .. "' which doesn't seem to exist!")
 		return false

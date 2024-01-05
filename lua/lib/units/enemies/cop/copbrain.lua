@@ -1047,6 +1047,7 @@ function CopBrain:pre_destroy(unit)
 	self:set_active(false)
 	self._reload_clbks[unit:key()] = nil
 	self._attention_handler:set_attention(nil)
+	self:rem_all_pos_rsrv()
 	self:end_alarm_pager()
 	if self._current_logic.pre_destroy then
 		self._current_logic.pre_destroy(self._logic_data)

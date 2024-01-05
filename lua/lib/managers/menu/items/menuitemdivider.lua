@@ -14,7 +14,6 @@ function MenuItemDivider:setup_gui(node, row_item)
 	})
 	local h = row_item.item:parameters().size or 10
 	if row_item.text then
-		print("HAS TEXT", row_item.text)
 		row_item.text = node._text_item_part(node, row_item, row_item.gui_panel, 0)
 		local _, _, tw, th = row_item.text:text_rect()
 		row_item.text:set_size(tw, th)

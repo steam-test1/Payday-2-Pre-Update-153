@@ -62,6 +62,11 @@ function MenuNodeGui:_world_left_align()
 	return safe_rect.x + safe_rect.width * self._align_line_proportions - self._align_line_padding
 end
 
+local mvector_tl = Vector3()
+local mvector_tr = Vector3()
+local mvector_bl = Vector3()
+local mvector_br = Vector3()
+
 function MenuNodeGui:_setup_panels(node)
 	MenuNodeGui.super._setup_panels(self, node)
 	local safe_rect_pixels = self:_scaled_size()
@@ -113,23 +118,45 @@ function MenuNodeGui:_setup_panels(node)
 	self._list_arrows = {}
 	local aw = safe_rect_pixels.width - self:_mid_align()
 	self._list_arrows.up = self.ws:panel():bitmap({
-		texture = "guis/textures/scroll_up",
+		texture = "guis/textures/pd2/shared_lines",
+		wrap_mode = "wrap",
 		visible = false,
 		x = self:_mid_align(),
 		y = 0,
 		w = aw,
-		layer = self.layers.items + 2,
-		color = self.row_item_color:with_alpha(1)
+		layer = self.layers.items + 2
 	})
 	self._list_arrows.down = self.ws:panel():bitmap({
-		texture = "guis/textures/scroll_down",
+		texture = "guis/textures/pd2/shared_lines",
+		wrap_mode = "wrap",
 		visible = false,
 		x = self:_mid_align(),
 		y = 0,
 		w = aw,
-		layer = self.layers.items + 2,
-		color = self.row_item_color:with_alpha(1)
+		layer = self.layers.items + 2
 	})
+	do
+		local x = math.random(1, 255)
+		local y = math.random(0, math.round(self._list_arrows.up:texture_height() / 2 - 1)) * 2
+		local w = aw
+		local h = 2
+		mvector3.set_static(mvector_tl, x, y, 0)
+		mvector3.set_static(mvector_tr, x + w, y, 0)
+		mvector3.set_static(mvector_bl, x, y + h, 0)
+		mvector3.set_static(mvector_br, x + w, y + h, 0)
+		self._list_arrows.up:set_texture_coordinates(mvector_tl, mvector_tr, mvector_bl, mvector_br)
+	end
+	do
+		local x = math.random(1, 255)
+		local y = math.random(0, math.round(self._list_arrows.down:texture_height() / 2 - 1)) * 2
+		local w = aw
+		local h = 2
+		mvector3.set_static(mvector_tl, x, y, 0)
+		mvector3.set_static(mvector_tr, x + w, y, 0)
+		mvector3.set_static(mvector_bl, x, y + h, 0)
+		mvector3.set_static(mvector_br, x + w, y + h, 0)
+		self._list_arrows.down:set_texture_coordinates(mvector_tl, mvector_tr, mvector_bl, mvector_br)
+	end
 	self._info_bg_rect = self.safe_rect_panel:rect({
 		visible = false,
 		x = 0,
@@ -269,10 +296,10 @@ function MenuNodeGui:_setup_item_panel_parent(safe_rect, shape)
 	local h = shape.h or safe_rect.height - CoreMenuRenderer.Renderer.border_height * 2
 	self._item_panel_parent:set_shape(x, y, w, h)
 	self._align_data.panel:set_h(self._item_panel_parent:h())
-	self._list_arrows.up:set_h(48 * tweak_data.scale.menu_arrow_padding_multiplier)
+	self._list_arrows.up:set_h(2)
 	self._list_arrows.up:set_world_left(self._align_data.panel:world_left())
 	self._list_arrows.up:set_world_top(self._align_data.panel:world_top())
-	self._list_arrows.down:set_h(48 * tweak_data.scale.menu_arrow_padding_multiplier)
+	self._list_arrows.down:set_h(2)
 	self._list_arrows.down:set_world_left(self._align_data.panel:world_left())
 	self._list_arrows.down:set_world_bottom(self._align_data.panel:world_bottom())
 	self._legends_panel:set_bottom(self.ws:panel():bottom())
@@ -1237,7 +1264,7 @@ end
 
 function MenuNodeGui:_align_marker(row_item)
 	if self.marker_color then
-		self._marker_data.gradient:set_color(row_item.item:enabled() and self.marker_color or row_item.disabled_color)
+		self._marker_data.gradient:set_color(row_item.item:enabled() and self.marker_color or self.marker_disabled_color or row_item.disabled_color)
 	end
 	if row_item.item:parameters().pd2_corner then
 		self._marker_data.marker:set_visible(true)

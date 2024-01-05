@@ -38,7 +38,9 @@ function MoneyTweakData._test_curves(pay, bags, alive_players, diff, days)
 	print(v, v * tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
-function MoneyTweakData:init()
+function MoneyTweakData:init(tweak_data)
+	local difficulty = Global.game_settings and Global.game_settings.difficulty or "normal"
+	local difficulty_index = tweak_data:difficulty_to_index(difficulty)
 	self.biggest_score = 4000000
 	self.biggest_cashout = 800000
 	self.offshore_rate = self.biggest_cashout / self.biggest_score
@@ -130,6 +132,7 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.halloween = 1
 	self.global_value_multipliers.xmas = 1
 	self.global_value_multipliers.armored_transport = 1.2
+	self.global_value_multipliers.big_bank = 0.8
 	self.global_value_multipliers.gage_pack = 1.4
 	self.global_value_multipliers.gage_pack_lmg = 1.8
 	self.global_value_multipliers.gage_pack_jobs = 0
@@ -151,6 +154,7 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.halloween = 0
 	self.global_value_bonus_multiplier.xmas = 0
 	self.global_value_bonus_multiplier.armored_transport = 0.5
+	self.global_value_bonus_multiplier.big_bank = 0.4
 	self.global_value_bonus_multiplier.gage_pack = 0.5
 	self.global_value_bonus_multiplier.gage_pack_lmg = 0.5
 	self.global_value_bonus_multiplier.gage_pack_jobs = 0
@@ -196,34 +200,131 @@ function MoneyTweakData:init()
 	self.mission_asset_cost_small = self._create_value_table(2500, 15000, 10, true, 1)
 	self.mission_asset_cost_medium = self._create_value_table(10000, 45000, 10, true, 1)
 	self.mission_asset_cost_large = self._create_value_table(55000, 400000, 10, true, 1)
-	self.small_loot_value_multiplier = {
-		100,
-		100,
-		100,
-		100,
-		100,
-		100,
-		100,
-		100,
-		100,
-		100,
-		100
+	self.preplaning_asset_cost_multiplier_by_risk = {
+		1,
+		2,
+		5,
+		10,
+		13
 	}
+	self.preplaning_asset_cost_thermite = 10
+	self.preplaning_asset_cost_escapebig = 40000
+	self.preplaning_asset_cost_spycam = 1000
+	self.preplaning_asset_cost_delay30 = 2000
+	self.preplaning_asset_cost_timelock60 = 2000
+	self.preplaning_asset_cost_cake = 5000
+	self.preplaning_asset_cost_extracameras = 500
+	self.preplaning_asset_cost_accesscameras = 1000
+	self.preplaning_asset_cost_drillparts = 5000
+	self.preplaning_asset_cost_deaddropbag = 1600
+	self.preplaning_asset_cost_unlocked_door = 1000
+	self.preplaning_asset_cost_unlocked_window = 1000
+	self.preplaning_asset_cost_zipline = 2000
+	self.preplaning_asset_cost_highlight_keybox = 1000
+	self.preplaning_asset_cost_keycard = 2000
 	self.small_loot = {}
-	self.small_loot.money_bundle = 10
-	self.small_loot.diamondheist_vault_bust = 12
-	self.small_loot.diamondheist_vault_diamond = 15
-	self.small_loot.diamondheist_big_diamond = 15
-	self.small_loot.value_gold = 30
-	self.small_loot.gen_atm = 220
-	self.small_loot.special_deposit_box = 35
-	self.small_loot.vault_loot_gold = 100
-	self.small_loot.vault_loot_cash = 50
-	self.small_loot.vault_loot_coins = 35
-	self.small_loot.vault_loot_ring = 15
-	self.small_loot.vault_loot_jewels = 25
-	self.small_loot.vault_loot_macka = 0.01
-	self.max_small_loot_value = 500000
+	if difficulty_index <= 2 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.diamondheist_vault_bust = 1200
+		self.small_loot.diamondheist_vault_diamond = 1500
+		self.small_loot.diamondheist_big_diamond = 1500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 22000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.vault_loot_chest = 570
+		self.small_loot.vault_loot_diamond_chest = 610
+		self.small_loot.vault_loot_banknotes = 500
+		self.small_loot.vault_loot_silver = 540
+		self.small_loot.vault_loot_diamond_collection = 650
+		self.small_loot.vault_loot_trophy = 690
+		self.small_loot.vault_loot_gold = 10000
+		self.small_loot.vault_loot_cash = 5000
+		self.small_loot.vault_loot_coins = 3500
+		self.small_loot.vault_loot_ring = 1500
+		self.small_loot.vault_loot_jewels = 2500
+		self.small_loot.vault_loot_macka = 1
+	elseif difficulty_index == 3 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.diamondheist_vault_bust = 1200
+		self.small_loot.diamondheist_vault_diamond = 1500
+		self.small_loot.diamondheist_big_diamond = 1500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 22000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.vault_loot_chest = 1150
+		self.small_loot.vault_loot_diamond_chest = 1250
+		self.small_loot.vault_loot_banknotes = 1000
+		self.small_loot.vault_loot_silver = 1100
+		self.small_loot.vault_loot_diamond_collection = 1300
+		self.small_loot.vault_loot_trophy = 1400
+		self.small_loot.vault_loot_gold = 10000
+		self.small_loot.vault_loot_cash = 5000
+		self.small_loot.vault_loot_coins = 3500
+		self.small_loot.vault_loot_ring = 1500
+		self.small_loot.vault_loot_jewels = 2500
+		self.small_loot.vault_loot_macka = 1
+	elseif difficulty_index == 4 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.diamondheist_vault_bust = 1200
+		self.small_loot.diamondheist_vault_diamond = 1500
+		self.small_loot.diamondheist_big_diamond = 1500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 22000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.vault_loot_chest = 2900
+		self.small_loot.vault_loot_diamond_chest = 3100
+		self.small_loot.vault_loot_banknotes = 2500
+		self.small_loot.vault_loot_silver = 2700
+		self.small_loot.vault_loot_diamond_collection = 3300
+		self.small_loot.vault_loot_trophy = 3500
+		self.small_loot.vault_loot_gold = 10000
+		self.small_loot.vault_loot_cash = 5000
+		self.small_loot.vault_loot_coins = 3500
+		self.small_loot.vault_loot_ring = 1500
+		self.small_loot.vault_loot_jewels = 2500
+		self.small_loot.vault_loot_macka = 1
+	elseif difficulty_index == 5 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.diamondheist_vault_bust = 1200
+		self.small_loot.diamondheist_vault_diamond = 1500
+		self.small_loot.diamondheist_big_diamond = 1500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 22000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.vault_loot_chest = 5800
+		self.small_loot.vault_loot_diamond_chest = 6200
+		self.small_loot.vault_loot_banknotes = 5000
+		self.small_loot.vault_loot_silver = 5400
+		self.small_loot.vault_loot_diamond_collection = 6500
+		self.small_loot.vault_loot_trophy = 6900
+		self.small_loot.vault_loot_gold = 10000
+		self.small_loot.vault_loot_cash = 5000
+		self.small_loot.vault_loot_coins = 3500
+		self.small_loot.vault_loot_ring = 1500
+		self.small_loot.vault_loot_jewels = 2500
+		self.small_loot.vault_loot_macka = 1
+	else
+		self.small_loot.money_bundle = 1000
+		self.small_loot.diamondheist_vault_bust = 1200
+		self.small_loot.diamondheist_vault_diamond = 1500
+		self.small_loot.diamondheist_big_diamond = 1500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 22000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.vault_loot_chest = 7500
+		self.small_loot.vault_loot_diamond_chest = 8000
+		self.small_loot.vault_loot_banknotes = 6500
+		self.small_loot.vault_loot_silver = 7000
+		self.small_loot.vault_loot_diamond_collection = 8500
+		self.small_loot.vault_loot_trophy = 9000
+		self.small_loot.vault_loot_gold = 10000
+		self.small_loot.vault_loot_cash = 5000
+		self.small_loot.vault_loot_coins = 3500
+		self.small_loot.vault_loot_ring = 1500
+		self.small_loot.vault_loot_jewels = 2500
+		self.small_loot.vault_loot_macka = 1
+	end
+	self.max_small_loot_value = 900000
 	self.skilltree = {}
 	self.skilltree.respec = {}
 	self.skilltree.respec.base_cost = 200

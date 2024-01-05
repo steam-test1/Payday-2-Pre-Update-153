@@ -173,7 +173,7 @@ function MenuNodeBaseGui:mouse_pressed(button, x, y)
 			end
 		end
 	end
-	return false
+	return MenuNodeBaseGui.super.mouse_pressed(self, button, x, y)
 end
 
 function MenuNodeBaseGui:mouse_released(button, x, y)

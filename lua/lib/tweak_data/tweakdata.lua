@@ -128,6 +128,7 @@ end
 function TweakData:_set_easy()
 	self.player:_set_easy()
 	self.character:_set_easy()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_easy()
 	self.experience_manager.civilians_killed = 15
@@ -140,6 +141,7 @@ end
 function TweakData:_set_normal()
 	self.player:_set_normal()
 	self.character:_set_normal()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_normal()
 	self.experience_manager.civilians_killed = 35
@@ -152,6 +154,7 @@ end
 function TweakData:_set_hard()
 	self.player:_set_hard()
 	self.character:_set_hard()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_hard()
 	self.experience_manager.civilians_killed = 75
@@ -164,6 +167,7 @@ end
 function TweakData:_set_overkill()
 	self.player:_set_overkill()
 	self.character:_set_overkill()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill()
 	self.experience_manager.civilians_killed = 150
@@ -176,6 +180,7 @@ end
 function TweakData:_set_overkill_145()
 	self.player:_set_overkill_145()
 	self.character:_set_overkill_145()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_145()
 	self.experience_manager.civilians_killed = 550
@@ -188,6 +193,7 @@ end
 function TweakData:_set_overkill_290()
 	self.player:_set_overkill_290()
 	self.character:_set_overkill_290()
+	self.money_manager:init(self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_290()
 	self.experience_manager.civilians_killed = 10000
@@ -296,7 +302,7 @@ function TweakData:init()
 	self.skilltree = SkillTreeTweakData:new()
 	self.upgrades.visual = UpgradesVisualTweakData:new()
 	self.tips = TipsTweakData:new()
-	self.money_manager = MoneyTweakData:new()
+	self.money_manager = MoneyTweakData:new(self)
 	self.blackmarket = BlackMarketTweakData:new(self)
 	self.carry = CarryTweakData:new(self)
 	self.mission_door = MissionDoorTweakData:new()
@@ -423,6 +429,12 @@ function TweakData:init()
 		Color(self.peer_vector_colors[3]:unpack()),
 		Color(self.peer_vector_colors[4]:unpack()),
 		Color(self.peer_vector_colors[5]:unpack())
+	}
+	self.preplanning_peer_colors = {
+		Color("ff82991e"),
+		Color("ff0055ff"),
+		Color("ffff7800"),
+		Color("ffffff00")
 	}
 	self.screen_colors = {}
 	self.screen_colors.text = Color(255, 255, 255, 255) / 255
@@ -1056,9 +1068,8 @@ function TweakData:init()
 	self.interaction.big_computer_hackable.icon = "interaction_keyboard"
 	self.interaction.big_computer_hackable.text_id = "hud_int_big_computer_hackable"
 	self.interaction.big_computer_hackable.timer = 6
-	self.interaction.big_computer_hackable.axis = "z"
 	self.interaction.big_computer_hackable.start_active = false
-	self.interaction.big_computer_hackable.interact_distance = 150
+	self.interaction.big_computer_hackable.interact_distance = 200
 	self.interaction.big_computer_hackable.sound_start = "bar_keyboard"
 	self.interaction.big_computer_hackable.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.big_computer_hackable.sound_done = "bar_keyboard_finished"
@@ -1066,9 +1077,8 @@ function TweakData:init()
 	self.interaction.big_computer_not_hackable.icon = "interaction_keyboard"
 	self.interaction.big_computer_not_hackable.text_id = "hud_int_big_computer_hackable"
 	self.interaction.big_computer_not_hackable.timer = 6
-	self.interaction.big_computer_not_hackable.axis = "z"
 	self.interaction.big_computer_not_hackable.start_active = false
-	self.interaction.big_computer_not_hackable.interact_distance = 150
+	self.interaction.big_computer_not_hackable.interact_distance = 200
 	self.interaction.big_computer_not_hackable.sound_start = "bar_keyboard"
 	self.interaction.big_computer_not_hackable.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.big_computer_not_hackable.sound_done = "bar_keyboard_finished"
@@ -1078,7 +1088,6 @@ function TweakData:init()
 	self.interaction.big_computer_server.icon = "interaction_keyboard"
 	self.interaction.big_computer_server.text_id = "hud_int_big_computer_server"
 	self.interaction.big_computer_server.timer = 6
-	self.interaction.big_computer_server.axis = "z"
 	self.interaction.big_computer_server.start_active = false
 	self.interaction.big_computer_server.interact_distance = 150
 	self.interaction.big_computer_server.sound_start = "bar_keyboard"
@@ -2156,9 +2165,8 @@ function TweakData:init()
 	self.interaction.bag_zipline = {}
 	self.interaction.bag_zipline.text_id = "hud_int_bag_zipline"
 	self.interaction.huge_lance = {}
-	self.interaction.huge_lance.contour = "contour_off"
-	self.interaction.huge_lance.text_id = "hud_int_equipment_lance"
-	self.interaction.huge_lance.action_text_id = "hud_action_placing_lance"
+	self.interaction.huge_lance.text_id = "hud_int_equipment_huge_lance"
+	self.interaction.huge_lance.action_text_id = "hud_action_placing_huge_lance"
 	self.interaction.huge_lance.timer = 3
 	self.interaction.huge_lance.sound_start = "bar_huge_lance_fix"
 	self.interaction.huge_lance.sound_interupt = "bar_huge_lance_fix_cancel"
@@ -2168,7 +2176,7 @@ function TweakData:init()
 	self.interaction.huge_lance_jammed.action_text_id = "hud_action_fixing_huge_lance"
 	self.interaction.huge_lance_jammed.special_equipment = "lance_part"
 	self.interaction.huge_lance_jammed.equipment_text_id = "hud_int_equipment_no_lance_part"
-	self.interaction.huge_lance_jammed.blocked_hint = "no_lance"
+	self.interaction.huge_lance_jammed.blocked_hint = "no_huge_lance"
 	self.interaction.huge_lance_jammed.equipment_consume = true
 	self.interaction.huge_lance_jammed.timer = 10
 	self.interaction.huge_lance_jammed.sound_start = "bar_huge_lance_fix"
@@ -2177,6 +2185,7 @@ function TweakData:init()
 	self.interaction.gen_pku_lance_part = {}
 	self.interaction.gen_pku_lance_part.text_id = "hud_int_take_lance_part"
 	self.interaction.gen_pku_lance_part.special_equipment_block = "lance_part"
+	self.interaction.gen_pku_lance_part.sound_done = "drill_fix_end"
 	self.interaction.crane_joystick_left = {}
 	self.interaction.crane_joystick_left.text_id = "hud_int_crane_left"
 	self.interaction.crane_joystick_left.start_active = false
@@ -2251,6 +2260,130 @@ function TweakData:init()
 	self.interaction.enter_code.sound_start = "bar_keyboard"
 	self.interaction.enter_code.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.enter_code.sound_done = "bar_keyboard_finished"
+	self.interaction.take_keys = {}
+	self.interaction.take_keys.text_id = "hud_int_take_keys"
+	self.interaction.push_button = {}
+	self.interaction.push_button.text_id = "hud_int_push_button"
+	self.interaction.breach_door = {}
+	self.interaction.breach_door.text_id = "debug_interact_crowbar"
+	self.interaction.breach_door.action_text_id = "hud_action_breaching_door"
+	self.interaction.breach_door.start_active = false
+	self.interaction.breach_door.timer = 2
+	self.interaction.breach_door.sound_start = "bar_pry_open_elevator_door"
+	self.interaction.breach_door.sound_interupt = "bar_pry_open_elevator_door_cancel"
+	self.interaction.breach_door.sound_done = "bar_pry_open_elevator_door_finished"
+	self.interaction.bus_wall_phone = {}
+	self.interaction.bus_wall_phone.text_id = "hud_int_use_phone_signal_bus"
+	self.interaction.bus_wall_phone.start_active = false
+	self.interaction.zipline_mount = {}
+	self.interaction.zipline_mount.text_id = "hud_int_setup_zipline"
+	self.interaction.zipline_mount.action_text_id = "hud_action_setting_zipline"
+	self.interaction.zipline_mount.start_active = false
+	self.interaction.zipline_mount.timer = 2
+	self.interaction.zipline_mount.sound_start = "bar_drill_apply"
+	self.interaction.zipline_mount.sound_interupt = "bar_drill_apply_cancel"
+	self.interaction.zipline_mount.sound_done = "bar_drill_apply_finished"
+	self.interaction.rewire_timelock = deep_clone(self.interaction.security_station)
+	self.interaction.rewire_timelock.text_id = "hud_int_rewire_timelock"
+	self.interaction.rewire_timelock.action_text_id = "hud_action_rewiring_timelock"
+	self.interaction.rewire_timelock.axis = "x"
+	self.interaction.pick_lock_x_axis = deep_clone(self.interaction.pick_lock_hard_no_skill)
+	self.interaction.pick_lock_x_axis.axis = "x"
+	self.interaction.money_wrap_single_bundle_active = deep_clone(self.interaction.money_wrap_single_bundle)
+	self.interaction.money_wrap_single_bundle_active.start_active = true
+	self.interaction.pku_barcode_downtown = {}
+	self.interaction.pku_barcode_downtown.text_id = "hud_int_hold_barcode"
+	self.interaction.pku_barcode_downtown.action_text_id = "hud_action_barcode"
+	self.interaction.pku_barcode_downtown.special_equipment_block = "barcode_downtown"
+	self.interaction.pku_barcode_downtown.timer = 2
+	self.interaction.pku_barcode_brickell = deep_clone(self.interaction.pku_barcode_downtown)
+	self.interaction.pku_barcode_brickell.special_equipment_block = "barcode_brickell"
+	self.interaction.pku_barcode_edgewater = deep_clone(self.interaction.pku_barcode_downtown)
+	self.interaction.pku_barcode_edgewater.special_equipment_block = "barcode_edgewater"
+	self.interaction.pku_barcode_isles_beach = deep_clone(self.interaction.pku_barcode_downtown)
+	self.interaction.pku_barcode_isles_beach.special_equipment_block = "barcode_isles_beach"
+	self.interaction.pku_barcode_opa_locka = deep_clone(self.interaction.pku_barcode_downtown)
+	self.interaction.pku_barcode_opa_locka.special_equipment_block = "barcode_opa_locka"
+	self.interaction.read_barcode_downtown = {}
+	self.interaction.read_barcode_downtown.text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_downtown.action_text_id = "hud_action_read_barcode"
+	self.interaction.read_barcode_downtown.special_equipment = "barcode_downtown"
+	self.interaction.read_barcode_downtown.dont_need_equipment = true
+	self.interaction.read_barcode_downtown.possible_special_equipment = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
+	self.interaction.read_barcode_downtown.equipment_text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_downtown.equipment_consume = true
+	self.interaction.read_barcode_downtown.start_active = false
+	self.interaction.read_barcode_downtown.timer = 2
+	self.interaction.read_barcode_brickell = {}
+	self.interaction.read_barcode_brickell.text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_brickell.action_text_id = "hud_action_read_barcode"
+	self.interaction.read_barcode_brickell.special_equipment = "barcode_brickell"
+	self.interaction.read_barcode_brickell.dont_need_equipment = true
+	self.interaction.read_barcode_brickell.possible_special_equipment = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
+	self.interaction.read_barcode_brickell.equipment_text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_brickell.equipment_consume = true
+	self.interaction.read_barcode_brickell.start_active = false
+	self.interaction.read_barcode_brickell.timer = 2
+	self.interaction.read_barcode_edgewater = {}
+	self.interaction.read_barcode_edgewater.text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_edgewater.action_text_id = "hud_action_read_barcode"
+	self.interaction.read_barcode_edgewater.special_equipment = "barcode_edgewater"
+	self.interaction.read_barcode_edgewater.dont_need_equipment = true
+	self.interaction.read_barcode_edgewater.possible_special_equipment = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
+	self.interaction.read_barcode_edgewater.equipment_text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_edgewater.equipment_consume = true
+	self.interaction.read_barcode_edgewater.start_active = false
+	self.interaction.read_barcode_edgewater.timer = 2
+	self.interaction.read_barcode_isles_beach = {}
+	self.interaction.read_barcode_isles_beach.text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_isles_beach.action_text_id = "hud_action_read_barcode"
+	self.interaction.read_barcode_isles_beach.special_equipment = "barcode_isles_beach"
+	self.interaction.read_barcode_isles_beach.dont_need_equipment = true
+	self.interaction.read_barcode_isles_beach.possible_special_equipment = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
+	self.interaction.read_barcode_isles_beach.equipment_text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_isles_beach.equipment_consume = true
+	self.interaction.read_barcode_isles_beach.start_active = false
+	self.interaction.read_barcode_isles_beach.timer = 2
+	self.interaction.read_barcode_opa_locka = {}
+	self.interaction.read_barcode_opa_locka.text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_opa_locka.action_text_id = "hud_action_read_barcode"
+	self.interaction.read_barcode_opa_locka.special_equipment = "barcode_opa_locka"
+	self.interaction.read_barcode_opa_locka.dont_need_equipment = true
+	self.interaction.read_barcode_opa_locka.possible_special_equipment = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
+	self.interaction.read_barcode_opa_locka.equipment_text_id = "hud_int_hold_read_barcode"
+	self.interaction.read_barcode_opa_locka.equipment_consume = true
+	self.interaction.read_barcode_opa_locka.start_active = false
+	self.interaction.read_barcode_opa_locka.timer = 2
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2258,6 +2391,7 @@ function TweakData:init()
 	self.gui.MENU_COMPONENT_LAYER = 300
 	self.gui.ATTRACT_SCREEN_LAYER = 400
 	self.gui.LOADING_SCREEN_LAYER = 1000
+	self.gui.CRIMENET_CHAT_LAYER = 1000
 	self.gui.DIALOG_LAYER = 1100
 	self.gui.MOUSE_LAYER = 1200
 	self.gui.SAVEFILE_LAYER = 1400
@@ -3113,6 +3247,13 @@ function TweakData:init()
 				"overkill_290"
 			},
 			job = "kosugi"
+		},
+		death_bigbank = {
+			award = "bigbank_9",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "big"
 		}
 	}
 	self.achievement.job_list = {}
@@ -3152,6 +3293,7 @@ function TweakData:init()
 		"arm_und",
 		"kosugi"
 	}
+	self.achievement.job_list.dentist = {"big"}
 	self.achievement.complete_heist_stats_achievements = {
 		death_vlad = {
 			award = "death_5",
@@ -3211,6 +3353,15 @@ function TweakData:init()
 				"skullveryhard",
 				"skulloverkill",
 				"skulloverkillplus"
+			}
+		},
+		funding_father = {
+			award = "bigbank_10",
+			masks = {
+				"franklin",
+				"lincoln",
+				"grant",
+				"washington"
 			}
 		}
 	}
@@ -3286,6 +3437,42 @@ function TweakData:init()
 		text_id = "bm_wp_snp_msr_b_long_achievment",
 		stat = "gage3_17_stats",
 		max_progress = 250
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_01 = {
+		text_id = "bm_wp_fal_fg_01_achievment",
+		award = "bigbank_7"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_03 = {
+		text_id = "bm_wp_fal_fg_03_achievment",
+		award = "bigbank_8"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_04 = {
+		text_id = "bm_wp_fal_fg_04_achievment",
+		award = "bigbank_3"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_wood = {
+		text_id = "bm_wp_fal_fg_wood_achievment",
+		award = "bigbank_4"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_01 = {
+		text_id = "bm_wp_fal_s_01_achievment",
+		award = "bigbank_5"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_03 = {
+		text_id = "bm_wp_fal_s_03_achievment",
+		award = "bigbank_10"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_wood = {
+		text_id = "bm_wp_fal_s_wood_achievment",
+		award = "bigbank_6"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_g_01 = {
+		text_id = "bm_wp_fal_g_01_achievment",
+		award = "bigbank_1"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_m_01 = {
+		text_id = "bm_wp_fal_m_01_achievment",
+		award = "bigbank_2"
 	}
 	self.pickups = {}
 	self.pickups.ammo = {
@@ -3382,6 +3569,14 @@ function TweakData:init()
 		"track_13"
 	}
 	self.music.heist.switches_infamous = {"track_11"}
+	self.music.big_bank = {}
+	self.music.big_bank.intro = "music_heist_setup"
+	self.music.big_bank.anticipation = "music_heist_anticipation"
+	self.music.big_bank.assault = "music_heist_assault"
+	self.music.big_bank.fake_assault = "music_heist_assault"
+	self.music.big_bank.control = "music_heist_control"
+	self.music.big_bank.switches = {"track_14"}
+	self.music.big_bank.switches_infamous = {"track_11"}
 	self.music.default = deep_clone(self.music.heist)
 	self.blame = {}
 	self.blame.default = "hint_blame_missing"

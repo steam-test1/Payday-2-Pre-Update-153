@@ -4545,7 +4545,8 @@ function CharacterTweakData:_create_table_structure()
 		"m249",
 		"benelli",
 		"g36",
-		"ump"
+		"ump",
+		"scar_murky"
 	}
 	self.weap_unit_names = {
 		Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
@@ -4564,7 +4565,8 @@ function CharacterTweakData:_create_table_structure()
 		Idstring("units/payday2/weapons/wpn_npc_lmg_m249/wpn_npc_lmg_m249"),
 		Idstring("units/payday2/weapons/wpn_npc_benelli/wpn_npc_benelli"),
 		Idstring("units/payday2/weapons/wpn_npc_g36/wpn_npc_g36"),
-		Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump")
+		Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump"),
+		Idstring("units/payday2/weapons/wpn_npc_scar_murkywater/wpn_npc_scar_murkywater")
 	}
 end
 

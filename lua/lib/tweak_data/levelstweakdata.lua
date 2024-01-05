@@ -677,7 +677,7 @@ function LevelsTweakData:init()
 		"Play_pln_bb1_end_03",
 		"Play_pln_bb1_end_04"
 	}
-	self.big.music = "heist"
+	self.big.music = "big_bank"
 	self.big.package = "packages/narr_big"
 	self.big.cube = "cube_apply_heist_bank"
 	self.big.ghost_bonus = 0.3

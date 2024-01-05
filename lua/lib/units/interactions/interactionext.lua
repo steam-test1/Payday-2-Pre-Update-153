@@ -530,6 +530,32 @@ function UseInteractionExt:destroy()
 	UseInteractionExt.super.destroy(self)
 end
 
+MultipleChoiceInteractionExt = MultipleChoiceInteractionExt or class(UseInteractionExt)
+
+function MultipleChoiceInteractionExt:interact(player)
+	if self._tweak_data.dont_need_equipment and not managers.player:has_special_equipment(self._tweak_data.special_equipment) then
+		if self._tweak_data.possible_special_equipment then
+			for i, special_equipment in ipairs(self._tweak_data.possible_special_equipment) do
+				if managers.player:has_special_equipment(special_equipment) then
+					managers.player:remove_special(special_equipment)
+				end
+			end
+		end
+		if self._unit:damage() then
+			self._unit:damage():run_sequence_simple("wrong", {unit = player})
+		end
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "interaction", 1)
+		return
+	end
+	MultipleChoiceInteractionExt.super.interact(self, player)
+end
+
+function MultipleChoiceInteractionExt:sync_net_event(event_id, player)
+	if self._unit:damage() then
+		self._unit:damage():run_sequence_simple("wrong", {unit = player})
+	end
+end
+
 TripMineInteractionExt = TripMineInteractionExt or class(UseInteractionExt)
 
 function TripMineInteractionExt:interact(player)

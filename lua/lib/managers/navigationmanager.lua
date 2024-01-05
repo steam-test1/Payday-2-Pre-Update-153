@@ -184,9 +184,8 @@ function NavigationManager:_draw_pos_reservations(t)
 				if alive(res.unit) then
 					Application:draw_cylinder(entry.position, res.unit:movement():m_pos(), 3, 0, 0, 0)
 				else
-					Application:error("[NavigationManager:_draw_pos_reservations] dead unit. reserved from:", res.stack, "unit name:", res.u_name)
+					debug_pause("[NavigationManager:_draw_pos_reservations] dead unit. reserved from:", res.stack, "unit name:", res.u_name)
 					Application:draw_sphere(entry.position, entry.radius + 5, 1, 0, 1)
-					Application:set_pause(true)
 				end
 			end
 		else

@@ -169,6 +169,72 @@ function DLCTweakData:init(tweak_data)
 	self.soundtrack.dlc = "has_soundtrack"
 	self.soundtrack.content = {}
 	self.soundtrack.content.loot_drops = {}
+	self.poetry_soundtrack = {}
+	self.poetry_soundtrack.dlc = "has_soundtrack_or_cce"
+	self.poetry_soundtrack.use_custom_func = true
+	self.poetry_soundtrack.content = {}
+	self.poetry_soundtrack.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "metalhead",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "tcn",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "surprise",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "optimist_prime",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "blackmetal",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "carbongrid",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "cosmoline",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "electronic",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "deathcube",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "tcn",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "tribalstroke",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "kraken",
+			amount = 1
+		}
+	}
 	self.halloween_nightmare_1 = {}
 	self.halloween_nightmare_1.dlc = "has_achievement"
 	self.halloween_nightmare_1.achievement_id = "halloween_nightmare_1"
@@ -676,6 +742,178 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.big_bank = {}
+	self.big_bank.dlc = "has_big_bank"
+	self.big_bank.content = {}
+	self.big_bank.content.loot_drops = {}
+	self.ach_bigbank_1 = {}
+	self.ach_bigbank_1.dlc = "has_achievement"
+	self.ach_bigbank_1.achievement_id = "bigbank_1"
+	self.ach_bigbank_1.content = {}
+	self.ach_bigbank_1.content.loot_global_value = "big_bank"
+	self.ach_bigbank_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "franklin",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "parchment",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "roman",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_g_01",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_2 = {}
+	self.ach_bigbank_2.dlc = "has_achievement"
+	self.ach_bigbank_2.achievement_id = "bigbank_2"
+	self.ach_bigbank_2.content = {}
+	self.ach_bigbank_2.content.loot_global_value = "big_bank"
+	self.ach_bigbank_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "washington",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "old",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "ruler",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_m_01",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_3 = {}
+	self.ach_bigbank_3.dlc = "has_achievement"
+	self.ach_bigbank_3.achievement_id = "bigbank_3"
+	self.ach_bigbank_3.content = {}
+	self.ach_bigbank_3.content.loot_global_value = "big_bank"
+	self.ach_bigbank_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "lincoln",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "clay",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "spartan",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_fg_04",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_4 = {}
+	self.ach_bigbank_4.dlc = "has_achievement"
+	self.ach_bigbank_4.achievement_id = "bigbank_4"
+	self.ach_bigbank_4.content = {}
+	self.ach_bigbank_4.content.loot_global_value = "big_bank"
+	self.ach_bigbank_4.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_fg_wood",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_5 = {}
+	self.ach_bigbank_5.dlc = "has_achievement"
+	self.ach_bigbank_5.achievement_id = "bigbank_5"
+	self.ach_bigbank_5.content = {}
+	self.ach_bigbank_5.content.loot_global_value = "big_bank"
+	self.ach_bigbank_5.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_s_01",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_6 = {}
+	self.ach_bigbank_6.dlc = "has_achievement"
+	self.ach_bigbank_6.achievement_id = "bigbank_6"
+	self.ach_bigbank_6.content = {}
+	self.ach_bigbank_6.content.loot_global_value = "big_bank"
+	self.ach_bigbank_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "grant",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "gemstone",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "wargod",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_s_wood",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_7 = {}
+	self.ach_bigbank_7.dlc = "has_achievement"
+	self.ach_bigbank_7.achievement_id = "bigbank_7"
+	self.ach_bigbank_7.content = {}
+	self.ach_bigbank_7.content.loot_global_value = "big_bank"
+	self.ach_bigbank_7.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_fg_01",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_8 = {}
+	self.ach_bigbank_8.dlc = "has_achievement"
+	self.ach_bigbank_8.achievement_id = "bigbank_8"
+	self.ach_bigbank_8.content = {}
+	self.ach_bigbank_8.content.loot_global_value = "big_bank"
+	self.ach_bigbank_8.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_fg_03",
+			amount = 1
+		}
+	}
+	self.ach_bigbank_10 = {}
+	self.ach_bigbank_10.dlc = "has_achievement"
+	self.ach_bigbank_10.achievement_id = "bigbank_10"
+	self.ach_bigbank_10.content = {}
+	self.ach_bigbank_10.content.loot_global_value = "big_bank"
+	self.ach_bigbank_10.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_fal_s_03",
+			amount = 1
+		}
+	}
 	self.skull_mask_1 = {}
 	self.skull_mask_1.dlc = "has_achievement"
 	self.skull_mask_1.achievement_id = "death_27"
@@ -778,6 +1016,22 @@ function DLCTweakData:init(tweak_data)
 	self.twitch_pack.content = {}
 	self.twitch_pack.dlc = "has_twitch_pack"
 	self.twitch_pack.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "twitch_orc",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ancient",
+			amount = 1
+		}
+	}
+	self.twitch_pack2 = {}
+	self.twitch_pack2.content = {}
+	self.twitch_pack2.dlc = "has_twitch_pack"
+	self.twitch_pack2.content.loot_global_value = "twitch_pack"
+	self.twitch_pack2.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "twitch_orc",

@@ -586,6 +586,24 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_ladder = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			32,
+			64,
+			32,
+			32
+		}
+	}
+	self.pd2_fix = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			64,
+			64,
+			32,
+			32
+		}
+	}
 	self.wp_vial = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {

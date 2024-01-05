@@ -10,6 +10,7 @@ function Renderer:init(logic, parameters)
 	parameters = parameters or {}
 	self._logic = logic
 	self._logic:register_callback("renderer_show_node", callback(self, self, "show_node"))
+	self._logic:register_callback("renderer_refresh_node_stack", callback(self, self, "refresh_node_stack"))
 	self._logic:register_callback("renderer_refresh_node", callback(self, self, "refresh_node"))
 	self._logic:register_callback("renderer_select_item", callback(self, self, "highlight_item"))
 	self._logic:register_callback("renderer_deselect_item", callback(self, self, "fade_item"))
@@ -79,6 +80,16 @@ function Renderer:show_node(node, parameters)
 	table.insert(self._node_gui_stack, new_node_gui)
 	if not managers.system_menu:is_active() then
 		self:disable_input(0.2)
+	end
+end
+
+function Renderer:refresh_node_stack(parameters)
+	for i, node_gui in ipairs(self._node_gui_stack) do
+		node_gui:refresh_gui(node_gui.node, parameters)
+		local selected_item = node_gui.node and node_gui.node:selected_item()
+		if selected_item then
+			node_gui:highlight_item(selected_item)
+		end
 	end
 end
 

@@ -1354,25 +1354,8 @@ function Layer:save()
 					continent = unit:unit_data().continent
 				})
 			end
-			local sequence_files = {}
-			self:_get_sequence_file(PackageManager:unit_data(unit:name()), sequence_files)
-			for _, file in ipairs(sequence_files) do
-				managers.editor:add_to_world_package({
-					category = "script_data",
-					name = file:s() .. ".sequence_manager",
-					continent = unit:unit_data().continent,
-					init = true
-				})
-			end
 		end
 	end
-end
-
-function Layer:_get_sequence_file(unit_data, sequence_files)
-	for _, unit_name in ipairs(unit_data:unit_dependencies()) do
-		self:_get_sequence_file(PackageManager:unit_data(unit_name), sequence_files)
-	end
-	table.insert(sequence_files, unit_data:sequence_manager_filename())
 end
 
 function Layer:test_spawn(type)

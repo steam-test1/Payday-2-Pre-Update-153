@@ -182,6 +182,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.equipment_drillfix = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			96,
+			64,
+			32,
+			32
+		}
+	}
 	self.hud_icons.equipment_thermite = {
 		texture = "guis/textures/pd2/hud_pickups",
 		texture_rect = {

@@ -171,6 +171,11 @@ function HUDBlackScreen:set_job_data()
 		})
 		risk_text:set_bottom(risk_panel:top())
 		risk_text:set_center_x(risk_panel:center_x())
+	else
+		risk_panel:set_size(64, 64)
+		risk_panel:set_center_x(job_panel:w() / 2)
+		risk_panel:set_bottom(job_panel:h() / 2)
+		risk_panel:set_position(math.round(risk_panel:x()), math.round(risk_panel:y()))
 	end
 	do return end
 	local contact_data = managers.job:current_contact_data()

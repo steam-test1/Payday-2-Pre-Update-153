@@ -51,6 +51,7 @@ function WeaponTweakData:init()
 	self:_init_data_m95_npc()
 	self:_init_data_msr_npc()
 	self:_init_data_r93_npc()
+	self:_init_data_fal_npc()
 	self:_precalculate_values()
 end
 
@@ -868,6 +869,23 @@ function WeaponTweakData:_init_data_r93_npc()
 	self.r93_npc.suppression = 1
 	self.r93_secondary_npc = deep_clone(self.r93_npc)
 	self.r93_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_fal_npc()
+	self.fal_npc.sounds.prefix = "fn_fal_npc"
+	self.fal_npc.use_data.selection_index = 2
+	self.fal_npc.DAMAGE = 2
+	self.fal_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.fal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.fal_npc.CLIP_AMMO_MAX = 20
+	self.fal_npc.NR_CLIPS_MAX = 5
+	self.fal_npc.auto.fire_rate = 0.15
+	self.fal_npc.hold = "rifle"
+	self.fal_npc.hud_icon = "m4"
+	self.fal_npc.alert_size = 5000
+	self.fal_npc.suppression = 1
+	self.fal_secondary_npc = deep_clone(self.fal_npc)
+	self.fal_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons()
@@ -1833,8 +1851,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.olympic.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.olympic.timers = {}
-	self.olympic.timers.reload_not_empty = 2.535
-	self.olympic.timers.reload_empty = 3.49
+	self.olympic.timers.reload_not_empty = 3
+	self.olympic.timers.reload_empty = 4.22
 	self.olympic.timers.unequip = 0.6
 	self.olympic.timers.equip = 0.5
 	self.olympic.name_id = "bm_w_olympic"
@@ -4561,7 +4579,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m95.animations.recoil_steelsight = true
 	self.m95.global_value = "gage_pack_snp"
 	self.m95.texture_bundle_folder = "gage_pack_snp"
-	self.m95.statistics = false
+	self.m95.statistics = true
 	self.m95.can_shoot_through_enemy = true
 	self.m95.can_shoot_through_shield = true
 	self.m95.can_shoot_through_wall = true
@@ -4663,7 +4681,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.animations.recoil_steelsight = true
 	self.msr.global_value = "gage_pack_snp"
 	self.msr.texture_bundle_folder = "gage_pack_snp"
-	self.msr.statistics = false
+	self.msr.statistics = true
 	self.msr.can_shoot_through_enemy = true
 	self.msr.can_shoot_through_shield = true
 	self.msr.can_shoot_through_wall = true
@@ -4765,7 +4783,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r93.animations.recoil_steelsight = true
 	self.r93.global_value = "gage_pack_snp"
 	self.r93.texture_bundle_folder = "gage_pack_snp"
-	self.r93.statistics = false
+	self.r93.statistics = true
 	self.r93.can_shoot_through_enemy = true
 	self.r93.can_shoot_through_shield = true
 	self.r93.can_shoot_through_wall = true
@@ -4786,6 +4804,90 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		damage = 5,
 		suppression = 3,
 		spread = 0.5
+	}
+	self.fal = {}
+	self.fal.category = "assault_rifle"
+	self.fal.damage_melee = damage_melee_default
+	self.fal.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.fal.sounds = {}
+	self.fal.sounds.fire = "fn_fal_fire_1p"
+	self.fal.sounds.fire_single = "fn_fal_fire_1p_single"
+	self.fal.sounds.fire_auto = "fn_fal_fire_1p"
+	self.fal.sounds.stop_fire = "fn_fal_stop"
+	self.fal.sounds.dryfire = "primary_dryfire"
+	self.fal.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.fal.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.fal.timers = {}
+	self.fal.timers.reload_not_empty = 2.2
+	self.fal.timers.reload_empty = 3.28
+	self.fal.timers.unequip = 0.9
+	self.fal.timers.equip = 0.9
+	self.fal.name_id = "bm_w_fal"
+	self.fal.desc_id = "bm_w_fal_desc"
+	self.fal.hud_icon = "m4"
+	self.fal.description_id = "des_fal"
+	self.fal.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.fal.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.fal.use_data = {}
+	self.fal.use_data.selection_index = 2
+	self.fal.DAMAGE = 1
+	self.fal.CLIP_AMMO_MAX = 20
+	self.fal.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.7 / self.fal.CLIP_AMMO_MAX)
+	self.fal.AMMO_MAX = self.fal.CLIP_AMMO_MAX * self.fal.NR_CLIPS_MAX
+	self.fal.AMMO_PICKUP = self:_pickup_chance(self.fal.AMMO_MAX, 2)
+	self.fal.FIRE_MODE = "auto"
+	self.fal.fire_mode_data = {}
+	self.fal.fire_mode_data.fire_rate = 0.092
+	self.fal.CAN_TOGGLE_FIREMODE = true
+	self.fal.auto = {}
+	self.fal.auto.fire_rate = 0.092
+	self.fal.spread = {}
+	self.fal.spread.standing = self.new_m4.spread.standing * 0.5
+	self.fal.spread.crouching = self.new_m4.spread.standing * 0.6
+	self.fal.spread.steelsight = self.new_m4.spread.steelsight
+	self.fal.spread.moving_standing = self.new_m4.spread.standing * 0.6
+	self.fal.spread.moving_crouching = self.new_m4.spread.standing * 0.7
+	self.fal.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.fal.kick = {}
+	self.fal.kick.standing = self.new_m4.kick.standing
+	self.fal.kick.crouching = self.fal.kick.standing
+	self.fal.kick.steelsight = self.fal.kick.standing
+	self.fal.crosshair = {}
+	self.fal.crosshair.standing = {}
+	self.fal.crosshair.crouching = {}
+	self.fal.crosshair.steelsight = {}
+	self.fal.crosshair.standing.offset = 0.14
+	self.fal.crosshair.standing.moving_offset = 0.8
+	self.fal.crosshair.standing.kick_offset = 0.6
+	self.fal.crosshair.crouching.offset = 0.1
+	self.fal.crosshair.crouching.moving_offset = 0.6
+	self.fal.crosshair.crouching.kick_offset = 0.4
+	self.fal.crosshair.steelsight.hidden = true
+	self.fal.crosshair.steelsight.offset = 0
+	self.fal.crosshair.steelsight.moving_offset = 0
+	self.fal.crosshair.steelsight.kick_offset = 0.14
+	self.fal.shake = {}
+	self.fal.shake.fire_multiplier = 1
+	self.fal.shake.fire_steelsight_multiplier = -1
+	self.fal.autohit = autohit_rifle_default
+	self.fal.aim_assist = aim_assist_rifle_default
+	self.fal.animations = {}
+	self.fal.animations.equip_id = "equip_m4"
+	self.fal.animations.recoil_steelsight = true
+	self.fal.global_value = "big_bank"
+	self.fal.texture_bundle_folder = "big_bank"
+	self.fal.statistics = false
+	self.fal.stats = {
+		damage = 18,
+		spread = 6,
+		recoil = 5,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 10,
+		suppression = 8,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 4
 	}
 end
 
@@ -5182,6 +5284,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.fal_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values()
@@ -5233,4 +5341,5 @@ function WeaponTweakData:_precalculate_values()
 	self.m95_npc.AMMO_MAX = self.m95_npc.CLIP_AMMO_MAX * self.m95_npc.NR_CLIPS_MAX
 	self.msr_npc.AMMO_MAX = self.msr_npc.CLIP_AMMO_MAX * self.msr_npc.NR_CLIPS_MAX
 	self.r93_npc.AMMO_MAX = self.r93_npc.CLIP_AMMO_MAX * self.r93_npc.NR_CLIPS_MAX
+	self.fal_npc.AMMO_MAX = self.fal_npc.CLIP_AMMO_MAX * self.fal_npc.NR_CLIPS_MAX
 end

@@ -76,9 +76,7 @@ function IngameWaitingForPlayersState:sync_start(variant)
 	self._intro_event = level_data and (variant == 0 and level_data.intro_event or level_data.intro_event[variant])
 	self._blackscreen_started = true
 	managers.menu_component:close_asset_mission_briefing_gui()
-	if Network:is_server() then
-		managers.preplanning:execute_reserved_mission_elements()
-	end
+	managers.preplanning:on_execute_preplanning()
 	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
 	if self._intro_event then
 		self._delay_audio_t = Application:time() + 1
@@ -153,7 +151,7 @@ function IngameWaitingForPlayersState:update(t, dt)
 			end
 			local job_data = managers.job:current_job_data()
 			if job_data and managers.job:current_job_id() == "safehouse" and Global.mission_manager.saved_job_values.playedSafeHouseBefore then
-			else
+			elseif not managers.menu_component:is_preplanning_enabled() then
 				managers.briefing:post_event(briefing_dialog, {
 					show_subtitle = false,
 					listener = {
@@ -344,6 +342,7 @@ function IngameWaitingForPlayersState:at_exit()
 	World:delete_unit(self._cam_unit)
 	managers.menu_component:hide_game_chat_gui()
 	managers.menu_component:close_mission_briefing_gui()
+	managers.menu_component:kill_preplanning_map_gui()
 	managers.overlay_effect:play_effect(tweak_data.overlay_effects.level_fade_in)
 	managers.overlay_effect:stop_effect(self._fade_out_id)
 	if self._sound_listener then

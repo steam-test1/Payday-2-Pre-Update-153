@@ -2,7 +2,6 @@ CarryTweakData = CarryTweakData or class()
 
 function CarryTweakData:init(tweak_data)
 	self.value_multiplier = tweak_data.money_manager.bag_value_multiplier
-	self.small_loot_value_multiplier = tweak_data.money_manager.small_loot_value_multiplier
 	self.dye = {}
 	self.dye.chance = 0.5
 	self.dye.value_multiplier = 60
@@ -52,6 +51,12 @@ function CarryTweakData:init(tweak_data)
 	self.small_loot.value_gold = tweak_data:get_value("money_manager", "small_loot", "value_gold")
 	self.small_loot.gen_atm = tweak_data:get_value("money_manager", "small_loot", "gen_atm")
 	self.small_loot.special_deposit_box = tweak_data:get_value("money_manager", "small_loot", "special_deposit_box")
+	self.small_loot.vault_loot_chest = tweak_data:get_value("money_manager", "small_loot", "vault_loot_chest")
+	self.small_loot.vault_loot_diamond_chest = tweak_data:get_value("money_manager", "small_loot", "vault_loot_diamond_chest")
+	self.small_loot.vault_loot_banknotes = tweak_data:get_value("money_manager", "small_loot", "vault_loot_banknotes")
+	self.small_loot.vault_loot_silver = tweak_data:get_value("money_manager", "small_loot", "vault_loot_silver")
+	self.small_loot.vault_loot_diamond_collection = tweak_data:get_value("money_manager", "small_loot", "vault_loot_diamond_collection")
+	self.small_loot.vault_loot_trophy = tweak_data:get_value("money_manager", "small_loot", "vault_loot_trophy")
 	self.small_loot.vault_loot_gold = tweak_data:get_value("money_manager", "small_loot", "vault_loot_gold")
 	self.small_loot.vault_loot_cash = tweak_data:get_value("money_manager", "small_loot", "vault_loot_cash")
 	self.small_loot.vault_loot_coins = tweak_data:get_value("money_manager", "small_loot", "vault_loot_coins")
@@ -100,7 +105,7 @@ function CarryTweakData:init(tweak_data)
 	self.lance_bag.AI_carry = {SO_category = "enemies"}
 	self.lance_bag_large = {}
 	self.lance_bag_large.type = "heavy"
-	self.lance_bag_large.name_id = "hud_carry_lance_bag"
+	self.lance_bag_large.name_id = "hud_carry_huge_bag"
 	self.lance_bag_large.skip_exit_secure = true
 	self.lance_bag_large.visual_object = "g_toolsbag_large"
 	self.lance_bag_large.unit = "units/payday2/pickups/gen_pku_toolbag_large/gen_pku_toolbag_large"

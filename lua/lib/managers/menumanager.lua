@@ -245,6 +245,9 @@ function MenuManager:close_all_menus()
 	for _, name in ipairs(names) do
 		self:close_menu(name)
 	end
+	if managers.menu_component then
+		managers.menu_component:close()
+	end
 end
 
 function MenuManager:is_open(menu_name)
@@ -988,6 +991,11 @@ function MenuCallbackHandler:dlc_buy_gage_pack_pc()
 	Steam:overlay_activate("store", 267380)
 end
 
+function MenuCallbackHandler:dlc_buy_big_bank_pc()
+	print("[MenuCallbackHandler:dlc_buy_big_bank_pc]")
+	Steam:overlay_activate("store", 306690)
+end
+
 function MenuCallbackHandler:dlc_buy_gage_pack_snp_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_snp_pc]")
 	Steam:overlay_activate("store", 259380)
@@ -1039,6 +1047,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"big_bank",
 		"gage_pack_snp",
 		"gage_pack_jobs",
 		"gage_pack_lmg",
@@ -1086,6 +1095,10 @@ end
 
 function MenuCallbackHandler:visible_callback_gage_pack_snp()
 	return self:is_dlc_latest_locked("gage_pack_snp")
+end
+
+function MenuCallbackHandler:visible_callback_big_bank()
+	return self:is_dlc_latest_locked("big_bank")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -1280,6 +1293,22 @@ end
 
 function MenuCallbackHandler:leave_online_menu()
 	managers.menu:leave_online_menu()
+end
+
+function MenuCallbackHandler:has_peer_1()
+	return not not managers.network:session() and managers.network:session():peer(1)
+end
+
+function MenuCallbackHandler:has_peer_2()
+	return not not managers.network:session() and managers.network:session():peer(2)
+end
+
+function MenuCallbackHandler:has_peer_3()
+	return not not managers.network:session() and managers.network:session():peer(3)
+end
+
+function MenuCallbackHandler:has_peer_4()
+	return not not managers.network:session() and managers.network:session():peer(4)
 end
 
 function MenuCallbackHandler:on_visit_forum()
@@ -4074,99 +4103,590 @@ end
 
 MenuPrePlanningInitiator = MenuPrePlanningInitiator or class(MenuCrimeNetContactInfoInitiator)
 
-function MenuPrePlanningInitiator:modify_node(node, category, type)
+function MenuPrePlanningInitiator:modify_node(node, item_name, selected_item)
 	node:clean_items()
-	local first_in_line
-	if category then
-		self:create_divider(node, 1, managers.preplanning:get_category_name(category), nil, tweak_data.screen_colors.text)
-		local types = managers.preplanning:types_with_mission_elements(category)
-		if not types or #types == 0 then
-			return node
-		end
-		local params = {
-			name = nil,
-			text_id = nil,
-			color_ranges = nil,
-			localize = "false",
-			callback = "set_preplanning_type_filter"
-		}
-		local type_data
-		for _, type in pairs(types) do
-			params.name = type
-			params.text_id = managers.preplanning:get_type_name(type)
-			self:create_item(node, params)
-			first_in_line = first_in_line or params.name
-		end
-	elseif type then
-		local params = {
-			name = nil,
-			text_id = nil,
-			color_ranges = nil,
-			localize = "false",
-			callback = "reserve_preplanning_mission_element_by_item"
-		}
-		local mission_elements = managers.preplanning:get_mission_elements_by_type(type)
-		local locations = managers.preplanning:sort_mission_elements_into_locations(mission_elements)
-		for index, elements in pairs(locations) do
-			self:create_divider(node, "div_" .. tostring(index), managers.preplanning:get_location_name_by_index(index), nil, tweak_data.screen_colors.text)
-			for i, data in ipairs(elements) do
-				params.name = data.element:id()
-				params.text_id = managers.localization:text("menu_pp_point", {point = i})
-				params.index = data.index
-				self:create_item(node, params)
-				first_in_line = first_in_line or params.name
-			end
-		end
-	else
-		local categories = managers.preplanning:categories_with_mission_elements()
-		if not categories or #categories == 0 then
-			return node
-		end
-		local params = {
-			name = nil,
-			text_id = nil,
-			color_ranges = nil,
-			localize = "false",
-			callback = "set_preplanning_category_filter"
-		}
-		local category_data
-		for _, category in pairs(categories) do
-			params.name = category
-			params.text_id = managers.preplanning:get_category_name(category)
-			self:create_item(node, params)
-			first_in_line = first_in_line or params.name
-		end
+	local name = node:parameters().name
+	local func_name = "modifiy_node_" .. tostring(name)
+	if self[func_name] then
+		node, selected_item = self[func_name](self, node, item_name, selected_item)
 	end
-	node:parameters().current_category = category
-	node:parameters().current_type = type
-	node:set_default_item_name(first_in_line)
-	node:select_item(first_in_line)
+	if selected_item then
+		node:set_default_item_name(selected_item)
+		node:select_item(selected_item)
+	end
 	return node
 end
 
+function MenuPrePlanningInitiator:create_info_items(node, params, selected_item)
+	self:create_divider(node, "info_div", nil, nil, nil)
+	params.enabled = true
+	self:create_divider(node, "cat_info", managers.localization:text("menu_pp_sub_info"), nil, tweak_data.screen_colors.text)
+	params.name = "custom_points"
+	params.callback = "open_preplanning_custom_item"
+	params.text_id = managers.localization:text("menu_pp_extra_info")
+	params.tooltip.texture = tweak_data.preplanning.gui.custom_icons_path
+	params.tooltip.texture_rect = tweak_data.preplanning:get_custom_texture_rect(45)
+	params.tooltip.name = params.text_id
+	params.tooltip.desc = managers.localization:text("menu_pp_extra_info_desc")
+	params.tooltip.errors = {}
+	self:create_item(node, params)
+	params.name = "preplanning_help"
+	params.callback = "open_preplanning_help"
+	params.text_id = managers.localization:text("menu_item_preplanning_help")
+	params.tooltip = {}
+	params.tooltip.texture = tweak_data.preplanning.gui.custom_icons_path
+	params.tooltip.texture_rect = tweak_data.preplanning:get_custom_texture_rect(45)
+	params.tooltip.name = params.text_id
+	params.tooltip.desc = managers.localization:text("menu_item_preplanning_help_desc")
+	self:create_item(node, params)
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:modifiy_node_view_only(node, item_name, selected_item)
+	local subgroups = managers.preplanning:get_mission_element_subgroups()
+	if not subgroups then
+		return node, nil
+	end
+	node:parameters().current_viewing = true
+	local params = {
+		name = nil,
+		text_id = nil,
+		color_ranges = nil,
+		localize = "false",
+		callback = nil,
+		tooltip = {
+			texture = tweak_data.preplanning.gui.type_icons_path
+		}
+	}
+	local finished_preplan = managers.preplanning:get_finished_preplan()
+	local type_data, location_data, data
+	for i = 1, #tweak_data.preplanning.location_groups do
+		data = finished_preplan[i]
+		if data then
+			self:create_divider(node, "sub_" .. tostring(i), managers.localization:text(data.name_id), nil, tweak_data.screen_colors.text)
+			for index = 1, #tweak_data.preplanning.location_groups do
+				if data[index] then
+					location_data = data[index]
+					for id, type in pairs(location_data) do
+						type_data = tweak_data:get_raw_value("preplanning", "types", type) or {}
+						params.name = id
+						params.text_id = managers.preplanning:get_type_name(type)
+						params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+						params.tooltip.name = params.text_id
+						params.tooltip.desc = managers.preplanning:get_type_desc(type)
+						self:create_item(node, params)
+						selected_item = selected_item or params.name
+					end
+				end
+			end
+		end
+	end
+	self:create_info_items(node, params, selected_item)
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:set_locks_to_param(params, key, index)
+	local data = tweak_data:get_raw_value("preplanning", key, index) or {}
+	local enabled = params.enabled ~= false
+	params.tooltip = params.tooltip or {}
+	params.tooltip.errors = params.tooltip.errors or {}
+	if data.dlc_lock then
+		local dlc_unlocked = managers.dlc:is_dlc_unlocked(data.dlc_lock)
+		if not dlc_unlocked then
+			local error_text_id = tweak_data:get_raw_value("lootdrop", "global_values", data.dlc_lock, "unlock_id")
+			table.insert(params.tooltip.errors, managers.localization:to_upper_text(error_text_id))
+			enabled = false
+		end
+	elseif data.upgrade_lock then
+		local upgrade_unlocked = managers.player:has_category_upgrade(data.upgrade_lock.category, data.upgrade_lock.upgrade)
+		if not upgrade_unlocked then
+			table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_asset_lock_" .. data.upgrade_lock.upgrade))
+			enabled = false
+		end
+	end
+	params.enabled = enabled
+end
+
+function MenuPrePlanningInitiator:modifiy_node_preplanning(node, item_name, selected_item)
+	if not managers.preplanning:can_edit_preplan() then
+		return self:modifiy_node_view_only(node, item_name, selected_item)
+	end
+	local subgroups = managers.preplanning:get_mission_element_subgroups()
+	if not subgroups then
+		return node, nil
+	end
+	local params = {
+		name = nil,
+		text_id = nil,
+		color_ranges = nil,
+		localize = "false",
+		callback = nil,
+		tooltip = {
+			texture = tweak_data.preplanning.gui.type_icons_path
+		}
+	}
+	local type_data, first_type, category_data
+	for i, data in ipairs(subgroups) do
+		self:create_divider(node, "cat_" .. tostring(i), managers.localization:text(data.name_id), nil, tweak_data.screen_colors.text)
+		params.callback = data.callback
+		for index, category in ipairs(data.subgroup) do
+			first_type = managers.preplanning:get_first_type_in_category(category)
+			type_data = tweak_data:get_raw_value("preplanning", "types", first_type) or {}
+			params.name = category
+			params.text_id = managers.preplanning:get_category_name(category)
+			params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+			params.tooltip.name = params.text_id
+			params.tooltip.desc = managers.preplanning:get_category_desc(category)
+			params.tooltip.errors = {}
+			params.enabled = true
+			self:set_locks_to_param(params, "categories", category)
+			self:create_item(node, params)
+			selected_item = selected_item or params.name
+		end
+		if i ~= #subgroups then
+			self:create_divider(node, "end_" .. tostring(i), nil, nil, nil)
+		end
+	end
+	self:create_info_items(node, params, selected_item)
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:modifiy_node_preplanning_category(node, item_name, selected_item)
+	node:parameters().current_category = item_name or node:parameters().current_category
+	local current_category = node:parameters().current_category
+	if not current_category then
+		return node, nil
+	end
+	self:create_divider(node, 1, managers.preplanning:get_category_name(current_category), nil, tweak_data.screen_colors.text)
+	local types = managers.preplanning:types_with_mission_elements(current_category)
+	if not types or #types == 0 then
+		return node, nil
+	end
+	local category_data = tweak_data:get_raw_value("preplanning", "categories", current_category) or {}
+	local params = {
+		name = nil,
+		text_id = nil,
+		color_ranges = nil,
+		localize = "false",
+		callback = "open_preplanning_type_item",
+		tooltip = {
+			texture = tweak_data.preplanning.gui.type_icons_path
+		},
+		enabled = true
+	}
+	local type_data, can_place, error_num, enabled
+	local peer_id = managers.network:session():local_peer():id()
+	for i, type in ipairs(types) do
+		type_data = tweak_data:get_raw_value("preplanning", "types", type) or {}
+		params.name = type
+		params.text_id = managers.preplanning:get_type_name(type)
+		params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+		params.tooltip.name = params.text_id
+		params.tooltip.desc = managers.preplanning:get_type_desc(type)
+		params.tooltip.errors = {}
+		enabled = true
+		can_place, error_num = managers.preplanning:can_reserve_mission_element(type, peer_id)
+		if not can_place then
+			enabled = false
+			if error_num == 1 then
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_not_enough_money"))
+			elseif error_num == 2 then
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_not_enough_budget"))
+			elseif error_num == 3 then
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_type_disabled"))
+			elseif error_num == 4 then
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_cap_reached"))
+			else
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_unknown"))
+			end
+		end
+		params.enabled = enabled
+		self:set_locks_to_param(params, "types", type)
+		self:create_item(node, params)
+		selected_item = selected_item or params.name
+	end
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:modifiy_node_preplanning_type(node, item_name, selected_item)
+	node:parameters().current_type = item_name or node:parameters().current_type
+	local current_type = node:parameters().current_type
+	if not current_type then
+		return node, nil
+	end
+	local params = {
+		name = nil,
+		text_id = nil,
+		color_ranges = nil,
+		localize = "false",
+		callback = "reserve_preplanning_mission_element_by_item",
+		tooltip = nil
+	}
+	local mission_elements = managers.preplanning:get_mission_elements_by_type(current_type)
+	local locations = managers.preplanning:sort_mission_elements_into_locations(mission_elements)
+	self:create_divider(node, 1, managers.preplanning:get_type_name(current_type), nil, tweak_data.screen_colors.text)
+	local peer_id = managers.network:session():local_peer():id()
+	local can_place, error_num = managers.preplanning:can_reserve_mission_element(current_type, peer_id)
+	local reserved, reserved_type, type_data, enabled, dlc_lock, upgrade_lock, last_location_index
+	for index = 1, #tweak_data.preplanning.location_groups do
+		if locations[index] then
+			last_location_index = index
+		end
+	end
+	last_location_index = last_location_index or 1
+	for index = 1, #tweak_data.preplanning.location_groups do
+		local elements = locations[index]
+		if elements then
+			self:create_divider(node, "div_" .. tostring(index), managers.preplanning:get_location_name_by_index(index), nil, tweak_data.screen_colors.text)
+			for i, data in ipairs(elements) do
+				params.name = data.element:id()
+				params.text_id = managers.preplanning:get_element_name(data.element)
+				params.index = data.index
+				type_data = tweak_data:get_raw_value("preplanning", "types", current_type) or {}
+				params.tooltip = {}
+				params.tooltip.name = managers.localization:text("menu_pp_reserve_type", {
+					type = managers.preplanning:get_type_name(current_type)
+				})
+				params.tooltip.desc = managers.preplanning:get_type_desc(current_type)
+				params.tooltip.texture = tweak_data.preplanning.gui.type_icons_path
+				params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+				params.tooltip.errors = {}
+				dlc_lock = data.element:value("dlc_lock")
+				upgrade_lock = data.element:value("upgrade_lock")
+				enabled = true
+				if dlc_lock and dlc_lock ~= "none" then
+					local dlc_unlocked = managers.dlc:is_dlc_unlocked(dlc_lock)
+					if not dlc_unlocked then
+						local error_text_id = tweak_data:get_raw_value("lootdrop", "global_values", type_data.dlc_lock, "unlock_id")
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text(error_text_id))
+						enabled = false
+					end
+				elseif upgrade_lock and upgrade_lock ~= "none" then
+					local upgrade_unlocked = managers.player:has_category_upgrade("player", upgrade_lock)
+					if not upgrade_unlocked then
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_asset_lock_" .. upgrade_lock))
+						enabled = false
+					end
+				end
+				reserved = managers.preplanning:get_reserved_mission_element(data.element:id())
+				if not reserved and enabled and not can_place then
+					enabled = false
+					if error_num == 1 then
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_not_enough_money"))
+						params.flash_money = true
+					elseif error_num == 2 then
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_not_enough_budget"))
+						params.flash_budget = true
+					elseif error_num == 3 then
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_type_disabled"))
+					elseif error_num == 4 then
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_cap_reached"))
+					else
+						table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_unknown"))
+					end
+				end
+				params.enabled = enabled
+				self:set_locks_to_param(params, "types", current_type)
+				if reserved then
+					reserved_type = reserved.pack[1]
+					type_data = tweak_data:get_raw_value("preplanning", "types", reserved_type) or {}
+					params.enabled = true
+					params.tooltip.texture = tweak_data.preplanning.gui.type_icons_path
+					params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+					params.tooltip.menu_color = tweak_data.chat_colors[reserved.peer_id]
+					if enabled and (reserved.peer_id == peer_id or Network:is_server() and managers.preplanning.server_master_planner) then
+						params.tooltip.name = managers.localization:text("menu_pp_unreserve_type", {
+							type = managers.preplanning:get_type_name(reserved_type)
+						})
+					else
+						params.tooltip.name = managers.preplanning:get_type_name(reserved_type)
+						params.enabled = false
+					end
+					params.tooltip.desc = managers.preplanning:get_type_desc(reserved_type)
+					params.tooltip.errors = {}
+					params.callback = "unreserve_preplanning_mission_element_by_item"
+				else
+					if not enabled then
+						params.tooltip.name = managers.preplanning:get_type_name(current_type)
+					end
+					params.callback = "reserve_preplanning_mission_element_by_item"
+				end
+				self:create_item(node, params)
+				selected_item = selected_item or params.name
+			end
+			if index ~= last_location_index then
+				self:create_divider(node, "end_" .. tostring(index), nil, nil, nil)
+			end
+		end
+	end
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:modifiy_node_preplanning_plan(node, item_name, selected_item)
+	node:parameters().current_plan = item_name or node:parameters().current_plan
+	local current_plan = node:parameters().current_plan
+	if not current_plan then
+		return node, nil
+	end
+	node:parameters().current_category = node:parameters().current_plan
+	self:create_divider(node, 1, managers.preplanning:get_category_name(current_plan), nil, tweak_data.screen_colors.text)
+	local types = managers.preplanning:types_with_mission_elements(current_plan)
+	if not types or #types == 0 then
+		return node
+	end
+	local category_data = tweak_data.preplanning.categories[current_plan]
+	local params = {
+		name = nil,
+		text_id = nil,
+		color_ranges = nil,
+		localize = "false",
+		callback = "vote_preplanning_mission_element_by_item",
+		tooltip = {
+			texture = tweak_data.preplanning.gui.type_icons_path
+		},
+		enabled = false,
+		votes = nil
+	}
+	local type_data
+	for _, type in pairs(types) do
+		type_data = tweak_data:get_raw_value("preplanning", "types", type) or {}
+		local enabled = true
+		params.post_event = type_data.post_event
+		params.tooltip.errors = {}
+		if not managers.preplanning:can_vote_on_plan(type) then
+			table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_pp_err_not_enough_budget"))
+			params.flash_budget = true
+			enabled = false
+		elseif type_data.dlc_lock then
+			local dlc_unlocked = managers.dlc:is_dlc_unlocked(type_data.dlc_lock)
+			if not dlc_unlocked then
+				local error_text_id = tweak_data:get_raw_value("lootdrop", "global_values", type_data.dlc_lock, "unlock_id")
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text(error_text_id))
+				enabled = false
+			end
+		elseif type_data.upgrade_lock then
+			local upgrade_unlocked = managers.player:has_category_upgrade(type_data.upgrade_lock.category, type_data.upgrade_lock.upgrade) and enabled or false
+			if not upgrade_unlocked then
+				table.insert(params.tooltip.errors, managers.localization:to_upper_text("menu_asset_lock_" .. type_data.upgrade_lock.upgrade))
+				enabled = false
+			end
+		elseif not managers.money:can_afford_preplanning_type(type) then
+		end
+		params.enabled = enabled
+		local mission_elements = managers.preplanning:get_mission_elements_by_type(type)
+		for index, element in ipairs(mission_elements) do
+			params.name = element:id()
+			params.text_id = managers.preplanning:get_type_name(type)
+			if 1 < #mission_elements then
+				params.text_id = params.text_id .. " - " .. managers.preplanning:get_element_name(element)
+			end
+			params.index = index
+			params.type = type
+			params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+			params.tooltip.name = params.text_id
+			params.tooltip.desc = managers.preplanning:get_type_desc(type)
+			params.votes = managers.preplanning:get_votes_on_element(category_data.plan, type, index)
+			self:create_item(node, params)
+			selected_item = selected_item or params.name
+		end
+	end
+	return node, selected_item
+end
+
+function MenuPrePlanningInitiator:modifiy_node_preplanning_custom(node, item_name, selected_item)
+	node:parameters().current_custom = item_name or node:parameters().current_custom
+	local current_custom = node:parameters().current_custom
+	if not current_custom then
+		return node, nil
+	end
+	node:parameters().current_category = node:parameters().current_custom
+	self:create_divider(node, 1, managers.localization:text("menu_pp_extra_info"), nil, tweak_data.screen_colors.text)
+	local params = {
+		name = "test",
+		text_id = "TEST",
+		color_ranges = nil,
+		localize = "false",
+		callback = "pressed_preplanning_custom_point"
+	}
+	local current_custom_points = managers.preplanning:get_current_custom_points()
+	local last_custom_point_index
+	for index = 1, #tweak_data.preplanning.location_groups do
+		if current_custom_points[index] then
+			last_custom_point_index = index
+		end
+	end
+	last_custom_point_index = last_custom_point_index or 1
+	for index = 1, #tweak_data.preplanning.location_groups do
+		local custom_points = current_custom_points[index]
+		if custom_points then
+			self:create_divider(node, "div_" .. tostring(index), managers.preplanning:get_location_name_by_index(index), nil, tweak_data.screen_colors.text)
+			for i, custom_point in pairs(custom_points) do
+				params.name = tostring(index) .. "_" .. tostring(i)
+				params.text_id = custom_point.text_id and managers.localization:text(custom_point.text_id) or " "
+				params.post_event = custom_point.post_event
+				self:create_item(node, params)
+				selected_item = selected_item or params.name
+			end
+			if index ~= last_custom_point_index then
+				self:create_divider(node, "end_" .. tostring(index), nil, nil, nil)
+			end
+		end
+	end
+	return node, selected_item
+end
+
 function MenuPrePlanningInitiator:refresh_node(node)
-	return node
+	local selected_item_name = node:selected_item() and node:selected_item():name()
+	return self:modify_node(node, nil, selected_item_name)
 end
 
 function MenuPrePlanningInitiator:create_item(node, params)
 	local data_node = {}
 	local new_item = node:create_item(data_node, deep_clone(params))
+	new_item:set_enabled(params.enabled == nil or not not params.enabled)
 	node:add_item(new_item)
+	return new_item
+end
+
+function MenuCallbackHandler:open_preplanning_plan_item(item)
+	managers.menu:open_node("preplanning_plan", {
+		item:name()
+	})
+end
+
+function MenuCallbackHandler:open_preplanning_category_item(item)
+	managers.menu:open_node("preplanning_category", {
+		item:name()
+	})
+end
+
+function MenuCallbackHandler:open_preplanning_custom_item(item)
+	managers.menu:open_node("preplanning_custom", {
+		item:name()
+	})
+end
+
+function MenuCallbackHandler:open_preplanning_type_item(item)
+	managers.menu:open_node("preplanning_type", {
+		item:name()
+	})
+end
+
+function MenuCallbackHandler:open_preplanning_to_type(category, type, item_name)
+	local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+	local node_name = logic and logic:selected_node() and logic:selected_node():parameters().name
+	local in_main = false
+	if node_name == "preplanning" then
+		in_main = true
+	elseif node_name == "preplanning_category" then
+		if logic:selected_node():parameters().current_category ~= category then
+			managers.menu:back(false)
+			in_main = true
+		end
+	elseif node_name == "preplanning_type" then
+		if logic:selected_node():parameters().current_type ~= type then
+			local current_category = tweak_data:get_raw_value("preplanning", "types", logic:selected_node():parameters().current_type, "category")
+			if current_category ~= category then
+				managers.menu:back(false)
+				in_main = true
+			end
+			managers.menu:back(false)
+		end
+	elseif node_name == "preplanning_plan" then
+		managers.menu:back(false)
+		in_main = true
+	elseif node_name == "preplanning_custom" then
+		managers.menu:back(false)
+		in_main = true
+	end
+	if in_main then
+		managers.menu:open_node("preplanning_category", {category, false})
+	end
+	managers.menu:open_node("preplanning_type", {type, item_name})
+end
+
+function MenuCallbackHandler:open_preplanning_to_plan(plan, item_name)
+	local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+	local node_name = logic and logic:selected_node() and logic:selected_node():parameters().name
+	if node_name == "preplanning" then
+	elseif node_name == "preplanning_category" then
+		managers.menu:back(false)
+	elseif node_name == "preplanning_type" then
+		managers.menu:back(false)
+		managers.menu:back(false)
+	elseif node_name == "preplanning_plan" then
+		if logic:selected_node():parameters().current_plan ~= plan then
+			managers.menu:back(false)
+		end
+	elseif node_name == "preplanning_custom" then
+		managers.menu:back(false)
+	end
+	print(plan, item_name)
+	managers.menu:open_node("preplanning_plan", {plan, item_name})
+end
+
+function MenuCallbackHandler:stop_preplanning_post_event()
+	managers.menu_component:preplanning_stop_event()
+end
+
+function MenuCallbackHandler:pressed_preplanning_custom_point(item)
+	if item:parameters().post_event then
+		managers.menu_component:preplanning_post_event(item:parameters().post_event, item:name())
+		managers.menu_component:preplanning_start_custom_talk(item:name())
+	end
+end
+
+function MenuCallbackHandler:set_preplanning_custom_filter(item)
+	if item and item:enabled() then
+		print("AAAAAAAAAAAAA ", item:name())
+	end
 end
 
 function MenuCallbackHandler:set_preplanning_category_filter(item)
-	managers.menu:open_node("preplanning_category", {
-		item:name(),
-		false
-	})
+	if item and item:enabled() then
+		managers.menu_component:set_preplanning_category_filter(item:name())
+		managers.menu:open_node("preplanning_category", {
+			item:name(),
+			false
+		})
+	end
 end
 
 function MenuCallbackHandler:set_preplanning_type_filter(item)
-	managers.menu_component:set_preplanning_type_filter(item:name())
-	managers.menu:open_node("preplanning_type", {
-		false,
-		item:name()
-	})
+	if item and item:enabled() then
+		managers.menu_component:set_preplanning_type_filter(item:name())
+		managers.menu:open_node("preplanning_type", {
+			false,
+			item:name()
+		})
+	end
+end
+
+function MenuCallbackHandler:vote_preplanning_mission_element_by_item(item)
+	if item then
+		if item:enabled() then
+			managers.preplanning:vote_on_plan(item:parameters().type, item:name())
+			local post_event = tweak_data:get_raw_value("preplanning", "types", item:parameters().type, "post_event")
+			if post_event then
+				managers.menu_component:preplanning_post_event(post_event)
+			else
+				managers.menu_component:preplanning_stop_event()
+			end
+		else
+			managers.menu_component:preplanning_flash_error(item:name(), item:parameters().flash_budget, item:parameters().flash_money)
+		end
+	end
+end
+
+function MenuCallbackHandler:vote_preplanning_mission_element_by_id(id)
+	local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+	local item = logic and logic:selected_node() and logic:selected_node():item(id)
+	if item then
+		MenuCallbackHandler:vote_preplanning_mission_element_by_item(item)
+	end
+end
+
+function MenuCallbackHandler:select_preplanning_mission_element_by_item(item)
 end
 
 function MenuCallbackHandler:reserve_preplanning_mission_element(type, id)
@@ -4174,20 +4694,64 @@ function MenuCallbackHandler:reserve_preplanning_mission_element(type, id)
 	managers.preplanning:reserve_mission_element(type, id)
 end
 
+function MenuCallbackHandler:reserve_preplanning_mission_element_by_item(item)
+	if item then
+		if item:enabled() then
+			local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+			local type = logic and logic:selected_node() and logic:selected_node():parameters().current_type
+			if type then
+				MenuCallbackHandler:reserve_preplanning_mission_element(type, item:name())
+			end
+		else
+			managers.menu_component:preplanning_flash_error(item:name(), item:parameters().flash_budget, item:parameters().flash_money)
+		end
+	end
+end
+
 function MenuCallbackHandler:reserve_preplanning_mission_element_by_id(id)
+	local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+	local item = logic and logic:selected_node() and logic:selected_node():item(id)
+	if item then
+		MenuCallbackHandler:reserve_preplanning_mission_element_by_item(item)
+	end
+end
+
+function MenuCallbackHandler:unreserve_preplanning_mission_element(id)
+	print("[unreserve_preplanning_mission_element]", "id", id)
+	managers.preplanning:unreserve_mission_element(id)
+end
+
+function MenuCallbackHandler:unreserve_preplanning_mission_element_by_item(item)
+	if item and item:enabled() then
+		MenuCallbackHandler:unreserve_preplanning_mission_element(item:name())
+	end
+end
+
+function MenuCallbackHandler:unreserve_preplanning_mission_element_by_id(id)
+	local logic = managers.menu:active_menu() and managers.menu:active_menu().logic
+	local item = logic and logic:selected_node() and logic:selected_node():item(id)
+	if item then
+		MenuCallbackHandler:unreserve_preplanning_mission_element_by_item(item)
+	end
+end
+
+function MenuCallbackHandler:swap_preplanning_mission_element_by_id(id)
 	local logic = managers.menu:active_menu().logic
 	if logic then
 		if not logic:selected_node() then
 			return false
 		end
 		local type = logic:selected_node():parameters().current_type
-		assert(type and id, "[MenuCallbackHandler:reserve_preplanning_mission_element_by_id] Mission element is missing!", "type", type, "id", id)
+		assert(type and id, "[MenuCallbackHandler:swap_preplanning_mission_element_by_id] Mission element is missing!", "type", type, "id", id)
+		MenuCallbackHandler:unreserve_preplanning_mission_element(id)
 		MenuCallbackHandler:reserve_preplanning_mission_element(type, id)
 	end
 end
 
-function MenuCallbackHandler:reserve_preplanning_mission_element_by_item(item)
-	MenuCallbackHandler:reserve_preplanning_mission_element_by_id(item:name())
+function MenuCallbackHandler:swap_preplanning_mission_element_by_item(item)
+	if item and item:enabled() then
+		MenuCallbackHandler:swap_preplanning_mission_element_by_id(item:name())
+	end
 end
 
 function MenuCallbackHandler:select_preplanning_item_by_id(id)
@@ -4197,8 +4761,7 @@ function MenuCallbackHandler:select_preplanning_item_by_id(id)
 			return false
 		end
 		if not logic:selected_node():selected_item() or logic:selected_node():selected_item():name() ~= id then
-			logic:selected_node():select_item(id)
-			logic:refresh_node()
+			logic:select_item(id, true)
 		end
 	end
 end
@@ -4211,8 +4774,25 @@ function MenuCallbackHandler:chk_preplanning_point(item)
 	return false
 end
 
-function MenuCallbackHandler:clear_preplanning_type_filter(item)
+function MenuCallbackHandler:clear_preplanning_category_filter()
+	managers.menu_component:set_preplanning_category_filter(false)
+end
+
+function MenuCallbackHandler:clear_preplanning_type_filter()
 	managers.menu_component:set_preplanning_type_filter(false)
+end
+
+function MenuCallbackHandler:open_preplanning_help(item)
+	managers.menu:show_preplanning_help()
+end
+
+function MenuCallbackHandler:open_preplanning_drawboard_item(item)
+	managers.menu:open_node("preplanning_drawboard")
+end
+
+function MenuCallbackHandler:toggle_preplanning_drawing(item)
+	local peer_id = tonumber(item:name())
+	managers.menu_component:toggle_preplanning_drawing(peer_id)
 end
 
 MenuCrimeNetGageAssignmentInitiator = MenuCrimeNetGageAssignmentInitiator or class(MenuCrimeNetContactInfoInitiator)
@@ -4341,12 +4921,20 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		local data_node = {
 			type = "MenuItemMultiChoice"
 		}
-		table.insert(data_node, {
-			_meta = "option",
-			no_text = true,
-			text_id = "",
-			value = contacts[#contacts] .. "#"
-		})
+		local num_contact = 0
+		for index, contact in ipairs(contacts) do
+			if jobs[contact] then
+				num_contact = num_contact + 1
+			end
+		end
+		if 1 < num_contact then
+			table.insert(data_node, {
+				_meta = "option",
+				no_text = true,
+				text_id = "",
+				value = contacts[#contacts] .. "#"
+			})
+		end
 		for index, contact in ipairs(contacts) do
 			if jobs[contact] then
 				table.insert(data_node, {
@@ -4356,12 +4944,14 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 				})
 			end
 		end
-		table.insert(data_node, {
-			_meta = "option",
-			no_text = true,
-			text_id = "",
-			value = contacts[1] .. "#"
-		})
+		if 1 < num_contact then
+			table.insert(data_node, {
+				_meta = "option",
+				no_text = true,
+				text_id = "",
+				value = contacts[1] .. "#"
+			})
+		end
 		local new_item = node:create_item(data_node, params)
 		new_item:set_value(listed_contact)
 		node:add_item(new_item)

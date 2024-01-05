@@ -157,6 +157,9 @@ function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, 
 		return
 	end
 	managers.player:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
+	if not managers.groupai:state():whisper_mode() and (game_state_machine:last_queued_state_name() == "ingame_clean" or game_state_machine:last_queued_state_name() == "ingame_mask_off") then
+		managers.player:set_player_state("standard")
+	end
 end
 
 function ConnectionNetworkHandler:ok_to_load_level(sender)
@@ -573,26 +576,45 @@ function ConnectionNetworkHandler:choose_lootcard(card_id, sender)
 	end
 end
 
-function ConnectionNetworkHandler:preplanning_reserved(type, id, peer_id, unreserve, sender)
+function ConnectionNetworkHandler:preplanning_reserved(type, id, peer_id, state, sender)
 	if not self._verify_sender(sender) then
 		return
 	end
-	if unreserve then
-		managers.preplanning:client_unreserve_mission_element(id)
-	else
+	if state == 0 then
 		managers.preplanning:client_reserve_mission_element(type, id, peer_id)
+	elseif state == 1 then
+		managers.preplanning:client_unreserve_mission_element(id)
+	elseif state == 2 then
+		managers.preplanning:client_vote_on_plan(type, id, peer_id)
 	end
 end
 
-function ConnectionNetworkHandler:reserve_preplanning(type, id, unreserve, sender)
-	print("A")
+function ConnectionNetworkHandler:reserve_preplanning(type, id, state, sender)
 	local peer = self._verify_sender(sender)
 	if not peer then
 		return
 	end
-	if unreserve then
-		managers.preplanning:server_unreserve_mission_element(id, peer:id())
-	else
+	if state == 0 then
 		managers.preplanning:server_reserve_mission_element(type, id, peer:id())
+	elseif state == 1 then
+		managers.preplanning:server_unreserve_mission_element(id, peer:id())
+	elseif state == 2 then
+		managers.preplanning:server_vote_on_plan(type, id, peer:id())
 	end
+end
+
+function ConnectionNetworkHandler:draw_preplanning_point(x, y, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.menu_component:sync_preplanning_draw_point(peer:id(), x, y)
+end
+
+function ConnectionNetworkHandler:draw_preplanning_event(event_id, var1, var2, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.menu_component:sync_preplanning_draw_event(peer:id(), event_id, var1, var2)
 end

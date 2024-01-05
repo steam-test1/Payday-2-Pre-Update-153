@@ -223,9 +223,6 @@ function GameSetup:unload_packages()
 		if PackageManager:loaded("packages/game_base") then
 			PackageManager:unload("packages/game_base")
 		end
-		if PackageManager:loaded("packages/game_base_streamed") then
-			PackageManager:unload("packages/game_base_streamed")
-		end
 		local prefix = "packages/dlcs/"
 		local sufix = "/game_base"
 		local package = ""
@@ -413,6 +410,7 @@ function GameSetup:save(data)
 	managers.loot:sync_save(data)
 	managers.enemy:save(data)
 	managers.gage_assignment:sync_save(data)
+	managers.preplanning:sync_save(data)
 	managers.assets:sync_save(data)
 	managers.job:sync_save(data)
 end
@@ -432,6 +430,7 @@ function GameSetup:load(data)
 	managers.loot:sync_load(data)
 	managers.enemy:load(data)
 	managers.gage_assignment:sync_load(data)
+	managers.preplanning:sync_load(data)
 	managers.assets:sync_load(data)
 	managers.job:sync_load(data)
 	managers.menu_component:load(data)

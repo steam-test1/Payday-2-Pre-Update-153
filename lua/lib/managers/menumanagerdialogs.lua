@@ -473,6 +473,18 @@ function MenuManager:show_key_binding_forbidden(params)
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_preplanning_help()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_information_title")
+	dialog_data.text = managers.localization:text("dialog_preplanning_help")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	dialog_data.w = 620
+	dialog_data.h = 532
+	managers.system_menu:show_new_unlock(dialog_data)
+end
+
 function MenuManager:show_new_item_gained(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_new_unlock_title")
@@ -1171,6 +1183,7 @@ function MenuManager:show_abort_mission_dialog(params)
 	yes_button.callback_func = params.yes_func
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_no")
+	no_button.cancel_button = true
 	dialog_data.button_list = {yes_button, no_button}
 	managers.system_menu:show(dialog_data)
 end

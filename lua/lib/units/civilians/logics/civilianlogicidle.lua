@@ -381,7 +381,7 @@ function CivilianLogicIdle.clbk_enemy_weapons_hot(_, data)
 end
 
 function CivilianLogicIdle.is_obstructed(data, aggressor_unit)
-	if data.unit:movement():chk_action_forbidden("walk") then
+	if data.unit:movement():chk_action_forbidden("walk") and not data.unit:anim_data().act_idle then
 		return
 	end
 	local objective = data.objective

@@ -150,7 +150,7 @@ function EquipmentsTweakData:init()
 	}
 	self.specials.lance_part = {
 		text_id = "hud_equipment_lance_part",
-		icon = "equipment_drill",
+		icon = "equipment_drillfix",
 		sync_possession = true
 	}
 	self.specials.glass_cutter = {
@@ -256,6 +256,31 @@ function EquipmentsTweakData:init()
 		icon = "equipment_gold",
 		player_rule = "no_run"
 	}
+	self.specials.barcode_downtown = {
+		text_id = "hud_int_equipment_barcode_downtown",
+		icon = "equipment_gold",
+		sync_possession = true
+	}
+	self.specials.barcode_brickell = {
+		text_id = "hud_int_equipment_barcode_brickell",
+		icon = "equipment_gold",
+		sync_possession = true
+	}
+	self.specials.barcode_edgewater = {
+		text_id = "hud_int_equipment_barcode_edgewater",
+		icon = "equipment_gold",
+		sync_possession = true
+	}
+	self.specials.barcode_isles_beach = {
+		text_id = "hud_int_equipment_barcode_isles_beach",
+		icon = "equipment_gold",
+		sync_possession = true
+	}
+	self.specials.barcode_opa_locka = {
+		text_id = "hud_int_equipment_barcode_opa_locka",
+		icon = "equipment_gold",
+		sync_possession = true
+	}
 	self.max_amount = {
 		ammo_bag = 2,
 		doctor_bag = 2,
@@ -264,8 +289,8 @@ function EquipmentsTweakData:init()
 		trip_mine = 6,
 		grenades = 3,
 		asset_ammo_bag = 4,
-		asset_doctor_bag = 2,
-		asset_grenade_crate = 1,
-		asset_bodybags_bag = 1
+		asset_doctor_bag = 3,
+		asset_grenade_crate = 3,
+		asset_bodybags_bag = 3
 	}
 end

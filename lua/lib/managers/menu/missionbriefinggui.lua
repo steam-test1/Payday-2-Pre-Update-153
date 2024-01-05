@@ -476,8 +476,19 @@ AssetsItem = AssetsItem or class(MissionBriefingTabItem)
 
 function AssetsItem:init(panel, text, i, assets_names, max_assets, menu_component_data)
 	AssetsItem.super.init(self, panel, text, i)
+	self._num_items = managers.preplanning:has_current_level_preplanning() and 4 or 8
+	self._panel:set_w(self._main_panel:w() * (self._num_items / 8))
+	self._panel:set_right(self._main_panel:w())
 	self._my_menu_component_data = menu_component_data
 	self:create_assets(assets_names, max_assets)
+	if #assets_names == 0 then
+		self._loading_text = self._panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			text = managers.localization:to_upper_text("debug_loading_level"),
+			rotation = 360
+		})
+	end
 end
 
 function AssetsItem:post_init()
@@ -499,8 +510,112 @@ function AssetsItem:get_asset_id(i)
 	return self._assets_names[i][4]
 end
 
+function AssetsItem:get_requested_textures()
+	return self._requested_textures
+end
+
+function AssetsItem:add_preplanning_button()
+	local preplanning_panel = self._panel:panel({
+		name = "preplanning"
+	})
+	preplanning_panel:set_right(0)
+	preplanning_panel:grow(-20, -20)
+	preplanning_panel:move(10, 10)
+	if preplanning_panel:w() > preplanning_panel:h() then
+		preplanning_panel:grow(preplanning_panel:h() - preplanning_panel:w(), 0)
+	end
+	local loading_text = preplanning_panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		name = "loading",
+		text = managers.localization:to_upper_text("menu_pp_loading"),
+		wrap = true,
+		word_wrap = true,
+		rotation = 360
+	})
+	self._requested_textures = {}
+	self._cached_textures = {}
+	self._ready_to_chk_preplanning_done = false
+	self._preplanning_ready = false
+	local index, texture_ids, key
+	local texture_done_clbk = callback(self, self, "preplanning_texture_done_clbk")
+	
+	local function request_texture_func(texture)
+		texture_ids = Idstring(texture)
+		key = texture_ids:key()
+		self._requested_textures[key] = true
+		index = managers.menu_component:request_texture(texture, texture_done_clbk)
+		self._requested_textures[key] = {texture = texture, index = index}
+	end
+	
+	for _, data in ipairs(managers.preplanning:current_location_data()) do
+		if data.texture then
+			request_texture_func(data.texture)
+		end
+	end
+	local custom_icons_path = tweak_data.preplanning.gui.custom_icons_path
+	local type_icons_path = tweak_data.preplanning.gui.type_icons_path
+	local category_icons_path = tweak_data.preplanning.gui.category_icons_path
+	if type_icons_path then
+		request_texture_func(type_icons_path)
+	end
+	if category_icons_path then
+		request_texture_func(category_icons_path)
+	end
+	self._ready_to_chk_preplanning_done = true
+	self:chk_preplanning_textures_done()
+end
+
+function AssetsItem:preplanning_texture_done_clbk(texture_idstring)
+	local key = texture_idstring:key()
+	if self._requested_textures[key] then
+		self._cached_textures[key] = true
+		print("[AssetsItem:preplanning_texture_done_clbk] Texture cached", key)
+		if self._ready_to_chk_preplanning_done then
+			self:chk_preplanning_textures_done()
+		end
+	end
+end
+
+function AssetsItem:chk_preplanning_textures_done()
+	self._preplanning_ready = true
+	for key, data in pairs(self._requested_textures) do
+		if not self._cached_textures[key] then
+			self._preplanning_ready = false
+			return
+		end
+	end
+	local preplanning_panel = self._preplanning_ready and self._panel:child("preplanning")
+	if alive(preplanning_panel) then
+		preplanning_panel:clear()
+		local text = preplanning_panel:text({
+			name = "text",
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			text = managers.localization:to_upper_text("menu_preplanning_enter"),
+			wrap = true,
+			word_wrap = true,
+			layer = 1,
+			rotation = 360
+		})
+		make_fine_text(text)
+		text:set_center(preplanning_panel:w() / 2, preplanning_panel:h() / 2)
+		text:set_visible(managers.menu:is_pc_controller())
+		local button = preplanning_panel:bitmap({
+			name = "button",
+			texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/mission_briefing_button",
+			alpha = 0.8,
+			rotation = 360,
+			blend_mode = "add",
+			w = preplanning_panel:w(),
+			h = preplanning_panel:h()
+		})
+	end
+end
+
 function AssetsItem:create_assets(assets_names, max_assets)
 	self._panel:clear()
+	self._loading_text = nil
 	self._asset_locked = {}
 	self._assets_list = {}
 	self._assets_names = assets_names
@@ -508,7 +623,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 	local center_y = math.round(self._panel:h() / 2) - tweak_data.menu.pd2_small_font_size
 	self._asset_text_panel = self._panel:panel({name = "asset_text", layer = 4})
 	local first_rect, rect
-	local w = self._panel:w() / 4
+	local w = self._panel:w() / (self._num_items / 2)
 	local step = w * 0.5
 	for i = 1, #assets_names do
 		local center_x = i * w - w * 0.5
@@ -569,7 +684,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 	self._text_strings_localized = false
 	self._my_asset_space = w
 	self._my_left_i = self._my_menu_component_data.my_left_i or 1
-	if 1 < math.ceil(#self._assets_list / 8) then
+	if 1 < math.ceil(#self._assets_list / self._num_items) then
 		self._move_left_rect = self._panel:bitmap({
 			texture = "guis/textures/pd2/hud_arrow",
 			color = tweak_data.screen_colors.button_stage_3,
@@ -600,6 +715,9 @@ function AssetsItem:create_assets(assets_names, max_assets)
 			"menu_legend_preview_move",
 			"menu_legend_select"
 		}
+		if managers.preplanning:has_current_level_preplanning() then
+			table.insert(legends, 1, "menu_legend_open_preplanning")
+		end
 		local t_text = ""
 		for i, string_id in ipairs(legends) do
 			local spacing = 1 < i and "  |  " or ""
@@ -609,6 +727,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 			}))
 		end
 		local legend_text = self._panel:text({
+			rotation = 360,
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			text = t_text
@@ -654,7 +773,7 @@ function AssetsItem:move_assets_left()
 end
 
 function AssetsItem:move_assets_right()
-	self._my_left_i = math.min(self._my_left_i + 1, math.ceil(#self._assets_list / 8))
+	self._my_left_i = math.min(self._my_left_i + 1, math.ceil(#self._assets_list / self._num_items))
 	self:update_asset_positions_and_text()
 	managers.menu_component:post_event("menu_enter")
 end
@@ -683,7 +802,7 @@ function AssetsItem:update_asset_positions()
 	self._my_menu_component_data.my_left_i = self._my_left_i
 	local w = self._my_asset_space
 	for i, asset in pairs(self._assets_list) do
-		local cx = (math.ceil(i / 2) - (self._my_left_i - 1) * 4) * w - w / 2
+		local cx = (math.ceil(i / 2) - (self._my_left_i - 1) * (self._num_items / 2)) * w - w / 2
 		local lock = self._panel:child("asset_lock_" .. tostring(i))
 		if alive(lock) then
 			lock:set_center_x(cx)
@@ -694,16 +813,16 @@ function AssetsItem:update_asset_positions()
 		asset:set_left(math.round(asset:left()))
 	end
 	self._move_left_rect:set_visible(self._my_left_i > 1)
-	self._move_right_rect:set_visible(self._my_left_i < math.ceil(#self._assets_list / 8))
-	if 1 < math.ceil(#self._assets_list / 8) then
-		self:set_tab_suffix(" (" .. tostring(self._my_left_i) .. "/" .. tostring(math.ceil(#self._assets_list / 8)) .. ")")
+	self._move_right_rect:set_visible(self._my_left_i < math.ceil(#self._assets_list / self._num_items))
+	if 1 < math.ceil(#self._assets_list / self._num_items) then
+		self:set_tab_suffix(" (" .. tostring(self._my_left_i) .. "/" .. tostring(math.ceil(#self._assets_list / self._num_items)) .. ")")
 	end
 end
 
 function AssetsItem:select_asset(i, instant)
-	if #self._assets_list > 8 then
+	if #self._assets_list > self._num_items then
 		if i then
-			local page = math.ceil(i / 8)
+			local page = math.ceil(i / self._num_items)
 			self._my_left_i = page
 		end
 		self:update_asset_positions()
@@ -851,6 +970,21 @@ function AssetsItem:mouse_moved(x, y)
 			self._move_right_highlighted = false
 		end
 	end
+	local preplanning = self._preplanning_ready and self._panel:child("preplanning")
+	if alive(preplanning) then
+		if preplanning:inside(x, y) then
+			if not self._preplanning_highlight then
+				self._preplanning_highlight = true
+				preplanning:child("button"):set_alpha(1)
+				managers.menu_component:post_event("highlight")
+			end
+			self:check_deselect_item()
+			return false, true
+		elseif self._preplanning_highlight then
+			self._preplanning_highlight = false
+			preplanning:child("button"):set_alpha(0.8)
+		end
+	end
 	local selected, highlighted = AssetsItem.super.mouse_moved(self, x, y)
 	if not self._panel:inside(x, y) or not selected then
 		self:check_deselect_item()
@@ -893,10 +1027,23 @@ function AssetsItem:mouse_pressed(button, x, y)
 			return
 		end
 	end
+	local preplanning = self._preplanning_ready and self._panel:child("preplanning")
+	if alive(preplanning) and preplanning:inside(x, y) then
+		self:open_preplanning()
+		return
+	end
 	if self._asset_selected and alive(self._panel:child("bg_rect_" .. tostring(self._asset_selected))) and self._panel:child("bg_rect_" .. tostring(self._asset_selected)):inside(x, y) then
 		return self:_return_asset_info(self._asset_selected)
 	end
 	return inside
+end
+
+function AssetsItem:open_preplanning()
+	if self._preplanning_ready then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("preplanning")
+		managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
+	end
 end
 
 function AssetsItem:move(x, y)
@@ -904,14 +1051,14 @@ function AssetsItem:move(x, y)
 		return
 	end
 	local asset_selected = self._asset_selected
-	local new_selected = self._my_left_i and (self._my_left_i - 1) * 8 + 1 or 1
+	local new_selected = self._my_left_i and (self._my_left_i - 1) * self._num_items + 1 or 1
 	if asset_selected then
 		local is_top = 0 < asset_selected % 2
 		local step = 2 * x + (is_top and math.max(y, 0) or math.min(y, 0))
 		new_selected = asset_selected + step
 		if new_selected > #self._assets_list then
-			local old_page = math.ceil(asset_selected / 8)
-			local new_page = math.ceil(new_selected / 8)
+			local old_page = math.ceil(asset_selected / self._num_items)
+			local new_page = math.ceil(new_selected / self._num_items)
 			if old_page < new_page then
 				new_selected = #self._assets_list
 			end
@@ -2397,7 +2544,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._items = {}
 	self._description_item = DescriptionItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_description")), 1, self._node:parameters().menu_component_data.saved_descriptions)
 	table.insert(self._items, self._description_item)
-	self._assets_item = AssetsItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_assets")), 2, {}, nil, asset_data)
+	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), 2, {}, nil, asset_data)
 	table.insert(self._items, self._assets_item)
 	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
 	table.insert(self._items, self._new_loadout_item)
@@ -2524,53 +2671,54 @@ end
 function MissionBriefingGui:create_asset_tab()
 	local asset_ids = managers.assets:get_all_asset_ids(true)
 	local assets_names = {}
-	if 0 < #asset_ids then
-		self._fullscreen_asset_background_h = self._fullscreen_panel:gradient({
-			name = "asset_background_h",
-			layer = 99,
-			orientation = "horizontal",
-			color = Color.black:with_alpha(0.1)
+	self._fullscreen_asset_background_h = self._fullscreen_panel:gradient({
+		name = "asset_background_h",
+		layer = 99,
+		orientation = "horizontal",
+		color = Color.black:with_alpha(0.1)
+	})
+	self._fullscreen_asset_background_h:add_gradient_point(0.25, Color.black:with_alpha(0.5))
+	self._fullscreen_asset_background_h:add_gradient_point(0.75, Color.black:with_alpha(0.5))
+	self._fullscreen_asset_background_h:add_gradient_point(0.5, Color.black:with_alpha(0.75))
+	self._fullscreen_asset_background_v = self._fullscreen_panel:gradient({
+		name = "asset_background_v",
+		layer = 99,
+		orientation = "vertical",
+		color = Color.black:with_alpha(0.1)
+	})
+	self._fullscreen_asset_background_v:add_gradient_point(0.25, Color.black:with_alpha(0.5))
+	self._fullscreen_asset_background_v:add_gradient_point(0.75, Color.black:with_alpha(0.5))
+	self._fullscreen_asset_background_v:add_gradient_point(0.5, Color.black:with_alpha(0.75))
+	self._fullscreen_asset_background_v:hide()
+	self._fullscreen_asset_background_h:hide()
+	self._fullscreen_assets_list = {}
+	for i, asset_id in ipairs(asset_ids) do
+		local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(asset_id)
+		assets_names[i] = {
+			managers.assets:get_asset_texture(asset_id),
+			asset_tweak_data.name_id,
+			managers.assets:get_asset_unlocked_by_id(asset_id),
+			asset_id,
+			managers.assets:get_asset_can_unlock_by_id(asset_id),
+			managers.assets:get_asset_no_mystery_by_id(asset_id)
+		}
+		local asset = self._fullscreen_panel:bitmap({
+			name = "asset_" .. tostring(i),
+			texture = assets_names[i][1],
+			w = 512,
+			h = 512,
+			layer = 100
 		})
-		self._fullscreen_asset_background_h:add_gradient_point(0.25, Color.black:with_alpha(0.5))
-		self._fullscreen_asset_background_h:add_gradient_point(0.75, Color.black:with_alpha(0.5))
-		self._fullscreen_asset_background_h:add_gradient_point(0.5, Color.black:with_alpha(0.75))
-		self._fullscreen_asset_background_v = self._fullscreen_panel:gradient({
-			name = "asset_background_v",
-			layer = 99,
-			orientation = "vertical",
-			color = Color.black:with_alpha(0.1)
-		})
-		self._fullscreen_asset_background_v:add_gradient_point(0.25, Color.black:with_alpha(0.5))
-		self._fullscreen_asset_background_v:add_gradient_point(0.75, Color.black:with_alpha(0.5))
-		self._fullscreen_asset_background_v:add_gradient_point(0.5, Color.black:with_alpha(0.75))
-		self._fullscreen_asset_background_v:hide()
-		self._fullscreen_asset_background_h:hide()
-		self._fullscreen_assets_list = {}
-		for i, asset_id in ipairs(asset_ids) do
-			local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(asset_id)
-			assets_names[i] = {
-				managers.assets:get_asset_texture(asset_id),
-				asset_tweak_data.name_id,
-				managers.assets:get_asset_unlocked_by_id(asset_id),
-				asset_id,
-				managers.assets:get_asset_can_unlock_by_id(asset_id),
-				managers.assets:get_asset_no_mystery_by_id(asset_id)
-			}
-			local asset = self._fullscreen_panel:bitmap({
-				name = "asset_" .. tostring(i),
-				texture = assets_names[i][1],
-				w = 512,
-				h = 512,
-				layer = 100
-			})
-			local aspect = asset:texture_width() / math.max(asset:texture_height(), 1)
-			local size = math.max(asset:texture_height(), self._panel:h())
-			asset:set_size(size * aspect, size)
-			asset:set_center(self._fullscreen_panel:w() / 2, self._fullscreen_panel:h() / 2)
-			asset:hide()
-			table.insert(self._fullscreen_assets_list, asset)
-		end
-		self._assets_item:create_assets(assets_names)
+		local aspect = asset:texture_width() / math.max(asset:texture_height(), 1)
+		local size = math.max(asset:texture_height(), self._panel:h())
+		asset:set_size(size * aspect, size)
+		asset:set_center(self._fullscreen_panel:w() / 2, self._fullscreen_panel:h() / 2)
+		asset:hide()
+		table.insert(self._fullscreen_assets_list, asset)
+	end
+	self._assets_item:create_assets(assets_names)
+	if managers.preplanning:has_current_level_preplanning() then
+		self._assets_item:add_preplanning_button()
 	end
 end
 
@@ -2959,6 +3107,8 @@ function MissionBriefingGui:special_btn_pressed(button)
 	if button == Idstring("menu_toggle_ready") then
 		self:on_ready_pressed()
 		return true
+	elseif button == Idstring("menu_toggle_pp_breakdown") and managers.preplanning:has_current_level_preplanning() then
+		self._assets_item:open_preplanning()
 	end
 	return false
 end
@@ -3013,7 +3163,15 @@ function MissionBriefingGui:update_tab_positions()
 end
 
 function MissionBriefingGui:close()
+	print("[MissionBriefingGui:close]")
 	WalletGuiObject.close_wallet(self._safe_workspace:panel())
+	self:close_asset()
+	local requested_asset_textures = self._assets_item and self._assets_item:get_requested_textures()
+	if requested_asset_textures then
+		for key, data in pairs(requested_asset_textures) do
+			managers.menu_component:unretrieve_texture(data.texture, data.index)
+		end
+	end
 	if self._panel and alive(self._panel) then
 		self._panel:parent():remove(self._panel)
 	end

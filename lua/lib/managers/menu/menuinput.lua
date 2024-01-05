@@ -317,7 +317,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						local item = self._logic:selected_item()
 						if item then
 							self._item_input_action_map[item.TYPE](item, self._controller, true)
-							return
+							return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 						end
 					end
 				elseif not row_item.gui_panel:inside(x, y) or row_item.type == "divider" then
@@ -356,7 +356,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						end
 					elseif not row_item.choice_panel:inside(x, y) then
 						self._item_input_action_map[item.TYPE](item, self._controller, true)
-						return
+						return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 					end
 				elseif row_item.type == "multi_choice" then
 					local item = row_item.item
@@ -377,7 +377,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						end
 					elseif not row_item.choice_panel:inside(x, y) then
 						self._item_input_action_map[item.TYPE](item, self._controller, true)
-						return
+						return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 					end
 				elseif row_item.type == "chat" then
 					local item = self._logic:selected_item()
@@ -388,7 +388,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 					local item = self._logic:selected_item()
 					if item then
 						self._item_input_action_map[item.TYPE](item, self._controller, true)
-						return
+						return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 					end
 				end
 			end
@@ -516,7 +516,9 @@ function MenuInput:update(t, dt)
 				"menu_toggle_legends",
 				"menu_toggle_filters",
 				"menu_toggle_ready",
-				"toggle_chat"
+				"toggle_chat",
+				"menu_toggle_pp_drawboard",
+				"menu_toggle_pp_breakdown"
 			}
 			if self._controller then
 				for _, button in ipairs(special_btns) do
@@ -536,6 +538,12 @@ function MenuInput:update(t, dt)
 		end
 		if self._controller:get_input_pressed("toggle_chat") then
 			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("toggle_chat"))
+		end
+		if self._controller:get_input_pressed("menu_toggle_pp_drawboard") then
+			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_drawboard"))
+		end
+		if self._controller:get_input_pressed("menu_toggle_pp_breakdown") then
+			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_breakdown"))
 		end
 	end
 	if not self._keyboard_used and self._mouse_active and self._accept_input and not self._mouse_moved then

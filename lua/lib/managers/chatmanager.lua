@@ -362,7 +362,7 @@ ChatGui.PRESETS.lobby = {
 ChatGui.PRESETS.crimenet = {
 	left = 0,
 	bottom = 0,
-	layer = tweak_data.gui.MOUSE_LAYER - 100,
+	layer = tweak_data.gui.CRIMENET_CHAT_LAYER,
 	chat_blur = true,
 	chat_bg_alpha = 0.25,
 	is_crimenet_chat = true
@@ -370,7 +370,7 @@ ChatGui.PRESETS.crimenet = {
 ChatGui.PRESETS.preplanning = {
 	left = 10,
 	bottom = 0,
-	layer = tweak_data.gui.MOUSE_LAYER - 100,
+	layer = tweak_data.gui.CRIMENET_CHAT_LAYER,
 	chat_blur = true,
 	chat_bg_alpha = 0.25,
 	is_crimenet_chat = true,
@@ -441,6 +441,25 @@ function ChatGui:toggle_crimenet_chat()
 	end
 end
 
+function ChatGui:set_crimenet_chat(state)
+	if MenuCallbackHandler:is_win32() and self._crimenet_chat_state ~= state then
+		self._crimenet_chat_state = state
+		if self._crimenet_chat_state then
+			self:_show_crimenet_chat()
+		else
+			self:_hide_crimenet_chat()
+		end
+	end
+end
+
+function ChatGui:get_chat_button_shape()
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	local chat_button = chat_button_panel and chat_button_panel:child("chat_button")
+	if chat_button then
+		return chat_button:shape()
+	end
+end
+
 function ChatGui:_show_crimenet_chat()
 	local chat_bg = self._panel:child("chat_bg")
 	local chat_blur = self._panel:child("chat_blur")
@@ -461,6 +480,8 @@ function ChatGui:_show_crimenet_chat()
 		chat_button:set_right(chat_button_panel:w() / 2)
 	end
 	chat_button:set_bottom(chat_button_panel:h() - 11)
+	managers.menu_component:set_preplanning_drawboard(chat_button:right() + 15, chat_button:top())
+	managers.menu_component:hide_preplanning_drawboard()
 	local blur_object = chat_button_panel:child("chat_button_blur")
 	blur_object:set_shape(chat_button:shape())
 	local new_msg_flash = chat_button_panel:child("new_msg_flash")
@@ -494,6 +515,7 @@ function ChatGui:_hide_crimenet_chat()
 		chat_button:set_right(chat_button_panel:w() / 2)
 	end
 	chat_button:set_bottom(chat_button_panel:h() - 11)
+	managers.menu_component:set_preplanning_drawboard(chat_button:right() + 15, chat_button:top())
 	local blur_object = chat_button_panel:child("chat_button_blur")
 	blur_object:set_shape(chat_button:shape())
 	local new_msg_flash = chat_button_panel:child("new_msg_flash")

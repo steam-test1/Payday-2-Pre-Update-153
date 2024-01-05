@@ -118,7 +118,7 @@ function Drill:set_jammed(jammed)
 	elseif self._jammed_effect then
 		self:_kill_jammed_effect()
 		self:_start_drill_effect()
-		if not self.is_hacking_device and not self.is_saw then
+		if not self.is_hacking_device and not self.is_saw and not managers.groupai:state():whisper_mode() then
 			managers.groupai:state():teammate_comment(nil, "g22", self._unit:position(), true, 500, false)
 		end
 		if self._autorepair_clbk_id then
@@ -153,7 +153,7 @@ function Drill:_change_num_jammed_drills(d)
 end
 
 function Drill:_drill_remind_clbk()
-	if not self.is_hacking_device then
+	if not self.is_hacking_device and not managers.groupai:state():whisper_mode() then
 		local suffix = Drill.active_drills > 1 and "plu" or "sin"
 		if 1 >= self._jammed_count then
 			managers.groupai:state():teammate_comment(nil, (self.is_saw and "d03_" or "d01x_") .. suffix, nil, false, nil, false)
@@ -184,7 +184,7 @@ function Drill:set_powered(powered)
 		self:_kill_drill_effect()
 	else
 		self:_start_drill_effect()
-		if not self.is_hacking_device and not self.is_saw then
+		if not self.is_hacking_device and not self.is_saw and not managers.groupai:state():whisper_mode() then
 			managers.groupai:state():teammate_comment(nil, "g22", self._unit:position(), true, 500, false)
 		end
 	end

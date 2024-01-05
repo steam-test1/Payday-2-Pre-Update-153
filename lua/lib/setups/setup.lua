@@ -107,6 +107,9 @@ function Setup:init_category_print()
 end
 
 function Setup:load_packages()
+	if not Application:editor() then
+		TextureCache:set_streaming_enabled(true)
+	end
 	if not PackageManager:loaded("packages/base") then
 		PackageManager:load("packages/base")
 	end
@@ -556,5 +559,25 @@ end
 function Setup:set_fps_cap(value)
 	if not self._framerate_low then
 		Application:cap_framerate(value)
+	end
+end
+
+function Setup:george_test()
+	local package_name = "packages/dyn_resources"
+	local asset_type = Idstring("texture")
+	local asset_name = Idstring("units/payday2/characters/civ_female_casual_4/civ_female_casual_4_df")
+	PackageManager:package(package_name):load_temp_resource(asset_type, asset_name, callback(self, self, "clbk_george_test"))
+end
+
+function Setup:george_test2()
+	local package_name = "packages/dyn_resources"
+	local asset_type = Idstring("texture")
+	local asset_name = Idstring("units/payday2/characters/civ_female_casual_4/civ_female_casual_4_df")
+	PackageManager:package(package_name):unload_resource(asset_type, asset_name, false)
+end
+
+function Setup:clbk_george_test(status, type, name)
+	print("[Setup:clbk_george_test] status", status, "type", type, "name", name)
+	if status then
 	end
 end

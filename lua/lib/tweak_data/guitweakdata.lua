@@ -121,6 +121,14 @@ function GuiTweakData:init()
 		store = 267382,
 		image = "guis/textures/pd2/content_updates/kosugi"
 	}
+	local big_bank = {
+		id = "big_bank",
+		name_id = "menu_content_big_bank",
+		desc_id = "menu_content_big_bank_desc",
+		date_id = "menu_content_big_bank_date",
+		store = 306690,
+		image = "guis/dlcs/big_bank/textures/pd2/content_updates/big_bank"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -142,7 +150,8 @@ function GuiTweakData:init()
 			election_day,
 			gage_pack_jobs,
 			gage_pack_snp,
-			kosugi
+			kosugi,
+			big_bank
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1275,6 +1284,22 @@ function GuiTweakData:init()
 						"gage3"
 					},
 					post_event = "pln_contact_gage"
+				}
+			},
+			{
+				id = "the_dentist",
+				name_id = "heist_contact_the_dentist",
+				{
+					desc_id = "heist_contact_the_dentist_description",
+					videos = {
+						"the_dentist1",
+						"the_dentist2",
+						"the_dentist3",
+						"the_dentist4",
+						"the_dentist5",
+						"the_dentist6"
+					},
+					post_event = "dentist_quote_set_a"
 				}
 			}
 		},

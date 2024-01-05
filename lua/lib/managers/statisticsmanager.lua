@@ -434,7 +434,9 @@ function StatisticsManager:_get_stat_tables()
 		"election_day_1",
 		"election_day_2",
 		"election_day_3_skip1",
-		"election_day_3_skip2"
+		"election_day_3_skip2",
+		"kosugi",
+		"big"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -463,7 +465,9 @@ function StatisticsManager:_get_stat_tables()
 		"arm_cro",
 		"roberts",
 		"election_day",
-		"election_day_prof"
+		"election_day_prof",
+		"kosugi",
+		"big"
 	}
 	return level_list, job_list
 end

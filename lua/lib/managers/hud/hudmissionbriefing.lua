@@ -408,7 +408,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	job_text:set_size(w, h)
 	local big_text = self._background_layer_three:text({
 		name = "job_text",
-		text = utf8.to_upper(managers.localization:text(self._current_job_data.name_id)),
+		text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id)),
 		align = "left",
 		vertical = "top",
 		font_size = bg_font_size,
