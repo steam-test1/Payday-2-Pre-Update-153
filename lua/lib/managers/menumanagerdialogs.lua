@@ -172,17 +172,13 @@ function MenuManager:show_peer_kicked_dialog(params)
 	Global.on_remove_peer_message = nil
 end
 
-function MenuManager:show_default_option_dialog()
+function MenuManager:show_default_option_dialog(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_default_options_title")
-	dialog_data.text = managers.localization:text("dialog_default_options_message")
+	dialog_data.text = params.text
 	local yes_button = {}
 	yes_button.text = managers.localization:text("dialog_yes")
-	
-	function yes_button.callback_func()
-		managers.user:reset_setting_map()
-	end
-	
+	yes_button.callback_func = params.callback
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_no")
 	no_button.cancel_button = true

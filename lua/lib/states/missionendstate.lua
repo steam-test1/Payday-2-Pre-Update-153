@@ -288,7 +288,7 @@ function MissionEndState:at_enter(old_state, params)
 			end
 		end
 	end
-	managers.music:post_event(self._success and "resultscreen_win" or "resultscreen_lose")
+	managers.music:post_event(self._success and managers.music:jukebox_menu_track("heistresult") or managers.music:jukebox_menu_track("heistlost"))
 	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
 	local ghost_bonus = 0
 	if self._type == "victory" or self._type == "gameover" then

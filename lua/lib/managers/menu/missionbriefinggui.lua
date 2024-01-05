@@ -2552,6 +2552,10 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		self._team_loadout_item = TeamLoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_team_loadout")), 4)
 		table.insert(self._items, self._team_loadout_item)
 	end
+	if tweak_data.levels[Global.level_data.level_id].music ~= "no_music" then
+		self._jukebox_item = JukeboxItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), Global.game_settings.single_player and 4 or 5)
+		table.insert(self._items, self._jukebox_item)
+	end
 	local max_x = self._panel:w()
 	if not managers.menu:is_pc_controller() then
 		local next_page = self._panel:text({
@@ -2948,6 +2952,13 @@ function MissionBriefingGui:on_ready_pressed(ready)
 	self._ready_tick_box:set_image(self._ready and "guis/textures/pd2/mission_briefing/gui_tickbox_ready" or "guis/textures/pd2/mission_briefing/gui_tickbox")
 	if ready_changed then
 		if self._ready then
+			managers.music:track_listen_stop()
+			if managers.menu:active_menu() and managers.menu:active_menu().logic and managers.menu:active_menu().logic:selected_node() then
+				local item = managers.menu:active_menu().logic:selected_node():item("choose_jukebox_your_choice")
+				if item then
+					item:set_icon_visible(false)
+				end
+			end
 			managers.menu_component:post_event("box_tick")
 		else
 			managers.menu_component:post_event("box_untick")
@@ -2956,6 +2967,9 @@ function MissionBriefingGui:on_ready_pressed(ready)
 end
 
 function MissionBriefingGui:input_focus()
+	if self._jukebox_item and self._jukebox_item.displayed then
+		return false
+	end
 	return self._displaying_asset and 1 or self._enabled
 end
 
@@ -3206,4 +3220,37 @@ end
 function MissionBriefingGui:reload()
 	self:close()
 	MissionBriefingGui.init(self, self._safe_workspace, self._full_workspace, self._node)
+end
+
+JukeboxItem = JukeboxItem or class(MissionBriefingTabItem)
+
+function JukeboxItem:init(panel, text, i, assets_names, max_assets, menu_component_data)
+	JukeboxItem.super.init(self, panel, text, i)
+	self._panel:set_w(self._main_panel:w())
+	self._panel:set_right(self._main_panel:w())
+	self._my_menu_component_data = menu_component_data
+end
+
+function JukeboxItem:post_init()
+end
+
+function JukeboxItem:select(no_sound)
+	JukeboxItem.super.select(self, no_sound)
+	if not self.displayed then
+		if managers.menu:active_menu() then
+			managers.menu:open_node("jukebox")
+		end
+		self.displayed = true
+		managers.music:track_listen_start("stop_all_music")
+	end
+end
+
+function JukeboxItem:deselect()
+	if managers.menu:active_menu() and managers.menu:active_menu().logic:selected_node() then
+		managers.menu:active_menu().logic:selected_node():parameters().block_back = false
+		managers.menu:back(true)
+	end
+	self.displayed = nil
+	managers.music:track_listen_stop()
+	JukeboxItem.super.deselect(self)
 end

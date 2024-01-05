@@ -114,6 +114,77 @@ function GenericUserManager:reset_setting_map()
 	end
 end
 
+function GenericUserManager:reset_controls_setting_map()
+	local settings = {
+		"camera_sensitivity",
+		"camera_zoom_sensitivity",
+		"enable_camera_zoom_sensitivity",
+		"invert_camera_y",
+		"southpaw",
+		"hold_to_steelsight",
+		"hold_to_run",
+		"hold_to_duck",
+		"rumble",
+		"aim_assist",
+		"controller_mod",
+		"controller_mod_type",
+		"invert_camera_x"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
+function GenericUserManager:reset_video_setting_map()
+	local settings = {
+		"subtitle",
+		"hit_indicator",
+		"objective_reminder",
+		"brightness",
+		"effect_quality",
+		"dof_setting",
+		"video_animation_lod",
+		"fps_cap",
+		"use_lightfx",
+		"fov_multiplier",
+		"use_headbob",
+		"max_streaming_chunk",
+		"video_color_grading",
+		"video_anti_alias",
+		"video_streaks",
+		"fov_standard",
+		"fov_zoom",
+		"light_adaption"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
+function GenericUserManager:reset_sound_setting_map()
+	local settings = {
+		"music_volume",
+		"sfx_volume",
+		"voice_volume",
+		"voice_chat",
+		"push_to_talk"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
+function GenericUserManager:reset_network_setting_map()
+	local settings = {
+		"net_packet_throttling",
+		"net_forwarding",
+		"net_use_compression"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
 function GenericUserManager:get_clone_value(value)
 	if type(value) == "table" then
 		return CoreTable.deep_clone(value)

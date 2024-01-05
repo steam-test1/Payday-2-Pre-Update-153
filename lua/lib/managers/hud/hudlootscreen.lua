@@ -440,7 +440,7 @@ function HUDLootScreen:show()
 	end
 	if not self._sound_source then
 		self._sound_source = SoundDevice:create_source("HUDLootScreen")
-		self._sound_source:post_event("music_loot_drop")
+		self._sound_source:post_event(managers.music:jukebox_menu_track("heistfinish"))
 	end
 	local fade_rect = self._foreground_layer_full:rect({
 		layer = 10000,

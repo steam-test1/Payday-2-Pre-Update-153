@@ -467,7 +467,7 @@ end
 
 function CasinoLootDropScreenGui:continue_to_lobby()
 	managers.menu:active_menu().logic:navigate_back(true)
-	managers.music:post_event("menu_music")
+	managers.music:post_event(managers.music:jukebox_menu_track("mainmenu"))
 end
 
 function CasinoLootDropScreenGui:card_chosen()

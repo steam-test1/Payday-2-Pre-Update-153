@@ -765,31 +765,9 @@ function LevelsTweakData:get_localized_level_name_from_level_id(level_id)
 	end
 end
 
-function LevelsTweakData:_random_all(music_id, infamous)
-	local switches = deep_clone(tweak_data.music[music_id].switches)
-	local switches_infamy = tweak_data.music[music_id].switches_infamous
-	if infamous and switches_infamy then
-		for _, data in pairs(switches_infamy) do
-			table.insert(switches, data)
-		end
-	end
-	return switches
-end
-
 function LevelsTweakData:get_music_switches()
 	if not Global.level_data then
 		return nil
-	end
-	local infamous
-	if managers.experience:current_rank() > 0 then
-		infamous = true
-	elseif managers.network and managers.network:game() then
-		for id, member in pairs(managers.network:game():all_members()) do
-			if member:peer() and 0 < member:peer():rank() then
-				infamous = true
-				break
-			end
-		end
 	end
 	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	local music_id = level_data and level_data.music or "default"
@@ -797,7 +775,24 @@ function LevelsTweakData:get_music_switches()
 		return nil
 	end
 	local switches = {}
-	switches = self:_random_all(music_id, infamous)
+	if not Global.music_manager.loadout_selection then
+		switches = managers.music:jukebox_random_all()
+	elseif Global.music_manager.loadout_selection == "global" then
+		switches = deep_clone(managers.music:playlist())
+	elseif Global.music_manager.loadout_selection == "heist" then
+		local track = managers.music:jukebox_heist_specific()
+		if track == "all" then
+			switches = managers.music:jukebox_random_all()
+		elseif track == "playlist" then
+			switches = deep_clone(managers.music:playlist())
+		else
+			table.insert(switches, track)
+		end
+	elseif Global.music_manager.loadout_selection == "server" then
+		table.insert(switches, Global.music_manager.synced_track)
+	else
+		table.insert(switches, Global.music_manager.loadout_selection)
+	end
 	if #switches == 0 then
 		Application:error("[LevelsTweakData:get_music_switches] Failed to find a track. JOB_ID = " .. (Global.job_manager.current_job and Global.job_manager.current_job.job_id or "[Missing]") .. ", SELECTION = " .. Global.music_manager.loadout_selection)
 	end

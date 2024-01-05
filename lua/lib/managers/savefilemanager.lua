@@ -401,7 +401,7 @@ function SavefileManager:_save_cache(slot)
 	}
 	if is_setting_slot then
 		managers.user:save(cache)
-		managers.music:save_savedata(cache)
+		managers.music:save_settings(cache)
 	else
 		managers.player:save(cache)
 		managers.experience:save(cache)
@@ -416,6 +416,7 @@ function SavefileManager:_save_cache(slot)
 		managers.infamy:save(cache)
 		managers.features:save(cache)
 		managers.gage_assignment:save(cache)
+		managers.music:save_profile(cache)
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		cache.user_id = self._USER_ID_OVERRRIDE or Steam:userid()
@@ -679,7 +680,7 @@ function SavefileManager:_load_cache(slot)
 		end
 		if is_setting_slot then
 			managers.user:load(cache, version)
-			managers.music:load_savedata(cache, version)
+			managers.music:load_settings(cache, version)
 			self:_set_setting_changed(false)
 		else
 			managers.blackmarket:load(cache, version)
@@ -695,6 +696,7 @@ function SavefileManager:_load_cache(slot)
 			managers.infamy:load(cache, version)
 			managers.features:load(cache, version)
 			managers.gage_assignment:load(cache, version)
+			managers.music:load_profile(cache, version)
 		end
 	else
 		Application:error("[SavefileManager] Unable to load savefile from slot \"" .. tostring(slot) .. "\".")

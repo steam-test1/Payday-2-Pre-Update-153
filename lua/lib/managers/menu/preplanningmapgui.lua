@@ -2557,7 +2557,6 @@ function PrePlanningMapGui:set_active_node(node)
 				})
 			end
 			managers.menu_component:play_transition(true)
-			managers.music:post_event("preplanning_music")
 			self:post_event("gus_preplan_01")
 			local location_data = managers.preplanning:current_location_data()
 			local start_location = location_data.start_location
@@ -2632,7 +2631,6 @@ function PrePlanningMapGui:disable()
 		self._panel:hide()
 		self._fullscreen_panel:hide()
 		self._blackborder_workspace:hide()
-		managers.music:post_event("loadout_music")
 		self:post_event("gus_preplan_18")
 	end
 end
@@ -3096,7 +3094,6 @@ function PrePlanningMapGui:close()
 	self:stop_event()
 	self._saferect_root_panel:remove(self._panel)
 	self._fullscreen_root_panel:remove(self._fullscreen_panel)
-	managers.music:post_event("loadout_music")
 	Overlay:gui():destroy_workspace(self._blackborder_workspace)
 	if self._resolution_changed_callback_id then
 		managers.viewport:remove_resolution_changed_func(self._resolution_changed_callback_id)

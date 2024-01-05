@@ -373,3 +373,32 @@ function MenuItemMultiChoice:_layout(node, row_item)
 	end
 	return true
 end
+
+MenuItemMultiChoiceWithIcon = MenuItemMultiChoiceWithIcon or class(MenuItemMultiChoice)
+
+function MenuItemMultiChoiceWithIcon:init(data_node, parameters, ...)
+	MenuItemMultiChoiceWithIcon.super.init(self, data_node, parameters, ...)
+	self._icon_texture = parameters and parameters.icon
+end
+
+function MenuItemMultiChoiceWithIcon:setup_gui(node, row_item, ...)
+	MenuItemMultiChoiceWithIcon.super.setup_gui(self, node, row_item, ...)
+	self._icon = row_item.gui_panel:bitmap({
+		name = "icon",
+		texture = self._icon_texture,
+		layer = 0,
+		y = 6,
+		w = 16,
+		h = 16,
+		blend_mode = node.row_item_blend_mode
+	})
+	self._icon:set_right(row_item.arrow_right:x())
+	self._icon:set_visible(false)
+	self._icon:set_color(not self._enabled and row_item.disabled_color or self:selected_option():parameters().color or node.row_item_hightlight_color)
+	self._icon:set_alpha(self._enabled and 1 or 0.75)
+	return true
+end
+
+function MenuItemMultiChoiceWithIcon:set_icon_visible(state)
+	self._icon:set_visible(state)
+end

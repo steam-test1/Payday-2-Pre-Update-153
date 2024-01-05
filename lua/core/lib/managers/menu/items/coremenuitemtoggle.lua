@@ -118,6 +118,9 @@ end
 local xl_pad = 64
 
 function ItemToggle:reload(row_item, node)
+	if not row_item then
+		return
+	end
 	local safe_rect = managers.gui_data:scaled_size()
 	row_item.gui_text:set_color(row_item.color)
 	row_item.gui_text:set_font_size(node.font_size)

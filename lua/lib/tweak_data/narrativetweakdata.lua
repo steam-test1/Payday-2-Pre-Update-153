@@ -1936,7 +1936,7 @@ function NarrativeTweakData:job_chain(job_id)
 	return self.jobs[job_id].chain or {}
 end
 
-function NarrativeTweakData:create_job_name(job_id)
+function NarrativeTweakData:create_job_name(job_id, skip_professional)
 	local color_ranges
 	local job_tweak = self:job_data(job_id)
 	local text_id = managers.localization:to_upper_text(job_tweak.name_id)
@@ -1951,7 +1951,7 @@ function NarrativeTweakData:create_job_name(job_id)
 			color = tweak_data.screen_colors.dlc_color
 		}
 	end
-	if job_tweak.professional then
+	if not skip_professional and job_tweak.professional then
 		local pro_text = "  " .. managers.localization:to_upper_text("cn_menu_pro_job")
 		local s_len = utf8.len(text_id)
 		text_id = text_id .. pro_text

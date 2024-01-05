@@ -54,13 +54,14 @@ function IngameWaitingForPlayersState:_start()
 	end
 	local variant = managers.groupai:state():blackscreen_variant() or 0
 	self:sync_start(variant)
-	managers.network:session():send_to_peers_synched("sync_waiting_for_player_start", variant, "")
+	managers.network:session():send_to_peers_synched("sync_waiting_for_player_start", variant, Global.music_manager.current_track)
 end
 
 function IngameWaitingForPlayersState:sync_start(variant, soundtrack)
 	self._kit_menu.renderer:set_all_items_enabled(false)
 	self._briefing_start_t = nil
 	managers.briefing:stop_event()
+	Global.music_manager.synced_track = soundtrack
 	managers.music:check_music_switch()
 	managers.music:post_event(tweak_data.levels:get_music_event("intro"))
 	local music, start_switch = tweak_data.levels:get_music_event_ext()
@@ -245,7 +246,8 @@ function IngameWaitingForPlayersState:at_enter()
 	if managers.job:interupt_stage() and not tweak_data.levels[managers.job:interupt_stage()].bonus_escape then
 		managers.menu_component:post_event("escape_menu")
 	end
-	managers.music:post_event("loadout_music")
+	managers.music:check_music_switch()
+	managers.music:post_event(managers.music:jukebox_menu_track("loadout"))
 	managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 2)
 	if managers.dyn_resource:is_file_streamer_idle() then
 		managers.network:session():send_to_peers_loaded("set_member_ready", managers.network:session():local_peer():id(), 100, 2, "")
@@ -344,6 +346,7 @@ function IngameWaitingForPlayersState:at_exit()
 	if self._started_from_beginning then
 		managers.music:post_event(tweak_data.levels:get_music_event("intro"))
 	else
+		managers.music:check_music_switch()
 		local music = tweak_data.levels:get_music_event_ext()
 		if music then
 			local music_ext = Global.music_manager.current_event
