@@ -694,6 +694,7 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.heat.value = 6
 	self.masks.heat.dlc = "pd2_clan"
+	self.masks.heat.sort_number = 1
 	self.masks.bear = {}
 	self.masks.bear.unit = "units/payday2/masks/msk_bear/msk_bear"
 	self.masks.bear.name_id = "bm_msk_bear"
@@ -706,6 +707,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.bear.value = 3
 	self.masks.bear.qlvl = 0
 	self.masks.bear.dlcs = {"pd2_clan"}
+	self.masks.bear.sort_number = 3
 	self.masks.clinton = {}
 	self.masks.clinton.unit = "units/pd2_dlc1/masks/msk_clinton/msk_clinton"
 	self.masks.clinton.name_id = "bm_msk_clinton"
@@ -815,6 +817,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.santa_happy.value = 4
 	self.masks.santa_happy.dlc = "pd2_clan"
 	self.masks.santa_happy.global_value = "pd2_clan"
+	self.masks.santa_happy.sort_number = 2
 	self.masks.santa_mad = {}
 	self.masks.santa_mad.unit = "units/pd2_dlc_xmas/masks/msk_santa_mad/msk_santa_mad"
 	self.masks.santa_mad.name_id = "bm_msk_santa_mad"
@@ -1061,6 +1064,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.unicorn.value = 0
 	self.masks.unicorn.dlc = "pd2_clan"
 	self.masks.unicorn.global_value = "pd2_clan"
+	self.masks.unicorn.sort_number = 4
 	self.masks.franklin = {}
 	self.masks.franklin.unit = "units/pd2_dlc_big/masks/msk_franklin/msk_franklin"
 	self.masks.franklin.name_id = "bm_msk_franklin"
@@ -1205,6 +1209,20 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.tiger.value = 0
 	self.masks.tiger.dlc = "hlm_game"
 	self.masks.tiger.texture_bundle_folder = "hl_miami"
+	self.masks.combusto = {}
+	self.masks.combusto.unit = "units/payday2/masks/combusto/msk_combusto"
+	self.masks.combusto.name_id = "bm_msk_combusto"
+	self.masks.combusto.pcs = {}
+	self.masks.combusto.dlc = "pd2_clan"
+	self.masks.combusto.value = 0
+	self.masks.combusto.sort_number = 5
+	self.masks.spackle = {}
+	self.masks.spackle.unit = "units/payday2/masks/spackle/msk_spackle"
+	self.masks.spackle.name_id = "bm_msk_spackle"
+	self.masks.spackle.pcs = {}
+	self.masks.spackle.dlc = "pd2_clan"
+	self.masks.spackle.value = 0
+	self.masks.spackle.sort_number = 5
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

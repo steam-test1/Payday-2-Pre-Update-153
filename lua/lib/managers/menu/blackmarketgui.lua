@@ -7732,6 +7732,8 @@ function BlackMarketGui:choose_mask_buy_callback(data)
 		y_td = sort_td[y.mask_id]
 		x_sn = tweak_data.lootdrop.global_values[x.global_value].sort_number or 0
 		y_sn = tweak_data.lootdrop.global_values[y.global_value].sort_number or 0
+		x_sn = x_sn + (x_td.sort_number or 0)
+		y_sn = y_sn + (y_td.sort_number or 0)
 		x_iso = table.get_key(iso, x.mask_id) or 0
 		y_iso = table.get_key(iso, y.mask_id) or 0
 		if x_sn ~= y_sn then
