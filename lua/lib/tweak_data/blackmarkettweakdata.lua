@@ -1094,6 +1094,13 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.skulloverkillplus.qlvl = 0
 	self.masks.skulloverkillplus.infamous = true
 	self.masks.skulloverkillplus.statistics = true
+	self.masks.samurai = {}
+	self.masks.samurai.unit = "units/payday2/masks/msk_samurai/msk_samurai"
+	self.masks.samurai.name_id = "bm_msk_samurai"
+	self.masks.samurai.pcs = {}
+	self.masks.samurai.value = 0
+	self.masks.samurai.qlvl = 0
+	self.masks.samurai.infamous = true
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

@@ -495,6 +495,7 @@ function ExperienceManager:get_xp_by_params(params)
 	local job_stars = params.job_stars or 0
 	local difficulty_stars = params.difficulty_stars or params.risk_stars or 0
 	local job_and_difficulty_stars = job_stars + difficulty_stars
+	local job_mul = tweak_data:get_raw_value("narrative", "jobs", job_id, "experience_mul", difficulty_stars + 1) or 1
 	local success = params.success
 	local num_winners = params.num_winners or 1
 	local on_last_stage = params.on_last_stage
@@ -530,8 +531,8 @@ function ExperienceManager:get_xp_by_params(params)
 	local extra_bonus_dissect = 0
 	local gage_assignment_dissect = 0
 	if success and on_last_stage then
-		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars)
-		level_limit_dissect = level_limit_dissect + managers.experience:get_job_xp_by_stars(job_stars)
+		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars) * job_mul
+		level_limit_dissect = level_limit_dissect + managers.experience:get_job_xp_by_stars(job_stars) * job_mul
 	end
 	local static_stage_experience = level_id and tweak_data.levels[level_id].static_experience
 	static_stage_experience = static_stage_experience and static_stage_experience[difficulty_stars + 1]

@@ -692,6 +692,9 @@ function MenuComponentManager:back_pressed()
 end
 
 function MenuComponentManager:special_btn_pressed(...)
+	if self._game_chat_gui and self._game_chat_gui:input_focus() == true then
+		return true
+	end
 	if self._game_chat_gui and self._game_chat_gui:special_btn_pressed(...) then
 		return true
 	end

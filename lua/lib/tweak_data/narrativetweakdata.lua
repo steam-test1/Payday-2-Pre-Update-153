@@ -1428,6 +1428,13 @@ function NarrativeTweakData:init()
 	self.jobs.big.package = "packages/job_big"
 	self.jobs.big.contact = "bain"
 	self.jobs.big.region = "street"
+	self.jobs.big.experience_mul = {
+		1,
+		1,
+		1.75,
+		3.6,
+		4.6
+	}
 	self.jobs.big.jc = 40
 	self.jobs.big.chain = {
 		{
@@ -1448,11 +1455,18 @@ function NarrativeTweakData:init()
 		"cn_jewel3"
 	}
 	self.jobs.big.payout = {
-		37000,
-		43000,
-		60000,
-		70000,
-		140000
+		140000,
+		210000,
+		310000,
+		380000,
+		600000
+	}
+	self.jobs.big.contract_cost = {
+		-100000,
+		-200000,
+		-350000,
+		-450000,
+		-1200000
 	}
 	self.jobs.big_prof = deep_clone(self.jobs.big)
 	self.jobs.big_prof.jc = 40
@@ -1671,7 +1685,14 @@ function NarrativeTweakData:init()
 	self.jobs.kosugi.briefing_id = "heist_kosugi_crimenet"
 	self.jobs.kosugi.contact = "bain"
 	self.jobs.kosugi.region = "street"
-	self.jobs.kosugi.jc = 70
+	self.jobs.kosugi.jc = 50
+	self.jobs.kosugi.experience_mul = {
+		0.7,
+		0.8,
+		1,
+		2,
+		2.75
+	}
 	self.jobs.kosugi.chain = {
 		{
 			level_id = "kosugi",
@@ -1915,6 +1936,7 @@ function NarrativeTweakData:init()
 		"roberts",
 		"election_day_prof",
 		"election_day",
+		"kosugi",
 		"arm_fac",
 		"arm_par",
 		"arm_hcm",

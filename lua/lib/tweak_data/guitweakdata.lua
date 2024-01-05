@@ -113,6 +113,14 @@ function GuiTweakData:init()
 		store = 259380,
 		image = "guis/textures/pd2/content_updates/gage_pack_snp"
 	}
+	local kosugi = {
+		id = "kosugi",
+		name_id = "menu_content_kosugi",
+		desc_id = "menu_content_kosugi_desc",
+		date_id = "menu_content_kosugi_date",
+		store = 267382,
+		image = "guis/textures/pd2/content_updates/kosugi"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -133,7 +141,8 @@ function GuiTweakData:init()
 			deathwish,
 			election_day,
 			gage_pack_jobs,
-			gage_pack_snp
+			gage_pack_snp,
+			kosugi
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

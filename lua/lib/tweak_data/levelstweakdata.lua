@@ -680,6 +680,7 @@ function LevelsTweakData:init()
 	self.big.music = "heist"
 	self.big.package = "packages/narr_big"
 	self.big.cube = "cube_apply_heist_bank"
+	self.big.ghost_bonus = 0.3
 	self.roberts = {}
 	self.roberts.name_id = "heist_roberts_hl"
 	self.roberts.briefing_id = "heist_roberts_briefing"

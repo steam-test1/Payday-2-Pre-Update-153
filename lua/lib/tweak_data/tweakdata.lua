@@ -1899,7 +1899,7 @@ function TweakData:init()
 	self.interaction.steal_methbag.timer = 3
 	self.interaction.pickup_keycard = {}
 	self.interaction.pickup_keycard.text_id = "hud_int_pickup_keycard"
-	self.interaction.pickup_keycard.sound_event = "ammo_bag_drop"
+	self.interaction.pickup_keycard.sound_done = "pick_up_key_card"
 	self.interaction.open_from_inside = {}
 	self.interaction.open_from_inside.text_id = "hud_int_invisible_interaction_open"
 	self.interaction.open_from_inside.start_active = true
@@ -2003,6 +2003,7 @@ function TweakData:init()
 	self.interaction.gen_pku_crowbar = {}
 	self.interaction.gen_pku_crowbar.text_id = "hud_int_take_crowbar"
 	self.interaction.gen_pku_crowbar.special_equipment_block = "crowbar"
+	self.interaction.gen_pku_crowbar.sound_done = "pick_up_crowbar"
 	self.interaction.gen_pku_thermite = {}
 	self.interaction.gen_pku_thermite.text_id = "hud_int_take_thermite"
 	self.interaction.gen_pku_thermite.special_equipment_block = "thermite"
@@ -2010,6 +2011,7 @@ function TweakData:init()
 	self.interaction.gen_pku_thermite_paste.text_id = "hud_int_take_thermite_paste"
 	self.interaction.gen_pku_thermite_paste.special_equipment_block = "thermite_paste"
 	self.interaction.gen_pku_thermite_paste.contour = "deployable"
+	self.interaction.gen_pku_thermite_paste.sound_done = "pick_up_thermite"
 	self.interaction.button_infopad = {}
 	self.interaction.button_infopad.text_id = "hud_int_press_for_info"
 	self.interaction.button_infopad.start_active = false
@@ -2238,6 +2240,17 @@ function TweakData:init()
 	self.interaction.samurai_armor.sound_start = "bar_bag_armor"
 	self.interaction.samurai_armor.sound_interupt = "bar_bag_armor_cancel"
 	self.interaction.samurai_armor.sound_done = "bar_bag_armor_finished"
+	self.interaction.fingerprint_scanner = {}
+	self.interaction.fingerprint_scanner.text_id = "hud_int_use_scanner"
+	self.interaction.fingerprint_scanner.start_active = false
+	self.interaction.enter_code = {}
+	self.interaction.enter_code.text_id = "hud_int_enter_code"
+	self.interaction.enter_code.action_text_id = "hud_action_enter_code"
+	self.interaction.enter_code.timer = 1
+	self.interaction.enter_code.start_active = false
+	self.interaction.enter_code.sound_start = "bar_keyboard"
+	self.interaction.enter_code.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.enter_code.sound_done = "bar_keyboard_finished"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1

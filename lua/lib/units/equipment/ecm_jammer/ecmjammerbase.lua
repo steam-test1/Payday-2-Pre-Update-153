@@ -384,7 +384,7 @@ function ECMJammerBase._detect_and_give_dmg(hit_pos, device_unit, user_unit, ran
 				local attack_data = {
 					variant = "stun",
 					damage = 0,
-					attacker_unit = user_unit,
+					attacker_unit = alive(user_unit) and user_unit or nil,
 					weapon_unit = device_unit,
 					col_ray = {
 						position = mvector3.copy(head_pos),
