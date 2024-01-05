@@ -133,7 +133,7 @@ function SawWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, sh
 	end
 	if col_ray then
 		managers.statistics:shot_fired({
-			hit = result.hit_enemy,
+			hit = true,
 			weapon_unit = self._unit
 		})
 	end

@@ -909,7 +909,7 @@ end
 
 function GroupAIStateBase:on_tase_start(cop_key, criminal_key)
 	self._criminals[criminal_key].being_tased = cop_key
-	if self._criminals[criminal_key].unit:key() == managers.player:player_unit():key() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.its_alive_its_alive.mask then
+	if managers.player:player_unit() and alive(self._criminals[criminal_key].unit) and self._criminals[criminal_key].unit:key() == managers.player:player_unit():key() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.its_alive_its_alive.mask then
 		managers.achievment:award_progress(tweak_data.achievement.its_alive_its_alive.stat)
 	end
 end
