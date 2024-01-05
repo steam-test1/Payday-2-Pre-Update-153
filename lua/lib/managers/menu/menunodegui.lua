@@ -337,7 +337,9 @@ function MenuNodeGui:_create_menu_item(row_item)
 		row_item.item:parameters().back = false
 		row_item.item:parameters().pd2_corner = true
 	end
-	if row_item.item:parameters().back then
+	if row_item.item:parameters().gui_node_custom then
+		self:gui_node_custom(row_item)
+	elseif row_item.item:parameters().back then
 		row_item.gui_panel = self._item_panel_parent:panel({
 			layer = self.layers.items,
 			w = 30,
@@ -1520,7 +1522,7 @@ function MenuNodeMainGui:_setup_item_rows(node)
 	end
 	self._version_string = self.ws:panel():text({
 		name = "version_string",
-		text = tostring(Global.version),
+		text = Application:version(),
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		align = SystemInfo:platform() == Idstring("WIN32") and "right" or "left",

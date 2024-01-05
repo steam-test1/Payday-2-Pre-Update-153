@@ -8,6 +8,7 @@ end
 function PlayerFatal:enter(state_data, enter_data)
 	PlayerFatal.super.enter(self, state_data, enter_data)
 	self:_interupt_action_steelsight()
+	self:_interupt_action_ladder(managers.player:player_timer():time())
 	self:_start_action_dead(managers.player:player_timer():time())
 	self:_start_action_unequip_weapon(managers.player:player_timer():time(), {selection_wanted = 1})
 	self._unit:base():set_slot(self._unit, 4)
@@ -90,7 +91,7 @@ function PlayerFatal:_start_action_dead(t)
 	self:_stance_entered()
 	self:_update_crosshair_offset()
 	self._unit:kill_mover()
-	self._unit:activate_mover(Idstring("duck"))
+	self:_activate_mover(Idstring("duck"))
 end
 
 function PlayerFatal:_end_action_dead(t)
@@ -101,7 +102,7 @@ function PlayerFatal:_end_action_dead(t)
 	self:_stance_entered()
 	self:_update_crosshair_offset()
 	self._unit:kill_mover()
-	self._unit:activate_mover(Idstring("stand"))
+	self:_activate_mover(Idstring("stand"))
 end
 
 function PlayerFatal:pre_destroy(unit)

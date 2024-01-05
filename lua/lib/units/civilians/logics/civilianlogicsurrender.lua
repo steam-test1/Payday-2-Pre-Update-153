@@ -327,7 +327,7 @@ end
 
 function CivilianLogicSurrender.on_alert(data, alert_data)
 	local alert_type = alert_data[1]
-	if alert_type ~= "aggression" and alert_type ~= "bullet" then
+	if alert_type ~= "aggression" and alert_type ~= "bullet" and alert_type ~= "explosion" then
 		return
 	end
 	local anim_data = data.unit:anim_data()

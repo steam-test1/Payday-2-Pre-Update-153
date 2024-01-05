@@ -271,6 +271,42 @@ function HudIconsTweakData:init()
 			48
 		}
 	}
+	self.firemode_single = {
+		texture = "guis/textures/pd2/hud_fireselector",
+		texture_rect = {
+			2,
+			0,
+			8,
+			18
+		}
+	}
+	self.firemode_auto = {
+		texture = "guis/textures/pd2/hud_fireselector",
+		texture_rect = {
+			12,
+			0,
+			8,
+			18
+		}
+	}
+	self.firemode_single_locked = {
+		texture = "guis/textures/pd2/hud_fireselector",
+		texture_rect = {
+			22,
+			0,
+			8,
+			18
+		}
+	}
+	self.firemode_auto_locked = {
+		texture = "guis/textures/pd2/hud_fireselector",
+		texture_rect = {
+			32,
+			0,
+			8,
+			18
+		}
+	}
 	self.loading = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {
@@ -393,15 +429,6 @@ function HudIconsTweakData:init()
 		texture_rect = {
 			464,
 			288,
-			48,
-			48
-		}
-	}
-	self.equipment_toolset = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			48,
-			48,
 			48,
 			48
 		}
@@ -997,46 +1024,10 @@ function HudIconsTweakData:init()
 			48
 		}
 	}
-	self.equipment_extra_cable_ties = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			0,
-			144,
-			48,
-			48
-		}
-	}
-	self.equipment_extra_start_out_ammo = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			48,
-			144,
-			48,
-			48
-		}
-	}
 	self.equipment_bleed_out = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {
 			96,
-			144,
-			48,
-			48
-		}
-	}
-	self.equipment_armor = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			144,
-			144,
-			48,
-			48
-		}
-	}
-	self.equipment_thick_skin = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			144,
 			144,
 			48,
 			48

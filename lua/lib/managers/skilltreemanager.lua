@@ -36,19 +36,20 @@ function SkillTreeManager:_create_tree_data(tree_id)
 end
 
 function SkillTreeManager:get_skill_points(skill, index)
-	local points = tweak_data.skilltree.skills[skill][index] and tweak_data.skilltree.skills[skill][index].cost and Application:digest_value(tweak_data.skilltree.skills[skill][index].cost, false)
-	if points then
+	local points = tweak_data.skilltree.skills[skill][index] and tweak_data.skilltree.skills[skill][index].cost and Application:digest_value(tweak_data.skilltree.skills[skill][index].cost, false) or 0
+	local total_points = points
+	if 0 < points then
 		for _, tree in ipairs(tweak_data.skilltree.trees) do
 			if tree.skill == skill then
 				local unlocked = self:trees_unlocked()
-				if unlocked < #tweak_data.skilltree.tree_multiplier then
-					points = points * Application:digest_value(tweak_data.skilltree.tree_multiplier[unlocked + 1], false)
+				if unlocked < #tweak_data.skilltree.unlock_tree_cost then
+					total_points = points + Application:digest_value(tweak_data.skilltree.unlock_tree_cost[unlocked + 1], false)
 				end
 				break
 			end
 		end
 	end
-	return points
+	return total_points, points
 end
 
 function SkillTreeManager:unlock_tree(tree)
@@ -58,25 +59,25 @@ function SkillTreeManager:unlock_tree(tree)
 	end
 	local skill_id = tweak_data.skilltree.trees[tree].skill
 	local to_unlock = managers.skilltree:next_skill_step(skill_id)
-	local points = managers.skilltree:get_skill_points(skill_id, to_unlock) or 0
+	local total_points, points = managers.skilltree:get_skill_points(skill_id, to_unlock)
 	local skill = tweak_data.skilltree.skills[skill_id][to_unlock]
 	if not skill or not skill.cost then
 		print("[SkillTreeManager:unlock_tree] skill tree: \"" .. tostring(skill_id) .. "\" is missing cost!")
 	end
-	if points > self:points() then
+	if total_points > self:points() then
 		return
 	end
 	self._global.trees[tree].unlocked = true
-	self:_spend_points(tree, nil, points)
+	self:_spend_points(tree, nil, total_points, points)
 end
 
-function SkillTreeManager:_spend_points(tree, tier, points)
+function SkillTreeManager:_spend_points(tree, tier, points, points_tier)
 	local pre_unlocked_tier = self:current_max_tier(tree)
 	managers.money:on_skillpoint_spent(tree, tier, points)
 	self:_set_points(self:points() - points)
-	self:_set_points_spent(tree, self:points_spent(tree) + points)
+	self:_set_points_spent(tree, self:points_spent(tree) + points_tier)
 	local post_unlocked_tier = self:current_max_tier(tree)
-	if pre_unlocked_tier < post_unlocked_tier then
+	if not tier or pre_unlocked_tier < post_unlocked_tier then
 		self:_on_tier_unlocked(tree, post_unlocked_tier)
 	end
 	self:_on_points_spent(tree, points)
@@ -98,9 +99,22 @@ function SkillTreeManager:_set_points_spent(tree, value)
 	self._global.trees[tree].points_spent = Application:digest_value(value, true)
 end
 
+function SkillTreeManager:tier_cost(tree, tier)
+	local points = Application:digest_value(tweak_data.skilltree.tier_unlocks[tier], false)
+	if managers.experience:current_rank() > 0 then
+		local tree_name = tweak_data.skilltree.trees[tree].skill
+		for infamy, item in pairs(tweak_data.infamy.items) do
+			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.skilltree and item.upgrades.skilltree.tree == tree_name then
+				points = math.round(points * item.upgrades.skilltree.multiplier or 1)
+			end
+		end
+	end
+	return points
+end
+
 function SkillTreeManager:current_max_tier(tree)
 	for tier, point in ipairs(tweak_data.skilltree.tier_unlocks) do
-		if self:points_spent(tree) < Application:digest_value(point, false) then
+		if self:points_spent(tree) < self:tier_cost(tree, tier) then
 			return tier - 1
 		end
 	end
@@ -160,8 +174,8 @@ function SkillTreeManager:unlock(tree, skill_id)
 	end
 	local to_unlock = managers.skilltree:next_skill_step(skill_id)
 	local skill = talent[to_unlock]
-	local points = managers.skilltree:get_skill_points(skill_id, to_unlock)
-	if points > self:points() then
+	local total_points, points = managers.skilltree:get_skill_points(skill_id, to_unlock)
+	if total_points > self:points() then
 		return
 	end
 	self._global.skills[skill_id].unlocked = to_unlock
@@ -172,7 +186,7 @@ function SkillTreeManager:unlock(tree, skill_id)
 			break
 		end
 	end
-	self:_spend_points(tree, tier, points)
+	self:_spend_points(tree, tier, total_points, points)
 	self:_aquire_skill(skill, skill_id)
 	self:_on_skill_unlocked(tree, skill_id)
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -228,7 +242,10 @@ function SkillTreeManager:_aquire_points(points)
 end
 
 function SkillTreeManager:tier_unlocked(tree, tier)
-	local required_points = Application:digest_value(tweak_data.skilltree.tier_unlocks[tier], false)
+	if not self:tree_unlocked(tree) then
+		return false
+	end
+	local required_points = managers.skilltree:tier_cost(tree, tier)
 	return required_points <= self:points_spent(tree)
 end
 
@@ -276,10 +293,32 @@ function SkillTreeManager:_unaquire_skill(skill_id)
 end
 
 function SkillTreeManager:on_respec_tree(tree, forced_respec_multiplier)
+	if SkillTreeManager.VERSION < 5 then
+		self:_respec_tree_version4(tree, forced_respec_multiplier)
+	else
+		self:_respec_tree_version5(tree, forced_respec_multiplier)
+	end
+end
+
+function SkillTreeManager:_respec_tree_version5(tree, forced_respec_multiplier)
 	local points_spent = self:points_spent(tree)
+	local unlocked = self:trees_unlocked()
+	if 0 < unlocked then
+		points_spent = points_spent + Application:digest_value(tweak_data.skilltree.unlock_tree_cost[unlocked], false)
+	end
+	self:_reset_skilltree(tree, forced_respec_multiplier)
+	self:_aquire_points(points_spent)
+end
+
+function SkillTreeManager:_respec_tree_version4(tree, forced_respec_multiplier)
+	local points_spent = self:points_spent(tree)
+	self:_reset_skilltree(tree, forced_respec_multiplier)
+	self:_aquire_points(points_spent)
+end
+
+function SkillTreeManager:_reset_skilltree(tree, forced_respec_multiplier)
 	self:_set_points_spent(tree, 0)
 	self._global.trees[tree].unlocked = false
-	print("points_spent", points_spent, "give back")
 	managers.money:on_respec_skilltree(tree, forced_respec_multiplier)
 	local tree_data = tweak_data.skilltree.trees[tree]
 	for i = #tree_data.tiers, 1, -1 do
@@ -289,7 +328,6 @@ function SkillTreeManager:on_respec_tree(tree, forced_respec_multiplier)
 		end
 	end
 	self:_unaquire_skill(tree_data.skill)
-	self:_aquire_points(points_spent)
 end
 
 function SkillTreeManager:analyze()
@@ -307,8 +345,14 @@ function SkillTreeManager:get_times_respeced()
 end
 
 function SkillTreeManager:reset_skilltrees()
-	for tree_id, tree_data in pairs(self._global.trees) do
-		self:on_respec_tree(tree_id, 1)
+	if self._global.VERSION < 5 then
+		for tree_id, tree_data in pairs(self._global.trees) do
+			self:_respec_tree_version4(tree_id, 1)
+		end
+	else
+		for tree_id, tree_data in pairs(self._global.trees) do
+			self:_respec_tree_version5(tree_id, 1)
+		end
 	end
 	self._global.VERSION = SkillTreeManager.VERSION
 	self._global.reset_message = true

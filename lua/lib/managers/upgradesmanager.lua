@@ -144,6 +144,24 @@ function UpgradesManager:aquire_default(id)
 	self:_aquire_upgrade(upgrade, id)
 end
 
+function UpgradesManager:enable_weapon(id)
+	if not tweak_data.upgrades.definitions[id] then
+		Application:error("Tried to aquire an upgrade that doesn't exist: " .. (id or "nil") .. "")
+		return
+	end
+	if self._global.aquired[id] then
+		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id .. "")
+		return
+	end
+	local upgrade = tweak_data.upgrades.definitions[id]
+	if upgrade.dlc and (tweak_data.dlc[upgrade.dlc] and tweak_data.dlc[upgrade.dlc].free or not managers.dlc:has_dlc(upgrade.dlc)) then
+		Application:error("Tried to aquire an upgrade locked to a dlc you do not have: " .. id .. " DLC: ", upgrade.dlc)
+		return
+	end
+	self._global.aquired[id] = true
+	managers.player:aquire_weapon(upgrade, id)
+end
+
 function UpgradesManager:aquire(id, loading)
 	if not tweak_data.upgrades.definitions[id] then
 		Application:error("Tried to aquire an upgrade that doesn't exist: " .. (id or "nil") .. "")

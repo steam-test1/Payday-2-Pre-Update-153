@@ -2444,7 +2444,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 				self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
 			end
-			return false, "arrow"
+			return false, "link"
 		elseif self._back_highlighted then
 			self._back_highlighted = false
 			self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -2455,7 +2455,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 				self._panel:child("legends_button"):set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
 			end
-			return false, "arrow"
+			return false, "link"
 		elseif self._legend_highlighted then
 			self._legend_highlighted = false
 			self._panel:child("legends_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -2467,7 +2467,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 					self._panel:child("filter_button"):set_color(tweak_data.screen_colors.button_stage_2)
 					managers.menu_component:post_event("highlight")
 				end
-				return false, "arrow"
+				return false, "link"
 			elseif self._filter_highlighted then
 				self._filter_highlighted = false
 				self._panel:child("filter_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -2550,7 +2550,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 		end
 	end
 	if inside_any_job then
-		return false, "arrow"
+		return false, "link"
 	end
 	if self._panel:inside(x, y) then
 		return false, "hand"

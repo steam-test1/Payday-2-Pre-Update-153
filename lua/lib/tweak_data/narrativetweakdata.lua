@@ -1363,12 +1363,12 @@ function NarrativeTweakData:init()
 			type = "d"
 		}
 	}
-	self.jobs.roberts.briefing_event = "pln_fj1_cbf_01"
+	self.jobs.roberts.briefing_event = "Play_pln_cs1_brf"
 	self.jobs.roberts.debrief_event = nil
 	self.jobs.roberts.crimenet_callouts = {
-		"pln_fj1_cnc_01_01",
-		"pln_fj1_cnc_01_02",
-		"pln_fj1_cnc_01_03"
+		"pln_cs1_cnc_01",
+		"pln_cs1_cnc_02",
+		"pln_cs1_cnc_03"
 	}
 	self.jobs.roberts.crimenet_videos = {
 		"cn_jewel1",
@@ -1426,6 +1426,81 @@ function NarrativeTweakData:init()
 		20000,
 		30000,
 		40000
+	}
+	self.jobs.heat = {}
+	self.jobs.heat.name_id = "heist_heat"
+	self.jobs.heat.briefing_id = "heist_heat_crimenet"
+	self.jobs.heat.contact = "bain"
+	self.jobs.heat.region = "street"
+	self.jobs.heat.jc = 10
+	self.jobs.heat.chain = {
+		{
+			level_id = "heat",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.heat.briefing_event = nil
+	self.jobs.heat.debrief_event = nil
+	self.jobs.heat.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.heat.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.haunted_prof = deep_clone(self.jobs.haunted)
+	self.jobs.haunted_prof.jc = 40
+	self.jobs.haunted_prof.professional = true
+	self.jobs.haunted_prof.region = "professional"
+	self.jobs.haunted_prof.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.branchbank_cloaker = {}
+	self.jobs.branchbank_cloaker.name_id = "heist_cloak"
+	self.jobs.branchbank_cloaker.briefing_id = "heist_cloak_crimenet"
+	self.jobs.branchbank_cloaker.contact = "bain"
+	self.jobs.branchbank_cloaker.region = "street"
+	self.jobs.branchbank_cloaker.jc = 30
+	self.jobs.branchbank_cloaker.chain = {
+		{
+			level_id = "branchbank_cloaker",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission = "standalone",
+			mission_filter = {2},
+			briefing_dialog = "Play_pln_branchbank_cash_stage1_brief",
+			briefing_id = "heist_branchbank_cash_briefing"
+		}
+	}
+	self.jobs.branchbank_cloaker.briefing_event = "pln_branchbank_cash_brf_speak"
+	self.jobs.branchbank_cloaker.debrief_event = nil
+	self.jobs.branchbank_cloaker.crimenet_callouts = {
+		"pln_branchbank_cash_cnc_01",
+		"pln_branchbank_cash_cnc_02",
+		"pln_branchbank_cash_cnc_03",
+		"pln_branchbank_cash_cnc_04",
+		"pln_branchbank_cash_cnc_05",
+		"pln_branchbank_cash_cnc_06",
+		"pln_branchbank_cash_cnc_07"
+	}
+	self.jobs.branchbank_cloaker.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.branchbank_cloaker.payout = {
+		10000,
+		15000,
+		40000,
+		60000
 	}
 	self.jobs.escape_chain_test = {}
 	self.jobs.escape_chain_test.name_id = "heist_escape_chain_test"

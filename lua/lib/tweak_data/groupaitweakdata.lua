@@ -1149,22 +1149,22 @@ function GroupAITweakData:_set_hard()
 		CS_heavys = {
 			0,
 			0.2,
-			1
+			0.7
 		},
 		CS_shields = {
 			0,
 			0.02,
-			0.35
+			0.2
 		},
 		CS_tazers = {
 			0,
-			0.1,
-			0.25
+			0.05,
+			0.15
 		},
 		CS_tanks = {
 			0,
-			0.02,
-			0.1
+			0.01,
+			0.05
 		}
 	}
 	self.besiege.reenforce.interval = {
@@ -1272,17 +1272,17 @@ function GroupAITweakData:_set_overkill()
 		FBI_heavys = {
 			0.05,
 			0.25,
-			0.25
+			0.5
 		},
 		FBI_shields = {
 			0.1,
 			0.2,
-			0.275
+			0.2
 		},
 		FBI_tanks = {
 			0,
-			0.15,
-			0.3
+			0.1,
+			0.15
 		},
 		CS_tazers = {
 			0.05,
@@ -1395,7 +1395,7 @@ function GroupAITweakData:_set_overkill_145()
 		FBI_heavys = {
 			0.1,
 			0.5,
-			0.25
+			0.75
 		},
 		FBI_shields = {
 			0.1,
@@ -1405,7 +1405,7 @@ function GroupAITweakData:_set_overkill_145()
 		FBI_tanks = {
 			0,
 			0.25,
-			0.35
+			0.3
 		},
 		CS_tazers = {
 			0.1,

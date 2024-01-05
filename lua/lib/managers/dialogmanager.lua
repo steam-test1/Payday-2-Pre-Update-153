@@ -13,7 +13,7 @@ end
 
 function DialogManager:queue_dialog(id, params)
 	if not self._dialog_list[id] then
-		Application:throw_exception("The dialog script tries to queue a dialog with id '" .. tostring(id) .. "' which doesn't seem to exist!")
+		debug_pause("The dialog script tries to queue a dialog with id '" .. tostring(id) .. "' which doesn't seem to exist!")
 		return false
 	end
 	if not self._current_dialog then
@@ -30,6 +30,8 @@ function DialogManager:queue_dialog(id, params)
 				self:_call_done_callback(self._dialog_list[self._next_dialog.id].params and self._dialog_list[self._next_dialog.id].params.done_cbk, "skipped")
 			end
 			self._next_dialog = {id = id, params = params}
+		else
+			self:_call_done_callback(params and params.done_cbk, "skipped")
 		end
 	end
 	return true

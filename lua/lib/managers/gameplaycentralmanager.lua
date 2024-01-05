@@ -274,7 +274,8 @@ function GamePlayCentralManager:update(t, dt)
 			self._heist_timer.next_sync = Application:time() + 9
 			local heist_time = Application:time() - self._heist_timer.start_time
 			for peer_id, peer in pairs(managers.network:session():peers()) do
-				peer:send_queued_sync("sync_heist_time", heist_time + Network:qos(peer:rpc()).ping / 1000)
+				local sync_time = math.min(100000, heist_time + Network:qos(peer:rpc()).ping / 1000)
+				peer:send_queued_sync("sync_heist_time", sync_time)
 			end
 		end
 	end

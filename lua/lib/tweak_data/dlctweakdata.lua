@@ -214,6 +214,92 @@ function DLCTweakData:init(tweak_data)
 		"s552",
 		"ppk"
 	}
+	self.gage_pack = {}
+	self.gage_pack.content = {}
+	self.gage_pack.dlc = "has_gage_pack"
+	self.gage_pack.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_i_singlefire",
+			amount = 5
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_i_autofire",
+			amount = 5
+		},
+		{
+			{
+				type_items = "masks",
+				item_entry = "goat",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "panda",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "pitbull",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "eagle",
+				amount = 1
+			}
+		},
+		{
+			{
+				type_items = "materials",
+				item_entry = "fur",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "galvanized",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "heavymetal",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "oilmetal",
+				amount = 1
+			}
+		},
+		{
+			{
+				type_items = "textures",
+				item_entry = "army",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "commando",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "hunter",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "digitalcamo",
+				amount = 1
+			}
+		}
+	}
+	self.gage_pack.content.upgrades = {
+		"mp7",
+		"scar",
+		"p226"
+	}
 	self.sweettooth = {}
 	self.sweettooth.content = {}
 	self.sweettooth.dlc = "has_sweettooth"

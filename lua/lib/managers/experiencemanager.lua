@@ -224,7 +224,7 @@ function ExperienceManager:current_level()
 end
 
 function ExperienceManager:current_rank()
-	return self._global.rank and Application:digest_value(self._global.rank, false) or 0
+	return 0
 end
 
 function ExperienceManager:_set_current_level(value)
@@ -232,7 +232,10 @@ function ExperienceManager:_set_current_level(value)
 end
 
 function ExperienceManager:set_current_rank(value)
-	self._global.rank = Application:digest_value(value, true)
+end
+
+function ExperienceManager:rank_string(rank)
+	return ""
 end
 
 function ExperienceManager:level_to_stars()

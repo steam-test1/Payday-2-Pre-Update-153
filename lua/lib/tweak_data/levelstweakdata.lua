@@ -319,6 +319,19 @@ function LevelsTweakData:init()
 		"Play_pln_branchbank_cash_stage1_intro_a"
 	}
 	self.branchbank.outro_event = "Play_pln_branchbank_stage1_end"
+	self.branchbank_cloaker = {}
+	self.branchbank_cloaker.name_id = "heist_cloak_hl"
+	self.branchbank_cloaker.briefing_id = "heist_cloak_briefing"
+	self.branchbank_cloaker.briefing_dialog = "Play_pln_branchbank_random_stage1_brief"
+	self.branchbank_cloaker.world_name = "narratives/h_firestarter/stage_3_cloaker"
+	self.branchbank_cloaker.intro_event = {
+		"Play_pln_branchbank_random_a_intro_a",
+		"Play_pln_branchbank_gold_a_intro_a",
+		"Play_pln_branchbank_depositbox_a_intro_a",
+		"Play_pln_branchbank_cash_stage1_intro_a"
+	}
+	self.branchbank_cloaker.outro_event = "Play_pln_branchbank_stage1_end"
+	self.branchbank_cloaker.package = "packages/narr_firestarter3"
 	self.branchbank.music = "heist"
 	self.branchbank.package = "packages/narr_firestarter3"
 	self.branchbank.cube = "cube_apply_heist_bank"
@@ -602,15 +615,16 @@ function LevelsTweakData:init()
 	self.roberts = {}
 	self.roberts.name_id = "heist_roberts_hl"
 	self.roberts.briefing_id = "heist_roberts_briefing"
-	self.roberts.briefing_dialog = "Play_pln_roberts_brief"
-	self.roberts.world_name = "wip/go_bank_go"
-	self.roberts.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.roberts.briefing_dialog = "Play_pln_cs1_brf"
+	self.roberts.world_name = "narratives/bain/roberts"
+	self.roberts.intro_event = "Play_pln_cs1_intro_01"
 	self.roberts.outro_event = {
-		"Play_pln_firestarter_stage3_end_a",
-		"Play_pln_firestarter_stage3_end_b"
+		"pln_cs1_end_01",
+		"pln_cs1_end_02",
+		"pln_cs1_end_03"
 	}
 	self.roberts.music = "heist"
-	self.roberts.package = "packages/level_debug"
+	self.roberts.package = "packages/narr_roberts"
 	self.roberts.cube = "cube_apply_heist_bank"
 	self.haunted = {}
 	self.haunted.name_id = "heist_haunted_hl"
@@ -621,6 +635,15 @@ function LevelsTweakData:init()
 	self.haunted.music = "heist"
 	self.haunted.package = "packages/narr_haunted"
 	self.haunted.cube = "cube_apply_heist_bank"
+	self.heat = {}
+	self.heat.name_id = "heist_heat_hl"
+	self.heat.briefing_id = "heist_heat_briefing"
+	self.heat.world_name = "wip/heat"
+	self.heat.intro_event = "lol"
+	self.heat.outro_event = {"lol", "lolo"}
+	self.heat.music = "heist"
+	self.heat.package = "packages/narr_heat"
+	self.heat.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -633,7 +656,7 @@ function LevelsTweakData:init()
 	self.test02 = {}
 	self.test02.name_id = "heist_test02_hl"
 	self.test02.briefing_id = "heist_test02"
-	self.test02.world_name = "wip/paz"
+	self.test02.world_name = "narratives/armadillo/arm_for"
 	self.test02.intro_event = "nothing"
 	self.test02.outro_event = "nothing"
 	self.test02.music = "heist"
@@ -1153,6 +1176,8 @@ function LevelsTweakData:init()
 		"big",
 		"roberts",
 		"haunted",
+		"branchbank_cloaker",
+		"heat",
 		"test01",
 		"test02",
 		"test03",

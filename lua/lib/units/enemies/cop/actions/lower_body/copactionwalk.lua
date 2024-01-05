@@ -54,6 +54,16 @@ CopActionWalk._walk_anim_velocities = {
 				bwd = 416.77,
 				l = 416.35,
 				r = 411.9
+			},
+			sprint = {
+				fwd = 672,
+				79,
+				bwd = 547,
+				35,
+				l = 488,
+				14,
+				r = 547,
+				9
 			}
 		}
 	},
@@ -122,6 +132,12 @@ CopActionWalk._walk_anim_lengths = {
 				bwd = 18,
 				l = 18,
 				r = 20
+			},
+			sprint = {
+				fwd = 16,
+				bwd = 16,
+				l = 16,
+				r = 19
 			},
 			run_start = {
 				fwd = 29,
@@ -360,7 +376,7 @@ function CopActionWalk:_init()
 		end
 		self._nav_path = nav_path
 	else
-		self._nav_path[1] = mvector3.copy(common_data.pos)
+		self._nav_path[1] = mvec3_cpy(common_data.pos)
 		for i, nav_point in ipairs(self._nav_path) do
 			if not nav_point.x then
 				function nav_point.element.value(element, name)
@@ -882,24 +898,35 @@ function CopActionWalk:update(t)
 				self:_set_updator("_upd_walk_turn_first_frame")
 			end
 		end
+		local pose = 0 < self._stance.values[4] and "wounded" or self._ext_anim.pose or "stand"
 		local real_velocity = self._cur_vel
 		local variant = self._haste
 		if variant == "run" and not self._no_walk then
-			local run_limit = 300
-			if anim_data.run then
-				if real_velocity < 280 and anim_data.move then
-					variant = "walk"
-				else
+			if self._ext_anim.sprint then
+				if 480 < real_velocity and self._ext_anim.pose == "stand" then
+					variant = "sprint"
+				elseif 250 < real_velocity then
 					variant = "run"
+				else
+					variant = "walk"
 				end
-			elseif 300 <= real_velocity then
+			elseif self._ext_anim.run then
+				if 530 < real_velocity and self._walk_anim_velocities[pose][self._stance.name].sprint and self._ext_anim.pose == "stand" then
+					variant = "sprint"
+				elseif 250 < real_velocity then
+					variant = "run"
+				else
+					variant = "walk"
+				end
+			elseif 530 < real_velocity and self._walk_anim_velocities[pose][self._stance.name].sprint and self._ext_anim.pose == "stand" then
+				variant = "sprint"
+			elseif 300 < real_velocity then
 				variant = "run"
 			else
 				variant = "walk"
 			end
 		end
 		self:_adjust_move_anim(wanted_walk_dir, variant)
-		local pose = 0 < self._stance.values[4] and "wounded" or self._ext_anim.pose or "stand"
 		if not (self._walk_anim_velocities[pose] and self._walk_anim_velocities[pose][self._stance.name] and self._walk_anim_velocities[pose][self._stance.name][variant]) or not self._walk_anim_velocities[pose][self._stance.name][variant][wanted_walk_dir] then
 			debug_pause("Boom...", self._common_data.unit, "pose", pose, "stance", self._stance.name, "variant", variant, "wanted_walk_dir", wanted_walk_dir, self._machine:segment_state(Idstring("base")))
 			return
@@ -953,7 +980,6 @@ function CopActionWalk:_upd_start_anim(t)
 			end
 			local delta_pos = self._common_data.unit:get_animation_delta_position()
 			self._cur_vel = math_max(delta_pos:length() / dt, self._start_max_vel)
-			self._start_max_vel = self._cur_vel
 			local new_pos = self._common_data.pos + delta_pos
 			local ray_params = {
 				tracker_from = self._common_data.nav_tracker,
@@ -964,6 +990,12 @@ function CopActionWalk:_upd_start_anim(t)
 			local collision = managers.navigation:raycast(ray_params)
 			if collision then
 				new_pos = ray_params.trace[1]
+				local travel_vec = tmp_vec1
+				mvec3_set(travel_vec, new_pos)
+				mvec3_sub(travel_vec, self._last_pos)
+				mvec3_set_z(travel_vec, 0)
+				self._cur_vel = mvec3_len(travel_vec) / dt
+				self._start_max_vel = self._cur_vel
 			end
 			self._last_pos = new_pos
 			local seg_rel_t_clamp = math.clamp((seg_rel_t - self._start_run_turn.start_seg_rel_t) / 0.77, 0, 1)
@@ -1333,7 +1365,7 @@ function CopActionWalk:_nav_chk_walk(t, dt, vis_state)
 					self._walk_turn = nil
 				end
 			else
-				if vis_state < 3 and self._end_of_curved_path and not self._NO_RUN_STOP and not self._no_walk and self._haste ~= "walk" and not (mvec3_dis(c_path[new_c_index + 1], new_pos) < 120) and not not self._ext_anim.run then
+				if vis_state < 3 and self._end_of_curved_path and self._ext_anim.run and not self._NO_RUN_STOP and not self._no_walk and not (mvec3_dis(c_path[new_c_index + 1], new_pos) < 120) then
 					self._chk_stop_dis = 210
 				end
 				self._walk_turn = nil
@@ -1521,9 +1553,13 @@ function CopActionWalk:_upd_wait(t)
 	if self._ext_anim.move then
 		self:_stop_walk()
 	end
+	if not self._sync and not self._simplified_path[2] and (not self._end_of_curved_path or not self._persistent) then
+		debug_pause_unit(self._unit, "[CopActionWalk:_upd_wait] missing next nav_point. self._end_of_curved_path", self._end_of_curved_path, "self._persistent", self._persistent)
+		table.insert(self._simplified_path, mvec3_cpy(self._simplified_path[1]))
+	end
 	if not self._end_of_curved_path or not self._persistent then
 		self._curve_path_index = 1
-		if self._simplified_path[2] and not self._simplified_path[2].x then
+		if not self._simplified_path[2].x then
 			self._next_is_nav_link = self._simplified_path[2]
 		end
 		self:_chk_start_anim(self._nav_point_pos(self._simplified_path[2]))
@@ -1706,9 +1742,9 @@ function CopActionWalk:stop(pos)
 			self._end_of_path = nil
 			self._walk_turn = nil
 			self._curve_path_index = 1
-			local stop_pos = mvector3.copy(pos)
+			local stop_pos = mvec3_cpy(pos)
 			self._curve_path = {
-				mvector3.copy(self._common_data.pos),
+				mvec3_cpy(self._common_data.pos),
 				stop_pos
 			}
 			table.remove(s_path, 2)
@@ -1807,7 +1843,7 @@ function CopActionWalk:_play_nav_link_anim(t)
 	local nav_link = self._next_is_nav_link
 	local anim = nav_link.element:value("so_action")
 	self._ext_movement:set_rotation(nav_link.element:value("rotation"))
-	self._last_pos = mvector3.copy(nav_link.element:value("position"))
+	self._last_pos = mvec3_cpy(nav_link.element:value("position"))
 	self:_set_new_pos(TimerManager:game():delta_time())
 	self._nav_link = self._next_is_nav_link
 	self._next_is_nav_link = nil

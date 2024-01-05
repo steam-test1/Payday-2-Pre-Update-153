@@ -82,7 +82,8 @@ function CivilianBrain:on_cool_state_changed(state)
 			vo_cbt = true,
 			vo_intimidate = true,
 			vo_distress = true,
-			aggression = true
+			aggression = true,
+			explosion = true
 		}
 	else
 		alert_listen_filter = managers.groupai:state():get_unit_type_filter("criminal")

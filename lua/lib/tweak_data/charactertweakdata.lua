@@ -179,6 +179,7 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.detection = presets.detection.normal
 	self.heavy_swat.HEALTH_INIT = 10
 	self.heavy_swat.headshot_dmg_mul = self.heavy_swat.HEALTH_INIT / 6
+	self.heavy_swat.damage.explosion_damage_mul = 0.7
 	self.heavy_swat.move_speed = presets.move_speed.fast
 	self.heavy_swat.surrender_break_time = {6, 8}
 	self.heavy_swat.suppression = presets.suppression.hard_agg
@@ -233,6 +234,7 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.detection = presets.detection.normal
 	self.fbi_heavy_swat.HEALTH_INIT = 20
 	self.fbi_heavy_swat.headshot_dmg_mul = self.fbi_heavy_swat.HEALTH_INIT / 10
+	self.fbi_heavy_swat.damage.explosion_damage_mul = 0.5
 	self.fbi_heavy_swat.move_speed = presets.move_speed.fast
 	self.fbi_heavy_swat.surrender_break_time = {6, 8}
 	self.fbi_heavy_swat.suppression = presets.suppression.hard_agg
@@ -392,6 +394,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.detection = presets.detection.normal
 	self.tank.HEALTH_INIT = 550
 	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
+	self.tank.damage.explosion_damage_mul = 0.33
 	self.tank.move_speed = presets.move_speed.very_slow
 	self.tank.allowed_stances = {cbt = true}
 	self.tank.allowed_poses = {stand = true}
@@ -431,8 +434,8 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.experience = {}
 	self.spooc.weapon = deep_clone(presets.weapon.good)
 	self.spooc.detection = presets.detection.normal
-	self.spooc.HEALTH_INIT = 32
-	self.spooc.headshot_dmg_mul = self.spooc.HEALTH_INIT / 6
+	self.spooc.HEALTH_INIT = 48
+	self.spooc.headshot_dmg_mul = self.spooc.HEALTH_INIT / 12
 	self.spooc.move_speed = presets.move_speed.lightning
 	self.spooc.SPEED_SPRINT = 1000
 	self.spooc.no_retreat = true
@@ -484,7 +487,8 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.deathguard = false
 	self.shield.no_equip_anim = true
 	self.shield.wall_fwd_offset = 100
-	self.shield.damage.hurt_severity = presets.hurt_severities.no_hurts
+	self.shield.damage.explosion_damage_mul = 0.25
+	self.shield.damage.hurt_severity = presets.hurt_severities.only_explosion_hurts
 	self.shield.damage.shield_knocked = true
 	self.shield.weapon.mp9 = {}
 	self.shield.weapon.mp9.choice_chance = 1
@@ -908,37 +912,85 @@ function CharacterTweakData:_presets(tweak_data)
 	local presets = {}
 	presets.hurt_severities = {}
 	presets.hurt_severities.no_hurts = {
-		health_reference = 1,
-		zones = {
-			{none = 1}
+		bullet = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
+		},
+		explosion = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
 	presets.hurt_severities.only_light_hurt = {
-		health_reference = 1,
-		zones = {
-			{light = 1}
+		bullet = {
+			health_reference = 1,
+			zones = {
+				{light = 1}
+			}
+		},
+		explosion = {
+			health_reference = 1,
+			zones = {
+				{explode = 1}
+			}
+		}
+	}
+	presets.hurt_severities.only_explosion_hurts = {
+		bullet = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
+		},
+		explosion = {
+			health_reference = 1,
+			zones = {
+				{explode = 1}
+			}
 		}
 	}
 	presets.hurt_severities.base = {
-		health_reference = "current",
-		zones = {
-			{
-				health_limit = 0.2,
-				none = 0,
-				light = 0.7,
-				moderate = 0.2,
-				heavy = 0.1
-			},
-			{
-				health_limit = 0.4,
-				light = 0.2,
-				moderate = 0.5,
-				heavy = 0.3
-			},
-			{
-				light = 0.1,
-				moderate = 0.3,
-				heavy = 0.6
+		bullet = {
+			health_reference = "current",
+			zones = {
+				{
+					health_limit = 0.2,
+					none = 0,
+					light = 0.7,
+					moderate = 0.2,
+					heavy = 0.1
+				},
+				{
+					health_limit = 0.4,
+					light = 0.2,
+					moderate = 0.5,
+					heavy = 0.3
+				},
+				{
+					light = 0.1,
+					moderate = 0.3,
+					heavy = 0.6
+				}
+			}
+		},
+		explosion = {
+			health_reference = "current",
+			zones = {
+				{
+					health_limit = 0.2,
+					none = 0.6,
+					heavy = 0.4
+				},
+				{
+					health_limit = 0.5,
+					heavy = 0.6,
+					explode = 0.4
+				},
+				{heavy = 0.2, explode = 0.8}
 			}
 		}
 	}
@@ -970,6 +1022,7 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.base.damage = {}
 	presets.base.damage.hurt_severity = presets.hurt_severities.base
 	presets.base.damage.death_severity = 0.5
+	presets.base.damage.explosion_damage_mul = 1
 	presets.gang_member_damage = {}
 	presets.gang_member_damage.HEALTH_INIT = 75
 	presets.gang_member_damage.REGENERATE_TIME = 2
@@ -979,7 +1032,8 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.gang_member_damage.BLEED_OUT_HEALTH_INIT = tweak_data.player.damage.BLEED_OUT_HEALTH_INIT
 	presets.gang_member_damage.ARRESTED_TIME = tweak_data.player.damage.ARRESTED_TIME
 	presets.gang_member_damage.INCAPACITATED_TIME = tweak_data.player.damage.INCAPACITATED_TIME
-	presets.gang_member_damage.hurt_severity = {
+	presets.gang_member_damage.hurt_severity = presets.hurt_severities.base
+	presets.gang_member_damage.hurt_severity.bullet = {
 		health_reference = "current",
 		zones = {
 			{
@@ -2690,7 +2744,7 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		},
 		ninja = {
-			speed = 2,
+			speed = 3,
 			occasions = {
 				hit = {
 					chance = 0.9,
@@ -2861,14 +2915,14 @@ function CharacterTweakData:_presets(tweak_data)
 				},
 				run = {
 					hos = {
-						fwd = 450,
-						strafe = 300,
-						bwd = 268
+						fwd = 700,
+						strafe = 500,
+						bwd = 468
 					},
 					cbt = {
-						fwd = 312,
-						strafe = 300,
-						bwd = 268
+						fwd = 512,
+						strafe = 500,
+						bwd = 468
 					}
 				}
 			}
@@ -2920,14 +2974,14 @@ function CharacterTweakData:_presets(tweak_data)
 				},
 				run = {
 					hos = {
-						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						fwd = 144,
+						strafe = 120,
+						bwd = 113
 					},
 					cbt = {
-						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						fwd = 144,
+						strafe = 100,
+						bwd = 125
 					}
 				}
 			}
@@ -3071,7 +3125,7 @@ function CharacterTweakData:_presets(tweak_data)
 				},
 				run = {
 					hos = {
-						fwd = 525,
+						fwd = 625,
 						strafe = 315,
 						bwd = 280
 					},
@@ -3130,7 +3184,7 @@ function CharacterTweakData:_presets(tweak_data)
 				},
 				run = {
 					hos = {
-						fwd = 550,
+						fwd = 670,
 						strafe = 340,
 						bwd = 325
 					},

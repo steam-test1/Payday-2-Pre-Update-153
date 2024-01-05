@@ -157,7 +157,6 @@ function StatisticsManager:_setup(reset)
 	self._defaults.experience = {}
 	self._defaults.misc = {}
 	self._defaults.play_time = {minutes = 0}
-	self._defaults.stat_date = {year = 0, month = 0}
 	if not Global.statistics_manager or reset then
 		Global.statistics_manager = deep_clone(self._defaults)
 		self._global = Global.statistics_manager
@@ -358,6 +357,72 @@ function StatisticsManager:aquired_money(amount)
 	self:_increment_misc("cash", amount * 1000)
 end
 
+function StatisticsManager:_get_stat_tables()
+	local level_list = {
+		"safehouse",
+		"jewelry_store",
+		"four_stores",
+		"nightclub",
+		"mallcrasher",
+		"ukrainian_job",
+		"branchbank",
+		"framing_frame_1",
+		"framing_frame_2",
+		"framing_frame_3",
+		"alex_1",
+		"alex_2",
+		"alex_3",
+		"watchdogs_1",
+		"watchdogs_2",
+		"firestarter_1",
+		"firestarter_2",
+		"firestarter_3",
+		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_2",
+		"escape_cafe_day",
+		"escape_park_day",
+		"escape_cafe",
+		"escape_park",
+		"escape_street",
+		"escape_overpass",
+		"escape_garage",
+		"family",
+		"arm_cro",
+		"arm_und",
+		"arm_hcm",
+		"arm_par",
+		"arm_fac",
+		"arm_for"
+	}
+	local job_list = {
+		"jewelry_store",
+		"four_stores",
+		"nightclub",
+		"mallcrasher",
+		"ukrainian_job_prof",
+		"branchbank_deposit",
+		"branchbank_cash",
+		"branchbank_gold_prof",
+		"branchbank_prof",
+		"framing_frame",
+		"framing_frame_prof",
+		"alex",
+		"alex_prof",
+		"watchdogs",
+		"watchdogs_prof",
+		"firestarter",
+		"firestarter_prof",
+		"welcome_to_the_jungle_prof",
+		"family",
+		"arm_fac",
+		"arm_par",
+		"arm_hcm",
+		"arm_und",
+		"arm_cro"
+	}
+	return level_list, job_list
+end
+
 function StatisticsManager:publish_to_steam(session, success)
 	if Application:editor() or not managers.criminals:local_character_name() then
 		return
@@ -368,21 +433,12 @@ function StatisticsManager:publish_to_steam(session, success)
 	if session_time_seconds == 0 or session_time_minutes == 0 or session_time == 0 then
 		return
 	end
-	local year = Application:date("%Y")
-	local month = Application:date("%m")
-	if self._global.stat_date.year ~= year or self._global.stat_date.month ~= month then
-		self._global.stat_date.year = year
-		self._global.stat_date.month = month
+	if managers.network.account:get_stat("payday2") ~= 0 then
 		self:clear_statistics()
 	end
 	local stats = {}
 	self._global.play_time.minutes = math.ceil(self._global.play_time.minutes + session_time_minutes)
 	local current_time = math.floor(self._global.play_time.minutes / 60)
-	stats.player_time = {
-		type = "int",
-		method = "set",
-		value = current_time
-	}
 	local time_found = false
 	local play_times = {
 		1000,
@@ -433,11 +489,6 @@ function StatisticsManager:publish_to_steam(session, success)
 		value = 1
 	}
 	local current_cash = managers.money:offshore()
-	stats.player_cash = {
-		type = "int",
-		method = "set",
-		value = current_cash
-	}
 	local cash_found = false
 	local cash_amount = 1000000000
 	current_cash = current_cash / 1000
@@ -501,6 +552,21 @@ function StatisticsManager:publish_to_steam(session, success)
 		type = "int",
 		value = success and 0 or 1
 	}
+	local level_list, job_list = self:_get_stat_tables()
+	local level_id = managers.job:current_level_id()
+	for _, level in ipairs(level_list) do
+		if level_id == level then
+			stats["level_" .. level_id] = {type = "int", value = 1}
+			break
+		end
+	end
+	local job_id = managers.job:current_job_id()
+	for _, job in ipairs(job_list) do
+		if job_id == job then
+			stats["job_" .. job_id] = {type = "int", value = 1}
+			break
+		end
+	end
 	managers.network.account:publish_statistics(stats)
 end
 
@@ -672,6 +738,11 @@ function StatisticsManager:clear_statistics()
 		method = "set",
 		value = 0
 	}
+	stats.payday2 = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
 	managers.network.account:publish_statistics(stats)
 end
 
@@ -708,6 +779,21 @@ function StatisticsManager:clear_skills_statistics()
 			}
 		end
 	end
+	local level_list, job_list = self:_get_stat_tables()
+	for _, level_id in ipairs(level_list) do
+		stats["level_" .. level_id] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	for _, job_id in ipairs(job_list) do
+		stats["job_" .. job_id] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
 	managers.network.account:publish_statistics(stats)
 end
 
@@ -732,9 +818,9 @@ function StatisticsManager:debug_estimate_steam_players()
 	}
 	for _, play_time in ipairs(play_times) do
 		key = "player_time_" .. play_time .. "h"
-		num_players = num_players + account:get_global_stat(key, days)
+		num_players = num_players + account:get_global_stat(key)
 	end
-	Application:debug(managers.money:add_decimal_marks_to_string(tostring(num_players)) .. " players have summited statistics to Steam.")
+	Application:debug(managers.money:add_decimal_marks_to_string(tostring(num_players)) .. " players have summited statistics to Steam the last 60 days.")
 end
 
 function StatisticsManager:debug_print_stats(global_flag, days)
@@ -742,11 +828,6 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 	local stats = {}
 	local account = managers.network.account
 	days = days or nil
-	table.insert(stats, {
-		name = "player_time",
-		loc = account:get_stat("player_time"),
-		glo = account:get_global_stat("player_time", days)
-	})
 	local play_times = {
 		0,
 		10,
@@ -781,11 +862,6 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 			glo = account:get_global_stat(key, days)
 		})
 	end
-	table.insert(stats, {
-		name = "player_cash",
-		loc = account:get_stat("player_cash"),
-		glo = account:get_global_stat("player_cash", days)
-	})
 	table.insert(stats, {
 		name = "player_cash_0k",
 		loc = account:get_stat("player_cash_0k"),
@@ -898,6 +974,28 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 		name = "heist_failed",
 		loc = account:get_stat("heist_failed"),
 		glo = account:get_global_stat("heist_failed", days)
+	})
+	local level_list, job_list = self:_get_stat_tables()
+	for _, level_id in ipairs(level_list) do
+		key = "level_" .. level_id
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, days)
+		})
+	end
+	for _, job_id in ipairs(job_list) do
+		key = "job_" .. job_id
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, days)
+		})
+	end
+	table.insert(stats, {
+		name = "payday2",
+		loc = account:get_stat("payday2"),
+		glo = account:get_global_stat("payday2", days)
 	})
 	print("----------------------------------")
 	print((global_flag and "GLOBAL" or "LOCAL") .. " STEAM STATISTICS FOR " .. (days == 1 and "TODAY" or not days and "ALLTIME" or "LAST " .. days .. " DAYS\n"))
@@ -1526,8 +1624,7 @@ function StatisticsManager:save(data)
 		shots_by_weapon = self._global.shots_by_weapon,
 		health = self._global.health,
 		misc = self._global.misc,
-		play_time = self._global.play_time,
-		stat_date = self._global.stat_date
+		play_time = self._global.play_time
 	}
 	data.StatisticsManager = state
 end

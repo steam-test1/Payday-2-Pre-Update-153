@@ -92,7 +92,21 @@ CopActionHurt.hurt_anim_variants = {
 			l = {high = 4, low = 2},
 			r = {high = 4, low = 2}
 		}
+	},
+	expl_hurt = {
+		fwd = 8,
+		bwd = 7,
+		l = 7,
+		r = 7
 	}
+}
+ShieldActionHurt = ShieldActionHurt or class(CopActionHurt)
+ShieldActionHurt.hurt_anim_variants = deep_clone(CopActionHurt.hurt_anim_variants)
+ShieldActionHurt.hurt_anim_variants.expl_hurt = {
+	fwd = 2,
+	bwd = 2,
+	l = 2,
+	r = 2
 }
 
 function CopActionHurt:init(action_desc, common_data)
@@ -188,7 +202,7 @@ function CopActionHurt:init(action_desc, common_data)
 			debug_pause("[CopActionHurt:init] death_run redirect failed in", self._machine:segment_state(Idstring("base")))
 			return
 		end
-		local variant = CopActionHurt.running_death_anim_variants[is_female and "female" or "male"] or 1
+		local variant = self.running_death_anim_variants[is_female and "female" or "male"] or 1
 		if 1 < variant then
 			variant = math.random(variant)
 		end
@@ -198,7 +212,7 @@ function CopActionHurt:init(action_desc, common_data)
 	else
 		local variant, height, old_variant, old_info
 		if (action_type == "hurt" or action_type == "heavy_hurt") and self._ext_anim.hurt then
-			for i = 1, CopActionHurt.hurt_anim_variants_highest_num do
+			for i = 1, self.hurt_anim_variants_highest_num do
 				if self._machine:get_parameter(self._machine:segment_state(Idstring("base")), "var" .. i) then
 					old_variant = i
 					break
@@ -250,9 +264,9 @@ function CopActionHurt:init(action_desc, common_data)
 				if action_type == "death" then
 					local death_type = is_civilian and "normal" or action_desc.death_type
 					if is_female then
-						variant = CopActionHurt.death_anim_fe_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
+						variant = self.death_anim_fe_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
 					else
-						variant = CopActionHurt.death_anim_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
+						variant = self.death_anim_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
 					end
 					if 1 < variant then
 						variant = math.random(variant)
@@ -262,7 +276,11 @@ function CopActionHurt:init(action_desc, common_data)
 						variant = old_variant
 					end
 					if not variant then
-						variant = CopActionHurt.hurt_anim_variants[action_type].not_crouching[dir_str][height]
+						if action_type == "expl_hurt" then
+							variant = self.hurt_anim_variants[action_type][dir_str]
+						else
+							variant = self.hurt_anim_variants[action_type].not_crouching[dir_str][height]
+						end
 						if 1 < variant then
 							variant = math.random(variant)
 						end
@@ -285,6 +303,8 @@ function CopActionHurt:init(action_desc, common_data)
 				self._machine:set_parameter(redir_res, "hvy", 1)
 			elseif action_type == "death" and action_desc.death_type == "heavy" and not is_civilian then
 				self._machine:set_parameter(redir_res, "heavy", 1)
+			elseif action_type == "expl_hurt" then
+				self._machine:set_parameter(redir_res, "expl", 1)
 			end
 		end
 	end

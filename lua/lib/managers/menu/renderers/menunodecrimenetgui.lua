@@ -1,3 +1,8 @@
+local make_fine_text = function(text)
+	local x, y, w, h = text:text_rect()
+	text:set_size(w, h)
+	text:set_position(math.round(text:x()), math.round(text:y()))
+end
 MenuNodeCrimenetGui = MenuNodeCrimenetGui or class(MenuNodeGui)
 
 function MenuNodeCrimenetGui:init(node, layer, parameters)
@@ -13,7 +18,7 @@ function MenuNodeCrimenetGui:init(node, layer, parameters)
 end
 
 function MenuNodeCrimenetGui:_setup_item_panel(safe_rect, res)
-	MenuNodeHiddenGui.super._setup_item_panel(self, safe_rect, res)
+	MenuNodeCrimenetGui.super._setup_item_panel(self, safe_rect, res)
 	local width = 900
 	local height = 580
 	if SystemInfo:platform() ~= Idstring("WIN32") then
@@ -713,4 +718,483 @@ end
 
 function MenuNodeCrimenetCasinoGui:set_offshore_text()
 	self._offshore_text:set_text(managers.localization:to_upper_text("menu_offshore_account") .. ": " .. managers.experience:cash_string(managers.money:offshore()))
+end
+
+MenuNodeCrimenetContactInfoGui = MenuNodeCrimenetContactInfoGui or class(MenuNodeGui)
+MenuNodeCrimenetContactInfoGui.WIDTH = 600
+MenuNodeCrimenetContactInfoGui.HEIGHT = 465
+MenuNodeCrimenetContactInfoGui.MENU_WIDTH = 220
+MenuNodeCrimenetContactInfoGui.PADDING = 10
+
+function MenuNodeCrimenetContactInfoGui:init(node, layer, parameters)
+	parameters.font = tweak_data.menu.pd2_small_font
+	parameters.font_size = tweak_data.menu.pd2_small_font_size
+	parameters.align = "left"
+	parameters.row_item_blend_mode = "add"
+	parameters.row_item_color = tweak_data.screen_colors.button_stage_3
+	parameters.row_item_hightlight_color = tweak_data.screen_colors.button_stage_2
+	parameters.marker_alpha = 1
+	parameters.to_upper = true
+	self._codex_text = managers.localization:to_upper_text("menu_contact_info_title")
+	self._current_file = 0
+	self._sound_source = SoundDevice:create_source("MenuNodeCrimenetContactInfoGui")
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(true)
+	end
+	self._file_icons = {}
+	self._file_icons.selected = {
+		0,
+		0,
+		17,
+		23
+	}
+	self._file_icons.unselected = {
+		20,
+		0,
+		17,
+		23
+	}
+	self._file_icons.locked = {
+		40,
+		0,
+		17,
+		23
+	}
+	MenuNodeCrimenetContactInfoGui.super.init(self, node, layer, parameters)
+	managers.menu_component:disable_crimenet()
+	self:_setup_layout()
+	managers.menu:active_menu().input:deactivate_controller_mouse()
+end
+
+function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, override_file)
+	self._files = files
+	local files_menu = self._panel:child("files_menu")
+	local num_files = #files
+	files_menu:clear()
+	if 1 < num_files then
+		files_menu:set_h(26)
+		local size = files_menu:h() - 4
+		for i = 1, num_files do
+			local is_locked = self._files[i] and self:is_file_locked(self._files[i].lock)
+			local texture_rect = is_locked and self._file_icons.locked or self._file_icons.unselected
+			files_menu:bitmap({
+				texture = "guis/textures/pd2/codex_pages",
+				texture_rect = texture_rect,
+				x = (i - 1) * 20,
+				y = 0,
+				w = 17,
+				h = 23
+			})
+		end
+	else
+		files_menu:set_h(0)
+	end
+	local contact_desc_text = self._panel:child("contact_desc_text")
+	contact_desc_text:set_top(files_menu:bottom())
+	local contact_title_text = self._panel:child("contact_title_text")
+	contact_title_text:set_text(self._codex_text .. ": " .. name)
+	make_fine_text(contact_title_text)
+	local contact_desc_title_text = self._panel:child("contact_desc_title_text")
+	contact_desc_title_text:set_text(self._codex_text .. ": " .. name)
+	make_fine_text(contact_desc_title_text)
+	self:set_file(override_file)
+	self._current_contact_info = id
+end
+
+function MenuNodeCrimenetContactInfoGui:set_empty()
+	local video_panel = self._panel:child("video_panel")
+	if alive(video_panel:child("video")) then
+		video_panel:remove(video_panel:child("video"))
+	end
+	local contact_desc_text = self._panel:child("contact_desc_text")
+	contact_desc_text:set_text("")
+end
+
+function MenuNodeCrimenetContactInfoGui:set_file(index)
+	self:set_empty()
+	if self._files[index] and self:is_file_locked(self._files[index].lock) then
+		local i = 1
+		local num_files = self._files and #self._files or 0
+		while self:is_file_locked(self._files[i].lock) do
+			i = i + 1
+			if num_files < i then
+				return
+			end
+		end
+		index = i
+	end
+	self._current_file = index or 1
+	local file = self._files[self._current_file]
+	local desc_id = file.desc_lozalized
+	local video = file.videos and file.videos[math.random(#file.videos)]
+	local post_event = file.post_event
+	local lock = file.lock
+	local contact_desc_text = self._panel:child("contact_desc_text")
+	contact_desc_text:set_text(desc_id)
+	self._sound_source:stop()
+	if post_event then
+		self._sound_source:post_event(post_event)
+	end
+	local video_panel = self._panel:child("video_panel")
+	if video then
+		video_panel:video({
+			name = "video",
+			video = "movies/codex/" .. video,
+			width = video_panel:w(),
+			height = video_panel:h(),
+			blend_mode = "add",
+			loop = true,
+			color = tweak_data.screen_colors.button_stage_2
+		})
+	end
+	local files_menu = self._panel:child("files_menu")
+	for i, file in ipairs(files_menu:children()) do
+		local is_locked = self:is_file_locked(self._files[i].lock)
+		local texture_rect = is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or self._file_icons.unselected
+		file:set_texture_rect(unpack(texture_rect))
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:is_file_locked(lock_callback)
+	if lock_callback then
+		local callback_handler = managers.menu:active_menu() and managers.menu:active_menu().callback_handler
+		if callback_handler then
+			local clbk = callback(callback_handler, callback_handler, lock_callback)
+			if clbk then
+				return clbk()
+			end
+		end
+	end
+	return false
+end
+
+function MenuNodeCrimenetContactInfoGui:change_file(diff)
+	if not self._files or #self._files <= 1 then
+		return
+	end
+	local num_files = #self._files
+	local current_file = self._current_file or 0
+	local new_file = math.clamp(current_file + diff, 1, num_files)
+	local newer_file
+	while self:is_file_locked(self._files[new_file].lock) do
+		newer_file = math.clamp(new_file + diff, 1, num_files)
+		if newer_file == new_file then
+			new_file = current_file
+			break
+		else
+			new_file = newer_file
+		end
+	end
+	if new_file ~= self._current_file then
+		self:set_file(new_file)
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:get_contact_info()
+	return self._current_contact_info or ""
+end
+
+function MenuNodeCrimenetContactInfoGui:mouse_moved(o, x, y)
+	local files_menu = self._panel:child("files_menu")
+	local is_inside = false
+	for i, file in ipairs(files_menu:children()) do
+		local is_locked = self:is_file_locked(self._files[i].lock)
+		local texture_rect = is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or file:inside(x, y) and self._file_icons.selected or self._file_icons.unselected
+		file:set_texture_rect(unpack(texture_rect))
+		if file:inside(x, y) then
+			is_inside = i
+		end
+	end
+	local is_locked = is_inside and self:is_file_locked(self._files[is_inside].lock)
+	return is_inside, self._file_pressed and (self._file_pressed == is_inside and "link" or "arrow") or not (not is_inside or is_locked) and "link" or "arrow"
+end
+
+function MenuNodeCrimenetContactInfoGui:mouse_pressed(button, x, y)
+	local files_menu = self._panel:child("files_menu")
+	for i, file in ipairs(files_menu:children()) do
+		if file:inside(x, y) and not self:is_file_locked(self._files[i].lock) then
+			self._file_pressed = i
+			return
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetContactInfoGui:mouse_released(button, x, y)
+	if self._file_pressed and self._file_pressed ~= self._current_file then
+		local files_menu = self._panel:child("files_menu")
+		local file = files_menu:children()[self._file_pressed]
+		if file and file:inside(x, y) then
+			self:set_file(self._file_pressed)
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetContactInfoGui:previous_page()
+	self:change_file(-1)
+end
+
+function MenuNodeCrimenetContactInfoGui:next_page()
+	self:change_file(1)
+end
+
+function MenuNodeCrimenetContactInfoGui:input_focus()
+	return false
+end
+
+function MenuNodeCrimenetContactInfoGui:_setup_item_panel(safe_rect, res)
+	MenuNodeCrimenetContactInfoGui.super._setup_item_panel(self, safe_rect, res)
+	self:_setup_menu()
+end
+
+function MenuNodeCrimenetContactInfoGui:_setup_menu()
+	if not self._init_finish then
+		return
+	end
+	local safe_rect = managers.gui_data:scaled_size()
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("right")
+	end
+	self:_set_topic_position()
+	self.item_panel:set_w(safe_rect.width * (1 - self._align_line_proportions) + 4)
+	self.item_panel:set_world_position(self._panel:world_position())
+	self.item_panel:move(self.PADDING, self.PADDING)
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("left")
+	end
+	self.item_panel:set_w(self.MENU_WIDTH)
+	self._align_data.panel:set_left(self.item_panel:left())
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+	if self._back_row_item and alive(self._back_row_item.gui_text) then
+		self._back_row_item.gui_text:set_w(self.MENU_WIDTH)
+		self._back_row_item.gui_text:set_world_left(math.round(self._panel:world_left() + self.PADDING * 2))
+		self._back_row_item.gui_text:set_world_bottom(math.round(self._panel:world_bottom() - self.PADDING))
+	end
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.gui_panel) then
+			row_item.gui_panel:set_w(self.MENU_WIDTH)
+		end
+	end
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_world_y(math.round(child:world_y()))
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:_fade_row_item(row_item)
+	MenuNodeCrimenetContactInfoGui.super._fade_row_item(self, row_item)
+	if row_item.icon then
+		row_item.icon:set_left(0)
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:_highlight_row_item(row_item, mouse_over)
+	MenuNodeCrimenetContactInfoGui.super._highlight_row_item(self, row_item, mouse_over)
+	if row_item.icon then
+		row_item.icon:set_left(0)
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:refresh_gui(node)
+	self:update_item_icon_visibility()
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:_setup_layout()
+	local safe_rect = managers.gui_data:scaled_size()
+	local mc_full_ws = managers.menu_component:fullscreen_ws()
+	local ws = self.ws
+	if alive(self._fullscreen_panel) then
+		mc_full_ws:panel():remove(self._fullscreen_panel)
+	end
+	if alive(ws:panel():child("main_panel")) then
+		ws:panel():remove(ws:panel():child("main_panel"))
+	end
+	local panel = ws:panel():panel({name = "main_panel"})
+	self._fullscreen_panel = mc_full_ws:panel():panel({layer = 50})
+	local blur = self._fullscreen_panel:bitmap({
+		texture = "guis/textures/test_blur_df",
+		w = self._fullscreen_panel:w(),
+		h = self._fullscreen_panel:h(),
+		render_template = "VertexColorTexturedBlur3D"
+	})
+	local func = function(o)
+		local start_blur = 0
+		over(0.6, function(p)
+			o:set_alpha(math.lerp(start_blur, 1, p))
+		end)
+	end
+	blur:animate(func)
+	local width = self.WIDTH
+	local height = self.HEIGHT
+	self._panel = panel:panel({
+		h = height,
+		w = width,
+		layer = 51
+	})
+	self._panel:set_center(panel:w() / 2, panel:h() / 2)
+	self._panel:rect({
+		color = Color.black,
+		alpha = 0.6,
+		layer = 0
+	})
+	BoxGuiObject:new(self._panel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	local title_text = panel:text({
+		name = "title_text",
+		text = self._codex_text,
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(title_text)
+	title_text:set_left(self._panel:left())
+	title_text:set_bottom(self._panel:top() - 2)
+	local contact_title_text = self._panel:text({
+		name = "contact_title_text",
+		text = self._codex_text .. ": ",
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 52
+	})
+	make_fine_text(contact_title_text)
+	contact_title_text:set_left(self.MENU_WIDTH + self.PADDING * 3)
+	contact_title_text:set_top(self.PADDING)
+	local video_panel = self._panel:panel({
+		name = "video_panel",
+		layer = 2,
+		w = self.WIDTH - self.MENU_WIDTH - self.PADDING * 5
+	})
+	video_panel:set_h(video_panel:w() / 1.7777778)
+	video_panel:set_top(contact_title_text:bottom() + self.PADDING)
+	video_panel:set_left(contact_title_text:left())
+	local box = BoxGuiObject:new(video_panel, {
+		sides = {
+			2,
+			2,
+			2,
+			2
+		}
+	})
+	box:set_color(Color(0.2, 1, 1, 1))
+	box:set_blend_mode("add")
+	local contact_desc_title_text = self._panel:text({
+		name = "contact_desc_title_text",
+		text = self._codex_text .. ": ",
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 52
+	})
+	make_fine_text(contact_desc_title_text)
+	contact_desc_title_text:set_left(contact_title_text:left())
+	contact_desc_title_text:set_top(video_panel:bottom() + self.PADDING)
+	contact_desc_title_text:hide()
+	local files_menu = self._panel:panel({
+		name = "files_menu",
+		x = contact_desc_title_text:x(),
+		y = contact_desc_title_text:y(),
+		h = 26,
+		w = video_panel:w()
+	})
+	local contact_desc_text = self._panel:text({
+		name = "contact_desc_text",
+		text = "",
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 52,
+		wrap = true,
+		word_wrap = true
+	})
+	make_fine_text(contact_desc_text)
+	contact_desc_text:set_left(files_menu:left())
+	contact_desc_text:set_top(files_menu:bottom())
+	contact_desc_text:set_w(video_panel:w())
+	contact_desc_text:set_h(self._panel:h() - self.PADDING - contact_desc_text:top())
+	self._init_finish = true
+	self:_setup_menu()
+end
+
+function MenuNodeCrimenetContactInfoGui:gui_node_custom(row_item)
+	row_item.gui_panel = self._item_panel_parent:panel({
+		layer = self.layers.items,
+		w = 3,
+		h = 3
+	})
+	row_item.gui_pd2_panel = self.ws:panel():panel({
+		layer = self.layers.items
+	})
+	local row_item_panel = row_item.gui_pd2_panel
+	row_item.gui_text = row_item_panel:text({
+		font_size = tweak_data.menu.pd2_small_font_size,
+		x = 0,
+		y = 0,
+		align = "left",
+		vertical = "bottom",
+		font = tweak_data.menu.pd2_small_font,
+		color = tweak_data.screen_colors.button_stage_3,
+		layer = 0,
+		text = utf8.to_upper(row_item.text),
+		blend_mode = "add",
+		render_template = Idstring("VertexColorTextured")
+	})
+	local _, _, w, h = row_item.gui_text:text_rect()
+	row_item.gui_text:set_size(math.round(w), math.round(h))
+	self._back_row_item = row_item
+end
+
+function MenuNodeCrimenetContactInfoGui:_align_marker(row_item)
+	MenuNodeCrimenetContactInfoGui.super._align_marker(self, row_item)
+	if row_item.item:parameters().pd2_corner then
+		self._marker_data.marker:set_visible(true)
+		self._marker_data.gradient:set_visible(true)
+		self._marker_data.gradient:set_rotation(360)
+		self._marker_data.marker:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.gradient:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.marker:set_w(self.MENU_WIDTH)
+		self._marker_data.gradient:set_w(self._marker_data.marker:w())
+		self._marker_data.marker:set_left(row_item.menu_unselected:x())
+		self._marker_data.marker:set_world_center_y(row_item.gui_text:world_center_y())
+		self._marker_data.marker:set_y(math.round(self._marker_data.marker:y()))
+		return
+	end
+end
+
+function MenuNodeCrimenetContactInfoGui:close()
+	self._fullscreen_panel:parent():remove(self._fullscreen_panel)
+	self._fullscreen_panel = nil
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(false)
+	end
+	self._sound_source:stop()
+	managers.menu:active_menu().input:activate_controller_mouse()
+	MenuNodeCrimenetContactInfoGui.super.close(self)
+	managers.menu_component:enable_crimenet()
 end

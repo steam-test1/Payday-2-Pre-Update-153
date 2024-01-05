@@ -47,6 +47,9 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45/wpn_fps_smg_m45"),
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_ass_s552/wpn_fps_ass_s552"),
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_pis_ppk/wpn_fps_pis_ppk"),
+	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_smg_mp7/wpn_fps_smg_mp7"),
+	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_ass_scar/wpn_fps_ass_scar"),
+	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_pis_p226/wpn_fps_pis_p226"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_b92fs/wpn_fps_pis_beretta_primary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4_secondary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug_secondary"),
@@ -472,11 +475,16 @@ function PlayerInventory:set_mask_visibility(state)
 	self._unit:link(mask_align:name(), mask_unit, mask_unit:orientation_object():name())
 	self._mask_unit = mask_unit
 	self._mask_unit_name = mask_unit:name()
-	local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), mask_align:position(), mask_align:rotation())
-	self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
-	local mask_on_sequence = managers.blackmarket:character_mask_on_sequence_by_character_name(character_name)
-	if mask_on_sequence then
-		self._unit:damage():run_sequence_simple(mask_on_sequence)
+	local mask_id = managers.criminals:character_data_by_name(character_name).mask_id
+	if not mask_id or not tweak_data.blackmarket.masks[mask_id].type then
+		local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), mask_align:position(), mask_align:rotation())
+		self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
+	end
+	if not mask_id or not tweak_data.blackmarket.masks[mask_id].skip_mask_on_sequence then
+		local mask_on_sequence = managers.blackmarket:character_mask_on_sequence_by_character_name(character_name)
+		if mask_on_sequence then
+			self._unit:damage():run_sequence_simple(mask_on_sequence)
+		end
 	end
 end
 

@@ -306,12 +306,13 @@ function ConnectionNetworkHandler:lobby_sync_update_difficulty(difficulty)
 	end
 end
 
-function ConnectionNetworkHandler:lobby_info(peer_id, level, character, mask_set, ass_progress, sha_progress, sup_progress, tech_progress, sender)
-	print("ConnectionNetworkHandler:lobby_info", peer_id, level)
+function ConnectionNetworkHandler:lobby_info(peer_id, level, rank, character, mask_set, ass_progress, sha_progress, sup_progress, tech_progress, sender)
+	print("ConnectionNetworkHandler:lobby_info", peer_id, level, rank)
 	local peer = self._verify_sender(sender)
 	print("  IS THIS AN OK PEER?", peer and peer:id())
 	if peer then
 		peer:set_level(level)
+		peer:set_rank(rank)
 		local progress = {
 			ass_progress,
 			sha_progress,
@@ -326,6 +327,7 @@ function ConnectionNetworkHandler:lobby_info(peer_id, level, character, mask_set
 				name = peer:name(),
 				peer_id = peer_id,
 				level = level,
+				rank = rank,
 				character = character,
 				progress = progress
 			})
@@ -336,6 +338,7 @@ function ConnectionNetworkHandler:lobby_info(peer_id, level, character, mask_set
 				name = peer:name(),
 				peer_id = peer_id,
 				level = level,
+				rank = rank,
 				character = character,
 				progress = progress
 			})

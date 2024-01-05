@@ -1220,6 +1220,10 @@ function Layer:clone_edited_values(unit, source)
 		unit:editable_gui():set_font_size(source:editable_gui():font_size())
 		unit:editable_gui():set_font_color(source:editable_gui():font_color())
 	end
+	if unit:ladder() then
+		unit:ladder():set_width(source:ladder():width())
+		unit:ladder():set_height(source:ladder():height())
+	end
 end
 
 function Layer:_continent_locked(unit)

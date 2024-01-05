@@ -607,11 +607,16 @@ function CopBrain:on_cool_state_changed(state)
 			vo_cbt = true,
 			vo_intimidate = true,
 			vo_distress = true,
-			aggression = true
+			aggression = true,
+			explosion = true
 		}
 	else
 		alert_listen_filter = managers.groupai:state():get_unit_type_filter("criminal")
-		alert_types = {bullet = true, aggression = true}
+		alert_types = {
+			bullet = true,
+			aggression = true,
+			explosion = true
+		}
 		if self._logic_data then
 			self:terminate_all_suspicion()
 		end

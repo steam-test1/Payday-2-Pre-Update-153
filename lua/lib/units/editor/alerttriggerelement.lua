@@ -21,7 +21,8 @@ function AlertTriggerElement:_build_panel(panel, panel_sizer)
 		"vo_intimidate",
 		"vo_distress",
 		"bullet",
-		"aggression"
+		"aggression",
+		"explosion"
 	}
 	self._alert_type_check_boxes = {}
 	for i, o in ipairs(alert_type_table) do

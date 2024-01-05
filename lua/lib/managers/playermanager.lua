@@ -56,6 +56,7 @@ function PlayerManager:init()
 	self._current_sync_state = self._DEFAULT_STATE
 	local ids_player = Idstring("player")
 	self._player_timer = TimerManager:timer(ids_player) or TimerManager:make_timer(ids_player, TimerManager:pausable())
+	self._hostage_close_to_local_t = 0
 	self:_setup()
 end
 
@@ -79,6 +80,7 @@ function PlayerManager:_setup()
 			equipment_slots = {},
 			special_equipment_slots = {}
 		}
+		Global.player_manager.viewed_content_updates = {}
 	end
 	Global.player_manager.default_kit = {
 		weapon_slots = {"glock_17"},
@@ -88,8 +90,8 @@ function PlayerManager:_setup()
 	Global.player_manager.synced_bonuses = {}
 	Global.player_manager.synced_equipment_possession = {}
 	Global.player_manager.synced_deployables = {}
+	Global.player_manager.synced_grenades = {}
 	Global.player_manager.synced_cable_ties = {}
-	Global.player_manager.synced_perks = {}
 	Global.player_manager.synced_ammo_info = {}
 	Global.player_manager.synced_carry = {}
 	Global.player_manager.synced_team_upgrades = {}
@@ -130,6 +132,11 @@ function PlayerManager:update_kit_to_peer(peer)
 end
 
 function PlayerManager:update(t, dt)
+	if not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t then
+		local local_player = self:local_player()
+		self._is_local_close_to_hostage = alive(local_player) and managers.groupai and managers.groupai:state():is_a_hostage_within(local_player:movement():m_pos(), tweak_data.upgrades.hostage_near_player_radius)
+		self._hostage_close_to_local_t = t + tweak_data.upgrades.hostage_near_player_check_t
+	end
 end
 
 function PlayerManager:add_listener(key, events, clbk)
@@ -154,6 +161,13 @@ function PlayerManager:_internal_load()
 	if primary then
 		player:inventory():add_unit_by_factory_name(primary.factory_id, false, false, primary.blueprint)
 	end
+	local peer_id = managers.network:session():local_peer():id()
+	local grenade, amount = managers.blackmarket:equipped_grenade()
+	amount = self:has_grenade(peer_id) and self:get_grenade_amount(peer_id) or amount
+	self:_set_grenade({
+		grenade = grenade,
+		amount = math.min(amount, self:get_max_grenades())
+	})
 	if self._respawn then
 	else
 		self:_add_level_equipment(player)
@@ -179,9 +193,7 @@ function PlayerManager:_internal_load()
 							equipment = upgrade.equipment_id,
 							silent = true
 						})
-					elseif upgrade.slot and upgrade.slot == 2 then
-						managers.hud:set_perk_equipment(HUDManager.PLAYER_PANEL, upgrade)
-						self:update_synced_perks_to_peers(ok_name)
+					elseif not upgrade.slot or upgrade.slot == 2 then
 					end
 				end
 			end
@@ -604,12 +616,34 @@ end
 
 function PlayerManager:get_hostage_bonus_multiplier(category)
 	local hostages = managers.groupai and managers.groupai:state():hostage_count() or 0
+	local minions = self:num_local_minions() or 0
 	local multiplier = 0
+	hostages = hostages + minions
 	multiplier = multiplier + self:team_upgrade_value(category, "hostage_multiplier", 1) - 1
 	multiplier = multiplier + self:team_upgrade_value(category, "passive_hostage_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "hostage_" .. category .. "_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "passive_hostage_" .. category .. "_multiplier", 1) - 1
+	local local_player = self:local_player()
+	if self._is_local_close_to_hostage then
+		multiplier = multiplier * tweak_data.upgrades.hostage_near_player_multiplier
+	end
 	return 1 + multiplier * hostages
+end
+
+function PlayerManager:get_hostage_bonus_addend(category)
+	local hostages = managers.groupai and managers.groupai:state():hostage_count() or 0
+	local minions = self:num_local_minions() or 0
+	local addend = 0
+	hostages = hostages + minions
+	addend = addend + self:team_upgrade_value(category, "hostage_addend", 0)
+	addend = addend + self:team_upgrade_value(category, "passive_hostage_addend", 0)
+	addend = addend + self:upgrade_value("player", "hostage_" .. category .. "_addend", 0)
+	addend = addend + self:upgrade_value("player", "passive_hostage_" .. category .. "_addend", 0)
+	local local_player = self:local_player()
+	if self._is_local_close_to_hostage then
+		addend = addend * tweak_data.upgrades.hostage_near_player_multiplier
+	end
+	return addend * hostages
 end
 
 function PlayerManager:movement_speed_multiplier(speed_state, bonus_multiplier)
@@ -647,6 +681,7 @@ end
 
 function PlayerManager:body_armor_skill_multiplier()
 	local multiplier = 1
+	multiplier = multiplier + self:upgrade_value("player", "tier_armor_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "passive_armor_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "armor_multiplier", 1) - 1
 	multiplier = multiplier + self:get_hostage_bonus_multiplier("armor") - 1
@@ -715,6 +750,13 @@ function PlayerManager:health_skill_multiplier()
 		multiplier = multiplier + self:upgrade_value("player", "minion_master_health_multiplier", 1) - 1
 	end
 	return multiplier
+end
+
+function PlayerManager:health_regen()
+	local health_regen = tweak_data.player.damage.HEALTH_REGEN
+	health_regen = health_regen + self:temporary_upgrade_value("temporary", "wolverine_health_regen", 0)
+	health_regen = health_regen + self:get_hostage_bonus_addend("health_regen")
+	return health_regen
 end
 
 function PlayerManager:max_health()
@@ -943,33 +985,6 @@ end
 
 function PlayerManager:get_synced_cable_ties(peer_id)
 	return self._global.synced_cable_ties[peer_id]
-end
-
-function PlayerManager:update_perks_to_peer(peer)
-	local peer_id = managers.network:session():local_peer():id()
-	if self._global.synced_perks[peer_id] then
-		local perk = self._global.synced_perks[peer_id].perk
-		peer:send_after_load("sync_perk_equipment", peer_id, perk)
-	end
-end
-
-function PlayerManager:update_synced_perks_to_peers(perk)
-	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_perk_equipment", peer_id, perk)
-	self:set_synced_perk(peer_id, perk)
-end
-
-function PlayerManager:set_synced_perk(peer_id, perk)
-	self._global.synced_perks[peer_id] = {perk = perk}
-	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
-	if character_data and character_data.panel_id then
-		local icon = tweak_data.upgrades.definitions[perk].icon
-		managers.hud:set_perk_equipment(character_data.panel_id, {icon = icon})
-	end
-end
-
-function PlayerManager:get_synced_perk(peer_id)
-	return self._global.synced_perks[peer_id]
 end
 
 function PlayerManager:update_ammo_info_to_peer(peer)
@@ -1257,7 +1272,7 @@ function PlayerManager:peer_dropped_out(peer)
 	self._global.synced_equipment_possession[peer_id] = nil
 	self._global.synced_deployables[peer_id] = nil
 	self._global.synced_cable_ties[peer_id] = nil
-	self._global.synced_perks[peer_id] = nil
+	self._global.synced_grenades[peer_id] = nil
 	self._global.synced_ammo_info[peer_id] = nil
 	self._global.synced_carry[peer_id] = nil
 	self._global.synced_team_upgrades[peer_id] = nil
@@ -1380,21 +1395,19 @@ function PlayerManager:from_server_equipment_place_result(selected_index, unit)
 		return
 	end
 	local new_amount = Application:digest_value(equipment.amount, false) - 1
-	repeat
-		equipment.amount = Application:digest_value(new_amount, true)
-		do break end -- pseudo-goto
-		if new_amount == 0 then
-			if equipment.equipment == "trip_mine" and not self:has_equipment("sentry_gun") then
-				self:add_equipment({equipment = "sentry_gun"})
-				self:select_next_item()
-				return
-			elseif equipment.equipment == "sentry_gun" and not self:has_equipment("trip_mine") then
-				self:add_equipment({equipment = "trip_mine"})
-				self:select_next_item()
-				return
-			end
+	equipment.amount = Application:digest_value(new_amount, true)
+	local equipments_available = self._global.equipment or {}
+	if managers.player:has_category_upgrade("player", "carry_sentry_and_trip") and equipments_available.sentry_gun and equipments_available.trip_mine and new_amount == 0 then
+		if equipment.equipment == "trip_mine" and not self:has_equipment("sentry_gun") then
+			self:add_equipment({equipment = "sentry_gun"})
+			self:select_next_item()
+			return
+		elseif equipment.equipment == "sentry_gun" and not self:has_equipment("trip_mine") then
+			self:add_equipment({equipment = "trip_mine"})
+			self:select_next_item()
+			return
 		end
-	until true
+	end
 	managers.hud:set_item_amount(self._equipment.selected_index, new_amount)
 	self:update_deployable_equipment_amount_to_peers(equipment.equipment, new_amount)
 end
@@ -1481,21 +1494,19 @@ end
 function PlayerManager:remove_equipment(equipment_id)
 	local equipment, index = self:equipment_data_by_name(equipment_id)
 	local new_amount = Application:digest_value(equipment.amount, false) - 1
-	repeat
-		equipment.amount = Application:digest_value(new_amount, true)
-		do break end -- pseudo-goto
-		if new_amount == 0 then
-			if equipment.equipment == "trip_mine" and not self:has_equipment("sentry_gun") then
-				self:add_equipment({equipment = "sentry_gun"})
-				self:select_next_item()
-				return
-			elseif equipment.equipment == "sentry_gun" and not self:has_equipment("trip_mine") then
-				self:add_equipment({equipment = "trip_mine"})
-				self:select_next_item()
-				return
-			end
+	equipment.amount = Application:digest_value(new_amount, true)
+	local equipments_available = self._global.equipment or {}
+	if managers.player:has_category_upgrade("player", "carry_sentry_and_trip") and equipments_available.sentry_gun and equipments_available.trip_mine and new_amount == 0 then
+		if equipment.equipment == "trip_mine" and not self:has_equipment("sentry_gun") then
+			self:add_equipment({equipment = "sentry_gun"})
+			self:select_next_item()
+			return
+		elseif equipment.equipment == "sentry_gun" and not self:has_equipment("trip_mine") then
+			self:add_equipment({equipment = "trip_mine"})
+			self:select_next_item()
+			return
 		end
-	until true
+	end
 	managers.hud:set_item_amount(index, new_amount)
 	self:update_deployable_equipment_amount_to_peers(equipment.equipment, new_amount)
 end
@@ -1626,6 +1637,90 @@ function PlayerManager:remove_special(name)
 		if equipment.player_rule then
 			self:set_player_rule(equipment.player_rule, false)
 		end
+	end
+end
+
+function PlayerManager:_set_grenade(params)
+	local grenade = params.grenade
+	local tweak_data = tweak_data.blackmarket.grenades[grenade]
+	local amount = params.amount
+	local icon = tweak_data.icon
+	self:update_grenades_amount_to_peers(grenade, amount)
+	managers.hud:set_teammate_grenades(HUDManager.PLAYER_PANEL, {amount = amount, icon = icon})
+end
+
+function PlayerManager:add_grenade_amount(amount)
+	local peer_id = managers.network:session():local_peer():id()
+	local grenade = self._global.synced_grenades[peer_id].grenade
+	local icon = tweak_data.blackmarket.grenades[grenade].icon
+	amount = math.min(Application:digest_value(self._global.synced_grenades[peer_id].amount, false) + amount, self:get_max_grenades())
+	managers.hud:set_teammate_grenades_amount(HUDManager.PLAYER_PANEL, {icon = icon, amount = amount})
+	self:update_grenades_amount_to_peers(grenade, amount)
+end
+
+function PlayerManager:update_grenades_to_peer(peer)
+	local peer_id = managers.network:session():local_peer():id()
+	if self._global.synced_grenades[peer_id] then
+		local grenade = self._global.synced_grenades[peer_id].grenade
+		local amount = self._global.synced_grenades[peer_id].amount
+		peer:send_after_load("sync_grenades", peer_id, grenade, Application:digest_value(amount, false))
+	end
+end
+
+function PlayerManager:update_grenades_amount_to_peers(grenade, amount)
+	local peer_id = managers.network:session():local_peer():id()
+	managers.network:session():send_to_peers("sync_grenades", peer_id, grenade, amount)
+	self:set_synced_grenades(peer_id, grenade, amount)
+end
+
+function PlayerManager:set_synced_grenades(peer_id, grenade, amount)
+	local only_update_amount = self._global.synced_grenades[peer_id] and self._global.synced_grenades[peer_id].grenade == grenade
+	local digested_amount = Application:digest_value(amount, true)
+	self._global.synced_grenades[peer_id] = {grenade = grenade, amount = digested_amount}
+	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
+	if character_data and character_data.panel_id then
+		local icon = tweak_data.blackmarket.grenades[grenade].icon
+		if only_update_amount then
+			managers.hud:set_teammate_grenades_amount(character_data.panel_id, {icon = icon, amount = amount})
+		else
+			managers.hud:set_teammate_grenades(character_data.panel_id, {icon = icon, amount = amount})
+		end
+	end
+end
+
+function PlayerManager:get_grenade_amount(peer_id)
+	return Application:digest_value(self._global.synced_grenades[peer_id].amount, false)
+end
+
+function PlayerManager:get_synced_grenades(peer_id)
+	return self._global.synced_grenades[peer_id]
+end
+
+function PlayerManager:can_throw_grenade()
+	local peer_id = managers.network:session():local_peer():id()
+	return self:get_grenade_amount(peer_id) > 0
+end
+
+function PlayerManager:get_max_grenades()
+	return tweak_data.upgrades.max_grenade_amount
+end
+
+function PlayerManager:got_max_grenades()
+	local peer_id = managers.network:session():local_peer():id()
+	return self:get_grenade_amount(peer_id) >= self:get_max_grenades()
+end
+
+function PlayerManager:has_grenade(peer_id)
+	peer_id = peer_id or managers.network:session():local_peer():id()
+	local synced_grenade = self:get_synced_grenades(peer_id)
+	return synced_grenade and synced_grenade.grenade and true or false
+end
+
+function PlayerManager:on_throw_grenade()
+	self:add_grenade_amount(-1)
+	local peer_id = managers.network:session():local_peer():id()
+	if tweak_data.achievement.fire_in_the_hole.grenade == self:get_synced_grenades(peer_id).grenade then
+		managers.achievment:award_progress(tweak_data.achievement.fire_in_the_hole.stat)
 	end
 end
 
@@ -1841,7 +1936,8 @@ end
 
 function PlayerManager:save(data)
 	local state = {
-		kit = self._global.kit
+		kit = self._global.kit,
+		viewed_content_updates = self._global.viewed_content_updates
 	}
 	data.PlayerManager = state
 end
@@ -1851,8 +1947,17 @@ function PlayerManager:load(data)
 	local state = data.PlayerManager
 	if state then
 		self._global.kit = state.kit or self._global.kit
+		self._global.viewed_content_updates = state.viewed_content_updates or self._global.viewed_content_updates
 		self:_verify_loaded_data()
 	end
+end
+
+function PlayerManager:set_content_update_viewed(content_update)
+	self._global.viewed_content_updates[content_update] = true
+end
+
+function PlayerManager:get_content_update_viewed(content_update)
+	return self._global.viewed_content_updates[content_update] or false
 end
 
 function PlayerManager:_verify_loaded_data()

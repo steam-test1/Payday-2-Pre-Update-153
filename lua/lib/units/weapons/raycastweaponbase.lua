@@ -145,11 +145,11 @@ function RaycastWeaponBase:dryfire()
 end
 
 function RaycastWeaponBase:recoil_wait()
-	return self:fire_mode() == "auto" and self:weapon_tweak_data().fire_mode_data.fire_rate or nil
+	return tweak_data.weapon[self._name_id].FIRE_MODE == "auto" and self:weapon_tweak_data().fire_mode_data.fire_rate or nil
 end
 
 function RaycastWeaponBase:_fire_sound()
-	self:play_tweak_data_sound("fire")
+	self:play_tweak_data_sound(self:fire_mode() == "auto" and "fire_auto" or "fire_single", "fire")
 end
 
 function RaycastWeaponBase:start_shooting_allowed()
@@ -195,8 +195,17 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 		if self:get_ammo_remaining_in_clip() == 0 then
 			return
 		end
-		self:set_ammo_remaining_in_clip(self:get_ammo_remaining_in_clip() - 1)
-		self:set_ammo_total(self:get_ammo_total() - 1)
+		local ammo_usage = 1
+		if managers.player:has_category_upgrade(self:weapon_tweak_data().category, "consume_no_ammo_chance") then
+			local roll = math.rand(1)
+			local chance = managers.player:upgrade_value(self:weapon_tweak_data().category, "consume_no_ammo_chance", 0)
+			if roll < chance then
+				ammo_usage = 0
+				print("NO AMMO COST")
+			end
+		end
+		self:set_ammo_remaining_in_clip(self:get_ammo_remaining_in_clip() - ammo_usage)
+		self:set_ammo_total(self:get_ammo_total() - ammo_usage)
 	end
 	local user_unit = self._setup.user_unit
 	self:_check_ammo_total(user_unit)
@@ -802,9 +811,11 @@ function RaycastWeaponBase:on_disabled()
 	self._enabled = false
 end
 
-function RaycastWeaponBase:play_tweak_data_sound(event)
-	if tweak_data.weapon[self._name_id].sounds[event] then
-		self:play_sound(tweak_data.weapon[self._name_id].sounds[event])
+function RaycastWeaponBase:play_tweak_data_sound(event, alternative_event)
+	local sounds = tweak_data.weapon[self._name_id].sounds
+	local event = sounds and (sounds[event] or sounds[alternative_event])
+	if event then
+		self:play_sound(event)
 	end
 end
 

@@ -266,13 +266,15 @@ end
 
 function PlayerEquipment:throw_grenade()
 	local from = self._unit:movement():m_head_pos()
-	local pos = from + self._unit:movement():m_head_rot():y() * 35 + Vector3(0, 0, 0)
+	local pos = from + self._unit:movement():m_head_rot():y() * 30 + Vector3(0, 0, 0)
 	local dir = self._unit:movement():m_head_rot():y()
+	self._unit:sound():play("g43", nil, true)
 	if Network:is_client() then
 		managers.network:session():send_to_host("server_throw_grenade", 1, pos, dir)
 	else
-		GrenadeBase.server_throw_grenade(1, pos, dir)
+		GrenadeBase.server_throw_grenade(1, pos, dir, 1)
 	end
+	managers.player:on_throw_grenade()
 end
 
 function PlayerEquipment:use_duck()

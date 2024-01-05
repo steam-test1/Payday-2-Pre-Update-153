@@ -146,51 +146,6 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
-	self.hud_icons.equipment_extra_cable_ties = {
-		texture = "guis/textures/pd2/equipment",
-		texture_rect = {
-			192,
-			64,
-			64,
-			64
-		}
-	}
-	self.hud_icons.equipment_armor = {
-		texture = "guis/textures/pd2/equipment",
-		texture_rect = {
-			128,
-			0,
-			64,
-			64
-		}
-	}
-	self.hud_icons.equipment_thick_skin = {
-		texture = "guis/textures/pd2/equipment",
-		texture_rect = {
-			128,
-			0,
-			64,
-			64
-		}
-	}
-	self.hud_icons.equipment_extra_start_out_ammo = {
-		texture = "guis/textures/pd2/equipment",
-		texture_rect = {
-			128,
-			64,
-			64,
-			64
-		}
-	}
-	self.hud_icons.equipment_toolset = {
-		texture = "guis/textures/pd2/equipment",
-		texture_rect = {
-			192,
-			0,
-			64,
-			64
-		}
-	}
 	self.hud_icons.equipment_chavez_key = {
 		texture = "guis/textures/pd2/mission_equipment",
 		texture_rect = {
@@ -450,6 +405,15 @@ function TweakData:_init_pd2()
 			0,
 			30,
 			30
+		}
+	}
+	self.hud_icons.frag_grenade = {
+		texture = "guis/textures/pd2/equipment",
+		texture_rect = {
+			64,
+			32,
+			32,
+			32
 		}
 	}
 end

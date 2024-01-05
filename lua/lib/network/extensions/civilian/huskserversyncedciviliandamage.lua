@@ -128,7 +128,6 @@ function HuskServerSyncedCivilianDamage:damage_explosion(attack_data)
 			attacker = self._unit
 		end
 		managers.hud:set_mugshot_damage_taken(self._unit:unit_data().mugshot_id)
-		self._unit:network():send_to_host("damage_explosion", attacker, damage_percent, 1)
 	end
 end
 

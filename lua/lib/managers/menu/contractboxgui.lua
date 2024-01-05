@@ -418,7 +418,13 @@ function ContractBoxGui:update_character(peer_id)
 		local peer_pos = managers.menu_scene:character_screen_position(peer_id)
 		x = peer_pos.x
 		y = peer_pos.y
-		text = peer:name() .. " (" .. tostring(peer == local_peer and managers.experience:current_level() or peer:level()) .. ")"
+		text = peer:name()
+		local player_level = peer == local_peer and managers.experience:current_level() or peer:level()
+		if player_level then
+			local player_rank = peer == local_peer and managers.experience:current_rank() or peer:rank()
+			local experience = (0 < player_rank and managers.experience:rank_string(player_rank) .. ":" or "") .. player_level
+			text = text .. " (" .. experience .. ")"
+		end
 	else
 		self:update_character_menu_state(peer_id, nil)
 	end

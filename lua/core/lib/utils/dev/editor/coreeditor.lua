@@ -26,6 +26,7 @@ require("core/lib/utils/dev/editor/ews_classes/EditTriggable")
 require("core/lib/utils/dev/editor/ews_classes/EditSettings")
 require("core/lib/utils/dev/editor/ews_classes/EditVariation")
 require("core/lib/utils/dev/editor/ews_classes/EditEditableGui")
+require("core/lib/utils/dev/editor/ews_classes/EditLadder")
 require("core/lib/utils/dev/editor/ews_classes/Continents")
 require("core/lib/utils/dev/editor/ews_classes/UnhideByName")
 require("core/lib/utils/dev/editor/ews_classes/CreateWorldSettingFile")
@@ -354,6 +355,7 @@ function CoreEditor:_init_edit_unit_dialog()
 	EditUnitVariation:new(self)
 	EditUnitEditableGui:new(self)
 	EditUnitSettings:new(self)
+	EditLadder:new(self)
 end
 
 function CoreEditor:_populate_replace_unit_categories_from_layer_types()
@@ -1926,6 +1928,12 @@ function CoreEditor:set_value_info_visibility(vis)
 	self._gui:child("value"):set_visible(vis)
 end
 
+function CoreEditor:_help_draw_all_units(t, dt)
+	for _, unit in ipairs(Ladder.ladders) do
+		unit:ladder():debug_draw()
+	end
+end
+
 function CoreEditor:draw_occluders(t, dt)
 	local brush = Draw:brush()
 	local cam_pos = self._vp:camera():position()
@@ -2041,6 +2049,7 @@ function CoreEditor:update(time, rel_time)
 			self._resizing_appwin = false
 			self:resize_appwin_done()
 		end
+		self:_help_draw_all_units(time, rel_time)
 		if self._draw_occluders then
 			self:draw_occluders(time, rel_time)
 		end

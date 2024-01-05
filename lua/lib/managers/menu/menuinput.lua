@@ -20,6 +20,12 @@ function MenuInput:init(logic, ...)
 	self._item_input_action_map[MenuItemWeaponExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemWeaponUpgradeExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemDivider.TYPE] = callback(self, self, "input_item")
+	self._callback_map = {}
+	self._callback_map.mouse_moved = {}
+	self._callback_map.mouse_pressed = {}
+	self._callback_map.mouse_released = {}
+	self._callback_map.mouse_clicked = {}
+	self._callback_map.mouse_double_click = {}
 end
 
 function MenuInput:back(...)
@@ -102,6 +108,14 @@ function MenuInput:set_page_timer(time)
 	self._page_timer = time
 end
 
+function MenuInput:force_input()
+	return self._force_input
+end
+
+function MenuInput:set_force_input(enabled)
+	self._force_input = enabled
+end
+
 function MenuInput:accept_input(accept, ...)
 	if managers.menu:active_menu() then
 		managers.menu:active_menu().renderer:accept_input(accept)
@@ -124,6 +138,9 @@ function MenuInput:mouse_moved(o, x, y, mouse_ws)
 	managers.mouse_pointer:set_pointer_image(pointer)
 	if used then
 		return
+	end
+	for i, clbk in pairs(self._callback_map.mouse_moved) do
+		clbk(o, x, y, mouse_ws)
 	end
 	if self._slider_marker then
 		local row_item = self._slider_marker.row_item
@@ -240,6 +257,22 @@ function MenuInput:get_accept_input()
 	return self._accept_input and true or false
 end
 
+function MenuInput:register_callback(input, name, callback)
+	if not self._callback_map[input] then
+		Application:error("MenuInput:register_callback", "Failed to register callback", "input: " .. input, "name: " .. name)
+		return
+	end
+	self._callback_map[input][name] = callback
+end
+
+function MenuInput:unregister_callback(input, name)
+	if not self._callback_map[input] then
+		Application:error("MenuInput:register_callback", "Failed to unregister callback", "input: " .. input, "name: " .. name)
+		return
+	end
+	self._callback_map[input][name] = nil
+end
+
 function MenuInput:mouse_pressed(o, button, x, y)
 	if not self._accept_input then
 		return
@@ -254,6 +287,9 @@ function MenuInput:mouse_pressed(o, button, x, y)
 	x, y = self:_modified_mouse_pos(x, y)
 	if managers.menu:active_menu().renderer:mouse_pressed(o, button, x, y) then
 		return
+	end
+	for i, clbk in pairs(self._callback_map.mouse_pressed) do
+		clbk(o, button, x, y)
 	end
 	if button == Idstring("0") then
 		local node_gui = managers.menu:active_menu().renderer:active_node_gui()
@@ -350,6 +386,9 @@ function MenuInput:mouse_released(o, button, x, y)
 	if managers.menu:active_menu().renderer:mouse_released(o, button, x, y) then
 		return
 	end
+	for i, clbk in pairs(self._callback_map.mouse_released) do
+		clbk(o, button, x, y)
+	end
 	if self._slider_marker then
 		self:post_event("slider_release")
 	end
@@ -358,6 +397,9 @@ end
 
 function MenuInput:mouse_clicked(o, button, x, y)
 	x, y = self:_modified_mouse_pos(x, y)
+	for i, clbk in pairs(self._callback_map.mouse_clicked) do
+		clbk(o, button, x, y)
+	end
 	if not managers.menu:active_menu().renderer.mouse_clicked then
 		return
 	end
@@ -366,6 +408,9 @@ end
 
 function MenuInput:mouse_double_click(o, button, x, y)
 	x, y = self:_modified_mouse_pos(x, y)
+	for i, clbk in pairs(self._callback_map.mouse_double_click) do
+		clbk(o, button, x, y)
+	end
 	if not managers.menu:active_menu().renderer.mouse_double_click then
 		return
 	end
@@ -386,7 +431,7 @@ function MenuInput:update(t, dt)
 	if 0 < self._page_timer then
 		self:set_page_timer(self._page_timer - dt)
 	end
-	if not MenuInput.super.update(self, t, dt) and self._accept_input then
+	if not MenuInput.super.update(self, t, dt) and self._accept_input or self:force_input() then
 		local axis_timer = self:axis_timer()
 		if 0 >= axis_timer.y then
 			if self:menu_up_input_bool() then

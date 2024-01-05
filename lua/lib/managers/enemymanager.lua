@@ -494,6 +494,9 @@ function EnemyManager:queued_tasks_by_callback()
 end
 
 function EnemyManager:register_enemy(enemy)
+	if self._destroyed then
+		debug_pause("[EnemyManager:register_enemy] enemy manager is destroyed")
+	end
 	local char_tweak = tweak_data.character[enemy:base()._tweak_table]
 	local u_data = {
 		unit = enemy,
@@ -509,6 +512,9 @@ function EnemyManager:register_enemy(enemy)
 end
 
 function EnemyManager:on_enemy_died(dead_unit, damage_info)
+	if self._destroyed then
+		debug_pause("[EnemyManager:on_enemy_died] enemy manager is destroyed", dead_unit)
+	end
 	local u_key = dead_unit:key()
 	local enemy_data = self._enemy_data
 	local u_data = enemy_data.unit_data[u_key]
@@ -697,15 +703,25 @@ end
 function EnemyManager:on_simulation_ended()
 end
 
+function EnemyManager:on_simulation_started()
+	self._destroyed = nil
+end
+
 function EnemyManager:dispose_all_corpses()
-	repeat
-		local u_key, corpse_data = next(self._enemy_data.corpses)
-		if u_key then
-			World:delete_unit(corpse_data.unit)
-		else
+	self._destroyed = true
+	while true do
+		do
+			local u_key, corpse_data = next(self._enemy_data.corpses)
+			if u_key then
+				World:delete_unit(corpse_data.unit)
+			else
+				break
+			end
 		end
-		break -- pseudo-goto
-	until true
+	end
+	if next(self._enemy_data.corpses) then
+		debug_pause("[EnemyManager:dispose_all_corpses] there are still corpses in enemy manager\n", inspect(self._enemy_data.corpses))
+	end
 end
 
 function EnemyManager:save(data)
@@ -738,11 +754,18 @@ function EnemyManager:load(data)
 		local civ_corpse_u_name = Idstring("units/payday2/characters/civ_male_dummy_corpse/civ_male_dummy_corpse")
 		local ene_corpse_u_name = Idstring("units/payday2/characters/ene_dummy_corpse/ene_dummy_corpse")
 		for _, corpse_data in pairs(my_data.corpses) do
-			local corpse = World:spawn_unit(corpse_data[2] and civ_corpse_u_name or ene_corpse_u_name, corpse_data[1], Rotation(math.random() * 360, 0, 0))
+			local spawn_pos = corpse_data[1]
+			local grnd_ray = World:raycast("ray", spawn_pos + Vector3(0, 0, 50), spawn_pos - Vector3(0, 0, 100), "slot_mask", managers.slot:get_mask("AI_graph_obstacle_check"), "ray_type", "walk")
+			spawn_pos = grnd_ray and grnd_ray.position or spawn_pos
+			local corpse = World:spawn_unit(corpse_data[2] and civ_corpse_u_name or ene_corpse_u_name, spawn_pos, Rotation(math.random() * 360, 0, 0))
 			if corpse then
 				corpse:play_state(corpse_data[2] and civ_spawn_state or ene_spawn_state)
 				corpse:interaction():set_tweak_data(corpse_data[4])
 				corpse:interaction():set_active(corpse_data[3])
+				local mover_blocker_body = corpse:body("mover_blocker")
+				if mover_blocker_body then
+					mover_blocker_body:set_enabled(false)
+				end
 				corpse:base():add_destroy_listener("EnemyManager_corpse_dummy" .. tostring(corpse:key()), callback(self, self, corpse_data[2] and "on_civilian_destroyed" or "on_enemy_destroyed"))
 				self._enemy_data.corpses[corpse:key()] = {
 					death_t = 0,

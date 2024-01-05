@@ -87,6 +87,7 @@ function MenuNodeButtonLayoutGui:_layout()
 				data.text:set_center_y(y)
 			end
 		end
+		data.text:set_position(math.round(data.text:x()), math.round(data.text:y()))
 	end
 end
 

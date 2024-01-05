@@ -6,6 +6,7 @@ PlayerBase.PLAYER_DOWNED_HUD = Idstring("guis/player_downed_hud")
 PlayerBase.PLAYER_CUSTODY_HUD = Idstring("guis/spectator_mode")
 PlayerBase.PLAYER_INFO_HUD_PD2 = Idstring("guis/player_info_hud_pd2")
 PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2 = Idstring("guis/player_info_hud_fullscreen_pd2")
+PlayerBase.USE_GRENADES = true
 
 function PlayerBase:init(unit)
 	UnitBase.init(self, unit, false)

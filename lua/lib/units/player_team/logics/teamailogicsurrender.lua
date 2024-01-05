@@ -18,6 +18,7 @@ function TeamAILogicSurrender.enter(data, new_logic_name, enter_params)
 			my_data.nearest_cover = old_internal_data.nearest_cover
 			managers.navigation:reserve_cover(my_data.nearest_cover[1], data.pos_rsrv_id)
 		end
+		my_data.attention_unit = old_internal_data.attention_unit
 	end
 	local action_data = {
 		type = "act",

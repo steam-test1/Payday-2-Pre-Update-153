@@ -108,18 +108,21 @@ function StaticLayer:set_unit_positions(pos)
 	end
 	reference:set_position(pos)
 	reference:unit_data().world_pos = pos
+	self:_on_unit_moved(reference, pos)
 end
 
 function StaticLayer:set_unit_position(unit, pos, rot)
 	local new_pos = pos + unit:unit_data().local_pos:rotate_with(rot)
 	unit:set_position(new_pos)
 	unit:unit_data().world_pos = new_pos
+	self:_on_unit_moved(unit, new_pos)
 end
 
 function StaticLayer:set_unit_rotations(rot)
 	local reference = self._selected_unit
 	local rot = rot * reference:rotation()
 	reference:set_rotation(rot)
+	self:_on_unit_rotated(reference, rot)
 	for _, unit in ipairs(self._selected_units) do
 		if unit ~= reference then
 			self:set_unit_position(unit, reference:position(), rot)
@@ -131,6 +134,21 @@ end
 function StaticLayer:set_unit_rotation(unit, rot)
 	local rot = rot * unit:unit_data().local_rot
 	unit:set_rotation(rot)
+	self:_on_unit_rotated(unit, rot)
+end
+
+function StaticLayer:_on_unit_moved(unit, pos)
+	if unit:ladder() then
+		unit:set_position(pos)
+		unit:ladder():set_config()
+	end
+end
+
+function StaticLayer:_on_unit_rotated(unit, rot)
+	if unit:ladder() then
+		unit:set_rotation(rot)
+		unit:ladder():set_config()
+	end
 end
 
 function StaticLayer:move_unit(btn, pressed)

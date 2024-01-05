@@ -24,6 +24,7 @@ function TeamAILogicIdle.enter(data, new_logic_name, enter_params)
 			my_data.nearest_cover = old_internal_data.nearest_cover
 			managers.navigation:reserve_cover(my_data.nearest_cover[1], data.pos_rsrv_id)
 		end
+		my_data.attention_unit = old_internal_data.attention_unit
 	end
 	data.internal_data = my_data
 	local key_str = tostring(data.key)
@@ -255,7 +256,7 @@ function TeamAILogicIdle.on_alert(data, alert_data)
 	local alert_unit = alert_data[5]
 	if alert_unit:in_slot(data.enemy_slotmask) then
 		local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, alert_unit:key())
-		if att_obj_data and (alert_type == "bullet" or alert_type == "aggression") then
+		if att_obj_data and (alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion") then
 			att_obj_data.alert_t = TimerManager:game():time()
 		end
 	end

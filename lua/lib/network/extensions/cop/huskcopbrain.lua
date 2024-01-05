@@ -14,7 +14,8 @@ function HuskCopBrain:post_init()
 		bullet = true,
 		vo_cbt = true,
 		vo_intimidate = true,
-		aggression = true
+		aggression = true,
+		explosion = true
 	}, self._unit:movement():m_head_pos())
 	self._last_alert_t = 0
 	self._unit:character_damage():add_listener("HuskCopBrain_death" .. tostring(self._unit:key()), {"death"}, callback(self, self, "clbk_death"))

@@ -44,7 +44,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 	local ignore_unit = params.ignore_unit
 	local curve_pow = params.curve_pow
 	local col_ray = params.col_ray
-	local alert_filter = params.alert_filter
+	local alert_filter = params.alert_filter or managers.groupai:state():get_unit_type_filter("civilians_enemies")
 	local owner = params.owner
 	local player = managers.player:player_unit()
 	if alive(player) and player_dmg ~= 0 then
@@ -55,15 +55,13 @@ function ExplosionManager:detect_and_give_dmg(params)
 		})
 	end
 	local bodies = World:find_bodies("intersect", "sphere", hit_pos, range, slotmask)
-	if user_unit then
-		managers.groupai:state():propagate_alert({
-			"aggression",
-			hit_pos,
-			10000,
-			alert_filter,
-			user_unit
-		})
-	end
+	managers.groupai:state():propagate_alert({
+		"explosion",
+		hit_pos,
+		10000,
+		alert_filter,
+		user_unit
+	})
 	local splinters = {
 		mvector3.copy(hit_pos)
 	}
@@ -211,7 +209,7 @@ function ExplosionManager:_apply_body_damage(is_server, hit_body, user_unit, dir
 			hit_body:extension().damage:damage_explosion(user_unit, normal, hit_body:position(), dir, prop_damage)
 			hit_body:extension().damage:damage_damage(user_unit, normal, hit_body:position(), dir, prop_damage)
 		end
-		if sync_damage then
+		if sync_damage and managers.network:session() then
 			if alive(user_unit) then
 				managers.network:session():send_to_peers_synched("sync_body_damage_explosion", hit_body, user_unit, normal, hit_body:position(), dir, math.min(32768, network_damage))
 			else
@@ -246,7 +244,7 @@ end
 
 function ExplosionManager:play_sound_and_effects(position, normal, range, custom_params)
 	self:player_feedback(position, normal, range, custom_params)
-	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect)
+	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect, custom_params and custom_params.sound_event)
 end
 
 function ExplosionManager:player_feedback(position, normal, range, custom_params)
@@ -304,7 +302,10 @@ function ExplosionManager:player_feedback(position, normal, range, custom_params
 	end
 end
 
-function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name)
+local decal_ray_from = Vector3()
+local decal_ray_to = Vector3()
+
+function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event)
 	effect_name = effect_name or "effects/particles/explosions/explosion_grenade_launcher"
 	if effect_name ~= "none" then
 		World:effect_manager():spawn({
@@ -313,18 +314,29 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 			normal = normal
 		})
 	end
-	local sound_source = SoundDevice:create_source("M79GrenadeBase")
+	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
+	mvector3.set(decal_ray_from, position)
+	mvector3.set(decal_ray_to, math.UP)
+	mvector3.multiply(decal_ray_to, -100)
+	mvector3.add(decal_ray_to, decal_ray_from)
+	local ray = World:raycast("ray", decal_ray_from, decal_ray_to, "slot_mask", slotmask_world_geometry)
+	local sound_switch_name
+	if ray then
+		local material_name, _, _ = World:pick_decal_material(ray.unit, decal_ray_from, decal_ray_to, slotmask_world_geometry)
+		sound_switch_name = material_name ~= empty_idstr and material_name
+	end
+	local sound_source = SoundDevice:create_source("ExplosionManager")
 	sound_source:set_position(position)
-	sound_source:post_event("trip_mine_explode")
-	managers.enemy:add_delayed_clbk("M79expl", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 2)
-	self:project_decal(position)
+	if sound_switch_name then
+		sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
+	end
+	sound_source:post_event(sound_event or "trip_mine_explode")
+	managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
+	self:project_decal(ray, decal_ray_from, decal_ray_to)
 end
 
-function ExplosionManager:project_decal(position, on_unit)
+function ExplosionManager:project_decal(ray, from, to, on_unit)
 	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
-	local from = position
-	local to = position + math.UP * -100
-	local ray = World:raycast("ray", from, to, "slot_mask", slotmask_world_geometry)
 	if ray then
 		local units = World:find_units("intersect", "cylinder", from, to, 100, slotmask_world_geometry)
 		local redir_name = World:project_decal(idstr_explosion_std, ray.position, ray.ray, on_unit or units, nil, ray.normal)

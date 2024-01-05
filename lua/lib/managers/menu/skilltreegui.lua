@@ -473,7 +473,7 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 		lock_image:set_rotation(360)
 		lock_image:set_world_position(debug_text:world_right(), debug_text:world_y() - 2)
 		lock_image:set_visible(false)
-		local cost_string = (Application:digest_value(tweak_data.skilltree.tier_unlocks[tier], false) < 10 and "0" or "") .. tostring(Application:digest_value(tweak_data.skilltree.tier_unlocks[tier], false))
+		local cost_string = (managers.skilltree:tier_cost(tree, tier) < 10 and "0" or "") .. tostring(managers.skilltree:tier_cost(tree, tier))
 		local cost_text = tier_panel:text({
 			name = "cost_text",
 			text = cost_string,
@@ -510,7 +510,7 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 	local next_tier_p = max_points
 	local ct = 0
 	for i = 1, 6 do
-		local tier_unlocks = Application:digest_value(tweak_data.skilltree.tier_unlocks[i], false)
+		local tier_unlocks = managers.skilltree:tier_cost(self._tree, i)
 		if ps < tier_unlocks then
 			next_tier_p = tier_unlocks
 			break
@@ -585,7 +585,7 @@ function SkillTreePage:on_points_spent()
 	local next_tier_p = max_points
 	local ct = 0
 	for i = 1, 6 do
-		local tier_unlocks = Application:digest_value(tweak_data.skilltree.tier_unlocks[i], false)
+		local tier_unlocks = managers.skilltree:tier_cost(self._tree, i)
 		if ps < tier_unlocks then
 			next_tier_p = tier_unlocks
 			break
@@ -1061,6 +1061,7 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 	if self._selected_item and self._selected_item._skill_panel then
 		local skill_id = self._selected_item._skill_id
 		local tweak_data_skill = tweak_data.skilltree.skills[skill_id]
+		local points = managers.skilltree:points() or 0
 		local basic_cost = managers.skilltree:get_skill_points(skill_id, 1) or 0
 		local pro_cost = managers.skilltree:get_skill_points(skill_id, 2) or 0
 		local talent = tweak_data.skilltree.skills[skill_id]
@@ -1076,9 +1077,8 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 			basic_cost = utf8.to_upper(managers.localization:text("st_menu_skill_owned"))
 			color_replace_table[basic_color_index] = tweak_data.screen_colors.resource
 		else
-			local points = managers.skilltree:get_skill_points(skill_id, 1) or 0
-			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, points)
-			local can_afford = basic_cost <= points and spending_money >= money_cost
+			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, basic_cost)
+			local can_afford = points >= basic_cost and spending_money >= money_cost
 			color_replace_table[basic_color_index] = can_afford and tweak_data.screen_colors.resource or tweak_data.screen_colors.important_1
 			basic_cost = managers.localization:text(basic_cost == 1 and "st_menu_point" or "st_menu_point_plural", {points = basic_cost}) .. " / " .. managers.experience:cash_string(money_cost)
 		end
@@ -1086,9 +1086,8 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 			pro_cost = utf8.to_upper(managers.localization:text("st_menu_skill_owned"))
 			color_replace_table[pro_color_index] = tweak_data.screen_colors.resource
 		else
-			local points = managers.skilltree:get_skill_points(skill_id, 2) or 0
-			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, points)
-			local can_afford = pro_cost <= points and spending_money >= money_cost
+			local money_cost = managers.money:get_skillpoint_cost(self._selected_item._tree, self._selected_item._tier, pro_cost)
+			local can_afford = points >= pro_cost and spending_money >= money_cost
 			color_replace_table[pro_color_index] = can_afford and tweak_data.screen_colors.resource or tweak_data.screen_colors.important_1
 			pro_cost = managers.localization:text(pro_cost == 1 and "st_menu_point" or "st_menu_point_plural", {points = pro_cost}) .. " / " .. managers.experience:cash_string(money_cost)
 		end
@@ -1101,7 +1100,7 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 		if self._selected_item._tier then
 			if not unlocked then
 				local point_spent = managers.skilltree:points_spent(self._selected_item._tree) or 0
-				local tier_unlocks = Application:digest_value(tweak_data.skilltree.tier_unlocks[self._selected_item._tier], false) or 0
+				local tier_unlocks = managers.skilltree:tier_cost(self._selected_item._tree, self._selected_item._tier) or 0
 				prerequisite_text = prerequisite_text .. managers.localization:text("st_menu_points_to_unlock_tier", {
 					points = tier_unlocks - point_spent,
 					tier = self._selected_item._tier

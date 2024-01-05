@@ -26,6 +26,7 @@ require("lib/tweak_data/GuiTweakData")
 require("lib/tweak_data/MoneyTweakData")
 require("lib/tweak_data/AssetsTweakData")
 require("lib/tweak_data/DLCTweakData")
+require("lib/tweak_data/InfamyTweakData")
 TweakData = TweakData or class()
 require("lib/tweak_data/TweakDataPD2")
 TweakData.RELOAD = true
@@ -34,7 +35,6 @@ function TweakData:digest_tweak_data()
 	Application:debug("TweakData: Digesting tweak_data. <('O'<)")
 	self:digest_recursive(self.money_manager)
 	self:digest_recursive(self.experience_manager)
-	self:digest_recursive(self.rank_manager)
 	self:digest_recursive(self.casino)
 end
 
@@ -240,6 +240,7 @@ function TweakData:init()
 	self.gui = GuiTweakData:new()
 	self.assets = AssetsTweakData:new(self)
 	self.dlc = DLCTweakData:new(self)
+	self.infamy = InfamyTweakData:new(self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -1160,6 +1161,16 @@ function TweakData:init()
 		category = "trip_mine",
 		upgrade = "can_switch_on_off"
 	}
+	self.interaction.grenade_crate = {}
+	self.interaction.grenade_crate.icon = "equipment_ammo_bag"
+	self.interaction.grenade_crate.text_id = "debug_interact_grenade_crate_take_grenades"
+	self.interaction.grenade_crate.contour = "deployable"
+	self.interaction.grenade_crate.timer = 1.5
+	self.interaction.grenade_crate.blocked_hint = "full_grenades"
+	self.interaction.grenade_crate.sound_start = "bar_bag_generic"
+	self.interaction.grenade_crate.sound_interupt = "bar_bag_generic_cancel"
+	self.interaction.grenade_crate.sound_done = "bar_bag_generic_finished"
+	self.interaction.grenade_crate.action_text_id = "hud_action_taking_grenades"
 	self.interaction.ammo_bag = {}
 	self.interaction.ammo_bag.icon = "equipment_ammo_bag"
 	self.interaction.ammo_bag.text_id = "debug_interact_ammo_bag_take_ammo"
@@ -1271,6 +1282,8 @@ function TweakData:init()
 	self.interaction.invisible_interaction_open.timer = 0.5
 	self.interaction.money_briefcase = deep_clone(self.interaction.invisible_interaction_open)
 	self.interaction.money_briefcase.axis = "x"
+	self.interaction.grenade_briefcase = deep_clone(self.interaction.invisible_interaction_open)
+	self.interaction.grenade_briefcase.contour = "deployable"
 	self.interaction.cash_register = deep_clone(self.interaction.invisible_interaction_open)
 	self.interaction.cash_register.axis = "x"
 	self.interaction.cash_register.interact_distance = 110
@@ -1306,7 +1319,6 @@ function TweakData:init()
 	self.interaction.sewer_manhole.axis = "z"
 	self.interaction.sewer_manhole.interact_distance = 200
 	self.interaction.sewer_manhole.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.sewer_manhole.special_equipment = "crowbar"
 	self.interaction.circuit_breaker = {}
 	self.interaction.circuit_breaker.icon = "interaction_powerbox"
 	self.interaction.circuit_breaker.text_id = "debug_interact_circuit_breaker"
@@ -1759,6 +1771,14 @@ function TweakData:init()
 	self.interaction.open_slash_close = {}
 	self.interaction.open_slash_close.text_id = "hud_int_open_slash_close"
 	self.interaction.open_slash_close.start_active = false
+	self.interaction.open_slash_close_act = {}
+	self.interaction.open_slash_close_act.text_id = "hud_int_open_slash_close"
+	self.interaction.open_slash_close_act.start_active = true
+	self.interaction.raise_balloon = {}
+	self.interaction.raise_balloon.text_id = "hud_int_hold_raise_balloon"
+	self.interaction.raise_balloon.action_text_id = "hud_action_raise_balloon"
+	self.interaction.raise_balloon.start_active = false
+	self.interaction.raise_balloon.timer = 2
 	self.interaction.stn_int_place_camera = {}
 	self.interaction.stn_int_place_camera.text_id = "hud_int_place_camera"
 	self.interaction.stn_int_place_camera.start_active = true
@@ -2191,9 +2211,6 @@ function TweakData:init()
 			points = math.round(22000 * (exp_step * (i - exp_step_start)) - 6000) * multiplier
 		}
 	end
-	self.rank_manager = {}
-	self.rank_manager.max_rank = 13
-	self.rank_manager.become_infamous_cost = 200000000
 	self.achievement = {}
 	self.achievement.im_a_healer_tank_damage_dealer = 10
 	self.achievement.iron_man = "level_7"
@@ -2207,6 +2224,7 @@ function TweakData:init()
 	self.achievement.most_wanted = 100
 	self.achievement.fully_loaded = 9
 	self.achievement.weapon_collector = 18
+	self.achievement.arms_dealer = 72
 	self.achievement.how_do_you_like_me_now = "level_1"
 	self.achievement.like_an_angry_bear = "bear"
 	self.achievement.witch_doctor = {
@@ -2230,10 +2248,6 @@ function TweakData:init()
 		stat = "halloween_10_stats"
 	}
 	self.achievement.unique_selling_point = "usp"
-	self.achievement.try_out_your_usp = {
-		weapon = "usp",
-		stat = "halloween_8_stats"
-	}
 	self.achievement.i_take_scores = {
 		mask = "heat",
 		stat = "armored_4_stat",
@@ -2250,31 +2264,73 @@ function TweakData:init()
 			"arm_fac_prof"
 		}
 	}
-	self.achievement.license_to_kill = {
-		weapon = "ppk",
-		stat = "armored_5_stat"
-	}
-	self.achievement.im_not_a_crook = {
-		mask = "nixon",
-		weapon = "s552",
-		enemy = "sniper",
-		stat = "armored_7_stat"
-	}
 	self.achievement.relation_with_bulldozer = {
 		mask = "clinton",
 		stat = "armored_8_stat"
-	}
-	self.achievement.fool_me_once = {
-		mask = "bush",
-		weapon = "m45",
-		enemy = "shield",
-		stat = "armored_9_stat"
 	}
 	self.achievement.no_we_cant = {
 		mask = "obama",
 		stat = "armored_10_stat"
 	}
 	self.achievement.heat_around_the_corner = "heat"
+	self.achievement.fire_in_the_hole = {
+		grenade = "frag",
+		stat = "gage_9_stats"
+	}
+	self.achievement.enemy_kill_achievements = {
+		try_out_your_usp = {
+			weapon = "usp",
+			stat = "halloween_8_stats"
+		},
+		license_to_kill = {
+			weapon = "ppk",
+			stat = "armored_5_stat"
+		},
+		im_not_a_crook = {
+			mask = "nixon",
+			weapon = "s552",
+			enemy = "sniper",
+			stat = "armored_7_stat"
+		},
+		fool_me_once = {
+			mask = "bush",
+			weapon = "m45",
+			enemy = "shield",
+			stat = "armored_9_stat"
+		},
+		wanted = {
+			mask = "goat",
+			weapon = "ak5",
+			stat = "gage_1_stats"
+		},
+		three_thousand_miles = {
+			mask = "panda",
+			weapon = "p90",
+			stat = "gage_2_stats"
+		},
+		commando = {
+			mask = "pitbull",
+			weapon = "aug",
+			stat = "gage_3_stats"
+		},
+		public_enemies = {
+			mask = "eagle",
+			weapon = "colt_1911",
+			stat = "gage_4_stats"
+		},
+		inception = {
+			weapon = "scar",
+			stat = "gage_5_stats"
+		},
+		hard_corps = {
+			weapon = "mp7",
+			stat = "gage_6_stats"
+		},
+		above_the_law = {
+			weapon = "p226",
+			stat = "gage_7_stats"
+		}
+	}
 	self.pickups = {}
 	self.pickups.ammo = {
 		unit = Idstring("units/pickups/ammo/ammo_pickup")
@@ -2423,6 +2479,11 @@ function TweakData:init()
 	self.blame.cop_fire = "hint_cop_fire"
 	self.blame.cop_voting = "hint_cop_voting"
 	self.blame.cop_breaking_entering = "hint_cop_breaking_entering"
+	self.blame.sys_explosion = "hint_alert_explosion"
+	self.blame.civ_explosion = "hint_alert_explosion"
+	self.blame.cop_explosion = "hint_alert_explosion"
+	self.blame.gan_explosion = "hint_alert_explosion"
+	self.blame.cam_explosion = "hint_alert_explosion"
 	self.blame.met_criminal = "hint_met_criminal"
 	self.blame.mot_criminal = "hint_mot_criminal"
 	self.blame.gls_alarm = "hint_alarm_glass"
@@ -2967,6 +3028,18 @@ function TweakData:get_controller_help_coords()
 			align = "right",
 			vertical = "center"
 		}
+		coords.menu_button_throw_grenade = {
+			x = 0,
+			y = 0,
+			align = "left",
+			vertical = "top"
+		}
+		coords.menu_button_weapon_firemode = {
+			x = 0,
+			y = 0,
+			align = "left",
+			vertical = "top"
+		}
 	else
 		coords.menu_button_sprint = {
 			x = 0,
@@ -3045,7 +3118,19 @@ function TweakData:get_controller_help_coords()
 			vertical = "bottom"
 		}
 		coords.menu_button_weapon_gadget = {
-			x = 209,
+			x = 0,
+			y = 243,
+			align = "right",
+			vertical = "center"
+		}
+		coords.menu_button_throw_grenade = {
+			x = 0,
+			y = 208,
+			align = "right",
+			vertical = "center"
+		}
+		coords.menu_button_weapon_firemode = {
+			x = 226,
 			y = 256,
 			align = "right",
 			vertical = "top"
@@ -3053,8 +3138,9 @@ function TweakData:get_controller_help_coords()
 		if SystemInfo:platform() == Idstring("WIN32") then
 			coords.menu_button_push_to_talk = {
 				x = 0,
-				y = 200,
-				align = "right"
+				y = 174,
+				align = "right",
+				vertical = "center"
 			}
 		end
 	end

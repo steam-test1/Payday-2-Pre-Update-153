@@ -194,6 +194,21 @@ function BoxGuiObject:set_color(color, rec_panel)
 	end
 end
 
+function BoxGuiObject:blend_mode()
+	return self._blend_mode
+end
+
+function BoxGuiObject:set_blend_mode(blend_mode, rec_panel)
+	self._blend_mode = blend_mode
+	for i, d in pairs(rec_panel and rec_panel:children() or self._panel:children()) do
+		if d.set_blend_mode then
+			d:set_blend_mode(blend_mode)
+		else
+			self:set_blend_mode(blend_mode, d)
+		end
+	end
+end
+
 function BoxGuiObject:close()
 	if alive(self._panel) and alive(self._panel:parent()) then
 		self._panel:parent():remove(self._panel)

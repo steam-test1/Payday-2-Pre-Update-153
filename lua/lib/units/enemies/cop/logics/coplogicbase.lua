@@ -14,9 +14,14 @@ CopLogicBase._AGGRESSIVE_ALERT_TYPES = {
 	vo_cbt = true,
 	vo_intimidate = true,
 	vo_distress = true,
-	aggression = true
+	aggression = true,
+	explosion = true
 }
-CopLogicBase._DANGEROUS_ALERT_TYPES = {bullet = true, aggression = true}
+CopLogicBase._DANGEROUS_ALERT_TYPES = {
+	bullet = true,
+	aggression = true,
+	explosion = true
+}
 
 function CopLogicBase.enter(data, new_logic_name, enter_params)
 end

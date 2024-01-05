@@ -110,16 +110,25 @@ do
 		"ene_swat_1",
 		"ene_swat_2",
 		"ene_swat_heavy_1",
-		"ene_tazer_1",
+		"ene_tazer_1"
+	}
+	local path_string = "units/payday2/characters/"
+	local character_path = ""
+	for _, character in ipairs(payday2_characters_map) do
+		character_path = path_string .. character .. "/" .. character
+		material_translation_map[tostring(Idstring(character_path):key())] = character_path .. "_contour"
+		material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = character_path
+	end
+	local pd2_dlc1_characters_map = {
 		"civ_male_firefighter_1",
 		"civ_male_paramedic_1",
 		"civ_male_paramedic_2",
 		"ene_security_gensec_1",
 		"ene_security_gensec_2"
 	}
-	local path_string = "units/payday2/characters/"
+	local path_string = "units/pd2_dlc1/characters/"
 	local character_path = ""
-	for _, character in ipairs(payday2_characters_map) do
+	for _, character in ipairs(pd2_dlc1_characters_map) do
 		character_path = path_string .. character .. "/" .. character
 		material_translation_map[tostring(Idstring(character_path):key())] = character_path .. "_contour"
 		material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = character_path

@@ -584,6 +584,15 @@ function AttentionTweakData:_init_prop()
 		release_delay = 1,
 		notice_requires_FOV = true
 	}
+	self.settings.prop_ene_ntl_edaycrate = {
+		reaction = "REACT_AIM",
+		filter = "all_enemy",
+		verification_interval = 0.4,
+		uncover_range = 300,
+		release_delay = 1,
+		notice_requires_FOV = true,
+		max_range = 700
+	}
 	self.settings.prop_ene_ntl = {
 		reaction = "REACT_AIM",
 		filter = "all_enemy",

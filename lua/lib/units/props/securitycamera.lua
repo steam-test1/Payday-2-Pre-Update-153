@@ -36,7 +36,7 @@ function SecurityCamera:set_detection_enabled(state, settings, mission_element)
 		return
 	end
 	self:set_update_enabled(state)
-	self._mission_script_element = mission_element
+	self._mission_script_element = mission_element or self._mission_script_element
 	if state then
 		self._u_key = self._unit:key()
 		self._last_detect_t = self._last_detect_t or TimerManager:game():time()
@@ -178,13 +178,13 @@ function SecurityCamera:_upd_detect_attention_objects(t)
 					else
 						local min_delay = det_delay[1]
 						local max_delay = det_delay[2]
-						local angle_mul_mod = 0.25 * math.min(angle / self._cone_angle, 1)
-						local dis_mul_mod = 0.75 * dis_multiplier
+						local angle_mul_mod = 0.15 * math.min(angle / self._cone_angle, 1)
+						local dis_mul_mod = 0.85 * dis_multiplier
 						local notice_delay_mul = attention_info.settings.notice_delay_mul or 1
 						if attention_info.settings.detection and attention_info.settings.detection.delay_mul then
 							notice_delay_mul = notice_delay_mul * attention_info.settings.detection.delay_mul
 						end
-						local notice_delay_modified = math.lerp(min_delay, max_delay, dis_mul_mod + angle_mul_mod) * notice_delay_mul
+						local notice_delay_modified = math.lerp(min_delay * notice_delay_mul, max_delay, dis_mul_mod + angle_mul_mod)
 						delta_prog = 0 < notice_delay_modified and dt / notice_delay_modified or 1
 					end
 				else
@@ -258,7 +258,7 @@ end
 function SecurityCamera:_detection_angle_and_dis_chk(my_pos, my_fwd, handler, settings, attention_pos)
 	local dis = mvector3.direction(self._tmp_vec1, my_pos, attention_pos)
 	local dis_multiplier, angle_multiplier
-	local max_dis = self._range
+	local max_dis = math.min(self._range, settings.max_range or self._range)
 	if settings.detection and settings.detection.range_mul then
 		max_dis = max_dis * settings.detection.range_mul
 	end
@@ -522,6 +522,8 @@ function SecurityCamera:_sound_the_alarm(detected_unit)
 		managers.enemy:add_delayed_clbk(self._call_police_clbk_id, callback(self, self, "clbk_call_the_police"), Application:time() + 7)
 		local reason_called = managers.groupai:state().analyse_giveaway("security_camera", detected_unit)
 		self._reason_called = managers.groupai:state():fetch_highest_giveaway(self._reason_called, reason_called)
+		self:_destroy_all_detected_attention_object_data()
+		self:set_detection_enabled(false, nil, nil)
 	end
 	if self._suspicion_sound then
 		self._suspicion_sound = nil
@@ -573,10 +575,8 @@ function SecurityCamera:_upd_sound(unit, t)
 	for u_key, attention_info in pairs(self._detected_attention_objects) do
 		if attention_info.reaction >= AIAttentionObject.REACT_SCARED then
 			if attention_info.identified then
-				if attention_info.verified then
-					self:_sound_the_alarm(attention_info.unit)
-					return
-				end
+				self:_sound_the_alarm(attention_info.unit)
+				return
 			elseif not suspicion_level or suspicion_level < attention_info.notice_progress then
 				suspicion_level = attention_info.notice_progress
 			end

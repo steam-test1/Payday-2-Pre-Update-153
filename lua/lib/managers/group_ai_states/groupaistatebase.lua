@@ -75,6 +75,11 @@ GroupAIStateBase.BLAME_SYNC = {
 	"cop_breaking_entering",
 	"cop_crate_open",
 	"cop_distress",
+	"sys_explosion",
+	"civ_explosion",
+	"cop_explosion",
+	"gan_explosion",
+	"cam_explosion",
 	"default"
 }
 GroupAIStateBase.EVENT_SYNC = {
@@ -900,6 +905,9 @@ end
 
 function GroupAIStateBase:on_tase_start(cop_key, criminal_key)
 	self._criminals[criminal_key].being_tased = cop_key
+	if self._criminals[criminal_key].unit == managers.player:player_unit() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.its_alive_its_alive.mask then
+		managers.achievment:award_progress(tweak_data.achievement.its_alive_its_alive.stat)
+	end
 end
 
 function GroupAIStateBase:on_tase_end(criminal_key)
@@ -2422,6 +2430,11 @@ function GroupAIStateBase:all_hostages()
 	return self._hostage_keys
 end
 
+function GroupAIStateBase:is_a_hostage_within(mvec_pos, radius)
+	local units = World:find_units_quick("sphere", mvec_pos, radius, 22)
+	return units and 0 < #units
+end
+
 function GroupAIStateBase:on_criminal_team_AI_enabled_state_changed()
 	if Network:is_client() then
 		return
@@ -3613,6 +3626,9 @@ function GroupAIStateBase.analyse_giveaway(trigger_string, giveaway_unit, additi
 		return trigger_string
 	end
 	if not giveaway_unit or type(giveaway_unit) ~= "userdata" or not alive(giveaway_unit) then
+		if additional_info[1] == "explosion" then
+			return "sys_explosion"
+		end
 		return nil
 	end
 	if GroupAIStateBase.unique_triggers[trigger_string] then
@@ -3652,7 +3668,7 @@ function GroupAIStateBase.investigate_unit(giveaway_unit, additional_info)
 			investigate_coolness = true
 		elseif alert_type == "bullet" then
 			return "gunfire"
-		elseif alert_type == "aggression" then
+		elseif alert_type == "aggression" or alert_type == "explosion" then
 		end
 	end
 	if investigate_coolness then
@@ -4090,4 +4106,8 @@ end
 
 function GroupAIStateBase:is_enemy_converted_to_criminal(unit)
 	return self._converted_police[unit:key()]
+end
+
+function GroupAIStateBase:get_amount_enemies_converted_to_criminals()
+	return self._converted_police and table.size(self._converted_police)
 end

@@ -352,8 +352,8 @@ function MenuBackdropGUI:_create_particle()
 		local seconds = distance / math.random(20, 26)
 		local wave_t = 0
 		local wave_length = math.random(5, 15)
-		local alpha_t = math.random(90)
-		local start_alpha = math.sin(alpha_t * 90) * 0.6 + 0.3
+		local alpha_t = 0
+		local start_alpha = 0
 		local next_alpha = start_alpha
 		wait(math.rand(2), self._fixed_dt)
 		over(0.2, function(p)
@@ -369,7 +369,7 @@ function MenuBackdropGUI:_create_particle()
 			alpha_t = alpha_t + dt * math.rand(0.25, 0.75)
 			o:set_center(math.lerp(start_x, end_x, t / seconds), math.lerp(start_y, end_y, t / seconds))
 			o:move(math.sin(wave_t * 90) * -dir_y * wave_length, math.sin(wave_t * 90) * dir_x * wave_length)
-			o:set_alpha(next_alpha)
+			o:set_alpha(next_alpha * math.clamp(seconds - t, 0, 1) * math.clamp(t, 0, 1))
 			next_alpha = math.abs(math.sin(alpha_t * 90)) * 0.5 + 0.5
 			o:set_blend_mode("add")
 		end

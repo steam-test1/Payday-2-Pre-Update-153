@@ -344,12 +344,12 @@ function CopLogicIntimidated.on_alert(data, alert_data)
 			return
 		end
 		local alert_type = alert_data[1]
-		if alert_type == "bullet" or alert_type == "aggression" then
+		if alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion" then
 			att_obj_data.alert_t = TimerManager:game():time()
 		end
 		if att_obj_data.criminal_record then
 			managers.groupai:state():criminal_spotted(alert_unit)
-			if alert_type == "bullet" or alert_type == "aggression" then
+			if alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion" then
 				managers.groupai:state():report_aggression(alert_unit)
 			end
 		end

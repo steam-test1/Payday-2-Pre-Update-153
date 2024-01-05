@@ -121,7 +121,9 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.pd2_clan = 1
 	self.global_value_multipliers.halloween = 1
 	self.global_value_multipliers.armored_transport = 1.2
+	self.global_value_multipliers.gage_pack = 1.4
 	self.global_value_multipliers.sweettooth = 1
+	self.global_value_multipliers.legendary = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -132,7 +134,9 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.pd2_clan = 0
 	self.global_value_bonus_multiplier.halloween = 0
 	self.global_value_bonus_multiplier.armored_transport = 0.5
+	self.global_value_bonus_multiplier.gage_pack = 0.5
 	self.global_value_bonus_multiplier.sweettooth = 0
+	self.global_value_bonus_multiplier.legendary = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -235,4 +239,5 @@ function MoneyTweakData:init()
 	self.loot_drop_cash.cash100 = loot_drop_value * 14
 	self.loot_drop_cash.cash_preorder = self.biggest_cashout / 10
 	self.unlock_new_mask_slot_value = self.biggest_cashout
+	self.unlock_new_weapon_slot_value = self.biggest_cashout
 end

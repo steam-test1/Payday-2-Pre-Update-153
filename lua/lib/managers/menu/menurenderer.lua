@@ -6,6 +6,7 @@ require("lib/managers/menu/renderers/MenuNodeCreditsGui")
 require("lib/managers/menu/renderers/MenuNodeButtonLayoutGui")
 require("lib/managers/menu/renderers/MenuNodeHiddenGui")
 require("lib/managers/menu/renderers/MenuNodeCrimenetGui")
+require("lib/managers/menu/renderers/MenuNodeUpdatesGui")
 MenuRenderer = MenuRenderer or class(CoreMenuRenderer.Renderer)
 
 function MenuRenderer:init(logic, ...)
@@ -297,11 +298,17 @@ function MenuRenderer:accept_input(accept)
 end
 
 function MenuRenderer:input_focus()
+	if self:active_node_gui() and self:active_node_gui().input_focus then
+		local input_focus = self:active_node_gui():input_focus()
+		if input_focus then
+			return input_focus
+		end
+	end
 	return managers.menu_component:input_focus()
 end
 
 function MenuRenderer:mouse_pressed(o, button, x, y)
-	if self:active_node_gui() and self:active_node_gui():mouse_pressed(button, x, y) then
+	if self:active_node_gui() and self:active_node_gui().mouse_pressed and self:active_node_gui():mouse_pressed(button, x, y) then
 		return true
 	end
 	if managers.menu_component:mouse_pressed(o, button, x, y) then
@@ -313,6 +320,9 @@ function MenuRenderer:mouse_pressed(o, button, x, y)
 end
 
 function MenuRenderer:mouse_released(o, button, x, y)
+	if self:active_node_gui() and self:active_node_gui().mouse_released and self:active_node_gui():mouse_released(button, x, y) then
+		return true
+	end
 	if managers.menu_component:mouse_released(o, button, x, y) then
 		return true
 	end
@@ -350,6 +360,13 @@ function MenuRenderer:mouse_moved(o, x, y)
 			return true, wanted_pointer
 		end
 	end
+	if self:active_node_gui() and self:active_node_gui().mouse_moved then
+		local used, pointer = self:active_node_gui():mouse_moved(o, x, y)
+		wanted_pointer = pointer or wanted_pointer
+		if used then
+			return true, wanted_pointer
+		end
+	end
 	return false, wanted_pointer
 end
 
@@ -362,30 +379,51 @@ function MenuRenderer:scroll_down()
 end
 
 function MenuRenderer:move_up()
+	if self:active_node_gui() and self:active_node_gui().move_up and self:active_node_gui():move_up() then
+		return true
+	end
 	return managers.menu_component:move_up()
 end
 
 function MenuRenderer:move_down()
+	if self:active_node_gui() and self:active_node_gui().move_down and self:active_node_gui():move_down() then
+		return true
+	end
 	return managers.menu_component:move_down()
 end
 
 function MenuRenderer:move_left()
+	if self:active_node_gui() and self:active_node_gui().move_left and self:active_node_gui():move_left() then
+		return true
+	end
 	return managers.menu_component:move_left()
 end
 
 function MenuRenderer:move_right()
+	if self:active_node_gui() and self:active_node_gui().move_right and self:active_node_gui():move_right() then
+		return true
+	end
 	return managers.menu_component:move_right()
 end
 
 function MenuRenderer:next_page()
+	if self:active_node_gui() and self:active_node_gui().next_page and self:active_node_gui():next_page() then
+		return true
+	end
 	return managers.menu_component:next_page()
 end
 
 function MenuRenderer:previous_page()
+	if self:active_node_gui() and self:active_node_gui().previous_page and self:active_node_gui():previous_page() then
+		return true
+	end
 	return managers.menu_component:previous_page()
 end
 
 function MenuRenderer:confirm_pressed()
+	if self:active_node_gui() and self:active_node_gui().confirm_pressed and self:active_node_gui():confirm_pressed() then
+		return true
+	end
 	return managers.menu_component:confirm_pressed()
 end
 

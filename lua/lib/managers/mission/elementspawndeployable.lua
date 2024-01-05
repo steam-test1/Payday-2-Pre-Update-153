@@ -17,6 +17,8 @@ function ElementSpawnDeployable:on_executed(instigator)
 			DoctorBagBase.spawn(self._values.position, self._values.rotation, 0)
 		elseif self._values.deployable_id == "ammo_bag" then
 			AmmoBagBase.spawn(self._values.position, self._values.rotation, 0)
+		elseif self._values.deployable_id == "grenade_crate" then
+			GrenadeCrateBase.spawn(self._values.position, self._values.rotation, 0)
 		end
 	end
 	ElementSpawnDeployable.super.on_executed(self, instigator)

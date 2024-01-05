@@ -778,7 +778,8 @@ function FPCameraPlayerBase:spawn_grenade()
 	local align_obj_r_name = Idstring("a_weapon_right")
 	local align_obj_l = self._unit:get_object(align_obj_l_name)
 	local align_obj_r = self._unit:get_object(align_obj_r_name)
-	self._grenade_unit = World:spawn_unit(Idstring("units/weapons/frag_grenade/frag_grenade_husk"), align_obj_r:position(), align_obj_r:rotation())
+	local grenade_entry = managers.blackmarket:equipped_grenade()
+	self._grenade_unit = World:spawn_unit(Idstring(tweak_data.blackmarket.grenades[grenade_entry].unit_dummy), align_obj_r:position(), align_obj_r:rotation())
 	self._unit:link(align_obj_r:name(), self._grenade_unit, self._grenade_unit:orientation_object():name())
 end
 
@@ -827,8 +828,13 @@ function FPCameraPlayerBase:spawn_mask()
 		end
 		managers.dyn_resource:load(Idstring("unit"), Idstring(mask_unit_name), DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._mask_unit = World:spawn_unit(Idstring(mask_unit_name), align_obj_r:position(), align_obj_r:rotation())
+		local glass_id_string = Idstring("glass")
 		for _, material in ipairs(self._mask_unit:get_objects_by_type(Idstring("material"))) do
-			material:set_render_template(Idstring("solid_mask:DEPTH_SCALING"))
+			if material:name() == glass_id_string then
+				material:set_render_template(Idstring("opacity:CUBE_ENVIRONMENT_MAPPING:CUBE_FRESNEL:DIFFUSE_TEXTURE:FPS"))
+			else
+				material:set_render_template(Idstring("solid_mask:DEPTH_SCALING"))
+			end
 		end
 		if blueprint then
 			print("FPCameraPlayerBase:spawn_mask", inspect(blueprint))
@@ -838,14 +844,16 @@ function FPCameraPlayerBase:spawn_mask()
 		self._mask_unit:set_timer(managers.player:player_timer())
 		self._mask_unit:set_animation_timer(managers.player:player_timer())
 		self._mask_unit:anim_stop()
-		local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), align_obj_r:position(), align_obj_r:rotation())
-		for _, material in ipairs(backside:get_objects_by_type(Idstring("material"))) do
-			material:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:NORMALMAP:SKINNED_3WEIGHTS"))
+		if not tweak_data.blackmarket.masks[equipped_mask.mask_id].type then
+			local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), align_obj_r:position(), align_obj_r:rotation())
+			for _, material in ipairs(backside:get_objects_by_type(Idstring("material"))) do
+				material:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:NORMALMAP:SKINNED_3WEIGHTS"))
+			end
+			backside:set_timer(managers.player:player_timer())
+			backside:set_animation_timer(managers.player:player_timer())
+			backside:anim_play(Idstring("mask_on"))
+			self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
 		end
-		backside:set_timer(managers.player:player_timer())
-		backside:set_animation_timer(managers.player:player_timer())
-		backside:anim_play(Idstring("mask_on"))
-		self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
 		self._unit:link(align_obj_l:name(), self._mask_unit, self._mask_unit:orientation_object():name())
 	end
 end

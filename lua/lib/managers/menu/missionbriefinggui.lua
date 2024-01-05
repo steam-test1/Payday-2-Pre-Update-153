@@ -661,7 +661,8 @@ function AssetsItem:select_asset(i, instant)
 		})
 	end
 	if self._asset_locked[i] then
-		local is_server = Network:is_server() or managers.assets.ALLOW_CLIENTS_UNLOCK
+		local can_client_unlock = managers.assets.ALLOW_CLIENTS_UNLOCK == true or type(managers.assets.ALLOW_CLIENTS_UNLOCK) == "string" and managers.player:has_team_category_upgrade("player", managers.assets.ALLOW_CLIENTS_UNLOCK)
+		local is_server = Network:is_server() or can_client_unlock
 		local can_unlock = self._assets_names[i][5]
 		text_string = self._assets_names[i][6] and text_string or ""
 		if is_server and can_unlock then
@@ -814,7 +815,8 @@ function AssetsItem:_return_asset_info(i)
 	local asset_cost
 	if self._asset_locked[i] then
 		local can_unlock = self._assets_names[i][5] and managers.money:can_afford_mission_asset(self._assets_names[i][4])
-		if (Network:is_server() or managers.assets.ALLOW_CLIENTS_UNLOCK) and can_unlock then
+		local can_client_unlock = managers.assets.ALLOW_CLIENTS_UNLOCK == true or type(managers.assets.ALLOW_CLIENTS_UNLOCK) == "string" and managers.player:has_team_category_upgrade("player", managers.assets.ALLOW_CLIENTS_UNLOCK)
+		if (Network:is_server() or can_client_unlock) and can_unlock then
 			asset_cost = managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4])
 		else
 			asset_cost = true
@@ -840,28 +842,72 @@ function LoadoutItem:init(panel, text, i, assets_names, menu_component_data)
 	end
 	if got_primary or self._assets_list[1] then
 	end
-	for i = 1, 2 do
-		local weapon_data = assets_names[i]
-		local perks = weapon_data[4]
-		if 0 < table.size(perks) then
-			local perk_index = 1
-			for perk in pairs(perks) do
-				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
-				if DB:has(Idstring("texture"), texture) then
-					local perk_object = self._panel:bitmap({
-						texture = texture,
-						w = 16,
-						h = 16,
-						rotation = math.random(2) - 1.5,
-						alpha = 0.8,
-						layer = 2
-					})
-					perk_object:set_rightbottom(math.round(self._assets_list[i]:right() - perk_index * 16), math.round(self._assets_list[i]:bottom() - 5))
-					perk_index = perk_index + 1
+	local when_to_split = 7
+	do
+		local equipped_weapon = managers.blackmarket:equipped_primary()
+		local primary_slot = managers.blackmarket:equipped_weapon_slot("primaries")
+		local icon_list = {}
+		for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "primaries", equipped_weapon.factory_id, primary_slot)) do
+			if icon.equipped then
+				table.insert(icon_list, icon)
+			end
+		end
+		local split = when_to_split < #icon_list
+		for index, icon in ipairs(icon_list) do
+			local texture = icon.texture
+			if DB:has(Idstring("texture"), texture) then
+				local object = self._panel:bitmap({
+					texture = texture,
+					w = 16,
+					h = 16,
+					rotation = math.random(2) - 1.5,
+					alpha = icon.equipped and 1 or 0.25,
+					layer = 2
+				})
+				object:set_rightbottom(math.round(self._assets_list[1]:right() - index * 18) + 25, math.round(self._assets_list[1]:bottom() + 17.5))
+				if split then
+					if when_to_split < index then
+						object:move(18 * when_to_split, 0)
+					else
+						object:move(0, 18)
+					end
 				end
 			end
 		end
 	end
+	do
+		local equipped_weapon = managers.blackmarket:equipped_secondary()
+		local primary_slot = managers.blackmarket:equipped_weapon_slot("secondaries")
+		local icon_list = {}
+		for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "secondaries", equipped_weapon.factory_id, primary_slot)) do
+			if icon.equipped then
+				table.insert(icon_list, icon)
+			end
+		end
+		local split = when_to_split < #icon_list
+		for index, icon in ipairs(icon_list) do
+			local texture = icon.texture
+			if DB:has(Idstring("texture"), texture) then
+				local object = self._panel:bitmap({
+					texture = texture,
+					w = 16,
+					h = 16,
+					rotation = math.random(2) - 1.5,
+					alpha = icon.equipped and 1 or 0.25,
+					layer = 2
+				})
+				object:set_rightbottom(math.round(self._assets_list[2]:right() - index * 18) + 25, math.round(self._assets_list[2]:bottom() + 17.5))
+				if split then
+					if when_to_split < index then
+						object:move(18 * when_to_split, 0)
+					else
+						object:move(0, 18)
+					end
+				end
+			end
+		end
+	end
+	self._asset_text:move(0, 25)
 	self:select_asset(self._my_menu_component_data.selected or 1, true)
 end
 
@@ -934,6 +980,13 @@ function LoadoutItem:populate_category(category, data)
 	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
 	local new_data = {}
 	local index = 0
+	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
+	local max_rows = tweak_data.gui.MAX_WEAPON_ROWS or 3
+	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
+	for i = 1, max_items do
+		data[i] = nil
+	end
+	local weapon_data = Global.blackmarket_manager.weapons
 	local guis_catalog = "guis/"
 	for i, crafted in pairs(crafted_category) do
 		guis_catalog = "guis/"
@@ -949,15 +1002,17 @@ function LoadoutItem:populate_category(category, data)
 		new_data.unlocked = managers.blackmarket:weapon_unlocked(crafted.weapon_id)
 		new_data.lock_texture = not new_data.unlocked and "guis/textures/pd2/lock_level"
 		new_data.equipped = crafted.equipped
-		new_data.level = not new_data.unlocked and 0
-		new_data.skill_name = new_data.level == 0 and "bm_menu_skill_locked_" .. new_data.name
+		new_data.can_afford = true
+		new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
+		new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+		new_data.level = managers.blackmarket:weapon_level(crafted.weapon_id)
 		local texture_name = tweak_data.weapon[crafted.weapon_id].texture_name or tostring(crafted.weapon_id)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		new_data.comparision_data = managers.blackmarket:get_weapon_stats(category, i)
+		new_data.comparision_data = new_data.unlocked and managers.blackmarket:get_weapon_stats(category, i)
 		new_data.stream = false
-		if new_data.comparision_data and new_data.comparision_data.alert_size then
-			new_data.comparision_data.alert_size = #tweak_data.weapon.stats.alert_size - new_data.comparision_data.alert_size
-		end
+		new_data.global_value = tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"
+		new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or nil
+		new_data.lock_texture = BlackMarketGui.get_lock_icon(self, new_data)
 		if not new_data.equipped and new_data.unlocked then
 			table.insert(new_data, "lo_w_equip")
 		end
@@ -980,7 +1035,7 @@ function LoadoutItem:populate_category(category, data)
 		data[i] = new_data
 		index = i
 	end
-	for i = 1, 9 do
+	for i = 1, max_items do
 		if not data[i] then
 			new_data = {}
 			new_data.name = "empty_slot"
@@ -1092,6 +1147,7 @@ function LoadoutItem:create_primaries_loadout()
 		name = "bm_menu_primaries",
 		category = "primaries",
 		on_create_func = callback(self, self, "populate_primaries"),
+		override_slots = {3, 3},
 		identifier = Idstring("weapon")
 	})
 	data.topic_id = "menu_loadout_blackmarket"
@@ -1107,6 +1163,7 @@ function LoadoutItem:create_secondaries_loadout()
 		name = "bm_menu_secondaries",
 		category = "secondaries",
 		on_create_func = callback(self, self, "populate_secondaries"),
+		override_slots = {3, 3},
 		identifier = Idstring("weapon")
 	})
 	data.topic_id = "menu_loadout_blackmarket"
@@ -1905,7 +1962,9 @@ function MissionBriefingGui:on_ready_pressed(ready)
 	if not managers.network:session() then
 		return
 	end
+	local ready_changed = true
 	if ready ~= nil then
+		ready_changed = self._ready ~= ready
 		self._ready = ready
 	else
 		self._ready = not self._ready
@@ -1917,10 +1976,12 @@ function MissionBriefingGui:on_ready_pressed(ready)
 	self._ready_button:set_text(ready_text)
 	self._fullscreen_panel:child("ready_big_text"):set_text(ready_text)
 	self._ready_tick_box:set_image(self._ready and "guis/textures/pd2/mission_briefing/gui_tickbox_ready" or "guis/textures/pd2/mission_briefing/gui_tickbox")
-	if self._ready then
-		managers.menu_component:post_event("box_tick")
-	else
-		managers.menu_component:post_event("box_untick")
+	if ready_changed then
+		if self._ready then
+			managers.menu_component:post_event("box_tick")
+		else
+			managers.menu_component:post_event("box_untick")
+		end
 	end
 end
 

@@ -353,7 +353,8 @@ function HUDMissionBriefing:set_player_slot(nr, params)
 	slot:child("criminal"):set_color(slot:child("criminal"):color():with_alpha(1))
 	slot:child("criminal"):set_text(utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(params.character) or params.character))
 	local name_len = utf8.len(slot:child("name"):text())
-	slot:child("name"):set_text(slot:child("name"):text() .. " (" .. tostring(params.level) .. ")  ")
+	local experience = (params.rank > 0 and managers.experience:rank_string(params.rank) .. ":" or "") .. tostring(params.level)
+	slot:child("name"):set_text(slot:child("name"):text() .. " (" .. experience .. ")  ")
 	if params.status then
 		slot:child("status"):set_text(params.status)
 	end

@@ -148,7 +148,7 @@ function AchievmentManager:_give_reward(id, skip_exp)
 end
 
 function AchievmentManager:award_progress(stat)
-	if Application:editor() or not managers.criminals:local_character_name() then
+	if Application:editor() then
 		return
 	end
 	print("[AchievmentManager:award_progress]: ", stat .. " increased with 1")

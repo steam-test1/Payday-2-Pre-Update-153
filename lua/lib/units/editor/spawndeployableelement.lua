@@ -14,7 +14,11 @@ function SpawnDeployableUnitElement:_build_panel(panel, panel_sizer)
 		name = "Deployable id:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {"doctor_bag", "ammo_bag"},
+		options = {
+			"doctor_bag",
+			"ammo_bag",
+			"grenade_crate"
+		},
 		value = self._hed.deployable_id,
 		default = "none",
 		tooltip = "Select a deployable_id to be spawned.",

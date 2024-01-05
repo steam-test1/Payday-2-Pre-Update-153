@@ -110,7 +110,7 @@ end
 
 function _get_sequence_file(unit_data, sequence_files)
 	for _, unit_name in ipairs(unit_data:unit_dependencies()) do
-		self:_get_sequence_file(CoreEngineAccess._editor_unit_data(unit_name), sequence_files)
+		_get_sequence_file(CoreEngineAccess._editor_unit_data(unit_name), sequence_files)
 	end
 	table.insert(sequence_files, unit_data:sequence_manager_filename())
 end

@@ -188,6 +188,23 @@ function MenuCallbackHandler:got_new_lootdrop()
 	return managers.blackmarket and managers.blackmarket:got_any_new_drop()
 end
 
+function MenuCallbackHandler:got_new_content_update()
+	return false
+end
+
+function MenuCallbackHandler:not_got_new_content_update()
+	return not self:got_new_content_update()
+end
+
+function MenuCallbackHandler:do_content_lootdrop(node)
+	managers.menu:back(true)
+	managers.menu:open_node("crimenet_contract_casino_lootdrop", {
+		secure_cards = 0,
+		preferred_item = nil,
+		increase_infamous = false
+	})
+end
+
 function MenuCallbackHandler:test_clicked_weapon(item)
 	if not item:parameter("customize") then
 		managers.menu_scene:clicked_blackmarket_item()

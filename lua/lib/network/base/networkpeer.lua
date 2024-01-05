@@ -18,7 +18,8 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 		Network:set_connection_persistent(self._steam_rpc, true)
 		Network:set_throttling_disabled(self._steam_rpc, true)
 	end
-	self._level = 0
+	self._level = nil
+	self._rank = 0
 	self._in_lobby = in_lobby
 	self._loading = loading
 	self._synced = synced
@@ -566,6 +567,17 @@ end
 
 function NetworkPeer:level()
 	return self._level
+end
+
+function NetworkPeer:set_rank(rank)
+	self._rank = rank
+	if managers.hud then
+		managers.hud:update_name_label_by_peer(self)
+	end
+end
+
+function NetworkPeer:rank()
+	return self._rank
 end
 
 function NetworkPeer:set_profile(level, rank)

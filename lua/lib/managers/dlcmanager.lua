@@ -2,6 +2,7 @@ DLCManager = DLCManager or class()
 DLCManager.PLATFORM_CLASS_MAP = {}
 DLCManager.BUNDLED_DLC_PACKAGES = {
 	dlc1 = true,
+	gage_pack = true,
 	season_pass = false,
 	animal = false
 }
@@ -121,7 +122,7 @@ function GenericDLCManager:has_corrupt_data()
 end
 
 function GenericDLCManager:has_all_dlcs()
-	return self:has_armored_transport()
+	return self:has_armored_transport() and self:has_gage_pack()
 end
 
 function GenericDLCManager:has_preorder()
@@ -142,6 +143,10 @@ end
 
 function GenericDLCManager:has_armored_transport()
 	return Global.dlc_manager.all_dlc_data.armored_transport and Global.dlc_manager.all_dlc_data.armored_transport.verified
+end
+
+function GenericDLCManager:has_gage_pack()
+	return Global.dlc_manager.all_dlc_data.gage_pack and Global.dlc_manager.all_dlc_data.gage_pack.verified
 end
 
 function GenericDLCManager:has_achievement(data)
@@ -375,6 +380,7 @@ function WINDLCManager:init()
 			preorder = {app_id = "247450", no_install = true},
 			career_criminal_edition = {app_id = "218630", no_install = true},
 			armored_transport = {app_id = "264610", no_install = true},
+			gage_pack = {app_id = "267380", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			}

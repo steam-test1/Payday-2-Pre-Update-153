@@ -241,7 +241,7 @@ function TeamAIDamage:_apply_damage(attack_data, result)
 			self._health_ratio = 1
 		else
 			health_subtracted = damage
-			result.type = self:get_damage_type(damage_percent) or "none"
+			result.type = self:get_damage_type(damage_percent, "bullet") or "none"
 			self:_on_hurt()
 			self._health_ratio = self._health / self._HEALTH_INIT
 		end

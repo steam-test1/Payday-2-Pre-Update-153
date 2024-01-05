@@ -17,22 +17,30 @@ function MousePointerManager:_setup()
 	local x, y = 640, 360
 	self._ws:connect_mouse(Input:mouse())
 	self._ws:feed_mouse_position(x, y)
-	self._mouse = self._ws:panel():bitmap({
-		texture = "guis/textures/mouse_pointer",
+	self._mouse = self._ws:panel():panel({
 		name_s = "mouse",
 		name = "mouse",
+		x = x,
+		y = y,
+		w = 19,
+		h = 23,
+		layer = tweak_data.gui.MOUSE_LAYER
+	})
+	self._mouse:bitmap({
+		name = "pointer",
+		texture = "guis/textures/mouse_pointer",
 		texture_rect = {
 			0,
 			0,
 			19,
 			23
 		},
-		x = x,
-		y = y,
+		x = -7,
+		y = -2,
 		w = 19,
 		h = 23,
-		layer = tweak_data.gui.MOUSE_LAYER,
-		color = Color(1, 0.7, 0.7, 0.7)
+		color = Color(1, 0.7, 0.7, 0.7),
+		rotation = 360
 	})
 	self._ws:hide()
 	self._resolution_changed_callback_id = managers.viewport:add_resolution_changed_func(callback(self, self, "resolution_changed"))
@@ -50,20 +58,20 @@ function MousePointerManager:set_pointer_image(type)
 			19,
 			23
 		},
-		hand = {
+		link = {
 			20,
 			0,
 			19,
 			23
 		},
-		grab = {
+		hand = {
 			40,
 			0,
 			19,
 			23
 		},
-		link = {
-			20,
+		grab = {
+			60,
 			0,
 			19,
 			23
@@ -71,7 +79,7 @@ function MousePointerManager:set_pointer_image(type)
 	}
 	local rect = types[type]
 	if rect then
-		self._mouse:set_texture_rect(rect[1], rect[2], rect[3], rect[4])
+		self._mouse:child("pointer"):set_texture_rect(rect[1], rect[2], rect[3], rect[4])
 	end
 end
 

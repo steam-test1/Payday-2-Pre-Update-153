@@ -104,7 +104,8 @@ action_variants.sniper = security_variant
 action_variants.gangster = security_variant
 action_variants.dealer = security_variant
 action_variants.biker_escape = security_variant
-action_variants.shield = security_variant
+action_variants.shield = clone(security_variant)
+action_variants.shield.hurt = ShieldActionHurt
 action_variants.murky = security_variant
 action_variants.tank = clone(security_variant)
 action_variants.tank.walk = TankCopActionWalk
@@ -217,6 +218,7 @@ function CopMovement:post_init()
 		"bleedout",
 		"light_hurt",
 		"heavy_hurt",
+		"expl_hurt",
 		"hurt",
 		"hurt_sick",
 		"shield_knock",
@@ -1013,7 +1015,7 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		block_type = hurt_type
 	end
 	local client_interrupt
-	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "death" or hurt_type == "hurt_sick") then
+	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "expl_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "death" or hurt_type == "hurt_sick") then
 		client_interrupt = true
 	end
 	local tweak = self._tweak_data

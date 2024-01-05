@@ -1,6 +1,41 @@
 GuiTweakData = GuiTweakData or class()
 
 function GuiTweakData:init()
+	self.content_updates = {
+		{
+			id = "birthday",
+			name_id = "menu_content_birthday",
+			desc_id = "menu_content_birthday_desc",
+			date_id = "menu_content_birthday_date",
+			webpage = "http://www.overkillsoftware.com/birthday/",
+			image = "guis/textures/pd2/content_updates/birthday"
+		},
+		{
+			id = "halloween",
+			name_id = "menu_content_halloween",
+			desc_id = "menu_content_halloween_desc",
+			date_id = "menu_content_halloween_date",
+			webpage = "http://www.overkillsoftware.com/halloween/",
+			image = "guis/textures/pd2/content_updates/halloween"
+		},
+		{
+			id = "armored_transport",
+			name_id = "menu_content_armored_transport",
+			desc_id = "menu_content_armored_transport_desc",
+			date_id = "menu_content_armored_transport_date",
+			store = 264610,
+			image = "guis/textures/pd2/content_updates/armored_transport"
+		},
+		{
+			id = "gage_pack",
+			name_id = "menu_content_gage_pack",
+			desc_id = "menu_content_gage_pack_desc",
+			date_id = "menu_content_gage_pack_date",
+			store = 267380,
+			image = "guis/textures/pd2/content_updates/gage_pack"
+		}
+	}
+	self.num_previous_updates = 3
 	self.suspicion_to_visibility = {}
 	self.suspicion_to_visibility[1] = {}
 	self.suspicion_to_visibility[1].name_id = "bm_menu_concealment_low"
@@ -17,6 +52,7 @@ function GuiTweakData:init()
 	self.mouse_pointer.controller.max_acceleration = 3
 	self.mouse_pointer.controller.mouse_pointer_speed = 125
 	self.MAX_MASK_ROWS = math.round(12)
+	self.MAX_WEAPON_ROWS = math.round(12)
 	self.crime_net = {}
 	self.crime_net.controller = {}
 	self.crime_net.controller.snap_distance = 50
@@ -982,6 +1018,146 @@ function GuiTweakData:init()
 			x = 420,
 			y = 846,
 			icon = "guis/textures/pd2/crimenet_marker_buy"
+		},
+		{
+			id = "contact_info",
+			name_id = "menu_cn_contact_info",
+			desc_id = "menu_cn_contact_info_desc",
+			menu_node = "crimenet_contact_info",
+			x = 912,
+			y = 905,
+			icon = "guis/textures/pd2/crimenet_marker_codex"
+		},
+		{
+			id = "casino",
+			name_id = "menu_cn_casino",
+			desc_id = "menu_cn_casino_desc",
+			menu_node = "crimenet_contract_casino",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_casino",
+			unlock = "unlock_level",
+			pulse = true,
+			pulse_color = Color(204, 255, 209, 32) / 255
+		}
+	}
+	self.crime_net.codex = {
+		{
+			id = "contacts",
+			name_id = "menu_contacts",
+			{
+				id = "bain",
+				name_id = "heist_contact_bain",
+				{
+					desc_id = "heist_contact_bain_description",
+					video = "bain",
+					post_event = "pln_contact_bain"
+				}
+			},
+			{
+				id = "vlad",
+				name_id = "heist_contact_vlad",
+				{
+					desc_id = "heist_contact_vlad_description",
+					videos = {
+						"vlad1",
+						"vlad2",
+						"vlad3"
+					},
+					post_event = "vld_quote_set_a"
+				}
+			},
+			{
+				id = "hector",
+				name_id = "heist_contact_hector",
+				{
+					desc_id = "heist_contact_hector_description",
+					videos = {
+						"hector1",
+						"hector2",
+						"hector3"
+					},
+					post_event = "hct_quote_set_a"
+				}
+			},
+			{
+				id = "the_elephant",
+				name_id = "heist_contact_the_elephant",
+				{
+					desc_id = "heist_contact_the_elephant_description",
+					videos = {
+						"the_elephant1",
+						"the_elephant2",
+						"the_elephant3"
+					},
+					post_event = "elp_quote_set_a"
+				}
+			},
+			{
+				id = "gage",
+				name_id = "heist_contact_gage",
+				{
+					desc_id = "heist_contact_gage_description",
+					videos = {
+						"gage1",
+						"gage2",
+						"gage3"
+					},
+					post_event = "pln_contact_gage"
+				}
+			}
+		},
+		{
+			id = "playable_characters",
+			name_id = "menu_playable_characters",
+			{
+				id = "dallas",
+				name_id = "menu_russian",
+				{
+					desc_id = "russian_desc_codex",
+					videos = {
+						"dallas1",
+						"dallas2",
+						"dallas3"
+					},
+					post_event = "pln_contact_dallas"
+				}
+			},
+			{
+				id = "wolf",
+				name_id = "menu_german",
+				{
+					desc_id = "german_desc_codex",
+					videos = {"wolf1", "wolf2"},
+					post_event = "pln_contact_wolf"
+				}
+			},
+			{
+				id = "chains",
+				name_id = "menu_spanish",
+				{
+					desc_id = "spanish_desc_codex",
+					videos = {
+						"chains1",
+						"chains2",
+						"chains3"
+					},
+					post_event = "pln_contact_chains"
+				}
+			},
+			{
+				id = "hoxton",
+				name_id = "menu_american",
+				{
+					desc_id = "american_desc_codex",
+					videos = {
+						"hoxton1",
+						"hoxton2",
+						"hoxton3"
+					},
+					post_event = "pln_contact_hoxton"
+				}
+			}
 		}
 	}
 	self.crime_net.locations = {}

@@ -580,6 +580,36 @@ function MenuManager:show_skilltree_reseted()
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_confirm_infamypoints(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_skills_place_title")
+	dialog_data.text = managers.localization:text(params.text_string, {
+		item = params.infamy_item,
+		points = params.points,
+		remaining_points = params.remaining_points
+	})
+	dialog_data.focus_button = 1
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_infamytree_reseted()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_infamy_reseted_title")
+	dialog_data.text = managers.localization:text("dialog_infamytree_reseted")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_confirm_blackmarket_sell_no_slot(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_bm_mask_sell_title")
@@ -613,6 +643,24 @@ function MenuManager:show_confirm_blackmarket_sell(params)
 
 
 ]] .. managers.localization:text("dialog_blackmarket_slot_item_sell", {
+		money = params.money
+	})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_confirm_blackmarket_buy_weapon_slot(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_bm_weapon_buy_title")
+	dialog_data.text = managers.localization:text("dialog_blackmarket_buy_weapon_slot", {
 		money = params.money
 	})
 	dialog_data.focus_button = 2
@@ -1027,14 +1075,14 @@ function MenuManager:show_confirm_become_infamous(params)
 		local yes_button = {}
 		yes_button.text = managers.localization:text("dialog_yes")
 		yes_button.callback_func = params.yes_func
-		dialog_data.text = managers.localization:text("menu_become_infamous", {
+		dialog_data.text = managers.localization:text("menu_dialog_become_infamous", {
 			cash = params.cost
 		})
 		dialog_data.focus_button = 2
 		dialog_data.button_list = {yes_button, no_button}
 	else
 		no_button.text = managers.localization:text("dialog_ok")
-		dialog_data.text = managers.localization:text("menu_become_infamous_no_cash", {
+		dialog_data.text = managers.localization:text("menu_dialog_become_infamous_no_cash", {
 			cash = params.cost
 		})
 		dialog_data.focus_button = 1

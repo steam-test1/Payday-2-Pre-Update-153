@@ -21,8 +21,12 @@ function AssetsTweakData:_init_empty_asset(tweak_data)
 	self.none.money_lock = nil
 	self.none.upgrade_lock = nil
 	self.none.achievment_lock = nil
+	self.none.dlc_lock = nil
+	self.none.server_lock = nil
 	self.none.set_saved_job_value = nil
 	self.none.set_job_value = nil
+	self.none.award_achievement = nil
+	self.none.progress_stat = nil
 end
 
 function AssetsTweakData:_init_safehouse_assets(tweak_data)
@@ -80,6 +84,28 @@ function AssetsTweakData:_init_assets(tweak_data)
 		category = "player",
 		upgrade = "additional_assets"
 	}
+	self.grenade_crate = {}
+	self.grenade_crate.name_id = "menu_asset_grenade_crate"
+	self.grenade_crate.texture = "guis/dlcs/gage_pack/textures/pd2/mission_briefing/assets/grenade_crate"
+	self.grenade_crate.stages = {
+		"watchdogs_1",
+		"watchdogs_2",
+		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_2",
+		"alex_1",
+		"firestarter_1",
+		"firestarter_2",
+		"firestarter_3",
+		"branchbank",
+		"arm_for"
+	}
+	self.grenade_crate.visible_if_locked = true
+	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
+	self.grenade_crate.no_mystery = true
+	self.grenade_crate.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 1)
+	self.grenade_crate.dlc_lock = "gage_pack"
+	self.grenade_crate.server_lock = true
+	self.grenade_crate.progress_stat = "gage_10_stats"
 	self.ukrainian_job_tiara = {}
 	self.ukrainian_job_tiara.name_id = "menu_asset_test_jewelry_store_tiara"
 	self.ukrainian_job_tiara.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset01"
@@ -736,6 +762,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.arm_und_info.name_id = "menu_asset_arm_location"
 	self.arm_und_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/arm/underpass"
 	self.arm_und_info.stages = {"arm_und"}
+	self.roberts_pilot = {}
+	self.roberts_pilot.name_id = "menu_asset_roberts_pilot"
+	self.roberts_pilot.texture = "guis/textures/pd2/mission_briefing/assets/rat/day3/asset01"
+	self.roberts_pilot.stages = {"roberts"}
+	self.roberts_pilot.visible_if_locked = true
+	self.roberts_pilot.unlock_desc_id = "menu_asset_roberts_pilot_desc"
+	self.roberts_pilot.no_mystery = true
+	self.roberts_pilot.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_medium", 10)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

@@ -355,7 +355,7 @@ function CopLogicIdle.on_alert(data, alert_data)
 		if not att_obj_data then
 			return
 		end
-		if alert_type == "bullet" or alert_type == "aggression" then
+		if alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion" then
 			att_obj_data.alert_t = TimerManager:game():time()
 		end
 		local action_data
@@ -372,11 +372,11 @@ function CopLogicIdle.on_alert(data, alert_data)
 		end
 		if att_obj_data.criminal_record then
 			managers.groupai:state():criminal_spotted(alert_unit)
-			if alert_type == "bullet" or alert_type == "aggression" then
+			if alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion" then
 				managers.groupai:state():report_aggression(alert_unit)
 			end
 		end
-	elseif was_cool and (alert_type == "footstep" or alert_type == "bullet" or alert_type == "aggression" or alert_type == "vo_cbt" or alert_type == "vo_intimidate" or alert_type == "vo_distress") then
+	elseif was_cool and (alert_type == "footstep" or alert_type == "bullet" or alert_type == "aggression" or alert_type == "explosion" or alert_type == "vo_cbt" or alert_type == "vo_intimidate" or alert_type == "vo_distress") then
 		local attention_obj = alert_unit and alert_unit:brain() and alert_unit:brain()._logic_data.attention_obj
 		if attention_obj then
 			local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, attention_obj.u_key)

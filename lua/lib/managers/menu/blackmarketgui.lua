@@ -71,7 +71,7 @@ function BlackMarketGuiItem:mouse_pressed(button, x, y)
 end
 
 function BlackMarketGuiItem:mouse_moved(x, y)
-	return false
+	return false, "arrow"
 end
 
 function BlackMarketGuiItem:mouse_released(o, button, x, y)
@@ -345,22 +345,27 @@ function BlackMarketGuiTabItem:inside(x, y)
 		return
 	end
 	local update_select = false
+	local result = not self._is_empty_slot_highlighted and 1 or false
 	if not self._slot_highlighted then
 		update_select = true
+		result = false
 	elseif self._slots[self._slot_highlighted] and not self._slots[self._slot_highlighted]:inside(x, y) then
 		self._slots[self._slot_highlighted]:set_highlight(false)
 		self._slot_highlighted = nil
 		update_select = true
+		result = false
 	end
 	if update_select then
 		for i, slot in ipairs(self._slots) do
 			if slot:inside(x, y) then
 				self._slot_highlighted = i
 				self._slots[self._slot_highlighted]:set_highlight(true)
-				return 1
+				self._is_empty_slot_highlighted = self._slots[self._slot_highlighted]._name == "empty"
+				return not self._is_empty_slot_highlighted and 1 or false
 			end
 		end
 	end
+	return result
 end
 
 function BlackMarketGuiTabItem:mouse_pressed(button, x, y)
@@ -394,6 +399,9 @@ function BlackMarketGuiTabItem:mouse_pressed(button, x, y)
 	if self._slots[self._slot_selected] == self._slots[self._slot_highlighted] then
 		return
 	end
+	if button ~= Idstring("0") then
+		return
+	end
 	if self._slots[self._slot_highlighted] and self._slots[self._slot_highlighted]:inside(x, y) then
 		if self._slots[self._slot_selected] then
 			self._slots[self._slot_selected]:deselect(false)
@@ -403,9 +411,7 @@ function BlackMarketGuiTabItem:mouse_pressed(button, x, y)
 end
 
 function BlackMarketGuiTabItem:mouse_moved(x, y)
-	if self:moved_scroll_bar(x, y) then
-		return true
-	end
+	return self:moved_scroll_bar(x, y)
 end
 
 function BlackMarketGuiTabItem:mouse_released(o, button, x, y)
@@ -446,11 +452,18 @@ function BlackMarketGuiTabItem:release_scroll_bar()
 end
 
 function BlackMarketGuiTabItem:moved_scroll_bar(x, y)
+	local scroll_bar = self._scroll_bar_panel:child("scroll_bar")
 	if self._grabbed_scroll_bar then
 		self._current_scroll_bar_y = self:scroll_with_bar(y, self._current_scroll_bar_y or 0)
-		return true
+		return true, "grab"
+	elseif self._scroll_bar_panel:visible() and scroll_bar:inside(x, y) then
+		return true, "hand"
+	elseif self._scroll_bar_panel:child("scroll_up_indicator_arrow"):visible() and self._scroll_bar_panel:child("scroll_up_indicator_arrow"):inside(x, y) then
+		return true, "link"
+	elseif self._scroll_bar_panel:child("scroll_down_indicator_arrow"):visible() and self._scroll_bar_panel:child("scroll_down_indicator_arrow"):inside(x, y) then
+		return true, "link"
 	end
-	return false
+	return false, "arrow"
 end
 
 function BlackMarketGuiTabItem:scroll_with_bar(target_y, current_y)
@@ -1571,6 +1584,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_btn_sell",
 				callback = callback(self, self, "sell_item_callback")
 			},
+			ew_unlock = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_buy_weapon_slot",
+				callback = callback(self, self, "choose_weapon_slot_unlock_callback")
+			},
 			ew_buy = {
 				prio = 1,
 				btn = "BTN_A",
@@ -2584,6 +2604,9 @@ function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo)
 	local weapon_tweak_data = tweak_data.weapon[weapon_id]
 	local ammo_max_multiplier = managers.player:upgrade_value("player", "extra_ammo_multiplier", 1)
 	ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(weapon_tweak_data.category, "extra_ammo_multiplier", 1)
+	if managers.player:has_category_upgrade("player", "add_armor_stat_skill_ammo_mul") then
+		ammo_max_multiplier = ammo_max_multiplier * managers.player:body_armor_value("skill_ammo_mul", nil, 1)
+	end
 	
 	local function get_ammo_max_per_clip(weapon_id)
 		local function upgrade_blocked(category, upgrade)
@@ -2610,11 +2633,12 @@ function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo)
 	ammo_data.base = tweak_data.weapon[weapon_id].AMMO_MAX
 	ammo_data.mod = managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip
 	ammo_data.skill = math.round((ammo_data.base + ammo_data.mod) * ammo_max_multiplier) - ammo_data.base - ammo_data.mod
+	ammo_data.skill_in_effect = managers.player:has_category_upgrade("player", "extra_ammo_multiplier") or managers.player:has_category_upgrade(weapon_tweak_data.category, "extra_ammo_multiplier") or managers.player:has_category_upgrade("player", "add_armor_stat_skill_ammo_mul")
 	local ammo_max = math.round((tweak_data.weapon[weapon_id].AMMO_MAX + managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
 	return ammo_max_per_clip, ammo_max, ammo_data
 end
 
-function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_stats, silencer)
+function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_stats, silencer, single_mod, auto_mod)
 	local skill_stats = {}
 	for _, stat in pairs(self._stats_shown) do
 		skill_stats[stat.name] = {}
@@ -2635,8 +2659,6 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 				end
 				skill_stats[stat.name].skill_in_effect = managers.player:has_category_upgrade(name, "clip_ammo_increase") or managers.player:has_category_upgrade("weapon", "clip_ammo_increase")
 			elseif stat.name == "totalammo" then
-				skill_stats[stat.name].value = managers.player:upgrade_value("player", "extra_ammo_multiplier", 0) * managers.player:upgrade_value(weapon_tweak.category, "extra_ammo_multiplier", 1)
-				skill_stats[stat.name].skill_in_effect = managers.player:has_category_upgrade("player", "extra_ammo_multiplier") or managers.player:has_category_upgrade(weapon_tweak.category, "extra_ammo_multiplier")
 			else
 				base_value = math.max(base_stats[stat.name].value + mods_stats[stat.name].value, 0)
 				multiplier = 1
@@ -2644,7 +2666,8 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 				if stat.name == "damage" then
 					multiplier = managers.blackmarket:damage_multiplier(name, weapon_tweak.category, silencer, detection_risk)
 				elseif stat.name == "spread" then
-					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, weapon_tweak.auto and "auto" or "single")
+					local fire_mode = single_mod and "single" or auto_mod and "auto" or weapon_tweak.auto and "auto" or "single"
+					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, fire_mode)
 				elseif stat.name == "recoil" then
 					multiplier = managers.blackmarket:recoil_multiplier(name, weapon_tweak.category, silencer)
 				elseif stat.name == "suppression" then
@@ -2833,6 +2856,8 @@ end
 function BlackMarketGui:_get_stats(name, category, slot)
 	local equipped_mods
 	local silencer = false
+	local single_mod = false
+	local auto_mod = false
 	local blueprint = managers.blackmarket:get_weapon_blueprint(category, slot)
 	if blueprint then
 		equipped_mods = deep_clone(blueprint)
@@ -2843,15 +2868,18 @@ function BlackMarketGui:_get_stats(name, category, slot)
 		end
 		if equipped_mods then
 			silencer = managers.weapon_factory:has_perk("silencer", factory_id, equipped_mods)
+			single_mod = managers.weapon_factory:has_perk("fire_mode_single", factory_id, equipped_mods)
+			auto_mod = managers.weapon_factory:has_perk("fire_mode_auto", factory_id, equipped_mods)
 		end
 	end
 	local base_stats = self:_get_base_stats(name)
 	local mods_stats = self:_get_mods_stats(name, base_stats, equipped_mods)
-	local skill_stats = self:_get_skill_stats(name, category, slot, base_stats, mods_stats, silencer)
+	local skill_stats = self:_get_skill_stats(name, category, slot, base_stats, mods_stats, silencer, single_mod, auto_mod)
 	local clip_ammo, max_ammo, ammo_data = self:get_weapon_ammo_info(name, tweak_data.weapon[name].stats.extra_ammo)
 	base_stats.totalammo.value = ammo_data.base
 	mods_stats.totalammo.value = ammo_data.mod
 	skill_stats.totalammo.value = ammo_data.skill
+	skill_stats.totalammo.skill_in_effect = ammo_data.skill_in_effect
 	return base_stats, mods_stats, skill_stats
 end
 
@@ -3197,6 +3225,15 @@ function BlackMarketGui:update_info_text()
 				updated_texts[4].text = updated_texts[4].text .. "##" .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"
 				updated_texts[4].resource_color = tweak_data.lootdrop.global_values[slot_data.global_value].color
 			end
+		elseif slot_data.locked_slot then
+			ignore_lock = true
+			updated_texts[1].text = managers.localization:to_upper_text("bm_menu_locked_mask_slot")
+			if slot_data.cannot_buy then
+				updated_texts[3].text = slot_data.dlc_locked
+			else
+				updated_texts[2].text = slot_data.dlc_locked
+			end
+			updated_texts[4].text = managers.localization:text("bm_menu_locked_mask_slot_desc")
 		elseif not slot_data.is_loadout then
 			local prefix = ""
 			if not managers.menu:is_pc_controller() then
@@ -3498,7 +3535,7 @@ function BlackMarketGui:update_info_text()
 	end
 	for _, desc_mini_icon in ipairs(self._desc_mini_icons) do
 		desc_mini_icon[1]:set_y(title_offset)
-		desc_mini_icon[1]:set_world_top(self._info_texts[desc_mini_icon[2]]:world_bottom() + (1 - (desc_mini_icon[2] - 1) * 3))
+		desc_mini_icon[1]:set_world_top(self._info_texts[desc_mini_icon[2]]:world_bottom() + (2 - (desc_mini_icon[2] - 1) * 3))
 	end
 end
 
@@ -3588,14 +3625,20 @@ function BlackMarketGui:_rec_round_object(object)
 end
 
 function BlackMarketGui:mouse_moved(o, x, y)
+	local used = true
+	local pointer = "link"
 	local inside_tab_scroll = self._tab_scroll_panel:inside(x, y)
 	local update_select = false
 	if not self._highlighted then
 		update_select = true
-	elseif not (not self._tabs[self._highlighted] or self._tabs[self._highlighted]:inside(x, y)) or not inside_tab_scroll then
+		used = false
+		pointer = "arrow"
+	elseif not inside_tab_scroll or self._tabs[self._highlighted] and not self._tabs[self._highlighted]:inside(x, y) then
 		self._tabs[self._highlighted]:set_highlight(not self._pages, not self._pages)
 		self._highlighted = nil
 		update_select = true
+		used = false
+		pointer = "arrow"
 	end
 	if update_select then
 		for i, tab in ipairs(self._tabs) do
@@ -3603,22 +3646,31 @@ function BlackMarketGui:mouse_moved(o, x, y)
 			if update_select then
 				self._highlighted = i
 				self._tabs[self._highlighted]:set_highlight(self._selected ~= self._highlighted)
+				used = true
+				pointer = "link"
 			end
 		end
 	end
-	if self._tabs[self._selected] and self._tabs[self._selected]:mouse_moved(x, y) then
-		local x, y = self._tabs[self._selected]:selected_slot_center()
-		self._select_rect:set_world_center(x, y)
-		self._select_rect:stop()
-		self._select_rect_box:set_color(Color.white)
-		self._select_rect:set_visible(y > self._tabs[self._selected]._grid_panel:top() and y < self._tabs[self._selected]._grid_panel:bottom())
+	if self._tabs[self._selected] then
+		local tab_used, tab_pointer = self._tabs[self._selected]:mouse_moved(x, y)
+		if tab_used then
+			local x, y = self._tabs[self._selected]:selected_slot_center()
+			self._select_rect:set_world_center(x, y)
+			self._select_rect:stop()
+			self._select_rect_box:set_color(Color.white)
+			self._select_rect:set_visible(y > self._tabs[self._selected]._grid_panel:top() and y < self._tabs[self._selected]._grid_panel:bottom())
+			used = tab_used
+			pointer = tab_pointer
+		end
 	end
 	if self._panel:child("back_button"):inside(x, y) then
+		used = true
+		pointer = "link"
 		if not self._back_button_highlighted then
 			self._back_button_highlighted = true
 			self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_2)
 			managers.menu_component:post_event("highlight")
-			return
+			return used, pointer
 		end
 	elseif self._back_button_highlighted then
 		self._back_button_highlighted = false
@@ -3640,10 +3692,16 @@ function BlackMarketGui:mouse_moved(o, x, y)
 			end
 		end
 	end
+	if self._button_highlighted then
+		used = true
+		pointer = "link"
+	end
 	if self._tab_scroll_table.left and self._tab_scroll_table.left_klick then
 		local color
 		if self._tab_scroll_table.left:inside(x, y) then
 			color = tweak_data.screen_colors.button_stage_2
+			used = true
+			pointer = "link"
 		else
 			color = tweak_data.screen_colors.button_stage_3
 		end
@@ -3653,11 +3711,14 @@ function BlackMarketGui:mouse_moved(o, x, y)
 		local color
 		if self._tab_scroll_table.right:inside(x, y) then
 			color = tweak_data.screen_colors.button_stage_2
+			used = true
+			pointer = "link"
 		else
 			color = tweak_data.screen_colors.button_stage_3
 		end
 		self._tab_scroll_table.right:set_color(color)
 	end
+	return used, pointer
 end
 
 function BlackMarketGui:mouse_pressed(button, x, y)
@@ -3707,7 +3768,7 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 	if self._selected_slot and self._selected_slot._equipped_rect then
 		self._selected_slot._equipped_rect:set_alpha(1)
 	end
-	if self._tab_scroll_panel:inside(x, y) and self._tabs[self._highlighted] and self._tabs[self._highlighted]:inside(x, y) then
+	if self._tab_scroll_panel:inside(x, y) and self._tabs[self._highlighted] and self._tabs[self._highlighted]:inside(x, y) ~= 1 then
 		if self._selected ~= self._highlighted then
 			self:set_selected_tab(self._highlighted)
 		end
@@ -4145,6 +4206,8 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		last_unlocked_weapon = category_size == 1
 	end
 	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
+	local max_rows = tweak_data.gui.MAX_WEAPON_ROWS or 3
+	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
 	for i = 1, max_items do
 		data[i] = nil
 	end
@@ -4237,35 +4300,71 @@ function BlackMarketGui:populate_weapon_category(category, data)
 	end
 	for i = 1, max_items do
 		if not data[i] then
+			local can_buy_weapon = managers.blackmarket:is_weapon_slot_unlocked(category, i)
 			new_data = {}
-			new_data.name = "bm_menu_btn_buy_new_weapon"
-			new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
-			new_data.mid_text = {}
-			new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_new_weapon")
-			new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
-			new_data.mid_text.noselected_text = new_data.name_localized
-			new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
-			new_data.empty_slot = true
-			new_data.category = category
-			new_data.slot = i
-			new_data.unlocked = true
-			new_data.can_afford = true
-			new_data.equipped = false
-			table.insert(new_data, "ew_buy")
-			if managers.blackmarket:got_new_drop(new_data.category, "weapon_buy_empty", nil) then
-				new_data.mini_icons = new_data.mini_icons or {}
-				table.insert(new_data.mini_icons, {
-					name = "new_drop",
-					texture = "guis/textures/pd2/blackmarket/inv_newdrop",
-					right = 0,
-					top = 0,
-					layer = 1,
-					w = 16,
-					h = 16,
-					stream = false,
-					visible = false
-				})
-				new_data.new_drop_data = {}
+			if can_buy_weapon then
+				new_data.name = "bm_menu_btn_buy_new_weapon"
+				new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
+				new_data.mid_text = {}
+				new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_new_weapon")
+				new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
+				new_data.mid_text.noselected_text = new_data.name_localized
+				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+				new_data.empty_slot = true
+				new_data.category = category
+				new_data.slot = i
+				new_data.unlocked = true
+				new_data.can_afford = true
+				new_data.equipped = false
+				table.insert(new_data, "ew_buy")
+				if managers.blackmarket:got_new_drop(new_data.category, "weapon_buy_empty", nil) then
+					new_data.mini_icons = new_data.mini_icons or {}
+					table.insert(new_data.mini_icons, {
+						name = "new_drop",
+						texture = "guis/textures/pd2/blackmarket/inv_newdrop",
+						right = 0,
+						top = 0,
+						layer = 1,
+						w = 16,
+						h = 16,
+						stream = false,
+						visible = false
+					})
+					new_data.new_drop_data = {}
+				end
+			else
+				new_data.name = "bm_menu_btn_buy_weapon_slot"
+				new_data.name_localized = managers.localization:text("bm_menu_locked_weapon_slot")
+				new_data.empty_slot = true
+				new_data.category = category
+				new_data.slot = i
+				new_data.unlocked = true
+				new_data.equipped = false
+				new_data.lock_texture = "guis/textures/pd2/blackmarket/money_lock"
+				new_data.lock_color = tweak_data.screen_colors.button_stage_3
+				new_data.lock_shape = {
+					w = 32,
+					h = 32,
+					x = 0,
+					y = -32
+				}
+				new_data.locked_slot = true
+				new_data.dlc_locked = managers.experience:cash_string(managers.money:get_buy_weapon_slot_price())
+				new_data.mid_text = {}
+				new_data.mid_text.noselected_text = new_data.name_localized
+				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+				new_data.mid_text.is_lock_same_color = true
+				if managers.money:can_afford_buy_weapon_slot() then
+					new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_weapon_slot")
+					new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
+					table.insert(new_data, "ew_unlock")
+				else
+					new_data.mid_text.selected_text = managers.localization:text("bm_menu_cannot_buy_weapon_slot")
+					new_data.mid_text.selected_color = tweak_data.screen_colors.important_1
+					new_data.dlc_locked = new_data.dlc_locked .. "  " .. managers.localization:to_upper_text("bm_menu_cannot_buy_weapon_slot")
+					new_data.mid_text.lock_noselected_color = tweak_data.screen_colors.important_1
+					new_data.cannot_buy = true
+				end
 			end
 			data[i] = new_data
 		end
@@ -4792,13 +4891,16 @@ function BlackMarketGui:populate_mods(data)
 					new_data.mid_text = nil
 					new_data.conflict = managers.localization:text("bm_menu_" .. tostring(tweak_data.weapon.factory.parts[forbids[1]].type))
 				end
+				local weapon = managers.blackmarket:get_crafted_category_slot(data.prev_node_data.category, data.prev_node_data.slot) or {}
 				local gadget
 				local mod_type = tweak_data.weapon.factory.parts[new_data.name].type
+				local sub_type = tweak_data.weapon.factory.parts[new_data.name].sub_type
+				local is_auto = weapon and tweak_data.weapon[weapon.weapon_id] and tweak_data.weapon[weapon.weapon_id].FIRE_MODE == "auto"
 				if mod_type == "gadget" then
-					gadget = tweak_data.weapon.factory.parts[new_data.name].sub_type
+					gadget = sub_type
 				end
-				local silencer = tweak_data.weapon.factory.parts[new_data.name].sub_type == "silencer" and true
-				local texture = managers.menu_component:get_texture_from_mod_type(mod_type, gadget, silencer)
+				local silencer = sub_type == "silencer" and true
+				local texture = managers.menu_component:get_texture_from_mod_type(mod_type, sub_type, gadget, silencer, is_auto)
 				new_data.desc_mini_icons = {}
 				if DB:has(Idstring("texture"), texture) then
 					table.insert(new_data.desc_mini_icons, {
@@ -4844,7 +4946,7 @@ function BlackMarketGui:populate_mods(data)
 			end
 			data[index] = new_data
 		end
-		for i = 1, math.min(num_steps, 3) * 3 do
+		for i = 1, math.max(math.ceil(num_steps / 3), 3) * 3 do
 			if not data[i] then
 				new_data = {}
 				new_data.name = "empty"
@@ -5050,7 +5152,9 @@ function BlackMarketGui:populate_buy_mask(data)
 		if new_data.unlocked and new_data.unlocked > 0 then
 			table.insert(new_data, "bm_buy")
 			table.insert(new_data, "bm_preview")
-			table.insert(new_data, "bm_sell")
+			if 0 < managers.money:get_mask_sell_value(new_data.name, new_data.global_value, {}) then
+				table.insert(new_data, "bm_sell")
+			end
 		else
 			new_data.mid_text = ""
 			new_data.lock_texture = new_data.lock_texture or true
@@ -5708,6 +5812,14 @@ function BlackMarketGui:choose_mask_global_value_callback(data)
 	managers.menu:open_node(self._inception_node_name, {new_node_data})
 end
 
+function BlackMarketGui:choose_weapon_slot_unlock_callback(data)
+	local params = {}
+	params.money = managers.experience:cash_string(managers.money:get_buy_weapon_slot_price())
+	params.yes_func = callback(self, self, "_dialog_yes", callback(self, self, "_buy_weapon_slot_callback", data))
+	params.no_func = callback(self, self, "_dialog_no")
+	managers.menu:show_confirm_blackmarket_buy_weapon_slot(params)
+end
+
 function BlackMarketGui:choose_mask_slot_unlock_callback(data)
 	local params = {}
 	params.money = managers.experience:cash_string(managers.money:get_buy_mask_slot_price())
@@ -6186,6 +6298,12 @@ end
 function BlackMarketGui:_buy_mask_slot_callback(data)
 	managers.menu_component:post_event("item_buy")
 	managers.blackmarket:buy_unlock_mask_slot(data.slot)
+	self:reload()
+end
+
+function BlackMarketGui:_buy_weapon_slot_callback(data)
+	managers.menu_component:post_event("item_buy")
+	managers.blackmarket:buy_unlock_weapon_slot(data.category, data.slot)
 	self:reload()
 end
 
