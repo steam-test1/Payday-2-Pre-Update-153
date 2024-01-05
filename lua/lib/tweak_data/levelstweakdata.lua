@@ -592,7 +592,7 @@ function LevelsTweakData:init()
 	self.family.music = "heist"
 	self.family.package = "packages/narr_family"
 	self.family.cube = "cube_apply_heist_bank"
-	self.family.ghost_bonus = 0.5
+	self.family.ghost_bonus = 0.05
 	self.family.max_bags = 24
 	self.big = {}
 	self.big.name_id = "heist_big_hl"
