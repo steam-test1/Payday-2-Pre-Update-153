@@ -41,7 +41,7 @@ function ElementLaserTrigger:init(...)
 		self._dummy_units = {}
 		self._dummies_visible = true
 		for _, point in pairs(self._values.points) do
-			local unit = World:spawn_unit(Idstring("units/payday2/props/gen_prop_lazer_blaster_dome/gen_prop_lazer_blaster_dome"), point.pos, point.rot)
+			local unit = safe_spawn_unit(Idstring("units/payday2/props/gen_prop_lazer_blaster_dome/gen_prop_lazer_blaster_dome"), point.pos, point.rot)
 			local materials = unit:get_objects_by_type(Idstring("material"))
 			for _, m in ipairs(materials) do
 				m:set_variable(Idstring("contour_opacity"), 0)

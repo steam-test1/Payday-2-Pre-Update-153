@@ -1055,7 +1055,6 @@ function BlackMarketGuiSlotItem:icon_loaded_clbk(icon_data, texture_idstring, ..
 	if icon_data.name == "new_drop" and self._data.new_drop_data then
 		self._data.new_drop_data.icon = new_icon
 	end
-	icon_data.request_index = false
 end
 
 function BlackMarketGuiSlotItem:destroy()
@@ -1122,7 +1121,6 @@ function BlackMarketGuiSlotItem:texture_loaded_clbk(texture_idstring)
 		self._post_load_blend_mode = nil
 	end
 	self._loading_texture = nil
-	self._request_index = nil
 	self:set_highlight(self._highlighted, true)
 	if self._selected then
 		self:select(true)
@@ -2341,7 +2339,10 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		else
 			self._stats_shown = {
 				{name = "magazine", stat_name = "extra_ammo"},
-				{name = "totalammo"},
+				{
+					name = "totalammo",
+					stat_name = "total_ammo_mod"
+				},
 				{name = "fire_rate"},
 				{name = "damage"},
 				{
@@ -2945,7 +2946,7 @@ function BlackMarketGui:_set_detection(value, maxed_reached)
 	end
 end
 
-function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo)
+function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo, total_ammo_mod)
 	local weapon_tweak_data = tweak_data.weapon[weapon_id]
 	local ammo_max_multiplier = managers.player:upgrade_value("player", "extra_ammo_multiplier", 1)
 	ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(weapon_tweak_data.category, "extra_ammo_multiplier", 1)
@@ -2974,12 +2975,15 @@ function BlackMarketGui:get_weapon_ammo_info(weapon_id, extra_ammo)
 	end
 	
 	local ammo_max_per_clip = get_ammo_max_per_clip(weapon_id)
+	local ammo_max = tweak_data.weapon[weapon_id].AMMO_MAX
+	local ammo_from_mods = math.round(ammo_max * (total_ammo_mod and tweak_data.weapon.stats.total_ammo_mod[total_ammo_mod] or 0))
+	ammo_max = math.round((ammo_max + ammo_from_mods + managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
+	ammo_max_per_clip = math.min(ammo_max_per_clip, ammo_max)
 	local ammo_data = {}
 	ammo_data.base = tweak_data.weapon[weapon_id].AMMO_MAX
-	ammo_data.mod = managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip
+	ammo_data.mod = ammo_from_mods + managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip
 	ammo_data.skill = math.round((ammo_data.base + ammo_data.mod) * ammo_max_multiplier) - ammo_data.base - ammo_data.mod
 	ammo_data.skill_in_effect = managers.player:has_category_upgrade("player", "extra_ammo_multiplier") or managers.player:has_category_upgrade(weapon_tweak_data.category, "extra_ammo_multiplier") or managers.player:has_category_upgrade("player", "add_armor_stat_skill_ammo_mul")
-	local ammo_max = math.round((tweak_data.weapon[weapon_id].AMMO_MAX + managers.player:upgrade_value(weapon_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
 	return ammo_max_per_clip, ammo_max, ammo_data
 end
 
@@ -3013,7 +3017,7 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 				if stat.name == "damage" then
 					multiplier = managers.blackmarket:damage_multiplier(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint)
 				elseif stat.name == "spread" then
-					local fire_mode = single_mod and "single" or auto_mod and "auto" or weapon_tweak.auto and "auto" or "single"
+					local fire_mode = single_mod and "single" or auto_mod and "auto" or weapon_tweak.FIRE_MODE or "single"
 					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, fire_mode, blueprint)
 				elseif stat.name == "recoil" then
 					multiplier = managers.blackmarket:recoil_multiplier(name, weapon_tweak.category, silencer, blueprint)
@@ -3053,6 +3057,9 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 							local ammo = tweak_factory[mod].stats.extra_ammo
 							ammo = ammo and ammo + (tweak_data.weapon[name].stats.extra_ammo or 0)
 							mods_stats[stat.name].value = mods_stats[stat.name].value + (ammo and tweak_data.weapon.stats.extra_ammo[ammo] or 0)
+						elseif stat.name == "totalammo" then
+							local ammo = tweak_factory[mod].stats.total_ammo_mod
+							mods_stats[stat.name].index = mods_stats[stat.name].index + (ammo or 0)
 						else
 							mods_stats[stat.name].index = mods_stats[stat.name].index + (tweak_factory[mod].stats[stat.name] or 0)
 						end
@@ -3060,21 +3067,22 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 				end
 			end
 		end
-		local index
+		local index, stat_name
 		for _, stat in pairs(self._stats_shown) do
-			if mods_stats[stat.name].index and tweak_stats[stat.name] then
+			stat_name = stat.name
+			if mods_stats[stat.name].index and tweak_stats[stat_name] then
 				if stat.name == "concealment" then
 					index = base_stats[stat.name].index + mods_stats[stat.name].index
 				else
-					index = math.clamp(base_stats[stat.name].index + mods_stats[stat.name].index, 1, #tweak_stats[stat.name])
+					index = math.clamp(base_stats[stat.name].index + mods_stats[stat.name].index, 1, #tweak_stats[stat_name])
 				end
-				mods_stats[stat.name].value = math.round(stat.index and index or tweak_stats[stat.name][index] * tweak_data.gui.stats_present_multiplier)
-				local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]) * tweak_data.gui.stats_present_multiplier)
+				mods_stats[stat.name].value = math.round(stat.index and index or tweak_stats[stat_name][index] * tweak_data.gui.stats_present_multiplier)
+				local offset = math.round(math.min(tweak_stats[stat_name][1], tweak_stats[stat_name][#tweak_stats[stat_name]]) * tweak_data.gui.stats_present_multiplier)
 				if stat.offset then
 					mods_stats[stat.name].value = mods_stats[stat.name].value - offset
 				end
 				if stat.revert then
-					local max_stat = math.round(math.max(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]) * tweak_data.gui.stats_present_multiplier)
+					local max_stat = math.round(math.max(tweak_stats[stat_name][1], tweak_stats[stat_name][#tweak_stats[stat_name]]) * tweak_data.gui.stats_present_multiplier)
 					if stat.revert then
 						max_stat = max_stat - offset
 					end
@@ -3083,18 +3091,18 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 				if modifier_stats and modifier_stats[stat.name] then
 					local mod = modifier_stats[stat.name]
 					if stat.revert and not stat.index then
-						local real_base_value = tweak_stats[stat.name][index]
+						local real_base_value = tweak_stats[stat_name][index]
 						local modded_value = real_base_value * mod
-						local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+						local offset = math.round(math.min(tweak_stats[stat_name][1], tweak_stats[stat_name][#tweak_stats[stat_name]]))
 						if stat.offset then
 							modded_value = modded_value - offset
 						end
-						local max_stat = math.round(math.max(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+						local max_stat = math.round(math.max(tweak_stats[stat_name][1], tweak_stats[stat_name][#tweak_stats[stat_name]]))
 						if stat.revert then
 							max_stat = max_stat - offset
 						end
 						local new_value = math.round((max_stat - modded_value) * tweak_data.gui.stats_present_multiplier)
-						if mod ~= 0 and (modded_value > tweak_stats[stat.name][1] or modded_value < tweak_stats[stat.name][#tweak_stats[stat.name]]) then
+						if mod ~= 0 and (modded_value > tweak_stats[stat_name][1] or modded_value < tweak_stats[stat_name][#tweak_stats[stat_name]]) then
 							new_value = math.round((new_value + mods_stats[stat.name].value / mod) / 2)
 						end
 						mods_stats[stat.name].value = new_value
@@ -3120,7 +3128,9 @@ function BlackMarketGui:_get_base_stats(name)
 			base_stats[stat.name].index = 0
 			base_stats[stat.name].value = tweak_data.weapon[name].CLIP_AMMO_MAX
 		elseif stat.name == "totalammo" then
-			base_stats[stat.name].index = 0
+			index = math.clamp(tweak_data.weapon[name].stats.total_ammo_mod, 1, #tweak_stats.total_ammo_mod)
+			base_stats[stat.name].index = tweak_data.weapon[name].stats.total_ammo_mod
+			base_stats[stat.name].value = tweak_data.weapon[name].AMMO_MAX
 		elseif stat.name == "fire_rate" then
 			local fire_rate = 60 / tweak_data.weapon[name].fire_mode_data.fire_rate
 			base_stats[stat.name].value = math.round(fire_rate / 10) * 10
@@ -3395,11 +3405,15 @@ function BlackMarketGui:_get_stats(name, category, slot)
 	local base_stats = self:_get_base_stats(name)
 	local mods_stats = self:_get_mods_stats(name, base_stats, equipped_mods)
 	local skill_stats = self:_get_skill_stats(name, category, slot, base_stats, mods_stats, silencer, single_mod, auto_mod)
-	local clip_ammo, max_ammo, ammo_data = self:get_weapon_ammo_info(name, tweak_data.weapon[name].stats.extra_ammo)
+	local clip_ammo, max_ammo, ammo_data = self:get_weapon_ammo_info(name, tweak_data.weapon[name].stats.extra_ammo, base_stats.totalammo.index + mods_stats.totalammo.index)
 	base_stats.totalammo.value = ammo_data.base
 	mods_stats.totalammo.value = ammo_data.mod
 	skill_stats.totalammo.value = ammo_data.skill
 	skill_stats.totalammo.skill_in_effect = ammo_data.skill_in_effect
+	local my_clip = base_stats.magazine.value + mods_stats.magazine.value + skill_stats.magazine.value
+	if max_ammo < my_clip then
+		mods_stats.magazine.value = mods_stats.magazine.value + (max_ammo - my_clip)
+	end
 	return base_stats, mods_stats, skill_stats
 end
 
@@ -3432,6 +3446,10 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 					local ammo = tweak_factory[mod.name].stats.extra_ammo
 					ammo = ammo and ammo + (tweak_data.weapon[weapon_name].stats.extra_ammo or 0)
 					mod[stat.name] = ammo and tweak_data.weapon.stats.extra_ammo[ammo] or 0
+				elseif stat.name == "totalammo" then
+					local chosen_index = tweak_factory[mod.name].stats.total_ammo_mod or 0
+					chosen_index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats.total_ammo_mod)
+					mod[stat.name] = math.round(base_stats[stat.name].value * tweak_stats.total_ammo_mod[chosen_index])
 				else
 					local chosen_index = tweak_factory[mod.name].stats[stat.name] or 0
 					if tweak_stats[stat.name] then
@@ -4127,12 +4145,6 @@ function BlackMarketGui:update_info_text()
 			if not slot_data.not_moddable and not self._data.is_loadout then
 				self:_set_rename_info_text(1)
 			end
-			local clip_ammo, max_ammo = self:get_weapon_ammo_info(slot_data.name, slot_data.comparision_data and slot_data.comparision_data.extra_ammo)
-			local ammo_id = "bm_menu_ammo_capacity"
-			if slot_data.name == "saw" then
-				ammo_id = "bm_menu_saw_ammo_capacity"
-				max_ammo = math.max(math.floor(max_ammo / clip_ammo), 0)
-			end
 			if not slot_data.unlocked then
 				local skill_based = slot_data.skill_based
 				local level_based = slot_data.level and 0 < slot_data.level
@@ -4337,14 +4349,15 @@ function BlackMarketGui:update_info_text()
 		end
 		local part_id = slot_data.name
 		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget"
-		if is_gadget then
+		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo"
+		if is_gadget or is_ammo then
 			local desc_id = tweak_data.blackmarket.weapon_mods[part_id].desc_id
 			updated_texts[4].text = desc_id and managers.localization:text(desc_id, {
 				BTN_GADGET = managers.localization:btn_macro("weapon_gadget", true)
 			}) or Application:production_build() and "Add ##desc_id## to ##" .. part_id .. "## in tweak_data.blackmarket.weapon_mods" or ""
 		end
 		if slot_data.global_value and slot_data.global_value ~= "normal" then
-			if is_gadget then
+			if is_gadget or is_ammo then
 				updated_texts[4].text = updated_texts[4].text .. [[
 
 ##]] .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"

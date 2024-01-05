@@ -445,6 +445,210 @@ function DLCTweakData:init(tweak_data)
 		"scar",
 		"p226"
 	}
+	self.gage_pack_shotgun_free = {}
+	self.gage_pack_shotgun_free.free = true
+	self.gage_pack_shotgun_free.content = {}
+	self.gage_pack_shotgun_free.content.loot_global_value = "normal"
+	self.gage_pack_shotgun_free.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_custom_free",
+			amount = 2
+		}
+	}
+	self.gage_pack_shotgun = {}
+	self.gage_pack_shotgun.dlc = "has_gage_pack_shotgun"
+	self.gage_pack_shotgun.content = {}
+	self.gage_pack_shotgun.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_slug",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_custom",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_explosive",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_piercing",
+			amount = 1
+		}
+	}
+	self.ach_gage4_2 = {}
+	self.ach_gage4_2.dlc = "has_achievement"
+	self.ach_gage4_2.achievement_id = "gage4_2"
+	self.ach_gage4_2.content = {}
+	self.ach_gage4_2.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_2.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_mbus_rear",
+			amount = 1
+		}
+	}
+	self.ach_gage4_4 = {}
+	self.ach_gage4_4.dlc = "has_achievement"
+	self.ach_gage4_4.achievement_id = "gage4_4"
+	self.ach_gage4_4.content = {}
+	self.ach_gage4_4.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mandril",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "explosive",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "terror",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ben_b_short",
+			amount = 1
+		}
+	}
+	self.ach_gage4_5 = {}
+	self.ach_gage4_5.dlc = "has_achievement"
+	self.ach_gage4_5.achievement_id = "gage4_5"
+	self.ach_gage4_5.content = {}
+	self.ach_gage4_5.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_5.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ben_b_long",
+			amount = 1
+		}
+	}
+	self.ach_gage4_6 = {}
+	self.ach_gage4_6.dlc = "has_achievement"
+	self.ach_gage4_6.achievement_id = "gage4_6"
+	self.ach_gage4_6.content = {}
+	self.ach_gage4_6.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_6.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ben_s_collapsed",
+			amount = 1
+		}
+	}
+	self.ach_gage4_7 = {}
+	self.ach_gage4_7.dlc = "has_achievement"
+	self.ach_gage4_7.achievement_id = "gage4_7"
+	self.ach_gage4_7.content = {}
+	self.ach_gage4_7.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_7.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ksg_b_short",
+			amount = 1
+		}
+	}
+	self.ach_gage4_8 = {}
+	self.ach_gage4_8.dlc = "has_achievement"
+	self.ach_gage4_8.achievement_id = "gage4_8"
+	self.ach_gage4_8.content = {}
+	self.ach_gage4_8.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_8.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "skullmonkey",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "leaf",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "monkeyskull",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ksg_b_long",
+			amount = 1
+		}
+	}
+	self.ach_gage4_9 = {}
+	self.ach_gage4_9.dlc = "has_achievement"
+	self.ach_gage4_9.achievement_id = "gage4_9"
+	self.ach_gage4_9.content = {}
+	self.ach_gage4_9.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_9.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_ben_s_solid",
+			amount = 1
+		}
+	}
+	self.ach_gage4_10 = {}
+	self.ach_gage4_10.dlc = "has_achievement"
+	self.ach_gage4_10.achievement_id = "gage4_10"
+	self.ach_gage4_10.content = {}
+	self.ach_gage4_10.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_10.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "silverback",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "sparks",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "chief",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_striker_b_long",
+			amount = 1
+		}
+	}
+	self.ach_gage4_11 = {}
+	self.ach_gage4_11.dlc = "has_achievement"
+	self.ach_gage4_11.achievement_id = "gage4_11"
+	self.ach_gage4_11.content = {}
+	self.ach_gage4_11.content.loot_global_value = "gage_pack_shotgun"
+	self.ach_gage4_11.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "orangutang",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "bananapeel",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "banana",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_striker_b_suppressed",
+			amount = 1
+		}
+	}
 	self.gage_pack_lmg = {}
 	self.gage_pack_lmg.content = {}
 	self.gage_pack_lmg.dlc = "has_gage_pack_lmg"

@@ -371,6 +371,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.big_bank.track = true
 	self.global_values.big_bank.sort_number = 84
 	self.global_values.big_bank.category = "dlc"
+	self.global_values.gage_pack_shotgun = {}
+	self.global_values.gage_pack_shotgun.name_id = "bm_global_value_gage_pack_shotgun"
+	self.global_values.gage_pack_shotgun.desc_id = "menu_l_global_value_gage_pack_shotgun"
+	self.global_values.gage_pack_shotgun.unlock_id = "bm_global_value_gage_pack_shotgun_unlock"
+	self.global_values.gage_pack_shotgun.color = Color(255, 255, 212, 0) / 255
+	self.global_values.gage_pack_shotgun.dlc = true
+	self.global_values.gage_pack_shotgun.chance = 1
+	self.global_values.gage_pack_shotgun.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "gage_pack_shotgun")
+	self.global_values.gage_pack_shotgun.durability_multiplier = 1
+	self.global_values.gage_pack_shotgun.drops = true
+	self.global_values.gage_pack_shotgun.track = true
+	self.global_values.gage_pack_shotgun.sort_number = 85
+	self.global_values.gage_pack_shotgun.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -409,7 +422,8 @@ function LootDropTweakData:init(tweak_data)
 		"gage_pack_jobs",
 		"gage_pack_snp",
 		"poetry_soundtrack",
-		"big_bank"
+		"big_bank",
+		"gage_pack_shotgun"
 	}
 	self.global_value_list_map = {}
 	for i, d in ipairs(self.global_value_list_index) do

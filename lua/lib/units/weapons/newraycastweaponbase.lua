@@ -16,6 +16,7 @@ NewRaycastWeaponBase = NewRaycastWeaponBase or class(RaycastWeaponBase)
 function NewRaycastWeaponBase:init(unit)
 	NewRaycastWeaponBase.super.init(self, unit)
 	self._has_gadget = false
+	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
 end
 
 function NewRaycastWeaponBase:is_npc()
@@ -37,7 +38,8 @@ end
 function NewRaycastWeaponBase:assemble(factory_id)
 	local third_person = self:is_npc()
 	local skip_queue = self:skip_queue()
-	self._parts, self._blueprint = managers.weapon_factory:assemble_default(factory_id, self._unit, third_person, callback(self, self, "_assemble_completed"), skip_queue)
+	self._parts, self._blueprint = managers.weapon_factory:assemble_default(factory_id, self._unit, third_person, callback(self, self, "clbk_assembly_complete", function()
+	end), skip_queue)
 	self:_update_stats_values()
 	do return end
 	local third_person = self:is_npc()
@@ -46,10 +48,11 @@ function NewRaycastWeaponBase:assemble(factory_id)
 	self:_update_stats_values()
 end
 
-function NewRaycastWeaponBase:assemble_from_blueprint(factory_id, blueprint)
+function NewRaycastWeaponBase:assemble_from_blueprint(factory_id, blueprint, clbk)
 	local third_person = self:is_npc()
 	local skip_queue = self:skip_queue()
-	self._parts, self._blueprint = managers.weapon_factory:assemble_from_blueprint(factory_id, self._unit, blueprint, third_person, callback(self, self, "_assemble_completed"), skip_queue)
+	self._parts, self._blueprint = managers.weapon_factory:assemble_from_blueprint(factory_id, self._unit, blueprint, third_person, callback(self, self, "clbk_assembly_complete", clbk or function()
+	end), skip_queue)
 	self:_update_stats_values()
 	do return end
 	local third_person = self:is_npc()
@@ -58,7 +61,7 @@ function NewRaycastWeaponBase:assemble_from_blueprint(factory_id, blueprint)
 	self:_update_stats_values()
 end
 
-function NewRaycastWeaponBase:_assemble_completed(parts, blueprint)
+function NewRaycastWeaponBase:clbk_assembly_complete(clbk, parts, blueprint)
 	self._assembly_complete = true
 	self._parts = parts
 	self._blueprint = blueprint
@@ -85,6 +88,7 @@ function NewRaycastWeaponBase:_assemble_completed(parts, blueprint)
 	if self._second_sight_data then
 		self._second_sight_data.unit = self._parts[self._second_sight_data.part_id].unit
 	end
+	clbk()
 end
 
 function NewRaycastWeaponBase:apply_texture_switches()
@@ -229,6 +233,31 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
 	self._locked_fire_mode = (not managers.weapon_factory:has_perk("fire_mode_auto", self._factory_id, self._blueprint) or not ids_auto) and managers.weapon_factory:has_perk("fire_mode_single", self._factory_id, self._blueprint) and ids_single
 	self._fire_mode = self._locked_fire_mode or Idstring(self:weapon_tweak_data().FIRE_MODE or "single")
+	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint)
+	self._can_shoot_through_shield = tweak_data.weapon[self._name_id].can_shoot_through_shield
+	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
+	self._can_shoot_through_wall = tweak_data.weapon[self._name_id].can_shoot_through_wall
+	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
+	if self._ammo_data then
+		if self._ammo_data.can_shoot_through_shield ~= nil then
+			self._can_shoot_through_shield = self._ammo_data.can_shoot_through_shield
+		end
+		if self._ammo_data.can_shoot_through_enemy ~= nil then
+			self._can_shoot_through_enemy = self._ammo_data.can_shoot_through_enemy
+		end
+		if self._ammo_data.can_shoot_through_wall ~= nil then
+			self._can_shoot_through_wall = self._ammo_data.can_shoot_through_wall
+		end
+		if self._ammo_data.bullet_class ~= nil then
+			self._bullet_class = CoreSerialize.string_to_classtable(self._ammo_data.bullet_class)
+		end
+		if self._ammo_data.armor_piercing_add ~= nil then
+			self._armor_piercing_chance = math.clamp(self._armor_piercing_chance + self._ammo_data.armor_piercing_add, 0, 1)
+		end
+		if self._ammo_data.armor_piercing_mul ~= nil then
+			self._armor_piercing_chance = math.clamp(self._armor_piercing_chance * self._ammo_data.armor_piercing_mul, 0, 1)
+		end
+	end
 	if self._silencer then
 		self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash_silenced or "effects/payday2/particles/weapons/9mm_auto_silence_fps")
 	else
@@ -281,6 +310,7 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._recoil = self._current_stats.recoil or self._recoil
 	self._spread_moving = self._current_stats.spread_moving or self._spread_moving
 	self._extra_ammo = self._current_stats.extra_ammo or self._extra_ammo
+	self._total_ammo_mod = self._current_stats.total_ammo_mod or self._total_ammo_mod
 	self._has_gadget = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	self._scopes = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("scope", self._factory_id, self._blueprint)
 	self._can_highlight = managers.weapon_factory:has_perk("highlight", self._factory_id, self._blueprint)
@@ -296,6 +326,7 @@ function NewRaycastWeaponBase:_check_second_sight()
 			if factory.parts[part_id].sub_type == "second_sight" then
 				self._second_sight_data = {}
 				self._second_sight_data.part_id = part_id
+				self._second_sight_data.unit = self._parts and self._parts[part_id] and alive(self._parts[part_id].unit) and self._parts[part_id].unit
 				break
 			end
 		end
@@ -333,11 +364,13 @@ end
 function NewRaycastWeaponBase:replenish()
 	local ammo_max_multiplier = managers.player:upgrade_value("player", "extra_ammo_multiplier", 1)
 	ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "extra_ammo_multiplier", 1)
+	ammo_max_multiplier = ammo_max_multiplier + ammo_max_multiplier * (self._total_ammo_mod or 0)
 	if managers.player:has_category_upgrade("player", "add_armor_stat_skill_ammo_mul") then
 		ammo_max_multiplier = ammo_max_multiplier * managers.player:body_armor_value("skill_ammo_mul", nil, 1)
 	end
 	local ammo_max_per_clip = self:calculate_ammo_max_per_clip()
 	local ammo_max = math.round((tweak_data.weapon[self._name_id].AMMO_MAX + managers.player:upgrade_value(self._name_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
+	ammo_max_per_clip = math.min(ammo_max_per_clip, ammo_max)
 	self:set_ammo_max_per_clip(ammo_max_per_clip)
 	self:set_ammo_max(ammo_max)
 	self:set_ammo_total(ammo_max)
@@ -358,6 +391,10 @@ function NewRaycastWeaponBase:calculate_ammo_max_per_clip()
 	end
 	ammo = ammo + (self._extra_ammo or 0)
 	return ammo
+end
+
+function NewRaycastWeaponBase:armor_piercing_chance()
+	return self._armor_piercing_chance or 0
 end
 
 function NewRaycastWeaponBase:stance_mod()
@@ -452,7 +489,7 @@ function NewRaycastWeaponBase:fire_mode()
 	return self._fire_mode == ids_single and "single" or "auto"
 end
 
-function RaycastWeaponBase:recoil_wait()
+function NewRaycastWeaponBase:recoil_wait()
 	local tweak_is_auto = tweak_data.weapon[self._name_id].FIRE_MODE == "auto"
 	local weapon_is_auto = self:fire_mode() == "auto"
 	if not tweak_is_auto then
@@ -504,6 +541,10 @@ function NewRaycastWeaponBase:_update_bullet_objects(ammo)
 			end
 		end
 	end
+end
+
+function NewRaycastWeaponBase:has_part(part_id)
+	return self._blueprint and table.contains(self._blueprint, part_id)
 end
 
 function NewRaycastWeaponBase:has_gadget()

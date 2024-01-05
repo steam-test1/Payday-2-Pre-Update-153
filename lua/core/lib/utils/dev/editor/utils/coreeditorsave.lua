@@ -26,7 +26,7 @@ function save_data_table(unit)
 	t.lights = _light_data_table(unit)
 	t.triggers = _triggers_data_table(unit)
 	t.editable_gui = _editable_gui_data_table(unit)
-	t.projection_light = CoreEditorUtils.has_projection_light(unit)
+	t.projection_light = CoreEditorUtils.has_any_projection_light(unit)
 	t.projection_lights = ud.projection_lights
 	t.projection_textures = ud.projection_textures
 	t.ladder = _editable_ladder_table(unit)

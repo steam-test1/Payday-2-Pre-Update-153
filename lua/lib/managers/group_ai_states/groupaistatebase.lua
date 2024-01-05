@@ -2185,7 +2185,7 @@ function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, spawn_on_unit)
 		local ai_character_id = managers.criminals:character_static_data_by_name(character_name).ai_character_id
 		local unit_name = Idstring(tweak_data.blackmarket.characters[ai_character_id].npc_unit)
 		local unit = World:spawn_unit(unit_name, spawn_pos, spawn_rot)
-		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, "", 0)
+		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, "", 0, 0)
 		if char_name and not is_drop_in then
 			managers.criminals:set_unit(character_name, unit)
 		else
@@ -2596,6 +2596,7 @@ function GroupAIStateBase:on_AI_criminal_death(criminal_name, unit)
 end
 
 function GroupAIStateBase:on_player_criminal_death(peer_id)
+	managers.player:transfer_special_equipment(peer_id)
 	local unit = managers.network:game():unit_from_peer_id(peer_id)
 	if not unit then
 		return

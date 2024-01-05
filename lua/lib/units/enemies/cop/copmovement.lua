@@ -643,7 +643,7 @@ end
 
 function CopMovement:set_stance_by_code(new_stance_code, instant, execute_queued)
 	if self._stance.code ~= new_stance_code then
-		self._ext_network:send("set_stance", new_stance_code, instant, execute_queued)
+		self._ext_network:send("set_stance", new_stance_code, instant or false, execute_queued or false)
 		self:_change_stance(new_stance_code, instant)
 	end
 end

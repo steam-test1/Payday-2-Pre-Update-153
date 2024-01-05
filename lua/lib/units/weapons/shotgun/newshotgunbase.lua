@@ -2,6 +2,10 @@ NewShotgunBase = NewShotgunBase or class(NewRaycastWeaponBase)
 
 function NewShotgunBase:init(...)
 	NewShotgunBase.super.init(self, ...)
+	self:setup_default()
+end
+
+function NewShotgunBase:setup_default()
 	self._damage_near = tweak_data.weapon[self._name_id].damage_near
 	self._damage_far = tweak_data.weapon[self._name_id].damage_far
 	self._rays = tweak_data.weapon[self._name_id].rays or 6
@@ -20,11 +24,43 @@ function NewShotgunBase:_create_use_setups()
 	self._use_data = use_data
 end
 
+function NewShotgunBase:_update_stats_values()
+	NewShotgunBase.super._update_stats_values(self)
+	self:setup_default()
+	if self._ammo_data then
+		if self._ammo_data.rays ~= nil then
+			self._rays = self._ammo_data.rays
+		end
+		if self._ammo_data.damage_near ~= nil then
+			self._damage_near = self._ammo_data.damage_near
+		end
+		if self._ammo_data.damage_near_mul ~= nil then
+			self._damage_near = self._damage_near * self._ammo_data.damage_near_mul
+		end
+		if self._ammo_data.damage_far ~= nil then
+			self._damage_far = self._ammo_data.damage_far
+		end
+		if self._ammo_data.damage_far_mul ~= nil then
+			self._damage_far = self._damage_far * self._ammo_data.damage_far_mul
+		end
+		self._range = self._damage_far
+	end
+end
+
+function NewShotgunBase:get_damage_falloff(damage, col_ray, user_unit)
+	local distance = col_ray.distance or mvector3.distance(col_ray.unit:position(), user_unit:position())
+	return (1 - math.min(1, math.max(0, distance - self._damage_near) / self._damage_far)) * damage
+end
+
 local mvec_to = Vector3()
 local mvec_direction = Vector3()
 local mvec_spread_direction = Vector3()
 
-function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul)
+function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, shoot_through_data)
+	if self._rays == 1 then
+		local result = NewShotgunBase.super._fire_raycast(self, user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, shoot_through_data)
+		return result
+	end
 	local result = {}
 	local hit_enemies = {}
 	local hit_something, col_rays
@@ -43,7 +79,7 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 				hit_enemies[enemy_key] = col_ray
 			end
 		else
-			InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+			self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 		end
 	end
 	
@@ -97,10 +133,9 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 		end
 	end
 	for _, col_ray in pairs(hit_enemies) do
-		local dist = mvector3.distance(col_ray.unit:position(), user_unit:position())
-		damage = (1 - math.min(1, math.max(0, dist - self._damage_near) / self._damage_far)) * damage
+		local damage = self:get_damage_falloff(damage, col_ray, user_unit)
 		if 0 < damage then
-			local result = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+			local result = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 			if result and result.type == "death" then
 				managers.game_play_central:do_shotgun_push(col_ray.unit, col_ray.position, col_ray.ray, col_ray.distance)
 			end
@@ -131,26 +166,34 @@ end
 
 function NewShotgunBase:reload_expire_t()
 	local ammo_remaining_in_clip = self:get_ammo_remaining_in_clip()
-	return math.min(self:get_ammo_total() - ammo_remaining_in_clip, self:get_ammo_max_per_clip() - ammo_remaining_in_clip) * 17 / 30
+	return math.min(self:get_ammo_total() - ammo_remaining_in_clip, self:get_ammo_max_per_clip() - ammo_remaining_in_clip) * self:reload_shell_expire_t()
 end
 
 function NewShotgunBase:reload_enter_expire_t()
-	return 0.3
+	return self:weapon_tweak_data().timers.shotgun_reload_enter or 0.3
 end
 
 function NewShotgunBase:reload_exit_expire_t()
-	return 0.7
+	return self:weapon_tweak_data().timers.shotgun_reload_exit_empty or 0.7
 end
 
 function NewShotgunBase:reload_not_empty_exit_expire_t()
-	return 0.3
+	return self:weapon_tweak_data().timers.shotgun_reload_exit_not_empty or 0.3
+end
+
+function NewShotgunBase:reload_shell_expire_t()
+	return self:weapon_tweak_data().timers.shotgun_reload_shell or 0.56666666
+end
+
+function NewShotgunBase:_first_shell_reload_expire_t()
+	return self:reload_shell_expire_t() - (self:weapon_tweak_data().timers.shotgun_reload_first_shell_offset or 0.33)
 end
 
 function NewShotgunBase:start_reload(...)
 	NewShotgunBase.super.start_reload(self, ...)
 	self._started_reload_empty = self:clip_empty()
 	local speed_multiplier = self:reload_speed_multiplier()
-	self._next_shell_reloded_t = managers.player:player_timer():time() + 0.23666665 / speed_multiplier
+	self._next_shell_reloded_t = managers.player:player_timer():time() + self:_first_shell_reload_expire_t() / speed_multiplier
 end
 
 function NewShotgunBase:started_reload_empty()
@@ -160,7 +203,7 @@ end
 function NewShotgunBase:update_reloading(t, dt, time_left)
 	if t > self._next_shell_reloded_t then
 		local speed_multiplier = self:reload_speed_multiplier()
-		self._next_shell_reloded_t = self._next_shell_reloded_t + 0.56666666 / speed_multiplier
+		self._next_shell_reloded_t = self._next_shell_reloded_t + self:reload_shell_expire_t() / speed_multiplier
 		self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), self:get_ammo_remaining_in_clip() + 1))
 		return true
 	end
@@ -168,6 +211,13 @@ end
 
 function NewShotgunBase:reload_interuptable()
 	return true
+end
+
+function NewShotgunBase:shotgun_shell_data()
+	local reload_shell_data = self:weapon_tweak_data().animations.reload_shell_data
+	local unit_name = reload_shell_data and reload_shell_data.unit_name or "units/payday2/weapons/wpn_fps_shell/wpn_fps_shell"
+	local align = reload_shell_data and reload_shell_data.align or nil
+	return {unit_name = unit_name, align = align}
 end
 
 SaigaShotgun = SaigaShotgun or class(NewShotgunBase)

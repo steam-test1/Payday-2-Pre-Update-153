@@ -75,13 +75,14 @@ function MissionLayer:save()
 end
 
 function MissionLayer:save_mission(params)
-	local script_units = {}
+	local all_script_units = {}
 	for _, unit in ipairs(self._created_units) do
-		script_units[unit:mission_element_data().script] = script_units[unit:mission_element_data().script] or {}
-		table.insert(script_units[unit:mission_element_data().script], unit)
+		all_script_units[unit:mission_element_data().script] = all_script_units[unit:mission_element_data().script] or {}
+		table.insert(all_script_units[unit:mission_element_data().script], unit)
 	end
 	local scripts = {}
-	for script, script_units in pairs(script_units) do
+	for script, _ in pairs(self._scripts) do
+		local script_units = all_script_units[script] or {}
 		if not params.name or params.name and self._scripts[script].continent == params.name then
 			scripts[script] = {
 				activate_on_parsed = self._scripts[script].activate_on_parsed
@@ -98,6 +99,12 @@ function MissionLayer:save_mission(params)
 				table.insert(elements, t)
 			end
 			scripts[script].elements = elements
+			scripts[script].instances = {}
+			for _, instance in ipairs(managers.world_instance:instance_data()) do
+				if instance.script == script then
+					table.insert(scripts[script].instances, instance.name)
+				end
+			end
 		end
 	end
 	return scripts
@@ -112,11 +119,12 @@ function MissionLayer:do_spawn_unit(name, pos, rot)
 		managers.editor:output_warning("Can't create mission element because the current script doesn't belong to current continent.")
 		return
 	end
-	local unit = MissionLayer.super.do_spawn_unit(self, name, pos, rot)
-	if unit then
-		unit:mission_element_data().script = self:current_script()
-		return unit
-	end
+	return MissionLayer.super.do_spawn_unit(self, name, pos, rot)
+end
+
+function MissionLayer:_on_unit_created(unit, ...)
+	MissionLayer.super._on_unit_created(self, unit, ...)
+	unit:mission_element_data().script = self:current_script()
 end
 
 function MissionLayer:condition()
@@ -587,6 +595,16 @@ function MissionLayer:current_script()
 	else
 		return nil
 	end
+end
+
+function MissionLayer:scripts_by_continent(continent)
+	local scripts = {}
+	for name, script in pairs(self._scripts) do
+		if script.continent == continent then
+			table.insert(scripts, name)
+		end
+	end
+	return scripts
 end
 
 function MissionLayer:_reset_scripts()

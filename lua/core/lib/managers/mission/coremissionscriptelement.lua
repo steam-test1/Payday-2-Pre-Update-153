@@ -242,6 +242,9 @@ function MissionScriptElement:get_orientation(use_last_orientation_index)
 	return pos, rot
 end
 
+function MissionScriptElement:debug_draw()
+end
+
 function MissionScriptElement:pre_destroy()
 end
 

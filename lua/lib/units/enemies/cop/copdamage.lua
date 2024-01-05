@@ -220,56 +220,11 @@ function CopDamage:damage_bullet(attack_data)
 					attack_data.attacker_unit:character_damage():revive(true)
 				end
 			end
-			if not self:_type_civilian(self._unit:base()._tweak_table) then
-				if managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") then
-					local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
-					if weapon_category == "shotgun" or weapon_category == "saw" then
-						managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
-					end
-				end
-				if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_data.weapon_unit:base():weapon_tweak_data().category == "shotgun" then
-					managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
-				end
-				local attack_weapon = attack_data.weapon_unit
-				if alive(attack_weapon) and attack_weapon:base() then
-					local unit_type = self._unit:base()._tweak_table
-					local unit_weapon = self._unit:base()._default_weapon_id
-					local unit_anim = self._unit.anim_data and self._unit:anim_data()
-					local achievements = tweak_data.achievement.enemy_kill_achievements or {}
-					local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-					local weapons_pass, weapon_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, distance_pass, zipline_pass, all_pass
-					for achievement, achievement_data in pairs(achievements) do
-						weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base().name_id)
-						weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
-						enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
-						enemy_weapon_pass = not achievement_data.enemy_weapon or unit_weapon == achievement_data.enemy_weapon
-						mask_pass = not achievement_data.mask or current_mask_id == achievement_data.mask
-						hiding_pass = not achievement_data.hiding or unit_anim and unit_anim.hide
-						head_pass = not achievement_data.in_head or head
-						distance_pass = not achievement_data.distance or attack_data.col_ray and attack_data.col_ray.distance >= achievement_data.distance
-						zipline_pass = not achievement_data.on_zipline or attack_data.attacker_unit:movement():zipline_unit()
-						all_pass = weapons_pass and weapon_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass
-						if all_pass then
-							if achievement_data.stat then
-								managers.achievment:award_progress(achievement_data.stat)
-							end
-							if achievement_data.award then
-								managers.achievment:award(achievement_data.award)
-							end
-						end
-					end
-					if unit_type == "spooc" then
-						local spooc_action = self._unit:movement()._active_actions[1]
-						if spooc_action and spooc_action:type() == "spooc" then
-							if spooc_action:is_flying_strike() then
-								if attack_weapon:base():weapon_tweak_data().category == tweak_data.achievement.in_town_you_are_law.weapon_type then
-									managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
-								end
-							elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
-								managers.achievment:award(tweak_data.achievement.dont_push_it.award)
-							end
-						end
-					end
+			self:_check_damage_achievements(attack_data, head)
+			if not self:_type_civilian(self._unit:base()._tweak_table) and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") then
+				local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
+				if weapon_category == "shotgun" or weapon_category == "saw" then
+					managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 				end
 			end
 			if self:_type_civilian(self._unit:base()._tweak_table) then
@@ -298,6 +253,73 @@ function CopDamage:damage_bullet(attack_data)
 	self:_send_bullet_attack_result(attack_data, attacker, damage_percent, body_index, hit_offset_height)
 	self:_on_damage_received(attack_data)
 	return result
+end
+
+function CopDamage:_check_damage_achievements(attack_data, head)
+	local attack_weapon = attack_data.weapon_unit
+	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not self:_type_civilian(self._unit:base()._tweak_table) then
+		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():weapon_tweak_data().category == "shotgun" then
+			managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
+		end
+		local unit_type = self._unit:base()._tweak_table
+		local unit_weapon = self._unit:base()._default_weapon_id
+		local unit_anim = self._unit.anim_data and self._unit:anim_data()
+		local achievements = tweak_data.achievement.enemy_kill_achievements or {}
+		local current_mask_id = managers.blackmarket:equipped_mask().mask_id
+		local weapons_pass, weapon_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, distance_pass, zipline_pass, weapon_type_pass, level_pass, part_pass, timer_pass, all_pass, memory
+		for achievement, achievement_data in pairs(achievements) do
+			weapon_type_pass = not achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().category == achievement_data.weapon_type
+			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base().name_id)
+			weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
+			enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
+			enemy_weapon_pass = not achievement_data.enemy_weapon or unit_weapon == achievement_data.enemy_weapon
+			mask_pass = not achievement_data.mask or current_mask_id == achievement_data.mask
+			hiding_pass = not achievement_data.hiding or unit_anim and unit_anim.hide
+			head_pass = not achievement_data.in_head or head
+			distance_pass = not achievement_data.distance or attack_data.col_ray and attack_data.col_ray.distance and attack_data.col_ray.distance >= achievement_data.distance
+			zipline_pass = not achievement_data.on_zipline or attack_data.attacker_unit and attack_data.attacker_unit:movement():zipline_unit()
+			level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
+			part_pass = not achievement_data.part_id or attack_weapon:base():has_part(achievement_data.part_id)
+			timer_pass = not achievement_data.timer
+			if achievement_data.timer then
+				memory = managers.job:get_memory(achievement)
+				local t = Application:time()
+				if memory then
+					table.insert(memory, t)
+					for i = #memory, 1, -1 do
+						if t - memory[i] >= achievement_data.timer then
+							table.remove(memory, i)
+						end
+					end
+					timer_pass = #memory >= achievement_data.count
+					managers.job:set_memory(achievement, memory)
+				else
+					managers.job:set_memory(achievement, {t})
+				end
+			end
+			all_pass = weapon_type_pass and weapons_pass and weapon_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and level_pass and timer_pass and part_pass
+			if all_pass then
+				if achievement_data.stat then
+					managers.achievment:award_progress(achievement_data.stat)
+				end
+				if achievement_data.award then
+					managers.achievment:award(achievement_data.award)
+				end
+			end
+		end
+		if unit_type == "spooc" then
+			local spooc_action = self._unit:movement()._active_actions[1]
+			if spooc_action and spooc_action:type() == "spooc" then
+				if spooc_action:is_flying_strike() then
+					if attack_weapon:base():weapon_tweak_data().category == tweak_data.achievement.in_town_you_are_law.weapon_type then
+						managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
+					end
+				elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
+					managers.achievment:award(tweak_data.achievement.dont_push_it.award)
+				end
+			end
+		end
+	end
 end
 
 function CopDamage:_type_civilian(type)
@@ -400,6 +422,12 @@ function CopDamage:damage_explosion(attack_data)
 				managers.money:civilian_killed()
 			end
 		end
+		if attack_data.attacker_unit == managers.player:player_unit() then
+			self:_check_damage_achievements(attack_data, false)
+		end
+	end
+	if attack_data.attacker_unit == managers.player:player_unit() and attack_data.weapon_unit then
+		managers.hud:on_hit_confirmed()
 	end
 	if not self._no_blood then
 		managers.game_play_central:sync_play_impact_flesh(attack_data.pos, attack_data.col_ray.ray)
@@ -441,7 +469,7 @@ function CopDamage:damage_melee(attack_data)
 		damage_effect = math.clamp(damage_effect, self._HEALTH_INIT_PRECENT, self._HEALTH_INIT)
 		damage_effect_percent = math.ceil(damage_effect / self._HEALTH_INIT_PRECENT)
 		damage_effect_percent = math.clamp(damage_effect_percent, 1, self._HEALTH_GRANULARITY)
-		local result_type = attack_data.shield_knock and self._char_tweak.damage.shield_knocked and "shield_knock" or attack_data.variant == "counter_tased" and "counter_tased" or self:get_damage_type(damage_effect_percent, "bullet")
+		local result_type = attack_data.shield_knock and self._char_tweak.damage.shield_knocked and "shield_knock" or attack_data.variant == "counter_tased" and "counter_tased" or self:get_damage_type(damage_effect_percent, "melee")
 		result = {
 			type = result_type,
 			variant = attack_data.variant
@@ -466,6 +494,8 @@ function CopDamage:damage_melee(attack_data)
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
 			local is_civlian = self:_type_civilian(self._unit:base()._tweak_table)
+			local is_gangster = self:_type_gangster(self._unit:base()._tweak_table)
+			local is_cop = not is_civlian and not is_gangster
 			if not is_civlian and managers.groupai:state():whisper_mode() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.cant_hear_you_scream.mask then
 				managers.achievment:award_progress(tweak_data.achievement.cant_hear_you_scream.stat)
 			end
@@ -474,12 +504,17 @@ function CopDamage:damage_melee(attack_data)
 				local melee_type = tweak_data.blackmarket.melee_weapons[attack_data.name_id].type
 				local enemy_type = self._unit:base()._tweak_table
 				local health_ratio = managers.player:player_unit():character_damage():health_ratio() * 100
-				local type_pass, enemy_pass, diff_pass, health_pass
+				local melee_pass, type_pass, enemy_pass, diff_pass, health_pass, level_pass, all_pass, cop_pass, gangster_pass, civilian_pass
 				for achievement, achievement_data in pairs(achievements) do
+					melee_pass = not achievement_data.melee_id or achievement_data.melee_id == attack_data.name_id
 					type_pass = not achievement_data.melee_type or melee_type == achievement_data.melee_type
 					enemy_pass = not achievement_data.enemy or enemy_type == achievement_data.enemy
 					diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 					health_pass = not achievement_data.health or health_ratio <= achievement_data.health
+					level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
+					cop_pass = not achievement_data.is_cop or is_cop
+					gangster_pass = not achievement_data.is_gangster or is_gangster
+					civilian_pass = not achievement_data.is_civlian or is_civlian
 					if achievement_data.enemies then
 						enemy_pass = false
 						for _, enemy in pairs(achievement_data.enemies) do
@@ -489,7 +524,8 @@ function CopDamage:damage_melee(attack_data)
 							end
 						end
 					end
-					if type_pass and enemy_pass and diff_pass and health_pass then
+					all_pass = melee_pass and type_pass and enemy_pass and diff_pass and health_pass and level_pass and cop_pass and gangster_pass and civilian_pass
+					if all_pass then
 						if achievement_data.stat then
 							managers.achievment:award_progress(achievement_data.stat)
 						elseif achievement_data.award then
@@ -498,7 +534,7 @@ function CopDamage:damage_melee(attack_data)
 					end
 				end
 			end
-			if not is_civlian and not self:_type_gangster(self._unit:base()._tweak_table) and Global.game_settings.level_id == "nightclub" and attack_data.name_id and attack_data.name_id == "fists" then
+			if is_cop and Global.game_settings.level_id == "nightclub" and attack_data.name_id and attack_data.name_id == "fists" then
 				managers.achievment:award_progress(tweak_data.achievement.final_rule.stat)
 			end
 			if is_civlian then

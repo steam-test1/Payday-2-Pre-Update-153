@@ -159,9 +159,11 @@ function NetworkManager:load()
 		if Global.network.session then
 			if Global.network.session_host then
 				self._session = HostNetworkSession:new()
+				self._session:create_local_peer()
 				self._game:on_server_session_created()
 			else
 				self._session = ClientNetworkSession:new()
+				self._session:create_local_peer()
 			end
 		end
 		self._session:load(Global.network.session)
@@ -320,12 +322,14 @@ function NetworkManager:start_client()
 		self.voice_chat:open()
 	end
 	self._session = ClientNetworkSession:new()
+	self._session:create_local_peer()
 end
 
 function NetworkManager:discover_hosts(result_cb)
 	self:stop_network(true)
 	self:start_network()
 	self._session = ClientNetworkSession:new()
+	self._session:create_local_peer()
 	self._discover_hosts_cb = result_cb
 	self._session:discover_hosts()
 end
@@ -371,6 +375,7 @@ function NetworkManager:host_game()
 		self.voice_chat:open()
 	end
 	self._session = HostNetworkSession:new()
+	self._session:create_local_peer()
 	self._game:on_server_session_created()
 	if self.is_ps3 then
 		self._session:broadcast_server_up()

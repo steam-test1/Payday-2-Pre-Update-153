@@ -1283,30 +1283,45 @@ function PlayerManager:set_synced_equipment_possession(peer_id, equipment, amoun
 	end
 end
 
-function PlayerManager:peer_dropped_out(peer)
-	local peer_id = peer:id()
-	if Network:is_server() then
-		if self._global.synced_equipment_possession[peer_id] then
-			local peers = {
-				managers.network:session():local_peer()
-			}
-			for _, p in pairs(managers.network:session():peers()) do
-				table.insert(peers, p)
+function PlayerManager:transfer_special_equipment(peer_id, include_custody)
+	if self._global.synced_equipment_possession[peer_id] then
+		local peers = {
+			managers.network:session():local_peer()
+		}
+		for _, p in pairs(managers.network:session():peers()) do
+			if managers.trade:is_peer_in_custody(p:id()) then
+				if include_custody then
+					table.insert(peers, p)
+				end
+			else
+				table.insert(peers, 0, p)
 			end
-			for name, amount in pairs(self._global.synced_equipment_possession[peer_id]) do
-				for _, p in pairs(peers) do
-					local id = p:id()
-					if not self._global.synced_equipment_possession[id] or not self._global.synced_equipment_possession[id][name] then
+		end
+		for name, amount in pairs(self._global.synced_equipment_possession[peer_id]) do
+			for _, p in pairs(peers) do
+				local id = p:id()
+				if not self._global.synced_equipment_possession[id] or not self._global.synced_equipment_possession[id][name] then
+					if Network:is_server() then
 						if p == managers.network:session():local_peer() then
 							managers.player:add_special({name = name, amount = amount})
-							break
+						else
+							p:send("give_equipment", name, amount)
 						end
-						p:send("give_equipment", name, amount)
-						break
 					end
+					if peer_id == managers.network:session():local_peer():id() then
+						self:remove_special(name)
+					end
+					break
 				end
 			end
 		end
+	end
+end
+
+function PlayerManager:peer_dropped_out(peer)
+	local peer_id = peer:id()
+	if Network:is_server() then
+		self:transfer_special_equipment(peer_id, true)
 		if self._global.synced_carry[peer_id] and self._global.synced_carry[peer_id].approved then
 			local carry_id = self._global.synced_carry[peer_id].carry_id
 			local carry_multiplier = self._global.synced_carry[peer_id].multiplier

@@ -326,16 +326,28 @@ function MissionScript:init(data)
 	self._name = data.name
 	self._activate_on_parsed = data.activate_on_parsed
 	CoreDebug.cat_debug("gaspode", "New MissionScript:", self._name)
-	for _, element in ipairs(data.elements) do
+	self:_create_elements(data.elements)
+	if data.instances then
+		for _, instance_name in ipairs(data.instances) do
+			local prepare_mission_data = managers.world_instance:prepare_mission_data_by_name(instance_name)
+			for _, instance_mission_data in pairs(prepare_mission_data) do
+				self:_create_elements(instance_mission_data.elements)
+			end
+		end
+	end
+	self._updators = {}
+	self._save_states = {}
+	self:_on_created()
+end
+
+function MissionScript:_create_elements(elements)
+	for _, element in ipairs(elements) do
 		local class = element.class
 		local new_element = self:_element_class(element.module, class):new(self, element)
 		self._elements[element.id] = new_element
 		self._element_groups[class] = self._element_groups[class] or {}
 		table.insert(self._element_groups[class], new_element)
 	end
-	self._updators = {}
-	self._save_states = {}
-	self:_on_created()
 end
 
 function MissionScript:activate_on_parsed()
@@ -385,6 +397,31 @@ function MissionScript:update(t, dt)
 	MissionScript.super.update(self, dt)
 	for _, updator in pairs(self._updators) do
 		updator(t, dt)
+	end
+end
+
+function MissionScript:_debug_draw(t, dt)
+	local brush = Draw:brush(Color.red)
+	local name_brush = Draw:brush(Color.red)
+	name_brush:set_font(Idstring("fonts/font_medium"), 16)
+	name_brush:set_render_template(Idstring("OverlayVertexColorTextured"))
+	for _, element in pairs(self._elements) do
+		brush:set_color(element:enabled() and Color.green or Color.red)
+		name_brush:set_color(element:enabled() and Color.green or Color.red)
+		if element:value("position") then
+			brush:sphere(element:value("position"), 5)
+			if managers.viewport:get_current_camera() then
+				local cam_up = managers.viewport:get_current_camera():rotation():z()
+				local cam_right = managers.viewport:get_current_camera():rotation():x()
+				name_brush:center_text(element:value("position") + Vector3(0, 0, 30), element:editor_name(), cam_right, -cam_up)
+			end
+		end
+		if element:value("rotation") then
+			local rotation = CoreClass.type_name(element:value("rotation")) == "Rotation" and element:value("rotation") or Rotation(element:value("rotation"), 0, 0)
+			brush:cylinder(element:value("position"), element:value("position") + rotation:y() * 50, 2)
+			brush:cylinder(element:value("position"), element:value("position") + rotation:z() * 25, 1)
+		end
+		element:debug_draw(t, dt)
 	end
 end
 

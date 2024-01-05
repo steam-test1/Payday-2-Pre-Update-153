@@ -996,6 +996,11 @@ function MenuCallbackHandler:dlc_buy_big_bank_pc()
 	Steam:overlay_activate("store", 306690)
 end
 
+function MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc]")
+	Steam:overlay_activate("store", 311050)
+end
+
 function MenuCallbackHandler:dlc_buy_gage_pack_snp_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_snp_pc]")
 	Steam:overlay_activate("store", 259380)
@@ -1047,6 +1052,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"gage_pack_shotgun",
 		"big_bank",
 		"gage_pack_snp",
 		"gage_pack_jobs",
@@ -1095,6 +1101,10 @@ end
 
 function MenuCallbackHandler:visible_callback_gage_pack_snp()
 	return self:is_dlc_latest_locked("gage_pack_snp")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_shotgun()
+	return self:is_dlc_latest_locked("gage_pack_shotgun")
 end
 
 function MenuCallbackHandler:visible_callback_big_bank()
@@ -2160,7 +2170,8 @@ function MenuCallbackHandler:lobby_start_the_game()
 		Global.boot_invite.pending = false
 	end
 	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
-	managers.network:session():load_level(level_name, mission, nil, nil, level_id)
+	local world_setting = Global.game_settings.world_setting
+	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
 end
 
 function MenuCallbackHandler:leave_lobby()

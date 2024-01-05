@@ -2361,6 +2361,8 @@ function MenuComponentManager:get_texture_from_mod_type(type, sub_type, gadget, 
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. (sub_type or is_auto and "autofire" or "singlefire")
 	elseif type == "sight" then
 		texture = "guis/textures/pd2/blackmarket/inv_mod_scope"
+	elseif type == "ammo" then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
 	else
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. type
 	end
@@ -2880,100 +2882,62 @@ end
 
 function MenuComponentManager:_request_done_callback(texture_ids)
 	local key = texture_ids:key()
-	local requests = self._requested_textures[key]
-	if not requests then
-		print("[MenuComponentManager] request_done_callback(): Have no requests for this texture", texture_ids)
+	local entry = self._requested_textures[key]
+	if not entry then
 		return
 	end
-	local count = self._cached_textures[key] or 0
-	if self._cached_textures[key] then
-		Application:error("[MenuComponentManager] request_done_callback(): Texture already in cache!", texture_ids)
-		TextureCache:unretrieve(texture_ids)
+	local clbks = {}
+	for index, owner_data in pairs(entry.owners) do
+		table.insert(clbks, owner_data.clbk)
+		owner_data.clbk = nil
 	end
-	for _, request_cb in pairs(requests) do
-		count = count + 1
-		request_cb(texture_ids)
+	for _, clbk in pairs(clbks) do
+		clbk(texture_ids)
 	end
-	self._cached_textures[key] = count
-	self._requested_textures[key] = nil
-	self._requested_index[key] = nil
 end
 
 function MenuComponentManager:request_texture(texture, done_cb)
-	if not DB:has(Idstring("texture"), texture) then
-		return
-	end
 	local texture_ids = Idstring(texture)
 	local key = texture_ids:key()
-	local is_removing = self._removing_textures[key] and true or false
-	self._removing_textures[key] = nil
-	if self._cached_textures[key] then
-		self._cached_textures[key] = self._cached_textures[key] + 1
-		done_cb(texture_ids)
-		return
-	elseif self._requested_textures[key] then
-		local count = self._requested_index[key] + 1
-		self._requested_index[key] = count
-		self._requested_textures[key][count] = done_cb
-		return count
-	else
-		self._requested_textures[key] = {}
-		local count = 1
-		self._requested_index[key] = count
-		self._requested_textures[key][count] = done_cb
-		if not is_removing then
-			TextureCache:request(texture, "NORMAL", callback(self, self, "_request_done_callback"), 100)
-		else
-			Application:debug("[MenuComponentManager] request_texture(): This code should no longer be used.")
-		end
-		return count
+	local entry = self._requested_textures[key]
+	if not entry then
+		entry = {
+			next_index = 1,
+			owners = {}
+		}
+		self._requested_textures[key] = entry
 	end
+	local index = entry.next_index
+	entry.owners[index] = {clbk = done_cb}
+	local next_index = index + 1
+	while entry.owners[next_index] do
+		if index == next_index then
+			debug_pause("[MenuComponentManager:request_texture] overflow!")
+		end
+		next_index = next_index + 1
+		if next_index == 10000 then
+			next_index = 1
+		end
+	end
+	entry.next_index = next_index
+	TextureCache:request(texture_ids, "NORMAL", callback(self, self, "_request_done_callback"), 100)
+	return index
 end
 
 function MenuComponentManager:unretrieve_texture(texture, index)
 	local texture_ids = Idstring(texture)
 	local key = texture_ids:key()
-	local is_removing = self._removing_textures[key] and true or false
-	if self._cached_textures[key] then
-		self._cached_textures[key] = self._cached_textures[key] - 1
-		if self._cached_textures[key] == 0 then
-			if not is_removing then
-				self._removing_textures[key] = texture_ids
-			else
-				Application:error("[MenuComponentManager] unretrieve_texture(self._cached_textures): Trying to unretrieve a texture that is already to be unretrieved!", texture)
-			end
-		elseif self._cached_textures[key] < 0 then
-			Application:error("[MenuComponentManager] unretrieve_texture(): To many unretrieve calls done!", texture, self._cached_textures[key])
-			self._cached_textures[key] = 0
+	local entry = self._requested_textures[key]
+	if entry and entry.owners[index] then
+		entry.owners[index] = nil
+		if not next(entry.owners) then
+			self._requested_textures[key] = nil
 		end
-		return
-	elseif self._requested_textures[key] then
-		if not index then
-			Application:error("[MenuComponentManager] unretrieve_texture(): Index parameter needed!", texture)
-			Application:stack_dump()
-			index = 1
-		end
-		self._requested_textures[key][index] = nil
-		if table.size(self._requested_textures[key]) == 0 then
-			if not is_removing then
-				self._removing_textures[key] = texture_ids
-			else
-				Application:error("[MenuComponentManager] unretrieve_texture(self._requested_textures): Trying to unretrieve a texture that is already to be unretrieved!", texture)
-			end
-		end
-		return
-	elseif is_removing then
-		Application:error("[MenuComponentManager] unretrieve_texture(): Texture not cache nor requested, but still already to be unretrieved?!", texture)
-	else
-		Application:error("[MenuComponentManager] unretrieve_texture(): Can't unretrieve texture that is not in the system!", texture)
+		TextureCache:unretrieve(texture_ids)
 	end
 end
 
 function MenuComponentManager:retrieve_texture(texture)
-	self._retrieved_textures = self._retrieved_textures or {}
-	local texture_ids = Idstring(texture)
-	if not self._retrieved_textures[texture_ids:key()] then
-	end
 	return TextureCache:retrieve(texture, "NORMAL")
 end
 

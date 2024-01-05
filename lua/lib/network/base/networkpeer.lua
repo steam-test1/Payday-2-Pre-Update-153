@@ -1,3 +1,7 @@
+require("lib/units/beings/player/PlayerInventory")
+require("lib/network/extensions/player/HuskPlayerInventory")
+local ids_unit = Idstring("unit")
+local ids_NORMAL = Idstring("NORMAL")
 NetworkPeer = NetworkPeer or class()
 NetworkPeer.PRE_HANDSHAKE_CHK_TIME = 8
 
@@ -49,6 +53,11 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 	}
 	self._handshakes = {}
 	self._streaming_status = 0
+	self._outfit_assets = {
+		unit = {},
+		texture = {}
+	}
+	self._outfit_version = 0
 end
 
 function NetworkPeer:set_rpc(rpc)
@@ -139,6 +148,17 @@ function NetworkPeer:load(data)
 	self._rank = data.rank
 	self._streaming_status = data.streaming_status
 	self._ticket_wait_response = data.wait_ticket_response
+	self._loading_outfit_assets = data.loading_outfit_assets
+	if self._loading_outfit_assets then
+		self._outfit_assets = Global.peer_loading_outfit_assets[self._id]
+		Global.peer_loading_outfit_assets[self._id] = nil
+		if not next(Global.peer_loading_outfit_assets) then
+			Global.peer_loading_outfit_assets = nil
+		end
+		self:_chk_outfit_loading_complete()
+	end
+	self._other_peer_outfits_loaded = data.other_peer_outfits_loaded
+	self._outfit_version = data.outfit_version
 	if self._ticket_wait_response then
 		self:change_ticket_callback()
 	end
@@ -151,6 +171,7 @@ function NetworkPeer:load(data)
 end
 
 function NetworkPeer:save(data)
+	print("[NetworkPeer:save] ID:", self._id)
 	data.name = self._name
 	data.rpc = self._rpc
 	data.steam_rpc = self._steam_rpc
@@ -176,6 +197,16 @@ function NetworkPeer:save(data)
 	data.rank = self._rank
 	data.streaming_status = self._streaming_status
 	data.wait_ticket_response = self._ticket_wait_response
+	data.other_peer_outfits_loaded = self._other_peer_outfits_loaded
+	data.outfit_version = self._outfit_version
+	if self._loading_outfit_assets then
+		data.loading_outfit_assets = true
+		Global.peer_loading_outfit_assets = Global.peer_loading_outfit_assets or {}
+		Global.peer_loading_outfit_assets[self._id] = self._outfit_assets
+	else
+		data.loading_outfit_assets = self._loading_outfit_assets
+		data.outfit_assets = self._outfit_assets
+	end
 	print("[NetworkPeer:save]", inspect(data))
 end
 
@@ -341,6 +372,7 @@ end
 
 function NetworkPeer:set_character(character)
 	self._character = character
+	self:_reload_outfit()
 end
 
 function NetworkPeer:set_waiting_for_player_ready(state)
@@ -390,7 +422,7 @@ end
 
 function NetworkPeer:send_after_load(...)
 	if not self._ip_verified then
-		Application:error("[NetworkPeer:send_after_load] ip unverified:", ...)
+		print("[NetworkPeer:send_after_load] ip unverified:", ...)
 		return
 	end
 	self:_send_queued("load", ...)
@@ -518,7 +550,7 @@ function NetworkPeer:set_name(name)
 end
 
 function NetworkPeer:destroy()
-	print("!! NetworkPeer:destroy()", self:id())
+	print("[NetworkPeer:destroy]", self:id())
 	if self._rpc then
 		Network:reset_connection(self._rpc)
 		if managers.network.voice_chat.on_member_removed then
@@ -528,6 +560,7 @@ function NetworkPeer:destroy()
 	if self._steam_rpc then
 		Network:reset_connection(self._steam_rpc)
 	end
+	self:_unload_outfit()
 end
 
 function NetworkPeer:on_send()
@@ -634,8 +667,19 @@ function NetworkPeer:set_profile(level, rank)
 	self._profile.rank = rank
 end
 
-function NetworkPeer:set_outfit_string(outfit_string)
+function NetworkPeer:set_outfit_string(outfit_string, outfit_version)
+	print("[NetworkPeer:set_outfit_string] ID", self._id, outfit_string, outfit_version)
+	Application:stack_dump()
+	local old_outfit_string = self._profile.outfit_string
 	self._profile.outfit_string = outfit_string
+	if old_outfit_string ~= outfit_string then
+		self:_reload_outfit()
+	end
+	if self == managers.network:session():local_peer() then
+		self:_increment_outfit_version()
+	else
+		self._outfit_version = outfit_version or 0
+	end
 end
 
 function NetworkPeer:profile(data)
@@ -769,4 +813,173 @@ end
 
 function NetworkPeer:streaming_status()
 	return self._streaming_status
+end
+
+function NetworkPeer:is_outfit_loaded()
+	return not self._loading_outfit_assets and self._profile.outfit_string ~= ""
+end
+
+function NetworkPeer:_unload_outfit()
+	for asset_id, asset_data in pairs(self._outfit_assets.unit) do
+		managers.dyn_resource:unload(ids_unit, asset_data.name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
+	end
+	for asset_id, asset_data in pairs(self._outfit_assets.texture) do
+		TextureCache:unretrieve(asset_data.name)
+	end
+	self._outfit_assets = {
+		unit = {},
+		texture = {}
+	}
+end
+
+function NetworkPeer:_reload_outfit()
+	if self._profile.outfit_string == "" then
+		return
+	end
+	self._loading_outfit_assets = true
+	local is_local_peer = self == managers.network:session():local_peer()
+	local new_outfit_assets = {
+		unit = {},
+		texture = {}
+	}
+	local old_outfit_assets = self._outfit_assets
+	local asset_load_result_clbk = callback(self, self, "clbk_outfit_asset_loaded", new_outfit_assets)
+	local texture_load_result_clbk = callback(self, self, "clbk_outfit_texture_loaded", new_outfit_assets)
+	local complete_outfit = self:blackmarket_outfit()
+	local mask_id = complete_outfit.mask.mask_id
+	local mask_u_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, self._id)
+	local mask_asset_data = {
+		name = Idstring(mask_u_name)
+	}
+	new_outfit_assets.unit.mask = mask_asset_data
+	local mask_blueprint = self:mask_blueprint()
+	local mask_pattern_id = mask_blueprint.pattern.id
+	local mask_pattern_texture = tweak_data.blackmarket.textures[mask_pattern_id].texture
+	local mask_pattern_texture_asset_data = {
+		name = Idstring(mask_pattern_texture)
+	}
+	new_outfit_assets.texture.mask_pattern = mask_pattern_texture_asset_data
+	local mask_material_id = mask_blueprint.material.id
+	local mask_reflection_texture = tweak_data.blackmarket.materials[mask_material_id].texture
+	local mask_reflection_texture_asset_data = {
+		name = Idstring(mask_reflection_texture)
+	}
+	new_outfit_assets.texture.mask_reflection = mask_reflection_texture_asset_data
+	if is_local_peer then
+		local mask_backstraps_asset_data = {
+			name = Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps")
+		}
+		new_outfit_assets.unit.mask_backstraps = mask_backstraps_asset_data
+	end
+	local ids_primary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.primary.factory_id].unit)
+	if not is_local_peer then
+		local inv_index = PlayerInventory._get_weapon_sync_index_from_name(ids_primary_u_name)
+		ids_primary_u_name = HuskPlayerInventory._index_to_weapon_list[inv_index]
+		if type(ids_primary_u_name) == "string" then
+			ids_primary_u_name = Idstring(tweak_data.weapon.factory[ids_primary_u_name].unit)
+		end
+	end
+	new_outfit_assets.unit.primary_w = {name = ids_primary_u_name}
+	local primary_w_parts = managers.weapon_factory:preload_blueprint(complete_outfit.primary.factory_id, complete_outfit.primary.blueprint, not is_local_peer, function()
+	end, true)
+	for part_id, part in pairs(primary_w_parts) do
+		new_outfit_assets.unit["prim_w_part_" .. tostring(part_id)] = {
+			name = part.name
+		}
+	end
+	local ids_secondary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.secondary.factory_id].unit)
+	if not is_local_peer then
+		local inv_index = PlayerInventory._get_weapon_sync_index_from_name(ids_secondary_u_name)
+		ids_secondary_u_name = HuskPlayerInventory._index_to_weapon_list[inv_index]
+		if type(ids_secondary_u_name) == "string" then
+			ids_secondary_u_name = Idstring(tweak_data.weapon.factory[ids_secondary_u_name].unit)
+		end
+	end
+	new_outfit_assets.unit.secondary_w = {name = ids_secondary_u_name}
+	local secondary_w_parts = managers.weapon_factory:preload_blueprint(complete_outfit.secondary.factory_id, complete_outfit.secondary.blueprint, not is_local_peer, function()
+	end, true)
+	for part_id, part in pairs(secondary_w_parts) do
+		new_outfit_assets.unit["sec_w_part_" .. tostring(part_id)] = {
+			name = part.name
+		}
+	end
+	self._outfit_assets = new_outfit_assets
+	for asset_id, asset_data in pairs(new_outfit_assets.unit) do
+		asset_data.is_streaming = true
+		managers.dyn_resource:load(ids_unit, asset_data.name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, asset_load_result_clbk)
+	end
+	for asset_id, asset_data in pairs(new_outfit_assets.texture) do
+		asset_data.is_streaming = true
+		TextureCache:request(asset_data.name, ids_NORMAL, texture_load_result_clbk, 90)
+	end
+	self._all_outfit_load_requests_sent = true
+	self._outfit_assets = old_outfit_assets
+	self:_unload_outfit()
+	self._outfit_assets = new_outfit_assets
+	self:_chk_outfit_loading_complete()
+end
+
+function NetworkPeer:clbk_outfit_asset_loaded(outfit_assets, status, asset_type, asset_name)
+	if not self._loading_outfit_assets or self._outfit_assets ~= outfit_assets then
+		return
+	end
+	for asset_id, asset_data in pairs(outfit_assets.unit) do
+		if asset_data.name == asset_name then
+			asset_data.is_streaming = nil
+		end
+	end
+	if not Global.peer_loading_outfit_assets or not Global.peer_loading_outfit_assets[self._id] then
+		self:_chk_outfit_loading_complete()
+	end
+end
+
+function NetworkPeer:clbk_outfit_texture_loaded(outfit_assets, tex_name)
+	if not self._loading_outfit_assets or self._outfit_assets ~= outfit_assets then
+		return
+	end
+	for asset_id, asset_data in pairs(outfit_assets.texture) do
+		if asset_data.name == tex_name then
+			asset_data.is_streaming = nil
+		end
+	end
+	if not Global.peer_loading_outfit_assets or not Global.peer_loading_outfit_assets[self._id] then
+		self:_chk_outfit_loading_complete()
+	end
+end
+
+function NetworkPeer:_chk_outfit_loading_complete()
+	if not self._loading_outfit_assets or not self._all_outfit_load_requests_sent then
+		return
+	end
+	for asset_type, asset_list in pairs(self._outfit_assets) do
+		for asset_id, asset_data in pairs(asset_list) do
+			if asset_data.is_streaming then
+				return
+			end
+		end
+	end
+	self._all_outfit_load_requests_sent = nil
+	self._loading_outfit_assets = nil
+	managers.network:session():on_peer_outfit_loaded(self)
+end
+
+function NetworkPeer:set_other_peer_outfit_loaded_status(status)
+	self._other_peer_outfits_loaded = status
+end
+
+function NetworkPeer:other_peer_outfit_loaded_status()
+	return self._other_peer_outfits_loaded
+end
+
+function NetworkPeer:_increment_outfit_version()
+	if self._outfit_version == 100 then
+		self._outfit_version = 1
+	else
+		self._outfit_version = self._outfit_version + 1
+	end
+	return self._outfit_version
+end
+
+function NetworkPeer:outfit_version()
+	return self._outfit_version
 end

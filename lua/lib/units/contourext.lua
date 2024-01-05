@@ -326,6 +326,7 @@ function ContourExt:_apply_top_preset()
 end
 
 function ContourExt:material_applied(material_was_swapped)
+	self._materials = nil
 	if material_was_swapped then
 		managers.occlusion:remove_occlusion(self._unit)
 		self._unit:base():set_allow_invisible(false)

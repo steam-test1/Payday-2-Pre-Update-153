@@ -15,11 +15,8 @@ function NetworkMember:delete()
 		if self._unit:id() ~= -1 then
 			Network:detach_unit(self._unit)
 		end
-		if self._unit:base() and self._unit:base().set_slot then
-			self._unit:base():set_slot(self._unit, 0)
-		else
-			self._unit:set_slot(0)
-		end
+		self._unit:inventory():destroy_all_items()
+		self._unit:set_slot(0)
 	end
 	self._unit = nil
 end
@@ -141,7 +138,7 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 		unit:base():set_detection_multiplier("equipment", 1 / con_mul)
 	end
 	self:set_unit(unit, character_name)
-	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, peer_id)
+	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, self._peer:outfit_version(), peer_id)
 	if is_drop_in then
 		self._peer:set_used_deployable(used_deployable)
 		self._peer:set_used_body_bags(used_body_bags)
@@ -162,9 +159,6 @@ function NetworkMember:set_unit(unit, character_name)
 	end
 	if is_new_unit then
 		unit:inventory():set_melee_weapon_by_peer(self:peer())
-	end
-	if SystemInfo:platform() == Idstring("PS3") and is_new_unit and self ~= Global.local_member and unit:inventory() then
-		unit:inventory():add_peer_blackmarket_outfit(self:peer())
 	end
 	if unit then
 		if managers.criminals:character_peer_id_by_name(character_name) == self._peer:id() then
@@ -200,10 +194,9 @@ function NetworkMember:sync_lobby_data(peer)
 	local menu_state = managers.menu:get_peer_state(local_peer:id())
 	local menu_state_index = tweak_data:menu_sync_state_to_index(menu_state)
 	cat_print("multiplayer_base", "NetworkMember:sync_lobby_data to", peer:id(), " : ", peer_id, level)
-	local_peer:set_outfit_string(managers.blackmarket:outfit_string())
 	peer:send_after_load("lobby_info", level, rank, character, mask_set)
 	peer:send_after_load("sync_profile", level, rank)
-	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string())
+	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string(), managers.network:session():local_peer():outfit_version())
 	if menu_state_index then
 		peer:send_after_load("set_menu_sync_state_index", menu_state_index)
 	end
@@ -220,7 +213,7 @@ function NetworkMember:sync_data(peer)
 	local level = managers.experience:current_level()
 	local rank = managers.experience:current_rank()
 	peer:send_after_load("sync_profile", level, rank)
-	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string())
+	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string(), managers.network:session():local_peer():outfit_version())
 	managers.player:update_deployable_equipment_to_peer(peer)
 	managers.player:update_cable_ties_to_peer(peer)
 	managers.player:update_grenades_to_peer(peer)

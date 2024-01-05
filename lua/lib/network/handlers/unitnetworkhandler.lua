@@ -1,6 +1,6 @@
 UnitNetworkHandler = UnitNetworkHandler or class(BaseNetworkHandler)
 
-function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, peer_id)
+function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit_version, peer_id)
 	print("[UnitNetworkHandler:set_unit]", unit, character_name, peer_id)
 	Application:stack_dump()
 	if not alive(unit) then
@@ -23,7 +23,9 @@ function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, peer_i
 	if not peer then
 		return
 	end
-	peer:set_outfit_string(outfit_string)
+	if peer ~= managers.network:session():local_peer() then
+		peer:set_outfit_string(outfit_string, outfit_version)
+	end
 	local member = managers.network:game():member_peer(peer)
 	if member then
 		member:set_unit(unit, character_name)

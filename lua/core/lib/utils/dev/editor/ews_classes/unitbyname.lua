@@ -275,7 +275,7 @@ function UnitByName:_unit_condition(unit)
 	if self._unit_filter_function then
 		return self._unit_filter_function(unit)
 	end
-	return true
+	return not unit:unit_data().instance
 end
 
 function UnitByName:reset()

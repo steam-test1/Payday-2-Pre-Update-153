@@ -14,7 +14,7 @@ local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
 local tmp_vec3 = Vector3()
 CopActionHurt = CopActionHurt or class()
-CopActionHurt.running_death_anim_variants = {male = 13, female = 5}
+CopActionHurt.running_death_anim_variants = {male = 26, female = 5}
 CopActionHurt.death_anim_variants = {
 	normal = {
 		crouching = {
@@ -95,7 +95,7 @@ CopActionHurt.hurt_anim_variants = {
 	},
 	expl_hurt = {
 		fwd = 8,
-		bwd = 7,
+		bwd = 8,
 		l = 7,
 		r = 7
 	}

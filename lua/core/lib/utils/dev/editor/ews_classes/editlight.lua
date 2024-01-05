@@ -267,11 +267,12 @@ function EditUnitLight:update_light_ctrls_from_light(light)
 	self._spot_start_angle_params.slider_ctrlr:set_enabled(is_spot)
 	self._spot_end_angle_params.number_ctrlr:set_enabled(is_spot)
 	self._spot_end_angle_params.slider_ctrlr:set_enabled(is_spot)
-	local is_projection = CoreEditorUtils.is_projection_light(self._reference_unit, light)
-	self._shadow_resolution_params.ctrlr:set_enabled(is_projection)
+	local is_shadow_projection = CoreEditorUtils.is_projection_light(self._reference_unit, light, "shadow_projection")
+	self._shadow_resolution_params.ctrlr:set_enabled(is_shadow_projection)
 	local resolution = self._reference_unit:unit_data().projection_lights
 	resolution = resolution and resolution[light:name():s()] and resolution[light:name():s()].x or EditUnitLight.DEFAULT_SHADOW_RESOLUTION
 	CoreEws.change_combobox_value(self._shadow_resolution_params, resolution)
+	local is_projection = CoreEditorUtils.is_projection_light(self._reference_unit, light, "projection")
 	self._spot_projection_texture_params.ctrlr:set_enabled(is_projection and is_spot)
 	local projection_texture = self._reference_unit:unit_data().projection_textures
 	projection_texture = projection_texture and projection_texture[light:name():s()] or EditUnitLight.DEFAULT_SPOT_PROJECTION_TEXTURE

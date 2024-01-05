@@ -811,6 +811,17 @@ function JobManager:interupt_stage()
 	return self._global.interupt_stage
 end
 
+function JobManager:set_memory(key, value)
+	if self._global.memory then
+		self._global.memory[key] = value
+	end
+	return false
+end
+
+function JobManager:get_memory(key)
+	return self._global.memory and self._global.memory[key]
+end
+
 function JobManager:has_active_job()
 	return self._global.current_job and true or false
 end
@@ -832,6 +843,7 @@ function JobManager:activate_job(job_id, current_stage)
 	}
 	self._global.start_time = TimerManager:wall_running():time()
 	self:start_accumulate_ghost_bonus(job_id)
+	self._global.memory = {}
 	return true
 end
 
@@ -842,6 +854,7 @@ function JobManager:deactivate_current_job()
 	self._global.interupt_stage = nil
 	self._global.next_interupt_stage = nil
 	self._global.start_time = nil
+	self._global.memory = nil
 	managers.loot:on_job_deactivated()
 	managers.mission:on_job_deactivated()
 	self._global.active_ghost_bonus = nil
@@ -910,6 +923,7 @@ function JobManager:next_stage()
 	end
 	Global.game_settings.level_id = managers.job:current_level_id()
 	Global.game_settings.mission = managers.job:current_mission()
+	Global.game_settings.world_setting = managers.job:current_world_setting()
 	if Network:is_server() then
 		MenuCallbackHandler:update_matchmake_attributes()
 		local level_id_index = tweak_data.levels:get_index_from_level_id(Global.game_settings.level_id)
@@ -928,6 +942,13 @@ function JobManager:current_job_data()
 		return
 	end
 	return tweak_data.narrative.jobs[self._global.current_job.job_id]
+end
+
+function JobManager:current_job_chain_data()
+	if not self._global.current_job then
+		return
+	end
+	return tweak_data.narrative.jobs[self._global.current_job.job_id] and tweak_data.narrative.jobs[self._global.current_job.job_id].chain
 end
 
 function JobManager:current_job_id()
@@ -989,6 +1010,16 @@ function JobManager:current_mission()
 		return "none"
 	end
 	return self:current_stage_data().mission or "none"
+end
+
+function JobManager:current_world_setting()
+	if not self._global.current_job then
+		return
+	end
+	if self._global.interupt_stage then
+		return nil
+	end
+	return self:current_stage_data().world_setting or nil
 end
 
 function JobManager:current_briefing_dialog()

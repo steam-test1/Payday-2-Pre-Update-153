@@ -65,6 +65,9 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_msr/wpn_fps_snp_msr"),
 	Idstring("units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_r93/wpn_fps_snp_r93"),
 	Idstring("units/pd2_dlc_big/weapons/wpn_fps_ass_fal/wpn_fps_ass_fal"),
+	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_ben/wpn_fps_sho_ben"),
+	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_striker/wpn_fps_sho_striker"),
+	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_ksg/wpn_fps_sho_ksg"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_b92fs/wpn_fps_pis_beretta_primary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4_secondary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug_secondary"),
@@ -98,13 +101,25 @@ function PlayerInventory:init(unit)
 	self._listener_id = "PlayerInventory" .. tostring(unit:key())
 	self._listener_holder = EventListenerHolder:new()
 	self._mask_unit = nil
-	self._mask_unit_name = nil
 	self._melee_weapon_unit = nil
 	self._melee_weapon_unit_name = nil
 end
 
 function PlayerInventory:pre_destroy(unit)
 	self:destroy_all_items()
+end
+
+function PlayerInventory:destroy_all_items()
+	for i_sel, selection_data in pairs(self._available_selections) do
+		if selection_data.unit and selection_data.unit:base() then
+			selection_data.unit:base():remove_destroy_listener(self._listener_id)
+			selection_data.unit:base():set_slot(selection_data.unit, 0)
+		else
+			debug_pause_unit(self._unit, "[PlayerInventory:destroy_all_items] broken inventory unit", selection_data.unit, selection_data.unit:base())
+		end
+	end
+	self._equipped_selection = nil
+	self._available_selections = {}
 	if alive(self._mask_unit) then
 		for _, linked_unit in ipairs(self._mask_unit:children()) do
 			linked_unit:unlink()
@@ -113,32 +128,9 @@ function PlayerInventory:pre_destroy(unit)
 		World:delete_unit(self._mask_unit)
 		self._mask_unit = nil
 	end
-	if self._mask_unit_name then
-		managers.dyn_resource:unload(Idstring("unit"), self._mask_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
-		self._mask_unit_name = nil
-	end
 	if self._melee_weapon_unit_name then
 		managers.dyn_resource:unload(Idstring("unit"), self._melee_weapon_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._melee_weapon_unit_name = nil
-	end
-end
-
-function PlayerInventory:destroy_all_items()
-	local names = {}
-	for i_sel, selection_data in pairs(self._available_selections) do
-		selection_data.unit:base():remove_destroy_listener(self._listener_id)
-		if managers.dyn_resource:has_resource(Idstring("unit"), selection_data.unit:name(), "packages/dyn_resources") then
-			table.insert(names, selection_data.unit:name())
-			selection_data.unit:base():set_slot(selection_data.unit, 0)
-			World:delete_unit(selection_data.unit)
-		else
-			selection_data.unit:base():set_slot(selection_data.unit, 0)
-		end
-	end
-	self._equipped_selection = nil
-	self._available_selections = {}
-	for _, name in pairs(names) do
-		managers.dyn_resource:unload(Idstring("unit"), name, "packages/dyn_resources", false)
 	end
 end
 
@@ -170,11 +162,7 @@ function PlayerInventory:add_unit(new_unit, is_equip, equip_is_instant)
 		is_equip = is_equip or old_weapon_unit == self:equipped_unit()
 		old_weapon_unit:base():remove_destroy_listener(self._listener_id)
 		old_weapon_unit:base():set_slot(old_weapon_unit, 0)
-		local old_weapon_name_ids = old_weapon_unit:name()
-		if managers.dyn_resource:has_resource(Idstring("unit"), old_weapon_name_ids, "packages/dyn_resources") then
-			World:delete_unit(old_weapon_unit)
-			managers.dyn_resource:unload(Idstring("unit"), old_weapon_name_ids, "packages/dyn_resources", false)
-		end
+		World:delete_unit(old_weapon_unit)
 		if self._equipped_selection == selection_index then
 			self._equipped_selection = nil
 		end
@@ -196,9 +184,6 @@ function PlayerInventory:clbk_weapon_unit_destroyed(weap_unit)
 		if sel_data.unit:key() == weapon_key then
 			if i_sel == self._equipped_selection then
 				self:_call_listeners("unequip")
-			end
-			if managers.dyn_resource:has_resource(Idstring("unit"), weap_unit:name(), "packages/dyn_resources") then
-				managers.dyn_resource:unload(Idstring("unit"), weap_unit:name(), "packages/dyn_resources", false)
 			end
 			self:remove_selection(i_sel, true)
 			break
@@ -241,7 +226,6 @@ end
 function PlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, blueprint, texture_switches)
 	local factory_weapon = tweak_data.weapon.factory[factory_name]
 	local ids_unit_name = Idstring(factory_weapon.unit)
-	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, "packages/dyn_resources", false)
 	local new_unit = World:spawn_unit(ids_unit_name, Vector3(), Rotation())
 	new_unit:base():set_factory_data(factory_name)
 	new_unit:base():set_texture_switches(texture_switches)
@@ -332,16 +316,13 @@ end
 
 function PlayerInventory:_send_equipped_weapon()
 	local eq_weap_name = self:equipped_unit():name()
-	local index = self:_get_weapon_sync_index_from_name(eq_weap_name)
+	local index = self._get_weapon_sync_index_from_name(eq_weap_name)
 	if not index then
 		debug_pause("[PlayerInventory:_send_equipped_weapon] cannot sync weapon", eq_weap_name, self._unit)
 		return
 	end
 	local blueprint_string = self:equipped_unit():base().blueprint_to_string and self:equipped_unit():base():blueprint_to_string() or ""
 	self._unit:network():send("set_equipped_weapon", index, blueprint_string)
-end
-
-function PlayerInventory:add_peer_blackmarket_outfit()
 end
 
 function PlayerInventory:unequip_selection(selection_index, instant)
@@ -413,8 +394,8 @@ function PlayerInventory:on_death_exit()
 	end
 end
 
-function PlayerInventory:_get_weapon_sync_index_from_name(wanted_weap_name)
-	for i, weap_name in pairs(self._index_to_weapon_list) do
+function PlayerInventory._get_weapon_sync_index_from_name(wanted_weap_name)
+	for i, weap_name in pairs(PlayerInventory._index_to_weapon_list) do
 		if (type(weap_name) == "string" and type(wanted_weap_name) == "string" or type(weap_name) ~= "string" and type(wanted_weap_name) ~= "string") and weap_name == wanted_weap_name then
 			return i
 		end
@@ -444,7 +425,7 @@ end
 function PlayerInventory:save(data)
 	if self._equipped_selection then
 		local eq_weap_name = self:equipped_unit():base()._factory_id or self._available_selections[self._equipped_selection].unit:name()
-		local index = self:_get_weapon_sync_index_from_name(eq_weap_name) or self:_get_weapon_sync_index_from_name(self._available_selections[self._equipped_selection].unit:name())
+		local index = self._get_weapon_sync_index_from_name(eq_weap_name) or self._get_weapon_sync_index_from_name(self._available_selections[self._equipped_selection].unit:name())
 		data.equipped_weapon_index = index
 		data.mask_visibility = self._mask_visibility
 		data.blueprint_string = self:equipped_unit():base().blueprint_to_string and self:equipped_unit():base():blueprint_to_string() or nil
@@ -478,6 +459,7 @@ function PlayerInventory:set_mask_visibility(state)
 	if not character_name then
 		return
 	end
+	self._mask_visibility = state
 	if alive(self._mask_unit) then
 		if not state then
 			for _, linked_unit in ipairs(self._mask_unit:children()) do
@@ -487,7 +469,6 @@ function PlayerInventory:set_mask_visibility(state)
 			self._mask_unit:unlink()
 			local name = self._mask_unit:name()
 			World:delete_unit(self._mask_unit)
-			managers.dyn_resource:unload(Idstring("unit"), name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		end
 		return
 	end
@@ -495,14 +476,15 @@ function PlayerInventory:set_mask_visibility(state)
 		return
 	end
 	local mask_unit_name = managers.criminals:character_data_by_name(character_name).mask_obj
+	if not managers.dyn_resource:is_resource_ready(Idstring("unit"), mask_unit_name, managers.dyn_resource.DYN_RESOURCES_PACKAGE) then
+		return
+	end
 	mask_unit_name = mask_unit_name[Global.level_data.level_id] or mask_unit_name.default or mask_unit_name
 	local mask_align = self._unit:get_object(Idstring("Head"))
-	managers.dyn_resource:load(Idstring("unit"), Idstring(mask_unit_name), DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 	local mask_unit = World:spawn_unit(Idstring(mask_unit_name), mask_align:position(), mask_align:rotation())
 	mask_unit:base():apply_blueprint(managers.criminals:character_data_by_name(character_name).mask_blueprint)
 	self._unit:link(mask_align:name(), mask_unit, mask_unit:orientation_object():name())
 	self._mask_unit = mask_unit
-	self._mask_unit_name = mask_unit:name()
 	local mask_id = managers.criminals:character_data_by_name(character_name).mask_id
 	if not mask_id or not tweak_data.blackmarket.masks[mask_id].type then
 		local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), mask_align:position(), mask_align:rotation())

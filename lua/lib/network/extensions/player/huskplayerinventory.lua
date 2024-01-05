@@ -60,6 +60,9 @@ HuskPlayerInventory._index_to_weapon_list = {
 	"wpn_fps_snp_msr_npc",
 	"wpn_fps_snp_r93_npc",
 	"wpn_fps_ass_fal_npc",
+	"wpn_fps_sho_ben_npc",
+	"wpn_fps_sho_striker_npc",
+	"wpn_fps_sho_ksg_npc",
 	"wpn_fps_pis_beretta_primary_npc",
 	"wpn_fps_ass_m4_secondary_npc",
 	"wpn_fps_ass_aug_secondary_npc",
@@ -97,41 +100,6 @@ function HuskPlayerInventory:synch_equipped_weapon(weap_index, blueprint_string)
 		return
 	end
 	self:add_unit_by_name(weapon_name, true, true)
-end
-
-function HuskPlayerInventory:add_peer_blackmarket_outfit(peer)
-	local peer_id = peer:id()
-	local blackmarket_outfit = peer and peer:blackmarket_outfit()
-	for i = 1, peer_id - 1 do
-		table.insert(self._peer_weapons, true)
-	end
-	if blackmarket_outfit then
-		local primary = blackmarket_outfit.primary
-		local secondary = blackmarket_outfit.secondary
-		if primary then
-			local factory_name_npc = tostring(primary.factory_id) .. "_npc"
-			assert(factory_name_npc)
-			table.insert(self._peer_weapons, {
-				factory_name_npc,
-				false,
-				true,
-				primary.blueprint
-			})
-		end
-		for i = 1, 3 do
-			table.insert(self._peer_weapons, true)
-		end
-		if secondary then
-			local factory_name_npc = tostring(secondary.factory_id) .. "_npc"
-			assert(factory_name_npc)
-			table.insert(self._peer_weapons, {
-				factory_name_npc,
-				false,
-				true,
-				secondary.blueprint
-			})
-		end
-	end
 end
 
 function HuskPlayerInventory:check_peer_weapon_spawn()
@@ -183,7 +151,6 @@ end
 function HuskPlayerInventory:add_unit_by_factory_blueprint(factory_name, equip, instant, blueprint)
 	local factory_weapon = tweak_data.weapon.factory[factory_name]
 	local ids_unit_name = Idstring(factory_weapon.unit)
-	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, "packages/dyn_resources", false)
 	local new_unit = World:spawn_unit(Idstring(factory_weapon.unit), Vector3(), Rotation())
 	new_unit:base():set_factory_data(factory_name)
 	new_unit:base():assemble_from_blueprint(factory_name, blueprint)

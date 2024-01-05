@@ -31,12 +31,13 @@ function MenuSetup:load_packages()
 	for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
 		package = prefix .. tostring(dlc_package) .. sufix
 		Application:debug("DLC PACKAGE LOCATION: " .. package, "IS PACKAGE OK TO LOAD?: " .. tostring(bundled))
-		if bundled and not PackageManager:loaded(package) then
+		if bundled and PackageManager:package_exists(package) and not PackageManager:loaded(package) then
 			PackageManager:load(package)
 		end
 	end
-	if not PackageManager:loaded("packages/game_base_streamed") then
-		PackageManager:load("packages/game_base_streamed")
+	if not PackageManager:loaded("packages/game_base") then
+		PackageManager:load("packages/game_base", function()
+		end)
 	end
 end
 
@@ -51,7 +52,7 @@ function MenuSetup:unload_packages()
 		local package = ""
 		for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
 			package = prefix .. tostring(dlc_package) .. sufix
-			if bundled and PackageManager:loaded(package) then
+			if bundled and PackageManager:package_exists(package) and PackageManager:loaded(package) then
 				PackageManager:unload(package)
 			end
 		end

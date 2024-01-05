@@ -137,6 +137,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.gage_pack_lmg = 1.8
 	self.global_value_multipliers.gage_pack_jobs = 0
 	self.global_value_multipliers.gage_pack_snp = 0.8
+	self.global_value_multipliers.gage_pack_shotgun = 1
 	self.global_value_multipliers.xmas_soundtrack = 1
 	self.global_value_multipliers.sweettooth = 1
 	self.global_value_multipliers.legendary = 1
@@ -159,6 +160,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.gage_pack_lmg = 0.5
 	self.global_value_bonus_multiplier.gage_pack_jobs = 0
 	self.global_value_bonus_multiplier.gage_pack_snp = 0.2
+	self.global_value_bonus_multiplier.gage_pack_shotgun = 0.2
 	self.global_value_bonus_multiplier.xmas_soundtrack = 0
 	self.global_value_bonus_multiplier.sweettooth = 0
 	self.global_value_bonus_multiplier.legendary = 0
@@ -237,6 +239,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 540
 		self.small_loot.vault_loot_diamond_collection = 650
 		self.small_loot.vault_loot_trophy = 690
+		self.small_loot.money_wrap_single_bundle_vscaled = 385
 		self.small_loot.spawn_bucket_of_money = 20000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
@@ -258,6 +261,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 1100
 		self.small_loot.vault_loot_diamond_collection = 1300
 		self.small_loot.vault_loot_trophy = 1400
+		self.small_loot.money_wrap_single_bundle_vscaled = 775
 		self.small_loot.spawn_bucket_of_money = 40000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
@@ -279,6 +283,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 2700
 		self.small_loot.vault_loot_diamond_collection = 3300
 		self.small_loot.vault_loot_trophy = 3500
+		self.small_loot.money_wrap_single_bundle_vscaled = 1950
 		self.small_loot.spawn_bucket_of_money = 100000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
@@ -300,6 +305,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 5400
 		self.small_loot.vault_loot_diamond_collection = 6500
 		self.small_loot.vault_loot_trophy = 6900
+		self.small_loot.money_wrap_single_bundle_vscaled = 3800
 		self.small_loot.spawn_bucket_of_money = 200000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
@@ -321,6 +327,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 7000
 		self.small_loot.vault_loot_diamond_collection = 8500
 		self.small_loot.vault_loot_trophy = 9000
+		self.small_loot.money_wrap_single_bundle_vscaled = 5000
 		self.small_loot.spawn_bucket_of_money = 260000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000

@@ -1642,7 +1642,6 @@ end
 
 function HuskPlayerMovement:_change_pose(pose_code)
 	local redirect = pose_code == 1 and "stand" or pose_code == 3 and "prone" or "crouch"
-	print("pose_code", pose_code, redirect)
 	self._pose_code = pose_code
 	if self._ext_anim[redirect] then
 		return
@@ -1794,8 +1793,8 @@ function HuskPlayerMovement:_post_load(unit, t, dt)
 		if not my_data then
 			return
 		end
-		peer:set_outfit_string(my_data.outfit)
-		UnitNetworkHandler.set_unit(UnitNetworkHandler, unit, my_data.character_name, my_data.outfit, my_data.peer_id)
+		peer:set_outfit_string(my_data.outfit, my_data.outfit_version)
+		UnitNetworkHandler.set_unit(UnitNetworkHandler, unit, my_data.character_name, my_data.outfit, my_data.outfit_version, my_data.peer_id)
 		if managers.network:game():member_from_unit(unit) == nil then
 			Application:error("[HuskPlayerBase:_post_load] A player husk who appears to not have an owning member was detached.")
 			Network:detach_unit(unit)

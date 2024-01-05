@@ -298,6 +298,14 @@ function CriminalsManager:character_unit_by_name(name)
 	end
 end
 
+function CriminalsManager:character_unit_by_peer_id(peer_id)
+	for _, data in pairs(self._characters) do
+		if data.taken and peer_id == data.peer_id then
+			return data.unit
+		end
+	end
+end
+
 function CriminalsManager:character_taken_by_name(name)
 	for _, data in pairs(self._characters) do
 		if name == data.name then

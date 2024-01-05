@@ -107,6 +107,12 @@ function UpgradesTweakData:_init_pd2_values()
 	self.on_headshot_dealt_cooldown = 1
 	self.weapon_movement_penalty = {}
 	self.weapon_movement_penalty.lmg = 0.8
+	self.explosive_bullet = {}
+	self.explosive_bullet.curve_pow = 0.5
+	self.explosive_bullet.player_dmg_mul = 0.1
+	self.explosive_bullet.range = 150
+	self.explosive_bullet.feedback_range = self.explosive_bullet.range
+	self.explosive_bullet.camera_shake_max_mul = 2
 	self.values.player.crime_net_deal = {0.9, 0.8}
 	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
@@ -860,7 +866,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[4] = {
 		name_id = "weapons",
-		upgrades = {"new_m4"}
+		upgrades = {"new_m4", "shovel"}
 	}
 	self.level_tree[6] = {
 		name_id = "weapons",
@@ -897,7 +903,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[15] = {
 		name_id = "weapons",
-		upgrades = {"msr"}
+		upgrades = {"msr", "benelli"}
 	}
 	self.level_tree[16] = {
 		name_id = "weapons",
@@ -905,7 +911,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[17] = {
 		name_id = "weapons",
-		upgrades = {"akm_gold"}
+		upgrades = {"akm_gold", "baton"}
 	}
 	self.level_tree[19] = {
 		name_id = "weapons",
@@ -926,7 +932,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[22] = {
 		name_id = "community_item",
-		upgrades = {"g22c"}
+		upgrades = {"g22c", "ksg"}
 	}
 	self.level_tree[26] = {
 		name_id = "weapons",
@@ -950,7 +956,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[33] = {
 		name_id = "weapons",
-		upgrades = {"ak5"}
+		upgrades = {"ak5", "striker"}
 	}
 	self.level_tree[35] = {
 		name_id = "weapons",
@@ -976,7 +982,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[42] = {
 		name_id = "weapons",
-		upgrades = {"fal"}
+		upgrades = {"fal", "tomahawk"}
 	}
 	self.level_tree[45] = {
 		name_id = "weapons",
@@ -987,6 +993,10 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"rep_upgrade5"
 		}
+	}
+	self.level_tree[54] = {
+		name_id = "weapons",
+		upgrades = {"becker"}
 	}
 	self.level_tree[60] = {
 		name_id = "lvl_60",
@@ -1188,6 +1198,9 @@ function UpgradesTweakData:init()
 	self:_msr_definitions()
 	self:_r93_definitions()
 	self:_fal_definitions()
+	self:_benelli_definitions()
+	self:_striker_definitions()
+	self:_ksg_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -4535,6 +4548,33 @@ function UpgradesTweakData:_fal_definitions()
 	}
 end
 
+function UpgradesTweakData:_benelli_definitions()
+	self.definitions.benelli = {
+		category = "weapon",
+		weapon_id = "benelli",
+		factory_id = "wpn_fps_sho_ben",
+		dlc = "gage_pack_shotgun"
+	}
+end
+
+function UpgradesTweakData:_striker_definitions()
+	self.definitions.striker = {
+		category = "weapon",
+		weapon_id = "striker",
+		factory_id = "wpn_fps_sho_striker",
+		dlc = "gage_pack_shotgun"
+	}
+end
+
+function UpgradesTweakData:_ksg_definitions()
+	self.definitions.ksg = {
+		category = "weapon",
+		weapon_id = "ksg",
+		factory_id = "wpn_fps_sho_ksg",
+		dlc = "gage_pack_shotgun"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -4561,6 +4601,22 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.brass_knuckles = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
+	}
+	self.definitions.tomahawk = {
+		category = "melee_weapon",
+		dlc = "gage_pack_shotgun"
+	}
+	self.definitions.baton = {
+		category = "melee_weapon",
+		dlc = "gage_pack_shotgun"
+	}
+	self.definitions.shovel = {
+		category = "melee_weapon",
+		dlc = "gage_pack_shotgun"
+	}
+	self.definitions.becker = {
+		category = "melee_weapon",
+		dlc = "gage_pack_shotgun"
 	}
 end
 

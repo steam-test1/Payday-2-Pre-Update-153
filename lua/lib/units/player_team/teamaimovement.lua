@@ -29,6 +29,7 @@ function TeamAIMovement:set_character_anim_variables()
 		end
 	end
 	HuskPlayerMovement.set_character_anim_variables(self)
+	self._unit:inventory():preload_mask()
 end
 
 function TeamAIMovement:check_visual_equipment()
@@ -142,26 +143,30 @@ function TeamAIMovement:_switch_to_not_cool(instant)
 		self:_switch_to_not_cool_clbk_func()
 	elseif not self._switch_to_not_cool_clbk_id then
 		self._switch_to_not_cool_clbk_id = "switch_to_not_cool_clbk" .. tostring(self._unit:key())
-		managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_switch_to_not_cool_clbk_func"), Application:time() + math.random() * 1 + 0.5)
+		managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_switch_to_not_cool_clbk_func"), TimerManager:game():time() + math.random() * 1 + 0.5)
 	end
 end
 
 function TeamAIMovement:_switch_to_not_cool_clbk_func()
 	if self._switch_to_not_cool_clbk_id and self._cool then
-		self._switch_to_not_cool_clbk_id = nil
-		self._cool = false
-		self._not_cool_t = TimerManager:game():time()
-		self._unit:base():set_slot(self._unit, 16)
-		if self._unit:brain()._logic_data and self._unit:brain():is_available_for_assignment() then
-			self._unit:brain():set_objective()
-			self._unit:movement():action_request({
-				type = "idle",
-				body_part = 1,
-				sync = true
-			})
+		if self._unit:inventory():is_mask_unit_loaded() then
+			self._switch_to_not_cool_clbk_id = nil
+			self._cool = false
+			self._not_cool_t = TimerManager:game():time()
+			self._unit:base():set_slot(self._unit, 16)
+			if self._unit:brain()._logic_data and self._unit:brain():is_available_for_assignment() then
+				self._unit:brain():set_objective()
+				self._unit:movement():action_request({
+					type = "idle",
+					body_part = 1,
+					sync = true
+				})
+			end
+			self:set_stance_by_code(2)
+			self._unit:brain():on_cool_state_changed(false)
+		else
+			managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_switch_to_not_cool_clbk_func"), TimerManager:game():time() + 1)
 		end
-		self:set_stance_by_code(2)
-		self._unit:brain():on_cool_state_changed(false)
 	end
 end
 

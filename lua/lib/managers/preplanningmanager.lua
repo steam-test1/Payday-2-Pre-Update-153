@@ -598,6 +598,7 @@ function PrePlanningManager:execute(type, index)
 	if self._mission_elements_by_type[type] and self._mission_elements_by_type[type][index] then
 		local element = self._mission_elements_by_type[type][index]
 		self:_check_spawn_deployable(type, element)
+		self:_check_spawn_unit(type, element)
 		element:on_executed(nil, "any")
 		element:on_executed(nil, type)
 		print("[PrePlanningManager:execute]", type, index)
@@ -622,6 +623,16 @@ function PrePlanningManager:_check_spawn_deployable(type, element)
 	elseif deployable_id == "bodybags_bag" then
 		BodyBagsBagBase.spawn(pos, rot, 0)
 	end
+end
+
+function PrePlanningManager:_check_spawn_unit(type, element)
+	local type_data = tweak_data.preplanning.types[type]
+	local unit_name = type_data.spawn_unit
+	if not unit_name then
+		return
+	end
+	local pos, rot = element:get_orientation()
+	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
 end
 
 function PrePlanningManager:can_edit_preplan()

@@ -12,10 +12,6 @@ BaseNetworkSession._STEAM_P2P_SEND_INTERVAL = 1
 function BaseNetworkSession:init()
 	print("[BaseNetworkSession:init]")
 	self._ids_WIN32 = Idstring("WIN32")
-	local my_name = managers.network.account:username_id()
-	local my_user_id = SystemInfo:platform() == self._ids_WIN32 and Steam:userid() or false
-	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 1, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
-	self._local_peer:set_outfit_string(managers.blackmarket:outfit_string())
 	self._peers = {}
 	self._server_peer = nil
 	self._timeout_chk_t = 0
@@ -24,6 +20,13 @@ function BaseNetworkSession:init()
 	self._soft_remove_peers = false
 	Network:set_client_send_callback(callback(self, self, "clbk_network_send"))
 	self._dropin_complete_event_manager_id = EventManager:register_listener(Idstring("net_save_received"), callback(self, self, "on_peer_save_received"))
+end
+
+function BaseNetworkSession:create_local_peer()
+	local my_name = managers.network.account:username_id()
+	local my_user_id = SystemInfo:platform() == self._ids_WIN32 and Steam:userid() or false
+	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 1, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
+	self._local_peer:set_outfit_string(managers.blackmarket:outfit_string(), nil)
 end
 
 function BaseNetworkSession:load(data)
@@ -50,6 +53,7 @@ function BaseNetworkSession:load(data)
 		end
 	end
 	self._server_protocol = data.server_protocol
+	self._notify_host_when_outfits_loaded = data.notify_host_when_outfits_loaded
 end
 
 function BaseNetworkSession:save(data)
@@ -84,6 +88,7 @@ function BaseNetworkSession:save(data)
 	end
 	self:_flush_soft_remove_peers()
 	data.server_protocol = self._server_protocol
+	data.notify_host_when_outfits_loaded = self._notify_host_when_outfits_loaded
 end
 
 function BaseNetworkSession:server_peer()
@@ -170,12 +175,12 @@ function BaseNetworkSession:remove_peer(peer, peer_id, reason)
 	end
 	self._peers[peer_id] = nil
 	self._connection_established_results[peer:name()] = nil
+	managers.network:game():on_peer_removed(peer, peer_id, reason)
 	if peer:rpc() then
 		self:_soft_remove_peer(peer)
 	else
 		peer:destroy()
 	end
-	managers.network:game():on_peer_removed(peer, peer_id, reason)
 end
 
 function BaseNetworkSession:_soft_remove_peer(peer)
@@ -465,7 +470,6 @@ function BaseNetworkSession:set_peer_loading_state(peer, state)
 		if peer:ip_verified() then
 			Global.local_member:sync_lobby_data(peer)
 			Global.local_member:sync_data(peer)
-			peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready() and 1 or 0, 1)
 		end
 		peer:flush_overwriteable_msgs()
 	end
@@ -543,13 +547,19 @@ end
 
 function BaseNetworkSession:chk_send_local_player_ready()
 	local state = self._local_peer:waiting_for_player_ready()
-	self:send_to_peers_loaded("set_member_ready", state and 1 or 0, 1)
+	if self:is_host() then
+		self:send_to_peers_loaded("set_member_ready", self._local_peer:id(), state and 1 or 0, 1, "")
+	else
+		self:send_to_host("set_member_ready", self._local_peer:id(), state and 1 or 0, 1, "")
+	end
 end
 
 function BaseNetworkSession:destroy()
 	for _, peer in pairs(self._peers) do
 		peer:end_ticket_session()
+		peer:destroy()
 	end
+	self._local_peer:destroy()
 	if self._dropin_complete_event_manager_id then
 		EventManager:unregister_listener(self._dropin_complete_event_manager_id)
 		self._dropin_complete_event_manager_id = nil
@@ -704,4 +714,38 @@ function BaseNetworkSession:peer_streaming_status()
 		end
 	end
 	return peer_name, status
+end
+
+function BaseNetworkSession:are_all_peer_assets_loaded()
+	if not self._local_peer:is_outfit_loaded() then
+		return false
+	end
+	for peer_id, peer in pairs(self._peers) do
+		if peer:waiting_for_player_ready() and not peer:is_outfit_loaded() then
+			print("[BaseNetworkSession:are_all_peer_assets_loaded] still loading outfit", peer_id)
+			return false
+		end
+	end
+	print("[BaseNetworkSession:are_all_peer_assets_loaded] all outfits loaded")
+	return true
+end
+
+function BaseNetworkSession:_get_peer_outfit_versions_str()
+	local outfit_versions_str = ""
+	for peer_id = 1, 4 do
+		local peer
+		if peer_id == self._local_peer:id() then
+			peer = self._local_peer
+		else
+			peer = self._peers[peer_id]
+		end
+		if peer and peer:waiting_for_player_ready() then
+			outfit_versions_str = outfit_versions_str .. tostring(peer_id) .. "-" .. peer:outfit_version() .. "."
+		end
+	end
+	return outfit_versions_str
+end
+
+function BaseNetworkSession:on_peer_outfit_loaded(peer)
+	print("[BaseNetworkSession:on_peer_outfit_loaded]", inspect(peer))
 end

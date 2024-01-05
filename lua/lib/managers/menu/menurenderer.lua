@@ -219,7 +219,10 @@ end
 function MenuRenderer:resolution_changed(...)
 	MenuRenderer.super.resolution_changed(self, ...)
 	self:_layout_menu_bg()
-	self:active_node_gui():update_item_icon_visibility()
+	local active_node_gui = self:active_node_gui()
+	if active_node_gui and active_node_gui.update_item_icon_visibility then
+		self:active_node_gui():update_item_icon_visibility()
+	end
 end
 
 function MenuRenderer:set_bg_visible(visible)

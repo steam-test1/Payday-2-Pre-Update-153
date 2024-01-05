@@ -886,7 +886,6 @@ function FPCameraPlayerBase:spawn_mask()
 		else
 			mask_unit_name = tweak_data.blackmarket.masks[equipped_mask].unit
 		end
-		managers.dyn_resource:load(Idstring("unit"), Idstring(mask_unit_name), DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._mask_unit = World:spawn_unit(Idstring(mask_unit_name), align_obj_r:position(), align_obj_r:rotation())
 		local glass_id_string = Idstring("glass")
 		local mtr_hair_solid_id_string = Idstring("mtr_hair_solid")
@@ -935,7 +934,6 @@ function FPCameraPlayerBase:unspawn_mask()
 		self._mask_unit:unlink()
 		local name = self._mask_unit:name()
 		World:delete_unit(self._mask_unit)
-		managers.dyn_resource:unload(Idstring("unit"), name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._mask_unit = nil
 	end
 end
@@ -994,10 +992,45 @@ function FPCameraPlayerBase:anim_clbk_check_bullet_object()
 	end
 end
 
+function FPCameraPlayerBase:anim_clbk_spawn_shotgun_shell()
+	if alive(self._parent_unit) then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		if alive(weapon) and weapon:base().shotgun_shell_data then
+			local shotgun_shell_data = weapon:base():shotgun_shell_data()
+			if not shotgun_shell_data then
+				return
+			end
+			local align_obj_l_name = Idstring("a_weapon_left")
+			local align_obj_r_name = Idstring("a_weapon_right")
+			local align_obj_l = self._unit:get_object(align_obj_l_name)
+			local align_obj_r = self._unit:get_object(align_obj_r_name)
+			local align_obj = align_obj_l
+			if shotgun_shell_data.align and shotgun_shell_data.align == "right" then
+				align_obj = align_obj_r
+			end
+			self:_unspawn_shotgun_shell()
+			self._shell = World:spawn_unit(Idstring(shotgun_shell_data.unit_name), align_obj:position(), align_obj:rotation())
+			self._unit:link(align_obj:name(), self._shell, self._shell:orientation_object():name())
+		end
+	end
+end
+
+function FPCameraPlayerBase:anim_clbk_unspawn_shotgun_shell()
+	self:_unspawn_shotgun_shell()
+end
+
+function FPCameraPlayerBase:_unspawn_shotgun_shell()
+	if not alive(self._shell) then
+		return
+	end
+	self._shell:unlink()
+	World:delete_unit(self._shell)
+	self._shell = nil
+end
+
 function FPCameraPlayerBase:load_fps_mask_units()
 	if not self._mask_backface_loaded then
 		self._mask_backface_loaded = true
-		managers.dyn_resource:load(Idstring("unit"), Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), "packages/dyn_resources", false)
 	end
 end
 
@@ -1016,8 +1049,8 @@ function FPCameraPlayerBase:destroy()
 	self:unspawn_mask()
 	self:unspawn_grenade()
 	self:unspawn_melee_item()
+	self:_unspawn_shotgun_shell()
 	if self._mask_backface_loaded then
 		self._mask_backface_loaded = nil
-		managers.dyn_resource:unload(Idstring("unit"), Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), "packages/dyn_resources", false)
 	end
 end

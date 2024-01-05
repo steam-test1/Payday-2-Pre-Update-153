@@ -1,4 +1,5 @@
 ExplosionManager = ExplosionManager or class()
+local idstr_small_light_fire = Idstring("effects/particles/fire/small_light_fire")
 local idstr_explosion_std = Idstring("explosion_std")
 local empty_idstr = Idstring("")
 local tmp_vec3 = Vector3()
@@ -153,6 +154,15 @@ function ExplosionManager:detect_and_give_dmg(params)
 			hit = next(characters_hit) and true or false,
 			weapon_unit = owner
 		})
+		local characters_hit = table.size(characters_hit)
+		local achievement_data = tweak_data.achievement.shock_awe
+		local weapon_type_pass = not achievement_data.weapon_type or owner:base() and owner:base().weapon_tweak_data and owner:base():weapon_tweak_data().category == achievement_data.weapon_type
+		local count_pass = not achievement_data.count or characters_hit >= achievement_data.count
+		local all_pass = weapon_type_pass and count_pass
+		if all_pass and achievement_data.award then
+			print(achievement_data.award)
+			managers.achievment:award(achievement_data.award)
+		end
 	end
 	return hit_units, splinters
 end
@@ -249,7 +259,7 @@ end
 
 function ExplosionManager:play_sound_and_effects(position, normal, range, custom_params)
 	self:player_feedback(position, normal, range, custom_params)
-	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect, custom_params and custom_params.sound_event)
+	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect, custom_params and custom_params.sound_event, custom_params and custom_params.on_unit, custom_params and custom_params.idstr_decal, custom_params and custom_params.idstr_effect)
 end
 
 function ExplosionManager:player_feedback(position, normal, range, custom_params)
@@ -310,7 +320,7 @@ end
 local decal_ray_from = Vector3()
 local decal_ray_to = Vector3()
 
-function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event)
+function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event, on_unit, idstr_decal, idstr_effect)
 	effect_name = effect_name or "effects/particles/explosions/explosion_grenade_launcher"
 	if effect_name ~= "none" then
 		World:effect_manager():spawn({
@@ -320,10 +330,19 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 		})
 	end
 	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
-	mvector3.set(decal_ray_from, position)
-	mvector3.set(decal_ray_to, math.UP)
-	mvector3.multiply(decal_ray_to, -100)
-	mvector3.add(decal_ray_to, decal_ray_from)
+	if on_unit then
+		mvector3.set(decal_ray_from, position)
+		mvector3.set(decal_ray_to, normal)
+		mvector3.multiply(decal_ray_to, 100)
+		mvector3.add(decal_ray_from, decal_ray_to)
+		mvector3.multiply(decal_ray_to, -2)
+		mvector3.add(decal_ray_to, decal_ray_from)
+	else
+		mvector3.set(decal_ray_from, position)
+		mvector3.set(decal_ray_to, math.UP)
+		mvector3.multiply(decal_ray_to, -100)
+		mvector3.add(decal_ray_to, decal_ray_from)
+	end
 	local ray = World:raycast("ray", decal_ray_from, decal_ray_to, "slot_mask", slotmask_world_geometry)
 	local sound_switch_name
 	if ray then
@@ -337,14 +356,14 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 	end
 	sound_source:post_event(sound_event or "trip_mine_explode")
 	managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
-	self:project_decal(ray, decal_ray_from, decal_ray_to)
+	self:project_decal(ray, decal_ray_from, decal_ray_to, on_unit and ray and ray.unit, idstr_decal, idstr_effect)
 end
 
-function ExplosionManager:project_decal(ray, from, to, on_unit)
+function ExplosionManager:project_decal(ray, from, to, on_unit, idstr_decal, idstr_effect)
 	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
 	if ray then
-		local units = World:find_units("intersect", "cylinder", from, to, 100, slotmask_world_geometry)
-		local redir_name = World:project_decal(idstr_explosion_std, ray.position, ray.ray, on_unit or units, nil, ray.normal)
+		local units = on_unit or World:find_units("intersect", "cylinder", from, to, 100, slotmask_world_geometry)
+		local redir_name = World:project_decal(idstr_decal or idstr_explosion_std, ray.position, ray.ray, on_unit or units, nil, ray.normal)
 		if redir_name ~= empty_idstr then
 			World:effect_manager():spawn({
 				effect = redir_name,
@@ -352,11 +371,13 @@ function ExplosionManager:project_decal(ray, from, to, on_unit)
 				normal = ray.normal
 			})
 		end
-		local id = World:effect_manager():spawn({
-			effect = Idstring("effects/particles/fire/small_light_fire"),
-			position = ray.position,
-			normal = ray.normal
-		})
-		self:add_sustain_effect(id, 2 + math.rand(3))
+		if not idstr_effect or idstr_effect ~= empty_idstr then
+			local id = World:effect_manager():spawn({
+				effect = idstr_effect or idstr_small_light_fire,
+				position = ray.position,
+				normal = ray.normal
+			})
+			self:add_sustain_effect(id, 2 + math.rand(3))
+		end
 	end
 end

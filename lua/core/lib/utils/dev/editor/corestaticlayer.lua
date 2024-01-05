@@ -117,6 +117,7 @@ function StaticLayer:set_unit_position(unit, pos, rot)
 	unit:set_position(new_pos)
 	unit:unit_data().world_pos = new_pos
 	self:_on_unit_moved(unit, new_pos)
+	unit:set_moving()
 end
 
 function StaticLayer:set_unit_rotations(rot)

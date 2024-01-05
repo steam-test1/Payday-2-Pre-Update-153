@@ -1091,6 +1091,12 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{none = 1}
 			}
+		},
+		melee = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
 	presets.hurt_severities.only_light_hurt = {
@@ -1104,6 +1110,12 @@ function CharacterTweakData:_presets(tweak_data)
 			health_reference = 1,
 			zones = {
 				{explode = 1}
+			}
+		},
+		melee = {
+			health_reference = 1,
+			zones = {
+				{light = 1}
 			}
 		}
 	}
@@ -1119,6 +1131,12 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{explode = 1}
 			}
+		},
+		melee = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
 	presets.hurt_severities.base = {
@@ -1126,22 +1144,28 @@ function CharacterTweakData:_presets(tweak_data)
 			health_reference = "current",
 			zones = {
 				{
-					health_limit = 0.2,
-					none = 0,
+					health_limit = 0.3,
+					none = 0.2,
 					light = 0.7,
-					moderate = 0.2,
-					heavy = 0.1
+					moderate = 0.05,
+					heavy = 0.05
 				},
 				{
-					health_limit = 0.4,
+					health_limit = 0.6,
+					light = 0.4,
+					moderate = 0.4,
+					heavy = 0.2
+				},
+				{
+					health_limit = 0.9,
 					light = 0.2,
-					moderate = 0.5,
-					heavy = 0.3
+					moderate = 0.2,
+					heavy = 0.6
 				},
 				{
-					light = 0.1,
-					moderate = 0.3,
-					heavy = 0.6
+					light = 0,
+					moderate = 0,
+					heavy = 1
 				}
 			}
 		},
@@ -1159,6 +1183,35 @@ function CharacterTweakData:_presets(tweak_data)
 					explode = 0.4
 				},
 				{heavy = 0.2, explode = 0.8}
+			}
+		},
+		melee = {
+			health_reference = "current",
+			zones = {
+				{
+					health_limit = 0.3,
+					none = 0.3,
+					light = 0.7,
+					moderate = 0,
+					heavy = 0
+				},
+				{
+					health_limit = 0.8,
+					light = 1,
+					moderate = 0,
+					heavy = 0
+				},
+				{
+					health_limit = 0.9,
+					light = 0.6,
+					moderate = 0.2,
+					heavy = 0.2
+				},
+				{
+					light = 0,
+					moderate = 0,
+					heavy = 9
+				}
 			}
 		}
 	}
@@ -1199,7 +1252,7 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.gang_member_damage.BLEED_OUT_HEALTH_INIT = tweak_data.player.damage.BLEED_OUT_HEALTH_INIT
 	presets.gang_member_damage.ARRESTED_TIME = tweak_data.player.damage.ARRESTED_TIME
 	presets.gang_member_damage.INCAPACITATED_TIME = tweak_data.player.damage.INCAPACITATED_TIME
-	presets.gang_member_damage.hurt_severity = presets.hurt_severities.base
+	presets.gang_member_damage.hurt_severity = deep_clone(presets.hurt_severities.base)
 	presets.gang_member_damage.hurt_severity.bullet = {
 		health_reference = "current",
 		zones = {

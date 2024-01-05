@@ -680,7 +680,8 @@ function PlayerMovement:save(data)
 		peer_id = peer_id,
 		character_name = managers.criminals:character_name_by_unit(self._unit),
 		attentions = {},
-		outfit = managers.network:session():peer(peer_id):profile("outfit_string")
+		outfit = managers.network:session():peer(peer_id):profile("outfit_string"),
+		outfit_version = managers.network:session():peer(peer_id):outfit_version()
 	}
 	if self._current_state_name == "clean" or self._current_state_name == "mask_off" then
 	elseif self._state_data.in_steelsight then

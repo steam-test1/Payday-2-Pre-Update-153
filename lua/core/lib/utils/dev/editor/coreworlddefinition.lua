@@ -205,6 +205,32 @@ function WorldDefinition:parse_continents(node, t)
 			self._excluded_continents[name] = true
 		end
 	end
+	self:_insert_instances()
+end
+
+function WorldDefinition:_insert_instances()
+	for name, data in pairs(self._continent_definitions) do
+		if data.instances then
+			for i, instance in ipairs(data.instances) do
+				local package_data = managers.world_instance:packages_by_instance(instance)
+				self:_load_continent_init_package(package_data.init_package)
+				self:_load_continent_package(package_data.package)
+				local prepared_unit_data = managers.world_instance:prepare_unit_data(instance, self._continents[instance.continent])
+				if prepared_unit_data.statics then
+					for _, static in ipairs(prepared_unit_data.statics) do
+						data.statics = data.statics or {}
+						table.insert(data.statics, static)
+					end
+				end
+				if prepared_unit_data.dynamics then
+					for _, dynamic in ipairs(prepared_unit_data.dynamics) do
+						data.dynamics = data.dynamics or {}
+						table.insert(data.dynamics, dynamic)
+					end
+				end
+			end
+		end
+	end
 end
 
 function WorldDefinition:_continent_editor_only(data)
@@ -245,6 +271,16 @@ function WorldDefinition:create(layer, offset)
 	end
 	if layer == "continents" then
 		return_data = self._continents
+	end
+	if layer == "instances" or layer == "all" then
+		for name, continent in pairs(self._continent_definitions) do
+			if continent.instances then
+				for _, data in ipairs(continent.instances) do
+					managers.world_instance:add_instance_data(data)
+					table.insert(return_data, data)
+				end
+			end
+		end
 	end
 	if layer == "ai" and self._definition.ai then
 		for _, values in ipairs(self._definition.ai) do
@@ -685,6 +721,7 @@ function WorldDefinition:assign_unit_data(unit, data)
 		unit:set_slot(0)
 		return
 	end
+	unit:unit_data().instance = data.instance
 	self:_setup_unit_id(unit, data)
 	self:_setup_editor_unit_data(unit, data)
 	if unit:unit_data().helper_type and unit:unit_data().helper_type ~= "none" then

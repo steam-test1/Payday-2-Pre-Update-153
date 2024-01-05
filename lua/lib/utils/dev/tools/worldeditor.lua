@@ -184,7 +184,12 @@ function WorldEditor:project_clear_units()
 	managers.groupai:state():set_AI_enabled(false)
 	local units = World:find_units_quick("all", World:make_slot_mask(0, 2, 4, 5, 6, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25))
 	for _, unit in ipairs(units) do
-		World:delete_unit(unit)
+		local layer = self:unit_in_layer(unit)
+		if layer then
+			layer:delete_unit(unit)
+		else
+			World:delete_unit(unit)
+		end
 	end
 end
 

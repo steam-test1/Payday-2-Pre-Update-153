@@ -57,6 +57,7 @@ function CarryTweakData:init(tweak_data)
 	self.small_loot.vault_loot_silver = tweak_data:get_value("money_manager", "small_loot", "vault_loot_silver")
 	self.small_loot.vault_loot_diamond_collection = tweak_data:get_value("money_manager", "small_loot", "vault_loot_diamond_collection")
 	self.small_loot.vault_loot_trophy = tweak_data:get_value("money_manager", "small_loot", "vault_loot_trophy")
+	self.small_loot.money_wrap_single_bundle_vscaled = tweak_data:get_value("money_manager", "small_loot", "money_wrap_single_bundle_vscaled")
 	self.small_loot.spawn_bucket_of_money = tweak_data:get_value("money_manager", "small_loot", "spawn_bucket_of_money")
 	self.small_loot.vault_loot_gold = tweak_data:get_value("money_manager", "small_loot", "vault_loot_gold")
 	self.small_loot.vault_loot_cash = tweak_data:get_value("money_manager", "small_loot", "vault_loot_cash")
@@ -232,6 +233,13 @@ function CarryTweakData:init(tweak_data)
 	self.samurai_suit.name_id = "hud_carry_samurai"
 	self.samurai_suit.bag_value = "samurai_suit"
 	self.samurai_suit.AI_carry = {SO_category = "enemies"}
+	self.equipment_bag = {}
+	self.equipment_bag.type = "medium"
+	self.equipment_bag.name_id = "hud_carry_equipment_bag"
+	self.equipment_bag.skip_exit_secure = true
+	self.equipment_bag.visual_object = "g_toolsbag"
+	self.equipment_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
+	self.equipment_bag.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

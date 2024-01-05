@@ -1,4 +1,7 @@
 HuskTeamAIInventory = HuskTeamAIInventory or class(HuskCopInventory)
+HuskTeamAIInventory.preload_mask = TeamAIInventory.preload_mask
+HuskTeamAIInventory.clbk_mask_unit_loaded = TeamAIInventory.clbk_mask_unit_loaded
+HuskTeamAIInventory._reset_mask_visibility = TeamAIInventory._reset_mask_visibility
 
 function HuskTeamAIInventory:add_unit_by_name(new_unit_name, equip)
 	local new_unit = World:spawn_unit(new_unit_name, Vector3(), Rotation())
@@ -14,4 +17,9 @@ function HuskTeamAIInventory:add_unit_by_name(new_unit_name, equip)
 	setup_data.user_sound_variant = tweak_data.character[self._unit:base()._tweak_table].weapon_voice
 	new_unit:base():setup(setup_data)
 	CopInventory.add_unit(self, new_unit, equip)
+end
+
+function HuskTeamAIInventory:pre_destroy()
+	HuskTeamAIInventory.super.pre_destroy(self)
+	TeamAIInventory._unload_mask(self)
 end

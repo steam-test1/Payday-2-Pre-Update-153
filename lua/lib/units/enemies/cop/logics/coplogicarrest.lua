@@ -40,6 +40,7 @@ function CopLogicArrest.enter(data, new_logic_name, enter_params)
 	if data.unit:movement():stance_name() == "ntl" then
 		data.unit:movement():set_stance("cbt")
 	end
+	CopLogicIdle._chk_has_old_action(data, my_data)
 	data.unit:brain():set_attention_settings({cbt = true})
 	my_data.next_action_delay_t = data.t + math.lerp(2, 2.5, math.random())
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
@@ -83,6 +84,11 @@ function CopLogicArrest.queued_update(data)
 	if my_data ~= data.internal_data then
 		return
 	end
+	if my_data.has_old_action then
+		CopLogicIdle._upd_stop_old_action(data, my_data, data.objective)
+		CopLogicBase.queue_task(my_data, my_data.update_task_key, CopLogicArrest.queued_update, data, data.t + 1, data.important)
+		return
+	end
 	local attention_obj = data.attention_obj
 	local arrest_data = attention_obj and my_data.arrest_targets[attention_obj.u_key]
 	if not data.unit:anim_data().reload and not data.unit:movement():chk_action_forbidden("action") then
@@ -117,7 +123,7 @@ function CopLogicArrest.queued_update(data)
 					my_data.gesture_arrest = true
 				end
 			end
-		elseif not arrest_data.intro_pos and data.t - arrest_data.intro_t > 1 then
+		elseif not arrest_data.intro_pos and 1 < data.t - arrest_data.intro_t then
 			arrest_data.intro_pos = mvector3.copy(attention_obj.m_pos)
 		end
 	end

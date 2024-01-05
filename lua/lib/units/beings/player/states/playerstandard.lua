@@ -1124,7 +1124,8 @@ function PlayerStandard:_start_action_melee(t, input, instant)
 	self._state_data.melee_global_value = tweak_data.blackmarket.melee_weapons[melee_entry].anim_global_param
 	self._camera_unit:anim_state_machine():set_global(self._state_data.melee_global_value, 1)
 	local current_state_name = self._camera_unit:anim_state_machine():segment_state(PlayerStandard.IDS_BASE)
-	self._state_data.melee_attack_allowed_t = t + (current_state_name ~= PlayerStandard.IDS_MELEE_ATTACK_STATE and 0.15 or 0)
+	local attack_allowed_expire_t = tweak_data.blackmarket.melee_weapons[melee_entry].attack_allowed_expire_t or 0.15
+	self._state_data.melee_attack_allowed_t = t + (current_state_name ~= PlayerStandard.IDS_MELEE_ATTACK_STATE and attack_allowed_expire_t or 0)
 	if current_state_name == PlayerStandard.IDS_MELEE_ATTACK_STATE then
 		self._ext_camera:play_redirect(PlayerStandard.IDS_MELEE_CHARGE)
 		return

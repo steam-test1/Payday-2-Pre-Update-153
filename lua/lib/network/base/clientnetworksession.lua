@@ -100,6 +100,7 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 				local interupt_level = tweak_data.levels:get_level_name_from_index(interupt_job_stage_level_index)
 				managers.job:synced_interupt_stage(interupt_level)
 			end
+			Global.game_settings.world_setting = managers.job:current_world_setting()
 		end
 		cb(state_index == 1 and "JOINED_LOBBY" or "JOINED_GAME", level_index, difficulty_index, state_index)
 	elseif reply == 2 then
@@ -275,7 +276,8 @@ function ClientNetworkSession:ok_to_load_level()
 	local level_id = Global.game_settings.level_id
 	local level_name = level_id and tweak_data.levels[level_id].world_name
 	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
-	managers.network:session():load_level(level_name, mission, nil, nil, level_id)
+	local world_setting = Global.game_settings.world_setting
+	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
 end
 
 function ClientNetworkSession:ok_to_load_lobby()
@@ -303,9 +305,6 @@ function ClientNetworkSession:on_mutual_connection(other_peer_id)
 	local other_peer = self._peers[other_peer_id]
 	if not other_peer then
 		return
-	end
-	if self._local_peer:loaded() and other_peer:ip_verified() then
-		other_peer:send_after_load("set_member_ready", self._local_peer:waiting_for_player_ready() and 1 or 0, 1)
 	end
 end
 
@@ -391,4 +390,36 @@ function ClientNetworkSession:_upd_request_join_resend(wall_time)
 		self._join_request_params.host_rpc:request_join(unpack(self._join_request_params.params))
 		self._last_join_request_t = wall_time
 	end
+end
+
+function ClientNetworkSession:chk_send_outfit_loading_status()
+	print("[ClientNetworkSession:chk_send_outfit_loading_status]\n", inspect(self._notify_host_when_outfits_loaded), "\n", "self:_get_peer_outfit_versions_str()", self:_get_peer_outfit_versions_str())
+	if not self._notify_host_when_outfits_loaded or self._notify_host_when_outfits_loaded.outfit_versions_str ~= self:_get_peer_outfit_versions_str() or not self:are_all_peer_assets_loaded() then
+		return
+	end
+	self:send_to_host("set_member_ready", self._local_peer:id(), self._notify_host_when_outfits_loaded.request_id, 3, self._notify_host_when_outfits_loaded.outfit_versions_str)
+	self._notify_host_when_outfits_loaded = nil
+	print("[ClientNetworkSession:chk_send_outfit_loading_status] end")
+end
+
+function ClientNetworkSession:notify_host_when_outfits_loaded(request_id, outfit_versions_str)
+	print("[ClientNetworkSession:notify_host_when outfits_loaded] request_id", request_id)
+	self._notify_host_when_outfits_loaded = {request_id = request_id, outfit_versions_str = outfit_versions_str}
+	self:chk_send_outfit_loading_status()
+end
+
+function ClientNetworkSession:on_peer_outfit_loaded(peer)
+	ClientNetworkSession.super.on_peer_outfit_loaded(self, peer)
+	self:chk_send_outfit_loading_status()
+end
+
+function ClientNetworkSession:on_set_member_ready(peer_id, ready, state_changed)
+	if ready then
+		self:chk_send_outfit_loading_status()
+	end
+end
+
+function ClientNetworkSession:remove_peer(...)
+	ClientNetworkSession.super.remove_peer(self, ...)
+	self:chk_send_outfit_loading_status()
 end

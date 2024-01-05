@@ -330,7 +330,9 @@ function UnitList:on_select_unit_list_unit()
 	local unit_list = self._unit_list
 	local index = unit_list:selected_item()
 	local unit = self._unit_list_units[unit_list:get_item_data(index)]
-	managers.editor:select_unit(unit)
+	if not unit:unit_data().instance then
+		managers.editor:select_unit(unit)
+	end
 	managers.editor:center_view_on_unit(unit)
 end
 

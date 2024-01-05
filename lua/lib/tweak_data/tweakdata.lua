@@ -2386,6 +2386,32 @@ function TweakData:init()
 	self.interaction.read_barcode_opa_locka.equipment_consume = true
 	self.interaction.read_barcode_opa_locka.start_active = false
 	self.interaction.read_barcode_opa_locka.timer = 2
+	self.interaction.hlm_motor_start = {}
+	self.interaction.hlm_motor_start.text_id = "hud_int_hold_start_motor"
+	self.interaction.hlm_motor_start.action_text_id = "hud_action_startig_motor"
+	self.interaction.hlm_motor_start.start_active = false
+	self.interaction.hlm_motor_start.timer = 2
+	self.interaction.hlm_motor_start.sound_start = "bar_huge_lance_fix"
+	self.interaction.hlm_motor_start.sound_interupt = "bar_huge_lance_fix_cancel"
+	self.interaction.hlm_motor_start.sound_done = "bar_huge_lance_fix_finished"
+	self.interaction.hlm_connect_equip = {}
+	self.interaction.hlm_connect_equip.text_id = "hud_int_hold_connect_equip"
+	self.interaction.hlm_connect_equip.action_text_id = "hud_action_connecting_equip"
+	self.interaction.hlm_connect_equip.start_active = false
+	self.interaction.hlm_connect_equip.timer = 2
+	self.interaction.hlm_roll_carpet = {}
+	self.interaction.hlm_roll_carpet.text_id = "hud_int_hold_roll_carpet"
+	self.interaction.hlm_roll_carpet.action_text_id = "hud_action_rolling_carpet"
+	self.interaction.hlm_roll_carpet.start_active = false
+	self.interaction.hlm_roll_carpet.timer = 2
+	self.interaction.hlm_roll_carpet.sound_start = "bar_roll_carpet"
+	self.interaction.hlm_roll_carpet.sound_interupt = "bar_roll_carpet_cancel"
+	self.interaction.hlm_roll_carpet.sound_done = "bar_roll_carpet_finished"
+	self.interaction.hold_pku_equipmentbag = {}
+	self.interaction.hold_pku_equipmentbag.text_id = "hud_int_hold_pku_equipment"
+	self.interaction.hold_pku_equipmentbag.action_text_id = "hud_action_grabbing_equipment"
+	self.interaction.hold_pku_equipmentbag.sound_event = "ammo_bag_drop"
+	self.interaction.hold_pku_equipmentbag.timer = 1
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2820,6 +2846,32 @@ function TweakData:init()
 	self.achievement.demise_knuckles = "brass_knuckles"
 	self.achievement.vote_for_change = "g22c"
 	self.achievement.steam_500k = "akm_gold"
+	self.achievement.shotgun_one_o_one = {
+		count = 50,
+		accuracy = 101,
+		award = "gage4_5"
+	}
+	self.achievement.shock_awe = {
+		count = 4,
+		weapon_type = "shotgun",
+		award = "gage4_9"
+	}
+	self.achievement.close_and_personal = {
+		award = "gage4_3",
+		kill_type = "melee",
+		count = 50
+	}
+	self.achievement.weapons_owned = {
+		gage4_2 = {
+			"huntsman",
+			"r870",
+			"saiga",
+			"ksg",
+			"striker",
+			"serbu",
+			"benelli"
+		}
+	}
 	self.achievement.gage_assignments = {
 		green_mantis = "gmod_1_stats",
 		yellow_bull = "gmod_2_stats",
@@ -2986,6 +3038,31 @@ function TweakData:init()
 		public_enemy_no_one = {
 			stat = "gage3_17_stats",
 			weapon = "msr"
+		},
+		knock_knock = {
+			stat = "gage4_6_stats",
+			enemy = "shield",
+			weapon_type = "shotgun",
+			part_id = "wpn_fps_upg_a_slug"
+		},
+		peek_a_boo = {
+			stat = "gage4_8_stats",
+			enemy = "sniper",
+			weapon_type = "shotgun",
+			part_id = "wpn_fps_upg_a_piercing"
+		},
+		seven_eleven = {
+			award = "gage4_4",
+			weapon_type = "shotgun",
+			in_head = true,
+			timer = 11,
+			count = 7
+		},
+		bang_for_buck = {
+			stat = "gage4_10_stats",
+			enemy = "tank",
+			weapon_type = "shotgun",
+			part_id = "wpn_fps_upg_a_custom"
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -3011,6 +3088,17 @@ function TweakData:init()
 				"overkill_290"
 			},
 			health = 25
+		},
+		police_brutality = {
+			award = "gage4_1",
+			enemy = "shield",
+			melee_id = "baton"
+		},
+		every_day_shovelin = {
+			stat = "gage4_7_stats",
+			level_id = "nightclub",
+			melee_id = "shovel",
+			is_cop = true
 		}
 	}
 	self.achievement.complete_heist_achievements = {
@@ -3256,6 +3344,24 @@ function TweakData:init()
 				"overkill_290"
 			},
 			job = "big"
+		},
+		not_for_old_men = {
+			award = "gage4_11",
+			full_jobs_id = {
+				"framing_frame",
+				"framing_frame_prof"
+			},
+			stealth = true,
+			equipped = {
+				secondaries = {
+					weapon_id = "serbu",
+					blueprint = {
+						{
+							"wpn_fps_upg_ns_shot_thick"
+						}
+					}
+				}
+			}
 		}
 	}
 	self.achievement.job_list = {}
@@ -3365,6 +3471,20 @@ function TweakData:init()
 				"grant",
 				"washington"
 			}
+		},
+		go_bananas = {
+			award = "gage4_12",
+			jobs = {"alex", "alex_prof"},
+			difficulties = {
+				"overkill_145",
+				"overkill_290"
+			},
+			masks = {
+				"silverback",
+				"mandril",
+				"skullmonkey",
+				"orangutang"
+			}
 		}
 	}
 	self.achievement.sniper_kill_achievements = {
@@ -3386,95 +3506,136 @@ function TweakData:init()
 			multi_kill = 2
 		}
 	}
-	self.achievement.weapon_part_tracker = {}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_long = {
-		text_id = "bm_wp_m95_b_barrel_long_achievment",
-		stat = "gage3_7_stats",
-		max_progress = 25
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_b_suppressed = {
-		text_id = "bm_wp_r93_b_suppressed_achievment",
-		award = "gage3_8"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_upg_o_45iron = {
-		text_id = "bm_wp_upg_o_45iron_achievment",
-		award = "gage3_9"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_b_short = {
-		text_id = "bm_wp_r93_b_short_achievment",
-		stat = "gage3_10_stats",
-		max_progress = 10
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_suppressed = {
-		text_id = "bm_wp_m95_b_barrel_suppressed_achievment",
-		stat = "gage3_11_stats",
-		max_progress = 10
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_short = {
-		text_id = "bm_wp_m95_b_barrel_short_achievment",
-		award = "gage3_12_stats",
-		max_progress = 10
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_upg_o_leupold = {
-		text_id = "bm_wp_upg_o_leupold_achievment",
-		stat = "gage3_13_stats",
-		max_progress = 10
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_body_msr = {
-		text_id = "bm_wp_msr_body_msr_achievment",
-		stat = "gage3_14_stats",
-		max_progress = 25
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_body_wood = {
-		text_id = "bm_wp_r93_body_wood_achievment",
-		stat = "gage3_15_stats",
-		max_progress = 25
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_ns_suppressor = {
-		text_id = "bm_wp_snp_msr_ns_suppressor_achievment",
-		stat = "gage3_16_stats",
-		max_progress = 25
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_b_long = {
-		text_id = "bm_wp_snp_msr_b_long_achievment",
-		stat = "gage3_17_stats",
-		max_progress = 250
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_01 = {
-		text_id = "bm_wp_fal_fg_01_achievment",
-		award = "bigbank_7"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_03 = {
-		text_id = "bm_wp_fal_fg_03_achievment",
-		award = "bigbank_8"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_04 = {
-		text_id = "bm_wp_fal_fg_04_achievment",
-		award = "bigbank_3"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_fg_wood = {
-		text_id = "bm_wp_fal_fg_wood_achievment",
-		award = "bigbank_4"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_01 = {
-		text_id = "bm_wp_fal_s_01_achievment",
-		award = "bigbank_5"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_03 = {
-		text_id = "bm_wp_fal_s_03_achievment",
-		award = "bigbank_10"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_s_wood = {
-		text_id = "bm_wp_fal_s_wood_achievment",
-		award = "bigbank_6"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_g_01 = {
-		text_id = "bm_wp_fal_g_01_achievment",
-		award = "bigbank_1"
-	}
-	self.achievement.weapon_part_tracker.wpn_fps_ass_fal_m_01 = {
-		text_id = "bm_wp_fal_m_01_achievment",
-		award = "bigbank_2"
+	self.achievement.weapon_part_tracker = {
+		wpn_fps_snp_m95_barrel_long = {
+			text_id = "bm_wp_m95_b_barrel_long_achievment",
+			stat = "gage3_7_stats",
+			max_progress = 25
+		},
+		wpn_fps_snp_r93_b_suppressed = {
+			text_id = "bm_wp_r93_b_suppressed_achievment",
+			award = "gage3_8"
+		},
+		wpn_fps_upg_o_45iron = {
+			text_id = "bm_wp_upg_o_45iron_achievment",
+			award = "gage3_9"
+		},
+		wpn_fps_snp_r93_b_short = {
+			text_id = "bm_wp_r93_b_short_achievment",
+			stat = "gage3_10_stats",
+			max_progress = 10
+		},
+		wpn_fps_snp_m95_barrel_suppressed = {
+			text_id = "bm_wp_m95_b_barrel_suppressed_achievment",
+			stat = "gage3_11_stats",
+			max_progress = 10
+		},
+		wpn_fps_snp_m95_barrel_short = {
+			text_id = "bm_wp_m95_b_barrel_short_achievment",
+			award = "gage3_12_stats",
+			max_progress = 10
+		},
+		wpn_fps_upg_o_leupold = {
+			text_id = "bm_wp_upg_o_leupold_achievment",
+			stat = "gage3_13_stats",
+			max_progress = 10
+		},
+		wpn_fps_snp_msr_body_msr = {
+			text_id = "bm_wp_msr_body_msr_achievment",
+			stat = "gage3_14_stats",
+			max_progress = 25
+		},
+		wpn_fps_snp_r93_body_wood = {
+			text_id = "bm_wp_r93_body_wood_achievment",
+			stat = "gage3_15_stats",
+			max_progress = 25
+		},
+		wpn_fps_snp_msr_ns_suppressor = {
+			text_id = "bm_wp_snp_msr_ns_suppressor_achievment",
+			stat = "gage3_16_stats",
+			max_progress = 25
+		},
+		wpn_fps_snp_msr_b_long = {
+			text_id = "bm_wp_snp_msr_b_long_achievment",
+			stat = "gage3_17_stats",
+			max_progress = 250
+		},
+		wpn_fps_ass_fal_fg_01 = {
+			text_id = "bm_wp_fal_fg_01_achievment",
+			award = "bigbank_7"
+		},
+		wpn_fps_ass_fal_fg_03 = {
+			text_id = "bm_wp_fal_fg_03_achievment",
+			award = "bigbank_8"
+		},
+		wpn_fps_ass_fal_fg_04 = {
+			text_id = "bm_wp_fal_fg_04_achievment",
+			award = "bigbank_3"
+		},
+		wpn_fps_ass_fal_fg_wood = {
+			text_id = "bm_wp_fal_fg_wood_achievment",
+			award = "bigbank_4"
+		},
+		wpn_fps_ass_fal_s_01 = {
+			text_id = "bm_wp_fal_s_01_achievment",
+			award = "bigbank_5"
+		},
+		wpn_fps_ass_fal_s_03 = {
+			text_id = "bm_wp_fal_s_03_achievment",
+			award = "bigbank_10"
+		},
+		wpn_fps_ass_fal_s_wood = {
+			text_id = "bm_wp_fal_s_wood_achievment",
+			award = "bigbank_6"
+		},
+		wpn_fps_ass_fal_g_01 = {
+			text_id = "bm_wp_fal_g_01_achievment",
+			award = "bigbank_1"
+		},
+		wpn_fps_ass_fal_m_01 = {
+			text_id = "bm_wp_fal_m_01_achievment",
+			award = "bigbank_2"
+		},
+		wpn_fps_upg_o_mbus_rear = {
+			text_id = "bm_wp_upg_o_mbus_rear_achievment",
+			award = "gage4_2"
+		},
+		wpn_fps_sho_ben_b_short = {
+			text_id = "bm_wp_ben_b_short_achievment",
+			award = "gage4_4"
+		},
+		wpn_fps_sho_ben_b_long = {
+			text_id = "bm_wp_ben_b_long_achievment",
+			award = "gage4_5"
+		},
+		wpn_fps_sho_ben_s_collapsed = {
+			text_id = "bm_wp_ben_s_collapsed_achievment",
+			stat = "gage4_6",
+			max_progress = 50
+		},
+		wpn_fps_sho_ksg_b_short = {
+			text_id = "bm_wp_ksg_b_short_achievment",
+			stat = "gage4_7",
+			max_progress = 25
+		},
+		wpn_fps_sho_ksg_b_long = {
+			text_id = "bm_wp_ksg_b_long_achievment",
+			stat = "gage4_8",
+			max_progress = 10
+		},
+		wpn_fps_sho_ben_s_solid = {
+			text_id = "bm_wp_ben_s_solid_achievment",
+			award = "gage4_9"
+		},
+		wpn_fps_sho_striker_b_long = {
+			text_id = "bm_wp_striker_b_long_achievment",
+			stat = "gage4_10_stats",
+			max_progress = 10
+		},
+		wpn_fps_sho_striker_b_suppressed = {
+			text_id = "bm_wp_striker_b_suppressed_achievment",
+			award = "gage4_11"
+		}
 	}
 	self.pickups = {}
 	self.pickups.ammo = {

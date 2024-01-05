@@ -248,7 +248,6 @@ function MenuLobbyRenderer:on_request_lobby_slot_reply()
 	local character = local_peer:character()
 	local progress = managers.upgrades:progress()
 	local mask_set = "remove"
-	local_peer:set_outfit_string(managers.blackmarket:outfit_string())
 	self:_set_player_slot(local_peer_id, {
 		name = local_peer:name(),
 		peer_id = local_peer_id,
@@ -259,7 +258,7 @@ function MenuLobbyRenderer:on_request_lobby_slot_reply()
 	})
 	managers.network:session():send_to_peers_loaded("lobby_info", level, rank, character, mask_set)
 	managers.network:session():send_to_peers_loaded("sync_profile", level, rank)
-	managers.network:session():send_to_peers_loaded("sync_outfit", managers.blackmarket:outfit_string())
+	managers.network:session():send_to_peers_loaded("sync_outfit", managers.blackmarket:outfit_string(), managers.network:session():local_peer():outfit_version())
 end
 
 function MenuLobbyRenderer:get_player_slot_by_peer_id(id)

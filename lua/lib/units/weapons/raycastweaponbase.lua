@@ -24,6 +24,7 @@ function RaycastWeaponBase:init(unit)
 	self:_create_use_setups()
 	self._setup = {}
 	self._digest_values = SystemInfo:platform() == Idstring("WIN32")
+	self._ammo_data = false
 	self:replenish()
 	self._aim_assist_data = tweak_data.weapon[self._name_id].aim_assist
 	self._autohit_data = tweak_data.weapon[self._name_id].autohit
@@ -36,6 +37,7 @@ function RaycastWeaponBase:init(unit)
 	self._can_shoot_through_shield = tweak_data.weapon[self._name_id].can_shoot_through_shield
 	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
 	self._can_shoot_through_wall = tweak_data.weapon[self._name_id].can_shoot_through_wall
+	self._bullet_class = InstantBulletBase
 	self._next_fire_allowed = -1000
 	self._obj_fire = self._unit:get_object(Idstring("fire"))
 	self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash or "effects/particles/test/muzzleflash_maingun")
@@ -71,6 +73,10 @@ end
 
 function RaycastWeaponBase:get_name_id()
 	return self._name_id
+end
+
+function RaycastWeaponBase:has_part(part_id)
+	return false
 end
 
 function RaycastWeaponBase:weapon_tweak_data()
@@ -259,6 +265,10 @@ function RaycastWeaponBase:_check_ammo_total(unit)
 	end
 end
 
+function RaycastWeaponBase:get_damage_falloff(damage, col_ray, user_unit)
+	return damage
+end
+
 local mvec_to = Vector3()
 local mvec_spread_direction = Vector3()
 local mvec1 = Vector3()
@@ -295,7 +305,8 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 		local weight = 0.1
 		if col_ray and col_ray.unit:in_slot(managers.slot:get_mask("enemies")) then
 			self._autohit_current = (self._autohit_current + weight) / (1 + weight)
-			hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+			damage = self:get_damage_falloff(damage, col_ray, user_unit)
+			hit_unit = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 		elseif autoaim then
 			local autohit_chance = 1 - math.clamp((self._autohit_current - self._autohit_data.MIN_RATIO) / (self._autohit_data.MAX_RATIO - self._autohit_data.MIN_RATIO), 0, 1)
 			if autohit_mul then
@@ -303,20 +314,23 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 			end
 			if autohit_chance > math.random() then
 				self._autohit_current = (self._autohit_current + weight) / (1 + weight)
-				hit_unit = InstantBulletBase:on_collision(autoaim, self._unit, user_unit, damage)
+				damage = self:get_damage_falloff(damage, autoaim, user_unit)
+				hit_unit = self._bullet_class:on_collision(autoaim, self._unit, user_unit, damage)
 			else
 				self._autohit_current = self._autohit_current / (1 + weight)
 			end
 		elseif col_ray then
-			hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+			damage = self:get_damage_falloff(damage, col_ray, user_unit)
+			hit_unit = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 		end
 		self._shot_fired_stats_table.hit = hit_unit and true or false
-		if not shoot_through_data or hit_unit then
+		if (not shoot_through_data or hit_unit) and (not self._ammo_data or not self._ammo_data.ignore_statistic) then
 			self._shot_fired_stats_table.skip_bullet_count = shoot_through_data and true
 			managers.statistics:shot_fired(self._shot_fired_stats_table)
 		end
 	elseif col_ray then
-		hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+		damage = self:get_damage_falloff(damage, col_ray, user_unit)
+		hit_unit = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 	end
 	if suppression_enemies and self._suppression then
 		result.enemies_in_cone = suppression_enemies
@@ -395,13 +409,14 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 	end
 	if self._shoot_through_data and hit_unit and col_ray and self._shoot_through_data.kills and 0 < self._shoot_through_data.kills and hit_unit.type == "death" then
 		local unit_type = col_ray.unit:base() and col_ray.unit:base()._tweak_table
-		local multi_kill, enemy_pass, obstacle_pass, weapon_pass
+		local multi_kill, enemy_pass, obstacle_pass, weapon_pass, weapons_pass
 		for achievement, achievement_data in pairs(tweak_data.achievement.sniper_kill_achievements) do
 			multi_kill = not achievement_data.multi_kill or self._shoot_through_data.kills == achievement_data.multi_kill
 			enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
 			obstacle_pass = not achievement_data.obstacle or achievement_data.obstacle == "wall" and self._shoot_through_data.has_hit_wall or achievement_data.obstacle == "shield" and self._shoot_through_data.has_passed_shield
 			weapon_pass = not achievement_data.weapon or self._name_id == achievement_data.weapon
-			if multi_kill and enemy_pass and obstacle_pass and weapon_pass then
+			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, self._name_id)
+			if multi_kill and enemy_pass and obstacle_pass and weapon_pass and weapons_pass then
 				if achievement_data.stat then
 					managers.achievment:award_progress(achievement_data.stat)
 				elseif achievement_data.award then
@@ -588,7 +603,7 @@ function RaycastWeaponBase:force_hit(from_pos, direction, user_unit, impact_pos,
 		unit = hit_unit,
 		body = hit_body or hit_unit:body(0)
 	}
-	InstantBulletBase:on_collision(col_ray, self._unit, user_unit, self._damage)
+	self._bullet_class:on_collision(col_ray, self._unit, user_unit, self._damage)
 end
 
 function RaycastWeaponBase:tweak_data_anim_play(anim, ...)
@@ -705,8 +720,10 @@ end
 function RaycastWeaponBase:replenish()
 	local ammo_max_multiplier = managers.player:upgrade_value("player", "extra_ammo_multiplier", 1)
 	ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "extra_ammo_multiplier", 1)
+	ammo_max_multiplier = ammo_max_multiplier + ammo_max_multiplier * (self._total_ammo_mod or 0)
 	local ammo_max_per_clip = self:calculate_ammo_max_per_clip()
 	local ammo_max = math.round((tweak_data.weapon[self._name_id].AMMO_MAX + managers.player:upgrade_value(self._name_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
+	ammo_max_per_clip = math.min(ammo_max_per_clip, ammo_max)
 	self:set_ammo_max_per_clip(ammo_max_per_clip)
 	self:set_ammo_max(ammo_max)
 	self:set_ammo_total(ammo_max)
@@ -903,8 +920,19 @@ function RaycastWeaponBase:add_ammo()
 	if self:ammo_max() then
 		return false
 	end
-	local multiplier = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
-	local add_amount = math.max(0, math.round(math.lerp(self._ammo_pickup[1] * multiplier, self._ammo_pickup[2] * multiplier, math.random())))
+	local multiplier_min = 1
+	local multiplier_max = 1
+	if self._ammo_data and self._ammo_data.ammo_pickup_min_mul then
+		multiplier_min = self._ammo_data.ammo_pickup_min_mul
+	else
+		multiplier_min = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+	end
+	if self._ammo_data and self._ammo_data.ammo_pickup_max_mul then
+		multiplier_max = self._ammo_data.ammo_pickup_max_mul
+	else
+		multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+	end
+	local add_amount = math.max(0, math.round(math.lerp(self._ammo_pickup[1] * multiplier_min, self._ammo_pickup[2] * multiplier_max, math.random())))
 	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
 	return true
 end
@@ -1002,6 +1030,9 @@ end
 InstantBulletBase = InstantBulletBase or class()
 
 function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
+	if damage == 0 then
+		return nil
+	end
 	local hit_unit = col_ray.unit
 	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
 		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
@@ -1064,4 +1095,68 @@ function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, d
 	action_data.armor_piercing = armor_piercing
 	local defense_data = col_ray.unit:character_damage():damage_bullet(action_data)
 	return defense_data
+end
+
+InstantExplosiveBulletBase = InstantExplosiveBulletBase or class(InstantBulletBase)
+InstantExplosiveBulletBase.CURVE_POW = tweak_data.upgrades.explosive_bullet.curve_pow
+InstantExplosiveBulletBase.PLAYER_DMG_MUL = tweak_data.upgrades.explosive_bullet.player_dmg_mul
+InstantExplosiveBulletBase.RANGE = tweak_data.upgrades.explosive_bullet.range
+InstantExplosiveBulletBase.EFFECT_PARAMS = {
+	effect = "effects/payday2/particles/impacts/shotgun_explosive_round",
+	sound_event = "round_explode",
+	feedback_range = tweak_data.upgrades.explosive_bullet.feedback_range,
+	camera_shake_max_mul = tweak_data.upgrades.explosive_bullet.camera_shake_max_mul,
+	sound_muffle_effect = true,
+	on_unit = true,
+	idstr_decal = Idstring("explosion_round"),
+	idstr_effect = Idstring("")
+}
+
+function InstantExplosiveBulletBase:play_impact_sound_and_effects(col_ray)
+	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_decal = true})
+end
+
+function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
+	if damage == 0 then
+		return nil
+	end
+	local slot_mask = managers.slot:get_mask("explosion_targets")
+	local hit_unit = col_ray.unit
+	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
+		self:play_impact_sound_and_effects(col_ray)
+	end
+	if blank then
+	else
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
+		mvec3_set(tmp_vec1, col_ray.position)
+		mvec3_set(tmp_vec2, col_ray.ray)
+		mvec3_norm(tmp_vec2)
+		mvec3_mul(tmp_vec2, 20)
+		mvec3_sub(tmp_vec1, tmp_vec2)
+		managers.explosion:play_sound_and_effects(tmp_vec1, col_ray.normal, self.RANGE, self.EFFECT_PARAMS)
+		local hit_units, splinters, results = managers.explosion:detect_and_give_dmg({
+			hit_pos = tmp_vec1,
+			range = self.RANGE,
+			collision_slotmask = slot_mask,
+			curve_pow = self.CURVE_POW,
+			damage = damage,
+			player_damage = damage * self.PLAYER_DMG_MUL,
+			ignore_unit = weapon_unit,
+			user = user_unit,
+			owner = weapon_unit
+		})
+		managers.network:session():send_to_peers_synched("sync_explosive_bullet", col_ray.position, col_ray.normal, math.min(16384, network_damage))
+		return {
+			col_ray = col_ray,
+			type = hit_unit:character_damage() and hit_unit:character_damage().is_head and hit_unit:character_damage().dead and hit_unit:character_damage():dead() and "death" or nil,
+			variant = "explosion"
+		}
+	end
+	return nil
+end
+
+function InstantExplosiveBulletBase:on_collision_client(position, normal, damage, user_unit)
+	managers.explosion:give_local_player_dmg(position, self.RANGE, damage * self.PLAYER_DMG_MUL)
+	managers.explosion:explode_on_client(position, normal, user_unit, damage, self.RANGE, self.CURVE_POW, self.EFFECT_PARAMS)
 end

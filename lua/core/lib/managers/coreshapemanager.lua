@@ -373,9 +373,9 @@ function ShapeBoxMiddle:is_inside(pos)
 	return false
 end
 
-function ShapeBoxMiddle:draw(t, dt, r, g, b)
+function ShapeBoxMiddle:draw(t, dt, r, g, b, a)
 	local brush = Draw:brush()
-	brush:set_color(Color(0.5, r, g, b))
+	brush:set_color(Color(a or 0.5, r, g, b))
 	local pos = self:position()
 	local rot = self:rotation()
 	brush:box(pos, rot:x() * self._properties.width / 2, rot:y() * self._properties.depth / 2, rot:z() * self._properties.height / 2)
