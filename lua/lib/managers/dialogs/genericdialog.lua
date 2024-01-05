@@ -111,6 +111,14 @@ function GenericDialog:update(t, dt)
 			self._counter[2]()
 		end
 	end
+	if managers.menu_component then
+		local x, y = managers.menu_component:get_right_controller_axis()
+		if 0 < y then
+			self._panel_script:scroll_up(y * 2)
+		elseif y < 0 then
+			self._panel_script:scroll_down(math.abs(y) * 2)
+		end
+	end
 end
 
 function GenericDialog:update_input(t, dt)

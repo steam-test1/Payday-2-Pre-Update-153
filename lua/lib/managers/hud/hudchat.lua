@@ -45,6 +45,10 @@ function HUDChat:init(ws, hud)
 	self:_layout_output_panel()
 end
 
+function HUDChat:set_layer(layer)
+	self._panel:set_layer(layer)
+end
+
 function HUDChat:set_channel_id(channel_id)
 	managers.chat:unregister_receiver(self._channel_id, self)
 	self._channel_id = channel_id
@@ -179,6 +183,10 @@ function HUDChat:input_focus()
 	return self._focus
 end
 
+function HUDChat:set_skip_first(skip_first)
+	self._skip_first = skip_first
+end
+
 function HUDChat:_on_focus()
 	if self._focus then
 		return
@@ -195,6 +203,7 @@ function HUDChat:_on_focus()
 	self._input_panel:key_release(callback(self, self, "key_release"))
 	self._enter_text_set = false
 	self._input_panel:child("input_bg"):animate(callback(self, self, "_animate_input_bg"))
+	self:set_layer(2000)
 	self:update_caret()
 end
 
@@ -215,6 +224,7 @@ function HUDChat:_loose_focus()
 	local text = self._input_panel:child("input_text")
 	text:stop()
 	self._input_panel:child("input_bg"):stop()
+	self:set_layer(0)
 	self:update_caret()
 end
 
@@ -354,9 +364,7 @@ end
 
 function HUDChat:key_press(o, k)
 	if self._skip_first then
-		if k == Idstring("enter") then
-			self._skip_first = false
-		end
+		self._skip_first = false
 		return
 	end
 	if not self._enter_text_set then

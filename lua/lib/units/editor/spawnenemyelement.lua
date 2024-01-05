@@ -41,6 +41,8 @@ function SpawnEnemyUnitElement:init(unit)
 		"units/payday2/characters/ene_security_1/ene_security_1",
 		"units/payday2/characters/ene_security_2/ene_security_2",
 		"units/payday2/characters/ene_security_3/ene_security_3",
+		"units/payday2/characters/ene_security_gensec_1/ene_security_gensec_1",
+		"units/payday2/characters/ene_security_gensec_2/ene_security_gensec_2",
 		"units/payday2/characters/ene_shield_1/ene_shield_1",
 		"units/payday2/characters/ene_shield_2/ene_shield_2",
 		"units/payday2/characters/ene_sniper_1/ene_sniper_1",

@@ -785,7 +785,7 @@ function CopDamage:build_suppression(amount)
 	elseif Network:is_server() and self._suppression_hardness_t and t < self._suppression_hardness_t then
 		amount = amount * 0.5
 	end
-	if Network:is_client() then
+	if not Network:is_server() then
 		local sync_amount_ratio
 		if sup_tweak.brown_point then
 			if sup_tweak.brown_point[2] <= 0 then

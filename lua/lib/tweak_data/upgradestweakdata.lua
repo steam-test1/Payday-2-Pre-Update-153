@@ -32,7 +32,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.sentry_gun_base_ammo = 150
 	self.sentry_gun_base_armor = 10
 	self.doctor_bag_base = 2
-	self.values.player.crime_net_deal = {0.9}
+	self.values.player.crime_net_deal = {0.9, 0.8}
 	self.values.weapon.special_damage_taken_multiplier = {1.05}
 	self.values.player.marked_enemy_extra_damage = {true}
 	self.values.player.marked_enemy_damage_mul = 1.15
@@ -269,9 +269,6 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[10] = {
 		name_id = "lvl_10",
-		announcements = {
-			"menu_es_jobs_available"
-		},
 		upgrades = {
 			"rep_upgrade1"
 		}
@@ -296,9 +293,6 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[20] = {
 		name_id = "lvl_20",
-		announcements = {
-			"menu_es_jobs_available"
-		},
 		upgrades = {
 			"rep_upgrade2"
 		}
@@ -319,9 +313,6 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[30] = {
 		name_id = "lvl_30",
-		announcements = {
-			"menu_es_jobs_available"
-		},
 		upgrades = {
 			"rep_upgrade3"
 		}
@@ -346,9 +337,6 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[40] = {
 		name_id = "lvl_40",
-		announcements = {
-			"menu_es_jobs_available"
-		},
 		upgrades = {
 			"rep_upgrade4"
 		}
@@ -1846,6 +1834,15 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "crime_net_deal",
 			value = 1
+		}
+	}
+	self.definitions.player_crime_net_deal_2 = {
+		category = "feature",
+		name_id = "menu_player_crime_net_deal",
+		upgrade = {
+			category = "player",
+			upgrade = "crime_net_deal",
+			value = 2
 		}
 	}
 	self.definitions.player_sell_cost_multiplier_1 = {

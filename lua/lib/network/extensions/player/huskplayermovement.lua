@@ -1506,6 +1506,9 @@ function HuskPlayerMovement:sync_movement_state(state, down_time)
 	elseif state == "carry" then
 		local event_desc = {type = "standard", previous_state = previous_state}
 		self:_add_sequenced_event(event_desc)
+	elseif state == "dead" then
+		local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
+		managers.groupai:state():on_player_criminal_death(peer_id)
 	end
 end
 

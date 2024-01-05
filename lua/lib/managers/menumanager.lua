@@ -80,7 +80,9 @@ function MenuManager:init(is_start_menu)
 		self:register_menu(loot_menu)
 	end
 	self._controller:add_trigger("toggle_menu", callback(self, self, "toggle_menu_state"))
-	self._controller:add_trigger("toggle_chat", callback(self, self, "toggle_chatinput"))
+	if MenuCallbackHandler:is_pc_controller() then
+		self._controller:add_trigger("toggle_chat", callback(self, self, "toggle_chatinput"))
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self._controller:add_trigger("push_to_talk", callback(self, self, "push_to_talk", true))
 		self._controller:add_release_trigger("push_to_talk", callback(self, self, "push_to_talk", false))
@@ -92,6 +94,7 @@ function MenuManager:init(is_start_menu)
 	managers.user:add_setting_changed_callback("rumble", callback(self, self, "rumble_changed"), true)
 	managers.user:add_setting_changed_callback("invert_camera_x", callback(self, self, "invert_camera_x_changed"), true)
 	managers.user:add_setting_changed_callback("invert_camera_y", callback(self, self, "invert_camera_y_changed"), true)
+	managers.user:add_setting_changed_callback("southpaw", callback(self, self, "southpaw_changed"), true)
 	managers.user:add_setting_changed_callback("subtitle", callback(self, self, "subtitle_changed"), true)
 	managers.user:add_setting_changed_callback("music_volume", callback(self, self, "music_volume_changed"), true)
 	managers.user:add_setting_changed_callback("sfx_volume", callback(self, self, "sfx_volume_changed"), true)
@@ -109,6 +112,7 @@ function MenuManager:init(is_start_menu)
 	self:effect_quality_changed(nil, nil, managers.user:get_setting("effect_quality"))
 	self:fps_limit_changed(nil, nil, managers.user:get_setting("fps_cap"))
 	self:invert_camera_y_changed("invert_camera_y", nil, managers.user:get_setting("invert_camera_y"))
+	self:southpaw_changed("southpaw", nil, managers.user:get_setting("southpaw"))
 	self:dof_setting_changed("dof_setting", nil, managers.user:get_setting("dof_setting"))
 	managers.system_menu:add_active_changed_callback(callback(self, self, "system_menu_active_changed"))
 	self._sound_source = SoundDevice:create_source("MenuManager")
@@ -301,7 +305,7 @@ function MenuManager:toggle_chatinput()
 	if Global.game_settings.single_player or Application:editor() then
 		return
 	end
-	if not MenuCallbackHandler:is_pc_controller() then
+	if SystemInfo:platform() ~= Idstring("WIN32") then
 		return
 	end
 	if self:active_menu() then
@@ -312,6 +316,7 @@ function MenuManager:toggle_chatinput()
 	end
 	if managers.hud then
 		managers.hud:toggle_chatinput()
+		return true
 	end
 end
 
@@ -1089,6 +1094,10 @@ function MenuCallbackHandler:singleplayer_restart()
 	return self:is_singleplayer() and self:has_full_game() and self:is_normal_job() and not managers.job:stage_success()
 end
 
+function MenuCallbackHandler:kick_player_visible()
+	return self:is_server() and self:is_multiplayer() and managers.platform:presence() ~= "Mission_end"
+end
+
 function MenuCallbackHandler:hidden()
 	return false
 end
@@ -1262,6 +1271,8 @@ function MenuCallbackHandler:invert_camera_vertically(item)
 end
 
 function MenuCallbackHandler:toggle_southpaw(item)
+	local southpaw = item:value() == "on"
+	managers.user:set_setting("southpaw", southpaw)
 end
 
 function MenuCallbackHandler:toggle_dof_setting(item)
@@ -1327,7 +1338,7 @@ function MenuCallbackHandler:toggle_push_to_talk(item)
 end
 
 function MenuCallbackHandler:toggle_team_AI(item)
-	Global.criminal_team_AI_disabled = item:value() == "off"
+	Global.game_settings.team_ai = item:value() == "on"
 	managers.groupai:state():on_criminal_team_AI_enabled_state_changed()
 end
 
@@ -1553,19 +1564,16 @@ function MenuCallbackHandler:play_single_player()
 	Global.game_settings.single_player = true
 	managers.network:host_game()
 	Network:set_server()
-	Global.game_settings.team_ai = true
 end
 
 function MenuCallbackHandler:play_online_game()
 	Global.game_settings.single_player = false
-	Global.game_settings.team_ai = true
 end
 
 function MenuCallbackHandler:play_safehouse(params)
 	local function yes_func()
 		self:play_single_player()
 		
-		Global.game_settings.team_ai = false
 		Global.mission_manager.has_played_tutorial = true
 		self:start_single_player_job({job_id = "safehouse", difficulty = "normal"})
 	end
@@ -1854,7 +1862,7 @@ function MenuCallbackHandler:find_friends()
 end
 
 function MenuCallbackHandler:invite_friends()
-	Steam:overlay_activate("game", "LobbyInvite")
+	Steam:overlay_activate("invite", managers.network.matchmake.lobby_handler:id())
 end
 
 function MenuCallbackHandler:invite_friend(item)
@@ -2140,7 +2148,11 @@ function MenuCallbackHandler:give_weapon()
 end
 
 function MenuCallbackHandler:give_experience()
-	managers.experience:debug_add_points(2500, true)
+	if managers.job:has_active_job() then
+		managers.experience:debug_add_points(managers.experience:get_xp_dissected(true, 1))
+	else
+		managers.experience:debug_add_points(2500, true)
+	end
 end
 
 function MenuCallbackHandler:give_more_experience()
@@ -2864,7 +2876,7 @@ function MenuSTEAMHostBrowser:refresh_node(node, info, friends_only)
 	local attribute_list = info.attribute_list
 	local dead_list = {}
 	for _, item in ipairs(node:items()) do
-		if not item:parameters().back and not item:parameters().filter then
+		if not item:parameters().back and not item:parameters().filter and not item:parameters().pd2_corner then
 			dead_list[item:parameters().room_id] = true
 		end
 	end
@@ -2890,9 +2902,9 @@ function MenuSTEAMHostBrowser:refresh_node(node, info, friends_only)
 					text_id = name_str,
 					room_id = room.room_id,
 					columns = {
-						string.upper(host_name),
-						string.upper(level_name),
-						string.upper(state_name),
+						utf8.to_upper(host_name),
+						utf8.to_upper(level_name),
+						utf8.to_upper(state_name),
 						tostring(num_plrs) .. "/4 "
 					},
 					level_name = level_id,
@@ -2912,7 +2924,7 @@ function MenuSTEAMHostBrowser:refresh_node(node, info, friends_only)
 				new_node:add_item(new_item)
 			else
 				if item:parameters().real_level_name ~= level_name then
-					item:parameters().columns[2] = string.upper(level_name)
+					item:parameters().columns[2] = utf8.to_upper(level_name)
 					item:parameters().level_name = level_id
 					item:parameters().level_id = level_id
 					item:parameters().real_level_name = level_name
@@ -3744,6 +3756,14 @@ function MenuOptionInitiator:modify_controls(node)
 		inv_cam_vertically_item:set_value(option_value)
 	end
 	option_value = "off"
+	local southpaw_item = node:item("toggle_southpaw")
+	if southpaw_item then
+		if managers.user:get_setting("southpaw") then
+			option_value = "on"
+		end
+		southpaw_item:set_value(option_value)
+	end
+	option_value = "off"
 	local hold_to_steelsight_item = node:item("toggle_hold_to_steelsight")
 	if hold_to_steelsight_item then
 		if managers.user:get_setting("hold_to_steelsight") then
@@ -3811,7 +3831,7 @@ function MenuOptionInitiator:modify_debug_options(node)
 	end
 	local team_AI_mode_item = node:item("toggle_team_AI")
 	if team_AI_mode_item then
-		local team_AI_mode_value = Global.criminal_team_AI_disabled and "off" or "on"
+		local team_AI_mode_value = managers.groupai:state():team_ai_enabled() and "on" or "off"
 		team_AI_mode_item:set_value(team_AI_mode_value)
 	end
 	return node

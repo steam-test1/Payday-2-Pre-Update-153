@@ -50,4 +50,11 @@ function DLCTweakData:init(tweak_data)
 	self.preorder.content.upgrades = {
 		"player_crime_net_deal"
 	}
+	self.cce = {}
+	self.cce.dlc = "has_cce"
+	self.cce.content = {}
+	self.cce.content.loot_drops = {}
+	self.cce.content.upgrades = {
+		"player_crime_net_deal_2"
+	}
 end

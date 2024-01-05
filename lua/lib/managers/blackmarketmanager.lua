@@ -1574,9 +1574,10 @@ function BlackMarketManager:on_buy_weapon_platform(category, weapon_id, slot, fr
 	end
 end
 
-function BlackMarketManager:on_sell_weapon_part(category, slot, global_value, part_id)
-	if self:remove_weapon_part(category, slot, global_value, part_id) then
-	end
+function BlackMarketManager:on_sell_weapon_part(part_id, global_value)
+	managers.money:on_sell_weapon_part(part_id, global_value)
+	self:alter_global_value_item(global_value, "weapon_mods", nil, part_id, INV_REMOVE)
+	self:remove_item(global_value, "weapon_mods", part_id)
 end
 
 function BlackMarketManager:on_sell_weapon(category, slot)
@@ -2193,7 +2194,7 @@ function BlackMarketManager:on_sell_mask(slot)
 		Application:debug(part.global_value, converted_category, slot, part.id, CRAFT_REMOVE)
 		self:alter_global_value_item(part.global_value, converted_category, slot, part.id, CRAFT_REMOVE)
 	end
-	self:alter_global_value_item(mask.global_value, "masks", slot, mask.mask_id, CRAFT_REMOVE)
+	self:alter_global_value_item(mask.global_value, category, slot, mask.mask_id, CRAFT_REMOVE)
 	self._global.crafted_items[category][slot] = nil
 	self:_verfify_equipped_category(category)
 end
@@ -2272,6 +2273,7 @@ end
 function BlackMarketManager:reset()
 	self._global.inventory = {}
 	self._global.crafted_items = {}
+	self._global.global_value_items = {}
 	self._global.new_drops = {}
 	self._global.new_item_type_unlocked = {}
 	self:_setup_weapons()
@@ -2427,7 +2429,7 @@ function BlackMarketManager:_verify_dlc_items()
 							if default_mod then
 								self:buy_and_modify_weapon("primaries", slot, "normal", default_mod, true)
 							else
-								managers.blackmarket:on_sell_weapon_part("primaries", slot, package_id, part_id)
+								self:remove_weapon_part("primaries", slot, package_id, part_id)
 							end
 							managers.money:refund_weapon_part(crafted.weapon_id, part_id, package_id)
 						end
@@ -2457,7 +2459,7 @@ function BlackMarketManager:_verify_dlc_items()
 							if default_mod then
 								self:buy_and_modify_weapon("secondaries", slot, "normal", default_mod, true)
 							else
-								managers.blackmarket:on_sell_weapon_part("secondaries", slot, package_id, part_id)
+								self:remove_weapon_part("secondaries", slot, package_id, part_id)
 							end
 							managers.money:refund_weapon_part(crafted.weapon_id, part_id, package_id)
 						end

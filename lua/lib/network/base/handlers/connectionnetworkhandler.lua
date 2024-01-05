@@ -388,17 +388,6 @@ function ConnectionNetworkHandler:request_character_response(peer_id, character,
 	end
 end
 
-function ConnectionNetworkHandler:client_died(peer_id, sender)
-	local peer = self._verify_sender(sender)
-	if not peer or peer:id() ~= peer_id then
-		return
-	end
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
-		return
-	end
-	managers.groupai:state():on_player_criminal_death(peer_id)
-end
-
 function ConnectionNetworkHandler:begin_trade()
 	if not self._verify_gamestate(self._gamestate_filter.waiting_for_respawn) then
 		return

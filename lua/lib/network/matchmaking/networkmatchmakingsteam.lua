@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v0.0.23"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v0.0.24"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -262,7 +262,7 @@ function NetworkMatchMakingSTEAM:game_owner_name()
 	return managers.network.matchmake.lobby_handler:get_lobby_data("owner_name")
 end
 
-function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_numbers)
+function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_numbers, is_invite)
 	local permission = tweak_data:index_to_permission(attributes_numbers[3])
 	local level_index, job_index = self:_split_attribute_number(attributes_numbers[1], 1000)
 	if not tweak_data.levels:get_level_name_from_index(level_index) then
@@ -275,7 +275,7 @@ function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_num
 	if managers.experience:current_level() < attributes_numbers[7] then
 		return false, 3
 	end
-	if permission == "private" then
+	if not is_invite and permission == "private" then
 		return false, 2
 	end
 	if permission == "public" then
@@ -284,7 +284,7 @@ function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_num
 	return true
 end
 
-function NetworkMatchMakingSTEAM:join_server_with_check(room_id)
+function NetworkMatchMakingSTEAM:join_server_with_check(room_id, is_invite)
 	managers.menu:show_joining_lobby_dialog()
 	local lobby = Steam:lobby(room_id)
 	local empty = function()
@@ -304,7 +304,7 @@ function NetworkMatchMakingSTEAM:join_server_with_check(room_id)
 			end
 		end
 		print(inspect(attributes))
-		local server_ok, ok_error = self:is_server_ok(nil, room_id, attributes)
+		local server_ok, ok_error = self:is_server_ok(nil, room_id, attributes, is_invite)
 		if server_ok then
 			self:join_server(room_id, true)
 		else
@@ -556,7 +556,7 @@ function NetworkMatchMakingSTEAM:set_attributes(settings)
 	local permissions = {
 		"public",
 		"friend",
-		"invisible"
+		"private"
 	}
 	local level_index, job_index = self:_split_attribute_number(settings.numbers[1], 1000)
 	local lobby_attributes = {

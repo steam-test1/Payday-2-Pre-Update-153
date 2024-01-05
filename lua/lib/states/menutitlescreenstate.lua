@@ -10,6 +10,7 @@ end
 
 local is_ps3 = SystemInfo:platform() == Idstring("PS3")
 local is_x360 = SystemInfo:platform() == Idstring("X360")
+local is_win32 = SystemInfo:platform() == Idstring("WIN32")
 
 function MenuTitlescreenState:setup()
 	local res = RenderSettings.resolution
@@ -47,8 +48,26 @@ function MenuTitlescreenState:setup()
 	self._controller_list = {}
 	for index = 1, managers.controller:get_wrapper_count() do
 		self._controller_list[index] = managers.controller:create_controller("title_" .. index, index, false)
+		if is_win32 and self._controller_list[index]:get_type() == "xbox360" then
+			self._controller_list[index]:add_connect_changed_callback(callback(self, self, "_update_pc_xbox_controller_connection", {text_gui = text, text_id = text_id}))
+		end
+	end
+	if is_win32 then
+		self:_update_pc_xbox_controller_connection({text_gui = text, text_id = text_id})
 	end
 	self:reset_attract_video()
+end
+
+function MenuTitlescreenState:_update_pc_xbox_controller_connection(params)
+	local text_string = managers.localization:to_upper_text(params.text_id)
+	local added_text
+	for _, controller in pairs(self._controller_list) do
+		if controller:get_type() == "xbox360" and controller:connected() then
+			text_string = text_string .. "\n" .. managers.localization:to_upper_text("menu_or_press_any_xbox_button")
+			break
+		end
+	end
+	params.text_gui:set_text(text_string)
 end
 
 function MenuTitlescreenState:at_enter()

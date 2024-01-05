@@ -417,7 +417,7 @@ function CopActionWalk:_init()
 	self._curve_path_index = 1
 	if not Network:is_server() then
 		if #self._simplified_path == 1 then
-			table.insert(self._simplified_path, 1, mvecotr3.copy(common_data.pos))
+			table.insert(self._simplified_path, 1, mvec3_cpy(common_data.pos))
 		end
 		if #self._simplified_path <= self._simplified_path_index then
 			self:_advance_simplified_path(#self._simplified_path - 1)

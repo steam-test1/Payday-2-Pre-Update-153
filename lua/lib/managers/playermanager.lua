@@ -224,7 +224,7 @@ function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deploy
 	player:inventory():set_ammo(0.5)
 	if dead or bleed_out then
 		print("[PlayerManager:spawn_dead] Killing")
-		IngameFatalState.client_died()
+		managers.groupai:state():on_player_criminal_death(Global.local_member:peer():id())
 		player:base():set_enabled(false)
 		game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
 		player:character_damage():set_invulnerable(true)
@@ -251,11 +251,17 @@ function PlayerManager:player_id(unit)
 	return id
 end
 
+function PlayerManager:viewport_config()
+	local configs = self._viewport_configs[self._last_id]
+	if configs then
+		return configs[1]
+	end
+end
+
 function PlayerManager:setup_viewports()
 	local configs = self._viewport_configs[self._last_id]
 	if configs then
 		for k, player in ipairs(self._players) do
-			player:camera():setup_viewport(configs[k])
 		end
 	else
 		Application:error("Unsupported number of players: " .. tostring(self._last_id))

@@ -1,5 +1,6 @@
 require("lib/managers/menu/SkillTreeGui")
 require("lib/managers/menu/BlackMarketGui")
+require("lib/managers/menu/InventoryList")
 require("lib/managers/menu/MissionBriefingGui")
 require("lib/managers/menu/StageEndScreenGui")
 require("lib/managers/menu/LootDropScreenGUI")
@@ -110,6 +111,52 @@ function MenuComponentManager:init()
 		create = callback(self, self, "_create_ingame_manual_gui"),
 		close = callback(self, self, "close_ingame_manual_gui")
 	}
+	self._active_components.inventory_list = {
+		create = callback(self, self, "_create_inventory_list_gui"),
+		close = callback(self, self, "close_inventory_list_gui")
+	}
+end
+
+function MenuComponentManager:_setup_controller_input()
+	if not self._controller_connected then
+		self._left_axis_vector = Vector3()
+		self._right_axis_vector = Vector3()
+		self._fullscreen_ws:connect_controller(managers.menu:active_menu().input:get_controller(), true)
+		self._fullscreen_ws:panel():axis_move(callback(self, self, "_axis_move"))
+		self._controller_connected = true
+		if SystemInfo:platform() == Idstring("WIN32") then
+			self._fullscreen_ws:connect_keyboard(Input:keyboard())
+			self._fullscreen_ws:panel():key_press(callback(self, self, "key_press_controller_support"))
+		end
+	end
+end
+
+function MenuComponentManager:_destroy_controller_input()
+	if self._controller_connected then
+		self._fullscreen_ws:disconnect_all_controllers()
+		if alive(self._fullscreen_ws:panel()) then
+			self._fullscreen_ws:panel():axis_move(nil)
+		end
+		self._controller_connected = nil
+		if SystemInfo:platform() == Idstring("WIN32") then
+			self._fullscreen_ws:panel():disconnect_keyboard()
+			self._fullscreen_ws:panel():key_press(nil)
+		end
+	end
+end
+
+function MenuComponentManager:key_press_controller_support(o, k)
+	local toggle_chat = Idstring(managers.controller:get_settings("pc"):get_connection("toggle_chat"):get_input_name_list()[1])
+	if k == toggle_chat then
+		if self._game_chat_gui and self._game_chat_gui:enabled() then
+			self._game_chat_gui:open_page()
+			return
+		end
+		if managers.hud and not managers.hud:chat_focus() and managers.menu:toggle_chatinput() then
+			managers.hud:set_chat_skip_first(true)
+		end
+		return
+	end
 end
 
 function MenuComponentManager:resolution_changed()
@@ -117,6 +164,14 @@ function MenuComponentManager:resolution_changed()
 	managers.gui_data:layout_fullscreen_16_9_workspace(self._fullscreen_ws)
 	if self._tcst then
 		managers.gui_data:layout_fullscreen_16_9_workspace(self._tcst)
+	end
+end
+
+function MenuComponentManager:_axis_move(o, axis_name, axis_vector, controller)
+	if axis_name == Idstring("left") then
+		mvector3.set(self._left_axis_vector, axis_vector)
+	elseif axis_name == Idstring("right") then
+		mvector3.set(self._right_axis_vector, axis_vector)
 	end
 end
 
@@ -133,6 +188,9 @@ function MenuComponentManager:set_active_components(components, node)
 	end
 	for component, _ in pairs(to_close) do
 		self._active_components[component]:close()
+	end
+	if not managers.menu:is_pc_controller() then
+		self:_setup_controller_input()
 	end
 end
 
@@ -190,6 +248,24 @@ function MenuComponentManager:update(t, dt)
 	if self._ingame_manual_gui then
 		self._ingame_manual_gui:update(t, dt)
 	end
+end
+
+function MenuComponentManager:get_left_controller_axis()
+	if managers.menu:is_pc_controller() or not self._left_axis_vector then
+		return 0, 0
+	end
+	local x = mvector3.x(self._left_axis_vector)
+	local y = mvector3.y(self._left_axis_vector)
+	return x, y
+end
+
+function MenuComponentManager:get_right_controller_axis()
+	if managers.menu:is_pc_controller() or not self._right_axis_vector then
+		return 0, 0
+	end
+	local x = mvector3.x(self._right_axis_vector)
+	local y = mvector3.y(self._right_axis_vector)
+	return x, y
 end
 
 function MenuComponentManager:accept_input(accept)
@@ -1102,7 +1178,7 @@ function MenuComponentManager:close_weapon_box()
 end
 
 function MenuComponentManager:_create_chat_gui()
-	if managers.controller:get_default_wrapper_type() == "pc" and MenuCallbackHandler:is_multiplayer() then
+	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() then
 		self._lobby_chat_gui_active = false
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
@@ -1113,7 +1189,7 @@ function MenuComponentManager:_create_chat_gui()
 end
 
 function MenuComponentManager:_create_lobby_chat_gui()
-	if managers.controller:get_default_wrapper_type() == "pc" and MenuCallbackHandler:is_multiplayer() then
+	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() then
 		self._lobby_chat_gui_active = true
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
@@ -1143,7 +1219,7 @@ function MenuComponentManager:create_chat_gui()
 end
 
 function MenuComponentManager:add_game_chat()
-	if managers.controller:get_default_wrapper_type() == "pc" then
+	if SystemInfo:platform() == Idstring("WIN32") then
 		self._game_chat_gui = ChatGui:new(self._ws)
 		if self._game_chat_params then
 			self._game_chat_gui:set_params(self._game_chat_params)
@@ -1216,7 +1292,7 @@ function MenuComponentManager:close_chat_gui()
 end
 
 function MenuComponentManager:_create_friends_gui()
-	if managers.controller:get_default_wrapper_type() == "pc" then
+	if SystemInfo:platform() == Idstring("WIN32") then
 		if self._friends_book then
 			self._friends_book:set_enabled(true)
 			return
@@ -1332,6 +1408,22 @@ end
 function MenuComponentManager:on_points_spent(...)
 	if self._skilltree_gui then
 		self._skilltree_gui:on_points_spent(...)
+	end
+end
+
+function MenuComponentManager:_create_inventory_list_gui(node)
+	self:create_inventory_list_gui(node)
+end
+
+function MenuComponentManager:create_inventory_list_gui(node)
+	self:close_inventory_list_gui()
+	self._inventory_list_gui = InventoryList:new(self._ws, self._fullscreen_ws, node)
+end
+
+function MenuComponentManager:close_inventory_list_gui()
+	if self._inventory_list_gui then
+		self._inventory_list_gui:close()
+		self._inventory_list_gui = nil
 	end
 end
 
@@ -2124,6 +2216,7 @@ function MenuComponentManager:close()
 	if alive(self._post_event) then
 		self._post_event:stop()
 	end
+	self:_destroy_controller_input()
 	for texture_ids, users in pairs(self._texture_cache) do
 		TextureCache:unretrieve(texture_ids)
 	end
@@ -2161,4 +2254,71 @@ function MenuComponentManager:test_camera_shutter_tech()
 	end
 	o:stop()
 	o:animate(animate_fade)
+end
+
+function MenuComponentManager:create_test_gui()
+	if alive(Global.test_gui) then
+		Overlay:gui():destroy_workspace(Global.test_gui)
+		Global.test_gui = nil
+	end
+	Global.test_gui = managers.gui_data:create_fullscreen_16_9_workspace()
+	local panel = Global.test_gui:panel()
+	local bg = panel:rect({
+		layer = 1000,
+		color = Color.black
+	})
+	local a = panel:bitmap({
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		layer = 1001,
+		texture_rect = {
+			0,
+			0,
+			128,
+			180
+		}
+	})
+	local b = panel:bitmap({
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		layer = 1001,
+		texture_rect = {
+			0,
+			0,
+			128,
+			180
+		}
+	})
+	local c = panel:bitmap({
+		texture = "guis/textures/pd2/lootscreen/loot_cards2",
+		layer = 1001,
+		texture_rect = {
+			0,
+			0,
+			64,
+			90
+		}
+	})
+	local d = panel:bitmap({
+		texture = "guis/textures/pd2/lootscreen/loot_cards2",
+		layer = 1001,
+		texture_rect = {
+			0,
+			0,
+			64,
+			90
+		}
+	})
+	b:set_top(a:bottom() + 10)
+	b:set_size(64, 90)
+	c:set_left(a:right() + 10)
+	c:set_top(a:top())
+	d:set_left(c:left())
+	d:set_top(b:top())
+	d:set_size(64, 90)
+end
+
+function MenuComponentManager:destroy_test_gui()
+	if alive(Global.test_gui) then
+		Overlay:gui():destroy_workspace(Global.test_gui)
+		Global.test_gui = nil
+	end
 end

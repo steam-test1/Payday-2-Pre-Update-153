@@ -1015,6 +1015,12 @@ function HUDManager:chat_focus()
 	return self._chat_focus
 end
 
+function HUDManager:set_chat_skip_first(skip_first)
+	if self._hud_chat then
+		self._hud_chat:set_skip_first(skip_first)
+	end
+end
+
 function HUDManager:set_chat_focus(focus)
 	if not self:alive(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2) then
 		return

@@ -317,7 +317,13 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.priority_shout = "f30"
 	self.tank.rescue_hostages = false
 	self.tank.damage.hurt_severity = presets.hurt_severities.only_light_hurt
-	self.tank.chatter = presets.enemy_chatter.no_chatter
+	self.tank.chatter = {
+		aggressive = true,
+		retreat = true,
+		go_go = true,
+		contact = true,
+		entrance = true
+	}
 	self.tank.announce_incomming = "incomming_tank"
 end
 
@@ -572,15 +578,21 @@ function CharacterTweakData:_init_taser(presets)
 	self.taser.damage.hurt_severity = presets.hurt_severities.only_light_hurt
 	self.taser.weapon_voice = "3"
 	self.taser.experience.cable_tie = "tie_swat"
-	self.taser.speech_prefix_p1 = "l"
-	self.taser.speech_prefix_p2 = "n"
-	self.taser.speech_prefix_count = 4
+	self.taser.speech_prefix_p1 = "tsr"
+	self.taser.speech_prefix_p2 = nil
+	self.taser.speech_prefix_count = nil
 	self.taser.access = "taser"
 	self.taser.dodge = presets.dodge.heavy
 	self.taser.priority_shout = "f32"
 	self.taser.rescue_hostages = false
 	self.taser.follower = true
-	self.taser.chatter = presets.enemy_chatter.no_chatter
+	self.taser.chatter = {
+		aggressive = true,
+		retreat = true,
+		go_go = true,
+		contact = true,
+		entrance = true
+	}
 	self.taser.announce_incomming = "incomming_taser"
 end
 

@@ -78,7 +78,6 @@ GroupAIStateBase.EVENT_SYNC = {
 }
 
 function GroupAIStateBase:init()
-	Global.criminal_team_AI_disabled = not Global.game_settings.team_ai
 	self:_init_misc_data()
 end
 
@@ -1919,7 +1918,7 @@ function GroupAIStateBase:_update_point_of_no_return(t, dt)
 end
 
 function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, spawn_on_unit)
-	if not (not Global.criminal_team_AI_disabled and self._ai_enabled) or not managers.criminals:character_taken_by_name(char_name) and managers.criminals:nr_AI_criminals() >= managers.criminals.MAX_NR_TEAM_AI then
+	if not (managers.groupai:state():team_ai_enabled() and self._ai_enabled) or not managers.criminals:character_taken_by_name(char_name) and managers.criminals:nr_AI_criminals() >= managers.criminals.MAX_NR_TEAM_AI then
 		return
 	end
 	local objective = self:_determine_spawn_objective_for_criminal_AI()
@@ -2032,12 +2031,20 @@ function GroupAIStateBase:sync_remove_one_teamAI(name, replace_with_player)
 end
 
 function GroupAIStateBase:fill_criminal_team_with_AI(is_drop_in)
-	if managers.navigation:is_data_ready() and self._ai_enabled and not Global.criminal_team_AI_disabled then
+	if managers.navigation:is_data_ready() and self._ai_enabled and managers.groupai:state():team_ai_enabled() then
 		while true do
 			if not (managers.criminals:get_free_character_name() and managers.criminals:nr_AI_criminals() < managers.criminals.MAX_NR_TEAM_AI) or not self:spawn_one_teamAI(is_drop_in) then
 				break
 			end
 		end
+	end
+end
+
+function GroupAIStateBase:team_ai_enabled()
+	if tweak_data.levels[Global.game_settings.level_id] then
+		return Global.game_settings.team_ai and not tweak_data.levels[Global.game_settings.level_id].team_ai_off
+	else
+		return Global.game_settings.team_ai
 	end
 end
 
@@ -2400,12 +2407,12 @@ function GroupAIStateBase:on_criminal_team_AI_enabled_state_changed()
 	if Network:is_client() then
 		return
 	end
-	if Global.criminal_team_AI_disabled then
+	if managers.groupai:state():team_ai_enabled() then
+		self:fill_criminal_team_with_AI()
+	else
 		for i = 1, 3 do
 			self:remove_one_teamAI()
 		end
-	else
-		self:fill_criminal_team_with_AI()
 	end
 end
 

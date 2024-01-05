@@ -44,6 +44,7 @@ function SpawnCivilianUnitElement:init(unit)
 		"units/payday2/characters/civ_male_italian_robe_1/civ_male_italian_robe_1",
 		"units/payday2/characters/civ_male_janitor_1/civ_male_janitor_1",
 		"units/payday2/characters/civ_male_meth_cook_1/civ_male_meth_cook_1",
+		"units/payday2/characters/civ_male_paramedic_1/civ_male_paramedic_1",
 		"units/payday2/characters/civ_male_party_1/civ_male_party_1",
 		"units/payday2/characters/civ_male_party_2/civ_male_party_2",
 		"units/payday2/characters/civ_male_party_3/civ_male_party_3",

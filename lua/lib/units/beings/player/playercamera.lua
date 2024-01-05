@@ -14,6 +14,7 @@ function PlayerCamera:init(unit)
 	self:_setup_sound_listener()
 	self._sync_fwd = unit:rotation():y():with_z(0):normalized()
 	self._last_sync_t = 0
+	self:setup_viewport(managers.player:viewport_config())
 end
 
 function PlayerCamera:setup_viewport(data)

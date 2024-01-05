@@ -318,6 +318,11 @@ function IngameWaitingForRespawnState:at_enter()
 		local hostages_killed = managers.trade:hostages_killed_by_name(managers.criminals:local_character_name())
 		self:trade_death(respawn_delay, hostages_killed)
 	end
+	if Global.game_settings.single_player then
+		managers.hud:set_custody_negotiating_visible(false)
+		managers.hud:set_custody_trade_delay_visible(false)
+		managers.hud:set_custody_timer_visibility(false)
+	end
 end
 
 function IngameWaitingForRespawnState:at_exit()

@@ -852,15 +852,17 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
 		local local_damage = not blank or hit_unit:id() == -1
 		local sync_damage = not blank and hit_unit:id() ~= -1
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
 		if local_damage then
 			col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.direction, 1)
 			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.direction, damage)
 		end
 		if sync_damage then
 			if user_unit:id() == -1 then
-				managers.network:session():send_to_peers_synched("sync_body_damage_bullet_no_attacker", col_ray.body, col_ray.normal, col_ray.position, col_ray.direction, math.min(100, damage))
+				managers.network:session():send_to_peers_synched("sync_body_damage_bullet_no_attacker", col_ray.body, col_ray.normal, col_ray.position, col_ray.direction, math.min(16384, network_damage))
 			else
-				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit, col_ray.normal, col_ray.position, col_ray.direction, math.min(100, damage))
+				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit, col_ray.normal, col_ray.position, col_ray.direction, math.min(16384, network_damage))
 			end
 		end
 	end

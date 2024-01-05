@@ -364,6 +364,8 @@ function CopActionHurt:init(action_desc, common_data)
 	if not self._unit:base().nick_name then
 		if action_type == "death" then
 			self._unit:sound():say("x02a_any_3p")
+		elseif action_type == "counter_tased" then
+			self._unit:sound():say("tasered")
 		else
 			self._unit:sound():say("x01a_any_3p")
 		end

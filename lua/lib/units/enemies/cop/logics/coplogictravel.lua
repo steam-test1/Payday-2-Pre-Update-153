@@ -488,6 +488,10 @@ function CopLogicTravel._upd_enemy_detection(data)
 		CopLogicAttack._upd_aim(data, my_data)
 	end
 	CopLogicBase._report_detections(data.detected_attention_objects)
+	if new_attention and data.char_tweak.chatter.entrance and not data.entrance and new_attention.criminal_record and new_attention.verified and new_reaction >= AIAttentionObject.REACT_SCARED and math.abs(data.m_pos.z - new_attention.m_pos.z) < 4000 then
+		data.unit:sound():say("entrance", true, nil)
+		data.entrance = true
+	end
 	return delay
 end
 

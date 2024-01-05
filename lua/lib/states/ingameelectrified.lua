@@ -6,10 +6,6 @@ function IngameElectrifiedState:init(game_state_machine)
 end
 
 function IngameElectrifiedState:update(t, dt)
-	local player = managers.player:player_unit()
-	if not alive(player) then
-		return
-	end
 end
 
 function IngameElectrifiedState:at_enter()

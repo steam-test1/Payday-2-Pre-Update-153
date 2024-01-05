@@ -240,6 +240,9 @@ function PlayerDamage:damage_tase(attack_data)
 			result = {type = "hurt", variant = "tase"}
 		}
 		self:_call_listeners(damage_info)
+		if attack_data.attacker_unit and attack_data.attacker_unit:alive() and attack_data.attacker_unit:base()._tweak_table == "taser" then
+			attack_data.attacker_unit:sound():say("post_tasing_taunt")
+		end
 	end
 end
 
@@ -274,6 +277,11 @@ function PlayerDamage:play_whizby(position)
 	self._unit:sound():play_whizby({position = position})
 	self._unit:camera():play_shaker("whizby", 0.1)
 	managers.rumble:play("bullet_whizby")
+end
+
+function PlayerDamage:clbk_kill_taunt(attack_data)
+	self._kill_taunt_clbk_id = nil
+	attack_data.attacker_unit:sound():say("post_kill_taunt")
 end
 
 function PlayerDamage:damage_bullet(attack_data)
@@ -347,6 +355,10 @@ function PlayerDamage:damage_bullet(attack_data)
 		self:_send_damage_drama(attack_data, health_subtracted)
 	elseif self._bleed_out then
 		managers.challenges:set_flag("bullet_to_bleed_out")
+		if attack_data.attacker_unit and attack_data.attacker_unit:alive() and attack_data.attacker_unit:base()._tweak_table == "tank" then
+			self._kill_taunt_clbk_id = "kill_taunt" .. tostring(self._unit:key())
+			managers.enemy:add_delayed_clbk(self._kill_taunt_clbk_id, callback(self, self, "clbk_kill_taunt", attack_data), managers.player:player_timer():time() + tweak_data.timespeed.downed.fade_in + tweak_data.timespeed.downed.sustain + tweak_data.timespeed.downed.fade_out)
+		end
 	end
 	self:_call_listeners(damage_info)
 end

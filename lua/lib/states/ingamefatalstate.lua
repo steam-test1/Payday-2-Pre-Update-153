@@ -5,9 +5,10 @@ function IngameFatalState:init(game_state_machine)
 	IngameFatalState.super.init(self, "ingame_fatal", game_state_machine)
 end
 
-function IngameFatalState.client_died()
+function IngameFatalState.on_local_player_dead()
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("client_died", peer_id)
+	local player = managers.player:player_unit()
+	player:network():send("sync_player_movement_state", "dead", player:character_damage():down_time(), player:id())
 	managers.groupai:state():on_player_criminal_death(peer_id)
 end
 
@@ -19,7 +20,7 @@ function IngameFatalState:update(t, dt)
 	if player:character_damage():update_downed(t, dt) then
 		managers.player:force_drop_carry()
 		managers.statistics:downed({death = true})
-		IngameFatalState.client_died()
+		IngameFatalState.on_local_player_dead()
 		game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
 		player:character_damage():set_invulnerable(true)
 		player:character_damage():set_health(0)

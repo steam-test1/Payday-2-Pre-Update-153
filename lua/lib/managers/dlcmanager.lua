@@ -107,7 +107,11 @@ function GenericDLCManager:has_corrupt_data()
 end
 
 function GenericDLCManager:has_preorder()
-	return Global.dlc_manager.all_dlc_data.preorder.verified
+	return Global.dlc_manager.all_dlc_data.preorder and Global.dlc_manager.all_dlc_data.preorder.verified
+end
+
+function GenericDLCManager:has_cce()
+	return Global.dlc_manager.all_dlc_data.career_criminal_edition and Global.dlc_manager.all_dlc_data.career_criminal_edition.verified
 end
 
 PS3DLCManager = PS3DLCManager or class(GenericDLCManager)
@@ -329,7 +333,8 @@ function WINDLCManager:init()
 		Global.dlc_manager = {}
 		Global.dlc_manager.all_dlc_data = {
 			full_game = {app_id = "218620", verified = true},
-			preorder = {app_id = "247450", no_install = true}
+			preorder = {app_id = "247450", no_install = true},
+			career_criminal_edition = {app_id = "218630", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

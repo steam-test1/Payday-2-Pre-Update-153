@@ -347,7 +347,7 @@ function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal, posi
 		return
 	end
 	body:extension().damage:damage_bullet(attacker, normal, position, direction, 1)
-	body:extension().damage:damage_damage(attacker, normal, position, direction, damage)
+	body:extension().damage:damage_damage(attacker, normal, position, direction, damage / 163.84)
 end
 
 function UnitNetworkHandler:sync_body_damage_bullet_no_attacker(body, normal, position, direction, damage)

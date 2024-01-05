@@ -403,6 +403,7 @@ function LevelsTweakData:init()
 	self.safehouse.music = "heist"
 	self.safehouse.package = "packages/safehouse"
 	self.safehouse.cube = "cube_apply_heist_bank"
+	self.safehouse.team_ai_off = true
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
