@@ -337,8 +337,7 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"player_intimidate_range_mul",
-				"player_intimidate_aura",
-				"player_ene_hostage_lim_1"
+				"player_intimidate_aura"
 			},
 			cost = self.costs.pro
 		}

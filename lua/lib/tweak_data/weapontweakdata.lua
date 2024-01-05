@@ -3265,7 +3265,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		value = 5
 	}
 	self.s552 = {}
-	self.s552.category = "ass"
+	self.s552.category = "assault_rifle"
 	self.s552.damage_melee = damage_melee_default
 	self.s552.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.s552.sounds = {}

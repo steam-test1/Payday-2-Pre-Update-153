@@ -5034,7 +5034,7 @@ function BlackMarketGui:populate_buy_mask(data)
 		new_data.category = data.category
 		new_data.slot = data.prev_node_data and data.prev_node_data.slot
 		new_data.global_value = data.on_create_data[i].global_value
-		new_data.unlocked = data.on_create_data[i].amount
+		new_data.unlocked = managers.blackmarket:get_item_amount(new_data.global_value, "masks", new_data.name, true) or 0
 		new_data.equipped = false
 		new_data.num_backs = data.prev_node_data.num_backs + 1
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. new_data.name
