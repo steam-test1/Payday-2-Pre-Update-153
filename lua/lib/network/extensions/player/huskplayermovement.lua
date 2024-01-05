@@ -1106,7 +1106,13 @@ function HuskPlayerMovement:_adjust_move_anim(side, speed)
 	local move_side = anim_data.move_side
 	if move_side and (side == move_side or self._matching_walk_anims[side][move_side]) then
 		local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
-		local walk_anim_length = self._walk_anim_lengths[anim_data.pose][self._stance.name][speed][side]
+		local pose = self._ext_anim.pose
+		local stance = self._stance.name
+		if not (self._walk_anim_lengths[pose] and self._walk_anim_lengths[pose][stance] and self._walk_anim_lengths[pose][stance][speed]) or not self._walk_anim_lengths[pose][stance][speed][side] then
+			debug_pause_unit(self._unit, "[HuskPlayerMovement:_adjust_move_anim] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "side", side, self._machine:segment_state(Idstring("base")))
+			return
+		end
+		local walk_anim_length = self._walk_anim_lengths[pose][stance][speed][side]
 		enter_t = seg_rel_t * walk_anim_length
 	end
 	local redir_res = self:play_redirect(redirect_name, enter_t)
@@ -1468,11 +1474,20 @@ function HuskPlayerMovement:_change_pose(pose_code)
 	if self._ext_anim[redirect] then
 		return
 	end
+	if self._load_data then
+		return
+	end
 	local enter_t
 	local move_side = self._ext_anim.move_side
 	if move_side then
 		local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
 		local speed = self._ext_anim.run and "run" or "walk"
+		local pose = self._ext_anim.pose
+		local stance = self._stance.name
+		if not (self._walk_anim_lengths[pose] and self._walk_anim_lengths[pose][stance] and self._walk_anim_lengths[pose][stance][speed]) or not self._walk_anim_lengths[pose][stance][speed][move_side] then
+			debug_pause_unit(self._unit, "[HuskPlayerMovement:_change_pose] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "move_side", move_side, self._machine:segment_state(Idstring("base")))
+			return
+		end
 		local walk_anim_length = self._walk_anim_lengths[self._ext_anim.pose][self._stance.name][speed][move_side]
 		enter_t = seg_rel_t * walk_anim_length
 	end
