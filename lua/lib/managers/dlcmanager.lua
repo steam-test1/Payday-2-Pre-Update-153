@@ -1,12 +1,12 @@
 DLCManager = DLCManager or class()
 DLCManager.PLATFORM_CLASS_MAP = {}
 DLCManager.BUNDLED_DLC_PACKAGES = {
-	infamous = true,
-	twitch_pack = true,
+	infamous = 1,
+	twitch_pack = 1,
 	dlc1 = true,
 	gage_pack = true,
 	gage_pack_lmg = true,
-	gage_pack_jobs = true,
+	gage_pack_jobs = false,
 	gage_pack_snp = true,
 	big_bank = true,
 	gage_pack_shotgun = true,

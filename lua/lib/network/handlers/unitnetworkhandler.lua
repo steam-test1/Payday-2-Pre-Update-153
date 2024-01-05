@@ -636,7 +636,7 @@ function UnitNetworkHandler:long_dis_interaction(target_unit, amount, aggressor_
 		if self._verify_in_server_session() then
 			aggressor_unit:movement():sync_call_civilian(target_unit)
 		end
-	else
+	elseif target_unit:brain() then
 		target_unit:brain():on_intimidated(amount / 10, aggressor_unit)
 	end
 end
