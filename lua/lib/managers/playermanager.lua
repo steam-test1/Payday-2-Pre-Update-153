@@ -2391,3 +2391,24 @@ end
 function PlayerManager:on_peer_synch_request(peer)
 	self:player_unit():network():synch_to_peer(peer)
 end
+
+function PlayerManager:on_hallowSPOOCed()
+	local player = self:local_player()
+	local t = Application:time()
+	if alive(player) and (not self._halloween_t or t > self._halloween_t) then
+		if math.rand(1) < 0.5 then
+			player:sound():play("cloaker_taunt_after_assault", nil, nil)
+		elseif math.rand(1) < 0.5 then
+			local camera_unit = player:camera() and player:camera():camera_unit()
+			if alive(camera_unit) then
+				local vec = mvector3.copy(player:movement():m_head_rot():y())
+				mvector3.set_z(vec, 0)
+				mvector3.negate(vec)
+				mvector3.normalize(vec)
+				camera_unit:base():clbk_aim_assist({ray = vec})
+				player:sound():play("cloaker_detect_mono", nil, nil)
+			end
+		end
+		self._halloween_t = t + 30
+	end
+end

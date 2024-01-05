@@ -144,6 +144,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.legendary = 1
 	self.global_value_multipliers.poetry_soundtrack = 0
 	self.global_value_multipliers.twitch_pack = 0
+	self.global_value_multipliers.humble_pack2 = 0
 	self.global_value_multipliers.hl_miami = 1
 	self.global_value_multipliers.hlm_game = 1
 	self.global_value_bonus_multiplier = {}
@@ -170,6 +171,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.legendary = 0
 	self.global_value_bonus_multiplier.poetry_soundtrack = 0
 	self.global_value_bonus_multiplier.twitch_pack = 0
+	self.global_value_bonus_multiplier.humble_pack2 = 0
 	self.global_value_bonus_multiplier.hl_miami = 0.2
 	self.global_value_bonus_multiplier.hlm_game = 0.2
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate

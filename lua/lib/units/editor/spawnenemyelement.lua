@@ -19,6 +19,7 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1",
 	"units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2",
 	"units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3",
+	"units/payday2/characters/ene_bulldozer_4/ene_bulldozer_4",
 	"units/payday2/characters/ene_city_swat_1/ene_city_swat_1",
 	"units/payday2/characters/ene_city_swat_2/ene_city_swat_2",
 	"units/payday2/characters/ene_city_swat_3/ene_city_swat_3",

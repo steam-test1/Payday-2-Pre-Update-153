@@ -58,6 +58,7 @@ logic_variants.shield.attack = ShieldLogicAttack
 logic_variants.shield.intimidated = nil
 logic_variants.shield.flee = nil
 logic_variants.tank.attack = TankCopLogicAttack
+logic_variants.tank_hw = logic_variants.tank
 logic_variants.spooc.idle = SpoocLogicIdle
 logic_variants.spooc.attack = SpoocLogicAttack
 logic_variants.taser.attack = TaserLogicAttack

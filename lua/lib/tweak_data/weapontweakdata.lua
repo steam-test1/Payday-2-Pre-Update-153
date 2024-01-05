@@ -108,6 +108,11 @@ function WeaponTweakData:_init_data_npc_melee()
 	self.npc_melee.fists.damage = 8
 	self.npc_melee.fists.animation_param = "melee_fist"
 	self.npc_melee.fists.player_blood_effect = true
+	self.npc_melee.helloween = {}
+	self.npc_melee.helloween.unit_name = Idstring("units/pd2_halloween/weapons/wpn_mel_titan_hammer/wpn_mel_titan_hammer")
+	self.npc_melee.helloween.damage = 10
+	self.npc_melee.helloween.animation_param = "melee_fireaxe"
+	self.npc_melee.helloween.player_blood_effect = true
 end
 
 function WeaponTweakData:_set_npc_weapon_damage_multiplier(mul)

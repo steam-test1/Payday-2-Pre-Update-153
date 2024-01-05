@@ -134,6 +134,13 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
+		taser = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
 		tank = {
 			count = 0,
 			head_shots = 0,
@@ -141,7 +148,7 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
-		taser = {
+		tank_hw = {
 			count = 0,
 			head_shots = 0,
 			melee = 0,
@@ -468,7 +475,10 @@ function StatisticsManager:_get_stat_tables()
 		"big",
 		"mia_1",
 		"mia_2",
-		"gallery"
+		"gallery",
+		"hox_1",
+		"hox_2",
+		"haunted"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -502,7 +512,10 @@ function StatisticsManager:_get_stat_tables()
 		"big",
 		"mia",
 		"mia_prof",
-		"gallery"
+		"gallery",
+		"hox",
+		"hox_prof",
+		"haunted"
 	}
 	local mask_list = {
 		"character_locked",
@@ -721,6 +734,8 @@ function StatisticsManager:_get_stat_tables()
 		"toothbrush"
 	}
 	local enemy_list = {
+		"civilian",
+		"civilian_female",
 		"cop",
 		"fbi",
 		"fbi_swat",
@@ -738,7 +753,8 @@ function StatisticsManager:_get_stat_tables()
 		"tank",
 		"taser",
 		"mobster",
-		"mobster_boss"
+		"mobster_boss",
+		"tank_hw"
 	}
 	local armor_list = {
 		"level_1",
@@ -940,7 +956,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		end
 	end
 	for enemy_name, enemy_data in pairs(session.killed) do
-		if 0 < enemy_data.count then
+		if 0 < enemy_data.count and enemy_name ~= "total" then
 			if table.contains(enemy_list, enemy_name) then
 				stats["enemy_kills_" .. enemy_name] = {
 					type = "int",

@@ -465,7 +465,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.weapon.armor_piercing_chance_2 = {0.05}
 	self.values.player.headshot_regen_armor_bonus = {0.4, 1.2}
 	self.values.player.resist_firing_tased = {true}
-	self.values.player.crouch_dodge_chance = {0.5, 0.15}
+	self.values.player.crouch_dodge_chance = {0.05, 0.15}
 	self.values.player.climb_speed_multiplier = {1.2, 1.75}
 	self.values.team.xp.stealth_multiplier = {1.5}
 	self.values.team.cash.stealth_money_multiplier = {1.5}
@@ -1344,7 +1344,8 @@ function UpgradesTweakData:init()
 	self.level_tree[31] = {
 		name_id = "body_armor5",
 		upgrades = {
-			"body_armor5"
+			"body_armor5",
+			"chef"
 		}
 	}
 	self.level_tree[32] = {
@@ -1594,6 +1595,7 @@ function UpgradesTweakData:init()
 	self:_akimbo_definitions()
 	self:_kabartanto_definitions()
 	self:_toothbrush_definitions()
+	self:_chef_definitions()
 	self:_olympic_definitions()
 	self:_amcar_definitions()
 	self:_m16_definitions()
@@ -7950,6 +7952,13 @@ end
 
 function UpgradesTweakData:_toothbrush_definitions()
 	self.definitions.toothbrush = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_chef_definitions()
+	self.definitions.chef = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
 	}

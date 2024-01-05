@@ -93,6 +93,7 @@ do
 		"ene_bulldozer_1",
 		"ene_bulldozer_2",
 		"ene_bulldozer_3",
+		"ene_bulldozer_4",
 		"ene_city_swat_1",
 		"ene_city_swat_2",
 		"ene_city_swat_3",
@@ -366,6 +367,10 @@ end
 
 function CopBase:char_tweak()
 	return self._char_tweak
+end
+
+function CopBase:melee_weapon()
+	return self._melee_weapon_table or self._char_tweak.melee_weapon or "weapon"
 end
 
 function CopBase:pre_destroy(unit)

@@ -797,6 +797,7 @@ function LevelsTweakData:init()
 		"family",
 		"big",
 		"roberts",
+		"haunted",
 		"mia_1",
 		"mia_2",
 		"mia2_new",

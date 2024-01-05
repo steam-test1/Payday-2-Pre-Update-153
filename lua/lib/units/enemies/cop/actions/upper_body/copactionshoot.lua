@@ -674,7 +674,7 @@ function CopActionShoot:_set_ik_updator(name)
 end
 
 function CopActionShoot:_chk_start_melee(target_vec, target_dis, autotarget, target_pos)
-	local melee_weapon = self._common_data.char_tweak.melee_weapon or "weapon"
+	local melee_weapon = self._unit:base():melee_weapon()
 	local is_weapon = melee_weapon == "weapon"
 	local state = self._ext_movement:play_redirect(is_weapon and "melee" or "melee_item")
 	if state then
@@ -717,7 +717,7 @@ function CopActionShoot:anim_clbk_melee_strike()
 		return
 	end
 	local push_vel = target_vec:with_z(0.1):normalized() * 600
-	local melee_weapon = self._common_data.char_tweak.melee_weapon or "weapon"
+	local melee_weapon = self._unit:base():melee_weapon()
 	local is_weapon = melee_weapon == "weapon"
 	local damage = is_weapon and self._w_usage_tweak.melee_dmg or tweak_data.weapon.npc_melee[melee_weapon].damage
 	damage = damage * (is_weapon and 1 or self._common_data.char_tweak.melee_weapon_dmg_multiplier or 1)

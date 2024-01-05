@@ -14,6 +14,7 @@ function AssetsTweakData:_init_empty_asset(tweak_data)
 	self.none.unlock_desc_id = nil
 	self.none.texture = nil
 	self.none.stages = nil
+	self.none.exclude_stages = nil
 	self.none.require_to_unlock = nil
 	self.none.visible_if_locked = nil
 	self.none.no_mystery = nil
@@ -38,21 +39,25 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_pd.name_id = "menu_asset_risklevel_0"
 	self.risk_pd.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_0"
 	self.risk_pd.stages = "all"
+	self.risk_pd.exclude_stages = {"safehouse"}
 	self.risk_pd.risk_lock = 0
 	self.risk_swat = {}
 	self.risk_swat.name_id = "menu_asset_risklevel_1"
 	self.risk_swat.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_1"
 	self.risk_swat.stages = "all"
+	self.risk_swat.exclude_stages = {"safehouse"}
 	self.risk_swat.risk_lock = 1
 	self.risk_fbi = {}
 	self.risk_fbi.name_id = "menu_asset_risklevel_2"
 	self.risk_fbi.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_2"
 	self.risk_fbi.stages = "all"
+	self.risk_fbi.exclude_stages = {"safehouse"}
 	self.risk_fbi.risk_lock = 2
 	self.risk_death_squad = {}
 	self.risk_death_squad.name_id = "menu_asset_risklevel_3"
 	self.risk_death_squad.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_3"
 	self.risk_death_squad.stages = "all"
+	self.risk_death_squad.exclude_stages = {"safehouse"}
 	self.risk_death_squad.risk_lock = 3
 end
 
@@ -61,7 +66,7 @@ function AssetsTweakData:_init_gage_assets(tweak_data)
 	self.gage_assignment.name_id = "menu_asset_gage_assignment"
 	self.gage_assignment.texture = "guis/dlcs/gage_pack_jobs/textures/pd2/mission_briefing/assets/gage_assignment"
 	self.gage_assignment.stages = "all"
-	self.gage_assignment.risk_lock = true
+	self.gage_assignment.exclude_stages = {"safehouse", "haunted"}
 end
 
 function AssetsTweakData:_init_assets(tweak_data)

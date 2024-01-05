@@ -117,6 +117,7 @@ action_variants.shield = clone(security_variant)
 action_variants.shield.hurt = ShieldActionHurt
 action_variants.tank = clone(security_variant)
 action_variants.tank.walk = TankCopActionWalk
+action_variants.tank_hw = action_variants.tank
 action_variants.spooc = security_variant
 action_variants.taser = security_variant
 action_variants.civilian = {
@@ -1367,7 +1368,7 @@ function CopMovement:anim_clbk_enemy_spawn_melee_item()
 	local align_obj_r_name = CopMovement._gadgets.aligns.hand_r
 	local align_obj_l = self._unit:get_object(align_obj_l_name)
 	local align_obj_r = self._unit:get_object(align_obj_r_name)
-	local melee_weapon = self._unit:base():char_tweak().melee_weapon
+	local melee_weapon = self._unit:base():melee_weapon()
 	local unit_name = melee_weapon and tweak_data.weapon.npc_melee[melee_weapon].unit_name or nil
 	if unit_name then
 		self._melee_item_unit = World:spawn_unit(unit_name, align_obj_l:position(), align_obj_l:rotation())

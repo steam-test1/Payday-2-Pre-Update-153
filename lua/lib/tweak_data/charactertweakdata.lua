@@ -690,6 +690,69 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.announce_incomming = "incomming_tank"
 	self.tank.steal_loot = nil
 	self.tank.calls_in = nil
+	self.tank_hw = deep_clone(self.tank)
+	self.tank_hw.move_speed = {
+		stand = {
+			walk = {
+				ntl = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				hos = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				}
+			},
+			run = {
+				hos = {
+					fwd = 72,
+					strafe = 70,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 50,
+					bwd = 60
+				}
+			}
+		},
+		crouch = {
+			walk = {
+				hos = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				}
+			},
+			run = {
+				hos = {
+					fwd = 72,
+					strafe = 65,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 50,
+					bwd = 60
+				}
+			}
+		}
+	}
+	self.tank_hw.HEALTH_INIT = 1100
+	self.tank_hw.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
+	self.tank_hw.damage.explosion_damage_mul = 1
 end
 
 function CharacterTweakData:_init_spooc(presets)

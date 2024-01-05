@@ -254,7 +254,7 @@ function GuiTweakData:init()
 	self.mouse_pointer.controller.acceleration_speed = 4
 	self.mouse_pointer.controller.max_acceleration = 3
 	self.mouse_pointer.controller.mouse_pointer_speed = 125
-	self.MAX_MASK_ROWS = math.round(12)
+	self.MAX_MASK_ROWS = math.round(24)
 	self.MAX_WEAPON_ROWS = math.round(12)
 	self.crime_net = {}
 	self.crime_net.controller = {}

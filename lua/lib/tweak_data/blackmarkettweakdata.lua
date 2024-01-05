@@ -639,67 +639,103 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.pumpkin_king = {}
 	self.masks.pumpkin_king.unit = "units/payday2/masks/msk_pumpkin_king/msk_pumpkin_king"
 	self.masks.pumpkin_king.name_id = "bm_msk_pumpkin_king"
+	self.masks.pumpkin_king.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.pumpkin_king.weight = 1000
-	self.masks.pumpkin_king.got_item_weight_mod = 0.01
+	self.masks.pumpkin_king.got_item_weight_mod = 0.001
 	self.masks.pumpkin_king.global_value = "halloween"
-	self.masks.pumpkin_king.value = 5
+	self.masks.pumpkin_king.value = 0
 	self.masks.pumpkin_king.qlvl = 0
 	self.masks.pumpkin_king.sort_number = 1
 	self.masks.witch = {}
 	self.masks.witch.unit = "units/payday2/masks/msk_witch/msk_witch"
 	self.masks.witch.name_id = "bm_msk_witch"
+	self.masks.witch.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.witch.weight = 1000
-	self.masks.witch.got_item_weight_mod = 0.01
+	self.masks.witch.got_item_weight_mod = 0.001
 	self.masks.witch.global_value = "halloween"
-	self.masks.witch.value = 5
+	self.masks.witch.value = 0
 	self.masks.witch.qlvl = 0
 	self.masks.witch.sort_number = 1
 	self.masks.venomorph = {}
 	self.masks.venomorph.unit = "units/payday2/masks/msk_venomorph/msk_venomorph"
 	self.masks.venomorph.name_id = "bm_msk_venomorph"
+	self.masks.venomorph.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.venomorph.weight = 1000
-	self.masks.venomorph.got_item_weight_mod = 0.01
+	self.masks.venomorph.got_item_weight_mod = 0.001
 	self.masks.venomorph.global_value = "halloween"
-	self.masks.venomorph.value = 5
+	self.masks.venomorph.value = 0
 	self.masks.venomorph.qlvl = 0
 	self.masks.venomorph.sort_number = 1
 	self.masks.frank = {}
 	self.masks.frank.unit = "units/payday2/masks/msk_frank/msk_frank"
 	self.masks.frank.name_id = "bm_msk_frank"
+	self.masks.frank.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.frank.weight = 1000
-	self.masks.frank.got_item_weight_mod = 0.01
+	self.masks.frank.got_item_weight_mod = 0.001
 	self.masks.frank.global_value = "halloween"
-	self.masks.frank.value = 5
+	self.masks.frank.value = 0
 	self.masks.frank.qlvl = 0
 	self.masks.frank.sort_number = 1
 	self.masks.brazil_baby = {}
 	self.masks.brazil_baby.unit = "units/payday2/masks/msk_brazil_baby/msk_brazil_baby"
 	self.masks.brazil_baby.name_id = "bm_msk_brazil_baby"
 	self.masks.brazil_baby.global_value = "halloween"
-	self.masks.brazil_baby.value = 8
+	self.masks.brazil_baby.value = 0
 	self.masks.brazil_baby.qlvl = 0
 	self.masks.brazil_baby.sort_number = 2
 	self.masks.baby_angry = {}
 	self.masks.baby_angry.unit = "units/payday2/masks/msk_baby_angry/msk_baby_angry"
 	self.masks.baby_angry.name_id = "bm_msk_baby_angry"
 	self.masks.baby_angry.global_value = "halloween"
-	self.masks.baby_angry.value = 8
+	self.masks.baby_angry.value = 0
 	self.masks.baby_angry.qlvl = 0
 	self.masks.baby_angry.sort_number = 2
 	self.masks.baby_cry = {}
 	self.masks.baby_cry.unit = "units/payday2/masks/msk_baby_cry/msk_baby_cry"
 	self.masks.baby_cry.name_id = "bm_msk_baby_cry"
 	self.masks.baby_cry.global_value = "halloween"
-	self.masks.baby_cry.value = 8
+	self.masks.baby_cry.value = 0
 	self.masks.baby_cry.qlvl = 0
 	self.masks.baby_cry.sort_number = 2
 	self.masks.baby_happy = {}
 	self.masks.baby_happy.unit = "units/payday2/masks/msk_baby_happy/msk_baby_happy"
 	self.masks.baby_happy.name_id = "bm_msk_baby_happy"
 	self.masks.baby_happy.global_value = "halloween"
-	self.masks.baby_happy.value = 8
+	self.masks.baby_happy.value = 0
 	self.masks.baby_happy.qlvl = 0
 	self.masks.baby_happy.sort_number = 2
+	self.masks.the_one_below = {}
+	self.masks.the_one_below.unit = "units/pd2_humble_halloween/masks/the_one_below/msk_the_one_below"
+	self.masks.the_one_below.name_id = "bm_msk_onebelow"
+	self.masks.the_one_below.pcs = {}
+	self.masks.the_one_below.dlc = "humble_pack2"
+	self.masks.the_one_below.value = 0
+	self.masks.lycan = {}
+	self.masks.lycan.unit = "units/pd2_humble_halloween/masks/lycan/msk_lycan"
+	self.masks.lycan.name_id = "bm_msk_lycanwulf"
+	self.masks.lycan.pcs = {}
+	self.masks.lycan.dlc = "humble_pack2"
+	self.masks.lycan.value = 0
 	self.masks.heat = {}
 	self.masks.heat.unit = "units/pd2_dlc1/masks/msk_hockey_b/msk_hockey_b"
 	self.masks.heat.name_id = "bm_msk_heat"
@@ -4300,37 +4336,73 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.yggdrasil.value = 4
 	self.textures.pumpgrin = {}
 	self.textures.pumpgrin.name_id = "bm_txt_pumpgrin"
-	self.textures.pumpgrin.weight = 2
+	self.textures.pumpgrin.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.pumpgrin.weight = 3
 	self.textures.pumpgrin.texture = "units/payday2/masks/shared_textures/patterns/pattern_pumpgrin_df"
 	self.textures.pumpgrin.global_value = "halloween"
 	self.textures.pumpgrin.value = 5
 	self.textures.shout = {}
 	self.textures.shout.name_id = "bm_txt_shout"
-	self.textures.shout.weight = 2
+	self.textures.shout.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.shout.weight = 3
 	self.textures.shout.texture = "units/payday2/masks/shared_textures/patterns/pattern_shout_df"
 	self.textures.shout.global_value = "halloween"
 	self.textures.shout.value = 5
 	self.textures.webbed = {}
 	self.textures.webbed.name_id = "bm_txt_webbed"
-	self.textures.webbed.weight = 2
+	self.textures.webbed.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.webbed.weight = 3
 	self.textures.webbed.texture = "units/payday2/masks/shared_textures/patterns/pattern_webbed_df"
 	self.textures.webbed.global_value = "halloween"
 	self.textures.webbed.value = 5
 	self.textures.hannibalistic = {}
 	self.textures.hannibalistic.name_id = "bm_txt_hannibalistic"
-	self.textures.hannibalistic.weight = 2
+	self.textures.hannibalistic.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.hannibalistic.weight = 3
 	self.textures.hannibalistic.texture = "units/payday2/masks/shared_textures/patterns/pattern_hannibalistic_df"
 	self.textures.hannibalistic.global_value = "halloween"
 	self.textures.hannibalistic.value = 5
 	self.textures.stitches = {}
 	self.textures.stitches.name_id = "bm_txt_stitches"
-	self.textures.stitches.weight = 2
+	self.textures.stitches.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.stitches.weight = 3
 	self.textures.stitches.texture = "units/payday2/masks/shared_textures/patterns/pattern_stitches_df"
 	self.textures.stitches.global_value = "halloween"
 	self.textures.stitches.value = 4
 	self.textures.doomweaver = {}
 	self.textures.doomweaver.name_id = "bm_txt_doomweaver"
-	self.textures.doomweaver.weight = 2
+	self.textures.doomweaver.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.doomweaver.weight = 3
 	self.textures.doomweaver.texture = "units/payday2/masks/shared_textures/patterns/pattern_doomweaver_df"
 	self.textures.doomweaver.global_value = "halloween"
 	self.textures.doomweaver.value = 4
@@ -5482,5 +5554,32 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.toothbrush.sounds.charge = "toothbrush_charge"
 	self.melee_weapons.toothbrush.repeat_expire_t = 0.3
 	self.melee_weapons.toothbrush.stats.concealment = 30
+	self.melee_weapons.chef = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.chef.name_id = "bm_melee_chef"
+	self.melee_weapons.chef.dlc = "pd2_clan"
+	self.melee_weapons.chef.texture_bundle_folder = nil
+	self.melee_weapons.chef.free = nil
+	self.melee_weapons.chef.anim_global_param = "melee_psycho"
+	self.melee_weapons.chef.type = "knife"
+	self.melee_weapons.chef.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.chef.unit = "units/pd2_halloween/weapons/wpn_fps_mel_chef/wpn_fps_mel_chef"
+	self.melee_weapons.chef.third_unit = "units/pd2_halloween/weapons/wpn_fps_mel_chef/wpn_third_mel_chef"
+	self.melee_weapons.chef.stats.weapon_type = "sharp"
+	self.melee_weapons.chef.stats.min_damage = 2.8
+	self.melee_weapons.chef.stats.max_damage = 14
+	self.melee_weapons.chef.stats.min_damage_effect = 1
+	self.melee_weapons.chef.stats.max_damage_effect = 1
+	self.melee_weapons.chef.stats.charge_time = 4
+	self.melee_weapons.chef.stats.range = 150
+	self.melee_weapons.chef.sounds = {}
+	self.melee_weapons.chef.sounds.equip = "tomahawk_equip"
+	self.melee_weapons.chef.sounds.hit_air = "tomahawk_hit_air"
+	self.melee_weapons.chef.sounds.hit_gen = "tomahawk_hit_gen"
+	self.melee_weapons.chef.sounds.hit_body = "tomahawk_hit_body"
+	self.melee_weapons.chef.sounds.charge = "halloween_charge"
+	self.melee_weapons.chef.repeat_expire_t = 0.36
+	self.melee_weapons.chef.stats.concealment = 28
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

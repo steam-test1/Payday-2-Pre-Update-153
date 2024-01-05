@@ -395,48 +395,48 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.halloween_nightmare_1 = {}
-	self.halloween_nightmare_1.dlc = "has_achievement"
-	self.halloween_nightmare_1.achievement_id = "halloween_nightmare_1"
-	self.halloween_nightmare_1.content = {}
-	self.halloween_nightmare_1.content.loot_global_value = "halloween"
-	self.halloween_nightmare_1.content.loot_drops = {
+	self.halloween_nightmare_1_2014 = {}
+	self.halloween_nightmare_1_2014.dlc = "has_achievement"
+	self.halloween_nightmare_1_2014.achievement_id = "halloween_nightmare_1"
+	self.halloween_nightmare_1_2014.content = {}
+	self.halloween_nightmare_1_2014.content.loot_global_value = "halloween"
+	self.halloween_nightmare_1_2014.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "baby_happy",
 			amount = 1
 		}
 	}
-	self.halloween_nightmare_2 = {}
-	self.halloween_nightmare_2.dlc = "has_achievement"
-	self.halloween_nightmare_2.achievement_id = "halloween_nightmare_2"
-	self.halloween_nightmare_2.content = {}
-	self.halloween_nightmare_2.content.loot_global_value = "halloween"
-	self.halloween_nightmare_2.content.loot_drops = {
+	self.halloween_nightmare_2_2014 = {}
+	self.halloween_nightmare_2_2014.dlc = "has_achievement"
+	self.halloween_nightmare_2_2014.achievement_id = "halloween_nightmare_2"
+	self.halloween_nightmare_2_2014.content = {}
+	self.halloween_nightmare_2_2014.content.loot_global_value = "halloween"
+	self.halloween_nightmare_2_2014.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "brazil_baby",
 			amount = 1
 		}
 	}
-	self.halloween_nightmare_3 = {}
-	self.halloween_nightmare_3.dlc = "has_achievement"
-	self.halloween_nightmare_3.achievement_id = "halloween_nightmare_3"
-	self.halloween_nightmare_3.content = {}
-	self.halloween_nightmare_3.content.loot_global_value = "halloween"
-	self.halloween_nightmare_3.content.loot_drops = {
+	self.halloween_nightmare_3_2014 = {}
+	self.halloween_nightmare_3_2014.dlc = "has_achievement"
+	self.halloween_nightmare_3_2014.achievement_id = "halloween_nightmare_3"
+	self.halloween_nightmare_3_2014.content = {}
+	self.halloween_nightmare_3_2014.content.loot_global_value = "halloween"
+	self.halloween_nightmare_3_2014.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "baby_angry",
 			amount = 1
 		}
 	}
-	self.halloween_nightmare_4 = {}
-	self.halloween_nightmare_4.dlc = "has_achievement"
-	self.halloween_nightmare_4.achievement_id = "halloween_nightmare_4"
-	self.halloween_nightmare_4.content = {}
-	self.halloween_nightmare_4.content.loot_global_value = "halloween"
-	self.halloween_nightmare_4.content.loot_drops = {
+	self.halloween_nightmare_4_2014 = {}
+	self.halloween_nightmare_4_2014.dlc = "has_achievement"
+	self.halloween_nightmare_4_2014.achievement_id = "halloween_nightmare_4"
+	self.halloween_nightmare_4_2014.content = {}
+	self.halloween_nightmare_4_2014.content.loot_global_value = "halloween"
+	self.halloween_nightmare_4_2014.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "baby_cry",
@@ -1678,6 +1678,21 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "ancient",
+			amount = 1
+		}
+	}
+	self.humble_pack2 = {}
+	self.humble_pack2.content = {}
+	self.humble_pack2.dlc = "has_humble_pack2"
+	self.humble_pack2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "the_one_below",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "lycan",
 			amount = 1
 		}
 	}
