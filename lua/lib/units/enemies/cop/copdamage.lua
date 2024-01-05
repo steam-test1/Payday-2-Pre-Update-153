@@ -9,6 +9,7 @@ CopDamage._all_event_types = {
 	"counter_tased"
 }
 CopDamage._ATTACK_VARIANTS = {"explosion", "stun"}
+CopDamage._HEALTH_GRANULARITY = 512
 CopDamage._hurt_severities = {
 	none = false,
 	light = "light_hurt",
@@ -22,7 +23,7 @@ function CopDamage:init(unit)
 	self._HEALTH_INIT = char_tweak.HEALTH_INIT
 	self._health = self._HEALTH_INIT
 	self._health_ratio = 1
-	self._HEALTH_INIT_PRECENT = self._HEALTH_INIT / 100
+	self._HEALTH_INIT_PRECENT = self._HEALTH_INIT / self._HEALTH_GRANULARITY
 	self._autotarget_data = {
 		fast = unit:get_object(Idstring("Spine1"))
 	}
@@ -47,7 +48,7 @@ end
 
 function CopDamage:get_damage_type(damage_percent)
 	local hurt_table = self._char_tweak.damage.hurt_severity
-	local dmg = damage_percent / 100
+	local dmg = damage_percent / self._HEALTH_GRANULARITY
 	if hurt_table.health_reference == "full" then
 	elseif hurt_table.health_reference == "current" then
 		dmg = math.min(1, self._HEALTH_INIT * dmg / self._health)
@@ -111,7 +112,7 @@ function CopDamage:damage_bullet(attack_data)
 			damage = self._health * 10
 		end
 	end
-	local damage_percent = math.ceil(math.clamp(damage / self._HEALTH_INIT_PRECENT, 1, 100))
+	local damage_percent = math.ceil(math.clamp(damage / self._HEALTH_INIT_PRECENT, 1, self._HEALTH_GRANULARITY))
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	if damage >= self._health then
 		if head and damage > math.random(10) then
@@ -331,7 +332,7 @@ function CopDamage:damage_melee(attack_data)
 		attack_data.damage = damage
 		damage_effect = math.clamp(damage_effect, self._HEALTH_INIT_PRECENT, self._HEALTH_INIT)
 		damage_effect_percent = math.ceil(damage_effect / self._HEALTH_INIT_PRECENT)
-		damage_effect_percent = math.clamp(damage_effect_percent, 1, 100)
+		damage_effect_percent = math.clamp(damage_effect_percent, 1, self._HEALTH_GRANULARITY)
 		local result_type = attack_data.shield_knock and self._char_tweak.damage.shield_knocked and "shield_knock" or attack_data.variant == "counter_tased" and "counter_tased" or self:get_damage_type(damage_effect_percent)
 		result = {
 			type = result_type,
@@ -378,7 +379,7 @@ function CopDamage:damage_mission(attack_data)
 		return
 	end
 	local result
-	local damage_percent = 100
+	local damage_percent = self._HEALTH_GRANULARITY
 	attack_data.damage = self._health
 	result = {
 		type = "death",

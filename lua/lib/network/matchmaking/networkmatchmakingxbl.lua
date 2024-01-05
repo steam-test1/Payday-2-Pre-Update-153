@@ -189,6 +189,21 @@ function NetworkMatchMakingXBL:set_difficulty_filter(filter)
 	self._difficulty_filter = filter
 end
 
+function NetworkMatchMakingXBL:get_lobby_return_count()
+end
+
+function NetworkMatchMakingXBL:set_lobby_return_count(lobby_return_count)
+end
+
+function NetworkMatchMakingXBL:lobby_filters()
+end
+
+function NetworkMatchMakingXBL:set_lobby_filters(filters)
+end
+
+function NetworkMatchMakingXBL:add_lobby_filter(key, value, comparision_type)
+end
+
 function NetworkMatchMakingXBL:search_lobby(friends_only)
 	if self._searching_lobbys then
 		print("Allready searching lobbys, waiting result")

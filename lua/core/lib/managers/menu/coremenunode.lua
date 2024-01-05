@@ -122,7 +122,7 @@ function MenuNode:add_item(item)
 		item:set_callback_handler(self.callback_handler)
 	end
 	local last = self._items[#self._items]
-	local is_back = last and last:parameters().back
+	local is_back = last and (last:parameters().back or last:parameters().last_item)
 	if is_back then
 		table.insert(self._items, #self._items, item)
 	else

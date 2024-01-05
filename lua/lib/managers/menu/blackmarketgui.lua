@@ -1294,7 +1294,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				callback = callback(self, self, "preview_weapon_callback")
 			},
 			wm_preview_mod = {
-				prio = 2,
+				prio = 3,
 				btn = "BTN_Y",
 				pc_btn = Idstring("menu_preview_item_alt"),
 				name = "bm_menu_btn_preview_with_mod",
@@ -1308,18 +1308,25 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				callback = callback(self, self, "remove_mod_callback")
 			},
 			wm_remove_preview_mod = {
-				prio = 2,
+				prio = 3,
 				btn = "BTN_Y",
 				pc_btn = Idstring("menu_preview_item_alt"),
 				name = "bm_menu_btn_preview_with_mod",
 				callback = callback(self, self, "preview_weapon_callback")
 			},
 			wm_remove_preview = {
-				prio = 3,
+				prio = 4,
 				btn = "BTN_STICK_R",
 				pc_btn = Idstring("menu_preview_item"),
 				name = "bm_menu_btn_preview_no_mod",
 				callback = callback(self, self, "preview_weapon_without_mod_callback")
+			},
+			wm_sell = {
+				prio = 2,
+				btn = "BTN_X",
+				pc_btn = Idstring("menu_remove_item"),
+				name = "bm_menu_btn_sell",
+				callback = callback(self, self, "sell_weapon_mods_callback")
 			},
 			a_equip = {
 				prio = 1,
@@ -4429,6 +4436,10 @@ function BlackMarketGui:equip_mask_callback(data)
 	self:reload()
 end
 
+function BlackMarketGui:open_inventory_list_node()
+	managers.menu:open_node("inventory_list_node", {})
+end
+
 function BlackMarketGui:_open_preview_node()
 	managers.menu:open_node(self._preview_node_name, {})
 end
@@ -4505,6 +4516,24 @@ end
 function BlackMarketGui:_sell_mask_callback(data)
 	managers.menu_component:post_event("item_sell")
 	managers.blackmarket:on_sell_mask(data.slot)
+	self:reload()
+end
+
+function BlackMarketGui:sell_weapon_mods_callback(data)
+	print(inspect(data))
+	local params = {}
+	params.name = data.name_localized or data.name
+	params.category = data.category
+	params.slot = data.slot
+	params.money = managers.experience:cash_string(managers.money:get_weapon_part_sell_value(data.name, data.global_value))
+	params.yes_func = callback(self, self, "_dialog_yes", callback(self, self, "_sell_weapon_mod_callback", data))
+	params.no_func = callback(self, self, "_dialog_no")
+	managers.menu:show_confirm_blackmarket_sell(params)
+end
+
+function BlackMarketGui:_sell_weapon_mod_callback(data)
+	managers.menu_component:post_event("item_sell")
+	managers.blackmarket:on_sell_weapon_part(data.name, data.global_value)
 	self:reload()
 end
 
@@ -5137,7 +5166,7 @@ function BlackMarketGui:_remove_mod_callback(data)
 	if data.default_mod then
 		managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.default_mod, true)
 	else
-		managers.blackmarket:on_sell_weapon_part(data.category, data.slot, data.global_value, data.name)
+		managers.blackmarket:remove_weapon_part(data.category, data.slot, data.global_value, data.name)
 	end
 	self:reload()
 end

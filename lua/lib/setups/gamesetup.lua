@@ -362,6 +362,7 @@ function GameSetup:save(data)
 	managers.loot:sync_save(data)
 	managers.enemy:save(data)
 	managers.assets:sync_save(data)
+	managers.job:sync_save(data)
 end
 
 function GameSetup:load(data)
@@ -379,6 +380,7 @@ function GameSetup:load(data)
 	managers.loot:sync_load(data)
 	managers.enemy:load(data)
 	managers.assets:sync_load(data)
+	managers.job:sync_load(data)
 end
 
 function GameSetup:_update_debug_input()

@@ -282,7 +282,10 @@ end
 
 function PlayerTased:clbk_exit_to_std()
 	self._recover_delayed_clbk = nil
-	managers.player:set_player_state("standard")
+	Application:debug("PlayerTased:clbk_exit_to_std(), game_state_machine:current_state_name()", game_state_machine:current_state_name())
+	if game_state_machine:current_state_name() == "ingame_electrified" then
+		managers.player:set_player_state("standard")
+	end
 end
 
 function PlayerTased:on_tase_ended()

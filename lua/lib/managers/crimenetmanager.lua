@@ -14,12 +14,21 @@ function CrimeNetManager:_setup_vars()
 	self._NEW_JOB_MAX_TIME = self._tweak_data.job_vars.new_job_max_time
 	self._next_job_timer = (self._NEW_JOB_MIN_TIME + self._NEW_JOB_MAX_TIME) / 2
 	self._MAX_ACTIVE_JOBS = self._tweak_data.job_vars.max_active_jobs
+	self._max_active_server_jobs = self._tweak_data.job_vars.max_active_server_jobs
 	self._refresh_server_t = 0
 	self._REFRESH_SERVERS_TIME = self._tweak_data.job_vars.refresh_servers_time
 	if Application:production_build() then
 		self._debug_mass_spawning = tweak_data.gui.crime_net.debug_options.mass_spawn or false
 	end
 	self._active_server_jobs = {}
+end
+
+function CrimeNetManager:set_max_active_server_jobs(max_server_jobs)
+	self._max_active_server_jobs = max_server_jobs
+end
+
+function CrimeNetManager:get_max_active_server_jobs()
+	return self._max_active_server_jobs
 end
 
 function CrimeNetManager:_get_jobs_by_jc()
@@ -304,10 +313,6 @@ function CrimeNetManager:_find_online_games_ps3(friends_only)
 	local function f(info_list)
 		managers.network.matchmake:search_lobby_done()
 		
-		local dead_list = {}
-		for id, _ in pairs(self._active_server_jobs) do
-			dead_list[id] = true
-		end
 		local friend_names = managers.network.friends:get_names_friends_list()
 		for _, info in ipairs(info_list) do
 			local room_list = info.room_list
@@ -317,39 +322,75 @@ function CrimeNetManager:_find_online_games_ps3(friends_only)
 				local friend_str = room.friend_id and tostring(room.friend_id)
 				local attributes_numbers = attribute_list[i].numbers
 				if managers.network.matchmake:is_server_ok(friends_only, room.owner_id, attributes_numbers) then
-					dead_list[name_str] = nil
 					local host_name = name_str
-					local level_id = tweak_data.levels:get_level_name_from_index(attributes_numbers[1] % 1000)
-					local name_id = level_id and tweak_data.levels[level_id] and tweak_data.levels[level_id].name_id
-					local level_name = name_id and managers.localization:text(name_id) or "LEVEL NAME ERROR"
-					local difficulty_id = attributes_numbers[2]
-					local difficulty = tweak_data:index_to_difficulty(difficulty_id)
-					local job_id = tweak_data.narrative:get_job_name_from_index(math.floor(attributes_numbers[1] / 1000))
-					local state_string_id = tweak_data:index_to_server_state(attributes_numbers[4])
-					local state_name = state_string_id and managers.localization:text("menu_lobby_server_state_" .. state_string_id) or "UNKNOWN"
-					local state = attributes_numbers[4]
-					local num_plrs = attributes_numbers[8]
+					local level_id, name_id, level_name, difficulty_id, difficulty, job_id, state_string_id, state_name, state, num_plrs = self:_server_properties(attributes_numbers)
 					local is_friend = friend_names[host_name] and true or false
-					if name_id then
-						if not self._active_server_jobs[name_str] then
-							if table.size(self._active_jobs) + table.size(self._active_server_jobs) < tweak_data.gui.crime_net.job_vars.total_active_jobs then
-								self._active_server_jobs[name_str] = {added = false, alive_time = 0}
-								managers.menu_component:add_crimenet_server_job({
-									room_id = room.room_id,
-									id = name_str,
-									level_id = level_id,
-									difficulty = difficulty,
-									difficulty_id = difficulty_id,
-									num_plrs = num_plrs,
-									host_name = host_name,
-									state_name = state_name,
-									state = state,
-									level_name = level_name,
-									job_id = job_id,
-									is_friend = is_friend
-								})
-							end
-						else
+					if name_id and not self._active_server_jobs[name_str] and table.size(self._active_jobs) + table.size(self._active_server_jobs) < tweak_data.gui.crime_net.job_vars.total_active_jobs then
+						self._active_server_jobs[name_str] = {
+							added = false,
+							alive_time = 0,
+							room_id = room.room_id
+						}
+						managers.menu_component:add_crimenet_server_job({
+							room_id = room.room_id,
+							id = name_str,
+							level_id = level_id,
+							difficulty = difficulty,
+							difficulty_id = difficulty_id,
+							num_plrs = num_plrs,
+							host_name = host_name,
+							state_name = state_name,
+							state = state,
+							level_name = level_name,
+							job_id = job_id,
+							is_friend = is_friend
+						})
+					else
+					end
+				end
+			end
+		end
+	end
+	
+	if #PSN:get_world_list() == 0 then
+		return
+	end
+	
+	local function done_verify_func()
+		managers.network.matchmake:register_callback("search_lobby", f)
+		managers.network.matchmake:start_search_lobbys(friends_only)
+	end
+	
+	local dead_list = {}
+	local rooms_original = {}
+	for id, data in pairs(self._active_server_jobs) do
+		dead_list[id] = true
+		table.insert(rooms_original, data.room_id)
+	end
+	local rooms = {}
+	while 0 < #rooms_original do
+		table.insert(rooms, table.remove(rooms_original, math.random(#rooms_original)))
+	end
+	
+	local function updated_session_attributes(active_info_list)
+		self._test_result = active_info_list
+		if active_info_list then
+			local friend_names = managers.network.friends:get_names_friends_list()
+			for _, info in ipairs(active_info_list) do
+				local room_list = info.room_list
+				local attribute_list = info.attribute_list
+				for i, room in ipairs(room_list) do
+					local name_str = tostring(room.owner_id)
+					local friend_str = room.friend_id and tostring(room.friend_id)
+					local attributes_numbers = attribute_list[i].numbers
+					if friends_only then
+					end
+					local is_friend = friend_names[name_str] and true or false
+					if (not friends_only or is_friend) and managers.network.matchmake:is_server_ok(friends_only, room.owner_id, attributes_numbers) then
+						dead_list[name_str] = nil
+						local host_name = name_str
+						local level_id, name_id, level_name, difficulty_id, difficulty, job_id, state_string_id, state_name, state, num_plrs = self:_server_properties(attributes_numbers)
+						if name_id and self._active_server_jobs[name_str] then
 							managers.menu_component:update_crimenet_server_job({
 								room_id = room.room_id,
 								id = name_str,
@@ -373,13 +414,24 @@ function CrimeNetManager:_find_online_games_ps3(friends_only)
 				managers.menu_component:remove_crimenet_gui_job(id)
 			end
 		end
+		done_verify_func()
 	end
 	
-	if #PSN:get_world_list() == 0 then
-		return
-	end
-	managers.network.matchmake:register_callback("search_lobby", f)
-	managers.network.matchmake:start_search_lobbys(friends_only)
+	managers.network.matchmake:update_session_attributes(rooms, updated_session_attributes)
+end
+
+function CrimeNetManager:_server_properties(attributes_numbers)
+	local level_id = tweak_data.levels:get_level_name_from_index(attributes_numbers[1] % 1000)
+	local name_id = level_id and tweak_data.levels[level_id] and tweak_data.levels[level_id].name_id
+	local level_name = name_id and managers.localization:text(name_id) or "LEVEL NAME ERROR"
+	local difficulty_id = attributes_numbers[2]
+	local difficulty = tweak_data:index_to_difficulty(difficulty_id)
+	local job_id = tweak_data.narrative:get_job_name_from_index(math.floor(attributes_numbers[1] / 1000))
+	local state_string_id = tweak_data:index_to_server_state(attributes_numbers[4])
+	local state_name = state_string_id and managers.localization:text("menu_lobby_server_state_" .. state_string_id) or "UNKNOWN"
+	local state = attributes_numbers[4]
+	local num_plrs = attributes_numbers[8]
+	return level_id, name_id, level_name, difficulty_id, difficulty, job_id, state_string_id, state_name, state, num_plrs
 end
 
 function CrimeNetManager:_find_online_games_win32(friends_only)
@@ -419,7 +471,7 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 				end
 				if name_id then
 					if not self._active_server_jobs[room.room_id] then
-						if table.size(self._active_jobs) + table.size(self._active_server_jobs) < tweak_data.gui.crime_net.job_vars.total_active_jobs then
+						if table.size(self._active_jobs) + table.size(self._active_server_jobs) < tweak_data.gui.crime_net.job_vars.total_active_jobs and table.size(self._active_server_jobs) < self._max_active_server_jobs then
 							self._active_server_jobs[room.room_id] = {added = false, alive_time = 0}
 							managers.menu_component:add_crimenet_server_job({
 								room_id = room.room_id,
@@ -501,67 +553,50 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	self._fullscreen_ws = fullscreeen_ws
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel({name = "fullscreen"})
 	self._panel = self._ws:panel():panel({name = "main"})
-	self._blackborder_workspace = managers.gui_data:create_fullscreen_workspace()
-	self._blackborder_workspace:panel():rect({
-		name = "top_border",
-		layer = 1000,
-		color = Color.black
-	})
-	self._blackborder_workspace:panel():rect({
-		name = "bottom_border",
-		layer = 1000,
-		color = Color.black
-	})
-	do
-		local top_border = self._blackborder_workspace:panel():child("top_border")
-		local bottom_border = self._blackborder_workspace:panel():child("bottom_border")
-		local border_w = self._blackborder_workspace:panel():w()
-		local border_h = (self._blackborder_workspace:panel():h() - 720) / 2
-		top_border:set_position(0, 0)
-		top_border:set_size(border_w, border_h)
-		bottom_border:set_position(0, 720 + border_h)
-		bottom_border:set_size(border_w, border_h)
-	end
 	local full_16_9 = managers.gui_data:full_16_9_size()
 	self._fullscreen_panel:bitmap({
 		name = "blur_top",
 		texture = "guis/textures/test_blur_df",
 		w = self._fullscreen_ws:panel():w(),
-		h = full_16_9.convert_y,
+		h = full_16_9.convert_y * 2,
 		x = 0,
-		y = 0,
+		y = -full_16_9.convert_y,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 26
+		layer = 1001,
+		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
 		name = "blur_right",
 		texture = "guis/textures/test_blur_df",
-		w = full_16_9.convert_x,
+		w = full_16_9.convert_x * 2,
 		h = self._fullscreen_ws:panel():h(),
 		x = self._fullscreen_ws:panel():w() - full_16_9.convert_x,
 		y = 0,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 26
+		layer = 1001,
+		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
 		name = "blur_bottom",
 		texture = "guis/textures/test_blur_df",
 		w = self._fullscreen_ws:panel():w(),
-		h = full_16_9.convert_y,
+		h = full_16_9.convert_y * 2,
 		x = 0,
 		y = self._fullscreen_ws:panel():h() - full_16_9.convert_y,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 26
+		layer = 1001,
+		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
 		name = "blur_left",
 		texture = "guis/textures/test_blur_df",
-		w = full_16_9.convert_x,
+		w = full_16_9.convert_x * 2,
 		h = self._fullscreen_ws:panel():h(),
-		x = 0,
+		x = -full_16_9.convert_x,
 		y = 0,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 26
+		layer = 1001,
+		rotation = 360
 	})
 	self._panel:rect({
 		w = self._panel:w(),
@@ -1042,9 +1077,6 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		end
 	end
 	if start_position then
-		self:_set_zoom("in", fw * 0.5, fh * 0.5)
-		self:_set_zoom("in", fw * 0.5, fh * 0.5)
-		self:_set_zoom("in", fw * 0.5, fh * 0.5)
 		self:_goto_map_position(start_position.x, start_position.y)
 	end
 	return
@@ -1344,33 +1376,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			x = x + star_size
 			num_stars = num_stars + 1
 		end
-		local money_multiplier = managers.money:get_contract_difficulty_multiplier(difficulty_stars)
-		local money_stage_stars = managers.money:get_stage_payout_by_stars(job_stars)
-		local money_job_stars = managers.money:get_job_payout_by_stars(job_stars)
-		local plvl = managers.experience:current_level()
-		local player_stars = math.max(math.ceil(plvl / 10), 1)
-		local money_manager = tweak_data.money_manager.level_limit
-		if player_stars <= job_and_difficulty_stars + tweak_data:get_value("money_manager", "level_limit", "low_cap_level") then
-			local diff_stars = math.clamp(job_and_difficulty_stars - player_stars, 1, #money_manager.pc_difference_multipliers)
-			local level_limit_mul = tweak_data:get_value("money_manager", "level_limit", "pc_difference_multipliers", diff_stars)
-			local plr_difficulty_stars = math.max(difficulty_stars - diff_stars, 0)
-			local plr_money_multiplier = managers.money:get_contract_difficulty_multiplier(plr_difficulty_stars) or 0
-			local white_player_stars = player_stars - plr_difficulty_stars
-			local cash_plr_stage_stars = managers.money:get_stage_payout_by_stars(white_player_stars, true)
-			cash_plr_stage_stars = cash_plr_stage_stars + cash_plr_stage_stars * plr_money_multiplier
-			local cash_stage = money_stage_stars + money_stage_stars * money_multiplier
-			local diff_stage = cash_stage - cash_plr_stage_stars
-			local new_cash_stage = cash_plr_stage_stars + diff_stage * level_limit_mul
-			money_stage_stars = money_stage_stars * (new_cash_stage / cash_stage)
-			local cash_plr_job_stars = managers.money:get_job_payout_by_stars(white_player_stars, true)
-			cash_plr_job_stars = cash_plr_job_stars + cash_plr_job_stars * plr_money_multiplier
-			local cash_job = money_job_stars + money_job_stars * money_multiplier
-			local diff_job = cash_job - cash_plr_job_stars
-			local new_cash_job = cash_plr_job_stars + diff_job * level_limit_mul
-			money_job_stars = money_job_stars * (new_cash_job / cash_job)
-		end
 		job_num = #tweak_data.narrative.jobs[data.job_id].chain
-		job_cash = managers.experience:cash_string(math.round(money_job_stars + tweak_data:get_value("money_manager", "flat_job_completion") + money_job_stars * money_multiplier + (money_stage_stars + tweak_data:get_value("money_manager", "flat_stage_completion") + money_stage_stars * money_multiplier) * #tweak_data.narrative.jobs[data.job_id].chain))
+		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, job_num)
+		job_cash = managers.experience:cash_string(math.round(total_payout))
 		local difficulty_string = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[tweak_data.difficulties[data.difficulty_id]])
 		difficulty_name:set_text(difficulty_string)
 		difficulty_name:set_color(0 < difficulty_stars and tweak_data.screen_colors.risk or tweak_data.screen_colors.text)
@@ -1693,14 +1701,14 @@ function CrimeNetGui:update_server_job(data, i)
 	end
 	local level_id = data.level_id
 	local level_data = tweak_data.levels[level_id]
-	local recreate_job = false
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "room_id", data.room_id)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "job_id", data.job_id)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "level_id", level_id)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "level_data", level_data)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "difficulty", data.difficulty)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "difficulty_id", data.difficulty_id)
-	recreate_job = recreate_job or self:_update_job_variable(job_index, "state", data.state)
+	local updated_room = self:_update_job_variable(job_index, "room_id", data.room_id)
+	local updated_job = self:_update_job_variable(job_index, "job_id", data.job_id)
+	local updated_level_id = self:_update_job_variable(job_index, "level_id", level_id)
+	local updated_level_data = self:_update_job_variable(job_index, "level_data", level_data)
+	local updated_difficulty = self:_update_job_variable(job_index, "difficulty", data.difficulty)
+	local updated_difficulty_id = self:_update_job_variable(job_index, "difficulty_id", data.difficulty_id)
+	local updated_state = self:_update_job_variable(job_index, "state", data.state)
+	local recreate_job = updated_room or updated_job or updated_level_id or updated_level_data or updated_difficulty or updated_difficulty_id or updated_state
 	self:_update_job_variable(job_index, "state_name", data.state_name)
 	if self:_update_job_variable(job_index, "num_plrs", data.num_plrs) and job.peers_panel then
 		for i, peer_icon in ipairs(job.peers_panel:children()) do
@@ -2440,8 +2448,6 @@ function CrimeNetGui:close()
 	managers.menu:active_menu().renderer.ws:show()
 	self._ws:panel():remove(self._panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
-	Overlay:gui():destroy_workspace(self._blackborder_workspace)
-	self._blackborder_workspace = nil
 	if managers.controller:get_default_wrapper_type() ~= "pc" then
 		managers.menu:active_menu().input:deactivate_controller_mouse()
 		managers.mouse_pointer:release_mouse_pointer()

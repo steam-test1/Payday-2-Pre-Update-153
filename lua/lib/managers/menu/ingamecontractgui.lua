@@ -212,44 +212,14 @@ function IngameContractGui:init(ws)
 		local cy = experience_title:center_y()
 		local num_days = #job_data.chain or 1
 		local days_multiplier = 0
-		for i = 1, num_days do
-			local day_mul = job_data.professional and tweak_data:get_value("experience_manager", "pro_day_multiplier", i) or tweak_data:get_value("experience_manager", "day_multiplier", i)
-			days_multiplier = days_multiplier + (day_mul - 1)
-		end
-		days_multiplier = 1 + days_multiplier / num_days
-		local last_day_mul = job_data.professional and tweak_data:get_value("experience_manager", "pro_day_multiplier", num_days) or tweak_data:get_value("experience_manager", "day_multiplier", num_days)
-		local xp_stage_stars = managers.experience:get_stage_xp_by_stars(job_stars)
-		local xp_job_stars = managers.experience:get_job_xp_by_stars(job_stars)
-		local xp_multiplier = managers.experience:get_contract_difficulty_multiplier(difficulty_stars)
-		local experience_manager = tweak_data.experience_manager.level_limit
-		if player_stars <= job_and_difficulty_stars + tweak_data:get_value("experience_manager", "level_limit", "low_cap_level") then
-			local diff_stars = math.clamp(job_and_difficulty_stars - player_stars, 1, #experience_manager.pc_difference_multipliers)
-			local level_limit_mul = tweak_data:get_value("experience_manager", "level_limit", "pc_difference_multipliers", diff_stars)
-			local plr_difficulty_stars = math.max(difficulty_stars - diff_stars, 0)
-			local plr_xp_multiplier = managers.experience:get_contract_difficulty_multiplier(plr_difficulty_stars) or 0
-			local white_player_stars = player_stars - plr_difficulty_stars
-			local xp_plr_stage_stars = managers.experience:get_stage_xp_by_stars(white_player_stars)
-			xp_plr_stage_stars = xp_plr_stage_stars + xp_plr_stage_stars * plr_xp_multiplier
-			local xp_stage = xp_stage_stars + xp_stage_stars * xp_multiplier
-			local diff_stage = xp_stage - xp_plr_stage_stars
-			local new_xp_stage = xp_plr_stage_stars + diff_stage * level_limit_mul
-			xp_stage_stars = xp_stage_stars * (new_xp_stage / xp_stage)
-			local xp_plr_job_stars = managers.experience:get_job_xp_by_stars(white_player_stars)
-			xp_plr_job_stars = xp_plr_job_stars + xp_plr_job_stars * plr_xp_multiplier
-			local xp_job = xp_job_stars + xp_job_stars * xp_multiplier
-			local diff_job = xp_job - xp_plr_job_stars
-			local new_xp_job = xp_plr_job_stars + diff_job * level_limit_mul
-			xp_job_stars = xp_job_stars * (new_xp_job / xp_job)
-		end
-		local pure_job_experience = xp_job_stars * last_day_mul + xp_stage_stars + xp_stage_stars * (num_days - 1) * days_multiplier
-		local job_experience = math.round(pure_job_experience)
+		local total_xp, base_xp, risk_xp = managers.experience:get_contract_xp_by_stars(job_stars, difficulty_stars, job_data.professional, num_days)
 		local job_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			text = "",
 			color = Color.white
 		})
-		job_xp:set_text(tostring(job_experience))
+		job_xp:set_text(tostring(math.round(base_xp)))
 		managers.hud:make_fine_text(job_xp)
 		job_xp:set_x(sx)
 		job_xp:set_center_y(cy)
@@ -259,38 +229,20 @@ function IngameContractGui:init(ws)
 			text = "",
 			color = risk_color
 		})
-		add_xp:set_text(" +" .. math.round(pure_job_experience * xp_multiplier))
+		add_xp:set_text(" +" .. math.round(risk_xp))
 		managers.hud:make_fine_text(add_xp)
 		add_xp:set_x(job_xp:right())
 		add_xp:set_center_y(cy)
-		local money_stage_stars = managers.money:get_stage_payout_by_stars(job_stars)
-		local money_job_stars = managers.money:get_job_payout_by_stars(job_stars)
-		local money_multiplier = managers.money:get_contract_difficulty_multiplier(difficulty_stars)
-		local money_manager = tweak_data.money_manager.level_limit
-		if player_stars <= job_and_difficulty_stars + tweak_data:get_value("money_manager", "level_limit", "low_cap_level") then
-			local diff_stars = math.clamp(job_and_difficulty_stars - player_stars, 1, #money_manager.pc_difference_multipliers)
-			local level_limit_mul = tweak_data:get_value("money_manager", "level_limit", "pc_difference_multipliers", diff_stars)
-			local plr_difficulty_stars = math.max(difficulty_stars - diff_stars, 0)
-			local plr_money_multiplier = managers.money:get_contract_difficulty_multiplier(plr_difficulty_stars) or 0
-			local white_player_stars = player_stars - plr_difficulty_stars
-			local cash_plr_stage_stars = managers.money:get_stage_payout_by_stars(white_player_stars, true)
-			cash_plr_stage_stars = cash_plr_stage_stars + cash_plr_stage_stars * plr_money_multiplier
-			local cash_stage = money_stage_stars + money_stage_stars * money_multiplier
-			local diff_stage = cash_stage - cash_plr_stage_stars
-			local new_cash_stage = cash_plr_stage_stars + diff_stage * level_limit_mul
-			money_stage_stars = money_stage_stars * (new_cash_stage / cash_stage)
-			local cash_plr_job_stars = managers.money:get_job_payout_by_stars(white_player_stars, true)
-			cash_plr_job_stars = cash_plr_job_stars + cash_plr_job_stars * plr_money_multiplier
-			local cash_job = money_job_stars + money_job_stars * money_multiplier
-			local diff_job = cash_job - cash_plr_job_stars
-			local new_cash_job = cash_plr_job_stars + diff_job * level_limit_mul
-			money_job_stars = money_job_stars * (new_cash_job / cash_job)
-		end
+		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, num_days)
+		local stage_value = stage_payout_table[1]
+		local stage_risk_value = stage_payout_table[3]
+		local job_value = job_payout_table[1]
+		local job_risk_value = job_payout_table[3]
 		local cy = stage_cash_title:center_y()
 		local stage_cash = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
-			text = tostring(num_days) .. " x " .. managers.experience:cash_string(money_stage_stars + tweak_data:get_value("money_manager", "flat_stage_completion")),
+			text = tostring(num_days) .. " x " .. managers.experience:cash_string(math.round(stage_value)),
 			color = tweak_data.screen_colors.text
 		})
 		managers.hud:make_fine_text(stage_cash)
@@ -302,7 +254,7 @@ function IngameContractGui:init(ws)
 			text = "",
 			color = risk_color
 		})
-		stage_add_cash:set_text(" +" .. tostring(num_days) .. " x " .. managers.experience:cash_string(math.round(money_stage_stars * money_multiplier)))
+		stage_add_cash:set_text(" +" .. tostring(num_days) .. " x " .. managers.experience:cash_string(math.round(stage_risk_value)))
 		managers.hud:make_fine_text(stage_add_cash)
 		stage_add_cash:set_x(stage_cash:right())
 		stage_add_cash:set_center_y(cy)
@@ -313,7 +265,7 @@ function IngameContractGui:init(ws)
 			text = "",
 			color = Color.white
 		})
-		job_cash:set_text(managers.experience:cash_string(money_job_stars + tweak_data:get_value("money_manager", "flat_job_completion")))
+		job_cash:set_text(managers.experience:cash_string(math.round(job_value)))
 		managers.hud:make_fine_text(job_cash)
 		job_cash:set_x(sx)
 		job_cash:set_center_y(cy)
@@ -323,11 +275,11 @@ function IngameContractGui:init(ws)
 			text = "",
 			color = risk_color
 		})
-		add_cash:set_text(" +" .. managers.experience:cash_string(math.round(money_job_stars * money_multiplier)))
+		add_cash:set_text(" +" .. managers.experience:cash_string(math.round(job_risk_value)))
 		managers.hud:make_fine_text(add_cash)
 		add_cash:set_x(job_cash:right())
 		add_cash:set_center_y(cy)
-		local payday_value = money_job_stars + tweak_data:get_value("money_manager", "flat_job_completion") + money_job_stars * money_multiplier + money_stage_stars * num_days + money_stage_stars * money_multiplier * num_days + tweak_data:get_value("money_manager", "flat_stage_completion") * num_days
+		local payday_value = total_payout
 		local payday_text = text_panel:text({
 			font = tweak_data.menu.pd2_large_font,
 			font_size = tweak_data.menu.pd2_large_font_size,

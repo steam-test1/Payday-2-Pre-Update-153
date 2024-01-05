@@ -46,7 +46,7 @@ end
 function GenericSystemMenuManager:init_finalize()
 	local gui = Overlay:gui()
 	self._ws = Overlay:gui():create_screen_workspace()
-	managers.gui_data:layout_fullscreen_workspace(self._ws)
+	managers.gui_data:layout_1280_workspace(self._ws)
 	self._ws:hide()
 	if Global.dialog_manager.init_show_data_list then
 		local init_show_data_list = Global.dialog_manager.init_show_data_list
@@ -59,7 +59,7 @@ function GenericSystemMenuManager:init_finalize()
 end
 
 function GenericSystemMenuManager:resolution_changed()
-	managers.gui_data:layout_fullscreen_workspace(self._ws)
+	managers.gui_data:layout_1280_workspace(self._ws)
 end
 
 function GenericSystemMenuManager:add_init_show(data)

@@ -7,7 +7,6 @@ function IngameManualGui:init(ws, fullscreen_ws)
 	self._manual_panel = self._ws:panel():panel()
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel()
 	self._active = true
-	self:_setup_controller_input()
 	local black_bg = self._fullscreen_panel:rect({
 		color = Color.black,
 		layer = 0,
@@ -66,14 +65,14 @@ end
 function IngameManualGui:_setup_controller_input()
 	self._left_axis_vector = Vector3()
 	self._right_axis_vector = Vector3()
-	self._ws:connect_controller(managers.menu:active_menu().input:get_controller(), true)
-	self._manual_panel:axis_move(callback(self, self, "_axis_move"))
+	self._fullscreen_ws:connect_controller(managers.menu:active_menu().input:get_controller(), true)
+	self._fullscreen_panel:axis_move(callback(self, self, "_axis_move"))
 end
 
-function IngameManualGui:_destroy_controller_unput()
-	self._ws:disconnect_all_controllers()
-	if alive(self._panel) then
-		self._manual_panel:axis_move(nil)
+function IngameManualGui:_destroy_controller_input()
+	self._fullscreen_ws:disconnect_all_controllers()
+	if alive(self._fullscreen_panel) then
+		self._fullscreen_panel:axis_move(nil)
 	end
 end
 
@@ -89,17 +88,10 @@ function IngameManualGui:update(t, dt)
 	if managers.menu:is_pc_controller() then
 		return
 	end
-	if mvector3.is_zero(self._left_axis_vector) then
-	else
-		local x = mvector3.x(self._left_axis_vector)
-		local y = mvector3.y(self._left_axis_vector)
-		self:controller_move(-x * dt, y * dt)
-	end
-	if mvector3.is_zero(self._right_axis_vector) then
-	else
-		local y = mvector3.y(self._right_axis_vector)
-		self:controller_zoom(y * dt)
-	end
+	local left_x, left_y = managers.menu_component:get_left_controller_axis()
+	local right_x, right_y = managers.menu_component:get_right_controller_axis()
+	self:controller_move(-left_x * dt, left_y * dt)
+	self:controller_zoom(right_y * dt)
 end
 
 function IngameManualGui:correct_position()
@@ -251,7 +243,6 @@ function IngameManualGui:set_layer(layer)
 end
 
 function IngameManualGui:close()
-	self:_destroy_controller_unput()
 	self._ws:panel():remove(self._manual_panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
 end

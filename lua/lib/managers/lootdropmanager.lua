@@ -220,6 +220,7 @@ function LootDropManager:_make_drop(debug, add_to_inventory, debug_stars, return
 		local items = pc_items[type_items]
 		local item_entry = items[math.random(#items)]
 		local global_value = "normal"
+		local block_item = false
 		if not tweak_data.blackmarket[type_items][item_entry].qlvl or plvl >= tweak_data.blackmarket[type_items][item_entry].qlvl then
 			local global_value_chance = math.rand(1)
 			local quality_mul = managers.player:upgrade_value("player", "passive_loot_drop_multiplier", 1) * managers.player:upgrade_value("player", "loot_drop_multiplier", 1)
@@ -237,13 +238,23 @@ function LootDropManager:_make_drop(debug, add_to_inventory, debug_stars, return
 				for _, dlc in pairs(dlcs) do
 					if managers.dlc:has_dlc(dlc) then
 						table.insert(dlc_global_values, dlc)
+					else
+						block_item = true
 					end
 				end
 				if 0 < #dlc_global_values then
 					global_value = dlc_global_values[math.random(#dlc_global_values)]
+					block_item = false
 				end
 			end
-			if tweak_data.blackmarket[type_items][item_entry].max_in_inventory and managers.blackmarket:get_item_amount(global_value, type_items, item_entry) >= tweak_data.blackmarket[type_items][item_entry].max_in_inventory then
+			if block_item then
+				if not debug then
+					print("Item drop got blocked!", "type_items", type_items, "item_entry", item_entry, "global_value", global_value)
+				end
+			elseif tweak_data.blackmarket[type_items][item_entry].max_in_inventory and managers.blackmarket:get_item_amount(global_value, type_items, item_entry) >= tweak_data.blackmarket[type_items][item_entry].max_in_inventory then
+				if not debug then
+					print("Already got max of this item", item_entry)
+				end
 			elseif not tweak_data.blackmarket[type_items][item_entry].infamous or global_value == "infamous" then
 				has_result = true
 				if not debug then

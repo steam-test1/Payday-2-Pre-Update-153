@@ -17,11 +17,13 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		visible = false,
 		name = "" .. i,
 		w = math.round(width),
-		x = 0
+		x = 0,
+		halign = "right"
 	})
 	if not main_player then
 		teammate_panel:set_h(84)
 		teammate_panel:set_bottom(teammates_panel:h())
+		teammate_panel:set_halign("left")
 	end
 	self._player_panel = teammate_panel:panel({name = "player"})
 	local name = teammate_panel:text({

@@ -134,7 +134,7 @@ function IngameWaitingForPlayersState:update(t, dt)
 		if managers.job:has_active_job() then
 			local stage_data = managers.job:current_stage_data()
 			local level_data = managers.job:current_level_data()
-			local briefing_dialog = stage_data.briefing_dialog or level_data.briefing_dialog
+			local briefing_dialog = managers.job:current_briefing_dialog()
 			if type(briefing_dialog) == "table" then
 				briefing_dialog = briefing_dialog[math.random(#briefing_dialog)]
 			end

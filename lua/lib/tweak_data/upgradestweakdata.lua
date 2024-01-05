@@ -37,7 +37,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.marked_enemy_extra_damage = {true}
 	self.values.player.marked_enemy_damage_mul = 1.15
 	self.values.cable_tie.interact_speed_multiplier = {0.5}
-	self.values.cable_tie.quantity = {3}
+	self.values.cable_tie.quantity = {4}
 	self.values.cable_tie.can_cable_tie_doors = {true}
 	self.values.temporary.combat_medic_damage_multiplier = {
 		{1.25, 10},
@@ -84,7 +84,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.team.stamina.passive_multiplier = {1.15, 1.3}
 	self.values.player.passive_intimidate_range_mul = {1.25}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.25}
-	self.values.player.passive_convert_enemies_damage_multiplier = {1.05}
+	self.values.player.passive_convert_enemies_damage_multiplier = {1.15}
 	self.values.player.convert_enemies_interaction_speed_multiplier = {0.33}
 	self.values.player.empowered_intimidation_mul = {3}
 	self.values.player.passive_assets_cost_multiplier = {0.5}
@@ -100,7 +100,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.primary_weapon_when_downed = {true}
 	self.values.player.armor_regen_timer_multiplier = {0.85}
 	self.values.temporary.dmg_multiplier_outnumbered = {
-		{1.1, 7}
+		{1.15, 7}
 	}
 	self.values.temporary.dmg_dampener_outnumbered = {
 		{0.85, 7}
@@ -146,7 +146,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.crafting_mask_multiplier = {0.9}
 	self.values.trip_mine.quantity_1 = {1}
 	self.values.trip_mine.can_switch_on_off = {true}
-	self.values.player.drill_speed_multiplier = {0.9, 0.75}
+	self.values.player.drill_speed_multiplier = {0.85, 0.7}
 	self.values.player.trip_mine_deploy_time_multiplier = {0.8, 0.5}
 	self.values.trip_mine.sensor_toggle = {true}
 	self.values.player.drill_fix_interaction_speed_multiplier = {0.75}
@@ -211,11 +211,11 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.cheat_death_chance = {0.1}
 	self.values.ecm_jammer.can_activate_feedback = {true}
 	self.values.ecm_jammer.feedback_duration_boost = {1.25}
-	self.values.weapon.silencer_damage_multiplier = {1.1, 1.2}
+	self.values.weapon.silencer_damage_multiplier = {1.15, 1.3}
 	self.values.ecm_jammer.duration_multiplier = {1.25}
 	self.values.ecm_jammer.can_open_sec_doors = {true}
 	self.values.player.pick_lock_easy = {true}
-	self.values.player.pick_lock_easy_speed_multiplier = {0.75}
+	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.6}
 	self.values.player.pick_lock_hard = {true}
 	self.values.weapon.silencer_recoil_multiplier = {0.5}
 	self.values.weapon.silencer_spread_multiplier = {0.5}

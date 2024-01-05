@@ -21,7 +21,8 @@ function GuiTweakData:init()
 	self.crime_net.job_vars.new_job_min_time = 0.5
 	self.crime_net.job_vars.new_job_max_time = 3.5
 	self.crime_net.job_vars.refresh_servers_time = 5
-	self.crime_net.job_vars.total_active_jobs = 50
+	self.crime_net.job_vars.total_active_jobs = 40
+	self.crime_net.job_vars.max_active_server_jobs = 100
 	self.crime_net.debug_options = {}
 	self.crime_net.debug_options.regions = false
 	self.crime_net.debug_options.mass_spawn = false
@@ -912,62 +913,62 @@ function GuiTweakData:init()
 	self.crime_net.map_start_positions = {
 		{
 			max_level = 10,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 20,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 30,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 40,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 50,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 60,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 70,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 80,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 90,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		},
 		{
 			max_level = 100,
-			x = 789,
-			y = 418,
+			x = 1080,
+			y = 512,
 			zoom = 4
 		}
 	}
@@ -976,57 +977,48 @@ function GuiTweakData:init()
 			{
 				{
 					dots = {
-						{1540, 900},
-						{1570, 545},
-						{1369, 600},
-						{1549, 645},
-						{1729, 600},
-						{1354, 745},
-						{1534, 700},
-						{1714, 745},
-						{1290, 800},
-						{1470, 845},
-						{1650, 800},
-						{750, 845},
-						{820, 900},
-						{850, 545},
-						{829, 645},
-						{1009, 600},
-						{814, 700},
-						{994, 745},
-						{930, 800},
-						{1649, 445},
-						{1520, 145},
-						{1294, 245},
-						{1474, 200},
-						{1654, 245},
-						{1163, 345},
-						{1343, 300},
-						{1523, 345},
-						{1703, 300},
-						{1109, 400},
-						{1289, 445},
-						{1469, 400},
-						{1030, 500},
-						{1210, 545},
-						{1390, 500},
-						{1114, 200},
-						{754, 200},
-						{934, 245},
-						{983, 300},
-						{649, 600},
-						{803, 345},
-						{749, 400},
-						{929, 445},
-						{670, 500},
-						{574, 245},
-						{214, 245},
-						{394, 200},
-						{263, 300},
-						{443, 345},
-						{389, 400},
-						{490, 545},
-						{570, 800}
+						{1601, 425},
+						{1630, 945},
+						{1221, 685},
+						{1603, 555},
+						{1401, 620},
+						{1581, 685},
+						{1306, 750},
+						{1486, 815},
+						{1666, 750},
+						{1450, 880},
+						{1041, 620},
+						{730, 880},
+						{883, 555},
+						{861, 685},
+						{766, 815},
+						{946, 750},
+						{1480, 165},
+						{1304, 295},
+						{1484, 230},
+						{1664, 295},
+						{1241, 425},
+						{1421, 360},
+						{1063, 490},
+						{1243, 555},
+						{1423, 490},
+						{1120, 165},
+						{1124, 230},
+						{760, 165},
+						{764, 230},
+						{944, 295},
+						{701, 360},
+						{681, 620},
+						{881, 425},
+						{703, 490},
+						{400, 165},
+						{404, 230},
+						{584, 295},
+						{343, 490},
+						{224, 295},
+						{341, 360},
+						{521, 425},
+						{586, 750}
 					},
 					weight = 100
 				},
@@ -3320,11 +3312,11 @@ function GuiTweakData:_create_location_spawning_dots()
 	local start_y = 50
 	local start_x = -50
 	local step_x = 180
-	local step_y = 100
+	local step_y = 130
 	local random_x = 0
 	local random_y = 0
-	local random_step_x = 75
-	local zig_y = 45
+	local random_step_x = step_x / 2
+	local zig_y = step_y / 2
 	local zig = true
 	for y = border_h + start_y, map_h - 2 * border_h + start_y, step_y do
 		for x = border_w + math.random(-random_step_x, random_step_x) + start_x, map_w - 2 * border_w + start_x, step_x do

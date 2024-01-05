@@ -1,12 +1,14 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v0.0.27"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v0.0.29"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
 	self._callback_map = {}
+	self._lobby_filters = {}
 	self._distance_filter = -1
 	self._difficulty_filter = 0
+	self._lobby_return_count = 30
 	self._try_re_enter_lobby = nil
 	self._server_joinable = true
 end
@@ -185,6 +187,34 @@ function NetworkMatchMakingSTEAM:set_distance_filter(filter)
 	self._distance_filter = filter
 end
 
+function NetworkMatchMakingSTEAM:get_lobby_return_count()
+	return self._lobby_return_count
+end
+
+function NetworkMatchMakingSTEAM:set_lobby_return_count(lobby_return_count)
+	self._lobby_return_count = lobby_return_count
+end
+
+function NetworkMatchMakingSTEAM:lobby_filters()
+	return self._lobby_filters
+end
+
+function NetworkMatchMakingSTEAM:set_lobby_filters(filters)
+	self._lobby_filters = filters or {}
+end
+
+function NetworkMatchMakingSTEAM:add_lobby_filter(key, value, comparision_type)
+	self._lobby_filters[key] = {
+		key = key,
+		value = value,
+		comparision_type = comparision_type
+	}
+end
+
+function NetworkMatchMakingSTEAM:get_lobby_filter(key)
+	return self._lobby_filters[key] and self._lobby_filters[key].value or false
+end
+
 function NetworkMatchMakingSTEAM:difficulty_filter()
 	return self._difficulty_filter
 end
@@ -245,6 +275,13 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 		end
 		self.browser:set_interest_keys(interest_keys)
 		self.browser:set_distance_filter(self._distance_filter)
+		self.browser:set_lobby_filter("min_level", managers.experience:current_level(), "equalto_less_than")
+		for key, data in pairs(self._lobby_filters) do
+			if data.value and data.value ~= -1 then
+				self.browser:set_lobby_filter(data.key, data.value, data.comparision_type)
+			end
+		end
+		self.browser:set_max_lobby_return_count(self._lobby_return_count)
 		if Global.game_settings.playing_lan then
 			self.browser:refresh_lan()
 		else
@@ -270,12 +307,15 @@ function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_num
 		return false
 	end
 	if (not NetworkManager.DROPIN_ENABLED or attributes_numbers[6] == 0) and attributes_numbers[4] ~= 1 then
+		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. DROPING NOT ENABLED")
 		return false, 1
 	end
 	if managers.experience:current_level() < attributes_numbers[7] then
+		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. REPUTATION CAP")
 		return false, 3
 	end
 	if not is_invite and permission == "private" then
+		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. PRIVATE GAME")
 		return false, 2
 	end
 	if permission == "public" then

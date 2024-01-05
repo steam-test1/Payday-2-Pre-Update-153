@@ -156,6 +156,8 @@ function StatisticsManager:_setup(reset)
 	self._defaults.health = {amount_lost = 0}
 	self._defaults.experience = {}
 	self._defaults.misc = {}
+	self._defaults.play_time = {minutes = 0}
+	self._defaults.stat_date = {year = 0, month = 0}
 	if not Global.statistics_manager or reset then
 		Global.statistics_manager = deep_clone(self._defaults)
 		self._global = Global.statistics_manager
@@ -340,6 +342,10 @@ function StatisticsManager:use_ecm_jammer()
 	self:_increment_misc("deploy_jammer", 1)
 end
 
+function StatisticsManager:use_sentry_gun()
+	self:_increment_misc("deploy_sentry", 1)
+end
+
 function StatisticsManager:in_custody()
 	self:_increment_misc("in_custody", 1)
 end
@@ -362,166 +368,510 @@ function StatisticsManager:publish_to_steam(session, success)
 	if session_time_seconds == 0 or session_time_minutes == 0 or session_time == 0 then
 		return
 	end
+	local year = Application:date("%Y")
+	local month = Application:date("%m")
+	if self._global.stat_date.year ~= year or self._global.stat_date.month ~= month then
+		self._global.stat_date.year = year
+		self._global.stat_date.month = month
+		self:clear_statistics()
+	end
 	local stats = {}
-	for weapon, data in pairs(session.shots_by_weapon) do
-		if 0 < data.total then
-			stats[weapon .. "_shots"] = {
+	self._global.play_time.minutes = math.ceil(self._global.play_time.minutes + session_time_minutes)
+	local current_time = self._global.play_time.minutes
+	stats.player_time = {
+		type = "int",
+		method = "set",
+		value = current_time
+	}
+	local time_found = false
+	local play_times = {
+		1000,
+		500,
+		250,
+		200,
+		150,
+		100,
+		80,
+		40,
+		20,
+		10,
+		0
+	}
+	for _, play_time in ipairs(play_times) do
+		if not time_found and current_time >= play_time then
+			stats["player_time_" .. play_time .. "h"] = {
 				type = "int",
-				value = data.total
+				method = "set",
+				value = 1
 			}
-			stats[weapon .. "_accuracy"] = {
-				type = "avgrate",
-				value = data.hits / data.total * 100,
-				hours = session_time
-			}
-			stats[weapon .. "_kills"] = {
+			time_found = true
+		else
+			stats["player_time_" .. play_time .. "h"] = {
 				type = "int",
-				value = session.killed_by_weapon[weapon] and session.killed_by_weapon[weapon].count or 0
-			}
-			stats[weapon .. "_headshots"] = {
-				type = "int",
-				value = session.killed_by_weapon[weapon] and session.killed_by_weapon[weapon].headshots or 0
+				method = "set",
+				value = 0
 			}
 		end
 	end
-	for unit, data in pairs(session.killed) do
-		if unit ~= "civilian" and unit ~= "civilian_female" and unit ~= "other" and unit ~= "total" then
-			stats[unit .. "_kills"] = {
-				type = "int",
-				value = data.count
-			}
-			stats[unit .. "_headshots"] = {
-				type = "int",
-				value = data.head_shots
-			}
-			stats[unit .. "_tied"] = {
-				type = "int",
-				value = data.tied
-			}
-			stats[unit .. "_melee"] = {
-				type = "int",
-				value = data.melee
-			}
-		end
-	end
-	local civ_kills = session.killed.civilian.count + session.killed.civilian_female.count
-	local civ_headshots = session.killed.civilian.head_shots + session.killed.civilian_female.head_shots
-	local civ_tied = session.killed.civilian.tied + session.killed.civilian_female.tied
-	local civ_melee = session.killed.civilian.melee + session.killed.civilian_female.melee
-	stats.civilian_kills = {type = "int", value = civ_kills}
-	stats.civilian_tied = {type = "int", value = civ_tied}
-	stats.civilian_melee = {type = "int", value = civ_melee}
-	stats.civilian_headshots = {type = "int", value = civ_headshots}
-	local downs = session.downed.bleed_out + session.downed.incapacitated
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "plays"] = {type = "int", value = 1}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "wins"] = {
+	local current_level = managers.experience:current_level()
+	stats.player_level = {
 		type = "int",
-		value = success and 1 or 0
+		method = "set",
+		value = current_level
 	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "shots"] = {
-		type = "int",
-		value = session.shots_fired.total
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "shots_per_minute"] = {
-		type = "avgrate",
-		value = session.shots_fired.total / session_time_minutes,
-		hours = session_time
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "kills"] = {
-		type = "int",
-		value = session.killed.total.count
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "kills_per_minute"] = {
-		type = "avgrate",
-		value = session.killed.total.count / session_time_minutes,
-		hours = session_time
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "accuracy"] = {
-		type = "avgrate",
-		value = 0 < session.shots_fired.total and session.shots_fired.hits / session.shots_fired.total * 100 or 0,
-		hours = session_time
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "health_lost"] = {
-		type = "int",
-		value = session.health.amount_lost
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "health_lost_per_minute"] = {
-		type = "avgrate",
-		value = session.health.amount_lost / session_time_minutes,
-		hours = session_time
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "downs"] = {type = "int", value = downs}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "downs_per_minute"] = {
-		type = "avgrate",
-		value = downs / session_time_minutes,
-		hours = session_time
-	}
-	if success and not managers.statistics:is_dropin() then
-		stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "time"] = {
+	for i = 0, 100, 10 do
+		stats["player_level_" .. i] = {
 			type = "int",
-			method = "lowest",
-			value = session_time_seconds
+			method = "set",
+			value = 0
 		}
 	end
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "custody"] = {
-		type = "int",
-		value = session.misc.in_custody or 0
-	}
-	stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "cash"] = {
-		type = "int",
-		value = session.misc.cash or 0
-	}
-	stats.current_level = {
+	local level_range = 100 <= current_level and 100 or math.floor(current_level / 10) * 10
+	stats["player_level_" .. level_range] = {
 		type = "int",
 		method = "set",
-		value = managers.experience._global.level
+		value = 1
 	}
-	stats.current_assault = {
+	local current_cash = managers.money:offshore()
+	stats.player_cash = {
 		type = "int",
 		method = "set",
-		value = managers.upgrades._global.progress[1]
+		value = current_cash
 	}
-	stats.current_sharpshooter = {
+	local cash_found = false
+	local cash_amount = 1000000000
+	current_cash = current_cash / 1000
+	for i = 0, 9 do
+		if not cash_found and cash_amount <= current_cash then
+			stats["player_cash_" .. cash_amount .. "k"] = {
+				type = "int",
+				method = "set",
+				value = 1
+			}
+			cash_found = true
+		else
+			stats["player_cash_" .. cash_amount .. "k"] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
+		cash_amount = cash_amount / 10
+	end
+	stats.player_cash_0k = {
 		type = "int",
 		method = "set",
-		value = managers.upgrades._global.progress[2]
+		value = cash_found and 0 or 1
 	}
-	stats.current_support = {
-		type = "int",
-		method = "set",
-		value = managers.upgrades._global.progress[3]
-	}
-	stats["plays_" .. managers.criminals:local_character_name()] = {type = "int", value = 1}
-	stats.total_accuracy = {
-		type = "avgrate",
-		value = 0 < session.shots_fired.total and session.shots_fired.hits / session.shots_fired.total * 100 or 0,
-		hours = session_time
-	}
-	stats.allies_revived = {
-		type = "int",
-		value = session.revives.npc_count + session.revives.player_count
-	}
-	stats.allies_traded = {
-		type = "int",
-		value = session.misc.trade or 0
-	}
-	stats.deployed_medic = {
-		type = "int",
-		value = session.misc.deploy_medic or 0
-	}
-	stats.deployed_ammo = {
+	for weapon_name, weapon_data in pairs(session.shots_by_weapon) do
+		if 0 < weapon_data.total then
+			stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
+		end
+	end
+	stats.gadget_used_ammo_bag = {
 		type = "int",
 		value = session.misc.deploy_ammo or 0
 	}
-	stats.deployed_trip_mine = {
+	stats.gadget_used_doctor_bag = {
+		type = "int",
+		value = session.misc.deploy_medic or 0
+	}
+	stats.gadget_used_trip_mine = {
 		type = "int",
 		value = session.misc.deploy_trip or 0
 	}
-	stats.deployed_ecm_jammer = {
+	stats.gadget_used_sentry_gun = {
+		type = "int",
+		value = session.misc.deploy_sentry or 0
+	}
+	stats.gadget_used_ecm_jammer = {
 		type = "int",
 		value = session.misc.deploy_jammer or 0
 	}
-	managers.network.account:publish_statistics(stats, success)
+	stats["mask_used_" .. managers.blackmarket:equipped_mask().mask_id] = {type = "int", value = 1}
+	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
+	stats.heist_success = {
+		type = "int",
+		value = success and 1 or 0
+	}
+	stats.heist_failed = {
+		type = "int",
+		value = not success and 1 or 0
+	}
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:publish_skills_to_steam()
+	if Application:editor() then
+		return
+	end
+	local stats = {}
+	local skill_amount = {}
+	local skill_data = tweak_data.skilltree.trees
+	for tree_index, tree in ipairs(skill_data) do
+		skill_amount[tree_index] = 0
+		for _, tier in ipairs(tree.tiers) do
+			for _, skill in ipairs(tier) do
+				local skill_points = managers.skilltree:next_skill_step(skill)
+				local skill_bought = 1 < skill_points and 1 or 0
+				local skill_aced = 2 < skill_points and 1 or 0
+				stats["skill_" .. tree.skill .. "_" .. skill] = {
+					type = "int",
+					method = "set",
+					value = skill_bought
+				}
+				stats["skill_" .. tree.skill .. "_" .. skill .. "_ace"] = {
+					type = "int",
+					method = "set",
+					value = skill_aced
+				}
+				skill_amount[tree_index] = skill_amount[tree_index] + skill_bought + skill_aced
+			end
+		end
+	end
+	for tree_index, tree in ipairs(skill_data) do
+		stats["skill_" .. tree.skill] = {
+			type = "int",
+			method = "set",
+			value = skill_amount[tree_index]
+		}
+		for i = 0, 35, 5 do
+			stats["skill_" .. tree.skill .. "_" .. i] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
+		stats["skill_" .. tree.skill .. "_" .. math.ceil(skill_amount[tree_index] / 5) * 5] = {
+			type = "int",
+			method = "set",
+			value = 1
+		}
+	end
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:clear_statistics()
+	local stats = {}
+	stats.player_time = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	local play_times = {
+		1000,
+		500,
+		250,
+		200,
+		150,
+		100,
+		80,
+		40,
+		20,
+		10,
+		0
+	}
+	for _, play_time in ipairs(play_times) do
+		stats["player_time_" .. play_time .. "h"] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats.player_level = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	for i = 0, 100, 10 do
+		stats["player_level_" .. i] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats.player_cash = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	local cash_amount = 1000000000
+	for i = 0, 9 do
+		stats["player_cash_" .. cash_amount .. "k"] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+		cash_amount = cash_amount / 10
+	end
+	stats.player_cash_0k = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	for weapon_name, weapon in pairs(tweak_data.weapon) do
+		if weapon.autohit then
+			stats["weapon_used_" .. weapon_name] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
+	end
+	stats.gadget_used_ammo_bag = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.gadget_used_doctor_bag = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.gadget_used_trip_mine = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.gadget_used_sentry_gun = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.gadget_used_ecm_jammer = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	for mask_name, mask in pairs(tweak_data.blackmarket.masks) do
+		stats["mask_used_" .. mask_name] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	for _, difficulty in pairs(tweak_data.difficulties) do
+		stats["difficulty_" .. difficulty] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats.heist_success = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.heist_failed = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:clear_skills_statistics()
+	local stats = {}
+	local skill_data = tweak_data.skilltree.trees
+	for tree_index, tree in ipairs(skill_data) do
+		for _, tier in ipairs(tree.tiers) do
+			for _, skill in ipairs(tier) do
+				stats["skill_" .. tree.skill .. "_" .. skill] = {
+					type = "int",
+					method = "set",
+					value = 0
+				}
+				stats["skill_" .. tree.skill .. "_" .. skill .. "_ace"] = {
+					type = "int",
+					method = "set",
+					value = 0
+				}
+			end
+		end
+	end
+	for tree_index, tree in ipairs(skill_data) do
+		stats["skill_" .. tree.skill] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+		for i = 0, 35, 5 do
+			stats["skill_" .. tree.skill .. "_" .. i] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
+	end
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:debug_print_stats(global_flag, day)
+	local key
+	local stats = {}
+	local account = managers.network.account
+	day = day or 1
+	table.insert(stats, {
+		name = "player_time",
+		loc = account:get_stat("player_time"),
+		glo = account:get_global_stat("player_time", day)
+	})
+	local play_times = {
+		0,
+		10,
+		20,
+		40,
+		80,
+		100,
+		150,
+		200,
+		250,
+		500,
+		1000
+	}
+	for _, play_time in ipairs(play_times) do
+		key = "player_time_" .. play_time .. "h"
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+	end
+	table.insert(stats, {
+		name = "player_level",
+		loc = account:get_stat("player_level"),
+		glo = account:get_global_stat("player_level", day)
+	})
+	for i = 0, 100, 10 do
+		key = "player_level_" .. i
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+	end
+	table.insert(stats, {
+		name = "player_cash",
+		loc = account:get_stat("player_cash"),
+		glo = account:get_global_stat("player_cash", day)
+	})
+	table.insert(stats, {
+		name = "player_cash_0k",
+		loc = account:get_stat("player_cash_0k"),
+		glo = account:get_global_stat("player_cash_0k", day)
+	})
+	local cash_amount = 1
+	for i = 0, 9 do
+		key = "player_cash_" .. cash_amount .. "k"
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+		cash_amount = cash_amount * 10
+	end
+	local skill_data = tweak_data.skilltree.trees
+	for tree_index, tree in ipairs(skill_data) do
+		for _, tier in ipairs(tree.tiers) do
+			for _, skill in ipairs(tier) do
+				key = "skill_" .. tree.skill .. "_" .. skill
+				table.insert(stats, {
+					name = key,
+					loc = account:get_stat(key),
+					glo = account:get_global_stat(key, day)
+				})
+				key = "skill_" .. tree.skill .. "_" .. skill .. "_ace"
+				table.insert(stats, {
+					name = key,
+					loc = account:get_stat(key),
+					glo = account:get_global_stat(key, day)
+				})
+			end
+		end
+	end
+	for tree_index, tree in ipairs(skill_data) do
+		key = "skill_" .. tree.skill
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+		for i = 0, 35, 5 do
+			key = "skill_" .. tree.skill .. "_" .. i
+			table.insert(stats, {
+				name = key,
+				loc = account:get_stat(key),
+				glo = account:get_global_stat(key, day)
+			})
+		end
+	end
+	for weapon_name, weapon in pairs(tweak_data.weapon) do
+		if weapon.autohit then
+			key = "weapon_used_" .. weapon_name
+			table.insert(stats, {
+				name = key,
+				loc = account:get_stat(key),
+				glo = account:get_global_stat(key, day)
+			})
+		end
+	end
+	table.insert(stats, {
+		name = "gadget_used_ammo_bag",
+		loc = account:get_stat("gadget_used_ammo_bag"),
+		glo = account:get_global_stat("gadget_used_ammo_bag", day)
+	})
+	table.insert(stats, {
+		name = "gadget_used_doctor_bag",
+		loc = account:get_stat("gadget_used_doctor_bag"),
+		glo = account:get_global_stat("gadget_used_doctor_bag", day)
+	})
+	table.insert(stats, {
+		name = "gadget_used_trip_mine",
+		loc = account:get_stat("gadget_used_trip_mine"),
+		glo = account:get_global_stat("gadget_used_trip_mine", day)
+	})
+	table.insert(stats, {
+		name = "gadget_used_sentry_gun",
+		loc = account:get_stat("gadget_used_sentry_gun"),
+		glo = account:get_global_stat("gadget_used_sentry_gun", day)
+	})
+	table.insert(stats, {
+		name = "gadget_used_ecm_jammer",
+		loc = account:get_stat("gadget_used_ecm_jammer"),
+		glo = account:get_global_stat("gadget_used_ecm_jammer", day)
+	})
+	for mask_name, mask in pairs(tweak_data.blackmarket.masks) do
+		key = "mask_used_" .. mask_name
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+	end
+	for _, difficulty in pairs(tweak_data.difficulties) do
+		key = "difficulty_" .. difficulty
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, day)
+		})
+	end
+	table.insert(stats, {
+		name = "heist_success",
+		loc = account:get_stat("heist_success"),
+		glo = account:get_global_stat("heist_success", day)
+	})
+	table.insert(stats, {
+		name = "heist_failed",
+		loc = account:get_stat("heist_failed"),
+		glo = account:get_global_stat("heist_failed", day)
+	})
+	print("----------------------------------")
+	print((global_flag and "GLOBAL" or "LOCAL") .. " STEAM STATISTICS\n")
+	for key, data in pairs(stats) do
+		print(data.name, global_flag and data.glo or data.loc)
+	end
+	print("----------------------------------")
 end
 
 function StatisticsManager:_calculate_average()
@@ -1142,7 +1492,9 @@ function StatisticsManager:save(data)
 		killed_by_weapon = self._global.killed_by_weapon,
 		shots_by_weapon = self._global.shots_by_weapon,
 		health = self._global.health,
-		misc = self._global.misc
+		misc = self._global.misc,
+		play_time = self._global.play_time,
+		stat_date = self._global.stat_date
 	}
 	data.StatisticsManager = state
 end

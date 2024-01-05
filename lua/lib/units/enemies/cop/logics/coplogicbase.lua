@@ -905,15 +905,15 @@ function CopLogicBase._get_logic_state_from_reaction(data, reaction)
 	end
 	local police_is_being_called = managers.groupai:state():chk_enemy_calling_in_area(managers.groupai:state():get_area_from_nav_seg_id(data.unit:movement():nav_tracker():nav_segment()), data.key)
 	if not reaction or reaction <= AIAttentionObject.REACT_SCARED then
-		if not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() then
+		if not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted then
 			return "arrest"
 		elseif data.unit:movement():cool() then
 		else
 			return "idle"
 		end
-	elseif reaction == AIAttentionObject.REACT_ARREST then
+	elseif reaction == AIAttentionObject.REACT_ARREST and not data.is_converted then
 		return "arrest"
-	elseif not data.char_tweak.no_arrest and not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and (not (data.attention_obj and data.attention_obj.verified) or not (data.attention_obj.dis < 1500)) then
+	elseif not data.char_tweak.no_arrest and not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted and (not (data.attention_obj and data.attention_obj.verified) or not (data.attention_obj.dis < 1500)) then
 		return "arrest"
 	else
 		return "attack"

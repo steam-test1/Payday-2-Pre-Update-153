@@ -210,6 +210,7 @@ function PlayerEquipment:use_sentry_gun(selected_index)
 		local pos = ray.position
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
+		managers.statistics:use_sentry_gun()
 		local ammo_multiplier = managers.player:upgrade_value("sentry_gun", "extra_ammo_multiplier", 1)
 		local armor_multiplier = managers.player:upgrade_value("sentry_gun", "armor_multiplier", 1)
 		local damage_multiplier = managers.player:upgrade_value("sentry_gun", "damage_multiplier", 1)

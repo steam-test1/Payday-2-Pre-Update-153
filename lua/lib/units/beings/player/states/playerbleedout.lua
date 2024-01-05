@@ -212,7 +212,7 @@ function PlayerBleedOut:call_civilian(line, t, no_gesture, skip_alert, revive_SO
 	if not managers.player:has_category_upgrade("player", "civilian_reviver") or revive_SO_data and revive_SO_data.sympathy_civ then
 		return
 	end
-	local detect_only = managers.statistics:session_total_civilian_kills() > 0
+	local detect_only = false
 	local voice_type, plural, prime_target = self:_get_unit_intimidation_action(false, true, false, false, false, 0, true, detect_only)
 	if prime_target then
 		if detect_only then

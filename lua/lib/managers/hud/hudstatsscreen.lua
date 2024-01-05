@@ -1,7 +1,6 @@
 HUDStatsScreen = HUDStatsScreen or class()
 
 function HUDStatsScreen:init()
-	self._hud_panel = managers.hud:script(managers.hud.STATS_SCREEN_SAFERECT).panel
 	self._full_hud_panel = managers.hud:script(managers.hud.STATS_SCREEN_FULLSCREEN).panel
 	self._full_hud_panel:clear()
 	local left_panel = self._full_hud_panel:panel({

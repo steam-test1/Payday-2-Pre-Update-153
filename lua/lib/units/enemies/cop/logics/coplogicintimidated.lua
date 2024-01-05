@@ -41,7 +41,7 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	if my_data ~= data.internal_data then
 		return
 	end
-	data.unit:brain():set_attention_settings({peaceful = true})
+	data.unit:brain():set_attention_settings({corpse_sneak = true})
 	managers.groupai:state():register_rescueable_hostage(data.unit, nil)
 end
 

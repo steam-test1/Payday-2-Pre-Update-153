@@ -49,7 +49,7 @@ function GenericDialog:mouse_moved(o, x, y)
 	if self._panel_script:moved_scroll_bar(x, y) then
 		return
 	end
-	x, y = managers.mouse_pointer:convert_fullscreen_mouse_pos(x, y)
+	local x, y = managers.mouse_pointer:convert_1280_mouse_pos(x, y)
 	for i, panel in ipairs(self._panel_script._text_box_buttons_panel:children()) do
 		if panel.child and panel:inside(x, y) then
 			self._panel_script:set_focus_button(i)
@@ -59,7 +59,7 @@ end
 
 function GenericDialog:mouse_pressed(o, button, x, y)
 	if button == Idstring("0") then
-		local x, y = managers.mouse_pointer:convert_fullscreen_mouse_pos(x, y)
+		local x, y = managers.mouse_pointer:convert_1280_mouse_pos(x, y)
 		if self._panel_script:check_grab_scroll_bar(x, y) then
 			return
 		end
@@ -114,9 +114,9 @@ function GenericDialog:update(t, dt)
 	if managers.menu_component then
 		local x, y = managers.menu_component:get_right_controller_axis()
 		if 0 < y then
-			self._panel_script:scroll_up(y * 2)
+			self._panel_script:scroll_up(y * 4)
 		elseif y < 0 then
-			self._panel_script:scroll_down(math.abs(y) * 2)
+			self._panel_script:scroll_down(math.abs(y) * 4)
 		end
 	end
 end

@@ -721,6 +721,186 @@ function NarrativeTweakData:init()
 	self.jobs.safehouse.briefing_event = nil
 	self.jobs.safehouse.debrief_event = nil
 	self.jobs.safehouse.crimenet_callouts = {}
+	self.jobs.arm_cro = {}
+	self.jobs.arm_cro.name_id = "heist_arm"
+	self.jobs.arm_cro.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_cro.contact = "bain"
+	self.jobs.arm_cro.region = "street"
+	self.jobs.arm_cro.jc = 40
+	self.jobs.arm_cro.chain = {
+		{
+			level_id = "arm_cro",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_cro.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_cro.debrief_event = nil
+	self.jobs.arm_cro.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_cro.crimenet_videos = nil
+	self.jobs.arm_cro_prof = deep_clone(self.jobs.arm_cro)
+	self.jobs.arm_cro_prof.jc = 40
+	self.jobs.arm_cro_prof.professional = true
+	self.jobs.arm_cro_prof.region = "professional"
+	self.jobs.arm_und = {}
+	self.jobs.arm_und.name_id = "heist_arm"
+	self.jobs.arm_und.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_und.contact = "bain"
+	self.jobs.arm_und.region = "street"
+	self.jobs.arm_und.jc = 40
+	self.jobs.arm_und.chain = {
+		{
+			level_id = "arm_und",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_und.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_und.debrief_event = nil
+	self.jobs.arm_und.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_und.crimenet_videos = nil
+	self.jobs.arm_und_prof = deep_clone(self.jobs.arm_und)
+	self.jobs.arm_und_prof.jc = 40
+	self.jobs.arm_und_prof.professional = true
+	self.jobs.arm_und_prof.region = "professional"
+	self.jobs.arm_bri = {}
+	self.jobs.arm_bri.name_id = "heist_arm"
+	self.jobs.arm_bri.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_bri.contact = "bain"
+	self.jobs.arm_bri.region = "street"
+	self.jobs.arm_bri.jc = 40
+	self.jobs.arm_bri.chain = {
+		{
+			level_id = "arm_bri",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_bri.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_bri.debrief_event = nil
+	self.jobs.arm_bri.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_bri.crimenet_videos = nil
+	self.jobs.arm_bri_prof = deep_clone(self.jobs.arm_bri)
+	self.jobs.arm_bri_prof.jc = 40
+	self.jobs.arm_bri_prof.professional = true
+	self.jobs.arm_bri_prof.region = "professional"
+	self.jobs.arm_hcm = {}
+	self.jobs.arm_hcm.name_id = "heist_arm"
+	self.jobs.arm_hcm.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_hcm.contact = "bain"
+	self.jobs.arm_hcm.region = "street"
+	self.jobs.arm_hcm.jc = 40
+	self.jobs.arm_hcm.chain = {
+		{
+			level_id = "arm_hcm",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_hcm.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_hcm.debrief_event = nil
+	self.jobs.arm_hcm.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_hcm.crimenet_videos = nil
+	self.jobs.arm_hcm_prof = deep_clone(self.jobs.arm_hcm)
+	self.jobs.arm_hcm_prof.jc = 40
+	self.jobs.arm_hcm_prof.professional = true
+	self.jobs.arm_hcm_prof.region = "professional"
+	self.jobs.arm_par = {}
+	self.jobs.arm_par.name_id = "heist_arm"
+	self.jobs.arm_par.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_par.contact = "bain"
+	self.jobs.arm_par.region = "street"
+	self.jobs.arm_par.jc = 40
+	self.jobs.arm_par.chain = {
+		{
+			level_id = "arm_par",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_par.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_par.debrief_event = nil
+	self.jobs.arm_par.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_par.crimenet_videos = nil
+	self.jobs.arm_par_prof = deep_clone(self.jobs.arm_par)
+	self.jobs.arm_par_prof.jc = 40
+	self.jobs.arm_par_prof.professional = true
+	self.jobs.arm_par_prof.region = "professional"
+	self.jobs.arm_fac = {}
+	self.jobs.arm_fac.name_id = "heist_arm"
+	self.jobs.arm_fac.briefing_id = "heist_arm_crimenet"
+	self.jobs.arm_fac.contact = "bain"
+	self.jobs.arm_fac.region = "street"
+	self.jobs.arm_fac.jc = 40
+	self.jobs.arm_fac.chain = {
+		{
+			level_id = "arm_fac",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {4},
+			briefing_dialog = nil
+		}
+	}
+	self.jobs.arm_fac.briefing_event = "pln_branchbank_random_brf_speak"
+	self.jobs.arm_fac.debrief_event = nil
+	self.jobs.arm_fac.crimenet_callouts = {
+		"pln_branchbank_random_cnc_01",
+		"pln_branchbank_random_cnc_02",
+		"pln_branchbank_random_cnc_03",
+		"pln_branchbank_random_cnc_04",
+		"pln_branchbank_random_cnc_05",
+		"pln_branchbank_random_cnc_06"
+	}
+	self.jobs.arm_fac.crimenet_videos = nil
+	self.jobs.arm_fac_prof = deep_clone(self.jobs.arm_fac)
+	self.jobs.arm_fac_prof.jc = 40
+	self.jobs.arm_fac_prof.professional = true
+	self.jobs.arm_fac_prof.region = "professional"
 	self.jobs.escape_chain_test = {}
 	self.jobs.escape_chain_test.name_id = "heist_escape_chain_test"
 	self.jobs.escape_chain_test.briefing_id = "heist_escape_chain_test_briefing"

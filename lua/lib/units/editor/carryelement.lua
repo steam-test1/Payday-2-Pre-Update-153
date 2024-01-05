@@ -24,7 +24,8 @@ function CarryUnitElement:_build_panel(panel, panel_sizer)
 			"freeze",
 			"secure",
 			"secure_silent",
-			"add_to_respawn"
+			"add_to_respawn",
+			"filter_only"
 		},
 		value = self._hed.operation,
 		tooltip = "Select the operation to be performed.",

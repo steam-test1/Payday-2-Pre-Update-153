@@ -159,6 +159,7 @@ function SkillTreeManager:unlock(tree, skill_id)
 	self:_spend_points(tree, tier, points)
 	self:_aquire_skill(skill, skill_id)
 	self:_on_skill_unlocked(tree, skill_id)
+	managers.statistics:publish_skills_to_steam()
 end
 
 function SkillTreeManager:_on_tier_unlocked(tree, tier)

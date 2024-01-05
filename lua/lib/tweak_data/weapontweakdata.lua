@@ -146,7 +146,7 @@ end
 function WeaponTweakData:_init_data_m14_sniper_npc()
 	self.m14_sniper_npc.sounds.prefix = "sniper_npc"
 	self.m14_sniper_npc.use_data.selection_index = 2
-	self.m14_sniper_npc.DAMAGE = 5.5
+	self.m14_sniper_npc.DAMAGE = 7
 	self.m14_sniper_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
 	self.m14_sniper_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
 	self.m14_sniper_npc.CLIP_AMMO_MAX = 6

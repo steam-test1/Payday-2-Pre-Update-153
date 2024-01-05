@@ -95,7 +95,7 @@ function CharacterTweakData:_init_fbi(presets)
 	self.fbi.surrender_break_time = {7, 12}
 	self.fbi.suppression = presets.suppression.easy
 	self.fbi.surrender = presets.surrender.normal
-	self.fbi.ecm_vulnerability = 0.6
+	self.fbi.ecm_vulnerability = 0.7
 	self.fbi.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -122,8 +122,8 @@ function CharacterTweakData:_init_swat(presets)
 	self.swat.move_speed = presets.move_speed.fast
 	self.swat.surrender_break_time = {6, 10}
 	self.swat.suppression = presets.suppression.hard_def
-	self.swat.surrender = presets.surrender.normal
-	self.swat.ecm_vulnerability = 0.4
+	self.swat.surrender = presets.surrender.hard
+	self.swat.ecm_vulnerability = 0.5
 	self.swat.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -149,8 +149,8 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.move_speed = presets.move_speed.fast
 	self.heavy_swat.surrender_break_time = {6, 8}
 	self.heavy_swat.suppression = presets.suppression.hard_agg
-	self.heavy_swat.surrender = presets.surrender.normal
-	self.heavy_swat.ecm_vulnerability = 0.2
+	self.heavy_swat.surrender = presets.surrender.hard
+	self.heavy_swat.ecm_vulnerability = 0.35
 	self.heavy_swat.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -176,7 +176,7 @@ function CharacterTweakData:_init_fbi_swat(presets)
 	self.fbi_swat.move_speed = presets.move_speed.very_fast
 	self.fbi_swat.surrender_break_time = {6, 10}
 	self.fbi_swat.suppression = presets.suppression.hard_def
-	self.fbi_swat.surrender = presets.surrender.normal
+	self.fbi_swat.surrender = presets.surrender.hard
 	self.fbi_swat.ecm_vulnerability = 0.4
 	self.fbi_swat.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
@@ -203,8 +203,8 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.move_speed = presets.move_speed.fast
 	self.fbi_heavy_swat.surrender_break_time = {6, 8}
 	self.fbi_heavy_swat.suppression = presets.suppression.hard_agg
-	self.fbi_heavy_swat.surrender = presets.surrender.normal
-	self.fbi_heavy_swat.ecm_vulnerability = 0.2
+	self.fbi_heavy_swat.surrender = presets.surrender.hard
+	self.fbi_heavy_swat.ecm_vulnerability = 0.25
 	self.fbi_heavy_swat.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -257,7 +257,7 @@ function CharacterTweakData:_init_gangster(presets)
 	self.gangster.suspicious = nil
 	self.gangster.suppression = presets.suppression.easy
 	self.gangster.surrender = nil
-	self.gangster.ecm_vulnerability = 0.7
+	self.gangster.ecm_vulnerability = 0.75
 	self.gangster.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -268,6 +268,7 @@ function CharacterTweakData:_init_gangster(presets)
 	self.gangster.speech_prefix_p1 = "l"
 	self.gangster.speech_prefix_p2 = "n"
 	self.gangster.speech_prefix_count = 4
+	self.gangster.silent_priority_shout = "Dia_10"
 	self.gangster.access = "gangster"
 	self.gangster.rescue_hostages = false
 	self.gangster.use_radio = nil
@@ -559,17 +560,83 @@ end
 function CharacterTweakData:_init_taser(presets)
 	self.taser = deep_clone(presets.base)
 	self.taser.experience = {}
-	self.taser.weapon = deep_clone(presets.weapon.normal)
-	self.taser.weapon.m4.tase_distance = 1200
-	self.taser.weapon.m4.aim_delay_tase = {0, 0.1}
+	self.taser.weapon = {
+		m4 = {
+			aim_delay = {0.1, 0.1},
+			focus_delay = 10,
+			focus_dis = 200,
+			spread = 20,
+			miss_dis = 40,
+			RELOAD_SPEED = 1,
+			melee_speed = 0.9,
+			melee_dmg = 6,
+			tase_distance = 1200,
+			aim_delay_tase = {0, 0.1},
+			range = {
+				close = 1000,
+				optimal = 2000,
+				far = 5000
+			},
+			FALLOFF = {
+				{
+					r = 500,
+					acc = {0.5, 0.9},
+					dmg_mul = 2.5,
+					recoil = {0.45, 0.8},
+					mode = {
+						0,
+						3,
+						3,
+						1
+					}
+				},
+				{
+					r = 1000,
+					acc = {0.3, 0.8},
+					dmg_mul = 1.2,
+					recoil = {0.35, 0.75},
+					mode = {
+						1,
+						2,
+						2,
+						0
+					}
+				},
+				{
+					r = 2000,
+					acc = {0.25, 0.5},
+					dmg_mul = 1,
+					recoil = {0.4, 1.2},
+					mode = {
+						3,
+						2,
+						2,
+						0
+					}
+				},
+				{
+					r = 3000,
+					acc = {0.01, 0.35},
+					dmg_mul = 1,
+					recoil = {1.5, 3},
+					mode = {
+						3,
+						1,
+						1,
+						0
+					}
+				}
+			}
+		}
+	}
 	self.taser.detection = presets.detection.normal
-	self.taser.HEALTH_INIT = 36
-	self.taser.headshot_dmg_mul = self.taser.HEALTH_INIT / 8
+	self.taser.HEALTH_INIT = 54
+	self.taser.headshot_dmg_mul = self.taser.HEALTH_INIT / 16
 	self.taser.move_speed = presets.move_speed.fast
 	self.taser.no_retreat = true
 	self.taser.no_arrest = true
-	self.taser.surrender = presets.surrender.normal
-	self.taser.ecm_vulnerability = 0.1
+	self.taser.surrender = presets.surrender.special
+	self.taser.ecm_vulnerability = 0.2
 	self.taser.ecm_hurts = {
 		ears = {min_duration = 1, max_duration = 3}
 	}
@@ -2029,7 +2096,7 @@ function CharacterTweakData:_presets(tweak_data)
 			r = 2500,
 			acc = {0, 0.6},
 			dmg_mul = 1,
-			recoil = {1, 3.5},
+			recoil = {2, 4},
 			mode = {
 				1,
 				0,
@@ -2956,9 +3023,9 @@ function CharacterTweakData:_presets(tweak_data)
 		reasons = {
 			health = {
 				[1] = 0,
-				[0.5] = 0.5
+				[0.35] = 0.5
 			},
-			weapon_down = 0.1,
+			weapon_down = 0.2,
 			pants_down = 0.25
 		},
 		factors = {

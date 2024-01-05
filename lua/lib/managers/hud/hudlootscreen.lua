@@ -549,7 +549,7 @@ function HUDLootScreen:texture_loaded_clbk(params, texture_idstring)
 	local peer_id = params[1]
 	local is_pattern = params[2]
 	local panel = self._peers_panel:child("peer" .. tostring(peer_id)):child("item")
-	local item = panel:bitmap({texture = texture_idstring, blend_mode = "add"})
+	local item = panel:bitmap({texture = texture_idstring, blend_mode = "normal"})
 	TextureCache:unretrieve(texture_idstring)
 	if is_pattern then
 		item:set_render_template(Idstring("VertexColorTexturedPatterns"))

@@ -94,6 +94,14 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
 		}
 	}
+	self.atm = {}
+	self.atm.devices = {}
+	self.atm.devices.ecm = {
+		{
+			align = "a_ecm_hack",
+			unit = Idstring("units/payday2/props/gen_prop_bank_atm_standing/gen_prop_bank_atm_jammer")
+		}
+	}
 	self.safe_small = {}
 	self.safe_small.devices = {}
 	self.safe_small.devices.drill = {

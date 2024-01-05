@@ -135,7 +135,7 @@ function TradeManager:update(t, dt)
 			end
 		end
 	end
-	if not (self._trade_countdown and Network:is_server() and not self._trading_hostage and not self._hostage_trade_clbk and #self._criminals_to_respawn > 0 and not Global.game_settings.single_player and self:get_criminal_to_trade()) or 0 >= managers.groupai:state():hostage_count() then
+	if not (self._trade_countdown and Network:is_server() and not self._trading_hostage and not self._hostage_trade_clbk and #self._criminals_to_respawn > 0 and not Global.game_settings.single_player and not managers.groupai:state():whisper_mode() and self:get_criminal_to_trade()) or 0 >= managers.groupai:state():hostage_count() then
 	else
 		self._cancel_trade = nil
 		local respawn_t = self._t + math.random(2, 5)

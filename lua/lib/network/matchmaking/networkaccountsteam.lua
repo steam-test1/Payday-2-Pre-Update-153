@@ -156,25 +156,19 @@ end
 
 function NetworkAccountSTEAM._on_stats_stored(status)
 	print("[NetworkAccountSTEAM:_on_stats_stored] Statistics stored, ", status, ". Publishing leaderboard score to Steam!")
-	local leaderboard_to_publish = managers.network.account._leaderboard_to_publish
-	if not leaderboard_to_publish then
-		return
-	end
-	local diff_id = leaderboard_to_publish[1]
-	local lvl_id = leaderboard_to_publish[2]
-	local diff_name = NetworkAccountSTEAM.lb_diffs[diff_id]
-	local lvl_name = NetworkAccountSTEAM.lb_levels[lvl_id]
-	Steam:lb_handler():register_mappings({
-		[lvl_name .. ": " .. diff_name] = diff_id .. "_" .. lvl_id .. "_time"
-	})
-	managers.network.account._leaderboard_to_publish = nil
 end
 
-function NetworkAccountSTEAM:publish_statistics(stats, success)
-	repeat
-		break -- pseudo-goto
-	until true
-	if managers.dlc:is_trial() then
+function NetworkAccountSTEAM:get_stat(key)
+	return Steam:sa_handler():get_stat(key)
+end
+
+function NetworkAccountSTEAM:get_global_stat(key, day)
+	local global_stat = Steam:sa_handler():get_global_stat(key, 60)
+	return global_stat[day]
+end
+
+function NetworkAccountSTEAM:publish_statistics(stats)
+	if managers.dlc:is_trial() or Application:production_build() then
 		return
 	end
 	local handler = Steam:sa_handler()
@@ -182,12 +176,6 @@ function NetworkAccountSTEAM:publish_statistics(stats, success)
 	if not handler:initialized() then
 		print("[NetworkAccountSTEAM:publish_statistics] Error, SA handler not initialized! Not sending stats.")
 		return
-	end
-	if success and not managers.statistics:is_dropin() then
-		self._leaderboard_to_publish = {
-			Global.game_settings.difficulty,
-			Global.level_data.level_id
-		}
 	end
 	local err = false
 	for key, stat in pairs(stats) do
@@ -233,10 +221,6 @@ function NetworkAccountSTEAM:publish_statistics(stats, success)
 			Application:error("[NetworkAccountSTEAM:publish_statistics] Error, could not set stat " .. key)
 			err = true
 		end
-	end
-	if Application:production_build() then
-		self._leaderboard_to_publish = nil
-		return
 	end
 	if not err then
 		handler:store_data()

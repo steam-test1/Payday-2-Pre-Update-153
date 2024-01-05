@@ -550,6 +550,12 @@ function TweakData:init()
 		category = "ecm_jammer",
 		upgrade = "can_open_sec_doors"
 	}
+	self.interaction.requires_ecm_jammer_atm = deep_clone(self.interaction.requires_ecm_jammer)
+	self.interaction.requires_ecm_jammer_atm.timer = 8
+	self.interaction.requires_ecm_jammer_atm.requires_upgrade = {
+		category = "ecm_jammer",
+		upgrade = "affects_cameras"
+	}
 	self.interaction.weapon_cache_drop_zone = {}
 	self.interaction.weapon_cache_drop_zone.icon = "equipment_vial"
 	self.interaction.weapon_cache_drop_zone.text_id = "debug_interact_hospital_veil_container"
@@ -1983,9 +1989,9 @@ function TweakData:init()
 	}
 	self.experience_manager.stage_failed_multiplier = 0.15
 	self.experience_manager.difficulty_multiplier = {
-		2,
-		4,
-		8
+		1.5,
+		3.5,
+		7
 	}
 	self.experience_manager.alive_humans_multiplier = {
 		1,
@@ -1997,35 +2003,35 @@ function TweakData:init()
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
 	self.experience_manager.level_limit.pc_difference_multipliers = {
-		1,
 		0.9,
-		0.72,
-		0.504,
-		0.3024,
-		0.1512,
-		0.06048,
-		0.018144,
-		0.0036288,
-		3.6288E-4
+		0.8,
+		0.7,
+		0.6,
+		0.5,
+		0.4,
+		0.3,
+		0.2,
+		0.1,
+		0.01
 	}
 	self.experience_manager.civilians_killed = 0
 	self.experience_manager.day_multiplier = {
 		1,
-		1.1,
-		1.2,
-		1.3,
-		1.4,
-		1.5,
-		1.6
+		2,
+		3,
+		4,
+		5,
+		6,
+		7
 	}
 	self.experience_manager.pro_day_multiplier = {
 		1,
-		1.5,
-		2,
 		2.5,
-		3,
-		3.5,
-		4
+		4,
+		5.5,
+		7,
+		8.5,
+		10
 	}
 	self.experience_manager.total_level_objectives = 500
 	self.experience_manager.total_criminals_finished = 50
@@ -2821,6 +2827,13 @@ function TweakData:get_controller_help_coords()
 			align = "right",
 			vertical = "top"
 		}
+		if SystemInfo:platform() == Idstring("WIN32") then
+			coords.menu_button_push_to_talk = {
+				x = 0,
+				y = 200,
+				align = "right"
+			}
+		end
 	end
 	if managers.user and managers.user:get_setting("southpaw") then
 		local tmp = coords.menu_button_move

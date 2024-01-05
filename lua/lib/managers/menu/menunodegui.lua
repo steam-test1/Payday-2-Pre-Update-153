@@ -1030,7 +1030,7 @@ function MenuNodeGui:_text_item_part(row_item, panel, align_x, text_align)
 		halign = "left",
 		vertical = "center",
 		font = row_item.font,
-		color = row_item.color,
+		color = row_item.item:parameters().color or row_item.color,
 		layer = self.layers.items,
 		blend_mode = self.row_item_blend_mode or "normal",
 		text = row_item.to_upper and utf8.to_upper(row_item.text) or row_item.text,

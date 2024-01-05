@@ -478,6 +478,7 @@ function HUDManager:_create_teammates_panel(hud)
 		name = "teammates_panel",
 		h = h,
 		y = hud.panel:h() - h,
+		halign = "grow",
 		valign = "bottom"
 	})
 	local teammate_w = 204
@@ -604,9 +605,13 @@ function HUDManager:hide_casing()
 	self._hud_assault_corner:hide_casing()
 end
 
+function HUDManager:_additional_layout()
+	self:_setup_stats_screen()
+end
+
 function HUDManager:_setup_stats_screen()
 	print("HUDManager:_setup_stats_screen")
-	if not self:alive(PlayerBase.PLAYER_INFO_HUD_PD2) then
+	if not self:alive(self.STATS_SCREEN_FULLSCREEN) then
 		return
 	end
 	self._hud_statsscreen = HUDStatsScreen:new()

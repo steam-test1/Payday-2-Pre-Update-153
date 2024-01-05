@@ -12,6 +12,17 @@ function JobManager:_setup()
 end
 
 function JobManager:on_retry_job_stage()
+	self:_on_retry_job_stage()
+	if managers.network:session() then
+		managers.network:session():send_to_peers_synched("sync_on_retry_job_stage")
+	end
+end
+
+function JobManager:synced_on_retry_job_stage()
+	self:_on_retry_job_stage()
+end
+
+function JobManager:_on_retry_job_stage()
 	self._global.next_alternative_stage = nil
 	self._global.next_interupt_stage = nil
 end
@@ -29,6 +40,7 @@ function JobManager:alternative_stage()
 end
 
 function JobManager:synced_interupt_stage(interupt)
+	self._global.next_interupt_stage = nil
 	self._global.interupt_stage = interupt
 end
 
@@ -79,6 +91,16 @@ function JobManager:on_last_stage()
 	if not self._global.current_job then
 		return false
 	end
+	if self._global.next_interupt_stage then
+		return false
+	end
+	return self._global.current_job.current_stage == self._global.current_job.stages
+end
+
+function JobManager:_on_last_stage()
+	if not self._global.current_job then
+		return false
+	end
 	return self._global.current_job.current_stage == self._global.current_job.stages
 end
 
@@ -86,7 +108,14 @@ function JobManager:is_job_finished()
 	if not self._global.current_job then
 		return false
 	end
+	if self._global.interupt_stage then
+		return false
+	end
 	return self._global.current_job.last_completed_stage == self._global.current_job.stages
+end
+
+function JobManager:skip_money()
+	return self._global.next_interupt_stage and true or false
 end
 
 function JobManager:next_stage()
@@ -94,7 +123,8 @@ function JobManager:next_stage()
 		return
 	end
 	self._global.current_job.last_completed_stage = self._global.current_job.current_stage
-	if self:is_job_finished() then
+	self._global.interupt_stage = nil
+	if self:is_job_finished() and not self._global.next_interupt_stage then
 		self:_check_add_to_cooldown()
 		managers.achievment:award("no_turning_back")
 		return
@@ -188,6 +218,26 @@ function JobManager:current_mission()
 	return self:current_stage_data().mission or "none"
 end
 
+function JobManager:current_briefing_dialog()
+	if not self._global.current_job then
+		return
+	end
+	if self._global.interupt_stage then
+		return managers.job:current_level_data().briefing_dialog
+	end
+	return managers.job:current_stage_data().briefing_dialog or managers.job:current_level_data().briefing_dialog
+end
+
+function JobManager:current_briefing_id()
+	if not self._global.current_job then
+		return
+	end
+	if self._global.interupt_stage then
+		return managers.job:current_level_data().briefing_id
+	end
+	return managers.job:current_stage_data().briefing_id or managers.job:current_level_data().briefing_id
+end
+
 function JobManager:current_mission_filter()
 	if not self._global.current_job then
 		return
@@ -240,6 +290,13 @@ function JobManager:stage_success()
 	return self._stage_success
 end
 
+function JobManager:is_current_job_safehouse()
+	if not self._global.current_job then
+		return false
+	end
+	return managers.job:current_job_data().is_safehouse
+end
+
 function JobManager:check_ok_with_cooldown(job_id)
 	if not self._global.cooldown then
 		return true
@@ -258,4 +315,15 @@ function JobManager:_check_add_to_cooldown()
 			self._global.cooldown[self:current_job_id()] = cooldown_time + TimerManager:wall_running():time()
 		end
 	end
+end
+
+function JobManager:sync_save(data)
+	local state = {}
+	state.next_interupt_stage = self._global.next_interupt_stage
+	data.JobManager = state
+end
+
+function JobManager:sync_load(data)
+	local state = data.JobManager
+	self._global.next_interupt_stage = state.next_interupt_stage
 end

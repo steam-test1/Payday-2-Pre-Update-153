@@ -4,20 +4,17 @@ MenuBackdropGUI.BASE_RES = {w = 1280, h = 720}
 function MenuBackdropGUI:init(ws, gui_data_manager, fixed_dt)
 	self._fixed_dt = fixed_dt
 	self._gui_data_manager = gui_data_manager
+	self._gui_data_scene_gui = (self._gui_data_manager or managers.gui_data):get_scene_gui()
 	self._workspace = ws or (self._gui_data_manager or managers.gui_data):create_fullscreen_16_9_workspace()
 	if not ws then
-		self._blackborder_workspace = (self._gui_data_manager or managers.gui_data):create_fullscreen_workspace()
-		self._blackborder_workspace:panel():rect({
-			name = "top_border",
-			layer = 1000,
-			color = Color.black
+		self._black_bg_ws = self._gui_data_scene_gui:create_screen_workspace()
+		self._black_bg_ws:panel():rect({
+			name = "bg",
+			color = Color.black,
+			layer = -1000,
+			halign = "scale",
+			valign = "scale"
 		})
-		self._blackborder_workspace:panel():rect({
-			name = "bottom_border",
-			layer = 1000,
-			color = Color.black
-		})
-		self:_set_black_borders()
 		if managers and managers.viewport then
 			self._resolution_changed_callback_id = managers.viewport:add_resolution_changed_func(callback(self, self, "resolution_changed"))
 		end
@@ -98,27 +95,23 @@ function MenuBackdropGUI:setup_saferect_shape()
 end
 
 function MenuBackdropGUI:create_black_borders()
-	self._blackborder_workspace = managers.gui_data:create_fullscreen_workspace()
-	self._blackborder_workspace:panel():rect({
-		name = "top_border",
-		layer = 49,
-		color = Color.black
-	})
-	self._blackborder_workspace:panel():rect({
-		name = "bottom_border",
-		layer = 49,
-		color = Color.black
-	})
-	self:_set_black_borders()
-	local one_frame_wait_anim = function(o)
-		o:hide()
-		coroutine.yield()
-		o:show()
+	if self._black_bg_ws then
+		self._gui_data_scene_gui:destroy_workspace(self._black_bg_ws)
+		self._black_bg_ws = nil
 	end
-	self._blackborder_workspace:panel():animate(one_frame_wait_anim)
+	self._gui_data_scene_gui = Overlay:gui()
+	self._black_bg_ws = self._gui_data_scene_gui:create_screen_workspace()
+	self._black_bg_ws:panel():rect({
+		name = "bg",
+		color = Color.black,
+		layer = -1000,
+		halign = "scale",
+		valign = "scale"
+	})
 end
 
 function MenuBackdropGUI:_set_black_borders(manager)
+	do return end
 	local manager = self._gui_data_manager or managers.gui_data
 	manager:layout_fullscreen_workspace(self._blackborder_workspace)
 	local top_border = self._blackborder_workspace:panel():child("top_border")
@@ -127,7 +120,7 @@ function MenuBackdropGUI:_set_black_borders(manager)
 	local border_h = (self._blackborder_workspace:panel():h() - self.BASE_RES.h) / 2
 	top_border:set_position(0, -2)
 	top_border:set_size(border_w, border_h + 2)
-	bottom_border:set_position(0, self.BASE_RES.h + border_h - 2)
+	bottom_border:set_position(0, self.BASE_RES.h + border_h)
 	bottom_border:set_size(border_w, border_h + 2)
 end
 
@@ -332,7 +325,8 @@ function MenuBackdropGUI:_create_particle()
 			texture_rect_y,
 			32,
 			32
-		}
+		},
+		alpha = 0
 	})
 	local from_longside = math.random(2) == 1
 	local otherside_start = math.random(2) == 1
@@ -362,6 +356,9 @@ function MenuBackdropGUI:_create_particle()
 		local start_alpha = math.sin(alpha_t * 90) * 0.6 + 0.3
 		local next_alpha = start_alpha
 		wait(math.rand(2), self._fixed_dt)
+		over(0.2, function(p)
+			o:set_alpha(math.lerp(0, start_alpha, p))
+		end, self._fixed_dt)
 		while true do
 			dt = coroutine.yield()
 			t = t + (self._fixed_dt and 0.033333335 or dt)
@@ -445,6 +442,9 @@ function MenuBackdropGUI:show()
 	if self._blackborder_workspace then
 		self._blackborder_workspace:show()
 	end
+	if self._black_bg_ws then
+		self._black_bg_ws:panel():show()
+	end
 end
 
 function MenuBackdropGUI:hide()
@@ -453,6 +453,9 @@ function MenuBackdropGUI:hide()
 	end
 	if self._blackborder_workspace then
 		self._blackborder_workspace:hide()
+	end
+	if self._black_bg_ws then
+		self._black_bg_ws:panel():hide()
 	end
 end
 
@@ -550,6 +553,10 @@ function MenuBackdropGUI:destroy()
 		Overlay:gui():destroy_workspace(self._workspace)
 	else
 		self._workspace:panel():remove(self._panel)
+	end
+	if self._black_bg_ws then
+		self._gui_data_scene_gui:destroy_workspace(self._black_bg_ws)
+		self._black_bg_ws = nil
 	end
 	if self._resolution_changed_callback_id then
 		managers.viewport:remove_resolution_changed_func(self._resolution_changed_callback_id)

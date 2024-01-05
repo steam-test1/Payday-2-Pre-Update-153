@@ -9,6 +9,7 @@ function ObjectInteractionManager:init()
 	self._close_index = 0
 	self._close_freq = 1
 	self._active_object = nil
+	self._slotmask_world_geometry = managers.slot:get_mask("world_geometry")
 end
 
 function ObjectInteractionManager:update(t, dt)
@@ -70,6 +71,7 @@ function ObjectInteractionManager:remove_object(obj)
 end
 
 local mvec1 = Vector3()
+local index_table = {}
 
 function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 	local mvec3_dis = mvector3.distance
@@ -106,22 +108,33 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 	if locked then
 		return
 	end
+	local optimized = true
 	local last_active = self._active_object
+	local last_dot = optimized and last_active and self._current_dot or nil
 	local blocked = player_unit:movement():object_interaction_blocked()
 	if #self._close_objects > 0 and not blocked then
 		local active_obj
-		local current_dot = 0.9
+		local current_dot = last_dot or 0.9
 		local player_fwd = player_unit:camera():forward()
 		local camera_pos = player_unit:camera():position()
-		for k, v in pairs(self._close_objects) do
-			if alive(v) then
+		self._close_test_index = self._close_test_index or 0
+		self._close_test_index = self._close_test_index + 1
+		if self._close_test_index > #self._close_objects then
+			self._close_test_index = 1
+		end
+		local contains = table.contains(self._close_objects, last_active)
+		for k, v in pairs(optimized and {
+			contains and last_active,
+			self._close_objects[self._close_test_index]
+		} or self._close_objects) do
+			if alive(v) and v:interaction():can_select(player_unit) then
 				mvector3.set(mvec1, v:interaction():interact_position())
 				mvector3.subtract(mvec1, camera_pos)
 				mvector3.normalize(mvec1)
 				local dot = mvector3.dot(player_fwd, mvec1)
-				if current_dot < dot then
+				if current_dot < dot or optimized and alive(last_active) and v == last_active and 0.9 < dot then
 					local interact_axis = v:interaction():interact_axis()
-					if not interact_axis or 0 > mvector3.dot(mvec1, interact_axis) then
+					if (not interact_axis or 0 > mvector3.dot(mvec1, interact_axis)) and self:_raycheck_ok(v, camera_pos) then
 						current_dot = dot
 						active_obj = v
 					end
@@ -137,6 +150,7 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 			end
 		end
 		self._active_object = active_obj
+		self._current_dot = current_dot
 	else
 		self._active_object = nil
 	end
@@ -144,6 +158,23 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 		self._active_object = nil
 		last_active:interaction():unselect()
 	end
+end
+
+local m_obj_pos = Vector3()
+
+function ObjectInteractionManager:_raycheck_ok(obj, camera_pos)
+	local check_objects = obj:interaction():ray_objects()
+	if not check_objects then
+		return true
+	end
+	for _, object in ipairs(check_objects) do
+		object:m_position(m_obj_pos)
+		local obstructed = obj:raycast("ray", m_obj_pos, camera_pos, "ray_type", "bag body", "slot_mask", self._slotmask_world_geometry, "report")
+		if not obstructed then
+			return true
+		end
+	end
+	return false
 end
 
 function ObjectInteractionManager:_in_close_list(obj)

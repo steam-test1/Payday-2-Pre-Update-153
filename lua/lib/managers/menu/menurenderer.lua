@@ -100,6 +100,56 @@ function MenuRenderer:_layout_menu_bg()
 	local res = RenderSettings.resolution
 	local safe_rect_pixels = managers.gui_data:scaled_size()
 	self:set_stencil_align(self._menu_stencil_align, self._menu_stencil_align_percent)
+	self:_create_blackborders()
+end
+
+function MenuRenderer:_create_blackborders()
+	if alive(self._blackborder_workspace) then
+		Overlay:gui():destroy_workspace(self._blackborder_workspace)
+		self._blackborder_workspace = nil
+	end
+	Application:debug("MenuRenderer: Creating blackborders")
+	self._blackborder_workspace = managers.gui_data:create_fullscreen_workspace()
+	self._blackborder_workspace:panel():rect({
+		name = "top_border",
+		layer = 1000,
+		color = Color.black
+	})
+	self._blackborder_workspace:panel():rect({
+		name = "bottom_border",
+		layer = 1000,
+		color = Color.black
+	})
+	self._blackborder_workspace:panel():rect({
+		name = "left_border",
+		layer = 1000,
+		color = Color.black
+	})
+	self._blackborder_workspace:panel():rect({
+		name = "right_border",
+		layer = 1000,
+		color = Color.black
+	})
+	local top_border = self._blackborder_workspace:panel():child("top_border")
+	local bottom_border = self._blackborder_workspace:panel():child("bottom_border")
+	local left_border = self._blackborder_workspace:panel():child("left_border")
+	local right_border = self._blackborder_workspace:panel():child("right_border")
+	local width = self._blackborder_workspace:panel():w()
+	local height = self._blackborder_workspace:panel():h()
+	local border_w = (width - 1280) / 2
+	local border_h = (height - 720) / 2
+	top_border:set_position(-1, -1)
+	top_border:set_size(width + 2, border_h + 2)
+	top_border:set_visible(0 < border_h)
+	bottom_border:set_position(border_w - 1, math.ceil(border_h) + 720 - 1)
+	bottom_border:set_size(width + 2, border_h + 2)
+	bottom_border:set_visible(0 < border_h)
+	left_border:set_position(-1, -1)
+	left_border:set_size(border_w + 2, height + 2)
+	left_border:set_visible(0 < border_w)
+	right_border:set_position(math.floor(border_w) + 1280 - 1, -1)
+	right_border:set_size(border_w + 2, height + 2)
+	right_border:set_visible(0 < border_w)
 end
 
 function MenuRenderer:update(t, dt)

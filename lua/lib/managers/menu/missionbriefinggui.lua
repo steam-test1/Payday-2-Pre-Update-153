@@ -212,7 +212,7 @@ function DescriptionItem:init(panel, text, i, saved_descriptions)
 	local stage_data = managers.job:current_stage_data()
 	local level_data = managers.job:current_level_data()
 	local name_id = stage_data.name_id or level_data.name_id
-	local briefing_id = stage_data.briefing_id or level_data.briefing_id
+	local briefing_id = managers.job:current_briefing_id()
 	local title_text = self._panel:text({
 		name = "title_text",
 		text = managers.localization:to_upper_text(name_id),

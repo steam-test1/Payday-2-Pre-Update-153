@@ -763,14 +763,15 @@ function SkillTreeGui:_setup()
 	self._panel:child("respec_tree_button"):set_left(points_text:left())
 	self._respec_text_id = "st_menu_respec_tree"
 	local black_rect = self._fullscreen_panel:rect({
-		color = Color(0.2, 0, 0, 0),
+		color = Color(0.4, 0, 0, 0),
 		layer = 1
 	})
 	local blur = self._fullscreen_panel:bitmap({
 		texture = "guis/textures/test_blur_df",
 		w = self._fullscreen_ws:panel():w(),
 		h = self._fullscreen_ws:panel():h(),
-		render_template = "VertexColorTexturedBlur3D"
+		render_template = "VertexColorTexturedBlur3D",
+		layer = -1
 	})
 	local func = function(o)
 		over(0.6, function(p)

@@ -111,7 +111,11 @@ function ECMJammerBase:set_active(active)
 			else
 				jam_cameras = self._owner:base():upgrade_value("ecm_jammer", "affects_cameras")
 			end
-			managers.groupai:state():register_ecm_jammer(self._unit, {call = true, camera = jam_cameras})
+			managers.groupai:state():register_ecm_jammer(self._unit, {
+				call = true,
+				camera = jam_cameras,
+				pager = true
+			})
 			self:_send_net_event(self._NET_EVENTS.jammer_active)
 		else
 			managers.groupai:state():register_ecm_jammer(self._unit, false)
@@ -232,7 +236,7 @@ function ECMJammerBase:_set_feedback_active(state)
 			local t = TimerManager:game():time()
 			self._feedback_clbk_id = "ecm_feedback" .. tostring(self._unit:key())
 			self._feedback_interval = 1.5
-			self._feedback_range = 1000
+			self._feedback_range = 1200
 			local duration_mul = 1
 			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
 				duration_mul = duration_mul * managers.player:upgrade_value("ecm_jammer", "feedback_duration_boost", 1)

@@ -342,6 +342,26 @@ function LevelsTweakData:init()
 	self.fwb.music = "heist"
 	self.fwb.package = "packages/vlad_fwb"
 	self.fwb.cube = "cube_apply_heist_bank"
+	self.escape_cafe_day = {}
+	self.escape_cafe_day.name_id = "heist_escape_cafe_hl"
+	self.escape_cafe_day.briefing_id = "heist_escape_cafe_briefing"
+	self.escape_cafe_day.briefing_dialog = "nothing"
+	self.escape_cafe_day.world_name = "narratives/escapes/escape_cafe_day"
+	self.escape_cafe_day.intro_event = "Play_dr1_a01"
+	self.escape_cafe_day.outro_event = "nothing"
+	self.escape_cafe_day.music = "heist"
+	self.escape_cafe_day.package = "packages/escape_cafe"
+	self.escape_cafe_day.cube = "cube_apply_heist_bank"
+	self.escape_park_day = {}
+	self.escape_park_day.name_id = "heist_escape_park_hl"
+	self.escape_park_day.briefing_id = "heist_escape_park_briefing"
+	self.escape_park_day.briefing_dialog = "nothing"
+	self.escape_park_day.world_name = "narratives/escapes/escape_park_day"
+	self.escape_park_day.intro_event = "Play_dr1_a01"
+	self.escape_park_day.outro_event = "nothing"
+	self.escape_park_day.music = "heist"
+	self.escape_park_day.package = "packages/escape_park"
+	self.escape_park_day.cube = "cube_apply_heist_bank"
 	self.escape_cafe = {}
 	self.escape_cafe.name_id = "heist_escape_cafe_hl"
 	self.escape_cafe.briefing_id = "heist_escape_cafe_briefing"
@@ -404,10 +424,88 @@ function LevelsTweakData:init()
 	self.safehouse.package = "packages/safehouse"
 	self.safehouse.cube = "cube_apply_heist_bank"
 	self.safehouse.team_ai_off = true
+	self.arm_cro = {}
+	self.arm_cro.name_id = "heist_arm_hl"
+	self.arm_cro.briefing_id = "heist_arm_briefing"
+	self.arm_cro.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_cro.world_name = "narratives/armadillo/arm_cro"
+	self.arm_cro.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_cro.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_cro.music = "heist"
+	self.arm_cro.package = "packages/narr_arm_cro"
+	self.arm_cro.cube = "cube_apply_heist_bank"
+	self.arm_und = {}
+	self.arm_und.name_id = "heist_arm_hl"
+	self.arm_und.briefing_id = "heist_arm_briefing"
+	self.arm_und.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_und.world_name = "narratives/armadillo/arm_und"
+	self.arm_und.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_und.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_und.music = "heist"
+	self.arm_und.package = "packages/narr_arm_und"
+	self.arm_und.cube = "cube_apply_heist_bank"
+	self.arm_bri = {}
+	self.arm_bri.name_id = "heist_arm_hl"
+	self.arm_bri.briefing_id = "heist_arm_briefing"
+	self.arm_bri.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_bri.world_name = "narratives/armadillo/arm_bri"
+	self.arm_bri.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_bri.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_bri.music = "heist"
+	self.arm_bri.package = "packages/narr_arm_bri"
+	self.arm_bri.cube = "cube_apply_heist_bank"
+	self.arm_hcm = {}
+	self.arm_hcm.name_id = "heist_arm_hl"
+	self.arm_hcm.briefing_id = "heist_arm_briefing"
+	self.arm_hcm.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_hcm.world_name = "narratives/armadillo/arm_hcm"
+	self.arm_hcm.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_hcm.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_hcm.music = "heist"
+	self.arm_hcm.package = "packages/narr_arm_hcm"
+	self.arm_hcm.cube = "cube_apply_heist_bank"
+	self.arm_par = {}
+	self.arm_par.name_id = "heist_arm_hl"
+	self.arm_par.briefing_id = "heist_arm_briefing"
+	self.arm_par.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_par.world_name = "narratives/armadillo/arm_par"
+	self.arm_par.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_par.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_par.music = "heist"
+	self.arm_par.package = "packages/narr_arm_par"
+	self.arm_par.cube = "cube_apply_heist_bank"
+	self.arm_fac = {}
+	self.arm_fac.name_id = "heist_arm_hl"
+	self.arm_fac.briefing_id = "heist_arm_briefing"
+	self.arm_fac.briefing_dialog = "Play_pln_firestarter_stage3_brief"
+	self.arm_fac.world_name = "narratives/armadillo/arm_fac"
+	self.arm_fac.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.arm_fac.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.arm_fac.music = "heist"
+	self.arm_fac.package = "packages/narr_arm_fac"
+	self.arm_fac.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
-	self.test01.world_name = "tests/sound_environment_test"
+	self.test01.world_name = "wip/family"
 	self.test01.intro_event = "nothing"
 	self.test01.outro_event = "nothing"
 	self.test01.music = "heist"
@@ -416,7 +514,7 @@ function LevelsTweakData:init()
 	self.test02 = {}
 	self.test02.name_id = "heist_test02_hl"
 	self.test02.briefing_id = "heist_test02"
-	self.test02.world_name = "narratives/h_bring_me_the_head_of_armando_garcia/stage_2"
+	self.test02.world_name = "wip/on_time/stage_1"
 	self.test02.intro_event = "nothing"
 	self.test02.outro_event = "nothing"
 	self.test02.music = "heist"
@@ -425,7 +523,7 @@ function LevelsTweakData:init()
 	self.test03 = {}
 	self.test03.name_id = "heist_test03_hl"
 	self.test03.briefing_id = "heist_test03"
-	self.test03.world_name = "tests/trailer_bank_b"
+	self.test03.world_name = "wip/scrap"
 	self.test03.intro_event = "nothing"
 	self.test03.outro_event = "nothing"
 	self.test03.music = "heist"
@@ -914,11 +1012,19 @@ function LevelsTweakData:init()
 		"fwb",
 		"escape_cafe",
 		"escape_park",
+		"escape_cafe_day",
+		"escape_park_day",
 		"escape_street",
 		"escape_overpass",
 		"escape_garage",
 		"escape_overpass_night",
 		"safehouse",
+		"arm_fac",
+		"arm_par",
+		"arm_hcm",
+		"arm_bri",
+		"arm_cro",
+		"arm_und",
 		"test01",
 		"test02",
 		"test03",
@@ -939,7 +1045,9 @@ function LevelsTweakData:init()
 		"escape_street",
 		"escape_overpass",
 		"escape_garage",
-		"escape_overpass_night"
+		"escape_overpass_night",
+		"escape_cafe_day",
+		"escape_park_day"
 	}
 end
 

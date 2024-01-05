@@ -272,6 +272,15 @@ function ConnectionNetworkHandler:sync_stage_settings(level_id_index, stage_num,
 	else
 		managers.job:synced_interupt_stage(nil)
 	end
+	Global.game_settings.mission = managers.job:current_mission()
+end
+
+function ConnectionNetworkHandler:sync_on_retry_job_stage(sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.job:synced_on_retry_job_stage()
 end
 
 function ConnectionNetworkHandler:lobby_sync_update_level_id(level_id_index)

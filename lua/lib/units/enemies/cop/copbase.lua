@@ -63,6 +63,7 @@ do
 		"civ_male_janitor_1",
 		"civ_male_meth_cook_1",
 		"civ_male_paramedic_1",
+		"civ_male_paramedic_2",
 		"civ_male_party_1",
 		"civ_male_party_2",
 		"civ_male_party_3",

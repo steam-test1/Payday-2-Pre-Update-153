@@ -592,7 +592,7 @@ function PlayerStandard:_stance_entered(unequipped)
 	local duration_multiplier = self._state_data.in_steelsight and 1 / self._equipped_unit:base():enter_steelsight_speed_multiplier() or 1
 	local new_fov = self:get_zoom_fov(misc_attribs) + 0
 	self._camera_unit:base():clbk_stance_entered(misc_attribs.shoulders, head_stance, misc_attribs.vel_overshot, new_fov, misc_attribs.shakers, stance_mod, duration_multiplier, duration)
-	managers.menu:set_mouse_sensitivity(new_fov < (misc_attribs.FOV or 75))
+	managers.menu:set_mouse_sensitivity(self:in_steelsight())
 end
 
 function PlayerStandard:update_fov_external()

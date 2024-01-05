@@ -915,6 +915,9 @@ function HuskPlayerMovement:_upd_move_downed(t, dt)
 end
 
 function HuskPlayerMovement:_upd_move_standard(t, dt)
+	if self._load_data then
+		return
+	end
 	local look_dir_flat = self._look_dir:with_z(0)
 	mvector3.normalize(look_dir_flat)
 	local leg_fwd_cur = self._m_rot:y()
@@ -1052,7 +1055,13 @@ function HuskPlayerMovement:_upd_move_standard(t, dt)
 				anim_velocity = "walk"
 			end
 			self:_adjust_move_anim(anim_side, anim_velocity)
-			local animated_walk_vel = self._walk_anim_velocities[self._ext_anim.pose][self._stance.name][anim_velocity][anim_side]
+			local pose = self._ext_anim.pose
+			local stance = self._stance.name
+			if not (self._walk_anim_velocities[pose] and self._walk_anim_velocities[pose][stance] and self._walk_anim_velocities[pose][stance][anim_velocity]) or not self._walk_anim_velocities[pose][stance][anim_velocity][anim_side] then
+				debug_pause_unit(self._unit, "Boom...", self._unit, "pose", pose, "stance", stance, "anim_velocity", anim_velocity, "anim_side", anim_side, self._machine:segment_state(Idstring("base")))
+				return
+			end
+			local animated_walk_vel = self._walk_anim_velocities[pose][stance][anim_velocity][anim_side]
 			local anim_speed = vel_len / animated_walk_vel
 			self:_adjust_walk_anim_speed(dt, anim_speed)
 		elseif not self._ext_anim.idle then

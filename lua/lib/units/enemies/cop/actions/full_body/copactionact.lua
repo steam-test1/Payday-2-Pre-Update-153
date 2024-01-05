@@ -61,7 +61,8 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_repel_into_window",
 	"e_sp_down_16m_right",
 	"e_sp_down_16m_left",
-	"e_sp_up_1_down_9m_var2"
+	"e_sp_up_1_down_9m_var2",
+	"e_sp_down_8m_var3"
 }
 CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_dj_loop",
@@ -101,6 +102,11 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_window_observer",
 	"cm_sp_sit_high_chair",
 	"cm_sp_sit_talk_table",
+	"cm_sp_sit_with_wounded",
+	"cm_sp_recieving_cpr",
+	"cm_sp_wounded_lying2",
+	"cm_sp_gives_cpr",
+	"cm_sp_wounded_lying",
 	"cf_sp_stand_idle_var1",
 	"cf_sp_stand_desk_1m",
 	"cf_sp_stand_desk_1m",
@@ -125,7 +131,7 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cf_sp_stand_talk_normal",
 	"cf_sp_stand_talk_upset",
 	"cf_sp_stand_talk_calm",
-	"cf_sp_stand_arms crossed",
+	"cf_sp_stand_arms_crossed",
 	"cf_sp_lean_bar_desk",
 	"cf_sp_lean_wall_right",
 	"cf_sp_lean_wall_back"
@@ -180,6 +186,9 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_up_7_down_1m",
 	"e_nl_down_stairs_4m",
 	"e_nl_press_button_enter",
+	"e_nl_up_5_down_1m_var2",
+	"e_nl_up_9_down_1m",
+	"e_nl_up_7_down_1m_var2",
 	"e_so_ntl_idle_tired",
 	"e_so_ntl_idle_kickpebble",
 	"e_so_ntl_idle_look",

@@ -45,6 +45,7 @@ function MissionEndState:at_enter(old_state, params)
 	local player = managers.player:player_unit()
 	if player then
 		player:camera():remove_sound_listener()
+		player:camera():play_redirect(Idstring("idle"))
 	end
 	Application:debug("1 second to managers.mission:pre_destroy()")
 	self._mission_destroy_t = Application:time() + 1
@@ -158,50 +159,7 @@ function MissionEndState:is_success()
 end
 
 function MissionEndState:_get_xp_dissected(success, num_winners)
-	local total_xp, dissection_table = managers.experience:get_xp_dissected(success, num_winners)
-	if managers.job:has_active_job() then
-		local job_stars = managers.job:current_job_stars()
-		local job_and_difficulty_stars = managers.job:current_job_and_difficulty_stars()
-		local difficulty_stars = job_and_difficulty_stars - job_stars
-		local xp_multiplier = managers.experience:get_contract_difficulty_multiplier(difficulty_stars)
-		local xp_stage_stars = dissection_table.stage_xp
-		local xp_job_stars = dissection_table.job_xp
-		local xp_risk_stars = dissection_table.bonus_risk
-		local xp_total_diff_pre = xp_stage_stars + xp_job_stars + xp_risk_stars + dissection_table.bonus_low_level
-		local plvl = managers.experience:current_level()
-		local player_stars = math.max(math.ceil(plvl / 10), 1)
-		local experience_manager = tweak_data.experience_manager.level_limit
-		if player_stars <= job_and_difficulty_stars + tweak_data:get_value("experience_manager", "level_limit", "low_cap_level") then
-			local diff_stars = math.clamp(job_and_difficulty_stars - player_stars, 1, #experience_manager.pc_difference_multipliers)
-			local level_limit_mul = tweak_data:get_value("experience_manager", "level_limit", "pc_difference_multipliers", diff_stars)
-			local plr_difficulty_stars = math.max(difficulty_stars - diff_stars, 0)
-			local plr_xp_multiplier = managers.experience:get_contract_difficulty_multiplier(plr_difficulty_stars) or 0
-			local white_player_stars = player_stars - plr_difficulty_stars
-			local xp_plr_stage_stars = managers.experience:get_stage_xp_by_stars(white_player_stars)
-			xp_plr_stage_stars = xp_plr_stage_stars + xp_plr_stage_stars * plr_xp_multiplier
-			local xp_stage = xp_stage_stars + xp_stage_stars * xp_multiplier
-			local diff_stage = xp_stage - xp_plr_stage_stars
-			local new_xp_stage = xp_plr_stage_stars + diff_stage * level_limit_mul
-			xp_stage_stars = xp_stage_stars * (new_xp_stage / xp_stage)
-			if success and managers.job:on_last_stage() then
-				local xp_plr_job_stars = managers.experience:get_job_xp_by_stars(white_player_stars)
-				xp_plr_job_stars = xp_plr_job_stars + xp_plr_job_stars * plr_xp_multiplier
-				local xp_job = xp_job_stars + xp_job_stars * xp_multiplier
-				local diff_job = xp_job - xp_plr_job_stars
-				local new_xp_job = xp_plr_job_stars + diff_job * level_limit_mul
-				xp_job_stars = xp_job_stars * (new_xp_job / xp_job)
-			end
-			xp_risk_stars = (xp_stage_stars + xp_job_stars) * xp_multiplier
-		end
-		dissection_table.stage_xp = math.round(xp_stage_stars)
-		dissection_table.job_xp = math.round(xp_job_stars)
-		dissection_table.bonus_risk = math.round(xp_risk_stars)
-		local xp_total_diff_post = dissection_table.stage_xp + dissection_table.job_xp + dissection_table.bonus_risk
-		local diff_in_xp = xp_total_diff_post - xp_total_diff_pre
-		total_xp = total_xp + diff_in_xp
-		dissection_table.total = dissection_table.total + diff_in_xp
-	end
-	return total_xp, dissection_table
+	return managers.experience:get_xp_dissected(success, num_winners)
 end
 
 function MissionEndState:_get_contract_xp(success)
@@ -326,7 +284,9 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 		local best_accuracy = managers.network:session():peer(best_accuracy_peer_id):name()
 		local most_downs = managers.network:session():peer(most_downs_peer_id):name()
 		local stage_cash_summary_string
-		if self._success then
+		if self._success and managers.job._global.next_interupt_stage then
+			stage_cash_summary_string = managers.localization:text("victory_cash_postponed")
+		elseif self._success then
 			local stage_payout, job_payout, bag_payout, small_loot_payout, crew_payout = managers.money:get_payouts()
 			local bonus_bags = managers.loot:get_secured_bonus_bags_amount() + managers.loot:get_secured_mandatory_bags_amount()
 			local bag_cash = bag_payout
@@ -497,14 +457,6 @@ function MissionEndState:update(t, dt)
 			local data = managers.experience:give_experience(self._total_xp_bonus)
 			data.bonuses = self._bonuses
 			managers.hud:send_xp_data_endscreen_hud(data, callback(self, self, "set_completion_bonus_done"))
-			if SystemInfo:platform() == Idstring("WIN32") and Global.level_data.level_id then
-				local stats = {}
-				stats[Global.game_settings.difficulty .. "_" .. Global.level_data.level_id .. "_" .. "exp"] = {
-					type = "int",
-					value = self._total_xp_bonus
-				}
-				managers.network.account:publish_statistics(stats)
-			end
 		else
 			self:set_completion_bonus_done(true)
 		end

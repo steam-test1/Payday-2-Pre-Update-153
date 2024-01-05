@@ -60,6 +60,8 @@ function MenuNodeCrimenetFiltersGui:_setup_item_panel(safe_rect, res)
 	end
 	self.item_panel:set_w(safe_rect.width * (1 - self._align_line_proportions))
 	self.item_panel:set_center(self.item_panel:parent():w() / 2, self.item_panel:parent():h() / 2)
+	self.item_panel:set_position(math.round(self.item_panel:x()), math.round(self.item_panel:y()))
+	self:_rec_round_object(self.item_panel)
 	self.box_panel = self.item_panel:parent():panel()
 	self.box_panel:set_shape(self.item_panel:shape())
 	self.box_panel:set_layer(51)
@@ -79,10 +81,22 @@ function MenuNodeCrimenetFiltersGui:_setup_item_panel(safe_rect, res)
 	})
 end
 
+function MenuNodeCrimenetFiltersGui:_rec_round_object(object)
+	if object.children then
+		for i, d in ipairs(object:children()) do
+			self:_rec_round_object(d)
+		end
+	end
+	local x, y = object:position()
+	object:set_position(math.round(x), math.round(y))
+end
+
 function MenuNodeCrimenetFiltersGui:reload_item(item)
 	MenuNodeCrimenetFiltersGui.super.reload_item(self, item)
 	local row_item = self:row_item(item)
-	row_item.gui_panel:set_right(self.item_panel:w())
+	if row_item and alive(row_item.gui_panel) then
+		row_item.gui_panel:set_right(self.item_panel:w())
+	end
 end
 
 function MenuNodeCrimenetFiltersGui:_align_marker(row_item)

@@ -164,7 +164,7 @@ function MenuManager:set_and_send_sync_state(state)
 	local index = tweak_data:menu_sync_state_to_index(state)
 	if index then
 		self:_set_peer_sync_state(managers.network:session():local_peer():id(), state)
-		managers.network:session():send_to_peers("set_menu_sync_state_index", index)
+		managers.network:session():send_to_peers_loaded("set_menu_sync_state_index", index)
 	end
 end
 
@@ -1018,6 +1018,10 @@ function MenuCallbackHandler:is_level_145()
 	return managers.experience:current_level() >= 145
 end
 
+function MenuCallbackHandler:is_level_50()
+	return managers.experience:current_level() >= 50
+end
+
 function MenuCallbackHandler:is_win32()
 	return SystemInfo:platform() == Idstring("WIN32")
 end
@@ -1096,6 +1100,16 @@ end
 
 function MenuCallbackHandler:kick_player_visible()
 	return self:is_server() and self:is_multiplayer() and managers.platform:presence() ~= "Mission_end"
+end
+
+function MenuCallbackHandler:abort_mission_visible()
+	if not (self:is_not_editor() and self:is_server()) or not self:is_multiplayer() then
+		return false
+	end
+	if game_state_machine:current_state_name() == "disconnected" then
+		return false
+	end
+	return true
 end
 
 function MenuCallbackHandler:hidden()
@@ -1384,6 +1398,15 @@ function MenuCallbackHandler:choice_mask(item)
 	end
 end
 
+function MenuCallbackHandler:choice_max_lobbies_filter(item)
+	if not managers.crimenet then
+		return
+	end
+	local max_server_jobs_filter = item:value()
+	managers.network.matchmake:set_lobby_return_count(max_server_jobs_filter)
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
 function MenuCallbackHandler:choice_distance_filter(item)
 	local dist_filter = item:value()
 	if managers.network.matchmake:distance_filter() == dist_filter then
@@ -1396,10 +1419,37 @@ end
 function MenuCallbackHandler:choice_difficulty_filter(item)
 	local diff_filter = item:value()
 	print("diff_filter", diff_filter)
-	if managers.network.matchmake:difficulty_filter() == diff_filter then
+	if managers.network.matchmake:get_lobby_filter("difficulty") == diff_filter then
 		return
 	end
-	managers.network.matchmake:set_difficulty_filter(diff_filter)
+	managers.network.matchmake:add_lobby_filter("difficulty", diff_filter, "equal")
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
+function MenuCallbackHandler:choice_job_id_filter(item)
+	local job_id_filter = item:value()
+	if managers.network.matchmake:get_lobby_filter("job_id") == job_id_filter then
+		return
+	end
+	managers.network.matchmake:add_lobby_filter("job_id", job_id_filter, "equal")
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
+function MenuCallbackHandler:choice_new_servers_only(item)
+	local num_players_filter = item:value()
+	if managers.network.matchmake:get_lobby_filter("num_players") == num_players_filter then
+		return
+	end
+	managers.network.matchmake:add_lobby_filter("num_players", num_players_filter, "equal")
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
+function MenuCallbackHandler:choice_server_state_lobby(item)
+	local state_filter = item:value()
+	if managers.network.matchmake:get_lobby_filter("state") == state_filter then
+		return
+	end
+	managers.network.matchmake:add_lobby_filter("state", state_filter, "equal")
 	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 end
 
@@ -1913,12 +1963,14 @@ end
 function MenuCallbackHandler:mute_player(item)
 	if managers.network.voice_chat then
 		managers.network.voice_chat:mute_player(item:parameters().peer, item:value() == "on")
+		item:parameters().peer:set_muted(item:value() == "on")
 	end
 end
 
 function MenuCallbackHandler:mute_xbox_player(item)
 	if managers.network.voice_chat then
 		managers.network.voice_chat:set_muted(item:parameters().xuid, item:value() == "on")
+		item:parameters().peer:set_muted(item:value() == "on")
 	end
 end
 
@@ -2098,8 +2150,14 @@ function MenuCallbackHandler:leave_safehouse()
 end
 
 function MenuCallbackHandler:abort_mission()
+	if game_state_machine:current_state_name() == "disconnected" then
+		return
+	end
+	
 	local function yes_func()
-		self:load_start_menu_lobby()
+		if game_state_machine:current_state_name() ~= "disconnected" then
+			self:load_start_menu_lobby()
+		end
 	end
 	
 	managers.menu:show_abort_mission_dialog({yes_func = yes_func})
@@ -2268,6 +2326,19 @@ function MenuCallbackHandler:debug_modify_challenge(item)
 	managers.challenges:debug_set_amount(item:parameters().challenge, item:parameters().count - 1)
 	managers.menu:back(true)
 	managers.menu:open_node("modify_active_challenges")
+end
+
+function MenuCallbackHandler:clear_local_steam_stats()
+	managers.statistics:clear_statistics()
+	managers.statistics:clear_skills_statistics()
+end
+
+function MenuCallbackHandler:print_local_steam_stats()
+	managers.statistics:debug_print_stats()
+end
+
+function MenuCallbackHandler:print_global_steam_stats()
+	managers.statistics:debug_print_stats(true)
 end
 
 MenuChallenges = MenuChallenges or class()
@@ -2528,7 +2599,7 @@ function MutePlayer:modify_node(node, up)
 				}
 			}
 			local new_item = node:create_item(data, params)
-			new_item:set_value(managers.network.voice_chat:is_muted(peer) and "on" or "off")
+			new_item:set_value(peer:is_muted() and "on" or "off")
 			new_node:add_item(new_item)
 		end
 	end
@@ -2584,7 +2655,7 @@ function MutePlayerX360:modify_node(node, up)
 				}
 			}
 			local new_item = node:create_item(data, params)
-			new_item:set_value(managers.network.voice_chat:is_muted(peer:xuid()) and "on" or "off")
+			new_item:set_value(peer:is_muted() and "on" or "off")
 			new_node:add_item(new_item)
 		end
 	end
@@ -3612,13 +3683,67 @@ function MenuCrimeNetFiltersInitiator:modify_node(original_node, data)
 	local node = deep_clone(original_node)
 	node:item("toggle_friends_only"):set_value(Global.game_settings.search_friends_only and "on" or "off")
 	if MenuCallbackHandler:is_win32() then
+		local matchmake_filters = managers.network.matchmake:lobby_filters()
+		node:item("toggle_new_servers_only"):set_value(matchmake_filters.num_players and matchmake_filters.num_players.value or -1)
+		node:item("toggle_server_state_lobby"):set_value(matchmake_filters.state and matchmake_filters.state.value or -1)
+		node:item("max_lobbies_filter"):set_value(managers.network.matchmake:get_lobby_return_count())
 		node:item("server_filter"):set_value(managers.network.matchmake:distance_filter())
+		node:item("difficulty_filter"):set_value(matchmake_filters.difficulty and matchmake_filters.difficulty.value or -1)
+		self:add_filters(node)
 	end
 	if data and data.back_callback then
 		table.insert(node:parameters().back_callback, data.back_callback)
 	end
 	node:parameters().menu_component_data = data
 	return node
+end
+
+function MenuCrimeNetFiltersInitiator:update_node(node)
+end
+
+function MenuCrimeNetFiltersInitiator:refresh_node(node)
+end
+
+function MenuCrimeNetFiltersInitiator:add_filters(node)
+	if node:item("divider_end") then
+		return
+	end
+	local params = {
+		name = "job_id_filter",
+		text_id = "menu_job_id_filter",
+		visible_callback = "is_win32 is_level_145",
+		callback = "choice_job_id_filter",
+		filter = true
+	}
+	local data_node = {
+		type = "MenuItemMultiChoice",
+		{
+			_meta = "option",
+			text_id = "menu_all",
+			value = -1
+		}
+	}
+	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
+		table.insert(data_node, {
+			_meta = "option",
+			text_id = tweak_data.narrative.jobs[job_id].name_id,
+			value = index,
+			color = tweak_data.narrative.jobs[job_id].professional and tweak_data.screen_colors.pro_color or Color.white
+		})
+	end
+	local new_item = node:create_item(data_node, params)
+	new_item:set_value(managers.network.matchmake:get_lobby_filter("job_id") or -1)
+	node:add_item(new_item)
+	local params = {
+		name = "divider_end",
+		no_text = true,
+		size = 8
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
 end
 
 MenuOptionInitiator = MenuOptionInitiator or class()

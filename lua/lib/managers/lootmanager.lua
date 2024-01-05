@@ -8,6 +8,7 @@ function LootManager:_setup()
 	local distribute = {}
 	local saved_secured = {}
 	local saved_mandatory_bags = Global.loot_manager and Global.loot_manager.mandatory_bags
+	local postponed_small_loot = Global.loot_manager and Global.loot_manager.postponed_small_loot
 	if Global.loot_manager and Global.loot_manager.secured then
 		saved_secured = deep_clone(Global.loot_manager.secured)
 		for _, data in ipairs(Global.loot_manager.secured) do
@@ -21,6 +22,7 @@ function LootManager:_setup()
 	Global.loot_manager.distribute = distribute
 	Global.loot_manager.saved_secured = saved_secured
 	Global.loot_manager.mandatory_bags = saved_mandatory_bags or {}
+	Global.loot_manager.postponed_small_loot = postponed_small_loot
 	self._global = Global.loot_manager
 	self._triggers = {}
 	self._respawns = {}
@@ -238,6 +240,30 @@ function LootManager:get_real_total_small_loot_value()
 		end
 	end
 	return value
+end
+
+function LootManager:set_postponed_small_loot()
+	self._global.postponed_small_loot = {}
+	for _, data in ipairs(self._global.secured) do
+		if tweak_data.carry.small_loot[data.carry_id] then
+			table.insert(self._global.postponed_small_loot, deep_clone(data))
+		end
+	end
+end
+
+function LootManager:get_real_total_postponed_small_loot_value()
+	if not self._global.postponed_small_loot then
+		return 0
+	end
+	local value = 0
+	for _, data in ipairs(self._global.postponed_small_loot) do
+		value = value + self:get_real_value(data.carry_id, data.value)
+	end
+	return value
+end
+
+function LootManager:clear_postponed_small_loot()
+	self._global.postponed_small_loot = nil
 end
 
 function LootManager:total_value_by_carry_id(carry_id)

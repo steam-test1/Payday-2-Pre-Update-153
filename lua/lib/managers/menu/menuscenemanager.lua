@@ -783,9 +783,27 @@ end
 
 function MenuSceneManager:_set_dimensions()
 	local aspect_ratio = self:_real_aspect_ratio()
-	local y = (1 - aspect_ratio / 1.7777778) / 2
-	local h = aspect_ratio / 1.7777778
-	self._vp._vp:set_dimensions(0, y, 1, h)
+	local screen_aspect = 1.77778
+	local width_mul = 1.7777778
+	local x, y = 0, 0
+	local w, h = 1, 1
+	if SystemInfo:platform() == Idstring("WIN32") then
+		if aspect_ratio == 0 then
+			local screen_res = Application:screen_resolution()
+			aspect_ratio = screen_res.x / screen_res.y
+		end
+		if screen_aspect < aspect_ratio then
+			width_mul = aspect_ratio
+		elseif screen_aspect > aspect_ratio then
+			y = (1 - aspect_ratio / width_mul) / 2
+			h = aspect_ratio / width_mul
+		end
+	else
+		y = (1 - aspect_ratio / width_mul) / 2
+		h = aspect_ratio / width_mul
+	end
+	self._vp._vp:set_dimensions(x, y, w, h)
+	self._vp:camera():set_width_multiplier(CoreMath.width_mul(width_mul))
 end
 
 function MenuSceneManager:_sky_rotation_modifier()

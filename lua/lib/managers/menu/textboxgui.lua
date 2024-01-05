@@ -49,7 +49,12 @@ function TextBoxGui:layer()
 end
 
 function TextBoxGui:add_background()
-	self._background = self._ws:panel():bitmap({
+	if alive(self._fullscreen_ws) then
+		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		self._fullscreen_ws = nil
+	end
+	self._fullscreen_ws = Overlay:gui():create_screen_workspace()
+	self._background = self._fullscreen_ws:panel():bitmap({
 		name = "bg",
 		texture = "guis/textures/test_blur_df",
 		color = Color.white,
@@ -60,12 +65,13 @@ function TextBoxGui:add_background()
 		h = self._ws:panel():h(),
 		valign = "grow"
 	})
-	self._background2 = self._ws:panel():rect({
+	self._background2 = self._fullscreen_ws:panel():rect({
 		name = "bg",
 		color = Color.black,
 		alpha = 0,
 		layer = 0,
 		blend_mode = "normal",
+		halign = "grow",
 		valign = "grow"
 	})
 end
@@ -86,6 +92,7 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	self._init_layer = self._ws:panel():layer()
 	if alive(self._text_box) then
 		ws:panel():remove(self._text_box)
+		self._text_box = nil
 	end
 	if self._info_box then
 		self._info_box:close()
@@ -875,7 +882,7 @@ function TextBoxGui:mouse_wheel_down(x, y)
 end
 
 function TextBoxGui:scroll_up(y)
-	if not self._text_box then
+	if not alive(self._text_box) then
 		return
 	end
 	local scroll_panel = self._text_box:child("info_area"):child("scroll_panel")
@@ -891,7 +898,7 @@ function TextBoxGui:scroll_up(y)
 end
 
 function TextBoxGui:scroll_down(y)
-	if not self._text_box then
+	if not alive(self._text_box) then
 		return
 	end
 	local info_area = self._text_box:child("info_area")
@@ -1162,9 +1169,13 @@ function TextBoxGui:close()
 	end
 	self._ws:panel():remove(self._panel)
 	if alive(self._background) then
-		self._ws:panel():remove(self._background)
+		self._fullscreen_ws:panel():remove(self._background)
 	end
 	if alive(self._background2) then
-		self._ws:panel():remove(self._background2)
+		self._fullscreen_ws:panel():remove(self._background2)
+	end
+	if alive(self._fullscreen_ws) then
+		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		self._fullscreen_ws = nil
 	end
 end

@@ -23,8 +23,8 @@ if SystemInfo:platform() == Idstring("PS3") then
 	SavefileManager.VERSION_NAME = "1.03"
 	SavefileManager.LOWEST_COMPATIBLE_VERSION = "1.02"
 else
-	SavefileManager.VERSION_NAME = ""
-	SavefileManager.LOWEST_COMPATIBLE_VERSION = ""
+	SavefileManager.VERSION_NAME = "1.8"
+	SavefileManager.LOWEST_COMPATIBLE_VERSION = "1.7"
 end
 SavefileManager.SAVE_SYSTEM = "steam_cloud"
 SavefileManager._USER_ID_OVERRRIDE = nil
@@ -811,7 +811,9 @@ function SavefileManager:_remove(slot, save_system)
 	if SystemInfo:platform() == Idstring("WIN32") then
 		param_map.save_system = save_system or "steam_cloud"
 	end
-	self._loading_save_games[slot] = nil
+	if self._loading_save_games then
+		self._loading_save_games[slot] = nil
+	end
 	local task = NewSave:remove(param_map)
 	local task_handler = SavefileTaskHandler:new(task, self.REMOVE_TASK_TYPE, callback(self, self, "_remove_callback"))
 	self:_add_task_handler(task_handler)

@@ -352,6 +352,11 @@ function MousePointerManager:modified_mouse_pos()
 	return self:convert_mouse_pos(x, y)
 end
 
+function MousePointerManager:convert_1280_mouse_pos(x, y)
+	local full_1280_size = managers.gui_data:full_1280_size()
+	return x - full_1280_size.convert_x, y - full_1280_size.convert_y
+end
+
 function MousePointerManager:convert_fullscreen_mouse_pos(x, y)
 	return x, y
 end

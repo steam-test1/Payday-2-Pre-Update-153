@@ -16,6 +16,7 @@ function HUDChat:init(ws, hud)
 		x = 0,
 		h = 500,
 		w = self._panel_width,
+		halign = "left",
 		valign = "bottom"
 	})
 	self._panel:set_bottom(self._panel:parent():h() - 112)

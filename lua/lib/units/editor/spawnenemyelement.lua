@@ -41,8 +41,6 @@ function SpawnEnemyUnitElement:init(unit)
 		"units/payday2/characters/ene_security_1/ene_security_1",
 		"units/payday2/characters/ene_security_2/ene_security_2",
 		"units/payday2/characters/ene_security_3/ene_security_3",
-		"units/payday2/characters/ene_security_gensec_1/ene_security_gensec_1",
-		"units/payday2/characters/ene_security_gensec_2/ene_security_gensec_2",
 		"units/payday2/characters/ene_shield_1/ene_shield_1",
 		"units/payday2/characters/ene_shield_2/ene_shield_2",
 		"units/payday2/characters/ene_sniper_1/ene_sniper_1",
@@ -52,7 +50,9 @@ function SpawnEnemyUnitElement:init(unit)
 		"units/payday2/characters/ene_swat_2/ene_swat_2",
 		"units/payday2/characters/ene_swat_heavy_1/ene_swat_heavy_1",
 		"units/payday2/characters/ene_tazer_1/ene_tazer_1",
-		"units/payday2/characters/ene_biker_escape/ene_biker_escape"
+		"units/payday2/characters/ene_biker_escape/ene_biker_escape",
+		"units/pd2_dlc1/characters/ene_security_gensec_1/ene_security_gensec_1",
+		"units/pd2_dlc1/characters/ene_security_gensec_2/ene_security_gensec_2"
 	}
 	self._hed.enemy = "units/payday2/characters/ene_swat_1/ene_swat_1"
 	self._hed.force_pickup = "none"

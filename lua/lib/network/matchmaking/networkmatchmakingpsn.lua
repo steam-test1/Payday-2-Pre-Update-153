@@ -276,6 +276,9 @@ function NetworkMatchMakingPSN:user_in_lobby(id)
 	if not self._room_id then
 		return false
 	end
+	if not PSN:get_info_session(self._room_id) then
+		return false
+	end
 	local memberlist = PSN:get_info_session(self._room_id).memberlist
 	for _, member in ipairs(memberlist) do
 		if member.user_id == id then
@@ -620,6 +623,21 @@ function NetworkMatchMakingPSN:set_difficulty_filter(filter)
 	self._difficulty_filter = filter
 end
 
+function NetworkMatchMakingPSN:get_lobby_return_count()
+end
+
+function NetworkMatchMakingPSN:set_lobby_return_count(lobby_return_count)
+end
+
+function NetworkMatchMakingPSN:lobby_filters()
+end
+
+function NetworkMatchMakingPSN:set_lobby_filters(filters)
+end
+
+function NetworkMatchMakingPSN:add_lobby_filter(key, value, comparision_type)
+end
+
 function NetworkMatchMakingPSN:start_search_lobbys(friends_only)
 	if self._searching_lobbys then
 		return
@@ -632,8 +650,8 @@ function NetworkMatchMakingPSN:start_search_lobbys(friends_only)
 		local function f(info)
 			table.insert(self._lobbys_info_list, info)
 			
-			if self._search_lobbys_index > 100 or #info.room_list == 0 then
-				print("search done")
+			if self._search_lobbys_index >= 1 then
+				print("--------------- search done")
 				self:_call_callback("search_lobby", self._lobbys_info_list)
 			else
 				self._search_lobbys_index = self._search_lobbys_index + self.MAX_SEARCH_RESULTS
@@ -765,7 +783,7 @@ function NetworkMatchMakingPSN:search_lobby(settings)
 			self._difficulty_filter
 		})
 	end
-	PSN:search_session(table_description, filter, PSN:get_world_list()[1].world_id, self._search_lobbys_index, self.MAX_SEARCH_RESULTS)
+	PSN:search_session(table_description, filter, PSN:get_world_list()[1].world_id, self._search_lobbys_index, self.MAX_SEARCH_RESULTS, true)
 end
 
 function NetworkMatchMakingPSN:_search_lobby_failed()
@@ -941,9 +959,11 @@ end
 function NetworkMatchMakingPSN:is_server_ok(friends_only, owner_id, attributes_numbers, skip_permission_check)
 	local permission = attributes_numbers and tweak_data:index_to_permission(attributes_numbers[3]) or "public"
 	if (attributes_numbers[6] ~= 1 or not NetworkManager.DROPIN_ENABLED) and attributes_numbers[4] ~= 1 then
+		print("[NetworkMatchMakingPSN:is_server_ok] Discard server due to drop in state")
 		return false, 1
 	end
 	if managers.experience:current_level() < attributes_numbers[7] then
+		print("[NetworkMatchMakingPSN:is_server_ok] Discard server due to reputation level limit")
 		return false, 3
 	end
 	if friends_only then
@@ -952,8 +972,12 @@ function NetworkMatchMakingPSN:is_server_ok(friends_only, owner_id, attributes_n
 		return true
 	end
 	if permission == "friends_only" then
+		if not managers.network.friends:is_friend(owner_id) then
+			print("[NetworkMatchMakingPSN:is_server_ok] Discard server cause friends only perimssion")
+		end
 		return managers.network.friends:is_friend(owner_id), 2
 	end
+	print("[NetworkMatchMakingPSN:is_server_ok] Discard server")
 	return false, 2
 end
 
@@ -1016,6 +1040,57 @@ function NetworkMatchMakingPSN:join_server_with_check(room_id, skip_permission_c
 		}
 	}
 	PSN:get_session_attributes({room_id}, wanted_attributes)
+end
+
+function NetworkMatchMakingPSN:update_session_attributes(rooms, cb_func)
+	if self._joining_lobby then
+		cb_func(nil)
+		return
+	end
+	if #rooms <= 0 then
+		cb_func({})
+		return
+	end
+	self._update_session_attributes_cb = cb_func
+	PSN:set_matchmaking_callback("fetch_session_attributes", callback(self, self, "_update_session_attributes_result"))
+	local wanted_attributes = {
+		numbers = {
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8
+		}
+	}
+	PSN:get_session_attributes(rooms, wanted_attributes)
+end
+
+function NetworkMatchMakingPSN:_update_session_attributes_result(results)
+	local info_list = {}
+	local info = {}
+	info.attribute_list = {}
+	info.request_id = 0
+	info.room_list = {}
+	table.insert(info_list, info)
+	if results.rooms then
+		for _, room_info in ipairs(results.rooms) do
+			local attributes = room_info.attributes
+			local full = room_info.full
+			local closed = room_info.closed
+			local owner_id = room_info.owner
+			local room_id = room_info.room_id
+			if not full and not closed and attributes.numbers[5] == self:_game_version() then
+				table.insert(info.attribute_list, attributes)
+				table.insert(info.room_list, {owner_id = owner_id, room_id = room_id})
+			end
+		end
+	end
+	if self._update_session_attributes_cb then
+		self._update_session_attributes_cb(info_list)
+	end
 end
 
 function NetworkMatchMakingPSN:join_server(room_id)

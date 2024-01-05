@@ -16,6 +16,7 @@ TeamAIDamage._RESULT_INDEX_TABLE = {
 	heavy_hurt = 5,
 	fatal = 6
 }
+TeamAIDamage._HEALTH_GRANULARITY = CopDamage._HEALTH_GRANULARITY
 TeamAIDamage.set_invulnerable = CopDamage.set_invulnerable
 TeamAIDamage._hurt_severities = CopDamage._hurt_severities
 TeamAIDamage.get_damage_type = CopDamage.get_damage_type

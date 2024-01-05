@@ -11,6 +11,7 @@ function BaseInteractionExt:init(unit)
 	local rotation = self._interact_obj and self._interact_obj:rotation() or self._unit:rotation()
 	self._interact_axis = self._tweak_data.axis and rotation[self._tweak_data.axis](rotation) or nil
 	self:_update_interact_position()
+	self:_setup_ray_objects()
 end
 
 local ids_material = Idstring("material")
@@ -32,6 +33,21 @@ end
 function BaseInteractionExt:interact_axis()
 	self:_update_interact_axis()
 	return self._interact_axis
+end
+
+function BaseInteractionExt:_setup_ray_objects()
+	if self._ray_object_names then
+		self._ray_objects = {
+			self._interact_obj or self._unit:orientation_object()
+		}
+		for _, object_name in ipairs(self._ray_object_names) do
+			table.insert(self._ray_objects, self._unit:get_object(Idstring(object_name)))
+		end
+	end
+end
+
+function BaseInteractionExt:ray_objects()
+	return self._ray_objects
 end
 
 function BaseInteractionExt:_update_interact_position()
@@ -64,14 +80,21 @@ function BaseInteractionExt:_btn_interact()
 	return "[" .. managers.controller:get_settings(type):get_connection("interact"):get_input_name_list()[1] .. "]"
 end
 
-function BaseInteractionExt:selected(player)
+function BaseInteractionExt:can_select(player)
 	if not self:_has_required_upgrade() then
-		return
+		return false
 	end
 	if not self:_has_required_deployable() then
-		return
+		return false
 	end
 	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
+		return false
+	end
+	return true
+end
+
+function BaseInteractionExt:selected(player)
+	if not self:can_select(player) then
 		return
 	end
 	local text_id = not self._tweak_data.text_id and alive(self._unit) and self._unit:base().interaction_text_id and self._unit:base():interaction_text_id()
@@ -328,6 +351,26 @@ function UseInteractionExt:interact(player)
 	if self._tweak_data.sound_event then
 		player:sound():play(self._tweak_data.sound_event)
 	end
+	if self._unit:base() and self._unit:base().set_alert_radius then
+		if managers.player:has_category_upgrade("player", "silent_drill") then
+			self._unit:base():set_alert_radius(nil)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
+		elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
+			local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
+			self._unit:base():set_alert_radius(radius)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
+		else
+			self._unit:base():set_alert_radius(2500)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
+		end
+		local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
+		if 0 < autorepair_chance and autorepair_chance > math.random() then
+			self._unit:base():set_autorepair(true)
+		else
+			self._unit:base():set_autorepair(nil)
+		end
+		self._unit:timer_gui():set_timer_multiplier(managers.player:upgrade_value("player", "drill_speed_multiplier", 1))
+	end
 	self:remove_interact()
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
@@ -346,6 +389,27 @@ function UseInteractionExt:sync_interacted(peer, skip_alive_check)
 	local player = managers.network:game():member(peer:id()):unit()
 	if not skip_alive_check and not alive(player) then
 		return
+	end
+	if Network:is_server() and self._unit:base() and self._unit:base().set_alert_radius then
+		if player:base():upgrade_value("player", "silent_drill") then
+			self._unit:base():set_alert_radius(nil)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
+		elseif player:base():upgrade_value("player", "drill_alert_rad") then
+			self._unit:base():set_alert_radius(player:base():upgrade_value("player", "drill_alert_rad"))
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
+		else
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
+		end
+		if player:base():upgrade_value("player", "drill_autorepair") then
+			self._unit:base():set_autorepair(true)
+		end
+		local autorepair_chance = player:base():upgrade_value("player", "drill_autorepair")
+		if autorepair_chance and autorepair_chance > math.random() then
+			self._unit:base():set_autorepair(true)
+		end
+		if player:base():upgrade_value("player", "drill_speed_multiplier") then
+			self._unit:timer_gui():set_timer_multiplier(player:base():upgrade_value("player", "drill_speed_multiplier") or 1)
+		end
 	end
 	self:remove_interact()
 	self:set_active(false)
@@ -891,11 +955,11 @@ function CarryInteractionExt:_interact_blocked(player)
 	return not managers.player:can_carry(self._unit:carry_data():carry_id())
 end
 
-function CarryInteractionExt:selected(player)
+function CarryInteractionExt:can_select(player)
 	if managers.player:is_carrying() or managers.player:carry_blocked_by_cooldown() then
-		return
+		return false
 	end
-	return CarryInteractionExt.super.selected(self, player)
+	return CarryInteractionExt.super.can_select(self, player)
 end
 
 function CarryInteractionExt:interact(player)
@@ -1004,11 +1068,14 @@ function MissionDoorDeviceInteractionExt:interact(player)
 		if self._unit:base() and self._unit:base().set_alert_radius then
 			if managers.player:has_category_upgrade("player", "silent_drill") then
 				self._unit:base():set_alert_radius(nil)
+				self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
 			elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
 				local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
 				self._unit:base():set_alert_radius(radius)
+				self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
 			else
 				self._unit:base():set_alert_radius(2500)
+				self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
 			end
 			local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
 			if 0 < autorepair_chance and autorepair_chance > math.random() then

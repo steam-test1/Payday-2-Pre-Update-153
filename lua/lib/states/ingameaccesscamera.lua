@@ -148,9 +148,9 @@ function IngameAccessCamera:update(t, dt)
 		if World:in_view_with_options(unit:movement():m_head_pos(), 0, 0, 4000) then
 			local ray
 			if self._last_access_camera and self._last_access_camera:has_camera_unit() then
-				ray = self._cam_unit:raycast("ray", unit:movement():m_head_pos(), self._cam_unit:position(), "slot_mask", managers.slot:get_mask("world_geometry"), "ignore_unit", self._last_access_camera:camera_unit(), "report")
+				ray = self._cam_unit:raycast("ray", unit:movement():m_head_pos(), self._cam_unit:position(), "ray_type", "ai_vision", "slot_mask", managers.slot:get_mask("world_geometry"), "ignore_unit", self._last_access_camera:camera_unit(), "report")
 			else
-				ray = self._cam_unit:raycast("ray", unit:movement():m_head_pos(), self._cam_unit:position(), "slot_mask", managers.slot:get_mask("world_geometry"), "report")
+				ray = self._cam_unit:raycast("ray", unit:movement():m_head_pos(), self._cam_unit:position(), "ray_type", "ai_vision", "slot_mask", managers.slot:get_mask("world_geometry"), "report")
 			end
 			if not ray then
 				amount = amount + 1
