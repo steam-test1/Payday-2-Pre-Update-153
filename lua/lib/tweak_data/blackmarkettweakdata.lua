@@ -4724,7 +4724,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.tomahawk.stats.range = 225
 	self.melee_weapons.tomahawk.expire_t = 1.1
 	self.melee_weapons.tomahawk.repeat_expire_t = 0.8
-	self.melee_weapons.tomahawk.attack_allowed_expire_t = 0.36666667
+	self.melee_weapons.tomahawk.attack_allowed_expire_t = 0.1
 	self.melee_weapons.tomahawk.sounds = {}
 	self.melee_weapons.tomahawk.sounds.equip = "tomahawk_equip"
 	self.melee_weapons.tomahawk.sounds.hit_air = "tomahawk_hit_air"

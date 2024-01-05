@@ -1011,7 +1011,7 @@ function NarrativeTweakData:init()
 		420000,
 		500000
 	}
-	self.jobs.election_day_prof.heat = {this_job = -2, other_jobs = 2}
+	self.jobs.election_day_prof.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.safehouse = {}
 	self.jobs.safehouse.name_id = "heist_safehouse"
 	self.jobs.safehouse.briefing_id = "heist_safehouse_crimenet"
@@ -1428,11 +1428,11 @@ function NarrativeTweakData:init()
 	self.jobs.big.contact = "the_dentist"
 	self.jobs.big.region = "street"
 	self.jobs.big.experience_mul = {
-		5.5,
-		5.5,
-		5.5,
-		5.5,
-		5.5
+		6.5,
+		6.5,
+		6.5,
+		6.5,
+		6.5
 	}
 	self.jobs.big.jc = 40
 	self.jobs.big.chain = {
@@ -1455,13 +1455,13 @@ function NarrativeTweakData:init()
 		"cn_big3"
 	}
 	self.jobs.big.payout = {
-		60000,
 		90000,
-		120000,
-		210000,
-		240000
+		135000,
+		180000,
+		310000,
+		380000
 	}
-	self.jobs.big.heat = {this_job = 0, other_jobs = 0}
+	self.jobs.big.heat = {this_job = -10, other_jobs = 20}
 	self.jobs.big.dlc = "big_bank"
 	self.jobs.big_prof = deep_clone(self.jobs.big)
 	self.jobs.big_prof.jc = 40

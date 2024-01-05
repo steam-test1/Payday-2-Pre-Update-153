@@ -374,17 +374,72 @@ function MenuManager:show_NPCommerce_browse_success()
 	managers.system_menu:show(dialog_data)
 end
 
-function MenuManager:show_new_message_dialog(params)
+function MenuManager:show_dlc_require_restart()
+	if not managers.system_menu:is_active() then
+		local dialog_data = {}
+		dialog_data.title = managers.localization:text("dialog_dlc_require_restart")
+		dialog_data.text = managers.localization:text("dialog_dlc_require_restart_desc")
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+		managers.system_menu:show(dialog_data)
+	end
+end
+
+function MenuManager:show_video_message_dialog(params)
+	local text_params = params.text_params or {}
+	text_params.player = text_params.player or tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
 	local dialog_data = {}
-	dialog_data.title = managers.localization:text(params.title)
-	dialog_data.text = managers.localization:text(params.text, {
-		player = tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
-	})
-	local ok_button = {}
-	ok_button.text = managers.localization:text("dialog_ok")
-	dialog_data.button_list = {ok_button}
-	dialog_data.texture = "guis/textures/pd2/feature_crimenet_heat"
-	dialog_data.text_blend_mode = "add"
+	dialog_data.title = managers.localization:text(params.title, params.title_params)
+	dialog_data.text = managers.localization:text(params.text, text_params)
+	if params.button_list then
+		dialog_data.button_list = params.button_list
+		dialog_data.focus_button = params.focus_button or #dialog_data.button_list
+	else
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+	end
+	dialog_data.texture = params.texture == nil and "guis/textures/pd2/feature_crimenet_heat" or params.texture
+	dialog_data.video = params.video or nil
+	dialog_data.video_loop = params.video_loop or nil
+	dialog_data.image_blend_mode = params.image_blend_mode or "normal"
+	dialog_data.text_blend_mode = params.text_blend_mode or "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 620
+	dialog_data.h = 532
+	dialog_data.image_w = 620
+	dialog_data.image_h = 300
+	dialog_data.image_halign = "center"
+	dialog_data.image_valign = "top"
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
+	dialog_data.text_formating_color = params.formating_color or Color.white
+	dialog_data.text_formating_color_table = params.color_table
+	managers.system_menu:show_new_unlock(dialog_data)
+end
+
+function MenuManager:show_new_message_dialog(params)
+	local text_params = params.text_params or {}
+	text_params.player = text_params.player or tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text(params.title, params.title_params)
+	dialog_data.text = managers.localization:text(params.text, text_params)
+	if params.button_list then
+		dialog_data.button_list = params.button_list
+		dialog_data.focus_button = params.focus_button or #dialog_data.button_list
+	else
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+	end
+	dialog_data.texture = params.texture == nil and "guis/textures/pd2/feature_crimenet_heat" or params.texture
+	dialog_data.video = params.video or nil
+	dialog_data.video_loop = params.video_loop or nil
+	dialog_data.image_blend_mode = params.image_blend_mode or "normal"
+	dialog_data.text_blend_mode = params.text_blend_mode or "add"
 	dialog_data.use_text_formating = true
 	dialog_data.w = 620
 	dialog_data.h = 532
@@ -395,6 +450,8 @@ function MenuManager:show_new_message_dialog(params)
 	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
 	dialog_data.font = tweak_data.menu.pd2_small_font
 	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
+	dialog_data.text_formating_color = params.formating_color or Color.white
+	dialog_data.text_formating_color_table = params.color_table
 	managers.system_menu:show_new_unlock(dialog_data)
 end
 
@@ -870,6 +927,9 @@ function MenuManager:show_confirm_blackmarket_mod(params)
 	if params.removes and 0 < #params.removes then
 		local mods = ""
 		for _, mod_name in ipairs(params.removes) do
+			if Application:production_build() and managers.weapon_factory:is_part_standard_issue(mod_name) then
+				Application:error("[MenuManager:show_confirm_blackmarket_mod] Standard Issuse Part Detected!", inspect(params))
+			end
 			mods = mods .. "\n" .. managers.weapon_factory:get_part_name_by_part_id(mod_name)
 		end
 		dialog_data.text = dialog_data.text .. "\n" .. l_local:text("dialog_blackmarket_mod_conflict", {mods = mods}) .. "\n"

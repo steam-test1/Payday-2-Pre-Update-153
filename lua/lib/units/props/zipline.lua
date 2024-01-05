@@ -54,18 +54,22 @@ local mvec1 = Vector3()
 function ZipLine:_update_sled(t, dt)
 	local current_time = self._current_time
 	if self._attached_bag then
-		self._current_time = math.min(1, self._current_time + dt / self._total_time)
-		local dir = math.lerp(self._line_data.dir_s, self._line_data.dir_e, self._current_time)
-		local rot = Rotation(dir, math.UP)
-		self._attached_bag:set_rotation(rot)
-		local pos = self:update_and_get_pos_at_time(self._current_time)
-		mvector3.set(mvec1, pos)
-		mvector3.add(mvec1, rot:x() * self._attached_bag_offset.x)
-		mvector3.add(mvec1, rot:y() * self._attached_bag_offset.y)
-		mvector3.add(mvec1, rot:z() * self._attached_bag_offset.z)
-		self._attached_bag:set_position(mvec1)
-		if self._current_time == 1 then
-			self:release_bag(self._attached_bag)
+		if alive(self._attached_bag) then
+			self._current_time = math.min(1, self._current_time + dt / self._total_time)
+			local dir = math.lerp(self._line_data.dir_s, self._line_data.dir_e, self._current_time)
+			local rot = Rotation(dir, math.UP)
+			self._attached_bag:set_rotation(rot)
+			local pos = self:update_and_get_pos_at_time(self._current_time)
+			mvector3.set(mvec1, pos)
+			mvector3.add(mvec1, rot:x() * self._attached_bag_offset.x)
+			mvector3.add(mvec1, rot:y() * self._attached_bag_offset.y)
+			mvector3.add(mvec1, rot:z() * self._attached_bag_offset.z)
+			self._attached_bag:set_position(mvec1)
+			if self._current_time == 1 then
+				self:release_bag(self._attached_bag)
+			end
+		else
+			self._attached_bag = nil
 		end
 	elseif not alive(self._user_unit) and self._current_time ~= 0 then
 		self._current_time = math.max(0, self._current_time - dt / self._total_time)

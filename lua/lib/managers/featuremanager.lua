@@ -12,6 +12,7 @@ function FeatureManager:_setup()
 	self._default.announcements.crimenet_welcome = 0
 	self._default.announcements.dlc_gage_pack_jobs = 1
 	self._default.announcements.blackmarket_rename = 1
+	self._default.announcements.join_pd2_clan = 50
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -20,6 +21,7 @@ function FeatureManager:_setup()
 		end
 		Global.feature_manager.announcements.crimenet_welcome = 3
 		Global.feature_manager.announcements.dlc_gage_pack_jobs = 1
+		Global.feature_manager.announcements.join_pd2_clan = 50
 		Global.feature_manager.announced = {}
 	end
 	self._global = Global.feature_manager
@@ -117,5 +119,32 @@ function FeatureManager:blackmarket_rename()
 		title = "menu_feature_blackmarket_rename",
 		text = "menu_feature_blackmarket_rename_desc"
 	})
+	return true
+end
+
+function FeatureManager:join_pd2_clan()
+	print("FeatureManager:join_pd2_clan()")
+	local params = {
+		title = "menu_feature_join_pd2_clan",
+		text = "menu_feature_join_pd2_clan_desc",
+		formating_color = tweak_data.screen_colors.button_stage_2,
+		texture = false,
+		video = "movies/join_community",
+		image_blend_mode = "add",
+		video_loop = true
+	}
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	ok_button.cancel_button = true
+	local joing_pd2_clan_button = {}
+	joing_pd2_clan_button.text = managers.localization:text("dialog_join_pd2_clan")
+	
+	function joing_pd2_clan_button.callback_func()
+		Steam:overlay_activate("game", "OfficialGameGroup")
+	end
+	
+	params.button_list = {joing_pd2_clan_button, ok_button}
+	params.focus_button = 1
+	managers.menu:show_video_message_dialog(params)
 	return true
 end

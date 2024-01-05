@@ -85,6 +85,7 @@ function ActionSpooc:init(action_desc, common_data)
 	self._last_pos = mvector3.copy(common_data.pos)
 	CopActionAct._create_blocks_table(self, action_desc.blocks)
 	if self._was_interrupted then
+		self._last_sent_pos = action_desc.last_sent_pos
 		if self._nav_path[self._nav_index + 1] then
 			self:_start_sprint()
 		else
@@ -509,7 +510,8 @@ function ActionSpooc:get_husk_interrupt_desc()
 		nr_expected_nav_points = self._nr_expected_nav_points,
 		flying_strike = self._action_desc.flying_strike,
 		is_local = self._is_local,
-		action_id = self._action_id
+		action_id = self._action_id,
+		last_sent_pos = self._last_sent_pos
 	}
 	if self._blocks then
 		local blocks = {}

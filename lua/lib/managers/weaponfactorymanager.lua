@@ -745,6 +745,48 @@ function WeaponFactoryManager:get_parts_from_weapon_id(weapon_id)
 	return self._parts_by_weapon[factory_id]
 end
 
+function WeaponFactoryManager:is_part_standard_issue(part_id)
+	local part_tweak_data = tweak_data.weapon.factory.parts[part_id]
+	if not part_tweak_data then
+		Application:error("[WeaponFactoryManager:get_part_name_by_part_id] Found no part with part id", part_id)
+		return false
+	end
+	return Idstring(part_tweak_data.name_id) == Idstring("bm_wp_ksg_fg_standard")
+end
+
+function WeaponFactoryManager:get_part_desc_by_part_id_from_weapon(part_id, factory_id, blueprint)
+	local factory = tweak_data.weapon.factory
+	local override = self:_get_override_parts(factory_id, blueprint)
+	local part = self:_part_data(part_id, factory_id, override)
+	local desc_id = part.desc_id or tweak_data.blackmarket.weapon_mods[part_id].desc_id
+	return desc_id and managers.localization:text(desc_id, {
+		BTN_GADGET = managers.localization:btn_macro("weapon_gadget", true)
+	}) or Application:production_build() and "Add ##desc_id## to ##" .. part_id .. "## in tweak_data.blackmarket.weapon_mods" or ""
+end
+
+function WeaponFactoryManager:get_part_name_by_part_id_from_weapon(part_id, factory_id, blueprint)
+	local factory = tweak_data.weapon.factory
+	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	local override = self:_get_override_parts(factory_id, blueprint)
+	if not forbidden[part_id] then
+		local part = self:_part_data(part_id, factory_id, override)
+		local name_id = part.name_id
+		return managers.localization:text(name_id)
+	end
+end
+
+function WeaponFactoryManager:get_part_desc_by_part_id(part_id)
+	local part_tweak_data = tweak_data.weapon.factory.parts[part_id]
+	if not part_tweak_data then
+		Application:error("[WeaponFactoryManager:get_part_desc_by_part_id] Found no part with part id", part_id)
+		return
+	end
+	local desc_id = tweak_data.blackmarket.weapon_mods[part_id].desc_id
+	return desc_id and managers.localization:text(desc_id, {
+		BTN_GADGET = managers.localization:btn_macro("weapon_gadget", true)
+	}) or Application:production_build() and "Add ##desc_id## to ##" .. part_id .. "## in tweak_data.blackmarket.weapon_mods" or ""
+end
+
 function WeaponFactoryManager:get_part_name_by_part_id(part_id)
 	local part_tweak_data = tweak_data.weapon.factory.parts[part_id]
 	if not part_tweak_data then

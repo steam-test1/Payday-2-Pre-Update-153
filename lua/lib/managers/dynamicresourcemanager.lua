@@ -62,6 +62,9 @@ function DynamicResourceManager:load(resource_type, resource_name, package_name,
 		entry.callbacks = {}
 		self._dyn_resources[key] = entry
 		self._to_unload[key] = nil
+		if not next(self._to_unload) then
+			self._to_unload = nil
+		end
 	end
 	entry = entry or self._dyn_resources[key]
 	if entry then
@@ -100,18 +103,18 @@ function DynamicResourceManager:load(resource_type, resource_name, package_name,
 			Application:error("[DynamicResourceManager:load]", resource_type, resource_name, package_name, complete_clbk)
 			Application:stack_dump("error")
 		end
-		PackageManager:package(package_name):load_temp_resource(resource_type, resource_name, complete_clbk and callback(self, DynamicResourceManager, "clbk_resource_loaded") or nil)
+		PackageManager:package(package_name):load_temp_resource(resource_type, resource_name, complete_clbk and callback(self, DynamicResourceManager, "clbk_resource_loaded") or nil, true)
 	end
 end
 
 function DynamicResourceManager:unload(resource_type, resource_name, package_name, keep_using)
 	if keep_using then
-		debug_pause("[DynamicResourceManager:unload]", resource_type, resource_name, package_name, keep_using)
+		debug_pause("[DynamicResourceManager:unload] keep_using should be false!", resource_type, resource_name, package_name, keep_using)
 	end
 	local key = self._get_resource_key(resource_type, resource_name, package_name)
 	local entry = self._dyn_resources[key]
-	if entry.ref_c ~= 1 then
-		entry.ref_c = entry.ref_c - 1
+	entry.ref_c = entry.ref_c - 1
+	if entry.ref_c ~= 0 then
 		return
 	end
 	self._to_unload = self._to_unload or {}

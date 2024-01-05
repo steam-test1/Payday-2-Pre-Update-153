@@ -4351,10 +4351,8 @@ function BlackMarketGui:update_info_text()
 		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget"
 		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo"
 		if is_gadget or is_ammo then
-			local desc_id = tweak_data.blackmarket.weapon_mods[part_id].desc_id
-			updated_texts[4].text = desc_id and managers.localization:text(desc_id, {
-				BTN_GADGET = managers.localization:btn_macro("weapon_gadget", true)
-			}) or Application:production_build() and "Add ##desc_id## to ##" .. part_id .. "## in tweak_data.blackmarket.weapon_mods" or ""
+			local crafted = managers.blackmarket:get_crafted_category_slot(prev_data.category, prev_data.slot)
+			updated_texts[4].text = managers.weapon_factory:get_part_desc_by_part_id_from_weapon(part_id, crafted.factory_id, crafted.blueprint)
 		end
 		if slot_data.global_value and slot_data.global_value ~= "normal" then
 			if is_gadget or is_ammo then

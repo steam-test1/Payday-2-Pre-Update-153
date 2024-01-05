@@ -1270,6 +1270,9 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	self._special_contracts_id = {}
 	self:add_special_contracts(node:parameters().no_casino)
 	managers.features:announce_feature("crimenet_welcome")
+	if is_win32 and Steam:logged_on() and not managers.dlc:has_pd2_clan() and math.random() < 0.2 then
+		managers.features:announce_feature("join_pd2_clan")
+	end
 	if managers.dlc:is_dlc_unlocked("gage_pack_jobs") then
 		managers.features:announce_feature("dlc_gage_pack_jobs")
 	end

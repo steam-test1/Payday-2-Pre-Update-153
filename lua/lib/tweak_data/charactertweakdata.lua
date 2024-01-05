@@ -188,7 +188,7 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.detection = presets.detection.normal
 	self.heavy_swat.HEALTH_INIT = 10
 	self.heavy_swat.headshot_dmg_mul = self.heavy_swat.HEALTH_INIT / 6
-	self.heavy_swat.damage.explosion_damage_mul = 0.7
+	self.heavy_swat.damage.explosion_damage_mul = 0.9
 	self.heavy_swat.move_speed = presets.move_speed.fast
 	self.heavy_swat.surrender_break_time = {6, 8}
 	self.heavy_swat.suppression = presets.suppression.hard_agg
@@ -244,7 +244,7 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.detection = presets.detection.normal
 	self.fbi_heavy_swat.HEALTH_INIT = 20
 	self.fbi_heavy_swat.headshot_dmg_mul = self.fbi_heavy_swat.HEALTH_INIT / 10
-	self.fbi_heavy_swat.damage.explosion_damage_mul = 0.6
+	self.fbi_heavy_swat.damage.explosion_damage_mul = 0.9
 	self.fbi_heavy_swat.move_speed = presets.move_speed.fast
 	self.fbi_heavy_swat.surrender_break_time = {6, 8}
 	self.fbi_heavy_swat.suppression = presets.suppression.hard_agg
@@ -530,7 +530,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.detection = presets.detection.normal
 	self.tank.HEALTH_INIT = 550
 	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
-	self.tank.damage.explosion_damage_mul = 0.75
+	self.tank.damage.explosion_damage_mul = 1
 	self.tank.move_speed = presets.move_speed.very_slow
 	self.tank.allowed_stances = {cbt = true}
 	self.tank.allowed_poses = {stand = true}
@@ -639,7 +639,7 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.deathguard = false
 	self.shield.no_equip_anim = true
 	self.shield.wall_fwd_offset = 100
-	self.shield.damage.explosion_damage_mul = 0.25
+	self.shield.damage.explosion_damage_mul = 0.8
 	self.shield.damage.hurt_severity = presets.hurt_severities.only_explosion_hurts
 	self.shield.damage.shield_knocked = true
 	self.shield.weapon.mp9 = {}
@@ -5213,7 +5213,7 @@ function CharacterTweakData:_set_overkill_290()
 	}
 	self.city_swat.HEALTH_INIT = 24
 	self.city_swat.headshot_dmg_mul = self.fbi_swat.HEALTH_INIT / 8
-	self.city_swat.damage.explosion_damage_mul = 0.6
+	self.city_swat.damage.explosion_damage_mul = 0.8
 	self.city_swat.damage.hurt_severity = self.presets.hurt_severities.only_light_hurt
 	self.shield.weapon.mp9.focus_dis = 200
 	self.tank.weapon.saiga.focus_dis = 200

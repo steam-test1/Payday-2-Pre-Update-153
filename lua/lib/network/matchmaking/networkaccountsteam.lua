@@ -124,6 +124,7 @@ function NetworkAccountSTEAM:_on_close_overlay()
 	end
 	self._overlay_opened = false
 	game_state_machine:_set_controller_enabled(true)
+	managers.dlc:chk_dlc_purchase()
 end
 
 function NetworkAccountSTEAM:achievements_fetched()

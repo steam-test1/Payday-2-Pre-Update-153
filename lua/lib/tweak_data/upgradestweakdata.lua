@@ -110,7 +110,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.explosive_bullet = {}
 	self.explosive_bullet.curve_pow = 0.5
 	self.explosive_bullet.player_dmg_mul = 0.1
-	self.explosive_bullet.range = 150
+	self.explosive_bullet.range = 200
 	self.explosive_bullet.feedback_range = self.explosive_bullet.range
 	self.explosive_bullet.camera_shake_max_mul = 2
 	self.values.player.crime_net_deal = {0.9, 0.8}

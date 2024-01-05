@@ -394,12 +394,12 @@ end
 
 function ClientNetworkSession:chk_send_outfit_loading_status()
 	print("[ClientNetworkSession:chk_send_outfit_loading_status]\n", inspect(self._notify_host_when_outfits_loaded), "\n", "self:_get_peer_outfit_versions_str()", self:_get_peer_outfit_versions_str())
-	if not self._notify_host_when_outfits_loaded or self._notify_host_when_outfits_loaded.outfit_versions_str ~= self:_get_peer_outfit_versions_str() or not self:are_all_peer_assets_loaded() then
-		return
+	if self._notify_host_when_outfits_loaded and self._notify_host_when_outfits_loaded.outfit_versions_str == self:_get_peer_outfit_versions_str() and self:are_all_peer_assets_loaded() then
+		print("answering to request")
+		self:send_to_host("set_member_ready", self._local_peer:id(), self._notify_host_when_outfits_loaded.request_id, 3, self._notify_host_when_outfits_loaded.outfit_versions_str)
+		self._notify_host_when_outfits_loaded = nil
+		return true
 	end
-	self:send_to_host("set_member_ready", self._local_peer:id(), self._notify_host_when_outfits_loaded.request_id, 3, self._notify_host_when_outfits_loaded.outfit_versions_str)
-	self._notify_host_when_outfits_loaded = nil
-	print("[ClientNetworkSession:chk_send_outfit_loading_status] end")
 end
 
 function ClientNetworkSession:notify_host_when_outfits_loaded(request_id, outfit_versions_str)
@@ -410,7 +410,14 @@ end
 
 function ClientNetworkSession:on_peer_outfit_loaded(peer)
 	ClientNetworkSession.super.on_peer_outfit_loaded(self, peer)
-	self:chk_send_outfit_loading_status()
+	if not self:server_peer() or not self:server_peer():ip_verified() then
+		return
+	end
+	local sent = self:chk_send_outfit_loading_status()
+	if not sent and self:are_all_peer_assets_loaded() then
+		print("[ClientNetworkSession:on_peer_outfit_loaded] sending outfit_ready proactively")
+		self:send_to_host("set_member_ready", self._local_peer:id(), 0, 3, "proactive")
+	end
 end
 
 function ClientNetworkSession:on_set_member_ready(peer_id, ready, state_changed)
