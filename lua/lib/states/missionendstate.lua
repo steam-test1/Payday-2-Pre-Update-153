@@ -77,6 +77,7 @@ function MissionEndState:at_enter(old_state, params)
 	managers.groupai:state():set_AI_enabled(false)
 	local player = managers.player:player_unit()
 	if player then
+		player:sound():stop()
 		player:character_damage():set_invulnerable(true)
 		player:character_damage():stop_heartbeat()
 		player:base():set_stats_screen_visible(false)

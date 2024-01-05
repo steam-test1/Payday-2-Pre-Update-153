@@ -1,4 +1,10 @@
 SpecialObjectiveUnitElement = SpecialObjectiveUnitElement or class(MissionElement)
+SpecialObjectiveUnitElement.INSTANCE_VAR_NAMES = {
+	{
+		type = "special_objective_action",
+		value = "so_action"
+	}
+}
 SpecialObjectiveUnitElement._AI_SO_types = {
 	"AI_defend",
 	"AI_security",

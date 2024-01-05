@@ -24,7 +24,6 @@ function ElementNavObstacle:on_script_activated()
 		else
 			local unit = managers.worlddefinition:get_unit_on_load(data.unit_id, callback(self, self, "_load_unit", data.obj_name))
 			if unit then
-				print("ElementNavObstacle:on_script_activated()", unit, data.obj_name)
 				table.insert(self._obstacle_units, {
 					unit = unit,
 					obj_name = data.obj_name

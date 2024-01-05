@@ -25,10 +25,16 @@ function MenuSetup:load_packages()
 	if not PackageManager:loaded("packages/start_menu") then
 		PackageManager:load("packages/start_menu")
 	end
+	if not PackageManager:loaded("packages/load_level") then
+		PackageManager:load("packages/load_level")
+	end
+	if not PackageManager:loaded("packages/load_default") then
+		PackageManager:load("packages/load_default")
+	end
 	local prefix = "packages/dlcs/"
 	local sufix = "/start_menu"
 	local package = ""
-	for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+	for dlc_package, bundled in pairs(tweak_data.BUNDLED_DLC_PACKAGES) do
 		package = prefix .. tostring(dlc_package) .. sufix
 		Application:debug("[MenuSetup:load_packages] DLC package: " .. package, "Is package OK to load?: " .. tostring(bundled))
 		if bundled and (bundled == true or bundled == 1) and PackageManager:package_exists(package) and not PackageManager:loaded(package) then
@@ -36,26 +42,49 @@ function MenuSetup:load_packages()
 		end
 	end
 	if not PackageManager:loaded("packages/game_base") then
-		PackageManager:load("packages/game_base", function()
-		end)
+		local _load_wip_func = function()
+			if PackageManager:package_exists("packages/wip/game_base") then
+				if not PackageManager:loaded("packages/wip/game_base") then
+					PackageManager:load("packages/wip/game_base", function()
+						Global._game_base_package_loaded = true
+					end)
+				end
+			else
+				Global._game_base_package_loaded = true
+			end
+		end
+		PackageManager:load("packages/game_base", _load_wip_func)
+	end
+	if PackageManager:package_exists("packages/wip/start_menu") and not PackageManager:loaded("packages/wip/start_menu") then
+		PackageManager:load("packages/wip/start_menu")
+	end
+end
+
+function MenuSetup:gather_packages_to_unload()
+	Setup.unload_packages(self)
+	self._packages_to_unload = self._packages_to_unload or {}
+	if not Global.load_start_menu then
+		if PackageManager:loaded("packages/start_menu") then
+		end
+		local prefix = "packages/dlcs/"
+		local sufix = "/start_menu"
+		local package = ""
+		for dlc_package, bundled in pairs(tweak_data.BUNDLED_DLC_PACKAGES) do
+			package = prefix .. tostring(dlc_package) .. sufix
+			if bundled and (bundled == true or bundled == 1) and PackageManager:package_exists(package) and PackageManager:loaded(package) then
+				table.insert(self._packages_to_unload, package)
+			end
+		end
+		if PackageManager:loaded("packages/wip/start_menu") then
+			table.insert(self._packages_to_unload, "packages/wip/start_menu")
+		end
 	end
 end
 
 function MenuSetup:unload_packages()
 	Setup.unload_packages(self)
-	if not Global.load_start_menu then
-		if PackageManager:loaded("packages/start_menu") then
-			PackageManager:unload("packages/start_menu")
-		end
-		local prefix = "packages/dlcs/"
-		local sufix = "/start_menu"
-		local package = ""
-		for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
-			package = prefix .. tostring(dlc_package) .. sufix
-			if bundled and (bundled == true or bundled == 1) and PackageManager:package_exists(package) and PackageManager:loaded(package) then
-				PackageManager:unload(package)
-			end
-		end
+	if PackageManager:loaded("packages/start_menu") then
+		PackageManager:unload("packages/start_menu")
 	end
 end
 

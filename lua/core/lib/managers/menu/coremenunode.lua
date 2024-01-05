@@ -74,7 +74,8 @@ function MenuNode:_parse_items(data_node)
 		elseif type == "legend" then
 			table.insert(self._legends, {
 				string_id = c.name,
-				pc = c.pc
+				pc = c.pc,
+				visible_callback = c.visible_callback
 			})
 		end
 	end

@@ -73,7 +73,6 @@ function SentryGunWeapon:change_ammo(amount)
 	self._ammo_total = math.min(math.ceil(self._ammo_total + amount), self._ammo_max)
 	local ammo_percent = self._ammo_total / self._ammo_max
 	local resolution_step = math.ceil(ammo_percent / self._ammo_sync_resolution)
-	print("change_ammo", self._ammo_total, self._ammo_max, ammo_percent, self._ammo_sync, resolution_step)
 	if ammo_percent == 0 or resolution_step ~= self._ammo_sync then
 		self._ammo_sync = resolution_step
 		self._unit:network():send("sentrygun_ammo", self._ammo_sync)
@@ -82,7 +81,6 @@ function SentryGunWeapon:change_ammo(amount)
 end
 
 function SentryGunWeapon:sync_ammo(ammo_ratio)
-	print("sync_ammo", self._ammo_ratio, ammo_ratio, ammo_ratio * self._ammo_sync_resolution)
 	self._ammo_ratio = ammo_ratio * self._ammo_sync_resolution
 	self._unit:interaction():set_dirty(true)
 end
@@ -159,7 +157,7 @@ function SentryGunWeapon:_fire_raycast(from_pos, direction, shoot_player)
 	mvector3.multiply(mvec_to, tweak_data.weapon[self._name_id].FIRE_RANGE)
 	mvector3.add(mvec_to, from_pos)
 	local col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask)
-	if col_ray then
+	if col_ray and (not col_ray.unit:in_slot(self._character_slotmask) or self._foe_teams[col_ray.unit:movement():team().id]) then
 		hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, self._unit, self._damage)
 	end
 	if not col_ray or col_ray.distance > 600 then
@@ -234,6 +232,10 @@ function SentryGunWeapon:ammo_max()
 	return self._ammo_max
 end
 
+function SentryGunWeapon:on_team_set(team_data)
+	self._foe_teams = team_data.foes
+end
+
 function SentryGunWeapon:save(save_data)
 	local my_save_data = {}
 	if self._spread_mul ~= 1 then
@@ -242,6 +244,7 @@ function SentryGunWeapon:save(save_data)
 	my_save_data.ammo_ratio = self:ammo_ratio()
 	my_save_data.setup = {}
 	my_save_data.setup.alert_filter = self._setup.alert_filter
+	my_save_data.foe_teams = self._foe_teams
 	if next(my_save_data) then
 		save_data.weapon = my_save_data
 	end
@@ -258,4 +261,5 @@ function SentryGunWeapon:load(save_data)
 	for name, data in pairs(save_data.weapon.setup) do
 		self._setup[name] = data
 	end
+	self._foe_teams = save_data.weapon.foe_teams
 end

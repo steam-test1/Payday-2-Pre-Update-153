@@ -131,12 +131,12 @@ function ConnectionNetworkHandler:remove_peer_confirmation(removed_peer_id, send
 	managers.network:session():on_remove_peer_confirmation(sender_peer, removed_peer_id)
 end
 
-function ConnectionNetworkHandler:set_loading_state(state, sender)
+function ConnectionNetworkHandler:set_loading_state(state, load_counter, sender)
 	local peer = self._verify_sender(sender)
 	if not peer then
 		return
 	end
-	managers.network:session():set_peer_loading_state(peer, state)
+	managers.network:session():set_peer_loading_state(peer, state, load_counter)
 end
 
 function ConnectionNetworkHandler:set_peer_synched(id, sender)
@@ -162,20 +162,20 @@ function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, 
 	end
 end
 
-function ConnectionNetworkHandler:ok_to_load_level(sender)
-	print("ConnectionNetworkHandler:ok_to_load_level")
+function ConnectionNetworkHandler:ok_to_load_level(load_counter, sender)
+	print("[ConnectionNetworkHandler:ok_to_load_level]", load_counter)
 	if not self:_verify_in_client_session() then
 		return
 	end
-	managers.network:session():ok_to_load_level()
+	managers.network:session():ok_to_load_level(load_counter)
 end
 
-function ConnectionNetworkHandler:ok_to_load_lobby(sender)
-	print("ConnectionNetworkHandler:ok_to_load_lobby")
+function ConnectionNetworkHandler:ok_to_load_lobby(load_counter, sender)
+	print("[ConnectionNetworkHandler:ok_to_load_lobby]", load_counter)
 	if not self:_verify_in_client_session() then
 		return
 	end
-	managers.network:session():ok_to_load_lobby()
+	managers.network:session():ok_to_load_lobby(load_counter)
 end
 
 function ConnectionNetworkHandler:set_peer_left(sender)

@@ -204,10 +204,12 @@ function ClientNetworkSession:is_client()
 end
 
 function ClientNetworkSession:load_level(...)
+	self:send_to_host("set_loading_state", true, self._load_counter)
 	self:_load_level(...)
 end
 
 function ClientNetworkSession:load_lobby(...)
+	self:send_to_host("set_loading_state", true, self._load_counter)
 	self:_load_lobby(...)
 end
 
@@ -262,17 +264,21 @@ function ClientNetworkSession:on_peer_synched(peer_id)
 	managers.network:game():on_peer_sync_complete(peer, peer_id)
 end
 
-function ClientNetworkSession:ok_to_load_level()
-	print("[ClientNetworkSession:ok_to_load_level]", self._recieved_ok_to_load_level, self._local_peer:id())
+function ClientNetworkSession:ok_to_load_level(load_counter)
+	print("[ClientNetworkSession:ok_to_load_level] load_counter", load_counter, "self._received_ok_to_load_level", self._received_ok_to_load_level)
 	if self._closing then
 		return
 	end
-	self:send_to_host("set_loading_state", true)
-	if self._recieved_ok_to_load_level then
+	if self._received_ok_to_load_level then
 		print("Allready recieved ok to load level, returns")
 		return
 	end
-	self._recieved_ok_to_load_level = true
+	if self._load_counter == load_counter then
+		print("Allready loaded, returns")
+		return
+	end
+	self._load_counter = load_counter
+	self._received_ok_to_load_level = load_counter
 	if managers.menu:active_menu() then
 		managers.menu:close_menu()
 	end
@@ -281,23 +287,28 @@ function ClientNetworkSession:ok_to_load_level()
 	local level_name = level_id and tweak_data.levels[level_id].world_name
 	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
 	local world_setting = Global.game_settings.world_setting
-	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
+	self:load_level(level_name, mission, world_setting, nil, level_id)
 end
 
-function ClientNetworkSession:ok_to_load_lobby()
-	print("[ClientNetworkSession:ok_to_load_lobby]", self._recieved_ok_to_load_lobby, self._local_peer:id())
+function ClientNetworkSession:ok_to_load_lobby(load_counter)
+	print("[ClientNetworkSession:ok_to_load_lobby] load_counter", load_counter, "self._received_ok_to_load_lobby", self._received_ok_to_load_lobby, self._local_peer:id())
 	if self._closing then
 		return
 	end
 	if self:_local_peer_in_lobby() then
 		return
 	end
-	self:send_to_host("set_loading_state", true)
-	if self._recieved_ok_to_load_lobby then
+	if self._received_ok_to_load_lobby then
 		print("Allready recieved ok to load lobby, returns")
 		return
 	end
-	self._recieved_ok_to_load_lobby = true
+	if self._load_counter == load_counter then
+		print("Allready loaded, returns")
+		return
+	end
+	self._load_counter = load_counter
+	self:send_to_host("set_loading_state", true, self._load_counter)
+	self._received_ok_to_load_lobby = load_counter
 	if managers.menu:active_menu() then
 		managers.menu:close_menu()
 	end
@@ -320,7 +331,7 @@ function ClientNetworkSession:on_peer_requested_info(peer_id)
 	other_peer:set_ip_verified(true)
 	Global.local_member:sync_lobby_data(other_peer)
 	Global.local_member:sync_data(other_peer)
-	other_peer:send("set_loading_state", self._local_peer:loading())
+	other_peer:send("set_loading_state", self._local_peer:loading(), self._load_counter or 1)
 	other_peer:send("peer_exchange_info", self._local_peer:id())
 end
 
@@ -437,4 +448,9 @@ end
 function ClientNetworkSession:remove_peer(...)
 	ClientNetworkSession.super.remove_peer(self, ...)
 	self:chk_send_outfit_loading_status()
+end
+
+function ClientNetworkSession:set_peer_loading_state(peer, state, load_counter)
+	peer:set_loading(state)
+	ClientNetworkSession.super.set_peer_loading_state(self, peer, state, load_counter)
 end

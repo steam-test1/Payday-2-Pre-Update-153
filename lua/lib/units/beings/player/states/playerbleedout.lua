@@ -40,11 +40,23 @@ function PlayerBleedOut:_enter(enter_data)
 	if Network:is_server() and self._ext_movement:nav_tracker() then
 		managers.groupai:state():on_player_weapons_hot()
 	end
-	self._ext_movement:set_attention_settings({
-		"pl_enemy_cbt",
-		"pl_team_idle_std",
-		"pl_civ_cbt"
-	})
+	local preset
+	if managers.groupai:state():whisper_mode() then
+		preset = {
+			"pl_mask_on_friend_combatant_whisper_mode",
+			"pl_mask_on_friend_non_combatant_whisper_mode",
+			"pl_mask_on_foe_combatant_whisper_mode_crouch",
+			"pl_mask_on_foe_non_combatant_whisper_mode_crouch"
+		}
+	else
+		preset = {
+			"pl_friend_combatant_cbt",
+			"pl_friend_non_combatant_cbt",
+			"pl_foe_combatant_cbt_crouch",
+			"pl_foe_non_combatant_cbt_crouch"
+		}
+	end
+	self._ext_movement:set_attention_settings(preset)
 end
 
 function PlayerBleedOut:exit(state_data, new_state_name)
@@ -208,7 +220,7 @@ function PlayerBleedOut._register_revive_SO(revive_SO_data, variant)
 		usage_amount = 1,
 		AI_group = "friendlies",
 		admin_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_administered", revive_SO_data),
-		verification_clbk = callback(PlayerBleedOut, PlayerBleedOut, "rescue_SO_verification")
+		verification_clbk = callback(PlayerBleedOut, PlayerBleedOut, "rescue_SO_verification", revive_SO_data.unit)
 	}
 	revive_SO_data.variant = variant
 	local so_id = "Playerrevive"
@@ -384,8 +396,8 @@ function PlayerBleedOut:on_rescue_SO_started(revive_SO_data, rescuer)
 	end
 end
 
-function PlayerBleedOut.rescue_SO_verification(ignore_this, unit)
-	return not unit:movement():cool()
+function PlayerBleedOut.rescue_SO_verification(ignore_this, my_unit, unit)
+	return not unit:movement():cool() and not my_unit:movement():team().foes[unit:movement():team().id]
 end
 
 function PlayerBleedOut:on_civ_revive_completed(revive_SO_data, sympathy_civ)

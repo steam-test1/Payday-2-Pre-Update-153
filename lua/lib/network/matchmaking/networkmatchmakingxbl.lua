@@ -403,7 +403,6 @@ function NetworkMatchMakingXBL:join_server(session_id, server, skip_showing_dial
 			elseif res == "JOINED_GAME" then
 				local level_id = tweak_data.levels:get_level_name_from_index(level_index)
 				Global.game_settings.level_id = level_id
-				managers.network:session():ok_to_load_level()
 			elseif res == "KICKED" then
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()
@@ -743,7 +742,6 @@ function NetworkMatchMakingXBL:_test_join(xs_info, skip_showing_dialog)
 			elseif res == "JOINED_GAME" then
 				local level_id = tweak_data.levels:get_level_name_from_index(level_index)
 				Global.game_settings.level_id = level_id
-				managers.network:session():ok_to_load_level()
 			elseif res == "KICKED" then
 				managers.network.matchmake:leave_game()
 				managers.network.voice_chat:destroy_voice()

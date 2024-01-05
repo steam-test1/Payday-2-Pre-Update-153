@@ -17,6 +17,8 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_sniper(presets)
 	self:_init_gangster(presets)
 	self:_init_biker_escape(presets)
+	self:_init_mobster(presets)
+	self:_init_mobster_boss(presets)
 	self:_init_tank(presets)
 	self:_init_spooc(presets)
 	self:_init_shield(presets)
@@ -362,6 +364,122 @@ function CharacterTweakData:_init_biker_escape(presets)
 	self.biker_escape.suppression = nil
 end
 
+function CharacterTweakData:_init_mobster(presets)
+	self.mobster = deep_clone(self.gangster)
+	self.mobster.calls_in = nil
+end
+
+function CharacterTweakData:_init_mobster_boss(presets)
+	self.mobster_boss = deep_clone(presets.base)
+	self.mobster_boss.experience = {}
+	self.mobster_boss.weapon = deep_clone(presets.weapon.good)
+	self.mobster_boss.weapon.ak47 = {}
+	self.mobster_boss.weapon.ak47.aim_delay = {0.1, 0.2}
+	self.mobster_boss.weapon.ak47.focus_delay = 4
+	self.mobster_boss.weapon.ak47.focus_dis = 200
+	self.mobster_boss.weapon.ak47.spread = 20
+	self.mobster_boss.weapon.ak47.miss_dis = 40
+	self.mobster_boss.weapon.ak47.RELOAD_SPEED = 1
+	self.mobster_boss.weapon.ak47.melee_speed = 1
+	self.mobster_boss.weapon.ak47.melee_dmg = 25
+	self.mobster_boss.weapon.ak47.melee_retry_delay = {1, 2}
+	self.mobster_boss.weapon.ak47.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	self.mobster_boss.weapon.ak47.autofire_rounds = {20, 30}
+	self.mobster_boss.weapon.ak47.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
+	self:_process_weapon_usage_table(self.mobster_boss.weapon)
+	self.mobster_boss.detection = presets.detection.normal
+	self.mobster_boss.HEALTH_INIT = 350
+	self.mobster_boss.headshot_dmg_mul = 4
+	self.mobster_boss.damage.explosion_damage_mul = 1
+	self.mobster_boss.move_speed = presets.move_speed.very_slow
+	self.mobster_boss.allowed_poses = {stand = true}
+	self.mobster_boss.no_retreat = true
+	self.mobster_boss.no_arrest = true
+	self.mobster_boss.surrender = nil
+	self.mobster_boss.ecm_vulnerability = 0.85
+	self.mobster_boss.ecm_hurts = {
+		ears = {min_duration = 7, max_duration = 9}
+	}
+	self.mobster_boss.weapon_voice = "3"
+	self.mobster_boss.experience.cable_tie = "tie_swat"
+	self.mobster_boss.access = "gangster"
+	self.mobster_boss.speech_prefix_p1 = "l"
+	self.mobster_boss.speech_prefix_p2 = "n"
+	self.mobster_boss.speech_prefix_count = 4
+	self.mobster_boss.rescue_hostages = false
+	self.mobster_boss.melee_weapon = "fists"
+	self.mobster_boss.melee_weapon_dmg_multiplier = 2.5
+	self.mobster_boss.steal_loot = nil
+	self.mobster_boss.calls_in = nil
+	self.mobster_boss.chatter = presets.enemy_chatter.no_chatter
+	self.mobster_boss.use_radio = nil
+end
+
 function CharacterTweakData:_init_tank(presets)
 	self.tank = deep_clone(presets.base)
 	self.tank.experience = {}
@@ -565,6 +683,7 @@ function CharacterTweakData:_init_tank(presets)
 	}
 	self.tank.announce_incomming = "incomming_tank"
 	self.tank.steal_loot = nil
+	self.tank.calls_in = nil
 end
 
 function CharacterTweakData:_init_spooc(presets)
@@ -640,6 +759,7 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.no_equip_anim = true
 	self.shield.wall_fwd_offset = 100
 	self.shield.damage.explosion_damage_mul = 0.8
+	self.shield.calls_in = nil
 	self.shield.damage.hurt_severity = presets.hurt_severities.only_explosion_hurts
 	self.shield.damage.shield_knocked = true
 	self.shield.weapon.mp9 = {}
@@ -953,6 +1073,7 @@ function CharacterTweakData:_init_civilian(presets)
 	self.civilian.access = "civ_male"
 	self.civilian.intimidateable = true
 	self.civilian.challenges = {type = "civilians"}
+	self.civilian.calls_in = true
 	self.civilian_female = deep_clone(self.civilian)
 	self.civilian_female.speech_prefix_p1 = "cf"
 	self.civilian_female.speech_prefix_count = 5
@@ -990,6 +1111,7 @@ function CharacterTweakData:_init_bank_manager(presets)
 	self.bank_manager.access = "civ_male"
 	self.bank_manager.intimidateable = true
 	self.bank_manager.challenges = {type = "civilians"}
+	self.bank_manager.calls_in = true
 	self.bank_manager.outline_on_discover = true
 end
 
@@ -1237,6 +1359,7 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.base.use_radio = "dispatch_generic_message"
 	presets.base.dodge = nil
 	presets.base.challenges = {type = "law"}
+	presets.base.calls_in = true
 	presets.base.experience = {}
 	presets.base.experience.cable_tie = "tie_swat"
 	presets.base.damage = {}
@@ -3293,7 +3416,7 @@ function CharacterTweakData:_presets(tweak_data)
 			r = 100,
 			acc = {0.95, 0.95},
 			dmg_mul = 8,
-			recoil = {1},
+			recoil = {1, 1.1},
 			mode = {
 				1,
 				0,
@@ -3858,7 +3981,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 9,
-							timeout = {0, 7}
+							timeout = {0, 7},
+							shoot_chance = 0.8,
+							shoot_accuracy = 0.5
 						},
 						roll = {
 							chance = 1,
@@ -3872,7 +3997,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 1,
-							timeout = {1, 7}
+							timeout = {1, 7},
+							shoot_chance = 1,
+							shoot_accuracy = 0.7
 						}
 					}
 				},
@@ -3882,7 +4009,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 5,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 0.5,
+							shoot_accuracy = 0.4
 						},
 						roll = {
 							chance = 1,
@@ -3905,7 +4034,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 5,
-							timeout = {1, 3}
+							timeout = {1, 3},
+							shoot_chance = 0.8,
+							shoot_accuracy = 0.5
 						},
 						roll = {
 							chance = 1,
@@ -3919,7 +4050,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 3,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 1,
+							shoot_accuracy = 0.7
 						},
 						roll = {
 							chance = 1,
@@ -3933,7 +4066,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 5,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 0.5,
+							shoot_accuracy = 0.4
 						},
 						roll = {
 							chance = 3,
@@ -3956,7 +4091,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 3,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 1,
+							shoot_accuracy = 0.7
 						},
 						roll = {
 							chance = 1,
@@ -3974,7 +4111,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 3,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 1,
+							shoot_accuracy = 0.8
 						},
 						roll = {
 							chance = 1,
@@ -3992,7 +4131,9 @@ function CharacterTweakData:_presets(tweak_data)
 					variations = {
 						side_step = {
 							chance = 5,
-							timeout = {1, 2}
+							timeout = {1, 2},
+							shoot_chance = 0.8,
+							shoot_accuracy = 0.6
 						},
 						roll = {
 							chance = 3,

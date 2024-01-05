@@ -97,10 +97,11 @@ function HostStateInGame:on_join_request_received(data, peer_name, client_prefer
 	end
 	local server_xuid = SystemInfo:platform() == Idstring("X360") and managers.network.account:player_id() or ""
 	new_peer:send("join_request_reply", 1, new_peer_id, character, level_index, difficulty_index, 2, data.local_peer:character(), my_user_id, Global.game_settings.mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, server_xuid, ticket)
-	new_peer:send("set_loading_state", false)
+	new_peer:send("set_loading_state", false, data.session:load_counter())
 	if SystemInfo:platform() == Idstring("X360") then
 		new_peer:send("request_player_name_reply", managers.network:session():local_peer():name())
 	end
+	data.session:send_ok_to_load_level()
 	self:on_handshake_confirmation(data, new_peer, 1)
 end
 
@@ -108,7 +109,7 @@ function HostStateInGame:on_peer_finished_loading(data, peer)
 	self:_introduce_new_peer_to_old_peers(data, peer, false, peer:name(), peer:character(), "remove", peer:xuid(), peer:xnaddr())
 	self:_introduce_old_peers_to_new_peer(data, peer)
 	if data.game_started then
-		peer:send_after_load("set_dropin")
+		peer:send("set_dropin")
 	end
 end
 

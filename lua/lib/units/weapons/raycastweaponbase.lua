@@ -932,14 +932,19 @@ function RaycastWeaponBase:add_ammo()
 		multiplier_min = self._ammo_data.ammo_pickup_min_mul
 	else
 		multiplier_min = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+		multiplier_min = multiplier_min + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
 	end
 	if self._ammo_data and self._ammo_data.ammo_pickup_max_mul then
 		multiplier_max = self._ammo_data.ammo_pickup_max_mul
 	else
 		multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+		multiplier_max = multiplier_max + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
 	end
 	local add_amount = math.max(0, math.round(math.lerp(self._ammo_pickup[1] * multiplier_min, self._ammo_pickup[2] * multiplier_max, math.random())))
 	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
+	if Application:production_build() then
+		managers.player:add_weapon_ammo_gain(self._name_id, add_amount)
+	end
 	return true
 end
 
@@ -1048,18 +1053,18 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 		self:play_impact_sound_and_effects(col_ray)
 	end
 	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
-		local local_damage = not blank or hit_unit:id() == -1
 		local sync_damage = not blank and hit_unit:id() ~= -1
 		local network_damage = math.ceil(damage * 163.84)
 		damage = network_damage / 163.84
-		if local_damage then
-			col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
-			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-		end
 		if sync_damage then
 			local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
 			local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
-			managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+			managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.unit:id() ~= -1 and col_ray.body or nil, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+		end
+		local local_damage = not blank or hit_unit:id() == -1
+		if local_damage then
+			col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 		end
 	end
 	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
@@ -1116,10 +1121,10 @@ function InstantBulletBase._get_vector_sync_yaw_pitch(dir, yaw_resolution, pitch
 	mrotation.set_look_at(tmp_rot1, dir, math.UP)
 	local packed_yaw = mrotation.yaw(tmp_rot1)
 	packed_yaw = packed_yaw + 180
-	packed_yaw = math.floor((yaw_resolution - 1) * packed_yaw / 360)
+	packed_yaw = math.clamp(math.floor((yaw_resolution - 1) * packed_yaw / 360), 0, yaw_resolution - 1)
 	local packed_pitch = mrotation.pitch(tmp_rot1)
 	packed_pitch = packed_pitch + 90
-	packed_pitch = math.floor((pitch_resolution - 1) * packed_pitch / 180)
+	packed_pitch = math.clamp(math.floor((pitch_resolution - 1) * packed_pitch / 180), 0, pitch_resolution - 1)
 	return packed_yaw, packed_pitch
 end
 
@@ -1179,16 +1184,16 @@ function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit
 		})
 		managers.network:session():send_to_peers_synched("sync_explosive_bullet", col_ray.position, col_ray.normal, math.min(16384, network_damage))
 		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
-			local local_damage = not blank or hit_unit:id() == -1
 			local sync_damage = not blank and hit_unit:id() ~= -1
-			if local_damage then
-				col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
-				col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-			end
 			if sync_damage then
 				local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
 				local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
 				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+			end
+			local local_damage = not blank or hit_unit:id() == -1
+			if local_damage then
+				col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+				col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 			end
 		end
 		return {

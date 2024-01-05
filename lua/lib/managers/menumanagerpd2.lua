@@ -42,7 +42,7 @@ function MenuManager:on_enter_lobby()
 end
 
 function MenuManager:on_leave_active_job()
-	managers.statistics:stop_session()
+	managers.statistics:stop_session({quit = true})
 	managers.savefile:save_progress()
 	managers.job:deactivate_current_job()
 	managers.gage_assignment:deactivate_assignments()

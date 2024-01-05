@@ -295,6 +295,19 @@ function GroupAIStateBase:_init_misc_data()
 	self:set_drama_draw_state(Global.drama_draw_state)
 	self._alert_listeners = {}
 	self:_init_unit_type_filters()
+	self:_init_team_tables()
+end
+
+function GroupAIStateBase:_init_team_tables()
+	self._teams = tweak_data.levels:get_team_setup()
+	if self._teams then
+		for id, team in pairs(self._teams) do
+			team.id = id
+		end
+	end
+	print("[GroupAIStateBase:_init_team_tables]", inspect(self._teams))
+	Application:stack_dump()
+	self:_call_listeners("team_def")
 end
 
 function GroupAIStateBase:add_alert_listener(id, clbk, filter_num, types, m_pos)
@@ -1011,6 +1024,7 @@ function GroupAIStateBase:on_simulation_started()
 	}
 	self._listener_holder = EventListenerHolder:new()
 	self:set_drama_draw_state(Global.drama_draw_state)
+	self:_init_team_tables()
 end
 
 function GroupAIStateBase:on_simulation_ended()
@@ -1084,6 +1098,9 @@ function GroupAIStateBase:on_enemy_registered(unit)
 	local unit_type = unit:base()._tweak_table
 	if self._special_unit_types[unit_type] then
 		self:register_special_unit(unit:key(), unit_type)
+	end
+	if Network:is_client() then
+		unit:movement():set_team(self._teams[tweak_data.levels:get_default_team_ID(unit:base():char_tweak().access == "gangster" and "gangster" or "combatant")])
 	end
 end
 
@@ -1259,6 +1276,9 @@ function GroupAIStateBase:register_criminal(unit)
 	if not unit:base().is_local_player then
 		managers.enemy:on_criminal_registered(unit)
 	end
+	if is_AI then
+		unit:movement():set_team(self._teams[tweak_data.levels:get_default_team_ID("player")])
+	end
 end
 
 function GroupAIStateBase:unregister_criminal(unit)
@@ -1433,11 +1453,11 @@ function GroupAIStateBase:on_civilian_try_freed()
 		self._warned_about_deploy_this_control = true
 		if not self._warned_about_deploy then
 			self:sync_warn_about_civilian_free(1)
-			managers.network:session():send_to_peers("warn_about_civilian_free", 1)
+			managers.network:session():send_to_peers_synched("warn_about_civilian_free", 1)
 			self._warned_about_deploy = true
 		else
 			self:sync_warn_about_civilian_free(2)
-			managers.network:session():send_to_peers("warn_about_civilian_free", 2)
+			managers.network:session():send_to_peers_synched("warn_about_civilian_free", 2)
 		end
 	end
 end
@@ -1447,11 +1467,11 @@ function GroupAIStateBase:on_civilian_freed()
 		self._warned_about_freed_this_control = true
 		if not self._warned_about_freed then
 			self:sync_warn_about_civilian_free(3)
-			managers.network:session():send_to_peers("warn_about_civilian_free", 3)
+			managers.network:session():send_to_peers_synched("warn_about_civilian_free", 3)
 			self._warned_about_freed = true
 		else
 			self:sync_warn_about_civilian_free(4)
-			managers.network:session():send_to_peers("warn_about_civilian_free", 4)
+			managers.network:session():send_to_peers_synched("warn_about_civilian_free", 4)
 		end
 	end
 end
@@ -1796,7 +1816,7 @@ function GroupAIStateBase:_execute_so(so_data, so_rooms, so_administered)
 	local access_f = nav_manager.check_access
 	if ai_group == "enemies" then
 		for e_key, enemy_unit_data in pairs(self._police) do
-			if enemy_unit_data.assigned_area and (not so_administered or not so_administered[e_key]) and (so_objective.forced or enemy_unit_data.unit:brain():is_available_for_assignment(so_objective)) and (not so_data.verification_clbk or so_data.verification_clbk(enemy_unit_data.unit)) and access_f(nav_manager, so_access, enemy_unit_data.so_access, 0) then
+			if (not so_administered or not so_administered[e_key]) and (so_objective.forced or enemy_unit_data.unit:brain():is_available_for_assignment(so_objective)) and (not so_data.verification_clbk or so_data.verification_clbk(enemy_unit_data.unit)) and access_f(nav_manager, so_access, enemy_unit_data.so_access, 0) then
 				local dis = max_dis and mvec3_dis_sq(enemy_unit_data.m_pos, pos)
 				if (not closest_dis or closest_dis > dis) and (not max_dis or max_dis > dis) then
 					closest_u_data = enemy_unit_data
@@ -2022,6 +2042,7 @@ function GroupAIStateBase:save(save_data)
 	if self._hostage_headcount > 0 then
 		my_save_data.hostage_headcount = self._hostage_headcount
 	end
+	my_save_data.teams = self._teams
 end
 
 function GroupAIStateBase:load(load_data)
@@ -2042,6 +2063,8 @@ function GroupAIStateBase:load(load_data)
 	if self._enemy_weapons_hot then
 		managers.enemy:set_corpse_disposal_enabled(true)
 	end
+	self._teams = my_load_data.teams
+	self:_call_listeners("team_def")
 end
 
 function GroupAIStateBase:set_point_of_no_return_timer(time, point_of_no_return_id)
@@ -2185,7 +2208,7 @@ function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, spawn_on_unit)
 		local ai_character_id = managers.criminals:character_static_data_by_name(character_name).ai_character_id
 		local unit_name = Idstring(tweak_data.blackmarket.characters[ai_character_id].npc_unit)
 		local unit = World:spawn_unit(unit_name, spawn_pos, spawn_rot)
-		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, "", 0, 0)
+		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, "", 0, 0, tweak_data.levels:get_default_team_ID("player"))
 		if char_name and not is_drop_in then
 			managers.criminals:set_unit(character_name, unit)
 		else
@@ -2204,6 +2227,9 @@ end
 function GroupAIStateBase:remove_one_teamAI(name_to_remove, replace_with_player)
 	local u_key, u_data
 	if name_to_remove then
+		if not managers.criminals:character_taken_by_name(name_to_remove) and managers.criminals:nr_taken_criminals() >= CriminalsManager.MAX_NR_CRIMINALS then
+			return self:remove_one_teamAI(nil, replace_with_player)
+		end
 		for uk, ud in pairs(self._ai_criminals) do
 			if managers.criminals:character_name_by_unit(ud.unit) == name_to_remove then
 				u_key, u_data = uk, ud
@@ -2258,7 +2284,7 @@ end
 function GroupAIStateBase:fill_criminal_team_with_AI(is_drop_in)
 	if managers.navigation:is_data_ready() and self._ai_enabled and managers.groupai:state():team_ai_enabled() then
 		while true do
-			if not (managers.criminals:get_free_character_name() and managers.criminals:nr_AI_criminals() < managers.criminals.MAX_NR_TEAM_AI) or not self:spawn_one_teamAI(is_drop_in) then
+			if not (managers.criminals:nr_taken_criminals() < CriminalsManager.MAX_NR_CRIMINALS and managers.criminals:nr_AI_criminals() < managers.criminals.MAX_NR_TEAM_AI) or not self:spawn_one_teamAI(is_drop_in) then
 				break
 			end
 		end
@@ -2549,6 +2575,14 @@ function GroupAIStateBase:sync_hostage_killed_warning(warning)
 end
 
 function GroupAIStateBase:hostage_killed(killer_unit)
+	if not alive(killer_unit) then
+		return
+	end
+	local key = killer_unit:key()
+	local criminal = self._criminals[key]
+	if not criminal then
+		return
+	end
 	self._hostages_killed = (self._hostages_killed or 0) + 1
 	if not self._hunt_mode then
 		if self._hostages_killed >= 1 and not self._hostage_killed_warning_lines then
@@ -2566,12 +2600,7 @@ function GroupAIStateBase:hostage_killed(killer_unit)
 			self._hostage_killed_warning_lines = 3
 		end
 	end
-	if not alive(killer_unit) then
-		return
-	end
-	local key = killer_unit:key()
-	local criminal = self._criminals[key]
-	if criminal and not criminal.is_deployable then
+	if not criminal.is_deployable then
 		local tweak
 		if killer_unit:base().is_local_player or killer_unit:base().is_husk_player then
 			tweak = tweak_data.player.damage
@@ -3040,7 +3069,8 @@ function GroupAIStateBase:_map_spawn_groups_to_respective_areas(id, spawn_groups
 				amount = amount,
 				interval = interval,
 				delay_t = -1,
-				spawn_pts = {}
+				spawn_pts = {},
+				team_id = spawn_grp_element:value("team")
 			}
 			local nr_elements = 0
 			for _, spawn_pt_element in ipairs(spawn_points) do
@@ -3148,11 +3178,13 @@ function GroupAIStateBase:remove_preferred_spawn_points(id)
 	end
 end
 
-function GroupAIStateBase:register_AI_attention_object(unit, handler, nav_tracker)
+function GroupAIStateBase:register_AI_attention_object(unit, handler, nav_tracker, team, SO_access)
 	self._attention_objects.all[unit:key()] = {
 		unit = unit,
 		handler = handler,
-		nav_tracker = nav_tracker
+		nav_tracker = nav_tracker,
+		team = team,
+		SO_access = SO_access
 	}
 	self:on_AI_attention_changed(unit:key())
 end
@@ -3162,7 +3194,7 @@ function GroupAIStateBase:on_AI_attention_changed(unit_key)
 	for cat_filter, list in pairs(self._attention_objects) do
 		if cat_filter ~= "all" then
 			local cat_filter_num = managers.navigation:convert_access_filter_to_number({cat_filter})
-			if not att_info or att_info.handler:get_attention(cat_filter_num, nil, nil) then
+			if not att_info or att_info.handler:get_attention(cat_filter_num, nil, nil, nil) then
 				list[unit_key] = att_info
 			else
 				list[unit_key] = nil
@@ -3186,7 +3218,7 @@ function GroupAIStateBase:get_AI_attention_objects_by_filter(filter)
 		local filter_num = managers.navigation:convert_access_filter_to_number({filter})
 		local new_attention_set = {}
 		for u_key, attention_info in pairs(self._attention_objects.all) do
-			if attention_info.handler:get_attention(filter_num, nil, nil) then
+			if attention_info.handler:get_attention(filter_num, nil, nil, nil) then
 				new_attention_set[u_key] = attention_info
 			end
 		end
@@ -3245,6 +3277,7 @@ function GroupAIStateBase:_add_group_member(group, u_key)
 	if not group.leader_key and u_data.char_tweak.leader then
 		u_data.leader_key = u_key
 	end
+	u_data.unit:movement():set_team(group.team)
 	u_data.unit:brain():set_group(group)
 end
 
@@ -3583,6 +3616,7 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	u_data.so_access = unit:brain():SO_access()
 	self._converted_police[u_key] = unit
 	minions[u_key] = u_data
+	unit:movement():set_team(player_unit:movement():team())
 	local convert_enemies_health_multiplier_level = 0
 	local passive_convert_enemies_health_multiplier_level = 0
 	if alive(peer_unit) then
@@ -3712,7 +3746,6 @@ function GroupAIStateBase:_init_unit_type_filters()
 	civ_filter = convert_f(nav_manager, civ_filter)
 	local law_enforcer_filter = {
 		"security",
-		"security_patrol",
 		"cop",
 		"fbi",
 		"swat",
@@ -3729,7 +3762,6 @@ function GroupAIStateBase:_init_unit_type_filters()
 	local all_enemy_filter = {
 		"gangster",
 		"security",
-		"security_patrol",
 		"cop",
 		"fbi",
 		"swat",
@@ -3751,7 +3783,6 @@ function GroupAIStateBase:_init_unit_type_filters()
 	local criminals_and_enemies_filter = {
 		"gangster",
 		"security",
-		"security_patrol",
 		"cop",
 		"fbi",
 		"swat",
@@ -3772,7 +3803,6 @@ function GroupAIStateBase:_init_unit_type_filters()
 		"civ_female",
 		"gangster",
 		"security",
-		"security_patrol",
 		"cop",
 		"fbi",
 		"swat",
@@ -3793,7 +3823,6 @@ function GroupAIStateBase:_init_unit_type_filters()
 		"civ_female",
 		"gangster",
 		"security",
-		"security_patrol",
 		"cop",
 		"fbi",
 		"swat",
@@ -3805,6 +3834,28 @@ function GroupAIStateBase:_init_unit_type_filters()
 		"taser"
 	}
 	civilians_enemies_filter = convert_f(nav_manager, civilians_enemies_filter)
+	local combatant_filter = {
+		"gangster",
+		"security",
+		"cop",
+		"fbi",
+		"swat",
+		"murky",
+		"sniper",
+		"spooc",
+		"shield",
+		"tank",
+		"taser",
+		"teamAI1",
+		"teamAI2",
+		"teamAI3",
+		"teamAI4"
+	}
+	combatant_filter = convert_f(nav_manager, combatant_filter)
+	local non_combatant_filter = {"civ_male", "civ_female"}
+	non_combatant_filter = convert_f(nav_manager, non_combatant_filter)
+	local murderer_filter = {"gangster"}
+	murderer_filter = convert_f(nav_manager, murderer_filter)
 	local all_filter = convert_f(nav_manager, managers.navigation.ACCESS_FLAGS)
 	self._unit_type_filter = {
 		none = 0,
@@ -3816,7 +3867,10 @@ function GroupAIStateBase:_init_unit_type_filters()
 		criminal = criminal_filter,
 		criminals_and_enemies = criminals_and_enemies_filter,
 		civilians_enemies = civilians_enemies_filter,
-		criminals_enemies_civilians = criminals_enemies_civilians_filter
+		criminals_enemies_civilians = criminals_enemies_civilians_filter,
+		combatant = combatant_filter,
+		non_combatant = non_combatant_filter,
+		murderer = murderer_filter
 	}
 end
 
@@ -3872,6 +3926,8 @@ GroupAIStateBase.blame_triggers = {
 	gangster = "gan",
 	dealer = "gan",
 	biker_escape = "gan",
+	mobster = "gan",
+	mobster_boss = "gan",
 	civilian = "civ",
 	civilian_female = "civ",
 	bank_manager = "civ",

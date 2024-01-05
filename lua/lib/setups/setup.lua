@@ -108,6 +108,7 @@ function Setup:init_category_print()
 end
 
 function Setup:load_packages()
+	PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	if not Application:editor() then
 		TextureCache:set_streaming_enabled(true)
 		PackageManager:set_streaming_enabled(true)
@@ -122,7 +123,7 @@ end
 
 function Setup:init_managers(managers)
 	Global.game_settings = Global.game_settings or {
-		level_id = managers.dlc:is_trial() and "bank_trial" or "bank",
+		level_id = managers.dlc:is_trial() and "bank_trial" or "branchbank",
 		difficulty = "normal",
 		permission = "public",
 		team_ai = true,
@@ -221,10 +222,6 @@ function Setup:_start_loading_screen()
 			end
 		end
 		local load_data = load_level_data.level_tweak_data.load_data
-		Global.current_load_package = load_data and load_data.package or "packages/load_default"
-		if Global.current_load_package then
-			PackageManager:load(Global.current_load_package)
-		end
 		local safe_rect_pixels = managers.viewport:get_safe_rect_pixels()
 		local safe_rect = managers.viewport:get_safe_rect()
 		local aspect_ratio = managers.viewport:aspect_ratio()
@@ -404,6 +401,7 @@ end
 
 function Setup:update(t, dt)
 	local main_t, main_dt = TimerManager:main():time(), TimerManager:main():delta_time()
+	self:_upd_unload_packages()
 	managers.weapon_factory:update(t, dt)
 	managers.platform:update(t, dt)
 	managers.dyn_resource:update()
@@ -532,20 +530,28 @@ function Setup:block_exec()
 		self:set_main_thread_loading_screen_visible(true)
 		return true
 	end
+	local result = false
+	if self._packages_to_unload then
+		print("BLOCKED BY UNLOADING PACKAGES")
+		result = true
+	elseif not self._packages_to_unload_gathered then
+		self._packages_to_unload_gathered = true
+		self:gather_packages_to_unload()
+		result = true
+	end
 	if not managers.network:is_ready_to_load() then
 		print("BLOCKED BY STOPPING NETWORK")
-		return true
+		result = true
 	end
 	if not managers.dyn_resource:is_ready_to_close() then
 		print("BLOCKED BY DYNAMIC RESOURCE MANAGER")
 		managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 1)
-		return true
+		result = true
 	end
 	if managers.system_menu:block_exec() or managers.savefile:is_active() then
-		return true
-	else
-		return false
+		result = true
 	end
+	return result
 end
 
 function Setup:block_quit()
@@ -566,22 +572,14 @@ function Setup:set_fps_cap(value)
 	end
 end
 
-function Setup:george_test()
-	local package_name = "packages/dyn_resources"
-	local asset_type = Idstring("texture")
-	local asset_name = Idstring("units/payday2/characters/civ_female_casual_4/civ_female_casual_4_df")
-	PackageManager:package(package_name):load_temp_resource(asset_type, asset_name, callback(self, self, "clbk_george_test"))
-end
-
-function Setup:george_test2()
-	local package_name = "packages/dyn_resources"
-	local asset_type = Idstring("texture")
-	local asset_name = Idstring("units/payday2/characters/civ_female_casual_4/civ_female_casual_4_df")
-	PackageManager:package(package_name):unload_resource(asset_type, asset_name, false)
-end
-
-function Setup:clbk_george_test(status, type, name)
-	print("[Setup:clbk_george_test] status", status, "type", type, "name", name)
-	if status then
+function Setup:_upd_unload_packages()
+	if self._packages_to_unload then
+		local package_name = table.remove(self._packages_to_unload)
+		if package_name then
+			PackageManager:unload(package_name)
+		end
+		if not next(self._packages_to_unload) then
+			self._packages_to_unload = nil
+		end
 	end
 end

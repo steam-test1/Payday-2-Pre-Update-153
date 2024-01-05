@@ -468,6 +468,10 @@ function SequenceManager:preload()
 	end
 end
 
+function SequenceManager:clbk_pkg_manager_unit_loaded(type, unit_name)
+	self:_add_sequences_from_unit_data(PackageManager:unit_data(unit_name))
+end
+
 function SequenceManager:reload(unit_name, sequences_only)
 	if self:remove(unit_name) then
 		if not sequences_only then

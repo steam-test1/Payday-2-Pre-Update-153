@@ -15,9 +15,10 @@ function AttentionTweakData:init()
 end
 
 function AttentionTweakData:_init_player()
-	self.settings.pl_team_cur_peaceful = {
+	self.settings.pl_mask_off_friend_combatant = {
 		reaction = "REACT_IDLE",
-		filter = "criminal",
+		filter = "combatant",
+		relation = "friend",
 		max_range = 1000,
 		notice_delay_mul = 1,
 		verification_interval = 4,
@@ -26,41 +27,10 @@ function AttentionTweakData:_init_player()
 		pause = {15, 25},
 		notice_requires_FOV = false
 	}
-	self.settings.pl_team_idle_std = {
-		reaction = "REACT_IDLE",
-		filter = "criminal",
-		max_range = 1000,
-		notice_delay_mul = 0,
-		verification_interval = 4,
-		release_delay = 3,
-		duration = {1.7, 2.5},
-		pause = {45, 90},
-		notice_requires_FOV = false
-	}
-	self.settings.pl_gangster_cur_peaceful = {
+	self.settings.pl_mask_off_foe_combatant = {
 		reaction = "REACT_SUSPICIOUS",
-		filter = "gangster",
-		max_range = 600,
-		suspicion_range = 500,
-		suspicion_duration = 5.5,
-		turn_around_range = 250,
-		uncover_range = 90,
-		notice_delay_mul = 0.3,
-		verification_interval = 0.02,
-		release_delay = 2,
-		notice_requires_FOV = true
-	}
-	self.settings.pl_gangster_cbt = {
-		reaction = "REACT_COMBAT",
-		filter = "gangster",
-		verification_interval = 1,
-		release_delay = 1,
-		uncover_range = 550,
-		notice_requires_FOV = true
-	}
-	self.settings.pl_law_susp_peaceful = {
-		reaction = "REACT_SUSPICIOUS",
-		filter = "law_enforcer",
+		filter = "combatant",
+		relation = "foe",
 		max_range = 600,
 		suspicion_range = 500,
 		suspicion_duration = 4,
@@ -71,61 +41,9 @@ function AttentionTweakData:_init_player()
 		release_delay = 2,
 		notice_requires_FOV = true
 	}
-	self.settings.pl_enemy_cur_peaceful = {
-		reaction = "REACT_CURIOUS",
-		filter = "all_enemy",
-		max_range = 600,
-		notice_delay_mul = 0.5,
-		verification_interval = 2,
-		release_delay = 1,
-		duration = {1.5, 3.5},
-		pause = {25, 50},
-		notice_requires_FOV = true
-	}
-	self.settings.pl_enemy_cbt = {
-		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
-		verification_interval = 1,
-		notice_interval = 0.1,
-		uncover_range = 550,
-		release_delay = 1,
-		notice_clbk = "clbk_attention_notice_sneak",
-		notice_requires_FOV = true
-	}
-	self.settings.pl_enemy_cbt_crh = {
-		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
-		verification_interval = 0.1,
-		uncover_range = 350,
-		release_delay = 1,
-		notice_delay_mul = 2,
-		notice_requires_FOV = true
-	}
-	self.settings.pl_enemy_stand_mask_on = {
-		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
-		verification_interval = 0.1,
-		uncover_range = 200,
-		release_delay = 1,
-		notice_delay_mul = 2,
-		max_range = 2000,
-		notice_clbk = "clbk_attention_notice_sneak",
-		notice_requires_FOV = true
-	}
-	self.settings.pl_enemy_sneak = {
-		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
-		verification_interval = 0.1,
-		uncover_range = 200,
-		release_delay = 1,
-		notice_delay_mul = 2,
-		max_range = 1200,
-		notice_clbk = "clbk_attention_notice_sneak",
-		notice_requires_FOV = true
-	}
-	self.settings.pl_civ_idle_peaceful = {
+	self.settings.pl_mask_off_foe_non_combatant = {
 		reaction = "REACT_IDLE",
-		filter = "civilian",
+		filter = "non_combatant",
 		max_range = 600,
 		notice_delay_mul = 0,
 		notice_interval = 0.5,
@@ -136,9 +54,70 @@ function AttentionTweakData:_init_player()
 		pause = {10, 60},
 		notice_requires_FOV = true
 	}
-	self.settings.pl_civ_sneak = {
+	self.settings.pl_mask_off_friend_non_combatant = {
+		reaction = "REACT_IDLE",
+		filter = "non_combatant",
+		relation = "friend",
+		max_range = 600,
+		notice_delay_mul = 0,
+		notice_interval = 0.5,
+		attract_chance = 0.5,
+		verification_interval = 2,
+		release_delay = 3,
+		duration = {2, 15},
+		pause = {10, 60},
+		notice_requires_FOV = true
+	}
+	self.settings.pl_mask_on_friend_combatant_whisper_mode = {
+		reaction = "REACT_CHECK",
+		filter = "combatant",
+		relation = "friend",
+		max_range = 2000,
+		notice_delay_mul = 1,
+		verification_interval = 4,
+		release_delay = 3,
+		duration = {2, 5},
+		pause = {25, 50},
+		notice_requires_FOV = true
+	}
+	self.settings.pl_mask_on_friend_non_combatant_whisper_mode = self.settings.pl_mask_off_friend_non_combatant
+	self.settings.pl_mask_on_foe_combatant_whisper_mode_stand = {
 		reaction = "REACT_COMBAT",
-		filter = "civilian",
+		filter = "combatant",
+		relation = "foe",
+		verification_interval = 0.1,
+		uncover_range = 200,
+		release_delay = 1,
+		notice_delay_mul = 2,
+		max_range = 2000,
+		notice_clbk = "clbk_attention_notice_sneak",
+		notice_requires_FOV = true
+	}
+	self.settings.pl_mask_on_foe_non_combatant_whisper_mode_stand = {
+		reaction = "REACT_COMBAT",
+		filter = "non_combatant",
+		verification_interval = 0.1,
+		uncover_range = 550,
+		release_delay = 1,
+		notice_delay_mul = 1.5,
+		notice_clbk = "clbk_attention_notice_sneak",
+		notice_requires_FOV = true
+	}
+	self.settings.pl_mask_on_foe_combatant_whisper_mode_crouch = {
+		reaction = "REACT_COMBAT",
+		filter = "combatant",
+		relation = "foe",
+		verification_interval = 0.1,
+		uncover_range = 200,
+		release_delay = 1,
+		notice_delay_mul = 2,
+		max_range = 1200,
+		notice_clbk = "clbk_attention_notice_sneak",
+		notice_requires_FOV = true
+	}
+	self.settings.pl_mask_on_foe_non_combatant_whisper_mode_crouch = {
+		reaction = "REACT_COMBAT",
+		filter = "non_combatant",
 		verification_interval = 0.1,
 		uncover_range = 200,
 		release_delay = 1,
@@ -147,22 +126,68 @@ function AttentionTweakData:_init_player()
 		notice_clbk = "clbk_attention_notice_sneak",
 		notice_requires_FOV = true
 	}
-	self.settings.pl_civ_cbt = {
-		reaction = "REACT_COMBAT",
-		filter = "civilian",
+	self.settings.pl_friend_combatant_cbt = {
+		reaction = "REACT_CHECK",
+		filter = "combatant",
+		relation = "friend",
+		max_range = 3000,
+		notice_delay_mul = 1,
+		verification_interval = 4,
+		release_delay = 3,
+		duration = {2, 3},
+		pause = {45, 60},
+		notice_requires_FOV = false
+	}
+	self.settings.pl_friend_non_combatant_cbt = {
+		reaction = "REACT_SCARED",
+		filter = "non_combatant",
+		relation = "friend",
 		verification_interval = 0.1,
 		uncover_range = 550,
 		release_delay = 1,
 		notice_delay_mul = 1.5,
+		notice_requires_FOV = true
+	}
+	self.settings.pl_foe_combatant_cbt_crouch = {
+		reaction = "REACT_COMBAT",
+		filter = "combatant",
+		relation = "foe",
+		verification_interval = 0.1,
+		uncover_range = 350,
+		release_delay = 1,
+		notice_delay_mul = 2,
+		notice_requires_FOV = true
+	}
+	self.settings.pl_foe_combatant_cbt_stand = {
+		reaction = "REACT_COMBAT",
+		filter = "combatant",
+		relation = "foe",
+		verification_interval = 1,
+		notice_interval = 0.1,
+		uncover_range = 550,
+		release_delay = 1,
 		notice_clbk = "clbk_attention_notice_sneak",
 		notice_requires_FOV = true
 	}
+	self.settings.pl_foe_non_combatant_cbt_crouch = {
+		reaction = "REACT_COMBAT",
+		filter = "non_combatant",
+		verification_interval = 0.1,
+		uncover_range = 200,
+		release_delay = 1,
+		notice_delay_mul = 2.5,
+		notice_clbk = "clbk_attention_notice_sneak",
+		notice_requires_FOV = true
+	}
+	self.settings.pl_foe_non_combatant_cbt_stand = deep_clone(self.settings.pl_foe_combatant_cbt_stand)
+	self.settings.pl_foe_non_combatant_cbt_stand.filter = "non_combatant"
 end
 
 function AttentionTweakData:_init_team_AI()
 	self.settings.team_team_idle = {
 		reaction = "REACT_IDLE",
-		filter = "criminal",
+		filter = "all",
+		relation = "friend",
 		max_range = 1000,
 		verification_interval = 3,
 		release_delay = 2,
@@ -172,7 +197,8 @@ function AttentionTweakData:_init_team_AI()
 	}
 	self.settings.team_enemy_idle = {
 		reaction = "REACT_IDLE",
-		filter = "all_enemy",
+		filter = "combatant",
+		relation = "foe",
 		max_range = 550,
 		verification_interval = 3,
 		release_delay = 1,
@@ -182,7 +208,8 @@ function AttentionTweakData:_init_team_AI()
 	}
 	self.settings.team_enemy_cbt = {
 		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
+		filter = "all",
+		relation = "foe",
 		max_range = 20000,
 		notice_interval = 1,
 		verification_interval = 1.5,
@@ -206,7 +233,7 @@ function AttentionTweakData:_init_civilian()
 	}
 	self.settings.civ_enemy_cbt = {
 		reaction = "REACT_SCARED",
-		filter = "all_enemy",
+		filter = "all",
 		max_range = 8000,
 		uncover_range = 300,
 		notice_delay_mul = 1,
@@ -216,9 +243,21 @@ function AttentionTweakData:_init_civilian()
 		notice_clbk = "clbk_attention_notice_corpse",
 		notice_requires_FOV = true
 	}
+	self.settings.civ_murderer_cbt = {
+		reaction = "REACT_SHOOT",
+		filter = "murderer",
+		relation = "foe",
+		max_range = 20000,
+		notice_interval = 1,
+		verification_interval = 1.5,
+		uncover_range = 300,
+		release_delay = 1,
+		notice_requires_FOV = true,
+		weight_mul = 0.75
+	}
 	self.settings.civ_enemy_corpse_sneak = {
 		reaction = "REACT_SCARED",
-		filter = "civilians_enemies",
+		filter = "all",
 		max_range = 2500,
 		uncover_range = 300,
 		notice_delay_mul = 0.05,
@@ -228,7 +267,7 @@ function AttentionTweakData:_init_civilian()
 	}
 	self.settings.civ_civ_cbt = {
 		reaction = "REACT_SCARED",
-		filter = "civilian",
+		filter = "all",
 		uncover_range = 300,
 		notice_delay_mul = 0.05,
 		verification_interval = 0.1,
@@ -241,7 +280,8 @@ end
 function AttentionTweakData:_init_enemy()
 	self.settings.enemy_team_idle = {
 		reaction = "REACT_IDLE",
-		filter = "criminal",
+		filter = "combatant",
+		relation = "foe",
 		max_range = 2000,
 		verification_interval = 3,
 		release_delay = 1,
@@ -251,7 +291,8 @@ function AttentionTweakData:_init_enemy()
 	}
 	self.settings.enemy_team_cbt = {
 		reaction = "REACT_COMBAT",
-		filter = "criminal",
+		filter = "combatant",
+		relation = "foe",
 		max_range = 20000,
 		notice_delay_mul = 0,
 		notice_interval = 0.2,
@@ -261,31 +302,20 @@ function AttentionTweakData:_init_enemy()
 	}
 	self.settings.enemy_law_corpse_sneak = self.settings.civ_enemy_corpse_sneak
 	self.settings.enemy_team_corpse_sneak = self.settings.civ_enemy_corpse_sneak
-	self.settings.enemy_law_corpse_cbt = {
-		reaction = "REACT_CURIOUS",
-		filter = "law_enforcer",
+	self.settings.enemy_combatant_corpse_cbt = {
+		reaction = "REACT_CHECK",
+		filter = "combatant",
 		max_range = 800,
 		notice_delay_mul = 0.1,
 		verification_interval = 1.5,
 		release_delay = 1,
 		duration = {2, 3},
-		pause = {30, 120},
-		notice_requires_FOV = true
-	}
-	self.settings.enemy_team_corpse_cbt = {
-		reaction = "REACT_IDLE",
-		filter = "criminal",
-		max_range = 800,
-		notice_delay_mul = 2,
-		verification_interval = 1.5,
-		release_delay = 0,
-		duration = {2, 3},
-		pause = {50, 360},
 		notice_requires_FOV = true
 	}
 	self.settings.enemy_enemy_cbt = {
 		reaction = "REACT_SCARED",
-		filter = "all_enemy",
+		filter = "combatant",
+		relation = "friend",
 		max_range = 8000,
 		uncover_range = 300,
 		notice_delay_mul = 0.5,
@@ -295,7 +325,7 @@ function AttentionTweakData:_init_enemy()
 	}
 	self.settings.enemy_civ_cbt = {
 		reaction = "REACT_SCARED",
-		filter = "civilian",
+		filter = "non_combatant",
 		max_range = 8000,
 		uncover_range = 300,
 		notice_delay_mul = 0.2,
@@ -683,6 +713,10 @@ end
 
 function AttentionTweakData:_post_init()
 	for setting_name, setting in pairs(self.settings) do
-		table.insert(self.indexes, setting_name)
+		local i_insert = 1
+		while self.indexes[i_insert] and setting_name >= self.indexes[i_insert] do
+			i_insert = i_insert + 1
+		end
+		table.insert(self.indexes, i_insert, setting_name)
 	end
 end

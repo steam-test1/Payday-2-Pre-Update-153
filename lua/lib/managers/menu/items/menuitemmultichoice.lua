@@ -265,9 +265,14 @@ function MenuItemMultiChoice:reload(row_item, node)
 	elseif self:info_panel() == "lobby_difficulty" then
 		node._reload_lobby_difficulty(node, row_item)
 	end
-	local color_section = self:selected_option():parameters().color_section
-	if color_section then
-		row_item.choice_text:set_range_color(self:selected_option():parameters().color_start, self:selected_option():parameters().color_stop, color_section)
+	local color = self:selected_option():parameters().color1
+	if color then
+		local count = 1
+		while color do
+			row_item.choice_text:set_range_color(self:selected_option():parameters()["color_start" .. count], self:selected_option():parameters()["color_stop" .. count], color)
+			count = count + 1
+			color = self:selected_option():parameters()["color" .. count]
+		end
 	end
 	return true
 end

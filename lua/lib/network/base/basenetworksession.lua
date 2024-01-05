@@ -60,6 +60,7 @@ function BaseNetworkSession:load(data)
 	end
 	self._server_protocol = data.server_protocol
 	self._notify_host_when_outfits_loaded = data.notify_host_when_outfits_loaded
+	self._load_counter = data.load_counter
 end
 
 function BaseNetworkSession:save(data)
@@ -95,6 +96,7 @@ function BaseNetworkSession:save(data)
 	self:_flush_soft_remove_peers()
 	data.server_protocol = self._server_protocol
 	data.notify_host_when_outfits_loaded = self._notify_host_when_outfits_loaded
+	data.load_counter = self._load_counter
 end
 
 function BaseNetworkSession:server_peer()
@@ -249,7 +251,7 @@ function BaseNetworkSession:on_peer_lost(peer, peer_id)
 		end
 	end
 	if peer_id ~= 1 and self:is_client() and self._server_peer then
-		self._server_peer:send_after_load("report_dead_connection", peer_id)
+		self._server_peer:send("report_dead_connection", peer_id)
 	end
 end
 
@@ -443,7 +445,6 @@ function BaseNetworkSession:is_ready_to_close()
 	for peer_id, peer in pairs(self._peers) do
 		if peer:has_queued_rpcs() then
 			print("[BaseNetworkSession:is_ready_to_close] waiting queued rpcs", peer_id)
-			return false
 		end
 		if not peer:rpc() then
 			print("[BaseNetworkSession:is_ready_to_close] waiting rpc", peer_id)
@@ -466,9 +467,8 @@ function BaseNetworkSession:prepare_to_close(skip_destroy_matchmaking)
 	Network:set_disconnected()
 end
 
-function BaseNetworkSession:set_peer_loading_state(peer, state)
+function BaseNetworkSession:set_peer_loading_state(peer, state, load_counter)
 	print("[BaseNetworkSession:set_peer_loading_state]", peer:id(), state)
-	peer:set_loading(state)
 	if Global.load_start_menu_lobby then
 		return
 	end
@@ -587,7 +587,7 @@ function BaseNetworkSession:on_load_complete()
 	self._local_peer:set_loading(false)
 	for peer_id, peer in pairs(self._peers) do
 		if peer:ip_verified() then
-			peer:send("set_loading_state", false)
+			peer:send("set_loading_state", false, self._load_counter)
 		end
 	end
 end

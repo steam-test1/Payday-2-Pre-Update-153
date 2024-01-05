@@ -1003,6 +1003,31 @@ function WeaponFactoryManager:get_stats(factory_id, blueprint)
 	return stats
 end
 
+function WeaponFactoryManager:get_stance_mod(factory_id, blueprint, using_second_sight)
+	local factory = tweak_data.weapon.factory
+	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	local override = self:_get_override_parts(factory_id, blueprint)
+	local part
+	local translation = Vector3()
+	local rotation = Rotation()
+	for _, part_id in ipairs(blueprint) do
+		if not forbidden[part_id] then
+			part = self:_part_data(part_id, factory_id, override)
+			if part.stance_mod and (part.type ~= "sight" and part.type ~= "gadget" or using_second_sight and part.type == "gadget" or not using_second_sight and part.type == "sight") and part.stance_mod[factory_id] then
+				local part_translation = part.stance_mod[factory_id].translation
+				if part_translation then
+					mvector3.add(translation, part_translation)
+				end
+				local part_rotation = part.stance_mod[factory_id].rotation
+				if part_rotation then
+					mrotation.multiply(rotation, part_rotation)
+				end
+			end
+		end
+	end
+	return {translation = translation, rotation = rotation}
+end
+
 function WeaponFactoryManager:has_perk(perk_name, factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)

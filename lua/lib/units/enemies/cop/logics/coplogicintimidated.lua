@@ -439,7 +439,7 @@ function CopLogicIntimidated.register_rescue_SO(ignore_this, data)
 		usage_amount = 1,
 		AI_group = "enemies",
 		admin_clbk = callback(CopLogicIntimidated, CopLogicIntimidated, "on_rescue_SO_administered", data),
-		verification_clbk = callback(CopLogicIntimidated, CopLogicIntimidated, "rescue_SO_verification")
+		verification_clbk = callback(CopLogicIntimidated, CopLogicIntimidated, "rescue_SO_verification", data)
 	}
 	local so_id = "rescue" .. tostring(data.unit:key())
 	my_data.rescue_SO_id = so_id
@@ -465,8 +465,8 @@ function CopLogicIntimidated.on_rescue_SO_administered(ignore_this, data, receiv
 	my_data.rescue_SO_id = nil
 end
 
-function CopLogicIntimidated.rescue_SO_verification(ignore_this, unit)
-	return unit:base():char_tweak().rescue_hostages and not unit:movement():cool()
+function CopLogicIntimidated.rescue_SO_verification(ignore_this, data, unit)
+	return unit:base():char_tweak().rescue_hostages and not unit:movement():cool() and not data.team.foes[unit:movement():team().id]
 end
 
 function CopLogicIntimidated.on_rescue_SO_failed(ignore_this, data)

@@ -5,11 +5,11 @@ ElementTimer = ElementTimer or class(CoreMissionScriptElement.MissionScriptEleme
 function ElementTimer:init(...)
 	ElementTimer.super.init(self, ...)
 	self._digital_gui_units = {}
-	self._timer = self._values.timer
 	self._triggers = {}
 end
 
 function ElementTimer:on_script_activated()
+	self._timer = self:value("timer")
 	if not Network:is_server() then
 		return
 	end

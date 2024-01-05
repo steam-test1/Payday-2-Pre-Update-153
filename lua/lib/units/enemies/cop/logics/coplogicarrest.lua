@@ -268,7 +268,7 @@ function CopLogicArrest._upd_enemy_detection(data)
 	end
 	if new_reaction ~= AIAttentionObject.REACT_ARREST then
 		if (not (new_reaction and not (new_reaction < AIAttentionObject.REACT_SHOOT) and new_attention.verified) or not (new_attention.dis < 1500)) and (my_data.in_position or not my_data.should_arrest and not my_data.should_stand_close) then
-			if data.t > my_data.next_action_delay_t and not managers.groupai:state():is_police_called() and not my_data.calling_the_police and not my_data.turning and not data.unit:sound():speaking(data.t) then
+			if data.char_tweak.calls_in and data.t > my_data.next_action_delay_t and not managers.groupai:state():is_police_called() and not my_data.calling_the_police and not my_data.turning and not data.unit:sound():speaking(data.t) then
 				CopLogicArrest._call_the_police(data, my_data, true)
 				return
 			end

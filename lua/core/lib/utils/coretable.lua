@@ -397,6 +397,16 @@ function table.list_union(...)
 	return result
 end
 
+function table.list_append(t, ...)
+	for _, list_table in ipairs({
+		...
+	}) do
+		for _, value in ipairs(list_table) do
+			table.insert(t, value)
+		end
+	end
+end
+
 function table.print_data(data, t)
 	if type(data) == "table" then
 		t = t or ""

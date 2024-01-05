@@ -27,6 +27,7 @@ function MenuNodeGui:init(node, layer, parameters)
 	self.row_item_color = tweak_data.screen_colors.button_stage_3
 	self.row_item_hightlight_color = tweak_data.screen_colors.button_stage_2
 	self.row_item_disabled_text_color = tweak_data.menu.default_disabled_text_color
+	self.item_panel_h = node:parameters().item_panel_h
 	MenuNodeGui.super.init(self, node, layer, parameters)
 	if node:parameters().no_item_parent then
 		self._item_panel_parent:set_visible(false)
@@ -229,8 +230,14 @@ function MenuNodeGui:_create_legends(node)
 	})
 	local t_text = ""
 	local has_pc_legend = false
+	local visible_callback_name, visible_callback
 	for i, legend in ipairs(node:legends()) do
-		if not is_pc or legend.pc then
+		visible_callback_name = legend.visible_callback
+		visible_callback = nil
+		if visible_callback_name then
+			visible_callback = callback(node.callback_handler, node.callback_handler, visible_callback_name)
+		end
+		if (not is_pc or legend.pc) and (not visible_callback or visible_callback(self)) then
 			has_pc_legend = has_pc_legend or legend.pc
 			local spacing = 1 < i and "  |  " or ""
 			t_text = t_text .. spacing .. utf8.to_upper(managers.localization:text(legend.string_id, {
@@ -293,7 +300,7 @@ function MenuNodeGui:_setup_item_panel_parent(safe_rect, shape)
 	local x = shape.x or safe_rect.x
 	local y = shape.y or safe_rect.y + CoreMenuRenderer.Renderer.border_height
 	local w = shape.w or safe_rect.width
-	local h = shape.h or safe_rect.height - CoreMenuRenderer.Renderer.border_height * 2
+	local h = shape.h or self.item_panel_h or safe_rect.height - CoreMenuRenderer.Renderer.border_height * 2
 	self._item_panel_parent:set_shape(x, y, w, h)
 	self._align_data.panel:set_h(self._item_panel_parent:h())
 	self._list_arrows.up:set_h(2)

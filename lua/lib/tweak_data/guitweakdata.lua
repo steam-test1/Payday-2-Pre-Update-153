@@ -153,6 +153,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/bigfatmusicupdate/",
 		image = "guis/textures/pd2/content_updates/jukebox"
 	}
+	local hl_miami = {
+		id = "hl_miami",
+		name_id = "menu_content_hl_miami",
+		desc_id = "menu_content_hl_miami_desc",
+		date_id = "menu_content_hl_miami_date",
+		store = 323500,
+		image = "guis/dlcs/hl_miami/textures/pd2/content_updates/hl_miami"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -178,7 +186,8 @@ function GuiTweakData:init()
 			big_bank,
 			gage_pack_shotgun,
 			gage_pack_assault,
-			jukebox
+			jukebox,
+			hl_miami
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

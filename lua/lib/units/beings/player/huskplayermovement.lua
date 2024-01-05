@@ -17,6 +17,11 @@ HuskPlayerMovement.on_suspicion = PlayerMovement.on_suspicion
 HuskPlayerMovement.state_enter_time = PlayerMovement.state_enter_time
 HuskPlayerMovement.SO_access = PlayerMovement.SO_access
 HuskPlayerMovement.rescue_SO_verification = PlayerBleedOut.rescue_SO_verification
+HuskPlayerMovement.set_team = PlayerMovement.set_team
+HuskPlayerMovement.team = PlayerMovement.team
+HuskPlayerMovement.sync_net_event = PlayerMovement.sync_net_event
+HuskPlayerMovement.set_friendly_fire = PlayerMovement.set_friendly_fire
+HuskPlayerMovement.friendly_fire = PlayerMovement.friendly_fire
 HuskPlayerMovement._walk_anim_velocities = {
 	stand = {
 		ntl = {
@@ -639,7 +644,7 @@ function HuskPlayerMovement:_register_revive_SO()
 		usage_amount = 1,
 		AI_group = "friendlies",
 		admin_clbk = callback(self, self, "on_revive_SO_administered"),
-		verification_clbk = callback(HuskPlayerMovement, HuskPlayerMovement, "rescue_SO_verification")
+		verification_clbk = callback(HuskPlayerMovement, HuskPlayerMovement, "rescue_SO_verification", self._unit)
 	}
 	local so_id = "PlayerHusk_revive" .. tostring(self._unit:key())
 	self._revive_SO_id = so_id
@@ -1776,6 +1781,7 @@ function HuskPlayerMovement:load(data)
 			self:set_attention_setting_enabled(setting_name, true)
 		end
 	end
+	self._team = managers.groupai:state():team_data(data.movement.team_id)
 end
 
 function HuskPlayerMovement:_post_load(unit, t, dt)
@@ -1870,7 +1876,9 @@ end
 
 function HuskPlayerMovement:_apply_attention_setting_modifications(setting)
 	setting.detection = self._unit:base():detection_settings()
-	local weight_mul = self._unit:base():upgrade_value("player", "camouflage_bonus", 1)
+	local weight_mul = self._unit:base():upgrade_value("player", "camouflage_bonus") or 1
+	weight_mul = weight_mul * (self._unit:base():upgrade_value("player", "camouflage_multiplier") or 1)
+	weight_mul = weight_mul * (self._unit:base():upgrade_value("player", "uncover_multiplier") or 1)
 	if weight_mul and weight_mul ~= 1 then
 		setting.weight_mul = (setting.weight_mul or 1) * weight_mul
 	end
@@ -2034,6 +2042,20 @@ function HuskPlayerMovement:_chk_groun_ray()
 	mvec3_mul(down_pos, -20)
 	mvec3_add(down_pos, self._m_pos)
 	return World:raycast("ray", up_pos, down_pos, "slot_mask", self._slotmask_gnd_ray, "ray_type", "walk", "report")
+end
+
+function HuskPlayerMovement:sync_attention_setting(setting_name, state)
+	if state then
+		local setting_desc = tweak_data.attention.settings[setting_name]
+		if setting_desc then
+			local setting = self:_create_attention_setting_from_descriptor(setting_desc, setting_name)
+			self._unit:movement():attention_handler():add_attention(setting)
+		else
+			debug_pause_unit(self._unit, "[PlayerMovement:add_attention_setting] invalid setting", setting_name, self._unit)
+		end
+	else
+		self._unit:movement():attention_handler():remove_attention(setting_name)
+	end
 end
 
 function HuskPlayerMovement:on_enter_zipline(zipline_unit)

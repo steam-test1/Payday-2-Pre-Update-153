@@ -93,6 +93,7 @@ function HUDBlackScreen:set_loading_text_status(status)
 			end
 		elseif status == "wait_for_peers" then
 			local peer_name, peer_status = managers.network:session():peer_streaming_status()
+			print("[HUDBlackScreen:set_loading_text_status] wait_for_peers", peer_name, peer_status)
 			local loading_text = utf8.to_upper(managers.localization:text("menu_waiting_for_players_progress", {player_name = peer_name, prog = peer_status}))
 			self._blackscreen_panel:child("loading_text"):set_text(loading_text)
 		else

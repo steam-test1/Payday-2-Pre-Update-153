@@ -104,14 +104,10 @@ function PlayerManager:_setup_rules()
 end
 
 function PlayerManager:aquire_default_upgrades()
-	managers.upgrades:aquire_default("cable_tie")
-	managers.upgrades:aquire_default("player_special_enemy_highlight")
-	managers.upgrades:aquire_default("player_hostage_trade")
-	managers.upgrades:aquire_default("player_sec_camera_highlight")
-	managers.upgrades:aquire_default("player_corpse_dispose")
-	managers.upgrades:aquire_default("player_corpse_dispose_amount_1")
-	managers.upgrades:aquire_default("player_civ_harmless_melee")
-	managers.upgrades:aquire_default("striker_reload_speed_default")
+	local default_upgrades = tweak_data.skilltree.default_upgrades or {}
+	for _, upgrade in ipairs(default_upgrades) do
+		managers.upgrades:aquire_default(upgrade)
+	end
 	for i = 1, PlayerManager.WEAPON_SLOTS do
 		if not managers.player:weapon_in_slot(i) then
 			self._global.kit.weapon_slots[i] = managers.player:availible_weapons(i)[1]
@@ -744,6 +740,7 @@ function PlayerManager:body_armor_skill_multiplier()
 	multiplier = multiplier + self:upgrade_value("player", "tier_armor_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "passive_armor_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "armor_multiplier", 1) - 1
+	multiplier = multiplier + self:team_upgrade_value("armor", "multiplier", 1) - 1
 	multiplier = multiplier + self:get_hostage_bonus_multiplier("armor") - 1
 	return multiplier
 end
@@ -991,7 +988,7 @@ function PlayerManager:update_deployable_equipment_to_peer(peer)
 	if self._global.synced_deployables[peer_id] then
 		local deployable = self._global.synced_deployables[peer_id].deployable
 		local amount = self._global.synced_deployables[peer_id].amount
-		peer:send_after_load("sync_deployable_equipment", deployable, amount)
+		peer:send_queued_sync("sync_deployable_equipment", deployable, amount)
 	end
 end
 
@@ -1030,7 +1027,7 @@ function PlayerManager:update_cable_ties_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_cable_ties[peer_id] then
 		local amount = self._global.synced_cable_ties[peer_id].amount
-		peer:send_after_load("sync_cable_ties", amount)
+		peer:send_queued_sync("sync_cable_ties", amount)
 	end
 end
 
@@ -1066,14 +1063,14 @@ function PlayerManager:update_ammo_info_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_ammo_info[peer_id] then
 		for selection_index, ammo_info in pairs(self._global.synced_ammo_info[peer_id]) do
-			peer:send_after_load("sync_ammo_amount", selection_index, unpack(ammo_info))
+			peer:send_queued_sync("sync_ammo_amount", selection_index, unpack(ammo_info))
 		end
 	end
 end
 
 function PlayerManager:update_synced_ammo_info_to_peers(selection_index, max_clip, current_clip, current_left, max)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers_loaded("sync_ammo_amount", selection_index, max_clip, current_clip, current_left, max)
+	managers.network:session():send_to_peers_synched("sync_ammo_amount", selection_index, max_clip, current_clip, current_left, max)
 	self:set_synced_ammo_info(peer_id, selection_index, max_clip, current_clip, current_left, max)
 end
 
@@ -1103,13 +1100,13 @@ function PlayerManager:update_carry_to_peer(peer)
 		local dye_initiated = self._global.synced_carry[peer_id].dye_initiated
 		local has_dye_pack = self._global.synced_carry[peer_id].has_dye_pack
 		local dye_value_multiplier = self._global.synced_carry[peer_id].dye_value_multiplier
-		peer:send_after_load("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+		peer:send_queued_sync("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	end
 end
 
 function PlayerManager:update_synced_carry_to_peers(carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.network:session():send_to_peers_synched("sync_carry", carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	self:set_synced_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 end
 
@@ -1141,7 +1138,7 @@ end
 
 function PlayerManager:update_removed_synced_carry_to_peers()
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_remove_carry")
+	managers.network:session():send_to_peers_synched("sync_remove_carry")
 	self:remove_synced_carry(peer_id)
 end
 
@@ -1247,7 +1244,7 @@ end
 function PlayerManager:update_team_upgrades_to_peer(peer)
 	for category, upgrades in pairs(self._global.team_upgrades) do
 		for upgrade, level in pairs(upgrades) do
-			peer:send_after_load("add_synced_team_upgrade", category, upgrade, level)
+			peer:send_queued_sync("add_synced_team_upgrade", category, upgrade, level)
 		end
 	end
 end
@@ -1277,14 +1274,14 @@ function PlayerManager:update_equipment_possession_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_equipment_possession[peer_id] then
 		for name, amount in pairs(self._global.synced_equipment_possession[peer_id]) do
-			peer:send_after_load("sync_equipment_possession", peer_id, name, amount)
+			peer:send_queued_sync("sync_equipment_possession", peer_id, name, amount)
 		end
 	end
 end
 
 function PlayerManager:update_equipment_possession_to_peers(equipment, amount)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_equipment_possession", peer_id, equipment, amount or 1)
+	managers.network:session():send_to_peers_synched("sync_equipment_possession", peer_id, equipment, amount or 1)
 	self:set_synced_equipment_possession(peer_id, equipment, amount)
 end
 
@@ -1310,33 +1307,49 @@ end
 
 function PlayerManager:transfer_special_equipment(peer_id, include_custody)
 	if self._global.synced_equipment_possession[peer_id] then
-		local peers = {
-			managers.network:session():local_peer()
-		}
+		local peers = {}
+		local local_peer = managers.network:session():local_peer()
+		if managers.trade:is_peer_in_custody(local_peer:id()) then
+			if include_custody then
+				table.insert(peers, local_peer)
+			end
+		else
+			table.insert(peers, local_peer)
+		end
 		for _, p in pairs(managers.network:session():peers()) do
 			if managers.trade:is_peer_in_custody(p:id()) then
 				if include_custody then
 					table.insert(peers, p)
 				end
 			else
-				table.insert(peers, 0, p)
+				table.insert(peers, 1, p)
 			end
 		end
 		for name, amount in pairs(self._global.synced_equipment_possession[peer_id]) do
-			for _, p in pairs(peers) do
-				local id = p:id()
-				if not self._global.synced_equipment_possession[id] or not self._global.synced_equipment_possession[id][name] then
-					if Network:is_server() then
-						if p == managers.network:session():local_peer() then
-							managers.player:add_special({name = name, amount = amount})
-						else
-							p:send("give_equipment", name, amount)
+			local equipment_data = tweak_data.equipments.specials[name]
+			if equipment_data and not equipment_data.avoid_tranfer then
+				local equipment_lost = true
+				for _, p in ipairs(peers) do
+					local id = p:id()
+					if not self._global.synced_equipment_possession[id] or not self._global.synced_equipment_possession[id][name] then
+						if Network:is_server() then
+							if p == managers.network:session():local_peer() then
+								managers.player:add_special({name = name, amount = amount})
+							else
+								p:send("give_equipment", name, amount)
+							end
 						end
+						if peer_id == managers.network:session():local_peer():id() then
+							for i = 1, amount do
+								self:remove_special(name)
+							end
+						end
+						equipment_lost = false
+						break
 					end
-					if peer_id == managers.network:session():local_peer():id() then
-						self:remove_special(name)
-					end
-					break
+				end
+				if equipment_lost and name == "evidence" then
+					managers.mission:call_global_event("equipment_evidence_lost")
 				end
 			end
 		end
@@ -1553,6 +1566,9 @@ function PlayerManager:use_selected_equipment(unit)
 	end
 	if used_one then
 		self:remove_equipment(equipment.equipment)
+		if redirect then
+			redirect(unit)
+		end
 	end
 	return {
 		expire_timer = equipment.action_timer,
@@ -1844,7 +1860,7 @@ function PlayerManager:update_grenades_to_peer(peer)
 	if self._global.synced_grenades[peer_id] then
 		local grenade = self._global.synced_grenades[peer_id].grenade
 		local amount = self._global.synced_grenades[peer_id].amount
-		peer:send_after_load("sync_grenades", grenade, Application:digest_value(amount, false))
+		peer:send_queued_sync("sync_grenades", grenade, Application:digest_value(amount, false))
 	end
 end
 
@@ -2155,6 +2171,24 @@ end
 
 function PlayerManager:player_timer()
 	return self._player_timer
+end
+
+function PlayerManager:add_weapon_ammo_gain(name_id, amount)
+	if Application:production_build() then
+		self._debug_weapon_ammo_gains = self._debug_weapon_ammo_gains or {}
+		self._debug_weapon_ammo_gains[name_id] = self._debug_weapon_ammo_gains[name_id] or {total = 0, index = 0}
+		self._debug_weapon_ammo_gains[name_id].total = self._debug_weapon_ammo_gains[name_id].total + amount
+		self._debug_weapon_ammo_gains[name_id].index = self._debug_weapon_ammo_gains[name_id].index + 1
+	end
+end
+
+function PlayerManager:report_weapon_ammo_gains()
+	if Application:production_build() then
+		self._debug_weapon_ammo_gains = self._debug_weapon_ammo_gains or {}
+		for name_id, data in pairs(self._debug_weapon_ammo_gains) do
+			print("WEAPON: " .. tostring(name_id), "AVERAGE AMMO PICKUP: " .. string.format("%3.2f%%", data.total / data.index * 100))
+		end
+	end
 end
 
 function PlayerManager:save(data)

@@ -1,6 +1,12 @@
 CoreCounterUnitElement = CoreCounterUnitElement or class(MissionElement)
 CoreCounterUnitElement.SAVE_UNIT_POSITION = false
 CoreCounterUnitElement.SAVE_UNIT_ROTATION = false
+CoreCounterUnitElement.INSTANCE_VAR_NAMES = {
+	{
+		type = "number",
+		value = "counter_target"
+	}
+}
 CounterUnitElement = CounterUnitElement or class(CoreCounterUnitElement)
 
 function CounterUnitElement:init(...)

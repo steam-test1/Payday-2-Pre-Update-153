@@ -41,4 +41,24 @@ function TimeSpeedEffectTweakData:_init_base_effects()
 end
 
 function TimeSpeedEffectTweakData:_init_mission_effects()
+	self.mission_effects = {}
+	self.mission_effects.quickdraw = {
+		speed = 0.2,
+		fade_in_delay = 0.5,
+		fade_in = 0.3,
+		sustain = 5,
+		fade_out = 0.8,
+		timer = "pausable",
+		sync = true
+	}
+	self.mission_effects.quickdraw_player = {
+		speed = 0.5,
+		fade_in_delay = self.mission_effects.quickdraw.fade_in_delay,
+		fade_in = self.mission_effects.quickdraw.fade_in,
+		sustain = self.mission_effects.quickdraw.sustain,
+		fade_out = self.mission_effects.quickdraw.fade_out,
+		timer = "pausable",
+		affect_timer = Idstring("player"),
+		sync = true
+	}
 end

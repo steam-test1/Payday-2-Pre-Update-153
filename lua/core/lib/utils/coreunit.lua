@@ -64,9 +64,6 @@ end
 function editor_load_unit(unit_name)
 	if Application:editor() then
 		CoreEngineAccess._editor_load(Idstring("unit"), unit_name:id())
-		if not managers.sequence:has(unit_name) then
-			managers.sequence:_add_sequences_from_unit_data(CoreEngineAccess._editor_unit_data(unit_name:id()))
-		end
 	end
 end
 

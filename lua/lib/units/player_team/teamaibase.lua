@@ -2,6 +2,7 @@ TeamAIBase = TeamAIBase or class(CopBase)
 
 function TeamAIBase:post_init()
 	self._ext_movement = self._unit:movement()
+	self._ext_anim = self._unit:anim_data()
 	self._ext_movement:post_init(true)
 	self._unit:brain():post_init()
 	self:set_anim_lod(1)

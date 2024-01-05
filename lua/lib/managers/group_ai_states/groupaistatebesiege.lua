@@ -58,10 +58,10 @@ end
 
 function GroupAIStateBesiege:_queue_police_upd_task()
 	self._police_upd_task_queued = true
-	managers.enemy:queue_task("GroupAIStateBesiege._upd_police_activity", GroupAIStateBesiege._upd_police_activity, self, self._t + 2)
+	managers.enemy:queue_task("GroupAIStateBesiege._upd_police_activity", GroupAIStateBesiege._upd_police_activity, self, self._t + (next(self._spawning_groups) and 0.4 or 2))
 end
 
-function GroupAIStateBesiege:assign_enemy_to_group_ai(unit)
+function GroupAIStateBesiege:assign_enemy_to_group_ai(unit, team_id)
 	local u_tracker = unit:movement():nav_tracker()
 	local seg = u_tracker:nav_segment()
 	local area = self:get_area_from_nav_seg_id(seg)
@@ -80,6 +80,7 @@ function GroupAIStateBesiege:assign_enemy_to_group_ai(unit)
 		size = 1
 	}
 	local group = self:_create_group(group_desc)
+	group.team = self._teams[team_id]
 	local grp_objective
 	local objective = unit:brain():objective()
 	local grp_obj_type = self._task_data.assault.active and "assault_area" or "recon_area"
@@ -565,7 +566,7 @@ function GroupAIStateBesiege:_end_regroup_task()
 		managers.trade:set_trade_countdown(true)
 		self:set_assault_mode(false)
 		if not self._smoke_grenade_ignore_control then
-			managers.network:session():send_to_peers("sync_smoke_grenade_kill")
+			managers.network:session():send_to_peers_synched("sync_smoke_grenade_kill")
 			self:sync_smoke_grenade_kill()
 		end
 		local dmg = self._downs_during_assault
@@ -834,6 +835,7 @@ function GroupAIStateBesiege:_find_spawn_group_near_area(target_area, allowed_gr
 		if rand_wgt <= 0 then
 			best_grp = candidate.group
 			best_grp_type = candidate.group_type
+			best_grp.delay_t = self._t + best_grp.interval
 			break
 		end
 	end
@@ -981,6 +983,7 @@ function GroupAIStateBesiege:_spawn_in_group(spawn_group, spawn_group_type, grp_
 	local group = self:_create_group(group_desc)
 	group.objective = grp_objective
 	group.objective.moving_out = true
+	group.team = self._teams[spawn_group.team_id or tweak_data.levels:get_default_team_ID("combatant")]
 	spawn_task.group = group
 	return group
 end
@@ -1066,9 +1069,8 @@ function GroupAIStateBesiege:_upd_group_spawning()
 				local success = _try_spawn_unit(u_type_name, spawn_info.spawn_entry)
 				if success then
 					spawn_info.amount = spawn_info.amount - 1
-				else
-					break
 				end
+				break
 			end
 		end
 	end
@@ -1077,9 +1079,8 @@ function GroupAIStateBesiege:_upd_group_spawning()
 			local success = _try_spawn_unit(u_type_name, spawn_info.spawn_entry)
 			if success then
 				spawn_info.amount = spawn_info.amount - 1
-			else
-				break
 			end
+			break
 		end
 	end
 	local complete = true
@@ -1369,6 +1370,9 @@ function GroupAIStateBesiege:_draw_enemy_activity(t)
 		if l_data.objective then
 			text_str = text_str .. ":" .. l_data.objective.type
 		end
+		if not l_data.group then
+			text_str = l_data.team.id .. ":" .. text_str
+		end
 		if logic_name_text then
 			logic_name_text:set_text(text_str)
 		else
@@ -1458,7 +1462,7 @@ function GroupAIStateBesiege:_draw_enemy_activity(t)
 				if not gui_text then
 					gui_text = panel:text({
 						name = "text",
-						text = group_id .. ":" .. group.objective.type,
+						text = group.team.id .. ":" .. group_id .. ":" .. group.objective.type,
 						font = tweak_data.hud.medium_font,
 						font_size = 24,
 						color = draw_data.group_id_color,
@@ -2649,7 +2653,7 @@ function GroupAIStateBesiege:_chk_group_use_flash_grenade(group, task_data, deto
 end
 
 function GroupAIStateBesiege:detonate_smoke_grenade(detonate_pos, shooter_pos, duration, flashbang)
-	managers.network:session():send_to_peers("sync_smoke_grenade", detonate_pos, shooter_pos, duration, flashbang and true or false)
+	managers.network:session():send_to_peers_synched("sync_smoke_grenade", detonate_pos, shooter_pos, duration, flashbang and true or false)
 	self:sync_smoke_grenade(detonate_pos, shooter_pos, duration, flashbang)
 end
 
@@ -2932,4 +2936,41 @@ function GroupAIStateBesiege:_count_criminals_engaged_force(max_count)
 		end
 	end
 	return count
+end
+
+function GroupAIStateBesiege:team_data(team_id)
+	return self._teams[team_id]
+end
+
+function GroupAIStateBesiege:set_char_team(unit, team_id)
+	local u_key = unit:key()
+	local team = self._teams[team_id]
+	local u_data = self._police[u_key]
+	if u_data and u_data.group then
+		u_data.group.team = team
+		for _, other_u_data in pairs(u_data.group.units) do
+			other_u_data.unit:movement():set_team(team)
+		end
+		return
+	end
+	unit:movement():set_team(team)
+end
+
+function GroupAIStateBesiege:set_team_relation(team1_id, team2_id, relation, mutual)
+	if mutual then
+		self:set_team_relation(team1_id, team2_id, relation, nil)
+		self:set_team_relation(team2_id, team1_id, relation, nil)
+		return
+	end
+	if relation == "foe" then
+		self._teams[team1_id].foes[team2_id] = true
+	elseif relation == "friend" or relation == "neutral" then
+		self._teams[team1_id].foes[team2_id] = nil
+	end
+	if Network:is_server() then
+		local team1_index = tweak_data.levels:get_team_index(team1_id)
+		local team2_index = tweak_data.levels:get_team_index(team2_id)
+		local relation_code = relation == "neutral" and 1 or relation == "friend" and 2 or 3
+		managers.network:session():send_to_peers_synched("sync_team_relation", team1_index, team2_index, relation_code)
+	end
 end

@@ -363,6 +363,7 @@ function PlayerMovement:_create_attention_setting_from_descriptor(setting_desc, 
 	setting.id = setting_name
 	setting.filter = managers.groupai:state():get_unit_type_filter(setting.filter)
 	setting.reaction = AIAttentionObject[setting.reaction]
+	setting.team = self._team
 	if setting.notice_clbk then
 		if self[setting.notice_clbk] then
 			setting.notice_clbk = callback(self, self, setting.notice_clbk)
@@ -381,10 +382,16 @@ function PlayerMovement:_apply_attention_setting_modifications(setting)
 	if managers.player:has_category_upgrade("player", "camouflage_bonus") then
 		setting.weight_mul = (setting.weight_mul or 1) * managers.player:upgrade_value("player", "camouflage_bonus", 1)
 	end
+	if managers.player:has_category_upgrade("player", "camouflage_multiplier") then
+		setting.weight_mul = (setting.weight_mul or 1) * managers.player:upgrade_value("player", "camouflage_multiplier", 1)
+	end
+	if managers.player:has_category_upgrade("player", "uncover_multiplier") then
+		setting.weight_mul = (setting.weight_mul or 1) * managers.player:upgrade_value("player", "uncover_multiplier", 1)
+	end
 end
 
-function PlayerMovement:set_attention_settings(setting_names)
-	local changes = self._attention_handler:chk_settings_diff(setting_names)
+function PlayerMovement:set_attention_settings(settings_list)
+	local changes = self._attention_handler:chk_settings_diff(settings_list)
 	if not changes then
 		return
 	end
@@ -423,24 +430,6 @@ function PlayerMovement:set_attention_settings(setting_names)
 				self._unit:network():send_to_host("set_attention_enabled", index, false)
 			end
 		end
-	end
-end
-
-function PlayerMovement:set_attention_setting_enabled(setting_name, state, sync)
-	if state then
-		local setting_desc = tweak_data.attention.settings[setting_name]
-		if setting_desc then
-			local setting = self:_create_attention_setting_from_descriptor(setting_desc, setting_name)
-			self._unit:movement():attention_handler():add_attention(setting)
-		else
-			debug_pause_unit(self._unit, "[PlayerMovement:add_attention_setting] invalid setting", setting_name, self._unit)
-		end
-	else
-		self._unit:movement():attention_handler():remove_attention(setting_name)
-	end
-	if sync then
-		local index = tweak_data.player:get_attention_index("player", setting_name)
-		self._ext_network:send_to_host("set_attention_enabled", index, state)
 	end
 end
 
@@ -672,6 +661,47 @@ function PlayerMovement:push(vel)
 	end
 end
 
+function PlayerMovement:set_team(team_data)
+	self._team = team_data
+	self._attention_handler:set_team(team_data)
+	if Network:is_server() and self._unit:id() ~= -1 then
+		local team_index = tweak_data.levels:get_team_index(team_data.id)
+		if team_index <= 16 then
+			self._unit:network():send("sync_unit_event_id_16", "movement", team_index)
+		else
+			debug_pause_unit(self._unit, "[PlayerMovement:set_team] team limit reached!", team_data.id)
+		end
+	end
+end
+
+function PlayerMovement:team()
+	return self._team
+end
+
+function PlayerMovement:sync_net_event(event_id, peer)
+	local team_id = tweak_data.levels:get_team_names_indexed()[event_id]
+	local team_data = managers.groupai:state():team_data(team_id)
+	self:set_team(team_data)
+end
+
+function PlayerMovement:set_friendly_fire(state)
+	if state then
+		if self._friendly_fire then
+			self._friendly_fire = self._friendly_fire + 1
+		else
+			self._friendly_fire = 1
+		end
+	elseif self._friendly_fire == 1 then
+		self._friendly_fire = nil
+	else
+		self._friendly_fire = self._friendly_fire - 1
+	end
+end
+
+function PlayerMovement:friendly_fire()
+	return self._friendly_fire and true or false
+end
+
 function PlayerMovement:save(data)
 	local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
 	data.movement = {
@@ -699,6 +729,7 @@ function PlayerMovement:save(data)
 	data.zip_line_unit_id = self:zipline_unit() and self:zipline_unit():editor_id()
 	data.down_time = self._unit:character_damage():down_time()
 	self._current_state:save(data.movement)
+	data.movement.team_id = self._team.id
 end
 
 function PlayerMovement:pre_destroy(unit)
@@ -776,6 +807,10 @@ end
 
 function PlayerMovement:in_air()
 	return self._state_data.in_air
+end
+
+function PlayerMovement:on_ladder()
+	return self._state_data.on_ladder
 end
 
 function PlayerMovement:on_enter_ladder(ladder_unit)

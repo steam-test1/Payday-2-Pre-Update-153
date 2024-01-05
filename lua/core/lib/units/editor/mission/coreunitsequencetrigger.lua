@@ -235,7 +235,7 @@ function CoreUnitSequenceTriggerUnitElement:_add_unit(unit, sequences, sequence_
 	self._guis_id = self._guis_id + 1
 	sequence_list_data.guis_id = self._guis_id
 	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT", "Select dialog", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:add_tool("SELECT", "Remove", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
 	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_entry"), self._guis_id)
 	toolbar:realize()
 	self._guis[self._guis_id] = {

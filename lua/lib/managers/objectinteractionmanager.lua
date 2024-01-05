@@ -102,7 +102,7 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 		if not alive(self._active_object) or not self._active_object:interaction():active() then
 			self._active_object_locked_data = nil
 		else
-			locked = mvec3_dis(player_pos, self._active_object:interaction():interact_position()) <= self._active_object:interaction():interact_distance()
+			locked = self._active_object:interaction():interact_dont_interupt_on_distance() or mvec3_dis(player_pos, self._active_object:interaction():interact_position()) <= self._active_object:interaction():interact_distance()
 		end
 	end
 	if locked then

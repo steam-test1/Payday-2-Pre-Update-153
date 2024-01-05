@@ -6,8 +6,16 @@ function DialogueUnitElement:init(unit)
 	DialogueUnitElement.super.init(self, unit)
 	self._hed.dialogue = "none"
 	self._hed.execute_on_executed_when_done = false
+	self._hed.use_position = false
 	table.insert(self._save_values, "dialogue")
 	table.insert(self._save_values, "execute_on_executed_when_done")
+	table.insert(self._save_values, "use_position")
+end
+
+function DialogueUnitElement:new_save_values(...)
+	local t = DialogueUnitElement.super.new_save_values(self, ...)
+	t.position = self._hed.use_position and self._unit:position() or nil
+	return t
 end
 
 function DialogueUnitElement:test_element()
@@ -68,11 +76,6 @@ function DialogueUnitElement:_build_panel(panel, panel_sizer)
 	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_dialog_btn"), nil)
 	toolbar:realize()
 	dialog_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	local execute_on_executed_when_done = EWS:CheckBox(panel, "Execute on executed when done", "")
-	execute_on_executed_when_done:set_value(self._hed.execute_on_executed_when_done)
-	execute_on_executed_when_done:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = execute_on_executed_when_done,
-		value = "execute_on_executed_when_done"
-	})
-	panel_sizer:add(execute_on_executed_when_done, 0, 0, "EXPAND")
+	self:_build_value_checkbox(panel, panel_sizer, "execute_on_executed_when_done", "Execute on executed when done")
+	self:_build_value_checkbox(panel, panel_sizer, "use_position")
 end

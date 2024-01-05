@@ -127,6 +127,9 @@ function LootDropTweakData:init(tweak_data)
 	end
 	
 	self.global_value_category = {}
+	self.global_value_category.normal = {}
+	self.global_value_category.normal.name_id = "bm_global_value_normal"
+	self.global_value_category.normal.sort_number = 0
 	self.global_value_category.dlc = {}
 	self.global_value_category.dlc.name_id = "bm_menu_dlc"
 	self.global_value_category.dlc.sort_number = 10
@@ -148,7 +151,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.normal.drops = true
 	self.global_values.normal.track = false
 	self.global_values.normal.sort_number = 0
-	self.global_values.normal.category = nil
+	self.global_values.normal.category = "normal"
 	self.global_values.superior = {}
 	self.global_values.superior.name_id = "bm_global_value_superior"
 	self.global_values.superior.desc_id = "menu_l_global_value_superior"
@@ -397,6 +400,33 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.gage_pack_assault.track = true
 	self.global_values.gage_pack_assault.sort_number = 86
 	self.global_values.gage_pack_assault.category = "dlc"
+	self.global_values.hl_miami = {}
+	self.global_values.hl_miami.name_id = "bm_global_value_hl_miami"
+	self.global_values.hl_miami.desc_id = "menu_l_global_value_hl_miami"
+	self.global_values.hl_miami.unlock_id = "bm_global_value_hl_miami_unlock"
+	self.global_values.hl_miami.color = Color(255, 255, 212, 0) / 255
+	self.global_values.hl_miami.dlc = true
+	self.global_values.hl_miami.chance = 1
+	self.global_values.hl_miami.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "hl_miami")
+	self.global_values.hl_miami.durability_multiplier = 1
+	self.global_values.hl_miami.drops = true
+	self.global_values.hl_miami.track = true
+	self.global_values.hl_miami.sort_number = 87
+	self.global_values.hl_miami.category = "dlc"
+	self.global_values.hlm_game = {}
+	self.global_values.hlm_game.name_id = "bm_global_value_hlm_game"
+	self.global_values.hlm_game.desc_id = "menu_l_global_value_hlm_game"
+	self.global_values.hlm_game.unlock_id = "bm_global_value_hlm_game_unlock"
+	self.global_values.hlm_game.color = Color(255, 255, 212, 0) / 255
+	self.global_values.hlm_game.dlc = true
+	self.global_values.hlm_game.chance = 1
+	self.global_values.hlm_game.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "hlm_game")
+	self.global_values.hlm_game.durability_multiplier = 1
+	self.global_values.hlm_game.drops = true
+	self.global_values.hlm_game.track = true
+	self.global_values.hlm_game.sort_number = 88
+	self.global_values.hlm_game.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.hlm_game.category = "normal"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -437,8 +467,14 @@ function LootDropTweakData:init(tweak_data)
 		"poetry_soundtrack",
 		"big_bank",
 		"gage_pack_shotgun",
-		"gage_pack_assault"
+		"gage_pack_assault",
+		"hl_miami",
+		"hlm_game"
 	}
+	self:_create_global_value_list_map()
+end
+
+function LootDropTweakData:_create_global_value_list_map()
 	self.global_value_list_map = {}
 	for i, d in ipairs(self.global_value_list_index) do
 		self.global_value_list_map[d] = i

@@ -121,15 +121,7 @@ function CopLogicAttack._upd_combat_movement(data)
 	local alert_soft = data.is_suppressed
 	local action_taken = data.logic.action_taken(data, my_data)
 	local want_to_take_cover = my_data.want_to_take_cover
-	if not action_taken then
-		if not ((not want_to_take_cover or in_cover and in_cover[4]) and data.char_tweak.allowed_poses) or data.char_tweak.allowed_poses.stand then
-			if not unit:anim_data().crouch then
-				action_taken = CopLogicAttack._chk_request_action_crouch(data)
-			end
-		elseif unit:anim_data().crouch and (not (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch) or 2 < my_data.cover_test_step) then
-			action_taken = CopLogicAttack._chk_request_action_stand(data)
-		end
-	end
+	action_taken = action_taken or CopLogicAttack._upd_pose(data, my_data)
 	local move_to_cover, want_flank_cover
 	if my_data.cover_test_step ~= 1 and not enemy_visible_softer and (action_taken or want_to_take_cover or not in_cover) then
 		my_data.cover_test_step = 1
@@ -243,7 +235,7 @@ function CopLogicAttack._upd_combat_movement(data)
 end
 
 function CopLogicAttack._chk_start_action_move_back(data, my_data, focus_enemy, engage)
-	if focus_enemy and focus_enemy.nav_tracker and focus_enemy.verified and focus_enemy.dis < 250 then
+	if focus_enemy and focus_enemy.nav_tracker and focus_enemy.verified and focus_enemy.dis < 250 and CopLogicAttack._can_move(data) then
 		local from_pos = mvector3.copy(data.m_pos)
 		local threat_tracker = focus_enemy.nav_tracker
 		local threat_head_pos = focus_enemy.m_head_pos
@@ -1318,4 +1310,19 @@ function CopLogicAttack._upd_stop_old_action(data, my_data)
 		CopLogicIdle._start_idle_action_from_act(data)
 	end
 	CopLogicIdle._chk_has_old_action(data, my_data)
+end
+
+function CopLogicAttack._upd_pose(data, my_data)
+	local unit_can_stand = not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.stand
+	local unit_can_crouch = not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch
+	local stand_objective = data.objective and data.objective.pose == "stand"
+	local crouch_objective = data.objective and data.objective.pose == "crouch"
+	local need_cover = my_data.want_to_take_cover and (not my_data.in_cover or not my_data.in_cover[4])
+	if not (unit_can_stand and (not need_cover or stand_objective)) or crouch_objective then
+		if not data.unit:anim_data().crouch and unit_can_crouch then
+			return CopLogicAttack._chk_request_action_crouch(data)
+		end
+	elseif (not (unit_can_crouch and (not (my_data.cover_test_step > 2) or crouch_objective)) or stand_objective) and data.unit:anim_data().crouch and unit_can_stand then
+		return CopLogicAttack._chk_request_action_stand(data)
+	end
 end

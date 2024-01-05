@@ -150,7 +150,7 @@ end
 function NavObstacleElement:_remove_from_obstacle_list(unit_id)
 	for i, entry in pairs(clone(self._hed.obstacle_list)) do
 		if entry.unit_id == unit_id then
-			table.insert(self._hed.obstacle_list, i)
+			table.remove(self._hed.obstacle_list, i)
 		end
 	end
 end

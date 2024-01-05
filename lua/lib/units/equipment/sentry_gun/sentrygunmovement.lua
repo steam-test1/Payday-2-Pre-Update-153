@@ -3,6 +3,8 @@ local tmp_rot1 = Rotation()
 local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
 SentryGunMovement = SentryGunMovement or class()
+SentryGunMovement.set_friendly_fire = PlayerMovement.set_friendly_fire
+SentryGunMovement.friendly_fire = PlayerMovement.friendly_fire
 
 function SentryGunMovement:init(unit)
 	self._unit = unit
@@ -293,9 +295,8 @@ function SentryGunMovement:save(save_data)
 	if self._rot_speed_mul ~= 1 then
 		my_save_data.rot_speed_mul = self._rot_speed_mul
 	end
-	if next(my_save_data) then
-		save_data.movement = my_save_data
-	end
+	my_save_data.team = self._team.id
+	save_data.movement = my_save_data
 end
 
 function SentryGunMovement:load(save_data)
@@ -306,6 +307,36 @@ function SentryGunMovement:load(save_data)
 	if save_data.movement.attention then
 		self._attention = save_data.movement.attention
 	end
+	self._team = managers.groupai:state():team_data(save_data.movement.team)
+	managers.groupai:state():add_listener("SentryGunMovement_team_def_" .. tostring(self._unit:key()), {"team_def"}, callback(self, self, "clbk_team_def"))
+end
+
+function SentryGunMovement:clbk_team_def()
+	self._team = managers.groupai:state():team_data(self._team.id)
+	managers.groupai:state():remove_listener("SentryGunMovement_team_def_" .. tostring(self._unit:key()))
+end
+
+function SentryGunMovement:set_team(team_data)
+	self._team = team_data
+	self._unit:weapon():on_team_set(team_data)
+	if Network:is_server() and self._unit:id() ~= -1 then
+		local team_index = tweak_data.levels:get_team_index(team_data.id)
+		if team_index <= 16 then
+			self._ext_network:send("sync_unit_event_id_16", "movement", team_index)
+		else
+			debug_pause_unit(self._unit, "[SentryGunMovement:set_team] team limit reached!", team_data.id)
+		end
+	end
+end
+
+function SentryGunMovement:team()
+	return self._team
+end
+
+function SentryGunMovement:sync_net_event(event_id, peer)
+	local team_id = tweak_data.levels:get_team_names_indexed()[event_id]
+	local team_data = managers.groupai:state():team_data(team_id)
+	self:set_team(team_data)
 end
 
 function SentryGunMovement:pre_destroy()

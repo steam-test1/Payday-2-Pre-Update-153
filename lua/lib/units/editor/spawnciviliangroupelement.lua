@@ -6,10 +6,12 @@ function SpawnCivilianGroupUnitElement:init(unit)
 	self._hed.ignore_disabled = false
 	self._hed.amount = 1
 	self._hed.elements = {}
+	self._hed.team = "default"
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "random")
 	table.insert(self._save_values, "ignore_disabled")
 	table.insert(self._save_values, "amount")
+	table.insert(self._save_values, "team")
 end
 
 function SpawnCivilianGroupUnitElement:draw_links(t, dt, selected_unit, all_units)
@@ -90,4 +92,19 @@ function SpawnCivilianGroupUnitElement:_build_panel(panel, panel_sizer)
 	local amount = CoreEWS.number_controller(amount_params)
 	amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
 	amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
+	local team_params = {
+		name = "Team:",
+		panel = panel,
+		sizer = panel_sizer,
+		options = tweak_data.levels:get_team_names_indexed(),
+		value = self._hed.team,
+		default = "default",
+		tooltip = "Select the group's team (overrides character team).",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sorted = true
+	}
+	local team_combo_box = CoreEWS.combobox(team_params)
+	team_combo_box:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
+	team_combo_box:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
 end

@@ -31,7 +31,7 @@ function CopInventory:add_unit_by_name(new_unit_name, equip)
 		self._shield_unit
 	}
 	setup_data.expend_ammo = false
-	setup_data.hit_slotmask = managers.slot:get_mask("bullet_impact_targets_no_police")
+	setup_data.hit_slotmask = managers.slot:get_mask("bullet_impact_targets")
 	setup_data.hit_player = true
 	setup_data.user_sound_variant = tweak_data.character[self._unit:base()._tweak_table].weapon_voice
 	setup_data.alert_AI = true
@@ -46,6 +46,7 @@ function CopInventory:_chk_spawn_shield(weapon_unit)
 		local align_obj = self._unit:get_object(align_name)
 		self._shield_unit = World:spawn_unit(Idstring(self._shield_unit_name), align_obj:position(), align_obj:rotation())
 		self._unit:link(align_name, self._shield_unit, self._shield_unit:orientation_object():name())
+		self._shield_unit:set_enabled(false)
 	end
 end
 

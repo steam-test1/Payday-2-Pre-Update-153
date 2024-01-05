@@ -2,6 +2,7 @@ CivilianBase = CivilianBase or class(CopBase)
 
 function CivilianBase:post_init()
 	self._ext_movement = self._unit:movement()
+	self._ext_anim = self._unit:anim_data()
 	local spawn_state = self._spawn_state or "civilian/spawn/loop"
 	self._ext_movement:play_state(spawn_state)
 	self._unit:anim_data().idle_full_blend = true

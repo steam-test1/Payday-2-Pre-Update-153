@@ -77,6 +77,7 @@ function SecurityCamera:set_detection_enabled(state, settings, mission_element)
 			self._detection_delay = settings.detection_delay
 			self._range = settings.detection_range
 			self._suspicion_range = settings.suspicion_range
+			self._team = managers.groupai:state():team_data(settings.team_id or tweak_data.levels:get_default_team_ID("combatant"))
 		end
 		self._detected_attention_objects = self._detected_attention_objects or {}
 		self._look_obj = self._unit:get_object(Idstring("CameraLens"))
@@ -100,6 +101,7 @@ function SecurityCamera:set_detection_enabled(state, settings, mission_element)
 		self._tmp_vec1 = nil
 		self._detected_attention_objects = nil
 		self._suspicion_lvl_sync = nil
+		self._team = nil
 		if not self._destroying then
 			self:_stop_all_sounds()
 			self:_deactivate_tape_loop()
@@ -163,7 +165,7 @@ function SecurityCamera:_upd_acquire_new_attention_objects(t)
 	local my_fwd = self._look_fwd
 	for u_key, attention_info in pairs(all_attention_objects) do
 		if u_key ~= my_key and not detected_obj[u_key] then
-			local settings = attention_info.handler:get_attention(self._SO_access, AIAttentionObject.REACT_SUSPICIOUS)
+			local settings = attention_info.handler:get_attention(self._SO_access, AIAttentionObject.REACT_SUSPICIOUS, nil, self._team)
 			if settings then
 				local attention_pos = attention_info.handler:get_detection_m_pos()
 				if self:_detection_angle_and_dis_chk(my_pos, my_fwd, attention_info.handler, settings, attention_pos) then
@@ -389,7 +391,7 @@ function SecurityCamera:on_detected_attention_obj_modified(modified_u_key)
 	if not attention_info then
 		return
 	end
-	local new_settings = attention_info.handler:get_attention(self._SO_access, AIAttentionObject.REACT_SUSPICIOUS)
+	local new_settings = attention_info.handler:get_attention(self._SO_access, AIAttentionObject.REACT_SUSPICIOUS, nil, self._team)
 	local old_settings = attention_info.settings
 	if new_settings == old_settings then
 		return

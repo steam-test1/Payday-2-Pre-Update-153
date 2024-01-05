@@ -16,7 +16,7 @@ function HuskTeamAIDamage:damage_bullet(attack_data)
 	if self._dead or self._fatal then
 		return
 	end
-	if PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		self._unit:network():send_to_host("friendly_fire_hit")
 		return
 	end
@@ -55,7 +55,7 @@ function HuskTeamAIDamage:damage_melee(attack_data)
 	if self._dead or self._fatal then
 		return
 	end
-	if PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		return
 	end
 	local damage_abs, damage_percent = self:_clamp_health_percentage(attack_data.damage, true)

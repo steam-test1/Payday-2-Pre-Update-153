@@ -99,6 +99,20 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
+		mobster = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
+		mobster_boss = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
 		sniper = {
 			count = 0,
 			head_shots = 0,
@@ -276,21 +290,17 @@ function StatisticsManager:start_session(data)
 	if self._session_started then
 		return
 	end
-	if not self._global.playing or managers.job:on_first_stage() then
-		self._global.playing = data.from_beginning and "beginning" or "dropin"
-	end
 	if Global.level_data.level_id then
 		self._global.sessions.levels[Global.level_data.level_id].started = self._global.sessions.levels[Global.level_data.level_id].started + 1
-		self._global.sessions.levels[Global.level_data.level_id].from_beginning = self._global.sessions.levels[Global.level_data.level_id].from_beginning + (data.from_beginning and 1 or 0)
-		self._global.sessions.levels[Global.level_data.level_id].drop_in = self._global.sessions.levels[Global.level_data.level_id].drop_in + (data.drop_in and 1 or 0)
+		self._global.sessions.levels[Global.level_data.level_id].from_beginning = self._global.sessions.levels[Global.level_data.level_id].from_beginning + (Global.statistics_manager.playing_from_start and 1 or 0)
+		self._global.sessions.levels[Global.level_data.level_id].drop_in = self._global.sessions.levels[Global.level_data.level_id].drop_in + (Global.statistics_manager.playing_from_start and 0 or 1)
 	end
 	local job_id = managers.job:current_job_id()
 	if managers.job:on_first_stage() then
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
-		if data.from_beginning then
+		if Global.statistics_manager.playing_from_start then
 			self._global.sessions.jobs[job_stat .. "_started"] = (self._global.sessions.jobs[job_stat .. "_started"] or 0) + 1
-		end
-		if data.drop_in then
+		else
 			self._global.sessions.jobs[job_stat .. "_started_dropin"] = (self._global.sessions.jobs[job_stat .. "_started_dropin"] or 0) + 1
 		end
 	end
@@ -304,6 +314,9 @@ end
 
 function StatisticsManager:stop_session(data)
 	if not self._session_started then
+		if data and data.quit then
+			Global.statistics_manager.playing_from_start = nil
+		end
 		return
 	end
 	self:_flush_log()
@@ -325,7 +338,7 @@ function StatisticsManager:stop_session(data)
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
 		if data.type == "victory" then
 			if managers.job:on_last_stage() then
-				if self._global.playing == "beginning" then
+				if Global.statistics_manager.playing_from_start then
 					self._global.sessions.jobs[job_stat .. "_completed"] = (self._global.sessions.jobs[job_stat .. "_completed"] or 0) + 1
 					completion = "win_begin"
 				else
@@ -334,7 +347,7 @@ function StatisticsManager:stop_session(data)
 				end
 			end
 		elseif data.type == "gameover" then
-			if self._global.playing == "beginning" then
+			if Global.statistics_manager.playing_from_start then
 				self._global.sessions.jobs[job_stat .. "_failed"] = (self._global.sessions.jobs[job_stat .. "_failed"] or 0) + 1
 			else
 				self._global.sessions.jobs[job_stat .. "_failed_dropin"] = (self._global.sessions.jobs[job_stat .. "_failed_dropin"] or 0) + 1
@@ -346,8 +359,8 @@ function StatisticsManager:stop_session(data)
 	self._global.session.sessions.time = session_time
 	self._global.last_session = deep_clone(self._global.session)
 	self:_calculate_average()
-	if managers.job:on_last_stage() then
-		self._global.playing = nil
+	if managers.job:on_last_stage() or data and data.quit then
+		Global.statistics_manager.playing_from_start = nil
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self:publish_to_steam(self._global.session, success, completion)
@@ -449,7 +462,9 @@ function StatisticsManager:_get_stat_tables()
 		"election_day_3_skip1",
 		"election_day_3_skip2",
 		"kosugi",
-		"big"
+		"big",
+		"mia_1",
+		"mia_2"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -480,7 +495,9 @@ function StatisticsManager:_get_stat_tables()
 		"election_day",
 		"election_day_prof",
 		"kosugi",
-		"big"
+		"big",
+		"mia",
+		"mia_prof"
 	}
 	local mask_list = {
 		"character_locked",
@@ -593,7 +610,15 @@ function StatisticsManager:_get_stat_tables()
 		"galax",
 		"crowgoblin",
 		"evil",
-		"volt"
+		"volt",
+		"white_wolf",
+		"owl",
+		"rabbit",
+		"pig",
+		"panther",
+		"rooster",
+		"horse",
+		"tiger"
 	}
 	local weapon_list = {
 		"ak5",
@@ -645,7 +670,10 @@ function StatisticsManager:_get_stat_tables()
 		"gre_m79",
 		"g3",
 		"galil",
-		"famas"
+		"famas",
+		"scorpion",
+		"tec9",
+		"uzi"
 	}
 	local melee_list = {
 		"weapon",
@@ -664,7 +692,12 @@ function StatisticsManager:_get_stat_tables()
 		"x46",
 		"dingdong",
 		"bayonet",
-		"bullseye"
+		"bullseye",
+		"baseballbat",
+		"cleaver",
+		"fireaxe",
+		"machete",
+		"briefcase"
 	}
 	local enemy_list = {
 		"cop",
@@ -682,7 +715,9 @@ function StatisticsManager:_get_stat_tables()
 		"shield",
 		"spooc",
 		"tank",
-		"taser"
+		"taser",
+		"mobster",
+		"mobster_boss"
 	}
 	local armor_list = {
 		"level_1",
@@ -1574,8 +1609,7 @@ function StatisticsManager:save(data)
 		shots_by_weapon = self._global.shots_by_weapon,
 		health = self._global.health,
 		misc = self._global.misc,
-		play_time = self._global.play_time,
-		playing = self._global.playing
+		play_time = self._global.play_time
 	}
 	data.StatisticsManager = state
 end

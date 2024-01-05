@@ -335,7 +335,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 	local my_key = data.key
 	local my_pos = data.unit:movement():m_head_pos()
 	local my_access = data.SO_access
-	local all_attention_objects = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str)
+	local all_attention_objects = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str, data.team)
 	local my_head_fwd
 	local my_tracker = data.unit:movement():nav_tracker()
 	local chk_vis_func = my_tracker.check_visibility
@@ -430,7 +430,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 	
 	for u_key, attention_info in pairs(all_attention_objects) do
 		if u_key ~= my_key and not detected_obj[u_key] and (not attention_info.nav_tracker or chk_vis_func(my_tracker, attention_info.nav_tracker)) then
-			local settings = attention_info.handler:get_attention(my_access, min_reaction, max_reaction)
+			local settings = attention_info.handler:get_attention(my_access, min_reaction, max_reaction, data.team)
 			if settings then
 				local attention_pos = attention_info.handler:get_detection_m_pos()
 				if _angle_and_dis_chk(attention_info.handler, settings, attention_pos) then
@@ -577,8 +577,8 @@ function CopLogicBase._create_detected_attention_object_data(data, my_data, u_ke
 		is_husk_player = att_unit:base().is_husk_player
 		is_deployable = att_unit:base().sentry_gun
 		is_person = att_unit:in_slot(managers.slot:get_mask("persons"))
-		if att_unit:base()._tweak_table then
-			char_tweak = tweak_data.character[att_unit:base()._tweak_table]
+		if att_unit:base().char_tweak then
+			char_tweak = att_unit:base():char_tweak()
 		end
 		is_very_dangerous = att_unit:base()._tweak_table == "taser" or att_unit:base()._tweak_table == "spooc"
 	end
@@ -650,7 +650,7 @@ function CopLogicBase.on_detected_attention_obj_modified(data, modified_u_key)
 	if not attention_info then
 		return
 	end
-	local new_settings = attention_info.handler:get_attention(data.SO_access)
+	local new_settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 	local old_settings = attention_info.settings
 	if new_settings == old_settings then
 		return
@@ -787,7 +787,7 @@ end
 function CopLogicBase.is_obstructed(data, objective, strictness, attention)
 	local my_data = data.internal_data
 	attention = attention or data.attention_obj
-	if not objective or objective.is_default or (objective.in_place or not objective.nav_seg) and not objective.action and not objective.action_duration then
+	if not objective or objective.is_default or (objective.in_place or not objective.nav_seg) and not objective.action then
 		return true, false
 	end
 	if objective.interrupt_suppression and data.is_suppressed then
@@ -834,7 +834,7 @@ function CopLogicBase._upd_suspicion(data, my_data, attention_obj)
 		attention_obj.unit:movement():on_uncovered(data.unit)
 		
 		local reaction, state_name
-		if attention_obj.dis < 2000 and attention_obj.verified then
+		if attention_obj.dis < 2000 and attention_obj.verified and not data.char_tweak.no_arrest then
 			reaction = AIAttentionObject.REACT_ARREST
 			state_name = "arrest"
 		else
@@ -922,7 +922,7 @@ function CopLogicBase._get_logic_state_from_reaction(data, reaction)
 	end
 	local police_is_being_called = managers.groupai:state():chk_enemy_calling_in_area(managers.groupai:state():get_area_from_nav_seg_id(data.unit:movement():nav_tracker():nav_segment()), data.key)
 	if not reaction or reaction <= AIAttentionObject.REACT_SCARED then
-		if not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted then
+		if data.char_tweak.calls_in and not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted then
 			return "arrest"
 		elseif data.unit:movement():cool() then
 		else
@@ -974,7 +974,7 @@ function CopLogicBase.identify_attention_obj_instant(data, att_u_key)
 	else
 		local attention_info = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str)[att_u_key]
 		if attention_info then
-			local settings = attention_info.handler:get_attention(data.SO_access, nil, nil)
+			local settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 			if settings then
 				att_obj_data = CopLogicBase._create_detected_attention_object_data(data, data.internal_data, att_u_key, attention_info, settings)
 				att_obj_data.identified = true
@@ -1266,19 +1266,25 @@ function CopLogicBase.chk_start_action_dodge(data, reason)
 			dodge_side = "l"
 		end
 	end
+	local body_part = 1
+	local shoot_chance = variation_data.shoot_chance
+	if shoot_chance and 0 < shoot_chance and shoot_chance > math.random() then
+		body_part = 2
+	end
 	local action_data = {
 		type = "dodge",
-		body_part = 1,
+		body_part = body_part,
 		variation = variation,
 		side = dodge_side,
 		direction = dodge_dir,
 		timeout = variation_data.timeout,
 		speed = data.char_tweak.dodge.speed,
+		shoot_accuracy = variation_data.shoot_accuracy,
 		blocks = {
 			walk = -1,
-			action = -1,
+			action = body_part == 1 and -1 or nil,
 			act = -1,
-			aim = -1,
+			aim = body_part == 1 and -1 or nil,
 			tase = -1,
 			bleedout = -1,
 			dodge = -1
@@ -1302,6 +1308,9 @@ end
 function CopLogicBase.chk_am_i_aimed_at(data, attention_obj, max_dot)
 	if not attention_obj.is_person then
 		return
+	end
+	if attention_obj.dis < 700 and 0.3 < max_dot then
+		max_dot = math.lerp(0.3, max_dot, (attention_obj.dis - 50) / 650)
 	end
 	local enemy_look_dir = tmp_vec1
 	mrotation.y(attention_obj.unit:movement():m_head_rot(), enemy_look_dir)

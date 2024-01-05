@@ -144,6 +144,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.legendary = 1
 	self.global_value_multipliers.poetry_soundtrack = 0
 	self.global_value_multipliers.twitch_pack = 0
+	self.global_value_multipliers.hl_miami = 1
+	self.global_value_multipliers.hlm_game = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -168,6 +170,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.legendary = 0
 	self.global_value_bonus_multiplier.poetry_soundtrack = 0
 	self.global_value_bonus_multiplier.twitch_pack = 0
+	self.global_value_bonus_multiplier.hl_miami = 0.2
+	self.global_value_bonus_multiplier.hlm_game = 0.2
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -236,6 +240,9 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_asset_cost_loot_drop_off = 3000
 	self.preplaning_asset_cost_thermal_paste = 3000
 	self.preplaning_asset_cost_branchbank_vault_key = 3000
+	self.preplaning_asset_cost_mia_sniper = 3000
+	self.preplaning_asset_cost_delayed_police = 2000
+	self.preplaning_asset_cost_reduce_mobsters = 2000
 	self.small_loot = {}
 	if difficulty_index <= 2 then
 		self.small_loot.money_bundle = 1000

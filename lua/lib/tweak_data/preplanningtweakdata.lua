@@ -393,18 +393,36 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.spotter.budget_cost = 2
 	self.types.spotter.post_event = "gus_preplan_13"
 	self.types.spotter.prio = 4
-	self.types.safe_escape = {}
-	self.types.safe_escape.name_id = "menu_asset_safe_escape"
-	self.types.safe_escape.category = "hired_help"
-	self.types.safe_escape.total = 1
-	self.types.safe_escape.post_event = "gus_preplan_12"
-	self.types.safe_escape.prio = 1
 	self.types.sniper = {}
-	self.types.sniper.name_id = "menu_asset_sniper"
+	self.types.sniper.name_id = "menu_pp_asset_sniper"
+	self.types.sniper.desc_id = "menu_pp_asset_sniper_desc"
 	self.types.sniper.category = "hired_help"
+	self.types.sniper.icon = 55
 	self.types.sniper.total = 1
 	self.types.sniper.post_event = "gus_preplan_13"
-	self.types.sniper.prio = 2
+	self.types.sniper.prio = 1
+	self.types.sniper.cost = tweak_data:get_value("money_manager", "preplaning_mia_cost_sniper")
+	self.types.sniper.budget_cost = 1
+	self.types.delayed_police = {}
+	self.types.delayed_police.name_id = "menu_pp_asset_delayed_police"
+	self.types.delayed_police.desc_id = "menu_pp_asset_delayed_police_desc"
+	self.types.delayed_police.category = "hired_help"
+	self.types.delayed_police.icon = 15
+	self.types.delayed_police.total = 1
+	self.types.delayed_police.post_event = "gus_preplan_13"
+	self.types.delayed_police.prio = 1
+	self.types.delayed_police.cost = tweak_data:get_value("money_manager", "preplaning_mia_cost_delayed_police")
+	self.types.delayed_police.budget_cost = 1
+	self.types.reduce_mobsters = {}
+	self.types.reduce_mobsters.name_id = "menu_pp_asset_reduce_mobsters"
+	self.types.reduce_mobsters.desc_id = "menu_pp_asset_reduce_mobsters_desc"
+	self.types.reduce_mobsters.category = "hired_help"
+	self.types.reduce_mobsters.icon = 61
+	self.types.reduce_mobsters.total = 1
+	self.types.reduce_mobsters.post_event = "gus_preplan_13"
+	self.types.reduce_mobsters.prio = 1
+	self.types.reduce_mobsters.cost = tweak_data:get_value("money_manager", "preplaning_mia_cost_reduce_mobsters")
+	self.types.reduce_mobsters.budget_cost = 1
 	self.types.escape_van_loud = {}
 	self.types.escape_van_loud.name_id = "menu_pp_escape_van_loud"
 	self.types.escape_van_loud.desc_id = "menu_pp_escape_van_loud_desc"
@@ -554,6 +572,85 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.vault_singularity.budget_cost = 10
 	self.types.vault_singularity.post_event = "gus_preplan_17"
 	self.types.vault_singularity.prio = 99
+	self.types.disable_alarm_button = {}
+	self.types.disable_alarm_button.name_id = "menu_pp_asset_disable_alarm_button"
+	self.types.disable_alarm_button.desc_id = "menu_pp_asset_disable_alarm_button_desc"
+	self.types.disable_alarm_button.category = "data_hacking"
+	self.types.disable_alarm_button.icon = 42
+	self.types.disable_alarm_button.total = 1
+	self.types.disable_alarm_button.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_disable_alarm_button")
+	self.types.disable_alarm_button.budget_cost = 3
+	self.types.disable_alarm_button.post_event = "gus_preplan_09"
+	self.types.disable_alarm_button.prio = 1
+	self.types.safe_escape = {}
+	self.types.safe_escape.name_id = "menu_pp_asset_safe_escape"
+	self.types.safe_escape.desc_id = "menu_pp_asset_safe_escape_desc"
+	self.types.safe_escape.category = "insider_help"
+	self.types.safe_escape.upgrade_lock = {
+		category = "player",
+		upgrade = "additional_assets"
+	}
+	self.types.safe_escape.icon = 54
+	self.types.safe_escape.total = 1
+	self.types.safe_escape.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_safe_escape")
+	self.types.safe_escape.budget_cost = 3
+	self.types.safe_escape.post_event = "gus_preplan_09"
+	self.types.safe_escape.prio = 1
+	self.types.sniper_spot = {}
+	self.types.sniper_spot.name_id = "menu_pp_asset_sniper_spot"
+	self.types.sniper_spot.desc_id = "menu_pp_asset_sniper_spot_desc"
+	self.types.sniper_spot.category = "insider_help"
+	self.types.sniper_spot.upgrade_lock = {
+		category = "player",
+		upgrade = "additional_assets"
+	}
+	self.types.sniper_spot.icon = 35
+	self.types.sniper_spot.total = 1
+	self.types.sniper_spot.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_sniper_spot")
+	self.types.sniper_spot.budget_cost = 3
+	self.types.sniper_spot.post_event = "gus_preplan_09"
+	self.types.sniper_spot.prio = 1
+	self.types.bag_shortcut = {}
+	self.types.bag_shortcut.name_id = "menu_pp_asset_bag_shortcut"
+	self.types.bag_shortcut.desc_id = "menu_pp_asset_bag_shortcut_desc"
+	self.types.bag_shortcut.category = "mission_equipment"
+	self.types.bag_shortcut.icon = 23
+	self.types.bag_shortcut.total = 1
+	self.types.bag_shortcut.post_event = "gus_preplan_07"
+	self.types.bag_shortcut.prio = 1
+	self.types.bag_shortcut.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_shortcut")
+	self.types.bag_shortcut.budget_cost = 2
+	self.types.bag_zipline = {}
+	self.types.bag_zipline.name_id = "menu_pp_asset_bag_zipline"
+	self.types.bag_zipline.desc_id = "menu_pp_asset_bag_zipline_desc"
+	self.types.bag_zipline.category = "mission_equipment"
+	self.types.bag_zipline.icon = 23
+	self.types.bag_zipline.total = 1
+	self.types.bag_zipline.post_event = "gus_preplan_07"
+	self.types.bag_zipline.prio = 1
+	self.types.bag_zipline.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_zipline")
+	self.types.bag_zipline.budget_cost = 2
+	self.types.loot_drop_off = {}
+	self.types.loot_drop_off.name_id = "menu_pp_asset_loot_drop_off"
+	self.types.loot_drop_off.desc_id = "menu_pp_asset_loot_drop_off_desc"
+	self.types.loot_drop_off.category = "hired_help"
+	self.types.loot_drop_off.icon = 23
+	self.types.loot_drop_off.total = 1
+	self.types.loot_drop_off.post_event = "gus_preplan_07"
+	self.types.loot_drop_off.prio = 1
+	self.types.loot_drop_off.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_loot_drop_off")
+	self.types.loot_drop_off.budget_cost = 3
+	self.types.thermal_paste = {}
+	self.types.thermal_paste.name_id = "menu_pp_asset_thermal_paste"
+	self.types.thermal_paste.desc_id = "menu_pp_asset_thermal_paste_desc"
+	self.types.thermal_paste.category = "dead_drop"
+	self.types.thermal_paste.icon = 51
+	self.types.thermal_paste.total = 1
+	self.types.thermal_paste.post_event = "gus_preplan_07"
+	self.types.thermal_paste.prio = 1
+	self.types.thermal_paste.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_thermal_paste")
+	self.types.thermal_paste.budget_cost = 3
+	self.types.thermal_paste.spawn_unit = "units/payday2/equipment/gen_equipment_thermal_paste_crate/gen_equipment_thermal_paste_crate"
 end
 
 function PrePlanningTweakData:_create_locations(tweak_data)
@@ -577,6 +674,7 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			vault_plan = "vault_big_drill"
 		},
 		total_budget = 10,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_big",
 		start_location = {
 			group = "a",
 			x = 1500,
@@ -839,6 +937,182 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 					icon = 45,
 					rotation = -90,
 					post_event = "pln_pp_bb1_f"
+				}
+			}
+		}
+	}
+	self.locations.mia_1 = {
+		default_plans = {},
+		total_budget = 6,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_hlm1",
+		start_location = {
+			group = "a",
+			x = 1024,
+			y = 512,
+			zoom = 1
+		},
+		grid_width_mul = 0.5,
+		grid_height_mul = 1.4,
+		{
+			name_id = "menu_pp_mia_1_loc_a",
+			texture = "guis/textures/pd2/pre_planning/hlm_01",
+			map_x = -0.55,
+			map_y = 0,
+			map_width = 2,
+			map_height = 1,
+			x1 = -5524,
+			y1 = -5358,
+			x2 = 7476,
+			y2 = 1142,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mia_1_loc_b",
+			texture = "guis/textures/pd2/pre_planning/hlm_02",
+			map_x = 1.05,
+			map_y = -0.25,
+			map_width = 1,
+			map_height = 0.5,
+			x1 = -1018,
+			y1 = -4672,
+			x2 = 7782,
+			y2 = -272,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mia_1_loc_c",
+			texture = "guis/textures/pd2/pre_planning/hlm_03",
+			map_x = 1.05,
+			map_y = 0.25,
+			map_width = 1,
+			map_height = 0.5,
+			x1 = -1018,
+			y1 = -4672,
+			x2 = 7782,
+			y2 = -272,
+			rotation = 0,
+			custom_points = {}
+		}
+	}
+	self.locations.mia_2 = {
+		default_plans = {},
+		total_budget = 6,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_hlm2",
+		grid_width_mul = 0.5,
+		grid_height_mul = 0.5,
+		start_location = {
+			group = "a",
+			x = 290,
+			y = 835,
+			zoom = 1.25
+		},
+		{
+			name_id = "menu_pp_mia_2_loc_a",
+			texture = "guis/textures/pd2/pre_planning/hlm2_01",
+			map_x = 0,
+			map_y = 1,
+			map_width = 1,
+			map_height = 1,
+			x1 = -3050,
+			y1 = -3275,
+			x2 = 3850,
+			y2 = 3625,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 290,
+					y = 840,
+					text_id = "menu_pp_info_the_box",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_pp_hm2_01"
+				},
+				{
+					x = 423,
+					y = 507,
+					text_id = "menu_pp_info_bombstrapped",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_pp_hm2_04"
+				}
+			}
+		},
+		{
+			name_id = "menu_pp_mia_2_loc_b",
+			texture = "guis/textures/pd2/pre_planning/hlm2_02",
+			map_x = -1,
+			map_y = 0,
+			map_width = 1,
+			map_height = 1,
+			x1 = -3050,
+			y1 = -3275,
+			x2 = 3850,
+			y2 = 3625,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mia_2_loc_c",
+			texture = "guis/textures/pd2/pre_planning/hlm2_03",
+			map_x = 0,
+			map_y = 0,
+			map_width = 1,
+			map_height = 1,
+			x1 = -3050,
+			y1 = -3275,
+			x2 = 3850,
+			y2 = 3625,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mia_2_loc_d",
+			texture = "guis/textures/pd2/pre_planning/hlm2_04",
+			map_x = 1,
+			map_y = 0,
+			map_width = 1,
+			map_height = 1,
+			x1 = -3050,
+			y1 = -3275,
+			x2 = 3850,
+			y2 = 3625,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mia_2_loc_e",
+			texture = "guis/textures/pd2/pre_planning/hlm2_05",
+			map_x = 0,
+			map_y = -1,
+			map_width = 1,
+			map_height = 1,
+			x1 = -3050,
+			y1 = -3275,
+			x2 = 3850,
+			y2 = 3625,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 300,
+					y = 143,
+					text_id = "menu_pp_info_vault_comm",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_pp_hm2_02"
+				},
+				{
+					x = 546,
+					y = 143,
+					text_id = "menu_pp_info_cocaine_mountain",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_pp_hm2_03"
 				}
 			}
 		}

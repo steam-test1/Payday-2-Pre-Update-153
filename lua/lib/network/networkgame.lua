@@ -77,6 +77,15 @@ function NetworkGame:on_entered_lobby()
 	cat_print("multiplayer_base", "NetworkGame:on_entered_lobby", local_peer, id)
 end
 
+function NetworkGame:on_game_joined()
+	local local_peer = managers.network:session():local_peer()
+	local id = local_peer:id()
+	local my_member = self._members[id] or NetworkMember:new(local_peer)
+	self._members[id] = my_member
+	Global.local_member = my_member
+	local_peer:set_in_lobby(false)
+end
+
 function NetworkGame:on_peer_entered_lobby(peer_id)
 	cat_print("multiplayer_base", "[NetworkGame:on_peer_entered_lobby]", peer_id)
 	local peer = managers.network:session():peer(peer_id)
@@ -169,7 +178,7 @@ function NetworkGame:on_peer_added(peer, peer_id)
 end
 
 function NetworkGame:check_peer_preferred_character(preferred_character)
-	local free_characters = CriminalsManager.character_names()
+	local free_characters = clone(CriminalsManager.character_names())
 	for pid, member in pairs(self._members) do
 		local character = member:peer():character()
 		table.delete(free_characters, character)

@@ -240,6 +240,7 @@ function ShieldLogicAttack._upd_enemy_detection(data)
 		threat_epicenter = threat_epicenter or Vector3()
 		mvector3.add(threat_epicenter, enemy_data.m_pos)
 		nr_threats = nr_threats + 1
+		enemy_data.aimed_at = CopLogicIdle.chk_am_i_aimed_at(data, enemy_data, enemy_data.aimed_at and 0.95 or 0.985)
 	end
 	if threat_epicenter then
 		mvector3.divide(threat_epicenter, nr_threats)

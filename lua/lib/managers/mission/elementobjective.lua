@@ -17,23 +17,27 @@ function ElementObjective:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	if self._values.objective ~= "none" then
+	local objective = self:value("objective")
+	local amount = self:value("amount")
+	amount = amount and 0 < amount and amount or nil
+	if objective ~= "none" then
 		if self._values.state == "activate" then
-			local amount = self._values.amount and self._values.amount > 0 and self._values.amount or nil
-			managers.objectives:activate_objective(self._values.objective, nil, {amount = amount})
+			managers.objectives:activate_objective(objective, nil, {amount = amount})
+		elseif self._values.state == "complete_and_activate" then
+			managers.objectives:complete_and_activate_objective(objective, nil, {amount = amount})
 		elseif self._values.state == "complete" then
 			if self._values.sub_objective and self._values.sub_objective ~= "none" then
-				managers.objectives:complete_sub_objective(self._values.objective, self._values.sub_objective)
+				managers.objectives:complete_sub_objective(objective, self._values.sub_objective)
 			else
-				managers.objectives:complete_objective(self._values.objective)
+				managers.objectives:complete_objective(objective)
 			end
 		elseif self._values.state == "update" then
-			managers.objectives:update_objective(self._values.objective)
+			managers.objectives:update_objective(objective)
 		elseif self._values.state == "remove" then
-			managers.objectives:remove_objective(self._values.objective)
+			managers.objectives:remove_objective(objective)
 		end
 	elseif Application:editor() then
-		managers.editor:output_error("Cant operate on objective " .. self._values.objective .. " in element " .. self._editor_name .. ".")
+		managers.editor:output_error("Cant operate on objective " .. objective .. " in element " .. self._editor_name .. ".")
 	end
 	ElementObjective.super.on_executed(self, instigator)
 end

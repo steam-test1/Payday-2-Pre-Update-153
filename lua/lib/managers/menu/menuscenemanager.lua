@@ -37,9 +37,26 @@ function MenuSceneManager:init()
 	self._global_poses.shotgun = {
 		"husk_shotgun1"
 	}
+	self._global_poses.snp = {
+		"husk_bullpup"
+	}
+	self._global_poses.lmg = {
+		"husk_bullpup"
+	}
 	self._global_poses.infamous = {
 		"husk_infamous1",
 		"husk_infamous2"
+	}
+	self._global_poses.famas = {
+		"husk_bullpup"
+	}
+	self._global_poses.aug = {
+		"husk_bullpup"
+	}
+	self._global_poses.m95 = {"husk_m95"}
+	self._global_poses.r93 = {"husk_r93"}
+	self._global_poses.huntsman = {
+		"husk_mosconi"
 	}
 	self._mask_units = {}
 	self._weapon_units = {}
@@ -432,13 +449,22 @@ function MenuSceneManager:_select_character_pose()
 	end
 	local primary = managers.blackmarket:equipped_primary()
 	if primary then
-		local category = tweak_data.weapon[primary.weapon_id].category
-		if category == "shotgun" then
-			pose = self._global_poses.shotgun[math.random(#self._global_poses.shotgun)]
-		elseif category == "assault_rifle" or category == "lmg" or category == "snp" then
-			pose = self._global_poses.assault_rifle[math.random(#self._global_poses.assault_rifle)]
-		elseif category == "saw" then
-			pose = self._global_poses.saw[math.random(#self._global_poses.saw)]
+		local weapon_id_poses = self._global_poses[primary.weapon_id]
+		if weapon_id_poses then
+			pose = weapon_id_poses[math.random(#weapon_id_poses)]
+		else
+			local category = tweak_data.weapon[primary.weapon_id].category
+			if category == "shotgun" then
+				pose = self._global_poses.shotgun[math.random(#self._global_poses.shotgun)]
+			elseif category == "assault_rifle" then
+				pose = self._global_poses.assault_rifle[math.random(#self._global_poses.assault_rifle)]
+			elseif category == "saw" then
+				pose = self._global_poses.saw[math.random(#self._global_poses.saw)]
+			elseif category == "lmg" then
+				pose = self._global_poses.lmg[math.random(#self._global_poses.lmg)]
+			elseif category == "snp" then
+				pose = self._global_poses.snp[math.random(#self._global_poses.snp)]
+			end
 		end
 		if pose then
 			self:_set_character_unit_pose(pose, self._character_unit)
@@ -612,7 +638,11 @@ end
 
 function MenuSceneManager:set_lobby_character_out_fit(i, outfit_string, rank)
 	local outfit = managers.blackmarket:unpack_outfit_from_string(outfit_string)
-	self:change_lobby_character(i, outfit.character)
+	local character = outfit.character
+	if managers.network:session() then
+		character = managers.network:session():peer(i):character_id()
+	end
+	self:change_lobby_character(i, character)
 	local unit = self._lobby_characters[i]
 	local mask_blueprint = managers.blackmarket:mask_blueprint_from_outfit_string(outfit_string)
 	self:set_character_mask_by_id(outfit.mask.mask_id, outfit.mask.blueprint, unit, i)

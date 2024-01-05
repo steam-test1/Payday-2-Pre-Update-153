@@ -13,6 +13,7 @@ function HuskPlayerBase:init(unit)
 end
 
 function HuskPlayerBase:post_init()
+	self._ext_anim = self._unit:anim_data()
 	self._unit:movement():post_init()
 	managers.groupai:state():register_criminal(self._unit)
 	managers.occlusion:remove_occlusion(self._unit)

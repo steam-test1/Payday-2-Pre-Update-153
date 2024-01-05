@@ -1170,7 +1170,7 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 					tier = self._selected_item._tier
 				}) .. "\n"
 			end
-			if not tweak_data.skilltree.SKIP_TIER_BONUS then
+			if not tweak_data.skilltree.HIDE_TIER_BONUS then
 				local skilltree = tweak_data.skilltree.trees[self._active_tree] and tweak_data.skilltree.trees[self._active_tree].skill or "NIL"
 				local tier_descs = tweak_data.upgrades.skill_descs[tostring(skilltree) .. "_tier" .. tostring(self._selected_item._tier)]
 				tier_bonus_text = [[
@@ -1488,7 +1488,7 @@ function SkillTreeGui:place_point(item)
 end
 
 function SkillTreeGui:_dialog_confirm_yes(item)
-	if item then
+	if item and alive(item._skill_panel) then
 		local skill_refresh_skills = item:trigger() or {}
 		SimpleGUIEffectSpewer.skill_up(item._skill_panel:child("state_image"):center_x(), item._skill_panel:child("state_image"):center_y(), item._skill_panel)
 		managers.menu_component:post_event("menu_skill_investment")
@@ -1558,10 +1558,14 @@ end
 
 function SkillTreeGui:_respec_tree(tree)
 	managers.skilltree:on_respec_tree(tree)
+	self:on_skilltree_reset(tree)
+end
+
+function SkillTreeGui:on_skilltree_reset(tree)
 	self:_pre_reload()
 	SkillTreeGui.init(self, self._ws, self._fullscreen_ws, self._node)
 	self:_post_reload()
-	self:set_active_page(tree)
+	self:set_active_page(tree or managers.skilltree:get_most_progressed_tree())
 	self:set_selected_item(self._active_page:item(), true)
 end
 

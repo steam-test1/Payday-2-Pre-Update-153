@@ -55,15 +55,12 @@ function CivilianLogicIdle.enter(data, new_logic_name, enter_params)
 		attention_settings = {
 			"civ_all_peaceful"
 		}
-	elseif not managers.groupai:state():enemy_weapons_hot() then
+	else
 		attention_settings = {
 			"civ_enemy_cbt",
-			"civ_civ_cbt"
+			"civ_civ_cbt",
+			"civ_murderer_cbt"
 		}
-		my_data.enemy_weapons_hot_listen_id = "CivilianLogicIdle" .. tostring(data.key)
-		managers.groupai:state():add_listener(my_data.enemy_weapons_hot_listen_id, {
-			"enemy_weapons_hot"
-		}, callback(CivilianLogicIdle, CivilianLogicIdle, "clbk_enemy_weapons_hot", data))
 	end
 	data.unit:brain():set_attention_settings(attention_settings)
 end
@@ -366,18 +363,6 @@ function CivilianLogicIdle.clbk_action_timeout(ignore_this, data)
 	if data.objective == old_objective then
 		managers.groupai:state():on_civilian_objective_complete(data.unit, old_objective)
 	end
-end
-
-function CivilianLogicIdle.clbk_enemy_weapons_hot(_, data)
-	local my_data = data.internal_data
-	if not my_data.enemy_weapons_hot_listen_id then
-		debug_pause_unit(data.unit, "[CivilianLogicIdle.clbk_enemy_weapons_hot] no key!", data.unit, inspect(data), inspect(my_data))
-		data.unit:brain():set_attention_settings()
-		return
-	end
-	managers.groupai:state():remove_listener(my_data.enemy_weapons_hot_listen_id)
-	my_data.enemy_weapons_hot_listen_id = nil
-	data.unit:brain():set_attention_settings()
 end
 
 function CivilianLogicIdle.is_obstructed(data, aggressor_unit)

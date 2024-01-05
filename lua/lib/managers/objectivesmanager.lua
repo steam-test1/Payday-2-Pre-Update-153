@@ -69,6 +69,16 @@ function ObjectivesManager:update(t, dt)
 			self:_remind_objetive(id)
 		end
 	end
+	if self._delayed_presentation then
+		self._delayed_presentation.t = self._delayed_presentation.t - dt
+		if self._delayed_presentation.t <= 0 then
+			managers.hud:activate_objective(self._delayed_presentation.activate_params)
+			if self._delayed_presentation.mid_text_params then
+				managers.hud:present_mid_text(self._delayed_presentation.mid_text_params)
+			end
+			self._delayed_presentation = nil
+		end
+	end
 end
 
 function ObjectivesManager:_remind_objetive(id, title_id)
@@ -100,6 +110,16 @@ function ObjectivesManager:update_objective(id, load_data)
 	})
 end
 
+function ObjectivesManager:complete_and_activate_objective(id, load_data, data)
+	local delay_presentation = next(self._active_objectives) and true or nil
+	for name, data in pairs(clone(self._active_objectives)) do
+		self:complete_objective(name)
+	end
+	data = data or {}
+	data.delay_presentation = delay_presentation or nil
+	self:activate_objective(id, nil, data)
+end
+
 function ObjectivesManager:activate_objective(id, load_data, data)
 	if not id or not self._objectives[id] then
 		Application:stack_dump_error("Bad id to activate objective, " .. tostring(id) .. ".")
@@ -114,24 +134,40 @@ function ObjectivesManager:activate_objective(id, load_data, data)
 	end
 	objective.current_amount = load_data and load_data.current_amount or data and data.amount and 0 or objective.current_amount
 	objective.amount = load_data and load_data.amount or data and data.amount or objective.amount
-	managers.hud:activate_objective({
+	local activate_params = {
 		id = id,
 		text = objective.text,
 		sub_objectives = objective.sub_objectives,
 		amount = objective.amount,
 		current_amount = objective.current_amount,
 		amount_text = objective.amount_text
-	})
+	}
+	self._delayed_presentation = nil
+	if data and data.delay_presentation then
+		self._delayed_presentation = {t = 1, activate_params = activate_params}
+	else
+		managers.hud:activate_objective(activate_params)
+	end
 	if not load_data then
 		local title_message = data and data.title_message or managers.localization:text("mission_objective_activated")
 		local text = objective.text
-		managers.hud:present_mid_text({
-			text = text,
-			title = title_message,
-			time = 4,
-			icon = nil,
-			event = "stinger_objectivecomplete"
-		})
+		if self._delayed_presentation then
+			self._delayed_presentation.mid_text_params = {
+				text = text,
+				title = title_message,
+				time = 4,
+				icon = nil,
+				event = "stinger_objectivecomplete"
+			}
+		else
+			managers.hud:present_mid_text({
+				text = text,
+				title = title_message,
+				time = 4,
+				icon = nil,
+				event = "stinger_objectivecomplete"
+			})
+		end
 	end
 	self._active_objectives[id] = objective
 	self._remind_objectives[id] = {
@@ -158,6 +194,9 @@ function ObjectivesManager:remove_objective(id, load_data)
 	})
 	self._active_objectives[id] = nil
 	self._remind_objectives[id] = nil
+	if self._delayed_presentation and self._delayed_presentation.activate_params.id == id then
+		self._delayed_presentation = nil
+	end
 end
 
 function ObjectivesManager:complete_objective(id, load_data)
@@ -200,6 +239,9 @@ function ObjectivesManager:complete_objective(id, load_data)
 	table.insert(self._completed_objectives_ordered, 1, id)
 	self._active_objectives[id] = nil
 	self._remind_objectives[id] = nil
+	if self._delayed_presentation and self._delayed_presentation.activate_params.id == id then
+		self._delayed_presentation = nil
+	end
 end
 
 function ObjectivesManager:complete_sub_objective(id, sub_id, load_data)

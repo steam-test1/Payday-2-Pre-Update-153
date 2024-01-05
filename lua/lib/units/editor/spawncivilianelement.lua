@@ -2,6 +2,13 @@ core:import("CoreEditorUtils")
 core:import("CoreUnit")
 SpawnCivilianUnitElement = SpawnCivilianUnitElement or class(MissionElement)
 SpawnCivilianUnitElement.USES_POINT_ORIENTATION = true
+SpawnCivilianUnitElement.INSTANCE_VAR_NAMES = {
+	{type = "civilian", value = "enemy"},
+	{
+		type = "civilian_spawn_state",
+		value = "state"
+	}
+}
 SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_female_bank_1/civ_female_bank_1",
 	"units/payday2/characters/civ_female_bank_manager_1/civ_female_bank_manager_1",
@@ -65,7 +72,6 @@ SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_male_worker_2/civ_male_worker_2",
 	"units/payday2/characters/civ_male_worker_3/civ_male_worker_3",
 	"units/payday2/characters/npc_getaway_driver_1/npc_getaway_driver_1",
-	"units/payday2/characters/npc_old_hoxton_prisonsuit_1/npc_old_hoxton_prisonsuit_1",
 	"units/pd2_dlc1/characters/civ_male_paramedic_1/civ_male_paramedic_1",
 	"units/pd2_dlc1/characters/civ_male_paramedic_2/civ_male_paramedic_2",
 	"units/pd2_dlc1/characters/civ_male_firefighter_1/civ_male_firefighter_1",
@@ -73,10 +79,7 @@ SpawnCivilianUnitElement._options = {
 	"units/pd2_dlc1/characters/civ_male_casual_11/civ_male_casual_11",
 	"units/pd2_dlc1/characters/civ_male_bank_manager_2/civ_male_bank_manager_2",
 	"units/pd2_dlc2/characters/civ_female_bank_assistant_1/civ_female_bank_assistant_1",
-	"units/pd2_dlc2/characters/civ_female_bank_assistant_2/civ_female_bank_assistant_2",
-	"units/pd2_dlc3/characters/civ_female_casino_1/civ_female_casino_1",
-	"units/pd2_dlc3/characters/civ_female_casino_2/civ_female_casino_2",
-	"units/pd2_dlc3/characters/civ_female_casino_3/civ_female_casino_3"
+	"units/pd2_dlc2/characters/civ_female_bank_assistant_2/civ_female_bank_assistant_2"
 }
 
 function SpawnCivilianUnitElement:init(unit)
@@ -86,9 +89,11 @@ function SpawnCivilianUnitElement:init(unit)
 	self._hed.state = "none"
 	self._hed.enemy = "units/payday2/characters/civ_male_casual_1/civ_male_casual_1"
 	self._hed.force_pickup = "none"
+	self._hed.team = "default"
 	table.insert(self._save_values, "enemy")
 	table.insert(self._save_values, "state")
 	table.insert(self._save_values, "force_pickup")
+	table.insert(self._save_values, "team")
 end
 
 function SpawnCivilianUnitElement:post_init(...)
@@ -115,25 +120,10 @@ function SpawnCivilianUnitElement:stop_test_element()
 	self._enemies = {}
 end
 
-function SpawnCivilianUnitElement:select_civilian_btn()
-	local dialog = SelectNameModal:new("Select unit", self._options)
-	if dialog:cancelled() then
-		return
-	end
-	for _, unit in ipairs(dialog:_selected_item_assets()) do
-		self._hed.enemy = unit
-		CoreEws.change_combobox_value(self._enemies_params, self._hed.enemy)
-	end
-end
-
-function SpawnCivilianUnitElement:select_state_btn()
-	local dialog = SelectNameModal:new("Select state", self._states)
-	if dialog:cancelled() then
-		return
-	end
-	for _, state in ipairs(dialog:_selected_item_assets()) do
-		self._hed.state = state
-		CoreEws.change_combobox_value(self._states_params, self._hed.state)
+function SpawnCivilianUnitElement:set_element_data(params, ...)
+	SpawnCivilianUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "force_pickup" then
+		self:_load_pickup()
 	end
 end
 
@@ -141,73 +131,12 @@ function SpawnCivilianUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local enemy_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(enemy_sizer, 0, 1, "EXPAND,LEFT")
-	local enemies_params = {
-		name = "Enemy:",
-		panel = panel,
-		sizer = enemy_sizer,
-		options = self._options,
-		value = self._hed.enemy,
-		tooltip = "Select an enemy from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local enemies = CoreEWS.combobox(enemies_params)
-	enemies:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = enemies, value = "enemy"})
-	self._enemies_params = enemies_params
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT", "Select unit", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_civilian_btn"), nil)
-	toolbar:realize()
-	enemy_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	local state_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(state_sizer, 0, 1, "EXPAND,LEFT")
-	local states_params = {
-		name = "State:",
-		panel = panel,
-		sizer = state_sizer,
-		options = self._states,
-		value = self._hed.state,
-		default = "none",
-		tooltip = "Select a state from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local states = CoreEWS.combobox(states_params)
-	states:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = states, value = "state"})
-	self._states_params = states_params
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT", "Select state", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_state_btn"), nil)
-	toolbar:realize()
-	state_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	local pickups = {}
-	for name, _ in pairs(tweak_data.pickups) do
-		table.insert(pickups, name)
-	end
-	local pickup_params = {
-		name = "Force Pickup:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = pickups,
-		value = self._hed.force_pickup,
-		default = "none",
-		tooltip = "Select a pickup to be forced spawned when characters from this element dies.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local force_pickup = CoreEWS.combobox(pickup_params)
-	force_pickup:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = force_pickup,
-		value = "force_pickup"
-	})
-	force_pickup:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_load_pickup"), nil)
+	self:_build_value_combobox(panel, panel_sizer, "enemy", self._options)
+	self:_build_value_combobox(panel, panel_sizer, "state", table.list_add(self._states, {"none"}))
+	local pickups = table.map_keys(tweak_data.pickups)
+	table.insert(pickups, "none")
+	self:_build_value_combobox(panel, panel_sizer, "force_pickup", pickups)
+	self:_build_value_combobox(panel, panel_sizer, "team", table.list_add({"default"}, tweak_data.levels:get_team_names_indexed()), "Select the character's team.")
 end
 
 function SpawnCivilianUnitElement:_load_pickup()

@@ -213,6 +213,9 @@ end
 
 function IngameWaitingForPlayersState:at_enter()
 	self._started_from_beginning = true
+	if Global.job_manager.current_job and Global.job_manager.current_job.current_stage == 1 then
+		Global.statistics_manager.playing_from_start = true
+	end
 	self:setup_controller()
 	self._sound_listener = SoundDevice:create_listener("lobby_menu")
 	self._sound_listener:set_position(Vector3(0, -50000, 0))
@@ -310,6 +313,7 @@ end
 
 function IngameWaitingForPlayersState:set_dropin(char_name)
 	self._started_from_beginning = false
+	Global.statistics_manager.playing_from_start = nil
 	print("Joining as " .. char_name)
 end
 

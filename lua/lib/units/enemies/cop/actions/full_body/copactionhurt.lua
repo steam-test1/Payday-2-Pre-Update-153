@@ -382,8 +382,8 @@ function CopActionHurt:init(action_desc, common_data)
 		local equipped_weapon = self._ext_inventory:equipped_unit()
 		if equipped_weapon and (not equipped_weapon:base().clip_empty or not equipped_weapon:base():clip_empty()) and shoot_chance > math.random() then
 			self._weapon_unit = equipped_weapon
-			self._original_bullet_hit_slotmask = equipped_weapon:base()._bullet_slotmask
-			equipped_weapon:base():set_bullet_hit_slotmask(managers.slot:get_mask("bullet_impact_targets_shooting_death"))
+			self._unit:movement():set_friendly_fire(true)
+			self._friendly_fire = true
 			if equipped_weapon:base():weapon_tweak_data().auto then
 				equipped_weapon:base():start_autofire()
 				self._shooting_hurt = true
@@ -511,9 +511,9 @@ function CopActionHurt:on_exit()
 		managers.enemy:remove_delayed_clbk(self._delayed_shooting_hurt_clbk_id)
 		self._delayed_shooting_hurt_clbk_id = nil
 	end
-	if self._original_bullet_hit_slotmask and alive(self._weapon_unit) then
-		self._weapon_unit:base():set_bullet_hit_slotmask(self._original_bullet_hit_slotmask)
-		self._original_bullet_hit_slotmask = nil
+	if self._friendly_fire then
+		self._unit:movement():set_friendly_fire(false)
+		self._friendly_fire = nil
 	end
 	if self._modifier_on then
 		self._machine:allow_modifier(self._head_modifier_name)

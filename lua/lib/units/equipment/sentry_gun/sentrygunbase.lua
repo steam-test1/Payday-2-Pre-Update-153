@@ -90,6 +90,7 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 	self._owner = owner
 	self._unit:movement():setup(rot_speed_multiplier)
 	self._unit:brain():setup(1 / rot_speed_multiplier)
+	self._unit:movement():set_team(owner:movement():team())
 	local setup_data = {}
 	setup_data.user_unit = self._owner
 	setup_data.ignore_units = {
@@ -292,9 +293,9 @@ function SentryGunBase:refill(ammo_ratio)
 	if Network:is_server() then
 		local ammo_total = self._unit:weapon():ammo_total()
 		local ammo_max = self._unit:weapon():ammo_max()
-		print("SentryGunBase:refill", "ammo_ratio", ammo_ratio, "ammo", math.min(ammo_max, ammo_total + ammo_max * ammo_ratio))
-		self._unit:weapon():change_ammo(math.floor(ammo_max * ammo_ratio))
+		self._unit:weapon():change_ammo(math.ceil(ammo_max * ammo_ratio))
 	end
+	self._unit:brain():switch_on()
 	self._unit:interaction():set_dirty(true)
 end
 

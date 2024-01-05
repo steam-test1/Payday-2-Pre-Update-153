@@ -5,6 +5,7 @@ function HuskTeamAIBase:default_weapon_name()
 end
 
 function HuskTeamAIBase:post_init()
+	self._ext_anim = self._unit:anim_data()
 	self._unit:movement():post_init()
 	self:set_anim_lod(1)
 	self._lod_stage = 1

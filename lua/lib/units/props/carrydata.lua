@@ -559,7 +559,7 @@ function CarryData:clbk_body_active_state(tag, unit, body, activated)
 end
 
 function CarryData:clbk_send_link()
-	if alive(self._unit) and self._steal_SO_data or not self._steal_SO_data.thief and self._steal_SO_data.picked_up then
+	if alive(self._unit) and self._steal_SO_data and self._steal_SO_data.thief and self._steal_SO_data.picked_up then
 		managers.network:session():send_to_peers_synched("loot_link", self._unit, self._steal_SO_data.thief)
 	end
 end

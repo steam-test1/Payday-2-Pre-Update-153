@@ -630,7 +630,7 @@ function PlayerStandard:_check_step(t)
 		return
 	end
 	self._last_step_pos = self._last_step_pos or Vector3()
-	local step_length = self._state_data.in_steelsight and 100 or self._state_data.ducking and 125 or self._running and 175 or 150
+	local step_length = self._state_data.on_ladder and 50 or self._state_data.in_steelsight and 100 or self._state_data.ducking and 125 or self._running and 175 or 150
 	if mvector3.distance_sq(self._last_step_pos, self._pos) > step_length * step_length then
 		mvector3.set(self._last_step_pos, self._pos)
 		self._unit:base():anim_data_clbk_footstep()
@@ -1007,7 +1007,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self._equipped_unit:base():tweak_data_anim_play("unequip")
 	managers.hud:show_interaction_bar(0, timer)
 	self._unit:base():set_detection_multiplier("interact", 0.5)
-	managers.network:session():send_to_peers_loaded("sync_teammate_progress", 1, true, self._interact_params.tweak_data, timer, false)
+	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, timer, false)
 end
 
 function PlayerStandard:_interupt_action_interact(t, input, complete)
@@ -1018,7 +1018,7 @@ function PlayerStandard:_interupt_action_interact(t, input, complete)
 		end
 		self._ext_camera:camera_unit():base():remove_limits()
 		managers.interaction:interupt_action_interact(self._unit)
-		managers.network:session():send_to_peers_loaded("sync_teammate_progress", 1, false, self._interact_params.tweak_data, 0, complete and true or false)
+		managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, false, self._interact_params.tweak_data, 0, complete and true or false)
 		self._interact_params = nil
 		local tweak_data = self._equipped_unit:base():weapon_tweak_data()
 		self._equip_weapon_expire_t = managers.player:player_timer():time() + (tweak_data.timers.equip or 0.7)
@@ -1463,7 +1463,7 @@ function PlayerStandard:_start_action_use_item(t)
 	})
 	managers.hud:show_progress_timer({text = text, icon = nil})
 	local equipment_id = managers.player:selected_equipment_id()
-	managers.network:session():send_to_peers_loaded("sync_teammate_progress", 2, true, equipment_id, deploy_timer, false)
+	managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, true, equipment_id, deploy_timer, false)
 end
 
 function PlayerStandard:_end_action_use_item(valid)
@@ -1481,7 +1481,7 @@ function PlayerStandard:_interupt_action_use_item(t, input, complete)
 		managers.hud:hide_progress_timer_bar(complete)
 		managers.hud:remove_progress_timer()
 		self._unit:equipment():on_deploy_interupted()
-		managers.network:session():send_to_peers_loaded("sync_teammate_progress", 2, false, "", 0, complete and true or false)
+		managers.network:session():send_to_peers_synched("sync_teammate_progress", 2, false, "", 0, complete and true or false)
 	end
 end
 
@@ -2508,31 +2508,39 @@ function PlayerStandard:_find_pickups(t)
 end
 
 function PlayerStandard:_upd_attention()
-	if self._state_data.ducking then
-		local crh_attention
-		if managers.groupai:state():whisper_mode() then
-			crh_attention = "pl_enemy_sneak"
+	local preset
+	if managers.groupai:state():whisper_mode() then
+		if self._state_data.ducking then
+			preset = {
+				"pl_mask_on_friend_combatant_whisper_mode",
+				"pl_mask_on_friend_non_combatant_whisper_mode",
+				"pl_mask_on_foe_combatant_whisper_mode_crouch",
+				"pl_mask_on_foe_non_combatant_whisper_mode_crouch"
+			}
 		else
-			crh_attention = "pl_enemy_cbt_crh"
+			preset = {
+				"pl_mask_on_friend_combatant_whisper_mode",
+				"pl_mask_on_friend_non_combatant_whisper_mode",
+				"pl_mask_on_foe_combatant_whisper_mode_stand",
+				"pl_mask_on_foe_non_combatant_whisper_mode_stand"
+			}
 		end
-		self._ext_movement:set_attention_settings({
-			crh_attention,
-			"pl_team_idle_std",
-			"pl_civ_sneak"
-		})
+	elseif self._state_data.ducking then
+		preset = {
+			"pl_friend_combatant_cbt",
+			"pl_friend_non_combatant_cbt",
+			"pl_foe_combatant_cbt_crouch",
+			"pl_foe_non_combatant_cbt_crouch"
+		}
 	else
-		local stand_attention
-		if managers.groupai:state():whisper_mode() then
-			stand_attention = "pl_enemy_stand_mask_on"
-		else
-			stand_attention = "pl_enemy_cbt"
-		end
-		self._ext_movement:set_attention_settings({
-			stand_attention,
-			"pl_team_idle_std",
-			"pl_civ_cbt"
-		})
+		preset = {
+			"pl_friend_combatant_cbt",
+			"pl_friend_non_combatant_cbt",
+			"pl_foe_combatant_cbt_stand",
+			"pl_foe_non_combatant_cbt_stand"
+		}
 	end
+	self._ext_movement:set_attention_settings(preset)
 end
 
 function PlayerStandard:get_melee_damage_result(attack_data)

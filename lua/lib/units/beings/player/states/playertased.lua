@@ -35,9 +35,10 @@ function PlayerTased:_enter(enter_data)
 	self._unit:base():set_slot(self._unit, 2)
 	self._unit:camera():camera_unit():base():set_target_tilt(0)
 	self._ext_movement:set_attention_settings({
-		"pl_enemy_cbt",
-		"pl_team_idle_std",
-		"pl_civ_cbt"
+		"pl_friend_combatant_cbt",
+		"pl_friend_non_combatant_cbt",
+		"pl_foe_combatant_cbt_stand",
+		"pl_foe_non_combatant_cbt_stand"
 	})
 	if Network:is_server() and self._ext_movement:nav_tracker() then
 		managers.groupai:state():on_player_weapons_hot()

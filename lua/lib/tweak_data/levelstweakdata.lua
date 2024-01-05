@@ -366,19 +366,6 @@ function LevelsTweakData:init()
 	self.branchbank.outro_event = "Play_pln_branchbank_stage1_end"
 	self.branchbank.ghost_bonus = 0.1
 	self.branchbank.max_bags = 24
-	self.branchbank_cloaker = {}
-	self.branchbank_cloaker.name_id = "heist_cloak_hl"
-	self.branchbank_cloaker.briefing_id = "heist_cloak_briefing"
-	self.branchbank_cloaker.briefing_dialog = "Play_pln_branchbank_random_stage1_brief"
-	self.branchbank_cloaker.world_name = "narratives/h_firestarter/stage_3_cloaker"
-	self.branchbank_cloaker.intro_event = {
-		"Play_pln_branchbank_random_a_intro_a",
-		"Play_pln_branchbank_gold_a_intro_a",
-		"Play_pln_branchbank_depositbox_a_intro_a",
-		"Play_pln_branchbank_cash_stage1_intro_a"
-	}
-	self.branchbank_cloaker.outro_event = "Play_pln_branchbank_stage1_end"
-	self.branchbank_cloaker.package = "packages/narr_firestarter3"
 	self.branchbank.music = "heist"
 	self.branchbank.package = "packages/narr_firestarter3"
 	self.branchbank.cube = "cube_apply_heist_bank"
@@ -627,6 +614,74 @@ function LevelsTweakData:init()
 	self.roberts.cube = "cube_apply_heist_bank"
 	self.roberts.ghost_bonus = 0.1
 	self.roberts.max_bags = 14
+	self.haunted = {}
+	self.haunted.name_id = "heist_haunted_hl"
+	self.haunted.briefing_id = "heist_haunted_briefing"
+	self.haunted.world_name = "narratives/haunted_safehouse"
+	self.haunted.intro_event = "lol"
+	self.haunted.outro_event = {"lol", "lolo"}
+	self.haunted.music = "heist"
+	self.haunted.package = "packages/narr_haunted"
+	self.haunted.cube = "cube_apply_heist_bank"
+	self.mia_1 = {}
+	self.mia_1.name_id = "heist_mia_1_hl"
+	self.mia_1.briefing_id = "heist_mia_1_briefing"
+	self.mia_1.briefing_dialog = "Play_pln_hm1_brf_01"
+	self.mia_1.world_name = "narratives/dentist/mia/stage1"
+	self.mia_1.intro_event = "Play_pln_hm1_intro_01"
+	self.mia_1.outro_event = {
+		"pln_hm1_end_01_01"
+	}
+	self.mia_1.music = "heist"
+	self.mia_1.package = "packages/narr_mia_1"
+	self.mia_1.cube = "cube_apply_heist_bank"
+	self.mia_2 = {}
+	self.mia_2.name_id = "heist_mia_2_hl"
+	self.mia_2.briefing_id = "heist_mia_2_briefing"
+	self.mia_2.briefing_dialog = "Play_pln_hm2_brf_01"
+	self.mia_2.world_name = "narratives/dentist/mia/stage2"
+	self.mia_2.intro_event = "Play_pln_hm2_intro_01"
+	self.mia_2.outro_event = {
+		"dentist_hm1_debrief"
+	}
+	self.mia_2.music = "heist"
+	self.mia_2.package = "packages/narr_mia_2"
+	self.mia_2.cube = "cube_apply_heist_bank"
+	self.mia_2.teams = {
+		criminal1 = {
+			foes = {
+				mobster1 = true,
+				law1 = true,
+				mobster_boss = true
+			}
+		},
+		law1 = {
+			foes = {mobster1 = true, criminal1 = true}
+		},
+		mobster1 = {
+			foes = {law1 = true, criminal1 = true}
+		},
+		mobster_boss = {
+			foes = {criminal1 = true}
+		},
+		neutral1 = {
+			foes = {}
+		}
+	}
+	self.mia2_new = {}
+	self.mia2_new.name_id = "heist_mia2_new_hl"
+	self.mia2_new.briefing_id = "heist_mia_2_briefing"
+	self.mia2_new.briefing_dialog = "Play_pln_hm2_brf_01"
+	self.mia2_new.world_name = "narratives/dentist/mia/stage2"
+	self.mia2_new.intro_event = "Play_pln_hm2_intro_01"
+	self.mia2_new.outro_event = {
+		"Play_gus_hm1_debrief_01",
+		"Play_gus_hm1_debrief_01"
+	}
+	self.mia2_new.music = "heist"
+	self.mia2_new.package = "packages/narr_mia_2"
+	self.mia2_new.cube = "cube_apply_heist_bank"
+	self.mia2_new.teams = self.mia_2.teams
 	self.kosugi = {}
 	self.kosugi.name_id = "heist_kosugi_hl"
 	self.kosugi.briefing_id = "heist_kosugi_briefing"
@@ -686,6 +741,9 @@ function LevelsTweakData:init()
 		"family",
 		"big",
 		"roberts",
+		"mia_1",
+		"mia_2",
+		"mia2_new",
 		"kosugi"
 	}
 	self.escape_levels = {
@@ -698,7 +756,9 @@ function LevelsTweakData:init()
 		"escape_cafe_day",
 		"escape_park_day",
 		"election_day_3",
-		"arm_for"
+		"arm_for",
+		"escape_hell",
+		"blueharvest_3"
 	}
 end
 
@@ -817,4 +877,96 @@ function LevelsTweakData:get_music_event_ext()
 	local music = level_data and level_data.music_ext
 	local music_start = level_data and level_data.music_ext_start
 	return music, music_start
+end
+
+function LevelsTweakData:get_default_team_ID(type)
+	local lvl_tweak = self[Global.level_data.level_id]
+	if lvl_tweak and lvl_tweak.default_teams and lvl_tweak.default_teams[type] then
+		if lvl_tweak.teams[lvl_tweak.default_teams[type]] then
+			return lvl_tweak.default_teams[type]
+		else
+			debug_pause("[LevelsTweakData:get_default_player_team_ID] Team not defined ", lvl_tweak.default_teams[type], "in", Global.level_data.level_id)
+		end
+	end
+	if type == "player" then
+		return "criminal1"
+	elseif type == "combatant" then
+		return "law1"
+	elseif type == "non_combatant" then
+		return "neutral1"
+	else
+		return "mobster1"
+	end
+end
+
+function LevelsTweakData:get_team_setup()
+	local lvl_tweak
+	if Application:editor() and managers.editor then
+		lvl_tweak = self[managers.editor:layer("Level Settings"):get_setting("simulation_level_id")]
+	else
+		lvl_tweak = Global.level_data and Global.level_data.level_id and self[Global.level_data.level_id]
+	end
+	local teams = lvl_tweak and lvl_tweak.teams
+	if teams then
+		teams = deep_clone(teams)
+	else
+		teams = {
+			criminal1 = {
+				foes = {mobster1 = true, law1 = true}
+			},
+			law1 = {
+				foes = {mobster1 = true, criminal1 = true}
+			},
+			mobster1 = {
+				foes = {law1 = true, criminal1 = true}
+			},
+			neutral1 = {
+				foes = {}
+			}
+		}
+		for id, team in pairs(teams) do
+			team.id = id
+		end
+	end
+	return teams
+end
+
+function LevelsTweakData:get_default_team_IDs()
+	local lvl_tweak
+	if Application:editor() and managers.editor then
+		lvl_tweak = self[managers.editor:layer("Level Settings"):get_setting("simulation_level_id")]
+	else
+		lvl_tweak = Global.level_data and Global.level_data.level_id and self[Global.level_data.level_id]
+	end
+	local default_team_IDs = lvl_tweak and lvl_tweak.default_teams
+	default_team_IDs = default_team_IDs or {
+		player = self:get_default_team_ID("player"),
+		combatant = self:get_default_team_ID("combatant"),
+		non_combatant = self:get_default_team_ID("non_combatant"),
+		gangster = self:get_default_team_ID("gangster")
+	}
+	return default_team_IDs
+end
+
+function LevelsTweakData:get_team_names_indexed()
+	local teams_index = self._teams_index
+	if not teams_index then
+		teams_index = {}
+		local teams = self:get_team_setup()
+		for team_id, team_data in pairs(teams) do
+			table.insert(teams_index, team_id)
+		end
+		table.sort(teams_index)
+		self._teams_index = teams_index
+	end
+	return teams_index
+end
+
+function LevelsTweakData:get_team_index(team_id)
+	local teams_index = self:get_team_names_indexed()
+	for index, test_team_id in ipairs(teams_index) do
+		if team_id == test_team_id then
+			return index
+		end
+	end
 end

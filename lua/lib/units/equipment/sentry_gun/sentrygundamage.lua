@@ -35,7 +35,7 @@ function SentryGunDamage:shoot_pos_mid(m_pos)
 end
 
 function SentryGunDamage:damage_bullet(attack_data)
-	if self._dead or self._invulnerable or PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	if self._dead or self._invulnerable or PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		return
 	end
 	local hit_shield = attack_data.col_ray.body and attack_data.col_ray.body:name() == self._shield_body_name

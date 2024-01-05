@@ -230,7 +230,7 @@ function MenuNodeCrimenetCasinoGui:_set_cards(amount, card)
 			self._betting_cards[i]:set_rotation(math.random(14) - 7)
 			self._betting_cards[i]:animate(callback(self, self, "flipcard", self._betting_cards[i]), 1.5)
 		end
-		self._betting_cards[i]:set_visible(0 < count)
+		self._betting_cards[i]:set_visible(MenuCallbackHandler:casino_betting_visible() and 0 < count)
 		count = count - 1
 	end
 end
@@ -376,6 +376,7 @@ function MenuNodeCrimenetCasinoGui:_setup_layout()
 			valign = "scale"
 		})
 		self._betting_cards[i]:set_rotation(math.random(14) - 7)
+		self._betting_cards[i]:set_visible(MenuCallbackHandler:casino_betting_visible())
 	end
 	self:_set_cards(0)
 	self._stats_panel = self._main_panel:panel({
@@ -712,8 +713,12 @@ function MenuNodeCrimenetCasinoGui:set_update_values(preferred_card, secured_car
 	local bets_value = increase_infamous and self:_round_value(base_value * tweak_data:get_value("casino", "infamous_chance") - base_value) or 0
 	self._infamous_values.bets:set_text(increase_infamous and "+" .. string.format("%.1f", bets_value) .. "%" or "")
 	self._infamous_values.total:set_text(string.format("%.1f", base_value + bets_value) .. "%")
-	self._betting_titles.safecards:set_alpha(safecards_enabled and 1 or 0.5)
-	self._betting_titles.infamous:set_alpha(infamous_enabled and 1 or 0.5)
+	if self._betting_titles.safecards then
+		self._betting_titles.safecards:set_alpha(safecards_enabled and 1 or 0.5)
+	end
+	if self._betting_titles.infamous then
+		self._betting_titles.infamous:set_alpha(infamous_enabled and 1 or 0.5)
+	end
 end
 
 function MenuNodeCrimenetCasinoGui:set_offshore_text()

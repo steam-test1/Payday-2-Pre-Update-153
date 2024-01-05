@@ -3,6 +3,7 @@ core:import("CoreEngineAccess")
 core:import("CoreSequenceManager")
 core:import("CoreDebug")
 core:import("CoreClass")
+core:import("CoreTable")
 core:import("CoreEngineAccess")
 DebugManager = DebugManager or class()
 DebugManager.ROT_LINE_LENGTH = 20
@@ -1126,7 +1127,7 @@ function GraphDebug:update(t, dt)
 		for list_index, list in pairs(self._pos_list) do
 			old_point = nil
 			for index, point in ipairs(list) do
-				local graph_point = clone(point)
+				local graph_point = CoreTable.clone(point)
 				graph_point._pos = offset_origo + self:get_scaled_pos(point._pos):rotate_with(rotation)
 				DebugManager.draw_point(index, #list, old_point, graph_point, self._skip_lines_map[list_index])
 				old_point = graph_point
@@ -2043,11 +2044,11 @@ function MacroDebug:get_unit_files(unit)
 	local object_file, unit_file
 	local unit_data = PackageManager:unit_data(unit:name():id())
 	local base = Application:base_path() .. "..\\..\\assets\\"
-	local unit_name = unit:name():s()
+	local unit_name = tostring(unit:name():s())
 	local unit_file = base .. unit_name .. ".unit"
 	local object_file = base .. unit_name .. ".object"
 	local relative_sequence_file = managers.sequence:get_sequence_file(unit_name)
-	local sequence_file = relative_sequence_file and base .. relative_sequence_file .. "." .. CoreSequenceManager.SequenceManager.SEQUENCE_FILE_EXTENSION
+	local sequence_file = relative_sequence_file and base .. tostring(relative_sequence_file:s()) .. "." .. CoreSequenceManager.SequenceManager.SEQUENCE_FILE_EXTENSION
 	return self:get_cleaned_path(unit_file), self:get_cleaned_path(object_file), self:get_cleaned_path(sequence_file), tostring(unit_data:anim() and unit_data:anim():s())
 end
 
@@ -2068,7 +2069,7 @@ function MacroDebug:ray_push(velocity_dir, velocity_length, mass)
 	local ray = self:get_ray()
 	if ray then
 		self:push(ray.unit, velocity_dir or ray.ray, velocity_length, mass)
-		cat_print("debug", "Unit: " .. ray.unit:name() .. ", Body: " .. ray.body:name())
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
 	else
 		cat_error("debug", "No unit found.")
 	end
@@ -2077,43 +2078,55 @@ end
 function MacroDebug:push(unit, velocity_dir, velocity_length, mass)
 	velocity_dir = velocity_dir or self._default_push_velocity_dir
 	velocity_length = velocity_length or self._default_push_velocity_length
-	World:play_physic_effect("core/physic_effects/debugmanager_push", unit, velocity_dir * velocity_length, mass or self._default_push_mass)
+	local effect_name = Idstring("core/physic_effects/debugmanager_push")
+	CoreEngineAccess._editor_load(Idstring("physic_effect"), effect_name)
+	World:play_physic_effect(effect_name, unit, velocity_dir * velocity_length, mass or self._default_push_mass)
 end
 
 function MacroDebug:ray_gravitate(multiplier)
 	local ray = self:get_ray()
 	if ray then
 		self:gravitate(ray.unit, multiplier)
-		cat_print("debug", "Unit: " .. ray.unit:name() .. ", Body: " .. ray.body:name())
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
 	else
 		cat_error("debug", "No unit found.")
 	end
 end
 
 function MacroDebug:gravitate(unit, multiplier)
-	World:play_physic_effect("core/physic_effects/debugmanager_gravitate", unit, -World:gravity() * (multiplier or 1))
+	local effect_name = Idstring("core/physic_effects/debugmanager_gravitate")
+	CoreEngineAccess._editor_load(Idstring("physic_effect"), effect_name)
+	World:play_physic_effect(effect_name, unit, -World:gravity() * (multiplier or 1))
 end
 
 function MacroDebug:stop_gravitate()
-	World:stop_physic_effect("core/physic_effects/debugmanager_gravitate")
+	local effect_name_str = "core/physic_effects/debugmanager_gravitate"
+	local effect_name = Idstring(effect_name_str)
+	CoreEngineAccess._editor_load(Idstring("physic_effect"), effect_name)
+	World:stop_physic_effect(effect_name_str)
 end
 
 function MacroDebug:ray_hover(multiplier)
 	local ray = self:get_ray()
 	if ray then
 		self:hover(ray.unit, multiplier)
-		cat_print("debug", "Unit: " .. ray.unit:name() .. ", Body: " .. ray.body:name())
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
 	else
 		cat_error("debug", "No unit found.")
 	end
 end
 
 function MacroDebug:hover(unit, multiplier)
-	World:play_physic_effect("core/physic_effects/debugmanager_hover", unit, -World:gravity() * (multiplier or 1))
+	local effect_name = Idstring("core/physic_effects/debugmanager_hover")
+	CoreEngineAccess._editor_load(Idstring("physic_effect"), effect_name)
+	World:play_physic_effect(effect_name, unit, -World:gravity() * (multiplier or 1))
 end
 
 function MacroDebug:stop_hover()
-	World:stop_physic_effect("core/physic_effects/debugmanager_hover")
+	local effect_name_str = "core/physic_effects/debugmanager_hover"
+	local effect_name = Idstring(effect_name_str)
+	CoreEngineAccess._editor_load(Idstring("physic_effect"), effect_name)
+	World:stop_physic_effect(effect_name_str)
 end
 
 function MacroDebug:effect(effect)
@@ -2132,7 +2145,7 @@ end
 function MacroDebug:ray_run_sequence(sequence, damage_type, source_unit, dest_body, normal, position, direction, damage, velocity, params)
 	local ray = self:get_ray()
 	if ray then
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name()) .. ", Body: " .. tostring(ray.body:name()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
 		local damage_ext = ray.unit:damage()
 		if damage_ext then
 			if damage_ext.run_sequence then
@@ -2151,7 +2164,7 @@ end
 function MacroDebug:ray_select_unit()
 	local ray = self:get_ray()
 	if ray then
-		cat_print("debug", "Unit: " .. ray.unit:name() .. ", Body: " .. ray.body:name())
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
 		self:select_unit(ray.unit)
 	else
 		cat_error("debug", "No unit found.")
@@ -2187,20 +2200,17 @@ end
 
 function MacroDebug:spawn(unit_name, pos, rot)
 	unit_name = unit_name or self._last_unit_name
-	if type(unit_name) == "string" and DB:has("unit", unit_name) then
+	if DB:has("unit", unit_name) then
 		local cam = managers.viewport:get_current_camera()
 		local pos = pos or cam and cam:position() + cam:rotation():y() * self._default_spawn_cam_offset or Vector3()
 		local rot = rot or cam and cam:rotation() or Rotation()
 		CoreEngineAccess._editor_load(Idstring("unit"), unit_name:id())
-		if not managers.sequence:has(unit_name) then
-			managers.sequence:_add_sequences_from_unit_data(CoreEngineAccess._editor_unit_data(unit_name:id()))
-		end
 		local unit = World:spawn_unit(unit_name:id(), pos, rot)
 		if alive(unit) then
 			self:set_last_unit(unit)
 		end
 	else
-		cat_print("debug", "Tried to spawn non-existing unit \"" .. tostring(unit_name) .. "\".")
+		cat_print("debug", "Tried to spawn non-existing unit \"" .. tostring(unit_name:s()) .. "\".")
 	end
 end
 

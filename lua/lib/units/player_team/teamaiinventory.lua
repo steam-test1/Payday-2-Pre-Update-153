@@ -26,7 +26,7 @@ function TeamAIInventory:add_unit_by_name(new_unit_name, equip)
 		new_unit
 	}
 	setup_data.expend_ammo = false
-	setup_data.hit_slotmask = managers.slot:get_mask("bullet_impact_targets_no_criminals")
+	setup_data.hit_slotmask = managers.slot:get_mask("bullet_impact_targets")
 	setup_data.user_sound_variant = tweak_data.character[self._unit:base()._tweak_table].weapon_voice
 	setup_data.alert_AI = true
 	setup_data.alert_filter = self._unit:brain():SO_access()

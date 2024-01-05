@@ -403,26 +403,11 @@ function NewRaycastWeaponBase:armor_piercing_chance()
 end
 
 function NewRaycastWeaponBase:stance_mod()
-	if not self._parts then
+	if not self._blueprint or not self._factory_id then
 		return nil
 	end
 	local using_second_sight = self:is_second_sight_on()
-	local translation = Vector3()
-	local rotation = Rotation()
-	local factory = tweak_data.weapon.factory
-	for part_id, data in pairs(self._parts) do
-		if factory.parts[part_id].stance_mod and (factory.parts[part_id].type ~= "sight" and factory.parts[part_id].type ~= "gadget" or using_second_sight and factory.parts[part_id].type == "gadget" or not using_second_sight and factory.parts[part_id].type == "sight") and factory.parts[part_id].stance_mod[self._factory_id] then
-			local part_translation = factory.parts[part_id].stance_mod[self._factory_id].translation
-			if part_translation then
-				mvector3.add(translation, part_translation)
-			end
-			local part_rotation = factory.parts[part_id].stance_mod[self._factory_id].rotation
-			if part_rotation then
-				mrotation.multiply(rotation, part_rotation)
-			end
-		end
-	end
-	return {translation = translation, rotation = rotation}
+	return managers.weapon_factory:get_stance_mod(self._factory_id, self._blueprint, self:is_second_sight_on())
 end
 
 function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)

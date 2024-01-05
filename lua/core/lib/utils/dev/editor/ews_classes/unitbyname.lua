@@ -138,6 +138,9 @@ function UnitByName:_on_select_unit()
 end
 
 function UnitByName:_selected_item_units()
+	if self._cancelled then
+		return {}
+	end
 	local units = {}
 	for _, i in ipairs(self._list:selected_items()) do
 		local unit = self._units[self._list:get_item_data(i)]

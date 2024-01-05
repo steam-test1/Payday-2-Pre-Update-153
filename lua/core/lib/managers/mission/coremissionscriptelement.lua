@@ -41,6 +41,12 @@ function MissionScriptElement:values()
 end
 
 function MissionScriptElement:value(name)
+	if self._values.instance_name and self._values.instance_var_names and self._values.instance_var_names[name] then
+		local value = managers.world_instance:get_instance_param(self._values.instance_name, self._values.instance_var_names[name])
+		if value then
+			return value
+		end
+	end
 	return self._values[name]
 end
 

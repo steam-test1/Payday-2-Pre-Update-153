@@ -22,10 +22,10 @@ function PlayerMaskOff:_enter(enter_data)
 	end
 	self._unit:base():set_slot(self._unit, 4)
 	self._ext_movement:set_attention_settings({
-		"pl_law_susp_peaceful",
-		"pl_gangster_cur_peaceful",
-		"pl_team_cur_peaceful",
-		"pl_civ_idle_peaceful"
+		"pl_mask_off_friend_combatant",
+		"pl_mask_off_friend_non_combatant",
+		"pl_mask_off_foe_combatant",
+		"pl_mask_off_foe_non_combatant"
 	})
 	if not managers.groupai:state():enemy_weapons_hot() then
 		self._enemy_weapons_hot_listen_id = "PlayerMaskOff" .. tostring(self._unit:key())
@@ -164,7 +164,7 @@ function PlayerMaskOff:_start_action_state_standard(t)
 		text = managers.localization:text("hud_starting_heist"),
 		icon = nil
 	})
-	managers.network:session():send_to_peers_loaded("sync_teammate_progress", 3, true, "mask_on_action", tweak_data.player.put_on_mask_time, false)
+	managers.network:session():send_to_peers_synched("sync_teammate_progress", 3, true, "mask_on_action", tweak_data.player.put_on_mask_time, false)
 end
 
 function PlayerMaskOff:_interupt_action_start_standard(t, input, complete)
@@ -172,7 +172,7 @@ function PlayerMaskOff:_interupt_action_start_standard(t, input, complete)
 		self._start_standard_expire_t = nil
 		managers.hud:hide_progress_timer_bar(complete)
 		managers.hud:remove_progress_timer()
-		managers.network:session():send_to_peers_loaded("sync_teammate_progress", 3, false, "mask_on_action", 0, complete and true or false)
+		managers.network:session():send_to_peers_synched("sync_teammate_progress", 3, false, "mask_on_action", 0, complete and true or false)
 	end
 end
 

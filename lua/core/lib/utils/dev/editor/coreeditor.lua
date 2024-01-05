@@ -1031,8 +1031,12 @@ end
 
 function CoreEditor:on_hide_selected()
 	if self._current_layer then
-		for _, unit in ipairs(clone(self._current_layer:selected_units())) do
-			self:set_unit_visible(unit, false)
+		if self._current_layer.on_hide_selected then
+			self._current_layer:on_hide_selected()
+		else
+			for _, unit in ipairs(clone(self._current_layer:selected_units())) do
+				self:set_unit_visible(unit, false)
+			end
 		end
 		self._current_layer:update_unit_settings()
 	end

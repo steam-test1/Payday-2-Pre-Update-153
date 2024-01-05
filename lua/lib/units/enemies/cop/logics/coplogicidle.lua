@@ -277,7 +277,7 @@ function CopLogicIdle.damage_clbk(data, damage_info)
 		else
 			local attention_info = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str)[enemy_key]
 			if attention_info then
-				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil)
+				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 				if settings then
 					enemy_data = CopLogicBase._create_detected_attention_object_data(data, my_data, enemy_key, attention_info, settings)
 					enemy_data.verified_t = t
@@ -387,14 +387,18 @@ end
 
 function CopLogicIdle._chk_reaction_to_attention_object(data, attention_data, stationary)
 	local record = attention_data.criminal_record
+	local can_arrest = CopLogicBase._can_arrest(data)
 	if not record or not attention_data.is_person then
-		return attention_data.settings.reaction
+		if attention_data.settings.reaction == AIAttentionObject.REACT_ARREST and not can_arrest then
+			return AIAttentionObject.REACT_AIM
+		else
+			return attention_data.settings.reaction
+		end
 	end
 	local att_unit = attention_data.unit
 	if attention_data.is_deployable or data.t < record.arrest_timeout then
 		return math.min(attention_data.settings.reaction, AIAttentionObject.REACT_COMBAT)
 	end
-	local can_arrest = CopLogicBase._can_arrest(data)
 	local visible = attention_data.verified
 	if record.status == "dead" then
 		return math.min(attention_data.settings.reaction, AIAttentionObject.REACT_AIM)
@@ -665,7 +669,7 @@ function CopLogicIdle.on_area_safety(data, nav_seg, safe, event)
 		if not data.detected_attention_objects[key_criminal] then
 			local attention_info = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str)[key_criminal]
 			if attention_info then
-				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil)
+				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 				if settings then
 					data.detected_attention_objects[key_criminal] = CopLogicBase._create_detected_attention_object_data(data, my_data, key_criminal, attention_info, settings)
 				end

@@ -83,6 +83,9 @@ require("lib/managers/mission/ElementSpotter")
 require("lib/managers/mission/ElementSpawnGageAssignment")
 require("lib/managers/mission/ElementPrePlanning")
 require("lib/managers/mission/ElementCinematicCamera")
+require("lib/managers/mission/ElementCharacterTeam")
+require("lib/managers/mission/ElementTeamRelation")
+require("lib/managers/mission/ElementSlowMotion")
 require("lib/managers/mission/ElementPlayerSpawner")
 require("lib/managers/mission/ElementAreaTrigger")
 require("lib/managers/mission/ElementSpawnEnemyDummy")
@@ -125,7 +128,8 @@ function MissionManager:init(...)
 		"pku_artifact_statue",
 		"pku_server",
 		"pku_samurai",
-		"bar_code"
+		"bar_code",
+		"equipment_evidence_lost"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

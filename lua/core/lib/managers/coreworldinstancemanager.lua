@@ -4,6 +4,7 @@ function CoreWorldInstanceManager:init()
 	self._instance_data = {}
 	self._registered_input_elements = {}
 	self._registered_output_event_elements = {}
+	self._instance_params = {}
 	self._start_offset_index = 30000
 end
 
@@ -381,6 +382,28 @@ function CoreWorldInstanceManager:get_mission_outputs(instance)
 	return mission_inputs
 end
 
+function CoreWorldInstanceManager:get_instance_params_by_name(name)
+	local instance_data = self:get_instance_data_by_name(name)
+	return self:get_instance_params(instance_data)
+end
+
+function CoreWorldInstanceManager:get_instance_params(instance)
+	local folder = instance.folder
+	local path = folder .. "/" .. "world"
+	local instance_data = self:_serialize_to_script("mission", path)
+	local instance_params = {}
+	for script, script_data in pairs(instance_data) do
+		for _, element in ipairs(script_data.elements) do
+			if element.class == "ElementInstanceParams" then
+				for _, params in ipairs(element.values.params) do
+					table.insert(instance_params, params)
+				end
+			end
+		end
+	end
+	return instance_params
+end
+
 function CoreWorldInstanceManager:_serialize_to_script(type, name)
 	if Application:editor() then
 		return PackageManager:editor_load_script_data(type:id(), name:id())
@@ -424,9 +447,21 @@ function CoreWorldInstanceManager:get_registered_output_event_elements(instance_
 	return self._registered_output_event_elements[instance_name][instance_output]
 end
 
+function CoreWorldInstanceManager:set_instance_params(instance_name, params)
+	self._instance_params[instance_name] = params
+end
+
+function CoreWorldInstanceManager:get_instance_param(instance_name, var_name)
+	if not self._instance_params[instance_name] then
+		return nil
+	end
+	return self._instance_params[instance_name][var_name]
+end
+
 function CoreWorldInstanceManager:on_simulation_ended()
 	self._registered_input_elements = {}
 	self._registered_output_event_elements = {}
+	self._instance_params = {}
 end
 
 function CoreWorldInstanceManager:clear()

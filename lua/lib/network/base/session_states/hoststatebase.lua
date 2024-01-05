@@ -39,7 +39,7 @@ function HostStateBase:_introduce_new_peer_to_old_peers(data, new_peer, loading,
 		if old_pid ~= new_peer_id then
 			if old_peer:handshakes()[new_peer_id] == nil then
 				print("[HostStateBase:_introduce_new_peer_to_old_peers] introducing", new_peer_id, "to", old_pid)
-				old_peer:send_after_load("peer_handshake", peer_name, new_peer_id, new_peer_user_id, new_peer:in_lobby(), loading, false, character, mask_set, xuid, xnaddr)
+				old_peer:send("peer_handshake", peer_name, new_peer_id, new_peer_user_id, new_peer:in_lobby(), loading, false, character, mask_set, xuid, xnaddr)
 				old_peer:set_handshake_status(new_peer_id, "asked")
 			else
 				print("[HostStateBase:_introduce_new_peer_to_old_peers] peer already had handshake", new_peer_id, "to", old_pid)
@@ -54,7 +54,7 @@ function HostStateBase:_introduce_old_peers_to_new_peer(data, new_peer)
 		if old_pid ~= new_peer_id then
 			if new_peer:handshakes()[old_pid] == nil then
 				print("[HostStateBase:_introduce_old_peers_to_new_peer] introducing", old_pid, "to", new_peer_id)
-				new_peer:send_after_load("peer_handshake", old_peer:connection_info())
+				new_peer:send("peer_handshake", old_peer:connection_info())
 				new_peer:set_handshake_status(old_pid, "asked")
 			else
 				print("[HostStateBase:_introduce_new_peer_to_old_peers] peer already had handshake", old_pid, "to", new_peer_id)
@@ -67,8 +67,8 @@ function HostStateBase:_chk_mutual_connection_established(data, peer, introduced
 	local introduced_peer = data.peers[introduced_peer_id]
 	if introduced_peer:handshakes()[peer:id()] == true then
 		cat_print("multiplayer_base", "[HostStateBase:_chk_mutual_connection_established] mutual connection", peer:id(), introduced_peer_id)
-		introduced_peer:send_after_load("mutual_connection", peer:id())
-		peer:send_after_load("mutual_connection", introduced_peer_id)
+		introduced_peer:send("mutual_connection", peer:id())
+		peer:send("mutual_connection", introduced_peer_id)
 		return true
 	end
 	return false

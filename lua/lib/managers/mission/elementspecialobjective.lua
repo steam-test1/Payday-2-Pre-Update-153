@@ -61,9 +61,10 @@ function ElementSpecialObjective:init(...)
 end
 
 function ElementSpecialObjective:_finalize_values(values)
+	values.so_action = self:value("so_action")
+	
 	local function _index_or_nil(table_in, name_in)
 		local found_index = table.index_of(table_in, values[name_in])
-		
 		values[name_in] = found_index ~= -1 and found_index or nil
 	end
 	

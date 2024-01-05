@@ -601,9 +601,10 @@ function AssetsItem:chk_preplanning_textures_done()
 		make_fine_text(text)
 		text:set_center(preplanning_panel:w() / 2, preplanning_panel:h() / 2)
 		text:set_visible(managers.menu:is_pc_controller())
+		local level_id = managers.job:current_level_id()
 		local button = preplanning_panel:bitmap({
 			name = "button",
-			texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/mission_briefing_button",
+			texture = tweak_data.preplanning.locations[level_id].mission_briefing_texture,
 			alpha = 0.8,
 			rotation = 360,
 			blend_mode = "add",
@@ -2968,8 +2969,11 @@ end
 
 function MissionBriefingGui:input_focus()
 	if self._jukebox_item then
-		if self._jukebox_item.displayed and not managers.menu:get_controller():get_input_bool("previous_page") then
-			return false
+		if self._jukebox_item.displayed then
+			local gamepad_used = managers.menu:get_controller():get_default_controller_id() ~= "keyboard"
+			if not managers.menu:get_controller():get_input_bool("previous_page") and (not gamepad_used or not managers.menu:get_controller():get_input_bool("menu_toggle_ready")) then
+				return false
+			end
 		end
 		if self._jukebox_item.closing then
 			self._jukebox_item.closing = nil

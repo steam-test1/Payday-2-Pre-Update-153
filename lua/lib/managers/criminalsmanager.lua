@@ -1,69 +1,25 @@
 CriminalsManager = CriminalsManager or class()
 CriminalsManager.MAX_NR_TEAM_AI = 2
+CriminalsManager.MAX_NR_CRIMINALS = 4
 
 function CriminalsManager:init()
-	self._characters = {
-		{
+	self:_create_characters()
+end
+
+function CriminalsManager:_create_characters()
+	self._characters = {}
+	for _, character in ipairs(tweak_data.criminals.characters) do
+		local static_data = deep_clone(character.static_data)
+		local character_data = {
 			taken = false,
-			name = "american",
+			name = character.name,
 			unit = nil,
 			peer_id = 0,
-			static_data = {
-				ai_character_id = "ai_hoxton",
-				ssuffix = "d",
-				color_id = 1,
-				voice = "rb2",
-				ai_mask_id = "hoxton",
-				mask_id = 1
-			},
-			data = {}
-		},
-		{
-			taken = false,
-			name = "german",
-			unit = nil,
-			peer_id = 0,
-			static_data = {
-				ai_character_id = "ai_wolf",
-				ssuffix = "c",
-				color_id = 2,
-				voice = "rb3",
-				ai_mask_id = "wolf",
-				mask_id = 2
-			},
-			data = {}
-		},
-		{
-			taken = false,
-			name = "russian",
-			unit = nil,
-			peer_id = 0,
-			static_data = {
-				ai_character_id = "ai_dallas",
-				ssuffix = "a",
-				color_id = 3,
-				voice = "rb4",
-				ai_mask_id = "dallas",
-				mask_id = 3
-			},
-			data = {}
-		},
-		{
-			taken = false,
-			name = "spanish",
-			unit = nil,
-			peer_id = 0,
-			static_data = {
-				ai_character_id = "ai_chains",
-				ssuffix = "b",
-				color_id = 4,
-				voice = "rb1",
-				ai_mask_id = "chains",
-				mask_id = 4
-			},
+			static_data = static_data,
 			data = {}
 		}
-	}
+		table.insert(self._characters, character_data)
+	end
 end
 
 function CriminalsManager.convert_old_to_new_character_workname(workname)
@@ -73,30 +29,19 @@ function CriminalsManager.convert_old_to_new_character_workname(workname)
 		russian = "dallas",
 		spanish = "chains"
 	}
-	return t[workname]
+	return t[workname] or workname
 end
 
 function CriminalsManager.character_names()
-	return {
-		"russian",
-		"german",
-		"spanish",
-		"american"
-	}
+	return tweak_data.criminals.character_names
 end
 
 function CriminalsManager.get_num_characters()
-	return 4
+	return #tweak_data.criminals.character_names
 end
 
 function CriminalsManager.character_workname_by_peer_id(peer_id)
-	local t = {
-		"russian",
-		"german",
-		"spanish",
-		"american"
-	}
-	return t[peer_id]
+	return CriminalsManager.character_names()[peer_id]
 end
 
 function CriminalsManager:on_simulation_ended()
@@ -141,9 +86,6 @@ end
 function CriminalsManager:add_character(name, unit, peer_id, ai)
 	print("[CriminalsManager:add_character]", name, unit, peer_id, ai)
 	Application:stack_dump()
-	if unit then
-		unit:base()._tweak_table = name
-	end
 	for id, data in pairs(self._characters) do
 		if data.name == name then
 			if data.taken then
@@ -185,7 +127,6 @@ end
 function CriminalsManager:set_unit(name, unit)
 	print("[CriminalsManager:set_unit] name", name, "unit", unit)
 	Application:stack_dump()
-	unit:base()._tweak_table = name
 	for id, data in pairs(self._characters) do
 		if data.name == name then
 			if not data.taken then
@@ -424,4 +365,14 @@ function CriminalsManager:nr_AI_criminals()
 		end
 	end
 	return nr_AI_criminals
+end
+
+function CriminalsManager:nr_taken_criminals()
+	local nr_taken_criminals = 0
+	for i, char_data in pairs(self._characters) do
+		if char_data.taken then
+			nr_taken_criminals = nr_taken_criminals + 1
+		end
+	end
+	return nr_taken_criminals
 end

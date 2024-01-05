@@ -1538,7 +1538,7 @@ function CopActionWalk:_adjust_move_anim(side, speed)
 		local walk_anim_length = self._walk_anim_lengths[anim_data.pose][self._stance.name][speed][side]
 		enter_t = seg_rel_t * walk_anim_length
 	end
-	local could_freeze = anim_data.can_freeze
+	local could_freeze = anim_data.can_freeze and anim_data.upper_body_empty
 	local redir_res = self._ext_movement:play_redirect(redirect_name, enter_t)
 	if could_freeze then
 		self._ext_base:chk_freeze_anims()

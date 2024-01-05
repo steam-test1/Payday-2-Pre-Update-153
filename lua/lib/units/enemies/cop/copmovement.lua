@@ -29,6 +29,8 @@ local stance_ctl_pts = {
 	1
 }
 CopMovement = CopMovement or class()
+CopMovement.set_friendly_fire = PlayerMovement.set_friendly_fire
+CopMovement.friendly_fire = PlayerMovement.friendly_fire
 CopMovement._gadgets = {
 	aligns = {
 		hand_l = Idstring("a_weapon_left_front"),
@@ -71,6 +73,9 @@ CopMovement._gadgets = {
 	ivstand = {
 		Idstring("units/world/architecture/hospital/props/iv_pole/iv_pole")
 	},
+	brush = {
+		Idstring("units/payday2/props/gen_prop_scrubbing_brush/gen_prop_scrubbing_brush")
+	},
 	clipboard_paper = {
 		Idstring("units/world/architecture/hospital/props/clipboard01/clipboard_paper")
 	}
@@ -102,6 +107,8 @@ action_variants.fbi_heavy_swat = security_variant
 action_variants.nathan = security_variant
 action_variants.sniper = security_variant
 action_variants.gangster = security_variant
+action_variants.mobster = security_variant
+action_variants.mobster_boss = security_variant
 action_variants.dealer = security_variant
 action_variants.biker_escape = security_variant
 action_variants.city_swat = security_variant
@@ -129,11 +136,12 @@ action_variants.escort_cfo = action_variants.civilian
 action_variants.escort_ralph = action_variants.civilian
 action_variants.escort_undercover = clone(action_variants.civilian)
 action_variants.escort_undercover.walk = EscortWithSuitcaseActionWalk
-action_variants.russian = clone(security_variant)
-action_variants.russian.walk = CriminalActionWalk
-action_variants.german = action_variants.russian
-action_variants.spanish = action_variants.russian
-action_variants.american = action_variants.russian
+action_variants.team_ai = clone(security_variant)
+action_variants.team_ai.walk = CriminalActionWalk
+action_variants.german = action_variants.team_ai
+action_variants.spanish = action_variants.team_ai
+action_variants.american = action_variants.team_ai
+action_variants.russian = action_variants.team_ai
 security_variant = nil
 CopMovement._action_variants = action_variants
 action_variants = nil
@@ -170,7 +178,7 @@ function CopMovement:init(unit)
 	self._footstep_event = ""
 	self._obj_com = unit:get_object(Idstring("Hips"))
 	self._slotmask_gnd_ray = managers.slot:get_mask("AI_graph_obstacle_check")
-	self._actions = self._action_variants[self._unit:base()._tweak_table]
+	self._actions = self._action_variants[self._unit:movement()._action_variant or self._unit:base()._tweak_table]
 	self._active_actions = {
 		false,
 		false,
@@ -243,6 +251,9 @@ function CopMovement:post_init()
 		end
 	elseif self._unit:inventory():is_selection_available(1) then
 		self._unit:inventory():equip_selection(1, true)
+	end
+	if self._ext_inventory:equipped_selection() == 2 then
+		self._ext_inventory:set_weapon_enabled(false)
 	end
 	local weap_name = self._ext_base:default_weapon_name(managers.groupai:state():enemy_weapons_hot() and "primary" or "secondary")
 	local fwd = self._m_rot:y()
@@ -805,6 +816,7 @@ function CopMovement:_chk_play_equip_weapon()
 			end
 		end
 	end
+	self._ext_inventory:set_weapon_enabled(true)
 end
 
 function CopMovement:set_cool(state, giveaway)
@@ -1430,6 +1442,7 @@ function CopMovement:save(save_data)
 	if self._allow_fire then
 		my_save_data.allow_fire = true
 	end
+	my_save_data.team_id = self._team.id
 	if self._attention then
 		if self._attention.pos then
 			my_save_data.attention = self._attention
@@ -1506,6 +1519,8 @@ function CopMovement:load(load_data)
 	if my_load_data.stance_wnd then
 		self:_change_stance(4)
 	end
+	self._team = managers.groupai:state():team_data(my_load_data.team_id)
+	managers.groupai:state():add_listener("CopMovement_team_def_" .. tostring(self._unit:key()), {"team_def"}, callback(self, self, "clbk_team_def"))
 	if my_load_data.actions then
 		for _, action_load_data in ipairs(my_load_data.actions) do
 			self:action_request(action_load_data)
@@ -1516,6 +1531,11 @@ function CopMovement:load(load_data)
 			self:_equip_item(unpack(item_desc))
 		end
 	end
+end
+
+function CopMovement:clbk_team_def()
+	self._team = managers.groupai:state():team_data(self._team.id)
+	managers.groupai:state():remove_listener("CopMovement_team_def_" .. tostring(self._unit:key()))
 end
 
 function CopMovement:tweak_data_clbk_reload()
@@ -1780,17 +1800,18 @@ function CopMovement:sync_action_act_end()
 	end
 end
 
-function CopMovement:sync_action_dodge_start(var, side, rot, speed)
+function CopMovement:sync_action_dodge_start(body_part, var, side, rot, speed, shoot_acc)
 	if self._ext_damage:dead() then
 		return
 	end
 	local action_data = {
 		type = "dodge",
-		body_part = 1,
+		body_part = body_part,
 		variation = CopActionDodge.get_variation_name(var),
 		direction = Rotation(rot):y(),
 		side = CopActionDodge.get_side_name(side),
-		speed = speed
+		speed = speed,
+		shoot_accuracy = shoot_acc
 	}
 	self:action_request(action_data)
 end
@@ -1922,4 +1943,27 @@ function CopMovement:clbk_sync_attention(attention)
 	elseif self._attention.unit and attention.unit:id() ~= -1 then
 		self._ext_network:send("set_attention", self._attention.unit, AIAttentionObject.REACT_IDLE)
 	end
+end
+
+function CopMovement:set_team(team_data)
+	self._team = team_data
+	self._ext_brain:on_team_set(team_data)
+	if Network:is_server() and self._unit:id() ~= -1 then
+		local team_index = tweak_data.levels:get_team_index(team_data.id)
+		if team_index <= 16 then
+			self._ext_network:send("sync_unit_event_id_16", "movement", team_index)
+		else
+			debug_pause_unit(self._unit, "[CopMovement:set_team] team limit reached!", team_data.id)
+		end
+	end
+end
+
+function CopMovement:sync_net_event(event_id, peer)
+	local team_id = tweak_data.levels:get_team_names_indexed()[event_id]
+	local team_data = managers.groupai:state():team_data(team_id)
+	self:set_team(team_data)
+end
+
+function CopMovement:team()
+	return self._team
 end

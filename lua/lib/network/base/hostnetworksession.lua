@@ -13,6 +13,7 @@ HostNetworkSession._STATES = {
 	closing = HostStateClosing
 }
 HostNetworkSession._DEAD_CONNECTION_REPORT_PROCESS_DELAY = 5
+HostNetworkSession._LOAD_COUNTER_LIMITS = {1, 1024}
 
 function HostNetworkSession:init()
 	HostNetworkSession.super.init(self)
@@ -22,6 +23,8 @@ function HostNetworkSession:init()
 		kicked_list = self._kicked_list
 	}
 	self._peer_outfit_loaded_status_request_id = math.random(1, 100)
+	self._load_counter = math.random(self._LOAD_COUNTER_LIMITS[1], self._LOAD_COUNTER_LIMITS[2])
+	print("[HostNetworkSession:init] self._load_counter", self._load_counter)
 end
 
 function HostNetworkSession:create_local_peer()
@@ -48,6 +51,7 @@ function HostNetworkSession:is_client()
 end
 
 function HostNetworkSession:load_level(...)
+	self:_inc_load_counter()
 	self._state:on_load_level(self._state_data)
 	managers.network.matchmake:set_server_state("loading")
 	for _, peer in pairs(self._peers) do
@@ -56,12 +60,13 @@ function HostNetworkSession:load_level(...)
 	end
 	self._local_peer:set_loaded(false)
 	self:set_state("closing")
-	self:send_to_peers("set_loading_state", true)
+	self:send_to_peers("set_loading_state", true, self._load_counter)
 	self:send_ok_to_load_level()
 	self:_load_level(...)
 end
 
 function HostNetworkSession:load_lobby(...)
+	self:_inc_load_counter()
 	managers.network.matchmake:set_server_state("loading")
 	for _, peer in pairs(self._peers) do
 		peer:set_synched(false)
@@ -70,7 +75,7 @@ function HostNetworkSession:load_lobby(...)
 	end
 	self._local_peer:set_loaded(false)
 	self:set_state("closing")
-	self:send_to_peers("set_loading_state", true)
+	self:send_to_peers("set_loading_state", true, self._load_counter)
 	self:send_ok_to_load_lobby()
 	self:_load_lobby(...)
 end
@@ -109,8 +114,8 @@ function HostNetworkSession:on_peer_connection_established(sender_peer, introduc
 		sender_peer:set_handshake_status(introduced_peer_id, "exchanging_info")
 		local introduced_peer = self._peers[introduced_peer_id]
 		if introduced_peer:handshakes()[sender_peer:id()] == "exchanging_info" then
-			sender_peer:send_after_load("peer_exchange_info", introduced_peer_id)
-			introduced_peer:send_after_load("peer_exchange_info", sender_peer:id())
+			sender_peer:send("peer_exchange_info", introduced_peer_id)
+			introduced_peer:send("peer_exchange_info", sender_peer:id())
 		end
 		return
 	elseif sender_peer:handshakes()[introduced_peer_id] == "exchanging_info" then
@@ -151,23 +156,13 @@ end
 
 function HostNetworkSession:send_ok_to_load_level()
 	for peer_id, peer in pairs(self._peers) do
-		if not peer:loaded() and not peer:loading() then
-			print("[HostNetworkSession:send_ok_to_load_level]", inspect(peer))
-			peer:send("ok_to_load_level")
-		else
-			self:remove_peer(peer, peer_id, "lost")
-		end
+		peer:send("ok_to_load_level", self._load_counter)
 	end
 end
 
 function HostNetworkSession:send_ok_to_load_lobby()
 	for peer_id, peer in pairs(self._peers) do
-		if not peer:loaded() and not peer:loading() then
-			print("[HostNetworkSession:send_ok_to_load_lobby]", inspect(peer))
-			peer:send("ok_to_load_lobby")
-		else
-			self:remove_peer(peer, peer_id, "lost")
-		end
+		peer:send("ok_to_load_lobby", self._load_counter)
 	end
 end
 
@@ -229,9 +224,21 @@ function HostNetworkSession:update()
 	self:process_dead_con_reports()
 end
 
-function HostNetworkSession:set_peer_loading_state(peer, state)
-	print("[HostNetworkSession:set_peer_loading_state]", peer:id(), state)
+function HostNetworkSession:set_peer_loading_state(peer, state, load_counter)
+	print("[HostNetworkSession:set_peer_loading_state]", peer:id(), state, load_counter)
+	if load_counter ~= self._load_counter then
+		Application:error("wrong load counter", self._load_counter)
+		if not state then
+			if Global.load_start_menu_lobby then
+				self:send_ok_to_load_lobby()
+			else
+				self:send_ok_to_load_level()
+			end
+		end
+		return
+	end
 	HostNetworkSession.super.set_peer_loading_state(self, peer, state)
+	peer:set_loading(state)
 	if Global.load_start_menu_lobby then
 		return
 	end
@@ -242,6 +249,9 @@ function HostNetworkSession:set_peer_loading_state(peer, state)
 			end
 		end
 		peer:send_after_load("set_member_ready", self._local_peer:id(), self._local_peer:waiting_for_player_ready() and 1 or 0, 1, "")
+		if self._local_peer:is_outfit_loaded() then
+			peer:send_after_load("set_member_ready", self._local_peer:id(), 100, 2, "")
+		end
 		self:chk_request_peer_outfit_load_status()
 		if self._local_peer:loaded() and NetworkManager.DROPIN_ENABLED then
 			if self._state.on_peer_finished_loading then
@@ -417,7 +427,7 @@ function HostNetworkSession:remove_peer(peer, peer_id, reason)
 	end
 	for other_peer_id, other_peer in pairs(self._peers) do
 		if other_peer:handshakes()[peer_id] == true or other_peer:handshakes()[peer_id] == "asked" or other_peer:handshakes()[peer_id] == "exchanging_info" then
-			other_peer:send_after_load(info_msg_type, peer_id, info_msg_id)
+			other_peer:send(info_msg_type, peer_id, info_msg_id)
 			other_peer:set_handshake_status(peer_id, "removing")
 		end
 	end
@@ -654,7 +664,7 @@ end
 
 function HostNetworkSession:on_re_open_lobby_request(peer, state)
 	if state then
-		peer:send_after_load("re_open_lobby_reply", true)
+		peer:send("re_open_lobby_reply", true)
 	end
 	peer:set_force_open_lobby_state(state)
 	self:chk_server_joinable_state()
@@ -734,4 +744,16 @@ function HostNetworkSession:on_peer_outfit_loaded(peer)
 		self:chk_drop_in_peer(_peer)
 		self:chk_spawn_member_unit(_peer, _peer_id)
 	end
+end
+
+function HostNetworkSession:_inc_load_counter()
+	if self._load_counter == self._LOAD_COUNTER_LIMITS[2] then
+		self._load_counter = self._LOAD_COUNTER_LIMITS[1]
+	else
+		self._load_counter = self._load_counter + 1
+	end
+end
+
+function HostNetworkSession:load_counter()
+	return self._load_counter
 end

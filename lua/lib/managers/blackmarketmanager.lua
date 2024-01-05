@@ -2462,6 +2462,14 @@ function BlackMarketManager:set_preferred_character(character)
 	end
 end
 
+function BlackMarketManager:get_character_id_by_character_name(character_name)
+	local new_name = CriminalsManager.convert_old_to_new_character_workname(character_name)
+	if tweak_data.blackmarket.characters.locked[new_name] then
+		return "locked"
+	end
+	return character_name
+end
+
 function BlackMarketManager:get_preferred_character()
 	return self._global._preferred_character
 end
@@ -3336,7 +3344,8 @@ function BlackMarketManager:load(data)
 			self._global.weapons[weapon].skill_based = got_parent or not is_default and weapon_level == 0 and not tweak_data.weapon[weapon].global_value
 		end
 		self._global._preferred_character = self._global._preferred_character or self._defaults.preferred_character
-		if not CriminalsManager.convert_old_to_new_character_workname(self._global._preferred_character) then
+		local character_name = CriminalsManager.convert_old_to_new_character_workname(self._global._preferred_character)
+		if not tweak_data.blackmarket.characters.locked[character_name] and not tweak_data.blackmarket.characters[character_name] then
 			self._global._preferred_character = self._defaults.preferred_character
 		end
 		for character, _ in pairs(tweak_data.blackmarket.characters) do

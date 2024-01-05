@@ -105,6 +105,8 @@ function BlackMarketGuiTabItem:init(main_panel, data, node, size_data, hide_sele
 	self.my_slots_dimensions = slots
 	square_w = square_w * 3 / slots[1]
 	square_h = square_h * 3 / slots[2]
+	self._square_w = square_w
+	self._square_h = square_h
 	self._tab_panel = scroll_tab_table.panel:panel({name = "tab_panel"})
 	self._tab_text_string = utf8.to_upper(data.name_localized or managers.localization:text(data.name))
 	local text = self._tab_panel:text({
@@ -432,7 +434,7 @@ function BlackMarketGuiTabItem:check_grab_scroll_bar(x, y)
 		self._current_scroll_bar_y = y
 		return true
 	end
-	local height = self._size_data.square_h + self._size_data.padding_h
+	local height = self._square_h + self._size_data.padding_h
 	if self._scroll_bar_panel:child("scroll_up_indicator_arrow"):visible() and self._scroll_bar_panel:child("scroll_up_indicator_arrow"):inside(x, y) then
 		self._my_node_data.scroll_y_index = math.max(self._my_node_data.scroll_y_index - 1, 1)
 		self._pressing_arrow_up = true
@@ -480,7 +482,7 @@ function BlackMarketGuiTabItem:scroll_with_bar(target_y, current_y)
 	local grid_panel = self._grid_panel
 	local grid_scroll_panel = self._grid_scroll_panel
 	local mul = grid_scroll_panel:h() / grid_panel:h()
-	local height = self._size_data.square_h + self._size_data.padding_h
+	local height = self._square_h + self._size_data.padding_h
 	local diff = current_y - target_y
 	if diff == 0 then
 		return current_y
@@ -565,7 +567,7 @@ function BlackMarketGuiTabItem:set_scroll_y(slot)
 	local y_index = slot and math.ceil(slot / max_view_x)
 	local top = self._my_node_data.scroll_y_index or 1
 	local bottom = top + max_view_y - 1
-	local height = self._size_data.square_h + self._size_data.padding_h
+	local height = self._square_h + self._size_data.padding_h
 	local new_y_index = self._my_node_data.scroll_y_index
 	if y_index and y_index < top then
 		new_y_index = y_index
@@ -662,6 +664,10 @@ function BlackMarketGuiSlotItem:init(main_panel, data, x, y, w, h)
 		})
 		text:grow(-10, -10)
 		text:move(5, 5)
+		if data.lock_texture then
+			text:move(0, text:h() / 2 - text:font_size() / 2)
+			text:set_vertical("top")
+		end
 		self._text_in_mid = true
 	end
 	local animate_loading_texture = function(o)
@@ -3979,9 +3985,6 @@ function BlackMarketGui:show_stats()
 				self._mweapon_stats_texts[stat.name].total:set_color(tweak_data.screen_colors.text)
 				self._mweapon_stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.text)
 				for _, color_range in ipairs(color_ranges) do
-					if stat.name == "damage" then
-						print(inspect(color_range))
-					end
 					self._mweapon_stats_texts[stat.name].total:set_range_color(color_range.start, color_range.stop, color_range.color)
 				end
 			end
@@ -4364,12 +4367,30 @@ function BlackMarketGui:update_info_text()
 			else
 				updated_texts[2].resource_color = resource_colors
 			end
+			local achievement_tracker = tweak_data.achievement.mask_tracker
+			local mask_id = slot_data.name
 			if slot_data.dlc_locked then
 				updated_texts[3].text = managers.localization:to_upper_text(slot_data.dlc_locked)
 			elseif slot_data.infamy_lock then
 				updated_texts[3].text = managers.localization:to_upper_text("menu_infamy_lock_info")
+			elseif mask_id and achievement_tracker[mask_id] then
+				local achievement_data = achievement_tracker[mask_id]
+				local max_progress = achievement_data.max_progress
+				local text_id = achievement_data.text_id
+				local award = achievement_data.award
+				local stat = achievement_data.stat
+				if stat and 0 < max_progress then
+					local progress_left = max_progress - (managers.achievment:get_stat(stat) or 0)
+					if 0 < progress_left then
+						local progress = tostring(progress_left)
+						updated_texts[3].text = "##" .. managers.localization:text(achievement_data.text_id, {progress = progress}) .. "##"
+						updated_texts[3].resource_color = tweak_data.screen_colors.button_stage_2
+					end
+				elseif award and not managers.achievment:get_info(award).awarded then
+					updated_texts[3].text = "##" .. managers.localization:text(achievement_data.text_id) .. "##"
+					updated_texts[3].resource_color = tweak_data.screen_colors.button_stage_2
+				end
 			end
-			local mask_id = slot_data.name
 			if mask_id then
 				local desc_id = tweak_data.blackmarket.masks[mask_id].desc_id
 				updated_texts[4].text = desc_id and managers.localization:text(desc_id) or Application:production_build() and "Add ##desc_id## to ##" .. mask_id .. "## in tweak_data.blackmarket.masks" or ""
@@ -4589,7 +4610,11 @@ function BlackMarketGui:update_info_text()
 			elseif #missed_mods == 1 then
 				list_of_mods = missed_mods[1]
 			end
-			updated_texts[3].text = managers.localization:to_upper_text("bm_menu_missing_to_finalize_mask", {missed_mods = list_of_mods}) .. "\n"
+			if slot_data.dlc_locked then
+				updated_texts[3].text = updated_texts[3].text .. "\n" .. managers.localization:to_upper_text("bm_menu_missing_to_finalize_mask", {missed_mods = list_of_mods}) .. "\n"
+			else
+				updated_texts[3].text = managers.localization:to_upper_text("bm_menu_missing_to_finalize_mask", {missed_mods = list_of_mods}) .. "\n"
+			end
 		end
 	elseif identifier == self.identifiers.deployable then
 		updated_texts[1].text = slot_data.name_localized
@@ -4761,7 +4786,7 @@ function BlackMarketGui:set_info_text(id, new_string, resource_color)
 	if resource_color then
 		info_text:clear_range_color(1, utf8.len(text))
 		if #start_ci ~= #end_ci then
-			Application:error("BlackMarketGui: Not even amount of ##'s in :set_info_text() string!", id, #start_ci, #end_ci)
+			Application:error("BlackMarketGui: Missing ##'s in :set_info_text() string!", id, new_string, #start_ci, #end_ci)
 		else
 			for i = 1, #start_ci do
 				info_text:set_range_color(start_ci[i], end_ci[i], type(resource_color) == "table" and resource_color[i] or resource_color)
@@ -4862,9 +4887,11 @@ function BlackMarketGui:mouse_moved(o, x, y)
 	end
 	if update_select then
 		for i, btn in pairs(self._btns) do
-			if btn:visible() and btn:inside(x, y) then
+			if not self._button_highlighted and btn:visible() and btn:inside(x, y) then
 				self._button_highlighted = i
-				self._btns[self._button_highlighted]:set_highlight(true)
+				btn:set_highlight(true)
+			else
+				btn:set_highlight(false)
 			end
 		end
 	end
@@ -5200,19 +5227,19 @@ function BlackMarketGui:on_slot_selected(selected_slot)
 		self._selected_slot = selected_slot
 		self._slot_data = self._selected_slot._data
 		self:show_btns(self._selected_slot)
-	end
-	local visibility_visible = false
-	if self._selected_slot then
-		if self._selected_slot._equipped_rect then
-			self._selected_slot._equipped_rect:set_alpha(0.6)
+		local visibility_visible = false
+		if self._selected_slot then
+			if self._selected_slot._equipped_rect then
+				self._selected_slot._equipped_rect:set_alpha(0.6)
+			end
+			local slot_category = self._selected_slot._data.category
+			visibility_visible = (slot_category == "primaries" or slot_category == "secondaries" or slot_category == "armors" or slot_category == "melee_weapons") and not self._data.buying_weapon
 		end
-		local slot_category = self._selected_slot._data.category
-		visibility_visible = (slot_category == "primaries" or slot_category == "secondaries" or slot_category == "armors" or slot_category == "melee_weapons") and not self._data.buying_weapon
+		self._detection_panel:set_visible(visibility_visible)
+		self:_update_borders()
+		self:show_stats()
+		self:update_info_text()
 	end
-	self._detection_panel:set_visible(visibility_visible)
-	self:_update_borders()
-	self:show_stats()
-	self:update_info_text()
 end
 
 function BlackMarketGui:move(mx, my)
@@ -5697,6 +5724,12 @@ function BlackMarketGui:populate_characters(data)
 	local guis_catalog = "guis/"
 	for i = 1, CriminalsManager.get_num_characters() do
 		local character = CriminalsManager.character_names()[i]
+		guis_catalog = "guis/"
+		local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character]
+		local bundle_folder = character_table and character_table.texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
 		new_data = {}
 		new_data.name = character
 		new_data.name_localized = managers.localization:text("menu_" .. new_data.name)
@@ -5754,13 +5787,6 @@ function BlackMarketGui:populate_melee_weapons(data)
 		end
 		x_gv = x_td.global_value or x_td.dlc or "normal"
 		y_gv = y_td.global_value or y_td.dlc or "normal"
-		if l_tweak_data[x_gv].category and l_tweak_data[y_gv].category and l_tweak_data[x_gv].category ~= l_tweak_data[y_gv].category then
-			x_sn = tweak_data.lootdrop.global_value_category[l_tweak_data[x_gv].category]
-			y_sn = tweak_data.lootdrop.global_value_category[l_tweak_data[y_gv].category]
-			x_sn = x_sn and x_sn.sort_number or 1
-			y_sn = y_sn and y_sn.sort_number or 1
-			return x_sn < y_sn
-		end
 		x_sn = l_tweak_data[x_gv]
 		y_sn = l_tweak_data[y_gv]
 		x_sn = x_sn and x_sn.sort_number or 1
@@ -5887,7 +5913,7 @@ function BlackMarketGui:populate_deployables(data)
 	table.sort(sort_data, function(x, y)
 		return x[1] < y[1]
 	end)
-	local max_items = (data.override_slots[1] or 3) * (data.override_slots[2] or 3)
+	local max_items = math.ceil(#sort_data / (data.override_slots[1] or 3)) * (data.override_slots[1] or 3)
 	for i = 1, max_items do
 		data[i] = nil
 	end

@@ -100,6 +100,9 @@ function CoreMissionElement:_add_default_saves()
 	if self.USES_INSTIGATOR_RULES then
 		self._hed.rules_elements = nil
 	end
+	if self.INSTANCE_VAR_NAMES then
+		self._hed.instance_var_names = nil
+	end
 	table.insert(self._save_values, "unit:position")
 	table.insert(self._save_values, "unit:rotation")
 	table.insert(self._save_values, "enabled")
@@ -111,54 +114,14 @@ function CoreMissionElement:_add_default_saves()
 	table.insert(self._save_values, "use_orientation_sequenced")
 	table.insert(self._save_values, "disable_orientation_on_use")
 	table.insert(self._save_values, "rules_elements")
+	table.insert(self._save_values, "instance_var_names")
 end
 
 function CoreMissionElement:build_default_gui(panel, sizer)
-	local enabled = EWS:CheckBox(panel, "Enabled", "")
-	enabled:set_value(self._hed.enabled)
-	enabled:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = enabled, value = "enabled"})
-	sizer:add(enabled, 0, 0, "EXPAND")
-	local execute_on_startup = EWS:CheckBox(panel, "Execute on startup", "")
-	execute_on_startup:set_value(self._hed.execute_on_startup)
-	execute_on_startup:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = execute_on_startup,
-		value = "execute_on_startup"
-	})
-	sizer:add(execute_on_startup, 0, 0, "EXPAND")
-	local trigger_times_params = {
-		name = "Trigger times:",
-		panel = panel,
-		sizer = sizer,
-		value = self._hed.trigger_times,
-		floats = 0,
-		tooltip = "Specifies how many time this element can be executed (0 mean unlimited times)",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local trigger_times = CoreEWS.number_controller(trigger_times_params)
-	trigger_times:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = trigger_times,
-		value = "trigger_times"
-	})
-	trigger_times:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = trigger_times,
-		value = "trigger_times"
-	})
-	local base_delay_params = {
-		name = "Base Delay:",
-		panel = panel,
-		sizer = sizer,
-		value = self._hed.base_delay,
-		floats = 2,
-		tooltip = "Specifies a base delay that is added to each on executed delay",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local base_delay = CoreEWS.number_controller(base_delay_params)
-	base_delay:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = base_delay, value = "base_delay"})
-	base_delay:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = base_delay, value = "base_delay"})
+	self:_build_value_checkbox(panel, sizer, "enabled")
+	self:_build_value_checkbox(panel, sizer, "execute_on_startup")
+	self:_build_value_number(panel, sizer, "trigger_times", {floats = 0, min = 0}, "Specifies how many time this element can be executed (0 mean unlimited times)")
+	self:_build_value_number(panel, sizer, "base_delay", {floats = 2, min = 0}, "Specifies a base delay that is added to each on executed delay")
 	local on_executed_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "On Executed")
 	local element_sizer = EWS:BoxSizer("HORIZONTAL")
 	on_executed_sizer:add(element_sizer, 0, 1, "EXPAND,LEFT")
@@ -222,6 +185,9 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 	sizer:add(on_executed_sizer, 0, 0, "EXPAND")
 	if self.USES_POINT_ORIENTATION then
 		sizer:add(self:_build_point_orientation(panel), 0, 0, "EXPAND")
+	end
+	if self.INSTANCE_VAR_NAMES then
+		sizer:add(self:_build_instance_var_names(panel), 0, 0, "EXPAND")
 	end
 	sizer:add(EWS:StaticLine(panel, "", "LI_HORIZONTAL"), 0, 5, "EXPAND,TOP,BOTTOM")
 	self:append_elements_sorted()
@@ -293,6 +259,46 @@ function CoreMissionElement:_remove_unit_from_orientation_elements()
 	for _, unit in ipairs(dialog:selected_units()) do
 		self:_remove_orientation_unit_id(unit:unit_data().unit_id)
 	end
+end
+
+function CoreMissionElement:_build_instance_var_names(panel)
+	local sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "Instance variables")
+	local options = {}
+	local func_instance_params_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
+		"func_instance_params"
+	})
+	for _, unit in ipairs(func_instance_params_units) do
+		for _, param in ipairs(unit:mission_element_data().params) do
+			options[param.type] = options[param.type] or {}
+			table.insert(options[param.type], param.var_name)
+		end
+	end
+	for _, data in ipairs(self.INSTANCE_VAR_NAMES) do
+		local params = {
+			name = string.pretty(data.value, true) .. ":",
+			panel = panel,
+			sizer = sizer,
+			options = options[data.type] or {},
+			value = self._hed.instance_var_names and self._hed.instance_var_names[data.value] or "not_used",
+			default = "not_used",
+			tooltip = "Select a value",
+			name_proportions = 1,
+			ctrlr_proportions = 2,
+			sizer_proportions = 1,
+			sorted = true
+		}
+		local ctrlr = CoreEws.combobox(params)
+		ctrlr:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_set_instance_var_name"), {ctrlr = ctrlr, data = data})
+	end
+	return sizer
+end
+
+function CoreMissionElement:_set_instance_var_name(params)
+	local value = params.ctrlr:get_value()
+	value = value ~= "not_used" and value or nil
+	self._hed.instance_var_names = self._hed.instance_var_names or {}
+	self._hed.instance_var_names[params.data.value] = value
+	self._hed.instance_var_names = next(self._hed.instance_var_names) and self._hed.instance_var_names or nil
 end
 
 function CoreMissionElement:_create_panel()
@@ -698,7 +704,7 @@ function CoreMissionElement:draw_link_on_executed(t, dt, selected_unit)
 			local offset = math.min(50, vec_len)
 			mvector3.multiply(dir, offset)
 			if self._distance_to_camera < 1000000 then
-				local text = string.format("%.2f", self:_get_on_executed(unit:unit_data().unit_id).delay)
+				local text = string.format("%.2f", self._hed.base_delay + self:_get_on_executed(unit:unit_data().unit_id).delay)
 				local alternative = self:_get_on_executed(unit:unit_data().unit_id).alternative
 				if alternative then
 					text = text .. " - " .. alternative .. ""
@@ -903,4 +909,71 @@ function CoreMissionElement:on_timeline()
 	else
 		self._timeline:set_visible(true)
 	end
+end
+
+function CoreMissionElement:_build_value_combobox(panel, sizer, value_name, options, tooltip)
+	local horizontal_sizer = EWS:BoxSizer("HORIZONTAL")
+	sizer:add(horizontal_sizer, 0, 1, "EXPAND,LEFT")
+	local combobox_params = {
+		name = string.pretty(value_name, true) .. ":",
+		panel = panel,
+		sizer = horizontal_sizer,
+		options = options,
+		value = self._hed[value_name],
+		tooltip = tooltip or "Select an option from the combobox",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sizer_proportions = 1,
+		sorted = false
+	}
+	local ctrlr = CoreEws.combobox(combobox_params)
+	ctrlr:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = value_name})
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("SELECT_NAME_LIST", "Select from list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("SELECT_NAME_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_value_combobox_toolbar_select_dialog"), {combobox_params = combobox_params, value_name = value_name})
+	toolbar:realize()
+	horizontal_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	return ctrlr, combobox_params
+end
+
+function CoreMissionElement:_on_gui_value_combobox_toolbar_select_dialog(params)
+	local dialog = SelectNameModal:new("Select name", params.combobox_params.options)
+	if dialog:cancelled() then
+		return
+	end
+	for _, name in ipairs(dialog:_selected_item_assets()) do
+		CoreEws.change_combobox_value(params.combobox_params, name)
+		self:set_element_data({
+			ctrlr = params.combobox_params.ctrlr,
+			value = params.value_name
+		})
+	end
+end
+
+function CoreMissionElement:_build_value_number(panel, sizer, value_name, options, tooltip)
+	local number_params = {
+		name = string.pretty(value_name, true) .. ":",
+		panel = panel,
+		sizer = sizer,
+		value = self._hed[value_name],
+		floats = options.floats,
+		tooltip = tooltip or "Set a number value",
+		min = options.min,
+		max = options.max,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local ctrlr = CoreEWS.number_controller(number_params)
+	ctrlr:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = value_name})
+	ctrlr:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = value_name})
+	return ctrlr, number_params
+end
+
+function CoreMissionElement:_build_value_checkbox(panel, sizer, value_name, tooltip)
+	local checkbox = EWS:CheckBox(panel, string.pretty(value_name, true), "")
+	checkbox:set_value(self._hed[value_name])
+	checkbox:set_tool_tip(tooltip or "Click to toggle")
+	checkbox:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = checkbox, value = value_name})
+	sizer:add(checkbox, 0, 0, "EXPAND")
+	return checkbox
 end

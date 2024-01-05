@@ -137,8 +137,9 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 		unit:base():set_suspicion_multiplier("equipment", 1 / con_mul)
 		unit:base():set_detection_multiplier("equipment", 1 / con_mul)
 	end
-	self:set_unit(unit, character_name)
-	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, self._peer:outfit_version(), peer_id)
+	local team_id = tweak_data.levels:get_default_team_ID("player")
+	self:set_unit(unit, character_name, team_id)
+	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, self._peer:outfit_version(), peer_id, team_id)
 	if self == Global.local_member then
 		unit:character_damage():send_set_status()
 	end
@@ -154,7 +155,7 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	return unit
 end
 
-function NetworkMember:set_unit(unit, character_name)
+function NetworkMember:set_unit(unit, character_name, team_id)
 	local is_new_unit = unit and (not self._unit or self._unit:key() ~= unit:key())
 	self._unit = unit
 	if is_new_unit and self == Global.local_member then
@@ -174,6 +175,7 @@ function NetworkMember:set_unit(unit, character_name)
 		end
 	end
 	if is_new_unit then
+		unit:movement():set_team(managers.groupai:state():team_data(tweak_data.levels:get_default_team_ID("player")))
 		if unit:damage() then
 			local sequence = managers.blackmarket:character_sequence_by_character_id(self._peer:character_id(), self._peer:id())
 			unit:damage():run_sequence_simple(sequence)
@@ -215,8 +217,8 @@ function NetworkMember:sync_data(peer)
 	print("[NetworkMember:sync_data] to", peer:id())
 	local level = managers.experience:current_level()
 	local rank = managers.experience:current_rank()
-	peer:send_after_load("sync_profile", level, rank)
-	peer:send_after_load("sync_outfit", managers.blackmarket:outfit_string(), managers.network:session():local_peer():outfit_version())
+	peer:send_queued_sync("sync_profile", level, rank)
+	peer:send_queued_sync("sync_outfit", managers.blackmarket:outfit_string(), managers.network:session():local_peer():outfit_version())
 	managers.player:update_deployable_equipment_to_peer(peer)
 	managers.player:update_cable_ties_to_peer(peer)
 	managers.player:update_grenades_to_peer(peer)

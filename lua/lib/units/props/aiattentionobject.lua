@@ -1,16 +1,17 @@
 AIAttentionObject = AIAttentionObject or class()
 AIAttentionObject.REACT_IDLE = 1
 AIAttentionObject.REACT_CURIOUS = 2
-AIAttentionObject.REACT_SUSPICIOUS = 3
-AIAttentionObject.REACT_SURPRISED = 4
-AIAttentionObject.REACT_SCARED = 5
-AIAttentionObject.REACT_AIM = 6
-AIAttentionObject.REACT_ARREST = 7
-AIAttentionObject.REACT_DISARM = 8
-AIAttentionObject.REACT_SHOOT = 9
-AIAttentionObject.REACT_MELEE = 10
-AIAttentionObject.REACT_COMBAT = 11
-AIAttentionObject.REACT_SPECIAL_ATTACK = 12
+AIAttentionObject.REACT_CHECK = 3
+AIAttentionObject.REACT_SUSPICIOUS = 4
+AIAttentionObject.REACT_SURPRISED = 5
+AIAttentionObject.REACT_SCARED = 6
+AIAttentionObject.REACT_AIM = 7
+AIAttentionObject.REACT_ARREST = 8
+AIAttentionObject.REACT_DISARM = 9
+AIAttentionObject.REACT_SHOOT = 10
+AIAttentionObject.REACT_MELEE = 11
+AIAttentionObject.REACT_COMBAT = 12
+AIAttentionObject.REACT_SPECIAL_ATTACK = 13
 AIAttentionObject.REACT_MIN = AIAttentionObject.REACT_IDLE
 AIAttentionObject.REACT_MAX = AIAttentionObject.REACT_SPECIAL_ATTACK
 
@@ -74,13 +75,7 @@ function AIAttentionObject:add_attention(settings)
 		self._attention_data = {}
 		needs_register = true
 	end
-	if self._overrides and self._overrides[settings.id] then
-		self._override_restore = self._override_restore or {}
-		self._override_restore[settings.id] = settings
-		self._attention_data[settings.id] = self._overrides[settings.id]
-	else
-		self._attention_data[settings.id] = settings
-	end
+	self._attention_data[settings.id] = settings
 	if needs_register then
 		self:_register()
 	end
@@ -90,12 +85,6 @@ end
 function AIAttentionObject:remove_attention(id)
 	if not self._attention_data then
 		return
-	end
-	if self._override_restore and self._override_restore[id] then
-		self._override_restore[id] = nil
-		if not next(self._override_restore) then
-			self._override_restore = nil
-		end
 	end
 	if self._attention_data[id] then
 		self._attention_data[id] = nil
@@ -108,21 +97,10 @@ function AIAttentionObject:remove_attention(id)
 end
 
 function AIAttentionObject:set_attention(settings, id)
-	if self._override_restore then
-		for att_id, att_setting in pairs(self._attention_data) do
-			if att_id ~= id and self._override_restore[att_id] then
-				self._override_restore[att_id] = nil
-			end
-		end
-		if not next(self._override_restore) then
-			self._override_restore = nil
-		end
-	end
 	if self._attention_data then
 		if settings then
-			local override_setting = self._overrides and self._overrides[id or settings.id]
 			self._attention_data = {
-				[id or settings.id] = override_setting or settings
+				[id or settings.id] = settings
 			}
 		else
 			self._attention_data = nil
@@ -141,38 +119,22 @@ end
 
 function AIAttentionObject:override_attention(original_preset_name, override_preset)
 	if override_preset then
-		local original_preset = (not self._override_restore or not self._override_restore[original_preset_name]) and self._attention_data and self._attention_data[original_preset_name]
-		if original_preset then
-			self._override_restore = self._override_restore or {}
-			self._override_restore[original_preset_name] = original_preset
-		end
 		self._overrides = self._overrides or {}
+		local call_listeners = self._attention_data and self._attention_data[original_preset_name] or self._overrides[original_preset_name]
 		self._overrides[original_preset_name] = override_preset
-		if self._attention_data and self._attention_data[original_preset_name] then
-			self._attention_data[original_preset_name] = override_preset
+		if call_listeners then
 			self:_call_listeners()
 		end
-	elseif self._overrides then
-		local original_preset = self._override_restore and self._override_restore[original_preset_name]
-		if original_preset then
-			self._override_restore[original_preset_name] = nil
-			if not next(self._override_restore) then
-				self._override_restore = nil
-			end
-		end
+	elseif self._overrides and self._overrides[original_preset_name] then
 		self._overrides[original_preset_name] = nil
 		if not next(self._overrides) then
 			self._overrides = nil
 		end
-		if original_preset then
-			self:add_attention(original_preset)
-		else
-			self:remove_attention(original_preset_name)
-		end
+		self:_call_listeners()
 	end
 end
 
-function AIAttentionObject:get_attention(filter, min, max)
+function AIAttentionObject:get_attention(filter, min, max, team)
 	if not self._attention_data then
 		return
 	end
@@ -180,20 +142,35 @@ function AIAttentionObject:get_attention(filter, min, max)
 	max = max or AIAttentionObject.REACT_MAX
 	local nav_manager = managers.navigation
 	local access_f = nav_manager.check_access
-	local settings_match
-	for id, settings in pairs(self._attention_data) do
-		if min <= settings.reaction and max >= settings.reaction and (not settings_match or settings.reaction > settings_match.reaction) and access_f(nav_manager, settings.filter, filter, 0) then
+	local settings_match, relation
+	if team and self._team then
+		relation = team.foes[self._team.id] and "foe" or "friend"
+	end
+	
+	local function _validity_f(id, settings)
+		if settings.reaction >= min and settings.reaction <= max and (not settings_match or settings.reaction > settings_match.reaction) and (not (relation and settings.relation) or relation == settings.relation) and access_f(nav_manager, settings.filter, filter, 0) then
 			settings_match = settings
+		end
+	end
+	
+	for id, settings in pairs(self._attention_data) do
+		if not self._overrides or not self._overrides[id] then
+			_validity_f(id, settings)
+		end
+	end
+	if self._overrides then
+		for id, settings in pairs(self._overrides) do
+			_validity_f(id, settings)
 		end
 	end
 	return settings_match
 end
 
-function AIAttentionObject:verify_attention(test_settings, min, max)
+function AIAttentionObject:verify_attention(test_settings, min, max, team)
 	if not self._attention_data then
 		return
 	end
-	local new_settings = self:get_attention(filter, min, max)
+	local new_settings = self:get_attention(filter, min, max, team)
 	return new_settings == test_settings
 end
 
@@ -259,6 +236,22 @@ function AIAttentionObject:link(parent_unit, obj_name, local_pos)
 		end
 		self:set_update_enabled(false)
 	end
+end
+
+function AIAttentionObject:set_team(team)
+	local call_listeners = self._team ~= team or team and team.id ~= self._team.id
+	self._team = team
+	if self._attention_data then
+		for id, setting in pairs(self._attention_data) do
+			setting.team = team
+		end
+	end
+	if self._overrides then
+		for id, setting in pairs(self._overrides) do
+			setting.team = team
+		end
+	end
+	self:_call_listeners()
 end
 
 function AIAttentionObject:save(data)

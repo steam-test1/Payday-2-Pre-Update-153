@@ -231,84 +231,16 @@ function MusicManager:_set_default_values()
 	end
 end
 
-function MusicManager:_jukebox_unlock_armored(tracks_locked)
-	if not managers.dlc then
-		tracks_locked.track_09 = "armored"
+function MusicManager:_jukebox_unlock_track(locked_list, track_id, unlock_id, unlock_reason)
+	if self:track_unlocked(track_id) then
 		return
 	end
-	if self:track_unlocked("track_09") then
+	if unlock_reason then
+		self:unlock_track(track_id)
+		self:playlist_add(track_id)
 		return
 	end
-	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
-		self:unlock_track("track_09")
-		self:playlist_add("track_09")
-		return
-	end
-	tracks_locked.track_09 = "armored"
-end
-
-function MusicManager:_jukebox_unlock_infamy(tracks_locked)
-	if not managers.experience then
-		tracks_locked.track_11 = "infamy"
-		return
-	end
-	if self:track_unlocked("track_11") then
-		return
-	end
-	if managers.experience:current_rank() > 0 then
-		self:unlock_track("track_11")
-		self:playlist_add("track_11")
-		return
-	end
-	tracks_locked.track_11 = "infamy"
-end
-
-function MusicManager:_jukebox_unlock_deathwish(tracks_locked)
-	if not managers.experience then
-		tracks_locked.track_12 = "deathwish"
-		return
-	end
-	if self:track_unlocked("track_12") then
-		return
-	end
-	if managers.experience:current_rank() > 0 or managers.experience:current_level() >= tweak_data.difficulty_level_locks[tweak_data:difficulty_to_index("overkill_290")] then
-		self:unlock_track("track_12")
-		self:playlist_add("track_12")
-		return
-	end
-	tracks_locked.track_12 = "deathwish"
-end
-
-function MusicManager:_jukebox_unlock_bigbank(tracks_locked)
-	if not managers.dlc then
-		tracks_locked.track_14 = "bigbank"
-		return
-	end
-	if self:track_unlocked("track_14") then
-		return
-	end
-	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then
-		self:unlock_track("track_14")
-		self:playlist_add("track_14")
-		return
-	end
-	tracks_locked.track_14 = "bigbank"
-end
-
-function MusicManager:_jukebox_unlock_assault(tracks_locked)
-	if not managers.dlc then
-		tracks_locked.track_17 = "assault"
-		return
-	end
-	if self:track_unlocked("track_17") then
-		return
-	end
-	if managers.dlc:has_gage_pack_assault() or managers.dlc:has_soundtrack_or_cce() then
-		self:unlock_track("track_17")
-		self:playlist_add("track_17")
-		return
-	end
-	tracks_locked.track_17 = "assault"
+	locked_list[track_id] = unlock_id
 end
 
 function MusicManager:jukebox_menu_track(name)
@@ -349,6 +281,8 @@ function MusicManager:jukebox_default_tracks()
 		heist_framing_frame2 = "track_08",
 		heist_framing_frame3 = "track_03",
 		heist_roberts = "track_10",
+		heist_mia1 = "all",
+		heist_mia2 = "all",
 		heist_jewelry_store = "track_01",
 		heist_mallcrasher = "track_03",
 		heist_nightclub = "track_05",
@@ -367,14 +301,18 @@ function MusicManager:jukebox_default_tracks()
 		escape = "track_16"
 	}
 	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
-		default_options.heist_big = "track_14"
-	end
-	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then
 		default_options.heist_arm_cro = "track_09"
 		default_options.heist_arm_hcm = "track_09"
 		default_options.heist_arm_fac = "track_09"
 		default_options.heist_arm_par = "track_09"
 		default_options.heist_arm_und = "track_09"
+	end
+	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_big = "track_14"
+	end
+	if managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_mia1 = "track_18"
+		default_options.heist_mia2 = "track_19"
 	end
 	return default_options
 end
@@ -398,6 +336,10 @@ function MusicManager:jukebox_music_tracks()
 		"track_15",
 		"track_16",
 		"track_17",
+		"track_18",
+		"track_19"
+	}
+	local pdth_tracks = {
 		"track_pth_01",
 		"track_pth_02",
 		"track_pth_03",
@@ -408,16 +350,18 @@ function MusicManager:jukebox_music_tracks()
 		"track_pth_08",
 		"track_pth_09"
 	}
+	tracks = table.list_add(tracks, pdth_tracks)
 	local tracks_locked = {}
-	self:_jukebox_unlock_armored(tracks_locked)
-	self:_jukebox_unlock_infamy(tracks_locked)
-	self:_jukebox_unlock_deathwish(tracks_locked)
-	self:_jukebox_unlock_bigbank(tracks_locked)
-	self:_jukebox_unlock_assault(tracks_locked)
-	if managers.dlc then
-		local pdth_soundtrack = not managers.dlc:has_pdth_soundtrack() and "payday"
-		for i = 1, 9 do
-			tracks_locked["track_pth_0" .. i] = pdth_soundtrack
+	self:_jukebox_unlock_track(tracks_locked, "track_09", "armored", not managers.dlc or managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce())
+	self:_jukebox_unlock_track(tracks_locked, "track_11", "infamy", managers.experience and managers.experience:current_rank() > 0)
+	self:_jukebox_unlock_track(tracks_locked, "track_12", "deathwish", managers.experience and (managers.experience:current_rank() > 0 or managers.experience:current_level() >= tweak_data.difficulty_level_locks[tweak_data:difficulty_to_index("overkill_290")]))
+	self:_jukebox_unlock_track(tracks_locked, "track_14", "bigbank", not managers.dlc or managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce())
+	self:_jukebox_unlock_track(tracks_locked, "track_17", "assault", not managers.dlc or managers.dlc:has_gage_pack_assault() or managers.dlc:has_soundtrack_or_cce())
+	self:_jukebox_unlock_track(tracks_locked, "track_18", "miami", not managers.dlc or managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce())
+	self:_jukebox_unlock_track(tracks_locked, "track_19", "miami", not managers.dlc or managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce())
+	if managers.dlc and not managers.dlc:has_pdth_soundtrack() then
+		for _, sound in ipairs(pdth_tracks) do
+			tracks_locked[sound] = "payday"
 		end
 	end
 	return tracks, tracks_locked

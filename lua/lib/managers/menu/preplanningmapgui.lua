@@ -23,6 +23,7 @@ local point_extras = {
 local mvec = Vector3()
 local mvec2 = Vector3()
 local mvec3 = Vector3()
+local mvec4 = Vector3()
 local mrot = Rotation()
 PrePlanningPoint = PrePlanningPoint or class()
 PrePlanningPoint.WIDTH = 48
@@ -1021,6 +1022,8 @@ function PrePlanningLocation:init(panel, index, size, active_node)
 	local map_x = self._location.map_x or 0
 	local map_y = self._location.map_y or 0
 	local map_size = self._location.map_size or 1
+	local map_width = self._location.map_width or map_size
+	local map_height = self._location.map_height or map_size
 	local x1 = self._location.x1 or 0
 	local x2 = self._location.x2 or 0
 	local y1 = self._location.y1 or 0
@@ -1034,8 +1037,8 @@ function PrePlanningLocation:init(panel, index, size, active_node)
 	self._rotation = location_rotation == 0 and 360 or location_rotation
 	self._map_panel = panel
 	self._panel = self._map_panel:panel({
-		w = size * map_size,
-		h = size * map_size,
+		w = size * map_width,
+		h = size * map_height,
 		name = location_group,
 		alpha = 0.9,
 		valign = "scale",
@@ -1044,7 +1047,7 @@ function PrePlanningLocation:init(panel, index, size, active_node)
 	self._panel:set_center(self._map_panel:w() / 2 + map_x * size * 1, self._map_panel:h() / 2 + map_y * size * 1)
 	self._map = self._panel:bitmap({
 		name = "map",
-		rotation = self._rotation,
+		rotation = 360,
 		texture = map_texture,
 		w = self._panel:w(),
 		h = self._panel:h(),
@@ -1053,6 +1056,22 @@ function PrePlanningLocation:init(panel, index, size, active_node)
 		render_template = map_render_template,
 		blend_mode = "add"
 	})
+	local texture_width, texture_height = self._map:texture_width(), self._map:texture_height()
+	local rot_cos = math.cos(-self._rotation)
+	local rot_sin = math.sin(-self._rotation)
+	local tl_x = 1 - (rot_cos * 0.5 - rot_sin * 0.5 + 0.5)
+	local tl_y = 1 - (rot_sin * 0.5 + rot_cos * 0.5 + 0.5)
+	local tr_x = 1 - (rot_cos * -0.5 - rot_sin * 0.5 + 0.5)
+	local tr_y = 1 - (rot_sin * -0.5 + rot_cos * 0.5 + 0.5)
+	local bl_x = 1 - (rot_cos * 0.5 - rot_sin * -0.5 + 0.5)
+	local bl_y = 1 - (rot_sin * 0.5 + rot_cos * -0.5 + 0.5)
+	local br_x = 1 - (rot_cos * -0.5 - rot_sin * -0.5 + 0.5)
+	local br_y = 1 - (rot_sin * -0.5 + rot_cos * -0.5 + 0.5)
+	mvector3.set_static(mvec, tl_x * texture_width, tl_y * texture_height, 0)
+	mvector3.set_static(mvec2, tr_x * texture_width, tr_y * texture_height, 0)
+	mvector3.set_static(mvec3, bl_x * texture_width, bl_y * texture_height, 0)
+	mvector3.set_static(mvec4, br_x * texture_width, br_y * texture_height, 0)
+	self._map:set_texture_coordinates(mvec, mvec2, mvec3, mvec4)
 	self._name = self._location.name_id and managers.localization:text(self._location.name_id) or "MISSING NAME_ID"
 	self._index = index
 	self._group = location_group
@@ -1573,13 +1592,24 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 	local center_y = self._map_panel:h() / 2
 	local x, y, w, h
 	local a = 2
+	local gw = 0
+	local gh = 0
+	local li = 0
 	for location_group, location in pairs(self._locations) do
 		x, y, w, h = location:map_shape()
+		li = li + 1
+		gw = gw + w
+		gh = gh + h
 		grid_width = math.max(grid_width, math.abs(x - center_x), math.abs(x + w - center_x))
 		grid_height = math.max(grid_height, math.abs(y - center_y), math.abs(y + h - center_y))
 	end
-	grid_width = grid_width * 2 + w * 1.5
-	grid_height = grid_height * 2 + h * 0.5
+	gw = 0 < li and gw / li or 0
+	gh = 0 < li and gh / li or 0
+	local location_data = managers.preplanning:current_location_data()
+	local gw_mul = location_data.grid_width_mul or 1.5
+	local gh_mul = location_data.grid_height_mul or 0.5
+	grid_width = grid_width * 2 + gw * gw_mul
+	grid_height = grid_height * 2 + gh * gh_mul
 	local tx, ty, tw, th
 	do
 		local M = grid_width
@@ -2055,10 +2085,10 @@ function PrePlanningMapGui:_update_breakdown()
 			1
 		}
 	})
+	breakdown_panel:set_alpha(0 < width and 1 or 0)
 end
 
 function PrePlanningMapGui:sync_draw_point(peer_id, x, y)
-	print("sync_draw_point", peer_id, x, y)
 	local line_index = self._peer_draw_line_index[peer_id]
 	if line_index and alive(self._grid_panel:child(tostring(peer_id))) then
 		local data = self._peer_draw_lines[peer_id][line_index]

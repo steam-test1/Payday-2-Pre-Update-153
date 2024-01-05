@@ -278,7 +278,7 @@ function SentryGunBrain:switch_off()
 end
 
 function SentryGunBrain:switch_on()
-	if self._active then
+	if self._active or self._unit:character_damage():dead() then
 		return
 	end
 	self._unit:damage():run_sequence_simple("laser_activate")

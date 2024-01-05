@@ -137,6 +137,12 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("player", "camouflage_bonus") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "camouflage_bonus", 1)
 		end
+		if managers.player:has_category_upgrade("player", "camouflage_multiplier") then
+			managers.network:session():send_to_host("sync_upgrade", "player", "camouflage_multiplier", 1)
+		end
+		if managers.player:has_category_upgrade("player", "uncover_multiplier") then
+			managers.network:session():send_to_host("sync_upgrade", "player", "uncover_multiplier", 1)
+		end
 		if managers.player:has_category_upgrade("sentry_gun", "spread_multiplier") then
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "spread_multiplier", 1)
 		end
@@ -275,12 +281,19 @@ function PlayerBase:controller()
 	return self._controller
 end
 
+local on_ladder_footstep_material = Idstring("steel")
+
 function PlayerBase:anim_data_clbk_footstep(foot)
 	local obj = self._unit:orientation_object()
 	local proj_dir = math.UP
 	local proj_from = obj:position()
 	local proj_to = proj_from - proj_dir * 30
-	local material_name, pos, norm = World:pick_decal_material(proj_from, proj_to, managers.slot:get_mask("surface_move"))
+	local material_name, pos, norm
+	if self._unit:movement():on_ladder() then
+		material_name = on_ladder_footstep_material
+	else
+		material_name, pos, norm = World:pick_decal_material(proj_from, proj_to, managers.slot:get_mask("surface_move"))
+	end
 	self._unit:sound():play_footstep(foot, material_name)
 end
 

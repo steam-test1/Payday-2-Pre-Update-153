@@ -213,34 +213,24 @@ function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_
 	mvector3.add(mvec_to, from_pos)
 	local damage = self._damage * (dmg_mul or 1)
 	local col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
-	if col_ray then
-		if col_ray.unit:in_slot(self._character_slotmask) then
-			hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
-		else
-			local hit, ray
-			if shoot_player and self._hit_player then
-				hit, ray = self:damage_player(col_ray, from_pos, direction)
-				if hit then
-					InstantBulletBase:on_hit_player(col_ray, self._unit, user_unit, self._damage * (dmg_mul or 1))
-				end
-			end
-			if not hit then
-				hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
-				if target_unit and target_unit:character_damage() and target_unit:character_damage().build_suppression then
-					target_unit:character_damage():build_suppression(tweak_data.weapon[self._name_id].suppression)
-				end
-			end
+	local player_hit, player_ray_data
+	if shoot_player and self._hit_player then
+		player_hit, player_ray_data = self:damage_player(col_ray, from_pos, direction)
+		if player_hit then
+			InstantBulletBase:on_hit_player(col_ray or player_ray_data, self._unit, user_unit, damage)
 		end
-	elseif shoot_player and self._hit_player then
-		local hit, ray_data = self:damage_player(col_ray, from_pos, direction)
-		if hit then
-			InstantBulletBase:on_hit_player(ray_data, self._unit, user_unit, damage)
-		end
+	end
+	local char_hit
+	if not player_hit and col_ray then
+		char_hit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
+	end
+	if (not col_ray or col_ray.unit ~= target_unit) and target_unit and target_unit:character_damage() and target_unit:character_damage().build_suppression then
+		target_unit:character_damage():build_suppression(tweak_data.weapon[self._name_id].suppression)
 	end
 	if not col_ray or col_ray.distance > 600 then
 		self:_spawn_trail_effect(direction, col_ray)
 	end
-	result.hit_enemy = hit_unit
+	result.hit_enemy = char_hit
 	if self._alert_events then
 		result.rays = {col_ray}
 	end

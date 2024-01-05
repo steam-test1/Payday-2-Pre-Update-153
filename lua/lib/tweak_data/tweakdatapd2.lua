@@ -281,6 +281,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.equipment_barcode = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			0,
+			96,
+			32,
+			32
+		}
+	}
 	self.hud_icons.ak = {
 		texture = "guis/textures/pd2/weapons",
 		texture_rect = {

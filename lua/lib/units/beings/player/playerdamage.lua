@@ -338,18 +338,14 @@ function PlayerDamage:damage_melee(attack_data)
 	self._unit:movement():push(attack_data.push_vel)
 end
 
-function PlayerDamage:_look_for_friendly_fire(unit)
-	local players = managers.player:players()
-	for _, player in ipairs(players) do
-		if player == unit then
-			return true
-		end
+function PlayerDamage:is_friendly_fire(unit)
+	if not unit then
+		return
 	end
-	local criminals = managers.groupai:state():all_criminals()
-	if unit and criminals[unit:key()] then
-		return true
+	if unit:movement():friendly_fire() then
+		return
 	end
-	return false
+	return unit:movement():team() == self._unit:movement():team()
 end
 
 function PlayerDamage:play_whizby(position)
@@ -405,7 +401,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		return
 	elseif self:incapacitated() then
 		return
-	elseif PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	elseif self:is_friendly_fire(attack_data.attacker_unit) then
 		return
 	elseif self:_chk_dmg_too_soon(attack_data.damage) then
 		return
@@ -966,7 +962,7 @@ function PlayerDamage:shoot_pos_mid(m_pos)
 end
 
 function PlayerDamage:set_regenerate_timer_to_max()
-	self._regenerate_timer = tweak_data.player.damage.REGENERATE_TIME * managers.player:upgrade_value("player", "armor_regen_timer_multiplier", 1) * managers.player:team_upgrade_value("armor", "regen_time_multiplier", 1) * managers.player:team_upgrade_value("armor", "passive_regen_time_multiplier", 1)
+	self._regenerate_timer = tweak_data.player.damage.REGENERATE_TIME * managers.player:upgrade_value("player", "armor_regen_timer_multiplier", 1) * managers.player:upgrade_value("player", "armor_regen_timer_multiplier_passive", 1) * managers.player:team_upgrade_value("armor", "regen_time_multiplier", 1) * managers.player:team_upgrade_value("armor", "passive_regen_time_multiplier", 1)
 	if alive(self._unit) and not self._unit:movement():current_state()._moving then
 		self._regenerate_timer = self._regenerate_timer * managers.player:upgrade_value("player", "armor_regen_timer_stand_still_multiplier", 1)
 	end
@@ -1138,7 +1134,7 @@ function PlayerDamage:_upd_health_regen(t, dt)
 		local max_health = self:_max_health()
 		if 0 < regen_rate and max_health > self:get_real_health() then
 			self:change_health(max_health * regen_rate)
-			self._health_regen_update_timer = 1
+			self._health_regen_update_timer = 5
 		end
 	end
 end

@@ -89,6 +89,9 @@ function CopDamage:damage_bullet(attack_data)
 	if self._dead or self._invulnerable then
 		return
 	end
+	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
+		return
+	end
 	if self._has_plate and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name then
 		local armor_pierce_roll = math.rand(1)
 		local armor_pierce_value = 0
@@ -457,6 +460,9 @@ function CopDamage:damage_melee(attack_data)
 	if self._dead or self._invulnerable then
 		return
 	end
+	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
+		return
+	end
 	local result
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local damage = attack_data.damage
@@ -529,7 +535,7 @@ function CopDamage:damage_melee(attack_data)
 				local melee_type = tweak_data.blackmarket.melee_weapons[attack_data.name_id].type
 				local enemy_type = self._unit:base()._tweak_table
 				local health_ratio = managers.player:player_unit():character_damage():health_ratio() * 100
-				local melee_pass, type_pass, enemy_pass, diff_pass, health_pass, level_pass, all_pass, cop_pass, gangster_pass, civilian_pass
+				local melee_pass, type_pass, enemy_pass, diff_pass, health_pass, level_pass, job_pass, all_pass, cop_pass, gangster_pass, civilian_pass
 				for achievement, achievement_data in pairs(achievements) do
 					melee_pass = not achievement_data.melee_id or achievement_data.melee_id == attack_data.name_id
 					type_pass = not achievement_data.melee_type or melee_type == achievement_data.melee_type
@@ -537,6 +543,7 @@ function CopDamage:damage_melee(attack_data)
 					diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 					health_pass = not achievement_data.health or health_ratio <= achievement_data.health
 					level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
+					job_pass = not achievement_data.job_id or managers.job:current_job_id() == achievement_data.job_id
 					cop_pass = not achievement_data.is_cop or is_cop
 					gangster_pass = not achievement_data.is_gangster or is_gangster
 					civilian_pass = not achievement_data.is_civlian or is_civlian
@@ -549,7 +556,7 @@ function CopDamage:damage_melee(attack_data)
 							end
 						end
 					end
-					all_pass = melee_pass and type_pass and enemy_pass and diff_pass and health_pass and level_pass and cop_pass and gangster_pass and civilian_pass
+					all_pass = melee_pass and type_pass and enemy_pass and diff_pass and health_pass and level_pass and job_pass and cop_pass and gangster_pass and civilian_pass
 					if all_pass then
 						if achievement_data.stat then
 							managers.achievment:award_progress(achievement_data.stat)

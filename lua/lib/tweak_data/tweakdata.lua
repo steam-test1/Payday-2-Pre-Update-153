@@ -27,8 +27,68 @@ require("lib/tweak_data/DLCTweakData")
 require("lib/tweak_data/InfamyTweakData")
 require("lib/tweak_data/GageAssignmentTweakData")
 require("lib/tweak_data/PrePlanningTweakData")
+require("lib/tweak_data/InteractionTweakData")
 TweakData = TweakData or class()
+
+function TweakData:_init_wip_hud_icons()
+end
+
+function TweakData:_init_wip_blackmarket(tweak_data)
+end
+
+function TweakData:_init_wip_character(tweak_data)
+end
+
+function TweakData:_init_wip_levels()
+end
+
+function TweakData:_init_wip_narrative()
+end
+
+function TweakData:_init_wip_assets(tweak_data)
+end
+
+function TweakData:_init_wip_dlc(tweak_data)
+end
+
+function TweakData:_init_wip_lootdrop(tweak_data)
+end
+
+function TweakData:_init_wip_gui(tweak_data)
+end
+
+function TweakData:_init_wip_preplanning(tweak_data)
+end
+
+function TweakData:_init_wip_money_manager(tweak_data)
+end
+
+function TweakData:_init_wip_weapon(tweak_data)
+end
+
+function TweakData:_init_wip_weapon_factory(tweak_data)
+end
+
+function TweakData:_init_wip_infamy(tweak_data)
+end
+
+function TweakData:_init_wip_interaction()
+end
+
+function TweakData:_init_wip_skilltree()
+end
+
+function TweakData:_init_wip_upgrades()
+end
+
+function TweakData:_init_wip_equipments()
+end
+
+function TweakData:_init_wip_criminals(tweak_data)
+end
+
 require("lib/tweak_data/TweakDataPD2")
+require("lib/tweak_data/TweakDataWip")
 TweakData.RELOAD = true
 
 function TweakData:digest_tweak_data()
@@ -285,34 +345,106 @@ function TweakData:init()
 	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
 	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
 	self.hud_icons = HudIconsTweakData:new()
-	self.weapon = WeaponTweakData:new()
+	self._init_wip_hud_icons(self.hud_icons)
+	self.weapon = WeaponTweakData:new(self)
+	self._init_wip_weapon(self.weapon, self)
 	self.weapon_upgrades = WeaponUpgradesTweakData:new()
 	self.equipments = EquipmentsTweakData:new()
+	self._init_wip_equipments(self.equipments)
 	self.player = PlayerTweakData:new()
 	self.character = CharacterTweakData:new(self)
+	self._init_wip_character(self.character, self)
 	self.statistics = StatisticsTweakData:new()
 	self.levels = LevelsTweakData:new()
+	self._init_wip_levels(self.levels)
 	self.narrative = NarrativeTweakData:new()
+	self._init_wip_narrative(self.narrative)
 	self.group_ai = GroupAITweakData:new(self)
 	self.drama = DramaTweakData:new()
 	self.upgrades = UpgradesTweakData:new()
+	self._init_wip_upgrades(self.upgrades)
 	self.skilltree = SkillTreeTweakData:new()
+	self._init_wip_skilltree(self.skilltree)
 	self.upgrades.visual = UpgradesVisualTweakData:new()
 	self.tips = TipsTweakData:new()
 	self.money_manager = MoneyTweakData:new(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.blackmarket = BlackMarketTweakData:new(self)
+	self._init_wip_blackmarket(self.blackmarket, self)
 	self.carry = CarryTweakData:new(self)
 	self.mission_door = MissionDoorTweakData:new()
 	self.attention = AttentionTweakData:new()
 	self.timespeed = TimeSpeedEffectTweakData:new()
 	self.sound = SoundTweakData:new()
 	self.lootdrop = LootDropTweakData:new(self)
+	self._init_wip_lootdrop(self.lootdrop, self)
 	self.gui = GuiTweakData:new()
+	self._init_wip_gui(self.gui)
 	self.assets = AssetsTweakData:new(self)
+	self._init_wip_assets(self.assets, self)
 	self.dlc = DLCTweakData:new(self)
+	self._init_wip_dlc(self.dlc, self)
 	self.infamy = InfamyTweakData:new(self)
+	self._init_wip_infamy(self.infamy, self)
 	self.gage_assignment = GageAssignmentTweakData:new(self)
 	self.preplanning = PrePlanningTweakData:new(self)
+	self._init_wip_preplanning(self.preplanning, self)
+	self.interaction = InteractionTweakData:new(self)
+	self._init_wip_interaction(self.interaction, self)
+	self.criminals = {}
+	self.criminals.character_names = {
+		"russian",
+		"german",
+		"spanish",
+		"american"
+	}
+	self.criminals.characters = {
+		{
+			name = "american",
+			static_data = {
+				ai_character_id = "ai_hoxton",
+				ssuffix = "d",
+				color_id = 1,
+				voice = "rb2",
+				ai_mask_id = "hoxton",
+				mask_id = 1
+			}
+		},
+		{
+			name = "german",
+			static_data = {
+				ai_character_id = "ai_wolf",
+				ssuffix = "c",
+				color_id = 2,
+				voice = "rb3",
+				ai_mask_id = "wolf",
+				mask_id = 2
+			}
+		},
+		{
+			name = "russian",
+			static_data = {
+				ai_character_id = "ai_dallas",
+				ssuffix = "a",
+				color_id = 3,
+				voice = "rb4",
+				ai_mask_id = "dallas",
+				mask_id = 3
+			}
+		},
+		{
+			name = "spanish",
+			static_data = {
+				ai_character_id = "ai_chains",
+				ssuffix = "b",
+				color_id = 4,
+				voice = "rb1",
+				ai_mask_id = "chains",
+				mask_id = 4
+			}
+		}
+	}
+	self._init_wip_criminals(self.criminals, self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -516,1919 +648,6 @@ function TweakData:init()
 	self.dialog.DURATION_PER_CHAR = 0.07
 	self.hud = {}
 	self:set_hud_values()
-	self.interaction = {}
-	self.interaction.CULLING_DISTANCE = 2000
-	self.interaction.INTERACT_DISTANCE = 200
-	self.interaction.copy_machine_smuggle = {}
-	self.interaction.copy_machine_smuggle.icon = "equipment_thermite"
-	self.interaction.copy_machine_smuggle.text_id = "debug_interact_copy_machine"
-	self.interaction.copy_machine_smuggle.interact_distance = 305
-	self.interaction.safety_deposit = {}
-	self.interaction.safety_deposit.icon = "develop"
-	self.interaction.safety_deposit.text_id = "debug_interact_safety_deposit"
-	self.interaction.paper_pickup = {}
-	self.interaction.paper_pickup.icon = "develop"
-	self.interaction.paper_pickup.text_id = "debug_interact_paper_pickup"
-	self.interaction.thermite = {}
-	self.interaction.thermite.icon = "equipment_thermite"
-	self.interaction.thermite.text_id = "debug_interact_thermite"
-	self.interaction.thermite.equipment_text_id = "debug_interact_equipment_thermite"
-	self.interaction.thermite.special_equipment = "thermite"
-	self.interaction.thermite.equipment_consume = true
-	self.interaction.thermite.interact_distance = 300
-	self.interaction.gasoline = {}
-	self.interaction.gasoline.icon = "equipment_thermite"
-	self.interaction.gasoline.text_id = "debug_interact_gas"
-	self.interaction.gasoline.equipment_text_id = "debug_interact_equipment_gas"
-	self.interaction.gasoline.special_equipment = "gas"
-	self.interaction.gasoline.equipment_consume = true
-	self.interaction.gasoline.interact_distance = 300
-	self.interaction.gasoline_engine = {}
-	self.interaction.gasoline_engine.icon = "equipment_thermite"
-	self.interaction.gasoline_engine.text_id = "debug_interact_gas"
-	self.interaction.gasoline_engine.equipment_text_id = "debug_interact_equipment_gas"
-	self.interaction.gasoline_engine.special_equipment = "gas"
-	self.interaction.gasoline_engine.equipment_consume = true
-	self.interaction.gasoline_engine.interact_distance = 300
-	self.interaction.gasoline_engine.timer = 20
-	self.interaction.train_car = {}
-	self.interaction.train_car.icon = "develop"
-	self.interaction.train_car.text_id = "debug_interact_train_car"
-	self.interaction.train_car.equipment_text_id = "debug_interact_equipment_gas"
-	self.interaction.train_car.special_equipment = "gas"
-	self.interaction.train_car.equipment_consume = true
-	self.interaction.train_car.interact_distance = 400
-	self.interaction.walkout_van = {}
-	self.interaction.walkout_van.icon = "develop"
-	self.interaction.walkout_van.text_id = "debug_interact_walkout_van"
-	self.interaction.walkout_van.equipment_text_id = "debug_interact_equipment_gold"
-	self.interaction.walkout_van.special_equipment = "gold"
-	self.interaction.walkout_van.equipment_consume = true
-	self.interaction.walkout_van.interact_distance = 400
-	self.interaction.alaska_plane = {}
-	self.interaction.alaska_plane.icon = "develop"
-	self.interaction.alaska_plane.text_id = "debug_interact_alaska_plane"
-	self.interaction.alaska_plane.equipment_text_id = "debug_interact_equipment_organs"
-	self.interaction.alaska_plane.special_equipment = "organs"
-	self.interaction.alaska_plane.equipment_consume = true
-	self.interaction.alaska_plane.interact_distance = 400
-	self.interaction.suburbia_door_crowbar = {}
-	self.interaction.suburbia_door_crowbar.icon = "equipment_crowbar"
-	self.interaction.suburbia_door_crowbar.text_id = "debug_interact_crowbar"
-	self.interaction.suburbia_door_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.suburbia_door_crowbar.special_equipment = "crowbar"
-	self.interaction.suburbia_door_crowbar.timer = 5
-	self.interaction.suburbia_door_crowbar.start_active = false
-	self.interaction.suburbia_door_crowbar.sound_start = "bar_crowbar"
-	self.interaction.suburbia_door_crowbar.sound_interupt = "bar_crowbar_cancel"
-	self.interaction.suburbia_door_crowbar.sound_done = "bar_crowbar_end"
-	self.interaction.suburbia_door_crowbar.interact_distance = 130
-	self.interaction.secret_stash_trunk_crowbar = {}
-	self.interaction.secret_stash_trunk_crowbar.icon = "equipment_crowbar"
-	self.interaction.secret_stash_trunk_crowbar.text_id = "debug_interact_crowbar2"
-	self.interaction.secret_stash_trunk_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.secret_stash_trunk_crowbar.special_equipment = "crowbar"
-	self.interaction.secret_stash_trunk_crowbar.timer = 20
-	self.interaction.secret_stash_trunk_crowbar.start_active = false
-	self.interaction.secret_stash_trunk_crowbar.sound_start = "und_crowbar_trunk"
-	self.interaction.secret_stash_trunk_crowbar.sound_interupt = "und_crowbar_trunk_cancel"
-	self.interaction.secret_stash_trunk_crowbar.sound_done = "und_crowbar_trunk_finished"
-	self.interaction.requires_crowbar_interactive_template = {}
-	self.interaction.requires_crowbar_interactive_template.icon = "equipment_crowbar"
-	self.interaction.requires_crowbar_interactive_template.text_id = "debug_interact_crowbar_breach"
-	self.interaction.requires_crowbar_interactive_template.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.requires_crowbar_interactive_template.special_equipment = "crowbar"
-	self.interaction.requires_crowbar_interactive_template.timer = 8
-	self.interaction.requires_crowbar_interactive_template.start_active = false
-	self.interaction.requires_crowbar_interactive_template.sound_start = "crowbar_metal_work_loop"
-	self.interaction.requires_crowbar_interactive_template.sound_interupt = "crowbar_metal_cancel"
-	self.interaction.requires_crowbar_interactive_template.sound_done = "crowbar_metal_cancel"
-	self.interaction.requires_saw_blade = {}
-	self.interaction.requires_saw_blade.icon = "develop"
-	self.interaction.requires_saw_blade.text_id = "hud_int_hold_add_blade"
-	self.interaction.requires_saw_blade.equipment_text_id = "hud_equipment_no_saw_blade"
-	self.interaction.requires_saw_blade.special_equipment = "saw_blade"
-	self.interaction.requires_saw_blade.timer = 2
-	self.interaction.requires_saw_blade.start_active = false
-	self.interaction.requires_saw_blade.equipment_consume = true
-	self.interaction.saw_blade = {}
-	self.interaction.saw_blade.text_id = "hud_int_hold_take_blade"
-	self.interaction.saw_blade.action_text_id = "hud_action_taking_saw_blade"
-	self.interaction.saw_blade.timer = 0.5
-	self.interaction.saw_blade.start_active = false
-	self.interaction.saw_blade.special_equipment_block = "saw_blade"
-	self.interaction.open_slash_close_sec_box = {}
-	self.interaction.open_slash_close_sec_box.text_id = "hud_int_hold_open_slash_close_sec_box"
-	self.interaction.open_slash_close_sec_box.action_text_id = "hud_action_opening_slash_closing_sec_box"
-	self.interaction.open_slash_close_sec_box.timer = 0.5
-	self.interaction.open_slash_close_sec_box.start_active = false
-	self.interaction.activate_camera = {}
-	self.interaction.activate_camera.text_id = "hud_int_hold_activate_camera"
-	self.interaction.activate_camera.action_text_id = "hud_action_activating_camera"
-	self.interaction.activate_camera.timer = 0.5
-	self.interaction.activate_camera.start_active = false
-	self.interaction.requires_ecm_jammer = {}
-	self.interaction.requires_ecm_jammer.icon = "equipment_ecm_jammer"
-	self.interaction.requires_ecm_jammer.contour = "interactable_icon"
-	self.interaction.requires_ecm_jammer.text_id = "hud_int_use_ecm_jammer"
-	self.interaction.requires_ecm_jammer.required_deployable = "ecm_jammer"
-	self.interaction.requires_ecm_jammer.deployable_consume = true
-	self.interaction.requires_ecm_jammer.timer = 4
-	self.interaction.requires_ecm_jammer.sound_start = "bar_c4_apply"
-	self.interaction.requires_ecm_jammer.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.requires_ecm_jammer.sound_done = "bar_c4_apply_finished"
-	self.interaction.requires_ecm_jammer.axis = "y"
-	self.interaction.requires_ecm_jammer.action_text_id = "hud_action_placing_ecm_jammer"
-	self.interaction.requires_ecm_jammer.requires_upgrade = {
-		category = "ecm_jammer",
-		upgrade = "can_open_sec_doors"
-	}
-	self.interaction.requires_ecm_jammer_atm = deep_clone(self.interaction.requires_ecm_jammer)
-	self.interaction.requires_ecm_jammer_atm.timer = 8
-	self.interaction.requires_ecm_jammer_atm.requires_upgrade = {
-		category = "ecm_jammer",
-		upgrade = "affects_cameras"
-	}
-	self.interaction.weapon_cache_drop_zone = {}
-	self.interaction.weapon_cache_drop_zone.icon = "equipment_vial"
-	self.interaction.weapon_cache_drop_zone.text_id = "debug_interact_hospital_veil_container"
-	self.interaction.weapon_cache_drop_zone.equipment_text_id = "debug_interact_equipment_blood_sample_verified"
-	self.interaction.weapon_cache_drop_zone.special_equipment = "blood_sample"
-	self.interaction.weapon_cache_drop_zone.equipment_consume = true
-	self.interaction.weapon_cache_drop_zone.start_active = false
-	self.interaction.weapon_cache_drop_zone.timer = 2
-	self.interaction.secret_stash_limo_roof_crowbar = {}
-	self.interaction.secret_stash_limo_roof_crowbar.icon = "develop"
-	self.interaction.secret_stash_limo_roof_crowbar.text_id = "debug_interact_hold_to_breach"
-	self.interaction.secret_stash_limo_roof_crowbar.timer = 5
-	self.interaction.secret_stash_limo_roof_crowbar.start_active = false
-	self.interaction.secret_stash_limo_roof_crowbar.sound_start = "und_limo_chassis_open"
-	self.interaction.secret_stash_limo_roof_crowbar.sound_interupt = "und_limo_chassis_open_stop"
-	self.interaction.secret_stash_limo_roof_crowbar.sound_done = "und_limo_chassis_open_stop"
-	self.interaction.secret_stash_limo_roof_crowbar.axis = "y"
-	self.interaction.suburbia_iron_gate_crowbar = {}
-	self.interaction.suburbia_iron_gate_crowbar.icon = "equipment_crowbar"
-	self.interaction.suburbia_iron_gate_crowbar.text_id = "debug_interact_crowbar"
-	self.interaction.suburbia_iron_gate_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.suburbia_iron_gate_crowbar.special_equipment = "crowbar"
-	self.interaction.suburbia_iron_gate_crowbar.timer = 5
-	self.interaction.suburbia_iron_gate_crowbar.start_active = false
-	self.interaction.suburbia_iron_gate_crowbar.sound_start = "crowbar_metal_work_loop"
-	self.interaction.suburbia_iron_gate_crowbar.sound_interupt = "crowbar_metal_cancel"
-	self.interaction.apartment_key = {}
-	self.interaction.apartment_key.icon = "equipment_chavez_key"
-	self.interaction.apartment_key.text_id = "debug_interact_apartment_key"
-	self.interaction.apartment_key.equipment_text_id = "debug_interact_equiptment_apartment_key"
-	self.interaction.apartment_key.special_equipment = "chavez_key"
-	self.interaction.apartment_key.equipment_consume = true
-	self.interaction.apartment_key.interact_distance = 150
-	self.interaction.hospital_sample_validation_machine = {}
-	self.interaction.hospital_sample_validation_machine.icon = "equipment_vial"
-	self.interaction.hospital_sample_validation_machine.text_id = "debug_interact_sample_validation"
-	self.interaction.hospital_sample_validation_machine.equipment_text_id = "debug_interact_equiptment_sample_validation"
-	self.interaction.hospital_sample_validation_machine.special_equipment = "blood_sample"
-	self.interaction.hospital_sample_validation_machine.equipment_consume = true
-	self.interaction.hospital_sample_validation_machine.start_active = false
-	self.interaction.hospital_sample_validation_machine.interact_distance = 150
-	self.interaction.hospital_sample_validation_machine.axis = "y"
-	self.interaction.methlab_bubbling = {}
-	self.interaction.methlab_bubbling.icon = "develop"
-	self.interaction.methlab_bubbling.text_id = "hud_int_methlab_bubbling"
-	self.interaction.methlab_bubbling.equipment_text_id = "hud_int_no_acid"
-	self.interaction.methlab_bubbling.special_equipment = "acid"
-	self.interaction.methlab_bubbling.equipment_consume = true
-	self.interaction.methlab_bubbling.start_active = false
-	self.interaction.methlab_bubbling.timer = 1
-	self.interaction.methlab_bubbling.action_text_id = "hud_action_methlab_bubbling"
-	self.interaction.methlab_bubbling.sound_start = "liquid_pour"
-	self.interaction.methlab_bubbling.sound_interupt = "liquid_pour_stop"
-	self.interaction.methlab_bubbling.sound_done = "liquid_pour_stop"
-	self.interaction.methlab_caustic_cooler = {}
-	self.interaction.methlab_caustic_cooler.icon = "develop"
-	self.interaction.methlab_caustic_cooler.text_id = "hud_int_methlab_caustic_cooler"
-	self.interaction.methlab_caustic_cooler.equipment_text_id = "hud_int_no_caustic_soda"
-	self.interaction.methlab_caustic_cooler.special_equipment = "caustic_soda"
-	self.interaction.methlab_caustic_cooler.equipment_consume = true
-	self.interaction.methlab_caustic_cooler.start_active = false
-	self.interaction.methlab_caustic_cooler.timer = 1
-	self.interaction.methlab_caustic_cooler.action_text_id = "hud_action_methlab_caustic_cooler"
-	self.interaction.methlab_caustic_cooler.sound_start = "liquid_pour"
-	self.interaction.methlab_caustic_cooler.sound_interupt = "liquid_pour_stop"
-	self.interaction.methlab_caustic_cooler.sound_done = "liquid_pour_stop"
-	self.interaction.methlab_gas_to_salt = {}
-	self.interaction.methlab_gas_to_salt.icon = "develop"
-	self.interaction.methlab_gas_to_salt.text_id = "hud_int_methlab_gas_to_salt"
-	self.interaction.methlab_gas_to_salt.equipment_text_id = "hud_int_no_hydrogen_chloride"
-	self.interaction.methlab_gas_to_salt.special_equipment = "hydrogen_chloride"
-	self.interaction.methlab_gas_to_salt.equipment_consume = true
-	self.interaction.methlab_gas_to_salt.start_active = false
-	self.interaction.methlab_gas_to_salt.timer = 1
-	self.interaction.methlab_gas_to_salt.action_text_id = "hud_action_methlab_gas_to_salt"
-	self.interaction.methlab_gas_to_salt.sound_start = "bar_bag_generic"
-	self.interaction.methlab_gas_to_salt.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.methlab_gas_to_salt.sound_done = "bar_bag_generic_finished"
-	self.interaction.methlab_drying_meth = {}
-	self.interaction.methlab_drying_meth.icon = "develop"
-	self.interaction.methlab_drying_meth.text_id = "hud_int_methlab_drying_meth"
-	self.interaction.methlab_drying_meth.equipment_text_id = "hud_int_no_liquid_meth"
-	self.interaction.methlab_drying_meth.special_equipment = "liquid_meth"
-	self.interaction.methlab_drying_meth.equipment_consume = true
-	self.interaction.methlab_drying_meth.start_active = false
-	self.interaction.methlab_drying_meth.timer = 1
-	self.interaction.methlab_drying_meth.action_text_id = "hud_action_methlab_drying_meth"
-	self.interaction.methlab_drying_meth.sound_start = "liquid_pour"
-	self.interaction.methlab_drying_meth.sound_interupt = "liquid_pour_stop"
-	self.interaction.methlab_drying_meth.sound_done = "liquid_pour_stop"
-	self.interaction.muriatic_acid = {}
-	self.interaction.muriatic_acid.icon = "develop"
-	self.interaction.muriatic_acid.text_id = "hud_int_take_acid"
-	self.interaction.muriatic_acid.start_active = false
-	self.interaction.muriatic_acid.interact_distance = 225
-	self.interaction.muriatic_acid.special_equipment_block = "acid"
-	self.interaction.caustic_soda = {}
-	self.interaction.caustic_soda.icon = "develop"
-	self.interaction.caustic_soda.text_id = "hud_int_take_caustic_soda"
-	self.interaction.caustic_soda.start_active = false
-	self.interaction.caustic_soda.interact_distance = 225
-	self.interaction.caustic_soda.special_equipment_block = "caustic_soda"
-	self.interaction.hydrogen_chloride = {}
-	self.interaction.hydrogen_chloride.icon = "develop"
-	self.interaction.hydrogen_chloride.text_id = "hud_int_take_hydrogen_chloride"
-	self.interaction.hydrogen_chloride.start_active = false
-	self.interaction.hydrogen_chloride.interact_distance = 225
-	self.interaction.hydrogen_chloride.special_equipment_block = "hydrogen_chloride"
-	self.interaction.elevator_button = {}
-	self.interaction.elevator_button.icon = "interaction_elevator"
-	self.interaction.elevator_button.text_id = "debug_interact_elevator_door"
-	self.interaction.elevator_button.start_active = false
-	self.interaction.use_computer = {}
-	self.interaction.use_computer.icon = "interaction_elevator"
-	self.interaction.use_computer.text_id = "hud_int_use_computer"
-	self.interaction.use_computer.start_active = false
-	self.interaction.use_computer.timer = 2
-	self.interaction.elevator_button_roof = {}
-	self.interaction.elevator_button_roof.icon = "interaction_elevator"
-	self.interaction.elevator_button_roof.text_id = "debug_interact_elevator_door_roof"
-	self.interaction.elevator_button_roof.start_active = false
-	self.interaction.key = {}
-	self.interaction.key.icon = "equipment_bank_manager_key"
-	self.interaction.key.text_id = "hud_int_equipment_keycard"
-	self.interaction.key.equipment_text_id = "hud_int_equipment_no_keycard"
-	self.interaction.key.special_equipment = "bank_manager_key"
-	self.interaction.key.equipment_consume = true
-	self.interaction.key.axis = "x"
-	self.interaction.key.interact_distance = 100
-	self.interaction.numpad = {}
-	self.interaction.numpad.icon = "equipment_bank_manager_key"
-	self.interaction.numpad.text_id = "debug_interact_numpad"
-	self.interaction.numpad.start_active = false
-	self.interaction.numpad.axis = "z"
-	self.interaction.numpad_keycard = {}
-	self.interaction.numpad_keycard.icon = "equipment_bank_manager_key"
-	self.interaction.numpad_keycard.text_id = "hud_int_numpad_keycard"
-	self.interaction.numpad_keycard.equipment_text_id = "hud_int_numpad_no_keycard"
-	self.interaction.numpad_keycard.special_equipment = "bank_manager_key"
-	self.interaction.numpad_keycard.equipment_consume = true
-	self.interaction.numpad_keycard.start_active = false
-	self.interaction.numpad_keycard.axis = "z"
-	self.interaction.timelock_panel = {}
-	self.interaction.timelock_panel.icon = "equipment_bank_manager_key"
-	self.interaction.timelock_panel.text_id = "hud_int_timelock_panel"
-	self.interaction.timelock_panel.equipment_text_id = "hud_int_equipment_no_keycard"
-	self.interaction.timelock_panel.special_equipment = "bank_manager_key"
-	self.interaction.timelock_panel.equipment_consume = true
-	self.interaction.timelock_panel.start_active = false
-	self.interaction.timelock_panel.axis = "z"
-	self.interaction.take_weapons = {}
-	self.interaction.take_weapons.icon = "develop"
-	self.interaction.take_weapons.text_id = "hud_int_take_weapons"
-	self.interaction.take_weapons.action_text_id = "hud_action_taking_weapons"
-	self.interaction.take_weapons.timer = 3
-	self.interaction.take_weapons.axis = "x"
-	self.interaction.take_weapons.interact_distance = 120
-	self.interaction.take_weapons_not_active = deep_clone(self.interaction.take_weapons)
-	self.interaction.take_weapons_not_active.start_active = false
-	self.interaction.pick_lock_easy = {}
-	self.interaction.pick_lock_easy.contour = "interactable_icon"
-	self.interaction.pick_lock_easy.icon = "equipment_bank_manager_key"
-	self.interaction.pick_lock_easy.text_id = "hud_int_pick_lock"
-	self.interaction.pick_lock_easy.start_active = true
-	self.interaction.pick_lock_easy.timer = 10
-	self.interaction.pick_lock_easy.interact_distance = 100
-	self.interaction.pick_lock_easy.requires_upgrade = {
-		category = "player",
-		upgrade = "pick_lock_easy"
-	}
-	self.interaction.pick_lock_easy.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
-	}
-	self.interaction.pick_lock_easy.action_text_id = "hud_action_picking_lock"
-	self.interaction.pick_lock_easy.sound_start = "bar_pick_lock"
-	self.interaction.pick_lock_easy.sound_interupt = "bar_pick_lock_cancel"
-	self.interaction.pick_lock_easy.sound_done = "bar_pick_lock_finished"
-	self.interaction.pick_lock_easy_no_skill = {}
-	self.interaction.pick_lock_easy_no_skill.contour = "interactable_icon"
-	self.interaction.pick_lock_easy_no_skill.icon = "equipment_bank_manager_key"
-	self.interaction.pick_lock_easy_no_skill.text_id = "hud_int_pick_lock"
-	self.interaction.pick_lock_easy_no_skill.start_active = true
-	self.interaction.pick_lock_easy_no_skill.timer = 7
-	self.interaction.pick_lock_easy_no_skill.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
-	}
-	self.interaction.pick_lock_easy_no_skill.action_text_id = "hud_action_picking_lock"
-	self.interaction.pick_lock_easy_no_skill.interact_distance = 100
-	self.interaction.pick_lock_easy_no_skill.sound_start = "bar_pick_lock"
-	self.interaction.pick_lock_easy_no_skill.sound_interupt = "bar_pick_lock_cancel"
-	self.interaction.pick_lock_easy_no_skill.sound_done = "bar_pick_lock_finished"
-	self.interaction.pick_lock_hard = {}
-	self.interaction.pick_lock_hard.contour = "interactable_icon"
-	self.interaction.pick_lock_hard.icon = "equipment_bank_manager_key"
-	self.interaction.pick_lock_hard.text_id = "hud_int_pick_lock"
-	self.interaction.pick_lock_hard.start_active = true
-	self.interaction.pick_lock_hard.timer = 45
-	self.interaction.pick_lock_hard.requires_upgrade = {
-		category = "player",
-		upgrade = "pick_lock_hard"
-	}
-	self.interaction.pick_lock_hard.action_text_id = "hud_action_picking_lock"
-	self.interaction.pick_lock_hard.sound_start = "bar_pick_lock"
-	self.interaction.pick_lock_hard.sound_interupt = "bar_pick_lock_cancel"
-	self.interaction.pick_lock_hard.sound_done = "bar_pick_lock_finished"
-	self.interaction.pick_lock_hard_no_skill = {}
-	self.interaction.pick_lock_hard_no_skill.contour = "interactable_icon"
-	self.interaction.pick_lock_hard_no_skill.icon = "equipment_bank_manager_key"
-	self.interaction.pick_lock_hard_no_skill.text_id = "hud_int_pick_lock"
-	self.interaction.pick_lock_hard_no_skill.start_active = true
-	self.interaction.pick_lock_hard_no_skill.timer = 20
-	self.interaction.pick_lock_hard_no_skill.action_text_id = "hud_action_picking_lock"
-	self.interaction.pick_lock_hard_no_skill.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
-	}
-	self.interaction.pick_lock_hard_no_skill.interact_distance = 100
-	self.interaction.pick_lock_hard_no_skill.sound_start = "bar_pick_lock"
-	self.interaction.pick_lock_hard_no_skill.sound_interupt = "bar_pick_lock_cancel"
-	self.interaction.pick_lock_hard_no_skill.sound_done = "bar_pick_lock_finished"
-	self.interaction.pick_lock_deposit_transport = deep_clone(self.interaction.pick_lock_hard_no_skill)
-	self.interaction.pick_lock_deposit_transport.timer = 15
-	self.interaction.pick_lock_deposit_transport.axis = "y"
-	self.interaction.pick_lock_deposit_transport.interact_distance = 80
-	self.interaction.open_door_with_keys = {}
-	self.interaction.open_door_with_keys.contour = "interactable_icon"
-	self.interaction.open_door_with_keys.icon = "equipment_bank_manager_key"
-	self.interaction.open_door_with_keys.text_id = "hud_int_try_keys"
-	self.interaction.open_door_with_keys.start_active = false
-	self.interaction.open_door_with_keys.timer = 5
-	self.interaction.open_door_with_keys.action_text_id = "hud_action_try_keys"
-	self.interaction.open_door_with_keys.interact_distance = 100
-	self.interaction.open_door_with_keys.sound_start = "bar_pick_lock"
-	self.interaction.open_door_with_keys.sound_interupt = "bar_pick_lock_cancel"
-	self.interaction.open_door_with_keys.sound_done = "bar_pick_lock_finished"
-	self.interaction.open_door_with_keys.special_equipment = "keychain"
-	self.interaction.open_door_with_keys.equipment_text_id = "hud_action_try_keys_no_key"
-	self.interaction.cant_pick_lock = {}
-	self.interaction.cant_pick_lock.icon = "equipment_bank_manager_key"
-	self.interaction.cant_pick_lock.text_id = "hud_int_pick_lock"
-	self.interaction.cant_pick_lock.start_active = false
-	self.interaction.cant_pick_lock.interact_distance = 80
-	self.interaction.hospital_veil_container = {}
-	self.interaction.hospital_veil_container.icon = "equipment_vialOK"
-	self.interaction.hospital_veil_container.text_id = "debug_interact_hospital_veil_container"
-	self.interaction.hospital_veil_container.equipment_text_id = "debug_interact_equipment_blood_sample_verified"
-	self.interaction.hospital_veil_container.special_equipment = "blood_sample_verified"
-	self.interaction.hospital_veil_container.equipment_consume = true
-	self.interaction.hospital_veil_container.start_active = false
-	self.interaction.hospital_veil_container.timer = 2
-	self.interaction.hospital_veil_container.axis = "y"
-	self.interaction.hospital_phone = {}
-	self.interaction.hospital_phone.icon = "interaction_answerphone"
-	self.interaction.hospital_phone.text_id = "debug_interact_hospital_phone"
-	self.interaction.hospital_phone.start_active = false
-	self.interaction.hospital_security_cable = {}
-	self.interaction.hospital_security_cable.text_id = "debug_interact_hospital_security_cable"
-	self.interaction.hospital_security_cable.icon = "interaction_wirecutter"
-	self.interaction.hospital_security_cable.start_active = false
-	self.interaction.hospital_security_cable.timer = 5
-	self.interaction.hospital_security_cable.interact_distance = 75
-	self.interaction.hospital_veil = {}
-	self.interaction.hospital_veil.icon = "equipment_vial"
-	self.interaction.hospital_veil.text_id = "debug_interact_hospital_veil_hold"
-	self.interaction.hospital_veil.start_active = false
-	self.interaction.hospital_veil.timer = 2
-	self.interaction.hospital_veil_take = {}
-	self.interaction.hospital_veil_take.icon = "equipment_vial"
-	self.interaction.hospital_veil_take.text_id = "debug_interact_hospital_veil_take"
-	self.interaction.hospital_veil_take.start_active = false
-	self.interaction.hospital_sentry = {}
-	self.interaction.hospital_sentry.icon = "interaction_sentrygun"
-	self.interaction.hospital_sentry.text_id = "debug_interact_hospital_sentry"
-	self.interaction.hospital_sentry.start_active = false
-	self.interaction.hospital_sentry.timer = 2
-	self.interaction.drill = {}
-	self.interaction.drill.icon = "equipment_drill"
-	self.interaction.drill.contour = "interactable_icon"
-	self.interaction.drill.text_id = "hud_int_equipment_drill"
-	self.interaction.drill.equipment_text_id = "hud_int_equipment_no_drill"
-	self.interaction.drill.timer = 3
-	self.interaction.drill.blocked_hint = "no_drill"
-	self.interaction.drill.sound_start = "bar_drill_apply"
-	self.interaction.drill.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.drill.sound_done = "bar_drill_apply_finished"
-	self.interaction.drill.axis = "y"
-	self.interaction.drill.action_text_id = "hud_action_placing_drill"
-	self.interaction.drill_upgrade = {}
-	self.interaction.drill_upgrade.icon = "equipment_drill"
-	self.interaction.drill_upgrade.contour = "upgradable"
-	self.interaction.drill_upgrade.text_id = "hud_int_equipment_drill_upgrade"
-	self.interaction.drill_upgrade.timer = 10
-	self.interaction.drill_upgrade.sound_start = "bar_drill_apply"
-	self.interaction.drill_upgrade.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.drill_upgrade.sound_done = "bar_drill_apply_finished"
-	self.interaction.drill_upgrade.action_text_id = "hud_action_upgrading_drill"
-	self.interaction.drill_jammed = {}
-	self.interaction.drill_jammed.icon = "equipment_drill"
-	self.interaction.drill_jammed.text_id = "hud_int_equipment_drill_jammed"
-	self.interaction.drill_jammed.timer = 10
-	self.interaction.drill_jammed.sound_start = "bar_drill_fix"
-	self.interaction.drill_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.drill_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.drill_jammed.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "drill_fix_interaction_speed_multiplier"
-	}
-	self.interaction.drill_jammed.action_text_id = "hud_action_fixing_drill"
-	self.interaction.lance = {}
-	self.interaction.lance.icon = "equipment_drill"
-	self.interaction.lance.contour = "interactable_icon"
-	self.interaction.lance.text_id = "hud_int_equipment_lance"
-	self.interaction.lance.equipment_text_id = "hud_int_equipment_no_lance"
-	self.interaction.lance.timer = 3
-	self.interaction.lance.blocked_hint = "no_lance"
-	self.interaction.lance.sound_start = "bar_thermal_lance_apply"
-	self.interaction.lance.sound_interupt = "bar_thermal_lance_apply_cancel"
-	self.interaction.lance.sound_done = "bar_thermal_lance_apply_finished"
-	self.interaction.lance.action_text_id = "hud_action_placing_lance"
-	self.interaction.lance_jammed = {}
-	self.interaction.lance_jammed.icon = "equipment_drill"
-	self.interaction.lance_jammed.text_id = "hud_int_equipment_lance_jammed"
-	self.interaction.lance_jammed.timer = 10
-	self.interaction.lance_jammed.sound_start = "bar_thermal_lance_fix"
-	self.interaction.lance_jammed.sound_interupt = "bar_thermal_lance_fix_cancel"
-	self.interaction.lance_jammed.sound_done = "bar_thermal_lance_fix_finished"
-	self.interaction.lance_jammed.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "drill_fix_interaction_speed_multiplier"
-	}
-	self.interaction.lance_jammed.action_text_id = "hud_action_fixing_lance"
-	self.interaction.lance_upgrade = {}
-	self.interaction.lance_upgrade.icon = "equipment_drill"
-	self.interaction.lance_upgrade.contour = "upgradable"
-	self.interaction.lance_upgrade.text_id = "hud_int_equipment_lance_upgrade"
-	self.interaction.lance_upgrade.timer = 10
-	self.interaction.lance_upgrade.sound_start = "bar_drill_apply"
-	self.interaction.lance_upgrade.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.lance_upgrade.sound_done = "bar_drill_apply_finished"
-	self.interaction.lance_upgrade.action_text_id = "hud_action_upgrading_lance"
-	self.interaction.glass_cutter = {}
-	self.interaction.glass_cutter.icon = "equipment_cutter"
-	self.interaction.glass_cutter.text_id = "debug_interact_glass_cutter"
-	self.interaction.glass_cutter.equipment_text_id = "debug_interact_equipment_glass_cutter"
-	self.interaction.glass_cutter.special_equipment = "glass_cutter"
-	self.interaction.glass_cutter.timer = 3
-	self.interaction.glass_cutter.blocked_hint = "no_glass_cutter"
-	self.interaction.glass_cutter.sound_start = "bar_drill_apply"
-	self.interaction.glass_cutter.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.glass_cutter.sound_done = "bar_drill_apply_finished"
-	self.interaction.glass_cutter_jammed = {}
-	self.interaction.glass_cutter_jammed.icon = "equipment_cutter"
-	self.interaction.glass_cutter_jammed.text_id = "debug_interact_cutter_jammed"
-	self.interaction.glass_cutter_jammed.timer = 10
-	self.interaction.glass_cutter_jammed.sound_start = "bar_drill_fix"
-	self.interaction.glass_cutter_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.glass_cutter_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.hack_ipad = {}
-	self.interaction.hack_ipad.icon = "equipment_hack_ipad"
-	self.interaction.hack_ipad.text_id = "debug_interact_hack_ipad"
-	self.interaction.hack_ipad.timer = 3
-	self.interaction.hack_ipad.sound_start = "bar_drill_apply"
-	self.interaction.hack_ipad.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.hack_ipad.sound_done = "bar_drill_apply_finished"
-	self.interaction.hack_ipad.axis = "x"
-	self.interaction.hack_ipad_jammed = {}
-	self.interaction.hack_ipad_jammed.icon = "equipment_hack_ipad"
-	self.interaction.hack_ipad_jammed.text_id = "debug_interact_hack_ipad_jammed"
-	self.interaction.hack_ipad_jammed.timer = 10
-	self.interaction.hack_ipad_jammed.sound_start = "bar_drill_fix"
-	self.interaction.hack_ipad_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.hack_ipad_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.hack_suburbia = {}
-	self.interaction.hack_suburbia.icon = "equipment_hack_ipad"
-	self.interaction.hack_suburbia.text_id = "debug_interact_hack_ipad"
-	self.interaction.hack_suburbia.timer = 5
-	self.interaction.hack_suburbia.sound_start = "bar_keyboard"
-	self.interaction.hack_suburbia.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.hack_suburbia.sound_done = "bar_keyboard_finished"
-	self.interaction.hack_suburbia.axis = "x"
-	self.interaction.hack_suburbia.contour = "contour_off"
-	self.interaction.hack_suburbia_jammed = {}
-	self.interaction.hack_suburbia_jammed.icon = "equipment_hack_ipad"
-	self.interaction.hack_suburbia_jammed.text_id = "debug_interact_hack_ipad_jammed"
-	self.interaction.hack_suburbia_jammed.timer = 5
-	self.interaction.hack_suburbia_jammed.sound_start = "bar_keyboard"
-	self.interaction.hack_suburbia_jammed.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.hack_suburbia_jammed.sound_done = "bar_keyboard_finished"
-	self.interaction.security_station = {}
-	self.interaction.security_station.icon = "equipment_hack_ipad"
-	self.interaction.security_station.text_id = "debug_interact_security_station"
-	self.interaction.security_station.timer = 3
-	self.interaction.security_station.sound_start = "bar_drill_apply"
-	self.interaction.security_station.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.security_station.sound_done = "bar_drill_apply_finished"
-	self.interaction.security_station.axis = "z"
-	self.interaction.security_station.start_active = false
-	self.interaction.security_station.sound_start = "bar_keyboard"
-	self.interaction.security_station.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.security_station.sound_done = "bar_keyboard_finished"
-	self.interaction.security_station_keyboard = {}
-	self.interaction.security_station_keyboard.icon = "interaction_keyboard"
-	self.interaction.security_station_keyboard.text_id = "debug_interact_security_station"
-	self.interaction.security_station_keyboard.timer = 6
-	self.interaction.security_station_keyboard.axis = "z"
-	self.interaction.security_station_keyboard.start_active = false
-	self.interaction.security_station_keyboard.interact_distance = 150
-	self.interaction.security_station_keyboard.sound_start = "bar_keyboard"
-	self.interaction.security_station_keyboard.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.security_station_keyboard.sound_done = "bar_keyboard_finished"
-	self.interaction.big_computer_hackable = {}
-	self.interaction.big_computer_hackable.icon = "interaction_keyboard"
-	self.interaction.big_computer_hackable.text_id = "hud_int_big_computer_hackable"
-	self.interaction.big_computer_hackable.timer = 6
-	self.interaction.big_computer_hackable.start_active = false
-	self.interaction.big_computer_hackable.interact_distance = 200
-	self.interaction.big_computer_hackable.sound_start = "bar_keyboard"
-	self.interaction.big_computer_hackable.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.big_computer_hackable.sound_done = "bar_keyboard_finished"
-	self.interaction.big_computer_not_hackable = {}
-	self.interaction.big_computer_not_hackable.icon = "interaction_keyboard"
-	self.interaction.big_computer_not_hackable.text_id = "hud_int_big_computer_hackable"
-	self.interaction.big_computer_not_hackable.timer = 6
-	self.interaction.big_computer_not_hackable.start_active = false
-	self.interaction.big_computer_not_hackable.interact_distance = 200
-	self.interaction.big_computer_not_hackable.sound_start = "bar_keyboard"
-	self.interaction.big_computer_not_hackable.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.big_computer_not_hackable.sound_done = "bar_keyboard_finished"
-	self.interaction.big_computer_not_hackable.equipment_text_id = "hud_int_big_computer_unhackable"
-	self.interaction.big_computer_not_hackable.special_equipment = "nothing"
-	self.interaction.big_computer_server = {}
-	self.interaction.big_computer_server.icon = "interaction_keyboard"
-	self.interaction.big_computer_server.text_id = "hud_int_big_computer_server"
-	self.interaction.big_computer_server.timer = 6
-	self.interaction.big_computer_server.start_active = false
-	self.interaction.big_computer_server.interact_distance = 150
-	self.interaction.big_computer_server.sound_start = "bar_keyboard"
-	self.interaction.big_computer_server.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.big_computer_server.sound_done = "bar_keyboard_finished"
-	self.interaction.security_station_jammed = {}
-	self.interaction.security_station_jammed.icon = "interaction_keyboard"
-	self.interaction.security_station_jammed.text_id = "debug_interact_security_station_jammed"
-	self.interaction.security_station_jammed.timer = 10
-	self.interaction.security_station_jammed.sound_start = "bar_drill_fix"
-	self.interaction.security_station_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.security_station_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.security_station_jammed.axis = "z"
-	self.interaction.apartment_drill = {}
-	self.interaction.apartment_drill.icon = "equipment_drill"
-	self.interaction.apartment_drill.text_id = "debug_interact_drill"
-	self.interaction.apartment_drill.equipment_text_id = "debug_interact_equipment_drill"
-	self.interaction.apartment_drill.timer = 3
-	self.interaction.apartment_drill.blocked_hint = "no_drill"
-	self.interaction.apartment_drill.sound_start = "bar_drill_apply"
-	self.interaction.apartment_drill.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.apartment_drill.sound_done = "bar_drill_apply_finished"
-	self.interaction.apartment_drill.interact_distance = 200
-	self.interaction.apartment_drill_jammed = {}
-	self.interaction.apartment_drill_jammed.icon = "equipment_drill"
-	self.interaction.apartment_drill_jammed.text_id = "debug_interact_drill_jammed"
-	self.interaction.apartment_drill_jammed.timer = 3
-	self.interaction.apartment_drill_jammed.sound_start = "bar_drill_fix"
-	self.interaction.apartment_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.apartment_drill_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.apartment_drill_jammed.interact_distance = 200
-	self.interaction.suburbia_drill = {}
-	self.interaction.suburbia_drill.icon = "equipment_drill"
-	self.interaction.suburbia_drill.text_id = "debug_interact_drill"
-	self.interaction.suburbia_drill.equipment_text_id = "debug_interact_equipment_drill"
-	self.interaction.suburbia_drill.timer = 3
-	self.interaction.suburbia_drill.blocked_hint = "no_drill"
-	self.interaction.suburbia_drill.sound_start = "bar_drill_apply"
-	self.interaction.suburbia_drill.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.suburbia_drill.sound_done = "bar_drill_apply_finished"
-	self.interaction.suburbia_drill.interact_distance = 200
-	self.interaction.suburbia_drill_jammed = {}
-	self.interaction.suburbia_drill_jammed.icon = "equipment_drill"
-	self.interaction.suburbia_drill_jammed.text_id = "debug_interact_drill_jammed"
-	self.interaction.suburbia_drill_jammed.timer = 3
-	self.interaction.suburbia_drill_jammed.sound_start = "bar_drill_fix"
-	self.interaction.suburbia_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.suburbia_drill_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.suburbia_drill_jammed.interact_distance = 200
-	self.interaction.goldheist_drill = {}
-	self.interaction.goldheist_drill.icon = "equipment_drill"
-	self.interaction.goldheist_drill.text_id = "debug_interact_drill"
-	self.interaction.goldheist_drill.equipment_text_id = "debug_interact_equipment_drill"
-	self.interaction.goldheist_drill.timer = 3
-	self.interaction.goldheist_drill.blocked_hint = "no_drill"
-	self.interaction.goldheist_drill.sound_start = "bar_drill_apply"
-	self.interaction.goldheist_drill.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.goldheist_drill.sound_done = "bar_drill_apply_finished"
-	self.interaction.goldheist_drill.interact_distance = 200
-	self.interaction.goldheist_drill_jammed = {}
-	self.interaction.goldheist_drill_jammed.icon = "equipment_drill"
-	self.interaction.goldheist_drill_jammed.text_id = "debug_interact_drill_jammed"
-	self.interaction.goldheist_drill_jammed.timer = 3
-	self.interaction.goldheist_drill_jammed.sound_start = "bar_drill_fix"
-	self.interaction.goldheist_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.goldheist_drill_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.goldheist_drill_jammed.interact_distance = 200
-	self.interaction.hospital_saw_teddy = {}
-	self.interaction.hospital_saw_teddy.icon = "equipment_saw"
-	self.interaction.hospital_saw_teddy.text_id = "debug_interact_hospital_saw_teddy"
-	self.interaction.hospital_saw_teddy.start_active = false
-	self.interaction.hospital_saw_teddy.timer = 2
-	self.interaction.hospital_saw = {}
-	self.interaction.hospital_saw.icon = "equipment_saw"
-	self.interaction.hospital_saw.text_id = "debug_interact_saw"
-	self.interaction.hospital_saw.equipment_text_id = "debug_interact_equipment_saw"
-	self.interaction.hospital_saw.special_equipment = "saw"
-	self.interaction.hospital_saw.timer = 3
-	self.interaction.hospital_saw.sound_start = "bar_drill_apply"
-	self.interaction.hospital_saw.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.hospital_saw.sound_done = "bar_drill_apply_finished"
-	self.interaction.hospital_saw.interact_distance = 200
-	self.interaction.hospital_saw.axis = "z"
-	self.interaction.hospital_saw_jammed = {}
-	self.interaction.hospital_saw_jammed.icon = "equipment_saw"
-	self.interaction.hospital_saw_jammed.text_id = "debug_interact_saw_jammed"
-	self.interaction.hospital_saw_jammed.timer = 3
-	self.interaction.hospital_saw_jammed.sound_start = "bar_drill_fix"
-	self.interaction.hospital_saw_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.hospital_saw_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.hospital_saw_jammed.interact_distance = 200
-	self.interaction.hospital_saw_jammed.axis = "z"
-	self.interaction.hospital_saw_jammed.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "drill_fix_interaction_speed_multiplier"
-	}
-	self.interaction.apartment_saw = {}
-	self.interaction.apartment_saw.icon = "equipment_saw"
-	self.interaction.apartment_saw.text_id = "debug_interact_saw"
-	self.interaction.apartment_saw.equipment_text_id = "debug_interact_equipment_saw"
-	self.interaction.apartment_saw.special_equipment = "saw"
-	self.interaction.apartment_saw.timer = 3
-	self.interaction.apartment_saw.sound_start = "bar_drill_apply"
-	self.interaction.apartment_saw.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.apartment_saw.sound_done = "bar_drill_apply_finished"
-	self.interaction.apartment_saw.interact_distance = 200
-	self.interaction.apartment_saw.axis = "z"
-	self.interaction.apartment_saw_jammed = {}
-	self.interaction.apartment_saw_jammed.icon = "equipment_saw"
-	self.interaction.apartment_saw_jammed.text_id = "debug_interact_saw_jammed"
-	self.interaction.apartment_saw_jammed.timer = 3
-	self.interaction.apartment_saw_jammed.sound_start = "bar_drill_fix"
-	self.interaction.apartment_saw_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.apartment_saw_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.apartment_saw_jammed.interact_distance = 200
-	self.interaction.apartment_saw_jammed.axis = "z"
-	self.interaction.apartment_saw_jammed.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "drill_fix_interaction_speed_multiplier"
-	}
-	self.interaction.secret_stash_saw = {}
-	self.interaction.secret_stash_saw.icon = "equipment_saw"
-	self.interaction.secret_stash_saw.text_id = "debug_interact_saw"
-	self.interaction.secret_stash_saw.equipment_text_id = "debug_interact_equipment_saw"
-	self.interaction.secret_stash_saw.special_equipment = "saw"
-	self.interaction.secret_stash_saw.timer = 3
-	self.interaction.secret_stash_saw.sound_start = "bar_drill_apply"
-	self.interaction.secret_stash_saw.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.secret_stash_saw.sound_done = "bar_drill_apply_finished"
-	self.interaction.secret_stash_saw.interact_distance = 200
-	self.interaction.secret_stash_saw.axis = "z"
-	self.interaction.secret_stash_saw_jammed = {}
-	self.interaction.secret_stash_saw_jammed.icon = "equipment_saw"
-	self.interaction.secret_stash_saw_jammed.text_id = "debug_interact_saw_jammed"
-	self.interaction.secret_stash_saw_jammed.timer = 3
-	self.interaction.secret_stash_saw_jammed.sound_start = "bar_drill_fix"
-	self.interaction.secret_stash_saw_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.secret_stash_saw_jammed.sound_done = "bar_drill_fix_finished"
-	self.interaction.secret_stash_saw_jammed.interact_distance = 200
-	self.interaction.secret_stash_saw_jammed.axis = "z"
-	self.interaction.secret_stash_saw_jammed.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "drill_fix_interaction_speed_multiplier"
-	}
-	self.interaction.revive = {}
-	self.interaction.revive.icon = "interaction_help"
-	self.interaction.revive.text_id = "debug_interact_revive"
-	self.interaction.revive.start_active = false
-	self.interaction.revive.interact_distance = 300
-	self.interaction.revive.axis = "z"
-	self.interaction.revive.timer = 6
-	self.interaction.revive.sound_start = "bar_helpup"
-	self.interaction.revive.sound_interupt = "bar_helpup_cancel"
-	self.interaction.revive.sound_done = "bar_helpup_finished"
-	self.interaction.revive.action_text_id = "hud_action_reviving"
-	self.interaction.revive.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "revive_interaction_speed_multiplier"
-	}
-	self.interaction.revive.contour_preset = "teammate_downed"
-	self.interaction.revive.contour_preset_selected = "teammate_downed_selected"
-	self.interaction.free = {}
-	self.interaction.free.icon = "interaction_free"
-	self.interaction.free.text_id = "debug_interact_free"
-	self.interaction.free.start_active = false
-	self.interaction.free.interact_distance = 300
-	self.interaction.free.no_contour = true
-	self.interaction.free.timer = 1
-	self.interaction.free.sound_start = "bar_rescue"
-	self.interaction.free.sound_interupt = "bar_rescue_cancel"
-	self.interaction.free.sound_done = "bar_rescue_finished"
-	self.interaction.free.action_text_id = "hud_action_freeing"
-	self.interaction.hostage_trade = {}
-	self.interaction.hostage_trade.icon = "interaction_trade"
-	self.interaction.hostage_trade.text_id = "debug_interact_trade"
-	self.interaction.hostage_trade.start_active = true
-	self.interaction.hostage_trade.timer = 3
-	self.interaction.hostage_trade.requires_upgrade = {
-		category = "player",
-		upgrade = "hostage_trade"
-	}
-	self.interaction.hostage_trade.action_text_id = "hud_action_trading"
-	self.interaction.hostage_trade.contour_preset = "generic_interactable"
-	self.interaction.hostage_trade.contour_preset_selected = "generic_interactable_selected"
-	self.interaction.hostage_move = {}
-	self.interaction.hostage_move.icon = "interaction_trade"
-	self.interaction.hostage_move.text_id = "debug_interact_hostage_move"
-	self.interaction.hostage_move.start_active = true
-	self.interaction.hostage_move.timer = 1
-	self.interaction.hostage_move.action_text_id = "hud_action_standing_up"
-	self.interaction.hostage_move.no_contour = true
-	self.interaction.hostage_move.interaction_obj = Idstring("Spine")
-	self.interaction.hostage_stay = {}
-	self.interaction.hostage_stay.icon = "interaction_trade"
-	self.interaction.hostage_stay.text_id = "debug_interact_hostage_stay"
-	self.interaction.hostage_stay.start_active = true
-	self.interaction.hostage_stay.timer = 0.4
-	self.interaction.hostage_stay.action_text_id = "hud_action_getting_down"
-	self.interaction.hostage_stay.no_contour = true
-	self.interaction.hostage_stay.interaction_obj = Idstring("Spine2")
-	self.interaction.trip_mine = {}
-	self.interaction.trip_mine.icon = "equipment_trip_mine"
-	self.interaction.trip_mine.contour = "deployable"
-	self.interaction.trip_mine.requires_upgrade = {
-		category = "trip_mine",
-		upgrade = "can_switch_on_off"
-	}
-	self.interaction.sentry_gun_refill = {}
-	self.interaction.sentry_gun_refill.icon = "equipment_ammo_bag"
-	self.interaction.sentry_gun_refill.contour = "deployable"
-	self.interaction.sentry_gun_refill.requires_upgrade = {category = "sentry_gun", upgrade = "can_reload"}
-	self.interaction.sentry_gun_refill.timer = 1.5
-	self.interaction.sentry_gun_refill.blocked_hint = "full_grenades"
-	self.interaction.sentry_gun_refill.sound_start = "bar_bag_generic"
-	self.interaction.sentry_gun_refill.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.sentry_gun_refill.sound_done = "bar_bag_generic_finished"
-	self.interaction.sentry_gun_refill.action_text_id = "hud_action_taking_grenades"
-	self.interaction.sentry_gun_revive = {}
-	self.interaction.sentry_gun_revive.icon = "equipment_ammo_bag"
-	self.interaction.sentry_gun_revive.contour = "deployable"
-	self.interaction.sentry_gun_revive.requires_upgrade = {category = "sentry_gun", upgrade = "can_revive"}
-	self.interaction.sentry_gun_revive.timer = 3.5
-	self.interaction.sentry_gun_revive.blocked_hint = "full_grenades"
-	self.interaction.sentry_gun_revive.sound_start = "bar_bag_generic"
-	self.interaction.sentry_gun_revive.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.sentry_gun_revive.sound_done = "bar_bag_generic_finished"
-	self.interaction.sentry_gun_revive.action_text_id = "hud_action_taking_grenades"
-	self.interaction.bodybags_bag = {}
-	self.interaction.bodybags_bag.icon = "equipment_ammo_bag"
-	self.interaction.bodybags_bag.text_id = "debug_interact_bodybags_bag_take_bodybag"
-	self.interaction.bodybags_bag.contour = "deployable"
-	self.interaction.bodybags_bag.timer = 1.5
-	self.interaction.bodybags_bag.blocked_hint = "full_bodybags"
-	self.interaction.bodybags_bag.sound_start = "bar_bag_generic"
-	self.interaction.bodybags_bag.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.bodybags_bag.sound_done = "bar_bag_generic_finished"
-	self.interaction.bodybags_bag.action_text_id = "hud_action_grabbing_bag"
-	self.interaction.grenade_crate = {}
-	self.interaction.grenade_crate.icon = "equipment_ammo_bag"
-	self.interaction.grenade_crate.text_id = "debug_interact_grenade_crate_take_grenades"
-	self.interaction.grenade_crate.contour = "deployable"
-	self.interaction.grenade_crate.timer = 1.5
-	self.interaction.grenade_crate.blocked_hint = "full_grenades"
-	self.interaction.grenade_crate.sound_start = "bar_bag_generic"
-	self.interaction.grenade_crate.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.grenade_crate.sound_done = "bar_bag_generic_finished"
-	self.interaction.grenade_crate.action_text_id = "hud_action_taking_grenades"
-	self.interaction.ammo_bag = {}
-	self.interaction.ammo_bag.icon = "equipment_ammo_bag"
-	self.interaction.ammo_bag.text_id = "debug_interact_ammo_bag_take_ammo"
-	self.interaction.ammo_bag.contour = "deployable"
-	self.interaction.ammo_bag.timer = 3.5
-	self.interaction.ammo_bag.blocked_hint = "full_ammo"
-	self.interaction.ammo_bag.sound_start = "bar_bag_generic"
-	self.interaction.ammo_bag.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.ammo_bag.sound_done = "bar_bag_generic_finished"
-	self.interaction.ammo_bag.action_text_id = "hud_action_taking_ammo"
-	self.interaction.doctor_bag = {}
-	self.interaction.doctor_bag.icon = "equipment_doctor_bag"
-	self.interaction.doctor_bag.text_id = "debug_interact_doctor_bag_heal"
-	self.interaction.doctor_bag.contour = "deployable"
-	self.interaction.doctor_bag.timer = 3.5
-	self.interaction.doctor_bag.blocked_hint = "full_health"
-	self.interaction.doctor_bag.sound_start = "bar_helpup"
-	self.interaction.doctor_bag.sound_interupt = "bar_helpup_cancel"
-	self.interaction.doctor_bag.sound_done = "bar_helpup_finished"
-	self.interaction.doctor_bag.action_text_id = "hud_action_healing"
-	self.interaction.doctor_bag.upgrade_timer_multiplier = {
-		category = "doctor_bag",
-		upgrade = "interaction_speed_multiplier"
-	}
-	self.interaction.ecm_jammer = {}
-	self.interaction.ecm_jammer.icon = "equipment_ecm_jammer"
-	self.interaction.ecm_jammer.text_id = "hud_int_equipment_ecm_feedback"
-	self.interaction.ecm_jammer.contour = "deployable"
-	self.interaction.ecm_jammer.requires_upgrade = {
-		category = "ecm_jammer",
-		upgrade = "can_activate_feedback"
-	}
-	self.interaction.ecm_jammer.upgrade_timer_multiplier = {
-		category = "ecm_jammer",
-		upgrade = "interaction_speed_multiplier"
-	}
-	self.interaction.ecm_jammer.timer = 2
-	self.interaction.laptop_objective = {}
-	self.interaction.laptop_objective.icon = "laptop_objective"
-	self.interaction.laptop_objective.start_active = false
-	self.interaction.laptop_objective.text_id = "debug_interact_laptop_objective"
-	self.interaction.laptop_objective.timer = 15
-	self.interaction.laptop_objective.sound_start = "bar_keyboard"
-	self.interaction.laptop_objective.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.laptop_objective.sound_done = "bar_keyboard_finished"
-	self.interaction.laptop_objective.say_waiting = "i01x_any"
-	self.interaction.laptop_objective.axis = "z"
-	self.interaction.laptop_objective.interact_distance = 100
-	self.interaction.money_bag = {}
-	self.interaction.money_bag.icon = "equipment_money_bag"
-	self.interaction.money_bag.text_id = "debug_interact_money_bag"
-	self.interaction.money_bag.equipment_text_id = "debug_interact_equipment_money_bag"
-	self.interaction.money_bag.special_equipment = "money_bag"
-	self.interaction.money_bag.equipment_consume = false
-	self.interaction.money_bag.sound_event = "ammo_bag_drop"
-	self.interaction.apartment_helicopter = {}
-	self.interaction.apartment_helicopter.icon = "develop"
-	self.interaction.apartment_helicopter.text_id = "debug_interact_apartment_helicopter"
-	self.interaction.apartment_helicopter.sound_event = "ammo_bag_drop"
-	self.interaction.apartment_helicopter.timer = 13
-	self.interaction.apartment_helicopter.interact_distance = 350
-	self.interaction.test_interactive_door = {}
-	self.interaction.test_interactive_door.icon = "develop"
-	self.interaction.test_interactive_door.text_id = "debug_interact_temp_interact_box"
-	self.interaction.test_interactive_door.sound_event = "ammo_bag_drop"
-	self.interaction.test_interactive_door_one_direction = {}
-	self.interaction.test_interactive_door_one_direction.icon = "develop"
-	self.interaction.test_interactive_door_one_direction.text_id = "debug_interact_temp_interact_box"
-	self.interaction.test_interactive_door_one_direction.sound_event = "ammo_bag_drop"
-	self.interaction.test_interactive_door_one_direction.axis = "y"
-	self.interaction.temp_interact_box = {}
-	self.interaction.temp_interact_box.icon = "develop"
-	self.interaction.temp_interact_box.text_id = "debug_interact_temp_interact_box"
-	self.interaction.temp_interact_box.sound_event = "ammo_bag_drop"
-	self.interaction.temp_interact_box.timer = 4
-	self.interaction.requires_cable_ties = {}
-	self.interaction.requires_cable_ties.icon = "develop"
-	self.interaction.requires_cable_ties.text_id = "debug_interact_temp_interact_box"
-	self.interaction.requires_cable_ties.equipment_text_id = "debug_interact_equipment_requires_cable_ties"
-	self.interaction.requires_cable_ties.sound_event = "ammo_bag_drop"
-	self.interaction.requires_cable_ties.special_equipment = "cable_tie"
-	self.interaction.requires_cable_ties.equipment_consume = true
-	self.interaction.requires_cable_ties.timer = 5
-	self.interaction.requires_cable_ties.requires_upgrade = {
-		category = "cable_tie",
-		upgrade = "can_cable_tie_doors"
-	}
-	self.interaction.requires_cable_ties.upgrade_timer_multiplier = {
-		category = "cable_tie",
-		upgrade = "interact_speed_multiplier"
-	}
-	self.interaction.temp_interact_box_no_timer = {}
-	self.interaction.temp_interact_box_no_timer.icon = "develop"
-	self.interaction.temp_interact_box_no_timer.text_id = "debug_interact_temp_interact_box"
-	self.interaction.access_camera = {}
-	self.interaction.access_camera.icon = "develop"
-	self.interaction.access_camera.text_id = "hud_int_access_camera"
-	self.interaction.access_camera.interact_distance = 125
-	self.interaction.interaction_ball = {}
-	self.interaction.interaction_ball.icon = "develop"
-	self.interaction.interaction_ball.text_id = "debug_interact_interaction_ball"
-	self.interaction.interaction_ball.timer = 5
-	self.interaction.interaction_ball.sound_start = "cft_hose_loop"
-	self.interaction.interaction_ball.sound_interupt = "cft_hose_cancel"
-	self.interaction.interaction_ball.sound_done = "cft_hose_end"
-	self.interaction.invisible_interaction_open = {}
-	self.interaction.invisible_interaction_open.icon = "develop"
-	self.interaction.invisible_interaction_open.text_id = "hud_int_invisible_interaction_open"
-	self.interaction.invisible_interaction_open.timer = 0.5
-	self.interaction.fork_lift_sound = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.fork_lift_sound.text_id = "hud_int_fork_lift_sound"
-	self.interaction.money_briefcase = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.money_briefcase.axis = "x"
-	self.interaction.grenade_briefcase = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.grenade_briefcase.contour = "deployable"
-	self.interaction.cash_register = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.cash_register.axis = "x"
-	self.interaction.cash_register.interact_distance = 110
-	self.interaction.atm_interaction = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.atm_interaction.start_active = false
-	self.interaction.atm_interaction.contour = "interactable_icon"
-	self.interaction.weapon_case = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.weapon_case.axis = "x"
-	self.interaction.weapon_case.interact_distance = 110
-	self.interaction.weapon_case_close = deep_clone(self.interaction.weapon_case)
-	self.interaction.weapon_case_close.text_id = "hud_int_invisible_interaction_close"
-	self.interaction.invisible_interaction_close = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.invisible_interaction_close.text_id = "hud_int_invisible_interaction_close"
-	self.interaction.interact_gen_pku_loot_take = {}
-	self.interaction.interact_gen_pku_loot_take.icon = "develop"
-	self.interaction.interact_gen_pku_loot_take.text_id = "debug_interact_gen_pku_loot_take"
-	self.interaction.interact_gen_pku_loot_take.timer = 2
-	self.interaction.water_tap = {}
-	self.interaction.water_tap.icon = "develop"
-	self.interaction.water_tap.text_id = "debug_interact_water_tap"
-	self.interaction.water_tap.timer = 3
-	self.interaction.water_tap.start_active = false
-	self.interaction.water_tap.axis = "y"
-	self.interaction.water_manhole = {}
-	self.interaction.water_manhole.icon = "develop"
-	self.interaction.water_manhole.text_id = "debug_interact_water_tap"
-	self.interaction.water_manhole.timer = 3
-	self.interaction.water_manhole.start_active = false
-	self.interaction.water_manhole.axis = "z"
-	self.interaction.water_manhole.interact_distance = 200
-	self.interaction.sewer_manhole = {}
-	self.interaction.sewer_manhole.icon = "develop"
-	self.interaction.sewer_manhole.text_id = "debug_interact_sewer_manhole"
-	self.interaction.sewer_manhole.timer = 3
-	self.interaction.sewer_manhole.start_active = false
-	self.interaction.sewer_manhole.interact_distance = 200
-	self.interaction.sewer_manhole.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.circuit_breaker = {}
-	self.interaction.circuit_breaker.icon = "interaction_powerbox"
-	self.interaction.circuit_breaker.text_id = "debug_interact_circuit_breaker"
-	self.interaction.circuit_breaker.start_active = false
-	self.interaction.circuit_breaker.axis = "z"
-	self.interaction.transformer_box = {}
-	self.interaction.transformer_box.icon = "interaction_powerbox"
-	self.interaction.transformer_box.text_id = "debug_interact_transformer_box"
-	self.interaction.transformer_box.start_active = false
-	self.interaction.transformer_box.axis = "y"
-	self.interaction.transformer_box.timer = 5
-	self.interaction.stash_server_cord = {}
-	self.interaction.stash_server_cord.icon = "interaction_powercord"
-	self.interaction.stash_server_cord.text_id = "debug_interact_stash_server_cord"
-	self.interaction.stash_server_cord.start_active = false
-	self.interaction.stash_server_cord.axis = "z"
-	self.interaction.stash_planks = {}
-	self.interaction.stash_planks.icon = "equipment_planks"
-	self.interaction.stash_planks.contour = "interactable_icon"
-	self.interaction.stash_planks.text_id = "debug_interact_stash_planks"
-	self.interaction.stash_planks.start_active = false
-	self.interaction.stash_planks.timer = 2.5
-	self.interaction.stash_planks.equipment_text_id = "debug_interact_equipment_stash_planks"
-	self.interaction.stash_planks.special_equipment = "planks"
-	self.interaction.stash_planks.equipment_consume = true
-	self.interaction.stash_planks.sound_start = "bar_barricade_window"
-	self.interaction.stash_planks.sound_interupt = "bar_barricade_window_cancel"
-	self.interaction.stash_planks.sound_done = "bar_barricade_window_finished"
-	self.interaction.stash_planks.action_text_id = "hud_action_barricading"
-	self.interaction.stash_planks.axis = "z"
-	self.interaction.stash_planks_pickup = {}
-	self.interaction.stash_planks_pickup.icon = "equipment_planks"
-	self.interaction.stash_planks_pickup.text_id = "debug_interact_stash_planks_pickup"
-	self.interaction.stash_planks_pickup.start_active = false
-	self.interaction.stash_planks_pickup.timer = 2
-	self.interaction.stash_planks_pickup.axis = "z"
-	self.interaction.stash_planks_pickup.special_equipment_block = "planks"
-	self.interaction.stash_planks_pickup.sound_start = "bar_pick_up_planks"
-	self.interaction.stash_planks_pickup.sound_interupt = "bar_pick_up_planks_cancel"
-	self.interaction.stash_planks_pickup.sound_done = "bar_pick_up_planks_finished"
-	self.interaction.stash_planks_pickup.action_text_id = "hud_action_grabbing_planks"
-	self.interaction.stash_server = {}
-	self.interaction.stash_server.icon = "equipment_stash_server"
-	self.interaction.stash_server.text_id = "debug_interact_stash_server"
-	self.interaction.stash_server.timer = 2
-	self.interaction.stash_server.start_active = false
-	self.interaction.stash_server.axis = "z"
-	self.interaction.stash_server.equipment_text_id = "debug_interact_equipment_stash_server"
-	self.interaction.stash_server.special_equipment = "server"
-	self.interaction.stash_server.equipment_consume = true
-	self.interaction.stash_server_pickup = {}
-	self.interaction.stash_server_pickup.icon = "equipment_stash_server"
-	self.interaction.stash_server_pickup.text_id = "hud_int_hold_take_hdd"
-	self.interaction.stash_server_pickup.timer = 1
-	self.interaction.stash_server_pickup.start_active = false
-	self.interaction.stash_server_pickup.axis = "z"
-	self.interaction.stash_server_pickup.special_equipment_block = "server"
-	self.interaction.shelf_sliding_suburbia = {}
-	self.interaction.shelf_sliding_suburbia.icon = "develop"
-	self.interaction.shelf_sliding_suburbia.text_id = "debug_interact_move_bookshelf"
-	self.interaction.shelf_sliding_suburbia.start_active = false
-	self.interaction.shelf_sliding_suburbia.timer = 3
-	self.interaction.tear_painting = {}
-	self.interaction.tear_painting.icon = "develop"
-	self.interaction.tear_painting.text_id = "debug_interact_tear_painting"
-	self.interaction.tear_painting.start_active = false
-	self.interaction.tear_painting.axis = "y"
-	self.interaction.ejection_seat_interact = {}
-	self.interaction.ejection_seat_interact.icon = "equipment_ejection_seat"
-	self.interaction.ejection_seat_interact.text_id = "debug_interact_temp_interact_box"
-	self.interaction.ejection_seat_interact.timer = 4
-	self.interaction.diamond_pickup = {}
-	self.interaction.diamond_pickup.icon = "interaction_diamond"
-	self.interaction.diamond_pickup.text_id = "hud_int_take_jewelry"
-	self.interaction.diamond_pickup.sound_event = "money_grab"
-	self.interaction.diamond_pickup.start_active = false
-	self.interaction.safe_loot_pickup = deep_clone(self.interaction.diamond_pickup)
-	self.interaction.safe_loot_pickup.start_active = true
-	self.interaction.safe_loot_pickup.text_id = "hud_int_take"
-	self.interaction.tiara_pickup = {}
-	self.interaction.tiara_pickup.icon = "develop"
-	self.interaction.tiara_pickup.text_id = "hud_int_pickup_tiara"
-	self.interaction.tiara_pickup.sound_event = "money_grab"
-	self.interaction.tiara_pickup.start_active = false
-	self.interaction.patientpaper_pickup = {}
-	self.interaction.patientpaper_pickup.icon = "interaction_patientfile"
-	self.interaction.patientpaper_pickup.text_id = "debug_interact_patient_paper"
-	self.interaction.patientpaper_pickup.timer = 2
-	self.interaction.patientpaper_pickup.start_active = false
-	self.interaction.diamond_case = {}
-	self.interaction.diamond_case.icon = "interaction_diamond"
-	self.interaction.diamond_case.text_id = "debug_interact_diamond_case"
-	self.interaction.diamond_case.start_active = false
-	self.interaction.diamond_case.axis = "x"
-	self.interaction.diamond_case.interact_distance = 150
-	self.interaction.diamond_single_pickup = {}
-	self.interaction.diamond_single_pickup.icon = "interaction_diamond"
-	self.interaction.diamond_single_pickup.text_id = "debug_interact_temp_interact_box_press"
-	self.interaction.diamond_single_pickup.sound_event = "ammo_bag_drop"
-	self.interaction.diamond_single_pickup.start_active = false
-	self.interaction.suburbia_necklace_pickup = {}
-	self.interaction.suburbia_necklace_pickup.icon = "interaction_diamond"
-	self.interaction.suburbia_necklace_pickup.text_id = "debug_interact_temp_interact_box_press"
-	self.interaction.suburbia_necklace_pickup.sound_event = "ammo_bag_drop"
-	self.interaction.suburbia_necklace_pickup.start_active = false
-	self.interaction.suburbia_necklace_pickup.interact_distance = 100
-	self.interaction.temp_interact_box2 = {}
-	self.interaction.temp_interact_box2.icon = "develop"
-	self.interaction.temp_interact_box2.text_id = "debug_interact_temp_interact_box"
-	self.interaction.temp_interact_box2.sound_event = "ammo_bag_drop"
-	self.interaction.temp_interact_box2.timer = 20
-	self.interaction.printing_plates = {}
-	self.interaction.printing_plates.icon = "develop"
-	self.interaction.printing_plates.text_id = "debug_interact_printing_plates"
-	self.interaction.printing_plates.timer = 0.25
-	self.interaction.c4 = {}
-	self.interaction.c4.icon = "equipment_c4"
-	self.interaction.c4.text_id = "debug_interact_c4"
-	self.interaction.c4.timer = 4
-	self.interaction.c4.sound_start = "bar_c4_apply"
-	self.interaction.c4.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.c4.sound_done = "bar_c4_apply_finished"
-	self.interaction.c4.action_text_id = "hud_action_placing_c4"
-	self.interaction.c4_diffusible = {}
-	self.interaction.c4_diffusible.icon = "equipment_c4"
-	self.interaction.c4_diffusible.text_id = "debug_c4_diffusible"
-	self.interaction.c4_diffusible.timer = 4
-	self.interaction.c4_diffusible.sound_start = "bar_c4_apply"
-	self.interaction.c4_diffusible.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.c4_diffusible.sound_done = "bar_c4_apply_finished"
-	self.interaction.c4_diffusible.axis = "z"
-	self.interaction.open_trunk = {}
-	self.interaction.open_trunk.icon = "develop"
-	self.interaction.open_trunk.text_id = "debug_interact_open_trunk"
-	self.interaction.open_trunk.timer = 0.5
-	self.interaction.open_trunk.axis = "x"
-	self.interaction.open_trunk.action_text_id = "hud_action_opening_trunk"
-	self.interaction.open_door = {}
-	self.interaction.open_door.icon = "interaction_open_door"
-	self.interaction.open_door.text_id = "debug_interact_open_door"
-	self.interaction.open_door.interact_distance = 200
-	self.interaction.embassy_door = {}
-	self.interaction.embassy_door.start_active = false
-	self.interaction.embassy_door.icon = "interaction_open_door"
-	self.interaction.embassy_door.text_id = "debug_interact_embassy_door"
-	self.interaction.embassy_door.interact_distance = 150
-	self.interaction.embassy_door.timer = 5
-	self.interaction.c4_special = {}
-	self.interaction.c4_special.icon = "equipment_c4"
-	self.interaction.c4_special.text_id = "debug_interact_c4"
-	self.interaction.c4_special.equipment_text_id = "debug_interact_equipment_c4"
-	self.interaction.c4_special.equipment_consume = true
-	self.interaction.c4_special.timer = 4
-	self.interaction.c4_special.sound_start = "bar_c4_apply"
-	self.interaction.c4_special.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.c4_special.sound_done = "bar_c4_apply_finished"
-	self.interaction.c4_special.axis = "z"
-	self.interaction.c4_special.action_text_id = "hud_action_placing_c4"
-	self.interaction.c4_bag = {}
-	self.interaction.c4_bag.text_id = "debug_interact_c4_bag"
-	self.interaction.c4_bag.timer = 8
-	self.interaction.c4_bag.contour = "interactable"
-	self.interaction.c4_bag.axis = "z"
-	self.interaction.c4_bag.sound_start = "bar_bag_generic"
-	self.interaction.c4_bag.sound_interupt = "bar_bag_generic_cancel"
-	self.interaction.c4_bag.sound_done = "bar_bag_generic_finished"
-	self.interaction.money_wrap = {}
-	self.interaction.money_wrap.icon = "interaction_money_wrap"
-	self.interaction.money_wrap.text_id = "debug_interact_money_wrap_take_money"
-	self.interaction.money_wrap.start_active = false
-	self.interaction.money_wrap.timer = 3
-	self.interaction.money_wrap.action_text_id = "hud_action_taking_money"
-	self.interaction.money_wrap.blocked_hint = "carry_block"
-	self.interaction.money_wrap.sound_start = "bar_bag_money"
-	self.interaction.money_wrap.sound_interupt = "bar_bag_money_cancel"
-	self.interaction.money_wrap.sound_done = "bar_bag_money_finished"
-	self.interaction.suburbia_money_wrap = {}
-	self.interaction.suburbia_money_wrap.icon = "interaction_money_wrap"
-	self.interaction.suburbia_money_wrap.text_id = "debug_interact_money_printed_take_money"
-	self.interaction.suburbia_money_wrap.start_active = false
-	self.interaction.suburbia_money_wrap.timer = 3
-	self.interaction.suburbia_money_wrap.action_text_id = "hud_action_taking_money"
-	self.interaction.money_wrap_single_bundle = {}
-	self.interaction.money_wrap_single_bundle.icon = "interaction_money_wrap"
-	self.interaction.money_wrap_single_bundle.text_id = "debug_interact_money_wrap_single_bundle_take_money"
-	self.interaction.money_wrap_single_bundle.start_active = false
-	self.interaction.money_wrap_single_bundle.interact_distance = 110
-	self.interaction.christmas_present = {}
-	self.interaction.christmas_present.icon = "interaction_christmas_present"
-	self.interaction.christmas_present.text_id = "debug_interact_take_christmas_present"
-	self.interaction.christmas_present.start_active = true
-	self.interaction.christmas_present.interact_distance = 125
-	self.interaction.gold_pile = {}
-	self.interaction.gold_pile.icon = "interaction_gold"
-	self.interaction.gold_pile.text_id = "debug_interact_gold_pile_take_money"
-	self.interaction.gold_pile.start_active = false
-	self.interaction.gold_pile.timer = 1
-	self.interaction.gold_pile.action_text_id = "hud_action_taking_gold"
-	self.interaction.gold_pile.blocked_hint = "carry_block"
-	self.interaction.gold_bag = {}
-	self.interaction.gold_bag.icon = "interaction_gold"
-	self.interaction.gold_bag.text_id = "debug_interact_gold_bag"
-	self.interaction.gold_bag.start_active = false
-	self.interaction.gold_bag.timer = 1
-	self.interaction.gold_bag.special_equipment_block = "gold_bag_equip"
-	self.interaction.gold_bag.action_text_id = "hud_action_taking_gold"
-	self.interaction.requires_gold_bag = {}
-	self.interaction.requires_gold_bag.icon = "interaction_gold"
-	self.interaction.requires_gold_bag.text_id = "debug_interact_requires_gold_bag"
-	self.interaction.requires_gold_bag.equipment_text_id = "debug_interact_equipment_requires_gold_bag"
-	self.interaction.requires_gold_bag.special_equipment = "gold_bag_equip"
-	self.interaction.requires_gold_bag.start_active = true
-	self.interaction.requires_gold_bag.equipment_consume = true
-	self.interaction.requires_gold_bag.timer = 1
-	self.interaction.requires_gold_bag.sound_event = "ammo_bag_drop"
-	self.interaction.requires_gold_bag.axis = "x"
-	self.interaction.intimidate = {}
-	self.interaction.intimidate.icon = "equipment_cable_ties"
-	self.interaction.intimidate.text_id = "debug_interact_intimidate"
-	self.interaction.intimidate.equipment_text_id = "debug_interact_equipment_cable_tie"
-	self.interaction.intimidate.start_active = false
-	self.interaction.intimidate.special_equipment = "cable_tie"
-	self.interaction.intimidate.equipment_consume = true
-	self.interaction.intimidate.no_contour = true
-	self.interaction.intimidate.timer = 2
-	self.interaction.intimidate.upgrade_timer_multiplier = {
-		category = "cable_tie",
-		upgrade = "interact_speed_multiplier"
-	}
-	self.interaction.intimidate.action_text_id = "hud_action_cable_tying"
-	self.interaction.intimidate_and_search = {}
-	self.interaction.intimidate_and_search.icon = "equipment_cable_ties"
-	self.interaction.intimidate_and_search.text_id = "debug_interact_intimidate"
-	self.interaction.intimidate_and_search.equipment_text_id = "debug_interact_search_key"
-	self.interaction.intimidate_and_search.start_active = false
-	self.interaction.intimidate_and_search.special_equipment = "cable_tie"
-	self.interaction.intimidate_and_search.equipment_consume = true
-	self.interaction.intimidate_and_search.dont_need_equipment = true
-	self.interaction.intimidate_and_search.no_contour = true
-	self.interaction.intimidate_and_search.timer = 3.5
-	self.interaction.intimidate_and_search.action_text_id = "hud_action_cable_tying"
-	self.interaction.intimidate_with_contour = deep_clone(self.interaction.intimidate)
-	self.interaction.intimidate_with_contour.no_contour = false
-	self.interaction.intimidate_and_search_with_contour = deep_clone(self.interaction.intimidate_and_search)
-	self.interaction.intimidate_and_search_with_contour.no_contour = false
-	self.interaction.computer_test = {}
-	self.interaction.computer_test.icon = "develop"
-	self.interaction.computer_test.text_id = "debug_interact_computer_test"
-	self.interaction.computer_test.start_active = false
-	self.interaction.carry_drop = {}
-	self.interaction.carry_drop.icon = "develop"
-	self.interaction.carry_drop.text_id = "hud_int_hold_grab_the_bag"
-	self.interaction.carry_drop.sound_event = "ammo_bag_drop"
-	self.interaction.carry_drop.timer = 1
-	self.interaction.carry_drop.force_update_position = true
-	self.interaction.carry_drop.action_text_id = "hud_action_grabbing_bag"
-	self.interaction.carry_drop.blocked_hint = "carry_block"
-	self.interaction.painting_carry_drop = {}
-	self.interaction.painting_carry_drop.icon = "develop"
-	self.interaction.painting_carry_drop.text_id = "hud_int_hold_grab_the_painting"
-	self.interaction.painting_carry_drop.sound_event = "ammo_bag_drop"
-	self.interaction.painting_carry_drop.timer = 1
-	self.interaction.painting_carry_drop.force_update_position = true
-	self.interaction.painting_carry_drop.action_text_id = "hud_action_grabbing_painting"
-	self.interaction.painting_carry_drop.blocked_hint = "carry_block"
-	self.interaction.corpse_alarm_pager = {}
-	self.interaction.corpse_alarm_pager.icon = "develop"
-	self.interaction.corpse_alarm_pager.text_id = "hud_int_disable_alarm_pager"
-	self.interaction.corpse_alarm_pager.sound_event = "ammo_bag_drop"
-	self.interaction.corpse_alarm_pager.timer = 10
-	self.interaction.corpse_alarm_pager.force_update_position = true
-	self.interaction.corpse_alarm_pager.action_text_id = "hud_action_disabling_alarm_pager"
-	self.interaction.corpse_alarm_pager.contour_preset = "generic_interactable"
-	self.interaction.corpse_alarm_pager.contour_preset_selected = "generic_interactable_selected"
-	self.interaction.corpse_alarm_pager.contour_flash_interval = 0.15
-	self.interaction.corpse_dispose = {}
-	self.interaction.corpse_dispose.icon = "develop"
-	self.interaction.corpse_dispose.text_id = "hud_int_dispose_corpse"
-	self.interaction.corpse_dispose.sound_event = "ammo_bag_drop"
-	self.interaction.corpse_dispose.timer = 2
-	self.interaction.corpse_dispose.requires_upgrade = {
-		category = "player",
-		upgrade = "corpse_dispose"
-	}
-	self.interaction.corpse_dispose.action_text_id = "hud_action_disposing_corpse"
-	self.interaction.corpse_dispose.no_contour = true
-	self.interaction.shaped_sharge = {}
-	self.interaction.shaped_sharge.icon = "equipment_c4"
-	self.interaction.shaped_sharge.text_id = "hud_int_equipment_shaped_charge"
-	self.interaction.shaped_sharge.contour = "interactable_icon"
-	self.interaction.shaped_sharge.required_deployable = "trip_mine"
-	self.interaction.shaped_sharge.deployable_consume = true
-	self.interaction.shaped_sharge.timer = 4
-	self.interaction.shaped_sharge.sound_start = "bar_c4_apply"
-	self.interaction.shaped_sharge.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.shaped_sharge.sound_done = "bar_c4_apply_finished"
-	self.interaction.shaped_sharge.requires_upgrade = {
-		category = "player",
-		upgrade = "trip_mine_shaped_charge"
-	}
-	self.interaction.shaped_sharge.action_text_id = "hud_action_placing_shaped_charge"
-	self.interaction.hostage_convert = {}
-	self.interaction.hostage_convert.icon = "develop"
-	self.interaction.hostage_convert.text_id = "hud_int_hostage_convert"
-	self.interaction.hostage_convert.sound_event = "ammo_bag_drop"
-	self.interaction.hostage_convert.blocked_hint = "convert_enemy_failed"
-	self.interaction.hostage_convert.timer = 1.5
-	self.interaction.hostage_convert.requires_upgrade = {
-		category = "player",
-		upgrade = "convert_enemies"
-	}
-	self.interaction.hostage_convert.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "convert_enemies_interaction_speed_multiplier"
-	}
-	self.interaction.hostage_convert.action_text_id = "hud_action_converting_hostage"
-	self.interaction.hostage_convert.no_contour = true
-	self.interaction.break_open = {}
-	self.interaction.break_open.icon = "develop"
-	self.interaction.break_open.text_id = "hud_int_break_open"
-	self.interaction.break_open.start_active = false
-	self.interaction.cut_fence = {}
-	self.interaction.cut_fence.text_id = "hud_int_hold_cut_fence"
-	self.interaction.cut_fence.action_text_id = "hud_action_cutting_fence"
-	self.interaction.cut_fence.contour = "interactable_icon"
-	self.interaction.cut_fence.timer = 0.5
-	self.interaction.cut_fence.start_active = true
-	self.interaction.cut_fence.sound_start = "bar_cut_fence"
-	self.interaction.cut_fence.sound_interupt = "bar_cut_fence_cancel"
-	self.interaction.cut_fence.sound_done = "bar_cut_fence_finished"
-	self.interaction.burning_money = {}
-	self.interaction.burning_money.text_id = "hud_int_hold_ignite_money"
-	self.interaction.burning_money.action_text_id = "hud_action_igniting_money"
-	self.interaction.burning_money.timer = 2
-	self.interaction.burning_money.start_active = false
-	self.interaction.burning_money.interact_distance = 250
-	self.interaction.hold_take_painting = {}
-	self.interaction.hold_take_painting.text_id = "hud_int_hold_take_painting"
-	self.interaction.hold_take_painting.action_text_id = "hud_action_taking_painting"
-	self.interaction.hold_take_painting.start_active = false
-	self.interaction.hold_take_painting.axis = "y"
-	self.interaction.hold_take_painting.timer = 2
-	self.interaction.hold_take_painting.sound_start = "bar_steal_painting"
-	self.interaction.hold_take_painting.sound_interupt = "bar_steal_painting_cancel"
-	self.interaction.hold_take_painting.sound_done = "bar_steal_painting_finished"
-	self.interaction.hold_take_painting.blocked_hint = "carry_block"
-	self.interaction.barricade_fence = deep_clone(self.interaction.stash_planks)
-	self.interaction.barricade_fence.contour = "interactable_icon"
-	self.interaction.barricade_fence.sound_start = "bar_barricade_fence"
-	self.interaction.barricade_fence.sound_interupt = "bar_barricade_fence_cancel"
-	self.interaction.barricade_fence.sound_done = "bar_barricade_fence_finished"
-	self.interaction.hack_numpad = {}
-	self.interaction.hack_numpad.text_id = "hud_int_hold_hack_numpad"
-	self.interaction.hack_numpad.action_text_id = "hud_action_hacking_numpad"
-	self.interaction.hack_numpad.start_active = false
-	self.interaction.hack_numpad.timer = 15
-	self.interaction.pickup_phone = {}
-	self.interaction.pickup_phone.text_id = "hud_int_pickup_phone"
-	self.interaction.pickup_phone.start_active = false
-	self.interaction.pickup_tablet = deep_clone(self.interaction.pickup_phone)
-	self.interaction.pickup_tablet.text_id = "hud_int_pickup_tablet"
-	self.interaction.hold_take_server = {}
-	self.interaction.hold_take_server.text_id = "hud_int_hold_take_server"
-	self.interaction.hold_take_server.action_text_id = "hud_action_taking_server"
-	self.interaction.hold_take_server.timer = 4
-	self.interaction.hold_take_server.sound_start = "bar_steal_circuit"
-	self.interaction.hold_take_server.sound_interupt = "bar_steal_circuit_cancel"
-	self.interaction.hold_take_server.sound_done = "bar_steal_circuit_finished"
-	self.interaction.hold_take_blueprints = {}
-	self.interaction.hold_take_blueprints.text_id = "hud_int_hold_take_blueprints"
-	self.interaction.hold_take_blueprints.action_text_id = "hud_action_taking_blueprints"
-	self.interaction.hold_take_blueprints.start_active = false
-	self.interaction.hold_take_blueprints.timer = 0.5
-	self.interaction.hold_take_blueprints.sound_start = "bar_steal_painting"
-	self.interaction.hold_take_blueprints.sound_interupt = "bar_steal_painting_cancel"
-	self.interaction.hold_take_blueprints.sound_done = "bar_steal_painting_finished"
-	self.interaction.take_confidential_folder = {}
-	self.interaction.take_confidential_folder.text_id = "hud_int_take_confidential_folder"
-	self.interaction.take_confidential_folder.start_active = false
-	self.interaction.take_confidential_folder_event = {}
-	self.interaction.take_confidential_folder_event.text_id = "hud_int_take_confidential_folder_event"
-	self.interaction.take_confidential_folder_event.start_active = false
-	self.interaction.hold_take_gas_can = {}
-	self.interaction.hold_take_gas_can.text_id = "hud_int_hold_take_gas"
-	self.interaction.hold_take_gas_can.action_text_id = "hud_action_taking_gasoline"
-	self.interaction.hold_take_gas_can.start_active = false
-	self.interaction.hold_take_gas_can.timer = 0.5
-	self.interaction.hold_take_gas_can.special_equipment_block = "gas"
-	self.interaction.gen_ladyjustice_statue = {}
-	self.interaction.gen_ladyjustice_statue.text_id = "hud_int_ladyjustice_statue"
-	self.interaction.hold_place_gps_tracker = {}
-	self.interaction.hold_place_gps_tracker.text_id = "hud_int_hold_place_gps_tracker"
-	self.interaction.hold_place_gps_tracker.action_text_id = "hud_action_placing_gps_tracker"
-	self.interaction.hold_place_gps_tracker.contour = "interactable_icon"
-	self.interaction.hold_place_gps_tracker.start_active = false
-	self.interaction.hold_place_gps_tracker.timer = 1.5
-	self.interaction.hold_place_gps_tracker.interact_distance = 200
-	self.interaction.keyboard_no_time = deep_clone(self.interaction.security_station_keyboard)
-	self.interaction.keyboard_no_time.timer = 2.5
-	self.interaction.keyboard_eday_1 = deep_clone(self.interaction.security_station_keyboard)
-	self.interaction.keyboard_eday_1.timer = 2.5
-	self.interaction.keyboard_eday_1.text_id = "hud_int_keyboard_eday_1"
-	self.interaction.keyboard_eday_2 = deep_clone(self.interaction.security_station_keyboard)
-	self.interaction.keyboard_eday_2.timer = 2.5
-	self.interaction.keyboard_eday_2.text_id = "hud_int_keyboard_eday_2"
-	self.interaction.hold_use_computer = {}
-	self.interaction.hold_use_computer.start_active = false
-	self.interaction.hold_use_computer.text_id = "hud_int_hold_use_computer"
-	self.interaction.hold_use_computer.action_text_id = "hud_action_using_computer"
-	self.interaction.hold_use_computer.timer = 1
-	self.interaction.hold_use_computer.axis = "z"
-	self.interaction.hold_use_computer.interact_distance = 100
-	self.interaction.use_server_device = {}
-	self.interaction.use_server_device.text_id = "hud_int_hold_use_device"
-	self.interaction.use_server_device.action_text_id = "hud_action_using_device"
-	self.interaction.use_server_device.timer = 1
-	self.interaction.use_server_device.start_active = false
-	self.interaction.iphone_answer = {}
-	self.interaction.iphone_answer.text_id = "hud_int_answer_phone"
-	self.interaction.iphone_answer.start_active = false
-	self.interaction.use_flare = {}
-	self.interaction.use_flare.text_id = "hud_int_use_flare"
-	self.interaction.use_flare.start_active = false
-	self.interaction.steal_methbag = {}
-	self.interaction.steal_methbag.text_id = "hud_int_hold_steal_meth"
-	self.interaction.steal_methbag.action_text_id = "hud_action_stealing_meth"
-	self.interaction.steal_methbag.start_active = true
-	self.interaction.steal_methbag.timer = 3
-	self.interaction.pickup_keycard = {}
-	self.interaction.pickup_keycard.text_id = "hud_int_pickup_keycard"
-	self.interaction.pickup_keycard.sound_done = "pick_up_key_card"
-	self.interaction.open_from_inside = {}
-	self.interaction.open_from_inside.text_id = "hud_int_invisible_interaction_open"
-	self.interaction.open_from_inside.start_active = true
-	self.interaction.open_from_inside.interact_distance = 100
-	self.interaction.open_from_inside.timer = 0.2
-	self.interaction.open_from_inside.axis = "x"
-	self.interaction.money_luggage = deep_clone(self.interaction.money_wrap)
-	self.interaction.money_luggage.start_active = true
-	self.interaction.money_luggage.axis = "x"
-	self.interaction.hold_pickup_lance = {}
-	self.interaction.hold_pickup_lance.text_id = "hud_int_hold_pickup_lance"
-	self.interaction.hold_pickup_lance.action_text_id = "hud_action_grabbing_lance"
-	self.interaction.hold_pickup_lance.sound_event = "ammo_bag_drop"
-	self.interaction.hold_pickup_lance.timer = 1
-	self.interaction.barrier_numpad = {}
-	self.interaction.barrier_numpad.text_id = "hud_int_barrier_numpad"
-	self.interaction.barrier_numpad.start_active = false
-	self.interaction.barrier_numpad.axis = "z"
-	self.interaction.timelock_numpad = {}
-	self.interaction.timelock_numpad.text_id = "hud_int_timelock_numpad"
-	self.interaction.timelock_numpad.start_active = false
-	self.interaction.timelock_numpad.axis = "z"
-	self.interaction.pickup_asset = {}
-	self.interaction.pickup_asset.text_id = "hud_int_pickup_asset"
-	self.interaction.pickup_asset.sound_event = "ammo_bag_drop"
-	self.interaction.open_slash_close = {}
-	self.interaction.open_slash_close.text_id = "hud_int_open_slash_close"
-	self.interaction.open_slash_close.start_active = false
-	self.interaction.open_slash_close.axis = "y"
-	self.interaction.open_slash_close.interact_distance = 200
-	self.interaction.open_slash_close_act = {}
-	self.interaction.open_slash_close_act.text_id = "hud_int_open_slash_close"
-	self.interaction.open_slash_close_act.action_text_id = "hud_action_open_slash_close"
-	self.interaction.open_slash_close_act.timer = 1
-	self.interaction.open_slash_close_act.start_active = true
-	self.interaction.raise_balloon = {}
-	self.interaction.raise_balloon.text_id = "hud_int_hold_raise_balloon"
-	self.interaction.raise_balloon.action_text_id = "hud_action_raise_balloon"
-	self.interaction.raise_balloon.start_active = false
-	self.interaction.raise_balloon.timer = 2
-	self.interaction.stn_int_place_camera = {}
-	self.interaction.stn_int_place_camera.text_id = "hud_int_place_camera"
-	self.interaction.stn_int_place_camera.start_active = true
-	self.interaction.stn_int_take_camera = {}
-	self.interaction.stn_int_take_camera.text_id = "hud_int_take_camera"
-	self.interaction.stn_int_take_camera.start_active = true
-	self.interaction.exit_to_crimenet = {}
-	self.interaction.exit_to_crimenet.text_id = "hud_int_exit_to_crimenet"
-	self.interaction.exit_to_crimenet.start_active = false
-	self.interaction.exit_to_crimenet.timer = 0.5
-	self.interaction.gage_assignment = {}
-	self.interaction.gage_assignment.icon = "develop"
-	self.interaction.gage_assignment.text_id = "debug_interact_gage_assignment_take"
-	self.interaction.gage_assignment.start_active = true
-	self.interaction.gage_assignment.timer = 1
-	self.interaction.gage_assignment.action_text_id = "hud_action_taking_gage_assignment"
-	self.interaction.gage_assignment.blocked_hint = "hint_gage_mods_dlc_block"
-	self.interaction.gen_pku_fusion_reactor = {}
-	self.interaction.gen_pku_fusion_reactor.text_id = "hud_int_hold_take_reaktor"
-	self.interaction.gen_pku_fusion_reactor.action_text_id = "hud_action_taking_reaktor"
-	self.interaction.gen_pku_fusion_reactor.blocked_hint = "carry_block"
-	self.interaction.gen_pku_fusion_reactor.start_active = false
-	self.interaction.gen_pku_fusion_reactor.timer = 3
-	self.interaction.gen_pku_fusion_reactor.no_contour = true
-	self.interaction.gen_pku_fusion_reactor.sound_start = "bar_bag_money"
-	self.interaction.gen_pku_fusion_reactor.sound_interupt = "bar_bag_money_cancel"
-	self.interaction.gen_pku_fusion_reactor.sound_done = "bar_bag_money_finished"
-	self.interaction.gen_pku_cocaine = {}
-	self.interaction.gen_pku_cocaine.text_id = "hud_int_hold_take_cocaine"
-	self.interaction.gen_pku_cocaine.action_text_id = "hud_action_taking_cocaine"
-	self.interaction.gen_pku_cocaine.timer = 3
-	self.interaction.gen_pku_cocaine.sound_start = "bar_bag_money"
-	self.interaction.gen_pku_cocaine.sound_interupt = "bar_bag_money_cancel"
-	self.interaction.gen_pku_cocaine.sound_done = "bar_bag_money_finished"
-	self.interaction.gen_pku_cocaine.blocked_hint = "carry_block"
-	self.interaction.gen_pku_artifact_statue = {}
-	self.interaction.gen_pku_artifact_statue.text_id = "hud_int_hold_take_artifact"
-	self.interaction.gen_pku_artifact_statue.action_text_id = "hud_action_taking_artifact"
-	self.interaction.gen_pku_artifact_statue.timer = 3
-	self.interaction.gen_pku_artifact_statue.start_active = false
-	self.interaction.gen_pku_artifact_statue.sound_start = "bar_bag_money"
-	self.interaction.gen_pku_artifact_statue.sound_interupt = "bar_bag_money_cancel"
-	self.interaction.gen_pku_artifact_statue.sound_done = "bar_bag_money_finished"
-	self.interaction.gen_pku_artifact_statue.blocked_hint = "carry_block"
-	self.interaction.gen_pku_jewelry = {}
-	self.interaction.gen_pku_jewelry.text_id = "hud_int_hold_take_jewelry"
-	self.interaction.gen_pku_jewelry.action_text_id = "hud_action_taking_jewelry"
-	self.interaction.gen_pku_jewelry.timer = 3
-	self.interaction.gen_pku_jewelry.sound_start = "bar_bag_jewelry"
-	self.interaction.gen_pku_jewelry.sound_interupt = "bar_bag_jewelry_cancel"
-	self.interaction.gen_pku_jewelry.sound_done = "bar_bag_jewelry_finished"
-	self.interaction.gen_pku_jewelry.blocked_hint = "carry_block"
-	self.interaction.taking_meth = {}
-	self.interaction.taking_meth.text_id = "hud_int_hold_take_meth"
-	self.interaction.taking_meth.action_text_id = "hud_action_taking_meth"
-	self.interaction.taking_meth.timer = 3
-	self.interaction.taking_meth.sound_start = "bar_bag_money"
-	self.interaction.taking_meth.sound_interupt = "bar_bag_money_cancel"
-	self.interaction.taking_meth.sound_done = "bar_bag_money_finished"
-	self.interaction.taking_meth.blocked_hint = "carry_block"
-	self.interaction.gen_pku_crowbar = {}
-	self.interaction.gen_pku_crowbar.text_id = "hud_int_take_crowbar"
-	self.interaction.gen_pku_crowbar.special_equipment_block = "crowbar"
-	self.interaction.gen_pku_crowbar.sound_done = "pick_up_crowbar"
-	self.interaction.gen_pku_thermite = {}
-	self.interaction.gen_pku_thermite.text_id = "hud_int_take_thermite"
-	self.interaction.gen_pku_thermite.special_equipment_block = "thermite"
-	self.interaction.gen_pku_thermite_paste = {}
-	self.interaction.gen_pku_thermite_paste.text_id = "hud_int_take_thermite_paste"
-	self.interaction.gen_pku_thermite_paste.special_equipment_block = "thermite_paste"
-	self.interaction.gen_pku_thermite_paste.contour = "deployable"
-	self.interaction.gen_pku_thermite_paste.sound_done = "pick_up_thermite"
-	self.interaction.button_infopad = {}
-	self.interaction.button_infopad.text_id = "hud_int_press_for_info"
-	self.interaction.button_infopad.start_active = false
-	self.interaction.button_infopad.axis = "z"
-	self.interaction.crate_loot = {}
-	self.interaction.crate_loot.text_id = "hud_int_hold_crack_crate"
-	self.interaction.crate_loot.action_text_id = "hud_action_cracking_crate"
-	self.interaction.crate_loot.timer = 2
-	self.interaction.crate_loot.start_active = false
-	self.interaction.crate_loot.sound_start = "bar_open_crate"
-	self.interaction.crate_loot.sound_interupt = "bar_open_crate_cancel"
-	self.interaction.crate_loot.sound_done = "bar_open_crate_finished"
-	self.interaction.crate_loot_crowbar = deep_clone(self.interaction.crate_loot)
-	self.interaction.crate_loot_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.crate_loot_crowbar.special_equipment = "crowbar"
-	self.interaction.crate_loot_crowbar.sound_start = "bar_crowbar"
-	self.interaction.crate_loot_crowbar.sound_interupt = "bar_crowbar_cancel"
-	self.interaction.crate_loot_crowbar.sound_done = "bar_crowbar_end"
-	self.interaction.weapon_case_not_active = deep_clone(self.interaction.weapon_case)
-	self.interaction.weapon_case_not_active.start_active = false
-	self.interaction.crate_weapon_crowbar = deep_clone(self.interaction.weapon_case)
-	self.interaction.crate_weapon_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.crate_weapon_crowbar.timer = 2
-	self.interaction.crate_weapon_crowbar.start_active = false
-	self.interaction.crate_weapon_crowbar.special_equipment = "crowbar"
-	self.interaction.crate_weapon_crowbar.sound_start = "bar_crowbar_plastic"
-	self.interaction.crate_weapon_crowbar.sound_interupt = "bar_crowbar_plastic_cancel"
-	self.interaction.crate_weapon_crowbar.sound_done = "bar_crowbar_plastic_finished"
-	self.interaction.crate_loot_close = {}
-	self.interaction.crate_loot_close.text_id = "hud_int_hold_close_crate"
-	self.interaction.crate_loot_close.action_text_id = "hud_action_closing_crate"
-	self.interaction.crate_loot_close.timer = 2
-	self.interaction.crate_loot_close.start_active = false
-	self.interaction.crate_loot_close.sound_start = "bar_close_crate"
-	self.interaction.crate_loot_close.sound_interupt = "bar_close_crate_cancel"
-	self.interaction.crate_loot_close.sound_done = "bar_close_crate_finished"
-	self.interaction.halloween_trick = {}
-	self.interaction.halloween_trick.text_id = "hud_int_trick_treat"
-	self.interaction.disassemble_turret = {}
-	self.interaction.disassemble_turret.text_id = "hud_int_hold_disassemble_turret"
-	self.interaction.disassemble_turret.action_text_id = "hud_action_disassemble_turret"
-	self.interaction.disassemble_turret.blocked_hint = "carry_block"
-	self.interaction.disassemble_turret.start_active = false
-	self.interaction.disassemble_turret.timer = 3
-	self.interaction.disassemble_turret.sound_start = "bar_steal_circuit"
-	self.interaction.disassemble_turret.sound_interupt = "bar_steal_circuit_cancel"
-	self.interaction.disassemble_turret.sound_done = "bar_steal_circuit_finished"
-	self.interaction.take_ammo = {}
-	self.interaction.take_ammo.text_id = "hud_int_hold_pack_shells"
-	self.interaction.take_ammo.action_text_id = "hud_action_packing_shells"
-	self.interaction.take_ammo.blocked_hint = "carry_block"
-	self.interaction.take_ammo.start_active = false
-	self.interaction.take_ammo.timer = 2
-	self.interaction.bank_note = {}
-	self.interaction.bank_note.text_id = "hud_int_bank_note"
-	self.interaction.bank_note.start_active = false
-	self.interaction.bank_note.timer = 3
-	self.interaction.pickup_boards = {}
-	self.interaction.pickup_boards.text_id = "hud_int_hold_pickup_boards"
-	self.interaction.pickup_boards.action_text_id = "hud_action_picking_up"
-	self.interaction.pickup_boards.start_active = false
-	self.interaction.pickup_boards.timer = 2
-	self.interaction.pickup_boards.axis = "z"
-	self.interaction.pickup_boards.special_equipment_block = "boards"
-	self.interaction.pickup_boards.sound_start = "bar_pick_up_planks"
-	self.interaction.pickup_boards.sound_interupt = "bar_pick_up_planks_cancel"
-	self.interaction.pickup_boards.sound_done = "bar_pick_up_planks_finished"
-	self.interaction.need_boards = {}
-	self.interaction.need_boards.contour = "interactable_icon"
-	self.interaction.need_boards.text_id = "debug_interact_stash_planks"
-	self.interaction.need_boards.action_text_id = "hud_action_barricading"
-	self.interaction.need_boards.start_active = false
-	self.interaction.need_boards.timer = 2.5
-	self.interaction.need_boards.equipment_text_id = "hud_equipment_need_boards"
-	self.interaction.need_boards.special_equipment = "boards"
-	self.interaction.need_boards.equipment_consume = true
-	self.interaction.need_boards.sound_start = "bar_barricade_window"
-	self.interaction.need_boards.sound_interupt = "bar_barricade_window_cancel"
-	self.interaction.need_boards.sound_done = "bar_barricade_window_finished"
-	self.interaction.need_boards.axis = "z"
-	self.interaction.uload_database = {}
-	self.interaction.uload_database.text_id = "hud_int_hold_use_computer"
-	self.interaction.uload_database.action_text_id = "hud_action_using_computer"
-	self.interaction.uload_database.timer = 4
-	self.interaction.uload_database.start_active = false
-	self.interaction.uload_database.sound_start = "bar_keyboard"
-	self.interaction.uload_database.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.uload_database.sound_done = "bar_keyboard_finished"
-	self.interaction.uload_database.axis = "x"
-	self.interaction.uload_database.contour = "contour_off"
-	self.interaction.uload_database_jammed = {}
-	self.interaction.uload_database_jammed.text_id = "hud_int_hold_resume_upload"
-	self.interaction.uload_database_jammed.action_text_id = "hud_action_resuming_upload"
-	self.interaction.uload_database_jammed.timer = 1
-	self.interaction.uload_database_jammed.sound_start = "bar_keyboard"
-	self.interaction.uload_database_jammed.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.uload_database_jammed.sound_done = "bar_keyboard_finished"
-	self.interaction.uload_database_jammed.axis = "x"
-	self.interaction.votingmachine2 = {}
-	self.interaction.votingmachine2.text_id = "debug_interact_hack_ipad"
-	self.interaction.votingmachine2.timer = 5
-	self.interaction.votingmachine2.sound_start = "bar_keyboard"
-	self.interaction.votingmachine2.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.votingmachine2.sound_done = "bar_keyboard_finished"
-	self.interaction.votingmachine2_jammed = {}
-	self.interaction.votingmachine2_jammed.text_id = "debug_interact_hack_ipad_jammed"
-	self.interaction.votingmachine2_jammed.timer = 5
-	self.interaction.votingmachine2_jammed.sound_start = "bar_keyboard"
-	self.interaction.votingmachine2_jammed.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.votingmachine2_jammed.sound_done = "bar_keyboard_finished"
-	self.interaction.sc_tape_loop = {}
-	self.interaction.sc_tape_loop.icon = "interaction_help"
-	self.interaction.sc_tape_loop.text_id = "hud_int_tape_loop"
-	self.interaction.sc_tape_loop.start_active = true
-	self.interaction.sc_tape_loop.interact_distance = 150
-	self.interaction.sc_tape_loop.no_contour = true
-	self.interaction.sc_tape_loop.timer = 4
-	self.interaction.sc_tape_loop.action_text_id = "hud_action_tape_looping"
-	self.interaction.sc_tape_loop.requires_upgrade = {
-		category = "player",
-		upgrade = "tape_loop_duration"
-	}
-	self.interaction.money_scanner = deep_clone(self.interaction.invisible_interaction_open)
-	self.interaction.money_scanner.axis = "y"
-	self.interaction.money_small = deep_clone(self.interaction.money_wrap)
-	self.interaction.money_small.sound_start = "bar_bag_pour_money"
-	self.interaction.money_small.sound_interupt = "bar_bag_pour_money_cancel"
-	self.interaction.money_small.sound_done = "bar_bag_pour_money_finished"
-	self.interaction.money_small_take = deep_clone(self.interaction.money_small)
-	self.interaction.money_small_take.text_id = "debug_interact_money_printed_take_money"
-	self.interaction.shape_charge_plantable = {}
-	self.interaction.shape_charge_plantable.text_id = "debug_interact_c4"
-	self.interaction.shape_charge_plantable.action_text_id = "hud_action_placing_c4"
-	self.interaction.shape_charge_plantable.equipment_text_id = "debug_interact_equipment_c4"
-	self.interaction.shape_charge_plantable.special_equipment = "c4"
-	self.interaction.shape_charge_plantable.contour = "interactable_icon"
-	self.interaction.shape_charge_plantable.equipment_consume = true
-	self.interaction.shape_charge_plantable.timer = 4
-	self.interaction.shape_charge_plantable.sound_start = "bar_c4_apply"
-	self.interaction.shape_charge_plantable.sound_interupt = "bar_c4_apply_cancel"
-	self.interaction.shape_charge_plantable.sound_done = "bar_c4_apply_finished"
-	self.interaction.player_zipline = {}
-	self.interaction.player_zipline.text_id = "hud_int_use_zipline"
-	self.interaction.bag_zipline = {}
-	self.interaction.bag_zipline.text_id = "hud_int_bag_zipline"
-	self.interaction.huge_lance = {}
-	self.interaction.huge_lance.text_id = "hud_int_equipment_huge_lance"
-	self.interaction.huge_lance.action_text_id = "hud_action_placing_huge_lance"
-	self.interaction.huge_lance.timer = 3
-	self.interaction.huge_lance.sound_start = "bar_huge_lance_fix"
-	self.interaction.huge_lance.sound_interupt = "bar_huge_lance_fix_cancel"
-	self.interaction.huge_lance.sound_done = "bar_huge_lance_fix_finished"
-	self.interaction.huge_lance_jammed = {}
-	self.interaction.huge_lance_jammed.text_id = "hud_int_equipment_huge_lance_jammed"
-	self.interaction.huge_lance_jammed.action_text_id = "hud_action_fixing_huge_lance"
-	self.interaction.huge_lance_jammed.special_equipment = "lance_part"
-	self.interaction.huge_lance_jammed.equipment_text_id = "hud_int_equipment_no_lance_part"
-	self.interaction.huge_lance_jammed.blocked_hint = "no_huge_lance"
-	self.interaction.huge_lance_jammed.equipment_consume = true
-	self.interaction.huge_lance_jammed.timer = 10
-	self.interaction.huge_lance_jammed.sound_start = "bar_huge_lance_fix"
-	self.interaction.huge_lance_jammed.sound_interupt = "bar_huge_lance_fix_cancel"
-	self.interaction.huge_lance_jammed.sound_done = "bar_huge_lance_fix_finished"
-	self.interaction.gen_pku_lance_part = {}
-	self.interaction.gen_pku_lance_part.text_id = "hud_int_take_lance_part"
-	self.interaction.gen_pku_lance_part.special_equipment_block = "lance_part"
-	self.interaction.gen_pku_lance_part.sound_done = "drill_fix_end"
-	self.interaction.crane_joystick_left = {}
-	self.interaction.crane_joystick_left.text_id = "hud_int_crane_left"
-	self.interaction.crane_joystick_left.start_active = false
-	self.interaction.crane_joystick_lift = {}
-	self.interaction.crane_joystick_lift.text_id = "hud_int_crane_lift"
-	self.interaction.crane_joystick_lift.start_active = false
-	self.interaction.crane_joystick_right = {}
-	self.interaction.crane_joystick_right.text_id = "hud_int_crane_right"
-	self.interaction.crane_joystick_right.start_active = false
-	self.interaction.crane_joystick_release = {}
-	self.interaction.crane_joystick_release.text_id = "hud_int_crane_release"
-	self.interaction.crane_joystick_release.start_active = false
-	self.interaction.gen_int_thermite_rig = {}
-	self.interaction.gen_int_thermite_rig.text_id = "hud_int_hold_assemble_thermite"
-	self.interaction.gen_int_thermite_rig.action_text_id = "hud_action_assemble_thermite"
-	self.interaction.gen_int_thermite_rig.special_equipment = "thermite"
-	self.interaction.gen_int_thermite_rig.equipment_text_id = "debug_interact_equipment_thermite"
-	self.interaction.gen_int_thermite_rig.equipment_consume = true
-	self.interaction.gen_int_thermite_rig.contour = "interactable_icon"
-	self.interaction.gen_int_thermite_rig.timer = 20
-	self.interaction.gen_int_thermite_rig.sound_start = "bar_drill_apply"
-	self.interaction.gen_int_thermite_rig.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.gen_int_thermite_rig.sound_done = "bar_drill_apply_finished"
-	self.interaction.gen_int_thermite_apply = {}
-	self.interaction.gen_int_thermite_apply.text_id = "hud_int_hold_ignite_thermite"
-	self.interaction.gen_int_thermite_apply.action_text_id = "hud_action_ignite_thermite"
-	self.interaction.gen_int_thermite_apply.contour = "interactable_icon"
-	self.interaction.gen_int_thermite_apply.timer = 2
-	self.interaction.gen_int_thermite_apply.sound_start = "bar_thermal_lance_fix"
-	self.interaction.gen_int_thermite_apply.sound_interupt = "bar_thermal_lance_fix_cancel"
-	self.interaction.gen_int_thermite_apply.sound_done = "bar_thermal_lance_fix_finished"
-	self.interaction.apply_thermite_paste = {}
-	self.interaction.apply_thermite_paste.text_id = "hud_int_hold_ignite_thermite_paste"
-	self.interaction.apply_thermite_paste.action_text_id = "hud_action_ignite_thermite_paste"
-	self.interaction.apply_thermite_paste.special_equipment = "thermite_paste"
-	self.interaction.apply_thermite_paste.equipment_text_id = "hud_int_need_thermite_paste"
-	self.interaction.apply_thermite_paste.equipment_consume = true
-	self.interaction.apply_thermite_paste.start_active = false
-	self.interaction.apply_thermite_paste.contour = "interactable_icon"
-	self.interaction.apply_thermite_paste.timer = 2
-	self.interaction.apply_thermite_paste.sound_start = "bar_thermal_lance_fix"
-	self.interaction.apply_thermite_paste.sound_interupt = "bar_thermal_lance_fix_cancel"
-	self.interaction.apply_thermite_paste.sound_done = "bar_thermal_lance_fix_finished"
-	self.interaction.set_off_alarm = {}
-	self.interaction.set_off_alarm.text_id = "hud_int_set_off_alarm"
-	self.interaction.set_off_alarm.action_text_id = "hud_action_setting_off_alarm"
-	self.interaction.set_off_alarm.timer = 0.5
-	self.interaction.set_off_alarm.start_active = false
-	self.interaction.hold_open_vault = {}
-	self.interaction.hold_open_vault.text_id = "hud_int_hold_open_vault"
-	self.interaction.hold_open_vault.action_text_id = "hud_action_opening_vault"
-	self.interaction.hold_open_vault.timer = 4
-	self.interaction.hold_open_vault.axis = "y"
-	self.interaction.hold_open_vault.start_active = false
-	self.interaction.samurai_armor = {}
-	self.interaction.samurai_armor.text_id = "hud_int_hold_bag_sa_armor"
-	self.interaction.samurai_armor.action_text_id = "hud_action_bagging_sa_armor"
-	self.interaction.samurai_armor.blocked_hint = "carry_block"
-	self.interaction.samurai_armor.start_active = false
-	self.interaction.samurai_armor.timer = 3
-	self.interaction.samurai_armor.sound_start = "bar_bag_armor"
-	self.interaction.samurai_armor.sound_interupt = "bar_bag_armor_cancel"
-	self.interaction.samurai_armor.sound_done = "bar_bag_armor_finished"
-	self.interaction.fingerprint_scanner = {}
-	self.interaction.fingerprint_scanner.text_id = "hud_int_use_scanner"
-	self.interaction.fingerprint_scanner.start_active = false
-	self.interaction.enter_code = {}
-	self.interaction.enter_code.text_id = "hud_int_enter_code"
-	self.interaction.enter_code.action_text_id = "hud_action_enter_code"
-	self.interaction.enter_code.timer = 1
-	self.interaction.enter_code.start_active = false
-	self.interaction.enter_code.sound_start = "bar_keyboard"
-	self.interaction.enter_code.sound_interupt = "bar_keyboard_cancel"
-	self.interaction.enter_code.sound_done = "bar_keyboard_finished"
-	self.interaction.take_keys = {}
-	self.interaction.take_keys.text_id = "hud_int_take_keys"
-	self.interaction.push_button = {}
-	self.interaction.push_button.text_id = "hud_int_push_button"
-	self.interaction.breach_door = {}
-	self.interaction.breach_door.text_id = "debug_interact_crowbar"
-	self.interaction.breach_door.action_text_id = "hud_action_breaching_door"
-	self.interaction.breach_door.start_active = false
-	self.interaction.breach_door.timer = 2
-	self.interaction.breach_door.sound_start = "bar_pry_open_elevator_door"
-	self.interaction.breach_door.sound_interupt = "bar_pry_open_elevator_door_cancel"
-	self.interaction.breach_door.sound_done = "bar_pry_open_elevator_door_finished"
-	self.interaction.bus_wall_phone = {}
-	self.interaction.bus_wall_phone.text_id = "hud_int_use_phone_signal_bus"
-	self.interaction.bus_wall_phone.start_active = false
-	self.interaction.zipline_mount = {}
-	self.interaction.zipline_mount.text_id = "hud_int_setup_zipline"
-	self.interaction.zipline_mount.action_text_id = "hud_action_setting_zipline"
-	self.interaction.zipline_mount.start_active = false
-	self.interaction.zipline_mount.timer = 2
-	self.interaction.zipline_mount.sound_start = "bar_drill_apply"
-	self.interaction.zipline_mount.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.zipline_mount.sound_done = "bar_drill_apply_finished"
-	self.interaction.rewire_timelock = deep_clone(self.interaction.security_station)
-	self.interaction.rewire_timelock.text_id = "hud_int_rewire_timelock"
-	self.interaction.rewire_timelock.action_text_id = "hud_action_rewiring_timelock"
-	self.interaction.rewire_timelock.axis = "x"
-	self.interaction.pick_lock_x_axis = deep_clone(self.interaction.pick_lock_hard_no_skill)
-	self.interaction.pick_lock_x_axis.axis = "x"
-	self.interaction.money_wrap_single_bundle_active = deep_clone(self.interaction.money_wrap_single_bundle)
-	self.interaction.money_wrap_single_bundle_active.start_active = true
-	self.interaction.pku_barcode_downtown = {}
-	self.interaction.pku_barcode_downtown.text_id = "hud_int_hold_barcode"
-	self.interaction.pku_barcode_downtown.action_text_id = "hud_action_barcode"
-	self.interaction.pku_barcode_downtown.special_equipment_block = "barcode_downtown"
-	self.interaction.pku_barcode_downtown.timer = 2
-	self.interaction.pku_barcode_brickell = deep_clone(self.interaction.pku_barcode_downtown)
-	self.interaction.pku_barcode_brickell.special_equipment_block = "barcode_brickell"
-	self.interaction.pku_barcode_edgewater = deep_clone(self.interaction.pku_barcode_downtown)
-	self.interaction.pku_barcode_edgewater.special_equipment_block = "barcode_edgewater"
-	self.interaction.pku_barcode_isles_beach = deep_clone(self.interaction.pku_barcode_downtown)
-	self.interaction.pku_barcode_isles_beach.special_equipment_block = "barcode_isles_beach"
-	self.interaction.pku_barcode_opa_locka = deep_clone(self.interaction.pku_barcode_downtown)
-	self.interaction.pku_barcode_opa_locka.special_equipment_block = "barcode_opa_locka"
-	self.interaction.read_barcode_downtown = {}
-	self.interaction.read_barcode_downtown.text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_downtown.action_text_id = "hud_action_read_barcode"
-	self.interaction.read_barcode_downtown.special_equipment = "barcode_downtown"
-	self.interaction.read_barcode_downtown.dont_need_equipment = true
-	self.interaction.read_barcode_downtown.possible_special_equipment = {
-		"barcode_downtown",
-		"barcode_brickell",
-		"barcode_edgewater",
-		"barcode_isles_beach",
-		"barcode_opa_locka"
-	}
-	self.interaction.read_barcode_downtown.equipment_text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_downtown.equipment_consume = true
-	self.interaction.read_barcode_downtown.start_active = false
-	self.interaction.read_barcode_downtown.timer = 2
-	self.interaction.read_barcode_brickell = {}
-	self.interaction.read_barcode_brickell.text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_brickell.action_text_id = "hud_action_read_barcode"
-	self.interaction.read_barcode_brickell.special_equipment = "barcode_brickell"
-	self.interaction.read_barcode_brickell.dont_need_equipment = true
-	self.interaction.read_barcode_brickell.possible_special_equipment = {
-		"barcode_downtown",
-		"barcode_brickell",
-		"barcode_edgewater",
-		"barcode_isles_beach",
-		"barcode_opa_locka"
-	}
-	self.interaction.read_barcode_brickell.equipment_text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_brickell.equipment_consume = true
-	self.interaction.read_barcode_brickell.start_active = false
-	self.interaction.read_barcode_brickell.timer = 2
-	self.interaction.read_barcode_edgewater = {}
-	self.interaction.read_barcode_edgewater.text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_edgewater.action_text_id = "hud_action_read_barcode"
-	self.interaction.read_barcode_edgewater.special_equipment = "barcode_edgewater"
-	self.interaction.read_barcode_edgewater.dont_need_equipment = true
-	self.interaction.read_barcode_edgewater.possible_special_equipment = {
-		"barcode_downtown",
-		"barcode_brickell",
-		"barcode_edgewater",
-		"barcode_isles_beach",
-		"barcode_opa_locka"
-	}
-	self.interaction.read_barcode_edgewater.equipment_text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_edgewater.equipment_consume = true
-	self.interaction.read_barcode_edgewater.start_active = false
-	self.interaction.read_barcode_edgewater.timer = 2
-	self.interaction.read_barcode_isles_beach = {}
-	self.interaction.read_barcode_isles_beach.text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_isles_beach.action_text_id = "hud_action_read_barcode"
-	self.interaction.read_barcode_isles_beach.special_equipment = "barcode_isles_beach"
-	self.interaction.read_barcode_isles_beach.dont_need_equipment = true
-	self.interaction.read_barcode_isles_beach.possible_special_equipment = {
-		"barcode_downtown",
-		"barcode_brickell",
-		"barcode_edgewater",
-		"barcode_isles_beach",
-		"barcode_opa_locka"
-	}
-	self.interaction.read_barcode_isles_beach.equipment_text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_isles_beach.equipment_consume = true
-	self.interaction.read_barcode_isles_beach.start_active = false
-	self.interaction.read_barcode_isles_beach.timer = 2
-	self.interaction.read_barcode_opa_locka = {}
-	self.interaction.read_barcode_opa_locka.text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_opa_locka.action_text_id = "hud_action_read_barcode"
-	self.interaction.read_barcode_opa_locka.special_equipment = "barcode_opa_locka"
-	self.interaction.read_barcode_opa_locka.dont_need_equipment = true
-	self.interaction.read_barcode_opa_locka.possible_special_equipment = {
-		"barcode_downtown",
-		"barcode_brickell",
-		"barcode_edgewater",
-		"barcode_isles_beach",
-		"barcode_opa_locka"
-	}
-	self.interaction.read_barcode_opa_locka.equipment_text_id = "hud_int_hold_read_barcode"
-	self.interaction.read_barcode_opa_locka.equipment_consume = true
-	self.interaction.read_barcode_opa_locka.start_active = false
-	self.interaction.read_barcode_opa_locka.timer = 2
-	self.interaction.read_barcode_activate = {}
-	self.interaction.read_barcode_activate.text_id = "hud_int_hold_activate_reader"
-	self.interaction.read_barcode_activate.action_text_id = "hud_action_activating_reader"
-	self.interaction.read_barcode_activate.special_equipment = "barcode_opa_locka"
-	self.interaction.read_barcode_activate.dont_need_equipment = true
-	self.interaction.read_barcode_activate.possible_special_equipment = {}
-	self.interaction.read_barcode_activate.equipment_text_id = "hud_int_hold_activate_reader"
-	self.interaction.read_barcode_activate.equipment_consume = false
-	self.interaction.read_barcode_activate.start_active = false
-	self.interaction.read_barcode_activate.timer = 2
-	self.interaction.hlm_motor_start = {}
-	self.interaction.hlm_motor_start.text_id = "hud_int_hold_start_motor"
-	self.interaction.hlm_motor_start.action_text_id = "hud_action_startig_motor"
-	self.interaction.hlm_motor_start.start_active = false
-	self.interaction.hlm_motor_start.force_update_position = true
-	self.interaction.hlm_motor_start.timer = 2
-	self.interaction.hlm_motor_start.sound_start = "bar_huge_lance_fix"
-	self.interaction.hlm_motor_start.sound_interupt = "bar_huge_lance_fix_cancel"
-	self.interaction.hlm_motor_start.sound_done = "bar_huge_lance_fix_finished"
-	self.interaction.hlm_connect_equip = {}
-	self.interaction.hlm_connect_equip.text_id = "hud_int_hold_connect_equip"
-	self.interaction.hlm_connect_equip.action_text_id = "hud_action_connecting_equip"
-	self.interaction.hlm_connect_equip.start_active = false
-	self.interaction.hlm_connect_equip.timer = 2
-	self.interaction.hlm_roll_carpet = {}
-	self.interaction.hlm_roll_carpet.text_id = "hud_int_hold_roll_carpet"
-	self.interaction.hlm_roll_carpet.action_text_id = "hud_action_rolling_carpet"
-	self.interaction.hlm_roll_carpet.start_active = false
-	self.interaction.hlm_roll_carpet.timer = 2
-	self.interaction.hlm_roll_carpet.sound_start = "bar_roll_carpet"
-	self.interaction.hlm_roll_carpet.sound_interupt = "bar_roll_carpet_cancel"
-	self.interaction.hlm_roll_carpet.sound_done = "bar_roll_carpet_finished"
-	self.interaction.hold_pku_equipmentbag = {}
-	self.interaction.hold_pku_equipmentbag.text_id = "hud_int_hold_pku_equipment"
-	self.interaction.hold_pku_equipmentbag.action_text_id = "hud_action_grabbing_equipment"
-	self.interaction.hold_pku_equipmentbag.sound_event = "ammo_bag_drop"
-	self.interaction.hold_pku_equipmentbag.timer = 1
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -3172,6 +1391,11 @@ function TweakData:init()
 			stat = "gage5_8_stats",
 			melee_id = "dingdong",
 			is_gangster = true
+		},
+		hurting_people = {
+			stat = "pig_3_stats",
+			melee_id = "baseballbat",
+			job_id = "mia"
 		}
 	}
 	self.achievement.complete_heist_achievements = {
@@ -3418,6 +1642,20 @@ function TweakData:init()
 			},
 			job = "big"
 		},
+		death_miami = {
+			award = "pig_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "mia"
+		},
+		death_miami_prof = {
+			award = "pig_6",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "mia_prof"
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -3474,7 +1712,11 @@ function TweakData:init()
 		"arm_und",
 		"kosugi"
 	}
-	self.achievement.job_list.dentist = {"big"}
+	self.achievement.job_list.dentist = {
+		"big",
+		"mia",
+		"mia_prof"
+	}
 	self.achievement.complete_heist_stats_achievements = {
 		death_vlad = {
 			award = "death_5",
@@ -3559,6 +1801,22 @@ function TweakData:init()
 				"orangutang"
 			}
 		},
+		animal_fight = {
+			award = "pig_5",
+			jobs = {"mia"},
+			difficulties = {
+				"hard",
+				"overkill",
+				"overkill_145",
+				"overkill_290"
+			},
+			masks = {
+				"white_wolf",
+				"owl",
+				"rabbit",
+				"pig"
+			}
+		},
 		guy_with_gun = {
 			award = "gage5_6",
 			jobs = {
@@ -3636,6 +1894,28 @@ function TweakData:init()
 		stat = "gage5_10_stats",
 		max_progress = 200
 	}
+	local pig_1_achievement = {
+		text_id = "bm_wp_pig_1_achievment",
+		award = "pig_1"
+	}
+	local pig_2_achievement = {
+		text_id = "bm_wp_pig_2_achievment",
+		award = "pig_2"
+	}
+	local pig_3_achievement = {
+		text_id = "bm_wp_pig_3_achievment",
+		stat = "pig_3_stats",
+		max_progress = 25
+	}
+	local pig_4_achievement = {
+		text_id = "bm_wp_pig_4_achievment",
+		award = "pig_4"
+	}
+	local pig_5_achievement = {
+		text_id = "bm_wp_pig_5_achievment",
+		award = "pig_5"
+	}
+	self.achievement.mask_tracker = {}
 	self.achievement.weapon_part_tracker = {
 		wpn_fps_snp_m95_barrel_long = {
 			text_id = "bm_wp_m95_b_barrel_long_achievment",
@@ -3793,7 +2073,22 @@ function TweakData:init()
 		wpn_fps_ass_famas_b_short = gage_5_4_achievement,
 		wpn_fps_ass_famas_b_long = gage_5_6_achievement,
 		wpn_fps_ass_famas_g_retro = gage_5_10_achievement,
-		wpn_fps_ass_famas_b_suppressed = gage_5_10_achievement
+		wpn_fps_ass_famas_b_suppressed = gage_5_10_achievement,
+		wpn_fps_smg_scorpion_g_ergo = pig_1_achievement,
+		wpn_fps_smg_scorpion_m_extended = pig_1_achievement,
+		wpn_fps_smg_scorpion_s_unfolded = pig_1_achievement,
+		wpn_fps_smg_uzi_fg_rail = pig_2_achievement,
+		wpn_fps_smg_uzi_s_leather = pig_2_achievement,
+		wpn_fps_smg_uzi_s_solid = pig_3_achievement,
+		wpn_fps_smg_scorpion_g_wood = pig_3_achievement,
+		wpn_fps_smg_tec9_ns_ext = pig_4_achievement,
+		wpn_fps_smg_tec9_m_extended = pig_4_achievement,
+		wpn_fps_smg_tec9_s_unfolded = pig_4_achievement,
+		wpn_fps_smg_uzi_b_suppressed = pig_5_achievement,
+		wpn_fps_smg_uzi_s_standard = pig_5_achievement,
+		wpn_fps_smg_scorpion_b_suppressed = pig_5_achievement,
+		wpn_fps_smg_scorpion_s_nostock = pig_5_achievement,
+		wpn_fps_smg_tec9_b_standard = pig_5_achievement
 	}
 	self.pickups = {}
 	self.pickups.ammo = {
@@ -3875,29 +2170,12 @@ function TweakData:init()
 	self.music.heist.assault = "music_heist_assault"
 	self.music.heist.fake_assault = "music_heist_assault"
 	self.music.heist.control = "music_heist_control"
-	self.music.heist.switches = {
-		"track_01",
-		"track_02",
-		"track_03",
-		"track_04",
-		"track_05",
-		"track_06",
-		"track_07",
-		"track_08",
-		"track_09",
-		"track_10",
-		"track_12",
-		"track_13"
-	}
-	self.music.heist.switches_infamous = {"track_11"}
 	self.music.big_bank = {}
 	self.music.big_bank.intro = "music_heist_setup"
 	self.music.big_bank.anticipation = "music_heist_anticipation"
 	self.music.big_bank.assault = "music_heist_assault"
 	self.music.big_bank.fake_assault = "music_heist_assault"
 	self.music.big_bank.control = "music_heist_control"
-	self.music.big_bank.switches = {"track_14"}
-	self.music.big_bank.switches_infamous = {"track_11"}
 	self.music.default = deep_clone(self.music.heist)
 	self.blame = {}
 	self.blame.default = "hint_blame_missing"
@@ -3986,34 +2264,34 @@ function TweakData:init()
 	self.casino.entrance_level = {
 		14,
 		28,
-		42,
-		56,
-		70,
-		84,
-		100
+		40,
+		45,
+		55,
+		65,
+		75
 	}
 	self.casino.entrance_fee = {
+		500000,
+		500000,
+		500000,
+		750000,
 		1000000,
-		3000000,
-		9000000,
-		15000000,
-		20000000,
-		25000000,
-		30000000
+		1250000,
+		1500000
 	}
-	self.casino.prefer_cost = 1500000
+	self.casino.prefer_cost = 500000
 	self.casino.prefer_chance = 0.1
 	self.casino.secure_card_cost = {
-		10000000,
-		33000000,
-		65000000
+		1000000,
+		3300000,
+		6500000
 	}
 	self.casino.secure_card_level = {
 		10,
 		40,
 		60
 	}
-	self.casino.infamous_cost = 30000000
+	self.casino.infamous_cost = 3000000
 	self.casino.infamous_chance = 3
 	self.grenades = {}
 	self.grenades.frag = {}

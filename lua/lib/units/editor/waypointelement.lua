@@ -21,35 +21,11 @@ function WaypointUnitElement:init(unit)
 		"pd2_methlab",
 		"pd2_generic_interact",
 		"pd2_goto",
-		"wp_vial",
-		"wp_standard",
-		"wp_powersupply",
-		"wp_watersupply",
-		"wp_c4",
-		"wp_drill",
-		"wp_hack",
-		"wp_talk",
-		"wp_crowbar",
-		"wp_planks",
-		"wp_door",
-		"wp_saw",
-		"wp_bag",
-		"wp_exit",
 		"pd2_ladder",
 		"pd2_fix",
-		"wp_can",
-		"wp_target",
-		"wp_key",
-		"wp_winch",
-		"wp_escort",
-		"wp_powerbutton",
-		"wp_server",
-		"wp_powercord",
-		"wp_phone",
-		"wp_scrubs",
-		"wp_sentry"
+		"pd2_question"
 	}
-	self._hed.icon = "wp_standard"
+	self._hed.icon = "pd2_goto"
 	self._hed.text_id = "debug_none"
 	table.insert(self._save_values, "icon")
 	table.insert(self._save_values, "text_id")

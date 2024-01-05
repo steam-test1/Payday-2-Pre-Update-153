@@ -287,7 +287,6 @@ function CoreSetup:__init()
 	managers.cutscene:post_init()
 	self._smoketest:post_init()
 	if not Application:editor() then
-		PackageManager:unload_lua()
 	end
 	self:init_finalize()
 end
@@ -449,7 +448,6 @@ function CoreSetup:__end_frame(t, dt)
 		managers.menu:destroy()
 		Overlay:newgui():destroy_all_workspaces()
 		Application:cleanup_thread_garbage()
-		PackageManager:reload_lua()
 		CoreEngineAccess._exec("core/lib/CoreEntry", self.__context)
 	end
 end

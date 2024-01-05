@@ -127,6 +127,10 @@ function BaseInteractionExt:interact_distance()
 	return self._tweak_data.interact_distance or tweak_data.interaction.INTERACT_DISTANCE
 end
 
+function BaseInteractionExt:interact_dont_interupt_on_distance()
+	return self._tweak_data.interact_dont_interupt_on_distance or false
+end
+
 function BaseInteractionExt:update(distance_to_player)
 end
 
@@ -167,8 +171,19 @@ function BaseInteractionExt:selected(player)
 	local text = managers.localization:text(text_id, string_macros)
 	local icon = self._tweak_data.icon
 	if self._tweak_data.special_equipment and not managers.player:has_special_equipment(self._tweak_data.special_equipment) then
-		text = managers.localization:text(self._tweak_data.equipment_text_id, string_macros)
-		icon = self.no_equipment_icon or self._tweak_data.no_equipment_icon or icon
+		local has_special_equipment = false
+		if self._tweak_data.possible_special_equipment then
+			for i, special_equipment in ipairs(self._tweak_data.possible_special_equipment) do
+				if managers.player:has_special_equipment(special_equipment) then
+					has_special_equipment = true
+					break
+				end
+			end
+		end
+		if not has_special_equipment then
+			text = managers.localization:text(self._tweak_data.equipment_text_id, string_macros)
+			icon = self.no_equipment_icon or self._tweak_data.no_equipment_icon or icon
+		end
 	end
 	if self._tweak_data.contour_preset or self._tweak_data.contour_preset_selected then
 		if not self._selected_contour_id and self._tweak_data.contour_preset_selected and self._tweak_data.contour_preset ~= self._tweak_data.contour_preset_selected then
@@ -522,8 +537,38 @@ end
 
 MultipleChoiceInteractionExt = MultipleChoiceInteractionExt or class(UseInteractionExt)
 
+function MultipleChoiceInteractionExt:can_interact(player)
+	if not self:_has_required_upgrade() then
+		return false
+	end
+	if not self:_has_required_deployable() then
+		return false
+	end
+	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
+		return false
+	end
+	if not self._tweak_data.special_equipment or self._tweak_data.dont_need_equipment then
+		return true
+	end
+	if managers.player:has_special_equipment(self._tweak_data.special_equipment) then
+		return true
+	end
+	if self._tweak_data.possible_special_equipment then
+		for i, special_equipment in ipairs(self._tweak_data.possible_special_equipment) do
+			if managers.player:has_special_equipment(special_equipment) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function MultipleChoiceInteractionExt:interact(player)
-	if self._tweak_data.dont_need_equipment and not managers.player:has_special_equipment(self._tweak_data.special_equipment) then
+	if self._tweak_data.dont_need_equipment then
+		MultipleChoiceInteractionExt.super.interact(self, player)
+		return
+	end
+	if not managers.player:has_special_equipment(self._tweak_data.special_equipment) then
 		if self._tweak_data.possible_special_equipment then
 			for i, special_equipment in ipairs(self._tweak_data.possible_special_equipment) do
 				if managers.player:has_special_equipment(special_equipment) then
@@ -538,6 +583,7 @@ function MultipleChoiceInteractionExt:interact(player)
 		return
 	end
 	MultipleChoiceInteractionExt.super.interact(self, player)
+	managers.player:remove_special(self._tweak_data.special_equipment)
 end
 
 function MultipleChoiceInteractionExt:sync_net_event(event_id, player)

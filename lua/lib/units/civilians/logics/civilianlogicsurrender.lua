@@ -47,16 +47,11 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 		return
 	end
 	local attention_settings
-	if not managers.groupai:state():enemy_weapons_hot() then
-		attention_settings = {
-			"civ_enemy_cbt",
-			"civ_civ_cbt"
-		}
-		my_data.enemy_weapons_hot_listen_id = "CivilianLogicSurrender" .. tostring(data.key)
-		managers.groupai:state():add_listener(my_data.enemy_weapons_hot_listen_id, {
-			"enemy_weapons_hot"
-		}, callback(CivilianLogicIdle, CivilianLogicIdle, "clbk_enemy_weapons_hot", data))
-	end
+	attention_settings = {
+		"civ_enemy_cbt",
+		"civ_civ_cbt",
+		"civ_murderer_cbt"
+	}
 	data.unit:brain():set_attention_settings(attention_settings)
 	if not data.been_outlined and data.char_tweak.outline_on_discover then
 		my_data.outline_detection_task_key = "CivilianLogicIdle._upd_outline_detection" .. tostring(data.key)

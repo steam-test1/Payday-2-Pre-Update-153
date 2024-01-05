@@ -6,11 +6,12 @@ ElementCounter = ElementCounter or class(CoreMissionScriptElement.MissionScriptE
 function ElementCounter:init(...)
 	ElementCounter.super.init(self, ...)
 	self._digital_gui_units = {}
-	self._original_value = self._values.counter_target
 	self._triggers = {}
 end
 
 function ElementCounter:on_script_activated()
+	self._values.counter_target = self:value("counter_target")
+	self._original_value = self._values.counter_target
 	if not Network:is_server() then
 		return
 	end

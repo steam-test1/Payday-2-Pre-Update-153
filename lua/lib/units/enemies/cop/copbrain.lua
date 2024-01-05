@@ -40,6 +40,8 @@ logic_variants.fbi_heavy_swat = security_variant
 logic_variants.nathan = security_variant
 logic_variants.sniper = security_variant
 logic_variants.gangster = security_variant
+logic_variants.mobster = security_variant
+logic_variants.mobster_boss = security_variant
 logic_variants.dealer = security_variant
 logic_variants.biker_escape = security_variant
 logic_variants.city_swat = security_variant
@@ -193,6 +195,7 @@ function CopBrain:save(save_data)
 	if self._logic_data.name == "trade" and self._logic_data.internal_data.fleeing then
 		my_save_data.trade_flee_contour = true
 	end
+	my_save_data.team_id = self._logic_data.team.id
 	save_data.brain = my_save_data
 end
 
@@ -630,8 +633,7 @@ function CopBrain:set_attention_settings(params)
 			end
 		elseif params.corpse_cbt then
 			att_settings = {
-				"enemy_law_corpse_cbt",
-				"enemy_team_corpse_cbt"
+				"enemy_combatant_corpse_cbt"
 			}
 		elseif params.corpse_sneak then
 			att_settings = {
@@ -641,7 +643,6 @@ function CopBrain:set_attention_settings(params)
 			}
 		end
 	end
-	self._attention_params = params
 	PlayerMovement.set_attention_settings(self, att_settings)
 end
 
@@ -712,8 +713,6 @@ end
 function CopBrain:clbk_enemy_weapons_hot()
 	managers.groupai:state():remove_listener(self._enemy_weapons_hot_listen_id)
 	self._enemy_weapons_hot_listen_id = nil
-	self:set_attention_settings(self._attention_params)
-	self._attention_params = nil
 	self:end_alarm_pager()
 	if self._logic_data.logic.on_enemy_weapons_hot then
 		self._logic_data.logic.on_enemy_weapons_hot(self._logic_data)
@@ -722,6 +721,11 @@ end
 
 function CopBrain:set_group(group)
 	self._logic_data.group = group
+end
+
+function CopBrain:on_team_set(team_data)
+	self._logic_data.team = team_data
+	self._attention_handler:set_team(team_data)
 end
 
 function CopBrain:on_new_group_objective(objective)

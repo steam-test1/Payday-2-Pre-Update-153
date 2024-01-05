@@ -45,15 +45,12 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 		attention_settings = {
 			"civ_all_peaceful"
 		}
-	elseif not managers.groupai:state():enemy_weapons_hot() then
+	else
 		attention_settings = {
 			"civ_enemy_cbt",
-			"civ_civ_cbt"
+			"civ_civ_cbt",
+			"civ_murderer_cbt"
 		}
-		my_data.enemy_weapons_hot_listen_id = "CivilianLogicTravel" .. tostring(data.key)
-		managers.groupai:state():add_listener(my_data.enemy_weapons_hot_listen_id, {
-			"enemy_weapons_hot"
-		}, callback(CivilianLogicIdle, CivilianLogicIdle, "clbk_enemy_weapons_hot", data))
 	end
 	data.unit:brain():set_attention_settings(attention_settings)
 	my_data.state_enter_t = TimerManager:game():time()

@@ -42,9 +42,10 @@ function PlayerCarry:_enter(enter_data)
 	end
 	if not self._state_data.ducking then
 		self._ext_movement:set_attention_settings({
-			"pl_enemy_cbt",
-			"pl_team_idle_std",
-			"pl_civ_cbt"
+			"pl_friend_combatant_cbt",
+			"pl_friend_non_combatant_cbt",
+			"pl_foe_combatant_cbt_stand",
+			"pl_foe_non_combatant_cbt_stand"
 		})
 	end
 end

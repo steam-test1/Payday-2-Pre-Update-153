@@ -9,9 +9,11 @@ function ElementSpawnCivilian:init(...)
 end
 
 function ElementSpawnCivilian:_finalize_values()
+	self._values.state = self:value("state")
 	local state_index = table.index_of(CopActionAct._act_redirects.civilian_spawn, self._values.state)
 	self._values.state = state_index ~= -1 and state_index or nil
 	self._values.force_pickup = self._values.force_pickup ~= "none" and self._values.force_pickup or nil
+	self._values.team = self._values.team ~= "default" and self._values.team or nil
 end
 
 function ElementSpawnCivilian:enemy_name()
@@ -22,10 +24,11 @@ function ElementSpawnCivilian:units()
 	return self._units
 end
 
-function ElementSpawnCivilian:produce()
+function ElementSpawnCivilian:produce(params)
 	if not managers.groupai:state():is_AI_enabled() then
 		return
 	end
+	local default_team_id = params and params.team or self._values.team or tweak_data.levels:get_default_team_ID("non_combatant")
 	local unit = safe_spawn_unit(self._enemy_name, self:get_orientation())
 	unit:unit_data().mission_element = self
 	table.insert(self._units, unit)
@@ -55,6 +58,7 @@ function ElementSpawnCivilian:produce()
 	if self._values.force_pickup then
 		unit:character_damage():set_pickup(self._values.force_pickup)
 	end
+	unit:movement():set_team(managers.groupai:state():team_data(default_team_id))
 	self:event("spawn", unit)
 	return unit
 end

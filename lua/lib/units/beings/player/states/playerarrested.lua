@@ -37,9 +37,10 @@ end
 
 function PlayerArrested:_enter(enter_data)
 	self._ext_movement:set_attention_settings({
-		"pl_enemy_cur_peaceful",
-		"pl_team_cur_peaceful",
-		"pl_civ_cbt"
+		"pl_friend_combatant_cbt",
+		"pl_friend_non_combatant_cbt",
+		"pl_foe_combatant_cbt_stand",
+		"pl_foe_non_combatant_cbt_stand"
 	})
 	if Network:is_server() and self._ext_movement:nav_tracker() then
 		managers.groupai:state():on_player_weapons_hot()

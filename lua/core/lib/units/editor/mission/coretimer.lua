@@ -1,4 +1,9 @@
 CoreTimerUnitElement = CoreTimerUnitElement or class(MissionElement)
+CoreTimerUnitElement.SAVE_UNIT_POSITION = false
+CoreTimerUnitElement.SAVE_UNIT_ROTATION = false
+CoreTimerUnitElement.INSTANCE_VAR_NAMES = {
+	{type = "number", value = "timer"}
+}
 TimerUnitElement = TimerUnitElement or class(CoreTimerUnitElement)
 
 function TimerUnitElement:init(...)

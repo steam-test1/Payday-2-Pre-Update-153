@@ -162,10 +162,13 @@ function GameSetup:load_packages()
 	if not PackageManager:loaded("packages/game_base") then
 		PackageManager:load("packages/game_base")
 	end
+	if PackageManager:package_exists("packages/wip/game_base") and not PackageManager:loaded("packages/wip/game_base") then
+		PackageManager:load("packages/wip/game_base")
+	end
 	local prefix = "packages/dlcs/"
 	local sufix = "/game_base"
 	local package = ""
-	for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+	for dlc_package, bundled in pairs(tweak_data.BUNDLED_DLC_PACKAGES) do
 		package = prefix .. tostring(dlc_package) .. sufix
 		Application:debug("[MenuSetup:load_packages] DLC package: " .. package, "Is package OK to load?: " .. tostring(bundled))
 		if bundled and (bundled == true or bundled == 2) and PackageManager:package_exists(package) and not PackageManager:loaded(package) then
@@ -219,16 +222,17 @@ function GameSetup:load_packages()
 	end
 end
 
-function GameSetup:unload_packages()
+function GameSetup:gather_packages_to_unload()
 	Setup.unload_packages(self)
+	self._packages_to_unload = self._packages_to_unload or {}
 	if not Global.load_level then
 		local prefix = "packages/dlcs/"
 		local sufix = "/game_base"
 		local package = ""
-		for dlc_package, bundled in pairs(DLCManager.BUNDLED_DLC_PACKAGES) do
+		for dlc_package, bundled in pairs(tweak_data.BUNDLED_DLC_PACKAGES) do
 			package = prefix .. tostring(dlc_package) .. sufix
 			if bundled and (bundled == true or bundled == 2) and PackageManager:package_exists(package) and PackageManager:loaded(package) then
-				PackageManager:unload(package)
+				table.insert(self._packages_to_unload, package)
 			end
 		end
 	end
@@ -236,22 +240,26 @@ function GameSetup:unload_packages()
 		if type(self._loaded_level_package) == "table" then
 			for _, package in ipairs(self._loaded_level_package) do
 				if PackageManager:loaded(package) then
-					PackageManager:unload(package)
+					table.insert(self._packages_to_unload, package)
 				end
 			end
 		elseif PackageManager:loaded(self._loaded_level_package) then
-			PackageManager:unload(self._loaded_level_package)
+			table.insert(self._packages_to_unload, self._loaded_level_package)
 		end
 		self._loaded_level_package = nil
 	end
 	if PackageManager:loaded(self._loaded_contact_package) then
-		PackageManager:unload(self._loaded_contact_package)
+		table.insert(self._packages_to_unload, self._loaded_contact_package)
 		self._loaded_contact_package = nil
 	end
 	if PackageManager:loaded(self._loaded_contract_package) then
-		PackageManager:unload(self._loaded_contract_package)
+		table.insert(self._packages_to_unload, self._loaded_contract_package)
 		self._loaded_contract_package = nil
 	end
+end
+
+function GameSetup:unload_packages()
+	Setup.unload_packages(self)
 end
 
 function GameSetup:init_managers(managers)

@@ -30,10 +30,23 @@ function PlayerFatal:enter(state_data, enter_data)
 end
 
 function PlayerFatal:_enter(enter_data)
-	self._ext_movement:set_attention_settings({
-		"pl_team_idle_std",
-		"pl_civ_cbt"
-	})
+	local preset
+	if managers.groupai:state():whisper_mode() then
+		preset = {
+			"pl_mask_on_friend_combatant_whisper_mode",
+			"pl_mask_on_friend_non_combatant_whisper_mode",
+			"pl_mask_on_foe_combatant_whisper_mode_crouch",
+			"pl_mask_on_foe_non_combatant_whisper_mode_crouch"
+		}
+	else
+		preset = {
+			"pl_friend_combatant_cbt",
+			"pl_friend_non_combatant_cbt",
+			"pl_foe_combatant_cbt_crouch",
+			"pl_foe_non_combatant_cbt_crouch"
+		}
+	end
+	self._ext_movement:set_attention_settings(preset)
 	if Network:is_server() and self._ext_movement:nav_tracker() then
 		managers.groupai:state():on_player_weapons_hot()
 	end

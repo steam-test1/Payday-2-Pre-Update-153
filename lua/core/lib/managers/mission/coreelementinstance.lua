@@ -4,7 +4,10 @@ ElementInstanceInput = ElementInstanceInput or class(CoreMissionScriptElement.Mi
 
 function ElementInstanceInput:init(...)
 	ElementInstanceInput.super.init(self, ...)
-	managers.world_instance:register_input_element(self._values.instance_name, self._values.event, self)
+	if self._values.instance_name then
+		managers.world_instance:register_input_element(self._values.instance_name, self._values.event, self)
+	else
+	end
 end
 
 function ElementInstanceInput:client_on_executed(...)
@@ -59,10 +62,21 @@ function ElementInstanceInputEvent:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	local input_elements = managers.world_instance:get_registered_input_elements(self._values.instance, self._values.event)
-	if input_elements then
-		for _, element in ipairs(input_elements) do
-			element:on_executed(instigator)
+	if self._values.instance then
+		local input_elements = managers.world_instance:get_registered_input_elements(self._values.instance, self._values.event)
+		if input_elements then
+			for _, element in ipairs(input_elements) do
+				element:on_executed(instigator)
+			end
+		end
+	elseif self._values.event_list then
+		for _, event_list_data in ipairs(self._values.event_list) do
+			local input_elements = managers.world_instance:get_registered_input_elements(event_list_data.instance, event_list_data.event)
+			if input_elements then
+				for _, element in ipairs(input_elements) do
+					element:on_executed(instigator)
+				end
+			end
 		end
 	end
 	ElementInstanceInputEvent.super.on_executed(self, instigator)
@@ -72,7 +86,14 @@ ElementInstanceOutputEvent = ElementInstanceOutputEvent or class(CoreMissionScri
 
 function ElementInstanceOutputEvent:init(...)
 	ElementInstanceOutputEvent.super.init(self, ...)
-	managers.world_instance:register_output_event_element(self._values.instance, self._values.event, self)
+	if self._values.instance then
+		managers.world_instance:register_output_event_element(self._values.instance, self._values.event, self)
+	end
+	if self._values.event_list then
+		for _, event_list_data in ipairs(self._values.event_list) do
+			managers.world_instance:register_output_event_element(event_list_data.instance, event_list_data.event, self)
+		end
+	end
 end
 
 function ElementInstanceOutputEvent:client_on_executed(...)
@@ -124,4 +145,12 @@ function ElementInstancePoint:load(data)
 	if data.has_created then
 		self:_create()
 	end
+end
+
+ElementInstanceParams = ElementInstanceParams or class(CoreMissionScriptElement.MissionScriptElement)
+ElementInstanceSetParams = ElementInstanceSetParams or class(CoreMissionScriptElement.MissionScriptElement)
+
+function ElementInstanceSetParams:init(...)
+	ElementInstanceOutputEvent.super.init(self, ...)
+	managers.world_instance:set_instance_params(self._values.instance, self._values.params)
 end

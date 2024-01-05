@@ -300,6 +300,16 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.drill = {}
+	self.drill.devices = {}
+	self.drill.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 60
+		}
+	}
 	self.truck = {}
 	self.truck.devices = {}
 	self.truck.devices.drill = {
@@ -390,6 +400,30 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_shp_charge",
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
+		}
+	}
+	self.c4_door = {}
+	self.c4_door.devices = {}
+	self.c4_door.devices.c4 = {
+		{
+			align = "a_c4_placement",
+			unit = Idstring("units/equipment/c4_charge/c4_mission_door")
+		}
+	}
+	self.c4_3_door = {}
+	self.c4_3_door.devices = {}
+	self.c4_3_door.devices.c4 = {
+		{
+			align = "a_c4_placement_1",
+			unit = Idstring("units/equipment/c4_charge/c4_mission_door")
+		},
+		{
+			align = "a_c4_placement_2",
+			unit = Idstring("units/equipment/c4_charge/c4_mission_door")
+		},
+		{
+			align = "a_c4_placement_3",
+			unit = Idstring("units/equipment/c4_charge/c4_mission_door")
 		}
 	}
 end

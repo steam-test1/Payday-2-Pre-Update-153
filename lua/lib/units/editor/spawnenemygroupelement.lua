@@ -9,12 +9,14 @@ function SpawnEnemyGroupUnitElement:init(unit)
 	self._hed.amount = 0
 	self._hed.elements = {}
 	self._hed.interval = 0
+	self._hed.team = "default"
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "random")
 	table.insert(self._save_values, "ignore_disabled")
 	table.insert(self._save_values, "amount")
 	table.insert(self._save_values, "preferred_spawn_groups")
 	table.insert(self._save_values, "interval")
+	table.insert(self._save_values, "team")
 end
 
 function SpawnEnemyGroupUnitElement:post_init()
@@ -125,6 +127,21 @@ function SpawnEnemyGroupUnitElement:_build_panel(panel, panel_sizer)
 	local interval = CoreEWS.number_controller(interval_params)
 	interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
 	interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
+	local team_params = {
+		name = "Team:",
+		panel = panel,
+		sizer = panel_sizer,
+		options = tweak_data.levels:get_team_names_indexed(),
+		value = self._hed.team,
+		default = "default",
+		tooltip = "Select the group's team (overrides character team).",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sorted = true
+	}
+	local team_combo_box = CoreEWS.combobox(team_params)
+	team_combo_box:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
+	team_combo_box:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
 	local opt_sizer = panel_sizer
 	local filter_sizer = EWS:BoxSizer("HORIZONTAL")
 	local opt1_sizer = EWS:BoxSizer("VERTICAL")

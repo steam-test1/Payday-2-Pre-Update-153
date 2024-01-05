@@ -36,6 +36,7 @@ function TeamAILogicAssault.enter(data, new_logic_name, enter_params)
 	data.unit:movement():set_cool(false)
 	data.unit:movement():set_stance("hos")
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
+	my_data.cover_test_step = 3
 end
 
 function TeamAILogicAssault.exit(data, new_logic_name, enter_params)
@@ -73,15 +74,7 @@ function TeamAILogicAssault.update(data)
 	local action_taken = my_data.turning or data.unit:movement():chk_action_forbidden("walk") or my_data.moving_to_cover or my_data.walking_to_cover_shoot_pos or my_data._turning_to_intimidate
 	my_data.want_to_take_cover = CopLogicAttack._chk_wants_to_take_cover(data, my_data)
 	local want_to_take_cover = my_data.want_to_take_cover
-	if not action_taken then
-		if not (not want_to_take_cover or in_cover and in_cover[4]) or data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.stand then
-			if not unit:anim_data().crouch then
-				action_taken = CopLogicAttack._chk_request_action_crouch(data)
-			end
-		elseif unit:anim_data().crouch and data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.crouch then
-			action_taken = CopLogicAttack._chk_request_action_stand(data)
-		end
-	end
+	action_taken = action_taken or CopLogicAttack._upd_pose(data, my_data)
 	local move_to_cover
 	if action_taken then
 	elseif want_to_take_cover then

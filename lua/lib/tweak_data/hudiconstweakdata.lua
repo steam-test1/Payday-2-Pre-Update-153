@@ -604,6 +604,24 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_question = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			96,
+			64,
+			32,
+			32
+		}
+	}
+	self.wp_arrow = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			0,
+			96,
+			32,
+			15
+		}
+	}
 	self.wp_vial = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {
@@ -611,15 +629,6 @@ function HudIconsTweakData:init()
 			310,
 			32,
 			32
-		}
-	}
-	self.wp_arrow = {
-		texture = "guis/textures/hud_icons",
-		texture_rect = {
-			432,
-			48,
-			32,
-			15
 		}
 	}
 	self.wp_standard = {

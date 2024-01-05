@@ -1,7 +1,7 @@
 local tmp_rot1 = Rotation()
 UnitNetworkHandler = UnitNetworkHandler or class(BaseNetworkHandler)
 
-function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit_version, peer_id)
+function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit_version, peer_id, team_id)
 	print("[UnitNetworkHandler:set_unit]", unit, character_name, peer_id)
 	Application:stack_dump()
 	if not alive(unit) then
@@ -757,11 +757,11 @@ function UnitNetworkHandler:action_act_end(unit)
 	unit:movement():sync_action_act_end()
 end
 
-function UnitNetworkHandler:action_dodge_start(unit, variation, side, rotation, speed)
+function UnitNetworkHandler:action_dodge_start(unit, body_part, variation, side, rotation, speed, shoot_acc)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
 		return
 	end
-	unit:movement():sync_action_dodge_start(variation, side, rotation, speed)
+	unit:movement():sync_action_dodge_start(body_part, variation, side, rotation, speed, shoot_acc)
 end
 
 function UnitNetworkHandler:action_dodge_end(unit)
@@ -771,26 +771,28 @@ function UnitNetworkHandler:action_dodge_end(unit)
 	unit:movement():sync_action_dodge_end()
 end
 
-function UnitNetworkHandler:action_tase_start(unit)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
+function UnitNetworkHandler:action_tase_event(taser_unit, event_id, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(taser_unit) then
 		return
 	end
-	local tase_action = {type = "tase", body_part = 3}
-	unit:movement():action_request(tase_action)
-end
-
-function UnitNetworkHandler:action_tase_end(unit)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
+	local sender_peer = self._verify_sender(sender)
+	if not sender_peer then
 		return
 	end
-	unit:movement():sync_action_tase_end()
-end
-
-function UnitNetworkHandler:action_tase_fire(unit, sender)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
-		return
+	if event_id == 1 then
+		if not managers.network:session():is_client() or managers.network:session():server_peer() ~= sender_peer then
+			return
+		end
+		local tase_action = {type = "tase", body_part = 3}
+		taser_unit:movement():action_request(tase_action)
+	elseif event_id == 2 then
+		if not managers.network:session():is_client() or managers.network:session():server_peer() ~= sender_peer then
+			return
+		end
+		taser_unit:movement():sync_action_tase_end()
+	else
+		taser_unit:movement():sync_taser_fire()
 	end
-	unit:movement():sync_taser_fire()
 end
 
 function UnitNetworkHandler:alert(alerted_unit, aggressor)
@@ -969,7 +971,7 @@ function UnitNetworkHandler:request_place_ecm_jammer(pos, normal, battery_life_u
 	end
 	local owner_unit = managers.network:game():member(peer:id()):unit()
 	if not alive(owner_unit) or owner_unit:id() == -1 then
-		rpc:from_server_ecm_jammer_place_rejected()
+		rpc:from_server_ecm_jammer_place_result(nil)
 		return
 	end
 	if not managers.player:verify_equipment(peer:id(), "ecm_jammer") then
@@ -980,20 +982,30 @@ function UnitNetworkHandler:request_place_ecm_jammer(pos, normal, battery_life_u
 	local unit = ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner_unit, peer:id())
 	unit:base():set_server_information(peer:id())
 	unit:base():set_active(true)
-	rpc:from_server_ecm_jammer_placed(unit)
+	rpc:from_server_ecm_jammer_place_result(unit)
 end
 
-function UnitNetworkHandler:from_server_ecm_jammer_placed(unit, rpc)
+function UnitNetworkHandler:from_server_ecm_jammer_place_result(unit, rpc)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	unit = alive(unit) and unit or nil
+	if alive(managers.player:player_unit()) then
+		managers.player:player_unit():equipment():from_server_ecm_jammer_placement_result(unit and true or false)
+	end
+	if not unit then
+		return
+	end
+	unit:base():set_owner(managers.player:player_unit())
+end
+
+function UnitNetworkHandler:from_server_ecm_jammer_rejected(rpc)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	if alive(managers.player:player_unit()) then
-		managers.player:player_unit():equipment():from_server_ecm_jammer_placement_result(true)
+		managers.player:player_unit():equipment():from_server_ecm_jammer_placement_result(false)
 	end
-	if not alive(unit) then
-		return
-	end
-	unit:base():set_owner(managers.player:player_unit())
 end
 
 function UnitNetworkHandler:sync_unit_event_id_16(unit, ext_name, event_id, rpc)
@@ -1007,15 +1019,6 @@ function UnitNetworkHandler:sync_unit_event_id_16(unit, ext_name, event_id, rpc)
 		return
 	end
 	extension:sync_net_event(event_id, peer)
-end
-
-function UnitNetworkHandler:from_server_ecm_jammer_rejected(rpc)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
-		return
-	end
-	if alive(managers.player:player_unit()) then
-		managers.player:player_unit():equipment():from_server_ecm_jammer_placement_result(false)
-	end
 end
 
 function UnitNetworkHandler:m79grenade_explode_on_client(position, normal, user, damage, range, curve_pow, sender)
@@ -1851,7 +1854,7 @@ function UnitNetworkHandler:set_attention_enabled(unit, setting_index, state, se
 	end
 	if unit:in_slot(managers.slot:get_mask("players")) and unit:base().is_husk_player then
 		local setting_name = tweak_data.attention:get_attention_name(setting_index)
-		unit:movement():set_attention_setting_enabled(setting_name, state, false)
+		unit:movement():sync_attention_setting(setting_name, state, false)
 	else
 		debug_pause_unit(unit, "[UnitNetworkHandler:set_attention_enabled] invalid unit", unit)
 	end
@@ -2048,4 +2051,18 @@ function UnitNetworkHandler:sync_inflict_body_damage(body, unit, normal, positio
 		return
 	end
 	body:extension().damage:damage_fire(unit, normal, position, direction, damage, velocity)
+end
+
+function UnitNetworkHandler:sync_team_relation(team_index_1, team_index_2, relation_code)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local team_id_1 = tweak_data.levels:get_team_names_indexed()[team_index_1]
+	local team_id_2 = tweak_data.levels:get_team_names_indexed()[team_index_2]
+	local relation = relation_code == 1 and "neutral" or relation_code == 2 and "friend" or "foe"
+	if not (team_id_1 and team_id_2) or relation_code < 1 or 3 < relation_code then
+		debug_pause("[UnitNetworkHandler:sync_team_relation] invalid params", team_index_1, team_index_2, relation_code, Global.level_data.level_id)
+		return
+	end
+	managers.groupai:state():set_team_relation(team_id_1, team_id_2, relation, nil)
 end

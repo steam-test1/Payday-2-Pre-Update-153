@@ -521,6 +521,18 @@ function ContractBoxGui:update_character_menu_state(peer_id, state)
 	self._peers_state[peer_id]:set_text(state and managers.localization:to_upper_text("menu_lobby_menu_state_" .. state) or "")
 end
 
+function ContractBoxGui:set_character_panel_alpha(peer_id, alpha)
+	if self._peers and self._peers[peer_id] then
+		self._peers[peer_id]:set_alpha(alpha)
+	end
+	if self._peers_state and self._peers_state[peer_id] then
+		self._peers_state[peer_id]:set_alpha(alpha)
+	end
+	if self._peers_icon and self._peers_icon[peer_id] then
+		self._peers_icon[peer_id]:set_alpha(alpha)
+	end
+end
+
 function ContractBoxGui:_create_text_box(ws, title, text, content_data, config)
 end
 

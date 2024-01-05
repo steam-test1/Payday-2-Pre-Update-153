@@ -20,6 +20,7 @@ end
 function DoctorBagBase:init(unit)
 	UnitBase.init(self, unit, false)
 	self._unit = unit
+	self._is_attachable = true
 	self._unit:sound_source():post_event("ammo_bag_drop")
 	self._max_amount = tweak_data.upgrades.doctor_bag_base + managers.player:upgrade_value_by_level("doctor_bag", "amount_increase", 1)
 	if Network:is_client() then
@@ -51,7 +52,7 @@ end
 function DoctorBagBase:setup(amount_upgrade_lvl)
 	self._amount = tweak_data.upgrades.doctor_bag_base + managers.player:upgrade_value_by_level("doctor_bag", "amount_increase", amount_upgrade_lvl)
 	self:_set_visual_stage()
-	if Network:is_server() then
+	if Network:is_server() and self._is_attachable then
 		local from_pos = self._unit:position() + self._unit:rotation():z() * 10
 		local to_pos = self._unit:position() + self._unit:rotation():z() * -10
 		local ray = self._unit:raycast("ray", from_pos, to_pos, "slot_mask", managers.slot:get_mask("world_geometry"))
@@ -182,5 +183,24 @@ function DoctorBagBase:destroy()
 	if self._validate_clbk_id then
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
+	end
+end
+
+CustomDoctorBagBase = CustomDoctorBagBase or class(DoctorBagBase)
+
+function CustomDoctorBagBase:init(unit)
+	CustomDoctorBagBase.super.init(self, unit)
+	self._is_attachable = self.is_attachable or false
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	self:setup(self.upgrade_lvl or 0)
+end
+
+function CustomDoctorBagBase:_set_empty()
+	self._empty = true
+	if self._unit:damage():has_sequence("empty") then
+		self._unit:damage():run_sequence_simple("empty")
 	end
 end

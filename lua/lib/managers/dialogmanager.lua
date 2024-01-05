@@ -93,6 +93,9 @@ function DialogManager:_play_dialog(dialog, params, line)
 			unit = managers.criminals:character_unit_by_name(dialog.character)
 		else
 			unit = managers.dialog._bain_unit
+			if params.position then
+				unit:set_position(params.position)
+			end
 		end
 	end
 	self._current_dialog.unit = unit

@@ -84,7 +84,7 @@ function TeamAIDamage:damage_melee(attack_data)
 	if self._invulnerable or self._dead or self._fatal or self._arrested_timer then
 		return
 	end
-	if PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		return
 	end
 	local result = {variant = "melee"}
@@ -135,7 +135,7 @@ function TeamAIDamage:damage_bullet(attack_data)
 	elseif PlayerDamage._chk_dmg_too_soon(self, attack_data.damage) then
 		self:_call_listeners(attack_data)
 		return
-	elseif PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	elseif PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		self:friendly_fire_hit()
 		return
 	end
@@ -158,7 +158,12 @@ end
 function TeamAIDamage:damage_explosion(attack_data)
 	if self:_cannot_take_damage() then
 		return
-	elseif PlayerDamage:_look_for_friendly_fire(attack_data.attacker_unit) then
+	end
+	local attacker_unit = attack_data.attacker_unit
+	if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+		attacker_unit = attacker_unit:base():thrower_unit()
+	end
+	if PlayerDamage.is_friendly_fire(self, attacker_unit) then
 		self:friendly_fire_hit()
 		return
 	end

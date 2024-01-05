@@ -9,6 +9,14 @@ function ElementSpawnEnemyGroup:init(...)
 	self._group_data.ignore_disabled = self._values.ignore_disabled
 	self._group_data.spawn_points = {}
 	self._unused_randoms = {}
+	self:_finalize_values()
+end
+
+function ElementSpawnEnemyGroup:_finalize_values()
+	local values = self._values
+	if values.team == "default" then
+		values.team = nil
+	end
 end
 
 function ElementSpawnEnemyGroup:on_script_activated()
@@ -51,7 +59,9 @@ function ElementSpawnEnemyGroup:on_executed(instigator)
 	if #self._spawn_points > 0 then
 		for i = 1, self._group_data.amount do
 			local element = self._spawn_points[self:_get_spawn_point(i)]
-			element:produce()
+			element:produce({
+				team = self._values.team
+			})
 		end
 	end
 	ElementSpawnEnemyGroup.super.on_executed(self, instigator)

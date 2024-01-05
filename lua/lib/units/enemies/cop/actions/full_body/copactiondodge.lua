@@ -25,7 +25,6 @@ function CopActionDodge:init(action_desc, common_data)
 	self._ids_base = Idstring("base")
 	local redir_res = self._ext_movement:play_redirect("dodge")
 	if redir_res then
-		self._body_part = action_desc.body_part
 		self._descriptor = action_desc
 		self._last_vel_z = 0
 		self:_determine_rotation_transition()
@@ -36,7 +35,8 @@ function CopActionDodge:init(action_desc, common_data)
 		end
 		self._machine:set_parameter(redir_res, action_desc.side, 1)
 		if Network:is_server() then
-			common_data.ext_network:send("action_dodge_start", CopActionDodge._get_variation_index(action_desc.variation), CopActionDodge._get_side_index(action_desc.side), Rotation(action_desc.direction, math.UP):yaw(), action_desc.speed or 1)
+			local accuracy = math.clamp(math.floor((action_desc.shoot_accuracy or 1) * 10) / 10, 0, 10)
+			common_data.ext_network:send("action_dodge_start", self._body_part, CopActionDodge._get_variation_index(action_desc.variation), CopActionDodge._get_side_index(action_desc.side), Rotation(action_desc.direction, math.UP):yaw(), action_desc.speed or 1, accuracy)
 		end
 		self._ext_movement:enable_update()
 		return true
@@ -142,4 +142,8 @@ function CopActionDodge:_determine_rotation_transition()
 		start_rot = self._unit:rotation(),
 		end_anim_t = 0.3
 	}
+end
+
+function CopActionDodge:accuracy_multiplier()
+	return self._descriptor.shoot_accuracy or 1
 end

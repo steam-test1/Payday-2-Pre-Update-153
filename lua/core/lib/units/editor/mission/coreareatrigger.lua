@@ -265,94 +265,42 @@ function CoreAreaTriggerUnitElement:_create_shapes()
 	self._cylinder_shape:set_unit(self._unit)
 end
 
+function CoreAreaTriggerUnitElement:set_element_data(params, ...)
+	CoreAreaTriggerUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "instigator" and self._hed.instigator == "criminals" then
+		EWS:message_box(Global.frame_panel, "Criminals is deprecated, you should probably use local_criminals. Ask Martin or Ilija why.", "Instigator Warning", "ICON_WARNING", Vector3(-1, -1, 0))
+	end
+	if params.value == "shape_type" then
+		self:_set_shape_type()
+	end
+end
+
 function CoreAreaTriggerUnitElement:create_values_ctrlrs(panel, panel_sizer, disable)
-	local interval_params = {
-		name = "Check interval:",
-		value = self._hed.interval,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "Set the check interval for the area, in seconds",
-		floats = 2,
-		min = 0.01,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interval = CoreEWS.number_controller(interval_params)
-	interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
+	self:_build_value_number(panel, panel_sizer, "interval", {floats = 2, min = 0.01}, "Set the check interval for the area, in seconds.")
 	if not disable or not disable.trigger_type then
-		local trigger_types_params = {
-			name = "Trigger on:",
-			panel = panel,
-			sizer = panel_sizer,
-			options = {
-				"on_enter",
-				"on_exit",
-				"both",
-				"on_empty",
-				"while_inside"
-			},
-			value = self._hed.trigger_on,
-			tooltip = "Select a trigger on type from the combobox",
-			name_proportions = 1,
-			ctrlr_proportions = 2,
-			sorted = false
-		}
-		local trigger_types = CoreEWS.combobox(trigger_types_params)
-		trigger_types:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = trigger_types, value = "trigger_on"})
+		self:_build_value_combobox(panel, panel_sizer, "trigger_on", {
+			"on_enter",
+			"on_exit",
+			"both",
+			"on_empty",
+			"while_inside"
+		})
 	end
 	if not disable or not disable.instigator then
-		local instigator_params = {
-			name = "Instigator:",
-			panel = panel,
-			sizer = panel_sizer,
-			options = managers.mission:area_instigator_categories(),
-			value = self._hed.instigator,
-			tooltip = "Select an instigator type for the area",
-			name_proportions = 1,
-			ctrlr_proportions = 2,
-			sorted = false
-		}
-		local instigator = CoreEWS.combobox(instigator_params)
-		instigator:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = instigator, value = "instigator"})
-		local f = function(ctrlr)
-			if ctrlr:get_value() == "criminals" then
-				EWS:message_box(Global.frame_panel, "Criminals is deprecated, you should probably use local_criminals. Ask Martin or Ilija why.", "Instigator Warning", "ICON_WARNING", Vector3(-1, -1, 0))
-			end
-		end
-		instigator:connect("EVT_COMMAND_COMBOBOX_SELECTED", f, instigator)
+		local instigator, _ = self:_build_value_combobox(panel, panel_sizer, "instigator", managers.mission:area_instigator_categories(), "Select an instigator type for the area")
 		self._instigator_ctrlr = instigator
 		self._instigator_ctrlr:set_enabled(not self._hed.unit_ids)
 	end
 	if not disable or not disable.amount then
-		local amount_params = {
-			name = "Amount:",
-			panel = panel,
-			sizer = panel_sizer,
-			options = {
-				"1",
-				"2",
-				"3",
-				"4",
-				"all"
-			},
-			value = self._hed.amount,
-			tooltip = "Select how many are required to trigger area",
-			name_proportions = 1,
-			ctrlr_proportions = 2,
-			sorted = false
-		}
-		local amount = CoreEWS.combobox(amount_params)
-		amount:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
+		self:_build_value_combobox(panel, panel_sizer, "amount", {
+			"1",
+			"2",
+			"3",
+			"4",
+			"all"
+		}, "Select how many are required to trigger area")
 	end
-	local use_disabled_shapes = EWS:CheckBox(panel, "Use disabled shapes", "")
-	use_disabled_shapes:set_value(self._hed.use_disabled_shapes)
-	use_disabled_shapes:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_disabled_shapes,
-		value = "use_disabled_shapes"
-	})
-	panel_sizer:add(use_disabled_shapes, 0, 0, "EXPAND")
-	self._use_disabled_shapes = use_disabled_shapes
+	self._use_disabled_shapes = self:_build_value_checkbox(panel, panel_sizer, "use_disabled_shapes")
 end
 
 function CoreAreaTriggerUnitElement:_build_panel(panel, panel_sizer, disable_params)
@@ -360,21 +308,8 @@ function CoreAreaTriggerUnitElement:_build_panel(panel, panel_sizer, disable_par
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
 	self:create_values_ctrlrs(panel, panel_sizer, disable_params)
-	local shape_type_params = {
-		name = "Shape Type:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"box", "cylinder"},
-		value = self._hed.shape_type,
-		tooltip = "Select shape for area",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
+	local _, shape_type_params = self:_build_value_combobox(panel, panel_sizer, "shape_type", {"box", "cylinder"}, "Select shape for area")
 	self._shape_type_params = shape_type_params
-	local shape_type = CoreEWS.combobox(shape_type_params)
-	shape_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = shape_type, value = "shape_type"})
-	shape_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_set_shape_type"), nil)
 	if not self._shape then
 		self:_create_shapes()
 	end

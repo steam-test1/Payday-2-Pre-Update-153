@@ -52,23 +52,18 @@ function CivilianLogicFlee.enter(data, new_logic_name, enter_params)
 		CopLogicBase.queue_task(my_data, my_data.detection_task_key, CivilianLogicFlee._upd_detection, data, data.t + 0)
 	end
 	local attention_settings
-	if not managers.groupai:state():enemy_weapons_hot() then
-		attention_settings = {
-			"civ_enemy_cbt",
-			"civ_civ_cbt"
-		}
-		my_data.enemy_weapons_hot_listen_id = "CivilianLogicFlee" .. tostring(data.key)
-		managers.groupai:state():add_listener(my_data.enemy_weapons_hot_listen_id, {
-			"enemy_weapons_hot"
-		}, callback(CivilianLogicIdle, CivilianLogicIdle, "clbk_enemy_weapons_hot", data))
-	end
+	attention_settings = {
+		"civ_enemy_cbt",
+		"civ_civ_cbt",
+		"civ_murderer_cbt"
+	}
 	CivilianLogicFlee.schedule_run_away_clbk(data)
 	if not my_data.delayed_post_react_alert_id and data.unit:movement():stance_name() == "ntl" then
 		my_data.delayed_post_react_alert_id = "postreact_alert" .. key_str
 		CopLogicBase.add_delayed_clbk(my_data, my_data.delayed_post_react_alert_id, callback(CivilianLogicFlee, CivilianLogicFlee, "post_react_alert_clbk", {data = data}), TimerManager:game():time() + math.lerp(4, 8, math.random()))
 	end
 	data.unit:brain():set_attention_settings(attention_settings)
-	if not managers.groupai:state():is_police_called() then
+	if data.char_tweak.calls_in and not managers.groupai:state():is_police_called() then
 		my_data.call_police_clbk_id = "civ_call_police" .. key_str
 		local call_t = math.max(data.call_police_delay_t or 0, TimerManager:game():time() + math.lerp(1, 10, math.random()))
 		CopLogicBase.add_delayed_clbk(my_data, my_data.call_police_clbk_id, callback(CivilianLogicFlee, CivilianLogicFlee, "clbk_chk_call_the_police", data), call_t)
@@ -629,7 +624,7 @@ function CivilianLogicFlee.register_rescue_SO(ignore_this, data)
 		usage_amount = 1,
 		AI_group = "enemies",
 		admin_clbk = callback(CivilianLogicFlee, CivilianLogicFlee, "on_rescue_SO_administered", data),
-		verification_clbk = callback(CivilianLogicFlee, CivilianLogicFlee, "rescue_SO_verification", receiver_areas)
+		verification_clbk = callback(CivilianLogicFlee, CivilianLogicFlee, "rescue_SO_verification", {logic_data = data, areas = receiver_areas})
 	}
 	local so_id = "rescue" .. tostring(data.key)
 	my_data.rescue_SO_id = so_id
@@ -661,8 +656,10 @@ function CivilianLogicFlee.on_rescue_SO_administered(ignore_this, data, receiver
 	managers.groupai:state():unregister_rescueable_hostage(data.key)
 end
 
-function CivilianLogicFlee.rescue_SO_verification(ignore_this, areas, unit)
-	if not unit:base():char_tweak().rescue_hostages or unit:movement():cool() then
+function CivilianLogicFlee.rescue_SO_verification(ignore_this, params, unit)
+	local areas = params.areas
+	local data = params.logic_data
+	if not unit:base():char_tweak().rescue_hostages or unit:movement():cool() or data.team.foes[unit:movement():team().id] then
 		return
 	end
 	local u_nav_seg = unit:movement():nav_tracker():nav_segment()

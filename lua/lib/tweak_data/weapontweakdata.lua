@@ -1,10 +1,11 @@
 require("lib/tweak_data/WeaponFactoryTweakData")
 WeaponTweakData = WeaponTweakData or class()
 
-function WeaponTweakData:init()
+function WeaponTweakData:init(tweak_data)
 	self:_create_table_structure()
+	self:_create_table_structure_wip()
 	self:_init_data_npc_melee()
-	self:_init_data_player_weapons()
+	self:_init_data_player_weapons(tweak_data)
 	self:_init_data_m4_npc()
 	self:_init_data_m14_npc()
 	self:_init_data_m14_sniper_npc()
@@ -60,6 +61,9 @@ function WeaponTweakData:init()
 	self:_init_data_g3_npc()
 	self:_init_data_galil_npc()
 	self:_init_data_famas_npc()
+	self:_init_data_scorpion_npc()
+	self:_init_data_tec9_npc()
+	self:_init_data_uzi_npc()
 	self:_precalculate_values()
 end
 
@@ -231,7 +235,7 @@ end
 function WeaponTweakData:_init_data_r870_npc()
 	self.r870_npc.sounds.prefix = "remington_npc"
 	self.r870_npc.use_data.selection_index = 2
-	self.r870_npc.DAMAGE = 7
+	self.r870_npc.DAMAGE = 5
 	self.r870_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
 	self.r870_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
 	self.r870_npc.CLIP_AMMO_MAX = 6
@@ -571,8 +575,6 @@ function WeaponTweakData:_init_data_saw_npc()
 	self.saw_npc.hold = "rifle"
 	self.saw_npc.alert_size = 4500
 	self.saw_npc.suppression = 1.8
-	self.saw_secondary_npc = deep_clone(self.saw_npc)
-	self.saw_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_sentry_gun_npc()
@@ -967,7 +969,52 @@ function WeaponTweakData:_init_data_famas_npc()
 	self.famas_npc.suppression = 1
 end
 
-function WeaponTweakData:_init_data_player_weapons()
+function WeaponTweakData:_init_data_scorpion_npc()
+	self.scorpion_npc.sounds.prefix = "skorpion_npc"
+	self.scorpion_npc.use_data.selection_index = 1
+	self.scorpion_npc.DAMAGE = 2
+	self.scorpion_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.scorpion_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.scorpion_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.scorpion_npc.CLIP_AMMO_MAX = 40
+	self.scorpion_npc.NR_CLIPS_MAX = 5
+	self.scorpion_npc.auto.fire_rate = 0.1
+	self.scorpion_npc.hold = "pistol"
+	self.scorpion_npc.alert_size = 2800
+	self.scorpion_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_tec9_npc()
+	self.tec9_npc.sounds.prefix = "tec9_npc"
+	self.tec9_npc.use_data.selection_index = 1
+	self.tec9_npc.DAMAGE = 2
+	self.tec9_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.tec9_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.tec9_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.tec9_npc.CLIP_AMMO_MAX = 40
+	self.tec9_npc.NR_CLIPS_MAX = 5
+	self.tec9_npc.auto.fire_rate = 0.1
+	self.tec9_npc.hold = "pistol"
+	self.tec9_npc.alert_size = 2800
+	self.tec9_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_uzi_npc()
+	self.uzi_npc.sounds.prefix = "uzi_npc"
+	self.uzi_npc.use_data.selection_index = 1
+	self.uzi_npc.DAMAGE = 2
+	self.uzi_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.uzi_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.uzi_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.uzi_npc.CLIP_AMMO_MAX = 40
+	self.uzi_npc.NR_CLIPS_MAX = 5
+	self.uzi_npc.auto.fire_rate = 0.1
+	self.uzi_npc.hold = "pistol"
+	self.uzi_npc.alert_size = 2800
+	self.uzi_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default
 	if SystemInfo:platform() == Idstring("WIN32") then
 		autohit_rifle_default = {
@@ -1096,7 +1143,9 @@ function WeaponTweakData:_init_data_player_weapons()
 	self.trip_mines.alert_radius = 5000
 	self:_init_stats()
 	self.factory = WeaponFactoryTweakData:new()
+	tweak_data._init_wip_weapon_factory(self.factory, tweak_data)
 	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
+	self:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
 end
 
 function WeaponTweakData:_init_stats()
@@ -1306,6 +1355,9 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 		max_ammo * low,
 		max_ammo * high
 	}
+end
+
+function WeaponTweakData:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
 end
 
 function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
@@ -5614,99 +5666,264 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 4
 	}
+	self.scorpion = {}
+	self.scorpion.category = "smg"
+	self.scorpion.damage_melee = damage_melee_default
+	self.scorpion.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.scorpion.sounds = {}
+	self.scorpion.sounds.fire = "skorpion_fire_single"
+	self.scorpion.sounds.fire_single = "skorpion_fire_single"
+	self.scorpion.sounds.fire_auto = "skorpion_fire"
+	self.scorpion.sounds.stop_fire = "skorpion_stop"
+	self.scorpion.sounds.dryfire = "secondary_dryfire"
+	self.scorpion.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.scorpion.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.scorpion.timers = {}
+	self.scorpion.timers.reload_not_empty = 2
+	self.scorpion.timers.reload_empty = 2.75
+	self.scorpion.timers.unequip = 0.75
+	self.scorpion.timers.equip = 0.75
+	self.scorpion.name_id = "bm_w_scorpion"
+	self.scorpion.desc_id = "bm_w_scorpion_desc"
+	self.scorpion.description_id = "des_scorpion"
+	self.scorpion.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.scorpion.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.scorpion.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.scorpion.use_data = {}
+	self.scorpion.use_data.selection_index = 1
+	self.scorpion.DAMAGE = 1
+	self.scorpion.CLIP_AMMO_MAX = 20
+	self.scorpion.NR_CLIPS_MAX = math.round(total_damage_secondary / 1 / self.scorpion.CLIP_AMMO_MAX)
+	self.scorpion.AMMO_MAX = self.scorpion.CLIP_AMMO_MAX * self.scorpion.NR_CLIPS_MAX
+	self.scorpion.AMMO_PICKUP = self:_pickup_chance(180, 1)
+	self.scorpion.FIRE_MODE = "auto"
+	self.scorpion.fire_mode_data = {}
+	self.scorpion.fire_mode_data.fire_rate = 0.06
+	self.scorpion.CAN_TOGGLE_FIREMODE = true
+	self.scorpion.auto = {}
+	self.scorpion.auto.fire_rate = 0.06
+	self.scorpion.spread = {}
+	self.scorpion.spread.standing = self.new_m4.spread.standing * 0.8
+	self.scorpion.spread.crouching = self.new_m4.spread.standing * 0.8
+	self.scorpion.spread.steelsight = self.new_m4.spread.steelsight
+	self.scorpion.spread.moving_standing = self.new_m4.spread.standing * 0.8
+	self.scorpion.spread.moving_crouching = self.new_m4.spread.standing * 0.8
+	self.scorpion.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.scorpion.kick = {}
+	self.scorpion.kick.standing = self.new_m4.kick.standing
+	self.scorpion.kick.crouching = self.scorpion.kick.standing
+	self.scorpion.kick.steelsight = self.scorpion.kick.standing
+	self.scorpion.crosshair = {}
+	self.scorpion.crosshair.standing = {}
+	self.scorpion.crosshair.crouching = {}
+	self.scorpion.crosshair.steelsight = {}
+	self.scorpion.crosshair.standing.offset = 0.5
+	self.scorpion.crosshair.standing.moving_offset = 0.8
+	self.scorpion.crosshair.standing.kick_offset = 0.7
+	self.scorpion.crosshair.crouching.offset = 0.3
+	self.scorpion.crosshair.crouching.moving_offset = 0.6
+	self.scorpion.crosshair.crouching.kick_offset = 0.5
+	self.scorpion.crosshair.steelsight.hidden = true
+	self.scorpion.crosshair.steelsight.offset = 0
+	self.scorpion.crosshair.steelsight.moving_offset = 0
+	self.scorpion.crosshair.steelsight.kick_offset = 0.3
+	self.scorpion.shake = {}
+	self.scorpion.shake.fire_multiplier = 1
+	self.scorpion.shake.fire_steelsight_multiplier = -1
+	self.scorpion.autohit = autohit_smg_default
+	self.scorpion.aim_assist = aim_assist_smg_default
+	self.scorpion.weapon_hold = "scorpion"
+	self.scorpion.animations = {}
+	self.scorpion.animations.equip_id = "equip_scorpion"
+	self.scorpion.animations.recoil_steelsight = true
+	self.scorpion.global_value = "hl_miami"
+	self.scorpion.texture_bundle_folder = "hl_miami"
+	self.scorpion.stats = {
+		damage = 8,
+		spread = 6,
+		recoil = 7,
+		spread_moving = 7,
+		zoom = 1,
+		concealment = 29,
+		suppression = 17,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 7
+	}
+	self.tec9 = {}
+	self.tec9.category = "smg"
+	self.tec9.damage_melee = damage_melee_default
+	self.tec9.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.tec9.sounds = {}
+	self.tec9.sounds.fire = "tec9_fire_single"
+	self.tec9.sounds.fire_single = "tec9_fire_single"
+	self.tec9.sounds.fire_auto = "tec9_fire"
+	self.tec9.sounds.stop_fire = "tec9_stop"
+	self.tec9.sounds.dryfire = "secondary_dryfire"
+	self.tec9.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.tec9.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.tec9.timers = {}
+	self.tec9.timers.reload_not_empty = 2.56
+	self.tec9.timers.reload_empty = 2.95
+	self.tec9.timers.unequip = 0.75
+	self.tec9.timers.equip = 0.75
+	self.tec9.name_id = "bm_w_tec9"
+	self.tec9.desc_id = "bm_w_tec9_desc"
+	self.tec9.description_id = "des_tec9"
+	self.tec9.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.tec9.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.tec9.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.tec9.use_data = {}
+	self.tec9.use_data.selection_index = 1
+	self.tec9.DAMAGE = 1
+	self.tec9.CLIP_AMMO_MAX = 20
+	self.tec9.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.3 / self.tec9.CLIP_AMMO_MAX)
+	self.tec9.AMMO_MAX = self.tec9.CLIP_AMMO_MAX * self.tec9.NR_CLIPS_MAX
+	self.tec9.AMMO_PICKUP = self:_pickup_chance(160, 1)
+	self.tec9.FIRE_MODE = "auto"
+	self.tec9.fire_mode_data = {}
+	self.tec9.fire_mode_data.fire_rate = 0.067
+	self.tec9.CAN_TOGGLE_FIREMODE = true
+	self.tec9.auto = {}
+	self.tec9.auto.fire_rate = 0.067
+	self.tec9.spread = {}
+	self.tec9.spread.standing = self.new_m4.spread.standing * 0.8
+	self.tec9.spread.crouching = self.new_m4.spread.standing * 0.8
+	self.tec9.spread.steelsight = self.new_m4.spread.steelsight
+	self.tec9.spread.moving_standing = self.new_m4.spread.standing * 0.8
+	self.tec9.spread.moving_crouching = self.new_m4.spread.standing * 0.8
+	self.tec9.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.tec9.kick = {}
+	self.tec9.kick.standing = self.new_m4.kick.standing
+	self.tec9.kick.crouching = self.tec9.kick.standing
+	self.tec9.kick.steelsight = self.tec9.kick.standing
+	self.tec9.crosshair = {}
+	self.tec9.crosshair.standing = {}
+	self.tec9.crosshair.crouching = {}
+	self.tec9.crosshair.steelsight = {}
+	self.tec9.crosshair.standing.offset = 0.5
+	self.tec9.crosshair.standing.moving_offset = 0.8
+	self.tec9.crosshair.standing.kick_offset = 0.7
+	self.tec9.crosshair.crouching.offset = 0.3
+	self.tec9.crosshair.crouching.moving_offset = 0.6
+	self.tec9.crosshair.crouching.kick_offset = 0.5
+	self.tec9.crosshair.steelsight.hidden = true
+	self.tec9.crosshair.steelsight.offset = 0
+	self.tec9.crosshair.steelsight.moving_offset = 0
+	self.tec9.crosshair.steelsight.kick_offset = 0.3
+	self.tec9.shake = {}
+	self.tec9.shake.fire_multiplier = 1
+	self.tec9.shake.fire_steelsight_multiplier = -1
+	self.tec9.autohit = autohit_smg_default
+	self.tec9.aim_assist = aim_assist_smg_default
+	self.tec9.weapon_hold = "tec9"
+	self.tec9.animations = {}
+	self.tec9.animations.equip_id = "equip_tec9"
+	self.tec9.animations.recoil_steelsight = true
+	self.tec9.global_value = "hl_miami"
+	self.tec9.texture_bundle_folder = "hl_miami"
+	self.tec9.stats = {
+		damage = 11,
+		spread = 7,
+		recoil = 7,
+		spread_moving = 10,
+		zoom = 1,
+		concealment = 27,
+		suppression = 12,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 7
+	}
+	self.uzi = {}
+	self.uzi.category = "smg"
+	self.uzi.damage_melee = damage_melee_default
+	self.uzi.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.uzi.sounds = {}
+	self.uzi.sounds.fire = "uzi_fire_single"
+	self.uzi.sounds.fire_single = "uzi_fire_single"
+	self.uzi.sounds.fire_auto = "uzi_fire"
+	self.uzi.sounds.stop_fire = "uzi_stop"
+	self.uzi.sounds.dryfire = "secondary_dryfire"
+	self.uzi.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.uzi.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.uzi.timers = {}
+	self.uzi.timers.reload_not_empty = 2.45
+	self.uzi.timers.reload_empty = 3.52
+	self.uzi.timers.unequip = 0.75
+	self.uzi.timers.equip = 0.75
+	self.uzi.name_id = "bm_w_uzi"
+	self.uzi.desc_id = "bm_w_uzi_desc"
+	self.uzi.description_id = "des_uzi"
+	self.uzi.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.uzi.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.uzi.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.uzi.use_data = {}
+	self.uzi.use_data.selection_index = 1
+	self.uzi.DAMAGE = 1
+	self.uzi.CLIP_AMMO_MAX = 30
+	self.uzi.NR_CLIPS_MAX = math.round(total_damage_secondary / 2 / self.uzi.CLIP_AMMO_MAX)
+	self.uzi.AMMO_MAX = self.uzi.CLIP_AMMO_MAX * self.uzi.NR_CLIPS_MAX
+	self.uzi.AMMO_PICKUP = self:_pickup_chance(100, 1)
+	self.uzi.FIRE_MODE = "auto"
+	self.uzi.fire_mode_data = {}
+	self.uzi.fire_mode_data.fire_rate = 0.086
+	self.uzi.CAN_TOGGLE_FIREMODE = true
+	self.uzi.auto = {}
+	self.uzi.auto.fire_rate = 0.086
+	self.uzi.spread = {}
+	self.uzi.spread.standing = self.new_m4.spread.standing * 0.8
+	self.uzi.spread.crouching = self.new_m4.spread.standing * 0.8
+	self.uzi.spread.steelsight = self.new_m4.spread.steelsight
+	self.uzi.spread.moving_standing = self.new_m4.spread.standing * 0.8
+	self.uzi.spread.moving_crouching = self.new_m4.spread.standing * 0.8
+	self.uzi.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.uzi.kick = {}
+	self.uzi.kick.standing = self.new_m4.kick.standing
+	self.uzi.kick.crouching = self.uzi.kick.standing
+	self.uzi.kick.steelsight = self.uzi.kick.standing
+	self.uzi.crosshair = {}
+	self.uzi.crosshair.standing = {}
+	self.uzi.crosshair.crouching = {}
+	self.uzi.crosshair.steelsight = {}
+	self.uzi.crosshair.standing.offset = 0.5
+	self.uzi.crosshair.standing.moving_offset = 0.8
+	self.uzi.crosshair.standing.kick_offset = 0.7
+	self.uzi.crosshair.crouching.offset = 0.3
+	self.uzi.crosshair.crouching.moving_offset = 0.6
+	self.uzi.crosshair.crouching.kick_offset = 0.5
+	self.uzi.crosshair.steelsight.hidden = true
+	self.uzi.crosshair.steelsight.offset = 0
+	self.uzi.crosshair.steelsight.moving_offset = 0
+	self.uzi.crosshair.steelsight.kick_offset = 0.3
+	self.uzi.shake = {}
+	self.uzi.shake.fire_multiplier = 1
+	self.uzi.shake.fire_steelsight_multiplier = -1
+	self.uzi.autohit = autohit_smg_default
+	self.uzi.aim_assist = aim_assist_smg_default
+	self.uzi.weapon_hold = "mp9"
+	self.uzi.animations = {}
+	self.uzi.animations.equip_id = "equip_mp9"
+	self.uzi.animations.recoil_steelsight = true
+	self.uzi.global_value = "hl_miami"
+	self.uzi.texture_bundle_folder = "hl_miami"
+	self.uzi.stats = {
+		damage = 12,
+		spread = 8,
+		recoil = 10,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 24,
+		suppression = 12,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 7
+	}
 end
 
-function WeaponTweakData:_init_data_offhand_weapons()
-	self.b92fs_primary = deep_clone(self.b92fs)
-	self.b92fs_primary.parent_weapon_id = "b92fs"
-	self.b92fs_primary.use_data.selection_index = 2
-	self.b92fs_primary.animations.reload_name_id = "b92fs"
-	self.b92fs_primary.use_stance = "b92fs"
-	self.b92fs_primary.texture_name = "b92fs"
-	self.b92fs_primary.AMMO_MAX = math.round(self.b92fs_primary.AMMO_MAX * 0.75)
-	self.glock_18c_primary = deep_clone(self.glock_18c)
-	self.glock_18c_primary.parent_weapon_id = "glock_18c"
-	self.glock_18c_primary.use_data.selection_index = 2
-	self.glock_18c_primary.animations.reload_name_id = "glock_18c"
-	self.glock_18c_primary.use_stance = "glock_18c"
-	self.glock_18c_primary.texture_name = "glock_18c"
-	self.glock_18c_primary.AMMO_MAX = math.round(self.glock_18c_primary.AMMO_MAX * 0.75)
-	self.olympic_primary = deep_clone(self.olympic)
-	self.olympic_primary.parent_weapon_id = "olympic"
-	self.olympic_primary.use_data.selection_index = 2
-	self.olympic_primary.animations.reload_name_id = "olympic"
-	self.olympic_primary.use_stance = "olympic"
-	self.olympic_primary.texture_name = "olympic"
-	self.olympic_primary.AMMO_MAX = math.round(self.olympic_primary.AMMO_MAX * 0.75)
-	self.akmsu_primary = deep_clone(self.akmsu)
-	self.akmsu_primary.parent_weapon_id = "akmsu"
-	self.akmsu_primary.use_data.selection_index = 2
-	self.akmsu_primary.animations.reload_name_id = "akmsu"
-	self.akmsu_primary.use_stance = "akmsu"
-	self.akmsu_primary.texture_name = "akmsu"
-	self.akmsu_primary.AMMO_MAX = math.round(self.akmsu_primary.AMMO_MAX * 0.75)
-	self.deagle_primary = deep_clone(self.deagle)
-	self.deagle_primary.parent_weapon_id = "deagle"
-	self.deagle_primary.use_data.selection_index = 2
-	self.deagle_primary.animations.reload_name_id = "deagle"
-	self.deagle_primary.use_stance = "deagle"
-	self.deagle_primary.texture_name = "deagle"
-	self.deagle_primary.weapon_hold = "deagle"
-	self.deagle_primary.AMMO_MAX = math.round(self.deagle_primary.AMMO_MAX * 0.75)
-	self.colt_1911_primary = deep_clone(self.colt_1911)
-	self.colt_1911_primary.parent_weapon_id = "colt_1911"
-	self.colt_1911_primary.use_data.selection_index = 2
-	self.colt_1911_primary.animations.reload_name_id = "colt_1911"
-	self.colt_1911_primary.use_stance = "colt_1911"
-	self.colt_1911_primary.texture_name = "colt_1911"
-	self.colt_1911_primary.weapon_hold = "colt_1911"
-	self.colt_1911_primary.AMMO_MAX = math.round(self.colt_1911_primary.AMMO_MAX * 0.75)
-	self.raging_bull_primary = deep_clone(self.new_raging_bull)
-	self.raging_bull_primary.parent_weapon_id = "new_raging_bull"
-	self.raging_bull_primary.use_data.selection_index = 2
-	self.raging_bull_primary.animations.reload_name_id = "new_raging_bull"
-	self.raging_bull_primary.use_stance = "new_raging_bull"
-	self.raging_bull_primary.texture_name = "new_raging_bull"
-	self.raging_bull_primary.AMMO_MAX = math.round(self.raging_bull_primary.AMMO_MAX * 0.75)
-	self.ak74_secondary = deep_clone(self.ak74)
-	self.ak74_secondary.parent_weapon_id = "ak74"
-	self.ak74_secondary.use_data.selection_index = 1
-	self.ak74_secondary.animations.reload_name_id = "ak74"
-	self.ak74_secondary.use_stance = "ak74"
-	self.ak74_secondary.texture_name = "ak74"
-	self.ak74_secondary.AMMO_MAX = math.round(self.ak74_secondary.AMMO_MAX * 0.75)
-	self.aug_secondary = deep_clone(self.aug)
-	self.aug_secondary.parent_weapon_id = "aug"
-	self.aug_secondary.use_data.selection_index = 1
-	self.aug_secondary.animations.reload_name_id = "aug"
-	self.aug_secondary.use_stance = "aug"
-	self.aug_secondary.texture_name = "aug"
-	self.aug_secondary.weapon_hold = "aug"
-	self.aug_secondary.AMMO_MAX = math.round(self.aug_secondary.AMMO_MAX * 0.75)
-	self.saw_secondary = deep_clone(self.saw)
-	self.saw_secondary.parent_weapon_id = "saw"
-	self.saw_secondary.use_data.selection_index = 1
-	self.saw_secondary.animations.reload_name_id = "saw"
-	self.saw_secondary.use_stance = "saw"
-	self.saw_secondary.texture_name = "saw"
-	self.saw_secondary.weapon_hold = "saw"
-	self.saw_secondary.AMMO_MAX = math.round(self.saw_secondary.AMMO_MAX * 0.75)
-	self.s552_secondary = deep_clone(self.s552)
-	self.s552_secondary.parent_weapon_id = "s552"
-	self.s552_secondary.use_data.selection_index = 1
-	self.s552_secondary.animations.reload_name_id = "s552"
-	self.s552_secondary.use_stance = "s552"
-	self.s552_secondary.texture_name = "s552"
-	self.s552_secondary.weapon_hold = "s552"
-	self.s552_secondary.AMMO_MAX = math.round(self.s552_secondary.AMMO_MAX * 0.75)
-	self.m4_secondary = deep_clone(self.new_m4)
-	self.m4_secondary.parent_weapon_id = "new_m4"
-	self.m4_secondary.use_data.selection_index = 1
-	self.m4_secondary.animations.reload_name_id = "new_m4"
-	self.m4_secondary.use_stance = "new_m4"
-	self.m4_secondary.texture_name = "new_m4"
-	self.m4_secondary.weapon_hold = "new_m4"
-	self.m4_secondary.AMMO_MAX = math.round(self.m4_secondary.AMMO_MAX * 0.75)
+function WeaponTweakData:_create_table_structure_wip()
 end
 
 function WeaponTweakData:_create_table_structure()
@@ -5907,7 +6124,6 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
-	self.saw_secondary_npc = deep_clone(self.saw_npc)
 	self.sentry_gun = {
 		sounds = {},
 		auto = {}
@@ -6051,6 +6267,27 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.scorpion_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.tec9_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.uzi_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+end
+
+function WeaponTweakData:_precalculate_values_wip()
 end
 
 function WeaponTweakData:_precalculate_values()
@@ -6111,4 +6348,7 @@ function WeaponTweakData:_precalculate_values()
 	self.g3_npc.AMMO_MAX = self.g3_npc.CLIP_AMMO_MAX * self.g3_npc.NR_CLIPS_MAX
 	self.galil_npc.AMMO_MAX = self.galil_npc.CLIP_AMMO_MAX * self.galil_npc.NR_CLIPS_MAX
 	self.famas_npc.AMMO_MAX = self.famas_npc.CLIP_AMMO_MAX * self.famas_npc.NR_CLIPS_MAX
+	self.scorpion_npc.AMMO_MAX = self.scorpion_npc.CLIP_AMMO_MAX * self.scorpion_npc.NR_CLIPS_MAX
+	self.tec9_npc.AMMO_MAX = self.tec9_npc.CLIP_AMMO_MAX * self.tec9_npc.NR_CLIPS_MAX
+	self.uzi_npc.AMMO_MAX = self.uzi_npc.CLIP_AMMO_MAX * self.uzi_npc.NR_CLIPS_MAX
 end

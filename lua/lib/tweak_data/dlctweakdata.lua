@@ -1,6 +1,23 @@
 DLCTweakData = DLCTweakData or class()
 
 function DLCTweakData:init(tweak_data)
+	tweak_data.BUNDLED_DLC_PACKAGES = {
+		infamous = 1,
+		twitch_pack = 1,
+		pd2_million = true,
+		washington_reveal = true,
+		dlc1 = true,
+		gage_pack = true,
+		gage_pack_lmg = true,
+		gage_pack_jobs = false,
+		gage_pack_snp = true,
+		big_bank = true,
+		gage_pack_shotgun = true,
+		gage_pack_assault = true,
+		hl_miami = true,
+		season_pass = false,
+		animal = false
+	}
 	self.starter_kit = {}
 	self.starter_kit.free = true
 	self.starter_kit.content = {}
@@ -1539,6 +1556,246 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "sweettooth",
+			amount = 1
+		}
+	}
+	self.hl_miami = {}
+	self.hl_miami.dlc = "has_hl_miami"
+	self.hl_miami.content = {}
+	self.hl_miami.content.loot_drops = {}
+	self.hlm_game = {}
+	self.hlm_game.dlc = "has_hlm_game"
+	self.hlm_game.content = {}
+	self.hlm_game.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "rooster",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "tiger",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "panther",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "horse",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "neon",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "hatred",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "cushion",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rug",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "uglyrug",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hotline",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "leopard",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "shutupandbleed",
+			amount = 1
+		}
+	}
+	self.hlm_game.content.upgrades = {"briefcase"}
+	self.ach_miami_2 = {}
+	self.ach_miami_2.dlc = "has_achievement"
+	self.ach_miami_2.achievement_id = "pig_2"
+	self.ach_miami_2.content = {}
+	self.ach_miami_2.content.loot_global_value = "hl_miami"
+	self.ach_miami_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "owl",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "chromescape",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "palmtrees",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_uzi_fg_rail",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_uzi_s_leather",
+			amount = 1
+		}
+	}
+	self.ach_miami_3 = {}
+	self.ach_miami_3.dlc = "has_achievement"
+	self.ach_miami_3.achievement_id = "pig_3"
+	self.ach_miami_3.content = {}
+	self.ach_miami_3.content.loot_global_value = "hl_miami"
+	self.ach_miami_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "white_wolf",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rubber",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hiptobepolygon",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_uzi_s_solid",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_g_wood",
+			amount = 1
+		}
+	}
+	self.ach_miami_4 = {}
+	self.ach_miami_4.dlc = "has_achievement"
+	self.ach_miami_4.achievement_id = "pig_4"
+	self.ach_miami_4.content = {}
+	self.ach_miami_4.content.loot_global_value = "hl_miami"
+	self.ach_miami_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "rabbit",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "error",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "bsomebody",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_tec9_ns_ext",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_tec9_m_extended",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_tec9_s_unfolded",
+			amount = 1
+		}
+	}
+	self.ach_miami_5 = {}
+	self.ach_miami_5.dlc = "has_achievement"
+	self.ach_miami_5.achievement_id = "pig_5"
+	self.ach_miami_5.content = {}
+	self.ach_miami_5.content.loot_global_value = "hl_miami"
+	self.ach_miami_5.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_uzi_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_uzi_s_standard",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_s_nostock",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_tec9_b_standard",
+			amount = 1
+		}
+	}
+	self.ach_miami_7 = {}
+	self.ach_miami_7.dlc = "has_achievement"
+	self.ach_miami_7.achievement_id = "pig_7"
+	self.ach_miami_7.content = {}
+	self.ach_miami_7.content.loot_global_value = "hl_miami"
+	self.ach_miami_7.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pig",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "sunset",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "doodles",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_g_ergo",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_m_extended",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_scorpion_s_unfolded",
 			amount = 1
 		}
 	}

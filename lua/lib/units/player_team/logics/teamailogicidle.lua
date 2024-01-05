@@ -205,7 +205,7 @@ function TeamAILogicIdle.damage_clbk(data, damage_info)
 		else
 			local attention_info = managers.groupai:state():get_AI_attention_objects_by_filter(data.SO_access_str)[attacker_key]
 			if attention_info then
-				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil)
+				local settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 				if settings then
 					enemy_data = CopLogicBase._create_detected_attention_object_data(data, my_data, attacker_key, attention_info, settings)
 					enemy_data.verified_t = t

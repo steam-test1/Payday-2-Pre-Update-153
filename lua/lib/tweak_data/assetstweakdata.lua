@@ -161,8 +161,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_1",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2",
-		"mia_1"
+		"election_day_3_skip2"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -180,8 +179,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_2",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2",
-		"mia_1"
+		"election_day_3_skip2"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -196,8 +194,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_2",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2",
-		"mia_1"
+		"election_day_3_skip2"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"

@@ -98,7 +98,8 @@ function Drill:_kill_jammed_effect()
 end
 
 function Drill:set_jammed(jammed)
-	if (self._jammed or false) == (jammed or false) then
+	jammed = jammed and true or false
+	if self._jammed == jammed then
 		return
 	end
 	self._jammed = jammed
@@ -187,6 +188,13 @@ function Drill:set_powered(powered)
 		self:_start_drill_effect()
 		if not self.is_hacking_device and not self.is_saw and not managers.groupai:state():whisper_mode() then
 			managers.groupai:state():teammate_comment(nil, "g22", self._unit:position(), true, 500, false)
+		end
+	end
+	if Network:is_server() then
+		if not powered then
+			self:_unregister_sabotage_SO()
+		else
+			self:_register_sabotage_SO()
 		end
 	end
 end

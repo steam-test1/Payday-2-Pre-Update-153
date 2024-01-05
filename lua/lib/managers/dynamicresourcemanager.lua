@@ -56,7 +56,7 @@ function DynamicResourceManager:is_ready_to_close()
 			return false
 		end
 	end
-	if not PackageManager:all_packages_loaded() then
+	if not Global._game_base_package_loaded or not PackageManager:all_packages_loaded() then
 		if not self._still_streaming_msg then
 			print("[DynamicResourceManager:is_ready_to_close] waiting for packages to load.")
 			self._still_streaming_msg = true

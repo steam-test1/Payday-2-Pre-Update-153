@@ -170,6 +170,7 @@ function NetworkPeer:load(data)
 	self._streaming_status = data.streaming_status
 	self._ticket_wait_response = data.wait_ticket_response
 	self._loading_outfit_assets = data.loading_outfit_assets
+	self._dlc_missing = data.dlc_missing
 	if self._loading_outfit_assets then
 		self._outfit_assets = Global.peer_loading_outfit_assets[self._id]
 		Global.peer_loading_outfit_assets[self._id] = nil
@@ -220,6 +221,7 @@ function NetworkPeer:save(data)
 	data.wait_ticket_response = self._ticket_wait_response
 	data.other_peer_outfits_loaded = self._other_peer_outfits_loaded
 	data.outfit_version = self._outfit_version
+	data.dlc_missing = self._dlc_missing
 	if self._loading_outfit_assets then
 		data.loading_outfit_assets = true
 		Global.peer_loading_outfit_assets = Global.peer_loading_outfit_assets or {}
@@ -740,9 +742,7 @@ function NetworkPeer:profile(data)
 end
 
 function NetworkPeer:character_id()
-	local outfit_string = self:profile("outfit_string")
-	local data = string.split(outfit_string, " ")
-	return data[managers.blackmarket:outfit_string_index("character")]
+	return managers.blackmarket:get_character_id_by_character_name(self:character())
 end
 
 function NetworkPeer:mask_id()

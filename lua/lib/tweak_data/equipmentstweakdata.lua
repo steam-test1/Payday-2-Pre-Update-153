@@ -265,33 +265,43 @@ function EquipmentsTweakData:init()
 	}
 	self.specials.barcode_downtown = {
 		text_id = "hud_int_equipment_barcode_downtown",
-		icon = "equipment_gold",
+		icon = "equipment_barcode",
 		sync_possession = true,
-		shares_pickup_with = barcodes
+		shares_pickup_with = barcodes,
+		avoid_tranfer = true
 	}
 	self.specials.barcode_brickell = {
 		text_id = "hud_int_equipment_barcode_brickell",
-		icon = "equipment_gold",
+		icon = "equipment_barcode",
 		sync_possession = true,
-		shares_pickup_with = barcodes
+		shares_pickup_with = barcodes,
+		avoid_tranfer = true
 	}
 	self.specials.barcode_edgewater = {
 		text_id = "hud_int_equipment_barcode_edgewater",
-		icon = "equipment_gold",
+		icon = "equipment_barcode",
 		sync_possession = true,
-		shares_pickup_with = barcodes
+		shares_pickup_with = barcodes,
+		avoid_tranfer = true
 	}
 	self.specials.barcode_isles_beach = {
 		text_id = "hud_int_equipment_barcode_isles_beach",
-		icon = "equipment_gold",
+		icon = "equipment_barcode",
 		sync_possession = true,
-		shares_pickup_with = barcodes
+		shares_pickup_with = barcodes,
+		avoid_tranfer = true
 	}
 	self.specials.barcode_opa_locka = {
 		text_id = "hud_int_equipment_barcode_opa_locka",
-		icon = "equipment_gold",
+		icon = "equipment_barcode",
 		sync_possession = true,
-		shares_pickup_with = barcodes
+		shares_pickup_with = barcodes,
+		avoid_tranfer = true
+	}
+	self.specials.evidence = {
+		text_id = "hud_equipment_evidence",
+		icon = "equipment_crowbar",
+		sync_possession = true
 	}
 	self.max_amount = {
 		ammo_bag = 2,

@@ -106,6 +106,10 @@ do
 		"ene_fbi_2",
 		"ene_fbi_3",
 		"ene_fbi_heavy_1",
+		"ene_fbi_office_1",
+		"ene_fbi_office_2",
+		"ene_fbi_office_3",
+		"ene_fbi_office_4",
 		"ene_fbi_swat_1",
 		"ene_fbi_swat_2",
 		"ene_gang_black_1",
@@ -129,6 +133,8 @@ do
 		"ene_guard_national_1",
 		"ene_murkywater_1",
 		"ene_murkywater_2",
+		"ene_prisonguard_female_1",
+		"ene_prisonguard_male_1",
 		"ene_secret_service_1",
 		"ene_secret_service_2",
 		"ene_security_1",
@@ -147,8 +153,7 @@ do
 		"ene_swat_2",
 		"ene_swat_heavy_1",
 		"ene_tazer_1",
-		"ene_veteran_cop_1",
-		"npc_old_hoxton_prisonsuit_1"
+		"ene_veteran_cop_1"
 	}
 	local path_string = "units/payday2/characters/"
 	local character_path = ""
@@ -200,6 +205,7 @@ end
 
 function CopBase:post_init()
 	self._ext_movement = self._unit:movement()
+	self._ext_anim = self._unit:anim_data()
 	self:set_anim_lod(1)
 	self._lod_stage = 1
 	self._ext_movement:post_init(true)
@@ -250,7 +256,7 @@ function CopBase:set_visibility_state(stage)
 			inventory:set_visibility_state(state)
 		end
 		unit:set_visible(state)
-		if state or self._unit:anim_data().can_freeze then
+		if state or self._ext_anim.can_freeze and self._ext_anim.upper_body_empty then
 			unit:set_animatable_enabled(ids_lod, state)
 			unit:set_animatable_enabled(ids_ik_aim, state)
 		end
@@ -278,7 +284,7 @@ function CopBase:on_death_exit()
 end
 
 function CopBase:chk_freeze_anims()
-	if (not self._lod_stage or self._lod_stage > 1) and self._unit:anim_data().can_freeze then
+	if (not self._lod_stage or self._lod_stage > 1) and self._ext_anim.can_freeze and self._ext_anim.upper_body_empty then
 		if not self._anims_frozen then
 			self._anims_frozen = true
 			self._unit:set_animations_enabled(false)
@@ -330,6 +336,9 @@ function CopBase:swap_material_config(material_applied_clbk)
 end
 
 function CopBase:on_material_applied(material_applied_clbk)
+	if not alive(self._unit) then
+		return
+	end
 	if self._unit:interaction() then
 		self._unit:interaction():refresh_material()
 	end

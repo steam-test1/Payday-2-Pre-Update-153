@@ -1732,4 +1732,14 @@ function SkillTreeTweakData:init()
 		"ecm_feedback",
 		"moving_target"
 	}
+	self.default_upgrades = {
+		"cable_tie",
+		"player_special_enemy_highlight",
+		"player_hostage_trade",
+		"player_sec_camera_highlight",
+		"player_corpse_dispose",
+		"player_corpse_dispose_amount_1",
+		"player_civ_harmless_melee",
+		"striker_reload_speed_default"
+	}
 end

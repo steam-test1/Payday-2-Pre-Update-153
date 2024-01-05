@@ -119,15 +119,34 @@ function TeamAILogicTravel.update(data)
 		end
 	elseif my_data.advance_path then
 		if not unit:movement():chk_action_forbidden("walk") or unit:anim_data().act_idle then
-			local haste, no_strafe
+			local haste
 			if objective and objective.haste then
 				haste = objective.haste
-			elseif unit:movement():cool() then
+			elseif data.unit:movement():cool() then
 				haste = "walk"
 			else
 				haste = "run"
 			end
-			CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, haste, objective and objective.rot, no_strafe)
+			local pose
+			if not data.char_tweak.crouch_move then
+				pose = "stand"
+			elseif data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.stand then
+				pose = "crouch"
+			else
+				pose = data.is_suppressed and "crouch" or objective and objective.pose or "stand"
+			end
+			if not unit:anim_data()[pose] then
+				CopLogicAttack["_chk_request_action_" .. pose](data)
+			end
+			local end_rot
+			if my_data.coarse_path_index == #my_data.coarse_path - 1 then
+				end_rot = objective and objective.rot
+			end
+			local no_strafe, end_pose
+			if my_data.moving_to_cover and (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch) then
+				end_pose = "crouch"
+			end
+			CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, haste, objective and objective.rot, no_strafe, end_pose)
 			if my_data.advancing then
 				TeamAILogicTravel._check_start_path_ahead(data)
 			end
@@ -174,16 +193,7 @@ function TeamAILogicTravel.update(data)
 		return
 	end
 	local action_taken = data.unit:movement():chk_action_forbidden("walk") and not unit:anim_data().act_idle
-	local want_to_take_cover = TeamAILogicTravel._chk_wants_to_take_cover(data, my_data)
-	if not action_taken then
-		if want_to_take_cover or data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.stand then
-			if not unit:anim_data().crouch then
-				action_taken = CopLogicAttack._chk_request_action_crouch(data)
-			end
-		elseif unit:anim_data().crouch and data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.crouch then
-			action_taken = CopLogicAttack._chk_request_action_stand(data)
-		end
-	end
+	my_data.want_to_take_cover = TeamAILogicTravel._chk_wants_to_take_cover(data, my_data)
 end
 
 function TeamAILogicTravel._upd_pathing(data, my_data)

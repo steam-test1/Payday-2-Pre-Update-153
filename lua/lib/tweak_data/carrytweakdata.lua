@@ -104,7 +104,6 @@ function CarryTweakData:init(tweak_data)
 	self.lance_bag.skip_exit_secure = true
 	self.lance_bag.visual_object = "g_toolsbag"
 	self.lance_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
-	self.lance_bag.AI_carry = {SO_category = "enemies"}
 	self.lance_bag_large = {}
 	self.lance_bag_large.type = "heavy"
 	self.lance_bag_large.name_id = "hud_carry_huge_bag"

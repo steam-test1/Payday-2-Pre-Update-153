@@ -9,8 +9,8 @@ function WorldDefinition:init(params)
 	managers.worlddefinition = self
 	self._world_dir = params.world_dir
 	self._cube_lights_path = params.cube_lights_path
+	PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	self:_load_world_package()
-	managers.sequence:preload()
 	self._definition = self:_serialize_to_script(params.file_type, params.file_path)
 	self._continent_definitions = {}
 	self._continents = {}
@@ -23,6 +23,8 @@ function WorldDefinition:init(params)
 	self._excluded_continents = {}
 	self:_parse_world_setting(params.world_setting)
 	self:parse_continents()
+	managers.sequence:preload()
+	PackageManager:set_resource_loaded_clbk(Idstring("unit"), callback(managers.sequence, managers.sequence, "clbk_pkg_manager_unit_loaded"))
 	self._all_units = {}
 	self._trigger_units = {}
 	self._use_unit_callbacks = {}
@@ -132,7 +134,6 @@ function WorldDefinition:_load_continent_package(path)
 	if not PackageManager:loaded(path) then
 		PackageManager:load(path)
 		table.insert(self._continent_packages, path)
-		managers.sequence:preload()
 	end
 end
 

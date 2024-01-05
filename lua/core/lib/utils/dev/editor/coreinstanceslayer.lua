@@ -260,6 +260,17 @@ function InstancesLayer:_delete_instance_by_name(name)
 			if instance.name == name then
 				table.remove(managers.world_instance:instance_data(), i)
 				self._stashed_instance_units[name] = nil
+				local mission_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
+					"func_instance_input_event",
+					"func_instance_output_event",
+					"func_instance_point",
+					"func_instance_set_params"
+				})
+				for _, mission_unit in ipairs(mission_units) do
+					if mission_unit:mission_element().on_instance_deleted then
+						mission_unit:mission_element():on_instance_deleted(name)
+					end
+				end
 				if self._selected_instance:name() == name then
 					self._selected_instance = nil
 					self._selected_instance_data = nil
@@ -690,10 +701,13 @@ function InstancesLayer:_on_gui_rename_instance()
 			local mission_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
 				"func_instance_input_event",
 				"func_instance_output_event",
-				"func_instance_point"
+				"func_instance_point",
+				"func_instance_set_params"
 			})
 			for _, mission_unit in ipairs(mission_units) do
-				if mission_unit:mission_element_data().instance == name then
+				if mission_unit:mission_element().on_instance_changed_name then
+					mission_unit:mission_element():on_instance_changed_name(name, new_name)
+				elseif mission_unit:mission_element_data().instance == name then
 					mission_unit:mission_element():external_change_instance(new_name)
 				end
 			end
@@ -859,6 +873,18 @@ function InstancesLayer:on_continent_changed(...)
 	self:_update_overlay_gui()
 end
 
+function InstancesLayer:on_hide_selected()
+	if not self._selected_instance then
+		return
+	end
+	for name, units in pairs(self:get_instance_units_by_name(self._selected_instance:name())) do
+		for _, unit in ipairs(units) do
+			managers.editor:set_unit_visible(unit, false)
+		end
+	end
+	self:select_instance(nil)
+end
+
 function InstancesLayer:_create_overlay_gui()
 	if self._workspace then
 		Overlay:newgui():destroy_workspace(self._workspace)
@@ -928,6 +954,7 @@ function InstancesLayer:activate()
 end
 
 function InstancesLayer:deactivate()
+	self._stashed_instance_units = {}
 	InstancesLayer.super.deactivate(self)
 	if self._workspace then
 		self._workspace:hide()
