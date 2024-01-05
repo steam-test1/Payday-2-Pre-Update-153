@@ -111,6 +111,8 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.on_headshot_dealt_cooldown = 3
 	self.berserker_movement_speed_multiplier = 0.4
+	self.weapon_cost_multiplier = {}
+	self.weapon_cost_multiplier.akimbo = 1.4
 	self.weapon_movement_penalty = {}
 	self.weapon_movement_penalty.lmg = 0.8
 	self.explosive_bullet = {}
@@ -528,10 +530,10 @@ function UpgradesTweakData:_init_pd2_values()
 		0.6
 	}
 	self.values.player.perk_armor_loss_multiplier = {
+		0.95,
 		0.9,
-		0.8,
-		0.7,
-		0.6
+		0.85,
+		0.8
 	}
 	local editable_skill_descs = {
 		ammo_2x = {
@@ -1030,7 +1032,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"25%"},
 			{
 				"10%",
-				"10%",
+				"5%",
 				"75%"
 			},
 			{
@@ -1038,13 +1040,13 @@ function UpgradesTweakData:_init_pd2_values()
 				"15%",
 				"45%"
 			},
-			{"10%", "10%"},
+			{"10%", "5%"},
 			{"135%"},
-			{"10%", "10%"},
+			{"10%", "5%"},
 			{"5%", "20%"},
 			{
 				"10%",
-				"10%",
+				"5%",
 				"50%",
 				"125%",
 				"10%"
@@ -1387,6 +1389,7 @@ function UpgradesTweakData:init()
 		30
 	}
 	self.values.ecm_jammer = self.values.ecm_jammer or {}
+	self.values.first_aid_kit = self.values.first_aid_kit or {}
 	self.values.sentry_gun = self.values.sentry_gun or {}
 	self.steps.sentry_gun = {}
 	self.values.doctor_bag = self.values.doctor_bag or {}
@@ -6297,6 +6300,15 @@ function UpgradesTweakData:_temporary_definitions()
 			category = "temporary",
 			upgrade = "no_ammo_cost",
 			value = 2
+		}
+	}
+	self.definitions.temporary_first_aid_damage_reduction = {
+		category = "temporary",
+		name_id = "menu_temporary_first_aid_damage_reduction",
+		upgrade = {
+			category = "temporary",
+			upgrade = "first_aid_damage_reduction",
+			value = 1
 		}
 	}
 end

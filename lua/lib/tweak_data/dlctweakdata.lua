@@ -221,6 +221,22 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.pd2_clan_johnwick.content.upgrades = {"kabartanto"}
+	self.pd2_clan_crimefest_oct23 = {}
+	self.pd2_clan_crimefest_oct23.content = {}
+	self.pd2_clan_crimefest_oct23.dlc = "has_pd2_clan"
+	self.pd2_clan_crimefest_oct23.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_crimefest_oct23.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "smiley",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "gumbo",
+			amount = 1
+		}
+	}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

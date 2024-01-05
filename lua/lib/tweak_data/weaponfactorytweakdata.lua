@@ -2386,7 +2386,7 @@ function WeaponFactoryTweakData:_init_m4()
 		stats = {
 			value = 2,
 			spread_moving = 2,
-			concealment = 2,
+			concealment = 1,
 			extra_ammo = -4
 		}
 	}
@@ -5301,7 +5301,9 @@ function WeaponFactoryTweakData:_init_deagle()
 		},
 		forbids = {
 			"wpn_fps_pis_deagle_co_long",
-			"wpn_fps_pis_deagle_co_short"
+			"wpn_fps_pis_deagle_co_short",
+			"wpn_fps_upg_ns_pis_meatgrinder",
+			"wpn_fps_upg_ns_pis_ipsccomp"
 		},
 		override = {
 			wpn_upg_o_marksmansight_front = {a_obj = "a_ol"}

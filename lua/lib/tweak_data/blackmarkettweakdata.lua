@@ -1259,6 +1259,20 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.wayfarer.type = "glasses"
 	self.masks.wayfarer.skip_mask_on_sequence = true
 	self.masks.wayfarer.sort_number = 7
+	self.masks.smiley = {}
+	self.masks.smiley.unit = "units/pd2_crimefest_2014/oct23/masks/smiley/msk_smiley"
+	self.masks.smiley.name_id = "bm_msk_smiley"
+	self.masks.smiley.pcs = {}
+	self.masks.smiley.dlc = "pd2_clan"
+	self.masks.smiley.value = 0
+	self.masks.smiley.sort_number = 6
+	self.masks.gumbo = {}
+	self.masks.gumbo.unit = "units/pd2_crimefest_2014/oct23/masks/gumbo/msk_gumbo"
+	self.masks.gumbo.name_id = "bm_msk_gumbo"
+	self.masks.gumbo.pcs = {}
+	self.masks.gumbo.dlc = "pd2_clan"
+	self.masks.gumbo.value = 0
+	self.masks.gumbo.sort_number = 6
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

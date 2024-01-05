@@ -119,7 +119,8 @@ function PlayerStandard:_enter(enter_data)
 		if not self._state_data.mask_equipped then
 			self._state_data.mask_equipped = true
 			local equipped_mask = managers.blackmarket:equipped_mask()
-			local mask_id = managers.blackmarket:get_real_mask_id(equipped_mask.mask_id)
+			local peer_id = managers.network:session() and managers.network:session():local_peer():id()
+			local mask_id = managers.blackmarket:get_real_mask_id(equipped_mask.mask_id, peer_id)
 			local equipped_mask_type = tweak_data.blackmarket.masks[mask_id].type
 			if not equipped_mask_type then
 				self._camera_unit:anim_state_machine():set_global("mask_equip", 1)

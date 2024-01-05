@@ -6100,9 +6100,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.jowi.animations.recoil_steelsight = true
 	self.jowi.stats = {
 		damage = 8,
-		spread = 6,
-		recoil = 6,
-		spread_moving = 6,
+		spread = 7,
+		recoil = 9,
+		spread_moving = 9,
 		zoom = 3,
 		concealment = 30,
 		suppression = 15,
@@ -6443,8 +6443,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g26.global_value = "pd2_clan"
 	self.g26.stats = {
 		damage = 8,
-		spread = 6,
-		recoil = 2,
+		spread = 7,
+		recoil = 9,
 		spread_moving = 9,
 		zoom = 3,
 		concealment = 30,
