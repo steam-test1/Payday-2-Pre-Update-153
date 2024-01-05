@@ -227,7 +227,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.crouch_speed_multiplier = {1.1}
 	self.values.player.silent_kill = {25}
 	self.values.player.melee_knockdown_mul = {1.5}
-	self.values.player.damage_dampener = {0.5}
+	self.values.player.damage_dampener = {0.95}
 	self.values.smg.reload_speed_multiplier = {1.35}
 	self.values.smg.fire_rate_multiplier = {1.2}
 	self.values.player.additional_lives = {1, 3}
