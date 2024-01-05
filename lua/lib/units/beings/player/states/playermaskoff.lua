@@ -112,7 +112,7 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 	if voice_type == "mark_cop" or voice_type == "mark_cop_quiet" then
 		interact_type = "cmd_point"
 		if voice_type == "mark_cop_quiet" then
-			sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout .. "x_any"
+			sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout .. "_any"
 		else
 			sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout .. "x_any"
 		end
@@ -120,7 +120,7 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		end
 	elseif voice_type == "mark_camera" and mark_sec_camera then
-		sound_name = "quiet"
+		sound_name = "f39_any"
 		interact_type = "cmd_point"
 		prime_target.unit:contour():add("mark_unit", true)
 	end
@@ -128,7 +128,7 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 		self:_do_action_intimidate(t, not no_gesture and interact_type or nil, sound_name, skip_alert)
 		return true
 	end
-	return false
+	return mark_sec_camera or mark_special_enemies
 end
 
 function PlayerMaskOff:_check_action_jump(t, input)

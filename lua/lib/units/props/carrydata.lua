@@ -7,7 +7,7 @@ function CarryData:init(unit)
 	self._has_dye_pack = false
 	self._dye_value_multiplier = 100
 	if self._carry_id then
-		self._value = managers.money:get_bag_value(self._carry_id)
+		self._value = managers.money:get_bag_value(self._carry_id, self._multiplier)
 	else
 		self._value = tweak_data:get_value("money_manager", "bag_values", "default")
 	end
@@ -284,6 +284,14 @@ function CarryData:set_value(value)
 	self._value = value
 end
 
+function CarryData:multiplier()
+	return self._multiplier
+end
+
+function CarryData:set_multiplier(multiplier)
+	self._multiplier = multiplier
+end
+
 function CarryData:sequence_clbk_secured()
 	self:_disable_dye_pack()
 end
@@ -556,6 +564,20 @@ function CarryData:clbk_send_link()
 	end
 end
 
+function CarryData:set_zipline_unit(zipline_unit)
+	self._zipline_unit = zipline_unit
+end
+
+function CarryData:is_attached_to_zipline_unit()
+	return self._zipline_unit and true
+end
+
+function CarryData:_on_load_attach_to_zipline(zipline_unit)
+	if alive(zipline_unit) then
+		zipline_unit:zipline():attach_bag(self._unit)
+	end
+end
+
 function CarryData:save(data)
 	local state = {}
 	state.carry_id = self._carry_id
@@ -566,6 +588,7 @@ function CarryData:save(data)
 	if self._steal_SO_data and self._steal_SO_data.picked_up then
 		managers.enemy:add_delayed_clbk("send_loot_link" .. tostring(self._unit:key()), callback(self, self, "clbk_send_link"), TimerManager:game():time() + 0.1)
 	end
+	data.zip_line_unit_id = self._zipline_unit and self._zipline_unit:editor_id()
 	data.CarryData = state
 end
 
@@ -576,6 +599,9 @@ function CarryData:load(data)
 	self._dye_initiated = state.dye_initiated
 	self._has_dye_pack = state.has_dye_pack
 	self._dye_value_multiplier = state.dye_value_multiplier
+	if data.zip_line_unit_id then
+		self:_on_load_attach_to_zipline(managers.worlddefinition:get_unit_on_load(data.zip_line_unit_id, callback(self, self, "_on_load_attach_to_zipline")))
+	end
 end
 
 function CarryData:destroy()

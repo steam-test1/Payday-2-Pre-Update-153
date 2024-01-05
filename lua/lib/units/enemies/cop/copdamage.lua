@@ -93,6 +93,7 @@ function CopDamage:damage_bullet(attack_data)
 		local armor_pierce_roll = math.rand(1)
 		local armor_pierce_value = 0
 		if attack_data.attacker_unit == managers.player:player_unit() then
+			armor_pierce_value = armor_pierce_value + attack_data.weapon_unit:base():armor_piercing_chance()
 			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance", 0)
 			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance_2", 0)
 			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance_silencer", 0)
@@ -232,14 +233,23 @@ function CopDamage:damage_bullet(attack_data)
 				local attack_weapon = attack_data.weapon_unit
 				if alive(attack_weapon) and attack_weapon:base() then
 					local unit_type = self._unit:base()._tweak_table
+					local unit_weapon = self._unit:base()._default_weapon_id
+					local unit_anim = self._unit.anim_data and self._unit:anim_data()
 					local achievements = tweak_data.achievement.enemy_kill_achievements or {}
 					local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-					local weapon_pass, enemy_pass, mask_pass
+					local weapons_pass, weapon_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, distance_pass, zipline_pass, all_pass
 					for achievement, achievement_data in pairs(achievements) do
+						weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base().name_id)
 						weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
 						enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
+						enemy_weapon_pass = not achievement_data.enemy_weapon or unit_weapon == achievement_data.enemy_weapon
 						mask_pass = not achievement_data.mask or current_mask_id == achievement_data.mask
-						if weapon_pass and enemy_pass and mask_pass then
+						hiding_pass = not achievement_data.hiding or unit_anim and unit_anim.hide
+						head_pass = not achievement_data.in_head or head
+						distance_pass = not achievement_data.distance or attack_data.col_ray and attack_data.col_ray.distance >= achievement_data.distance
+						zipline_pass = not achievement_data.on_zipline or attack_data.attacker_unit:movement():zipline_unit()
+						all_pass = weapons_pass and weapon_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass
+						if all_pass then
 							if achievement_data.stat then
 								managers.achievment:award_progress(achievement_data.stat)
 							end
@@ -703,15 +713,15 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 	local hit_pos = mvector3.copy(self._unit:movement():m_pos())
 	mvector3.set_z(hit_pos, hit_pos.z + hit_offset_height)
 	attack_data.pos = hit_pos
-	local attack_dir
+	local attack_dir, distance
 	if attacker_unit then
 		attack_dir = hit_pos - attacker_unit:movement():m_head_pos()
-		mvector3.normalize(attack_dir)
+		distance = mvector3.normalize(attack_dir)
 	else
 		attack_dir = self._unit:rotation():y()
 	end
 	attack_data.attack_dir = attack_dir
-	local result
+	local shotgun_push, result
 	if death then
 		if head and damage > math.random(10) then
 			self:_spawn_head_gadget({
@@ -730,6 +740,9 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 		}
 		if data.weapon_unit then
 			managers.statistics:killed_by_anyone(data)
+			if data.weapon_unit:base():weapon_tweak_data().is_shotgun and distance and distance < 500 then
+				shotgun_push = true
+			end
 		end
 	else
 		local result_type = self:get_damage_type(damage_percent, "bullet")
@@ -746,6 +759,9 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 	end
 	self:_send_sync_bullet_attack_result(attack_data, hit_offset_height)
 	self:_on_damage_received(attack_data)
+	if shotgun_push then
+		managers.game_play_central:do_shotgun_push(self._unit, hit_pos, attack_dir, distance)
+	end
 end
 
 function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack_variant, death, direction)

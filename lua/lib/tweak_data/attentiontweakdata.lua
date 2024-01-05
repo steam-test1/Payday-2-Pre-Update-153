@@ -209,7 +209,7 @@ function AttentionTweakData:_init_civilian()
 		filter = "all_enemy",
 		max_range = 8000,
 		uncover_range = 300,
-		notice_delay_mul = 0.6,
+		notice_delay_mul = 1,
 		verification_interval = 0.1,
 		release_delay = 6,
 		duration = {3, 6},

@@ -203,7 +203,7 @@ function TaserLogicAttack._upd_aim(data, my_data, reaction)
 		end
 		if not data.unit:anim_data().reload and not data.unit:movement():chk_action_forbidden("action") then
 			if tase then
-				if (not my_data.tasing or my_data.tasing.target_u_data ~= focus_enemy) and not data.unit:movement():chk_action_forbidden("walk") then
+				if (not my_data.tasing or my_data.tasing.target_u_data ~= focus_enemy) and not data.unit:movement():chk_action_forbidden("walk") and not focus_enemy.unit:movement():zipline_unit() then
 					if my_data.attention_unit ~= focus_enemy.u_key then
 						CopLogicBase._set_attention(data, focus_enemy)
 						my_data.attention_unit = focus_enemy.u_key

@@ -312,16 +312,26 @@ function ContourExt:_apply_top_preset()
 	local data = self._types[setup.type]
 	self._last_opacity = nil
 	if data.material_swap_required then
-		if self._unit:base():is_in_original_material() then
-			self._unit:base():swap_material_config()
-			managers.occlusion:remove_occlusion(self._unit)
-			self._unit:base():set_allow_invisible(false)
-		end
 		self._materials = nil
 		self._last_opacity = nil
+		if self._unit:base():is_in_original_material() then
+			self._unit:base():swap_material_config(callback(self, ContourExt, "material_applied", true))
+		else
+			self:material_applied()
+		end
 	else
 		managers.occlusion:remove_occlusion(self._unit)
+		self:material_applied()
 	end
+end
+
+function ContourExt:material_applied(material_was_swapped)
+	if material_was_swapped then
+		managers.occlusion:remove_occlusion(self._unit)
+		self._unit:base():set_allow_invisible(false)
+	end
+	local setup = self._contour_list[1]
+	local data = self._types[setup.type]
 	if data.damage_bonus then
 		self._unit:character_damage():on_marked_state(true)
 	end

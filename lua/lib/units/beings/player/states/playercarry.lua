@@ -1,4 +1,5 @@
 PlayerCarry = PlayerCarry or class(PlayerStandard)
+PlayerCarry.target_tilt = -5
 
 function PlayerCarry:init(unit)
 	PlayerCarry.super.init(self, unit)
@@ -6,7 +7,7 @@ end
 
 function PlayerCarry:enter(state_data, enter_data)
 	PlayerCarry.super.enter(self, state_data, enter_data)
-	self._unit:camera():camera_unit():base():set_target_tilt(-5)
+	self._unit:camera():camera_unit():base():set_target_tilt(PlayerCarry.target_tilt)
 end
 
 function PlayerCarry:_enter(enter_data)
@@ -97,6 +98,7 @@ function PlayerCarry:_update_check_actions(t, dt)
 	self:_update_melee_timers(t, input)
 	self:_update_equip_weapon_timers(t, input)
 	self:_update_running_timers(t)
+	self:_update_zipline_timers(t, dt)
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
 	elseif input.btn_stats_screen_release then
@@ -119,6 +121,7 @@ function PlayerCarry:_update_check_actions(t, dt)
 	self:_check_action_jump(t, input)
 	self:_check_action_run(t, input)
 	self:_check_action_ladder(t, input)
+	self:_check_action_zipline(t, input)
 	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_check_use_item(t, input)
@@ -135,7 +138,7 @@ function PlayerCarry:_check_use_item(t, input)
 	local new_action
 	local action_wanted = input.btn_use_item_press
 	if action_wanted then
-		local action_forbidden = self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:_is_throwing_grenade()
+		local action_forbidden = self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:_is_throwing_grenade() or self:_on_zipline()
 		if not action_forbidden then
 			managers.player:drop_carry()
 			new_action = true

@@ -1435,12 +1435,11 @@ function NarrativeTweakData:init()
 			type = "d"
 		}
 	}
-	self.jobs.big.briefing_event = "pln_fj1_cbf_01"
-	self.jobs.big.debrief_event = nil
+	self.jobs.big.briefing_event = "gus_bb1_cbf_01"
+	self.jobs.big.debrief_event = "gus_bb1_debrief_01"
 	self.jobs.big.crimenet_callouts = {
-		"pln_fj1_cnc_01_01",
-		"pln_fj1_cnc_01_02",
-		"pln_fj1_cnc_01_03"
+		"gus_bb1_cnc_01_01",
+		"gus_bb1_cnc_01_02"
 	}
 	self.jobs.big.crimenet_videos = {
 		"cn_jewel1",

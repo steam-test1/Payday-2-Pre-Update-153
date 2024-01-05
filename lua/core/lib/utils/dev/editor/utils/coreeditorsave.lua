@@ -30,6 +30,7 @@ function save_data_table(unit)
 	t.projection_lights = ud.projection_lights
 	t.projection_textures = ud.projection_textures
 	t.ladder = _editable_ladder_table(unit)
+	t.zipline = _editable_zipline_table(unit)
 	return t
 end
 
@@ -92,6 +93,19 @@ function _editable_ladder_table(unit)
 		t = {
 			width = unit:ladder():width(),
 			height = unit:ladder():height()
+		}
+	end
+	return t
+end
+
+function _editable_zipline_table(unit)
+	local t
+	if unit:zipline() then
+		t = {
+			end_pos = unit:zipline():end_pos(),
+			speed = unit:zipline():speed(),
+			slack = unit:zipline():slack(),
+			usage_type = unit:zipline():usage_type()
 		}
 	end
 	return t

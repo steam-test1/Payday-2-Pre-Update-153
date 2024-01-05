@@ -3,6 +3,7 @@ BodyBagsBagBase = BodyBagsBagBase or class(UnitBase)
 function BodyBagsBagBase.spawn(pos, rot)
 	local unit_name = "units/payday2/equipment/gen_equipment_bodybags_bag/gen_equipment_bodybags_bag"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, 0)
 	return unit
 end
 
@@ -19,7 +20,30 @@ function BodyBagsBagBase:init(unit)
 	self._unit = unit
 	self._max_bodybag_amount = tweak_data.upgrades.bodybag_crate_base
 	self._unit:sound_source():post_event("ammo_bag_drop")
+	if Network:is_client() then
+		self._validate_clbk_id = "bodybags_bag_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
 	self:setup()
+end
+
+function BodyBagsBagBase:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
+end
+
+function BodyBagsBagBase:sync_setup(upgrade_lvl, peer_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(0, "bodybags_bag")
 end
 
 function BodyBagsBagBase:setup()
@@ -155,7 +179,12 @@ function BodyBagsBagBase:load(data)
 		self:_set_empty()
 	end
 	self:_set_visual_stage()
+	self._was_dropin = true
 end
 
 function BodyBagsBagBase:destroy()
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
 end

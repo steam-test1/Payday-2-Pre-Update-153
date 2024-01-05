@@ -863,7 +863,7 @@ function MenuManager:show_confirm_blackmarket_mod(params)
 		dialog_data.text = dialog_data.text .. "\n" .. l_local:text("dialog_blackmarket_mod_conflict", {mods = mods}) .. "\n"
 		warn_lost_mods = true
 	end
-	if warn_lost_mods or not params.add then
+	if not params.ignore_lost_mods and (warn_lost_mods or not params.add) then
 		dialog_data.text = dialog_data.text .. "\n" .. l_local:text("dialog_blackmarket_lost_mods_warning")
 	end
 	if params.add and params.money then

@@ -6,6 +6,7 @@ DLCManager.BUNDLED_DLC_PACKAGES = {
 	gage_pack_lmg = true,
 	infamous = true,
 	gage_pack_jobs = true,
+	gage_pack_snp = true,
 	season_pass = false,
 	animal = false
 }
@@ -99,6 +100,9 @@ function GenericDLCManager:is_dlc_unlocked(dlc)
 end
 
 function GenericDLCManager:has_dlc(dlc)
+	if tweak_data.dlc[dlc] and tweak_data.dlc[dlc].use_custom_func and tweak_data.dlc[dlc].dlc then
+		return self[tweak_data.dlc[dlc].dlc](self, tweak_data.dlc[dlc])
+	end
 	if dlc == "cce" then
 		dlc = "career_criminal_edition"
 	end
@@ -140,6 +144,14 @@ function GenericDLCManager:has_cce()
 	return Global.dlc_manager.all_dlc_data.career_criminal_edition and Global.dlc_manager.all_dlc_data.career_criminal_edition.verified
 end
 
+function GenericDLCManager:has_soundtrack()
+	return Global.dlc_manager.all_dlc_data.soundtrack and Global.dlc_manager.all_dlc_data.soundtrack.verified
+end
+
+function GenericDLCManager:has_soundtrack_or_cce()
+	return self:has_soundtrack() or self:has_cce()
+end
+
 function GenericDLCManager:has_pd2_clan()
 	return Global.dlc_manager.all_dlc_data.pd2_clan and Global.dlc_manager.all_dlc_data.pd2_clan.verified
 end
@@ -162,6 +174,10 @@ end
 
 function GenericDLCManager:has_gage_pack_jobs()
 	return Global.dlc_manager.all_dlc_data.gage_pack_jobs and Global.dlc_manager.all_dlc_data.gage_pack_jobs.verified
+end
+
+function GenericDLCManager:has_gage_pack_snp()
+	return Global.dlc_manager.all_dlc_data.gage_pack_snp and Global.dlc_manager.all_dlc_data.gage_pack_snp.verified
 end
 
 function GenericDLCManager:has_xmas_soundtrack()
@@ -417,10 +433,12 @@ function WINDLCManager:init()
 			full_game = {app_id = "218620", verified = true},
 			preorder = {app_id = "247450", no_install = true},
 			career_criminal_edition = {app_id = "218630", no_install = true},
+			soundtrack = {app_id = "254260", no_install = true},
 			armored_transport = {app_id = "264610", no_install = true},
 			gage_pack = {app_id = "267380", no_install = true},
 			gage_pack_lmg = {app_id = "275590", no_install = true},
 			gage_pack_jobs = {app_id = "259381", no_install = true},
+			gage_pack_snp = {app_id = "259380", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"

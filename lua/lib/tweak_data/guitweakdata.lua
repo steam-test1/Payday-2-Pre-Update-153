@@ -105,6 +105,14 @@ function GuiTweakData:init()
 		store = 259381,
 		image = "guis/textures/pd2/content_updates/gage_pack_jobs"
 	}
+	local gage_pack_snp = {
+		id = "gage_pack_snp",
+		name_id = "menu_content_gage_pack_snp",
+		desc_id = "menu_content_gage_pack_snp_desc",
+		date_id = "menu_content_gage_pack_snp_date",
+		store = 259380,
+		image = "guis/textures/pd2/content_updates/gage_pack_snp"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -124,7 +132,8 @@ function GuiTweakData:init()
 			gage_pack_lmg,
 			deathwish,
 			election_day,
-			gage_pack_jobs
+			gage_pack_jobs,
+			gage_pack_snp
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -210,6 +219,7 @@ function GuiTweakData:init()
 	self.crime_net.debug_options.mass_spawn = false
 	self.crime_net.debug_options.mass_spawn_limit = 100
 	self.crime_net.debug_options.mass_spawn_timer = 0.04
+	self.rename_max_letters = 20
 	self.mod_preview_min_fov = -20
 	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
@@ -1179,6 +1189,18 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
+		},
+		{
+			id = "casino",
+			name_id = "menu_cn_casino",
+			desc_id = "menu_cn_casino_desc",
+			menu_node = "crimenet_contract_casino",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_casino",
+			unlock = "unlock_level",
+			pulse = true,
+			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {

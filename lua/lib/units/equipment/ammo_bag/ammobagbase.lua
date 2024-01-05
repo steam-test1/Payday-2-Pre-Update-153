@@ -1,9 +1,9 @@
 AmmoBagBase = AmmoBagBase or class(UnitBase)
 
-function AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl)
+function AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, peer_id)
 	local unit_name = "units/payday2/equipment/gen_equipment_ammobag/gen_equipment_ammobag"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_ammo_bag_setup", unit, ammo_upgrade_lvl)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, ammo_upgrade_lvl, peer_id or 0)
 	unit:base():setup(ammo_upgrade_lvl)
 	return unit
 end
@@ -22,9 +22,29 @@ function AmmoBagBase:init(unit)
 	self._unit = unit
 	self._max_ammo_amount = tweak_data.upgrades.ammo_bag_base + managers.player:upgrade_value_by_level("ammo_bag", "ammo_increase", 1)
 	self._unit:sound_source():post_event("ammo_bag_drop")
+	if Network:is_client() then
+		self._validate_clbk_id = "ammo_bag_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
 end
 
-function AmmoBagBase:sync_setup(ammo_upgrade_lvl)
+function AmmoBagBase:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
+end
+
+function AmmoBagBase:sync_setup(ammo_upgrade_lvl, peer_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(peer_id, "ammo_bag")
 	self:setup(ammo_upgrade_lvl)
 end
 
@@ -161,7 +181,12 @@ function AmmoBagBase:load(data)
 		self:_set_dynamic()
 	end
 	self:_set_visual_stage()
+	self._was_dropin = true
 end
 
 function AmmoBagBase:destroy()
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
 end

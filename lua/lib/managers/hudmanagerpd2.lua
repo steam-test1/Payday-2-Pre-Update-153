@@ -397,6 +397,19 @@ function HUDManager:_create_assault_corner()
 	self._hud_assault_corner = HUDAssaultCorner:new(hud, full_hud)
 end
 
+function HUDManager:mark_cheater(peer_id)
+	local name_label = self:_name_label_by_peer_id(peer_id)
+	if name_label then
+		name_label.panel:child("cheater"):set_visible(true)
+	end
+	for i, data in ipairs(self._hud.teammate_panels_data) do
+		if self._teammate_panels[i]:peer_id() == peer_id then
+			self._teammate_panels[i]:set_cheater(true)
+			break
+		end
+	end
+end
+
 function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 	for i, data in ipairs(self._hud.teammate_panels_data) do
 		if not data.taken then
@@ -457,7 +470,7 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 			end
 			local peer_carry_data = managers.player:get_synced_carry(peer_id)
 			if peer_carry_data then
-				self:set_teammate_carry_info(i, peer_carry_data.carry_id, managers.loot:get_real_value(peer_carry_data.carry_id, peer_carry_data.value))
+				self:set_teammate_carry_info(i, peer_carry_data.carry_id, managers.loot:get_real_value(peer_carry_data.carry_id, peer_carry_data.multiplier))
 			end
 			data.taken = true
 			return i
@@ -868,6 +881,38 @@ function HUDManager:set_custody_can_be_trade_visible(visible)
 	self._hud_player_custody:set_can_be_trade_visible(visible)
 end
 
+function HUDManager:align_teammate_name_label(panel, interact)
+	local double_radius = interact:radius() * 2
+	local text = panel:child("text")
+	local action = panel:child("action")
+	local bag = panel:child("bag")
+	local cheater = panel:child("cheater")
+	local _, _, tw, th = text:text_rect()
+	local _, _, aw, ah = action:text_rect()
+	local _, _, cw, ch = cheater:text_rect()
+	panel:set_size(math.max(tw, cw) + 4 + double_radius, math.max(th + ah + ch, double_radius))
+	text:set_size(panel:w(), th)
+	action:set_size(panel:w(), ah)
+	cheater:set_size(tw, ch)
+	text:set_x(double_radius + 4)
+	action:set_x(double_radius + 4)
+	cheater:set_x(double_radius + 4)
+	text:set_top(cheater:bottom())
+	action:set_top(text:bottom())
+	bag:set_top(text:top() + 4)
+	interact:set_position(0, text:top())
+	local infamy = panel:child("infamy")
+	if infamy then
+		panel:set_w(panel:w() + infamy:w())
+		text:set_size(panel:size())
+		infamy:set_x(double_radius + 4)
+		infamy:set_top(text:top())
+		text:set_x(double_radius + 4 + infamy:w())
+	end
+	panel:set_w(panel:w() + bag:w() + 4)
+	bag:set_right(panel:w())
+end
+
 function HUDManager:_add_name_label(data)
 	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2)
 	local last_id = self._hud.name_labels[#self._hud.name_labels] and self._hud.name_labels[#self._hud.name_labels].id or 0
@@ -906,6 +951,18 @@ function HUDManager:_add_name_label(data)
 	}
 	local color_id = managers.criminals:character_color_id_by_unit(data.unit)
 	local crim_color = tweak_data.chat_colors[color_id]
+	local text = panel:text({
+		name = "text",
+		text = utf8.to_upper(data.name),
+		font = tweak_data.hud.medium_font,
+		font_size = tweak_data.hud.name_label_font_size,
+		color = crim_color,
+		align = "left",
+		vertical = "top",
+		layer = -1,
+		w = 256,
+		h = 18
+	})
 	local bag = panel:bitmap({
 		name = "bag",
 		texture = tabs_texture,
@@ -916,19 +973,19 @@ function HUDManager:_add_name_label(data)
 		x = 1,
 		y = 1
 	})
-	local text = panel:text({
-		name = "text",
-		text = utf8.to_upper(data.name),
+	panel:text({
+		name = "cheater",
+		text = utf8.to_upper(managers.localization:text("menu_hud_cheater")),
 		font = tweak_data.hud.medium_font,
 		font_size = tweak_data.hud.name_label_font_size,
-		color = crim_color,
-		align = "right",
-		vertical = "top",
+		color = tweak_data.screen_colors.pro_color,
+		align = "center",
+		visible = false,
 		layer = -1,
 		w = 256,
 		h = 18
 	})
-	local action = panel:text({
+	panel:text({
 		name = "action",
 		rotation = 360,
 		visible = false,
@@ -942,15 +999,9 @@ function HUDManager:_add_name_label(data)
 		w = 256,
 		h = 18
 	})
-	local _, _, w, h = text:text_rect()
-	h = math.max(h, radius * 2)
-	panel:set_size(w + 4 + radius * 2, h)
-	text:set_size(panel:size())
-	action:set_size(panel:size())
-	action:set_x(radius * 2 + 4)
 	if 0 < rank then
 		local infamy_icon = tweak_data.hud_icons:get_icon_data("infamy_icon")
-		local infamy = panel:bitmap({
+		panel:bitmap({
 			name = "infamy",
 			texture = infamy_icon,
 			layer = 0,
@@ -958,13 +1009,8 @@ function HUDManager:_add_name_label(data)
 			h = 32,
 			color = crim_color
 		})
-		panel:set_w(panel:w() + infamy:w())
-		text:set_size(panel:size())
-		infamy:set_x(panel:w() - w - infamy:w())
 	end
-	panel:set_w(panel:w() + bag:w() + 4)
-	bag:set_right(panel:w())
-	bag:set_y(4)
+	self:align_teammate_name_label(panel, interact)
 	table.insert(self._hud.name_labels, {
 		movement = data.unit:movement(),
 		panel = panel,
@@ -1217,6 +1263,10 @@ end
 
 function HUDManager:set_kit_selection(peer_id, category, id, slot)
 	self._hud_mission_briefing:set_kit_selection(peer_id, category, id, slot)
+end
+
+function HUDManager:set_slot_outfit(slot, criminal_name, outfit)
+	self._hud_mission_briefing:set_slot_outfit(slot, criminal_name, outfit)
 end
 
 function HUDManager:set_slot_voice(peer, peer_id, active)

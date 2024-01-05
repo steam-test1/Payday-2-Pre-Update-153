@@ -705,6 +705,7 @@ function WorldDefinition:assign_unit_data(unit, data)
 	self:_add_to_portal(unit, data)
 	self:_setup_projection_light(unit, data)
 	self:_setup_ladder(unit, data)
+	self:_setup_zipline(unit, data)
 	self:_project_assign_unit_data(unit, data)
 end
 
@@ -767,7 +768,8 @@ function WorldDefinition:_setup_variations(unit, data)
 	end
 	if data.material_variation and data.material_variation ~= "default" then
 		unit:unit_data().material = data.material_variation
-		unit:set_material_config(Idstring(unit:unit_data().material), true)
+		unit:set_material_config(Idstring(unit:unit_data().material), true, function()
+		end)
 	end
 end
 
@@ -797,6 +799,20 @@ function WorldDefinition:_setup_ladder(unit, data)
 	end
 	unit:ladder():set_width(data.ladder.width)
 	unit:ladder():set_height(data.ladder.height)
+end
+
+function WorldDefinition:_setup_zipline(unit, data)
+	if not data.zipline then
+		return
+	end
+	if not unit:zipline() then
+		Application:error("Unit has zipline data saved but no zipline extension. No zipline data will be loaded.")
+		return
+	end
+	unit:zipline():set_end_pos(data.zipline.end_pos)
+	unit:zipline():set_speed(data.zipline.speed)
+	unit:zipline():set_slack(data.zipline.slack)
+	unit:zipline():set_usage_type(data.zipline.usage_type)
 end
 
 function WorldDefinition:external_set_only_visible_in_editor(unit)

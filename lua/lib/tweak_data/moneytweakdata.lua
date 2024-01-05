@@ -129,9 +129,11 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.gage_pack = 1.4
 	self.global_value_multipliers.gage_pack_lmg = 1.8
 	self.global_value_multipliers.gage_pack_jobs = 0
+	self.global_value_multipliers.gage_pack_snp = 0.8
 	self.global_value_multipliers.xmas_soundtrack = 1
 	self.global_value_multipliers.sweettooth = 1
 	self.global_value_multipliers.legendary = 1
+	self.global_value_multipliers.poetry_soundtrack = 0
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -147,9 +149,11 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.gage_pack = 0.5
 	self.global_value_bonus_multiplier.gage_pack_lmg = 0.5
 	self.global_value_bonus_multiplier.gage_pack_jobs = 0
+	self.global_value_bonus_multiplier.gage_pack_snp = 0.2
 	self.global_value_bonus_multiplier.xmas_soundtrack = 0
 	self.global_value_bonus_multiplier.sweettooth = 0
 	self.global_value_bonus_multiplier.legendary = 0
+	self.global_value_bonus_multiplier.poetry_soundtrack = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -213,6 +217,7 @@ function MoneyTweakData:init()
 	self.small_loot.vault_loot_ring = 15
 	self.small_loot.vault_loot_jewels = 25
 	self.small_loot.vault_loot_macka = 0.01
+	self.max_small_loot_value = 500000
 	self.skilltree = {}
 	self.skilltree.respec = {}
 	self.skilltree.respec.base_cost = 200

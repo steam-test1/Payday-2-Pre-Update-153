@@ -24,8 +24,8 @@ function ElementCarry:on_executed(instigator)
 		if Network:is_server() then
 			local carry_ext = instigator:carry_data()
 			local carry_id = carry_ext:carry_id()
-			local value = carry_ext:value()
-			managers.loot:add_to_respawn(carry_id, value)
+			local multiplier = carry_ext:multiplier()
+			managers.loot:add_to_respawn(carry_id, multiplier)
 			instigator:set_slot(0)
 		end
 	elseif self._values.operation == "freeze" then
@@ -41,8 +41,8 @@ function ElementCarry:on_executed(instigator)
 			if Network:is_server() then
 				local silent = self._values.operation == "secure_silent"
 				local carry_id = carry_ext:carry_id()
-				local value = carry_ext:value()
-				managers.loot:secure(carry_id, value, silent)
+				local multiplier = carry_ext:multiplier()
+				managers.loot:secure(carry_id, multiplier, silent)
 			end
 			carry_ext:set_value(0)
 			if instigator:damage():has_sequence("secured") then

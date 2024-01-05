@@ -156,12 +156,22 @@ function AchievmentManager:award_progress(stat, value)
 		return
 	end
 	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self.handler:achievement_store_callback(AchievmentManager.steam_unlock_result)
+	end
 	local stats = {}
 	stats[stat] = {
 		type = "int",
 		value = value or 1
 	}
 	managers.network.account:publish_statistics(stats, true)
+end
+
+function AchievmentManager:get_stat(stat)
+	if SystemInfo:platform() == Idstring("WIN32") then
+		return managers.network.account:get_stat(stat)
+	end
+	return false
 end
 
 function AchievmentManager:award_steam(id)
@@ -182,6 +192,16 @@ function AchievmentManager:clear_steam(id)
 		return
 	end
 	self.handler:clear_achievement(self:get_info(id).id)
+	self.handler:store_data()
+end
+
+function AchievmentManager:clear_all_steam()
+	print("[AchievmentManager:clear_all_steam]")
+	if not self.handler:initialized() then
+		print("[AchievmentManager:clear_steam] Achievments are not initialized. Cannot clear steam:")
+		return
+	end
+	self.handler:clear_all_stats(true)
 	self.handler:store_data()
 end
 

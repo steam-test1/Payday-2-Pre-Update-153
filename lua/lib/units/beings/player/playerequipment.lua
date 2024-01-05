@@ -41,7 +41,7 @@ function PlayerEquipment:use_trip_mine()
 			managers.network:session():send_to_host("attach_device", ray.position, ray.normal, sensor_upgrade)
 		else
 			local rot = Rotation(ray.normal, math.UP)
-			local unit = TripMineBase.spawn(ray.position, rot, sensor_upgrade)
+			local unit = TripMineBase.spawn(ray.position, rot, sensor_upgrade, managers.network:session():local_peer():id())
 			unit:base():set_active(true, self._unit)
 		end
 		return true
@@ -92,7 +92,7 @@ function PlayerEquipment:use_ammo_bag()
 		if Network:is_client() then
 			managers.network:session():send_to_host("place_deployable_bag", "AmmoBagBase", pos, rot, ammo_upgrade_lvl)
 		else
-			local unit = AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl)
+			local unit = AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, managers.network:session():local_peer():id())
 		end
 		if managers.player:has_category_upgrade("temporary", "no_ammo_cost") then
 			managers.player:activate_temporary_upgrade("temporary", "no_ammo_cost")
@@ -117,7 +117,7 @@ function PlayerEquipment:use_doctor_bag()
 		if Network:is_client() then
 			managers.network:session():send_to_host("place_deployable_bag", "DoctorBagBase", pos, rot, amount_upgrade_lvl)
 		else
-			local unit = DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl)
+			local unit = DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl, managers.network:session():local_peer():id())
 		end
 		return true
 	end
@@ -137,7 +137,7 @@ function PlayerEquipment:use_ecm_jammer()
 			managers.network:session():send_to_host("request_place_ecm_jammer", ray.position, ray.normal, duration_multiplier)
 		else
 			local rot = Rotation(ray.normal, math.UP)
-			local unit = ECMJammerBase.spawn(ray.position, rot, duration_multiplier, self._unit)
+			local unit = ECMJammerBase.spawn(ray.position, rot, duration_multiplier, self._unit, managers.network:session():local_peer():id())
 			unit:base():set_active(true)
 		end
 		return true
@@ -223,7 +223,7 @@ function PlayerEquipment:use_sentry_gun(selected_index)
 			return false
 		else
 			local shield = managers.player:has_category_upgrade("sentry_gun", "shield")
-			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier)
+			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, managers.network:session():local_peer():id())
 			if sentry_gun_unit then
 				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield)
 			else
@@ -272,7 +272,8 @@ function PlayerEquipment:throw_grenade()
 	if Network:is_client() then
 		managers.network:session():send_to_host("server_throw_grenade", 1, pos, dir)
 	else
-		GrenadeBase.server_throw_grenade(1, pos, dir, 1)
+		GrenadeBase.server_throw_grenade(1, pos, dir, managers.network:session():local_peer():id())
+		managers.player:verify_grenade(managers.network:session():local_peer():id())
 	end
 	managers.player:on_throw_grenade()
 end

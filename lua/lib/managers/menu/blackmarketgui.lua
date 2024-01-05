@@ -619,19 +619,45 @@ function BlackMarketGuiSlotItem:init(main_panel, data, x, y, w, h)
 		color = Color.black,
 		alpha = 0
 	})
+	if data.holding then
+		self._post_load_alpha = 0.2
+		data.equipped_text = managers.localization:to_upper_text("bm_menu_holding_item")
+	end
+	if data.custom_name_text then
+		local custom_name_text = self._panel:text({
+			name = "custom_name_text",
+			text = data.custom_name_text,
+			align = "right",
+			vertical = "top",
+			font_size = small_font_size,
+			font = small_font,
+			color = tweak_data.screen_colors.text,
+			layer = 2
+		})
+		custom_name_text:move((data.custom_name_text_right or 0) - 5, 5)
+		local right = custom_name_text:right()
+		custom_name_text:grow(-(custom_name_text:w() * (data.custom_name_text_width or 0.5)), 0)
+		local _, _, w, h = custom_name_text:text_rect()
+		if w > custom_name_text:w() then
+			custom_name_text:set_font_scale(custom_name_text:font_scale() * custom_name_text:w() / w)
+		end
+		custom_name_text:set_right(right)
+	end
 	if data.hide_bg then
 	end
 	if data.mid_text and type(data.mid_text) == "table" then
 		local text = self._panel:text({
 			name = "text",
-			text = utf8.to_upper(data.mid_text.noselected_text),
+			text = data.mid_text.no_upper and data.mid_text.noselected_text or utf8.to_upper(data.mid_text.noselected_text),
 			align = data.mid_text.align or "center",
 			vertical = data.mid_text.vertical or "center",
 			font_size = data.mid_text.font_size or medium_font_size,
 			font = data.mid_text.font or medium_font,
 			color = data.mid_text.noselected_color,
 			blend_mode = data.mid_text.blend_mode or "add",
-			layer = 2
+			layer = 2,
+			wrap = true,
+			word_wrap = true
 		})
 		text:grow(-10, -10)
 		text:move(5, 5)
@@ -1184,7 +1210,7 @@ function BlackMarketGuiSlotItem:select(instant, no_sound)
 	end
 	if self._text_in_mid and alive(self._panel:child("text")) then
 		self._panel:child("text"):set_color(self._data.mid_text.selected_color or Color.white)
-		self._panel:child("text"):set_text(utf8.to_upper(self._data.mid_text.selected_text or ""))
+		self._panel:child("text"):set_text(self._data.mid_text.no_upper and self._data.mid_text.selected_text or utf8.to_upper(self._data.mid_text.selected_text or ""))
 		if alive(self._lock_bitmap) and self._data.mid_text.is_lock_same_color then
 			self._lock_bitmap:set_color(self._panel:child("text"):color())
 		end
@@ -1199,7 +1225,8 @@ function BlackMarketGuiSlotItem:select(instant, no_sound)
 			self._data.new_drop_data = nil
 		end
 	end
-	if self._panel:child("equipped_text") then
+	if self._panel:child("equipped_text") and self._data.selected_text and not self._data.equipped then
+		self._panel:child("equipped_text"):set_text(self._data.selected_text)
 	end
 	return self
 end
@@ -1211,12 +1238,13 @@ function BlackMarketGuiSlotItem:deselect(instant)
 	end
 	if self._text_in_mid and alive(self._panel:child("text")) then
 		self._panel:child("text"):set_color(self._data.mid_text.noselected_color or Color.white)
-		self._panel:child("text"):set_text(utf8.to_upper(self._data.mid_text.noselected_text or ""))
+		self._panel:child("text"):set_text(self._data.mid_text.no_upper and self._data.mid_text.noselected_text or utf8.to_upper(self._data.mid_text.noselected_text or ""))
 		if alive(self._lock_bitmap) and self._data.mid_text.is_lock_same_color then
 			self._lock_bitmap:set_color(self._panel:child("text"):color())
 		end
 	end
-	if self._panel:child("equipped_text") then
+	if self._panel:child("equipped_text") and self._data.selected_text and not self._data.equipped then
+		self._panel:child("equipped_text"):set_text("")
 	end
 end
 
@@ -1672,6 +1700,55 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		local x, y = self._tabs[self._selected]:selected_slot_center()
 		self._select_rect:set_world_center(x, y)
 		local BTNS = {
+			w_move = {
+				prio = 5,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_move_weapon",
+				callback = callback(self, self, "pickup_crafted_item_callback")
+			},
+			w_place = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_place_weapon",
+				callback = callback(self, self, "place_crafted_item_callback")
+			},
+			w_swap = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_swap_weapon",
+				callback = callback(self, self, "place_crafted_item_callback")
+			},
+			m_move = {
+				prio = 5,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_move_mask",
+				callback = callback(self, self, "pickup_crafted_item_callback")
+			},
+			m_place = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_place_mask",
+				callback = callback(self, self, "place_crafted_item_callback")
+			},
+			m_swap = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_swap_mask",
+				callback = callback(self, self, "place_crafted_item_callback")
+			},
+			i_stop_move = {
+				prio = 2,
+				btn = "BTN_X",
+				pc_btn = nil,
+				name = "bm_menu_btn_stop_move",
+				callback = callback(self, self, "drop_hold_crafted_item_callback")
+			},
 			w_mod = {
 				prio = 2,
 				btn = "BTN_Y",
@@ -2196,6 +2273,18 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			wrap = true,
 			word_wrap = true
 		}))
+		self._info_texts_color = {}
+		self._info_texts_bg = {}
+		for i, info_text in ipairs(self._info_texts) do
+			self._info_texts_color[i] = info_text:color()
+			self._info_texts_bg[i] = self._info_texts_panel:rect({
+				layer = 0,
+				color = Color.black,
+				alpha = 0.2,
+				visible = false
+			})
+			self._info_texts_bg[i]:set_shape(info_text:shape())
+		end
 		local h = real_small_font_size
 		local longest_text_w = 0
 		if self._data.info_callback then
@@ -2294,14 +2383,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				x = 120,
 				font_size = small_font_size,
 				font = small_font,
-				layer = 1,
+				layer = 2,
 				color = tweak_data.screen_colors.text
 			})
 			self._stats_titles.base = self._stats_panel:text({
 				x = 170,
 				font_size = small_font_size,
 				font = small_font,
-				layer = 1,
+				layer = 2,
 				alpha = 0.75,
 				color = tweak_data.screen_colors.text,
 				text = utf8.to_upper(managers.localization:text("bm_menu_stats_base"))
@@ -2310,7 +2399,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				x = 215,
 				font_size = small_font_size,
 				font = small_font,
-				layer = 1,
+				layer = 2,
 				alpha = 0.75,
 				color = tweak_data.screen_colors.stats_mods,
 				text = utf8.to_upper(managers.localization:text("bm_menu_stats_mod"))
@@ -2320,7 +2409,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				font_size = small_font_size,
 				font = small_font,
 				alpha = 0.75,
-				layer = 1,
+				layer = 2,
 				color = tweak_data.screen_colors.resource,
 				text = utf8.to_upper(managers.localization:text("bm_menu_stats_skill"))
 			})
@@ -2328,7 +2417,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				x = 200,
 				font_size = small_font_size,
 				font = small_font,
-				layer = 1,
+				layer = 2,
 				color = tweak_data.screen_colors.text,
 				text = utf8.to_upper(managers.localization:text("bm_menu_chosen"))
 			})
@@ -2759,6 +2848,9 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		layer = 1
 	})
 	if is_start_page then
+		if managers.menu:is_pc_controller() then
+			managers.features:announce_feature("blackmarket_rename")
+		end
 		local new_givens = managers.blackmarket:fetch_new_items_unlocked()
 		local params = {}
 		params.sound_event = "stinger_new_weapon"
@@ -2932,7 +3024,7 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 					multiplier = managers.blackmarket:fire_rate_multiplier(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint)
 				end
 				if stat.revert then
-					multiplier = 1 + (1 - multiplier)
+					multiplier = 1 / math.max(multiplier, 0.01)
 				end
 				skill_stats[stat.name].skill_in_effect = multiplier ~= 1 or modifier ~= 0
 				skill_stats[stat.name].value = modifier + math.round(base_value * multiplier) - base_value
@@ -2944,6 +3036,7 @@ end
 
 function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 	local mods_stats = {}
+	local modifier_stats = tweak_data.weapon[name].stats_modifiers
 	for _, stat in pairs(self._stats_shown) do
 		mods_stats[stat.name] = {}
 		mods_stats[stat.name].index = 0
@@ -2970,7 +3063,11 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 		local index
 		for _, stat in pairs(self._stats_shown) do
 			if mods_stats[stat.name].index and tweak_stats[stat.name] then
-				index = math.clamp(base_stats[stat.name].index + mods_stats[stat.name].index, 1, #tweak_stats[stat.name])
+				if stat.name == "concealment" then
+					index = base_stats[stat.name].index + mods_stats[stat.name].index
+				else
+					index = math.clamp(base_stats[stat.name].index + mods_stats[stat.name].index, 1, #tweak_stats[stat.name])
+				end
 				mods_stats[stat.name].value = math.round(stat.index and index or tweak_stats[stat.name][index] * tweak_data.gui.stats_present_multiplier)
 				local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]) * tweak_data.gui.stats_present_multiplier)
 				if stat.offset then
@@ -2983,7 +3080,29 @@ function BlackMarketGui:_get_mods_stats(name, base_stats, equipped_mods)
 					end
 					mods_stats[stat.name].value = max_stat - mods_stats[stat.name].value
 				end
-				mods_stats[stat.name].value = mods_stats[stat.name].value - base_stats[stat.name].value
+				if modifier_stats and modifier_stats[stat.name] then
+					local mod = modifier_stats[stat.name]
+					if stat.revert and not stat.index then
+						local real_base_value = tweak_stats[stat.name][index]
+						local modded_value = real_base_value * mod
+						local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+						if stat.offset then
+							modded_value = modded_value - offset
+						end
+						local max_stat = math.round(math.max(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+						if stat.revert then
+							max_stat = max_stat - offset
+						end
+						local new_value = math.round((max_stat - modded_value) * tweak_data.gui.stats_present_multiplier)
+						if mod ~= 0 and (modded_value > tweak_stats[stat.name][1] or modded_value < tweak_stats[stat.name][#tweak_stats[stat.name]]) then
+							new_value = math.round((new_value + mods_stats[stat.name].value / mod) / 2)
+						end
+						mods_stats[stat.name].value = new_value
+					else
+						mods_stats[stat.name].value = math.round(mods_stats[stat.name].value * mod)
+					end
+				end
+				mods_stats[stat.name].value = math.round(mods_stats[stat.name].value - base_stats[stat.name].value)
 			end
 		end
 	end
@@ -2994,6 +3113,7 @@ function BlackMarketGui:_get_base_stats(name)
 	local base_stats = {}
 	local index
 	local tweak_stats = tweak_data.weapon.stats
+	local modifier_stats = tweak_data.weapon[name].stats_modifiers
 	for _, stat in pairs(self._stats_shown) do
 		base_stats[stat.name] = {}
 		if stat.name == "magazine" then
@@ -3018,6 +3138,28 @@ function BlackMarketGui:_get_base_stats(name)
 					max_stat = max_stat - offset
 				end
 				base_stats[stat.name].value = max_stat - base_stats[stat.name].value
+			end
+			if modifier_stats and modifier_stats[stat.name] then
+				local mod = modifier_stats[stat.name]
+				if stat.revert and not stat.index then
+					local real_base_value = tweak_stats[stat.name][index]
+					local modded_value = real_base_value * mod
+					local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+					if stat.offset then
+						modded_value = modded_value - offset
+					end
+					local max_stat = math.round(math.max(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+					if stat.revert then
+						max_stat = max_stat - offset
+					end
+					local new_value = math.round((max_stat - modded_value) * tweak_data.gui.stats_present_multiplier)
+					if mod ~= 0 and (modded_value > tweak_stats[stat.name][1] or modded_value < tweak_stats[stat.name][#tweak_stats[stat.name]]) then
+						new_value = math.round((new_value + base_stats[stat.name].value / mod) / 2)
+					end
+					base_stats[stat.name].value = new_value
+				else
+					base_stats[stat.name].value = math.round(base_stats[stat.name].value * mod)
+				end
 			end
 		end
 	end
@@ -3261,9 +3403,10 @@ function BlackMarketGui:_get_stats(name, category, slot)
 	return base_stats, mods_stats, skill_stats
 end
 
-function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats, equipped_mods)
+function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats, mods_stats, equipped_mods)
 	local tweak_stats = tweak_data.weapon.stats
 	local tweak_factory = tweak_data.weapon.factory.parts
+	local modifier_stats = tweak_data.weapon[weapon_name].stats_modifiers
 	local mod_stats = {}
 	mod_stats.chosen = {}
 	mod_stats.equip = {}
@@ -3280,6 +3423,7 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 			end
 		end
 	end
+	local curr_stats = base_stats
 	local index
 	for _, mod in pairs(mod_stats) do
 		for _, stat in pairs(self._stats_shown) do
@@ -3291,7 +3435,7 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 				else
 					local chosen_index = tweak_factory[mod.name].stats[stat.name] or 0
 					if tweak_stats[stat.name] then
-						index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats[stat.name])
+						index = math.clamp(curr_stats[stat.name].index + chosen_index, 1, #tweak_stats[stat.name])
 						mod[stat.name] = math.round(stat.index and index or tweak_stats[stat.name][index] * tweak_data.gui.stats_present_multiplier)
 						local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]) * tweak_data.gui.stats_present_multiplier)
 						if stat.offset then
@@ -3304,7 +3448,29 @@ function BlackMarketGui:_get_weapon_mod_stats(mod_name, weapon_name, base_stats,
 							end
 							mod[stat.name] = max_stat - mod[stat.name]
 						end
-						mod[stat.name] = mod[stat.name] - base_stats[stat.name].value
+						if modifier_stats and modifier_stats[stat.name] then
+							local mod_stat = modifier_stats[stat.name]
+							if stat.revert and not stat.index then
+								local real_base_value = tweak_stats[stat.name][index]
+								local modded_value = real_base_value * mod_stat
+								local offset = math.round(math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+								if stat.offset then
+									modded_value = modded_value - offset
+								end
+								local max_stat = math.round(math.max(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]))
+								if stat.revert then
+									max_stat = max_stat - offset
+								end
+								local new_value = math.round((max_stat - modded_value) * tweak_data.gui.stats_present_multiplier)
+								if mod_stat ~= 0 and (modded_value > tweak_stats[stat.name][1] or modded_value < tweak_stats[stat.name][#tweak_stats[stat.name]]) then
+									new_value = math.round((new_value + mod[stat.name] / mod_stat) / 2)
+								end
+								mod[stat.name] = new_value
+							else
+								mod[stat.name] = math.round(mod[stat.name] * mod_stat)
+							end
+						end
+						mod[stat.name] = math.round(mod[stat.name] - curr_stats[stat.name].value)
 					end
 				end
 			end
@@ -3325,7 +3491,8 @@ function BlackMarketGui:_get_stats_for_mod(mod_name, weapon_name, category, slot
 		end
 	end
 	local base_stats = self:_get_base_stats(weapon_name)
-	return self:_get_weapon_mod_stats(mod_name, weapon_name, base_stats, equipped_mods)
+	local mods_stats = self:_get_mods_stats(weapon_name, base_stats, equipped_mods)
+	return self:_get_weapon_mod_stats(mod_name, weapon_name, base_stats, mods_stats, equipped_mods)
 end
 
 function BlackMarketGui:hide_melee_weapon_stats()
@@ -3782,6 +3949,152 @@ function BlackMarketGui:show_stats()
 	self._stats_panel:show()
 end
 
+function BlackMarketGui:_start_rename_item(category, slot)
+	if not self._renaming_item then
+		local custom_name = managers.blackmarket:get_crafted_custom_name(category, slot) or ""
+		self._renaming_item = {
+			category = category,
+			slot = slot,
+			custom_name = custom_name
+		}
+		self._ws:connect_keyboard(Input:keyboard())
+		self._panel:enter_text(callback(self, self, "enter_text"))
+		self._panel:key_press(callback(self, self, "key_press"))
+		self._panel:key_release(callback(self, self, "key_release"))
+		self._rename_caret = self._panel:rect({
+			name = "caret",
+			layer = 2,
+			x = 0,
+			y = 0,
+			w = 0,
+			h = 0,
+			color = Color(0.05, 1, 1, 1)
+		})
+		self._rename_caret:animate(self.blink)
+		self:update_info_text()
+	end
+end
+
+function BlackMarketGui:_stop_rename_item()
+	if self._renaming_item then
+		managers.blackmarket:set_crafted_custom_name(self._renaming_item.category, self._renaming_item.slot, self._renaming_item.custom_name)
+		self._renaming_item = nil
+		self._rename_info_text = nil
+		self._ws:disconnect_keyboard()
+		self._panel:enter_text(nil)
+		self._panel:key_press(nil)
+		self._panel:key_release(nil)
+		self._panel:remove(self._rename_caret)
+		self._rename_caret = nil
+		self:reload()
+	end
+end
+
+function BlackMarketGui:_cancel_rename_item()
+	if self._renaming_item then
+		self._renaming_item = nil
+		self._rename_info_text = nil
+		self._ws:disconnect_keyboard()
+		self._panel:enter_text(nil)
+		self._panel:key_press(nil)
+		self._panel:key_release(nil)
+		self._panel:remove(self._rename_caret)
+		self._rename_caret = nil
+		self._one_frame_input_delay = true
+		self:update_info_text()
+	end
+end
+
+function BlackMarketGui:_set_rename_info_text(info_text)
+	self._rename_info_text = info_text
+end
+
+function BlackMarketGui:_shift()
+	local k = Input:keyboard()
+	return not k:down("left shift") and not k:down("right shift") and k:has_button("shift") and k:down("shift")
+end
+
+function BlackMarketGui.blink(o)
+	while true do
+		o:set_color(Color(0, 1, 1, 1))
+		wait(0.3)
+		o:set_color(Color.white)
+		wait(0.3)
+	end
+end
+
+function BlackMarketGui:enter_text(o, s)
+	if self._renaming_item then
+		local m = tweak_data:get_raw_value("gui", "rename_max_letters") or 20
+		local n = utf8.len(self._renaming_item.custom_name)
+		s = s:sub(1, m - n)
+		self._renaming_item.custom_name = self._renaming_item.custom_name .. tostring(s)
+		self:update_info_text()
+	end
+end
+
+function BlackMarketGui:update_key_down(o, k)
+	wait(0.6)
+	while self._key_pressed == k do
+		if not self._renaming_item then
+			return
+		end
+		local text = self._renaming_item.custom_name
+		local n = utf8.len(text)
+		if self._key_pressed == Idstring("backspace") then
+			text = utf8.sub(text, 0, math.max(n - 1, 0))
+		elseif self._key_pressed == Idstring("delete") then
+		elseif self._key_pressed == Idstring("left") then
+		elseif self._key_pressed == Idstring("right") then
+			self._key_pressed = false
+		elseif self._key_ctrl_pressed == true and k == Idstring("v") then
+			return
+		end
+		if text ~= self._renaming_item.custom_name then
+			self._renaming_item.custom_name = text
+			self:update_info_text()
+		end
+		wait(0.03)
+	end
+end
+
+function BlackMarketGui:key_release(o, k)
+	if self._key_pressed == k then
+		self._key_pressed = false
+	end
+	if k == Idstring("left ctrl") or k == Idstring("right ctrl") then
+		self._key_ctrl_pressed = false
+	end
+end
+
+function BlackMarketGui:key_press(o, k)
+	local text = self._renaming_item.custom_name
+	local n = utf8.len(text)
+	self._key_pressed = k
+	self._panel:stop()
+	self._panel:animate(callback(self, self, "update_key_down"), k)
+	if k == Idstring("backspace") then
+		text = utf8.sub(text, 0, math.max(n - 1, 0))
+	elseif k == Idstring("delete") then
+	elseif k == Idstring("left") then
+	elseif k == Idstring("right") then
+	elseif self._key_pressed == Idstring("end") then
+	elseif self._key_pressed == Idstring("home") then
+	elseif k == Idstring("enter") then
+	elseif k == Idstring("esc") then
+		self:_cancel_rename_item()
+		return
+	elseif k == Idstring("left ctrl") or k == Idstring("right ctrl") then
+		self._key_ctrl_pressed = true
+	elseif self._key_ctrl_pressed == true and k == Idstring("v") then
+		return
+	end
+	if text ~= self._renaming_item.custom_name then
+		self._renaming_item.custom_name = text
+		self:update_info_text()
+	end
+end
+
 function BlackMarketGui:update_info_text()
 	local slot_data = self._slot_data
 	local tab_data = self._tabs[self._selected]._data
@@ -3799,6 +4112,8 @@ function BlackMarketGui:update_info_text()
 	self._stats_text_modslist:set_text("")
 	local suspicion, max_reached = managers.blackmarket:get_suspicion_offset_of_local(tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 	self:_set_detection(suspicion, max_reached)
+	self:_set_rename_info_text(nil)
+	local is_renaming_this = self._renaming_item and not self._data.is_loadout and self._renaming_item.category == slot_data.category and self._renaming_item.slot == slot_data.slot
 	if identifier == self.identifiers.weapon then
 		local price = slot_data.price or 0
 		if not slot_data.empty_slot then
@@ -3808,6 +4123,9 @@ function BlackMarketGui:update_info_text()
 			if 0 < price then
 				updated_texts[2].text = "##" .. managers.localization:to_upper_text(slot_data.not_moddable and "st_menu_cost" or "st_menu_value") .. " " .. managers.experience:cash_string(price) .. "##"
 				table.insert(resource_color, slot_data.can_afford and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1)
+			end
+			if not slot_data.not_moddable and not self._data.is_loadout then
+				self:_set_rename_info_text(1)
 			end
 			local clip_ammo, max_ammo = self:get_weapon_ammo_info(slot_data.name, slot_data.comparision_data and slot_data.comparision_data.extra_ammo)
 			local ammo_id = "bm_menu_ammo_capacity"
@@ -3924,6 +4242,9 @@ function BlackMarketGui:update_info_text()
 		end
 		if not slot_data.empty_slot then
 			updated_texts[1].text = slot_data.name_localized
+			if not self._data.is_loadout and slot_data.slot ~= 1 and slot_data.unlocked == true then
+				self:_set_rename_info_text(1)
+			end
 			local resource_colors = {}
 			if 0 < price and slot_data.slot ~= 1 then
 				updated_texts[2].text = "##" .. managers.localization:to_upper_text("st_menu_value") .. " " .. managers.experience:cash_string(price) .. "##" .. "   "
@@ -3990,10 +4311,15 @@ function BlackMarketGui:update_info_text()
 			table.insert(resource_colors, slot_data.can_afford and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1)
 		end
 		local unlocked = slot_data.unlocked and slot_data.unlocked ~= true and slot_data.unlocked or 0
-		updated_texts[2].text = updated_texts[2].text .. (0 < price and "   " or "") .. "##" .. managers.localization:to_upper_text("bm_menu_item_amount", {
-			amount = tostring(math.abs(unlocked))
-		}) .. "##"
-		table.insert(resource_colors, tweak_data.screen_colors.text)
+		updated_texts[2].text = updated_texts[2].text .. (0 < price and "   " or "")
+		if slot_data.free_of_charge then
+			updated_texts[2].text = updated_texts[2].text .. (0 < unlocked and managers.localization:to_upper_text("bm_menu_item_unlocked") or managers.localization:to_upper_text("bm_menu_item_locked"))
+		else
+			updated_texts[2].text = updated_texts[2].text .. "##" .. managers.localization:to_upper_text("bm_menu_item_amount", {
+				amount = tostring(math.abs(unlocked))
+			}) .. "##"
+			table.insert(resource_colors, tweak_data.screen_colors.text)
+		end
 		if #resource_colors == 1 then
 			updated_texts[2].resource_color = resource_colors[1]
 		else
@@ -4214,6 +4540,11 @@ function BlackMarketGui:update_info_text()
 		table.insert(self._desc_mini_icons, {new_icon, 2})
 	else
 	end
+	if is_renaming_this and self._rename_info_text then
+		local text = self._renaming_item.custom_name ~= "" and self._renaming_item.custom_name or "##" .. tostring(slot_data.raw_name_localized) .. "##"
+		updated_texts[self._rename_info_text].text = text
+		updated_texts[self._rename_info_text].resource_color = tweak_data.screen_colors.text:with_alpha(0.35)
+	end
 	for id, _ in ipairs(self._info_texts) do
 		self:set_info_text(id, updated_texts[id].text, updated_texts[id].resource_color)
 	end
@@ -4221,6 +4552,10 @@ function BlackMarketGui:update_info_text()
 	self._info_texts[1]:set_h(th)
 	local y = self._info_texts[1]:bottom()
 	local title_offset = y
+	local bg = self._info_texts_bg[1]
+	if alive(bg) then
+		bg:set_shape(self._info_texts[1]:shape())
+	end
 	local below_y
 	for i = 2, #self._info_texts do
 		local info_text = self._info_texts[i]
@@ -4244,11 +4579,25 @@ function BlackMarketGui:update_info_text()
 		info_text:set_font_size(small_font_size * scale)
 		_, _, _, th = info_text:text_rect()
 		info_text:set_h(th)
+		local bg = self._info_texts_bg[i]
+		if alive(bg) then
+			bg:set_shape(info_text:shape())
+		end
 		y = info_text:bottom()
 	end
 	for _, desc_mini_icon in ipairs(self._desc_mini_icons) do
 		desc_mini_icon[1]:set_y(title_offset)
 		desc_mini_icon[1]:set_world_top(self._info_texts[desc_mini_icon[2]]:world_bottom() + (2 - (desc_mini_icon[2] - 1) * 3))
+	end
+	if is_renaming_this and self._rename_info_text and self._rename_caret then
+		local info_text = self._info_texts[self._rename_info_text]
+		local x, y, w, h = info_text:text_rect()
+		if self._renaming_item.custom_name == "" then
+			w = 0
+		end
+		self._rename_caret:set_w(2)
+		self._rename_caret:set_h(h)
+		self._rename_caret:set_world_position(x + w, y)
 	end
 end
 
@@ -4272,6 +4621,10 @@ end
 function BlackMarketGui:set_info_text(id, new_string, resource_color)
 	local info_text = self._info_texts[id]
 	local text = new_string
+	self._info_texts_bg[id]:set_visible(false)
+	info_text:set_blend_mode("normal")
+	info_text:set_color(self._info_texts_color[id] or Color.white)
+	info_text:clear_range_color(0, utf8.len(info_text:text()))
 	local start_ci, end_ci, first_ci
 	if resource_color then
 		local text_dissected = utf8.characters(text)
@@ -4302,6 +4655,7 @@ function BlackMarketGui:set_info_text(id, new_string, resource_color)
 		text = string.gsub(text, "##", "")
 	end
 	info_text:set_text(text)
+	info_text:set_alpha(1)
 	if resource_color then
 		info_text:clear_range_color(1, utf8.len(text))
 		if #start_ci ~= #end_ci then
@@ -4340,6 +4694,9 @@ end
 function BlackMarketGui:mouse_moved(o, x, y)
 	if not self._enabled then
 		return
+	end
+	if self._renaming_item then
+		return true, "link"
 	end
 	local inside_tab_area = self._tab_area_panel:inside(x, y)
 	local used = true
@@ -4435,11 +4792,39 @@ function BlackMarketGui:mouse_moved(o, x, y)
 		end
 		self._tab_scroll_table.right:set_color(color)
 	end
+	if self._rename_info_text then
+		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
+		if text_button then
+			if text_button:inside(x, y) then
+				text_button:set_blend_mode("add")
+				text_button:set_color(tweak_data.screen_colors.button_stage_2)
+				used = true
+				pointer = "link"
+				local bg = self._info_texts_bg[self._rename_info_text]
+				if alive(bg) then
+					bg:set_visible(true)
+					bg:set_color(tweak_data.screen_colors.button_stage_3)
+				end
+			else
+				text_button:set_blend_mode("normal")
+				text_button:set_color(tweak_data.screen_colors.text)
+				local bg = self._info_texts_bg[self._rename_info_text]
+				if alive(bg) then
+					bg:set_visible(false)
+					bg:set_color(Color.black)
+				end
+			end
+		end
+	end
 	return used, pointer
 end
 
 function BlackMarketGui:mouse_pressed(button, x, y)
 	if not self._enabled then
+		return
+	end
+	if self._renaming_item then
+		self:_stop_rename_item()
 		return
 	end
 	local holding_shift = false
@@ -4488,6 +4873,15 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 		local selected_slot = self._tabs[self._selected]:mouse_pressed(button, x, y)
 		self:on_slot_selected(selected_slot)
 		if selected_slot then
+			return
+		end
+	end
+	if self._rename_info_text then
+		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
+		if self._slot_data and text_button and text_button:inside(x, y) then
+			local category = self._slot_data.category
+			local slot = self._slot_data.slot
+			self:_start_rename_item(category, slot)
 			return
 		end
 	end
@@ -4641,6 +5035,9 @@ function BlackMarketGui:set_selected_tab(tab, no_sound)
 			1
 		}
 	})
+	if managers.blackmarket:get_hold_crafted_item() then
+		self:drop_hold_crafted_item_callback()
+	end
 end
 
 function BlackMarketGui:set_tab_positions()
@@ -4740,11 +5137,17 @@ function BlackMarketGui:move_up()
 	if not self._enabled then
 		return
 	end
+	if self._renaming_item then
+		return
+	end
 	self:move(0, -1)
 end
 
 function BlackMarketGui:move_down()
 	if not self._enabled then
+		return
+	end
+	if self._renaming_item then
 		return
 	end
 	self:move(0, 1)
@@ -4754,6 +5157,9 @@ function BlackMarketGui:move_left()
 	if not self._enabled then
 		return
 	end
+	if self._renaming_item then
+		return
+	end
 	self:move(-1, 0)
 end
 
@@ -4761,11 +5167,17 @@ function BlackMarketGui:move_right()
 	if not self._enabled then
 		return
 	end
+	if self._renaming_item then
+		return
+	end
 	self:move(1, 0)
 end
 
 function BlackMarketGui:next_page(no_sound)
 	if not self._enabled then
+		return
+	end
+	if self._renaming_item then
 		return
 	end
 	if self._pages then
@@ -4782,6 +5194,9 @@ end
 
 function BlackMarketGui:previous_page(no_sound)
 	if not self._enabled then
+		return
+	end
+	if self._renaming_item then
 		return
 	end
 	if self._pages then
@@ -4812,6 +5227,9 @@ end
 
 function BlackMarketGui:press_button(button)
 	if not self._enabled then
+		return
+	end
+	if self._renaming_item then
 		return
 	end
 	local btn = self._controllers_mapping and self._controllers_mapping[button:key()]
@@ -4849,6 +5267,10 @@ function BlackMarketGui:confirm_pressed()
 	if not self._enabled then
 		return
 	end
+	if self._renaming_item then
+		self:_stop_rename_item()
+		return
+	end
 	if managers.menu:is_pc_controller() then
 		return self:press_first_btn(Idstring("0"))
 	else
@@ -4860,11 +5282,18 @@ function BlackMarketGui:special_btn_pressed(button)
 	if not self._enabled then
 		return
 	end
+	if self._renaming_item then
+		return
+	end
 	return self:press_pc_button(button)
 end
 
 function BlackMarketGui:input_focus()
-	return not self._enabled or #self._data > -1 and 1 or true
+	if self._one_frame_input_delay then
+		self._one_frame_input_delay = nil
+		return true
+	end
+	return self._renaming_item and true or self._enabled and (#self._data > -1 and 1 or true)
 end
 
 function BlackMarketGui:visible()
@@ -4955,6 +5384,8 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		end
 		last_unlocked_weapon = category_size == 1
 	end
+	local hold_crafted_item = managers.blackmarket:get_hold_crafted_item()
+	local currently_holding = hold_crafted_item and hold_crafted_item.category == category
 	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
 	local max_rows = tweak_data.gui.MAX_WEAPON_ROWS or 3
 	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
@@ -4973,7 +5404,9 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		end
 		new_data = {}
 		new_data.name = crafted.weapon_id
-		new_data.name_localized = managers.weapon_factory:get_weapon_name_by_factory_id(crafted.factory_id)
+		new_data.name_localized = managers.blackmarket:get_weapon_name_by_category_slot(category, i)
+		new_data.raw_name_localized = managers.weapon_factory:get_weapon_name_by_factory_id(crafted.factory_id)
+		new_data.custom_name_text = managers.blackmarket:get_crafted_custom_name(category, i, true)
 		new_data.category = category
 		new_data.slot = i
 		new_data.unlocked = managers.blackmarket:weapon_unlocked(crafted.weapon_id)
@@ -4989,6 +5422,7 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		new_data.global_value = tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"
 		new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or nil
 		new_data.lock_texture = self:get_lock_icon(new_data)
+		new_data.holding = currently_holding and hold_crafted_item.slot == i
 		local icon_list = managers.menu_component:create_weapon_mod_icon_list(crafted.weapon_id, category, crafted.factory_id, i)
 		local icon_index = 1
 		local new_parts = {}
@@ -5034,17 +5468,28 @@ function BlackMarketGui:populate_weapon_category(category, data)
 			self._equipped_comparision_data = self._equipped_comparision_data or {}
 			self._equipped_comparision_data[category] = new_data.comparision_data
 		end
-		local has_mods = managers.weapon_factory:has_weapon_more_than_default_parts(crafted.factory_id)
-		if has_mods and new_data.unlocked then
-			table.insert(new_data, "w_mod")
+		if currently_holding then
+			new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_swap_weapon")
+			if new_data.slot ~= hold_crafted_item.slot then
+				table.insert(new_data, "w_swap")
+			end
+			table.insert(new_data, "i_stop_move")
+		else
+			local has_mods = managers.weapon_factory:has_weapon_more_than_default_parts(crafted.factory_id)
+			if has_mods and new_data.unlocked then
+				table.insert(new_data, "w_mod")
+			end
+			if not new_data.last_weapon then
+				table.insert(new_data, "w_sell")
+			end
+			if not new_data.equipped and new_data.unlocked then
+				table.insert(new_data, "w_equip")
+			end
+			if new_data.equipped and new_data.unlocked then
+				table.insert(new_data, "w_move")
+			end
+			table.insert(new_data, "w_preview")
 		end
-		if not new_data.last_weapon then
-			table.insert(new_data, "w_sell")
-		end
-		if not new_data.equipped and new_data.unlocked then
-			table.insert(new_data, "w_equip")
-		end
-		table.insert(new_data, "w_preview")
 		data[i] = new_data
 		index = i
 	end
@@ -5056,17 +5501,23 @@ function BlackMarketGui:populate_weapon_category(category, data)
 				new_data.name = "bm_menu_btn_buy_new_weapon"
 				new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
 				new_data.mid_text = {}
-				new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_new_weapon")
-				new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
 				new_data.mid_text.noselected_text = new_data.name_localized
 				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+				new_data.mid_text.selected_text = currently_holding and new_data.mid_text.noselected_text or managers.localization:text("bm_menu_btn_buy_new_weapon")
+				new_data.mid_text.selected_color = currently_holding and new_data.mid_text.noselected_color or tweak_data.screen_colors.button_stage_2
 				new_data.empty_slot = true
 				new_data.category = category
 				new_data.slot = i
 				new_data.unlocked = true
 				new_data.can_afford = true
 				new_data.equipped = false
-				table.insert(new_data, "ew_buy")
+				if currently_holding then
+					new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_place_weapon")
+					table.insert(new_data, "w_place")
+					table.insert(new_data, "i_stop_move")
+				else
+					table.insert(new_data, "ew_buy")
+				end
 				if managers.blackmarket:got_new_drop(new_data.category, "weapon_buy_empty", nil) then
 					new_data.mini_icons = new_data.mini_icons or {}
 					table.insert(new_data.mini_icons, {
@@ -5104,7 +5555,11 @@ function BlackMarketGui:populate_weapon_category(category, data)
 				new_data.mid_text.noselected_text = new_data.name_localized
 				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
 				new_data.mid_text.is_lock_same_color = true
-				if managers.money:can_afford_buy_weapon_slot() then
+				if currently_holding then
+					new_data.mid_text.selected_text = new_data.mid_text.noselected_text
+					new_data.mid_text.selected_color = new_data.mid_text.noselected_color
+					table.insert(new_data, "i_stop_move")
+				elseif managers.money:can_afford_buy_weapon_slot() then
 					new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_weapon_slot")
 					new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
 					table.insert(new_data, "ew_unlock")
@@ -5361,6 +5816,8 @@ function BlackMarketGui:populate_masks(data)
 	local mini_icon_helper = math.round((self._panel:h() - (tweak_data.menu.pd2_medium_font_size + 10) - 70) * GRID_H_MUL / 3) - 16
 	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
 	local start_crafted_item = data.start_crafted_item or 1
+	local hold_crafted_item = managers.blackmarket:get_hold_crafted_item()
+	local currently_holding = hold_crafted_item and hold_crafted_item.category == "masks"
 	local max_rows = tweak_data.gui.MAX_MASK_ROWS
 	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
 	for i = 1, max_items do
@@ -5377,7 +5834,11 @@ function BlackMarketGui:populate_masks(data)
 		end
 		new_data = {}
 		new_data.name = crafted.mask_id
-		new_data.name_localized = managers.localization:text(tweak_data.blackmarket.masks[new_data.name].name_id)
+		new_data.name_localized = managers.blackmarket:get_mask_name_by_category_slot("masks", i)
+		new_data.raw_name_localized = managers.localization:text(tweak_data.blackmarket.masks[new_data.name].name_id)
+		new_data.custom_name_text = managers.blackmarket:get_crafted_custom_name("masks", i, true)
+		new_data.custom_name_text_right = crafted.modded and -55 or -20
+		new_data.custom_name_text_width = crafted.modded and 0.6
 		new_data.category = "masks"
 		new_data.global_value = crafted.global_value
 		new_data.slot = i
@@ -5385,6 +5846,7 @@ function BlackMarketGui:populate_masks(data)
 		new_data.equipped = crafted.equipped
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. new_data.name
 		new_data.stream = false
+		new_data.holding = currently_holding and hold_crafted_item.slot == i
 		local is_locked = tweak_data.lootdrop.global_values[new_data.global_value] and tweak_data.lootdrop.global_values[new_data.global_value].dlc and not tweak_data.dlc[new_data.global_value].free and not managers.dlc:has_dlc(new_data.global_value)
 		local locked_parts = {}
 		if not is_locked then
@@ -5400,22 +5862,35 @@ function BlackMarketGui:populate_masks(data)
 			new_data.lock_texture = self:get_lock_icon(new_data, "guis/textures/pd2/lock_incompatible")
 			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
 		end
-		if new_data.unlocked then
-			if not new_data.equipped then
-				table.insert(new_data, "m_equip")
+		if currently_holding then
+			if i ~= 1 then
+				new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_swap_mask")
 			end
-			if not crafted.modded and managers.blackmarket:can_modify_mask(i) and i ~= 1 then
-				table.insert(new_data, "m_mod")
+			if i ~= 1 and new_data.slot ~= hold_crafted_item.slot then
+				table.insert(new_data, "m_swap")
+			end
+			table.insert(new_data, "i_stop_move")
+		else
+			if new_data.unlocked then
+				if not new_data.equipped then
+					table.insert(new_data, "m_equip")
+				end
+				if i ~= 1 and new_data.equipped then
+					table.insert(new_data, "m_move")
+				end
+				if not crafted.modded and managers.blackmarket:can_modify_mask(i) and i ~= 1 then
+					table.insert(new_data, "m_mod")
+				end
+				if i ~= 1 then
+					table.insert(new_data, "m_preview")
+				end
 			end
 			if i ~= 1 then
-				table.insert(new_data, "m_preview")
-			end
-		end
-		if i ~= 1 then
-			if 0 < managers.money:get_mask_sell_value(new_data.name, new_data.global_value) then
-				table.insert(new_data, "m_sell")
-			else
-				table.insert(new_data, "m_remove")
+				if 0 < managers.money:get_mask_sell_value(new_data.name, new_data.global_value) then
+					table.insert(new_data, "m_sell")
+				else
+					table.insert(new_data, "m_remove")
+				end
 			end
 		end
 		if crafted.modded then
@@ -5549,10 +6024,10 @@ function BlackMarketGui:populate_masks(data)
 				new_data.name = "bm_menu_btn_buy_new_mask"
 				new_data.name_localized = managers.localization:text("bm_menu_empty_mask_slot")
 				new_data.mid_text = {}
-				new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_new_mask")
-				new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
 				new_data.mid_text.noselected_text = new_data.name_localized
 				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+				new_data.mid_text.selected_text = currently_holding and new_data.mid_text.noselected_text or managers.localization:text("bm_menu_btn_buy_new_mask")
+				new_data.mid_text.selected_color = currently_holding and new_data.mid_text.noselected_color or tweak_data.screen_colors.button_stage_2
 				new_data.empty_slot = true
 				new_data.category = "masks"
 				new_data.slot = index
@@ -5560,7 +6035,17 @@ function BlackMarketGui:populate_masks(data)
 				new_data.equipped = false
 				new_data.num_backs = 0
 				new_data.cannot_buy = not can_buy_masks
-				table.insert(new_data, "em_buy")
+				if currently_holding then
+					if i ~= 1 then
+						new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_place_mask")
+					end
+					if i ~= 1 then
+						table.insert(new_data, "m_place")
+					end
+					table.insert(new_data, "i_stop_move")
+				else
+					table.insert(new_data, "em_buy")
+				end
 				if index ~= 1 and managers.blackmarket:got_new_drop(nil, "mask_buy", nil) then
 					new_data.mini_icons = new_data.mini_icons or {}
 					table.insert(new_data.mini_icons, {
@@ -5599,7 +6084,11 @@ function BlackMarketGui:populate_masks(data)
 				new_data.mid_text.noselected_text = new_data.name_localized
 				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
 				new_data.mid_text.is_lock_same_color = true
-				if managers.money:can_afford_buy_mask_slot() then
+				if currently_holding then
+					new_data.mid_text.selected_text = new_data.mid_text.noselected_text
+					new_data.mid_text.selected_color = new_data.mid_text.noselected_color
+					table.insert(new_data, "i_stop_move")
+				elseif managers.money:can_afford_buy_mask_slot() then
 					new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_mask_slot")
 					new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
 					table.insert(new_data, "em_unlock")
@@ -5744,6 +6233,7 @@ function BlackMarketGui:populate_mods(data)
 		local gvs = {}
 		local mod_t = {}
 		local num_steps = #data.on_create_data
+		local achievement_tracker = tweak_data.achievement.weapon_part_tracker
 		local guis_catalog = "guis/"
 		for index, mod_t in ipairs(data.on_create_data) do
 			local mod_name = mod_t[1]
@@ -5766,6 +6256,8 @@ function BlackMarketGui:populate_mods(data)
 			new_data.stream = true
 			new_data.default_mod = default_mod
 			new_data.is_internal = tweak_data.weapon.factory:is_part_internal(new_data.name)
+			new_data.free_of_charge = tweak_data.blackmarket.weapon_mods[mod_name] and tweak_data.blackmarket.weapon_mods[mod_name].is_a_unlockable
+			new_data.unlock_tracker = achievement_tracker[new_data.name] or false
 			if tweak_data.lootdrop.global_values[mod_global_value] and tweak_data.lootdrop.global_values[mod_global_value].dlc and not tweak_data.dlc[mod_global_value].free and not managers.dlc:has_dlc(mod_global_value) then
 				new_data.unlocked = -math.abs(new_data.unlocked)
 				new_data.unlocked = new_data.unlocked ~= 0 and new_data.unlocked or false
@@ -5775,13 +6267,47 @@ function BlackMarketGui:populate_mods(data)
 			local weapon_id = managers.blackmarket:get_crafted_category(new_data.category)[new_data.slot].weapon_id
 			new_data.price = managers.money:get_weapon_modify_price(weapon_id, new_data.name, new_data.global_value)
 			new_data.can_afford = managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
+			local font, font_size
+			local no_upper = false
 			if not new_data.lock_texture and (not new_data.unlocked or new_data.unlocked == 0) then
+				local selected_text, noselected_text
+				if not new_data.dlc_locked and new_data.unlock_tracker then
+					local text_id = "bm_menu_no_items"
+					local progress = ""
+					local stat = new_data.unlock_tracker.stat or false
+					local max_progress = new_data.unlock_tracker.max_progress or 0
+					local award = new_data.unlock_tracker.award or false
+					if new_data.unlock_tracker.text_id then
+						if 0 < max_progress and stat then
+							local progress_left = max_progress - (managers.achievment:get_stat(stat) or 0)
+							if 0 < progress_left then
+								progress = tostring(progress_left)
+								text_id = new_data.unlock_tracker.text_id
+								font = small_font
+								font_size = small_font_size
+								no_upper = true
+							end
+						elseif award then
+							local achievement = managers.achievment:get_info(award)
+							text_id = new_data.unlock_tracker.text_id
+							font = small_font
+							font_size = small_font_size
+							no_upper = true
+						end
+						selected_text = managers.localization:text(text_id, {progress = progress})
+					end
+				end
+				selected_text = selected_text or managers.localization:text("bm_menu_no_items")
+				noselected_text = selected_text
 				new_data.mid_text = {}
-				new_data.mid_text.selected_text = managers.localization:text("bm_menu_no_items")
+				new_data.mid_text.selected_text = selected_text
 				new_data.mid_text.selected_color = tweak_data.screen_colors.text
-				new_data.mid_text.noselected_text = new_data.mid_text.selected_text
+				new_data.mid_text.noselected_text = noselected_text
 				new_data.mid_text.noselected_color = tweak_data.screen_colors.text
 				new_data.mid_text.vertical = "center"
+				new_data.mid_text.font = font
+				new_data.mid_text.font_size = font_size
+				new_data.mid_text.no_upper = no_upper
 				new_data.lock_texture = true
 			end
 			if mod_name then
@@ -6559,6 +7085,21 @@ function BlackMarketGui:set_preferred_character_callback(data)
 	self:reload()
 end
 
+function BlackMarketGui:pickup_crafted_item_callback(data)
+	managers.blackmarket:pickup_crafted_item(data.category, data.slot)
+	self:reload()
+end
+
+function BlackMarketGui:place_crafted_item_callback(data)
+	managers.blackmarket:place_crafted_item(data.category, data.slot)
+	self:reload()
+end
+
+function BlackMarketGui:drop_hold_crafted_item_callback(data)
+	managers.blackmarket:drop_hold_crafted_item()
+	self:reload()
+end
+
 function BlackMarketGui:equip_weapon_callback(data)
 	managers.blackmarket:equip_weapon(data.category, data.slot)
 	self:reload()
@@ -7103,7 +7644,7 @@ function BlackMarketGui:mask_mods_callback(data)
 			td = tweak_data.blackmarket[category][items[i].id]
 			if not listed_items[items[i].id] and td.texture or td.colors then
 				table.insert(mods, items[i])
-				mods[#mods].pc = td.pc or td.pcs and td.pcs[1] or 0
+				mods[#mods].pc = td.pc or td.pcs and td.pcs[1] or 10
 				mods[#mods].colors = td.colors
 			end
 		end
@@ -7659,7 +8200,7 @@ end
 function BlackMarketGui:_buy_mod_callback(data)
 	self._item_bought = true
 	managers.menu_component:post_event("item_buy")
-	managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.name)
+	managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.name, data.free_of_charge)
 	local factory = tweak_data.weapon.factory.parts[data.name]
 	if factory then
 		local texture_switch = factory.texture_switch
@@ -7681,6 +8222,7 @@ function BlackMarketGui:remove_mod_callback(data)
 	params.slot = data.slot
 	params.weapon_name = managers.weapon_factory:get_weapon_name_by_factory_id(managers.blackmarket:get_crafted_category(data.category)[data.slot].factory_id)
 	params.add = false
+	params.ignore_lost_mods = data.free_of_charge
 	if data.default_mod then
 	end
 	local replaces, removes = managers.blackmarket:get_modify_weapon_consequence(data.category, data.slot, data.default_mod or data.name, true)
@@ -7763,6 +8305,7 @@ end
 function BlackMarketGui:close()
 	WalletGuiObject.close_wallet(self._panel)
 	self:destroy()
+	managers.blackmarket:drop_hold_crafted_item()
 	self._ws:panel():remove(self._panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
 	if not managers.menu_component._menuscene_info_gui then

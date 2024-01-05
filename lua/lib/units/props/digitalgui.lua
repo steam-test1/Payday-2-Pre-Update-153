@@ -72,6 +72,12 @@ function DigitalGui:setup()
 		visible = true,
 		color = self.DIGIT_COLOR
 	})
+	if self.RENDER_TEMPLATE then
+		self._title_text:set_render_template(Idstring(self.RENDER_TEMPLATE))
+	end
+	if self.BLEND_MODE then
+		self._title_text:set_blend_mode(self.BLEND_MODE)
+	end
 	if self.TYPE == "timer" then
 		self:_update_timer_text()
 	else
@@ -145,12 +151,16 @@ function DigitalGui:number_decrease()
 end
 
 function DigitalGui:_update_number_text()
-	self._number = self._number < 0 and 0 or self._number
-	local zero = ""
-	for i = 1, self.NUMBER_DIGITS - 1 do
-		zero = zero .. (self._number < math.pow(10, i) and "0" or "")
+	if self._number then
+		self._number = self._number < 0 and 0 or self._number
+		local zero = ""
+		for i = 1, self.NUMBER_DIGITS - 1 do
+			zero = zero .. (self._number < math.pow(10, i) and "0" or "")
+		end
+		self._title_text:set_text(zero .. self._number)
+	elseif self._number == false then
+		self._title_text:set_text("---")
 	end
-	self._title_text:set_text(zero .. self._number)
 end
 
 function DigitalGui:timer_start_count_up(sync)

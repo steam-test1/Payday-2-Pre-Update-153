@@ -112,7 +112,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arm_for",
 		"family",
 		"big",
-		"roberts"
+		"roberts",
+		"kosugi"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -132,7 +133,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"framing_frame_1",
 		"framing_frame_3",
 		"firestarter_2",
-		"big"
+		"big",
+		"kosugi"
 	}
 	self.spotter.visible_if_locked = true
 	self.spotter.unlock_desc_id = "menu_asset_spotter_desc"
@@ -206,6 +208,108 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
 	self.health_bag.no_mystery = true
 	self.health_bag.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.camera_access = {}
+	self.camera_access.name_id = "menu_asset_cam"
+	self.camera_access.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day2/asset03"
+	self.camera_access.stages = {"big"}
+	self.camera_access.visible_if_locked = true
+	self.camera_access.unlock_desc_id = "menu_asset_cam_desc"
+	self.camera_access.no_mystery = true
+	self.camera_access.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 7)
+	self.sniper_spot_jewelery = {}
+	self.sniper_spot_jewelery.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_jewelery.texture = "guis/textures/pd2/mission_briefing/assets/jewelery_store/sniper_spot_jewelery"
+	self.sniper_spot_jewelery.stages = {
+		"jewelry_store",
+		"ukrainian_job"
+	}
+	self.sniper_spot_jewelery.visible_if_locked = true
+	self.sniper_spot_jewelery.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_jewelery.no_mystery = true
+	self.sniper_spot_jewelery.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_jewelery.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_jewelery.server_lock = true
+	self.sniper_spot_election1 = {}
+	self.sniper_spot_election1.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_election1.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day1/sniper_spot_election1"
+	self.sniper_spot_election1.stages = {
+		"election_day_1"
+	}
+	self.sniper_spot_election1.visible_if_locked = true
+	self.sniper_spot_election1.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_election1.no_mystery = true
+	self.sniper_spot_election1.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_election1.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_election1.server_lock = true
+	self.sniper_spot_election2 = {}
+	self.sniper_spot_election2.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_election2.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day2/sniper_spot_election2"
+	self.sniper_spot_election2.stages = {
+		"election_day_2"
+	}
+	self.sniper_spot_election2.visible_if_locked = true
+	self.sniper_spot_election2.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_election2.no_mystery = true
+	self.sniper_spot_election2.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_election2.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_election2.server_lock = true
+	self.sniper_spot_rats1 = {}
+	self.sniper_spot_rats1.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_rats1.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/sniper_spot_rats1"
+	self.sniper_spot_rats1.stages = {"alex_1"}
+	self.sniper_spot_rats1.visible_if_locked = true
+	self.sniper_spot_rats1.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_rats1.no_mystery = true
+	self.sniper_spot_rats1.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_rats1.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_rats1.server_lock = true
+	self.sniper_spot_rats3 = {}
+	self.sniper_spot_rats3.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_rats3.texture = "guis/textures/pd2/mission_briefing/assets/rat/day3/sniper_spot_rats3"
+	self.sniper_spot_rats3.stages = {"alex_3"}
+	self.sniper_spot_rats3.visible_if_locked = true
+	self.sniper_spot_rats3.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_rats3.no_mystery = true
+	self.sniper_spot_rats3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_rats3.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_rats3.server_lock = true
+	self.sniper_spot_firestarter3 = {}
+	self.sniper_spot_firestarter3.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_firestarter3.texture = "guis/textures/pd2/mission_briefing/assets/bank/sniper_spot_harvest"
+	self.sniper_spot_firestarter3.stages = {
+		"firestarter_3",
+		"branchbank"
+	}
+	self.sniper_spot_firestarter3.visible_if_locked = true
+	self.sniper_spot_firestarter3.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_firestarter3.no_mystery = true
+	self.sniper_spot_firestarter3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_firestarter3.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_firestarter3.server_lock = true
+	self.sniper_spot_firestarter1 = {}
+	self.sniper_spot_firestarter1.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_firestarter1.texture = "guis/textures/pd2/mission_briefing/assets/firestarter/day1/sniper_spot_firestarter1"
+	self.sniper_spot_firestarter1.stages = {
+		"firestarter_1"
+	}
+	self.sniper_spot_firestarter1.visible_if_locked = true
+	self.sniper_spot_firestarter1.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_firestarter1.no_mystery = true
+	self.sniper_spot_firestarter1.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_firestarter1.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_firestarter1.server_lock = true
+	self.sniper_spot_framing3 = {}
+	self.sniper_spot_framing3.name_id = "menu_asset_sniper_spot"
+	self.sniper_spot_framing3.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day3/sniper_spot_framing3"
+	self.sniper_spot_framing3.stages = {
+		"framing_frame_3"
+	}
+	self.sniper_spot_framing3.visible_if_locked = true
+	self.sniper_spot_framing3.unlock_desc_id = "menu_asset_sniper_spot_desc"
+	self.sniper_spot_framing3.no_mystery = true
+	self.sniper_spot_framing3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.sniper_spot_framing3.dlc_lock = "gage_pack_snp"
+	self.sniper_spot_framing3.server_lock = true
 	self.ukrainian_job_tiara = {}
 	self.ukrainian_job_tiara.name_id = "menu_asset_test_jewelry_store_tiara"
 	self.ukrainian_job_tiara.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset01"
@@ -874,6 +978,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.big_escape_bus.unlock_desc_id = "menu_asset_big_escape_bus_desc"
 	self.big_escape_bus.no_mystery = true
 	self.big_escape_bus.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.kosugi_speedboat = {}
+	self.kosugi_speedboat.name_id = "menu_asset_kosugi_speedboat"
+	self.kosugi_speedboat.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_kosugispeedboat"
+	self.kosugi_speedboat.stages = {"kosugi"}
+	self.kosugi_speedboat.visible_if_locked = true
+	self.kosugi_speedboat.unlock_desc_id = "menu_asset_kosugi_speedboat_desc"
+	self.kosugi_speedboat.no_mystery = true
+	self.kosugi_speedboat.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

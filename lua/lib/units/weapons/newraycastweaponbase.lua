@@ -82,6 +82,9 @@ function NewRaycastWeaponBase:_assemble_completed(parts, blueprint)
 	self:apply_texture_switches()
 	self:check_npc()
 	self:_set_parts_enabled(self._enabled)
+	if self._second_sight_data then
+		self._second_sight_data.unit = self._parts[self._second_sight_data.part_id].unit
+	end
 end
 
 function NewRaycastWeaponBase:apply_texture_switches()
@@ -126,6 +129,51 @@ function NewRaycastWeaponBase:apply_texture_switches()
 end
 
 function NewRaycastWeaponBase:check_npc()
+end
+
+function NewRaycastWeaponBase:has_range_distance_scope()
+	if not self._scopes or not self._parts then
+		return false
+	end
+	local part
+	for i, part_id in ipairs(self._scopes) do
+		part = self._parts[part_id]
+		if part and (part.unit:digital_gui() or part.unit:digital_gui_upper()) then
+			return true
+		end
+	end
+	return false
+end
+
+function NewRaycastWeaponBase:set_scope_range_distance(distance)
+	if self._scopes and self._parts then
+		local part
+		for i, part_id in ipairs(self._scopes) do
+			part = self._parts[part_id]
+			if part and part.unit:digital_gui() then
+				part.unit:digital_gui():number_set(distance and math.round(distance) or false, false)
+			end
+			if part and part.unit:digital_gui_upper() then
+				part.unit:digital_gui_upper():number_set(distance and math.round(distance) or false, false)
+			end
+		end
+	end
+end
+
+function NewRaycastWeaponBase:check_highlight_unit(unit)
+	if not self._can_highlight then
+		return
+	end
+	if self:is_second_sight_on() then
+		return
+	end
+	unit = unit:in_slot(8) and alive(unit:parent()) and unit:parent() or unit
+	if not unit:in_slot(managers.slot:get_mask("enemies")) then
+		return
+	end
+	if unit:base()._tweak_table and (managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout) then
+		managers.game_play_central:auto_highlight_enemy(unit, true)
+	end
 end
 
 function NewRaycastWeaponBase:change_part(part_id)
@@ -192,6 +240,7 @@ function NewRaycastWeaponBase:_update_stats_values()
 	local parts_stats = managers.weapon_factory:get_stats(self._factory_id, self._blueprint)
 	local stats = deep_clone(base_stats)
 	local tweak_data = tweak_data.weapon.stats
+	local modifier_stats = self:weapon_tweak_data().stats_modifiers
 	if stats.zoom then
 		stats.zoom = math.min(stats.zoom + managers.player:upgrade_value(self:weapon_tweak_data().category, "zoom_increase", 0), #tweak_data.zoom)
 	end
@@ -207,8 +256,14 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
+		if modifier_stats and modifier_stats[stat] then
+			self._current_stats[stat] = self._current_stats[stat] * modifier_stats[stat]
+		end
 	end
 	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.alert_size, 1, #tweak_data.alert_size)]
+	if modifier_stats and modifier_stats.alert_size then
+		self._current_stats.alert_size = self._current_stats.alert_size * modifier_stats.alert_size
+	end
 	if stats.concealment then
 		stats.suspicion = math.clamp(#tweak_data.concealment - base_stats.concealment - (parts_stats.concealment or 0), 1, #tweak_data.concealment)
 		self._current_stats.suspicion = tweak_data.concealment[stats.suspicion]
@@ -221,7 +276,39 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._spread_moving = self._current_stats.spread_moving or self._spread_moving
 	self._extra_ammo = self._current_stats.extra_ammo or self._extra_ammo
 	self._has_gadget = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
+	self._scopes = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("scope", self._factory_id, self._blueprint)
+	self._can_highlight = managers.weapon_factory:has_perk("highlight", self._factory_id, self._blueprint)
+	self:_check_second_sight()
 	self:replenish()
+end
+
+function NewRaycastWeaponBase:_check_second_sight()
+	self._second_sight_data = nil
+	if self._has_gadget then
+		local factory = tweak_data.weapon.factory
+		for _, part_id in ipairs(self._has_gadget) do
+			if factory.parts[part_id].sub_type == "second_sight" then
+				self._second_sight_data = {}
+				self._second_sight_data.part_id = part_id
+				break
+			end
+		end
+	end
+end
+
+function NewRaycastWeaponBase:zoom()
+	if self:is_second_sight_on() then
+		local gadget_zoom_stats = tweak_data.weapon.factory.parts[self._second_sight_data.part_id].stats.gadget_zoom
+		return tweak_data.weapon.stats.zoom[gadget_zoom_stats]
+	end
+	return NewRaycastWeaponBase.super.zoom(self)
+end
+
+function NewRaycastWeaponBase:is_second_sight_on()
+	if not self._second_sight_data or not self._second_sight_data.unit then
+		return false
+	end
+	return self._second_sight_data.unit:base():is_on()
 end
 
 function NewRaycastWeaponBase:_check_sound_switch()
@@ -271,11 +358,12 @@ function NewRaycastWeaponBase:stance_mod()
 	if not self._parts then
 		return nil
 	end
+	local using_second_sight = self:is_second_sight_on()
 	local translation = Vector3()
 	local rotation = Rotation()
 	local factory = tweak_data.weapon.factory
 	for part_id, data in pairs(self._parts) do
-		if factory.parts[part_id].stance_mod and factory.parts[part_id].stance_mod[self._factory_id] then
+		if factory.parts[part_id].stance_mod and (factory.parts[part_id].type ~= "sight" and factory.parts[part_id].type ~= "gadget" or using_second_sight and factory.parts[part_id].type == "gadget" or not using_second_sight and factory.parts[part_id].type == "sight") and factory.parts[part_id].stance_mod[self._factory_id] then
 			local part_translation = factory.parts[part_id].stance_mod[self._factory_id].translation
 			if part_translation then
 				mvector3.add(translation, part_translation)
@@ -331,6 +419,12 @@ function NewRaycastWeaponBase:_set_parts_enabled(enabled)
 		for part_id, data in pairs(self._parts) do
 			if alive(data.unit) then
 				data.unit:set_enabled(enabled)
+				if data.unit:digital_gui() then
+					data.unit:digital_gui():set_visible(enabled)
+				end
+				if data.unit:digital_gui_upper() then
+					data.unit:digital_gui_upper():set_visible(enabled)
+				end
 			end
 		end
 	end
@@ -483,6 +577,21 @@ function NewRaycastWeaponBase:gadget_update()
 	self:set_gadget_on(false, true)
 end
 
+function NewRaycastWeaponBase:gadget_toggle_requires_stance_update()
+	if not self._enabled then
+		return false
+	end
+	if not self._has_gadget then
+		return false
+	end
+	for _, part_id in ipairs(self._has_gadget) do
+		if self._parts[part_id].unit:base():toggle_requires_stance_update() then
+			return true
+		end
+	end
+	return false
+end
+
 function NewRaycastWeaponBase:check_stats()
 	local base_stats = self:weapon_tweak_data().stats
 	if not base_stats then
@@ -492,6 +601,7 @@ function NewRaycastWeaponBase:check_stats()
 	local parts_stats = managers.weapon_factory:get_stats(self._factory_id, self._blueprint)
 	local stats = deep_clone(base_stats)
 	local tweak_data = tweak_data.weapon.stats
+	local modifier_stats = self:weapon_tweak_data().stats_modifiers
 	stats.zoom = math.min(stats.zoom + managers.player:upgrade_value(self:weapon_tweak_data().category, "zoom_increase", 0), #tweak_data.zoom)
 	for stat, _ in pairs(stats) do
 		if parts_stats[stat] then
@@ -501,8 +611,14 @@ function NewRaycastWeaponBase:check_stats()
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
+		if modifier_stats and modifier_stats[stat] then
+			self._current_stats[stat] = self._current_stats[stat] * modifier_stats[stat]
+		end
 	end
 	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.alert_size, 1, #tweak_data.alert_size)]
+	if modifier_stats and modifier_stats.alert_size then
+		self._current_stats.alert_size = self._current_stats.alert_size * modifier_stats.alert_size
+	end
 	return stats
 end
 

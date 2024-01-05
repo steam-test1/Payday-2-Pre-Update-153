@@ -695,6 +695,7 @@ function PlayerMovement:save(data)
 			table.insert(data.movement.attentions, index)
 		end
 	end
+	data.zip_line_unit_id = self:zipline_unit() and self:zipline_unit():editor_id()
 	data.down_time = self._unit:character_damage():down_time()
 	self._current_state:save(data.movement)
 end
@@ -772,6 +773,10 @@ function PlayerMovement:crouching()
 	return self._state_data.ducking
 end
 
+function PlayerMovement:in_air()
+	return self._state_data.in_air
+end
+
 function PlayerMovement:on_enter_ladder(ladder_unit)
 	self._ladder_unit = ladder_unit
 end
@@ -782,4 +787,19 @@ end
 
 function PlayerMovement:ladder_unit()
 	return self._ladder_unit
+end
+
+function PlayerMovement:on_enter_zipline(zipline_unit)
+	self._zipline_unit = zipline_unit
+end
+
+function PlayerMovement:on_exit_zipline()
+	if alive(self._zipline_unit) then
+		self._zipline_unit:zipline():set_user(nil)
+	end
+	self._zipline_unit = nil
+end
+
+function PlayerMovement:zipline_unit()
+	return self._zipline_unit
 end

@@ -174,6 +174,7 @@ function MenuLobbyRenderer:set_slot_outfit(slot, criminal_name, outfit_string)
 		local outfit = managers.blackmarket:unpack_outfit_from_string(outfit_string)
 		self._player_slots[slot].outfit = outfit
 		managers.menu_component:set_slot_outfit_mission_briefing_gui(slot, criminal_name, outfit)
+		managers.hud:set_slot_outfit(slot, criminal_name, outfit)
 	end
 end
 

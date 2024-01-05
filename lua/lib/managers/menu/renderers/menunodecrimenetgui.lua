@@ -1621,6 +1621,11 @@ function MenuNodeCrimenetGageAssignmentGui:texture_done_clbk(params, texture_ids
 	local th = texture_height
 	local pw = panel_width
 	local ph = panel_height
+	if tw == 0 or th == 0 then
+		Application:error("[MenuNodeCrimenetGageAssignmentGui:texture_done_clbk] Texture size error!:", "width", tw, "height", th)
+		tw = 1
+		th = 1
+	end
 	local sw = math.min(pw, ph * (tw / th))
 	local sh = math.min(ph, pw / (tw / th))
 	image:set_size(math.round(sw), math.round(sh))

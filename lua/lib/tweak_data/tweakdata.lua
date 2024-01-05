@@ -28,6 +28,7 @@ require("lib/tweak_data/AssetsTweakData")
 require("lib/tweak_data/DLCTweakData")
 require("lib/tweak_data/InfamyTweakData")
 require("lib/tweak_data/GageAssignmentTweakData")
+require("lib/tweak_data/PrePlanningTweakData")
 TweakData = TweakData or class()
 require("lib/tweak_data/TweakDataPD2")
 TweakData.RELOAD = true
@@ -308,6 +309,7 @@ function TweakData:init()
 	self.dlc = DLCTweakData:new(self)
 	self.infamy = InfamyTweakData:new(self)
 	self.gage_assignment = GageAssignmentTweakData:new(self)
+	self.preplanning = PrePlanningTweakData:new(self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -795,6 +797,8 @@ function TweakData:init()
 	self.interaction.take_weapons.timer = 3
 	self.interaction.take_weapons.axis = "x"
 	self.interaction.take_weapons.interact_distance = 120
+	self.interaction.take_weapons_not_active = deep_clone(self.interaction.take_weapons)
+	self.interaction.take_weapons_not_active.start_active = false
 	self.interaction.pick_lock_easy = {}
 	self.interaction.pick_lock_easy.contour = "interactable_icon"
 	self.interaction.pick_lock_easy.icon = "equipment_bank_manager_key"
@@ -1436,6 +1440,8 @@ function TweakData:init()
 	self.interaction.weapon_case = deep_clone(self.interaction.invisible_interaction_open)
 	self.interaction.weapon_case.axis = "x"
 	self.interaction.weapon_case.interact_distance = 110
+	self.interaction.weapon_case_close = deep_clone(self.interaction.weapon_case)
+	self.interaction.weapon_case_close.text_id = "hud_int_invisible_interaction_close"
 	self.interaction.invisible_interaction_close = deep_clone(self.interaction.invisible_interaction_open)
 	self.interaction.invisible_interaction_close.text_id = "hud_int_invisible_interaction_close"
 	self.interaction.interact_gen_pku_loot_take = {}
@@ -1965,6 +1971,15 @@ function TweakData:init()
 	self.interaction.gen_pku_cocaine.sound_interupt = "bar_bag_money_cancel"
 	self.interaction.gen_pku_cocaine.sound_done = "bar_bag_money_finished"
 	self.interaction.gen_pku_cocaine.blocked_hint = "carry_block"
+	self.interaction.gen_pku_artifact_statue = {}
+	self.interaction.gen_pku_artifact_statue.text_id = "hud_int_hold_take_artifact"
+	self.interaction.gen_pku_artifact_statue.action_text_id = "hud_action_taking_artifact"
+	self.interaction.gen_pku_artifact_statue.timer = 3
+	self.interaction.gen_pku_artifact_statue.start_active = false
+	self.interaction.gen_pku_artifact_statue.sound_start = "bar_bag_money"
+	self.interaction.gen_pku_artifact_statue.sound_interupt = "bar_bag_money_cancel"
+	self.interaction.gen_pku_artifact_statue.sound_done = "bar_bag_money_finished"
+	self.interaction.gen_pku_artifact_statue.blocked_hint = "carry_block"
 	self.interaction.gen_pku_jewelry = {}
 	self.interaction.gen_pku_jewelry.text_id = "hud_int_hold_take_jewelry"
 	self.interaction.gen_pku_jewelry.action_text_id = "hud_action_taking_jewelry"
@@ -2002,6 +2017,16 @@ function TweakData:init()
 	self.interaction.crate_loot_crowbar.sound_start = "bar_crowbar"
 	self.interaction.crate_loot_crowbar.sound_interupt = "bar_crowbar_cancel"
 	self.interaction.crate_loot_crowbar.sound_done = "bar_crowbar_end"
+	self.interaction.weapon_case_not_active = deep_clone(self.interaction.weapon_case)
+	self.interaction.weapon_case_not_active.start_active = false
+	self.interaction.crate_weapon_crowbar = deep_clone(self.interaction.weapon_case)
+	self.interaction.crate_weapon_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
+	self.interaction.crate_weapon_crowbar.timer = 2
+	self.interaction.crate_weapon_crowbar.start_active = false
+	self.interaction.crate_weapon_crowbar.special_equipment = "crowbar"
+	self.interaction.crate_weapon_crowbar.sound_start = "bar_crowbar_plastic"
+	self.interaction.crate_weapon_crowbar.sound_interupt = "bar_crowbar_plastic_cancel"
+	self.interaction.crate_weapon_crowbar.sound_done = "bar_crowbar_plastic_finished"
 	self.interaction.crate_loot_close = {}
 	self.interaction.crate_loot_close.text_id = "hud_int_hold_close_crate"
 	self.interaction.crate_loot_close.action_text_id = "hud_action_closing_crate"
@@ -2113,6 +2138,10 @@ function TweakData:init()
 	self.interaction.shape_charge_plantable.sound_start = "bar_c4_apply"
 	self.interaction.shape_charge_plantable.sound_interupt = "bar_c4_apply_cancel"
 	self.interaction.shape_charge_plantable.sound_done = "bar_c4_apply_finished"
+	self.interaction.player_zipline = {}
+	self.interaction.player_zipline.text_id = "hud_int_use_zipline"
+	self.interaction.bag_zipline = {}
+	self.interaction.bag_zipline.text_id = "hud_int_bag_zipline"
 	self.interaction.huge_lance = {}
 	self.interaction.huge_lance.contour = "contour_off"
 	self.interaction.huge_lance.text_id = "hud_int_equipment_lance"
@@ -2147,6 +2176,25 @@ function TweakData:init()
 	self.interaction.crane_joystick_release = {}
 	self.interaction.crane_joystick_release.text_id = "hud_int_crane_release"
 	self.interaction.crane_joystick_release.start_active = false
+	self.interaction.gen_int_thermite_rig = {}
+	self.interaction.gen_int_thermite_rig.text_id = "hud_int_hold_assemble_thermite"
+	self.interaction.gen_int_thermite_rig.action_text_id = "hud_action_assemble_thermite"
+	self.interaction.gen_int_thermite_rig.special_equipment = "thermite"
+	self.interaction.gen_int_thermite_rig.equipment_text_id = "debug_interact_equipment_thermite"
+	self.interaction.gen_int_thermite_rig.equipment_consume = true
+	self.interaction.gen_int_thermite_rig.contour = "interactable_icon"
+	self.interaction.gen_int_thermite_rig.timer = 20
+	self.interaction.gen_int_thermite_rig.sound_start = "bar_drill_apply"
+	self.interaction.gen_int_thermite_rig.sound_interupt = "bar_drill_apply_cancel"
+	self.interaction.gen_int_thermite_rig.sound_done = "bar_drill_apply_finished"
+	self.interaction.gen_int_thermite_apply = {}
+	self.interaction.gen_int_thermite_apply.text_id = "hud_int_hold_ignite_thermite"
+	self.interaction.gen_int_thermite_apply.action_text_id = "hud_action_ignite_thermite"
+	self.interaction.gen_int_thermite_apply.contour = "interactable_icon"
+	self.interaction.gen_int_thermite_apply.timer = 2
+	self.interaction.gen_int_thermite_apply.sound_start = "bar_thermal_lance_fix"
+	self.interaction.gen_int_thermite_apply.sound_interupt = "bar_thermal_lance_fix_cancel"
+	self.interaction.gen_int_thermite_apply.sound_done = "bar_thermal_lance_fix_finished"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2579,6 +2627,7 @@ function TweakData:init()
 	self.achievement.finally = {award = "gage2_8"}
 	self.achievement.demise_knuckles = "brass_knuckles"
 	self.achievement.vote_for_change = "g22c"
+	self.achievement.steam_500k = "akm_gold"
 	self.achievement.gage_assignments = {
 		green_mantis = "gmod_1_stats",
 		yellow_bull = "gmod_2_stats",
@@ -2663,6 +2712,88 @@ function TweakData:init()
 		above_the_law = {
 			weapon = "p226",
 			stat = "gage_7_stats"
+		},
+		surprise_motherfucker = {
+			weapon = "m95",
+			stat = "gage3_12_stats",
+			enemy = "tank"
+		},
+		man_with_golden_gun = {
+			stat = "gage3_2_stats",
+			weapon = "akm_gold",
+			enemy = "tank",
+			enemy_weapon = "m249"
+		},
+		lord_of_flies = {
+			stat = "gage3_3_stats",
+			in_head = true,
+			weapons = {
+				"m95",
+				"msr",
+				"r93"
+			}
+		},
+		arachnes_curse = {
+			stat = "gage3_4_stats",
+			in_head = true,
+			weapons = {
+				"m95",
+				"msr",
+				"r93"
+			}
+		},
+		pest_control = {
+			stat = "gage3_5_stats",
+			in_head = true,
+			weapons = {
+				"m95",
+				"msr",
+				"r93"
+			}
+		},
+		seer_of_death = {
+			stat = "gage3_6_stats",
+			in_head = true,
+			weapons = {
+				"m95",
+				"msr",
+				"r93"
+			}
+		},
+		far_far_away = {
+			stat = "gage3_7_stats",
+			distance = 4000,
+			weapon = "m95"
+		},
+		last_action_villian = {
+			award = "gage3_8",
+			in_head = true,
+			on_zipline = true,
+			weapon = "r93"
+		},
+		dodge_this = {
+			stat = "gage3_11_stats",
+			in_head = true,
+			enemy = "spooc",
+			weapon = "m95"
+		},
+		didnt_see_this_coming = {
+			stat = "gage3_13_stats",
+			on_zipline = true,
+			weapons = {
+				"m95",
+				"msr",
+				"r93"
+			}
+		},
+		grand_master_sniper = {
+			stat = "gage3_14_stats",
+			enemy = "sniper",
+			weapon = "msr"
+		},
+		public_enemy_no_one = {
+			stat = "gage3_17_stats",
+			weapon = "msr"
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -3018,6 +3149,79 @@ function TweakData:init()
 				"skulloverkillplus"
 			}
 		}
+	}
+	self.achievement.sniper_kill_achievements = {
+		did_i_do_that = {award = "gage3_9", multi_kill = 3},
+		max_peneration = {
+			stat = "gage3_10_stats",
+			weapon = "r93",
+			obstacle = "shield",
+			enemy = "shield"
+		},
+		you_cant_hide = {
+			stat = "gage3_15_stats",
+			weapon = "r93",
+			obstacle = "wall"
+		},
+		two_for_one = {
+			stat = "gage3_16_stats",
+			weapon = "msr",
+			multi_kill = 2
+		}
+	}
+	self.achievement.weapon_part_tracker = {}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_long = {
+		text_id = "bm_wp_m95_b_barrel_long_achievment",
+		stat = "gage3_7_stats",
+		max_progress = 25
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_b_suppressed = {
+		text_id = "bm_wp_r93_b_suppressed_achievment",
+		award = "gage3_8"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_upg_o_45iron = {
+		text_id = "bm_wp_upg_o_45iron_achievment",
+		award = "gage3_9"
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_b_short = {
+		text_id = "bm_wp_r93_b_short_achievment",
+		stat = "gage3_10_stats",
+		max_progress = 10
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_suppressed = {
+		text_id = "bm_wp_m95_b_barrel_suppressed_achievment",
+		stat = "gage3_11_stats",
+		max_progress = 10
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_m95_barrel_short = {
+		text_id = "bm_wp_m95_b_barrel_short_achievment",
+		award = "gage3_12_stats",
+		max_progress = 10
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_upg_o_leupold = {
+		text_id = "bm_wp_upg_o_leupold_achievment",
+		stat = "gage3_13_stats",
+		max_progress = 10
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_body_msr = {
+		text_id = "bm_wp_msr_body_msr_achievment",
+		stat = "gage3_14_stats",
+		max_progress = 25
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_r93_body_wood = {
+		text_id = "bm_wp_r93_body_wood_achievment",
+		stat = "gage3_15_stats",
+		max_progress = 25
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_ns_suppressor = {
+		text_id = "bm_wp_snp_msr_ns_suppressor_achievment",
+		stat = "gage3_16_stats",
+		max_progress = 25
+	}
+	self.achievement.weapon_part_tracker.wpn_fps_snp_msr_b_long = {
+		text_id = "bm_wp_snp_msr_b_long_achievment",
+		stat = "gage3_17_stats",
+		max_progress = 250
 	}
 	self.pickups = {}
 	self.pickups.ammo = {

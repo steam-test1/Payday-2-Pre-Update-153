@@ -30,6 +30,7 @@ function WeaponTweakData:init()
 	self:_init_data_mac10_npc()
 	self:_init_data_akmsu_npc()
 	self:_init_data_akm_npc()
+	self:_init_data_akm_gold_npc()
 	self:_init_data_deagle_npc()
 	self:_init_data_serbu_npc()
 	self:_init_data_saiga_npc()
@@ -47,6 +48,9 @@ function WeaponTweakData:init()
 	self:_init_data_hk21_npc()
 	self:_init_data_m249_npc()
 	self:_init_data_rpk_npc()
+	self:_init_data_m95_npc()
+	self:_init_data_msr_npc()
+	self:_init_data_r93_npc()
 	self:_precalculate_values()
 end
 
@@ -235,6 +239,7 @@ function WeaponTweakData:_init_data_r870_npc()
 	self.r870_npc.hud_icon = "r870_shotgun"
 	self.r870_npc.alert_size = 4500
 	self.r870_npc.suppression = 1.8
+	self.r870_npc.is_shotgun = true
 	self.benelli_npc = deep_clone(self.r870_npc)
 end
 
@@ -250,6 +255,7 @@ function WeaponTweakData:_init_data_mossberg_npc()
 	self.mossberg_npc.hud_icon = "mossberg"
 	self.mossberg_npc.alert_size = 3000
 	self.mossberg_npc.suppression = 2
+	self.mossberg_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_mp5_npc()
@@ -495,6 +501,21 @@ function WeaponTweakData:_init_data_akm_npc()
 	self.akm_npc.suppression = 1
 end
 
+function WeaponTweakData:_init_data_akm_gold_npc()
+	self.akm_gold_npc.sounds.prefix = "akm_npc"
+	self.akm_gold_npc.use_data.selection_index = 2
+	self.akm_gold_npc.DAMAGE = 3
+	self.akm_gold_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.akm_gold_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.akm_gold_npc.CLIP_AMMO_MAX = 20
+	self.akm_gold_npc.NR_CLIPS_MAX = 5
+	self.akm_gold_npc.auto.fire_rate = 0.2
+	self.akm_gold_npc.hold = "rifle"
+	self.akm_gold_npc.hud_icon = "ak"
+	self.akm_gold_npc.alert_size = 5000
+	self.akm_gold_npc.suppression = 1
+end
+
 function WeaponTweakData:_init_data_deagle_npc()
 	self.deagle_npc.sounds.prefix = "deagle_npc"
 	self.deagle_npc.use_data.selection_index = 1
@@ -524,6 +545,7 @@ function WeaponTweakData:_init_data_serbu_npc()
 	self.serbu_npc.hud_icon = "r870_shotgun"
 	self.serbu_npc.alert_size = 4500
 	self.serbu_npc.suppression = 1.8
+	self.serbu_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_saiga_npc()
@@ -539,6 +561,7 @@ function WeaponTweakData:_init_data_saiga_npc()
 	self.saiga_npc.hud_icon = "r870_shotgun"
 	self.saiga_npc.alert_size = 4500
 	self.saiga_npc.suppression = 1.8
+	self.saiga_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_huntsman_npc()
@@ -553,6 +576,7 @@ function WeaponTweakData:_init_data_huntsman_npc()
 	self.huntsman_npc.hud_icon = "r870_shotgun"
 	self.huntsman_npc.alert_size = 4500
 	self.huntsman_npc.suppression = 1.8
+	self.huntsman_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_saw_npc()
@@ -705,7 +729,7 @@ function WeaponTweakData:_init_data_mp7_npc()
 	self.mp7_npc.CLIP_AMMO_MAX = 40
 	self.mp7_npc.NR_CLIPS_MAX = 5
 	self.mp7_npc.auto.fire_rate = 0.1
-	self.mp7_npc.hold = "rifle"
+	self.mp7_npc.hold = "pistol"
 	self.mp7_npc.hud_icon = "mac11"
 	self.mp7_npc.alert_size = 2800
 	self.mp7_npc.suppression = 1
@@ -795,23 +819,74 @@ function WeaponTweakData:_init_data_rpk_npc()
 	self.rpk_secondary_npc.use_data.selection_index = 1
 end
 
+function WeaponTweakData:_init_data_m95_npc()
+	self.m95_npc.sounds.prefix = "barrett_npc"
+	self.m95_npc.use_data.selection_index = 2
+	self.m95_npc.DAMAGE = 2
+	self.m95_npc.muzzleflash = "effects/payday2/particles/weapons/50cal_auto"
+	self.m95_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_m95"
+	self.m95_npc.CLIP_AMMO_MAX = 20
+	self.m95_npc.NR_CLIPS_MAX = 5
+	self.m95_npc.auto.fire_rate = 20
+	self.m95_npc.hold = "rifle"
+	self.m95_npc.hud_icon = "m4"
+	self.m95_npc.alert_size = 5000
+	self.m95_npc.suppression = 1
+	self.m95_secondary_npc = deep_clone(self.m95_npc)
+	self.m95_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_msr_npc()
+	self.msr_npc.sounds.prefix = "msr_npc"
+	self.msr_npc.use_data.selection_index = 2
+	self.msr_npc.DAMAGE = 2
+	self.msr_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.msr_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.msr_npc.CLIP_AMMO_MAX = 20
+	self.msr_npc.NR_CLIPS_MAX = 5
+	self.msr_npc.auto.fire_rate = 20
+	self.msr_npc.hold = "rifle"
+	self.msr_npc.hud_icon = "m4"
+	self.msr_npc.alert_size = 5000
+	self.msr_npc.suppression = 1
+	self.msr_secondary_npc = deep_clone(self.msr_npc)
+	self.msr_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_r93_npc()
+	self.r93_npc.sounds.prefix = "blazer_npc"
+	self.r93_npc.use_data.selection_index = 2
+	self.r93_npc.DAMAGE = 2
+	self.r93_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.r93_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.r93_npc.CLIP_AMMO_MAX = 20
+	self.r93_npc.NR_CLIPS_MAX = 5
+	self.r93_npc.auto.fire_rate = 20
+	self.r93_npc.hold = "rifle"
+	self.r93_npc.hud_icon = "m4"
+	self.r93_npc.alert_size = 5000
+	self.r93_npc.suppression = 1
+	self.r93_secondary_npc = deep_clone(self.r93_npc)
+	self.r93_secondary_npc.use_data.selection_index = 1
+end
+
 function WeaponTweakData:_init_data_player_weapons()
-	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default
+	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default
 	if SystemInfo:platform() == Idstring("WIN32") then
 		autohit_rifle_default = {
 			MIN_RATIO = 0.75,
 			MAX_RATIO = 0.85,
 			INIT_RATIO = 0.15,
-			far_dis = 5000,
-			far_angle = 1.5,
+			far_dis = 4000,
+			far_angle = 1,
 			near_angle = 3
 		}
 		autohit_pistol_default = {
 			MIN_RATIO = 0.82,
 			MAX_RATIO = 0.95,
 			INIT_RATIO = 0.15,
-			far_dis = 5000,
-			far_angle = 1.5,
+			far_dis = 4000,
+			far_angle = 0.5,
 			near_angle = 3
 		}
 		autohit_shotgun_default = {
@@ -829,6 +904,22 @@ function WeaponTweakData:_init_data_player_weapons()
 			far_dis = 2000,
 			far_angle = 0.2,
 			near_angle = 2
+		}
+		autohit_snp_default = {
+			MIN_RATIO = 0.2,
+			MAX_RATIO = 0.4,
+			INIT_RATIO = 0.05,
+			far_dis = 5000,
+			far_angle = 0.2,
+			near_angle = 2
+		}
+		autohit_smg_default = {
+			MIN_RATIO = 0.2,
+			MAX_RATIO = 0.4,
+			INIT_RATIO = 0.05,
+			far_dis = 2500,
+			far_angle = 0.5,
+			near_angle = 4
 		}
 	else
 		autohit_rifle_default = {
@@ -863,15 +954,35 @@ function WeaponTweakData:_init_data_player_weapons()
 			far_angle = 3,
 			near_angle = 3
 		}
+		autohit_snp_default = {
+			MIN_RATIO = 0.25,
+			MAX_RATIO = 0.6,
+			INIT_RATIO = 0.6,
+			far_dis = 5000,
+			far_angle = 3,
+			near_angle = 3
+		}
+		autohit_smg_default = {
+			MIN_RATIO = 0.25,
+			MAX_RATIO = 0.6,
+			INIT_RATIO = 0.6,
+			far_dis = 5000,
+			far_angle = 3,
+			near_angle = 3
+		}
 	end
 	aim_assist_rifle_default = deep_clone(autohit_rifle_default)
 	aim_assist_pistol_default = deep_clone(autohit_pistol_default)
 	aim_assist_shotgun_default = deep_clone(autohit_shotgun_default)
 	aim_assist_lmg_default = deep_clone(autohit_lmg_default)
+	aim_assist_snp_default = deep_clone(autohit_snp_default)
+	aim_assist_smg_default = deep_clone(autohit_smg_default)
 	aim_assist_rifle_default.near_angle = 40
-	aim_assist_pistol_default.near_angle = 40
+	aim_assist_pistol_default.near_angle = 20
 	aim_assist_shotgun_default.near_angle = 40
 	aim_assist_lmg_default.near_angle = 10
+	aim_assist_snp_default.near_angle = 20
+	aim_assist_smg_default.near_angle = 30
 	self.crosshair = {}
 	self.crosshair.MIN_OFFSET = 18
 	self.crosshair.MAX_OFFSET = 150
@@ -888,7 +999,7 @@ function WeaponTweakData:_init_data_player_weapons()
 	self.trip_mines.alert_radius = 5000
 	self:_init_stats()
 	self.factory = WeaponFactoryTweakData:new()
-	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default)
+	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
 end
 
 function WeaponTweakData:_init_stats()
@@ -1096,7 +1207,7 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 	}
 end
 
-function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default)
+function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
 	local total_damage_primary = 300
 	local total_damage_secondary = 150
 	self.new_m4 = {}
@@ -1334,8 +1445,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.shake = {}
 	self.mp9.shake.fire_multiplier = 1
 	self.mp9.shake.fire_steelsight_multiplier = -1
-	self.mp9.autohit = autohit_pistol_default
-	self.mp9.aim_assist = aim_assist_pistol_default
+	self.mp9.autohit = autohit_smg_default
+	self.mp9.aim_assist = aim_assist_smg_default
 	self.mp9.animations = {}
 	self.mp9.animations.equip_id = "equip_mac11_rifle"
 	self.mp9.animations.recoil_steelsight = true
@@ -1773,8 +1884,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.shake = {}
 	self.olympic.shake.fire_multiplier = 1
 	self.olympic.shake.fire_steelsight_multiplier = -1
-	self.olympic.autohit = autohit_rifle_default
-	self.olympic.aim_assist = aim_assist_rifle_default
+	self.olympic.autohit = autohit_smg_default
+	self.olympic.aim_assist = aim_assist_smg_default
 	self.olympic.weapon_hold = "m4"
 	self.olympic.animations = {}
 	self.olympic.animations.reload = "reload"
@@ -1966,6 +2077,93 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		value = 1
 	}
+	self.akm_gold = {}
+	self.akm_gold.category = "assault_rifle"
+	self.akm_gold.damage_melee = damage_melee_default
+	self.akm_gold.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.akm_gold.sounds = {}
+	self.akm_gold.sounds.fire = "akm_fire_single"
+	self.akm_gold.sounds.fire_single = "akm_fire_single"
+	self.akm_gold.sounds.fire_auto = "akm_fire"
+	self.akm_gold.sounds.stop_fire = "akm_stop"
+	self.akm_gold.sounds.dryfire = "primary_dryfire"
+	self.akm_gold.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.akm_gold.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.akm_gold.timers = {}
+	self.akm_gold.timers.reload_not_empty = 2.8
+	self.akm_gold.timers.reload_empty = 3.87
+	self.akm_gold.timers.unequip = 0.8
+	self.akm_gold.timers.equip = 0.8
+	self.akm_gold.name_id = "bm_w_akm_gold"
+	self.akm_gold.desc_id = "bm_w_akm_gold_desc"
+	self.akm_gold.hud_icon = "ak"
+	self.akm_gold.description_id = "des_ak47"
+	self.akm_gold.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.akm_gold.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.akm_gold.use_data = {}
+	self.akm_gold.use_data.selection_index = 2
+	self.akm_gold.DAMAGE = 1.25
+	self.akm_gold.CLIP_AMMO_MAX = 30
+	self.akm_gold.NR_CLIPS_MAX = math.round(total_damage_primary / 4 / self.akm_gold.CLIP_AMMO_MAX)
+	self.akm_gold.AMMO_MAX = self.akm_gold.CLIP_AMMO_MAX * self.akm_gold.NR_CLIPS_MAX
+	self.akm_gold.AMMO_PICKUP = self:_pickup_chance(self.akm_gold.AMMO_MAX, 2)
+	self.akm_gold.FIRE_MODE = "auto"
+	self.akm_gold.fire_mode_data = {}
+	self.akm_gold.fire_mode_data.fire_rate = 0.107
+	self.akm_gold.CAN_TOGGLE_FIREMODE = true
+	self.akm_gold.auto = {}
+	self.akm_gold.auto.fire_rate = 0.107
+	self.akm_gold.spread = {}
+	self.akm_gold.spread.standing = self.new_m4.spread.standing
+	self.akm_gold.spread.crouching = self.new_m4.spread.standing
+	self.akm_gold.spread.steelsight = self.new_m4.spread.steelsight
+	self.akm_gold.spread.moving_standing = self.new_m4.spread.standing
+	self.akm_gold.spread.moving_crouching = self.new_m4.spread.standing
+	self.akm_gold.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.akm_gold.kick = {}
+	self.akm_gold.kick.standing = self.new_m4.kick.standing
+	self.akm_gold.kick.crouching = self.akm_gold.kick.standing
+	self.akm_gold.kick.steelsight = self.akm_gold.kick.standing
+	self.akm_gold.crosshair = {}
+	self.akm_gold.crosshair.standing = {}
+	self.akm_gold.crosshair.crouching = {}
+	self.akm_gold.crosshair.steelsight = {}
+	self.akm_gold.crosshair.standing.offset = 0.16
+	self.akm_gold.crosshair.standing.moving_offset = 0.8
+	self.akm_gold.crosshair.standing.kick_offset = 0.6
+	self.akm_gold.crosshair.crouching.offset = 0.08
+	self.akm_gold.crosshair.crouching.moving_offset = 0.7
+	self.akm_gold.crosshair.crouching.kick_offset = 0.4
+	self.akm_gold.crosshair.steelsight.hidden = true
+	self.akm_gold.crosshair.steelsight.offset = 0
+	self.akm_gold.crosshair.steelsight.moving_offset = 0
+	self.akm_gold.crosshair.steelsight.kick_offset = 0.1
+	self.akm_gold.shake = {}
+	self.akm_gold.shake.fire_multiplier = 1
+	self.akm_gold.shake.fire_steelsight_multiplier = -1
+	self.akm_gold.autohit = autohit_rifle_default
+	self.akm_gold.aim_assist = aim_assist_rifle_default
+	self.akm_gold.weapon_hold = "ak47"
+	self.akm_gold.animations = {}
+	self.akm_gold.animations.equip_id = "equip_ak47"
+	self.akm_gold.animations.recoil_steelsight = true
+	self.akm_gold.statistics = false
+	self.akm_gold.global_value = "pd2_clan"
+	self.akm_gold.challenges = {}
+	self.akm_gold.challenges.group = "rifle"
+	self.akm_gold.challenges.weapon = "ak47"
+	self.akm_gold.stats = {
+		damage = 17,
+		spread = 6,
+		recoil = 5,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 11,
+		suppression = 8,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 1
+	}
 	self.akmsu = {}
 	self.akmsu.category = "smg"
 	self.akmsu.damage_melee = damage_melee_default
@@ -2030,8 +2228,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.shake = {}
 	self.akmsu.shake.fire_multiplier = 1
 	self.akmsu.shake.fire_steelsight_multiplier = -1
-	self.akmsu.autohit = autohit_rifle_default
-	self.akmsu.aim_assist = aim_assist_rifle_default
+	self.akmsu.autohit = autohit_smg_default
+	self.akmsu.aim_assist = aim_assist_smg_default
 	self.akmsu.weapon_hold = "ak47"
 	self.akmsu.animations = {}
 	self.akmsu.animations.equip_id = "equip_ak47"
@@ -2455,8 +2653,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.shake = {}
 	self.p90.shake.fire_multiplier = 1
 	self.p90.shake.fire_steelsight_multiplier = 1
-	self.p90.autohit = autohit_pistol_default
-	self.p90.aim_assist = aim_assist_pistol_default
+	self.p90.autohit = autohit_smg_default
+	self.p90.aim_assist = aim_assist_smg_default
 	self.p90.animations = {}
 	self.p90.animations.equip_id = "equip_mac11_rifle"
 	self.p90.animations.recoil_steelsight = true
@@ -2701,8 +2899,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.shake = {}
 	self.new_mp5.shake.fire_multiplier = 1
 	self.new_mp5.shake.fire_steelsight_multiplier = 0.5
-	self.new_mp5.autohit = autohit_pistol_default
-	self.new_mp5.aim_assist = aim_assist_pistol_default
+	self.new_mp5.autohit = autohit_smg_default
+	self.new_mp5.aim_assist = aim_assist_smg_default
 	self.new_mp5.weapon_hold = "mp5"
 	self.new_mp5.animations = {}
 	self.new_mp5.animations.equip_id = "equip_mp5_rifle"
@@ -2868,8 +3066,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.shake = {}
 	self.mac10.shake.fire_multiplier = 1
 	self.mac10.shake.fire_steelsight_multiplier = -1
-	self.mac10.autohit = autohit_pistol_default
-	self.mac10.aim_assist = aim_assist_pistol_default
+	self.mac10.autohit = autohit_smg_default
+	self.mac10.aim_assist = aim_assist_smg_default
 	self.mac10.weapon_hold = "mac11"
 	self.mac10.animations = {}
 	self.mac10.animations.equip_id = "equip_mac11_rifle"
@@ -3046,8 +3244,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.shake = {}
 	self.huntsman.shake.fire_multiplier = 2
 	self.huntsman.shake.fire_steelsight_multiplier = 2
-	self.huntsman.autohit = autohit_rifle_default
-	self.huntsman.aim_assist = aim_assist_rifle_default
+	self.huntsman.autohit = autohit_shotgun_default
+	self.huntsman.aim_assist = aim_assist_shotgun_default
 	self.huntsman.animations = {}
 	self.huntsman.animations.equip_id = "equip_huntsman"
 	self.huntsman.animations.recoil_steelsight = true
@@ -3571,8 +3769,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m45.shake = {}
 	self.m45.shake.fire_multiplier = 1
 	self.m45.shake.fire_steelsight_multiplier = -1
-	self.m45.autohit = autohit_pistol_default
-	self.m45.aim_assist = aim_assist_pistol_default
+	self.m45.autohit = autohit_smg_default
+	self.m45.aim_assist = aim_assist_smg_default
 	self.m45.weapon_hold = "m45"
 	self.m45.animations = {}
 	self.m45.animations.equip_id = "equip_m45"
@@ -3826,8 +4024,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.shake = {}
 	self.mp7.shake.fire_multiplier = 1
 	self.mp7.shake.fire_steelsight_multiplier = -1
-	self.mp7.autohit = autohit_pistol_default
-	self.mp7.aim_assist = aim_assist_pistol_default
+	self.mp7.autohit = autohit_smg_default
+	self.mp7.aim_assist = aim_assist_smg_default
 	self.mp7.weapon_hold = "mp9"
 	self.mp7.animations = {}
 	self.mp7.animations.equip_id = "equip_mp9"
@@ -4285,6 +4483,310 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		value = 9
 	}
+	self.m95 = {}
+	self.m95.category = "snp"
+	self.m95.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.m95.damage_melee = damage_melee_default
+	self.m95.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m95.sounds = {}
+	self.m95.sounds.fire = "barrett_fire"
+	self.m95.sounds.dryfire = "primary_dryfire"
+	self.m95.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.m95.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.m95.timers = {}
+	self.m95.timers.reload_not_empty = 3.96
+	self.m95.timers.reload_empty = 5.23
+	self.m95.timers.unequip = 0.9
+	self.m95.timers.equip = 0.9
+	self.m95.name_id = "bm_w_m95"
+	self.m95.desc_id = "bm_w_m95_desc"
+	self.m95.hud_icon = "m4"
+	self.m95.description_id = "des_m95"
+	self.m95.muzzleflash = "effects/payday2/particles/weapons/50cal_auto_fps"
+	self.m95.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_m95"
+	self.m95.use_data = {}
+	self.m95.use_data.selection_index = 2
+	self.m95.DAMAGE = 1
+	self.m95.CLIP_AMMO_MAX = 5
+	self.m95.NR_CLIPS_MAX = 3
+	self.m95.AMMO_MAX = self.m95.CLIP_AMMO_MAX * self.m95.NR_CLIPS_MAX
+	self.m95.AMMO_PICKUP = {0.05, 0.65}
+	self.m95.FIRE_MODE = "single"
+	self.m95.fire_mode_data = {}
+	self.m95.fire_mode_data.fire_rate = 1.5
+	self.m95.CAN_TOGGLE_FIREMODE = false
+	self.m95.single = {}
+	self.m95.single.fire_rate = 20
+	self.m95.spread = {}
+	self.m95.spread.standing = 20
+	self.m95.spread.crouching = 20
+	self.m95.spread.steelsight = 0
+	self.m95.spread.moving_standing = 20
+	self.m95.spread.moving_crouching = 20
+	self.m95.spread.moving_steelsight = 0.2
+	self.m95.kick = {}
+	self.m95.kick.standing = {
+		3,
+		3.8,
+		-0.5,
+		0.5
+	}
+	self.m95.kick.crouching = self.m95.kick.standing
+	self.m95.kick.steelsight = self.m95.kick.standing
+	self.m95.crosshair = {}
+	self.m95.crosshair.standing = {}
+	self.m95.crosshair.crouching = {}
+	self.m95.crosshair.steelsight = {}
+	self.m95.crosshair.standing.offset = 1.14
+	self.m95.crosshair.standing.moving_offset = 1.8
+	self.m95.crosshair.standing.kick_offset = 1.6
+	self.m95.crosshair.crouching.offset = 1.1
+	self.m95.crosshair.crouching.moving_offset = 1.6
+	self.m95.crosshair.crouching.kick_offset = 1.4
+	self.m95.crosshair.steelsight.hidden = true
+	self.m95.crosshair.steelsight.offset = 1
+	self.m95.crosshair.steelsight.moving_offset = 1
+	self.m95.crosshair.steelsight.kick_offset = 1.14
+	self.m95.shake = {}
+	self.m95.shake.fire_multiplier = 3.8
+	self.m95.shake.fire_steelsight_multiplier = -3.8
+	self.m95.autohit = autohit_snp_default
+	self.m95.aim_assist = aim_assist_snp_default
+	self.m95.animations = {}
+	self.m95.animations.equip_id = "equip_m95"
+	self.m95.animations.recoil_steelsight = true
+	self.m95.global_value = "gage_pack_snp"
+	self.m95.texture_bundle_folder = "gage_pack_snp"
+	self.m95.statistics = false
+	self.m95.can_shoot_through_enemy = true
+	self.m95.can_shoot_through_shield = true
+	self.m95.can_shoot_through_wall = true
+	self.m95.stats = {
+		damage = 35,
+		spread = 9,
+		recoil = 1,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 2,
+		suppression = 2,
+		alert_size = 9,
+		extra_ammo = 6,
+		value = 9
+	}
+	self.m95.armor_piercing_chance = 1
+	self.m95.stats_modifiers = {
+		damage = 24,
+		suppression = 5,
+		spread = 0.5
+	}
+	self.msr = {}
+	self.msr.category = "snp"
+	self.msr.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.msr.damage_melee = damage_melee_default
+	self.msr.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.msr.sounds = {}
+	self.msr.sounds.fire = "msr_fire"
+	self.msr.sounds.dryfire = "primary_dryfire"
+	self.msr.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.msr.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.msr.timers = {}
+	self.msr.timers.reload_not_empty = 3
+	self.msr.timers.reload_empty = 3.7
+	self.msr.timers.unequip = 0.9
+	self.msr.timers.equip = 0.9
+	self.msr.name_id = "bm_w_msr"
+	self.msr.desc_id = "bm_w_msr_desc"
+	self.msr.hud_icon = "m4"
+	self.msr.description_id = "des_msr"
+	self.msr.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.msr.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.msr.use_data = {}
+	self.msr.use_data.selection_index = 2
+	self.msr.use_data.align_place = "left_hand"
+	self.msr.DAMAGE = 1
+	self.msr.CLIP_AMMO_MAX = 10
+	self.msr.NR_CLIPS_MAX = 5
+	self.msr.AMMO_MAX = self.msr.CLIP_AMMO_MAX * self.msr.NR_CLIPS_MAX
+	self.msr.AMMO_PICKUP = {1, 1}
+	self.msr.FIRE_MODE = "single"
+	self.msr.fire_mode_data = {}
+	self.msr.fire_mode_data.fire_rate = 1
+	self.msr.CAN_TOGGLE_FIREMODE = false
+	self.msr.single = {}
+	self.msr.single.fire_rate = 20
+	self.msr.spread = {}
+	self.msr.spread.standing = 20
+	self.msr.spread.crouching = 20
+	self.msr.spread.steelsight = 0
+	self.msr.spread.moving_standing = 20
+	self.msr.spread.moving_crouching = 20
+	self.msr.spread.moving_steelsight = 0
+	self.msr.kick = {}
+	self.msr.kick.standing = {
+		3,
+		4.8,
+		-0.3,
+		0.3
+	}
+	self.msr.kick.crouching = self.msr.kick.standing
+	self.msr.kick.steelsight = self.msr.kick.standing
+	self.msr.crosshair = {}
+	self.msr.crosshair.standing = {}
+	self.msr.crosshair.crouching = {}
+	self.msr.crosshair.steelsight = {}
+	self.msr.crosshair.standing.offset = 1.14
+	self.msr.crosshair.standing.moving_offset = 1.8
+	self.msr.crosshair.standing.kick_offset = 1.6
+	self.msr.crosshair.crouching.offset = 1.1
+	self.msr.crosshair.crouching.moving_offset = 1.6
+	self.msr.crosshair.crouching.kick_offset = 1.4
+	self.msr.crosshair.steelsight.hidden = true
+	self.msr.crosshair.steelsight.offset = 1
+	self.msr.crosshair.steelsight.moving_offset = 1
+	self.msr.crosshair.steelsight.kick_offset = 1.14
+	self.msr.shake = {}
+	self.msr.shake.fire_multiplier = 3.5
+	self.msr.shake.fire_steelsight_multiplier = -3.5
+	self.msr.autohit = autohit_snp_default
+	self.msr.aim_assist = aim_assist_snp_default
+	self.msr.weapon_hold = "msr"
+	self.msr.animations = {}
+	self.msr.animations.equip_id = "equip_msr"
+	self.msr.animations.recoil_steelsight = true
+	self.msr.global_value = "gage_pack_snp"
+	self.msr.texture_bundle_folder = "gage_pack_snp"
+	self.msr.statistics = false
+	self.msr.can_shoot_through_enemy = true
+	self.msr.can_shoot_through_shield = true
+	self.msr.can_shoot_through_wall = true
+	self.msr.stats = {
+		damage = 21,
+		spread = 9,
+		recoil = 2,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 5,
+		suppression = 6,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 9
+	}
+	self.msr.armor_piercing_chance = 1
+	self.msr.stats_modifiers = {
+		damage = 2.6,
+		suppression = 3,
+		spread = 0.6
+	}
+	self.r93 = {}
+	self.r93.category = "snp"
+	self.r93.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.r93.damage_melee = damage_melee_default
+	self.r93.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.r93.sounds = {}
+	self.r93.sounds.fire = "blazer_fire"
+	self.r93.sounds.dryfire = "primary_dryfire"
+	self.r93.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.r93.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.r93.timers = {}
+	self.r93.timers.reload_not_empty = 2.82
+	self.r93.timers.reload_empty = 3.82
+	self.r93.timers.unequip = 0.9
+	self.r93.timers.equip = 0.9
+	self.r93.name_id = "bm_w_r93"
+	self.r93.desc_id = "bm_w_r93_desc"
+	self.r93.hud_icon = "m4"
+	self.r93.description_id = "des_r93"
+	self.r93.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.r93.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.r93.use_data = {}
+	self.r93.use_data.selection_index = 2
+	self.r93.use_data.align_place = "left_hand"
+	self.r93.DAMAGE = 1
+	self.r93.CLIP_AMMO_MAX = 6
+	self.r93.NR_CLIPS_MAX = 5
+	self.r93.AMMO_MAX = self.r93.CLIP_AMMO_MAX * self.r93.NR_CLIPS_MAX
+	self.r93.AMMO_PICKUP = {0.7, 1}
+	self.r93.FIRE_MODE = "single"
+	self.r93.fire_mode_data = {}
+	self.r93.fire_mode_data.fire_rate = 1.2
+	self.r93.CAN_TOGGLE_FIREMODE = false
+	self.r93.single = {}
+	self.r93.single.fire_rate = 20
+	self.r93.spread = {}
+	self.r93.spread.standing = 20
+	self.r93.spread.crouching = 20
+	self.r93.spread.steelsight = 0
+	self.r93.spread.moving_standing = 20
+	self.r93.spread.moving_crouching = 20
+	self.r93.spread.moving_steelsight = 1
+	self.r93.kick = {}
+	self.r93.kick.standing = {
+		3,
+		3.8,
+		-0.1,
+		0.1
+	}
+	self.r93.kick.crouching = self.r93.kick.standing
+	self.r93.kick.steelsight = self.r93.kick.standing
+	self.r93.crosshair = {}
+	self.r93.crosshair.standing = {}
+	self.r93.crosshair.crouching = {}
+	self.r93.crosshair.steelsight = {}
+	self.r93.crosshair.standing.offset = 1.14
+	self.r93.crosshair.standing.moving_offset = 1.8
+	self.r93.crosshair.standing.kick_offset = 1.6
+	self.r93.crosshair.crouching.offset = 1.1
+	self.r93.crosshair.crouching.moving_offset = 1.6
+	self.r93.crosshair.crouching.kick_offset = 1.4
+	self.r93.crosshair.steelsight.hidden = true
+	self.r93.crosshair.steelsight.offset = 1
+	self.r93.crosshair.steelsight.moving_offset = 1
+	self.r93.crosshair.steelsight.kick_offset = 1.14
+	self.r93.shake = {}
+	self.r93.shake.fire_multiplier = 2.8
+	self.r93.shake.fire_steelsight_multiplier = -2.8
+	self.r93.autohit = autohit_snp_default
+	self.r93.aim_assist = aim_assist_snp_default
+	self.r93.weapon_hold = "r93"
+	self.r93.animations = {}
+	self.r93.animations.equip_id = "equip_r93"
+	self.r93.animations.recoil_steelsight = true
+	self.r93.global_value = "gage_pack_snp"
+	self.r93.texture_bundle_folder = "gage_pack_snp"
+	self.r93.statistics = false
+	self.r93.can_shoot_through_enemy = true
+	self.r93.can_shoot_through_shield = true
+	self.r93.can_shoot_through_wall = true
+	self.r93.stats = {
+		damage = 21,
+		spread = 9,
+		recoil = 2,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 5,
+		suppression = 4,
+		alert_size = 8,
+		extra_ammo = 6,
+		value = 9
+	}
+	self.r93.armor_piercing_chance = 1
+	self.r93.stats_modifiers = {
+		damage = 5,
+		suppression = 3,
+		spread = 0.5
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -4557,6 +5059,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.akm_gold_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 	self.deagle_npc = {
 		usage = "raging_bull",
 		sounds = {},
@@ -4621,7 +5129,7 @@ function WeaponTweakData:_create_table_structure()
 		auto = {}
 	}
 	self.mp7_npc = {
-		usage = "mp5",
+		usage = "c45",
 		sounds = {},
 		use_data = {},
 		auto = {}
@@ -4651,6 +5159,24 @@ function WeaponTweakData:_create_table_structure()
 		auto = {}
 	}
 	self.rpk_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m95_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.msr_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.r93_npc = {
 		usage = "ak47",
 		sounds = {},
 		use_data = {},
@@ -4687,6 +5213,7 @@ function WeaponTweakData:_precalculate_values()
 	self.mac10_npc.AMMO_MAX = self.mac10_npc.CLIP_AMMO_MAX * self.mac10_npc.NR_CLIPS_MAX
 	self.akmsu_npc.AMMO_MAX = self.akmsu_npc.CLIP_AMMO_MAX * self.akmsu_npc.NR_CLIPS_MAX
 	self.akm_npc.AMMO_MAX = self.akm_npc.CLIP_AMMO_MAX * self.akm_npc.NR_CLIPS_MAX
+	self.akm_gold_npc.AMMO_MAX = self.akm_gold_npc.CLIP_AMMO_MAX * self.akm_gold_npc.NR_CLIPS_MAX
 	self.deagle_npc.AMMO_MAX = self.deagle_npc.CLIP_AMMO_MAX * self.deagle_npc.NR_CLIPS_MAX
 	self.serbu_npc.AMMO_MAX = self.serbu_npc.CLIP_AMMO_MAX * self.serbu_npc.NR_CLIPS_MAX
 	self.saiga_npc.AMMO_MAX = self.saiga_npc.CLIP_AMMO_MAX * self.saiga_npc.NR_CLIPS_MAX
@@ -4703,4 +5230,7 @@ function WeaponTweakData:_precalculate_values()
 	self.hk21_npc.AMMO_MAX = self.hk21_npc.CLIP_AMMO_MAX * self.hk21_npc.NR_CLIPS_MAX
 	self.m249_npc.AMMO_MAX = self.m249_npc.CLIP_AMMO_MAX * self.m249_npc.NR_CLIPS_MAX
 	self.rpk_npc.AMMO_MAX = self.rpk_npc.CLIP_AMMO_MAX * self.rpk_npc.NR_CLIPS_MAX
+	self.m95_npc.AMMO_MAX = self.m95_npc.CLIP_AMMO_MAX * self.m95_npc.NR_CLIPS_MAX
+	self.msr_npc.AMMO_MAX = self.msr_npc.CLIP_AMMO_MAX * self.msr_npc.NR_CLIPS_MAX
+	self.r93_npc.AMMO_MAX = self.r93_npc.CLIP_AMMO_MAX * self.r93_npc.NR_CLIPS_MAX
 end

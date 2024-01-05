@@ -165,6 +165,10 @@ function TeamAIMovement:_switch_to_not_cool_clbk_func()
 	end
 end
 
+function TeamAIMovement:zipline_unit()
+	return nil
+end
+
 function TeamAIMovement:pre_destroy()
 	if self._heat_listener_clbk then
 		managers.groupai:state():remove_listener(self._heat_listener_clbk)

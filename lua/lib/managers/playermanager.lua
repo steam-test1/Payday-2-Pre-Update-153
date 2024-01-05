@@ -110,6 +110,7 @@ function PlayerManager:aquire_default_upgrades()
 	managers.upgrades:aquire_default("player_sec_camera_highlight")
 	managers.upgrades:aquire_default("player_corpse_dispose")
 	managers.upgrades:aquire_default("player_corpse_dispose_amount_1")
+	managers.upgrades:aquire_default("player_civ_harmless_melee")
 	for i = 1, PlayerManager.WEAPON_SLOTS do
 		if not managers.player:weapon_in_slot(i) then
 			self._global.kit.weapon_slots[i] = managers.player:availible_weapons(i)[1]
@@ -246,7 +247,6 @@ function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deploy
 		min_health = 0.25
 	end
 	player:character_damage():set_health(math.max(min_health, health) * player:character_damage():_max_health())
-	player:inventory():set_ammo(0.5)
 	if dead or bleed_out then
 		print("[PlayerManager:spawn_dead] Killing")
 		managers.groupai:state():on_player_criminal_death(Global.local_member:peer():id())
@@ -1090,33 +1090,33 @@ function PlayerManager:update_carry_to_peer(peer)
 	local peer_id = managers.network:session():local_peer():id()
 	if self._global.synced_carry[peer_id] then
 		local carry_id = self._global.synced_carry[peer_id].carry_id
-		local value = self._global.synced_carry[peer_id].value
+		local multiplier = self._global.synced_carry[peer_id].multiplier
 		local dye_initiated = self._global.synced_carry[peer_id].dye_initiated
 		local has_dye_pack = self._global.synced_carry[peer_id].has_dye_pack
 		local dye_value_multiplier = self._global.synced_carry[peer_id].dye_value_multiplier
-		peer:send_after_load("sync_carry", peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
+		peer:send_after_load("sync_carry", peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	end
 end
 
-function PlayerManager:update_synced_carry_to_peers(carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
+function PlayerManager:update_synced_carry_to_peers(carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	local peer_id = managers.network:session():local_peer():id()
-	managers.network:session():send_to_peers("sync_carry", peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
-	self:set_synced_carry(peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.network:session():send_to_peers("sync_carry", peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+	self:set_synced_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 end
 
-function PlayerManager:set_synced_carry(peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
+function PlayerManager:set_synced_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	self._global.synced_carry[peer_id] = {
 		carry_id = carry_id,
-		value = value,
+		multiplier = multiplier,
 		dye_initiated = dye_initiated,
 		has_dye_pack = has_dye_pack,
 		dye_value_multiplier = dye_value_multiplier
 	}
 	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
 	if character_data and character_data.panel_id then
-		managers.hud:set_teammate_carry_info(character_data.panel_id, carry_id, managers.loot:get_real_value(carry_id, value))
+		managers.hud:set_teammate_carry_info(character_data.panel_id, carry_id, managers.loot:get_real_value(carry_id, multiplier))
 	end
-	managers.hud:set_name_label_carry_info(peer_id, carry_id, managers.loot:get_real_value(carry_id, value))
+	managers.hud:set_name_label_carry_info(peer_id, carry_id, managers.loot:get_real_value(carry_id, multiplier))
 	local local_peer_id = managers.network:session():local_peer():id()
 	if peer_id ~= local_peer_id and managers.network:game():member(peer_id) then
 		local unit = managers.network:game():member(peer_id):unit()
@@ -1325,14 +1325,21 @@ function PlayerManager:peer_dropped_out(peer)
 		end
 		if self._global.synced_carry[peer_id] and self._global.synced_carry[peer_id].approved then
 			local carry_id = self._global.synced_carry[peer_id].carry_id
-			local carry_value = self._global.synced_carry[peer_id].value
+			local carry_multiplier = self._global.synced_carry[peer_id].multiplier
 			local dye_initiated = self._global.synced_carry[peer_id].dye_initiated
 			local has_dye_pack = self._global.synced_carry[peer_id].has_dye_pack
 			local dye_value_multiplier = self._global.synced_carry[peer_id].dye_value_multiplier
 			local peer_unit = managers.network:game():member(peer_id):unit()
-			local position = alive(peer_unit) and peer_unit:position() or Vector3()
+			local position = Vector3()
+			if alive(peer_unit) then
+				if peer_unit:movement():zipline_unit() then
+					position = peer_unit:movement():zipline_unit():position()
+				else
+					position = peer_unit:position()
+				end
+			end
 			local dir = Vector3(0, 0, 0)
-			self:server_drop_carry(carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, Rotation(), dir, 0)
+			self:server_drop_carry(carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, Rotation(), dir, 0, nil, peer_id)
 		end
 	end
 	self._global.synced_equipment_possession[peer_id] = nil
@@ -1577,6 +1584,76 @@ function PlayerManager:remove_equipment(equipment_id)
 	self:update_deployable_equipment_amount_to_peers(equipment.equipment, new_amount)
 end
 
+function PlayerManager:verify_equipment(peer_id, equipment_id)
+	if peer_id == 0 then
+		local id = "asset_" .. equipment_id
+		self._asset_equipment = self._asset_equipment or {}
+		if not tweak_data.equipments.max_amount[id] or self._asset_equipment[id] and self._asset_equipment[id] + 1 > tweak_data.equipments.max_amount[id] then
+			local peer = managers.network:session():server_peer()
+			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+				name = peer:name()
+			}))
+			managers.hud:mark_cheater(peer:id())
+			return false
+		end
+		self._asset_equipment[id] = (self._asset_equipment[id] or 0) + 1
+		return true
+	elseif not managers.network:game():member(peer_id) then
+		return false
+	end
+	return managers.network:game():member(peer_id):place_deployable(equipment_id)
+end
+
+function PlayerManager:verify_grenade(peer_id)
+	if not managers.network:game():member(peer_id) then
+		return false
+	end
+	return managers.network:game():member(peer_id):set_grenade(1)
+end
+
+function PlayerManager:register_grenade(peer_id)
+	if not managers.network:game():member(peer_id) then
+		return false
+	end
+	return managers.network:game():member(peer_id):set_grenade(-1)
+end
+
+function PlayerManager:verify_carry(peer_id, carry_id)
+	if Network:is_client() then
+		return true
+	end
+	if peer_id == 0 then
+		if Network:is_server() then
+			return true
+		end
+		local level_id = managers.job:current_level_id()
+		local amount_bags = tweak_data.levels[level_id] and tweak_data.levels[level_id].max_bags or 20
+		self._total_bags = self._total_bags and self._total_bags + 1 or 1
+		if amount_bags < self._total_bags then
+			local peer = managers.network:session():server_peer()
+			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_bags", {
+				name = peer:name()
+			}))
+			managers.hud:mark_cheater(peer:id())
+			return false
+		end
+	end
+	if not managers.network:game():member(peer_id) then
+		return false
+	end
+	return managers.network:game():member(peer_id):place_bag(carry_id, -1)
+end
+
+function PlayerManager:register_carry(peer_id, carry_id)
+	if Network:is_client() then
+		return true
+	end
+	if not managers.network:game():member(peer_id) then
+		return false
+	end
+	return managers.network:game():member(peer_id):place_bag(carry_id, 1)
+end
+
 function PlayerManager:add_special(params)
 	local name = params.equipment or params.name
 	if not tweak_data.equipments.specials[name] then
@@ -1790,7 +1867,7 @@ function PlayerManager:on_throw_grenade()
 	end
 end
 
-function PlayerManager:set_carry(carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier)
+function PlayerManager:set_carry(carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 	local carry_data = tweak_data.carry[carry_id]
 	local carry_type = carry_data.type
 	self:set_player_state("carry")
@@ -1809,9 +1886,9 @@ function PlayerManager:set_carry(carry_id, carry_value, dye_initiated, has_dye_p
 			until true
 		end
 	end
-	self:update_synced_carry_to_peers(carry_id, carry_value or 100, dye_initiated, has_dye_pack, dye_value_multiplier)
-	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, carry_value or 100))
-	managers.hud:temp_show_carry_bag(carry_id, managers.loot:get_real_value(carry_id, carry_value or 100))
+	self:update_synced_carry_to_peers(carry_id, carry_multiplier or 1, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, carry_multiplier or 1))
+	managers.hud:temp_show_carry_bag(carry_id, managers.loot:get_real_value(carry_id, carry_multiplier or 1))
 	local player = self:player_unit()
 	if not player then
 		return
@@ -1821,14 +1898,14 @@ end
 
 function PlayerManager:bank_carry()
 	local carry_data = self:get_my_carry_data()
-	managers.loot:secure(carry_data.carry_id, carry_data.value)
+	managers.loot:secure(carry_data.carry_id, carry_data.multiplier)
 	managers.hud:remove_teammate_carry_info(HUDManager.PLAYER_PANEL)
 	managers.hud:temp_hide_carry_bag()
 	self:update_removed_synced_carry_to_peers()
 	managers.player:set_player_state("standard")
 end
 
-function PlayerManager:drop_carry()
+function PlayerManager:drop_carry(zipline_unit)
 	local carry_data = self:get_my_carry_data()
 	if not carry_data then
 		return
@@ -1841,9 +1918,9 @@ function PlayerManager:drop_carry()
 	local dye_value_multiplier = carry_data.dye_value_multiplier
 	local throw_distance_multiplier_upgrade_level = managers.player:upgrade_level("carry", "throw_distance_multiplier", 0)
 	if Network:is_client() then
-		managers.network:session():send_to_host("server_drop_carry", carry_data.carry_id, carry_data.value, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), player:camera():forward(), throw_distance_multiplier_upgrade_level)
+		managers.network:session():send_to_host("server_drop_carry", carry_data.carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), player:camera():forward(), throw_distance_multiplier_upgrade_level, zipline_unit)
 	else
-		self:server_drop_carry(carry_data.carry_id, carry_data.value, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), player:camera():forward(), throw_distance_multiplier_upgrade_level)
+		self:server_drop_carry(carry_data.carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), player:camera():forward(), throw_distance_multiplier_upgrade_level, zipline_unit, managers.network:session():local_peer():id())
 	end
 	managers.hud:remove_teammate_carry_info(HUDManager.PLAYER_PANEL)
 	managers.hud:temp_hide_carry_bag()
@@ -1853,25 +1930,30 @@ function PlayerManager:drop_carry()
 	end
 end
 
-function PlayerManager:server_drop_carry(carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level)
-	if carry_value <= 0 then
+function PlayerManager:server_drop_carry(carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level, zipline_unit, peer_id)
+	if not managers.player:verify_carry(peer_id, carry_id) then
 		return
 	end
 	local unit_name = tweak_data.carry[carry_id].unit or "units/payday2/pickups/gen_pku_lootbag/gen_pku_lootbag"
 	local unit = World:spawn_unit(Idstring(unit_name), position, rotation)
-	managers.network:session():send_to_peers_synched("sync_carry_data", unit, carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level)
-	self:sync_carry_data(unit, carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level)
+	managers.network:session():send_to_peers_synched("sync_carry_data", unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit, peer_id or 0)
+	self:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit)
 	return unit
 end
 
-function PlayerManager:sync_carry_data(unit, carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level)
+function PlayerManager:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit)
 	local throw_distance_multiplier = self:upgrade_value_by_level("carry", "throw_distance_multiplier", throw_distance_multiplier_upgrade_level, 1)
 	local carry_type = tweak_data.carry[carry_id].type
 	throw_distance_multiplier = throw_distance_multiplier * tweak_data.carry.types[carry_type].throw_distance_multiplier
-	unit:push(100, dir * 600 * throw_distance_multiplier)
 	unit:carry_data():set_carry_id(carry_id)
-	unit:carry_data():set_value(carry_value)
+	unit:carry_data():set_multiplier(carry_multiplier)
+	unit:carry_data():set_value(managers.money:get_bag_value(carry_id, carry_multiplier))
 	unit:carry_data():set_dye_pack_data(dye_initiated, has_dye_pack, dye_value_multiplier)
+	if alive(zipline_unit) then
+		zipline_unit:zipline():attach_bag(unit)
+	else
+		unit:push(100, dir * 600 * throw_distance_multiplier)
+	end
 	unit:interaction():register_collision_callbacks()
 end
 
@@ -1890,9 +1972,9 @@ function PlayerManager:force_drop_carry()
 	local dye_value_multiplier = carry_data.dye_value_multiplier
 	local camera_ext = player:camera()
 	if Network:is_client() then
-		managers.network:session():send_to_host("server_drop_carry", carry_data.carry_id, carry_data.value, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), Vector3(0, 0, 0), 0)
+		managers.network:session():send_to_host("server_drop_carry", carry_data.carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), Vector3(0, 0, 0), 0, nil)
 	else
-		self:server_drop_carry(carry_data.carry_id, carry_data.value, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), Vector3(0, 0, 0), 0)
+		self:server_drop_carry(carry_data.carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, camera_ext:position(), camera_ext:rotation(), Vector3(0, 0, 0), 0, nil, managers.network:session():local_peer():id())
 	end
 	managers.hud:remove_teammate_carry_info(HUDManager.PLAYER_PANEL)
 	managers.hud:temp_hide_carry_bag()
@@ -1948,8 +2030,8 @@ function PlayerManager:check_damage_carry(attack_data)
 	local has_dye_pack = carry_data.has_dye_pack
 	local dye_value_multiplier = carry_data.dye_value_multiplier
 	local value = math.max(carry_data.value - tweak_data.carry.types[type].looses_value_per_hit * attack_data.damage, 0)
-	self:update_synced_carry_to_peers(carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
-	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, value))
+	self:update_synced_carry_to_peers(carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, carry_data.multiplier))
 end
 
 function PlayerManager:dye_pack_exploded()
@@ -1965,8 +2047,8 @@ function PlayerManager:dye_pack_exploded()
 	local value = carry_data.value * (1 - dye_value_multiplier / 100)
 	value = math.round(value)
 	has_dye_pack = false
-	self:update_synced_carry_to_peers(carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
-	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, value))
+	self:update_synced_carry_to_peers(carry_id, carry_data.multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.hud:set_teammate_carry_info(HUDManager.PLAYER_PANEL, carry_id, managers.loot:get_real_value(carry_id, carry_data.multiplier))
 end
 
 function PlayerManager:count_up_player_minions()

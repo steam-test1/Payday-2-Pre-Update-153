@@ -433,14 +433,16 @@ function SkillTreeTweakData:init()
 		icon_xy = {1, 9},
 		[1] = {
 			upgrades = {
-				"assault_rifle_reload_speed_multiplier"
+				"assault_rifle_reload_speed_multiplier",
+				"snp_reload_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
 				"assault_rifle_move_spread_multiplier",
-				"player_run_and_reload"
+				"player_run_and_reload",
+				"snp_move_spread_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -743,7 +745,9 @@ function SkillTreeTweakData:init()
 				"assault_rifle_hip_fire_spread_multiplier",
 				"saw_hip_fire_spread_multiplier",
 				"pistol_hip_fire_spread_multiplier",
-				"smg_hip_fire_spread_multiplier"
+				"smg_hip_fire_spread_multiplier",
+				"snp_hip_fire_spread_multiplier",
+				"lmg_hip_fire_spread_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -913,13 +917,15 @@ function SkillTreeTweakData:init()
 		icon_xy = {0, 5},
 		[1] = {
 			upgrades = {
-				"assault_rifle_enter_steelsight_speed_multiplier"
+				"assault_rifle_enter_steelsight_speed_multiplier",
+				"snp_enter_steelsight_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_zoom_increase"
+				"assault_rifle_zoom_increase",
+				"snp_zoom_increase"
 			},
 			cost = self.costs.pro
 		}
@@ -1006,7 +1012,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_recoil_multiplier"
+				"assault_rifle_recoil_multiplier",
+				"snp_recoil_multiplier"
 			},
 			cost = self.costs.pro
 		}
@@ -1325,7 +1332,9 @@ function SkillTreeTweakData:init()
 		icon_xy = {5, 3},
 		[1] = {
 			upgrades = {
-				"player_suspicion_bonus"
+				"player_suspicion_bonus",
+				"player_sec_camera_highlight_mask_off",
+				"player_special_enemy_highlight_mask_off"
 			},
 			cost = self.costs.default
 		},

@@ -65,7 +65,9 @@ function ElementSpotter:update_spotter()
 			if angle < 45 then
 				local ray = World:raycast("ray", unit:movement():m_head_pos(), self._values.position, "ray_type", "ai_vision", "slot_mask", managers.slot:get_mask("world_geometry"), "report")
 				if not ray and unit:base()._tweak_table and (tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout) then
-					self:add_enemy_contour(unit)
+					if managers.game_play_central:auto_highlight_enemy(unit, false) then
+						self:on_executed(unit, "on_outlined")
+					end
 					self:on_executed(unit, "on_spotted")
 				end
 			end
@@ -75,16 +77,4 @@ function ElementSpotter:update_spotter()
 		self._found_units = World:find_units_quick("all", managers.slot:get_mask("enemies"))
 		self._found_units = #self._found_units > 0 and self._found_units or nil
 	end
-end
-
-function ElementSpotter:add_enemy_contour(unit)
-	if self._enemy_contours[unit:key()] and self._enemy_contours[unit:key()] > Application:time() then
-		return
-	end
-	self:on_executed(unit, "on_outlined")
-	self._enemy_contours[unit:key()] = Application:time() + 9
-	if not unit:contour() then
-		debug_pause_unit(unit, "[IngameAccessCamera:add_enemy_contour]: Unit doesn't have Contour Extension")
-	end
-	unit:contour():add("mark_enemy", true, 1)
 end

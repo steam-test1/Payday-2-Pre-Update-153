@@ -3,6 +3,7 @@ GrenadeCrateBase = GrenadeCrateBase or class(UnitBase)
 function GrenadeCrateBase.spawn(pos, rot)
 	local unit_name = "units/payday2/equipment/gen_equipment_grenade_crate/gen_equipment_grenade_crate"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", unit, "sync", 1)
 	return unit
 end
 
@@ -75,8 +76,11 @@ function GrenadeCrateBase:server_set_dynamic()
 	end
 end
 
-function GrenadeCrateBase:sync_net_event(event_id)
+function GrenadeCrateBase:sync_net_event(event_id, peer)
 	if event_id == 1 then
+		if peer then
+			managers.player:register_grenade(peer:id())
+		end
 		self:sync_grenade_taken(1)
 	elseif event_id == 2 then
 		self:_set_dynamic()
@@ -97,6 +101,7 @@ function GrenadeCrateBase:take_grenade(unit)
 		unit:sound():play("pickup_ammo")
 		managers.player:add_grenade_amount(1)
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", 1)
+		managers.player:register_grenade(managers.network:session():local_peer():id())
 		self._grenade_amount = self._grenade_amount - 1
 		print("Took " .. 1 .. " grenades, " .. self._grenade_amount .. " left")
 	end
@@ -158,4 +163,43 @@ function GrenadeCrateBase:load(data)
 end
 
 function GrenadeCrateBase:destroy()
+end
+
+GrenadeCrateSync = GrenadeCrateSync or class()
+
+function GrenadeCrateSync:init(unit)
+	if Network:is_client() then
+		self._validate_clbk_id = "grenade_crate_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
+end
+
+function GrenadeCrateSync:sync_net_event(event_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(0, "grenade_crate")
+end
+
+function GrenadeCrateSync:load(save_data)
+	self._was_dropin = true
+end
+
+function GrenadeCrateSync:destroy()
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+end
+
+function GrenadeCrateSync:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
 end

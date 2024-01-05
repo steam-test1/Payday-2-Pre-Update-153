@@ -659,9 +659,12 @@ function UnitNetworkHandler:alarm_pager_interaction(u_id, tweak_table, status, s
 	end
 end
 
-function UnitNetworkHandler:remove_corpse_by_id(u_id)
+function UnitNetworkHandler:remove_corpse_by_id(u_id, carry_bodybag, peer_id, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
+	end
+	if carry_bodybag and Network:is_client() then
+		managers.player:register_carry(peer_id, "person")
 	end
 	managers.enemy:remove_corpse_by_id(u_id)
 end
@@ -902,12 +905,16 @@ function UnitNetworkHandler:interaction_set_waypoint_paused(unit, paused, sender
 end
 
 function UnitNetworkHandler:attach_device(pos, normal, sensor_upgrade, rpc)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(rpc) then
+	local peer = self._verify_sender(rpc)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	if not managers.player:verify_equipment(peer:id(), "trip_mine") then
 		return
 	end
 	local rot = Rotation(normal, math.UP)
 	local peer = self._verify_sender(rpc)
-	local unit = TripMineBase.spawn(pos, rot, sensor_upgrade)
+	local unit = TripMineBase.spawn(pos, rot, sensor_upgrade, peer:id())
 	unit:base():set_server_information(peer:id())
 	rpc:activate_trip_mine(unit)
 end
@@ -921,10 +928,11 @@ function UnitNetworkHandler:activate_trip_mine(unit)
 	end
 end
 
-function UnitNetworkHandler:sync_trip_mine_setup(unit, sensor_upgrade)
+function UnitNetworkHandler:sync_trip_mine_setup(unit, sensor_upgrade, peer_id)
 	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
+	managers.player:verify_equipment(peer_id, "trip_mine")
 	unit:base():sync_setup(sensor_upgrade)
 end
 
@@ -961,9 +969,12 @@ function UnitNetworkHandler:request_place_ecm_jammer(pos, normal, battery_life_u
 		rpc:from_server_ecm_jammer_place_rejected()
 		return
 	end
+	if not managers.player:verify_equipment(peer:id(), "ecm_jammer") then
+		return
+	end
 	local rot = Rotation(normal, math.UP)
 	local peer = self._verify_sender(rpc)
-	local unit = ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner_unit)
+	local unit = ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner_unit, peer:id())
 	unit:base():set_server_information(peer:id())
 	unit:base():set_active(true)
 	rpc:from_server_ecm_jammer_placed(unit)
@@ -992,7 +1003,7 @@ function UnitNetworkHandler:sync_unit_event_id_16(unit, ext_name, event_id, rpc)
 		debug_pause("[UnitNetworkHandler:sync_unit_event_id_16] unit", unit, "does not have extension", ext_name)
 		return
 	end
-	extension:sync_net_event(event_id)
+	extension:sync_net_event(event_id, peer)
 end
 
 function UnitNetworkHandler:from_server_ecm_jammer_rejected(rpc)
@@ -1023,7 +1034,10 @@ function UnitNetworkHandler:place_sentry_gun(pos, rot, ammo_multiplier, armor_mu
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	local unit = SentryGunBase.spawn(user_unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier)
+	if not managers.player:verify_equipment(peer:id(), "sentry_gun") then
+		return
+	end
+	local unit = SentryGunBase.spawn(user_unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer:id())
 	if unit then
 		unit:base():set_server_information(peer:id())
 	end
@@ -1074,11 +1088,11 @@ function UnitNetworkHandler:sentrygun_health(unit, health_ratio)
 	unit:character_damage():sync_health(health_ratio)
 end
 
-function UnitNetworkHandler:sync_ammo_bag_setup(unit, ammo_upgrade_lvl)
+function UnitNetworkHandler:sync_equipment_setup(unit, upgrade_lvl, peer_id)
 	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	unit:base():sync_setup(ammo_upgrade_lvl)
+	unit:base():sync_setup(upgrade_lvl, peer_id)
 end
 
 function UnitNetworkHandler:sync_ammo_bag_ammo_taken(unit, amount, sender)
@@ -1100,18 +1114,14 @@ function UnitNetworkHandler:place_deployable_bag(class_name, pos, rot, upgrade_l
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	local class = CoreSerialize.string_to_classtable(class_name)
-	if class then
-		local unit = class.spawn(pos, rot, upgrade_lvl)
-		unit:base():set_server_information(peer:id())
-	end
-end
-
-function UnitNetworkHandler:sync_doctor_bag_setup(unit, amount_upgrade_lvl)
-	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+	if not managers.player:verify_equipment(peer:id(), class_name == "AmmoBagBase" and "ammo_bag" or "doctor_bag") then
 		return
 	end
-	unit:base():sync_setup(amount_upgrade_lvl)
+	local class = CoreSerialize.string_to_classtable(class_name)
+	if class then
+		local unit = class.spawn(pos, rot, upgrade_lvl, peer:id())
+		unit:base():set_server_information(peer:id())
+	end
 end
 
 function UnitNetworkHandler:sync_doctor_bag_taken(unit, amount, sender)
@@ -1425,11 +1435,11 @@ function UnitNetworkHandler:sync_ammo_amount(peer_id, selection_index, max_clip,
 	managers.player:set_synced_ammo_info(peer_id, selection_index, max_clip, current_clip, current_left, max)
 end
 
-function UnitNetworkHandler:sync_carry(peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier, sender)
+function UnitNetworkHandler:sync_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
-	managers.player:set_synced_carry(peer_id, carry_id, value, dye_initiated, has_dye_pack, dye_value_multiplier)
+	managers.player:set_synced_carry(peer_id, carry_id, multiplier, dye_initiated, has_dye_pack, dye_value_multiplier)
 end
 
 function UnitNetworkHandler:sync_remove_carry(peer_id, sender)
@@ -1439,48 +1449,58 @@ function UnitNetworkHandler:sync_remove_carry(peer_id, sender)
 	managers.player:remove_synced_carry(peer_id)
 end
 
-function UnitNetworkHandler:server_drop_carry(carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level, sender)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+function UnitNetworkHandler:server_drop_carry(carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level, zipline_unit, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	managers.player:server_drop_carry(carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level)
+	managers.player:server_drop_carry(carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, rotation, dir, throw_distance_multiplier_upgrade_level, zipline_unit, peer:id())
 end
 
-function UnitNetworkHandler:sync_carry_data(unit, carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, sender)
+function UnitNetworkHandler:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit, peer_id, sender)
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
-	managers.player:sync_carry_data(unit, carry_id, carry_value, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level)
+	managers.player:verify_carry(peer_id, carry_id)
+	managers.player:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit)
 end
 
 function UnitNetworkHandler:server_throw_grenade(grenade_type, position, dir, sender)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	local peer = self._verify_sender(sender)
 	local peer_id = peer:id()
+	if not managers.player:verify_grenade(peer_id) then
+		return
+	end
 	GrenadeBase.server_throw_grenade(grenade_type, position, dir, peer_id)
 end
 
-function UnitNetworkHandler:sync_throw_grenade(unit, dir, grenade_type, sender)
+function UnitNetworkHandler:sync_throw_grenade(unit, dir, grenade_type, peer_id, sender)
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
+	managers.player:verify_grenade(peer_id)
 	unit:base():sync_throw_grenade(dir, grenade_type)
 end
 
-function UnitNetworkHandler:server_secure_loot(carry_id, carry_value, sender)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+function UnitNetworkHandler:server_secure_loot(carry_id, multiplier_level, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	managers.loot:server_secure_loot(carry_id, carry_value)
+	if not tweak_data.carry.small_loot[carry_id] and not managers.player:verify_carry(peer:id(), carry_id) then
+		return
+	end
+	managers.loot:server_secure_loot(carry_id, multiplier_level)
 end
 
-function UnitNetworkHandler:sync_secure_loot(carry_id, carry_value, silent, sender)
+function UnitNetworkHandler:sync_secure_loot(carry_id, carry_multiplier, silent, sender)
 	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) or self._verify_gamestate(self._gamestate_filter.any_end_game)) or not self._verify_sender(sender) then
 		return
 	end
-	managers.loot:sync_secure_loot(carry_id, carry_value, silent)
+	managers.loot:sync_secure_loot(carry_id, carry_multiplier, silent)
 end
 
 function UnitNetworkHandler:sync_small_loot_taken(unit, multiplier_level, sender)

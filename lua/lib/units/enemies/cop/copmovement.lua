@@ -588,8 +588,12 @@ end
 
 function CopMovement:set_attention(attention)
 	if self._attention and self._attention.destroy_listener_key then
-		self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
-		self._attention.destroy_listener_key = nil
+		if alive(self._attention.unit) and self._attention.unit:base() then
+			self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
+			self._attention.destroy_listener_key = nil
+		else
+			debug_pause_unit(self._unit, "[CopMovement:set_attention] could not remove destroy listener. self._attention.unit", self._attention.unit, "base", alive(self._attention.unit) and self._attention.unit:base())
+		end
 	end
 	if attention then
 		if attention.unit then

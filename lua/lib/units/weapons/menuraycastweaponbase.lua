@@ -139,6 +139,7 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
 	local stats = deep_clone(base_stats)
 	local tweak_data = tweak_data.weapon.stats
+	local modifier_stats = self:weapon_tweak_data().stats_modifiers
 	if stats.zoom then
 		stats.zoom = math.min(stats.zoom + managers.player:upgrade_value(self:weapon_tweak_data().category, "zoom_increase", 0), #tweak_data.zoom)
 	end
@@ -151,6 +152,9 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
+		if modifier_stats and modifier_stats[stat] then
+			self._current_stats[stat] = self._current_stats[stat] * modifier_stats[stat]
+		end
 	end
 	self._alert_size = self._current_stats.alert_size or self._alert_size
 	self._suppression = self._current_stats.suppression or self._suppression
@@ -278,6 +282,7 @@ function NewRaycastWeaponBase:check_stats()
 	local parts_stats = managers.weapon_factory:get_stats(self._factory_id, self._blueprint)
 	local stats = deep_clone(base_stats)
 	local tweak_data = tweak_data.weapon.stats
+	local modifier_stats = self:weapon_tweak_data().stats_modifiers
 	stats.zoom = math.min(stats.zoom + managers.player:upgrade_value(self:weapon_tweak_data().category, "zoom_increase", 0), #tweak_data.zoom)
 	for stat, _ in pairs(stats) do
 		if parts_stats[stat] then
@@ -287,8 +292,14 @@ function NewRaycastWeaponBase:check_stats()
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
 		self._current_stats[stat] = tweak_data[stat][i]
+		if modifier_stats and modifier_stats[stat] then
+			self._current_stats[stat] = self._current_stats[stat] * modifier_stats[stat]
+		end
 	end
 	self._current_stats.alert_size = tweak_data.alert_size[math_clamp(stats.alert_size, 1, #tweak_data.alert_size)]
+	if modifier_stats and modifier_stats.alert_size then
+		self._current_stats.alert_size = self._current_stats.alert_size * modifier_stats.alert_size
+	end
 	return stats
 end
 

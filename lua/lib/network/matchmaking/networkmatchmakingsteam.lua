@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v1.8.1"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v1.9.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")

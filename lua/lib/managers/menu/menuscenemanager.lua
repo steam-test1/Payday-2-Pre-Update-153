@@ -419,7 +419,7 @@ function MenuSceneManager:_select_character_pose()
 		local pose
 		if category == "shotgun" then
 			pose = self._global_poses.shotgun[math.random(#self._global_poses.shotgun)]
-		elseif category == "assault_rifle" or category == "lmg" then
+		elseif category == "assault_rifle" or category == "lmg" or category == "snp" then
 			pose = self._global_poses.assault_rifle[math.random(#self._global_poses.assault_rifle)]
 		elseif category == "saw" then
 			pose = self._global_poses.saw[math.random(#self._global_poses.saw)]

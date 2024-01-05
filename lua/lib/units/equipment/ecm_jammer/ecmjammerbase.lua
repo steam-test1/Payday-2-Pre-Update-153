@@ -8,8 +8,9 @@ ECMJammerBase._NET_EVENTS = {
 	jammer_active = 5
 }
 
-function ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner)
+function ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner, peer_id)
 	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_jammer/gen_equipment_jammer"), pos, rot)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
 	unit:base():setup(battery_life_upgrade_lvl, owner)
 	return unit
 end
@@ -37,6 +38,29 @@ function ECMJammerBase:init(unit)
 	self._low_battery_life = tweak_data.upgrades.ecm_jammer_base_low_battery_life
 	self._feedback_active = false
 	self._jammer_active = false
+	if Network:is_client() then
+		self._validate_clbk_id = "ecm_jammer_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
+end
+
+function ECMJammerBase:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
+end
+
+function ECMJammerBase:sync_setup(upgrade_lvl, peer_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(peer_id, "ecm_jammer")
 end
 
 function ECMJammerBase:get_name_id()
@@ -407,9 +431,14 @@ function ECMJammerBase:load(data)
 	if state.feedback_active then
 		self:_set_feedback_active(true)
 	end
+	self._was_dropin = true
 end
 
 function ECMJammerBase:destroy()
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
 	self:set_active(false)
 	self:_set_feedback_active(false)
 end

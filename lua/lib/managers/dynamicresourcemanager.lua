@@ -104,3 +104,18 @@ function DynamicResourceManager:has_resource(resource_type, resource_name, packa
 	local resource_name_key = resource_name:key()
 	return self._dyn_resources[package_name] and self._dyn_resources[package_name][resource_type_key] and self._dyn_resources[package_name][resource_type_key][resource_name_key] and true or false
 end
+
+function DynamicResourceManager:change_material_config(name, unit)
+	unit:set_material_config(name, true, callback(self, self, "on_material_applied", unit))
+end
+
+function DynamicResourceManager:on_material_applied(unit)
+	if alive(unit) then
+		if unit:interaction() then
+			unit:interaction():refresh_material()
+		end
+		if unit:contour() then
+			unit:contour():update_materials()
+		end
+	end
+end

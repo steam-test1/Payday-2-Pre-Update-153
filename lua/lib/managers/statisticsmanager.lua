@@ -944,13 +944,15 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 		500,
 		1000
 	}
+	local play_stat
 	for _, play_time in ipairs(play_times) do
 		key = "player_time_" .. play_time .. "h"
-		num_players = num_players + account:get_global_stat(key, days)
+		play_stat = account:get_global_stat(key, days)
+		num_players = num_players + (0 <= play_stat and play_stat or 0)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, days)
+			glo = play_stat
 		})
 	end
 	table.insert(stats, {

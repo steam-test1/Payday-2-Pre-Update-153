@@ -52,8 +52,12 @@ function PlayerDamage:update(unit, t, dt)
 		self._check_berserker_done = nil
 		self._check_berserker_delay_death = nil
 	end
+	if self._bleed_out_blocked_by_zipline and not self._unit:movement():zipline_unit() then
+		self:_check_bleed_out()
+		self._bleed_out_blocked_by_zipline = nil
+	end
 	if self._regenerate_timer and not self._dead and not self._bleed_out then
-		if not is_berserker_active then
+		if not is_berserker_active and not self._bleed_out_blocked_by_zipline then
 			self._regenerate_timer = self._regenerate_timer - dt
 			local top_fade = math.clamp(self._hurt_value - 0.8, 0, 1) / 0.2
 			local hurt = self._hurt_value - (1 - top_fade) * ((1 + math.sin(t * 500)) / 2) / 10
@@ -661,6 +665,10 @@ end
 
 function PlayerDamage:_check_bleed_out(is_berserker_invulnerability_active)
 	if self:get_real_health() == 0 then
+		if self._unit:movement():zipline_unit() then
+			self._bleed_out_blocked_by_zipline = true
+			return
+		end
 		self._check_berserker_delay_death = self._check_berserker_delay_death or is_berserker_invulnerability_active
 		self._hurt_value = 0.2
 		managers.environment_controller:set_downed_value(0)

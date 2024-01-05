@@ -72,7 +72,8 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 			infamous = data.infamous,
 			value = data.stats and data.stats.value or 1,
 			weight = data.weight,
-			texture_bundle_folder = data.texture_bundle_folder
+			texture_bundle_folder = data.texture_bundle_folder,
+			is_a_unlockable = data.is_a_unlockable
 		}
 	end
 	self:_add_desc_from_name_macro(self.weapon_mods)
@@ -1025,6 +1026,42 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.gage_deltaforce.texture_bundle_folder = "gage_pack_lmg"
 	self.masks.gage_deltaforce.dlc = "gage_pack_lmg"
 	self.masks.gage_deltaforce.statistics = true
+	self.masks.robberfly = {}
+	self.masks.robberfly.unit = "units/pd2_dlc_gage_snp/masks/msk_robberfly/msk_robberfly"
+	self.masks.robberfly.name_id = "bm_msk_robberfly"
+	self.masks.robberfly.pcs = {}
+	self.masks.robberfly.value = 0
+	self.masks.robberfly.qlvl = 0
+	self.masks.robberfly.texture_bundle_folder = "gage_pack_snp"
+	self.masks.robberfly.dlc = "gage_pack_snp"
+	self.masks.robberfly.statistics = false
+	self.masks.spider = {}
+	self.masks.spider.unit = "units/pd2_dlc_gage_snp/masks/msk_spider/msk_spider"
+	self.masks.spider.name_id = "bm_msk_spider"
+	self.masks.spider.pcs = {}
+	self.masks.spider.value = 0
+	self.masks.spider.qlvl = 0
+	self.masks.spider.texture_bundle_folder = "gage_pack_snp"
+	self.masks.spider.dlc = "gage_pack_snp"
+	self.masks.spider.statistics = false
+	self.masks.mantis = {}
+	self.masks.mantis.unit = "units/pd2_dlc_gage_snp/masks/msk_mantis/msk_mantis"
+	self.masks.mantis.name_id = "bm_msk_mantis"
+	self.masks.mantis.pcs = {}
+	self.masks.mantis.value = 0
+	self.masks.mantis.qlvl = 0
+	self.masks.mantis.texture_bundle_folder = "gage_pack_snp"
+	self.masks.mantis.dlc = "gage_pack_snp"
+	self.masks.mantis.statistics = false
+	self.masks.wasp = {}
+	self.masks.wasp.unit = "units/pd2_dlc_gage_snp/masks/msk_wasp/msk_wasp"
+	self.masks.wasp.name_id = "bm_msk_wasp"
+	self.masks.wasp.pcs = {}
+	self.masks.wasp.value = 0
+	self.masks.wasp.qlvl = 0
+	self.masks.wasp.texture_bundle_folder = "gage_pack_snp"
+	self.masks.wasp.dlc = "gage_pack_snp"
+	self.masks.wasp.statistics = false
 	self.masks.skullhard = {}
 	self.masks.skullhard.unit = "units/payday2/masks/msk_skullhard/msk_skullhard"
 	self.masks.skullhard.name_id = "bm_msk_skullhard"
@@ -2759,6 +2796,32 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.electric.value = 0
 	self.materials.electric.global_value = "infamy"
 	self.materials.electric.infamy_lock = "infamy_technician"
+	self.materials.bugshell = {}
+	self.materials.bugshell.name_id = "bm_mtl_bugshell"
+	self.materials.bugshell.pcs = {}
+	self.materials.bugshell.texture = "units/pd2_dlc_gage_snp/materials/matcap_bugshell_df"
+	self.materials.bugshell.material_amount = 0
+	self.materials.bugshell.value = 0
+	self.materials.bugshell.dlc = "gage_pack_snp"
+	self.materials.carapace = {}
+	self.materials.carapace.name_id = "bm_mtl_carapace"
+	self.materials.carapace.pcs = {}
+	self.materials.carapace.texture = "units/pd2_dlc_gage_snp/materials/matcap_carapace_df"
+	self.materials.carapace.value = 0
+	self.materials.carapace.dlc = "gage_pack_snp"
+	self.materials.hardshell = {}
+	self.materials.hardshell.name_id = "bm_mtl_hardshell"
+	self.materials.hardshell.pcs = {}
+	self.materials.hardshell.texture = "units/pd2_dlc_gage_snp/materials/matcap_hardshell_df"
+	self.materials.hardshell.material_amount = 0
+	self.materials.hardshell.value = 0
+	self.materials.hardshell.dlc = "gage_pack_snp"
+	self.materials.insectoid = {}
+	self.materials.insectoid.name_id = "bm_mtl_insectoid"
+	self.materials.insectoid.pcs = {}
+	self.materials.insectoid.texture = "units/pd2_dlc_gage_snp/materials/matcap_insectoid_df"
+	self.materials.insectoid.value = 0
+	self.materials.insectoid.dlc = "gage_pack_snp"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -4061,6 +4124,30 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.warrior.texture = "units/pd2_dlc_gage_lmg/masks/patterns/warrior_df"
 	self.textures.warrior.value = 4
 	self.textures.warrior.dlc = "gage_pack_lmg"
+	self.textures.bugger = {}
+	self.textures.bugger.name_id = "bm_txt_bugger"
+	self.textures.bugger.pcs = {}
+	self.textures.bugger.texture = "units/pd2_dlc_gage_snp/patterns/pattern_bugger_df"
+	self.textures.bugger.value = 0
+	self.textures.bugger.dlc = "gage_pack_snp"
+	self.textures.spidereyes = {}
+	self.textures.spidereyes.name_id = "bm_txt_spidereyes"
+	self.textures.spidereyes.pcs = {}
+	self.textures.spidereyes.texture = "units/pd2_dlc_gage_snp/patterns/pattern_spidereyes_df"
+	self.textures.spidereyes.value = 0
+	self.textures.spidereyes.dlc = "gage_pack_snp"
+	self.textures.venomous = {}
+	self.textures.venomous.name_id = "bm_txt_venomous"
+	self.textures.venomous.pcs = {}
+	self.textures.venomous.texture = "units/pd2_dlc_gage_snp/patterns/pattern_venomous_df"
+	self.textures.venomous.value = 0
+	self.textures.venomous.dlc = "gage_pack_snp"
+	self.textures.wingsofdeath = {}
+	self.textures.wingsofdeath.name_id = "bm_txt_wingsofdeath"
+	self.textures.wingsofdeath.pcs = {}
+	self.textures.wingsofdeath.texture = "units/pd2_dlc_gage_snp/patterns/pattern_wingsofdeath_df"
+	self.textures.wingsofdeath.value = 0
+	self.textures.wingsofdeath.dlc = "gage_pack_snp"
 end
 
 function BlackMarketTweakData:_init_cash()

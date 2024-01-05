@@ -15,6 +15,7 @@ require("lib/units/weapons/MenuSawWeaponBase")
 require("lib/units/weapons/WeaponGadgetBase")
 require("lib/units/weapons/WeaponFlashLight")
 require("lib/units/weapons/WeaponLaser")
+require("lib/units/weapons/WeaponSecondSight")
 core:import("SequenceManager")
 MenuSetup = MenuSetup or class(Setup)
 MenuSetup.IS_START_MENU = true

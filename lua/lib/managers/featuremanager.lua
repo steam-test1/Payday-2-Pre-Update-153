@@ -11,6 +11,7 @@ function FeatureManager:_setup()
 	self._default.announcements.election_changes = 1
 	self._default.announcements.crimenet_welcome = 0
 	self._default.announcements.dlc_gage_pack_jobs = 1
+	self._default.announcements.blackmarket_rename = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -106,6 +107,15 @@ function FeatureManager:dlc_gage_pack_jobs()
 	managers.menu:show_new_message_dialog({
 		title = "menu_feature_crimenet_thanks_gagemod",
 		text = "menu_feature_crimenet_thanks_gagemod_desc"
+	})
+	return true
+end
+
+function FeatureManager:blackmarket_rename()
+	print("FeatureManager:blackmarket_rename()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_blackmarket_rename",
+		text = "menu_feature_blackmarket_rename_desc"
 	})
 	return true
 end

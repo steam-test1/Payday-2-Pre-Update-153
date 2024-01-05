@@ -225,6 +225,20 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.pd2_clan.sort_number = -100
 	self.global_values.pd2_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
 	self.global_values.pd2_clan.category = nil
+	self.global_values.poetry_soundtrack = {}
+	self.global_values.poetry_soundtrack.name_id = "bm_global_value_poetry_soundtrack"
+	self.global_values.poetry_soundtrack.desc_id = "menu_l_global_value_poetry_soundtrack"
+	self.global_values.poetry_soundtrack.unlock_id = "bm_global_value_poetry_soundtrack_unlock"
+	self.global_values.poetry_soundtrack.color = Color(255, 59, 174, 254) / 255
+	self.global_values.poetry_soundtrack.dlc = true
+	self.global_values.poetry_soundtrack.chance = 1
+	self.global_values.poetry_soundtrack.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "poetry_sountrack")
+	self.global_values.poetry_soundtrack.durability_multiplier = 1
+	self.global_values.poetry_soundtrack.drops = true
+	self.global_values.poetry_soundtrack.track = true
+	self.global_values.poetry_soundtrack.sort_number = 40
+	self.global_values.poetry_soundtrack.hide_unavailable = false
+	self.global_values.poetry_soundtrack.category = "dlc"
 	self.global_values.halloween = {}
 	self.global_values.halloween.name_id = "bm_global_value_halloween"
 	self.global_values.halloween.desc_id = "menu_l_global_value_halloween"
@@ -317,6 +331,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.gage_pack_jobs.track = true
 	self.global_values.gage_pack_jobs.sort_number = 82
 	self.global_values.gage_pack_jobs.category = "dlc"
+	self.global_values.gage_pack_snp = {}
+	self.global_values.gage_pack_snp.name_id = "bm_global_value_gage_pack_snp"
+	self.global_values.gage_pack_snp.desc_id = "menu_l_global_value_gage_pack_snp"
+	self.global_values.gage_pack_snp.unlock_id = "bm_global_value_gage_pack_snp_unlock"
+	self.global_values.gage_pack_snp.color = Color(255, 255, 212, 0) / 255
+	self.global_values.gage_pack_snp.dlc = true
+	self.global_values.gage_pack_snp.chance = 1
+	self.global_values.gage_pack_snp.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "gage_pack_snp")
+	self.global_values.gage_pack_snp.durability_multiplier = 1
+	self.global_values.gage_pack_snp.drops = true
+	self.global_values.gage_pack_snp.track = true
+	self.global_values.gage_pack_snp.sort_number = 83
+	self.global_values.gage_pack_snp.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -352,7 +379,9 @@ function LootDropTweakData:init(tweak_data)
 		"armored_transport",
 		"gage_pack",
 		"gage_pack_lmg",
-		"gage_pack_jobs"
+		"gage_pack_jobs",
+		"gage_pack_snp",
+		"poetry_soundtrack"
 	}
 	self.global_value_list_map = {}
 	for i, d in ipairs(self.global_value_list_index) do

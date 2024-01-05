@@ -82,7 +82,7 @@ function HUDMissionBriefing:init(hud, workspace)
 				text = "  ",
 				font = text_font,
 				font_size = text_font_size,
-				align = "left",
+				align = "right",
 				vertical = "center",
 				w = 256,
 				h = text_font_size,
@@ -99,14 +99,69 @@ function HUDMissionBriefing:init(hud, workspace)
 				color = color,
 				y = 1
 			})
+			local detection = slot_panel:panel({
+				name = "detection",
+				layer = 2,
+				visible = false,
+				w = slot_panel:h(),
+				h = slot_panel:h()
+			})
+			local detection_ring_left_bg = detection:bitmap({
+				name = "detection_left_bg",
+				texture = "guis/textures/pd2/mission_briefing/inv_detection_meter",
+				alpha = 0.2,
+				blend_mode = "add",
+				w = detection:w(),
+				h = detection:h()
+			})
+			local detection_ring_right_bg = detection:bitmap({
+				name = "detection_right_bg",
+				texture = "guis/textures/pd2/mission_briefing/inv_detection_meter",
+				alpha = 0.2,
+				blend_mode = "add",
+				w = detection:w(),
+				h = detection:h()
+			})
+			detection_ring_right_bg:set_texture_rect(detection_ring_right_bg:texture_width(), 0, -detection_ring_right_bg:texture_width(), detection_ring_right_bg:texture_height())
+			local detection_ring_left = detection:bitmap({
+				name = "detection_left",
+				texture = "guis/textures/pd2/mission_briefing/inv_detection_meter",
+				render_template = "VertexColorTexturedRadial",
+				blend_mode = "add",
+				layer = 1,
+				w = detection:w(),
+				h = detection:h()
+			})
+			local detection_ring_right = detection:bitmap({
+				name = "detection_right",
+				texture = "guis/textures/pd2/mission_briefing/inv_detection_meter",
+				render_template = "VertexColorTexturedRadial",
+				blend_mode = "add",
+				layer = 1,
+				w = detection:w(),
+				h = detection:h()
+			})
+			detection_ring_right:set_texture_rect(detection_ring_right:texture_width(), 0, -detection_ring_right:texture_width(), detection_ring_right:texture_height())
+			local detection_value = slot_panel:text({
+				name = "detection_value",
+				font_size = text_font_size,
+				font = text_font,
+				color = color,
+				text = " ",
+				blend_mode = "add",
+				align = "left",
+				vertical = "center"
+			})
+			detection:set_left(slot_panel:w() * 0.65)
+			detection_value:set_left(detection:right() + 2)
+			detection_value:set_visible(detection:visible())
 			local _, _, w, _ = criminal:text_rect()
 			voice:set_left(w + 2)
 			criminal:set_w(w)
 			criminal:set_align("right")
 			criminal:set_text("")
 			name:set_left(voice:right() + 2)
-			local x, y, w, h = name:text_rect()
-			status:set_left(name:x() + w)
+			status:set_right(slot_panel:w())
 			infamy:set_left(name:x())
 		end
 		BoxGuiObject:new(self._ready_slot_panel, {
@@ -432,8 +487,6 @@ function HUDMissionBriefing:set_player_slot(nr, params)
 	if params.status then
 		slot:child("status"):set_text(params.status)
 	end
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 end
 
 function HUDMissionBriefing:set_slot_joining(peer, peer_id)
@@ -452,8 +505,6 @@ function HUDMissionBriefing:set_slot_joining(peer, peer_id)
 	slot:child("name"):set_text(peer:name() .. "  ")
 	slot:child("status"):set_visible(true)
 	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_joining"))
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 	local animate_joining = function(o)
 		local t = 0
@@ -477,8 +528,6 @@ function HUDMissionBriefing:set_slot_ready(peer, peer_id)
 	slot:child("status"):set_alpha(1)
 	slot:child("status"):set_color(slot:child("status"):color():with_alpha(1))
 	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_ready"))
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 	managers.menu_component:flash_ready_mission_briefing_gui()
 end
@@ -494,8 +543,6 @@ function HUDMissionBriefing:set_slot_not_ready(peer, peer_id)
 	slot:child("status"):set_alpha(1)
 	slot:child("status"):set_color(slot:child("status"):color():with_alpha(1))
 	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_not_ready"))
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 end
 
@@ -509,13 +556,31 @@ function HUDMissionBriefing:set_dropin_progress(peer_id, progress_percentage)
 	slot:child("status"):set_visible(true)
 	slot:child("status"):set_alpha(1)
 	slot:child("status"):set_text(managers.localization:text("menu_waiting_is_joining") .. " " .. tostring(progress_percentage) .. "%")
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 end
 
 function HUDMissionBriefing:set_kit_selection(peer_id, category, id, slot)
 	print("set_kit_selection( peer_id, category, id, slot )", peer_id, category, id, slot)
+end
+
+function HUDMissionBriefing:set_slot_outfit(peer_id, criminal_name, outfit)
+	print("set_slot_outfit( peer_id, criminal_name, outfit )", peer_id, criminal_name, inspect(outfit))
+	local slot = self._ready_slot_panel:child("slot_" .. tostring(peer_id))
+	if not slot or not alive(slot) then
+		return
+	end
+	local detection, reached = managers.blackmarket:get_suspicion_offset_of_outfit_string(outfit, tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
+	local detection_panel = slot:child("detection")
+	detection_panel:child("detection_left"):set_color(Color(0.5 + detection * 0.5, 1, 1))
+	detection_panel:child("detection_right"):set_color(Color(0.5 + detection * 0.5, 1, 1))
+	detection_panel:set_visible(true)
+	slot:child("detection_value"):set_visible(detection_panel:visible())
+	slot:child("detection_value"):set_text(math.round(detection * 100))
+	if reached then
+		slot:child("detection_value"):set_color(Color(255, 255, 42, 0) / 255)
+	else
+		slot:child("detection_value"):set_color(tweak_data.screen_colors.text)
+	end
 end
 
 function HUDMissionBriefing:set_slot_voice(peer, peer_id, active)
@@ -540,11 +605,11 @@ function HUDMissionBriefing:remove_player_slot_by_peer_id(peer, reason)
 	slot:child("status"):set_text("")
 	slot:child("status"):set_visible(false)
 	slot:child("voice"):set_visible(false)
-	local x, y, w, h = slot:child("name"):text_rect()
-	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
 	slot:child("name"):set_x(slot:child("infamy"):x())
 	slot:child("infamy"):set_visible(false)
+	slot:child("detection"):set_visible(false)
+	slot:child("detection_value"):set_visible(slot:child("detection"):visible())
 end
 
 function HUDMissionBriefing:update_layout()

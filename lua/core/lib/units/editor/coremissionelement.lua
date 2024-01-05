@@ -186,6 +186,9 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 	self._elements_toolbar:connect("DELETE_SELECTED", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_toolbar_remove"), nil)
 	self._elements_toolbar:realize()
 	element_sizer:add(self._elements_toolbar, 0, 1, "EXPAND,LEFT")
+	if not self.ON_EXECUTED_ALTERNATIVES and self._create_dynamic_on_executed_alternatives then
+		self:_create_dynamic_on_executed_alternatives()
+	end
 	if self.ON_EXECUTED_ALTERNATIVES then
 		local on_executed_alternatives_params = {
 			name = "Alternative:",

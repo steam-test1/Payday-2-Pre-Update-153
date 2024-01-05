@@ -35,6 +35,10 @@ function BaseInteractionExt:refresh_material()
 	end
 end
 
+function BaseInteractionExt:external_upd_interaction_topology()
+	self:_upd_interaction_topology()
+end
+
 function BaseInteractionExt:_upd_interaction_topology()
 	if self._tweak_data.interaction_obj then
 		self._interact_obj = self._unit:get_object(self._tweak_data.interaction_obj)
@@ -280,7 +284,8 @@ function BaseInteractionExt:check_interupt()
 end
 
 function BaseInteractionExt:interact_interupt(player, complete)
-	self:_post_event(player, "sound_interupt")
+	local tweak_data_id = self._tweak_data_at_interact_start ~= self.tweak_data and self._tweak_data_at_interact_start
+	self:_post_event(player, "sound_interupt", tweak_data_id)
 	if self._interact_say_clbk then
 		managers.enemy:remove_delayed_clbk(self._interact_say_clbk)
 		self._interact_say_clbk = nil
@@ -288,25 +293,32 @@ function BaseInteractionExt:interact_interupt(player, complete)
 	self:_at_interact_interupt(player, complete)
 end
 
-function BaseInteractionExt:_post_event(player, sound_type)
+function BaseInteractionExt:_post_event(player, sound_type, tweak_data_id)
 	if not alive(player) then
 		return
 	end
 	if player ~= managers.player:player_unit() then
 		return
 	end
-	if self._tweak_data[sound_type] then
-		player:sound():play(self._tweak_data[sound_type])
+	local tweak_data_table = self._tweak_data
+	if tweak_data_id then
+		tweak_data_table = tweak_data.interaction[tweak_data_id]
+	end
+	if tweak_data_table[sound_type] then
+		player:sound():play(tweak_data_table[sound_type])
 	end
 end
 
 function BaseInteractionExt:_at_interact_start()
+	self._tweak_data_at_interact_start = self.tweak_data
 end
 
 function BaseInteractionExt:_at_interact_interupt(player, complete)
+	self._tweak_data_at_interact_start = nil
 end
 
 function BaseInteractionExt:interact(player)
+	self._tweak_data_at_interact_start = nil
 	self:_post_event(player, "sound_done")
 end
 
@@ -559,6 +571,7 @@ function ReviveInteractionExt:init(unit, ...)
 end
 
 function ReviveInteractionExt:_at_interact_start(player, timer)
+	ReviveInteractionExt.super._at_interact_start(self, player, timer)
 	if self.tweak_data == "revive" then
 		self:_at_interact_start_revive(player, timer)
 	elseif self.tweak_data == "free" then
@@ -595,6 +608,7 @@ function ReviveInteractionExt:_at_interact_start_free(player)
 end
 
 function ReviveInteractionExt:_at_interact_interupt(player, complete)
+	ReviveInteractionExt.super._at_interact_interupt(self, player, complete)
 	if self.tweak_data == "revive" then
 		self:_at_interact_interupt_revive(player)
 	elseif self.tweak_data == "free" then
@@ -953,6 +967,38 @@ function SecurityCameraInteractionExt:sync_interacted(peer, player, status, skip
 	end
 end
 
+ZipLineInteractionExt = ZipLineInteractionExt or class(UseInteractionExt)
+
+function ZipLineInteractionExt:can_select(player)
+	return ZipLineInteractionExt.super.can_select(self, player)
+end
+
+function ZipLineInteractionExt:check_interupt()
+	if alive(self._unit:zipline():user_unit()) then
+		return true
+	end
+	return ZipLineInteractionExt.super.check_interupt(self)
+end
+
+function ZipLineInteractionExt:_interact_blocked(player)
+	if self._unit:zipline():is_usage_type_bag() and not managers.player:is_carrying() then
+		return true, nil, "zipline_no_bag"
+	end
+	if player:movement():in_air() then
+		return true, nil, nil
+	end
+	if self._unit:zipline():is_interact_blocked() then
+		return true, nil, nil
+	end
+	return false
+end
+
+function ZipLineInteractionExt:interact(player)
+	ZipLineInteractionExt.super.super.interact(self, player)
+	print("ZipLineInteractionExt:interact")
+	self._unit:zipline():on_interacted(player)
+end
+
 IntimitateInteractionExt = IntimitateInteractionExt or class(BaseInteractionExt)
 IntimitateInteractionExt.drop_in_sync_tweak_data = true
 
@@ -1001,14 +1047,15 @@ function IntimitateInteractionExt:interact(player)
 		end
 		self:remove_interact()
 	elseif self.tweak_data == "corpse_dispose" then
-		managers.player:set_carry("person", 1)
+		managers.player:set_carry("person", 0)
 		managers.player:on_used_body_bag()
 		local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
 		if Network:is_server() then
 			self:remove_interact()
 			self:set_active(false, true)
 			self._unit:set_slot(0)
-			managers.network:session():send_to_peers_synched("remove_corpse_by_id", u_id)
+			managers.network:session():send_to_peers_synched("remove_corpse_by_id", u_id, true, managers.network:session():local_peer():id())
+			managers.player:register_carry(managers.network:session():local_peer():id(), "person")
 		else
 			managers.network:session():send_to_host("sync_interacted_by_id", u_id, self.tweak_data)
 			player:movement():set_carry_restriction(true)
@@ -1175,11 +1222,14 @@ function IntimitateInteractionExt:sync_interacted(peer, player, status, skip_ali
 			end
 		end
 	elseif self.tweak_data == "corpse_dispose" then
+		if peer then
+			managers.player:register_carry(peer:id(), "person")
+		end
 		self:remove_interact()
 		self:set_active(false, true)
 		local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
 		self._unit:set_slot(0)
-		managers.network:session():send_to_peers_synched("remove_corpse_by_id", u_id)
+		managers.network:session():send_to_peers_synched("remove_corpse_by_id", u_id, true, peer:id())
 		if Network:is_server() and peer then
 			peer:on_used_body_bags()
 		end
@@ -1238,15 +1288,15 @@ end
 CarryInteractionExt = CarryInteractionExt or class(UseInteractionExt)
 
 function CarryInteractionExt:_interact_blocked(player)
-	local by_cooldown = managers.player:carry_blocked_by_cooldown()
-	if managers.player:is_carrying() or by_cooldown then
-		return true, by_cooldown
+	local silent_block = managers.player:carry_blocked_by_cooldown() or self._unit:carry_data():is_attached_to_zipline_unit()
+	if managers.player:is_carrying() or silent_block then
+		return true, silent_block
 	end
 	return not managers.player:can_carry(self._unit:carry_data():carry_id())
 end
 
 function CarryInteractionExt:can_select(player)
-	if managers.player:is_carrying() or managers.player:carry_blocked_by_cooldown() then
+	if managers.player:is_carrying() or managers.player:carry_blocked_by_cooldown() or self._unit:carry_data():is_attached_to_zipline_unit() then
 		return false
 	end
 	return CarryInteractionExt.super.can_select(self, player)
@@ -1257,9 +1307,10 @@ function CarryInteractionExt:interact(player)
 	if self._has_modified_timer then
 		managers.achievment:award("murphys_laws")
 	end
-	managers.player:set_carry(self._unit:carry_data():carry_id(), self._unit:carry_data():value(), self._unit:carry_data():dye_pack_data())
+	managers.player:set_carry(self._unit:carry_data():carry_id(), self._unit:carry_data():multiplier(), self._unit:carry_data():dye_pack_data())
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
 	self:sync_interacted(nil, player)
+	managers.player:register_carry(managers.network:session():local_peer():id(), self._unit:carry_data() and self._unit:carry_data():carry_id())
 	if Network:is_client() then
 		player:movement():set_carry_restriction(true)
 	else
@@ -1269,6 +1320,9 @@ end
 
 function CarryInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
 	player = player or managers.network:game():member(peer:id()):unit()
+	if peer and not managers.player:register_carry(peer:id(), self._unit:carry_data() and self._unit:carry_data():carry_id()) then
+		return
+	end
 	if self._unit:damage():has_sequence("interact") then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
 	end

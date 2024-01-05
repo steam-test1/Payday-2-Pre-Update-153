@@ -15,6 +15,7 @@ function GamePlayCentralManager:init()
 	self._play_effects = {}
 	self._play_sounds = {}
 	self._footsteps = {}
+	self._queue_fire_raycast = {}
 	self._effect_manager = World:effect_manager()
 	self._slotmask_flesh = managers.slot:get_mask("flesh")
 	self._slotmask_world_geometry = managers.slot:get_mask("world_geometry")
@@ -166,6 +167,7 @@ function GamePlayCentralManager:end_update(t, dt)
 	self:_flush_play_effects()
 	self:_flush_play_sounds()
 	self:_flush_footsteps()
+	self:_flush_queue_fire_raycast()
 end
 
 function GamePlayCentralManager:play_impact_sound_and_effects(params)
@@ -507,6 +509,74 @@ end
 function GamePlayCentralManager:sync_heist_time(heist_time)
 	self._heist_timer.offset_time = heist_time
 	self._heist_timer.start_time = Application:time()
+end
+
+function GamePlayCentralManager:queue_fire_raycast(expire_t, weapon_unit, ...)
+	self._queue_fire_raycast = self._queue_fire_raycast or {}
+	local data = {
+		expire_t = expire_t,
+		weapon_unit = weapon_unit,
+		data = {
+			...
+		}
+	}
+	table.insert(self._queue_fire_raycast, data)
+end
+
+function GamePlayCentralManager:_flush_queue_fire_raycast()
+	local i = 1
+	while i <= #self._queue_fire_raycast do
+		local ray_data = self._queue_fire_raycast[i]
+		if ray_data.expire_t < Application:time() then
+			table.remove(self._queue_fire_raycast, i)
+			local data = ray_data.data
+			local user_unit = data[1]
+			if alive(ray_data.weapon_unit) and alive(user_unit) then
+				ray_data.weapon_unit:base():_fire_raycast(unpack(data))
+			end
+		else
+			i = i + 1
+		end
+	end
+end
+
+function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades)
+	self._auto_highlighted_enemies = self._auto_highlighted_enemies or {}
+	if self._auto_highlighted_enemies[unit:key()] and self._auto_highlighted_enemies[unit:key()] > Application:time() then
+		return false
+	end
+	self._auto_highlighted_enemies[unit:key()] = Application:time() + (managers.groupai:state():whisper_mode() and 9 or 4)
+	if not unit:contour() then
+		debug_pause_unit(unit, "[GamePlayCentralManager:auto_highlight_enemy]: Unit doesn't have Contour Extension")
+	end
+	local contour_type = use_player_upgrades and managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy"
+	local time_multiplier = use_player_upgrades and managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1) or 1
+	unit:contour():add(contour_type, true, time_multiplier)
+	return true
+end
+
+function GamePlayCentralManager:do_shotgun_push(unit, hit_pos, dir, distance)
+	if 500 < distance then
+		return
+	end
+	if unit:movement()._active_actions[1] and unit:movement()._active_actions[1]:type() == "hurt" then
+		unit:movement()._active_actions[1]:force_ragdoll()
+	end
+	local scale = math.clamp(1 - distance / 500, 0.5, 1)
+	local height = mvector3.distance(hit_pos, unit:position()) - 100
+	local twist_dir = math.random(2) == 1 and 1 or -1
+	local rot_acc = (dir:cross(math.UP) + math.UP * (0.5 * twist_dir)) * (-1000 * math.sign(height))
+	local rot_time = 1 + math.rand(2)
+	local nr_u_bodies = unit:num_bodies()
+	local i_u_body = 0
+	while nr_u_bodies > i_u_body do
+		local u_body = unit:body(i_u_body)
+		if u_body:enabled() and u_body:dynamic() then
+			local body_mass = u_body:mass()
+			World:play_physic_effect(Idstring("physic_effects/shotgun_hit"), u_body, Vector3(dir.x, dir.y, dir.z + 0.5) * 600 * scale, 4 * body_mass / math.random(2), rot_acc, rot_time)
+		end
+		i_u_body = i_u_body + 1
+	end
 end
 
 function GamePlayCentralManager:save(data)

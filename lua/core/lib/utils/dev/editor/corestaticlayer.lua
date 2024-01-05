@@ -142,6 +142,9 @@ function StaticLayer:_on_unit_moved(unit, pos)
 		unit:set_position(pos)
 		unit:ladder():set_config()
 	end
+	if unit:zipline() then
+		unit:zipline():set_start_pos(pos)
+	end
 end
 
 function StaticLayer:_on_unit_rotated(unit, rot)

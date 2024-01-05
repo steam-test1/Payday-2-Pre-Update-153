@@ -208,7 +208,7 @@ function CopActionTase:update(t)
 		})
 		if self._tasing_local_unit and mvector3.distance(shoot_from_pos, target_pos) < self._w_usage_tweak.tase_distance then
 			local record = managers.groupai:state():criminal_record(self._tasing_local_unit:key())
-			if not record or record.status or self._tasing_local_unit:movement():chk_action_forbidden("hurt") then
+			if not record or record.status or self._tasing_local_unit:movement():chk_action_forbidden("hurt") or self._tasing_local_unit:movement():zipline_unit() then
 				if Network:is_server() then
 					self._expired = true
 				end

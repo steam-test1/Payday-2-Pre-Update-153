@@ -7,7 +7,11 @@ local mvec3_dot = mvector3.dot
 local mvec3_set_z = mvector3.set_z
 local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
+local tmp_rot1 = Rotation()
+local tmp_rot2 = Rotation()
+local tmp_rot3 = Rotation()
 HuskPlayerMovement = HuskPlayerMovement or class()
+HuskPlayerMovement._ids_base = Idstring("base")
 HuskPlayerMovement._calc_suspicion_ratio_and_sync = PlayerMovement._calc_suspicion_ratio_and_sync
 HuskPlayerMovement.on_suspicion = PlayerMovement.on_suspicion
 HuskPlayerMovement.state_enter_time = PlayerMovement.state_enter_time
@@ -389,7 +393,7 @@ function HuskPlayerMovement:sync_look_dir(fwd)
 end
 
 function HuskPlayerMovement:set_look_dir_instant(fwd)
-	self._look_dir = fwd
+	mvector3.set(self._look_dir, fwd)
 	self._look_modifier:set_target_y(self._look_dir)
 	self._sync_look_dir = nil
 end
@@ -495,7 +499,7 @@ function HuskPlayerMovement:play_redirect(redirect_name, at_time)
 	if result then
 		return result
 	end
-	print("[HuskPlayerMovement:play_redirect] redirect", redirect_name, "failed in", self._machine:segment_state(Idstring("base")), self._machine:segment_state(Idstring("upper_body")))
+	print("[HuskPlayerMovement:play_redirect] redirect", redirect_name, "failed in", self._machine:segment_state(self._ids_base), self._machine:segment_state(Idstring("upper_body")))
 	Application:stack_dump()
 end
 
@@ -505,7 +509,7 @@ function HuskPlayerMovement:play_redirect_idstr(redirect_name, at_time)
 	if result then
 		return result
 	end
-	print("[HuskPlayerMovement:play_redirect_idstr] redirect", redirect_name, "failed in", self._machine:segment_state(Idstring("base")), self._machine:segment_state(Idstring("upper_body")))
+	print("[HuskPlayerMovement:play_redirect_idstr] redirect", redirect_name, "failed in", self._machine:segment_state(self._ids_base), self._machine:segment_state(Idstring("upper_body")))
 	Application:stack_dump()
 end
 
@@ -515,7 +519,7 @@ function HuskPlayerMovement:play_state(state_name, at_time)
 	if result then
 		return result
 	end
-	print("[HuskPlayerMovement:play_state] state", state_name, "failed in", self._machine:segment_state(Idstring("base")), self._machine:segment_state(Idstring("upper_body")))
+	print("[HuskPlayerMovement:play_state] state", state_name, "failed in", self._machine:segment_state(self._ids_base), self._machine:segment_state(Idstring("upper_body")))
 	Application:stack_dump()
 end
 
@@ -525,7 +529,7 @@ function HuskPlayerMovement:play_state_idstr(state_name, at_time)
 	if result then
 		return result
 	end
-	print("[HuskPlayerMovement:play_state_idstr] state", state_name, "failed in", self._machine:segment_state(Idstring("base")), self._machine:segment_state(Idstring("upper_body")))
+	print("[HuskPlayerMovement:play_state_idstr] state", state_name, "failed in", self._machine:segment_state(self._ids_base), self._machine:segment_state(Idstring("upper_body")))
 	Application:stack_dump()
 end
 
@@ -735,15 +739,15 @@ function HuskPlayerMovement:_upd_attention_mask_off(dt)
 		self._machine:force_modifier(self._mask_off_modifier_name)
 	end
 	if self._sync_look_dir then
-		local arror_angle = self._sync_look_dir:angle(self._look_dir)
-		local rot_speed_rel = math.pow(math.min(arror_angle / 90, 1), 0.5)
+		local error_angle = self._sync_look_dir:angle(self._look_dir)
+		local rot_speed_rel = math.pow(math.min(error_angle / 90, 1), 0.5)
 		local rot_speed = math.lerp(40, 360, rot_speed_rel)
-		local rot_amount = math.min(rot_speed * dt, arror_angle)
+		local rot_amount = math.min(rot_speed * dt, error_angle)
 		local error_axis = self._look_dir:cross(self._sync_look_dir)
 		local rot_adj = Rotation(error_axis, rot_amount)
 		self._look_dir = self._look_dir:rotate_with(rot_adj)
 		self._mask_off_modifier:set_target_z(self._look_dir)
-		if rot_amount == arror_angle then
+		if rot_amount == error_angle then
 			self._sync_look_dir = nil
 		end
 	end
@@ -778,15 +782,15 @@ function HuskPlayerMovement:_upd_attention_standard(dt)
 				mvector3.rotate_with(tar_look_dir, Rotation(min_spin - hips_err_spin))
 			end
 		end
-		local arror_angle = tar_look_dir:angle(self._look_dir)
-		local rot_speed_rel = math.pow(math.min(arror_angle / 90, 1), 0.5)
+		local error_angle = tar_look_dir:angle(self._look_dir)
+		local rot_speed_rel = math.pow(math.min(error_angle / 90, 1), 0.5)
 		local rot_speed = math.lerp(40, 360, rot_speed_rel)
-		local rot_amount = math.min(rot_speed * dt, arror_angle)
+		local rot_amount = math.min(rot_speed * dt, error_angle)
 		local error_axis = self._look_dir:cross(tar_look_dir)
 		local rot_adj = Rotation(error_axis, rot_amount)
 		self._look_dir = self._look_dir:rotate_with(rot_adj)
 		self._look_modifier:set_target_y(self._look_dir)
-		if rot_amount == arror_angle and not wait_for_turn then
+		if rot_amount == error_angle and not wait_for_turn then
 			self._sync_look_dir = nil
 		end
 	end
@@ -814,10 +818,10 @@ function HuskPlayerMovement:_upd_attention_bleedout(dt)
 			self._machine:force_modifier(self._head_modifier_name)
 			self._machine:force_modifier(self._arm_modifier_name)
 		end
-		local arror_angle = self._sync_look_dir:angle(self._look_dir)
-		local rot_speed_rel = math.pow(math.min(arror_angle / 90, 1), 0.5)
+		local error_angle = self._sync_look_dir:angle(self._look_dir)
+		local rot_speed_rel = math.pow(math.min(error_angle / 90, 1), 0.5)
 		local rot_speed = math.lerp(40, 360, rot_speed_rel)
-		local rot_amount = math.min(rot_speed * dt, arror_angle)
+		local rot_amount = math.min(rot_speed * dt, error_angle)
 		local error_axis = self._look_dir:cross(self._sync_look_dir)
 		local rot_adj = Rotation(error_axis, rot_amount)
 		self._look_dir = self._look_dir:rotate_with(rot_adj)
@@ -825,7 +829,7 @@ function HuskPlayerMovement:_upd_attention_bleedout(dt)
 		self._head_modifier:set_target_z(self._look_dir)
 		local aim_polar = self._look_dir:to_polar_with_reference(fwd, math.UP)
 		local aim_spin = aim_polar.spin
-		local anim = self._machine:segment_state(Idstring("base"))
+		local anim = self._machine:segment_state(self._ids_base)
 		local fwd = 1 - math.clamp(math.abs(aim_spin / 90), 0, 1)
 		self._machine:set_parameter(anim, "angle0", fwd)
 		local bwd = math.clamp(math.abs(aim_spin / 90), 1, 2) - 1
@@ -834,9 +838,85 @@ function HuskPlayerMovement:_upd_attention_bleedout(dt)
 		self._machine:set_parameter(anim, "angle90neg", l)
 		local r = 1 - math.clamp(math.abs(aim_spin / 90 + 1), 0, 1)
 		self._machine:set_parameter(anim, "angle90", r)
-		if rot_amount == arror_angle then
+		if rot_amount == error_angle then
 			self._sync_look_dir = nil
 		end
+	end
+end
+
+function HuskPlayerMovement:_upd_attention_zipline(dt)
+	if self._sync_look_dir then
+		if self._atention_on then
+			if self._ext_anim.reload then
+				self._atention_on = false
+				local blend_out_t = 0.15
+				self._machine:set_modifier_blend(self._head_modifier_name, blend_out_t)
+				self._machine:set_modifier_blend(self._arm_modifier_name, blend_out_t)
+				self._machine:forbid_modifier(self._head_modifier_name)
+				self._machine:forbid_modifier(self._arm_modifier_name)
+			end
+		elseif self._ext_anim.reload then
+			if self._sync_look_dir ~= self._look_dir then
+				self._look_dir = mvector3.copy(self._sync_look_dir)
+			end
+			return
+		else
+			self._atention_on = true
+			self._machine:force_modifier(self._head_modifier_name)
+			self._machine:force_modifier(self._arm_modifier_name)
+		end
+		local max_yaw_from_rp = 90
+		local min_yaw_from_rp = -90
+		local root_yaw = mrotation.yaw(self._m_rot)
+		local look_rot = tmp_rot1
+		mrotation.set_look_at(look_rot, self._sync_look_dir, math.UP)
+		local look_yaw = mrotation.yaw(look_rot)
+		local look_yaw_relative = look_yaw - root_yaw
+		if math.abs(look_yaw_relative) > 180 then
+			look_yaw_relative = look_yaw_relative - math.sign(look_yaw_relative) * 180
+		end
+		local out_of_bounds
+		if max_yaw_from_rp < look_yaw_relative or min_yaw_from_rp > look_yaw_relative then
+			out_of_bounds = true
+			look_yaw_relative = math.clamp(look_yaw_relative, min_yaw_from_rp, max_yaw_from_rp)
+		end
+		local old_look_rot = tmp_rot2
+		mrotation.set_look_at(old_look_rot, self._look_dir, math.UP)
+		local old_look_yaw = mrotation.yaw(old_look_rot)
+		local old_look_yaw_relative = old_look_yaw - root_yaw
+		if math.abs(old_look_yaw_relative) > 180 then
+			old_look_yaw_relative = old_look_yaw_relative - math.sign(old_look_yaw_relative) * 180
+		end
+		local yaw_diff = look_yaw_relative - old_look_yaw_relative
+		local pitch_diff = mrotation.pitch(look_rot) - mrotation.pitch(old_look_rot)
+		local yaw_step = math.lerp(40, 400, (math.min(math.abs(yaw_diff), 20) / 20) ^ 2) * dt
+		yaw_step = math.sign(yaw_diff) * math.min(yaw_step, math.abs(yaw_diff))
+		local pitch_step = math.lerp(30, 250, (math.min(math.abs(pitch_diff), 20) / 20) ^ 2) * dt
+		pitch_step = math.sign(pitch_diff) * math.min(pitch_step, math.abs(pitch_diff))
+		local new_yaw = old_look_yaw + yaw_step
+		local out_of_bounds
+		if max_yaw_from_rp < new_yaw - root_yaw or min_yaw_from_rp > new_yaw - root_yaw then
+			new_yaw = math.clamp(new_yaw, min_yaw_from_rp, max_yaw_from_rp)
+		end
+		if look_yaw_relative == 0 and new_yaw == look_yaw and pitch_diff == pitch_step and not out_of_bounds then
+			self._sync_look_dir = nil
+		end
+		local new_rot = tmp_rot3
+		mrotation.set_yaw_pitch_roll(new_rot, new_yaw, mrotation.pitch(old_look_rot) + pitch_step, 0)
+		mrotation.y(new_rot, self._look_dir)
+		self._arm_modifier:set_target_y(self._look_dir)
+		self._head_modifier:set_target_z(self._look_dir)
+		local aim_spin = new_yaw - root_yaw
+		if math.abs(aim_spin) > 180 then
+			aim_spin = aim_spin - math.sign(aim_spin) * 180
+		end
+		local anim = self._machine:segment_state(self._ids_base)
+		local fwd = 1 - math.clamp(math.abs(aim_spin / 90), 0, 1)
+		local l = math.clamp(aim_spin / max_yaw_from_rp, 0, 1)
+		local r = math.clamp(aim_spin / min_yaw_from_rp, 0, 1)
+		self._machine:set_parameter(anim, "fwd", fwd)
+		self._machine:set_parameter(anim, "l", l)
+		self._machine:set_parameter(anim, "r", r)
 	end
 end
 
@@ -886,8 +966,13 @@ function HuskPlayerMovement:_upd_sequenced_events(t, dt)
 		if self:_start_dead(next_event) then
 			table.remove(sequenced_events, 1)
 		end
-	elseif event_type == "arrested" and self:_start_arrested(next_event) then
-		table.remove(sequenced_events, 1)
+	elseif event_type == "arrested" then
+		if self:_start_arrested(next_event) then
+			table.remove(sequenced_events, 1)
+		end
+	elseif event_type == "zipline" then
+		next_event.commencing = true
+		self:_start_zipline(next_event)
 	end
 end
 
@@ -984,6 +1069,10 @@ function HuskPlayerMovement:_upd_move_standard(t, dt)
 	if self._pose_code == 1 then
 		if not self._ext_anim.stand then
 			self:play_redirect("stand")
+		end
+	elseif self._pose_code == 3 then
+		if not self._ext_anim.prone then
+			self:play_redirect("prone")
 		end
 	elseif not self._ext_anim.crouch then
 		self:play_redirect("crouch")
@@ -1113,7 +1202,7 @@ function HuskPlayerMovement:_upd_move_standard(t, dt)
 			local pose = self._ext_anim.pose
 			local stance = self._stance.name
 			if not (self._walk_anim_velocities[pose] and self._walk_anim_velocities[pose][stance] and self._walk_anim_velocities[pose][stance][anim_velocity]) or not self._walk_anim_velocities[pose][stance][anim_velocity][anim_side] then
-				debug_pause_unit(self._unit, "Boom...", self._unit, "pose", pose, "stance", stance, "anim_velocity", anim_velocity, "anim_side", anim_side, self._machine:segment_state(Idstring("base")))
+				debug_pause_unit(self._unit, "Boom...", self._unit, "pose", pose, "stance", stance, "anim_velocity", anim_velocity, "anim_side", anim_side, self._machine:segment_state(self._ids_base))
 				return
 			end
 			local animated_walk_vel = self._walk_anim_velocities[pose][stance][anim_velocity][anim_side]
@@ -1146,9 +1235,37 @@ function HuskPlayerMovement:_upd_move_standard(t, dt)
 			self._unit:set_driving("animation")
 			self._machine:set_root_blending(false)
 		else
-			debug_pause_unit(self._unit, "[HuskPlayerMovement:_upd_move_standard] ", redir_name, " redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+			debug_pause_unit(self._unit, "[HuskPlayerMovement:_upd_move_standard] ", redir_name, " redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		end
 	end
+end
+
+function HuskPlayerMovement:_upd_move_zipline(t, dt)
+	if self._load_data then
+		return
+	end
+	if not self._ext_anim.zipline then
+		self:play_redirect("zipline")
+	end
+	local event_desc = self._sequenced_events[1]
+	event_desc.current_time = math.min(1, event_desc.current_time + dt / event_desc.zipline_unit:zipline():total_time())
+	self:set_position(event_desc.zipline_unit:zipline():update_and_get_pos_at_time(event_desc.current_time))
+	if event_desc.current_time == 1 then
+		self:on_exit_zipline()
+	end
+	local look_rot = tmp_rot1
+	mrotation.set_look_at(look_rot, self._look_dir, math.UP)
+	local look_yaw = mrotation.yaw(look_rot)
+	local root_yaw = mrotation.yaw(self._m_rot)
+	if math.abs(look_yaw - root_yaw) > 180 then
+		root_yaw = root_yaw - math.sign(root_yaw) * 180
+	end
+	local yaw_diff = look_yaw - root_yaw
+	local step = math.lerp(20, 220, math.min(math.abs(yaw_diff), 30) / 30) * dt
+	step = math.sign(yaw_diff) * math.min(step, math.abs(yaw_diff))
+	local new_rot = tmp_rot1
+	mrotation.set_yaw_pitch_roll(new_rot, root_yaw + step, 0, 0)
+	self:set_rotation(new_rot)
 end
 
 function HuskPlayerMovement:_adjust_move_anim(side, speed)
@@ -1160,11 +1277,11 @@ function HuskPlayerMovement:_adjust_move_anim(side, speed)
 	local enter_t
 	local move_side = anim_data.move_side
 	if move_side and (side == move_side or self._matching_walk_anims[side][move_side]) then
-		local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
+		local seg_rel_t = self._machine:segment_relative_time(self._ids_base)
 		local pose = self._ext_anim.pose
 		local stance = self._stance.name
 		if not (self._walk_anim_lengths[pose] and self._walk_anim_lengths[pose][stance] and self._walk_anim_lengths[pose][stance][speed]) or not self._walk_anim_lengths[pose][stance][speed][side] then
-			debug_pause_unit(self._unit, "[HuskPlayerMovement:_adjust_move_anim] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "side", side, self._machine:segment_state(Idstring("base")))
+			debug_pause_unit(self._unit, "[HuskPlayerMovement:_adjust_move_anim] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "side", side, self._machine:segment_state(self._ids_base))
 			return
 		end
 		local walk_anim_length = self._walk_anim_lengths[pose][stance][speed][side]
@@ -1306,7 +1423,7 @@ end
 function HuskPlayerMovement:_start_bleedout(event_desc)
 	local redir_res = self:play_redirect("bleedout")
 	if not redir_res then
-		print("[HuskPlayerMovement:_start_bleedout] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+		print("[HuskPlayerMovement:_start_bleedout] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		return
 	end
 	self._unit:set_slot(3)
@@ -1329,7 +1446,7 @@ end
 function HuskPlayerMovement:_start_tased(event_desc)
 	local redir_res = self:play_redirect("tased")
 	if not redir_res then
-		print("[HuskPlayerMovement:_start_tased] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+		print("[HuskPlayerMovement:_start_tased] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		return
 	end
 	self._unit:set_slot(3)
@@ -1353,7 +1470,7 @@ end
 function HuskPlayerMovement:_start_fatal(event_desc)
 	local redir_res = self:play_redirect("fatal")
 	if not redir_res then
-		print("[HuskPlayerMovement:_start_fatal] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+		print("[HuskPlayerMovement:_start_fatal] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		return
 	end
 	self._unit:set_slot(5)
@@ -1376,7 +1493,7 @@ end
 function HuskPlayerMovement:_start_incapacitated(event_desc)
 	local redir_res = self:play_redirect("incapacitated")
 	if not redir_res then
-		print("[HuskPlayerMovement:_start_incapacitated] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+		print("[HuskPlayerMovement:_start_incapacitated] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		return
 	end
 	self:set_need_revive(true)
@@ -1395,7 +1512,7 @@ end
 function HuskPlayerMovement:_start_dead(event_desc)
 	local redir_res = self:play_redirect("death")
 	if not redir_res then
-		print("[HuskPlayerMovement:_start_dead] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+		print("[HuskPlayerMovement:_start_dead] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 		return
 	end
 	if self._atention_on then
@@ -1418,7 +1535,7 @@ function HuskPlayerMovement:_start_arrested(event_desc)
 	if not self._ext_anim.hands_tied then
 		local redir_res = self:play_redirect("tied")
 		if not redir_res then
-			print("[HuskPlayerMovement:_start_arrested] redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+			print("[HuskPlayerMovement:_start_arrested] redirect failed in", self._machine:segment_state(self._ids_base), self._unit)
 			return
 		end
 	end
@@ -1440,7 +1557,7 @@ function HuskPlayerMovement:_start_arrested(event_desc)
 end
 
 function HuskPlayerMovement:_adjust_walk_anim_speed(dt, target_speed)
-	local state = self._machine:segment_state(Idstring("base"))
+	local state = self._machine:segment_state(self._ids_base)
 	local cur_speed = self._machine:get_speed(state)
 	local max = 2
 	local min = 0.05
@@ -1524,7 +1641,8 @@ function HuskPlayerMovement:_change_stance(stance_code, delayed_shot)
 end
 
 function HuskPlayerMovement:_change_pose(pose_code)
-	local redirect = pose_code == 1 and "stand" or "crouch"
+	local redirect = pose_code == 1 and "stand" or pose_code == 3 and "prone" or "crouch"
+	print("pose_code", pose_code, redirect)
 	self._pose_code = pose_code
 	if self._ext_anim[redirect] then
 		return
@@ -1535,12 +1653,12 @@ function HuskPlayerMovement:_change_pose(pose_code)
 	local enter_t
 	local move_side = self._ext_anim.move_side
 	if move_side then
-		local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
+		local seg_rel_t = self._machine:segment_relative_time(self._ids_base)
 		local speed = self._ext_anim.run and "run" or "walk"
 		local pose = self._ext_anim.pose
 		local stance = self._stance.name
 		if not (self._walk_anim_lengths[pose] and self._walk_anim_lengths[pose][stance] and self._walk_anim_lengths[pose][stance][speed]) or not self._walk_anim_lengths[pose][stance][speed][move_side] then
-			debug_pause_unit(self._unit, "[HuskPlayerMovement:_change_pose] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "move_side", move_side, self._machine:segment_state(Idstring("base")))
+			debug_pause_unit(self._unit, "[HuskPlayerMovement:_change_pose] Boom...", self._unit, "pose", pose, "stance", stance, "speed", speed, "move_side", move_side, self._machine:segment_state(self._ids_base))
 			return
 		end
 		local walk_anim_length = self._walk_anim_lengths[self._ext_anim.pose][self._stance.name][speed][move_side]
@@ -1692,6 +1810,9 @@ function HuskPlayerMovement:_post_load(unit, t, dt)
 		local unit_rot = Rotation(my_data.look_fwd:with_z(0), math.UP)
 		self:set_rotation(unit_rot)
 		self:set_look_dir_instant(my_data.look_fwd)
+		if data.zip_line_unit_id then
+			self:on_enter_zipline(managers.worlddefinition:get_unit_on_load(data.zip_line_unit_id, callback(self, self, "on_enter_zipline")))
+		end
 	end
 end
 
@@ -1706,6 +1827,7 @@ function HuskPlayerMovement:save(data)
 		character_name = managers.criminals:character_name_by_unit(self._unit),
 		outfit = managers.network:session():peer(peer_id):profile("outfit_string")
 	}
+	data.zip_line_unit_id = self:zipline_unit() and self:zipline_unit():editor_id()
 	data.down_time = self._last_down_time
 end
 
@@ -1915,4 +2037,47 @@ function HuskPlayerMovement:_chk_groun_ray()
 	mvec3_mul(down_pos, -20)
 	mvec3_add(down_pos, self._m_pos)
 	return World:raycast("ray", up_pos, down_pos, "slot_mask", self._slotmask_gnd_ray, "ray_type", "walk", "report")
+end
+
+function HuskPlayerMovement:on_enter_zipline(zipline_unit)
+	local event_desc = {type = "zipline", zipline_unit = zipline_unit}
+	self:_add_sequenced_event(event_desc)
+end
+
+function HuskPlayerMovement:on_exit_zipline()
+	local event_desc = self._sequenced_events[1]
+	if alive(event_desc.zipline_unit) then
+	end
+	table.remove(self._sequenced_events, 1)
+	if self._atention_on then
+		self._machine:forbid_modifier(self._look_modifier_name)
+		self._machine:forbid_modifier(self._head_modifier_name)
+		self._machine:forbid_modifier(self._arm_modifier_name)
+		self._machine:forbid_modifier(self._mask_off_modifier_name)
+		self._atention_on = false
+	end
+	self._look_modifier:set_target_y(self._look_dir)
+	self._attention_updator = callback(self, self, "_upd_attention_standard")
+	self._movement_updator = callback(self, self, "_upd_move_standard")
+end
+
+function HuskPlayerMovement:_start_zipline(event_desc)
+	event_desc.current_time = event_desc.zipline_unit:zipline():current_time()
+	if self._atention_on then
+		self._machine:forbid_modifier(self._look_modifier_name)
+		self._machine:forbid_modifier(self._head_modifier_name)
+		self._machine:forbid_modifier(self._arm_modifier_name)
+		self._machine:forbid_modifier(self._mask_off_modifier_name)
+		self._atention_on = false
+	end
+	self._arm_modifier:set_target_y(self._look_dir)
+	self._head_modifier:set_target_z(self._look_dir)
+	self._movement_updator = callback(self, self, "_upd_move_zipline")
+	self._attention_updator = callback(self, self, "_upd_attention_zipline")
+end
+
+function HuskPlayerMovement:zipline_unit()
+	if self._sequenced_events[1] and self._sequenced_events[1].zipline_unit then
+		return self._sequenced_events[1].zipline_unit
+	end
 end

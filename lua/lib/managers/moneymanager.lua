@@ -143,13 +143,14 @@ function MoneyManager:on_mission_completed(num_winners)
 	self:_add_to_total(total_payout)
 end
 
-function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_days, job_id)
+function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_days, job_id, level_id)
 	local job_and_difficulty_stars = job_stars + risk_stars
 	local job_stars = job_stars
 	local difficulty_stars = risk_stars
 	local player_stars = managers.experience:level_to_stars()
 	local params = {}
 	params.job_id = job_id
+	params.level_id = level_id
 	params.job_stars = job_stars
 	params.difficulty_stars = difficulty_stars
 	params.success = true
@@ -228,7 +229,7 @@ function MoneyManager:get_money_by_params(params)
 		cash_skill_bonus = cash_skill_bonus * managers.player:team_upgrade_value("cash", "stealth_money_multiplier", 1)
 		bag_skill_bonus = bag_skill_bonus * managers.player:team_upgrade_value("cash", "stealth_bags_multiplier", 1)
 	end
-	local bonus_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value()
+	local bonus_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value(params.level_id)
 	local mandatory_bags = params.secured_bags or managers.loot:get_secured_mandatory_bags_value()
 	local real_small_value = params.small_value or math.round(managers.loot:get_real_total_small_loot_value())
 	local offshore_rate = self:get_tweak_value("money_manager", "offshore_rate")
@@ -247,6 +248,10 @@ function MoneyManager:get_money_by_params(params)
 	base_static_value = static_value - risk_static_value
 	if static_value then
 		small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
+		if small_value > tweak_data:get_value("money_manager", "max_small_loot_value") then
+			print("[MoneyManager:get_money_by_params] - Small Loot drop was too much", small_value, tweak_data.carry.max_small_loot_value)
+			small_value = tweak_data:get_value("money_manager", "max_small_loot_value")
+		end
 		if on_last_stage then
 			bag_value = bonus_bags * total_stages
 			bag_risk = math.round(bag_value * money_multiplier * bag_skill_bonus)
@@ -349,6 +354,7 @@ function MoneyManager:get_real_job_money_values(num_winners, potential_payout)
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
 	local job_id = managers.job:current_job_id()
+	local level_id = managers.job:current_level_id()
 	local job_stars = has_active_job and managers.job:current_job_stars() or 1
 	local difficulty_stars = has_active_job and managers.job:current_difficulty_stars() or 0
 	local current_stage = has_active_job and managers.job:current_stage() or 1
@@ -356,6 +362,7 @@ function MoneyManager:get_real_job_money_values(num_winners, potential_payout)
 	local on_last_stage = potential_payout and true or has_active_job and managers.job:on_last_stage()
 	return self:get_money_by_params({
 		job_id = job_id,
+		level_id = level_id,
 		job_stars = job_stars,
 		difficulty_stars = difficulty_stars,
 		current_stage = current_stage,
@@ -372,7 +379,7 @@ function MoneyManager:get_secured_bonus_bags_money()
 	local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
 	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
-	local bonus_bags = managers.loot:get_secured_bonus_bags_value()
+	local bonus_bags = managers.loot:get_secured_bonus_bags_value(managers.job:current_level_id())
 	local bag_value = bonus_bags * total_stages
 	local bag_risk = math.round(bag_value * money_multiplier)
 	return math.round((bag_value + bag_risk) * bag_skill_bonus / self:get_tweak_value("money_manager", "offshore_rate"))
@@ -384,7 +391,8 @@ function MoneyManager:get_secured_mandatory_bags_money()
 	return math.round(mandatory_value * bag_skill_bonus / self:get_tweak_value("money_manager", "offshore_rate"))
 end
 
-function MoneyManager:get_secured_bonus_bag_value(carry_id, value)
+function MoneyManager:get_secured_bonus_bag_value(carry_id, multiplier)
+	local carry_value = managers.money:get_bag_value(carry_id, multiplier)
 	local bag_value = 0
 	local bag_risk = 0
 	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
@@ -393,10 +401,10 @@ function MoneyManager:get_secured_bonus_bag_value(carry_id, value)
 		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 		local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 		local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
-		bag_value = value * total_stages
+		bag_value = carry_value * total_stages
 		bag_risk = math.round(bag_value * money_multiplier)
 	else
-		bag_value = value
+		bag_value = carry_value
 	end
 	return math.round((bag_value + bag_risk) * bag_skill_bonus / self:get_tweak_value("money_manager", "offshore_rate"))
 end
@@ -407,10 +415,14 @@ function MoneyManager:get_job_bag_value()
 	return self:get_tweak_value("money_manager", "bag_value_multiplier", job_and_difficulty_stars)
 end
 
-function MoneyManager:get_bag_value(carry_id)
-	local carry_data = tweak_data.carry[carry_id]
-	local bag_value_id = carry_data.bag_value or "default"
-	local value = self:get_tweak_value("money_manager", "bag_values", bag_value_id)
+function MoneyManager:get_bag_value(carry_id, multiplier)
+	local value = tweak_data.carry.small_loot[carry_id]
+	if value then
+		value = value * (multiplier or 1)
+	else
+		local bag_value_id = tweak_data.carry[carry_id].bag_value or "default"
+		value = self:get_tweak_value("money_manager", "bag_values", bag_value_id)
+	end
 	return math.round(value)
 end
 
@@ -458,7 +470,11 @@ end
 function MoneyManager:get_weapon_price(weapon_id)
 	local pc = self:_get_weapon_pc(weapon_id)
 	if not tweak_data.money_manager.weapon_cost[pc] then
-		pc = 1
+		if pc and pc > #tweak_data.money_manager.weapon_cost then
+			pc = #tweak_data.money_manager.weapon_cost
+		else
+			pc = 1
+		end
 	end
 	return self:get_tweak_value("money_manager", "weapon_cost", pc)
 end
@@ -466,7 +482,11 @@ end
 function MoneyManager:get_weapon_price_modified(weapon_id)
 	local pc = self:_get_weapon_pc(weapon_id)
 	if not tweak_data.money_manager.weapon_cost[pc] then
-		pc = 1
+		if pc and pc > #tweak_data.money_manager.weapon_cost then
+			pc = #tweak_data.money_manager.weapon_cost
+		else
+			pc = 1
+		end
 	end
 	return math.round(self:get_tweak_value("money_manager", "weapon_cost", pc) * managers.player:upgrade_value("player", "buy_cost_multiplier", 1) * managers.player:upgrade_value("player", "crime_net_deal", 1))
 end

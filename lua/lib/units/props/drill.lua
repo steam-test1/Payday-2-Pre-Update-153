@@ -161,7 +161,6 @@ function Drill:_drill_remind_clbk()
 			managers.groupai:state():teammate_comment(nil, (self.is_saw and "d04_" or "d02x_") .. suffix, nil, false, nil, false)
 		end
 	elseif managers.groupai:state():bain_state() then
-		managers.dialog:queue_dialog("Play_ban_d01", {})
 	end
 	managers.enemy:add_delayed_clbk(Drill._drill_remind_clbk_id, Drill._drll_remind_clbk, Application:time() + 45)
 end

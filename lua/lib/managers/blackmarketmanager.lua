@@ -395,6 +395,11 @@ function BlackMarketManager:equip_weapon(category, slot)
 		if equipped.weapon_id == tweak_data.achievement.vote_for_change then
 			managers.achievment:award("bob_1")
 		end
+	elseif category == "primaries" then
+		local equipped = self:equipped_primary()
+		if equipped.weapon_id == tweak_data.achievement.steam_500k then
+			managers.achievment:award("gage3_1")
+		end
 	end
 	if managers.menu_scene then
 		local data = category == "primaries" and self:equipped_primary() or self:equipped_secondary()
@@ -1311,6 +1316,33 @@ function BlackMarketManager:get_weapon_data(weapon_id)
 	return self._global.weapons[weapon_id]
 end
 
+function BlackMarketManager:get_crafted_custom_name(category, slot, add_quotation)
+	local crafted_slot = self:get_crafted_category_slot(category, slot)
+	local custom_name = crafted_slot and crafted_slot.custom_name
+	if custom_name then
+		if add_quotation then
+			return "\"" .. custom_name .. "\""
+		end
+		return custom_name
+	end
+end
+
+function BlackMarketManager:set_crafted_custom_name(category, slot, custom_name)
+	local crafted_slot = self:get_crafted_category_slot(category, slot)
+	crafted_slot.custom_name = custom_name ~= "" and custom_name
+end
+
+function BlackMarketManager:get_mask_name_by_category_slot(category, slot)
+	local crafted_slot = self:get_crafted_category_slot(category, slot)
+	if crafted_slot then
+		if crafted_slot.custom_name then
+			return "\"" .. crafted_slot.custom_name .. "\""
+		end
+		return managers.localization:text(tweak_data.blackmarket.masks[crafted_slot.mask_id].name_id)
+	end
+	return ""
+end
+
 function BlackMarketManager:get_weapon_name_by_category_slot(category, slot)
 	local crafted_slot = self:get_crafted_category_slot(category, slot)
 	if crafted_slot then
@@ -1429,11 +1461,12 @@ function BlackMarketManager:_calculate_weapon_concealment(weapon)
 	local weapon_id = weapon.weapon_id or managers.weapon_factory:get_weapon_id_by_factory_id(factory_id)
 	local blueprint = weapon.blueprint
 	local base_stats = tweak_data.weapon[weapon_id].stats
+	local modifiers_stats = tweak_data.weapon[weapon_id].stats_modifiers
 	if not base_stats or not base_stats.concealment then
 		return 0
 	end
 	local parts_stats = managers.weapon_factory:get_stats(factory_id, blueprint)
-	return base_stats.concealment + (parts_stats.concealment or 0)
+	return (base_stats.concealment + (parts_stats.concealment or 0)) * (modifiers_stats and modifiers_stats.concealment or 1)
 end
 
 function BlackMarketManager:_calculate_armor_concealment(armor)
@@ -1454,6 +1487,10 @@ end
 
 function BlackMarketManager:_get_concealment_from_local_player()
 	return self:_get_concealment(self:equipped_primary(), self:equipped_secondary(), self:equipped_armor(), self:visibility_modifiers())
+end
+
+function BlackMarketManager:_get_concealment_from_outfit_string(outfit_string)
+	return self:_get_concealment(outfit_string.primary, outfit_string.secondary, outfit_string.armor, -outfit_string.concealment_modifier)
 end
 
 function BlackMarketManager:_get_concealment_from_peer(peer)
@@ -1491,6 +1528,10 @@ function BlackMarketManager:get_concealment_of_peer(peer)
 	return self:_get_concealment_from_peer(peer)
 end
 
+function BlackMarketManager:_get_concealment_of_outfit_string(outfit_string)
+	return self:_get_concealment_from_outfit_string(outfit_string)
+end
+
 function BlackMarketManager:_calculate_suspicion_offset(index, lerp)
 	local con_val = tweak_data.weapon.stats.concealment[index]
 	local min_val = tweak_data.weapon.stats.concealment[1]
@@ -1499,6 +1540,11 @@ function BlackMarketManager:_calculate_suspicion_offset(index, lerp)
 	local mul_ratio = math.max(1, con_val / min_val)
 	local susp_lerp = math.clamp(1 - (con_val - min_val) / (max_val - min_val), 0, 1)
 	return math.lerp(0, lerp, susp_lerp)
+end
+
+function BlackMarketManager:get_suspicion_offset_of_outfit_string(outfit_string, lerp)
+	local con_mul, index = self:_get_concealment_of_outfit_string(outfit_string)
+	return self:_calculate_suspicion_offset(index, lerp), index == 1
 end
 
 function BlackMarketManager:get_suspicion_offset_of_peer(peer, lerp)
@@ -2136,12 +2182,17 @@ function BlackMarketManager:modify_weapon(category, slot, global_value, part_id,
 	craft_data.global_values = craft_data.global_values or {}
 	local old_gv = "" .. (craft_data.global_values[part_id] or "normal")
 	craft_data.global_values[part_id] = global_value or "normal"
+	local parts_tweak_data = tweak_data.blackmarket.weapon_mods
 	local removed_parts = {}
 	for _, part in pairs(replaces) do
-		table.insert(removed_parts, part)
+		if parts_tweak_data[part] and (parts_tweak_data[part].pcs or parts_tweak_data[part].pc) and not parts_tweak_data[part].is_a_unlockable then
+			table.insert(removed_parts, part)
+		end
 	end
 	for _, part in pairs(removes) do
-		table.insert(removed_parts, part)
+		if parts_tweak_data[part] and (parts_tweak_data[part].pcs or parts_tweak_data[part].pc) and not parts_tweak_data[part].is_a_unlockable then
+			table.insert(removed_parts, part)
+		end
 	end
 	local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(craft_data.factory_id)
 	for _, default_part in ipairs(default_blueprint) do
@@ -2274,6 +2325,32 @@ end
 
 function BlackMarketManager:get_melee_weapon_data(melee_weapon_id)
 	return tweak_data.blackmarket.melee_weapons[melee_weapon_id]
+end
+
+function BlackMarketManager:get_hold_crafted_item()
+	return self._hold_crafted_item
+end
+
+function BlackMarketManager:drop_hold_crafted_item()
+	self._hold_crafted_item = nil
+end
+
+function BlackMarketManager:pickup_crafted_item(category, slot)
+	self._hold_crafted_item = {category = category, slot = slot}
+end
+
+function BlackMarketManager:place_crafted_item(category, slot)
+	if not self._hold_crafted_item then
+		return
+	end
+	if self._hold_crafted_item.category ~= category then
+		return
+	end
+	local tmp = self:get_crafted_category_slot(category, slot)
+	self._global.crafted_items[category][slot] = self:get_crafted_category_slot(self._hold_crafted_item.category, self._hold_crafted_item.slot)
+	self._global.crafted_items[self._hold_crafted_item.category][self._hold_crafted_item.slot] = tmp
+	tmp = nil
+	self._hold_crafted_item = nil
 end
 
 function BlackMarketManager:on_aquired_armor(upgrade, id, loading)

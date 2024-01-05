@@ -39,7 +39,7 @@ function CoreSoundEnvironmentManager:init()
 	end
 	self._ambience_enabled = false
 	self._occasional_blocked_by_platform = SystemInfo:platform() == Idstring("X360")
-	self._ambience_sources_count = SystemInfo:platform() == Idstring("X360") and 1 or 4
+	self._ambience_sources_count = 1
 	self.POSITION_OFFSET = 50
 	self._active_ambience_soundbanks = {}
 	self._occasional_sound_source = SoundDevice:create_source("occasional")

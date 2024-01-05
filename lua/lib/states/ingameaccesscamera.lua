@@ -155,24 +155,13 @@ function IngameAccessCamera:update(t, dt)
 			if not ray then
 				amount = amount + 1
 				managers.hud:access_camera_track(amount, self._cam_unit:camera()._camera, unit:movement():m_head_pos())
-				if self._last_access_camera and not self._last_access_camera:value("destroyed") and managers.player:upgrade_value("player", "sec_camera_highlight", false) and (managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout) then
-					self:add_enemy_contour(unit)
+				if self._last_access_camera and not self._last_access_camera:value("destroyed") and managers.player:upgrade_value("player", "sec_camera_highlight", false) and unit:base()._tweak_table and (managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout) then
+					managers.game_play_central:auto_highlight_enemy(unit, true)
 				end
 			end
 		end
 	end
 	managers.hud:access_camera_track_max_amount(amount)
-end
-
-function IngameAccessCamera:add_enemy_contour(unit)
-	if self._enemy_contours[unit:key()] and self._enemy_contours[unit:key()] > Application:time() then
-		return
-	end
-	self._enemy_contours[unit:key()] = Application:time() + 9
-	if not unit:contour() then
-		debug_pause_unit(unit, "[IngameAccessCamera:add_enemy_contour]: Unit doesn't have Contour Extension")
-	end
-	unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 end
 
 function IngameAccessCamera:update_player_stamina(t, dt)
@@ -217,7 +206,6 @@ function IngameAccessCamera:at_enter(old_state, ...)
 	else
 		self:_next_camera()
 	end
-	self._enemy_contours = {}
 	self:_setup_controller()
 end
 

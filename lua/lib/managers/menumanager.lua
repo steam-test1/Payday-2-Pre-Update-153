@@ -982,6 +982,16 @@ function MenuCallbackHandler:dlc_buy_gage_pack_pc()
 	Steam:overlay_activate("store", 267380)
 end
 
+function MenuCallbackHandler:dlc_buy_gage_pack_snp_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_snp_pc]")
+	Steam:overlay_activate("store", 259380)
+end
+
+function MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc]")
+	Steam:overlay_activate("store", 259381)
+end
+
 function MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc]")
 	Steam:overlay_activate("store", 275590)
@@ -1023,6 +1033,8 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"gage_pack_snp",
+		"gage_pack_jobs",
 		"gage_pack_lmg",
 		"gage_pack",
 		"armored_transport"
@@ -1060,6 +1072,14 @@ end
 
 function MenuCallbackHandler:visible_callback_gage_pack_lmg()
 	return self:is_dlc_latest_locked("gage_pack_lmg")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_jobs()
+	return self:is_dlc_latest_locked("gage_pack_jobs")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_snp()
+	return self:is_dlc_latest_locked("gage_pack_snp")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()

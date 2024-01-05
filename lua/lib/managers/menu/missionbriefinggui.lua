@@ -1,4 +1,9 @@
 require("lib/managers/menu/WalletGuiObject")
+local make_fine_text = function(text)
+	local x, y, w, h = text:text_rect()
+	text:set_size(w, h)
+	text:set_position(math.round(text:x()), math.round(text:y()))
+end
 MissionBriefingTabItem = MissionBriefingTabItem or class()
 
 function MissionBriefingTabItem:init(panel, text, i)
@@ -501,6 +506,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 	self._assets_names = assets_names
 	self._unlock_cost = assets_names[3] or false
 	local center_y = math.round(self._panel:h() / 2) - tweak_data.menu.pd2_small_font_size
+	self._asset_text_panel = self._panel:panel({name = "asset_text", layer = 4})
 	local first_rect, rect
 	local w = self._panel:w() / 4
 	local step = w * 0.5
@@ -514,7 +520,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		rect:hide()
 		first_rect = first_rect or rect
 		local center_x = math.ceil(i / 2) * w - step
-		local center_y = self._panel:h() * (i % 2 > 0 and 0.25 or 0.75)
+		local center_y = self._panel:h() * (i % 2 > 0 and 0.245 or 0.765)
 		local texture = assets_names[i][1]
 		local asset
 		if texture and DB:has(Idstring("texture"), texture) then
@@ -561,20 +567,6 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		table.insert(self._assets_list, asset)
 	end
 	self._text_strings_localized = false
-	if first_rect then
-		self._asset_text = self._panel:text({
-			name = "asset_text",
-			text = "",
-			h = 64,
-			align = "center",
-			vertical = "top",
-			font_size = tweak_data.menu.pd2_small_font_size,
-			font = tweak_data.menu.pd2_small_font,
-			layer = 4,
-			color = tweak_data.screen_colors.text
-		})
-		self._asset_text:set_top(first_rect:bottom() + tweak_data.menu.pd2_small_font_size * 0.5 - 6)
-	end
 	self._my_asset_space = w
 	self._my_left_i = self._my_menu_component_data.my_left_i or 1
 	if 1 < math.ceil(#self._assets_list / 8) then
@@ -671,13 +663,18 @@ function AssetsItem:update_asset_positions_and_text()
 	self:update_asset_positions()
 	local bg = self._panel:child("bg_rect_" .. tostring(self._asset_selected))
 	if alive(bg) then
-		local _, _, w, _ = self._asset_text:text_rect()
-		self._asset_text:set_w(w)
-		self._asset_text:set_center_x(bg:center_x())
-		if self._asset_text:left() < 10 then
-			self._asset_text:set_left(10)
-		elseif self._asset_text:right() > self._panel:w() - 10 then
-			self._asset_text:set_right(self._panel:w() - 10)
+		self._asset_text_panel:set_center_x(bg:center_x())
+		self._asset_text_panel:set_position(math.round(self._asset_text_panel:x()), math.round(self._asset_text_panel:y()))
+		for i, asset_text in ipairs(self._asset_text_panel:children()) do
+			if asset_text:world_left() < 10 then
+				asset_text:set_world_left(10)
+				asset_text:set_align("left")
+			elseif asset_text:world_right() > self._panel:w() - 10 then
+				asset_text:set_world_right(self._panel:w() - 10)
+				asset_text:set_align("right")
+			else
+				asset_text:set_align("center")
+			end
 		end
 	end
 end
@@ -719,8 +716,7 @@ function AssetsItem:select_asset(i, instant)
 		return
 	end
 	local text_string = self._assets_names[i][2]
-	local extra_string = ""
-	local extra_color
+	local extra_string, extra_color
 	if not self._text_strings_localized then
 		text_string = managers.localization:text(text_string)
 	end
@@ -748,53 +744,71 @@ function AssetsItem:select_asset(i, instant)
 		local can_client_unlock = managers.assets.ALLOW_CLIENTS_UNLOCK == true or type(managers.assets.ALLOW_CLIENTS_UNLOCK) == "string" and managers.player:has_team_category_upgrade("player", managers.assets.ALLOW_CLIENTS_UNLOCK)
 		local is_server = Network:is_server() or can_client_unlock
 		local can_unlock = self._assets_names[i][5]
-		text_string = self._assets_names[i][6] and text_string or ""
+		text_string = self._assets_names[i][6] and text_string
 		if is_server and can_unlock then
-			extra_string = extra_string .. managers.localization:text("st_menu_cost") .. " " .. managers.experience:cash_string(managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4]))
+			extra_string = managers.localization:text("st_menu_cost") .. " " .. managers.experience:cash_string(managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4]))
 			if not managers.money:can_afford_mission_asset(self._assets_names[i][4]) then
 				extra_string = extra_string .. "\n" .. managers.localization:text("bm_menu_not_enough_cash")
 				extra_color = tweak_data.screen_colors.important_1
 			end
 		else
-			extra_string = extra_string .. managers.localization:text(not is_server and "menu_briefing_asset_server_locked" or managers.assets:get_asset_unlock_text_by_id(self._assets_names[i][4]))
+			extra_string = managers.localization:text(not is_server and "menu_briefing_asset_server_locked" or managers.assets:get_asset_unlock_text_by_id(self._assets_names[i][4]))
 		end
 		extra_color = extra_color or can_unlock and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1
 	end
 	extra_color = extra_color or tweak_data.screen_colors.text
-	self._asset_text:set_text(text_string .. extra_string)
-	self._asset_text:set_selection(utf8.len(text_string), utf8.len(self._asset_text:text()))
-	self._asset_text:set_color(tweak_data.screen_colors.text)
-	self._asset_text:set_selection_color(extra_color)
+	self._asset_text_panel:clear()
+	if text_string then
+		local text = self._asset_text_panel:text({
+			name = "text_string",
+			text = text_string,
+			align = "center",
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = tweak_data.screen_colors.text
+		})
+		make_fine_text(text)
+		text:set_top(0)
+		text:set_center_x(self._asset_text_panel:w() / 2)
+	end
+	if extra_string then
+		local last_child = self._asset_text_panel:children()[self._asset_text_panel:num_children()]
+		local text = self._asset_text_panel:text({
+			name = "extra_string",
+			text = extra_string,
+			align = "center",
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = extra_color
+		})
+		make_fine_text(text)
+		if last_child then
+			text:set_top(last_child:bottom())
+		end
+		text:set_center_x(self._asset_text_panel:w() / 2)
+	end
 	self._assets_list[i]:stop()
 	self._assets_list[i]:animate(self.animate_select, self._panel:child("bg_rect_" .. tostring(i)), instant)
 	if alive(bg) then
-		local _, _, w, _ = self._asset_text:text_rect()
-		self._asset_text:set_w(w)
-		self._asset_text:set_center_x(bg:center_x())
-		self._asset_text:set_position(math.round(self._asset_text:x()), math.round(self._asset_text:y()))
-		if self._asset_text:left() < 10 then
-			self._asset_text:set_left(10)
-			local len_to_left = math.abs(self._assets_list[i]:center_x() - self._asset_text:left())
-			local len_to_center = math.abs(self._assets_list[i]:center_x() - self._asset_text:center_x())
-			self._asset_text:set_align("left")
-		elseif self._asset_text:right() > self._panel:w() - 10 then
-			self._asset_text:set_right(self._panel:w() - 10)
-			local len_to_right = math.abs(self._assets_list[i]:center_x() - self._asset_text:right())
-			local len_to_center = math.abs(self._assets_list[i]:center_x() - self._asset_text:center_x())
-			self._asset_text:set_align("right")
-		else
-			self._asset_text:set_align("center")
+		self._asset_text_panel:set_h(self._asset_text_panel:children()[self._asset_text_panel:num_children()]:bottom())
+		self._asset_text_panel:set_center_x(bg:center_x())
+		self._asset_text_panel:set_position(math.round(self._asset_text_panel:x()), math.round(self._asset_text_panel:y()))
+		local a_left = self._asset_text_panel:left()
+		local a_right = self._asset_text_panel:right()
+		for i, asset_text in ipairs(self._asset_text_panel:children()) do
+			asset_text:set_position(math.round(asset_text:x()), math.round(asset_text:y()))
+			if a_left + asset_text:left() < 12 then
+				asset_text:set_left(12 - a_left)
+			elseif a_left + asset_text:right() > self._panel:w() - 12 then
+				asset_text:set_right(self._panel:w() - 12 - a_left)
+			end
 		end
-		local _, _, w, h = self._asset_text:text_rect()
-		self._asset_text:set_size(w, h)
 	end
 	if rect then
 		if i % 2 > 0 then
-			self._asset_text:set_center_y(rect:bottom() + 10)
-			self._asset_text:set_y(math.round(self._asset_text:y()))
+			self._asset_text_panel:set_top(rect:bottom())
 		else
-			self._asset_text:set_center_y(rect:top() - 10)
-			self._asset_text:set_y(math.round(self._asset_text:y()))
+			self._asset_text_panel:set_bottom(rect:top())
 		end
 	end
 end
@@ -803,7 +817,7 @@ function AssetsItem:check_deselect_item()
 	if self._asset_selected and self._assets_list[self._asset_selected] then
 		self._assets_list[self._asset_selected]:stop()
 		self._assets_list[self._asset_selected]:animate(self.animate_deselect, self._panel:child("bg_rect_" .. tostring(self._asset_selected)))
-		self._asset_text:set_text("")
+		self._asset_text_panel:clear()
 	end
 	self._asset_selected = nil
 end
@@ -817,7 +831,7 @@ function AssetsItem:mouse_moved(x, y)
 				managers.menu_component:post_event("highlight")
 				self:check_deselect_item()
 			end
-			self._asset_text:set_text("")
+			self._asset_text_panel:clear()
 			return false, true
 		elseif self._move_left_highlighted then
 			self._move_left_rect:set_color(tweak_data.screen_colors.button_stage_3)
@@ -830,7 +844,7 @@ function AssetsItem:mouse_moved(x, y)
 				managers.menu_component:post_event("highlight")
 				self:check_deselect_item()
 			end
-			self._asset_text:set_text("")
+			self._asset_text_panel:clear()
 			return false, true
 		elseif self._move_right_highlighted then
 			self._move_right_rect:set_color(tweak_data.screen_colors.button_stage_3)
@@ -2031,6 +2045,7 @@ function NewLoadoutTab:populate_category(category, data)
 		new_data.name = crafted.weapon_id
 		new_data.name_localized = managers.blackmarket:get_weapon_name_by_category_slot(category, i)
 		new_data.category = category
+		new_data.custom_name_text = managers.blackmarket:get_crafted_custom_name(category, i, true)
 		new_data.slot = i
 		new_data.unlocked = managers.blackmarket:weapon_unlocked(crafted.weapon_id)
 		new_data.lock_texture = not new_data.unlocked and "guis/textures/pd2/lock_level"
@@ -2187,6 +2202,7 @@ function NewLoadoutTab:create_primaries_loadout()
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_primaries")
 	}
+	data.is_loadout = true
 	return data
 end
 
@@ -2203,6 +2219,7 @@ function NewLoadoutTab:create_secondaries_loadout()
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_secondaries")
 	}
+	data.is_loadout = true
 	return data
 end
 
@@ -2219,6 +2236,7 @@ function NewLoadoutTab:create_deployable_loadout()
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_deployables")
 	}
+	data.is_loadout = true
 	return data
 end
 
@@ -2235,6 +2253,7 @@ function NewLoadoutTab:create_melee_weapon_loadout()
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_melee_weapons")
 	}
+	data.is_loadout = true
 	return data
 end
 
@@ -2251,6 +2270,7 @@ function NewLoadoutTab:create_armor_loadout()
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_armors")
 	}
+	data.is_loadout = true
 	return data
 end
 

@@ -1,9 +1,9 @@
 DoctorBagBase = DoctorBagBase or class(UnitBase)
 
-function DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl)
+function DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl, peer_id)
 	local unit_name = "units/payday2/equipment/gen_equipment_medicbag/gen_equipment_medicbag"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_doctor_bag_setup", unit, amount_upgrade_lvl)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, amount_upgrade_lvl, peer_id or 0)
 	unit:base():setup(amount_upgrade_lvl)
 	return unit
 end
@@ -22,9 +22,29 @@ function DoctorBagBase:init(unit)
 	self._unit = unit
 	self._unit:sound_source():post_event("ammo_bag_drop")
 	self._max_amount = tweak_data.upgrades.doctor_bag_base + managers.player:upgrade_value_by_level("doctor_bag", "amount_increase", 1)
+	if Network:is_client() then
+		self._validate_clbk_id = "doctor_bag_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
 end
 
-function DoctorBagBase:sync_setup(amount_upgrade_lvl)
+function DoctorBagBase:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
+end
+
+function DoctorBagBase:sync_setup(amount_upgrade_lvl, peer_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(peer_id, "doctor_bag")
 	self:setup(amount_upgrade_lvl)
 end
 
@@ -155,7 +175,12 @@ function DoctorBagBase:load(data)
 		self:_set_dynamic()
 	end
 	self:_set_visual_stage()
+	self._was_dropin = true
 end
 
 function DoctorBagBase:destroy()
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
 end

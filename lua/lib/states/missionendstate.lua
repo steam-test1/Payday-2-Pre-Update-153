@@ -36,8 +36,7 @@ function MissionEndState:at_enter(old_state, params)
 		if self._success then
 			for peer_id, data in pairs(managers.player:get_all_synced_carry()) do
 				if not tweak_data.carry[data.carry_id].skip_exit_secure then
-					print("Secure loot for", peer_id, data.carry_id, data.value)
-					managers.loot:secure(data.carry_id, data.value)
+					managers.loot:secure(data.carry_id, data.multiplier)
 				end
 			end
 		end

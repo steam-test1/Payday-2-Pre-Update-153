@@ -64,7 +64,9 @@ require("lib/managers/VoiceBriefingManager")
 require("lib/managers/FeatureManager")
 require("lib/managers/MissionAssetsManager")
 require("lib/managers/GageAssignmentManager")
+require("lib/managers/PrePlanningManager")
 require("lib/units/UnitDamage")
+require("lib/units/props/DigitalGui")
 require("lib/units/MaskExt")
 script_data = script_data or {}
 game_state_machine = game_state_machine or nil
@@ -151,6 +153,7 @@ function Setup:init_managers(managers)
 	managers.features = FeatureManager:new()
 	managers.gage_assignment = GageAssignmentManager:new()
 	managers.assets = MissionAssetsManager:new()
+	managers.preplanning = PrePlanningManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 

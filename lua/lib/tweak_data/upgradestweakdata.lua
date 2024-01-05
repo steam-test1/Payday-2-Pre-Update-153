@@ -104,6 +104,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.hostage_near_player_radius = 1000
 	self.hostage_near_player_check_t = 0.5
 	self.hostage_near_player_multiplier = 1.25
+	self.on_headshot_dealt_cooldown = 1
 	self.weapon_movement_penalty = {}
 	self.weapon_movement_penalty.lmg = 0.8
 	self.values.player.crime_net_deal = {0.9, 0.8}
@@ -314,6 +315,20 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.passive_armor_movement_penalty_multiplier = {0.75}
 	self.values.player.passive_loot_drop_multiplier = {1.1}
 	self.values.weapon.armor_piercing_chance = {0.15}
+	self.values.lmg.recoil_multiplier = {0.75}
+	self.values.lmg.enter_steelsight_speed_multiplier = {2}
+	self.values.lmg.reload_speed_multiplier = {1.25}
+	self.values.lmg.move_spread_multiplier = {0.5}
+	self.values.lmg.hip_fire_spread_multiplier = {0.8}
+	self.values.lmg.hip_fire_damage_multiplier = {1.2}
+	self.values.lmg.zoom_increase = {2}
+	self.values.snp.recoil_multiplier = {0.75}
+	self.values.snp.enter_steelsight_speed_multiplier = {2}
+	self.values.snp.reload_speed_multiplier = {1.25}
+	self.values.snp.move_spread_multiplier = {0.5}
+	self.values.snp.hip_fire_spread_multiplier = {0.8}
+	self.values.snp.hip_fire_damage_multiplier = {1.2}
+	self.values.snp.zoom_increase = {2}
 	self.values.player.run_and_shoot = {true}
 	self.values.player.run_and_reload = {true}
 	self.values.player.morale_boost = {true}
@@ -880,9 +895,17 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"new_mp5", "serbu"}
 	}
+	self.level_tree[15] = {
+		name_id = "weapons",
+		upgrades = {"msr"}
+	}
 	self.level_tree[16] = {
 		name_id = "weapons",
 		upgrades = {"akm", "g36"}
+	}
+	self.level_tree[17] = {
+		name_id = "weapons",
+		upgrades = {"akm_gold"}
 	}
 	self.level_tree[19] = {
 		name_id = "weapons",
@@ -929,6 +952,10 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"ak5"}
 	}
+	self.level_tree[35] = {
+		name_id = "weapons",
+		upgrades = {"r93"}
+	}
 	self.level_tree[36] = {
 		name_id = "weapons",
 		upgrades = {"p90", "deagle"}
@@ -966,6 +993,10 @@ function UpgradesTweakData:init()
 	self.level_tree[61] = {
 		name_id = "weapons",
 		upgrades = {"rambo"}
+	}
+	self.level_tree[65] = {
+		name_id = "weapons",
+		upgrades = {"m95"}
 	}
 	self.level_tree[70] = {
 		name_id = "lvl_70",
@@ -1120,6 +1151,7 @@ function UpgradesTweakData:init()
 	self:_akmsu_definitions()
 	self:_ak74_definitions()
 	self:_akm_definitions()
+	self:_akm_gold_definitions()
 	self:_ak5_definitions()
 	self:_aug_definitions()
 	self:_g36_definitions()
@@ -1148,11 +1180,16 @@ function UpgradesTweakData:init()
 	self:_hk21_definitions()
 	self:_m249_definitions()
 	self:_rpk_definitions()
+	self:_m95_definitions()
+	self:_msr_definitions()
+	self:_r93_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
 	self:_smg_definitions()
 	self:_shotgun_definitions()
+	self:_lmg_definitions()
+	self:_snp_definitions()
 	self:_melee_weapon_definitions()
 	self:_carry_definitions()
 	self:_team_definitions()
@@ -1212,6 +1249,8 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.smg = {}
 	self.values.shotgun = {}
 	self.values.saw = {}
+	self.values.lmg = {}
+	self.values.snp = {}
 	self.values.temporary = {}
 	self.values.team = {}
 	self.values.team.player = {}
@@ -4057,6 +4096,15 @@ function UpgradesTweakData:_akm_definitions()
 	}
 end
 
+function UpgradesTweakData:_akm_gold_definitions()
+	self.definitions.akm_gold = {
+		category = "weapon",
+		weapon_id = "akm_gold",
+		factory_id = "wpn_fps_ass_akm_gold",
+		dlc = "pd2_clan"
+	}
+end
+
 function UpgradesTweakData:_ak5_definitions()
 	self.definitions.ak5 = {
 		category = "weapon",
@@ -4446,6 +4494,33 @@ function UpgradesTweakData:_rpk_definitions()
 	}
 end
 
+function UpgradesTweakData:_m95_definitions()
+	self.definitions.m95 = {
+		category = "weapon",
+		weapon_id = "m95",
+		factory_id = "wpn_fps_snp_m95",
+		dlc = "gage_pack_snp"
+	}
+end
+
+function UpgradesTweakData:_msr_definitions()
+	self.definitions.msr = {
+		category = "weapon",
+		weapon_id = "msr",
+		factory_id = "wpn_fps_snp_msr",
+		dlc = "gage_pack_snp"
+	}
+end
+
+function UpgradesTweakData:_r93_definitions()
+	self.definitions.r93 = {
+		category = "weapon",
+		weapon_id = "r93",
+		factory_id = "wpn_fps_snp_r93",
+		dlc = "gage_pack_snp"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -4820,6 +4895,138 @@ function UpgradesTweakData:_assault_rifle_definitions()
 		name_id = "menu_assault_rifle_zoom_increase",
 		upgrade = {
 			category = "assault_rifle",
+			upgrade = "zoom_increase",
+			value = 1
+		}
+	}
+end
+
+function UpgradesTweakData:_lmg_definitions()
+	self.definitions.lmg_recoil_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_recoil_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_enter_steelsight_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_enter_steelsight_speed_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "enter_steelsight_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_reload_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_reload_speed_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "reload_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_move_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_move_spread_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "move_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_hip_fire_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_hip_fire_spread_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "hip_fire_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_hip_fire_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_lmg_hip_fire_damage_multiplier",
+		upgrade = {
+			category = "lmg",
+			upgrade = "hip_fire_damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.lmg_zoom_increase = {
+		category = "feature",
+		name_id = "menu_lmg_zoom_increase",
+		upgrade = {
+			category = "lmg",
+			upgrade = "zoom_increase",
+			value = 1
+		}
+	}
+end
+
+function UpgradesTweakData:_snp_definitions()
+	self.definitions.snp_recoil_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_recoil_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_enter_steelsight_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_enter_steelsight_speed_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "enter_steelsight_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_reload_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_reload_speed_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "reload_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_move_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_move_spread_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "move_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_hip_fire_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_hip_fire_spread_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "hip_fire_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_hip_fire_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_snp_hip_fire_damage_multiplier",
+		upgrade = {
+			category = "snp",
+			upgrade = "hip_fire_damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.snp_zoom_increase = {
+		category = "feature",
+		name_id = "menu_snp_zoom_increase",
+		upgrade = {
+			category = "snp",
 			upgrade = "zoom_increase",
 			value = 1
 		}

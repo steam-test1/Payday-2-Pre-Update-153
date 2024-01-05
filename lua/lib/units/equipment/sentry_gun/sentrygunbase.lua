@@ -4,6 +4,29 @@ function SentryGunBase:init(unit)
 	SentryGunBase.super.init(self, unit, false)
 	self._unit = unit
 	self._unit:sound_source():post_event("turret_place")
+	if Network:is_client() then
+		self._validate_clbk_id = "sentry_gun_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
+end
+
+function SentryGunBase:_clbk_validate()
+	self._validate_clbk_id = nil
+	if not self._was_dropin then
+		local peer = managers.network:session():server_peer()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
+			name = peer:name()
+		}))
+		managers.hud:mark_cheater(peer:id())
+	end
+end
+
+function SentryGunBase:sync_setup(upgrade_lvl, peer_id)
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
+	managers.player:verify_equipment(peer_id, "sentry_gun")
 end
 
 function SentryGunBase:post_init()
@@ -14,7 +37,7 @@ function SentryGunBase:post_init()
 	end
 end
 
-function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier)
+function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer_id)
 	local attached_data = SentryGunBase._attach(pos, rot)
 	if not attached_data then
 		return
@@ -30,6 +53,7 @@ function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier,
 		has_shield = managers.player:has_category_upgrade("sentry_gun", "shield")
 	end
 	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry"), pos, rot)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
 	unit:base():setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
 	unit:brain():set_active(true)
 	SentryGunBase.deployed = (SentryGunBase.deployed or 0) + 1
@@ -288,8 +312,16 @@ function SentryGunBase:register()
 	managers.groupai:state():register_criminal(self._unit)
 end
 
+function SentryGunBase:load(save_data)
+	self._was_dropin = true
+end
+
 function SentryGunBase:pre_destroy()
 	SentryGunBase.super.pre_destroy(self, self._unit)
 	self:unregister()
 	self._removed = true
+	if self._validate_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
+		self._validate_clbk_id = nil
+	end
 end

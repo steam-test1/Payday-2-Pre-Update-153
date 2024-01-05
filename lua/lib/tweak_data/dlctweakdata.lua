@@ -18,6 +18,61 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.starter_kit.content.upgrades = {"fists"}
+	do
+		local all_normal_masks = {
+			"alienware",
+			"babyrhino",
+			"mr_sinister",
+			"day_of_the_dead",
+			"irondoom",
+			"greek_tragedy",
+			"hockey",
+			"kawaii",
+			"demonictender",
+			"monkeybiss",
+			"rubber_male",
+			"scarecrow",
+			"tounge",
+			"rubber_female",
+			"oni",
+			"biglips",
+			"brainiack",
+			"bullet",
+			"outlandish_a",
+			"clowncry",
+			"dripper",
+			"gagball",
+			"hog",
+			"demon",
+			"jaw",
+			"mummy",
+			"outlandish_b",
+			"outlandish_c",
+			"stonekisses",
+			"buha",
+			"shogun",
+			"shrunken",
+			"clown_56",
+			"troll",
+			"dawn_of_the_dead",
+			"vampire",
+			"zipper",
+			"zombie"
+		}
+		local lootdrops = {}
+		for i, mask_id in ipairs(all_normal_masks) do
+			table.insert(lootdrops, {
+				type_items = "masks",
+				item_entry = mask_id,
+				amount = 1
+			})
+		end
+		self.starter_kit_mask = {}
+		self.starter_kit_mask.free = true
+		self.starter_kit_mask.content = {}
+		self.starter_kit_mask.content.loot_global_value = "normal"
+		self.starter_kit_mask.content.loot_drops = {lootdrops}
+	end
 	self.pd2_clan = {}
 	self.pd2_clan.content = {}
 	self.pd2_clan.dlc = "has_pd2_clan"
@@ -110,6 +165,10 @@ function DLCTweakData:init(tweak_data)
 	self.cce.content.upgrades = {
 		"player_crime_net_deal_2"
 	}
+	self.soundtrack = {}
+	self.soundtrack.dlc = "has_soundtrack"
+	self.soundtrack.content = {}
+	self.soundtrack.content.loot_drops = {}
 	self.halloween_nightmare_1 = {}
 	self.halloween_nightmare_1.dlc = "has_achievement"
 	self.halloween_nightmare_1.achievement_id = "halloween_nightmare_1"
@@ -392,6 +451,231 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.gage_pack_lmg.content.upgrades = {"rpk", "kabar"}
+	self.gage_pack_snp = {}
+	self.gage_pack_snp.content = {}
+	self.gage_pack_snp.dlc = "has_gage_pack_snp"
+	self.gage_pack_snp.content.loot_drops = {}
+	self.gage_pack_snp.content.upgrades = {}
+	self.ach_gage3_3 = {}
+	self.ach_gage3_3.dlc = "has_achievement"
+	self.ach_gage3_3.achievement_id = "gage3_3"
+	self.ach_gage3_3.content = {}
+	self.ach_gage3_3.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "robberfly",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "carapace",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "bugger",
+			amount = 1
+		}
+	}
+	self.ach_gage3_4 = {}
+	self.ach_gage3_4.dlc = "has_achievement"
+	self.ach_gage3_4.achievement_id = "gage3_4"
+	self.ach_gage3_4.content = {}
+	self.ach_gage3_4.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spider",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "insectoid",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "spidereyes",
+			amount = 1
+		}
+	}
+	self.ach_gage3_5 = {}
+	self.ach_gage3_5.dlc = "has_achievement"
+	self.ach_gage3_5.achievement_id = "gage3_5"
+	self.ach_gage3_5.content = {}
+	self.ach_gage3_5.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "wasp",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "bugshell",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "venomous",
+			amount = 1
+		}
+	}
+	self.ach_gage3_6 = {}
+	self.ach_gage3_6.dlc = "has_achievement"
+	self.ach_gage3_6.achievement_id = "gage3_6"
+	self.ach_gage3_6.content = {}
+	self.ach_gage3_6.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mantis",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "hardshell",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "wingsofdeath",
+			amount = 1
+		}
+	}
+	self.ach_gage3_7 = {}
+	self.ach_gage3_7.dlc = "has_achievement"
+	self.ach_gage3_7.achievement_id = "gage3_7"
+	self.ach_gage3_7.content = {}
+	self.ach_gage3_7.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_7.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_m95_barrel_long",
+			amount = 1
+		}
+	}
+	self.ach_gage3_8 = {}
+	self.ach_gage3_8.dlc = "has_achievement"
+	self.ach_gage3_8.achievement_id = "gage3_8"
+	self.ach_gage3_8.content = {}
+	self.ach_gage3_8.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_8.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_r93_b_suppressed",
+			amount = 1
+		}
+	}
+	self.ach_gage3_9 = {}
+	self.ach_gage3_9.dlc = "has_achievement"
+	self.ach_gage3_9.achievement_id = "gage3_9"
+	self.ach_gage3_9.content = {}
+	self.ach_gage3_9.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_9.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_45iron",
+			amount = 1
+		}
+	}
+	self.ach_gage3_10 = {}
+	self.ach_gage3_10.dlc = "has_achievement"
+	self.ach_gage3_10.achievement_id = "gage3_10"
+	self.ach_gage3_10.content = {}
+	self.ach_gage3_10.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_10.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_r93_b_short",
+			amount = 1
+		}
+	}
+	self.ach_gage3_11 = {}
+	self.ach_gage3_11.dlc = "has_achievement"
+	self.ach_gage3_11.achievement_id = "gage3_11"
+	self.ach_gage3_11.content = {}
+	self.ach_gage3_11.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_11.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_m95_barrel_suppressed",
+			amount = 1
+		}
+	}
+	self.ach_gage3_12 = {}
+	self.ach_gage3_12.dlc = "has_achievement"
+	self.ach_gage3_12.achievement_id = "gage3_12"
+	self.ach_gage3_12.content = {}
+	self.ach_gage3_12.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_12.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_m95_barrel_short",
+			amount = 1
+		}
+	}
+	self.ach_gage3_13 = {}
+	self.ach_gage3_13.dlc = "has_achievement"
+	self.ach_gage3_13.achievement_id = "gage3_13"
+	self.ach_gage3_13.content = {}
+	self.ach_gage3_13.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_13.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_leupold",
+			amount = 1
+		}
+	}
+	self.ach_gage3_14 = {}
+	self.ach_gage3_14.dlc = "has_achievement"
+	self.ach_gage3_14.achievement_id = "gage3_14"
+	self.ach_gage3_14.content = {}
+	self.ach_gage3_14.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_14.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_msr_body_msr",
+			amount = 1
+		}
+	}
+	self.ach_gage3_15 = {}
+	self.ach_gage3_15.dlc = "has_achievement"
+	self.ach_gage3_15.achievement_id = "gage3_15"
+	self.ach_gage3_15.content = {}
+	self.ach_gage3_15.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_15.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_r93_body_wood",
+			amount = 1
+		}
+	}
+	self.ach_gage3_16 = {}
+	self.ach_gage3_16.dlc = "has_achievement"
+	self.ach_gage3_16.achievement_id = "gage3_16"
+	self.ach_gage3_16.content = {}
+	self.ach_gage3_16.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_16.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_msr_ns_suppressor",
+			amount = 1
+		}
+	}
+	self.ach_gage3_17 = {}
+	self.ach_gage3_17.dlc = "has_achievement"
+	self.ach_gage3_17.achievement_id = "gage3_17"
+	self.ach_gage3_17.content = {}
+	self.ach_gage3_17.content.loot_global_value = "gage_pack_snp"
+	self.ach_gage3_17.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_msr_b_long",
+			amount = 1
+		}
+	}
 	self.skull_mask_1 = {}
 	self.skull_mask_1.dlc = "has_achievement"
 	self.skull_mask_1.achievement_id = "death_27"

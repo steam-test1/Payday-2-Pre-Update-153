@@ -251,4 +251,16 @@ function EquipmentsTweakData:init()
 		icon = "equipment_gold",
 		player_rule = "no_run"
 	}
+	self.max_amount = {
+		ammo_bag = 2,
+		doctor_bag = 2,
+		ecm_jammer = 2,
+		sentry_gun = 2,
+		trip_mine = 6,
+		grenades = 3,
+		asset_ammo_bag = 4,
+		asset_doctor_bag = 2,
+		asset_grenade_crate = 1,
+		asset_bodybags_bag = 1
+	}
 end

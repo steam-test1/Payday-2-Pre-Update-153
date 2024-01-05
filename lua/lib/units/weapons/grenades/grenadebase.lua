@@ -15,7 +15,7 @@ function GrenadeBase.server_throw_grenade(grenade_type, pos, dir, owner_peer_id)
 		end
 	end
 	unit:base():throw({dir = dir, grenade_entry = grenade_entry})
-	managers.network:session():send_to_peers_synched("sync_throw_grenade", unit, dir, grenade_type)
+	managers.network:session():send_to_peers_synched("sync_throw_grenade", unit, dir, grenade_type, owner_peer_id or 0)
 end
 
 function GrenadeBase.spawn(unit_name, pos, rot)

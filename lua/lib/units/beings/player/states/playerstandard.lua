@@ -190,7 +190,7 @@ function PlayerStandard:_activate_mover(mover, velocity)
 end
 
 function PlayerStandard:interaction_blocked()
-	return self:is_deploying()
+	return self:is_deploying() or self:_on_zipline()
 end
 
 function PlayerStandard:update(t, dt)
@@ -297,10 +297,19 @@ end
 
 function PlayerStandard:_update_fwd_ray()
 	local from = self._unit:movement():m_head_pos()
-	local to = self._cam_fwd * 4000
+	local range = self._equipped_unit and self._equipped_unit:base():has_range_distance_scope() and 20000 or 4000
+	local to = self._cam_fwd * range
 	mvector3.add(to, from)
 	self._fwd_ray = World:raycast("ray", from, to, "slot_mask", self._slotmask_fwd_ray)
-	managers.environment_controller:set_dof_distance(math.max(0, (self._fwd_ray and self._fwd_ray.distance or 4000) - 200), self._state_data.in_steelsight)
+	managers.environment_controller:set_dof_distance(math.max(0, math.min(self._fwd_ray and self._fwd_ray.distance or 4000, 4000) - 200), self._state_data.in_steelsight)
+	if self._equipped_unit then
+		if self._state_data.in_steelsight and self._fwd_ray and self._fwd_ray.unit and self._equipped_unit:base().check_highlight_unit then
+			self._equipped_unit:base():check_highlight_unit(self._fwd_ray.unit)
+		end
+		if self._equipped_unit:base().set_scope_range_distance then
+			self._equipped_unit:base():set_scope_range_distance(self._fwd_ray and self._fwd_ray.distance / 100 or false)
+		end
+	end
 end
 
 local win32 = SystemInfo:platform() == Idstring("WIN32")
@@ -372,6 +381,9 @@ end
 
 function PlayerStandard:_determine_move_direction()
 	self._stick_move = self._controller:get_input_axis("move")
+	if self._state_data.on_zipline then
+		return
+	end
 	if mvector3.length(self._stick_move) < 0.1 or self:_interacting() then
 		self._move_dir = nil
 		self._normal_move_dir = nil
@@ -415,6 +427,7 @@ function PlayerStandard:_update_check_actions(t, dt)
 	self:_update_use_item_timers(t, input)
 	self:_update_equip_weapon_timers(t, input)
 	self:_update_running_timers(t)
+	self:_update_zipline_timers(t, dt)
 	if self._change_item_expire_t and t >= self._change_item_expire_t then
 		self._change_item_expire_t = nil
 	end
@@ -442,6 +455,7 @@ function PlayerStandard:_update_check_actions(t, dt)
 	self:_check_action_jump(t, input)
 	self:_check_action_run(t, input)
 	self:_check_action_ladder(t, input)
+	self:_check_action_zipline(t, input)
 	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_find_pickups(t)
@@ -456,7 +470,19 @@ function PlayerStandard:_update_movement(t, dt)
 	local pos_new
 	self._target_headbob = self._target_headbob or 0
 	self._headbob = self._headbob or 0
-	if self._move_dir then
+	if self._state_data.on_zipline and self._state_data.zipline_data.position then
+		local speed = mvector3.length(self._state_data.zipline_data.position - self._pos) / dt / 500
+		pos_new = mvec_pos_new
+		mvector3.set(pos_new, self._state_data.zipline_data.position)
+		if self._state_data.zipline_data.camera_shake then
+			self._ext_camera:shaker():set_parameter(self._state_data.zipline_data.camera_shake, "amplitude", speed)
+		end
+		if alive(self._state_data.zipline_data.zipline_unit) then
+			local dot = mvector3.dot(self._ext_camera:rotation():x(), self._state_data.zipline_data.zipline_unit:zipline():current_direction())
+			self._ext_camera:camera_unit():base():set_target_tilt(dot * 10 * speed)
+		end
+		self._target_headbob = 0
+	elseif self._move_dir then
 		local enter_moving = not self._moving
 		self._moving = true
 		if enter_moving then
@@ -517,7 +543,7 @@ function PlayerStandard:_update_movement(t, dt)
 		self._unit:movement():set_position(pos_new)
 		mvector3.set(self._last_velocity_xy, pos_new)
 		mvector3.subtract(self._last_velocity_xy, self._pos)
-		if not self._state_data.on_ladder then
+		if not self._state_data.on_ladder and not self._state_data.on_zipline then
 			mvector3.set_z(self._last_velocity_xy, 0)
 		end
 		mvector3.divide(self._last_velocity_xy, dt)
@@ -526,7 +552,7 @@ function PlayerStandard:_update_movement(t, dt)
 	end
 	local cur_pos = pos_new or self._pos
 	local move_dis = mvector3.distance_sq(cur_pos, self._last_sent_pos)
-	if 22500 < move_dis or 400 < move_dis and (t - self._last_sent_pos_t > 1.5 or not pos_new) then
+	if not self:_on_zipline() and (22500 < move_dis or 400 < move_dis and (t - self._last_sent_pos_t > 1.5 or not pos_new)) then
 		self._ext_network:send("action_walk_nav_point", cur_pos)
 		mvector3.set(self._last_sent_pos, cur_pos)
 		self._last_sent_pos_t = t
@@ -560,6 +586,9 @@ function PlayerStandard:_get_walk_headbob()
 end
 
 function PlayerStandard:_update_foley(t, input)
+	if self._state_data.on_zipline then
+		return
+	end
 	if not self._gnd_ray and not self._state_data.on_ladder then
 		if not self._state_data.in_air then
 			self._state_data.in_air = true
@@ -704,7 +733,7 @@ function PlayerStandard:_get_max_walk_speed(t)
 end
 
 function PlayerStandard:_start_action_steelsight(t)
-	if self:_changing_weapon() or self:_is_reloading() or self:_interacting() or self:_is_meleeing() or self._use_item_expire_t or self:_is_throwing_grenade() then
+	if self:_changing_weapon() or self:_is_reloading() or self:_interacting() or self:_is_meleeing() or self._use_item_expire_t or self:_is_throwing_grenade() or self:_on_zipline() then
 		self._steelsight_wanted = true
 		return
 	end
@@ -748,7 +777,7 @@ function PlayerStandard:_start_action_running(t)
 		self._running_wanted = true
 		return
 	end
-	if self:on_ladder() then
+	if self:on_ladder() or self:_on_zipline() then
 		return
 	end
 	if not (not self._shooting or self.RUN_AND_SHOOT) or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self._state_data.in_air or self:_is_throwing_grenade() then
@@ -768,6 +797,9 @@ function PlayerStandard:_start_action_running(t)
 	end
 	if not self._unit:movement():is_above_stamina_threshold() then
 		return
+	end
+	if not self._state_data.shake_player_start_running or not self._ext_camera:shaker():is_playing(self._state_data.shake_player_start_running) then
+		self._state_data.shake_player_start_running = self._ext_camera:play_shaker("player_start_running", 0.75)
 	end
 	self:set_running(true)
 	self._end_running_expire_t = nil
@@ -803,7 +835,7 @@ function PlayerStandard:_interupt_action_running(t)
 end
 
 function PlayerStandard:_start_action_ducking(t)
-	if self:_interacting() then
+	if self:_interacting() or self:_on_zipline() then
 		return
 	end
 	self:_interupt_action_running(t)
@@ -817,8 +849,8 @@ function PlayerStandard:_start_action_ducking(t)
 	self:_upd_attention()
 end
 
-function PlayerStandard:_end_action_ducking(t)
-	if not self:_can_stand() then
+function PlayerStandard:_end_action_ducking(t, skip_can_stand_check)
+	if not skip_can_stand_check and not self:_can_stand() then
 		return
 	end
 	self._state_data.ducking = false
@@ -831,9 +863,9 @@ function PlayerStandard:_end_action_ducking(t)
 	self:_upd_attention()
 end
 
-function PlayerStandard:_interupt_action_ducking(t)
+function PlayerStandard:_interupt_action_ducking(t, skip_can_stand_check)
 	if self._state_data.ducking then
-		self:_end_action_ducking(t)
+		self:_end_action_ducking(t, skip_can_stand_check)
 	end
 end
 
@@ -942,7 +974,7 @@ function PlayerStandard:_check_action_interact(t, input)
 	local new_action, timer, interact_object
 	local interaction_wanted = input.btn_interact_press
 	if interaction_wanted then
-		local action_forbidden = self:chk_action_forbidden("interact") or self._unit:base():stats_screen_visible() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_grenade() or self:_is_meleeing()
+		local action_forbidden = self:chk_action_forbidden("interact") or self._unit:base():stats_screen_visible() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_grenade() or self:_is_meleeing() or self:_on_zipline()
 		if not action_forbidden then
 			new_action, timer, interact_object = managers.interaction:interact(self._unit)
 			if new_action then
@@ -1033,6 +1065,9 @@ end
 
 function PlayerStandard:_check_action_weapon_gadget(t, input)
 	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() and self._equipped_unit:base():toggle_gadget() then
+		if self._equipped_unit:base():gadget_toggle_requires_stance_update() then
+			self:_stance_entered()
+		end
 		self._unit:network():send("set_weapon_gadget_state", self._equipped_unit:base()._gadget_on)
 	end
 end
@@ -1132,7 +1167,9 @@ function PlayerStandard:_do_action_melee(t, input)
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
 	self._state_data.melee_expire_t = t + tweak_data.blackmarket.melee_weapons[melee_entry].expire_t
 	self._state_data.melee_repeat_expire_t = t + math.min(tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t, tweak_data.blackmarket.melee_weapons[melee_entry].expire_t)
-	self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
+	if not instant_hit then
+		self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
+	end
 	managers.network:session():send_to_peers("play_distance_interact_redirect", self._unit, instant_hit and "melee" or "melee_item")
 	if self._state_data.melee_charge_shake then
 		self._ext_camera:shaker():stop(self._state_data.melee_charge_shake)
@@ -1946,7 +1983,7 @@ function PlayerStandard:_check_action_jump(t, input)
 	local action_wanted = input.btn_jump_press
 	if action_wanted then
 		local action_forbidden = self._jump_t and t < self._jump_t + 0.55
-		action_forbidden = action_forbidden or self._unit:base():stats_screen_visible() or self._state_data.in_air or self:_interacting()
+		action_forbidden = action_forbidden or self._unit:base():stats_screen_visible() or self._state_data.in_air or self:_interacting() or self:_on_zipline()
 		if not action_forbidden then
 			if self._state_data.ducking then
 				self:_interupt_action_ducking(t)
@@ -1989,6 +2026,95 @@ end
 
 function PlayerStandard:_perform_jump(jump_vec)
 	self._unit:mover():set_velocity(jump_vec)
+end
+
+function PlayerStandard:_check_action_zipline(t, input)
+	if self._state_data.in_air then
+		return
+	end
+	if not self._state_data.on_zipline then
+		local zipline_unit = self._unit:movement():zipline_unit()
+		if alive(zipline_unit) then
+			self:_start_action_zipline(t, input, zipline_unit)
+		end
+	end
+end
+
+function PlayerStandard:_start_action_zipline(t, input, zipline_unit)
+	self:_interupt_action_running(t)
+	self:_interupt_action_ducking(t, true)
+	self:_interupt_action_steelsight(t)
+	self._state_data.on_zipline = true
+	self._state_data.zipline_data = {}
+	self._state_data.zipline_data.zipline_unit = zipline_unit
+	self._ext_camera:play_shaker("player_enter_zipline")
+	if zipline_unit then
+		self._state_data.zipline_data.player_lerp_t = 0
+		self._state_data.zipline_data.player_lerp_tot_t = 0.5
+		self._state_data.zipline_data.tot_t = zipline_unit:zipline():total_time()
+	else
+		self._state_data.zipline_data.start_pos = self._unit:position()
+		self._state_data.zipline_data.end_pos = self._fwd_ray.position
+		self._state_data.zipline_data.slack = math.max(0, math.abs(self._state_data.zipline_data.start_pos.z - self._state_data.zipline_data.end_pos.z) / 3)
+		self._state_data.zipline_data.tot_t = (self._state_data.zipline_data.end_pos - self._state_data.zipline_data.start_pos):length() / 1000
+	end
+	self._state_data.zipline_data.t = 0
+	self._state_data.zipline_data.camera_shake = self._ext_camera:play_shaker("player_on_zipline", 0)
+	self._unit:kill_mover()
+end
+
+function PlayerStandard:_update_zipline_timers(t, dt)
+	if not self._state_data.on_zipline then
+		return
+	end
+	self._state_data.zipline_data.t = math.min(self._state_data.zipline_data.t + dt / self._state_data.zipline_data.tot_t, 1)
+	if alive(self._state_data.zipline_data.zipline_unit) then
+		self._state_data.zipline_data.position = self._state_data.zipline_data.zipline_unit:zipline():update_and_get_pos_at_time(self._state_data.zipline_data.t)
+		if self._state_data.zipline_data.player_lerp_t then
+			self._state_data.zipline_data.player_lerp_t = math.min(self._state_data.zipline_data.player_lerp_t + dt / self._state_data.zipline_data.player_lerp_tot_t, 1)
+			self._state_data.zipline_data.position = math.lerp(self._unit:position(), self._state_data.zipline_data.position, self._state_data.zipline_data.player_lerp_t)
+			if self._state_data.zipline_data.player_lerp_t == 1 then
+				self._state_data.zipline_data.player_lerp_t = nil
+			end
+		end
+	else
+		self._state_data.on_zipline_move = math.bezier({
+			0,
+			0,
+			1,
+			1
+		}, self._state_data.zipline_data.t)
+		self._state_data.zipline_data.position = math.lerp(self._state_data.zipline_data.start_pos, self._state_data.zipline_data.end_pos, self._state_data.on_zipline_move)
+		local bez = math.bezier({
+			0,
+			1,
+			0.5,
+			0
+		}, self._state_data.on_zipline_move)
+		local slack = math.lerp(0, self._state_data.zipline_data.slack, bez)
+		mvector3.set_z(self._state_data.zipline_data.position, mvector3.z(self._state_data.zipline_data.position) - slack)
+	end
+	if self._state_data.zipline_data.t == 1 then
+		self:_end_action_zipline(t)
+	end
+end
+
+function PlayerStandard:_end_action_zipline(t)
+	self._ext_camera:play_shaker("player_exit_zipline", 1)
+	local tilt = managers.player:is_carrying() and PlayerCarry.target_tilt or 0
+	self._ext_camera:camera_unit():base():set_target_tilt(tilt)
+	self._state_data.on_zipline = nil
+	self._unit:movement():on_exit_zipline()
+	if self._state_data.zipline_data.camera_shake then
+		self._ext_camera:shaker():stop(self._state_data.zipline_data.camera_shake)
+		self._state_data.zipline_data.camera_shake = nil
+	end
+	self._state_data.zipline_data = nil
+	self:_activate_mover(PlayerStandard.MOVER_STAND)
+end
+
+function PlayerStandard:_on_zipline()
+	return self._state_data.on_zipline
 end
 
 function PlayerStandard:_check_action_run(t, input)
@@ -2213,7 +2339,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 							if not self._state_data.in_steelsight then
 								self._ext_camera:play_redirect(self.IDS_RECOIL, 1)
 							elseif weap_tweak_data.animations.recoil_steelsight then
-								self._ext_camera:play_redirect(self.IDS_RECOIL_STEELSIGHT, 1)
+								self._ext_camera:play_redirect(weap_base:is_second_sight_on() and self.IDS_RECOIL or self.IDS_RECOIL_STEELSIGHT, 1)
 							end
 						end
 						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier()
@@ -2393,8 +2519,10 @@ function PlayerStandard:get_bullet_damage_result(attack_data)
 end
 
 function PlayerStandard:push(vel)
-	self._last_velocity_xy = self._last_velocity_xy + vel
-	self._unit:mover():set_velocity(self._last_velocity_xy)
+	if self._unit:mover() then
+		self._last_velocity_xy = self._last_velocity_xy + vel
+		self._unit:mover():set_velocity(self._last_velocity_xy)
+	end
 	self:_interupt_action_running(managers.player:player_timer():time())
 end
 
