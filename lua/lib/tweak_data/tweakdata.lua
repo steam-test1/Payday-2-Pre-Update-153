@@ -34,6 +34,7 @@ function TweakData:digest_tweak_data()
 	Application:debug("TweakData: Digesting tweak_data. <('O'<)")
 	self:digest_recursive(self.money_manager)
 	self:digest_recursive(self.experience_manager)
+	self:digest_recursive(self.casino)
 end
 
 function TweakData:digest_recursive(key, parent)
@@ -2077,6 +2078,7 @@ function TweakData:init()
 		1.2,
 		1.3
 	}
+	self.experience_manager.limited_bonus_multiplier = 1.33
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
@@ -2175,6 +2177,7 @@ function TweakData:init()
 	self.achievement.fully_loaded = 9
 	self.achievement.weapon_collector = 18
 	self.achievement.how_do_you_like_me_now = "level_1"
+	self.achievement.like_an_angry_bear = "bear"
 	self.pickups = {}
 	self.pickups.ammo = {
 		unit = Idstring("units/pickups/ammo/ammo_pickup")
@@ -2330,6 +2333,40 @@ function TweakData:init()
 	self.blame.civ_alarm = "hint_alarm_civ"
 	self.blame.cop_alarm = "hint_alarm_cop"
 	self.blame.gan_alarm = "hint_alarm_cop"
+	self.casino = {}
+	self.casino.unlock_level = 10
+	self.casino.entrance_level = {
+		14,
+		28,
+		42,
+		56,
+		70,
+		84,
+		100
+	}
+	self.casino.entrance_fee = {
+		1000000,
+		3000000,
+		9000000,
+		15000000,
+		20000000,
+		25000000,
+		30000000
+	}
+	self.casino.prefer_cost = 1500000
+	self.casino.prefer_chance = 0.1
+	self.casino.secure_card_cost = {
+		10000000,
+		33000000,
+		65000000
+	}
+	self.casino.secure_card_level = {
+		10,
+		40,
+		60
+	}
+	self.casino.infamous_cost = 30000000
+	self.casino.infamous_chance = 3
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()

@@ -321,6 +321,10 @@ function BlackMarketManager:equip_mask(slot)
 		data.equipped = s == slot
 	end
 	local new_mask_data = Global.blackmarket_manager.crafted_items[category][slot]
+	local equipped = new_mask_data and new_mask_data.mask_id
+	if equipped == tweak_data.achievement.like_an_angry_bear then
+		managers.achievment:award("like_an_angry_bear")
+	end
 	if managers.menu_scene then
 		managers.menu_scene:set_character_mask_by_id(new_mask_data.mask_id, new_mask_data.blueprint)
 	end

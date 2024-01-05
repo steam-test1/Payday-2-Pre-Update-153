@@ -6,10 +6,12 @@ require("lib/managers/menu/StageEndScreenGui")
 require("lib/managers/menu/LootDropScreenGUI")
 require("lib/managers/menu/CrimeNetContractGui")
 require("lib/managers/menu/CrimeNetFiltersGui")
+require("lib/managers/menu/CrimeNetCasinoGui")
 require("lib/managers/menu/MenuSceneGui")
 require("lib/managers/menu/PlayerProfileGuiObject")
 require("lib/managers/menu/IngameContractGui")
 require("lib/managers/menu/IngameManualGui")
+require("lib/managers/hud/HUDLootScreen")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -78,6 +80,14 @@ function MenuComponentManager:init()
 	self._active_components.crimenet_filters = {
 		create = callback(self, self, "_create_crimenet_filters_gui"),
 		close = callback(self, self, "close_crimenet_filters_gui")
+	}
+	self._active_components.crimenet_casino = {
+		create = callback(self, self, "_create_crimenet_casino_gui"),
+		close = callback(self, self, "close_crimenet_casino_gui")
+	}
+	self._active_components.lootdrop_casino = {
+		create = callback(self, self, "_create_lootdrop_casino_gui"),
+		close = callback(self, self, "close_lootdrop_casino_gui")
 	}
 	self._active_components.blackmarket = {
 		create = callback(self, self, "_create_blackmarket_gui"),
@@ -250,6 +260,9 @@ function MenuComponentManager:update(t, dt)
 	if self._lootdrop_gui then
 		self._lootdrop_gui:update(t, dt)
 	end
+	if self._lootdrop_casino_gui then
+		self._lootdrop_casino_gui:update(t, dt)
+	end
 	if self._stage_endscreen_gui then
 		self._stage_endscreen_gui:update(t, dt)
 	end
@@ -312,11 +325,14 @@ function MenuComponentManager:input_focus()
 	if self._stage_endscreen_gui then
 		return self._stage_endscreen_gui:input_focus()
 	end
-	if self._crimenet_gui then
-		return self._crimenet_gui:input_focus()
+	if self._lootdrop_casino_gui then
+		return self._lootdrop_casino_gui:input_focus()
 	end
 	if self._lootdrop_gui then
 		return self._lootdrop_gui:input_focus()
+	end
+	if self._crimenet_gui then
+		return self._crimenet_gui:input_focus()
 	end
 	if self._ingame_manual_gui then
 		return self._ingame_manual_gui:input_focus()
@@ -337,6 +353,9 @@ function MenuComponentManager:scroll_up()
 	if self._lootdrop_gui and self._lootdrop_gui:scroll_up() then
 		return true
 	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:scroll_up() then
+		return true
+	end
 end
 
 function MenuComponentManager:scroll_down()
@@ -351,6 +370,9 @@ function MenuComponentManager:scroll_down()
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:scroll_down() then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:scroll_down() then
 		return true
 	end
 end
@@ -371,6 +393,9 @@ function MenuComponentManager:move_up()
 	if self._lootdrop_gui and self._lootdrop_gui:move_up() then
 		return true
 	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:move_up() then
+		return true
+	end
 end
 
 function MenuComponentManager:move_down()
@@ -387,6 +412,9 @@ function MenuComponentManager:move_down()
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:move_down() then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:move_down() then
 		return true
 	end
 end
@@ -407,6 +435,9 @@ function MenuComponentManager:move_left()
 	if self._lootdrop_gui and self._lootdrop_gui:move_left() then
 		return true
 	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:move_left() then
+		return true
+	end
 end
 
 function MenuComponentManager:move_right()
@@ -423,6 +454,9 @@ function MenuComponentManager:move_right()
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:move_right() then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:move_right() then
 		return true
 	end
 end
@@ -444,6 +478,9 @@ function MenuComponentManager:next_page()
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:next_page() then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:next_page() then
 		return true
 	end
 	if self._ingame_manual_gui and self._ingame_manual_gui:next_page() then
@@ -470,6 +507,9 @@ function MenuComponentManager:previous_page()
 	if self._lootdrop_gui and self._lootdrop_gui:previous_page() then
 		return true
 	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:previous_page() then
+		return true
+	end
 	if self._ingame_manual_gui and self._ingame_manual_gui:previous_page() then
 		return true
 	end
@@ -494,6 +534,9 @@ function MenuComponentManager:confirm_pressed()
 	if self._lootdrop_gui and self._lootdrop_gui:confirm_pressed() then
 		return true
 	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:confirm_pressed() then
+		return true
+	end
 	if Application:production_build() and self._debug_font_gui then
 		self._debug_font_gui:toggle()
 	end
@@ -507,6 +550,9 @@ function MenuComponentManager:back_pressed()
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:back_pressed() then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:back_pressed() then
 		return true
 	end
 end
@@ -528,6 +574,12 @@ function MenuComponentManager:special_btn_pressed(...)
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:special_btn_pressed(...) then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:special_btn_pressed(...) then
+		return true
+	end
+	if self._crimenet_casino_gui and self._crimenet_casino_gui:special_btn_pressed(...) then
 		return true
 	end
 end
@@ -643,6 +695,12 @@ function MenuComponentManager:mouse_pressed(o, button, x, y)
 		return true
 	end
 	if self._lootdrop_gui and self._lootdrop_gui:mouse_pressed(button, x, y) then
+		return true
+	end
+	if self._lootdrop_casino_gui and self._lootdrop_casino_gui:mouse_pressed(button, x, y) then
+		return true
+	end
+	if self._crimenet_casino_gui and self._crimenet_casino_gui:mouse_pressed(button, x, y) then
 		return true
 	end
 	if self._view_character_profile_gui then
@@ -943,6 +1001,20 @@ function MenuComponentManager:mouse_moved(o, x, y)
 			return true, wanted_pointer
 		end
 	end
+	if self._lootdrop_casino_gui then
+		local used, pointer = self._lootdrop_casino_gui:mouse_moved(x, y)
+		wanted_pointer = pointer or wanted_pointer
+		if used then
+			return true, wanted_pointer
+		end
+	end
+	if self._crimenet_casino_gui then
+		local used, pointer = self._crimenet_casino_gui:mouse_moved(x, y)
+		wanted_pointer = pointer or wanted_pointer
+		if used then
+			return true, wanted_pointer
+		end
+	end
 	if self._lobby_profile_gui then
 		local used, pointer = self._lobby_profile_gui:moved_scroll_bar(x, y)
 		if used then
@@ -1009,6 +1081,9 @@ function MenuComponentManager:on_peer_removed(peer, reason)
 	if self._lootdrop_gui then
 		self._lootdrop_gui:on_peer_removed(peer, reason)
 	end
+	if self._lootdrop_casino_gui then
+		self._lootdrop_casino_gui:on_peer_removed(peer, reason)
+	end
 end
 
 function MenuComponentManager:_create_crimenet_contract_gui(node)
@@ -1042,6 +1117,26 @@ function MenuComponentManager:close_crimenet_filters_gui(...)
 		self._crimenet_filters_gui:close()
 		self._crimenet_filters_gui = nil
 		self:enable_crimenet()
+	end
+end
+
+function MenuComponentManager:_create_crimenet_casino_gui(node)
+	self:close_crimenet_casino_gui()
+	self._crimenet_casino_gui = CrimeNetCasinoGui:new(self._ws, self._fullscreen_ws, node)
+	self:disable_crimenet()
+end
+
+function MenuComponentManager:close_crimenet_casino_gui(...)
+	if self._crimenet_casino_gui then
+		self._crimenet_casino_gui:close()
+		self._crimenet_casino_gui = nil
+		self:enable_crimenet()
+	end
+end
+
+function MenuComponentManager:can_afford()
+	if self._crimenet_casino_gui then
+		self._crimenet_casino_gui:can_afford()
 	end
 end
 
@@ -1573,7 +1668,6 @@ function MenuComponentManager:flash_ready_mission_briefing_gui()
 end
 
 function MenuComponentManager:_create_lootdrop_gui()
-	print("_create_lootdrop_gui()")
 	self:create_lootdrop_gui()
 end
 
@@ -1621,6 +1715,88 @@ function MenuComponentManager:lootdrop_is_now_active()
 		self._lootdrop_gui._panel:show()
 		self._lootdrop_gui._fullscreen_panel:show()
 	end
+end
+
+function MenuComponentManager:_create_lootdrop_casino_gui(node)
+	self:create_lootdrop_casino_gui(node)
+end
+
+function MenuComponentManager:create_lootdrop_casino_gui(node)
+	if not self._lootdrop_casino_gui then
+		local casino_data = node:parameters().menu_component_data
+		local card_secured = casino_data.secure_cards
+		local card_drops = {}
+		card_drops[1] = card_secured >= math.random(3) and casino_data.preferred_item
+		card_secured = card_drops[1] and card_secured - 1 or card_secured
+		card_drops[2] = card_secured == 2 and managers.lootdrop:specific_fake_loot_pc(casino_data.preferred_item) or card_secured == 1 and card_secured == math.random(3) and managers.lootdrop:specific_fake_loot_pc(casino_data.preferred_item)
+		card_secured = card_drops[2] and card_secured - 1 or card_secured
+		card_drops[3] = 0 < card_secured and managers.lootdrop:specific_fake_loot_pc(casino_data.preferred_item)
+		local skip_types = {cash = true, xp = true}
+		local setup_lootdrop_data = {}
+		setup_lootdrop_data.preferred_type = casino_data.preferred_item
+		setup_lootdrop_data.preferred_type_drop = card_drops[1]
+		setup_lootdrop_data.preferred_chance = tweak_data:get_value("casino", "prefer_chance")
+		setup_lootdrop_data.increase_infamous = casino_data.increase_infamous and tweak_data:get_value("casino", "infamous_chance")
+		setup_lootdrop_data.skip_types = skip_types
+		setup_lootdrop_data.disable_difficulty = true
+		setup_lootdrop_data.max_pcs = 1
+		local new_lootdrop_data = {}
+		managers.lootdrop:new_make_drop(new_lootdrop_data, setup_lootdrop_data)
+		local global_values = {
+			normal = 1,
+			superior = 2,
+			exceptional = 3,
+			infamous = 4
+		}
+		local peer = managers.network:session() and managers.network:session():local_peer() or false
+		local global_value = global_values[new_lootdrop_data.global_value] or 1
+		local item_category = new_lootdrop_data.type_items
+		local item_id = new_lootdrop_data.item_entry
+		local max_pc = new_lootdrop_data.total_stars
+		local item_pc = new_lootdrop_data.joker and 0 or math.ceil(new_lootdrop_data.item_payclass / 10)
+		skip_types.weapon_mods = not managers.lootdrop:can_drop_weapon_mods() and true or nil
+		local card_left_pc = card_drops[2] or managers.lootdrop:new_fake_loot_pc(nil, skip_types)
+		local card_right_pc = card_drops[3] or managers.lootdrop:new_fake_loot_pc(nil, skip_types)
+		local lootdrop_data = {
+			peer,
+			new_lootdrop_data.global_value,
+			item_category,
+			item_id,
+			max_pc,
+			item_pc,
+			card_left_pc,
+			card_right_pc
+		}
+		local selected_card = {}
+		selected_card[peer and peer:id() or 1] = 2
+		local parent_layer = managers.menu:active_menu().renderer:selected_node():layer()
+		self._lootscreen_casino_hud = HUDLootScreen:new(nil, self._fullscreen_ws, nil, selected_card)
+		self._lootscreen_casino_hud:set_layer(parent_layer + 1)
+		self._lootscreen_casino_hud:show()
+		self._lootdrop_casino_gui = CasinoLootDropScreenGui:new(self._ws, self._fullscreen_ws, self._lootscreen_casino_hud)
+		self._lootdrop_casino_gui:set_layer(parent_layer + 1)
+		self._lootscreen_casino_hud:feed_lootdrop(lootdrop_data)
+	end
+	if self._lootdrop_casino_gui then
+		self:disable_crimenet()
+		self._lootdrop_casino_gui:show()
+	end
+end
+
+function MenuComponentManager:close_lootdrop_casino_gui()
+	if self._lootdrop_casino_gui then
+		self._lootdrop_casino_gui:close()
+		self._lootdrop_casino_gui = nil
+		self:enable_crimenet()
+	end
+	if self._lootscreen_casino_hud then
+		self._lootscreen_casino_hud:close()
+		self._lootscreen_casino_hud = nil
+	end
+end
+
+function MenuComponentManager:check_lootdrop_casino_done()
+	return self._lootdrop_casino_gui:card_chosen()
 end
 
 function MenuComponentManager:_create_stage_endscreen_gui()
@@ -2275,6 +2451,7 @@ function MenuComponentManager:close()
 	self:close_blackmarket_gui()
 	self:close_stage_endscreen_gui()
 	self:close_lootdrop_gui()
+	self:close_lootdrop_casino_gui()
 	self:close_mission_briefing_gui()
 	self:close_debug_fonts_gui()
 	if self._resolution_changed_callback_id then

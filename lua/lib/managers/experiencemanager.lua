@@ -228,7 +228,8 @@ function ExperienceManager:_set_current_level(value)
 end
 
 function ExperienceManager:level_to_stars()
-	local player_stars = math.max(math.ceil(self:current_level() / 10), 1)
+	local plvl = managers.experience:current_level()
+	local player_stars = math.clamp(math.ceil((plvl + 1) / 10), 1, 10)
 	return player_stars
 end
 
@@ -429,6 +430,21 @@ function ExperienceManager:get_xp_by_params(params)
 	total_xp = total_xp + days_dissect
 	local days_dissect_risk = math.round(days_dissect * (risk_dissect / (base_xp + risk_dissect)))
 	local days_dissect_job = days_dissect - days_dissect_risk
+	local limited_bonus = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+	if 1 < limited_bonus then
+		base_xp = base_xp * limited_bonus
+		total_xp = total_xp * limited_bonus
+		risk_dissect = risk_dissect * limited_bonus
+		alive_crew_dissect = alive_crew_dissect * limited_bonus
+		failed_level_dissect = failed_level_dissect * limited_bonus
+		level_limit_dissect = level_limit_dissect * limited_bonus
+		skill_dissect = skill_dissect * limited_bonus
+		days_dissect = days_dissect * limited_bonus
+		days_dissect_job = days_dissect_job * limited_bonus
+		days_dissect_risk = days_dissect_risk * limited_bonus
+		stage_xp_dissect = stage_xp_dissect * limited_bonus
+		job_xp_dissect = job_xp_dissect * limited_bonus
+	end
 	local dissection_table = {
 		bonus_risk = math.round(risk_dissect),
 		bonus_num_players = math.round(alive_crew_dissect),

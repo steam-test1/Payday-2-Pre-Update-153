@@ -115,6 +115,10 @@ function GenericDLCManager:has_cce()
 	return Global.dlc_manager.all_dlc_data.career_criminal_edition and Global.dlc_manager.all_dlc_data.career_criminal_edition.verified
 end
 
+function GenericDLCManager:has_pd2_clan()
+	return Global.dlc_manager.all_dlc_data.pd2_clan and Global.dlc_manager.all_dlc_data.pd2_clan.verified
+end
+
 PS3DLCManager = PS3DLCManager or class(GenericDLCManager)
 DLCManager.PLATFORM_CLASS_MAP[Idstring("PS3"):key()] = PS3DLCManager
 PS3DLCManager.SERVICE_ID = "EP4040-BLES01902_00"
@@ -335,7 +339,10 @@ function WINDLCManager:init()
 		Global.dlc_manager.all_dlc_data = {
 			full_game = {app_id = "218620", verified = true},
 			preorder = {app_id = "247450", no_install = true},
-			career_criminal_edition = {app_id = "218630", no_install = true}
+			career_criminal_edition = {app_id = "218630", no_install = true},
+			pd2_clan = {
+				source_id = "103582791433980119"
+			}
 		}
 		self:_verify_dlcs()
 	end
@@ -344,12 +351,21 @@ end
 function WINDLCManager:_verify_dlcs()
 	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
 		if not dlc_data.verified then
-			if dlc_data.no_install then
-				if Steam:is_product_owned(dlc_data.app_id) then
+			if dlc_data.app_id then
+				if dlc_data.no_install then
+					if Steam:is_product_owned(dlc_data.app_id) then
+						dlc_data.verified = true
+					end
+				elseif Steam:is_product_installed(dlc_data.app_id) then
 					dlc_data.verified = true
 				end
-			elseif Steam:is_product_installed(dlc_data.app_id) then
-				dlc_data.verified = true
+			elseif dlc_data.source_id then
+				if not Steam.is_user_in_source then
+					Application:error("EXE OUT OF DATE!")
+				end
+				if Steam:is_user_in_source(Steam:userid(), dlc_data.source_id) then
+					dlc_data.verified = true
+				end
 			end
 		end
 	end

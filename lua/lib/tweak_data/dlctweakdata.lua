@@ -17,6 +17,16 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan = {}
+	self.pd2_clan.content = {}
+	self.pd2_clan.dlc = "has_pd2_clan"
+	self.pd2_clan.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "bear",
+			amount = 1
+		}
+	}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

@@ -203,3 +203,8 @@ function Renderer:resolution_changed()
 		node_gui:resolution_changed()
 	end
 end
+
+function Renderer:selected_node()
+	local stack = self._node_gui_stack
+	return stack[#stack]
+end

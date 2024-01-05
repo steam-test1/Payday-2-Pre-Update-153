@@ -1690,6 +1690,33 @@ function HudIconsTweakData:init()
 			180
 		}
 	}
+	self.upcard_material = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			128,
+			180,
+			128,
+			180
+		}
+	}
+	self.upcard_color = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			256,
+			180,
+			128,
+			180
+		}
+	}
+	self.upcard_pattern = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			384,
+			180,
+			128,
+			180
+		}
+	}
 	self.upcard_weapon = {
 		texture = "guis/textures/pd2/lootscreen/loot_cards",
 		texture_rect = {

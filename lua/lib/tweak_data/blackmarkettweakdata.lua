@@ -656,6 +656,18 @@ function BlackMarketTweakData:_init_masks()
 		40
 	}
 	self.masks.rubber_female.value = 3
+	self.masks.bear = {}
+	self.masks.bear.unit = "units/payday2/masks/msk_bear/msk_bear"
+	self.masks.bear.name_id = "bm_msk_bear"
+	self.masks.bear.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.bear.value = 3
+	self.masks.bear.qlvl = 0
+	self.masks.bear.dlcs = {"pd2_clan"}
 	self:_add_desc_from_name_macro(self.masks)
 end
 

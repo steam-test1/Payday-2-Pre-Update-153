@@ -5,6 +5,7 @@ function MenuInput:init(logic, ...)
 	MenuInput.super.init(self, logic, ...)
 	self._move_axis_limit = 0.5
 	self._sound_source = SoundDevice:create_source("MenuInput")
+	self._controller_mouse_active_counter = 0
 	self._item_input_action_map[ItemColumn.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[ItemServerColumn.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemLevel.TYPE] = callback(self, self, "input_item")
@@ -49,13 +50,17 @@ function MenuInput:activate_mouse(position, controller_activated)
 end
 
 function MenuInput:activate_controller_mouse(position)
-	if managers.mouse_pointer:change_mouse_to_controller(self._controller:get_controller()) then
+	self._controller_mouse_active_counter = self._controller_mouse_active_counter + 1
+	if self._controller_mouse_active_counter == 1 and managers.mouse_pointer:change_mouse_to_controller(self._controller:get_controller()) then
 		self:activate_mouse(position, true)
 	end
 end
 
 function MenuInput:deactivate_controller_mouse()
-	if managers.mouse_pointer:change_controller_to_mouse() then
+	self._controller_mouse_active_counter = self._controller_mouse_active_counter - 1
+	if self._controller_mouse_active_counter < 0 then
+	end
+	if self._controller_mouse_active_counter == 0 and managers.mouse_pointer:change_controller_to_mouse() then
 		self:deactivate_mouse()
 	end
 end
@@ -453,8 +458,13 @@ function MenuInput:update(t, dt)
 				end
 			end
 		end
-	elseif self._controller and self._controller:get_input_pressed("menu_toggle_voice_message") and managers.menu:active_menu().renderer.special_btn_pressed then
-		managers.menu:active_menu().renderer:special_btn_pressed(Idstring("voice_message"))
+	elseif self._controller and managers.menu:active_menu().renderer.special_btn_pressed then
+		if self._controller:get_input_pressed("menu_toggle_voice_message") then
+			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("voice_message"))
+		end
+		if self._controller:get_input_pressed("menu_casino_bet") then
+			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("start_bet"))
+		end
 	end
 	if not self._keyboard_used and self._mouse_active and self._accept_input and not self._mouse_moved then
 		self:mouse_moved(managers.mouse_pointer:mouse(), managers.mouse_pointer:world_position())

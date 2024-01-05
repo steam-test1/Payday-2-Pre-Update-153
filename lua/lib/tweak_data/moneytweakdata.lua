@@ -91,6 +91,7 @@ function MoneyTweakData:init()
 	}
 	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 3, false, 1)
 	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, 4, false, 1)
+	self.limited_bonus_multiplier = 1
 	self.sell_weapon_multiplier = 0.25
 	self.sell_mask_multiplier = 0.25
 	self.killing_civilian_deduction = self._create_value_table(2000, 20000, 10, true, 2)
@@ -115,6 +116,7 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.infamous = 5
 	self.global_value_multipliers.preorder = 1
 	self.global_value_multipliers.overkill = 0.01
+	self.global_value_multipliers.pd2_clan = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -122,6 +124,7 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.infamous = 1
 	self.global_value_bonus_multiplier.preorder = 0
 	self.global_value_bonus_multiplier.overkill = 20
+	self.global_value_bonus_multiplier.pd2_clan = 1
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
