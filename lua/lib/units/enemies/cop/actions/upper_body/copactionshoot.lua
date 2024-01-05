@@ -672,11 +672,21 @@ function CopActionShoot:_set_ik_updator(name)
 end
 
 function CopActionShoot:_chk_start_melee(target_vec, target_dis, autotarget, target_pos)
-	local state = self._ext_movement:play_redirect("melee")
+	local melee_weapon = self._common_data.char_tweak.melee_weapon or "weapon"
+	local is_weapon = melee_weapon == "weapon"
+	local state = self._ext_movement:play_redirect(is_weapon and "melee" or "melee_item")
 	if state then
-		local anim_speed = self._w_usage_tweak.melee_speed
-		self._common_data.machine:set_speed(state, anim_speed)
-		self._melee_timeout_t = TimerManager:game():time() + 1 + math.random() * 1
+		if not is_weapon then
+			local anim_attack_vars = {"var1", "var2"}
+			self._common_data.machine:set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
+			local param = tweak_data.weapon.npc_melee[melee_weapon].animation_param
+			self._common_data.machine:set_parameter(state, param, 1)
+		end
+		if is_weapon then
+			local anim_speed = self._w_usage_tweak.melee_speed
+			self._common_data.machine:set_speed(state, anim_speed)
+		end
+		self._melee_timeout_t = TimerManager:game():time() + math.lerp(self._w_usage_tweak.melee_retry_delay[1], self._w_usage_tweak.melee_retry_delay[2], math.random())
 	else
 		debug_pause_unit(self._common_data.unit, "[CopActionShoot:_chk_start_melee] redirect failed in state", self._common_data.machine:segment_state(Idstring("base")), self._common_data.unit)
 	end
@@ -704,12 +714,17 @@ function CopActionShoot:anim_clbk_melee_strike()
 	if min_dot > fwd_dot then
 		return
 	end
-	local push_vel = target_vec:with_z(0):normalized() * 600
+	local push_vel = target_vec:with_z(0.1):normalized() * 600
+	local melee_weapon = self._common_data.char_tweak.melee_weapon or "weapon"
+	local is_weapon = melee_weapon == "weapon"
+	local damage = is_weapon and self._w_usage_tweak.melee_dmg or tweak_data.weapon.npc_melee[melee_weapon].damage
+	damage = damage * (is_weapon and 1 or self._common_data.char_tweak.melee_weapon_dmg_multiplier or 1)
 	local action_data = {
 		variant = "melee",
-		damage = self._w_usage_tweak.melee_dmg,
+		damage = damage,
 		weapon_unit = self._weapon_unit,
 		attacker_unit = self._common_data.unit,
+		melee_weapon = melee_weapon,
 		push_vel = push_vel,
 		col_ray = {
 			position = shoot_from_pos + fwd * 50,

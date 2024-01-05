@@ -85,7 +85,7 @@ function WeaponFactoryManager:get_factory_id_by_weapon_id(weapon_id)
 end
 
 function WeaponFactoryManager:get_default_blueprint_by_factory_id(factory_id)
-	return tweak_data.weapon.factory[factory_id].default_blueprint
+	return tweak_data.weapon.factory[factory_id] and tweak_data.weapon.factory[factory_id].default_blueprint or {}
 end
 
 function WeaponFactoryManager:create_limited_blueprints(factory_id)
@@ -493,6 +493,16 @@ function WeaponFactoryManager:get_part_from_weapon_by_type(type, parts)
 	for id, data in pairs(parts) do
 		if factory.parts[id].type == type then
 			return parts[id]
+		end
+	end
+	return false
+end
+
+function WeaponFactoryManager:get_part_data_type_from_weapon_by_type(type, data_type, parts)
+	local factory = tweak_data.weapon.factory
+	for id, data in pairs(parts) do
+		if factory.parts[id].type == type then
+			return factory.parts[id][data_type]
 		end
 	end
 	return false

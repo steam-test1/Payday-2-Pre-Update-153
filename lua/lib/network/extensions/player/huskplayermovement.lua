@@ -12,6 +12,7 @@ HuskPlayerMovement._calc_suspicion_ratio_and_sync = PlayerMovement._calc_suspici
 HuskPlayerMovement.on_suspicion = PlayerMovement.on_suspicion
 HuskPlayerMovement.state_enter_time = PlayerMovement.state_enter_time
 HuskPlayerMovement.SO_access = PlayerMovement.SO_access
+HuskPlayerMovement.rescue_SO_verification = PlayerBleedOut.rescue_SO_verification
 HuskPlayerMovement._walk_anim_velocities = {
 	stand = {
 		ntl = {
@@ -522,6 +523,43 @@ function HuskPlayerMovement:play_state_idstr(state_name, at_time)
 	Application:stack_dump()
 end
 
+function HuskPlayerMovement:anim_cbk_set_melee_item_state_vars(unit)
+	local state = self._unit:anim_state_machine():segment_state(Idstring("upper_body"))
+	local anim_attack_vars = {"var1", "var2"}
+	self._unit:anim_state_machine():set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
+	local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
+	local peer = managers.network:session():peer(peer_id)
+	local melee_entry = peer:melee_id()
+	local anim_global_param = tweak_data.blackmarket.melee_weapons[melee_entry].anim_global_param
+	self._unit:anim_state_machine():set_parameter(state, anim_global_param, 1)
+end
+
+function HuskPlayerMovement:anim_cbk_spawn_melee_item(unit)
+	if alive(self._melee_item_unit) then
+		return
+	end
+	local align_obj_l_name = Idstring("a_weapon_left_front")
+	local align_obj_r_name = Idstring("a_weapon_right_front")
+	local align_obj_l = self._unit:get_object(align_obj_l_name)
+	local align_obj_r = self._unit:get_object(align_obj_r_name)
+	local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
+	local peer = managers.network:session():peer(peer_id)
+	local melee_entry = peer:melee_id()
+	local unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].third_unit
+	if unit_name then
+		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj_l:position(), align_obj_l:rotation())
+		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+	end
+end
+
+function HuskPlayerMovement:anim_cbk_unspawn_melee_item(unit)
+	if alive(self._melee_item_unit) then
+		self._melee_item_unit:unlink()
+		World:delete_unit(self._melee_item_unit)
+		self._melee_item_unit = nil
+	end
+end
+
 function HuskPlayerMovement:set_need_revive(need_revive, down_time)
 	if self._need_revive == need_revive then
 		return
@@ -592,7 +630,8 @@ function HuskPlayerMovement:_register_revive_SO()
 		search_pos = self._unit:position(),
 		usage_amount = 1,
 		AI_group = "friendlies",
-		admin_clbk = callback(self, self, "on_revive_SO_administered")
+		admin_clbk = callback(self, self, "on_revive_SO_administered"),
+		verification_clbk = callback(HuskPlayerMovement, HuskPlayerMovement, "rescue_SO_verification")
 	}
 	local so_id = "PlayerHusk_revive" .. tostring(self._unit:key())
 	self._revive_SO_id = so_id
@@ -1563,16 +1602,6 @@ function HuskPlayerMovement:on_uncovered(enemy_unit)
 	})
 end
 
-function HuskPlayerMovement:on_SPOOCed()
-	self._unit:network():send_to_unit({
-		"sync_player_movement_state",
-		self._unit,
-		"incapacitated",
-		0,
-		self._unit:id()
-	})
-end
-
 function HuskPlayerMovement:anim_clbk_footstep(unit)
 	CopMovement.anim_clbk_footstep(self, unit, self._m_pos)
 end
@@ -1692,6 +1721,7 @@ function HuskPlayerMovement:pre_destroy(unit)
 		managers.groupai:state():remove_listener(self._enemy_weapons_hot_listen_id)
 		self._enemy_weapons_hot_listen_id = nil
 	end
+	self:anim_cbk_unspawn_melee_item()
 end
 
 function HuskPlayerMovement:set_attention_setting_enabled(setting_name, state)

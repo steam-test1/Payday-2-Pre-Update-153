@@ -842,19 +842,5 @@ function CivilianLogicFlee.clbk_chk_call_the_police(ignore_this, data)
 end
 
 function CivilianLogicFlee._say_call_the_police(data, my_data)
-	local snd_event_name
-	if my_data.call_in_event == "corpse" then
-		snd_event_name = "cmd_cal_bod_xxx"
-	elseif my_data.call_in_event == "w_hot" then
-		snd_event_name = "cmd_sht_frd_xxx"
-	elseif my_data.call_in_event == "drill" then
-		snd_event_name = "cmd_sht_frd_xxx"
-	elseif my_data.call_in_event == "civilian" then
-		snd_event_name = "cmd_civ_dist_xxx"
-	elseif my_data.call_in_event == "criminal" then
-		snd_event_name = "cmd_sht_frd_xxx"
-	else
-		snd_event_name = "cmd_sht_frd_xxx"
-	end
-	data.unit:sound():say(snd_event_name, true, false)
+	data.unit:sound():say("911_call", true, false)
 end

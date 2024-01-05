@@ -13,6 +13,7 @@ function PlayerArrested:enter(state_data, enter_data)
 	}
 	self:_interupt_action_throw_grenade()
 	self:_interupt_action_steelsight()
+	self:_interupt_action_melee(managers.player:player_timer():time())
 	self:_interupt_action_ladder(managers.player:player_timer():time())
 	self._old_selection = self._unit:inventory():equipped_selection()
 	self:_start_action_handcuffed(managers.player:player_timer():time())

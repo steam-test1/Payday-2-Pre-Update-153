@@ -7,6 +7,7 @@ ActionSpooc._anim_movement = CopActionWalk._anim_movement
 ActionSpooc._get_max_walk_speed = CopActionWalk._get_max_walk_speed
 ActionSpooc._get_current_max_walk_speed = CopActionWalk._get_current_max_walk_speed
 ActionSpooc._global_incremental_action_ID = 1
+ActionSpooc._apply_freefall = CopActionWalk._apply_freefall
 ActionSpooc._tmp_vec1 = Vector3()
 ActionSpooc._tmp_vec2 = Vector3()
 
@@ -40,6 +41,7 @@ function ActionSpooc:init(action_desc, common_data)
 	self._strike_nav_index = action_desc.strike_nav_index
 	self._haste = "run"
 	self._nr_expected_nav_points = action_desc.nr_expected_nav_points
+	self._last_vel_z = 0
 	self._was_interrupted = action_desc.interrupted
 	local is_server = Network:is_server()
 	if is_server then
@@ -79,7 +81,6 @@ function ActionSpooc:init(action_desc, common_data)
 		self._ext_network:send("action_spooc_start", self._target_unit:movement():m_pos(), action_desc.flying_strike, self._action_id)
 	end
 	self._walk_velocity = self:_get_max_walk_speed()
-	self._last_vel_z = 0
 	self._cur_vel = 0
 	self._last_pos = mvector3.copy(common_data.pos)
 	CopActionAct._create_blocks_table(self, action_desc.blocks)
@@ -112,11 +113,17 @@ function ActionSpooc:init(action_desc, common_data)
 	else
 		self:_wait()
 	end
+	self._unit:sound():play("cloaker_detect_mono", nil, nil)
 	self._unit:damage():run_sequence_simple("turn_on_spook_lights")
 	return true
 end
 
 function ActionSpooc:on_exit()
+	if self._unit:character_damage():dead() then
+		self._unit:sound():play("cloaker_detect_stop", nil, nil)
+	else
+		self._unit:sound():play("cloaker_presence_loop", nil, nil)
+	end
 	self._unit:damage():run_sequence_simple("kill_spook_lights")
 	if self._root_blend_disabled then
 		self._ext_movement:set_root_blend(true)
@@ -206,16 +213,19 @@ function ActionSpooc:_upd_strike_first_frame(t)
 	if redir_result then
 		self._ext_movement:spawn_wanted_items()
 	end
-	self._stroke_t = t
-	self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
 	if self._is_local then
 		mvector3.set(self._last_sent_pos, self._common_data.pos)
 		self._ext_network:send("action_spooc_strike", mvector3.copy(self._common_data.pos), self._action_id)
 		self._nav_path[self._nav_index + 1] = mvector3.copy(self._common_data.pos)
-		self._strike_unit = self._target_unit
-		self._target_unit:movement():on_SPOOCed()
+		if self._target_unit:base().is_local_player then
+			local enemy_vec = mvector3.copy(self._common_data.pos)
+			mvector3.subtract(enemy_vec, self._target_unit:movement():m_pos())
+			mvector3.set_z(enemy_vec, 0)
+			mvector3.normalize(enemy_vec)
+			self._target_unit:camera():camera_unit():base():clbk_aim_assist({ray = enemy_vec})
+		end
 	end
-	self._vel_z = 0
+	self._last_vel_z = 0
 	self:_set_updator("_upd_striking")
 	self._common_data.unit:base():chk_freeze_anims()
 end
@@ -465,10 +475,6 @@ function ActionSpooc:_set_new_pos(dt)
 	CopActionWalk._set_new_pos(self, dt)
 end
 
-function ActionSpooc._apply_freefall(...)
-	return CopActionWalk._apply_freefall(...)
-end
-
 function ActionSpooc:type()
 	return "spooc"
 end
@@ -624,12 +630,26 @@ function ActionSpooc:_upd_wait(t)
 		self:_upd_chase_path()
 		if self._end_of_path and #self._nav_path > self._nav_index then
 			self._end_of_path = nil
+			self:_start_sprint()
 		end
 	end
 end
 
 function ActionSpooc:_upd_striking(t)
-	if self._ext_anim.act and t - self._stroke_t < 7 then
+	if self._ext_anim.act and not self._ext_anim.spooc_enter and not self._taunt_at_beating_played then
+		self._taunt_at_beating_played = true
+		self._unit:sound():say("cloaker_taunt_during_assault", nil, true)
+	end
+	if not self._ext_anim.act or self._stroke_t and t - self._stroke_t > 7 then
+		if not self._unit:sound():speaking(t) then
+			self._unit:sound():say("cloaker_taunt_after_assault", nil, true)
+		end
+		if Network:is_server() then
+			self:_expire()
+		else
+			self:_wait()
+		end
+	elseif self._stroke_t then
 		if self._is_local then
 			if not self._ext_anim.spooc_exit and not self._ext_anim.spooc_enter and (not (alive(self._strike_unit) and self._strike_unit:character_damage().incapacitated) or not self._strike_unit:character_damage():incapacitated()) then
 				self._ext_movement:play_redirect("spooc_exit")
@@ -657,19 +677,15 @@ function ActionSpooc:_upd_striking(t)
 			self._ext_movement:upd_ground_ray(my_pos, true)
 			local gnd_z = self._common_data.gnd_ray.position.z
 			if gnd_z < my_pos.z then
-				self._vel_z = self._apply_freefall(my_pos, self._vel_z, gnd_z, TimerManager:game():delta_time())
+				self._last_vel_z = self._apply_freefall(my_pos, self._last_vel_z, gnd_z, TimerManager:game():delta_time())
 			else
 				if gnd_z > my_pos.z then
 					mvector3.set_z(my_pos, gnd_z)
 				end
-				self._vel_z = 0
+				self._last_vel_z = 0
 			end
 			self._ext_movement:set_position(my_pos)
 		end
-	elseif Network:is_server() then
-		self:_expire()
-	else
-		self:_wait()
 	end
 end
 
@@ -788,8 +804,17 @@ end
 
 function ActionSpooc:anim_act_clbk(anim_act)
 	if anim_act == "strike" then
-		self._unit:sound():say("punch_3rd_person_3p", true)
+		if self._stroke_t then
+			if self._strike_unit then
+				self._unit:sound():say("punch_3rd_person_3p", true)
+			end
+			return
+		end
+		self._stroke_t = TimerManager:game():time()
+		self._unit:sound():play("cloaker_detect_stop", nil, nil)
 		if not self._is_local then
+			self._unit:sound():say("punch_3rd_person_3p", true)
+			self._beating_end_t = self._stroke_t + 1
 			return
 		end
 		if self:_chk_target_invalid() then
@@ -800,24 +825,66 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			end
 			return
 		end
-		self._stroke_t = TimerManager:game():time()
-		self._beating_end_t = self._stroke_t + 3
+		if self:is_flying_strike() then
+			self._beating_end_t = 0
+		else
+			self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
+		end
 		local target_vec = self._tmp_vec1
 		mvector3.set(target_vec, self._target_unit:movement():m_com())
 		mvector3.subtract(target_vec, self._common_data.pos)
 		local target_dis_z = math.abs(mvector3.z(target_vec))
 		if 200 < target_dis_z then
+			if not self:is_flying_strike() then
+				if Network:is_server() then
+					self:_expire()
+				else
+					self:_wait()
+				end
+			end
 			return
 		end
 		mvector3.set_z(target_vec, 0)
-		local angle = mvector3.angle(target_vec, self._common_data.fwd)
-		local max_dis = math.lerp(170, 70, math.clamp(angle, 0, 90) / 90)
-		local target_dis_xy = mvector3.length(target_vec)
-		if max_dis < target_dis_xy then
-			return
+		if self:is_flying_strike() then
+			local angle = mvector3.angle(target_vec, self._common_data.fwd)
+			local max_dis = math.lerp(170, 70, math.clamp(angle, 0, 90) / 90)
+			local target_dis_xy = mvector3.normalize(target_vec)
+			if max_dis < target_dis_xy then
+				if not self:is_flying_strike() then
+					if Network:is_server() then
+						self:_expire()
+					else
+						self:_wait()
+					end
+				end
+				return
+			end
 		end
 		self._strike_unit = self._target_unit
-		self._target_unit:movement():on_SPOOCed()
+		self._strike_unit:movement():on_SPOOCed(self._unit)
+		self._unit:sound():say("punch_3rd_person_3p", true)
+		if self._strike_unit:base().is_local_player then
+			self:_play_strike_camera_shake()
+			mvector3.negate(target_vec)
+			local dot_fwd = mvector3.dot(target_vec, self._common_data.fwd)
+			local dot_r = mvector3.dot(target_vec, self._common_data.right)
+			if math.abs(dot_fwd) > math.abs(dot_r) then
+				if 0 < dot_fwd then
+					managers.environment_controller:hit_feedback_front()
+				else
+					managers.environment_controller:hit_feedback_back()
+				end
+			elseif 0 < dot_r then
+				managers.environment_controller:hit_feedback_right()
+			else
+				managers.environment_controller:hit_feedback_left()
+			end
+		end
+		if not self:is_flying_strike() then
+			mvector3.set(self._last_sent_pos, self._common_data.pos)
+			self._ext_network:send("action_spooc_strike", mvector3.copy(self._common_data.pos), self._action_id)
+			self._nav_path[self._nav_index + 1] = mvector3.copy(self._common_data.pos)
+		end
 	end
 end
 
@@ -972,4 +1039,20 @@ function ActionSpooc:_upd_flying_strike(t)
 	if new_pos then
 		self._ext_movement:set_position(new_pos)
 	end
+end
+
+function ActionSpooc:_play_strike_camera_shake()
+	local vars = {
+		"melee_hit",
+		"melee_hit_var2"
+	}
+	self._strike_unit:camera():play_shaker(vars[math.random(#vars)], 1)
+end
+
+function ActionSpooc:has_striken()
+	return self._stroke_t and true or false
+end
+
+function ActionSpooc:is_flying_strike()
+	return self._action_desc.flying_strike
 end

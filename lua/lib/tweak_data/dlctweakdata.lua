@@ -17,6 +17,7 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.starter_kit.content.upgrades = {"fists"}
 	self.pd2_clan = {}
 	self.pd2_clan.content = {}
 	self.pd2_clan.dlc = "has_pd2_clan"
@@ -300,6 +301,78 @@ function DLCTweakData:init(tweak_data)
 		"scar",
 		"p226"
 	}
+	self.gage_pack_lmg = {}
+	self.gage_pack_lmg.content = {}
+	self.gage_pack_lmg.dlc = "has_gage_pack_lmg"
+	self.gage_pack_lmg.content.loot_drops = {
+		{
+			{
+				type_items = "masks",
+				item_entry = "cloth_commander",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "gage_blade",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "gage_rambo",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "gage_deltaforce",
+				amount = 1
+			}
+		},
+		{
+			{
+				type_items = "materials",
+				item_entry = "gunmetal",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "mud",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "splinter",
+				amount = 1
+			},
+			{
+				type_items = "materials",
+				item_entry = "erdl",
+				amount = 1
+			}
+		},
+		{
+			{
+				type_items = "textures",
+				item_entry = "styx",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "fingerpaint",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "fighter",
+				amount = 1
+			},
+			{
+				type_items = "textures",
+				item_entry = "warrior",
+				amount = 1
+			}
+		}
+	}
+	self.gage_pack_lmg.content.upgrades = {"rpk", "kabar"}
 	self.charliesierra = {}
 	self.charliesierra.content = {}
 	self.charliesierra.free = true

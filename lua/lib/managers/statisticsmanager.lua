@@ -128,6 +128,7 @@ function StatisticsManager:_setup(reset)
 			tied = 0
 		}
 	}
+	self._defaults.killed_by_melee = {}
 	self._defaults.killed_by_weapon = {}
 	self._defaults.shots_by_weapon = {}
 	self._defaults.sessions = {count = 0, time = 0}
@@ -1096,6 +1097,12 @@ function StatisticsManager:killed(data)
 		self._global.killed_by_weapon[name_id].count = self._global.killed_by_weapon[name_id].count + 1
 		self._global.killed_by_weapon[name_id].headshots = (self._global.killed_by_weapon[name_id].headshots or 0) + (data.head_shot and 1 or 0)
 		self:_bullet_challenges(data)
+		if self._global.session.killed_by_weapon[name_id].count == tweak_data.achievement.first_blood.count then
+			local category = data.weapon_unit:base():weapon_tweak_data().category
+			if category == tweak_data.achievement.first_blood.weapon_type then
+				managers.achievment:award(tweak_data.achievement.first_blood.award)
+			end
+		end
 		if name_id == "sentry_gun" then
 			managers.challenges:count_up("sentry_gun_law_row_kills")
 			if game_state_machine:last_queued_state_name() == "ingame_waiting_for_respawn" then
@@ -1122,6 +1129,9 @@ function StatisticsManager:killed(data)
 			self._m14_kills = self._m14_kills + 1
 		end
 	elseif by_melee then
+		local name_id = data.name_id
+		self._global.session.killed_by_melee[name_id] = (self._global.session.killed_by_melee[name_id] or 0) + 1
+		self._global.killed_by_melee[name_id] = (self._global.killed_by_melee[name_id] or 0) + 1
 		self:_melee_challenges(data)
 		managers.challenges:reset_counter("sentry_gun_law_row_kills")
 	elseif by_explosion then
@@ -1626,6 +1636,7 @@ function StatisticsManager:save(data)
 		sessions = self._global.sessions,
 		shots_fired = self._global.shots_fired,
 		experience = self._global.experience,
+		killed_by_melee = self._global.killed_by_melee,
 		killed_by_weapon = self._global.killed_by_weapon,
 		shots_by_weapon = self._global.shots_by_weapon,
 		health = self._global.health,

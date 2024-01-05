@@ -429,6 +429,9 @@ function CarryData:clbk_pickup_SO_verification(candidate_unit)
 	if not self._steal_SO_data.pickup_area.nav_segs[nav_seg] then
 		return
 	end
+	if not candidate_unit:base():char_tweak().steal_loot then
+		return
+	end
 	return true
 end
 

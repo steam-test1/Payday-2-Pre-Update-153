@@ -84,7 +84,8 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_clk_up_manhole",
 	"e_sp_clk_up_water",
 	"e_sp_clk_over_2_5m",
-	"e_sp_clk_jump_dwn_5m_heli_l"
+	"e_sp_clk_jump_dwn_5m_heli_l",
+	"e_sp_clk_4_5m_dwn_vent"
 }
 CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_dj_loop",
@@ -241,6 +242,7 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_cs_up_sewer_ladder",
 	"e_nl_cs_dwn_sewer",
 	"e_nl_cs_up_8m_ladder",
+	"e_nl_clk_over_1_8m",
 	"e_so_ntl_idle_tired",
 	"e_so_ntl_idle_kickpebble",
 	"e_so_ntl_idle_look",

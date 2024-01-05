@@ -246,6 +246,18 @@ function CopDamage:damage_bullet(attack_data)
 							end
 						end
 					end
+					if unit_type == "spooc" then
+						local spooc_action = self._unit:movement()._active_actions[1]
+						if spooc_action and spooc_action:type() == "spooc" then
+							if spooc_action:is_flying_strike() then
+								if attack_weapon:base():weapon_tweak_data().category == tweak_data.achievement.in_town_you_are_law.weapon_type then
+									managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
+								end
+							elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
+								managers.achievment:award(tweak_data.achievement.dont_push_it.award)
+							end
+						end
+					end
 				end
 			end
 			if self:_type_civilian(self._unit:base()._tweak_table) then
@@ -278,6 +290,10 @@ end
 
 function CopDamage:_type_civilian(type)
 	return type == "civilian" or type == "civilian_female" or type == "bank_manager"
+end
+
+function CopDamage:_type_gangster(type)
+	return type == "gangster"
 end
 
 function CopDamage:_show_death_hint(type)
@@ -429,6 +445,7 @@ function CopDamage:damage_melee(attack_data)
 			name = self._unit:base()._tweak_table,
 			head_shot = head,
 			weapon_unit = attack_data.weapon_unit,
+			name_id = attack_data.name_id,
 			variant = attack_data.variant
 		}
 		managers.statistics:killed_by_anyone(data)
@@ -436,10 +453,43 @@ function CopDamage:damage_melee(attack_data)
 			self:_comment_death(attack_data.attacker_unit, self._unit:base()._tweak_table)
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
-			if not self:_type_civilian(self._unit:base()._tweak_table) and managers.groupai:state():whisper_mode() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.cant_hear_you_scream.mask then
+			local is_civlian = self:_type_civilian(self._unit:base()._tweak_table)
+			if not is_civlian and managers.groupai:state():whisper_mode() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.cant_hear_you_scream.mask then
 				managers.achievment:award_progress(tweak_data.achievement.cant_hear_you_scream.stat)
 			end
-			if self:_type_civilian(self._unit:base()._tweak_table) then
+			if tweak_data.blackmarket.melee_weapons[attack_data.name_id] then
+				local achievements = tweak_data.achievement.enemy_melee_kill_achievements or {}
+				local melee_type = tweak_data.blackmarket.melee_weapons[attack_data.name_id].type
+				local enemy_type = self._unit:base()._tweak_table
+				local health_ratio = managers.player:player_unit():character_damage():health_ratio() * 100
+				local type_pass, enemy_pass, diff_pass, health_pass
+				for achievement, achievement_data in pairs(achievements) do
+					type_pass = not achievement_data.melee_type or melee_type == achievement_data.melee_type
+					enemy_pass = not achievement_data.enemy or enemy_type == achievement_data.enemy
+					diff_pass = not achievement_data.difficulty or Global.game_settings.difficulty == achievement_data.difficulty
+					health_pass = not achievement_data.health or health_ratio <= achievement_data.health
+					if achievement_data.enemies then
+						enemy_pass = false
+						for _, enemy in pairs(achievement_data.enemies) do
+							if enemy == enemy_type then
+								enemy_pass = true
+								break
+							end
+						end
+					end
+					if type_pass and enemy_pass and diff_pass and health_pass then
+						if achievement_data.stat then
+							managers.achievment:award_progress(achievement_data.stat)
+						elseif achievement_data.award then
+							managers.achievment:award(achievement_data.award)
+						end
+					end
+				end
+			end
+			if not is_civlian and not self:_type_gangster(self._unit:base()._tweak_table) and Global.game_settings.level_id == "nightclub" and attack_data.name_id and attack_data.name_id == "fists" then
+				managers.achievment:award_progress(tweak_data.achievement.final_rule.stat)
+			end
+			if is_civlian then
 				managers.money:civilian_killed()
 			elseif managers.player:upgrade_value("player", "melee_kill_snatch_pager_chance", 0) > math.rand(1) then
 				snatch_pager = true
@@ -587,6 +637,9 @@ function CopDamage:die(variant)
 		else
 			debug_pause_unit(self._unit, "[CopDamage:die] does not have death sequence", self._death_sequence, self._unit)
 		end
+	end
+	if self._unit:base():char_tweak().die_sound_event then
+		self._unit:sound():play(self._unit:base():char_tweak().die_sound_event, nil, nil)
 	end
 end
 

@@ -418,6 +418,12 @@ function PlayerManager:unaquire_weapon(upgrade, id)
 	self._global.weapons[id] = upgrade
 end
 
+function PlayerManager:aquire_melee_weapon(upgrade, id)
+end
+
+function PlayerManager:unaquire_melee_weapon(upgrade, id)
+end
+
 function PlayerManager:_verify_equipment_kit()
 	for i = 1, 3 do
 		if not managers.player:equipment_in_slot(i) then

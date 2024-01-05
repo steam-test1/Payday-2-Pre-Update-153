@@ -79,6 +79,7 @@ function ChatBase:receive_message(name, message, color, icon)
 end
 
 ChatGui = ChatGui or class(ChatBase)
+ChatGui.line_height = 22
 
 function ChatGui:init(ws)
 	self._ws = ws
@@ -343,6 +344,8 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 	local scroll_panel = output_panel:child("scroll_panel")
 	scroll_panel:set_w(self._output_width)
 	output_panel:set_w(self._output_width)
+	local line_height = ChatGui.line_height
+	local max_lines = self._max_lines
 	local lines = 0
 	for i = #self._lines, 1, -1 do
 		local line = self._lines[i][1]
@@ -352,11 +355,9 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 		local _, _, w, h = line:text_rect()
 		line:set_h(h)
 		line_bg:set_w(w + line:left() + 2)
-		line_bg:set_h(h)
+		line_bg:set_h(line_height)
 		lines = lines + line:number_of_lines()
 	end
-	local line_height = 22
-	local max_lines = self._max_lines
 	local scroll_at_bottom = scroll_panel:bottom() == output_panel:h()
 	output_panel:set_h(math.round(line_height * math.min(max_lines, lines)))
 	scroll_panel:set_h(math.round(line_height * lines))
@@ -378,7 +379,7 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 		y = y + h
 	end
 	output_panel:set_bottom(math.round(self._input_panel:top()))
-	if lines <= max_lines or scroll_at_bottom then
+	if max_lines >= lines or scroll_at_bottom then
 		scroll_panel:set_bottom(output_panel:h())
 	end
 	self:set_scroll_indicators(force_update_scroll_indicators)
@@ -502,7 +503,7 @@ function ChatGui:moved_scroll_bar(x, y)
 end
 
 function ChatGui:scroll_with_bar(target_y, current_y)
-	local line_height = 22
+	local line_height = ChatGui.line_height
 	local diff = current_y - target_y
 	if diff == 0 then
 		return current_y
@@ -600,7 +601,7 @@ function ChatGui:scroll_up()
 		if scroll_panel:top() == 0 then
 			self._one_scroll_dn_delay = true
 		end
-		scroll_panel:set_top(math.min(0, scroll_panel:top() + 22))
+		scroll_panel:set_top(math.min(0, scroll_panel:top() + ChatGui.line_height))
 		return true
 	end
 end
@@ -612,7 +613,7 @@ function ChatGui:scroll_down()
 		if scroll_panel:bottom() == output_panel:h() then
 			self._one_scroll_up_delay = true
 		end
-		scroll_panel:set_bottom(math.max(scroll_panel:bottom() - 22, output_panel:h()))
+		scroll_panel:set_bottom(math.max(scroll_panel:bottom() - ChatGui.line_height, output_panel:h()))
 		return true
 	end
 end

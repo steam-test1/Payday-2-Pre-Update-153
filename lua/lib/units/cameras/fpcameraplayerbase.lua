@@ -511,9 +511,9 @@ function FPCameraPlayerBase:eye_rotation()
 	return self._obj_eye:rotation()
 end
 
-function FPCameraPlayerBase:play_redirect(redirect_name, speed)
+function FPCameraPlayerBase:play_redirect(redirect_name, speed, offset_time)
 	self:set_anims_enabled(true)
-	local result = self._unit:play_redirect(redirect_name)
+	local result = self._unit:play_redirect(redirect_name, offset_time)
 	if result == self.IDS_NOSTRING then
 		return false
 	end
@@ -743,6 +743,17 @@ function FPCameraPlayerBase:play_sound(unit, event)
 	end
 end
 
+function FPCameraPlayerBase:play_melee_sound(unit, sound_id)
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	local tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
+	if not tweak_data.sounds or not tweak_data.sounds[sound_id] then
+		return
+	end
+	if alive(self._parent_unit) then
+		self._parent_unit:sound():play(tweak_data.sounds[sound_id], nil, false)
+	end
+end
+
 function FPCameraPlayerBase:set_limits(spin, pitch)
 	self._limits = {}
 	if spin then
@@ -791,6 +802,30 @@ function FPCameraPlayerBase:unspawn_grenade()
 	end
 end
 
+function FPCameraPlayerBase:spawn_melee_item()
+	if alive(self._melee_item_unit) then
+		return
+	end
+	local align_obj_l_name = Idstring("a_weapon_left")
+	local align_obj_r_name = Idstring("a_weapon_right")
+	local align_obj_l = self._unit:get_object(align_obj_l_name)
+	local align_obj_r = self._unit:get_object(align_obj_r_name)
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	local unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].unit
+	if unit_name then
+		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj_l:position(), align_obj_l:rotation())
+		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+	end
+end
+
+function FPCameraPlayerBase:unspawn_melee_item()
+	if alive(self._melee_item_unit) then
+		self._melee_item_unit:unlink()
+		World:delete_unit(self._melee_item_unit)
+		self._melee_item_unit = nil
+	end
+end
+
 function FPCameraPlayerBase:hide_weapon()
 	if alive(self._parent_unit) then
 		self._parent_unit:inventory():hide_equipped_unit()
@@ -829,9 +864,13 @@ function FPCameraPlayerBase:spawn_mask()
 		managers.dyn_resource:load(Idstring("unit"), Idstring(mask_unit_name), DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._mask_unit = World:spawn_unit(Idstring(mask_unit_name), align_obj_r:position(), align_obj_r:rotation())
 		local glass_id_string = Idstring("glass")
+		local mtr_hair_solid_id_string = Idstring("mtr_hair_solid")
+		local mtr_hair_effect_id_string = Idstring("mtr_hair_effect")
 		for _, material in ipairs(self._mask_unit:get_objects_by_type(Idstring("material"))) do
 			if material:name() == glass_id_string then
 				material:set_render_template(Idstring("opacity:CUBE_ENVIRONMENT_MAPPING:CUBE_FRESNEL:DIFFUSE_TEXTURE:FPS"))
+			elseif material:name() == mtr_hair_solid_id_string then
+			elseif material:name() == mtr_hair_effect_id_string then
 			else
 				material:set_render_template(Idstring("solid_mask:DEPTH_SCALING"))
 			end
@@ -921,6 +960,15 @@ function FPCameraPlayerBase:end_tase()
 	end
 end
 
+function FPCameraPlayerBase:anim_clbk_check_bullet_object()
+	if alive(self._parent_unit) then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		if alive(weapon) then
+			weapon:base():predict_bullet_objects()
+		end
+	end
+end
+
 function FPCameraPlayerBase:destroy()
 	if self._parent_unit then
 		self._parent_unit:base():remove_destroy_listener("FPCameraPlayerBase")
@@ -934,4 +982,6 @@ function FPCameraPlayerBase:destroy()
 	end
 	self:anim_clbk_unspawn_handcuffs()
 	self:unspawn_mask()
+	self:unspawn_grenade()
+	self:unspawn_melee_item()
 end

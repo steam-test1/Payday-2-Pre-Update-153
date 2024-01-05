@@ -1535,6 +1535,37 @@ function NarrativeTweakData:init()
 		30000,
 		40000
 	}
+	self.jobs.escape_hell = {}
+	self.jobs.escape_hell.name_id = "heist_escape_hell"
+	self.jobs.escape_hell.briefing_id = "heist_escape_hell_crimenet"
+	self.jobs.escape_hell.contact = "bain"
+	self.jobs.escape_hell.region = "street"
+	self.jobs.escape_hell.jc = 40
+	self.jobs.escape_hell.chain = {
+		{
+			level_id = "escape_hell",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.escape_hell.briefing_event = "pln_fj1_cbf_01"
+	self.jobs.escape_hell.debrief_event = nil
+	self.jobs.escape_hell.crimenet_callouts = {
+		"pln_fj1_cnc_01_01",
+		"pln_fj1_cnc_01_02",
+		"pln_fj1_cnc_01_03"
+	}
+	self.jobs.escape_hell.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.escape_hell.payout = {
+		37000,
+		43000,
+		60000,
+		70000
+	}
 	self.jobs.branchbank_cloaker = {}
 	self.jobs.branchbank_cloaker.name_id = "heist_cloak"
 	self.jobs.branchbank_cloaker.briefing_id = "heist_cloak_crimenet"

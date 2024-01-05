@@ -293,10 +293,31 @@ function PlayerDamage:erase_tase_data()
 	self._tase_data = nil
 end
 
+local mvec1 = Vector3()
+
 function PlayerDamage:damage_melee(attack_data)
+	local blood_effect = attack_data.melee_weapon and attack_data.melee_weapon == "weapon"
+	blood_effect = blood_effect or attack_data.melee_weapon and tweak_data.weapon.npc_melee[attack_data.melee_weapon] and tweak_data.weapon.npc_melee[attack_data.melee_weapon].player_blood_effect or false
+	if blood_effect then
+		local pos = mvec1
+		mvector3.set(pos, self._unit:camera():forward())
+		mvector3.multiply(pos, 20)
+		mvector3.add(pos, self._unit:camera():position())
+		local rot = self._unit:camera():rotation():z()
+		World:effect_manager():spawn({
+			effect = Idstring("effects/payday2/particles/impacts/blood/blood_impact_a"),
+			position = pos,
+			normal = rot
+		})
+	end
 	local dmg_mul = managers.player:upgrade_value("player", "melee_damage_dampener", 1)
 	attack_data.damage = attack_data.damage * dmg_mul
 	self:damage_bullet(attack_data)
+	local vars = {
+		"melee_hit",
+		"melee_hit_var2"
+	}
+	self._unit:camera():play_shaker(vars[math.random(#vars)], 1)
 	self._unit:movement():push(attack_data.push_vel)
 end
 
@@ -1156,4 +1177,27 @@ function PlayerDamage:_stop_tinnitus()
 	end
 	self._unit:sound():play("tinnitus_beep_stop")
 	self._tinnitus_data = nil
+end
+
+PlayerBodyDamage = PlayerBodyDamage or class()
+
+function PlayerBodyDamage:init(unit, unit_extension, body)
+	self._unit = unit
+	self._unit_extension = unit_extension
+	self._body = body
+end
+
+function PlayerBodyDamage:get_body()
+	return self._body
+end
+
+function PlayerBodyDamage:damage_fire(attack_unit, normal, position, direction, damage, velocity)
+	print("PlayerBodyDamage:damage_fire", damage)
+	local attack_data = {
+		damage = damage,
+		col_ray = {
+			ray = -direction
+		}
+	}
+	self._unit_extension:damage_killzone(attack_data)
 end

@@ -3,6 +3,7 @@ DLCManager.PLATFORM_CLASS_MAP = {}
 DLCManager.BUNDLED_DLC_PACKAGES = {
 	dlc1 = true,
 	gage_pack = true,
+	gage_pack_lmg = true,
 	infamous = true,
 	season_pass = false,
 	animal = false
@@ -152,6 +153,10 @@ end
 
 function GenericDLCManager:has_gage_pack()
 	return Global.dlc_manager.all_dlc_data.gage_pack and Global.dlc_manager.all_dlc_data.gage_pack.verified
+end
+
+function GenericDLCManager:has_gage_pack_lmg()
+	return Global.dlc_manager.all_dlc_data.gage_pack_lmg and Global.dlc_manager.all_dlc_data.gage_pack_lmg.verified
 end
 
 function GenericDLCManager:has_xmas_soundtrack()
@@ -390,6 +395,7 @@ function WINDLCManager:init()
 			career_criminal_edition = {app_id = "218630", no_install = true},
 			armored_transport = {app_id = "264610", no_install = true},
 			gage_pack = {app_id = "267380", no_install = true},
+			gage_pack_lmg = {app_id = "275590", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"

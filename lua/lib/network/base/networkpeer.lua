@@ -621,6 +621,12 @@ function NetworkPeer:armor_id()
 	return data[managers.blackmarket:outfit_string_index("armor")]
 end
 
+function NetworkPeer:melee_id()
+	local outfit_string = self:profile("outfit_string")
+	local data = string.split(outfit_string, " ")
+	return data[managers.blackmarket:outfit_string_index("melee_weapon")]
+end
+
 function NetworkPeer:blackmarket_outfit()
 	local outfit_string = self:profile("outfit_string")
 	return managers.blackmarket:unpack_outfit_from_string(outfit_string)

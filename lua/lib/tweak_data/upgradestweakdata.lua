@@ -835,15 +835,15 @@ function UpgradesTweakData:init()
 		}
 	}
 	self.level_tree[2] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"colt_1911", "mac10"}
 	}
 	self.level_tree[4] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"new_m4"}
 	}
 	self.level_tree[6] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {
 			"new_raging_bull",
 			"b92fs"
@@ -856,7 +856,7 @@ function UpgradesTweakData:init()
 		}
 	}
 	self.level_tree[8] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"r870", "aug"}
 	}
 	self.level_tree[10] = {
@@ -872,15 +872,15 @@ function UpgradesTweakData:init()
 		}
 	}
 	self.level_tree[13] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"new_mp5", "serbu"}
 	}
 	self.level_tree[16] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"akm", "g36"}
 	}
 	self.level_tree[19] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"olympic", "mp9"}
 	}
 	self.level_tree[20] = {
@@ -892,15 +892,16 @@ function UpgradesTweakData:init()
 	self.level_tree[21] = {
 		name_id = "body_armor4",
 		upgrades = {
-			"body_armor4"
+			"body_armor4",
+			"kampfmesser"
 		}
 	}
 	self.level_tree[26] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"new_m14", "saiga"}
 	}
 	self.level_tree[29] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"akmsu", "glock_18c"}
 	}
 	self.level_tree[30] = {
@@ -916,15 +917,15 @@ function UpgradesTweakData:init()
 		}
 	}
 	self.level_tree[33] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"ak5"}
 	}
 	self.level_tree[36] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"p90", "deagle"}
 	}
 	self.level_tree[39] = {
-		name_id = "Angst",
+		name_id = "weapons",
 		upgrades = {"m16", "huntsman"}
 	}
 	self.level_tree[40] = {
@@ -932,6 +933,14 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"rep_upgrade4"
 		}
+	}
+	self.level_tree[41] = {
+		name_id = "weapons",
+		upgrades = {"gerber"}
+	}
+	self.level_tree[45] = {
+		name_id = "weapons",
+		upgrades = {"m249"}
 	}
 	self.level_tree[50] = {
 		name_id = "lvl_50",
@@ -942,14 +951,23 @@ function UpgradesTweakData:init()
 	self.level_tree[60] = {
 		name_id = "lvl_60",
 		upgrades = {
-			"rep_upgrade6"
+			"rep_upgrade6",
+			"rambo"
 		}
+	}
+	self.level_tree[61] = {
+		name_id = "weapons",
+		upgrades = {"rambo"}
 	}
 	self.level_tree[70] = {
 		name_id = "lvl_70",
 		upgrades = {
 			"rep_upgrade7"
 		}
+	}
+	self.level_tree[75] = {
+		name_id = "weapons",
+		upgrades = {"hk21"}
 	}
 	self.level_tree[80] = {
 		name_id = "lvl_80",
@@ -1126,6 +1144,7 @@ function UpgradesTweakData:init()
 	self:_assault_rifle_definitions()
 	self:_smg_definitions()
 	self:_shotgun_definitions()
+	self:_melee_weapon_definitions()
 	self:_carry_definitions()
 	self:_team_definitions()
 	self:_temporary_definitions()
@@ -4351,6 +4370,31 @@ function UpgradesTweakData:_rpk_definitions()
 		category = "weapon",
 		weapon_id = "rpk",
 		factory_id = "wpn_fps_lmg_rpk",
+		dlc = "gage_pack_lmg"
+	}
+end
+
+function UpgradesTweakData:_melee_weapon_definitions()
+	self.definitions.weapon = {
+		category = "melee_weapon"
+	}
+	self.definitions.fists = {
+		category = "melee_weapon"
+	}
+	self.definitions.kabar = {
+		category = "melee_weapon",
+		dlc = "gage_pack_lmg"
+	}
+	self.definitions.rambo = {
+		category = "melee_weapon",
+		dlc = "gage_pack_lmg"
+	}
+	self.definitions.gerber = {
+		category = "melee_weapon",
+		dlc = "gage_pack_lmg"
+	}
+	self.definitions.kampfmesser = {
+		category = "melee_weapon",
 		dlc = "gage_pack_lmg"
 	}
 end

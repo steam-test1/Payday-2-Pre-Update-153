@@ -8,6 +8,7 @@ end
 function PlayerFatal:enter(state_data, enter_data)
 	PlayerFatal.super.enter(self, state_data, enter_data)
 	self:_interupt_action_steelsight()
+	self:_interupt_action_melee(managers.player:player_timer():time())
 	self:_interupt_action_ladder(managers.player:player_timer():time())
 	self:_interupt_action_throw_grenade(managers.player:player_timer():time())
 	self:_start_action_dead(managers.player:player_timer():time())

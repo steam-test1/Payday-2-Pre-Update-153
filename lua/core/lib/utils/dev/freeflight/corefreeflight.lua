@@ -405,8 +405,7 @@ function FreeFlight:_set_fov(value)
 end
 
 function FreeFlight:_set_game_timer(value)
-	TimerManager:game():set_multiplier(value)
-	TimerManager:game_animation():set_multiplier(value)
+	TimerManager:pausable():set_multiplier(value)
 end
 
 function FreeFlight:_current_action()

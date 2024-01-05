@@ -67,10 +67,8 @@ function TeamAIMovement:on_cuffed()
 	self._unit:character_damage():on_arrested()
 end
 
-function TeamAIMovement:on_SPOOCed()
-	self._unit:brain():set_logic("surrender")
-	self._unit:network():send("arrested")
-	self._unit:character_damage():on_arrested()
+function TeamAIMovement:on_SPOOCed(enemy_unit)
+	self._unit:character_damage():on_incapacitated()
 end
 
 function TeamAIMovement:on_discovered()

@@ -213,6 +213,8 @@ function UpgradesManager:_aquire_upgrade(upgrade, id, loading)
 		self:_aquire_armor(upgrade, id, loading)
 	elseif upgrade.category == "rep_upgrade" then
 		self:_aquire_rep_upgrade(upgrade, id, loading)
+	elseif upgrade.category == "melee_weapon" then
+		self:_aquire_melee_weapon(upgrade, id, loading)
 	end
 end
 
@@ -231,6 +233,8 @@ function UpgradesManager:_unaquire_upgrade(upgrade, id)
 		self:_unaquire_team(upgrade, id)
 	elseif upgrade.category == "armor" then
 		self:_unaquire_armor(upgrade, id)
+	elseif upgrade.category == "melee_weapon" then
+		self:_unaquire_melee_weapon(upgrade, id)
 	end
 end
 
@@ -242,6 +246,16 @@ end
 function UpgradesManager:_unaquire_weapon(upgrade, id)
 	managers.player:unaquire_weapon(upgrade, id)
 	managers.blackmarket:on_unaquired_weapon_platform(upgrade, id)
+end
+
+function UpgradesManager:_aquire_melee_weapon(upgrade, id, loading)
+	managers.player:aquire_melee_weapon(upgrade, id)
+	managers.blackmarket:on_aquired_melee_weapon(upgrade, id, loading)
+end
+
+function UpgradesManager:_unaquire_melee_weapon(upgrade, id)
+	managers.player:unaquire_melee_weapon(upgrade, id)
+	managers.blackmarket:on_unaquired_melee_weapon(upgrade, id)
 end
 
 function UpgradesManager:_aquire_feature(feature)
@@ -312,7 +326,7 @@ function UpgradesManager:_aquire_rep_upgrade(upgrade, id)
 	managers.skilltree:rep_upgrade(upgrade, id)
 end
 
-function UpgradesManager:get_value(upgrade_id)
+function UpgradesManager:get_value(upgrade_id, ...)
 	local upgrade = tweak_data.upgrades.definitions[upgrade_id]
 	local u = upgrade.upgrade
 	if upgrade.category == "feature" then
@@ -332,7 +346,7 @@ function UpgradesManager:get_value(upgrade_id)
 		local weapon_id = upgrade.weapon_id
 		local is_default_weapon = table.contains(default_weapons, weapon_id) and true or false
 		local weapon_level = 0
-		local new_weapon_id = tweak_data.weapon[weapon_id].parent_weapon_id or weapon_id
+		local new_weapon_id = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].parent_weapon_id or weapon_id
 		for level, data in pairs(tweak_data.upgrades.level_tree) do
 			local upgrades = data.upgrades
 			if upgrades and table.contains(upgrades, new_weapon_id) then
@@ -341,6 +355,22 @@ function UpgradesManager:get_value(upgrade_id)
 			end
 		end
 		return is_default_weapon, weapon_level, weapon_id ~= new_weapon_id
+	elseif upgrade.category == "melee_weapon" then
+		local params = {
+			...
+		}
+		local default_id = params[1] or managers.blackmarket and managers.blackmarket:get_category_default("melee_weapon") or "weapon"
+		local melee_weapon_id = upgrade_id
+		local is_default_weapon = melee_weapon_id == default_id
+		local melee_weapon_level = 0
+		for level, data in pairs(tweak_data.upgrades.level_tree) do
+			local upgrades = data.upgrades
+			if upgrades and table.contains(upgrades, melee_weapon_id) then
+				melee_weapon_level = level
+				break
+			end
+		end
+		return is_default_weapon, melee_weapon_level
 	end
 	print("no value for", upgrade_id, upgrade.category)
 end
@@ -353,6 +383,24 @@ end
 function UpgradesManager:get_upgrade_upgrade(upgrade_id)
 	local upgrade = tweak_data.upgrades.definitions[upgrade_id]
 	return upgrade.upgrade
+end
+
+function UpgradesManager:get_upgrade_locks(upgrade_id)
+	local upgrade = tweak_data.upgrades.definitions[upgrade_id]
+	return {
+		dlc = upgrade.dlc
+	}
+end
+
+function UpgradesManager:is_upgrade_locked(upgrade_id)
+	local locks = self:get_upgrade_locks(upgrade_id)
+	for category, id in pairs(locks) do
+		if category == "dlc" and not managers.dlc:is_dlc_unlocked(id) then
+			return true
+		else
+		end
+	end
+	return false
 end
 
 function UpgradesManager:is_locked(step)

@@ -776,6 +776,7 @@ function CopMovement:set_cool(state, giveaway)
 	end
 	local old_state = self._cool
 	self._cool = state
+	self._action_common_data.is_cool = state
 	if not state and old_state then
 		self._not_cool_t = TimerManager:game():time()
 	end
@@ -1269,6 +1270,30 @@ function CopMovement:_destroy_gadgets()
 	end
 	self._equipped_gadgets = nil
 	self._droppable_gadgets = nil
+end
+
+function CopMovement:anim_clbk_enemy_spawn_melee_item()
+	if alive(self._melee_item_unit) then
+		return
+	end
+	local align_obj_l_name = CopMovement._gadgets.aligns.hand_l
+	local align_obj_r_name = CopMovement._gadgets.aligns.hand_r
+	local align_obj_l = self._unit:get_object(align_obj_l_name)
+	local align_obj_r = self._unit:get_object(align_obj_r_name)
+	local melee_weapon = self._unit:base():char_tweak().melee_weapon
+	local unit_name = melee_weapon and tweak_data.weapon.npc_melee[melee_weapon].unit_name or nil
+	if unit_name then
+		self._melee_item_unit = World:spawn_unit(unit_name, align_obj_l:position(), align_obj_l:rotation())
+		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+	end
+end
+
+function CopMovement:anim_clbk_enemy_unspawn_melee_item()
+	if alive(self._melee_item_unit) then
+		self._melee_item_unit:unlink()
+		World:delete_unit(self._melee_item_unit)
+		self._melee_item_unit = nil
+	end
 end
 
 function CopMovement:clbk_inventory(unit, event)

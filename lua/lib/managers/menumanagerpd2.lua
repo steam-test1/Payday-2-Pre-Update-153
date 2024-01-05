@@ -192,12 +192,15 @@ function MenuCallbackHandler:got_new_content_update()
 	return false
 end
 
+function MenuCallbackHandler:got_new_fav_videos()
+	return false
+end
+
 function MenuCallbackHandler:not_got_new_content_update()
 	return not self:got_new_content_update()
 end
 
 function MenuCallbackHandler:do_content_lootdrop(node)
-	managers.menu:back(true)
 	managers.menu:open_node("crimenet_contract_casino_lootdrop", {
 		secure_cards = 0,
 		preferred_item = nil,

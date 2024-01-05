@@ -956,6 +956,58 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.smoker.global_value = "infamy"
 	self.masks.smoker.texture_bundle_folder = "infamous"
 	self.masks.smoker.infamy_lock = "infamy_technician"
+	self.masks.cloth_commander = {}
+	self.masks.cloth_commander.unit = "units/pd2_dlc_gage_lmg/masks/cloth_commander/msk_cloth_commander"
+	self.masks.cloth_commander.name_id = "bm_msk_cloth_commander"
+	self.masks.cloth_commander.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.cloth_commander.value = 4
+	self.masks.cloth_commander.qlvl = 0
+	self.masks.cloth_commander.dlc = "gage_pack_lmg"
+	self.masks.cloth_commander.texture_bundle_folder = "gage_pack_lmg"
+	self.masks.gage_blade = {}
+	self.masks.gage_blade.unit = "units/pd2_dlc_gage_lmg/masks/msk_gage_blade/msk_gage_blade"
+	self.masks.gage_blade.name_id = "bm_msk_gage_blade"
+	self.masks.gage_blade.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.gage_blade.value = 4
+	self.masks.gage_blade.qlvl = 0
+	self.masks.gage_blade.texture_bundle_folder = "gage_pack_lmg"
+	self.masks.gage_blade.dlc = "gage_pack_lmg"
+	self.masks.gage_rambo = {}
+	self.masks.gage_rambo.unit = "units/pd2_dlc_gage_lmg/masks/msk_gage_rambo/msk_gage_rambo"
+	self.masks.gage_rambo.name_id = "bm_msk_rambo"
+	self.masks.gage_rambo.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.gage_rambo.value = 4
+	self.masks.gage_rambo.qlvl = 0
+	self.masks.gage_rambo.texture_bundle_folder = "gage_pack_lmg"
+	self.masks.gage_rambo.dlc = "gage_pack_lmg"
+	self.masks.gage_deltaforce = {}
+	self.masks.gage_deltaforce.unit = "units/pd2_dlc_gage_lmg/masks/msk_gage_deltaforce/msk_gage_deltaforce"
+	self.masks.gage_deltaforce.name_id = "bm_msk_deltaforce"
+	self.masks.gage_deltaforce.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.gage_deltaforce.value = 4
+	self.masks.gage_deltaforce.qlvl = 0
+	self.masks.gage_deltaforce.texture_bundle_folder = "gage_pack_lmg"
+	self.masks.gage_deltaforce.dlc = "gage_pack_lmg"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -2581,6 +2633,53 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.oilmetal.texture = "units/pd2_dlc_dec5/matcaps/matcap_oilmetal_df"
 	self.materials.oilmetal.value = 5
 	self.materials.oilmetal.dlc = "gage_pack"
+	self.materials.gunmetal = {}
+	self.materials.gunmetal.name_id = "bm_mtl_gunmetal"
+	self.materials.gunmetal.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.gunmetal.texture = "units/pd2_dlc_gage_lmg/matcaps/matcap_gunmetal_df"
+	self.materials.gunmetal.value = 5
+	self.materials.gunmetal.dlc = "gage_pack_lmg"
+	self.materials.mud = {}
+	self.materials.mud.name_id = "bm_mtl_mud"
+	self.materials.mud.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.mud.texture = "units/pd2_dlc_gage_lmg/matcaps/matcap_mud_df"
+	self.materials.mud.material_amount = 0
+	self.materials.mud.value = 5
+	self.materials.mud.dlc = "gage_pack_lmg"
+	self.materials.splinter = {}
+	self.materials.splinter.name_id = "bm_mtl_splinter"
+	self.materials.splinter.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.splinter.texture = "units/pd2_dlc_gage_lmg/matcaps/matcap_splinter_df"
+	self.materials.splinter.material_amount = 0
+	self.materials.splinter.value = 5
+	self.materials.splinter.dlc = "gage_pack_lmg"
+	self.materials.erdl = {}
+	self.materials.erdl.name_id = "bm_mtl_erdl"
+	self.materials.erdl.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.materials.erdl.texture = "units/pd2_dlc_gage_lmg/matcaps/matcap_erdl_df"
+	self.materials.erdl.material_amount = 0
+	self.materials.erdl.value = 5
+	self.materials.erdl.dlc = "gage_pack_lmg"
 	self.materials.copper = {}
 	self.materials.copper.name_id = "bm_mtl_copper"
 	self.materials.copper.pcs = {}
@@ -3869,6 +3968,50 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.fatman.value = 0
 	self.textures.fatman.global_value = "infamy"
 	self.textures.fatman.infamy_lock = "infamy_enforcer"
+	self.textures.styx = {}
+	self.textures.styx.name_id = "bm_txt_styx"
+	self.textures.styx.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.styx.texture = "units/pd2_dlc_gage_lmg/masks/patterns/styx_df"
+	self.textures.styx.value = 4
+	self.textures.styx.dlc = "gage_pack_lmg"
+	self.textures.fingerpaint = {}
+	self.textures.fingerpaint.name_id = "bm_txt_fingerpaint"
+	self.textures.fingerpaint.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.fingerpaint.texture = "units/pd2_dlc_gage_lmg/masks/patterns/fingerpaint_df"
+	self.textures.fingerpaint.value = 4
+	self.textures.fingerpaint.dlc = "gage_pack_lmg"
+	self.textures.fighter = {}
+	self.textures.fighter.name_id = "bm_txt_fighter"
+	self.textures.fighter.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.fighter.texture = "units/pd2_dlc_gage_lmg/masks/patterns/fighter_df"
+	self.textures.fighter.value = 4
+	self.textures.fighter.dlc = "gage_pack_lmg"
+	self.textures.warrior = {}
+	self.textures.warrior.name_id = "bm_txt_warrior"
+	self.textures.warrior.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.textures.warrior.texture = "units/pd2_dlc_gage_lmg/masks/patterns/warrior_df"
+	self.textures.warrior.value = 4
+	self.textures.warrior.dlc = "gage_pack_lmg"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -4100,16 +4243,123 @@ end
 
 function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons = {}
-	self.melee_weapons.gun = {}
-	self.melee_weapons.gun.name_id = "bm_melee_gun"
-	self.melee_weapons.gun.unit = nil
-	self.melee_weapons.gun.animation = nil
-	self.melee_weapons.gun.stats = {}
-	self.melee_weapons.gun.stats.min_damage = 0
-	self.melee_weapons.gun.stats.max_damage = 0
-	self.melee_weapons.gun.stats.min_damage_effect = 0
-	self.melee_weapons.gun.stats.max_damage_effect = 0
-	self.melee_weapons.gun.stats.charge_time = 0
-	self.melee_weapons.gun.stats.range = 0
+	self.melee_weapons.weapon = {}
+	self.melee_weapons.weapon.name_id = "bm_melee_weapon"
+	self.melee_weapons.weapon.type = "weapon"
+	self.melee_weapons.weapon.unit = nil
+	self.melee_weapons.weapon.animation = nil
+	self.melee_weapons.weapon.instant = true
+	self.melee_weapons.weapon.free = true
+	self.melee_weapons.weapon.stats = {}
+	self.melee_weapons.weapon.stats.min_damage = 1.5
+	self.melee_weapons.weapon.stats.max_damage = 1.5
+	self.melee_weapons.weapon.stats.min_damage_effect = 1.75
+	self.melee_weapons.weapon.stats.max_damage_effect = 1.75
+	self.melee_weapons.weapon.stats.charge_time = 0
+	self.melee_weapons.weapon.stats.range = 150
+	self.melee_weapons.weapon.stats.weapon_type = "blunt"
+	self.melee_weapons.weapon.expire_t = 0.6
+	self.melee_weapons.weapon.repeat_expire_t = 0.6
+	self.melee_weapons.weapon.sounds = {}
+	self.melee_weapons.weapon.sounds.hit_body = "melee_hit_body"
+	self.melee_weapons.weapon.sounds.hit_gen = "melee_hit_gen"
+	self.melee_weapons.fists = {}
+	self.melee_weapons.fists.name_id = "bm_melee_fists"
+	self.melee_weapons.fists.type = "fists"
+	self.melee_weapons.fists.unit = nil
+	self.melee_weapons.fists.animation = nil
+	self.melee_weapons.fists.free = true
+	self.melee_weapons.fists.stats = {}
+	self.melee_weapons.fists.stats.min_damage = 1
+	self.melee_weapons.fists.stats.max_damage = 3
+	self.melee_weapons.fists.stats.min_damage_effect = 2
+	self.melee_weapons.fists.stats.max_damage_effect = 4
+	self.melee_weapons.fists.stats.charge_time = 1
+	self.melee_weapons.fists.stats.range = 175
+	self.melee_weapons.fists.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.fists.stats.weapon_type = "blunt"
+	self.melee_weapons.fists.anim_global_param = "melee_fist"
+	self.melee_weapons.fists.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.fists.expire_t = 1
+	self.melee_weapons.fists.repeat_expire_t = 0.55
+	self.melee_weapons.fists.melee_damage_delay = 0.2
+	self.melee_weapons.fists.melee_charge_shaker = "player_melee_charge_fist"
+	self.melee_weapons.fists.sounds = {}
+	self.melee_weapons.fists.sounds.equip = "fist_equip"
+	self.melee_weapons.fists.sounds.hit_air = "fist_hit_air"
+	self.melee_weapons.fists.sounds.hit_gen = "fist_hit_gen"
+	self.melee_weapons.fists.sounds.hit_body = "fist_hit_body"
+	self.melee_weapons.fists.sounds.charge = "fist_charge"
+	self.melee_weapons.kabar = {}
+	self.melee_weapons.kabar.name_id = "bm_melee_kabar"
+	self.melee_weapons.kabar.type = "knife"
+	self.melee_weapons.kabar.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_mel_kabar/wpn_fps_mel_kabar"
+	self.melee_weapons.kabar.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_mel_kabar/wpn_third_mel_kabar"
+	self.melee_weapons.kabar.animation = nil
+	self.melee_weapons.kabar.dlc = "gage_pack_lmg"
+	self.melee_weapons.kabar.texture_bundle_folder = "gage_pack_lmg"
+	self.melee_weapons.kabar.stats = {}
+	self.melee_weapons.kabar.stats.min_damage = 1.5
+	self.melee_weapons.kabar.stats.max_damage = 7
+	self.melee_weapons.kabar.stats.min_damage_effect = 0.7
+	self.melee_weapons.kabar.stats.max_damage_effect = 0.75
+	self.melee_weapons.kabar.stats.charge_time = 2
+	self.melee_weapons.kabar.stats.range = 150
+	self.melee_weapons.kabar.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.kabar.stats.weapon_type = "sharp"
+	self.melee_weapons.kabar.anim_global_param = "melee_knife"
+	self.melee_weapons.kabar.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.kabar.repeat_expire_t = 0.6
+	self.melee_weapons.kabar.expire_t = 1.1
+	self.melee_weapons.kabar.melee_damage_delay = 0.1
+	self.melee_weapons.kabar.sounds = {}
+	self.melee_weapons.kabar.sounds.equip = "knife_equip"
+	self.melee_weapons.kabar.sounds.hit_air = "knife_hit_air"
+	self.melee_weapons.kabar.sounds.hit_gen = "knife_hit_gen"
+	self.melee_weapons.kabar.sounds.hit_body = "knife_hit_body"
+	self.melee_weapons.kabar.sounds.charge = "knife_charge"
+	self.melee_weapons.rambo = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.rambo.name_id = "bm_melee_rambo"
+	self.melee_weapons.rambo.type = "knife"
+	self.melee_weapons.rambo.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_mel_rambo/wpn_fps_mel_rambo"
+	self.melee_weapons.rambo.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_mel_rambo/wpn_third_mel_rambo"
+	self.melee_weapons.rambo.stats.min_damage = 2.5
+	self.melee_weapons.rambo.stats.max_damage = 10
+	self.melee_weapons.rambo.stats.min_damage_effect = 0.7
+	self.melee_weapons.rambo.stats.max_damage_effect = 0.75
+	self.melee_weapons.rambo.stats.charge_time = 2.75
+	self.melee_weapons.rambo.stats.range = 185
+	self.melee_weapons.gerber = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.gerber.name_id = "bm_melee_gerber"
+	self.melee_weapons.gerber.type = "knife"
+	self.melee_weapons.gerber.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_mel_dmf/wpn_fps_mel_dmf"
+	self.melee_weapons.gerber.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_mel_dmf/wpn_third_mel_dmf"
+	self.melee_weapons.gerber.stats.min_damage = 2
+	self.melee_weapons.gerber.stats.max_damage = 5.2
+	self.melee_weapons.gerber.stats.min_damage_effect = 1
+	self.melee_weapons.gerber.stats.max_damage_effect = 1.15
+	self.melee_weapons.gerber.stats.charge_time = 1.5
+	self.melee_weapons.gerber.stats.range = 125
+	self.melee_weapons.kampfmesser = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.kampfmesser.name_id = "bm_melee_kampfmesser"
+	self.melee_weapons.kampfmesser.type = "knife"
+	self.melee_weapons.kampfmesser.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_mel_km2000/wpn_fps_mel_km2000"
+	self.melee_weapons.kampfmesser.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_mel_km2000/wpn_third_mel_km2000"
+	self.melee_weapons.kampfmesser.stats.min_damage = 1.5
+	self.melee_weapons.kampfmesser.stats.max_damage = 7.5
+	self.melee_weapons.kampfmesser.stats.min_damage_effect = 1
+	self.melee_weapons.kampfmesser.stats.max_damage_effect = 1.15
+	self.melee_weapons.kampfmesser.stats.charge_time = 2.25
+	self.melee_weapons.kampfmesser.stats.range = 150
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

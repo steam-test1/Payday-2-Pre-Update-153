@@ -1430,7 +1430,9 @@ function HUDStageEndScreen:level_up(level)
 		end
 		if data.upgrades then
 			for i, upgrade in ipairs(data.upgrades) do
-				table.insert(new_items, {upgrade = upgrade})
+				if not managers.upgrades:is_upgrade_locked(upgrade) then
+					table.insert(new_items, {upgrade = upgrade})
+				end
 			end
 		end
 		self._package_forepanel:child("title_text"):set_text(managers.localization:to_upper_text("menu_es_package_unlocked_" .. (#new_items == 1 and "singular" or "plural")))

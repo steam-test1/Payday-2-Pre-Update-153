@@ -6,6 +6,9 @@ function CopSound:init(unit)
 	local char_tweak = tweak_data.character[unit:base()._tweak_table]
 	local nr_variations = char_tweak.speech_prefix_count
 	self._prefix = (char_tweak.speech_prefix_p1 or "") .. (nr_variations and tostring(math.random(nr_variations)) or "") .. (char_tweak.speech_prefix_p2 or "") .. "_"
+	if self._unit:base():char_tweak().spawn_sound_event then
+		self._unit:sound():play(self._unit:base():char_tweak().spawn_sound_event, nil, nil)
+	end
 	unit:base():post_init()
 end
 

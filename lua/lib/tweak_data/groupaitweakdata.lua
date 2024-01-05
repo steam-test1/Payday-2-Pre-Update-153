@@ -635,13 +635,13 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				unit = "CS_heavy_M4",
 				freq = 1,
 				tactics = tactics_CS_swat_rifle,
-				rank = 1
+				rank = 2
 			},
 			{
 				unit = "CS_heavy_M4",
 				freq = 0.35,
 				tactics = tactics_CS_swat_rifle_flank,
-				rank = 2
+				rank = 3
 			}
 		}
 	}
@@ -828,6 +828,13 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 				amount_max = 2,
 				tactics = tactics_FBI_swat_shotgun,
 				rank = 1
+			},
+			{
+				unit = "spooc",
+				freq = 0.15,
+				amount_max = 2,
+				tactics = tactics_spooc,
+				rank = 1
 			}
 		}
 	}
@@ -921,6 +928,7 @@ function GroupAITweakData:_init_enemy_spawn_groups()
 			}
 		}
 	}
+	self.enemy_spawn_groups.FBI_spoocs = self.enemy_spawn_groups.single_spooc
 end
 
 function GroupAITweakData:_init_task_data()
@@ -929,9 +937,14 @@ function GroupAITweakData:_init_task_data()
 	self.difficulty_curve_points = {0.5}
 	self.optimal_trade_distance = {0, 0}
 	self.bain_assault_praise_limits = {1, 3}
-	self.besiege.recurring_group_SO_intervals = {
-		recurring_cloaker_spawn = {180, 300},
-		recurring_spawn_1 = {30, 60}
+	self.besiege.recurring_group_SO = {
+		recurring_cloaker_spawn = {
+			interval = {180, 300},
+			retire_delay = 30
+		},
+		recurring_spawn_1 = {
+			interval = {30, 60}
+		}
 	}
 	self.besiege.regroup.duration = {
 		15,
@@ -1106,7 +1119,7 @@ function GroupAITweakData:_set_normal()
 	print("-------------\\//> Difficulty set to : Normal <//\\-------------")
 	print("-------------//\\//\\//\\//\\//\\//\\//\\//\\//\\//-------------")
 	print("-------------\\//\\//\\//\\//\\//\\//\\//\\//\\//\\-------------")
-	self.unit_categories.tank.max_amount = 0
+	self.unit_categories.tank.max_amount = 1
 	self.unit_categories.taser.max_amount = 1
 	self.unit_categories.spooc.max_amount = 0
 	self.unit_categories.shield.max_amount = 2
@@ -1248,7 +1261,7 @@ function GroupAITweakData:_set_hard()
 	self.unit_categories.spooc.max_amount = 1
 	self.unit_categories.shield.max_amount = 4
 	self.besiege.recurring_group_SO_intervals = {
-		recurring_cloaker_spawn = {100, 150},
+		recurring_cloaker_spawn = {60, 120},
 		recurring_spawn_1 = {30, 60}
 	}
 end
@@ -1391,10 +1404,10 @@ function GroupAITweakData:_set_overkill()
 	end
 	self.unit_categories.tank.max_amount = 3
 	self.unit_categories.taser.max_amount = 4
-	self.unit_categories.spooc.max_amount = 2
+	self.unit_categories.spooc.max_amount = 4
 	self.unit_categories.shield.max_amount = 5
 	self.besiege.recurring_group_SO_intervals = {
-		recurring_cloaker_spawn = {60, 90},
+		recurring_cloaker_spawn = {45, 60},
 		recurring_spawn_1 = {30, 60}
 	}
 end
@@ -1527,7 +1540,7 @@ function GroupAITweakData:_set_overkill_145()
 	end
 	self.unit_categories.tank.max_amount = 4
 	self.unit_categories.taser.max_amount = 4
-	self.unit_categories.spooc.max_amount = 3
+	self.unit_categories.spooc.max_amount = 6
 	self.unit_categories.shield.max_amount = 6
 	self.besiege.recurring_group_SO_intervals = {
 		recurring_cloaker_spawn = {20, 40},

@@ -88,7 +88,8 @@ GroupAIStateBase.BLAME_SYNC = {
 }
 GroupAIStateBase.EVENT_SYNC = {
 	"police_called",
-	"enemy_weapons_hot"
+	"enemy_weapons_hot",
+	"cloaker_spawned"
 }
 
 function GroupAIStateBase:init()
@@ -1014,8 +1015,8 @@ function GroupAIStateBase:on_simulation_ended()
 	self._forbid_drop_in = nil
 	self._whisper_mode = false
 	if self._police_call_clbk_id then
-		self._police_call_clbk_id = nil
 		managers.enemy:remove_delayed_clbk(self._police_call_clbk_id)
+		self._police_call_clbk_id = nil
 	end
 	if self._gameover_clbk then
 		managers.enemy:remove_delayed_clbk("_gameover_clbk")
@@ -1816,6 +1817,17 @@ function GroupAIStateBase:remove_special_objective(id)
 end
 
 function GroupAIStateBase:add_grp_SO(id, element)
+	if self._grp_SO_task_queue then
+		table.insert(self._grp_SO_task_queue, {
+			"add",
+			id,
+			element
+		})
+	else
+		self:remove_grp_SO(id)
+		self._grp_SO = self._grp_SO or {}
+		self._grp_SO[id] = element
+	end
 end
 
 function GroupAIStateBase:remove_grp_SO(id)
@@ -1861,7 +1873,7 @@ function GroupAIStateBase:_process_grp_SO(grp_so_id, element)
 				elements = {},
 				delay_t = 0
 			}
-			self._recurring_grp_SO[mode].interval = tweak_data.group_ai.besiege.recurring_group_SO_intervals[mode]
+			self._recurring_grp_SO[mode].interval = tweak_data.group_ai.besiege.recurring_group_SO[mode].interval
 		end
 		table.insert(self._recurring_grp_SO[mode].elements, element)
 		return
@@ -1876,9 +1888,6 @@ function GroupAIStateBase:_process_grp_SO(grp_so_id, element)
 end
 
 function GroupAIStateBase:_process_recurring_grp_SO(recurring_id, data)
-	if self._t < data.delay_t then
-		return
-	end
 	if data.groups then
 		local junk_groups
 		for group_id, group in pairs(data.groups) do
@@ -1898,7 +1907,7 @@ function GroupAIStateBase:_process_recurring_grp_SO(recurring_id, data)
 					end
 					if is_junk then
 						if group.objective.fail_t then
-							if self._t - group.objective.fail_t < 30 then
+							if self._t - group.objective.fail_t < tweak_data.group_ai.besiege.recurring_group_SO[recurring_id].retire_delay then
 								is_junk = nil
 							end
 						else
@@ -1924,9 +1933,12 @@ function GroupAIStateBase:_process_recurring_grp_SO(recurring_id, data)
 			if not next(data.groups) then
 				data.groups = nil
 			end
-			data.delay_t = self._t + math.lerp(data.interval[1], data.interval[2], math.random())
+			data.delay_t = math.max(data.delay_t, self._t + math.lerp(data.interval[1], data.interval[2], math.random()))
 			return
 		end
+	end
+	if self._t < data.delay_t then
+		return
 	end
 	local total_w = 0
 	for i, element in ipairs(data.elements) do
@@ -1950,6 +1962,7 @@ function GroupAIStateBase:_process_recurring_grp_SO(recurring_id, data)
 	if new_group then
 		data.groups = data.groups or {}
 		data.groups[new_group.id] = new_group
+		managers.network:session():send_to_peers_synched("group_ai_event", self:get_sync_event_id("cloaker_spawned"), 0)
 	end
 	data.delay_t = self._t + 5
 	return new_group and true
@@ -3706,6 +3719,8 @@ function GroupAIStateBase:sync_event(event_id, blame_id)
 		self:_call_listeners("enemy_weapons_hot")
 		managers.enemy:add_delayed_clbk("notify_bain_weapons_hot", callback(self, self, "notify_bain_weapons_hot", blame_name), Application:time() + 0)
 		managers.enemy:set_corpse_disposal_enabled(true)
+	elseif event_name == "cloaker_spawned" then
+		managers.hud:post_event("cloaker_spawn")
 	end
 end
 

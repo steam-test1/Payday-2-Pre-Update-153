@@ -2,64 +2,103 @@ GuiTweakData = GuiTweakData or class()
 
 function GuiTweakData:init()
 	self.content_updates = {
-		{
-			id = "birthday",
-			name_id = "menu_content_birthday",
-			desc_id = "menu_content_birthday_desc",
-			date_id = "menu_content_birthday_date",
-			webpage = "http://www.overkillsoftware.com/birthday/",
-			image = "guis/textures/pd2/content_updates/birthday"
-		},
-		{
-			id = "halloween",
-			name_id = "menu_content_halloween",
-			desc_id = "menu_content_halloween_desc",
-			date_id = "menu_content_halloween_date",
-			webpage = "http://www.overkillsoftware.com/halloween/",
-			image = "guis/textures/pd2/content_updates/halloween"
-		},
-		{
-			id = "armored_transport",
-			name_id = "menu_content_armored_transport",
-			desc_id = "menu_content_armored_transport_desc",
-			date_id = "menu_content_armored_transport_date",
-			store = 264610,
-			image = "guis/textures/pd2/content_updates/armored_transport"
-		},
-		{
-			id = "gage_pack",
-			name_id = "menu_content_gage_pack",
-			desc_id = "menu_content_gage_pack_desc",
-			date_id = "menu_content_gage_pack_date",
-			store = 267380,
-			image = "guis/textures/pd2/content_updates/gage_pack"
-		},
-		{
-			id = "charliesierra",
-			name_id = "menu_content_charliesierra",
-			desc_id = "menu_content_charliesierra_desc",
-			date_id = "menu_content_charliesierra_date",
-			webpage = "http://www.overkillsoftware.com/charliesanta/",
-			image = "guis/textures/pd2/content_updates/charliesierra"
-		},
-		{
-			id = "christmas",
-			name_id = "menu_content_christmas",
-			desc_id = "menu_content_christmas_desc",
-			date_id = "menu_content_christmas_date",
-			store = 267381,
-			image = "guis/textures/pd2/content_updates/christmas"
-		},
-		{
-			id = "infamy",
-			name_id = "menu_content_infamy",
-			desc_id = "menu_content_infamy_desc",
-			date_id = "menu_content_infamy_date",
-			webpage = "http://www.overkillsoftware.com/infamy",
-			image = "guis/textures/pd2/content_updates/infamy_introduction"
+		title_id = "menu_content_updates",
+		choice_id = "menu_content_updates_previous",
+		num_items = 6,
+		item_list = {
+			{
+				id = "birthday",
+				name_id = "menu_content_birthday",
+				desc_id = "menu_content_birthday_desc",
+				date_id = "menu_content_birthday_date",
+				webpage = "http://www.overkillsoftware.com/birthday/",
+				image = "guis/textures/pd2/content_updates/birthday"
+			},
+			{
+				id = "halloween",
+				name_id = "menu_content_halloween",
+				desc_id = "menu_content_halloween_desc",
+				date_id = "menu_content_halloween_date",
+				webpage = "http://www.overkillsoftware.com/halloween/",
+				image = "guis/textures/pd2/content_updates/halloween"
+			},
+			{
+				id = "armored_transport",
+				name_id = "menu_content_armored_transport",
+				desc_id = "menu_content_armored_transport_desc",
+				date_id = "menu_content_armored_transport_date",
+				store = 264610,
+				image = "guis/textures/pd2/content_updates/armored_transport"
+			},
+			{
+				id = "gage_pack",
+				name_id = "menu_content_gage_pack",
+				desc_id = "menu_content_gage_pack_desc",
+				date_id = "menu_content_gage_pack_date",
+				store = 267380,
+				image = "guis/textures/pd2/content_updates/gage_pack"
+			},
+			{
+				id = "charliesierra",
+				name_id = "menu_content_charliesierra",
+				desc_id = "menu_content_charliesierra_desc",
+				date_id = "menu_content_charliesierra_date",
+				store = 271110,
+				image = "guis/textures/pd2/content_updates/charliesierra"
+			},
+			{
+				id = "christmas",
+				name_id = "menu_content_christmas",
+				desc_id = "menu_content_christmas_desc",
+				date_id = "menu_content_christmas_date",
+				store = 267381,
+				image = "guis/textures/pd2/content_updates/christmas"
+			},
+			{
+				id = "infamy",
+				name_id = "menu_content_infamy",
+				desc_id = "menu_content_infamy_desc",
+				date_id = "menu_content_infamy_date",
+				store = 274161,
+				image = "guis/textures/pd2/content_updates/infamy_introduction"
+			},
+			{
+				id = "gage_pack_lmg",
+				name_id = "menu_content_gage_pack_lmg",
+				desc_id = "menu_content_gage_pack_lmg_desc",
+				date_id = "menu_content_gage_pack_lmg_date",
+				store = 275590,
+				image = "guis/textures/pd2/content_updates/gage_pack_lmg"
+			}
 		}
 	}
-	self.num_previous_updates = 6
+	self.fav_videos = {
+		title_id = "menu_fav_videos",
+		choice_id = nil,
+		num_items = 3,
+		db_url = "http://www.overkillsoftware.com/?page_id=1263",
+		button = {
+			text_id = "menu_fav_video_homepage",
+			url = "http://www.overkillsoftware.com/?page_id=1263"
+		},
+		item_list = {
+			{
+				id = "fav3",
+				image = "guis/textures/pd2/fav_video3",
+				use_db = true
+			},
+			{
+				id = "fav2",
+				image = "guis/textures/pd2/fav_video2",
+				use_db = true
+			},
+			{
+				id = "fav1",
+				image = "guis/textures/pd2/fav_video1",
+				use_db = true
+			}
+		}
+	}
 	self.infamy_masks_sort_order = {
 		"aviator",
 		"plague",

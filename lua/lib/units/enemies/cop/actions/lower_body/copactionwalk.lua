@@ -720,8 +720,8 @@ function CopActionWalk:_calculate_curved_path(path, index, curvature_factor, ent
 end
 
 function CopActionWalk:on_exit()
-	if tostring(self._unit:key()) == "userdata: 000018B1" then
-		debug_pause_unit(self._unit, "[CopActionWalk:on_exit] unit", self._common_data.unit, "rot", self._common_data.rot, "end_rot", self._end_rot)
+	if self._expired and self._end_rot then
+		self._ext_movement:set_rotation(self._end_rot)
 	end
 	if self._root_blend_disabled then
 		self._ext_movement:set_root_blend(true)
@@ -2114,6 +2114,9 @@ function CopActionWalk:_chk_correct_pose()
 		self._ext_movement:action_request({type = "stand", body_part = 4})
 	elseif pose == "stand" and not allowed_poses.stand then
 		self._ext_movement:action_request({type = "crouch", body_part = 4})
+	end
+	if pose == "crouch" and self._common_data.is_cool then
+		self._ext_movement:action_request({type = "stand", body_part = 4})
 	end
 end
 

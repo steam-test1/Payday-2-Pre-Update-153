@@ -17,7 +17,7 @@ function BlackMarketManager:_setup()
 	self._defaults.armor = "level_1"
 	self._defaults.preferred_character = "russian"
 	self._defaults.grenade = "frag"
-	self._defaults.melee_weapon = "gun"
+	self._defaults.melee_weapon = "weapon"
 	if not Global.blackmarket_manager then
 		Global.blackmarket_manager = {}
 		self:_setup_armors()
@@ -77,10 +77,21 @@ function BlackMarketManager:_setup_melee_weapons()
 	local melee_weapons = {}
 	Global.blackmarket_manager.melee_weapons = melee_weapons
 	for melee_weapon, _ in pairs(tweak_data.blackmarket.melee_weapons) do
-		melee_weapons[melee_weapon] = {unlocked = true, equipped = false}
+		melee_weapons[melee_weapon] = {
+			unlocked = false,
+			equipped = false,
+			owned = false,
+			durability = 1,
+			level = 0,
+			skill_based = false
+		}
+		local is_default, weapon_level = managers.upgrades:get_value(melee_weapon, self._defaults.melee_weapon)
+		melee_weapons[melee_weapon].level = weapon_level
+		melee_weapons[melee_weapon].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.melee_weapons[melee_weapon].dlc
 	end
 	melee_weapons[self._defaults.melee_weapon].equipped = true
-	melee_weapons[self._defaults.melee_weapon].unlocked = true
+	melee_weapons[self._defaults.melee_weapon].owned = true
+	melee_weapons[self._defaults.melee_weapon].level = 0
 end
 
 function BlackMarketManager:_setup_track_global_values()
@@ -293,7 +304,17 @@ function BlackMarketManager:equipped_melee_weapon()
 			return melee_weapon_id
 		end
 	end
+	self:aquire_default_weapons()
 	return self._defaults.melee_weapon
+end
+
+function BlackMarketManager:equipped_melee_weapon_damage_info(lerp_value)
+	lerp_value = lerp_value or 0
+	local melee_entry = self:equipped_melee_weapon()
+	local stats = tweak_data.blackmarket.melee_weapons[melee_entry].stats
+	local dmg = math.lerp(stats.min_damage, stats.max_damage, lerp_value)
+	local dmg_effect = dmg * math.lerp(stats.min_damage_effect, stats.max_damage_effect, lerp_value)
+	return dmg, dmg_effect
 end
 
 function BlackMarketManager:equipped_secondary()
@@ -1279,6 +1300,17 @@ function BlackMarketManager:get_weapon_data(weapon_id)
 	return self._global.weapons[weapon_id]
 end
 
+function BlackMarketManager:get_weapon_name_by_category_slot(category, slot)
+	local crafted_slot = self:get_crafted_category_slot(category, slot)
+	if crafted_slot then
+		if crafted_slot.custom_name then
+			return "\"" .. crafted_slot.custom_name .. "\""
+		end
+		return managers.weapon_factory:get_weapon_name_by_factory_id(crafted_slot.factory_id)
+	end
+	return ""
+end
+
 function BlackMarketManager:get_weapon_category(category)
 	local weapon_index = {secondaries = 1, primaries = 2}
 	local selection_index = weapon_index[category] or 1
@@ -1895,6 +1927,26 @@ function BlackMarketManager:on_unaquired_weapon_platform(upgrade, id)
 	end
 end
 
+function BlackMarketManager:on_aquired_melee_weapon(upgrade, id, loading)
+	self._global.melee_weapons[id].unlocked = true
+	self._global.melee_weapons[id].owned = true
+	if not loading then
+		self._global.new_drops.normal = self._global.new_drops.normal or {}
+		self._global.new_drops.normal.melee_weapons = self._global.new_drops.normal.melee_weapons or {}
+		self._global.new_drops.normal.melee_weapons[id] = true
+	end
+end
+
+function BlackMarketManager:on_unaquired_melee_weapon(upgrade, id)
+	self._global.melee_weapons[id].unlocked = false
+	self._global.melee_weapons[id].owned = false
+	local equipped_melee_weapon = managers.blackmarket:equipped_melee_weapon()
+	if equipped_melee_weapon and equipped_melee_weapon == id then
+		equipped_melee_weapon.equipped = false
+		self:_verfify_equipped_category("melee_weapons")
+	end
+end
+
 function BlackMarketManager:aquire_default_weapons(only_enable)
 	print("BlackMarketManager:aquire_default_weapons()")
 	local glock_17 = self._global and self._global.weapons and self._global.weapons.glock_17
@@ -1913,6 +1965,14 @@ function BlackMarketManager:aquire_default_weapons(only_enable)
 			self._global.weapons.amcar.unlocked = true
 		else
 			managers.upgrades:aquire("amcar")
+		end
+	end
+	local melee_weapon = self._global and self._global.melee_weapons and self._global.melee_weapons[self._defaults.melee_weapon]
+	if melee_weapon and not melee_weapon.unlocked and not managers.upgrades:aquired(self._defaults.melee_weapon) then
+		if only_enable then
+			self._global.melee_weapons[self._defaults.melee_weapon].unlocked = true
+		else
+			managers.upgrades:aquire(self._defaults.melee_weapon)
 		end
 	end
 end
@@ -2231,6 +2291,10 @@ end
 
 function BlackMarketManager:get_preferred_character_real_name()
 	return managers.localization:text("menu_" .. tostring(self._global._preferred_character or "russian"))
+end
+
+function BlackMarketManager:get_category_default(category)
+	return self._defaults and self._defaults[category]
 end
 
 function BlackMarketManager:aquire_default_masks()
@@ -2665,6 +2729,9 @@ end
 
 function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
 	if mask_id ~= "character_locked" then
+		if not tweak_data.blackmarket.masks[mask_id] then
+			print("Missing mask:" .. mask_id)
+		end
 		return tweak_data.blackmarket.masks[mask_id].unit
 	end
 	local character = self:get_preferred_character()
@@ -2876,6 +2943,11 @@ function BlackMarketManager:load(data)
 		else
 			self._global.melee_weapons[self._defaults.melee_weapon].equipped = true
 		end
+		for melee_weapon, data in pairs(self._global.melee_weapons) do
+			local is_default, melee_weapon_level = managers.upgrades:get_value(melee_weapon)
+			self._global.melee_weapons[melee_weapon].level = melee_weapon_level
+			self._global.melee_weapons[melee_weapon].skill_based = not is_default and melee_weapon_level == 0 and not tweak_data.blackmarket.melee_weapons[melee_weapon].dlc and not tweak_data.blackmarket.melee_weapons[melee_weapon].free
+		end
 		self._global.equipped_melee_weapon = nil
 		self._global.weapons = default_global.weapons or {}
 		for weapon, data in pairs(tweak_data.weapon) do
@@ -3058,20 +3130,22 @@ function BlackMarketManager:_cleanup_blackmarket()
 										break
 									end
 								end
-							end
-							if default_mod then
-								table.insert(invalid_parts, {
-									slot = slot,
-									global_value = "normal",
-									default_mod = default_mod,
-									part_id = part_id
-								})
+								if default_mod then
+									table.insert(invalid_parts, {
+										slot = slot,
+										global_value = "normal",
+										default_mod = default_mod,
+										part_id = part_id
+									})
+								else
+									table.insert(invalid_parts, {
+										slot = slot,
+										global_value = item.global_values[part_id] or "normal",
+										part_id = part_id
+									})
+								end
 							else
-								table.insert(invalid_parts, {
-									slot = slot,
-									global_value = item.global_values[part_id] or "normal",
-									part_id = part_id
-								})
+								table.insert(invalid_weapons, slot)
 							end
 						end
 					end
@@ -3195,6 +3269,7 @@ function BlackMarketManager:_verify_dlc_items()
 			if weapon_def then
 				weapon_dlc = weapon_def.dlc
 				if weapon_dlc then
+					managers.upgrades:aquire(weapon_id)
 					Global.blackmarket_manager.weapons[weapon_id].unlocked = managers.dlc:is_dlc_unlocked(weapon_dlc) or false
 				else
 					Application:error("[BlackMarketManager] Weapon locked by unknown source: " .. tostring(weapon_id))

@@ -112,6 +112,9 @@ function WeaponFactoryTweakData:init()
 	self:_init_mp7()
 	self:_init_scar()
 	self:_init_p226()
+	self:_init_hk21()
+	self:_init_m249()
+	self:_init_rpk()
 	self:_init_content_unfinished()
 end
 
@@ -8009,4 +8012,515 @@ function WeaponFactoryTweakData:_init_p226()
 	}
 	self.wpn_fps_pis_p226_npc = deep_clone(self.wpn_fps_pis_p226)
 	self.wpn_fps_pis_p226_npc.unit = "units/pd2_dlc_dec5/weapons/wpn_fps_pis_p226/wpn_fps_pis_p226_npc"
+end
+
+function WeaponFactoryTweakData:_init_hk21()
+	self.parts.wpn_fps_lmg_hk21_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_hk21_b_long",
+		a_obj = "a_b",
+		parent = "foregrip",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_b_long",
+		stats = {
+			value = 4,
+			spread = 1,
+			recoil = 1,
+			damage = -1,
+			spread_moving = -2,
+			concealment = -2
+		},
+		texture_bundle_folder = "gage_pack_lmg",
+		dlc = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_hk21_b_short = {
+		type = "barrel",
+		name_id = "bm_wp_hk21_b_hk21a4",
+		a_obj = "a_b",
+		parent = "foregrip",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_b_short",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_hk21_body_lower = {
+		type = "lower_reciever",
+		name_id = "bm_wp_hk21_b_hk21a5",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_body_lower",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_hk21_body_upper = {
+		type = "upper_reciever",
+		name_id = "bm_wp_hk21_b_hk21sd",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_body_upper",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_hk21_fg_long = {
+		type = "foregrip",
+		name_id = "bm_wp_hk21_body_hk21",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_fg_long",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_lmg_hk21_fg_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "foregrip",
+		name_id = "bm_wp_hk21_fg_short",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_fg_short",
+		stats = {
+			value = 6,
+			spread = -1,
+			damage = 1,
+			spread_moving = 2,
+			concealment = 3
+		},
+		texture_bundle_folder = "gage_pack_lmg",
+		dlc = "gage_pack_lmg",
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_lmg_hk21_g_ergo = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "grip",
+		name_id = "bm_wp_hk21_g_ergo",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_g_ergo",
+		stats = {
+			value = 3,
+			recoil = 1,
+			spread_moving = 2,
+			concealment = -1
+		},
+		texture_bundle_folder = "gage_pack_lmg",
+		dlc = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_hk21_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_hk21_body_rail",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_hk21_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_hk21_body_rail",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_hk21_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_hk21_body_rail",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_fps_lmg_hk21_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_hk21_b_long.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_b_long"
+	self.parts.wpn_fps_lmg_hk21_b_short.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_b_short"
+	self.parts.wpn_fps_lmg_hk21_body_lower.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_body_lower"
+	self.parts.wpn_fps_lmg_hk21_body_upper.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_body_upper"
+	self.parts.wpn_fps_lmg_hk21_fg_long.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_fg_long"
+	self.parts.wpn_fps_lmg_hk21_fg_short.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_fg_short"
+	self.parts.wpn_fps_lmg_hk21_g_ergo.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_g_ergo"
+	self.parts.wpn_fps_lmg_hk21_g_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_g_standard"
+	self.parts.wpn_fps_lmg_hk21_m_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_m_standard"
+	self.parts.wpn_fps_lmg_hk21_s_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21_pts/wpn_third_lmg_hk21_s_standard"
+	self.wpn_fps_lmg_hk21 = {}
+	self.wpn_fps_lmg_hk21.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21/wpn_fps_lmg_hk21"
+	self.wpn_fps_lmg_hk21.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_lmg_hk21.default_blueprint = {
+		"wpn_fps_lmg_hk21_b_short",
+		"wpn_fps_lmg_hk21_body_lower",
+		"wpn_fps_lmg_hk21_body_upper",
+		"wpn_fps_lmg_hk21_fg_long",
+		"wpn_fps_lmg_hk21_g_standard",
+		"wpn_fps_lmg_hk21_m_standard",
+		"wpn_fps_lmg_hk21_s_standard"
+	}
+	self.wpn_fps_lmg_hk21.uses_parts = {
+		"wpn_fps_lmg_hk21_b_short",
+		"wpn_fps_lmg_hk21_b_long",
+		"wpn_fps_lmg_hk21_body_lower",
+		"wpn_fps_lmg_hk21_body_upper",
+		"wpn_fps_lmg_hk21_fg_short",
+		"wpn_fps_lmg_hk21_fg_long",
+		"wpn_fps_lmg_hk21_g_standard",
+		"wpn_fps_lmg_hk21_g_ergo",
+		"wpn_fps_lmg_hk21_m_standard",
+		"wpn_fps_lmg_hk21_s_standard",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire"
+	}
+	self.wpn_fps_lmg_hk21_npc = deep_clone(self.wpn_fps_lmg_hk21)
+	self.wpn_fps_lmg_hk21_npc.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21/wpn_fps_lmg_hk21_npc"
+end
+
+function WeaponFactoryTweakData:_init_m249()
+	self.parts.wpn_fps_lmg_m249_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_m249_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_b_long",
+		stats = {
+			value = 4,
+			damage = -1,
+			spread = 1,
+			recoil = 1,
+			concealment = -2
+		},
+		dlc = "gage_pack_lmg",
+		texture_bundle_folder = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_m249_b_short = {
+		type = "barrel",
+		name_id = "bm_wp_m249_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_b_short",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m249_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_m249_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_body_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_m249_fg_mk46 = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "foregrip",
+		name_id = "bm_wp_m249_fg_mk46",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_fg_mk46",
+		stats = {
+			value = 6,
+			recoil = -2,
+			damage = 2,
+			spread_moving = 2,
+			concealment = -1
+		},
+		dlc = "gage_pack_lmg",
+		texture_bundle_folder = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_m249_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_m249_fg_standard",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_fg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m249_m_standard = {
+		type = "magazine",
+		bullet_objects = {prefix = "g_bullet_", amount = 15},
+		name_id = "bm_wp_m249_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_lmg_m249_s_modern = {
+		type = "stock",
+		name_id = "bm_wp_m249_s_modern",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_s_modern",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m249_s_para = {
+		type = "stock",
+		name_id = "bm_wp_m249_s_para",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_s_para",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m249_s_solid = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_m249_s_solid",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_s_solid",
+		stats = {
+			value = 3,
+			recoil = 2,
+			spread_moving = -2,
+			concealment = -2
+		},
+		dlc = "gage_pack_lmg",
+		texture_bundle_folder = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_m249_upper_reciever = {
+		type = "upper_reciever",
+		name_id = "bm_wp_m249_upper_reciever",
+		a_obj = "a_upper",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249_pts/wpn_fps_lmg_m249_upper_reciever",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_m249_b_long.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_b_long"
+	self.parts.wpn_fps_lmg_m249_b_short.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_b_short"
+	self.parts.wpn_fps_lmg_m249_body_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_body_standard"
+	self.parts.wpn_fps_lmg_m249_fg_mk46.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_fg_mk46"
+	self.parts.wpn_fps_lmg_m249_fg_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_fg_standard"
+	self.parts.wpn_fps_lmg_m249_m_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_m_standard"
+	self.parts.wpn_fps_lmg_m249_s_modern.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_s_modern"
+	self.parts.wpn_fps_lmg_m249_s_para.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_s_para"
+	self.parts.wpn_fps_lmg_m249_s_solid.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_s_solid"
+	self.parts.wpn_fps_lmg_m249_upper_reciever.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_m249_pts/wpn_third_lmg_m249_upper_reciever"
+	self.wpn_fps_lmg_m249 = {}
+	self.wpn_fps_lmg_m249.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249/wpn_fps_lmg_m249"
+	self.wpn_fps_lmg_m249.stock_adapter = "wpn_fps_lmg_m249_s_modern"
+	self.wpn_fps_lmg_m249.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight",
+		"vertical_grip"
+	}
+	self.wpn_fps_lmg_m249.default_blueprint = {
+		"wpn_fps_lmg_m249_b_short",
+		"wpn_fps_lmg_m249_body_standard",
+		"wpn_fps_lmg_m249_fg_standard",
+		"wpn_fps_lmg_m249_m_standard",
+		"wpn_fps_lmg_m249_s_para",
+		"wpn_fps_lmg_m249_upper_reciever"
+	}
+	self.wpn_fps_lmg_m249.uses_parts = {
+		"wpn_fps_lmg_m249_b_long",
+		"wpn_fps_lmg_m249_b_short",
+		"wpn_fps_lmg_m249_body_standard",
+		"wpn_fps_lmg_m249_fg_mk46",
+		"wpn_fps_lmg_m249_fg_standard",
+		"wpn_fps_lmg_m249_m_standard",
+		"wpn_fps_lmg_m249_s_para",
+		"wpn_fps_lmg_m249_s_solid",
+		"wpn_fps_lmg_m249_upper_reciever",
+		"wpn_fps_upg_m4_s_standard",
+		"wpn_fps_upg_m4_s_crane",
+		"wpn_fps_upg_m4_s_mk46",
+		"wpn_fps_upg_m4_s_pts",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire"
+	}
+	self.wpn_fps_lmg_m249_npc = deep_clone(self.wpn_fps_lmg_m249)
+	self.wpn_fps_lmg_m249_npc.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249/wpn_fps_lmg_m249_npc"
+end
+
+function WeaponFactoryTweakData:_init_rpk()
+	self.parts.wpn_fps_lmg_rpk_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_rpk_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_rpk_body_lowerreceiver = {
+		type = "lower_reciever",
+		name_id = "bm_wp_rpk_b_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_body_lowerreceiver",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_lmg_rpk_fg_wood = {
+		type = "foregrip",
+		name_id = "bm_wp_rpk_fg_wood",
+		a_obj = "a_fg",
+		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_upg_ak_fg_combo4",
+		stats = {value = 1},
+		texture_bundle_folder = "gage_pack_lmg",
+		forbids = {
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_fps_lmg_rpk_fg_standard = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "foregrip",
+		name_id = "bm_wp_rpk_fg_standard",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_fg_standard",
+		stats = {
+			value = 5,
+			spread = -1,
+			recoil = -1,
+			damage = 1,
+			spread_moving = 2,
+			concealment = 1
+		},
+		forbids = {
+			"wpn_fps_addon_ris"
+		},
+		dlc = "gage_pack_lmg",
+		texture_bundle_folder = "gage_pack_lmg",
+		adds = {
+			"wpn_fps_upg_vg_ass_smg_verticalgrip",
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_lmg_rpk_m_drum = {
+		type = "magazine",
+		name_id = "bm_wp_rpk_m_drum",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_lmg_rpk_m_drum",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_rpk_s_standard = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_rpk_s_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_s_standard",
+		texture_bundle_folder = "gage_pack_lmg",
+		dlc = "gage_pack_lmg",
+		stats = {
+			value = 3,
+			recoil = 2,
+			concealment = 1
+		}
+	}
+	self.parts.wpn_fps_lmg_rpk_s_wood = {
+		type = "stock",
+		name_id = "bm_wp_rpk_s_wood",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_s_wood",
+		stats = {value = 1},
+		texture_bundle_folder = "gage_pack_lmg"
+	}
+	self.parts.wpn_fps_lmg_rpk_b_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_rpk_pts/wpn_third_lmg_rpk_b_standard"
+	self.parts.wpn_fps_lmg_rpk_body_lowerreceiver.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_ass_ak_body_lowerreceiver"
+	self.parts.wpn_fps_lmg_rpk_fg_wood.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_fg_combo4"
+	self.parts.wpn_fps_lmg_rpk_fg_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_rpk_pts/wpn_third_lmg_rpk_fg_standard"
+	self.parts.wpn_lmg_rpk_m_drum.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_rpk_pts/wpn_third_lmg_rpk_m_drum"
+	self.parts.wpn_fps_lmg_rpk_s_standard.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_rpk_pts/wpn_third_lmg_rpk_s_standard"
+	self.parts.wpn_fps_lmg_rpk_s_wood.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_lmg_rpk_pts/wpn_third_lmg_rpk_s_wood"
+	self.wpn_fps_lmg_rpk = {}
+	self.wpn_fps_lmg_rpk.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk/wpn_fps_lmg_rpk"
+	self.wpn_fps_lmg_rpk.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_lmg_rpk.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight",
+		"vertical_grip"
+	}
+	self.wpn_fps_lmg_rpk.default_blueprint = {
+		"wpn_fps_lmg_rpk_b_standard",
+		"wpn_fps_lmg_rpk_fg_wood",
+		"wpn_lmg_rpk_m_drum",
+		"wpn_fps_lmg_rpk_s_wood",
+		"wpn_fps_ass_74_body_upperreceiver",
+		"wpn_fps_lmg_rpk_body_lowerreceiver",
+		"wpn_upg_ak_g_standard"
+	}
+	self.wpn_fps_lmg_rpk.uses_parts = {
+		"wpn_fps_lmg_rpk_b_standard",
+		"wpn_fps_lmg_rpk_fg_standard",
+		"wpn_fps_lmg_rpk_fg_wood",
+		"wpn_lmg_rpk_m_drum",
+		"wpn_fps_lmg_rpk_s_standard",
+		"wpn_fps_lmg_rpk_s_wood",
+		"wpn_fps_ass_74_body_upperreceiver",
+		"wpn_fps_lmg_rpk_body_lowerreceiver",
+		"wpn_upg_ak_g_standard",
+		"wpn_fps_upg_m4_s_standard",
+		"wpn_fps_upg_m4_s_pts",
+		"wpn_upg_ak_s_folding",
+		"wpn_upg_ak_s_skfoldable_vanilla",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_vg_ass_smg_verticalgrip",
+		"wpn_fps_upg_m4_s_crane",
+		"wpn_fps_upg_m4_s_mk46"
+	}
+	self.wpn_fps_lmg_rpk_npc = deep_clone(self.wpn_fps_lmg_rpk)
+	self.wpn_fps_lmg_rpk_npc.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk/wpn_fps_lmg_rpk_npc"
 end

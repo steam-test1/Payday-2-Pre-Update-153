@@ -1040,12 +1040,15 @@ function UnitNetworkHandler:place_sentry_gun(pos, rot, ammo_multiplier, armor_mu
 		unit:base():set_server_information(peer:id())
 	end
 	if alive(user_unit) and user_unit:id() ~= -1 then
-		managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", peer:id(), unit and equipment_selection_index or 0, unit, unit:movement()._rot_speed_mul, unit:weapon()._setup.spread_mul, unit:base():has_shield() and true or false)
+		managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", peer:id(), unit and equipment_selection_index or 0, unit or user_unit, unit and unit:movement()._rot_speed_mul, unit and unit:weapon()._setup.spread_mul, unit and unit:base():has_shield() and true or false)
 	end
 end
 
 function UnitNetworkHandler:from_server_sentry_gun_place_result(owner_peer_id, equipment_selection_index, sentry_gun_unit, rot_speed_mul, spread_mul, shield, rpc)
-	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) and self._verify_sender(rpc) and alive(sentry_gun_unit)) or not managers.network:session():peer(owner_peer_id) then
+	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) and self._verify_sender(rpc) and alive(sentry_gun_unit) and managers.network:session():peer(owner_peer_id)) or alive(Global.local_member:unit()) and Global.local_member:unit():key() == sentry_gun_unit:key() then
+		if alive(Global.local_member:unit()) then
+			Global.local_member:unit():equipment():from_server_sentry_gun_place_result()
+		end
 		return
 	end
 	if owner_peer_id == managers.network:session():local_peer():id() and alive(Global.local_member:unit()) then

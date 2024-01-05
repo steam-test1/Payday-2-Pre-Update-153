@@ -234,7 +234,7 @@ function TeamAILogicIdle.damage_clbk(data, damage_info)
 			end
 		end
 	end
-	if (damage_info.result.type == "bleedout" or damage_info.variant == "tase") and data.name ~= "disabled" then
+	if (damage_info.result.type == "bleedout" or damage_info.result.type == "fatal" or damage_info.variant == "tase") and data.name ~= "disabled" then
 		CopLogicBase._exit(data.unit, "disabled")
 	end
 end

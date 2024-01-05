@@ -20,4 +20,7 @@ function HuskCopDamage:die(variant)
 			debug_pause_unit(self._unit, "[HuskCopDamage:die] does not have death sequence", self._death_sequence, self._unit)
 		end
 	end
+	if self._unit:base():char_tweak().die_sound_event then
+		self._unit:sound():play(self._unit:base():char_tweak().die_sound_event, nil, nil)
+	end
 end

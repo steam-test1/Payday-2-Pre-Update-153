@@ -1,11 +1,11 @@
 HuskTankCopDamage = HuskTankCopDamage or class(HuskCopDamage)
 
 function HuskTankCopDamage:damage_melee(attack_data)
-	return
-end
-
-function HuskTankCopDamage:sync_damage_melee(attacker_unit, damage_percent, damage_effect_percent, i_body, hit_offset_height)
-	return
+	if tweak_data.blackmarket.melee_weapons[attack_data.name_id].type == "knife" then
+		HuskTankCopDamage.super.damage_melee(self, attack_data)
+	else
+		return
+	end
 end
 
 function HuskTankCopDamage:seq_clbk_vizor_shatter()

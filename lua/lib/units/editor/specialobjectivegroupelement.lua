@@ -149,6 +149,56 @@ function SpecialObjectiveGroupElement:selected()
 	SpecialObjectiveUnitElement.super.selected(self)
 end
 
+function SpecialObjectiveGroupElement:add_unit_list_btn()
+	local script = self._unit:mission_element_data().script
+	
+	local function f(unit)
+		if not unit:mission_element_data() or unit:mission_element_data().script ~= script then
+			return
+		end
+		local id = unit:unit_data().unit_id
+		if self._hed.spawn_instigator_ids and table.contains(self._hed.spawn_instigator_ids, id) then
+			return false
+		end
+		if self._hed.followup_elements and table.contains(self._hed.followup_elements, id) then
+			return false
+		end
+		if string.find(unit:name():s(), "ai_enemy_group", 1, true) or string.find(unit:name():s(), "ai_spawn_enemy", 1, true) or string.find(unit:name():s(), "ai_civilian_group", 1, true) or string.find(unit:name():s(), "ai_spawn_civilian", 1, true) or string.find(unit:name():s(), "point_special_objective", 1, true) or string.find(unit:name():s(), "ai_so_group", 1, true) then
+			return true
+		end
+		return false
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Add Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		local id = unit:unit_data().unit_id
+		if string.find(unit:name():s(), "ai_enemy_group", 1, true) or string.find(unit:name():s(), "ai_spawn_enemy", 1, true) or string.find(unit:name():s(), "ai_civilian_group", 1, true) or string.find(unit:name():s(), "ai_spawn_civilian", 1, true) then
+			self._hed.spawn_instigator_ids = self._hed.spawn_instigator_ids or {}
+			table.insert(self._hed.spawn_instigator_ids, id)
+		elseif string.find(unit:name():s(), "point_special_objective", 1, true) or string.find(unit:name():s(), "ai_so_group", 1, true) then
+			self._hed.followup_elements = self._hed.followup_elements or {}
+			table.insert(self._hed.followup_elements, id)
+		end
+	end
+end
+
+function SpecialObjectiveGroupElement:remove_unit_list_btn()
+	local function f(unit)
+		return (not self._hed.spawn_instigator_ids or not table.contains(self._hed.spawn_instigator_ids, unit:unit_data().unit_id)) and self._hed.followup_elements and table.contains(self._hed.followup_elements, unit:unit_data().unit_id)
+	end
+	
+	local dialog = SelectUnitByNameModal:new("Remove Unit", f)
+	for _, unit in ipairs(dialog:selected_units()) do
+		local id = unit:unit_data().unit_id
+		if self._hed.spawn_instigator_ids then
+			table.delete(self._hed.spawn_instigator_ids, id)
+		end
+		if self._hed.followup_elements then
+			table.delete(self._hed.followup_elements, id)
+		end
+	end
+end
+
 function SpecialObjectiveGroupElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
@@ -199,6 +249,13 @@ function SpecialObjectiveGroupElement:_build_panel(panel, panel_sizer)
 		ctrlr = base_chance,
 		value = "base_chance"
 	})
+	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	self._btn_toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	self._btn_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
+	self._btn_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	self._btn_toolbar:realize()
+	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
 end
 
 function SpecialObjectiveGroupElement:add_to_mission_package()

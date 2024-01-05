@@ -169,6 +169,7 @@ end
 function RaycastWeaponBase:stop_shooting()
 	self:play_tweak_data_sound("stop_fire")
 	self._shooting = nil
+	self._kills_without_releasing_trigger = nil
 end
 
 function RaycastWeaponBase:trigger_pressed(...)
@@ -288,6 +289,12 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 	end
 	if suppression_enemies and self._suppression then
 		result.enemies_in_cone = suppression_enemies
+	end
+	if hit_unit and hit_unit.type == "death" and self:weapon_tweak_data().category == tweak_data.achievement.easy_as_breathing.weapon_type then
+		self._kills_without_releasing_trigger = (self._kills_without_releasing_trigger or 0) + 1
+		if self._kills_without_releasing_trigger >= tweak_data.achievement.easy_as_breathing.count then
+			managers.achievment:award(tweak_data.achievement.easy_as_breathing.award)
+		end
 	end
 	if (col_ray and col_ray.distance > 600 or not col_ray) and alive(self._obj_fire) then
 		self._obj_fire:m_position(self._trail_effect_table.position)

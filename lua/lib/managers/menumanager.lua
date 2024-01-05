@@ -978,6 +978,11 @@ function MenuCallbackHandler:dlc_buy_gage_pack_pc()
 	Steam:overlay_activate("store", 267380)
 end
 
+function MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc]")
+	Steam:overlay_activate("store", 275590)
+end
+
 function MenuCallbackHandler:dlc_buy_armadillo_pc()
 	print("[MenuCallbackHandler:dlc_buy_armadillo_pc]")
 	Steam:overlay_activate("store", 264610)
@@ -1010,6 +1015,47 @@ end
 
 function MenuCallbackHandler:has_all_dlcs()
 	return true
+end
+
+function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
+	local dlcs = {
+		"gage_pack_lmg",
+		"gage_pack",
+		"armored_transport"
+	}
+	local dlc_tweak_data = tweak_data.dlc
+	for _, dlc in ipairs(dlcs) do
+		if dlc_tweak_data[dlc] then
+			local dlc_func = dlc_tweak_data[dlc].dlc
+			if dlc_tweak_data[dlc].free then
+				return false
+			elseif dlc_func then
+				if not managers.dlc[dlc_func](managers.dlc, dlc_tweak_data[dlc]) then
+					return dlc == check_dlc
+				end
+			else
+				Application:error("[is_dlc_lastest_locked] DLC do not have a dlc check function tweak_data_dlc.dlc", dlc)
+			end
+			if dlc == check_dlc then
+				break
+			end
+		else
+			Application:error("[is_dlc_lastest_locked] DLC do not exist in dlc tweak data", dlc)
+		end
+	end
+	return false
+end
+
+function MenuCallbackHandler:visible_callback_armored_transport()
+	return self:is_dlc_latest_locked("armored_transport")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack()
+	return self:is_dlc_latest_locked("gage_pack")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_lmg()
+	return self:is_dlc_latest_locked("gage_pack_lmg")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()

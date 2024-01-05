@@ -29,6 +29,7 @@ function PlayerBleedOut:enter(state_data, enter_data)
 	if self._state_data.in_steelsight then
 		self:_interupt_action_steelsight(managers.player:player_timer():time())
 	end
+	self:_interupt_action_melee(managers.player:player_timer():time())
 	self:_interupt_action_ladder(managers.player:player_timer():time())
 	managers.groupai:state():report_criminal_downed(self._unit)
 end
@@ -204,7 +205,8 @@ function PlayerBleedOut._register_revive_SO(revive_SO_data, variant)
 		search_pos = revive_SO_data.unit:position(),
 		usage_amount = 1,
 		AI_group = "friendlies",
-		admin_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_administered", revive_SO_data)
+		admin_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_administered", revive_SO_data),
+		verification_clbk = callback(PlayerBleedOut, PlayerBleedOut, "rescue_SO_verification")
 	}
 	revive_SO_data.variant = variant
 	local so_id = "Playerrevive"
@@ -378,6 +380,10 @@ function PlayerBleedOut:on_rescue_SO_started(revive_SO_data, rescuer)
 			end
 		end
 	end
+end
+
+function PlayerBleedOut.rescue_SO_verification(ignore_this, unit)
+	return not unit:movement():cool()
 end
 
 function PlayerBleedOut:on_civ_revive_completed(revive_SO_data, sympathy_civ)

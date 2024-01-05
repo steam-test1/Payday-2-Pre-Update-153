@@ -324,12 +324,13 @@ function PlayerMovement:on_uncovered(enemy_unit)
 	self._state_data.uncovered = nil
 end
 
-function PlayerMovement:on_SPOOCed()
+function PlayerMovement:on_SPOOCed(enemy_unit)
 	if self._unit:character_damage()._god_mode then
 		return
 	end
-	if self._current_state_name == "standard" or self._current_state_name == "bleed_out" then
+	if self._current_state_name == "standard" or self._current_state_name == "carry" or self._current_state_name == "bleed_out" then
 		managers.player:set_player_state("incapacitated")
+		managers.achievment:award(tweak_data.achievement.finally.award)
 	end
 end
 

@@ -849,7 +849,7 @@ end
 LoadoutItem = LoadoutItem or class(AssetsItem)
 
 function LoadoutItem:init(panel, text, i, assets_names, menu_component_data)
-	LoadoutItem.super.init(self, panel, text, i, assets_names, 4, menu_component_data, true)
+	LoadoutItem.super.init(self, panel, text, i, assets_names, 5, menu_component_data, true)
 	self._text_strings_localized = true
 	local got_deployables = managers.player:availible_equipment(1)
 	got_deployables = got_deployables and 0 < #got_deployables
@@ -970,9 +970,14 @@ function LoadoutItem:open_node(node)
 	elseif node == 3 then
 		managers.menu_component:post_event("menu_enter")
 		managers.menu:open_node("loadout", {
-			self:create_armor_loadout()
+			self:create_melee_weapon_loadout()
 		})
 	elseif node == 4 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_armor_loadout()
+		})
+	elseif node == 5 then
 		managers.menu_component:post_event("menu_enter")
 		managers.menu:open_node("loadout", {
 			self:create_deployable_loadout()
@@ -1311,8 +1316,8 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 	local slot_h = player_slot.panel:h()
 	local aspect
 	local x = player_slot.panel:w() / 2
-	local y = player_slot.panel:h() / 14
-	local w = slot_h / 5 * 1.15
+	local y = player_slot.panel:h() / 17
+	local w = slot_h / 6 * 1.15
 	local h = w
 	local slot_color = tweak_data.chat_colors[slot]
 	local criminal_text = player_slot.panel:text({
@@ -1323,6 +1328,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		y = 10,
 		text = utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(criminal_name) or criminal_name)
 	})
+	local primary_texture, secondary_texture
 	if outfit.primary.factory_id then
 		local primary_id = managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id)
 		local guis_catalog = "guis/"
@@ -1331,8 +1337,9 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 		end
 		local texture_name = tweak_data.weapon[primary_id].texture_name or tostring(primary_id)
+		local texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 		local primary_bitmap = player_slot.panel:bitmap({
-			texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name,
+			texture = texture,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1342,6 +1349,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		primary_bitmap:set_w(primary_bitmap:h() * aspect)
 		primary_bitmap:set_center_x(x)
 		primary_bitmap:set_center_y(y * 3)
+		primary_texture = texture
 		local perks = managers.blackmarket:get_perks_from_weapon_blueprint(outfit.primary.factory_id, outfit.primary.blueprint)
 		if table.size(perks) > 0 then
 			local perk_index = 0
@@ -1369,8 +1377,9 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 		end
 		local texture_name = tweak_data.weapon[secondary_id].texture_name or tostring(secondary_id)
+		local texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 		local secondary_bitmap = player_slot.panel:bitmap({
-			texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name,
+			texture = texture,
 			w = w,
 			h = h,
 			rotation = math.random(2) - 1.5,
@@ -1380,6 +1389,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		secondary_bitmap:set_w(secondary_bitmap:h() * aspect)
 		secondary_bitmap:set_center_x(x)
 		secondary_bitmap:set_center_y(y * 6)
+		secondary_texture = texture
 		local perks = managers.blackmarket:get_perks_from_weapon_blueprint(outfit.secondary.factory_id, outfit.secondary.blueprint)
 		if table.size(perks) > 0 then
 			local perk_index = 0
@@ -1399,6 +1409,51 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			end
 		end
 	end
+	if outfit.melee_weapon then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.melee_weapons[outfit.melee_weapon] and tweak_data.blackmarket.melee_weapons[outfit.melee_weapon].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		if outfit.melee_weapon == "weapon" then
+			if primary_texture and secondary_texture then
+				local primary = player_slot.panel:bitmap({
+					texture = primary_texture,
+					w = w * 0.75,
+					h = h * 0.75,
+					rotation = math.random(2) - 21.5,
+					alpha = 0.8
+				})
+				aspect = primary:texture_width() / math.max(1, primary:texture_height())
+				primary:set_w(primary:h() * aspect)
+				local secondary = player_slot.panel:bitmap({
+					texture = secondary_texture,
+					w = w * 0.75,
+					h = h * 0.75,
+					rotation = math.random(2) - 21.5,
+					alpha = 0.8
+				})
+				aspect = secondary:texture_width() / math.max(1, secondary:texture_height())
+				secondary:set_w(secondary:h() * aspect)
+				primary:set_center_x(x - primary:w() * 0.25)
+				primary:set_center_y(y * 9)
+				secondary:set_center_x(x + secondary:w() * 0.25)
+				secondary:set_center_y(y * 9)
+			end
+		else
+			local melee_weapon_bitmap = player_slot.panel:bitmap({
+				texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. outfit.melee_weapon,
+				w = w,
+				h = h,
+				rotation = math.random(2) - 1.5,
+				alpha = 0.8
+			})
+			aspect = melee_weapon_bitmap:texture_width() / math.max(1, melee_weapon_bitmap:texture_height())
+			melee_weapon_bitmap:set_w(melee_weapon_bitmap:h() * aspect)
+			melee_weapon_bitmap:set_center_x(x)
+			melee_weapon_bitmap:set_center_y(y * 9)
+		end
+	end
 	if outfit.armor then
 		local guis_catalog = "guis/"
 		local bundle_folder = tweak_data.blackmarket.armors[outfit.armor] and tweak_data.blackmarket.armors[outfit.armor].texture_bundle_folder
@@ -1415,7 +1470,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		aspect = armor_bitmap:texture_width() / math.max(1, armor_bitmap:texture_height())
 		armor_bitmap:set_w(armor_bitmap:h() * aspect)
 		armor_bitmap:set_center_x(x)
-		armor_bitmap:set_center_y(y * 9)
+		armor_bitmap:set_center_y(y * 12)
 	end
 	if outfit.deployable and outfit.deployable ~= "nil" then
 		local guis_catalog = "guis/"
@@ -1433,7 +1488,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		aspect = deployable_bitmap:texture_width() / math.max(1, deployable_bitmap:texture_height())
 		deployable_bitmap:set_w(deployable_bitmap:h() * aspect)
 		deployable_bitmap:set_center_x(x)
-		deployable_bitmap:set_center_y(y * 12)
+		deployable_bitmap:set_center_y(y * 15)
 		local deployable_amount = tonumber(outfit.deployable_amount) or 0
 		if 1 < deployable_amount then
 			local deployable_text = player_slot.panel:text({
@@ -1457,6 +1512,662 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			1
 		}
 	})
+end
+
+NewLoadoutItem = NewLoadoutItem or class()
+
+function NewLoadoutItem:init(panel, columns, rows, x, y, params)
+	local parent_w, parent_h = panel:size()
+	local w = math.round(parent_w / (columns or 1))
+	local h = math.round(parent_h / (rows or 1))
+	local font = tweak_data.menu.pd2_medium_font
+	local font_size = tweak_data.menu.pd2_medium_font_size
+	self._panel = panel:panel({
+		w = w - 2,
+		h = h - 2,
+		x = (x - 1) * w + 1,
+		y = (y - 1) * h + 1
+	})
+	self._info_panel = self._panel:panel({h = font_size})
+	self._item_panel = self._panel:panel({
+		h = math.max(0, self._panel:h() - self._info_panel:h())
+	})
+	self._item_panel:set_position(0, 0)
+	self._info_panel:set_top(self._item_panel:bottom())
+	self._info_panel:left(self._item_panel:left())
+	local font = tweak_data.menu.pd2_small_font
+	local font_size = tweak_data.menu.pd2_small_font_size
+	self._info_text = self._info_panel:text({
+		font = font,
+		font_size = font_size,
+		visible = false,
+		align = "center",
+		rotation = 360
+	})
+	if params then
+		if params.info_text then
+			self:set_info_text(params.info_text)
+		end
+		if params.item_texture and DB:has(Idstring("texture"), params.item_texture) then
+			self._item_image = self._item_panel:bitmap({
+				texture = params.item_texture,
+				layer = 1
+			})
+			local texture_width = self._item_image:texture_width()
+			local texture_height = self._item_image:texture_height()
+			local aspect = texture_width / texture_height
+			local sw = math.min(self._item_panel:w(), self._item_panel:h() * aspect)
+			local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
+			self._item_image:set_size(sw, sh)
+			self._item_image:set_center(self._item_panel:w() / 2, self._item_panel:h() / 2)
+		elseif params.dual_texture_1 and params.dual_texture_2 then
+			if DB:has(Idstring("texture"), params.dual_texture_1) then
+				self._item_image1 = self._item_panel:bitmap({
+					texture = params.dual_texture_1,
+					layer = 1
+				})
+				local texture_width = self._item_image1:texture_width()
+				local texture_height = self._item_image1:texture_height()
+				local aspect = texture_width / texture_height
+				local sw = math.min(self._item_panel:w(), self._item_panel:h() * aspect)
+				local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
+				self._item_image1:set_size(sw * 0.5, sh * 0.5)
+				self._item_image1:set_center(self._item_panel:w() * 0.5, self._item_panel:h() * 0.35)
+			end
+			if DB:has(Idstring("texture"), params.dual_texture_2) then
+				self._item_image2 = self._item_panel:bitmap({
+					texture = params.dual_texture_2,
+					layer = 1
+				})
+				local texture_width = self._item_image2:texture_width()
+				local texture_height = self._item_image2:texture_height()
+				local aspect = texture_width / texture_height
+				local sw = math.min(self._item_panel:w(), self._item_panel:h() * aspect)
+				local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
+				self._item_image2:set_size(sw * 0.5, sh * 0.5)
+				self._item_image2:set_center(self._item_panel:w() * 0.5, self._item_panel:h() * 0.65)
+			end
+		end
+		if params.info_icons then
+			self._info_icon_panel = self._info_panel:panel()
+			local when_to_split = math.floor(self._info_icon_panel:w() / 18)
+			local split = when_to_split < #params.info_icons
+			for index, icon in ipairs(params.info_icons) do
+				local texture = icon.texture
+				if DB:has(Idstring("texture"), texture) then
+					local object = self._info_icon_panel:bitmap({
+						texture = texture,
+						w = 16,
+						h = 16,
+						alpha = icon.equipped and 1 or 0.25,
+						layer = 1
+					})
+					object:set_center(self._info_icon_panel:right() - index * 18, self._info_icon_panel:h() / 2)
+					if split and index > when_to_split then
+						object:move(18 * when_to_split, 0)
+					else
+					end
+				end
+			end
+		end
+		self._params = params
+	end
+	self:deselect_item()
+end
+
+function NewLoadoutItem:set_info_text(text)
+	self._info_text:set_text(text)
+	local x, y, w, h = self._info_text:text_rect()
+	self._info_text:set_align(w > self._info_text:w() and "left" or "center")
+end
+
+function NewLoadoutItem:mouse_moved(x, y)
+	local mouse_over = self._item_panel:inside(x, y)
+	if mouse_over then
+		self:select_item()
+	else
+		self:deselect_item()
+	end
+	return mouse_over
+end
+
+function NewLoadoutItem:inside(x, y)
+	return self._item_panel:inside(x, y)
+end
+
+function NewLoadoutItem:select_item()
+	self._panel:set_alpha(1)
+	self._info_text:set_visible(true)
+	self._selected = true
+	if alive(self._info_icon_panel) then
+		self._info_icon_panel:set_visible(false)
+	end
+end
+
+function NewLoadoutItem:deselect_item()
+	self._panel:set_alpha(0.75)
+	self._info_text:set_visible(false)
+	self._selected = false
+	if alive(self._info_icon_panel) then
+		self._info_icon_panel:set_visible(true)
+	end
+end
+
+NewLoadoutTab = NewLoadoutTab or class(MissionBriefingTabItem)
+NewLoadoutTab.columns = 3
+NewLoadoutTab.rows = 2
+
+function NewLoadoutTab:init(panel, text, i, menu_component_data)
+	self._my_menu_component_data = menu_component_data
+	NewLoadoutTab.super.init(self, panel, text, i)
+	self._panel:move(0, 5)
+	self._panel:grow(0, -5)
+	local primary_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local secondary_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local melee_weapon_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local armor_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local empty_string = managers.localization:to_upper_text("menu_loadout_empty")
+	local primary_string = empty_string
+	local secondary_string = empty_string
+	local melee_weapon_string = empty_string
+	local armor_string = empty_string
+	local deployable_string = empty_string
+	local primary_perks = {}
+	local secondary_perks = {}
+	local primary = managers.blackmarket:equipped_primary()
+	local secondary = managers.blackmarket:equipped_secondary()
+	local melee_weapon = managers.blackmarket:equipped_melee_weapon()
+	local armor = managers.blackmarket:equipped_armor()
+	local deployable = managers.player:equipment_in_slot(1)
+	if primary then
+		local guis_catalog = "guis/"
+		local weapon_id = primary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
+		primary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
+		local equipped_weapon = managers.blackmarket:equipped_primary()
+		local equipped_slot = managers.blackmarket:equipped_weapon_slot("primaries")
+		primary_string = managers.blackmarket:get_weapon_name_by_category_slot("primaries", equipped_slot)
+		if equipped_weapon and equipped_slot then
+			local icon_list = {}
+			for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "primaries", equipped_weapon.factory_id, equipped_slot)) do
+				if icon.equipped then
+					table.insert(icon_list, icon)
+				end
+			end
+			primary_perks = icon_list
+		end
+	end
+	if secondary then
+		local guis_catalog = "guis/"
+		local weapon_id = secondary.weapon_id
+		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		local texture_name = tweak_data.weapon[secondary.weapon_id].texture_name or tostring(secondary.weapon_id)
+		secondary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
+		local equipped_weapon = managers.blackmarket:equipped_secondary()
+		local equipped_slot = managers.blackmarket:equipped_weapon_slot("secondaries")
+		secondary_string = managers.blackmarket:get_weapon_name_by_category_slot("secondaries", equipped_slot)
+		if equipped_weapon and equipped_slot then
+			local icon_list = {}
+			for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "secondaries", equipped_weapon.factory_id, equipped_slot)) do
+				if icon.equipped then
+					table.insert(icon_list, icon)
+				end
+			end
+			secondary_perks = icon_list
+		end
+	end
+	if melee_weapon then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.melee_weapons[melee_weapon] and tweak_data.blackmarket.melee_weapons[melee_weapon].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		if melee_weapon == "weapon" then
+			melee_weapon_texture = nil
+		else
+			melee_weapon_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. tostring(melee_weapon)
+		end
+		melee_weapon_string = managers.localization:text(tweak_data.blackmarket.melee_weapons[melee_weapon].name_id)
+	end
+	if armor then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		armor_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
+		armor_string = managers.localization:text(tweak_data.blackmarket.armors[armor].name_id)
+	end
+	if deployable then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
+	end
+	local primary = {
+		item_texture = primary_texture,
+		info_text = primary_string,
+		info_icons = primary_perks
+	}
+	local secondary = {
+		item_texture = secondary_texture,
+		info_text = secondary_string,
+		info_icons = secondary_perks
+	}
+	local melee_weapon = {
+		item_texture = melee_weapon_texture,
+		info_text = melee_weapon_string,
+		dual_texture_1 = primary_texture,
+		dual_texture_2 = secondary_texture
+	}
+	local armor = {item_texture = armor_texture, info_text = armor_string}
+	local deployable = {item_texture = deployable_texture, info_text = deployable_string}
+	local items = {
+		primary,
+		secondary,
+		melee_weapon,
+		armor,
+		deployable
+	}
+	local selected = self._my_menu_component_data.selected or 1
+	self._items = {}
+	local columns = NewLoadoutTab.columns
+	local rows = NewLoadoutTab.rows
+	for row = 1, rows do
+		for column = 1, columns do
+			local item = items[(row - 1) * columns + column]
+			if item then
+				local new_item = NewLoadoutItem:new(self._panel, columns, rows, column, row, item)
+				table.insert(self._items, new_item)
+				if #self._items == selected then
+					new_item:select_item()
+					self._item_selected = #self._items
+					self._my_menu_component_data.selected = selected
+				end
+			end
+		end
+	end
+end
+
+function NewLoadoutTab:mouse_moved(x, y)
+	local selected, highlighted = NewLoadoutTab.super.mouse_moved(self, x, y)
+	if not selected then
+		return selected, highlighted
+	end
+	local mouse_over = false
+	if self._items then
+		for index, item in ipairs(self._items) do
+			local item_state = item:mouse_moved(x, y)
+			if item_state then
+				mouse_over = index
+			end
+		end
+	end
+	if mouse_over then
+		if self._item_selected ~= mouse_over then
+			self._item_selected = mouse_over
+			self._my_menu_component_data.selected = mouse_over
+			managers.menu_component:post_event("highlight")
+		end
+	elseif self._item_selected then
+		self._item_selected = false
+		self._my_menu_component_data.selected = false
+	end
+	return false, mouse_over
+end
+
+function NewLoadoutTab:mouse_pressed(button, x, y)
+	local inside = NewLoadoutTab.super.mouse_pressed(self, button, x, y)
+	if inside == false then
+		return false
+	end
+	if self._item_selected and self._items[self._item_selected] and self._items[self._item_selected]:inside(x, y) then
+		self:confirm_pressed()
+	end
+	return inside
+end
+
+function NewLoadoutTab:confirm_pressed()
+	if self._item_selected then
+		self:open_node(self._item_selected)
+		return true
+	end
+end
+
+function NewLoadoutTab:move_selected(x, y)
+	if not self._item_selected then
+		self._item_selected = self._my_menu_component_data.selected or 1
+	end
+	local columns = NewLoadoutTab.columns
+	local rows = NewLoadoutTab.rows
+	local c = (self._item_selected - 1) % columns + 1
+	local r = math.ceil(self._item_selected / columns)
+	c = math.clamp(c + x, 1, columns)
+	r = math.clamp(r + y, 1, rows)
+	local new_selected = c + (r - 1) * columns
+	if new_selected ~= self._item_selected and self._items[new_selected] then
+		self._items[self._item_selected]:deselect_item()
+		self._item_selected = new_selected
+		self._my_menu_component_data.selected = new_selected
+		self._items[new_selected]:select_item()
+		managers.menu_component:post_event("highlight")
+	end
+end
+
+function NewLoadoutTab:move_left()
+	self:move_selected(-1, 0)
+end
+
+function NewLoadoutTab:move_right()
+	self:move_selected(1, 0)
+end
+
+function NewLoadoutTab:move_up()
+	self:move_selected(0, -1)
+end
+
+function NewLoadoutTab:move_down()
+	self:move_selected(0, 1)
+end
+
+function NewLoadoutTab:select(no_sound)
+	NewLoadoutTab.super.select(self, no_sound)
+end
+
+function NewLoadoutTab:deselect()
+	NewLoadoutTab.super.deselect(self)
+end
+
+function NewLoadoutTab:populate_category(category, data)
+	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
+	local new_data = {}
+	local index = 0
+	local max_items = data.override_slots and data.override_slots[1] * data.override_slots[2] or 9
+	local max_rows = tweak_data.gui.MAX_WEAPON_ROWS or 3
+	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
+	for i = 1, max_items do
+		data[i] = nil
+	end
+	local weapon_data = Global.blackmarket_manager.weapons
+	local guis_catalog = "guis/"
+	for i, crafted in pairs(crafted_category) do
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.weapon[crafted.weapon_id] and tweak_data.weapon[crafted.weapon_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		new_data = {}
+		new_data.name = crafted.weapon_id
+		new_data.name_localized = managers.blackmarket:get_weapon_name_by_category_slot(category, i)
+		new_data.category = category
+		new_data.slot = i
+		new_data.unlocked = managers.blackmarket:weapon_unlocked(crafted.weapon_id)
+		new_data.lock_texture = not new_data.unlocked and "guis/textures/pd2/lock_level"
+		new_data.equipped = crafted.equipped
+		new_data.can_afford = true
+		new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
+		new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+		new_data.level = managers.blackmarket:weapon_level(crafted.weapon_id)
+		local texture_name = tweak_data.weapon[crafted.weapon_id].texture_name or tostring(crafted.weapon_id)
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
+		new_data.comparision_data = new_data.unlocked and managers.blackmarket:get_weapon_stats(category, i)
+		new_data.stream = false
+		new_data.global_value = tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"
+		new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or nil
+		new_data.lock_texture = BlackMarketGui.get_lock_icon(self, new_data)
+		if not new_data.equipped and new_data.unlocked then
+			table.insert(new_data, "lo_w_equip")
+		end
+		local icon_list = managers.menu_component:create_weapon_mod_icon_list(crafted.weapon_id, category, crafted.factory_id, i)
+		local icon_index = 1
+		new_data.mini_icons = {}
+		for _, icon in pairs(icon_list) do
+			table.insert(new_data.mini_icons, {
+				texture = icon.texture,
+				right = (icon_index - 1) * 18,
+				bottom = 0,
+				layer = 1,
+				w = 16,
+				h = 16,
+				stream = false,
+				alpha = icon.equipped and 1 or 0.25
+			})
+			icon_index = icon_index + 1
+		end
+		data[i] = new_data
+		index = i
+	end
+	for i = 1, max_items do
+		if not data[i] then
+			new_data = {}
+			new_data.name = "empty_slot"
+			new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
+			new_data.name_localized_selected = new_data.name_localized
+			new_data.is_loadout = true
+			new_data.category = category
+			new_data.empty_slot = true
+			new_data.slot = i
+			new_data.unlocked = true
+			new_data.equipped = false
+			data[i] = new_data
+		end
+	end
+end
+
+function NewLoadoutTab:populate_primaries(data)
+	self:populate_category("primaries", data)
+end
+
+function NewLoadoutTab:populate_secondaries(data)
+	self:populate_category("secondaries", data)
+end
+
+function NewLoadoutTab:populate_armors(data)
+	local new_data = {}
+	local index = 0
+	local guis_catalog = "guis/"
+	for armor_id, armor_data in pairs(tweak_data.blackmarket.armors) do
+		local bm_data = Global.blackmarket_manager.armors[armor_id]
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.armors[armor_id] and tweak_data.blackmarket.armors[armor_id].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		if bm_data.owned then
+			index = index + 1
+			new_data = {}
+			new_data.name = tweak_data.blackmarket.armors[armor_id].name_id
+			new_data.category = "armors"
+			new_data.slot = index
+			new_data.unlocked = bm_data.unlocked
+			new_data.lock_texture = not new_data.unlocked and "guis/textures/pd2/lock_level"
+			new_data.equipped = bm_data.equipped
+			new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. armor_id
+			if not new_data.equipped then
+				table.insert(new_data, "a_equip")
+			end
+			data[index] = new_data
+		end
+	end
+	for i = 1, 9 do
+		if not data[i] then
+			new_data = {}
+			new_data.name = "empty"
+			new_data.name_localized = ""
+			new_data.category = "armors"
+			new_data.slot = i
+			new_data.unlocked = true
+			new_data.equipped = false
+			data[i] = new_data
+		end
+	end
+end
+
+function NewLoadoutTab:populate_deployables(data)
+	local deployables = managers.player:availible_equipment(1) or {}
+	local new_data = {}
+	local index = 0
+	local guis_catalog = "guis/"
+	for i, deployable in ipairs(deployables) do
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		new_data = {}
+		new_data.name = deployable
+		new_data.name_localized = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
+		new_data.category = "deployables"
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		new_data.slot = i
+		new_data.unlocked = true
+		new_data.equipped = managers.player:equipment_in_slot(1) == deployable
+		new_data.stream = false
+		if not new_data.equipped then
+			table.insert(new_data, "lo_d_equip")
+		end
+		data[i] = new_data
+		index = i
+	end
+	for i = 1, 9 do
+		if not data[i] then
+			new_data = {}
+			new_data.name = "empty"
+			new_data.name_localized = ""
+			new_data.category = "deployables"
+			new_data.slot = i
+			new_data.unlocked = true
+			new_data.equipped = false
+			data[i] = new_data
+		end
+	end
+end
+
+function NewLoadoutTab:create_primaries_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_primaries",
+		category = "primaries",
+		on_create_func = callback(self, self, "populate_primaries"),
+		override_slots = {3, 3},
+		identifier = Idstring("weapon")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_primaries")
+	}
+	return data
+end
+
+function NewLoadoutTab:create_secondaries_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_secondaries",
+		category = "secondaries",
+		on_create_func = callback(self, self, "populate_secondaries"),
+		override_slots = {3, 3},
+		identifier = Idstring("weapon")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_secondaries")
+	}
+	return data
+end
+
+function NewLoadoutTab:create_deployable_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_deployables",
+		category = "deployables",
+		on_create_func_name = "populate_deployables",
+		override_slots = {3, 2},
+		identifier = Idstring("deployable")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_deployables")
+	}
+	return data
+end
+
+function NewLoadoutTab:create_melee_weapon_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_melee_weapons",
+		category = "melee_weapons",
+		on_create_func_name = "populate_melee_weapons",
+		override_slots = {3, 2},
+		identifier = Idstring("melee_weapon")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_melee_weapons")
+	}
+	return data
+end
+
+function NewLoadoutTab:create_armor_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_armors",
+		category = "armors",
+		on_create_func_name = "populate_armors",
+		override_slots = {4, 2},
+		identifier = Idstring("armor")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_armors")
+	}
+	return data
+end
+
+function NewLoadoutTab:open_node(node)
+	self._my_menu_component_data.changing_loadout = nil
+	self._my_menu_component_data.current_slot = nil
+	if node == 1 then
+		self._my_menu_component_data.changing_loadout = "primary"
+		self._my_menu_component_data.current_slot = managers.blackmarket:equipped_weapon_slot("primaries")
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_primaries_loadout()
+		})
+	elseif node == 2 then
+		self._my_menu_component_data.changing_loadout = "secondary"
+		self._my_menu_component_data.current_slot = managers.blackmarket:equipped_weapon_slot("secondaries")
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_secondaries_loadout()
+		})
+	elseif node == 3 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_melee_weapon_loadout()
+		})
+	elseif node == 4 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_armor_loadout()
+		})
+	elseif node == 5 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_deployable_loadout()
+		})
+	end
+	managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
 end
 
 MissionBriefingGui = MissionBriefingGui or class()
@@ -1521,92 +2232,6 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		MenuBackdropGUI.animate_bg_text(self, big_text)
 	end
 	WalletGuiObject.set_wallet(self._safe_workspace:panel(), 10)
-	local primary_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local secondary_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local melee_weapon_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local armor_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local empty_string = managers.localization:to_upper_text("menu_loadout_empty")
-	local primary_string = empty_string
-	local secondary_string = empty_string
-	local melee_weapon_string = empty_string
-	local armor_string = empty_string
-	local deployable_string = empty_string
-	local primary_perks = {}
-	local secondary_perks = {}
-	local primary = managers.blackmarket:equipped_primary()
-	local secondary = managers.blackmarket:equipped_secondary()
-	local melee_weapon = managers.blackmarket:equipped_melee_weapon()
-	local armor = managers.blackmarket:equipped_armor()
-	local deployable = managers.player:equipment_in_slot(1)
-	if primary then
-		local guis_catalog = "guis/"
-		local weapon_id = primary.weapon_id
-		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
-		primary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		primary_string = managers.weapon_factory:get_weapon_name_by_factory_id(primary.factory_id)
-		primary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(primary.factory_id, primary.blueprint)
-	end
-	if secondary then
-		local guis_catalog = "guis/"
-		local weapon_id = secondary.weapon_id
-		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		local texture_name = tweak_data.weapon[secondary.weapon_id].texture_name or tostring(secondary.weapon_id)
-		secondary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		secondary_string = managers.weapon_factory:get_weapon_name_by_factory_id(secondary.factory_id)
-		secondary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(secondary.factory_id, secondary.blueprint)
-	end
-	if melee_weapon then
-	end
-	if armor then
-		local guis_catalog = "guis/"
-		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		armor_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
-		armor_string = managers.localization:text(tweak_data.blackmarket.armors[armor].name_id)
-	end
-	if deployable then
-		local guis_catalog = "guis/"
-		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
-		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
-	end
-	local loadout = {
-		{
-			primary_texture,
-			primary_string,
-			true,
-			primary_perks
-		},
-		{
-			secondary_texture,
-			secondary_string,
-			true,
-			secondary_perks
-		},
-		{
-			armor_texture,
-			armor_string,
-			true
-		},
-		{
-			deployable_texture,
-			deployable_string,
-			true
-		}
-	}
 	self._node:parameters().menu_component_data = self._node:parameters().menu_component_data or {}
 	self._node:parameters().menu_component_data.asset = self._node:parameters().menu_component_data.asset or {}
 	self._node:parameters().menu_component_data.loadout = self._node:parameters().menu_component_data.loadout or {}
@@ -1634,8 +2259,8 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	table.insert(self._items, self._description_item)
 	self._assets_item = AssetsItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_assets")), 2, {}, nil, asset_data)
 	table.insert(self._items, self._assets_item)
-	self._loadout_item = LoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_loadout")), 3, loadout, loadout_data)
-	table.insert(self._items, self._loadout_item)
+	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
+	table.insert(self._items, self._new_loadout_item)
 	if not Global.game_settings.single_player then
 		self._team_loadout_item = TeamLoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_team_loadout")), 4)
 		table.insert(self._items, self._team_loadout_item)
@@ -2246,92 +2871,6 @@ function MissionBriefingGui:close()
 end
 
 function MissionBriefingGui:reload_loadout()
-	local primary_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local secondary_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local melee_weapon_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local armor_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
-	local empty_string = managers.localization:to_upper_text("menu_loadout_empty")
-	local primary_string = empty_string
-	local secondary_string = empty_string
-	local melee_weapon_string = empty_string
-	local armor_string = empty_string
-	local deployable_string = empty_string
-	local primary_perks = {}
-	local secondary_perks = {}
-	local primary = managers.blackmarket:equipped_primary()
-	local secondary = managers.blackmarket:equipped_secondary()
-	local melee_weapon = managers.blackmarket:equipped_melee_weapon()
-	local armor = managers.blackmarket:equipped_armor()
-	local deployable = managers.player:equipment_in_slot(1)
-	if primary then
-		local guis_catalog = "guis/"
-		local weapon_id = primary.weapon_id
-		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
-		primary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		primary_string = managers.weapon_factory:get_weapon_name_by_factory_id(primary.factory_id)
-		primary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(primary.factory_id, primary.blueprint)
-	end
-	if secondary then
-		local guis_catalog = "guis/"
-		local weapon_id = secondary.weapon_id
-		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		local texture_name = tweak_data.weapon[secondary.weapon_id].texture_name or tostring(secondary.weapon_id)
-		secondary_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		secondary_string = managers.weapon_factory:get_weapon_name_by_factory_id(secondary.factory_id)
-		secondary_perks = managers.blackmarket:get_perks_from_weapon_blueprint(secondary.factory_id, secondary.blueprint)
-	end
-	if melee_weapon then
-	end
-	if armor then
-		local guis_catalog = "guis/"
-		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		armor_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. tostring(armor)
-		armor_string = managers.localization:text(tweak_data.blackmarket.armors[armor].name_id)
-	end
-	if deployable then
-		local guis_catalog = "guis/"
-		local bundle_folder = tweak_data.blackmarket.deployables[deployable] and tweak_data.blackmarket.deployables[deployable].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
-		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
-	end
-	local loadout = {
-		{
-			primary_texture,
-			primary_string,
-			true,
-			primary_perks
-		},
-		{
-			secondary_texture,
-			secondary_string,
-			true,
-			secondary_perks
-		},
-		{
-			armor_texture,
-			armor_string,
-			true
-		},
-		{
-			deployable_texture,
-			deployable_string,
-			true
-		}
-	}
 	self._node:parameters().menu_component_data = self._node:parameters().menu_component_data or {}
 	self._node:parameters().menu_component_data.loadout = self._node:parameters().menu_component_data.loadout or {}
 	local loadout_data = self._node:parameters().menu_component_data.loadout
@@ -2344,11 +2883,11 @@ function MissionBriefingGui:reload_loadout()
 	end
 	loadout_data.changing_loadout = nil
 	loadout_data.current_slot = nil
-	self._loadout_item:destroy()
-	self._loadout_item = nil
+	self._new_loadout_item:destroy()
+	self._new_loadout_item = nil
 	self._items[3] = nil
-	self._loadout_item = LoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_loadout")), 3, loadout, loadout_data)
-	self._items[3] = self._loadout_item
+	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
+	self._items[3] = self._new_loadout_item
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
 	self._items[self._selected_item]:select(true)
 	WalletGuiObject.set_wallet(self._safe_workspace:panel(), 10)

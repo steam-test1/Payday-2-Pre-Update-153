@@ -44,6 +44,11 @@ function NetworkAccountXBL:lan_connection()
 	return true
 end
 
+function NetworkAccountXBL:publish_statistics(stats, force_store)
+	Application:error("NetworkAccountXBL:publish_statistics( stats, force_store )")
+	Application:stack_dump()
+end
+
 function NetworkAccountXBL:challenges_loaded()
 	self._challenges_loaded = true
 end

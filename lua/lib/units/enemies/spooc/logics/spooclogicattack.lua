@@ -139,7 +139,12 @@ function SpoocLogicAttack.action_complete_clbk(data, action)
 	elseif action_type == "turn" then
 		my_data.turning = nil
 	elseif action_type == "spooc" then
-		data.spooc_attack_timeout_t = TimerManager:game():time() + math.lerp(data.char_tweak.spooc_attack_timeout[1], data.char_tweak.spooc_attack_timeout[2], math.random())
+		if action:complete() then
+			data.spooc_attack_timeout_t = TimerManager:game():time() + math.lerp(data.char_tweak.spooc_attack_timeout[1], data.char_tweak.spooc_attack_timeout[2], math.random())
+			if data.char_tweak.spooc_attack_use_smoke_chance > 0 and math.random() <= data.char_tweak.spooc_attack_use_smoke_chance and not managers.groupai:state():is_smoke_grenade_active() then
+				managers.groupai:state():detonate_smoke_grenade(data.m_pos + math.UP * 10, data.unit:movement():m_head_pos(), math.lerp(15, 30, math.random()), false)
+			end
+		end
 		if my_data.spooc_attack then
 			my_data.spooc_attack = nil
 		end
@@ -171,8 +176,8 @@ end
 
 function SpoocLogicAttack._upd_spooc_attack(data, my_data)
 	local focus_enemy = data.attention_obj
-	if focus_enemy.nav_tracker and focus_enemy.is_person and focus_enemy.criminal_record and not focus_enemy.criminal_record.status and not my_data.spooc_attack and focus_enemy.reaction >= AIAttentionObject.REACT_SHOOT and data.t > data.spooc_attack_timeout_t and focus_enemy.verified_dis < (my_data.want_to_take_cover and 1500 or 2500) and not data.unit:movement():chk_action_forbidden("walk") then
-		if ActionSpooc.chk_can_start_spooc_sprint(data.unit, focus_enemy.unit) then
+	if focus_enemy.nav_tracker and focus_enemy.is_person and focus_enemy.criminal_record and not focus_enemy.criminal_record.status and not my_data.spooc_attack and focus_enemy.reaction >= AIAttentionObject.REACT_SHOOT and data.t > data.spooc_attack_timeout_t and focus_enemy.verified_dis < (my_data.want_to_take_cover and 1500 or 2500) and not data.unit:movement():chk_action_forbidden("walk") and not SpoocLogicAttack._is_last_standing_criminal(focus_enemy) then
+		if focus_enemy.verified and ActionSpooc.chk_can_start_spooc_sprint(data.unit, focus_enemy.unit) and not data.unit:raycast("ray", data.unit:movement():m_head_pos(), focus_enemy.m_head_pos, "slot_mask", managers.slot:get_mask("bullet_impact_targets_no_criminals"), "ignore_unit", focus_enemy.unit, "report") then
 			if my_data.attention_unit ~= focus_enemy.u_key then
 				CopLogicBase._set_attention(data, focus_enemy)
 				my_data.attention_unit = focus_enemy.u_key
@@ -271,4 +276,14 @@ function SpoocLogicAttack._upd_aim(data, my_data)
 	else
 		CopLogicAttack._upd_aim(data, my_data)
 	end
+end
+
+function SpoocLogicAttack._is_last_standing_criminal(focus_enemy)
+	local all_criminals = managers.groupai:state():all_char_criminals()
+	for u_key, u_data in pairs(all_criminals) do
+		if not u_data.status and focus_enemy.u_key ~= u_key then
+			return
+		end
+	end
+	return true
 end

@@ -75,6 +75,11 @@ function NetworkAccountPSN:has_mask(mask)
 	return false
 end
 
+function NetworkAccountPSN:publish_statistics(stats, force_store)
+	Application:error("NetworkAccountPSN:publish_statistics( stats, force_store )")
+	Application:stack_dump()
+end
+
 function NetworkAccountPSN:achievements_fetched()
 	self._achievements_fetched = true
 	self:_check_for_unawarded_achievements()

@@ -59,6 +59,21 @@ function NewRaycastWeaponBase:_assemble_completed(parts, blueprint)
 	self._blueprint = blueprint
 	self:_update_fire_object()
 	self:_update_stats_values()
+	local magazine = managers.weapon_factory:get_part_from_weapon_by_type("magazine", self._parts)
+	if magazine then
+		local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type("magazine", "bullet_objects", self._parts)
+		if bullet_objects then
+			self._bullet_objects = {}
+			local prefix = bullet_objects.prefix
+			for i = 1, bullet_objects.amount do
+				local object = magazine.unit:get_object(Idstring(prefix .. i))
+				if object then
+					self._bullet_objects[i] = self._bullet_objects[i] or {}
+					table.insert(self._bullet_objects[i], object)
+				end
+			end
+		end
+	end
 	self:check_npc()
 	self:_set_parts_enabled(self._enabled)
 end
@@ -208,15 +223,15 @@ function NewRaycastWeaponBase:stance_mod()
 	if not self._parts then
 		return nil
 	end
+	local translation = Vector3()
 	local factory = tweak_data.weapon.factory
 	for part_id, data in pairs(self._parts) do
 		if factory.parts[part_id].stance_mod and factory.parts[part_id].stance_mod[self._factory_id] then
-			return {
-				translation = factory.parts[part_id].stance_mod[self._factory_id].translation
-			}
+			local part_translation = factory.parts[part_id].stance_mod[self._factory_id].translation
+			mvector3.add(translation, part_translation)
 		end
 	end
-	return nil
+	return {translation = translation}
 end
 
 function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
@@ -253,6 +268,7 @@ function NewRaycastWeaponBase:tweak_data_anim_stop(anim)
 			data.unit:anim_stop(Idstring(anim_name))
 		end
 	end
+	NewRaycastWeaponBase.super.tweak_data_anim_stop(self, anim)
 end
 
 function NewRaycastWeaponBase:_set_parts_enabled(enabled)
@@ -310,9 +326,38 @@ function NewRaycastWeaponBase:toggle_firemode()
 	return false
 end
 
+function NewRaycastWeaponBase:set_ammo_remaining_in_clip(...)
+	NewRaycastWeaponBase.super.set_ammo_remaining_in_clip(self, ...)
+	self:check_bullet_objects()
+end
+
+function NewRaycastWeaponBase:check_bullet_objects()
+	if self._bullet_objects then
+		self:_update_bullet_objects(self:get_ammo_remaining_in_clip())
+	end
+end
+
+function NewRaycastWeaponBase:predict_bullet_objects()
+	self:_update_bullet_objects(self:get_ammo_total())
+end
+
+function NewRaycastWeaponBase:_update_bullet_objects(ammo)
+	if self._bullet_objects then
+		for i, objects in pairs(self._bullet_objects) do
+			for _, object in ipairs(objects) do
+				object:set_visibility(i <= ammo)
+			end
+		end
+	end
+end
+
 function NewRaycastWeaponBase:has_gadget()
 	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
 	return 0 < #gadgets and true or false
+end
+
+function NewRaycastWeaponBase:is_gadget_on()
+	return self._gadget_on
 end
 
 function NewRaycastWeaponBase:gadget_on()
@@ -336,6 +381,9 @@ function NewRaycastWeaponBase:gadget_off()
 end
 
 function NewRaycastWeaponBase:toggle_gadget()
+	if not self._enabled then
+		return
+	end
 	self._gadget_on = not self._gadget_on
 	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
 	if gadgets then
