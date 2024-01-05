@@ -1,4 +1,39 @@
 TimerGui = TimerGui or class()
+TimerGui.themes = {}
+TimerGui.themes.default = {}
+TimerGui.themes.default.hide_background = false
+TimerGui.themes.default.timer_color = tweak_data.hud.prime_color
+TimerGui.themes.default.working_text_color = TimerGui.themes.default.timer_color
+TimerGui.themes.default.time_header_text_color = TimerGui.themes.default.timer_color
+TimerGui.themes.default.time_text_color = TimerGui.themes.default.timer_color
+TimerGui.themes.old = {}
+TimerGui.themes.old.hide_background = true
+TimerGui.themes.old.timer_color = Color(0.3, 0.5, 0.3)
+TimerGui.themes.old.working_text_color = TimerGui.themes.old.timer_color
+TimerGui.themes.old.time_header_text_color = TimerGui.themes.old.timer_color
+TimerGui.themes.old.time_text_color = TimerGui.themes.old.timer_color
+TimerGui.themes.old.bg_rect_color = Color(0.4, 0, 0, 0)
+TimerGui.themes.old.jammed = {}
+TimerGui.themes.old.jammed.bg_rect = Color(0.1, 0, 0)
+TimerGui.themes.old.upgrade_color_0 = Color(0, 0, 0)
+TimerGui.themes.old.upgrade_color_1 = Color(0.3, 0.6, 0.3)
+TimerGui.themes.old.upgrade_color_2 = Color(0.8, 1, 0.8)
+TimerGui.themes.blue = {}
+TimerGui.themes.blue.hide_background = true
+TimerGui.themes.blue.timer_color = Color(0.4, 0.6, 0.8)
+TimerGui.themes.blue.working_text_color = TimerGui.themes.blue.timer_color
+TimerGui.themes.blue.time_header_text_color = TimerGui.themes.blue.timer_color
+TimerGui.themes.blue.time_text_color = TimerGui.themes.blue.timer_color
+TimerGui.themes.blue.bg_rect_color = Color(0.4, 0, 0, 0)
+TimerGui.themes.blue.jammed = {}
+TimerGui.themes.blue.jammed.bg_rect = Color(0.1, 0, 0)
+TimerGui.themes.blue.upgrade_color_0 = Color(0, 0, 0)
+TimerGui.themes.blue.upgrade_color_1 = Color(0.2, 0.3, 0.4)
+TimerGui.themes.blue.upgrade_color_2 = TimerGui.themes.blue.timer_color
+TimerGui.upgrade_colors = {}
+TimerGui.upgrade_colors.upgrade_color_0 = tweak_data.screen_colors.item_stage_3
+TimerGui.upgrade_colors.upgrade_color_1 = tweak_data.screen_colors.text
+TimerGui.upgrade_colors.upgrade_color_2 = tweak_data.hud.prime_color
 TimerGui.EVENT_IDS = {}
 TimerGui.EVENT_IDS.jammed = 1
 TimerGui.EVENT_IDS.unjammed = 2
@@ -38,10 +73,50 @@ function TimerGui:add_workspace(gui_object)
 	self._gui_script = self._gui:script()
 end
 
+function TimerGui:get_upgrade_icon_color(upgrade_color)
+	if not self.THEME then
+		return TimerGui.upgrade_colors[upgrade_color]
+	end
+	local theme = TimerGui.themes[self.THEME]
+	return theme and theme[upgrade_color] or TimerGui.upgrade_colors[upgrade_color]
+end
+
+function TimerGui:_set_theme(theme_name)
+	local theme = TimerGui.themes[theme_name]
+	if not theme then
+		return
+	end
+	self._gui_script.drill_screen_background:set_visible(not theme.hide_background)
+	if theme.timer_color then
+		self._gui_script.timer:set_color(theme.timer_color)
+	end
+	if theme.working_text_color then
+		self._gui_script.working_text:set_color(theme.working_text_color)
+	end
+	if theme.time_header_text_color then
+		self._gui_script.time_header_text:set_color(theme.time_header_text_color)
+	end
+	if theme.time_text_color then
+		self._gui_script.time_text:set_color(theme.time_text_color)
+	end
+	self._gui_script.bg_rect:set_visible(theme.bg_rect_color and true or false)
+	if theme.bg_rect_color then
+		self._gui_script.bg_rect:set_color(theme.bg_rect_color)
+	end
+	self:_set_original_colors()
+end
+
+function TimerGui:_set_original_colors()
+	self._original_colors = {}
+	for _, child in ipairs(self._gui_script.panel:children()) do
+		self._original_colors[child:key()] = child:color()
+	end
+end
+
 function TimerGui:setup()
-	self._gui_script.working_text:set_render_template(Idstring("VertexColorTextured"))
-	self._gui_script.time_header_text:set_render_template(Idstring("VertexColorTextured"))
-	self._gui_script.time_text:set_render_template(Idstring("VertexColorTextured"))
+	self._gui_script.working_text:set_render_template(Idstring("Text"))
+	self._gui_script.time_header_text:set_render_template(Idstring("Text"))
+	self._gui_script.time_text:set_render_template(Idstring("Text"))
 	self._gui_script.drill_screen_background:set_size(self._gui_script.drill_screen_background:parent():size())
 	self._gui_script.timer:set_h(120 * self._size_multiplier)
 	self._gui_script.timer:set_w(self._gui_script.timer:parent():w() - self._gui_script.timer:parent():w() / 5)
@@ -66,12 +141,19 @@ function TimerGui:setup()
 	self._gui_script.time_text:set_visible(false)
 	self._gui_script.time_text:set_center_x(self._gui_script.working_text:parent():w() / 2)
 	self._gui_script.time_text:set_center_y(self._gui_script.working_text:parent():h() / 1.125)
+	if self.THEME then
+		self:_set_theme(self.THEME)
+	end
 	self._original_colors = {}
 	self._gui_script.panel:set_alpha(1)
 	for _, child in ipairs(self._gui_script.panel:children()) do
 		self._original_colors[child:key()] = child:color()
 	end
-	self._gui_script.panel:set_alpha(0.6)
+	self._gui_script.panel:set_alpha(1)
+end
+
+function TimerGui:reset()
+	self._started = false
 end
 
 function TimerGui:_start(timer, current_timer)
@@ -124,6 +206,10 @@ function TimerGui:set_background_icons(background_icons)
 	local background_icons_panel = panel:child("background_icons_panel") or panel:panel({
 		name = "background_icons_panel"
 	})
+	background_icons_panel:rect({
+		color = Color.green,
+		layer = 3
+	})
 	for _, child in ipairs(background_icons_panel:children()) do
 		self._original_colors[child:key()] = nil
 	end
@@ -164,6 +250,7 @@ end
 function TimerGui:update(unit, t, dt)
 	if self._jammed then
 		self._gui_script.drill_screen_background:set_color(self._gui_script.drill_screen_background:color():with_alpha(0.5 + (math.sin(t * 750) + 1) / 4))
+		self._gui_script.bg_rect:set_color(self._gui_script.bg_rect:color():with_alpha(0.5 + (math.sin(t * 750) + 1) / 4))
 		return
 	end
 	if not self._powered then
@@ -224,6 +311,7 @@ function TimerGui:_set_jammed(jammed)
 			end
 		end
 		for _, child in ipairs(self._gui_script.panel:children()) do
+			local theme = TimerGui.themes[self.THEME]
 			if child.children then
 				for _, grandchild in ipairs(child:children()) do
 					local color = self._original_colors[grandchild:key()]
@@ -232,7 +320,8 @@ function TimerGui:_set_jammed(jammed)
 				end
 			else
 				local color = self._original_colors[child:key()]
-				local c = Color(color.a, 1, 0, 0)
+				local jammed_color = theme and theme.jammed and theme.jammed[child:name()] or Color.red
+				local c = jammed_color:with_alpha(color.a)
 				child:set_color(c)
 			end
 		end
@@ -391,6 +480,9 @@ function TimerGui:load(data)
 		end
 		if not state.powered then
 			self:_set_powered(state.powered, state.powered_interaction_enabled)
+		end
+		if not state.jammed and self._unit:interaction() and self._unit:interaction().check_for_upgrade then
+			self._unit:interaction():check_for_upgrade()
 		end
 	end
 	self:set_visible(state.visible)

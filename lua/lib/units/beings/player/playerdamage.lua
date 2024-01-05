@@ -160,6 +160,26 @@ function PlayerDamage:_regenerate_armor()
 	self:_send_set_armor()
 end
 
+function PlayerDamage:restore_armor(armor_restored)
+	if self._dead or self._bleed_out then
+		return
+	end
+	local max_armor = self:_max_armor()
+	local armor = self:get_real_armor()
+	local new_armor = math.min(armor + armor_restored * max_armor, max_armor)
+	self:set_armor(new_armor)
+	self:_send_set_armor()
+	if self._unit:sound() and new_armor ~= armor and new_armor == max_armor then
+		self._unit:sound():play("shield_full_indicator")
+	end
+	managers.hud:set_player_armor({
+		current = self:get_real_armor(),
+		total = self:_total_armor(),
+		max = max_armor,
+		no_hint = true
+	})
+end
+
 function PlayerDamage:_regenerated(no_messiah)
 	self:set_health(self:_max_health())
 	self:_send_set_health()
@@ -320,7 +340,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	local dodge_roll = math.rand(1)
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
 	local armor_dodge_chance = managers.player:body_armor_value("dodge")
-	local skill_dodge_chance = managers.player:skill_dodge_chance(self._unit:movement():running())
+	local skill_dodge_chance = managers.player:skill_dodge_chance(self._unit:movement():running(), self._unit:movement():crouching())
 	dodge_value = dodge_value + armor_dodge_chance + skill_dodge_chance
 	if dodge_roll < dodge_value then
 		if attack_data.damage > 0 then
@@ -904,6 +924,9 @@ end
 
 function PlayerDamage:set_regenerate_timer_to_max()
 	self._regenerate_timer = tweak_data.player.damage.REGENERATE_TIME * managers.player:upgrade_value("player", "armor_regen_timer_multiplier", 1) * managers.player:team_upgrade_value("armor", "regen_time_multiplier", 1) * managers.player:team_upgrade_value("armor", "passive_regen_time_multiplier", 1)
+	if alive(self._unit) and not self._unit:movement():current_state()._moving then
+		self._regenerate_timer = self._regenerate_timer * managers.player:upgrade_value("player", "armor_regen_timer_stand_still_multiplier", 1)
+	end
 end
 
 function PlayerDamage:_send_set_health()

@@ -175,6 +175,9 @@ function PlayerBleedOut._register_revive_SO(revive_SO_data, variant)
 		fail_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_failed", revive_SO_data),
 		complete_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_completed", revive_SO_data),
 		action_start_clbk = callback(PlayerBleedOut, PlayerBleedOut, "on_rescue_SO_started", revive_SO_data),
+		interrupt_dis = 300,
+		interrupt_health = 0.25,
+		interrupt_suppression = true,
 		scan = true,
 		action = {
 			type = "act",

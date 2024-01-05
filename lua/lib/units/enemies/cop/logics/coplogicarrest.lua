@@ -29,8 +29,7 @@ function CopLogicArrest.enter(data, new_logic_name, enter_params)
 	my_data.update_task_key = "CopLogicArrest.queued_update" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.update_task_key, CopLogicArrest.queued_update, data, data.t)
 	data.unit:brain():set_update_enabled_state(false)
-	CopLogicTravel.reset_actions(data, my_data, old_internal_data, CopLogicTravel.allowed_transitional_actions)
-	if not data.char_tweak.no_stand and not data.unit:anim_data().stand then
+	if (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.stand) and not data.unit:anim_data().stand then
 		CopLogicAttack._chk_request_action_stand(data)
 	end
 	data.unit:movement():set_cool(false)
@@ -164,7 +163,7 @@ function CopLogicArrest._upd_advance(data, my_data, attention_obj, arrest_data)
 	if my_data.advancing then
 	elseif my_data.advance_path then
 		if data.t > my_data.next_action_delay_t and not data.unit:movement():chk_action_forbidden("walk") then
-			if not data.char_tweak.no_stand and my_data.should_stand_close and not data.unit:anim_data().stand then
+			if (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.stand) and my_data.should_stand_close and not data.unit:anim_data().stand then
 				CopLogicAttack._chk_request_action_stand(data)
 			end
 			local new_action_data = {
@@ -672,21 +671,28 @@ function CopLogicArrest._mark_call_in_event(data, my_data, attention_obj)
 	if not attention_obj then
 		return
 	end
-	if attention_obj.reaction == AIAttentionObject.REACT_SCARED then
+	if attention_obj.reaction == AIAttentionObject.REACT_ARREST then
+		my_data.call_in_event = "criminal"
+	elseif attention_obj.reaction >= AIAttentionObject.REACT_SCARED then
+		local unit_base = attention_obj.unit:base()
+		local unit_brain = attention_obj.unit:brain()
 		if attention_obj.unit:in_slot(17) then
-			my_data.call_in_event = "corpse"
+			my_data.call_in_event = managers.enemy:get_corpse_unit_data_from_key(attention_obj.unit:key()).is_civilian and "dead_civ" or "dead_cop"
 		elseif attention_obj.unit:in_slot(managers.slot:get_mask("enemies")) then
 			my_data.call_in_event = "w_hot"
-		elseif attention_obj.unit:base() and attention_obj.unit:base().is_drill then
+		elseif unit_brain and unit_brain.is_hostage and unit_brain:is_hostage() then
+			my_data.call_in_event = managers.enemy:is_civilian(attention_obj.unit) and "hostage_civ" or "hostage_cop"
+		elseif unit_base and unit_base.is_drill then
 			my_data.call_in_event = "drill"
-		else
-			if attention_obj.unit:in_slot(21) then
-				my_data.call_in_event = "civilian"
-			else
-			end
+		elseif unit_base and unit_base.sentry_gun then
+			my_data.call_in_event = "sentry_gun"
+		elseif unit_base and unit_base.is_tripmine then
+			my_data.call_in_event = "trip_mine"
+		elseif attention_obj.unit:carry_data() and attention_obj.unit:carry_data():carry_id() == "person" then
+			my_data.call_in_event = "body_bag"
+		elseif attention_obj.unit:in_slot(21) then
+			my_data.call_in_event = "civilian"
 		end
-	elseif attention_obj.reaction == AIAttentionObject.REACT_ARREST then
-		my_data.call_in_event = "criminal"
 	end
 end
 
@@ -704,19 +710,18 @@ function CopLogicArrest._chk_say_approach(data, my_data, attention_obj)
 end
 
 function CopLogicArrest._say_call_the_police(data, my_data)
-	local snd_event_name
-	if my_data.call_in_event == "corpse" then
-		snd_event_name = "a11"
-	elseif my_data.call_in_event == "w_hot" then
-		snd_event_name = "a16"
-	elseif my_data.call_in_event == "drill" then
-		snd_event_name = "a25"
-	elseif my_data.call_in_event == "civilian" then
-		snd_event_name = "a11"
-	elseif my_data.call_in_event == "criminal" then
-		snd_event_name = "a23"
-	else
-		snd_event_name = "a23"
-	end
-	data.unit:sound():say(snd_event_name, true)
+	local blame_list = {
+		dead_civ = "a11",
+		dead_cop = "a12",
+		hostage_civ = "a13",
+		hostage_cop = "a14",
+		civilian = "a15",
+		w_hot = "a16",
+		body_bag = "a19",
+		sentry_gun = "a20",
+		trip_mine = "a21",
+		criminal = "a23",
+		drill = "a25"
+	}
+	data.unit:sound():say(blame_list[my_data.call_in_event] or "a23", true)
 end

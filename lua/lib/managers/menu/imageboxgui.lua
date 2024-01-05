@@ -125,9 +125,3 @@ function ImageBoxGui:_create_image_box(image_config)
 	self:_set_scroll_indicator()
 	main:set_center(main:parent():w() / 2, main:parent():h() / 2)
 end
-
-function ImageBoxGui:mouse_moved(x, y)
-end
-
-function ImageBoxGui:mouse_pressed(button, x, y)
-end

@@ -11,6 +11,7 @@ require("lib/units/enemies/cop/logics/CopLogicSniper")
 require("lib/units/enemies/cop/logics/CopLogicTrade")
 require("lib/units/enemies/tank/logics/TankCopLogicAttack")
 require("lib/units/enemies/shield/logics/ShieldLogicAttack")
+require("lib/units/enemies/spooc/logics/SpoocLogicIdle")
 require("lib/units/enemies/spooc/logics/SpoocLogicAttack")
 require("lib/units/enemies/taser/logics/TaserLogicAttack")
 CopBrain = CopBrain or class()
@@ -54,6 +55,7 @@ logic_variants.shield.attack = ShieldLogicAttack
 logic_variants.shield.intimidated = nil
 logic_variants.shield.flee = nil
 logic_variants.tank.attack = TankCopLogicAttack
+logic_variants.spooc.idle = SpoocLogicIdle
 logic_variants.spooc.attack = SpoocLogicAttack
 logic_variants.taser.attack = TaserLogicAttack
 security_variant = nil
@@ -177,7 +179,7 @@ function CopBrain:objective()
 end
 
 function CopBrain:is_hostage()
-	return self._logic_data.is_hostage
+	return self._logic_data.internal_data and self._logic_data.internal_data.is_hostage
 end
 
 function CopBrain:is_available_for_assignment(objective)
@@ -486,6 +488,38 @@ end
 
 function CopBrain:anim_clbk(unit, ...)
 	self._current_logic.anim_clbk(self._logic_data, ...)
+end
+
+function CopBrain:anim_clbk_dodge_cover_grenade(unit)
+	self:_chk_use_cover_grenade(unit)
+end
+
+function CopBrain:_chk_use_cover_grenade(unit)
+	if not (Network:is_server() and self._logic_data.char_tweak.dodge_with_grenade) or not self._logic_data.attention_obj then
+		return
+	end
+	local check_f = self._logic_data.char_tweak.dodge_with_grenade.check
+	local t = TimerManager:game():time()
+	if check_f and (not self._flashbang_cover_expire_t or t > self._next_cover_grenade_chk_t) then
+		local result, next_t = check_f(t, self._nr_flashbang_covers_used or 0)
+		self._next_cover_grenade_chk_t = next_t
+		if not result then
+			return
+		end
+	end
+	local grenade_was_used
+	if self._logic_data.attention_obj.dis > 1000 or not self._logic_data.char_tweak.dodge_with_grenade.flash then
+		if self._logic_data.char_tweak.dodge_with_grenade.smoke and not managers.groupai:state():is_smoke_grenade_active() then
+			managers.groupai:state():detonate_smoke_grenade(self._logic_data.m_pos + math.UP * 10, self._unit:movement():m_head_pos(), math.lerp(6, 10, math.random()), false)
+			grenade_was_used = true
+		end
+	elseif self._logic_data.char_tweak.dodge_with_grenade.flash then
+		managers.groupai:state():detonate_smoke_grenade(self._logic_data.m_pos + math.UP * 10, self._unit:movement():m_head_pos(), math.lerp(4, 8, math.random()), true)
+		grenade_was_used = true
+	end
+	if grenade_was_used then
+		self._nr_flashbang_covers_used = (self._nr_flashbang_covers_used or 0) + 1
+	end
 end
 
 function CopBrain:on_nav_link_unregistered(element_id)

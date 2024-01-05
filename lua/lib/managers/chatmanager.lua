@@ -39,22 +39,28 @@ function ChatManager:send_message(channel_id, sender, message)
 	end
 end
 
+function ChatManager:feed_system_message(channel_id, message)
+	if not Global.game_settings.single_player then
+		self:_receive_message(channel_id, managers.localization:to_upper_text("menu_system_message"), message, tweak_data.system_chat_color)
+	end
+end
+
 function ChatManager:receive_message_by_peer(channel_id, peer, message)
 	local color_id = peer:id()
 	local color = tweak_data.chat_colors[color_id]
-	self:_receive_message(channel_id, peer:name(), message, tweak_data.chat_colors[color_id])
+	self:_receive_message(channel_id, peer:name(), message, tweak_data.chat_colors[color_id], (peer:level() == nil and managers.experience:current_rank() > 0 or 0 < peer:rank()) and "infamy_icon")
 end
 
 function ChatManager:receive_message_by_name(channel_id, name, message)
 	self:_receive_message(channel_id, name, message, tweak_data.chat_colors[1])
 end
 
-function ChatManager:_receive_message(channel_id, name, message, color)
+function ChatManager:_receive_message(channel_id, name, message, color, icon)
 	if not self._receivers[channel_id] then
 		return
 	end
 	for i, receiver in ipairs(self._receivers[channel_id]) do
-		receiver:receive_message(name, message, color)
+		receiver:receive_message(name, message, color, icon)
 	end
 end
 
@@ -69,7 +75,7 @@ ChatBase = ChatBase or class()
 function ChatBase:init()
 end
 
-function ChatBase:receive_message(name, message, color)
+function ChatBase:receive_message(name, message, color, icon)
 end
 
 ChatGui = ChatGui or class(ChatBase)
@@ -78,8 +84,8 @@ function ChatGui:init(ws)
 	self._ws = ws
 	self._hud_panel = ws:panel()
 	self:set_channel_id(ChatManager.GAME)
-	self._output_width = self._hud_panel:w() * 0.5 - 10
 	self._panel_width = self._hud_panel:w() * 0.5 - 10
+	self._output_width = self._panel_width - 20
 	self._panel_height = 500
 	self._max_lines = 15
 	self._lines = {}
@@ -100,7 +106,7 @@ function ChatGui:init(ws)
 		name = "output_panel",
 		x = 20,
 		h = 10,
-		w = self._output_width - 20,
+		w = self._output_width,
 		layer = 1
 	})
 	local scroll_panel = output_panel:panel({
@@ -123,9 +129,10 @@ function ChatGui:init(ws)
 		rotation = 180,
 		layer = 2,
 		color = Color.white,
-		w = output_panel:w()
+		w = output_panel:w(),
+		visible = false
 	})
-	local texture, rect = tweak_data.hud_icons:get_icon_data("scroll_up")
+	local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
 	local scroll_up_indicator_arrow = self._panel:bitmap({
 		name = "scroll_up_indicator_arrow",
 		texture = texture,
@@ -138,15 +145,17 @@ function ChatGui:init(ws)
 		texture = "guis/textures/headershadow",
 		layer = 2,
 		color = Color.white,
-		w = output_panel:w()
+		w = output_panel:w(),
+		visible = false
 	})
-	local texture, rect = tweak_data.hud_icons:get_icon_data("scroll_dn")
+	local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
 	local scroll_down_indicator_arrow = self._panel:bitmap({
 		name = "scroll_down_indicator_arrow",
 		texture = texture,
 		texture_rect = rect,
 		layer = 2,
-		color = Color.white
+		color = Color.white,
+		rotation = 180
 	})
 	local bar_h = scroll_down_indicator_arrow:top() - scroll_up_indicator_arrow:bottom()
 	local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar")
@@ -175,7 +184,7 @@ function ChatGui:init(ws)
 	output_panel:set_x(scroll_down_indicator_arrow:w() + 4)
 	self:_create_input_panel()
 	self:_layout_input_panel()
-	self:_layout_output_panel()
+	self:_layout_output_panel(true)
 end
 
 function ChatGui:set_leftbottom(left, bottom)
@@ -185,7 +194,7 @@ end
 
 function ChatGui:set_max_lines(max_lines)
 	self._max_lines = max_lines
-	self:_layout_output_panel()
+	self:_layout_output_panel(true)
 end
 
 function ChatGui:set_params(params)
@@ -329,7 +338,7 @@ function ChatGui:_create_input_panel()
 	self._input_panel:animate(callback(self, self, "_animate_hide_input"))
 end
 
-function ChatGui:_layout_output_panel()
+function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 	local output_panel = self._panel:child("output_panel")
 	local scroll_panel = output_panel:child("scroll_panel")
 	scroll_panel:set_w(self._output_width)
@@ -338,10 +347,11 @@ function ChatGui:_layout_output_panel()
 	for i = #self._lines, 1, -1 do
 		local line = self._lines[i][1]
 		local line_bg = self._lines[i][2]
-		line:set_w(output_panel:w())
+		local icon = self._lines[i][3]
+		line:set_w(output_panel:w() - line:left())
 		local _, _, w, h = line:text_rect()
 		line:set_h(h)
-		line_bg:set_w(w + 2)
+		line_bg:set_w(w + line:left() + 2)
 		line_bg:set_h(h)
 		lines = lines + line:number_of_lines()
 	end
@@ -354,17 +364,24 @@ function ChatGui:_layout_output_panel()
 	for i = #self._lines, 1, -1 do
 		local line = self._lines[i][1]
 		local line_bg = self._lines[i][2]
+		local icon = self._lines[i][3]
 		local _, _, w, h = line:text_rect()
 		line:set_bottom(scroll_panel:h() - y)
 		line_bg:set_bottom(line:bottom())
-		line:set_left(line:left())
+		if icon then
+			icon:set_left(icon:left())
+			icon:set_top(line:top() + 1)
+			line:set_left(icon:right())
+		else
+			line:set_left(line:left())
+		end
 		y = y + h
 	end
 	output_panel:set_bottom(math.round(self._input_panel:top()))
 	if lines <= max_lines or scroll_at_bottom then
 		scroll_panel:set_bottom(output_panel:h())
 	end
-	self:set_scroll_indicators()
+	self:set_scroll_indicators(force_update_scroll_indicators)
 end
 
 function ChatGui:_layout_input_panel()
@@ -381,7 +398,7 @@ function ChatGui:_layout_input_panel()
 	self._input_panel:set_x(self._panel:child("output_panel"):x())
 end
 
-function ChatGui:set_scroll_indicators()
+function ChatGui:set_scroll_indicators(force_update_scroll_indicators)
 	local output_panel = self._panel:child("output_panel")
 	local scroll_panel = output_panel:child("scroll_panel")
 	local scroll_up_indicator_shade = output_panel:child("scroll_up_indicator_shade")
@@ -416,7 +433,7 @@ function ChatGui:set_scroll_indicators()
 	local scroll_dn_visible = visible and scroll_panel:bottom() > output_panel:h()
 	self:_layout_input_panel()
 	scroll_bar:set_visible(visible)
-	local update_scroll_indicator_box = false
+	local update_scroll_indicator_box = force_update_scroll_indicators or false
 	if scroll_up_indicator_arrow:visible() ~= scroll_up_visible then
 		scroll_up_indicator_shade:set_visible(false)
 		scroll_up_indicator_arrow:set_visible(scroll_up_visible)
@@ -441,8 +458,8 @@ end
 
 function ChatGui:set_size(x, y)
 	ChatGui.super.set_size(self, x, y)
-	self:_layout_output_panel()
 	self:_layout_input_panel()
+	self:_layout_output_panel(true)
 end
 
 function ChatGui:input_focus()
@@ -459,16 +476,21 @@ end
 
 function ChatGui:mouse_moved(x, y)
 	if not self._enabled then
-		return
+		return false
 	end
 	local inside = self._input_panel:inside(x, y)
 	self._input_panel:child("focus_indicator"):set_visible(inside or self._focus)
 	if self:moved_scroll_bar(x, y) then
 		return true, "grab"
-	elseif self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) or self._panel:child("scroll_down_indicator_arrow"):visible() and self._panel:child("scroll_down_indicator_arrow"):inside(x, y) or self._panel:child("scroll_up_indicator_arrow"):visible() and self._panel:child("scroll_up_indicator_arrow"):inside(x, y) then
-		return false, "hand"
+	elseif self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) then
+		return true, "hand"
+	elseif self._panel:child("scroll_down_indicator_arrow"):visible() and self._panel:child("scroll_down_indicator_arrow"):inside(x, y) or self._panel:child("scroll_up_indicator_arrow"):visible() and self._panel:child("scroll_up_indicator_arrow"):inside(x, y) then
+		return true, "link"
 	end
-	return false, inside and "arrow"
+	if self._focus then
+		inside = not inside
+	end
+	return inside, inside and "link"
 end
 
 function ChatGui:moved_scroll_bar(x, y)
@@ -648,7 +670,7 @@ function ChatGui:_on_focus()
 	self._input_panel:key_release(callback(self, self, "key_release"))
 	self._enter_text_set = false
 	self._input_panel:child("input_bg"):animate(callback(self, self, "_animate_input_bg"))
-	self:set_layer(2000)
+	self:set_layer(tweak_data.gui.MOUSE_LAYER - 100)
 	self:update_caret()
 end
 
@@ -865,18 +887,32 @@ end
 function ChatGui:send_message(name, message)
 end
 
-function ChatGui:receive_message(name, message, color)
+function ChatGui:receive_message(name, message, color, icon)
 	if not alive(self._panel) then
 		return
 	end
 	local output_panel = self._panel:child("output_panel")
 	local scroll_panel = output_panel:child("scroll_panel")
+	local local_peer = managers.network:session():local_peer()
+	local peers = managers.network:session():peers()
 	local len = utf8.len(name) + 1
+	local x = 0
+	local icon_bitmap
+	if icon then
+		local icon_texture, icon_texture_rect = tweak_data.hud_icons:get_icon_data(icon)
+		icon_bitmap = scroll_panel:bitmap({
+			texture = icon_texture,
+			texture_rect = icon_texture_rect,
+			color = color,
+			y = 1
+		})
+		x = icon_bitmap:right()
+	end
 	local line = scroll_panel:text({
 		text = name .. ": " .. message,
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
-		x = 0,
+		x = x,
 		y = 0,
 		align = "left",
 		halign = "left",
@@ -900,7 +936,11 @@ function ChatGui:receive_message(name, message, color)
 		hvertical = "top"
 	})
 	line_bg:set_h(h)
-	table.insert(self._lines, {line, line_bg})
+	table.insert(self._lines, {
+		line,
+		line_bg,
+		icon_bitmap
+	})
 	self:_layout_output_panel()
 	if not self._focus then
 		output_panel:stop()

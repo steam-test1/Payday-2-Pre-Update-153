@@ -46,6 +46,14 @@ function DialogManager:finished()
 		self._current_dialog = self._next_dialog
 		self._next_dialog = nil
 		self:_play_dialog(self._dialog_list[self._current_dialog.id], self._current_dialog.params)
+	elseif self._current_dialog.line then
+		local line = self._current_dialog.line + 1
+		local dialog = self._dialog_list[self._current_dialog.id]
+		if line <= #dialog.sounds then
+			self:_play_dialog(self._dialog_list[self._current_dialog.id], self._current_dialog.params, line)
+		else
+			self._current_dialog = nil
+		end
 	else
 		self._current_dialog = nil
 	end
@@ -75,7 +83,7 @@ function DialogManager:on_simulation_ended()
 	self:quit_dialog(true)
 end
 
-function DialogManager:_play_dialog(dialog, params)
+function DialogManager:_play_dialog(dialog, params, line)
 	local unit = not params.on_unit and params.override_characters and managers.player:player_unit()
 	if not alive(unit) then
 		if dialog.character then
@@ -94,6 +102,9 @@ function DialogManager:_play_dialog(dialog, params)
 		end
 		if dialog.sound then
 			unit:drama():play_sound(dialog.sound, dialog.sound_source)
+		elseif dialog.sounds and #dialog.sounds > 0 then
+			self._current_dialog.line = line or 1
+			unit:drama():play_sound(dialog.sounds[self._current_dialog.line], dialog.sound_source)
 		end
 	end
 end
@@ -125,16 +136,26 @@ function DialogManager:_load_dialog_data(name)
 	local data = PackageManager:script_data(Idstring("dialog"), file_name:id())
 	for _, node in ipairs(data) do
 		if node._meta == "dialog" then
-			if node.id then
-				self._dialog_list[node.id] = {
-					id = node.id,
-					character = node.character,
-					sound = node.sound,
-					string_id = node.string_id,
-					priority = node.priority and tonumber(node.priority) or tweak_data.dialog.DEFAULT_PRIORITY
-				}
-			else
+			if not node.id then
 				Application:throw_exception("Error in '" .. file_name .. "'! A node definition must have an id parameter!")
+				break
+			end
+			self._dialog_list[node.id] = {
+				id = node.id,
+				character = node.character,
+				sound = node.sound,
+				string_id = node.string_id,
+				priority = node.priority and tonumber(node.priority) or tweak_data.dialog.DEFAULT_PRIORITY
+			}
+			for _, line_node in ipairs(node) do
+				if line_node._meta == "line" and line_node.sound then
+					self._dialog_list[node.id].sounds = self._dialog_list[node.id].sounds or {}
+					table.insert(self._dialog_list[node.id].sounds, line_node.sound)
+				end
+			end
+			if self._dialog_list[node.id].sounds and node.sound then
+				Application:throw_exception("Error in '" .. file_name .. "' in node " .. node.id .. "! Sound can't be defined in parameters when it have sound lines!")
+				self._dialog_list[node.id].sound = nil
 			end
 		end
 	end

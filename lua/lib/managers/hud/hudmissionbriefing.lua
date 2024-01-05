@@ -31,6 +31,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._ready_slot_panel:set_right(self._foreground_layer_one:w())
 	if not self._singleplayer then
 		local voice_icon, voice_texture_rect = tweak_data.hud_icons:get_icon_data("mugshot_talk")
+		local infamy_icon, infamy_rect = tweak_data.hud_icons:get_icon_data("infamy_icon")
 		for i = 1, 4 do
 			local color_id = i
 			local color = tweak_data.chat_colors[color_id]
@@ -89,6 +90,15 @@ function HUDMissionBriefing:init(hud, workspace)
 				blend_mode = "add",
 				color = tweak_data.screen_colors.text:with_alpha(0.5)
 			})
+			local infamy = slot_panel:bitmap({
+				name = "infamy",
+				texture = infamy_icon,
+				texture_rect = infamy_rect,
+				visible = false,
+				layer = 2,
+				color = color,
+				y = 1
+			})
 			local _, _, w, _ = criminal:text_rect()
 			voice:set_left(w + 2)
 			criminal:set_w(w)
@@ -97,6 +107,7 @@ function HUDMissionBriefing:init(hud, workspace)
 			name:set_left(voice:right() + 2)
 			local x, y, w, h = name:text_rect()
 			status:set_left(name:x() + w)
+			infamy:set_left(name:x())
 		end
 		BoxGuiObject:new(self._ready_slot_panel, {
 			sides = {
@@ -353,8 +364,14 @@ function HUDMissionBriefing:set_player_slot(nr, params)
 	slot:child("criminal"):set_color(slot:child("criminal"):color():with_alpha(1))
 	slot:child("criminal"):set_text(utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(params.character) or params.character))
 	local name_len = utf8.len(slot:child("name"):text())
-	local experience = (params.rank > 0 and managers.experience:rank_string(params.rank) .. ":" or "") .. tostring(params.level)
+	local experience = (params.rank > 0 and managers.experience:rank_string(params.rank) .. "-" or "") .. tostring(params.level)
 	slot:child("name"):set_text(slot:child("name"):text() .. " (" .. experience .. ")  ")
+	if params.rank > 0 then
+		slot:child("infamy"):set_visible(true)
+		slot:child("name"):set_x(slot:child("infamy"):right())
+	else
+		slot:child("infamy"):set_visible(false)
+	end
 	if params.status then
 		slot:child("status"):set_text(params.status)
 	end
@@ -368,6 +385,8 @@ function HUDMissionBriefing:set_slot_joining(peer, peer_id)
 	if not slot or not alive(slot) then
 		return
 	end
+	slot:child("voice"):set_visible(false)
+	slot:child("infamy"):set_visible(false)
 	slot:child("status"):stop()
 	slot:child("status"):set_alpha(1)
 	slot:child("status"):set_color(slot:child("status"):color():with_alpha(1))
@@ -467,6 +486,8 @@ function HUDMissionBriefing:remove_player_slot_by_peer_id(peer, reason)
 	local x, y, w, h = slot:child("name"):text_rect()
 	slot:child("status"):set_left(slot:child("name"):x() + w)
 	slot:child("status"):set_font_size(tweak_data.menu.pd2_small_font_size)
+	slot:child("name"):set_x(slot:child("infamy"):x())
+	slot:child("infamy"):set_visible(false)
 end
 
 function HUDMissionBriefing:update_layout()

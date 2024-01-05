@@ -159,6 +159,11 @@ function NetworkGame:on_peer_added(peer, peer_id)
 	if SystemInfo:platform() == Idstring("X360") then
 		managers.network.matchmake:on_peer_added(peer)
 	end
+	if managers.chat then
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_added", {
+			name = peer:name()
+		}))
+	end
 end
 
 function NetworkGame:check_peer_preferred_character(preferred_character)
@@ -239,8 +244,8 @@ function NetworkGame:on_peer_sync_complete(peer, peer_id)
 	end
 end
 
-function NetworkGame:on_set_member_ready(peer_id, ready)
-	print("[NetworkGame:on_set_member_ready]", peer_id, ready)
+function NetworkGame:on_set_member_ready(peer_id, ready, state_changed)
+	print("[NetworkGame:on_set_member_ready]", peer_id, ready, state_changed)
 	local peer = managers.network:session():peer(peer_id)
 	local kit_menu = managers.menu:get_menu("kit_menu")
 	if kit_menu and kit_menu.renderer:is_open() then
@@ -249,6 +254,9 @@ function NetworkGame:on_set_member_ready(peer_id, ready)
 		else
 			kit_menu.renderer:set_slot_not_ready(peer, peer_id)
 		end
+	end
+	if not (managers.chat and state_changed) or ready then
+	else
 	end
 	if Network:is_server() then
 		self:_check_start_game_intro()
@@ -351,6 +359,21 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 		end
 		if managers.menu_component then
 			managers.menu_component:on_peer_removed(peer, reason)
+		end
+		if managers.chat then
+			if reason == "left" then
+				managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_left", {
+					name = peer:name()
+				}))
+			elseif reason == "kicked" then
+				managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_kicked", {
+					name = peer:name()
+				}))
+			else
+				managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_lost", {
+					name = peer:name()
+				}))
+			end
 		end
 		print("Someone left", peer:name(), peer_id)
 		local player_left = false
@@ -628,6 +651,12 @@ function NetworkGame:on_drop_in_pause_request_received(peer_id, nickname, state)
 					print("DROP-IN PAUSE")
 					Application:set_pause(true)
 					SoundDevice:set_rtpc("ingame_sound", 0)
+					if managers.network:session() then
+						local peer = managers.network:session():peer(peer_id)
+						if is_playing and peer and 0 < peer:rank() then
+							managers.hud:post_event("infamous_player_join_stinger")
+						end
+					end
 				end
 				if Network:is_client() then
 					managers.network:session():send_to_host("drop_in_pause_confirmation", peer_id)

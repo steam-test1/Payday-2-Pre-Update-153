@@ -468,12 +468,14 @@ function MenuManager:show_new_item_gained(params)
 		table.insert(shapes, shape_template)
 	elseif category == "primaries" or category == "secondaries" then
 		local weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(id)
-		local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		if weapon_id then
+			local bundle_folder = tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].texture_bundle_folder
+			if bundle_folder then
+				guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+			end
+			local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 		end
-		local texture_name = tweak_data.weapon[weapon_id].texture_name or tostring(weapon_id)
-		texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
 	elseif category == "textures" then
 		texture = _G.tweak_data.blackmarket.textures[id].texture
 		render_template = Idstring("VertexColorTexturedPatterns")
@@ -621,6 +623,68 @@ function MenuManager:show_confirm_blackmarket_sell_no_slot(params)
 ]] .. managers.localization:text("dialog_blackmarket_slot_item_sell", {
 		money = params.money
 	})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_confirm_blackmarket_mask_remove(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_bm_crafted_sell_title")
+	dialog_data.text = managers.localization:text("dialog_blackmarket_slot_item", {
+		slot = params.slot,
+		item = params.name
+	}) .. [[
+
+
+]] .. managers.localization:text("dialog_blackmarket_slot_mask_remove", {
+		suffix = params.skip_money and "" or " " .. managers.localization:text("dialog_blackmarket_slot_mask_remove_suffix", {
+			money = params.money
+		})
+	})
+	if params.mods_readded and #params.mods_readded > 0 then
+		dialog_data.text = dialog_data.text .. "\n"
+		for _, mod_id in ipairs(params.mods_readded) do
+			dialog_data.text = dialog_data.text .. "\n" .. managers.localization:text("dialog_blackmarket_mask_sell_mod_readded", {mod = mod_id})
+		end
+	end
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_confirm_blackmarket_mask_sell(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_bm_crafted_sell_title")
+	dialog_data.text = managers.localization:text("dialog_blackmarket_slot_item", {
+		slot = params.slot,
+		item = params.name
+	}) .. [[
+
+
+]] .. managers.localization:text("dialog_blackmarket_slot_item_sell", {
+		money = params.money
+	})
+	if params.mods_readded and #params.mods_readded > 0 then
+		dialog_data.text = dialog_data.text .. "\n"
+		for _, mod_id in ipairs(params.mods_readded) do
+			dialog_data.text = dialog_data.text .. "\n" .. managers.localization:text("dialog_blackmarket_mask_sell_mod_readded", {mod = mod_id})
+		end
+	end
 	dialog_data.focus_button = 2
 	local yes_button = {}
 	yes_button.text = managers.localization:text("dialog_yes")
@@ -1076,10 +1140,34 @@ function MenuManager:show_confirm_become_infamous(params)
 		yes_button.text = managers.localization:text("dialog_yes")
 		yes_button.callback_func = params.yes_func
 		dialog_data.text = managers.localization:text("menu_dialog_become_infamous", {
+			level = 100,
 			cash = params.cost
 		})
 		dialog_data.focus_button = 2
 		dialog_data.button_list = {yes_button, no_button}
+		local got_usable_primary_weapon = managers.blackmarket:check_will_have_free_slot("primaries")
+		local got_usable_secondary_weapon = managers.blackmarket:check_will_have_free_slot("secondaries")
+		local add_weapon_replace_warning = not got_usable_primary_weapon or not got_usable_secondary_weapon
+		if add_weapon_replace_warning then
+			local primary_weapon = managers.blackmarket:get_crafted_category_slot("primaries", 1)
+			local secondary_weapon = managers.blackmarket:get_crafted_category_slot("secondaries", 1)
+			local warning_text_id = "menu_dialog_warning_infamy_replace_pri_sec"
+			if got_usable_primary_weapon then
+				warning_text_id = "menu_dialog_warning_infamy_replace_secondary"
+			elseif got_usable_secondary_weapon then
+				warning_text_id = "menu_dialog_warning_infamy_replace_primary"
+			end
+			local params = {
+				primary = primary_weapon and managers.localization:to_upper_text(tweak_data.weapon[primary_weapon.weapon_id].name_id),
+				secondary = secondary_weapon and managers.localization:to_upper_text(tweak_data.weapon[secondary_weapon.weapon_id].name_id),
+				amcar = managers.localization:to_upper_text(tweak_data.weapon.amcar.name_id),
+				glock_17 = managers.localization:to_upper_text(tweak_data.weapon.glock_17.name_id)
+			}
+			dialog_data.text = dialog_data.text .. [[
+
+
+]] .. managers.localization:text(warning_text_id, params)
+		end
 	else
 		no_button.text = managers.localization:text("dialog_ok")
 		dialog_data.text = managers.localization:text("menu_dialog_become_infamous_no_cash", {
@@ -1088,5 +1176,28 @@ function MenuManager:show_confirm_become_infamous(params)
 		dialog_data.focus_button = 1
 		dialog_data.button_list = {no_button}
 	end
+	dialog_data.w = 620
+	dialog_data.h = 500
+	managers.system_menu:show_new_unlock(dialog_data)
+end
+
+function MenuManager:show_infamous_message(can_become_infamous)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_infamous_info_title")
+	local no_button = {}
+	no_button.cancel_button = true
+	no_button.text = managers.localization:text("dialog_ok")
+	if can_become_infamous then
+		dialog_data.text = managers.localization:text("dialog_can_become_infamous_desc", {
+			become_infamous_menu_item = managers.localization:to_upper_text("menu_become_infamous")
+		})
+	else
+		dialog_data.text = managers.localization:text("dialog_infamous_info_desc", {
+			level = 100,
+			cash = managers.experience:cash_string(Application:digest_value(tweak_data.infamy.ranks[managers.experience:current_rank() + 1], false))
+		})
+	end
+	dialog_data.focus_button = 1
+	dialog_data.button_list = {no_button}
 	managers.system_menu:show(dialog_data)
 end

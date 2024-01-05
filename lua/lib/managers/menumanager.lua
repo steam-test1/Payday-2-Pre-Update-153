@@ -1133,7 +1133,11 @@ function MenuCallbackHandler:is_normal_job()
 end
 
 function MenuCallbackHandler:is_not_max_rank()
-	return managers.experience:current_rank() < #tweak_data.infamy.tree
+	return managers.experience:current_rank() < #tweak_data.infamy.ranks
+end
+
+function MenuCallbackHandler:can_become_infamous()
+	return self:is_level_100() and self:is_not_max_rank()
 end
 
 function MenuCallbackHandler:singleplayer_restart()
@@ -1287,7 +1291,7 @@ function MenuCallbackHandler:toggle_ready(item)
 	if managers.menu:active_menu() and managers.menu:active_menu().renderer and managers.menu:active_menu().renderer.set_ready_items_enabled then
 		managers.menu:active_menu().renderer:set_ready_items_enabled(not ready)
 	end
-	managers.network:game():on_set_member_ready(managers.network:session():local_peer():id(), ready)
+	managers.network:game():on_set_member_ready(managers.network:session():local_peer():id(), ready, true)
 end
 
 function MenuCallbackHandler:freeflight(item)
@@ -1859,6 +1863,54 @@ function MenuCallbackHandler:play_safehouse(params)
 		return
 	end
 	managers.menu:show_play_safehouse_question({yes_func = yes_func})
+end
+
+function MenuCallbackHandler:_increase_infamous()
+	managers.menu_scene:destroy_infamy_card()
+	if managers.experience:current_level() < 100 or managers.experience:current_rank() >= #tweak_data.infamy.ranks then
+		return
+	end
+	local rank = managers.experience:current_rank() + 1
+	managers.experience:reset()
+	managers.experience:set_current_rank(rank)
+	managers.money:deduct_from_total(managers.money:total())
+	managers.money:deduct_from_offshore(Application:digest_value(tweak_data.infamy.ranks[rank], false))
+	managers.skilltree:reset()
+	managers.blackmarket:reset_equipped()
+	if managers.menu_component then
+		managers.menu_component:refresh_player_profile_gui()
+	end
+	local logic = managers.menu:active_menu().logic
+	if logic then
+		logic:refresh_node()
+		logic:select_item("crimenet")
+	end
+	if rank <= #tweak_data.achievement.infamous then
+		managers.achievment:award(tweak_data.achievement.infamous[rank])
+	end
+	managers.savefile:save_progress()
+	managers.savefile:save_setting(true)
+	self._sound_source:post_event("infamous_player_join_stinger")
+end
+
+function MenuCallbackHandler:become_infamous(params)
+	local infamous_cost = Application:digest_value(tweak_data.infamy.ranks[managers.experience:current_rank() + 1], false)
+	local params = {}
+	params.cost = managers.experience:cash_string(infamous_cost)
+	if infamous_cost <= managers.money:offshore() and managers.experience:current_level() >= 100 then
+		function params.yes_func()
+			local rank = managers.experience:current_rank() + 1
+			
+			managers.menu:open_node("blackmarket_preview_node", {
+				{
+					back_callback = callback(self, self, "_increase_infamous")
+				}
+			})
+			managers.menu_scene:spawn_infamy_card(rank)
+			self._sound_source:post_event("infamous_stinger_level_" .. (rank < 10 and "0" or "") .. tostring(rank))
+		end
+	end
+	managers.menu:show_confirm_become_infamous(params)
 end
 
 function MenuCallbackHandler:choice_choose_character(item)
@@ -4000,16 +4052,6 @@ function MenuCrimeNetContactInfoInitiator:modify_node(original_node, data)
 		end
 		table.insert(codex_data, codex)
 	end
-	local x_id, y_id
-	for i, codex in ipairs(codex_data) do
-		for i, info_data in ipairs(codex) do
-			table.sort(info_data, function(x, y)
-				x_id = x.name_lozalized
-				y_id = y.name_lozalized
-				return x_id < y_id
-			end)
-		end
-	end
 	node:clean_items()
 	for i, codex in ipairs(codex_data) do
 		self:create_divider(node, codex.id, codex.name_lozalized, nil, tweak_data.screen_colors.text)
@@ -4106,12 +4148,12 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 			local contact = tweak_data.narrative.jobs[job_id].contact
 			if table.contains(contacts, contact) then
 				jobs[contact] = jobs[contact] or {}
-				if not tweak_data.narrative.jobs[job_id].dlc or managers.dlc:has_dlc(tweak_data.narrative.jobs[job_id].dlc) then
-					table.insert(jobs[contact], {
-						id = job_id,
-						enabled = max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0) and not tweak_data.narrative.jobs[job_id].wrapped_to_job
-					})
-				end
+				local dlc = tweak_data.narrative.jobs[job_id].dlc
+				dlc = not dlc or tweak_data.dlc[dlc] and tweak_data.dlc[dlc].free or managers.dlc:has_dlc(dlc)
+				table.insert(jobs[contact], {
+					id = job_id,
+					enabled = dlc and max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0) and not tweak_data.narrative.jobs[job_id].wrapped_to_job
+				})
 			end
 		end
 		local job_tweak = tweak_data.narrative.jobs
@@ -4212,6 +4254,19 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 	local job_tweak = tweak_data.narrative.jobs[id]
 	local text_id = managers.localization:to_upper_text(job_tweak.name_id)
 	local color_ranges
+	if job_tweak.dlc and tweak_data.dlc[job_tweak.dlc] and not tweak_data.dlc[job_tweak.dlc].free then
+		local pro_text = "  DLC"
+		local s_len = utf8.len(text_id)
+		text_id = text_id .. pro_text
+		local e_len = utf8.len(text_id)
+		color_ranges = {
+			{
+				start = s_len,
+				stop = e_len,
+				color = tweak_data.screen_colors.dlc_color
+			}
+		}
+	end
 	if job_tweak.professional then
 		local pro_text = "  " .. managers.localization:to_upper_text("cn_menu_pro_job")
 		local s_len = utf8.len(text_id)

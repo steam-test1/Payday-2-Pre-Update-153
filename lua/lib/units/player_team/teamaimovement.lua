@@ -24,7 +24,7 @@ function TeamAIMovement:set_character_anim_variables()
 		local ai_character_id = managers.criminals:character_static_data_by_name(char_name).ai_character_id
 		local sequence = tweak_data.blackmarket.characters[ai_character_id].sequence
 		self._unit:damage():run_sequence_simple(sequence)
-		managers.game_play_central:change_contour_material_by_unit(self._unit)
+		self._unit:contour():update_materials()
 	end
 	HuskPlayerMovement.set_character_anim_variables(self)
 end

@@ -12,6 +12,7 @@ function BlackMarketTweakData:init(tweak_data)
 	self:_init_armors()
 	self:_init_deployables(tweak_data)
 	self:_init_grenades()
+	self:_init_melee_weapons()
 end
 
 function BlackMarketTweakData:print_missing_strings(skip_print_id)
@@ -912,6 +913,49 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.santa_surprise.value = 4
 	self.masks.santa_surprise.dlc = "xmas_soundtrack"
+	self.masks.aviator = {}
+	self.masks.aviator.unit = "units/pd2_dlc_infamy/masks/msk_aviator/msk_aviator"
+	self.masks.aviator.name_id = "bm_msk_aviator"
+	self.masks.aviator.pcs = {}
+	self.masks.aviator.value = 0
+	self.masks.aviator.type = "glasses"
+	self.masks.aviator.skip_mask_on_sequence = true
+	self.masks.aviator.global_value = "infamy"
+	self.masks.aviator.texture_bundle_folder = "infamous"
+	self.masks.aviator.infamy_lock = "infamy_root"
+	self.masks.ghost = {}
+	self.masks.ghost.unit = "units/pd2_dlc_infamy/masks/msk_ghost/msk_ghost"
+	self.masks.ghost.name_id = "bm_msk_ghost"
+	self.masks.ghost.pcs = {}
+	self.masks.ghost.value = 0
+	self.masks.ghost.global_value = "infamy"
+	self.masks.ghost.texture_bundle_folder = "infamous"
+	self.masks.ghost.type = "helmet"
+	self.masks.ghost.infamy_lock = "infamy_ghost"
+	self.masks.welder = {}
+	self.masks.welder.unit = "units/pd2_dlc_infamy/masks/msk_welder/msk_welder"
+	self.masks.welder.name_id = "bm_msk_welder"
+	self.masks.welder.pcs = {}
+	self.masks.welder.value = 0
+	self.masks.welder.global_value = "infamy"
+	self.masks.welder.texture_bundle_folder = "infamous"
+	self.masks.welder.infamy_lock = "infamy_enforcer"
+	self.masks.plague = {}
+	self.masks.plague.unit = "units/pd2_dlc_infamy/masks/msk_plague/msk_plague"
+	self.masks.plague.name_id = "bm_msk_plague"
+	self.masks.plague.pcs = {}
+	self.masks.plague.value = 0
+	self.masks.plague.global_value = "infamy"
+	self.masks.plague.texture_bundle_folder = "infamous"
+	self.masks.plague.infamy_lock = "infamy_mastermind"
+	self.masks.smoker = {}
+	self.masks.smoker.unit = "units/pd2_dlc_infamy/masks/msk_smoker/msk_smoker"
+	self.masks.smoker.name_id = "bm_msk_smoker"
+	self.masks.smoker.pcs = {}
+	self.masks.smoker.value = 0
+	self.masks.smoker.global_value = "infamy"
+	self.masks.smoker.texture_bundle_folder = "infamous"
+	self.masks.smoker.infamy_lock = "infamy_technician"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -2537,6 +2581,36 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.oilmetal.texture = "units/pd2_dlc_dec5/matcaps/matcap_oilmetal_df"
 	self.materials.oilmetal.value = 5
 	self.materials.oilmetal.dlc = "gage_pack"
+	self.materials.copper = {}
+	self.materials.copper.name_id = "bm_mtl_copper"
+	self.materials.copper.pcs = {}
+	self.materials.copper.texture = "units/pd2_dlc_infamy/matcaps/matcap_copper_df"
+	self.materials.copper.material_amount = 0
+	self.materials.copper.value = 0
+	self.materials.copper.global_value = "infamy"
+	self.materials.copper.infamy_lock = "infamy_enforcer"
+	self.materials.dark_leather = {}
+	self.materials.dark_leather.name_id = "bm_mtl_dark_leather"
+	self.materials.dark_leather.pcs = {}
+	self.materials.dark_leather.texture = "units/pd2_dlc_infamy/matcaps/matcap_dark_leather_df"
+	self.materials.dark_leather.material_amount = 0
+	self.materials.dark_leather.value = 0
+	self.materials.dark_leather.global_value = "infamy"
+	self.materials.dark_leather.infamy_lock = "infamy_mastermind"
+	self.materials.sinister = {}
+	self.materials.sinister.name_id = "bm_mtl_sinister"
+	self.materials.sinister.pcs = {}
+	self.materials.sinister.texture = "units/pd2_dlc_infamy/matcaps/matcap_sinister_df"
+	self.materials.sinister.value = 0
+	self.materials.sinister.global_value = "infamy"
+	self.materials.sinister.infamy_lock = "infamy_ghost"
+	self.materials.electric = {}
+	self.materials.electric.name_id = "bm_mtl_electric"
+	self.materials.electric.pcs = {}
+	self.materials.electric.texture = "units/pd2_dlc_infamy/matcaps/matcap_electric_df"
+	self.materials.electric.value = 0
+	self.materials.electric.global_value = "infamy"
+	self.materials.electric.infamy_lock = "infamy_technician"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -3767,6 +3841,34 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.digitalcamo.texture = "units/pd2_dlc_dec5/masks/patterns/pattern_digitalcamo_df"
 	self.textures.digitalcamo.value = 4
 	self.textures.digitalcamo.dlc = "gage_pack"
+	self.textures.ribcage = {}
+	self.textures.ribcage.name_id = "bm_txt_ribcage"
+	self.textures.ribcage.pcs = {}
+	self.textures.ribcage.texture = "units/pd2_dlc_infamy/masks/patterns/pattern_ribcage_df"
+	self.textures.ribcage.value = 0
+	self.textures.ribcage.global_value = "infamy"
+	self.textures.ribcage.infamy_lock = "infamy_ghost"
+	self.textures.toto = {}
+	self.textures.toto.name_id = "bm_txt_toto"
+	self.textures.toto.pcs = {}
+	self.textures.toto.texture = "units/pd2_dlc_infamy/masks/patterns/pattern_toto_df"
+	self.textures.toto.value = 0
+	self.textures.toto.global_value = "infamy"
+	self.textures.toto.infamy_lock = "infamy_technician"
+	self.textures.imperial = {}
+	self.textures.imperial.name_id = "bm_txt_imperial"
+	self.textures.imperial.pcs = {}
+	self.textures.imperial.texture = "units/pd2_dlc_infamy/masks/patterns/pattern_imperial_df"
+	self.textures.imperial.value = 0
+	self.textures.imperial.global_value = "infamy"
+	self.textures.imperial.infamy_lock = "infamy_mastermind"
+	self.textures.fatman = {}
+	self.textures.fatman.name_id = "bm_txt_fatman"
+	self.textures.fatman.pcs = {}
+	self.textures.fatman.texture = "units/pd2_dlc_infamy/masks/patterns/pattern_fatman_df"
+	self.textures.fatman.value = 0
+	self.textures.fatman.global_value = "infamy"
+	self.textures.fatman.infamy_lock = "infamy_enforcer"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -3994,4 +4096,20 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
 	self.grenades.frag.icon = "frag_grenade"
 	self.grenades.frag.dlc = "gage_pack"
+end
+
+function BlackMarketTweakData:_init_melee_weapons()
+	self.melee_weapons = {}
+	self.melee_weapons.gun = {}
+	self.melee_weapons.gun.name_id = "bm_melee_gun"
+	self.melee_weapons.gun.unit = nil
+	self.melee_weapons.gun.animation = nil
+	self.melee_weapons.gun.stats = {}
+	self.melee_weapons.gun.stats.min_damage = 0
+	self.melee_weapons.gun.stats.max_damage = 0
+	self.melee_weapons.gun.stats.min_damage_effect = 0
+	self.melee_weapons.gun.stats.max_damage_effect = 0
+	self.melee_weapons.gun.stats.charge_time = 0
+	self.melee_weapons.gun.stats.range = 0
+	self:_add_desc_from_name_macro(self.melee_weapons)
 end

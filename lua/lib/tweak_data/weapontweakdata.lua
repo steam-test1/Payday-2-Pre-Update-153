@@ -676,7 +676,7 @@ function WeaponTweakData:_init_data_p226_npc()
 end
 
 function WeaponTweakData:_init_data_player_weapons()
-	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default
+	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default
 	if SystemInfo:platform() == Idstring("WIN32") then
 		autohit_rifle_default = {
 			MIN_RATIO = 0.75,
@@ -701,6 +701,14 @@ function WeaponTweakData:_init_data_player_weapons()
 			far_dis = 5000,
 			far_angle = 1.5,
 			near_angle = 3
+		}
+		autohit_lmg_default = {
+			MIN_RATIO = 0.2,
+			MAX_RATIO = 0.4,
+			INIT_RATIO = 0.05,
+			far_dis = 2000,
+			far_angle = 0.2,
+			near_angle = 2
 		}
 	else
 		autohit_rifle_default = {
@@ -727,13 +735,23 @@ function WeaponTweakData:_init_data_player_weapons()
 			far_angle = 5,
 			near_angle = 3
 		}
+		autohit_lmg_default = {
+			MIN_RATIO = 0.25,
+			MAX_RATIO = 0.6,
+			INIT_RATIO = 0.6,
+			far_dis = 5000,
+			far_angle = 3,
+			near_angle = 3
+		}
 	end
 	aim_assist_rifle_default = deep_clone(autohit_rifle_default)
 	aim_assist_pistol_default = deep_clone(autohit_pistol_default)
 	aim_assist_shotgun_default = deep_clone(autohit_shotgun_default)
+	aim_assist_lmg_default = deep_clone(autohit_lmg_default)
 	aim_assist_rifle_default.near_angle = 40
 	aim_assist_pistol_default.near_angle = 40
 	aim_assist_shotgun_default.near_angle = 40
+	aim_assist_lmg_default.near_angle = 10
 	self.crosshair = {}
 	self.crosshair.MIN_OFFSET = 18
 	self.crosshair.MAX_OFFSET = 150
@@ -750,7 +768,7 @@ function WeaponTweakData:_init_data_player_weapons()
 	self.trip_mines.alert_radius = 5000
 	self:_init_stats()
 	self.factory = WeaponFactoryTweakData:new()
-	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default)
+	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default)
 end
 
 function WeaponTweakData:_init_stats()
@@ -958,7 +976,7 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 	}
 end
 
-function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default)
+function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default)
 	local total_damage_primary = 300
 	local total_damage_secondary = 150
 	self.new_m4 = {}
@@ -994,10 +1012,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.AMMO_PICKUP = self:_pickup_chance(self.new_m4.AMMO_MAX, 2)
 	self.new_m4.FIRE_MODE = "auto"
 	self.new_m4.fire_mode_data = {}
-	self.new_m4.fire_mode_data.fire_rate = 0.11
+	self.new_m4.fire_mode_data.fire_rate = 0.1
 	self.new_m4.CAN_TOGGLE_FIREMODE = true
 	self.new_m4.auto = {}
-	self.new_m4.auto.fire_rate = 0.12
+	self.new_m4.auto.fire_rate = 0.1
 	self.new_m4.spread = {}
 	self.new_m4.spread.standing = 3.5
 	self.new_m4.spread.crouching = self.new_m4.spread.standing
@@ -1159,10 +1177,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.AMMO_PICKUP = self:_pickup_chance(self.mp9.AMMO_MAX, 1)
 	self.mp9.FIRE_MODE = "auto"
 	self.mp9.fire_mode_data = {}
-	self.mp9.fire_mode_data.fire_rate = 0.0675
+	self.mp9.fire_mode_data.fire_rate = 0.063
 	self.mp9.CAN_TOGGLE_FIREMODE = true
 	self.mp9.auto = {}
-	self.mp9.auto.fire_rate = 0.0675
+	self.mp9.auto.fire_rate = 0.063
 	self.mp9.spread = {}
 	self.mp9.spread.standing = self.new_m4.spread.standing * 0.75
 	self.mp9.spread.crouching = self.new_m4.spread.standing * 0.75
@@ -1340,10 +1358,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_18c.AMMO_PICKUP = self:_pickup_chance(self.glock_18c.AMMO_MAX, 1)
 	self.glock_18c.FIRE_MODE = "auto"
 	self.glock_18c.fire_mode_data = {}
-	self.glock_18c.fire_mode_data.fire_rate = 0.06
+	self.glock_18c.fire_mode_data.fire_rate = 0.066
 	self.glock_18c.CAN_TOGGLE_FIREMODE = true
 	self.glock_18c.auto = {}
-	self.glock_18c.auto.fire_rate = 0.06
+	self.glock_18c.auto.fire_rate = 0.066
 	self.glock_18c.spread = {}
 	self.glock_18c.spread.standing = self.new_m4.spread.standing * 0.75
 	self.glock_18c.spread.crouching = self.new_m4.spread.standing * 0.75
@@ -1431,10 +1449,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.amcar.AMMO_PICKUP = self:_pickup_chance(self.amcar.AMMO_MAX, 2)
 	self.amcar.FIRE_MODE = "auto"
 	self.amcar.fire_mode_data = {}
-	self.amcar.fire_mode_data.fire_rate = 0.12
+	self.amcar.fire_mode_data.fire_rate = 0.11
 	self.amcar.CAN_TOGGLE_FIREMODE = true
 	self.amcar.auto = {}
-	self.amcar.auto.fire_rate = 0.12
+	self.amcar.auto.fire_rate = 0.11
 	self.amcar.spread = {}
 	self.amcar.spread.standing = self.new_m4.spread.standing
 	self.amcar.spread.crouching = self.new_m4.spread.standing
@@ -1517,10 +1535,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.AMMO_PICKUP = self:_pickup_chance(self.m16.AMMO_MAX, 2)
 	self.m16.FIRE_MODE = "auto"
 	self.m16.fire_mode_data = {}
-	self.m16.fire_mode_data.fire_rate = 0.11
+	self.m16.fire_mode_data.fire_rate = 0.07
 	self.m16.CAN_TOGGLE_FIREMODE = true
 	self.m16.auto = {}
-	self.m16.auto.fire_rate = 0.11
+	self.m16.auto.fire_rate = 0.07
 	self.m16.spread = {}
 	self.m16.spread.standing = self.new_m4.spread.standing
 	self.m16.spread.crouching = self.new_m4.spread.standing
@@ -1603,10 +1621,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.AMMO_PICKUP = self:_pickup_chance(self.olympic.AMMO_MAX, 1)
 	self.olympic.FIRE_MODE = "auto"
 	self.olympic.fire_mode_data = {}
-	self.olympic.fire_mode_data.fire_rate = 0.0925
+	self.olympic.fire_mode_data.fire_rate = 0.088
 	self.olympic.CAN_TOGGLE_FIREMODE = true
 	self.olympic.auto = {}
-	self.olympic.auto.fire_rate = 0.0925
+	self.olympic.auto.fire_rate = 0.088
 	self.olympic.spread = {}
 	self.olympic.spread.standing = self.new_m4.spread.standing * 0.8
 	self.olympic.spread.crouching = self.new_m4.spread.standing * 0.8
@@ -1688,10 +1706,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.AMMO_PICKUP = self:_pickup_chance(self.ak74.AMMO_MAX, 2)
 	self.ak74.FIRE_MODE = "auto"
 	self.ak74.fire_mode_data = {}
-	self.ak74.fire_mode_data.fire_rate = 0.125
+	self.ak74.fire_mode_data.fire_rate = 0.092
 	self.ak74.CAN_TOGGLE_FIREMODE = true
 	self.ak74.auto = {}
-	self.ak74.auto.fire_rate = 0.125
+	self.ak74.auto.fire_rate = 0.092
 	self.ak74.spread = {}
 	self.ak74.spread.standing = self.new_m4.spread.standing
 	self.ak74.spread.crouching = self.new_m4.spread.standing
@@ -1774,10 +1792,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm.AMMO_PICKUP = self:_pickup_chance(self.akm.AMMO_MAX, 2)
 	self.akm.FIRE_MODE = "auto"
 	self.akm.fire_mode_data = {}
-	self.akm.fire_mode_data.fire_rate = 0.14
+	self.akm.fire_mode_data.fire_rate = 0.107
 	self.akm.CAN_TOGGLE_FIREMODE = true
 	self.akm.auto = {}
-	self.akm.auto.fire_rate = 0.14
+	self.akm.auto.fire_rate = 0.107
 	self.akm.spread = {}
 	self.akm.spread.standing = self.new_m4.spread.standing
 	self.akm.spread.crouching = self.new_m4.spread.standing
@@ -1860,10 +1878,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.AMMO_PICKUP = self:_pickup_chance(self.akmsu.AMMO_MAX, 1)
 	self.akmsu.FIRE_MODE = "auto"
 	self.akmsu.fire_mode_data = {}
-	self.akmsu.fire_mode_data.fire_rate = 0.1
+	self.akmsu.fire_mode_data.fire_rate = 0.073
 	self.akmsu.CAN_TOGGLE_FIREMODE = true
 	self.akmsu.auto = {}
-	self.akmsu.auto.fire_rate = 0.09
+	self.akmsu.auto.fire_rate = 0.073
 	self.akmsu.spread = {}
 	self.akmsu.spread.standing = self.new_m4.spread.standing
 	self.akmsu.spread.crouching = self.new_m4.spread.standing
@@ -2033,10 +2051,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.AMMO_PICKUP = self:_pickup_chance(self.ak5.AMMO_MAX, 2)
 	self.ak5.FIRE_MODE = "auto"
 	self.ak5.fire_mode_data = {}
-	self.ak5.fire_mode_data.fire_rate = 0.13
+	self.ak5.fire_mode_data.fire_rate = 0.085
 	self.ak5.CAN_TOGGLE_FIREMODE = true
 	self.ak5.auto = {}
-	self.ak5.auto.fire_rate = 0.13
+	self.ak5.auto.fire_rate = 0.085
 	self.ak5.spread = {}
 	self.ak5.spread.standing = self.new_m4.spread.standing
 	self.ak5.spread.crouching = self.new_m4.spread.standing
@@ -2119,10 +2137,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aug.AMMO_PICKUP = self:_pickup_chance(self.aug.AMMO_MAX, 2)
 	self.aug.FIRE_MODE = "auto"
 	self.aug.fire_mode_data = {}
-	self.aug.fire_mode_data.fire_rate = 0.125
+	self.aug.fire_mode_data.fire_rate = 0.08
 	self.aug.CAN_TOGGLE_FIREMODE = true
 	self.aug.auto = {}
-	self.aug.auto.fire_rate = 0.125
+	self.aug.auto.fire_rate = 0.08
 	self.aug.spread = {}
 	self.aug.spread.standing = self.new_m4.spread.standing * 2.5
 	self.aug.spread.crouching = self.new_m4.spread.standing * 2.5
@@ -2202,10 +2220,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.AMMO_PICKUP = self:_pickup_chance(self.g36.AMMO_MAX, 2)
 	self.g36.FIRE_MODE = "auto"
 	self.g36.fire_mode_data = {}
-	self.g36.fire_mode_data.fire_rate = 0.1175
+	self.g36.fire_mode_data.fire_rate = 0.085
 	self.g36.CAN_TOGGLE_FIREMODE = true
 	self.g36.auto = {}
-	self.g36.auto.fire_rate = 0.1175
+	self.g36.auto.fire_rate = 0.085
 	self.g36.spread = {}
 	self.g36.spread.standing = self.new_m4.spread.standing * 0.8
 	self.g36.spread.crouching = self.new_m4.spread.standing * 0.8
@@ -2285,10 +2303,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.AMMO_PICKUP = self:_pickup_chance(self.p90.AMMO_MAX, 1)
 	self.p90.FIRE_MODE = "auto"
 	self.p90.fire_mode_data = {}
-	self.p90.fire_mode_data.fire_rate = 0.095
+	self.p90.fire_mode_data.fire_rate = 0.066
 	self.p90.CAN_TOGGLE_FIREMODE = true
 	self.p90.auto = {}
-	self.p90.auto.fire_rate = 0.095
+	self.p90.auto.fire_rate = 0.066
 	self.p90.spread = {}
 	self.p90.spread.standing = self.new_m4.spread.standing * 1.35
 	self.p90.spread.crouching = self.new_m4.spread.standing * 1.35
@@ -2531,10 +2549,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.AMMO_PICKUP = self:_pickup_chance(self.new_mp5.AMMO_MAX, 1)
 	self.new_mp5.FIRE_MODE = "auto"
 	self.new_mp5.fire_mode_data = {}
-	self.new_mp5.fire_mode_data.fire_rate = 0.1075
+	self.new_mp5.fire_mode_data.fire_rate = 0.08
 	self.new_mp5.CAN_TOGGLE_FIREMODE = true
 	self.new_mp5.auto = {}
-	self.new_mp5.auto.fire_rate = 0.1075
+	self.new_mp5.auto.fire_rate = 0.08
 	self.new_mp5.spread = {}
 	self.new_mp5.spread.standing = self.new_m4.spread.standing
 	self.new_mp5.spread.crouching = self.new_m4.spread.standing
@@ -2698,10 +2716,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.AMMO_PICKUP = self:_pickup_chance(self.mac10.AMMO_MAX, 1)
 	self.mac10.FIRE_MODE = "auto"
 	self.mac10.fire_mode_data = {}
-	self.mac10.fire_mode_data.fire_rate = 0.065
+	self.mac10.fire_mode_data.fire_rate = 0.06
 	self.mac10.CAN_TOGGLE_FIREMODE = true
 	self.mac10.auto = {}
-	self.mac10.auto.fire_rate = 0.065
+	self.mac10.auto.fire_rate = 0.06
 	self.mac10.spread = {}
 	self.mac10.spread.standing = self.new_m4.spread.standing * 0.75
 	self.mac10.spread.crouching = self.new_m4.spread.standing * 0.75
@@ -3399,10 +3417,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.s552.AMMO_PICKUP = self:_pickup_chance(self.s552.AMMO_MAX, 2)
 	self.s552.FIRE_MODE = "auto"
 	self.s552.fire_mode_data = {}
-	self.s552.fire_mode_data.fire_rate = 0.1175
+	self.s552.fire_mode_data.fire_rate = 0.084
 	self.s552.CAN_TOGGLE_FIREMODE = true
 	self.s552.auto = {}
-	self.s552.auto.fire_rate = 0.1175
+	self.s552.auto.fire_rate = 0.084
 	self.s552.spread = {}
 	self.s552.spread.standing = self.new_m4.spread.standing * 0.8
 	self.s552.spread.crouching = self.new_m4.spread.standing * 0.8
@@ -3736,9 +3754,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p226.AMMO_PICKUP = self:_pickup_chance(self.p226.AMMO_MAX, 1)
 	self.p226.FIRE_MODE = "single"
 	self.p226.fire_mode_data = {}
-	self.p226.fire_mode_data.fire_rate = 0.05
+	self.p226.fire_mode_data.fire_rate = 0.09
 	self.p226.single = {}
-	self.p226.single.fire_rate = 0.05
+	self.p226.single.fire_rate = 0.09
 	self.p226.spread = {}
 	self.p226.spread.standing = self.new_m4.spread.standing * 0.3
 	self.p226.spread.crouching = self.new_m4.spread.standing * 0.3
@@ -4125,6 +4143,24 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.p226_npc = {
 		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.hk21_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m249_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.rpk_npc = {
+		usage = "ak47",
 		sounds = {},
 		use_data = {},
 		auto = {}

@@ -180,6 +180,14 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("player", "ene_hostage_lim_1") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "ene_hostage_lim_1", 1)
 		end
+		if managers.player:has_category_upgrade("sentry_gun", "armor_piercing_chance") then
+			local level = managers.player:upgrade_level("sentry_gun", "armor_piercing_chance")
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_piercing_chance", level)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "armor_piercing_chance_2") then
+			local level = managers.player:upgrade_level("sentry_gun", "armor_piercing_chance_2")
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_piercing_chance_2", level)
+		end
 	end
 end
 

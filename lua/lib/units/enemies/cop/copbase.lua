@@ -239,8 +239,8 @@ function CopBase:chk_freeze_anims()
 	end
 end
 
-function CopBase:anim_act_clbk(unit, anim_act, nav_link)
-	if nav_link then
+function CopBase:anim_act_clbk(unit, anim_act, send_to_action)
+	if send_to_action then
 		unit:movement():on_anim_act_clbk(anim_act)
 	elseif unit:unit_data().mission_element then
 		unit:unit_data().mission_element:event(anim_act, unit)
@@ -248,74 +248,15 @@ function CopBase:anim_act_clbk(unit, anim_act, nav_link)
 end
 
 function CopBase:save(data)
-	if self._contour_state then
-		data.base_contour_on = true
-	elseif not self._is_in_original_material then
-		data.swap_material = true
-	end
 	if self._unit:interaction() and self._unit:interaction().tweak_data == "hostage_trade" then
 		data.is_hostage_trade = true
 	end
 end
 
 function CopBase:load(data)
-	if data.base_contour_on or data.swap_material then
-		self._contour_on_clbk_id = "clbk_set_contour_on" .. tostring(self._unit:key())
-		managers.enemy:add_delayed_clbk(self._contour_on_clbk_id, callback(self, self, "clbk_set_contour_on", data.swap_material), TimerManager:game():time() + 1)
-	end
 	if data.is_hostage_trade then
 		CopLogicTrade.hostage_trade(self._unit, true, false)
 	end
-end
-
-function CopBase:clbk_set_contour_on(swap_material_only)
-	if not self._contour_on_clbk_id or not alive(self._unit) then
-		return
-	end
-	self._contour_on_clbk_id = nil
-	self:set_contour(true, swap_material_only)
-end
-
-local ids_materials = Idstring("material")
-local ids_contour_color = Idstring("contour_color")
-local ids_contour_opacity = Idstring("contour_opacity")
-
-function CopBase:set_contour(state, swap_material_only)
-	if not alive(self._unit) then
-		return
-	end
-	if (self._contour_state or false) == (state or false) then
-		return
-	end
-	if Network:is_server() then
-		self._unit:network():send("set_contour", state)
-	end
-	if not self._unit:interaction() then
-		return
-	end
-	self:swap_material_config()
-	if swap_material_only then
-		return
-	end
-	local opacity
-	if state then
-		managers.occlusion:remove_occlusion(self._unit)
-		self._unit:interaction():set_tweak_data(self._unit:interaction().orig_tweak_data_contour or "intimidate_with_contour")
-		self._unit:base():set_allow_invisible(false)
-		self:set_visibility_state(1)
-		opacity = 1
-	else
-		managers.occlusion:add_occlusion(self._unit)
-		self._unit:interaction():set_tweak_data(self._unit:interaction().orig_tweak_data or "intimidate")
-		self._unit:base():set_allow_invisible(true)
-		opacity = 0
-	end
-	local materials = self._unit:get_objects_by_type(ids_materials)
-	for _, m in ipairs(materials) do
-		m:set_variable(ids_contour_color, tweak_data.contour.interactable.standard_color)
-		m:set_variable(ids_contour_opacity, opacity)
-	end
-	self._contour_state = state
 end
 
 function CopBase:swap_material_config()
@@ -349,9 +290,6 @@ end
 function CopBase:pre_destroy(unit)
 	if unit:unit_data().secret_assignment_id and alive(unit) then
 		managers.secret_assignment:unregister_unit(unit)
-	end
-	if self._contour_on_clbk_id then
-		managers.enemy:remove_delayed_clbk(self._contour_on_clbk_id)
 	end
 	unit:brain():pre_destroy(unit)
 	self._ext_movement:pre_destroy()

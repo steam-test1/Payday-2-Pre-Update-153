@@ -319,7 +319,7 @@ function NPCRaycastWeaponBase:set_laser_enabled(state)
 		self._unit:link(self._obj_fire:name(), self._laser_unit)
 		self._laser_unit:base():set_npc()
 		self._laser_unit:base():set_on()
-		self._laser_unit:base():set_color(Color(0.15, 1, 0, 0))
+		self._laser_unit:base():set_color_by_theme("cop_sniper")
 		self._laser_unit:base():set_max_distace(10000)
 	elseif alive(self._laser_unit) then
 		self._laser_unit:set_slot(0)

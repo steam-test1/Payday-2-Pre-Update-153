@@ -513,8 +513,9 @@ function ConnectionNetworkHandler:set_member_ready(ready, sender)
 		return
 	end
 	local peer_id = peer:id()
+	local ready_state = peer:waiting_for_player_ready()
 	peer:set_waiting_for_player_ready(ready)
-	managers.network:game():on_set_member_ready(peer_id, ready)
+	managers.network:game():on_set_member_ready(peer_id, ready, ready_state ~= ready)
 	if not Network:is_server() or game_state_machine:current_state().start_game_intro then
 	elseif ready then
 		managers.network:session():chk_spawn_member_unit(peer, peer_id)
@@ -537,7 +538,7 @@ function ConnectionNetworkHandler:sync_outfit(outfit_string, sender)
 	end
 	peer:set_outfit_string(outfit_string)
 	if managers.menu_scene then
-		managers.menu_scene:set_lobby_character_out_fit(peer:id(), outfit_string)
+		managers.menu_scene:set_lobby_character_out_fit(peer:id(), outfit_string, peer:rank())
 	end
 	local kit_menu = managers.menu:get_menu("kit_menu")
 	if kit_menu then

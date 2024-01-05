@@ -13,8 +13,8 @@ function NewUnlockDialog:init(manager, data, is_title_outside)
 	end
 	self._ws = self._data.ws or manager:_get_ws()
 	local text_config = {
-		w = 420,
-		h = 400,
+		w = data.w or 420,
+		h = data.h or 400,
 		no_close_legend = true,
 		no_scroll_legend = true,
 		use_indicator = data.indicator or data.no_buttons,
@@ -57,7 +57,7 @@ end
 
 function NewUnlockDialog:fade_in()
 	NewUnlockDialog.super.fade_in(self)
-	self._start_sound_t = TimerManager:main():time() + 0.2
+	self._start_sound_t = self._sound_event and TimerManager:main():time() + 0.2
 end
 
 function NewUnlockDialog:update(t, dt)

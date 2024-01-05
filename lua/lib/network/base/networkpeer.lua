@@ -108,6 +108,7 @@ function NetworkPeer:load(data)
 	self._xnaddr = data.xnaddr
 	self._join_attempt_identifier = data.join_attempt_identifier
 	self._muted = data.muted
+	self._rank = data.rank
 	self:chk_enable_queue()
 	self:_chk_flush_msg_queues()
 	if self._rpc and not self._loading and managers.network.voice_chat.on_member_added then
@@ -139,6 +140,7 @@ function NetworkPeer:save(data)
 	data.xnaddr = self._xnaddr
 	data.join_attempt_identifier = self._join_attempt_identifier
 	data.muted = self._muted
+	data.rank = self._rank
 	print("[NetworkPeer:save]", inspect(data))
 end
 

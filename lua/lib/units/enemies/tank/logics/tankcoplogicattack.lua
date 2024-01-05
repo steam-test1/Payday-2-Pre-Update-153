@@ -11,17 +11,17 @@ function TankCopLogicAttack.enter(data, new_logic_name, enter_params)
 	my_data.rsrv_pos = {}
 	if old_internal_data then
 		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
+		my_data.turning = old_internal_data.turning
+		my_data.firing = old_internal_data.firing
+		my_data.shooting = old_internal_data.shooting
+		my_data.attention_unit = old_internal_data.attention_unit
 	end
 	local key_str = tostring(data.key)
 	my_data.detection_task_key = "CopLogicAttack._upd_enemy_detection" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicAttack._upd_enemy_detection, data)
-	CopLogicTravel.reset_actions(data, my_data, old_internal_data, CopLogicTravel.allowed_transitional_actions)
+	CopLogicIdle._chk_has_old_action(data, my_data)
 	my_data.attitude = data.objective and data.objective.attitude or "avoid"
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
-	local upper_body_action = data.unit:movement()._active_actions[3]
-	if not upper_body_action or upper_body_action:type() ~= "shoot" then
-		data.unit:movement():set_stance("hos")
-	end
 	data.unit:brain():set_update_enabled_state(false)
 	my_data.update_queue_id = "TankCopLogicAttack.queued_update" .. key_str
 	TankCopLogicAttack.queue_update(data, my_data)
@@ -51,10 +51,13 @@ function TankCopLogicAttack.exit(data, new_logic_name, enter_params)
 end
 
 function TankCopLogicAttack.update(data)
-	managers.groupai:state():on_unit_detection_updated(data.unit)
 	local t = data.t
 	local unit = data.unit
 	local my_data = data.internal_data
+	if my_data.has_old_action then
+		CopLogicAttack._upd_stop_old_action(data, my_data)
+		return
+	end
 	if CopLogicIdle._chk_relocate(data) then
 		return
 	end
@@ -186,6 +189,7 @@ function TankCopLogicAttack.action_complete_clbk(data, action)
 	local action_type = action:type()
 	local my_data = data.internal_data
 	if action_type == "walk" then
+		my_data.advancing = nil
 		if my_data.rsrv_pos.stand then
 			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
 			my_data.rsrv_pos.stand = nil

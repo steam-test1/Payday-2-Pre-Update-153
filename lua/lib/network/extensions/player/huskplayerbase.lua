@@ -15,7 +15,7 @@ end
 function HuskPlayerBase:post_init()
 	self._unit:movement():post_init()
 	managers.groupai:state():register_criminal(self._unit)
-	managers.game_play_central:add_contour_unit(self._unit, "character")
+	self._unit:contour():add("teammate")
 	managers.occlusion:remove_occlusion(self._unit)
 	self:set_anim_lod(1)
 	self._lod_stage = 1
@@ -48,7 +48,7 @@ function HuskPlayerBase:upgrade_level(category, upgrade)
 end
 
 function HuskPlayerBase:pre_destroy(unit)
-	managers.game_play_central:remove_contour_unit(unit)
+	self._unit:contour():clear()
 	self._unit:movement():pre_destroy(unit)
 	self._unit:inventory():pre_destroy(self._unit)
 	managers.groupai:state():unregister_criminal(self._unit)

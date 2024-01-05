@@ -153,7 +153,7 @@ end
 function NewsFeedGui:mouse_moved(x, y)
 	local inside = self._panel:inside(x, y)
 	self._mouse_over = inside
-	return false, inside and "link"
+	return inside, inside and "link"
 end
 
 function NewsFeedGui:mouse_pressed(button, x, y)

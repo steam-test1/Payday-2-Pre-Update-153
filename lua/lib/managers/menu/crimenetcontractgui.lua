@@ -815,22 +815,22 @@ function CrimeNetContractGui:update(t, dt)
 end
 
 function CrimeNetContractGui:mouse_moved(o, x, y)
-	if alive(self._briefing_len_panel) then
+	if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() then
 		if self._briefing_len_panel:child("button_text"):inside(x, y) then
 			if not self._button_highlight then
 				self._button_highlight = true
 				self._briefing_len_panel:child("button_text"):set_color(tweak_data.screen_colors.button_stage_2)
 			end
-			return true, "arrow"
+			return true, "link"
 		elseif self._button_highlight then
 			self._briefing_len_panel:child("button_text"):set_color(tweak_data.screen_colors.button_stage_3)
 			self._button_highlight = false
 		end
 	end
 	if x > self._contract_panel:left() + 270 and y > self._contract_panel:bottom() - 140 and x < self._contract_panel:right() and y < self._contract_panel:bottom() then
-		return false, "arrow"
+		return false
 	end
-	return false, "hand"
+	return false, "arrow"
 end
 
 function CrimeNetContractGui:mouse_pressed(o, button, x, y)

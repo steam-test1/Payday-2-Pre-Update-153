@@ -6,7 +6,7 @@ function CopLogicInactive.enter(data, new_logic_name, enter_params)
 	data.internal_data = {}
 	local my_data = data.internal_data
 	if data.has_outline then
-		data.unit:base():set_contour(false)
+		data.unit:contour():remove("highlight")
 		data.has_outline = nil
 	end
 	local attention_obj = data.attention_obj
@@ -37,7 +37,9 @@ function CopLogicInactive.enter(data, new_logic_name, enter_params)
 	end
 	data.unit:brain():set_update_enabled_state(false)
 	if data.objective then
-		managers.groupai:state():on_objective_failed(data.unit, data.objective)
+		my_data.removing_objective = true
+		data.unit:brain():set_objective(nil)
+		my_data.removing_objective = nil
 	end
 	data.logic._register_attention(data, my_data)
 	data.logic._set_interaction(data, my_data)
@@ -90,7 +92,6 @@ function CopLogicInactive._register_attention(data, my_data)
 end
 
 function CopLogicInactive.on_alarm_pager_interaction(data, status, player)
-	print("[CopLogicInactive.on_alarm_pager_interaction]", status, player)
 	if managers.groupai:state():enemy_weapons_hot() then
 		return
 	end
@@ -115,7 +116,6 @@ function CopLogicInactive.on_alarm_pager_interaction(data, status, player)
 		local is_last = chance_table[math.min(chance_index + 1, #chance_table)] == 0
 		local rand_nr = math.random()
 		local success = 0 < chance_table[chance_index] and rand_nr < chance_table[chance_index]
-		print("nr_previous_bluffs", nr_previous_bluffs, "has_upgrade", has_upgrade, "chance_index", chance_index, "rand_nr", rand_nr, "chance_table", inspect(chance_table), "success", success)
 		if success then
 			data.unit:interaction():set_tweak_data("corpse_dispose")
 			data.unit:interaction():set_active(true, true, true)
@@ -215,8 +215,13 @@ function CopLogicInactive.clbk_alarm_pager_not_answered(ignore_this, data)
 end
 
 function CopLogicInactive.on_new_objective(data, old_objective)
-	debug_pause_unit(data.unit, "[CopLogicInactive.on_new_objective]", data.unit, "new_objective", data.objective and inspect(data.objective), "old_objective", old_objective and inspect(old_objective))
+	if not data.internal_data.removing_objective then
+		debug_pause_unit(data.unit, "[CopLogicInactive.on_new_objective]", data.unit, "new_objective", data.objective and inspect(data.objective), "old_objective", old_objective and inspect(old_objective))
+	end
 	CopLogicBase.on_new_objective(data, old_objective)
+	if old_objective and old_objective.fail_clbk then
+		old_objective.fail_clbk(data.unit)
+	end
 end
 
 function CopLogicInactive.pre_destroy(data)

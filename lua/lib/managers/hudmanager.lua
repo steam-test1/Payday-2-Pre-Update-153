@@ -403,6 +403,9 @@ function HUDManager:show(name)
 	else
 		Application:error("ERROR! Component " .. tostring(name) .. " isn't loaded!")
 	end
+	if name == PlayerBase.PLAYER_INFO_HUD_PD2 then
+		self._hud_chat = self._hud_chat_ingame or self._hud_chat
+	end
 end
 
 function HUDManager:hide(name)
@@ -427,6 +430,9 @@ function HUDManager:hide(name)
 		component.panel:hide()
 	elseif not component then
 		Application:error("ERROR! Component " .. tostring(name) .. " isn't loaded!")
+	end
+	if name == PlayerBase.PLAYER_INFO_HUD_PD2 then
+		self._hud_chat = self._hud_chat_access or self._hud_chat
 	end
 end
 
@@ -600,6 +606,11 @@ function HUDManager:_update_name_labels(t, dt)
 	if not cam then
 		return
 	end
+	local player = managers.player:local_player()
+	local in_steelsight = false
+	if alive(player) then
+		in_steelsight = player:movement() and player:movement():current_state() and player:movement():current_state():in_steelsight() or false
+	end
 	local cam_pos = managers.viewport:get_current_camera_position()
 	local cam_rot = managers.viewport:get_current_camera_rotation()
 	mrotation.y(cam_rot, nl_cam_forward)
@@ -621,6 +632,7 @@ function HUDManager:_update_name_labels(t, dt)
 				label_panel:set_visible(false)
 			end
 		else
+			label_panel:set_alpha(in_steelsight and math.clamp((1 - dot) * 100, 0, 1) or 1)
 			label_panel:set_visible(true)
 			if mvector3.distance_sq(cam_pos, nl_w_pos) < 250000 then
 				label_panel:set_visible(true)
@@ -839,6 +851,10 @@ function HUDManager:_say(message, id)
 	local i = utf8.find_char(message, ":")
 	s.box_print(message, tweak_data.chat_colors[id], i)
 	s.scrollus:set_color(Color.white)
+end
+
+function HUDManager:post_event(event)
+	self._sound_source:post_event(event)
 end
 
 function HUDManager:_cb_unlock()
@@ -2233,7 +2249,7 @@ function HUDManager:_add_name_label(data)
 		local level = data.unit:network():peer():level()
 		local rank = data.unit:network():peer():rank()
 		if level then
-			local experience = (0 < rank and managers.experience:rank_string(rank) .. ":" or "") .. level
+			local experience = (0 < rank and managers.experience:rank_string(rank) .. "-" or "") .. level
 			data.name = data.name .. " (" .. experience .. ")"
 		end
 	end
@@ -2280,17 +2296,23 @@ function HUDManager:update_name_label_by_peer(peer)
 		if data.peer_id == peer:id() then
 			local name = data.character_name
 			if peer:level() then
-				local experience = (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. ":" or "") .. peer:level()
+				local experience = (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. peer:level()
 				name = name .. " (" .. experience .. ")"
 			end
 			data.text:set_text(utf8.to_upper(name))
 			local _, _, w, h = data.text:text_rect()
+			local infamy_size = h
 			local radius = data.interact:radius()
 			h = math.max(h, radius * 2)
 			data.panel:set_size(w + 4 + radius * 2, h)
 			data.text:set_size(data.panel:size())
 			data.panel:child("action"):set_size(data.panel:size())
 			data.panel:child("action"):set_x(data.interact:radius() * 2 + 4)
+			if data.panel:child("infamy") then
+				data.panel:set_w(data.panel:w() + infamy_size)
+				data.panel:child("text"):set_size(data.panel:size())
+				data.panel:child("infamy"):set_x(data.panel:w() - w - infamy_size)
+			end
 			local bag = data.panel:child("bag")
 			data.panel:set_w(data.panel:w() + bag:w() + 4)
 			bag:set_right(data.panel:w())

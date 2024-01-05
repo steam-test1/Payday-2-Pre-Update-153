@@ -224,7 +224,7 @@ function ExperienceManager:current_level()
 end
 
 function ExperienceManager:current_rank()
-	return 0
+	return self._global.rank and Application:digest_value(self._global.rank, false) or 0
 end
 
 function ExperienceManager:_set_current_level(value)
@@ -232,10 +232,52 @@ function ExperienceManager:_set_current_level(value)
 end
 
 function ExperienceManager:set_current_rank(value)
+	if value < #tweak_data.infamy.ranks + 1 then
+		managers.infamy:aquire_point()
+		self._global.rank = Application:digest_value(value, true)
+		managers.achievment:award("ignominy_" .. tostring(value))
+	end
 end
 
 function ExperienceManager:rank_string(rank)
-	return ""
+	if not rank or rank <= 0 then
+		return ""
+	end
+	local numbers = {
+		1,
+		5,
+		10,
+		50,
+		100,
+		500,
+		1000
+	}
+	local chars = {
+		"I",
+		"V",
+		"X",
+		"L",
+		"C",
+		"D",
+		"M"
+	}
+	local roman = ""
+	for i = #numbers, 1, -1 do
+		local num = numbers[i]
+		while 0 <= rank - num and 0 < rank do
+			roman = roman .. chars[i]
+			rank = rank - num
+		end
+		for j = 1, i - 1 do
+			local num2 = numbers[j]
+			if 0 <= rank - (num - num2) and num > rank and 0 < rank and num - num2 ~= num2 then
+				roman = roman .. chars[j] .. chars[i]
+				rank = rank - (num - num2)
+				break
+			end
+		end
+	end
+	return roman
 end
 
 function ExperienceManager:level_to_stars()
@@ -438,26 +480,36 @@ function ExperienceManager:get_xp_by_params(params)
 	local multiplier = managers.player:upgrade_value("player", "xp_multiplier", 1)
 	multiplier = multiplier * managers.player:upgrade_value("player", "passive_xp_multiplier", 1)
 	multiplier = multiplier * managers.player:team_upgrade_value("xp", "multiplier", 1)
+	if managers.groupai and managers.groupai:state():whisper_mode() then
+		multiplier = multiplier * managers.player:team_upgrade_value("xp", "stealth_multiplier", 1)
+	end
 	skill_dissect = math.round(contract_xp * multiplier - contract_xp)
 	total_xp = total_xp + skill_dissect
 	days_dissect = math.round(contract_xp * days_multiplier - contract_xp)
 	total_xp = total_xp + days_dissect
 	local days_dissect_risk = math.round(days_dissect * (risk_dissect / (base_xp + risk_dissect)))
 	local days_dissect_job = days_dissect - days_dissect_risk
-	local limited_bonus = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
-	if 1 < limited_bonus then
-		base_xp = base_xp * limited_bonus
-		total_xp = total_xp * limited_bonus
-		risk_dissect = risk_dissect * limited_bonus
-		alive_crew_dissect = alive_crew_dissect * limited_bonus
-		failed_level_dissect = failed_level_dissect * limited_bonus
-		level_limit_dissect = level_limit_dissect * limited_bonus
-		skill_dissect = skill_dissect * limited_bonus
-		days_dissect = days_dissect * limited_bonus
-		days_dissect_job = days_dissect_job * limited_bonus
-		days_dissect_risk = days_dissect_risk * limited_bonus
-		stage_xp_dissect = stage_xp_dissect * limited_bonus
-		job_xp_dissect = job_xp_dissect * limited_bonus
+	local bonus_xp = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+	if 0 < managers.experience:current_rank() then
+		for infamy, item in pairs(tweak_data.infamy.items) do
+			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.infamous_xp then
+				bonus_xp = bonus_xp + math.abs(item.upgrades.infamous_xp - 1)
+			end
+		end
+	end
+	if 1 < bonus_xp then
+		base_xp = base_xp * bonus_xp
+		total_xp = total_xp * bonus_xp
+		risk_dissect = risk_dissect * bonus_xp
+		alive_crew_dissect = alive_crew_dissect * bonus_xp
+		failed_level_dissect = failed_level_dissect * bonus_xp
+		level_limit_dissect = level_limit_dissect * bonus_xp
+		skill_dissect = skill_dissect * bonus_xp
+		days_dissect = days_dissect * bonus_xp
+		days_dissect_job = days_dissect_job * bonus_xp
+		days_dissect_risk = days_dissect_risk * bonus_xp
+		stage_xp_dissect = stage_xp_dissect * bonus_xp
+		job_xp_dissect = job_xp_dissect * bonus_xp
 	end
 	local dissection_table = {
 		bonus_risk = math.round(risk_dissect),
@@ -550,14 +602,23 @@ function ExperienceManager:reset()
 end
 
 function ExperienceManager:chk_ask_use_backup(savegame_data, backup_savegame_data)
-	local savegame_exp_total, backup_savegame_exp_total
+	local savegame_exp_total, backup_savegame_exp_total, savegame_rank, backup_savegame_rank
 	local state = savegame_data.ExperienceManager
 	if state then
 		savegame_exp_total = state.total
+		savegame_rank = state.rank
 	end
 	state = backup_savegame_data.ExperienceManager
 	if state then
 		backup_savegame_exp_total = state.total
+		backup_savegame_rank = state.rank
+	end
+	local rank = savegame_rank and Application:digest_value(savegame_rank, false) or 0
+	local backup_rank = backup_savegame_rank and Application:digest_value(backup_savegame_rank, false) or 0
+	if rank < backup_rank then
+		return true
+	elseif rank > backup_rank then
+		return false
 	end
 	if savegame_exp_total and backup_savegame_exp_total and Application:digest_value(savegame_exp_total, false) < Application:digest_value(backup_savegame_exp_total, false) then
 		return true

@@ -23,7 +23,7 @@ function LightLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer, 
 	self._title_text = self._saferect_panel:text({
 		y = 0,
 		text_id = "debug_loading_level",
-		font = "fonts/font_medium_shadow_mf",
+		font = "fonts/font_medium_mf",
 		font_size = 32,
 		color = Color.white,
 		align = "left",

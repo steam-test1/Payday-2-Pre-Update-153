@@ -17,7 +17,7 @@ function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 	end
 	CivilianLogicEscort._get_objective_path_data(data, my_data)
 	data.internal_data = my_data
-	data.unit:base():set_contour(true)
+	data.unit:contour():add("highlight")
 	data.unit:movement():set_cool(false, "escort")
 	data.unit:movement():set_stance("hos")
 	if data.unit:anim_data().tied then
@@ -40,7 +40,7 @@ function CivilianLogicEscort.exit(data, new_logic_name, enter_params)
 	local my_data = data.internal_data
 	data.unit:brain():cancel_all_pathing_searches()
 	CopLogicBase.cancel_queued_tasks(my_data)
-	data.unit:base():set_contour(false)
+	data.unit:contour():remove("highlight")
 	if new_logic_name ~= "inactive" then
 		data.unit:brain():set_update_enabled_state(true)
 	end

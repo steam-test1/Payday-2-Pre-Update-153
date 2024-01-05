@@ -9,7 +9,13 @@ function ElementSetOutline:client_on_executed(...)
 end
 
 function ElementSetOutline.sync_function(unit, state)
-	unit:base():set_contour(state)
+	if unit:contour() then
+		if state then
+			unit:contour():add("highlight")
+		else
+			unit:contour():remove("highlight")
+		end
+	end
 end
 
 function ElementSetOutline:on_executed(instigator)

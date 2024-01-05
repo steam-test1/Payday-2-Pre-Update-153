@@ -676,7 +676,7 @@ function PlayerStandard:_get_max_walk_speed(t)
 		speed_state = has_normal_speed_upgrade and "walk" or "steelsight"
 	elseif self:on_ladder() then
 		movement_speed = speed_tweak.CLIMBING_MAX
-		speed_state = "walk"
+		speed_state = "climb"
 	elseif self._state_data.ducking then
 		movement_speed = speed_tweak.CROUCHING_MAX
 		speed_state = "crouch"
@@ -689,6 +689,9 @@ function PlayerStandard:_get_max_walk_speed(t)
 	end
 	local morale_boost_bonus = self._ext_movement:morale_boost()
 	local multiplier = managers.player:movement_speed_multiplier(speed_state, speed_state and morale_boost_bonus and morale_boost_bonus.move_speed_bonus)
+	if alive(self._equipped_unit) then
+		multiplier = multiplier * self._equipped_unit:base():movement_penalty()
+	end
 	return movement_speed * multiplier
 end
 
@@ -916,6 +919,7 @@ function PlayerStandard:_start_action_throw_grenade(t, input)
 	self:_interupt_action_reload(t)
 	self:_interupt_action_steelsight(t)
 	self:_interupt_action_running(t)
+	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, "throw_grenade")
 	self._ext_camera:play_redirect(Idstring("throw_grenade"))
 	self._state_data.throw_grenade_expire_t = t + 1.1
 end
@@ -1600,9 +1604,8 @@ function PlayerStandard:_start_action_intimidate(t)
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
 				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
 				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-				managers.game_play_central:add_enemy_contour(prime_target.unit, marked_extra_damage, time_multiplier)
+				prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
 				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
-				managers.challenges:set_flag("eagle_eyes")
 			end
 		elseif voice_type == "down" then
 			interact_type = "cmd_down"
@@ -1677,7 +1680,7 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "mark_camera" then
 			sound_name = "quiet"
 			interact_type = "cmd_point"
-			managers.game_play_central:add_marked_contour_unit(prime_target.unit)
+			prime_target.unit:contour():add("mark_unit")
 			managers.network:session():send_to_peers_synched("mark_contour_unit", prime_target.unit)
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
@@ -2235,7 +2238,7 @@ function PlayerStandard:save(data)
 	end
 end
 
-function PlayerStandard:destroy()
+function PlayerStandard:pre_destroy()
 	if self._pos_reservation then
 		managers.navigation:unreserve_pos(self._pos_reservation)
 		self._pos_reservation = nil

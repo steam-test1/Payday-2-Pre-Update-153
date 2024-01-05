@@ -375,10 +375,19 @@ end
 
 function HUDManager:_create_hud_chat()
 	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2)
-	if self._hud_chat then
-		self._hud_chat:remove()
+	if self._hud_chat_ingame then
+		self._hud_chat_ingame:remove()
 	end
-	self._hud_chat = HUDChat:new(self._saferect, hud)
+	self._hud_chat_ingame = HUDChat:new(self._saferect, hud)
+	self._hud_chat = self._hud_chat_ingame
+end
+
+function HUDManager:_create_hud_chat_access()
+	local hud = managers.hud:script(IngameAccessCamera.GUI_SAFERECT)
+	if self._hud_chat_access then
+		self._hud_chat_access:remove()
+	end
+	self._hud_chat_access = HUDChat:new(self._saferect, hud)
 end
 
 function HUDManager:_create_assault_corner()
@@ -858,14 +867,15 @@ function HUDManager:_add_name_label(data)
 	local last_id = self._hud.name_labels[#self._hud.name_labels] and self._hud.name_labels[#self._hud.name_labels].id or 0
 	local id = last_id + 1
 	local character_name = data.name
+	local rank = 0
 	local peer_id
 	local is_husk_player = data.unit:base().is_husk_player
 	if is_husk_player then
 		peer_id = data.unit:network():peer():id()
 		local level = data.unit:network():peer():level()
-		local rank = data.unit:network():peer():rank()
+		rank = data.unit:network():peer():rank()
 		if level then
-			local experience = (0 < rank and managers.experience:rank_string(rank) .. ":" or "") .. level
+			local experience = (0 < rank and managers.experience:rank_string(rank) .. "-" or "") .. level
 			data.name = data.name .. " (" .. experience .. ")"
 		end
 	end
@@ -932,6 +942,20 @@ function HUDManager:_add_name_label(data)
 	text:set_size(panel:size())
 	action:set_size(panel:size())
 	action:set_x(radius * 2 + 4)
+	if 0 < rank then
+		local infamy_icon = tweak_data.hud_icons:get_icon_data("infamy_icon")
+		local infamy = panel:bitmap({
+			name = "infamy",
+			texture = infamy_icon,
+			layer = 0,
+			w = 16,
+			h = 32,
+			color = crim_color
+		})
+		panel:set_w(panel:w() + infamy:w())
+		text:set_size(panel:size())
+		infamy:set_x(panel:w() - w - infamy:w())
+	end
 	panel:set_w(panel:w() + bag:w() + 4)
 	bag:set_right(panel:w())
 	bag:set_y(4)
@@ -1084,6 +1108,7 @@ function HUDManager:setup_access_camera_hud()
 	local hud = managers.hud:script(IngameAccessCamera.GUI_SAFERECT)
 	local full_hud = managers.hud:script(IngameAccessCamera.GUI_FULLSCREEN)
 	self._hud_access_camera = HUDAccessCamera:new(hud, full_hud)
+	self:_create_hud_chat_access()
 end
 
 function HUDManager:set_access_camera_name(name)

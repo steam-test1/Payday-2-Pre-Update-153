@@ -1463,37 +1463,73 @@ function NarrativeTweakData:init()
 		30000,
 		40000
 	}
-	self.jobs.monolithic_1 = {}
-	self.jobs.monolithic_1.name_id = "heist_monolithic_1"
-	self.jobs.monolithic_1.briefing_id = "heist_monolithic_1_crimenet"
-	self.jobs.monolithic_1.contact = "bain"
-	self.jobs.monolithic_1.region = "street"
-	self.jobs.monolithic_1.jc = 10
-	self.jobs.monolithic_1.chain = {
+	self.jobs.monolithic = {}
+	self.jobs.monolithic.name_id = "heist_monolithic_1"
+	self.jobs.monolithic.briefing_id = "heist_monolithic_1_crimenet"
+	self.jobs.monolithic.contact = "bain"
+	self.jobs.monolithic.region = "street"
+	self.jobs.monolithic.jc = 10
+	self.jobs.monolithic.chain = {
 		{
 			level_id = "monolithic_1",
 			type_id = "heist_type_assault",
 			type = "d"
 		}
 	}
-	self.jobs.monolithic_1.briefing_event = nil
-	self.jobs.monolithic_1.debrief_event = nil
-	self.jobs.monolithic_1.crimenet_videos = {
+	self.jobs.monolithic.briefing_event = nil
+	self.jobs.monolithic.debrief_event = nil
+	self.jobs.monolithic.crimenet_videos = {
 		"cn_branchbank1",
 		"cn_branchbank2",
 		"cn_branchbank3"
 	}
-	self.jobs.monolithic_1.payout = {
+	self.jobs.monolithic.payout = {
 		10000,
 		20000,
 		30000,
 		40000
 	}
-	self.jobs.monolithic_1 = deep_clone(self.jobs.monolithic_1)
-	self.jobs.monolithic_1.jc = 40
-	self.jobs.monolithic_1.professional = true
-	self.jobs.monolithic_1.region = "professional"
-	self.jobs.monolithic_1.payout = {
+	self.jobs.monolithic_prof = deep_clone(self.jobs.monolithic)
+	self.jobs.monolithic_prof.jc = 40
+	self.jobs.monolithic_prof.professional = true
+	self.jobs.monolithic_prof.region = "professional"
+	self.jobs.monolithic_prof.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.blueharvest = {}
+	self.jobs.blueharvest.name_id = "heist_blueharvest"
+	self.jobs.blueharvest.briefing_id = "heist_blueharvest_crimenet"
+	self.jobs.blueharvest.contact = "bain"
+	self.jobs.blueharvest.region = "street"
+	self.jobs.blueharvest.jc = 10
+	self.jobs.blueharvest.chain = {
+		{
+			level_id = "blueharvest_2",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.blueharvest.briefing_event = nil
+	self.jobs.blueharvest.debrief_event = nil
+	self.jobs.blueharvest.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.blueharvest.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.blueharvest_prof = deep_clone(self.jobs.blueharvest)
+	self.jobs.blueharvest_prof.jc = 40
+	self.jobs.blueharvest_prof.professional = true
+	self.jobs.blueharvest_prof.region = "professional"
+	self.jobs.blueharvest_prof.payout = {
 		10000,
 		20000,
 		30000,

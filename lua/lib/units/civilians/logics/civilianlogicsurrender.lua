@@ -97,7 +97,7 @@ function CivilianLogicSurrender.exit(data, new_logic_name, enter_params)
 		data.unit:interaction():set_active(false, true)
 		my_data.interaction_active = nil
 		if data.has_outline then
-			data.unit:base():set_contour(true)
+			data.unit:contour():add("highlight")
 		end
 	end
 	if my_data.surrender_clbk_registered then
@@ -146,7 +146,7 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 	end
 	if not_tied then
 		if data.has_outline then
-			data.unit:base():set_contour(false)
+			data.unit:contour():remove("highlight")
 			data.has_outline = nil
 		end
 		data.unit:inventory():destroy_all_items()
@@ -174,7 +174,7 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 			managers.groupai:state():on_hostage_state(true, data.key)
 			my_data.is_hostage = true
 			if data.has_outline then
-				data.unit:base():set_contour(false)
+				data.unit:contour():remove("highlight")
 				data.has_outline = nil
 			end
 			data.unit:inventory():destroy_all_items()

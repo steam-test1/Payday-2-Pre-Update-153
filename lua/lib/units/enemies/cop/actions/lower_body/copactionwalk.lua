@@ -720,6 +720,9 @@ function CopActionWalk:_calculate_curved_path(path, index, curvature_factor, ent
 end
 
 function CopActionWalk:on_exit()
+	if tostring(self._unit:key()) == "userdata: 000018B1" then
+		debug_pause_unit(self._unit, "[CopActionWalk:on_exit] unit", self._common_data.unit, "rot", self._common_data.rot, "end_rot", self._end_rot)
+	end
 	if self._root_blend_disabled then
 		self._ext_movement:set_root_blend(true)
 	end

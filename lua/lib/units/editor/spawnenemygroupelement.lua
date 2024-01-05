@@ -17,6 +17,22 @@ function SpawnEnemyGroupUnitElement:init(unit)
 	table.insert(self._save_values, "interval")
 end
 
+function SpawnEnemyGroupUnitElement:post_init()
+	if self._hed.preferred_spawn_groups then
+		local i = 1
+		while i <= #self._hed.preferred_spawn_groups do
+			if not tweak_data.group_ai.enemy_spawn_groups[self._hed.preferred_spawn_groups[i]] then
+				table.remove(self._hed.preferred_spawn_groups, i)
+			else
+				i = i + 1
+			end
+		end
+		if not next(self._hed.preferred_spawn_groups) then
+			self._hed.preferred_spawn_groups = nil
+		end
+	end
+end
+
 function SpawnEnemyGroupUnitElement:draw_links(t, dt, selected_unit, all_units)
 	MissionElement.draw_links(self, t, dt, selected_unit, all_units)
 end
@@ -114,7 +130,6 @@ function SpawnEnemyGroupUnitElement:_build_panel(panel, panel_sizer)
 	local opt1_sizer = EWS:BoxSizer("VERTICAL")
 	local opt2_sizer = EWS:BoxSizer("VERTICAL")
 	local opt3_sizer = EWS:BoxSizer("VERTICAL")
-	local opt = NavigationManager.ACCESS_FLAGS
 	local opt = {}
 	for cat_name, team in pairs(tweak_data.group_ai.enemy_spawn_groups) do
 		table.insert(opt, cat_name)

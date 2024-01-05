@@ -231,16 +231,17 @@ function MissionAssetsManager:get_money_spent()
 	return self._money_spent
 end
 
-function MissionAssetsManager:server_unlock_asset(asset_id)
+function MissionAssetsManager:server_unlock_asset(asset_id, peer)
 	if not self:is_unlock_asset_allowed() then
 		return
 	end
-	managers.network:session():send_to_peers_synched("sync_unlock_asset", asset_id)
-	self:sync_unlock_asset(asset_id)
+	peer = peer or managers.network:session():local_peer()
+	managers.network:session():send_to_peers_synched("sync_unlock_asset", asset_id, peer:id())
+	self:sync_unlock_asset(asset_id, peer)
 	self:_check_triggers("asset")
 end
 
-function MissionAssetsManager:sync_unlock_asset(asset_id)
+function MissionAssetsManager:sync_unlock_asset(asset_id, peer)
 	local asset = self:_get_asset_by_id(asset_id)
 	if not asset then
 		Application:error("sync_set_asset_enabled: No asset with id:", asset_id)
@@ -253,6 +254,15 @@ function MissionAssetsManager:sync_unlock_asset(asset_id)
 	asset.unlocked = true
 	managers.menu_component:unlock_asset_mission_briefing_gui(asset_id)
 	self:trigger_asset_tweak(asset_id)
+	if managers.chat and peer then
+		local asset_tweak_data = tweak_data.assets[asset_id]
+		if asset_tweak_data then
+			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_unlocked_asset", {
+				name = peer:name(),
+				asset = managers.localization:text(asset_tweak_data.name_id)
+			}))
+		end
+	end
 end
 
 function MissionAssetsManager:get_every_asset_ids()
@@ -370,7 +380,7 @@ function MissionAssetsManager:is_unlock_asset_allowed()
 	if game_state_machine:current_state_name() ~= "ingame_waiting_for_players" then
 		return false
 	end
-	local check_is_dropin = game_state_machine:current_state() and game_state_machine:current_state().check_is_dropin and game_state_machine:current_state():check_is_dropin()
+	local check_is_dropin = game_state_machine and game_state_machine:current_state() and game_state_machine:current_state().check_is_dropin and game_state_machine:current_state():check_is_dropin()
 	return not check_is_dropin
 end
 

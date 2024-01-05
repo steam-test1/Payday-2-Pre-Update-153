@@ -239,7 +239,6 @@ function SkillTreeSkillItem:flash()
 		box:set_color(b_color)
 	end
 	
-	managers.menu_component:post_event("selection_next")
 	self:refresh(self._locked)
 	self._skill_panel:animate(flash_anim)
 end
@@ -473,6 +472,16 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 		lock_image:set_rotation(360)
 		lock_image:set_world_position(debug_text:world_right(), debug_text:world_y() - 2)
 		lock_image:set_visible(false)
+		local add_infamy_glow = false
+		if 0 < managers.experience:current_rank() then
+			local tree_name = tweak_data.skilltree.trees[tree].skill
+			for infamy, item in pairs(tweak_data.infamy.items) do
+				if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.skilltree and item.upgrades.skilltree.tree == tree_name then
+					add_infamy_glow = true
+					break
+				end
+			end
+		end
 		local cost_string = (managers.skilltree:tier_cost(tree, tier) < 10 and "0" or "") .. tostring(managers.skilltree:tier_cost(tree, tier))
 		local cost_text = tier_panel:text({
 			name = "cost_text",
@@ -489,8 +498,34 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 			blend_mode = "add",
 			rotation = 360
 		})
+		do
+			local x, y, w, h = cost_text:text_rect()
+			cost_text:set_size(w, h)
+		end
 		cost_text:set_world_bottom(tree_panel:child("rect" .. tostring(tier + 1)):world_top() + 2)
 		cost_text:set_x(debug_text:right() + tw * 3)
+		if add_infamy_glow then
+			local glow = tier_panel:bitmap({
+				name = "cost_glow",
+				w = 56,
+				h = 56,
+				texture = "guis/textures/pd2/crimenet_marker_glow",
+				blend_mode = "add",
+				color = tweak_data.screen_colors.button_stage_3,
+				rotation = 360
+			})
+			local anim_pulse_glow = function(o)
+				local t = 0
+				local dt = 0
+				while true do
+					dt = coroutine.yield()
+					t = (t + dt * 0.5) % 1
+					o:set_alpha((math.sin(t * 180) * 0.5 + 0.5) * 0.8)
+				end
+			end
+			glow:set_center(cost_text:center())
+			glow:animate(anim_pulse_glow)
+		end
 		local color = unlocked and tweak_data.screen_colors.item_stage_1 or tweak_data.screen_colors.item_stage_2
 		debug_text:set_color(color)
 		cost_text:set_color(color)
@@ -1101,8 +1136,9 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 			if not unlocked then
 				local point_spent = managers.skilltree:points_spent(self._selected_item._tree) or 0
 				local tier_unlocks = managers.skilltree:tier_cost(self._selected_item._tree, self._selected_item._tier) or 0
-				prerequisite_text = prerequisite_text .. managers.localization:text("st_menu_points_to_unlock_tier", {
-					points = tier_unlocks - point_spent,
+				local points_needed = tier_unlocks - point_spent
+				prerequisite_text = prerequisite_text .. managers.localization:text(points_needed == 1 and "st_menu_points_to_unlock_tier_singular" or "st_menu_points_to_unlock_tier", {
+					points = points_needed,
 					tier = self._selected_item._tier
 				}) .. "\n"
 			end
@@ -1216,22 +1252,26 @@ function SkillTreeGui:check_respec_button(x, y, force_text_update)
 		self._panel:child("respec_tree_button"):set_text(prefix .. managers.localization:to_upper_text(text_id, macroes))
 		self:make_fine_text(self._panel:child("respec_tree_button"))
 	end
+	return self._respec_highlight
 end
 
 function SkillTreeGui:mouse_moved(o, x, y)
-	self:check_respec_button(x, y)
+	if self:check_respec_button(x, y) then
+		return true, "link"
+	end
 	if self._active_page then
 		for _, item in ipairs(self._active_page._items) do
 			if item:inside(x, y) then
 				self:set_selected_item(item)
-				return true
+				return true, "link"
 			end
 		end
 	end
 	for _, tab_item in ipairs(self._tab_items) do
 		if tab_item:inside(x, y) then
+			local same_tab_item = self._active_tree == tab_item:tree()
 			self:set_selected_item(tab_item, true)
-			return true
+			return true, same_tab_item and "arrow" or "link"
 		end
 	end
 	if managers.menu:is_pc_controller() then
@@ -1241,14 +1281,16 @@ function SkillTreeGui:mouse_moved(o, x, y)
 				self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
 			end
+			return true, "link"
 		else
 			self._back_highlight = false
 			self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_3)
 		end
 	end
 	if self._panel:inside(x, y) then
-		return true
+		return true, "arrow"
 	end
+	return false, "arrow"
 end
 
 function SkillTreeGui:mouse_released(button, x, y)
@@ -1352,6 +1394,7 @@ end
 
 function SkillTreeGui:flash_item(item)
 	item:flash()
+	managers.menu_component:post_event("menu_error")
 end
 
 function SkillTreeGui:place_point(item)
@@ -1417,6 +1460,8 @@ end
 function SkillTreeGui:_dialog_confirm_yes(item)
 	if item then
 		local skill_refresh_skills = item:trigger() or {}
+		SimpleGUIEffectSpewer.skill_up(item._skill_panel:child("state_image"):center_x(), item._skill_panel:child("state_image"):center_y(), item._skill_panel)
+		managers.menu_component:post_event("menu_skill_investment")
 		for _, id in ipairs(skill_refresh_skills) do
 			for _, item in ipairs(self._active_page._items) do
 				if item._skill_id == id then

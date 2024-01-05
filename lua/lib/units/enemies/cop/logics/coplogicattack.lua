@@ -26,6 +26,9 @@ function CopLogicAttack.enter(data, new_logic_name, enter_params)
 	my_data.rsrv_pos = {}
 	if old_internal_data then
 		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
+		my_data.turning = old_internal_data.turning
+		my_data.firing = old_internal_data.firing
+		my_data.shooting = old_internal_data.shooting
 		my_data.attention_unit = old_internal_data.attention_unit
 		CopLogicAttack._set_best_cover(data, my_data, old_internal_data.best_cover)
 	end
@@ -33,21 +36,7 @@ function CopLogicAttack.enter(data, new_logic_name, enter_params)
 	local key_str = tostring(data.key)
 	my_data.detection_task_key = "CopLogicAttack._upd_enemy_detection" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicAttack._upd_enemy_detection, data, data.t)
-	local allowed_actions
-	if data.unit:movement():chk_action_forbidden("walk") and data.unit:movement()._active_actions[2] then
-		allowed_actions = CopLogicTravel.allowed_transitional_actions_nav_link
-		my_data.wants_stop_old_walk_action = true
-	else
-		allowed_actions = CopLogicTravel.allowed_transitional_actions
-	end
-	local idle_body_part = CopLogicTravel.reset_actions(data, my_data, old_internal_data, allowed_actions)
-	local upper_body_action = data.unit:movement()._active_actions[3]
-	if (not upper_body_action or upper_body_action:type() ~= "shoot") and idle_body_part == 1 then
-		data.unit:movement():set_stance("hos")
-	end
-	if data.unit:anim_data().stand and (not (not data.char_tweak.no_stand and data.objective) or data.objective.attitude ~= "engage") then
-		CopLogicAttack._chk_request_action_crouch(data)
-	end
+	CopLogicIdle._chk_has_old_action(data, my_data)
 	my_data.attitude = data.objective and data.objective.attitude or "avoid"
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
 	data.unit:brain():set_update_enabled_state(true)
@@ -81,10 +70,12 @@ end
 
 function CopLogicAttack.update(data)
 	local my_data = data.internal_data
-	if my_data.wants_stop_old_walk_action then
-		if not data.unit:movement():chk_action_forbidden("walk") then
-			data.unit:movement():action_request({type = "idle", body_part = 2})
-			my_data.wants_stop_old_walk_action = nil
+	if my_data.has_old_action then
+		CopLogicAttack._upd_stop_old_action(data, my_data)
+		if not my_data.update_queue_id then
+			data.unit:brain():set_update_enabled_state(false)
+			my_data.update_queue_id = "CopLogicAttack.queued_update" .. tostring(data.key)
+			CopLogicAttack.queue_update(data, my_data)
 		end
 		return
 	end
@@ -130,11 +121,11 @@ function CopLogicAttack._upd_combat_movement(data)
 	local action_taken = data.logic.action_taken(data, my_data)
 	local want_to_take_cover = my_data.want_to_take_cover
 	if not action_taken then
-		if not (not want_to_take_cover or in_cover and in_cover[4]) or data.char_tweak.no_stand then
+		if not ((not want_to_take_cover or in_cover and in_cover[4]) and data.char_tweak.allowed_poses) or data.char_tweak.allowed_poses.stand then
 			if not unit:anim_data().crouch then
 				action_taken = CopLogicAttack._chk_request_action_crouch(data)
 			end
-		elseif unit:anim_data().crouch and (not data.char_tweak.allow_crouch or 2 < my_data.cover_test_step) then
+		elseif unit:anim_data().crouch and (not (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch) or 2 < my_data.cover_test_step) then
 			action_taken = CopLogicAttack._chk_request_action_stand(data)
 		end
 	end
@@ -320,6 +311,10 @@ function CopLogicAttack._chk_start_action_move_out_of_the_way(data, my_data)
 				to_pos
 			}
 			CopLogicAttack._chk_request_action_walk_to_cover_shoot_pos(data, my_data, path, "run")
+			if not my_data.advancing then
+				managers.navigation:unreserve_pos(rsrv_pos.path)
+				rsrv_pos.path = nil
+			end
 		end
 	end
 end
@@ -894,7 +889,7 @@ function CopLogicAttack._upd_aim(data, my_data)
 					if last_sup_t and data.t - last_sup_t < 7 * (running and 0.3 or 1) * (focus_enemy.verified and 1 or focus_enemy.vis_ray and focus_enemy.vis_ray.distance > 500 and 0.5 or 0.2) then
 						shoot = true
 					elseif focus_enemy.verified and focus_enemy.verified_dis < data.internal_data.weapon_range.close then
-						if focus_enemy.aimed_at then
+						if focus_enemy.aimed_at or not focus_enemy.is_human_player then
 							shoot = true
 						else
 							aim = true
@@ -1033,7 +1028,7 @@ function CopLogicAttack.aim_allow_fire(shoot, aim, data, my_data)
 end
 
 function CopLogicAttack.chk_should_turn(data, my_data)
-	return not my_data.turning and not data.unit:movement():chk_action_forbidden("walk") and not my_data.moving_to_cover and not my_data.walking_to_cover_shoot_pos and not my_data.surprised
+	return not my_data.turning and not my_data.has_old_action and not data.unit:movement():chk_action_forbidden("walk") and not my_data.moving_to_cover and not my_data.walking_to_cover_shoot_pos and not my_data.surprised
 end
 
 function CopLogicAttack._get_cover_offset_pos(data, cover_data, threat_pos)
@@ -1362,5 +1357,19 @@ function CopLogicAttack._chk_exit_attack_logic(data, new_reaction)
 end
 
 function CopLogicAttack.action_taken(data, my_data)
-	return my_data.turning or my_data.moving_to_cover or my_data.walking_to_cover_shoot_pos or my_data.surprised or data.unit:movement():chk_action_forbidden("walk")
+	return my_data.turning or my_data.moving_to_cover or my_data.walking_to_cover_shoot_pos or my_data.surprised or my_data.has_old_action or data.unit:movement():chk_action_forbidden("walk")
+end
+
+function CopLogicAttack._upd_stop_old_action(data, my_data)
+	if data.unit:anim_data().to_idle then
+		return
+	end
+	if data.unit:movement():chk_action_forbidden("walk") then
+		if not data.unit:movement():chk_action_forbidden("idle") then
+			CopLogicIdle._start_idle_action_from_act(data)
+		end
+	elseif data.unit:anim_data().act and data.unit:anim_data().needs_idle then
+		CopLogicIdle._start_idle_action_from_act(data)
+	end
+	CopLogicIdle._chk_has_old_action(data, my_data)
 end

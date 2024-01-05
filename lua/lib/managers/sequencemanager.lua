@@ -22,7 +22,7 @@ function InteractionElement:activate_callback(env)
 	if env.dest_unit:interaction() then
 		env.dest_unit:interaction():set_active(enabled)
 	else
-		Application:error("Unit " .. env.dest_unit:name() .. " doesn't have the interaction extension.")
+		Application:error("Unit " .. tostring(env.dest_unit:name()) .. " doesn't have the interaction extension.")
 	end
 end
 

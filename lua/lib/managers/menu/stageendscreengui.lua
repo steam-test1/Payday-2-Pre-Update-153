@@ -239,7 +239,7 @@ function StatsTabItem:mouse_moved(x, y)
 		self._highlighted = false
 		self._tab_text:set_color(tweak_data.screen_colors.button_stage_3)
 	end
-	return self._selected
+	return self._selected, self._highlighted
 end
 
 function StatsTabItem:mouse_pressed(button, x, y)
@@ -649,10 +649,17 @@ end
 
 function StageEndScreenGui:mouse_moved(x, y)
 	if not (alive(self._panel) and alive(self._fullscreen_panel)) or not self._enabled then
-		return
+		return false
 	end
+	local mouse_over_tab = false
 	for _, tab in ipairs(self._items) do
-		tab:mouse_moved(x, y)
+		local selected, highlighted = tab:mouse_moved(x, y)
+		if highlighted and not selected then
+			mouse_over_tab = true
+		end
+	end
+	if mouse_over_tab then
+		return true, "link"
 	end
 	if self._button_not_clickable then
 		self._continue_button:set_color(tweak_data.screen_colors.item_stage_1)
@@ -662,6 +669,7 @@ function StageEndScreenGui:mouse_moved(x, y)
 			self._continue_button:set_color(tweak_data.screen_colors.button_stage_2)
 			managers.menu_component:post_event("highlight")
 		end
+		return true, "link"
 	elseif self._continue_button_highlighted then
 		self._continue_button_highlighted = false
 		self._continue_button:set_color(tweak_data.screen_colors.button_stage_3)
@@ -670,6 +678,7 @@ function StageEndScreenGui:mouse_moved(x, y)
 	if managers.hud._hud_stage_endscreen and managers.hud._hud_stage_endscreen._backdrop then
 		managers.hud._hud_stage_endscreen._backdrop:mouse_moved(x, y)
 	end
+	return false, "arrow"
 end
 
 function StageEndScreenGui:input_focus()

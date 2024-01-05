@@ -108,6 +108,18 @@ function SpecialObjectiveUnitElement:test_element()
 		elseif access_category == "civ_female" then
 			spawn_unit_name = Idstring("units/payday2/characters/civ_female_casual_1/civ_female_casual_1")
 			break
+		elseif access_category == "spooc" then
+			spawn_unit_name = Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
+			break
+		elseif access_category == "shield" then
+			spawn_unit_name = Idstring("units/payday2/characters/ene_shield_2/ene_shield_2")
+			break
+		elseif access_category == "tank" then
+			spawn_unit_name = Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1")
+			break
+		elseif access_category == "taser" then
+			spawn_unit_name = Idstring("units/payday2/characters/ene_tazer_1/ene_tazer_1")
+			break
 		else
 			spawn_unit_name = Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
 			break

@@ -85,13 +85,17 @@ function PlayerTased:_update_check_actions(t, dt)
 		if not alive(self._counter_taser_unit) then
 			self._camera_unit:base():start_shooting()
 			self._recoil_t = t + 0.5
-			input.btn_primary_attack_state = true
-			input.btn_primary_attack_press = true
+			if not managers.player:has_category_upgrade("player", "resist_firing_tased") then
+				input.btn_primary_attack_state = true
+				input.btn_primary_attack_press = true
+			end
 			self._camera_unit:base():recoil_kick(-5, 5, -5, 5)
 			self._unit:camera():play_redirect(self._ids_tased_boost)
 		end
 	elseif self._recoil_t then
-		input.btn_primary_attack_state = true
+		if not managers.player:has_category_upgrade("player", "resist_firing_tased") then
+			input.btn_primary_attack_state = true
+		end
 		if t > self._recoil_t then
 			self._recoil_t = nil
 			self._camera_unit:base():stop_shooting()
@@ -223,9 +227,8 @@ function PlayerTased:call_teammate(line, t, no_gesture, skip_alert)
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
 				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
 				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-				managers.game_play_central:add_enemy_contour(prime_target.unit, marked_extra_damage, time_multiplier)
+				prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
 				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
-				managers.challenges:set_flag("eagle_eyes")
 			end
 			if not self._tase_ended and managers.player:has_category_upgrade("player", "taser_self_shock") and prime_target.unit:key() == self._unit:character_damage():tase_data().attacker_unit:key() then
 				self:_start_action_counter_tase(t, prime_target)

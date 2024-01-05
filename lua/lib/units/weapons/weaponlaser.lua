@@ -17,34 +17,34 @@ function WeaponLaser:init(unit)
 	self._light:set_near_range(40)
 	self._light:link(obj)
 	self._light:set_rotation(Rotation(obj:rotation():z(), -obj:rotation():x(), -obj:rotation():y()))
-	self._colors = {
-		{
+	self._themes = {
+		default = {
 			light = Vector3(0, 10, 0),
+			glow = Vector3(0, 0.2, 0),
 			brush = Color(0.05, 0, 1, 0)
 		},
-		{
+		cop_sniper = {
 			light = Vector3(10, 0, 0),
-			brush = Color(0.05, 1, 0, 0)
-		},
-		{
-			light = Vector3(0, 0, 10),
-			brush = Color(0.05, 0, 0, 1)
+			glow = Vector3(0.2, 0, 0),
+			brush = Color(0.15, 1, 0, 0)
 		}
 	}
-	self._light_color = self._colors[1].light
+	self._light_color = Vector3()
+	mvector3.set(self._light_color, self._themes.default.light)
 	self._light:set_color(self._light_color)
 	self._light:set_enable(false)
 	self._light_glow = World:create_light("spot|specular")
 	self._light_glow:set_spot_angle_end(20)
 	self._light_glow:set_far_range(75)
 	self._light_glow:set_near_range(40)
-	self._light_glow_color = Vector3(0, 0.2, 0)
+	self._light_glow_color = Vector3()
+	mvector3.set(self._light_color, self._themes.default.glow)
 	self._light_glow:set_color(self._light_glow_color)
 	self._light_glow:set_enable(false)
 	self._light_glow:link(obj)
 	self._light_glow:set_rotation(Rotation(obj:rotation():z(), -obj:rotation():x(), -obj:rotation():y()))
 	self._slotmask = managers.slot:get_mask("bullet_impact_targets")
-	self._brush = Draw:brush(self._colors[1].brush)
+	self._brush = Draw:brush(self._themes.default.brush)
 	self._brush:set_blend_mode("opacity_add")
 end
 
@@ -107,6 +107,15 @@ function WeaponLaser:destroy(unit)
 	if alive(self._light_glow) then
 		World:delete_light(self._light_glow)
 	end
+end
+
+function WeaponLaser:set_color_by_theme(type)
+	local theme = self._themes[type] or self._themes.default
+	mvector3.set(self._light_color, theme.light)
+	self._light:set_color(self._light_color)
+	mvector3.set(self._light_glow_color, theme.glow)
+	self._light_glow:set_color(self._light_glow_color)
+	self._brush:set_color(theme.brush)
 end
 
 function WeaponLaser:set_color(color)

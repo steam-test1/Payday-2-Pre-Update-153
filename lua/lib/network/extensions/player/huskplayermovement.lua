@@ -563,6 +563,9 @@ function HuskPlayerMovement:_register_revive_SO()
 		nav_seg = self._unit:movement():nav_tracker():nav_segment(),
 		fail_clbk = callback(self, self, "on_revive_SO_failed"),
 		complete_clbk = callback(self, self, "on_revive_SO_completed"),
+		interrupt_dis = 300,
+		interrupt_health = 0.25,
+		interrupt_suppression = true,
 		scan = true,
 		action = {
 			type = "act",

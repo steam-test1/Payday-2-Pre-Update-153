@@ -102,7 +102,9 @@ function UpgradesTweakData:_init_pd2_values()
 	self.max_weapon_dmg_mul_stacks = 5
 	self.hostage_near_player_radius = 1000
 	self.hostage_near_player_check_t = 0.5
-	self.hostage_near_player_multiplier = 10.25
+	self.hostage_near_player_multiplier = 1.25
+	self.weapon_movement_penalty = {}
+	self.weapon_movement_penalty.lmg = 0.8
 	self.values.player.crime_net_deal = {0.9, 0.8}
 	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
@@ -356,7 +358,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.overkill_health_to_damage_multiplier = {0.66}
 	self.values.player.tased_recover_multiplier = {0.5}
-	self.values.player.armor_regen_timer_stand_still_multiplier = {10}
+	self.values.player.armor_regen_timer_stand_still_multiplier = {1.1}
 	self.values.player.secured_bags_speed_multiplier = {1.02}
 	self.values.temporary.no_ammo_cost_buff = {
 		{true, 60}
@@ -394,6 +396,23 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.steelsight_normal_movement_speed = {true}
 	self.values.team.weapon.move_spread_multiplier = {1.1}
 	self.values.team.player.civ_intimidation_mul = {1.15}
+	self.values.sentry_gun.can_revive = {true}
+	self.values.sentry_gun.can_reload = {true}
+	self.sentry_gun_reload_ratio = 1
+	self.values.weapon.modded_damage_multiplier = {1.1}
+	self.values.weapon.modded_spread_multiplier = {0.9}
+	self.values.weapon.modded_recoil_multiplier = {0.9}
+	self.values.sentry_gun.armor_piercing_chance = {0.15}
+	self.values.sentry_gun.armor_piercing_chance_2 = {0.05}
+	self.values.weapon.armor_piercing_chance_2 = {0.05}
+	self.values.player.headshot_regen_armor_bonus = {0.05}
+	self.values.player.resist_firing_tased = {true}
+	self.values.player.crouch_dodge_chance = {0.1}
+	self.values.player.climb_speed_multiplier = {1.33, 1.75}
+	self.values.team.xp.stealth_multiplier = {1.5}
+	self.values.team.cash.stealth_money_multiplier = {1.5}
+	self.values.team.cash.stealth_bags_multiplier = {1.5}
+	self.values.player.close_to_hostage_boost = {true}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1099,6 +1118,9 @@ function UpgradesTweakData:init()
 	self:_mp7_definitions()
 	self:_scar_definitions()
 	self:_p226_definitions()
+	self:_hk21_definitions()
+	self:_m249_definitions()
+	self:_rpk_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1171,6 +1193,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.team.armor = {}
 	self.values.team.stamina = {}
 	self.values.team.health = {}
+	self.values.team.cash = {}
 end
 
 function UpgradesTweakData:_init_values()
@@ -1694,6 +1717,15 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "hostage_health_regen_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_close_to_hostage_boost = {
+		category = "temporary",
+		name_id = "menu_player_close_to_hostage_boost",
+		upgrade = {
+			category = "player",
+			upgrade = "close_to_hostage_boost",
 			value = 1
 		}
 	}
@@ -2674,6 +2706,15 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.weapon_armor_piercing_chance_2 = {
+		category = "feature",
+		name_id = "menu_weapon_armor_piercing_chance_2",
+		upgrade = {
+			category = "weapon",
+			upgrade = "armor_piercing_chance_2",
+			value = 1
+		}
+	}
 	self.definitions.weapon_silencer_armor_piercing_chance = {
 		category = "feature",
 		name_id = "menu_weapon_silencer_armor_piercing_chance",
@@ -2906,6 +2947,51 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "steelsight_normal_movement_speed",
 			value = 1
+		}
+	}
+	self.definitions.player_headshot_regen_armor_bonus = {
+		category = "feature",
+		name_id = "menu_player_headshot_regen_armor_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "headshot_regen_armor_bonus",
+			value = 1
+		}
+	}
+	self.definitions.player_resist_firing_tased = {
+		category = "feature",
+		name_id = "menu_player_resist_firing_tased",
+		upgrade = {
+			category = "player",
+			upgrade = "resist_firing_tased",
+			value = 1
+		}
+	}
+	self.definitions.player_crouch_dodge_chance = {
+		category = "feature",
+		name_id = "menu_player_crouch_dodge_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "crouch_dodge_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_climb_speed_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_player_climb_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "climb_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_climb_speed_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_player_climb_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "climb_speed_multiplier",
+			value = 2
 		}
 	}
 	self.definitions.toolset = {
@@ -3459,6 +3545,42 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "shield",
+			value = 1
+		}
+	}
+	self.definitions.sentry_gun_can_revive = {
+		category = "feature",
+		name_id = "menu_sentry_gun_can_revive",
+		upgrade = {
+			category = "sentry_gun",
+			upgrade = "can_revive",
+			value = 1
+		}
+	}
+	self.definitions.sentry_gun_can_reload = {
+		category = "feature",
+		name_id = "menu_sentry_gun_can_reload",
+		upgrade = {
+			category = "sentry_gun",
+			upgrade = "can_reload",
+			value = 1
+		}
+	}
+	self.definitions.sentry_gun_armor_piercing_chance = {
+		category = "feature",
+		name_id = "menu_sentry_gun_armor_piercing_chance",
+		upgrade = {
+			category = "sentry_gun",
+			upgrade = "armor_piercing_chance",
+			value = 1
+		}
+	}
+	self.definitions.sentry_gun_armor_piercing_chance_2 = {
+		category = "feature",
+		name_id = "menu_sentry_gun_armor_piercing_chance_2",
+		upgrade = {
+			category = "sentry_gun",
+			upgrade = "armor_piercing_chance_2",
 			value = 1
 		}
 	}
@@ -4206,7 +4328,61 @@ function UpgradesTweakData:_p226_definitions()
 	}
 end
 
+function UpgradesTweakData:_hk21_definitions()
+	self.definitions.hk21 = {
+		category = "weapon",
+		weapon_id = "hk21",
+		factory_id = "wpn_fps_lmg_hk21",
+		dlc = "gage_pack_lmg"
+	}
+end
+
+function UpgradesTweakData:_m249_definitions()
+	self.definitions.m249 = {
+		category = "weapon",
+		weapon_id = "m249",
+		factory_id = "wpn_fps_lmg_m249",
+		dlc = "gage_pack_lmg"
+	}
+end
+
+function UpgradesTweakData:_rpk_definitions()
+	self.definitions.rpk = {
+		category = "weapon",
+		weapon_id = "rpk",
+		factory_id = "wpn_fps_lmg_rpk",
+		dlc = "gage_pack_lmg"
+	}
+end
+
 function UpgradesTweakData:_weapon_definitions()
+	self.definitions.weapon_modded_damage_multiplier = {
+		category = "feature",
+		name_id = "menu_modded_damage_multiplier",
+		upgrade = {
+			category = "weapon",
+			upgrade = "modded_damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.weapon_modded_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_modded_spread_multiplier",
+		upgrade = {
+			category = "weapon",
+			upgrade = "modded_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.weapon_modded_recoil_multiplier = {
+		category = "feature",
+		name_id = "menu_modded_recoil_multiplier",
+		upgrade = {
+			category = "weapon",
+			upgrade = "modded_recoil_multiplier",
+			value = 1
+		}
+	}
 	self.definitions.weapon_clip_ammo_increase_1 = {
 		category = "feature",
 		name_id = "menu_weapon_clip_ammo_increase_1",
@@ -4870,6 +5046,33 @@ function UpgradesTweakData:_team_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "civ_intimidation_mul",
+			value = 1
+		}
+	}
+	self.definitions.team_xp_stealth_multiplier = {
+		category = "team",
+		name_id = "menu_team_xp_stealth_multiplier",
+		upgrade = {
+			category = "xp",
+			upgrade = "stealth_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.team_cash_stealth_multiplier = {
+		category = "team",
+		name_id = "menu_team_cash_stealth_multiplier",
+		upgrade = {
+			category = "cash",
+			upgrade = "stealth_money_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.team_bags_stealth_multiplier = {
+		category = "team",
+		name_id = "menu_team_bags_stealth_multiplier",
+		upgrade = {
+			category = "cash",
+			upgrade = "stealth_bags_multiplier",
 			value = 1
 		}
 	}
@@ -5590,100 +5793,6 @@ function UpgradesTweakData:_mossberg_definitions()
 			upgrade = {
 				category = "mossberg",
 				upgrade = "recoil_multiplier",
-				value = i
-			}
-		}
-	end
-end
-
-function UpgradesTweakData:_hk21_definitions()
-	self.definitions.hk21 = {
-		tree = 1,
-		step = 22,
-		category = "weapon",
-		weapon_id = "hk21",
-		unit_name = Idstring("units/weapons/hk21/hk21"),
-		name_id = "debug_hk21",
-		title_id = "debug_upgrade_new_weapon",
-		subtitle_id = "debug_hk21_short",
-		icon = "hk21",
-		image = "upgrades_hk21",
-		image_slice = "upgrades_hk21_slice",
-		unlock_lvl = 140,
-		prio = "high",
-		description_text_id = "des_hk21"
-	}
-	for i, _ in ipairs(self.values.hk21.clip_ammo_increase) do
-		local depends_on = i - 1 > 0 and "hk21_mag" .. i - 1 or "hk21"
-		local unlock_lvl = 141
-		local prio = i == 1 and "high"
-		self.definitions["hk21_mag" .. i] = {
-			tree = 1,
-			step = self.steps.hk21.clip_ammo_increase[i],
-			category = "feature",
-			name_id = "debug_upgrade_hk21_mag" .. i,
-			title_id = "debug_hk21_short",
-			subtitle_id = "debug_upgrade_mag" .. i,
-			icon = "hk21",
-			image = "upgrades_hk21",
-			image_slice = "upgrades_hk21_slice",
-			description_text_id = "clip_ammo_increase",
-			depends_on = depends_on,
-			unlock_lvl = unlock_lvl,
-			prio = prio,
-			upgrade = {
-				category = "hk21",
-				upgrade = "clip_ammo_increase",
-				value = i
-			}
-		}
-	end
-	for i, _ in ipairs(self.values.hk21.recoil_multiplier) do
-		local depends_on = i - 1 > 0 and "hk21_recoil" .. i - 1 or "hk21"
-		local unlock_lvl = 141
-		local prio = i == 1 and "high"
-		self.definitions["hk21_recoil" .. i] = {
-			tree = 1,
-			step = self.steps.hk21.recoil_multiplier[i],
-			category = "feature",
-			name_id = "debug_upgrade_hk21_recoil" .. i,
-			title_id = "debug_hk21_short",
-			subtitle_id = "debug_upgrade_recoil" .. i,
-			icon = "hk21",
-			image = "upgrades_hk21",
-			image_slice = "upgrades_hk21_slice",
-			description_text_id = "recoil_multiplier",
-			depends_on = depends_on,
-			unlock_lvl = unlock_lvl,
-			prio = prio,
-			upgrade = {
-				category = "hk21",
-				upgrade = "recoil_multiplier",
-				value = i
-			}
-		}
-	end
-	for i, _ in ipairs(self.values.hk21.damage_multiplier) do
-		local depends_on = i - 1 > 0 and "hk21_damage" .. i - 1 or "hk21"
-		local unlock_lvl = 141
-		local prio = i == 1 and "high"
-		self.definitions["hk21_damage" .. i] = {
-			tree = 1,
-			step = self.steps.hk21.damage_multiplier[i],
-			category = "feature",
-			name_id = "debug_upgrade_hk21_damage" .. i,
-			title_id = "debug_hk21_short",
-			subtitle_id = "debug_upgrade_damage" .. i,
-			icon = "hk21",
-			image = "upgrades_hk21",
-			image_slice = "upgrades_hk21_slice",
-			description_text_id = "damage_multiplier",
-			depends_on = depends_on,
-			unlock_lvl = unlock_lvl,
-			prio = prio,
-			upgrade = {
-				category = "hk21",
-				upgrade = "damage_multiplier",
 				value = i
 			}
 		}

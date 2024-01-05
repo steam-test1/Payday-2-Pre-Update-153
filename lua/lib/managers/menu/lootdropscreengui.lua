@@ -256,10 +256,10 @@ end
 
 function LootDropScreenGui:mouse_moved(x, y)
 	if self._no_loot_for_me then
-		return
+		return false
 	end
 	if not (alive(self._panel) and alive(self._fullscreen_panel)) or not self._enabled then
-		return
+		return false
 	end
 	if self._button_not_clickable then
 		self._continue_button:set_color(tweak_data.screen_colors.item_stage_1)
@@ -269,18 +269,20 @@ function LootDropScreenGui:mouse_moved(x, y)
 			self._continue_button:set_color(tweak_data.screen_colors.button_stage_2)
 			managers.menu_component:post_event("highlight")
 		end
+		return true, "link"
 	elseif self._continue_button_highlighted then
 		self._continue_button_highlighted = false
 		self._continue_button:set_color(tweak_data.screen_colors.button_stage_3)
 	end
 	if self._card_chosen then
-		return
+		return false
 	end
 	if self._lootscreen_hud then
 		local inside = self._lootscreen_hud:check_inside_local_peer(managers.mouse_pointer:modified_fullscreen_16_9_mouse_pos())
 		if inside then
 			self:_set_selected_and_sync(inside)
 		end
+		return inside, "link"
 	end
 end
 

@@ -2,15 +2,16 @@ SpecialObjectiveGroupElement = SpecialObjectiveGroupElement or class(MissionElem
 
 function SpecialObjectiveGroupElement:init(unit)
 	SpecialObjectiveGroupElement.super.init(self, unit)
-	self._enemies = {}
 	self._hed.base_chance = 1
 	self._hed.use_instigator = false
 	self._hed.followup_elements = nil
 	self._hed.spawn_instigator_ids = nil
+	self._hed.mode = "randomizer"
 	table.insert(self._save_values, "base_chance")
 	table.insert(self._save_values, "use_instigator")
 	table.insert(self._save_values, "followup_elements")
 	table.insert(self._save_values, "spawn_instigator_ids")
+	table.insert(self._save_values, "mode")
 end
 
 function SpecialObjectiveGroupElement:post_init()
@@ -152,6 +153,24 @@ function SpecialObjectiveGroupElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	local mode_params = {
+		name = "Mode:",
+		panel = panel,
+		sizer = panel_sizer,
+		options = {
+			"randomizer",
+			"forced_spawn",
+			"recurring_cloaker_spawn",
+			"recurring_spawn_1"
+		},
+		value = self._hed.mode,
+		tooltip = "Randomizer: assigns SOs to instigators. Forced Spawn: Will spawn a new group of choice. Recurring: Spawns new group. After failure, a new group will be spawned with a delay.",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sorted = false
+	}
+	local mode = CoreEws.combobox(mode_params)
+	mode:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = mode, value = "mode"})
 	local use_instigator = EWS:CheckBox(panel, "Use instigator", "")
 	use_instigator:set_value(self._hed.use_instigator)
 	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {

@@ -1010,14 +1010,11 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			wpn_fps_ass_scar = {
 				translation = Vector3(0, 0, -0.25)
 			},
-			wpn_fps_smg_tec9 = {
+			wpn_fps_lmg_hk21 = {
 				translation = Vector3(0, 0, -3.2)
 			},
-			wpn_fps_shot_benelli = {
-				translation = Vector3(0, 0, -0.25)
-			},
-			wpn_fps_pis_g22c = {
-				translation = Vector3(0, 0, -1)
+			wpn_fps_lmg_m249 = {
+				translation = Vector3(0, 0, -3.2)
 			}
 		},
 		forbids = {
@@ -3280,6 +3277,11 @@ function WeaponFactoryTweakData:_init_ak5()
 		},
 		adds = {
 			"wpn_fps_ass_ak5_s_ak5a"
+		},
+		stance_mod = {
+			wpn_fps_ass_ak5 = {
+				translation = Vector3(0, -8, 0)
+			}
 		}
 	}
 	self.parts.wpn_fps_ass_ak5_s_ak5c = {

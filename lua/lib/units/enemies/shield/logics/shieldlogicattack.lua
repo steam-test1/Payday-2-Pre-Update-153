@@ -11,9 +11,13 @@ function ShieldLogicAttack.enter(data, new_logic_name, enter_params)
 	my_data.tmp_vec1 = Vector3()
 	if old_internal_data then
 		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
+		my_data.turning = old_internal_data.turning
+		my_data.firing = old_internal_data.firing
+		my_data.shooting = old_internal_data.shooting
+		my_data.attention_unit = old_internal_data.attention_unit
 	end
 	local key_str = tostring(data.key)
-	CopLogicTravel.reset_actions(data, my_data, old_internal_data, CopLogicTravel.allowed_transitional_actions)
+	CopLogicIdle._chk_has_old_action(data, my_data)
 	my_data.attitude = data.objective and data.objective.attitude or "avoid"
 	data.unit:brain():set_update_enabled_state(false)
 	if not data.attack_sound_t or data.t - data.attack_sound_t > 40 then
@@ -54,6 +58,12 @@ function ShieldLogicAttack.queued_update(data)
 	local my_data = data.internal_data
 	ShieldLogicAttack._upd_enemy_detection(data)
 	if my_data ~= data.internal_data then
+		return
+	end
+	if my_data.has_old_action then
+		CopLogicAttack._upd_stop_old_action(data, my_data)
+		ShieldLogicAttack.queue_update(data, my_data)
+		CopLogicBase._report_detections(data.detected_attention_objects)
 		return
 	end
 	if not data.attention_obj or data.attention_obj.reaction < AIAttentionObject.REACT_AIM then
@@ -407,6 +417,7 @@ function ShieldLogicAttack.action_complete_clbk(data, action)
 	local my_data = data.internal_data
 	local action_type = action:type()
 	if action_type == "walk" then
+		my_data.advancing = nil
 		if my_data.rsrv_pos.stand then
 			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
 			my_data.rsrv_pos.stand = nil

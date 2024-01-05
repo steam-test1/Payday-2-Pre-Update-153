@@ -196,11 +196,6 @@ function CopActionShoot:save(save_data)
 	save_data.body_part = 3
 end
 
-function CopActionShoot:get_husk_interrupt_desc()
-	local desc = {type = "shoot", body_part = 3}
-	return desc
-end
-
 function CopActionShoot:on_exit()
 	if Network:is_server() then
 		self._ext_movement:set_stance("hos")

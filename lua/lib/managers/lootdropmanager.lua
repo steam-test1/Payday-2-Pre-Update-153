@@ -171,8 +171,22 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 	return droppable_items, maxed_inventory_items
 end
 
-function LootDropManager:infamous_chance()
-	return tweak_data.lootdrop.global_values.infamous.chance
+function LootDropManager:infamous_chance(setup_data)
+	local infamous_diff = 1
+	if not setup_data or not setup_data.disable_difficulty then
+		local difficulty_stars = managers.job:current_difficulty_stars() or 0
+		infamous_diff = tweak_data.lootdrop.risk_infamous_multiplier[difficulty_stars] or 1
+	end
+	local chance = tweak_data.lootdrop.global_values.infamous.chance
+	local multiplier = managers.player:upgrade_value("player", "passive_loot_drop_multiplier", 1) * managers.player:upgrade_value("player", "loot_drop_multiplier", 1) * infamous_diff * (setup_data and setup_data.increase_infamous or 1)
+	if 0 < managers.experience:current_rank() then
+		for infamy, item in pairs(tweak_data.infamy.items) do
+			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.infamous_lootdrop then
+				multiplier = multiplier * item.upgrades.infamous_lootdrop
+			end
+		end
+	end
+	return chance * multiplier, chance, multiplier
 end
 
 function LootDropManager:new_make_drop(return_data, setup_data)
@@ -225,17 +239,11 @@ function LootDropManager:_new_make_drop(debug, add_to_inventory, debug_stars, re
 			break
 		end
 	end
-	local infamous_chance = self:infamous_chance()
-	local infamous_diff = 1
-	if not setup_data or not setup_data.disable_difficulty then
-		local difficulty_stars = managers.job:current_difficulty_stars() or 0
-		infamous_diff = tweak_data.lootdrop.risk_infamous_multiplier[difficulty_stars] or 1
-	end
-	local infamous_mod = managers.player:upgrade_value("player", "passive_loot_drop_multiplier", 1) * managers.player:upgrade_value("player", "loot_drop_multiplier", 1) * infamous_diff * (setup_data and setup_data.increase_infamous or 1)
+	local infamous_chance, infamous_base_chance, infamous_base_multiplier = self:infamous_chance(setup_data)
 	local infamous_roll = math.rand(1)
-	local infamous_success = infamous_roll < infamous_chance * infamous_mod
+	local infamous_success = infamous_chance > infamous_roll
 	if not debug then
-		print("infamous_success", infamous_success, "infamous_roll", infamous_roll, "infamous_chance*infamous_mod", infamous_chance * infamous_mod, "infamous_chance", infamous_chance, "infamous_mod", infamous_mod)
+		print("infamous_success", infamous_success, "infamous_roll", infamous_roll, "infamous_chance", infamous_chance, "infamous_base_chance", infamous_base_chance, "infamous_base_multiplier", infamous_base_multiplier)
 	end
 	local droppable_items, maxed_inventory_items = self:droppable_items(item_pc, infamous_success, setup_data and setup_data.skip_types)
 	local weighted_type_chance = {}

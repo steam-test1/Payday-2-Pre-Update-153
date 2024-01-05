@@ -21,7 +21,7 @@ function CopLogicFlee.enter(data, new_logic_name, enter_params)
 		end
 	end
 	data.internal_data = my_data
-	if data.unit:movement():chk_action_forbidden("walk") and data.unit:movement()._active_actions[2] then
+	if data.unit:movement():chk_action_forbidden("walk") then
 		my_data.wants_stop_old_walk_action = true
 	end
 	local key_str = tostring(data.key)

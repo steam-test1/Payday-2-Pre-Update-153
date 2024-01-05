@@ -132,7 +132,7 @@ end
 
 function CivilianLogicIdle._enable_outline(data)
 	local my_data = data.internal_data
-	data.unit:base():set_contour(true)
+	data.unit:contour():add("highlight")
 	data.has_outline = true
 	data.been_outlined = true
 	my_data.outline_detection_task_key = nil

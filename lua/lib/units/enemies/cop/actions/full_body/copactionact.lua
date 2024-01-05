@@ -78,7 +78,13 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_car_exit_ntrl_front_r",
 	"e_sp_car_exit_ntrl_front_l",
 	"e_sp_down_5_5m",
-	"e_sp_up_ledge"
+	"e_sp_up_ledge",
+	"e_sp_clk_3m_dwn_vent",
+	"e_sp_clk_3_5m_dwn_vent",
+	"e_sp_clk_up_manhole",
+	"e_sp_clk_up_water",
+	"e_sp_clk_over_2_5m",
+	"e_sp_clk_jump_dwn_5m_heli_l"
 }
 CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_dj_loop",
@@ -271,6 +277,10 @@ CopActionAct._act_redirects.SO = {
 	"e_so_container_kick",
 	"e_so_not_dizzy_look_v2",
 	"e_so_not_dizzy_look",
+	"e_so_hide_under_car_enter",
+	"e_so_hide_2_5m_vent_enter",
+	"e_so_hide_behind_door_enter",
+	"e_so_hide_ledge_enter",
 	"cmf_so_lean_r_wall",
 	"cmf_so_lean_bar",
 	"cmf_so_call_police",
@@ -560,6 +570,7 @@ function CopActionAct:save(save_data)
 		local state_index = self._machine:state_name_to_index(state_name)
 		save_data.variant = state_index
 	end
+	save_data.pos_z = mvector3.z(self._common_data.pos)
 end
 
 function CopActionAct:need_upd()
@@ -613,6 +624,7 @@ function CopActionAct:_play_anim()
 	if type(self._action_desc.variant) == "number" then
 		redir_name = self._machine:index_to_state_name(self._action_desc.variant)
 		redir_res = self._ext_movement:play_state_idstr(redir_name, self._action_desc.start_anim_time)
+		self._unit:movement():set_position(self._unit:movement():m_pos():with_z(self._action_desc.pos_z))
 	else
 		redir_name = self._action_desc.variant
 		redir_res = self._ext_movement:play_redirect(redir_name, self._action_desc.start_anim_time)

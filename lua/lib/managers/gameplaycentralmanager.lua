@@ -2,9 +2,6 @@ local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
 local empty_idstr = Idstring("")
 local idstr_concrete = Idstring("concrete")
-local idstr_contour_color = Idstring("contour_color")
-local idstr_contour_opacity = Idstring("contour_opacity")
-local idstr_material = Idstring("material")
 local idstr_blood_spatter = Idstring("blood_spatter")
 local idstr_blood_screen = Idstring("effects/particles/character/player/blood_screen")
 local idstr_bullet_hit_blood = Idstring("effects/payday2/particles/impacts/blood/blood_impact_a")
@@ -24,13 +21,6 @@ function GamePlayCentralManager:init()
 	self._slotmask_physics_push = managers.slot:get_mask("bullet_physics_push")
 	self._slotmask_footstep = managers.slot:get_mask("footstep")
 	self._slotmask_bullet_impact_targets = managers.slot:get_mask("bullet_impact_targets")
-	self._contour = {
-		index = 1,
-		units = {}
-	}
-	self._enemy_contour_units = {}
-	self._friendly_contour_units = {}
-	self._marked_contour_units = {}
 	self:_init_impact_sources()
 	local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	self._flashlights_on = lvl_tweak_data and lvl_tweak_data.flashlights_on
@@ -127,118 +117,7 @@ function GamePlayCentralManager:update(t, dt)
 			self:next_weapon()
 		end
 	end
-	if #self._contour.units > 0 then
-		local cam_pos = managers.viewport:get_current_camera_position()
-		if not cam_pos then
-			return
-		end
-		local data = self._contour.units[self._contour.index]
-		local unit = data.unit
-		local on = false
-		if mvector3.distance_sq(cam_pos, data.movement:m_com()) > 16000000 then
-			on = true
-		else
-			on = unit:raycast("ray", data.movement:m_com(), cam_pos, "slot_mask", self._slotmask_world_geometry, "report")
-		end
-		data.target_opacity = on and 0.65 or 0
-		if data.type == "character" then
-			local anim_data = data.anim_data
-			local downed = anim_data.bleedout or anim_data.fatal
-			local dead = anim_data.death
-			local hands_tied = anim_data.hands_tied
-			on = downed or dead or hands_tied
-			local color_id = managers.criminals:character_color_id_by_unit(unit)
-			data.target_color = dead and data.dead_color or (hands_tied or downed) and data.downed_color or color_id and tweak_data.peer_vector_colors[color_id] or data.standard_color
-			data.target_opacity = on and (downed or dead or hands_tied) and 1 or data.target_opacity
-		end
-		if data.color ~= data.target_color then
-			data.color = math.step(data.color, data.target_color, 6 * dt)
-			for _, material in ipairs(data.materials) do
-				material:set_variable(idstr_contour_color, data.color)
-			end
-		end
-		if 0 < data.flash then
-			data.flash = math.max(0, data.flash - dt * 2)
-			local o = math.sin(data.flash * 360 + 45)
-			data.target_opacity = math.max(0, math.min(1, o))
-		end
-		if data.opacity ~= data.target_opacity then
-			data.opacity = math.step(data.opacity, data.target_opacity, 6 * dt)
-			for _, material in ipairs(data.materials) do
-				material:set_variable(idstr_contour_opacity, data.opacity)
-			end
-		end
-		self._contour.index = self._contour.index + 1
-		self._contour.index = self._contour.index <= #self._contour.units and self._contour.index or 1
-	end
-	for key, data in pairs(self._friendly_contour_units) do
-		local unit = data.unit
-		if not alive(unit) then
-			self._friendly_contour_units[key] = nil
-			managers.occlusion:add_occlusion(unit)
-		elseif unit:character_damage() and unit:character_damage():dead() then
-			self._friendly_contour_units[key] = nil
-			managers.occlusion:add_occlusion(unit)
-			unit:base():swap_material_config()
-			unit:base():set_allow_invisible(true)
-		end
-	end
-	for key, data in pairs(self._enemy_contour_units) do
-		local unit = data.unit
-		if not alive(unit) then
-			self._enemy_contour_units[key] = nil
-			managers.occlusion:add_occlusion(unit)
-		else
-			if data.color ~= data.target_color then
-				data.color = math.step(data.color, data.target_color, 0.3 * dt)
-				for _, material in ipairs(data.materials) do
-					material:set_variable(idstr_contour_color, data.color)
-				end
-			end
-			if data.opacity ~= data.target_opacity then
-				if unit:character_damage():dead() then
-					data.opacity = data.target_opacity
-				else
-					data.opacity = math.step(data.opacity, data.target_opacity, 0.3 * dt)
-				end
-				for _, material in ipairs(data.materials) do
-					material:set_variable(idstr_contour_opacity, math.min(1.5, data.opacity))
-				end
-			end
-			if data.opacity == data.target_opacity then
-				self._enemy_contour_units[key] = nil
-				managers.occlusion:add_occlusion(unit)
-				unit:base():swap_material_config()
-				unit:base():set_allow_invisible(true)
-				unit:character_damage():on_marked_state(false)
-			end
-		end
-	end
-	for key, data in pairs(self._marked_contour_units) do
-		local unit = data.unit
-		if not alive(unit) then
-			self._marked_contour_units[key] = nil
-			managers.occlusion:add_occlusion(unit)
-		else
-			if data.color ~= data.target_color then
-				data.color = math.step(data.color, data.target_color, 0.3 * dt)
-				for _, material in ipairs(data.materials) do
-					material:set_variable(idstr_contour_color, data.color)
-				end
-			end
-			if data.opacity ~= data.target_opacity then
-				data.opacity = math.step(data.opacity, data.target_opacity, 0.3 * dt)
-				for _, material in ipairs(data.materials) do
-					material:set_variable(idstr_contour_opacity, math.min(1.5, data.opacity))
-				end
-			end
-			if data.opacity == data.target_opacity then
-				self._marked_contour_units[key] = nil
-				managers.occlusion:add_occlusion(unit)
-			end
-		end
-	end
-	if 0 < #self._dropped_weapons.units then
+	if #self._dropped_weapons.units > 0 then
 		local data = self._dropped_weapons.units[self._dropped_weapons.index]
 		local unit = data.unit
 		data.t = data.t + (t - data.last_t)
@@ -281,120 +160,6 @@ function GamePlayCentralManager:update(t, dt)
 	end
 end
 
-function GamePlayCentralManager:add_enemy_contour(unit, marking_strength, time_multiplier)
-	if not self._enemy_contour_units[unit:key()] then
-		unit:base():swap_material_config()
-		managers.occlusion:remove_occlusion(unit)
-		unit:base():set_allow_invisible(false)
-	elseif unit:base():is_in_original_material() then
-		unit:base():swap_material_config()
-	end
-	unit:character_damage():on_marked_state(marking_strength)
-	local color = marking_strength and tweak_data.contour.character.more_dangerous_color or tweak_data.contour.character.dangerous_color
-	local materials = unit:get_objects_by_type(idstr_material)
-	for _, m in ipairs(materials) do
-		m:set_variable(idstr_contour_color, color)
-		m:set_variable(idstr_contour_opacity, 0)
-	end
-	self._enemy_contour_units[unit:key()] = {
-		unit = unit,
-		materials = materials,
-		color = color,
-		target_color = color,
-		opacity = (tweak_data.character[unit:base()._tweak_table].silent_priority_shout and 4.5 or 1.5) * (time_multiplier or 1),
-		target_opacity = 0
-	}
-end
-
-function GamePlayCentralManager:add_friendly_contour(unit)
-	if not self._friendly_contour_units[unit:key()] then
-		unit:base():swap_material_config()
-		managers.occlusion:remove_occlusion(unit)
-		unit:base():set_allow_invisible(false)
-	end
-	local color = tweak_data.contour.character.friendly_color
-	local materials = unit:get_objects_by_type(idstr_material)
-	for _, m in ipairs(materials) do
-		m:set_variable(idstr_contour_color, color)
-		m:set_variable(idstr_contour_opacity, 1)
-	end
-	self._friendly_contour_units[unit:key()] = {unit = unit, materials = materials}
-end
-
-function GamePlayCentralManager:add_marked_contour_unit(unit)
-	managers.occlusion:remove_occlusion(unit)
-	local color = tweak_data.contour.character.dangerous_color
-	local materials = unit:get_objects_by_type(idstr_material)
-	for _, m in ipairs(materials) do
-		m:set_variable(idstr_contour_color, color)
-		m:set_variable(idstr_contour_opacity, 0)
-	end
-	self._marked_contour_units[unit:key()] = {
-		unit = unit,
-		materials = materials,
-		color = color,
-		target_color = color,
-		opacity = 1.5,
-		target_opacity = 0
-	}
-end
-
-function GamePlayCentralManager:add_contour_unit(unit, type)
-	local standard_color = tweak_data.contour[type].standard_color
-	local downed_color = tweak_data.contour[type].downed_color
-	local dead_color = tweak_data.contour[type].dead_color
-	local materials = unit:get_objects_by_type(idstr_material)
-	for _, m in ipairs(materials) do
-		m:set_variable(idstr_contour_color, standard_color)
-		m:set_variable(idstr_contour_opacity, 0)
-	end
-	table.insert(self._contour.units, {
-		unit = unit,
-		type = type,
-		anim_data = unit:anim_data(),
-		movement = unit:movement(),
-		materials = materials,
-		standard_color = standard_color,
-		downed_color = downed_color,
-		dead_color = dead_color,
-		color = standard_color,
-		target_color = standard_color,
-		opacity = 0,
-		target_opacity = 0,
-		flash = 0
-	})
-	self._contour.index = 1
-end
-
-function GamePlayCentralManager:change_contour_material_by_unit(unit)
-	for _, contour_data in ipairs(self._contour.units) do
-		if contour_data.unit == unit then
-			local materials = unit:get_objects_by_type(idstr_material)
-			contour_data.materials = materials
-			break
-		end
-	end
-end
-
-function GamePlayCentralManager:remove_contour_unit(unit)
-	for i, data in pairs(self._contour.units) do
-		if data.unit == unit then
-			table.remove(self._contour.units, i)
-			break
-		end
-	end
-	self._contour.index = 1
-end
-
-function GamePlayCentralManager:flash_contour(unit)
-	for i, data in pairs(self._contour.units) do
-		if data.unit == unit then
-			data.flash = 3
-			break
-		end
-	end
-end
-
 function GamePlayCentralManager:end_update(t, dt)
 	self._camera_pos = managers.viewport:get_current_camera_position()
 	self:_flush_bullet_hits()
@@ -416,8 +181,9 @@ function GamePlayCentralManager:request_play_footstep(unit, m_pos)
 	end
 end
 
-function GamePlayCentralManager:physics_push(col_ray)
+function GamePlayCentralManager:physics_push(col_ray, push_multiplier)
 	local unit = col_ray.unit
+	push_multiplier = push_multiplier or 1
 	if unit:in_slot(self._slotmask_physics_push) then
 		local body = col_ray.body
 		if not body:dynamic() then
@@ -437,7 +203,7 @@ function GamePlayCentralManager:physics_push(col_ray)
 				i_body = i_body + 1
 			end
 		end
-		local body_mass = math.min(50, body:mass())
+		local body_mass = math.min(50, body:mass()) * push_multiplier
 		local len = mvector3.distance(col_ray.position, body:center_of_mass())
 		local body_vel = body:velocity()
 		mvector3.set(tmp_vec1, col_ray.ray)
@@ -445,7 +211,7 @@ function GamePlayCentralManager:physics_push(col_ray)
 		local max_vel = 600
 		if vel_dot < max_vel then
 			local push_vel = max_vel - math.max(vel_dot, 0)
-			push_vel = math.lerp(push_vel * 0.7, push_vel, math.random())
+			push_vel = math.lerp(push_vel * 0.7, push_vel, math.random()) * push_multiplier
 			mvector3.multiply(tmp_vec1, push_vel)
 			body:push_at(body_mass, tmp_vec1, col_ray.position)
 		end
@@ -563,7 +329,7 @@ function GamePlayCentralManager:_play_bullet_hit(params)
 	mvector3.add(decal_ray_from, hit_pos)
 	local material_name, pos, norm = World:pick_decal_material(col_ray.unit, decal_ray_from, decal_ray_to, slot_mask)
 	material_name = material_name ~= empty_idstr and material_name
-	local effect
+	local effect = params.effect
 	if material_name then
 		local offset = col_ray.sphere_cast_radius and col_ray.ray * col_ray.sphere_cast_radius or zero_vector
 		local redir_name
@@ -577,7 +343,7 @@ function GamePlayCentralManager:_play_bullet_hit(params)
 		end
 		if need_effect then
 			effect = {
-				effect = redir_name,
+				effect = effect or redir_name,
 				position = hit_pos + offset,
 				normal = col_ray.normal
 			}
@@ -585,7 +351,7 @@ function GamePlayCentralManager:_play_bullet_hit(params)
 		sound_switch_name = need_sound and material_name
 	else
 		if need_effect then
-			local generic_effect = idstr_fallback
+			local generic_effect = effect or idstr_fallback
 			effect = {
 				effect = generic_effect,
 				position = hit_pos,

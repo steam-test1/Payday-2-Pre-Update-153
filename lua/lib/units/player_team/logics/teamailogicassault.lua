@@ -83,11 +83,11 @@ function TeamAILogicAssault.update(data)
 	my_data.want_to_take_cover = CopLogicAttack._chk_wants_to_take_cover(data, my_data)
 	local want_to_take_cover = my_data.want_to_take_cover
 	if not action_taken then
-		if not (not want_to_take_cover or in_cover and in_cover[4]) or data.char_tweak.no_stand then
+		if not (not want_to_take_cover or in_cover and in_cover[4]) or data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.stand then
 			if not unit:anim_data().crouch then
 				action_taken = CopLogicAttack._chk_request_action_crouch(data)
 			end
-		elseif unit:anim_data().crouch and (not data.char_tweak.allow_crouch or my_data.cover_test_step > 2) then
+		elseif unit:anim_data().crouch and data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses.crouch then
 			action_taken = CopLogicAttack._chk_request_action_stand(data)
 		end
 	end
@@ -175,7 +175,7 @@ end
 function TeamAILogicAssault.find_enemy_to_mark(enemies)
 	local best_nmy, best_nmy_wgt
 	for key, attention_info in pairs(enemies) do
-		if attention_info.identified and (attention_info.verified or attention_info.nearly_visible) and attention_info.is_person and attention_info.char_tweak and attention_info.char_tweak.priority_shout and attention_info.reaction >= AIAttentionObject.REACT_COMBAT and (not best_nmy_wgt or best_nmy_wgt > attention_info.verified_dis) then
+		if attention_info.identified and (attention_info.verified or attention_info.nearly_visible) and attention_info.is_person and attention_info.char_tweak and attention_info.char_tweak.priority_shout and attention_info.reaction >= AIAttentionObject.REACT_COMBAT and (not attention_info.char_tweak.priority_shout_max_dis or attention_info.dis < attention_info.char_tweak.priority_shout_max_dis) and (not best_nmy_wgt or best_nmy_wgt > attention_info.verified_dis) then
 			best_nmy_wgt = attention_info.verified_dis
 			best_nmy = attention_info.unit
 		end
@@ -198,7 +198,7 @@ function TeamAILogicAssault.mark_enemy(data, criminal, to_mark, play_sound, play
 			data.internal_data.gesture_arrest = true
 		end
 	end
-	managers.game_play_central:add_enemy_contour(to_mark, false, 1)
+	to_mark:contour():add("mark_enemy", false, 1)
 	managers.network:session():send_to_peers_synched("mark_enemy", to_mark, false, 1)
 end
 

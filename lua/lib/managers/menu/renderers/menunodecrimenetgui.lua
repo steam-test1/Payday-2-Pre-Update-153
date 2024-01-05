@@ -562,8 +562,8 @@ function MenuNodeCrimenetCasinoGui:_setup_layout()
 			end
 		end
 	end
-	local infamous_chance = 0 < items_total and managers.lootdrop:infamous_chance() * (items_infamous / items_total) or 0
-	local infamous_mod = managers.player:upgrade_value("player", "passive_loot_drop_multiplier", 1) * managers.player:upgrade_value("player", "loot_drop_multiplier", 1)
+	local _, infamous_base_chance, infamous_mod = managers.lootdrop:infamous_chance()
+	local infamous_chance = 0 < items_total and infamous_base_chance * (items_infamous / items_total) or 0
 	self._infamous_chance = {}
 	self._infamous_chance.base = infamous_chance
 	self._infamous_chance.skill = infamous_mod

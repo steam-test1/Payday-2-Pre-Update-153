@@ -1843,6 +1843,15 @@ function HudIconsTweakData:init()
 			142
 		}
 	}
+	self.infamy_icon = {
+		texture = "guis/textures/pd2/infamous_symbol",
+		texture_rect = {
+			0,
+			4,
+			16,
+			16
+		}
+	}
 end
 
 function HudIconsTweakData:get_icon_data(icon_id, default_rect)

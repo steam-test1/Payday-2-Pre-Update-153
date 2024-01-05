@@ -1513,6 +1513,10 @@ function CoreEditor:reload_units(unit_names, small_compile)
 			if sequence_file then
 				table.insert(files, sequence_file:s() .. ".sequence_manager")
 			end
+			local material_config_file = PackageManager:unit_data(unit_name):material_config()
+			if material_config_file then
+				table.insert(files, material_config_file:s() .. ".material_config")
+			end
 			table.insert(files, managers.database:entry_relative_path(unit_name:s() .. ".unit"))
 			table.insert(files, managers.database:entry_relative_path(unit_name:s() .. ".object"))
 			table.insert(files, managers.database:entry_relative_path(unit_name:s() .. ".model"))

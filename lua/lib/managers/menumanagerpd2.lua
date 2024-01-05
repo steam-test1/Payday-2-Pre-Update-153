@@ -60,7 +60,7 @@ function MenuManager:setup_local_lobby_character()
 	local character = local_peer:character()
 	local progress = managers.upgrades:progress()
 	if managers.menu_scene then
-		managers.menu_scene:set_lobby_character_out_fit(local_peer:id(), managers.blackmarket:outfit_string())
+		managers.menu_scene:set_lobby_character_out_fit(local_peer:id(), managers.blackmarket:outfit_string(), rank)
 	end
 	local_peer:set_outfit_string(managers.blackmarket:outfit_string())
 	managers.network:session():send_to_peers_loaded("sync_profile", level, rank)
@@ -346,7 +346,7 @@ function MenuCallbackHandler:_update_outfit_information()
 		local local_peer = managers.network:session():local_peer()
 		if managers.menu_scene then
 			local id = local_peer:id()
-			managers.menu_scene:set_lobby_character_out_fit(id, outfit_string)
+			managers.menu_scene:set_lobby_character_out_fit(id, outfit_string, managers.experience:current_rank())
 		end
 		local kit_menu = managers.menu:get_menu("kit_menu")
 		if kit_menu then

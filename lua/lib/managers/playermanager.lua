@@ -132,7 +132,7 @@ function PlayerManager:update_kit_to_peer(peer)
 end
 
 function PlayerManager:update(t, dt)
-	if not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t then
+	if self:has_category_upgrade("player", "close_to_hostage_boost") and (not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t) then
 		local local_player = self:local_player()
 		self._is_local_close_to_hostage = alive(local_player) and managers.groupai and managers.groupai:state():is_a_hostage_within(local_player:movement():m_pos(), tweak_data.upgrades.hostage_near_player_radius)
 		self._hostage_close_to_local_t = t + tweak_data.upgrades.hostage_near_player_check_t
@@ -161,6 +161,7 @@ function PlayerManager:_internal_load()
 	if primary then
 		player:inventory():add_unit_by_factory_name(primary.factory_id, false, false, primary.blueprint)
 	end
+	player:inventory():set_melee_weapon(managers.blackmarket:equipped_melee_weapon())
 	local peer_id = managers.network:session():local_peer():id()
 	local grenade, amount = managers.blackmarket:equipped_grenade()
 	amount = self:has_grenade(peer_id) and self:get_grenade_amount(peer_id) or amount
@@ -436,6 +437,18 @@ function PlayerManager:aquire_equipment(upgrade, id)
 	self:_verify_equipment_kit()
 end
 
+function PlayerManager:on_headshot_dealt()
+	local player_unit = self:player_unit()
+	if not player_unit then
+		return
+	end
+	local damage_ext = player_unit:character_damage()
+	local regen_armor_bonus = managers.player:upgrade_value("player", "headshot_regen_armor_bonus", 0)
+	if damage_ext and 0 < regen_armor_bonus then
+		damage_ext:restore_armor(regen_armor_bonus)
+	end
+end
+
 function PlayerManager:unaquire_equipment(upgrade, id)
 	if not self._global.equipment[id] then
 		return
@@ -624,7 +637,7 @@ function PlayerManager:get_hostage_bonus_multiplier(category)
 	multiplier = multiplier + self:upgrade_value("player", "hostage_" .. category .. "_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", "passive_hostage_" .. category .. "_multiplier", 1) - 1
 	local local_player = self:local_player()
-	if self._is_local_close_to_hostage then
+	if self:has_category_upgrade("player", "close_to_hostage_boost") and self._is_local_close_to_hostage then
 		multiplier = multiplier * tweak_data.upgrades.hostage_near_player_multiplier
 	end
 	return 1 + multiplier * hostages
@@ -640,7 +653,7 @@ function PlayerManager:get_hostage_bonus_addend(category)
 	addend = addend + self:upgrade_value("player", "hostage_" .. category .. "_addend", 0)
 	addend = addend + self:upgrade_value("player", "passive_hostage_" .. category .. "_addend", 0)
 	local local_player = self:local_player()
-	if self._is_local_close_to_hostage then
+	if self:has_category_upgrade("player", "close_to_hostage_boost") and self._is_local_close_to_hostage then
 		addend = addend * tweak_data.upgrades.hostage_near_player_multiplier
 	end
 	return addend * hostages
@@ -650,6 +663,18 @@ function PlayerManager:movement_speed_multiplier(speed_state, bonus_multiplier)
 	local multiplier = 1
 	local armor_penalty = self:mod_movement_penalty(self:body_armor_value("movement", nil, 1))
 	multiplier = multiplier + armor_penalty - 1
+	local primary_weapon = managers.blackmarket:equipped_primary()
+	local primary_tweak = primary_weapon and tweak_data.weapon[primary_weapon.weapon_id]
+	local primary_category = primary_tweak and primary_tweak.category
+	local primary_penalty = primary_category and tweak_data.upgrades.weapon_movement_penalty[primary_category]
+	local secondary_weapon = managers.blackmarket:equipped_secondary()
+	local secondary_tweak = secondary_weapon and tweak_data.weapon[secondary_weapon.weapon_id]
+	local secondary_category = secondary_tweak and secondary_tweak.category
+	local secondary_penalty = secondary_category and tweak_data.upgrades.weapon_movement_penalty[secondary_category]
+	if primary_penalty then
+	end
+	if secondary_penalty then
+	end
 	if bonus_multiplier then
 		multiplier = multiplier + bonus_multiplier - 1
 	end
@@ -688,10 +713,13 @@ function PlayerManager:body_armor_skill_multiplier()
 	return multiplier
 end
 
-function PlayerManager:skill_dodge_chance(running, detection_risk)
+function PlayerManager:skill_dodge_chance(running, crouching, detection_risk)
 	local chance = self:upgrade_value("player", "passive_dodge_chance", 0)
 	if running then
 		chance = chance + self:upgrade_value("player", "run_dodge_chance", 0)
+	end
+	if crouching then
+		chance = chance + self:upgrade_value("player", "crouch_dodge_chance", 0)
 	end
 	local detection_risk_add_dodge_chance = managers.player:upgrade_value("player", "detection_risk_add_dodge_chance")
 	chance = chance + self:get_value_from_risk_upgrade(detection_risk_add_dodge_chance, detection_risk)

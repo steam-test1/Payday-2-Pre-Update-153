@@ -119,14 +119,13 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 		if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
 			local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
 			local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-			managers.game_play_central:add_enemy_contour(prime_target.unit, marked_extra_damage, time_multiplier)
+			prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
 			managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
-			managers.challenges:set_flag("eagle_eyes")
 		end
 	elseif voice_type == "mark_camera" and mark_sec_camera then
 		sound_name = "quiet"
 		interact_type = "cmd_point"
-		managers.game_play_central:add_marked_contour_unit(prime_target.unit)
+		prime_target.unit:contour():add("mark_unit")
 		managers.network:session():send_to_peers_synched("mark_contour_unit", prime_target.unit)
 	end
 	if interact_type then

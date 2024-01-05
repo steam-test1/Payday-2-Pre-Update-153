@@ -50,6 +50,9 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_smg_mp7/wpn_fps_smg_mp7"),
 	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_ass_scar/wpn_fps_ass_scar"),
 	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_pis_p226/wpn_fps_pis_p226"),
+	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21/wpn_fps_lmg_hk21"),
+	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249/wpn_fps_lmg_m249"),
+	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk/wpn_fps_lmg_rpk"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_b92fs/wpn_fps_pis_beretta_primary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4_secondary"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug_secondary"),
@@ -84,6 +87,8 @@ function PlayerInventory:init(unit)
 	self._listener_holder = EventListenerHolder:new()
 	self._mask_unit = nil
 	self._mask_unit_name = nil
+	self._melee_weapon_unit = nil
+	self._melee_weapon_unit_name = nil
 end
 
 function PlayerInventory:pre_destroy(unit)
@@ -99,6 +104,10 @@ function PlayerInventory:pre_destroy(unit)
 	if self._mask_unit_name then
 		managers.dyn_resource:unload(Idstring("unit"), self._mask_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 		self._mask_unit_name = nil
+	end
+	if self._melee_weapon_unit_name then
+		managers.dyn_resource:unload(Idstring("unit"), self._melee_weapon_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
+		self._melee_weapon_unit_name = nil
 	end
 end
 
@@ -485,6 +494,14 @@ function PlayerInventory:set_mask_visibility(state)
 		if mask_on_sequence then
 			self._unit:damage():run_sequence_simple(mask_on_sequence)
 		end
+	end
+end
+
+function PlayerInventory:set_melee_weapon(melee_weapon_id)
+	self._melee_weapon_data = managers.blackmarket:get_melee_weapon_data(melee_weapon_id)
+	if self._melee_weapon_data.unit then
+		self._melee_weapon_unit_name = Idstring(self._melee_weapon_data.unit)
+		managers.dyn_resource:load(Idstring("unit"), self._melee_weapon_unit_name, "packages/dyn_resources", false)
 	end
 end
 

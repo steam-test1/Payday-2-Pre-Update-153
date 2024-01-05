@@ -10,7 +10,7 @@ function HuskTeamAIBase:post_init()
 	self._lod_stage = 1
 	self._allow_invisible = true
 	TeamAIBase._register(self)
-	managers.game_play_central:add_contour_unit(self._unit, "character")
+	self._unit:contour():add("teammate")
 	managers.occlusion:remove_occlusion(self._unit)
 end
 
@@ -25,7 +25,7 @@ function HuskTeamAIBase:on_death_exit()
 end
 
 function HuskTeamAIBase:pre_destroy(unit)
-	managers.game_play_central:remove_contour_unit(unit)
+	unit:contour():clear()
 	unit:movement():pre_destroy()
 	unit:inventory():pre_destroy(unit)
 	TeamAIBase.unregister(self)

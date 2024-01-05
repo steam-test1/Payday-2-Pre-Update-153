@@ -90,8 +90,8 @@ function HUDChat:_create_input_panel()
 	local say = self._input_panel:text({
 		name = "say",
 		text = utf8.to_upper(managers.localization:text("debug_chat_say")),
-		font = tweak_data.menu.small_font,
-		font_size = tweak_data.menu.small_font_size,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
 		x = 0,
 		y = 0,
 		align = "left",
@@ -107,8 +107,8 @@ function HUDChat:_create_input_panel()
 	local input_text = self._input_panel:text({
 		name = "input_text",
 		text = "",
-		font = tweak_data.menu.small_font_noshadow,
-		font_size = tweak_data.menu.small_font_size,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
 		x = 0,
 		y = 0,
 		align = "left",
@@ -152,7 +152,8 @@ function HUDChat:_layout_output_panel()
 	output_panel:set_w(self._output_width)
 	local lines = 0
 	for i = #self._lines, 1, -1 do
-		local line = self._lines[i]
+		local line = self._lines[i][1]
+		local icon = self._lines[i][2]
 		line:set_w(output_panel:w())
 		local _, _, w, h = line:text_rect()
 		line:set_h(h)
@@ -161,9 +162,13 @@ function HUDChat:_layout_output_panel()
 	output_panel:set_h(21 * math.min(10, lines))
 	local y = 0
 	for i = #self._lines, 1, -1 do
-		local line = self._lines[i]
+		local line = self._lines[i][1]
+		local icon = self._lines[i][2]
 		local _, _, w, h = line:text_rect()
 		line:set_bottom(output_panel:h() - y)
+		if icon then
+			icon:set_top(line:top() + 1)
+		end
 		y = y + h
 	end
 	output_panel:set_bottom(self._input_panel:top())
@@ -204,7 +209,7 @@ function HUDChat:_on_focus()
 	self._input_panel:key_release(callback(self, self, "key_release"))
 	self._enter_text_set = false
 	self._input_panel:child("input_bg"):animate(callback(self, self, "_animate_input_bg"))
-	self:set_layer(2000)
+	self:set_layer(1100)
 	self:update_caret()
 end
 
@@ -225,7 +230,7 @@ function HUDChat:_loose_focus()
 	local text = self._input_panel:child("input_text")
 	text:stop()
 	self._input_panel:child("input_bg"):stop()
-	self:set_layer(0)
+	self:set_layer(1)
 	self:update_caret()
 end
 
@@ -424,14 +429,26 @@ end
 function HUDChat:send_message(name, message)
 end
 
-function HUDChat:receive_message(name, message, color)
+function HUDChat:receive_message(name, message, color, icon)
 	local output_panel = self._panel:child("output_panel")
 	local len = utf8.len(name) + 1
+	local x = 0
+	local icon_bitmap
+	if icon then
+		local icon_texture, icon_texture_rect = tweak_data.hud_icons:get_icon_data(icon)
+		icon_bitmap = output_panel:bitmap({
+			texture = icon_texture,
+			texture_rect = icon_texture_rect,
+			color = color,
+			y = 1
+		})
+		x = icon_bitmap:right()
+	end
 	local line = output_panel:text({
 		text = name .. ": " .. message,
-		font = tweak_data.menu.small_font,
-		font_size = tweak_data.menu.small_font_size,
-		x = 0,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		x = x,
 		y = 0,
 		align = "left",
 		halign = "left",
@@ -448,7 +465,7 @@ function HUDChat:receive_message(name, message, color)
 	line:set_range_color(len, total_len, Color.white)
 	local _, _, w, h = line:text_rect()
 	line:set_h(h)
-	table.insert(self._lines, line)
+	table.insert(self._lines, {line, icon_bitmap})
 	self:_layout_output_panel()
 	if not self._focus then
 		local output_panel = self._panel:child("output_panel")

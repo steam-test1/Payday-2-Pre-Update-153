@@ -78,7 +78,8 @@ function MousePointerManager:set_pointer_image(type)
 		}
 	}
 	local rect = types[type]
-	if rect then
+	if rect and self._mouse_pointer_image ~= type then
+		self._mouse_pointer_image = type
 		self._mouse:child("pointer"):set_texture_rect(rect[1], rect[2], rect[3], rect[4])
 	end
 end

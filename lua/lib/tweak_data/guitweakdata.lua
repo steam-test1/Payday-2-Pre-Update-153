@@ -49,9 +49,24 @@ function GuiTweakData:init()
 			date_id = "menu_content_christmas_date",
 			store = 267381,
 			image = "guis/textures/pd2/content_updates/christmas"
+		},
+		{
+			id = "infamy",
+			name_id = "menu_content_infamy",
+			desc_id = "menu_content_infamy_desc",
+			date_id = "menu_content_infamy_date",
+			webpage = "http://www.overkillsoftware.com/infamy",
+			image = "guis/textures/pd2/content_updates/infamy_introduction"
 		}
 	}
 	self.num_previous_updates = 6
+	self.infamy_masks_sort_order = {
+		"aviator",
+		"plague",
+		"welder",
+		"smoker",
+		"ghost"
+	}
 	self.suspicion_to_visibility = {}
 	self.suspicion_to_visibility[1] = {}
 	self.suspicion_to_visibility[1].name_id = "bm_menu_concealment_low"

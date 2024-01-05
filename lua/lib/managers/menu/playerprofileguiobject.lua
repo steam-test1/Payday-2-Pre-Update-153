@@ -28,10 +28,14 @@ function PlayerProfileGuiObject:init(ws)
 		blend_mode = "add",
 		layer = 1
 	})
+	local player_level = managers.experience:current_level()
+	local player_rank = managers.experience:current_rank()
+	local is_infamous = 0 < player_rank
+	local level_string = (is_infamous and managers.experience:rank_string(player_rank) .. "-" or "") .. tostring(player_level)
 	local level_text = panel:text({
 		font = tweak_data.menu.pd2_medium_font,
-		font_size = tweak_data.menu.pd2_medium_font_size,
-		text = tostring(managers.experience:current_level()),
+		font_size = tweak_data.menu.pd2_medium_font_size + (is_infamous and -5 or 0),
+		text = level_string,
 		color = tweak_data.screen_colors.text
 	})
 	self:_make_fine_text(level_text)

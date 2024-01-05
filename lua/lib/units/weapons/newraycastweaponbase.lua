@@ -345,6 +345,15 @@ function NewRaycastWeaponBase:toggle_gadget()
 	end
 end
 
+function NewRaycastWeaponBase:gadget_update()
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._parts)
+	if gadgets then
+		for _, gadget in ipairs(gadgets) do
+			gadget.unit:base():set_state(self._enabled and self._gadget_on, self._sound_fire)
+		end
+	end
+end
+
 function NewRaycastWeaponBase:check_stats()
 	local base_stats = self:weapon_tweak_data().stats
 	if not base_stats then
@@ -384,10 +393,16 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 	return self._spread * spread_multiplier
 end
 
+function NewRaycastWeaponBase:fire_rate_multiplier()
+	local user_unit = self._setup and self._setup.user_unit
+	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
+	return managers.blackmarket:fire_rate_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
+end
+
 function NewRaycastWeaponBase:damage_multiplier()
 	local user_unit = self._setup and self._setup.user_unit
 	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
-	return managers.blackmarket:damage_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state)
+	return managers.blackmarket:damage_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
 end
 
 function NewRaycastWeaponBase:melee_damage_multiplier()
@@ -395,11 +410,11 @@ function NewRaycastWeaponBase:melee_damage_multiplier()
 end
 
 function NewRaycastWeaponBase:spread_multiplier(current_state)
-	return managers.blackmarket:accuracy_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, current_state, self:fire_mode())
+	return managers.blackmarket:accuracy_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, current_state, self:fire_mode(), self._blueprint)
 end
 
 function NewRaycastWeaponBase:recoil_multiplier()
-	return managers.blackmarket:recoil_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer)
+	return managers.blackmarket:recoil_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, self._blueprint)
 end
 
 function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()

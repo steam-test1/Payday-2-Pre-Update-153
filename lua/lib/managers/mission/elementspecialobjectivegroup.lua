@@ -1,5 +1,7 @@
 core:import("CoreMissionScriptElement")
 ElementSpecialObjectiveGroup = ElementSpecialObjectiveGroup or class(CoreMissionScriptElement.MissionScriptElement)
+ElementSpecialObjectiveGroup.add_event_callback = ElementSpecialObjective.add_event_callback
+ElementSpecialObjectiveGroup.event = ElementSpecialObjective.event
 
 function ElementSpecialObjectiveGroup:init(...)
 	ElementSpecialObjectiveGroup.super.init(self, ...)
@@ -13,6 +15,7 @@ function ElementSpecialObjectiveGroup:init(...)
 			self._values.SO_access = tonumber(self._values.SO_access)
 		end
 	end
+	self._events = {}
 end
 
 function ElementSpecialObjectiveGroup:clbk_verify_administration(unit)
@@ -24,6 +27,8 @@ function ElementSpecialObjectiveGroup:on_executed(instigator)
 		return
 	end
 	if not managers.groupai:state():is_AI_enabled() and not Application:editor() then
+	elseif self._values.mode == "forced_spawn" or self._values.mode == "recurring_cloaker_spawn" or self._values.mode == "recurring_spawn_1" then
+		self:_register_to_group_AI()
 	elseif self._values.spawn_instigator_ids and next(self._values.spawn_instigator_ids) then
 		local chosen_units = self:_select_units_from_spawners()
 		if chosen_units then
@@ -50,9 +55,28 @@ function ElementSpecialObjectiveGroup:on_executed(instigator)
 end
 
 function ElementSpecialObjectiveGroup:operation_remove()
-	for _, followup_element_id in ipairs(self._values.followup_elements) do
-		managers.groupai:state():remove_special_objective(followup_element_id)
+	if self._registered_in_groupai then
+		self:_unregister_from_group_AI()
+	else
+		for _, followup_element_id in ipairs(self._values.followup_elements) do
+			managers.groupai:state():remove_special_objective(followup_element_id)
+		end
 	end
+end
+
+function ElementSpecialObjectiveGroup:_unregister_from_group_AI()
+	if self._registered_in_groupai then
+		self._registered_in_groupai = nil
+		managers.groupai:state():remove_grp_SO(self._id)
+	end
+end
+
+function ElementSpecialObjectiveGroup:_register_to_group_AI()
+	if self._registered_in_groupai then
+		return
+	end
+	managers.groupai:state():add_grp_SO(self._id, self)
+	self._registered_in_groupai = true
 end
 
 function ElementSpecialObjectiveGroup:_select_units_from_spawners()
@@ -82,4 +106,41 @@ function ElementSpecialObjectiveGroup:_execute_random_SO(instigator)
 	if random_SO then
 		random_SO:on_executed(instigator)
 	end
+end
+
+function ElementSpecialObjectiveGroup:get_random_SO(receiver_unit)
+	local random_SO_element = ElementSpecialObjective.choose_followup_SO(self, receiver_unit, {
+		[self._id] = true
+	})
+	if not random_SO_element then
+		return
+	end
+	local objective = random_SO_element:get_objective(receiver_unit)
+	return objective
+end
+
+function ElementSpecialObjectiveGroup:get_SO_spawn_group_types()
+	return self._values.allowed_group_types
+end
+
+function ElementSpecialObjectiveGroup:get_grp_objective()
+	if not self._area then
+		local nav_seg_id = managers.navigation:get_nav_seg_from_pos(self._values.position, nil)
+		self._area = managers.groupai:state():get_area_from_nav_seg_id(nav_seg_id)
+	end
+	local grp_objective = {
+		element = self,
+		type = self._values.mode,
+		area = self._area,
+		no_retry = true,
+		fail_clbk = callback(self, self, "clbk_objective_failed")
+	}
+	return grp_objective
+end
+
+function ElementSpecialObjectiveGroup:clbk_objective_failed(group)
+	if managers.editor and managers.editor._stopping_simulation then
+		return
+	end
+	self:event("fail", group)
 end

@@ -274,6 +274,27 @@ function SentryGunBrain:switch_off()
 		PlayerMovement.set_attention_settings(self, nil)
 	end
 	self._unit:base():unregister()
+	self._AI_data.focus_enemy = nil
+end
+
+function SentryGunBrain:switch_on()
+	if self._active then
+		return
+	end
+	self._unit:damage():run_sequence_simple("laser_activate")
+	local is_server = Network:is_server()
+	if is_server then
+	end
+	self:set_active(true)
+	self._ext_movement:switch_on()
+	self._unit:set_slot(25)
+	self._unit:base():register()
+	managers.groupai:state():on_criminal_recovered(self._unit)
+	if is_server then
+		PlayerMovement.set_attention_settings(self, {
+			"sentry_gun_enemy_cbt"
+		})
+	end
 end
 
 function SentryGunBrain:_setup_attention_handler()

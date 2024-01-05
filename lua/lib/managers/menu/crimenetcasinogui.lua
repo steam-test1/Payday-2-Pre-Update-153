@@ -92,16 +92,16 @@ function CrimeNetCasinoGui:mouse_moved(x, y)
 				self._button_bet_highlight = true
 				self._button_panel:child("button_bet"):set_color(tweak_data.screen_colors.button_stage_2)
 			end
-			return true, "arrow"
+			return true, "link"
 		elseif self._button_panel:child("button_exit"):inside(x, y) then
 			if not self._button_exit_highlight then
 				self._button_exit_highlight = true
 				self._button_panel:child("button_exit"):set_color(tweak_data.screen_colors.button_stage_2)
 			end
-			return true, "arrow"
+			return true, "link"
 		end
 	end
-	return false, "hand"
+	return false, "arrow"
 end
 
 function CrimeNetCasinoGui:mouse_pressed(button, x, y)

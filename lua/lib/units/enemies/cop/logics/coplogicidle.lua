@@ -30,6 +30,15 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 	local old_internal_data = data.internal_data
 	if old_internal_data then
 		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
+		my_data.turning = old_internal_data.turning
+		if old_internal_data.firing then
+			data.unit:movement():set_allow_fire(false)
+		end
+		if old_internal_data.shooting then
+			data.unit:brain():action_request({type = "idle", body_part = 3})
+		end
+		local lower_body_action = data.unit:movement()._active_actions[2]
+		my_data.advancing = lower_body_action and lower_body_action:type() == "walk" and lower_body_action
 		if old_internal_data.best_cover then
 			my_data.best_cover = old_internal_data.best_cover
 			managers.navigation:reserve_cover(my_data.best_cover[1], data.pos_rsrv_id)
@@ -43,7 +52,7 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 	if not my_data.rsrv_pos.stand then
 		local pos_rsrv = {
 			position = mvector3.copy(data.m_pos),
-			radius = 60,
+			radius = 30,
 			filter = data.pos_rsrv_id
 		}
 		my_data.rsrv_pos.stand = pos_rsrv
@@ -62,11 +71,6 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 			debug_pause_unit(data.unit, "[CopLogicIdle.enter] wrong logic", data.unit)
 		end
 		my_data.scan = objective.scan
-		if objective.action_duration then
-			my_data.action_timeout_clbk_id = "CopLogicIdle_action_timeout" .. key_str
-			local action_timeout_t = data.t + objective.action_duration
-			CopLogicBase.add_delayed_clbk(my_data, my_data.action_timeout_clbk_id, callback(CopLogicIdle, CopLogicIdle, "clbk_action_timeout", data), action_timeout_t)
-		end
 		my_data.rubberband_rotation = objective.rubberband_rotation and data.unit:movement():m_rot():y()
 	else
 		my_data.scan = true
@@ -75,36 +79,9 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 		my_data.stare_path_search_id = "stare" .. key_str
 		my_data.wall_stare_task_key = "CopLogicIdle._chk_stare_into_wall" .. key_str
 	end
+	CopLogicIdle._chk_has_old_action(data, my_data)
 	if my_data.scan and (not objective or not objective.action) then
 		CopLogicBase.queue_task(my_data, my_data.wall_stare_task_key, CopLogicIdle._chk_stare_into_wall_1, data, data.t)
-	end
-	local entry_action
-	if objective and objective.action then
-		entry_action = data.unit:brain():action_request(objective.action)
-		if objective.action_start_clbk then
-			objective.action_start_clbk(data.unit)
-		end
-		if objective.action.type == "act" then
-			my_data.acting = true
-			if objective.type == "act" then
-				my_data.performing_act_objective = objective
-			end
-		end
-	end
-	if objective and objective.stance then
-		local upper_body_action = data.unit:movement()._active_actions[3]
-		if not upper_body_action or upper_body_action:type() ~= "shoot" then
-			data.unit:movement():set_stance(objective.stance)
-		end
-	end
-	CopLogicBase._reset_attention(data)
-	if not entry_action and not data.unit:movement():chk_action_forbidden("walk") then
-		CopLogicTravel.reset_actions(data, my_data, old_internal_data, CopLogicIdle.allowed_transitional_actions)
-		if data.char_tweak.no_stand and data.unit:anim_data().stand then
-			CopLogicAttack._chk_request_action_crouch(data)
-		end
-	else
-		data.unit:movement():set_allow_fire(false)
 	end
 	if is_cool then
 		data.unit:brain():set_attention_settings({peaceful = true})
@@ -118,10 +95,6 @@ end
 function CopLogicIdle.exit(data, new_logic_name, enter_params)
 	CopLogicBase.exit(data, new_logic_name, enter_params)
 	local my_data = data.internal_data
-	if my_data.acting and not data.unit:character_damage():dead() then
-		local new_action = {type = "idle", body_part = 1}
-		data.unit:brain():action_request(new_action)
-	end
 	data.unit:brain():cancel_all_pathing_searches()
 	CopLogicBase.cancel_queued_tasks(my_data)
 	CopLogicBase.cancel_delayed_clbks(my_data)
@@ -144,9 +117,15 @@ end
 
 function CopLogicIdle.queued_update(data)
 	local my_data = data.internal_data
-	local delay = CopLogicIdle._upd_enemy_detection(data)
+	local delay = data.logic._upd_enemy_detection(data)
 	if data.internal_data ~= my_data then
 		CopLogicBase._report_detections(data.detected_attention_objects)
+		return
+	end
+	local objective = data.objective
+	if my_data.has_old_action then
+		CopLogicIdle._upd_stop_old_action(data, my_data, objective)
+		CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicIdle.queued_update, data, data.t + delay, data.important and true)
 		return
 	end
 	if data.is_converted and (not data.objective or data.objective.type == "free") and (not data.path_fail_t or data.t - data.path_fail_t > 6) then
@@ -158,6 +137,8 @@ function CopLogicIdle.queued_update(data)
 	if CopLogicIdle._chk_relocate(data) then
 		return
 	end
+	CopLogicIdle._perform_objective_action(data, my_data, objective)
+	CopLogicIdle._upd_stance_and_pose(data, my_data, objective)
 	CopLogicIdle._upd_pathing(data, my_data)
 	CopLogicIdle._upd_scan(data, my_data)
 	if data.cool then
@@ -430,7 +411,9 @@ function CopLogicIdle._chk_reaction_to_attention_object(data, attention_data, st
 	end
 	local can_arrest = CopLogicBase._can_arrest(data)
 	local visible = attention_data.verified
-	if record.status == "disabled" then
+	if record.status == "dead" then
+		return math.min(attention_data.settings.reaction, AIAttentionObject.REACT_AIM)
+	elseif record.status == "disabled" then
 		if record.assault_t and record.assault_t - record.disabled_t > 0.6 then
 			return math.min(attention_data.settings.reaction, AIAttentionObject.REACT_COMBAT)
 		else
@@ -718,19 +701,16 @@ function CopLogicIdle.action_complete_clbk(data, action)
 		end
 	elseif action_type == "act" then
 		local my_data = data.internal_data
-		my_data.acting = nil
-		if my_data.scan and not my_data.exiting and (not my_data.queued_tasks or not my_data.queued_tasks[my_data.wall_stare_task_key]) and not my_data.stare_path_pos then
-			CopLogicBase.queue_task(my_data, my_data.wall_stare_task_key, CopLogicIdle._chk_stare_into_wall_1, data, data.t)
-		end
-		if my_data.performing_act_objective then
-			local old_objective = my_data.performing_act_objective
-			my_data.performing_act_objective = nil
+		if my_data.action_started == action then
+			if my_data.scan and not my_data.exiting and (not my_data.queued_tasks or not my_data.queued_tasks[my_data.wall_stare_task_key]) and not my_data.stare_path_pos then
+				CopLogicBase.queue_task(my_data, my_data.wall_stare_task_key, CopLogicIdle._chk_stare_into_wall_1, data, data.t)
+			end
 			if action:expired() then
 				if not my_data.action_timeout_clbk_id then
-					managers.groupai:state():on_objective_complete(data.unit, old_objective)
+					managers.groupai:state():on_objective_complete(data.unit, data.objective)
 				end
-			else
-				managers.groupai:state():on_objective_failed(data.unit, old_objective)
+			elseif not my_data.action_expired then
+				managers.groupai:state():on_objective_failed(data.unit, data.objective)
 			end
 		end
 	elseif action_type == "hurt" and action:expired() then
@@ -738,24 +718,39 @@ function CopLogicIdle.action_complete_clbk(data, action)
 	end
 end
 
-function CopLogicIdle.is_available_for_assignment(data)
-	return (not data.internal_data.performing_act_objective or data.unit:anim_data().act_idle) and not data.internal_data.exiting and (not data.path_fail_t or not (data.t < data.path_fail_t + 6))
+function CopLogicIdle.is_available_for_assignment(data, objective)
+	if objective and objective.forced then
+		return true
+	end
+	local my_data = data.internal_data
+	if data.objective and data.objective.action then
+		if my_data.action_started then
+			if not data.unit:anim_data().act_idle then
+				return
+			end
+		else
+			return
+		end
+	end
+	if my_data.exiting or data.path_fail_t and data.t < data.path_fail_t + 6 then
+		return
+	end
+	return true
 end
 
 function CopLogicIdle.clbk_action_timeout(ignore_this, data)
 	local my_data = data.internal_data
 	CopLogicBase.on_delayed_clbk(my_data, my_data.action_timeout_clbk_id)
 	my_data.action_timeout_clbk_id = nil
-	local old_objective = data.objective
-	if my_data.performing_act_objective then
-		my_data.performing_act_objective = nil
-		my_data.acting = nil
-	end
-	if not old_objective then
+	if not data.objective then
 		debug_pause_unit(data.unit, "[CopLogicIdle.clbk_action_timeout] missing objective")
 		return
 	end
-	managers.groupai:state():on_civilian_objective_complete(data.unit, old_objective)
+	my_data.action_expired = true
+	if data.unit:anim_data().act and data.unit:anim_data().needs_idle then
+		CopLogicIdle._start_idle_action_from_act(data)
+	end
+	managers.groupai:state():on_objective_complete(data.unit, data.objective)
 end
 
 function CopLogicIdle._nav_point_pos(nav_point)
@@ -1033,8 +1028,8 @@ function CopLogicIdle._turn_by_spin(data, my_data, spin)
 		body_part = 2,
 		angle = spin
 	}
-	if data.unit:brain():action_request(new_action_data) then
-		my_data.turning = spin
+	my_data.turning = data.unit:brain():action_request(new_action_data)
+	if my_data.turning then
 		return true
 	end
 end
@@ -1054,4 +1049,119 @@ function CopLogicIdle._chk_objective_needs_travel(data, new_objective)
 		return
 	end
 	return true
+end
+
+function CopLogicIdle._upd_stance_and_pose(data, my_data, objective)
+	if data.unit:movement():chk_action_forbidden("walk") then
+		return
+	end
+	local obj_has_stance, obj_has_pose
+	if objective then
+		if objective.stance and (not data.char_tweak.allowed_stances or data.char_tweak.allowed_stances[objective.stance]) then
+			obj_has_stance = true
+			local upper_body_action = data.unit:movement()._active_actions[3]
+			if not upper_body_action or upper_body_action:type() ~= "shoot" then
+				data.unit:movement():set_stance(objective.stance)
+			end
+		end
+		if objective.pose and not data.is_suppressed and (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses[objective.pose]) then
+			obj_has_pose = true
+			if objective.pose == "crouch" then
+				CopLogicAttack._chk_request_action_crouch(data)
+			elseif objective.pose == "stand" then
+				CopLogicAttack._chk_request_action_stand(data)
+			end
+		end
+	end
+	if not obj_has_stance and data.char_tweak.allowed_stances and not data.char_tweak.allowed_stances[data.unit:anim_data().stance] then
+		for stance_name, state in pairs(data.char_tweak.allowed_stances) do
+			if state then
+				data.unit:movement():set_stance(stance_name)
+				break
+			end
+		end
+	end
+	if not obj_has_pose then
+		if data.is_suppressed and not data.unit:anim_data().crouch and (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch) then
+			CopLogicAttack._chk_request_action_crouch(data)
+		elseif data.char_tweak.allowed_poses and not data.char_tweak.allowed_poses[data.unit:anim_data().pose] then
+			for pose_name, state in pairs(data.char_tweak.allowed_poses) do
+				if state then
+					if pose_name == "crouch" then
+						CopLogicAttack._chk_request_action_crouch(data)
+						break
+					end
+					if pose_name == "stand" then
+						CopLogicAttack._chk_request_action_stand(data)
+					end
+					break
+				end
+			end
+		end
+	end
+end
+
+function CopLogicIdle._perform_objective_action(data, my_data, objective)
+	if objective and objective.action and not my_data.action_started and (data.unit:anim_data().act_idle or not data.unit:movement():chk_action_forbidden("action")) then
+		my_data.action_started = data.unit:brain():action_request(objective.action)
+		if my_data.action_started then
+			if objective.action_duration then
+				my_data.action_timeout_clbk_id = "CopLogicIdle_action_timeout" .. tostring(data.key)
+				local action_timeout_t = data.t + objective.action_duration
+				CopLogicBase.add_delayed_clbk(my_data, my_data.action_timeout_clbk_id, callback(CopLogicIdle, CopLogicIdle, "clbk_action_timeout", data), action_timeout_t)
+			end
+			if objective.action_start_clbk then
+				objective.action_start_clbk(data.unit)
+			end
+		end
+	end
+end
+
+function CopLogicIdle._upd_stop_old_action(data, my_data, objective)
+	if not my_data.action_started and objective and objective.action and not data.unit:anim_data().to_idle then
+		if my_data.advancing then
+			if not data.unit:movement():chk_action_forbidden("idle") then
+				data.unit:brain():action_request({
+					type = "idle",
+					body_part = 2,
+					sync = true
+				})
+			end
+		elseif not data.unit:movement():chk_action_forbidden("idle") and data.unit:anim_data().needs_idle then
+			CopLogicIdle._start_idle_action_from_act(data)
+		elseif data.unit:anim_data().idle then
+			data.unit:brain():action_request({
+				type = "idle",
+				body_part = 2,
+				sync = true
+			})
+		end
+		CopLogicIdle._chk_has_old_action(data, my_data)
+	end
+end
+
+function CopLogicIdle._chk_has_old_action(data, my_data)
+	local anim_data = data.unit:anim_data()
+	my_data.has_old_action = not anim_data.to_idle and anim_data.act and not anim_data.act_idle
+	if not my_data.has_old_action then
+		local lower_body_action = data.unit:movement()._active_actions[2]
+		my_data.advancing = lower_body_action and lower_body_action:type() == "walk" and lower_body_action
+	end
+end
+
+function CopLogicIdle._start_idle_action_from_act(data)
+	data.unit:brain():action_request({
+		type = "act",
+		body_part = 1,
+		variant = "idle",
+		blocks = {
+			idle = -1,
+			action = -1,
+			walk = -1,
+			light_hurt = -1,
+			hurt = -1,
+			heavy_hurt = -1,
+			expl_hurt = -1
+		}
+	})
 end

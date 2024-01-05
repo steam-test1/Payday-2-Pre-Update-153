@@ -92,10 +92,22 @@ function CopDamage:damage_bullet(attack_data)
 		local armor_pierce_value = 0
 		if attack_data.attacker_unit == managers.player:player_unit() then
 			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance", 0)
+			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance_2", 0)
 			armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance_silencer", 0)
 			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
 			if weapon_category == "saw" then
 				armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("saw", "armor_piercing_chance", 0)
+			end
+		elseif attack_data.attacker_unit:base() and attack_data.attacker_unit:base().sentry_gun then
+			local owner = attack_data.attacker_unit:base():get_owner()
+			if alive(owner) then
+				if owner == managers.player:player_unit() then
+					armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("sentry_gun", "armor_piercing_chance", 0)
+					armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("sentry_gun", "armor_piercing_chance_2", 0)
+				else
+					armor_pierce_value = armor_pierce_value + (owner:base():upgrade_value("sentry_gun", "armor_piercing_chance") or 0)
+					armor_pierce_value = armor_pierce_value + (owner:base():upgrade_value("sentry_gun", "armor_piercing_chance_2") or 0)
+				end
 			end
 		end
 		if armor_pierce_roll >= armor_pierce_value then
@@ -138,6 +150,9 @@ function CopDamage:damage_bullet(attack_data)
 		headshot_multiplier = managers.player:upgrade_value("weapon", "passive_headshot_damage_multiplier", 1)
 		if tweak_data.character[self._unit:base()._tweak_table].priority_shout then
 			damage = damage * managers.player:upgrade_value("weapon", "special_damage_taken_multiplier", 1)
+		end
+		if head then
+			managers.player:on_headshot_dealt()
 		end
 	end
 	if self._damage_reduction_multiplier then
@@ -550,6 +565,9 @@ end
 
 function CopDamage:die(variant)
 	self._unit:base():set_slot(self._unit, 17)
+	if alive(managers.interaction:active_object()) then
+		managers.interaction:active_object():interaction():selected()
+	end
 	self:drop_pickup()
 	self._unit:inventory():drop_shield()
 	if self._unit:unit_data().mission_element then
@@ -1007,13 +1025,6 @@ function CopDamage:load(data)
 	end
 	if data.char_dmg.is_converted then
 		self._unit:set_slot(16)
-		managers.enemy:add_delayed_clbk("converted_contour" .. tostring(self._unit:key()), callback(self, self, "clbk_apply_converted_contour"), TimerManager:game():time() + 1)
 		managers.groupai:state():sync_converted_enemy(self._unit)
-	end
-end
-
-function CopDamage:clbk_apply_converted_contour()
-	if alive(self._unit) and self._unit:in_slot(16) then
-		managers.game_play_central:add_friendly_contour(self._unit)
 	end
 end

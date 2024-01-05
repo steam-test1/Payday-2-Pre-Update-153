@@ -112,7 +112,6 @@ function CharacterTweakData:_init_cop(presets)
 	self.cop.speech_prefix_count = 4
 	self.cop.access = "cop"
 	self.cop.dodge = presets.dodge.average
-	self.cop.follower = true
 	self.cop.deathguard = true
 	self.cop.chatter = presets.enemy_chatter.cop
 end
@@ -139,7 +138,6 @@ function CharacterTweakData:_init_fbi(presets)
 	self.fbi.speech_prefix_count = 4
 	self.fbi.access = "fbi"
 	self.fbi.dodge = presets.dodge.athletic
-	self.fbi.follower = true
 	self.fbi.deathguard = true
 	self.fbi.no_arrest = true
 	self.fbi.chatter = presets.enemy_chatter.cop
@@ -167,7 +165,6 @@ function CharacterTweakData:_init_swat(presets)
 	self.swat.speech_prefix_count = 4
 	self.swat.access = "swat"
 	self.swat.dodge = presets.dodge.athletic
-	self.swat.follower = true
 	self.swat.no_arrest = true
 	self.swat.chatter = presets.enemy_chatter.swat
 end
@@ -195,7 +192,6 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.speech_prefix_count = 4
 	self.heavy_swat.access = "swat"
 	self.heavy_swat.dodge = presets.dodge.heavy
-	self.heavy_swat.follower = true
 	self.heavy_swat.no_arrest = true
 	self.heavy_swat.chatter = presets.enemy_chatter.swat
 end
@@ -222,7 +218,6 @@ function CharacterTweakData:_init_fbi_swat(presets)
 	self.fbi_swat.speech_prefix_count = 4
 	self.fbi_swat.access = "swat"
 	self.fbi_swat.dodge = presets.dodge.athletic
-	self.fbi_swat.follower = true
 	self.fbi_swat.no_arrest = true
 	self.fbi_swat.chatter = presets.enemy_chatter.swat
 end
@@ -234,7 +229,7 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.detection = presets.detection.normal
 	self.fbi_heavy_swat.HEALTH_INIT = 20
 	self.fbi_heavy_swat.headshot_dmg_mul = self.fbi_heavy_swat.HEALTH_INIT / 10
-	self.fbi_heavy_swat.damage.explosion_damage_mul = 0.5
+	self.fbi_heavy_swat.damage.explosion_damage_mul = 0.6
 	self.fbi_heavy_swat.move_speed = presets.move_speed.fast
 	self.fbi_heavy_swat.surrender_break_time = {6, 8}
 	self.fbi_heavy_swat.suppression = presets.suppression.hard_agg
@@ -250,7 +245,6 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.speech_prefix_count = 4
 	self.fbi_heavy_swat.access = "swat"
 	self.fbi_heavy_swat.dodge = presets.dodge.heavy
-	self.fbi_heavy_swat.follower = true
 	self.fbi_heavy_swat.no_arrest = true
 	self.fbi_heavy_swat.chatter = presets.enemy_chatter.swat
 end
@@ -394,12 +388,11 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.detection = presets.detection.normal
 	self.tank.HEALTH_INIT = 550
 	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
-	self.tank.damage.explosion_damage_mul = 0.33
+	self.tank.damage.explosion_damage_mul = 0.5
 	self.tank.move_speed = presets.move_speed.very_slow
 	self.tank.allowed_stances = {cbt = true}
 	self.tank.allowed_poses = {stand = true}
 	self.tank.crouch_move = false
-	self.tank.allow_crouch = false
 	self.tank.no_run_start = true
 	self.tank.no_run_stop = true
 	self.tank.no_retreat = true
@@ -432,12 +425,11 @@ end
 function CharacterTweakData:_init_spooc(presets)
 	self.spooc = deep_clone(presets.base)
 	self.spooc.experience = {}
-	self.spooc.weapon = deep_clone(presets.weapon.good)
+	self.spooc.weapon = deep_clone(presets.weapon.expert)
 	self.spooc.detection = presets.detection.normal
-	self.spooc.HEALTH_INIT = 48
+	self.spooc.HEALTH_INIT = 60
 	self.spooc.headshot_dmg_mul = self.spooc.HEALTH_INIT / 12
 	self.spooc.move_speed = presets.move_speed.lightning
-	self.spooc.SPEED_SPRINT = 1000
 	self.spooc.no_retreat = true
 	self.spooc.no_arrest = true
 	self.spooc.damage.hurt_severity = presets.hurt_severities.no_hurts
@@ -445,20 +437,28 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.suppression = nil
 	self.spooc.surrender = presets.surrender.special
 	self.spooc.priority_shout = "f33"
+	self.spooc.priority_shout_max_dis = 700
 	self.spooc.rescue_hostages = false
-	self.spooc.weapon.beretta92.choice_chance = 0
-	self.spooc.weapon.m4.choice_chance = 1
-	self.spooc.weapon.r870.choice_chance = 0
-	self.spooc.weapon.mp5.choice_chance = 1
+	self.spooc.spooc_attack_timeout = {7, 9}
+	self.spooc.spooc_attack_beating_time = {3, 3}
 	self.spooc.weapon_voice = "3"
 	self.spooc.experience.cable_tie = "tie_swat"
 	self.spooc.speech_prefix_p1 = "clk"
-	self.spooc.speech_prefix_count = 4
+	self.spooc.speech_prefix_count = nil
 	self.spooc.access = "spooc"
 	self.spooc.dodge = presets.dodge.ninja
-	self.spooc.follower = false
+	self.spooc.dodge_with_grenade = {flash = true, smoke = true}
+	
+	function self.spooc.dodge_with_grenade.check(t, nr_grenades_used)
+		local delay_till_next_use = math.lerp(17, 45, math.min(1, (nr_grenades_used or 0) / 4))
+		local chance = math.lerp(1, 0.5, math.min(1, (nr_grenades_used or 0) / 10))
+		if chance > math.random() then
+			return true, t + delay_till_next_use
+		end
+		return false, t + delay_till_next_use
+	end
+	
 	self.spooc.chatter = presets.enemy_chatter.no_chatter
-	self.spooc.announce_incomming = "incomming_spooc"
 end
 
 function CharacterTweakData:_init_shield(presets)
@@ -475,7 +475,6 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.no_run_start = true
 	self.shield.no_run_stop = true
 	self.shield.no_retreat = true
-	self.shield.no_stand = true
 	self.shield.no_arrest = true
 	self.shield.surrender = nil
 	self.shield.ecm_vulnerability = 0.85
@@ -491,7 +490,6 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.damage.hurt_severity = presets.hurt_severities.only_explosion_hurts
 	self.shield.damage.shield_knocked = true
 	self.shield.weapon.mp9 = {}
-	self.shield.weapon.mp9.choice_chance = 1
 	self.shield.weapon.mp9.aim_delay = {0, 0.1}
 	self.shield.weapon.mp9.focus_delay = 2
 	self.shield.weapon.mp9.focus_dis = 250
@@ -568,7 +566,6 @@ function CharacterTweakData:_init_shield(presets)
 		}
 	}
 	self.shield.weapon.c45 = {}
-	self.shield.weapon.c45.choice_chance = 1
 	self.shield.weapon.c45.aim_delay = {0, 0.3}
 	self.shield.weapon.c45.focus_delay = 2
 	self.shield.weapon.c45.focus_dis = 250
@@ -749,7 +746,6 @@ function CharacterTweakData:_init_taser(presets)
 	self.taser.dodge = presets.dodge.athletic
 	self.taser.priority_shout = "f32"
 	self.taser.rescue_hostages = false
-	self.taser.follower = true
 	self.taser.deathguard = true
 	self.taser.chatter = {
 		aggressive = true,
@@ -1005,7 +1001,6 @@ function CharacterTweakData:_presets(tweak_data)
 	}
 	presets.base.SPEED_RUN = 370
 	presets.base.crouch_move = true
-	presets.base.allow_crouch = true
 	presets.base.shooting_death = true
 	presets.base.suspicious = true
 	presets.base.surrender_break_time = {20, 30}
@@ -2890,13 +2885,13 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 900,
-						strafe = 500,
-						bwd = 500
+						strafe = 400,
+						bwd = 350
 					},
 					cbt = {
 						fwd = 800,
-						strafe = 500,
-						bwd = 500
+						strafe = 380,
+						bwd = 320
 					}
 				}
 			},
@@ -2916,13 +2911,13 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 700,
-						strafe = 500,
-						bwd = 468
+						strafe = 340,
+						bwd = 250
 					},
 					cbt = {
 						fwd = 512,
-						strafe = 500,
-						bwd = 468
+						strafe = 320,
+						bwd = 280
 					}
 				}
 			}
@@ -2949,7 +2944,7 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 144,
-						strafe = 120,
+						strafe = 140,
 						bwd = 113
 					},
 					cbt = {
@@ -2975,7 +2970,7 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 144,
-						strafe = 120,
+						strafe = 130,
 						bwd = 113
 					},
 					cbt = {
@@ -3008,13 +3003,13 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						strafe = 150,
+						bwd = 135
 					},
 					cbt = {
 						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						strafe = 150,
+						bwd = 155
 					}
 				}
 			},
@@ -3034,13 +3029,13 @@ function CharacterTweakData:_presets(tweak_data)
 				run = {
 					hos = {
 						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						strafe = 140,
+						bwd = 150
 					},
 					cbt = {
 						fwd = 360,
-						strafe = 300,
-						bwd = 355
+						strafe = 140,
+						bwd = 155
 					}
 				}
 			}

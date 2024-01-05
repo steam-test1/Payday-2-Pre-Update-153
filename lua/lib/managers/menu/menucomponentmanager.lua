@@ -174,6 +174,10 @@ function MenuComponentManager:key_press_controller_support(o, k)
 	end
 end
 
+function MenuComponentManager:saferect_ws()
+	return self._ws
+end
+
 function MenuComponentManager:fullscreen_ws()
 	return self._fullscreen_ws
 end
@@ -1093,8 +1097,11 @@ function MenuComponentManager:mouse_moved(o, x, y)
 		end
 	end
 	if self._newsfeed_gui then
-		local _, pointer = self._newsfeed_gui:mouse_moved(x, y)
+		local used, pointer = self._newsfeed_gui:mouse_moved(x, y)
 		wanted_pointer = pointer or wanted_pointer
+		if used then
+			return true, wanted_pointer
+		end
 	end
 	if self._minimized_list then
 		for i, data in ipairs(self._minimized_list) do
@@ -1323,7 +1330,7 @@ function MenuComponentManager:close_weapon_box()
 end
 
 function MenuComponentManager:_create_chat_gui()
-	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() then
+	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() and managers.network:session() then
 		self._lobby_chat_gui_active = false
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
@@ -1334,7 +1341,7 @@ function MenuComponentManager:_create_chat_gui()
 end
 
 function MenuComponentManager:_create_lobby_chat_gui()
-	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() then
+	if SystemInfo:platform() == Idstring("WIN32") and MenuCallbackHandler:is_multiplayer() and managers.network:session() then
 		self._lobby_chat_gui_active = true
 		if self._game_chat_gui then
 			self:show_game_chat_gui()
@@ -2477,6 +2484,53 @@ function MenuComponentManager:unretrieve_texture(texture, index)
 		Application:error("[MenuComponentManager] unretrieve_texture(): Texture not cache nor requested, but still already to be unretrieved?!", texture)
 	else
 		Application:error("[MenuComponentManager] unretrieve_texture(): Can't unretrieve texture that is not in the system!", texture)
+	end
+end
+
+function MenuComponentManager:add_colors_to_text_object(text_object, ...)
+	local text = text_object:text()
+	local unchanged_text = text
+	local colors = {
+		...
+	}
+	local default_color = #colors == 1 and colors[1] or tweak_data.screen_colors.text
+	local start_ci, end_ci, first_ci
+	local text_dissected = utf8.characters(text)
+	local idsp = Idstring("#")
+	start_ci = {}
+	end_ci = {}
+	first_ci = true
+	for i, c in ipairs(text_dissected) do
+		if Idstring(c) == idsp then
+			local next_c = text_dissected[i + 1]
+			if next_c and Idstring(next_c) == idsp then
+				if first_ci then
+					table.insert(start_ci, i)
+				else
+					table.insert(end_ci, i)
+				end
+				first_ci = not first_ci
+			end
+		end
+	end
+	if #start_ci ~= #end_ci then
+	else
+		for i = 1, #start_ci do
+			start_ci[i] = start_ci[i] - ((i - 1) * 4 + 1)
+			end_ci[i] = end_ci[i] - (i * 4 - 1)
+		end
+	end
+	text = string.gsub(text, "##", "")
+	text_object:set_text(text)
+	if colors then
+		text_object:clear_range_color(1, utf8.len(text))
+		if #start_ci ~= #end_ci then
+			Application:error("[MenuComponentManager:color_text_object]: Missing '#' in text:", unchanged_text, #start_ci, #end_ci)
+		else
+			for i = 1, #start_ci do
+				text_object:set_range_color(start_ci[i], end_ci[i], colors[i] or default_color)
+			end
+		end
 	end
 end
 
