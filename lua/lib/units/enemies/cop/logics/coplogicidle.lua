@@ -698,7 +698,7 @@ function CopLogicIdle.action_complete_clbk(data, action)
 				managers.groupai:state():on_objective_failed(data.unit, data.objective)
 			end
 		end
-	elseif action_type == "hurt" and action:expired() then
+	elseif action_type == "hurt" and data.important and action:expired() then
 		CopLogicBase.chk_start_action_dodge(data, "hit")
 	end
 end
@@ -1098,9 +1098,10 @@ function CopLogicIdle._perform_objective_action(data, my_data, objective)
 			my_data.action_started = true
 		end
 		if my_data.action_started then
-			if objective.action_duration then
+			if objective.action_duration or objective.action_timeout_t then
 				my_data.action_timeout_clbk_id = "CopLogicIdle_action_timeout" .. tostring(data.key)
-				local action_timeout_t = data.t + objective.action_duration
+				local action_timeout_t = objective.action_timeout_t or data.t + objective.action_duration
+				objective.action_timeout_t = action_timeout_t
 				CopLogicBase.add_delayed_clbk(my_data, my_data.action_timeout_clbk_id, callback(CopLogicIdle, CopLogicIdle, "clbk_action_timeout", data), action_timeout_t)
 			end
 			if objective.action_start_clbk then

@@ -90,6 +90,7 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 		self._server_peer:set_synched_soft(state_index ~= 1)
 		if SystemInfo:platform() == Idstring("PS3") then
 		end
+		self:_chk_send_proactive_outfit_loaded()
 		if job_id_index ~= 0 then
 			local job_id = tweak_data.narrative:get_job_name_from_index(job_id_index)
 			managers.job:activate_job(job_id, job_stage)
@@ -413,12 +414,16 @@ end
 
 function ClientNetworkSession:on_peer_outfit_loaded(peer)
 	ClientNetworkSession.super.on_peer_outfit_loaded(self, peer)
-	if not self:server_peer() or not self:server_peer():ip_verified() then
+	self:_chk_send_proactive_outfit_loaded()
+end
+
+function ClientNetworkSession:_chk_send_proactive_outfit_loaded()
+	if not (self:server_peer() and self:server_peer():ip_verified()) or self:server_peer():id() == 0 or self._local_peer:id() == 0 then
 		return
 	end
 	local sent = self:chk_send_outfit_loading_status()
 	if not sent and self:are_all_peer_assets_loaded() then
-		print("[ClientNetworkSession:on_peer_outfit_loaded] sending outfit_ready proactively")
+		print("[ClientNetworkSession:_chk_send_proactive_outfit_loaded] sending outfit_ready proactively")
 		self:send_to_host("set_member_ready", self._local_peer:id(), 0, 3, "proactive")
 	end
 end

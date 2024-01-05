@@ -1,16 +1,23 @@
 FragGrenade = FragGrenade or class(GrenadeBase)
 
 function FragGrenade:init(unit)
-	self._init_timer = 2.5
+	self:_setup_frag_data(self._tweak_grenade_entry or "frag")
 	FragGrenade.super.init(self, unit)
-	self._range = tweak_data.grenades.frag.range
+end
+
+function FragGrenade:_setup_frag_data(grenade_entry)
+	local tweak_entry = tweak_data.grenades[grenade_entry]
+	self._init_timer = tweak_entry.init_timer or 2.5
+	self._mass_look_up_modifier = tweak_entry.mass_look_up_modifier
+	self._range = tweak_entry.range
 	self._effect_name = "effects/payday2/particles/explosions/grenade_explosion"
-	self._curve_pow = 3
-	self._damage = tweak_data.grenades.frag.damage
-	self._player_damage = tweak_data.grenades.frag.player_damage
+	self._curve_pow = tweak_entry.curve_pow or 3
+	self._damage = tweak_entry.damage
+	self._player_damage = tweak_entry.player_damage
+	local sound_event = tweak_entry.sound_event or "grenade_explode"
 	self._custom_params = {
 		effect = self._effect_name,
-		sound_event = "grenade_explode",
+		sound_event = sound_event,
 		feedback_range = self._range * 2,
 		camera_shake_max_mul = 4,
 		sound_muffle_effect = true
@@ -32,7 +39,7 @@ function FragGrenade:_detonate()
 		damage = self._damage,
 		player_damage = 0,
 		ignore_unit = self._unit,
-		user = self:thrower_unit()
+		user = self._unit
 	})
 	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
 	self._unit:set_slot(0)

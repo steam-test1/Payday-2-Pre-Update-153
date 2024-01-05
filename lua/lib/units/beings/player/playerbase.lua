@@ -236,12 +236,6 @@ function PlayerBase:_setup_hud()
 	if not managers.hud:exists(self.PLAYER_HUD) then
 		managers.hud:load_hud(self.PLAYER_HUD, false, false, true, {})
 	end
-	if not managers.hud:exists(self.PLAYER_INFO_HUD_FULLSCREEN) then
-		managers.hud:load_hud(self.PLAYER_INFO_HUD_FULLSCREEN, false, false, false, {})
-	end
-	if not managers.hud:exists(self.PLAYER_INFO_HUD) then
-		managers.hud:load_hud(self.PLAYER_INFO_HUD, false, false, true, {})
-	end
 	if not managers.hud:exists(self.PLAYER_DOWNED_HUD) then
 		managers.hud:load_hud(self.PLAYER_DOWNED_HUD, false, false, true, {})
 	end

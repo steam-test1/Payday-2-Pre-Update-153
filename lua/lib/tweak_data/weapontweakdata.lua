@@ -56,6 +56,10 @@ function WeaponTweakData:init()
 	self:_init_data_ben_npc()
 	self:_init_data_striker_npc()
 	self:_init_data_ksg_npc()
+	self:_init_data_gre_m79_npc()
+	self:_init_data_g3_npc()
+	self:_init_data_galil_npc()
+	self:_init_data_famas_npc()
 	self:_precalculate_values()
 end
 
@@ -112,7 +116,6 @@ function WeaponTweakData:_init_data_c45_npc()
 	self.c45_npc.CLIP_AMMO_MAX = 10
 	self.c45_npc.NR_CLIPS_MAX = 5
 	self.c45_npc.hold = "pistol"
-	self.c45_npc.hud_icon = "c45"
 	self.c45_npc.alert_size = 2500
 	self.c45_npc.suppression = 1
 	self.colt_1911_primary_npc = deep_clone(self.c45_npc)
@@ -129,7 +132,6 @@ function WeaponTweakData:_init_data_beretta92_npc()
 	self.beretta92_npc.CLIP_AMMO_MAX = 14
 	self.beretta92_npc.NR_CLIPS_MAX = 4
 	self.beretta92_npc.hold = "pistol"
-	self.beretta92_npc.hud_icon = "beretta92"
 	self.beretta92_npc.alert_size = 300
 	self.beretta92_npc.suppression = 0.3
 	self.beretta92_primary_npc = deep_clone(self.beretta92_npc)
@@ -146,7 +148,6 @@ function WeaponTweakData:_init_data_glock_18_npc()
 	self.glock_18_npc.CLIP_AMMO_MAX = 20
 	self.glock_18_npc.NR_CLIPS_MAX = 8
 	self.glock_18_npc.hold = "pistol"
-	self.glock_18_npc.hud_icon = "glock"
 	self.glock_18_npc.alert_size = 2500
 	self.glock_18_npc.suppression = 0.45
 	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
@@ -163,7 +164,6 @@ function WeaponTweakData:_init_data_raging_bull_npc()
 	self.raging_bull_npc.CLIP_AMMO_MAX = 6
 	self.raging_bull_npc.NR_CLIPS_MAX = 8
 	self.raging_bull_npc.hold = "pistol"
-	self.raging_bull_npc.hud_icon = "raging_bull"
 	self.raging_bull_npc.alert_size = 5000
 	self.raging_bull_npc.suppression = 1.8
 	self.raging_bull_primary_npc = deep_clone(self.raging_bull_npc)
@@ -180,7 +180,6 @@ function WeaponTweakData:_init_data_m4_npc()
 	self.m4_npc.NR_CLIPS_MAX = 5
 	self.m4_npc.auto.fire_rate = 0.175
 	self.m4_npc.hold = "rifle"
-	self.m4_npc.hud_icon = "m4"
 	self.m4_npc.alert_size = 5000
 	self.m4_npc.suppression = 1
 	self.m4_secondary_npc = deep_clone(self.m4_npc)
@@ -197,7 +196,6 @@ function WeaponTweakData:_init_data_ak47_npc()
 	self.ak47_npc.NR_CLIPS_MAX = 5
 	self.ak47_npc.auto.fire_rate = 0.2
 	self.ak47_npc.hold = "rifle"
-	self.ak47_npc.hud_icon = "ak"
 	self.ak47_npc.alert_size = 5000
 	self.ak47_npc.suppression = 1
 end
@@ -212,7 +210,6 @@ function WeaponTweakData:_init_data_m14_npc()
 	self.m14_npc.NR_CLIPS_MAX = 8
 	self.m14_npc.auto.fire_rate = 0.2
 	self.m14_npc.hold = "rifle"
-	self.m14_npc.hud_icon = "m14"
 	self.m14_npc.alert_size = 5000
 	self.m14_npc.suppression = 1
 end
@@ -226,7 +223,6 @@ function WeaponTweakData:_init_data_m14_sniper_npc()
 	self.m14_sniper_npc.CLIP_AMMO_MAX = 6
 	self.m14_sniper_npc.NR_CLIPS_MAX = 8
 	self.m14_sniper_npc.hold = "rifle"
-	self.m14_sniper_npc.hud_icon = "m14"
 	self.m14_sniper_npc.alert_size = 5000
 	self.m14_sniper_npc.suppression = 1
 	self.m14_sniper_npc.armor_piercing = true
@@ -241,7 +237,6 @@ function WeaponTweakData:_init_data_r870_npc()
 	self.r870_npc.CLIP_AMMO_MAX = 6
 	self.r870_npc.NR_CLIPS_MAX = 4
 	self.r870_npc.hold = "rifle"
-	self.r870_npc.hud_icon = "r870_shotgun"
 	self.r870_npc.alert_size = 4500
 	self.r870_npc.suppression = 1.8
 	self.r870_npc.is_shotgun = true
@@ -257,7 +252,6 @@ function WeaponTweakData:_init_data_mossberg_npc()
 	self.mossberg_npc.CLIP_AMMO_MAX = 4
 	self.mossberg_npc.NR_CLIPS_MAX = 6
 	self.mossberg_npc.hold = "rifle"
-	self.mossberg_npc.hud_icon = "mossberg"
 	self.mossberg_npc.alert_size = 3000
 	self.mossberg_npc.suppression = 2
 	self.mossberg_npc.is_shotgun = true
@@ -274,7 +268,6 @@ function WeaponTweakData:_init_data_mp5_npc()
 	self.mp5_npc.NR_CLIPS_MAX = 5
 	self.mp5_npc.auto.fire_rate = 0.12
 	self.mp5_npc.hold = "rifle"
-	self.mp5_npc.hud_icon = "mp5"
 	self.mp5_npc.alert_size = 2500
 	self.mp5_npc.suppression = 1
 	self.mp5_tactical_npc = deep_clone(self.mp5_npc)
@@ -293,7 +286,6 @@ function WeaponTweakData:_init_data_mac11_npc()
 	self.mac11_npc.NR_CLIPS_MAX = 5
 	self.mac11_npc.auto.fire_rate = 0.11
 	self.mac11_npc.hold = "pistol"
-	self.mac11_npc.hud_icon = "mac11"
 	self.mac11_npc.alert_size = 2500
 	self.mac11_npc.suppression = 1
 end
@@ -308,7 +300,6 @@ function WeaponTweakData:_init_data_g36_npc()
 	self.g36_npc.NR_CLIPS_MAX = 5
 	self.g36_npc.auto.fire_rate = 0.15
 	self.g36_npc.hold = "rifle"
-	self.g36_npc.hud_icon = "m4"
 	self.g36_npc.alert_size = 5000
 	self.g36_npc.suppression = 1
 end
@@ -323,7 +314,6 @@ function WeaponTweakData:_init_data_g17_npc()
 	self.g17_npc.CLIP_AMMO_MAX = 10
 	self.g17_npc.NR_CLIPS_MAX = 5
 	self.g17_npc.hold = "pistol"
-	self.g17_npc.hud_icon = "c45"
 	self.g17_npc.alert_size = 2500
 	self.g17_npc.suppression = 1
 end
@@ -339,7 +329,6 @@ function WeaponTweakData:_init_data_mp9_npc()
 	self.mp9_npc.NR_CLIPS_MAX = 5
 	self.mp9_npc.auto.fire_rate = 0.125
 	self.mp9_npc.hold = "pistol"
-	self.mp9_npc.hud_icon = "mac11"
 	self.mp9_npc.alert_size = 1000
 	self.mp9_npc.suppression = 1
 end
@@ -355,7 +344,6 @@ function WeaponTweakData:_init_data_olympic_npc()
 	self.olympic_npc.NR_CLIPS_MAX = 5
 	self.olympic_npc.auto.fire_rate = 0.115
 	self.olympic_npc.hold = "rifle"
-	self.olympic_npc.hud_icon = "mac11"
 	self.olympic_npc.alert_size = 1000
 	self.olympic_npc.suppression = 1
 	self.olympic_primary_npc = deep_clone(self.olympic_npc)
@@ -372,7 +360,6 @@ function WeaponTweakData:_init_data_m16_npc()
 	self.m16_npc.NR_CLIPS_MAX = 8
 	self.m16_npc.auto.fire_rate = 0.215
 	self.m16_npc.hold = "rifle"
-	self.m16_npc.hud_icon = "m14"
 	self.m16_npc.alert_size = 5000
 	self.m16_npc.suppression = 1
 end
@@ -387,7 +374,6 @@ function WeaponTweakData:_init_data_aug_npc()
 	self.aug_npc.NR_CLIPS_MAX = 5
 	self.aug_npc.auto.fire_rate = 0.185
 	self.aug_npc.hold = "rifle"
-	self.aug_npc.hud_icon = "m4"
 	self.aug_npc.alert_size = 5000
 	self.aug_npc.suppression = 1
 	self.aug_secondary_npc = deep_clone(self.aug_npc)
@@ -404,7 +390,6 @@ function WeaponTweakData:_init_data_ak74_npc()
 	self.ak74_npc.NR_CLIPS_MAX = 5
 	self.ak74_npc.auto.fire_rate = 0.19
 	self.ak74_npc.hold = "rifle"
-	self.ak74_npc.hud_icon = "ak"
 	self.ak74_npc.alert_size = 5000
 	self.ak74_npc.suppression = 1
 	self.ak74_secondary_npc = deep_clone(self.ak74_npc)
@@ -421,7 +406,6 @@ function WeaponTweakData:_init_data_ak5_npc()
 	self.ak5_npc.NR_CLIPS_MAX = 5
 	self.ak5_npc.auto.fire_rate = 0.2
 	self.ak5_npc.hold = "rifle"
-	self.ak5_npc.hud_icon = "m4"
 	self.ak5_npc.alert_size = 5000
 	self.ak5_npc.suppression = 1
 end
@@ -437,7 +421,6 @@ function WeaponTweakData:_init_data_p90_npc()
 	self.p90_npc.NR_CLIPS_MAX = 5
 	self.p90_npc.auto.fire_rate = 0.11
 	self.p90_npc.hold = "pistol"
-	self.p90_npc.hud_icon = "mac11"
 	self.p90_npc.alert_size = 1000
 	self.p90_npc.suppression = 1
 end
@@ -452,7 +435,6 @@ function WeaponTweakData:_init_data_amcar_npc()
 	self.amcar_npc.NR_CLIPS_MAX = 5
 	self.amcar_npc.auto.fire_rate = 0.2
 	self.amcar_npc.hold = "rifle"
-	self.amcar_npc.hud_icon = "m4"
 	self.amcar_npc.alert_size = 5000
 	self.amcar_npc.suppression = 1
 end
@@ -468,7 +450,6 @@ function WeaponTweakData:_init_data_mac10_npc()
 	self.mac10_npc.NR_CLIPS_MAX = 5
 	self.mac10_npc.auto.fire_rate = 0.1
 	self.mac10_npc.hold = "pistol"
-	self.mac10_npc.hud_icon = "mac11"
 	self.mac10_npc.alert_size = 1000
 	self.mac10_npc.suppression = 1
 end
@@ -484,7 +465,6 @@ function WeaponTweakData:_init_data_akmsu_npc()
 	self.akmsu_npc.NR_CLIPS_MAX = 5
 	self.akmsu_npc.auto.fire_rate = 0.1
 	self.akmsu_npc.hold = "rifle"
-	self.akmsu_npc.hud_icon = "mac11"
 	self.akmsu_npc.alert_size = 1000
 	self.akmsu_npc.suppression = 1
 	self.akmsu_primary_npc = deep_clone(self.akmsu_npc)
@@ -501,7 +481,6 @@ function WeaponTweakData:_init_data_akm_npc()
 	self.akm_npc.NR_CLIPS_MAX = 5
 	self.akm_npc.auto.fire_rate = 0.2
 	self.akm_npc.hold = "rifle"
-	self.akm_npc.hud_icon = "ak"
 	self.akm_npc.alert_size = 5000
 	self.akm_npc.suppression = 1
 end
@@ -516,7 +495,6 @@ function WeaponTweakData:_init_data_akm_gold_npc()
 	self.akm_gold_npc.NR_CLIPS_MAX = 5
 	self.akm_gold_npc.auto.fire_rate = 0.2
 	self.akm_gold_npc.hold = "rifle"
-	self.akm_gold_npc.hud_icon = "ak"
 	self.akm_gold_npc.alert_size = 5000
 	self.akm_gold_npc.suppression = 1
 end
@@ -531,7 +509,6 @@ function WeaponTweakData:_init_data_deagle_npc()
 	self.deagle_npc.CLIP_AMMO_MAX = 10
 	self.deagle_npc.NR_CLIPS_MAX = 5
 	self.deagle_npc.hold = "pistol"
-	self.deagle_npc.hud_icon = "c45"
 	self.deagle_npc.alert_size = 2500
 	self.deagle_npc.suppression = 1
 	self.deagle_primary_npc = deep_clone(self.deagle_npc)
@@ -547,7 +524,6 @@ function WeaponTweakData:_init_data_serbu_npc()
 	self.serbu_npc.CLIP_AMMO_MAX = 6
 	self.serbu_npc.NR_CLIPS_MAX = 4
 	self.serbu_npc.hold = "rifle"
-	self.serbu_npc.hud_icon = "r870_shotgun"
 	self.serbu_npc.alert_size = 4500
 	self.serbu_npc.suppression = 1.8
 	self.serbu_npc.is_shotgun = true
@@ -563,7 +539,6 @@ function WeaponTweakData:_init_data_saiga_npc()
 	self.saiga_npc.CLIP_AMMO_MAX = 20
 	self.saiga_npc.NR_CLIPS_MAX = 4
 	self.saiga_npc.hold = "rifle"
-	self.saiga_npc.hud_icon = "r870_shotgun"
 	self.saiga_npc.alert_size = 4500
 	self.saiga_npc.suppression = 1.8
 	self.saiga_npc.is_shotgun = true
@@ -578,7 +553,6 @@ function WeaponTweakData:_init_data_huntsman_npc()
 	self.huntsman_npc.CLIP_AMMO_MAX = 2
 	self.huntsman_npc.NR_CLIPS_MAX = 4
 	self.huntsman_npc.hold = "rifle"
-	self.huntsman_npc.hud_icon = "r870_shotgun"
 	self.huntsman_npc.alert_size = 4500
 	self.huntsman_npc.suppression = 1.8
 	self.huntsman_npc.is_shotgun = true
@@ -595,7 +569,6 @@ function WeaponTweakData:_init_data_saw_npc()
 	self.saw_npc.CLIP_AMMO_MAX = 2
 	self.saw_npc.NR_CLIPS_MAX = 4
 	self.saw_npc.hold = "rifle"
-	self.saw_npc.hud_icon = "r870_shotgun"
 	self.saw_npc.alert_size = 4500
 	self.saw_npc.suppression = 1.8
 	self.saw_secondary_npc = deep_clone(self.saw_npc)
@@ -655,7 +628,6 @@ function WeaponTweakData:_init_data_usp_npc()
 	self.usp_npc.NR_CLIPS_MAX = 6
 	self.usp_npc.auto.fire_rate = 0.1
 	self.usp_npc.hold = "pistol"
-	self.usp_npc.hud_icon = "mac11"
 	self.usp_npc.alert_size = 1800
 	self.usp_npc.suppression = 2
 end
@@ -671,7 +643,6 @@ function WeaponTweakData:_init_data_g22c_npc()
 	self.g22c_npc.NR_CLIPS_MAX = 6
 	self.g22c_npc.auto.fire_rate = 0.1
 	self.g22c_npc.hold = "pistol"
-	self.g22c_npc.hud_icon = "mac11"
 	self.g22c_npc.alert_size = 1800
 	self.g22c_npc.suppression = 2
 end
@@ -686,7 +657,6 @@ function WeaponTweakData:_init_data_judge_npc()
 	self.judge_npc.CLIP_AMMO_MAX = 6
 	self.judge_npc.NR_CLIPS_MAX = 8
 	self.judge_npc.hold = "pistol"
-	self.judge_npc.hud_icon = "raging_bull"
 	self.judge_npc.alert_size = 5000
 	self.judge_npc.suppression = 1.8
 end
@@ -702,7 +672,6 @@ function WeaponTweakData:_init_data_m45_npc()
 	self.m45_npc.NR_CLIPS_MAX = 5
 	self.m45_npc.auto.fire_rate = 0.1
 	self.m45_npc.hold = "rifle"
-	self.m45_npc.hud_icon = "mac11"
 	self.m45_npc.alert_size = 2800
 	self.m45_npc.suppression = 1
 end
@@ -717,7 +686,6 @@ function WeaponTweakData:_init_data_s552_npc()
 	self.s552_npc.NR_CLIPS_MAX = 5
 	self.s552_npc.auto.fire_rate = 0.15
 	self.s552_npc.hold = "rifle"
-	self.s552_npc.hud_icon = "m4"
 	self.s552_npc.alert_size = 5000
 	self.s552_npc.suppression = 1
 	self.s552_secondary_npc = deep_clone(self.s552_npc)
@@ -734,7 +702,6 @@ function WeaponTweakData:_init_data_ppk_npc()
 	self.ppk_npc.CLIP_AMMO_MAX = 10
 	self.ppk_npc.NR_CLIPS_MAX = 5
 	self.ppk_npc.hold = "pistol"
-	self.ppk_npc.hud_icon = "c45"
 	self.ppk_npc.alert_size = 2500
 	self.ppk_npc.suppression = 1
 end
@@ -750,7 +717,6 @@ function WeaponTweakData:_init_data_mp7_npc()
 	self.mp7_npc.NR_CLIPS_MAX = 5
 	self.mp7_npc.auto.fire_rate = 0.1
 	self.mp7_npc.hold = "pistol"
-	self.mp7_npc.hud_icon = "mac11"
 	self.mp7_npc.alert_size = 2800
 	self.mp7_npc.suppression = 1
 end
@@ -765,7 +731,6 @@ function WeaponTweakData:_init_data_scar_npc()
 	self.scar_npc.NR_CLIPS_MAX = 5
 	self.scar_npc.auto.fire_rate = 0.15
 	self.scar_npc.hold = "rifle"
-	self.scar_npc.hud_icon = "m4"
 	self.scar_npc.alert_size = 5000
 	self.scar_npc.suppression = 1
 	self.scar_secondary_npc = deep_clone(self.scar_npc)
@@ -782,7 +747,6 @@ function WeaponTweakData:_init_data_p226_npc()
 	self.p226_npc.CLIP_AMMO_MAX = 10
 	self.p226_npc.NR_CLIPS_MAX = 5
 	self.p226_npc.hold = "pistol"
-	self.p226_npc.hud_icon = "c45"
 	self.p226_npc.alert_size = 2500
 	self.p226_npc.suppression = 1
 end
@@ -797,7 +761,6 @@ function WeaponTweakData:_init_data_hk21_npc()
 	self.hk21_npc.NR_CLIPS_MAX = 5
 	self.hk21_npc.auto.fire_rate = 0.15
 	self.hk21_npc.hold = "rifle"
-	self.hk21_npc.hud_icon = "m4"
 	self.hk21_npc.alert_size = 5000
 	self.hk21_npc.suppression = 1
 	self.hk21_secondary_npc = deep_clone(self.hk21_npc)
@@ -814,7 +777,6 @@ function WeaponTweakData:_init_data_m249_npc()
 	self.m249_npc.NR_CLIPS_MAX = 2
 	self.m249_npc.auto.fire_rate = 0.08
 	self.m249_npc.hold = "rifle"
-	self.m249_npc.hud_icon = "m4"
 	self.m249_npc.alert_size = 5000
 	self.m249_npc.suppression = 1
 	self.m249_secondary_npc = deep_clone(self.m249_npc)
@@ -832,7 +794,6 @@ function WeaponTweakData:_init_data_rpk_npc()
 	self.rpk_npc.NR_CLIPS_MAX = 5
 	self.rpk_npc.auto.fire_rate = 0.15
 	self.rpk_npc.hold = "rifle"
-	self.rpk_npc.hud_icon = "ak"
 	self.rpk_npc.alert_size = 5000
 	self.rpk_npc.suppression = 1
 	self.rpk_secondary_npc = deep_clone(self.rpk_npc)
@@ -849,7 +810,6 @@ function WeaponTweakData:_init_data_m95_npc()
 	self.m95_npc.NR_CLIPS_MAX = 5
 	self.m95_npc.auto.fire_rate = 20
 	self.m95_npc.hold = "rifle"
-	self.m95_npc.hud_icon = "m4"
 	self.m95_npc.alert_size = 5000
 	self.m95_npc.suppression = 1
 	self.m95_secondary_npc = deep_clone(self.m95_npc)
@@ -866,7 +826,6 @@ function WeaponTweakData:_init_data_msr_npc()
 	self.msr_npc.NR_CLIPS_MAX = 5
 	self.msr_npc.auto.fire_rate = 20
 	self.msr_npc.hold = "rifle"
-	self.msr_npc.hud_icon = "m4"
 	self.msr_npc.alert_size = 5000
 	self.msr_npc.suppression = 1
 	self.msr_secondary_npc = deep_clone(self.msr_npc)
@@ -883,7 +842,6 @@ function WeaponTweakData:_init_data_r93_npc()
 	self.r93_npc.NR_CLIPS_MAX = 5
 	self.r93_npc.auto.fire_rate = 20
 	self.r93_npc.hold = "rifle"
-	self.r93_npc.hud_icon = "m4"
 	self.r93_npc.alert_size = 5000
 	self.r93_npc.suppression = 1
 	self.r93_secondary_npc = deep_clone(self.r93_npc)
@@ -900,7 +858,6 @@ function WeaponTweakData:_init_data_fal_npc()
 	self.fal_npc.NR_CLIPS_MAX = 5
 	self.fal_npc.auto.fire_rate = 0.15
 	self.fal_npc.hold = "rifle"
-	self.fal_npc.hud_icon = "m4"
 	self.fal_npc.alert_size = 5000
 	self.fal_npc.suppression = 1
 	self.fal_secondary_npc = deep_clone(self.fal_npc)
@@ -917,7 +874,6 @@ function WeaponTweakData:_init_data_ben_npc()
 	self.ben_npc.CLIP_AMMO_MAX = 20
 	self.ben_npc.NR_CLIPS_MAX = 4
 	self.ben_npc.hold = "rifle"
-	self.ben_npc.hud_icon = "r870_shotgun"
 	self.ben_npc.alert_size = 4500
 	self.ben_npc.suppression = 1.8
 	self.ben_npc.is_shotgun = true
@@ -933,7 +889,6 @@ function WeaponTweakData:_init_data_striker_npc()
 	self.striker_npc.CLIP_AMMO_MAX = 20
 	self.striker_npc.NR_CLIPS_MAX = 4
 	self.striker_npc.hold = "rifle"
-	self.striker_npc.hud_icon = "r870_shotgun"
 	self.striker_npc.alert_size = 4500
 	self.striker_npc.suppression = 1.8
 	self.striker_npc.is_shotgun = true
@@ -949,10 +904,67 @@ function WeaponTweakData:_init_data_ksg_npc()
 	self.ksg_npc.CLIP_AMMO_MAX = 20
 	self.ksg_npc.NR_CLIPS_MAX = 4
 	self.ksg_npc.hold = "rifle"
-	self.ksg_npc.hud_icon = "r870_shotgun"
 	self.ksg_npc.alert_size = 4500
 	self.ksg_npc.suppression = 1.8
 	self.ksg_npc.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_gre_m79_npc()
+	self.gre_m79_npc.sounds.prefix = "gl40_npc"
+	self.gre_m79_npc.use_data.selection_index = 2
+	self.gre_m79_npc.DAMAGE = 2
+	self.gre_m79_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.gre_m79_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.gre_m79_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.gre_m79_npc.no_trail = true
+	self.gre_m79_npc.CLIP_AMMO_MAX = 1
+	self.gre_m79_npc.NR_CLIPS_MAX = 4
+	self.gre_m79_npc.auto.fire_rate = 0.1
+	self.gre_m79_npc.hold = "rifle"
+	self.gre_m79_npc.alert_size = 2800
+	self.gre_m79_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_g3_npc()
+	self.g3_npc.sounds.prefix = "g3_npc"
+	self.g3_npc.use_data.selection_index = 2
+	self.g3_npc.DAMAGE = 2
+	self.g3_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.g3_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.g3_npc.CLIP_AMMO_MAX = 20
+	self.g3_npc.NR_CLIPS_MAX = 5
+	self.g3_npc.auto.fire_rate = 0.15
+	self.g3_npc.hold = "rifle"
+	self.g3_npc.alert_size = 5000
+	self.g3_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_galil_npc()
+	self.galil_npc.sounds.prefix = "galil_npc"
+	self.galil_npc.use_data.selection_index = 2
+	self.galil_npc.DAMAGE = 2
+	self.galil_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.galil_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.galil_npc.CLIP_AMMO_MAX = 20
+	self.galil_npc.NR_CLIPS_MAX = 5
+	self.galil_npc.auto.fire_rate = 0.15
+	self.galil_npc.hold = "rifle"
+	self.galil_npc.alert_size = 5000
+	self.galil_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_famas_npc()
+	self.famas_npc.sounds.prefix = "famas_npc"
+	self.famas_npc.use_data.selection_index = 2
+	self.famas_npc.DAMAGE = 2
+	self.famas_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.famas_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.famas_npc.CLIP_AMMO_MAX = 20
+	self.famas_npc.NR_CLIPS_MAX = 5
+	self.famas_npc.auto.fire_rate = 0.15
+	self.famas_npc.hold = "rifle"
+	self.famas_npc.alert_size = 5000
+	self.famas_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons()
@@ -1314,12 +1326,11 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.new_m4.timers = {}
 	self.new_m4.timers.reload_not_empty = 2.665
-	self.new_m4.timers.reload_empty = 3.73
+	self.new_m4.timers.reload_empty = 3.43
 	self.new_m4.timers.unequip = 0.75
 	self.new_m4.timers.equip = 0.7
 	self.new_m4.name_id = "bm_w_m4"
 	self.new_m4.desc_id = "bm_w_m4_desc"
-	self.new_m4.hud_icon = "m4"
 	self.new_m4.description_id = "des_m4"
 	self.new_m4.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.new_m4.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -1397,9 +1408,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_17.timers.equip = 0.5
 	self.glock_17.name_id = "bm_w_glock_17"
 	self.glock_17.desc_id = "bm_w_glock_17_desc"
-	self.glock_17.hud_icon = "c45"
 	self.glock_17.description_id = "des_glock_17"
-	self.glock_17.hud_ammo = "guis/textures/ammo_9mm"
 	self.glock_17.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.glock_17.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.glock_17.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -1482,9 +1491,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.timers.equip = 0.55
 	self.mp9.name_id = "bm_w_mp9"
 	self.mp9.desc_id = "bm_w_mp9_desc"
-	self.mp9.hud_icon = "mac11"
 	self.mp9.description_id = "des_mp9"
-	self.mp9.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.mp9.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.mp9.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.mp9.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -1566,9 +1573,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r870.timers.equip = 0.85
 	self.r870.name_id = "bm_w_r870"
 	self.r870.desc_id = "bm_w_r870_desc"
-	self.r870.hud_icon = "r870_shotgun"
 	self.r870.description_id = "des_r870"
-	self.r870.hud_ammo = "guis/textures/ammo_shell"
 	self.r870.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.r870.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
 	self.r870.use_data = {}
@@ -1663,9 +1668,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_18c.timers.equip = 0.55
 	self.glock_18c.name_id = "bm_w_glock_18c"
 	self.glock_18c.desc_id = "bm_w_glock_18c_desc"
-	self.glock_18c.hud_icon = "glock"
 	self.glock_18c.description_id = "des_glock"
-	self.glock_18c.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.glock_18c.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.glock_18c.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.glock_18c.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -1756,7 +1759,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.amcar.timers.equip = 0.7
 	self.amcar.name_id = "bm_w_amcar"
 	self.amcar.desc_id = "bm_w_amcar_desc"
-	self.amcar.hud_icon = "m4"
 	self.amcar.description_id = "des_m4"
 	self.amcar.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.amcar.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -1837,12 +1839,11 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.m16.timers = {}
 	self.m16.timers.reload_not_empty = 2.665
-	self.m16.timers.reload_empty = 3.43
+	self.m16.timers.reload_empty = 3.73
 	self.m16.timers.unequip = 0.8
 	self.m16.timers.equip = 0.8
 	self.m16.name_id = "bm_w_m16"
 	self.m16.desc_id = "bm_w_m16_desc"
-	self.m16.hud_icon = "m4"
 	self.m16.description_id = "des_m4"
 	self.m16.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.m16.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -1928,7 +1929,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.timers.equip = 0.5
 	self.olympic.name_id = "bm_w_olympic"
 	self.olympic.desc_id = "bm_w_olympic_desc"
-	self.olympic.hud_icon = "m4"
 	self.olympic.description_id = "des_m4"
 	self.olympic.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.olympic.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2013,7 +2013,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.timers.equip = 0.8
 	self.ak74.name_id = "bm_w_ak74"
 	self.ak74.desc_id = "bm_w_ak74_desc"
-	self.ak74.hud_icon = "ak"
 	self.ak74.description_id = "des_ak47"
 	self.ak74.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.ak74.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2099,7 +2098,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm.timers.equip = 0.8
 	self.akm.name_id = "bm_w_akm"
 	self.akm.desc_id = "bm_w_akm_desc"
-	self.akm.hud_icon = "ak"
 	self.akm.description_id = "des_ak47"
 	self.akm.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.akm.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2185,7 +2183,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm_gold.timers.equip = 0.8
 	self.akm_gold.name_id = "bm_w_akm_gold"
 	self.akm_gold.desc_id = "bm_w_akm_gold_desc"
-	self.akm_gold.hud_icon = "ak"
 	self.akm_gold.description_id = "des_ak47"
 	self.akm_gold.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.akm_gold.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2272,7 +2269,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.timers.equip = 0.6
 	self.akmsu.name_id = "bm_w_akmsu"
 	self.akmsu.desc_id = "bm_w_akmsu_desc"
-	self.akmsu.hud_icon = "ak"
 	self.akmsu.description_id = "des_ak47"
 	self.akmsu.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.akmsu.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2356,9 +2352,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.timers.equip = 0.85
 	self.saiga.name_id = "bm_w_saiga"
 	self.saiga.desc_id = "bm_w_saiga_desc"
-	self.saiga.hud_icon = "r870_shotgun"
 	self.saiga.description_id = "des_saiga"
-	self.saiga.hud_ammo = "guis/textures/ammo_shell"
 	self.saiga.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.saiga.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
 	self.saiga.use_data = {}
@@ -2445,7 +2439,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.timers.equip = 0.8
 	self.ak5.name_id = "bm_w_ak5"
 	self.ak5.desc_id = "bm_w_ak5_desc"
-	self.ak5.hud_icon = "m4"
 	self.ak5.description_id = "des_m4"
 	self.ak5.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.ak5.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2530,9 +2523,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aug.timers.equip = 0.8
 	self.aug.name_id = "bm_w_aug"
 	self.aug.desc_id = "bm_w_aug_desc"
-	self.aug.hud_icon = "mp5"
 	self.aug.description_id = "des_aug"
-	self.aug.hud_ammo = "guis/textures/ammo_9mm"
 	self.aug.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.aug.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
 	self.aug.use_data = {}
@@ -2614,7 +2605,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.timers.equip = 0.85
 	self.g36.name_id = "bm_w_g36"
 	self.g36.desc_id = "bm_w_g36_desc"
-	self.g36.hud_icon = "m4"
 	self.g36.description_id = "des_m4"
 	self.g36.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.g36.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2696,9 +2686,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.timers.equip = 0.65
 	self.p90.name_id = "bm_w_p90"
 	self.p90.desc_id = "bm_w_p90_desc"
-	self.p90.hud_icon = "mac11"
 	self.p90.description_id = "des_p90"
-	self.p90.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.p90.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.p90.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
 	self.p90.use_data = {}
@@ -2779,7 +2767,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m14.timers.equip = 0.9
 	self.new_m14.name_id = "bm_w_m14"
 	self.new_m14.desc_id = "bm_w_m14_desc"
-	self.new_m14.hud_icon = "m14"
 	self.new_m14.description_id = "des_m14"
 	self.new_m14.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.new_m14.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -2831,7 +2818,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m14.animations.equip_id = "equip_m14_rifle"
 	self.new_m14.animations.recoil_steelsight = true
 	self.new_m14.stats = {
-		damage = 26,
+		damage = 30,
 		spread = 9,
 		recoil = 2,
 		spread_moving = 5,
@@ -2864,9 +2851,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.deagle.timers.equip = 0.6
 	self.deagle.name_id = "bm_w_deagle"
 	self.deagle.desc_id = "bm_w_deagle_desc"
-	self.deagle.hud_icon = "c45"
 	self.deagle.description_id = "des_deagle"
-	self.deagle.hud_ammo = "guis/textures/ammo_9mm"
 	self.deagle.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.deagle.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.deagle.use_data = {}
@@ -2941,9 +2926,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.timers.equip = 0.7
 	self.new_mp5.name_id = "bm_w_mp5"
 	self.new_mp5.desc_id = "bm_w_mp5_desc"
-	self.new_mp5.hud_icon = "mp5"
 	self.new_mp5.description_id = "des_mp5"
-	self.new_mp5.hud_ammo = "guis/textures/ammo_9mm"
 	self.new_mp5.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.new_mp5.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.new_mp5.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3028,9 +3011,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.colt_1911.timers.equip = 0.55
 	self.colt_1911.name_id = "bm_w_colt_1911"
 	self.colt_1911.desc_id = "bm_w_colt_1911_desc"
-	self.colt_1911.hud_icon = "c45"
 	self.colt_1911.description_id = "des_colt_1911"
-	self.colt_1911.hud_ammo = "guis/textures/ammo_9mm"
 	self.colt_1911.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.colt_1911.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.colt_1911.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3108,9 +3089,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.timers.equip = 0.5
 	self.mac10.name_id = "bm_w_mac10"
 	self.mac10.desc_id = "bm_w_mac10_desc"
-	self.mac10.hud_icon = "mac11"
 	self.mac10.description_id = "des_mac10"
-	self.mac10.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.mac10.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.mac10.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.mac10.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3188,9 +3167,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.serbu.timers.equip = 0.6
 	self.serbu.name_id = "bm_w_serbu"
 	self.serbu.desc_id = "bm_w_serbu_desc"
-	self.serbu.hud_icon = "r870_shotgun"
 	self.serbu.description_id = "des_r870"
-	self.serbu.hud_ammo = "guis/textures/ammo_shell"
 	self.serbu.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.serbu.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
 	self.serbu.use_data = {}
@@ -3277,9 +3254,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.timers.equip = 0.85
 	self.huntsman.name_id = "bm_w_huntsman"
 	self.huntsman.desc_id = "bm_w_huntsman_desc"
-	self.huntsman.hud_icon = "m79"
 	self.huntsman.description_id = "des_huntsman"
-	self.huntsman.hud_ammo = "guis/textures/ammo_grenade"
 	self.huntsman.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.huntsman.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
 	self.huntsman.use_data = {}
@@ -3367,9 +3342,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b92fs.timers.equip = 0.55
 	self.b92fs.name_id = "bm_w_b92fs"
 	self.b92fs.desc_id = "bm_w_b92fs_desc"
-	self.b92fs.hud_icon = "beretta92"
 	self.b92fs.description_id = "des_b92fs"
-	self.b92fs.hud_ammo = "guis/textures/ammo_9mm"
 	self.b92fs.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.b92fs.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.b92fs.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3458,9 +3431,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_raging_bull.single.fire_rate = 0.21
 	self.new_raging_bull.name_id = "bm_w_raging_bull"
 	self.new_raging_bull.desc_id = "bm_w_raging_bull_desc"
-	self.new_raging_bull.hud_icon = "raging_bull"
 	self.new_raging_bull.description_id = "des_new_raging_bull"
-	self.new_raging_bull.hud_ammo = "guis/textures/ammo_9mm"
 	self.new_raging_bull.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.new_raging_bull.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
 	self.new_raging_bull.use_data = {}
@@ -3539,9 +3510,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saw.timers.equip = 0.8
 	self.saw.name_id = "bm_w_saw"
 	self.saw.desc_id = "bm_w_saw_desc"
-	self.saw.hud_icon = "equipment_saw"
 	self.saw.description_id = "des_mp5"
-	self.saw.hud_ammo = "guis/textures/ammo_9mm"
 	self.saw.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.saw.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.saw.use_data = {}
@@ -3635,9 +3604,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.usp.timers.equip = 0.55
 	self.usp.name_id = "bm_w_usp"
 	self.usp.desc_id = "bm_w_usp_desc"
-	self.usp.hud_icon = "beretta92"
 	self.usp.description_id = "des_usp"
-	self.usp.hud_ammo = "guis/textures/ammo_9mm"
 	self.usp.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.usp.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.usp.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3722,9 +3689,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g22c.timers.equip = 0.55
 	self.g22c.name_id = "bm_w_g22c"
 	self.g22c.desc_id = "bm_w_g22c_desc"
-	self.g22c.hud_icon = "beretta92"
 	self.g22c.description_id = "des_g22c"
-	self.g22c.hud_ammo = "guis/textures/ammo_9mm"
 	self.g22c.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.g22c.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.g22c.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3819,9 +3784,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.judge.single.fire_rate = 0.21
 	self.judge.name_id = "bm_w_judge"
 	self.judge.desc_id = "bm_w_judge_desc"
-	self.judge.hud_icon = "raging_bull"
 	self.judge.description_id = "des_judge"
-	self.judge.hud_ammo = "guis/textures/ammo_9mm"
 	self.judge.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.judge.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
 	self.judge.use_data = {}
@@ -3908,9 +3871,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m45.timers.equip = 0.75
 	self.m45.name_id = "bm_w_m45"
 	self.m45.desc_id = "bm_w_m45_desc"
-	self.m45.hud_icon = "mac11"
 	self.m45.description_id = "des_m45"
-	self.m45.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.m45.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.m45.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.m45.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -3994,7 +3955,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.s552.timers.equip = 0.9
 	self.s552.name_id = "bm_w_s552"
 	self.s552.desc_id = "bm_w_s552_desc"
-	self.s552.hud_icon = "m4"
 	self.s552.description_id = "des_s552"
 	self.s552.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
 	self.s552.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -4076,9 +4036,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ppk.timers.equip = 0.5
 	self.ppk.name_id = "bm_w_ppk"
 	self.ppk.desc_id = "bm_w_ppk_desc"
-	self.ppk.hud_icon = "beretta92"
 	self.ppk.description_id = "des_ppk"
-	self.ppk.hud_ammo = "guis/textures/ammo_9mm"
 	self.ppk.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.ppk.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.ppk.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -4162,9 +4120,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.timers.equip = 0.75
 	self.mp7.name_id = "bm_w_mp7"
 	self.mp7.desc_id = "bm_w_mp7_desc"
-	self.mp7.hud_icon = "mac11"
 	self.mp7.description_id = "des_mp7"
-	self.mp7.hud_ammo = "guis/textures/ammo_small_9mm"
 	self.mp7.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.mp7.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.mp7.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -4249,7 +4205,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scar.timers.equip = 0.9
 	self.scar.name_id = "bm_w_scar"
 	self.scar.desc_id = "bm_w_scar_desc"
-	self.scar.hud_icon = "m4"
 	self.scar.description_id = "des_scar"
 	self.scar.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.scar.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -4331,9 +4286,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p226.timers.equip = 0.5
 	self.p226.name_id = "bm_w_p226"
 	self.p226.desc_id = "bm_w_p226_desc"
-	self.p226.hud_icon = "beretta92"
 	self.p226.description_id = "des_p226"
-	self.p226.hud_ammo = "guis/textures/ammo_9mm"
 	self.p226.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
 	self.p226.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.p226.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -4417,7 +4370,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hk21.timers.equip = 0.9
 	self.hk21.name_id = "bm_w_hk21"
 	self.hk21.desc_id = "bm_w_hk21_desc"
-	self.hk21.hud_icon = "m4"
 	self.hk21.description_id = "des_hk21"
 	self.hk21.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
 	self.hk21.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
@@ -4507,7 +4459,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m249.timers.equip = 0.9
 	self.m249.name_id = "bm_w_m249"
 	self.m249.desc_id = "bm_w_m249_desc"
-	self.m249.hud_icon = "m4"
 	self.m249.description_id = "des_m249"
 	self.m249.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
 	self.m249.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
@@ -4597,7 +4548,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpk.timers.equip = 0.9
 	self.rpk.name_id = "bm_w_rpk"
 	self.rpk.desc_id = "bm_w_rpk_desc"
-	self.rpk.hud_icon = "m4"
 	self.rpk.description_id = "des_rpk"
 	self.rpk.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
 	self.rpk.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -4689,7 +4639,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m95.timers.equip = 0.9
 	self.m95.name_id = "bm_w_m95"
 	self.m95.desc_id = "bm_w_m95_desc"
-	self.m95.hud_icon = "m4"
 	self.m95.description_id = "des_m95"
 	self.m95.muzzleflash = "effects/payday2/particles/weapons/50cal_auto_fps"
 	self.m95.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_m95"
@@ -4789,7 +4738,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.timers.equip = 0.9
 	self.msr.name_id = "bm_w_msr"
 	self.msr.desc_id = "bm_w_msr_desc"
-	self.msr.hud_icon = "m4"
 	self.msr.description_id = "des_msr"
 	self.msr.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
 	self.msr.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
@@ -4891,7 +4839,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r93.timers.equip = 0.9
 	self.r93.name_id = "bm_w_r93"
 	self.r93.desc_id = "bm_w_r93_desc"
-	self.r93.hud_icon = "m4"
 	self.r93.description_id = "des_r93"
 	self.r93.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
 	self.r93.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
@@ -4991,7 +4938,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.fal.timers.equip = 0.9
 	self.fal.name_id = "bm_w_fal"
 	self.fal.desc_id = "bm_w_fal_desc"
-	self.fal.hud_icon = "m4"
 	self.fal.description_id = "des_fal"
 	self.fal.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.fal.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
@@ -5071,9 +5017,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.benelli.timers.equip = 0.85
 	self.benelli.name_id = "bm_w_benelli"
 	self.benelli.desc_id = "bm_w_benelli_desc"
-	self.benelli.hud_icon = "r870_shotgun"
 	self.benelli.description_id = "des_benelli"
-	self.benelli.hud_ammo = "guis/textures/ammo_shell"
 	self.benelli.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.benelli.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
 	self.benelli.use_data = {}
@@ -5161,9 +5105,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.striker.timers.equip = 0.85
 	self.striker.name_id = "bm_w_striker"
 	self.striker.desc_id = "bm_w_striker_desc"
-	self.striker.hud_icon = "r870_shotgun"
 	self.striker.description_id = "des_striker"
-	self.striker.hud_ammo = "guis/textures/ammo_shell"
 	self.striker.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.striker.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
 	self.striker.use_data = {}
@@ -5246,9 +5188,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ksg.timers.equip = 0.85
 	self.ksg.name_id = "bm_w_ksg"
 	self.ksg.desc_id = "bm_w_ksg_desc"
-	self.ksg.hud_icon = "r870_shotgun"
 	self.ksg.description_id = "des_ksg"
-	self.ksg.hud_ammo = "guis/textures/ammo_shell"
 	self.ksg.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
 	self.ksg.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
 	self.ksg.use_data = {}
@@ -5325,6 +5265,354 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		total_ammo_mod = 21,
 		value = 1
+	}
+	self.gre_m79 = {}
+	self.gre_m79.category = "grenade_launcher"
+	self.gre_m79.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.gre_m79.damage_melee = damage_melee_default
+	self.gre_m79.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.gre_m79.sounds = {}
+	self.gre_m79.sounds.fire = "gl40_fire"
+	self.gre_m79.sounds.dryfire = "shotgun_dryfire"
+	self.gre_m79.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.gre_m79.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.gre_m79.timers = {}
+	self.gre_m79.timers.reload_not_empty = 3.1
+	self.gre_m79.timers.reload_empty = self.gre_m79.timers.reload_not_empty
+	self.gre_m79.timers.unequip = 0.85
+	self.gre_m79.timers.equip = 0.85
+	self.gre_m79.name_id = "bm_w_gre_m79"
+	self.gre_m79.desc_id = "bm_w_gre_m79_desc"
+	self.gre_m79.description_id = "des_gre_m79"
+	self.gre_m79.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.gre_m79.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.gre_m79.use_data = {}
+	self.gre_m79.use_data.selection_index = 2
+	self.gre_m79.use_data.align_place = "right_hand"
+	self.gre_m79.DAMAGE = 6
+	self.gre_m79.damage_near = 1000
+	self.gre_m79.damage_far = 2000
+	self.gre_m79.rays = 6
+	self.gre_m79.CLIP_AMMO_MAX = 1
+	self.gre_m79.NR_CLIPS_MAX = math.round(total_damage_primary / 50 / self.gre_m79.CLIP_AMMO_MAX)
+	self.gre_m79.AMMO_MAX = self.gre_m79.CLIP_AMMO_MAX * self.gre_m79.NR_CLIPS_MAX
+	self.gre_m79.AMMO_PICKUP = {0.05, 0.65}
+	self.gre_m79.FIRE_MODE = "single"
+	self.gre_m79.fire_mode_data = {}
+	self.gre_m79.fire_mode_data.fire_rate = 2
+	self.gre_m79.single = {}
+	self.gre_m79.single.fire_rate = 2
+	self.gre_m79.spread = {}
+	self.gre_m79.spread.standing = self.r870.spread.standing
+	self.gre_m79.spread.crouching = self.r870.spread.crouching
+	self.gre_m79.spread.steelsight = self.r870.spread.steelsight
+	self.gre_m79.spread.moving_standing = self.r870.spread.moving_standing
+	self.gre_m79.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.gre_m79.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.gre_m79.kick = {}
+	self.gre_m79.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.gre_m79.kick.crouching = self.gre_m79.kick.standing
+	self.gre_m79.kick.steelsight = self.gre_m79.kick.standing
+	self.gre_m79.crosshair = {}
+	self.gre_m79.crosshair.standing = {}
+	self.gre_m79.crosshair.crouching = {}
+	self.gre_m79.crosshair.steelsight = {}
+	self.gre_m79.crosshair.standing.offset = 0.16
+	self.gre_m79.crosshair.standing.moving_offset = 0.8
+	self.gre_m79.crosshair.standing.kick_offset = 0.6
+	self.gre_m79.crosshair.standing.hidden = true
+	self.gre_m79.crosshair.crouching.offset = 0.08
+	self.gre_m79.crosshair.crouching.moving_offset = 0.7
+	self.gre_m79.crosshair.crouching.kick_offset = 0.4
+	self.gre_m79.crosshair.crouching.hidden = true
+	self.gre_m79.crosshair.steelsight.hidden = true
+	self.gre_m79.crosshair.steelsight.offset = 0
+	self.gre_m79.crosshair.steelsight.moving_offset = 0
+	self.gre_m79.crosshair.steelsight.kick_offset = 0.1
+	self.gre_m79.shake = {}
+	self.gre_m79.shake.fire_multiplier = 2
+	self.gre_m79.shake.fire_steelsight_multiplier = 2
+	self.gre_m79.autohit = autohit_shotgun_default
+	self.gre_m79.aim_assist = aim_assist_shotgun_default
+	self.gre_m79.animations = {}
+	self.gre_m79.animations.equip_id = "equip_gre_m79"
+	self.gre_m79.animations.recoil_steelsight = true
+	self.gre_m79.global_value = "gage_pack_assault"
+	self.gre_m79.texture_bundle_folder = "gage_pack_assault"
+	self.gre_m79.ignore_damage_upgrades = true
+	self.gre_m79.stats = {
+		damage = 31,
+		spread = 7,
+		recoil = 3,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 18,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.gre_m79.stats_modifiers = {damage = 3.4}
+	self.g3 = {}
+	self.g3.category = "assault_rifle"
+	self.g3.damage_melee = damage_melee_default
+	self.g3.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.g3.sounds = {}
+	self.g3.sounds.fire = "g3_fire_single"
+	self.g3.sounds.fire_single = "g3_fire_single"
+	self.g3.sounds.fire_auto = "g3_fire"
+	self.g3.sounds.stop_fire = "g3_stop"
+	self.g3.sounds.dryfire = "primary_dryfire"
+	self.g3.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.g3.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.g3.timers = {}
+	self.g3.timers.reload_not_empty = 2.6
+	self.g3.timers.reload_empty = 4.2
+	self.g3.timers.unequip = 0.9
+	self.g3.timers.equip = 0.9
+	self.g3.name_id = "bm_w_g3"
+	self.g3.desc_id = "bm_w_g3_desc"
+	self.g3.description_id = "des_g3"
+	self.g3.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.g3.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.g3.use_data = {}
+	self.g3.use_data.selection_index = 2
+	self.g3.DAMAGE = 1
+	self.g3.CLIP_AMMO_MAX = 20
+	self.g3.NR_CLIPS_MAX = math.round(total_damage_primary / 4 / self.g3.CLIP_AMMO_MAX)
+	self.g3.AMMO_MAX = self.g3.CLIP_AMMO_MAX * self.g3.NR_CLIPS_MAX
+	self.g3.AMMO_PICKUP = self:_pickup_chance(self.g3.AMMO_MAX, 2)
+	self.g3.FIRE_MODE = "auto"
+	self.g3.fire_mode_data = {}
+	self.g3.fire_mode_data.fire_rate = 0.092
+	self.g3.CAN_TOGGLE_FIREMODE = true
+	self.g3.auto = {}
+	self.g3.auto.fire_rate = 0.092
+	self.g3.spread = {}
+	self.g3.spread.standing = self.new_m4.spread.standing * 0.5
+	self.g3.spread.crouching = self.new_m4.spread.standing * 0.6
+	self.g3.spread.steelsight = self.new_m4.spread.steelsight
+	self.g3.spread.moving_standing = self.new_m4.spread.standing * 0.6
+	self.g3.spread.moving_crouching = self.new_m4.spread.standing * 0.7
+	self.g3.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.g3.kick = {}
+	self.g3.kick.standing = self.new_m4.kick.standing
+	self.g3.kick.crouching = self.g3.kick.standing
+	self.g3.kick.steelsight = self.g3.kick.standing
+	self.g3.crosshair = {}
+	self.g3.crosshair.standing = {}
+	self.g3.crosshair.crouching = {}
+	self.g3.crosshair.steelsight = {}
+	self.g3.crosshair.standing.offset = 0.14
+	self.g3.crosshair.standing.moving_offset = 0.8
+	self.g3.crosshair.standing.kick_offset = 0.6
+	self.g3.crosshair.crouching.offset = 0.1
+	self.g3.crosshair.crouching.moving_offset = 0.6
+	self.g3.crosshair.crouching.kick_offset = 0.4
+	self.g3.crosshair.steelsight.hidden = true
+	self.g3.crosshair.steelsight.offset = 0
+	self.g3.crosshair.steelsight.moving_offset = 0
+	self.g3.crosshair.steelsight.kick_offset = 0.14
+	self.g3.shake = {}
+	self.g3.shake.fire_multiplier = 1
+	self.g3.shake.fire_steelsight_multiplier = -1
+	self.g3.autohit = autohit_rifle_default
+	self.g3.aim_assist = aim_assist_rifle_default
+	self.g3.animations = {}
+	self.g3.animations.equip_id = "equip_m4"
+	self.g3.animations.recoil_steelsight = true
+	self.g3.global_value = "gage_pack_assault"
+	self.g3.texture_bundle_folder = "gage_pack_assault"
+	self.g3.stats = {
+		damage = 18,
+		spread = 8,
+		recoil = 4,
+		spread_moving = 7,
+		zoom = 3,
+		concealment = 12,
+		suppression = 6,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
+	self.galil = {}
+	self.galil.category = "assault_rifle"
+	self.galil.damage_melee = damage_melee_default
+	self.galil.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.galil.sounds = {}
+	self.galil.sounds.fire = "galil_fire"
+	self.galil.sounds.fire_single = "galil_fire_single"
+	self.galil.sounds.fire_auto = "galil_fire"
+	self.galil.sounds.stop_fire = "galil_stop"
+	self.galil.sounds.dryfire = "primary_dryfire"
+	self.galil.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.galil.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.galil.timers = {}
+	self.galil.timers.reload_not_empty = 3
+	self.galil.timers.reload_empty = 4.2
+	self.galil.timers.unequip = 0.9
+	self.galil.timers.equip = 0.9
+	self.galil.name_id = "bm_w_galil"
+	self.galil.desc_id = "bm_w_galil_desc"
+	self.galil.description_id = "des_galil"
+	self.galil.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.galil.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.galil.use_data = {}
+	self.galil.use_data.selection_index = 2
+	self.galil.DAMAGE = 1
+	self.galil.CLIP_AMMO_MAX = 30
+	self.galil.NR_CLIPS_MAX = math.round(total_damage_primary / 2.5 / self.galil.CLIP_AMMO_MAX)
+	self.galil.AMMO_MAX = self.galil.CLIP_AMMO_MAX * self.galil.NR_CLIPS_MAX
+	self.galil.AMMO_PICKUP = self:_pickup_chance(self.galil.AMMO_MAX, 2)
+	self.galil.FIRE_MODE = "auto"
+	self.galil.fire_mode_data = {}
+	self.galil.fire_mode_data.fire_rate = 0.071
+	self.galil.CAN_TOGGLE_FIREMODE = true
+	self.galil.auto = {}
+	self.galil.auto.fire_rate = 0.071
+	self.galil.spread = {}
+	self.galil.spread.standing = self.new_m4.spread.standing * 0.5
+	self.galil.spread.crouching = self.new_m4.spread.standing * 0.6
+	self.galil.spread.steelsight = self.new_m4.spread.steelsight
+	self.galil.spread.moving_standing = self.new_m4.spread.standing * 0.6
+	self.galil.spread.moving_crouching = self.new_m4.spread.standing * 0.7
+	self.galil.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.galil.kick = {}
+	self.galil.kick.standing = self.new_m4.kick.standing
+	self.galil.kick.crouching = self.galil.kick.standing
+	self.galil.kick.steelsight = self.galil.kick.standing
+	self.galil.crosshair = {}
+	self.galil.crosshair.standing = {}
+	self.galil.crosshair.crouching = {}
+	self.galil.crosshair.steelsight = {}
+	self.galil.crosshair.standing.offset = 0.14
+	self.galil.crosshair.standing.moving_offset = 0.8
+	self.galil.crosshair.standing.kick_offset = 0.6
+	self.galil.crosshair.crouching.offset = 0.1
+	self.galil.crosshair.crouching.moving_offset = 0.6
+	self.galil.crosshair.crouching.kick_offset = 0.4
+	self.galil.crosshair.steelsight.hidden = true
+	self.galil.crosshair.steelsight.offset = 0
+	self.galil.crosshair.steelsight.moving_offset = 0
+	self.galil.crosshair.steelsight.kick_offset = 0.14
+	self.galil.shake = {}
+	self.galil.shake.fire_multiplier = 1
+	self.galil.shake.fire_steelsight_multiplier = -1
+	self.galil.autohit = autohit_rifle_default
+	self.galil.aim_assist = aim_assist_rifle_default
+	self.galil.weapon_hold = "ak47"
+	self.galil.animations = {}
+	self.galil.animations = {}
+	self.galil.animations.equip_id = "equip_ak47"
+	self.galil.animations.recoil_steelsight = true
+	self.galil.global_value = "gage_pack_assault"
+	self.galil.texture_bundle_folder = "gage_pack_assault"
+	self.galil.stats = {
+		damage = 14,
+		spread = 7,
+		recoil = 8,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 15,
+		suppression = 7,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
+	self.famas = {}
+	self.famas.category = "assault_rifle"
+	self.famas.damage_melee = damage_melee_default
+	self.famas.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.famas.sounds = {}
+	self.famas.sounds.fire = "famas_fire_single"
+	self.famas.sounds.fire_single = "famas_fire_single"
+	self.famas.sounds.fire_auto = "famas_fire"
+	self.famas.sounds.stop_fire = "famas_stop"
+	self.famas.sounds.dryfire = "primary_dryfire"
+	self.famas.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.famas.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.famas.timers = {}
+	self.famas.timers.reload_not_empty = 2.72
+	self.famas.timers.reload_empty = 3.78
+	self.famas.timers.unequip = 0.9
+	self.famas.timers.equip = 0.9
+	self.famas.name_id = "bm_w_famas"
+	self.famas.desc_id = "bm_w_famas_desc"
+	self.famas.description_id = "des_famas"
+	self.famas.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.famas.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.famas.use_data = {}
+	self.famas.use_data.selection_index = 2
+	self.famas.DAMAGE = 1
+	self.famas.CLIP_AMMO_MAX = 30
+	self.famas.NR_CLIPS_MAX = math.round(total_damage_primary / 2 / self.famas.CLIP_AMMO_MAX)
+	self.famas.AMMO_MAX = self.famas.CLIP_AMMO_MAX * self.famas.NR_CLIPS_MAX
+	self.famas.AMMO_PICKUP = self:_pickup_chance(self.famas.AMMO_MAX, 2)
+	self.famas.FIRE_MODE = "auto"
+	self.famas.fire_mode_data = {}
+	self.famas.fire_mode_data.fire_rate = 0.06
+	self.famas.CAN_TOGGLE_FIREMODE = true
+	self.famas.auto = {}
+	self.famas.auto.fire_rate = 0.06
+	self.famas.spread = {}
+	self.famas.spread.standing = self.new_m4.spread.standing * 0.5
+	self.famas.spread.crouching = self.new_m4.spread.standing * 0.6
+	self.famas.spread.steelsight = self.new_m4.spread.steelsight
+	self.famas.spread.moving_standing = self.new_m4.spread.standing * 0.6
+	self.famas.spread.moving_crouching = self.new_m4.spread.standing * 0.7
+	self.famas.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.famas.kick = {}
+	self.famas.kick.standing = self.new_m4.kick.standing
+	self.famas.kick.crouching = self.famas.kick.standing
+	self.famas.kick.steelsight = self.famas.kick.standing
+	self.famas.crosshair = {}
+	self.famas.crosshair.standing = {}
+	self.famas.crosshair.crouching = {}
+	self.famas.crosshair.steelsight = {}
+	self.famas.crosshair.standing.offset = 0.14
+	self.famas.crosshair.standing.moving_offset = 0.8
+	self.famas.crosshair.standing.kick_offset = 0.6
+	self.famas.crosshair.crouching.offset = 0.1
+	self.famas.crosshair.crouching.moving_offset = 0.6
+	self.famas.crosshair.crouching.kick_offset = 0.4
+	self.famas.crosshair.steelsight.hidden = true
+	self.famas.crosshair.steelsight.offset = 0
+	self.famas.crosshair.steelsight.moving_offset = 0
+	self.famas.crosshair.steelsight.kick_offset = 0.14
+	self.famas.shake = {}
+	self.famas.shake.fire_multiplier = 1
+	self.famas.shake.fire_steelsight_multiplier = -1
+	self.famas.autohit = autohit_rifle_default
+	self.famas.aim_assist = aim_assist_rifle_default
+	self.famas.animations = {}
+	self.famas.animations.equip_id = "equip_m4"
+	self.famas.animations.recoil_steelsight = true
+	self.famas.global_value = "gage_pack_assault"
+	self.famas.texture_bundle_folder = "gage_pack_assault"
+	self.famas.stats = {
+		damage = 11,
+		spread = 8,
+		recoil = 5,
+		spread_moving = 4,
+		zoom = 3,
+		concealment = 24,
+		suppression = 10,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
 	}
 end
 
@@ -5739,6 +6027,30 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.gre_m79_npc = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g3_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.galil_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.famas_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values()
@@ -5795,4 +6107,8 @@ function WeaponTweakData:_precalculate_values()
 	self.ben_npc.AMMO_MAX = self.ben_npc.CLIP_AMMO_MAX * self.ben_npc.NR_CLIPS_MAX
 	self.striker_npc.AMMO_MAX = self.striker_npc.CLIP_AMMO_MAX * self.striker_npc.NR_CLIPS_MAX
 	self.ksg_npc.AMMO_MAX = self.ksg_npc.CLIP_AMMO_MAX * self.ksg_npc.NR_CLIPS_MAX
+	self.gre_m79_npc.AMMO_MAX = self.gre_m79_npc.CLIP_AMMO_MAX * self.gre_m79_npc.NR_CLIPS_MAX
+	self.g3_npc.AMMO_MAX = self.g3_npc.CLIP_AMMO_MAX * self.g3_npc.NR_CLIPS_MAX
+	self.galil_npc.AMMO_MAX = self.galil_npc.CLIP_AMMO_MAX * self.galil_npc.NR_CLIPS_MAX
+	self.famas_npc.AMMO_MAX = self.famas_npc.CLIP_AMMO_MAX * self.famas_npc.NR_CLIPS_MAX
 end

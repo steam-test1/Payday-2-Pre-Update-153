@@ -1407,10 +1407,15 @@ end
 
 function CopMovement:save(save_data)
 	local my_save_data = {}
+	if self._stance.code ~= 1 then
+		my_save_data.stance_code = self._stance.code
+	end
 	if self._stance.transition then
-		my_save_data.stance = self._stance.transition.end_values
-	elseif self._stance.values[1] ~= 1 then
-		my_save_data.stance = self._stance.values
+		if self._stance.transition.end_values[4] ~= 0 then
+			my_save_data.stance_wnd = true
+		end
+	elseif self._stance.values[4] ~= 0 then
+		my_save_data.stance_wnd = true
 	end
 	for _, action in ipairs(self._active_actions) do
 		if action and action.save then
@@ -1490,17 +1495,16 @@ function CopMovement:load(load_data)
 	end
 	self._allow_fire = my_load_data.allow_fire
 	self._attention = my_load_data.attention
-	if my_load_data.stance then
-		for i_stance, v in ipairs(my_load_data.stance) do
-			if 0 < v then
-				self:_change_stance(i_stance)
-				if i_stance == 1 then
-					self:set_cool(true)
-				else
-					self:set_cool(false)
-				end
-			end
+	if my_load_data.stance_code then
+		self:_change_stance(my_load_data.stance_code)
+		if my_load_data.stance_code == 1 then
+			self:set_cool(true)
+		else
+			self:set_cool(false)
 		end
+	end
+	if my_load_data.stance_wnd then
+		self:_change_stance(4)
 	end
 	if my_load_data.actions then
 		for _, action_load_data in ipairs(my_load_data.actions) do

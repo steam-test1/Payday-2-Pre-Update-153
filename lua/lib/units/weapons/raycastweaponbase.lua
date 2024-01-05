@@ -155,6 +155,9 @@ function RaycastWeaponBase:setup(setup_data)
 	self._bullet_slotmask = setup_data.hit_slotmask or self._bullet_slotmask
 	self._setup = setup_data
 	self._fire_mode = self._fire_mode or tweak_data.weapon[self._name_id].FIRE_MODE or "single"
+	if self._setup.timer then
+		self:set_timer(self._setup.timer)
+	end
 end
 
 function RaycastWeaponBase:fire_mode()
@@ -177,12 +180,12 @@ function RaycastWeaponBase:_fire_sound()
 end
 
 function RaycastWeaponBase:start_shooting_allowed()
-	return self._next_fire_allowed <= Application:time()
+	return self._next_fire_allowed <= self._unit:timer():time()
 end
 
 function RaycastWeaponBase:start_shooting()
 	self:_fire_sound()
-	self._next_fire_allowed = math.max(self._next_fire_allowed, Application:time())
+	self._next_fire_allowed = math.max(self._next_fire_allowed, self._unit:timer():time())
 	self._shooting = true
 end
 
@@ -194,7 +197,7 @@ end
 
 function RaycastWeaponBase:trigger_pressed(...)
 	local fired
-	if self._next_fire_allowed <= Application:time() then
+	if self._next_fire_allowed <= self._unit:timer():time() then
 		fired = self:fire(...)
 		if fired then
 			local next_fire = (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
@@ -206,7 +209,7 @@ end
 
 function RaycastWeaponBase:trigger_held(...)
 	local fired
-	if self._next_fire_allowed <= Application:time() then
+	if self._next_fire_allowed <= self._unit:timer():time() then
 		fired = self:fire(...)
 		if fired then
 			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
@@ -222,7 +225,9 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 			managers.player:activate_temporary_upgrade("temporary", "no_ammo_cost")
 		end
 	end
-	if not managers.player:has_activate_temporary_upgrade("temporary", "no_ammo_cost") then
+	local consume_ammo = self:weapon_tweak_data().category == "grenade_launcher"
+	consume_ammo = consume_ammo or not managers.player:has_activate_temporary_upgrade("temporary", "no_ammo_cost") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost"))
+	if consume_ammo then
 		if self:get_ammo_remaining_in_clip() == 0 then
 			return
 		end
@@ -958,11 +963,11 @@ function RaycastWeaponBase:reduce_ammo_by_procentage_of_total(ammo_procentage)
 	if ammo_total == 0 then
 		return
 	end
-	local ammo_after_reduction = math.max(math.ceil(ammo_total - ammo_max * ammo_procentage), 0)
-	self:set_ammo_total(math.min(ammo_total, ammo_after_reduction))
-	print(math.min(ammo_total, ammo_after_reduction), ammo_after_reduction, ammo_max * ammo_procentage)
+	local ammo_after_reduction = math.max(ammo_total - math.ceil(ammo_max * ammo_procentage), 0)
+	self:set_ammo_total(math.round(math.min(ammo_total, ammo_after_reduction)))
+	print("reduce_ammo_by_procentage_of_total", math.round(math.min(ammo_total, ammo_after_reduction)), ammo_after_reduction, ammo_max * ammo_procentage)
 	local ammo_remaining_in_clip = self:get_ammo_remaining_in_clip()
-	self:set_ammo_remaining_in_clip(math.min(ammo_after_reduction, ammo_remaining_in_clip))
+	self:set_ammo_remaining_in_clip(math.round(math.min(ammo_after_reduction, ammo_remaining_in_clip)))
 end
 
 function RaycastWeaponBase:on_equip()
@@ -1026,6 +1031,12 @@ function RaycastWeaponBase:flashlight_state_changed()
 end
 
 function RaycastWeaponBase:set_flashlight_enabled(enabled)
+end
+
+function RaycastWeaponBase:set_timer(timer)
+	self._timer = timer
+	self._unit:set_timer(timer)
+	self._unit:set_animation_timer(timer)
 end
 
 InstantBulletBase = InstantBulletBase or class()

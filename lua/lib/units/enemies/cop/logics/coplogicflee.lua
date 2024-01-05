@@ -379,7 +379,7 @@ function CopLogicFlee.action_complete_clbk(data, action)
 	elseif action_type == "shoot" then
 		data.internal_data.shooting = nil
 	elseif action_type == "hurt" then
-		if action:expired() then
+		if data.important and action:expired() then
 			local action_data = CopLogicBase.chk_start_action_dodge(data, "hit")
 			local my_data = data.internal_data
 			if action_data then

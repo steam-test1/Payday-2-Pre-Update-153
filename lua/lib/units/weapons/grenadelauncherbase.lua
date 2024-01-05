@@ -1,22 +1,27 @@
-GrenadeLauncherBase = GrenadeLauncherBase or class(RaycastWeaponBase)
+GrenadeLauncherBase = GrenadeLauncherBase or class(NewRaycastWeaponBase)
 
 function GrenadeLauncherBase:init(...)
 	GrenadeLauncherBase.super.init(self, ...)
 end
 
-function GrenadeLauncherBase:_fire_raycast(user_unit, from_pos, direction)
-	local range_mul = managers.player:upgrade_value(self._name_id, "explosion_range_multiplier")
-	local range = tweak_data.weapon[self._name_id].EXPLOSION_RANGE * (range_mul == 0 and 1 or range_mul)
-	local curve_pow = tweak_data.weapon[self._name_id].DAMAGE_CURVE_POW
-	local unit = M79GrenadeBase.spawn("units/weapons/m79/grenade", from_pos, Rotation(direction, math.UP))
-	unit:base():launch({
-		dir = direction,
-		owner = self._unit,
-		user = user_unit,
-		damage = self._damage,
-		range = range,
-		curve_pow = curve_pow,
-		alert_filter = user_unit:movement():SO_access()
+local mvec_spread_direction = Vector3()
+
+function GrenadeLauncherBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, shoot_through_data)
+	local unit
+	local spread = self:_get_spread(user_unit)
+	mvector3.set(mvec_spread_direction, direction)
+	if spread then
+		mvector3.spread(mvec_spread_direction, spread * (spread_mul or 1))
+	end
+	mvec_spread_direction = mvec_spread_direction * 5
+	if Network:is_client() then
+		managers.network:session():send_to_host("server_throw_grenade", 2, from_pos, mvec_spread_direction)
+	else
+		unit = GrenadeBase.server_throw_grenade(2, from_pos, mvec_spread_direction, managers.network:session():local_peer():id())
+	end
+	managers.statistics:shot_fired({
+		hit = false,
+		weapon_unit = self._unit
 	})
 	return {}
 end

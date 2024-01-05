@@ -218,6 +218,9 @@ end
 
 function NewRaycastWeaponBase:_update_fire_object()
 	local fire = managers.weapon_factory:get_part_from_weapon_by_type("barrel_ext", self._parts) or managers.weapon_factory:get_part_from_weapon_by_type("slide", self._parts) or managers.weapon_factory:get_part_from_weapon_by_type("barrel", self._parts)
+	if not fire.unit:get_object(Idstring("fire")) then
+		debug_pause("[NewRaycastWeaponBase:_update_fire_object] Weapon \"" .. tostring(self._factory_id) .. "\" is missing fire object for part \"" .. tostring(fire.unit) .. "\"!")
+	end
 	self:change_fire_object(fire.unit:get_object(Idstring("fire")))
 end
 
@@ -746,6 +749,14 @@ function NewRaycastWeaponBase:reload_speed_multiplier()
 		end
 	end
 	return self:_convert_add_to_mul(multiplier)
+end
+
+function NewRaycastWeaponBase:set_timer(timer, ...)
+	NewRaycastWeaponBase.super.set_timer(self, timer)
+	for _, data in pairs(self._parts) do
+		data.unit:set_timer(timer)
+		data.unit:set_animation_timer(timer)
+	end
 end
 
 function NewRaycastWeaponBase:destroy(unit)

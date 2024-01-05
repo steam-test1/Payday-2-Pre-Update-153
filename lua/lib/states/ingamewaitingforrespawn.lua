@@ -3,8 +3,6 @@ require("lib/states/GameState")
 IngameWaitingForRespawnState = IngameWaitingForRespawnState or class(GameState)
 IngameWaitingForRespawnState.GUI_SPECTATOR_FULLSCREEN = Idstring("guis/spectator_fullscreen")
 IngameWaitingForRespawnState.GUI_SPECTATOR = Idstring("guis/spectator_mode")
-IngameWaitingForRespawnState.PLAYER_HUD = Idstring("guis/player_hud")
-IngameWaitingForRespawnState.PLAYER_INFO_HUD = Idstring("guis/player_info_hud")
 
 function IngameWaitingForRespawnState:init(game_state_machine)
 	GameState.init(self, "ingame_waiting_for_respawn", game_state_machine)
@@ -293,7 +291,7 @@ function IngameWaitingForRespawnState:at_enter()
 		managers.hud:load_hud(self.GUI_SPECTATOR, false, true, true, {})
 	end
 	managers.hud:show(self.GUI_SPECTATOR)
-	managers.hud:show(self.PLAYER_INFO_HUD)
+	managers.hud:show(PlayerBase.PLAYER_INFO_HUD)
 	managers.hud:show(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
 	managers.hud:set_custody_can_be_trade_visible(false)
 	managers.hud:set_custody_negotiating_visible(false)
@@ -304,11 +302,8 @@ function IngameWaitingForRespawnState:at_enter()
 	else
 		managers.hud:set_custody_timer_visibility(false)
 	end
-	if not managers.hud:exists(self.PLAYER_HUD) then
-		managers.hud:load_hud(self.PLAYER_HUD, false, false, true, {})
-	end
-	if not managers.hud:exists(self.PLAYER_INFO_HUD) then
-		managers.hud:load_hud(self.PLAYER_INFO_HUD, false, false, true, {})
+	if not managers.hud:exists(PlayerBase.PLAYER_HUD) then
+		managers.hud:load_hud(PlayerBase.PLAYER_HUD, false, false, true, {})
 	end
 	self:_create_spectator_data()
 	self._next_player_cb()
@@ -326,7 +321,7 @@ end
 
 function IngameWaitingForRespawnState:at_exit()
 	managers.hud:hide(self.GUI_SPECTATOR)
-	managers.hud:hide(self.PLAYER_INFO_HUD)
+	managers.hud:hide(PlayerBase.PLAYER_INFO_HUD)
 	managers.hud:hide(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
 	managers.overlay_effect:fade_out_effect(self._fade_in_overlay_eff_id)
 	if managers.hud:visible(self.GUI_SPECTATOR_FULLSCREEN) then

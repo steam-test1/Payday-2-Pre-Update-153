@@ -44,7 +44,6 @@ function IngameBleedOutState:at_enter()
 end
 
 function IngameBleedOutState:at_exit()
-	managers.challenges:reset("exit_bleed_out")
 	local player = managers.player:player_unit()
 	if player then
 		player:base():set_enabled(false)

@@ -22,9 +22,6 @@ function MoneyWrapBase:take_money(unit)
 		managers.network:session():send_to_peers_synched("sync_money_wrap_money_taken", self._unit)
 		self._money_amount = 0
 		MoneyWrapBase.taken_wraps = MoneyWrapBase.taken_wraps + 1
-		if MoneyWrapBase.taken_wraps >= 10 and Global.level_data.level_id == "apartment" then
-			managers.challenges:set_flag("take_money")
-		end
 	else
 		local taken = self:_take_money(unit)
 		if 0 < taken then

@@ -4,8 +4,6 @@ IngameWaitingForPlayersState = IngameWaitingForPlayersState or class(GameState)
 IngameWaitingForPlayersState.GUI_SAFERECT = Idstring("guis/waiting_saferect")
 IngameWaitingForPlayersState.GUI_FULLSCREEN = Idstring("guis/waiting_fullscreen")
 IngameWaitingForPlayersState.PLAYER_HUD = Idstring("guis/player_hud")
-IngameWaitingForPlayersState.PLAYER_INFO_HUD = Idstring("guis/player_info_hud")
-IngameWaitingForPlayersState.PLAYER_INFO_HUD_FULLSCREEN = Idstring("guis/player_info_hud_fullscreen")
 IngameWaitingForPlayersState.PLAYER_DOWNED_HUD = Idstring("guis/player_downed_hud")
 IngameWaitingForPlayersState.LEVEL_INTRO_GUI = Idstring("guis/level_intro")
 
@@ -56,14 +54,14 @@ function IngameWaitingForPlayersState:_start()
 	end
 	local variant = managers.groupai:state():blackscreen_variant() or 0
 	self:sync_start(variant)
-	managers.network:session():send_to_peers_synched("sync_waiting_for_player_start", variant)
+	managers.network:session():send_to_peers_synched("sync_waiting_for_player_start", variant, "")
 end
 
-function IngameWaitingForPlayersState:sync_start(variant)
-	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
+function IngameWaitingForPlayersState:sync_start(variant, soundtrack)
 	self._kit_menu.renderer:set_all_items_enabled(false)
 	self._briefing_start_t = nil
 	managers.briefing:stop_event()
+	managers.music:check_music_switch()
 	managers.music:post_event(tweak_data.levels:get_music_event("intro"))
 	local music, start_switch = tweak_data.levels:get_music_event_ext()
 	if music then
@@ -77,7 +75,7 @@ function IngameWaitingForPlayersState:sync_start(variant)
 	self._blackscreen_started = true
 	managers.menu_component:close_asset_mission_briefing_gui()
 	managers.preplanning:on_execute_preplanning()
-	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
+	managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 1)
 	if self._intro_event then
 		self._delay_audio_t = Application:time() + 1
 	else
@@ -225,12 +223,6 @@ function IngameWaitingForPlayersState:at_enter()
 	if not managers.hud:exists(self.PLAYER_HUD) then
 		managers.hud:load_hud(self.PLAYER_HUD, false, false, true, {})
 	end
-	if not managers.hud:exists(self.PLAYER_INFO_HUD_FULLSCREEN) then
-		managers.hud:load_hud(self.PLAYER_INFO_HUD_FULLSCREEN, false, false, false, {})
-	end
-	if not managers.hud:exists(self.PLAYER_INFO_HUD) then
-		managers.hud:load_hud(self.PLAYER_INFO_HUD, false, false, true, {})
-	end
 	if not managers.hud:exists(self.PLAYER_DOWNED_HUD) then
 		managers.hud:load_hud(self.PLAYER_DOWNED_HUD, false, false, true, {})
 	end
@@ -254,7 +246,7 @@ function IngameWaitingForPlayersState:at_enter()
 		managers.menu_component:post_event("escape_menu")
 	end
 	managers.music:post_event("loadout_music")
-	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 2)
+	managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 2)
 	if managers.dyn_resource:is_file_streamer_idle() then
 		managers.network:session():send_to_peers_loaded("set_member_ready", managers.network:session():local_peer():id(), 100, 2, "")
 	else
@@ -324,7 +316,7 @@ function IngameWaitingForPlayersState:check_is_dropin()
 end
 
 function IngameWaitingForPlayersState:at_exit()
-	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk() * 0.25, 5)
+	managers.dyn_resource:set_file_streaming_chunk_size_mul(0.25, 5)
 	if self._file_streamer_max_workload then
 		self._file_streamer_max_workload = nil
 		managers.dyn_resource:remove_listener(self)

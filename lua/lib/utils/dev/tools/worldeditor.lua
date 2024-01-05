@@ -27,7 +27,6 @@ require("lib/units/editor/KillzoneElement")
 require("lib/units/editor/SpecialObjectiveElement")
 require("lib/units/editor/SpecialObjectiveTriggerElement")
 require("lib/units/editor/SpecialObjectiveGroupElement")
-require("lib/units/editor/SecretAssignmentElement")
 require("lib/units/editor/PlayerStateTriggerUnitElement")
 require("lib/units/editor/DifficultyElement")
 require("lib/units/editor/BlurZoneElement")
@@ -152,9 +151,6 @@ function WorldEditor:project_run_simulation(with_mission)
 end
 
 function WorldEditor:_project_check_unit(unit)
-	if unit:unit_data().secret_assignment_id then
-		managers.secret_assignment:register_unit(unit)
-	end
 end
 
 function WorldEditor:project_stop_simulation()
@@ -170,7 +166,6 @@ function WorldEditor:project_stop_simulation()
 	managers.dialog:on_simulation_ended()
 	managers.hint:on_simulation_ended()
 	managers.player:soft_reset()
-	managers.secret_assignment:reset()
 	managers.statistics:stop_session()
 	managers.environment_controller:set_blurzone(0)
 	managers.music:stop()

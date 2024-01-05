@@ -12,6 +12,7 @@ DLCManager.BUNDLED_DLC_PACKAGES = {
 	gage_pack_snp = true,
 	big_bank = true,
 	gage_pack_shotgun = true,
+	gage_pack_assault = true,
 	season_pass = false,
 	animal = false
 }
@@ -242,6 +243,10 @@ function GenericDLCManager:has_soundtrack_or_cce()
 	return self:has_soundtrack() or self:has_cce()
 end
 
+function GenericDLCManager:has_pdth_soundtrack()
+	return Global.dlc_manager.all_dlc_data.pdth_soundtrack and Global.dlc_manager.all_dlc_data.pdth_soundtrack.verified
+end
+
 function GenericDLCManager:has_pd2_clan()
 	return Global.dlc_manager.all_dlc_data.pd2_clan and Global.dlc_manager.all_dlc_data.pd2_clan.verified
 end
@@ -272,6 +277,10 @@ end
 
 function GenericDLCManager:has_gage_pack_shotgun()
 	return Global.dlc_manager.all_dlc_data.gage_pack_shotgun and Global.dlc_manager.all_dlc_data.gage_pack_shotgun.verified
+end
+
+function GenericDLCManager:has_gage_pack_assault()
+	return Global.dlc_manager.all_dlc_data.gage_pack_assault and Global.dlc_manager.all_dlc_data.gage_pack_assault.verified
 end
 
 function GenericDLCManager:has_big_bank()
@@ -536,12 +545,14 @@ function WINDLCManager:init()
 			preorder = {app_id = "247450", no_install = true},
 			career_criminal_edition = {app_id = "218630", no_install = true},
 			soundtrack = {app_id = "254260", no_install = true},
+			pdth_soundtrack = {app_id = "207816", no_install = true},
 			armored_transport = {app_id = "264610", no_install = true},
 			gage_pack = {app_id = "267380", no_install = true},
 			gage_pack_lmg = {app_id = "275590", no_install = true},
 			gage_pack_jobs = {app_id = "259381", no_install = true},
 			gage_pack_snp = {app_id = "259380", no_install = true},
 			gage_pack_shotgun = {app_id = "311050", no_install = true},
+			gage_pack_assault = {app_id = "320030", no_install = true},
 			big_bank = {app_id = "306690", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},

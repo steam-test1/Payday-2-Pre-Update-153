@@ -11,11 +11,8 @@ end
 
 function MenuItemChallenge:setup_gui(node, row_item)
 	local safe_rect = managers.gui_data:scaled_size()
-	local challenge_data = managers.challenges:challenge(self:parameter("challenge"))
-	local progress_data = managers.challenges:active_challenge(self:parameter("challenge"))
-	progress_data = progress_data or {
-		amount = challenge_data.count
-	}
+	local challenge_data = {count = 0, xp = 0}
+	local progress_data = {amount = 0}
 	local chl_color = self:parameter("awarded") and tweak_data.menu.awarded_challenge_color or row_item.color
 	row_item.gui_panel = node.item_panel:panel({
 		w = node.item_panel:w()

@@ -44,11 +44,6 @@ function MenuNodeStatsGui:_setup_stats(node)
 		type = "text"
 	})
 	self:_add_stats({
-		topic = managers.localization:text("menu_stats_challenges_completion"),
-		data = managers.challenges:amount_of_completed_challenges() / managers.challenges:amount_of_challenges(),
-		type = "progress"
-	})
-	self:_add_stats({
 		topic = managers.localization:text("menu_stats_favourite_weapon"),
 		data = "" .. string.upper(managers.statistics:favourite_weapon()),
 		type = "text"

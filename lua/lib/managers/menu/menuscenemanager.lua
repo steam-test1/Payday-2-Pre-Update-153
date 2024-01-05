@@ -411,15 +411,28 @@ function MenuSceneManager:_select_character_pose()
 		self:_set_character_unit_pose(pose, self._character_unit)
 		return
 	end
+	local pose
 	if math.rand(1) < 0.25 then
-		local pose = self._global_poses.generic[math.random(#self._global_poses.generic)]
+		pose = self._global_poses.generic[math.random(#self._global_poses.generic)]
 		self:_set_character_unit_pose(pose, self._character_unit)
 		return
+	end
+	if math.rand(1) < 0.12 then
+		local secondary = managers.blackmarket:equipped_secondary()
+		if secondary then
+			local category = tweak_data.weapon[secondary.weapon_id].category
+			if category == "pistol" then
+				pose = self._global_poses.pistol[math.random(#self._global_poses.pistol)]
+			end
+			if pose then
+				self:_set_character_unit_pose(pose, self._character_unit)
+				return
+			end
+		end
 	end
 	local primary = managers.blackmarket:equipped_primary()
 	if primary then
 		local category = tweak_data.weapon[primary.weapon_id].category
-		local pose
 		if category == "shotgun" then
 			pose = self._global_poses.shotgun[math.random(#self._global_poses.shotgun)]
 		elseif category == "assault_rifle" or category == "lmg" or category == "snp" then
@@ -432,18 +445,8 @@ function MenuSceneManager:_select_character_pose()
 			return
 		end
 	end
-	local secondary = managers.blackmarket:equipped_secondary()
-	if secondary then
-		local category = tweak_data.weapon[secondary.weapon_id].category
-		local pose
-		if category == "pistol" then
-			pose = self._global_poses.pistol[math.random(#self._global_poses.pistol)]
-		end
-		if pose then
-			self:_set_character_unit_pose(pose, self._character_unit)
-			return
-		end
-	end
+	pose = self._global_poses.generic[math.random(#self._global_poses.generic)]
+	self:_set_character_unit_pose(pose, self._character_unit)
 end
 
 function MenuSceneManager:_set_character_equipment()

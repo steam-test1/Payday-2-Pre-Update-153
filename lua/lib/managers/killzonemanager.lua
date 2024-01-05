@@ -100,9 +100,6 @@ function KillzoneManager:_add_unit(unit, type)
 			next_shot = next_shot,
 			unit = unit
 		}
-		managers.hud:set_danger_visible(true, {
-			texture = "guis/textures/warning_sniper"
-		})
 	elseif type == "gas" then
 		local next_gas = math.rand(1)
 		self._units[unit:key()] = {
@@ -111,9 +108,6 @@ function KillzoneManager:_add_unit(unit, type)
 			next_gas = next_gas,
 			unit = unit
 		}
-		managers.hud:set_danger_visible(true, {
-			texture = "guis/textures/warning_gas"
-		})
 	elseif type == "fire" then
 		local next_fire = math.rand(1)
 		self._units[unit:key()] = {
@@ -122,13 +116,9 @@ function KillzoneManager:_add_unit(unit, type)
 			next_fire = next_fire,
 			unit = unit
 		}
-		managers.hud:set_danger_visible(true, {
-			texture = "guis/textures/warning_gas"
-		})
 	end
 end
 
 function KillzoneManager:_remove_unit(unit)
 	self._units[unit:key()] = nil
-	managers.hud:set_danger_visible(false)
 end

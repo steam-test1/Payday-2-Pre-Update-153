@@ -3955,12 +3955,16 @@ function CharacterTweakData:_presets(tweak_data)
 					check_timeout = {0, 3},
 					variations = {
 						side_step = {
-							chance = 2,
+							chance = 3,
 							timeout = {1, 2}
 						},
 						roll = {
 							chance = 1,
-							timeout = {2, 3}
+							timeout = {1.2, 2}
+						},
+						wheel = {
+							chance = 2,
+							timeout = {1.2, 2}
 						}
 					}
 				},

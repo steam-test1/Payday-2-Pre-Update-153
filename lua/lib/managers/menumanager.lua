@@ -104,8 +104,8 @@ function MenuManager:init(is_start_menu)
 	managers.user:add_setting_changed_callback("effect_quality", callback(self, self, "effect_quality_changed"), true)
 	managers.user:add_setting_changed_callback("dof_setting", callback(self, self, "dof_setting_changed"), true)
 	managers.user:add_setting_changed_callback("fps_cap", callback(self, self, "fps_limit_changed"), true)
-	managers.user:add_setting_changed_callback("max_streaming_chunk", callback(self, self, "max_streaming_chunk_changed"), true)
 	managers.user:add_setting_changed_callback("net_packet_throttling", callback(self, self, "net_packet_throttling_changed"), true)
+	managers.user:add_setting_changed_callback("net_forwarding", callback(self, self, "net_forwarding_changed"), true)
 	managers.user:add_setting_changed_callback("net_use_compression", callback(self, self, "net_use_compression_changed"), true)
 	managers.user:add_active_user_state_changed_callback(callback(self, self, "on_user_changed"))
 	managers.user:add_storage_changed_callback(callback(self, self, "on_storage_changed"))
@@ -115,8 +115,8 @@ function MenuManager:init(is_start_menu)
 	self:brightness_changed(nil, nil, managers.user:get_setting("brightness"))
 	self:effect_quality_changed(nil, nil, managers.user:get_setting("effect_quality"))
 	self:fps_limit_changed(nil, nil, managers.user:get_setting("fps_cap"))
-	self:max_streaming_chunk_changed(nil, nil, managers.user:get_setting("max_streaming_chunk"))
 	self:net_packet_throttling_changed(nil, nil, managers.user:get_setting("net_packet_throttling"))
+	self:net_forwarding_changed(nil, nil, managers.user:get_setting("net_forwarding"))
 	self:net_use_compression_changed(nil, nil, managers.user:get_setting("net_use_compression"))
 	self:invert_camera_y_changed("invert_camera_y", nil, managers.user:get_setting("invert_camera_y"))
 	self:southpaw_changed("southpaw", nil, managers.user:get_setting("southpaw"))
@@ -290,7 +290,7 @@ function MenuManager:toggle_menu_state()
 				self:close_menu("menu_pause")
 				managers.savefile:save_setting(true)
 			end
-		elseif (not self:active_menu() or #self:active_menu().logic._node_stack == 1) and managers.menu_component:input_focus() ~= 1 then
+		elseif (not (self:active_menu() and #self:active_menu().logic._node_stack ~= 1 and managers.menu:active_menu().logic:selected_node()) or managers.menu:active_menu().logic:selected_node():parameters().allow_pause_menu) and managers.menu_component:input_focus() ~= 1 then
 			self:open_menu("menu_pause")
 			if Global.game_settings.single_player then
 				Application:set_pause(true)
@@ -528,14 +528,15 @@ function MenuManager:fps_limit_changed(name, old_value, new_value)
 	setup:set_fps_cap(new_value)
 end
 
-function MenuManager:max_streaming_chunk_changed(name, old_value, new_value)
-	managers.dyn_resource:set_max_streaming_chunk(new_value)
-end
-
 function MenuManager:net_packet_throttling_changed(name, old_value, new_value)
 	if managers.network then
 		managers.network:set_packet_throttling_enabled(new_value)
 	end
+end
+
+function MenuManager:net_forwarding_changed(name, old_value, new_value)
+	print("[Network:set_forwarding_enabled]", new_value)
+	Network:set_forwarding_enabled(new_value)
 end
 
 function MenuManager:net_use_compression_changed(name, old_value, new_value)
@@ -641,21 +642,6 @@ function MenuManager:progress_resetted()
 end
 
 function MenuManager:_dialog_progress_resetted_ok()
-end
-
-function MenuManager:relay_chat_message(message, id)
-	for _, menu in pairs(self._open_menus) do
-		if menu.renderer.sync_chat_message then
-			menu.renderer:sync_chat_message(message, id)
-		end
-	end
-	if self:is_console() then
-		return
-	end
-	print("relay_chat_message", message, id)
-	if managers.hud then
-		managers.hud:sync_say(message, id)
-	end
 end
 
 function MenuManager:is_console()
@@ -957,7 +943,6 @@ function MenuManager:do_clear_progress()
 	managers.skilltree:reset()
 	managers.experience:reset()
 	managers.money:reset()
-	managers.challenges:reset_challenges()
 	managers.blackmarket:reset()
 	managers.dlc:on_reset_profile()
 	managers.mission:on_reset_profile()
@@ -1009,6 +994,11 @@ end
 function MenuCallbackHandler:dlc_buy_big_bank_pc()
 	print("[MenuCallbackHandler:dlc_buy_big_bank_pc]")
 	Steam:overlay_activate("store", 306690)
+end
+
+function MenuCallbackHandler:dlc_buy_gage_pack_assault_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_assault_pc]")
+	Steam:overlay_activate("store", 320030)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc()
@@ -1065,8 +1055,13 @@ function MenuCallbackHandler:has_all_dlcs()
 	return true
 end
 
+function MenuCallbackHandler:is_overlay_enabled()
+	return true
+end
+
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"gage_pack_assault",
 		"gage_pack_shotgun",
 		"big_bank",
 		"gage_pack_snp",
@@ -1120,6 +1115,10 @@ end
 
 function MenuCallbackHandler:visible_callback_gage_pack_shotgun()
 	return self:is_dlc_latest_locked("gage_pack_shotgun")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_assault()
+	return self:is_dlc_latest_locked("gage_pack_assault")
 end
 
 function MenuCallbackHandler:visible_callback_big_bank()
@@ -1499,9 +1498,9 @@ function MenuCallbackHandler:toggle_net_throttling(item)
 	managers.user:set_setting("net_packet_throttling", state, nil)
 end
 
-function MenuCallbackHandler:toggle_net_allow_relayed_connections(item)
+function MenuCallbackHandler:toggle_net_forwarding(item)
 	local state = item:value() == "on"
-	managers.user:set_setting("net_allow_relayed_connections", state, nil)
+	managers.user:set_setting("net_forwarding", state, nil)
 end
 
 function MenuCallbackHandler:toggle_net_use_compression(item)
@@ -1623,7 +1622,8 @@ function MenuCallbackHandler:refresh_node(item)
 end
 
 function MenuCallbackHandler:open_contract_node(item)
-	local is_professional = tweak_data.narrative.jobs[item:parameters().id].professional or false
+	local job_tweak = tweak_data.narrative:job_data(item:parameters().id)
+	local is_professional = job_tweak and job_tweak.professional or false
 	managers.menu:open_node(Global.game_settings.single_player and "crimenet_contract_singleplayer" or "crimenet_contract_host", {
 		{
 			job_id = item:parameters().id,
@@ -1657,7 +1657,7 @@ function MenuCallbackHandler:is_contract_difficulty_allowed(item)
 	end
 	if job_data.professional or item:value() > 5 then
 	end
-	local job_jc = tweak_data.narrative.jobs[job_data.job_id].jc
+	local job_jc = tweak_data.narrative:job_data(job_data.job_id).jc
 	local difficulty_jc = (item:value() - 2) * 10
 	local plvl = managers.experience:current_level()
 	local prank = managers.experience:current_rank()
@@ -1946,7 +1946,7 @@ function MenuCallbackHandler:get_matchmake_attributes()
 	if self:is_win32() then
 		local kicking_allowed = Global.game_settings.kicking_allowed and 1 or 0
 		table.insert(attributes.numbers, kicking_allowed)
-		local job_class = managers.job:calculate_job_class(job_id, difficulty_id)
+		local job_class = managers.job:calculate_job_class(managers.job:current_job_id(), difficulty_id)
 		table.insert(attributes.numbers, job_class)
 	end
 	return attributes
@@ -2095,7 +2095,6 @@ function MenuCallbackHandler:toggle_lightfx(item)
 end
 
 function MenuCallbackHandler:choice_max_streaming_chunk(item)
-	managers.dyn_resource:set_max_streaming_chunk(item:value())
 	managers.user:set_setting("max_streaming_chunk", item:value())
 end
 
@@ -2427,10 +2426,6 @@ function MenuCallbackHandler:restart_game(item)
 	})
 end
 
-function MenuCallbackHandler:start_credits(item)
-	managers.timeline:debug_level_jump("credits_fortress2", nil, nil, "CreditsFotressLevel")
-end
-
 function MenuCallbackHandler:set_music_volume(item)
 	local volume = item:value()
 	local old_volume = managers.user:get_setting("music_volume")
@@ -2658,76 +2653,25 @@ function MenuCallbackHandler:set_default_controller(item)
 	managers.menu:back(true)
 end
 
-MenuChallenges = MenuChallenges or class()
-
-function MenuChallenges:modify_node(node, up)
-	local new_node = up and node or deep_clone(node)
-	for _, data in pairs(managers.challenges:get_near_completion()) do
-		local title_text = managers.challenges:get_title_text(data.id)
-		local description_text = managers.challenges:get_description_text(data.id)
-		local params = {
-			name = data.id,
-			text_id = string.upper(title_text),
-			description_text = string.upper(description_text),
-			localize = "false",
-			challenge = data.id
-		}
-		local new_item = new_node:create_item({
-			type = "MenuItemChallenge"
-		}, params)
-		new_node:add_item(new_item)
+function MenuCallbackHandler:debug_goto_custody()
+	local player = managers.player:player_unit()
+	if not alive(player) then
+		return
 	end
-	managers.menu:add_back_button(new_node)
-	return new_node
-end
-
-MenuChallengesAwarded = MenuChallengesAwarded or class()
-
-function MenuChallengesAwarded:modify_node(node, up)
-	local new_node = up and node or deep_clone(node)
-	for _, data in pairs(managers.challenges:get_completed()) do
-		local params = {
-			name = data.id,
-			text_id = string.upper(data.name),
-			description_text = string.upper(data.description),
-			localize = "false",
-			challenge = data.id,
-			awarded = true
-		}
-		local new_item = new_node:create_item({
-			type = "MenuItemChallenge"
-		}, params)
-		new_node:add_item(new_item)
+	if managers.player:current_state() ~= "bleed_out" then
+		managers.player:set_player_state("bleed_out")
 	end
-	managers.menu:add_back_button(new_node)
-	return new_node
-end
-
-MenuModifyActiveChallenges = MenuModifyActiveChallenges or class()
-
-function MenuModifyActiveChallenges:modify_node(node, up)
-	local new_node = up and node or deep_clone(node)
-	for _, data in pairs(managers.challenges:get_near_completion()) do
-		if data.count > 1 then
-			local title_text = managers.challenges:get_title_text(data.id)
-			local description_text = managers.challenges:get_description_text(data.id)
-			local params = {
-				name = data.id,
-				text_id = string.upper(title_text),
-				description_text = string.upper(description_text),
-				localize = "false",
-				challenge = data.id,
-				count = data.count,
-				callback = "debug_modify_challenge"
-			}
-			local new_item = new_node:create_item({
-				type = "MenuItemChallenge"
-			}, params)
-			new_node:add_item(new_item)
-		end
+	if managers.player:current_state() ~= "fatal" then
+		managers.player:set_player_state("fatal")
 	end
-	managers.menu:add_back_button(new_node)
-	return new_node
+	managers.player:force_drop_carry()
+	managers.statistics:downed({death = true})
+	IngameFatalState.on_local_player_dead()
+	game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
+	player:character_damage():set_invulnerable(true)
+	player:character_damage():set_health(0)
+	player:base():_unregister()
+	player:base():set_slot(player, 0)
 end
 
 MenuUpgrades = MenuUpgrades or class()
@@ -4771,34 +4715,36 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		local max_jc = managers.job:get_max_jc_for_player()
 		local jobs = {}
 		for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-			local contact = tweak_data.narrative.jobs[job_id].contact
+			local job_tweak = tweak_data.narrative:job_data(job_id)
+			local contact = job_tweak.contact
 			if table.contains(contacts, contact) then
 				jobs[contact] = jobs[contact] or {}
-				local dlc = tweak_data.narrative.jobs[job_id].dlc
+				local dlc = job_tweak.dlc
 				dlc = not dlc or tweak_data.dlc[dlc] and tweak_data.dlc[dlc].free or managers.dlc:has_dlc(dlc)
-				if not tweak_data.narrative.jobs[job_id].wrapped_to_job then
+				if not tweak_data.narrative:is_wrapped_to_job(job_id) then
 					table.insert(jobs[contact], {
 						id = job_id,
-						enabled = dlc and max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0)
+						enabled = dlc and max_jc >= (job_tweak.jc or 0) + (job_tweak.professional and 1 or 0)
 					})
 				end
 			end
 		end
-		local job_tweak = tweak_data.narrative.jobs
 		for _, contracts in pairs(jobs) do
 			table.sort(contracts, function(x, y)
 				if x.enabled ~= y.enabled then
 					return x.enabled
 				end
-				local string_x = managers.localization:to_upper_text(job_tweak[x.id].name_id)
-				local string_y = managers.localization:to_upper_text(job_tweak[y.id].name_id)
+				local job_tweak_x = tweak_data.narrative:job_data(x.id)
+				local job_tweak_y = tweak_data.narrative:job_data(y.id)
+				local string_x = managers.localization:to_upper_text(job_tweak_x.name_id)
+				local string_y = managers.localization:to_upper_text(job_tweak_y.name_id)
 				local ids_x = Idstring(string_x)
 				local ids_y = Idstring(string_y)
 				if ids_x ~= ids_y then
 					return string_x < string_y
 				end
-				if job_tweak[x.id].jc ~= job_tweak[y.id].jc then
-					return job_tweak[x.id].jc <= job_tweak[y.id].jc
+				if job_tweak_x.jc ~= job_tweak_y.jc then
+					return job_tweak_x.jc <= job_tweak_y.jc
 				end
 				return false
 			end)
@@ -4889,35 +4835,7 @@ end
 function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 	local id = contract.id
 	local enabled = contract.enabled
-	local job_tweak = tweak_data.narrative.jobs[id]
-	local text_id = managers.localization:to_upper_text(job_tweak.name_id)
-	local color_ranges
-	if job_tweak.dlc and tweak_data.dlc[job_tweak.dlc] and not tweak_data.dlc[job_tweak.dlc].free then
-		local pro_text = "  DLC"
-		local s_len = utf8.len(text_id)
-		text_id = text_id .. pro_text
-		local e_len = utf8.len(text_id)
-		color_ranges = {
-			{
-				start = s_len,
-				stop = e_len,
-				color = tweak_data.screen_colors.dlc_color
-			}
-		}
-	end
-	if job_tweak.professional then
-		local pro_text = "  " .. managers.localization:to_upper_text("cn_menu_pro_job")
-		local s_len = utf8.len(text_id)
-		text_id = text_id .. pro_text
-		local e_len = utf8.len(text_id)
-		color_ranges = {
-			{
-				start = s_len,
-				stop = e_len,
-				color = tweak_data.screen_colors.pro_color
-			}
-		}
-	end
+	local text_id, color = tweak_data.narrative:create_job_name(id)
 	local ghostable = managers.job:is_job_ghostable(id)
 	if ghostable then
 		text_id = text_id .. " " .. managers.localization:get_default_macro("BTN_GHOST")
@@ -4925,7 +4843,7 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 	local params = {
 		name = "job_" .. id,
 		text_id = text_id,
-		color_ranges = color_ranges,
+		color_ranges = {color},
 		localize = "false",
 		callback = enabled and "open_contract_node",
 		id = id,
@@ -5503,12 +5421,18 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 		}
 	}
 	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		table.insert(data_node, {
-			_meta = "option",
-			text_id = tweak_data.narrative.jobs[job_id].name_id,
-			value = index,
-			color = tweak_data.narrative.jobs[job_id].professional and tweak_data.screen_colors.pro_color or Color.white
-		})
+		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "wip" then
+			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
+			table.insert(data_node, {
+				_meta = "option",
+				text_id = text_id,
+				value = index,
+				color_section = color_data and color_data.color,
+				color_start = color_data and color_data.start,
+				color_stop = color_data and color_data.stop,
+				localize = false
+			})
+		end
 	end
 	local new_item = node:create_item(data_node, params)
 	new_item:set_value(managers.network.matchmake:get_lobby_filter("job_id") or -1)
@@ -5795,10 +5719,10 @@ function MenuOptionInitiator:modify_network_options(node)
 		local toggle_throttling_value = managers.user:get_setting("net_packet_throttling") and "on" or "off"
 		toggle_throttling_item:set_value(toggle_throttling_value)
 	end
-	local toggle_allow_relayed_connections_item = node:item("toggle_allow_relayed_connections")
-	if toggle_allow_relayed_connections_item then
-		local toggle_allow_relayed_connections_value = managers.user:get_setting("net_allow_relayed_connections") and "on" or "off"
-		toggle_allow_relayed_connections_item:set_value(toggle_allow_relayed_connections_value)
+	local toggle_net_forwarding_item = node:item("toggle_net_forwarding")
+	if toggle_net_forwarding_item then
+		local toggle_net_forwarding_value = managers.user:get_setting("net_forwarding") and "on" or "off"
+		toggle_net_forwarding_item:set_value(toggle_net_forwarding_value)
 	end
 	local net_use_compression_item = node:item("toggle_net_use_compression")
 	if net_use_compression_item then

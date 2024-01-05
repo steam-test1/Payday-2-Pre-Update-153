@@ -1701,6 +1701,16 @@ end
 function MenuComponentManager:update_contract_character_menu_state(peer_id, state)
 	if self._contract_gui then
 		self._contract_gui:update_character_menu_state(peer_id, state)
+		local peer = managers.network:session() and managers.network:session():local_peer() or false
+		if peer and peer:id() == peer_id then
+			local lobby_bg = self._fullscreen_ws:panel():child("lobby_bg") or self._fullscreen_ws:panel():rect({
+				name = "lobby_bg",
+				layer = -1,
+				color = Color.black,
+				alpha = 0
+			})
+			lobby_bg:set_alpha(state == "options" and 0.4 or 0)
+		end
 	end
 end
 

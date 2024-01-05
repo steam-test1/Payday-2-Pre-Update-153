@@ -259,10 +259,15 @@ function MenuItemMultiChoice:reload(row_item, node)
 	row_item.arrow_right:set_alpha(arrow_alpha)
 	row_item.gui_text:set_color(row_item.color)
 	row_item.choice_text:set_color(not self._enabled and row_item.disabled_color or self:selected_option():parameters().color or node.row_item_hightlight_color)
+	row_item.choice_text:set_alpha(self._enabled and 1 or 0.75)
 	if self:info_panel() == "lobby_campaign" then
 		node._reload_lobby_campaign(node, row_item)
 	elseif self:info_panel() == "lobby_difficulty" then
 		node._reload_lobby_difficulty(node, row_item)
+	end
+	local color_section = self:selected_option():parameters().color_section
+	if color_section then
+		row_item.choice_text:set_range_color(self:selected_option():parameters().color_start, self:selected_option():parameters().color_stop, color_section)
 	end
 	return true
 end
@@ -270,12 +275,13 @@ end
 function MenuItemMultiChoice:highlight_row_item(node, row_item, mouse_over)
 	row_item.gui_text:set_color(row_item.color)
 	row_item.choice_text:set_color(not self._enabled and row_item.disabled_color or self:selected_option():parameters().color or node.row_item_hightlight_color)
+	row_item.choice_text:set_alpha(self._enabled and 1 or 0.75)
 	row_item.arrow_left:set_image("guis/textures/menu_arrows", 24, 0, 24, 24)
 	row_item.arrow_right:set_image("guis/textures/menu_arrows", 48, 0, -24, 24)
 	row_item.arrow_left:set_color(not self._enabled and row_item.disabled_color or self:left_arrow_visible() and tweak_data.screen_colors.button_stage_2 or tweak_data.screen_colors.button_stage_3)
 	row_item.arrow_right:set_color(not self._enabled and row_item.disabled_color or self:right_arrow_visible() and tweak_data.screen_colors.button_stage_2 or tweak_data.screen_colors.button_stage_3)
-	row_item.arrow_left:set_alpha(1)
-	row_item.arrow_right:set_alpha(1)
+	row_item.arrow_left:set_alpha(self._enabled and 1 or 0.75)
+	row_item.arrow_right:set_alpha(self._enabled and 1 or 0.75)
 	if self:info_panel() == "lobby_campaign" then
 		node._highlight_lobby_campaign(node, row_item)
 	elseif self:info_panel() == "lobby_difficulty" then
@@ -289,12 +295,13 @@ end
 function MenuItemMultiChoice:fade_row_item(node, row_item, mouse_over)
 	row_item.gui_text:set_color(row_item.color)
 	row_item.choice_text:set_color(not self._enabled and row_item.disabled_color or self:selected_option():parameters().color or node.row_item_hightlight_color)
+	row_item.choice_text:set_alpha(self._enabled and 1 or 0.75)
 	row_item.arrow_left:set_image("guis/textures/menu_arrows", 0, 0, 24, 24)
 	row_item.arrow_right:set_image("guis/textures/menu_arrows", 24, 0, -24, 24)
 	row_item.arrow_left:set_color(not self._enabled and row_item.disabled_color or self:left_arrow_visible() and tweak_data.screen_colors.button_stage_2 or tweak_data.screen_colors.button_stage_3)
 	row_item.arrow_right:set_color(not self._enabled and row_item.disabled_color or self:right_arrow_visible() and tweak_data.screen_colors.button_stage_2 or tweak_data.screen_colors.button_stage_3)
-	row_item.arrow_left:set_alpha(0.5)
-	row_item.arrow_right:set_alpha(0.5)
+	row_item.arrow_left:set_alpha(self._enabled and 0.5 or 0.25)
+	row_item.arrow_right:set_alpha(self._enabled and 0.5 or 0.25)
 	if self:info_panel() == "lobby_campaign" then
 		node._fade_lobby_campaign(node, row_item)
 	elseif self:info_panel() == "lobby_difficulty" then
@@ -332,7 +339,7 @@ function MenuItemMultiChoice:_layout(node, row_item)
 		h = row_item.font_size
 		row_item.choice_panel:set_w(row_item.gui_panel:width() - (arrow_size + node._align_line_padding) * 2)
 	else
-		row_item.choice_panel:set_w(row_item.gui_panel:width() * 0.4)
+		row_item.choice_panel:set_w(row_item.gui_panel:width() * 0.4 + (self:parameters().text_offset or 0))
 	end
 	row_item.choice_panel:set_h(h)
 	if row_item.align == "right" then

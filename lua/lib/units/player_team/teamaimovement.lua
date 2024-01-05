@@ -53,9 +53,6 @@ function TeamAIMovement:_upd_location()
 	local nav_seg_id = self._nav_tracker:nav_segment()
 	if self._standing_nav_seg_id ~= nav_seg_id then
 		self._standing_nav_seg_id = nav_seg_id
-		local metadata = managers.navigation:get_nav_seg_metadata(nav_seg_id)
-		local location_id = metadata.location_id
-		managers.hud:set_mugshot_location(self._unit:unit_data().mugshot_id, location_id)
 		managers.groupai:state():on_criminal_nav_seg_change(self._unit, nav_seg_id)
 	end
 end

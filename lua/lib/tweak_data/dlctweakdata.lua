@@ -660,6 +660,280 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.gage_pack_assault = {}
+	self.gage_pack_assault.dlc = "has_gage_pack_assault"
+	self.gage_pack_assault.content = {}
+	self.gage_pack_assault.content.loot_drops = {}
+	self.ach_gage5_1 = {}
+	self.ach_gage5_1.dlc = "has_achievement"
+	self.ach_gage5_1.achievement_id = "gage5_1"
+	self.ach_gage5_1.content = {}
+	self.ach_gage5_1.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "evil",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_b_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_fg_psg",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_g_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_s_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_fg_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_g_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_famas_b_sniper",
+			amount = 1
+		}
+	}
+	self.ach_gage5_2 = {}
+	self.ach_gage5_2.dlc = "has_achievement"
+	self.ach_gage5_2.achievement_id = "gage5_2"
+	self.ach_gage5_2.content = {}
+	self.ach_gage5_2.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "crowgoblin",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_m79_stock_short",
+			amount = 1
+		}
+	}
+	self.ach_gage5_3 = {}
+	self.ach_gage5_3.dlc = "has_achievement"
+	self.ach_gage5_3.achievement_id = "gage5_3"
+	self.ach_gage5_3.content = {}
+	self.ach_gage5_3.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_3.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_fg_mar",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_plastic",
+			amount = 1
+		}
+	}
+	self.ach_gage5_4 = {}
+	self.ach_gage5_4.dlc = "has_achievement"
+	self.ach_gage5_4.achievement_id = "gage5_4"
+	self.ach_gage5_4.content = {}
+	self.ach_gage5_4.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_4.content.loot_drops = {
+		{
+			type_items = "materials",
+			item_entry = "evil",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "vicious",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_fg_retro_plastic",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_light",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_famas_b_short",
+			amount = 1
+		}
+	}
+	self.ach_gage5_5 = {}
+	self.ach_gage5_5.dlc = "has_achievement"
+	self.ach_gage5_5.achievement_id = "gage5_5"
+	self.ach_gage5_5.content = {}
+	self.ach_gage5_5.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_5.content.loot_drops = {
+		{
+			type_items = "materials",
+			item_entry = "bone",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "muerte",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_m79_barrel_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_wood",
+			amount = 1
+		}
+	}
+	self.ach_gage5_6 = {}
+	self.ach_gage5_6.dlc = "has_achievement"
+	self.ach_gage5_6.achievement_id = "gage5_6"
+	self.ach_gage5_6.content = {}
+	self.ach_gage5_6.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_6.content.loot_drops = {
+		{
+			type_items = "materials",
+			item_entry = "void",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "death",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_famas_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_fg_railed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_fg_sar",
+			amount = 1
+		}
+	}
+	self.ach_gage5_7 = {}
+	self.ach_gage5_7.dlc = "has_achievement"
+	self.ach_gage5_7.achievement_id = "gage5_7"
+	self.ach_gage5_7.content = {}
+	self.ach_gage5_7.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_7.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_fg_retro",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_g_retro",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g3_s_wood",
+			amount = 1
+		}
+	}
+	self.ach_gage5_8 = {}
+	self.ach_gage5_8.dlc = "has_achievement"
+	self.ach_gage5_8.achievement_id = "gage5_8"
+	self.ach_gage5_8.content = {}
+	self.ach_gage5_8.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_8.content.loot_drops = {
+		{
+			type_items = "materials",
+			item_entry = "frost",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "emperor",
+			amount = 1
+		}
+	}
+	self.ach_gage5_9 = {}
+	self.ach_gage5_9.dlc = "has_achievement"
+	self.ach_gage5_9.achievement_id = "gage5_9"
+	self.ach_gage5_9.content = {}
+	self.ach_gage5_9.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_9.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "volt",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_fg_fab",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_fab",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_galil_s_skeletal",
+			amount = 1
+		}
+	}
+	self.ach_gage5_10 = {}
+	self.ach_gage5_10.dlc = "has_achievement"
+	self.ach_gage5_10.achievement_id = "gage5_10"
+	self.ach_gage5_10.content = {}
+	self.ach_gage5_10.content.loot_global_value = "gage_pack_assault"
+	self.ach_gage5_10.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "galax",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_famas_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_famas_g_retro",
+			amount = 1
+		}
+	}
 	self.gage_pack_lmg = {}
 	self.gage_pack_lmg.content = {}
 	self.gage_pack_lmg.dlc = "has_gage_pack_lmg"

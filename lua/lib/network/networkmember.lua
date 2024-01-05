@@ -139,6 +139,9 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	end
 	self:set_unit(unit, character_name)
 	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self._peer:profile().outfit_string, self._peer:outfit_version(), peer_id)
+	if self == Global.local_member then
+		unit:character_damage():send_set_status()
+	end
 	if is_drop_in then
 		self._peer:set_used_deployable(used_deployable)
 		self._peer:set_used_body_bags(used_body_bags)

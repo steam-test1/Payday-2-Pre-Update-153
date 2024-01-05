@@ -690,7 +690,6 @@ function StageEndScreenGui:feed_statistics(data)
 		PERCENT = data.completed_ratio
 	})
 	data.time_played = managers.statistics:session_time_played()
-	data.last_completed_challenge = managers.challenges:get_last_comleted_title_text()
 	data.total_downed = managers.statistics:total_downed()
 	data.favourite_weapon = managers.statistics:session_favourite_weapon()
 	data.hit_accuracy = managers.statistics:session_hit_accuracy() .. "%"

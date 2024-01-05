@@ -298,7 +298,9 @@ function CoreWorldInstanceManager:prepare_mission_data(instance)
 			if element.class == "ElementSpecialObjective" then
 				element.values.search_position = instance.position + element.values.search_position:rotate_with(instance.rotation)
 			elseif element.class == "ElementLootBag" then
-				element.values.spawn_dir = element.values.spawn_dir:rotate_with(instance.rotation)
+				if element.values.spawn_dir then
+					element.values.spawn_dir = element.values.spawn_dir:rotate_with(instance.rotation)
+				end
 			elseif element.class == "ElementSpawnGrenade" then
 				element.values.spawn_dir = element.values.spawn_dir:rotate_with(instance.rotation)
 			elseif element.class == "ElementSpawnUnit" then

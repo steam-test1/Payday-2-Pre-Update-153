@@ -3,12 +3,28 @@ DynamicResourceManager.DYN_RESOURCES_PACKAGE = "packages/dyn_resources"
 DynamicResourceManager.listener_events = {file_streamer_workload = 1}
 
 function DynamicResourceManager:init()
-	self._dyn_resources = Global.dyn_resource_manager_data or {}
-	Global.dyn_resource_manager_data = self._dyn_resources
+	if not Global.dyn_resource_manager_data then
+		Global.dyn_resource_manager_data = {
+			streaming_settings = {
+				sleep_time = 3,
+				chunk_size_mul = 1,
+				chunk_size_kb = 4096
+			},
+			dyn_resources = {}
+		}
+	end
+	self._dyn_resources = Global.dyn_resource_manager_data.dyn_resources
+	self._streaming_settings = Global.dyn_resource_manager_data.streaming_settings
 	self._to_unload = nil
 	self._listener_holder = EventListenerHolder:new()
-	self._max_streaming_chunk_kb = 256
-	self:set_file_streaming_settings(self._max_streaming_chunk_kb, 3)
+end
+
+function DynamicResourceManager:post_init()
+	local chunk_size_kb = managers.user:get_setting("max_streaming_chunk")
+	if self._streaming_settings.chunk_size_kb ~= chunk_size_kb then
+		self:_set_file_streamer_settings(chunk_size_kb, self._streaming_settings.sleep_time)
+	end
+	managers.user:add_setting_changed_callback("max_streaming_chunk", callback(self, self, "clbk_streaming_chunk_size_changed"), true)
 end
 
 function DynamicResourceManager:update()
@@ -177,14 +193,22 @@ function DynamicResourceManager:is_file_streamer_idle()
 	return nr_tasks == 0
 end
 
-function DynamicResourceManager:set_file_streaming_settings(chunk_size_kb, sleep_time)
-	chunk_size_kb = math.min(chunk_size_kb, self._max_streaming_chunk_kb)
-	if chunk_size_kb == Global.streaming_chunk_size_kb and sleep_time == Global.streaming_sleep_time then
+function DynamicResourceManager:set_file_streaming_chunk_size_mul(mul, sleep_time)
+	mul = mul or self._streaming_settings.chunk_size_mul
+	sleep_time = sleep_time or self._streaming_settings.sleep_time
+	if mul == self._streaming_settings.chunk_size_mul and sleep_time == self._streaming_settings.sleep_time then
 		return
 	end
-	Global.streaming_chunk_size_kb = chunk_size_kb
-	Global.streaming_sleep_time = sleep_time
-	Application:set_file_streamer_settings(chunk_size_kb * 1024, sleep_time)
+	print("[DynamicResourceManager:set_file_streaming_chunk_size_mul]", mul, "sleep_time", sleep_time)
+	self._streaming_settings.chunk_size_mul = mul
+	self:_set_file_streamer_settings(self._streaming_settings.chunk_size_kb, sleep_time)
+end
+
+function DynamicResourceManager:_set_file_streamer_settings(chunk_size_kb, sleep_time)
+	self._streaming_settings.chunk_size_kb = chunk_size_kb
+	self._streaming_settings.sleep_time = sleep_time
+	local chunk_size_kb_end_value = chunk_size_kb * 1024 * self._streaming_settings.chunk_size_mul
+	Application:set_file_streamer_settings(chunk_size_kb_end_value, sleep_time)
 end
 
 function DynamicResourceManager:add_listener(key, events, clbk)
@@ -195,11 +219,10 @@ function DynamicResourceManager:remove_listener(key)
 	self._listener_holder:remove(key)
 end
 
-function DynamicResourceManager:set_max_streaming_chunk(size_kb)
-	self._max_streaming_chunk_kb = size_kb
-	self:set_file_streaming_settings(Global.streaming_chunk_size_kb, Global.streaming_sleep_time)
-end
-
 function DynamicResourceManager:max_streaming_chunk()
 	return self._max_streaming_chunk_kb
+end
+
+function DynamicResourceManager:clbk_streaming_chunk_size_changed(name, old_value, new_value)
+	self:_set_file_streamer_settings(new_value, self._streaming_settings.sleep_time)
 end

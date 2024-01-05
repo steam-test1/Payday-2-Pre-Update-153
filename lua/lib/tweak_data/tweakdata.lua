@@ -7,8 +7,6 @@ require("lib/tweak_data/StatisticsTweakData")
 require("lib/tweak_data/LevelsTweakData")
 require("lib/tweak_data/GroupAITweakData")
 require("lib/tweak_data/DramaTweakData")
-require("lib/tweak_data/SecretAssignmentTweakData")
-require("lib/tweak_data/ChallengesTweakData")
 require("lib/tweak_data/UpgradesTweakData")
 require("lib/tweak_data/UpgradesVisualTweakData")
 require("lib/tweak_data/HudIconsTweakData")
@@ -276,7 +274,8 @@ function TweakData:init()
 		"lobby",
 		"blackmarket",
 		"blackmarket_weapon",
-		"blackmarket_mask"
+		"blackmarket_mask",
+		"payday"
 	}
 	self.difficulty_name_ids = {}
 	self.difficulty_name_ids.easy = "menu_difficulty_easy"
@@ -296,8 +295,6 @@ function TweakData:init()
 	self.narrative = NarrativeTweakData:new()
 	self.group_ai = GroupAITweakData:new(self)
 	self.drama = DramaTweakData:new()
-	self.secret_assignment_manager = SecretAssignmentTweakData:new()
-	self.challenges = ChallengesTweakData:new()
 	self.upgrades = UpgradesTweakData:new()
 	self.skilltree = SkillTreeTweakData:new()
 	self.upgrades.visual = UpgradesVisualTweakData:new()
@@ -1297,7 +1294,6 @@ function TweakData:init()
 	}
 	self.interaction.sentry_gun_refill = {}
 	self.interaction.sentry_gun_refill.icon = "equipment_ammo_bag"
-	self.interaction.sentry_gun_refill.text_id = "debug_interact_grenade_crate_take_grenades"
 	self.interaction.sentry_gun_refill.contour = "deployable"
 	self.interaction.sentry_gun_refill.requires_upgrade = {category = "sentry_gun", upgrade = "can_reload"}
 	self.interaction.sentry_gun_refill.timer = 1.5
@@ -1306,6 +1302,16 @@ function TweakData:init()
 	self.interaction.sentry_gun_refill.sound_interupt = "bar_bag_generic_cancel"
 	self.interaction.sentry_gun_refill.sound_done = "bar_bag_generic_finished"
 	self.interaction.sentry_gun_refill.action_text_id = "hud_action_taking_grenades"
+	self.interaction.sentry_gun_revive = {}
+	self.interaction.sentry_gun_revive.icon = "equipment_ammo_bag"
+	self.interaction.sentry_gun_revive.contour = "deployable"
+	self.interaction.sentry_gun_revive.requires_upgrade = {category = "sentry_gun", upgrade = "can_revive"}
+	self.interaction.sentry_gun_revive.timer = 3.5
+	self.interaction.sentry_gun_revive.blocked_hint = "full_grenades"
+	self.interaction.sentry_gun_revive.sound_start = "bar_bag_generic"
+	self.interaction.sentry_gun_revive.sound_interupt = "bar_bag_generic_cancel"
+	self.interaction.sentry_gun_revive.sound_done = "bar_bag_generic_finished"
+	self.interaction.sentry_gun_revive.action_text_id = "hud_action_taking_grenades"
 	self.interaction.bodybags_bag = {}
 	self.interaction.bodybags_bag.icon = "equipment_ammo_bag"
 	self.interaction.bodybags_bag.text_id = "debug_interact_bodybags_bag_take_bodybag"
@@ -2386,10 +2392,21 @@ function TweakData:init()
 	self.interaction.read_barcode_opa_locka.equipment_consume = true
 	self.interaction.read_barcode_opa_locka.start_active = false
 	self.interaction.read_barcode_opa_locka.timer = 2
+	self.interaction.read_barcode_activate = {}
+	self.interaction.read_barcode_activate.text_id = "hud_int_hold_activate_reader"
+	self.interaction.read_barcode_activate.action_text_id = "hud_action_activating_reader"
+	self.interaction.read_barcode_activate.special_equipment = "barcode_opa_locka"
+	self.interaction.read_barcode_activate.dont_need_equipment = true
+	self.interaction.read_barcode_activate.possible_special_equipment = {}
+	self.interaction.read_barcode_activate.equipment_text_id = "hud_int_hold_activate_reader"
+	self.interaction.read_barcode_activate.equipment_consume = false
+	self.interaction.read_barcode_activate.start_active = false
+	self.interaction.read_barcode_activate.timer = 2
 	self.interaction.hlm_motor_start = {}
 	self.interaction.hlm_motor_start.text_id = "hud_int_hold_start_motor"
 	self.interaction.hlm_motor_start.action_text_id = "hud_action_startig_motor"
 	self.interaction.hlm_motor_start.start_active = false
+	self.interaction.hlm_motor_start.force_update_position = true
 	self.interaction.hlm_motor_start.timer = 2
 	self.interaction.hlm_motor_start.sound_start = "bar_huge_lance_fix"
 	self.interaction.hlm_motor_start.sound_interupt = "bar_huge_lance_fix_cancel"
@@ -2655,24 +2672,24 @@ function TweakData:init()
 	self.experience_manager.loot_drop_value.xp90 = 28000
 	self.experience_manager.loot_drop_value.xp100 = 32000
 	self.experience_manager.stage_completion = {
-		200,
-		250,
-		300,
-		350,
-		425,
-		475,
-		550
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
 	}
 	self.experience_manager.job_completion = {
-		750,
-		1000,
-		1500,
 		2000,
-		2500,
-		3000,
-		4000
+		4000,
+		10000,
+		16000,
+		20000,
+		28000,
+		32000
 	}
-	self.experience_manager.stage_failed_multiplier = 0.1
+	self.experience_manager.stage_failed_multiplier = 0.01
 	self.experience_manager.in_custody_multiplier = 0.7
 	self.experience_manager.difficulty_multiplier = {
 		2,
@@ -2705,8 +2722,8 @@ function TweakData:init()
 	self.experience_manager.civilians_killed = 0
 	self.experience_manager.day_multiplier = {
 		1,
-		2,
-		3,
+		1,
+		1,
 		4,
 		5,
 		6,
@@ -2714,8 +2731,8 @@ function TweakData:init()
 	}
 	self.experience_manager.pro_day_multiplier = {
 		1,
-		2.5,
-		5,
+		1,
+		1,
 		5.5,
 		7,
 		8.5,
@@ -2851,15 +2868,18 @@ function TweakData:init()
 		accuracy = 101,
 		award = "gage4_5"
 	}
-	self.achievement.shock_awe = {
-		count = 4,
-		weapon_type = "shotgun",
-		award = "gage4_9"
-	}
 	self.achievement.close_and_personal = {
 		award = "gage4_3",
 		kill_type = "melee",
 		count = 50
+	}
+	self.achievement.one_man_army = {
+		award = "gage5_3",
+		equipped = {
+			primary = "gre_m79",
+			secondary = "serbu",
+			armor = "level_7"
+		}
 	}
 	self.achievement.weapons_owned = {
 		gage4_2 = {
@@ -2870,6 +2890,12 @@ function TweakData:init()
 			"striker",
 			"serbu",
 			"benelli"
+		},
+		gage5_4 = {
+			"gre_m79",
+			"g3",
+			"galil",
+			"famas"
 		}
 	}
 	self.achievement.gage_assignments = {
@@ -2902,6 +2928,34 @@ function TweakData:init()
 			"wpn_fps_upg_ak_b_draco",
 			"wpn_fps_upg_ak_m_quad",
 			"wpn_fps_upg_ass_ns_linear"
+		}
+	}
+	self.achievement.explosion_achievements = {
+		shock_awe = {
+			count = 4,
+			weapon_type = "shotgun",
+			award = "gage4_9"
+		}
+	}
+	self.achievement.grenade_achievements = {
+		bada_boom = {
+			count = 4,
+			grenade_type = "launcher_frag",
+			award = "gage5_2",
+			kill = true
+		},
+		artillery_barrage = {
+			grenade_type = "launcher_frag",
+			stat = "gage5_5_stats",
+			distance = 4000,
+			kill = true
+		},
+		boom_shakalaka = {
+			grenade_type = "launcher_frag",
+			award = "gage5_7",
+			enemy = "spooc",
+			flying_strike = true,
+			kill = true
 		}
 	}
 	self.achievement.enemy_kill_achievements = {
@@ -3063,6 +3117,20 @@ function TweakData:init()
 			enemy = "tank",
 			weapon_type = "shotgun",
 			part_id = "wpn_fps_upg_a_custom"
+		},
+		grind_fest = {
+			stat = "gage5_1_stats",
+			enemy = "tank",
+			weapon = "g3"
+		},
+		kill_streak = {
+			stat = "gage5_9_stats",
+			enemy = "spooc",
+			weapon = "galil"
+		},
+		le_picnic = {
+			stat = "gage5_10_stats",
+			weapon = "famas"
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -3099,6 +3167,11 @@ function TweakData:init()
 			level_id = "nightclub",
 			melee_id = "shovel",
 			is_cop = true
+		},
+		cant_touch_this = {
+			stat = "gage5_8_stats",
+			melee_id = "dingdong",
+			is_gangster = true
 		}
 	}
 	self.achievement.complete_heist_achievements = {
@@ -3485,6 +3558,23 @@ function TweakData:init()
 				"skullmonkey",
 				"orangutang"
 			}
+		},
+		guy_with_gun = {
+			award = "gage5_6",
+			jobs = {
+				"watchdogs",
+				"watchdogs_prof"
+			},
+			difficulties = {
+				"overkill_145",
+				"overkill_290"
+			},
+			masks = {
+				"galax",
+				"crowgoblin",
+				"evil",
+				"volt"
+			}
 		}
 	}
 	self.achievement.sniper_kill_achievements = {
@@ -3505,6 +3595,46 @@ function TweakData:init()
 			weapon = "msr",
 			multi_kill = 2
 		}
+	}
+	local gage_5_1_achievement = {
+		text_id = "bm_wp_gage5_1_achievment",
+		stat = "gage5_1_stats",
+		max_progress = 25
+	}
+	local gage_5_2_achievement = {
+		text_id = "bm_wp_gage5_2_achievment",
+		award = "gage5_2"
+	}
+	local gage_5_3_achievement = {
+		text_id = "bm_wp_gage5_3_achievment",
+		award = "gage5_3"
+	}
+	local gage_5_4_achievement = {
+		text_id = "bm_wp_gage5_4_achievment",
+		award = "gage5_4"
+	}
+	local gage_5_5_achievement = {
+		text_id = "bm_wp_gage5_5_achievment",
+		stat = "gage5_5_stats",
+		max_progress = 25
+	}
+	local gage_5_6_achievement = {
+		text_id = "bm_wp_gage5_6_achievment",
+		award = "gage5_6"
+	}
+	local gage_5_7_achievement = {
+		text_id = "bm_wp_gage5_7_achievment",
+		award = "gage5_7"
+	}
+	local gage_5_9_achievement = {
+		text_id = "bm_wp_gage5_9_achievment",
+		stat = "gage5_9_stats",
+		max_progress = 10
+	}
+	local gage_5_10_achievement = {
+		text_id = "bm_wp_gage5_10_achievment",
+		stat = "gage5_10_stats",
+		max_progress = 200
 	}
 	self.achievement.weapon_part_tracker = {
 		wpn_fps_snp_m95_barrel_long = {
@@ -3635,7 +3765,35 @@ function TweakData:init()
 		wpn_fps_sho_striker_b_suppressed = {
 			text_id = "bm_wp_striker_b_suppressed_achievment",
 			award = "gage4_11"
-		}
+		},
+		wpn_fps_gre_m79_barrel_short = gage_5_5_achievement,
+		wpn_fps_gre_m79_stock_short = gage_5_2_achievement,
+		wpn_fps_ass_g3_b_sniper = gage_5_1_achievement,
+		wpn_fps_ass_g3_fg_psg = gage_5_1_achievement,
+		wpn_fps_ass_g3_g_sniper = gage_5_1_achievement,
+		wpn_fps_ass_g3_s_sniper = gage_5_1_achievement,
+		wpn_fps_ass_g3_b_short = gage_5_4_achievement,
+		wpn_fps_ass_g3_fg_retro_plastic = gage_5_4_achievement,
+		wpn_fps_ass_g3_fg_railed = gage_5_6_achievement,
+		wpn_fps_ass_g3_fg_retro = gage_5_7_achievement,
+		wpn_fps_ass_g3_g_retro = gage_5_7_achievement,
+		wpn_fps_ass_g3_s_wood = gage_5_7_achievement,
+		wpn_fps_ass_galil_s_sniper = gage_5_1_achievement,
+		wpn_fps_ass_galil_fg_sniper = gage_5_1_achievement,
+		wpn_fps_ass_galil_g_sniper = gage_5_1_achievement,
+		wpn_fps_ass_galil_fg_sar = gage_5_6_achievement,
+		wpn_fps_ass_galil_fg_mar = gage_5_3_achievement,
+		wpn_fps_ass_galil_s_plastic = gage_5_3_achievement,
+		wpn_fps_ass_galil_s_light = gage_5_4_achievement,
+		wpn_fps_ass_galil_s_wood = gage_5_5_achievement,
+		wpn_fps_ass_galil_fg_fab = gage_5_9_achievement,
+		wpn_fps_ass_galil_s_fab = gage_5_9_achievement,
+		wpn_fps_ass_galil_s_skeletal = gage_5_9_achievement,
+		wpn_fps_ass_famas_b_sniper = gage_5_1_achievement,
+		wpn_fps_ass_famas_b_short = gage_5_4_achievement,
+		wpn_fps_ass_famas_b_long = gage_5_6_achievement,
+		wpn_fps_ass_famas_g_retro = gage_5_10_achievement,
+		wpn_fps_ass_famas_b_suppressed = gage_5_10_achievement
 	}
 	self.pickups = {}
 	self.pickups.ammo = {
@@ -3862,6 +4020,14 @@ function TweakData:init()
 	self.grenades.frag.damage = 30
 	self.grenades.frag.player_damage = 10
 	self.grenades.frag.range = 1000
+	self.grenades.launcher_frag = {}
+	self.grenades.launcher_frag.damage = 34
+	self.grenades.launcher_frag.curve_pow = 0.1
+	self.grenades.launcher_frag.player_damage = 8
+	self.grenades.launcher_frag.range = 350
+	self.grenades.launcher_frag.init_timer = 2.5
+	self.grenades.launcher_frag.mass_look_up_modifier = 1
+	self.grenades.launcher_frag.sound_event = "gl_explode"
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()

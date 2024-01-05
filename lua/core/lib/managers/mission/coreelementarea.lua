@@ -121,6 +121,18 @@ function ElementAreaTrigger:on_executed(instigator, ...)
 end
 
 function ElementAreaTrigger:instigators()
+	if self._values.unit_ids then
+		local instigators = {}
+		if Network:is_server() then
+			for _, id in ipairs(self._values.unit_ids) do
+				local unit = Application:editor() and managers.editor:layer("Statics"):created_units_pairs()[id] or managers.worlddefinition:get_unit(id)
+				if alive(unit) then
+					table.insert(instigators, unit)
+				end
+			end
+		end
+		return instigators
+	end
 	local instigators = self:project_instigators()
 	for _, id in ipairs(self._values.spawn_unit_elements) do
 		local element = self:get_mission_element(id)

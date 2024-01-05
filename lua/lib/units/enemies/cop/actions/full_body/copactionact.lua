@@ -81,6 +81,7 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_car_exit_ntrl_front_l",
 	"e_sp_down_5_5m",
 	"e_sp_dwn_10_25m",
+	"e_sp_climb_over_2m",
 	"e_sp_dwn_11m",
 	"e_sp_up_ledge",
 	"e_sp_clk_3m_dwn_vent",
@@ -142,6 +143,8 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_investigate_low",
 	"cm_sp_take_cover_hide",
 	"cf_sp_accident_scene",
+	"cm_sp_sit_hostage",
+	"cm_sp_look_at_phone",
 	"cf_sp_stand_idle_var1",
 	"cf_sp_stand_desk_1m",
 	"cf_sp_stand_desk_1m",
@@ -170,7 +173,8 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cf_sp_lean_bar_desk",
 	"cf_sp_lean_wall_right",
 	"cf_sp_lean_wall_back",
-	"cf_sp_lying_hurt"
+	"cf_sp_lying_hurt",
+	"cf_sp_lying_drugged_sleep"
 }
 CopActionAct._act_redirects.SO = {
 	"e_nl_plant_run_through",
@@ -260,6 +264,7 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_down_elevator_shaft",
 	"e_nl_up_elevator_shaft",
 	"e_nl_down_thermite_hole",
+	"e_nl_up_7m_ladder",
 	"e_so_ntl_idle_tired",
 	"e_so_ntl_idle_kickpebble",
 	"e_so_ntl_idle_look",
@@ -274,6 +279,7 @@ CopActionAct._act_redirects.SO = {
 	"e_so_ntl_talk_phone",
 	"e_so_plant_c4_low",
 	"e_so_plant_c4_hi",
+	"e_so_interact_mid",
 	"e_so_plant_c4_floor",
 	"e_so_ntl_look_up_wall",
 	"e_so_alarm_under_table",
@@ -328,6 +334,7 @@ CopActionAct._act_redirects.SO = {
 	"cm_so_investigate_hi",
 	"cm_so_investigate_low",
 	"cm_so_hide",
+	"cm_so_look_at_phone",
 	"cmf_so_smoke"
 }
 

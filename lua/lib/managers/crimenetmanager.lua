@@ -38,10 +38,11 @@ function CrimeNetManager:_get_jobs_by_jc()
 	for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 		local is_cooldown_ok = managers.job:check_ok_with_cooldown(job_id)
 		local is_not_wrapped = not tweak_data.narrative.jobs[job_id].wrapped_to_job
-		local is_not_dlc_or_got = not tweak_data.narrative.jobs[job_id].dlc or managers.dlc:has_dlc(tweak_data.narrative.jobs[job_id].dlc)
+		local dlc = tweak_data.narrative:job_data(job_id).dlc
+		local is_not_dlc_or_got = not dlc or managers.dlc:has_dlc(dlc)
 		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got
 		if pass_all_tests then
-			local job_data = tweak_data.narrative.jobs[job_id]
+			local job_data = tweak_data.narrative:job_data(job_id)
 			local start_difficulty = job_data.professional and 1 or 0
 			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
 			for i = start_difficulty, num_difficulties do
@@ -110,7 +111,8 @@ function CrimeNetManager:_setup()
 				else
 					job_data = table.remove(jobs_by_jc[jcs[i]], math.random(#jobs_by_jc[jcs[i]]))
 				end
-				local chance_multiplier = tweak_data.narrative.jobs[job_data.job_id] and tweak_data.narrative.jobs[job_data.job_id].spawn_chance_multiplier or 1
+				local job_tweak = tweak_data.narrative:job_data(job_data.job_id)
+				local chance_multiplier = job_tweak and job_tweak.spawn_chance_multiplier or 1
 				job_data.chance = chance * chance_multiplier
 				table.insert(self._presets, job_data)
 				j = j + 1
@@ -1546,7 +1548,7 @@ end
 function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_location)
 	local level_id = data.level_id
 	local level_data = tweak_data.levels[level_id]
-	local narrative_data = data.job_id and tweak_data.narrative.jobs[data.job_id]
+	local narrative_data = data.job_id and tweak_data.narrative:job_data(data.job_id)
 	local is_special = type == "special"
 	local is_server = type == "server"
 	local is_professional = narrative_data and narrative_data.professional
@@ -1682,7 +1684,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	if data.job_id then
 		local x = 0
 		local y = 0
-		local job_stars = math.ceil(tweak_data.narrative.jobs[data.job_id].jc / 10)
+		local job_stars = math.ceil(tweak_data.narrative:job_data(data.job_id).jc / 10)
 		local difficulty_stars = data.difficulty_id - 2
 		local job_and_difficulty_stars = job_stars + difficulty_stars
 		local start_difficulty = 1
@@ -1708,7 +1710,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			x = x + 11
 			num_stars = num_stars + 1
 		end
-		job_num = #tweak_data.narrative.jobs[data.job_id].chain
+		job_num = #tweak_data.narrative:job_chain(data.job_id)
 		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, job_num, data.job_id)
 		job_cash = managers.experience:cash_string(math.round(total_payout))
 		local difficulty_string = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[tweak_data.difficulties[data.difficulty_id]])
@@ -1749,9 +1751,10 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			heat_name:set_range_color(unpack(range))
 		end
 	end
+	local job_tweak = tweak_data.narrative:job_data(data.job_id)
 	local host_string = data.host_name or is_professional and managers.localization:to_upper_text("cn_menu_pro_job") or " "
-	local job_string = data.job_id and managers.localization:to_upper_text(tweak_data.narrative.jobs[data.job_id].name_id) or data.level_name or "NO JOB"
-	local contact_string = utf8.to_upper(data.job_id and managers.localization:text(tweak_data.narrative.contacts[tweak_data.narrative.jobs[data.job_id].contact].name_id)) or "BAIN"
+	local job_string = data.job_id and managers.localization:to_upper_text(job_tweak.name_id) or data.level_name or "NO JOB"
+	local contact_string = utf8.to_upper(data.job_id and managers.localization:text(tweak_data.narrative.contacts[job_tweak.contact].name_id)) or "BAIN"
 	contact_string = contact_string .. ": "
 	local info_string = managers.localization:to_upper_text("cn_menu_contract_short_" .. (1 < job_num and "plural" or "singular"), {days = job_num, money = job_cash})
 	info_string = info_string .. (data.state_name and " / " .. data.state_name or "")

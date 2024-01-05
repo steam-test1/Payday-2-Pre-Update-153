@@ -2177,9 +2177,9 @@ end
 function CoreEditor:_update_mute_state(t, dt)
 	if self._mute_states.wanted ~= self._mute_states.current then
 		if self._mute_states.wanted then
-			self._mute_source:post_event("mute")
+			self._mute_source:post_event("mute_global")
 		else
-			self._mute_source:post_event("unmute")
+			self._mute_source:post_event("unmute_global")
 		end
 		self._mute_states.current = self._mute_states.wanted
 	end

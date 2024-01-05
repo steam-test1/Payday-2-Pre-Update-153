@@ -138,6 +138,14 @@ function JobManager:is_job_stage_ghostable(job_id, stage)
 	if not job_data then
 		return false
 	end
+	if tweak_data.narrative:has_job_wrapper(job_id) then
+		for i, wrapped_job_id in ipairs(tweak_data.narrative.jobs[job_id].job_wrapper) do
+			if self:is_job_stage_ghostable(wrapped_job_id, stage) then
+				return true
+			end
+		end
+		return false
+	end
 	local chain = job_data.chain
 	if not chain then
 		return false
@@ -158,6 +166,14 @@ end
 function JobManager:is_job_ghostable(job_id)
 	local job_data = tweak_data.narrative.jobs[job_id]
 	if not job_data then
+		return false
+	end
+	if tweak_data.narrative:has_job_wrapper(job_id) then
+		for i, wrapped_job_id in ipairs(tweak_data.narrative.jobs[job_id].job_wrapper) do
+			if self:is_job_ghostable(wrapped_job_id) then
+				return true
+			end
+		end
 		return false
 	end
 	local chain = job_data.chain
@@ -182,6 +198,17 @@ function JobManager:get_job_ghost_bonus(job_id)
 	local job_data = tweak_data.narrative.jobs[job_id]
 	if not job_data then
 		return false
+	end
+	if tweak_data.narrative:has_job_wrapper(job_id) then
+		local min_ghost_bonus, max_ghost_bonus, min_bonus, max_bonus
+		for i, wrapped_job_id in ipairs(tweak_data.narrative.jobs[job_id].job_wrapper) do
+			min_bonus, max_bonus = self:get_job_ghost_bonus(wrapped_job_id)
+			if min_bonus then
+				min_ghost_bonus = min_ghost_bonus and math.min(min_ghost_bonus, min_bonus) or min_bonus
+				max_ghost_bonus = max_ghost_bonus and math.max(max_ghost_bonus, max_bonus) or max_bonus
+			end
+		end
+		return min_ghost_bonus, max_ghost_bonus
 	end
 	local chain = job_data.chain
 	if not chain then
@@ -242,12 +269,23 @@ function JobManager:_setup_job_heat()
 	local heat = {}
 	Global.job_manager.heat = heat
 	for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		heat[job_id] = self:_get_default_heat()
+		if not tweak_data.narrative:is_wrapped_to_job(job_id) then
+			heat[job_id] = self:_get_default_heat()
+		end
 	end
 end
 
 function JobManager:_get_default_heat()
 	return 0
+end
+
+function JobManager:_get_wrapped_default_heat(job_id)
+	local heat = self:_get_default_heat()
+	local job_wrapper = tweak_data.narrative.jobs[job_id].job_wrapper
+	for i, job in ipairs(job_wrapper) do
+		heat = heat + (self:_get_job_heat(job) or 0)
+	end
+	return math.clamp(heat, -self.JOB_HEAT_MAX_VALUE, self.JOB_HEAT_MAX_VALUE)
 end
 
 function JobManager:heat_to_value(heat)
@@ -411,7 +449,7 @@ function JobManager:last_known_heat()
 end
 
 function JobManager:current_job_heat_color()
-	local job_id = self:current_job_id()
+	local job_id = self:current_job_wrapper_id() or self:current_job_id()
 	return job_id and self:get_job_heat_color(job_id) or tweak_data.screen_colors.heat_standard_color
 end
 
@@ -446,7 +484,7 @@ function JobManager:current_job_heat_multipliers()
 	if not self:has_active_job() then
 		return
 	end
-	local job_id = self:current_job_id()
+	local job_id = self:current_job_wrapper_id() or self:current_job_id()
 	return self:get_job_heat_multipliers(job_id)
 end
 
@@ -494,7 +532,7 @@ function JobManager:_check_add_heat_to_jobs(debug_job_id, ignore_debug_prints)
 	if not self._global.heat then
 		self:_setup_job_heat()
 	end
-	local current_job = debug_job_id or self:current_job_id()
+	local current_job = debug_job_id or self:current_job_wrapper_id() or self:current_job_id()
 	if not current_job then
 		Application:error("[JobManager:_check_add_heat_to_jobs] No current job.")
 		return
@@ -578,6 +616,9 @@ function JobManager:set_job_heat(job_id, new_heat, cap_heat)
 end
 
 function JobManager:_get_job_heat(job_id)
+	if tweak_data.narrative:is_wrapped_to_job(job_id) then
+		return self:_get_job_heat(tweak_data.narrative.jobs[job_id].wrapped_to_job)
+	end
 	return self._global.heat[job_id]
 end
 
@@ -586,7 +627,7 @@ function JobManager:get_job_heat(job_id)
 end
 
 function JobManager:current_job_heat()
-	local current_job = self:current_job_id()
+	local current_job = self:current_job_wrapper_id() or self:current_job_id()
 	if not current_job then
 		Application:error("[JobManager:current_job_heat] No current job.")
 		return 0
@@ -746,13 +787,17 @@ function JobManager:load(data)
 		for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 			if not self._global.heat[job_id] then
 				Application:debug("[JobManager:load] Adding new job heat", job_id)
-				self._global.heat[job_id] = self:_get_default_heat()
+				if tweak_data.narrative:has_job_wrapper(job_id) then
+					self._global.heat[job_id] = self:_get_wrapped_default_heat(job_id)
+				else
+					self._global.heat[job_id] = self:_get_default_heat()
+				end
 			end
 		end
 		self:_chk_fill_heat_containers()
 		local invalid_jobs = {}
 		for job_id, heat in pairs(self._global.heat) do
-			if tweak_data.narrative:get_index_from_job_id(job_id) == 0 then
+			if tweak_data.narrative:get_index_from_job_id(job_id) == 0 or tweak_data.narrative:is_wrapped_to_job(job_id) then
 				table.insert(invalid_jobs, job_id)
 			else
 				self:_chk_is_heat_correct(job_id)
@@ -835,8 +880,15 @@ function JobManager:activate_job(job_id, current_stage)
 	if job.job_wrapper then
 		return self:activate_job(job.job_wrapper[math.random(#job.job_wrapper)], current_stage)
 	end
+	local job_wrapper_id
+	local wrapped_job_id = job_id
+	while tweak_data.narrative:is_wrapped_to_job(wrapped_job_id) do
+		job_wrapper_id = tweak_data.narrative.jobs[wrapped_job_id].wrapped_to_job
+		wrapped_job_id = job_wrapper_id
+	end
 	self._global.current_job = {
 		job_id = job_id,
+		job_wrapper_id = job_wrapper_id,
 		current_stage = current_stage or 1,
 		last_completed_stage = 0,
 		stages = #job.chain
@@ -951,14 +1003,21 @@ function JobManager:current_job_data()
 	if not self._global.current_job then
 		return
 	end
-	return tweak_data.narrative.jobs[self._global.current_job.job_id]
+	return tweak_data.narrative:job_data(self._global.current_job.job_id)
 end
 
 function JobManager:current_job_chain_data()
 	if not self._global.current_job then
 		return
 	end
-	return tweak_data.narrative.jobs[self._global.current_job.job_id] and tweak_data.narrative.jobs[self._global.current_job.job_id].chain
+	return tweak_data.narrative:job_chain(self._global.current_job.job_id)
+end
+
+function JobManager:current_job_wrapper_id()
+	if not self._global.current_job then
+		return
+	end
+	return self._global.current_job.job_wrapper_id
 end
 
 function JobManager:current_job_id()
@@ -972,7 +1031,7 @@ function JobManager:is_current_job_professional()
 	if not self._global.current_job then
 		return
 	end
-	return tweak_data.narrative.jobs[self._global.current_job.job_id].professional
+	return tweak_data.narrative:job_data(self._global.current_job.job_id).professional
 end
 
 function JobManager:is_job_professional_by_job_id(job_id)
@@ -980,7 +1039,7 @@ function JobManager:is_job_professional_by_job_id(job_id)
 		Application:error("[JobManager:is_job_professional_by_job_id] no job id or no job", job_id)
 		return
 	end
-	return tweak_data.narrative.jobs[job_id].professional and true or false
+	return tweak_data.narrative:job_data(job_id).professional and true or false
 end
 
 function JobManager:current_stage()
@@ -994,8 +1053,8 @@ function JobManager:current_stage_data()
 	if not self._global.current_job then
 		return
 	end
-	local job_data = tweak_data.narrative.jobs[self._global.current_job.job_id]
-	local stage = job_data.chain[self._global.current_job.current_stage]
+	local job_chain = tweak_data.narrative:job_chain(self._global.current_job.job_id)
+	local stage = job_chain[self._global.current_job.current_stage]
 	if 0 < #stage then
 		return stage[self._global.alternative_stage or 1]
 	end
@@ -1070,7 +1129,7 @@ function JobManager:current_contact_id()
 	if not self._global.current_job then
 		return
 	end
-	return tweak_data.narrative.jobs[self._global.current_job.job_id].contact
+	return tweak_data.narrative:job_data(self._global.current_job.job_id).contact
 end
 
 function JobManager:current_contact_data()
@@ -1084,7 +1143,7 @@ function JobManager:current_contact_data()
 end
 
 function JobManager:current_job_stars()
-	return math.ceil(tweak_data.narrative.jobs[self._global.current_job.job_id].jc / 10)
+	return math.ceil(tweak_data.narrative:job_data(self._global.current_job.job_id).jc / 10)
 end
 
 function JobManager:current_difficulty_stars()
@@ -1100,9 +1159,8 @@ function JobManager:current_job_and_difficulty_stars()
 end
 
 function JobManager:calculate_job_class(job_id, difficulty_id)
-	local job = tweak_data.narrative:get_job_name_from_index(job_id)
-	if job then
-		local job_jc = tweak_data.narrative.jobs[job].jc or 10
+	if job_id then
+		local job_jc = tweak_data.narrative:job_data(job_id).jc or 10
 		local difficulty_jc = math.max((difficulty_id or 1) - 2, 0) * 10
 		Application:debug("[calculate_job_class]", job_jc + difficulty_jc)
 		return job_jc + difficulty_jc
@@ -1151,13 +1209,6 @@ function JobManager:stage_success()
 	return self._stage_success
 end
 
-function JobManager:is_current_job_safehouse()
-	if not self._global.current_job then
-		return false
-	end
-	return managers.job:current_job_data().is_safehouse
-end
-
 function JobManager:check_ok_with_cooldown(job_id)
 	if not self._global.cooldown then
 		return true
@@ -1173,7 +1224,7 @@ function JobManager:_check_add_to_cooldown()
 		local cooldown_time = self._global.start_time + tweak_data.narrative.CONTRACT_COOLDOWN_TIME - TimerManager:wall_running():time()
 		if 0 < cooldown_time then
 			self._global.cooldown = self._global.cooldown or {}
-			self._global.cooldown[self:current_job_id()] = cooldown_time + TimerManager:wall_running():time()
+			self._global.cooldown[self:current_job_wrapper_id() or self:current_job_id()] = cooldown_time + TimerManager:wall_running():time()
 		end
 	end
 end

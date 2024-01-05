@@ -138,13 +138,11 @@ function ExperienceManager:add_points(points, present_xp, debug)
 		self:_set_total(self:total() + points)
 		self:_set_next_level_data_current_points(0)
 		self:present()
-		managers.challenges:aquired_money()
 		managers.statistics:aquired_money(points)
 		return points
 	end
 	if self:current_level() >= self:level_cap() then
 		self:_set_total(self:total() + points)
-		managers.challenges:aquired_money()
 		managers.statistics:aquired_money(points)
 		return points
 	end
@@ -157,7 +155,6 @@ function ExperienceManager:add_points(points, present_xp, debug)
 		self:_set_xp_gained(self:total())
 		self:_set_next_level_data_current_points(self:next_level_data_current_points() + points)
 		self:present()
-		managers.challenges:aquired_money()
 		managers.statistics:aquired_money(points)
 		return
 	end
@@ -177,13 +174,9 @@ function ExperienceManager:_level_up()
 	if alive(player) and tweak_data:difficulty_to_index(Global.game_settings.difficulty) < 4 then
 		player:base():replenish()
 	end
-	managers.challenges:check_active_challenges()
 	self:_check_achievements()
 	if managers.network:session() then
 		managers.network:session():send_to_peers_synched("sync_level_up", self:current_level())
-	end
-	if self:current_level() >= 145 then
-		managers.challenges:set_flag("president")
 	end
 	managers.upgrades:level_up()
 	managers.skilltree:level_up()
@@ -413,7 +406,7 @@ function ExperienceManager:get_contract_xp_by_stars(job_id, job_stars, risk_star
 	local job_stars = job_stars
 	local difficulty_stars = risk_stars
 	local player_stars = debug_player_level and math.max(math.ceil(debug_player_level / 10), 1) or managers.experience:level_to_stars()
-	local job_tweak_data = tweak_data.narrative.jobs[job_id]
+	local job_tweak_chains = tweak_data.narrative:job_chain(job_id)
 	local params = {}
 	params.job_id = job_id
 	params.job_stars = job_stars
@@ -446,7 +439,7 @@ function ExperienceManager:get_contract_xp_by_stars(job_id, job_stars, risk_star
 	for i = 1, job_days do
 		params.current_stage = i
 		params.on_last_stage = i == job_days
-		params.level_id = job_tweak_data and job_tweak_data.chain and job_tweak_data.chain[i] and job_tweak_data.chain[i].level_id
+		params.level_id = job_tweak_chains and job_tweak_chains[i] and job_tweak_chains[i].level_id
 		local total_xp, dissection_table = self:get_xp_by_params(params)
 		base_exp = dissection_table.base
 		risk_exp = dissection_table.bonus_risk
@@ -495,7 +488,8 @@ function ExperienceManager:get_xp_by_params(params)
 	local job_stars = params.job_stars or 0
 	local difficulty_stars = params.difficulty_stars or params.risk_stars or 0
 	local job_and_difficulty_stars = job_stars + difficulty_stars
-	local job_mul = tweak_data:get_raw_value("narrative", "jobs", job_id, "experience_mul", difficulty_stars + 1) or 1
+	local job_data = tweak_data.narrative:job_data(job_id)
+	local job_mul = job_data and job_data.experience_mul and job_data.experience_mul[difficulty_stars + 1] or 1
 	local success = params.success
 	local num_winners = params.num_winners or 1
 	local on_last_stage = params.on_last_stage

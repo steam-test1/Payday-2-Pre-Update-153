@@ -57,9 +57,6 @@ function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier,
 	unit:base():setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
 	unit:brain():set_active(true)
 	SentryGunBase.deployed = (SentryGunBase.deployed or 0) + 1
-	if SentryGunBase.deployed >= 4 then
-		managers.challenges:set_flag("sentry_gun_resources")
-	end
 	return unit
 end
 
@@ -186,9 +183,7 @@ function SentryGunBase:weapon_tweak_data()
 end
 
 function SentryGunBase:check_interact_blocked(player)
-	if self._unit:character_damage():dead() then
-	end
-	local result = not alive(self._unit) or self._unit:weapon():ammo_ratio() == 1 or not self:get_net_event_id(player) or false
+	local result = not alive(self._unit) or self._unit:character_damage():dead() or self._unit:weapon():ammo_ratio() == 1 or not self:get_net_event_id(player) or false
 	return result
 end
 
@@ -197,6 +192,7 @@ function SentryGunBase:can_interact(player)
 end
 
 function SentryGunBase:show_blocked_hint(interaction_tweak_data, player, skip_hint)
+	print("SentryGunBase:show_blocked_hint", interaction_tweak_data, player, skip_hint)
 	local event_id, wanted, possible = self:get_net_event_id(player)
 	if self._unit:weapon():ammo_ratio() == 1 or not wanted then
 		managers.hint:show_hint("hint_full_sentry_gun")
@@ -207,10 +203,21 @@ end
 
 local refill_ratios = {
 	1,
+	0.9375,
+	0.875,
+	0.8125,
 	0.75,
+	0.6875,
+	0.625,
+	0.5625,
 	0.5,
+	0.4375,
+	0.375,
+	0.3125,
 	0.25,
-	0.1
+	0.1875,
+	0.125,
+	0.0625
 }
 
 function SentryGunBase:get_net_event_id(player)
@@ -252,7 +259,18 @@ function SentryGunBase:get_net_event_id(player)
 	return event_id, wanted_event_id, possible_event_id
 end
 
-function SentryGunBase:sync_net_event(event_id, player)
+function SentryGunBase:interaction_text_id()
+	return "debug_interact_sentry_gun_reload"
+end
+
+function SentryGunBase:add_string_macros(macroes)
+	local event_id, wanted_event_id, possible_event_id = self:get_net_event_id(managers.player:local_player())
+	macroes.AMMO = wanted_event_id and string.format("%2.f%%", (1 - refill_ratios[wanted_event_id]) * 100) or "100%"
+end
+
+function SentryGunBase:sync_net_event(event_id, peer)
+	print("SentryGunBase:sync_net_event", event_id, inspect(peer), Network:is_server())
+	local player = managers.network:game():member(peer:id()):unit()
 	local ammo_ratio = refill_ratios[event_id]
 	self:refill(ammo_ratio)
 	if alive(player) and alive(managers.player:local_player()) and player:key() == managers.player:local_player():key() then
@@ -275,9 +293,9 @@ function SentryGunBase:refill(ammo_ratio)
 		local ammo_total = self._unit:weapon():ammo_total()
 		local ammo_max = self._unit:weapon():ammo_max()
 		print("SentryGunBase:refill", "ammo_ratio", ammo_ratio, "ammo", math.min(ammo_max, ammo_total + ammo_max * ammo_ratio))
-		self._unit:weapon():set_ammo(math.min(ammo_max, ammo_total + ammo_max * ammo_ratio))
+		self._unit:weapon():change_ammo(math.floor(ammo_max * ammo_ratio))
 	end
-	self._unit:brain():switch_on()
+	self._unit:interaction():set_dirty(true)
 end
 
 function SentryGunBase:on_death()

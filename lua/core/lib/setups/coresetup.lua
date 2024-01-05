@@ -442,7 +442,7 @@ function CoreSetup:__end_frame(t, dt)
 			managers.sound_environment:destroy()
 		end
 		self:start_loading_screen()
-		managers.dyn_resource:set_file_streaming_settings(1, 1)
+		managers.dyn_resource:set_file_streaming_chunk_size_mul(0.1, 10)
 		if managers.worlddefinition then
 			managers.worlddefinition:unload_packages()
 		end
@@ -451,7 +451,6 @@ function CoreSetup:__end_frame(t, dt)
 		Overlay:newgui():destroy_all_workspaces()
 		Application:cleanup_thread_garbage()
 		PackageManager:reload_lua()
-		managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk() * 0.25, 10)
 		CoreEngineAccess._exec("core/lib/CoreEntry", self.__context)
 	end
 end

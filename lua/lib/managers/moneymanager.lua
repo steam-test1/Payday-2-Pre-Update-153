@@ -185,16 +185,18 @@ function MoneyManager:get_money_by_job(job_id, difficulty)
 		Application:error("Error: Missing Job =", job_id)
 		return 0, 0, 0
 	end
-	if tweak_data.narrative.jobs[job_id].payout and tweak_data.narrative.jobs[job_id].payout[difficulty] then
-		local payout = tweak_data.narrative.jobs[job_id].payout[difficulty] or 0
-		local base_payout = tweak_data.narrative.jobs[job_id].payout[1] or 0
+	local tweak_job = tweak_data.narrative:job_data(job_id)
+	if tweak_job.payout and tweak_job.payout[difficulty] then
+		local payout = tweak_job.payout[difficulty] or 0
+		local base_payout = tweak_job.payout[1] or 0
 		local risk_payout = payout - base_payout
 		return payout, base_payout, risk_payout
 	else
 		local payout = 0
 		local base_payout = 0
 		local risk_payout = 0
-		for _, level in pairs(tweak_data.narrative.jobs[job_id].chain) do
+		local job_chain = tweak_data.narrative:job_chain(job_id)
+		for _, level in pairs(job_chain) do
 			if tweak_data.levels[level.level_id] and tweak_data.levels[level.level_id].payout and tweak_data.levels[level.level_id].payout[difficulty] then
 				local cash = tweak_data.levels[level.level_id].payout[difficulty] or 0
 				local base_cash = tweak_data.levels[level.level_id].payout[1] or 0
@@ -216,7 +218,7 @@ function MoneyManager:get_money_by_params(params)
 	local num_winners = params.num_winners or 1
 	local on_last_stage = params.on_last_stage
 	local current_job_stage = params.current_stage or 1
-	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
+	local total_stages = job_id and #tweak_data.narrative:job_chain(job_id) or 1
 	local player_stars = params.player_stars or managers.experience:level_to_stars() or 0
 	local total_stars = math.min(job_stars, player_stars)
 	local total_difficulty_stars = difficulty_stars
@@ -253,7 +255,7 @@ function MoneyManager:get_money_by_params(params)
 			small_value = tweak_data:get_value("money_manager", "max_small_loot_value")
 		end
 		if on_last_stage then
-			bag_value = bonus_bags * total_stages
+			bag_value = bonus_bags
 			bag_risk = math.round(bag_value * money_multiplier * bag_skill_bonus)
 			bag_value = (bag_value + mandatory_bags) * bag_skill_bonus
 			total_payout = math.max(0, math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value))
@@ -288,7 +290,7 @@ function MoneyManager:get_money_by_params(params)
 		small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
 		if on_last_stage then
 			job_value = self:get_job_payout_by_stars(total_stars) or 0
-			bonus_bag_value = bonus_bags * total_stages
+			bonus_bag_value = bonus_bags
 			mandatory_bag_value = mandatory_bags
 		end
 		local is_level_limited = job_stars > player_stars
@@ -377,10 +379,10 @@ function MoneyManager:get_secured_bonus_bags_money()
 	local job_id = managers.job:current_job_id()
 	local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 	local money_multiplier = self:get_contract_difficulty_multiplier(stars)
-	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
+	local total_stages = job_id and #tweak_data.narrative:job_chain(job_id) or 1
 	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
 	local bonus_bags = managers.loot:get_secured_bonus_bags_value(managers.job:current_level_id())
-	local bag_value = bonus_bags * total_stages
+	local bag_value = bonus_bags
 	local bag_risk = math.round(bag_value * money_multiplier)
 	return math.round((bag_value + bag_risk) * bag_skill_bonus / self:get_tweak_value("money_manager", "offshore_rate"))
 end
@@ -400,8 +402,8 @@ function MoneyManager:get_secured_bonus_bag_value(carry_id, multiplier)
 		local job_id = managers.job:current_job_id()
 		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 		local money_multiplier = self:get_contract_difficulty_multiplier(stars)
-		local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
-		bag_value = carry_value * total_stages
+		local total_stages = job_id and #tweak_data.narrative:job_chain(job_id) or 1
+		bag_value = carry_value
 		bag_risk = math.round(bag_value * money_multiplier)
 	else
 		bag_value = carry_value
@@ -894,12 +896,12 @@ function MoneyManager:get_mission_asset_cost_by_id(id)
 end
 
 function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
-	local job_data = tweak_data.narrative.jobs[job_id]
+	local job_data = tweak_data.narrative:job_data(job_id)
 	if not job_data then
 		return 0
 	end
 	local stars = job_data.jc / 10
-	local total_payout, stage_payout_table, job_payout_table = self:get_contract_money_by_stars(stars, difficulty_id - 2, #job_data.chain, job_id)
+	local total_payout, stage_payout_table, job_payout_table = self:get_contract_money_by_stars(stars, difficulty_id - 2, #tweak_data.narrative:job_chain(job_id), job_id)
 	local diffs = {
 		"easy",
 		"normal",
@@ -909,10 +911,9 @@ function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
 		"overkill_290"
 	}
 	local value = total_payout * self:get_tweak_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + self:get_tweak_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
-	value = value + (tweak_data.narrative.jobs[job_id].payout and (tweak_data.narrative.jobs[job_id].payout[difficulty_id - 1] or 0) / self:get_tweak_value("money_manager", "offshore_rate") or 0)
 	local total_value = value
 	local multiplier = 1 * managers.player:upgrade_value("player", "buy_cost_multiplier", 1) * managers.player:upgrade_value("player", "crime_net_deal", 1) * managers.player:upgrade_value("player", "premium_contract_cost_multiplier", 1)
-	total_value = total_value + (tweak_data.narrative.jobs[job_id].contract_cost and tweak_data.narrative.jobs[job_id].contract_cost[difficulty_id - 1] / self:get_tweak_value("money_manager", "offshore_rate") or 0)
+	total_value = total_value + (job_data.contract_cost and job_data.contract_cost[difficulty_id - 1] / self:get_tweak_value("money_manager", "offshore_rate") or 0)
 	total_value = total_value * multiplier
 	return total_value
 end

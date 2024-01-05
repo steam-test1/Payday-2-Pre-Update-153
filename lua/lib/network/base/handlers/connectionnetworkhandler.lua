@@ -324,15 +324,6 @@ function ConnectionNetworkHandler:lobby_info(level, rank, character, mask_set, s
 	end
 end
 
-function ConnectionNetworkHandler:sync_chat_message(message, sender)
-	local peer = self._verify_sender(sender)
-	if not peer then
-		return
-	end
-	print("sync_chat_message peer", peer, peer:id())
-	managers.menu:relay_chat_message(message, peer:id())
-end
-
 function ConnectionNetworkHandler:begin_trade()
 	if not self._verify_gamestate(self._gamestate_filter.waiting_for_respawn) then
 		return

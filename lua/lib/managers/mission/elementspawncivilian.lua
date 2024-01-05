@@ -55,11 +55,6 @@ function ElementSpawnCivilian:produce()
 	if self._values.force_pickup then
 		unit:character_damage():set_pickup(self._values.force_pickup)
 	end
-	if unit:unit_data().secret_assignment_id then
-		managers.secret_assignment:register_unit(unit)
-	else
-		managers.secret_assignment:register_civilian(unit)
-	end
 	self:event("spawn", unit)
 	return unit
 end

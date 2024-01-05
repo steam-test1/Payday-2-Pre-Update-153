@@ -467,8 +467,6 @@ function HuskPlayerMovement:set_position(pos)
 		if self._standing_nav_seg_id ~= nav_seg_id then
 			self._standing_nav_seg_id = nav_seg_id
 			local metadata = managers.navigation:get_nav_seg_metadata(nav_seg_id)
-			local location_id = metadata.location_id
-			managers.hud:set_mugshot_location(self._unit:unit_data().mugshot_id, location_id)
 			self._unit:base():set_suspicion_multiplier("area", metadata.suspicion_mul)
 			self._unit:base():set_detection_multiplier("area", metadata.detection_mul and 1 / metadata.detection_mul or nil)
 			managers.groupai:state():on_criminal_nav_seg_change(self._unit, nav_seg_id)

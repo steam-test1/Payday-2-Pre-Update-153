@@ -127,26 +127,10 @@ function CopDamage:damage_bullet(attack_data)
 	end
 	local headshot_multiplier = 1
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit = false
-		local critical_value = 0 + managers.player:critical_hit_chance()
-		if 0 < critical_value then
-			mvector3.set(mvec_1, self._unit:movement():m_fwd())
-			mvector3.set_z(mvec_1, 0)
-			mvector3.set(mvec_2, attack_data.col_ray.ray)
-			mvector3.set_z(mvec_2, 0)
-			mvector3.negate(mvec_2)
-			if mvector3.angle(mvec_1, mvec_2) > 90 then
-				local critical_roll = math.rand(1)
-				critical_hit = critical_value > critical_roll
-			end
-		end
+		local critical_hit, crit_damage = self:roll_critical_hit(damage)
 		if critical_hit then
 			managers.hud:on_crit_confirmed()
-			if self._char_tweak.headshot_dmg_mul then
-				damage = damage * self._char_tweak.headshot_dmg_mul
-			else
-				damage = self._health * 10
-			end
+			damage = crit_damage
 		else
 			managers.hud:on_hit_confirmed()
 		end
@@ -367,6 +351,17 @@ function CopDamage:damage_explosion(attack_data)
 	local result
 	local damage = attack_data.damage * (self._char_tweak.damage.explosion_damage_mul or 1)
 	damage = damage * (self._marked_dmg_mul or 1)
+	if attack_data.attacker_unit == managers.player:player_unit() then
+		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		damage = crit_damage
+		if attack_data.weapon_unit then
+			if critical_hit then
+				managers.hud:on_crit_confirmed()
+			else
+				managers.hud:on_hit_confirmed()
+			end
+		end
+	end
 	damage = math.clamp(damage, 0, self._HEALTH_INIT)
 	local damage_percent = math.ceil(damage / self._HEALTH_INIT_PRECENT)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
@@ -412,22 +407,25 @@ function CopDamage:damage_explosion(attack_data)
 			head_shot = head
 		}
 		managers.statistics:killed_by_anyone(data)
-		if attack_data.attacker_unit == managers.player:player_unit() then
-			if alive(attack_data.attacker_unit) then
-				self:_comment_death(attack_data.attacker_unit, self._unit:base()._tweak_table)
+		local attacker_unit = attack_data.attacker_unit
+		if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+			attacker_unit = attacker_unit:base():thrower_unit()
+			data.weapon_unit = attack_data.attacker_unit
+		end
+		if attacker_unit == managers.player:player_unit() then
+			if alive(attacker_unit) then
+				self:_comment_death(attacker_unit, self._unit:base()._tweak_table)
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
 			if self:_type_civilian(self._unit:base()._tweak_table) then
 				managers.money:civilian_killed()
 			end
-		end
-		if attack_data.attacker_unit == managers.player:player_unit() then
 			self:_check_damage_achievements(attack_data, false)
 		end
 	end
-	if attack_data.attacker_unit == managers.player:player_unit() and attack_data.weapon_unit then
-		managers.hud:on_hit_confirmed()
+	if alive(attacker) and attacker:base() and attacker:base().add_damage_result then
+		attacker:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	if not self._no_blood then
 		managers.game_play_central:sync_play_impact_flesh(attack_data.pos, attack_data.col_ray.ray)
@@ -437,13 +435,40 @@ function CopDamage:damage_explosion(attack_data)
 	return result
 end
 
+function CopDamage:roll_critical_hit(damage)
+	local critical_hit = false
+	local critical_value = 0 + managers.player:critical_hit_chance()
+	if 0 < critical_value then
+		local critical_roll = math.rand(1)
+		critical_hit = critical_value > critical_roll
+	end
+	if critical_hit then
+		if self._char_tweak.headshot_dmg_mul then
+			damage = damage * self._char_tweak.headshot_dmg_mul
+		else
+			damage = self._health * 10
+		end
+	end
+	return critical_hit, damage
+end
+
 function CopDamage:damage_melee(attack_data)
+	print(attack_data.attacker_unit, managers.player:player_unit())
 	if self._dead or self._invulnerable then
 		return
 	end
 	local result
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local damage = attack_data.damage
+	if attack_data.attacker_unit == managers.player:player_unit() then
+		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		if critical_hit then
+			managers.hud:on_crit_confirmed()
+			damage = crit_damage
+		else
+			managers.hud:on_hit_confirmed()
+		end
+	end
 	damage = damage * (self._marked_dmg_mul or 1)
 	if self._unit:movement():cool() then
 		damage = self._HEALTH_INIT
@@ -853,9 +878,14 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 			weapon_unit = attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
 			variant = "explosion"
 		}
-		if attack_data.attacker_unit == managers.player:player_unit() then
-			if alive(attack_data.attacker_unit) then
-				self:_comment_death(attack_data.attacker_unit, self._unit:base()._tweak_table)
+		local attacker_unit = attack_data.attacker_unit
+		if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+			attacker_unit = attacker_unit:base():thrower_unit()
+			data.weapon_unit = attack_data.attacker_unit
+		end
+		if attacker_unit == managers.player:player_unit() then
+			if alive(attacker_unit) then
+				self:_comment_death(attacker_unit, self._unit:base()._tweak_table)
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
@@ -863,6 +893,9 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 				managers.money:civilian_killed()
 			end
 		end
+	end
+	if alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().add_damage_result then
+		attacker_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	if not self._no_blood then
 		local hit_pos = mvector3.copy(self._unit:movement():m_pos())

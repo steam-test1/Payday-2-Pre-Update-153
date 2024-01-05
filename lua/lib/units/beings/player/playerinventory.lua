@@ -167,6 +167,7 @@ function PlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, 
 	setup_data.autoaim = true
 	setup_data.alert_AI = true
 	setup_data.alert_filter = self._unit:movement():SO_access()
+	setup_data.timer = managers.player:player_timer()
 	new_unit:base():setup(setup_data)
 	self:add_unit(new_unit, equip, instant)
 end

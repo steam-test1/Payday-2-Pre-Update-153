@@ -109,6 +109,7 @@ function ContractBoxGui:create_contract_box()
 	self._contract_text_header = nil
 	local contact_data = managers.job:current_contact_data()
 	local job_data = managers.job:current_job_data()
+	local job_chain = managers.job:current_job_chain_data()
 	local job_id = managers.job:current_job_id()
 	self._contract_panel = self._panel:panel({
 		name = "contract_box_panel",
@@ -192,7 +193,7 @@ function ContractBoxGui:create_contract_box()
 		payout_text_header:set_top(exp_text_header:bottom())
 		local length_text = self._contract_panel:text({
 			text = managers.localization:to_upper_text("cn_menu_contract_length", {
-				stages = #job_data.chain
+				stages = #job_chain
 			}),
 			align = "left",
 			vertical = "top",
@@ -255,7 +256,7 @@ function ContractBoxGui:create_contract_box()
 		end
 		local plvl = managers.experience:current_level()
 		local player_stars = math.max(math.ceil(plvl / 10), 1)
-		local total_xp, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_data.chain)
+		local total_xp, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain)
 		local job_xp = self._contract_panel:text({
 			font = font,
 			font_size = font_size,
@@ -328,7 +329,7 @@ function ContractBoxGui:create_contract_box()
 			end
 			heat_xp_text:set_position(math.round(ghost_xp_text and ghost_xp_text:right() or risk_xp:visible() and risk_xp:right() or job_xp:right()), job_xp:top())
 		end
-		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_data.chain, managers.job:current_job_id(), managers.job:current_level_id())
+		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_chain, managers.job:current_job_id(), managers.job:current_level_id())
 		local total_stage_value = stage_payout_table[2]
 		local total_stage_risk_value = stage_payout_table[4]
 		local total_job_value = job_payout_table[2]

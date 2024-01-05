@@ -249,6 +249,9 @@ function NavObstacleElement:_build_panel(panel, panel_sizer)
 		local unit = self._obstacle_units[data.unit_id]
 		if not alive(unit) then
 			self:_remove_by_unit_id(data.unit_id)
+		elseif not unit:get_object(data.obj_name) then
+			debug_pause("[NavObstacleElement:_build_panel] object", data.object_name, "not found in unit", unit, ". element ID ", self._unit:unit_data().unit_id)
+			self:_remove_by_unit_id(data.unit_id)
 		else
 			local all_object_names = self:_get_objects_by_unit(unit)
 			self:_add_unit(unit, all_object_names, data)

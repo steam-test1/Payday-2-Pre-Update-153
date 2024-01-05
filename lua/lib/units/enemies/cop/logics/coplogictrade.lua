@@ -16,7 +16,6 @@ function CopLogicTrade.enter(data, new_logic_name, enter_params)
 	CopLogicTrade.hostage_trade(data.unit, true, false)
 	data.unit:brain():set_update_enabled_state(true)
 	managers.groupai:state():on_hostage_state(true, data.key)
-	managers.secret_assignment:unregister_unit(data.unit, true)
 	data.unit:brain():set_attention_settings({peaceful = true})
 end
 
@@ -111,13 +110,6 @@ function CopLogicTrade.on_trade(data, trading_unit)
 		return
 	end
 	managers.trade:on_hostage_traded(trading_unit)
-	if data.unit:base().butcher then
-		CopLogicTrade.butchers_traded = CopLogicTrade.butchers_traded + 1
-		if CopLogicTrade.butchers_traded >= 3 then
-			managers.challenges:set_flag("blood_in_blood_out")
-			managers.network:session():send_to_peers_synched("award_achievment", "blood_in_blood_out")
-		end
-	end
 	data.internal_data._trade_enabled = false
 	data.unit:network():send("hostage_trade", false, true)
 	CopLogicTrade.hostage_trade(data.unit, false, true)

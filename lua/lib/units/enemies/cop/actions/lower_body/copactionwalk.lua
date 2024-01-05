@@ -479,7 +479,15 @@ function CopActionWalk:_init()
 			nav_link_from_idle = next_nav_point.element:nav_link_wants_align_pos() and true or false
 			self._nav_link_synched_with_start = true
 		end
-		self._ext_network:send("action_walk_start", self._nav_point_pos(next_nav_point), nav_link_act_yaw, nav_link_act_index, nav_link_from_idle, sync_haste, sync_yaw, self._no_walk and true or false, self._no_strafe and true or false)
+		local end_pose_code
+		if not action_desc.end_pose then
+			end_pose_code = 0
+		elseif action_desc.end_pose == "stand" then
+			end_pose_code = 1
+		else
+			end_pose_code = 2
+		end
+		self._ext_network:send("action_walk_start", self._nav_point_pos(next_nav_point), nav_link_act_yaw, nav_link_act_index, nav_link_from_idle, sync_haste, sync_yaw, self._no_walk and true or false, self._no_strafe and true or false, end_pose_code)
 	end
 	if Network:is_server() then
 		self._unit:brain():rem_pos_rsrv("stand")
@@ -913,7 +921,19 @@ function CopActionWalk:update(t)
 				else
 					stop_anim_side = "r"
 				end
-				local stop_dis = self._anim_movement[self._ext_anim.pose]["run_stop_" .. stop_anim_side]
+				local stop_pose
+				if self._action_desc.end_pose then
+					stop_pose = self._action_desc.end_pose
+				else
+					stop_pose = self._ext_anim.pose
+				end
+				if stop_pose ~= self._ext_anim.pose then
+					local pose_redir_res = self._ext_movement:play_redirect(stop_pose)
+					if not pose_redir_res then
+						debug_pause_unit(self._unit, "STOP POSE FAIL!!!", self._unit, stop_pose)
+					end
+				end
+				local stop_dis = self._anim_movement[stop_pose]["run_stop_" .. stop_anim_side]
 				if stop_dis and end_dis < stop_dis then
 					self._stop_anim_side = stop_anim_side
 					self._stop_anim_fwd = stop_anim_fwd
@@ -1647,45 +1667,25 @@ function CopActionWalk:_upd_stop_anim_first_frame(t)
 				return math.lerp(p1, p2, t_clamp)
 			end
 		end
-	elseif self._stop_anim_side == "fwd" then
+	elseif self._stop_anim_side == "fwd" or self._stop_anim_side == "bwd" then
 		function self._stop_anim_displacement_f(p1, p2, t)
-			local t_clamp = math.clamp(t, 0, 0.7) / 0.7
+			local t_clamp = math.clamp(t, 0, 0.4) / 0.4
 			
 			t_clamp = t_clamp ^ 0.85
 			return math.lerp(p1, p2, t_clamp)
 		end
-	elseif self._stop_anim_side == "bwd" then
-		function self._stop_anim_displacement_f(p1, p2, t)
-			local low = 0.97
-			
-			local p_1_5 = 0.9
-			local t_clamp = t
-			return math.lerp(p1, p2, t_clamp)
-		end
 	elseif self._stop_anim_side == "l" then
 		function self._stop_anim_displacement_f(p1, p2, t)
-			local p_1_5 = 0.6
+			local t_clamp = math.clamp(t, 0, 0.3) / 0.3
 			
-			local low = 0.8
-			local t_clamp = math.clamp(t, 0, 0.75) / 0.75
-			if p_1_5 > t_clamp then
-				t_clamp = low * t_clamp / p_1_5
-			else
-				t_clamp = low + (1 - low) * (t_clamp - p_1_5) / (1 - p_1_5)
-			end
+			t_clamp = t_clamp ^ 0.85
 			return math.lerp(p1, p2, t_clamp)
 		end
 	else
 		function self._stop_anim_displacement_f(p1, p2, t)
-			local low = 0.9
+			local t_clamp = math.clamp(t, 0, 0.6) / 0.6
 			
-			local p_1_5 = 0.85
-			local t_clamp = math.clamp(t, 0, 0.75) / 0.75
-			if p_1_5 > t_clamp then
-				t_clamp = low * (1 - (p_1_5 - t_clamp) / p_1_5)
-			else
-				t_clamp = low + (1 - low) * (t_clamp - p_1_5) / (1 - p_1_5)
-			end
+			t_clamp = t_clamp ^ 0.85
 			return math.lerp(p1, p2, t_clamp)
 		end
 	end

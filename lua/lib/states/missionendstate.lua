@@ -72,18 +72,6 @@ function MissionEndState:at_enter(old_state, params)
 	end
 	self._old_state = old_state
 	managers.menu_component:set_max_lines_game_chat(7)
-	for _, component in ipairs(managers.hud:script(PlayerBase.PLAYER_INFO_HUD).panel:children()) do
-		if component:name() == "title_mid_text" or component:name() == "present_mid_text" or component:name() == "present_mid_icon" then
-			if not managers.hud._mid_text_presenting or managers.hud._mid_text_presenting.type ~= "challenge" then
-				component:set_visible(false)
-			end
-		else
-			component:set_visible(false)
-		end
-	end
-	if not managers.hud._mid_text_presenting or managers.hud._mid_text_presenting.type ~= "challenge" then
-		managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN).present_background:set_visible(false)
-	end
 	managers.hud:set_success_endscreen_hud(self._success, self._server_left)
 	managers.hud:show_endscreen_hud()
 	managers.groupai:state():set_AI_enabled(false)
@@ -94,6 +82,9 @@ function MissionEndState:at_enter(old_state, params)
 		player:base():set_stats_screen_visible(false)
 		if player:movement():current_state():shooting() then
 			player:movement():current_state()._equipped_unit:base():stop_shooting()
+		end
+		if player:movement():tased() then
+			player:sound():play("tasered_stop")
 		end
 		if player:movement():current_state()._interupt_action_interact then
 			player:movement():current_state():_interupt_action_interact()
@@ -542,10 +533,6 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 		}
 	end
 	print("on_statistics_result end")
-	if Network:is_server() and self._success and not managers.achievment:get_script_data("cant_touch_fail") and tweak_data:difficulty_to_index(Global.game_settings.difficulty) >= 4 and Global.level_data.level_id == "heat_street" and 60 <= group_accuracy then
-		managers.challenges:set_flag("cant_touch")
-		managers.network:session():send_to_peers("award_achievment", "cant_touch")
-	end
 end
 
 function MissionEndState:_continue_blocked()

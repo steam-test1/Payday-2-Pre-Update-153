@@ -27,6 +27,7 @@ end
 function HostNetworkSession:create_local_peer()
 	HostNetworkSession.super.create_local_peer(self)
 	self._state_data.local_peer = self._local_peer
+	self._local_peer:set_id(1)
 	self:set_state("in_lobby")
 end
 
@@ -546,6 +547,7 @@ function HostNetworkSession:on_load_complete()
 	HostNetworkSession.super.on_load_complete(self)
 	if Global.load_start_menu_lobby then
 		managers.network.matchmake:set_server_state("in_lobby")
+		self:chk_server_joinable_state()
 		return
 	else
 		managers.network.matchmake:set_server_state("in_game")

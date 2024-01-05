@@ -398,10 +398,6 @@ function BaseInteractionExt:set_outline_flash_state(state, sync)
 	end
 end
 
-function BaseInteractionExt:set_assignment(name)
-	self._assignment = name
-end
-
 local ids_contour_color = Idstring("contour_color")
 local ids_contour_opacity = Idstring("contour_opacity")
 
@@ -486,9 +482,6 @@ function UseInteractionExt:interact(player)
 		managers.player:remove_special(self._tweak_data.special_equipment)
 		if self._tweak_data.special_equipment == "planks" and Global.level_data.level_id == "secret_stash" then
 			UseInteractionExt._saviour_count = (UseInteractionExt._saviour_count or 0) + 1
-			if UseInteractionExt._saviour_count >= 20 then
-				managers.challenges:set_flag("saviour")
-			end
 		end
 	end
 	if self._tweak_data.deployable_consume then
@@ -502,9 +495,6 @@ function UseInteractionExt:interact(player)
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
 	end
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, -2, self.tweak_data, 1)
-	if self._assignment then
-		managers.secret_assignment:interacted(self._assignment)
-	end
 	if self._global_event then
 		managers.mission:call_global_event(self._global_event, player)
 	end
@@ -1094,7 +1084,6 @@ function IntimitateInteractionExt:interact(player)
 		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.relation_with_bulldozer.mask then
 			managers.achievment:award_progress(tweak_data.achievement.relation_with_bulldozer.stat)
 		end
-		managers.challenges:set_flag("diplomatic")
 		managers.statistics:trade({
 			name = self._unit:base()._tweak_table
 		})
@@ -1483,6 +1472,13 @@ function EventIDInteractionExt:interact_start(player)
 	return self:interact(player)
 end
 
+function EventIDInteractionExt:_add_string_macros(macros)
+	EventIDInteractionExt.super._add_string_macros(self, macros)
+	if alive(self._unit) and self._unit:base() and self._unit:base().add_string_macros then
+		self._unit:base():add_string_macros(macros)
+	end
+end
+
 function EventIDInteractionExt:interact(player)
 	if not self:can_interact(player) then
 		return false
@@ -1490,7 +1486,7 @@ function EventIDInteractionExt:interact(player)
 	local event_id = alive(self._unit) and self._unit:base() and self._unit:base().get_net_event_id and self._unit:base():get_net_event_id(player) or 1
 	if event_id then
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "interaction", event_id)
-		self:sync_net_event(event_id, player)
+		self:sync_net_event(event_id, managers.network:session():local_peer())
 	end
 end
 
@@ -1501,10 +1497,10 @@ function EventIDInteractionExt:can_interact(player)
 	return alive(self._unit) and self._unit:base() and self._unit:base().can_interact and self._unit:base():can_interact(player)
 end
 
-function EventIDInteractionExt:sync_net_event(event_id, player)
+function EventIDInteractionExt:sync_net_event(event_id, peer)
 	local unit_base = alive(self._unit) and self._unit:base()
 	if unit_base and unit_base.sync_net_event then
-		unit_base:sync_net_event(event_id, player)
+		unit_base:sync_net_event(event_id, peer)
 	end
 end
 
@@ -1533,10 +1529,10 @@ function MissionDoorDeviceInteractionExt:server_place_mission_door_device(player
 	local info_id = self:get_player_info_id(player)
 	self:remove_interact()
 	self:set_info_id(info_id)
+	managers.network:session():send_to_peers_synched("sync_interaction_info_id", self._unit, info_id)
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
 	end
-	managers.network:session():send_to_peers_synched("sync_interaction_info_id", self._unit, info_id)
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, -2, self.tweak_data, 1)
 	self:set_active(false)
 	self:check_for_upgrade()
@@ -1562,7 +1558,7 @@ function MissionDoorDeviceInteractionExt:result_place_mission_door_device(placed
 end
 
 function MissionDoorDeviceInteractionExt:check_for_upgrade()
-	if self._unit:timer_gui() and self._unit:base() and self._unit:timer_gui()._upgrade_tweak_data and self._unit:base().get_skill_upgrades then
+	if self._unit:timer_gui() and self._unit:timer_gui():is_visible() and self._unit:base() and self._unit:timer_gui()._upgrade_tweak_data and self._unit:base().get_skill_upgrades then
 		local player_info_id = self:get_player_info_id()
 		local player_info_table = self:split_info_id(player_info_id)
 		local unit_info_table = self._unit:base():get_skill_upgrades()
@@ -1724,136 +1720,4 @@ function AccessCameraInteractionExt:interact(player)
 	AccessCameraInteractionExt.super.super.interact(self, player)
 	game_state_machine:change_state_by_name("ingame_access_camera")
 	return true
-end
-
-NPCInteractionExt = NPCInteractionExt or class(BaseInteractionExt)
-
-function NPCInteractionExt:init(unit)
-	BaseInteractionExt.init(self, unit)
-	self._ws = World:newgui():create_world_workspace(150, 100, unit:position() + Vector3(-25, 0, 250), Vector3(50, 0, 0), Vector3(0, 0, -50))
-	self._ws:set_billboard(self._ws.BILLBOARD_Y)
-	self._panel = self._ws:panel()
-	self._bg = self._panel:rect({
-		name = "bg",
-		x = 0,
-		y = 0,
-		w = 150,
-		h = 100,
-		color = Color.yellow
-	})
-	self._text = self._panel:text({
-		name = "text",
-		text = self:_default_text(),
-		align = "center",
-		vertical = "center",
-		font = "fonts/font_fortress_22",
-		font_size = 60,
-		color = Color.black,
-		layer = 2
-	})
-	self._toggle = false
-	self._panel:hide()
-end
-
-function NPCInteractionExt:destroy()
-	if alive(self._ws) then
-		World:newgui():destroy_workspace(self._ws)
-	end
-end
-
-function NPCInteractionExt:update(distance_to_player)
-	local t = 1 - math.clamp((distance_to_player - tweak_data.interaction.INTERACT_DISTANCE) / (tweak_data.interaction.CULLING_DISTANCE - tweak_data.interaction.INTERACT_DISTANCE), 0, 1)
-	if t <= 0 and self._panel:visible() then
-		self._panel:hide()
-	end
-	if not self._panel:visible() then
-		self._panel:show()
-	end
-	self._bg:set_color(self._bg:color():with_alpha(t))
-	self._text:set_color(self._text:color():with_alpha(t))
-end
-
-function NPCInteractionExt:selected(player)
-	self:_set_color(true)
-	if managers.player:current_state() ~= "dialog" and managers.player:current_state() ~= "minigame" then
-		managers.player:set_player_state("adventure")
-	end
-end
-
-function NPCInteractionExt:unselect()
-	self:_set_color(false)
-	managers.player:set_player_state(managers.player:default_player_state())
-end
-
-function NPCInteractionExt:interact(player)
-	self._unit:set_rotation(Rotation((self._unit:position() - player:position()):with_z(0):normalized(), Vector3(0, 0, 1)))
-	self._text:set_text(":)")
-	self:_do_interact()
-end
-
-function NPCInteractionExt:_set_color(set)
-	if set == self._toggle then
-		return
-	end
-	self._toggle = set
-	self._bg:set_color(self._toggle and Color.green or Color.yellow)
-	self._text:set_text(self._toggle and "!" or self:_default_text())
-end
-
-NPCDialogInteractionExt = NPCDialogInteractionExt or class(NPCInteractionExt)
-
-function NPCDialogInteractionExt:_default_text()
-	return "Talk"
-end
-
-function NPCDialogInteractionExt:_do_interact()
-	managers.player:set_player_state("dialog")
-end
-
-NPCMinigameInteractionExt = NPCMinigameInteractionExt or class(NPCInteractionExt)
-
-function NPCMinigameInteractionExt:_default_text()
-	return "Game"
-end
-
-function NPCMinigameInteractionExt:_do_interact()
-	managers.player:set_player_state("minigame")
-end
-
-BoxInteractionExt = BoxInteractionExt or class(BaseInteractionExt)
-
-function BoxInteractionExt:init(unit)
-	BaseInteractionExt.init(self, unit)
-end
-
-function BoxInteractionExt:interact(player)
-	self._unit:push(10, Vector3(0, 0, 1) * 1000)
-end
-
-MimicInteractionExt = MimicInteractionExt or class(BaseInteractionExt)
-
-function MimicInteractionExt:init(unit)
-	BaseInteractionExt.init(self, unit)
-end
-
-function MimicInteractionExt:destroy()
-end
-
-function MimicInteractionExt:selected(player)
-	if managers.player:current_state() ~= "mimic" and managers.player:current_state() ~= "mimic_interaction" then
-		managers.player:set_player_state("mimic_interaction")
-		self._unit:mimic():set_mimic("interaction")
-	end
-end
-
-function MimicInteractionExt:unselect()
-	if managers.player:current_state() ~= "mimic" then
-		managers.player:set_player_state(managers.player:default_player_state())
-	end
-end
-
-function MimicInteractionExt:interact(player)
-	self._unit:mimic():activate_mimic("interaction")
-	self._unit:mimic():add_player_to_mimic(managers.player:player_unit())
-	managers.player:set_player_state("mimic")
 end

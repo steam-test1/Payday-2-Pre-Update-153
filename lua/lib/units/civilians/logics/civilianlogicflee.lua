@@ -121,7 +121,6 @@ function CivilianLogicFlee.update(data)
 				if data.unit:unit_data().mission_element then
 					data.unit:unit_data().mission_element:event("fled", data.unit)
 				end
-				managers.secret_assignment:civilian_escaped()
 				data.unit:base():set_slot(unit, 0)
 			else
 				local to_pos, to_cover

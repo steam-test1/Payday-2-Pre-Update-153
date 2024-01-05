@@ -283,11 +283,19 @@ function UpgradesManager:_unaquire_equipment(equipment, id)
 end
 
 function UpgradesManager:_aquire_equipment_upgrade(equipment_upgrade)
-	managers.player:aquire_upgrade(equipment_upgrade.upgrade)
+	if equipment_upgrade.incremental then
+		managers.player:aquire_incremental_upgrade(equipment_upgrade.upgrade)
+	else
+		managers.player:aquire_upgrade(equipment_upgrade.upgrade)
+	end
 end
 
 function UpgradesManager:_unaquire_equipment_upgrade(equipment_upgrade)
-	managers.player:unaquire_upgrade(equipment_upgrade.upgrade)
+	if equipment_upgrade.incremental then
+		managers.player:unaquire_incremental_upgrade(equipment_upgrade.upgrade)
+	else
+		managers.player:unaquire_upgrade(equipment_upgrade.upgrade)
+	end
 end
 
 function UpgradesManager:_aquire_temporary(temporary, id)

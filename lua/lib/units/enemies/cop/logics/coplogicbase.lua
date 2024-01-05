@@ -1217,15 +1217,22 @@ function CopLogicBase.chk_start_action_dodge(data, reason)
 	local ray_hit1 = managers.navigation:raycast(ray_params)
 	local dis
 	if ray_hit1 then
-		dis = mvector3.distance(ray_params.trace[1], data.m_pos)
+		local hit_vec = tmp_vec2
+		mvec3_set(hit_vec, ray_params.trace[1])
+		mvec3_sub(hit_vec, data.m_pos)
+		mvec3_set_z(hit_vec, 0)
+		dis = mvector3.length(hit_vec)
 		mvec3_set(ray_to_pos, dodge_dir)
 		mvector3.multiply(ray_to_pos, -130)
 		mvector3.add(ray_to_pos, data.m_pos)
 		ray_params.pos_to = ray_to_pos
 		local ray_hit2 = managers.navigation:raycast(ray_params)
 		if ray_hit2 then
+			mvec3_set(hit_vec, ray_params.trace[1])
+			mvec3_sub(hit_vec, data.m_pos)
+			mvec3_set_z(hit_vec, 0)
 			local prev_dis = dis
-			dis = mvector3.distance(ray_params.trace[1], data.m_pos)
+			dis = mvector3.length(hit_vec)
 			if prev_dis < dis and min_space < dis then
 				mvector3.negate(dodge_dir)
 				dodge_dir_reversed = not dodge_dir_reversed

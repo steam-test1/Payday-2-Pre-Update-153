@@ -148,7 +148,10 @@ function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 			self._obj_fire:m_position(self._trail_effect_table.position)
 			mvector3.set(self._trail_effect_table.normal, mspread)
 		end
-		local trail = alive(self._obj_fire) and (not col_ray or col_ray.distance > 650) and World:effect_manager():spawn(self._trail_effect_table) or nil
+		local trail
+		if not self:weapon_tweak_data().no_trail then
+			trail = alive(self._obj_fire) and (not col_ray or col_ray.distance > 650) and World:effect_manager():spawn(self._trail_effect_table) or nil
+		end
 		if col_ray then
 			InstantBulletBase:on_collision(col_ray, self._unit, user_unit, self._damage, true)
 			if trail then

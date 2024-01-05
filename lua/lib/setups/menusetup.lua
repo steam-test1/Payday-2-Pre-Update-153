@@ -2,7 +2,6 @@ require("lib/setups/Setup")
 require("lib/network/base/NetworkManager")
 require("lib/network/NetworkGame")
 require("lib/managers/MoneyManager")
-require("lib/managers/ChallengesManager")
 require("lib/managers/StatisticsManager")
 require("lib/managers/MissionManager")
 require("lib/managers/CriminalsManager")
@@ -16,6 +15,7 @@ require("lib/units/weapons/WeaponGadgetBase")
 require("lib/units/weapons/WeaponFlashLight")
 require("lib/units/weapons/WeaponLaser")
 require("lib/units/weapons/WeaponSecondSight")
+require("lib/units/weapons/WeaponSimpleAnim")
 core:import("SequenceManager")
 MenuSetup = MenuSetup or class(Setup)
 MenuSetup.IS_START_MENU = true
@@ -121,7 +121,6 @@ function MenuSetup:init_managers(managers)
 	managers.sequence:preload()
 	managers.menu_scene = MenuSceneManager:new()
 	managers.money = MoneyManager:new()
-	managers.challenges = ChallengesManager:new()
 	managers.statistics = StatisticsManager:new()
 	managers.network = NetworkManager:new("NetworkGame")
 end
@@ -142,6 +141,7 @@ function MenuSetup:init_finalize()
 	if managers.music then
 		managers.music:init_finalize()
 	end
+	managers.dyn_resource:post_init()
 end
 
 function MenuSetup:update_wait_for_savegame_info(t, dt)

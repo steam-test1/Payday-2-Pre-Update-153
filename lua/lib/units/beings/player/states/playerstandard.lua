@@ -95,7 +95,6 @@ function PlayerStandard:enter(state_data, enter_data)
 		managers.navigation:add_pos_reservation(self._pos_reservation_slow)
 	end
 	managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
-	managers.hud:set_weapon_name(tweak_data.weapon[self._equipped_unit:base():get_name_id()].name_id)
 	if enter_data and enter_data.equip_weapon then
 		self:_start_action_unequip_weapon(managers.player:player_timer():time(), {
 			selection_wanted = enter_data.equip_weapon
@@ -1171,7 +1170,7 @@ function PlayerStandard:_do_action_melee(t, input)
 	if not instant_hit then
 		self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
 	end
-	managers.network:session():send_to_peers("play_distance_interact_redirect", self._unit, instant_hit and "melee" or "melee_item")
+	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, instant_hit and "melee" or "melee_item")
 	if self._state_data.melee_charge_shake then
 		self._ext_camera:shaker():stop(self._state_data.melee_charge_shake)
 		self._state_data.melee_charge_shake = nil
@@ -1251,6 +1250,7 @@ function PlayerStandard:_do_melee_damage(t)
 			else
 				dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_damage_multiplier", 1)
 			end
+			dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_" .. tostring(tweak_data.blackmarket.melee_weapons[melee_entry].stats.weapon_type) .. "_damage_multiplier", 1)
 			local health_ratio = self._ext_damage:health_ratio()
 			if health_ratio <= tweak_data.upgrades.player_damage_health_ratio_threshold then
 				local damage_ratio = 1 - health_ratio / math.max(0.01, tweak_data.upgrades.player_damage_health_ratio_threshold)
@@ -1923,7 +1923,7 @@ function PlayerStandard:say_line(sound_name, skip_alert)
 end
 
 function PlayerStandard:_play_distance_interact_redirect(t, variant)
-	managers.network:session():send_to_peers("play_distance_interact_redirect", self._unit, variant)
+	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, variant)
 	if self._state_data.in_steelsight then
 		return
 	end
@@ -2318,6 +2318,16 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						dmg_mul = dmg_mul * (1 + managers.player:upgrade_value("player", upgrade_name, 0) * damage_ratio)
 					end
 					dmg_mul = dmg_mul * managers.player:temporary_upgrade_value("temporary", "berserker_damage_multiplier", 1)
+					if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
+						self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+						self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
+						local stack = self._state_data.stacking_dmg_mul[weapon_category]
+						if stack[1] and t < stack[1] then
+							dmg_mul = dmg_mul * (1 + managers.player:upgrade_value(weapon_category, "stacking_hit_damage_multiplier", 0) * stack[2])
+						else
+							stack[2] = 0
+						end
+					end
 					local fired
 					if fire_mode == "single" then
 						if input.btn_primary_attack_press then
@@ -2346,6 +2356,18 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier()
 						local up, down, left, right = unpack(weap_tweak_data.kick[self._state_data.in_steelsight and "steelsight" or self._state_data.ducking and "crouching" or "standing"])
 						self._camera_unit:base():recoil_kick(up * recoil_multiplier, down * recoil_multiplier, left * recoil_multiplier, right * recoil_multiplier)
+						if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
+							self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+							self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
+							local stack = self._state_data.stacking_dmg_mul[weapon_category]
+							if fired.hit_enemy then
+								stack[1] = t + managers.player:upgrade_value(weapon_category, "stacking_hit_expire_t", 1)
+								stack[2] = math.min(stack[2] + 1, tweak_data.upgrades.max_weapon_dmg_mul_stacks or 5)
+							else
+								stack[1] = nil
+								stack[2] = 0
+							end
+						end
 						managers.hud:set_ammo_amount(weap_base:selection_index(), weap_base:ammo_info())
 						local impact = not fired.hit_enemy
 						self._ext_network:send("shot_blank", impact)
@@ -2555,7 +2577,6 @@ function PlayerStandard:inventory_clbk_listener(unit, event)
 		for id, weapon in pairs(self._ext_inventory:available_selections()) do
 			managers.hud:set_ammo_amount(id, weapon.unit:base():ammo_info())
 		end
-		managers.hud:set_weapon_name(tweak_data.weapon[weapon:base():get_name_id()].name_id)
 		self:_update_crosshair_offset()
 		self:_stance_entered()
 	end

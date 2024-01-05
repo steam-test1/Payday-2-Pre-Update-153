@@ -56,6 +56,7 @@ SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_male_party_2/civ_male_party_2",
 	"units/payday2/characters/civ_male_party_3/civ_male_party_3",
 	"units/payday2/characters/civ_male_scientist_1/civ_male_scientist_1",
+	"units/payday2/characters/civ_male_miami_store_clerk_1/civ_male_miami_store_clerk_1",
 	"units/payday2/characters/civ_male_trucker_1/civ_male_trucker_1",
 	"units/payday2/characters/civ_male_worker_docks_1/civ_male_worker_docks_1",
 	"units/payday2/characters/civ_male_worker_docks_2/civ_male_worker_docks_2",

@@ -83,6 +83,9 @@ function ItemToggle:setup_gui(node, row_item)
 	if not self:enabled() then
 		row_item.color = row_item.disabled_color
 		row_item.gui_text:set_color(row_item.color)
+		row_item.gui_text:set_alpha(0.75)
+	else
+		row_item.gui_text:set_alpha(1)
 	end
 	if self:selected_option():parameters().text_id then
 		row_item.gui_option = node._text_item_part(node, row_item, row_item.gui_panel, node._left_align(node))
@@ -200,8 +203,10 @@ function ItemToggle:_set_toggle_item_image(row_item)
 		end
 		if self:enabled() then
 			row_item.gui_icon:set_color(row_item.color or Color.white)
+			row_item.gui_icon:set_alpha(1)
 		else
 			row_item.gui_icon:set_color(row_item.disabled_color)
+			row_item.gui_icon:set_alpha(0.75)
 		end
 	end
 end

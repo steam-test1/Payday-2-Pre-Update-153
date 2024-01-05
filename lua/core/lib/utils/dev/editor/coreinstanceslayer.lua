@@ -78,7 +78,7 @@ function InstancesLayer:_get_instance_info_from_user()
 		managers.editor:output_error("Instance cannot be placed in new level. Open a saved level first.")
 		return
 	end
-	local predef = self:_get_selection_predefined_instances_listbox()
+	local predef = self._selected_predefined_instance
 	if not predef then
 		return
 	end
@@ -522,6 +522,8 @@ function InstancesLayer:build_panel(notebook, settings)
 	local instances_sizer = EWS:StaticBoxSizer(self._ews_panel, "VERTICAL", "Instances")
 	self._sizer:add(instances_sizer, 3, 0, "EXPAND")
 	local toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("OPEN", "Open world file", CoreEws.image_path("folder_open_16x16.png"), "Open selected instance world")
+	toolbar:connect("OPEN", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_open_selected_instance_path"), nil)
 	toolbar:add_tool("RENAME", "Rename instance", CoreEws.image_path("toolbar\\rename_16x16.png"), "Rename instance")
 	toolbar:connect("RENAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_rename_instance"), nil)
 	toolbar:add_tool("DELETE", "Delete instance", CoreEws.image_path("toolbar\\delete_16x16.png"), "Delete instance")
@@ -548,14 +550,8 @@ function InstancesLayer:build_panel(notebook, settings)
 	_info("start_index")
 	_info("end_index")
 	local predefined_instances_sizer = EWS:StaticBoxSizer(self._ews_panel, "VERTICAL", "Predefined instances")
-	self._sizer:add(predefined_instances_sizer, 3, 0, "EXPAND")
-	local predefined_instances_listbox = EWS:ListBox(self._ews_panel, "", "LB_SINGLE,LB_HSCROLL,LB_NEEDED_SB,LB_SORT")
-	predefined_instances_sizer:add(predefined_instances_listbox, 1, 0, "EXPAND")
-	predefined_instances_listbox:connect("EVT_COMMAND_LISTBOX_SELECTED", callback(self, self, "_on_gui_select_predefined_instance"), predefined_instances_listbox)
-	self._predefined_instances_listbox = predefined_instances_listbox
-	for name, _ in pairs(self._predefined_instances) do
-		predefined_instances_listbox:append(name)
-	end
+	self._sizer:add(predefined_instances_sizer, 4, 0, "EXPAND")
+	predefined_instances_sizer:add(self:_build_predefined_instances_notebook(), 1, 0, "EXPAND")
 	self._predefined_instances_info_guis = {}
 	
 	local function _info(name)
@@ -573,13 +569,109 @@ function InstancesLayer:build_panel(notebook, settings)
 	_info("mission_elements")
 	_info("statics")
 	_info("dynamics")
+	local pi_toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_NODIVIDER,ALIGN_BOTTOM")
+	pi_toolbar:add_tool("TB_OPEN_INSTANCE_WORLD", "Open world file", CoreEws.image_path("folder_open_16x16.png"), "Open predefined instance world")
+	pi_toolbar:connect("TB_OPEN_INSTANCE_WORLD", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_open_instance_path"), nil)
+	pi_toolbar:add_tool("TB_OPEN_PREDEFINED_INSTANCES_FILE", "Open predefined instances file", CoreEws.image_path("document_16x16.png"), "Open predefined instances file")
+	pi_toolbar:connect("TB_OPEN_PREDEFINED_INSTANCES_FILE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_open_predefined_instances_file"), nil)
+	pi_toolbar:add_tool("TB_OPEN_RELOAD_PREDEFINED_INSTANCES_FILE", "Reload predefined instances file", CoreEws.image_path("toolbar\\refresh_16x16.png"), "Reload predefined instances file")
+	pi_toolbar:connect("TB_OPEN_RELOAD_PREDEFINED_INSTANCES_FILE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_reload_predefined_instances_file"), nil)
+	pi_toolbar:realize()
+	predefined_instances_sizer:add(pi_toolbar, 0, 1, "EXPAND,BOTTOM")
 	local help = EWS:TextCtrl(self._ews_panel, "Predefined instances can be added in " .. self._predefined_instances_file .. ".xml.", 0, "TE_MULTILINE,TE_READONLY,TE_WORDWRAP,TE_CENTRE")
-	self._sizer:add(help, 1, 0, "EXPAND")
+	self._sizer:add(help, 0, 0, "EXPAND")
 	return self._ews_panel
+end
+
+function InstancesLayer:_build_predefined_instances_notebook()
+	local notebook_sizer = EWS:BoxSizer("VERTICAL")
+	self._predefined_instances_notebook = EWS:Notebook(self._ews_panel, "", "NB_TOP,NB_MULTILINE")
+	self._predefined_instances_notebook:connect("EVT_COMMAND_NOTEBOOK_PAGE_CHANGING", callback(self, self, "_on_gui_instances_page_changed"), nil)
+	notebook_sizer:add(self._predefined_instances_notebook, 1, 0, "EXPAND")
+	self:_add_predefined_instances_notebook_pages()
+	return notebook_sizer
+end
+
+function InstancesLayer:_add_predefined_instances_notebook_pages()
+	local style = "LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING,LC_SINGLE_SEL"
+	self._predefined_instances_notebook_lists = {}
+	local predefined_data_by_category = self:_predefined_data_by_category()
+	for c, names in pairs(predefined_data_by_category) do
+		local panel = EWS:Panel(self._predefined_instances_notebook, "", "TAB_TRAVERSAL")
+		local instance_sizer = EWS:BoxSizer("VERTICAL")
+		panel:set_sizer(instance_sizer)
+		instance_sizer:add(EWS:StaticText(panel, "Filter", 0, ""), 0, 0, "ALIGN_CENTER_HORIZONTAL")
+		local instance_filter = EWS:TextCtrl(panel, "", "", "TE_CENTRE")
+		instance_sizer:add(instance_filter, 0, 0, "EXPAND")
+		local instances = EWS:ListCtrl(panel, "", style)
+		instances:clear_all()
+		instances:append_column("Name")
+		for _, name in ipairs(names) do
+			local i = instances:append_item(name)
+			instances:set_item_data(i, name)
+		end
+		instances:autosize_column(0)
+		instance_sizer:add(instances, 1, 0, "EXPAND")
+		instances:connect("EVT_COMMAND_LIST_ITEM_SELECTED", callback(self, self, "_on_gui_select_predefined_instance"), instances)
+		instance_filter:connect("EVT_COMMAND_TEXT_UPDATED", callback(self, self, "_on_gui_instances_update_filter"), {
+			filter = instance_filter,
+			instances = instances,
+			category = c
+		})
+		local page_name = c
+		self._predefined_instances_notebook_lists[page_name] = {instances = instances, filter = instance_filter}
+		self._predefined_instances_notebook:add_page(panel, page_name, true)
+	end
+end
+
+function InstancesLayer:_clear_predefined_instances_notebook()
+	self._predefined_instances_notebook_lists = {}
+	while self._predefined_instances_notebook:get_page_count() > 0 do
+		self._predefined_instances_notebook:delete_page(self._predefined_instances_notebook:get_page_count() - 1)
+	end
+end
+
+function InstancesLayer:_predefined_data_by_category()
+	local t = {}
+	for name, data in pairs(self._predefined_instances) do
+		local category = data.category or "N/A"
+		t[category] = t[category] or {}
+		table.insert(t[category], name)
+	end
+	return t
+end
+
+function InstancesLayer:_on_gui_instances_page_changed()
+	for _, data in pairs(self._predefined_instances_notebook_lists) do
+		for _, item in ipairs(data.instances:selected_items()) do
+			data.instances:set_item_selected(item, false)
+		end
+	end
+end
+
+function InstancesLayer:_on_gui_instances_update_filter(data)
+	local filter = data.filter:get_value()
+	data.instances:delete_all_items()
+	local instances_names = self:_predefined_data_by_category()[data.category]
+	for _, name in ipairs(instances_names) do
+		if string.find(name, filter, 1, true) then
+			local i = data.instances:append_item(name)
+			data.instances:set_item_data(i, name)
+		end
+	end
+	data.instances:autosize_column(0)
 end
 
 function InstancesLayer:_on_gui_new_instance()
 	self:_get_instance_info_from_user()
+end
+
+function InstancesLayer:_on_gui_open_selected_instance_path()
+	local name = self:_get_selection_instances_listbox()
+	if name then
+		local instance_data = managers.world_instance:get_instance_data_by_name(name)
+		self:_open_instance_path(instance_data.folder)
+	end
 end
 
 function InstancesLayer:_on_gui_rename_instance()
@@ -626,7 +718,12 @@ function InstancesLayer:_on_gui_mission_placed()
 end
 
 function InstancesLayer:_on_gui_select_predefined_instance(predefined_instances_list_box)
-	local name = self:_get_selection_predefined_instances_listbox()
+	local name = self:_get_selection_predefined_instances_listbox(predefined_instances_list_box)
+	self:_set_selected_predefined_instance(name)
+end
+
+function InstancesLayer:_set_selected_predefined_instance(name)
+	self._selected_predefined_instance = name
 	if not name then
 		self._predefined_instances_info_guis.folder:set_label("")
 		self._predefined_instances_info_guis.size:set_label("")
@@ -647,12 +744,24 @@ function InstancesLayer:_on_gui_select_predefined_instance(predefined_instances_
 	self._predefined_instances_info_guis.statics:set_label("" .. type_amount.statics)
 	self._predefined_instances_info_guis.dynamics:set_label("" .. type_amount.dynamics)
 	self._predefined_instances_info_guis.highest_id:set_label("" .. id)
+	if size < amount then
+		local message = "Actual size (" .. amount .. ") of instance \"" .. name .. "\" is higher than size in predefined instances xml (" .. size .. "). It will not be allowed to be placed. Any previously placed instances needs to be looked over and replaced if needed."
+		EWS:message_box(Global.frame_panel, message, "Instances", "OK,ICON_ERROR", Vector3(-1, -1, 0))
+		self:_set_selected_predefined_instance(nil)
+		return
+	end
+	if size < id then
+		local message = "Highest id (" .. id .. ") of instance \"" .. name .. "\" is higher than size in predefined instances xml (" .. size .. "). It will not be allowed to be placed. Any previously placed instances needs to be looked over and replaced if needed."
+		EWS:message_box(Global.frame_panel, message, "Instances", "OK,ICON_ERROR", Vector3(-1, -1, 0))
+		self:_set_selected_predefined_instance(nil)
+	end
 end
 
-function InstancesLayer:_get_selection_predefined_instances_listbox()
-	local i = self._predefined_instances_listbox:selected_index()
+function InstancesLayer:_get_selection_predefined_instances_listbox(predefined_instances_list_box)
+	predefined_instances_list_box = predefined_instances_list_box or self._predefined_instances_listbox
+	local i = predefined_instances_list_box:selected_item()
 	if -1 < i then
-		return self._predefined_instances_listbox:get_string(i)
+		return predefined_instances_list_box:get_item(i, 0)
 	end
 	return nil
 end
@@ -693,6 +802,54 @@ function InstancesLayer:_set_selection_instances_listbox(name)
 			self._instances_listbox:select_index(i)
 		end
 	end
+end
+
+function InstancesLayer:_on_gui_open_instance_path(name)
+	name = name or self._selected_predefined_instance
+	if not name then
+		return
+	end
+	local folder = self._predefined_instances[name].folder
+	self:_open_instance_path(folder)
+end
+
+function InstancesLayer:_open_instance_path(folder)
+	if managers.editor:confirm_on_new() then
+		return
+	end
+	local reverse = string.reverse(folder)
+	local i = string.find(reverse, "/")
+	local p_folder = string.reverse(string.sub(reverse, i + 1))
+	local abs_folder = managers.database:entry_expanded_directory(p_folder)
+	local abs_file = abs_folder .. "\\world.world"
+	managers.editor:load_level(abs_folder, abs_file)
+end
+
+function InstancesLayer:_on_gui_open_predefined_instances_file()
+	os.execute("start " .. managers.database:entry_expanded_directory(self._predefined_instances_file .. ".xml"))
+end
+
+function InstancesLayer:_on_gui_reload_predefined_instances_file()
+	local t = {
+		platform = "win32",
+		source_root = managers.database:base_path(),
+		target_db_root = Application:base_path() .. "/assets",
+		target_db_name = "all",
+		verbose = false,
+		source_files = {
+			self._predefined_instances_file .. ".xml"
+		},
+		send_idstrings = false
+	}
+	Application:data_compile(t)
+	DB:reload()
+	self:_load_predefined_instances()
+	local current_page_index = CoreEws.get_notebook_current_page_index(self._predefined_instances_notebook)
+	self._predefined_instances_notebook:freeze()
+	self:_clear_predefined_instances_notebook()
+	self:_add_predefined_instances_notebook_pages()
+	self._predefined_instances_notebook:thaw()
+	self._predefined_instances_notebook:set_page(math.min(current_page_index, self._predefined_instances_notebook:get_page_count() - 1))
 end
 
 function InstancesLayer:on_continent_changed(...)

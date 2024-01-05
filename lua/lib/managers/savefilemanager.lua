@@ -401,13 +401,13 @@ function SavefileManager:_save_cache(slot)
 	}
 	if is_setting_slot then
 		managers.user:save(cache)
+		managers.music:save_savedata(cache)
 	else
 		managers.player:save(cache)
 		managers.experience:save(cache)
 		managers.upgrades:save(cache)
 		managers.money:save(cache)
 		managers.statistics:save(cache)
-		managers.challenges:save(cache)
 		managers.skilltree:save(cache)
 		managers.blackmarket:save(cache)
 		managers.mission:save_job_values(cache)
@@ -679,6 +679,7 @@ function SavefileManager:_load_cache(slot)
 		end
 		if is_setting_slot then
 			managers.user:load(cache, version)
+			managers.music:load_savedata(cache, version)
 			self:_set_setting_changed(false)
 		else
 			managers.blackmarket:load(cache, version)
@@ -686,7 +687,6 @@ function SavefileManager:_load_cache(slot)
 			managers.experience:load(cache, version)
 			managers.player:load(cache, version)
 			managers.money:load(cache, version)
-			managers.challenges:load(cache, version)
 			managers.statistics:load(cache, version)
 			managers.skilltree:load(cache, version)
 			managers.mission:load_job_values(cache, version)

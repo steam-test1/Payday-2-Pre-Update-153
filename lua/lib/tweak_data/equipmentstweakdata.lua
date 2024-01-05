@@ -256,30 +256,42 @@ function EquipmentsTweakData:init()
 		icon = "equipment_gold",
 		player_rule = "no_run"
 	}
+	local barcodes = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.specials.barcode_downtown = {
 		text_id = "hud_int_equipment_barcode_downtown",
 		icon = "equipment_gold",
-		sync_possession = true
+		sync_possession = true,
+		shares_pickup_with = barcodes
 	}
 	self.specials.barcode_brickell = {
 		text_id = "hud_int_equipment_barcode_brickell",
 		icon = "equipment_gold",
-		sync_possession = true
+		sync_possession = true,
+		shares_pickup_with = barcodes
 	}
 	self.specials.barcode_edgewater = {
 		text_id = "hud_int_equipment_barcode_edgewater",
 		icon = "equipment_gold",
-		sync_possession = true
+		sync_possession = true,
+		shares_pickup_with = barcodes
 	}
 	self.specials.barcode_isles_beach = {
 		text_id = "hud_int_equipment_barcode_isles_beach",
 		icon = "equipment_gold",
-		sync_possession = true
+		sync_possession = true,
+		shares_pickup_with = barcodes
 	}
 	self.specials.barcode_opa_locka = {
 		text_id = "hud_int_equipment_barcode_opa_locka",
 		icon = "equipment_gold",
-		sync_possession = true
+		sync_possession = true,
+		shares_pickup_with = barcodes
 	}
 	self.max_amount = {
 		ammo_bag = 2,

@@ -730,6 +730,26 @@ function MenuManager:show_infamytree_reseted()
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_enable_steam_overlay()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_error_title")
+	dialog_data.text = managers.localization:text("dialog_requires_steam_overlay")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_requires_big_picture()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_error_title")
+	dialog_data.text = managers.localization:text("dialog_requires_big_picture")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_confirm_blackmarket_sell_no_slot(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_bm_mask_sell_title")

@@ -994,9 +994,10 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 		return
 	end
 	if has_stage_data then
-		local num_stages = self._current_job_data and #self._current_job_data.chain or 0
+		local num_stages = self._current_job_chain and #self._current_job_chain or 0
+		local job_chain = managers.job:current_job_chain_data()
 		local day = managers.job:current_stage()
-		local days = job_data and #job_data.chain or 0
+		local days = job_chain and #job_chain or 0
 		days_title:set_text(utf8.to_upper(managers.localization:text("hud_days_title", {DAY = day, DAYS = days})))
 		local payout = managers.money:get_potential_payout_from_current_stage()
 		local day_payout = day_wrapper_panel:child("day_payout")
@@ -1026,98 +1027,6 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			ghost_icon:set_color(is_whisper_mode and Color.white or tweak_data.screen_colors.important_1)
 			ghostable_text:set_visible(is_level_ghostable and is_whisper_mode)
 		end
-	end
-end
-
-function HUDStatsScreen:_create_stats_screen_challenges(challenges_panel, near_completion_panel)
-	challenges_panel:clear()
-	local last_comleted_title_text = challenges_panel:text({
-		name = "last_comleted_title_text",
-		text = utf8.to_upper(managers.challenges:get_last_comleted_title_text()),
-		font_size = tweak_data.menu.loading_challenge_name_font_size,
-		font = tweak_data.hud_stats.objectives_font
-	})
-	managers.hud:make_fine_text(last_comleted_title_text)
-	local last_comleted_description_text = challenges_panel:text({
-		name = "last_comleted_description_text",
-		text = utf8.to_upper(managers.challenges:get_last_comleted_description_text()),
-		font_size = tweak_data.hud.small_font_size,
-		font = tweak_data.hud.small_font,
-		y = last_comleted_title_text:bottom(),
-		wrap = true,
-		word_wrap = true
-	})
-	managers.hud:make_fine_text(last_comleted_description_text)
-	near_completion_panel:clear()
-	local challenges = managers.challenges:get_near_completion()
-	challenges = {
-		challenges[1],
-		challenges[2],
-		challenges[3]
-	}
-	local w = near_completion_panel:w() - 8
-	local y = 0
-	for i, challenge in ipairs(challenges) do
-		local text = near_completion_panel:text({
-			text = utf8.to_upper(challenge.name),
-			y = y,
-			font = tweak_data.hud.medium_font,
-			font_size = tweak_data.menu.loading_challenge_name_font_size,
-			color = Color.white,
-			align = "left",
-			layer = 1
-		})
-		managers.hud:make_fine_text(text)
-		y = y + text:h()
-		local c_panel = near_completion_panel:panel({
-			w = w,
-			h = 22,
-			y = y
-		})
-		local bg_bar = c_panel:rect({
-			x = 0,
-			y = 0,
-			w = c_panel:w(),
-			h = c_panel:h(),
-			color = Color.black:with_alpha(0.5),
-			align = "center",
-			halign = "center",
-			vertical = "center",
-			layer = 1
-		})
-		local bar = c_panel:gradient({
-			orientation = "vertical",
-			gradient_points = {
-				0,
-				Color(1, 1, 0.65882355, 0),
-				1,
-				Color(1, 0.6039216, 0.4, 0)
-			},
-			x = 2,
-			y = 2,
-			w = (bg_bar:w() - 4) * (challenge.amount / challenge.count),
-			h = bg_bar:h() - 4,
-			layer = 2,
-			align = "center",
-			halign = "center",
-			vertical = "center"
-		})
-		local progress_text = c_panel:text({
-			font_size = tweak_data.menu.loading_challenge_progress_font_size,
-			font = tweak_data.hud.medium_font,
-			x = 0,
-			y = 0,
-			h = bg_bar:h(),
-			w = bg_bar:w(),
-			align = "center",
-			halign = "center",
-			vertical = "center",
-			valign = "center",
-			color = Color.white,
-			layer = 3,
-			text = challenge.amount .. "/" .. challenge.count
-		})
-		y = y + c_panel:h()
 	end
 end
 

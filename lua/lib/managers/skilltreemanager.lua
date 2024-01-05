@@ -28,6 +28,14 @@ function SkillTreeManager:_setup(reset)
 	self._global = Global.skilltree_manager
 end
 
+function SkillTreeManager:all_skilltree_ids()
+	local t = {}
+	for tree, data in ipairs(tweak_data.skilltree.trees) do
+		table.insert(t, data.skill)
+	end
+	return t
+end
+
 function SkillTreeManager:_create_tree_data(tree_id)
 	self._global.trees[tree_id] = {
 		unlocked = false,
@@ -416,6 +424,33 @@ function SkillTreeManager:get_most_progressed_tree()
 		end
 	end
 	return max_tree
+end
+
+function SkillTreeManager:pack_to_string()
+	local packed_string = tostring(SkillTreeManager.VERSION) .. "_"
+	local skill_data = self._global.skills
+	for tree, tree_data in ipairs(tweak_data.skilltree.trees) do
+		packed_string = packed_string .. tostring(skill_data[tree_data.skill].unlocked)
+		for tier, tier_data in ipairs(tree_data.tiers) do
+			for row, skill_id in ipairs(tier_data) do
+				packed_string = packed_string .. tostring(skill_data[skill_id].unlocked)
+			end
+		end
+	end
+	return packed_string
+end
+
+function SkillTreeManager:unpack_from_string(packed_string)
+	local t = string.split(packed_string, "_")
+	local version = tonumber(t[1])
+	if version == SkillTreeManager.VERSION then
+		local skill_string = t[2]
+		local skill_table = {}
+		return skill_table
+	else
+		Application:error("[SkillTreeManager:unpack_from_string] Wrong version skill string!", "Packed Skill String Version", version, "Skilltree Version", SkillTreeManager.VERSION)
+	end
+	return false
 end
 
 function SkillTreeManager:save(data)

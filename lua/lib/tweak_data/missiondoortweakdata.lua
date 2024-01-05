@@ -376,4 +376,20 @@ function MissionDoorTweakData:init()
 			timer = 60
 		}
 	}
+	self.cage_door_deluxe = {}
+	self.cage_door_deluxe.devices = {}
+	self.cage_door_deluxe.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 60
+		}
+	}
+	self.cage_door_deluxe.devices.c4 = {
+		{
+			align = "a_shp_charge",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge_single")
+		}
+	}
 end

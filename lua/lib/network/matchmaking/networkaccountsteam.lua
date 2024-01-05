@@ -26,6 +26,7 @@ function NetworkAccountSTEAM:init()
 	Steam:request_listener(NetworkAccountSTEAM._on_join_request, NetworkAccountSTEAM._on_server_request)
 	Steam:error_listener(NetworkAccountSTEAM._on_disconnected, NetworkAccountSTEAM._on_ipc_fail, NetworkAccountSTEAM._on_connect_fail)
 	Steam:overlay_listener(callback(self, self, "_on_open_overlay"), callback(self, self, "_on_close_overlay"))
+	self._gamepad_text_listeners = {}
 	if Steam:overlay_open() then
 		self:_on_open_overlay()
 	end
@@ -127,22 +128,54 @@ function NetworkAccountSTEAM:_on_close_overlay()
 	managers.dlc:chk_dlc_purchase()
 end
 
+function NetworkAccountSTEAM:_on_gamepad_text_submitted(submitted, submitted_text)
+	print("[NetworkAccountSTEAM:_on_gamepad_text_submitted]", "submitted", submitted, "submitted_text", submitted_text)
+	for id, clbk in pairs(self._gamepad_text_listeners) do
+		clbk(submitted, submitted_text)
+	end
+	self._gamepad_text_listeners = {}
+end
+
+function NetworkAccountSTEAM:show_gamepad_text_input(id, callback, params)
+	local is_password, is_multi_line, description_text, max_characters, start_text
+	if params then
+		is_password = params.is_password or params.password or params[1]
+		is_multi_line = params.is_multi_line or params.multi or params[2]
+		description_text = params.description_text or params.desc or params[3]
+		max_characters = params.max_characters or params.max_chars or params[4]
+		start_text = params.start_text or params[5]
+	end
+	if Steam:show_gamepad_text_input(is_password and "password" or "normal", is_multi_line and "multi" or "single", description_text or "", max_characters or 20, start_text or "") then
+		self:add_gamepad_text_listener(id, callback)
+		return true
+	end
+	return false
+end
+
+function NetworkAccountSTEAM:add_gamepad_text_listener(id, clbk)
+	if self._gamepad_text_listeners[id] then
+		debug_pause("[NetworkAccountSTEAM:add_gamepad_text_listener] ID already added!", id, "Old Clbk", self._gamepad_text_listeners[id], "New Clbk", clbk)
+	end
+	self._gamepad_text_listeners[id] = clbk
+end
+
+function NetworkAccountSTEAM:remove_gamepad_text_listener(id)
+	if not self._gamepad_text_listeners[id] then
+		debug_pause("[NetworkAccountSTEAM:remove_gamepad_text_listener] ID do not exist!", id)
+	end
+	self._gamepad_text_listeners[id] = nil
+end
+
 function NetworkAccountSTEAM:achievements_fetched()
 	self._achievements_fetched = true
-	self:_check_for_unawarded_achievements()
 end
 
 function NetworkAccountSTEAM:challenges_loaded()
 	self._challenges_loaded = true
-	self:_check_for_unawarded_achievements()
 end
 
 function NetworkAccountSTEAM:experience_loaded()
 	self._experience_loaded = true
-	self:_check_for_unawarded_achievements()
-end
-
-function NetworkAccountSTEAM:_check_for_unawarded_achievements()
 end
 
 function NetworkAccountSTEAM._on_leaderboard_stored(status)

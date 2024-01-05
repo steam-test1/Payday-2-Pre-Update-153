@@ -337,10 +337,11 @@ end
 
 function LootManager:_present(carry_id, multiplier)
 	local real_value = 0
-	if tweak_data:get_value("money_manager", "bag_values", carry_id) then
-		real_value = managers.money:get_secured_bonus_bag_value(carry_id, multiplier)
-	else
+	local is_small_loot = not not tweak_data.carry.small_loot[carry_id]
+	if is_small_loot then
 		real_value = self:get_real_value(carry_id, multiplier)
+	else
+		real_value = managers.money:get_secured_bonus_bag_value(carry_id, multiplier)
 	end
 	local carry_data = tweak_data.carry[carry_id]
 	local title = managers.localization:text("hud_loot_secured_title")

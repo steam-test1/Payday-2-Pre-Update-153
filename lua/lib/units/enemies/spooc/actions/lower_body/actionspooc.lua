@@ -93,6 +93,9 @@ function ActionSpooc:init(action_desc, common_data)
 		end
 	elseif is_local then
 		if not is_server and self:_chk_target_invalid() then
+			if not action_desc.flying_strike then
+				self._last_sent_pos = mvector3.copy(common_data.pos)
+			end
 			self:_wait()
 		elseif action_desc.flying_strike then
 			if is_server or ActionSpooc.chk_can_start_flying_strike(self._unit, self._target_unit) then
@@ -159,7 +162,7 @@ function ActionSpooc:_chk_can_strike()
 		mvector3.subtract(pos, my_pos)
 		local dif_z = math.abs(mvector3.z(pos))
 		mvector3.set_z(pos, 0)
-		return mvector3.length_sq(pos) < 10000 and dif_z < 75
+		return mvector3.length_sq(pos) < 52900 and dif_z < 75
 	end
 	
 	if not _dis_chk(target_pos) then
@@ -654,8 +657,7 @@ end
 
 function ActionSpooc:_upd_striking(t)
 	local target_unit = (not alive(self._strike_unit) or not self._strike_unit) and alive(self._target_unit) and self._target_unit
-	local my_pos = self._tmp_vec2
-	mvector3.set(my_pos, self._common_data.pos)
+	local my_pos = CopActionHurt._get_pos_clamped_to_graph(self, false)
 	if target_unit then
 		local my_fwd = self._common_data.fwd
 		local target_pos = target_unit:movement():m_pos()

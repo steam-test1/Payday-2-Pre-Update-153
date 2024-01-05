@@ -31,7 +31,7 @@ end
 function BaseNetworkSession:create_local_peer()
 	local my_name = managers.network.account:username_id()
 	local my_user_id = SystemInfo:platform() == self._ids_WIN32 and Steam:userid() or false
-	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 1, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
+	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 0, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
 	self._local_peer:set_outfit_string(managers.blackmarket:outfit_string(), nil)
 end
 

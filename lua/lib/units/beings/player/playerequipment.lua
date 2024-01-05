@@ -34,7 +34,6 @@ end
 function PlayerEquipment:use_trip_mine()
 	local ray = self:valid_look_at_placement()
 	if ray then
-		managers.challenges:count_up("plant_tripmine")
 		managers.statistics:use_trip_mine()
 		local sensor_upgrade = managers.player:has_category_upgrade("trip_mine", "sensor_toggle")
 		if Network:is_client() then
@@ -87,7 +86,6 @@ function PlayerEquipment:use_ammo_bag()
 		rot = Rotation(rot:yaw(), 0, 0)
 		PlayerStandard.say_line(self, "s01x_plu")
 		managers.statistics:use_ammo_bag()
-		managers.challenges:count_up("deploy_ammobag")
 		local ammo_upgrade_lvl = managers.player:upgrade_level("ammo_bag", "ammo_increase")
 		if Network:is_client() then
 			managers.network:session():send_to_host("place_deployable_bag", "AmmoBagBase", pos, rot, ammo_upgrade_lvl)

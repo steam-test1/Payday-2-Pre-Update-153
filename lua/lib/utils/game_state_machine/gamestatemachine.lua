@@ -1,6 +1,5 @@
 core:import("CoreGameStateMachine")
 require("lib/states/BootupState")
-require("lib/states/CreditsState")
 require("lib/states/MenuTitlescreenState")
 require("lib/states/MenuMainState")
 require("lib/states/EditorState")

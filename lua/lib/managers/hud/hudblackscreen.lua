@@ -263,7 +263,7 @@ function HUDBlackScreen:set_job_data()
 end
 
 function HUDBlackScreen:_create_stages()
-	local job_data = managers.job:current_job_data()
+	local job_chain = managers.job:current_job_chain_data()
 	local job_panel = self._blackscreen_panel:child("job_panel")
 	local stages_panel = job_panel:panel({
 		visible = true,
@@ -331,7 +331,7 @@ function HUDBlackScreen:_create_stages()
 		}
 	}
 	local x = 0
-	for i, heist in ipairs(job_data.chain) do
+	for i, heist in ipairs(job_chain) do
 		local is_current_stage = managers.job:current_stage() == i
 		local is_completed = i < managers.job:current_stage()
 		local panel = stages_panel:panel({

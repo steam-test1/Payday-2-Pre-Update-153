@@ -7,6 +7,7 @@ function IngameContractGui:init(ws)
 	})
 	self._panel:set_y(CoreMenuRenderer.Renderer.border_height + tweak_data.menu.pd2_large_font_size)
 	local job_data = managers.job:current_job_data()
+	local job_chain = managers.job:current_job_chain_data()
 	if job_data and managers.job:current_job_id() == "safehouse" and Global.mission_manager.saved_job_values.playedSafeHouseBefore then
 		self._panel:set_visible(false)
 	end
@@ -309,7 +310,7 @@ function IngameContractGui:init(ws)
 		local plvl = managers.experience:current_level()
 		local player_stars = math.max(math.ceil(plvl / 10), 1)
 		local cy = experience_title:center_y()
-		local num_days = #job_data.chain or 1
+		local num_days = #job_chain or 1
 		local days_multiplier = 0
 		local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, num_days)
 		local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)

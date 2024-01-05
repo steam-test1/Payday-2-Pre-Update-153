@@ -295,6 +295,10 @@ function TimerGui:set_visible(visible)
 	self._gui:set_visible(visible)
 end
 
+function TimerGui:is_visible()
+	return self._visible
+end
+
 function TimerGui:sync_net_event(event_id)
 	if event_id == TimerGui.EVENT_IDS.jammed then
 		self:_set_jammed(true)
@@ -447,7 +451,7 @@ function TimerGui:_set_done()
 end
 
 function TimerGui:update_sound_event()
-	if self._done or not self._started then
+	if not (not self._done and self._started) or self._jammed or not self._powered then
 		return
 	end
 	self:post_event(self._resume_event)

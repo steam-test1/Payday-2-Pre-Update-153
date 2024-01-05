@@ -128,7 +128,7 @@ function Setup:init_managers(managers)
 		reputation_permission = 0,
 		drop_in_allowed = true,
 		kicking_allowed = true,
-		search_appropriate_jobs = false
+		search_appropriate_jobs = true
 	}
 	managers.dyn_resource = DynamicResourceManager:new()
 	managers.gui_data = CoreGuiDataManager.GuiDataManager:new()
@@ -223,12 +223,6 @@ function Setup:_start_loading_screen()
 		if Global.current_load_package then
 			PackageManager:load(Global.current_load_package)
 		end
-		local challenges = managers.challenges:get_near_completion()
-		load_level_data.challenges = {
-			challenges[1],
-			challenges[2],
-			challenges[3]
-		}
 		local safe_rect_pixels = managers.viewport:get_safe_rect_pixels()
 		local safe_rect = managers.viewport:get_safe_rect()
 		local aspect_ratio = managers.viewport:aspect_ratio()
@@ -401,6 +395,9 @@ function Setup:init_finalize()
 	end
 	managers.player:aquire_default_upgrades()
 	managers.blackmarket:init_finalize()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		AnimationManager:set_anim_cache_size(10485760, 0)
+	end
 end
 
 function Setup:update(t, dt)
@@ -502,6 +499,7 @@ function Setup:load_start_menu()
 end
 
 function Setup:exec(context)
+	self:set_fps_cap(30)
 	managers.music:stop()
 	SoundDevice:stop()
 	if not managers.system_menu:is_active() then
@@ -538,7 +536,7 @@ function Setup:block_exec()
 	end
 	if not managers.dyn_resource:is_ready_to_close() then
 		print("BLOCKED BY DYNAMIC RESOURCE MANAGER")
-		managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk(), 1)
+		managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 1)
 		return true
 	end
 	if managers.system_menu:block_exec() or managers.savefile:is_active() then

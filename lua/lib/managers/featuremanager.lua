@@ -136,14 +136,14 @@ function FeatureManager:join_pd2_clan()
 	local ok_button = {}
 	ok_button.text = managers.localization:text("dialog_ok")
 	ok_button.cancel_button = true
-	local joing_pd2_clan_button = {}
-	joing_pd2_clan_button.text = managers.localization:text("dialog_join_pd2_clan")
+	local joining_pd2_clan_button = {}
+	joining_pd2_clan_button.text = managers.localization:text("dialog_join_pd2_clan")
 	
-	function joing_pd2_clan_button.callback_func()
+	function joining_pd2_clan_button.callback_func()
 		Steam:overlay_activate("game", "OfficialGameGroup")
 	end
 	
-	params.button_list = {joing_pd2_clan_button, ok_button}
+	params.button_list = {joining_pd2_clan_button, ok_button}
 	params.focus_button = 1
 	managers.menu:show_video_message_dialog(params)
 	return true

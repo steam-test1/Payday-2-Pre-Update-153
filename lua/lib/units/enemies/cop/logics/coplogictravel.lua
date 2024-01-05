@@ -306,8 +306,11 @@ function CopLogicTravel.queued_update(data)
 		if my_data.coarse_path_index == #my_data.coarse_path - 1 then
 			end_rot = objective and objective.rot
 		end
-		local no_strafe
-		CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, haste, end_rot, no_strafe)
+		local no_strafe, end_pose
+		if my_data.moving_to_cover and (not data.char_tweak.allowed_poses or data.char_tweak.allowed_poses.crouch) then
+			end_pose = "crouch"
+		end
+		CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, haste, end_rot, no_strafe, end_pose)
 	end
 	CopLogicTravel.queue_update(data, my_data, delay)
 end
@@ -658,7 +661,7 @@ function CopLogicTravel.on_intimidated(data, amount, aggressor_unit)
 	end
 end
 
-function CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, speed, end_rot, no_strafe)
+function CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, speed, end_rot, no_strafe, end_pose)
 	if not data.unit:movement():chk_action_forbidden("walk") or data.unit:anim_data().act_idle then
 		CopLogicAttack._correct_path_start_pos(data, my_data.advance_path)
 		local path = my_data.advance_path
@@ -669,7 +672,8 @@ function CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, s
 			body_part = 2,
 			end_rot = end_rot,
 			path_simplified = my_data.path_is_precise,
-			no_strafe = no_strafe
+			no_strafe = no_strafe,
+			end_pose = end_pose
 		}
 		my_data.advance_path = nil
 		my_data.starting_advance_action = true

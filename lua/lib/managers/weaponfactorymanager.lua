@@ -963,7 +963,11 @@ function WeaponFactoryManager:blueprint_to_string(factory_id, blueprint)
 	end
 	local s = ""
 	for _, part_id in ipairs(blueprint) do
-		s = s .. index_table[part_id] .. " "
+		if index_table[part_id] then
+			s = s .. tostring(index_table[part_id]) .. " "
+		else
+			Application:error("[WeaponFactoryManager:blueprint_to_string] Part do not exist in weapon's uses_parts!", "factory_id", factory_id, "part_id", part_id)
+		end
 	end
 	return s
 end
@@ -972,8 +976,12 @@ function WeaponFactoryManager:unpack_blueprint_from_string(factory_id, blueprint
 	local factory = tweak_data.weapon.factory
 	local index_table = string.split(blueprint_string, " ")
 	local blueprint = {}
+	local part_id
 	for _, part_index in ipairs(index_table) do
-		table.insert(blueprint, factory[factory_id].uses_parts[tonumber(part_index)])
+		part_id = factory[factory_id].uses_parts[tonumber(part_index)]
+		if part_id then
+			table.insert(blueprint, part_id)
+		end
 	end
 	return blueprint
 end

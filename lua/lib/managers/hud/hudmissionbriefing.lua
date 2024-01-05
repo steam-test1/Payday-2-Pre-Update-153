@@ -180,6 +180,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._current_level_data = managers.job:current_level_data()
 	self._current_stage_data = managers.job:current_stage_data()
 	self._current_job_data = managers.job:current_job_data()
+	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
 	local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
 	local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
@@ -290,9 +291,9 @@ function HUDMissionBriefing:init(hud, workspace)
 			self._interupt_panel:set_shape(self._job_schedule_panel:shape())
 		end
 	end
-	local num_stages = self._current_job_data and #self._current_job_data.chain or 0
+	local num_stages = self._current_job_chain and #self._current_job_chain or 0
 	local day_color = tweak_data.screen_colors.item_stage_1
-	local chain = self._current_job_data and self._current_job_data.chain or {}
+	local chain = self._current_job_chain and self._current_job_chain or {}
 	local js_w = self._job_schedule_panel:w() / 7
 	local js_h = self._job_schedule_panel:h()
 	for i = 1, 7 do

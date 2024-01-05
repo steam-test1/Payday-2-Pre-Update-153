@@ -76,10 +76,9 @@ function MenuMainState:at_enter(old_state)
 		managers.menu:show_question_start_tutorial({yes_func = yes_func})
 	end
 	if Global.savefile_manager.backup_save_enabled then
-		print("BACKUP SAVE")
 		managers.savefile:save_progress("local_hdd")
 	end
-	managers.dyn_resource:set_file_streaming_settings(managers.dyn_resource:max_streaming_chunk() * 0.5, 3)
+	managers.dyn_resource:set_file_streaming_chunk_size_mul(0.5, 3)
 end
 
 function MenuMainState:at_exit(new_state)

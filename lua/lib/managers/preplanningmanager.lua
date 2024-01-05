@@ -1031,7 +1031,7 @@ function PrePlanningManager:sync_load(data)
 			self._players_votes = data.PrePlanningManager.players_votes or {}
 			for id, element_data in pairs(self._reserved_mission_elements) do
 				local type, index = unpack(element_data.pack)
-				local mission_element = self._mission_elements_by_type[type][index]
+				local mission_element = self._mission_elements_by_type[type] and self._mission_elements_by_type[type][index]
 				if mission_element then
 					local disables_types = mission_element:value("disables_types") or {}
 					for _, type in ipairs(disables_types) do
