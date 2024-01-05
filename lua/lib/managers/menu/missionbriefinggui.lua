@@ -585,7 +585,7 @@ function AssetsItem:chk_preplanning_textures_done()
 			return
 		end
 	end
-	local preplanning_panel = self._preplanning_ready and self._panel:child("preplanning")
+	local preplanning_panel = self._preplanning_ready and alive(self._panel) and self._panel:child("preplanning")
 	if alive(preplanning_panel) then
 		preplanning_panel:clear()
 		local text = preplanning_panel:text({
@@ -971,7 +971,7 @@ function AssetsItem:mouse_moved(x, y)
 		end
 	end
 	local preplanning = self._preplanning_ready and self._panel:child("preplanning")
-	if alive(preplanning) then
+	if alive(preplanning) and preplanning:tree_visible() then
 		if preplanning:inside(x, y) then
 			if not self._preplanning_highlight then
 				self._preplanning_highlight = true

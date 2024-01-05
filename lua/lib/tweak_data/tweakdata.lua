@@ -2149,6 +2149,8 @@ function TweakData:init()
 	self.interaction.money_small.sound_start = "bar_bag_pour_money"
 	self.interaction.money_small.sound_interupt = "bar_bag_pour_money_cancel"
 	self.interaction.money_small.sound_done = "bar_bag_pour_money_finished"
+	self.interaction.money_small_take = deep_clone(self.interaction.money_small)
+	self.interaction.money_small_take.text_id = "debug_interact_money_printed_take_money"
 	self.interaction.shape_charge_plantable = {}
 	self.interaction.shape_charge_plantable.text_id = "debug_interact_c4"
 	self.interaction.shape_charge_plantable.action_text_id = "hud_action_placing_c4"

@@ -237,6 +237,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 540
 		self.small_loot.vault_loot_diamond_collection = 650
 		self.small_loot.vault_loot_trophy = 690
+		self.small_loot.spawn_bucket_of_money = 20000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
 		self.small_loot.vault_loot_coins = 3500
@@ -257,6 +258,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 1100
 		self.small_loot.vault_loot_diamond_collection = 1300
 		self.small_loot.vault_loot_trophy = 1400
+		self.small_loot.spawn_bucket_of_money = 40000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
 		self.small_loot.vault_loot_coins = 3500
@@ -277,6 +279,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 2700
 		self.small_loot.vault_loot_diamond_collection = 3300
 		self.small_loot.vault_loot_trophy = 3500
+		self.small_loot.spawn_bucket_of_money = 100000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
 		self.small_loot.vault_loot_coins = 3500
@@ -297,6 +300,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 5400
 		self.small_loot.vault_loot_diamond_collection = 6500
 		self.small_loot.vault_loot_trophy = 6900
+		self.small_loot.spawn_bucket_of_money = 200000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
 		self.small_loot.vault_loot_coins = 3500
@@ -317,6 +321,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_silver = 7000
 		self.small_loot.vault_loot_diamond_collection = 8500
 		self.small_loot.vault_loot_trophy = 9000
+		self.small_loot.spawn_bucket_of_money = 260000
 		self.small_loot.vault_loot_gold = 10000
 		self.small_loot.vault_loot_cash = 5000
 		self.small_loot.vault_loot_coins = 3500
@@ -324,7 +329,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_jewels = 2500
 		self.small_loot.vault_loot_macka = 1
 	end
-	self.max_small_loot_value = 900000
+	self.max_small_loot_value = 1100000
 	self.skilltree = {}
 	self.skilltree.respec = {}
 	self.skilltree.respec.base_cost = 200

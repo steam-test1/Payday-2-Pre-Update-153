@@ -4837,10 +4837,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.fal.AMMO_PICKUP = self:_pickup_chance(self.fal.AMMO_MAX, 2)
 	self.fal.FIRE_MODE = "auto"
 	self.fal.fire_mode_data = {}
-	self.fal.fire_mode_data.fire_rate = 0.092
+	self.fal.fire_mode_data.fire_rate = 0.086
 	self.fal.CAN_TOGGLE_FIREMODE = true
 	self.fal.auto = {}
-	self.fal.auto.fire_rate = 0.092
+	self.fal.auto.fire_rate = 0.086
 	self.fal.spread = {}
 	self.fal.spread.standing = self.new_m4.spread.standing * 0.5
 	self.fal.spread.crouching = self.new_m4.spread.standing * 0.6
