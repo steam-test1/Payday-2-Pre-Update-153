@@ -39,6 +39,7 @@ function WeaponTweakData:init()
 	self:_init_data_sentry_gun_npc()
 	self:_init_data_usp_npc()
 	self:_init_data_g22c_npc()
+	self:_init_data_judge_npc()
 	self:_init_data_m45_npc()
 	self:_init_data_s552_npc()
 	self:_init_data_ppk_npc()
@@ -673,6 +674,21 @@ function WeaponTweakData:_init_data_g22c_npc()
 	self.g22c_npc.hud_icon = "mac11"
 	self.g22c_npc.alert_size = 1800
 	self.g22c_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_judge_npc()
+	self.judge_npc.sounds.prefix = "judge_npc"
+	self.judge_npc.use_data.selection_index = 1
+	self.judge_npc.DAMAGE = 4
+	self.judge_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.judge_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.judge_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.judge_npc.CLIP_AMMO_MAX = 6
+	self.judge_npc.NR_CLIPS_MAX = 8
+	self.judge_npc.hold = "pistol"
+	self.judge_npc.hud_icon = "raging_bull"
+	self.judge_npc.alert_size = 5000
+	self.judge_npc.suppression = 1.8
 end
 
 function WeaponTweakData:_init_data_m45_npc()
@@ -3777,6 +3793,102 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.judge = {}
+	self.judge.category = "shotgun"
+	self.judge.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.judge.damage_melee = damage_melee_default
+	self.judge.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.judge.sounds = {}
+	self.judge.sounds.fire = "judge_fire"
+	self.judge.sounds.dryfire = "secondary_dryfire"
+	self.judge.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.judge.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.judge.timers = {}
+	self.judge.timers.reload_not_empty = 2.25
+	self.judge.timers.reload_empty = 2.25
+	self.judge.timers.unequip = 0.65
+	self.judge.timers.equip = 0.65
+	self.judge.FIRE_MODE = "single"
+	self.judge.fire_mode_data = {}
+	self.judge.fire_mode_data.fire_rate = 0.12
+	self.judge.single = {}
+	self.judge.single.fire_rate = 0.21
+	self.judge.name_id = "bm_w_judge"
+	self.judge.desc_id = "bm_w_judge_desc"
+	self.judge.hud_icon = "raging_bull"
+	self.judge.description_id = "des_judge"
+	self.judge.hud_ammo = "guis/textures/ammo_9mm"
+	self.judge.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.judge.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.judge.use_data = {}
+	self.judge.use_data.selection_index = 1
+	self.judge.use_data.align_place = "right_hand"
+	self.judge.DAMAGE = 6
+	self.judge.damage_near = 800
+	self.judge.damage_far = 1200
+	self.judge.rays = 6
+	self.judge.CLIP_AMMO_MAX = 5
+	self.judge.NR_CLIPS_MAX = math.round(total_damage_secondary / 8.5 / self.judge.CLIP_AMMO_MAX)
+	self.judge.AMMO_MAX = self.judge.CLIP_AMMO_MAX * self.judge.NR_CLIPS_MAX
+	self.judge.AMMO_PICKUP = self:_pickup_chance(self.judge.AMMO_MAX, 1)
+	self.judge.spread = {}
+	self.judge.spread.standing = self.r870.spread.standing
+	self.judge.spread.crouching = self.r870.spread.crouching
+	self.judge.spread.steelsight = self.r870.spread.steelsight
+	self.judge.spread.moving_standing = self.r870.spread.moving_standing
+	self.judge.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.judge.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.judge.kick = {}
+	self.judge.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.judge.kick.crouching = self.judge.kick.standing
+	self.judge.kick.steelsight = self.judge.kick.standing
+	self.judge.crosshair = {}
+	self.judge.crosshair.standing = {}
+	self.judge.crosshair.crouching = {}
+	self.judge.crosshair.steelsight = {}
+	self.judge.crosshair.standing.offset = 0.2
+	self.judge.crosshair.standing.moving_offset = 0.8
+	self.judge.crosshair.standing.kick_offset = 0.6
+	self.judge.crosshair.crouching.offset = 0.1
+	self.judge.crosshair.crouching.moving_offset = 0.7
+	self.judge.crosshair.crouching.kick_offset = 0.4
+	self.judge.crosshair.steelsight.hidden = true
+	self.judge.crosshair.steelsight.offset = 0
+	self.judge.crosshair.steelsight.moving_offset = 0
+	self.judge.crosshair.steelsight.kick_offset = 0.1
+	self.judge.shake = {}
+	self.judge.shake.fire_multiplier = 2
+	self.judge.shake.fire_steelsight_multiplier = 2
+	self.judge.autohit = autohit_shotgun_default
+	self.judge.aim_assist = aim_assist_shotgun_default
+	self.judge.weapon_hold = "raging_bull"
+	self.judge.animations = {}
+	self.judge.animations.equip_id = "equip_raging_bull"
+	self.judge.animations.recoil_steelsight = true
+	self.judge.global_value = "pd2_clan"
+	self.judge.texture_bundle_folder = "pd2_million"
+	self.judge.stats = {
+		damage = 30,
+		spread = 4,
+		recoil = 2,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 29,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 	self.m45 = {}
 	self.m45.category = "smg"
 	self.m45.damage_melee = damage_melee_default
@@ -5524,6 +5636,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.judge_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 	self.m45_npc = {
 		usage = "mp5",
 		sounds = {},
@@ -5660,6 +5778,7 @@ function WeaponTweakData:_precalculate_values()
 	self.saw_npc.AMMO_MAX = self.saw_npc.CLIP_AMMO_MAX * self.saw_npc.NR_CLIPS_MAX
 	self.usp_npc.AMMO_MAX = self.usp_npc.CLIP_AMMO_MAX * self.usp_npc.NR_CLIPS_MAX
 	self.g22c_npc.AMMO_MAX = self.g22c_npc.CLIP_AMMO_MAX * self.p226_npc.NR_CLIPS_MAX
+	self.judge_npc.AMMO_MAX = self.judge_npc.CLIP_AMMO_MAX * self.judge_npc.NR_CLIPS_MAX
 	self.m45_npc.AMMO_MAX = self.m45_npc.CLIP_AMMO_MAX * self.m45_npc.NR_CLIPS_MAX
 	self.s552_npc.AMMO_MAX = self.s552_npc.CLIP_AMMO_MAX * self.s552_npc.NR_CLIPS_MAX
 	self.ppk_npc.AMMO_MAX = self.ppk_npc.CLIP_AMMO_MAX * self.ppk_npc.NR_CLIPS_MAX

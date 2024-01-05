@@ -871,14 +871,7 @@ function NetworkPeer:_reload_outfit()
 		}
 		new_outfit_assets.unit.mask_backstraps = mask_backstraps_asset_data
 	end
-	local ids_primary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.primary.factory_id].unit)
-	if not is_local_peer then
-		local inv_index = PlayerInventory._get_weapon_sync_index_from_name(ids_primary_u_name)
-		ids_primary_u_name = HuskPlayerInventory._index_to_weapon_list[inv_index]
-		if type(ids_primary_u_name) == "string" then
-			ids_primary_u_name = Idstring(tweak_data.weapon.factory[ids_primary_u_name].unit)
-		end
-	end
+	local ids_primary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.primary.factory_id .. (is_local_peer and "" or "_npc")].unit)
 	new_outfit_assets.unit.primary_w = {name = ids_primary_u_name}
 	local primary_w_parts = managers.weapon_factory:preload_blueprint(complete_outfit.primary.factory_id, complete_outfit.primary.blueprint, not is_local_peer, function()
 	end, true)
@@ -887,14 +880,7 @@ function NetworkPeer:_reload_outfit()
 			name = part.name
 		}
 	end
-	local ids_secondary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.secondary.factory_id].unit)
-	if not is_local_peer then
-		local inv_index = PlayerInventory._get_weapon_sync_index_from_name(ids_secondary_u_name)
-		ids_secondary_u_name = HuskPlayerInventory._index_to_weapon_list[inv_index]
-		if type(ids_secondary_u_name) == "string" then
-			ids_secondary_u_name = Idstring(tweak_data.weapon.factory[ids_secondary_u_name].unit)
-		end
-	end
+	local ids_secondary_u_name = Idstring(tweak_data.weapon.factory[complete_outfit.secondary.factory_id .. (is_local_peer and "" or "_npc")].unit)
 	new_outfit_assets.unit.secondary_w = {name = ids_secondary_u_name}
 	local secondary_w_parts = managers.weapon_factory:preload_blueprint(complete_outfit.secondary.factory_id, complete_outfit.secondary.blueprint, not is_local_peer, function()
 	end, true)

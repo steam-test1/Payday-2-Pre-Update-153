@@ -4,83 +4,6 @@ PlayerInventory._all_event_types = {
 	"equip",
 	"unequip"
 }
-PlayerInventory._index_to_weapon_list = {
-	Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45"),
-	Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
-	Idstring("units/payday2/weapons/wpn_npc_raging_bull/wpn_npc_raging_bull"),
-	Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
-	Idstring("units/payday2/weapons/wpn_npc_ak47/wpn_npc_ak47"),
-	Idstring("units/payday2/weapons/wpn_npc_r870/wpn_npc_r870"),
-	Idstring("units/payday2/weapons/wpn_npc_sawnoff_shotgun/wpn_npc_sawnoff_shotgun"),
-	Idstring("units/payday2/weapons/wpn_npc_mp5/wpn_npc_mp5"),
-	Idstring("units/payday2/weapons/wpn_npc_mp5_tactical/wpn_npc_mp5_tactical"),
-	Idstring("units/payday2/weapons/wpn_npc_smg_mp9/wpn_npc_smg_mp9"),
-	Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11"),
-	Idstring("units/payday2/weapons/wpn_npc_sniper/wpn_npc_sniper"),
-	Idstring("units/payday2/weapons/wpn_npc_saiga/wpn_npc_saiga"),
-	Idstring("units/payday2/weapons/wpn_npc_lmg_m249/wpn_npc_lmg_m249"),
-	Idstring("units/payday2/weapons/wpn_npc_benelli/wpn_npc_benelli"),
-	Idstring("units/payday2/weapons/wpn_npc_g36/wpn_npc_g36"),
-	Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump"),
-	Idstring("units/payday2/weapons/wpn_npc_scar_murkywater/wpn_npc_scar_murkywater"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_g18c/wpn_fps_pis_g18c"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_amcar/wpn_fps_ass_amcar"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_m16/wpn_fps_ass_m16"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_olympic/wpn_fps_smg_olympic"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_74/wpn_fps_ass_74"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_akm/wpn_fps_ass_akm"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_akm_gold/wpn_fps_ass_akm_gold"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_akmsu/wpn_fps_smg_akmsu"),
-	Idstring("units/payday2/weapons/wpn_fps_shot_saiga/wpn_fps_shot_saiga"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_ak5/wpn_fps_ass_ak5"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_g36/wpn_fps_ass_g36"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_p90/wpn_fps_smg_p90"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_m14/wpn_fps_ass_m14"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_mp9/wpn_fps_smg_mp9"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_deagle/wpn_fps_pis_deagle"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_mp5/wpn_fps_smg_mp5"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_1911/wpn_fps_pis_1911"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_mac10/wpn_fps_smg_mac10"),
-	Idstring("units/payday2/weapons/wpn_fps_shot_r870/wpn_fps_shot_r870"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_g17/wpn_fps_pis_g17"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_b92fs/wpn_fps_pis_beretta"),
-	Idstring("units/payday2/weapons/wpn_fps_shot_huntsman/wpn_fps_shot_huntsman"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_rage/wpn_fps_pis_rage"),
-	Idstring("units/payday2/weapons/wpn_fps_saw/wpn_fps_saw"),
-	Idstring("units/payday2/weapons/wpn_fps_shot_shorty/wpn_fps_shot_shorty"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_usp/wpn_fps_pis_usp"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_g22c/wpn_fps_pis_g22c"),
-	Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45/wpn_fps_smg_m45"),
-	Idstring("units/pd2_dlc1/weapons/wpn_fps_ass_s552/wpn_fps_ass_s552"),
-	Idstring("units/pd2_dlc1/weapons/wpn_fps_pis_ppk/wpn_fps_pis_ppk"),
-	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_smg_mp7/wpn_fps_smg_mp7"),
-	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_ass_scar/wpn_fps_ass_scar"),
-	Idstring("units/pd2_dlc_dec5/weapons/wpn_fps_pis_p226/wpn_fps_pis_p226"),
-	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_hk21/wpn_fps_lmg_hk21"),
-	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_m249/wpn_fps_lmg_m249"),
-	Idstring("units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk/wpn_fps_lmg_rpk"),
-	Idstring("units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_m95/wpn_fps_snp_m95"),
-	Idstring("units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_msr/wpn_fps_snp_msr"),
-	Idstring("units/pd2_dlc_gage_snp/weapons/wpn_fps_snp_r93/wpn_fps_snp_r93"),
-	Idstring("units/pd2_dlc_big/weapons/wpn_fps_ass_fal/wpn_fps_ass_fal"),
-	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_ben/wpn_fps_sho_ben"),
-	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_striker/wpn_fps_sho_striker"),
-	Idstring("units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_ksg/wpn_fps_sho_ksg"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_b92fs/wpn_fps_pis_beretta_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4_secondary"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug_secondary"),
-	Idstring("units/payday2/weapons/wpn_fps_ass_74/wpn_fps_ass_74_secondary"),
-	Idstring("units/pd2_dlc1/weapons/wpn_fps_ass_s552/wpn_fps_ass_s552_secondary"),
-	Idstring("units/payday2/weapons/wpn_fps_saw/wpn_fps_saw_secondary"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_rage/wpn_fps_pis_rage_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_deagle/wpn_fps_pis_deagle_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_1911/wpn_fps_pis_1911_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_pis_g18c/wpn_fps_pis_g18c_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_olympic/wpn_fps_smg_olympic_primary"),
-	Idstring("units/payday2/weapons/wpn_fps_smg_akmsu/wpn_fps_smg_akmsu_primary")
-}
 
 function PlayerInventory:init(unit)
 	self._unit = unit
@@ -315,8 +238,8 @@ function PlayerInventory:equip_selection(selection_index, instant)
 end
 
 function PlayerInventory:_send_equipped_weapon()
-	local eq_weap_name = self:equipped_unit():name()
-	local index = self._get_weapon_sync_index_from_name(eq_weap_name)
+	local eq_weap_name = self:equipped_unit():base()._factory_id or self:equipped_unit():name()
+	local index = self._get_weapon_sync_index(eq_weap_name)
 	if not index then
 		debug_pause("[PlayerInventory:_send_equipped_weapon] cannot sync weapon", eq_weap_name, self._unit)
 		return
@@ -394,12 +317,46 @@ function PlayerInventory:on_death_exit()
 	end
 end
 
-function PlayerInventory._get_weapon_sync_index_from_name(wanted_weap_name)
-	for i, weap_name in pairs(PlayerInventory._index_to_weapon_list) do
-		if (type(weap_name) == "string" and type(wanted_weap_name) == "string" or type(weap_name) ~= "string" and type(wanted_weap_name) ~= "string") and weap_name == wanted_weap_name then
-			return i
+function PlayerInventory._chk_create_w_factory_indexes()
+	if PlayerInventory._weapon_factory_indexed then
+		return
+	end
+	local weapon_factory_indexed = {}
+	PlayerInventory._weapon_factory_indexed = weapon_factory_indexed
+	for id, data in pairs(tweak_data.weapon.factory) do
+		if id ~= "parts" and data.unit then
+			table.insert(weapon_factory_indexed, id)
 		end
 	end
+	table.sort(weapon_factory_indexed, function(a, b)
+		return a < b
+	end)
+end
+
+function PlayerInventory._get_weapon_sync_index(wanted_weap_name)
+	if type_name(wanted_weap_name) == "Idstring" then
+		for i, test_weap_name in ipairs(tweak_data.character.weap_unit_names) do
+			if test_weap_name == wanted_weap_name then
+				return i
+			end
+		end
+	end
+	PlayerInventory._chk_create_w_factory_indexes()
+	local start_index = #tweak_data.character.weap_unit_names
+	for i, factory_id in ipairs(PlayerInventory._weapon_factory_indexed) do
+		if wanted_weap_name == factory_id then
+			return start_index + i
+		end
+	end
+end
+
+function PlayerInventory._get_weapon_name_from_sync_index(w_index)
+	if w_index <= #tweak_data.character.weap_unit_names then
+		return tweak_data.character.weap_unit_names[w_index]
+	end
+	w_index = w_index - #tweak_data.character.weap_unit_names
+	PlayerInventory._chk_create_w_factory_indexes()
+	return PlayerInventory._weapon_factory_indexed[w_index]
 end
 
 function PlayerInventory:hide_equipped_unit()
@@ -424,8 +381,8 @@ end
 
 function PlayerInventory:save(data)
 	if self._equipped_selection then
-		local eq_weap_name = self:equipped_unit():base()._factory_id or self._available_selections[self._equipped_selection].unit:name()
-		local index = self._get_weapon_sync_index_from_name(eq_weap_name) or self._get_weapon_sync_index_from_name(self._available_selections[self._equipped_selection].unit:name())
+		local eq_weap_name = self:equipped_unit():base()._factory_id or self:equipped_unit():name()
+		local index = self._get_weapon_sync_index(eq_weap_name)
 		data.equipped_weapon_index = index
 		data.mask_visibility = self._mask_visibility
 		data.blueprint_string = self:equipped_unit():base().blueprint_to_string and self:equipped_unit():base():blueprint_to_string() or nil
@@ -435,7 +392,7 @@ end
 
 function PlayerInventory:load(data)
 	if data.equipped_weapon_index then
-		local eq_weap_name = self._index_to_weapon_list[data.equipped_weapon_index]
+		local eq_weap_name = self._get_weapon_name_from_sync_index(data.equipped_weapon_index)
 		if type(eq_weap_name) == "string" then
 			self:add_unit_by_factory_name(eq_weap_name, true, true, data.blueprint_string)
 			self:synch_weapon_gadget_state(data.gadget_on)

@@ -1,81 +1,4 @@
 HuskPlayerInventory = HuskPlayerInventory or class(PlayerInventory)
-HuskPlayerInventory._index_to_weapon_list = {
-	Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45"),
-	Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
-	Idstring("units/payday2/weapons/wpn_npc_raging_bull/wpn_npc_raging_bull"),
-	Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
-	Idstring("units/payday2/weapons/wpn_npc_ak47/wpn_npc_ak47"),
-	Idstring("units/payday2/weapons/wpn_npc_r870/wpn_npc_r870"),
-	Idstring("units/payday2/weapons/wpn_npc_sawnoff_shotgun/wpn_npc_sawnoff_shotgun"),
-	Idstring("units/payday2/weapons/wpn_npc_mp5/wpn_npc_mp5"),
-	Idstring("units/payday2/weapons/wpn_npc_mp5_tactical/wpn_npc_mp5_tactical"),
-	Idstring("units/payday2/weapons/wpn_npc_smg_mp9/wpn_npc_smg_mp9"),
-	Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11"),
-	Idstring("units/payday2/weapons/wpn_npc_sniper/wpn_npc_sniper"),
-	Idstring("units/payday2/weapons/wpn_npc_saiga/wpn_npc_saiga"),
-	Idstring("units/payday2/weapons/wpn_npc_lmg_m249/wpn_npc_lmg_m249"),
-	Idstring("units/payday2/weapons/wpn_npc_benelli/wpn_npc_benelli"),
-	Idstring("units/payday2/weapons/wpn_npc_g36/wpn_npc_g36"),
-	Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump"),
-	Idstring("units/payday2/weapons/wpn_npc_scar_murkywater/wpn_npc_scar_murkywater"),
-	"wpn_fps_pis_g18c_npc",
-	"wpn_fps_ass_m4_npc",
-	"wpn_fps_ass_amcar_npc",
-	"wpn_fps_ass_m16_npc",
-	"wpn_fps_smg_olympic_npc",
-	"wpn_fps_ass_74_npc",
-	"wpn_fps_ass_akm_npc",
-	"wpn_fps_ass_akm_gold_npc",
-	"wpn_fps_smg_akmsu_npc",
-	"wpn_fps_shot_saiga_npc",
-	"wpn_fps_ass_ak5_npc",
-	"wpn_fps_ass_aug_npc",
-	"wpn_fps_ass_g36_npc",
-	"wpn_fps_smg_p90_npc",
-	"wpn_fps_ass_m14_npc",
-	"wpn_fps_smg_mp9_npc",
-	"wpn_fps_pis_deagle_npc",
-	"wpn_fps_smg_mp5_npc",
-	"wpn_fps_pis_1911_npc",
-	"wpn_fps_smg_mac10_npc",
-	"wpn_fps_shot_r870_npc",
-	"wpn_fps_pis_g17_npc",
-	"wpn_fps_pis_beretta_npc",
-	"wpn_fps_shot_huntsman_npc",
-	"wpn_fps_pis_rage_npc",
-	"wpn_fps_saw_npc",
-	"wpn_fps_shot_serbu_npc",
-	"wpn_fps_pis_usp_npc",
-	"wpn_fps_pis_g22c_npc",
-	"wpn_fps_smg_m45_npc",
-	"wpn_fps_ass_s552_npc",
-	"wpn_fps_pis_ppk_npc",
-	"wpn_fps_smg_mp7_npc",
-	"wpn_fps_ass_scar_npc",
-	"wpn_fps_pis_p226_npc",
-	"wpn_fps_lmg_hk21_npc",
-	"wpn_fps_lmg_m249_npc",
-	"wpn_fps_lmg_rpk_npc",
-	"wpn_fps_snp_m95_npc",
-	"wpn_fps_snp_msr_npc",
-	"wpn_fps_snp_r93_npc",
-	"wpn_fps_ass_fal_npc",
-	"wpn_fps_sho_ben_npc",
-	"wpn_fps_sho_striker_npc",
-	"wpn_fps_sho_ksg_npc",
-	"wpn_fps_pis_beretta_primary_npc",
-	"wpn_fps_ass_m4_secondary_npc",
-	"wpn_fps_ass_aug_secondary_npc",
-	"wpn_fps_ass_74_secondary_npc",
-	"wpn_fps_ass_s552_secondary_npc",
-	"wpn_fps_saw_secondary_npc",
-	"wpn_fps_pis_rage_primary_npc",
-	"wpn_fps_pis_deagle_primary_npc",
-	"wpn_fps_pis_1911_primary_npc",
-	"wpn_fps_pis_g18c_primary_npc",
-	"wpn_fps_smg_olympic_primary_npc",
-	"wpn_fps_smg_akmsu_primary_npc"
-}
 
 function HuskPlayerInventory:init(unit)
 	HuskPlayerInventory.super.init(self, unit)
@@ -94,7 +17,7 @@ function HuskPlayerInventory:_send_equipped_weapon()
 end
 
 function HuskPlayerInventory:synch_equipped_weapon(weap_index, blueprint_string)
-	local weapon_name = HuskPlayerInventory._index_to_weapon_list[weap_index]
+	local weapon_name = self._get_weapon_name_from_sync_index(weap_index)
 	if type(weapon_name) == "string" then
 		self:add_unit_by_factory_name(weapon_name, true, true, blueprint_string)
 		return
@@ -177,5 +100,19 @@ function HuskPlayerInventory:synch_weapon_gadget_state(state)
 		else
 			self._unit:movement():set_cbt_permanent(false)
 		end
+	end
+end
+
+function HuskPlayerInventory._get_weapon_name_from_sync_index(w_index)
+	if w_index <= #tweak_data.character.weap_unit_names then
+		return tweak_data.character.weap_unit_names[w_index]
+	end
+	w_index = w_index - #tweak_data.character.weap_unit_names
+	HuskPlayerInventory._chk_create_w_factory_indexes()
+	local fps_id = PlayerInventory._weapon_factory_indexed[w_index]
+	if tweak_data.weapon.factory[fps_id .. "_npc"] then
+		return fps_id .. "_npc"
+	else
+		return fps_id
 	end
 end

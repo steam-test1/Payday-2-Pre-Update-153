@@ -955,7 +955,7 @@ end
 
 function StatisticsManager:killed(data)
 	data.type = tweak_data.character[data.name] and tweak_data.character[data.name].challenges.type
-	if not self._global.killed[data.name] then
+	if not self._global.killed[data.name] or not self._global.session.killed[data.name] then
 		Application:error("Bad name id applied to killed, " .. tostring(data.name) .. ". Defaulting to 'other'")
 		data.name = "other"
 	end

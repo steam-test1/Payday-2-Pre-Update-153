@@ -732,16 +732,16 @@ function MoneyManager:get_mask_crafting_price(mask_id, global_value, blueprint, 
 		color = "colors"
 	}
 	bonus_global_values[global_value] = (bonus_global_values[global_value] or 0) + 1
-	blueprint = blueprint or managers.blackmarket:get_default_mask_blueprint()
+	blueprint = blueprint or default_blueprint
 	for id, data in pairs(blueprint) do
 		if not default_blueprint[id] or data.id ~= default_blueprint[id].id then
 			local part_pc = tweak_data.blackmarket[part_name_converter[id]] and self:_get_pc_entry(tweak_data.blackmarket[part_name_converter[id]][data.id]) or 1
 			local star_value = tweak_data.blackmarket[part_name_converter[id]] and tweak_data.blackmarket[part_name_converter[id]][data.id] and tweak_data.blackmarket[part_name_converter[id]][data.id].value or 1
 			if 0 < star_value then
-				local gv = data.global_value
-				local gv_tweak_data = tweak_data.lootdrop.global_values[gv or "normal"]
+				local gv = data.global_value or "normal"
+				local gv_tweak_data = tweak_data.lootdrop.global_values[gv]
 				local gv_multiplier = gv_tweak_data and gv_tweak_data.value_multiplier or 1
-				bonus_global_values[data.global_value] = (bonus_global_values[data.global_value] or 0) + 1
+				bonus_global_values[gv] = (bonus_global_values[gv] or 0) + 1
 				local pv = 0 < star_value and self:get_tweak_value("money_manager", "masks", id .. "_value", star_value) or 0
 				parts_value = parts_value + pv * gv_multiplier
 			end

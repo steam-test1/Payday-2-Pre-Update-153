@@ -123,6 +123,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_serbu()
 	self:_init_usp()
 	self:_init_g22c()
+	self:_init_judge()
 	self:_init_m45()
 	self:_init_s552()
 	self:_init_ppk()
@@ -678,6 +679,9 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_sho_ksg = {
 				translation = Vector3(0, 0, -1.3)
+			},
+			wpn_fps_pis_judge = {
+				translation = Vector3(0, -10, -6)
 			}
 		},
 		forbids = {
@@ -1250,6 +1254,9 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_sho_ksg = {
 				translation = Vector3(0, 0, -1.3)
+			},
+			wpn_fps_pis_judge = {
+				translation = Vector3(0, -10, -5.4)
 			}
 		},
 		forbids = {
@@ -8040,6 +8047,143 @@ function WeaponFactoryTweakData:_init_g22c()
 	self.wpn_fps_pis_g22c_npc.unit = "units/payday2/weapons/wpn_fps_pis_g22c/wpn_fps_pis_g22c_npc"
 end
 
+function WeaponFactoryTweakData:_init_judge()
+	self.parts.wpn_fps_pis_judge_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_judge_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_million/weapons/wpn_fps_pis_judge_pts/wpn_fps_pis_judge_body_standard",
+		stats = {value = 1},
+		forbids = {
+			"wpn_fps_addon_ris"
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_judge_b_standard = {
+		type = "slide",
+		name_id = "bm_wp_judge_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_million/weapons/wpn_fps_pis_judge_pts/wpn_fps_pis_judge_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_judge_fl_adapter = {
+		type = "extra",
+		name_id = "bm_wp_judge_b_standard",
+		a_obj = "a_fl_body",
+		unit = "units/pd2_million/weapons/wpn_fps_pis_judge_pts/wpn_fps_pis_judge_fl_adapter",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_judge_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_judge_b_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_million/weapons/wpn_fps_pis_judge_pts/wpn_fps_pis_judge_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_judge_body_standard.third_unit = "units/pd2_million/weapons/wpn_third_pis_judge_pts/wpn_third_pis_judge_body_standard"
+	self.parts.wpn_fps_pis_judge_b_standard.third_unit = "units/pd2_million/weapons/wpn_third_pis_judge_pts/wpn_third_pis_judge_b_standard"
+	self.parts.wpn_fps_pis_judge_fl_adapter.third_unit = "units/pd2_million/weapons/wpn_third_pis_judge_pts/wpn_third_pis_judge_fl_adapter"
+	self.parts.wpn_fps_pis_judge_g_standard.third_unit = "units/pd2_million/weapons/wpn_third_pis_judge_pts/wpn_third_pis_judge_g_standard"
+	self.wpn_fps_pis_judge = {}
+	self.wpn_fps_pis_judge.unit = "units/pd2_million/weapons/wpn_fps_pis_judge/wpn_fps_pis_judge"
+	self.wpn_fps_pis_judge.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_pis_judge.override = {
+		wpn_fps_upg_ns_shot_shark = {parent = "slide"},
+		wpn_fps_upg_ns_shot_thick = {parent = "slide"},
+		wpn_fps_upg_shot_ns_king = {parent = "slide"}
+	}
+	self.wpn_fps_pis_judge.adds = {
+		wpn_fps_upg_fl_ass_laser = {
+			"wpn_fps_pis_judge_fl_adapter"
+		},
+		wpn_fps_upg_fl_ass_peq15 = {
+			"wpn_fps_pis_judge_fl_adapter"
+		},
+		wpn_fps_upg_fl_ass_smg_sho_peqbox = {
+			"wpn_fps_pis_judge_fl_adapter"
+		},
+		wpn_fps_upg_fl_ass_smg_sho_surefire = {
+			"wpn_fps_pis_judge_fl_adapter"
+		},
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_pis_rage_o_adapter"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_pis_rage_o_adapter"
+		}
+	}
+	self.wpn_fps_pis_judge.default_blueprint = {
+		"wpn_fps_pis_judge_body_standard",
+		"wpn_fps_pis_judge_b_standard",
+		"wpn_fps_pis_judge_g_standard"
+	}
+	self.wpn_fps_pis_judge.uses_parts = {
+		"wpn_fps_pis_judge_body_standard",
+		"wpn_fps_pis_judge_b_standard",
+		"wpn_fps_pis_judge_g_standard",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_ns_shot_thick",
+		"wpn_fps_upg_ns_shot_shark",
+		"wpn_fps_upg_shot_ns_king",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs"
+	}
+	self.wpn_fps_pis_judge_npc = deep_clone(self.wpn_fps_pis_judge)
+	self.wpn_fps_pis_judge_npc.unit = "units/pd2_million/weapons/wpn_fps_pis_judge/wpn_fps_pis_judge_npc"
+end
+
 function WeaponFactoryTweakData:_init_m45()
 	self.parts.wpn_fps_smg_m45_m_mag = {
 		type = "magazine",
@@ -11550,7 +11694,8 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_shot_serbu",
 		"wpn_fps_sho_ben",
 		"wpn_fps_sho_striker",
-		"wpn_fps_sho_ksg"
+		"wpn_fps_sho_ksg",
+		"wpn_fps_pis_judge"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then

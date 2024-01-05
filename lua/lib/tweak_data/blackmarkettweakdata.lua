@@ -4785,5 +4785,31 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.becker.sounds.hit_gen = "becker_hit_gen"
 	self.melee_weapons.becker.sounds.hit_body = "becker_hit_body"
 	self.melee_weapons.becker.sounds.charge = "knife_charge"
+	self.melee_weapons.moneybundle = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.moneybundle.name_id = "bm_melee_moneybundle"
+	self.melee_weapons.moneybundle.dlc = "pd2_clan"
+	self.melee_weapons.moneybundle.texture_bundle_folder = "pd2_million"
+	self.melee_weapons.moneybundle.free = nil
+	self.melee_weapons.moneybundle.anim_global_param = "melee_axe"
+	self.melee_weapons.moneybundle.type = "axe"
+	self.melee_weapons.moneybundle.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.moneybundle.unit = "units/pd2_million/weapons/wpn_fps_mel_moneybundle/wpn_fps_mel_moneybundle"
+	self.melee_weapons.moneybundle.third_unit = "units/pd2_million/weapons/wpn_third_mel_moneybundle/wpn_third_mel_moneybundle"
+	self.melee_weapons.moneybundle.stats.weapon_type = "blunt"
+	self.melee_weapons.moneybundle.stats.min_damage = 0.2
+	self.melee_weapons.moneybundle.stats.max_damage = 1
+	self.melee_weapons.moneybundle.stats.min_damage_effect = 15
+	self.melee_weapons.moneybundle.stats.max_damage_effect = 10
+	self.melee_weapons.moneybundle.stats.charge_time = 1
+	self.melee_weapons.moneybundle.stats.range = 150
+	self.melee_weapons.moneybundle.sounds = {}
+	self.melee_weapons.moneybundle.repeat_expire_t = 0.5
+	self.melee_weapons.moneybundle.sounds.equip = "cash_equip"
+	self.melee_weapons.moneybundle.sounds.hit_air = "cash_hit_air"
+	self.melee_weapons.moneybundle.sounds.hit_gen = "cash_hit_gen"
+	self.melee_weapons.moneybundle.sounds.hit_body = "cash_hit_body"
+	self.melee_weapons.moneybundle.sounds.charge = "cash_charge"
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

@@ -1,5 +1,4 @@
 CopInventory = CopInventory or class(PlayerInventory)
-CopInventory._index_to_weapon_list = HuskPlayerInventory._index_to_weapon_list
 
 function CopInventory:init(unit)
 	CopInventory.super.init(self, unit)

@@ -426,7 +426,7 @@ end
 
 function HUDMissionBriefing:_apply_ghost_color(ghost, i, is_unknown)
 	local accumulated_ghost_bonus = managers.job:get_accumulated_ghost_bonus()
-	local agb = accumulated_ghost_bonus[i]
+	local agb = accumulated_ghost_bonus and accumulated_ghost_bonus[i]
 	if is_unknown then
 		ghost:set_color(Color(64, 255, 255, 255) / 255)
 	elseif i == managers.job:current_stage() then
