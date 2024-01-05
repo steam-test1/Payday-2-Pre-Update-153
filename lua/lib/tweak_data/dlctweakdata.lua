@@ -774,6 +774,21 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.twitch_pack = {}
+	self.twitch_pack.content = {}
+	self.twitch_pack.dlc = "has_twitch_pack"
+	self.twitch_pack.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "twitch_orc",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ancient",
+			amount = 1
+		}
+	}
 	self.sweettooth = {}
 	self.sweettooth.content = {}
 	self.sweettooth.dlc = "has_sweettooth"

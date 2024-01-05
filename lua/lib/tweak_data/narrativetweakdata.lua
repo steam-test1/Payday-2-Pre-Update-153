@@ -1693,13 +1693,6 @@ function NarrativeTweakData:init()
 		2,
 		2.75
 	}
-	self.jobs.kosugi.experience_mul = {
-		1,
-		1,
-		1.75,
-		3.6,
-		4.6
-	}
 	self.jobs.kosugi.chain = {
 		{
 			level_id = "kosugi",

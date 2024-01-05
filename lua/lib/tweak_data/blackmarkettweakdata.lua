@@ -1101,6 +1101,24 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.samurai.value = 0
 	self.masks.samurai.qlvl = 0
 	self.masks.samurai.infamous = true
+	self.masks.twitch_orc = {}
+	self.masks.twitch_orc.unit = "units/pd2_twitch_pack/masks/msk_twitch_orc/msk_twitch_orc"
+	self.masks.twitch_orc.name_id = "bm_msk_twitch_orc"
+	self.masks.twitch_orc.pcs = {}
+	self.masks.twitch_orc.value = 0
+	self.masks.twitch_orc.qlvl = 0
+	self.masks.twitch_orc.texture_bundle_folder = "twitch_pack"
+	self.masks.twitch_orc.dlc = "twitch_pack"
+	self.masks.twitch_orc.statistics = false
+	self.masks.ancient = {}
+	self.masks.ancient.unit = "units/pd2_twitch_pack/masks/msk_ancient/msk_ancient"
+	self.masks.ancient.name_id = "bm_msk_ancient"
+	self.masks.ancient.pcs = {}
+	self.masks.ancient.value = 0
+	self.masks.ancient.qlvl = 0
+	self.masks.ancient.texture_bundle_folder = "twitch_pack"
+	self.masks.ancient.dlc = "twitch_pack"
+	self.masks.ancient.statistics = false
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

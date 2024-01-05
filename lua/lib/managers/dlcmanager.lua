@@ -1,10 +1,11 @@
 DLCManager = DLCManager or class()
 DLCManager.PLATFORM_CLASS_MAP = {}
 DLCManager.BUNDLED_DLC_PACKAGES = {
+	infamous = true,
+	twitch_pack = true,
 	dlc1 = true,
 	gage_pack = true,
 	gage_pack_lmg = true,
-	infamous = true,
 	gage_pack_jobs = true,
 	gage_pack_snp = true,
 	season_pass = false,
@@ -182,6 +183,10 @@ end
 
 function GenericDLCManager:has_xmas_soundtrack()
 	return Global.dlc_manager.all_dlc_data.xmas_soundtrack and Global.dlc_manager.all_dlc_data.xmas_soundtrack.verified
+end
+
+function GenericDLCManager:has_twitch_pack()
+	return Global.dlc_manager.all_dlc_data.twitch_pack and Global.dlc_manager.all_dlc_data.twitch_pack.verified
 end
 
 function GenericDLCManager:has_achievement(data)
@@ -440,6 +445,7 @@ function WINDLCManager:init()
 			gage_pack_jobs = {app_id = "259381", no_install = true},
 			gage_pack_snp = {app_id = "259380", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
+			twitch_pack = {app_id = "306110", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			}

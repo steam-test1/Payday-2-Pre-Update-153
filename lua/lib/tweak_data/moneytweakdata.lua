@@ -138,6 +138,7 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.sweettooth = 1
 	self.global_value_multipliers.legendary = 1
 	self.global_value_multipliers.poetry_soundtrack = 0
+	self.global_value_multipliers.twitch_pack = 0
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -158,6 +159,7 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.sweettooth = 0
 	self.global_value_bonus_multiplier.legendary = 0
 	self.global_value_bonus_multiplier.poetry_soundtrack = 0
+	self.global_value_bonus_multiplier.twitch_pack = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
