@@ -41,6 +41,9 @@ function MenuSceneManager:init()
 	self._global_poses.snp = {
 		"husk_bullpup"
 	}
+	self._global_poses.lmg = {
+		"husk_bullpup"
+	}
 	self._global_poses.infamous = {
 		"husk_infamous1",
 		"husk_infamous2"

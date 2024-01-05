@@ -98,7 +98,7 @@ function EditUnitTriggable:change_time(ctrls)
 end
 
 function EditUnitTriggable:remove_element(ctrls)
-	self._ctrls.unit:damage():remove_trigger_data(ctrls.trigger_name, ctrls.id, true)
+	self._ctrls.unit:damage():remove_trigger_func(ctrls.trigger_name, ctrls.id, true)
 	self:update_element_gui()
 end
 
