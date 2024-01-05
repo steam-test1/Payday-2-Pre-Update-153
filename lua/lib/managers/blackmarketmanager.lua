@@ -2212,7 +2212,7 @@ function BlackMarketManager:modify_weapon(category, slot, global_value, part_id,
 	self:_on_modified_weapon(category, slot)
 end
 
-function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, part_id, free_of_charge)
+function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, part_id, free_of_charge, no_consume)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		Application:error("[BlackMarketManager:modify_weapon] Trying to buy and modify weapon that doesn't exist", category, slot)
 		return
@@ -2220,10 +2220,12 @@ function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, 
 	self:modify_weapon(category, slot, global_value, part_id)
 	if not free_of_charge then
 		managers.money:on_buy_weapon_modification(self._global.crafted_items[category][slot].weapon_id, part_id, global_value)
+		managers.achievment:award("would_you_like_your_receipt")
+	end
+	if not no_consume then
 		self:remove_item(global_value, "weapon_mods", part_id)
 		self:alter_global_value_item(global_value, "weapon_mods", slot, part_id, INV_REMOVE)
 		self:alter_global_value_item(global_value, category, slot, part_id, CRAFT_ADD)
-		managers.achievment:award("would_you_like_your_receipt")
 	else
 	end
 end
@@ -3612,7 +3614,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 			if crafted_category[data.slot] then
 				Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid Weapon part", "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
 				if data.default_mod then
-					self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true)
+					self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true, true)
 				else
 					self:remove_weapon_part(category, data.slot, data.global_value, data.part_id)
 				end
@@ -3754,7 +3756,7 @@ function BlackMarketManager:_verify_dlc_items()
 								end
 							end
 							if default_mod then
-								self:buy_and_modify_weapon("primaries", slot, "normal", default_mod, true)
+								self:buy_and_modify_weapon("primaries", slot, "normal", default_mod, true, true)
 							else
 								self:remove_weapon_part("primaries", slot, package_id, part_id)
 							end
@@ -3784,7 +3786,7 @@ function BlackMarketManager:_verify_dlc_items()
 								end
 							end
 							if default_mod then
-								self:buy_and_modify_weapon("secondaries", slot, "normal", default_mod, true)
+								self:buy_and_modify_weapon("secondaries", slot, "normal", default_mod, true, true)
 							else
 								self:remove_weapon_part("secondaries", slot, package_id, part_id)
 							end

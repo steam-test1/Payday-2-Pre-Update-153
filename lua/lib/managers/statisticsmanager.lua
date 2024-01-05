@@ -1419,21 +1419,23 @@ function StatisticsManager:health_subtracted(amount)
 end
 
 function StatisticsManager:shot_fired(data)
-	self._global.shots_fired.total = self._global.shots_fired.total + 1
-	self._global.session.shots_fired.total = self._global.session.shots_fired.total + 1
 	local name_id = data.weapon_unit:base():get_name_id()
-	self._global.session.shots_by_weapon[name_id] = self._global.session.shots_by_weapon[name_id] or {hits = 0, total = 0}
-	self._global.session.shots_by_weapon[name_id].total = self._global.session.shots_by_weapon[name_id].total + 1
-	self._global.shots_by_weapon[name_id] = self._global.shots_by_weapon[name_id] or {hits = 0, total = 0}
-	self._global.shots_by_weapon[name_id].total = self._global.shots_by_weapon[name_id].total + 1
+	if not data.skip_bullet_count then
+		self._global.shots_fired.total = self._global.shots_fired.total + 1
+		self._global.session.shots_fired.total = self._global.session.shots_fired.total + 1
+		self._global.session.shots_by_weapon[name_id] = self._global.session.shots_by_weapon[name_id] or {hits = 0, total = 0}
+		self._global.session.shots_by_weapon[name_id].total = self._global.session.shots_by_weapon[name_id].total + 1
+		self._global.shots_by_weapon[name_id] = self._global.shots_by_weapon[name_id] or {hits = 0, total = 0}
+		self._global.shots_by_weapon[name_id].total = self._global.shots_by_weapon[name_id].total + 1
+		if name_id == "m14" then
+			self._m14_shots = self._m14_shots + 1
+		end
+	end
 	if data.hit then
 		self._global.shots_fired.hits = self._global.shots_fired.hits + 1
 		self._global.session.shots_fired.hits = self._global.session.shots_fired.hits + 1
 		self._global.session.shots_by_weapon[name_id].hits = self._global.session.shots_by_weapon[name_id].hits + 1
 		self._global.shots_by_weapon[name_id].hits = self._global.shots_by_weapon[name_id].hits + 1
-	end
-	if name_id == "m14" then
-		self._m14_shots = self._m14_shots + 1
 	end
 end
 
@@ -1749,7 +1751,7 @@ function StatisticsManager:send_statistics()
 	local total_kills = self:session_total_kills()
 	local total_specials_kills = self:session_total_specials_kills()
 	local total_head_shots = self:session_total_head_shots()
-	local accuracy = self:session_hit_accuracy()
+	local accuracy = math.min(self:session_hit_accuracy(), 1000)
 	local downs = self:total_downed()
 	if Network:is_server() then
 		managers.network:game():on_statistics_recieved(peer_id, total_kills, total_specials_kills, total_head_shots, accuracy, downs)

@@ -2123,6 +2123,10 @@ function MenuCallbackHandler:set_fov_zoom(item)
 	end
 end
 
+function MenuCallbackHandler:toggle_headbob(item)
+	managers.user:set_setting("use_headbob", item:value() == "on")
+end
+
 function MenuCallbackHandler:retry_job_stage()
 	managers.loot:on_retry_job_stage()
 	managers.job:on_retry_job_stage()
@@ -5093,6 +5097,7 @@ function MenuOptionInitiator:modify_adv_video(node)
 		node:item("fov_multiplier"):set_value(managers.user:get_setting("fov_multiplier"))
 	end
 	node:item("choose_fps_cap"):set_value(managers.user:get_setting("fps_cap"))
+	node:item("use_headbob"):set_value(managers.user:get_setting("use_headbob") and "on" or "off")
 	local option_value = "off"
 	local dof_setting_item = node:item("toggle_dof")
 	if dof_setting_item then

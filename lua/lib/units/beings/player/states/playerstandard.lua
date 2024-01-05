@@ -798,7 +798,7 @@ function PlayerStandard:_start_action_running(t)
 	if not self._unit:movement():is_above_stamina_threshold() then
 		return
 	end
-	if not self._state_data.shake_player_start_running or not self._ext_camera:shaker():is_playing(self._state_data.shake_player_start_running) then
+	if (not self._state_data.shake_player_start_running or not self._ext_camera:shaker():is_playing(self._state_data.shake_player_start_running)) and managers.user:get_setting("use_headbob") then
 		self._state_data.shake_player_start_running = self._ext_camera:play_shaker("player_start_running", 0.75)
 	end
 	self:set_running(true)

@@ -174,6 +174,9 @@ function ActionSpooc:_chk_target_invalid()
 	if not self._target_unit then
 		return true
 	end
+	if self._target_unit:movement():zipline_unit() then
+		return true
+	end
 	local record = managers.groupai:state():criminal_record(self._target_unit:key())
 	if not record or record.status then
 		return true
@@ -270,7 +273,7 @@ function ActionSpooc:_upd_chase_path()
 	local walk_ray
 	if not simplified then
 		ray_params.tracker_from = nil
-		ray_params.pos_from = self._nav_path[#self._nav_path - 1]
+		ray_params.pos_from = self._nav_path[math.max(1, #self._nav_path - 1)]
 		walk_ray = managers.navigation:raycast(ray_params)
 	end
 	if walk_ray then

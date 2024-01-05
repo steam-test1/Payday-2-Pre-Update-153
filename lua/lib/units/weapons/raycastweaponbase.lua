@@ -311,7 +311,10 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 			hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
 		end
 		self._shot_fired_stats_table.hit = hit_unit and true or false
-		managers.statistics:shot_fired(self._shot_fired_stats_table)
+		if not shoot_through_data or hit_unit then
+			self._shot_fired_stats_table.skip_bullet_count = shoot_through_data and true
+			managers.statistics:shot_fired(self._shot_fired_stats_table)
+		end
 	elseif col_ray then
 		hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, user_unit, damage)
 	end
@@ -343,7 +346,9 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 				if not self._can_shoot_through_enemy then
 				else
 					local killed = hit_unit.type == "death"
-					kills = (shoot_through_data and shoot_through_data.kills or 0) + (killed and 1 or 0)
+					local unit_type = col_ray.unit:base() and col_ray.unit:base()._tweak_table
+					local is_enemy = unit_type ~= "civilian" and unit_type ~= "civilian_female" and unit_type ~= "bank_manager"
+					kills = (shoot_through_data and shoot_through_data.kills or 0) + (killed and is_enemy and 1 or 0)
 					self._shoot_through_data.kills = kills
 					if 0.1 > col_ray.distance or ray_distance - col_ray.distance < 50 then
 					else
@@ -372,7 +377,7 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 						else
 							local ray_from_unit = hit_unit and col_ray.unit
 							if is_shield then
-								dmg_mul = dmg_mul * 0.25
+								dmg_mul = (dmg_mul or 1) * 0.25
 							end
 							self._shoot_through_data.has_hit_wall = has_hit_wall or is_wall
 							self._shoot_through_data.has_passed_shield = has_passed_shield or is_shield

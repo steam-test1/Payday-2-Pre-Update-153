@@ -8200,7 +8200,7 @@ end
 function BlackMarketGui:_buy_mod_callback(data)
 	self._item_bought = true
 	managers.menu_component:post_event("item_buy")
-	managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.name, data.free_of_charge)
+	managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.name, false, data.free_of_charge)
 	local factory = tweak_data.weapon.factory.parts[data.name]
 	if factory then
 		local texture_switch = factory.texture_switch
@@ -8239,7 +8239,7 @@ end
 function BlackMarketGui:_remove_mod_callback(data)
 	managers.menu_component:post_event("item_sell")
 	if data.default_mod then
-		managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.default_mod, true)
+		managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.default_mod, true, true)
 	else
 		managers.blackmarket:remove_weapon_part(data.category, data.slot, data.global_value, data.name)
 	end
