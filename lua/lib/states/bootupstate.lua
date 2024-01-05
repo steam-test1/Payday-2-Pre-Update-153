@@ -96,6 +96,7 @@ function BootupState:setup()
 	local has_full_game = managers.dlc:has_full_game()
 	local legal_text = managers.localization:text("legal_text")
 	local item_layer = self._back_drop_gui:background_layers()
+	local intro_trailer_layer = self._back_drop_gui:foreground_layers()
 	self._play_data_list = {
 		{
 			visible = not is_win32,
@@ -118,6 +119,15 @@ function BootupState:setup()
 			fade_in = 1.25,
 			duration = show_esrb and 6.5 or 0,
 			fade_out = 1.25
+		},
+		{
+			visible = is_win32,
+			layer = intro_trailer_layer,
+			video = "movies/intro_trailer",
+			width = res.x,
+			height = res.y,
+			padding = 200,
+			can_skip = true
 		},
 		{
 			layer = item_layer,
@@ -311,6 +321,7 @@ function BootupState:play_next()
 		}
 		if self._play_data.video then
 			gui_config.video = self._play_data.video
+			gui_config.layer = self._play_data.layer or gui_config.layer
 			self._gui_obj = self._full_panel:video(gui_config)
 			if not managers.music:has_music_control() then
 				self._gui_obj:set_volume_gain(0)
