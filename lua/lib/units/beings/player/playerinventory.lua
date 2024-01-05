@@ -170,6 +170,9 @@ function PlayerInventory:clbk_weapon_unit_destroyed(weap_unit)
 	local weapon_key = weap_unit:key()
 	for i_sel, sel_data in pairs(self._available_selections) do
 		if sel_data.unit:key() == weapon_key then
+			if i_sel == self._equipped_selection then
+				self:_call_listeners("unequip")
+			end
 			if managers.dyn_resource:has_resource(Idstring("unit"), weap_unit:name(), "packages/dyn_resources") then
 				managers.dyn_resource:unload(Idstring("unit"), weap_unit:name(), "packages/dyn_resources", false)
 			end

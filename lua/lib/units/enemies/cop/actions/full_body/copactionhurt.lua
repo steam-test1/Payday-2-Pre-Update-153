@@ -341,7 +341,7 @@ function CopActionHurt:init(action_desc, common_data)
 			if action_type == "counter_tased" then
 				weapon_unit:base():on_reload()
 				shoot_chance = 1
-			elseif action_type == "death" or action_type == "hurt" or action_type == "heavy_hurt" or action_type == "counter_tased" then
+			elseif action_type == "death" or action_type == "hurt" or action_type == "heavy_hurt" then
 				shoot_chance = 0.1
 			end
 		end

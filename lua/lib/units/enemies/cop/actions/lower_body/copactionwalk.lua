@@ -1523,7 +1523,7 @@ function CopActionWalk:_upd_wait(t)
 	end
 	if not self._end_of_curved_path or not self._persistent then
 		self._curve_path_index = 1
-		if not self._simplified_path[2].x then
+		if self._simplified_path[2] and not self._simplified_path[2].x then
 			self._next_is_nav_link = self._simplified_path[2]
 		end
 		self:_chk_start_anim(self._nav_point_pos(self._simplified_path[2]))
@@ -1695,7 +1695,7 @@ function CopActionWalk:stop(pos)
 			self._end_of_curved_path = nil
 		end
 	end
-	if is_initialized and self.update ~= self._upd_nav_link and self.update ~= self._upd_nav_link_first_frame and self.update ~= self._upd_nav_link_blend_to_idle and self.update ~= self._upd_stop_anim_first_frame and self.update ~= self._upd_stop_anim and self.update ~= self._upd_walk_turn_first_frame and self.update ~= self._upd_walk_turn then
+	if is_initialized and #s_path == 3 and self.update ~= self._upd_nav_link and self.update ~= self._upd_nav_link_first_frame and self.update ~= self._upd_nav_link_blend_to_idle and self.update ~= self._upd_stop_anim_first_frame and self.update ~= self._upd_stop_anim and self.update ~= self._upd_walk_turn_first_frame and self.update ~= self._upd_walk_turn then
 		local ray_params = {
 			tracker_from = self._common_data.nav_tracker,
 			pos_to = pos
@@ -1711,10 +1711,7 @@ function CopActionWalk:stop(pos)
 				mvector3.copy(self._common_data.pos),
 				stop_pos
 			}
-			local i = 2
-			while i < #s_path do
-				table.remove(s_path, i)
-			end
+			table.remove(s_path, 2)
 		end
 	end
 end
