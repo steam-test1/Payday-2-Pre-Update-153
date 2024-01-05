@@ -39,17 +39,14 @@ function PlayerSound:play(sound_name, source_name, sync)
 	local event_id
 	if type(sound_name) == "number" then
 		event_id = sound_name
+		sound_name = nil
 	end
 	if sync then
 		event_id = event_id or SoundDevice:string_to_id(sound_name)
 		source_name = source_name or ""
 		self._unit:network():send("unit_sound_play", event_id, source_name)
 	end
-	local event = self:_play(event_id or sound_name, source_name)
-	if not event then
-		Application:error("[PlayerSound:play] event not found in Wwise", sound_name, event_id, self._unit)
-		return
-	end
+	local event = self:_play(sound_name or event_id, source_name)
 	return event
 end
 
@@ -91,17 +88,14 @@ function PlayerSound:say(sound_name, important_say, sync)
 	local event_id
 	if type(sound_name) == "number" then
 		event_id = sound_name
+		sound_name = nil
 	end
 	if sync then
 		event_id = event_id or SoundDevice:string_to_id(sound_name)
 		self._unit:network():send("say", event_id)
 	end
-	self._last_speech = self:_play(event_id or sound_name, nil, true)
-	if not self._last_speech then
-		Application:error("[PlayerSound:say] event not found in Wwise", sound_name, event_id, self._unit)
-		return
-	end
-	if important_say then
+	self._last_speech = self:_play(sound_name or event_id, nil, true)
+	if important_say and self._last_speech then
 		managers.hud:set_mugshot_talk(self._unit:unit_data().mugshot_id, true)
 		self._speaking = true
 	end

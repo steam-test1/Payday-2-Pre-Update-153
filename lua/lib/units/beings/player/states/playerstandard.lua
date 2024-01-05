@@ -1010,7 +1010,7 @@ end
 
 function PlayerStandard:_update_interaction_timers(t)
 	if self._interact_expire_t then
-		if not alive(self._interact_params.object) or self._interact_params.object ~= managers.interaction:active_object() or self._interact_params.tweak_data ~= self._interact_params.object:interaction().tweak_data then
+		if not alive(self._interact_params.object) or self._interact_params.object ~= managers.interaction:active_object() or self._interact_params.tweak_data ~= self._interact_params.object:interaction().tweak_data or self._interact_params.object:interaction():check_interupt() then
 			self:_interupt_action_interact(t)
 		else
 			managers.hud:set_interaction_bar_width(self._interact_params.timer - (self._interact_expire_t - t), self._interact_params.timer)
@@ -1193,9 +1193,9 @@ function PlayerStandard:_do_melee_damage(t)
 			})
 		end
 		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
-			col_ray.body:extension().damage:damage_melee(self._unit, col_ray.normal, col_ray.position, col_ray.direction, damage)
+			col_ray.body:extension().damage:damage_melee(self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 			if hit_unit:id() ~= -1 then
-				managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.direction, damage)
+				managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 			end
 		end
 		managers.rumble:play("melee_hit")
@@ -1623,7 +1623,9 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 					voice_type = "escort"
 				end
 			else
-				if prime_target.unit:anim_data().move then
+				if prime_target.unit:movement():stance_name() == "cbt" and prime_target.unit:anim_data().stand then
+					voice_type = "come"
+				elseif prime_target.unit:anim_data().move then
 					voice_type = "stop"
 				elseif prime_target.unit:anim_data().drop then
 					voice_type = "down_stay"
@@ -1769,15 +1771,12 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "mark_cop" or voice_type == "mark_cop_quiet" then
 			interact_type = "cmd_point"
 			if voice_type == "mark_cop_quiet" then
-				sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout .. "x_any"
+				sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout .. "_any"
 			else
 				sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout .. "x_any"
 			end
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
-				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-				prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
-				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
+				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 			end
 		elseif voice_type == "down" then
 			interact_type = "cmd_down"
@@ -1799,11 +1798,12 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "come" then
 			interact_type = "cmd_come"
 			local static_data = managers.criminals:character_static_data_by_unit(prime_target.unit)
-			if not static_data then
-				return
+			if static_data then
+				local character_code = static_data.ssuffix
+				sound_name = "f21" .. character_code .. "_sin"
+			else
+				sound_name = "f38_any"
 			end
-			local character_code = static_data.ssuffix
-			sound_name = "f21" .. character_code .. "_sin"
 		elseif voice_type == "revive" then
 			interact_type = "cmd_get_up"
 			local static_data = managers.criminals:character_static_data_by_unit(prime_target.unit)
@@ -1852,8 +1852,7 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "mark_camera" then
 			sound_name = "quiet"
 			interact_type = "cmd_point"
-			prime_target.unit:contour():add("mark_unit")
-			managers.network:session():send_to_peers_synched("mark_contour_unit", prime_target.unit)
+			prime_target.unit:contour():add("mark_unit", true)
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
 	end

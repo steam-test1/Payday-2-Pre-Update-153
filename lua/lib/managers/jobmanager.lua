@@ -10,8 +10,232 @@ function JobManager:_setup()
 		Global.job_manager = {}
 		self:_setup_job_heat()
 		self:_setup_heat_job_containers()
+		self:_setup_job_ghosts()
 	end
 	self._global = Global.job_manager
+end
+
+function JobManager:_setup_job_ghosts()
+	Global.job_manager.saved_ghost_bonus = Application:digest_value(0, true)
+	Global.job_manager.active_ghost_bonus = nil
+	Global.job_manager.accumulated_ghost_bonus = nil
+end
+
+function JobManager:reset_ghost_bonus()
+	self:_setup_job_ghosts()
+end
+
+function JobManager:clear_saved_ghost_bonus()
+	if self:current_job_id() == "safehouse" or self:is_job_finished() or self:stage_success() and self:on_last_stage() then
+		return
+	end
+	self._global.saved_ghost_bonus = Application:digest_value(0, true)
+end
+
+function JobManager:start_accumulate_ghost_bonus(job_id)
+	if job_id ~= "safehouse" then
+		self._global.active_ghost_bonus = self._global.saved_ghost_bonus
+		self._global.accumulated_ghost_bonus = {
+			job_id = job_id,
+			bonus = Application:digest_value(0, true)
+		}
+	else
+		self._global.active_ghost_bonus = nil
+		self._global.accumulated_ghost_bonus = nil
+	end
+end
+
+function JobManager:accumulate_ghost_bonus()
+	if self:has_active_job() and self:current_job_id() ~= "safehouse" then
+		local stage_data = self:current_stage_data()
+		local level_data = self:current_level_data()
+		local stage = self:current_stage()
+		local stage_success = self:stage_success()
+		local ghost_success = managers.groupai and managers.groupai:state():whisper_mode()
+		local ghost_bonus = stage_data and stage_data.ghost_bonus or level_data and level_data.ghost_bonus or tweak_data.narrative.DEFAULT_GHOST_BONUS or 0
+		local agb = self._global.accumulated_ghost_bonus
+		local job_id = self:current_job_id()
+		local level_id = self:current_level_id()
+		if not (agb and job_id) or agb.job_id ~= job_id then
+			return 0
+		end
+		local stage_ghost_data = self._global.accumulated_ghost_bonus[stage]
+		if stage_ghost_data and (stage_ghost_data.stage_success or stage_ghost_data.level_id ~= level_id) then
+			return 0
+		end
+		local ghost_data = {
+			level_id = level_id,
+			stage_success = stage_success,
+			ghost_success = ghost_success
+		}
+		if stage_success and ghost_success then
+			ghost_data.bonus = Application:digest_value(ghost_bonus, true)
+			local bonus = Application:digest_value(agb.bonus, false) + ghost_bonus
+			self._global.accumulated_ghost_bonus.bonus = Application:digest_value(bonus, true)
+		else
+			ghost_data.bonus = Application:digest_value(0, true)
+		end
+		self._global.accumulated_ghost_bonus[stage] = ghost_data
+		return stage_success and ghost_success and ghost_bonus or 0
+	end
+	return 0
+end
+
+function JobManager:activate_accumulated_ghost_bonus()
+	if self:current_job_id() ~= "safehouse" then
+		local agb = self._global.accumulated_ghost_bonus
+		local job_id = self:current_job_id()
+		if not (agb and job_id) or agb.job_id ~= job_id then
+			self:_set_ghost_bonus(0, true)
+			return
+		end
+		self:_set_ghost_bonus(agb.bonus, false)
+	end
+end
+
+function JobManager:_set_ghost_bonus(ghost_bonus, digest)
+	Application:debug("[JobManager:_set_ghost_bonus]", "ghost_bonus", ghost_bonus, "digest", digest)
+	self._global.saved_ghost_bonus = digest and Application:digest_value(ghost_bonus, true) or ghost_bonus
+	self._global.accumulated_ghost_bonus = nil
+end
+
+function JobManager:get_accumulated_ghost_bonus()
+	if not self._global.accumulated_ghost_bonus then
+		return nil
+	end
+	local agb = self._global.accumulated_ghost_bonus
+	local accumulated = {}
+	accumulated.job_id = agb.job_id
+	accumulated.bonus = Application:digest_value(agb.bonus, false)
+	for i, level_data in ipairs(agb) do
+		table.insert(accumulated, {
+			level_id = level_data.level_id,
+			bonus = Application:digest_value(level_data.bonus, false),
+			stage_success = level_data.stage_success or false,
+			ghost_success = level_data.ghost_success or false
+		})
+	end
+	return accumulated
+end
+
+function JobManager:get_saved_ghost_bonus()
+	if self:current_job_id() ~= "safehouse" then
+		return self._global.saved_ghost_bonus and Application:digest_value(self._global.saved_ghost_bonus, false) or 0
+	end
+	return 0
+end
+
+function JobManager:get_ghost_bonus()
+	return self._global.active_ghost_bonus and Application:digest_value(self._global.active_ghost_bonus, false) or self._global.saved_ghost_bonus and Application:digest_value(self._global.saved_ghost_bonus, false) or 0
+end
+
+function JobManager:has_ghost_bonus()
+	return self:get_ghost_bonus() > 0
+end
+
+function JobManager:is_job_stage_ghostable(job_id, stage)
+	local job_data = tweak_data.narrative.jobs[job_id]
+	if not job_data then
+		return false
+	end
+	local chain = job_data.chain
+	if not chain then
+		return false
+	end
+	local level_data = chain[stage] or {}
+	if 0 < #level_data then
+		for _, alt_level_data in ipairs(level_data) do
+			if self:_is_level_ghostable(tweak_data.levels[alt_level_data.level_id]) then
+				return true
+			end
+		end
+	elseif self:_is_level_ghostable(tweak_data.levels[level_data.level_id]) then
+		return true
+	end
+	return false
+end
+
+function JobManager:is_job_ghostable(job_id)
+	local job_data = tweak_data.narrative.jobs[job_id]
+	if not job_data then
+		return false
+	end
+	local chain = job_data.chain
+	if not chain then
+		return false
+	end
+	for _, level_data in ipairs(chain) do
+		if 0 < #level_data then
+			for _, alt_level_data in ipairs(level_data) do
+				if self:_is_level_ghostable(tweak_data.levels[alt_level_data.level_id]) then
+					return true
+				end
+			end
+		elseif self:_is_level_ghostable(tweak_data.levels[level_data.level_id]) then
+			return true
+		end
+	end
+	return false
+end
+
+function JobManager:get_job_ghost_bonus(job_id)
+	local job_data = tweak_data.narrative.jobs[job_id]
+	if not job_data then
+		return false
+	end
+	local chain = job_data.chain
+	if not chain then
+		return false
+	end
+	local math_min = function(a, b)
+		if not a then
+			return b or 0
+		end
+		if not b then
+			return a or 0
+		end
+		return math.min(a, b)
+	end
+	local math_max = function(a, b, c)
+		if not a then
+			return b or 0
+		end
+		if not b then
+			return a or 0
+		end
+		return c and math.max(a, b) or a + b
+	end
+	local min_ghost_bonus, max_ghost_bonus
+	for _, level_data in ipairs(chain) do
+		if 0 < #level_data then
+			local min_bonus, max_bonus
+			for _, alt_level_data in ipairs(level_data) do
+				local bonus = self:_is_level_ghostable(tweak_data.levels[alt_level_data.level_id])
+				if bonus then
+					min_bonus = math_min(min_bonus, bonus, true)
+					max_bonus = math_max(max_bonus, bonus, true)
+				end
+			end
+			min_ghost_bonus = math_min(min_ghost_bonus, min_bonus)
+			max_ghost_bonus = math_max(max_ghost_bonus, max_bonus)
+		else
+			local bonus = self:_is_level_ghostable(tweak_data.levels[level_data.level_id])
+			if bonus then
+				min_ghost_bonus = math_min(min_ghost_bonus, bonus)
+				max_ghost_bonus = math_max(max_ghost_bonus, bonus)
+			end
+		end
+	end
+	return min_ghost_bonus, max_ghost_bonus
+end
+
+function JobManager:_is_level_ghostable(level_data)
+	return level_data and level_data.ghost_bonus
+end
+
+function JobManager:is_level_ghostable(level_id)
+	local ghost_bonus = self:_is_level_ghostable(tweak_data.levels[level_id])
+	return ghost_bonus and 0 < ghost_bonus
 end
 
 function JobManager:_setup_job_heat()
@@ -174,6 +398,7 @@ function JobManager:heat_to_experience_value(heat)
 		value = math.clamp(loadstring("return " .. heated_equation)(), 0, 100)
 		value = math.max(value * (tweak_data.narrative.HEATED_MAX_XP_MUL - 1), 0) + 100
 	end
+	value = math.round(value)
 	return value
 end
 
@@ -274,6 +499,9 @@ function JobManager:_check_add_heat_to_jobs(debug_job_id, ignore_debug_prints)
 		Application:error("[JobManager:_check_add_heat_to_jobs] No current job.")
 		return
 	end
+	if current_job == "safehouse" then
+		return
+	end
 	local current_job_heat = self._global.heat[current_job]
 	if not current_job_heat then
 		Application:error("[JobManager:_check_add_heat_to_jobs] Job have no heat. If this is safehouse, IGNORE ME!", current_job)
@@ -355,6 +583,15 @@ end
 
 function JobManager:get_job_heat(job_id)
 	return self:_get_job_heat(job_id)
+end
+
+function JobManager:current_job_heat()
+	local current_job = self:current_job_id()
+	if not current_job then
+		Application:error("[JobManager:current_job_heat] No current job.")
+		return 0
+	end
+	return self._global.heat[current_job]
 end
 
 function JobManager:on_buy_job(job_id, difficulty_id)
@@ -495,16 +732,11 @@ end
 function JobManager:save(data)
 	local save_data = {}
 	save_data.heat = deep_clone(Global.job_manager.heat)
+	save_data.ghost_bonus = Application:digest_value(Global.job_manager.saved_ghost_bonus, false)
 	data.job_manager = save_data
 end
 
 function JobManager:load(data)
-	if data.job_manager_heat then
-		data.job_manager = {
-			heat = data.job_manager_heat
-		}
-		data.job_manager_heat = nil
-	end
 	if data.job_manager then
 		self._global.heat = data.job_manager.heat or self._global.heat
 		if not self._global.heat then
@@ -529,6 +761,10 @@ function JobManager:load(data)
 		for _, job_id in ipairs(invalid_jobs) do
 			Application:debug("[JobManager:load] Removing invalid job heat", job_id)
 			self._global.heat[job_id] = nil
+		end
+		self._global.saved_ghost_bonus = data.job_manager.ghost_bonus or self._global.saved_ghost_bonus
+		if type(self._global.saved_ghost_bonus) == "number" then
+			self._global.saved_ghost_bonus = Application:digest_value(self._global.saved_ghost_bonus, true)
 		end
 	end
 end
@@ -595,6 +831,7 @@ function JobManager:activate_job(job_id, current_stage)
 		stages = #job.chain
 	}
 	self._global.start_time = TimerManager:wall_running():time()
+	self:start_accumulate_ghost_bonus(job_id)
 	return true
 end
 
@@ -607,6 +844,8 @@ function JobManager:deactivate_current_job()
 	self._global.start_time = nil
 	managers.loot:on_job_deactivated()
 	managers.mission:on_job_deactivated()
+	self._global.active_ghost_bonus = nil
+	self._global.accumulated_ghost_bonus = nil
 end
 
 function JobManager:complete_stage()

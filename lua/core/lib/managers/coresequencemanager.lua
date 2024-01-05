@@ -1069,6 +1069,10 @@ function SequenceEnvironment.object_local_rot_z(object_name)
 	end
 end
 
+function SequenceEnvironment.Z()
+	return math.Z
+end
+
 function SequenceEnvironment.pick(...)
 	local pick_list = {
 		...
@@ -3805,6 +3809,9 @@ end
 
 function MaterialConfigElement.load(unit, data)
 	unit:set_material_config(data.material, true)
+	if unit:interaction() then
+		unit:interaction():refresh_material()
+	end
 end
 
 MaterialElement = MaterialElement or class(BaseElement)

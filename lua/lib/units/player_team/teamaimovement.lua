@@ -27,7 +27,6 @@ function TeamAIMovement:set_character_anim_variables()
 			self._unit:damage():run_sequence_simple(sequence)
 			self._current_sequence = sequence
 		end
-		self._unit:contour():update_materials()
 	end
 	HuskPlayerMovement.set_character_anim_variables(self)
 end
@@ -116,6 +115,7 @@ function TeamAIMovement:set_cool(state)
 		end
 		self:set_stance_by_code(1)
 	else
+		self._not_cool_t = TimerManager:game():time()
 		self:_switch_to_not_cool(true)
 	end
 end
@@ -150,6 +150,7 @@ function TeamAIMovement:_switch_to_not_cool_clbk_func()
 	if self._switch_to_not_cool_clbk_id and self._cool then
 		self._switch_to_not_cool_clbk_id = nil
 		self._cool = false
+		self._not_cool_t = TimerManager:game():time()
 		self._unit:base():set_slot(self._unit, 16)
 		if self._unit:brain()._logic_data and self._unit:brain():is_available_for_assignment() then
 			self._unit:brain():set_objective()

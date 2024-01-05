@@ -366,4 +366,14 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
 		}
 	}
+	self.cage_door = {}
+	self.cage_door.devices = {}
+	self.cage_door.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 60
+		}
+	}
 end

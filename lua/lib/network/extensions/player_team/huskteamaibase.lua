@@ -10,7 +10,6 @@ function HuskTeamAIBase:post_init()
 	self._lod_stage = 1
 	self._allow_invisible = true
 	TeamAIBase._register(self)
-	self._unit:contour():add("teammate")
 	managers.occlusion:remove_occlusion(self._unit)
 end
 
@@ -25,7 +24,6 @@ function HuskTeamAIBase:on_death_exit()
 end
 
 function HuskTeamAIBase:pre_destroy(unit)
-	unit:contour():clear()
 	unit:movement():pre_destroy()
 	unit:inventory():pre_destroy(unit)
 	TeamAIBase.unregister(self)
@@ -44,7 +42,6 @@ function HuskTeamAIBase:load(data)
 			end
 		end
 		managers.criminals:add_character(character_name, self._unit, nil, true)
-		self._unit:movement():set_character_anim_variables()
 	end
 end
 

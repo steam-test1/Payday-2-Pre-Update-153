@@ -237,6 +237,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	end
 	local num_stages = self._current_job_data and #self._current_job_data.chain or 0
 	local day_color = tweak_data.screen_colors.item_stage_1
+	local chain = self._current_job_data and self._current_job_data.chain or {}
 	local js_w = self._job_schedule_panel:w() / 7
 	local js_h = self._job_schedule_panel:h()
 	for i = 1, 7 do
@@ -264,6 +265,20 @@ function HUDMissionBriefing:init(hud, workspace)
 			blend_mode = "add"
 		})
 		day_text:set_left(i == 1 and 0 or self._job_schedule_panel:child("day_" .. tostring(i - 1)):right())
+		local ghost = self._job_schedule_panel:bitmap({
+			name = "ghost_" .. tostring(i),
+			texture = "guis/textures/pd2/cn_minighost",
+			w = 16,
+			h = 16,
+			blend_mode = "add",
+			color = tweak_data.screen_colors.ghost_color
+		})
+		ghost:set_center(day_text:center_x(), day_text:center_y() + day_text:h() * 0.25)
+		local ghost_visible = i <= num_stages and managers.job:is_job_stage_ghostable(managers.job:current_job_id(), i)
+		ghost:set_visible(ghost_visible)
+		if ghost_visible then
+			self:_apply_ghost_color(ghost, i, not Network:is_server())
+		end
 	end
 	for i = 1, managers.job:current_stage() or 0 do
 		local stage_marker = self._job_schedule_panel:bitmap({
@@ -352,6 +367,36 @@ function HUDMissionBriefing:init(hud, workspace)
 	big_text:set_world_x(self._foreground_layer_one:child("job_text"):world_x())
 	big_text:move(-13, 9)
 	self._backdrop:animate_bg_text(big_text)
+end
+
+function HUDMissionBriefing:_apply_ghost_color(ghost, i, is_unknown)
+	local accumulated_ghost_bonus = managers.job:get_accumulated_ghost_bonus()
+	local agb = accumulated_ghost_bonus[i]
+	if is_unknown then
+		ghost:set_color(Color(64, 255, 255, 255) / 255)
+	elseif i == managers.job:current_stage() then
+		if not managers.groupai or not managers.groupai:state():whisper_mode() then
+			ghost:set_color(Color(255, 255, 51, 51) / 255)
+		else
+			ghost:set_color(Color(128, 255, 255, 255) / 255)
+		end
+	elseif agb and agb.ghost_success then
+		ghost:set_color(tweak_data.screen_colors.ghost_color)
+	elseif i < managers.job:current_stage() then
+		ghost:set_color(Color(255, 255, 51, 51) / 255)
+	else
+		ghost:set_color(Color(128, 255, 255, 255) / 255)
+	end
+end
+
+function HUDMissionBriefing:on_whisper_mode_changed()
+	if alive(self._job_schedule_panel) then
+		local i = managers.job:current_stage() or 1
+		local ghost_icon = self._job_schedule_panel:child("ghost_" .. tostring(i))
+		if alive(ghost_icon) then
+			self:_apply_ghost_color(ghost_icon, i)
+		end
+	end
 end
 
 function HUDMissionBriefing:hide()

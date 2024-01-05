@@ -9,6 +9,10 @@ function BoxGuiObject:init(panel, config)
 end
 
 function BoxGuiObject:create_sides(panel, config)
+	if not alive(panel) then
+		Application:error("[BoxGuiObject:create_sides] Failed creating BoxGui. Parent panel not alive!")
+		return
+	end
 	if alive(self._panel) then
 		self._panel:parent():remove(self._panel)
 		self._panel = nil

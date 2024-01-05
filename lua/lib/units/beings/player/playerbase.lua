@@ -22,6 +22,20 @@ function PlayerBase:init(unit)
 	self:_chk_set_unit_upgrades()
 end
 
+function PlayerBase:post_init()
+	self._unit:movement():post_init()
+	self:_equip_default_weapon()
+	if self._unit:movement():nav_tracker() then
+		managers.groupai:state():register_criminal(self._unit)
+	else
+		self._unregistered = true
+	end
+	self._unit:character_damage():post_init()
+	local con_mul, index = managers.blackmarket:get_concealment_of_peer(Global.local_member:peer())
+	self:set_suspicion_multiplier("equipment", 1 / con_mul)
+	self:set_detection_multiplier("equipment", 1 / con_mul)
+end
+
 function PlayerBase:update(unit, t, dt)
 	if self._wanted_controller_enabled_t then
 		if self._wanted_controller_enabled_t <= 0 then
@@ -234,20 +248,6 @@ function PlayerBase:_setup_hud()
 end
 
 function PlayerBase:_equip_default_weapon()
-end
-
-function PlayerBase:post_init()
-	self._unit:movement():post_init()
-	self:_equip_default_weapon()
-	if self._unit:movement():nav_tracker() then
-		managers.groupai:state():register_criminal(self._unit)
-	else
-		self._unregistered = true
-	end
-	self._unit:character_damage():post_init()
-	local con_mul, index = managers.blackmarket:get_concealment_of_peer(Global.local_member:peer())
-	self:set_suspicion_multiplier("equipment", 1 / con_mul)
-	self:set_detection_multiplier("equipment", 1 / con_mul)
 end
 
 function PlayerBase:_setup_controller()

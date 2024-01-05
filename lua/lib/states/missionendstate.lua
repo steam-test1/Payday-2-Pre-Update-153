@@ -47,6 +47,7 @@ function MissionEndState:at_enter(old_state, params)
 		player:camera():remove_sound_listener()
 		player:camera():play_redirect(Idstring("idle"))
 	end
+	managers.dialog:quit_dialog()
 	Application:debug("1 second to managers.mission:pre_destroy()")
 	self._mission_destroy_t = Application:time() + 1
 	if not self._success then
@@ -189,13 +190,22 @@ function MissionEndState:at_enter(old_state, params)
 	end
 	managers.music:post_event(self._success and "resultscreen_win" or "resultscreen_lose")
 	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
+	local ghost_bonus = 0
 	if self._type == "victory" or self._type == "gameover" then
 		local total_xp_bonus, bonuses = self:_get_xp_dissected(self._success, params and params.num_winners, params and params.personal_win)
 		self._bonuses = bonuses
 		self:completion_bonus_done(total_xp_bonus)
+		managers.job:clear_saved_ghost_bonus()
+		ghost_bonus = managers.job:accumulate_ghost_bonus(ghost_bonus)
 	end
-	if self._success and managers.job:on_last_stage() then
-		managers.job:check_add_heat_to_jobs()
+	if self._success then
+		if managers.job:on_last_stage() then
+			managers.job:check_add_heat_to_jobs()
+			managers.job:activate_accumulated_ghost_bonus()
+			managers.hud:set_ghost_bonus_endscreen_hud(managers.job:get_saved_ghost_bonus())
+		else
+			managers.hud:set_ghost_bonus_endscreen_hud(ghost_bonus)
+		end
 	end
 	if Network:is_server() then
 		managers.network:session():set_state("game_end")

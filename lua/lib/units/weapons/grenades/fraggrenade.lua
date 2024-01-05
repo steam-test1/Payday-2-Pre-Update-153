@@ -34,7 +34,7 @@ function FragGrenade:_detonate()
 		ignore_unit = self._unit,
 		user = self:thrower_unit()
 	})
-	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
 	self._unit:set_slot(0)
 end
 

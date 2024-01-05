@@ -1466,7 +1466,7 @@ function MenuNodeGui:_layout_legends()
 	else
 		text:set_right(self._legends_panel:w())
 	end
-	text:set_bottom(self._legends_panel:h() - 2)
+	text:set_bottom(self._legends_panel:h())
 	self._legends_panel:set_bottom(self.ws:panel():bottom())
 end
 

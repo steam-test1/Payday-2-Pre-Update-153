@@ -20,8 +20,6 @@ function CopLogicTrade.enter(data, new_logic_name, enter_params)
 	data.unit:brain():set_attention_settings({peaceful = true})
 end
 
-local is_win32 = SystemInfo:platform() == Idstring("WIN32")
-
 function CopLogicTrade.hostage_trade(unit, enable, trade_success)
 	local wp_id = "wp_hostage_trade"
 	print("[CopLogicTrade.hostage_trade]", unit, enable, trade_success)
@@ -31,28 +29,64 @@ function CopLogicTrade.hostage_trade(unit, enable, trade_success)
 			text = text,
 			icon = "wp_trade",
 			position = unit:movement():m_pos(),
-			distance = is_win32
+			distance = SystemInfo:platform() == Idstring("WIN32")
 		})
 		if managers.network:session() and not managers.trade:is_peer_in_custody(managers.network:session():local_peer():id()) then
 			managers.hint:show_hint("trade_offered")
 		end
-		unit:base():set_allow_invisible(false)
+		if Network:is_server() and managers.enemy:all_civilians()[unit:key()] and unit:anim_data().stand and unit:brain():is_tied() then
+			unit:brain():on_hostage_move_interaction(nil, "stay")
+		end
 		unit:character_damage():set_invulnerable(true)
-		unit:base():swap_material_config()
 		unit:interaction():set_tweak_data("hostage_trade")
 		unit:interaction():set_active(true, false)
+		if Network:is_server() and not unit:anim_data().hands_tied and not unit:anim_data().tied then
+			local action_data
+			if managers.enemy:all_civilians()[unit:key()] then
+				if not unit:brain():is_tied() then
+					action_data = {
+						type = "act",
+						body_part = 1,
+						variant = "tied",
+						clamp_to_graph = true,
+						blocks = {
+							light_hurt = -1,
+							hurt = -1,
+							heavy_hurt = -1,
+							walk = -1
+						}
+					}
+				end
+			else
+				action_data = {
+					type = "act",
+					body_part = 1,
+					variant = "tied_all_in_one",
+					clamp_to_graph = true,
+					blocks = {
+						light_hurt = -1,
+						hurt = -1,
+						heavy_hurt = -1,
+						walk = -1
+					}
+				}
+			end
+			if action_data then
+				unit:brain():action_request(action_data)
+			end
+		end
 	else
 		managers.hud:remove_waypoint(wp_id)
 		if trade_success then
 			unit:interaction():set_active(false, false)
-			unit:interaction():set_contour("standard_color", 1)
-			unit:interaction():set_contour_override(true)
-			managers.occlusion:remove_occlusion(unit)
 		else
-			unit:base():swap_material_config()
-			unit:interaction():set_tweak_data("intimidate")
 			unit:interaction():set_active(false, false)
-			unit:base():set_allow_invisible(true)
+			if managers.enemy:all_civilians()[unit:key()] then
+				unit:interaction():set_tweak_data("hostage_move")
+			else
+				unit:interaction():set_tweak_data("intimidate")
+			end
+			unit:interaction():set_active(false, false)
 		end
 	end
 end
@@ -88,15 +122,28 @@ function CopLogicTrade.on_trade(data, trading_unit)
 	managers.groupai:state():on_hostage_state(false, data.key)
 	local flee_pos = managers.groupai:state():flee_point(data.unit:movement():nav_tracker():nav_segment())
 	if flee_pos then
+		data.internal_data.fleeing = true
 		data.internal_data.flee_pos = flee_pos
 		if data.unit:anim_data().hands_tied or data.unit:anim_data().tied then
-			local new_action = {
-				type = "act",
-				variant = "stand",
-				body_part = 1
-			}
+			local new_action
+			if data.unit:anim_data().stand and data.is_tied then
+				new_action = {
+					type = "act",
+					variant = "panic",
+					body_part = 1
+				}
+				data.is_tied = nil
+				data.unit:movement():set_stance("hos")
+			else
+				new_action = {
+					type = "act",
+					variant = "stand",
+					body_part = 1
+				}
+			end
 			data.unit:brain():action_request(new_action)
 		end
+		data.unit:contour():add("hostage_trade", true, nil)
 	else
 		data.unit:set_slot(0)
 	end

@@ -238,6 +238,7 @@ function IngameWaitingForPlayersState:at_enter()
 	if managers.job:interupt_stage() and not tweak_data.levels[managers.job:interupt_stage()].bonus_escape then
 		managers.menu_component:post_event("escape_menu")
 	end
+	managers.music:post_event("loadout_music")
 end
 
 function IngameWaitingForPlayersState:start_game_intro()

@@ -881,16 +881,32 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			blend_mode = "add"
 		})
 		mw = math.max(mw, self:make_fine_text(pro_text))
+		local ghost_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/cn_minighost",
+			x = 7,
+			y = pro_text:bottom() + 2 + 2,
+			color = tweak_data.screen_colors.ghost_color
+		})
+		local ghost_text = legend_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			x = host_text:left(),
+			y = pro_text:bottom(),
+			text = managers.localization:to_upper_text("menu_cn_legend_ghostable"),
+			blend_mode = "add",
+			color = tweak_data.screen_colors.ghost_color
+		})
+		mw = math.max(mw, self:make_fine_text(ghost_text))
 		local kick_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_kick_marker",
 			x = 10,
-			y = pro_text:bottom() + 2
+			y = ghost_text:bottom() + 2
 		})
 		local kick_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			x = host_text:left(),
-			y = pro_text:bottom(),
+			y = ghost_text:bottom(),
 			text = managers.localization:to_upper_text("menu_cn_kick_disabled"),
 			blend_mode = "add"
 		})
@@ -898,7 +914,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		if managers.crimenet:no_servers() then
 			kick_icon:hide()
 			kick_text:hide()
-			kick_text:set_bottom(pro_text:bottom())
+			kick_text:set_bottom(ghost_text:bottom())
 		end
 		legend_panel:set_size(host_text:left() + mw + 10, kick_text:bottom() + 10)
 		legend_panel:rect({
@@ -921,6 +937,131 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			render_template = "VertexColorTexturedBlur3D",
 			layer = -1
 		})
+	end
+	do
+		local w, h
+		local mw, mh = 0
+		local global_bonuses_panel = self._panel:panel({
+			name = "global_bonuses_panel",
+			layer = 40,
+			y = 10,
+			h = 30
+		})
+		local mul_to_procent_string = function(multiplier)
+			local pro = math.round(multiplier * 100)
+			local procent_string
+			if pro == 0 and multiplier ~= 0 then
+				procent_string = string.format("%0.2f", math.abs(multiplier * 100))
+			else
+				procent_string = tostring(math.abs(pro))
+			end
+			return procent_string, 0 <= multiplier
+		end
+		local has_ghost_bonus = managers.job:has_ghost_bonus()
+		if has_ghost_bonus then
+			repeat
+				do
+					local ghost_bonus_mul = managers.job:get_ghost_bonus()
+					local job_ghost_string = mul_to_procent_string(ghost_bonus_mul)
+					local ghost_text = global_bonuses_panel:text({
+						font = tweak_data.menu.pd2_small_font,
+						font_size = tweak_data.menu.pd2_small_font_size,
+						align = "center",
+						text = managers.localization:to_upper_text("menu_ghost_bonus", {exp_bonus = job_ghost_string}),
+						blend_mode = "add",
+						color = tweak_data.screen_colors.ghost_color
+					})
+				end
+				do break end -- pseudo-goto
+				local skill_bonus = managers.player:get_skill_exp_multiplier()
+				skill_bonus = skill_bonus - 1
+				if 0 < skill_bonus then
+					local skill_string = mul_to_procent_string(skill_bonus)
+					local skill_text = global_bonuses_panel:text({
+						font = tweak_data.menu.pd2_small_font,
+						font_size = tweak_data.menu.pd2_small_font_size,
+						align = "center",
+						text = managers.localization:to_upper_text("menu_cn_skill_bonus", {exp_bonus = skill_string}),
+						blend_mode = "add",
+						color = tweak_data.screen_colors.skill_color
+					})
+				end
+				local infamy_bonus = managers.player:get_infamy_exp_multiplier()
+				infamy_bonus = infamy_bonus - 1
+				if 0 < infamy_bonus then
+					local infamy_string = mul_to_procent_string(infamy_bonus)
+					local infamy_text = global_bonuses_panel:text({
+						font = tweak_data.menu.pd2_small_font,
+						font_size = tweak_data.menu.pd2_small_font_size,
+						align = "center",
+						text = managers.localization:to_upper_text("menu_cn_infamy_bonus", {exp_bonus = infamy_string}),
+						blend_mode = "add",
+						color = tweak_data.lootdrop.global_values.infamy.color
+					})
+				end
+				local limited_bonus = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+				limited_bonus = limited_bonus - 1
+				if 0 < limited_bonus then
+					local limited_string = mul_to_procent_string(limited_bonus)
+					local limited_text = global_bonuses_panel:text({
+						font = tweak_data.menu.pd2_small_font,
+						font_size = tweak_data.menu.pd2_small_font_size,
+						align = "center",
+						text = managers.localization:to_upper_text("menu_cn_limited_bonus", {exp_bonus = limited_string}),
+						blend_mode = "add",
+						color = tweak_data.screen_colors.button_stage_2
+					})
+				end
+			until true
+		end
+		if 1 < #global_bonuses_panel:children() then
+			for i, child in ipairs(global_bonuses_panel:children()) do
+				child:set_alpha(0)
+			end
+			
+			local function global_bonuses_anim(panel)
+				local child_num = 1
+				local viewing_child = panel:children()[child_num]
+				local t = 0
+				local dt = 0
+				while alive(viewing_child) do
+					if not self._crimenet_enabled then
+						coroutine.yield()
+					else
+						viewing_child:set_alpha(0)
+						over(0.5, function(p)
+							viewing_child:set_alpha(math.sin(p * 90))
+						end)
+						viewing_child:set_alpha(1)
+						over(4, function(p)
+							viewing_child:set_alpha((math.cos(p * 360 * 2) + 1) * 0.5 * 0.2 + 0.8)
+						end)
+						over(0.5, function(p)
+							viewing_child:set_alpha(math.cos(p * 90))
+						end)
+						viewing_child:set_alpha(0)
+						child_num = child_num % #panel:children() + 1
+						viewing_child = panel:children()[child_num]
+					end
+				end
+			end
+			
+			global_bonuses_panel:animate(global_bonuses_anim)
+		elseif #global_bonuses_panel:children() == 1 then
+			local function global_bonuses_anim(panel)
+				while alive(panel) do
+					if not self._crimenet_enabled then
+						coroutine.yield()
+					else
+						over(2, function(p)
+							panel:set_alpha((math.sin(p * 360) + 1) * 0.5 * 0.2 + 0.8)
+						end)
+					end
+				end
+			end
+			
+			global_bonuses_panel:animate(global_bonuses_anim)
+		end
 	end
 	if not no_servers then
 		local id = is_x360 and "menu_cn_friends" or "menu_cn_filter"
@@ -1129,6 +1270,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	self._special_contracts_id = {}
 	self:add_special_contracts(node:parameters().no_casino)
 	managers.features:announce_feature("crimenet_heat")
+	managers.features:announce_feature("election_changes")
 	return
 end
 
@@ -1457,6 +1599,76 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		layer = 0
 	})
 	local got_heat = false
+	local range_colors = {}
+	local text_string = managers.localization:to_upper_text("menu_exp_short")
+	local mul_to_procent_string = function(multiplier)
+		local pro = math.round(multiplier * 100)
+		local procent_string
+		if pro == 0 and multiplier ~= 0 then
+			procent_string = string.format("%0.2f", math.abs(multiplier * 100))
+		else
+			procent_string = tostring(math.abs(pro))
+		end
+		return (multiplier < 0 and " -" or " +") .. procent_string .. "%"
+	end
+	local got_heat_text = false
+	local has_ghost_bonus = managers.job:has_ghost_bonus()
+	if has_ghost_bonus then
+		repeat
+			do
+				local ghost_bonus_mul = managers.job:get_ghost_bonus()
+				local job_ghost_string = mul_to_procent_string(ghost_bonus_mul)
+				local s = utf8.len(text_string)
+				text_string = text_string .. job_ghost_string
+				table.insert(range_colors, {
+					s,
+					utf8.len(text_string),
+					tweak_data.screen_colors.ghost_color
+				})
+				got_heat_text = true
+			end
+			do break end -- pseudo-goto
+			local skill_bonus = managers.player:get_skill_exp_multiplier()
+			skill_bonus = skill_bonus - 1
+			if 0 < skill_bonus then
+				local s = utf8.len(text_string)
+				local skill_string = mul_to_procent_string(skill_bonus)
+				text_string = text_string .. skill_string
+				table.insert(range_colors, {
+					s,
+					utf8.len(text_string),
+					tweak_data.screen_colors.skill_color
+				})
+				got_heat_text = true
+			end
+			local infamy_bonus = managers.player:get_infamy_exp_multiplier()
+			infamy_bonus = infamy_bonus - 1
+			if 0 < infamy_bonus then
+				local s = utf8.len(text_string)
+				local infamy_string = mul_to_procent_string(infamy_bonus)
+				text_string = text_string .. infamy_string
+				table.insert(range_colors, {
+					s,
+					utf8.len(text_string),
+					tweak_data.lootdrop.global_values.infamy.color
+				})
+				got_heat_text = true
+			end
+			local limited_bonus = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+			limited_bonus = limited_bonus - 1
+			if 0 < limited_bonus then
+				local s = utf8.len(text_string)
+				local limited_string = mul_to_procent_string(limited_bonus)
+				text_string = text_string .. limited_string
+				table.insert(range_colors, {
+					s,
+					utf8.len(text_string),
+					tweak_data.screen_colors.button_stage_2
+				})
+				got_heat_text = true
+			end
+		until true
+	end
 	local job_heat = managers.job:get_job_heat(data.job_id) or 0
 	local job_heat_mul = managers.job:heat_to_experience_multiplier(job_heat) - 1
 	if data.job_id then
@@ -1504,18 +1716,29 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			h = 256 * heat_size,
 			blend_mode = "add",
 			color = heat_color,
-			alpha = heat_alpha
+			alpha = 0
 		})
 		if job_heat_mul ~= 0 then
-			job_heat = math.round(job_heat_mul * 100)
-			local job_heat_string = tostring(math.abs(job_heat))
-			if job_heat == 0 and job_heat_mul ~= 0 then
-				job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
-			end
-			local text_string = managers.localization:to_upper_text("menu_heat_" .. (0 < job_heat_mul and "warm_short" or job_heat_mul < 0 and "cold_short" or "ok_short"), {job_heat = job_heat_string})
-			heat_name:set_text(text_string)
-			heat_name:set_color(heat_color)
+			local s = utf8.len(text_string)
+			local heat_string = mul_to_procent_string(job_heat_mul)
+			text_string = text_string .. heat_string
+			table.insert(range_colors, {
+				s,
+				utf8.len(text_string),
+				heat_color
+			})
 			got_heat = true
+			got_heat_text = true
+			heat_glow:set_alpha(heat_alpha)
+		end
+	end
+	heat_name:set_text(text_string)
+	for i, range in ipairs(range_colors) do
+		if i == 1 then
+			local s, e, c = unpack(range)
+			heat_name:set_range_color(0, e, c)
+		else
+			heat_name:set_range_color(unpack(range))
 		end
 	end
 	local host_string = data.host_name or is_professional and managers.localization:to_upper_text("cn_menu_pro_job") or " "
@@ -1613,7 +1836,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		heat_name:set_top(difficulty_name:bottom())
 		heat_name:set_right(0)
 	end
-	if not got_heat then
+	if not got_heat_text then
 		heat_name:set_text(" ")
 		heat_name:set_w(1, 0)
 		heat_name:set_position(0, host_name:bottom())
@@ -1732,7 +1955,26 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			blend_mode = "add"
 		})
 	end
-	local timer_rect, peers_panel, icon_panel
+	local timer_rect, peers_panel
+	local icon_panel = self._pan_panel:panel({
+		layer = 26,
+		alpha = 1,
+		h = 64,
+		w = 18
+	})
+	if data.job_id and managers.job:is_job_ghostable(data.job_id) then
+		local ghost_icon = icon_panel:bitmap({
+			name = "ghost_icon",
+			texture = "guis/textures/pd2/cn_minighost",
+			blend_mode = "add",
+			color = tweak_data.screen_colors.ghost_color
+		})
+		local y = 0
+		for i = 1, #icon_panel:children() - 1 do
+			y = math.max(y, icon_panel:children()[i]:bottom())
+		end
+		ghost_icon:set_y(y)
+	end
 	if is_server then
 		peers_panel = self._pan_panel:panel({
 			layer = 11 + self._num_layer_jobs * 3,
@@ -1758,16 +2000,17 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			})
 			player_marker:set_position(cx, cy)
 		end
-		icon_panel = self._pan_panel:panel({
-			layer = 26,
-			alpha = 0,
-			h = 18,
-			w = 18
-		})
 		local kick_icon = icon_panel:bitmap({
 			name = "kick_icon",
-			texture = "guis/textures/pd2/cn_kick_marker"
+			texture = "guis/textures/pd2/cn_kick_marker",
+			blend_mode = "add",
+			alpha = 0
 		})
+		local y = 0
+		for i = 1, #icon_panel:children() - 1 do
+			y = math.max(y, icon_panel:children()[i]:bottom())
+		end
+		kick_icon:set_y(y)
 	elseif not is_special then
 		timer_rect = marker_panel:bitmap({
 			name = "timer_rect",
@@ -1800,7 +2043,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		end
 	end
 	local container_panel
-	if diff_containers ~= 0 then
+	if diff_containers ~= 0 and job_heat_mul ~= 0 then
 		container_panel = self._pan_panel:panel({
 			layer = 11 + self._num_layer_jobs * 3,
 			alpha = 0
@@ -1851,11 +2094,11 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	side_panel:set_top(marker_panel:top() - job_name:top() + 1)
 	if icon_panel then
 		if text_on_right then
-			icon_panel:set_right(marker_panel:left())
+			icon_panel:set_right(marker_panel:left() + 2)
 		else
-			icon_panel:set_left(marker_panel:right())
+			icon_panel:set_left(marker_panel:right() - 2)
 		end
-		icon_panel:set_center_y(marker_panel:top() + 11)
+		icon_panel:set_top(math.round(marker_panel:top() + 1))
 	end
 	if peers_panel then
 		peers_panel:set_center_x(marker_panel:center_x())
@@ -2502,11 +2745,11 @@ function CrimeNetGui:_set_zoom(zoom, x, y)
 		job.side_panel:set_top(job.marker_panel:top() - job.side_panel:child("job_name"):top() + 1)
 		if job.icon_panel then
 			if job.text_on_right then
-				job.icon_panel:set_right(job.marker_panel:left())
+				job.icon_panel:set_right(job.marker_panel:left() + 2)
 			else
-				job.icon_panel:set_left(job.marker_panel:right())
+				job.icon_panel:set_left(job.marker_panel:right() - 2)
 			end
-			job.icon_panel:set_center_y(job.marker_panel:top() + 11)
+			job.icon_panel:set_top(math.round(job.marker_panel:top() + 1))
 		end
 		if job.peers_panel then
 			job.peers_panel:set_center_x(job.marker_panel:center_x())
@@ -2535,10 +2778,6 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local difficulty_name = job.side_panel:child("difficulty_name")
 			local heat_name = job.side_panel:child("heat_name")
 			local stars_panel = job.side_panel:child("stars_panel")
-			local kick_icon
-			if job.icon_panel then
-				kick_icon = job.icon_panel:child("kick_icon")
-			end
 			local base_h = math.round(host_name:h() + job_name:h() + stars_panel:h())
 			local expand_h = math.round(base_h + info_name:h() + difficulty_name:h() + heat_name:h() + math.max(contact_name:h() - job_name:h(), 0))
 			local start_x = 0
@@ -2551,7 +2790,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local x = start_x
 			local object_alpha = {}
 			local text_alpha = job.side_panel:alpha()
-			local icon_alpha = job.icon_panel and job.icon_panel:alpha() or 0
+			local icon_alpha = job.icon_panel and job.icon_panel:child("kick_icon") and job.icon_panel:child("kick_icon"):alpha() or 0
 			local alpha_met = false
 			local glow_met = false
 			local expand_met = false
@@ -2572,8 +2811,11 @@ function CrimeNetGui:update_job_gui(job, inside)
 					text_alpha = math.step(text_alpha, wanted_text_alpha, dt * 2)
 					job.side_panel:set_alpha(text_alpha)
 					if job.icon_panel then
+						job.icon_panel:set_alpha(text_alpha)
+					end
+					if job.icon_panel and job.icon_panel:child("kick_icon") then
 						icon_alpha = math.step(icon_alpha, wanted_icon_alpha, dt * 2)
-						job.icon_panel:set_alpha(icon_alpha)
+						job.icon_panel:child("kick_icon"):set_alpha(icon_alpha)
 					end
 					alpha_met = alpha_met and text_alpha == wanted_text_alpha and icon_alpha == wanted_icon_alpha
 					if not alpha_met or inside then
@@ -2648,9 +2890,6 @@ function CrimeNetGui:update_job_gui(job, inside)
 			job.side_panel:child("info_name"):set_blend_mode("add")
 			job.side_panel:child("difficulty_name"):set_blend_mode("add")
 			job.side_panel:child("heat_name"):set_blend_mode("add")
-			if job.icon_panel then
-				job.icon_panel:child("kick_icon"):set_blend_mode("add")
-			end
 		else
 			job.side_panel:child("job_name"):set_blend_mode("add")
 			job.side_panel:child("contact_name"):set_blend_mode("add")

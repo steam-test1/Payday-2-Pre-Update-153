@@ -131,6 +131,9 @@ function ExperienceManager:add_points(points, present_xp, debug)
 	if not debug and managers.platform:presence() ~= "Playing" and managers.platform:presence() ~= "Mission_end" then
 		return
 	end
+	if points <= 0 then
+		return
+	end
 	if not managers.dlc:has_full_game() and self:current_level() >= 10 then
 		self:_set_total(self:total() + points)
 		self:_set_next_level_data_current_points(0)
@@ -228,6 +231,7 @@ function ExperienceManager:current_rank()
 end
 
 function ExperienceManager:_set_current_level(value)
+	value = math.max(value, 0)
 	self._global.level = Application:digest_value(value, true)
 end
 
@@ -426,20 +430,64 @@ function ExperienceManager:get_contract_xp_by_stars(job_id, job_stars, risk_star
 	local total_risk_xp = 0
 	local total_heat_base_xp = 0
 	local total_heat_risk_xp = 0
-	local total_skill_xp = 0
+	local total_ghost_base_xp = 0
+	local total_ghost_risk_xp = 0
+	local total_skill_base_xp = 0
+	local total_skill_risk_xp = 0
+	local total_infamy_base_xp = 0
+	local total_infamy_risk_xp = 0
+	local total_extra_base_xp = 0
+	local total_extra_risk_xp = 0
 	local total_xp = 0
+	local make_fine_number = function(v)
+		return math.round(v)
+	end
+	local risk_ratio, base_exp, risk_exp, skill_base, skill_risk, heat_base, heat_risk, ghost_base, ghost_risk, infamy_base, infamy_risk, extra_base, extra_risk
 	for i = 1, job_days do
 		params.current_stage = i
 		params.on_last_stage = i == job_days
 		params.level_id = job_tweak_data and job_tweak_data.chain and job_tweak_data.chain[i] and job_tweak_data.chain[i].level_id
 		local total_xp, dissection_table = self:get_xp_by_params(params)
-		total_base_xp = total_base_xp + dissection_table.base + dissection_table.bonus_days_job
-		total_risk_xp = total_risk_xp + dissection_table.bonus_risk + dissection_table.bonus_days_risk + dissection_table.bonus_extra + dissection_table.bonus_skill
-		total_heat_base_xp = total_heat_base_xp + dissection_table.heat_base_xp
-		total_heat_risk_xp = total_heat_risk_xp + dissection_table.heat_risk_xp
+		base_exp = dissection_table.base
+		risk_exp = dissection_table.bonus_risk
+		total_base_xp = total_base_xp + base_exp
+		total_risk_xp = total_risk_xp + risk_exp
+		risk_ratio = risk_exp / math.max(base_exp + risk_exp, 1)
+		heat_risk = make_fine_number(dissection_table.heat_xp * risk_ratio)
+		heat_base = dissection_table.heat_xp - heat_risk
+		ghost_risk = make_fine_number(dissection_table.bonus_ghost * risk_ratio)
+		ghost_base = dissection_table.bonus_ghost - ghost_risk
+		skill_risk = make_fine_number(dissection_table.bonus_skill * risk_ratio)
+		skill_base = dissection_table.bonus_skill - skill_risk
+		infamy_risk = make_fine_number(dissection_table.bonus_infamy * risk_ratio)
+		infamy_base = dissection_table.bonus_infamy - infamy_risk
+		extra_risk = make_fine_number(dissection_table.bonus_extra * risk_ratio)
+		extra_base = dissection_table.bonus_extra - extra_risk
+		total_heat_base_xp = total_heat_base_xp + heat_base
+		total_heat_risk_xp = total_heat_risk_xp + heat_risk
+		total_ghost_base_xp = total_ghost_base_xp + ghost_base
+		total_ghost_risk_xp = total_ghost_risk_xp + ghost_risk
+		total_skill_base_xp = total_skill_base_xp + skill_base
+		total_skill_risk_xp = total_skill_risk_xp + skill_risk
+		total_infamy_base_xp = total_infamy_base_xp + infamy_base
+		total_infamy_risk_xp = total_infamy_risk_xp + infamy_risk
+		total_extra_base_xp = total_extra_base_xp + extra_base
+		total_extra_risk_xp = total_extra_risk_xp + extra_risk
+		total_base_xp = total_base_xp + skill_base + infamy_base + extra_base
+		total_risk_xp = total_risk_xp + skill_risk + infamy_risk + extra_risk
 	end
-	total_xp = total_base_xp + total_risk_xp + total_heat_base_xp + total_heat_risk_xp
-	return total_xp, total_base_xp, total_risk_xp, total_heat_base_xp, total_heat_risk_xp
+	local dissected_xp = {
+		total_base_xp,
+		total_risk_xp,
+		total_heat_base_xp,
+		total_heat_risk_xp,
+		total_ghost_base_xp,
+		total_ghost_risk_xp
+	}
+	for i, xp in ipairs(dissected_xp) do
+		total_xp = total_xp + xp
+	end
+	return total_xp, dissected_xp
 end
 
 function ExperienceManager:get_xp_by_params(params)
@@ -456,6 +504,7 @@ function ExperienceManager:get_xp_by_params(params)
 	local ignore_heat = params.ignore_heat
 	local current_job_stage = params.current_stage or 1
 	local days_multiplier = params.professional and tweak_data:get_value("experience_manager", "pro_day_multiplier", current_job_stage) or tweak_data:get_value("experience_manager", "day_multiplier", current_job_stage)
+	local ghost_multiplier = 1 + (managers.job:get_ghost_bonus() or 0)
 	local total_stars = math.min(job_stars, player_stars)
 	local total_difficulty_stars = difficulty_stars
 	local xp_multiplier = managers.experience:get_contract_difficulty_multiplier(total_difficulty_stars)
@@ -474,6 +523,10 @@ function ExperienceManager:get_xp_by_params(params)
 	local job_heat_dissect = 0
 	local base_heat_dissect = 0
 	local risk_heat_dissect = 0
+	local ghost_dissect = 0
+	local ghost_base_dissect = 0
+	local ghost_risk_dissect = 0
+	local infamy_dissect = 0
 	local extra_bonus_dissect = 0
 	if success and on_last_stage then
 		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars)
@@ -483,7 +536,8 @@ function ExperienceManager:get_xp_by_params(params)
 	static_stage_experience = static_stage_experience and static_stage_experience[difficulty_stars + 1]
 	stage_xp_dissect = static_stage_experience or managers.experience:get_stage_xp_by_stars(total_stars)
 	level_limit_dissect = level_limit_dissect + (static_stage_experience or managers.experience:get_stage_xp_by_stars(job_stars))
-	contract_xp = job_xp_dissect + stage_xp_dissect
+	base_xp = job_xp_dissect + stage_xp_dissect
+	days_dissect = math.round(base_xp * days_multiplier - base_xp)
 	local is_level_limited = job_stars > player_stars
 	if is_level_limited then
 		local diff_in_stars = job_stars - player_stars
@@ -491,55 +545,42 @@ function ExperienceManager:get_xp_by_params(params)
 		local tweak_multiplier = tweak_data:get_value("experience_manager", "level_limit", "pc_difference_multipliers", diff_in_stars) or 0
 		days_multiplier = (days_multiplier - days_tweak_multiplier) * tweak_multiplier + days_tweak_multiplier
 	end
-	base_xp = contract_xp
+	level_limit_dissect = math.round(base_xp * days_multiplier - base_xp)
+	level_limit_dissect = math.round(level_limit_dissect - days_dissect)
+	base_xp = base_xp + days_dissect + level_limit_dissect
+	contract_xp = base_xp
 	risk_dissect = math.round(contract_xp * xp_multiplier)
 	contract_xp = contract_xp + risk_dissect
-	level_limit_dissect = level_limit_dissect + math.round(level_limit_dissect * xp_multiplier)
-	level_limit_dissect = contract_xp - level_limit_dissect
 	if not success then
-		failed_level_dissect = contract_xp
-		contract_xp = math.round(contract_xp * (tweak_data:get_value("experience_manager", "stage_failed_multiplier") or 1))
-		failed_level_dissect = contract_xp - failed_level_dissect
+		local multiplier = tweak_data:get_value("experience_manager", "stage_failed_multiplier") or 1
+		failed_level_dissect = math.round(contract_xp * multiplier - contract_xp)
+		contract_xp = contract_xp + failed_level_dissect
 	elseif not personal_win then
-		personal_win_dissect = contract_xp
-		contract_xp = math.round(contract_xp * (tweak_data:get_value("experience_manager", "in_custody_multiplier") or 1))
-		personal_win_dissect = contract_xp - personal_win_dissect
+		local multiplier = tweak_data:get_value("experience_manager", "in_custody_multiplier") or 1
+		personal_win_dissect = math.round(contract_xp * multiplier - contract_xp)
+		contract_xp = contract_xp + personal_win_dissect
 	end
 	total_xp = contract_xp
+	local total_contract_xp = total_xp
+	local multiplier = managers.player:get_skill_exp_multiplier(managers.groupai and managers.groupai:state():whisper_mode())
+	skill_dissect = math.round(total_contract_xp * multiplier - total_contract_xp)
+	total_xp = total_xp + skill_dissect
+	local bonus_xp = managers.player:get_infamy_exp_multiplier()
+	infamy_dissect = math.round(total_contract_xp * bonus_xp - total_contract_xp)
+	total_xp = total_xp + infamy_dissect
+	bonus_xp = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+	extra_bonus_dissect = math.round(total_contract_xp * bonus_xp - total_contract_xp)
+	total_xp = total_xp + extra_bonus_dissect
 	if success then
 		local num_players_bonus = num_winners and tweak_data:get_value("experience_manager", "alive_humans_multiplier", num_winners) or 1
-		alive_crew_dissect = math.round(contract_xp * num_players_bonus - contract_xp)
+		alive_crew_dissect = math.round(total_contract_xp * num_players_bonus - total_contract_xp)
 		total_xp = total_xp + alive_crew_dissect
 	end
-	local multiplier = managers.player:upgrade_value("player", "xp_multiplier", 1)
-	multiplier = multiplier * managers.player:upgrade_value("player", "passive_xp_multiplier", 1)
-	multiplier = multiplier * managers.player:team_upgrade_value("xp", "multiplier", 1)
-	if managers.groupai and managers.groupai:state():whisper_mode() then
-		multiplier = multiplier * managers.player:team_upgrade_value("xp", "stealth_multiplier", 1)
-	end
-	skill_dissect = math.round(contract_xp * multiplier - contract_xp)
-	total_xp = total_xp + skill_dissect
-	days_dissect = math.round(contract_xp * days_multiplier - contract_xp)
-	total_xp = total_xp + days_dissect
-	local days_dissect_risk = math.round(days_dissect * (risk_dissect / (base_xp + risk_dissect)))
-	local days_dissect_job = days_dissect - days_dissect_risk
-	local bonus_xp = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
-	if 0 < managers.experience:current_rank() then
-		for infamy, item in pairs(tweak_data.infamy.items) do
-			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.infamous_xp then
-				bonus_xp = bonus_xp + math.abs(item.upgrades.infamous_xp - 1)
-			end
-		end
-	end
-	extra_bonus_dissect = math.round(total_xp * bonus_xp - total_xp)
-	total_xp = total_xp + extra_bonus_dissect
-	local risk_ratio = (risk_dissect + days_dissect_risk + skill_dissect + extra_bonus_dissect) / math.max(total_xp, 1)
+	ghost_dissect = math.round(total_xp * ghost_multiplier - total_xp)
+	total_xp = total_xp + ghost_dissect
 	local heat_xp_mul = ignore_heat and 1 or math.max(managers.job:get_job_heat_multipliers(job_id), 0)
-	job_heat_dissect = total_xp
-	total_xp = math.round(total_xp * heat_xp_mul)
-	job_heat_dissect = total_xp - job_heat_dissect
-	risk_heat_dissect = math.round(job_heat_dissect * risk_ratio)
-	base_heat_dissect = job_heat_dissect - risk_heat_dissect
+	job_heat_dissect = math.round(total_xp * heat_xp_mul - total_xp)
+	total_xp = total_xp + job_heat_dissect
 	local dissection_table = {
 		bonus_risk = math.round(risk_dissect),
 		bonus_num_players = math.round(alive_crew_dissect),
@@ -547,13 +588,11 @@ function ExperienceManager:get_xp_by_params(params)
 		bonus_low_level = math.round(level_limit_dissect),
 		bonus_skill = math.round(skill_dissect),
 		bonus_days = math.round(days_dissect),
-		bonus_days_job = math.round(days_dissect_job),
-		bonus_days_risk = math.round(days_dissect_risk),
+		bonus_infamy = math.round(infamy_dissect),
 		bonus_extra = math.round(extra_bonus_dissect),
 		in_custody = math.round(personal_win_dissect),
 		heat_xp = math.round(job_heat_dissect),
-		heat_base_xp = math.round(base_heat_dissect),
-		heat_risk_xp = math.round(risk_heat_dissect),
+		bonus_ghost = math.round(ghost_dissect),
 		stage_xp = math.round(stage_xp_dissect),
 		job_xp = math.round(job_xp_dissect),
 		base = math.round(base_xp),

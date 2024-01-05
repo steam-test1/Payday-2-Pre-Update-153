@@ -10,6 +10,7 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
+	my_data.aggressor_unit = enter_params.aggressor_unit
 	if data.attention_obj then
 		CopLogicBase._set_attention_obj(data, nil, nil)
 	end
@@ -39,6 +40,8 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	end
 	data.unit:brain():set_attention_settings({corpse_sneak = true})
 	managers.groupai:state():register_rescueable_hostage(data.unit, nil)
+	my_data.is_hostage = true
+	managers.groupai:state():on_hostage_state(true, data.key, true)
 end
 
 function CopLogicIntimidated.exit(data, new_logic_name, enter_params)
@@ -53,6 +56,7 @@ function CopLogicIntimidated.exit(data, new_logic_name, enter_params)
 	end
 	if new_logic_name ~= "inactive" then
 		data.unit:brain():set_update_enabled_state(true)
+		data.unit:interaction():set_active(false, true, false)
 	end
 	if my_data.tied then
 		managers.groupai:state():on_enemy_untied(data.unit:key())
@@ -65,7 +69,6 @@ function CopLogicIntimidated.exit(data, new_logic_name, enter_params)
 	if my_data.is_hostage then
 		managers.groupai:state():on_hostage_state(false, data.key, true)
 	end
-	data.unit:interaction():set_active(false, true, false)
 end
 
 function CopLogicIntimidated.death_clbk(data, damage_info)
@@ -173,7 +176,7 @@ function CopLogicIntimidated.on_intimidated(data, amount, aggressor_unit)
 				walk = -1
 			}
 		else
-			anim = "hands_up"
+			anim = managers.groupai:state():whisper_mode() and "tied_all_in_one" or "hands_up"
 			blocks = {
 				light_hurt = -1,
 				hurt = -1,
@@ -286,6 +289,7 @@ end
 
 function CopLogicIntimidated._do_tied(data, aggressor_unit)
 	local my_data = data.internal_data
+	aggressor_unit = alive(aggressor_unit) and aggressor_unit
 	if my_data.surrender_clbk_registered then
 		managers.groupai:state():remove_from_surrendered(data.unit)
 		my_data.surrender_clbk_registered = nil
@@ -300,10 +304,11 @@ function CopLogicIntimidated._do_tied(data, aggressor_unit)
 	data.brain:rem_pos_rsrv("stand")
 	managers.groupai:state():on_enemy_tied(data.unit:key())
 	data.unit:base():set_slot(data.unit, 22)
-	data.unit:interaction():set_tweak_data("hostage_convert")
-	data.unit:interaction():set_active(true, true, false)
-	my_data.is_hostage = true
-	managers.groupai:state():on_hostage_state(true, data.key, true)
+	CopLogicIntimidated._chk_begin_alarm_pager(data)
+	if not data.brain:is_pager_started() then
+		data.unit:interaction():set_tweak_data("hostage_convert")
+		data.unit:interaction():set_active(true, true, false)
+	end
 	if aggressor_unit then
 		data.unit:character_damage():drop_pickup()
 		data.unit:character_damage():set_pickup(nil)
@@ -317,6 +322,13 @@ function CopLogicIntimidated._do_tied(data, aggressor_unit)
 				data.unit:base()._tweak_table
 			})
 		end
+	end
+end
+
+function CopLogicIntimidated.on_enemy_weapons_hot(data)
+	if data.internal_data.tied then
+		data.unit:interaction():set_tweak_data("hostage_convert")
+		data.unit:interaction():set_active(true, true, false)
 	end
 end
 
@@ -504,10 +516,11 @@ end
 
 function CopLogicIntimidated._start_action_hands_up(data)
 	local my_data = data.internal_data
+	local anim_name = managers.groupai:state():whisper_mode() and "tied_all_in_one" or "hands_up"
 	local action_data = {
 		type = "act",
 		body_part = 1,
-		variant = "hands_up",
+		variant = anim_name,
 		clamp_to_graph = true,
 		blocks = {
 			light_hurt = -1,
@@ -517,4 +530,13 @@ function CopLogicIntimidated._start_action_hands_up(data)
 		}
 	}
 	my_data.act_action = data.unit:brain():action_request(action_data)
+	if my_data.act_action and data.unit:anim_data().hands_tied then
+		CopLogicIntimidated._do_tied(data, my_data.aggressor_unit)
+	end
+end
+
+function CopLogicIntimidated._chk_begin_alarm_pager(data)
+	if managers.groupai:state():whisper_mode() and data.unit:unit_data().has_alarm_pager then
+		data.brain:begin_alarm_pager()
+	end
 end

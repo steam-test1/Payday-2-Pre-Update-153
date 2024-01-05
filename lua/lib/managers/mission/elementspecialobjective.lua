@@ -58,7 +58,6 @@ function ElementSpecialObjective:init(...)
 	ElementSpecialObjective.super.init(self, ...)
 	self:_finalize_values(self._values)
 	self._values = clone(self._values)
-	self._events = {}
 end
 
 function ElementSpecialObjective:_finalize_values(values)
@@ -153,7 +152,7 @@ function ElementSpecialObjective:_finalize_values(values)
 end
 
 function ElementSpecialObjective:event(name, unit)
-	if self._events[name] then
+	if self._events and self._events[name] then
 		for _, callback in ipairs(self._events[name]) do
 			callback(unit)
 		end
@@ -240,6 +239,7 @@ function ElementSpecialObjective:clbk_verify_administration(unit)
 end
 
 function ElementSpecialObjective:add_event_callback(name, callback)
+	self._events = self._events or {}
 	self._events[name] = self._events[name] or {}
 	table.insert(self._events[name], callback)
 end
@@ -630,6 +630,7 @@ function ElementSpecialObjective:get_as_followup(unit, skip_element_ids)
 	if (not unit or managers.navigation:check_access(self._values.SO_access, unit:brain():SO_access(), 0) and self:clbk_verify_administration(unit)) and not skip_element_ids[self._id] then
 		return self, self:_get_default_value_if_nil("base_chance")
 	end
+	self:event("admin_fail", unit)
 end
 
 function ElementSpecialObjective:_get_action_duration()

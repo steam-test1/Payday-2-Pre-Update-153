@@ -10,6 +10,10 @@ function CivilianDamage:die(variant)
 	self:drop_pickup()
 	if self._unit:unit_data().mission_element then
 		self._unit:unit_data().mission_element:event("death", self._unit)
+		if not self._unit:unit_data().alerted_event_called then
+			self._unit:unit_data().alerted_event_called = true
+			self._unit:unit_data().mission_element:event("alerted", self._unit)
+		end
 	end
 	if alive(managers.interaction:active_object()) then
 		managers.interaction:active_object():interaction():selected()

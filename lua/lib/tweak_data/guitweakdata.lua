@@ -1,85 +1,113 @@
 GuiTweakData = GuiTweakData or class()
 
 function GuiTweakData:init()
+	local birthday = {
+		id = "birthday",
+		name_id = "menu_content_birthday",
+		desc_id = "menu_content_birthday_desc",
+		date_id = "menu_content_birthday_date",
+		webpage = "http://www.overkillsoftware.com/birthday/",
+		image = "guis/textures/pd2/content_updates/birthday"
+	}
+	local halloween = {
+		id = "halloween",
+		name_id = "menu_content_halloween",
+		desc_id = "menu_content_halloween_desc",
+		date_id = "menu_content_halloween_date",
+		webpage = "http://www.overkillsoftware.com/halloween/",
+		image = "guis/textures/pd2/content_updates/halloween"
+	}
+	local armored_transport = {
+		id = "armored_transport",
+		name_id = "menu_content_armored_transport",
+		desc_id = "menu_content_armored_transport_desc",
+		date_id = "menu_content_armored_transport_date",
+		store = 264610,
+		image = "guis/textures/pd2/content_updates/armored_transport"
+	}
+	local gage_pack = {
+		id = "gage_pack",
+		name_id = "menu_content_gage_pack",
+		desc_id = "menu_content_gage_pack_desc",
+		date_id = "menu_content_gage_pack_date",
+		store = 267380,
+		image = "guis/textures/pd2/content_updates/gage_pack"
+	}
+	local charliesierra = {
+		id = "charliesierra",
+		name_id = "menu_content_charliesierra",
+		desc_id = "menu_content_charliesierra_desc",
+		date_id = "menu_content_charliesierra_date",
+		store = 271110,
+		image = "guis/textures/pd2/content_updates/charliesierra"
+	}
+	local christmas = {
+		id = "christmas",
+		name_id = "menu_content_christmas",
+		desc_id = "menu_content_christmas_desc",
+		date_id = "menu_content_christmas_date",
+		store = 267381,
+		image = "guis/textures/pd2/content_updates/christmas"
+	}
+	local infamy = {
+		id = "infamy",
+		name_id = "menu_content_infamy",
+		desc_id = "menu_content_infamy_desc",
+		date_id = "menu_content_infamy_date",
+		store = 274161,
+		image = "guis/textures/pd2/content_updates/infamy_introduction"
+	}
+	local gage_pack_lmg = {
+		id = "gage_pack_lmg",
+		name_id = "menu_content_gage_pack_lmg",
+		desc_id = "menu_content_gage_pack_lmg_desc",
+		date_id = "menu_content_gage_pack_lmg_date",
+		store = 275590,
+		image = "guis/textures/pd2/content_updates/gage_pack_lmg"
+	}
+	local deathwish = {
+		id = "deathwish",
+		name_id = "menu_content_deathwish",
+		desc_id = "menu_content_deathwish_desc",
+		date_id = "menu_content_deathwish_date",
+		store = 284430,
+		image = "guis/textures/pd2/content_updates/deathwish"
+	}
+	local election_day = {
+		id = "election_day",
+		name_id = "menu_content_election_day",
+		desc_id = "menu_content_election_day_desc",
+		date_id = "menu_content_election_day_date",
+		store = 284430,
+		image = "guis/textures/pd2/content_updates/election_day"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
-		num_items = 6,
-		item_list = {
-			{
-				id = "birthday",
-				name_id = "menu_content_birthday",
-				desc_id = "menu_content_birthday_desc",
-				date_id = "menu_content_birthday_date",
-				webpage = "http://www.overkillsoftware.com/birthday/",
-				image = "guis/textures/pd2/content_updates/birthday"
-			},
-			{
-				id = "halloween",
-				name_id = "menu_content_halloween",
-				desc_id = "menu_content_halloween_desc",
-				date_id = "menu_content_halloween_date",
-				webpage = "http://www.overkillsoftware.com/halloween/",
-				image = "guis/textures/pd2/content_updates/halloween"
-			},
-			{
-				id = "armored_transport",
-				name_id = "menu_content_armored_transport",
-				desc_id = "menu_content_armored_transport_desc",
-				date_id = "menu_content_armored_transport_date",
-				store = 264610,
-				image = "guis/textures/pd2/content_updates/armored_transport"
-			},
-			{
-				id = "gage_pack",
-				name_id = "menu_content_gage_pack",
-				desc_id = "menu_content_gage_pack_desc",
-				date_id = "menu_content_gage_pack_date",
-				store = 267380,
-				image = "guis/textures/pd2/content_updates/gage_pack"
-			},
-			{
-				id = "charliesierra",
-				name_id = "menu_content_charliesierra",
-				desc_id = "menu_content_charliesierra_desc",
-				date_id = "menu_content_charliesierra_date",
-				store = 271110,
-				image = "guis/textures/pd2/content_updates/charliesierra"
-			},
-			{
-				id = "christmas",
-				name_id = "menu_content_christmas",
-				desc_id = "menu_content_christmas_desc",
-				date_id = "menu_content_christmas_date",
-				store = 267381,
-				image = "guis/textures/pd2/content_updates/christmas"
-			},
-			{
-				id = "infamy",
-				name_id = "menu_content_infamy",
-				desc_id = "menu_content_infamy_desc",
-				date_id = "menu_content_infamy_date",
-				store = 274161,
-				image = "guis/textures/pd2/content_updates/infamy_introduction"
-			},
-			{
-				id = "gage_pack_lmg",
-				name_id = "menu_content_gage_pack_lmg",
-				desc_id = "menu_content_gage_pack_lmg_desc",
-				date_id = "menu_content_gage_pack_lmg_date",
-				store = 275590,
-				image = "guis/textures/pd2/content_updates/gage_pack_lmg"
-			},
-			{
-				id = "deathwish",
-				name_id = "menu_content_deathwish",
-				desc_id = "menu_content_deathwish_desc",
-				date_id = "menu_content_deathwish_date",
-				webpage = "http://www.overkillsoftware.com/deathwish/",
-				image = "guis/textures/pd2/content_updates/deathwish"
-			}
-		}
+		num_items = 6
 	}
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self.content_updates.item_list = {
+			birthday,
+			halloween,
+			armored_transport,
+			gage_pack,
+			charliesierra,
+			christmas,
+			infamy,
+			gage_pack_lmg,
+			deathwish,
+			election_day
+		}
+	elseif SystemInfo:platform() == Idstring("PS3") then
+		self.content_updates.item_list = {
+			armored_transport,
+			gage_pack,
+			gage_pack_lmg
+		}
+	elseif SystemInfo:platform() == Idstring("X360") then
+		self.content_updates.item_list = {}
+	end
 	self.fav_videos = {
 		title_id = "menu_fav_videos",
 		choice_id = nil,
@@ -1112,18 +1140,6 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
-		},
-		{
-			id = "casino",
-			name_id = "menu_cn_casino",
-			desc_id = "menu_cn_casino_desc",
-			menu_node = "crimenet_contract_casino",
-			x = 347,
-			y = 716,
-			icon = "guis/textures/pd2/crimenet_casino",
-			unlock = "unlock_level",
-			pulse = true,
-			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {

@@ -201,6 +201,22 @@ function ContractBoxGui:create_contract_box()
 			color = tweak_data.screen_colors.text
 		})
 		length_text:set_position(length_text_header:right() + 5, length_text_header:top())
+		do
+			local _, _, tw, th = length_text:text_rect()
+			w = math.max(w, tw)
+			length_text:set_size(tw, th)
+		end
+		if managers.job:is_job_ghostable(managers.job:current_job_id()) then
+			local ghost_icon = self._contract_panel:bitmap({
+				texture = "guis/textures/pd2/cn_minighost",
+				w = 16,
+				h = 16,
+				blend_mode = "add",
+				color = tweak_data.screen_colors.ghost_color
+			})
+			ghost_icon:set_center_y(length_text:center_y())
+			ghost_icon:set_left(length_text:right())
+		end
 		local filled_star_rect = {
 			0,
 			32,
@@ -239,7 +255,7 @@ function ContractBoxGui:create_contract_box()
 		end
 		local plvl = managers.experience:current_level()
 		local player_stars = math.max(math.ceil(plvl / 10), 1)
-		local total_xp, base_xp, risk_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_data.chain)
+		local total_xp, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_data.chain)
 		local job_xp = self._contract_panel:text({
 			font = font,
 			font_size = font_size,
@@ -254,7 +270,7 @@ function ContractBoxGui:create_contract_box()
 		local risk_xp = self._contract_panel:text({
 			font = font,
 			font_size = font_size,
-			text = " +" .. tostring(math.round(risk_xp)),
+			text = " +" .. tostring(math.round(0)),
 			color = risk_color
 		})
 		do
@@ -263,6 +279,55 @@ function ContractBoxGui:create_contract_box()
 		end
 		risk_xp:set_position(math.round(job_xp:right()), job_xp:top())
 		risk_xp:hide()
+		local job_ghost_mul = managers.job:get_ghost_bonus() or 0
+		local ghost_xp_text
+		if job_ghost_mul ~= 0 then
+			local job_ghost = math.round(job_ghost_mul * 100)
+			local job_ghost_string = tostring(math.abs(job_ghost))
+			local ghost_color = tweak_data.screen_colors.ghost_color
+			if job_ghost == 0 and job_ghost_mul ~= 0 then
+				job_ghost_string = string.format("%0.2f", math.abs(job_ghost_mul * 100))
+			end
+			local text_prefix = job_ghost_mul < 0 and "-" or "+"
+			local text_string = " (" .. text_prefix .. job_ghost_string .. "%)"
+			ghost_xp_text = self._contract_panel:text({
+				font = font,
+				font_size = font_size,
+				text = text_string,
+				color = ghost_color,
+				blend_mode = "add"
+			})
+			do
+				local _, _, tw, th = ghost_xp_text:text_rect()
+				ghost_xp_text:set_size(tw, th)
+			end
+			ghost_xp_text:set_position(math.round(risk_xp:visible() and risk_xp:right() or job_xp:right()), job_xp:top())
+		end
+		local job_heat = managers.job:current_job_heat() or 0
+		local job_heat_mul = managers.job:heat_to_experience_multiplier(job_heat) - 1
+		local heat_xp_text
+		if job_heat_mul ~= 0 then
+			job_heat = math.round(job_heat_mul * 100)
+			local job_heat_string = tostring(math.abs(job_heat))
+			local heat_color = managers.job:current_job_heat_color()
+			if job_heat == 0 and job_heat_mul ~= 0 then
+				job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
+			end
+			local text_prefix = job_heat_mul < 0 and "-" or "+"
+			local text_string = " (" .. text_prefix .. job_heat_string .. "%)"
+			heat_xp_text = self._contract_panel:text({
+				font = font,
+				font_size = font_size,
+				text = text_string,
+				color = heat_color,
+				blend_mode = "add"
+			})
+			do
+				local _, _, tw, th = heat_xp_text:text_rect()
+				heat_xp_text:set_size(tw, th)
+			end
+			heat_xp_text:set_position(math.round(ghost_xp_text and ghost_xp_text:right() or risk_xp:visible() and risk_xp:right() or job_xp:right()), job_xp:top())
+		end
 		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_data.chain, managers.job:current_job_id())
 		local total_stage_value = stage_payout_table[2]
 		local total_stage_risk_value = stage_payout_table[4]

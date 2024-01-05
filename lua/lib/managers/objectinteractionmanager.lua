@@ -148,6 +148,12 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 			if not active_obj:interaction():selected(player_unit) then
 				active_obj = nil
 			end
+		elseif alive(self._active_object) and self._active_object:interaction():dirty() then
+			self._active_object:interaction():set_dirty(false)
+			self._active_object:interaction():unselect()
+			if not self._active_object:interaction():selected(player_unit) then
+				active_obj = nil
+			end
 		end
 		self._active_object = active_obj
 		self._current_dot = current_dot

@@ -91,8 +91,10 @@ end
 
 function VoiceBriefingManager:_check_event_ok()
 	if not self._event_instance then
-		Application:error("[VoiceBriefingManager:_check_event_ok] Wasn't able to play sound event " .. tostring(self._event_name))
-		Application:stack_dump()
+		if self._event_name ~= "nothing" then
+			Application:error("[VoiceBriefingManager:_check_event_ok] Wasn't able to play sound event " .. tostring(self._event_name))
+			Application:stack_dump()
+		end
 		self._post_event_enabled = false
 		self:_sound_callback(nil, nil, "end_of_event", nil, self._event_name, nil, nil, nil)
 		self._post_event_enabled = true

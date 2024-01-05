@@ -123,9 +123,42 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 			scale = (math.round(self._contract_panel:h() * 0.5) - font_size) / (h + contract_text:top())
 		end
 		contract_text:set_font_size(font_size * scale)
+		self:make_fine_text(contract_text)
 	end
 	local contact_w = width - (text_w + 20) - 10
 	local contact_h = contact_w / 1.7777778
+	local is_job_ghostable = managers.job:is_job_ghostable(job_data.job_id)
+	if is_job_ghostable then
+		local min_ghost_bonus, max_ghost_bonus = managers.job:get_job_ghost_bonus(job_data.job_id)
+		local min_ghost = math.round(min_ghost_bonus * 100)
+		local max_ghost = math.round(max_ghost_bonus * 100)
+		local min_string, max_string
+		if min_ghost == 0 and min_ghost_bonus ~= 0 then
+			min_string = string.format("%0.2f", math.abs(min_ghost_bonus * 100))
+		else
+			min_string = tostring(math.abs(min_ghost))
+		end
+		if max_ghost == 0 and max_ghost_bonus ~= 0 then
+			max_string = string.format("%0.2f", math.abs(max_ghost_bonus * 100))
+		else
+			max_string = tostring(math.abs(max_ghost))
+		end
+		local ghost_bonus_string = min_ghost_bonus == max_ghost_bonus and min_string or min_string .. "-" .. max_string
+		local ghostable_text = self._contract_panel:text({
+			text = managers.localization:to_upper_text("menu_ghostable_job", {bonus = ghost_bonus_string}),
+			blend_mode = "add",
+			align = "left",
+			vertical = "top",
+			w = text_w,
+			font_size = font_size,
+			font = font,
+			color = tweak_data.screen_colors.ghost_color,
+			wrap = true,
+			wrap_word = true
+		})
+		ghostable_text:set_position(contract_text:x(), contract_text:bottom() + 10)
+		self:make_fine_text(ghostable_text)
+	end
 	local contact_panel = self._contract_panel:panel({
 		w = contact_w,
 		h = contact_h,
@@ -179,6 +212,34 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	})
 	self:make_fine_text(modifiers_text)
 	modifiers_text:set_bottom(math.round(self._contract_panel:h() * 0.5))
+	local ghost_bonus_mul = managers.job:get_ghost_bonus()
+	local skill_bonus = managers.player:get_skill_exp_multiplier()
+	local infamy_bonus = managers.player:get_infamy_exp_multiplier()
+	local limited_bonus = tweak_data:get_value("experience_manager", "limited_bonus_multiplier") or 1
+	local job_ghost = math.round(ghost_bonus_mul * 100)
+	local job_ghost_string = tostring(math.abs(job_ghost))
+	local has_ghost_bonus = 0 < ghost_bonus_mul
+	if job_ghost == 0 and ghost_bonus_mul ~= 0 then
+		job_ghost_string = string.format("%0.2f", math.abs(ghost_bonus_mul * 100))
+	end
+	local ghost_color = tweak_data.screen_colors.ghost_color
+	local ghost_warning_text = self._contract_panel:text({
+		name = "ghost_color_warning_text",
+		text = managers.localization:to_upper_text("menu_ghost_bonus", {exp_bonus = job_ghost_string}),
+		font = font,
+		font_size = font_size,
+		color = ghost_color,
+		align = "left",
+		vertical = "top",
+		wrap = true,
+		word_wrap = true,
+		w = text_w,
+		blend_mode = "normal"
+	})
+	self:make_fine_text(ghost_warning_text)
+	ghost_warning_text:set_top(modifiers_text:bottom())
+	ghost_warning_text:set_left(20)
+	ghost_warning_text:set_visible(has_ghost_bonus)
 	local job_heat_value = managers.job:get_job_heat(job_data.job_id)
 	local ignore_heat = 0 < job_heat_value and self._customizable
 	local job_heat_mul = ignore_heat and 0 or managers.job:get_job_heat_multipliers(job_data.job_id) - 1
@@ -189,6 +250,7 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
 	else
 	end
+	self._is_job_heated = is_job_heated
 	local heat_color = managers.job:get_job_heat_color(job_data.job_id)
 	local heat_warning_text = self._contract_panel:text({
 		name = "heat_warning_text",
@@ -200,12 +262,14 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		vertical = "top",
 		wrap = true,
 		word_wrap = true,
-		w = text_w
+		w = text_w,
+		blend_mode = "normal"
 	})
 	self:make_fine_text(heat_warning_text)
-	heat_warning_text:set_top(modifiers_text:bottom())
+	heat_warning_text:set_top(has_ghost_bonus and ghost_warning_text:bottom() or modifiers_text:bottom())
 	heat_warning_text:set_left(20)
 	heat_warning_text:set_visible(is_job_heated)
+	self._heat_color = heat_color
 	local pro_warning_text = self._contract_panel:text({
 		name = "pro_warning_text",
 		text = managers.localization:to_upper_text("menu_pro_warning"),
@@ -216,14 +280,15 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		vertical = "top",
 		wrap = true,
 		word_wrap = true,
-		w = text_w
+		w = text_w,
+		blend_mode = "normal"
 	})
 	self:make_fine_text(pro_warning_text)
 	pro_warning_text:set_h(pro_warning_text:h())
 	pro_warning_text:set_left(20)
-	pro_warning_text:set_top(is_job_heated and heat_warning_text:bottom() or modifiers_text:bottom())
+	pro_warning_text:set_top(is_job_heated and heat_warning_text:bottom() or has_ghost_bonus and ghost_warning_text:bottom() or modifiers_text:bottom())
 	pro_warning_text:set_visible(narrative.professional)
-	modifiers_text:set_visible(heat_warning_text:visible() or pro_warning_text:visible())
+	modifiers_text:set_visible(heat_warning_text:visible() or pro_warning_text:visible() or ghost_warning_text:visible())
 	local risk_title = self._contract_panel:text({
 		font = font,
 		font_size = font_size,
@@ -232,7 +297,7 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		x = 10
 	})
 	self:make_fine_text(risk_title)
-	risk_title:set_top((pro_warning_text:visible() and pro_warning_text:bottom() or heat_warning_text:visible() and heat_warning_text:bottom() or math.round(self._contract_panel:h() * 0.5)) + 5)
+	risk_title:set_top((pro_warning_text:visible() and pro_warning_text:bottom() or heat_warning_text:visible() and heat_warning_text:bottom() or ghost_warning_text:visible() and ghost_warning_text:bottom() or math.round(self._contract_panel:h() * 0.5)) + 5)
 	local menu_risk_id = "menu_risk_pd"
 	if job_data.difficulty == "hard" then
 		menu_risk_id = "menu_risk_swat"
@@ -368,42 +433,11 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		32
 	}
 	local cy = experience_title:center_y()
-	local total_xp, base_xp, risk_xp, heat_base_xp, heat_risk_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, narrative.professional, #narrative.chain, {
+	local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, narrative.professional, #narrative.chain, {
 		ignore_heat = 0 < job_heat_value and self._customizable
 	})
-	local job_xp = self._contract_panel:text({
-		name = "job_xp",
-		font = font,
-		font_size = font_size,
-		text = "0",
-		color = tweak_data.screen_colors.text
-	})
-	self:make_fine_text(job_xp)
-	job_xp:set_x(sx)
-	job_xp:set_center_y(math.round(cy))
-	local add_xp = self._contract_panel:text({
-		name = "add_xp",
-		font = font,
-		font_size = font_size,
-		text = "",
-		color = risk_color
-	})
-	add_xp:set_text(" +" .. math.round(0))
-	self:make_fine_text(add_xp)
-	add_xp:set_x(math.round(job_xp:right()))
-	add_xp:set_center_y(math.round(cy))
-	local heat_add_xp = self._contract_panel:text({
-		name = "heat_add_xp",
-		font = font,
-		font_size = font_size,
-		text = "",
-		color = heat_color
-	})
-	heat_add_xp:set_text(" +" .. math.round(0))
-	self:make_fine_text(heat_add_xp)
-	heat_add_xp:set_x(math.round(add_xp:right()))
-	heat_add_xp:set_center_y(math.round(cy))
-	heat_add_xp:set_visible(is_job_heated)
+	local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)
+	local job_xp, add_xp, heat_add_xp, ghost_add_xp = self:_create_xp_appendices(sx, cy)
 	cy = jobpay_title:center_y()
 	local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #narrative.chain, job_data.job_id)
 	local stage_value = stage_payout_table[1]
@@ -517,6 +551,8 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	self._data.add_experience = risk_xp
 	self._data.heat_experience = heat_base_xp
 	self._data.heat_add_experience = heat_risk_xp
+	self._data.ghost_experience = ghost_base_xp
+	self._data.ghost_add_experience = ghost_risk_xp
 	self._data.num_stages_string = tostring(#narrative.chain) .. " x "
 	self._data.payday_money = payday_money
 	self._data.counted_job_cash = 0
@@ -524,6 +560,7 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	self._data.counted_risk_cash = 0
 	self._data.counted_risk_xp = 0
 	self._data.counted_heat_xp = 0
+	self._data.counted_ghost_xp = 0
 	self._data.counted_payday_money = 0
 	self._data.stars = {
 		job_and_difficulty_stars = job_and_difficulty_stars,
@@ -537,6 +574,7 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	self._data.gui_objects.job_cash = job_cash
 	self._data.gui_objects.job_add_cash = add_cash
 	self._data.gui_objects.heat_add_xp = heat_add_xp
+	self._data.gui_objects.ghost_add_xp = ghost_add_xp
 	self._data.gui_objects.add_xp = add_xp
 	self._data.gui_objects.job_xp = job_xp
 	self._data.gui_objects.risks = {
@@ -565,8 +603,8 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		color = tweak_data.hud_stats.potential_xp_color
 	})
 	self:make_fine_text(potential_level_up_text)
-	potential_level_up_text:set_left(math.round((heat_add_xp:visible() and heat_add_xp:right() or add_xp:right()) + 4))
 	potential_level_up_text:set_top(math.round(heat_add_xp:top()))
+	self:_update_xp_appendices()
 	self._data.gui_objects.potential_level_up_text = potential_level_up_text
 	self._step = 1
 	self._steps = {
@@ -626,6 +664,105 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	self:_rec_round_object(self._panel)
 end
 
+function CrimeNetContractGui:_create_xp_appendices(x, y)
+	local font_size = tweak_data.menu.pd2_small_font_size
+	local font = tweak_data.menu.pd2_small_font
+	local job_xp = self._contract_panel:text({
+		name = "job_xp",
+		font = font,
+		font_size = font_size,
+		text = "0",
+		color = tweak_data.screen_colors.text
+	})
+	self:make_fine_text(job_xp)
+	job_xp:set_x(x)
+	job_xp:set_center_y(y)
+	local add_xp = self._contract_panel:text({
+		name = "add_xp",
+		font = font,
+		font_size = font_size,
+		text = "",
+		color = tweak_data.screen_colors.risk
+	})
+	add_xp:set_text(" +" .. math.round(0))
+	self:make_fine_text(add_xp)
+	add_xp:set_x(x)
+	add_xp:set_center_y(y)
+	local ghost_add_xp = self._contract_panel:text({
+		name = "ghost_add_xp",
+		font = font,
+		font_size = font_size,
+		text = "",
+		color = tweak_data.screen_colors.ghost_color
+	})
+	ghost_add_xp:set_text(" +" .. math.round(0))
+	self:make_fine_text(ghost_add_xp)
+	ghost_add_xp:set_x(x)
+	ghost_add_xp:set_center_y(y)
+	ghost_add_xp:set_visible(managers.job:has_ghost_bonus())
+	local heat_add_xp = self._contract_panel:text({
+		name = "heat_add_xp",
+		font = font,
+		font_size = font_size,
+		text = "",
+		color = self._heat_color
+	})
+	heat_add_xp:set_text(" +" .. math.round(0))
+	self:make_fine_text(heat_add_xp)
+	heat_add_xp:set_x(x)
+	heat_add_xp:set_center_y(y)
+	heat_add_xp:set_visible(self._is_job_heated)
+	job_xp:set_y(math.round(job_xp:y()))
+	add_xp:set_y(math.round(job_xp:y()))
+	heat_add_xp:set_y(math.round(job_xp:y()))
+	ghost_add_xp:set_y(math.round(job_xp:y()))
+	return job_xp, add_xp, heat_add_xp, ghost_add_xp
+end
+
+function CrimeNetContractGui:_update_xp_appendices()
+	local job_xp = self._contract_panel:child("job_xp")
+	local add_xp = self._contract_panel:child("add_xp")
+	local ghost_add_xp = self._contract_panel:child("ghost_add_xp")
+	local heat_add_xp = self._contract_panel:child("heat_add_xp")
+	local potential_level_up_text = self._contract_panel:child("potential_level_up_text")
+	self:make_fine_text(job_xp)
+	self:make_fine_text(add_xp)
+	self:make_fine_text(ghost_add_xp)
+	self:make_fine_text(heat_add_xp)
+	self:make_fine_text(potential_level_up_text)
+	add_xp:set_left(job_xp:right())
+	ghost_add_xp:set_left(add_xp:right())
+	heat_add_xp:set_left(ghost_add_xp:visible() and ghost_add_xp:right() or add_xp:right())
+	if alive(potential_level_up_text) then
+		local x = heat_add_xp:visible() and heat_add_xp:right() or ghost_add_xp:visible() and ghost_add_xp:right() or add_xp:right()
+		local fine_x = math.round(x)
+		potential_level_up_text:set_left(fine_x + 4)
+	end
+end
+
+function CrimeNetContractGui:_check_level_up(levels_gained)
+	local gonna_level_up = 1 <= levels_gained
+	self._gonna_level_up = self._gonna_level_up or false
+	if self._gonna_level_up ~= gonna_level_up then
+		self._gonna_level_up = gonna_level_up
+		local potential_level_up_text = self._contract_panel:child("potential_level_up_text")
+		potential_level_up_text:stop()
+		potential_level_up_text:set_alpha(1)
+		potential_level_up_text:set_blend_mode("normal")
+		if gonna_level_up then
+			local pulse_anim = function(o)
+				o:set_blend_mode("add")
+				while alive(o) do
+					over(2, function(p)
+						o:set_alpha((math.sin(p * 360) + 1) * 0.5 * 0.2 + 0.8)
+					end)
+				end
+			end
+			potential_level_up_text:animate(pulse_anim)
+		end
+	end
+end
+
 function CrimeNetContractGui:_rec_round_object(object)
 	if object.children then
 		for i, d in ipairs(object:children()) do
@@ -671,6 +808,7 @@ function CrimeNetContractGui:count_job_stars(t, dt)
 			})
 			self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
 			self:make_fine_text(self._data.gui_objects.potential_level_up_text)
+			self:_check_level_up(levels_gained)
 		end
 		self._data.gui_objects.potential_level_up_text:set_left(math.round((gui_heat_add_xp:visible() and gui_heat_add_xp:right() or gui_add_xp:right()) + 4))
 	end
@@ -699,31 +837,36 @@ function CrimeNetContractGui:count_difficulty_stars(t, dt)
 	self._current_difficulty_star = self._current_difficulty_star + 1
 	local stars = self._data.stars.difficulty_stars
 	local gui_panel = self._contract_panel
-	local risk_xp = math.round(self._data.add_experience * (self._current_difficulty_star / stars))
-	local heat_xp = math.round(self._data.heat_experience + self._data.heat_add_experience * (self._current_difficulty_star / stars))
+	local step = self._current_difficulty_star / stars
+	local risk_xp = math.round(self._data.add_experience * step)
+	local heat_xp = math.round(self._data.heat_experience + self._data.heat_add_experience * step)
+	local ghost_xp = math.round(self._data.ghost_experience + self._data.ghost_add_experience * step)
 	local gui_add_xp = self._data.gui_objects.add_xp
 	local gui_heat_add_xp = self._data.gui_objects.heat_add_xp
+	local gui_ghost_add_xp = self._data.gui_objects.ghost_add_xp
 	local risk_prefix = 0 <= risk_xp and " +" or " -"
 	local heat_prefix = 0 <= heat_xp and " +" or " -"
+	local ghost_prefix = 0 <= ghost_xp and " +" or " -"
 	local abs_risk_xp = math.abs(risk_xp)
 	local abs_heat_xp = math.abs(heat_xp)
+	local abs_ghost_xp = math.abs(ghost_xp)
 	gui_add_xp:set_text(risk_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_risk_xp)))
 	self:make_fine_text(gui_add_xp)
 	gui_heat_add_xp:set_text(heat_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_heat_xp)))
 	self:make_fine_text(gui_heat_add_xp)
-	gui_heat_add_xp:set_x(math.round(gui_add_xp:right()))
-	if self._data.gui_objects.potential_level_up_text then
-		if not managers.experience:reached_level_cap() then
-			local gain_xp = self._data.experience + risk_xp + heat_xp
-			local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
-			local levelup_text = managers.localization:to_upper_text("menu_levelup", {
-				levels = string.format("%0.1d%%", levels_gained * 100)
-			})
-			self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
-			self:make_fine_text(self._data.gui_objects.potential_level_up_text)
-		end
-		self._data.gui_objects.potential_level_up_text:set_left(math.round((gui_heat_add_xp:visible() and gui_heat_add_xp:right() or gui_add_xp:right()) + 4))
+	gui_ghost_add_xp:set_text(ghost_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_ghost_xp)))
+	self:make_fine_text(gui_ghost_add_xp)
+	if self._data.gui_objects.potential_level_up_text and not managers.experience:reached_level_cap() then
+		local gain_xp = self._data.experience + risk_xp + heat_xp + ghost_xp
+		local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
+		local levelup_text = managers.localization:to_upper_text("menu_levelup", {
+			levels = string.format("%0.1d%%", levels_gained * 100)
+		})
+		self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
+		self:make_fine_text(self._data.gui_objects.potential_level_up_text)
+		self:_check_level_up(levels_gained)
 	end
+	self:_update_xp_appendices()
 	local job_cash = math.round(self._data.add_job_cash * (self._current_difficulty_star / stars))
 	local gui_job_cash = self._data.gui_objects.job_cash
 	local gui_job_add_cash = self._data.gui_objects.job_add_cash
@@ -796,31 +939,35 @@ function CrimeNetContractGui:count_job_base(t, dt)
 	local tick = dt * math.max(self._data.experience / (math.rand(1) + 1.5), 4000)
 	self._data.counted_job_xp = math.round(math.step(self._data.counted_job_xp, self._data.experience, tick))
 	self._data.counted_heat_xp = math.round(math.step(self._data.counted_heat_xp, self._data.heat_experience, tick))
+	self._data.counted_ghost_xp = math.round(math.step(self._data.counted_ghost_xp, self._data.ghost_experience, tick))
 	local xp = self._data.counted_job_xp
 	local heat_xp = self._data.counted_heat_xp
+	local ghost_xp = self._data.counted_ghost_xp
 	local gui_xp = self._data.gui_objects.job_xp
 	local gui_add_xp = self._data.gui_objects.add_xp
 	local gui_heat_add_xp = self._data.gui_objects.heat_add_xp
+	local gui_ghost_add_xp = self._data.gui_objects.ghost_add_xp
 	gui_xp:set_text(managers.money:add_decimal_marks_to_string(tostring(xp)))
 	self:make_fine_text(gui_xp)
-	gui_add_xp:set_x(math.round(gui_xp:right()))
 	local heat_prefix = 0 <= heat_xp and " +" or " -"
 	local abs_heat_xp = math.abs(heat_xp)
 	gui_heat_add_xp:set_text(heat_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_heat_xp)))
 	self:make_fine_text(gui_heat_add_xp)
-	gui_heat_add_xp:set_x(math.round(gui_add_xp:right()))
-	if self._data.gui_objects.potential_level_up_text then
-		if not managers.experience:reached_level_cap() then
-			local gain_xp = xp + heat_xp
-			local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
-			local levelup_text = managers.localization:to_upper_text("menu_levelup", {
-				levels = string.format("%0.1d%%", levels_gained * 100)
-			})
-			self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
-			self:make_fine_text(self._data.gui_objects.potential_level_up_text)
-		end
-		self._data.gui_objects.potential_level_up_text:set_left(math.round((gui_heat_add_xp:visible() and gui_heat_add_xp:right() or gui_add_xp:right()) + 4))
+	local ghost_prefix = 0 <= ghost_xp and " +" or " -"
+	local abs_ghost_xp = math.abs(ghost_xp)
+	gui_ghost_add_xp:set_text(ghost_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_ghost_xp)))
+	self:make_fine_text(gui_ghost_add_xp)
+	if self._data.gui_objects.potential_level_up_text and not managers.experience:reached_level_cap() then
+		local gain_xp = xp + heat_xp + ghost_xp
+		local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
+		local levelup_text = managers.localization:to_upper_text("menu_levelup", {
+			levels = string.format("%0.1d%%", levels_gained * 100)
+		})
+		self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
+		self:make_fine_text(self._data.gui_objects.potential_level_up_text)
+		self:_check_level_up(levels_gained)
 	end
+	self:_update_xp_appendices()
 	self._data.counted_job_cash = math.round(math.step(self._data.counted_job_cash, self._data.job_cash, dt * math.max(self._data.job_cash / (math.rand(1) + 1.5), 80000)))
 	local job_cash = self._data.counted_job_cash
 	local gui_job_cash = self._data.gui_objects.job_cash
@@ -828,7 +975,7 @@ function CrimeNetContractGui:count_job_base(t, dt)
 	gui_job_cash:set_text(managers.experience:cash_string(job_cash))
 	self:make_fine_text(gui_job_cash)
 	gui_job_add_cash:set_x(math.round(gui_job_cash:right()))
-	if self._data.counted_job_xp == self._data.experience and self._data.counted_job_cash == self._data.job_cash and self._data.counted_heat_xp == self._data.heat_experience then
+	if self._data.counted_job_xp == self._data.experience and self._data.counted_job_cash == self._data.job_cash and self._data.counted_heat_xp == self._data.heat_experience and self._data.counted_ghost_xp == self._data.ghost_experience then
 		self._step = self._step + 1
 	end
 end
@@ -859,6 +1006,7 @@ function CrimeNetContractGui:count_job_risk(t, dt)
 			})
 			self._data.gui_objects.potential_level_up_text:set_text(levelup_text)
 			self:make_fine_text(self._data.gui_objects.potential_level_up_text)
+			self:_check_level_up(levels_gained)
 		end
 		self._data.gui_objects.potential_level_up_text:set_left(math.round((gui_heat_add_xp:visible() and gui_heat_add_xp:right() or gui_add_xp:right()) + 4))
 	end
@@ -892,10 +1040,11 @@ function CrimeNetContractGui:set_all(t, dt)
 	local gui_panel = self._contract_panel
 	local potential_level_up_text = gui_panel:child("potential_level_up_text")
 	local job_heat_value = managers.job:get_job_heat(job_data.job_id)
-	local total_xp, base_xp, risk_xp, heat_base_xp, heat_risk_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, job_data.professional, #narrative.chain, {
+	local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, job_data.professional, #narrative.chain, {
 		ignore_heat = 0 < job_heat_value and self._customizable
 	})
 	local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #narrative.chain, job_data.job_id)
+	local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)
 	local stage_value = stage_payout_table[1]
 	local stage_risk_value = stage_payout_table[3]
 	local job_value = job_payout_table[1]
@@ -909,39 +1058,40 @@ function CrimeNetContractGui:set_all(t, dt)
 	local gui_xp = gui_panel:child("job_xp")
 	local gui_add_xp = gui_panel:child("add_xp")
 	local gui_heat_add_xp = gui_panel:child("heat_add_xp")
-	local gui_add_xp = gui_panel:child("add_xp")
-	local gui_heat_add_xp = gui_panel:child("heat_add_xp")
+	local gui_ghost_add_xp = gui_panel:child("ghost_add_xp")
 	local heat_xp = heat_base_xp + heat_risk_xp
+	local ghost_xp = ghost_base_xp + ghost_risk_xp
 	local risk_prefix = 0 <= risk_xp and " +" or " -"
 	local heat_prefix = 0 <= heat_xp and " +" or " -"
+	local ghost_prefix = 0 <= ghost_xp and " +" or " -"
 	local abs_risk_xp = math.abs(risk_xp)
 	local abs_heat_xp = math.abs(heat_xp)
+	local abs_ghost_xp = math.abs(ghost_xp)
 	gui_xp:set_text(managers.money:add_decimal_marks_to_string(tostring(xp)))
 	self:make_fine_text(gui_xp)
 	gui_add_xp:set_text(risk_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_risk_xp)))
 	self:make_fine_text(gui_add_xp)
-	gui_add_xp:set_x(math.round(gui_xp:right()))
 	gui_heat_add_xp:set_text(heat_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_heat_xp)))
 	self:make_fine_text(gui_heat_add_xp)
-	gui_heat_add_xp:set_x(math.round(gui_add_xp:right()))
+	gui_ghost_add_xp:set_text(ghost_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_ghost_xp)))
+	self:make_fine_text(gui_ghost_add_xp)
 	local job_cash = job_value
 	local gui_job_cash = gui_panel:child("job_cash")
 	local gui_job_add_cash = gui_panel:child("job_add_cash")
 	gui_job_cash:set_text(managers.experience:cash_string(job_cash))
 	self:make_fine_text(gui_job_cash)
 	gui_job_add_cash:set_x(math.round(gui_job_cash:right()))
-	if potential_level_up_text then
-		if not managers.experience:reached_level_cap() then
-			local gain_xp = base_xp + risk_xp + heat_xp
-			local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
-			local levelup_text = managers.localization:to_upper_text("menu_levelup", {
-				levels = string.format("%0.1d%%", levels_gained * 100)
-			})
-			potential_level_up_text:set_text(levelup_text)
-			self:make_fine_text(potential_level_up_text)
-		end
-		potential_level_up_text:set_left(math.round((gui_heat_add_xp:visible() and gui_heat_add_xp:right() or gui_add_xp:right()) + 4))
+	if potential_level_up_text and not managers.experience:reached_level_cap() then
+		local gain_xp = base_xp + risk_xp + heat_xp + ghost_xp
+		local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
+		local levelup_text = managers.localization:to_upper_text("menu_levelup", {
+			levels = string.format("%0.1d%%", levels_gained * 100)
+		})
+		potential_level_up_text:set_text(levelup_text)
+		self:make_fine_text(potential_level_up_text)
+		self:_check_level_up(levels_gained)
 	end
+	self:_update_xp_appendices()
 	local job_cash = job_risk_value
 	local gui_job_add_cash = gui_panel:child("job_add_cash")
 	gui_job_add_cash:set_text(" +" .. managers.experience:cash_string(job_cash))
@@ -1117,6 +1267,7 @@ function CrimeNetContractGui:special_btn_pressed(button)
 	if button == Idstring("voice_message") then
 		self:toggle_post_event()
 		return true
+	elseif button == Idstring("menu_toggle_filters") then
 	end
 	return false
 end

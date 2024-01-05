@@ -3,7 +3,8 @@ CopActionDodge._apply_freefall = CopActionWalk._apply_freefall
 CopActionDodge._VARIATIONS = {
 	"side_step",
 	"dive",
-	"roll"
+	"roll",
+	"wheel"
 }
 CopActionDodge._SIDES = {
 	"fwd",
@@ -22,17 +23,14 @@ function CopActionDodge:init(action_desc, common_data)
 	self._timeout = action_desc.timeout
 	self._machine = common_data.machine
 	self._ids_base = Idstring("base")
-	local redir_name = action_desc.variation == "side_step" and "dodge_stand" or "dodge_crouch"
-	local redir_res = self._ext_movement:play_redirect(redir_name)
+	local redir_res = self._ext_movement:play_redirect("dodge")
 	if redir_res then
 		self._body_part = action_desc.body_part
 		self._descriptor = action_desc
 		self._last_vel_z = 0
 		self:_determine_rotation_transition()
 		self._ext_movement:set_root_blend(false)
-		if action_desc.variation ~= "side_step" then
-			self._machine:set_parameter(redir_res, action_desc.variation, 1)
-		end
+		self._machine:set_parameter(redir_res, action_desc.variation, 1)
 		if action_desc.speed then
 			self._machine:set_speed(redir_res, action_desc.speed)
 		end
@@ -53,12 +51,6 @@ function CopActionDodge:on_exit()
 		self._ext_movement:set_m_host_stop_pos(self._ext_movement:m_pos())
 	elseif not self._expired then
 		self._common_data.ext_network:send("action_dodge_end")
-	end
-	if Network:is_server() and not self._unit:character_damage():dead() then
-		self._unit:brain():add_pos_rsrv("stand", {
-			position = mvector3.copy(self._common_data.pos),
-			radius = 30
-		})
 	end
 end
 

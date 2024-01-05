@@ -88,7 +88,11 @@ function ElementSpecialObjectiveGroup:choose_followup_SO(unit, skip_element_ids)
 		return
 	end
 	skip_element_ids[self._id] = true
-	return ElementSpecialObjective.choose_followup_SO(self, unit, skip_element_ids)
+	local res_element = ElementSpecialObjective.choose_followup_SO(self, unit, skip_element_ids)
+	if not res_element then
+		self:event("admin_fail", unit)
+	end
+	return res_element
 end
 
 function ElementSpecialObjectiveGroup:get_as_followup(unit, skip_element_ids)
@@ -96,7 +100,11 @@ function ElementSpecialObjectiveGroup:get_as_followup(unit, skip_element_ids)
 		return
 	end
 	skip_element_ids[self._id] = true
-	return ElementSpecialObjective.choose_followup_SO(self, unit, skip_element_ids), self._values.base_chance
+	local res_element = ElementSpecialObjective.choose_followup_SO(self, unit, skip_element_ids)
+	if not res_element then
+		self:event("admin_fail", unit)
+	end
+	return res_element, self._values.base_chance
 end
 
 function ElementSpecialObjectiveGroup:_execute_random_SO(instigator)
@@ -105,6 +113,8 @@ function ElementSpecialObjectiveGroup:_execute_random_SO(instigator)
 	})
 	if random_SO then
 		random_SO:on_executed(instigator)
+	else
+		self:event("admin_fail", instigator)
 	end
 end
 

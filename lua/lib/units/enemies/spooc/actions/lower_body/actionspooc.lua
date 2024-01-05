@@ -144,12 +144,6 @@ function ActionSpooc:on_exit()
 	if alive(self._target_unit) and self._target_unit:base().is_local_player then
 		self._target_unit:movement():on_targetted_for_attack(false, self._common_data.unit)
 	end
-	if Network:is_server() and not self._unit:character_damage():dead() then
-		self._unit:brain():add_pos_rsrv("stand", {
-			position = mvector3.copy(self._common_data.pos),
-			radius = 30
-		})
-	end
 end
 
 function ActionSpooc:_chk_can_strike()

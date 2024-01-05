@@ -9,12 +9,15 @@ TimerGui.themes.default.time_text_color = TimerGui.themes.default.timer_color
 TimerGui.themes.old = {}
 TimerGui.themes.old.hide_background = true
 TimerGui.themes.old.timer_color = Color(0.3, 0.5, 0.3)
+TimerGui.themes.old.timer_background_color = Color(0.2, 0.1, 0.2, 0.1)
 TimerGui.themes.old.working_text_color = TimerGui.themes.old.timer_color
 TimerGui.themes.old.time_header_text_color = TimerGui.themes.old.timer_color
 TimerGui.themes.old.time_text_color = TimerGui.themes.old.timer_color
-TimerGui.themes.old.bg_rect_color = Color(0.4, 0, 0, 0)
+TimerGui.themes.old.bg_rect_color = Color.black
+TimerGui.themes.old.bg_rect_blend_mode = "mul"
 TimerGui.themes.old.jammed = {}
 TimerGui.themes.old.jammed.bg_rect = Color(0.1, 0, 0)
+TimerGui.themes.old.jammed.bg_rect_blend_mode = "mul"
 TimerGui.themes.old.upgrade_color_0 = Color(0, 0, 0)
 TimerGui.themes.old.upgrade_color_1 = Color(0.3, 0.6, 0.3)
 TimerGui.themes.old.upgrade_color_2 = Color(0.8, 1, 0.8)
@@ -90,6 +93,9 @@ function TimerGui:_set_theme(theme_name)
 	if theme.timer_color then
 		self._gui_script.timer:set_color(theme.timer_color)
 	end
+	if theme.timer_background_color then
+		self._gui_script.timer_background:set_color(theme.timer_background_color)
+	end
 	if theme.working_text_color then
 		self._gui_script.working_text:set_color(theme.working_text_color)
 	end
@@ -102,6 +108,12 @@ function TimerGui:_set_theme(theme_name)
 	self._gui_script.bg_rect:set_visible(theme.bg_rect_color and true or false)
 	if theme.bg_rect_color then
 		self._gui_script.bg_rect:set_color(theme.bg_rect_color)
+	end
+	if theme.bg_rect_blend_mode then
+		self._gui_script.bg_rect:set_blend_mode(theme.bg_rect_blend_mode)
+	end
+	if theme.bg_rect_render_template then
+		self._gui_script.bg_rect:set_render_template(theme.bg_rect_render_template)
 	end
 	self:_set_original_colors()
 end
@@ -294,7 +306,7 @@ end
 function TimerGui:set_jammed(jammed)
 	if managers.network:session() then
 		local event_id = jammed and TimerGui.EVENT_IDS.jammed or TimerGui.EVENT_IDS.unjammed
-		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "timer_gui", event_id)
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "timer_gui", event_id)
 	end
 	self:_set_jammed(jammed)
 end
@@ -323,6 +335,10 @@ function TimerGui:_set_jammed(jammed)
 				local jammed_color = theme and theme.jammed and theme.jammed[child:name()] or Color.red
 				local c = jammed_color:with_alpha(color.a)
 				child:set_color(c)
+				local blend_mode = theme and theme.jammed and theme.jammed[child:name() .. "_blend_mode"]
+				if blend_mode then
+					child:set_blend_mode(blend_mode)
+				end
 			end
 		end
 		self._gui_script.working_text:set_text(managers.localization:text(self._gui_malfunction))
@@ -348,6 +364,10 @@ function TimerGui:_set_jammed(jammed)
 		self._gui_script.time_text:set_text(math.floor(self._time_left or self._current_timer) .. " " .. managers.localization:text("prop_timer_gui_seconds"))
 		self._gui_script.drill_screen_background:set_color(self._gui_script.drill_screen_background:color():with_alpha(1))
 		self:post_event(self._resume_event)
+		local theme = TimerGui.themes[self.THEME]
+		if theme and theme.bg_rect_blend_mode then
+			self._gui_script.bg_rect:set_blend_mode(theme.bg_rect_blend_mode)
+		end
 	end
 	self._unit:base():set_jammed(jammed)
 	if self._unit:mission_door_device() then

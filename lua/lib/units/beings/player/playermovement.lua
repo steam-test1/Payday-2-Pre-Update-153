@@ -468,13 +468,15 @@ function PlayerMovement:on_suspicion(observer_unit, status)
 			if not next(self._suspicion) then
 				self._suspicion = nil
 			end
-		elseif type(visible_status) == "number" then
+			if visible_status and observer_unit:movement() and not observer_unit:movement():cool() and TimerManager:game():time() - observer_unit:movement():not_cool_t() > 1 then
+				return
+			end
+		elseif type(visible_status) == "number" and (not observer_unit:movement() or observer_unit:movement():cool()) then
 			self._suspicion[observer_unit:key()] = visible_status
 		else
 			return
 		end
 		self:_calc_suspicion_ratio_and_sync(observer_unit, visible_status)
-		managers.groupai:state():on_criminal_suspicion_progress(self._unit, observer_unit, visible_status)
 	else
 		self._suspicion_ratio = status
 	end

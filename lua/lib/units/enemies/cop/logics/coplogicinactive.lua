@@ -9,6 +9,9 @@ function CopLogicInactive.enter(data, new_logic_name, enter_params)
 		data.unit:contour():remove("highlight")
 		data.has_outline = nil
 	end
+	if data.is_converted then
+		data.unit:contour():remove("friendly", true)
+	end
 	local attention_obj = data.attention_obj
 	CopLogicBase._set_attention_obj(data, nil, nil)
 	CopLogicBase._destroy_all_detected_attention_object_data(data)
@@ -36,10 +39,6 @@ end
 function CopLogicInactive.exit(data, new_logic_name, enter_params)
 	CopLogicBase.exit(data, new_logic_name, enter_params)
 	local my_data = data.internal_data
-	if my_data.weapons_hot_listener_key then
-		managers.groupai:state():remove_listener(my_data.weapons_hot_listener_key)
-		my_data.weapons_hot_listener_key = nil
-	end
 	CopLogicBase.cancel_delayed_clbks(my_data)
 end
 
@@ -47,19 +46,11 @@ function CopLogicInactive.is_available_for_assignment(data)
 	return false
 end
 
-function CopLogicInactive.on_enemy_weapons_hot(_, data)
+function CopLogicInactive.on_enemy_weapons_hot(data)
 	local my_data = data.internal_data
 	data.unit:brain():set_attention_settings({corpse_cbt = true})
 	if data.unit:interaction():active() then
 		data.unit:interaction():set_active(false, true, true)
-	end
-	if my_data.pager_alert_clbk_id then
-		CopLogicBase.cancel_delayed_clbk(my_data, my_data.pager_alert_clbk_id)
-		my_data.pager_alert_clbk_id = nil
-	end
-	if my_data.pager_reminder_clbk_id then
-		CopLogicBase.cancel_delayed_clbk(my_data, my_data.pager_reminder_clbk_id)
-		my_data.pager_reminder_clbk_id = nil
 	end
 end
 
@@ -68,10 +59,6 @@ function CopLogicInactive._register_attention(data, my_data)
 		if managers.groupai:state():enemy_weapons_hot() then
 			data.unit:brain():set_attention_settings({corpse_cbt = true})
 		else
-			my_data.weapons_hot_listener_key = "CopLogicInactive_corpse" .. tostring(data.key)
-			managers.groupai:state():add_listener(my_data.weapons_hot_listener_key, {
-				"enemy_weapons_hot"
-			}, callback(CopLogicInactive, CopLogicInactive, "on_enemy_weapons_hot", data))
 			data.unit:brain():set_attention_settings({corpse_sneak = true})
 		end
 	else
@@ -79,127 +66,15 @@ function CopLogicInactive._register_attention(data, my_data)
 	end
 end
 
-function CopLogicInactive.on_alarm_pager_interaction(data, status, player)
-	if managers.groupai:state():enemy_weapons_hot() then
-		return
-	end
-	local my_data = data.internal_data
-	if status == "started" then
-		CopLogicBase.cancel_delayed_clbk(my_data, my_data.pager_alert_clbk_id)
-		my_data.pager_alert_clbk_id = nil
-		if my_data.pager_reminder_clbk_id then
-			CopLogicBase.cancel_delayed_clbk(my_data, my_data.pager_reminder_clbk_id)
-			my_data.pager_reminder_clbk_id = nil
-		end
-	elseif status == "complete" then
-		local nr_previous_bluffs = managers.groupai:state():get_nr_successful_alarm_pager_bluffs()
-		local has_upgrade
-		if player:base().is_local_player then
-			has_upgrade = managers.player:has_category_upgrade("player", "corpse_alarm_pager_bluff")
-		else
-			has_upgrade = player:base():upgrade_value("player", "corpse_alarm_pager_bluff")
-		end
-		local chance_table = tweak_data.player.alarm_pager[has_upgrade and "bluff_success_chance_w_skill" or "bluff_success_chance"]
-		local chance_index = math.min(nr_previous_bluffs + 1, #chance_table)
-		local is_last = chance_table[math.min(chance_index + 1, #chance_table)] == 0
-		local rand_nr = math.random()
-		local success = 0 < chance_table[chance_index] and rand_nr < chance_table[chance_index]
-		if success then
-			data.unit:interaction():set_tweak_data("corpse_dispose")
-			data.unit:interaction():set_active(true, true, true)
-			managers.groupai:state():on_successful_alarm_pager_bluff()
-			data.unit:sound():stop()
-			local cue_index = is_last and 4 or chance_index
-			data.unit:sound():corpse_play("dsp_radio_fooled_" .. tostring(cue_index), nil, true)
-		else
-			managers.groupai:state():on_police_called("alarm_pager_bluff_failed")
-			data.unit:interaction():set_active(false, true, true)
-			data.unit:sound():stop()
-			data.unit:sound():corpse_play("dsp_radio_alarm_1", nil, true)
-		end
-	elseif status == "interrupted" then
-		managers.groupai:state():on_police_called("alarm_pager_hang_up")
-		data.unit:interaction():set_active(false, true, true)
-		data.unit:sound():stop()
-		data.unit:sound():corpse_play("dsp_radio_alarm_1", nil, true)
-	end
-end
-
 function CopLogicInactive._set_interaction(data, my_data)
 	if data.unit:character_damage():dead() and managers.groupai:state():whisper_mode() then
-		local my_data = data.internal_data
 		if data.unit:unit_data().has_alarm_pager then
-			local pager_delay = math.lerp(tweak_data.player.alarm_pager.ring_delay[1], tweak_data.player.alarm_pager.ring_delay[2], math.random())
-			my_data.pager_alert_clbk_id = "alarm_pager" .. tostring(data.key)
-			CopLogicBase.add_delayed_clbk(my_data, my_data.pager_alert_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_triggered", data), TimerManager:game():time() + pager_delay)
+			data.brain:begin_alarm_pager()
 		else
 			data.unit:interaction():set_tweak_data("corpse_dispose")
 			data.unit:interaction():set_active(true, true, true)
 		end
 	end
-end
-
-function CopLogicInactive.clbk_alarm_pager_triggered(ignore_this, data)
-	print("[CopLogicInactive.clbk_alarm_pager_triggered]")
-	local my_data = data.internal_data
-	CopLogicBase.on_delayed_clbk(my_data, my_data.pager_alert_clbk_id)
-	my_data.pager_alert_clbk_id = nil
-	if managers.groupai:state():enemy_weapons_hot() then
-		return
-	end
-	if managers.groupai:state():is_ecm_jammer_active("pager") then
-		local pager_delay = math.lerp(tweak_data.player.alarm_pager.ring_delay[1], tweak_data.player.alarm_pager.ring_delay[2], math.random())
-		my_data.pager_alert_clbk_id = "alarm_pager" .. tostring(data.key)
-		CopLogicBase.add_delayed_clbk(my_data, my_data.pager_alert_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_triggered", data), TimerManager:game():time() + pager_delay)
-		return
-	end
-	data.unit:base():set_material_state(false)
-	local u_id = managers.enemy:get_corpse_unit_data_from_key(data.key).u_id
-	managers.network:session():send_to_peers_synched("set_corpse_material_config", u_id, false)
-	data.unit:interaction():set_tweak_data("corpse_alarm_pager")
-	data.unit:interaction():set_active(true, true, true)
-	data.unit:sound():stop()
-	data.unit:sound():corpse_play("dsp_radio_query_1", nil, true)
-	local pager_delay = math.lerp(tweak_data.player.alarm_pager.ring_duration[1], tweak_data.player.alarm_pager.ring_duration[2], math.random())
-	my_data.hang_up_t = TimerManager:game():time() + pager_delay
-	my_data.pager_alert_clbk_id = "alarm_pager_hang_up" .. tostring(data.key)
-	CopLogicBase.add_delayed_clbk(my_data, my_data.pager_alert_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_not_answered", data), TimerManager:game():time() + pager_delay)
-	local reminder_delay = math.lerp(tweak_data.player.alarm_pager.ring_reminder[1], tweak_data.player.alarm_pager.ring_reminder[2], math.random())
-	my_data.pager_reminder_clbk_id = "alarm_pager_reminder" .. tostring(data.key)
-	CopLogicBase.add_delayed_clbk(my_data, my_data.pager_reminder_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_reminder", data), TimerManager:game():time() + reminder_delay)
-end
-
-function CopLogicInactive.clbk_alarm_pager_reminder(ignore_this, data)
-	print("[CopLogicInactive.clbk_alarm_pager_reminder]")
-	local my_data = data.internal_data
-	CopLogicBase.on_delayed_clbk(my_data, my_data.pager_reminder_clbk_id)
-	my_data.pager_reminder_clbk_id = nil
-	if managers.groupai:state():enemy_weapons_hot() then
-		return
-	end
-	if not my_data.pager_alert_clbk_id or my_data.hang_up_t - TimerManager:game():time() < 1.5 then
-		return
-	end
-	data.unit:sound():stop()
-	data.unit:sound():corpse_play("dsp_radio_reminder_1", nil, true)
-	local reminder_delay = math.lerp(tweak_data.player.alarm_pager.ring_reminder[1], tweak_data.player.alarm_pager.ring_reminder[2], math.random())
-	my_data.pager_reminder_clbk_id = "alarm_pager_reminder" .. tostring(data.key)
-	CopLogicBase.add_delayed_clbk(my_data, my_data.pager_reminder_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_reminder", data), TimerManager:game():time() + reminder_delay)
-end
-
-function CopLogicInactive.clbk_alarm_pager_not_answered(ignore_this, data)
-	print("[CopLogicInactive.clbk_alarm_pager_not_answered]")
-	local my_data = data.internal_data
-	CopLogicBase.on_delayed_clbk(my_data, my_data.pager_alert_clbk_id)
-	my_data.pager_alert_clbk_id = nil
-	if managers.groupai:state():enemy_weapons_hot() then
-		return
-	end
-	data.unit:base():swap_material_config()
-	data.unit:interaction():set_active(false, true, true)
-	managers.groupai:state():on_police_called("alarm_pager_not_answered")
-	data.unit:sound():stop()
-	data.unit:sound():corpse_play("pln_alm_any_any", nil, true)
 end
 
 function CopLogicInactive.on_new_objective(data, old_objective)
@@ -209,21 +84,5 @@ function CopLogicInactive.on_new_objective(data, old_objective)
 	CopLogicBase.on_new_objective(data, old_objective)
 	if old_objective and old_objective.fail_clbk then
 		old_objective.fail_clbk(data.unit)
-	end
-end
-
-function CopLogicInactive.pre_destroy(data)
-	local my_data = data.internal_data
-	if my_data.weapons_hot_listener_key then
-		managers.groupai:state():remove_listener(my_data.weapons_hot_listener_key)
-		my_data.weapons_hot_listener_key = nil
-	end
-	if my_data.pager_alert_clbk_id then
-		managers.enemy:remove_delayed_clbk(my_data.pager_alert_clbk_id)
-		my_data.pager_alert_clbk_id = nil
-	end
-	if my_data.pager_reminder_clbk_id then
-		managers.enemy:remove_delayed_clbk(my_data.pager_reminder_clbk_id)
-		my_data.pager_reminder_clbk_id = nil
 	end
 end

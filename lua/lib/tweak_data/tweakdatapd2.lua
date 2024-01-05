@@ -254,6 +254,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.equipment_crowbar = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			0,
+			64,
+			32,
+			32
+		}
+	}
 	self.hud_icons.ak = {
 		texture = "guis/textures/pd2/weapons",
 		texture_rect = {
@@ -420,6 +429,15 @@ function TweakData:_init_pd2()
 		texture = "guis/textures/pd2/equipment",
 		texture_rect = {
 			64,
+			32,
+			32,
+			32
+		}
+	}
+	self.hud_icons.equipment_body_bag = {
+		texture = "guis/textures/pd2/equipment",
+		texture_rect = {
+			96,
 			32,
 			32,
 			32

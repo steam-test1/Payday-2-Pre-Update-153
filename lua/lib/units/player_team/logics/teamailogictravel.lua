@@ -416,6 +416,7 @@ function TeamAILogicTravel._upd_enemy_detection(data)
 		end
 	end
 	TeamAILogicAssault._chk_request_combat_chatter(data, my_data)
+	TeamAILogicIdle._upd_sneak_spotting(data, my_data)
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, TeamAILogicTravel._upd_enemy_detection, data, data.t + delay)
 end
 

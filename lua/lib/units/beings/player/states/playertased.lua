@@ -226,10 +226,7 @@ function PlayerTased:call_teammate(line, t, no_gesture, skip_alert)
 			interact_type = "cmd_point"
 			queue_name = "s07x_sin"
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
-				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-				prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
-				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
+				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 			end
 			if not self._tase_ended and managers.player:has_category_upgrade("player", "taser_self_shock") and prime_target.unit:key() == self._unit:character_damage():tase_data().attacker_unit:key() then
 				self:_start_action_counter_tase(t, prime_target)

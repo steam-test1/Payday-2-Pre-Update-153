@@ -71,11 +71,11 @@ function ECMJammerBase:sync_net_event(event_id)
 end
 
 function ECMJammerBase:_send_net_event(event_id)
-	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", event_id)
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", event_id)
 end
 
 function ECMJammerBase:_send_net_event_to_host(event_id)
-	managers.network:session():send_to_host("sync_unit_event_id_8", self._unit, "base", event_id)
+	managers.network:session():send_to_host("sync_unit_event_id_16", self._unit, "base", event_id)
 end
 
 function ECMJammerBase:setup(battery_life_upgrade_lvl, owner)

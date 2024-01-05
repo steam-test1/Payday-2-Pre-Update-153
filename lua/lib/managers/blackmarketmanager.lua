@@ -392,6 +392,9 @@ function BlackMarketManager:equip_weapon(category, slot)
 		if equipped.weapon_id == tweak_data.achievement.unique_selling_point then
 			managers.achievment:award("halloween_9")
 		end
+		if equipped.weapon_id == tweak_data.achievement.vote_for_change then
+			managers.achievment:award("bob_1")
+		end
 	end
 	if managers.menu_scene then
 		local data = category == "primaries" and self:equipped_primary() or self:equipped_secondary()
@@ -1162,19 +1165,14 @@ function BlackMarketManager:got_new_drop(global_value, category, id)
 		local uses_parts = managers.weapon_factory:get_parts_from_factory_id(id) or {}
 		for type, parts in pairs(uses_parts) do
 			for _, part in ipairs(parts) do
-				if self:check_new_drop("normal", "weapon_mods", part) then
-					return true
-				end
-				if self:check_new_drop("infamous", "weapon_mods", part) then
+				local gv = tweak_data.weapon.factory.parts[part].dlc or "normal"
+				if self:check_new_drop(gv, "weapon_mods", part) then
 					return true
 				end
 			end
 		end
 	elseif category_ids == Idstring("weapon_mods") then
-		if self:check_new_drop("normal", "weapon_mods", id) then
-			return true
-		end
-		if self:check_new_drop("infamous", "weapon_mods", id) then
+		if self:check_new_drop(global_value, "weapon_mods", id) then
 			return true
 		end
 	elseif category_ids == Idstring("weapon_tabs") then

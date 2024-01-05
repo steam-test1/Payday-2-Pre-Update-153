@@ -17,6 +17,9 @@ GroupAIStateBase.BLAME_SYNC = {
 	"sys_gensec",
 	"sys_police_alerted",
 	"sys_csgo_gunfire",
+	"alarm_pager_bluff_failed",
+	"alarm_pager_not_answered",
+	"alarm_pager_hang_up",
 	"civ_alarm",
 	"cop_alarm",
 	"gan_alarm",
@@ -59,6 +62,7 @@ GroupAIStateBase.BLAME_SYNC = {
 	"civ_glass",
 	"civ_breaking_entering",
 	"civ_crate_open",
+	"civ_computer",
 	"civ_distress",
 	"cop_criminal",
 	"cop_gunfire",
@@ -78,6 +82,7 @@ GroupAIStateBase.BLAME_SYNC = {
 	"cop_glass",
 	"cop_breaking_entering",
 	"cop_crate_open",
+	"cop_computer",
 	"cop_distress",
 	"sys_explosion",
 	"civ_explosion",
@@ -86,6 +91,26 @@ GroupAIStateBase.BLAME_SYNC = {
 	"cam_explosion",
 	"default"
 }
+
+function GroupAIStateBase.chk_all_blame_synced()
+	local all_fine = true
+	for blame, _ in pairs(tweak_data.blame) do
+		if blame ~= "empty" and not table.contains(GroupAIStateBase.BLAME_SYNC, blame) then
+			Application:error("[GroupAIStateBase.chk_all_blame_synced] Blame not synced!", blame)
+			all_fine = false
+		end
+	end
+	for _, blame in ipairs(GroupAIStateBase.BLAME_SYNC) do
+		if blame ~= "empty" and not tweak_data.blame[blame] then
+			Application:error("[GroupAIStateBase.chk_all_blame_synced] Blame not in tweak_data!", blame)
+			all_fine = false
+		end
+	end
+	if all_fine then
+		Application:debug("[GroupAIStateBase.chk_all_blame_synced] PASSED CHECK")
+	end
+end
+
 GroupAIStateBase.EVENT_SYNC = {
 	"police_called",
 	"enemy_weapons_hot",
@@ -590,17 +615,17 @@ function GroupAIStateBase:hostage_count()
 end
 
 function GroupAIStateBase:has_room_for_police_hostage()
-	local global_limit = 1
+	local nr_hostages_allowed = 0
 	for u_key, u_data in pairs(self._player_criminals) do
-		local limit
 		if u_data.unit:base().is_local_player then
-			limit = managers.player:upgrade_value("player", "ene_hostage_lim_1", 1)
-		else
-			limit = u_data.unit:base():upgrade_value("player", "ene_hostage_lim_1")
+			if managers.player:has_category_upgrade("player", "intimidate_enemies") then
+				nr_hostages_allowed = nr_hostages_allowed + 1
+			end
+		elseif u_data.unit:base():upgrade_value("player", "intimidate_enemies") then
+			nr_hostages_allowed = nr_hostages_allowed + 1
 		end
-		global_limit = limit and math.max(global_limit, limit) or global_limit
 	end
-	return global_limit > self._police_hostage_headcount
+	return nr_hostages_allowed > self._police_hostage_headcount + table.size(self._converted_police)
 end
 
 GroupAIStateBase.PATH = "gamedata/comments"
@@ -680,7 +705,7 @@ function GroupAIStateBase:sync_teammate_comment_instigator(unit, message)
 	self:teammate_comment(unit, self.teammate_comment_names[message], nil, false, nil, false)
 end
 
-function GroupAIStateBase:on_hostage_state(state, key, police)
+function GroupAIStateBase:on_hostage_state(state, key, police, skip_announcement)
 	local d = state and 1 or -1
 	if state then
 		for i, h_key in ipairs(self._hostage_keys) do
@@ -700,13 +725,13 @@ function GroupAIStateBase:on_hostage_state(state, key, police)
 	end
 	self._hostage_headcount = self._hostage_headcount + d
 	self:sync_hostage_headcount()
-	if self._hostage_headcount == 1 and self._task_data.assault.disabled then
+	if state and not skip_announcement and self._hostage_headcount == 1 and self._task_data.assault.disabled then
 		managers.dialog:queue_dialog("ban_h01a", {})
 	end
 	if police then
 		self._police_hostage_headcount = self._police_hostage_headcount + d
 	end
-	if self._hstg_hint_clbk then
+	if state and self._hstg_hint_clbk then
 		managers.enemy:remove_delayed_clbk("_hostage_hint_clbk")
 		self._hstg_hint_clbk = nil
 	end
@@ -1160,6 +1185,10 @@ end
 
 function GroupAIStateBase:on_civilian_unregistered(unit)
 	self:sync_suspicion_hud(unit, false)
+	local u_data = managers.enemy:all_civilians()[unit:key()]
+	if u_data and u_data.hostage_following then
+		self:on_hostage_follow(u_data.hostage_following, unit, false)
+	end
 end
 
 function GroupAIStateBase:report_aggression(unit)
@@ -1333,8 +1362,8 @@ function GroupAIStateBase:check_gameover_conditions()
 end
 
 function GroupAIStateBase:_gameover_clbk_func()
-	local govr = self:check_gameover_conditions()
 	self._gameover_clbk = nil
+	local govr = self:check_gameover_conditions()
 	if govr then
 		managers.network:session():send_to_peers("begin_gameover_fadeout")
 		self:begin_gameover_fadeout()
@@ -2282,7 +2311,14 @@ function GroupAIStateBase:on_civilian_objective_failed(unit, objective)
 	if fail_clbk then
 		fail_clbk(unit)
 	end
-	unit:brain():set_objective({type = "free", is_default = true})
+	if alive(unit) and objective == unit:brain():objective() then
+		if unit:brain():is_tied() then
+			print("going back to tied")
+			unit:brain():on_hostage_move_interaction(nil, "stay")
+		else
+			unit:brain():set_objective({type = "free", is_default = true})
+		end
+	end
 end
 
 function GroupAIStateBase:on_criminal_objective_complete(unit, objective)
@@ -3516,6 +3552,7 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	u_data.is_converted = true
 	unit:brain():convert_to_criminal(peer_unit)
 	unit:character_damage():add_listener("Converted" .. tostring(player_unit:key()), {"death"}, callback(self, self, "clbk_minion_dies", player_unit:key()))
+	unit:base():add_destroy_listener("Converted" .. tostring(player_unit:key()), callback(self, self, "clbk_minion_destroyed", player_unit:key()))
 	if not unit:contour() then
 		debug_pause_unit(unit, "[GroupAIStateBase:convert_hostage_to_criminal]: Unit doesn't have Contour Extension")
 	end
@@ -3539,7 +3576,17 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	end
 end
 
+function GroupAIStateBase:clbk_minion_destroyed(player_key, my_unit)
+	if not self._converted_police[my_unit:key()] then
+		return
+	end
+	self:clbk_minion_dies(player_key, my_unit)
+end
+
 function GroupAIStateBase:clbk_minion_dies(player_key, my_unit, damage_info)
+	if not self._converted_police[my_unit:key()] then
+		return
+	end
 	self._converted_police[my_unit:key()] = nil
 	if not self._criminals[player_key] then
 		Application:error("GroupAIStateBase:clbk_minion_dies", "Minion dies, but master do not exists", player_key, my_unit:key(), inspect(damage_info))
@@ -4133,16 +4180,19 @@ function GroupAIStateBase:_upd_criminal_suspicion_progress()
 		if Network:is_server() then
 			local critical_icon, to_remove
 			for susp_key, suspect_data in pairs(obs_susp_data.suspects) do
-				if suspect_data.status == true then
-					if t - suspect_data.last_status_t > 5 then
-						to_remove = to_remove or {}
-						table.insert(to_remove, susp_key)
+				if not self._whisper_mode then
+					to_remove = to_remove or {}
+					table.insert(to_remove, susp_key)
+				elseif suspect_data.status == true then
+					repeat
+						do break end -- pseudo-goto
+						if t - suspect_data.last_status_t > 8 then
+							to_remove = to_remove or {}
+							table.insert(to_remove, susp_key)
+					until true
 					else
 						critical_icon = true
 					end
-				elseif not self._whisper_mode then
-					to_remove = to_remove or {}
-					table.insert(to_remove, susp_key)
 				end
 			end
 			if to_remove then
@@ -4296,6 +4346,10 @@ function GroupAIStateBase:get_amount_enemies_converted_to_criminals()
 	return self._converted_police and table.size(self._converted_police)
 end
 
+function GroupAIStateBase:all_converted_enemies()
+	return self._converted_police
+end
+
 function GroupAIStateBase._get_group_acces_mask(group)
 	local quadfield = managers.navigation._quad_field
 	local union_mask = quadfield:convert_access_filter_to_number("0")
@@ -4304,4 +4358,49 @@ function GroupAIStateBase._get_group_acces_mask(group)
 		union_mask = quadfield:access_filter_union(access_num, union_mask)
 	end
 	return union_mask
+end
+
+function GroupAIStateBase:on_hostage_follow(owner, follower, state)
+	if state then
+		local owner_data = self:criminal_record(owner:key())
+		owner_data.following_hostages = owner_data.following_hostages or {}
+		owner_data.following_hostages[follower:key()] = follower
+		local follower_data = managers.enemy:all_civilians()[follower:key()]
+		if follower_data then
+			follower_data.hostage_following = owner
+		end
+		if Network:is_server() then
+			local owner_member = managers.network:game():member_from_unit(owner)
+			if owner_member and owner_member ~= Global.local_member then
+				owner_member:peer():send_queued_sync("sync_unit_event_id_16", follower, "base", 1)
+			end
+		end
+	else
+		local follower_data = managers.enemy:all_civilians()[follower:key()]
+		owner = owner or follower_data and follower_data.hostage_following
+		local owner_data = owner and self:criminal_record(owner:key())
+		if owner_data and owner_data.following_hostages then
+			owner_data.following_hostages[follower:key()] = nil
+			if not next(owner_data.following_hostages) then
+				owner_data.following_hostages = nil
+			end
+		end
+		if follower_data then
+			follower_data.hostage_following = nil
+		end
+		if owner and follower and Network:is_server() then
+			local owner_member = managers.network:game():member_from_unit(owner)
+			if owner_member and owner_member ~= Global.local_member then
+				owner_member:peer():send_queued_sync("sync_unit_event_id_16", follower, "base", 2)
+			end
+		end
+	end
+end
+
+function GroupAIStateBase:get_following_hostages(owner)
+	local owner_data = self:criminal_record(owner:key())
+	if not owner_data then
+		return
+	end
+	return owner_data.following_hostages
 end

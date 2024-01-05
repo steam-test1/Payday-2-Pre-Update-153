@@ -202,7 +202,7 @@ function TripMineBase:_sensor(t)
 			self._sensor_units_detected[ray.unit:key()] = true
 			self:_emit_sensor_sound_and_effect()
 			if managers.network:session() then
-				managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", TripMineBase.EVENT_IDS.sensor_beep)
+				managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", TripMineBase.EVENT_IDS.sensor_beep)
 			end
 			self._sensor_last_unit_time = t + 5
 		end
@@ -241,7 +241,7 @@ function TripMineBase:_check()
 		self._explode_ray = ray
 		self._unit:sound_source():post_event("trip_mine_beep_explode")
 		if managers.network:session() then
-			managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", TripMineBase.EVENT_IDS.explosion_beep)
+			managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", TripMineBase.EVENT_IDS.explosion_beep)
 		end
 	end
 end

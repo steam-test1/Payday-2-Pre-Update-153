@@ -421,6 +421,9 @@ function TweakData:init()
 	self.screen_colors.regular_color = Color(255, 41, 150, 240) / 255
 	self.screen_colors.pro_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.dlc_color = Color(255, 255, 212, 0) / 255
+	self.screen_colors.skill_color = Color(255, 77, 198, 255) / 255
+	self.screen_colors.ghost_color = Color("4ca6ff")
+	self.screen_colors.extra_bonus_color = Color(255, 255, 255, 255) / 255
 	self.screen_colors.heat_cold_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.heat_warm_color = Color("ff7f00")
 	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
@@ -762,7 +765,7 @@ function TweakData:init()
 	self.interaction.timelock_panel = {}
 	self.interaction.timelock_panel.icon = "equipment_bank_manager_key"
 	self.interaction.timelock_panel.text_id = "hud_int_timelock_panel"
-	self.interaction.timelock_panel.equipment_text_id = "hud_int_timelock_panel_no_keycard"
+	self.interaction.timelock_panel.equipment_text_id = "hud_int_equipment_no_keycard"
 	self.interaction.timelock_panel.special_equipment = "bank_manager_key"
 	self.interaction.timelock_panel.equipment_consume = true
 	self.interaction.timelock_panel.start_active = false
@@ -841,6 +844,17 @@ function TweakData:init()
 	self.interaction.pick_lock_deposit_transport.timer = 15
 	self.interaction.pick_lock_deposit_transport.axis = "y"
 	self.interaction.pick_lock_deposit_transport.interact_distance = 80
+	self.interaction.open_door_with_keys = {}
+	self.interaction.open_door_with_keys.contour = "interactable_icon"
+	self.interaction.open_door_with_keys.icon = "equipment_bank_manager_key"
+	self.interaction.open_door_with_keys.text_id = "hud_int_try_keys"
+	self.interaction.open_door_with_keys.start_active = false
+	self.interaction.open_door_with_keys.timer = 5
+	self.interaction.open_door_with_keys.action_text_id = "hud_action_try_keys"
+	self.interaction.open_door_with_keys.interact_distance = 100
+	self.interaction.open_door_with_keys.sound_start = "bar_pick_lock"
+	self.interaction.open_door_with_keys.sound_interupt = "bar_pick_lock_cancel"
+	self.interaction.open_door_with_keys.sound_done = "bar_pick_lock_finished"
 	self.interaction.cant_pick_lock = {}
 	self.interaction.cant_pick_lock.icon = "equipment_bank_manager_key"
 	self.interaction.cant_pick_lock.text_id = "hud_int_pick_lock"
@@ -980,17 +994,18 @@ function TweakData:init()
 	self.interaction.hack_suburbia.icon = "equipment_hack_ipad"
 	self.interaction.hack_suburbia.text_id = "debug_interact_hack_ipad"
 	self.interaction.hack_suburbia.timer = 5
-	self.interaction.hack_suburbia.sound_start = "bar_drill_apply"
-	self.interaction.hack_suburbia.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.hack_suburbia.sound_done = "bar_drill_apply_finished"
+	self.interaction.hack_suburbia.sound_start = "bar_keyboard"
+	self.interaction.hack_suburbia.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.hack_suburbia.sound_done = "bar_keyboard_finished"
 	self.interaction.hack_suburbia.axis = "x"
+	self.interaction.hack_suburbia.contour = "contour_off"
 	self.interaction.hack_suburbia_jammed = {}
 	self.interaction.hack_suburbia_jammed.icon = "equipment_hack_ipad"
 	self.interaction.hack_suburbia_jammed.text_id = "debug_interact_hack_ipad_jammed"
 	self.interaction.hack_suburbia_jammed.timer = 5
-	self.interaction.hack_suburbia_jammed.sound_start = "bar_drill_fix"
-	self.interaction.hack_suburbia_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.hack_suburbia_jammed.sound_done = "bar_drill_fix_finished"
+	self.interaction.hack_suburbia_jammed.sound_start = "bar_keyboard"
+	self.interaction.hack_suburbia_jammed.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.hack_suburbia_jammed.sound_done = "bar_keyboard_finished"
 	self.interaction.security_station = {}
 	self.interaction.security_station.icon = "equipment_hack_ipad"
 	self.interaction.security_station.text_id = "debug_interact_security_station"
@@ -1157,7 +1172,6 @@ function TweakData:init()
 	self.interaction.revive.text_id = "debug_interact_revive"
 	self.interaction.revive.start_active = false
 	self.interaction.revive.interact_distance = 300
-	self.interaction.revive.no_contour = true
 	self.interaction.revive.axis = "z"
 	self.interaction.revive.timer = 6
 	self.interaction.revive.sound_start = "bar_helpup"
@@ -1168,6 +1182,8 @@ function TweakData:init()
 		category = "player",
 		upgrade = "revive_interaction_speed_multiplier"
 	}
+	self.interaction.revive.contour_preset = "teammate_downed"
+	self.interaction.revive.contour_preset_selected = "teammate_downed_selected"
 	self.interaction.free = {}
 	self.interaction.free.icon = "interaction_free"
 	self.interaction.free.text_id = "debug_interact_free"
@@ -1183,13 +1199,30 @@ function TweakData:init()
 	self.interaction.hostage_trade.icon = "interaction_trade"
 	self.interaction.hostage_trade.text_id = "debug_interact_trade"
 	self.interaction.hostage_trade.start_active = true
-	self.interaction.hostage_trade.contour = "character_interactable"
 	self.interaction.hostage_trade.timer = 3
 	self.interaction.hostage_trade.requires_upgrade = {
 		category = "player",
 		upgrade = "hostage_trade"
 	}
 	self.interaction.hostage_trade.action_text_id = "hud_action_trading"
+	self.interaction.hostage_trade.contour_preset = "generic_interactable"
+	self.interaction.hostage_trade.contour_preset_selected = "generic_interactable_selected"
+	self.interaction.hostage_move = {}
+	self.interaction.hostage_move.icon = "interaction_trade"
+	self.interaction.hostage_move.text_id = "debug_interact_hostage_move"
+	self.interaction.hostage_move.start_active = true
+	self.interaction.hostage_move.timer = 1
+	self.interaction.hostage_move.action_text_id = "hud_action_standing_up"
+	self.interaction.hostage_move.no_contour = true
+	self.interaction.hostage_move.interaction_obj = Idstring("Spine")
+	self.interaction.hostage_stay = {}
+	self.interaction.hostage_stay.icon = "interaction_trade"
+	self.interaction.hostage_stay.text_id = "debug_interact_hostage_stay"
+	self.interaction.hostage_stay.start_active = true
+	self.interaction.hostage_stay.timer = 0.4
+	self.interaction.hostage_stay.action_text_id = "hud_action_getting_down"
+	self.interaction.hostage_stay.no_contour = true
+	self.interaction.hostage_stay.interaction_obj = Idstring("Spine2")
 	self.interaction.trip_mine = {}
 	self.interaction.trip_mine.icon = "equipment_trip_mine"
 	self.interaction.trip_mine.contour = "deployable"
@@ -1208,6 +1241,16 @@ function TweakData:init()
 	self.interaction.sentry_gun_refill.sound_interupt = "bar_bag_generic_cancel"
 	self.interaction.sentry_gun_refill.sound_done = "bar_bag_generic_finished"
 	self.interaction.sentry_gun_refill.action_text_id = "hud_action_taking_grenades"
+	self.interaction.bodybags_bag = {}
+	self.interaction.bodybags_bag.icon = "equipment_ammo_bag"
+	self.interaction.bodybags_bag.text_id = "debug_interact_bodybags_bag_take_bodybag"
+	self.interaction.bodybags_bag.contour = "deployable"
+	self.interaction.bodybags_bag.timer = 1.5
+	self.interaction.bodybags_bag.blocked_hint = "full_bodybags"
+	self.interaction.bodybags_bag.sound_start = "bar_bag_generic"
+	self.interaction.bodybags_bag.sound_interupt = "bar_bag_generic_cancel"
+	self.interaction.bodybags_bag.sound_done = "bar_bag_generic_finished"
+	self.interaction.bodybags_bag.action_text_id = "hud_action_grabbing_bag"
 	self.interaction.grenade_crate = {}
 	self.interaction.grenade_crate.icon = "equipment_ammo_bag"
 	self.interaction.grenade_crate.text_id = "debug_interact_grenade_crate_take_grenades"
@@ -1327,6 +1370,8 @@ function TweakData:init()
 	self.interaction.invisible_interaction_open.icon = "develop"
 	self.interaction.invisible_interaction_open.text_id = "hud_int_invisible_interaction_open"
 	self.interaction.invisible_interaction_open.timer = 0.5
+	self.interaction.fork_lift_sound = deep_clone(self.interaction.invisible_interaction_open)
+	self.interaction.fork_lift_sound.text_id = "hud_int_fork_lift_sound"
 	self.interaction.money_briefcase = deep_clone(self.interaction.invisible_interaction_open)
 	self.interaction.money_briefcase.axis = "x"
 	self.interaction.grenade_briefcase = deep_clone(self.interaction.invisible_interaction_open)
@@ -1639,6 +1684,8 @@ function TweakData:init()
 	self.interaction.corpse_alarm_pager.timer = 10
 	self.interaction.corpse_alarm_pager.force_update_position = true
 	self.interaction.corpse_alarm_pager.action_text_id = "hud_action_disabling_alarm_pager"
+	self.interaction.corpse_alarm_pager.contour_preset = "generic_interactable"
+	self.interaction.corpse_alarm_pager.contour_preset_selected = "generic_interactable_selected"
 	self.interaction.corpse_dispose = {}
 	self.interaction.corpse_dispose.icon = "develop"
 	self.interaction.corpse_dispose.text_id = "hud_int_dispose_corpse"
@@ -1649,6 +1696,7 @@ function TweakData:init()
 		upgrade = "corpse_dispose"
 	}
 	self.interaction.corpse_dispose.action_text_id = "hud_action_disposing_corpse"
+	self.interaction.corpse_dispose.no_contour = true
 	self.interaction.shaped_sharge = {}
 	self.interaction.shaped_sharge.icon = "equipment_c4"
 	self.interaction.shaped_sharge.text_id = "hud_int_equipment_shaped_charge"
@@ -1756,10 +1804,10 @@ function TweakData:init()
 	self.interaction.hold_place_gps_tracker = {}
 	self.interaction.hold_place_gps_tracker.text_id = "hud_int_hold_place_gps_tracker"
 	self.interaction.hold_place_gps_tracker.action_text_id = "hud_action_placing_gps_tracker"
+	self.interaction.hold_place_gps_tracker.contour = "interactable_icon"
 	self.interaction.hold_place_gps_tracker.start_active = false
 	self.interaction.hold_place_gps_tracker.timer = 1.5
-	self.interaction.hold_place_gps_tracker.force_update_position = true
-	self.interaction.hold_place_gps_tracker.interact_distance = 300
+	self.interaction.hold_place_gps_tracker.interact_distance = 200
 	self.interaction.keyboard_no_time = deep_clone(self.interaction.security_station_keyboard)
 	self.interaction.keyboard_no_time.timer = 2.5
 	self.interaction.keyboard_eday_1 = deep_clone(self.interaction.security_station_keyboard)
@@ -1818,6 +1866,8 @@ function TweakData:init()
 	self.interaction.open_slash_close = {}
 	self.interaction.open_slash_close.text_id = "hud_int_open_slash_close"
 	self.interaction.open_slash_close.start_active = false
+	self.interaction.open_slash_close.axis = "y"
+	self.interaction.open_slash_close.interact_distance = 200
 	self.interaction.open_slash_close_act = {}
 	self.interaction.open_slash_close_act.text_id = "hud_int_open_slash_close"
 	self.interaction.open_slash_close_act.action_text_id = "hud_action_open_slash_close"
@@ -1882,13 +1932,17 @@ function TweakData:init()
 	self.interaction.crate_loot = {}
 	self.interaction.crate_loot.text_id = "hud_int_hold_crack_crate"
 	self.interaction.crate_loot.action_text_id = "hud_action_cracking_crate"
-	self.interaction.crate_loot.equipment_text_id = "debug_interact_equipment_crowbar"
-	self.interaction.crate_loot.special_equipment = "crowbar"
 	self.interaction.crate_loot.timer = 2
 	self.interaction.crate_loot.start_active = false
 	self.interaction.crate_loot.sound_start = "bar_open_crate"
 	self.interaction.crate_loot.sound_interupt = "bar_open_crate_cancel"
 	self.interaction.crate_loot.sound_done = "bar_open_crate_finished"
+	self.interaction.crate_loot_crowbar = deep_clone(self.interaction.crate_loot)
+	self.interaction.crate_loot_crowbar.equipment_text_id = "debug_interact_equipment_crowbar"
+	self.interaction.crate_loot_crowbar.special_equipment = "crowbar"
+	self.interaction.crate_loot_crowbar.sound_start = "bar_crowbar"
+	self.interaction.crate_loot_crowbar.sound_interupt = "bar_crowbar_cancel"
+	self.interaction.crate_loot_crowbar.sound_done = "bar_crowbar_end"
 	self.interaction.crate_loot_close = {}
 	self.interaction.crate_loot_close.text_id = "hud_int_hold_close_crate"
 	self.interaction.crate_loot_close.action_text_id = "hud_action_closing_crate"
@@ -1944,12 +1998,13 @@ function TweakData:init()
 	self.interaction.uload_database = {}
 	self.interaction.uload_database.text_id = "hud_int_hold_use_computer"
 	self.interaction.uload_database.action_text_id = "hud_action_using_computer"
-	self.interaction.uload_database.timer = 0.5
+	self.interaction.uload_database.timer = 4
 	self.interaction.uload_database.start_active = false
 	self.interaction.uload_database.sound_start = "bar_keyboard"
 	self.interaction.uload_database.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.uload_database.sound_done = "bar_keyboard_finished"
 	self.interaction.uload_database.axis = "x"
+	self.interaction.uload_database.contour = "contour_off"
 	self.interaction.uload_database_jammed = {}
 	self.interaction.uload_database_jammed.text_id = "hud_int_hold_resume_upload"
 	self.interaction.uload_database_jammed.action_text_id = "hud_action_resuming_upload"
@@ -1961,15 +2016,33 @@ function TweakData:init()
 	self.interaction.votingmachine2 = {}
 	self.interaction.votingmachine2.text_id = "debug_interact_hack_ipad"
 	self.interaction.votingmachine2.timer = 5
-	self.interaction.votingmachine2.sound_start = "bar_drill_apply"
-	self.interaction.votingmachine2.sound_interupt = "bar_drill_apply_cancel"
-	self.interaction.votingmachine2.sound_done = "bar_drill_apply_finished"
+	self.interaction.votingmachine2.sound_start = "bar_keyboard"
+	self.interaction.votingmachine2.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.votingmachine2.sound_done = "bar_keyboard_finished"
 	self.interaction.votingmachine2_jammed = {}
 	self.interaction.votingmachine2_jammed.text_id = "debug_interact_hack_ipad_jammed"
 	self.interaction.votingmachine2_jammed.timer = 5
-	self.interaction.votingmachine2_jammed.sound_start = "bar_drill_fix"
-	self.interaction.votingmachine2_jammed.sound_interupt = "bar_drill_fix_cancel"
-	self.interaction.votingmachine2_jammed.sound_done = "bar_drill_fix_finished"
+	self.interaction.votingmachine2_jammed.sound_start = "bar_keyboard"
+	self.interaction.votingmachine2_jammed.sound_interupt = "bar_keyboard_cancel"
+	self.interaction.votingmachine2_jammed.sound_done = "bar_keyboard_finished"
+	self.interaction.sc_tape_loop = {}
+	self.interaction.sc_tape_loop.icon = "interaction_help"
+	self.interaction.sc_tape_loop.text_id = "hud_int_tape_loop"
+	self.interaction.sc_tape_loop.start_active = true
+	self.interaction.sc_tape_loop.interact_distance = 150
+	self.interaction.sc_tape_loop.no_contour = true
+	self.interaction.sc_tape_loop.timer = 4
+	self.interaction.sc_tape_loop.action_text_id = "hud_action_tape_looping"
+	self.interaction.sc_tape_loop.requires_upgrade = {
+		category = "player",
+		upgrade = "tape_loop_duration"
+	}
+	self.interaction.money_scanner = deep_clone(self.interaction.invisible_interaction_open)
+	self.interaction.money_scanner.axis = "y"
+	self.interaction.money_small = deep_clone(self.interaction.money_wrap)
+	self.interaction.money_small.sound_start = "bar_bag_pour_money"
+	self.interaction.money_small.sound_interupt = "bar_bag_pour_money_cancel"
+	self.interaction.money_small.sound_done = "bar_bag_pour_money_finished"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2401,6 +2474,7 @@ function TweakData:init()
 	self.achievement.dont_push_it = {award = "gage2_7", weapon = "deagle"}
 	self.achievement.finally = {award = "gage2_8"}
 	self.achievement.demise_knuckles = "brass_knuckles"
+	self.achievement.vote_for_change = "g22c"
 	self.achievement.enemy_kill_achievements = {
 		try_out_your_usp = {
 			weapon = "usp",
@@ -2695,6 +2769,20 @@ function TweakData:init()
 				"overkill_290"
 			},
 			job = "arm_for"
+		},
+		death_election_day = {
+			award = "bob_9",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "election_day"
+		},
+		death_election_day_prof = {
+			award = "bob_2",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "election_day_prof"
 		}
 	}
 	self.achievement.job_list = {}
@@ -2715,7 +2803,9 @@ function TweakData:init()
 	self.achievement.job_list.elephant = {
 		"framing_frame",
 		"framing_frame_prof",
-		"welcome_to_the_jungle_prof"
+		"welcome_to_the_jungle_prof",
+		"election_day",
+		"election_day_prof"
 	}
 	self.achievement.job_list.bain = {
 		"jewelry_store",
@@ -2782,6 +2872,15 @@ function TweakData:init()
 				"santa_drunk",
 				"santa_surprise"
 			}
+		},
+		ghost_riders = {
+			award = "bob_10",
+			masks = {
+				"skullhard",
+				"skullveryhard",
+				"skulloverkill",
+				"skulloverkillplus"
+			}
 		}
 	}
 	self.pickups = {}
@@ -2821,6 +2920,10 @@ function TweakData:init()
 	self.contour.interactable = {}
 	self.contour.interactable.standard_color = Vector3(1, 0.5, 0)
 	self.contour.interactable.selected_color = Vector3(1, 1, 1)
+	self.contour.contour_off = {}
+	self.contour.contour_off.standard_color = Vector3(0, 0, 0)
+	self.contour.contour_off.selected_color = Vector3(0, 0, 0)
+	self.contour.contour_off.standard_opacity = 0
 	self.contour.deployable = {}
 	self.contour.deployable.standard_color = Vector3(0.1, 1, 0.5)
 	self.contour.deployable.selected_color = Vector3(1, 1, 1)
@@ -2871,7 +2974,8 @@ function TweakData:init()
 		"track_08",
 		"track_09",
 		"track_10",
-		"track_12"
+		"track_12",
+		"track_13"
 	}
 	self.music.heist.switches_infamous = {"track_11"}
 	self.music.default = deep_clone(self.music.heist)

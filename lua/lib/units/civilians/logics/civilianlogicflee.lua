@@ -1,4 +1,4 @@
-CivilianLogicFlee = class(CopLogicBase)
+CivilianLogicFlee = class(CivilianLogicBase)
 
 function CivilianLogicFlee.enter(data, new_logic_name, enter_params)
 	CopLogicBase.enter(data, new_logic_name, enter_params)
@@ -31,7 +31,7 @@ function CivilianLogicFlee.enter(data, new_logic_name, enter_params)
 			CivilianLogicFlee.damage_clbk(data, data.objective.dmg_info)
 		end
 	end
-	data.unit:movement():set_stance("hos")
+	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
 	data.unit:movement():set_cool(false)
 	if my_data ~= data.internal_data then
 		return
@@ -681,13 +681,22 @@ function CivilianLogicFlee.on_rescue_SO_completed(ignore_this, data, good_pig)
 	if data.internal_data.rescuer and good_pig:key() == data.internal_data.rescuer:key() then
 		data.internal_data.rescue_active = nil
 		data.internal_data.rescuer = nil
-		if data.unit:anim_data().tied or data.unit:anim_data().drop then
-			local new_action = {
-				type = "act",
-				variant = "stand",
-				body_part = 1
-			}
-			data.unit:brain():action_request(new_action)
+		if data.name == "surrender" then
+			local new_action
+			if data.unit:anim_data().stand and data.is_tied then
+				data.brain:on_hostage_move_interaction(nil, "release")
+			elseif data.unit:anim_data().drop or data.unit:anim_data().tied then
+				new_action = {
+					type = "act",
+					variant = "stand",
+					body_part = 1
+				}
+			end
+			if new_action then
+				data.is_tied = nil
+				data.unit:interaction():set_active(false, true)
+				data.unit:brain():action_request(new_action)
+			end
 			data.unit:brain():set_objective({
 				type = "free",
 				is_default = true,

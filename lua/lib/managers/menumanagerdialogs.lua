@@ -344,8 +344,8 @@ end
 
 function MenuManager:show_waiting_NPCommerce_open(params)
 	local dialog_data = {}
-	dialog_data.title = managers.localization:text("dialog_npcommerce_opening")
-	dialog_data.text = string.upper(managers.localization:text("dialog_wait"))
+	dialog_data.title = managers.localization:text("dialog_wait")
+	dialog_data.text = managers.localization:text("dialog_npcommerce_opening")
 	dialog_data.id = "waiting_for_NPCommerce_open"
 	dialog_data.no_upper = true
 	dialog_data.no_buttons = true
@@ -372,6 +372,26 @@ function MenuManager:show_NPCommerce_browse_success()
 	ok_button.text = managers.localization:text("dialog_ok")
 	dialog_data.button_list = {ok_button}
 	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_new_message_dialog(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text(params.title)
+	dialog_data.text = managers.localization:text(params.text, {
+		player = tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
+	})
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	dialog_data.texture = "guis/textures/pd2/feature_crimenet_heat"
+	dialog_data.text_blend_mode = "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 620
+	dialog_data.h = 532
+	dialog_data.image_w = 64
+	dialog_data.image_h = 64
+	dialog_data.image_valign = "top"
+	managers.system_menu:show_new_unlock(dialog_data)
 end
 
 function MenuManager:show_announce_crimenet_heat()

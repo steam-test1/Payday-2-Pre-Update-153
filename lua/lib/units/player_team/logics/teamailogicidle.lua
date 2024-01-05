@@ -416,6 +416,7 @@ function TeamAILogicIdle._upd_enemy_detection(data)
 			return
 		end
 	end
+	data.logic._upd_sneak_spotting(data, my_data)
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, TeamAILogicIdle._upd_enemy_detection, data, data.t + delay)
 end
 
@@ -436,7 +437,7 @@ function TeamAILogicIdle._find_intimidateable_civilians(criminal, use_default_sh
 	local my_tracker = criminal:movement():nav_tracker()
 	local chk_vis_func = my_tracker.check_visibility
 	for key, unit in pairs(managers.groupai:state():fleeing_civilians()) do
-		if chk_vis_func(my_tracker, unit:movement():nav_tracker()) and tweak_data.character[unit:base()._tweak_table].intimidateable and not unit:base().unintimidateable and not unit:anim_data().unintimidateable then
+		if chk_vis_func(my_tracker, unit:movement():nav_tracker()) and tweak_data.character[unit:base()._tweak_table].intimidateable and not unit:base().unintimidateable and not unit:anim_data().unintimidateable and not unit:brain():is_tied() then
 			local u_head_pos = unit:movement():m_head_pos() + math.UP * 30
 			local vec = u_head_pos - head_pos
 			local dis = mvector3.normalize(vec)
@@ -782,4 +783,47 @@ function TeamAILogicIdle._get_priority_attention(data, attention_objects, reacti
 		end
 	end
 	return best_target, best_target_priority_slot, best_target_reaction
+end
+
+function TeamAILogicIdle._upd_sneak_spotting(data, my_data)
+	repeat
+		do break end -- pseudo-goto
+		if managers.groupai:state():whisper_mode() and (not TeamAILogicAssault._mark_special_chk_t or TeamAILogicAssault._mark_special_chk_t + 0.75 < data.t) and (not TeamAILogicAssault._mark_special_t or TeamAILogicAssault._mark_special_t + 6 < data.t) and not data.unit:sound():speaking() then
+			local nmy = TeamAILogicIdle.find_sneak_char_to_mark(data)
+			TeamAILogicAssault._mark_special_chk_t = data.t
+			if nmy then
+				TeamAILogicAssault._mark_special_t = data.t
+				TeamAILogicIdle.mark_sneak_char(data, data.unit, nmy, nil, nil)
+			end
+		end
+	until true
+end
+
+function TeamAILogicIdle.find_sneak_char_to_mark(data)
+	local best_nmy, best_nmy_wgt
+	for key, attention_info in pairs(data.detected_attention_objects) do
+		if attention_info.identified and (attention_info.verified or attention_info.nearly_visible) and attention_info.is_person and attention_info.char_tweak and attention_info.char_tweak.silent_priority_shout and (not attention_info.char_tweak.priority_shout_max_dis or attention_info.dis < attention_info.char_tweak.priority_shout_max_dis) and (not best_nmy_wgt or best_nmy_wgt > attention_info.verified_dis) then
+			best_nmy_wgt = attention_info.verified_dis
+			best_nmy = attention_info.unit
+		end
+	end
+	return best_nmy
+end
+
+function TeamAILogicIdle.mark_sneak_char(data, criminal, to_mark, play_sound, play_action)
+	if play_sound then
+		criminal:sound():say(to_mark:base():char_tweak().silent_priority_shout .. "x_any", nil, true)
+	end
+	if play_action and not criminal:movement():chk_action_forbidden("action") then
+		local new_action = {
+			type = "act",
+			variant = "arrest",
+			body_part = 3,
+			align_sync = true
+		}
+		if criminal:brain():action_request(new_action) then
+			data.internal_data.gesture_arrest = true
+		end
+	end
+	to_mark:contour():add("mark_enemy", true)
 end

@@ -39,13 +39,14 @@ function CopSound:play(sound_name, source_name, sync)
 	local event_id
 	if type(sound_name) == "number" then
 		event_id = sound_name
+		sound_name = nil
 	end
 	if sync then
 		event_id = event_id or SoundDevice:string_to_id(sound_name)
 		local sync_source_name = source_name or ""
 		self._unit:network():send("unit_sound_play", event_id, sync_source_name)
 	end
-	local event = self:_play(event_id or sound_name, source_name)
+	local event = self:_play(sound_name or event_id, source_name)
 	return event
 end
 
@@ -53,6 +54,7 @@ function CopSound:corpse_play(sound_name, source_name, sync)
 	local event_id
 	if type(sound_name) == "number" then
 		event_id = sound_name
+		sound_name = nil
 	end
 	if sync then
 		event_id = event_id or SoundDevice:string_to_id(sound_name)
@@ -60,7 +62,7 @@ function CopSound:corpse_play(sound_name, source_name, sync)
 		local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
 		managers.network:session():send_to_peers_synched("corpse_sound_play", u_id, event_id, sync_source_name)
 	end
-	local event = self:_play(event_id or sound_name, source_name)
+	local event = self:_play(sound_name or event_id, source_name)
 	if not event then
 		Application:error("[CopSound:corpse_play] event not found in Wwise", sound_name, event_id, self._unit)
 		Application:stack_dump("error")
@@ -90,12 +92,13 @@ function CopSound:say(sound_name, sync, skip_prefix)
 	local event_id
 	if type(full_sound) == "number" then
 		event_id = full_sound
+		full_sound = nil
 	end
 	if sync then
 		event_id = event_id or SoundDevice:string_to_id(full_sound)
 		self._unit:network():send("say", event_id)
 	end
-	self._last_speech = self:_play(event_id or full_sound)
+	self._last_speech = self:_play(full_sound or event_id)
 	if not self._last_speech then
 		return
 	end

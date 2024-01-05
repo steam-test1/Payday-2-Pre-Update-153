@@ -5,6 +5,7 @@ DLCManager.BUNDLED_DLC_PACKAGES = {
 	gage_pack = true,
 	gage_pack_lmg = true,
 	infamous = true,
+	gage_pack_jobs = false,
 	season_pass = false,
 	animal = false
 }

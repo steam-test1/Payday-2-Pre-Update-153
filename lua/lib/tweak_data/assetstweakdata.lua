@@ -65,7 +65,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"ukrainian_job",
 		"jewelry_store",
 		"four_stores",
-		"mallcrasher",
 		"nightclub",
 		"branchbank",
 		"arm_fac",
@@ -84,6 +83,58 @@ function AssetsTweakData:_init_assets(tweak_data)
 		category = "player",
 		upgrade = "additional_assets"
 	}
+	self.bodybags_bag = {}
+	self.bodybags_bag.name_id = "menu_asset_bodybags_bag"
+	self.bodybags_bag.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/bodybags_bag"
+	self.bodybags_bag.stages = {
+		"welcome_to_the_jungle_1",
+		"welcome_to_the_jungle_2",
+		"framing_frame_1",
+		"framing_frame_3",
+		"election_day_1",
+		"election_day_2",
+		"firestarter_1",
+		"firestarter_2",
+		"firestarter_3",
+		"ukrainian_job",
+		"jewelry_store",
+		"four_stores",
+		"nightclub",
+		"branchbank",
+		"arm_for",
+		"family",
+		"big",
+		"roberts"
+	}
+	self.bodybags_bag.visible_if_locked = true
+	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
+	self.bodybags_bag.no_mystery = true
+	self.bodybags_bag.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.bodybags_bag.upgrade_lock = {
+		category = "player",
+		upgrade = "buy_bodybags_asset"
+	}
+	self.bodybags_bag.server_lock = true
+	self.spotter = {}
+	self.spotter.name_id = "menu_asset_spotter"
+	self.spotter.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/spotter"
+	self.spotter.stages = {
+		"election_day_1",
+		"election_day_2",
+		"framing_frame_1",
+		"framing_frame_3",
+		"firestarter_2",
+		"big"
+	}
+	self.spotter.visible_if_locked = true
+	self.spotter.unlock_desc_id = "menu_asset_spotter_desc"
+	self.spotter.no_mystery = true
+	self.spotter.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
+	self.spotter.upgrade_lock = {
+		category = "player",
+		upgrade = "buy_spotter_asset"
+	}
+	self.spotter.server_lock = true
 	self.grenade_crate = {}
 	self.grenade_crate.name_id = "menu_asset_grenade_crate"
 	self.grenade_crate.texture = "guis/dlcs/gage_pack/textures/pd2/mission_briefing/assets/grenade_crate"
@@ -98,7 +149,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"firestarter_3",
 		"branchbank",
 		"arm_for",
-		"roberts"
+		"roberts",
+		"election_day_1",
+		"election_day_3",
+		"election_day_3_skip1",
+		"election_day_3_skip2"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -110,7 +165,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.ammo_bag = {}
 	self.ammo_bag.name_id = "menu_asset_ammo"
 	self.ammo_bag.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
-	self.ammo_bag.stages = {"roberts"}
+	self.ammo_bag.stages = {
+		"roberts",
+		"election_day_1",
+		"election_day_2",
+		"election_day_3",
+		"election_day_3_skip1",
+		"election_day_3_skip2"
+	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
 	self.ammo_bag.no_mystery = true
@@ -118,7 +180,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.health_bag = {}
 	self.health_bag.name_id = "menu_asset_health"
 	self.health_bag.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
-	self.health_bag.stages = {"roberts"}
+	self.health_bag.stages = {
+		"roberts",
+		"election_day_1",
+		"election_day_2",
+		"election_day_3",
+		"election_day_3_skip1",
+		"election_day_3_skip2"
+	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
 	self.health_bag.no_mystery = true
@@ -442,26 +511,36 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.framing_frame_3_vent.unlock_desc_id = "menu_asset_framing3_vent_desc"
 	self.framing_frame_3_vent.no_mystery = true
 	self.framing_frame_3_vent.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.election_day_3_ammo = {}
-	self.election_day_3_ammo.name_id = "menu_asset_ammo"
-	self.election_day_3_ammo.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_3_ammo.stages = {
-		"election_day_3"
+	self.election_day_1_keycard = {}
+	self.election_day_1_keycard.name_id = "menu_asset_election1_keycard"
+	self.election_day_1_keycard.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day1/assets_election_day_1_keycard"
+	self.election_day_1_keycard.stages = {
+		"election_day_1"
 	}
-	self.election_day_3_ammo.visible_if_locked = true
-	self.election_day_3_ammo.unlock_desc_id = "menu_asset_ammo_desc"
-	self.election_day_3_ammo.no_mystery = true
-	self.election_day_3_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.election_day_3_health = {}
-	self.election_day_3_health.name_id = "menu_asset_health"
-	self.election_day_3_health.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_3_health.stages = {
-		"election_day_3"
+	self.election_day_1_keycard.visible_if_locked = true
+	self.election_day_1_keycard.unlock_desc_id = "menu_asset_election1_keycard_desc"
+	self.election_day_1_keycard.no_mystery = true
+	self.election_day_1_keycard.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
+	self.election_day_2_ladder = {}
+	self.election_day_2_ladder.name_id = "menu_asset_election2_ladder"
+	self.election_day_2_ladder.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day2/assets_election_day_2_ladder"
+	self.election_day_2_ladder.stages = {
+		"election_day_2"
 	}
-	self.election_day_3_health.visible_if_locked = true
-	self.election_day_3_health.unlock_desc_id = "menu_asset_health_desc"
-	self.election_day_3_health.no_mystery = true
-	self.election_day_3_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
+	self.election_day_2_ladder.visible_if_locked = true
+	self.election_day_2_ladder.unlock_desc_id = "menu_asset_election2_ladder_desc"
+	self.election_day_2_ladder.no_mystery = true
+	self.election_day_2_ladder.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.election_day_2_keycard = {}
+	self.election_day_2_keycard.name_id = "menu_asset_election2_keycard"
+	self.election_day_2_keycard.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day2/assets_election_day_2_keycard"
+	self.election_day_2_keycard.stages = {
+		"election_day_2"
+	}
+	self.election_day_2_keycard.visible_if_locked = true
+	self.election_day_2_keycard.unlock_desc_id = "menu_asset_election2_keycard_desc"
+	self.election_day_2_keycard.no_mystery = true
+	self.election_day_2_keycard.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 5)
 	self.jungle_1_bikers = {}
 	self.jungle_1_bikers.name_id = "menu_asset_big_oil_1_bikers"
 	self.jungle_1_bikers.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day1/big_oil_1_biker_gang"

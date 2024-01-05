@@ -1357,7 +1357,12 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 			CS_swats = {
 				0,
 				1,
-				0.7
+				0.85
+			},
+			CS_shields = {
+				0,
+				0,
+				0.15
 			},
 			single_spooc = {
 				0,

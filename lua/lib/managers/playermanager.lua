@@ -35,7 +35,7 @@ function PlayerManager:init()
 	}
 	self:_setup_rules()
 	self._local_player_minions = 0
-	self._local_player_used_body_bags = 0
+	self._local_player_body_bags = nil
 	self._player_states = {
 		standard = "ingame_standard",
 		mask_off = "ingame_mask_off",
@@ -108,6 +108,8 @@ function PlayerManager:aquire_default_upgrades()
 	managers.upgrades:aquire_default("player_special_enemy_highlight")
 	managers.upgrades:aquire_default("player_hostage_trade")
 	managers.upgrades:aquire_default("player_sec_camera_highlight")
+	managers.upgrades:aquire_default("player_corpse_dispose")
+	managers.upgrades:aquire_default("player_corpse_dispose_amount_1")
 	for i = 1, PlayerManager.WEAPON_SLOTS do
 		if not managers.player:weapon_in_slot(i) then
 			self._global.kit.weapon_slots[i] = managers.player:availible_weapons(i)[1]
@@ -174,6 +176,7 @@ function PlayerManager:_internal_load()
 		grenade = grenade,
 		amount = math.min(amount, self:get_max_grenades())
 	})
+	self:_set_body_bags_amount(self._local_player_body_bags or self:total_body_bags())
 	if self._respawn then
 	else
 		self:_add_level_equipment(player)
@@ -235,7 +238,7 @@ function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deploy
 	for i = 1, used_cable_ties do
 		self:remove_special("cable_tie")
 	end
-	self:set_used_body_bags(used_body_bags)
+	self:_set_body_bags_amount(math.max(self:total_body_bags() - used_body_bags, 0))
 	local min_health
 	if dead or bleed_out then
 		min_health = 0
@@ -637,6 +640,29 @@ end
 function PlayerManager:body_armor_value(category, override_value, default)
 	local armor_data = tweak_data.blackmarket.armors[managers.blackmarket:equipped_armor()]
 	return self:upgrade_value_by_level("player", "body_armor", category, {})[override_value or armor_data.upgrade_level] or default or 0
+end
+
+function PlayerManager:get_infamy_exp_multiplier()
+	local multiplier = 1
+	if managers.experience:current_rank() > 0 then
+		for infamy, item in pairs(tweak_data.infamy.items) do
+			if managers.infamy:owned(infamy) and item.upgrades and item.upgrades.infamous_xp then
+				multiplier = multiplier + math.abs(item.upgrades.infamous_xp - 1)
+			end
+		end
+	end
+	return multiplier
+end
+
+function PlayerManager:get_skill_exp_multiplier(whisper_mode)
+	local multiplier = 1
+	multiplier = multiplier + managers.player:upgrade_value("player", "xp_multiplier", 1) - 1
+	multiplier = multiplier + managers.player:upgrade_value("player", "passive_xp_multiplier", 1) - 1
+	multiplier = multiplier + managers.player:team_upgrade_value("xp", "multiplier", 1) - 1
+	if whisper_mode then
+		multiplier = multiplier + managers.player:team_upgrade_value("xp", "stealth_multiplier", 1) - 1
+	end
+	return multiplier
 end
 
 function PlayerManager:get_hostage_bonus_multiplier(category)
@@ -1963,20 +1989,37 @@ function PlayerManager:chk_minion_limit_reached()
 	return self._local_player_minions >= self:upgrade_value("player", "convert_enemies_max_minions", 0)
 end
 
-function PlayerManager:set_used_body_bags(used_body_bag)
-	self._local_player_used_body_bags = used_body_bag
-end
-
 function PlayerManager:on_used_body_bag()
-	self._local_player_used_body_bags = self._local_player_used_body_bags + 1
+	self:_set_body_bags_amount(self._local_player_body_bags - 1)
 end
 
 function PlayerManager:reset_used_body_bag()
-	self._local_player_used_body_bags = 0
+	self:_set_body_bags_amount(self:total_body_bags())
 end
 
-function PlayerManager:chk_body_bag_limit_reached()
-	return self._local_player_used_body_bags >= 2
+function PlayerManager:chk_body_bags_depleted()
+	return self._local_player_body_bags <= 0
+end
+
+function PlayerManager:_set_body_bags_amount(body_bags_amount)
+	self._local_player_body_bags = body_bags_amount
+	managers.hud:on_ext_inventory_changed()
+end
+
+function PlayerManager:add_body_bags_amount(body_bags_amount)
+	self:_set_body_bags_amount(math.min(self._local_player_body_bags + body_bags_amount, self:total_body_bags()))
+end
+
+function PlayerManager:get_body_bags_amount()
+	return self._local_player_body_bags
+end
+
+function PlayerManager:has_total_body_bags()
+	return self._local_player_body_bags == self:total_body_bags()
+end
+
+function PlayerManager:total_body_bags()
+	return self:upgrade_value("player", "corpse_dispose_amount", 0)
 end
 
 function PlayerManager:change_player_look(new_look)

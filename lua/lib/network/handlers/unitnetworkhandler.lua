@@ -429,7 +429,7 @@ function UnitNetworkHandler:sync_body_damage_melee(body, attacker, normal, posit
 	body:extension().damage:damage_melee(attacker, normal, position, direction, damage)
 end
 
-function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, sender)
+function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, status, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
@@ -446,7 +446,7 @@ function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, sender
 		end
 	end
 	if alive(unit) then
-		unit:interaction():sync_interacted(peer)
+		unit:interaction():sync_interacted(peer, nil, status)
 	end
 end
 
@@ -471,7 +471,7 @@ function UnitNetworkHandler:sync_interacted_by_id(unit_id, tweak_setting, sender
 	if not u_data then
 		return
 	end
-	self:sync_interacted(u_data.unit, unit_id, tweak_setting, sender)
+	self:sync_interacted(u_data.unit, unit_id, tweak_setting, 1, sender)
 end
 
 function UnitNetworkHandler:sync_interaction_reply(status)
@@ -657,20 +657,9 @@ function UnitNetworkHandler:alarm_pager_interaction(u_id, tweak_table, status, s
 			else
 				status_str = "complete"
 			end
-			unit_data.unit:interaction():sync_interacted(peer, status_str)
+			unit_data.unit:interaction():sync_interacted(peer, nil, status_str)
 		end
 	end
-end
-
-function UnitNetworkHandler:set_corpse_material_config(u_id, original)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
-		return
-	end
-	local unit_data = managers.enemy:get_corpse_unit_data_from_id(u_id)
-	if not unit_data then
-		return
-	end
-	unit_data.unit:base():set_material_state(original)
 end
 
 function UnitNetworkHandler:remove_corpse_by_id(u_id)
@@ -996,14 +985,14 @@ function UnitNetworkHandler:from_server_ecm_jammer_placed(unit, rpc)
 	unit:base():set_owner(managers.player:player_unit())
 end
 
-function UnitNetworkHandler:sync_unit_event_id_8(unit, ext_name, event_id, rpc)
+function UnitNetworkHandler:sync_unit_event_id_16(unit, ext_name, event_id, rpc)
 	local peer = self._verify_sender(rpc)
 	if not (peer and alive(unit)) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	local extension = unit[ext_name](unit)
 	if not extension then
-		debug_pause("[UnitNetworkHandler:sync_unit_event_id_8] unit", unit, "does not have extension", ext_name)
+		debug_pause("[UnitNetworkHandler:sync_unit_event_id_16] unit", unit, "does not have extension", ext_name)
 		return
 	end
 	extension:sync_net_event(event_id)
@@ -1660,34 +1649,28 @@ function UnitNetworkHandler:sync_assault_dialog(index)
 	managers.hud:sync_assault_dialog(index)
 end
 
-function UnitNetworkHandler:set_contour(unit, state)
-	if not alive(unit) then
-		return
-	end
-	if unit:contour() then
-		if state then
-			unit:contour():add("highlight")
-		else
-			unit:contour():remove("highlight")
-		end
-	end
-end
-
-function UnitNetworkHandler:mark_contour_unit(unit, sender)
+function UnitNetworkHandler:sync_contour_state(unit, u_id, type, state, multiplier, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
 		return
 	end
-	if not alive(unit) then
+	local contour_unit
+	if alive(unit) and unit:id() ~= -1 then
+		contour_unit = unit
+	else
+		local unit_data = managers.enemy:get_corpse_unit_data_from_id(u_id)
+		if unit_data then
+			contour_unit = unit_data.unit
+		end
+	end
+	if not contour_unit then
+		Application:error("[UnitNetworkHandler:sync_contour_state] Unit is missing")
 		return
 	end
-	unit:contour():add("mark_unit")
-end
-
-function UnitNetworkHandler:mark_enemy(unit, marking_strength, time_multiplier, sender)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
-		return
+	if state then
+		contour_unit:contour():add(ContourExt.indexed_types[type], false, multiplier)
+	else
+		contour_unit:contour():remove(ContourExt.indexed_types[type], nil)
 	end
-	unit:contour():add("mark_enemy", marking_strength, time_multiplier)
 end
 
 function UnitNetworkHandler:mark_minion(unit, minion_owner_peer_id, convert_enemies_health_multiplier_level, passive_convert_enemies_health_multiplier_level, sender)
@@ -1702,7 +1685,7 @@ function UnitNetworkHandler:mark_minion(unit, minion_owner_peer_id, convert_enem
 		health_multiplier = health_multiplier * tweak_data.upgrades.values.player.passive_convert_enemies_health_multiplier[passive_convert_enemies_health_multiplier_level]
 	end
 	unit:character_damage():convert_to_criminal(health_multiplier)
-	unit:contour():add("friendly")
+	unit:contour():add("friendly", false)
 	managers.groupai:state():sync_converted_enemy(unit)
 	if minion_owner_peer_id == managers.network:session():local_peer():id() then
 		managers.player:count_up_player_minions()

@@ -34,7 +34,9 @@ function Drill:start()
 		if not managers.groupai:state():enemy_weapons_hot() then
 			self:_set_attention_state(true)
 			self:_set_alert_state(true)
-			managers.dialog:queue_dialog("Play_pln_drl_wrn", {})
+			if not self.is_hacking_device then
+				managers.dialog:queue_dialog("Play_pln_drl_wrn", {})
+			end
 			if not self._ene_weap_hot_listen_id then
 				self._ene_weap_hot_listen_id = "Drill_ene_w_hot" .. tostring(self._unit:key())
 				managers.groupai:state():add_listener(self._ene_weap_hot_listen_id, {

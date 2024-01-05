@@ -76,7 +76,7 @@ end
 function DoctorBagBase:server_set_dynamic()
 	self:_set_dynamic()
 	if managers.network:session() then
-		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", 1)
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", 1)
 	end
 end
 

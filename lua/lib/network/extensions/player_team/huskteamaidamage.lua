@@ -287,4 +287,7 @@ function HuskTeamAIDamage:load(data)
 	if data.char_dmg.bleedout then
 		self:_on_bleedout()
 	end
+	if data.char_dmg.fatal then
+		self:_on_fatal()
+	end
 end

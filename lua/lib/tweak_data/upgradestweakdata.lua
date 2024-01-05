@@ -88,6 +88,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.doctor_bag_base = 2
 	self.grenade_crate_base = 3
 	self.max_grenade_amount = 3
+	self.bodybag_crate_base = 3
 	self.cop_hurt_alert_radius_whisper = 600
 	self.cop_hurt_alert_radius = 400
 	self.drill_alert_radius = 2500
@@ -131,7 +132,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.intimidate_enemies = {true}
 	self.values.player.intimidate_range_mul = {1.5}
 	self.values.player.intimidate_aura = {700}
-	self.values.player.ene_hostage_lim_1 = {3}
 	self.values.player.civilian_reviver = {true}
 	self.values.player.civilian_gives_ammo = {true}
 	self.values.player.buy_cost_multiplier = {0.9, 0.7}
@@ -271,7 +271,9 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.fall_health_damage_multiplier = {0}
 	self.values.player.respawn_time_multiplier = {0.5}
 	self.values.weapon.special_damage_taken_multiplier = {1.05}
+	self.values.player.buy_bodybags_asset = {true}
 	self.values.player.corpse_dispose = {true}
+	self.values.player.corpse_dispose_amount = {1, 2}
 	self.values.carry.interact_speed_multiplier = {0.75, 0.25}
 	self.values.player.suspicion_multiplier = {0.75}
 	self.values.player.camouflage_bonus = {0.85}
@@ -412,6 +414,9 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.team.xp.stealth_multiplier = {1.5}
 	self.values.team.cash.stealth_money_multiplier = {1.5}
 	self.values.team.cash.stealth_bags_multiplier = {1.5}
+	self.values.player.tape_loop_duration = {10, 20}
+	self.values.player.tape_loop_interact_distance_mul = {1.4}
+	self.values.player.buy_spotter_asset = {true}
 	self.values.player.close_to_hostage_boost = {true}
 	local editable_skill_descs = {
 		ammo_2x = {
@@ -455,8 +460,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{"15%"}
 		},
 		cleaner = {
-			{"5%"},
-			{"2"}
+			{"5%", "3"},
+			{"1"}
 		},
 		combat_medic = {
 			{"25%", "10"},
@@ -516,8 +521,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{}
 		},
 		good_luck_charm = {
-			{"50%"},
-			{"200%"}
+			{"10", "1"},
+			{"10"}
 		},
 		gun_fighter = {
 			{"50%"},
@@ -696,8 +701,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{}
 		},
 		tactician = {
-			{"4", "2"},
-			{"15%"}
+			{"15%"},
+			{}
 		},
 		target_mark = {
 			{},
@@ -895,6 +900,10 @@ function UpgradesTweakData:init()
 			"body_armor4",
 			"kampfmesser"
 		}
+	}
+	self.level_tree[22] = {
+		name_id = "community_item",
+		upgrades = {"g22c"}
 	}
 	self.level_tree[26] = {
 		name_id = "weapons",
@@ -1129,6 +1138,7 @@ function UpgradesTweakData:init()
 	self:_new_raging_bull_definitions()
 	self:_saw_definitions()
 	self:_usp_definitions()
+	self:_g22c_definitions()
 	self:_m45_definitions()
 	self:_s552_definitions()
 	self:_ppk_definitions()
@@ -2092,6 +2102,15 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_buy_bodybags_asset = {
+		category = "feature",
+		name_id = "menu_player_buy_bodybags_asset",
+		upgrade = {
+			category = "player",
+			upgrade = "buy_bodybags_asset",
+			value = 1
+		}
+	}
 	self.definitions.player_corpse_dispose = {
 		category = "feature",
 		name_id = "menu_player_corpse_disp",
@@ -2099,6 +2118,24 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "corpse_dispose",
 			value = 1
+		}
+	}
+	self.definitions.player_corpse_dispose_amount_1 = {
+		category = "feature",
+		name_id = "menu_player_corpse_disp_amount_1",
+		upgrade = {
+			category = "player",
+			upgrade = "corpse_dispose_amount",
+			value = 1
+		}
+	}
+	self.definitions.player_corpse_dispose_amount_2 = {
+		category = "feature",
+		name_id = "menu_player_corpse_disp_amount_2",
+		upgrade = {
+			category = "player",
+			upgrade = "corpse_dispose_amount",
+			value = 2
 		}
 	}
 	self.definitions.player_taser_malfunction = {
@@ -2553,15 +2590,6 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
-	self.definitions.player_ene_hostage_lim_1 = {
-		category = "feature",
-		name_id = "menu_player_intimidate_aura",
-		upgrade = {
-			category = "player",
-			upgrade = "ene_hostage_lim_1",
-			value = 1
-		}
-	}
 	self.definitions.player_civilian_gives_ammo = {
 		category = "feature",
 		name_id = "menu_player_civilian_gives_ammo",
@@ -3010,6 +3038,42 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "climb_speed_multiplier",
 			value = 2
+		}
+	}
+	self.definitions.player_tape_loop_duration_1 = {
+		category = "feature",
+		name_id = "menu_player_tape_loop_duration",
+		upgrade = {
+			category = "player",
+			upgrade = "tape_loop_duration",
+			value = 1
+		}
+	}
+	self.definitions.player_tape_loop_duration_2 = {
+		category = "feature",
+		name_id = "menu_player_tape_loop_duration",
+		upgrade = {
+			category = "player",
+			upgrade = "tape_loop_duration",
+			value = 2
+		}
+	}
+	self.definitions.player_tape_loop_interact_distance_mul_1 = {
+		category = "feature",
+		name_id = "menu_player_tape_loop_interact_distance_mul",
+		upgrade = {
+			category = "player",
+			upgrade = "tape_loop_interact_distance_mul",
+			value = 1
+		}
+	}
+	self.definitions.player_buy_spotter_asset = {
+		category = "feature",
+		name_id = "menu_player_buy_spotter_asset",
+		upgrade = {
+			category = "player",
+			upgrade = "buy_spotter_asset",
+			value = 1
 		}
 	}
 	self.definitions.toolset = {
@@ -4282,6 +4346,15 @@ function UpgradesTweakData:_usp_definitions()
 		category = "weapon",
 		weapon_id = "usp",
 		factory_id = "wpn_fps_pis_usp",
+		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_g22c_definitions()
+	self.definitions.g22c = {
+		category = "weapon",
+		weapon_id = "g22c",
+		factory_id = "wpn_fps_pis_g22c",
 		dlc = "pd2_clan"
 	}
 end

@@ -51,6 +51,7 @@ function FPCameraPlayerBase:init(unit)
 	self._recoil_kick = {}
 	self._recoil_kick.h = {}
 	self:check_flashlight_enabled()
+	self:load_fps_mask_units()
 end
 
 function FPCameraPlayerBase:set_parent_unit(parent_unit)
@@ -993,6 +994,13 @@ function FPCameraPlayerBase:anim_clbk_check_bullet_object()
 	end
 end
 
+function FPCameraPlayerBase:load_fps_mask_units()
+	if not self._mask_backface_loaded then
+		self._mask_backface_loaded = true
+		managers.dyn_resource:load(Idstring("unit"), Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), "packages/dyn_resources", false)
+	end
+end
+
 function FPCameraPlayerBase:destroy()
 	if self._parent_unit then
 		self._parent_unit:base():remove_destroy_listener("FPCameraPlayerBase")
@@ -1008,4 +1016,8 @@ function FPCameraPlayerBase:destroy()
 	self:unspawn_mask()
 	self:unspawn_grenade()
 	self:unspawn_melee_item()
+	if self._mask_backface_loaded then
+		self._mask_backface_loaded = nil
+		managers.dyn_resource:unload(Idstring("unit"), Idstring("units/payday2/masks/msk_fps_back_straps/msk_fps_back_straps"), "packages/dyn_resources", false)
+	end
 end

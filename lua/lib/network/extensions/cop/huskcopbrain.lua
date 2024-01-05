@@ -38,6 +38,10 @@ function HuskCopBrain:clbk_death(my_unit, damage_info)
 	if self._unit:inventory():equipped_unit() then
 		self._unit:inventory():equipped_unit():base():set_laser_enabled(false)
 	end
+	if self._following_hostage_contour_id then
+		self._unit:contour():remove_by_id(self._following_hostage_contour_id)
+		self._following_hostage_contour_id = nil
+	end
 end
 
 function HuskCopBrain:set_interaction_voice(voice)
@@ -49,6 +53,12 @@ function HuskCopBrain:load(load_data)
 	self:set_interaction_voice(my_load_data.interaction_voice)
 	if my_load_data.weapon_laser_on then
 		self:sync_net_event(self._NET_EVENTS.weapon_laser_on)
+	end
+	if my_load_data.trade_flee_contour then
+		self._unit:contour():add("hostage_trade", nil, nil)
+	end
+	if my_load_data.following_hostage_contour then
+		self._unit:contour():add("friendly", nil, nil)
 	end
 end
 

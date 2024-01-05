@@ -203,6 +203,10 @@ function MenuNodeUpdatesGui:setup()
 		x = 0,
 		y = 70
 	})
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		latest_update_panel:set_w(latest_update_panel:w() * 0.8)
+		latest_update_panel:set_h(latest_update_panel:w() * 0.5)
+	end
 	local selected = BoxGuiObject:new(latest_update_panel, {
 		sides = {
 			2,
@@ -223,11 +227,13 @@ function MenuNodeUpdatesGui:setup()
 	self._selects[latest_update.id] = selected
 	self._select_x = 1
 	local w = panel:w()
+	local padding = SystemInfo:platform() == Idstring("WIN32") and 30 or 5
+	local dech_panel_h = SystemInfo:platform() == Idstring("WIN32") and latest_update_panel:h() or panel:h() / 2
 	local latest_desc_panel = panel:panel({
 		name = "latest_description",
-		w = panel:w() - latest_update_panel:w() - 30,
-		h = latest_update_panel:h(),
-		x = latest_update_panel:right() + 30,
+		w = panel:w() - latest_update_panel:w() - padding,
+		h = dech_panel_h,
+		x = latest_update_panel:right() + padding,
 		y = latest_update_panel:top()
 	})
 	BoxGuiObject:new(latest_desc_panel, {
@@ -325,7 +331,7 @@ function MenuNodeUpdatesGui:setup()
 		w = w,
 		h = small_width / 2 + self.PADDING * 2,
 		x = 0,
-		y = latest_update_panel:bottom() + 30
+		y = math.max(latest_update_panel:bottom(), latest_desc_panel:bottom()) + 30
 	})
 	local previous_update_text = panel:text({
 		name = "previous_update_text",
@@ -614,6 +620,15 @@ function MenuNodeUpdatesGui:open(content_update)
 			else
 				play_sound = false
 			end
+		else
+			play_sound = false
+		end
+	elseif SystemInfo:platform() == Idstring("PS3") then
+		repeat
+			break -- pseudo-goto
+		until true
+		if not managers.dlc:has_dlc(content_update.id) then
+			managers.dlc:buy_product(content_update.id)
 		else
 			play_sound = false
 		end

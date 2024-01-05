@@ -82,7 +82,7 @@ function ElementSpawnEnemyDummy:produce(params)
 		end
 		local spawn_ai = {init_state = "idle", objective = objective}
 		unit:brain():set_spawn_ai(spawn_ai)
-		if self._values.participate_to_group_ai ~= false then
+		if self._values.participate_to_group_ai then
 			managers.groupai:state():assign_enemy_to_group_ai(unit)
 		end
 		if self._values.voice then

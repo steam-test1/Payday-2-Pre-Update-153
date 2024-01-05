@@ -418,6 +418,15 @@ function CopActionHurt:init(action_desc, common_data)
 	end
 	CopActionAct._create_blocks_table(self, action_desc.blocks)
 	self._ext_movement:enable_update()
+	if (self._body_part == 1 or self._body_part == 2) and Network:is_server() then
+		local stand_rsrv = self._unit:brain():get_pos_rsrv("stand")
+		if not stand_rsrv or 400 < mvector3.distance_sq(stand_rsrv.position, common_data.pos) then
+			self._unit:brain():add_pos_rsrv("stand", {
+				position = mvector3.copy(common_data.pos),
+				radius = 30
+			})
+		end
+	end
 	return true
 end
 
@@ -511,12 +520,6 @@ function CopActionHurt:on_exit()
 	end
 	if self._hurt_type == "fatal" or self._variant == "tase" then
 		managers.hud:set_mugshot_normal(self._unit:unit_data().mugshot_id)
-	end
-	if Network:is_server() and not self._unit:character_damage():dead() and self._body_part == 1 then
-		self._unit:brain():add_pos_rsrv("stand", {
-			position = mvector3.copy(self._common_data.pos),
-			radius = 30
-		})
 	end
 end
 

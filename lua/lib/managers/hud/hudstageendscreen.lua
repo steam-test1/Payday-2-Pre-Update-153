@@ -1,5 +1,11 @@
 require("lib/managers/menu/MenuBackdropGUI")
 require("lib/managers/menu/WalletGuiObject")
+local make_fine_text = function(text)
+	local x, y, w, h = text:text_rect()
+	text:set_size(w, h)
+	text:set_position(math.round(text:x()), math.round(text:y()))
+	return x, y, w, h
+end
 HUDPackageUnlockedItem = HUDPackageUnlockedItem or class()
 
 function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
@@ -16,6 +22,7 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 	end
 	local announcement = params.announcement
 	local upgrade = params.upgrade
+	local ghost_bonus = params.ghost_bonus
 	local bitmap_texture = "guis/textures/pd2/endscreen/test_icon_package"
 	local text_string = ""
 	local blend_mode = "normal"
@@ -77,6 +84,12 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 				bitmap_texture = "guis/textures/pd2/endscreen/" .. upgrade_def.category
 			end
 		end
+	elseif ghost_bonus then
+		local on_last_stage = managers.job:on_last_stage()
+		bitmap_texture = "guis/textures/pd2/endscreen/stealth_bonus"
+		local string_id = on_last_stage and "menu_es_ghost_bonus_job" or "menu_es_ghost_bonus_day"
+		text_string = managers.localization:to_upper_text(string_id, {bonus = ghost_bonus})
+		blend_mode = "add"
 	else
 		Application:debug("HUDPackageUnlockedItem: Something something unknown")
 	end
@@ -108,6 +121,8 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 			text:set_font(tweak_data.menu.pd2_small_font_id)
 			text:set_font_size(tweak_data.menu.pd2_small_font_size)
 		end
+		text:set_position(math.round(text:x()), math.round(text:y()))
+		managers.menu_component:make_color_text(text, tweak_data.screen_colors.ghost_color)
 	end
 	self._panel:animate(callback(self, self, "create_animation"))
 end
@@ -154,6 +169,12 @@ function HUDStageEndScreen:init(hud, workspace)
 	local title_font_size = tweak_data.menu.pd2_large_font_size
 	local content_font_size = tweak_data.menu.pd2_medium_font_size
 	local small_font_size = tweak_data.menu.pd2_small_font_size
+	local massive_font = bg_font
+	local large_font = title_font
+	local medium_font = content_font
+	local massive_font_size = bg_font_size
+	local large_font_size = title_font_size
+	local medium_font_size = content_font_size
 	self._background_layer_safe = self._backdrop:get_new_background_layer()
 	self._background_layer_full = self._backdrop:get_new_background_layer()
 	self._foreground_layer_safe = self._backdrop:get_new_foreground_layer()
@@ -269,7 +290,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		h = self._foreground_layer_safe:h() / 2,
 		y = 70
 	})
-	self._lp_forepanel:text({
+	local level_progress_text = self._lp_forepanel:text({
 		name = "level_progress_text",
 		text = managers.localization:to_upper_text("menu_es_level_progress"),
 		align = "left",
@@ -281,6 +302,8 @@ function HUDStageEndScreen:init(hud, workspace)
 		x = 10,
 		y = 10
 	})
+	local _, _, lw, lh = level_progress_text:text_rect()
+	level_progress_text:set_size(lw, lh)
 	local lp_bg_circle = self._lp_backpanel:bitmap({
 		name = "bg_progress_circle",
 		texture = "guis/textures/pd2/endscreen/exp_ring",
@@ -318,7 +341,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		name = "current_xp",
 		text = managers.localization:to_upper_text("menu_es_current_xp"),
 		align = "left",
-		vertical = "center",
+		vertical = "top",
 		h = small_font_size,
 		font_size = small_font_size,
 		font = small_font,
@@ -328,7 +351,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		name = "xp_gained",
 		text = managers.localization:to_upper_text("menu_es_xp_gained"),
 		align = "left",
-		vertical = "center",
+		vertical = "top",
 		h = content_font_size,
 		font_size = content_font_size,
 		font = content_font,
@@ -338,7 +361,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		name = "next_level",
 		text = managers.localization:to_upper_text("menu_es_next_level"),
 		align = "left",
-		vertical = "center",
+		vertical = "top",
 		h = small_font_size,
 		font_size = small_font_size,
 		font = small_font,
@@ -348,7 +371,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		name = "skill_points",
 		text = managers.localization:to_upper_text("menu_es_skill_points_gained"),
 		align = "left",
-		vertical = "center",
+		vertical = "top",
 		h = small_font_size,
 		font_size = small_font_size,
 		font = small_font,
@@ -398,10 +421,12 @@ function HUDStageEndScreen:init(hud, workspace)
 	local _, _, gw, gh = self._lp_xp_gained:text_rect()
 	local _, _, nw, nh = self._lp_next_level:text_rect()
 	local _, _, sw, sh = self._lp_skill_points:text_rect()
+	ch = ch - 2
+	nh = nh - 2
+	sh = sh - 2
 	local w = math.ceil(math.max(cw, gw, nw, sw)) + 20
 	local squeeze_more_pixels = false
-	if SystemInfo:platform() ~= Idstring("WIN32") and 170 < w then
-		w = 170
+	if 170 < w then
 		squeeze_more_pixels = true
 	end
 	self._num_skill_points_gained = 0
@@ -419,32 +444,45 @@ function HUDStageEndScreen:init(hud, workspace)
 		wrap = true,
 		word_wrap = true
 	})
-	self._lp_sp_info:grow(-self._lp_circle:right() - 20, 0)
+	self._lp_sp_info:grow(-self._lp_circle:right() - 10, 0)
 	local _, _, iw, ih = self._lp_sp_info:text_rect()
 	self._lp_sp_info:set_h(ih)
 	self._lp_sp_info:set_leftbottom(self._lp_circle:right() + 0, self._lp_forepanel:h() - 10)
-	self._lp_skill_points:set_h(sh)
+	local w = self._lp_forepanel:w() - self._lp_sp_info:x() - 90
+	local number_text_x = self._lp_sp_info:left() + w
+	self._lp_skill_points:set_size(sw, sh)
 	self._lp_skill_points:set_left(self._lp_sp_info:left())
 	self._lp_skill_points:set_bottom(self._lp_sp_info:top())
-	self._lp_sp_gain:set_h(sh)
-	self._lp_sp_gain:set_left(self._lp_skill_points:left() + w)
+	self._lp_sp_gain:set_left(number_text_x)
 	self._lp_sp_gain:set_top(self._lp_skill_points:top())
-	self._lp_next_level:set_h(nh)
+	self._lp_sp_gain:set_size(self._lp_forepanel:w() - self._lp_sp_gain:left() - 10, sh)
+	self._lp_next_level:set_size(nw, nh)
 	self._lp_next_level:set_left(self._lp_sp_info:left())
 	self._lp_next_level:set_bottom(self._lp_skill_points:top())
-	self._lp_xp_nl:set_h(nh)
-	self._lp_xp_nl:set_left(self._lp_next_level:left() + w)
+	self._lp_xp_nl:set_left(number_text_x)
 	self._lp_xp_nl:set_top(self._lp_next_level:top())
+	self._lp_xp_nl:set_size(self._lp_forepanel:w() - self._lp_xp_nl:left() - 10, nh)
+	self._lp_curr_xp:set_size(cw, ch)
 	self._lp_curr_xp:set_left(self._lp_sp_info:left())
 	self._lp_curr_xp:set_bottom(self._lp_next_level:top())
-	self._lp_curr_xp:set_h(gh)
-	self._lp_xp_curr:set_left(self._lp_curr_xp:left() + w)
+	self._lp_xp_curr:set_left(number_text_x)
 	self._lp_xp_curr:set_top(self._lp_curr_xp:top())
-	self._lp_xp_curr:set_h(ch)
+	self._lp_xp_curr:set_size(self._lp_forepanel:w() - self._lp_xp_curr:left() - 10, ch)
+	self._lp_xp_gained:set_size(gw, gh)
 	self._lp_xp_gained:set_left(self._lp_curr_xp:left())
-	self._lp_xp_gained:set_h(ch)
-	self._lp_xp_gain:set_left(self._lp_xp_gained:x() + w + 5)
-	self._lp_xp_gain:set_h(gh)
+	self._lp_xp_gained:set_bottom(self._lp_curr_xp:top())
+	self._lp_xp_gain:set_left(number_text_x)
+	self._lp_xp_gain:set_top(self._lp_xp_gained:top())
+	self._lp_xp_gain:set_size(self._lp_forepanel:w() - self._lp_xp_gain:left() - 10, gh)
+	self._lp_xp_gained:set_bottom(math.round(self._lp_forepanel:h() / 2))
+	self._lp_curr_xp:set_top(self._lp_xp_gained:bottom())
+	self._lp_next_level:set_top(self._lp_curr_xp:bottom())
+	self._lp_skill_points:set_top(self._lp_next_level:bottom())
+	self._lp_sp_info:set_top(self._lp_skill_points:bottom())
+	self._lp_xp_gain:set_top(self._lp_xp_gained:top())
+	self._lp_xp_curr:set_top(self._lp_curr_xp:top())
+	self._lp_xp_nl:set_top(self._lp_next_level:top())
+	self._lp_sp_gain:set_top(self._lp_skill_points:top())
 	if squeeze_more_pixels then
 		lp_bg_circle:move(-20, 0)
 		self._lp_circle:move(-20, 0)
@@ -469,7 +507,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		w = self._foreground_layer_safe:w() / 2 - 10,
 		h = self._foreground_layer_safe:h() / 2 - 70 - 10,
 		y = 70,
-		alpha = 0
+		alpha = 1
 	})
 	self._package_forepanel:set_right(self._foreground_layer_safe:w())
 	self._package_forepanel:text({
@@ -495,6 +533,12 @@ function HUDStageEndScreen:init(hud, workspace)
 	self:clear_stage()
 	if self._data then
 		self:start_experience_gain()
+	end
+	for i, child in ipairs(self._lp_forepanel:children()) do
+		if child.text then
+			local text = child:text()
+			child:set_text(string.gsub(text, ":", ""))
+		end
 	end
 end
 
@@ -541,6 +585,57 @@ function HUDStageEndScreen:destroy_animation(o, delay, speed)
 	o = nil
 end
 
+function HUDStageEndScreen:_create_bonus(params)
+	local panel = params.panel
+	local positive_color = params.positive_color
+	local negative_color = params.negative_color
+	local color = params.color or params.bonus > 0 and positive_color or negative_color or Color.white
+	local positive_title = params.positive_title
+	local negative_title = params.negative_title
+	local title_string = params.title or params.bonus > 0 and positive_title or negative_title or ""
+	local sign_string = params.bonus > 0 and "+ " or "- "
+	local stat_string = managers.money:add_decimal_marks_to_string(tostring(math.abs(params.bonus)))
+	local bonus_panel = panel:panel({layer = 1})
+	local title_text = bonus_panel:text({
+		name = "title",
+		text = title_string,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = color
+	})
+	local sign_text = bonus_panel:text({
+		name = "sign",
+		text = sign_string,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = color
+	})
+	local stat_text = bonus_panel:text({
+		name = "stat",
+		text = stat_string,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = color
+	})
+	local x = self._lp_xp_gain:x() - panel:x()
+	local _, _, _, h = make_fine_text(title_text)
+	make_fine_text(sign_text)
+	bonus_panel:set_h(h - 4)
+	title_text:set_left(0)
+	sign_text:set_right(x)
+	stat_text:set_left(x)
+	stat_text:set_top(title_text:top())
+	stat_text:set_w(bonus_panel:w() - x)
+	stat_text:set_h(title_text:h())
+	for i, child in ipairs(bonus_panel:children()) do
+		if child.text then
+			local text = child:text()
+			child:set_text(string.gsub(text, ":", ""))
+		end
+	end
+	return bonus_panel
+end
+
 function HUDStageEndScreen:bonus_risk(panel, delay, bonus)
 	local risk_text = panel:text({
 		font = tweak_data.menu.pd2_small_font,
@@ -564,6 +659,7 @@ function HUDStageEndScreen:bonus_risk(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay, false)
 	local value_text = panel:text({
@@ -575,6 +671,7 @@ function HUDStageEndScreen:bonus_risk(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay, false)
+	make_fine_text(value_text)
 	return delay
 end
 
@@ -599,6 +696,7 @@ function HUDStageEndScreen:bonus_days(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -610,6 +708,7 @@ function HUDStageEndScreen:bonus_days(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -634,6 +733,7 @@ function HUDStageEndScreen:bonus_skill(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -645,6 +745,7 @@ function HUDStageEndScreen:bonus_skill(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -669,6 +770,7 @@ function HUDStageEndScreen:bonus_num_players(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -680,6 +782,7 @@ function HUDStageEndScreen:bonus_num_players(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -704,6 +807,7 @@ function HUDStageEndScreen:bonus_failed(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -715,6 +819,7 @@ function HUDStageEndScreen:bonus_failed(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -739,6 +844,7 @@ function HUDStageEndScreen:in_custody(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -750,6 +856,7 @@ function HUDStageEndScreen:in_custody(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -777,6 +884,7 @@ function HUDStageEndScreen:heat_xp(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -788,6 +896,7 @@ function HUDStageEndScreen:heat_xp(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -813,6 +922,7 @@ function HUDStageEndScreen:bonus_low_level(panel, delay, bonus)
 		alpha = 0,
 		align = "right"
 	})
+	make_fine_text(sign_text)
 	sign_text:set_world_right(self._lp_xp_curr:world_left())
 	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
 	local value_text = panel:text({
@@ -824,6 +934,7 @@ function HUDStageEndScreen:bonus_low_level(panel, delay, bonus)
 	})
 	value_text:set_world_left(self._lp_xp_curr:world_left())
 	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	make_fine_text(value_text)
 	return delay + 0
 end
 
@@ -865,6 +976,25 @@ function HUDStageEndScreen:clear_stage()
 	WalletGuiObject.set_object_visible("wallet_money_text", false)
 	WalletGuiObject.set_object_visible("wallet_skillpoint_icon", false)
 	WalletGuiObject.set_object_visible("wallet_skillpoint_text", false)
+end
+
+function HUDStageEndScreen:_check_ghost_bonus()
+	local ghost_bonus_mul = self._ghost_bonus
+	if ghost_bonus_mul and 0 < ghost_bonus_mul then
+		local ghost_bonus = math.round(ghost_bonus_mul * 100)
+		local ghost_string
+		if ghost_bonus == 0 then
+			ghost_string = string.format("%0.2f", math.abs(ghost_bonus_mul * 100))
+		else
+			ghost_string = tostring(math.abs(ghost_bonus))
+		end
+		for _, item in ipairs(self._package_items) do
+			item:close()
+		end
+		self._package_items = {
+			HUDPackageUnlockedItem:new(self._package_forepanel, 1, {ghost_bonus = ghost_string}, self)
+		}
+	end
 end
 
 function HUDStageEndScreen:stop_stage()
@@ -916,6 +1046,7 @@ end
 
 function HUDStageEndScreen:create_money_counter(t, dt)
 	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
+	self:_check_ghost_bonus()
 	self._is_fail_video = not is_success
 	if SystemInfo:platform() ~= Idstring("X360") then
 		if self._is_fail_video then
@@ -1138,8 +1269,10 @@ function HUDStageEndScreen:hide_money(t, dt)
 			video:animate(callback(self, self, "destroy_animation"))
 		end
 	end
-	self._money_panel:animate(callback(self, self, "destroy_animation"))
-	self._money_panel = nil
+	if alive(self._money_panel) then
+		self._money_panel:animate(callback(self, self, "destroy_animation"))
+		self._money_panel = nil
+	end
 	self:step_stage_up()
 end
 
@@ -1160,100 +1293,126 @@ function HUDStageEndScreen:stage_init(t, dt)
 	self._lp_backpanel:child("bg_progress_circle"):set_alpha(0)
 	self._lp_text:set_alpha(0)
 	self._bonuses_panel = self._lp_forepanel:panel({
-		x = self._lp_curr_xp:x(),
-		y = 10
+		x = self._lp_xp_gained:x(),
+		y = 10,
+		w = self._lp_forepanel:w() - self._lp_xp_gained:left() - 10,
+		h = self._lp_xp_gained:top() - 10
 	})
-	self._bonuses_panel:grow(-self._bonuses_panel:x(), -self._bonuses_panel:y())
-	local stage_text = managers.localization:to_upper_text("menu_es_base_xp_stage")
-	local base_text = self._bonuses_panel:text({
-		name = "base_text",
-		font = tweak_data.menu.pd2_small_font,
-		font_size = tweak_data.menu.pd2_small_font_size,
-		color = tweak_data.screen_colors.text,
-		text = stage_text
+	self._anim_exp_bonus = nil
+	local bonus_params = {
+		panel = self._bonuses_panel,
+		color = tweak_data.screen_colors.text
+	}
+	bonus_params.title = managers.localization:to_upper_text("menu_experience")
+	bonus_params.bonus = 0
+	local exp = self:_create_bonus(bonus_params)
+	exp:child("sign"):hide()
+	self._experience_text_panel = exp
+	self._experience_text_panel:set_alpha(0)
+	self._experience_added = 0
+	bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_stage")
+	bonus_params.bonus = data.bonuses.stage_xp
+	local stage = self:_create_bonus(bonus_params)
+	stage:set_right(0)
+	stage:set_top(exp:bottom())
+	self._bonuses = {}
+	table.insert(self._bonuses, {
+		stage,
+		bonus_params.bonus
 	})
-	local xp_text = self._bonuses_panel:text({
-		name = "xp_text",
-		font = tweak_data.menu.pd2_small_font,
-		font_size = tweak_data.menu.pd2_small_font_size,
-		color = tweak_data.screen_colors.text,
-		text = managers.money:add_decimal_marks_to_string(tostring(data.bonuses.stage_xp))
-	})
-	local _, _, tw, th = base_text:text_rect()
-	base_text:set_h(th)
-	xp_text:set_world_left(self._lp_xp_curr:world_left())
-	local delay = 0.8
-	local y = math.round(base_text:bottom())
-	if data.bonuses.last_stage then
-		local job_text = managers.localization:to_upper_text("menu_es_base_xp_job")
-		local job_xp_fade_panel = self._bonuses_panel:panel({alpha = 0})
-		local base_text = job_xp_fade_panel:text({
-			name = "base_text",
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text,
-			text = job_text,
-			y = y
+	local job
+	if data.bonuses.last_stage and data.bonuses.job_xp ~= 0 then
+		bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_job")
+		bonus_params.bonus = data.bonuses.job_xp
+		job = self:_create_bonus(bonus_params)
+		job:set_right(0)
+		job:set_top(exp:bottom())
+		table.insert(self._bonuses, {
+			job,
+			bonus_params.bonus
 		})
-		local sign_text = job_xp_fade_panel:text({
-			name = "sign_text",
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text,
-			y = y,
-			text = "+",
-			align = "right"
-		})
-		local xp_text = job_xp_fade_panel:text({
-			name = "xp_text",
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text,
-			y = y,
-			text = managers.money:add_decimal_marks_to_string(tostring(data.bonuses.job_xp))
-		})
-		local _, _, tw, th = base_text:text_rect()
-		base_text:set_h(th)
-		xp_text:set_world_left(self._lp_xp_curr:world_left())
-		sign_text:set_world_right(self._lp_xp_curr:world_left())
-		delay = 1.45
-		y = math.round(base_text:bottom())
-		job_xp_fade_panel:animate(callback(self, self, "spawn_animation"), 0.6, "box_tick")
 	end
-	local bonuses_to_string_converter = {
+	local heat_xp = self._bonuses.heat_xp or 0
+	local heat = managers.job:last_known_heat() or managers.job:current_job_id() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
+	local heat_color = managers.job:get_heat_color(heat)
+	local bonuses_list = {
+		"bonus_days",
+		"bonus_low_level",
 		"bonus_risk",
 		"bonus_failed",
 		"in_custody",
-		"bonus_days",
 		"bonus_num_players",
 		"bonus_skill",
+		"bonus_infamy",
+		"bonus_extra",
+		"bonus_ghost",
 		"heat_xp"
 	}
-	if data.bonuses.rounding_error ~= 0 then
-		Application:debug("GOT A ROUNDING ERROR IN EXPERIENCE GIVING:", data.bonuses.rounding_error)
-	end
-	local index = 2
-	for i, func_name in ipairs(bonuses_to_string_converter) do
+	local bonuses_params = {}
+	bonuses_params.bonus_days = {
+		color = tweak_data.screen_colors.text,
+		title = managers.localization:to_upper_text("menu_es_day_bonus")
+	}
+	bonuses_params.bonus_low_level = {
+		color = tweak_data.screen_colors.important_1,
+		title = managers.localization:to_upper_text("menu_es_alive_low_level_bonus")
+	}
+	bonuses_params.bonus_risk = {
+		color = tweak_data.screen_colors.risk,
+		title = managers.localization:to_upper_text("menu_es_risk_bonus")
+	}
+	bonuses_params.bonus_failed = {
+		color = tweak_data.screen_colors.important_1,
+		title = managers.localization:to_upper_text("menu_es_alive_failed_bonus")
+	}
+	bonuses_params.in_custody = {
+		color = tweak_data.screen_colors.important_1,
+		title = managers.localization:to_upper_text("menu_es_in_custody_reduction")
+	}
+	bonuses_params.bonus_num_players = {
+		color = tweak_data.screen_colors.risk,
+		title = managers.localization:to_upper_text("menu_es_alive_players_bonus")
+	}
+	bonuses_params.bonus_skill = {
+		color = tweak_data.screen_colors.button_stage_2,
+		title = managers.localization:to_upper_text("menu_es_skill_bonus")
+	}
+	bonuses_params.bonus_infamy = {
+		color = tweak_data.lootdrop.global_values.infamy.color,
+		title = managers.localization:to_upper_text("menu_es_infamy_bonus")
+	}
+	bonuses_params.bonus_extra = {
+		color = tweak_data.screen_colors.button_stage_2,
+		title = managers.localization:to_upper_text("menu_es_extra_bonus")
+	}
+	bonuses_params.bonus_ghost = {
+		color = tweak_data.screen_colors.ghost_color,
+		title = managers.localization:to_upper_text("menu_es_ghost_bonus")
+	}
+	bonuses_params.heat_xp = {
+		color = heat_color,
+		title = managers.localization:to_upper_text(0 <= heat and "menu_es_heat_bonus" or "menu_es_heat_reduction")
+	}
+	for i, func_name in ipairs(bonuses_list) do
 		local bonus = data.bonuses[func_name] or 0
-		if bonus and bonus ~= 0 then
-			local panel = self._bonuses_panel:panel({alpha = 0, y = y})
-			delay = (callback(self, self, func_name)(panel, delay, bonus) or delay) + 0.6
-			y = y + panel:h() - 2
-			index = index + 1
+		if bonus ~= 0 then
+			bonus_params.color = bonuses_params[func_name] and bonuses_params[func_name].color or Color.purple
+			bonus_params.title = bonuses_params[func_name] and bonuses_params[func_name].title or "ERR: " .. func_name
+			bonus_params.bonus = bonus
+			local b = self:_create_bonus(bonus_params)
+			b:set_right(0)
+			b:set_top(exp:bottom())
+			table.insert(self._bonuses, {
+				b,
+				bonus_params.bonus
+			})
 		end
 	end
-	local sum_line = self._bonuses_panel:rect({
-		color = Color(0, 1, 1, 1),
-		alpha = 0,
-		h = 2
-	})
-	sum_line:set_y(y)
-	self._lp_xp_gain:set_world_top(sum_line:world_top())
+	local delay = 0.8
+	local y = 0
 	if SystemInfo:platform() == Idstring("WIN32") then
-		self._lp_xp_gain:move(0, self._lp_xp_gain:h())
 	end
-	self._lp_xp_gained:set_top(self._lp_xp_gain:top())
-	local sum_text = self._bonuses_panel:text({
+	local sum_text = self._lp_forepanel:text({
 		name = "sum_text",
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
@@ -1261,18 +1420,65 @@ function HUDStageEndScreen:stage_init(t, dt)
 		align = "right",
 		alpha = 1
 	})
-	sum_text:set_world_righttop(self._lp_xp_gain:world_left(), self._lp_xp_gain:world_top())
+	make_fine_text(sum_text)
+	sum_text:set_righttop(self._lp_xp_gain:left(), self._lp_xp_gain:top())
 	sum_text:hide()
 	self._sum_text = sum_text
 	self._lp_circle:set_color(Color(data.start_t.current / data.start_t.total, 1, 1))
-	self._wait_t = t + 1
-	self._start_ramp_up_t = delay
+	self._wait_t = t + 0.5
+	self._start_ramp_up_t = 1
 	self._ramp_up_timer = 0
 	managers.menu_component:post_event("box_tick")
 	self:step_stage_up()
 end
 
-function HUDStageEndScreen:stage_spin_up(t, dt)
+function HUDStageEndScreen:anim_count_experience(o, stat)
+	self._anim_exp_bonus = true
+	local dt
+	managers.menu_component:post_event("count_1_finished")
+	while o:left() < 0 do
+		dt = coroutine.yield()
+		o:move(o:w() * dt * 6, 0)
+		o:set_left(math.min(o:left(), 0))
+	end
+	wait(0.85)
+	if 0 < stat then
+		managers.menu_component:post_event("zoom_in")
+	else
+		managers.menu_component:post_event("zoom_out")
+	end
+	while 0 < o:top() do
+		dt = coroutine.yield()
+		o:move(0, -o:h() * dt * 6)
+		o:set_top(math.max(o:top(), 0))
+		o:set_alpha(o:top() / o:h())
+	end
+	local old_exp_text = self._bonuses_panel:text({
+		rotation = 360,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		text = self._experience_text_panel:child("stat"):text(),
+		layer = 3
+	})
+	old_exp_text:set_size(self._experience_text_panel:child("stat"):size())
+	old_exp_text:set_world_position(self._experience_text_panel:child("stat"):world_position())
+	self._experience_added = self._experience_added + stat
+	self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added)))
+	local st = 0.5
+	local t = st
+	while 0 < t do
+		dt = coroutine.yield()
+		t = t - dt
+		old_exp_text:move(dt * 5, -35 * dt)
+		old_exp_text:set_alpha(t / st)
+	end
+	self._bonuses_panel:remove(old_exp_text)
+	self._anim_exp_bonus = false
+	o:parent():remove(o)
+end
+
+function HUDStageEndScreen:stage_count_exp(t, dt)
 	local data = self._data
 	if self._start_ramp_up_t then
 		self._ramp_up_timer = math.min(self._ramp_up_timer + dt, self._start_ramp_up_t)
@@ -1281,6 +1487,31 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 		self._lp_circle:set_alpha(ratio)
 		self._lp_backpanel:child("bg_progress_circle"):set_alpha(ratio * 0.6)
 		self._lp_text:set_alpha(ratio)
+		self._experience_text_panel:set_alpha(ratio)
+		if self._ramp_up_timer == self._start_ramp_up_t then
+			if self._anim_exp_bonus then
+				return
+			end
+			if #self._bonuses > 0 then
+				local bonus = self._bonuses[1][1]
+				local stat = self._bonuses[1][2]
+				local func = callback(self, self, "anim_count_experience")
+				bonus:animate(func, stat)
+				table.remove(self._bonuses, 1)
+				return
+			end
+			self._start_ramp_up_t = 1
+			self:step_stage_up()
+		end
+		return
+	end
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:stage_spin_up(t, dt)
+	local data = self._data
+	if self._start_ramp_up_t then
+		local ratio = 0
 		if self._ramp_up_timer == self._start_ramp_up_t then
 			self._static_current_xp = data.start_t.xp
 			self._static_gained_xp = 0
@@ -1289,7 +1520,7 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 			self._gained_xp = self._static_gained_xp
 			self._next_level_xp = data.start_t.total - data.start_t.current
 			self._speed = 1
-			self._wait_t = t + 2.4
+			self._wait_t = t + 0.8
 			self._ramp_up_timer = nil
 			self._start_ramp_up_t = nil
 			ratio = 1
@@ -1318,6 +1549,7 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 			self:step_stage_up()
 		end
 	end
+	self:step_stage_up()
 end
 
 function HUDStageEndScreen:stage_show_all(t, dt)
@@ -1375,8 +1607,10 @@ function HUDStageEndScreen:stage_spin_levels(t, dt)
 				self._playing_sound = nil
 			end
 		end
+		local floored_gained = math.floor(self._gained_xp)
+		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
 		self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
-		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._gained_xp))))
+		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
 		if current_level_data.level < managers.experience:level_cap() then
 			self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._next_level_xp))))
 		else
@@ -1410,8 +1644,10 @@ function HUDStageEndScreen:stage_spin_slowdown(t, dt)
 	local ratio = 1 - self._next_level_xp / data.end_t.total
 	self._lp_circle:set_color(Color(ratio, 1, 1))
 	if data.end_t.level < managers.experience:level_cap() then
+		local floored_gained = math.floor(self._gained_xp)
+		self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
 		self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
-		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._gained_xp))))
+		self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
 		self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._next_level_xp))))
 	else
 		self._lp_xp_nl:set_text("")
@@ -1425,8 +1661,11 @@ function HUDStageEndScreen:stage_end(t, dt)
 	self._static_gained_xp = data.gained
 	self._current_xp = self._static_current_xp
 	self._gained_xp = self._static_gained_xp
+	local floored_gained = math.floor(self._gained_xp)
+	self._experience_text_panel:child("stat"):set_text(managers.money:add_decimal_marks_to_string(tostring(self._experience_added - floored_gained)))
+	self._experience_text_panel:hide()
 	self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._current_xp))))
-	self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(self._gained_xp))))
+	self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(floored_gained)))
 	if data.end_t.level < managers.experience:level_cap() then
 		self._lp_circle:set_color(Color(ratio, 1, 1))
 		self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(data.end_t.total - data.end_t.current))))
@@ -1596,6 +1835,7 @@ HUDStageEndScreen.stages = {
 	"count_money",
 	"hide_money",
 	"stage_init",
+	"stage_count_exp",
 	"stage_spin_up",
 	"stage_show_all",
 	"stage_spin_levels",
@@ -1691,6 +1931,11 @@ function HUDStageEndScreen:set_success(success, server_left)
 	local stage_status = success and utf8.to_upper(managers.localization:text("menu_success")) or utf8.to_upper(managers.localization:text("menu_failed"))
 	self._foreground_layer_safe:child("stage_text"):set_text(self._stage_name .. ": " .. stage_status)
 	self._background_layer_full:child("stage_text"):set_text(self._stage_name .. ": " .. stage_status)
+end
+
+function HUDStageEndScreen:set_ghost_bonus(ghost_bonus)
+	self._ghost_bonus = ghost_bonus
+	self:_check_ghost_bonus()
 end
 
 function HUDStageEndScreen:set_statistics(criminals_completed, success)

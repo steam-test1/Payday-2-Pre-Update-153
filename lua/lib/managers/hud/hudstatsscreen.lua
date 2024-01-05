@@ -3,18 +3,14 @@ HUDStatsScreen = HUDStatsScreen or class()
 function HUDStatsScreen:init()
 	self._full_hud_panel = managers.hud:script(managers.hud.STATS_SCREEN_FULLSCREEN).panel
 	self._full_hud_panel:clear()
+	local x_margine = 10
+	local y_margine = 10
 	local left_panel = self._full_hud_panel:panel({
 		name = "left_panel",
 		valign = "scale",
 		w = self._full_hud_panel:w() / 3
 	})
 	left_panel:set_x(-left_panel:w())
-	left_panel:rect({
-		name = "rect_bg",
-		color = Color(0, 0, 0):with_alpha(0.75),
-		valign = "scale",
-		blend_mode = "normal"
-	})
 	local blur_bg = left_panel:bitmap({
 		name = "blur_bg",
 		texture = "guis/textures/test_blur_df",
@@ -22,8 +18,24 @@ function HUDStatsScreen:init()
 		h = left_panel:h(),
 		valign = "scale",
 		render_template = "VertexColorTexturedBlur3D",
-		layer = -1
+		layer = -1,
+		x = x_margine,
+		y = y_margine,
+		w = left_panel:w() - x_margine,
+		h = left_panel:h() - y_margine * 2
 	})
+	local leftbox = HUDBGBox_create(left_panel, {
+		valign = "scale",
+		x = x_margine,
+		y = y_margine,
+		w = left_panel:w() - x_margine,
+		h = left_panel:h() - y_margine * 2
+	}, {
+		color = Color.white,
+		blend_mode = "normal"
+	})
+	leftbox:child("bg"):set_color(Color(0, 0, 0):with_alpha(0.75))
+	leftbox:child("bg"):set_alpha(1)
 	local objectives_title = left_panel:text({
 		layer = 1,
 		name = "objectives_title",
@@ -262,18 +274,38 @@ function HUDStatsScreen:init()
 		y = near_completion_title:bottom(),
 		w = left_panel:w() - (near_completion_title:x() + pad)
 	})
+	local bottom_panel = self._full_hud_panel:panel({
+		name = "bottom_panel",
+		h = y + 90,
+		w = self._full_hud_panel:w() / 3 - x_margine * 2
+	})
+	bottom_panel:set_y(self._full_hud_panel:h())
+	bottom_panel:set_x(self._full_hud_panel:w() / 3 + x_margine)
+	local blur_bg = bottom_panel:bitmap({
+		name = "blur_bg",
+		texture = "guis/textures/test_blur_df",
+		w = bottom_panel:w(),
+		h = bottom_panel:h(),
+		valign = "scale",
+		render_template = "VertexColorTexturedBlur3D",
+		layer = -1,
+		h = bottom_panel:h() - y_margine
+	})
+	local bottombox = HUDBGBox_create(bottom_panel, {
+		valign = "scale",
+		h = bottom_panel:h() - y_margine
+	}, {
+		color = Color.white,
+		blend_mode = "normal"
+	})
+	bottombox:child("bg"):set_color(Color(0, 0, 0):with_alpha(0.6))
+	bottombox:child("bg"):set_alpha(1)
 	local right_panel = self._full_hud_panel:panel({
 		name = "right_panel",
 		valign = "scale",
 		w = self._full_hud_panel:w() / 3
 	})
 	right_panel:set_x(self._full_hud_panel:w())
-	right_panel:rect({
-		name = "rect_bg",
-		color = Color(0, 0, 0):with_alpha(0.75),
-		valign = "scale",
-		blend_mode = "normal"
-	})
 	local blur_bg = right_panel:bitmap({
 		name = "blur_bg",
 		texture = "guis/textures/test_blur_df",
@@ -281,8 +313,22 @@ function HUDStatsScreen:init()
 		h = right_panel:h(),
 		valign = "scale",
 		render_template = "VertexColorTexturedBlur3D",
-		layer = -1
+		layer = -1,
+		y = y_margine,
+		h = right_panel:h() - y_margine * 2,
+		w = right_panel:w() - x_margine
 	})
+	local rightbox = HUDBGBox_create(right_panel, {
+		valign = "scale",
+		y = y_margine,
+		h = right_panel:h() - y_margine * 2,
+		w = right_panel:w() - x_margine
+	}, {
+		color = Color.white,
+		blend_mode = "normal"
+	})
+	rightbox:child("bg"):set_color(Color(0, 0, 0):with_alpha(0.75))
+	rightbox:child("bg"):set_alpha(1)
 	local days_title = right_panel:text({
 		layer = 1,
 		x = 20,
@@ -404,24 +450,64 @@ function HUDStatsScreen:init()
 	})
 	day_description:set_y(math.round(bains_plan:bottom()))
 	day_description:set_h(day_wrapper_panel:h())
-	local profile_wrapper_panel = right_panel:panel({
+	do
+		local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id())
+		local is_whisper_mode = managers.groupai and managers.groupai:state():whisper_mode()
+		local ghost_icon = right_panel:bitmap({
+			name = "ghost_icon",
+			texture = "guis/textures/pd2/cn_minighost",
+			w = 16,
+			h = 16,
+			blend_mode = "add"
+		})
+		local ghostable_text = day_wrapper_panel:text({
+			name = "ghostable_text",
+			text = managers.localization:text("menu_ghostable_stage"),
+			align = "left",
+			vertical = "top",
+			blend_mode = "add",
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = tweak_data.screen_colors.text
+		})
+		local x, y, w, h = ghostable_text:text_rect()
+		ghostable_text:set_size(w, h)
+		ghost_icon:set_left(days_title:right())
+		ghost_icon:set_center_y(days_title:center_y())
+		ghostable_text:set_y(day_description:top() + 10)
+		ghostable_text:set_left(day_description:left())
+		ghost_icon:set_visible(is_level_ghostable)
+		ghost_icon:set_color(is_whisper_mode and Color.white or tweak_data.screen_colors.important_1)
+		ghostable_text:set_visible(is_level_ghostable and is_whisper_mode)
+	end
+	local ext_inventory_panel = right_panel:panel({
 		layer = 1,
 		valign = {0.5, 0.5},
-		name = "profile_wrapper_panel",
+		name = "ext_inventory_panel",
 		x = 20,
 		y = y + math.round(managers.gui_data:scaled_size().height / 2),
 		h = math.round(managers.gui_data:scaled_size().height / 2),
 		w = left_panel:w()
 	})
-	profile_wrapper_panel:set_w(right_panel:w() - x - profile_wrapper_panel:x())
+	ext_inventory_panel:set_w(right_panel:w() - x - ext_inventory_panel:x())
 	local _, by = managers.gui_data:corner_safe_to_full(0, managers.gui_data:corner_scaled_size().height)
-	profile_wrapper_panel:set_bottom(by)
-	profile_wrapper_panel:set_valign({
+	ext_inventory_panel:set_bottom(by)
+	ext_inventory_panel:set_valign({
 		by / managers.gui_data:full_scaled_size().h,
 		0
 	})
+	local profile_wrapper_panel = bottom_panel:panel({
+		layer = 1,
+		valign = {0.5, 0.5},
+		name = "profile_wrapper_panel",
+		x = x_margine,
+		y = y_margine,
+		h = math.round(bottom_panel:h() - y - y_margine),
+		w = bottom_panel:w() - x_margine * 2
+	})
 	self:_rec_round_object(left_panel)
 	self:_rec_round_object(right_panel)
+	self:_rec_round_object(bottom_panel)
 end
 
 function HUDStatsScreen:_rec_round_object(object)
@@ -440,16 +526,24 @@ function HUDStatsScreen:show()
 	managers.hud:show(full)
 	local left_panel = self._full_hud_panel:child("left_panel")
 	local right_panel = self._full_hud_panel:child("right_panel")
+	local bottom_panel = self._full_hud_panel:child("bottom_panel")
 	left_panel:stop()
-	self:_create_stats_screen_profile(right_panel:child("profile_wrapper_panel"))
+	self:_create_stats_screen_profile(bottom_panel:child("profile_wrapper_panel"))
 	self:_create_stats_screen_objectives(left_panel:child("objectives_panel"))
+	self:_create_stats_ext_inventory(right_panel:child("ext_inventory_panel"))
 	self:_update_stats_screen_loot(left_panel:child("loot_wrapper_panel"))
 	self:_update_stats_screen_day(right_panel)
 	local teammates_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("teammates_panel")
 	local objectives_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("objectives_panel")
 	local chat_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("chat_panel")
-	left_panel:animate(callback(self, self, "_animate_show_stats_left_panel"), right_panel, teammates_panel, objectives_panel, chat_panel)
+	left_panel:animate(callback(self, self, "_animate_show_stats_left_panel"), right_panel, bottom_panel, teammates_panel, objectives_panel, chat_panel)
 	self._showing_stats_screen = true
+	if managers.groupai:state() and not self._whisper_listener then
+		self._whisper_listener = "HUDStatsScreen_whisper_mode"
+		managers.groupai:state():add_listener(self._whisper_listener, {
+			"whisper_mode"
+		}, callback(self, self, "on_whisper_mode_changed"))
+	end
 end
 
 function HUDStatsScreen:hide()
@@ -462,11 +556,16 @@ function HUDStatsScreen:hide()
 	managers.hud:hide(safe)
 	local left_panel = self._full_hud_panel:child("left_panel")
 	local right_panel = self._full_hud_panel:child("right_panel")
+	local bottom_panel = self._full_hud_panel:child("bottom_panel")
 	left_panel:stop()
 	local teammates_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("teammates_panel")
 	local objectives_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("objectives_panel")
 	local chat_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("chat_panel")
-	left_panel:animate(callback(self, self, "_animate_hide_stats_left_panel"), right_panel, teammates_panel, objectives_panel, chat_panel)
+	left_panel:animate(callback(self, self, "_animate_hide_stats_left_panel"), right_panel, bottom_panel, teammates_panel, objectives_panel, chat_panel)
+	if managers.groupai:state() and self._whisper_listener then
+		managers.groupai:state():remove_listener(self._whisper_listener)
+		self._whisper_listener = nil
+	end
 end
 
 function HUDStatsScreen:_create_stats_screen_objectives(panel)
@@ -619,6 +718,126 @@ function HUDStatsScreen:_create_stats_screen_profile(profile_wrapper_panel)
 			potential_level_up_text:animate(callback(self, self, "_animate_text_pulse"), exp_gain_ring, exp_ring)
 		end
 	end
+end
+
+function HUDStatsScreen:on_whisper_mode_changed()
+	local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
+	local right_panel = self._full_hud_panel:child("right_panel")
+	local day_wrapper_panel = right_panel:child("day_wrapper_panel")
+	local ghost_icon = right_panel:child("ghost_icon")
+	local ghostable_text = day_wrapper_panel:child("ghostable_text")
+	if alive(ghost_icon) and alive(ghostable_text) then
+		ghost_icon:set_color(tweak_data.screen_colors.important_1)
+		ghostable_text:set_visible(is_level_ghostable)
+	end
+end
+
+function HUDStatsScreen:on_ext_inventory_changed()
+	local right_panel = self._full_hud_panel:child("right_panel")
+	if not alive(right_panel) then
+		return
+	end
+	local ext_inventory_panel = right_panel:child("ext_inventory_panel")
+	if not alive(ext_inventory_panel) then
+		return
+	end
+	self:_create_stats_ext_inventory(ext_inventory_panel)
+end
+
+function HUDStatsScreen:_create_stats_ext_inventory(ext_inventory_panel)
+	ext_inventory_panel:clear()
+	local eq_h = 64 / (PlayerBase.USE_GRENADES and 3 or 2)
+	local eq_w = 48
+	local equipment = {
+		{
+			text = managers.localization:to_upper_text("hud_body_bags"),
+			icon = "equipment_body_bag",
+			amount = managers.player:get_body_bags_amount()
+		}
+	}
+	local y
+	for i, eq in ipairs(equipment) do
+		y = ext_inventory_panel:h() - eq_h * i - 2 * (i - 1)
+		local panel = ext_inventory_panel:panel({
+			name = "panel" .. i,
+			layer = 1,
+			w = eq_w,
+			h = eq_h,
+			x = ext_inventory_panel:w() - eq_w,
+			y = y
+		})
+		local icon, texture_rect = tweak_data.hud_icons:get_icon_data(eq.icon)
+		local image = panel:bitmap({
+			name = "image",
+			texture = icon,
+			texture_rect = texture_rect,
+			visible = true,
+			layer = 1,
+			color = Color.white,
+			w = panel:h(),
+			h = panel:h(),
+			x = -(panel:h() - panel:h()) / 2,
+			y = -(panel:h() - panel:h()) / 2
+		})
+		local amount = panel:text({
+			name = "amount",
+			visible = true,
+			text = tostring(13),
+			font = "fonts/font_medium_mf",
+			font_size = 22,
+			color = Color.white,
+			align = "right",
+			vertical = "center",
+			layer = 2,
+			x = -2,
+			y = 2,
+			w = panel:w(),
+			h = panel:h()
+		})
+		self:_set_amount_string(amount, eq.amount)
+		local text = ext_inventory_panel:text({
+			name = "text" .. i,
+			visible = true,
+			text = eq.text,
+			font = "fonts/font_medium_mf",
+			font_size = 22,
+			color = Color.white,
+			align = "right",
+			vertical = "center",
+			layer = 2,
+			x = -2,
+			y = 2,
+			w = panel:w(),
+			h = panel:h()
+		})
+		managers.hud:make_fine_text(text)
+		text:set_y(math.round(panel:center_y() - text:h() / 2) + 2)
+		text:set_right(math.round(panel:left() - 8))
+	end
+	local title = ext_inventory_panel:text({
+		name = "title",
+		visible = true,
+		text = managers.localization:to_upper_text("hud_extended_inventory"),
+		font_size = tweak_data.hud_stats.loot_title_size,
+		font = tweak_data.hud_stats.objectives_font,
+		color = Color.white,
+		align = "right",
+		vertical = "center",
+		layer = 2,
+		x = -2,
+		y = 2,
+		w = ext_inventory_panel:w(),
+		h = ext_inventory_panel:h()
+	})
+	managers.hud:make_fine_text(title)
+	title:set_y(y - title:h() - 4)
+	title:set_right(math.round(ext_inventory_panel:w()))
+end
+
+function HUDStatsScreen:_set_amount_string(text, amount)
+	local zero = amount < 10 and "0" or ""
+	text:set_text(zero .. amount)
+	text:set_range_color(0, string.len(amount == 0 and text:text() or zero), Color.white:with_alpha(0.5))
 end
 
 function HUDStatsScreen:_animate_text_pulse(text, exp_gain_ring, exp_ring)
@@ -791,6 +1010,21 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			local briefing_id = stage_data.briefing_id or level_data.briefing_id
 			local day_description = day_wrapper_panel:child("day_description")
 			day_description:set_text(managers.localization:text(briefing_id))
+			local _, _, _, h = day_description:text_rect()
+			day_description:set_h(h)
+			managers.hud:make_fine_text(days_title)
+			local _, _, _, h = day_description:text_rect()
+			local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id())
+			local is_whisper_mode = managers.groupai and managers.groupai:state():whisper_mode()
+			local ghost_icon = right_panel:child("ghost_icon")
+			local ghostable_text = day_wrapper_panel:child("ghostable_text")
+			ghost_icon:set_left(days_title:right())
+			ghost_icon:set_center_y(days_title:center_y())
+			ghostable_text:set_y(day_description:bottom() + 10)
+			ghostable_text:set_left(day_description:left())
+			ghost_icon:set_visible(is_level_ghostable)
+			ghost_icon:set_color(is_whisper_mode and Color.white or tweak_data.screen_colors.important_1)
+			ghostable_text:set_visible(is_level_ghostable and is_whisper_mode)
 		end
 	end
 end
@@ -893,7 +1127,7 @@ function HUDStatsScreen:loot_value_updated()
 	self:_update_stats_screen_loot(left_panel:child("loot_wrapper_panel"))
 end
 
-function HUDStatsScreen:_animate_show_stats_left_panel(left_panel, right_panel, teammates_panel, objectives_panel, chat_panel)
+function HUDStatsScreen:_animate_show_stats_left_panel(left_panel, right_panel, bottom_panel, teammates_panel, objectives_panel, chat_panel)
 	local start_x = left_panel:x()
 	local start_a = 1 - start_x / -left_panel:w()
 	local TOTAL_T = 0.33 * (start_x / -left_panel:w())
@@ -906,6 +1140,8 @@ function HUDStatsScreen:_animate_show_stats_left_panel(left_panel, right_panel, 
 		left_panel:set_x(math.lerp(start_x, 0, t / TOTAL_T))
 		right_panel:set_alpha(a)
 		right_panel:set_x(right_panel:parent():w() - (left_panel:x() + right_panel:w()))
+		bottom_panel:set_alpha(a)
+		bottom_panel:set_y(bottom_panel:parent():h() - (left_panel:x() + bottom_panel:h()))
 		local a_half = 0.5 + (1 - a) * 0.5
 		teammates_panel:set_alpha(a_half)
 		objectives_panel:set_alpha(1 - a)
@@ -918,9 +1154,14 @@ function HUDStatsScreen:_animate_show_stats_left_panel(left_panel, right_panel, 
 	chat_panel:set_alpha(0.5)
 	right_panel:set_alpha(1)
 	right_panel:set_x(right_panel:parent():w() - right_panel:w())
+	bottom_panel:set_alpha(1)
+	bottom_panel:set_y(bottom_panel:parent():h() - bottom_panel:h())
+	self:_rec_round_object(left_panel)
+	self:_rec_round_object(right_panel)
+	self:_rec_round_object(bottom_panel)
 end
 
-function HUDStatsScreen:_animate_hide_stats_left_panel(left_panel, right_panel, teammates_panel, objectives_panel, chat_panel)
+function HUDStatsScreen:_animate_hide_stats_left_panel(left_panel, right_panel, bottom_panel, teammates_panel, objectives_panel, chat_panel)
 	local start_x = left_panel:x()
 	local start_a = 1 - start_x / -left_panel:w()
 	local TOTAL_T = 0.33 * (1 - start_x / -left_panel:w())
@@ -933,6 +1174,8 @@ function HUDStatsScreen:_animate_hide_stats_left_panel(left_panel, right_panel, 
 		left_panel:set_x(math.lerp(start_x, -left_panel:w(), t / TOTAL_T))
 		right_panel:set_alpha(a)
 		right_panel:set_x(right_panel:parent():w() - (left_panel:x() + right_panel:w()))
+		bottom_panel:set_alpha(a)
+		bottom_panel:set_y(bottom_panel:parent():h() - (left_panel:x() + bottom_panel:h()))
 		local a_half = 0.5 + (1 - a) * 0.5
 		teammates_panel:set_alpha(a_half)
 		objectives_panel:set_alpha(1 - a)
@@ -945,4 +1188,6 @@ function HUDStatsScreen:_animate_hide_stats_left_panel(left_panel, right_panel, 
 	chat_panel:set_alpha(1)
 	right_panel:set_alpha(0)
 	right_panel:set_x(right_panel:parent():w())
+	bottom_panel:set_alpha(0)
+	bottom_panel:set_y(bottom_panel:parent():h())
 end

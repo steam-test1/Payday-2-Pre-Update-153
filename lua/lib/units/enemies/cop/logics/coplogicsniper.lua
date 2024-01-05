@@ -54,7 +54,7 @@ function CopLogicSniper.enter(data, new_logic_name, enter_params)
 		data.unit:inventory():equipped_unit():base():set_laser_enabled(true)
 		my_data.weapon_laser_on = true
 		managers.enemy:_destroy_unit_gfx_lod_data(data.key)
-		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", data.unit, "brain", HuskCopBrain._NET_EVENTS.weapon_laser_on)
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", data.unit, "brain", HuskCopBrain._NET_EVENTS.weapon_laser_on)
 	end
 end
 
@@ -73,7 +73,7 @@ function CopLogicSniper.exit(data, new_logic_name, enter_params)
 		if data.unit:inventory():equipped_unit() then
 			data.unit:inventory():equipped_unit():base():set_laser_enabled(false)
 		end
-		managers.network:session():send_to_peers_synched("sync_unit_event_id_8", data.unit, "brain", HuskCopBrain._NET_EVENTS.weapon_laser_off)
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", data.unit, "brain", HuskCopBrain._NET_EVENTS.weapon_laser_off)
 		if new_logic_name ~= "inactive" then
 			managers.enemy:_create_unit_gfx_lod_data(data.unit)
 		end

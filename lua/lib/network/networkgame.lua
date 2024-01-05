@@ -437,6 +437,8 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 						elseif member_downed then
 							unit:character_damage():force_bleedout()
 						end
+					else
+						managers.trade:remove_from_trade(player_character)
 					end
 				end
 				local deployed_equipment = World:find_units_quick("all", 14, 25, 26)

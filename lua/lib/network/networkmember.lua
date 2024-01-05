@@ -167,9 +167,6 @@ function NetworkMember:set_unit(unit, character_name)
 			local sequence = managers.blackmarket:character_sequence_by_character_id(self._peer:character_id(), self._peer:id())
 			unit:damage():run_sequence_simple(sequence)
 			unit:damage():run_sequence_simple(tweak_data.blackmarket.armors[self._peer:armor_id()].sequence)
-			if unit:contour() then
-				unit:contour():update_materials()
-			end
 		end
 		unit:movement():set_character_anim_variables()
 		if self ~= Global.local_member then

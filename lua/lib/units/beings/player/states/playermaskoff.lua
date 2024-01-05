@@ -117,16 +117,12 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 			sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout .. "x_any"
 		end
 		if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-			local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
-			local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-			prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
-			managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
+			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		end
 	elseif voice_type == "mark_camera" and mark_sec_camera then
 		sound_name = "quiet"
 		interact_type = "cmd_point"
-		prime_target.unit:contour():add("mark_unit")
-		managers.network:session():send_to_peers_synched("mark_contour_unit", prime_target.unit)
+		prime_target.unit:contour():add("mark_unit", true)
 	end
 	if interact_type then
 		self:_do_action_intimidate(t, not no_gesture and interact_type or nil, sound_name, skip_alert)

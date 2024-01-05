@@ -1,4 +1,4 @@
-CivilianLogicTravel = class(CopLogicBase)
+CivilianLogicTravel = class(CivilianLogicBase)
 CivilianLogicTravel.on_alert = CivilianLogicIdle.on_alert
 CivilianLogicTravel.on_new_objective = CivilianLogicIdle.on_new_objective
 CivilianLogicTravel.action_complete_clbk = CopLogicTravel.action_complete_clbk
@@ -21,6 +21,10 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 	data.unit:brain():set_update_enabled_state(true)
 	CivilianLogicEscort._get_objective_path_data(data, my_data)
 	my_data.tmp_vec3 = Vector3()
+	if data.is_tied then
+		managers.groupai:state():on_hostage_state(true, data.key, nil, true)
+		my_data.is_hostage = true
+	end
 	local key_str = tostring(data.key)
 	if not data.been_outlined and data.char_tweak.outline_on_discover then
 		my_data.outline_detection_task_key = "CivilianLogicIdle._upd_outline_detection" .. key_str
@@ -35,6 +39,7 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 	if data.objective and data.objective.stance then
 		data.unit:movement():set_stance(data.objective.stance)
 	end
+	CivilianLogicTravel._chk_has_old_action(data, my_data)
 	local attention_settings
 	if is_cool then
 		attention_settings = {
@@ -51,6 +56,7 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 		}, callback(CivilianLogicIdle, CivilianLogicIdle, "clbk_enemy_weapons_hot", data))
 	end
 	data.unit:brain():set_attention_settings(attention_settings)
+	my_data.state_enter_t = TimerManager:game():time()
 end
 
 function CivilianLogicTravel.exit(data, new_logic_name, enter_params)
@@ -65,6 +71,10 @@ function CivilianLogicTravel.exit(data, new_logic_name, enter_params)
 	if my_data.enemy_weapons_hot_listen_id then
 		managers.groupai:state():remove_listener(my_data.enemy_weapons_hot_listen_id)
 	end
+	if my_data.is_hostage then
+		managers.groupai:state():on_hostage_state(false, data.key, nil, true)
+		my_data.is_hostage = nil
+	end
 	if new_logic_name ~= "inactive" then
 		data.unit:brain():set_update_enabled_state(true)
 	end
@@ -75,7 +85,9 @@ function CivilianLogicTravel.update(data)
 	local unit = data.unit
 	local objective = data.objective
 	local t = data.t
-	if my_data.processing_advance_path or my_data.processing_coarse_path then
+	if my_data.has_old_action then
+		CivilianLogicTravel._upd_stop_old_action(data, my_data)
+	elseif my_data.processing_advance_path or my_data.processing_coarse_path then
 		CivilianLogicEscort._upd_pathing(data, my_data)
 	elseif my_data.advancing then
 	elseif my_data.advance_path then
@@ -106,7 +118,7 @@ function CivilianLogicTravel.update(data)
 			local total_nav_points = #coarse_path
 			if cur_index >= total_nav_points then
 				objective.in_place = true
-				if objective.type ~= "escort" and objective.type ~= "act" and not objective.action_duration then
+				if objective.type ~= "escort" and objective.type ~= "act" and objective.type ~= "follow" and not objective.action_duration then
 					managers.groupai:state():on_civilian_objective_complete(unit, objective)
 				else
 					CivilianLogicTravel.on_new_objective(data)
@@ -115,8 +127,8 @@ function CivilianLogicTravel.update(data)
 			else
 				data.brain:rem_pos_rsrv("path")
 				local to_pos
-				if objective.pos and cur_index == total_nav_points - 1 then
-					to_pos = objective.pos
+				if cur_index == total_nav_points - 1 then
+					to_pos = CivilianLogicTravel._determine_exact_destination(data, objective)
 				else
 					to_pos = coarse_path[cur_index + 1][2]
 				end
@@ -125,8 +137,14 @@ function CivilianLogicTravel.update(data)
 				unit:brain():search_for_path(my_data.advance_path_search_id, to_pos)
 			end
 		else
-			local search_id = tostring(unit:key()) .. "coarse"
-			if unit:brain():search_for_coarse_path(search_id, objective.nav_seg) then
+			local nav_seg
+			if objective.follow_unit then
+				nav_seg = objective.follow_unit:movement():nav_tracker():nav_segment()
+			else
+				nav_seg = objective.nav_seg
+			end
+			local search_id = "CivilianLogicTravelcoarse" .. tostring(unit:key())
+			if unit:brain():search_for_coarse_path(search_id, nav_seg) then
 				my_data.coarse_path_search_id = search_id
 				my_data.processing_coarse_path = true
 			end
@@ -151,4 +169,41 @@ function CivilianLogicTravel.on_intimidated(data, amount, aggressor_unit)
 	end
 	data.unit:sound():say("a02x_any", true)
 	data.unit:brain():set_objective(new_objective)
+end
+
+function CivilianLogicTravel._determine_exact_destination(data, objective)
+	if objective.pos then
+		return objective.pos
+	elseif objective.type == "follow" then
+		local follow_pos, follow_nav_seg
+		local follow_unit_objective = objective.follow_unit:brain() and objective.follow_unit:brain():objective()
+		follow_pos = objective.follow_unit:movement():nav_tracker():field_position()
+		follow_nav_seg = objective.follow_unit:movement():nav_tracker():nav_segment()
+		local distance = objective.distance and math.lerp(objective.distance * 0.5, objective.distance * 0.9, math.random()) or 700
+		local to_pos = CopLogicTravel._get_pos_on_wall(follow_pos, distance)
+		return to_pos
+	else
+		return CopLogicTravel._get_pos_on_wall(managers.navigation._nav_segments[objective.nav_seg].pos, 700)
+	end
+end
+
+function CivilianLogicTravel._chk_has_old_action(data, my_data)
+	local anim_data = data.unit:anim_data()
+	my_data.has_old_action = not anim_data.to_idle and anim_data.act and anim_data.needs_idle
+end
+
+function CivilianLogicTravel._upd_stop_old_action(data, my_data, objective)
+	if not data.unit:anim_data().to_idle then
+		if not data.unit:movement():chk_action_forbidden("idle") and data.unit:anim_data().act and data.unit:anim_data().needs_idle then
+			CopLogicIdle._start_idle_action_from_act(data)
+		end
+		CivilianLogicTravel._chk_has_old_action(data, my_data)
+	end
+end
+
+function CivilianLogicTravel.is_available_for_assignment(data, objective)
+	if objective and objective.forced then
+		return true
+	end
+	return not data.is_tied
 end

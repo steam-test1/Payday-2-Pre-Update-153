@@ -1,5 +1,6 @@
 SecurityCamera = SecurityCamera or class()
 SecurityCamera.cameras = SecurityCamera.cameras or {}
+SecurityCamera.active_tape_loop_unit = nil
 SecurityCamera._NET_EVENTS = {
 	sound_off = 1,
 	alarm_start = 2,
@@ -8,7 +9,11 @@ SecurityCamera._NET_EVENTS = {
 	suspicion_3 = 5,
 	suspicion_4 = 6,
 	suspicion_5 = 7,
-	suspicion_6 = 8
+	suspicion_6 = 8,
+	start_tape_loop_1 = 9,
+	start_tape_loop_2 = 10,
+	request_start_tape_loop_1 = 11,
+	request_start_tape_loop_2 = 12
 }
 
 function SecurityCamera:init(unit)
@@ -17,8 +22,28 @@ function SecurityCamera:init(unit)
 	table.insert(SecurityCamera.cameras, self._unit)
 end
 
+function SecurityCamera:_update_tape_loop_restarting(unit, t, dt)
+	if self._tape_loop_restarting_t then
+		local v = math.round((math.sin(t * 500) + 1) / 2)
+		if v == 0 and not self._tape_loop_active_contour then
+			self._tape_loop_active_contour = true
+			self._unit:contour():add("mark_unit_friendly")
+		elseif v == 1 and self._tape_loop_active_contour then
+			self._tape_loop_active_contour = false
+			self._unit:contour():remove("mark_unit_friendly")
+		end
+		if t > self._tape_loop_restarting_t then
+			self:_deactivate_tape_loop_restart()
+		end
+	end
+end
+
 function SecurityCamera:update(unit, t, dt)
-	if managers.groupai:state():is_ecm_jammer_active("camera") then
+	self:_update_tape_loop_restarting(unit, t, dt)
+	if not Network:is_server() then
+		return
+	end
+	if managers.groupai:state():is_ecm_jammer_active("camera") or self._tape_loop_expired_clbk_id or self._tape_loop_restarting_t then
 		self:_destroy_all_detected_attention_object_data()
 		self:_stop_all_sounds()
 	else
@@ -76,6 +101,7 @@ function SecurityCamera:set_detection_enabled(state, settings, mission_element)
 		self._suspicion_lvl_sync = nil
 		if not self._destroying then
 			self:_stop_all_sounds()
+			self:_deactivate_tape_loop_restart()
 		end
 	end
 	if settings then
@@ -297,6 +323,22 @@ function SecurityCamera:generate_cooldown(amount)
 		self._access_camera_mission_element:access_camera_operation_destroy()
 	end
 	self._destroyed = true
+	if SecurityCamera.active_tape_loop_unit and SecurityCamera.active_tape_loop_unit == self._unit then
+		SecurityCamera.active_tape_loop_unit = nil
+		self._unit:contour():remove("mark_unit_friendly")
+	end
+	if self._tape_loop_expired_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._tape_loop_expired_clbk_id)
+		self._tape_loop_expired_clbk_id = nil
+	end
+	if self._camera_wrong_image_sound then
+		self._camera_wrong_image_sound:stop()
+		self._camera_wrong_image_sound = nil
+	end
+	if self._tape_loop_restarting_t then
+		self:_deactivate_tape_loop_restart()
+	end
+	self._unit:interaction():set_active(false)
 end
 
 function SecurityCamera:set_access_camera_mission_element(access_camera_mission_element)
@@ -599,16 +641,133 @@ function SecurityCamera:sync_net_event(event_id)
 		self:_stop_all_sounds()
 	elseif event_id == net_events.alarm_start then
 		self:_sound_the_alarm()
+	elseif event_id == net_events.start_tape_loop_1 then
+		self:_start_tape_loop_by_upgrade_level(1)
+	elseif event_id == net_events.start_tape_loop_2 then
+		self:_start_tape_loop_by_upgrade_level(2)
+	elseif event_id == net_events.request_start_tape_loop_1 then
+		self:_request_start_tape_loop_by_upgrade_level(1)
+	elseif event_id == net_events.request_start_tape_loop_2 then
+		self:_request_start_tape_loop_by_upgrade_level(2)
 	end
 end
 
 function SecurityCamera:_send_net_event(event_id)
-	managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", event_id)
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", event_id)
 end
 
 function SecurityCamera:clbk_call_the_police()
 	self._call_police_clbk_id = nil
 	managers.groupai:state():on_police_called(self._reason_called)
+end
+
+function SecurityCamera:start_tape_loop(tape_loop_t)
+	if alive(SecurityCamera.active_tape_loop_unit) then
+		return
+	end
+	local time_upgrade_level = managers.player:upgrade_level("player", "tape_loop_duration", 0)
+	if Network:is_server() then
+		self:_start_tape_loop_by_upgrade_level(time_upgrade_level)
+		if time_upgrade_level == 1 then
+			self:_send_net_event(self._NET_EVENTS.start_tape_loop_1)
+		elseif time_upgrade_level == 2 then
+			self:_send_net_event(self._NET_EVENTS.start_tape_loop_2)
+		end
+	elseif time_upgrade_level == 1 then
+		self:_send_net_event(self._NET_EVENTS.request_start_tape_loop_1)
+	elseif time_upgrade_level == 2 then
+		self:_send_net_event(self._NET_EVENTS.request_start_tape_loop_2)
+	end
+end
+
+function SecurityCamera:_request_start_tape_loop_by_upgrade_level(time_upgrade_level)
+	if not Network:is_server() then
+		return
+	end
+	if alive(SecurityCamera.active_tape_loop_unit) then
+		return
+	end
+	self:_start_tape_loop_by_upgrade_level(time_upgrade_level)
+	if time_upgrade_level == 1 then
+		self:_send_net_event(self._NET_EVENTS.start_tape_loop_1)
+	elseif time_upgrade_level == 2 then
+		self:_send_net_event(self._NET_EVENTS.start_tape_loop_2)
+	end
+end
+
+function SecurityCamera:_start_tape_loop_by_upgrade_level(time_upgrade_level)
+	local tape_loop_t = managers.player:upgrade_value_by_level("player", "tape_loop_duration", time_upgrade_level)
+	self:_start_tape_loop(tape_loop_t)
+end
+
+function SecurityCamera:_start_tape_loop(tape_loop_t)
+	self:_deactivate_tape_loop_restart()
+	self._tape_loop_end_t = Application:time() + tape_loop_t
+	SecurityCamera.active_tape_loop_unit = self._unit
+	self._unit:contour():add("mark_unit_friendly")
+	self._unit:interaction():set_active(false)
+	if self._camera_wrong_image_sound then
+		self._camera_wrong_image_sound:stop()
+	end
+	self._camera_wrong_image_sound = self._unit:sound_source():post_event("camera_wrong_image")
+	if self._tape_loop_expired_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._tape_loop_expired_clbk_id)
+		self._tape_loop_expired_clbk_id = nil
+	end
+	self._tape_loop_expired_clbk_id = "tape_loop_expired" .. tostring(self._unit:key())
+	managers.enemy:add_delayed_clbk(self._tape_loop_expired_clbk_id, callback(self, self, "_clbk_tape_loop_expired"), self._tape_loop_end_t)
+end
+
+function SecurityCamera:_clbk_tape_loop_expired(...)
+	self._tape_loop_expired_clbk_id = nil
+	self._tape_loop_end_t = nil
+	self._unit:contour():remove("mark_unit_friendly")
+	self._unit:interaction():set_active(true)
+	if self._destroyed then
+		return
+	end
+	self:_activate_tape_loop_restart(6)
+	SecurityCamera.active_tape_loop_unit = nil
+end
+
+function SecurityCamera:_activate_tape_loop_restart(restart_t)
+	if not managers.groupai:state():whisper_mode() then
+		if self._camera_wrong_image_sound then
+			self._camera_wrong_image_sound:stop()
+		end
+		return
+	end
+	self._unit:sound_source():post_event("camera_wrong_image_outro")
+	self._tape_loop_restarting_t = Application:time() + restart_t
+	if not Network:is_server() then
+		self:set_update_enabled(true)
+	end
+end
+
+function SecurityCamera:_deactivate_tape_loop_restart()
+	if not self._tape_loop_restarting_t then
+		return
+	end
+	self._unit:sound_source():post_event("camera_wrong_image_outro_end")
+	self._tape_loop_restarting_t = nil
+	if not Network:is_server() then
+		self:set_update_enabled(false)
+	end
+	if self._tape_loop_active_contour then
+		self._tape_loop_active_contour = nil
+		self._unit:contour():remove("mark_unit_friendly")
+	end
+end
+
+function SecurityCamera:can_apply_tape_loop()
+	return not self._tape_loop_end_t or self._tape_loop_end_t < Application:time()
+end
+
+function SecurityCamera:on_unit_set_enabled(enabled)
+	if self._destroyed then
+		return
+	end
+	self._unit:interaction():set_active(enabled)
 end
 
 function SecurityCamera:save(data)
@@ -622,6 +781,12 @@ function SecurityCamera:save(data)
 		data.yaw = self._yaw
 		data.pitch = self._pitch
 	end
+	if self._tape_loop_end_t then
+		data.tape_loop_t = self._tape_loop_end_t - Application:time()
+	end
+	if self._tape_loop_restarting_t then
+		data.tape_loop_restarting_t = self._tape_loop_restarting_t - Application:time()
+	end
 end
 
 function SecurityCamera:load(data)
@@ -634,6 +799,12 @@ function SecurityCamera:load(data)
 		self:apply_rotations(data.yaw, data.pitch)
 	end
 	self._destroyed = data.destroyed
+	if data.tape_loop_t then
+		self:_start_tape_loop(data.tape_loop_t)
+	end
+	if data.tape_loop_restarting_t then
+		self:_activate_tape_loop_restart(data.tape_loop_restarting_t)
+	end
 end
 
 function SecurityCamera:destroy(unit)
@@ -643,5 +814,12 @@ function SecurityCamera:destroy(unit)
 	if self._call_police_clbk_id then
 		managers.enemy:remove_delayed_clbk(self._call_police_clbk_id)
 		self._call_police_clbk_id = nil
+	end
+	if self._tape_loop_expired_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._tape_loop_expired_clbk_id)
+		self._tape_loop_expired_clbk_id = nil
+	end
+	if SecurityCamera.active_tape_loop_unit and SecurityCamera.active_tape_loop_unit == self._unit then
+		SecurityCamera.active_tape_loop_unit = nil
 	end
 end

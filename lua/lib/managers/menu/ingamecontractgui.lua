@@ -52,6 +52,37 @@ function IngameContractGui:init(ws)
 	managers.hud:make_fine_text(briefing_description)
 	briefing_description:set_h(briefing_description:h() + 10)
 	briefing_description:set_top(briefing_title:bottom())
+	local is_job_ghostable = managers.job:is_job_ghostable(managers.job:current_job_id())
+	if is_job_ghostable then
+		local min_ghost_bonus, max_ghost_bonus = managers.job:get_job_ghost_bonus(managers.job:current_job_id())
+		local min_ghost = math.round(min_ghost_bonus * 100)
+		local max_ghost = math.round(max_ghost_bonus * 100)
+		local min_string, max_string
+		if min_ghost == 0 and min_ghost_bonus ~= 0 then
+			min_string = string.format("%0.2f", math.abs(min_ghost_bonus * 100))
+		else
+			min_string = tostring(math.abs(min_ghost))
+		end
+		if max_ghost == 0 and max_ghost_bonus ~= 0 then
+			max_string = string.format("%0.2f", math.abs(max_ghost_bonus * 100))
+		else
+			max_string = tostring(math.abs(max_ghost))
+		end
+		local ghost_bonus_string = min_ghost_bonus == max_ghost_bonus and min_string or min_string .. "-" .. max_string
+		local ghostable_text = text_panel:text({
+			text = managers.localization:to_upper_text("menu_ghostable_job", {bonus = ghost_bonus_string}),
+			align = "left",
+			vertical = "top",
+			blend_mode = "add",
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = tweak_data.screen_colors.ghost_color,
+			wrap = true,
+			wrap_word = true
+		})
+		ghostable_text:set_position(briefing_description:x(), briefing_description:bottom() + 10)
+		managers.hud:make_fine_text(ghostable_text)
+	end
 	local modifiers_text = text_panel:text({
 		name = "modifiers_text",
 		text = managers.localization:to_upper_text("menu_cn_modifiers"),
@@ -71,6 +102,32 @@ function IngameContractGui:init(ws)
 		job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
 	else
 	end
+	local ghost_bonus_mul = managers.job:get_ghost_bonus()
+	local job_ghost = math.round(ghost_bonus_mul * 100)
+	local job_ghost_string = tostring(math.abs(job_ghost))
+	local has_ghost_bonus = managers.job:has_ghost_bonus()
+	if job_ghost == 0 and ghost_bonus_mul ~= 0 then
+		job_ghost_string = string.format("%0.2f", math.abs(ghost_bonus_mul * 100))
+	end
+	local ghost_warning_text
+	if has_ghost_bonus then
+		local ghost_color = tweak_data.screen_colors.ghost_color
+		ghost_warning_text = text_panel:text({
+			name = "ghost_color_warning_text",
+			text = managers.localization:to_upper_text("menu_ghost_bonus", {exp_bonus = job_ghost_string}),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			color = ghost_color,
+			align = "left",
+			vertical = "top",
+			wrap = true,
+			word_wrap = true,
+			blend_mode = "normal"
+		})
+		managers.hud:make_fine_text(ghost_warning_text)
+		ghost_warning_text:set_top(modifiers_text:bottom())
+		ghost_warning_text:set_left(10)
+	end
 	local heat_warning_text
 	local heat_color = managers.job:get_job_heat_color(managers.job:current_job_id())
 	if is_job_heated then
@@ -86,7 +143,7 @@ function IngameContractGui:init(ws)
 			word_wrap = true
 		})
 		managers.hud:make_fine_text(heat_warning_text)
-		heat_warning_text:set_top(modifiers_text:bottom())
+		heat_warning_text:set_top(has_ghost_bonus and ghost_warning_text:bottom() or modifiers_text:bottom())
 		heat_warning_text:set_left(10)
 	end
 	local pro_warning_text
@@ -105,10 +162,10 @@ function IngameContractGui:init(ws)
 		})
 		managers.hud:make_fine_text(pro_warning_text)
 		pro_warning_text:set_h(pro_warning_text:h())
-		pro_warning_text:set_top(is_job_heated and heat_warning_text:bottom() or modifiers_text:bottom())
+		pro_warning_text:set_top(is_job_heated and heat_warning_text:bottom() or has_ghost_bonus and ghost_warning_text:bottom() or modifiers_text:bottom())
 		pro_warning_text:set_left(10)
 	end
-	modifiers_text:set_visible(heat_warning_text and heat_warning_text:visible() or pro_warning_text and pro_warning_text:visible())
+	modifiers_text:set_visible(heat_warning_text and heat_warning_text:visible() or pro_warning_text and pro_warning_text:visible() or ghost_warning_text and ghost_warning_text:visible())
 	local risk_color = tweak_data.screen_colors.risk
 	local risk_title = text_panel:text({
 		font = tweak_data.menu.pd2_small_font,
@@ -117,7 +174,7 @@ function IngameContractGui:init(ws)
 		color = risk_color
 	})
 	managers.hud:make_fine_text(risk_title)
-	risk_title:set_top((pro_warning_text and pro_warning_text:visible() and pro_warning_text:bottom() or heat_warning_text and heat_warning_text:visible() and heat_warning_text:bottom() or math.round(text_panel:h() / 2)) + 5)
+	risk_title:set_top((pro_warning_text and pro_warning_text:visible() and pro_warning_text:bottom() or heat_warning_text and heat_warning_text:visible() and heat_warning_text:bottom() or ghost_warning_text and ghost_warning_text:visible() and ghost_warning_text:bottom() or math.round(text_panel:h() / 2)) + 5)
 	risk_title:set_visible(job_data and true or false)
 	local menu_risk_id = "menu_risk_pd"
 	if Global.game_settings.difficulty == "hard" then
@@ -254,7 +311,8 @@ function IngameContractGui:init(ws)
 		local cy = experience_title:center_y()
 		local num_days = #job_data.chain or 1
 		local days_multiplier = 0
-		local total_xp, base_xp, risk_xp, heat_base_xp, heat_risk_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, num_days)
+		local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, num_days)
+		local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)
 		local job_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
@@ -266,10 +324,13 @@ function IngameContractGui:init(ws)
 		job_xp:set_x(sx)
 		job_xp:set_center_y(cy)
 		local heat_xp = math.round(heat_base_xp + heat_risk_xp)
+		local ghost_xp = math.round(ghost_base_xp + ghost_risk_xp)
 		local risk_prefix = 0 <= risk_xp and " +" or " -"
 		local heat_prefix = 0 <= heat_xp and " +" or " -"
+		local ghost_prefix = 0 <= ghost_xp and " +" or " -"
 		local abs_risk_xp = math.abs(math.round(risk_xp))
 		local abs_heat_xp = math.abs(heat_xp)
+		local abs_ghost_xp = math.abs(ghost_xp)
 		local add_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
@@ -280,6 +341,17 @@ function IngameContractGui:init(ws)
 		managers.hud:make_fine_text(add_xp)
 		add_xp:set_x(job_xp:right())
 		add_xp:set_center_y(cy)
+		local ghost_add_xp = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = "",
+			color = tweak_data.screen_colors.ghost_color
+		})
+		ghost_add_xp:set_text(ghost_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_ghost_xp)))
+		managers.hud:make_fine_text(ghost_add_xp)
+		ghost_add_xp:set_x(math.round(add_xp:right()))
+		ghost_add_xp:set_center_y(math.round(cy))
+		ghost_add_xp:set_visible(has_ghost_bonus)
 		local heat_add_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
@@ -288,7 +360,7 @@ function IngameContractGui:init(ws)
 		})
 		heat_add_xp:set_text(heat_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_heat_xp)))
 		managers.hud:make_fine_text(heat_add_xp)
-		heat_add_xp:set_x(math.round(add_xp:right()))
+		heat_add_xp:set_x(math.round(ghost_add_xp:visible() and ghost_add_xp:right() or add_xp:right()))
 		heat_add_xp:set_center_y(math.round(cy))
 		heat_add_xp:set_visible(is_job_heated)
 		local gain_xp = total_xp
@@ -308,7 +380,7 @@ function IngameContractGui:init(ws)
 			color = tweak_data.hud_stats.potential_xp_color
 		})
 		managers.hud:make_fine_text(potential_level_up_text)
-		potential_level_up_text:set_left(math.round((heat_add_xp:visible() and heat_add_xp:right() or add_xp:right()) + 4))
+		potential_level_up_text:set_left(math.round((heat_add_xp:visible() and heat_add_xp:right() or ghost_add_xp:visible() and ghost_add_xp:right() or add_xp:right()) + 4))
 		potential_level_up_text:set_top(math.round(heat_add_xp:top()))
 		potential_level_up_text:set_visible(not managers.job:stage_success() or not managers.job:on_last_stage())
 		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, num_days, managers.job:current_job_id())

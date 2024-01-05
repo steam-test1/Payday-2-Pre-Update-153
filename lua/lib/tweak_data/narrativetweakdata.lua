@@ -146,11 +146,11 @@ function NarrativeTweakData:init()
 	self.JC_CHANCE = 0.01
 	self.JC_PICKS = 35
 	self.CONTRACT_COOLDOWN_TIME = 300
-	self.HEAT_OTHER_JOBS_RATIO = 0.4
+	self.HEAT_OTHER_JOBS_RATIO = 0.3
 	self.ABSOLUTE_ZERO_JOBS_HEATS_OTHERS = false
 	self.HEATED_MAX_XP_MUL = 1.5
 	self.FREEZING_MAX_XP_MUL = 0
-	self.DEFAULT_HEAT = {this_job = -25, other_jobs = 10}
+	self.DEFAULT_HEAT = {this_job = -15, other_jobs = 10}
 	self.MAX_JOBS_IN_CONTAINERS = {
 		6,
 		18,
@@ -160,6 +160,7 @@ function NarrativeTweakData:init()
 		4,
 		1
 	}
+	self.DEFAULT_GHOST_BONUS = 0
 	self.contacts = {}
 	self.contacts.dallas = {}
 	self.contacts.dallas.name_id = "heist_contact_dallas"
@@ -201,6 +202,7 @@ function NarrativeTweakData:init()
 	self.jobs.firestarter = {}
 	self.jobs.firestarter.name_id = "heist_firestarter"
 	self.jobs.firestarter.briefing_id = "heist_firestarter_crimenet"
+	self.jobs.firestarter.package = "packages/job_firestarter"
 	self.jobs.firestarter.contact = "hector"
 	self.jobs.firestarter.jc = 50
 	self.jobs.firestarter.chain = {
@@ -241,7 +243,7 @@ function NarrativeTweakData:init()
 		200000,
 		250000
 	}
-	self.jobs.firestarter.heat = {this_job = -25, other_jobs = 25}
+	self.jobs.firestarter.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.firestarter_prof = deep_clone(self.jobs.firestarter)
 	self.jobs.firestarter_prof.jc = 70
 	self.jobs.firestarter_prof.professional = true
@@ -253,10 +255,11 @@ function NarrativeTweakData:init()
 		250000,
 		300000
 	}
-	self.jobs.firestarter_prof.heat = {this_job = -25, other_jobs = 30}
+	self.jobs.firestarter_prof.heat = {this_job = -15, other_jobs = 25}
 	self.jobs.alex = {}
 	self.jobs.alex.name_id = "heist_alex"
 	self.jobs.alex.briefing_id = "heist_alex_crimenet"
+	self.jobs.alex.package = "packages/job_rats"
 	self.jobs.alex.contact = "hector"
 	self.jobs.alex.jc = 50
 	self.jobs.alex.chain = {
@@ -302,7 +305,7 @@ function NarrativeTweakData:init()
 		500000,
 		600000
 	}
-	self.jobs.alex.heat = {this_job = -35, other_jobs = 10}
+	self.jobs.alex.heat = {this_job = -25, other_jobs = 10}
 	self.jobs.alex_prof = deep_clone(self.jobs.alex)
 	self.jobs.alex_prof.jc = 70
 	self.jobs.alex_prof.professional = true
@@ -321,10 +324,11 @@ function NarrativeTweakData:init()
 		530000,
 		700000
 	}
-	self.jobs.alex_prof.heat = {this_job = -35, other_jobs = 10}
+	self.jobs.alex_prof.heat = {this_job = -25, other_jobs = 10}
 	self.jobs.welcome_to_the_jungle = {}
 	self.jobs.welcome_to_the_jungle.name_id = "heist_welcome_to_the_jungle"
 	self.jobs.welcome_to_the_jungle.briefing_id = "heist_welcome_to_the_jungle_crimenet"
+	self.jobs.welcome_to_the_jungle.package = "packages/job_bigoil"
 	self.jobs.welcome_to_the_jungle.contact = "the_elephant"
 	self.jobs.welcome_to_the_jungle.jc = 50
 	self.jobs.welcome_to_the_jungle.chain = {
@@ -367,7 +371,7 @@ function NarrativeTweakData:init()
 		90000,
 		150000
 	}
-	self.jobs.welcome_to_the_jungle.heat = {this_job = -25, other_jobs = 30}
+	self.jobs.welcome_to_the_jungle.heat = {this_job = -15, other_jobs = 25}
 	self.jobs.welcome_to_the_jungle_prof = deep_clone(self.jobs.welcome_to_the_jungle)
 	self.jobs.welcome_to_the_jungle_prof.jc = 70
 	self.jobs.welcome_to_the_jungle_prof.professional = true
@@ -386,10 +390,11 @@ function NarrativeTweakData:init()
 		-850000,
 		-1200000
 	}
-	self.jobs.welcome_to_the_jungle_prof.heat = {this_job = -25, other_jobs = 30}
+	self.jobs.welcome_to_the_jungle_prof.heat = {this_job = -15, other_jobs = 25}
 	self.jobs.framing_frame = {}
 	self.jobs.framing_frame.name_id = "heist_framing_frame"
 	self.jobs.framing_frame.briefing_id = "heist_framing_frame_crimenet"
+	self.jobs.framing_frame.package = "packages/job_framing_frame"
 	self.jobs.framing_frame.contact = "the_elephant"
 	self.jobs.framing_frame.jc = 40
 	self.jobs.framing_frame.chain = {
@@ -431,7 +436,7 @@ function NarrativeTweakData:init()
 		185000,
 		270000
 	}
-	self.jobs.framing_frame.heat = {this_job = -25, other_jobs = 25}
+	self.jobs.framing_frame.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.framing_frame_prof = deep_clone(self.jobs.framing_frame)
 	self.jobs.framing_frame_prof.jc = 60
 	self.jobs.framing_frame_prof.professional = true
@@ -443,10 +448,11 @@ function NarrativeTweakData:init()
 		200000,
 		300000
 	}
-	self.jobs.framing_frame_prof.heat = {this_job = -25, other_jobs = 30}
+	self.jobs.framing_frame_prof.heat = {this_job = -15, other_jobs = 25}
 	self.jobs.watchdogs = {}
 	self.jobs.watchdogs.name_id = "heist_watchdogs"
 	self.jobs.watchdogs.briefing_id = "heist_watchdogs_crimenet"
+	self.jobs.watchdogs.package = "packages/job_watchdogs"
 	self.jobs.watchdogs.contact = "hector"
 	self.jobs.watchdogs.region = "dock"
 	self.jobs.watchdogs.jc = 40
@@ -481,7 +487,7 @@ function NarrativeTweakData:init()
 		185000,
 		260000
 	}
-	self.jobs.watchdogs.heat = {this_job = -25, other_jobs = 15}
+	self.jobs.watchdogs.heat = {this_job = -15, other_jobs = 15}
 	self.jobs.watchdogs_prof = deep_clone(self.jobs.watchdogs)
 	self.jobs.watchdogs_prof.jc = 60
 	self.jobs.watchdogs_prof.professional = true
@@ -492,10 +498,11 @@ function NarrativeTweakData:init()
 		200000,
 		290000
 	}
-	self.jobs.watchdogs_prof.heat = {this_job = -25, other_jobs = 20}
+	self.jobs.watchdogs_prof.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.nightclub = {}
 	self.jobs.nightclub.name_id = "heist_nightclub"
 	self.jobs.nightclub.briefing_id = "heist_nightclub_crimenet"
+	self.jobs.nightclub.package = "packages/job_nightclub"
 	self.jobs.nightclub.region = "street"
 	self.jobs.nightclub.contact = "vlad"
 	self.jobs.nightclub.jc = 30
@@ -539,6 +546,7 @@ function NarrativeTweakData:init()
 	self.jobs.ukrainian_job = {}
 	self.jobs.ukrainian_job.name_id = "heist_ukrainian_job"
 	self.jobs.ukrainian_job.briefing_id = "heist_ukrainian_job_crimenet"
+	self.jobs.ukrainian_job.package = "packages/job_ukrainian"
 	self.jobs.ukrainian_job.contact = "vlad"
 	self.jobs.ukrainian_job.region = "street"
 	self.jobs.ukrainian_job.jc = 30
@@ -569,7 +577,7 @@ function NarrativeTweakData:init()
 		25000,
 		30000
 	}
-	self.jobs.ukrainian_job.heat = {this_job = -30, other_jobs = 10}
+	self.jobs.ukrainian_job.heat = {this_job = -20, other_jobs = 10}
 	self.jobs.ukrainian_job_prof = deep_clone(self.jobs.ukrainian_job)
 	self.jobs.ukrainian_job_prof.jc = 30
 	self.jobs.ukrainian_job_prof.professional = true
@@ -581,10 +589,11 @@ function NarrativeTweakData:init()
 		30000,
 		40000
 	}
-	self.jobs.ukrainian_job_prof.heat = {this_job = -30, other_jobs = 10}
+	self.jobs.ukrainian_job_prof.heat = {this_job = -20, other_jobs = 10}
 	self.jobs.jewelry_store = {}
 	self.jobs.jewelry_store.name_id = "heist_jewelry_store"
 	self.jobs.jewelry_store.briefing_id = "heist_jewelry_store_crimenet"
+	self.jobs.jewelry_store.package = "packages/job_jewelry"
 	self.jobs.jewelry_store.contact = "bain"
 	self.jobs.jewelry_store.region = "street"
 	self.jobs.jewelry_store.jc = 10
@@ -628,6 +637,7 @@ function NarrativeTweakData:init()
 	self.jobs.four_stores = {}
 	self.jobs.four_stores.name_id = "heist_four_stores"
 	self.jobs.four_stores.briefing_id = "heist_four_stores_crimenet"
+	self.jobs.four_stores.package = "packages/job_four_stores"
 	self.jobs.four_stores.contact = "vlad"
 	self.jobs.four_stores.region = "street"
 	self.jobs.four_stores.jc = 10
@@ -671,6 +681,7 @@ function NarrativeTweakData:init()
 	self.jobs.mallcrasher = {}
 	self.jobs.mallcrasher.name_id = "heist_mallcrasher"
 	self.jobs.mallcrasher.briefing_id = "heist_mallcrasher_crimenet"
+	self.jobs.mallcrasher.package = "packages/job_mallcrasher"
 	self.jobs.mallcrasher.contact = "vlad"
 	self.jobs.mallcrasher.region = "street"
 	self.jobs.mallcrasher.jc = 20
@@ -714,6 +725,7 @@ function NarrativeTweakData:init()
 	self.jobs.branchbank = {}
 	self.jobs.branchbank.name_id = "heist_branchbank"
 	self.jobs.branchbank.briefing_id = "heist_branchbank_crimenet"
+	self.jobs.branchbank.package = "packages/job_branchbank_random"
 	self.jobs.branchbank.contact = "bain"
 	self.jobs.branchbank.region = "street"
 	self.jobs.branchbank.jc = 40
@@ -763,6 +775,7 @@ function NarrativeTweakData:init()
 	self.jobs.branchbank_deposit = {}
 	self.jobs.branchbank_deposit.name_id = "heist_branchbank_deposit"
 	self.jobs.branchbank_deposit.briefing_id = "heist_branchbank_deposit_crimenet"
+	self.jobs.branchbank_deposit.package = "packages/job_branchbank_deposit"
 	self.jobs.branchbank_deposit.contact = "bain"
 	self.jobs.branchbank_deposit.region = "street"
 	self.jobs.branchbank_deposit.jc = 30
@@ -813,6 +826,7 @@ function NarrativeTweakData:init()
 	self.jobs.branchbank_cash = {}
 	self.jobs.branchbank_cash.name_id = "heist_branchbank_cash"
 	self.jobs.branchbank_cash.briefing_id = "heist_branchbank_cash_crimenet"
+	self.jobs.branchbank_cash.package = "packages/job_branchbank_cash"
 	self.jobs.branchbank_cash.contact = "bain"
 	self.jobs.branchbank_cash.region = "street"
 	self.jobs.branchbank_cash.jc = 30
@@ -864,6 +878,7 @@ function NarrativeTweakData:init()
 	self.jobs.branchbank_gold = {}
 	self.jobs.branchbank_gold.name_id = "heist_branchbank_gold"
 	self.jobs.branchbank_gold.briefing_id = "heist_branchbank_gold_crimenet"
+	self.jobs.branchbank_gold.package = "packages/job_branchbank_gold"
 	self.jobs.branchbank_gold.contact = "bain"
 	self.jobs.branchbank_gold.region = "street"
 	self.jobs.branchbank_gold.jc = 30
@@ -915,6 +930,7 @@ function NarrativeTweakData:init()
 	self.jobs.election_day = {}
 	self.jobs.election_day.name_id = "heist_election_day"
 	self.jobs.election_day.briefing_id = "heist_election_day_crimenet"
+	self.jobs.election_day.package = "packages/job_election_day"
 	self.jobs.election_day.contact = "the_elephant"
 	self.jobs.election_day.jc = 50
 	self.jobs.election_day.chain = {
@@ -964,23 +980,39 @@ function NarrativeTweakData:init()
 		"cn_elcday3"
 	}
 	self.jobs.election_day.payout = {
-		10000,
 		20000,
-		30000,
+		25000,
 		40000,
-		50000
+		60000,
+		90000
 	}
+	self.jobs.election_day.contract_cost = {
+		76000,
+		116000,
+		170000,
+		360000,
+		430000
+	}
+	self.jobs.election_day.heat = {this_job = -2, other_jobs = 2}
 	self.jobs.election_day_prof = deep_clone(self.jobs.election_day)
-	self.jobs.election_day_prof.jc = 60
+	self.jobs.election_day_prof.jc = 70
 	self.jobs.election_day_prof.professional = true
 	self.jobs.election_day_prof.region = "professional"
 	self.jobs.election_day_prof.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		50000
+		25000,
+		35000,
+		50000,
+		65000,
+		100000
 	}
+	self.jobs.election_day_prof.contract_cost = {
+		120000,
+		135000,
+		200000,
+		420000,
+		500000
+	}
+	self.jobs.election_day_prof.heat = {this_job = -2, other_jobs = 2}
 	self.jobs.safehouse = {}
 	self.jobs.safehouse.name_id = "heist_safehouse"
 	self.jobs.safehouse.briefing_id = "heist_safehouse_crimenet"
@@ -1031,6 +1063,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_cro = {}
 	self.jobs.arm_cro.name_id = "heist_arm_cro"
 	self.jobs.arm_cro.briefing_id = "heist_arm_cro_crimenet"
+	self.jobs.arm_cro.package = "packages/job_arm_cro"
 	self.jobs.arm_cro.contact = "bain"
 	self.jobs.arm_cro.region = "street"
 	self.jobs.arm_cro.jc = 40
@@ -1068,6 +1101,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_und = {}
 	self.jobs.arm_und.name_id = "heist_arm_und"
 	self.jobs.arm_und.briefing_id = "heist_arm_und_crimenet"
+	self.jobs.arm_und.package = "packages/job_arm_und"
 	self.jobs.arm_und.contact = "bain"
 	self.jobs.arm_und.region = "street"
 	self.jobs.arm_und.jc = 30
@@ -1105,6 +1139,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_bri = {}
 	self.jobs.arm_bri.name_id = "heist_arm_bri"
 	self.jobs.arm_bri.briefing_id = "heist_arm_bri_crimenet"
+	self.jobs.arm_bri.package = "packages/job_arm_bri"
 	self.jobs.arm_bri.contact = "bain"
 	self.jobs.arm_bri.region = "street"
 	self.jobs.arm_bri.jc = 40
@@ -1144,6 +1179,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_hcm = {}
 	self.jobs.arm_hcm.name_id = "heist_arm_hcm"
 	self.jobs.arm_hcm.briefing_id = "heist_arm_hcm_crimenet"
+	self.jobs.arm_hcm.package = "packages/job_arm_hcm"
 	self.jobs.arm_hcm.contact = "bain"
 	self.jobs.arm_hcm.region = "street"
 	self.jobs.arm_hcm.jc = 30
@@ -1181,6 +1217,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_par = {}
 	self.jobs.arm_par.name_id = "heist_arm_par"
 	self.jobs.arm_par.briefing_id = "heist_arm_par_crimenet"
+	self.jobs.arm_par.package = "packages/job_arm_par"
 	self.jobs.arm_par.contact = "bain"
 	self.jobs.arm_par.region = "street"
 	self.jobs.arm_par.jc = 20
@@ -1218,6 +1255,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_fac = {}
 	self.jobs.arm_fac.name_id = "heist_arm_fac"
 	self.jobs.arm_fac.briefing_id = "heist_arm_fac_crimenet"
+	self.jobs.arm_fac.package = "packages/job_arm_fac"
 	self.jobs.arm_fac.contact = "bain"
 	self.jobs.arm_fac.region = "street"
 	self.jobs.arm_fac.jc = 20
@@ -1296,6 +1334,7 @@ function NarrativeTweakData:init()
 	self.jobs.family = {}
 	self.jobs.family.name_id = "heist_family"
 	self.jobs.family.briefing_id = "heist_family_crimenet"
+	self.jobs.family.package = "packages/job_family"
 	self.jobs.family.contact = "bain"
 	self.jobs.family.region = "street"
 	self.jobs.family.jc = 40
@@ -1429,6 +1468,7 @@ function NarrativeTweakData:init()
 	self.jobs.roberts = {}
 	self.jobs.roberts.name_id = "heist_roberts"
 	self.jobs.roberts.briefing_id = "heist_roberts_crimenet"
+	self.jobs.roberts.package = "packages/job_roberts"
 	self.jobs.roberts.contact = "bain"
 	self.jobs.roberts.region = "street"
 	self.jobs.roberts.jc = 30
@@ -1658,6 +1698,38 @@ function NarrativeTweakData:init()
 		70000,
 		80000
 	}
+	self.jobs.hot = {}
+	self.jobs.hot.name_id = "heist_hot"
+	self.jobs.hot.briefing_id = "heist_hot_crimenet"
+	self.jobs.hot.contact = "bain"
+	self.jobs.hot.region = "street"
+	self.jobs.hot.jc = 40
+	self.jobs.hot.chain = {
+		{
+			level_id = "hot",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.hot.briefing_event = "pln_fj1_cbf_01"
+	self.jobs.hot.debrief_event = nil
+	self.jobs.hot.crimenet_callouts = {
+		"pln_fj1_cnc_01_01",
+		"pln_fj1_cnc_01_02",
+		"pln_fj1_cnc_01_03"
+	}
+	self.jobs.hot.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.hot.payout = {
+		37000,
+		43000,
+		60000,
+		70000,
+		80000
+	}
 	self.jobs.branchbank_cloaker = {}
 	self.jobs.branchbank_cloaker.name_id = "heist_cloak"
 	self.jobs.branchbank_cloaker.briefing_id = "heist_cloak_crimenet"
@@ -1742,6 +1814,8 @@ function NarrativeTweakData:init()
 		"branchbank_prof",
 		"family",
 		"roberts",
+		"election_day_prof",
+		"election_day",
 		"arm_fac",
 		"arm_par",
 		"arm_hcm",
@@ -1778,4 +1852,18 @@ end
 
 function NarrativeTweakData:get_job_name_from_index(index)
 	return self._jobs_index[index]
+end
+
+function NarrativeTweakData:test_contract_packages()
+	for i, job_id in ipairs(self._jobs_index) do
+		local package = self.jobs[job_id] and self.jobs[job_id].package
+		if not package or not DB:has(Idstring("package"), package) then
+			print("test_contract_packages", "1", job_id)
+		end
+	end
+	for job_id, job in ipairs(self.jobs) do
+		if job.package and not DB:has(Idstring("package"), job.package) then
+			print("test_contract_packages", "2", job_id)
+		end
+	end
 end

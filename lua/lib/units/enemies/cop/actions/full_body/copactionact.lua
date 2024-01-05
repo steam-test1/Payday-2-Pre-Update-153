@@ -20,6 +20,8 @@ CopActionAct._act_redirects.script = {
 	"hands_up",
 	"hands_back",
 	"tied",
+	"stand_tied",
+	"tied_all_in_one",
 	"drop",
 	"panic",
 	"idle",
@@ -339,6 +341,15 @@ function CopActionAct:init(action_desc, common_data)
 	if self._host_expired and not self._waiting_full_blend then
 		self._expired = true
 	end
+	if not self._expired and Network:is_server() then
+		local stand_rsrv = self._unit:brain():get_pos_rsrv("stand")
+		if not stand_rsrv or mvector3.distance_sq(stand_rsrv.position, common_data.pos) > 400 then
+			self._unit:brain():add_pos_rsrv("stand", {
+				position = mvector3.copy(common_data.pos),
+				radius = 30
+			})
+		end
+	end
 	return true
 end
 
@@ -364,12 +375,6 @@ function CopActionAct:on_exit()
 		self._ext_movement:set_m_host_stop_pos(self._ext_movement:m_pos())
 	elseif not self._expired then
 		self._common_data.ext_network:send("action_act_end")
-	end
-	if Network:is_server() and not self._unit:character_damage():dead() then
-		self._unit:brain():add_pos_rsrv("stand", {
-			position = mvector3.copy(self._common_data.pos),
-			radius = 30
-		})
 	end
 end
 

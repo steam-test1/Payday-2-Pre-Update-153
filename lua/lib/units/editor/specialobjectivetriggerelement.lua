@@ -14,6 +14,7 @@ function SpecialObjectiveTriggerUnitElement:init(unit)
 		"anim_act_09",
 		"anim_act_10",
 		"administered",
+		"admin_fail",
 		"anim_start",
 		"complete",
 		"fail"

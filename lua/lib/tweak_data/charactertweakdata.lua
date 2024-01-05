@@ -53,7 +53,7 @@ function CharacterTweakData:_init_security(presets)
 	self.security.access = "security"
 	self.security.rescue_hostages = false
 	self.security.use_radio = nil
-	self.security.silent_priority_shout = "Dia_10"
+	self.security.silent_priority_shout = "f37"
 	self.security.dodge = presets.dodge.poor
 	self.security.deathguard = false
 	self.security.chatter = presets.enemy_chatter.cop
@@ -86,7 +86,7 @@ function CharacterTweakData:_init_gensec(presets)
 	self.gensec.access = "security"
 	self.gensec.rescue_hostages = false
 	self.gensec.use_radio = nil
-	self.gensec.silent_priority_shout = "Dia_10"
+	self.gensec.silent_priority_shout = "f37"
 	self.gensec.dodge = presets.dodge.athletic
 	self.gensec.deathguard = false
 	self.gensec.chatter = presets.enemy_chatter.cop
@@ -116,6 +116,7 @@ function CharacterTweakData:_init_cop(presets)
 	self.cop.speech_prefix_p2 = "n"
 	self.cop.speech_prefix_count = 4
 	self.cop.access = "cop"
+	self.cop.silent_priority_shout = "f37"
 	self.cop.dodge = presets.dodge.average
 	self.cop.deathguard = true
 	self.cop.chatter = presets.enemy_chatter.cop
@@ -341,7 +342,7 @@ function CharacterTweakData:_init_gangster(presets)
 	self.gangster.speech_prefix_p1 = "l"
 	self.gangster.speech_prefix_p2 = "n"
 	self.gangster.speech_prefix_count = 4
-	self.gangster.silent_priority_shout = "Dia_10"
+	self.gangster.silent_priority_shout = "f37"
 	self.gangster.access = "gangster"
 	self.gangster.rescue_hostages = false
 	self.gangster.use_radio = nil
@@ -3893,7 +3894,7 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		},
 		ninja = {
-			speed = 3,
+			speed = 1.6,
 			occasions = {
 				hit = {
 					chance = 0.9,
@@ -3920,6 +3921,10 @@ function CharacterTweakData:_presets(tweak_data)
 						roll = {
 							chance = 1,
 							timeout = {1.2, 2}
+						},
+						wheel = {
+							chance = 2,
+							timeout = {1.2, 2}
 						}
 					}
 				},
@@ -3932,6 +3937,10 @@ function CharacterTweakData:_presets(tweak_data)
 							timeout = {1, 2}
 						},
 						roll = {
+							chance = 3,
+							timeout = {1.2, 2}
+						},
+						wheel = {
 							chance = 3,
 							timeout = {1.2, 2}
 						},
@@ -4780,7 +4789,7 @@ function CharacterTweakData:_set_overkill_290()
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.expert, 0)
-	self:_multiply_weapon_delay(self.presets.weapon.sniper, 1)
+	self:_multiply_weapon_delay(self.presets.weapon.sniper, 3)
 	self:_multiply_weapon_delay(self.presets.weapon.gang_member, 0)
 	self.presets.gang_member_damage.REGENERATE_TIME = 1.8
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.6

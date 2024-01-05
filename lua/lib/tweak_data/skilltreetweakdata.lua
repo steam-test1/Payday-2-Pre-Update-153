@@ -399,13 +399,13 @@ function SkillTreeTweakData:init()
 		icon_xy = {3, 7},
 		[1] = {
 			upgrades = {
-				"player_corpse_alarm_pager_bluff"
+				"player_marked_enemy_extra_damage"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_marked_enemy_extra_damage"
+				"player_buy_spotter_asset"
 			},
 			cost = self.costs.pro
 		}
@@ -1342,13 +1342,14 @@ function SkillTreeTweakData:init()
 		icon_xy = {7, 2},
 		[1] = {
 			upgrades = {
+				"player_buy_bodybags_asset",
 				"weapon_special_damage_taken_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_corpse_dispose"
+				"player_corpse_dispose_amount_2"
 			},
 			cost = self.costs.pro
 		}
@@ -1536,13 +1537,13 @@ function SkillTreeTweakData:init()
 		icon_xy = {4, 2},
 		[1] = {
 			upgrades = {
-				"player_loot_drop_multiplier_1"
+				"player_tape_loop_duration_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_loot_drop_multiplier_2"
+				"player_tape_loop_duration_2"
 			},
 			cost = self.costs.hightierpro
 		}

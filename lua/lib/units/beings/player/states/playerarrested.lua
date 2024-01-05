@@ -32,6 +32,7 @@ function PlayerArrested:enter(state_data, enter_data)
 	self._unit:character_damage():set_invulnerable(true)
 	self._entry_speech_clbk = "PlayerArrested_entryspeech"
 	managers.enemy:add_delayed_clbk(self._entry_speech_clbk, callback(self, self, "clbk_entry_speech"), managers.player:player_timer():time() + 5 + 2 * math.random())
+	managers.network:session():send_to_peers_synched("sync_contour_state", self._unit, -1, table.index_of(ContourExt.indexed_types, "teammate_cuffed"), true, 1)
 end
 
 function PlayerArrested:_enter(enter_data)
@@ -59,6 +60,7 @@ function PlayerArrested:exit(state_data, new_state_name)
 		managers.enemy:remove_delayed_clbk(self._entry_speech_clbk)
 		self._entry_speech_clbk = nil
 	end
+	managers.network:session():send_to_peers_synched("sync_contour_state", self._unit, -1, table.index_of(ContourExt.indexed_types, "teammate_cuffed"), false, 1)
 	if not self._unequip_weapon_expire_t and not self._timer_finished then
 		local exit_data = {
 			equip_weapon = self._old_selection
@@ -139,10 +141,7 @@ function PlayerArrested:call_teammate(line, t, no_gesture, skip_alert, skip_mark
 			interact_type = "cmd_point"
 			queue_name = shout_sound .. "y_any"
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-				local marked_extra_damage = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") or false
-				local time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
-				prime_target.unit:contour():add("mark_enemy", marked_extra_damage, time_multiplier)
-				managers.network:session():send_to_peers_synched("mark_enemy", prime_target.unit, marked_extra_damage, time_multiplier)
+				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 			end
 		end
 	end

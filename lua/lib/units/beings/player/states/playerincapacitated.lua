@@ -27,6 +27,7 @@ function PlayerIncapacitated:enter(state_data, enter_data)
 		PlayerBleedOut._register_revive_SO(self._revive_SO_data, "revive")
 	end
 	managers.groupai:state():report_criminal_downed(self._unit)
+	managers.network:session():send_to_peers_synched("sync_contour_state", self._unit, -1, table.index_of(ContourExt.indexed_types, "teammate_downed"), true, 1)
 end
 
 function PlayerIncapacitated:_enter(enter_data)
@@ -44,6 +45,7 @@ function PlayerIncapacitated:exit(state_data, new_state_name)
 	self:_end_action_incapacitated(managers.player:player_timer():time())
 	managers.environment_controller:set_taser_value(1)
 	PlayerBleedOut._unregister_revive_SO(self)
+	managers.network:session():send_to_peers_synched("sync_contour_state", self._unit, -1, table.index_of(ContourExt.indexed_types, "teammate_downed"), false, 1)
 	return {
 		equip_weapon = self._reequip_weapon
 	}

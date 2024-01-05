@@ -1,5 +1,5 @@
 local tmp_vec1 = Vector3()
-CivilianLogicSurrender = class(CopLogicBase)
+CivilianLogicSurrender = class(CivilianLogicBase)
 CivilianLogicSurrender.on_new_objective = CivilianLogicIdle.on_new_objective
 CivilianLogicSurrender.on_rescue_allowed_state = CivilianLogicFlee.on_rescue_allowed_state
 CivilianLogicSurrender.wants_rescue = CivilianLogicFlee.wants_rescue
@@ -12,9 +12,13 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 		unit = data.unit
 	}
 	data.internal_data = my_data
-	if data.unit:anim_data().tied then
-		managers.groupai:state():on_hostage_state(true, data.key)
+	if data.is_tied then
+		managers.groupai:state():on_hostage_state(true, data.key, nil, true)
 		my_data.is_hostage = true
+		if data.unit:anim_data().drop then
+			data.unit:interaction():set_tweak_data("hostage_move", true)
+			data.unit:interaction():set_active(true, true)
+		end
 	end
 	if data.unit:anim_data().drop and not data.unit:anim_data().tied then
 		data.unit:interaction():set_active(true, true)
@@ -37,7 +41,7 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 	data.unit:movement():set_allow_fire(false)
 	managers.groupai:state():add_to_surrendered(data.unit, callback(CivilianLogicSurrender, CivilianLogicSurrender, "queued_update", data))
 	my_data.surrender_clbk_registered = true
-	data.unit:movement():set_stance("hos")
+	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
 	data.unit:movement():set_cool(false)
 	if my_data ~= data.internal_data then
 		return
@@ -68,14 +72,16 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 			CivilianLogicSurrender._do_initial_act(data, data.objective.amount, data.objective.aggressor_unit, data.objective.initial_act)
 		end
 	end
+	for u_key, attention_info in pairs(data.detected_attention_objects) do
+		if attention_info.identified and attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
+			managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, true)
+		end
+	end
 end
 
 function CivilianLogicSurrender.exit(data, new_logic_name, enter_params)
 	CopLogicBase.exit(data, new_logic_name, enter_params)
 	local my_data = data.internal_data
-	if data.unit:anim_data().tied and new_logic_name ~= "trade" and new_logic_name ~= "inactive" and (not data.objective or not data.objective.forced) then
-		debug_pause_unit(data.unit, "[CivilianLogicSurrender.exit] tied civilian!!!", data.unit, "new_logic_name", new_logic_name)
-	end
 	CivilianLogicFlee._unregister_rescue_SO(data, my_data)
 	managers.groupai:state():unregister_fleeing_civilian(data.key)
 	if new_logic_name ~= "inactive" then
@@ -94,7 +100,7 @@ function CivilianLogicSurrender.exit(data, new_logic_name, enter_params)
 	end
 	CopLogicBase.cancel_queued_tasks(my_data)
 	if my_data.is_hostage then
-		managers.groupai:state():on_hostage_state(false, data.key)
+		managers.groupai:state():on_hostage_state(false, data.key, nil, true)
 		my_data.is_hostage = nil
 	end
 	CopLogicBase._reset_attention(data)
@@ -106,7 +112,7 @@ end
 function CivilianLogicSurrender.queued_update(rubbish, data)
 	local my_data = data.internal_data
 	CivilianLogicSurrender._update_enemy_detection(data, my_data)
-	if my_data.submission_meter == 0 and not data.unit:anim_data().tied and (not data.unit:anim_data().react_enter or not not data.unit:anim_data().idle) then
+	if my_data.submission_meter == 0 and not data.is_tied and (not data.unit:anim_data().react_enter or not not data.unit:anim_data().idle) then
 		if data.unit:anim_data().drop then
 			local new_action = {
 				type = "act",
@@ -122,15 +128,14 @@ function CivilianLogicSurrender.queued_update(rubbish, data)
 		CivilianLogicFlee._chk_add_delayed_rescue_SO(data, my_data)
 		managers.groupai:state():add_to_surrendered(data.unit, callback(CivilianLogicSurrender, CivilianLogicSurrender, "queued_update", data))
 	end
-	if data.unit:anim_data().act and data.pos_rsrv.stand then
-		data.pos_rsrv.stand.position = mvector3.copy(data.m_pos)
-		managers.navigation:move_pos_rsrv(data.pos_rsrv.stand)
+	if CopLogicIdle._chk_relocate(data) then
+		return
 	end
 end
 
 function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 	local my_data = data.internal_data
-	if my_data.is_hostage then
+	if data.is_tied then
 		return
 	end
 	if not_tied then
@@ -160,8 +165,11 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 		}
 		local action_res = data.unit:brain():action_request(action_data)
 		if action_res then
-			managers.groupai:state():on_hostage_state(true, data.key)
+			managers.groupai:state():on_hostage_state(true, data.key, nil, nil)
 			my_data.is_hostage = true
+			data.is_tied = true
+			data.unit:interaction():set_tweak_data("hostage_move")
+			data.unit:interaction():set_active(true, true)
 			if data.has_outline then
 				data.unit:contour():remove("highlight")
 				data.has_outline = nil
@@ -218,7 +226,7 @@ function CivilianLogicSurrender.action_complete_clbk(data, action)
 end
 
 function CivilianLogicSurrender.on_intimidated(data, amount, aggressor_unit, skip_delay)
-	if data.unit:anim_data().tied then
+	if data.is_tied then
 		return
 	end
 	if not tweak_data.character[data.unit:base()._tweak_table].intimidateable or data.unit:base().unintimidateable or data.unit:anim_data().unintimidateable then
@@ -271,6 +279,7 @@ function CivilianLogicSurrender._delayed_intimidate_clbk(ignore_this, params)
 		local action_res = data.unit:brain():action_request(action_data)
 		if action_res and action_data.variant == "drop" then
 			managers.groupai:state():unregister_fleeing_civilian(data.key)
+			data.unit:interaction():set_tweak_data("intimidate")
 			data.unit:interaction():set_active(true, true)
 			my_data.interaction_active = true
 		end
@@ -305,9 +314,6 @@ function CivilianLogicSurrender.on_alert(data, alert_data)
 		return
 	end
 	local anim_data = data.unit:anim_data()
-	if anim_data.tied then
-		return
-	end
 	if CopLogicBase.is_alert_aggressive(alert_data[1]) then
 		local aggressor = alert_data[5]
 		if aggressor and aggressor:base() then
@@ -319,7 +325,7 @@ function CivilianLogicSurrender.on_alert(data, alert_data)
 			elseif aggressor:base().is_husk_player and aggressor:base():upgrade_value("player", "civ_calming_alerts") then
 				is_intimidation = true
 			end
-			if is_intimidation then
+			if is_intimidation and not data.is_tied then
 				data.unit:brain():on_intimidated(1, aggressor)
 				return
 			end
@@ -331,18 +337,24 @@ function CivilianLogicSurrender.on_alert(data, alert_data)
 	end
 	local my_data = data.internal_data
 	local scare_modifier = data.char_tweak.scare_shot
-	if anim_data.halt or anim_data.react then
+	if anim_data.halt or anim_data.react or anim_data.stand then
 		scare_modifier = scare_modifier * 4
 	end
 	my_data.scare_meter = math.min(my_data.scare_max, my_data.scare_meter + scare_modifier)
 	if my_data.scare_meter == my_data.scare_max and 5 < data.t - my_data.state_enter_t then
 		data.unit:sound():say("a01x_any", true)
-		if not my_data.inside_intimidate_aura then
-			data.unit:brain():set_objective({
-				type = "free",
-				is_default = true,
-				alert_data = clone(alert_data)
-			})
+		if data.is_tied or not my_data.inside_intimidate_aura then
+			if data.is_tied then
+				if anim_data.stand then
+					data.unit:brain():on_hostage_move_interaction(alert_data[5], "stay")
+				end
+			else
+				data.unit:brain():set_objective({
+					type = "free",
+					is_default = true,
+					alert_data = clone(alert_data)
+				})
+			end
 		end
 	elseif not data.unit:sound():speaking(TimerManager:game():time()) then
 		local rand = math.random()

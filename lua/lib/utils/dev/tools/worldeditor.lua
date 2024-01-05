@@ -78,6 +78,7 @@ require("lib/units/editor/InstigatorRuleElement")
 require("lib/units/editor/PickupElement")
 require("lib/units/editor/LaserTriggerElement")
 require("lib/units/editor/SpawnGrenadeElement")
+require("lib/units/editor/SpotterElement")
 require("lib/units/editor/SpawnPlayerElement")
 require("lib/units/editor/EnemyDummyTrigger")
 require("lib/units/editor/SpawnEnemyElement")
@@ -120,14 +121,17 @@ function WorldEditor:_project_init_slot_masks()
 	self._go_through_units_before_simulaton_mask = self._go_through_units_before_simulaton_mask + 15
 end
 
+function WorldEditor:project_prestart_up(with_mission)
+	managers.navigation:on_simulation_started()
+	managers.groupai:on_simulation_started()
+	managers.enemy:on_simulation_started()
+end
+
 function WorldEditor:project_run_simulation(with_mission)
 	Global.game_settings.difficulty = self._mission_difficulty
 	managers.network:host_game()
 	managers.statistics:start_session({from_beginning = true})
 	managers.player:on_simulation_started()
-	managers.navigation:on_simulation_started()
-	managers.groupai:on_simulation_started()
-	managers.enemy:on_simulation_started()
 	if not with_mission then
 		managers.player:set_player_state("standard")
 		managers.groupai:state():set_AI_enabled(false)

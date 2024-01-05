@@ -37,6 +37,7 @@ function WeaponTweakData:init()
 	self:_init_data_saw_npc()
 	self:_init_data_sentry_gun_npc()
 	self:_init_data_usp_npc()
+	self:_init_data_g22c_npc()
 	self:_init_data_m45_npc()
 	self:_init_data_s552_npc()
 	self:_init_data_ppk_npc()
@@ -630,6 +631,22 @@ function WeaponTweakData:_init_data_usp_npc()
 	self.usp_npc.suppression = 2
 end
 
+function WeaponTweakData:_init_data_g22c_npc()
+	self.g22c_npc.sounds.prefix = "g22_npc"
+	self.g22c_npc.use_data.selection_index = 1
+	self.g22c_npc.DAMAGE = 1.25
+	self.g22c_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.g22c_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.g22c_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.g22c_npc.CLIP_AMMO_MAX = 80
+	self.g22c_npc.NR_CLIPS_MAX = 6
+	self.g22c_npc.auto.fire_rate = 0.1
+	self.g22c_npc.hold = "pistol"
+	self.g22c_npc.hud_icon = "mac11"
+	self.g22c_npc.alert_size = 1800
+	self.g22c_npc.suppression = 2
+end
+
 function WeaponTweakData:_init_data_m45_npc()
 	self.m45_npc.sounds.prefix = "m45_npc"
 	self.m45_npc.use_data.selection_index = 1
@@ -1096,8 +1113,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.new_m4.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.new_m4.timers = {}
-	self.new_m4.timers.reload_not_empty = 2.25
-	self.new_m4.timers.reload_empty = 3
+	self.new_m4.timers.reload_not_empty = 2.665
+	self.new_m4.timers.reload_empty = 3.73
 	self.new_m4.timers.unequip = 0.75
 	self.new_m4.timers.equip = 0.7
 	self.new_m4.name_id = "bm_w_m4"
@@ -1619,8 +1636,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.m16.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.m16.timers = {}
-	self.m16.timers.reload_not_empty = 2.25
-	self.m16.timers.reload_empty = 3
+	self.m16.timers.reload_not_empty = 2.665
+	self.m16.timers.reload_empty = 3.73
 	self.m16.timers.unequip = 0.8
 	self.m16.timers.equip = 0.8
 	self.m16.name_id = "bm_w_m16"
@@ -2135,7 +2152,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.ak5.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.ak5.timers = {}
-	self.ak5.timers.reload_not_empty = 2.25
+	self.ak5.timers.reload_not_empty = 2.665
 	self.ak5.timers.reload_empty = 3.47
 	self.ak5.timers.unequip = 0.8
 	self.ak5.timers.equip = 0.8
@@ -3402,6 +3419,93 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		value = 1
 	}
+	self.g22c = {}
+	self.g22c.category = "pistol"
+	self.g22c.damage_melee = damage_melee_default
+	self.g22c.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.g22c.sounds = {}
+	self.g22c.sounds.fire = "g22_fire"
+	self.g22c.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.g22c.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.g22c.sounds.dryfire = "secondary_dryfire"
+	self.g22c.timers = {}
+	self.g22c.timers.reload_not_empty = 1.47
+	self.g22c.timers.reload_empty = 2.2
+	self.g22c.timers.unequip = 0.55
+	self.g22c.timers.equip = 0.55
+	self.g22c.name_id = "bm_w_g22c"
+	self.g22c.desc_id = "bm_w_g22c_desc"
+	self.g22c.hud_icon = "beretta92"
+	self.g22c.description_id = "des_g22c"
+	self.g22c.hud_ammo = "guis/textures/ammo_9mm"
+	self.g22c.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.g22c.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.g22c.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.g22c.use_data = {}
+	self.g22c.use_data.selection_index = 1
+	self.g22c.DAMAGE = 1
+	self.g22c.FIRE_MODE = "single"
+	self.g22c.fire_mode_data = {}
+	self.g22c.fire_mode_data.fire_rate = 0.08
+	self.g22c.single = {}
+	self.g22c.single.fire_rate = 0.09
+	self.g22c.CLIP_AMMO_MAX = 16
+	self.g22c.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.15 / self.g22c.CLIP_AMMO_MAX)
+	self.g22c.AMMO_MAX = self.g22c.CLIP_AMMO_MAX * self.g22c.NR_CLIPS_MAX
+	self.g22c.AMMO_PICKUP = self:_pickup_chance(self.g22c.AMMO_MAX, 1)
+	self.g22c.spread = {}
+	self.g22c.spread.standing = self.new_m4.spread.standing * 0.75
+	self.g22c.spread.crouching = self.new_m4.spread.standing * 0.75
+	self.g22c.spread.steelsight = self.new_m4.spread.steelsight
+	self.g22c.spread.moving_standing = self.new_m4.spread.standing * 0.75
+	self.g22c.spread.moving_crouching = self.new_m4.spread.standing * 0.75
+	self.g22c.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.g22c.kick = {}
+	self.g22c.kick.standing = {
+		1.2,
+		1.8,
+		-0.5,
+		0.5
+	}
+	self.g22c.kick.crouching = self.glock_17.kick.standing
+	self.g22c.kick.steelsight = self.glock_17.kick.standing
+	self.g22c.global_value = "pd2_clan"
+	self.g22c.crosshair = {}
+	self.g22c.crosshair.standing = {}
+	self.g22c.crosshair.crouching = {}
+	self.g22c.crosshair.steelsight = {}
+	self.g22c.crosshair.standing.offset = 0.2
+	self.g22c.crosshair.standing.moving_offset = 0.6
+	self.g22c.crosshair.standing.kick_offset = 0.4
+	self.g22c.crosshair.crouching.offset = 0.1
+	self.g22c.crosshair.crouching.moving_offset = 0.6
+	self.g22c.crosshair.crouching.kick_offset = 0.3
+	self.g22c.crosshair.steelsight.hidden = true
+	self.g22c.crosshair.steelsight.offset = 0
+	self.g22c.crosshair.steelsight.moving_offset = 0
+	self.g22c.crosshair.steelsight.kick_offset = 0.1
+	self.g22c.shake = {}
+	self.g22c.shake.fire_multiplier = 1
+	self.g22c.shake.fire_steelsight_multiplier = -1
+	self.g22c.autohit = autohit_pistol_default
+	self.g22c.aim_assist = aim_assist_pistol_default
+	self.g22c.weapon_hold = "glock"
+	self.g22c.animations = {}
+	self.g22c.animations.equip_id = "equip_glock"
+	self.g22c.animations.recoil_steelsight = true
+	self.g22c.statistics = true
+	self.g22c.stats = {
+		damage = 10,
+		spread = 6,
+		recoil = 13,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 1
+	}
 	self.m45 = {}
 	self.m45.category = "smg"
 	self.m45.damage_melee = damage_melee_default
@@ -3730,6 +3834,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.animations.recoil_steelsight = true
 	self.mp7.global_value = "gage_pack"
 	self.mp7.texture_bundle_folder = "gage_pack"
+	self.mp7.statistics = true
 	self.mp7.stats = {
 		damage = 12,
 		spread = 7,
@@ -3814,6 +3919,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scar.animations.recoil_steelsight = true
 	self.scar.global_value = "gage_pack"
 	self.scar.texture_bundle_folder = "gage_pack"
+	self.scar.statistics = true
 	self.scar.stats = {
 		damage = 18,
 		spread = 7,
@@ -3894,6 +4000,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p226.animations = {}
 	self.p226.animations.equip_id = "equip_glock"
 	self.p226.animations.recoil_steelsight = true
+	self.p226.statistics = true
 	self.p226.global_value = "gage_pack"
 	self.p226.texture_bundle_folder = "gage_pack"
 	self.p226.stats = {
@@ -3985,6 +4092,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hk21.animations.recoil_steelsight = true
 	self.hk21.global_value = "gage_pack_lmg"
 	self.hk21.texture_bundle_folder = "gage_pack_lmg"
+	self.hk21.statistics = true
 	self.hk21.stats = {
 		damage = 14,
 		spread = 6,
@@ -4074,6 +4182,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m249.animations.recoil_steelsight = true
 	self.m249.global_value = "gage_pack_lmg"
 	self.m249.texture_bundle_folder = "gage_pack_lmg"
+	self.m249.statistics = true
 	self.m249.stats = {
 		damage = 12,
 		spread = 4,
@@ -4163,6 +4272,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpk.animations.recoil_steelsight = true
 	self.rpk.global_value = "gage_pack_lmg"
 	self.rpk.texture_bundle_folder = "gage_pack_lmg"
+	self.rpk.statistics = true
 	self.rpk.stats = {
 		damage = 13,
 		spread = 5,
@@ -4485,6 +4595,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.g22c_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 	self.m45_npc = {
 		usage = "mp5",
 		sounds = {},
@@ -4577,6 +4693,7 @@ function WeaponTweakData:_precalculate_values()
 	self.huntsman_npc.AMMO_MAX = self.huntsman_npc.CLIP_AMMO_MAX * self.huntsman_npc.NR_CLIPS_MAX
 	self.saw_npc.AMMO_MAX = self.saw_npc.CLIP_AMMO_MAX * self.saw_npc.NR_CLIPS_MAX
 	self.usp_npc.AMMO_MAX = self.usp_npc.CLIP_AMMO_MAX * self.usp_npc.NR_CLIPS_MAX
+	self.g22c_npc.AMMO_MAX = self.g22c_npc.CLIP_AMMO_MAX * self.p226_npc.NR_CLIPS_MAX
 	self.m45_npc.AMMO_MAX = self.m45_npc.CLIP_AMMO_MAX * self.m45_npc.NR_CLIPS_MAX
 	self.s552_npc.AMMO_MAX = self.s552_npc.CLIP_AMMO_MAX * self.s552_npc.NR_CLIPS_MAX
 	self.ppk_npc.AMMO_MAX = self.ppk_npc.CLIP_AMMO_MAX * self.ppk_npc.NR_CLIPS_MAX

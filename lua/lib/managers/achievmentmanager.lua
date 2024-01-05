@@ -26,9 +26,13 @@ function AchievmentManager:init()
 			self.achievments = Global.achievment_manager.achievments
 		end
 	elseif SystemInfo:platform() == Idstring("PS3") then
+		if not Global.achievment_manager then
+			Global.achievment_manager = {
+				trophy_requests = {}
+			}
+		end
 		self:_parse_achievments("PSN")
 		AchievmentManager.do_award = AchievmentManager.award_psn
-		self._requests = {}
 	elseif SystemInfo:platform() == Idstring("X360") then
 		self:_parse_achievments("X360")
 		AchievmentManager.do_award = AchievmentManager.award_x360
@@ -208,13 +212,14 @@ function AchievmentManager:award_psn(id)
 		return
 	end
 	local request = Trophies:unlock_id(self:get_info(id).id, AchievmentManager.psn_unlock_result)
-	self._requests[request] = id
+	Global.achievment_manager.trophy_requests[request] = id
 end
 
 function AchievmentManager.psn_unlock_result(request, error_str)
 	print("[AchievmentManager:psn_unlock_result] Awarded PSN achievment", request, error_str)
-	local id = managers.achievment._requests[request]
+	local id = Global.achievment_manager.trophy_requests[request]
 	if error_str == "success" then
+		Global.achievment_manager.trophy_requests[request] = nil
 		managers.achievment:_give_reward(id)
 	end
 end

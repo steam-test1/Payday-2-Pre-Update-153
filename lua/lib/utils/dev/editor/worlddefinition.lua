@@ -6,9 +6,6 @@ function WorldDefinition:init(...)
 end
 
 function WorldDefinition:_project_assign_unit_data(unit, data)
-	if not Application:editor() and unit:unit_data().secret_assignment_id then
-		managers.secret_assignment:register_unit(unit)
-	end
 end
 
 function WorldDefinition:get_cover_data()

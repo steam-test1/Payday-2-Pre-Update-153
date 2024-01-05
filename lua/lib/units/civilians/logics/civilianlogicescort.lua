@@ -1,4 +1,4 @@
-CivilianLogicEscort = class(CopLogicBase)
+CivilianLogicEscort = class(CivilianLogicBase)
 
 function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 	CopLogicBase.enter(data, new_logic_name, enter_params)
@@ -15,7 +15,7 @@ function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 	data.internal_data = my_data
 	data.unit:contour():add("highlight")
 	data.unit:movement():set_cool(false, "escort")
-	data.unit:movement():set_stance("hos")
+	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
 	if data.unit:anim_data().tied then
 		local action_data = {
 			type = "act",

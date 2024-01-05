@@ -8,6 +8,7 @@ function FeatureManager:_setup()
 	self._default = {}
 	self._default.announcements = {}
 	self._default.announcements.crimenet_heat = 3
+	self._default.announcements.election_changes = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -75,5 +76,14 @@ end
 function FeatureManager:crimenet_heat()
 	print("FeatureManager:crimenet_heat()")
 	managers.menu:show_announce_crimenet_heat()
+	return true
+end
+
+function FeatureManager:election_changes()
+	print("FeatureManager:election_changes()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_election_changes_title",
+		text = "menu_feature_election_changes_desc"
+	})
 	return true
 end

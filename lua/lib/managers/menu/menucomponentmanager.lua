@@ -132,6 +132,13 @@ function MenuComponentManager:init()
 	}
 end
 
+function MenuComponentManager:save(data)
+end
+
+function MenuComponentManager:load(data)
+	self:on_whisper_mode_changed()
+end
+
 function MenuComponentManager:_setup_controller_input()
 	if not self._controller_connected then
 		self._left_axis_vector = Vector3()
@@ -214,6 +221,45 @@ function MenuComponentManager:set_active_components(components, node)
 	end
 	if not managers.menu:is_pc_controller() then
 		self:_setup_controller_input()
+	end
+end
+
+function MenuComponentManager:make_color_text(text_object, color)
+	local text = text_object:text()
+	local text_dissected = utf8.characters(text)
+	local idsp = Idstring("#")
+	local start_ci = {}
+	local end_ci = {}
+	local first_ci = true
+	for i, c in ipairs(text_dissected) do
+		if Idstring(c) == idsp then
+			local next_c = text_dissected[i + 1]
+			if next_c and Idstring(next_c) == idsp then
+				if first_ci then
+					table.insert(start_ci, i)
+				else
+					table.insert(end_ci, i)
+				end
+				first_ci = not first_ci
+			end
+		end
+	end
+	if #start_ci ~= #end_ci then
+	else
+		for i = 1, #start_ci do
+			start_ci[i] = start_ci[i] - ((i - 1) * 4 + 1)
+			end_ci[i] = end_ci[i] - (i * 4 - 1)
+		end
+	end
+	text = string.gsub(text, "##", "")
+	text_object:set_text(text)
+	text_object:clear_range_color(1, utf8.len(text))
+	if #start_ci ~= #end_ci then
+		Application:error("CrimeNetGui:make_color_text: Not even amount of ##'s in text", #start_ci, #end_ci)
+	else
+		for i = 1, #start_ci do
+			text_object:set_range_color(start_ci[i], end_ci[i], color or tweak_data.screen_colors.resource)
+		end
 	end
 end
 
@@ -1664,6 +1710,12 @@ end
 function MenuComponentManager:create_mission_briefing_gui(node)
 	if not self._mission_briefing_gui then
 		self._mission_briefing_gui = MissionBriefingGui:new(self._ws, self._fullscreen_ws, node)
+		if managers.groupai and managers.groupai:state() and not self._whisper_listener then
+			self._whisper_listener = "MenuComponentManager_whisper_mode"
+			managers.groupai:state():add_listener(self._whisper_listener, {
+				"whisper_mode"
+			}, callback(self, self, "on_whisper_mode_changed"))
+		end
 	else
 		self._mission_briefing_gui:reload_loadout()
 	end
@@ -1690,6 +1742,20 @@ function MenuComponentManager:close_mission_briefing_gui()
 	if self._mission_briefing_gui then
 		self._mission_briefing_gui:close()
 		self._mission_briefing_gui = nil
+		if self._whisper_listener then
+			managers.groupai:state():remove_listener(self._whisper_listener)
+			self._whisper_listener = nil
+		end
+	end
+end
+
+function MenuComponentManager:on_whisper_mode_changed()
+	if self._mission_briefing_gui then
+		self._mission_briefing_gui:on_whisper_mode_changed()
+		local hud = managers.hud:get_mission_briefing_hud()
+		if hud then
+			hud:on_whisper_mode_changed()
+		end
 	end
 end
 

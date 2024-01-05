@@ -47,6 +47,7 @@ do
 		"civ_male_bank_1",
 		"civ_male_bank_2",
 		"civ_male_bank_manager_1",
+		"civ_male_bank_manager_3",
 		"civ_male_business_1",
 		"civ_male_business_2",
 		"civ_male_casual_1",
@@ -67,6 +68,9 @@ do
 		"civ_male_party_3",
 		"civ_male_scientist_1",
 		"civ_male_trucker_1",
+		"civ_male_worker_1",
+		"civ_male_worker_2",
+		"civ_male_worker_3",
 		"civ_male_worker_docks_1",
 		"civ_male_worker_docks_2",
 		"civ_male_worker_docks_3",
@@ -101,6 +105,9 @@ do
 		"ene_gang_russian_1",
 		"ene_gang_russian_2",
 		"ene_gang_russian_3",
+		"ene_gang_russian_4",
+		"ene_gang_russian_5",
+		"ene_guard_national_1",
 		"ene_secret_service_1",
 		"ene_secret_service_2",
 		"ene_security_1",
@@ -114,7 +121,8 @@ do
 		"ene_swat_1",
 		"ene_swat_2",
 		"ene_swat_heavy_1",
-		"ene_tazer_1"
+		"ene_tazer_1",
+		"ene_veteran_cop_1"
 	}
 	local path_string = "units/payday2/characters/"
 	local character_path = ""
@@ -124,6 +132,9 @@ do
 		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
 	end
 	local pd2_dlc1_characters_map = {
+		"civ_male_bank_manager_2",
+		"civ_male_casual_10",
+		"civ_male_casual_11",
 		"civ_male_firefighter_1",
 		"civ_male_paramedic_1",
 		"civ_male_paramedic_2",
@@ -131,6 +142,17 @@ do
 		"ene_security_gensec_2"
 	}
 	local path_string = "units/pd2_dlc1/characters/"
+	local character_path = ""
+	for _, character in ipairs(pd2_dlc1_characters_map) do
+		character_path = path_string .. character .. "/" .. character
+		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
+		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
+	end
+	local pd2_dlc1_characters_map = {
+		"civ_female_bank_assistant_1",
+		"civ_female_bank_assistant_2"
+	}
+	local path_string = "units/pd2_dlc2/characters/"
 	local character_path = ""
 	for _, character in ipairs(pd2_dlc1_characters_map) do
 		character_path = path_string .. character .. "/" .. character
@@ -254,12 +276,16 @@ end
 function CopBase:save(data)
 	if self._unit:interaction() and self._unit:interaction().tweak_data == "hostage_trade" then
 		data.is_hostage_trade = true
+	elseif self._unit:interaction() and self._unit:interaction().tweak_data == "hostage_convert" then
+		data.is_hostage_convert = true
 	end
 end
 
 function CopBase:load(data)
 	if data.is_hostage_trade then
 		CopLogicTrade.hostage_trade(self._unit, true, false)
+	elseif data.is_hostage_convert then
+		self._unit:interaction():set_tweak_data("hostage_convert")
 	end
 end
 

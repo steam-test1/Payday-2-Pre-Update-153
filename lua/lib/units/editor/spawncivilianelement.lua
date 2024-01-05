@@ -25,6 +25,7 @@ SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_male_bank_1/civ_male_bank_1",
 	"units/payday2/characters/civ_male_bank_2/civ_male_bank_2",
 	"units/payday2/characters/civ_male_bank_manager_1/civ_male_bank_manager_1",
+	"units/payday2/characters/civ_male_bank_manager_3/civ_male_bank_manager_3",
 	"units/payday2/characters/civ_male_business_1/civ_male_business_1",
 	"units/payday2/characters/civ_male_business_2/civ_male_business_2",
 	"units/payday2/characters/civ_male_casual_1/civ_male_casual_1",

@@ -15,7 +15,6 @@ local small_font_size = tweak_data.menu.pd2_small_font_size
 function InventoryList:init(ws, fullscreen_ws, node)
 	self._ws = ws
 	self._panel = ws:panel():panel()
-	self._panel:set_debug(true)
 end
 
 function InventoryList:close()

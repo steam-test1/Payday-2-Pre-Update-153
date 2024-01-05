@@ -493,7 +493,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 				else
 					noticable = attention_info.notice_progress
 					attention_info.prev_notice_chk_t = t
-					if attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
+					if data.cool and attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
 						managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, noticable)
 					end
 				end
@@ -617,7 +617,7 @@ function CopLogicBase._destroy_detected_attention_object_data(data, attention_in
 	if attention_info.settings.notice_clbk then
 		attention_info.settings.notice_clbk(data.unit, false)
 	end
-	if attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
+	if attention_info.settings.reaction >= AIAttentionObject.REACT_SUSPICIOUS then
 		managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, nil)
 	end
 	if attention_info.uncover_progress then
@@ -632,7 +632,7 @@ function CopLogicBase._destroy_all_detected_attention_object_data(data)
 		if not attention_info.identified and attention_info.settings.notice_clbk then
 			attention_info.settings.notice_clbk(data.unit, false)
 		end
-		if attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
+		if attention_info.settings.reaction >= AIAttentionObject.REACT_SUSPICIOUS then
 			managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, nil)
 		end
 		if attention_info.uncover_progress then
@@ -991,7 +991,7 @@ function CopLogicBase.identify_attention_obj_instant(data, att_u_key)
 			end
 		end
 	end
-	if att_obj_data then
+	if (data.cool or data.t - data.unit:movement():not_cool_t() < 1) and att_obj_data then
 		managers.groupai:state():on_criminal_suspicion_progress(att_obj_data.unit, data.unit, true)
 	end
 	return att_obj_data, is_new
@@ -1150,7 +1150,7 @@ function CopLogicBase.on_attention_obj_identified(data, attention_u_key, attenti
 			end
 		end
 	end
-	if attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
+	if data.cool and attention_info.settings.reaction >= AIAttentionObject.REACT_SCARED then
 		managers.groupai:state():on_criminal_suspicion_progress(attention_info.unit, data.unit, true)
 	end
 end

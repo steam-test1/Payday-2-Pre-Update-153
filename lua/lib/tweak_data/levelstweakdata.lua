@@ -16,6 +16,7 @@ function LevelsTweakData:init()
 		"packages/narr_framing_1"
 	}
 	self.framing_frame_1.cube = "cube_apply_heist_bank"
+	self.framing_frame_1.ghost_bonus = 0.15
 	self.framing_frame_2 = {}
 	self.framing_frame_2.name_id = "heist_framing_frame_2_hl"
 	self.framing_frame_2.briefing_id = "heist_framing_frame_2_briefing"
@@ -31,6 +32,7 @@ function LevelsTweakData:init()
 		"packages/narr_framing_2"
 	}
 	self.framing_frame_2.cube = "cube_apply_heist_bank"
+	self.framing_frame_2.ghost_bonus = 0.05
 	self.framing_frame_3 = {}
 	self.framing_frame_3.name_id = "heist_framing_frame_3_hl"
 	self.framing_frame_3.briefing_id = "heist_framing_frame_3_briefing"
@@ -45,41 +47,56 @@ function LevelsTweakData:init()
 	self.framing_frame_3.music = "heist"
 	self.framing_frame_3.package = "packages/narr_framing_3"
 	self.framing_frame_3.cube = "cube_apply_heist_bank"
+	self.framing_frame_3.ghost_bonus = 0.3
 	self.election_day_1 = {}
 	self.election_day_1.name_id = "heist_election_day_1_hl"
 	self.election_day_1.briefing_id = "eday1_brief"
+	self.election_day_1.briefing_dialog = "Play_pln_ed1_brf"
 	self.election_day_1.world_name = "narratives/e_election_day/stage_1"
-	self.election_day_1.intro_event = "nothing"
-	self.election_day_1.outro_event = "nothing"
+	self.election_day_1.intro_event = "Play_pln_ed1_intro_a"
+	self.election_day_1.outro_event = {
+		"Play_pln_ed1_end_a",
+		"Play_pln_ed1_end_b",
+		"Play_pln_ed1_end_c"
+	}
 	self.election_day_1.music = "heist"
 	self.election_day_1.package = {
 		"packages/narr_election1"
 	}
 	self.election_day_1.cube = "cube_apply_heist_bank"
+	self.election_day_1.ghost_bonus = 0.1
 	self.election_day_2 = {}
 	self.election_day_2.name_id = "heist_election_day_2_hl"
 	self.election_day_2.briefing_id = "eday2_brief"
+	self.election_day_2.briefing_dialog = "Play_pln_ed2_brf"
 	self.election_day_2.world_name = "narratives/e_election_day/stage_2"
-	self.election_day_2.intro_event = "nothing"
-	self.election_day_2.outro_event = "nothing"
+	self.election_day_2.intro_event = "Play_pln_ed2_intro_a"
+	self.election_day_2.outro_event = {
+		"Play_pln_ed2_end_a",
+		"Play_pln_ed2_end_b"
+	}
 	self.election_day_2.music = "heist"
 	self.election_day_2.package = {
 		"packages/narr_election2"
 	}
 	self.election_day_2.cube = "cube_apply_heist_bank"
+	self.election_day_2.ghost_bonus = 0.3
 	self.election_day_3 = {}
 	self.election_day_3.name_id = "heist_election_day_3_hl"
-	self.election_day_3.briefing_id = "eday3_brief"
+	self.election_day_3.briefing_id = "eday3_brief_skip1"
+	self.election_day_3.briefing_dialog = "Play_pln_ed3_brf_b"
 	self.election_day_3.world_name = "narratives/e_election_day/stage_3"
-	self.election_day_3.intro_event = "nothing"
-	self.election_day_3.outro_event = "nothing"
+	self.election_day_3.intro_event = "Play_pln_ed3_intro_a"
+	self.election_day_3.outro_event = "Play_pln_ed3_end_a"
 	self.election_day_3.music = "heist"
 	self.election_day_3.package = "packages/narr_election3"
 	self.election_day_3.cube = "cube_apply_heist_bank"
 	self.election_day_3_skip1 = deep_clone(self.election_day_3)
 	self.election_day_3_skip1.briefing_id = "eday3_brief_skip1"
+	self.election_day_3_skip1.briefing_dialog = "Play_pln_ed3_brf_b"
 	self.election_day_3_skip2 = deep_clone(self.election_day_3)
 	self.election_day_3_skip2.briefing_id = "eday3_brief_skip2"
+	self.election_day_3_skip2.briefing_dialog = "Play_pln_ed3_brf_c"
 	self.alex_1 = {}
 	self.alex_1.name_id = "heist_alex_1_hl"
 	self.alex_1.briefing_id = "heist_alex_1_briefing"
@@ -185,6 +202,7 @@ function LevelsTweakData:init()
 	self.firestarter_2.music = "heist"
 	self.firestarter_2.package = "packages/narr_firestarter2"
 	self.firestarter_2.cube = "cube_apply_heist_bank"
+	self.firestarter_2.ghost_bonus = 0.3
 	self.firestarter_3 = {}
 	self.firestarter_3.name_id = "heist_firestarter_3_hl"
 	self.firestarter_3.briefing_id = "heist_firestarter_3_briefing"
@@ -201,6 +219,7 @@ function LevelsTweakData:init()
 	self.firestarter_3.mission_data = {
 		{mission = "default"}
 	}
+	self.firestarter_3.ghost_bonus = 0.1
 	self.welcome_to_the_jungle_1 = {}
 	self.welcome_to_the_jungle_1.name_id = "heist_welcome_to_the_jungle_1_hl"
 	self.welcome_to_the_jungle_1.briefing_id = "heist_welcome_to_the_jungle_1_briefing"
@@ -217,6 +236,7 @@ function LevelsTweakData:init()
 		"packages/narr_jungle1"
 	}
 	self.welcome_to_the_jungle_1.cube = "cube_apply_heist_bank"
+	self.welcome_to_the_jungle_1.ghost_bonus = 0.3
 	self.welcome_to_the_jungle_2 = {}
 	self.welcome_to_the_jungle_2.name_id = "heist_welcome_to_the_jungle_2_hl"
 	self.welcome_to_the_jungle_2.briefing_id = "heist_welcome_to_the_jungle_2_briefing"
@@ -251,6 +271,7 @@ function LevelsTweakData:init()
 	}
 	self.ukrainian_job.cube = "cube_apply_heist_bank"
 	self.ukrainian_job.group_ai_preset = "small_urban"
+	self.ukrainian_job.ghost_bonus = 0.1
 	self.four_stores = {}
 	self.four_stores.name_id = "heist_four_stores_hl"
 	self.four_stores.briefing_id = "heist_four_stores_briefing"
@@ -264,6 +285,7 @@ function LevelsTweakData:init()
 	self.four_stores.music = "heist"
 	self.four_stores.package = "packages/vlad_four_stores"
 	self.four_stores.cube = "cube_apply_heist_bank"
+	self.four_stores.ghost_bonus = 0.1
 	self.jewelry_store = {}
 	self.jewelry_store.name_id = "heist_jewelry_store_hl"
 	self.jewelry_store.briefing_id = "heist_jewelry_store_briefing"
@@ -281,6 +303,7 @@ function LevelsTweakData:init()
 	self.jewelry_store.music = "heist"
 	self.jewelry_store.package = "packages/ukrainian_job"
 	self.jewelry_store.cube = "cube_apply_heist_bank"
+	self.jewelry_store.ghost_bonus = 0.1
 	self.mallcrasher = {}
 	self.mallcrasher.name_id = "heist_mallcrasher_hl"
 	self.mallcrasher.briefing_id = "heist_mallcrasher_briefing"
@@ -307,6 +330,7 @@ function LevelsTweakData:init()
 	self.nightclub.music = "heist"
 	self.nightclub.package = "packages/vlad_nightclub"
 	self.nightclub.cube = "cube_apply_heist_bank"
+	self.nightclub.ghost_bonus = 0.2
 	self.branchbank = {}
 	self.branchbank.name_id = "heist_branchbank_hl"
 	self.branchbank.briefing_id = "heist_branchbank_briefing"
@@ -319,6 +343,7 @@ function LevelsTweakData:init()
 		"Play_pln_branchbank_cash_stage1_intro_a"
 	}
 	self.branchbank.outro_event = "Play_pln_branchbank_stage1_end"
+	self.branchbank.ghost_bonus = 0.2
 	self.branchbank_cloaker = {}
 	self.branchbank_cloaker.name_id = "heist_cloak_hl"
 	self.branchbank_cloaker.briefing_id = "heist_cloak_briefing"
@@ -575,6 +600,7 @@ function LevelsTweakData:init()
 	self.family.music = "heist"
 	self.family.package = "packages/narr_family"
 	self.family.cube = "cube_apply_heist_bank"
+	self.family.ghost_bonus = 0.3
 	self.on_time_1 = {}
 	self.on_time_1.name_id = "heist_on_time_1_hl"
 	self.on_time_1.briefing_id = "heist_on_time_1_briefing"
@@ -614,7 +640,7 @@ function LevelsTweakData:init()
 	self.big.name_id = "heist_big_hl"
 	self.big.briefing_id = "heist_big_briefing"
 	self.big.briefing_dialog = "Play_pln_big_brief"
-	self.big.world_name = "wip/big_4"
+	self.big.world_name = "narratives/bain/big"
 	self.big.intro_event = "Play_pln_firestarter_stage3_intro_a"
 	self.big.outro_event = {
 		"Play_pln_firestarter_stage3_end_a",
@@ -637,6 +663,7 @@ function LevelsTweakData:init()
 	self.roberts.music = "heist"
 	self.roberts.package = "packages/narr_roberts"
 	self.roberts.cube = "cube_apply_heist_bank"
+	self.roberts.ghost_bonus = 0.2
 	self.haunted = {}
 	self.haunted.name_id = "heist_haunted_hl"
 	self.haunted.briefing_id = "heist_haunted_briefing"
@@ -691,6 +718,19 @@ function LevelsTweakData:init()
 	self.blueharvest_3.music = "heist"
 	self.blueharvest_3.package = "packages/level_debug"
 	self.blueharvest_3.cube = "cube_apply_heist_bank"
+	self.hot = {}
+	self.hot.name_id = "heist_hot_hl"
+	self.hot.briefing_id = "heist_hot_briefing"
+	self.hot.briefing_dialog = "Play_pln_hot_brief"
+	self.hot.world_name = "wip/hm"
+	self.hot.intro_event = "Play_pln_firestarter_stage3_intro_a"
+	self.hot.outro_event = {
+		"Play_pln_firestarter_stage3_end_a",
+		"Play_pln_firestarter_stage3_end_b"
+	}
+	self.hot.music = "heist"
+	self.hot.package = "packages/level_debug"
+	self.hot.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -1230,6 +1270,7 @@ function LevelsTweakData:init()
 		"blueharvest_1",
 		"blueharvest_2",
 		"blueharvest_3",
+		"hot",
 		"test01",
 		"test02",
 		"test03",

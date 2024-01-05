@@ -715,6 +715,9 @@ function TeamAIDamage:clbk_exit_to_incapacitated()
 end
 
 function TeamAIDamage:on_incapacitated()
+	if self._fatal then
+		return
+	end
 	if self._tase_effect then
 		World:effect_manager():fade_kill(self._tase_effect)
 		self._tase_effect = nil
@@ -726,9 +729,11 @@ function TeamAIDamage:on_incapacitated()
 	}
 	self._bleed_out_health = 0
 	self:_check_fatal()
-	self._to_dead_clbk_id = "TeamAIDamage_to_dead" .. tostring(self._unit:key())
-	self._to_dead_t = TimerManager:game():time() + self._char_dmg_tweak.INCAPACITATED_TIME
-	managers.enemy:add_delayed_clbk(self._to_dead_clbk_id, callback(self, self, "clbk_exit_to_dead"), self._to_dead_t)
+	if not self._to_dead_clbk_id then
+		self._to_dead_clbk_id = "TeamAIDamage_to_dead" .. tostring(self._unit:key())
+		self._to_dead_t = TimerManager:game():time() + self._char_dmg_tweak.INCAPACITATED_TIME
+		managers.enemy:add_delayed_clbk(self._to_dead_clbk_id, callback(self, self, "clbk_exit_to_dead"), self._to_dead_t)
+	end
 	self:_call_listeners(dmg_info)
 	self._unit:network():send("from_server_damage_incapacitated")
 end
@@ -780,5 +785,9 @@ function TeamAIDamage:save(data)
 	if self._bleed_out then
 		data.char_dmg = data.char_dmg or {}
 		data.char_dmg.bleedout = true
+	end
+	if self._fatal then
+		data.char_dmg = data.char_dmg or {}
+		data.char_dmg.fatal = true
 	end
 end

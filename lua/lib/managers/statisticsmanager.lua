@@ -429,7 +429,12 @@ function StatisticsManager:_get_stat_tables()
 		"arm_hcm",
 		"arm_par",
 		"arm_fac",
-		"arm_for"
+		"arm_for",
+		"roberts",
+		"election_day_1",
+		"election_day_2",
+		"election_day_3_skip1",
+		"election_day_3_skip2"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -455,7 +460,10 @@ function StatisticsManager:_get_stat_tables()
 		"arm_par",
 		"arm_hcm",
 		"arm_und",
-		"arm_cro"
+		"arm_cro",
+		"roberts",
+		"election_day",
+		"election_day_prof"
 	}
 	return level_list, job_list
 end
@@ -525,6 +533,20 @@ function StatisticsManager:publish_to_steam(session, success)
 		method = "set",
 		value = 1
 	}
+	local current_rank = managers.experience:current_rank()
+	local current_rank_range = 5 < current_rank and 5 or current_rank
+	for i = 0, 5 do
+		stats["player_rank_" .. i] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats["player_rank_" .. current_rank_range] = {
+		type = "int",
+		method = "set",
+		value = 1
+	}
 	local current_cash = managers.money:offshore()
 	local cash_found = false
 	local cash_amount = 1000000000
@@ -580,9 +602,7 @@ function StatisticsManager:publish_to_steam(session, success)
 	if tweak_data.blackmarket.masks[mask_id].statistics then
 		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
 	end
-	if not Global.game_settings.difficulty == "overkill_290" then
-		stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
-	end
+	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	stats.heist_success = {
 		type = "int",
 		value = success and 1 or 0
@@ -605,6 +625,11 @@ function StatisticsManager:publish_to_steam(session, success)
 			stats["job_" .. job_id] = {type = "int", value = 1}
 			break
 		end
+	end
+	if level_id == "election_day_2" then
+		local stealth = managers.groupai and managers.groupai:state():whisper_mode()
+		print("[StatisticsManager]: Election Day 2 Voting: " .. (stealth and "Swing Vote" or "Delayed Vote"))
+		stats["stats_election_day_" .. (stealth and "s" or "n")] = {type = "int", value = 1}
 	end
 	managers.network.account:publish_statistics(stats)
 end
@@ -650,7 +675,11 @@ function StatisticsManager:publish_skills_to_steam()
 				value = 0
 			}
 		end
-		stats["skill_" .. tree.skill .. "_" .. math.ceil(skill_amount[tree_index] / 5) * 5] = {
+		local skill_count = math.ceil(skill_amount[tree_index] / 5) * 5
+		if 35 < skill_count then
+			skill_count = 35
+		end
+		stats["skill_" .. tree.skill .. "_" .. skill_count] = {
 			type = "int",
 			method = "set",
 			value = 1
@@ -693,6 +722,13 @@ function StatisticsManager:clear_statistics()
 	}
 	for i = 0, 100, 10 do
 		stats["player_level_" .. i] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	for i = 0, 5 do
+		stats["player_rank_" .. i] = {
 			type = "int",
 			method = "set",
 			value = 0
@@ -773,6 +809,33 @@ function StatisticsManager:clear_statistics()
 		value = 0
 	}
 	stats.heist_failed = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	local level_list, job_list = self:_get_stat_tables()
+	local level_id = managers.job:current_level_id()
+	for _, level in ipairs(level_list) do
+		stats["level_" .. level] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	local job_id = managers.job:current_job_id()
+	for _, job in ipairs(job_list) do
+		stats["job_" .. job] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats.stats_election_day_s = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
+	stats.stats_election_day_n = {
 		type = "int",
 		method = "set",
 		value = 0
@@ -867,6 +930,7 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 	local stats = {}
 	local account = managers.network.account
 	days = days or nil
+	local num_players = 0
 	local play_times = {
 		0,
 		10,
@@ -882,6 +946,7 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 	}
 	for _, play_time in ipairs(play_times) do
 		key = "player_time_" .. play_time .. "h"
+		num_players = num_players + account:get_global_stat(key, days)
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
@@ -895,6 +960,14 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 	})
 	for i = 0, 100, 10 do
 		key = "player_level_" .. i
+		table.insert(stats, {
+			name = key,
+			loc = account:get_stat(key),
+			glo = account:get_global_stat(key, days)
+		})
+	end
+	for i = 0, 5 do
+		key = "player_rank_" .. i
 		table.insert(stats, {
 			name = key,
 			loc = account:get_stat(key),
@@ -1032,6 +1105,16 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 		})
 	end
 	table.insert(stats, {
+		name = "stats_election_day_s",
+		loc = account:get_stat("stats_election_day_s"),
+		glo = account:get_global_stat("stats_election_day_s", days)
+	})
+	table.insert(stats, {
+		name = "stats_election_day_n",
+		loc = account:get_stat("stats_election_day_n"),
+		glo = account:get_global_stat("stats_election_day_n", days)
+	})
+	table.insert(stats, {
 		name = "payday2",
 		loc = account:get_stat("payday2"),
 		glo = account:get_global_stat("payday2", days)
@@ -1040,6 +1123,10 @@ function StatisticsManager:debug_print_stats(global_flag, days)
 	print((global_flag and "GLOBAL" or "LOCAL") .. " STEAM STATISTICS FOR " .. (days == 1 and "TODAY" or not days and "ALLTIME" or "LAST " .. days .. " DAYS\n"))
 	for key, data in pairs(stats) do
 		print(data.name, global_flag and data.glo or data.loc)
+	end
+	if global_flag then
+		print("----------------------------------")
+		print("Unique Players: " .. managers.money:add_decimal_marks_to_string(tostring(num_players)))
 	end
 	print("----------------------------------")
 end

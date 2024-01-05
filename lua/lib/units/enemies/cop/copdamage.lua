@@ -624,6 +624,10 @@ function CopDamage:die(variant)
 	self._unit:inventory():drop_shield()
 	if self._unit:unit_data().mission_element then
 		self._unit:unit_data().mission_element:event("death", self._unit)
+		if not self._unit:unit_data().alerted_event_called then
+			self._unit:unit_data().alerted_event_called = true
+			self._unit:unit_data().mission_element:event("alerted", self._unit)
+		end
 	end
 	if self._unit:movement() then
 		self._unit:movement():remove_giveaway()
@@ -1081,5 +1085,6 @@ function CopDamage:load(data)
 	if data.char_dmg.is_converted then
 		self._unit:set_slot(16)
 		managers.groupai:state():sync_converted_enemy(self._unit)
+		self._unit:contour():add("friendly", false)
 	end
 end

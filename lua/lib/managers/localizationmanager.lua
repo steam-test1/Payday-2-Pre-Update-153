@@ -28,6 +28,8 @@ function LocalizationManager:_setup_macros()
 	local btn_dpad_l = utf8.char(57358)
 	local btn_dpad_r = utf8.char(57358)
 	local btn_inv_new = utf8.char(57362)
+	local btn_ghost = utf8.char(57363)
+	local btn_skull = utf8.char(57364)
 	if SystemInfo:platform() ~= Idstring("PS3") then
 		btn_top_l = utf8.char(57354)
 		btn_bottom_l = utf8.char(57352)
@@ -83,6 +85,8 @@ function LocalizationManager:_setup_macros()
 	self:set_default_macro("CONTINUE", btn_a)
 	self:set_default_macro("BTN_GADGET", btn_dpad_u)
 	self:set_default_macro("BTN_INV_NEW", btn_inv_new)
+	self:set_default_macro("BTN_GHOST", btn_ghost)
+	self:set_default_macro("BTN_SKULL", btn_skull)
 end
 
 local is_PS3 = SystemInfo:platform() == Idstring("PS3")

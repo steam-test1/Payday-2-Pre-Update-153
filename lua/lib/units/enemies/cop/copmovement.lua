@@ -357,8 +357,12 @@ function CopMovement:_upd_actions(t)
 	if has_no_action and (not self._queued_actions or not next(self._queued_actions)) then
 		self:action_request({type = "idle", body_part = 1})
 	end
-	if not a_actions[1] and not a_actions[3] and (not self._queued_actions or not next(self._queued_actions)) and not self:chk_action_forbidden("action") then
-		self:action_request({type = "idle", body_part = 3})
+	if not a_actions[1] and not a_actions[2] and (not self._queued_actions or not next(self._queued_actions)) and not self:chk_action_forbidden("action") then
+		if a_actions[3] then
+			self:action_request({type = "idle", body_part = 2})
+		else
+			self:action_request({type = "idle", body_part = 1})
+		end
 	end
 	self:_upd_stance(t)
 	if not self._need_upd and (self._ext_anim.base_need_upd or self._ext_anim.upper_need_upd or self._stance.transition or self._suppression.transition) then
@@ -779,6 +783,10 @@ function CopMovement:set_cool(state, giveaway)
 	self._action_common_data.is_cool = state
 	if not state and old_state then
 		self._not_cool_t = TimerManager:game():time()
+		if self._unit:unit_data().mission_element and not self._unit:unit_data().alerted_event_called then
+			self._unit:unit_data().alerted_event_called = true
+			self._unit:unit_data().mission_element:event("alerted", self._unit)
+		end
 	end
 	self._unit:brain():on_cool_state_changed(state)
 	if not state and old_state and self._unit:unit_data().mission_element then
@@ -815,6 +823,7 @@ function CopMovement:synch_attention(attention)
 		local listener_key = "CopMovement" .. tostring(self._unit:key())
 		attention.destroy_listener_key = listener_key
 		attention.unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
+		attention.debug_unit_name = attention.unit:name()
 	end
 	self._attention = attention
 	self._action_common_data.attention = attention
@@ -1814,7 +1823,11 @@ function CopMovement:pre_destroy()
 		end
 	end
 	if self._attention and self._attention.destroy_listener_key then
-		self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
+		if alive(self._attention.unit) then
+			self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
+		else
+			debug_pause_unit(self._unit, "[CopMovement:pre_destroy] destroyed unit did not remove attention: ", self._attention.debug_unit_name)
+		end
 		self._attention.destroy_listener_key = nil
 	end
 end

@@ -107,6 +107,7 @@ require("lib/units/equipment/sentry_gun/SentryGunMovement")
 require("lib/units/equipment/sentry_gun/SentryGunDamage")
 require("lib/units/equipment/ecm_jammer/ECMJammerBase")
 require("lib/units/equipment/grenade_crate/GrenadeCrateBase")
+require("lib/units/equipment/bodybags_bag/BodyBagsBagBase")
 require("lib/units/ContourExt")
 require("lib/units/weapons/RaycastWeaponBase")
 require("lib/units/weapons/NewRaycastWeaponBase")
@@ -203,6 +204,11 @@ function GameSetup:load_packages()
 		self._loaded_contact_package = contact_package
 		PackageManager:load(contact_package)
 	end
+	local contract_package = job_tweak_data and job_tweak_data.package
+	if contract_package and not PackageManager:loaded(contract_package) then
+		self._loaded_contract_package = contract_package
+		PackageManager:load(contract_package)
+	end
 end
 
 function GameSetup:unload_packages()
@@ -236,6 +242,10 @@ function GameSetup:unload_packages()
 	if PackageManager:loaded(self._loaded_contact_package) then
 		PackageManager:unload(self._loaded_contact_package)
 		self._loaded_contact_package = nil
+	end
+	if PackageManager:loaded(self._loaded_contract_package) then
+		PackageManager:unload(self._loaded_contract_package)
+		self._loaded_contract_package = nil
 	end
 end
 
@@ -411,6 +421,7 @@ function GameSetup:load(data)
 	managers.enemy:load(data)
 	managers.assets:sync_load(data)
 	managers.job:sync_load(data)
+	managers.menu_component:load(data)
 end
 
 function GameSetup:_update_debug_input()

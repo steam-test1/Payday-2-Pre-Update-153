@@ -1,4 +1,4 @@
-require("lib/units/enemies/cop/logics/CopLogicBase")
+require("lib/units/civilians/logics/CivilianLogicBase")
 require("lib/units/civilians/logics/CivilianLogicInactive")
 require("lib/units/civilians/logics/CivilianLogicIdle")
 require("lib/units/civilians/logics/CivilianLogicFlee")
@@ -7,6 +7,7 @@ require("lib/units/civilians/logics/CivilianLogicEscort")
 require("lib/units/civilians/logics/CivilianLogicTravel")
 require("lib/units/civilians/logics/CivilianLogicTrade")
 CivilianBrain = CivilianBrain or class(CopBrain)
+CivilianBrain.set_attention_settings = PlayerMovement.set_attention_settings
 CivilianBrain._logics = {
 	inactive = CivilianLogicInactive,
 	idle = CivilianLogicIdle,
@@ -92,6 +93,116 @@ function CivilianBrain:on_cool_state_changed(state)
 	managers.groupai:state():add_alert_listener(self._alert_listen_key, callback(self, self, "on_alert"), alert_listen_filter, alert_types, self._unit:movement():m_head_pos())
 end
 
-function CivilianBrain:set_attention_settings(att_settings)
-	PlayerMovement.set_attention_settings(self, att_settings)
+function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
+	if not self._logic_data.is_tied then
+		return
+	end
+	if command == "move" then
+		local following_hostages = managers.groupai:state():get_following_hostages(interacting_unit)
+		if following_hostages and table.size(following_hostages) >= tweak_data.player.max_nr_following_hostages then
+			return
+		end
+		if not self._unit:anim_data().drop and self._unit:anim_data().tied then
+			return
+		end
+		local stand_action_desc = {
+			type = "act",
+			variant = "stand_tied",
+			body_part = 1,
+			clamp_to_graph = true
+		}
+		local action = self._unit:movement():action_request(stand_action_desc)
+		if not action then
+			return
+		end
+		self._unit:movement():set_stance("cbt")
+		local follow_objective = {
+			type = "follow",
+			follow_unit = interacting_unit,
+			nav_seg = interacting_unit:movement():nav_tracker():nav_segment(),
+			interrupt_dis = 0,
+			interrupt_health = 0,
+			loose_track_dis = 2000,
+			distance = 500,
+			stance = "cbt",
+			fail_clbk = callback(self, self, "on_hostage_follow_objective_failed")
+		}
+		self:set_objective(follow_objective)
+		self._unit:interaction():set_tweak_data("hostage_stay")
+		self._unit:interaction():set_active(true, true)
+		interacting_unit:sound():say("f38_any", false, true)
+		self._following_hostage_contour_id = self._unit:contour():add("friendly", true)
+		managers.groupai:state():on_hostage_follow(interacting_unit, self._unit, true)
+	elseif command == "stay" then
+		if not self._unit:anim_data().stand then
+			return
+		end
+		self:set_objective({
+			type = "surrender",
+			amount = 1,
+			aggressor_unit = interacting_unit
+		})
+		if not self._unit:anim_data().stand then
+			return
+		end
+		local stand_action_desc = {
+			type = "act",
+			variant = "drop",
+			body_part = 1,
+			clamp_to_graph = true
+		}
+		local action = self._unit:movement():action_request(stand_action_desc)
+		if not action then
+			return
+		end
+		self._unit:movement():set_stance("hos")
+		self._unit:interaction():set_tweak_data("hostage_move")
+		self._unit:interaction():set_active(true, true)
+		if alive(interacting_unit) then
+			interacting_unit:sound():say("f02x_sin", false, true)
+		end
+		if self._following_hostage_contour_id then
+			self._unit:contour():remove_by_id(self._following_hostage_contour_id, true)
+			self._following_hostage_contour_id = nil
+		end
+		managers.groupai:state():on_hostage_follow(interacting_unit, self._unit, false)
+	elseif command == "release" then
+		self._logic_data.is_tied = nil
+		self:set_objective(nil)
+		local stand_action_desc = {
+			type = "act",
+			variant = "panic",
+			body_part = 1
+		}
+		local action = self._unit:movement():action_request(stand_action_desc)
+		if not action then
+			return
+		end
+		self._unit:interaction():set_tweak_data("intimidate")
+		self._unit:interaction():set_active(false, true)
+		if self._following_hostage_contour_id then
+			self._unit:contour():remove_by_id(self._following_hostage_contour_id, true)
+			self._following_hostage_contour_id = nil
+		end
+		managers.groupai:state():on_hostage_follow(interacting_unit, self._unit, false)
+	end
+	return true
+end
+
+function CivilianBrain:on_hostage_follow_objective_failed(unit)
+	if not unit:character_damage():dead() then
+		self:on_hostage_move_interaction(nil, "stay")
+	end
+end
+
+function CivilianBrain:is_tied()
+	return self._logic_data.is_tied
+end
+
+function CivilianBrain:save(save_data)
+	CivilianBrain.super.save(self, save_data)
+	local my_save_data = save_data.brain
+	if self._following_hostage_contour_id then
+		my_save_data.following_hostage_contour = true
+	end
 end

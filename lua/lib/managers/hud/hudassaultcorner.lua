@@ -243,8 +243,17 @@ function HUDAssaultCorner:_animate_text(text_panel, bg_box, color)
 			text_panel:remove(texts[text_index].text)
 			texts[text_index] = nil
 		end
+		local text_id = text_list[text_index]
+		local text_string = ""
+		if type(text_id) == "string" then
+			text_string = managers.localization:to_upper_text(text_id)
+		elseif text_id == Idstring("risk") then
+			for i = 1, managers.job:current_difficulty_stars() do
+				text_string = text_string .. managers.localization:get_default_macro("BTN_SKULL")
+			end
+		end
 		local text = text_panel:text({
-			text = utf8.to_upper(managers.localization:text(text_list[text_index])),
+			text = text_string,
 			layer = 1,
 			align = "center",
 			vertical = "center",
@@ -295,14 +304,28 @@ function HUDAssaultCorner:sync_start_assault(data)
 		return
 	end
 	self:_hide_hostages()
-	self:_start_assault({
-		"hud_assault_assault",
-		"hud_assault_end_line",
-		"hud_assault_assault",
-		"hud_assault_end_line",
-		"hud_assault_assault",
-		"hud_assault_end_line"
-	})
+	if managers.job:current_difficulty_stars() > 0 then
+		local ids_risk = Idstring("risk")
+		self:_start_assault({
+			"hud_assault_assault",
+			"hud_assault_end_line",
+			ids_risk,
+			"hud_assault_end_line",
+			"hud_assault_assault",
+			"hud_assault_end_line",
+			ids_risk,
+			"hud_assault_end_line"
+		})
+	else
+		self:_start_assault({
+			"hud_assault_assault",
+			"hud_assault_end_line",
+			"hud_assault_assault",
+			"hud_assault_end_line",
+			"hud_assault_assault",
+			"hud_assault_end_line"
+		})
+	end
 end
 
 function HUDAssaultCorner:sync_end_assault(result)

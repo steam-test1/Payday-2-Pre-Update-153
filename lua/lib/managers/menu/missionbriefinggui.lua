@@ -225,8 +225,9 @@ function DescriptionItem:init(panel, text, i, saved_descriptions)
 	local x, y, w, h = title_text:text_rect()
 	title_text:set_size(w, h)
 	title_text:set_position(math.round(title_text:x()), math.round(title_text:y()))
+	local pro_text
 	if managers.job:is_current_job_professional() then
-		local pro_text = self._panel:text({
+		pro_text = self._panel:text({
 			name = "pro_text",
 			text = managers.localization:to_upper_text("cn_menu_pro_job"),
 			font_size = tweak_data.menu.pd2_medium_font_size,
@@ -243,18 +244,38 @@ function DescriptionItem:init(panel, text, i, saved_descriptions)
 		y = title_text:bottom()
 	})
 	self._scroll_panel:grow(-self._scroll_panel:x() - 10, -self._scroll_panel:y())
+	local desc_string = managers.localization:text(briefing_id)
+	local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
+	if is_level_ghostable and Network:is_server() then
+		desc_string = desc_string .. [[
+
+
+]] .. managers.localization:text("menu_ghostable_stage")
+	end
 	local desc_text = self._scroll_panel:text({
 		name = "description_text",
-		text = managers.localization:text(briefing_id),
+		text = desc_string,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		font = tweak_data.menu.pd2_small_font,
 		wrap = true,
 		word_wrap = true,
 		color = tweak_data.screen_colors.text
 	})
+	if saved_descriptions then
+		local text = ""
+		for i, text_id in ipairs(saved_descriptions) do
+			text = text .. managers.localization:text(text_id) .. "\n"
+		end
+		desc_text:set_text(text)
+	end
+	self:_chk_add_scrolling()
+end
+
+function DescriptionItem:_chk_add_scrolling()
+	local desc_text = self._scroll_panel:child("description_text")
 	local _, _, _, h = desc_text:text_rect()
 	desc_text:set_h(h)
-	if desc_text:h() > self._scroll_panel:h() then
+	if desc_text:h() > self._scroll_panel:h() and not self._scrolling then
 		self._scrolling = true
 		self._scroll_box = BoxGuiObject:new(self._scroll_panel, {
 			sides = {
@@ -303,13 +324,22 @@ function DescriptionItem:init(panel, text, i, saved_descriptions)
 			legend_text:set_size(lw, lh)
 			legend_text:set_righttop(self._panel:w() - 5, 10)
 		end
+	elseif self._scrolling then
 	end
-	if saved_descriptions then
-		local text = ""
-		for i, text_id in ipairs(saved_descriptions) do
-			text = text .. managers.localization:text(text_id) .. "\n"
+end
+
+function DescriptionItem:on_whisper_mode_changed()
+	local briefing_id = managers.job:current_briefing_id()
+	if briefing_id then
+		local desc_string = managers.localization:text(briefing_id)
+		local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
+		if is_level_ghostable then
+			desc_string = desc_string .. [[
+
+
+]] .. managers.localization:text("menu_ghostable_stage")
 		end
-		desc_text:set_text(text)
+		self:set_description_text(desc_string)
 	end
 end
 
@@ -318,11 +348,13 @@ function DescriptionItem:set_title_text(text)
 end
 
 function DescriptionItem:add_description_text(text)
-	self._panel:child("description_text"):set_text(self._panel:child("description_text"):text() .. "\n" .. text)
+	self._scroll_panel:child("description_text"):set_text(self._scroll_panel:child("description_text"):text() .. "\n" .. text)
+	self:_chk_add_scrolling()
 end
 
 function DescriptionItem:set_description_text(text)
-	self._panel:child("description_text"):set_text(text)
+	self._scroll_panel:child("description_text"):set_text(text)
+	self:_chk_add_scrolling()
 end
 
 function DescriptionItem:move_up()
@@ -2434,6 +2466,12 @@ function MissionBriefingGui:create_asset_tab()
 			table.insert(self._fullscreen_assets_list, asset)
 		end
 		self._assets_item:create_assets(assets_names)
+	end
+end
+
+function MissionBriefingGui:on_whisper_mode_changed()
+	if self._description_item then
+		self._description_item:on_whisper_mode_changed()
 	end
 end
 

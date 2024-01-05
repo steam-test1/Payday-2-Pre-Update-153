@@ -31,6 +31,7 @@ CivilianActionWalk._walk_anim_velocities = {
 		}
 	}
 }
+CivilianActionWalk._walk_anim_velocities.stand.cbt = CivilianActionWalk._walk_anim_velocities.stand.hos
 CivilianActionWalk._anim_movement = {
 	stand = {
 		run_start_turn_bwd = {

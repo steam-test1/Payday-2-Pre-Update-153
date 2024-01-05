@@ -525,7 +525,8 @@ function NetworkPeer:flush_overwriteable_msgs()
 		if ok then
 			self:send(unpack(rpc_params))
 		else
-			debug_pause("[NetworkPeer:flush_overwriteable_msgs] msg with dead params peer_id:", self._id, "msg", msg_name, "params", unpack(rpc_params))
+			Application:error("[NetworkPeer:flush_overwriteable_msgs] msg with dead params peer_id:", self._id, "msg", msg_name, "params", unpack(rpc_params))
+			Application:stack_dump("error")
 		end
 	end
 	self._overwriteable_queue = {}

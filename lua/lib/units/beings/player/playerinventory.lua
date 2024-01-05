@@ -49,6 +49,7 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/payday2/weapons/wpn_fps_saw/wpn_fps_saw"),
 	Idstring("units/payday2/weapons/wpn_fps_shot_shorty/wpn_fps_shot_shorty"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_usp/wpn_fps_pis_usp"),
+	Idstring("units/payday2/weapons/wpn_fps_pis_g22c/wpn_fps_pis_g22c"),
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45/wpn_fps_smg_m45"),
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_ass_s552/wpn_fps_ass_s552"),
 	Idstring("units/pd2_dlc1/weapons/wpn_fps_pis_ppk/wpn_fps_pis_ppk"),

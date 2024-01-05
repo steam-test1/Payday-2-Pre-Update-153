@@ -460,7 +460,7 @@ function CopLogicIdle.on_intimidated(data, amount, aggressor_unit)
 			end
 		end
 		if surrender then
-			CopLogicIdle._surrender(data, amount)
+			CopLogicIdle._surrender(data, amount, aggressor_unit)
 		else
 			data.unit:brain():on_surrender_chance()
 		end
@@ -470,8 +470,8 @@ function CopLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	return surrender
 end
 
-function CopLogicIdle._surrender(data, amount)
-	local params = {effect = amount}
+function CopLogicIdle._surrender(data, amount, aggressor_unit)
+	local params = {effect = amount, aggressor_unit = aggressor_unit}
 	data.unit:brain():set_logic("intimidated", params)
 	if data.objective then
 		managers.groupai:state():on_objective_failed(data.unit, data.objective)
@@ -747,19 +747,23 @@ function CopLogicIdle._chk_relocate(data)
 		if data.is_converted then
 			if TeamAILogicIdle._check_should_relocate(data, data.internal_data, data.objective) then
 				data.objective.in_place = nil
-				CopLogicIdle._exit(data.unit, "travel")
+				data.logic._exit(data.unit, "travel")
 				return true
 			end
 			return
 		end
+		if data.is_tied and data.objective.loose_track_dis and data.objective.loose_track_dis * data.objective.loose_track_dis < mvector3.distance_sq(data.m_pos, data.objective.follow_unit:movement():m_pos()) then
+			data.brain:set_objective(nil)
+			return true
+		end
 		local relocate
 		local follow_unit = data.objective.follow_unit
 		local advance_pos = follow_unit:brain() and follow_unit:brain():is_advancing()
-		local follow_unit_pos = advance_pos or data.m_pos
+		local follow_unit_pos = advance_pos or follow_unit:movement():m_pos()
 		if data.objective.relocated_to and mvector3.equal(data.objective.relocated_to, follow_unit_pos) then
 			return
 		end
-		if mvector3.distance(follow_unit:movement():m_pos(), follow_unit_pos) > data.objective.distance then
+		if mvector3.distance(data.m_pos, follow_unit_pos) > data.objective.distance then
 			relocate = true
 		end
 		if not relocate then
@@ -776,7 +780,7 @@ function CopLogicIdle._chk_relocate(data)
 			data.objective.in_place = nil
 			data.objective.nav_seg = follow_unit:movement():nav_tracker():nav_segment()
 			data.objective.relocated_to = mvector3.copy(follow_unit_pos)
-			CopLogicBase._exit(data.unit, "travel")
+			data.logic._exit(data.unit, "travel")
 			return true
 		end
 	end
@@ -975,7 +979,7 @@ function CopLogicIdle._upd_curious_reaction(data)
 	local turn_spin = 70
 	local attention_obj = data.attention_obj
 	local dis = attention_obj.dis
-	local is_suspicious = attention_obj.reaction == AIAttentionObject.REACT_SUSPICIOUS
+	local is_suspicious = data.cool and attention_obj.reaction == AIAttentionObject.REACT_SUSPICIOUS
 	local set_attention = data.unit:movement():attention()
 	if not set_attention or set_attention.u_key ~= attention_obj.u_key then
 		CopLogicBase._set_attention(data, attention_obj)

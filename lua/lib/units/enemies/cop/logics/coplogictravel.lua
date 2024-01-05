@@ -336,7 +336,7 @@ function CopLogicTravel._upd_enemy_detection(data)
 		end
 	end
 	if my_data == data.internal_data then
-		if new_reaction == AIAttentionObject.REACT_SUSPICIOUS and CopLogicBase._upd_suspicion(data, my_data, new_attention) then
+		if data.cool and new_reaction == AIAttentionObject.REACT_SUSPICIOUS and CopLogicBase._upd_suspicion(data, my_data, new_attention) then
 			CopLogicBase._report_detections(data.detected_attention_objects)
 			return
 		elseif new_reaction and new_reaction <= AIAttentionObject.REACT_SCARED then

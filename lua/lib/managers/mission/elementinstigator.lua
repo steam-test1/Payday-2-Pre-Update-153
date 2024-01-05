@@ -183,7 +183,7 @@ function ElementInstigatorOperator:_check_and_execute(use_instigator)
 	if alive(use_instigator) and not use_instigator:character_damage():dead() then
 		ElementInstigatorOperator.super.on_executed(self, use_instigator)
 	elseif Application:editor() then
-		managers.editor:output_error("Cant use instigator. Reason: " .. ((alive(use_instigator) or not " Dont exist") and use_instigator:character_damage():dead() and "Dead") .. ". In element " .. self._editor_name .. ".")
+		managers.editor:output_warning("Cant use instigator. Reason: " .. ((alive(use_instigator) or not " Dont exist") and use_instigator:character_damage():dead() and "Dead") .. ". In element " .. self._editor_name .. ".")
 	end
 end
 

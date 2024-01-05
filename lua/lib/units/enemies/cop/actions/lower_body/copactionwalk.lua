@@ -472,6 +472,7 @@ function CopActionWalk:_init()
 		self._ext_network:send("action_walk_start", self._nav_point_pos(next_nav_point), nav_link_act_yaw, nav_link_act_index, nav_link_from_idle, sync_haste, sync_yaw, self._no_walk and true or false, self._no_strafe and true or false)
 	end
 	if Network:is_server() then
+		self._unit:brain():rem_pos_rsrv("stand")
 		self._unit:brain():add_pos_rsrv("move_dest", {
 			position = mvector3.copy(self._simplified_path[#self._simplified_path]),
 			radius = 30
@@ -755,12 +756,6 @@ function CopActionWalk:on_exit()
 	end
 	if Network:is_server() then
 		self._unit:brain():rem_pos_rsrv("move_dest")
-		if not self._unit:character_damage():dead() then
-			self._unit:brain():add_pos_rsrv("stand", {
-				position = mvector3.copy(self._common_data.pos),
-				radius = 30
-			})
-		end
 	end
 end
 
@@ -787,6 +782,9 @@ function CopActionWalk:_upd_wait_for_full_blend(t)
 			end
 			return
 		end
+	else
+		self._ext_movement:set_m_rot(self._unit:rotation())
+		self._ext_movement:set_m_pos(self._unit:position())
 	end
 end
 
