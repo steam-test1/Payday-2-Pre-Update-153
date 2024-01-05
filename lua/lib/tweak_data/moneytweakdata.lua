@@ -207,15 +207,15 @@ function MoneyTweakData:init(tweak_data)
 		10,
 		13
 	}
-	self.preplaning_asset_cost_thermite = 10
-	self.preplaning_asset_cost_escapebig = 40000
+	self.preplaning_asset_cost_thermite = 15000
+	self.preplaning_asset_cost_escapebig = 10000
 	self.preplaning_asset_cost_spycam = 1000
 	self.preplaning_asset_cost_delay30 = 2000
 	self.preplaning_asset_cost_timelock60 = 2000
-	self.preplaning_asset_cost_cake = 5000
+	self.preplaning_asset_cost_cake = 3000
 	self.preplaning_asset_cost_extracameras = 500
 	self.preplaning_asset_cost_accesscameras = 1000
-	self.preplaning_asset_cost_drillparts = 5000
+	self.preplaning_asset_cost_drillparts = 3000
 	self.preplaning_asset_cost_deaddropbag = 1600
 	self.preplaning_asset_cost_unlocked_door = 1000
 	self.preplaning_asset_cost_unlocked_window = 1000

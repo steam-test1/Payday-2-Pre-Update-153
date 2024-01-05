@@ -460,7 +460,7 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.escape_zipline_loud.category = "escape_plan"
 	self.types.escape_zipline_loud.icon = 54
 	self.types.escape_zipline_loud.total = 1
-	self.types.escape_zipline_loud.cost = tweak_data:get_value("money_manager", "mission_asset_cost_large", 2)
+	self.types.escape_zipline_loud.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_zipline")
 	self.types.escape_zipline_loud.budget_cost = 3
 	self.types.escape_zipline_loud.post_event = "gus_preplan_17"
 	self.types.escape_zipline_loud.prio = 2
@@ -540,7 +540,7 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.vault_thermite.category = "vault_plan"
 	self.types.vault_thermite.icon = 51
 	self.types.vault_thermite.total = 1
-	self.types.vault_thermite.cost = tweak_data:get_value("money_manager", "mission_asset_cost_large", 4)
+	self.types.vault_thermite.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_thermite")
 	self.types.vault_thermite.budget_cost = 8
 	self.types.vault_thermite.post_event = "gus_preplan_02"
 	self.types.vault_thermite.prio = 1
