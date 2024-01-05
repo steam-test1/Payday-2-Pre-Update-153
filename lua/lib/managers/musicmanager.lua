@@ -284,6 +284,8 @@ function MusicManager:jukebox_default_tracks()
 		heist_roberts = "track_10",
 		heist_mia1 = "all",
 		heist_mia2 = "all",
+		heist_hox1 = "track_20",
+		heist_hox2 = "track_21",
 		heist_jewelry_store = "track_01",
 		heist_mallcrasher = "track_03",
 		heist_nightclub = "track_05",

@@ -425,7 +425,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{1, 9}
 	}
 	self.values.player.berserker_no_ammo_cost = {true}
-	self.values.player.hostage_health_regen_addend = {0.003, 0.01}
+	self.values.player.hostage_health_regen_addend = {0.006, 0.02}
 	self.values.player.carry_sentry_and_trip = {true}
 	self.values.player.tier_armor_multiplier = {
 		1.05,
@@ -557,7 +557,6 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.7, 5}
 	}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.4, 0.2}
-	self.values.player.hostage_health_regen_addend = {0.8, 0.02}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},

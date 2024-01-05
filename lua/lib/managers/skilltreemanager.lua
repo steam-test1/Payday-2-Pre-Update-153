@@ -315,7 +315,7 @@ function SkillTreeManager:_unlock(tree, skill_id)
 end
 
 function SkillTreeManager:_aquire_skill(skill, skill_id, loading)
-	if skill.upgrades then
+	if skill and skill.upgrades then
 		for _, upgrade in ipairs(skill.upgrades) do
 			managers.upgrades:aquire(upgrade, loading, UpgradesManager.AQUIRE_STRINGS[2] .. "_" .. tostring(skill_id))
 		end
