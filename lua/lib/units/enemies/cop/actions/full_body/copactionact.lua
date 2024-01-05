@@ -291,7 +291,8 @@ CopActionAct._act_redirects.SO = {
 	"cmf_so_press_alarm_table",
 	"cm_so_investigate_hi",
 	"cm_so_investigate_low",
-	"cm_so_hide"
+	"cm_so_hide",
+	"cmf_so_smoke"
 }
 
 function CopActionAct:init(action_desc, common_data)

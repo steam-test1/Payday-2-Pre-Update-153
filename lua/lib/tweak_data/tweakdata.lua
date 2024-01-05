@@ -2386,10 +2386,10 @@ function TweakData:init()
 		reindeer_games = {
 			award = "charliesierra_9",
 			masks = {
-				"A",
-				"B",
-				"C",
-				"D"
+				"santa_happy",
+				"santa_mad",
+				"santa_drunk",
+				"santa_surprise"
 			}
 		}
 	}

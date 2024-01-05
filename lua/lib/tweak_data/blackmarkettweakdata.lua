@@ -879,6 +879,39 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.santa_happy.value = 4
 	self.masks.santa_happy.dlc = "pd2_clan"
 	self.masks.santa_happy.global_value = "pd2_clan"
+	self.masks.santa_mad = {}
+	self.masks.santa_mad.unit = "units/pd2_dlc_xmas/masks/msk_santa_mad/msk_santa_mad"
+	self.masks.santa_mad.name_id = "bm_msk_santa_mad"
+	self.masks.santa_mad.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.santa_mad.value = 4
+	self.masks.santa_mad.dlc = "xmas_soundtrack"
+	self.masks.santa_drunk = {}
+	self.masks.santa_drunk.unit = "units/pd2_dlc_xmas/masks/msk_santa_drunk/msk_santa_drunk"
+	self.masks.santa_drunk.name_id = "bm_msk_santa_drunk"
+	self.masks.santa_drunk.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.santa_drunk.value = 4
+	self.masks.santa_drunk.dlc = "xmas_soundtrack"
+	self.masks.santa_surprise = {}
+	self.masks.santa_surprise.unit = "units/pd2_dlc_xmas/masks/msk_santa_suprise/msk_santa_suprise"
+	self.masks.santa_surprise.name_id = "bm_msk_santa_surprise"
+	self.masks.santa_surprise.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.santa_surprise.value = 4
+	self.masks.santa_surprise.dlc = "xmas_soundtrack"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

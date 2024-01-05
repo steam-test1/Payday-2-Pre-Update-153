@@ -123,6 +123,7 @@ function MoneyTweakData:init()
 	self.global_value_multipliers.xmas = 1
 	self.global_value_multipliers.armored_transport = 1.2
 	self.global_value_multipliers.gage_pack = 1.4
+	self.global_value_multipliers.xmas_soundtrack = 1
 	self.global_value_multipliers.sweettooth = 1
 	self.global_value_multipliers.legendary = 1
 	self.global_value_bonus_multiplier = {}
@@ -137,6 +138,7 @@ function MoneyTweakData:init()
 	self.global_value_bonus_multiplier.xmas = 0
 	self.global_value_bonus_multiplier.armored_transport = 0.5
 	self.global_value_bonus_multiplier.gage_pack = 0.5
+	self.global_value_bonus_multiplier.xmas_soundtrack = 0
 	self.global_value_bonus_multiplier.sweettooth = 0
 	self.global_value_bonus_multiplier.legendary = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate

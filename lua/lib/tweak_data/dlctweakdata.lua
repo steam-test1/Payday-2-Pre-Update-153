@@ -322,6 +322,28 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.xmas_soundtrack = {}
+	self.xmas_soundtrack.content = {}
+	self.xmas_soundtrack.dlc = "has_xmas_soundtrack"
+	self.xmas_soundtrack.content.loot_drops = {
+		{
+			{
+				type_items = "masks",
+				item_entry = "santa_mad",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "santa_drunk",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "santa_surprise",
+				amount = 1
+			}
+		}
+	}
 	self.sweettooth = {}
 	self.sweettooth.content = {}
 	self.sweettooth.dlc = "has_sweettooth"

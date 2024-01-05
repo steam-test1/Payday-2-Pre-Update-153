@@ -41,6 +41,14 @@ function GuiTweakData:init()
 			date_id = "menu_content_charliesierra_date",
 			webpage = "http://www.overkillsoftware.com/charliesanta/",
 			image = "guis/textures/pd2/content_updates/charliesierra"
+		},
+		{
+			id = "christmas",
+			name_id = "menu_content_christmas",
+			desc_id = "menu_content_christmas_desc",
+			date_id = "menu_content_christmas_date",
+			store = 267381,
+			image = "guis/textures/pd2/content_updates/christmas"
 		}
 	}
 	self.num_previous_updates = 6
