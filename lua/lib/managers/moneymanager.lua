@@ -459,15 +459,8 @@ function MoneyManager:get_weapon_sell_value(weapon_id)
 end
 
 function MoneyManager:_get_weapon_pc(weapon_id)
-	local weapon_level
-	for level, level_data in pairs(tweak_data.upgrades.level_tree) do
-		for _, upgrade in ipairs(level_data.upgrades) do
-			if upgrade == weapon_id then
-				weapon_level = level
-				break
-			end
-		end
-	end
+	local weapon_data = managers.blackmarket:get_weapon_data(weapon_id) or {}
+	local weapon_level = weapon_data.level
 	if not weapon_level then
 		Application:error("DIDN'T FIND LEVEL FOR", weapon_id)
 		weapon_level = 1
@@ -590,6 +583,22 @@ function MoneyManager:_get_pc_entry(entry)
 		end
 	end
 	return pc_value
+end
+
+function MoneyManager:get_buy_mask_slot_price()
+	local multiplier = 1
+	multiplier = multiplier * managers.player:upgrade_value("player", "buy_cost_multiplier", 1)
+	multiplier = multiplier * managers.player:upgrade_value("player", "crime_net_deal", 1)
+	return tweak_data:get_value("money_manager", "unlock_new_mask_slot_value")
+end
+
+function MoneyManager:can_afford_buy_mask_slot()
+	return self:total() >= self:get_buy_mask_slot_price()
+end
+
+function MoneyManager:on_buy_mask_slot(slot)
+	local amount = self:get_buy_mask_slot_price()
+	self:_deduct_from_total(amount)
 end
 
 function MoneyManager:get_mask_part_price_modified(category, id, global_value)

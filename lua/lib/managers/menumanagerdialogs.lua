@@ -625,6 +625,24 @@ function MenuManager:show_confirm_blackmarket_sell(params)
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_confirm_blackmarket_buy_mask_slot(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_bm_weapon_buy_title")
+	dialog_data.text = managers.localization:text("dialog_blackmarket_buy_mask_slot", {
+		money = params.money
+	})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_confirm_blackmarket_buy(params)
 	local num_in_inventory = ""
 	local num_of_same = managers.blackmarket:get_crafted_item_amount(params.category, params.weapon)

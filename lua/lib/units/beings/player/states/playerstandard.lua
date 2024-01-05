@@ -617,7 +617,7 @@ end
 function PlayerStandard:_get_max_walk_speed(t)
 	local morale_boost_bonus = self._ext_movement:morale_boost()
 	morale_boost_bonus = morale_boost_bonus and morale_boost_bonus.move_speed_bonus or 1
-	local armor_penalty = managers.player:body_armor_movement_penalty()
+	local armor_penalty = managers.player:mod_movement_penalty(managers.player:body_armor_value("movement", nil, 1))
 	local speed_multiplier = 1 * morale_boost_bonus * armor_penalty
 	if self._state_data.in_steelsight then
 		return speed_multiplier * self._tweak_data.movement.speed.STEELSIGHT_MAX
@@ -1810,7 +1810,6 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 					local autohit_mul = math.lerp(1, tweak_data.player.suppression.autohit_chance_mul, suppression_ratio)
 					local suppression_mul = managers.blackmarket:threat_multiplier()
 					local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_multiplier_outnumbered", 1)
-					dmg_mul = dmg_mul * managers.player:upgrade_value("player", "passive_damage_multiplier", 1)
 					local weapon_category = weap_base:weapon_tweak_data().category
 					if managers.player:has_category_upgrade("player", "overkill_all_weapons") or weapon_category == "shotgun" or weapon_category == "saw" then
 						dmg_mul = dmg_mul * managers.player:temporary_upgrade_value("temporary", "overkill_damage_multiplier", 1)

@@ -618,6 +618,9 @@ function ReviveInteractionExt:interact(reviving_unit)
 		managers.network:session():send_to_peers_synched("sync_teammate_helped_hint", hint, self._unit, reviving_unit)
 		managers.trade:sync_teammate_helped_hint(self._unit, reviving_unit, hint)
 	end
+	if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.witch_doctor.mask then
+		managers.achievment:award_progress(tweak_data.achievement.witch_doctor.stat)
+	end
 end
 
 function ReviveInteractionExt:save(data)

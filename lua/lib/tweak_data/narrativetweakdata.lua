@@ -1164,6 +1164,42 @@ function NarrativeTweakData:init()
 		62000,
 		70000
 	}
+	self.jobs.haunted = {}
+	self.jobs.haunted.name_id = "heist_haunted"
+	self.jobs.haunted.briefing_id = "heist_haunted_crimenet"
+	self.jobs.haunted.contact = "bain"
+	self.jobs.haunted.region = "street"
+	self.jobs.haunted.jc = 10
+	self.jobs.haunted.chain = {
+		{
+			level_id = "haunted",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.haunted.briefing_event = nil
+	self.jobs.haunted.debrief_event = nil
+	self.jobs.haunted.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.haunted.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
+	self.jobs.haunted_prof = deep_clone(self.jobs.haunted)
+	self.jobs.haunted_prof.jc = 40
+	self.jobs.haunted_prof.professional = true
+	self.jobs.haunted_prof.region = "professional"
+	self.jobs.haunted_prof.payout = {
+		10000,
+		20000,
+		30000,
+		40000
+	}
 	self.jobs.escape_chain_test = {}
 	self.jobs.escape_chain_test.name_id = "heist_escape_chain_test"
 	self.jobs.escape_chain_test.briefing_id = "heist_escape_chain_test_briefing"
@@ -1206,7 +1242,8 @@ function NarrativeTweakData:init()
 		"branchbank_cash",
 		"branchbank_gold_prof",
 		"branchbank_prof",
-		"family"
+		"family",
+		"haunted"
 	}
 end
 

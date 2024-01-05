@@ -84,7 +84,8 @@ function AchievmentManager:_parse_achievments(platform)
 						id = reward.id,
 						name = ach.name,
 						exp = self.exp_awards[ach.awards_exp],
-						awarded = false
+						awarded = false,
+						dlc_loot = reward.dlc_loot or false
 					}
 				end
 			end
@@ -141,6 +142,19 @@ function AchievmentManager:_give_reward(id, skip_exp)
 	print("[AchievmentManager:_give_reward] ", id)
 	local data = self:get_info(id)
 	data.awarded = true
+	if data.dlc_loot then
+		managers.dlc:on_achievement_award_loot()
+	end
+end
+
+function AchievmentManager:award_progress(stat)
+	if Application:editor() or not managers.criminals:local_character_name() then
+		return
+	end
+	print("[AchievmentManager:award_progress]: ", stat .. " increased with 1")
+	local stats = {}
+	stats[stat] = {type = "int", value = 1}
+	managers.network.account:publish_statistics(stats, true)
 end
 
 function AchievmentManager:award_steam(id)

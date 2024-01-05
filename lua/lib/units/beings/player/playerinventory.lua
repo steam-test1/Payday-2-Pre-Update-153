@@ -42,7 +42,8 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/payday2/weapons/wpn_fps_shot_huntsman/wpn_fps_shot_huntsman"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_rage/wpn_fps_pis_rage"),
 	Idstring("units/payday2/weapons/wpn_fps_saw/wpn_fps_saw"),
-	Idstring("units/payday2/weapons/wpn_fps_shot_shorty/wpn_fps_shot_shorty")
+	Idstring("units/payday2/weapons/wpn_fps_shot_shorty/wpn_fps_shot_shorty"),
+	Idstring("units/payday2/weapons/wpn_fps_pis_usp/wpn_fps_pis_usp")
 }
 
 function PlayerInventory:init(unit)

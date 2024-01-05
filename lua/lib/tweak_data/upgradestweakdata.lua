@@ -7,7 +7,9 @@ function UpgradesTweakData:_init_pd2_values()
 		"rep_upgrade"
 	}
 	self.values.rep_upgrades.values = {2}
-	self.values.player.body_armor = {
+	self.values.player.body_armor = {}
+	self.values.player.body_armor.armor = {
+		0,
 		1,
 		2,
 		3,
@@ -15,7 +17,35 @@ function UpgradesTweakData:_init_pd2_values()
 		7,
 		15
 	}
-	self.values.player.armor_movement_penalty = {
+	self.values.player.body_armor.movement = {
+		1.05,
+		1.025,
+		1,
+		0.95,
+		0.75,
+		0.65,
+		0.5
+	}
+	self.values.player.body_armor.concealment = {
+		30,
+		26,
+		23,
+		21,
+		18,
+		12,
+		1
+	}
+	self.values.player.body_armor.dodge = {
+		0.2,
+		0.1,
+		0.05,
+		-0.05,
+		-0.1,
+		-0.25,
+		-0.75
+	}
+	self.values.player.body_armor.damage_shake = {
+		1,
 		0.96,
 		0.92,
 		0.85,
@@ -23,17 +53,20 @@ function UpgradesTweakData:_init_pd2_values()
 		0.65,
 		0.5
 	}
-	self.values.player.armor_dodge_penalty = {
+	self.values.player.body_armor.stamina = {
+		1.025,
 		1,
-		1,
-		0.8,
-		0.5,
-		0.25,
-		0
+		0.95,
+		0.9,
+		0.75,
+		0.65,
+		0.5
 	}
 	self.values.player.special_enemy_highlight = {true}
 	self.values.player.hostage_trade = {true}
 	self.values.player.sec_camera_highlight = {true}
+	self.values.player.sec_camera_highlight_mask_off = {true}
+	self.values.player.special_enemy_highlight_mask_off = {true}
 	self.ammo_bag_base = 4
 	self.ecm_jammer_base_battery_life = 20
 	self.ecm_jammer_base_low_battery_life = 8
@@ -228,6 +261,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.silent_kill = {25}
 	self.values.player.melee_knockdown_mul = {1.5}
 	self.values.player.damage_dampener = {0.95}
+	self.values.player.melee_damage_dampener = {0.5}
 	self.values.smg.reload_speed_multiplier = {1.35}
 	self.values.smg.fire_rate_multiplier = {1.2}
 	self.values.player.additional_lives = {1, 3}
@@ -263,12 +297,38 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.run_and_reload = {true}
 	self.values.player.morale_boost = {true}
 	self.values.player.electrocution_resistance_multiplier = {0.25}
-	self.values.player.concealment_addition = {
-		2,
-		4,
-		6
+	self.values.player.concealment_modifier = {
+		5,
+		10,
+		15
 	}
 	self.values.sentry_gun.armor_multiplier2 = {1.25}
+	self.values.saw.armor_piercing_chance = {1}
+	self.values.saw.swap_speed_multiplier = {1.5}
+	self.values.saw.reload_speed_multiplier = {1.5}
+	self.values.team.health.hostage_multiplier = {1.01}
+	self.values.team.stamina.hostage_multiplier = {1.01}
+	self.values.player.minion_master_speed_multiplier = {1.05}
+	self.values.player.minion_master_health_multiplier = {1.1}
+	self.values.player.mark_enemy_time_multiplier = {2}
+	self.values.player.critical_hit_chance = {0.25, 0.5}
+	self.values.player.melee_kill_snatch_pager_chance = {0.25}
+	self.values.player.detection_risk_add_crit_chance = {
+		{
+			0.005,
+			3,
+			"below",
+			35
+		}
+	}
+	self.values.player.detection_risk_add_dodge_chance = {
+		{
+			0.01,
+			3,
+			"below",
+			35
+		}
+	}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -548,8 +608,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{"50%"}
 		},
 		stockholm_syndrome = {
-			{"100%"},
-			{"100%"}
+			{},
+			{}
 		},
 		tactician = {
 			{"4", "2"},
@@ -967,6 +1027,7 @@ function UpgradesTweakData:init()
 	self:_serbu_definitions()
 	self:_new_raging_bull_definitions()
 	self:_saw_definitions()
+	self:_usp_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1201,6 +1262,80 @@ function UpgradesTweakData:_player_definitions()
 			}
 		}
 	end
+	self.definitions.player_detection_risk_add_crit_chance = {
+		category = "feature",
+		name_id = "menu_player_detection_risk_add_crit_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "detection_risk_add_crit_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_detection_risk_add_dodge_chance = {
+		category = "feature",
+		name_id = "menu_player_detection_risk_add_dodge_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "detection_risk_add_dodge_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_melee_kill_snatch_pager_chance = {
+		category = "feature",
+		name_id = "menu_player_melee_kill_snatch_pager_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "melee_kill_snatch_pager_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_critical_hit_chance_1 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_critical_hit_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "critical_hit_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_critical_hit_chance_2 = {
+		category = "feature",
+		incremental = true,
+		name_id = "menu_player_critical_hit_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "critical_hit_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_mark_enemy_time_multiplier = {
+		category = "feature",
+		name_id = "menu_player_mark_enemy_time_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "mark_enemy_time_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_minion_master_health_multiplier = {
+		category = "feature",
+		name_id = "menu_player_minion_master_health_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "minion_master_health_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_minion_master_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_player_minion_master_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "minion_master_speed_multiplier",
+			value = 1
+		}
+	}
 	self.definitions.player_flashbang_multiplier_1 = {
 		category = "feature",
 		name_id = "menu_player_flashbang_multiplier",
@@ -1603,7 +1738,7 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_passive_suspicion_bonus",
 		upgrade = {
 			category = "player",
-			upgrade = "concealment_addition",
+			upgrade = "concealment_modifier",
 			value = 1
 		}
 	}
@@ -1613,7 +1748,7 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_passive_suspicion_bonus",
 		upgrade = {
 			category = "player",
-			upgrade = "concealment_addition",
+			upgrade = "concealment_modifier",
 			value = 1
 		}
 	}
@@ -1623,7 +1758,7 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_passive_suspicion_bonus",
 		upgrade = {
 			category = "player",
-			upgrade = "concealment_addition",
+			upgrade = "concealment_modifier",
 			value = 1
 		}
 	}
@@ -1822,6 +1957,15 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "damage_dampener",
+			value = 1
+		}
+	}
+	self.definitions.player_melee_damage_dampener = {
+		category = "feature",
+		name_id = "menu_player_melee_damage_dampener",
+		upgrade = {
+			category = "player",
+			upgrade = "melee_damage_dampener",
 			value = 1
 		}
 	}
@@ -2220,6 +2364,24 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "sec_camera_highlight",
+			value = 1
+		}
+	}
+	self.definitions.player_sec_camera_highlight_mask_off = {
+		category = "feature",
+		name_id = "menu_player_sec_camera_highlight_mask_off",
+		upgrade = {
+			category = "player",
+			upgrade = "sec_camera_highlight_mask_off",
+			value = 1
+		}
+	}
+	self.definitions.player_special_enemy_highlight_mask_off = {
+		category = "feature",
+		name_id = "menu_player_special_enemy_highlight_mask_off",
+		upgrade = {
+			category = "player",
+			upgrade = "special_enemy_highlight_mask_off",
 			value = 1
 		}
 	}
@@ -3629,6 +3791,41 @@ function UpgradesTweakData:_saw_definitions()
 			value = 1
 		}
 	}
+	self.definitions.saw_armor_piercing_chance = {
+		category = "feature",
+		name_id = "menu_saw_armor_piercing_chance",
+		upgrade = {
+			category = "saw",
+			upgrade = "armor_piercing_chance",
+			value = 1
+		}
+	}
+	self.definitions.saw_swap_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_saw_swap_speed_multiplier",
+		upgrade = {
+			category = "saw",
+			upgrade = "swap_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.saw_reload_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_saw_reload_speed_multiplier",
+		upgrade = {
+			category = "saw",
+			upgrade = "reload_speed_multiplier",
+			value = 1
+		}
+	}
+end
+
+function UpgradesTweakData:_usp_definitions()
+	self.definitions.usp = {
+		category = "weapon",
+		weapon_id = "usp",
+		factory_id = "wpn_fps_pis_usp"
+	}
 end
 
 function UpgradesTweakData:_weapon_definitions()
@@ -4169,6 +4366,24 @@ function UpgradesTweakData:_team_definitions()
 		upgrade = {
 			category = "health",
 			upgrade = "passive_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.team_hostage_health_multiplier = {
+		category = "team",
+		name_id = "menu_team_hostage_health_multiplier",
+		upgrade = {
+			category = "health",
+			upgrade = "hostage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.team_hostage_stamina_multiplier = {
+		category = "team",
+		name_id = "menu_team_hostage_stamina_multiplier",
+		upgrade = {
+			category = "stamina",
+			upgrade = "hostage_multiplier",
 			value = 1
 		}
 	}

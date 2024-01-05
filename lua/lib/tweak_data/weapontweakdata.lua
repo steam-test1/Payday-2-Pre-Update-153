@@ -35,6 +35,7 @@ function WeaponTweakData:init()
 	self:_init_data_huntsman_npc()
 	self:_init_data_saw_npc()
 	self:_init_data_sentry_gun_npc()
+	self:_init_data_usp_npc()
 	self:_precalculate_values()
 end
 
@@ -531,6 +532,22 @@ function WeaponTweakData:_init_data_sentry_gun_npc()
 	self.sentry_gun.challenges.group = "sentry_gun"
 	self.sentry_gun.challenges.weapon = "sentry_gun"
 	self.sentry_gun.suppression = 0.8
+end
+
+function WeaponTweakData:_init_data_usp_npc()
+	self.usp_npc.sounds.prefix = "c45_npc"
+	self.usp_npc.use_data.selection_index = 1
+	self.usp_npc.DAMAGE = 3
+	self.usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.usp_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.usp_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.usp_npc.CLIP_AMMO_MAX = 80
+	self.usp_npc.NR_CLIPS_MAX = 6
+	self.usp_npc.auto.fire_rate = 0.1
+	self.usp_npc.hold = "pistol"
+	self.usp_npc.hud_icon = "mac11"
+	self.usp_npc.alert_size = 1800
+	self.usp_npc.suppression = 2
 end
 
 function WeaponTweakData:_init_data_player_weapons()
@@ -3005,6 +3022,93 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6
 	}
 	self.saw.hit_alert_size_increase = 4
+	self.usp = {}
+	self.usp.category = "pistol"
+	self.usp.damage_melee = damage_melee_default
+	self.usp.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.usp.sounds = {}
+	self.usp.sounds.fire = "c45_fire"
+	self.usp.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.usp.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.usp.sounds.dryfire = "c45_dryfire"
+	self.usp.timers = {}
+	self.usp.timers.reload_not_empty = 1.47
+	self.usp.timers.reload_empty = 2.12
+	self.usp.timers.unequip = 0.55
+	self.usp.timers.equip = 0.55
+	self.usp.name_id = "bm_w_usp"
+	self.usp.desc_id = "bm_w_usp_desc"
+	self.usp.hud_icon = "beretta92"
+	self.usp.description_id = "des_usp"
+	self.usp.hud_ammo = "guis/textures/ammo_9mm"
+	self.usp.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.usp.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.usp.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.usp.use_data = {}
+	self.usp.use_data.selection_index = 1
+	self.usp.DAMAGE = 1
+	self.usp.FIRE_MODE = "single"
+	self.usp.fire_mode_data = {}
+	self.usp.fire_mode_data.fire_rate = 0.08
+	self.usp.single = {}
+	self.usp.single.fire_rate = 0.09
+	self.usp.CLIP_AMMO_MAX = 13
+	self.usp.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.15 / self.usp.CLIP_AMMO_MAX)
+	self.usp.AMMO_MAX = self.usp.CLIP_AMMO_MAX * self.usp.NR_CLIPS_MAX
+	self.usp.AMMO_PICKUP = self:_pickup_chance(self.usp.AMMO_MAX, 1)
+	self.usp.spread = {}
+	self.usp.spread.standing = self.new_m4.spread.standing * 0.75
+	self.usp.spread.crouching = self.new_m4.spread.standing * 0.75
+	self.usp.spread.steelsight = self.new_m4.spread.steelsight
+	self.usp.spread.moving_standing = self.new_m4.spread.standing * 0.75
+	self.usp.spread.moving_crouching = self.new_m4.spread.standing * 0.75
+	self.usp.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.usp.kick = {}
+	self.usp.kick.standing = {
+		1.2,
+		1.8,
+		-0.5,
+		0.5
+	}
+	self.usp.kick.crouching = self.glock_17.kick.standing
+	self.usp.kick.steelsight = self.glock_17.kick.standing
+	self.usp.global_value = "pd2_clan"
+	self.usp.crosshair = {}
+	self.usp.crosshair.standing = {}
+	self.usp.crosshair.crouching = {}
+	self.usp.crosshair.steelsight = {}
+	self.usp.crosshair.standing.offset = 0.2
+	self.usp.crosshair.standing.moving_offset = 0.6
+	self.usp.crosshair.standing.kick_offset = 0.4
+	self.usp.crosshair.crouching.offset = 0.1
+	self.usp.crosshair.crouching.moving_offset = 0.6
+	self.usp.crosshair.crouching.kick_offset = 0.3
+	self.usp.crosshair.steelsight.hidden = true
+	self.usp.crosshair.steelsight.offset = 0
+	self.usp.crosshair.steelsight.moving_offset = 0
+	self.usp.crosshair.steelsight.kick_offset = 0.1
+	self.usp.shake = {}
+	self.usp.shake.fire_multiplier = 1
+	self.usp.shake.fire_steelsight_multiplier = -1
+	self.usp.autohit = autohit_pistol_default
+	self.usp.aim_assist = aim_assist_pistol_default
+	self.usp.weapon_hold = "glock"
+	self.usp.animations = {}
+	self.usp.animations.equip_id = "equip_glock"
+	self.usp.animations.recoil_steelsight = true
+	self.usp.statistics = false
+	self.usp.stats = {
+		damage = 9,
+		spread = 8,
+		recoil = 7,
+		spread_moving = 6,
+		zoom = 1,
+		concealment = 29,
+		suppression = 16,
+		alert_size = 7,
+		extra_ammo = 6,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_create_table_structure()
@@ -3188,6 +3292,12 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		auto = {}
 	}
+	self.usp_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values()
@@ -3221,4 +3331,5 @@ function WeaponTweakData:_precalculate_values()
 	self.saiga_npc.AMMO_MAX = self.saiga_npc.CLIP_AMMO_MAX * self.saiga_npc.NR_CLIPS_MAX
 	self.huntsman_npc.AMMO_MAX = self.huntsman_npc.CLIP_AMMO_MAX * self.huntsman_npc.NR_CLIPS_MAX
 	self.saw_npc.AMMO_MAX = self.saw_npc.CLIP_AMMO_MAX * self.saw_npc.NR_CLIPS_MAX
+	self.usp_npc.AMMO_MAX = self.usp_npc.CLIP_AMMO_MAX * self.usp_npc.NR_CLIPS_MAX
 end

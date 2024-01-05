@@ -205,11 +205,11 @@ function PlayerDamage:health_ratio()
 end
 
 function PlayerDamage:_max_health()
-	return (self._HEALTH_INIT + managers.player:thick_skin_value()) * managers.player:upgrade_value("player", "health_multiplier", 1) * managers.player:upgrade_value("player", "passive_health_multiplier", 1) * managers.player:team_upgrade_value("health", "passive_multiplier", 1)
+	return (self._HEALTH_INIT + managers.player:thick_skin_value()) * managers.player:health_skill_multiplier()
 end
 
 function PlayerDamage:_total_armor()
-	return (self._ARMOR_INIT + managers.player:body_armor_value()) * managers.player:upgrade_value("player", "passive_armor_multiplier", 1) * managers.player:upgrade_value("player", "armor_multiplier", 1)
+	return (self._ARMOR_INIT + managers.player:body_armor_value("armor")) * managers.player:body_armor_skill_multiplier()
 end
 
 function PlayerDamage:_max_armor()
@@ -255,6 +255,8 @@ function PlayerDamage:erase_tase_data()
 end
 
 function PlayerDamage:damage_melee(attack_data)
+	local dmg_mul = managers.player:upgrade_value("player", "melee_damage_dampener", 1)
+	attack_data.damage = attack_data.damage * dmg_mul
 	self:damage_bullet(attack_data)
 	self._unit:movement():push(attack_data.push_vel)
 end
@@ -291,16 +293,19 @@ function PlayerDamage:damage_bullet(attack_data)
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
 	}
-	local dodge_value = math.rand(1)
-	local armor_penalty = managers.player:body_armor_dodge_penalty()
-	local passive_dodge_chance = managers.player:upgrade_value("player", "passive_dodge_chance", 0) * armor_penalty
-	local run_dodge_chance = managers.player:upgrade_value("player", "run_dodge_chance", 0) * armor_penalty
-	if dodge_value <= passive_dodge_chance or self._unit:movement():running() and dodge_value <= run_dodge_chance then
-		if 0 < attack_data.damage then
+	local dodge_roll = math.rand(1)
+	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
+	local armor_dodge_chance = managers.player:body_armor_value("dodge")
+	local skill_dodge_chance = managers.player:skill_dodge_chance(self._unit:movement():running())
+	dodge_value = dodge_value + armor_dodge_chance + skill_dodge_chance
+	if dodge_roll < dodge_value then
+		if attack_data.damage > 0 then
 			self:_send_damage_drama(attack_data, attack_data.damage)
 		end
 		self:_call_listeners(damage_info)
 		self:_hit_direction(attack_data.col_ray)
+		self._next_allowed_dmg_t = Application:digest_value(managers.player:player_timer():time() + self._dmg_interval, true)
+		self._last_received_dmg = attack_data.damage
 		return
 	end
 	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:upgrade_value("player", "damage_dampener", 1)
@@ -309,7 +314,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	end
 	attack_data.damage = attack_data.damage * dmg_mul
 	if self._god_mode then
-		if 0 < attack_data.damage then
+		if attack_data.damage > 0 then
 			self:_send_damage_drama(attack_data, attack_data.damage)
 		end
 		self:_call_listeners(damage_info)
@@ -335,7 +340,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	else
 		self._unit:sound():play("player_hit_permadamage")
 	end
-	local shake_multiplier = math.clamp(attack_data.damage, 0.2, 2) * managers.player:upgrade_value("player", "damage_shake_multiplier", 1)
+	local shake_multiplier = math.clamp(attack_data.damage, 0.2, 2) * managers.player:body_armor_value("damage_shake") * managers.player:upgrade_value("player", "damage_shake_multiplier", 1)
 	self._unit:camera():play_shaker("player_bullet_damage", 1 * shake_multiplier)
 	managers.rumble:play("damage_bullet")
 	self:_hit_direction(attack_data.col_ray)

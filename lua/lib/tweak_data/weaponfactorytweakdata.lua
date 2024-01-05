@@ -34,6 +34,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_raging_bull()
 	self:_init_saw()
 	self:_init_serbu()
+	self:_init_usp()
 end
 
 function WeaponFactoryTweakData:_init_silencers()
@@ -5338,4 +5339,149 @@ function WeaponFactoryTweakData:_init_saw()
 	self.parts.wpn_fps_saw_b_normal.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_b_normal"
 	self.parts.wpn_fps_saw_body_standard.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_body_standard"
 	self.parts.wpn_fps_saw_m_blade.third_unit = "units/payday2/weapons/wpn_third_saw_pts/wpn_third_saw_m_blade"
+end
+
+function WeaponFactoryTweakData:_init_usp()
+	self.parts.wpn_fps_pis_usp_body_standard = {
+		type = "lower_reciever",
+		a_obj = "a_body",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_usp_m_standard = {
+		type = "magazine",
+		a_obj = "a_m",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_pis_usp_fl_adapter = {
+		type = "extra",
+		a_obj = "a_fl",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_fl_adapter",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_usp_body_standard.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_body_standard"
+	self.parts.wpn_fps_pis_usp_m_standard.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_m_standard"
+	self.parts.wpn_fps_pis_usp_fl_adapter.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_fl_adapter"
+	self.parts.wpn_fps_pis_usp_b_tactical = {
+		type = "slide",
+		name_id = "bm_wp_pis_usp_b_tactical",
+		a_obj = "a_b",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_b_tactical",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_usp_b_expert = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_pis_usp_b_expert",
+		a_obj = "a_b",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_b_expert",
+		stats = {
+			value = 2,
+			spread = 3,
+			concealment = -1
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_pis_usp_b_match = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_pis_usp_b_match",
+		a_obj = "a_b",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_b_match",
+		stats = {
+			value = 2,
+			recoil = 2,
+			spread = 1,
+			concealment = -1
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_pis_usp_m_extended = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_pis_usp_m_extended",
+		a_obj = "a_m",
+		unit = "units/payday2/weapons/wpn_fps_pis_usp_pts/wpn_fps_pis_usp_m_extended",
+		stats = {
+			value = 2,
+			spread_moving = -1,
+			concealment = -1,
+			extra_ammo = 4
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		},
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_pis_usp_b_expert.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_b_expert"
+	self.parts.wpn_fps_pis_usp_b_match.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_b_match"
+	self.parts.wpn_fps_pis_usp_b_tactical.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_b_tactical"
+	self.parts.wpn_fps_pis_usp_m_extended.third_unit = "units/payday2/weapons/wpn_third_pis_usp_pts/wpn_third_pis_usp_m_extended"
+	self.wpn_fps_pis_usp = {}
+	self.wpn_fps_pis_usp.unit = "units/payday2/weapons/wpn_fps_pis_usp/wpn_fps_pis_usp"
+	self.wpn_fps_pis_usp.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_pis_usp.adds = {
+		wpn_fps_upg_fl_pis_laser = {
+			"wpn_fps_pis_usp_fl_adapter"
+		},
+		wpn_fps_upg_fl_pis_tlr1 = {
+			"wpn_fps_pis_usp_fl_adapter"
+		}
+	}
+	self.wpn_fps_pis_usp.default_blueprint = {
+		"wpn_fps_pis_usp_b_tactical",
+		"wpn_fps_pis_usp_body_standard",
+		"wpn_fps_pis_usp_m_standard"
+	}
+	self.wpn_fps_pis_usp.uses_parts = {
+		"wpn_fps_pis_usp_b_match",
+		"wpn_fps_pis_usp_body_standard",
+		"wpn_fps_pis_usp_m_standard",
+		"wpn_fps_pis_usp_m_extended",
+		"wpn_fps_pis_usp_b_expert",
+		"wpn_fps_pis_usp_b_tactical",
+		"wpn_fps_upg_fl_pis_laser",
+		"wpn_fps_upg_fl_pis_tlr1",
+		"wpn_fps_upg_ns_pis_large",
+		"wpn_fps_upg_ns_pis_medium",
+		"wpn_fps_upg_ns_pis_small"
+	}
+	self.wpn_fps_pis_usp_npc = deep_clone(self.wpn_fps_pis_usp)
+	self.wpn_fps_pis_usp_npc.unit = "units/payday2/weapons/wpn_fps_pis_usp/wpn_fps_pis_usp_npc"
 end

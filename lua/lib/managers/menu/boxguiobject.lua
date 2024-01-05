@@ -162,6 +162,13 @@ function BoxGuiObject:size()
 	return self._panel:size()
 end
 
+function BoxGuiObject:set_aligns(halign, valign)
+	for i, d in pairs(self._panel:children()) do
+		d:set_valign(valign)
+		d:set_halign(halign)
+	end
+end
+
 function BoxGuiObject:set_clipping(clip, rec_panel)
 	for i, d in pairs(rec_panel and rec_panel:children() or self._panel:children()) do
 		if d.set_rotation then

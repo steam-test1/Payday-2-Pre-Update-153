@@ -465,6 +465,17 @@ function WeaponFactoryManager:unload_package(package)
 	end
 end
 
+function WeaponFactoryManager:get_parts_from_weapon_by_type_or_perk(type_or_perk, parts)
+	local factory = tweak_data.weapon.factory
+	local type_parts = {}
+	for id, data in pairs(parts) do
+		if factory.parts[id].type == type_or_perk or factory.parts[id].perks and table.contains(factory.parts[id].perks, type_or_perk) then
+			table.insert(type_parts, parts[id])
+		end
+	end
+	return type_parts
+end
+
 function WeaponFactoryManager:get_part_from_weapon_by_type(type, parts)
 	local factory = tweak_data.weapon.factory
 	for id, data in pairs(parts) do
@@ -473,6 +484,11 @@ function WeaponFactoryManager:get_part_from_weapon_by_type(type, parts)
 		end
 	end
 	return false
+end
+
+function WeaponFactoryManager:has_weapon_more_than_default_parts(factory_id)
+	local weapon_tweak = tweak_data.weapon.factory[factory_id]
+	return #weapon_tweak.uses_parts > #weapon_tweak.default_blueprint
 end
 
 function WeaponFactoryManager:get_parts_from_factory_id(factory_id)

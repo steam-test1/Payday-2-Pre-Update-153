@@ -15,11 +15,7 @@ end
 
 function LootDropManager:add_qlvl_to_weapon_mods(override_tweak_data)
 	local weapon_mods_tweak_data = override_tweak_data or tweak_data.blackmarket.weapon_mods
-	local weapon_level_data = {
-		wpn_fps_ass_amcar = 0,
-		wpn_fps_pis_g17 = 0,
-		wpn_fps_saw = 0
-	}
+	local weapon_level_data = {}
 	for level, data in pairs(tweak_data.upgrades.level_tree) do
 		if data.upgrades then
 			for _, upgrade in ipairs(data.upgrades) do
@@ -36,7 +32,7 @@ function LootDropManager:add_qlvl_to_weapon_mods(override_tweak_data)
 		local min_level = managers.experience:level_cap()
 		for _, factory_id in ipairs(weapon_uses_part) do
 			if not table.contains(tweak_data.weapon.factory[factory_id].default_blueprint, part_id) then
-				min_level = math.min(min_level, weapon_level_data[factory_id])
+				min_level = math.min(min_level, weapon_level_data[factory_id] or 0)
 			end
 		end
 		weapon_mods_tweak_data[part_id].qlvl = min_level
@@ -125,11 +121,12 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 				local is_infamous = item_tweak.infamous or false
 				local is_dlc = item_tweak.dlcs or item_tweak.dlc or false
 				local got_qlvl = item_tweak.qlvl or false
+				local fixed_global_value = item_tweak.global_value or false
 				local pass_infamous = not is_infamous or infamous_success
 				local pass_dlc = true
 				local pass_qlvl = not got_qlvl or plvl >= got_qlvl
 				local pass_xp_card = type ~= "xp" or xp_no_next_lv > (tweak_data:get_value("experience_manager", "loot_drop_value", item_tweak.value_id) or 0)
-				local global_value = "normal"
+				local global_value = fixed_global_value or "normal"
 				if is_infamous then
 					global_value = "infamous"
 				elseif is_dlc then
@@ -157,7 +154,7 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 						weight = weight * type_weight_mod_func(global_value, type, item)
 					end
 					if 0 < amount_in_inventory then
-						weight = weight * tweak_data.lootdrop.got_item_weight_mod
+						weight = weight * (item_tweak.got_item_weight_mod or tweak_data.lootdrop.got_item_weight_mod or 0.5)
 					end
 					if not item_tweak.max_in_inventory or amount_in_inventory < item_tweak.max_in_inventory then
 						table.insert(droppable_items[type], {

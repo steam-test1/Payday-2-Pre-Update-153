@@ -305,6 +305,19 @@ function UpgradesManager:get_value(upgrade_id)
 	elseif upgrade.category == "team" then
 		local value = tweak_data.upgrades.values.team[u.category][u.upgrade][u.value]
 		return value
+	elseif upgrade.category == "weapon" then
+		local default_weapons = {"glock_17", "amcar"}
+		local weapon_id = upgrade.weapon_id
+		local is_default_weapon = table.contains(default_weapons, weapon_id) and true or false
+		local weapon_level = 0
+		for level, data in pairs(tweak_data.upgrades.level_tree) do
+			local upgrades = data.upgrades
+			if upgrades and table.contains(upgrades, weapon_id) then
+				weapon_level = level
+				break
+			end
+		end
+		return is_default_weapon, weapon_level
 	end
 	print("no value for", upgrade_id, upgrade.category)
 end

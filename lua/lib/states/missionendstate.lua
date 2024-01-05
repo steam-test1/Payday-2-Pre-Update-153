@@ -102,6 +102,9 @@ function MissionEndState:at_enter(old_state, params)
 	self._sound_listener = SoundDevice:create_listener("lobby_menu")
 	self._sound_listener:set_position(Vector3(0, -50000, 0))
 	self._sound_listener:activate(true)
+	if self._success and Global.game_settings.difficulty == "overkill_145" and managers.job:current_contact_id() == "vlad" and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.in_soviet_russia.mask then
+		managers.achievment:award_progress(tweak_data.achievement.in_soviet_russia.stat)
+	end
 	if self._success then
 		if params.personal_win then
 			if managers.achievment:get_script_data("last_man_standing") then

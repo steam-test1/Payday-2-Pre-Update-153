@@ -1397,7 +1397,7 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_damage_dampener"
+				"player_melee_damage_dampener"
 			},
 			cost = self.costs.pro
 		}

@@ -517,9 +517,9 @@ function TweakData:init()
 	self.interaction.suburbia_door_crowbar.special_equipment = "crowbar"
 	self.interaction.suburbia_door_crowbar.timer = 5
 	self.interaction.suburbia_door_crowbar.start_active = false
-	self.interaction.suburbia_door_crowbar.sound_start = "crowbar_work_loop"
-	self.interaction.suburbia_door_crowbar.sound_interupt = "crowbar_cancel"
-	self.interaction.suburbia_door_crowbar.sound_done = "crowbar_work_finished"
+	self.interaction.suburbia_door_crowbar.sound_start = "bar_crowbar"
+	self.interaction.suburbia_door_crowbar.sound_interupt = "bar_crowbar_cancel"
+	self.interaction.suburbia_door_crowbar.sound_done = "bar_crowbar_end"
 	self.interaction.suburbia_door_crowbar.interact_distance = 130
 	self.interaction.secret_stash_trunk_crowbar = {}
 	self.interaction.secret_stash_trunk_crowbar.icon = "equipment_crowbar"
@@ -801,6 +801,7 @@ function TweakData:init()
 	self.interaction.pick_lock_hard_no_skill.sound_done = "bar_pick_lock_finished"
 	self.interaction.pick_lock_deposit_transport = deep_clone(self.interaction.pick_lock_hard_no_skill)
 	self.interaction.pick_lock_deposit_transport.timer = 15
+	self.interaction.pick_lock_deposit_transport.axis = "y"
 	self.interaction.cant_pick_lock = {}
 	self.interaction.cant_pick_lock.icon = "equipment_bank_manager_key"
 	self.interaction.cant_pick_lock.text_id = "hud_int_pick_lock"
@@ -1807,6 +1808,16 @@ function TweakData:init()
 	self.interaction.button_infopad.text_id = "hud_int_press_for_info"
 	self.interaction.button_infopad.start_active = false
 	self.interaction.button_infopad.axis = "z"
+	self.interaction.crate_loot = {}
+	self.interaction.crate_loot.text_id = "hud_int_hold_crack_crate"
+	self.interaction.crate_loot.action_text_id = "hud_action_cracking_crate"
+	self.interaction.crate_loot.timer = 2
+	self.interaction.crate_loot.start_active = false
+	self.interaction.crate_loot.sound_start = "bar_crowbar"
+	self.interaction.crate_loot.sound_interupt = "bar_crowbar_cancel"
+	self.interaction.crate_loot.sound_done = "bar_crowbar_end"
+	self.interaction.halloween_trick = {}
+	self.interaction.halloween_trick.text_id = "hud_int_trick_treat"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2178,6 +2189,31 @@ function TweakData:init()
 	self.achievement.weapon_collector = 18
 	self.achievement.how_do_you_like_me_now = "level_1"
 	self.achievement.like_an_angry_bear = "bear"
+	self.achievement.witch_doctor = {
+		mask = "witch",
+		stat = "halloween_4_stats"
+	}
+	self.achievement.its_alive_its_alive = {
+		mask = "frank",
+		stat = "halloween_5_stats"
+	}
+	self.achievement.pump_action = {
+		mask = "pumpkin_king",
+		stat = "halloween_6_stats"
+	}
+	self.achievement.cant_hear_you_scream = {
+		mask = "venomorph",
+		stat = "halloween_7_stats"
+	}
+	self.achievement.in_soviet_russia = {
+		mask = "bear",
+		stat = "halloween_10_stats"
+	}
+	self.achievement.unique_selling_point = "usp"
+	self.achievement.try_out_your_usp = {
+		weapon = "usp",
+		stat = "halloween_8_stats"
+	}
 	self.pickups = {}
 	self.pickups.ammo = {
 		unit = Idstring("units/pickups/ammo/ammo_pickup")
@@ -2333,6 +2369,10 @@ function TweakData:init()
 	self.blame.civ_alarm = "hint_alarm_civ"
 	self.blame.cop_alarm = "hint_alarm_cop"
 	self.blame.gan_alarm = "hint_alarm_cop"
+	self.blame.cam_crate_open = "hint_cam_crate_open"
+	self.blame.civ_crate_open = "hint_civ_crate_open"
+	self.blame.cop_crate_open = "hint_cop_crate_open"
+	self.blame.gan_crate_open = "hint_cop_crate_open"
 	self.casino = {}
 	self.casino.unlock_level = 10
 	self.casino.entrance_level = {

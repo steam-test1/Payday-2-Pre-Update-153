@@ -712,7 +712,7 @@ function PlayerMovement:destroy(unit)
 end
 
 function PlayerMovement:_max_stamina()
-	local max_stamina = self._STAMINA_INIT * managers.player:upgrade_value("player", "stamina_multiplier", 1) * managers.player:team_upgrade_value("stamina", "multiplier", 1) * managers.player:team_upgrade_value("stamina", "passive_multiplier", 1)
+	local max_stamina = self._STAMINA_INIT * managers.player:body_armor_value("stamina") * managers.player:stamina_multiplier()
 	managers.hud:set_max_stamina(max_stamina)
 	return max_stamina
 end

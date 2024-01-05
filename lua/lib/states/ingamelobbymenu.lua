@@ -116,12 +116,7 @@ function IngameLobbyMenuState:at_enter()
 		self._lootdrop_data = {}
 		managers.lootdrop:new_make_drop(self._lootdrop_data)
 		local disable_weapon_mods = not managers.lootdrop:can_drop_weapon_mods() and true or nil
-		local global_values = {
-			normal = 1,
-			superior = 2,
-			exceptional = 3,
-			infamous = 4
-		}
+		local global_values = tweak_data.lootdrop.global_value_list_map
 		local peer = managers.network:session() and managers.network:session():local_peer() or false
 		local global_value = global_values[self._lootdrop_data.global_value] or 1
 		local item_category = self._lootdrop_data.type_items
