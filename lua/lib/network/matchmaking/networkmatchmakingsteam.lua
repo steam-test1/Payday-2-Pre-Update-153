@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v1.0.31"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_release_v1.0.33"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -54,6 +54,10 @@ function NetworkMatchMakingSTEAM:_load_globals()
 		end
 		self._try_re_enter_lobby = Global.steam.match.try_re_enter_lobby
 		self._server_rpc = Global.steam.match.server_rpc
+		self._lobby_filters = Global.steam.match.lobby_filters or self._lobby_filters
+		self._distance_filter = Global.steam.match.distance_filter or self._distance_filter
+		self._difficulty_filter = Global.steam.match.difficulty_filter or self._difficulty_filter
+		self._lobby_return_count = Global.steam.match.lobby_return_count or self._lobby_return_count
 		Global.steam.match = nil
 	end
 end
@@ -67,6 +71,10 @@ function NetworkMatchMakingSTEAM:_save_globals()
 	Global.steam.match.lobby_attributes = self._lobby_attributes
 	Global.steam.match.try_re_enter_lobby = self._try_re_enter_lobby
 	Global.steam.match.server_rpc = self._server_rpc
+	Global.steam.match.lobby_filters = self._lobby_filters
+	Global.steam.match.distance_filter = self._distance_filter
+	Global.steam.match.difficulty_filter = self._difficulty_filter
+	Global.steam.match.lobby_return_count = self._lobby_return_count
 end
 
 function NetworkMatchMakingSTEAM:update()
@@ -276,6 +284,7 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 		self.browser:set_interest_keys(interest_keys)
 		self.browser:set_distance_filter(self._distance_filter)
 		self.browser:set_lobby_filter("min_level", managers.experience:current_level(), "equalto_less_than")
+		self.browser:set_lobby_filter(self._BUILD_SEARCH_INTEREST_KEY, "true", "equal")
 		for key, data in pairs(self._lobby_filters) do
 			if data.value and data.value ~= -1 then
 				self.browser:set_lobby_filter(data.key, data.value, data.comparision_type)

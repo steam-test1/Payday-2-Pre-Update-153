@@ -83,6 +83,74 @@ end
 function IngameLobbyMenuState:update(t, dt)
 end
 
+function IngameLobbyMenuState:can_drop_weapon_mods()
+	local plvl = managers.experience:current_level()
+	local dropable_items = {}
+	for item, item_tweak in pairs(tweak_data.blackmarket.weapon_mods) do
+		if item_tweak.pc or item_tweak.pcs then
+			local is_infamous = item_tweak.infamous or false
+			local is_dlc = item_tweak.dlcs or item_tweak.dlc or false
+			local got_qlvl = item_tweak.qlvl or false
+			local pass_infamous = not is_infamous or infamous_success
+			local pass_dlc = true
+			local pass_qlvl = not got_qlvl or plvl >= got_qlvl
+			local pass_max_in_inventory
+			local global_value = "normal"
+			if is_infamous then
+				global_value = "infamous"
+			elseif is_dlc then
+				local dlcs = item_tweak.dlcs or {}
+				if item_tweak.dlc then
+					table.insert(dlcs, item_tweak.dlc)
+				end
+				local dlc_global_values = {}
+				for _, dlc in pairs(dlcs) do
+					if managers.dlc:has_dlc(dlc) then
+						table.insert(dlc_global_values, dlc)
+					end
+				end
+				if 0 < #dlc_global_values then
+					global_value = dlc_global_values[math.random(#dlc_global_values)]
+				else
+					pass_dlc = false
+				end
+			end
+			local amount_in_inventory = managers.blackmarket:get_item_amount(global_value, "weapon_mods", item, true)
+			pass_max_in_inventory = not item_tweak.max_in_inventory or amount_in_inventory < item_tweak.max_in_inventory
+			if pass_infamous and pass_dlc and pass_qlvl and pass_max_in_inventory then
+				table.insert(dropable_items, true)
+			end
+		end
+	end
+	return 0 < #dropable_items
+end
+
+function IngameLobbyMenuState:new_fake_loot_pc(debug_pc, can_drop_weapon_mods)
+	local sum = 0
+	local to_drop = {
+		colors = 1,
+		textures = 1,
+		materials = 1,
+		masks = 1,
+		cash = 3
+	}
+	if can_drop_weapon_mods then
+		to_drop.weapon_mods = 2
+	end
+	local WEIGHTS = tweak_data.lootdrop.WEIGHTED_TYPE_CHANCE[(debug_pc or managers.experience:level_to_stars()) * 10]
+	for type in pairs(to_drop) do
+		sum = sum + WEIGHTS[type]
+	end
+	local variant = math.random(sum)
+	for type, card in pairs(to_drop) do
+		variant = variant - WEIGHTS[type]
+		if variant <= 0 then
+			return card
+		end
+	end
+	return 1
+end
+
 function IngameLobbyMenuState:fake_loot_pc(debug_pc)
 	local max_pc = debug_pc or math.ceil(math.min(managers.experience:current_level() / 10, managers.job:current_job_and_difficulty_stars()))
 	local chance = 0.85 / math.max(2 ^ (#tweak_data.lootdrop.STARS[max_pc].pcs - 1), 1)
@@ -132,7 +200,8 @@ function IngameLobbyMenuState:at_enter()
 		managers.menu_component:set_max_lines_game_chat(6)
 		managers.menu_component:pre_set_game_chat_leftbottom(0, 0)
 		self._lootdrop_data = {}
-		managers.lootdrop:make_drop(self._lootdrop_data)
+		managers.lootdrop:new_make_drop(self._lootdrop_data)
+		local can_drop_weapon_mods = self:can_drop_weapon_mods()
 		local global_values = {
 			normal = 1,
 			superior = 2,
@@ -145,8 +214,8 @@ function IngameLobbyMenuState:at_enter()
 		local item_id = self._lootdrop_data.item_entry
 		local max_pc = self._lootdrop_data.total_stars
 		local item_pc = self._lootdrop_data.joker and 0 or math.ceil(self._lootdrop_data.item_payclass / 10)
-		local card_left_pc = self:fake_loot_pc()
-		local card_right_pc = self:fake_loot_pc()
+		local card_left_pc = self:new_fake_loot_pc(nil, can_drop_weapon_mods)
+		local card_right_pc = self:new_fake_loot_pc(nil, can_drop_weapon_mods)
 		local lootdrop_data = {
 			peer,
 			self._lootdrop_data.global_value,

@@ -84,8 +84,17 @@ function CopDamage:damage_bullet(attack_data)
 	if self._dead or self._invulnerable then
 		return
 	end
-	if self._has_plate and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name then
-		return
+	if self._has_plate then
+		local armor_pierced = false
+		if attack_data.attacker_unit == managers.player:player_unit() then
+			armor_pierced = math.rand(1) < managers.player:upgrade_value("weapon", "armor_piercing_chance", 0)
+			if alive(attack_data.weapon_unit) and attack_data.weapon_unit:base().got_silencer and attack_data.weapon_unit:base():got_silencer() then
+				armor_pierced = armor_pierced or math.rand(1) < managers.player:upgrade_value("weapon", "armor_piercing_chance_silencer", 0)
+			end
+		end
+		if not armor_pierced and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name then
+			return
+		end
 	end
 	local result
 	local body_index = self._unit:get_body_index(attack_data.col_ray.body:name())

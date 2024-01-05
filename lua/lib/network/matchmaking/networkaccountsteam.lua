@@ -168,7 +168,7 @@ function NetworkAccountSTEAM:get_global_stat(key, day)
 end
 
 function NetworkAccountSTEAM:publish_statistics(stats)
-	if managers.dlc:is_trial() or Application:production_build() then
+	if managers.dlc:is_trial() then
 		return
 	end
 	local handler = Steam:sa_handler()
@@ -221,6 +221,12 @@ function NetworkAccountSTEAM:publish_statistics(stats)
 			Application:error("[NetworkAccountSTEAM:publish_statistics] Error, could not set stat " .. key)
 			err = true
 		end
+	end
+	if Application:production_build() then
+		if err then
+			Application:throw_exception("[NetworkAccountSTEAM:publish_statistics] Missing statistics, needs to be added!!")
+		end
+		return
 	end
 	if not err then
 		handler:store_data()

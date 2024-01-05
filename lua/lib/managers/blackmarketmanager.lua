@@ -2263,7 +2263,10 @@ function BlackMarketManager:character_sequence_by_character_id(character_id, pee
 	local character = self:get_preferred_character()
 	if managers.network and managers.network:session() and peer_id then
 		print("character_sequence_by_character_id", managers.network:session(), peer_id, character)
-		character = managers.network:session():peer(peer_id):character()
+		local peer = managers.network:session():peer(peer_id)
+		if peer then
+			character = peer:character()
+		end
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)
 	print("character_sequence_by_character_id", "character", character, "character_id", character_id)

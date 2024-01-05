@@ -584,9 +584,9 @@ function PlayerTweakData:_init_new_stances()
 	self.stances.new_m14.crouched.vel_overshot.pitch_neg = 4
 	self.stances.new_m14.crouched.vel_overshot.pitch_pos = -4
 	self.stances.mp9 = deep_clone(self.stances.default)
-	local pivot_shoulder_translation = Vector3(8.64427, 34.7702, -4.76617)
-	local pivot_shoulder_rotation = Rotation(0.109998, 0.0123081, 0.630295)
-	local pivot_head_translation = Vector3(8, 23, -2)
+	local pivot_shoulder_translation = Vector3(10.7095, 13.7143, -7.28688)
+	local pivot_shoulder_rotation = Rotation(0.106632, -0.0844457, 0.629207)
+	local pivot_head_translation = Vector3(8, 10, -2)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.mp9.standard.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.mp9.standard.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
@@ -595,7 +595,7 @@ function PlayerTweakData:_init_new_stances()
 	self.stances.mp9.standard.vel_overshot.yaw_pos = -10
 	self.stances.mp9.standard.vel_overshot.pitch_neg = -5
 	self.stances.mp9.standard.vel_overshot.pitch_pos = 5
-	local pivot_head_translation = Vector3(0, 22, 0)
+	local pivot_head_translation = Vector3(0, 10, 0)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.mp9.steelsight.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.mp9.steelsight.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
@@ -604,7 +604,7 @@ function PlayerTweakData:_init_new_stances()
 	self.stances.mp9.steelsight.vel_overshot.yaw_pos = -4
 	self.stances.mp9.steelsight.vel_overshot.pitch_neg = -8
 	self.stances.mp9.steelsight.vel_overshot.pitch_pos = 8
-	local pivot_head_translation = Vector3(7, 20, 0)
+	local pivot_head_translation = Vector3(7, 8, 0)
 	local pivot_head_rotation = Rotation(0, 0, 0)
 	self.stances.mp9.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.mp9.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()

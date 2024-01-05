@@ -983,6 +983,9 @@ function CarryInteractionExt:sync_interacted(peer, player)
 	end
 	if Network:is_server() then
 		if self._remove_on_interact then
+			if self._unit == managers.interaction:active_object() then
+				self:interact_interupt(managers.player:player_unit(), false)
+			end
 			self:remove_interact()
 			self:set_active(false, true)
 			if alive(player) then

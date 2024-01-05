@@ -101,6 +101,10 @@ function NewRaycastWeaponBase:_update_fire_object()
 	self:change_fire_object(fire.unit:get_object(Idstring("fire")))
 end
 
+function NewRaycastWeaponBase:got_silencer()
+	return self._silencer
+end
+
 function NewRaycastWeaponBase:_update_stats_values()
 	self:_check_sound_switch()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)

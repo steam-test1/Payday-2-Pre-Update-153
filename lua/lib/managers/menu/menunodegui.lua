@@ -1055,7 +1055,11 @@ end
 
 function MenuNodeGui:reload_item(item)
 	local type = item:type()
-	if not item:reload(self:row_item(item), self) then
+	local row_item = self:row_item(item)
+	if row_item then
+		row_item.color = item:enabled() and (row_item.highlighted and self.row_item_hightlight_color or self.row_item_color) or tweak_data.menu.default_disabled_text_color
+	end
+	if not item:reload(row_item, self) then
 		if type == "weapon_expand" or type == "weapon_upgrade_expand" then
 			self:_reload_expand(item)
 		elseif type == "expand" then
@@ -1066,11 +1070,8 @@ function MenuNodeGui:reload_item(item)
 			MenuNodeGui.super.reload_item(self, item)
 		end
 	end
-	if self._highlighted_item and self._highlighted_item == item then
-		local row_item = self:row_item(item)
-		if row_item then
-			self:_align_marker(row_item)
-		end
+	if self._highlighted_item and self._highlighted_item == item and row_item then
+		self:_align_marker(row_item)
 	end
 end
 
@@ -1170,7 +1171,7 @@ function MenuNodeGui:_highlight_row_item(row_item, mouse_over)
 			active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id)
 		end
 		self:_align_marker(row_item)
-		row_item.color = self.row_item_hightlight_color
+		row_item.color = row_item.item:enabled() and self.row_item_hightlight_color or tweak_data.menu.default_disabled_text_color
 		if row_item.type == "NOTHING" then
 		elseif row_item.type == "column" then
 			for _, gui in ipairs(row_item.gui_columns) do
@@ -1230,6 +1231,9 @@ function MenuNodeGui:_highlight_row_item(row_item, mouse_over)
 end
 
 function MenuNodeGui:_align_marker(row_item)
+	if self.marker_color then
+		self._marker_data.gradient:set_color(row_item.item:enabled() and self.marker_color or tweak_data.menu.default_disabled_text_color)
+	end
 	if row_item.item:parameters().pd2_corner then
 		self._marker_data.marker:set_visible(true)
 		self._marker_data.gradient:set_visible(true)

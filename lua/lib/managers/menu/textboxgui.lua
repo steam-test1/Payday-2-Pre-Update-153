@@ -61,8 +61,8 @@ function TextBoxGui:add_background()
 		alpha = 0,
 		layer = 0,
 		render_template = "VertexColorTexturedBlur3D",
-		w = self._ws:panel():w(),
-		h = self._ws:panel():h(),
+		w = self._fullscreen_ws:panel():w(),
+		h = self._fullscreen_ws:panel():h(),
 		valign = "grow"
 	})
 	self._background2 = self._fullscreen_ws:panel():rect({

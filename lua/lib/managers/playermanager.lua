@@ -589,7 +589,14 @@ end
 
 function PlayerManager:body_armor_movement_penalty()
 	local armor_data = tweak_data.blackmarket.armors[managers.blackmarket:equipped_armor()]
-	return self:upgrade_value_by_level("player", "armor_movement_penalty", armor_data.movement_penalty, 1)
+	local movement_penalty = self:upgrade_value_by_level("player", "armor_movement_penalty", armor_data.movement_penalty, 1)
+	local skill_mods = self:upgrade_value("player", "passive_armor_movement_penalty_multiplier", 1)
+	if skill_mods < 1 then
+		local penalty = 1 - movement_penalty
+		penalty = penalty * skill_mods
+		movement_penalty = 1 - penalty
+	end
+	return movement_penalty
 end
 
 function PlayerManager:thick_skin_value()

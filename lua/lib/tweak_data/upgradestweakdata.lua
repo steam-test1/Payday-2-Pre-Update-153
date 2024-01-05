@@ -20,8 +20,8 @@ function UpgradesTweakData:_init_pd2_values()
 		0.92,
 		0.88,
 		0.84,
-		0.8,
-		0.76
+		0.76,
+		0.64
 	}
 	self.values.player.special_enemy_highlight = {true}
 	self.values.player.hostage_trade = {true}
@@ -201,22 +201,23 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.suspicion_multiplier = {0.75}
 	self.values.player.camouflage_bonus = {1.25}
 	self.values.player.walk_speed_multiplier = {1.25}
-	self.values.player.crouch_speed_multiplier = {1.25}
+	self.values.player.crouch_speed_multiplier = {1.1}
 	self.values.player.silent_kill = {100}
 	self.values.player.melee_knockdown_mul = {1.5}
 	self.values.player.damage_dampener = {0.5}
 	self.values.smg.reload_speed_multiplier = {1.33}
-	self.values.smg.recoil_multiplier = {0.75}
+	self.values.smg.fire_rate_multiplier = {1.2}
 	self.values.player.additional_lives = {1, 3}
 	self.values.player.cheat_death_chance = {0.1}
 	self.values.ecm_jammer.can_activate_feedback = {true}
 	self.values.ecm_jammer.feedback_duration_boost = {1.25}
 	self.values.ecm_jammer.affects_pagers = {true}
 	self.values.weapon.silencer_damage_multiplier = {1.15, 1.3}
+	self.values.weapon.armor_piercing_chance_silencer = {0.15}
 	self.values.ecm_jammer.duration_multiplier = {1.25}
 	self.values.ecm_jammer.can_open_sec_doors = {true}
 	self.values.player.pick_lock_easy = {true}
-	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.6}
+	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.65}
 	self.values.player.pick_lock_hard = {true}
 	self.values.weapon.silencer_recoil_multiplier = {0.5}
 	self.values.weapon.silencer_spread_multiplier = {0.5}
@@ -231,7 +232,9 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.passive_dodge_chance = {0.05, 0.15}
 	self.values.weapon.passive_swap_speed_multiplier = {1.2, 2}
 	self.values.player.passive_suspicion_multiplier = {0.75}
+	self.values.player.passive_armor_movement_penalty_multiplier = {0.5}
 	self.values.player.passive_loot_drop_multiplier = {1.1}
+	self.values.weapon.armor_piercing_chance = {0.15}
 end
 
 function UpgradesTweakData:init()
@@ -1783,6 +1786,15 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_pick_lock_easy_speed_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_player_pick_lock_easy_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "pick_lock_easy_speed_multiplier",
+			value = 2
+		}
+	}
 	self.definitions.player_loot_drop_multiplier_1 = {
 		category = "feature",
 		name_id = "menu_player_loot_drop_multiplier",
@@ -1807,6 +1819,33 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "passive_loot_drop_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.weapon_passive_armor_piercing_chance = {
+		category = "feature",
+		name_id = "menu_weapon_passive_armor_piercing_chance",
+		upgrade = {
+			category = "weapon",
+			upgrade = "armor_piercing_chance",
+			value = 1
+		}
+	}
+	self.definitions.weapon_silencer_armor_piercing_chance = {
+		category = "feature",
+		name_id = "menu_weapon_silencer_armor_piercing_chance",
+		upgrade = {
+			category = "weapon",
+			upgrade = "armor_piercing_chance_silencer",
+			value = 1
+		}
+	}
+	self.definitions.player_passive_armor_movement_penalty_multiplier = {
+		category = "feature",
+		name_id = "menu_passive_armor_movement_penalty_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "passive_armor_movement_penalty_multiplier",
 			value = 1
 		}
 	}
@@ -3387,6 +3426,15 @@ function UpgradesTweakData:_smg_definitions()
 		upgrade = {
 			category = "smg",
 			upgrade = "recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.smg_fire_rate_multiplier = {
+		category = "feature",
+		name_id = "menu_smg_fire_rate_multiplier",
+		upgrade = {
+			category = "smg",
+			upgrade = "fire_rate_multiplier",
 			value = 1
 		}
 	}

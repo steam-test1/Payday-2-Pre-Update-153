@@ -140,6 +140,9 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("ecm_jammer", "affects_cameras") then
 			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "affects_cameras", 1)
 		end
+		if managers.player:has_category_upgrade("ecm_jammer", "affects_pagers") then
+			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "affects_pagers", 1)
+		end
 		if managers.player:has_category_upgrade("ecm_jammer", "feedback_duration_boost") then
 			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "feedback_duration_boost", 1)
 		end

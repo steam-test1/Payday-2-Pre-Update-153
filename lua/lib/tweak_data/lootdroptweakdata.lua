@@ -13,87 +13,52 @@ function LootDropTweakData:init(tweak_data)
 		0,
 		0
 	}
+	self.risk_infamous_multiplier = {
+		1,
+		2,
+		3
+	}
 	self.PC_CHANCE = {}
 	self.PC_CHANCE[1] = 0.7
 	self.PC_CHANCE[2] = 0.7
 	self.PC_CHANCE[3] = 0.7
 	self.PC_CHANCE[4] = 0.7
 	self.PC_CHANCE[5] = 0.7
-	self.PC_CHANCE[6] = 0.7
-	self.PC_CHANCE[7] = 0.7
-	self.PC_CHANCE[8] = 0.7
-	self.PC_CHANCE[9] = 0.7
-	self.PC_CHANCE[10] = 0.7
+	self.PC_CHANCE[6] = 0.68
+	self.PC_CHANCE[7] = 0.66
+	self.PC_CHANCE[8] = 0.64
+	self.PC_CHANCE[9] = 0.62
+	self.PC_CHANCE[10] = 0.6
 	self.STARS = {}
 	self.STARS[1] = {
-		pcs = {
-			10,
-			100,
-			100
-		}
+		pcs = {10, 10}
 	}
 	self.STARS[2] = {
-		pcs = {
-			20,
-			100,
-			100
-		}
+		pcs = {20, 20}
 	}
 	self.STARS[3] = {
-		pcs = {
-			30,
-			100,
-			100
-		}
+		pcs = {30, 30}
 	}
 	self.STARS[4] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[5] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[6] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[7] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[8] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[9] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS[10] = {
-		pcs = {
-			40,
-			100,
-			100
-		}
+		pcs = {40, 40}
 	}
 	self.STARS_CURVES = {
 		1,
@@ -111,12 +76,12 @@ function LootDropTweakData:init(tweak_data)
 	local min = 10
 	local max = 100
 	local range = {
-		cash = {20, 20},
-		weapon_mods = {50, 50},
-		colors = {6, 6},
-		textures = {7, 7},
-		materials = {7, 7},
-		masks = {10, 10}
+		cash = {20, 5},
+		weapon_mods = {50, 45},
+		colors = {6, 11},
+		textures = {7, 12},
+		materials = {7, 12},
+		masks = {10, 15}
 	}
 	for i = min, max, 10 do
 		local cash = math.lerp(range.cash[1], range.cash[2], i / max)
@@ -134,6 +99,30 @@ function LootDropTweakData:init(tweak_data)
 			masks = masks
 		}
 	end
+	self.DEFAULT_WEIGHT = 1
+	self.got_item_weight_mod = 0.5
+	self.type_weight_mod_funcs = {}
+	
+	function self.type_weight_mod_funcs.weapon_mods(global_value, category, id)
+		local weapons = managers.weapon_factory:get_weapons_uses_part(id)
+		local primaries = managers.blackmarket:get_crafted_category("primaries")
+		local secondaries = managers.blackmarket:get_crafted_category("secondaries")
+		local crafted_weapons = {}
+		for _, weapon in pairs(primaries) do
+			table.insert(crafted_weapons, weapon.factory_id)
+		end
+		for _, weapon in pairs(secondaries) do
+			table.insert(crafted_weapons, weapon.factory_id)
+		end
+		table.list_union(crafted_weapons)
+		for _, factory_id in pairs(weapons) do
+			if table.contains(crafted_weapons, factory_id) then
+				return 2
+			end
+		end
+		return 1
+	end
+	
 	self.global_values = {}
 	self.global_values.normal = {}
 	self.global_values.normal.name_id = "bm_global_value_normal"

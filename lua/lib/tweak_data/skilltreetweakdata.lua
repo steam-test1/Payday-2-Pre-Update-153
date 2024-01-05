@@ -183,7 +183,8 @@ function SkillTreeTweakData:init()
 		},
 		[4] = {
 			upgrades = {
-				"player_passive_suspicion_bonus"
+				"player_passive_suspicion_bonus",
+				"player_passive_armor_movement_penalty_multiplier"
 			},
 			desc_id = "menu_ghost_tier_4"
 		},
@@ -195,7 +196,8 @@ function SkillTreeTweakData:init()
 		},
 		[6] = {
 			upgrades = {
-				"player_passive_loot_drop_multiplier"
+				"player_passive_loot_drop_multiplier",
+				"weapon_passive_armor_piercing_chance"
 			},
 			desc_id = "menu_ghost_tier_6"
 		}
@@ -1267,7 +1269,7 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"smg_recoil_multiplier"
+				"smg_fire_rate_multiplier"
 			},
 			cost = self.costs.pro
 		}
@@ -1475,7 +1477,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"weapon_silencer_damage_multiplier_2"
+				"weapon_silencer_damage_multiplier_2",
+				"weapon_silencer_armor_piercing_chance"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1557,7 +1560,8 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_pick_lock_hard"
+				"player_pick_lock_hard",
+				"player_pick_lock_easy_speed_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}

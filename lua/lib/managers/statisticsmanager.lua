@@ -377,7 +377,7 @@ function StatisticsManager:publish_to_steam(session, success)
 	end
 	local stats = {}
 	self._global.play_time.minutes = math.ceil(self._global.play_time.minutes + session_time_minutes)
-	local current_time = self._global.play_time.minutes
+	local current_time = math.floor(self._global.play_time.minutes / 60)
 	stats.player_time = {
 		type = "int",
 		method = "set",
@@ -496,7 +496,7 @@ function StatisticsManager:publish_to_steam(session, success)
 	}
 	stats.heist_failed = {
 		type = "int",
-		value = not success and 1 or 0
+		value = success and 0 or 1
 	}
 	managers.network.account:publish_statistics(stats)
 end

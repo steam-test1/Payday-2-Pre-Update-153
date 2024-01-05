@@ -979,8 +979,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.mp9.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.mp9.timers = {}
-	self.mp9.timers.reload_not_empty = 1.7
-	self.mp9.timers.reload_empty = 2.6
+	self.mp9.timers.reload_not_empty = 1.51
+	self.mp9.timers.reload_empty = 2.48
 	self.mp9.timers.unequip = 0.75
 	self.mp9.timers.equip = 0.5
 	self.mp9.name_id = "bm_w_mp9"
@@ -1035,7 +1035,6 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.shake.fire_steelsight_multiplier = -1
 	self.mp9.autohit = autohit_pistol_default
 	self.mp9.aim_assist = aim_assist_pistol_default
-	self.mp9.weapon_hold = "mac11"
 	self.mp9.animations = {}
 	self.mp9.animations.equip_id = "equip_mac11_rifle"
 	self.mp9.animations.recoil_steelsight = false
@@ -1389,7 +1388,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.olympic.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.olympic.timers = {}
-	self.olympic.timers.reload_not_empty = 2.535
+	self.olympic.timers.reload_not_empty = 2.4
 	self.olympic.timers.reload_empty = 3.49
 	self.olympic.timers.unequip = 0.6
 	self.olympic.timers.equip = 0.5

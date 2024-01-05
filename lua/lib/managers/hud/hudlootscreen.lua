@@ -631,16 +631,6 @@ function HUDLootScreen:begin_choose_card(peer_id, card_id)
 		local downcard = card_panel:child("downcard")
 		local joker = pc == 0 and 0 < tweak_data.lootdrop.joker_chance
 		local card_i = my_card and type_to_card[item_category] or math.max(pc, 1)
-		if not my_card then
-			local card_weights = tweak_data.lootdrop.WEIGHTED_TYPE_CHANCE[card_i * 10] or {}
-			if card_i == 10 then
-				card_i = 1
-			elseif math.rand((card_weights.weapon_mods or 0) + (card_weights.cash or 1)) < (card_weights.cash or 1) then
-				card_i = 3
-			else
-				card_i = 2
-			end
-		end
 		local texture, rect, coords = tweak_data.hud_icons:get_icon_data(card_nums[card_i] or "downcard_overkill_deck")
 		local upcard = card_panel:bitmap({
 			name = "upcard",

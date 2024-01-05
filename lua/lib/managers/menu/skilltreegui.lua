@@ -245,6 +245,9 @@ function SkillTreeSkillItem:flash()
 end
 
 function SkillTreeSkillItem:refresh(locked)
+	if not alive(self._skill_panel) then
+		return
+	end
 	local skill_id = self._skill_panel:name()
 	self._skill_panel:stop()
 	local step = managers.skilltree:next_skill_step(skill_id)
@@ -944,6 +947,17 @@ function SkillTreeGui:_setup()
 	end
 	self:set_active_page(managers.skilltree:get_most_progressed_tree())
 	self:set_selected_item(self._active_page:item(), true)
+	self:_rec_round_object(self._panel)
+end
+
+function SkillTreeGui:_rec_round_object(object)
+	if object.children then
+		for i, d in ipairs(object:children()) do
+			self:_rec_round_object(d)
+		end
+	end
+	local x, y = object:position()
+	object:set_position(math.round(x), math.round(y))
 end
 
 function SkillTreeGui:activate_next_tree_panel(play_sound)

@@ -120,7 +120,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.heist_name = row_item.gui_info_panel:text({
 			visible = false,
-			text = string.upper(row_item.item:parameters().level_name),
+			text = utf8.to_upper(row_item.item:parameters().level_name),
 			layer = self.layers.items,
 			font = self.font,
 			font_size = tweak_data.menu.challenges_font_size,
@@ -128,7 +128,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 			align = "left",
 			vertical = "left"
 		})
-		local briefing_text = string.upper(level_id and managers.localization:text(tweak_data.levels[level_id].briefing_id) or "")
+		local briefing_text = level_id and managers.localization:text(tweak_data.levels[level_id].briefing_id) or ""
 		row_item.heist_briefing = row_item.gui_info_panel:text({
 			visible = true,
 			x = 0,
@@ -136,19 +136,19 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 			align = "left",
 			halign = "top",
 			vertical = "top",
-			font = tweak_data.menu.small_font,
-			font_size = tweak_data.menu.small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
 			color = Color.white,
 			layer = self.layers.items,
 			text = briefing_text,
 			wrap = true,
 			word_wrap = true
 		})
-		local font_size = tweak_data.menu.lobby_info_font_size
+		local font_size = tweak_data.menu.pd2_small_font_size
 		row_item.server_title = row_item.gui_info_panel:text({
 			name = "server_title",
-			text = string.upper(managers.localization:text("menu_lobby_server_title")),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(managers.localization:text("menu_lobby_server_title")) .. " ",
+			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			align = "left",
 			vertical = "center",
@@ -158,8 +158,8 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.server_text = row_item.gui_info_panel:text({
 			name = "server_text",
-			text = string.upper(row_item.item:parameters().host_name),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(row_item.item:parameters().host_name),
+			font = tweak_data.menu.pd2_small_font,
 			color = tweak_data.hud.prime_color,
 			font_size = font_size,
 			align = "left",
@@ -170,7 +170,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.server_info_title = row_item.gui_info_panel:text({
 			name = "server_info_title",
-			text = string.upper(managers.localization:text("menu_lobby_server_state_title")),
+			text = utf8.to_upper(managers.localization:text("menu_lobby_server_state_title")) .. " ",
 			font = self.font,
 			font_size = font_size,
 			align = "left",
@@ -181,7 +181,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.server_info_text = row_item.gui_info_panel:text({
 			name = "server_info_text",
-			text = string.upper(row_item.item:parameters().state_name),
+			text = utf8.to_upper(row_item.item:parameters().state_name) .. " " .. tostring(row_item.item:parameters().num_plrs) .. "/4 ",
 			font = self.font,
 			color = tweak_data.hud.prime_color,
 			font_size = font_size,
@@ -193,8 +193,8 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.level_title = row_item.gui_info_panel:text({
 			name = "level_title",
-			text = string.upper(managers.localization:text("menu_lobby_campaign_title")),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(managers.localization:text("menu_lobby_campaign_title")) .. " ",
+			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			align = "left",
 			vertical = "center",
@@ -204,8 +204,8 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.level_text = row_item.gui_info_panel:text({
 			name = "level_text",
-			text = string.upper(row_item.item:parameters().real_level_name),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(row_item.item:parameters().real_level_name),
+			font = tweak_data.menu.pd2_small_font,
 			color = tweak_data.hud.prime_color,
 			font_size = font_size,
 			align = "left",
@@ -216,8 +216,8 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.difficulty_title = row_item.gui_info_panel:text({
 			name = "difficulty_title",
-			text = string.upper(managers.localization:text("menu_lobby_difficulty_title")),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(managers.localization:text("menu_lobby_difficulty_title")) .. " ",
+			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			align = "left",
 			vertical = "center",
@@ -227,8 +227,8 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.difficulty_text = row_item.gui_info_panel:text({
 			name = "difficulty_text",
-			text = string.upper(managers.localization:text("menu_difficulty_" .. row_item.item:parameters().difficulty)),
-			font = tweak_data.menu.default_font,
+			text = utf8.to_upper(managers.localization:text("menu_difficulty_" .. row_item.item:parameters().difficulty)),
+			font = tweak_data.menu.pd2_small_font,
 			color = tweak_data.hud.prime_color,
 			font_size = font_size,
 			align = "left",
@@ -247,6 +247,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 			layer = -1
 		})
 		row_item.menu_unselected:set_color(row_item.item:parameters().is_expanded and Color(0.5, 0.5, 0.5) or Color.white)
+		row_item.menu_unselected:hide()
 	else
 		MenuNodeTableGui.super._create_menu_item(self, row_item)
 	end
@@ -255,7 +256,7 @@ end
 function MenuNodeTableGui:_align_server_column(row_item)
 	local safe_rect = self:_scaled_size()
 	self:_align_item_gui_info_panel(row_item.gui_info_panel)
-	local font_size = tweak_data.menu.lobby_info_font_size
+	local font_size = tweak_data.menu.pd2_small_font_size
 	local offset = 22 * tweak_data.scale.lobby_info_offset_multiplier
 	row_item.server_title:set_font_size(font_size)
 	row_item.server_text:set_font_size(font_size)
@@ -265,6 +266,7 @@ function MenuNodeTableGui:_align_server_column(row_item)
 	row_item.server_title:set_w(w)
 	row_item.server_text:set_lefttop(row_item.server_title:righttop())
 	row_item.server_text:set_w(row_item.gui_info_panel:w())
+	row_item.server_text:set_position(math.round(row_item.server_text:x()), math.round(row_item.server_text:y()))
 	row_item.server_info_title:set_font_size(font_size)
 	row_item.server_info_text:set_font_size(font_size)
 	local x, y, w, h = row_item.server_info_title:text_rect()
@@ -273,6 +275,7 @@ function MenuNodeTableGui:_align_server_column(row_item)
 	row_item.server_info_title:set_w(w)
 	row_item.server_info_text:set_lefttop(row_item.server_info_title:righttop())
 	row_item.server_info_text:set_w(row_item.gui_info_panel:w())
+	row_item.server_info_text:set_position(math.round(row_item.server_info_text:x()), math.round(row_item.server_info_text:y()))
 	row_item.level_title:set_font_size(font_size)
 	row_item.level_text:set_font_size(font_size)
 	local x, y, w, h = row_item.level_title:text_rect()
@@ -281,6 +284,7 @@ function MenuNodeTableGui:_align_server_column(row_item)
 	row_item.level_title:set_w(w)
 	row_item.level_text:set_lefttop(row_item.level_title:righttop())
 	row_item.level_text:set_w(row_item.gui_info_panel:w())
+	row_item.level_text:set_position(math.round(row_item.level_text:x()), math.round(row_item.level_text:y()))
 	row_item.difficulty_title:set_font_size(font_size)
 	row_item.difficulty_text:set_font_size(font_size)
 	local x, y, w, h = row_item.difficulty_title:text_rect()
@@ -289,6 +293,7 @@ function MenuNodeTableGui:_align_server_column(row_item)
 	row_item.difficulty_title:set_w(w)
 	row_item.difficulty_text:set_lefttop(row_item.difficulty_title:righttop())
 	row_item.difficulty_text:set_w(row_item.gui_info_panel:w())
+	row_item.difficulty_text:set_position(math.round(row_item.difficulty_text:x()), math.round(row_item.difficulty_text:y()))
 	local _, _, _, h = row_item.heist_name:text_rect()
 	local w = row_item.gui_info_panel:w()
 	row_item.heist_name:set_height(h)
@@ -297,6 +302,7 @@ function MenuNodeTableGui:_align_server_column(row_item)
 	row_item.heist_briefing:set_shape(row_item.heist_briefing:text_rect())
 	row_item.heist_briefing:set_x(0)
 	row_item.heist_briefing:set_y(tweak_data.menu.info_padding + offset * 4 + tweak_data.menu.info_padding * 2)
+	row_item.heist_briefing:set_position(math.round(row_item.heist_briefing:x()), math.round(row_item.heist_briefing:y()))
 end
 
 function MenuNodeTableGui:_setup_item_panel_parent(safe_rect)

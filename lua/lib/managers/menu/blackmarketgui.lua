@@ -3714,146 +3714,147 @@ function BlackMarketGui:populate_mod_types(data)
 end
 
 function BlackMarketGui:populate_mods(data)
-	local new_data = {}
-	local default_mod = data.on_create_data.default_mod
-	local global_values = managers.blackmarket:get_crafted_category(data.prev_node_data.category)[data.prev_node_data.slot].global_values or {}
-	local gvs = {}
-	local mod_t = {}
-	local num_steps = #data.on_create_data
-	for index, mod_t in ipairs(data.on_create_data) do
-		local mod_name = mod_t[1]
-		local mod_default = mod_t[2]
-		local mod_global_value = mod_t[3] or "normal"
-		new_data = {}
-		new_data.name = mod_name or data.prev_node_data.name
-		new_data.name_localized = mod_name and managers.weapon_factory:get_part_name_by_part_id(mod_name) or managers.localization:text("bm_menu_no_mod")
-		new_data.category = not data.category and data.prev_node_data and data.prev_node_data.category
-		new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/mods/" .. new_data.name
-		new_data.slot = not data.slot and data.prev_node_data and data.prev_node_data.slot
-		new_data.global_value = mod_global_value
-		new_data.unlocked = mod_default or managers.blackmarket:get_item_amount(new_data.global_value, "weapon_mods", new_data.name)
-		new_data.equipped = false
-		new_data.stream = true
-		new_data.default_mod = default_mod
-		if tweak_data.lootdrop.global_values[mod_global_value] and tweak_data.lootdrop.global_values[mod_global_value].dlc and not tweak_data.dlc[mod_global_value].free and not managers.dlc:has_dlc(mod_global_value) then
-			new_data.unlocked = -math.abs(new_data.unlocked)
-			new_data.lock_texture = "guis/textures/pd2/lock_skill"
-			new_data.dlc_locked = "bm_menu_dlc_locked"
-		end
-		local weapon_id = managers.blackmarket:get_crafted_category(new_data.category)[new_data.slot].weapon_id
-		new_data.price = managers.money:get_weapon_modify_price(weapon_id, new_data.name, new_data.global_value)
-		new_data.can_afford = managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
-		if not new_data.unlocked or new_data.unlocked == 0 then
-			new_data.mid_text = {}
-			new_data.mid_text.selected_text = managers.localization:text("bm_menu_no_items")
-			new_data.mid_text.selected_color = tweak_data.screen_colors.text
-			new_data.mid_text.noselected_text = new_data.mid_text.selected_text
-			new_data.mid_text.noselected_color = tweak_data.screen_colors.text
-			new_data.mid_text.vertical = "center"
-		end
-		if mod_name then
-			local forbids = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
-			if forbids and 0 < #forbids then
-				if type(new_data.unlocked) == "number" then
-					new_data.unlocked = -new_data.unlocked
-				else
-					new_data.unlocked = false
-				end
-				new_data.lock_texture = new_data.unlocked and new_data.unlocked ~= 0 and "guis/textures/pd2/lock_incompatible"
-				new_data.conflict = managers.localization:text("bm_menu_" .. tostring(tweak_data.weapon.factory.parts[forbids[1]].type))
-			end
-			local perks = managers.blackmarket:get_perks_from_part(new_data.name)
-			if 0 < table.size(perks) then
-				new_data.desc_mini_icons = {}
-				local perk_index = 1
-				for perk in pairs(perks) do
-					table.insert(new_data.desc_mini_icons, {
-						texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
-						right = (perk_index - 1) * 18,
-						bottom = 0,
-						w = 16,
-						h = 16
-					})
-					perk_index = perk_index + 1
-				end
-			end
-			if not new_data.conflict and new_data.unlocked then
-				new_data.comparision_data = managers.blackmarket:get_weapon_stats_with_mod(new_data.category, new_data.slot, mod_name)
-			end
-			if managers.blackmarket:got_new_drop(mod_global_value, "weapon_mods", mod_name) then
-				new_data.mini_icons = new_data.mini_icons or {}
-				table.insert(new_data.mini_icons, {
-					name = "new_drop",
-					texture = "guis/textures/pd2/blackmarket/inv_newdrop",
-					left = 0,
-					top = 0,
-					layer = 1,
-					w = 16,
-					h = 16,
-					stream = false
-				})
-				new_data.new_drop_data = {
-					new_data.global_value or "normal",
-					"weapon_mods",
-					mod_name
-				}
-			end
-		end
-		if mod_name and new_data.unlocked then
-			if type(new_data.unlocked) ~= "number" or new_data.unlocked > 0 then
-				if new_data.can_afford then
-					table.insert(new_data, "wm_buy")
-				end
-				table.insert(new_data, "wm_preview")
-				table.insert(new_data, "wm_preview_mod")
-			else
-				table.insert(new_data, "wm_remove_preview")
-			end
-		end
-		data[index] = new_data
-	end
-	for i = 1, 9 do
-		if not data[i] then
+	if true then
+		local new_data = {}
+		local default_mod = data.on_create_data.default_mod
+		local global_values = managers.blackmarket:get_crafted_category(data.prev_node_data.category)[data.prev_node_data.slot].global_values or {}
+		local gvs = {}
+		local mod_t = {}
+		local num_steps = #data.on_create_data
+		for index, mod_t in ipairs(data.on_create_data) do
+			local mod_name = mod_t[1]
+			local mod_default = mod_t[2]
+			local mod_global_value = mod_t[3] or "normal"
 			new_data = {}
-			new_data.name = "empty"
-			new_data.name_localized = ""
-			new_data.category = data.category
-			new_data.slot = i
-			new_data.unlocked = true
+			new_data.name = mod_name or data.prev_node_data.name
+			new_data.name_localized = mod_name and managers.weapon_factory:get_part_name_by_part_id(mod_name) or managers.localization:text("bm_menu_no_mod")
+			new_data.category = not data.category and data.prev_node_data and data.prev_node_data.category
+			new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/mods/" .. new_data.name
+			new_data.slot = not data.slot and data.prev_node_data and data.prev_node_data.slot
+			new_data.global_value = mod_global_value
+			new_data.unlocked = mod_default or managers.blackmarket:get_item_amount(new_data.global_value, "weapon_mods", new_data.name)
 			new_data.equipped = false
-			data[i] = new_data
+			new_data.stream = true
+			new_data.default_mod = default_mod
+			if tweak_data.lootdrop.global_values[mod_global_value] and tweak_data.lootdrop.global_values[mod_global_value].dlc and not tweak_data.dlc[mod_global_value].free and not managers.dlc:has_dlc(mod_global_value) then
+				new_data.unlocked = -math.abs(new_data.unlocked)
+				new_data.lock_texture = "guis/textures/pd2/lock_skill"
+				new_data.dlc_locked = "bm_menu_dlc_locked"
+			end
+			local weapon_id = managers.blackmarket:get_crafted_category(new_data.category)[new_data.slot].weapon_id
+			new_data.price = managers.money:get_weapon_modify_price(weapon_id, new_data.name, new_data.global_value)
+			new_data.can_afford = managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
+			if not new_data.unlocked or new_data.unlocked == 0 then
+				new_data.mid_text = {}
+				new_data.mid_text.selected_text = managers.localization:text("bm_menu_no_items")
+				new_data.mid_text.selected_color = tweak_data.screen_colors.text
+				new_data.mid_text.noselected_text = new_data.mid_text.selected_text
+				new_data.mid_text.noselected_color = tweak_data.screen_colors.text
+				new_data.mid_text.vertical = "center"
+			end
+			if mod_name then
+				local forbids = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
+				if forbids and 0 < #forbids then
+					if type(new_data.unlocked) == "number" then
+						new_data.unlocked = -new_data.unlocked
+					else
+						new_data.unlocked = false
+					end
+					new_data.lock_texture = new_data.unlocked and new_data.unlocked ~= 0 and "guis/textures/pd2/lock_incompatible"
+					new_data.conflict = managers.localization:text("bm_menu_" .. tostring(tweak_data.weapon.factory.parts[forbids[1]].type))
+				end
+				local perks = managers.blackmarket:get_perks_from_part(new_data.name)
+				if 0 < table.size(perks) then
+					new_data.desc_mini_icons = {}
+					local perk_index = 1
+					for perk in pairs(perks) do
+						table.insert(new_data.desc_mini_icons, {
+							texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk,
+							right = (perk_index - 1) * 18,
+							bottom = 0,
+							w = 16,
+							h = 16
+						})
+						perk_index = perk_index + 1
+					end
+				end
+				if not new_data.conflict and new_data.unlocked then
+					new_data.comparision_data = managers.blackmarket:get_weapon_stats_with_mod(new_data.category, new_data.slot, mod_name)
+				end
+				if managers.blackmarket:got_new_drop(mod_global_value, "weapon_mods", mod_name) then
+					new_data.mini_icons = new_data.mini_icons or {}
+					table.insert(new_data.mini_icons, {
+						name = "new_drop",
+						texture = "guis/textures/pd2/blackmarket/inv_newdrop",
+						left = 0,
+						top = 0,
+						layer = 1,
+						w = 16,
+						h = 16,
+						stream = false
+					})
+					new_data.new_drop_data = {
+						new_data.global_value or "normal",
+						"weapon_mods",
+						mod_name
+					}
+				end
+			end
+			if mod_name and new_data.unlocked then
+				if type(new_data.unlocked) ~= "number" or new_data.unlocked > 0 then
+					if new_data.can_afford then
+						table.insert(new_data, "wm_buy")
+					end
+					table.insert(new_data, "wm_preview")
+					table.insert(new_data, "wm_preview_mod")
+				else
+					table.insert(new_data, "wm_remove_preview")
+				end
+			end
+			data[index] = new_data
 		end
-	end
-	local weapon_blueprint = managers.blackmarket:get_weapon_blueprint(data.prev_node_data.category, data.prev_node_data.slot) or {}
-	local equipped
-	for i, mod in ipairs(data) do
-		for _, weapon_mod in ipairs(weapon_blueprint) do
-			if mod.name == weapon_mod and (not global_values[weapon_mod] or global_values[weapon_mod] == data[i].global_value) then
-				equipped = i
-				break
+		for i = 1, 9 do
+			if not data[i] then
+				new_data = {}
+				new_data.name = "empty"
+				new_data.name_localized = ""
+				new_data.category = data.category
+				new_data.slot = i
+				new_data.unlocked = true
+				new_data.equipped = false
+				data[i] = new_data
 			end
 		end
-	end
-	if equipped then
-		data[equipped].equipped = true
-		data[equipped].unlocked = data[equipped].unlocked or true
-		data[equipped].mid_text = nil
-		for i = 1, #data[equipped] do
-			table.remove(data[equipped], 1)
-		end
-		data[equipped].price = 0
-		data[equipped].can_afford = true
-		table.insert(data[equipped], "wm_remove_buy")
-		table.insert(data[equipped], "wm_remove_preview_mod")
-		table.insert(data[equipped], "wm_remove_preview")
-		if not data[equipped].conflict then
-			if data[equipped].default_mod then
-				data[equipped].comparision_data = managers.blackmarket:get_weapon_stats_with_mod(data[equipped].category, data[equipped].slot, data[equipped].default_mod)
-			else
-				data[equipped].comparision_data = managers.blackmarket:get_weapon_stats_without_mod(data[equipped].category, data[equipped].slot, data[equipped].name)
+		local weapon_blueprint = managers.blackmarket:get_weapon_blueprint(data.prev_node_data.category, data.prev_node_data.slot) or {}
+		local equipped
+		for i, mod in ipairs(data) do
+			for _, weapon_mod in ipairs(weapon_blueprint) do
+				if mod.name == weapon_mod and (not global_values[weapon_mod] or global_values[weapon_mod] == data[i].global_value) then
+					equipped = i
+					break
+				end
 			end
 		end
-	end
+		if equipped then
+			data[equipped].equipped = true
+			data[equipped].unlocked = data[equipped].unlocked or true
+			data[equipped].mid_text = nil
+			for i = 1, #data[equipped] do
+				table.remove(data[equipped], 1)
+			end
+			data[equipped].price = 0
+			data[equipped].can_afford = true
+			table.insert(data[equipped], "wm_remove_buy")
+			table.insert(data[equipped], "wm_remove_preview_mod")
+			table.insert(data[equipped], "wm_remove_preview")
+			if not data[equipped].conflict then
+				elseif data[equipped].default_mod then
+					data[equipped].comparision_data = managers.blackmarket:get_weapon_stats_with_mod(data[equipped].category, data[equipped].slot, data[equipped].default_mod)
+				else
+					data[equipped].comparision_data = managers.blackmarket:get_weapon_stats_without_mod(data[equipped].category, data[equipped].slot, data[equipped].name)
+				end
+			end
+		end
 end
 
 function BlackMarketGui:set_equipped_comparision(data)
