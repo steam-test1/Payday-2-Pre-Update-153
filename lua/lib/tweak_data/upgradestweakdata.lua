@@ -987,7 +987,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[45] = {
 		name_id = "weapons",
-		upgrades = {"m249"}
+		upgrades = {"m249", "barbedwire"}
 	}
 	self.level_tree[50] = {
 		name_id = "lvl_50",
@@ -4641,6 +4641,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		dlc = "gage_pack_shotgun"
 	}
 	self.definitions.moneybundle = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
+	}
+	self.definitions.barbedwire = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
 	}

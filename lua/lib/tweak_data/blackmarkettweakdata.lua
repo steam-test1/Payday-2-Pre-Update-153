@@ -4810,5 +4810,33 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.moneybundle.sounds.hit_gen = "cash_hit_gen"
 	self.melee_weapons.moneybundle.sounds.hit_body = "cash_hit_body"
 	self.melee_weapons.moneybundle.sounds.charge = "cash_charge"
+	self.melee_weapons.barbedwire = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.barbedwire.name_id = "bm_melee_baseballbat"
+	self.melee_weapons.barbedwire.dlc = "pd2_clan"
+	self.melee_weapons.barbedwire.texture_bundle_folder = "washington_reveal"
+	self.melee_weapons.barbedwire.free = nil
+	self.melee_weapons.barbedwire.anim_global_param = "melee_baseballbat"
+	self.melee_weapons.barbedwire.type = "axe"
+	self.melee_weapons.barbedwire.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.barbedwire.unit = "units/pd2_washington_reveal/weapons/wpn_fps_mel_barbedwire/wpn_fps_mel_barbedwire"
+	self.melee_weapons.barbedwire.third_unit = "units/pd2_washington_reveal/weapons/wpn_fps_mel_barbedwire/wpn_third_mel_barbedwire"
+	self.melee_weapons.barbedwire.stats.weapon_type = "blunt"
+	self.melee_weapons.barbedwire.stats.min_damage = 4
+	self.melee_weapons.barbedwire.stats.max_damage = 6.64
+	self.melee_weapons.barbedwire.stats.min_damage_effect = 4
+	self.melee_weapons.barbedwire.stats.max_damage_effect = 3.2
+	self.melee_weapons.barbedwire.stats.charge_time = 3
+	self.melee_weapons.barbedwire.stats.range = 275
+	self.melee_weapons.barbedwire.sounds = {}
+	self.melee_weapons.barbedwire.repeat_expire_t = 1
+	self.melee_weapons.barbedwire.expire_t = 1.2
+	self.melee_weapons.barbedwire.sounds.equip = "bat_equip"
+	self.melee_weapons.barbedwire.sounds.hit_air = "bat_hit_air"
+	self.melee_weapons.barbedwire.sounds.hit_gen = "bat_hit_gen"
+	self.melee_weapons.barbedwire.sounds.hit_body = "bat_hit_body"
+	self.melee_weapons.barbedwire.sounds.charge = "bat_charge"
+	self.melee_weapons.barbedwire.melee_damage_delay = 0.2
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

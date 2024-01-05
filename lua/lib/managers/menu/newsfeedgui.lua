@@ -66,7 +66,7 @@ function NewsFeedGui:news_result(success, body)
 		return
 	end
 	if success then
-		self._titles = self:_get_text_block(body, "<title><![CDATA[", "]]></title>", self.MAX_NEWS)
+		self._titles = self:_get_text_block(body, "<title>", "</title>", self.MAX_NEWS)
 		self._links = self:_get_text_block(body, "<link><![CDATA[", "]]></link>", self.MAX_NEWS)
 		self._news = {i = 0}
 		self._next = true

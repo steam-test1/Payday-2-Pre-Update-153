@@ -5662,7 +5662,7 @@ function BlackMarketGui:populate_melee_weapons(data)
 		end
 		return x[1] < y[1]
 	end)
-	local max_items = (data.override_slots[1] or 3) * (data.override_slots[2] or 3)
+	local max_items = math.ceil(#sort_data / (data.override_slots[1] or 3)) * (data.override_slots[1] or 3)
 	for i = 1, max_items do
 		data[i] = nil
 	end
