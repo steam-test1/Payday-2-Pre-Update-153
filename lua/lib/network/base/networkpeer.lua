@@ -189,6 +189,18 @@ function NetworkPeer:set_used_deployable(used)
 	self._used_deployable = used
 end
 
+function NetworkPeer:set_used_cable_ties(used_cable_ties)
+	self._used_cable_ties = used_cable_ties
+end
+
+function NetworkPeer:on_used_cable_tie()
+	self._used_cable_ties = (self._used_cable_ties or 0) + 1
+end
+
+function NetworkPeer:used_cable_ties()
+	return self._used_cable_ties
+end
+
 function NetworkPeer:waiting_for_player_ready()
 	return self._waiting_for_player_ready
 end

@@ -105,16 +105,18 @@ function ECMJammerBase:set_active(active)
 				self._attached_data.max_index = 3
 			end
 			self._alert_filter = self._owner:movement():SO_access()
-			local jam_cameras
+			local jam_cameras, jam_pagers
 			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
 				jam_cameras = managers.player:has_category_upgrade("ecm_jammer", "affects_cameras")
+				jam_pagers = managers.player:has_category_upgrade("ecm_jammer", "affects_pagers")
 			else
 				jam_cameras = self._owner:base():upgrade_value("ecm_jammer", "affects_cameras")
+				jam_pagers = self._owner:base():upgrade_value("ecm_jammer", "affects_pagers")
 			end
 			managers.groupai:state():register_ecm_jammer(self._unit, {
 				call = true,
 				camera = jam_cameras,
-				pager = true
+				pager = jam_pagers
 			})
 			self:_send_net_event(self._NET_EVENTS.jammer_active)
 		else

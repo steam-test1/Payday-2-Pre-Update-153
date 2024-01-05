@@ -48,14 +48,15 @@ function NetworkMember:_get_old_entry()
 	local member_downed
 	local health = 1
 	local used_deployable = false
-	local member_dead
+	local used_cable_ties, member_dead
 	if old_plr_entry and old_plr_entry.t + 180 > Application:time() then
 		member_downed = old_plr_entry.member_downed
 		health = old_plr_entry.health
 		used_deployable = old_plr_entry.used_deployable
+		used_cable_ties = old_plr_entry.used_cable_ties
 		member_dead = old_plr_entry.member_dead
 	end
-	return member_downed, member_dead, health, used_deployable, old_plr_entry
+	return member_downed, member_dead, health, used_deployable, used_cable_ties, old_plr_entry
 end
 
 function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
@@ -90,7 +91,7 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	else
 		pos_rot = managers.network:spawn_point(spawn_point_id).pos_rot
 	end
-	local member_downed, member_dead, health, used_deployable, old_plr_entry = self:_get_old_entry()
+	local member_downed, member_dead, health, used_deployable, used_cable_ties, old_plr_entry = self:_get_old_entry()
 	if old_plr_entry then
 		old_plr_entry.member_downed = nil
 		old_plr_entry.member_dead = nil
@@ -127,9 +128,9 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	if is_drop_in then
 		self._peer:set_used_deployable(used_deployable)
 		if self == Global.local_member then
-			managers.player:spawn_dropin_penalty(spawn_in_custody, spawn_in_custody, health, used_deployable)
+			managers.player:spawn_dropin_penalty(spawn_in_custody, spawn_in_custody, health, used_deployable, used_cable_ties)
 		else
-			self._peer:send_queued_sync("spawn_dropin_penalty", spawn_in_custody, spawn_in_custody, health, used_deployable)
+			self._peer:send_queued_sync("spawn_dropin_penalty", spawn_in_custody, spawn_in_custody, health, used_deployable, used_cable_ties)
 		end
 	end
 	return unit

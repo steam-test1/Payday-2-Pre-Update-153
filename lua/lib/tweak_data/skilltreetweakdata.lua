@@ -1354,7 +1354,8 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"ecm_jammer_duration_multiplier_2",
-				"ecm_jammer_feedback_duration_boost_2"
+				"ecm_jammer_feedback_duration_boost_2",
+				"ecm_jammer_affects_pagers"
 			},
 			cost = self.costs.hightierpro
 		}

@@ -154,6 +154,7 @@ end
 function SavefileManager:save_progress(save_system)
 	if self:_is_saving_progress_allowed() then
 		self:_save(self.PROGRESS_SLOT, nil, save_system)
+		Global.savefile_manager.backup_save_enabled = SystemInfo:platform() == Idstring("WIN32")
 	end
 end
 

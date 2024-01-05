@@ -74,6 +74,10 @@ function MenuMainState:at_enter(old_state)
 		end
 		managers.menu:show_question_start_tutorial({yes_func = yes_func})
 	end
+	if Global.savefile_manager.backup_save_enabled then
+		print("BACKUP SAVE")
+		managers.savefile:save_progress("local_hdd")
+	end
 end
 
 function MenuMainState:at_exit(new_state)

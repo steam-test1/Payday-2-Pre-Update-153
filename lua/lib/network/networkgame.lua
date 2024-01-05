@@ -372,6 +372,7 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 			member_health = mugshot_data and mugshot_data.health_amount or 1
 		end
 		local member_used_deployable = peer:used_deployable() or false
+		local member_used_cable_ties = peer:used_cable_ties() or 0
 		self._members[peer_id]:delete()
 		self._members[peer_id] = nil
 		local peer_ident = SystemInfo:platform() == Idstring("WIN32") and peer:user_id() or peer:name()
@@ -399,6 +400,7 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 						member_downed = member_downed,
 						health = member_health,
 						used_deployable = member_used_deployable,
+						used_cable_ties = member_used_cable_ties,
 						member_dead = member_dead
 					}
 					local trade_entry = managers.trade:replace_player_with_ai(player_character, player_character)

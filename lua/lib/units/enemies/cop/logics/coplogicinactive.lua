@@ -159,6 +159,12 @@ function CopLogicInactive.clbk_alarm_pager_triggered(ignore_this, data)
 	if managers.groupai:state():enemy_weapons_hot() then
 		return
 	end
+	if managers.groupai:state():is_ecm_jammer_active("pager") then
+		local pager_delay = math.lerp(tweak_data.player.alarm_pager.ring_delay[1], tweak_data.player.alarm_pager.ring_delay[2], math.random())
+		my_data.pager_alert_clbk_id = "alarm_pager" .. tostring(data.key)
+		CopLogicBase.add_delayed_clbk(my_data, my_data.pager_alert_clbk_id, callback(CopLogicInactive, CopLogicInactive, "clbk_alarm_pager_triggered", data), TimerManager:game():time() + pager_delay)
+		return
+	end
 	data.unit:base():set_material_state(false)
 	local u_id = managers.enemy:get_corpse_unit_data_from_key(data.key).u_id
 	managers.network:session():send_to_peers_synched("set_corpse_material_config", u_id, false)

@@ -205,14 +205,17 @@ function PlayerManager:_add_level_equipment(player)
 	end
 end
 
-function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deployable)
+function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties)
 	local player = self:player_unit()
-	print("[PlayerManager:spawn_dropin_penalty]", dead, bleed_out, health)
+	print("[PlayerManager:spawn_dropin_penalty]", dead, bleed_out, health, used_deployable, used_cable_ties)
 	if not alive(player) then
 		return
 	end
 	if used_deployable then
 		managers.player:clear_equipment()
+	end
+	for i = 1, used_cable_ties do
+		self:remove_special("cable_tie")
 	end
 	local min_health
 	if dead or bleed_out then
@@ -791,6 +794,10 @@ end
 
 function PlayerManager:set_synced_cable_ties(peer_id, amount)
 	local only_update_amount = false
+	if self._global.synced_cable_ties[peer_id] and amount < self._global.synced_cable_ties[peer_id].amount and managers.network:session() and managers.network:session():peer(peer_id) then
+		local peer = managers.network:session():peer(peer_id)
+		peer:on_used_cable_tie()
+	end
 	self._global.synced_cable_ties[peer_id] = {amount = amount}
 	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
 	if character_data and character_data.panel_id then

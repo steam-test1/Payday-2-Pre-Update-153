@@ -354,14 +354,11 @@ function UseInteractionExt:interact(player)
 	if self._unit:base() and self._unit:base().set_alert_radius then
 		if managers.player:has_category_upgrade("player", "silent_drill") then
 			self._unit:base():set_alert_radius(nil)
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
 		elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
 			local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
 			self._unit:base():set_alert_radius(radius)
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
 		else
 			self._unit:base():set_alert_radius(2500)
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
 		end
 		local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
 		if 0 < autorepair_chance and autorepair_chance > math.random() then
@@ -393,12 +390,8 @@ function UseInteractionExt:sync_interacted(peer, skip_alive_check)
 	if Network:is_server() and self._unit:base() and self._unit:base().set_alert_radius then
 		if player:base():upgrade_value("player", "silent_drill") then
 			self._unit:base():set_alert_radius(nil)
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
 		elseif player:base():upgrade_value("player", "drill_alert_rad") then
 			self._unit:base():set_alert_radius(player:base():upgrade_value("player", "drill_alert_rad"))
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
-		else
-			self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
 		end
 		if player:base():upgrade_value("player", "drill_autorepair") then
 			self._unit:base():set_autorepair(true)
@@ -1068,14 +1061,11 @@ function MissionDoorDeviceInteractionExt:interact(player)
 		if self._unit:base() and self._unit:base().set_alert_radius then
 			if managers.player:has_category_upgrade("player", "silent_drill") then
 				self._unit:base():set_alert_radius(nil)
-				self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
 			elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
 				local radius = managers.player:upgrade_value("player", "drill_alert_rad", self._unit:base()._alert_radius)
 				self._unit:base():set_alert_radius(radius)
-				self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
 			else
 				self._unit:base():set_alert_radius(2500)
-				self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
 			end
 			local autorepair_chance = managers.player:upgrade_value("player", "drill_autorepair", 0)
 			if 0 < autorepair_chance and autorepair_chance > math.random() then
@@ -1083,6 +1073,21 @@ function MissionDoorDeviceInteractionExt:interact(player)
 			else
 				self._unit:base():set_autorepair(nil)
 			end
+		end
+	end
+	if managers.network:session() and self._unit:base() and self._unit:base().set_alert_radius then
+		if managers.player:has_category_upgrade("player", "silent_drill") then
+			managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", 3)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
+			print("DRILL SOUND: User Drill (ACED SKILL)")
+		elseif managers.player:has_category_upgrade("player", "drill_alert_rad") then
+			managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", 2)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
+			print("DRILL SOUND: User Drill (BASIC SKILL)")
+		else
+			managers.network:session():send_to_peers_synched("sync_unit_event_id_8", self._unit, "base", 1)
+			self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
+			print("DRILL SOUND: User Drill (NO SKILL)")
 		end
 	end
 end
