@@ -125,6 +125,17 @@ function DLCTweakData:init(tweak_data)
 	self.pd2_clan5.content.upgrades = {
 		"brass_knuckles"
 	}
+	self.pd2_clan6 = {}
+	self.pd2_clan6.content = {}
+	self.pd2_clan6.dlc = "has_pd2_clan"
+	self.pd2_clan6.content.loot_global_value = "pd2_clan"
+	self.pd2_clan6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "unicorn",
+			amount = 1
+		}
+	}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

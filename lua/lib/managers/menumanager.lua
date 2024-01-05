@@ -2854,7 +2854,7 @@ function KickPlayer:modify_node(node, up)
 		for _, peer in pairs(managers.network:session():peers()) do
 			local params = {
 				name = peer:name(),
-				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. peer:level() .. ")",
+				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. (peer:level() or "") .. ")",
 				callback = "kick_player",
 				to_upper = false,
 				localize = "false",
@@ -2877,7 +2877,7 @@ function MutePlayer:modify_node(node, up)
 		for _, peer in pairs(managers.network:session():peers()) do
 			local params = {
 				name = peer:name(),
-				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. peer:level() .. ")",
+				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. (peer:level() or "") .. ")",
 				callback = "mute_player",
 				to_upper = false,
 				localize = "false",

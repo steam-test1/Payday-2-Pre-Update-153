@@ -662,7 +662,8 @@ function StatisticsManager:_get_stat_tables()
 		"baton",
 		"shovel",
 		"becker",
-		"moneybundle"
+		"moneybundle",
+		"barbedwire"
 	}
 	local enemy_list = {
 		"cop",
@@ -1226,7 +1227,7 @@ end
 
 function StatisticsManager:tied(data)
 	data.type = tweak_data.character[data.name] and tweak_data.character[data.name].challenges.type
-	if not self._global.killed[data.name] then
+	if not self._global.killed[data.name] or not self._global.session.killed[data.name] then
 		Application:error("Bad name id applied to tied, " .. tostring(data.name) .. ". Defaulting to 'other'")
 		data.name = "other"
 	end

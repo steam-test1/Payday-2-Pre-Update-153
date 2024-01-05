@@ -1622,12 +1622,9 @@ function NarrativeTweakData:init()
 		80000
 	}
 	self._jobs_index = {
-		"welcome_to_the_jungle_wrapper_prof",
 		"welcome_to_the_jungle_prof",
 		"framing_frame",
 		"framing_frame_prof",
-		"watchdogs_wrapper",
-		"watchdogs_wrapper_prof",
 		"watchdogs",
 		"watchdogs_prof",
 		"alex",

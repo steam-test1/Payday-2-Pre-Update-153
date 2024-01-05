@@ -1054,6 +1054,13 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.ancient.qlvl = 0
 	self.masks.ancient.texture_bundle_folder = "twitch_pack"
 	self.masks.ancient.dlc = "twitch_pack"
+	self.masks.unicorn = {}
+	self.masks.unicorn.unit = "units/payday2/masks/msk_unicorn/msk_unicorn"
+	self.masks.unicorn.name_id = "bm_msk_unicorn"
+	self.masks.unicorn.pcs = {}
+	self.masks.unicorn.value = 0
+	self.masks.unicorn.dlc = "pd2_clan"
+	self.masks.unicorn.global_value = "pd2_clan"
 	self.masks.franklin = {}
 	self.masks.franklin.unit = "units/pd2_dlc_big/masks/msk_franklin/msk_franklin"
 	self.masks.franklin.name_id = "bm_msk_franklin"
