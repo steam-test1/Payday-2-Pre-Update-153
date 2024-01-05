@@ -71,6 +71,8 @@ do
 		"civ_male_dj_1",
 		"civ_male_italian_robe_1",
 		"civ_male_janitor_1",
+		"civ_male_janitor_2",
+		"civ_male_janitor_3",
 		"civ_male_meth_cook_1",
 		"civ_male_party_1",
 		"civ_male_party_2",
@@ -139,7 +141,8 @@ do
 		"ene_swat_2",
 		"ene_swat_heavy_1",
 		"ene_tazer_1",
-		"ene_veteran_cop_1"
+		"ene_veteran_cop_1",
+		"npc_old_hoxton_prisonsuit_1"
 	}
 	local path_string = "units/payday2/characters/"
 	local character_path = ""

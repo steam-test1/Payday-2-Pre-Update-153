@@ -15,7 +15,11 @@ local make_fine_text = function(text)
 	text:set_position(math.round(text:x()), math.round(text:y()))
 	return text:x(), text:y(), w, h
 end
-local point_extras = {"look_angle", "plan"}
+local point_extras = {
+	"look_angle",
+	"plan",
+	"wall_rect"
+}
 local mvec = Vector3()
 local mvec2 = Vector3()
 local mvec3 = Vector3()
@@ -110,34 +114,74 @@ function PrePlanningPoint:init(map_panel, element, shape, rotation, active_node,
 						mvec3,
 						color:with_alpha(0.01)
 					})
+				elseif key == "plan" then
+					local vote_panel = self._extras[type]:panel({name = "plan"})
+					local new_icon
+					local x = 0
+					for i = 1, managers.criminals.get_num_characters() do
+						new_icon = vote_panel:bitmap({
+							x = x,
+							texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_voting",
+							texture_rect = {
+								32,
+								0,
+								24,
+								24
+							},
+							w = 18,
+							h = 18,
+							blend_mode = "normal"
+						})
+						x = new_icon:right() + 1
+					end
+					vote_panel:set_size(new_icon:right(), new_icon:bottom())
+					vote_panel:set_center_x(self._extras[type]:w() / 2)
+					vote_panel:set_top(self._extras[type]:h() / 2 + 20)
 				else
-					if key == "plan" then
-						local vote_panel = self._extras[type]:panel({name = "plan"})
-						local new_icon
-						local x = 0
-						for i = 1, managers.criminals.get_num_characters() do
-							new_icon = vote_panel:bitmap({
-								x = x,
-								texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_voting",
-								texture_rect = {
-									32,
-									0,
-									24,
-									24
-								},
-								w = 18,
-								h = 18,
-								blend_mode = "normal"
+					if key == "wall_rect" then
+						do
+							local width = value.w or value.width
+							if value.real_w or vale.real_width then
+								width = value.real_w or vale.real_width
+								width = width / w
+								width = width * self._extras[type]:w()
+							end
+							local height = value.h or value.height
+							if value.real_h or vale.real_height then
+								height = value.real_h or vale.real_height
+								height = height / h
+								height = height * self._extras[type]:h()
+							end
+							local panel = self._extras[type]:panel({
+								name = "wall_rect",
+								halign = "scale",
+								valign = "scale"
 							})
-							x = new_icon:right() + 1
+							local wall = panel:rect({
+								w = width,
+								h = height,
+								color = value.color,
+								blend_mode = "add",
+								halign = "scale",
+								valign = "scale"
+							})
+							if value.right then
+								wall:set_right(panel:w() / 2 + value.right)
+							elseif value.x or value.left then
+								wall:set_left(panel:w() / 2 + (value.x or value.left))
+							end
+							if value.bottom then
+								wall:set_bottom(panel:h() / 2 + value.bottom)
+							else
+								if value.y or value.top then
+									wall:set_top(panel:h() / 2 + (value.y or value.top))
+								else
+								end
+								break -- pseudo-goto
+							end
 						end
-						vote_panel:set_size(new_icon:right(), new_icon:bottom())
-						vote_panel:set_center_x(self._extras[type]:w() / 2)
-						vote_panel:set_top(self._extras[type]:h() / 2 + 20)
 					else
 					end
-					do break end -- pseudo-goto
-					break -- pseudo-goto
 				end
 			else
 			end
@@ -419,7 +463,7 @@ function PrePlanningPoint:_update_extra()
 		else
 			is_current_type = self._active_node.current_type == type
 			is_reserved = self._viewing_only or self._reserved_data and self._reserved_data.pack[1] == type
-			alpha = is_selected and 0.75 or is_reserved and 0.5 or is_current_type and 0.1 or 0
+			alpha = is_selected and (is_current_type and 0.75 or 0) or is_reserved and 0.5 or is_current_type and 0.1 or 0
 		end
 		extra:set_alpha(alpha)
 		extra:set_visible(0 < alpha)
@@ -2025,14 +2069,14 @@ function PrePlanningMapGui:sync_draw_point(peer_id, x, y)
 				table.insert(points, x)
 				table.insert(points, y)
 				if 4 <= #points then
-					local line_points = {}
-					local px, py
-					for i = 1, #points - 1, 2 do
-						px = points[i] * self._grid_panel:w()
-						py = points[i + 1] * self._grid_panel:h()
-						table.insert(line_points, Vector3(px, py, 0))
-					end
 					if not data.gui then
+						local line_points = {}
+						local px, py
+						for i = 1, #points - 1, 2 do
+							px = points[i] * self._grid_panel:w()
+							py = points[i + 1] * self._grid_panel:h()
+							table.insert(line_points, Vector3(px, py, 0))
+						end
 						data.gui = self._grid_panel:child(tostring(peer_id)):polyline({
 							points = line_points,
 							line_width = data.line_width,
@@ -2043,7 +2087,8 @@ function PrePlanningMapGui:sync_draw_point(peer_id, x, y)
 							valign = "scale"
 						})
 					else
-						data.gui:set_points(line_points)
+						mvector3.set_static(mvec, x * self._grid_panel:w(), y * self._grid_panel:h(), 0)
+						data.gui:add_point(mvec)
 					end
 				end
 			end
@@ -2245,45 +2290,46 @@ function PrePlanningMapGui:get_drawings()
 	return peer_draw_lines, peer_draw_line_index
 end
 
+function PrePlanningMapGui._flash_anim(text, start_color)
+	start_color = start_color or tweak_data.screen_colors.text
+	local s = 0
+	
+	local function f(t)
+		s = math.min(1, math.sin(t * 180) * 2)
+		text:set_color(math.lerp(start_color, tweak_data.screen_colors.important_1, s))
+	end
+	
+	local seconds = 0.5
+	local t = 0
+	while true do
+		local dt = coroutine.yield()
+		if dt == 0 then
+			dt = TimerManager:main():delta_time()
+		end
+		t = t + dt
+		if seconds <= t then
+			break
+		end
+		f(t / seconds, t)
+	end
+	f(1, seconds)
+	text:set_color(start_color)
+end
+
 function PrePlanningMapGui:flash_error(element_id, budget, money, ...)
 	managers.menu_component:post_event("menu_error")
 	for i, location in pairs(self._locations) do
 		location:flash_error(element_id)
 	end
-	local flash_anim = function(text)
-		local start_color = tweak_data.screen_colors.text
-		local s = 0
-		
-		local function f(t)
-			s = math.min(1, math.sin(t * 180) * 2)
-			text:set_color(math.lerp(start_color, tweak_data.screen_colors.important_1, s))
-		end
-		
-		local seconds = 0.5
-		local t = 0
-		while true do
-			local dt = coroutine.yield()
-			if dt == 0 then
-				dt = TimerManager:main():delta_time()
-			end
-			t = t + dt
-			if seconds <= t then
-				break
-			end
-			f(t / seconds, t)
-		end
-		f(1, seconds)
-		text:set_color(start_color)
-	end
 	if budget then
 		local budget_text = self._panel:child("budget_text")
 		budget_text:stop()
-		budget_text:animate(flash_anim)
+		budget_text:animate(self._flash_anim)
 	end
 	if money then
 		local total_cost = self._panel:child("total_cost")
 		total_cost:stop()
-		total_cost:animate(flash_anim)
+		total_cost:animate(self._flash_anim)
 	end
 end
 

@@ -3602,6 +3602,9 @@ end
 function GroupAIStateBase:clbk_minion_destroyed(player_key, minion_unit)
 	local minion_key = minion_unit:key()
 	local owner_data = self._player_criminals[player_key]
+	if not owner_data then
+		return
+	end
 	local minion_data = owner_data.minions[minion_key]
 	minion_data.minion_destroyed_clbk_key = nil
 	self:remove_minion(minion_key, player_key)

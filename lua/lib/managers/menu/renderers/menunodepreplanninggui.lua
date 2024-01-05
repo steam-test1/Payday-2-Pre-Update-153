@@ -487,7 +487,7 @@ end
 function MenuNodePrePlanningGui:mouse_pressed(button, x, y)
 	if button == Idstring("0") or button == Idstring("1") then
 		for _, row_item in pairs(self.row_items) do
-			if row_item.gui_panel and row_item.gui_panel:inside(x, y) and row_item.type ~= "divider" then
+			if row_item.gui_panel and row_item.gui_panel:inside(x, y) and self._item_panel_parent:inside(x, y) and row_item.type ~= "divider" then
 				managers.menu_component:set_preplanning_map_position_to_item(row_item.item)
 				break
 			end

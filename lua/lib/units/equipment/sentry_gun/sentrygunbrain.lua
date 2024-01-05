@@ -57,7 +57,7 @@ function SentryGunBrain:set_active(state)
 		self._unit:weapon():stop_autofire()
 		self._firing = false
 		if Network:is_server() then
-			self._unit:network():send("cop_forbid_fire")
+			self._unit:network():send("set_allow_fire", false)
 		end
 	end
 	if not state and Network:is_server() then
@@ -218,13 +218,13 @@ function SentryGunBrain:_check_fire(t)
 				self._unit:weapon():start_autofire()
 				self._unit:weapon():trigger_held(false, true)
 				self._firing = true
-				self._unit:network():send("cop_allow_fire")
+				self._unit:network():send("set_allow_fire", true)
 			end
 		end
 	elseif self._firing then
 		self._unit:weapon():stop_autofire()
 		self._firing = false
-		self._unit:network():send("cop_forbid_fire")
+		self._unit:network():send("set_allow_fire", false)
 	end
 end
 

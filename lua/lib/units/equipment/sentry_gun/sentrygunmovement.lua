@@ -67,14 +67,12 @@ function SentryGunMovement:set_attention(attention)
 			local listener_key = "SentryGunMovement" .. tostring(self._unit:key())
 			attention.destroy_listener_key = listener_key
 			attention.unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
-			if self._ext_network then
-				self._ext_network:send("cop_set_attention_unit", attention.unit)
-			end
-		elseif self._ext_network then
+			self._ext_network:send("set_attention", attention.unit, AIAttentionObject.REACT_IDLE)
+		else
 			self._ext_network:send("cop_set_attention_pos", attention.pos)
 		end
 	elseif self._attention and Network:is_server() and self._unit:id() ~= -1 then
-		self._ext_network:send("cop_reset_attention")
+		self._ext_network:send("set_attention", nil, AIAttentionObject.REACT_IDLE)
 	end
 	self:chk_play_alert(attention, self._attention)
 	self._attention = attention

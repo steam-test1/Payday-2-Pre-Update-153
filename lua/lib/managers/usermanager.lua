@@ -90,6 +90,9 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(39, "fps_cap", 135)
 	self:setup_setting(40, "use_headbob", true)
 	self:setup_setting(41, "max_streaming_chunk", 4096)
+	self:setup_setting(42, "net_packet_throttling", false)
+	self:setup_setting(43, "net_allow_relayed_connections", false)
+	self:setup_setting(44, "net_use_compression", true)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)

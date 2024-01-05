@@ -100,6 +100,7 @@ CopActionHurt.hurt_anim_variants = {
 		r = 7
 	}
 }
+CopActionHurt.running_hurt_anim_variants = {fwd = 14}
 ShieldActionHurt = ShieldActionHurt or class(CopActionHurt)
 ShieldActionHurt.hurt_anim_variants = deep_clone(CopActionHurt.hurt_anim_variants)
 ShieldActionHurt.hurt_anim_variants.expl_hurt = {
@@ -209,6 +210,17 @@ function CopActionHurt:init(action_desc, common_data)
 		self._machine:set_parameter(redir_res, "var" .. tostring(variant), 1)
 	elseif action_type == "death" and (self._ext_anim.run or self._ext_anim.ragdoll) and self:_start_ragdoll() then
 		self.update = self._upd_ragdolled
+	elseif action_type == "heavy_hurt" and (self._ext_anim.run and self._ext_anim.move_fwd or self._ext_anim.sprint) then
+		redir_res = self._ext_movement:play_redirect("heavy_run")
+		if not redir_res then
+			debug_pause("[CopActionHurt:init] heavy_run redirect failed in", self._machine:segment_state(Idstring("base")))
+			return
+		end
+		local variant = self.running_hurt_anim_variants.fwd or 1
+		if 1 < variant then
+			variant = math.random(variant)
+		end
+		self._machine:set_parameter(redir_res, "var" .. tostring(variant), 1)
 	else
 		local variant, height, old_variant, old_info
 		if (action_type == "hurt" or action_type == "heavy_hurt") and self._ext_anim.hurt then

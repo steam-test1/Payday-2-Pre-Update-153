@@ -7,6 +7,9 @@ end
 function HostStateInGame:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
 	print("[HostStateInGame:on_join_request_received]", data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender:ip_at_index(0))
 	local my_user_id = data.local_peer:user_id() or ""
+	if SystemInfo:platform() == Idstring("WIN32") then
+		peer_name = managers.network.account:username_by_id(sender:ip_at_index(0))
+	end
 	if self:_has_peer_left_PSN(peer_name) then
 		print("this CLIENT has left us from PSN, ignore his request", peer_name)
 		return
@@ -30,6 +33,9 @@ function HostStateInGame:on_join_request_received(data, peer_name, client_prefer
 		self:_send_request_denied(sender, 7, my_user_id)
 		return
 	elseif data.wants_to_load_level then
+		self:_send_request_denied(sender, 0, my_user_id)
+		return
+	elseif not Global.local_member then
 		self:_send_request_denied(sender, 0, my_user_id)
 		return
 	end

@@ -250,6 +250,8 @@ function NewRaycastWeaponBase:_update_stats_values()
 		end
 		if self._ammo_data.bullet_class ~= nil then
 			self._bullet_class = CoreSerialize.string_to_classtable(self._ammo_data.bullet_class)
+			self._bullet_slotmask = self._bullet_class:bullet_slotmask()
+			self._blank_slotmask = self._bullet_class:blank_slotmask()
 		end
 		if self._ammo_data.armor_piercing_add ~= nil then
 			self._armor_piercing_chance = math.clamp(self._armor_piercing_chance + self._ammo_data.armor_piercing_add, 0, 1)

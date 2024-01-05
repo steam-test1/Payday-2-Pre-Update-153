@@ -1837,7 +1837,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.m16.timers = {}
 	self.m16.timers.reload_not_empty = 2.665
-	self.m16.timers.reload_empty = 3.73
+	self.m16.timers.reload_empty = 3.43
 	self.m16.timers.unequip = 0.8
 	self.m16.timers.equip = 0.8
 	self.m16.name_id = "bm_w_m16"

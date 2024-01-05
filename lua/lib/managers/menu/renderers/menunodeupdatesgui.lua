@@ -190,7 +190,7 @@ function MenuNodeUpdatesGui:setup()
 	local content_updates = self._tweak_data.item_list or {}
 	local previous_updates = {}
 	local latest_update = content_updates[#content_updates - start_number]
-	for i = #content_updates - start_number, math.max(#content_updates - num_previous_updates - start_number, 1), -1 do
+	for i = #content_updates - start_number, math.max(#content_updates - num_previous_updates - start_number + 1, 1), -1 do
 		table.insert(previous_updates, content_updates[i])
 	end
 	self._lastest_content_update = latest_update

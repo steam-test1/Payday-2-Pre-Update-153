@@ -298,6 +298,10 @@ function NetworkAccountSTEAM:username_id()
 	return Steam:username()
 end
 
+function NetworkAccountSTEAM:username_by_id(id)
+	return Steam:username(id)
+end
+
 function NetworkAccountSTEAM:player_id()
 	return Steam:userid()
 end

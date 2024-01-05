@@ -12,7 +12,10 @@ function PlayerCamera:init(unit)
 	self._camera_object:set_fov(75)
 	self:spawn_camera_unit()
 	self:_setup_sound_listener()
-	self._sync_fwd = unit:rotation():y():with_z(0):normalized()
+	self._sync_dir = {
+		yaw = unit:rotation():yaw(),
+		pitch = 0
+	}
 	self._last_sync_t = 0
 	self:setup_viewport(managers.player:viewport_config())
 end
@@ -154,14 +157,22 @@ function PlayerCamera:set_rotation(rot)
 	self._camera_controller:set_default_up(mvec1)
 	mrotation.set_yaw_pitch_roll(self._m_cam_rot, rot:yaw(), rot:pitch(), rot:roll())
 	mrotation.y(self._m_cam_rot, self._m_cam_fwd)
-	local new_fwd = self:forward()
-	local error_sync_dot = mvector3.dot(self._sync_fwd, new_fwd)
-	local t = managers.player:player_timer():time()
+	local t = TimerManager:game():time()
 	local sync_dt = t - self._last_sync_t
-	if error_sync_dot < 0.9 and 0.5 < sync_dt or error_sync_dot < 0.99 and 1 < sync_dt then
+	local sync_yaw = rot:yaw()
+	sync_yaw = sync_yaw % 360
+	if sync_yaw < 0 then
+		sync_yaw = 360 - sync_yaw
+	end
+	sync_yaw = math.floor(255 * sync_yaw / 360)
+	local sync_pitch = math.clamp(rot:pitch(), -85, 85) + 85
+	sync_pitch = math.floor(127 * sync_pitch / 170)
+	local angle_delta = math.abs(self._sync_dir.yaw - sync_yaw) + math.abs(self._sync_dir.pitch - sync_pitch)
+	if 1 < sync_dt and 0 < angle_delta or 5 < angle_delta then
+		self._unit:network():send("set_look_dir", sync_yaw, sync_pitch)
+		self._sync_dir.yaw = sync_yaw
+		self._sync_dir.pitch = sync_pitch
 		self._last_sync_t = t
-		self._unit:network():send("set_look_dir", new_fwd)
-		mvector3.set(self._sync_fwd, new_fwd)
 	end
 end
 

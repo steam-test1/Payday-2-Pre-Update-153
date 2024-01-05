@@ -1030,7 +1030,7 @@ function CopDamage:build_suppression(amount)
 		else
 			sync_amount_ratio = amount / sup_tweak.react_point[2]
 		end
-		local sync_amount = math.min(255, math.ceil(sync_amount_ratio * 255))
+		local sync_amount = math.min(15, math.ceil(sync_amount_ratio * 15))
 		managers.network:session():send_to_host("suppression", self._unit, sync_amount)
 		return
 	end

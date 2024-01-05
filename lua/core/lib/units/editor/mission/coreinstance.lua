@@ -201,3 +201,103 @@ InstanceOutputEventUnitElement = InstanceOutputEventUnitElement or class(CoreIns
 function InstanceOutputEventUnitElement:init(...)
 	InstanceOutputEventUnitElement.super.init(self, "output", ...)
 end
+
+CoreInstancePointUnitElement = CoreInstancePointUnitElement or class(MissionElement)
+InstancePointUnitElement = InstancePointUnitElement or class(CoreInstancePointUnitElement)
+
+function InstancePointUnitElement:init(...)
+	InstancePointUnitElement.super.init(self, ...)
+	self._hed.instance = nil
+	table.insert(self._save_values, "instance")
+end
+
+function InstancePointUnitElement:update_selected(t, dt)
+	if self._hed.instance then
+		InstanceEventUnitElement._draw_instance_link(self, t, dt, self._hed.instance)
+	end
+end
+
+function InstancePointUnitElement:update_editing(t, dt)
+	local instance_name = self:_instance_name_raycast()
+	if instance_name then
+		InstanceEventUnitElement._draw_instance_link(self, t, dt, instance_name)
+	end
+end
+
+function InstancePointUnitElement:selected()
+	InstanceEventUnitElement.super.selected(self)
+	local names = self:_get_options()
+	if self._instance_params then
+		CoreEws.update_combobox_options(self._instance_params, names)
+	end
+	if not table.contains(names, self._hed.instance) then
+		self._hed.instance = nil
+	end
+	if self._instance_params then
+		CoreEws.change_combobox_value(self._instance_params, self._hed.instance)
+	end
+end
+
+function InstancePointUnitElement:external_change_instance(instance)
+	self._hed.instance = instance
+end
+
+function InstancePointUnitElement:_set_instance_by_raycast()
+	local instance_name = self:_instance_name_raycast()
+	if instance_name then
+		self._hed.instance = instance_name
+		CoreEws.change_combobox_value(self._instance_params, instance_name)
+	end
+end
+
+function InstancePointUnitElement:_instance_name_raycast()
+	local ray = managers.editor:unit_by_raycast({
+		mask = 1,
+		ray_type = "body editor",
+		skip_instance_check = true
+	})
+	if not ray or not ray.unit then
+		return nil
+	end
+	local instance_name = ray.unit:unit_data().instance
+	if not instance_name then
+		return nil
+	end
+	local instance_data = managers.world_instance:get_instance_data_by_name(instance_name)
+	return instance_data.mission_placed and instance_data.script == self._unit:mission_element_data().script and instance_name or nil
+end
+
+function InstancePointUnitElement:_get_options()
+	local _names = managers.world_instance:instance_names_by_script(self._unit:mission_element_data().script)
+	local names = {}
+	for _, name in ipairs(_names) do
+		if managers.world_instance:get_instance_data_by_name(name).mission_placed then
+			table.insert(names, name)
+		end
+	end
+	return names
+end
+
+function InstancePointUnitElement:_build_panel(panel, panel_sizer)
+	self:_create_panel()
+	panel = panel or self._panel
+	panel_sizer = panel_sizer or self._panel_sizer
+	local instance_params = {
+		name = "Instance:",
+		panel = panel,
+		sizer = panel_sizer,
+		options = self:_get_options(),
+		value = self._hed.instance,
+		tooltip = "Select an instance",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sorted = false
+	}
+	local instance = CoreEWS.combobox(instance_params)
+	instance:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = instance, value = "instance"})
+	self._instance_params = instance_params
+end
+
+function InstancePointUnitElement:add_triggers(vc)
+	vc:add_trigger(Idstring("lmb"), callback(self, self, "_set_instance_by_raycast"))
+end

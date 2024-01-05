@@ -483,3 +483,9 @@ end
 function NetworkManager:protocol_type()
 	return self.PROTOCOL_TYPE
 end
+
+function NetworkManager:set_packet_throttling_enabled(state)
+	if self._session then
+		self._session:set_packet_throttling_enabled(state)
+	end
+end

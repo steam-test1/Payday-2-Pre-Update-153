@@ -398,7 +398,7 @@ function CopActionWalk:_init()
 				end
 			end
 		end
-		if not action_desc.host_stop_pos_ahead then
+		if not action_desc.host_stop_pos_ahead and self._nav_path[2] then
 			local ray_params = {
 				tracker_from = common_data.nav_tracker,
 				pos_to = self._nav_point_pos(self._nav_path[2])
@@ -752,7 +752,10 @@ function CopActionWalk:on_exit()
 	end
 	self._ext_movement:drop_held_items()
 	if self._sync then
-		self._ext_network:send("action_walk_stop", mvec3_cpy(self._ext_movement:m_pos()))
+		if not self._expired then
+			self._ext_network:send("action_walk_nav_point", mvec3_cpy(self._ext_movement:m_pos()))
+		end
+		self._ext_network:send("action_walk_stop")
 	else
 		self._ext_movement:set_m_host_stop_pos(self._ext_movement:m_pos())
 	end
@@ -788,7 +791,7 @@ function CopActionWalk:_upd_wait_for_full_blend(t)
 		else
 			if self._sync then
 				self._expired = true
-				self._ext_network:send("action_walk_stop", mvec3_cpy(self._ext_movement:m_pos()))
+				self._ext_network:send("action_walk_nav_point", mvec3_cpy(self._ext_movement:m_pos()))
 			end
 			return
 		end
@@ -1562,7 +1565,6 @@ function CopActionWalk:_upd_wait(t)
 		self:_stop_walk()
 	end
 	if not self._sync and not self._simplified_path[2] and (not self._end_of_curved_path or not self._persistent) then
-		debug_pause_unit(self._unit, "[CopActionWalk:_upd_wait] missing next nav_point. self._end_of_curved_path", self._end_of_curved_path, "self._persistent", self._persistent)
 		table.insert(self._simplified_path, mvec3_cpy(self._simplified_path[1]))
 	end
 	if not self._end_of_curved_path or not self._persistent then
@@ -1720,7 +1722,7 @@ function CopActionWalk:_upd_stop_anim(t)
 	self:_set_new_pos(dt)
 end
 
-function CopActionWalk:stop(pos)
+function CopActionWalk:stop()
 	local is_initialized = self._init_called
 	if not is_initialized then
 		self._simplified_path = self._simplified_path or {}
@@ -1729,7 +1731,14 @@ function CopActionWalk:stop(pos)
 	if 0 < #s_path and not s_path[#s_path].x then
 		s_path[#s_path] = self._nav_point_pos(s_path[#s_path])
 	end
-	table.insert(s_path, pos)
+	if next(s_path) then
+		if not s_path[#s_path].x then
+			table.insert(s_path, self._nav_point_pos(s_path[#s_path]))
+		end
+	else
+		table.insert(s_path, mvector3.copy(self._common_data.pos))
+	end
+	local pos = s_path[#s_path]
 	self._persistent = false
 	if is_initialized then
 		if self.update == self._upd_wait then
@@ -1772,17 +1781,6 @@ function CopActionWalk:stop(pos)
 			break
 		end
 	end
-	managers.navigation:draw_path(self._simplified_path, {
-		0.2,
-		0,
-		0,
-		1
-	}, {
-		0.3,
-		1,
-		1,
-		0
-	}, 0)
 end
 
 function CopActionWalk:append_nav_point(nav_point)
@@ -1912,6 +1910,7 @@ function CopActionWalk:_play_nav_link_anim(t)
 		self._cur_vel = 0
 		self:_set_blocks(self._old_blocks)
 		self._old_blocks = nil
+		self._nav_link = nil
 		if self._simplified_path[2] then
 			if mvec3_dis(self._simplified_path[1], self._nav_point_pos(self._simplified_path[2])) > 400 and self._ext_base:lod_stage() == 1 then
 				self._curve_path = self:_calculate_curved_path(self._simplified_path, 1, 1, self._common_data.fwd)
@@ -1982,12 +1981,16 @@ function CopActionWalk:_upd_nav_link(t)
 			self._nav_link_invul_on = nil
 			self._common_data.ext_damage:set_invulnerable(false)
 		end
+		self._nav_link = nil
 		self._cur_vel = 0
 		self._last_vel_z = 0
 		self:_set_blocks(self._old_blocks)
 		self._old_blocks = nil
 		self:_chk_correct_pose()
-		self:_set_updator("_upd_wait")
+		self._expired = true
+		if self._end_rot then
+			self._ext_movement:set_rotation(self._end_rot)
+		end
 	end
 end
 

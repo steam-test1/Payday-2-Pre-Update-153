@@ -215,18 +215,22 @@ function WorldDefinition:_insert_instances()
 				local package_data = managers.world_instance:packages_by_instance(instance)
 				self:_load_continent_init_package(package_data.init_package)
 				self:_load_continent_package(package_data.package)
-				local prepared_unit_data = managers.world_instance:prepare_unit_data(instance, self._continents[instance.continent])
-				if prepared_unit_data.statics then
-					for _, static in ipairs(prepared_unit_data.statics) do
-						data.statics = data.statics or {}
-						table.insert(data.statics, static)
+				if Application:editor() or not instance.mission_placed then
+					local prepared_unit_data = managers.world_instance:prepare_unit_data(instance, self._continents[instance.continent])
+					if prepared_unit_data.statics then
+						for _, static in ipairs(prepared_unit_data.statics) do
+							data.statics = data.statics or {}
+							table.insert(data.statics, static)
+						end
 					end
-				end
-				if prepared_unit_data.dynamics then
-					for _, dynamic in ipairs(prepared_unit_data.dynamics) do
-						data.dynamics = data.dynamics or {}
-						table.insert(data.dynamics, dynamic)
+					if prepared_unit_data.dynamics then
+						for _, dynamic in ipairs(prepared_unit_data.dynamics) do
+							data.dynamics = data.dynamics or {}
+							table.insert(data.dynamics, dynamic)
+						end
 					end
+				else
+					managers.world_instance:prepare_serialized_instance_data(instance)
 				end
 			end
 		end

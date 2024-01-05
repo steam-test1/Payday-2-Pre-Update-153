@@ -111,6 +111,7 @@ function PlayerManager:aquire_default_upgrades()
 	managers.upgrades:aquire_default("player_corpse_dispose")
 	managers.upgrades:aquire_default("player_corpse_dispose_amount_1")
 	managers.upgrades:aquire_default("player_civ_harmless_melee")
+	managers.upgrades:aquire_default("striker_reload_speed_default")
 	for i = 1, PlayerManager.WEAPON_SLOTS do
 		if not managers.player:weapon_in_slot(i) then
 			self._global.kit.weapon_slots[i] = managers.player:availible_weapons(i)[1]
@@ -441,6 +442,11 @@ function PlayerManager:on_headshot_dealt()
 	if not player_unit then
 		return
 	end
+	local t = Application:time()
+	if self._on_headshot_dealt_t and t < self._on_headshot_dealt_t then
+		return
+	end
+	self._on_headshot_dealt_t = t + (tweak_data.upgrades.on_headshot_dealt_cooldown or 0)
 	local damage_ext = player_unit:character_damage()
 	local regen_armor_bonus = managers.player:upgrade_value("player", "headshot_regen_armor_bonus", 0)
 	if damage_ext and 0 < regen_armor_bonus then
@@ -524,6 +530,10 @@ function PlayerManager:upgrade_value(category, upgrade, default)
 	local level = self._global.upgrades[category][upgrade]
 	local value = tweak_data.upgrades.values[category][upgrade][level]
 	return value
+end
+
+function PlayerManager:list_level_rewards(dlcs)
+	return managers.upgrades:list_level_rewards(dlcs)
 end
 
 function PlayerManager:activate_temporary_upgrade(category, upgrade)

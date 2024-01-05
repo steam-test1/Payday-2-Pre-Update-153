@@ -153,11 +153,50 @@ function CoreWorldInstanceManager:packages_by_instance(instance)
 	return {package = package, init_package = init_package}
 end
 
+function CoreWorldInstanceManager:custom_create_instance(instance_name, custom_data)
+	local instance = self:get_instance_data_by_name(instance_name)
+	local continent_data = managers.worlddefinition._continents[instance.continent]
+	local package_data = managers.world_instance:packages_by_instance(instance)
+	instance.position = custom_data.position or Vector3()
+	instance.rotation = custom_data.rotation or Rotation()
+	local prepared_unit_data = managers.world_instance:prepare_unit_data(instance, continent_data)
+	if prepared_unit_data.statics then
+		for _, static in ipairs(prepared_unit_data.statics) do
+			local unit = managers.worlddefinition:_create_statics_unit(static, Vector3())
+			if Application:editor() then
+				managers.editor:layer("Statics"):add_unit_to_created_units(unit)
+			end
+		end
+	end
+	if prepared_unit_data.dynamics then
+		for _, entry in ipairs(prepared_unit_data.dynamics) do
+			local unit = managers.worlddefinition:_create_dynamics_unit(entry, Vector3())
+			if Application:editor() then
+				managers.editor:layer("Dynamics"):add_unit_to_created_units(unit)
+			end
+		end
+	end
+	local prepare_mission_data = self:prepare_mission_data_by_name(instance_name)
+	managers.mission:script(instance.script):external_create_instance_elements(prepare_mission_data)
+end
+
+function CoreWorldInstanceManager:_get_instance_continent_data(path)
+	if Application:editor() then
+		return self:_serialize_to_script("continent", path)
+	end
+	self._instance_continent_data = self._instance_continent_data or {}
+	if self._instance_continent_data[path] then
+		return deep_clone(self._instance_continent_data[path])
+	end
+	self._instance_continent_data[path] = self:_serialize_to_script("continent", path)
+	return deep_clone(self._instance_continent_data[path])
+end
+
 function CoreWorldInstanceManager:prepare_unit_data(instance, continent_data)
 	local start_index = instance.start_index
 	local folder = instance.folder
 	local path = folder .. "/" .. "world"
-	local instance_data = self:_serialize_to_script("continent", path)
+	local instance_data = self:_get_instance_continent_data(path)
 	
 	local function _prepare_entries(entries)
 		if not entries then
@@ -182,6 +221,13 @@ end
 
 function CoreWorldInstanceManager:_get_mod_id(id)
 	return math.mod(id, 100000)
+end
+
+function CoreWorldInstanceManager:prepare_serialized_instance_data(instance)
+	local folder = instance.folder
+	local path = folder .. "/" .. "world"
+	self:_get_instance_mission_data(path)
+	self:_get_instance_continent_data(path)
 end
 
 function CoreWorldInstanceManager:check_highest_id(instance)
@@ -219,11 +265,23 @@ function CoreWorldInstanceManager:prepare_mission_data_by_name(name)
 	return self:prepare_mission_data(instance_data)
 end
 
+function CoreWorldInstanceManager:_get_instance_mission_data(path)
+	if Application:editor() then
+		return self:_serialize_to_script("mission", path)
+	end
+	self._instance_mission_data = self._instance_mission_data or {}
+	if self._instance_mission_data[path] then
+		return deep_clone(self._instance_mission_data[path])
+	end
+	self._instance_mission_data[path] = self:_serialize_to_script("mission", path)
+	return deep_clone(self._instance_mission_data[path])
+end
+
 function CoreWorldInstanceManager:prepare_mission_data(instance)
 	local start_index = instance.start_index
 	local folder = instance.folder
 	local path = folder .. "/" .. "world"
-	local instance_data = self:_serialize_to_script("mission", path)
+	local instance_data = self:_get_instance_mission_data(path)
 	local continent_data = managers.worlddefinition._continents[instance.continent]
 	local convert_list = {}
 	for script, script_data in pairs(instance_data) do

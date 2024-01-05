@@ -11,6 +11,7 @@ local math_clamp = math.clamp
 local math_lerp = math.lerp
 local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
+local tmp_rot1 = Rotation()
 RaycastWeaponBase = RaycastWeaponBase or class(UnitBase)
 RaycastWeaponBase.TRAIL_EFFECT = Idstring("effects/particles/weapons/weapon_trail")
 
@@ -19,8 +20,6 @@ function RaycastWeaponBase:init(unit)
 	self._unit = unit
 	self._name_id = self.name_id or "test_raycast_weapon"
 	self.name_id = nil
-	self._bullet_slotmask = managers.slot:get_mask("bullet_impact_targets")
-	self._blank_slotmask = managers.slot:get_mask("bullet_blank_impact_targets")
 	self:_create_use_setups()
 	self._setup = {}
 	self._digest_values = SystemInfo:platform() == Idstring("WIN32")
@@ -38,6 +37,8 @@ function RaycastWeaponBase:init(unit)
 	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
 	self._can_shoot_through_wall = tweak_data.weapon[self._name_id].can_shoot_through_wall
 	self._bullet_class = InstantBulletBase
+	self._bullet_slotmask = self._bullet_class:bullet_slotmask()
+	self._blank_slotmask = self._bullet_class:blank_slotmask()
 	self._next_fire_allowed = -1000
 	self._obj_fire = self._unit:get_object(Idstring("fire"))
 	self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash or "effects/particles/test/muzzleflash_maingun")
@@ -1030,9 +1031,6 @@ end
 InstantBulletBase = InstantBulletBase or class()
 
 function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
-	if damage == 0 then
-		return nil
-	end
 	local hit_unit = col_ray.unit
 	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
 		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
@@ -1048,11 +1046,9 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 		end
 		if sync_damage then
-			if user_unit:id() == -1 then
-				managers.network:session():send_to_peers_synched("sync_body_damage_bullet_no_attacker", col_ray.body, col_ray.normal, col_ray.position, col_ray.ray, math.min(16384, network_damage))
-			else
-				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit, col_ray.normal, col_ray.position, col_ray.ray, math.min(16384, network_damage))
-			end
+			local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
+			local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
+			managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
 		end
 	end
 	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
@@ -1081,6 +1077,14 @@ function InstantBulletBase:on_hit_player(col_ray, weapon_unit, user_unit, damage
 	return self:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing)
 end
 
+function InstantBulletBase:bullet_slotmask()
+	return managers.slot:get_mask("bullet_impact_targets")
+end
+
+function InstantBulletBase:blank_slotmask()
+	return managers.slot:get_mask("bullet_blank_impact_targets")
+end
+
 function InstantBulletBase:play_impact_sound_and_effects(col_ray)
 	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray})
 end
@@ -1095,6 +1099,17 @@ function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, d
 	action_data.armor_piercing = armor_piercing
 	local defense_data = col_ray.unit:character_damage():damage_bullet(action_data)
 	return defense_data
+end
+
+function InstantBulletBase._get_vector_sync_yaw_pitch(dir, yaw_resolution, pitch_resolution)
+	mrotation.set_look_at(tmp_rot1, dir, math.UP)
+	local packed_yaw = mrotation.yaw(tmp_rot1)
+	packed_yaw = packed_yaw + 180
+	packed_yaw = math.floor((yaw_resolution - 1) * packed_yaw / 360)
+	local packed_pitch = mrotation.pitch(tmp_rot1)
+	packed_pitch = packed_pitch + 90
+	packed_pitch = math.floor((pitch_resolution - 1) * packed_pitch / 180)
+	return packed_yaw, packed_pitch
 end
 
 InstantExplosiveBulletBase = InstantExplosiveBulletBase or class(InstantBulletBase)
@@ -1112,14 +1127,19 @@ InstantExplosiveBulletBase.EFFECT_PARAMS = {
 	idstr_effect = Idstring("")
 }
 
+function InstantExplosiveBulletBase:bullet_slotmask()
+	return managers.slot:get_mask("bullet_impact_targets")
+end
+
+function InstantExplosiveBulletBase:blank_slotmask()
+	return managers.slot:get_mask("bullet_blank_impact_targets")
+end
+
 function InstantExplosiveBulletBase:play_impact_sound_and_effects(col_ray)
 	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_decal = true})
 end
 
 function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
-	if damage == 0 then
-		return nil
-	end
 	local slot_mask = managers.slot:get_mask("explosion_targets")
 	local hit_unit = col_ray.unit
 	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
@@ -1147,6 +1167,19 @@ function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit
 			owner = weapon_unit
 		})
 		managers.network:session():send_to_peers_synched("sync_explosive_bullet", col_ray.position, col_ray.normal, math.min(16384, network_damage))
+		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
+			local local_damage = not blank or hit_unit:id() == -1
+			local sync_damage = not blank and hit_unit:id() ~= -1
+			if local_damage then
+				col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+				col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+			end
+			if sync_damage then
+				local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
+				local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
+				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+			end
+		end
 		return {
 			col_ray = col_ray,
 			type = hit_unit:character_damage() and hit_unit:character_damage().is_head and hit_unit:character_damage().dead and hit_unit:character_damage():dead() and "death" or nil,

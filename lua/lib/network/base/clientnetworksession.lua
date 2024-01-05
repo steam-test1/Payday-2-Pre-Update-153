@@ -231,6 +231,9 @@ function ClientNetworkSession:peer_handshake(name, peer_id, peer_user_id, in_lob
 		Network:add_co_client(rpc)
 	end
 	peer_user_id = SystemInfo:platform() == self._ids_WIN32 and peer_user_id or false
+	if SystemInfo:platform() == Idstring("WIN32") then
+		name = managers.network.account:username_by_id(peer_user_id)
+	end
 	local id, peer = self:add_peer(name, rpc, in_lobby, loading, synched, peer_id, character, peer_user_id, xuid, xnaddr)
 	cat_print("multiplayer_base", "[ClientNetworkSession:peer_handshake]", name, peer_user_id, loading, synched, id, inspect(peer))
 	local check_peer = SystemInfo:platform() == Idstring("X360") and peer or nil

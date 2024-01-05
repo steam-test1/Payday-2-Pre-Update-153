@@ -13,7 +13,6 @@ end
 function ElementExecuteInOtherMission:get_mission_element(id)
 	for name, script in pairs(managers.mission:scripts()) do
 		if script:element(id) then
-			print("found in", name, id)
 			return script:element(id)
 		end
 	end

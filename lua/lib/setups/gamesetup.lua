@@ -155,6 +155,7 @@ require("lib/units/vehicles/SimpleVehicle")
 require("lib/units/props/ZipLine")
 require("lib/units/props/TextTemplateBase")
 require("lib/managers/menu/FadeoutGuiObject")
+require("lib/units/cameras/CinematicStateCamera")
 GameSetup = GameSetup or class(Setup)
 
 function GameSetup:load_packages()

@@ -96,9 +96,13 @@ function ExplosionManager:detect_and_give_dmg(params)
 			table.insert(splinters, mvector3.copy(pos))
 		end
 	end
+	local count_cops = 0
+	local count_gangsters = 0
+	local count_civilians = 0
 	local characters_hit = {}
 	local units_to_push = {}
 	local hit_units = {}
+	local type
 	for _, hit_body in ipairs(bodies) do
 		local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion
 		local apply_dmg = hit_body:extension() and hit_body:extension().damage
@@ -116,6 +120,20 @@ function ExplosionManager:detect_and_give_dmg(params)
 					if ray_hit then
 						characters_hit[hit_body:unit():key()] = true
 						break
+					end
+				end
+			end
+			if ray_hit then
+				local hit_unit = hit_body:unit()
+				if hit_unit:base() and hit_unit:base()._tweak_table and not hit_unit:character_damage():dead() then
+					type = hit_unit:base()._tweak_table
+					if type == "civilian" or type == "civilian_female" or type == "bank_manager" then
+						count_civilians = count_civilians + 1
+					elseif type == "gangster" then
+						count_gangsters = count_gangsters + 1
+					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" then
+					else
+						count_cops = count_cops + 1
 					end
 				end
 			end
@@ -154,13 +172,11 @@ function ExplosionManager:detect_and_give_dmg(params)
 			hit = next(characters_hit) and true or false,
 			weapon_unit = owner
 		})
-		local characters_hit = table.size(characters_hit)
 		local achievement_data = tweak_data.achievement.shock_awe
 		local weapon_type_pass = not achievement_data.weapon_type or owner:base() and owner:base().weapon_tweak_data and owner:base():weapon_tweak_data().category == achievement_data.weapon_type
-		local count_pass = not achievement_data.count or characters_hit >= achievement_data.count
+		local count_pass = not achievement_data.count or count_cops + count_gangsters >= achievement_data.count
 		local all_pass = weapon_type_pass and count_pass
 		if all_pass and achievement_data.award then
-			print(achievement_data.award)
 			managers.achievment:award(achievement_data.award)
 		end
 	end

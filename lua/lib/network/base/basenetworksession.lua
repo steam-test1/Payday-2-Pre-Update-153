@@ -749,3 +749,9 @@ end
 function BaseNetworkSession:on_peer_outfit_loaded(peer)
 	print("[BaseNetworkSession:on_peer_outfit_loaded]", inspect(peer))
 end
+
+function BaseNetworkSession:set_packet_throttling_enabled(state)
+	for peer_id, peer in pairs(self._peers) do
+		peer:set_throttling_enabled(state)
+	end
+end

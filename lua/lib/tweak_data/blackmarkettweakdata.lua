@@ -4802,10 +4802,9 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.moneybundle.stats.max_damage = 1
 	self.melee_weapons.moneybundle.stats.min_damage_effect = 15
 	self.melee_weapons.moneybundle.stats.max_damage_effect = 10
-	self.melee_weapons.moneybundle.stats.charge_time = 1
+	self.melee_weapons.moneybundle.stats.charge_time = 2
 	self.melee_weapons.moneybundle.stats.range = 150
 	self.melee_weapons.moneybundle.sounds = {}
-	self.melee_weapons.moneybundle.repeat_expire_t = 0.5
 	self.melee_weapons.moneybundle.sounds.equip = "cash_equip"
 	self.melee_weapons.moneybundle.sounds.hit_air = "cash_hit_air"
 	self.melee_weapons.moneybundle.sounds.hit_gen = "cash_hit_gen"

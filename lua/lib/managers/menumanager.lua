@@ -24,6 +24,7 @@ require("lib/managers/MenuManagerPD2")
 MenuManager.IS_NORTH_AMERICA = true
 MenuManager.ONLINE_AGE = SystemInfo:platform() == Idstring("PS3") and MenuManager.IS_NORTH_AMERICA and 17 or 18
 require("lib/managers/MenuManagerDialogs")
+require("lib/managers/MenuManagerDebug")
 
 function MenuManager:init(is_start_menu)
 	MenuManager.super.init(self)
@@ -104,6 +105,8 @@ function MenuManager:init(is_start_menu)
 	managers.user:add_setting_changed_callback("dof_setting", callback(self, self, "dof_setting_changed"), true)
 	managers.user:add_setting_changed_callback("fps_cap", callback(self, self, "fps_limit_changed"), true)
 	managers.user:add_setting_changed_callback("max_streaming_chunk", callback(self, self, "max_streaming_chunk_changed"), true)
+	managers.user:add_setting_changed_callback("net_packet_throttling", callback(self, self, "net_packet_throttling_changed"), true)
+	managers.user:add_setting_changed_callback("net_use_compression", callback(self, self, "net_use_compression_changed"), true)
 	managers.user:add_active_user_state_changed_callback(callback(self, self, "on_user_changed"))
 	managers.user:add_storage_changed_callback(callback(self, self, "on_storage_changed"))
 	managers.savefile:add_active_changed_callback(callback(self, self, "safefile_manager_active_changed"))
@@ -113,6 +116,8 @@ function MenuManager:init(is_start_menu)
 	self:effect_quality_changed(nil, nil, managers.user:get_setting("effect_quality"))
 	self:fps_limit_changed(nil, nil, managers.user:get_setting("fps_cap"))
 	self:max_streaming_chunk_changed(nil, nil, managers.user:get_setting("max_streaming_chunk"))
+	self:net_packet_throttling_changed(nil, nil, managers.user:get_setting("net_packet_throttling"))
+	self:net_use_compression_changed(nil, nil, managers.user:get_setting("net_use_compression"))
 	self:invert_camera_y_changed("invert_camera_y", nil, managers.user:get_setting("invert_camera_y"))
 	self:southpaw_changed("southpaw", nil, managers.user:get_setting("southpaw"))
 	self:dof_setting_changed("dof_setting", nil, managers.user:get_setting("dof_setting"))
@@ -525,6 +530,16 @@ end
 
 function MenuManager:max_streaming_chunk_changed(name, old_value, new_value)
 	managers.dyn_resource:set_max_streaming_chunk(new_value)
+end
+
+function MenuManager:net_packet_throttling_changed(name, old_value, new_value)
+	if managers.network then
+		managers.network:set_packet_throttling_enabled(new_value)
+	end
+end
+
+function MenuManager:net_use_compression_changed(name, old_value, new_value)
+	Network:set_use_compression(new_value)
 end
 
 function MenuManager:subtitle_changed(name, old_value, new_value)
@@ -1364,38 +1379,6 @@ function MenuCallbackHandler:_dialog_save_progress_backup_no()
 	setup:quit()
 end
 
-function MenuCallbackHandler:toggle_god_mode(item)
-	local god_mode_on = item:value() == "on"
-	Global.god_mode = god_mode_on
-	if managers.player:player_unit() then
-		managers.player:player_unit():character_damage():set_god_mode(god_mode_on)
-	end
-end
-
-function MenuCallbackHandler:toggle_post_effects(item)
-	local post_effects_on = item:value() == "on"
-	Global.debug_post_effects_enabled = post_effects_on
-	if not post_effects_on then
-		managers.environment_controller:set_suppression_value(0)
-	end
-end
-
-function MenuCallbackHandler:toggle_alienware_mask(item)
-	local use_mask = item:value() == "on"
-	if SystemInfo:platform() ~= Idstring("WIN32") or not managers.network.account:has_alienware() then
-		use_mask = false
-	end
-	managers.user:set_setting("alienware_mask", use_mask)
-end
-
-function MenuCallbackHandler:toggle_developer_mask(item)
-	local use_mask = item:value() == "on"
-	if SystemInfo:platform() ~= Idstring("WIN32") or not managers.network.account:is_developer() then
-		use_mask = false
-	end
-	managers.user:set_setting("developer_mask", use_mask)
-end
-
 function MenuCallbackHandler:toggle_ready(item)
 	local ready = item:value() == "on"
 	if not managers.network:session() then
@@ -1407,13 +1390,6 @@ function MenuCallbackHandler:toggle_ready(item)
 		managers.menu:active_menu().renderer:set_ready_items_enabled(not ready)
 	end
 	managers.network:game():on_set_member_ready(managers.network:session():local_peer():id(), ready, true)
-end
-
-function MenuCallbackHandler:freeflight(item)
-	if setup:freeflight() then
-		setup:freeflight():enable()
-		self:resume_game()
-	end
 end
 
 function MenuCallbackHandler:change_nr_players(item)
@@ -1516,6 +1492,22 @@ function MenuCallbackHandler:toggle_coordinates(item)
 	else
 		managers.hud:debug_hide_coordinates()
 	end
+end
+
+function MenuCallbackHandler:toggle_net_throttling(item)
+	local state = item:value() == "on"
+	managers.user:set_setting("net_packet_throttling", state, nil)
+end
+
+function MenuCallbackHandler:toggle_net_allow_relayed_connections(item)
+	local state = item:value() == "on"
+	managers.user:set_setting("net_allow_relayed_connections", state, nil)
+end
+
+function MenuCallbackHandler:toggle_net_use_compression(item)
+	local state = item:value() == "on"
+	print("[MenuCallbackHandler:toggle_net_use_compression]", state)
+	managers.user:set_setting("net_use_compression", state, nil)
 end
 
 function MenuCallbackHandler:change_resolution(item)
@@ -2613,62 +2605,6 @@ function MenuCallbackHandler:open_savefile_menu(item)
 	managers.menu:open_node(parameter_map.delayed_node, {parameter_map})
 end
 
-function MenuCallbackHandler:give_weapon()
-	local player = managers.player:player_unit()
-	if player then
-		player:inventory():add_unit_by_name(Idstring("units/weapons/mp5/mp5"), false)
-	end
-end
-
-function MenuCallbackHandler:give_experience()
-	if managers.job:has_active_job() then
-		managers.experience:debug_add_points(managers.experience:get_xp_dissected(true, 1, true))
-	else
-		managers.experience:debug_add_points(2500, true)
-	end
-end
-
-function MenuCallbackHandler:give_more_experience()
-	managers.experience:debug_add_points(250000, false)
-end
-
-function MenuCallbackHandler:give_max_experience()
-	managers.experience:debug_add_points(100000000, false)
-end
-
-function MenuCallbackHandler:debug_next_stage()
-	if managers.platform:presence() == "Playing" then
-		local num_winners = managers.network:game():amount_of_alive_players()
-		managers.network:session():send_to_peers("mission_ended", true, num_winners)
-		game_state_machine:change_state_by_name("victoryscreen", {
-			num_winners = num_winners,
-			personal_win = alive(managers.player:player_unit())
-		})
-	end
-end
-
-function MenuCallbackHandler:debug_give_alot_of_lootdrops()
-	for i = 1, 4 do
-		managers.lootdrop:new_debug_drop(100, true, i)
-	end
-end
-
-function MenuCallbackHandler:debug_give_money()
-	managers.money:debug_job_completed(3)
-end
-
-function MenuCallbackHandler:debug_give_alot_of_money()
-	for stars = 1, 7 do
-		for i = 1, 10 do
-			managers.money:debug_job_completed(stars)
-		end
-	end
-end
-
-function MenuCallbackHandler:debug_show_marketplace_ui()
-	XboxLive:show_marketplace_ui(0)
-end
-
 function MenuCallbackHandler:hide_huds()
 	managers.hud:set_disabled()
 end
@@ -2716,72 +2652,10 @@ end
 function MenuCallbackHandler:_dialog_clear_progress_no()
 end
 
-function MenuCallbackHandler:reset_statistics()
-	local dialog_data = {}
-	dialog_data.title = managers.localization:text("dialog_warning_title")
-	dialog_data.text = managers.localization:text("dialog_are_you_sure_you_want_to_reset_statistics")
-	local yes_button = {}
-	yes_button.text = managers.localization:text("dialog_yes")
-	yes_button.callback_func = callback(self, self, "_dialog_reset_statistics_yes")
-	local no_button = {}
-	no_button.text = managers.localization:text("dialog_no")
-	no_button.callback_func = callback(self, self, "_dialog_reset_statistics_no")
-	no_button.cancel_button = true
-	dialog_data.button_list = {yes_button, no_button}
-	managers.system_menu:show(dialog_data)
-end
-
-function MenuCallbackHandler:_dialog_reset_statistics_yes()
-	managers.statistics:reset()
-	managers.savefile:save_progress()
-end
-
-function MenuCallbackHandler:_dialog_reset_statistics_no()
-end
-
 function MenuCallbackHandler:set_default_controller(item)
 	managers.controller:load_settings("settings/controller_settings")
 	managers.controller:clear_user_mod()
 	managers.menu:back(true)
-end
-
-function MenuCallbackHandler:debug_modify_challenge(item)
-	managers.challenges:debug_set_amount(item:parameters().challenge, item:parameters().count - 1)
-	managers.menu:back(true)
-	managers.menu:open_node("modify_active_challenges")
-end
-
-function MenuCallbackHandler:clear_local_steam_stats()
-	managers.statistics:clear_statistics()
-	managers.statistics:clear_skills_statistics()
-end
-
-function MenuCallbackHandler:print_local_steam_stats()
-	managers.statistics:debug_print_stats(false, 1)
-end
-
-function MenuCallbackHandler:print_global_steam_stats()
-	managers.statistics:debug_print_stats(true, 1)
-end
-
-function MenuCallbackHandler:print_global_steam_stats_yesterday()
-	managers.statistics:debug_print_stats(true, -1)
-end
-
-function MenuCallbackHandler:print_global_steam_stats_7days()
-	managers.statistics:debug_print_stats(true, 7)
-end
-
-function MenuCallbackHandler:print_global_steam_stats_30days()
-	managers.statistics:debug_print_stats(true, 30)
-end
-
-function MenuCallbackHandler:print_global_steam_stats_60days()
-	managers.statistics:debug_print_stats(true, 60)
-end
-
-function MenuCallbackHandler:print_global_steam_stats_alltime()
-	managers.statistics:debug_print_stats(true)
 end
 
 MenuChallenges = MenuChallenges or class()
@@ -2980,7 +2854,7 @@ function KickPlayer:modify_node(node, up)
 		for _, peer in pairs(managers.network:session():peers()) do
 			local params = {
 				name = peer:name(),
-				text_id = peer:name(),
+				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. peer:level() .. ")",
 				callback = "kick_player",
 				to_upper = false,
 				localize = "false",
@@ -3003,7 +2877,7 @@ function MutePlayer:modify_node(node, up)
 		for _, peer in pairs(managers.network:session():peers()) do
 			local params = {
 				name = peer:name(),
-				text_id = peer:name(),
+				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. peer:level() .. ")",
 				callback = "mute_player",
 				to_upper = false,
 				localize = "false",
@@ -4132,15 +4006,17 @@ function MenuPrePlanningInitiator:create_info_items(node, params, selected_item)
 	self:create_divider(node, "info_div", nil, nil, nil)
 	params.enabled = true
 	self:create_divider(node, "cat_info", managers.localization:text("menu_pp_sub_info"), nil, tweak_data.screen_colors.text)
-	params.name = "custom_points"
-	params.callback = "open_preplanning_custom_item"
-	params.text_id = managers.localization:text("menu_pp_extra_info")
-	params.tooltip.texture = tweak_data.preplanning.gui.custom_icons_path
-	params.tooltip.texture_rect = tweak_data.preplanning:get_custom_texture_rect(45)
-	params.tooltip.name = params.text_id
-	params.tooltip.desc = managers.localization:text("menu_pp_extra_info_desc")
-	params.tooltip.errors = {}
-	self:create_item(node, params)
+	if managers.preplanning:has_current_custom_points() then
+		params.name = "custom_points"
+		params.callback = "open_preplanning_custom_item"
+		params.text_id = managers.localization:text("menu_pp_extra_info")
+		params.tooltip.texture = tweak_data.preplanning.gui.custom_icons_path
+		params.tooltip.texture_rect = tweak_data.preplanning:get_custom_texture_rect(45)
+		params.tooltip.name = params.text_id
+		params.tooltip.desc = managers.localization:text("menu_pp_extra_info_desc")
+		params.tooltip.errors = {}
+		self:create_item(node, params)
+	end
 	params.name = "preplanning_help"
 	params.callback = "open_preplanning_help"
 	params.text_id = managers.localization:text("menu_item_preplanning_help")
@@ -4238,24 +4114,26 @@ function MenuPrePlanningInitiator:modifiy_node_preplanning(node, item_name, sele
 	}
 	local type_data, first_type, category_data
 	for i, data in ipairs(subgroups) do
-		self:create_divider(node, "cat_" .. tostring(i), managers.localization:text(data.name_id), nil, tweak_data.screen_colors.text)
-		params.callback = data.callback
-		for index, category in ipairs(data.subgroup) do
-			first_type = managers.preplanning:get_first_type_in_category(category)
-			type_data = tweak_data:get_raw_value("preplanning", "types", first_type) or {}
-			params.name = category
-			params.text_id = managers.preplanning:get_category_name(category)
-			params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
-			params.tooltip.name = params.text_id
-			params.tooltip.desc = managers.preplanning:get_category_desc(category)
-			params.tooltip.errors = {}
-			params.enabled = true
-			self:set_locks_to_param(params, "categories", category)
-			self:create_item(node, params)
-			selected_item = selected_item or params.name
-		end
-		if i ~= #subgroups then
-			self:create_divider(node, "end_" .. tostring(i), nil, nil, nil)
+		if #data.subgroup > 0 then
+			self:create_divider(node, "cat_" .. tostring(i), managers.localization:text(data.name_id), nil, tweak_data.screen_colors.text)
+			params.callback = data.callback
+			for index, category in ipairs(data.subgroup) do
+				first_type = managers.preplanning:get_first_type_in_category(category)
+				type_data = tweak_data:get_raw_value("preplanning", "types", first_type) or {}
+				params.name = category
+				params.text_id = managers.preplanning:get_category_name(category)
+				params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
+				params.tooltip.name = params.text_id
+				params.tooltip.desc = managers.preplanning:get_category_desc(category)
+				params.tooltip.errors = {}
+				params.enabled = true
+				self:set_locks_to_param(params, "categories", category)
+				self:create_item(node, params)
+				selected_item = selected_item or params.name
+			end
+			if i ~= #subgroups then
+				self:create_divider(node, "end_" .. tostring(i), nil, nil, nil)
+			end
 		end
 	end
 	self:create_info_items(node, params, selected_item)
@@ -4898,10 +4776,12 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 				jobs[contact] = jobs[contact] or {}
 				local dlc = tweak_data.narrative.jobs[job_id].dlc
 				dlc = not dlc or tweak_data.dlc[dlc] and tweak_data.dlc[dlc].free or managers.dlc:has_dlc(dlc)
-				table.insert(jobs[contact], {
-					id = job_id,
-					enabled = dlc and max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0) and not tweak_data.narrative.jobs[job_id].wrapped_to_job
-				})
+				if not tweak_data.narrative.jobs[job_id].wrapped_to_job then
+					table.insert(jobs[contact], {
+						id = job_id,
+						enabled = dlc and max_jc >= (tweak_data.narrative.jobs[job_id].jc or 0) + (tweak_data.narrative.jobs[job_id].professional and 1 or 0)
+					})
+				end
 			end
 		end
 		local job_tweak = tweak_data.narrative.jobs
@@ -5696,6 +5576,8 @@ function MenuOptionInitiator:modify_node(node)
 		return self:modify_debug_options(node)
 	elseif node_name == "options" then
 		return self:modify_options(node)
+	elseif node_name == "network_options" then
+		return self:modify_network_options(node)
 	end
 end
 
@@ -5904,5 +5786,24 @@ function MenuOptionInitiator:modify_debug_options(node)
 end
 
 function MenuOptionInitiator:modify_options(node)
+	return node
+end
+
+function MenuOptionInitiator:modify_network_options(node)
+	local toggle_throttling_item = node:item("toggle_throttling")
+	if toggle_throttling_item then
+		local toggle_throttling_value = managers.user:get_setting("net_packet_throttling") and "on" or "off"
+		toggle_throttling_item:set_value(toggle_throttling_value)
+	end
+	local toggle_allow_relayed_connections_item = node:item("toggle_allow_relayed_connections")
+	if toggle_allow_relayed_connections_item then
+		local toggle_allow_relayed_connections_value = managers.user:get_setting("net_allow_relayed_connections") and "on" or "off"
+		toggle_allow_relayed_connections_item:set_value(toggle_allow_relayed_connections_value)
+	end
+	local net_use_compression_item = node:item("toggle_net_use_compression")
+	if net_use_compression_item then
+		local net_use_compression_value = managers.user:get_setting("net_use_compression") and "on" or "off"
+		net_use_compression_item:set_value(net_use_compression_value)
+	end
 	return node
 end

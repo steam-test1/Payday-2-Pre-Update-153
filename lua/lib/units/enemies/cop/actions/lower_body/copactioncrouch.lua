@@ -10,7 +10,7 @@ function CopActionCrouch:init(action_desc, common_data)
 		return
 	end
 	if common_data.active_actions[2] and common_data.active_actions[2]._nav_link then
-		debug_pause_unit(common_data.unit, "interrupted nav_link!", common_data.unit, inspect(action_desc), common_data.machine:segment_state(Idstring("base")), inspect(common_data.ext_movement._actions[2]))
+		debug_pause_unit(common_data.unit, "interrupted nav_link!", common_data.unit, inspect(action_desc), common_data.machine:segment_state(Idstring("base")), inspect(common_data.ext_movement._active_actions[2]))
 		return
 	end
 	if ext_anim.move then

@@ -201,16 +201,18 @@ end
 function InstancesLayer:select_instance(instance_name)
 	self._selected_instance = nil
 	self._selected_instance_data = nil
+	self._mission_placed_ctrlr:set_enabled(instance_name and true or false)
+	self:_set_selection_instances_listbox(instance_name)
 	if instance_name then
 		self._selected_instance = Instance:new(managers.world_instance:get_instance_data_by_name(instance_name))
 		self._selected_instance_data = managers.world_instance:get_instance_data_by_name(instance_name)
 		managers.editor:set_grid_altitude(self._selected_instance:data().position.z)
-		self:_set_selection_instances_listbox(instance_name)
 		local instance_data = managers.world_instance:get_instance_data_by_name(instance_name)
 		local continent_data = managers.editor:continents()[instance_data.continent]
 		local start_index = continent_data:base_id() + managers.world_instance:start_offset_index() + instance_data.start_index
 		self._instance_info_guis.start_index:set_label("" .. start_index)
 		self._instance_info_guis.end_index:set_label("" .. start_index + instance_data.index_size)
+		self._mission_placed_ctrlr:set_value(instance_data.mission_placed)
 	else
 		self._instance_info_guis.start_index:set_label("N/A")
 		self._instance_info_guis.end_index:set_label("N/A")
@@ -529,6 +531,10 @@ function InstancesLayer:build_panel(notebook, settings)
 	self._instances_listbox = EWS:ListBox(self._ews_panel, "", "LB_SINGLE,LB_HSCROLL,LB_NEEDED_SB,LB_SORT")
 	instances_sizer:add(self._instances_listbox, 1, 0, "EXPAND")
 	self._instances_listbox:connect("EVT_COMMAND_LISTBOX_SELECTED", callback(self, self, "_on_gui_select_instance"), self._instances_listbox)
+	self._mission_placed_ctrlr = EWS:CheckBox(self._ews_panel, "Mission placed", "", "ALIGN_LEFT")
+	self._mission_placed_ctrlr:set_value(false)
+	self._mission_placed_ctrlr:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "_on_gui_mission_placed"), nil)
+	instances_sizer:add(self._mission_placed_ctrlr, 0, 0, "EXPAND")
 	self._instance_info_guis = {}
 	
 	local function _info(name)
@@ -591,7 +597,8 @@ function InstancesLayer:_on_gui_rename_instance()
 			end
 			local mission_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
 				"func_instance_input_event",
-				"func_instance_output_event"
+				"func_instance_output_event",
+				"func_instance_point"
 			})
 			for _, mission_unit in ipairs(mission_units) do
 				if mission_unit:mission_element_data().instance == name then
@@ -608,6 +615,13 @@ function InstancesLayer:_on_gui_delete_instance()
 	local name = self:_get_selection_instances_listbox()
 	if name then
 		self:_delete_instance_by_name(name)
+	end
+end
+
+function InstancesLayer:_on_gui_mission_placed()
+	local name = self:_get_selection_instances_listbox()
+	if name then
+		managers.world_instance:get_instance_data_by_name(name).mission_placed = self._mission_placed_ctrlr:get_value() and true or nil
 	end
 end
 
@@ -667,6 +681,13 @@ function InstancesLayer:_update_instances_listbox()
 end
 
 function InstancesLayer:_set_selection_instances_listbox(name)
+	if not name then
+		local i = self._instances_listbox:selected_index()
+		if -1 < i then
+			self._instances_listbox:deselect_index(i)
+		end
+		return
+	end
 	for i = 0, self._instances_listbox:nr_items() - 1 do
 		if name == self._instances_listbox:get_string(i) then
 			self._instances_listbox:select_index(i)
@@ -725,6 +746,20 @@ function InstancesLayer:_update_overlay_gui()
 			layer = 3,
 			color = Color.blue
 		})
+	end
+end
+
+function InstancesLayer:on_simulation_started()
+	for _, instance_data in ipairs(managers.world_instance:instance_data()) do
+		if instance_data.mission_placed then
+			local instance_units = self:get_instance_units_by_name(instance_data.name)
+			for name, units in pairs(instance_units) do
+				for _, unit in ipairs(units) do
+					managers.editor:layer(name):delete_unit(unit)
+				end
+			end
+			self._stashed_instance_units[instance_data.name] = nil
+		end
 	end
 end
 

@@ -1,3 +1,4 @@
+local tmp_rot1 = Rotation()
 UnitNetworkHandler = UnitNetworkHandler or class(BaseNetworkHandler)
 
 function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit_version, peer_id)
@@ -53,10 +54,15 @@ function UnitNetworkHandler:set_weapon_gadget_state(unit, gadget_state, sender)
 	unit:inventory():synch_weapon_gadget_state(gadget_state)
 end
 
-function UnitNetworkHandler:set_look_dir(unit, dir, sender)
+function UnitNetworkHandler:set_look_dir(unit, yaw_in, pitch_in, sender)
 	if not self._verify_character_and_sender(unit, sender) then
 		return
 	end
+	local dir = Vector3()
+	local yaw = 360 * yaw_in / 255
+	local pitch = math.lerp(-85, 85, pitch_in / 127)
+	local rot = Rotation(yaw, pitch, 0)
+	mrotation.y(rot, dir)
 	unit:movement():sync_look_dir(dir)
 end
 
@@ -112,11 +118,11 @@ function UnitNetworkHandler:action_walk_nav_point(unit, nav_point, sender)
 	unit:movement():sync_action_walk_nav_point(nav_point)
 end
 
-function UnitNetworkHandler:action_walk_stop(unit, pos)
+function UnitNetworkHandler:action_walk_stop(unit)
 	if not self._verify_character(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	unit:movement():sync_action_walk_stop(pos)
+	unit:movement():sync_action_walk_stop()
 end
 
 function UnitNetworkHandler:action_walk_nav_link(unit, pos, yaw, anim_index, from_idle)
@@ -331,7 +337,7 @@ function UnitNetworkHandler:to_server_access_camera_trigger(id, trigger, instiga
 	managers.mission:to_server_access_camera_trigger(id, trigger, instigator)
 end
 
-function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal, position, direction, damage)
+function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, normal_pitch, position, direction_yaw, direction_pitch, damage)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
@@ -350,12 +356,14 @@ function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal, posi
 		print("[UnitNetworkHandler:sync_body_damage_bullet] body has no damage damage_bullet function", body:name(), body:unit():name())
 		return
 	end
+	local normal = Vector3()
+	mrotation.set_yaw_pitch_roll(tmp_rot1, math.lerp(-180, 180, normal_yaw / 127), math.lerp(-90, 90, normal_pitch / 63), 0)
+	mrotation.y(tmp_rot1, normal)
+	local direction = Vector3()
+	mrotation.set_yaw_pitch_roll(tmp_rot1, math.lerp(-180, 180, direction_yaw / 127), math.lerp(-90, 90, direction_pitch / 63), 0)
+	mrotation.y(tmp_rot1, direction)
 	body:extension().damage:damage_bullet(attacker, normal, position, direction, 1)
 	body:extension().damage:damage_damage(attacker, normal, position, direction, damage / 163.84)
-end
-
-function UnitNetworkHandler:sync_body_damage_bullet_no_attacker(body, normal, position, direction, damage)
-	self:sync_body_damage_bullet(body, nil, normal, position, direction, damage)
 end
 
 function UnitNetworkHandler:sync_body_damage_lock(body, damage)
@@ -513,7 +521,7 @@ function UnitNetworkHandler:sync_teammate_progress(type_index, enabled, tweak_da
 	managers.hud:teammate_progress(peer_id, type_index, enabled, tweak_data_id, timer, success)
 end
 
-function UnitNetworkHandler:action_aim_start(cop)
+function UnitNetworkHandler:action_aim_state(cop)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(cop) then
 		return
 	end
@@ -540,7 +548,11 @@ function UnitNetworkHandler:action_hurt_end(unit)
 end
 
 function UnitNetworkHandler:set_attention(unit, target_unit, reaction, sender)
-	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) and self._verify_character(unit)) or not alive(target_unit) then
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
+		return
+	end
+	if not alive(target_unit) then
+		unit:movement():synch_attention()
 		return
 	end
 	local handler
@@ -565,13 +577,6 @@ function UnitNetworkHandler:set_attention(unit, target_unit, reaction, sender)
 	})
 end
 
-function UnitNetworkHandler:cop_set_attention_unit(unit, target_unit)
-	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) and self._verify_character(unit)) or not self._verify_character(target_unit) then
-		return
-	end
-	unit:movement():synch_attention({unit = target_unit})
-end
-
 function UnitNetworkHandler:cop_set_attention_pos(unit, pos)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
 		return
@@ -579,25 +584,11 @@ function UnitNetworkHandler:cop_set_attention_pos(unit, pos)
 	unit:movement():synch_attention({pos = pos})
 end
 
-function UnitNetworkHandler:cop_reset_attention(unit)
+function UnitNetworkHandler:set_allow_fire(unit, state)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
 		return
 	end
-	unit:movement():synch_attention()
-end
-
-function UnitNetworkHandler:cop_allow_fire(unit)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
-		return
-	end
-	unit:movement():synch_allow_fire(true)
-end
-
-function UnitNetworkHandler:cop_forbid_fire(unit)
-	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
-		return
-	end
-	unit:movement():synch_allow_fire(false)
+	unit:movement():synch_allow_fire(state)
 end
 
 function UnitNetworkHandler:set_stance(unit, stance_code, instant, execute_queued, sender)
@@ -2003,7 +1994,7 @@ function UnitNetworkHandler:suppression(unit, ratio, sender)
 		return
 	end
 	local amount_max = (sup_tweak.brown_point or sup_tweak.react_point)[2]
-	local amount = 0 < amount_max and amount_max * ratio / 255 or "max"
+	local amount = 0 < amount_max and amount_max * ratio / 15 or "max"
 	unit:character_damage():build_suppression(amount)
 end
 

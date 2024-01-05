@@ -385,15 +385,6 @@ function LevelsTweakData:init()
 	self.branchbank.mission_data = {
 		{mission = "standalone"}
 	}
-	self.fwb = {}
-	self.fwb.name_id = "heist_fwb_hl"
-	self.fwb.briefing_id = "heist_fwb_briefing"
-	self.fwb.world_name = "narratives/vlad/fwb"
-	self.fwb.intro_event = "nothing"
-	self.fwb.outro_event = "nothing"
-	self.fwb.music = "heist"
-	self.fwb.package = "packages/vlad_fwb"
-	self.fwb.cube = "cube_apply_heist_bank"
 	self.escape_cafe_day = {}
 	self.escape_cafe_day.name_id = "heist_escape_cafe_hl"
 	self.escape_cafe_day.briefing_id = "heist_escape_cafe_briefing"
@@ -465,16 +456,6 @@ function LevelsTweakData:init()
 	self.escape_garage.music = "heist"
 	self.escape_garage.package = "packages/escape_garage"
 	self.escape_garage.cube = "cube_apply_heist_bank"
-	self.escape_hell = {}
-	self.escape_hell.name_id = "heist_escape_hell_hl"
-	self.escape_hell.briefing_id = "heist_escape_hell_briefing"
-	self.escape_hell.briefing_dialog = "nothing"
-	self.escape_hell.world_name = "narratives/escapes/escape_hell"
-	self.escape_hell.intro_event = "Play_dr1_a01"
-	self.escape_hell.outro_event = "nothing"
-	self.escape_hell.music = "heist"
-	self.escape_hell.package = "packages/level_debug"
-	self.escape_hell.cube = "cube_apply_heist_bank"
 	self.safehouse = {}
 	self.safehouse.name_id = "heist_safehouse_hl"
 	self.safehouse.briefing_id = "heist_safehouse_briefing"
@@ -522,23 +503,6 @@ function LevelsTweakData:init()
 	self.arm_und.package = "packages/narr_arm_und"
 	self.arm_und.cube = "cube_apply_heist_bank"
 	self.arm_und.max_bags = 22
-	self.arm_bri = {}
-	self.arm_bri.name_id = "heist_arm_bri_hl"
-	self.arm_bri.briefing_id = "heist_arm_bri_briefing"
-	self.arm_bri.briefing_dialog = "Play_pln_at1_cbf_01"
-	self.arm_bri.world_name = "narratives/armadillo/arm_bri"
-	self.arm_bri.intro_event = "Play_pln_at1_intro_01"
-	self.arm_bri.outro_event = {
-		"Play_pln_at1_end_01",
-		"Play_pln_at1_end_02",
-		"Play_pln_at1_end_03",
-		"Play_pln_at1_end_01b",
-		"Play_pln_at1_end_02b",
-		"Play_pln_at1_end_03b"
-	}
-	self.arm_bri.music = "heist"
-	self.arm_bri.package = "packages/narr_arm_bri"
-	self.arm_bri.cube = "cube_apply_heist_bank"
 	self.arm_hcm = {}
 	self.arm_hcm.name_id = "heist_arm_hcm_hl"
 	self.arm_hcm.briefing_id = "heist_arm_hcm_briefing"
@@ -630,41 +594,6 @@ function LevelsTweakData:init()
 	self.family.cube = "cube_apply_heist_bank"
 	self.family.ghost_bonus = 0.3
 	self.family.max_bags = 24
-	self.on_time_1 = {}
-	self.on_time_1.name_id = "heist_on_time_1_hl"
-	self.on_time_1.briefing_id = "heist_on_time_1_briefing"
-	self.on_time_1.briefing_dialog = "Play_pln_watchdogs_new_stage1_brief"
-	self.on_time_1.briefing_assets_gui = Idstring("guis/mission_briefing/preload_stage_watchdogs_1")
-	self.on_time_1.world_name = "wip/on_time/stage_1"
-	self.on_time_1.intro_event = "Play_pln_watchdogs_new_stage1_intro_a"
-	self.on_time_1.outro_event = {
-		"Play_pln_watchdogs_new_stage1_end_a",
-		"Play_pln_watchdogs_new_stage1_end_b"
-	}
-	self.on_time_1.music = "heist"
-	self.on_time_1.package = {
-		"packages/level_debug"
-	}
-	self.on_time_1.cube = "cube_apply_heist_bank"
-	self.on_time_2 = {}
-	self.on_time_2.name_id = "heist_on_time_2_hl"
-	self.on_time_2.briefing_id = "heist_on_time_2_briefing"
-	self.on_time_2.briefing_dialog = "Play_pln_watchdogs_new_stage2_brief"
-	self.on_time_2.briefing_assets_gui = Idstring("guis/mission_briefing/preload_stage_watchdogs_2")
-	self.on_time_2.world_name = "wip/on_time/stage_2_3"
-	self.on_time_2.intro_event = {
-		"Play_pln_watchdogs_new_stage2_intro_a",
-		"Play_pln_watchdogs_new_stage2_intro_b"
-	}
-	self.on_time_2.outro_event = {
-		"Play_pln_watchdogs_new_stage2_end_a",
-		"Play_pln_watchdogs_new_stage2_end_b"
-	}
-	self.on_time_2.music = "heist"
-	self.on_time_2.package = {
-		"packages/level_debug"
-	}
-	self.on_time_2.cube = "cube_apply_heist_bank"
 	self.big = {}
 	self.big.name_id = "heist_big_hl"
 	self.big.briefing_id = "heist_big_briefing"
@@ -681,7 +610,7 @@ function LevelsTweakData:init()
 	self.big.package = "packages/narr_big"
 	self.big.cube = "cube_apply_heist_bank"
 	self.big.ghost_bonus = 0.3
-	self.big.max_bags = 25
+	self.big.max_bags = 28
 	self.roberts = {}
 	self.roberts.name_id = "heist_roberts_hl"
 	self.roberts.briefing_id = "heist_roberts_briefing"
@@ -698,95 +627,6 @@ function LevelsTweakData:init()
 	self.roberts.cube = "cube_apply_heist_bank"
 	self.roberts.ghost_bonus = 0.2
 	self.roberts.max_bags = 14
-	self.haunted = {}
-	self.haunted.name_id = "heist_haunted_hl"
-	self.haunted.briefing_id = "heist_haunted_briefing"
-	self.haunted.world_name = "narratives/haunted_safehouse"
-	self.haunted.intro_event = "lol"
-	self.haunted.outro_event = {"lol", "lolo"}
-	self.haunted.music = "heist"
-	self.haunted.package = "packages/narr_haunted"
-	self.haunted.cube = "cube_apply_heist_bank"
-	self.heat = {}
-	self.heat.name_id = "heist_heat_hl"
-	self.heat.briefing_id = "heist_heat_briefing"
-	self.heat.world_name = "wip/heat"
-	self.heat.intro_event = "lol"
-	self.heat.outro_event = {"lol", "lolo"}
-	self.heat.music = "heist"
-	self.heat.package = "packages/narr_heat"
-	self.heat.cube = "cube_apply_heist_bank"
-	self.hoxton = {}
-	self.hoxton.name_id = "heist_hoxton_hl"
-	self.hoxton.briefing_id = "heist_hoxton_briefing"
-	self.hoxton.world_name = "wip/hox_2"
-	self.hoxton.intro_event = "lol"
-	self.hoxton.outro_event = {"lol", "lolo"}
-	self.hoxton.music = "heist"
-	self.hoxton.package = "packages/narr_heat"
-	self.hoxton.cube = "cube_apply_heist_bank"
-	self.monolithic_1 = {}
-	self.monolithic_1.name_id = "heist_monolithic_1_hl"
-	self.monolithic_1.briefing_id = "heist_monolithic_1_briefing"
-	self.monolithic_1.world_name = "wip/monolithic/stage_1"
-	self.monolithic_1.intro_event = "lol"
-	self.monolithic_1.outro_event = {"lol", "lolo"}
-	self.monolithic_1.music = "heist"
-	self.monolithic_1.package = "packages/level_debug"
-	self.monolithic_1.cube = "cube_apply_heist_bank"
-	self.blueharvest_1 = {}
-	self.blueharvest_1.name_id = "heist_blueharvest_1_hl"
-	self.blueharvest_1.briefing_id = "heist_blueharvest_1_briefing"
-	self.blueharvest_1.world_name = "narratives/blue_harvest/stage_1"
-	self.blueharvest_1.intro_event = "lol"
-	self.blueharvest_1.outro_event = {"lol", "lolo"}
-	self.blueharvest_1.music = "heist"
-	self.blueharvest_1.package = "packages/level_debug"
-	self.blueharvest_1.cube = "cube_apply_heist_bank"
-	self.blueharvest_2 = {}
-	self.blueharvest_2.name_id = "heist_blueharvest_2_hl"
-	self.blueharvest_2.briefing_id = "heist_blueharvest_2_briefing"
-	self.blueharvest_2.world_name = "narratives/blue_harvest/stage_2"
-	self.blueharvest_2.intro_event = "lol"
-	self.blueharvest_2.outro_event = {"lol", "lolo"}
-	self.blueharvest_2.music = "heist"
-	self.blueharvest_2.package = "packages/level_debug"
-	self.blueharvest_2.cube = "cube_apply_heist_bank"
-	self.blueharvest_3 = {}
-	self.blueharvest_3.name_id = "heist_blueharvest_3_hl"
-	self.blueharvest_3.briefing_id = "heist_blueharvest_3_briefing"
-	self.blueharvest_3.world_name = "narratives/blue_harvest/stage_3"
-	self.blueharvest_3.intro_event = "lol"
-	self.blueharvest_3.outro_event = {"lol", "lolo"}
-	self.blueharvest_3.music = "heist"
-	self.blueharvest_3.package = "packages/level_debug"
-	self.blueharvest_3.cube = "cube_apply_heist_bank"
-	self.mia_1 = {}
-	self.mia_1.name_id = "heist_mia_1_hl"
-	self.mia_1.briefing_id = "heist_mia_1_briefing"
-	self.mia_1.briefing_dialog = "Play_pln_mia_brief"
-	self.mia_1.world_name = "wip/hm_stage1"
-	self.mia_1.intro_event = "Play_pln_firestarter_stage3_intro_a"
-	self.mia_1.outro_event = {
-		"Play_pln_firestarter_stage3_end_a",
-		"Play_pln_firestarter_stage3_end_b"
-	}
-	self.mia_1.music = "heist"
-	self.mia_1.package = "packages/narr_mia_1"
-	self.mia_1.cube = "cube_apply_heist_bank"
-	self.mia_2 = {}
-	self.mia_2.name_id = "heist_mia_2_hl"
-	self.mia_2.briefing_id = "heist_mia_2_briefing"
-	self.mia_2.briefing_dialog = "Play_pln_mia_brief"
-	self.mia_2.world_name = "wip/hm_stage2"
-	self.mia_2.intro_event = "Play_pln_firestarter_stage3_intro_a"
-	self.mia_2.outro_event = {
-		"Play_pln_firestarter_stage3_end_a",
-		"Play_pln_firestarter_stage3_end_b"
-	}
-	self.mia_2.music = "heist"
-	self.mia_2.package = "packages/narr_mia_2"
-	self.mia_2.cube = "cube_apply_heist_bank"
 	self.kosugi = {}
 	self.kosugi.name_id = "heist_kosugi_hl"
 	self.kosugi.briefing_id = "heist_kosugi_briefing"
@@ -803,490 +643,6 @@ function LevelsTweakData:init()
 	self.kosugi.cube = "cube_apply_heist_bank"
 	self.kosugi.ghost_bonus = 0.1
 	self.kosugi.max_bags = 25
-	self.test01 = {}
-	self.test01.name_id = "heist_test01_hl"
-	self.test01.briefing_id = "heist_test01"
-	self.test01.world_name = "tests/enemy_sounds"
-	self.test01.intro_event = "nothing"
-	self.test01.outro_event = "nothing"
-	self.test01.music = "heist"
-	self.test01.package = "packages/level_debug"
-	self.test01.cube = "cube_apply_heist_bank"
-	self.test02 = {}
-	self.test02.name_id = "heist_test02_hl"
-	self.test02.briefing_id = "heist_test02"
-	self.test02.world_name = "narratives/escapes/escape_hell"
-	self.test02.intro_event = "nothing"
-	self.test02.outro_event = "nothing"
-	self.test02.music = "heist"
-	self.test02.package = "packages/level_debug"
-	self.test02.cube = "cube_apply_heist_bank"
-	self.test03 = {}
-	self.test03.name_id = "heist_test03_hl"
-	self.test03.briefing_id = "heist_test03"
-	self.test03.world_name = "tests/enemy_test"
-	self.test03.intro_event = "nothing"
-	self.test03.outro_event = "nothing"
-	self.test03.music = "heist"
-	self.test03.package = "packages/level_debug"
-	self.test03.cube = "cube_apply_heist_bank"
-	self.test04 = {}
-	self.test04.name_id = "heist_test04_hl"
-	self.test04.briefing_id = "heist_test04"
-	self.test04.world_name = "narratives/escapes/escape_cafe"
-	self.test04.intro_event = "nothing"
-	self.test04.outro_event = "nothing"
-	self.test04.music = "heist"
-	self.test04.package = "packages/level_debug"
-	self.test04.cube = "cube_apply_heist_bank"
-	self.test05 = {}
-	self.test05.name_id = "heist_test05_hl"
-	self.test05.briefing_id = "heist_test05"
-	self.test05.world_name = "payday2/apartment_c"
-	self.test05.intro_event = "nothing"
-	self.test05.outro_event = "nothing"
-	self.test05.music = "heist"
-	self.test05.package = "packages/level_debug"
-	self.test05.cube = "cube_apply_heist_bank"
-	self.test06 = {}
-	self.test06.name_id = "heist_test06_hl"
-	self.test06.briefing_id = "heist_test06"
-	self.test06.world_name = "narratives/escapes/escape_garage"
-	self.test06.intro_event = "nothing"
-	self.test06.outro_event = "nothing"
-	self.test06.music = "heist"
-	self.test06.package = "packages/level_debug"
-	self.test06.cube = "cube_apply_heist_bank"
-	self.test07 = {}
-	self.test07.name_id = "heist_test07_hl"
-	self.test07.briefing_id = "heist_test07"
-	self.test07.world_name = "tests/character_showcase"
-	self.test07.intro_event = "nothing"
-	self.test07.outro_event = "nothing"
-	self.test07.music = "heist"
-	self.test07.package = "packages/level_debug"
-	self.test07.cube = "cube_apply_heist_bank"
-	self.test08 = {}
-	self.test08.name_id = "heist_test08_hl"
-	self.test08.briefing_id = "heist_test08"
-	self.test08.world_name = "tests/narrative/stage1"
-	self.test08.intro_event = "nothing"
-	self.test08.outro_event = "nothing"
-	self.test08.music = "heist"
-	self.test08.package = "packages/level_debug"
-	self.test08.cube = "cube_apply_heist_bank"
-	self.test09 = {}
-	self.test09.name_id = "heist_test09_hl"
-	self.test09.briefing_id = "heist_test09"
-	self.test09.world_name = "tests/narrative/stage2"
-	self.test09.intro_event = "nothing"
-	self.test09.outro_event = "nothing"
-	self.test09.music = "heist"
-	self.test09.package = "packages/narr_watchdogs1"
-	self.test09.cube = "cube_apply_heist_bank"
-	self.test10 = {}
-	self.test10.name_id = "heist_test10_hl"
-	self.test10.briefing_id = "heist_test10"
-	self.test10.world_name = "tests/graph_difference_test"
-	self.test10.intro_event = "nothing"
-	self.test10.outro_event = "nothing"
-	self.test10.music = "heist"
-	self.test10.package = "packages/level_debug"
-	self.test10.cube = "cube_apply_heist_bank"
-	self.vehicle_van_test = {}
-	self.vehicle_van_test.name_id = "heist_vehicle_van_test_hl"
-	self.vehicle_van_test.briefing_id = "heist_vehicle_van_test"
-	self.vehicle_van_test.world_name = "tests/vehicle_van_test"
-	self.vehicle_van_test.intro_event = "nothing"
-	self.vehicle_van_test.outro_event = "nothing"
-	self.vehicle_van_test.music = "heist"
-	self.vehicle_van_test.package = "packages/level_debug"
-	self.vehicle_van_test.cube = "cube_apply_heist_bank"
-	self.escape_chain_test_1 = {}
-	self.escape_chain_test_1.name_id = "heist_escape_chain_test_1_hl"
-	self.escape_chain_test_1.briefing_id = "heist_escape_chain_test_1_briefing"
-	self.escape_chain_test_1.world_name = "narratives/escapes/esc_testchain/stage_1"
-	self.escape_chain_test_1.intro_event = "nothing"
-	self.escape_chain_test_1.outro_event = "nothing"
-	self.escape_chain_test_1.music = "heist"
-	self.escape_chain_test_1.package = "packages/level_debug"
-	self.escape_chain_test_1.cube = "cube_apply_heist_bank"
-	self.escape_chain_test_2 = {}
-	self.escape_chain_test_2.name_id = "heist_escape_chain_test_2_hl"
-	self.escape_chain_test_2.briefing_id = "heist_escape_chain_test_2_briefing"
-	self.escape_chain_test_2.world_name = "narratives/escapes/esc_testchain/stage_2"
-	self.escape_chain_test_2.intro_event = "nothing"
-	self.escape_chain_test_2.outro_event = "nothing"
-	self.escape_chain_test_2.music = "heist"
-	self.escape_chain_test_2.package = "packages/level_debug"
-	self.escape_chain_test_2.cube = "cube_apply_heist_bank"
-	self.bank = {}
-	self.bank.name_id = "debug_bank"
-	self.bank.briefing_id = "debug_bank_briefing"
-	self.bank.ticker_id = "debug_bank_ticker"
-	self.bank.world_name = SystemInfo:platform() == Idstring("PS3") and "bank_ps3" or "bank"
-	self.bank.intro_event = "Play_1wb_ban_01x_any"
-	self.bank.intro_cues = {
-		"intro_bank01",
-		"intro_bank02",
-		"intro_bank03",
-		"intro_bank04"
-	}
-	self.bank.intro_text_id = "intro_bank"
-	self.bank.music = "heist"
-	self.bank.package = "packages/level_bank"
-	self.bank.megaphone_pos = Vector3(-6202, 32, 88)
-	self.bank.cube = "cube_apply_bank"
-	self.bank.load_data = {
-		package = "packages/load_bank",
-		image = "guis/textures/loading/loading_bank"
-	}
-	self.heat_street = {}
-	self.heat_street.name_id = "debug_street"
-	self.heat_street.world_name = SystemInfo:platform() == Idstring("PS3") and "street_ps3" or "street"
-	self.heat_street.intro_event = "str_blackscreen"
-	self.heat_street.intro_cues = {
-		"intro_street01",
-		"intro_street02",
-		"intro_street03",
-		"intro_street04",
-		"intro_street05"
-	}
-	self.heat_street.intro_text_id = "intro_street"
-	self.heat_street.music = "heist"
-	self.heat_street.briefing_id = "debug_street_briefing"
-	self.heat_street.package = "packages/level_street"
-	self.heat_street.cube = "cube_apply_street"
-	self.bridge = {}
-	self.bridge.name_id = "debug_bridge"
-	self.bridge.world_name = SystemInfo:platform() == Idstring("PS3") and "bridge_ps3" or "bridge"
-	self.bridge.intro_event = "bri_blackscreen"
-	self.bridge.intro_cues = {
-		"intro_bridge01",
-		"intro_bridge02"
-	}
-	self.bridge.intro_text_id = "intro_bridge"
-	self.bridge.briefing_id = "debug_bridge_briefing"
-	self.bridge.package = "packages/level_bridge"
-	self.bridge.equipment = {"saw"}
-	self.bridge.music = "heist"
-	self.bridge.flashlights_on = true
-	self.bridge.unit_suit = "raincoat"
-	self.bridge.environment_effects = {
-		"rain",
-		"raindrop_screen",
-		"lightning"
-	}
-	self.bridge.cube = "cube_apply_bridge"
-	self.apartment = {}
-	self.apartment.name_id = "debug_apartment"
-	self.apartment.world_name = SystemInfo:platform() == Idstring("PS3") and "tests/n_drop_in" or "tests/n_drop_in"
-	self.apartment.briefing_id = "debug_apartment_briefing"
-	self.apartment.equipment = {"saw"}
-	self.apartment.intro_event = "Play_apa_rbx_00x_any"
-	self.apartment.intro_cues = {
-		"intro_apartment01",
-		"intro_apartment02",
-		"intro_apartment03",
-		"intro_apartment04"
-	}
-	self.apartment.intro_text_id = "intro_apartment"
-	self.apartment.music = "heist"
-	self.apartment.package = "packages/level_debug"
-	self.apartment.megaphone_pos = Vector3(-444, -1502, 206)
-	self.apartment.cube = "cube_apply_apartment"
-	self.apartment.load_data = {
-		package = "packages/load_apartment",
-		image = "guis/textures/loading/loading_apartment"
-	}
-	self.apartment.mission_data = {
-		{mission = "version2"}
-	}
-	self.apartment_night = deep_clone(self.apartment)
-	self.apartment_night.env_params = {
-		environment = "environments/env_watchdogs_2_4/env_watchdogs_2_4"
-	}
-	self.diamond_heist = {}
-	self.diamond_heist.name_id = "debug_diamond_heist"
-	self.diamond_heist.world_name = SystemInfo:platform() == Idstring("PS3") and "diamondheist_ps3" or "diamondheist"
-	self.diamond_heist.intro_event = "dim_blackscreen"
-	self.diamond_heist.intro_cues = {
-		"intro_diamondheist01",
-		"intro_diamondheist02",
-		"intro_diamondheist03"
-	}
-	self.diamond_heist.intro_text_id = "intro_diamondheist"
-	self.diamond_heist.music = "heist"
-	self.diamond_heist.briefing_id = "debug_diamond_heist_briefing"
-	self.diamond_heist.package = "packages/level_diamond_heist"
-	self.diamond_heist.unit_suit = "cat_suit"
-	self.diamond_heist.cube = "cube_apply_diamond"
-	self.slaughter_house = {}
-	self.slaughter_house.name_id = "debug_slaughter_house"
-	self.slaughter_house.world_name = SystemInfo:platform() == Idstring("PS3") and "slaughterhouse_ps3" or "slaughterhouse"
-	self.slaughter_house.intro_event = "slh_blackscreen"
-	self.slaughter_house.intro_cues = {
-		"intro_slaughterhouse01",
-		"intro_slaughterhouse03",
-		"intro_slaughterhouse05"
-	}
-	self.slaughter_house.intro_text_id = "intro_slaughterhouse"
-	self.slaughter_house.briefing_id = "debug_slaughter_house_briefing"
-	self.slaughter_house.package = "packages/level_slaughterhouse"
-	self.slaughter_house.equipment = {"drill"}
-	self.slaughter_house.music = "heist"
-	self.slaughter_house.unit_suit = "cat_suit"
-	self.slaughter_house.cube = "cube_apply_slaughter"
-	self.suburbia = {}
-	self.suburbia.name_id = "debug_suburbia"
-	self.suburbia.world_name = "suburbia"
-	self.suburbia.intro_event = "cft_blackscreen"
-	self.suburbia.intro_cues = {
-		"intro_suburbia01",
-		"intro_suburbia02",
-		"intro_suburbia03",
-		"intro_suburbia04",
-		"intro_suburbia05",
-		"intro_suburbia06"
-	}
-	self.suburbia.intro_text_id = "intro_suburbia"
-	self.suburbia.briefing_id = "debug_suburbia_briefing"
-	self.suburbia.package = "packages/level_suburbia"
-	self.suburbia.equipment = {"drill"}
-	self.suburbia.music = "heist"
-	self.suburbia.unit_suit = "suburbia"
-	self.suburbia.cube = "cube_apply_suburbia"
-	self.suburbia.dlc = "dlc2"
-	self.secret_stash = {}
-	self.secret_stash.name_id = "debug_secret_stash"
-	self.secret_stash.world_name = "secret_stash"
-	self.secret_stash.intro_event = "und_blackscreen"
-	self.secret_stash.intro_cues = {
-		"intro_secret_stash01",
-		"intro_secret_stash02",
-		"intro_secret_stash03",
-		"intro_secret_stash04",
-		"intro_secret_stash05",
-		"intro_secret_stash06",
-		"intro_secret_stash07"
-	}
-	self.secret_stash.intro_text_id = "intro_secret_stash"
-	self.secret_stash.briefing_id = "debug_secret_stash_briefing"
-	self.secret_stash.package = "packages/level_secret_stash"
-	self.secret_stash.equipment = {"saw"}
-	self.secret_stash.music = "heist"
-	self.secret_stash.cube = "cube_apply_secret_stash"
-	self.secret_stash.dlc = "dlc3"
-	self.secret_stash.unit_suit = "cat_suit"
-	self.hospital = {}
-	self.hospital.name_id = "debug_hospital"
-	self.hospital.world_name = "l4d"
-	self.hospital.intro_event = {
-		"hos_blackscreen",
-		"hos_blackscreen_bill_01",
-		"hos_blackscreen_bill_02",
-		"hos_blackscreen_bill_03",
-		"hos_blackscreen_bill_04",
-		"hos_blackscreen_bill_05",
-		"hos_blackscreen_bill_06",
-		"hos_blackscreen_bill_07",
-		"hos_blackscreen_bill_08",
-		"hos_blackscreen_bill_09",
-		"hos_blackscreen_bill_10",
-		"hos_blackscreen_bill_11",
-		"hos_blackscreen_bill_12",
-		"hos_blackscreen_bill_13",
-		"hos_blackscreen_bill_14"
-	}
-	self.hospital.intro_cues = {
-		{
-			"intro_hospital00",
-			"intro_hospital01",
-			"intro_hospital02",
-			"intro_hospital03",
-			"intro_hospital04",
-			"intro_hospital05",
-			"intro_hospital06",
-			"intro_hospital07",
-			"intro_hospital08",
-			"intro_hospital09"
-		},
-		{
-			"intro_hospital10",
-			"intro_hospital11",
-			"intro_hospital12",
-			"intro_hospital13",
-			"intro_hospital14",
-			"intro_hospital15",
-			"intro_hospital16",
-			"intro_hospital17",
-			"intro_hospital18",
-			"intro_hospital19"
-		},
-		{
-			"intro_hospital20",
-			"intro_hospital21",
-			"intro_hospital22",
-			"intro_hospital23",
-			"intro_hospital24",
-			"intro_hospital25",
-			"intro_hospital26",
-			"intro_hospital27",
-			"intro_hospital28",
-			"intro_hospital29"
-		},
-		{
-			"intro_hospital30",
-			"intro_hospital31",
-			"intro_hospital32",
-			"intro_hospital33",
-			"intro_hospital34",
-			"intro_hospital35",
-			"intro_hospital36",
-			"intro_hospital37",
-			"intro_hospital38",
-			"intro_hospital39"
-		},
-		{
-			"intro_hospital40",
-			"intro_hospital41",
-			"intro_hospital42",
-			"intro_hospital43",
-			"intro_hospital44",
-			"intro_hospital45",
-			"intro_hospital46",
-			"intro_hospital47",
-			"intro_hospital48",
-			"intro_hospital49"
-		},
-		{
-			"intro_hospital50",
-			"intro_hospital51",
-			"intro_hospital52",
-			"intro_hospital53",
-			"intro_hospital54",
-			"intro_hospital55",
-			"intro_hospital56",
-			"intro_hospital57",
-			"intro_hospital58",
-			"intro_hospital59"
-		},
-		{
-			"intro_hospital60",
-			"intro_hospital61",
-			"intro_hospital62",
-			"intro_hospital63",
-			"intro_hospital64",
-			"intro_hospital65",
-			"intro_hospital66",
-			"intro_hospital67",
-			"intro_hospital68",
-			"intro_hospital69"
-		},
-		{
-			"intro_hospital70",
-			"intro_hospital71",
-			"intro_hospital72",
-			"intro_hospital73",
-			"intro_hospital74",
-			"intro_hospital75",
-			"intro_hospital76",
-			"intro_hospital77",
-			"intro_hospital78",
-			"intro_hospital79"
-		},
-		{
-			"intro_hospital80",
-			"intro_hospital81",
-			"intro_hospital82",
-			"intro_hospital83",
-			"intro_hospital84",
-			"intro_hospital85",
-			"intro_hospital86",
-			"intro_hospital87",
-			"intro_hospital88",
-			"intro_hospital89"
-		},
-		{
-			"intro_hospital90",
-			"intro_hospital91",
-			"intro_hospital92",
-			"intro_hospital93",
-			"intro_hospital94",
-			"intro_hospital95",
-			"intro_hospital96",
-			"intro_hospital97",
-			"intro_hospital98",
-			"intro_hospital99"
-		},
-		{
-			"intro_hospital100",
-			"intro_hospital101",
-			"intro_hospital102",
-			"intro_hospital103",
-			"intro_hospital104",
-			"intro_hospital105",
-			"intro_hospital106",
-			"intro_hospital107",
-			"intro_hospital108",
-			"intro_hospital109"
-		},
-		{
-			"intro_hospital110",
-			"intro_hospital111",
-			"intro_hospital112",
-			"intro_hospital113",
-			"intro_hospital114",
-			"intro_hospital115",
-			"intro_hospital116",
-			"intro_hospital117",
-			"intro_hospital118",
-			"intro_hospital119"
-		},
-		{
-			"intro_hospital120",
-			"intro_hospital121",
-			"intro_hospital122",
-			"intro_hospital123",
-			"intro_hospital124",
-			"intro_hospital125",
-			"intro_hospital126",
-			"intro_hospital127",
-			"intro_hospital128",
-			"intro_hospital129"
-		},
-		{
-			"intro_hospital130",
-			"intro_hospital131",
-			"intro_hospital132",
-			"intro_hospital133",
-			"intro_hospital134",
-			"intro_hospital135",
-			"intro_hospital136",
-			"intro_hospital137",
-			"intro_hospital138",
-			"intro_hospital139"
-		},
-		{
-			"intro_hospital140",
-			"intro_hospital141",
-			"intro_hospital142",
-			"intro_hospital143",
-			"intro_hospital144",
-			"intro_hospital145",
-			"intro_hospital146",
-			"intro_hospital147",
-			"intro_hospital148",
-			"intro_hospital149"
-		}
-	}
-	self.hospital.intro_text_id = "intro_hospital"
-	self.hospital.briefing_id = "debug_hospital_briefing"
-	self.hospital.package = "packages/level_hospital"
-	self.hospital.music = "heist"
-	self.hospital.unit_suit = "scrubs"
-	self.hospital.cube = "cube_apply_slaughter"
-	self.hospital.dlc = "dlc4"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_2",
@@ -1312,7 +668,6 @@ function LevelsTweakData:init()
 		"mallcrasher",
 		"nightclub",
 		"branchbank",
-		"fwb",
 		"escape_cafe",
 		"escape_park",
 		"escape_cafe_day",
@@ -1321,44 +676,17 @@ function LevelsTweakData:init()
 		"escape_overpass",
 		"escape_garage",
 		"escape_overpass_night",
-		"escape_hell",
 		"safehouse",
 		"arm_fac",
 		"arm_par",
 		"arm_hcm",
-		"arm_bri",
 		"arm_cro",
 		"arm_und",
 		"arm_for",
 		"family",
-		"on_time_1",
-		"on_time_2",
 		"big",
 		"roberts",
-		"haunted",
-		"branchbank_cloaker",
-		"heat",
-		"monolithic_1",
-		"blueharvest_1",
-		"blueharvest_2",
-		"blueharvest_3",
-		"mia_1",
-		"mia_2",
-		"kosugi",
-		"hoxton",
-		"test01",
-		"test02",
-		"test03",
-		"test04",
-		"test05",
-		"test06",
-		"test07",
-		"test08",
-		"test09",
-		"test10",
-		"escape_chain_test_1",
-		"escape_chain_test_2",
-		"vehicle_van_test"
+		"kosugi"
 	}
 	self.escape_levels = {
 		"escape_cafe",
@@ -1370,9 +698,7 @@ function LevelsTweakData:init()
 		"escape_cafe_day",
 		"escape_park_day",
 		"election_day_3",
-		"arm_for",
-		"escape_hell",
-		"blueharvest_3"
+		"arm_for"
 	}
 end
 

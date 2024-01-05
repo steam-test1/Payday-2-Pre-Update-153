@@ -452,7 +452,7 @@ function CopLogicTravel.action_complete_clbk(data, action)
 		if action:expired() and not my_data.starting_advance_action and my_data.coarse_path_index and not my_data.has_old_action and my_data.advancing then
 			my_data.coarse_path_index = my_data.coarse_path_index + 1
 			if my_data.coarse_path_index > #my_data.coarse_path then
-				debug_pause_unit(data.unit, "[CopLogicTravel.action_complete_clbk] invalid coarse path index increment", inspect(my_data.coarse_path), my_data.coarse_path_index)
+				debug_pause_unit(data.unit, "[CopLogicTravel.action_complete_clbk] invalid coarse path index increment", data.unit, inspect(my_data.coarse_path), my_data.coarse_path_index)
 				my_data.coarse_path_index = my_data.coarse_path_index - 1
 			end
 		end

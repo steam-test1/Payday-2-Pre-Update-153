@@ -3,6 +3,7 @@ DLCManager.PLATFORM_CLASS_MAP = {}
 DLCManager.BUNDLED_DLC_PACKAGES = {
 	infamous = 1,
 	twitch_pack = 1,
+	pd2_million = true,
 	dlc1 = true,
 	gage_pack = true,
 	gage_pack_lmg = true,

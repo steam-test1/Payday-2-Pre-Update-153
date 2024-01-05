@@ -365,6 +365,16 @@ function update_number_from_slider(params)
 	change_entered_number(params, params.value)
 end
 
+function update_slider_and_number_controller_value(params, value)
+	params.value = value
+	change_entered_number(params, params.value)
+	update_slider_from_number(params)
+end
+
+function change_slider_and_number_controller_range(params, min, max)
+	params.slider_ctrlr:set_range(min * params.slider_multiplier, max * params.slider_multiplier)
+end
+
 function list_selector(params)
 	params.title = params.title or ""
 	params.options = params.options or {}

@@ -865,6 +865,16 @@ function JobManager:complete_stage()
 	self._global.current_job.current_stage = current_stage + 1
 end
 
+function JobManager:on_first_stage()
+	if not self._global.current_job then
+		return false
+	end
+	if self._global.next_interupt_stage then
+		return false
+	end
+	return self._global.current_job.current_stage == 1
+end
+
 function JobManager:on_last_stage()
 	if not self._global.current_job then
 		return false

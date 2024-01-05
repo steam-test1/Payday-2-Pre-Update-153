@@ -45,9 +45,9 @@ function WorldCameraLayer:toggle_show_framing_gui(layer_toolbar, event)
 	self:set_gui_visible(visible)
 end
 
-function WorldCameraLayer:set_gui_visible(visible)
+function WorldCameraLayer:set_gui_visible(visible, external_forced)
 	if self._gui_visible ~= visible or self._forced_show_framing_gui then
-		if visible and (self._forced_show_framing_gui or managers.worldcamera:use_gui()) then
+		if visible and (self._forced_show_framing_gui or managers.worldcamera:use_gui() or external_forced) then
 			self._workspace:show()
 		else
 			self._workspace:hide()

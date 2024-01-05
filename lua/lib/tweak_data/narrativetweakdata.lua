@@ -324,6 +324,52 @@ function NarrativeTweakData:init()
 		700000
 	}
 	self.jobs.alex_prof.heat = {this_job = -25, other_jobs = 10}
+	self.jobs.welcome_to_the_jungle_wrapper = {}
+	self.jobs.welcome_to_the_jungle_wrapper.name_id = "heist_welcome_to_the_jungle"
+	self.jobs.welcome_to_the_jungle_wrapper.briefing_id = "heist_welcome_to_the_jungle_crimenet"
+	self.jobs.welcome_to_the_jungle_wrapper.contact = "the_elephant"
+	self.jobs.welcome_to_the_jungle_wrapper.package = "packages/job_bigoil"
+	self.jobs.welcome_to_the_jungle_wrapper.jc = 50
+	self.jobs.welcome_to_the_jungle_wrapper.chain = {
+		{}
+	}
+	self.jobs.welcome_to_the_jungle_wrapper.job_wrapper = {
+		"welcome_to_the_jungle"
+	}
+	self.jobs.welcome_to_the_jungle_wrapper.briefing_event = "elp_bigoil_brf"
+	self.jobs.welcome_to_the_jungle_wrapper.debrief_event = "elp_bigoil_debrief"
+	self.jobs.welcome_to_the_jungle_wrapper.crimenet_callouts = {
+		"elp_bigoil_cnc_01",
+		"elp_bigoil_cnc_02",
+		"elp_bigoil_cnc_03"
+	}
+	self.jobs.welcome_to_the_jungle_wrapper.crimenet_videos = {
+		"cn_bigoil1",
+		"cn_bigoil2",
+		"cn_bigoil3"
+	}
+	self.jobs.welcome_to_the_jungle_wrapper.payout = {
+		200000,
+		275000,
+		400000,
+		500000,
+		800000
+	}
+	self.jobs.welcome_to_the_jungle_wrapper.heat = {this_job = -15, other_jobs = 15}
+	self.jobs.welcome_to_the_jungle_wrapper_prof = deep_clone(self.jobs.welcome_to_the_jungle_wrapper)
+	self.jobs.welcome_to_the_jungle_wrapper_prof.job_wrapper = {
+		"welcome_to_the_jungle_prof"
+	}
+	self.jobs.welcome_to_the_jungle_wrapper_prof.jc = 70
+	self.jobs.welcome_to_the_jungle_wrapper_prof.professional = true
+	self.jobs.welcome_to_the_jungle_wrapper_prof.payout = {
+		250000,
+		300000,
+		450000,
+		550000,
+		850000
+	}
+	self.jobs.welcome_to_the_jungle_wrapper_prof.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.welcome_to_the_jungle = {}
 	self.jobs.welcome_to_the_jungle.name_id = "heist_welcome_to_the_jungle"
 	self.jobs.welcome_to_the_jungle.briefing_id = "heist_welcome_to_the_jungle_crimenet"
@@ -448,6 +494,51 @@ function NarrativeTweakData:init()
 		300000
 	}
 	self.jobs.framing_frame_prof.heat = {this_job = -15, other_jobs = 25}
+	self.jobs.watchdogs_wrapper = {}
+	self.jobs.watchdogs_wrapper.name_id = "heist_watchdogs"
+	self.jobs.watchdogs_wrapper.briefing_id = "heist_watchdogs_crimenet"
+	self.jobs.watchdogs_wrapper.contact = "hector"
+	self.jobs.watchdogs_wrapper.package = "packages/job_watchdogs"
+	self.jobs.watchdogs_wrapper.region = "dock"
+	self.jobs.watchdogs_wrapper.jc = 40
+	self.jobs.watchdogs_wrapper.chain = {
+		{}
+	}
+	self.jobs.watchdogs_wrapper.job_wrapper = {"watchdogs"}
+	self.jobs.watchdogs_wrapper.briefing_event = "hct_watchdogs_brf_speak"
+	self.jobs.watchdogs_wrapper.debrief_event = "hct_watchdogs_debrief"
+	self.jobs.watchdogs_wrapper.crimenet_callouts = {
+		"hct_watchdogs_cnc_01",
+		"hct_watchdogs_cnc_02",
+		"hct_watchdogs_cnc_03"
+	}
+	self.jobs.watchdogs_wrapper.crimenet_videos = {
+		"cn_watchdog1",
+		"cn_watchdog2",
+		"cn_watchdog3"
+	}
+	self.jobs.watchdogs_wrapper.payout = {
+		60000,
+		74000,
+		125000,
+		185000,
+		260000
+	}
+	self.jobs.watchdogs_wrapper.heat = {this_job = -15, other_jobs = 15}
+	self.jobs.watchdogs_wrapper_prof = deep_clone(self.jobs.watchdogs_wrapper)
+	self.jobs.watchdogs_wrapper_prof.job_wrapper = {
+		"watchdogs_prof"
+	}
+	self.jobs.watchdogs_wrapper_prof.jc = 60
+	self.jobs.watchdogs_wrapper_prof.professional = true
+	self.jobs.watchdogs_wrapper_prof.payout = {
+		75000,
+		85000,
+		150000,
+		200000,
+		290000
+	}
+	self.jobs.watchdogs_wrapper_prof.heat = {this_job = -15, other_jobs = 20}
 	self.jobs.watchdogs = {}
 	self.jobs.watchdogs.name_id = "heist_watchdogs"
 	self.jobs.watchdogs.briefing_id = "heist_watchdogs_crimenet"
@@ -1374,53 +1465,6 @@ function NarrativeTweakData:init()
 		70000,
 		85000
 	}
-	self.jobs.on_time = {}
-	self.jobs.on_time.name_id = "heist_on_time"
-	self.jobs.on_time.briefing_id = "heist_on_time_crimenet"
-	self.jobs.on_time.contact = "hector"
-	self.jobs.on_time.region = "dock"
-	self.jobs.on_time.jc = 40
-	self.jobs.on_time.chain = {
-		{
-			level_id = "on_time_1",
-			type_id = "heist_type_survive",
-			type = "d"
-		},
-		{
-			level_id = "on_time_2",
-			type_id = "heist_type_survive",
-			type = "d"
-		}
-	}
-	self.jobs.on_time.briefing_event = "hct_watchdogs_brf_speak"
-	self.jobs.on_time.debrief_event = "hct_watchdogs_debrief"
-	self.jobs.on_time.crimenet_callouts = {
-		"hct_watchdogs_cnc_01",
-		"hct_watchdogs_cnc_02",
-		"hct_watchdogs_cnc_03"
-	}
-	self.jobs.on_time.crimenet_videos = {
-		"cn_watchdog1",
-		"cn_watchdog2",
-		"cn_watchdog3"
-	}
-	self.jobs.on_time.payout = {
-		20000,
-		24000,
-		35000,
-		50000,
-		100000
-	}
-	self.jobs.on_time_prof = deep_clone(self.jobs.on_time)
-	self.jobs.on_time_prof.jc = 60
-	self.jobs.on_time_prof.professional = true
-	self.jobs.on_time_prof.payout = {
-		30000,
-		35000,
-		40000,
-		65000,
-		130000
-	}
 	self.jobs.big = {}
 	self.jobs.big.name_id = "heist_big"
 	self.jobs.big.briefing_id = "heist_big_crimenet"
@@ -1439,7 +1483,8 @@ function NarrativeTweakData:init()
 		{
 			level_id = "big",
 			type_id = "heist_type_assault",
-			type = "d"
+			type = "d",
+			mission_filter = {1}
 		}
 	}
 	self.jobs.big.briefing_event = "gus_bb1_cbf_01"
@@ -1518,163 +1563,6 @@ function NarrativeTweakData:init()
 		70000,
 		140000
 	}
-	self.jobs.haunted = {}
-	self.jobs.haunted.name_id = "heist_haunted"
-	self.jobs.haunted.briefing_id = "heist_haunted_crimenet"
-	self.jobs.haunted.contact = "bain"
-	self.jobs.haunted.region = "street"
-	self.jobs.haunted.jc = 10
-	self.jobs.haunted.chain = {
-		{
-			level_id = "haunted",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.haunted.briefing_event = nil
-	self.jobs.haunted.debrief_event = nil
-	self.jobs.haunted.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.haunted.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.haunted_prof = deep_clone(self.jobs.haunted)
-	self.jobs.haunted_prof.jc = 40
-	self.jobs.haunted_prof.professional = true
-	self.jobs.haunted_prof.region = "professional"
-	self.jobs.haunted_prof.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.heat = {}
-	self.jobs.heat.name_id = "heist_heat"
-	self.jobs.heat.briefing_id = "heist_heat_crimenet"
-	self.jobs.heat.contact = "bain"
-	self.jobs.heat.region = "street"
-	self.jobs.heat.jc = 10
-	self.jobs.heat.chain = {
-		{
-			level_id = "heat",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.heat.briefing_event = nil
-	self.jobs.heat.debrief_event = nil
-	self.jobs.heat.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.heat.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.haunted_prof = deep_clone(self.jobs.haunted)
-	self.jobs.haunted_prof.jc = 40
-	self.jobs.haunted_prof.professional = true
-	self.jobs.haunted_prof.region = "professional"
-	self.jobs.haunted_prof.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.monolithic = {}
-	self.jobs.monolithic.name_id = "heist_monolithic_1"
-	self.jobs.monolithic.briefing_id = "heist_monolithic_1_crimenet"
-	self.jobs.monolithic.contact = "bain"
-	self.jobs.monolithic.region = "street"
-	self.jobs.monolithic.jc = 10
-	self.jobs.monolithic.chain = {
-		{
-			level_id = "monolithic_1",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.monolithic.briefing_event = nil
-	self.jobs.monolithic.debrief_event = nil
-	self.jobs.monolithic.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.monolithic.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.monolithic_prof = deep_clone(self.jobs.monolithic)
-	self.jobs.monolithic_prof.jc = 40
-	self.jobs.monolithic_prof.professional = true
-	self.jobs.monolithic_prof.region = "professional"
-	self.jobs.monolithic_prof.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.blueharvest = {}
-	self.jobs.blueharvest.name_id = "heist_blueharvest"
-	self.jobs.blueharvest.briefing_id = "heist_blueharvest_crimenet"
-	self.jobs.blueharvest.contact = "bain"
-	self.jobs.blueharvest.region = "street"
-	self.jobs.blueharvest.jc = 10
-	self.jobs.blueharvest.chain = {
-		{
-			level_id = "blueharvest_1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "blueharvest_2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.blueharvest.briefing_event = nil
-	self.jobs.blueharvest.debrief_event = nil
-	self.jobs.blueharvest.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.blueharvest.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
-	self.jobs.blueharvest_prof = deep_clone(self.jobs.blueharvest)
-	self.jobs.blueharvest_prof.jc = 40
-	self.jobs.blueharvest_prof.professional = true
-	self.jobs.blueharvest_prof.region = "professional"
-	self.jobs.blueharvest_prof.payout = {
-		10000,
-		20000,
-		30000,
-		40000,
-		80000
-	}
 	self.jobs.kosugi = {}
 	self.jobs.kosugi.name_id = "heist_kosugi"
 	self.jobs.kosugi.briefing_id = "heist_kosugi_crimenet"
@@ -1733,185 +1621,13 @@ function NarrativeTweakData:init()
 		40000,
 		80000
 	}
-	self.jobs.hoxton = {}
-	self.jobs.hoxton.name_id = "heist_hoxton"
-	self.jobs.hoxton.briefing_id = "heist_hoxton_crimenet"
-	self.jobs.hoxton.contact = "bain"
-	self.jobs.hoxton.region = "street"
-	self.jobs.hoxton.jc = 30
-	self.jobs.hoxton.chain = {
-		{
-			level_id = "hoxton",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.hoxton.briefing_event = "pln_cs1_cbf_01"
-	self.jobs.hoxton.debrief_event = nil
-	self.jobs.hoxton.crimenet_callouts = {
-		"pln_cs1_cnc_01",
-		"pln_cs1_cnc_02",
-		"pln_cs1_cnc_03"
-	}
-	self.jobs.hoxton.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
-	}
-	self.jobs.hoxton.payout = {
-		26000,
-		37000,
-		81000,
-		101000,
-		202000
-	}
-	self.jobs.hoxton_prof = deep_clone(self.jobs.hoxton)
-	self.jobs.hoxton_prof.jc = 40
-	self.jobs.hoxton_prof.professional = true
-	self.jobs.hoxton_prof.region = "professional"
-	self.jobs.hoxton_prof.payout = {
-		40000,
-		44000,
-		62000,
-		70000,
-		140000
-	}
-	self.jobs.escape_hell = {}
-	self.jobs.escape_hell.name_id = "heist_escape_hell"
-	self.jobs.escape_hell.briefing_id = "heist_escape_hell_crimenet"
-	self.jobs.escape_hell.contact = "bain"
-	self.jobs.escape_hell.region = "street"
-	self.jobs.escape_hell.jc = 40
-	self.jobs.escape_hell.chain = {
-		{
-			level_id = "escape_hell",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.escape_hell.briefing_event = "pln_fj1_cbf_01"
-	self.jobs.escape_hell.debrief_event = nil
-	self.jobs.escape_hell.crimenet_callouts = {
-		"pln_fj1_cnc_01_01",
-		"pln_fj1_cnc_01_02",
-		"pln_fj1_cnc_01_03"
-	}
-	self.jobs.escape_hell.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
-	}
-	self.jobs.escape_hell.payout = {
-		37000,
-		43000,
-		60000,
-		70000,
-		80000
-	}
-	self.jobs.mia = {}
-	self.jobs.mia.name_id = "heist_mia"
-	self.jobs.mia.briefing_id = "heist_mia_crimenet"
-	self.jobs.mia.contact = "bain"
-	self.jobs.mia.region = "street"
-	self.jobs.mia.jc = 40
-	self.jobs.mia.chain = {
-		{
-			level_id = "mia_1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "mia_2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.mia.briefing_event = "pln_fj1_cbf_01"
-	self.jobs.mia.debrief_event = nil
-	self.jobs.mia.crimenet_callouts = {
-		"pln_fj1_cnc_01_01",
-		"pln_fj1_cnc_01_02",
-		"pln_fj1_cnc_01_03"
-	}
-	self.jobs.mia.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
-	}
-	self.jobs.mia.payout = {
-		37000,
-		43000,
-		60000,
-		70000,
-		80000
-	}
-	self.jobs.branchbank_cloaker = {}
-	self.jobs.branchbank_cloaker.name_id = "heist_cloak"
-	self.jobs.branchbank_cloaker.briefing_id = "heist_cloak_crimenet"
-	self.jobs.branchbank_cloaker.contact = "bain"
-	self.jobs.branchbank_cloaker.region = "street"
-	self.jobs.branchbank_cloaker.jc = 30
-	self.jobs.branchbank_cloaker.chain = {
-		{
-			level_id = "branchbank_cloaker",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission = "standalone",
-			mission_filter = {2},
-			briefing_dialog = "Play_pln_branchbank_cash_stage1_brief",
-			briefing_id = "heist_branchbank_cash_briefing"
-		}
-	}
-	self.jobs.branchbank_cloaker.briefing_event = "pln_branchbank_cash_brf_speak"
-	self.jobs.branchbank_cloaker.debrief_event = nil
-	self.jobs.branchbank_cloaker.crimenet_callouts = {
-		"pln_branchbank_cash_cnc_01",
-		"pln_branchbank_cash_cnc_02",
-		"pln_branchbank_cash_cnc_03",
-		"pln_branchbank_cash_cnc_04",
-		"pln_branchbank_cash_cnc_05",
-		"pln_branchbank_cash_cnc_06",
-		"pln_branchbank_cash_cnc_07"
-	}
-	self.jobs.branchbank_cloaker.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.branchbank_cloaker.payout = {
-		10000,
-		15000,
-		40000,
-		60000,
-		120000
-	}
-	self.jobs.escape_chain_test = {}
-	self.jobs.escape_chain_test.name_id = "heist_escape_chain_test"
-	self.jobs.escape_chain_test.briefing_id = "heist_escape_chain_test_briefing"
-	self.jobs.escape_chain_test.contact = "hector"
-	self.jobs.escape_chain_test.jc = 20
-	self.jobs.escape_chain_test.chain = {
-		{
-			level_id = "escape_chain_test_1",
-			type_id = "heist_type_survive",
-			type = "d"
-		},
-		{
-			level_id = "escape_chain_test_2",
-			type_id = "heist_type_survive",
-			type = "d"
-		}
-	}
-	self.jobs.escape_chain_test.briefing_event = nil
-	self.jobs.escape_chain_test.debrief_event = nil
-	self.jobs.escape_chain_test.crimenet_callouts = {}
-	self.jobs.escape_chain_test_prof = deep_clone(self.jobs.escape_chain_test)
-	self.jobs.escape_chain_test_prof.jc = 50
-	self.jobs.escape_chain_test_prof.professional = true
 	self._jobs_index = {
+		"welcome_to_the_jungle_wrapper_prof",
 		"welcome_to_the_jungle_prof",
 		"framing_frame",
 		"framing_frame_prof",
+		"watchdogs_wrapper",
+		"watchdogs_wrapper_prof",
 		"watchdogs",
 		"watchdogs_prof",
 		"alex",

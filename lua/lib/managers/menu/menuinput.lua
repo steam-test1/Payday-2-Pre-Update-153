@@ -320,7 +320,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 							return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 						end
 					end
-				elseif not row_item.gui_panel:inside(x, y) or row_item.type == "divider" then
+				elseif not (row_item.gui_panel:inside(x, y) and node_gui._item_panel_parent:inside(x, y)) or row_item.type == "divider" then
 				elseif row_item.type == "slider" then
 					self:post_event("slider_grab")
 					if row_item.gui_slider_marker:inside(x, y) then
