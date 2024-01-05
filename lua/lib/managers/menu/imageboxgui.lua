@@ -122,7 +122,6 @@ function ImageBoxGui:_create_image_box(image_config)
 			1
 		}
 	})
-	Global.info_area = info_area
 	self:_set_scroll_indicator()
 	main:set_center(main:parent():w() / 2, main:parent():h() / 2)
 end
@@ -131,10 +130,4 @@ function ImageBoxGui:mouse_moved(x, y)
 end
 
 function ImageBoxGui:mouse_pressed(button, x, y)
-end
-
-function ImageBoxGui:close()
-	if alive(self._panel) then
-		self._ws:panel():remove(self._panel)
-	end
 end

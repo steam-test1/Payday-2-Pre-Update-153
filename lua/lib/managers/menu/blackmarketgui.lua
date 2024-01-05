@@ -3227,13 +3227,13 @@ function BlackMarketGui:update_info_text()
 			end
 		elseif slot_data.locked_slot then
 			ignore_lock = true
-			updated_texts[1].text = managers.localization:to_upper_text("bm_menu_locked_mask_slot")
+			updated_texts[1].text = managers.localization:to_upper_text("bm_menu_locked_weapon_slot")
 			if slot_data.cannot_buy then
 				updated_texts[3].text = slot_data.dlc_locked
 			else
 				updated_texts[2].text = slot_data.dlc_locked
 			end
-			updated_texts[4].text = managers.localization:text("bm_menu_locked_mask_slot_desc")
+			updated_texts[4].text = managers.localization:text("bm_menu_locked_weapon_slot_desc")
 		elseif not slot_data.is_loadout then
 			local prefix = ""
 			if not managers.menu:is_pc_controller() then
