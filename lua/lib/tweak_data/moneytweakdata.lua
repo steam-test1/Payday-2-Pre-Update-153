@@ -39,12 +39,12 @@ function MoneyTweakData._test_curves(pay, bags, alive_players, diff, days)
 end
 
 function MoneyTweakData:init()
-	self.biggest_score = 5040000
-	self.biggest_cashout = 250000
+	self.biggest_score = 4000000
+	self.biggest_cashout = 400000
 	self.offshore_rate = self.biggest_cashout / self.biggest_score
-	self.alive_players_max = 1.3
+	self.alive_players_max = 1.1
 	self.cashout_without_player_alive = self.biggest_cashout / self.alive_players_max
-	self.cut_difficulty = 8
+	self.cut_difficulty = 4
 	self.max_mission_bags = 6
 	self.cut_lootbag_bonus = self.cashout_without_player_alive * 0.3
 	self.cut_lootbag_bonus = self.cut_lootbag_bonus / self.max_mission_bags / self.cut_difficulty
@@ -54,17 +54,18 @@ function MoneyTweakData:init()
 	self.cut_job_complete = self.cashout_without_player_alive * 0.15
 	self.cut_job_complete = self.cut_job_complete / self.cut_difficulty
 	self.bag_values = {}
-	self.bag_values.default = 150
-	self.bag_values.money = 450
-	self.bag_values.gold = 600
-	self.bag_values.diamonds = 125
-	self.bag_values.coke = 500
-	self.bag_values.meth = 600
-	self.bag_values.weapons = 700
+	self.bag_values.default = 900
+	self.bag_values.money = 750
+	self.bag_values.gold = 1000
+	self.bag_values.diamonds = 500
+	self.bag_values.coke = 900
+	self.bag_values.meth = 1000
+	self.bag_values.weapon = 950
+	self.bag_values.weapons = 950
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
-	self.flat_stage_completion = math.round(2500 / self.offshore_rate)
+	self.flat_stage_completion = math.round(10000 / self.offshore_rate)
 	self.flat_job_completion = 0
 	self.level_limit = {}
 	self.level_limit.low_cap_level = -1
@@ -82,7 +83,11 @@ function MoneyTweakData:init()
 		0.1
 	}
 	self.stage_failed_multiplier = 0.1
-	self.difficulty_multiplier = self._create_value_table(2.5, self.cut_difficulty, 3, false, 1)
+	self.difficulty_multiplier = {
+		2,
+		3,
+		6
+	}
 	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 3, false, 1)
 	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, 4, false, 1)
 	self.sell_weapon_multiplier = 0.25
@@ -204,7 +209,7 @@ function MoneyTweakData:init()
 	self.skilltree.respec.respec_refund_multiplier = 0.5
 	self.skilltree.respec.point_cost = 0
 	self.skilltree.respec.point_multiplier_cost = 1
-	local loot_drop_value = 1500
+	local loot_drop_value = 10000
 	self.loot_drop_cash = {}
 	self.loot_drop_cash.cash10 = loot_drop_value * 2
 	self.loot_drop_cash.cash20 = loot_drop_value * 4

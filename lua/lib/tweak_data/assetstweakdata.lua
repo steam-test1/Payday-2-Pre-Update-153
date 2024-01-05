@@ -50,7 +50,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.safe_escape.name_id = "menu_asset_safe_escape"
 	self.safe_escape.texture = "guis/textures/pd2/mission_briefing/assets/generic_assets/generic_escape"
 	self.safe_escape.stages = {
-		"welcome_to_the_jungle_1",
 		"framing_frame_1",
 		"framing_frame_2",
 		"ukrainian_job",

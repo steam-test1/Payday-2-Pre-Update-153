@@ -44,7 +44,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{1.25, 15}
 	}
 	self.values.player.revive_health_boost = {1}
-	self.revive_health_multiplier = {1.25}
+	self.revive_health_multiplier = {1.35}
 	self.values.player.civ_harmless_bullets = {true}
 	self.values.player.civ_harmless_melee = {true}
 	self.values.player.civ_calming_alerts = {true}
@@ -158,18 +158,18 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.taser_malfunction = {true}
 	self.values.player.taser_self_shock = {true}
 	self.values.sentry_gun.spread_multiplier = {0.5}
-	self.values.sentry_gun.rot_speed_multiplier = {2}
+	self.values.sentry_gun.rot_speed_multiplier = {2.5}
 	self.values.player.interacting_damage_multiplier = {0.5}
 	self.values.player.steelsight_when_downed = {true}
 	self.values.player.drill_alert_rad = {900}
 	self.values.player.silent_drill = {true}
-	self.values.sentry_gun.extra_ammo_multiplier = {1.5, 2}
+	self.values.sentry_gun.extra_ammo_multiplier = {1.5, 2.5}
 	self.values.sentry_gun.shield = {true}
 	self.values.trip_mine.explosion_size_multiplier = {1.25, 1.75}
 	self.values.trip_mine.quantity_3 = {3}
 	self.values.player.trip_mine_shaped_charge = {true}
 	self.values.sentry_gun.quantity = {1}
-	self.values.sentry_gun.damage_multiplier = {2}
+	self.values.sentry_gun.damage_multiplier = {4}
 	self.values.weapon.clip_ammo_increase = {5, 15}
 	self.values.player.armor_multiplier = {1.5}
 	self.values.team.armor.regen_time_multiplier = {0.75}
@@ -202,7 +202,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.camouflage_bonus = {1.25}
 	self.values.player.walk_speed_multiplier = {1.25}
 	self.values.player.crouch_speed_multiplier = {1.1}
-	self.values.player.silent_kill = {100}
+	self.values.player.silent_kill = {25}
 	self.values.player.melee_knockdown_mul = {1.5}
 	self.values.player.damage_dampener = {0.5}
 	self.values.smg.reload_speed_multiplier = {1.33}

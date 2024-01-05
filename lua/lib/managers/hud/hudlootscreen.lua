@@ -82,7 +82,7 @@ function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, save
 	local panel = self._peers_panel:child("peer" .. tostring(local_peer_id))
 	local peer_info_panel = panel:child("peer_info")
 	local peer_name = peer_info_panel:child("peer_name")
-	peer_name:set_text(tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()) .. " (" .. managers.experience:current_level() .. ")")
+	peer_name:set_text(tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()))
 	self:make_fine_text(peer_name)
 	peer_name:set_right(peer_info_panel:w())
 	panel:set_alpha(1)
@@ -465,7 +465,7 @@ function HUDLootScreen:feed_lootdrop(lootdrop_data)
 	local peer_info_panel = panel:child("peer_info")
 	local peer_name = peer_info_panel:child("peer_name")
 	local max_quality = peer_info_panel:child("max_quality")
-	peer_name:set_text(peer_name_string .. " (" .. player_level .. ")")
+	peer_name:set_text(peer_name_string)
 	max_quality:set_text(managers.localization:to_upper_text("menu_l_max_quality", {quality = max_pc}))
 	self:make_fine_text(peer_name)
 	self:make_fine_text(max_quality)
@@ -529,6 +529,8 @@ function HUDLootScreen:feed_lootdrop(lootdrop_data)
 			end
 		elseif category == "cash" then
 			texture_path = "guis/textures/pd2/blackmarket/cash_drop"
+		elseif category == "xp" then
+			texture_path = "guis/textures/pd2/blackmarket/xp_drop"
 		else
 			texture_path = "guis/textures/pd2/blackmarket/icons/" .. tostring(category) .. "/" .. tostring(item_id)
 		end
@@ -618,12 +620,14 @@ function HUDLootScreen:begin_choose_card(peer_id, card_id)
 		masks = 1,
 		materials = 1,
 		colors = 1,
-		textures = 1
+		textures = 1,
+		xp = 4
 	}
 	local card_nums = {
 		"upcard_mask",
 		"upcard_weapon",
-		"upcard_cash"
+		"upcard_cash",
+		"upcard_xp"
 	}
 	for i, pc in ipairs(cards) do
 		local my_card = i == card_id
@@ -784,6 +788,10 @@ function HUDLootScreen:show_item(peer_id)
 			local value_id = tweak_data.blackmarket[item_category][item_id].value_id
 			local money = tweak_data:get_value("money_manager", "loot_drop_cash", value_id) or 100
 			item_text = managers.experience:cash_string(money)
+		elseif item_category == "xp" then
+			local value_id = tweak_data.blackmarket[item_category][item_id].value_id
+			local amount = tweak_data:get_value("experience_manager", "loot_drop_value", value_id) or 0
+			item_text = managers.experience:experience_string(amount)
 		end
 		main_text:set_text(managers.localization:to_upper_text("menu_l_you_got", {
 			category = managers.localization:text("bm_menu_" .. item_category),

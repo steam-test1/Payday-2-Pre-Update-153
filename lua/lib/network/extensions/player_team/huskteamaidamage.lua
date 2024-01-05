@@ -42,7 +42,7 @@ function HuskTeamAIDamage:damage_explosion(attack_data)
 	if 0 < damage_percent then
 		local hit_offset_height = math.clamp(attack_data.col_ray.position.z - self._unit:movement():m_pos().z, 0, 300)
 		local attacker = attack_data.attacker_unit
-		if attacker:id() == -1 then
+		if attacker and attacker:id() == -1 then
 			attacker = self._unit
 		end
 		managers.hud:set_mugshot_damage_taken(self._unit:unit_data().mugshot_id)

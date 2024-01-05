@@ -1431,7 +1431,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			num_stars = num_stars + 1
 		end
 		job_num = #tweak_data.narrative.jobs[data.job_id].chain
-		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, job_num)
+		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, job_num, data.job_id)
 		job_cash = managers.experience:cash_string(math.round(total_payout))
 		local difficulty_string = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[tweak_data.difficulties[data.difficulty_id]])
 		difficulty_name:set_text(difficulty_string)

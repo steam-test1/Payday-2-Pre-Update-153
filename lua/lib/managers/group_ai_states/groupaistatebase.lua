@@ -12,6 +12,7 @@ GroupAIStateBase.BLAME_SYNC = {
 	"empty",
 	"met_criminal",
 	"mot_criminal",
+	"gls_alarm",
 	"civ_alarm",
 	"cop_alarm",
 	"gan_alarm",
@@ -3564,7 +3565,8 @@ GroupAIStateBase.unique_triggers = {
 	cop_alarm = "cop_alarm",
 	gangster_alarm = "gan_alarm",
 	metal_detector = "met_criminal",
-	motion_sensor = "mot_criminal"
+	motion_sensor = "mot_criminal",
+	glass_alarm = "gls_alarm"
 }
 
 function GroupAIStateBase:fetch_highest_giveaway(...)

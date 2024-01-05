@@ -49,7 +49,7 @@ CopActionWalk._walk_anim_velocities = {
 				r = 192.75
 			},
 			run = {
-				fwd = 457.98,
+				fwd = 414.73,
 				bwd = 416.77,
 				l = 416.35,
 				r = 411.9
@@ -117,27 +117,27 @@ CopActionWalk._walk_anim_lengths = {
 				r = 26
 			},
 			run = {
-				fwd = 20,
+				fwd = 19,
 				bwd = 18,
 				l = 18,
 				r = 20
 			},
 			run_start = {
-				fwd = 31,
-				bwd = 34,
+				fwd = 29,
+				bwd = 25,
 				l = 27,
-				r = 26
+				r = 24
 			},
 			run_start_turn = {
-				bwd = 29,
-				l = 33,
-				r = 31
+				bwd = 26,
+				l = 37,
+				r = 26
 			},
 			run_stop = {
-				fwd = 31,
-				bwd = 37,
-				l = 32,
-				r = 36
+				fwd = 29,
+				bwd = 23,
+				l = 28,
+				r = 31
 			}
 		}
 	},
@@ -156,21 +156,21 @@ CopActionWalk._walk_anim_lengths = {
 				r = 19
 			},
 			run_start = {
-				fwd = 35,
-				bwd = 19,
-				l = 33,
-				r = 33
+				fwd = 31,
+				bwd = 16,
+				l = 30,
+				r = 22
 			},
 			run_start_turn = {
-				bwd = 31,
-				l = 40,
-				r = 37
+				bwd = 28,
+				l = 21,
+				r = 21
 			},
 			run_stop = {
-				fwd = 35,
-				bwd = 19,
-				l = 27,
-				r = 30
+				fwd = 27,
+				bwd = 25,
+				l = 28,
+				r = 26
 			}
 		}
 	},
@@ -229,33 +229,33 @@ CopActionWalk._walk_side_rot = {
 CopActionWalk._anim_movement = {
 	stand = {
 		run_start_turn_bwd = {
-			ds = Vector3(25, -152, 0)
+			ds = Vector3(19, -173, 0)
 		},
 		run_start_turn_l = {
-			ds = Vector3(-230, 50, 0)
+			ds = Vector3(-287, 23, 0)
 		},
 		run_start_turn_r = {
-			ds = Vector3(230, 50, 0)
+			ds = Vector3(133, 16, 0)
 		},
-		run_stop_fwd = 163,
-		run_stop_bwd = 150,
-		run_stop_l = 160,
-		run_stop_r = 210
+		run_stop_fwd = 154,
+		run_stop_bwd = 91,
+		run_stop_l = 87,
+		run_stop_r = 106
 	},
 	crouch = {
 		run_start_turn_bwd = {
-			ds = Vector3(49, -161, 0)
+			ds = Vector3(0, -123, 0)
 		},
 		run_start_turn_l = {
-			ds = Vector3(-250, 90, 0)
+			ds = Vector3(-66, 0, 0)
 		},
 		run_start_turn_r = {
-			ds = Vector3(240, 68, 0)
+			ds = Vector3(103, 0, 0)
 		},
-		run_stop_fwd = 120,
-		run_stop_bwd = 50,
-		run_stop_l = 110,
-		run_stop_r = 80
+		run_stop_fwd = 83,
+		run_stop_bwd = 62,
+		run_stop_l = 75,
+		run_stop_r = 65
 	}
 }
 CopActionWalk._anim_block_presets = {

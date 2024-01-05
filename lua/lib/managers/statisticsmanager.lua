@@ -464,7 +464,7 @@ function StatisticsManager:publish_to_steam(session, success)
 		value = cash_found and 0 or 1
 	}
 	for weapon_name, weapon_data in pairs(session.shots_by_weapon) do
-		if 0 < weapon_data.total then
+		if 0 < weapon_data.total and tweak_data.weapon[weapon_name].statistics then
 			stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
 		end
 	end
@@ -488,7 +488,10 @@ function StatisticsManager:publish_to_steam(session, success)
 		type = "int",
 		value = session.misc.deploy_jammer or 0
 	}
-	stats["mask_used_" .. managers.blackmarket:equipped_mask().mask_id] = {type = "int", value = 1}
+	local mask_id = managers.blackmarket:equipped_mask().mask_id
+	if tweak_data.blackmarket.masks[mask_id].statistics then
+		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
+	end
 	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	stats.heist_success = {
 		type = "int",
@@ -610,7 +613,7 @@ function StatisticsManager:clear_statistics()
 		value = 0
 	}
 	for weapon_name, weapon in pairs(tweak_data.weapon) do
-		if weapon.autohit then
+		if weapon.autohit and weapon.statistics then
 			stats["weapon_used_" .. weapon_name] = {
 				type = "int",
 				method = "set",
@@ -644,11 +647,13 @@ function StatisticsManager:clear_statistics()
 		value = 0
 	}
 	for mask_name, mask in pairs(tweak_data.blackmarket.masks) do
-		stats["mask_used_" .. mask_name] = {
-			type = "int",
-			method = "set",
-			value = 0
-		}
+		if tweak_data.blackmarket.masks[mask_name].statistics then
+			stats["mask_used_" .. mask_name] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
 	end
 	for _, difficulty in pairs(tweak_data.difficulties) do
 		stats["difficulty_" .. difficulty] = {
@@ -806,7 +811,7 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		end
 	end
 	for weapon_name, weapon in pairs(tweak_data.weapon) do
-		if weapon.autohit then
+		if weapon.autohit and weapon.statistics then
 			key = "weapon_used_" .. weapon_name
 			table.insert(stats, {
 				name = key,
@@ -841,12 +846,14 @@ function StatisticsManager:debug_print_stats(global_flag, day)
 		glo = account:get_global_stat("gadget_used_ecm_jammer", day)
 	})
 	for mask_name, mask in pairs(tweak_data.blackmarket.masks) do
-		key = "mask_used_" .. mask_name
-		table.insert(stats, {
-			name = key,
-			loc = account:get_stat(key),
-			glo = account:get_global_stat(key, day)
-		})
+		if tweak_data.blackmarket.masks[mask_name].statistics then
+			key = "mask_used_" .. mask_name
+			table.insert(stats, {
+				name = key,
+				loc = account:get_stat(key),
+				glo = account:get_global_stat(key, day)
+			})
+		end
 	end
 	for _, difficulty in pairs(tweak_data.difficulties) do
 		key = "difficulty_" .. difficulty

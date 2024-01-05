@@ -62,8 +62,6 @@ do
 		"civ_male_italian_robe_1",
 		"civ_male_janitor_1",
 		"civ_male_meth_cook_1",
-		"civ_male_paramedic_1",
-		"civ_male_paramedic_2",
 		"civ_male_party_1",
 		"civ_male_party_2",
 		"civ_male_party_3",
@@ -103,8 +101,6 @@ do
 		"ene_security_1",
 		"ene_security_2",
 		"ene_security_3",
-		"ene_security_gensec_1",
-		"ene_security_gensec_2",
 		"ene_shield_1",
 		"ene_shield_2",
 		"ene_sniper_1",
@@ -113,7 +109,12 @@ do
 		"ene_swat_1",
 		"ene_swat_2",
 		"ene_swat_heavy_1",
-		"ene_tazer_1"
+		"ene_tazer_1",
+		"civ_male_firefighter_1",
+		"civ_male_paramedic_1",
+		"civ_male_paramedic_2",
+		"ene_security_gensec_1",
+		"ene_security_gensec_2"
 	}
 	local path_string = "units/payday2/characters/"
 	local character_path = ""

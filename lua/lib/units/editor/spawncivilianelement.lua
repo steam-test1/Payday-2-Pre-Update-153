@@ -54,7 +54,8 @@ function SpawnCivilianUnitElement:init(unit)
 		"units/payday2/characters/civ_male_worker_docks_3/civ_male_worker_docks_3",
 		"units/payday2/characters/npc_getaway_driver_1/npc_getaway_driver_1",
 		"units/pd2_dlc1/characters/civ_male_paramedic_1/civ_male_paramedic_1",
-		"units/pd2_dlc1/characters/civ_male_paramedic_2/civ_male_paramedic_2"
+		"units/pd2_dlc1/characters/civ_male_paramedic_2/civ_male_paramedic_2",
+		"units/pd2_dlc1/characters/civ_male_firefighter_1/civ_male_firefighter_1"
 	}
 	self._hed.state = "none"
 	self._hed.enemy = "units/payday2/characters/civ_male_casual_1/civ_male_casual_1"

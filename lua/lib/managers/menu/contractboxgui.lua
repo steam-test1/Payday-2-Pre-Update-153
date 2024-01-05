@@ -263,7 +263,7 @@ function ContractBoxGui:create_contract_box()
 			risk_xp:set_size(tw, th)
 		end
 		risk_xp:set_position(math.round(job_xp:right()), job_xp:top())
-		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_data.chain)
+		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_data.chain, managers.job:current_job_id())
 		local total_stage_value = stage_payout_table[2]
 		local total_stage_risk_value = stage_payout_table[4]
 		local total_job_value = job_payout_table[2]

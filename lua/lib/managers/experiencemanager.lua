@@ -122,6 +122,11 @@ function ExperienceManager:give_experience(xp)
 	return return_data
 end
 
+function ExperienceManager:on_loot_drop_xp(value_id)
+	local amount = tweak_data:get_value("experience_manager", "loot_drop_value", value_id) or 0
+	self:add_points(amount, false)
+end
+
 function ExperienceManager:add_points(points, present_xp, debug)
 	if not debug and managers.platform:presence() ~= "Playing" and managers.platform:presence() ~= "Mission_end" then
 		return
@@ -255,6 +260,16 @@ function ExperienceManager:cash_string(cash)
 		s = s .. string.sub(reverse, i, i) .. (math.mod(i, 3) == 0 and i ~= string.len(reverse) and self._cash_tousand_separator or "")
 	end
 	return sign .. self._cash_sign .. string.reverse(s)
+end
+
+function ExperienceManager:experience_string(xp)
+	local total = tostring(math.round(math.abs(xp)))
+	local reverse = string.reverse(total)
+	local s = ""
+	for i = 1, string.len(reverse) do
+		s = s .. string.sub(reverse, i, i) .. (math.mod(i, 3) == 0 and i ~= string.len(reverse) and self._cash_tousand_separator or "")
+	end
+	return string.reverse(s)
 end
 
 function ExperienceManager:total_cash_string()

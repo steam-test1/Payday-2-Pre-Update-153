@@ -110,6 +110,12 @@ function TimerGui:set_timer_multiplier(multiplier)
 	self._timer_multiplier = multiplier
 end
 
+function TimerGui:set_skill(skill)
+	if self._skill == nil then
+		self._skill = skill
+	end
+end
+
 function TimerGui:start(timer)
 	timer = (self._override_timer or timer) * (self._timer_multiplier or 1)
 	if self._jammed then
@@ -324,4 +330,23 @@ function TimerGui:load(data)
 		end
 	end
 	self:set_visible(state.visible)
+end
+
+DrillTimerGui = DrillTimerGui or class(TimerGui)
+
+function DrillTimerGui:post_event(event)
+	if not event then
+		return
+	end
+	if event == self._start_event or event == self._resume_event or event == self._done_event then
+		if self._skill == 3 then
+			self._unit:sound_source():post_event(event .. "_aced")
+		elseif self._skill == 2 then
+			self._unit:sound_source():post_event(event .. "_basic")
+		else
+			self._unit:sound_source():post_event(event)
+		end
+	else
+		self._unit:sound_source():post_event(event)
+	end
 end

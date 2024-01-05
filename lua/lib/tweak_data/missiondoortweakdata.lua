@@ -118,6 +118,16 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.safe_small_titan = {}
+	self.safe_small_titan.devices = {}
+	self.safe_small_titan.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 240
+		}
+	}
 	self.safe_medium = {}
 	self.safe_medium.devices = {}
 	self.safe_medium.devices.drill = {
@@ -132,6 +142,16 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_shp_charge",
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
+	self.safe_medium_titan = {}
+	self.safe_medium_titan.devices = {}
+	self.safe_medium_titan.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 300
 		}
 	}
 	self.safe_large = {}
@@ -178,6 +198,16 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.safe_giga_titan = {}
+	self.safe_giga_titan.devices = {}
+	self.safe_giga_titan.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 360
+		}
+	}
 	self.safe = {}
 	self.safe.devices = {}
 	self.safe.devices.drill = {
@@ -204,6 +234,26 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_shp_charge_4",
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
+	self.safe_titan = {}
+	self.safe_titan.devices = {}
+	self.safe_titan.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 600
+		}
+	}
+	self.safe_deposit_titan = {}
+	self.safe_deposit_titan.devices = {}
+	self.safe_deposit_titan.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 666
 		}
 	}
 	self.security_panel = {}

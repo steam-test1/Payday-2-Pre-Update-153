@@ -526,16 +526,3 @@ function Drill:destroy()
 	self:_kill_drill_effect()
 	self:set_jammed(false)
 end
-
-function Drill:sync_net_event(event_id)
-	if event_id == 3 then
-		self._unit:sound_source():set_rtpc("silent_drill_skill", 100)
-		print("DRILL SOUND: Synced Drill (ACED SKILL)")
-	elseif event_id == 2 then
-		self._unit:sound_source():set_rtpc("silent_drill_skill", 50)
-		print("DRILL SOUND: Synced Drill (BASIC SKILL)")
-	else
-		self._unit:sound_source():set_rtpc("silent_drill_skill", 0)
-		print("DRILL SOUND: Synced Drill (NO SKILL)")
-	end
-end

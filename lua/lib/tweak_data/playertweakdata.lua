@@ -22,7 +22,13 @@ end
 function PlayerTweakData:_set_overkill_145()
 	self.damage.DOWNED_TIME_DEC = 15
 	self.damage.DOWNED_TIME_MIN = 1
-	self.damage.REVIVE_HEALTH_STEPS = {0.2}
+end
+
+function PlayerTweakData:_set_singleplayer()
+	self.damage.REGENERATE_TIME = 1.25
+end
+
+function PlayerTweakData:_set_multiplayer()
 end
 
 function PlayerTweakData:init()
@@ -49,7 +55,7 @@ function PlayerTweakData:init()
 		0.98,
 		0.99
 	}
-	self.damage.HEALTH_INIT = 20
+	self.damage.HEALTH_INIT = 25
 	self.damage.LIVES_INIT = 4
 	if is_console then
 		self.damage.REGENERATE_TIME = 2
@@ -59,7 +65,7 @@ function PlayerTweakData:init()
 	self.damage.REVIVE_HEALTH_STEPS = {0.5}
 	self.damage.BLEED_OT_TIME = 40
 	self.damage.TASED_TIME = 10
-	self.damage.TASED_RECOVER_TIME = 1
+	self.damage.TASED_RECOVER_TIME = 3
 	self.damage.BLEED_OUT_HEALTH_INIT = 10
 	self.damage.DOWNED_TIME = 30
 	self.damage.DOWNED_TIME_DEC = 5

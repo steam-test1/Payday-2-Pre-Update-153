@@ -737,17 +737,22 @@ function BlackMarketManager:add_to_inventory(global_value, category, id, not_new
 	if category == "cash" then
 		local value_id = tweak_data.blackmarket[category][id].value_id
 		managers.money:on_loot_drop_cash(value_id)
+	elseif category == "xp" then
+		local value_id = tweak_data.blackmarket[category][id].value_id
+		managers.experience:on_loot_drop_xp(value_id)
 	end
 	self._global.inventory[global_value] = self._global.inventory[global_value] or {}
 	self._global.inventory[global_value][category] = self._global.inventory[global_value][category] or {}
 	self._global.inventory[global_value][category][id] = (self._global.inventory[global_value][category][id] or 0) + 1
-	if not not_new and category ~= "cash" and self._global.inventory[global_value][category][id] > 0 then
-		self._global.new_drops[global_value] = self._global.new_drops[global_value] or {}
-		self._global.new_drops[global_value][category] = self._global.new_drops[global_value][category] or {}
-		self._global.new_drops[global_value][category][id] = true
-	end
-	if self._global.new_item_type_unlocked[category] == nil and category ~= "cash" then
-		self._global.new_item_type_unlocked[category] = id
+	if category ~= "cash" and category ~= "xp" then
+		if not not_new and self._global.inventory[global_value][category][id] > 0 then
+			self._global.new_drops[global_value] = self._global.new_drops[global_value] or {}
+			self._global.new_drops[global_value][category] = self._global.new_drops[global_value][category] or {}
+			self._global.new_drops[global_value][category][id] = true
+		end
+		if self._global.new_item_type_unlocked[category] == nil then
+			self._global.new_item_type_unlocked[category] = id
+		end
 	end
 	self:alter_global_value_item(global_value, category, nil, id, INV_ADD)
 end

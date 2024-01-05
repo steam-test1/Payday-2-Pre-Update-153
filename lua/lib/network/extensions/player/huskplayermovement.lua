@@ -36,7 +36,7 @@ HuskPlayerMovement._walk_anim_velocities = {
 				r = 192.75
 			},
 			run = {
-				fwd = 457.98,
+				fwd = 414.73,
 				bwd = 416.77,
 				l = 416.35,
 				r = 411.9
@@ -96,7 +96,7 @@ HuskPlayerMovement._walk_anim_lengths = {
 				r = 26
 			},
 			run = {
-				fwd = 20,
+				fwd = 19,
 				bwd = 18,
 				l = 18,
 				r = 20
@@ -108,21 +108,21 @@ HuskPlayerMovement._walk_anim_lengths = {
 				r = 19
 			},
 			run_start = {
-				fwd = 31,
-				bwd = 34,
+				fwd = 29,
+				bwd = 25,
 				l = 27,
-				r = 26
+				r = 24
 			},
 			run_start_turn = {
-				bwd = 29,
-				l = 33,
-				r = 31
+				bwd = 26,
+				l = 37,
+				r = 26
 			},
 			run_stop = {
-				fwd = 31,
-				bwd = 37,
-				l = 32,
-				r = 36
+				fwd = 29,
+				bwd = 23,
+				l = 28,
+				r = 31
 			}
 		}
 	},
@@ -141,21 +141,21 @@ HuskPlayerMovement._walk_anim_lengths = {
 				r = 19
 			},
 			run_start = {
-				fwd = 35,
-				bwd = 19,
-				l = 33,
-				r = 33
+				fwd = 31,
+				bwd = 16,
+				l = 30,
+				r = 22
 			},
 			run_start_turn = {
-				bwd = 31,
-				l = 40,
-				r = 37
+				bwd = 28,
+				l = 21,
+				r = 21
 			},
 			run_stop = {
-				fwd = 35,
-				bwd = 19,
-				l = 27,
-				r = 30
+				fwd = 27,
+				bwd = 25,
+				l = 28,
+				r = 26
 			}
 		}
 	},

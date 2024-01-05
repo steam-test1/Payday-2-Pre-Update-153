@@ -483,12 +483,13 @@ function CoreEnvironmentControllerManager:_update_dof(t, dt)
 	end
 end
 
-function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_sight, travel_dis, linear_dis)
+function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_sight, travel_dis, linear_dis, multiplier)
 	local flash = self.test_line_of_sight(flashbang_pos + flashbang_test_offset, 200, 1000, 3000)
 	if 0 < flash then
-		self._current_flashbang = math.min(self._current_flashbang + flash, 1.5)
-		self._current_flashbang_flash = math.min(self._current_flashbang_flash + flash, 1.5)
+		self._current_flashbang = math.min(self._current_flashbang + flash, 1.5) * multiplier
+		self._current_flashbang_flash = math.min(self._current_flashbang_flash + flash, 1.5) * multiplier
 	end
+	self._flashbang_multiplier = self._flashbang_multiplier * multiplier
 	World:effect_manager():spawn({
 		effect = Idstring("effects/particles/explosions/explosion_grenade"),
 		position = flashbang_pos,
@@ -497,7 +498,7 @@ function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_s
 end
 
 function CoreEnvironmentControllerManager:set_flashbang_multiplier(multiplier)
-	self._flashbang_multiplier = multiplier or 1
+	self._flashbang_multiplier = multiplier ~= 0 and multiplier or 1
 	self._flashbang_multiplier = 1 + (1 - self._flashbang_multiplier) * 2
 end
 

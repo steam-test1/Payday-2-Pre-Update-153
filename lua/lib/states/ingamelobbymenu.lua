@@ -132,7 +132,8 @@ function IngameLobbyMenuState:new_fake_loot_pc(debug_pc, can_drop_weapon_mods)
 		textures = 1,
 		materials = 1,
 		masks = 1,
-		cash = 3
+		cash = 3,
+		xp = 4
 	}
 	if can_drop_weapon_mods then
 		to_drop.weapon_mods = 2

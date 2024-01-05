@@ -143,12 +143,13 @@ function MoneyManager:on_mission_completed(num_winners)
 	self:_add_to_total(total_payout)
 end
 
-function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_days)
+function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_days, job_id)
 	local job_and_difficulty_stars = job_stars + risk_stars
 	local job_stars = job_stars
 	local difficulty_stars = risk_stars
 	local player_stars = managers.experience:level_to_stars()
 	local params = {}
+	params.job_id = job_id
 	params.job_stars = job_stars
 	params.difficulty_stars = difficulty_stars
 	params.success = true
@@ -160,12 +161,8 @@ function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_day
 	local stage_value, job_value, bag_value, small_value, crew_value, total_payout, risk_table = self:get_money_by_params(params)
 	local stage_risk_value = risk_table.stage_risk
 	local job_risk_value = risk_table.job_risk
-	local total_stage_value = 0
-	local total_stage_risk_value = 0
-	for i = 1, job_days do
-		total_stage_value = total_stage_value + stage_value
-		total_stage_risk_value = total_stage_risk_value + stage_risk_value
-	end
+	local total_stage_value = stage_value
+	local total_stage_risk_value = stage_risk_value
 	local total_job_value = job_value
 	local total_job_risk_value = job_risk_value
 	total_payout = total_stage_value + total_stage_risk_value + total_job_value + total_job_risk_value
@@ -182,7 +179,26 @@ function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_day
 	}
 end
 
+function MoneyManager:get_money_by_job(job_id, difficulty)
+	if not job_id or not tweak_data.narrative.jobs[job_id] then
+		Application:error("Error: Missing Job =", job_id)
+		return 0
+	end
+	if tweak_data.narrative.jobs[job_id].payout and tweak_data.narrative.jobs[job_id].payout[difficulty] then
+		return tweak_data.narrative.jobs[job_id].payout[difficulty]
+	else
+		local payout = 0
+		for _, level in pairs(tweak_data.narrative.jobs[job_id].chain) do
+			if tweak_data.levels[level.level_id] and tweak_data.levels[level.level_id].payout and tweak_data.levels[level.level_id].payout[difficulty] then
+				payout = payout + tweak_data.levels[level.level_id].payout[difficulty]
+			end
+		end
+		return payout
+	end
+end
+
 function MoneyManager:get_money_by_params(params)
+	local job_id = params.job_id
 	local job_stars = params.job_stars or 0
 	local difficulty_stars = params.difficulty_stars or params.risk_stars or 0
 	local job_and_difficulty_stars = job_stars + difficulty_stars
@@ -190,69 +206,104 @@ function MoneyManager:get_money_by_params(params)
 	local num_winners = params.num_winners or 1
 	local on_last_stage = params.on_last_stage
 	local current_job_stage = params.current_stage or 1
+	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
 	local player_stars = params.player_stars or managers.experience:level_to_stars() or 0
 	local total_stars = math.min(job_stars, player_stars)
 	local total_difficulty_stars = difficulty_stars
 	local money_multiplier = managers.money:get_contract_difficulty_multiplier(total_difficulty_stars) or 0
+	local contract_money_multiplier = 1 + money_multiplier / 10
 	local small_loot_multiplier = managers.money:get_small_loot_difficulty_multiplier(total_difficulty_stars) or 0
-	local secured_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value()
+	local bonus_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value()
+	local mandatory_bags = params.secured_bags or managers.loot:get_secured_mandatory_bags_value()
 	local real_small_value = params.small_value or math.round(managers.loot:get_real_total_small_loot_value())
-	local stage_value = self:get_stage_payout_by_stars(total_stars) or 0
+	local offshore_rate = tweak_data:get_value("money_manager", "offshore_rate")
+	local total_payout = 0
+	local stage_value = 0
 	local job_value = 0
 	local bag_value = 0
+	local small_value = 0
 	local crew_value = 0
-	local small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
 	local stage_risk = 0
 	local job_risk = 0
 	local bag_risk = 0
 	local small_risk = 0
-	if on_last_stage then
-		job_value = self:get_job_payout_by_stars(total_stars) or 0
-		bag_value = secured_bags * tweak_data:get_value("money_manager", "bag_value_multiplier", total_stars)
-	end
-	local total_payout = 0
-	local is_level_limited = job_stars > player_stars
-	if is_level_limited and 0 < stage_value then
-		local unlimited_stage_value = self:get_stage_payout_by_stars(job_stars) or 0
-		local unlimited_job_value = 0
-		local unlimited_bag_value = 0
-		local unlimited_small_value = real_small_value
-		if managers.job:on_last_stage() then
-			unlimited_job_value = self:get_job_payout_by_stars(job_stars) or 0
-			unlimited_bag_value = secured_bags * tweak_data:get_value("money_manager", "bag_value_multiplier", job_stars)
+	local static_value = self:get_money_by_job(job_id, difficulty_stars + 1)
+	if static_value then
+		small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
+		if on_last_stage then
+			bag_value = bonus_bags * total_stages
+			bag_risk = math.round(bag_value * money_multiplier)
+			bag_value = bag_value + mandatory_bags
+			total_payout = math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value)
+			stage_value = math.round(static_value / offshore_rate)
+			bag_value = math.round(bag_value / offshore_rate)
+			bag_risk = math.round(bag_risk / offshore_rate)
+			crew_value = total_payout
+			total_payout = math.round(total_payout * (tweak_data:get_value("money_manager", "alive_humans_multiplier", num_winners) or 1))
+			crew_value = total_payout - crew_value
+		else
+			total_payout = static_value / offshore_rate + small_value
 		end
-		local unlimited_payout = unlimited_stage_value + unlimited_job_value + unlimited_bag_value + unlimited_small_value
-		total_payout = math.round(stage_value + job_value + bag_value + small_value)
-		local diff_in_money = unlimited_payout - total_payout
-		local diff_in_stars = job_stars - player_stars
-		local tweak_multiplier = tweak_data:get_value("money_manager", "level_limit", "pc_difference_multipliers", diff_in_stars) or 0
-		local new_total_payout = total_payout + math.round(diff_in_money * tweak_multiplier)
-		local stage_ratio = stage_value / total_payout
-		local small_ratio = small_value / total_payout
-		local bag_ratio = bag_value / total_payout
-		local job_ratio = job_value / total_payout
-		stage_value = math.round(new_total_payout * stage_ratio)
-		small_value = math.round(new_total_payout * small_ratio)
-		bag_value = math.round(new_total_payout * bag_ratio)
-		job_value = math.round(new_total_payout * job_ratio)
-		local rounding_error = new_total_payout - (stage_value + small_value + bag_value + job_value)
-		job_value = job_value + rounding_error
-	end
-	local stage_risk = math.round(stage_value * money_multiplier)
-	local job_risk = math.round(job_value * money_multiplier)
-	local bag_risk = math.round(bag_value * money_multiplier)
-	local small_risk = math.round(small_value * small_loot_multiplier)
-	total_payout = stage_value + job_value + bag_value + small_value
-	total_payout = total_payout + stage_risk + job_risk + bag_risk + small_risk
-	total_payout = math.round(total_payout)
-	crew_value = total_payout
-	total_payout = math.round(total_payout * (tweak_data:get_value("money_manager", "alive_humans_multiplier", num_winners) or 1))
-	crew_value = math.round(total_payout - crew_value)
-	total_payout = total_payout + tweak_data:get_value("money_manager", "flat_stage_completion")
-	stage_value = stage_value + tweak_data:get_value("money_manager", "flat_stage_completion")
-	if on_last_stage then
-		total_payout = total_payout + tweak_data:get_value("money_manager", "flat_job_completion")
-		job_value = job_value + tweak_data:get_value("money_manager", "flat_job_completion")
+	else
+		stage_value = self:get_stage_payout_by_stars(total_stars) or 0
+		local mandatory_bag_value = 0
+		local bonus_bag_value = 0
+		small_value = real_small_value + managers.loot:get_real_total_postponed_small_loot_value()
+		if on_last_stage then
+			job_value = self:get_job_payout_by_stars(total_stars) or 0
+			bonus_bag_value = bonus_bags * total_stages
+			mandatory_bag_value = mandatory_bags
+		end
+		local is_level_limited = job_stars > player_stars
+		if is_level_limited and 0 < stage_value then
+			local unlimited_stage_value = self:get_stage_payout_by_stars(job_stars) or 0
+			local unlimited_job_value = 0
+			local unlimited_bonus_bag_value = 0
+			local unlimited_mandatory_bag_value = 0
+			local unlimited_small_value = real_small_value
+			if managers.job:on_last_stage() then
+				unlimited_job_value = self:get_job_payout_by_stars(job_stars) or 0
+				unlimited_bonus_bag_value = bonus_bags * tweak_data:get_value("money_manager", "bag_value_multiplier", job_stars)
+				unlimited_mandatory_bag_value = mandatory_bags
+			end
+			local unlimited_payout = unlimited_stage_value + unlimited_job_value + unlimited_bonus_bag_value + unlimited_mandatory_bag_value + unlimited_small_value
+			total_payout = math.round(stage_value + job_value + bonus_bag_value + mandatory_bag_value + small_value)
+			local diff_in_money = unlimited_payout - total_payout
+			local diff_in_stars = job_stars - player_stars
+			local tweak_multiplier = tweak_data:get_value("money_manager", "level_limit", "pc_difference_multipliers", diff_in_stars) or 0
+			local new_total_payout = total_payout + math.round(diff_in_money * tweak_multiplier)
+			local stage_ratio = stage_value / total_payout
+			local small_ratio = small_value / total_payout
+			local bonus_bag_ratio = bonus_bag_value / total_payout
+			local mandatory_bag_ratio = mandatory_bag_value / total_payout
+			local job_ratio = job_value / total_payout
+			stage_value = math.round(new_total_payout * stage_ratio)
+			small_value = math.round(new_total_payout * small_ratio)
+			bonus_bag_value = math.round(new_total_payout * bonus_bag_ratio)
+			mandatory_bag_value = math.round(new_total_payout * mandatory_bag_ratio)
+			job_value = math.round(new_total_payout * job_ratio)
+			local rounding_error = new_total_payout - (stage_value + small_value + bonus_bag_value + mandatory_bag_value + job_value)
+			job_value = job_value + rounding_error
+		end
+		stage_risk = math.round(stage_value * contract_money_multiplier)
+		job_risk = math.round(job_value * contract_money_multiplier)
+		bag_risk = math.round(bonus_bag_value * money_multiplier)
+		small_risk = math.round(small_value * small_loot_multiplier)
+		total_payout = stage_value + job_value + bonus_bag_value + mandatory_bag_value + small_value
+		total_payout = total_payout + stage_risk + job_risk + bag_risk + small_risk
+		crew_value = math.round(total_payout)
+		total_payout = math.round(total_payout * (tweak_data:get_value("money_manager", "alive_humans_multiplier", num_winners) or 1))
+		crew_value = math.round(total_payout - crew_value)
+		if not static_value then
+			total_payout = total_payout + tweak_data:get_value("money_manager", "flat_stage_completion")
+			stage_value = stage_value + tweak_data:get_value("money_manager", "flat_stage_completion")
+			if on_last_stage then
+				total_payout = total_payout + tweak_data:get_value("money_manager", "flat_job_completion")
+				job_value = job_value + tweak_data:get_value("money_manager", "flat_job_completion")
+			end
+		end
+		local bag_value = math.round((bonus_bag_value + mandatory_bag_value) / offshore_rate)
+		bag_risk = math.round(bag_risk / offshore_rate)
 	end
 	return stage_value, job_value, bag_value, small_value, crew_value, total_payout, {
 		stage_risk = stage_risk,
@@ -265,12 +316,14 @@ end
 function MoneyManager:get_real_job_money_values(num_winners)
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
+	local job_id = managers.job:current_job_id()
 	local job_stars = has_active_job and managers.job:current_job_stars() or 1
 	local difficulty_stars = job_and_difficulty_stars - job_stars
 	local current_stage = has_active_job and managers.job:current_stage() or 1
 	local is_professional = has_active_job and managers.job:is_current_job_professional() or false
 	local on_last_stage = has_active_job and managers.job:on_last_stage()
 	return self:get_money_by_params({
+		job_id = job_id,
 		job_stars = job_stars,
 		difficulty_stars = difficulty_stars,
 		current_stage = current_stage,
@@ -281,73 +334,33 @@ function MoneyManager:get_real_job_money_values(num_winners)
 	})
 end
 
-function MoneyManager:on_stage_completed(num_winners)
-	if not managers.job:has_active_job() then
-		return 0
-	end
-	local stage_value = self:_get_contract_money(false, nil)
-	local amount = stage_value
-	amount = math.round(amount * tweak_data:get_value("money_manager", "alive_humans_multiplier", num_winners))
-	self:_add_to_total(amount)
-	self:_set_stage_payout(stage_value)
-	self:_set_crew_payout(amount - stage_value)
-	return amount
-end
-
-function MoneyManager:on_job_completed(num_winners)
-	if not managers.job:has_active_job() then
-		return 0
-	end
-	local stage_value = self:_get_contract_money(false, nil)
-	local job_value = self:_get_contract_money(true, nil)
-	local bag_value = self:get_secured_bonus_bags_money()
-	local amount = stage_value + job_value
-	amount = amount + bag_value
-	amount = math.round(amount * tweak_data:get_value("money_manager", "alive_humans_multiplier", num_winners))
-	self:_add_to_total(amount)
-	self:_set_stage_payout(stage_value)
-	self:_set_job_payout(job_value)
-	self:_set_bag_payout(bag_value)
-	self:_set_crew_payout(amount - stage_value - job_value - bag_value)
-	return amount
-end
-
 function MoneyManager:get_secured_bonus_bags_money()
-	local has_active_job = managers.job:has_active_job()
-	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
-	local job_stars = has_active_job and managers.job:current_job_stars() or 1
-	local difficulty_stars = job_and_difficulty_stars - job_stars
-	local player_stars = managers.experience:level_to_stars()
-	local is_level_limited = job_and_difficulty_stars > player_stars
-	local total_stars = job_and_difficulty_stars
-	local total_difficulty_stars = math.max(0, total_stars - job_stars)
-	local money_multiplier = managers.money:get_contract_difficulty_multiplier(total_difficulty_stars) or 0
-	total_stars = math.min(job_stars, total_stars)
-	local secured_bags = managers.loot:get_secured_bonus_bags_value()
-	local bag_value = 0
-	bag_value = secured_bags * tweak_data:get_value("money_manager", "bag_value_multiplier", total_stars)
-	bag_value = math.round(bag_value)
-	return bag_value
+	local job_id = managers.job:current_job_id()
+	local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars()
+	local money_multiplier = tweak_data:get_value("money_manager", "difficulty_multiplier", stars) or 1
+	local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
+	local bonus_bags = managers.loot:get_secured_bonus_bags_value()
+	local bag_value = bonus_bags * money_multiplier * total_stages
+	return math.round(bag_value / tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
-function MoneyManager:_get_contract_money(is_job, success)
-	local has_active_job = managers.job:has_active_job()
-	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
-	local job_stars = has_active_job and managers.job:current_job_stars() or 1
-	local difficulty_stars = job_and_difficulty_stars - job_stars
-	local player_stars = managers.experience:level_to_stars()
-	local total_stars = math.min(job_and_difficulty_stars, player_stars + 1)
-	local total_difficulty_stars = math.max(0, total_stars - job_stars)
-	local money_multiplier = self:get_contract_difficulty_multiplier(total_difficulty_stars)
-	total_stars = math.min(job_stars, total_stars)
-	local contract_money = 0
-	if is_job then
-		contract_money = contract_money + self:get_job_payout_by_stars(total_stars)
+function MoneyManager:get_secured_mandatory_bags_money()
+	local mandatory_value = managers.loot:get_secured_mandatory_bags_value()
+	return math.round(mandatory_value / tweak_data:get_value("money_manager", "offshore_rate"))
+end
+
+function MoneyManager:get_secured_bonus_bag_value(value)
+	local bag_value = 0
+	if managers.loot:is_bonus_bag() then
+		local job_id = managers.job:current_job_id()
+		local stars = managers.job:has_active_job() and managers.job:current_difficulty_stars()
+		local money_multiplier = tweak_data:get_value("money_manager", "difficulty_multiplier", stars) or 1
+		local total_stages = job_id and #tweak_data.narrative.jobs[job_id].chain or 1
+		bag_value = value * money_multiplier * total_stages
 	else
-		contract_money = contract_money + self:get_stage_payout_by_stars(total_stars)
+		bag_value = value
 	end
-	contract_money = contract_money + contract_money * money_multiplier
-	return math.round(contract_money)
+	return math.round(bag_value / tweak_data:get_value("money_manager", "offshore_rate"))
 end
 
 function MoneyManager:get_job_bag_value()
@@ -730,7 +743,9 @@ function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
 		"overkill",
 		"overkill_145"
 	}
-	return total_payout * tweak_data:get_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + tweak_data:get_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
+	local value = total_payout * tweak_data:get_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + tweak_data:get_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
+	value = value + tweak_data.narrative.jobs[job_id].payout[difficulty_id - 1] / tweak_data:get_value("money_manager", "offshore_rate")
+	return value
 end
 
 function MoneyManager:can_afford_buy_premium_contract(job_id, difficulty_id)

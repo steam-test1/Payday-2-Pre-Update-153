@@ -572,6 +572,7 @@ function EnemyManager:on_civilian_died(dead_unit, damage_info)
 	if Network:is_server() and damage_info.attacker_unit and not dead_unit:base().enemy then
 		managers.groupai:state():hostage_killed(damage_info.attacker_unit)
 	end
+	managers.mission:call_global_event("civilian_killed")
 	local u_data = self._civilian_data.unit_data[u_key]
 	local enemy_data = self._enemy_data
 	if enemy_data.nr_corpses == 0 and self:is_corpse_disposal_enabled() then

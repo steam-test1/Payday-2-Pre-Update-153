@@ -22,7 +22,7 @@ function QuickFlashGrenade:_play_sound_and_effects()
 		local range = 1000
 		local affected, line_of_sight, travel_dis, linear_dis = self:_chk_dazzle_local_player(detonate_pos, range)
 		if affected then
-			managers.environment_controller:set_flashbang(detonate_pos, line_of_sight, travel_dis, linear_dis)
+			managers.environment_controller:set_flashbang(detonate_pos, line_of_sight, travel_dis, linear_dis, tweak_data.character.flashbang_multiplier)
 			local sound_eff_mul = math.clamp(1 - (travel_dis or linear_dis) / range, 0.3, 1)
 			managers.player:player_unit():character_damage():on_flashbanged(sound_eff_mul)
 		end

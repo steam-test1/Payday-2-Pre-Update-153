@@ -3963,7 +3963,7 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 	local params = {
 		name = "job_id_filter",
 		text_id = "menu_job_id_filter",
-		visible_callback = "is_multiplayer is_win32 is_level_145",
+		visible_callback = "is_multiplayer is_win32",
 		callback = "choice_job_id_filter",
 		filter = true
 	}

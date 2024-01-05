@@ -52,7 +52,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		stats = {
 			value = 5,
 			suppression = 12,
-			damage = -4,
+			damage = -2,
 			recoil = 3,
 			spread_moving = -3,
 			concealment = -3
@@ -77,7 +77,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		stats = {
 			value = 2,
 			suppression = 12,
-			damage = -4,
+			damage = -3,
 			recoil = 1,
 			spread_moving = -2,
 			concealment = -2
@@ -127,7 +127,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		stats = {
 			value = 5,
 			suppression = 12,
-			damage = -4,
+			damage = -2,
 			recoil = 2,
 			spread_moving = -2,
 			concealment = -1
@@ -152,7 +152,7 @@ function WeaponFactoryTweakData:_init_silencers()
 		stats = {
 			value = 1,
 			suppression = 12,
-			damage = -4,
+			damage = -3,
 			recoil = 1,
 			spread_moving = -2,
 			concealment = -2
@@ -237,9 +237,9 @@ function WeaponFactoryTweakData:_init_nozzles()
 		stats = {
 			value = 5,
 			suppression = -5,
-			damage = 1,
+			damage = 3,
 			recoil = 1,
-			concealment = -1
+			concealment = -2
 		}
 	}
 	self.parts.wpn_fps_upg_ns_ass_smg_stubby = {
@@ -257,9 +257,8 @@ function WeaponFactoryTweakData:_init_nozzles()
 		stats = {
 			value = 3,
 			suppression = -1,
-			damage = 2,
-			recoil = 1,
-			concealment = -1
+			damage = 1,
+			recoil = 3
 		}
 	}
 	self.parts.wpn_fps_upg_ns_ass_smg_tank = {
@@ -277,8 +276,8 @@ function WeaponFactoryTweakData:_init_nozzles()
 		stats = {
 			value = 4,
 			suppression = -2,
-			damage = 1,
-			recoil = 1,
+			damage = 2,
+			recoil = 2,
 			concealment = -1
 		}
 	}
@@ -551,7 +550,7 @@ function WeaponFactoryTweakData:_init_sights()
 			zoom = 4,
 			recoil = 2,
 			spread_moving = -3,
-			concealment = -1
+			concealment = -2
 		},
 		perks = {"scope"},
 		stance_mod = deep_clone(self.parts.wpn_fps_upg_o_specter.stance_mod),
@@ -701,7 +700,11 @@ function WeaponFactoryTweakData:_init_m4()
 		name_id = "bm_wp_m4_upper_reciever_edge",
 		a_obj = "a_body",
 		unit = "units/payday2/weapons/wpn_fps_ass_m4_pts/wpn_fps_m4_upper_reciever_edge",
-		stats = {value = 3, recoil = 1},
+		stats = {
+			value = 3,
+			damage = 1,
+			recoil = 1
+		},
 		animations = {reload = "reload"}
 	}
 	self.parts.wpn_fps_m4_upper_reciever_round = {
@@ -725,9 +728,9 @@ function WeaponFactoryTweakData:_init_m4()
 		unit = "units/payday2/weapons/wpn_fps_ass_m4_pts/wpn_fps_m4_uupg_b_long",
 		stats = {
 			value = 4,
-			damage = 1,
+			damage = 2,
 			spread = 1,
-			spread_moving = -2,
+			spread_moving = -3,
 			concealment = -2
 		}
 	}
@@ -778,7 +781,7 @@ function WeaponFactoryTweakData:_init_m4()
 		unit = "units/payday2/weapons/wpn_fps_ass_m4_pts/wpn_fps_m4_uupg_b_sd",
 		stats = {
 			value = 6,
-			suppression = 9,
+			suppression = 12,
 			spread = -1,
 			damage = -2,
 			recoil = 1,
@@ -920,7 +923,7 @@ function WeaponFactoryTweakData:_init_m4()
 		stats = {
 			value = 2,
 			spread = 1,
-			recoil = -2,
+			recoil = 2,
 			spread_moving = -2
 		}
 	}
@@ -978,11 +981,7 @@ function WeaponFactoryTweakData:_init_m4()
 		name_id = "bm_wp_m4_s_standard",
 		a_obj = "a_s",
 		unit = "units/payday2/weapons/wpn_fps_upg_m4_reusable/wpn_fps_upg_m4_s_standard",
-		stats = {
-			value = 1,
-			recoil = 1,
-			spread_moving = -1
-		},
+		stats = {value = 1, spread_moving = -1},
 		adds_type = {
 			"stock_adapter"
 		},
@@ -1004,7 +1003,7 @@ function WeaponFactoryTweakData:_init_m4()
 		stats = {
 			value = 3,
 			spread = 0,
-			spread_moving = -1,
+			spread_moving = 1,
 			recoil = 2,
 			concealment = -1
 		},
@@ -1158,6 +1157,7 @@ function WeaponFactoryTweakData:_init_g18c()
 			value = 4,
 			suppression = -5,
 			damage = 1,
+			recoil = -1,
 			concealment = -1
 		}
 	}
@@ -1169,7 +1169,7 @@ function WeaponFactoryTweakData:_init_g18c()
 		unit = "units/payday2/weapons/wpn_fps_pis_g18c_pts/wpn_fps_pis_g18c_co_comp_2",
 		stats = {
 			value = 5,
-			recoil = 3,
+			recoil = 4,
 			damage = 1,
 			suppression = -1,
 			concealment = -1
@@ -1220,7 +1220,11 @@ function WeaponFactoryTweakData:_init_g18c()
 		name_id = "bm_wp_g18c_g_ergo",
 		a_obj = "a_g",
 		unit = "units/payday2/weapons/wpn_fps_pis_g18c_pts/wpn_fps_pis_g18c_g_ergo",
-		stats = {value = 4, spread_moving = 1}
+		stats = {
+			value = 4,
+			recoil = 2,
+			spread_moving = 1
+		}
 	}
 	self.parts.wpn_fps_pis_g18c_body_frame.third_unit = "units/payday2/weapons/wpn_third_pis_g18c_pts/wpn_third_pis_g18c_body_standard"
 	self.parts.wpn_fps_pis_g18c_b_standard.third_unit = "units/payday2/weapons/wpn_third_pis_g18c_pts/wpn_third_pis_g18c_b_standard"
@@ -1526,7 +1530,7 @@ function WeaponFactoryTweakData:_init_olympic()
 		unit = "units/payday2/weapons/wpn_fps_smg_olympic_pts/wpn_fps_smg_olympic_s_short",
 		stats = {
 			value = 5,
-			recoil = -2,
+			recoil = -1,
 			spread_moving = 3,
 			concealment = 2
 		}
@@ -1536,7 +1540,11 @@ function WeaponFactoryTweakData:_init_olympic()
 		name_id = "bm_wp_olympic_s_adjust",
 		a_obj = "a_s",
 		unit = "units/payday2/weapons/wpn_fps_smg_olympic_pts/wpn_fps_smg_olympic_s_adjust",
-		stats = {value = 1}
+		stats = {
+			value = 1,
+			recoil = 1,
+			spread_moving = 1
+		}
 	}
 	self.parts.wpn_fps_smg_olympic_fg_railed.third_unit = "units/payday2/weapons/wpn_third_smg_olympic_pts/wpn_third_smg_olympic_fg_railed"
 	self.parts.wpn_fps_smg_olympic_fg_olympic.third_unit = "units/payday2/weapons/wpn_third_smg_olympic_pts/wpn_third_smg_olympic_fg_olympic"
@@ -1626,6 +1634,7 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		stats = {
 			value = 3,
 			spread_moving = -1,
+			spread = 1,
 			recoil = 1
 		},
 		forbids = {
@@ -1647,6 +1656,7 @@ function WeaponFactoryTweakData:_init_ak_parts()
 			value = 5,
 			spread_moving = -2,
 			recoil = 2,
+			spread = 1,
 			concealment = -1
 		},
 		forbids = {
@@ -1749,7 +1759,7 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_upg_ak_s_psl",
 		stats = {
 			value = 5,
-			spread = 2,
+			spread = 3,
 			spread_moving = -2,
 			recoil = -1,
 			concealment = -3
@@ -1772,7 +1782,7 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		stats = {
 			value = 3,
 			spread_moving = 2,
-			recoil = 0,
+			recoil = 1,
 			concealment = 2
 		},
 		adds = {
@@ -2047,7 +2057,7 @@ function WeaponFactoryTweakData:_init_akmsu()
 		stats = {
 			value = 5,
 			spread_moving = -2,
-			recoil = 1,
+			recoil = 2,
 			concealment = -2
 		},
 		forbids = {
@@ -2327,7 +2337,8 @@ function WeaponFactoryTweakData:_init_ak5()
 		unit = "units/payday2/weapons/wpn_fps_ass_ak5_pts/wpn_fps_ass_ak5_fg_ak5c",
 		stats = {
 			value = 7,
-			recoil = 1,
+			recoil = 2,
+			damage = 1,
 			spread_moving = -2,
 			concealment = -2
 		},
@@ -2545,6 +2556,7 @@ function WeaponFactoryTweakData:_init_aug()
 		stats = {
 			value = 7,
 			recoil = 2,
+			damage = 1,
 			spread_moving = -2,
 			concealment = -2
 		}
@@ -2724,6 +2736,7 @@ function WeaponFactoryTweakData:_init_g36()
 		stats = {
 			value = 5,
 			spread_moving = -2,
+			spread = 1,
 			recoil = 2,
 			concealment = -2
 		},
@@ -2867,6 +2880,7 @@ function WeaponFactoryTweakData:_init_p90()
 			value = 8,
 			spread = 1,
 			spread_moving = -3,
+			damage = 2,
 			recoil = 3,
 			concealment = -2
 		}
@@ -3130,7 +3144,8 @@ function WeaponFactoryTweakData:_init_mp9()
 		stats = {
 			value = 5,
 			recoil = 3,
-			spread_moving = -2,
+			spread = 1,
+			spread_moving = -3,
 			concealment = -3
 		}
 	}
@@ -3209,9 +3224,9 @@ function WeaponFactoryTweakData:_init_deagle()
 		unit = "units/payday2/weapons/wpn_fps_pis_deagle_pts/wpn_fps_pis_deagle_b_long",
 		stats = {
 			value = 7,
-			spread_moving = -2,
+			spread_moving = -3,
 			spread = 2,
-			recoil = 1,
+			damage = 2,
 			concealment = -3
 		},
 		forbids = {
@@ -3521,7 +3536,7 @@ function WeaponFactoryTweakData:_init_mp5()
 		stats = {
 			value = 5,
 			spread_moving = -2,
-			recoil = 1,
+			recoil = 2,
 			concealment = -3
 		},
 		adds = {
@@ -3545,7 +3560,7 @@ function WeaponFactoryTweakData:_init_mp5()
 		stats = {
 			value = 10,
 			spread_moving = 1,
-			suppression = 9,
+			suppression = 12,
 			damage = -4,
 			recoil = 3,
 			concealment = 1
@@ -3617,7 +3632,7 @@ function WeaponFactoryTweakData:_init_mp5()
 		unit = "units/payday2/weapons/wpn_fps_smg_mp5_pts/wpn_fps_smg_mp5_s_ring",
 		stats = {
 			value = 3,
-			spread_moving = 3,
+			spread_moving = 4,
 			recoil = -3,
 			concealment = 5
 		}
@@ -4044,6 +4059,7 @@ function WeaponFactoryTweakData:_init_mac10()
 		stats = {
 			value = 2,
 			spread_moving = -2,
+			recoil = 1,
 			concealment = -2,
 			extra_ammo = 4
 		},
@@ -4096,6 +4112,7 @@ function WeaponFactoryTweakData:_init_mac10()
 			value = 1,
 			spread_moving = -3,
 			recoil = 3,
+			spread = 1,
 			concealment = -2
 		}
 	}
@@ -4192,7 +4209,7 @@ function WeaponFactoryTweakData:_init_r870()
 		stats = {
 			value = 3,
 			spread_moving = -1,
-			concealment = -1,
+			concealment = -2,
 			extra_ammo = 1
 		}
 	}
@@ -4251,7 +4268,11 @@ function WeaponFactoryTweakData:_init_r870()
 		name_id = "bm_wp_r870_fg_wood",
 		a_obj = "a_fg",
 		unit = "units/payday2/weapons/wpn_fps_shot_r870_pts/wpn_fps_shot_r870_fg_wood",
-		stats = {value = 2, spread_moving = 0},
+		stats = {
+			value = 2,
+			recoil = 1,
+			spread_moving = 0
+		},
 		animations = {
 			reload_exit = "reload_exit",
 			fire = "recoil",
@@ -5060,7 +5081,7 @@ function WeaponFactoryTweakData:_init_raging_bull()
 		stats = {
 			value = 3,
 			recoil = 2,
-			damage = 1,
+			damage = 2,
 			spread = 2,
 			spread_moving = -3,
 			concealment = -3
