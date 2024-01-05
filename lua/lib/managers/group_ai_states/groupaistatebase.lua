@@ -1134,7 +1134,6 @@ function GroupAIStateBase:on_enemy_unregistered(unit)
 	for crim_key, record in pairs(self._ai_criminals) do
 		record.unit:brain():on_cop_neutralized(u_key)
 	end
-	self._converted_police[unit:key()] = nil
 	local unit_type = unit:base()._tweak_table
 	if self._special_unit_types[unit_type] then
 		self:unregister_special_unit(u_key, unit_type)

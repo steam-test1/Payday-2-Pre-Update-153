@@ -61,6 +61,7 @@ function AssetsTweakData:_init_gage_assets(tweak_data)
 	self.gage_assignment.name_id = "menu_asset_gage_assignment"
 	self.gage_assignment.texture = "guis/dlcs/gage_pack_jobs/textures/pd2/mission_briefing/assets/gage_assignment"
 	self.gage_assignment.stages = "all"
+	self.gage_assignment.risk_lock = true
 end
 
 function AssetsTweakData:_init_assets(tweak_data)

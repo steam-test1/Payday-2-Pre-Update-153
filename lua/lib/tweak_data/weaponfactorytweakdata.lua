@@ -6198,7 +6198,8 @@ function WeaponFactoryTweakData:_init_r870()
 			"wpn_fps_upg_o_eotech_xps",
 			"wpn_fps_upg_o_cmore",
 			"wpn_fps_upg_o_aimpoint_2",
-			"wpn_fps_upg_o_acog"
+			"wpn_fps_upg_o_acog",
+			"wpn_fps_upg_o_cs"
 		}
 	}
 	self.parts.wpn_fps_shot_r870_s_m4 = {

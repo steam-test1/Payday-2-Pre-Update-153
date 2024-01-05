@@ -242,6 +242,7 @@ function ActionSpooc:_upd_strike_first_frame(t)
 end
 
 function ActionSpooc:_upd_chase_path()
+	self._chase_tracker = self._chase_tracker or self._target_unit:movement():nav_tracker()
 	local ray_params = {
 		tracker_from = self._common_data.nav_tracker,
 		tracker_to = self._chase_tracker,

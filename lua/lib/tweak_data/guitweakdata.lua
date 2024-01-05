@@ -1179,18 +1179,6 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
-		},
-		{
-			id = "casino",
-			name_id = "menu_cn_casino",
-			desc_id = "menu_cn_casino_desc",
-			menu_node = "crimenet_contract_casino",
-			x = 347,
-			y = 716,
-			icon = "guis/textures/pd2/crimenet_casino",
-			unlock = "unlock_level",
-			pulse = true,
-			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {
@@ -3693,8 +3681,16 @@ function GuiTweakData:init()
 	wts.types.sight = {
 		suffix = "_il",
 		{
-			texture_path = dlc_1_folder .. "wpn_sight_reticle_1_il",
-			name_id = "menu_reticle_1"
+			texture_path = dlc_1_folder .. "wpn_sight_reticle_s_1_il",
+			name_id = "menu_reticle_1_s"
+		},
+		{
+			texture_path = dlc_1_folder .. "wpn_sight_reticle_m_1_il",
+			name_id = "menu_reticle_1_m"
+		},
+		{
+			texture_path = dlc_1_folder .. "wpn_sight_reticle_l_1_il",
+			name_id = "menu_reticle_1_l"
 		},
 		{
 			texture_path = dlc_1_folder .. "wpn_sight_reticle_2_il",

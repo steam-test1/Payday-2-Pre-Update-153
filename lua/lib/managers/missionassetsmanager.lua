@@ -79,7 +79,7 @@ function MissionAssetsManager:_setup_mission_assets()
 				can_unlock = requirements.dlc_lock and can_unlock or false
 			end
 			if asset.risk_lock then
-				requirements.risk_lock = current_stage ~= "safehouse" and managers.job:current_difficulty_stars() == asset.risk_lock
+				requirements.risk_lock = current_stage ~= "safehouse" and (asset.risk_lock == true or managers.job:current_difficulty_stars() == asset.risk_lock)
 				can_unlock = current_stage ~= "safehouse" and requirements.risk_lock and can_unlock or false
 			end
 			local needs_any = Idstring(require_to_unlock) == Idstring("any")

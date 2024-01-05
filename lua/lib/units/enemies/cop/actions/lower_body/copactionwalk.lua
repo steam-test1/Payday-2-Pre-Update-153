@@ -342,7 +342,7 @@ function CopActionWalk:init(action_desc, common_data)
 		self:_set_updator("_upd_wait_for_full_blend")
 		if Network:is_server() then
 			self._unit:brain():add_pos_rsrv("move_dest", {
-				position = mvector3.copy(self._nav_point_pos(self._nav_path[self._nav_path])),
+				position = mvector3.copy(self._nav_point_pos(self._nav_path[#self._nav_path])),
 				radius = 30
 			})
 		end
