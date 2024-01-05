@@ -16,53 +16,10 @@ function SmokeGrenadeElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local duration_params = {
-		name = "Duration (sec):",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.duration,
-		floats = 0,
-		tooltip = "Set the duration of the smoke grenade",
-		min = 1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local duration = CoreEWS.number_controller(duration_params)
-	duration:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = duration, value = "duration"})
-	duration:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = duration, value = "duration"})
-	local immediate = EWS:CheckBox(panel, "Explode immediately", "")
-	immediate:set_value(self._hed.immediate)
-	immediate:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = immediate, value = "immediate"})
-	panel_sizer:add(immediate, 0, 0, "EXPAND")
-	local ignore_control = EWS:CheckBox(panel, "Ignore control/assault mode", "")
-	ignore_control:set_value(self._hed.ignore_control)
-	ignore_control:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = ignore_control,
-		value = "ignore_control"
-	})
-	panel_sizer:add(ignore_control, 0, 0, "EXPAND")
-	local effect_type_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(effect_type_sizer, 0, 1, "EXPAND,LEFT")
-	local effect_type_params = {
-		name = "Effect:",
-		panel = panel,
-		sizer = effect_type_sizer,
-		options = {"smoke", "flash"},
-		value = self._hed.effect_type,
-		tooltip = "Select what type of effect will be spawned.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local effect_type_box = CoreEws.combobox(effect_type_params)
-	effect_type_box:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = effect_type_box,
-		value = "effect_type"
-	})
-	local help = {}
-	help.text = "Spawns a smoke grenade."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	local _, params = self:_build_value_number(panel, panel_sizer, "duration", {floats = 0, min = 1}, "Set the duration of the smoke grenade")
+	params.name_ctrlr:set_label("Duration (sec):")
+	self:_build_value_checkbox(panel, panel_sizer, "immediate", "Explode immediately", "Explode immediately")
+	self:_build_value_checkbox(panel, panel_sizer, "ignore_control", "Ignore control/assault mode", "Ignore control/assault mode")
+	self:_build_value_combobox(panel, panel_sizer, "effect_type", {"smoke", "flash"}, "Select what type of effect will be spawned.")
+	self:_add_help_text("Spawns a smoke grenade.")
 end

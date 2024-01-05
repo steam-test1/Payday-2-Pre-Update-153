@@ -85,6 +85,9 @@ function NetworkManager:init_finalize()
 	if Network:multiplayer() and not Application:editor() then
 		self._session:on_load_complete()
 		self._game:on_load_complete()
+		if self._session:is_client() and not self._session:server_peer() then
+			game_state_machine:current_state():on_server_left()
+		end
 	end
 end
 

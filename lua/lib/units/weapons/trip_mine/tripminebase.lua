@@ -138,7 +138,7 @@ function TripMineBase:_set_armed(armed)
 	if self._use_draw_laser then
 		self._laser_brush:set_color(self._armed and self._laser_color or self._sensor_upgrade and self._laser_sensor_color or self._laser_color)
 	end
-	if not self._first_armed then
+	if not self._first_armed and self._armed then
 		self._first_armed = true
 		self._activate_timer = nil
 		self._unit:sound_source():post_event("trip_mine_beep_armed")
@@ -158,8 +158,10 @@ function TripMineBase:set_armed(armed)
 end
 
 function TripMineBase:sync_trip_mine_set_armed(armed, length)
-	self._length = length
-	self._unit:anim_set_time(self._ids_laser, length / self._init_length)
+	if not self._owner then
+		self._length = length
+		self._unit:anim_set_time(self._ids_laser, length / self._init_length)
+	end
 	self:_set_armed(armed)
 end
 

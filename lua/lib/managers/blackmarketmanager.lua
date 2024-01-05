@@ -321,6 +321,12 @@ function BlackMarketManager:equipped_melee_weapon_damage_info(lerp_value)
 	lerp_value = lerp_value or 0
 	local melee_entry = self:equipped_melee_weapon()
 	local stats = tweak_data.blackmarket.melee_weapons[melee_entry].stats
+	local primary = self:equipped_primary()
+	local bayonet_id = self:equipped_bayonet(primary.weapon_id)
+	local player = managers.player:player_unit()
+	if bayonet_id and player:movement():current_state()._equipped_unit:base():selection_index() == 2 and melee_entry == "weapon" then
+		stats = tweak_data.weapon.factory.parts[bayonet_id].stats
+	end
 	local dmg = math.lerp(stats.min_damage, stats.max_damage, lerp_value)
 	local dmg_effect = dmg * math.lerp(stats.min_damage_effect, stats.max_damage_effect, lerp_value)
 	return dmg, dmg_effect
@@ -381,6 +387,21 @@ function BlackMarketManager:equipped_melee_weapon_slot()
 	for slot, data in pairs(Global.blackmarket_manager.melee_weapons) do
 		if data.equipped then
 			return slot
+		end
+	end
+	return nil
+end
+
+function BlackMarketManager:equipped_bayonet(weapon_id)
+	local available_weapon_mods = managers.weapon_factory:get_parts_from_weapon_id(weapon_id)
+	local equipped_weapon_mods = managers.blackmarket:equipped_item("primaries").blueprint
+	if available_weapon_mods and available_weapon_mods.bayonet then
+		for _, mod in ipairs(equipped_weapon_mods) do
+			for _, bayonet in ipairs(available_weapon_mods.bayonet) do
+				if mod == bayonet then
+					return bayonet
+				end
+			end
 		end
 	end
 	return nil
@@ -4059,6 +4080,18 @@ function BlackMarketManager:fire_rate_multiplier(name, category, silencer, detec
 	local multiplier = managers.player:upgrade_value(category, "fire_rate_multiplier", 1)
 	multiplier = multiplier * managers.player:upgrade_value(name, "fire_rate_multiplier", 1)
 	return multiplier
+end
+
+function BlackMarketManager:damage_addend(name, category, silencer, detection_risk, current_state, blueprint)
+	local value = 0
+	if tweak_data.weapon[name] and tweak_data.weapon[name].ignore_damage_upgrades then
+		return value
+	end
+	value = value + managers.player:upgrade_value("player", "damage_addend", 0)
+	value = value + managers.player:upgrade_value("weapon", "damage_addend", 0)
+	value = value + managers.player:upgrade_value(category, "damage_addend", 0)
+	value = value + managers.player:upgrade_value(name, "damage_addend", 0)
+	return value
 end
 
 function BlackMarketManager:damage_multiplier(name, category, silencer, detection_risk, current_state, blueprint)

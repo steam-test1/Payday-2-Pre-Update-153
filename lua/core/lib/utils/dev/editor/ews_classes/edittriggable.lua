@@ -98,7 +98,7 @@ function EditUnitTriggable:change_time(ctrls)
 end
 
 function EditUnitTriggable:remove_element(ctrls)
-	self._ctrls.unit:damage():remove_trigger_func(ctrls.trigger_name, ctrls.id, true)
+	self._ctrls.unit:damage():remove_trigger_data(ctrls.trigger_name, ctrls.id)
 	self:update_element_gui()
 end
 
@@ -130,11 +130,16 @@ end
 
 function EditUnitTriggable:update_element_gui()
 	self:clear_element_gui()
-	local trigger_data = self._ctrls.unit:damage():get_editor_trigger_data()
-	if trigger_data and 0 < #trigger_data then
-		for _, data in ipairs(trigger_data) do
-			if data.trigger_name == self._triggers_params.ctrlr:get_value() then
-				self:build_element_gui(data)
+	local trigger_name_list = self._ctrls.unit:damage():get_trigger_name_list()
+	if trigger_name_list then
+		for _, trigger_name in ipairs(trigger_name_list) do
+			local trigger_data = self._ctrls.unit:damage():get_trigger_data_list(trigger_name)
+			if trigger_data and 0 < #trigger_data then
+				for _, data in ipairs(trigger_data) do
+					if data.trigger_name == self._triggers_params.ctrlr:get_value() then
+						self:build_element_gui(data)
+					end
+				end
 			end
 		end
 	end

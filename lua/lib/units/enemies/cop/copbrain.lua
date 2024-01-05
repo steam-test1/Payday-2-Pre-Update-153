@@ -919,6 +919,9 @@ function CopBrain:on_alarm_pager_interaction(status, player)
 	end
 	local is_dead = self._unit:character_damage():dead()
 	local pager_data = self._alarm_pager_data
+	if not pager_data then
+		return
+	end
 	if status == "started" then
 		self._unit:sound():stop()
 		self._unit:interaction():set_outline_flash_state(nil, true)

@@ -41,9 +41,7 @@ function PlayerFatal:_enter(enter_data)
 	else
 		preset = {
 			"pl_friend_combatant_cbt",
-			"pl_friend_non_combatant_cbt",
-			"pl_foe_combatant_cbt_crouch",
-			"pl_foe_non_combatant_cbt_crouch"
+			"pl_friend_non_combatant_cbt"
 		}
 	end
 	self._ext_movement:set_attention_settings(preset)

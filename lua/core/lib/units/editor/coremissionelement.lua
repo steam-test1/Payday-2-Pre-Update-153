@@ -90,6 +90,7 @@ function CoreMissionElement:_add_default_saves()
 	self._hed.execute_on_startup = false
 	self._hed.execute_on_restart = nil
 	self._hed.base_delay = 0
+	self._hed.base_delay_rand = nil
 	self._hed.trigger_times = 0
 	self._hed.on_executed = {}
 	if self.USES_POINT_ORIENTATION then
@@ -121,7 +122,22 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 	self:_build_value_checkbox(panel, sizer, "enabled")
 	self:_build_value_checkbox(panel, sizer, "execute_on_startup")
 	self:_build_value_number(panel, sizer, "trigger_times", {floats = 0, min = 0}, "Specifies how many time this element can be executed (0 mean unlimited times)")
-	self:_build_value_number(panel, sizer, "base_delay", {floats = 2, min = 0}, "Specifies a base delay that is added to each on executed delay")
+	local base_delay_sizer = EWS:BoxSizer("HORIZONTAL")
+	sizer:add(base_delay_sizer, 0, 0, "EXPAND,LEFT")
+	self:_build_value_number(panel, base_delay_sizer, "base_delay", {
+		floats = 2,
+		min = 0,
+		name_proportions = 1,
+		ctrlr_proportions = 1,
+		sizer_proportions = 2
+	}, "Specifies a base delay that is added to each on executed delay")
+	self:_build_value_number(panel, base_delay_sizer, "base_delay_rand", {
+		floats = 2,
+		min = 0,
+		name_proportions = 0,
+		ctrlr_proportions = 1,
+		sizer_proportions = 1
+	}, "Specifies an additional random time to be added to base delay (delay + rand)", "  random")
 	local on_executed_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "On Executed")
 	local element_sizer = EWS:BoxSizer("HORIZONTAL")
 	on_executed_sizer:add(element_sizer, 0, 1, "EXPAND,LEFT")
@@ -159,29 +175,47 @@ function CoreMissionElement:build_default_gui(panel, sizer)
 			sizer = on_executed_sizer,
 			options = self.ON_EXECUTED_ALTERNATIVES,
 			value = self.ON_EXECUTED_ALTERNATIVES[1],
-			tooltip = "Select am alternative on executed from the combobox",
+			tooltip = "Select an alternative on executed from the combobox",
 			name_proportions = 1,
 			ctrlr_proportions = 2,
 			sorted = false
 		}
-		local on_executed_alternatives_types = CoreEWS.combobox(on_executed_alternatives_params)
+		local on_executed_alternatives_types = CoreEws.combobox(on_executed_alternatives_params)
 		on_executed_alternatives_types:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "on_executed_alternatives_types"), nil)
 		self._on_executed_alternatives_params = on_executed_alternatives_params
 	end
+	local delay_sizer = EWS:BoxSizer("HORIZONTAL")
+	on_executed_sizer:add(delay_sizer, 0, 0, "EXPAND,LEFT")
 	self._element_delay_params = {
 		name = "Delay:",
 		panel = panel,
-		sizer = on_executed_sizer,
+		sizer = delay_sizer,
 		value = 0,
 		floats = 2,
 		tooltip = "Sets the delay time for the selected on executed element",
 		min = 0,
 		name_proportions = 1,
-		ctrlr_proportions = 2
+		ctrlr_proportions = 1,
+		sizer_proportions = 2
 	}
-	local element_delay = CoreEWS.number_controller(self._element_delay_params)
+	local element_delay = CoreEws.number_controller(self._element_delay_params)
 	element_delay:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "on_executed_element_delay"), nil)
 	element_delay:connect("EVT_KILL_FOCUS", callback(self, self, "on_executed_element_delay"), nil)
+	self._element_delay_rand_params = {
+		name = "  Random:",
+		panel = panel,
+		sizer = delay_sizer,
+		value = 0,
+		floats = 2,
+		tooltip = "Specifies an additional random time to be added to delay (delay + rand)",
+		min = 0,
+		name_proportions = 0,
+		ctrlr_proportions = 1,
+		sizer_proportions = 1
+	}
+	local element_delay_rand = CoreEws.number_controller(self._element_delay_rand_params)
+	element_delay_rand:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "on_executed_element_delay_rand"), nil)
+	element_delay_rand:connect("EVT_KILL_FOCUS", callback(self, self, "on_executed_element_delay_rand"), nil)
 	sizer:add(on_executed_sizer, 0, 0, "EXPAND")
 	if self.USES_POINT_ORIENTATION then
 		sizer:add(self:_build_point_orientation(panel), 0, 0, "EXPAND")
@@ -346,6 +380,15 @@ function CoreMissionElement:add_help_text(data)
 	end
 end
 
+function CoreMissionElement:_add_help_text(text)
+	local help = {
+		panel = self._panel,
+		sizer = self._panel_sizer,
+		text = text
+	}
+	self:add_help_text(help)
+end
+
 function CoreMissionElement:_on_toolbar_add_element()
 	local function f(unit)
 		return unit:type() == Idstring("mission_element") and unit ~= self._unit
@@ -449,6 +492,7 @@ function CoreMissionElement:new_save_values()
 	for _, value in ipairs(self._save_values) do
 		t[value] = self._hed[value]
 	end
+	t.base_delay_rand = self._hed.base_delay_rand and self._hed.base_delay_rand > 0 and self._hed.base_delay_rand or nil
 	if self.save then
 		self:save(t)
 	end
@@ -704,7 +748,13 @@ function CoreMissionElement:draw_link_on_executed(t, dt, selected_unit)
 			local offset = math.min(50, vec_len)
 			mvector3.multiply(dir, offset)
 			if self._distance_to_camera < 1000000 then
-				local text = string.format("%.2f", self._hed.base_delay + self:_get_on_executed(unit:unit_data().unit_id).delay)
+				local delay = self._hed.base_delay + self:_get_on_executed(unit:unit_data().unit_id).delay
+				local text = string.format("%.2f", delay)
+				if self._hed.base_delay_rand or self:_get_on_executed(unit:unit_data().unit_id).delay_rand then
+					local delay_max = delay + (self:_get_on_executed(unit:unit_data().unit_id).delay_rand or 0)
+					delay_max = delay_max + (self._hed.base_delay_rand and self._hed.base_delay_rand or 0)
+					text = text .. "-" .. string.format("%.2f", delay_max) .. ""
+				end
 				local alternative = self:_get_on_executed(unit:unit_data().unit_id).alternative
 				if alternative then
 					text = text .. " - " .. alternative .. ""
@@ -786,6 +836,7 @@ function CoreMissionElement:set_on_executed_data()
 	local id = self:combobox_id(self._elements_params.value)
 	local params = self:_get_on_executed(id)
 	CoreEWS.change_entered_number(self._element_delay_params, params.delay)
+	CoreEWS.change_entered_number(self._element_delay_rand_params, params.delay_rand or 0)
 	if self._on_executed_alternatives_params then
 		CoreEWS.change_combobox_value(self._on_executed_alternatives_params, params.alternative)
 	end
@@ -806,6 +857,7 @@ function CoreMissionElement:_set_on_execute_ctrlrs_enabled(enabled)
 	end
 	self._elements_params.ctrlr:set_enabled(enabled)
 	self._element_delay_params.number_ctrlr:set_enabled(enabled)
+	self._element_delay_rand_params.number_ctrlr:set_enabled(enabled)
 	self._elements_toolbar:set_enabled(enabled)
 	if self._on_executed_alternatives_params then
 		self._on_executed_alternatives_params.ctrlr:set_enabled(enabled)
@@ -850,6 +902,12 @@ function CoreMissionElement:on_executed_element_delay()
 	if self._timeline then
 		self._timeline:delay_updated(params)
 	end
+end
+
+function CoreMissionElement:on_executed_element_delay_rand()
+	local id = self:combobox_id(self._elements_params.value)
+	local params = self:_get_on_executed(id)
+	params.delay_rand = self._element_delay_rand_params.value > 0 and self._element_delay_rand_params.value or nil
 end
 
 function CoreMissionElement:on_executed_alternatives_types()
@@ -911,11 +969,11 @@ function CoreMissionElement:on_timeline()
 	end
 end
 
-function CoreMissionElement:_build_value_combobox(panel, sizer, value_name, options, tooltip)
+function CoreMissionElement:_build_value_combobox(panel, sizer, value_name, options, tooltip, custom_name)
 	local horizontal_sizer = EWS:BoxSizer("HORIZONTAL")
 	sizer:add(horizontal_sizer, 0, 1, "EXPAND,LEFT")
 	local combobox_params = {
-		name = string.pretty(value_name, true) .. ":",
+		name = string.pretty(custom_name or value_name, true) .. ":",
 		panel = panel,
 		sizer = horizontal_sizer,
 		options = options,
@@ -950,9 +1008,9 @@ function CoreMissionElement:_on_gui_value_combobox_toolbar_select_dialog(params)
 	end
 end
 
-function CoreMissionElement:_build_value_number(panel, sizer, value_name, options, tooltip)
+function CoreMissionElement:_build_value_number(panel, sizer, value_name, options, tooltip, custom_name)
 	local number_params = {
-		name = string.pretty(value_name, true) .. ":",
+		name = string.pretty(custom_name or value_name, true) .. ":",
 		panel = panel,
 		sizer = sizer,
 		value = self._hed[value_name],
@@ -960,17 +1018,18 @@ function CoreMissionElement:_build_value_number(panel, sizer, value_name, option
 		tooltip = tooltip or "Set a number value",
 		min = options.min,
 		max = options.max,
-		name_proportions = 1,
-		ctrlr_proportions = 2
+		name_proportions = options.name_proportions or 1,
+		ctrlr_proportions = options.ctrlr_proportions or 2,
+		sizer_proportions = options.sizer_proportions
 	}
-	local ctrlr = CoreEWS.number_controller(number_params)
+	local ctrlr = CoreEws.number_controller(number_params)
 	ctrlr:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = value_name})
 	ctrlr:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = value_name})
 	return ctrlr, number_params
 end
 
-function CoreMissionElement:_build_value_checkbox(panel, sizer, value_name, tooltip)
-	local checkbox = EWS:CheckBox(panel, string.pretty(value_name, true), "")
+function CoreMissionElement:_build_value_checkbox(panel, sizer, value_name, tooltip, custom_name)
+	local checkbox = EWS:CheckBox(panel, custom_name or string.pretty(value_name, true), "")
 	checkbox:set_value(self._hed[value_name])
 	checkbox:set_tool_tip(tooltip or "Click to toggle")
 	checkbox:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = checkbox, value = value_name})

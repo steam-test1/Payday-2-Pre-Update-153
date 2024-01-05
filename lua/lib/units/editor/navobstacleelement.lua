@@ -227,24 +227,12 @@ function NavObstacleElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"add", "remove"},
-		value = self._hed.operation,
-		tooltip = "Choose if you want to add or remove an obstacle.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	self._btn_toolbar:add_tool("SELECT_UNIT_LIST", "Select unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	self._btn_toolbar:connect("SELECT_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_unit_list_btn"), nil)
-	self._btn_toolbar:realize()
-	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
+	self:_build_value_combobox(panel, panel_sizer, "operation", {"add", "remove"}, "Choose if you want to add or remove an obstacle.")
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("SELECT_UNIT_LIST", "Select unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("SELECT_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_unit_list_btn"), nil)
+	toolbar:realize()
+	panel_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
 	for _, data in pairs(clone(self._hed.obstacle_list)) do
 		local unit = self._obstacle_units[data.unit_id]
 		if not alive(unit) then

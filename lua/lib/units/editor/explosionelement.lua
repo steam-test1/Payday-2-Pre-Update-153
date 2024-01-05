@@ -18,92 +18,18 @@ function ExplosionUnitElement:update_selected(...)
 	ExplosionUnitElement.super.update_selected(self, ...)
 end
 
-function ExplosionUnitElement:select_explosion_effect_btn()
-	local dialog = SelectNameModal:new("Select effect", self:_effect_options())
-	if dialog:cancelled() then
-		return
-	end
-	for _, effect in ipairs(dialog:_selected_item_assets()) do
-		self._hed.explosion_effect = effect
-		CoreEws.change_combobox_value(self._explosion_effect_params, self._hed.explosion_effect)
-	end
-end
-
 function ExplosionUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local damage_params = {
-		name = "Damage:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.damage,
-		floats = 0,
-		tooltip = "The damage from the explosion",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local damage = CoreEws.number_controller(damage_params)
-	damage:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = damage, value = "damage"})
-	damage:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = damage, value = "damage"})
-	local player_damage_params = {
-		name = "Player damage:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.player_damage,
-		floats = 0,
-		tooltip = "The player damage from the explosion",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local player_damage = CoreEws.number_controller(player_damage_params)
-	player_damage:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = player_damage,
-		value = "player_damage"
-	})
-	player_damage:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = player_damage,
-		value = "player_damage"
-	})
-	local explosion_effect_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(explosion_effect_sizer, 0, 1, "EXPAND,LEFT")
-	local explosion_effect_params = {
-		name = "Explosion effect:",
-		panel = panel,
-		sizer = explosion_effect_sizer,
-		default = "none",
-		options = self:_effect_options(),
-		value = self._hed.explosion_effect,
-		tooltip = "Select and explosion effect from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local explosion_effect = CoreEWS.combobox(explosion_effect_params)
-	self._explosion_effect_params = explosion_effect_params
-	explosion_effect:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = explosion_effect,
-		value = "explosion_effect"
-	})
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT_EXPLOSION_EFFECT", "Select explosion effect", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT_EXPLOSION_EFFECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_explosion_effect_btn"), nil)
-	toolbar:realize()
-	explosion_effect_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	self:_build_value_number(panel, panel_sizer, "damage", {floats = 0, min = 0}, "The damage done to beings and props from the explosion")
+	self:_build_value_number(panel, panel_sizer, "player_damage", {floats = 0, min = 0}, "The player damage from the explosion")
+	self:_build_value_combobox(panel, panel_sizer, "explosion_effect", table.list_add({"none"}, self:_effect_options()), "Select and explosion effect")
 	self:_build_value_combobox(panel, panel_sizer, "sound_event", {
 		"no_sound",
 		"trip_mine_explode"
 	})
-	local no_raycast_check_characters = EWS:CheckBox(panel, "No raycast check against characters", "")
-	no_raycast_check_characters:set_value(self._hed.no_raycast_check_characters)
-	no_raycast_check_characters:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = no_raycast_check_characters,
-		value = "no_raycast_check_characters"
-	})
-	panel_sizer:add(no_raycast_check_characters, 0, 0, "EXPAND")
+	self:_build_value_checkbox(panel, panel_sizer, "no_raycast_check_characters", "No raycast check against characters")
 	ExplosionUnitElement.super._build_panel(self, panel, panel_sizer)
 end
 

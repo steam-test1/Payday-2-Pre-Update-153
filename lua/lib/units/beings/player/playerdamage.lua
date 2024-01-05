@@ -42,12 +42,15 @@ function PlayerDamage:update(unit, t, dt)
 	local is_berserker_active = managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier")
 	if self._check_berserker_done then
 		if not is_berserker_active then
+			self._check_berserker_done = nil
+			managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_normal", "")
 			managers.hud:set_player_custom_radial({
 				current = 0,
 				total = self:_max_health(),
 				revives = Application:digest_value(self._revives, false)
 			})
 			self:set_health(0)
+			self:_chk_cheat_death()
 			self:_damage_screen()
 			self:_check_bleed_out()
 			managers.hud:set_player_health({
@@ -57,9 +60,6 @@ function PlayerDamage:update(unit, t, dt)
 			})
 			self:_send_set_health()
 			self:_set_health_effect()
-			managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_normal", "")
-			self._check_berserker_done = nil
-			self:_chk_cheat_death()
 		else
 			local expire_time = managers.player:get_activate_temporary_expire_time("temporary", "berserker_damage_multiplier")
 			local total_time = managers.player:upgrade_value("temporary", "berserker_damage_multiplier")
@@ -91,7 +91,7 @@ function PlayerDamage:update(unit, t, dt)
 			end
 		end
 	elseif self._hurt_value then
-		if not self._bleed_out or self._check_berserker_done then
+		if not self._dead and not self._bleed_out and not self._check_berserker_done then
 			self._hurt_value = math.min(1, self._hurt_value + dt)
 			local top_fade = math.clamp(self._hurt_value - 0.8, 0, 1) / 0.2
 			local hurt = self._hurt_value - (1 - top_fade) * ((1 + math.sin(t * 500)) / 2) / 10
@@ -148,7 +148,7 @@ function PlayerDamage:update(unit, t, dt)
 		end
 	end
 	self:_upd_suppression(t, dt)
-	if not self._dead and not self._bleed_out then
+	if not self._dead and not self._bleed_out and not self._check_berserker_done then
 		self:_upd_health_regen(t, dt)
 	end
 end
@@ -210,7 +210,7 @@ function PlayerDamage:_regenerate_armor()
 end
 
 function PlayerDamage:restore_armor(armor_restored)
-	if self._dead or self._bleed_out then
+	if self._dead or self._bleed_out or self._check_berserker_done then
 		return
 	end
 	local max_armor = self:_max_armor()
@@ -281,6 +281,9 @@ function PlayerDamage:set_health(health)
 	self._health = Application:digest_value(math.clamp(health, 0, max_health), true)
 	self:_send_set_health()
 	self:_set_health_effect()
+	if self._said_hurt and self:get_real_health() / self:_max_health() > 0.2 then
+		self._said_hurt = false
+	end
 	managers.hud:set_player_health({
 		current = self:get_real_health(),
 		total = max_health,
@@ -636,6 +639,7 @@ function PlayerDamage:damage_fall(data)
 	end
 	local health_damage_multiplier = 0
 	if die then
+		self._check_berserker_done = false
 		self:set_health(0)
 	else
 		health_damage_multiplier = managers.player:upgrade_value("player", "fall_damage_multiplier", 1) * managers.player:upgrade_value("player", "fall_health_damage_multiplier", 1)
@@ -728,7 +732,7 @@ function PlayerDamage:is_berserker()
 end
 
 function PlayerDamage:_check_bleed_out(can_activate_berserker)
-	if self:get_real_health() == 0 then
+	if self:get_real_health() == 0 and not self._check_berserker_done then
 		if self._unit:movement():zipline_unit() then
 			self._bleed_out_blocked_by_zipline = true
 			return
@@ -744,7 +748,7 @@ function PlayerDamage:_check_bleed_out(can_activate_berserker)
 		self._hurt_value = 0.2
 		managers.environment_controller:set_downed_value(0)
 		SoundDevice:set_rtpc("downed_state_progression", 0)
-		if not can_activate_berserker or not self._check_berserker_done then
+		if not self._check_berserker_done or not can_activate_berserker then
 			self._revives = Application:digest_value(Application:digest_value(self._revives, false) - 1, true)
 			self._check_berserker_done = nil
 			managers.environment_controller:set_last_life(Application:digest_value(self._revives, false) <= 1)
@@ -804,10 +808,21 @@ function PlayerDamage:_drop_blood_sample()
 	end
 end
 
+function PlayerDamage:disable_berserker()
+	managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_normal", "")
+	managers.hud:set_player_custom_radial({
+		current = 0,
+		total = self:_max_health(),
+		revives = Application:digest_value(self._revives, false)
+	})
+	self._check_berserker_done = false
+end
+
 function PlayerDamage:on_downed()
 	self._downed_timer = self:down_time()
 	self._downed_start_time = self._downed_timer
 	self._downed_paused_counter = 0
+	self:disable_berserker()
 	managers.hud:pd_start_timer({
 		time = self._downed_timer
 	})

@@ -59,16 +59,21 @@ function _triggers_data_table(unit)
 	local t = {}
 	local triggers = managers.sequence:get_trigger_list(unit:name())
 	if 0 < #triggers and unit:damage() then
-		local trigger_data = unit:damage():get_editor_trigger_data()
-		if trigger_data and 0 < #trigger_data then
-			for _, data in ipairs(trigger_data) do
-				table.insert(t, {
-					name = data.trigger_name,
-					id = data.id,
-					notify_unit_id = data.notify_unit:unit_data().unit_id,
-					time = data.time,
-					notify_unit_sequence = data.notify_unit_sequence
-				})
+		local trigger_name_list = unit:damage():get_trigger_name_list()
+		if trigger_name_list then
+			for _, trigger_name in ipairs(trigger_name_list) do
+				local trigger_data = unit:damage():get_trigger_data_list(trigger_name)
+				if trigger_data and 0 < #trigger_data then
+					for _, data in ipairs(trigger_data) do
+						table.insert(t, {
+							name = data.trigger_name,
+							id = data.id,
+							notify_unit_id = data.notify_unit:unit_data().unit_id,
+							time = data.time,
+							notify_unit_sequence = data.notify_unit_sequence
+						})
+					end
+				end
 			end
 		end
 	end

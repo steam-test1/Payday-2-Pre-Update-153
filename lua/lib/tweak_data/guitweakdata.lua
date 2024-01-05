@@ -201,6 +201,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/halloween/",
 		image = "guis/textures/pd2/content_updates/halloween_2014"
 	}
+	local gage_pack_historical = {
+		id = "gage_pack_historical",
+		name_id = "menu_content_gage_pack_historical",
+		desc_id = "menu_content_gage_pack_historical_desc",
+		date_id = "menu_content_gage_pack_historical_date",
+		store = 331900,
+		image = "guis/dlcs/gage_pack_historical/textures/pd2/content_updates/gage_pack_historical"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -232,7 +240,8 @@ function GuiTweakData:init()
 			jowi,
 			hoxton_char,
 			hoxton_job,
-			halloween_2014
+			halloween_2014,
+			gage_pack_historical
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -300,7 +309,7 @@ function GuiTweakData:init()
 	self.mouse_pointer.controller.max_acceleration = 3
 	self.mouse_pointer.controller.mouse_pointer_speed = 125
 	self.MAX_MASK_ROWS = math.round(24)
-	self.MAX_WEAPON_ROWS = math.round(12)
+	self.MAX_WEAPON_ROWS = math.round(24)
 	self.crime_net = {}
 	self.crime_net.controller = {}
 	self.crime_net.controller.snap_distance = 50

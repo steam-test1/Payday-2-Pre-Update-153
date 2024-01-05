@@ -139,6 +139,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.civ_calming_alerts = {true}
 	self.values.player.civ_intimidation_mul = {1.5}
 	self.values.team.pistol.recoil_multiplier = {0.75}
+	self.values.team.akimbo.recoil_multiplier = self.values.team.pistol.recoil_multiplier
 	self.values.team.weapon.recoil_multiplier = {0.5}
 	self.values.player.assets_cost_multiplier = {0.5}
 	self.values.player.additional_assets = {true}
@@ -160,13 +161,19 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.xp_multiplier = {1.15}
 	self.values.team.xp.multiplier = {1.3}
 	self.values.pistol.reload_speed_multiplier = {1.5}
+	self.values.akimbo.reload_speed_multiplier = self.values.pistol.reload_speed_multiplier
+	self.values.pistol.damage_addend = {1.5}
+	self.values.akimbo.damage_addend = {0.75}
 	self.values.pistol.damage_multiplier = {1.5}
 	self.values.assault_rifle.reload_speed_multiplier = {1.25}
 	self.values.assault_rifle.move_spread_multiplier = {0.5}
 	self.values.player.pistol_revive_from_bleed_out = {1, 3}
 	self.values.pistol.spread_multiplier = {0.9}
+	self.values.akimbo.spread_multiplier = self.values.pistol.spread_multiplier
 	self.values.pistol.swap_speed_multiplier = {1.5}
+	self.values.akimbo.swap_speed_multiplier = self.values.pistol.swap_speed_multiplier
 	self.values.pistol.fire_rate_multiplier = {2}
+	self.values.akimbo.fire_rate_multiplier = self.values.pistol.fire_rate_multiplier
 	self.values.player.revive_interaction_speed_multiplier = {0.5}
 	self.values.player.long_dis_revive = {0.75, 1}
 	self.values.doctor_bag.interaction_speed_multiplier = {0.8}
@@ -514,7 +521,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.panic_suppression = {true}
 	self.values.akimbo.extra_ammo_multiplier = {1.25, 1.5}
 	self.values.akimbo.damage_multiplier = {1.5, 3}
-	self.values.akimbo.spread_multiplier = {0.5, 0.25}
 	self.values.akimbo.recoil_multiplier = {
 		2.5,
 		2,
@@ -549,7 +555,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.extra_corpse_dispose_amount = {1}
 	self.values.player.standstill_omniscience = {true}
 	self.values.player.mask_off_pickup = {true}
-	self.values.player.cleaner_cost_multiplier = {0.75}
+	self.values.player.cleaner_cost_multiplier = {0.25}
 	self.values.player.counter_strike_melee = {true}
 	self.values.player.counter_strike_spooc = {true}
 	self.values.temporary.passive_revive_damage_reduction = {
@@ -1321,7 +1327,11 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[23] = {
 		name_id = "weapons",
-		upgrades = {"bullseye"}
+		upgrades = {"bullseye", "c96"}
+	}
+	self.level_tree[24] = {
+		name_id = "weapons",
+		upgrades = {"model24"}
 	}
 	self.level_tree[26] = {
 		name_id = "weapons",
@@ -1380,7 +1390,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[41] = {
 		name_id = "weapons",
-		upgrades = {"gerber"}
+		upgrades = {"gerber", "fairbair"}
 	}
 	self.level_tree[42] = {
 		name_id = "weapons",
@@ -1394,6 +1404,10 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"gre_m79"}
 	}
+	self.level_tree[47] = {
+		name_id = "weapons",
+		upgrades = {"freedom"}
+	}
 	self.level_tree[48] = {
 		name_id = "weapons",
 		upgrades = {"dingdong"}
@@ -1406,7 +1420,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[51] = {
 		name_id = "weapons",
-		upgrades = {"machete"}
+		upgrades = {"machete", "sterling"}
 	}
 	self.level_tree[52] = {
 		name_id = "weapons",
@@ -1414,7 +1428,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[54] = {
 		name_id = "weapons",
-		upgrades = {"becker"}
+		upgrades = {"becker", "mosin"}
 	}
 	self.level_tree[55] = {
 		name_id = "weapons",
@@ -1442,7 +1456,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[71] = {
 		name_id = "weapons",
-		upgrades = {"fireaxe"}
+		upgrades = {"fireaxe", "mg42"}
 	}
 	self.level_tree[75] = {
 		name_id = "weapons",
@@ -1650,6 +1664,10 @@ function UpgradesTweakData:init()
 	self:_galil_definitions()
 	self:_famas_definitions()
 	self:_spas12_definitions()
+	self:_mg42_definitions()
+	self:_c96_definitions()
+	self:_sterling_definitions()
+	self:_mosin_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1726,6 +1744,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.team.player = {}
 	self.values.team.weapon = {}
 	self.values.team.pistol = {}
+	self.values.team.akimbo = {}
 	self.values.team.xp = {}
 	self.values.team.armor = {}
 	self.values.team.stamina = {}
@@ -5641,6 +5660,42 @@ function UpgradesTweakData:_spas12_definitions()
 	}
 end
 
+function UpgradesTweakData:_mg42_definitions()
+	self.definitions.mg42 = {
+		category = "weapon",
+		weapon_id = "mg42",
+		factory_id = "wpn_fps_lmg_mg42",
+		dlc = "gage_pack_historical"
+	}
+end
+
+function UpgradesTweakData:_c96_definitions()
+	self.definitions.c96 = {
+		category = "weapon",
+		weapon_id = "c96",
+		factory_id = "wpn_fps_pis_c96",
+		dlc = "gage_pack_historical"
+	}
+end
+
+function UpgradesTweakData:_sterling_definitions()
+	self.definitions.sterling = {
+		category = "weapon",
+		weapon_id = "sterling",
+		factory_id = "wpn_fps_smg_sterling",
+		dlc = "gage_pack_historical"
+	}
+end
+
+function UpgradesTweakData:_mosin_definitions()
+	self.definitions.mosin = {
+		category = "weapon",
+		weapon_id = "mosin",
+		factory_id = "wpn_fps_snp_mosin",
+		dlc = "gage_pack_historical"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -5727,6 +5782,22 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.briefcase = {
 		category = "melee_weapon",
 		dlc = "hlm_game"
+	}
+	self.definitions.fairbair = {
+		category = "melee_weapon",
+		dlc = "gage_pack_historical"
+	}
+	self.definitions.freedom = {
+		category = "melee_weapon",
+		dlc = "gage_pack_historical"
+	}
+	self.definitions.model24 = {
+		category = "melee_weapon",
+		dlc = "gage_pack_historical"
+	}
+	self.definitions.swagger = {
+		category = "melee_weapon",
+		dlc = "gage_pack_historical"
 	}
 end
 
@@ -6029,6 +6100,15 @@ function UpgradesTweakData:_pistol_definitions()
 			category = "pistol",
 			upgrade = "stacking_hit_expire_t",
 			value = 2
+		}
+	}
+	self.definitions.pistol_damage_addend = {
+		category = "feature",
+		name_id = "menu_pistol_damage_addend",
+		upgrade = {
+			category = "pistol",
+			upgrade = "damage_addend",
+			value = 1
 		}
 	}
 end
@@ -6444,6 +6524,15 @@ function UpgradesTweakData:_team_definitions()
 		name_id = "menu_team_pistol_recoil_multiplier",
 		upgrade = {
 			category = "pistol",
+			upgrade = "recoil_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.team_akimbo_recoil_multiplier = {
+		category = "team",
+		name_id = "menu_team_akimbo_recoil_multiplier",
+		upgrade = {
+			category = "akimbo",
 			upgrade = "recoil_multiplier",
 			value = 1
 		}
@@ -7713,26 +7802,6 @@ function UpgradesTweakData:_akimbo_definitions()
 			value = 1
 		}
 	}
-	self.definitions.akimbo_spread_multiplier_1 = {
-		category = "feature",
-		name_id = "menu_akimbo_spread_multiplier",
-		incremental = true,
-		upgrade = {
-			category = "akimbo",
-			upgrade = "spread_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_spread_multiplier_2 = {
-		category = "feature",
-		name_id = "menu_akimbo_spread_multiplier",
-		incremental = true,
-		upgrade = {
-			category = "akimbo",
-			upgrade = "spread_multiplier",
-			value = 1
-		}
-	}
 	self.definitions.akimbo_extra_ammo_multiplier_1 = {
 		category = "feature",
 		name_id = "menu_akimbo_extra_ammo_multiplier",
@@ -7821,6 +7890,51 @@ function UpgradesTweakData:_akimbo_definitions()
 			category = "akimbo",
 			upgrade = "clip_ammo_increase",
 			value = 2
+		}
+	}
+	self.definitions.akimbo_reload_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_pistol_reload_speed",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "reload_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_spread_multiplier = {
+		category = "feature",
+		name_id = "menu_pistol_spread_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_swap_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_pistol_swap_speed_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "swap_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_fire_rate_multiplier = {
+		category = "feature",
+		name_id = "menu_pistol_fire_rate_multiplier",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "fire_rate_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.akimbo_damage_addend = {
+		category = "feature",
+		name_id = "menu_akimbo_damage_addend",
+		upgrade = {
+			category = "akimbo",
+			upgrade = "damage_addend",
+			value = 1
 		}
 	}
 end

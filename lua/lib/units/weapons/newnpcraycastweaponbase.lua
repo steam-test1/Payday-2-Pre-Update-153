@@ -93,9 +93,15 @@ function NewNPCRaycastWeaponBase:check_npc()
 	if not self._assembly_complete then
 		return
 	end
-	local gadget = managers.weapon_factory:get_part_from_weapon_by_type("gadget", self._parts)
-	if gadget then
-		gadget.unit:base():set_npc()
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
+	if gadgets then
+		local gadget
+		for _, i in ipairs(gadgets) do
+			gadget = self._parts[i]
+			if gadget then
+				gadget.unit:base():set_npc()
+			end
+		end
 	end
 end
 

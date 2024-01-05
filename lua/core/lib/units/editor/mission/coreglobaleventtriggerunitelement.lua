@@ -16,21 +16,5 @@ function CoreGlobalEventTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local events_params = {
-		name = "Global Event:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = managers.mission:get_global_event_list(),
-		value = self._hed.global_event,
-		default = "none",
-		tooltip = "Select a global event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local events = CoreEWS.combobox(events_params)
-	events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = events,
-		value = "global_event"
-	})
+	self:_build_value_combobox(panel, panel_sizer, "global_event", table.list_add({"none"}, managers.mission:get_global_event_list()), "Select a global event from the combobox")
 end

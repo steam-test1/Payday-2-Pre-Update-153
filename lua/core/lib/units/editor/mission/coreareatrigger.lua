@@ -313,52 +313,24 @@ function CoreAreaTriggerUnitElement:_build_panel(panel, panel_sizer, disable_par
 	if not self._shape then
 		self:_create_shapes()
 	end
-	local base_params = {
-		panel = panel,
-		sizer = panel_sizer,
-		floats = 0,
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local width_params = clone(base_params)
-	width_params.name = "Width[cm]:"
-	width_params.value = self._hed.width
-	width_params.tooltip = "Set the width for the shape"
-	local width = CoreEWS.number_controller(width_params)
+	local width, width_params = self:_build_value_number(panel, panel_sizer, "width", {floats = 0, min = 0}, "Set the width for the shape")
+	width_params.name_ctrlr:set_label("Width[cm]:")
 	self._width_params = width_params
-	width:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = width, value = "width"})
-	width:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = width, value = "width"})
 	width:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_shape_property"), {property = "width", value = "width"})
 	width:connect("EVT_KILL_FOCUS", callback(self, self, "set_shape_property"), {property = "width", value = "width"})
-	local depth_params = clone(base_params)
-	depth_params.name = "Depth[cm]:"
-	depth_params.value = self._hed.depth
-	depth_params.tooltip = "Set the depth for the shape"
-	local depth = CoreEWS.number_controller(depth_params)
+	local depth, depth_params = self:_build_value_number(panel, panel_sizer, "depth", {floats = 0, min = 0}, "Set the depth for the shape")
+	depth_params.name_ctrlr:set_label("Depth[cm]:")
 	self._depth_params = depth_params
-	depth:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = depth, value = "depth"})
-	depth:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = depth, value = "depth"})
 	depth:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_shape_property"), {property = "depth", value = "depth"})
 	depth:connect("EVT_KILL_FOCUS", callback(self, self, "set_shape_property"), {property = "depth", value = "depth"})
-	local height_params = clone(base_params)
-	height_params.name = "Height[cm]:"
-	height_params.value = self._hed.height
-	height_params.tooltip = "Set the height for the shape"
-	local height = CoreEWS.number_controller(height_params)
+	local height, height_params = self:_build_value_number(panel, panel_sizer, "height", {floats = 0, min = 0}, "Set the height for the shape")
+	height_params.name_ctrlr:set_label("Height[cm]:")
 	self._height_params = height_params
-	height:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = height, value = "height"})
-	height:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = height, value = "height"})
 	height:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_shape_property"), {property = "height", value = "height"})
 	height:connect("EVT_KILL_FOCUS", callback(self, self, "set_shape_property"), {property = "height", value = "height"})
-	local radius_params = clone(base_params)
-	radius_params.name = "Radius[cm]:"
-	radius_params.value = self._hed.radius
-	radius_params.tooltip = "Set the radius for the shape"
-	local radius = CoreEWS.number_controller(radius_params)
+	local radius, radius_params = self:_build_value_number(panel, panel_sizer, "radius", {floats = 0, min = 0}, "Set the radius for the shape")
+	radius_params.name_ctrlr:set_label("Radius[cm]:")
 	self._radius_params = radius_params
-	radius:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = radius, value = "radius"})
-	radius:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = radius, value = "radius"})
 	radius:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_shape_property"), {property = "radius", value = "radius"})
 	radius:connect("EVT_KILL_FOCUS", callback(self, self, "set_shape_property"), {property = "radius", value = "radius"})
 	self:scale_slider(panel, panel_sizer, width_params, "width", "Width scale:")
@@ -496,34 +468,15 @@ function CoreAreaOperatorUnitElement:_build_panel(panel, panel_sizer)
 		amount = true
 	})
 	panel_sizer:add(EWS:StaticLine(panel, "", "LI_HORIZONTAL"), 0, 5, "EXPAND,TOP,BOTTOM")
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"clear_inside"
-		},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"clear_inside"
+	}, "Select an operation for the selected elements")
 	for _, uses in ipairs(self._apply_on_checkboxes) do
 		local name = "apply_on_" .. uses
-		local cb = EWS:CheckBox(panel, string.pretty(name, true), "")
-		cb:set_value(self._hed[name])
-		cb:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = cb, value = name})
-		panel_sizer:add(cb, 0, 0, "EXPAND")
+		self:_build_value_checkbox(panel, panel_sizer, name)
 	end
-	local help = {}
-	help.text = "This element can modify trigger_area element. Select areas to modify using insert and clicking on the elements."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_add_help_text("This element can modify trigger_area element. Select areas to modify using insert and clicking on the elements.")
 end
 
 CoreAreaReportTriggerUnitElement = CoreAreaReportTriggerUnitElement or class(CoreAreaTriggerUnitElement)

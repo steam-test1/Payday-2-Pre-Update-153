@@ -42,19 +42,8 @@ function CorePlayEffectUnitElement:stop_test_element()
 	end
 end
 
-function CorePlayEffectUnitElement:select_effect_btn()
-	local dialog = SelectNameModal:new("Select effect", self:_effect_options())
-	if dialog:cancelled() then
-		return
-	end
-	for _, effect in ipairs(dialog:_selected_item_assets()) do
-		self._hed.effect = effect
-		CoreEws.change_combobox_value(self._effects_params, self._hed.effect)
-	end
-end
-
 function CorePlayEffectUnitElement:_effect_options()
-	local effect_options = {}
+	local effect_options = {"none"}
 	for _, name in ipairs(managers.database:list_entries_of_type("effect")) do
 		table.insert(effect_options, name)
 	end
@@ -65,84 +54,11 @@ function CorePlayEffectUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local screen_space = EWS:CheckBox(panel, "Play in Screen Space", "")
-	screen_space:set_value(self._hed.screen_space)
-	screen_space:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = screen_space,
-		value = "screen_space"
-	})
-	panel_sizer:add(screen_space, 0, 0, "EXPAND")
-	local effect_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(effect_sizer, 0, 1, "EXPAND,LEFT")
-	local effects_params = {
-		name = "Effect:",
-		panel = panel,
-		sizer = effect_sizer,
-		default = "none",
-		options = self:_effect_options(),
-		value = self._hed.effect,
-		tooltip = "Select and effect from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local effects = CoreEWS.combobox(effects_params)
-	self._effects_params = effects_params
-	effects:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = effects, value = "effect"})
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT_EFFECT", "Select effect", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT_EFFECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_effect_btn"), nil)
-	toolbar:realize()
-	effect_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	local base_time_params = {
-		name = "Base Time:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.base_time,
-		floats = 2,
-		tooltip = "This is the minimum time to wait before spawning next effect",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local base_time = CoreEWS.number_controller(base_time_params)
-	base_time:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = base_time, value = "base_time"})
-	base_time:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = base_time, value = "base_time"})
-	local random_time_params = {
-		name = "Random Time:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.random_time,
-		floats = 2,
-		tooltip = "Random time is added to minimum time to give the time between effect spawns",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local random_time = CoreEWS.number_controller(random_time_params)
-	random_time:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = random_time,
-		value = "random_time"
-	})
-	random_time:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = random_time,
-		value = "random_time"
-	})
-	local max_amount_params = {
-		name = "Max Amount:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.max_amount,
-		floats = 0,
-		tooltip = "Maximum amount of spawns when repeating effects (0 = unlimited)",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local max_amount = CoreEWS.number_controller(max_amount_params)
-	max_amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = max_amount, value = "max_amount"})
-	max_amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = max_amount, value = "max_amount"})
+	self:_build_value_checkbox(panel, panel_sizer, "screen_space", "Play in Screen Space")
+	self:_build_value_combobox(panel, panel_sizer, "effect", self:_effect_options(), "Select and effect from the combobox")
+	self:_build_value_number(panel, panel_sizer, "base_time", {floats = 2, min = 0}, "This is the minimum time to wait before spawning next effect")
+	self:_build_value_number(panel, panel_sizer, "random_time", {floats = 2, min = 0}, "Random time is added to minimum time to give the time between effect spawns")
+	self:_build_value_number(panel, panel_sizer, "max_amount", {floats = 0, min = 0}, "Maximum amount of spawns when repeating effects (0 = unlimited)")
 	local help = {}
 	help.text = [[
 Choose an effect from the combobox. Use "Play in Screen Space" if the effect is set up to be played like that. 
@@ -240,16 +156,5 @@ function CoreStopEffectUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"kill", "fade_kill"},
-		value = self._hed.operation,
-		tooltip = "Select a kind of operation to perform on the added effects",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
+	self:_build_value_combobox(panel, panel_sizer, "operation", {"kill", "fade_kill"}, "Select a kind of operation to perform on the added effects")
 end

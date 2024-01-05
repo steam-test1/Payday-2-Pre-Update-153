@@ -87,6 +87,8 @@ function NodeGui:_setup_item_rows(node)
 				y = self.font_size * i + self.spacing * (i - 1)
 			}
 			row_item.color = params.color or self.row_item_color
+			row_item.row_item_color = params.row_item_color
+			row_item.hightlight_color = params.hightlight_color
 			row_item.disabled_color = params.disabled_color or self.row_item_disabled_text_color
 			row_item.font = self.font
 			row_item.font_size = self.font_size
@@ -136,6 +138,8 @@ function NodeGui:_insert_row_item(item, node, i)
 			y = self.font_size * i + self.spacing * (i - 1)
 		}
 		row_item.color = params.color or self.row_item_color
+		row_item.row_item_color = params.row_item_color
+		row_item.hightlight_color = params.hightlight_color
 		row_item.disabled_color = params.disabled_color or self.row_item_disabled_text_color
 		row_item.font = self.font
 		row_item.text = item_text

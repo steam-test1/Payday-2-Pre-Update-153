@@ -452,7 +452,7 @@ function MissionAssetsManager:get_asset_texture(asset_id)
 end
 
 function MissionAssetsManager:texture_loaded_clbk(texture_idstring)
-	if not self._asset_textures_in_loading[texture_idstring:key()] then
+	if not self._asset_textures_in_loading or not self._asset_textures_in_loading[texture_idstring:key()] then
 		return
 	end
 	local asset_texture_data = self._asset_textures_in_loading[texture_idstring:key()]
@@ -470,7 +470,7 @@ function MissionAssetsManager:texture_loaded_clbk(texture_idstring)
 end
 
 function MissionAssetsManager:check_all_textures_loaded()
-	if self:is_all_textures_loaded() then
+	if self:is_all_textures_loaded() or #self:get_all_asset_ids(true) == 0 then
 		Application:debug("[MissionAssetsManager] Creating mission assets")
 		managers.menu_component:create_asset_mission_briefing_gui()
 	end

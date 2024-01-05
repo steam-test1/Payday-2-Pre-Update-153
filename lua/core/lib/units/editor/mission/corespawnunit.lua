@@ -70,76 +70,21 @@ function CoreSpawnUnitUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local unit_options = {}
+	local unit_options = {"none"}
 	for name, _ in pairs(managers.editor:layers().Dynamics:get_unit_map()) do
 		table.insert(unit_options, managers.editor:get_real_name(name))
 	end
-	local units_params = {
-		name = "Unit:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = unit_options,
-		value = self._hed.unit_name,
-		tooltip = "Select a unit from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local units = CoreEWS.combobox(units_params)
-	units:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = units, value = "unit_name"})
-	local velocity_params = {
-		name = "Velocity:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.unit_spawn_velocity,
-		floats = 0,
-		tooltip = "Use this to add a velocity to a physic push on the spawned unit(will need mass as well)",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local velocity = CoreEWS.number_controller(velocity_params)
-	velocity:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = velocity,
-		value = "unit_spawn_velocity"
-	})
-	velocity:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = velocity,
-		value = "unit_spawn_velocity"
-	})
-	local mass_params = {
-		name = "Mass:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.unit_spawn_mass,
-		floats = 0,
-		tooltip = "Use this to add a mass to a physic push on the spawned unit(will need velocity as well)",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local mass = CoreEWS.number_controller(mass_params)
-	mass:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = mass,
-		value = "unit_spawn_mass"
-	})
-	mass:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = mass,
-		value = "unit_spawn_mass"
-	})
-	local help = {}
-	help.text = [[
+	self:_build_value_combobox(panel, panel_sizer, "unit_name", unit_options, "Select a unit from the combobox")
+	self:_build_value_number(panel, panel_sizer, "unit_spawn_velocity", {floats = 0, min = 0}, "Use this to add a velocity to a physic push on the spawned unit(will need mass as well)", "Velocity")
+	self:_build_value_number(panel, panel_sizer, "unit_spawn_mass", {floats = 0, min = 0}, "Use this to add a mass to a physic push on the spawned unit(will need velocity as well)", "Mass")
+	self:_add_help_text([[
 Select a unit to be spawned in the unit combobox.
 
 Add velocity and mass if you want to give the spawned unit a push as if it was hit by an object of mass mass, traveling at a velocity of velocity relative to the unit (both values are required to give the push)
 
 Body slam (80 kg, 10 m/s)
 Fist punch (8 kg, 10 m/s)
-Bullet hit (10 g, 900 m/s)]]
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+Bullet hit (10 g, 900 m/s)]])
 end
 
 function CoreSpawnUnitUnitElement:add_to_mission_package()

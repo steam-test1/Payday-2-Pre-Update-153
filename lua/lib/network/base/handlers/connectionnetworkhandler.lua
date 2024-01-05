@@ -237,6 +237,7 @@ function ConnectionNetworkHandler:sync_game_settings(job_index, level_id_index, 
 	Global.game_settings.mission = managers.job:current_mission()
 	Global.game_settings.world_setting = managers.job:current_world_setting()
 	Global.game_settings.difficulty = difficulty
+	peer:verify_job(job_id)
 	if managers.menu_component then
 		managers.menu_component:on_job_updated()
 	end

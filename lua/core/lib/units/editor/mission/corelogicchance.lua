@@ -15,21 +15,11 @@ function CoreLogicChanceUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local chance_params = {
-		name = "Chance:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.chance,
+	self:_build_value_number(panel, panel_sizer, "chance", {
 		floats = 0,
-		tooltip = "Specifies chance that this element will call its on executed elements (in percent)",
 		min = 0,
-		max = 100,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local chance = CoreEWS.number_controller(chance_params)
-	chance:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = chance, value = "chance"})
-	chance:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = chance, value = "chance"})
+		max = 100
+	}, "Specifies chance that this element will call its on executed elements (in percent)")
 end
 
 CoreLogicChanceOperatorUnitElement = CoreLogicChanceOperatorUnitElement or class(MissionElement)
@@ -97,46 +87,19 @@ function CoreLogicChanceOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"add_chance",
-			"subtract_chance",
-			"reset",
-			"set_chance"
-		},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local chance_params = {
-		name = "Chance:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.chance,
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"add_chance",
+		"subtract_chance",
+		"reset",
+		"set_chance"
+	}, "Select an operation for the selected elements")
+	self:_build_value_number(panel, panel_sizer, "chance", {
 		floats = 0,
-		tooltip = "Amount of chance to add, subtract or set to the logic chance elements.",
 		min = 0,
-		max = 100,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local chance = CoreEWS.number_controller(chance_params)
-	chance:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = chance, value = "chance"})
-	chance:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = chance, value = "chance"})
-	local help = {}
-	help.text = "This element can modify logic_chance element. Select logic chance elements to modify using insert and clicking on the elements."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+		max = 100
+	}, "Amount of chance to add, subtract or set to the logic chance elements.")
+	self:_add_help_text("This element can modify logic_chance element. Select logic chance elements to modify using insert and clicking on the elements.")
 end
 
 CoreLogicChanceTriggerUnitElement = CoreLogicChanceTriggerUnitElement or class(MissionElement)
@@ -202,22 +165,6 @@ function CoreLogicChanceTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local outcome_params = {
-		name = "Outcome:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"fail", "success"},
-		value = self._hed.outcome,
-		tooltip = "Select an outcome to trigger on",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local outcome = CoreEWS.combobox(outcome_params)
-	outcome:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = outcome, value = "outcome"})
-	local help = {}
-	help.text = "This element is a trigger to logic_chance element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "outcome", {"fail", "success"}, "Select an outcome to trigger on")
+	self:_add_help_text("This element is a trigger to logic_chance element.")
 end

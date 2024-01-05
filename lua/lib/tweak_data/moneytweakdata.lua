@@ -139,6 +139,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.gage_pack_snp = 0.8
 	self.global_value_multipliers.gage_pack_shotgun = 1
 	self.global_value_multipliers.gage_pack_assault = 1
+	self.global_value_multipliers.gage_pack_historical = 1
 	self.global_value_multipliers.xmas_soundtrack = 1
 	self.global_value_multipliers.sweettooth = 1
 	self.global_value_multipliers.legendary = 1
@@ -166,6 +167,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.gage_pack_snp = 0.2
 	self.global_value_bonus_multiplier.gage_pack_shotgun = 0.2
 	self.global_value_bonus_multiplier.gage_pack_assault = 0.2
+	self.global_value_bonus_multiplier.gage_pack_historical = 0.2
 	self.global_value_bonus_multiplier.xmas_soundtrack = 0
 	self.global_value_bonus_multiplier.sweettooth = 0
 	self.global_value_bonus_multiplier.legendary = 0

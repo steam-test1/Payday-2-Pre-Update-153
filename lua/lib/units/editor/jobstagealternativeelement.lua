@@ -14,39 +14,6 @@ function JobStageAlternativeUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local alternative_params = {
-		name = "Alternative:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.alternative,
-		floats = 0,
-		tooltip = "Sets the next job stage alternative",
-		min = 1,
-		max = 4,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local alternative = CoreEWS.number_controller(alternative_params)
-	alternative:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = alternative,
-		value = "alternative"
-	})
-	alternative:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = alternative,
-		value = "alternative"
-	})
-	local interupt_params = {
-		name = "Escape level:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = tweak_data.levels.escape_levels,
-		value = self._hed.interupt,
-		default = "none",
-		tooltip = "Select an escape level to be loaded between stages",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local interupt = CoreEWS.combobox(interupt_params)
-	interupt:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = interupt, value = "interupt"})
+	self:_build_value_number(panel, panel_sizer, "alternative", {floats = 0, min = 1}, "Sets the next job stage alternative")
+	self:_build_value_combobox(panel, panel_sizer, "interupt", table.list_add({"none"}, tweak_data.levels.escape_levels), "Select an escape level to be loaded between stages")
 end

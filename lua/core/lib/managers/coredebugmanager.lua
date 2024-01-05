@@ -2054,10 +2054,10 @@ end
 
 function MacroDebug:get_cleaned_path(path)
 	if path then
-		local clean_path = string.gsub(tostring(path), "(.-)[/\\]+(.-)", "%1\\%2")
+		local clean_path = string.gsub(tostring(path), "(.-)[/\\]+(.-)", "%1/%2")
 		local hit_count
 		repeat
-			clean_path, hit_count = string.gsub(clean_path, "\\[^\\:]+\\%.%.", "")
+			clean_path, hit_count = string.gsub(clean_path, "/[^/:]+/%.%.", "")
 		until hit_count == 0
 		return clean_path
 	else
@@ -2409,6 +2409,110 @@ function MacroDebug:set_draw_unit_enabled(unit_name, is_enabled, draw_camera_lin
 			self._draw_unit_map = nil
 		end
 	end
+end
+
+function MacroDebug:get_file_list_by_type(file_type)
+	local index = "indices/types/" .. tostring(file_type)
+	local file = DB:has("index", index) and DB:open("index", index) or nil
+	if file == nil then
+		return {}
+	else
+		local data = file:read()
+		file:close()
+		return string.split(data, "[\r\n]")
+	end
+end
+
+function MacroDebug:get_asset_path()
+	local is_assetslocation_arg
+	local relative_path = "../../assets/"
+	for _, v in ipairs(Application:argv()) do
+		if v == "-assetslocation" then
+			is_assetslocation_arg = true
+		elseif is_assetslocation_arg then
+			relative_path = v .. "/assets/"
+			break
+		end
+	end
+	return self:get_cleaned_path(Application:nice_path(Application:base_path() .. relative_path, true))
+end
+
+function MacroDebug:check_dangerous_sequence_slot(slot_list)
+	slot_list = slot_list or {0}
+	local asset_path = self:get_asset_path()
+	local unit_file_list = self:get_file_list_by_type("unit")
+	local found_unit_file_map = {}
+	for _, unit_file in ipairs(unit_file_list) do
+		local unit_node = DB:load_node("unit", unit_file)
+		local network_sync, object_file
+		for child_node in unit_node:children() do
+			local child_node_name = child_node:name()
+			if child_node_name == "network" then
+				local sync_type = child_node:parameter("sync")
+				network_sync = sync_type and sync_type ~= "none" and sync_type
+			elseif child_node_name == "object" then
+				object_file = child_node:parameter("file")
+			end
+		end
+		if network_sync and object_file and DB:has("object", object_file) then
+			local object_node = DB:load_node("object", object_file)
+			local object_sequence_node
+			for child_node in object_node:children() do
+				local child_node_name = child_node:name()
+				if child_node_name == "sequence_manager" then
+					object_sequence_node = child_node
+					break
+				end
+			end
+			if object_sequence_node then
+				local sequence_file = object_sequence_node:parameter("file")
+				if sequence_file and DB:has("sequence_manager", sequence_file) then
+					local sequence_data = PackageManager:editor_load_script_data(Idstring("sequence_manager"), Idstring(sequence_file))
+					
+					local function find_slot_func(map, recursive_func)
+						for k, v in pairs(map) do
+							if type(v) == "table" then
+								if k == "slot" then
+									local slot = v.slot
+									if table.contains(slot_list, tonumber(slot)) then
+										local list = found_unit_file_map[slot]
+										if not list then
+											list = {}
+											found_unit_file_map[slot] = list
+										end
+										table.insert(list, {
+											unit = asset_path .. tostring(unit_file) .. ".unit",
+											object = asset_path .. tostring(object_file) .. ".object",
+											sequence = asset_path .. tostring(sequence_file) .. ".sequence_manager",
+											sync = network_sync,
+											slot = slot
+										})
+									end
+								end
+								recursive_func(v, recursive_func)
+							end
+						end
+					end
+					
+					find_slot_func(sequence_data, find_slot_func)
+				else
+					Application:error("Object " .. tostring(object_file) .. " has an invalid <sequence_manager file=\"...\"/> node.")
+				end
+			end
+		end
+	end
+	for _, list in pairs(found_unit_file_map) do
+		for _, data in ipairs(list) do
+			cat_print("debug", "Slot: " .. tostring(data.slot) .. ", Sync: " .. tostring(data.sync) .. [[
+
+Sequence file: ]] .. data.sequence .. [[
+
+Unit file: ]] .. data.unit .. [[
+
+Object file: ]] .. data.object)
+		end
+	end
+	return found_unit_file_map
 end
 
 function MacroDebug:update(t, dt)

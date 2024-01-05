@@ -72,7 +72,7 @@ function AccessCameraUnitElement:_add_text_options()
 	end
 end
 
-function AccessCameraUnitElement:set_text()
+function AccessCameraUnitElement:_set_text()
 	self._text:set_value(managers.localization:text(self._hed.text_id))
 end
 
@@ -91,6 +91,13 @@ function AccessCameraUnitElement:add_camera_uid()
 	end
 end
 
+function AccessCameraUnitElement:set_element_data(params, ...)
+	AccessCameraUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "text_id" then
+		self:_set_text()
+	end
+end
+
 function AccessCameraUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_camera_uid"))
 end
@@ -99,61 +106,14 @@ function AccessCameraUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local text_params = {
-		name = "Text id:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = self._text_options,
-		value = self._hed.text_id,
-		tooltip = "Select a text id from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local text = CoreEWS.combobox(text_params)
-	text:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = text, value = "text_id"})
-	text:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_text"), nil)
+	self:_build_value_combobox(panel, panel_sizer, "text_id", self._text_options, "Select a text id from the combobox")
 	local text_sizer = EWS:BoxSizer("HORIZONTAL")
 	text_sizer:add(EWS:StaticText(panel, "Text: ", "", ""), 1, 2, "ALIGN_CENTER_VERTICAL,RIGHT,EXPAND")
 	self._text = EWS:StaticText(panel, managers.localization:text(self._hed.text_id), "", "")
 	text_sizer:add(self._text, 2, 2, "RIGHT,TOP,EXPAND")
 	panel_sizer:add(text_sizer, 0, 4, "EXPAND,BOTTOM")
-	local yaw_limit_params = {
-		name = "Yaw limit:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.yaw_limit,
-		floats = 0,
-		tooltip = "Specify a yaw limit.",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local yaw_limit = CoreEWS.number_controller(yaw_limit_params)
-	yaw_limit:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = yaw_limit, value = "yaw_limit"})
-	yaw_limit:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = yaw_limit, value = "yaw_limit"})
-	local pitch_limit_params = {
-		name = "Pitch limit:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.pitch_limit,
-		floats = 0,
-		tooltip = "Specify a pitch limit.",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local pitch_limit = CoreEWS.number_controller(pitch_limit_params)
-	pitch_limit:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = pitch_limit,
-		value = "pitch_limit"
-	})
-	pitch_limit:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = pitch_limit,
-		value = "pitch_limit"
-	})
+	self:_build_value_number(panel, panel_sizer, "yaw_limit", {floats = 0, min = -1}, "Specify a yaw limit.")
+	self:_build_value_number(panel, panel_sizer, "pitch_limit", {floats = 0, min = -1}, "Specify a pitch limit.")
 end
 
 AccessCameraOperatorUnitElement = AccessCameraOperatorUnitElement or class(MissionElement)
@@ -214,25 +174,8 @@ function AccessCameraOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {"destroy"},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local help = {}
-	help.text = "This element can modify point_access_camera element. Select elements to modify using insert and clicking on them."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "operation", {"none", "destroy"}, "Select an operation for the selected elements")
+	self:_add_help_text("This element can modify point_access_camera element. Select elements to modify using insert and clicking on them.")
 end
 
 AccessCameraTriggerUnitElement = AccessCameraTriggerUnitElement or class(MissionElement)
@@ -298,30 +241,10 @@ function AccessCameraTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local trigger_type_params = {
-		name = "Trigger Type:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"accessed",
-			"destroyed",
-			"alarm"
-		},
-		value = self._hed.trigger_type,
-		tooltip = "Select a trigger type for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local trigger_type = CoreEWS.combobox(trigger_type_params)
-	trigger_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = trigger_type,
-		value = "trigger_type"
-	})
-	local help = {}
-	help.text = "This element is a trigger to point_access_camera element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "trigger_type", {
+		"accessed",
+		"destroyed",
+		"alarm"
+	}, "Select a trigger type for the selected elements")
+	self:_add_help_text("This element is a trigger to point_access_camera element.")
 end

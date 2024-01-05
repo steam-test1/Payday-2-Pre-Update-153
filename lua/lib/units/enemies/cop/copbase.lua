@@ -137,6 +137,7 @@ do
 		"ene_gang_mobster_4",
 		"ene_gang_mobster_boss",
 		"ene_guard_national_1",
+		"ene_male_tgt_1",
 		"ene_murkywater_1",
 		"ene_murkywater_2",
 		"ene_prisonguard_female_1",

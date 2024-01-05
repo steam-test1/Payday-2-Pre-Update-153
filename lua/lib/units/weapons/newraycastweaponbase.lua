@@ -385,7 +385,7 @@ function NewRaycastWeaponBase:replenish()
 end
 
 function NewRaycastWeaponBase:update_damage()
-	self._damage = (self._current_stats and self._current_stats.damage or 0) * self:damage_multiplier()
+	self._damage = ((self._current_stats and self._current_stats.damage or 0) + self:damage_addend()) * self:damage_multiplier()
 end
 
 function NewRaycastWeaponBase:calculate_ammo_max_per_clip()
@@ -685,6 +685,12 @@ function NewRaycastWeaponBase:fire_rate_multiplier()
 	local user_unit = self._setup and self._setup.user_unit
 	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
 	return managers.blackmarket:fire_rate_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
+end
+
+function NewRaycastWeaponBase:damage_addend()
+	local user_unit = self._setup and self._setup.user_unit
+	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
+	return managers.blackmarket:damage_addend(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
 end
 
 function NewRaycastWeaponBase:damage_multiplier()

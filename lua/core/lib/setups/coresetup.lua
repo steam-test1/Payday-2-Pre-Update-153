@@ -156,6 +156,10 @@ function CoreSetup:block_quit()
 	return false
 end
 
+function CoreSetup:has_queued_exec()
+	return self.__exec
+end
+
 function CoreSetup:__pre_init()
 	if Application:editor() then
 		managers.global_texture = CoreGTextureManager.GTextureManager:new()

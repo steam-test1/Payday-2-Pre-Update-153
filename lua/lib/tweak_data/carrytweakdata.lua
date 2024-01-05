@@ -248,6 +248,7 @@ function CarryTweakData:get_carry_ids()
 			table.insert(t, id)
 		end
 	end
+	table.sort(t)
 	return t
 end
 

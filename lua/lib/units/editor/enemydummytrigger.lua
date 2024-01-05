@@ -72,35 +72,24 @@ function EnemyDummyTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local event_params = {
-		name = "Event:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"alerted",
-			"death",
-			"fled",
-			"spawn",
-			"panic",
-			"weapons_hot",
-			"tied",
-			"anim_act_01",
-			"anim_act_02",
-			"anim_act_03",
-			"anim_act_04",
-			"anim_act_05",
-			"anim_act_06",
-			"anim_act_07",
-			"anim_act_08",
-			"anim_act_09",
-			"anim_act_10"
-		},
-		value = self._hed.event,
-		tooltip = "Select an event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
+	local options = {
+		"alerted",
+		"death",
+		"fled",
+		"spawn",
+		"panic",
+		"weapons_hot",
+		"tied",
+		"anim_act_01",
+		"anim_act_02",
+		"anim_act_03",
+		"anim_act_04",
+		"anim_act_05",
+		"anim_act_06",
+		"anim_act_07",
+		"anim_act_08",
+		"anim_act_09",
+		"anim_act_10"
 	}
-	local events = CoreEWS.combobox(event_params)
-	events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = events, value = "event"})
+	self:_build_value_combobox(panel, panel_sizer, "event", options)
 end

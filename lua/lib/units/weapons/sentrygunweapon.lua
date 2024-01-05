@@ -72,7 +72,7 @@ end
 function SentryGunWeapon:_setup_contour()
 	if self:out_of_ammo() then
 		self._unit:contour():remove("deployable_active")
-		if self._unit:base():is_owner() or managers.player:has_category_upgrade("sentry_gun", "can_reload") then
+		if managers.player:has_category_upgrade("sentry_gun", "can_reload") then
 			self._unit:contour():add("deployable_disabled")
 		end
 	end

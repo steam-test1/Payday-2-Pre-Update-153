@@ -441,6 +441,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.hlm_game.sort_number = 88
 	self.global_values.hlm_game.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
 	self.global_values.hlm_game.category = "normal"
+	self.global_values.gage_pack_historical = {}
+	self.global_values.gage_pack_historical.name_id = "bm_global_value_gage_pack_historical"
+	self.global_values.gage_pack_historical.desc_id = "menu_l_global_value_gage_pack_historical"
+	self.global_values.gage_pack_historical.unlock_id = "bm_global_value_gage_pack_historical_unlock"
+	self.global_values.gage_pack_historical.color = Color(255, 255, 212, 0) / 255
+	self.global_values.gage_pack_historical.dlc = true
+	self.global_values.gage_pack_historical.chance = 1
+	self.global_values.gage_pack_historical.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "gage_pack_historical")
+	self.global_values.gage_pack_historical.durability_multiplier = 1
+	self.global_values.gage_pack_historical.drops = true
+	self.global_values.gage_pack_historical.track = true
+	self.global_values.gage_pack_historical.sort_number = 89
+	self.global_values.gage_pack_historical.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -451,7 +464,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.legendary.durability_multiplier = 1
 	self.global_values.legendary.drops = false
 	self.global_values.legendary.track = false
-	self.global_values.legendary.sort_number = 50
+	self.global_values.legendary.sort_number = 201
 	self.global_values.legendary.category = nil
 	self.global_values.sweettooth = {}
 	self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -483,7 +496,8 @@ function LootDropTweakData:init(tweak_data)
 		"gage_pack_shotgun",
 		"gage_pack_assault",
 		"hl_miami",
-		"hlm_game"
+		"hlm_game",
+		"gage_pack_historical"
 	}
 	self:_create_global_value_list_map()
 end

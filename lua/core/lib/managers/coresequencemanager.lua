@@ -72,9 +72,14 @@ function SequenceManager:init(area_damage_mask, target_world_mask, beings_mask)
 	self:register_inflict_element_class(InflictFireElement)
 	self._unit_elements = {}
 	self._sequence_file_map = {}
-	self._time_callback_map = CoreLinkedStackMap.LinkedStackMap:new()
+	self._start_time_id_element_map = {}
+	self._last_startup_callback_id = 0
+	self._start_time_callback_list = {}
+	self._last_start_time_callback_id = 0
+	self._current_start_time_callback_index = 0
 	self._retry_callback_list = {}
 	self._retry_callback_indices = {}
+	self._current_retry_callback_index = 0
 	self._callback_map = {}
 	self._last_callback_id = 0
 	self._inflict_updator_damage_type_map = {fire = true}
@@ -344,20 +349,37 @@ function SequenceManager:get_body_param(unit_name, body_name, param_name)
 	end
 end
 
-function SequenceManager:add_time_callback(func, delay, repeat_nr, ...)
-	local time_callback = {}
-	time_callback.func = func
-	time_callback.delay = tonumber(delay) or 0
-	time_callback.time = TimerManager:game():time() + time_callback.delay
-	time_callback.repeat_nr = tonumber(repeat_nr) or 1
-	time_callback.params = {
-		...
-	}
-	return self._time_callback_map:add(time_callback)
+function SequenceManager:_register_start_time_callback(id, element, node)
+	if not self._is_reloading and self._start_time_id_element_map[id] then
+		element:print_error("Element id \"" .. id .. "\" already exists.", false, nil, node)
+	end
+	self._start_time_id_element_map[id] = element
 end
 
-function SequenceManager:remove_time_callback(id)
-	self._time_callback_map:remove(id)
+function SequenceManager:_add_start_time_callback(element_id, env, delay, repeat_nr, sequence_name)
+	self._last_start_time_callback_id = self._last_start_time_callback_id + 1
+	local time_callback = {}
+	time_callback.id = self._last_start_time_callback_id
+	time_callback.element_id = element_id
+	time_callback.env = env
+	time_callback.delay = tonumber(delay) or 0
+	time_callback.start_time = time_callback.delay
+	time_callback.repeat_nr = tonumber(repeat_nr) or 1
+	time_callback.sequence_name = sequence_name
+	table.insert(self._start_time_callback_list, time_callback)
+	return self._last_start_time_callback_id
+end
+
+function SequenceManager:_remove_start_time_callback(id)
+	for index, time_callback in ipairs(self._start_time_callback_list) do
+		if time_callback.id == id then
+			if index <= self._current_start_time_callback_index then
+				self._current_start_time_callback_index = self._current_start_time_callback_index - 1
+			end
+			table.remove(self._start_time_callback_list, index)
+			return
+		end
+	end
 end
 
 function SequenceManager:add_retry_callback(callback_type, func, try_immediately)
@@ -382,45 +404,144 @@ function SequenceManager:add_callback(func)
 end
 
 function SequenceManager:remove_callback(id)
-	self._callback_map[id] = nil
+	self._remove_callback_map = self._remove_callback_map or {}
+	self._remove_callback_map[id] = true
 end
 
-function SequenceManager:update(time, delta_time)
-	local remove_time_callback_list
-	for id, time_callback in self._time_callback_map:bottom_top_iterator() do
-		if time >= time_callback.time then
-			time_callback.func(time_callback.params and unpack(time_callback.params))
-			if time_callback.repeat_nr > 1 then
-				time_callback.time = time + time_callback.delay + (time - time_callback.time)
+function SequenceManager:add_startup_callback(func)
+	self._last_startup_callback_id = self._last_startup_callback_id + 1
+	self._startup_callback_map = self._startup_callback_map or {}
+	self._startup_callback_map[self._last_startup_callback_id] = func
+	return self._last_startup_callback_id
+end
+
+function SequenceManager:remove_startup_callback(id)
+	if self._startup_callback_map then
+		self._startup_callback_map[id] = nil
+	end
+end
+
+function SequenceManager:update(t, dt)
+	self:update_startup_callbacks()
+	self:update_start_time_callbacks(dt)
+	self:update_retry_callbacks()
+	self:update_callbacks(t, dt)
+end
+
+function SequenceManager:update_startup_callbacks()
+	if self._startup_callback_map then
+		local startup_callback_map_copy = self._startup_callback_map
+		self._startup_callback_map = nil
+		for _, func in pairs(startup_callback_map_copy) do
+			func()
+		end
+	end
+end
+
+function SequenceManager:update_start_time_callbacks(dt)
+	self._current_start_time_callback_index = 1
+	local time_callback = self._start_time_callback_list[self._current_start_time_callback_index]
+	while time_callback do
+		time_callback.start_time = time_callback.start_time - dt
+		if time_callback.start_time <= 0 then
+			local is_repeat
+			local env = time_callback.env
+			if env then
+				if time_callback.is_corrupt then
+					Application:error("Failed to load a time callback in SequenceManager. " .. self:get_time_callback_info(time_callback))
+				else
+					is_repeat = 1 < time_callback.repeat_nr
+					if is_repeat and time_callback.params then
+						if not time_callback.env_params_copy then
+							time_callback.env_params_copy = table.map_copy(time_callback.params)
+						elseif time_callback.repeat_nr > 2 then
+							env.params = table.map_copy(time_callback.env_params_copy)
+						else
+							env.params = time_callback.env_params_copy
+						end
+					end
+					if time_callback.sequence_name then
+						if alive(env.dest_unit) then
+							self:run_sequence(time_callback.sequence_name, "trigger", env.src_unit, env.dest_unit, nil, env.dest_normal, env.pos, env.dir, env.damage, env.velocity, env.params)
+						else
+							is_repeat = false
+						end
+					else
+						local element = self._start_time_id_element_map[time_callback.element_id]
+						if not element then
+							Application:error("Different version of the game saved than the one that loaded. " .. self:get_time_callback_info(time_callback))
+							is_repeat = false
+						else
+							element:start_time_callback(time_callback.env)
+						end
+					end
+				end
+			end
+			if is_repeat then
+				time_callback.start_time = time_callback.delay
 				time_callback.repeat_nr = time_callback.repeat_nr - 1
 			else
-				remove_time_callback_list = remove_time_callback_list or {}
-				table.insert(remove_time_callback_list, id)
+				table.remove(self._start_time_callback_list, self._current_start_time_callback_index)
+				self._current_start_time_callback_index = self._current_start_time_callback_index - 1
+			end
+		end
+		self._current_start_time_callback_index = self._current_start_time_callback_index + 1
+		time_callback = self._start_time_callback_list[self._current_start_time_callback_index]
+	end
+	self._current_start_time_callback_index = 0
+end
+
+function SequenceManager:get_time_callback_info(time_callback)
+	if time_callback.element_id then
+		return "Element: " .. tostring(time_callback.element_id) .. ", Unit: " .. tostring(time_callback.env and time_callback.env.dest_unit)
+	else
+		return "Sequence: " .. tostring(time_callback.sequence_name) .. ", Unit: " .. tostring(time_callback.env and time_callback.env.dest_unit)
+	end
+end
+
+function SequenceManager:update_retry_callbacks()
+	if next(self._retry_callback_list) then
+		local remove_retry_callback_map
+		for callback_type, list in pairs(self._retry_callback_list) do
+			if not next(self._retry_callback_list[callback_type]) then
+				remove_retry_callback_map = remove_retry_callback_map or {}
+				table.insert(remove_retry_callback_map, callback_type)
+			else
+				local retry_func = self._retry_callback_list[callback_type][self._retry_callback_indices[callback_type]]
+				if retry_func() then
+					table.remove(self._retry_callback_list[callback_type], self._retry_callback_indices[callback_type])
+					self._retry_callback_indices[callback_type] = self._retry_callback_indices[callback_type] - 1
+				end
+				self._retry_callback_indices[callback_type] = self._retry_callback_indices[callback_type] + 1
+				if self._retry_callback_indices[callback_type] > #self._retry_callback_list[callback_type] then
+					self._retry_callback_indices[callback_type] = 1
+				end
+			end
+		end
+		if remove_retry_callback_map then
+			for _, callback_type in pairs(remove_retry_callback_map) do
+				if not next(self._retry_callback_list[callback_type]) then
+					self._retry_callback_list[callback_type] = nil
+					self._retry_callback_indices[callback_type] = nil
+				end
 			end
 		end
 	end
-	if remove_time_callback_list then
-		for _, id in ipairs(remove_time_callback_list) do
-			self._time_callback_map:remove(id)
-		end
-	end
-	for callback_type, list in pairs(self._retry_callback_list) do
-		if #self._retry_callback_list[callback_type] > 0 then
-			local retry_func = self._retry_callback_list[callback_type][self._retry_callback_indices[callback_type]]
-			if retry_func() then
-				table.remove(self._retry_callback_list[callback_type], self._retry_callback_indices[callback_type])
-				self._retry_callback_indices[callback_type] = self._retry_callback_indices[callback_type] - 1
+end
+
+function SequenceManager:update_callbacks(t, dt)
+	if next(self._callback_map) then
+		if self._remove_callback_map then
+			for id in pairs(self._remove_callback_map) do
+				self._callback_map[id] = nil
 			end
-			self._retry_callback_indices[callback_type] = self._retry_callback_indices[callback_type] + 1
-			if self._retry_callback_indices[callback_type] > #self._retry_callback_list[callback_type] then
-				self._retry_callback_indices[callback_type] = 1
-			end
-		else
-			self._retry_callback_list[callback_type] = nil
+			self._remove_callback_map = nil
 		end
-	end
-	for _, func in pairs(self._callback_map) do
-		func(time, delta_time)
+		for id, func in pairs(self._callback_map) do
+			if not self._remove_callback_map or not self._remove_callback_map[id] then
+				func(t, dt)
+			end
+		end
 	end
 end
 
@@ -434,28 +555,39 @@ end
 
 function SequenceManager:_add_sequences_from_unit_data(unit_data)
 	local unit_name = unit_data:name()
-	if self._sequence_file_map[unit_name:key()] then
+	local unit_name_key = unit_name:key()
+	if self._sequence_file_map[unit_name_key] then
 		return
 	end
 	local seq_manager_filename = unit_data:sequence_manager_filename()
 	if seq_manager_filename then
 		for key, file in pairs(self._sequence_file_map) do
 			if file == seq_manager_filename then
-				self._sequence_file_map[unit_name:key()] = seq_manager_filename
-				self._unit_elements[unit_name:key()] = self._unit_elements[key]
+				self._sequence_file_map[unit_name_key] = seq_manager_filename
+				self._unit_elements[unit_name_key] = self._unit_elements[key]
 				return
 			end
 		end
 		if DB:has(self.SEQUENCE_FILE_EXTENSION, seq_manager_filename) then
-			self._sequence_file_map[unit_name:key()] = seq_manager_filename
+			self._sequence_file_map[unit_name_key] = seq_manager_filename
 			manager_node = self:_serialize_to_script(self.SEQUENCE_FILE_EXTENSION:id(), seq_manager_filename)
-		else
+		elseif Application:production_build() then
 			Application:error("Unit \"" .. unit_name:t() .. "\" refers to the external sequence manager file \"" .. seq_manager_filename:t() .. "." .. self.SEQUENCE_FILE_EXTENSION .. "\", but it doesn't exist.")
+		else
+			Application:error("Unit \"" .. tostring(unit_name) .. "\" refers to the external sequence manager file \"" .. tostring(seq_manager_filename) .. "\", but it doesn't exist.")
 		end
 		if manager_node then
 			for _, data in ipairs(manager_node) do
 				if data._meta == "unit" then
-					self._unit_elements[unit_name:key()] = UnitElement:new(data, unit_name)
+					if self._unit_elements[unit_name_key] then
+						if Application:production_build() then
+							Application:throw_exception("Unit \"" .. unit_name:t() .. "\" has duplicate <unit/>-elements in the external sequence manager file \"" .. seq_manager_filename:t() .. "." .. self.SEQUENCE_FILE_EXTENSION .. "\".")
+						else
+							Application:error("Unit \"" .. tostring(unit_name) .. "\" has duplicate <unit/>-elements in the external sequence manager file \"" .. tostring(seq_manager_filename) .. "\".")
+						end
+					else
+						self._unit_elements[unit_name_key] = UnitElement:new(data, unit_name)
+					end
 				end
 			end
 		end
@@ -480,8 +612,12 @@ function SequenceManager:reload(unit_name, sequences_only)
 		end
 		local unit_data = PackageManager:unit_data(unit_name)
 		local sequence_file = unit_data:sequence_manager_filename()
-		PackageManager:reload(self.SEQUENCE_FILE_EXTENSION:id(), sequence_file)
+		if sequence_file then
+			PackageManager:reload(self.SEQUENCE_FILE_EXTENSION:id(), sequence_file)
+		end
+		self._is_reloading = true
 		self:_add_sequences_from_unit_data(unit_data)
+		self._is_reloading = nil
 	end
 end
 
@@ -498,6 +634,7 @@ function SequenceManager:clear()
 	self:internal_load()
 	self._unit_elements = {}
 	self._sequence_file_map = {}
+	self._start_time_id_element_map = {}
 end
 
 function SequenceManager:remove(unit_name)
@@ -597,12 +734,34 @@ function SequenceManager:save(data)
 	end
 	if changed then
 		state.unit_element_map = unit_element_map
+	end
+	if self._last_start_time_callback_id ~= 0 then
+		state.last_start_time_callback_id = self._last_start_time_callback_id
+		changed = true
+	end
+	if next(self._start_time_callback_list) then
+		local start_time_callback_list = self:safe_save_map(self._start_time_callback_list)
+		for index = #start_time_callback_list, 1, -1 do
+			local time_callback = start_time_callback_list[index]
+			if not time_callback.env.dest_unit then
+				table.remove(start_time_callback_list, index)
+			end
+		end
+		if next(start_time_callback_list) then
+			state.start_time_callback_list = start_time_callback_list
+			changed = true
+		end
+	end
+	if changed then
 		data.CoreSequenceManager = state
 	end
 end
 
 function SequenceManager:load(data)
 	local state = data.CoreSequenceManager
+	SequenceEnvironment.g_save_data = {}
+	self._start_time_callback_list = {}
+	self._last_start_time_callback_id = 0
 	if state then
 		if state.unit_element_map then
 			for unit_name, _ in pairs(state.unit_element_map) do
@@ -613,6 +772,14 @@ function SequenceManager:load(data)
 			end
 		end
 		self:load_global_save_data(state)
+		if state.last_start_time_callback_id then
+			self._last_start_time_callback_id = state.last_start_time_callback_id
+		end
+		if state.start_time_callback_list then
+			for _, time_callback in ipairs(state.start_time_callback_list) do
+				table.insert(self._start_time_callback_list, self:safe_load_map(time_callback))
+			end
+		end
 	end
 end
 
@@ -631,9 +798,125 @@ function SequenceManager:load_global_save_data(data)
 	local state = data.SequenceEnvironment
 	if state then
 		SequenceEnvironment.g_save_data = table.map_copy(state.g_save_data)
-		return true
+	end
+end
+
+function SequenceManager:safe_save_map(map)
+	return self:_safe_save_map(map, {})
+end
+
+function SequenceManager:_safe_save_map(map, visited_map)
+	local state = {}
+	if visited_map[map] then
+		return visited_map[map]
+	end
+	visited_map[map] = state
+	for key, value in pairs(map) do
+		local value_type = type(value)
+		if value_type == "userdata" then
+			local type_name = CoreClass.type_name(value)
+			if type_name == "Unit" then
+				if alive(value) then
+					local id = value:editor_id()
+					if 0 < id then
+						value = {id = id, __is_unit = true}
+					else
+						value = nil
+					end
+				else
+					value = nil
+				end
+			elseif type_name ~= "Vector3" and type_name ~= "Rotation" and type_name ~= "Idstring" then
+				value = nil
+			end
+		elseif value_type == "table" then
+			local is_sequence_env = getmetatable(value) == SequenceEnvironment
+			value = self:_safe_save_map(value, visited_map)
+			if is_sequence_env then
+				value.__is_sequence_env = true
+			end
+		end
+		state[key] = value
+	end
+	return state
+end
+
+function SequenceManager:safe_load_map(data_map)
+	data_map = table.deep_map_copy(data_map)
+	local wait_unit_load_map = {}
+	local done_callback_func = callback(self, self, "_safe_load_map_done", data_map)
+	data_map.is_corrupt = true
+	self:_safe_load_map(data_map, wait_unit_load_map, done_callback_func, {})
+	if not next(wait_unit_load_map) then
+		done_callback_func()
+	end
+	return data_map
+end
+
+function SequenceManager:_safe_load_map_done(data_map)
+	local env = data_map.env
+	if env and type(env) == "table" and env.__is_sequence_env then
+		if alive(env.dest_unit) then
+			local unit_name = env.dest_unit:name()
+			local unit_element = self._unit_elements[unit_name:key()]
+			if unit_element then
+				data_map.env = SequenceEnvironment:new(env.damage_type, env.src_unit, env.dest_unit, env.dest_body, env.dest_normal, env.pos, env.dir, env.damage, env.velocity, env.params, unit_element, env.dest_unit:damage())
+				data_map.is_corrupt = nil
+			else
+				data_map.env = nil
+				Application:stack_dump_error("Unit \"" .. tostring(unit_name) .. "\" doesn't exists.\n")
+				return false
+			end
+		else
+			data_map.env = nil
+			return false
+		end
 	else
-		return false
+		data_map.is_corrupt = nil
+	end
+end
+
+function SequenceManager:_safe_load_map(state, wait_unit_load_map, done_callback_func, visited_map)
+	if visited_map[state] then
+		return
+	end
+	visited_map[state] = true
+	for key, value in pairs(state) do
+		if type(value) == "table" then
+			if value.__is_unit then
+				local id = value.id
+				local data = {
+					id = id,
+					state = state,
+					key = key,
+					wait_unit_load_map = wait_unit_load_map,
+					done_callback_func = done_callback_func
+				}
+				wait_unit_load_map[id] = (wait_unit_load_map[id] or 0) + 1
+				local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "_on_load_unit_done_callback", data))
+				if unit ~= nil then
+					state[key] = unit
+					self:_count_down_wait_unit_load_map(wait_unit_load_map, id)
+				end
+			else
+				self:_safe_load_map(value, wait_unit_load_map, done_callback_func, visited_map)
+			end
+		end
+	end
+end
+
+function SequenceManager:_on_load_unit_done_callback(data, unit)
+	data.state[data.key] = unit
+	self:_count_down_wait_unit_load_map(data.wait_unit_load_map, data.id)
+	if not next(data.wait_unit_load_map) then
+		data.done_callback_func()
+	end
+end
+
+function SequenceManager:_count_down_wait_unit_load_map(wait_unit_load_map, id)
+	wait_unit_load_map[id] = wait_unit_load_map[id] - 1
+	if wait_unit_load_map[id] <= 0 then
+		wait_unit_load_map[id] = nil
 	end
 end
 
@@ -891,6 +1174,7 @@ SequenceEnvironment.rand = math.random
 SequenceEnvironment.abs = math.abs
 SequenceEnvironment.string = string
 SequenceEnvironment.stack_dump = Application.stack_dump
+SequenceEnvironment.Idstring = Idstring
 
 function SequenceEnvironment:init(endurance_type, source_unit, dest_unit, dest_body, dest_normal, position, direction, damage, velocity, params, unit_element, damage_ext)
 	self.damage_type = endurance_type
@@ -905,7 +1189,6 @@ function SequenceEnvironment:init(endurance_type, source_unit, dest_unit, dest_b
 	self.params = params or {}
 	self.__run_params = CoreTable.clone(self.params)
 	self.dest_unit = dest_unit
-	self.Idstring = Idstring
 	local ext = damage_ext or dest_unit:damage()
 	if ext then
 		self.vars = ext._variables
@@ -1304,6 +1587,8 @@ end
 BaseElement = BaseElement or class()
 BaseElement.BASE_ATTRIBUTE_MAP = BaseElement.BASE_ATTRIBUTE_MAP or {
 	start_time = true,
+	start_time_element_id = true,
+	start_time_id_var = true,
 	repeat_nr = true,
 	filter = true,
 	delayed_filter = true
@@ -1323,7 +1608,16 @@ function BaseElement:init(node, unit_element)
 			end
 		end
 		self._start_time = self:get("start_time")
-		self._start_time_var = self:get("start_time_id_var")
+		if not unit_element then
+			self._start_time = nil
+			self:print_error("Unable to use \"start_time\"-attribute because the unit_element is missing.", true, nil, node)
+		end
+		if self._start_time then
+			self._start_time_element_id = self:get("start_time_element_id")
+			self._start_time_element_id = self._start_time_element_id and self:run_parsed_func(SequenceEnvironment, self._start_time_element_id)
+			self._start_time_element_id = unit_element:_register_start_time_callback(self._start_time_element_id, self, node)
+		end
+		self._start_time_id_var = self:get("start_time_id_var")
 		self._repeat_nr = self:get("repeat_nr")
 		__filter_name = self:get("filter")
 		__delayed_filter_name = self:get("delayed_filter")
@@ -1428,19 +1722,8 @@ function BaseElement:activate(env)
 		local start_time = self:run_parsed_func(env, self._start_time) or 0
 		local repeat_nr = self:run_parsed_func(env, self._repeat_nr) or 1
 		if 0 < start_time then
-			local params = env.params
-			local start_time_id_var = self:run_parsed_func(env, self._start_time_var)
-			
-			local function func()
-				if self:delayed_filter_callback(env) and alive(env.dest_unit) then
-					env.params = params
-					SequenceEnvironment.self = env
-					SequenceEnvironment.element = self
-					self:activate_callback(env)
-				end
-			end
-			
-			local id = managers.sequence:add_time_callback(func, start_time, repeat_nr)
+			local start_time_id_var = self:run_parsed_func(env, self._start_time_id_var)
+			local id = managers.sequence:_add_start_time_callback(self._start_time_element_id, env, start_time, repeat_nr, nil)
 			if start_time_id_var then
 				env.vars[start_time_id_var] = id
 			end
@@ -1455,6 +1738,14 @@ function BaseElement:activate(env)
 				end
 			end
 		end
+	end
+end
+
+function BaseElement:start_time_callback(env)
+	if alive(env.dest_unit) and self:delayed_filter_callback(env) then
+		SequenceEnvironment.self = env
+		SequenceEnvironment.element = self
+		self:activate_callback(env)
 	end
 end
 
@@ -1501,7 +1792,7 @@ end
 
 function BaseElement:check_invalid_node(node, valid_node_list)
 	if self:is_valid_xml_node(node) then
-		local unit_name = self._unit_element and self._unit_element._name or self._name or "[None]"
+		local unit_name = self._unit_element and self._unit_element:get_name() or self._name or "[None]"
 		Application:error("\"" .. tostring(node:name()) .. "\" elements for unit \"" .. tostring(unit_name) .. "\" are not supported in the \"" .. tostring(self._element_name or "<nil>") .. "\" elements, only the following are allowed: " .. SequenceManager:get_keys_as_string(valid_node_list, "[None]", true, 0 < #valid_node_list) .. " " .. self:get_xml_origin())
 	end
 end
@@ -1559,9 +1850,9 @@ function BaseElement:get_model_xml_file()
 end
 
 function BaseElement:get_xml_element_string(node)
-	local name = node and node:name() or self._element_name
+	local name = node and type(node.name) == "function" and node:name() or self._element_name
 	local str = "<" .. tostring(name)
-	local paramaters = node and (node.parameter_map and node:parameter_map() or node:parameters()) or self._parameters
+	local paramaters = node and (type(node.parameter_map) == "function" and node:parameter_map() or type(node.parameters) == "function" and node:parameters()) or self._parameters
 	for k, v in pairs(paramaters) do
 		str = str .. " " .. k .. "=\"" .. tostring(v) .. "\""
 	end
@@ -1701,6 +1992,15 @@ function UnitElement:init(node, name, is_global)
 			end
 		end
 	end
+end
+
+function UnitElement:_register_start_time_callback(id, element, node)
+	if id == nil then
+		self._last_created_start_time_element_id = (self._last_created_start_time_element_id or 0) + 1
+		id = (self._unit_element and self._unit_element:get_name():key() or "[None]") .. "_" .. self._last_created_start_time_element_id
+	end
+	managers.sequence:_register_start_time_callback(id, element, node)
+	return id
 end
 
 function UnitElement:get_startup_sequence_map(unit, damage_ext)
@@ -2097,6 +2397,7 @@ function SequenceElement:init(node, unit_element)
 end
 
 function SequenceElement:activate_callback(env)
+	managers.sequence:update_startup_callbacks()
 	local damage_ext = env.dest_unit:damage()
 	if not damage_ext._runned_sequences or not damage_ext._runned_sequences[self._name] then
 		if self:run_parsed_func(env, self._activate_once) then
@@ -2104,7 +2405,7 @@ function SequenceElement:activate_callback(env)
 			damage_ext._runned_sequences[self._name] = true
 		end
 		if Global.category_print.sequence then
-			cat_print("sequence", string.format("[SequenceManager] Run sequence: %s, Unit: %s, Id: %s, Key: %s", tostring(self._name), tostring(env.dest_unit:name()), tostring(env.dest_unit:editor_id()), tostring(env.dest_unit:key())))
+			cat_print("sequence", string.format("[SequenceManager] Run sequence: %s, Type: %s, Unit: %s, Id: %s, Key: %s", tostring(self._name), tostring(env.damage_type), tostring(env.dest_unit:name()), tostring(env.dest_unit:editor_id()), tostring(env.dest_unit:key())))
 		end
 		managers.mission:runned_unit_sequence(env.dest_unit, self._name, env.params)
 		for _, element in ipairs(self._elements) do
@@ -3392,7 +3693,7 @@ function DecalMeshElement:activate_callback(env)
 			if self._material then
 				local material = self:run_parsed_func(env, self._material)
 				if material then
-					decal_surface:set_mesh_material(name, material)
+					decal_surface:set_mesh_material(Idstring(name), Idstring(material))
 					if self.SAVE_STATE then
 						self:set_cat_state2(env.dest_unit, name, "set_mesh_material", material)
 					end
@@ -3408,6 +3709,9 @@ function DecalMeshElement.load(unit, data)
 	local decal_surface = unit:decal_surface()
 	for name, cat_data in pairs(data) do
 		for func_name, value in pairs(cat_data) do
+			if type(value) == "string" then
+				value = Idstring(value)
+			end
 			decal_surface[func_name](decal_surface, Idstring(name), value)
 		end
 	end
@@ -4176,7 +4480,7 @@ end
 function RemoveStartTimeElement:activate_callback(env)
 	local id = self:run_parsed_func(env, self._id)
 	if id then
-		managers.sequence:remove_time_callback(id)
+		managers.sequence:_remove_start_time_callback(id)
 	end
 end
 
@@ -4655,16 +4959,14 @@ SetVariableElement = SetVariableElement or class(SetGlobalVariableElement)
 SetVariableElement.NAME = "set_variable"
 
 function SetVariableElement:set_variable(env, name, value)
-	env.vars[name] = value
-	env.dest_unit:damage():set_variable(name, value)
+	env.vars = env.dest_unit:damage():set_variable(name, value)
 end
 
 SetVariablesElement = SetVariablesElement or class(SetGlobalVariablesElement)
 SetVariablesElement.NAME = "set_variables"
 
 function SetVariablesElement:set_variable(env, name, value)
-	env.vars[name] = value
-	env.dest_unit:damage():set_variable(name, value)
+	env.vars = env.dest_unit:damage():set_variable(name, value)
 end
 
 SetWaterElement = SetWaterElement or class(BaseElement)
@@ -5190,5 +5492,19 @@ end
 
 function TriggerElement:activate_callback(env)
 	local name = self:run_parsed_func(env, self._name)
-	env.dest_unit:damage():activate_trigger(name, env)
+	local trigger_data_list = env.dest_unit:damage():get_trigger_data_list(name)
+	if trigger_data_list then
+		for _, trigger_data in ipairs(trigger_data_list) do
+			if trigger_data.params then
+				for k, v in pairs(trigger_data.params) do
+					env.params[k] = v
+				end
+			end
+			local damage_ext = trigger_data.notify_unit:damage()
+			if damage_ext then
+				env = SequenceEnvironment:new(env.damage_type, env.dest_unit, trigger_data.notify_unit, nil, env.dest_normal, env.pos, env.dir, env.damage, env.velocity, env.params, damage_ext:get_unit_element(), damage_ext)
+				managers.sequence:_add_start_time_callback(nil, env, trigger_data.time, trigger_data.repeat_nr, trigger_data.notify_unit_sequence)
+			end
+		end
+	end
 end

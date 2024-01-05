@@ -216,6 +216,9 @@ function StatsTabItem:set_stats(stats_data)
 					reward_text:set_color(tweak_data.screen_colors.important_1)
 					reward_text:set_alpha(1)
 					reward_text:set_x(title_stat:x())
+					if reward_text:right() > new_stat_panel:w() then
+						reward_text:set_right(new_stat_panel:w())
+					end
 				else
 					reward_text:set_alpha(0)
 				end

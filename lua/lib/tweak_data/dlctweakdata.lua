@@ -15,8 +15,9 @@ function DLCTweakData:init(tweak_data)
 		gage_pack_shotgun = true,
 		gage_pack_assault = true,
 		hl_miami = true,
-		season_pass = false,
-		animal = false
+		gage_pack_historical = true,
+		season_pass = true,
+		animal = true
 	}
 	self.starter_kit = {}
 	self.starter_kit.free = true
@@ -1946,4 +1947,216 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.ach_eagle_1 = {}
+	self.ach_eagle_1.dlc = "has_achievement"
+	self.ach_eagle_1.achievement_id = "eagle_1"
+	self.ach_eagle_1.content = {}
+	self.ach_eagle_1.content.loot_global_value = "gage_pack_historical"
+	self.ach_eagle_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "de_gaulle",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "gunsmoke",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "dazzle",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_b_sniper",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_b_standard",
+			amount = 1
+		}
+	}
+	self.ach_eagle_2 = {}
+	self.ach_eagle_2.dlc = "has_achievement"
+	self.ach_eagle_2.achievement_id = "eagle_2"
+	self.ach_eagle_2.content = {}
+	self.ach_eagle_2.content.loot_global_value = "gage_pack_historical"
+	self.ach_eagle_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "red_hurricane",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "redsun",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "deathdealer",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_b_e11",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_c96_nozzle",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_c96_sight",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_m_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_s_folded",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_s_nostock",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_s_solid",
+			amount = 1
+		}
+	}
+	self.ach_eagle_3 = {}
+	self.ach_eagle_3.dlc = "has_achievement"
+	self.ach_eagle_3.achievement_id = "eagle_3"
+	self.ach_eagle_3.content = {}
+	self.ach_eagle_3.content.loot_global_value = "gage_pack_historical"
+	self.ach_eagle_3.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_body_black",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_c96_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_m_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sterling_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_lmg_mg42_b_vg38",
+			amount = 1
+		}
+	}
+	self.ach_eagle_4 = {}
+	self.ach_eagle_4.dlc = "has_achievement"
+	self.ach_eagle_4.achievement_id = "eagle_4"
+	self.ach_eagle_4.content = {}
+	self.ach_eagle_4.content.loot_global_value = "gage_pack_historical"
+	self.ach_eagle_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "churchill",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "armygreen",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "filthythirteen",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_c96_m_extended",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_c96_s_solid",
+			amount = 1
+		}
+	}
+	self.ach_eagle_5 = {}
+	self.ach_eagle_5.dlc = "has_achievement"
+	self.ach_eagle_5.achievement_id = "eagle_5"
+	self.ach_eagle_5.content = {}
+	self.ach_eagle_5.content.loot_global_value = "gage_pack_historical"
+	self.ach_eagle_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "patton",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "patriot",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "captainwar",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_lmg_mg42_b_mg34",
+			amount = 1
+		}
+	}
+	self.gage_pack_historical = {}
+	self.gage_pack_historical.dlc = "has_gage_pack_historical"
+	self.gage_pack_historical.content = {}
+	self.gage_pack_historical.content.loot_global_value = "gage_pack_historical"
+	self.gage_pack_historical.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_ns_bayonet",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_mosin_iron_sight",
+			amount = 1
+		}
+	}
+	self.gage_pack_historical.content.upgrades = {"swagger"}
 end

@@ -67,23 +67,10 @@ function CoreOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {"add", "remove"},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local help = {}
-	help.text = "Choose an operation to perform on the selected elements. An element might not have the selected operation implemented and will then generate error when executed."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"add",
+		"remove"
+	}, "Select an operation for the selected elements")
+	self:_add_help_text("Choose an operation to perform on the selected elements. An element might not have the selected operation implemented and will then generate error when executed.")
 end

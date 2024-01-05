@@ -157,6 +157,10 @@ function WeaponFactoryTweakData:init()
 	self:_init_x_deagle()
 	self:_init_g26()
 	self:_init_spas12()
+	self:_init_mg42()
+	self:_init_c96()
+	self:_init_sterling()
+	self:_init_mosin()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -716,6 +720,12 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_sho_spas12 = {
 				translation = Vector3(-0.2, 0, -3.9)
+			},
+			wpn_fps_smg_sterling = {
+				translation = Vector3(0, -14, -3.7)
+			},
+			wpn_fps_snp_mosin = {
+				translation = Vector3(0, -28, -4.3)
 			}
 		},
 		forbids = {
@@ -969,6 +979,10 @@ function WeaponFactoryTweakData:_init_sights()
 			wpn_fps_snp_r93 = {
 				translation = Vector3(-2.4, 8, -13.8),
 				rotation = Rotation(0, 0, -45)
+			},
+			wpn_fps_snp_mosin = {
+				translation = Vector3(-2.44, -5, -12.4),
+				rotation = Rotation(0, 0, -45)
 			}
 		}
 	}
@@ -988,6 +1002,9 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_snp_r93 = {
 				translation = Vector3(0, -28, -4.52)
+			},
+			wpn_fps_snp_mosin = {
+				translation = Vector3(0, -51, -5.02)
 			}
 		},
 		texture_bundle_folder = "gage_pack_snp",
@@ -1021,6 +1038,9 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_snp_r93 = {
 				translation = Vector3(0, -30, -4.63)
+			},
+			wpn_fps_snp_mosin = {
+				translation = Vector3(-0.005, -47, -5.14)
 			}
 		},
 		texture_bundle_folder = "gage_pack_snp",
@@ -1312,6 +1332,12 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_sho_spas12 = {
 				translation = Vector3(-0.2, 5, -3.9)
+			},
+			wpn_fps_smg_sterling = {
+				translation = Vector3(0, -14, -3.7)
+			},
+			wpn_fps_snp_mosin = {
+				translation = Vector3(0, -28, -4.3)
 			}
 		},
 		forbids = {
@@ -1876,6 +1902,9 @@ function WeaponFactoryTweakData:_init_content_jobs()
 			},
 			wpn_fps_pis_g22c = {
 				translation = Vector3(0, 0, -0.45)
+			},
+			wpn_fps_pis_c96 = {
+				translation = Vector3(0, 0, -1.2)
 			}
 		},
 		dlc = "gage_pack_jobs",
@@ -12164,7 +12193,11 @@ function WeaponFactoryTweakData:_init_galil()
 		texture_bundle_folder = "big_bank",
 		dlc = "big_bank",
 		is_a_unlockable = true,
-		animations = {reload = "reload"}
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
 	}
 	self.parts.wpn_fps_ass_galil_fg_fab = {
 		pcs = {},
@@ -14153,6 +14186,7 @@ function WeaponFactoryTweakData:_init_g26()
 			concealment = -2,
 			damage = -1
 		},
+		perks = {"silencer"},
 		sound_switch = {
 			suppressed = "suppressed_b"
 		},
@@ -14919,4 +14953,1031 @@ function WeaponFactoryTweakData:_init_spas12()
 	}
 	self.wpn_fps_sho_spas12_npc = deep_clone(self.wpn_fps_sho_spas12)
 	self.wpn_fps_sho_spas12_npc.unit = "units/pd2_crimefest_2014/oct26/weapons/wpn_fps_sho_spas12/wpn_fps_sho_spas12_npc"
+end
+
+function WeaponFactoryTweakData:_init_mg42()
+	self.parts.wpn_fps_lmg_mg42_b_mg42 = {
+		type = "barrel",
+		name_id = "bm_wp_mg42_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_b_mg42",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_mg42_b_mg34 = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_mg42_b_mg34",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_b_mg34",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = 2,
+			spread = 2,
+			damage = -1
+		},
+		override = {
+			wpn_fps_lmg_mg42_n42 = {
+				unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n34",
+				third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n34"
+			}
+		}
+	}
+	self.parts.wpn_fps_lmg_mg42_b_vg38 = {
+		pcs = {},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_mg42_b_vg38",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_b_vg38",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 4,
+			spread = 1,
+			suppression = 12,
+			alert_size = 12,
+			damage = 0,
+			recoil = 1,
+			spread = -1,
+			spread_moving = 0,
+			concealment = 0
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_d"
+		},
+		forbids = {
+			"wpn_fps_upg_ns_ass_smg_large",
+			"wpn_fps_upg_ns_ass_smg_medium",
+			"wpn_fps_upg_ns_ass_smg_small",
+			"wpn_fps_upg_ns_ass_smg_firepig",
+			"wpn_fps_upg_ns_ass_smg_stubby",
+			"wpn_fps_upg_ns_ass_smg_tank",
+			"wpn_fps_upg_ass_ns_jprifles",
+			"wpn_fps_upg_ass_ns_linear",
+			"wpn_fps_upg_ass_ns_surefire"
+		},
+		override = {
+			wpn_fps_lmg_mg42_n42 = {
+				unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n38",
+				third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_n38"
+			}
+		}
+	}
+	self.parts.wpn_fps_lmg_mg42_reciever = {
+		type = "lower_reciever",
+		name_id = "bm_wp_mg42_b_long",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_reciever",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_lmg_mg42_n42 = {
+		type = "barrel_ext",
+		name_id = "bm_wp_mg42_n42",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n42",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_mg42_n34 = {
+		type = "barrel_ext",
+		name_id = "bm_wp_mg42_n42",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n42",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_mg42_n38 = {
+		type = "barrel_ext",
+		name_id = "bm_wp_mg42_n42",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42_pts/wpn_fps_lmg_mg42_n38",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_mg42_b_mg42.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_b_mg42"
+	self.parts.wpn_fps_lmg_mg42_b_mg34.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_b_mg34"
+	self.parts.wpn_fps_lmg_mg42_b_vg38.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_b_vg38"
+	self.parts.wpn_fps_lmg_mg42_reciever.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_reciever"
+	self.parts.wpn_fps_lmg_mg42_n42.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_nozzle_42"
+	self.parts.wpn_fps_lmg_mg42_n34.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_nozzle_34"
+	self.parts.wpn_fps_lmg_mg42_n38.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_lmg_mg42_pts/wpn_third_lmg_mg42_n38"
+	self.wpn_fps_lmg_mg42 = {}
+	self.wpn_fps_lmg_mg42.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42/wpn_fps_lmg_mg42"
+	self.wpn_fps_lmg_mg42.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_lmg_mg42.adds = {}
+	self.wpn_fps_lmg_mg42.default_blueprint = {
+		"wpn_fps_lmg_mg42_b_mg42",
+		"wpn_fps_lmg_mg42_n42",
+		"wpn_fps_lmg_mg42_reciever"
+	}
+	self.wpn_fps_lmg_mg42.uses_parts = {
+		"wpn_fps_lmg_mg42_b_mg42",
+		"wpn_fps_lmg_mg42_b_mg34",
+		"wpn_fps_lmg_mg42_b_vg38",
+		"wpn_fps_lmg_mg42_reciever",
+		"wpn_fps_lmg_mg42_n42",
+		"wpn_fps_lmg_mg42_n34",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser"
+	}
+	self.wpn_fps_lmg_mg42_npc = deep_clone(self.wpn_fps_lmg_mg42)
+	self.wpn_fps_lmg_mg42_npc.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_lmg_mg42/wpn_fps_lmg_mg42_npc"
+end
+
+function WeaponFactoryTweakData:_init_c96()
+	self.parts.wpn_fps_pis_c96_b_long = {
+		pcs = {},
+		type = "slide",
+		name_id = "bm_wp_c96_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_b_long",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = 1,
+			spread = 3,
+			damage = -3,
+			concealment = -3
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_nozzle = {
+		pcs = {},
+		type = "barrel_ext",
+		name_id = "bm_wp_c96_nozzle",
+		a_obj = "a_co",
+		parent = "slide",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_nozzle",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = 2,
+			spread = -1,
+			damage = 2,
+			concealment = -1
+		},
+		sound_switch = {
+			suppressed = "suppressed_d"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_sight = {
+		pcs = {},
+		type = "sight",
+		name_id = "bm_wp_c96_sight",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_sight",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			zoom = 7,
+			concealment = -2
+		},
+		perks = {"scope"},
+		stance_mod = {
+			wpn_fps_pis_c96 = {
+				translation = Vector3(-3.41, -12, 0.93)
+			}
+		},
+		texture_switch = {
+			material = "gfx_reddot1",
+			channel = "diffuse_texture"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_rail = {
+		type = "extra",
+		name_id = "bm_wp_c96_b_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_rail",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_c96_b_standard = {
+		type = "slide",
+		name_id = "bm_wp_c96_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_b_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_c96_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_c96_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_c96_g_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_c96_m_extended = {
+		pcs = {},
+		type = "magazine",
+		name_id = "bm_wp_c96_m_extended",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_m_extended",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			concealment = -2,
+			extra_ammo = 5
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_c96_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_pis_c96_s_solid = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_c96_s_solid",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_s_solid",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = 4,
+			concealment = -3
+		}
+	}
+	self.parts.wpn_fps_pis_c96_b_long.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_b_long"
+	self.parts.wpn_fps_pis_c96_b_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_b_standard"
+	self.parts.wpn_fps_pis_c96_body_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_body_standard"
+	self.parts.wpn_fps_pis_c96_g_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_g_standard"
+	self.parts.wpn_fps_pis_c96_m_extended.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_m_extended"
+	self.parts.wpn_fps_pis_c96_m_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_m_standard"
+	self.parts.wpn_fps_pis_c96_s_solid.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_s_solid"
+	self.parts.wpn_fps_pis_c96_nozzle.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_nozzle"
+	self.parts.wpn_fps_pis_c96_sight.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_sight"
+	self.parts.wpn_fps_pis_c96_rail.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_pis_c96_pts/wpn_third_pis_c96_rail"
+	self.wpn_fps_pis_c96 = {}
+	self.wpn_fps_pis_c96.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96/wpn_fps_pis_c96"
+	self.wpn_fps_pis_c96.animations = {
+		fire = "recoil",
+		fire_steelsight = "recoil",
+		reload = "reload"
+	}
+	self.wpn_fps_pis_c96.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight"
+	}
+	self.wpn_fps_pis_c96.adds = {
+		wpn_fps_upg_fl_pis_laser = {
+			"wpn_fps_pis_c96_rail"
+		},
+		wpn_fps_upg_fl_pis_tlr1 = {
+			"wpn_fps_pis_c96_rail"
+		},
+		wpn_fps_upg_fl_pis_crimson = {
+			"wpn_fps_pis_c96_rail"
+		},
+		wpn_fps_upg_fl_pis_x400v = {
+			"wpn_fps_pis_c96_rail"
+		},
+		wpn_fps_pis_c96_sight = {
+			"wpn_fps_pis_c96_rail"
+		}
+	}
+	self.wpn_fps_pis_c96.override = {
+		wpn_fps_upg_o_rmr = {parent = "slide"}
+	}
+	self.wpn_fps_pis_c96.default_blueprint = {
+		"wpn_fps_pis_c96_b_standard",
+		"wpn_fps_pis_c96_body_standard",
+		"wpn_fps_pis_c96_g_standard",
+		"wpn_fps_pis_c96_m_standard"
+	}
+	self.wpn_fps_pis_c96.uses_parts = {
+		"wpn_fps_pis_c96_b_long",
+		"wpn_fps_pis_c96_b_standard",
+		"wpn_fps_pis_c96_body_standard",
+		"wpn_fps_pis_c96_g_standard",
+		"wpn_fps_pis_c96_m_extended",
+		"wpn_fps_pis_c96_m_standard",
+		"wpn_fps_pis_c96_s_solid",
+		"wpn_fps_pis_c96_nozzle",
+		"wpn_fps_pis_c96_sight",
+		"wpn_fps_upg_fl_pis_laser",
+		"wpn_fps_upg_fl_pis_tlr1",
+		"wpn_fps_upg_ns_pis_large",
+		"wpn_fps_upg_ns_pis_medium",
+		"wpn_fps_upg_ns_pis_small",
+		"wpn_fps_upg_ns_pis_large_kac",
+		"wpn_fps_upg_ns_pis_medium_gem",
+		"wpn_fps_upg_o_rmr",
+		"wpn_fps_upg_ns_pis_medium_slim",
+		"wpn_fps_upg_pis_ns_flash",
+		"wpn_fps_upg_fl_pis_crimson",
+		"wpn_fps_upg_fl_pis_x400v"
+	}
+	self.wpn_fps_pis_c96_npc = deep_clone(self.wpn_fps_pis_c96)
+	self.wpn_fps_pis_c96_npc.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96/wpn_fps_pis_c96_npc"
+end
+
+function WeaponFactoryTweakData:_init_sterling()
+	self.parts.wpn_fps_smg_sterling_b_long = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_sterling_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_b_long",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = -1,
+			spread = 1,
+			damage = 1,
+			concealment = -2
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_b_short = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_sterling_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_b_short",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 1,
+			damage = 2,
+			concealment = 1
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_sterling_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_b_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_b_suppressed = {
+		pcs = {},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_sterling_b_suppressed",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_b_suppressed",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 4,
+			spread = 1,
+			suppression = 12,
+			alert_size = 12,
+			damage = 0,
+			recoil = 1,
+			spread = -1,
+			spread_moving = 0,
+			concealment = -2
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_c"
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		forbids = {
+			"wpn_fps_upg_ns_ass_smg_large",
+			"wpn_fps_upg_ns_ass_smg_medium",
+			"wpn_fps_upg_ns_ass_smg_small",
+			"wpn_fps_upg_ns_ass_smg_firepig",
+			"wpn_fps_upg_ns_ass_smg_stubby",
+			"wpn_fps_upg_ns_ass_smg_tank",
+			"wpn_fps_upg_ass_ns_jprifles",
+			"wpn_fps_upg_ass_ns_linear",
+			"wpn_fps_upg_ass_ns_surefire"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_b_e11 = {
+		pcs = {},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_sterling_b_e11",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_b_e11",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 4,
+			spread = 1,
+			suppression = 12,
+			alert_size = 12,
+			damage = 0,
+			recoil = 1,
+			spread = -1,
+			spread_moving = 0,
+			concealment = -1
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_d"
+		},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		forbids = {
+			"wpn_fps_upg_ns_ass_smg_large",
+			"wpn_fps_upg_ns_ass_smg_medium",
+			"wpn_fps_upg_ns_ass_smg_small",
+			"wpn_fps_upg_ns_ass_smg_firepig",
+			"wpn_fps_upg_ns_ass_smg_stubby",
+			"wpn_fps_upg_ns_ass_smg_tank",
+			"wpn_fps_upg_ass_ns_jprifles",
+			"wpn_fps_upg_ass_ns_linear",
+			"wpn_fps_upg_ass_ns_surefire"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_mg42_b_long",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_sterling_m_long = {
+		pcs = {},
+		type = "magazine",
+		name_id = "bm_wp_sterling_m_long",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_m_long",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			extra_ammo = 5,
+			concealment = -2
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_m_medium = {
+		type = "magazine",
+		name_id = "bm_wp_mg42_m_medium",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_m_medium",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_m_short = {
+		pcs = {},
+		type = "magazine",
+		name_id = "bm_wp_sterling_m_short",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_m_short",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			extra_ammo = -5,
+			concealment = 2
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_s_folded = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_sterling_s_folded",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_s_folded",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = -2,
+			concealment = 2
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_s_nostock = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_sterling_s_nostock",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_s_nostock",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = -2,
+			concealment = 4
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_s_solid = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_sterling_s_solid",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_s_solid",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			spread = 1,
+			recoil = 2,
+			concealment = -2
+		}
+	}
+	self.parts.wpn_fps_smg_sterling_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_mg42_b_long",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_sterling_o_adapter = {
+		type = "extra",
+		name_id = "bm_wp_mg42_b_long",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling_pts/wpn_fps_smg_sterling_o_adapter",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_sterling_b_long.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_b_long"
+	self.parts.wpn_fps_smg_sterling_b_short.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_b_short"
+	self.parts.wpn_fps_smg_sterling_b_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_b_standard"
+	self.parts.wpn_fps_smg_sterling_b_suppressed.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_b_suppressed"
+	self.parts.wpn_fps_smg_sterling_b_e11.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_b_e11"
+	self.parts.wpn_fps_smg_sterling_body_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_body_standard"
+	self.parts.wpn_fps_smg_sterling_m_long.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_m_long"
+	self.parts.wpn_fps_smg_sterling_m_medium.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_m_medium"
+	self.parts.wpn_fps_smg_sterling_m_short.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_m_short"
+	self.parts.wpn_fps_smg_sterling_s_folded.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_s_folded"
+	self.parts.wpn_fps_smg_sterling_s_nostock.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_s_nostock"
+	self.parts.wpn_fps_smg_sterling_s_solid.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_s_solid"
+	self.parts.wpn_fps_smg_sterling_s_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_s_standard"
+	self.parts.wpn_fps_smg_sterling_o_adapter.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_smg_sterling_pts/wpn_third_smg_sterling_o_adapter"
+	self.wpn_fps_smg_sterling = {}
+	self.wpn_fps_smg_sterling.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling/wpn_fps_smg_sterling"
+	self.wpn_fps_smg_sterling.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_smg_sterling.adds = {
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_smg_sterling_o_adapter"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_smg_sterling_o_adapter"
+		}
+	}
+	self.wpn_fps_smg_sterling.default_blueprint = {
+		"wpn_fps_smg_sterling_b_standard",
+		"wpn_fps_smg_sterling_body_standard",
+		"wpn_fps_smg_sterling_m_medium",
+		"wpn_fps_smg_sterling_s_standard"
+	}
+	self.wpn_fps_smg_sterling.uses_parts = {
+		"wpn_fps_smg_sterling_b_long",
+		"wpn_fps_smg_sterling_b_short",
+		"wpn_fps_smg_sterling_b_standard",
+		"wpn_fps_smg_sterling_b_suppressed",
+		"wpn_fps_smg_sterling_b_e11",
+		"wpn_fps_smg_sterling_body_standard",
+		"wpn_fps_smg_sterling_m_long",
+		"wpn_fps_smg_sterling_m_medium",
+		"wpn_fps_smg_sterling_m_short",
+		"wpn_fps_smg_sterling_s_folded",
+		"wpn_fps_smg_sterling_s_nostock",
+		"wpn_fps_smg_sterling_s_solid",
+		"wpn_fps_smg_sterling_s_standard",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser"
+	}
+	self.wpn_fps_smg_sterling_npc = deep_clone(self.wpn_fps_smg_sterling)
+	self.wpn_fps_smg_sterling_npc.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_smg_sterling/wpn_fps_smg_sterling_npc"
+end
+
+function WeaponFactoryTweakData:_init_mosin()
+	self.parts.wpn_fps_snp_mosin_b_medium = {
+		type = "barrel",
+		name_id = "bm_wp_mosin_b_medium",
+		texture_bundle_folder = "gage_pack_historical",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_medium",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_snp_mosin_b_standard = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_mosin_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_standard",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			spread = 0,
+			recoil = 2,
+			concealment = -2
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_b_short = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_mosin_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_short",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 0,
+			concealment = 3
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_b_sniper = {
+		pcs = {},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_mosin_b_sniper",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_sniper",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 6,
+			suppression = 12,
+			alert_size = 12,
+			damage = -4,
+			recoil = 1,
+			spread = -1,
+			spread_moving = -1,
+			concealment = -2
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_d"
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_body_standard = {
+		type = "stock",
+		name_id = "bm_wp_mosin_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_body_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_body_black = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_mosin_body_conceal",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_body_black",
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		stats = {
+			value = 1,
+			recoil = -1,
+			concealment = 3
+		},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		override = {
+			wpn_fps_snp_mosin_b_medium = {
+				unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_medium_black",
+				third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_medium_black"
+			},
+			wpn_fps_snp_mosin_b_standard = {
+				unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_standard_black",
+				third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_standard_black"
+			},
+			wpn_fps_snp_mosin_b_short = {
+				unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_b_short_black",
+				third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_short_black"
+			}
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_m14_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_ns_bayonet = {
+		pcs = {},
+		type = "bayonet",
+		name_id = "bm_wp_mosin_ns_bayonet",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_ns_bayonet",
+		stats = {
+			value = 1,
+			concealment = -2,
+			min_damage = 4,
+			max_damage = 4,
+			min_damage_effect = 1.75,
+			max_damage_effect = 1.75
+		},
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true
+	}
+	self.parts.wpn_fps_snp_mosin_rail = {
+		type = "extra",
+		name_id = "bm_wp_m14_m_standard",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_rail",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_snp_mosin_iron_sight = {
+		pcs = {},
+		type = "sight",
+		name_id = "bm_wp_mosin_iron_sight",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin_pts/wpn_fps_snp_mosin_iron_sight",
+		stats = {
+			value = 0,
+			zoom = 3,
+			recoil = -1,
+			concealment = 2
+		},
+		dlc = "gage_pack_historical",
+		texture_bundle_folder = "gage_pack_historical",
+		is_a_unlockable = true,
+		forbids = {
+			"wpn_fps_upg_o_45iron",
+			"wpn_fps_snp_mosin_rail"
+		}
+	}
+	self.parts.wpn_fps_snp_mosin_b_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_standard"
+	self.parts.wpn_fps_snp_mosin_b_medium.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_medium"
+	self.parts.wpn_fps_snp_mosin_b_short.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_short"
+	self.parts.wpn_fps_snp_mosin_b_sniper.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_b_sniper"
+	self.parts.wpn_fps_snp_mosin_body_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_body_standard"
+	self.parts.wpn_fps_snp_mosin_body_black.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_body_standard_black"
+	self.parts.wpn_fps_snp_mosin_m_standard.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_m_standard"
+	self.parts.wpn_fps_snp_mosin_ns_bayonet.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_ns_bayonet"
+	self.parts.wpn_fps_snp_mosin_rail.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_snp_mosin_pts/wpn_third_snp_mosin_rail"
+	self.wpn_fps_snp_mosin = {}
+	self.wpn_fps_snp_mosin.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin/wpn_fps_snp_mosin"
+	self.wpn_fps_snp_mosin.optional_types = {
+		"gadget",
+		"sight",
+		"bayonet"
+	}
+	self.wpn_fps_snp_mosin.adds = {
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_snp_mosin_rail"
+		},
+		wpn_fps_upg_o_shortdot = {
+			"wpn_fps_snp_mosin_rail"
+		}
+	}
+	self.wpn_fps_snp_mosin.default_blueprint = {
+		"wpn_fps_snp_mosin_b_medium",
+		"wpn_fps_snp_mosin_body_standard",
+		"wpn_fps_snp_mosin_m_standard",
+		"wpn_fps_upg_o_shortdot"
+	}
+	self.wpn_fps_snp_mosin.uses_parts = {
+		"wpn_fps_snp_mosin_b_standard",
+		"wpn_fps_snp_mosin_b_medium",
+		"wpn_fps_snp_mosin_b_short",
+		"wpn_fps_snp_mosin_b_sniper",
+		"wpn_fps_snp_mosin_iron_sight",
+		"wpn_fps_snp_mosin_body_black",
+		"wpn_fps_snp_mosin_body_standard",
+		"wpn_fps_snp_mosin_m_standard",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_o_shortdot",
+		"wpn_fps_upg_o_leupold",
+		"wpn_fps_upg_o_45iron",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_snp_mosin_ns_bayonet"
+	}
+	self.wpn_fps_snp_mosin_npc = deep_clone(self.wpn_fps_snp_mosin)
+	self.wpn_fps_snp_mosin_npc.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_snp_mosin/wpn_fps_snp_mosin_npc"
 end

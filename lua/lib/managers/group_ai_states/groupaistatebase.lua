@@ -2039,6 +2039,7 @@ function GroupAIStateBase:save(save_data)
 		my_save_data.hostage_headcount = self._hostage_headcount
 	end
 	my_save_data.teams = self._teams
+	my_save_data.endscreen_variant = self._endscreen_variant
 end
 
 function GroupAIStateBase:load(load_data)
@@ -2060,6 +2061,7 @@ function GroupAIStateBase:load(load_data)
 		managers.enemy:set_corpse_disposal_enabled(true)
 	end
 	self._teams = my_load_data.teams
+	self._endscreen_variant = my_load_data.endscreen_variant
 	self:_call_listeners("team_def")
 end
 
@@ -3396,7 +3398,7 @@ function GroupAIStateBase.get_nav_seg_id_from_area(area)
 		end
 	end
 	debug_pause("[GroupAIStateBase:get_nav_seg_id_from_area] area\n", inspect(area))
-	return table.random_map_key(area.nav_segs)
+	return table.random_key(area.nav_segs)
 end
 
 function GroupAIStateBase:is_area_safe(area)

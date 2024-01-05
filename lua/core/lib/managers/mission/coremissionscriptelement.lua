@@ -91,9 +91,17 @@ function MissionScriptElement:on_executed(instigator, alternative, skip_execute_
 	end
 end
 
+function MissionScriptElement:_calc_base_delay()
+	if not self._values.base_delay_rand then
+		return self._values.base_delay
+	end
+	return self._values.base_delay + math.rand(self._values.base_delay_rand)
+end
+
 function MissionScriptElement:_trigger_execute_on_executed(instigator, alternative)
-	if self._values.base_delay > 0 then
-		self._mission_script:add(callback(self, self, "_execute_on_executed", {instigator = instigator, alternative = alternative}), self._values.base_delay, 1)
+	local base_delay = self:_calc_base_delay()
+	if 0 < base_delay then
+		self._mission_script:add(callback(self, self, "_execute_on_executed", {instigator = instigator, alternative = alternative}), base_delay, 1)
 	else
 		self:execute_on_executed({instigator = instigator, alternative = alternative})
 	end
@@ -126,16 +134,24 @@ function MissionScriptElement:_execute_on_executed(params)
 	self:execute_on_executed(params)
 end
 
+function MissionScriptElement:_calc_element_delay(params)
+	if not params.delay_rand then
+		return params.delay
+	end
+	return params.delay + math.rand(params.delay_rand)
+end
+
 function MissionScriptElement:execute_on_executed(execute_params)
 	for _, params in ipairs(self._values.on_executed) do
 		if not (execute_params.alternative and params.alternative) or execute_params.alternative == params.alternative then
 			local element = self:get_mission_element(params.id)
 			if element then
-				if params.delay > 0 then
+				local delay = self:_calc_element_delay(params)
+				if 0 < delay then
 					if self:is_debug() or element:is_debug() then
-						self._mission_script:debug_output("  Executing element '" .. element:editor_name() .. "' in " .. params.delay .. " seconds ...", Color(1, 0.75, 0.75, 0.75))
+						self._mission_script:debug_output("  Executing element '" .. element:editor_name() .. "' in " .. delay .. " seconds ...", Color(1, 0.75, 0.75, 0.75))
 					end
-					self._mission_script:add(callback(element, element, "on_executed", execute_params.instigator), params.delay, 1)
+					self._mission_script:add(callback(element, element, "on_executed", execute_params.instigator), delay, 1)
 				else
 					if self:is_debug() or element:is_debug() then
 						self._mission_script:debug_output("  Executing element '" .. element:editor_name() .. "' ...", Color(1, 0.75, 0.75, 0.75))

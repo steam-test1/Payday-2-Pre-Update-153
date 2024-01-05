@@ -1345,7 +1345,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		x = 0,
 		y = -full_16_9.convert_y,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 1001,
+		layer = tweak_data.gui.CRIMENET_CHAT_LAYER + 1,
 		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
@@ -1356,7 +1356,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		x = self._fullscreen_root_panel:w() - full_16_9.convert_x,
 		y = 0,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 1001,
+		layer = tweak_data.gui.CRIMENET_CHAT_LAYER + 1,
 		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
@@ -1367,7 +1367,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		x = 0,
 		y = self._fullscreen_root_panel:h() - full_16_9.convert_y,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 1001,
+		layer = tweak_data.gui.CRIMENET_CHAT_LAYER + 1,
 		rotation = 360
 	})
 	self._fullscreen_panel:bitmap({
@@ -1378,7 +1378,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		x = -full_16_9.convert_x,
 		y = 0,
 		render_template = "VertexColorTexturedBlur3D",
-		layer = 1001,
+		layer = tweak_data.gui.CRIMENET_CHAT_LAYER + 1,
 		rotation = 360
 	})
 	self._panel:rect({

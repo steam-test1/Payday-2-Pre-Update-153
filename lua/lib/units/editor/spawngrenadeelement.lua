@@ -51,42 +51,7 @@ function SpawnGrenadeUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local options = {}
-	for grenade_name, _ in pairs(tweak_data.blackmarket.grenades) do
-		table.insert(options, grenade_name)
-	end
-	local grenade_type_params = {
-		name = "Grenade:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = options,
-		value = self._hed.grenade_type,
-		tooltip = "Select what type of grenade will be spawned.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local grenade_type = CoreEws.combobox(grenade_type_params)
-	grenade_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = grenade_type,
-		value = "grenade_type"
-	})
-	local strength_params = {
-		name = "Strength:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.strength,
-		floats = 1,
-		tooltip = "Use this to add a strength to a physic push on the spawned grenade",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local strength = CoreEWS.number_controller(strength_params)
-	strength:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = strength, value = "strength"})
-	strength:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = strength, value = "strength "})
-	local help = {}
-	help.text = "Spawns a grenade."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "grenade_type", table.map_keys(tweak_data.blackmarket.grenades), "Select what type of grenade will be spawned.")
+	self:_build_value_number(panel, panel_sizer, "strength", {floats = 1}, "Use this to add a strength to a physic push on the spawned grenade")
+	self:_add_help_text("Spawns a grenade.")
 end

@@ -295,6 +295,10 @@ function GenericDLCManager:has_humble_pack2()
 	return Global.dlc_manager.all_dlc_data.humble_pack2 and Global.dlc_manager.all_dlc_data.humble_pack2.verified
 end
 
+function GenericDLCManager:has_gage_pack_historical()
+	return Global.dlc_manager.all_dlc_data.gage_pack_historical and Global.dlc_manager.all_dlc_data.gage_pack_historical.verified
+end
+
 function GenericDLCManager:has_achievement(data)
 	local achievement = managers.achievment and data and data.achievement_id and managers.achievment:get_info(data.achievement_id)
 	return achievement and achievement.awarded or false
@@ -563,6 +567,7 @@ function WINDLCManager:init()
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			humble_pack2 = {app_id = "331040", no_install = true},
+			gage_pack_historical = {app_id = "331900", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			}

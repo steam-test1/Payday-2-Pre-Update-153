@@ -206,13 +206,15 @@ function SkillTreeTweakData:init()
 		icon_xy = {0, 9},
 		[1] = {
 			upgrades = {
-				"pistol_reload_speed_multiplier"
+				"pistol_reload_speed_multiplier",
+				"akimbo_reload_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"pistol_damage_multiplier"
+				"akimbo_damage_addend",
+				"pistol_damage_addend"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -260,7 +262,8 @@ function SkillTreeTweakData:init()
 		icon_xy = {7, 7},
 		[1] = {
 			upgrades = {
-				"team_pistol_recoil_multiplier"
+				"team_pistol_recoil_multiplier",
+				"team_akimbo_recoil_multiplier"
 			},
 			cost = self.costs.default
 		},
@@ -431,13 +434,16 @@ function SkillTreeTweakData:init()
 		[1] = {
 			upgrades = {
 				"pistol_spread_multiplier",
-				"pistol_swap_speed_multiplier"
+				"pistol_swap_speed_multiplier",
+				"akimbo_spread_multiplier",
+				"akimbo_swap_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"pistol_fire_rate_multiplier"
+				"pistol_fire_rate_multiplier",
+				"akimbo_fire_rate_multiplier"
 			},
 			cost = self.costs.pro
 		}
@@ -602,6 +608,7 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
+				"player_pick_up_ammo_multiplier",
 				"player_pick_up_ammo_multiplier_2"
 			},
 			cost = self.costs.hightierpro
@@ -2267,6 +2274,7 @@ function SkillTreeTweakData:init()
 			desc_id = "menu_st_spec_3_desc",
 			{
 				upgrades = {
+					"player_tier_armor_multiplier_1",
 					"player_tier_armor_multiplier_2"
 				},
 				cost = 200,
@@ -2343,6 +2351,7 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
+					"player_tier_armor_multiplier_5",
 					"player_tier_armor_multiplier_6",
 					"team_passive_armor_regen_time_multiplier",
 					"player_passive_loot_drop_multiplier"

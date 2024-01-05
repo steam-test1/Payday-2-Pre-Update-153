@@ -152,5 +152,9 @@ ElementInstanceSetParams = ElementInstanceSetParams or class(CoreMissionScriptEl
 
 function ElementInstanceSetParams:init(...)
 	ElementInstanceOutputEvent.super.init(self, ...)
-	managers.world_instance:set_instance_params(self._values.instance, self._values.params)
+	if self._values.instance then
+		managers.world_instance:set_instance_params(self._values.instance, self._values.params)
+	elseif Application:editor() then
+		managers.editor:output_error("[ElementInstanceSetParams:init()] No instance defined in [" .. self._editor_name .. "]")
+	end
 end

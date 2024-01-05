@@ -45,6 +45,7 @@ function MissionEndState:at_enter(old_state, params)
 	if player then
 		player:camera():remove_sound_listener()
 		player:camera():play_redirect(Idstring("idle"))
+		player:character_damage():disable_berserker()
 	end
 	managers.dialog:quit_dialog()
 	Application:debug("1 second to managers.mission:pre_destroy()")
@@ -143,21 +144,13 @@ function MissionEndState:at_enter(old_state, params)
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
 				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 				mask_pass = not achievement_data.mask or managers.blackmarket:equipped_mask().mask_id == achievement_data.mask
-				job_pass = not achievement_data.job or managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
+				job_pass = not achievement_data.job or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
+				jobs_pass = not achievement_data.jobs or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
 				full_job_pass = not achievement_data.full_job_id or managers.job:has_active_job()
 				full_jobs_pass = not achievement_data.full_jobs_id or managers.job:has_active_job()
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
 				no_shots_pass = not achievement_data.no_shots or managers.statistics:session_total_shots(achievement_data.no_shots) == 0
 				stealth_pass = not achievement_data.stealth or managers.groupai and managers.groupai:state():whisper_mode()
-				jobs_pass = not achievement_data.jobs or false
-				if achievement_data.jobs and managers.job:on_last_stage() then
-					for _, job_id in ipairs(achievement_data.jobs) do
-						if managers.job:current_real_job_id() == job_id then
-							jobs_pass = true
-							break
-						end
-					end
-				end
 				equipped_pass = not achievement_data.equipped or false
 				if achievement_data.equipped then
 					for category, data in pairs(achievement_data.equipped) do
@@ -227,8 +220,8 @@ function MissionEndState:at_enter(old_state, params)
 			level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 			masks_pass = not not achievement_data.masks
 			level_pass = not achievement_data.level_id or achievement_data.level_id == level_id
-			job_pass = not achievement_data.job or not managers.statistics:is_dropin() and managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
-			jobs_pass = not achievement_data.jobs or not managers.statistics:is_dropin() and managers.job:on_last_stage() and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
+			job_pass = not achievement_data.job or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
+			jobs_pass = not achievement_data.jobs or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
 			difficulty_pass = not achievement_data.difficulty or Global.game_settings.difficulty == achievement_data.difficulty
 			difficulties_pass = not achievement_data.difficulties or table.contains(achievement_data.difficulties, Global.game_settings.difficulty)
 			all_pass = masks_pass and level_pass and job_pass and jobs_pass and difficulty_pass and difficulties_pass

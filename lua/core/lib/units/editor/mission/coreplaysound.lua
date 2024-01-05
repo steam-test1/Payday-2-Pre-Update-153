@@ -90,10 +90,10 @@ function CorePlaySoundUnitElement:stop_test_element()
 	end
 end
 
-function CorePlaySoundUnitElement:set_category()
-	local value = self._paths_params.value
-	CoreEWS.update_combobox_options(self._sound_params, managers.sound_environment:scene_events(value))
-	CoreEWS.change_combobox_value(self._sound_params, managers.sound_environment:scene_events(value)[1])
+function CorePlaySoundUnitElement:set_category(params)
+	local value = params.value
+	CoreEws.update_combobox_options(self._sound_params, managers.sound_environment:scene_events(value))
+	CoreEws.change_combobox_value(self._sound_params, managers.sound_environment:scene_events(value)[1])
 	self._hed.sound_event = self._sound_params.value
 	self:_add_soundbank()
 end
@@ -103,66 +103,39 @@ function CorePlaySoundUnitElement:_add_soundbank()
 	managers.sound_environment:add_soundbank(managers.sound_environment:scene_soundbank(self._hed.sound_event))
 end
 
+function CorePlaySoundUnitElement:set_element_data(params, ...)
+	CorePlaySoundUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "sound_event" then
+		self:_add_soundbank()
+	end
+end
+
 function CorePlaySoundUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
 	local paths = managers.sound_environment:scene_paths()
 	if #paths <= 0 then
-		local help = {}
+		local help = {panel = panel, sizer = panel_sizer}
 		help.text = "No scene sounds available in project!"
-		help.panel = panel
-		help.sizer = panel_sizer
 		self:add_help_text(help)
 		return
 	end
 	self._hed.sound_event = self._hed.sound_event or managers.sound_environment:scene_events(paths[1])[1]
 	self:_add_soundbank()
 	local path_value = managers.sound_environment:scene_path(self._hed.sound_event)
-	self._paths_params = {
+	local _, _ = CoreEws.combobox_and_list({
 		name = "Category:",
 		panel = panel,
 		sizer = panel_sizer,
 		options = paths,
 		value = path_value,
-		tooltip = "Select a category from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local paths = CoreEWS.combobox(self._paths_params)
-	paths:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_category"), nil)
-	self._sound_params = {
-		name = "Event:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = managers.sound_environment:scene_events(self._paths_params.value),
-		value = self._hed.sound_event,
-		tooltip = "Select a sound event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local sound_events = CoreEWS.combobox(self._sound_params)
-	sound_events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = sound_events,
-		value = "sound_event"
+		value_changed_cb = callback(self, self, "set_category")
 	})
-	sound_events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_add_soundbank"), nil)
-	local prefix = EWS:CheckBox(panel, "Append unit prefix", "")
-	prefix:set_value(self._hed.append_prefix)
-	prefix:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = prefix,
-		value = "append_prefix"
-	})
-	panel_sizer:add(prefix, 0, 0, "EXPAND")
-	local use_instigator = EWS:CheckBox(panel, "Play on instigator", "")
-	use_instigator:set_value(self._hed.use_instigator)
-	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_instigator,
-		value = "use_instigator"
-	})
-	panel_sizer:add(use_instigator, 0, 0, "EXPAND")
+	local _, sound_params = self:_build_value_combobox(panel, panel_sizer, "sound_event", managers.sound_environment:scene_events(path_value), "Select a sound event")
+	self._sound_params = sound_params
+	self:_build_value_checkbox(panel, panel_sizer, "append_prefix", "Append unit prefix")
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator", "Play on instigator")
 end
 
 function CorePlaySoundUnitElement:add_to_mission_package()

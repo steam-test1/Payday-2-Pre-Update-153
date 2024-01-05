@@ -3044,6 +3044,7 @@ function BlackMarketGui:_get_skill_stats(name, category, slot, base_stats, mods_
 				local blueprint = crafted_weapon and crafted_weapon.blueprint
 				if stat.name == "damage" then
 					multiplier = managers.blackmarket:damage_multiplier(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint)
+					modifier = math.floor(managers.blackmarket:damage_addend(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint) * tweak_data.gui.stats_present_multiplier * multiplier)
 				elseif stat.name == "spread" then
 					local fire_mode = single_mod and "single" or auto_mod and "auto" or weapon_tweak.FIRE_MODE or "single"
 					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, fire_mode, blueprint)
@@ -4484,12 +4485,13 @@ function BlackMarketGui:update_info_text()
 		local perks = part_id and tweak_data.weapon.factory.parts[part_id].perks
 		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget" or perks and table.contains(perks, "gadget")
 		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo" or perks and table.contains(perks, "ammo")
-		if is_gadget or is_ammo then
+		local is_bayonet = part_id and tweak_data.weapon.factory.parts[part_id].type == "bayonet" or perks and table.contains(perks, "bayonet")
+		if is_gadget or is_ammo or is_bayonet then
 			local crafted = managers.blackmarket:get_crafted_category_slot(prev_data.category, prev_data.slot)
 			updated_texts[4].text = managers.weapon_factory:get_part_desc_by_part_id_from_weapon(part_id, crafted.factory_id, crafted.blueprint)
 		end
 		if slot_data.global_value and slot_data.global_value ~= "normal" then
-			if is_gadget or is_ammo then
+			if is_gadget or is_ammo or is_bayonet then
 				updated_texts[4].text = updated_texts[4].text .. [[
 
 ##]] .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"

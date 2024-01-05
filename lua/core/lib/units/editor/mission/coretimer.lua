@@ -164,33 +164,15 @@ function CoreTimerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local timer_params = {
-		name = "Timer:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.timer,
-		floats = 1,
-		tooltip = "Specifies how long time (in seconds) to wait before execute",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local timer = CoreEWS.number_controller(timer_params)
-	timer:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = timer, value = "timer"})
-	timer:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = timer, value = "timer"})
-	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	self._btn_toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	self._btn_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
-	self._btn_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
-	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
-	self._btn_toolbar:realize()
-	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
-	local help = {}
-	help.text = "Creates a timer element. When the timer runs out, execute will be run. The timer element can be operated on using the logic_timer_operator"
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_number(panel, panel_sizer, "timer", {floats = 1, min = 0}, "Specifies how long time (in seconds) to wait before execute")
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
+	toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	toolbar:realize()
+	panel_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	self:_add_help_text("Creates a timer element. When the timer runs out, execute will be run. The timer element can be operated on using the logic_timer_operator")
 end
 
 CoreTimerOperatorUnitElement = CoreTimerOperatorUnitElement or class(MissionElement)
@@ -258,47 +240,17 @@ function CoreTimerOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"pause",
-			"start",
-			"add_time",
-			"subtract_time",
-			"reset",
-			"set_time"
-		},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local time_params = {
-		name = "Time:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.time,
-		floats = 1,
-		tooltip = "Amount of time to add, subtract or set to the timers.",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local time = CoreEWS.number_controller(time_params)
-	time:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = time, value = "time"})
-	time:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = time, value = "time"})
-	local help = {}
-	help.text = "This element can modify logic_timer element. Select timers to modify using insert and clicking on the elements."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"pause",
+		"start",
+		"add_time",
+		"subtract_time",
+		"reset",
+		"set_time"
+	}, "Select an operation for the selected elements")
+	self:_build_value_number(panel, panel_sizer, "time", {floats = 1, min = 0}, "Amount of time to add, subtract or set to the timers.")
+	self:_add_help_text("This element can modify logic_timer element. Select timers to modify using insert and clicking on the elements.")
 end
 
 CoreTimerTriggerUnitElement = CoreTimerTriggerUnitElement or class(MissionElement)
@@ -364,24 +316,6 @@ function CoreTimerTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local time_params = {
-		name = "Time:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.time,
-		floats = 1,
-		tooltip = "Specify how much time should be left on the timer to trigger.",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local time = CoreEWS.number_controller(time_params)
-	time:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = time, value = "time"})
-	time:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = time, value = "time"})
-	local help = {}
-	help.text = "This element is a trigger to logic_timer element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_number(panel, panel_sizer, "time", {floats = 1, min = 0}, "Specify how much time should be left on the timer to trigger.")
+	self:_add_help_text("This element is a trigger to logic_timer element.")
 end

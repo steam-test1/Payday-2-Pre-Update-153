@@ -986,10 +986,11 @@ function SavefileManager:clbk_result_iterate_savegame_slots(task_data, result_da
 	if type_name(result_data) == "table" then
 		for slot, slot_data in pairs(result_data) do
 			print("slot:", slot, "\n", inspect(slot_data))
-			self._save_slots_to_load[slot] = true
 			if slot == self.SETTING_SLOT then
+				self._save_slots_to_load[slot] = true
 				self:load_settings()
 			elseif slot == self.PROGRESS_SLOT then
+				self._save_slots_to_load[slot] = true
 				found_progress_slot = true
 				self:load_progress()
 			end

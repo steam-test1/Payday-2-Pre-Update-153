@@ -639,12 +639,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.pumpkin_king = {}
 	self.masks.pumpkin_king.unit = "units/payday2/masks/msk_pumpkin_king/msk_pumpkin_king"
 	self.masks.pumpkin_king.name_id = "bm_msk_pumpkin_king"
-	self.masks.pumpkin_king.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.masks.pumpkin_king.weight = 1000
 	self.masks.pumpkin_king.got_item_weight_mod = 0.001
 	self.masks.pumpkin_king.global_value = "halloween"
@@ -654,12 +648,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.witch = {}
 	self.masks.witch.unit = "units/payday2/masks/msk_witch/msk_witch"
 	self.masks.witch.name_id = "bm_msk_witch"
-	self.masks.witch.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.masks.witch.weight = 1000
 	self.masks.witch.got_item_weight_mod = 0.001
 	self.masks.witch.global_value = "halloween"
@@ -669,12 +657,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.venomorph = {}
 	self.masks.venomorph.unit = "units/payday2/masks/msk_venomorph/msk_venomorph"
 	self.masks.venomorph.name_id = "bm_msk_venomorph"
-	self.masks.venomorph.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.masks.venomorph.weight = 1000
 	self.masks.venomorph.got_item_weight_mod = 0.001
 	self.masks.venomorph.global_value = "halloween"
@@ -684,12 +666,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.frank = {}
 	self.masks.frank.unit = "units/payday2/masks/msk_frank/msk_frank"
 	self.masks.frank.name_id = "bm_msk_frank"
-	self.masks.frank.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.masks.frank.weight = 1000
 	self.masks.frank.got_item_weight_mod = 0.001
 	self.masks.frank.global_value = "halloween"
@@ -730,12 +706,14 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.the_one_below.pcs = {}
 	self.masks.the_one_below.dlc = "humble_pack2"
 	self.masks.the_one_below.value = 0
+	self.masks.the_one_below.sort_number = 4
 	self.masks.lycan = {}
 	self.masks.lycan.unit = "units/pd2_humble_halloween/masks/lycan/msk_lycan"
 	self.masks.lycan.name_id = "bm_msk_lycanwulf"
 	self.masks.lycan.pcs = {}
 	self.masks.lycan.dlc = "humble_pack2"
 	self.masks.lycan.value = 0
+	self.masks.lycan.sort_number = 4
 	self.masks.heat = {}
 	self.masks.heat.unit = "units/pd2_dlc1/masks/msk_hockey_b/msk_hockey_b"
 	self.masks.heat.name_id = "bm_msk_heat"
@@ -1323,6 +1301,34 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.crazy_lion.dlc = "pd2_clan"
 	self.masks.crazy_lion.value = 0
 	self.masks.crazy_lion.sort_number = 8
+	self.masks.churchill = {}
+	self.masks.churchill.unit = "units/pd2_dlc_gage_historical/masks/churchill/msk_churchill"
+	self.masks.churchill.name_id = "bm_msk_churchill"
+	self.masks.churchill.pcs = {}
+	self.masks.churchill.value = 0
+	self.masks.churchill.dlc = "gage_pack_historical"
+	self.masks.churchill.texture_bundle_folder = "gage_pack_historical"
+	self.masks.red_hurricane = {}
+	self.masks.red_hurricane.unit = "units/pd2_dlc_gage_historical/masks/red_hurricane/msk_red_hurricane"
+	self.masks.red_hurricane.name_id = "bm_msk_red_hurricane"
+	self.masks.red_hurricane.pcs = {}
+	self.masks.red_hurricane.value = 0
+	self.masks.red_hurricane.dlc = "gage_pack_historical"
+	self.masks.red_hurricane.texture_bundle_folder = "gage_pack_historical"
+	self.masks.patton = {}
+	self.masks.patton.unit = "units/pd2_dlc_gage_historical/masks/patton/msk_patton"
+	self.masks.patton.name_id = "bm_msk_patton"
+	self.masks.patton.pcs = {}
+	self.masks.patton.value = 0
+	self.masks.patton.dlc = "gage_pack_historical"
+	self.masks.patton.texture_bundle_folder = "gage_pack_historical"
+	self.masks.de_gaulle = {}
+	self.masks.de_gaulle.unit = "units/pd2_dlc_gage_historical/masks/de_gaulle/msk_de_gaulle"
+	self.masks.de_gaulle.name_id = "bm_msk_de_gaulle"
+	self.masks.de_gaulle.pcs = {}
+	self.masks.de_gaulle.value = 0
+	self.masks.de_gaulle.dlc = "gage_pack_historical"
+	self.masks.de_gaulle.texture_bundle_folder = "gage_pack_historical"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -3228,6 +3234,32 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.neon.texture = "units/pd2_dlc_miami/matcaps/matcap_neon_df"
 	self.materials.neon.value = 0
 	self.materials.neon.dlc = "hlm_game"
+	self.materials.armygreen = {}
+	self.materials.armygreen.name_id = "bm_mtl_armygreen"
+	self.materials.armygreen.pcs = {}
+	self.materials.armygreen.texture = "units/pd2_dlc_gage_historical/materials/matcap_armygreen_df"
+	self.materials.armygreen.material_amount = 0
+	self.materials.armygreen.value = 0
+	self.materials.armygreen.dlc = "gage_pack_historical"
+	self.materials.gunsmoke = {}
+	self.materials.gunsmoke.name_id = "bm_mtl_gunsmoke"
+	self.materials.gunsmoke.pcs = {}
+	self.materials.gunsmoke.texture = "units/pd2_dlc_gage_historical/materials/matcap_gunsmoke_df"
+	self.materials.gunsmoke.value = 0
+	self.materials.gunsmoke.dlc = "gage_pack_historical"
+	self.materials.patriot = {}
+	self.materials.patriot.name_id = "bm_mtl_patriot"
+	self.materials.patriot.pcs = {}
+	self.materials.patriot.texture = "units/pd2_dlc_gage_historical/materials/matcap_patriot_df"
+	self.materials.patriot.material_amount = 0
+	self.materials.patriot.value = 0
+	self.materials.patriot.dlc = "gage_pack_historical"
+	self.materials.redsun = {}
+	self.materials.redsun.name_id = "bm_mtl_redsun"
+	self.materials.redsun.pcs = {}
+	self.materials.redsun.texture = "units/pd2_dlc_gage_historical/materials/matcap_redsun_df"
+	self.materials.redsun.value = 0
+	self.materials.redsun.dlc = "gage_pack_historical"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -4336,72 +4368,36 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.yggdrasil.value = 4
 	self.textures.pumpgrin = {}
 	self.textures.pumpgrin.name_id = "bm_txt_pumpgrin"
-	self.textures.pumpgrin.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.pumpgrin.weight = 3
 	self.textures.pumpgrin.texture = "units/payday2/masks/shared_textures/patterns/pattern_pumpgrin_df"
 	self.textures.pumpgrin.global_value = "halloween"
 	self.textures.pumpgrin.value = 5
 	self.textures.shout = {}
 	self.textures.shout.name_id = "bm_txt_shout"
-	self.textures.shout.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.shout.weight = 3
 	self.textures.shout.texture = "units/payday2/masks/shared_textures/patterns/pattern_shout_df"
 	self.textures.shout.global_value = "halloween"
 	self.textures.shout.value = 5
 	self.textures.webbed = {}
 	self.textures.webbed.name_id = "bm_txt_webbed"
-	self.textures.webbed.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.webbed.weight = 3
 	self.textures.webbed.texture = "units/payday2/masks/shared_textures/patterns/pattern_webbed_df"
 	self.textures.webbed.global_value = "halloween"
 	self.textures.webbed.value = 5
 	self.textures.hannibalistic = {}
 	self.textures.hannibalistic.name_id = "bm_txt_hannibalistic"
-	self.textures.hannibalistic.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.hannibalistic.weight = 3
 	self.textures.hannibalistic.texture = "units/payday2/masks/shared_textures/patterns/pattern_hannibalistic_df"
 	self.textures.hannibalistic.global_value = "halloween"
 	self.textures.hannibalistic.value = 5
 	self.textures.stitches = {}
 	self.textures.stitches.name_id = "bm_txt_stitches"
-	self.textures.stitches.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.stitches.weight = 3
 	self.textures.stitches.texture = "units/payday2/masks/shared_textures/patterns/pattern_stitches_df"
 	self.textures.stitches.global_value = "halloween"
 	self.textures.stitches.value = 4
 	self.textures.doomweaver = {}
 	self.textures.doomweaver.name_id = "bm_txt_doomweaver"
-	self.textures.doomweaver.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
 	self.textures.doomweaver.weight = 3
 	self.textures.doomweaver.texture = "units/payday2/masks/shared_textures/patterns/pattern_doomweaver_df"
 	self.textures.doomweaver.global_value = "halloween"
@@ -4751,6 +4747,30 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.uglyrug.value = 0
 	self.textures.uglyrug.dlc = "hlm_game"
 	self.textures.uglyrug.texture_bundle_folder = "hl_miami"
+	self.textures.captainwar = {}
+	self.textures.captainwar.name_id = "bm_txt_captainwar"
+	self.textures.captainwar.pcs = {}
+	self.textures.captainwar.texture = "units/pd2_dlc_gage_historical/patterns/pattern_captainwar_df"
+	self.textures.captainwar.value = 0
+	self.textures.captainwar.dlc = "gage_pack_historical"
+	self.textures.dazzle = {}
+	self.textures.dazzle.name_id = "bm_txt_dazzle"
+	self.textures.dazzle.pcs = {}
+	self.textures.dazzle.texture = "units/pd2_dlc_gage_historical/patterns/pattern_dazzle_df"
+	self.textures.dazzle.value = 0
+	self.textures.dazzle.dlc = "gage_pack_historical"
+	self.textures.deathdealer = {}
+	self.textures.deathdealer.name_id = "bm_txt_deathdealer"
+	self.textures.deathdealer.pcs = {}
+	self.textures.deathdealer.texture = "units/pd2_dlc_gage_historical/patterns/pattern_deathdealer_df"
+	self.textures.deathdealer.value = 0
+	self.textures.deathdealer.dlc = "gage_pack_historical"
+	self.textures.filthythirteen = {}
+	self.textures.filthythirteen.name_id = "bm_txt_filthythirteen"
+	self.textures.filthythirteen.pcs = {}
+	self.textures.filthythirteen.texture = "units/pd2_dlc_gage_historical/patterns/pattern_filthythirteen_df"
+	self.textures.filthythirteen.value = 0
+	self.textures.filthythirteen.dlc = "gage_pack_historical"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -5581,5 +5601,114 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.chef.sounds.charge = "halloween_charge"
 	self.melee_weapons.chef.repeat_expire_t = 0.36
 	self.melee_weapons.chef.stats.concealment = 28
+	self.melee_weapons.fairbair = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.fairbair.name_id = "bm_melee_fairbair"
+	self.melee_weapons.fairbair.dlc = "gage_pack_historical"
+	self.melee_weapons.fairbair.texture_bundle_folder = "gage_pack_historical"
+	self.melee_weapons.fairbair.free = nil
+	self.melee_weapons.fairbair.anim_global_param = "melee_stab"
+	self.melee_weapons.fairbair.type = "knife"
+	self.melee_weapons.fairbair.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.fairbair.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_fairbair/wpn_fps_mel_fairbair"
+	self.melee_weapons.fairbair.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_fairbair/wpn_third_mel_fairbair"
+	self.melee_weapons.fairbair.stats.weapon_type = "sharp"
+	self.melee_weapons.fairbair.stats.min_damage = 3
+	self.melee_weapons.fairbair.stats.max_damage = 5
+	self.melee_weapons.fairbair.stats.min_damage_effect = 0.2
+	self.melee_weapons.fairbair.stats.max_damage_effect = 1
+	self.melee_weapons.fairbair.stats.charge_time = 2
+	self.melee_weapons.fairbair.stats.range = 175
+	self.melee_weapons.fairbair.sounds = {}
+	self.melee_weapons.fairbair.sounds.equip = "knife_equip"
+	self.melee_weapons.fairbair.sounds.hit_air = "fairbairn_hit_air"
+	self.melee_weapons.fairbair.sounds.hit_gen = "knife_hit_gen"
+	self.melee_weapons.fairbair.sounds.hit_body = "fairbairn_hit_body"
+	self.melee_weapons.fairbair.sounds.charge = "knife_charge"
+	self.melee_weapons.fairbair.repeat_expire_t = 0.3
+	self.melee_weapons.fairbair.stats.concealment = 30
+	self.melee_weapons.freedom = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.freedom.name_id = "bm_melee_freedom"
+	self.melee_weapons.freedom.dlc = "gage_pack_historical"
+	self.melee_weapons.freedom.texture_bundle_folder = "gage_pack_historical"
+	self.melee_weapons.freedom.free = nil
+	self.melee_weapons.freedom.anim_global_param = "melee_freedom"
+	self.melee_weapons.freedom.type = "flag"
+	self.melee_weapons.freedom.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.freedom.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_freedom/wpn_fps_mel_freedom"
+	self.melee_weapons.freedom.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_mel_freedom/wpn_third_mel_freedom"
+	self.melee_weapons.freedom.stats.weapon_type = "sharp"
+	self.melee_weapons.freedom.stats.min_damage = 7
+	self.melee_weapons.freedom.stats.max_damage = 16
+	self.melee_weapons.freedom.stats.min_damage_effect = 1
+	self.melee_weapons.freedom.stats.max_damage_effect = 1
+	self.melee_weapons.freedom.stats.charge_time = 4
+	self.melee_weapons.freedom.stats.range = 275
+	self.melee_weapons.freedom.sounds = {}
+	self.melee_weapons.freedom.sounds.equip = "freedom_equip"
+	self.melee_weapons.freedom.sounds.hit_air = "freedom_hit_air"
+	self.melee_weapons.freedom.sounds.hit_gen = "freedom_hit_gen"
+	self.melee_weapons.freedom.sounds.hit_body = "freedom_hit_body"
+	self.melee_weapons.freedom.sounds.charge = "freedom_charge"
+	self.melee_weapons.freedom.repeat_expire_t = 0.9
+	self.melee_weapons.freedom.expire_t = 1.3
+	self.melee_weapons.freedom.stats.concealment = 18
+	self.melee_weapons.model24 = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.model24.name_id = "bm_melee_model24"
+	self.melee_weapons.model24.dlc = "gage_pack_historical"
+	self.melee_weapons.model24.texture_bundle_folder = "gage_pack_historical"
+	self.melee_weapons.model24.free = nil
+	self.melee_weapons.model24.anim_global_param = "melee_axe"
+	self.melee_weapons.model24.type = "knife"
+	self.melee_weapons.model24.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.model24.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_model24/wpn_fps_mel_model24"
+	self.melee_weapons.model24.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_model24/wpn_third_mel_model24"
+	self.melee_weapons.model24.stats.weapon_type = "sharp"
+	self.melee_weapons.model24.stats.min_damage = 3
+	self.melee_weapons.model24.stats.max_damage = 6.1
+	self.melee_weapons.model24.stats.min_damage_effect = 3.2
+	self.melee_weapons.model24.stats.max_damage_effect = 1.5
+	self.melee_weapons.model24.stats.charge_time = 2
+	self.melee_weapons.model24.stats.range = 185
+	self.melee_weapons.model24.sounds = {}
+	self.melee_weapons.model24.sounds.equip = "grenade_equip"
+	self.melee_weapons.model24.sounds.hit_air = "grenade_hit_air"
+	self.melee_weapons.model24.sounds.hit_gen = "grenade_hit_gen"
+	self.melee_weapons.model24.sounds.hit_body = "grenade_hit_body"
+	self.melee_weapons.model24.sounds.charge = "bat_charge"
+	self.melee_weapons.model24.repeat_expire_t = 0.8
+	self.melee_weapons.model24.stats.concealment = 27
+	self.melee_weapons.swagger = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.swagger.name_id = "bm_melee_swagger"
+	self.melee_weapons.swagger.dlc = "gage_pack_historical"
+	self.melee_weapons.swagger.texture_bundle_folder = "gage_pack_historical"
+	self.melee_weapons.swagger.free = nil
+	self.melee_weapons.swagger.anim_global_param = "melee_axe"
+	self.melee_weapons.swagger.type = "knife"
+	self.melee_weapons.swagger.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.swagger.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_swagger/wpn_fps_mel_swagger"
+	self.melee_weapons.swagger.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_mel_swagger/wpn_third_mel_swagger"
+	self.melee_weapons.swagger.stats.weapon_type = "sharp"
+	self.melee_weapons.swagger.stats.min_damage = 2
+	self.melee_weapons.swagger.stats.max_damage = 3.5
+	self.melee_weapons.swagger.stats.min_damage_effect = 3.8
+	self.melee_weapons.swagger.stats.max_damage_effect = 4
+	self.melee_weapons.swagger.stats.charge_time = 2.2
+	self.melee_weapons.swagger.stats.range = 225
+	self.melee_weapons.swagger.sounds = {}
+	self.melee_weapons.swagger.sounds.equip = "grenade_equip"
+	self.melee_weapons.swagger.sounds.hit_air = "grenade_hit_air"
+	self.melee_weapons.swagger.sounds.hit_gen = "swagger_hit_gen"
+	self.melee_weapons.swagger.sounds.hit_body = "swagger_hit_body"
+	self.melee_weapons.swagger.sounds.charge = "bat_charge"
+	self.melee_weapons.swagger.repeat_expire_t = 0.8
+	self.melee_weapons.swagger.stats.concealment = 27
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

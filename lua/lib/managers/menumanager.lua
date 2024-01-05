@@ -997,6 +997,11 @@ function MenuCallbackHandler:dlc_buy_big_bank_pc()
 	Steam:overlay_activate("store", 306690)
 end
 
+function MenuCallbackHandler:dlc_buy_gage_pack_historical_pc()
+	print("[MenuCallbackHandler:dlc_buy_gage_pack_historical_pc]")
+	Steam:overlay_activate("store", 331900)
+end
+
 function MenuCallbackHandler:dlc_buy_hl_miami_pc()
 	print("[MenuCallbackHandler:dlc_buy_hl_miami_pc]")
 	Steam:overlay_activate("store", 323500)
@@ -1067,6 +1072,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"gage_pack_historical",
 		"hl_miami",
 		"gage_pack_assault",
 		"gage_pack_shotgun",
@@ -1134,6 +1140,10 @@ end
 
 function MenuCallbackHandler:visible_callback_big_bank()
 	return self:is_dlc_latest_locked("big_bank")
+end
+
+function MenuCallbackHandler:visible_callback_gage_pack_historical()
+	return self:is_dlc_latest_locked("gage_pack_historical")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()

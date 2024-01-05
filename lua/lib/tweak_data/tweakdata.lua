@@ -1180,6 +1180,10 @@ function TweakData:init()
 			"wpn_fps_upg_ak_b_draco",
 			"wpn_fps_upg_ak_m_quad",
 			"wpn_fps_upg_ass_ns_linear"
+		},
+		eagle_4 = {
+			"wpn_fps_pis_c96_nozzle",
+			"wpn_fps_pis_c96_sight"
 		}
 	}
 	self.achievement.explosion_achievements = {
@@ -1383,6 +1387,17 @@ function TweakData:init()
 		le_picnic = {
 			stat = "gage5_10_stats",
 			weapon = "famas"
+		},
+		repel_from_rope = {
+			stat = "eagle_1_stats",
+			weapon = "mosin",
+			on_rope = true
+		},
+		bullet_hell = {
+			award = "eagle_5",
+			weapon = "mg42",
+			timer = 10,
+			count = 10
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -1432,7 +1447,13 @@ function TweakData:init()
 				"mobster",
 				"mobster_boss"
 			},
-			job_id = "mia"
+			jobs = {"mia", "mia_prof"}
+		},
+		special_operations = {
+			stat = "eagle_2_stats",
+			melee_id = "fairbair",
+			is_not_civilian = true,
+			is_stealth = true
 		}
 	}
 	self.achievement.complete_heist_achievements = {
@@ -1880,7 +1901,7 @@ function TweakData:init()
 		},
 		animal_fight = {
 			award = "pig_5",
-			jobs = {"mia"},
+			jobs = {"mia", "mia_prof"},
 			difficulties = {
 				"hard",
 				"overkill",
@@ -1913,6 +1934,21 @@ function TweakData:init()
 				"crowgoblin",
 				"evil",
 				"volt"
+			}
+		},
+		wind_of_change = {
+			award = "eagle_3",
+			jobs = {"hox", "hox_prof"},
+			difficulties = {
+				"overkill",
+				"overkill_145",
+				"overkill_290"
+			},
+			masks = {
+				"churchill",
+				"red_hurricane",
+				"patton",
+				"de_gaulle"
 			}
 		}
 	}
@@ -1995,6 +2031,28 @@ function TweakData:init()
 	local pig_5_achievement = {
 		text_id = "bm_wp_pig_5_achievment",
 		award = "pig_5"
+	}
+	local eagle_1_achievement = {
+		text_id = "bm_wp_eagle_1_achievment",
+		stat = "eagle_1_stats",
+		max_progress = 25
+	}
+	local eagle_2_achievement = {
+		text_id = "bm_wp_eagle_2_achievment",
+		stat = "eagle_2_stats",
+		max_progress = 25
+	}
+	local eagle_3_achievement = {
+		text_id = "bm_wp_eagle_3_achievment",
+		award = "eagle_3"
+	}
+	local eagle_4_achievement = {
+		text_id = "bm_wp_eagle_4_achievment",
+		award = "eagle_4"
+	}
+	local eagle_5_achievement = {
+		text_id = "bm_wp_eagle_5_achievment",
+		award = "eagle_5"
 	}
 	self.achievement.mask_tracker = {}
 	self.achievement.weapon_part_tracker = {
@@ -2169,7 +2227,27 @@ function TweakData:init()
 		wpn_fps_smg_uzi_s_standard = pig_5_achievement,
 		wpn_fps_smg_scorpion_b_suppressed = pig_5_achievement,
 		wpn_fps_smg_scorpion_s_nostock = pig_5_achievement,
-		wpn_fps_smg_tec9_b_standard = pig_5_achievement
+		wpn_fps_smg_tec9_b_standard = pig_5_achievement,
+		wpn_fps_snp_mosin_b_sniper = eagle_1_achievement,
+		wpn_fps_snp_mosin_b_standard = eagle_1_achievement,
+		wpn_fps_smg_sterling_b_e11 = eagle_2_achievement,
+		wpn_fps_pis_c96_nozzle = eagle_2_achievement,
+		wpn_fps_pis_c96_sight = eagle_2_achievement,
+		wpn_fps_smg_sterling_b_short = eagle_2_achievement,
+		wpn_fps_smg_sterling_b_suppressed = eagle_2_achievement,
+		wpn_fps_smg_sterling_m_short = eagle_2_achievement,
+		wpn_fps_smg_sterling_s_folded = eagle_2_achievement,
+		wpn_fps_smg_sterling_s_nostock = eagle_2_achievement,
+		wpn_fps_smg_sterling_s_solid = eagle_2_achievement,
+		wpn_fps_snp_mosin_body_black = eagle_3_achievement,
+		wpn_fps_pis_c96_b_long = eagle_3_achievement,
+		wpn_fps_snp_mosin_b_short = eagle_3_achievement,
+		wpn_fps_smg_sterling_m_long = eagle_3_achievement,
+		wpn_fps_smg_sterling_b_long = eagle_3_achievement,
+		wpn_fps_lmg_mg42_b_vg38 = eagle_3_achievement,
+		wpn_fps_pis_c96_m_extended = eagle_4_achievement,
+		wpn_fps_pis_c96_s_solid = eagle_4_achievement,
+		wpn_fps_lmg_mg42_b_mg34 = eagle_5_achievement
 	}
 	self.pickups = {}
 	self.pickups.ammo = {

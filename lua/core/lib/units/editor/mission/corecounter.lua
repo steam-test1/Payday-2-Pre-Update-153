@@ -167,34 +167,15 @@ function CoreCounterUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local counter_target_params = {
-		name = "Counter target:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.counter_target,
-		floats = 0,
-		tooltip = "Specifies how many times the counter should be executed before running its on executed",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local counter_target = CoreEWS.number_controller(counter_target_params)
-	counter_target:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = counter_target,
-		value = "counter_target"
-	})
-	counter_target:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = counter_target,
-		value = "counter_target"
-	})
-	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	self._btn_toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	self._btn_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
-	self._btn_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
-	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
-	self._btn_toolbar:realize()
-	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
+	self:_build_value_number(panel, panel_sizer, "counter_target", {floats = 0, min = 0}, "Specifies how many times the counter should be executed before running its on executed")
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
+	toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	toolbar:realize()
+	panel_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
+	self:_add_help_text("Units with number gui extension can have their value updated from a counter.")
 end
 
 CoreCounterOperatorUnitElement = CoreCounterOperatorUnitElement or class(MissionElement)
@@ -264,45 +245,15 @@ function CoreCounterOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"add",
-			"subtract",
-			"reset",
-			"set"
-		},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local amount_params = {
-		name = "Amount:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.amount,
-		floats = 0,
-		tooltip = "Amount to add, subtract or set to the counters.",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local amount = CoreEWS.number_controller(amount_params)
-	amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	local help = {}
-	help.text = "This element can modify logic_counter element. Select counters to modify using insert and clicking on the elements."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"add",
+		"subtract",
+		"reset",
+		"set"
+	}, "Select an operation for the selected elements")
+	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0, min = 0}, "Amount to add, subtract or set to the counters.")
+	self:_add_help_text("This element can modify logic_counter element. Select counters to modify using insert and clicking on the elements.")
 end
 
 CoreCounterTriggerUnitElement = CoreCounterTriggerUnitElement or class(MissionElement)
@@ -372,48 +323,16 @@ function CoreCounterTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local trigger_type_params = {
-		name = "Trigger Type:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"value",
-			"add",
-			"subtract",
-			"reset",
-			"set"
-		},
-		value = self._hed.trigger_type,
-		tooltip = "Select a trigger type for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local trigger_type = CoreEWS.combobox(trigger_type_params)
-	trigger_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = trigger_type,
-		value = "trigger_type"
-	})
-	local amount_params = {
-		name = "Amount:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.amount,
-		floats = 0,
-		tooltip = "Specify value to trigger on.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local amount = CoreEWS.number_controller(amount_params)
-	amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	local help = {}
-	help.text = "This element is a trigger to logic_counter element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "trigger_type", {
+		"none",
+		"value",
+		"add",
+		"subtract",
+		"reset",
+		"set"
+	}, "Select a trigger type for the selected elements")
+	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0}, "Specify value to trigger on.")
+	self:_add_help_text("This element is a trigger to logic_counter element.")
 end
 
 CoreCounterFilterUnitElement = CoreCounterFilterUnitElement or class(MissionElement)
@@ -485,60 +404,16 @@ function CoreCounterFilterUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local needed_to_execute_params = {
-		name = "Needed to execute:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"all", "any"},
-		value = self._hed.needed_to_execute,
-		tooltip = "Select how many elements are needed to execute",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local needed_to_execute = CoreEWS.combobox(needed_to_execute_params)
-	needed_to_execute:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = needed_to_execute,
-		value = "needed_to_execute"
-	})
-	local value_params = {
-		name = "Value:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.value,
-		floats = 0,
-		tooltip = "Specify value to trigger on.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local value = CoreEWS.number_controller(value_params)
-	value:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = value, value = "value"})
-	value:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = value, value = "value"})
-	local check_type_params = {
-		name = "Check type:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"equal",
-			"less_than",
-			"greater_than",
-			"less_or_equal",
-			"greater_or_equal",
-			"counters_equal",
-			"counters_not_equal"
-		},
-		value = self._hed.check_type,
-		tooltip = "Select which check operation to berform",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local check_type = CoreEWS.combobox(check_type_params)
-	check_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = check_type, value = "check_type"})
-	local help = {}
-	help.text = "This element is a filter to logic_counter element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "needed_to_execute", {"all", "any"}, "Select how many elements are needed to execute")
+	self:_build_value_number(panel, panel_sizer, "value", {floats = 0}, "Specify value to trigger on.")
+	self:_build_value_combobox(panel, panel_sizer, "check_type", {
+		"equal",
+		"less_than",
+		"greater_than",
+		"less_or_equal",
+		"greater_or_equal",
+		"counters_equal",
+		"counters_not_equal"
+	}, "Select which check operation to perform")
+	self:_add_help_text("This element is a filter to logic_counter element.")
 end

@@ -10,26 +10,11 @@ function SpawnDeployableUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local deployable_id_params = {
-		name = "Deployable id:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"doctor_bag",
-			"ammo_bag",
-			"grenade_crate",
-			"bodybags_bag"
-		},
-		value = self._hed.deployable_id,
-		default = "none",
-		tooltip = "Select a deployable_id to be spawned.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local deployable_id = CoreEWS.combobox(deployable_id_params)
-	deployable_id:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = deployable_id,
-		value = "deployable_id"
-	})
+	self:_build_value_combobox(panel, panel_sizer, "deployable_id", {
+		"none",
+		"doctor_bag",
+		"ammo_bag",
+		"grenade_crate",
+		"bodybags_bag"
+	}, "Select a deployable_id to be spawned.")
 end

@@ -70,6 +70,10 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_x_deagle_npc()
 	self:_init_data_g26_npc()
 	self:_init_data_spas12_npc()
+	self:_init_data_mg42_npc()
+	self:_init_data_c96_npc()
+	self:_init_data_sterling_npc()
+	self:_init_data_mosin_npc()
 	self:_precalculate_values()
 end
 
@@ -1110,6 +1114,68 @@ function WeaponTweakData:_init_data_spas12_npc()
 	self.spas12_npc.alert_size = 4500
 	self.spas12_npc.suppression = 1.8
 	self.spas12_npc.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_mg42_npc()
+	self.mg42_npc.sounds.prefix = "mg42_npc"
+	self.mg42_npc.use_data.selection_index = 2
+	self.mg42_npc.DAMAGE = 2
+	self.mg42_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.mg42_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.mg42_npc.CLIP_AMMO_MAX = 120
+	self.mg42_npc.NR_CLIPS_MAX = 3
+	self.mg42_npc.auto.fire_rate = 0.08
+	self.mg42_npc.hold = "rifle"
+	self.mg42_npc.alert_size = 5000
+	self.mg42_npc.suppression = 1
+	self.mg42_secondary_npc = deep_clone(self.mg42_npc)
+	self.mg42_secondary_npc.use_data.selection_index = 1
+	self.mg42_secondary_npc.armor_piercing = true
+end
+
+function WeaponTweakData:_init_data_c96_npc()
+	self.c96_npc.sounds.prefix = "c96_npc"
+	self.c96_npc.use_data.selection_index = 1
+	self.c96_npc.DAMAGE = 1
+	self.c96_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.c96_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.c96_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.c96_npc.CLIP_AMMO_MAX = 10
+	self.c96_npc.NR_CLIPS_MAX = 5
+	self.c96_npc.hold = "pistol"
+	self.c96_npc.alert_size = 2500
+	self.c96_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_sterling_npc()
+	self.sterling_npc.sounds.prefix = "sterling_npc"
+	self.sterling_npc.use_data.selection_index = 1
+	self.sterling_npc.DAMAGE = 2
+	self.sterling_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sterling_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sterling_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sterling_npc.CLIP_AMMO_MAX = 40
+	self.sterling_npc.NR_CLIPS_MAX = 5
+	self.sterling_npc.auto.fire_rate = 0.1
+	self.sterling_npc.hold = "pistol"
+	self.sterling_npc.alert_size = 2800
+	self.sterling_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mosin_npc()
+	self.mosin_npc.sounds.prefix = "nagant_npc"
+	self.mosin_npc.use_data.selection_index = 2
+	self.mosin_npc.DAMAGE = 2
+	self.mosin_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.mosin_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.mosin_npc.CLIP_AMMO_MAX = 5
+	self.mosin_npc.NR_CLIPS_MAX = 8
+	self.mosin_npc.auto.fire_rate = 20
+	self.mosin_npc.hold = "rifle"
+	self.mosin_npc.alert_size = 5000
+	self.mosin_npc.suppression = 1
+	self.mosin_secondary_npc = deep_clone(self.mosin_npc)
+	self.mosin_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -3049,7 +3115,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.deagle.animations.equip_id = "equip_glock"
 	self.deagle.animations.recoil_steelsight = true
 	self.deagle.stats = {
-		damage = 19,
+		damage = 23,
 		spread = 6,
 		recoil = 3,
 		spread_moving = 6,
@@ -3632,7 +3698,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_raging_bull.animations.equip_id = "equip_raging_bull"
 	self.new_raging_bull.animations.recoil_steelsight = true
 	self.new_raging_bull.stats = {
-		damage = 22,
+		damage = 26,
 		spread = 7,
 		recoil = 2,
 		spread_moving = 5,
@@ -4975,6 +5041,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		recoil = 2,
 		spread_moving = 8,
 		zoom = 1,
+		concealment = 5,
 		concealment = 5,
 		suppression = 6,
 		alert_size = 7,
@@ -6383,7 +6450,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.x_deagle.animations.has_steelsight_stance = true
 	self.x_deagle.animations.recoil_steelsight = true
 	self.x_deagle.stats = {
-		damage = 19,
+		damage = 23,
 		spread = 6,
 		recoil = 3,
 		spread_moving = 4,
@@ -6561,6 +6628,365 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		total_ammo_mod = 21,
 		value = 1
+	}
+	self.mg42 = {}
+	self.mg42.category = "lmg"
+	self.mg42.damage_melee = damage_melee_default
+	self.mg42.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.mg42.sounds = {}
+	self.mg42.sounds.fire = "mg42_fire_single"
+	self.mg42.sounds.fire_single = "mg42_fire_single"
+	self.mg42.sounds.fire_auto = "mg42_fire"
+	self.mg42.sounds.stop_fire = "mg42_stop"
+	self.mg42.sounds.dryfire = "primary_dryfire"
+	self.mg42.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.mg42.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.mg42.timers = {}
+	self.mg42.timers.reload_not_empty = 6.5
+	self.mg42.timers.reload_empty = 6.5
+	self.mg42.timers.unequip = 0.9
+	self.mg42.timers.equip = 0.9
+	self.mg42.name_id = "bm_w_mg42"
+	self.mg42.desc_id = "bm_w_mg42_desc"
+	self.mg42.description_id = "des_mg42"
+	self.mg42.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.mg42.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.mg42.use_data = {}
+	self.mg42.use_data.selection_index = 2
+	self.mg42.DAMAGE = 1
+	self.mg42.CLIP_AMMO_MAX = 150
+	self.mg42.NR_CLIPS_MAX = 3
+	self.mg42.AMMO_MAX = self.mg42.CLIP_AMMO_MAX * self.mg42.NR_CLIPS_MAX
+	self.mg42.AMMO_PICKUP = self:_pickup_chance(90, 1.5)
+	self.mg42.FIRE_MODE = "auto"
+	self.mg42.fire_mode_data = {}
+	self.mg42.fire_mode_data.fire_rate = 0.05
+	self.mg42.CAN_TOGGLE_FIREMODE = false
+	self.mg42.auto = {}
+	self.mg42.auto.fire_rate = 0.05
+	self.mg42.spread = {}
+	self.mg42.spread.standing = 4.3
+	self.mg42.spread.crouching = 4
+	self.mg42.spread.steelsight = 1.8
+	self.mg42.spread.moving_standing = 4.5
+	self.mg42.spread.moving_crouching = 4
+	self.mg42.spread.moving_steelsight = 2.5
+	self.mg42.kick = {}
+	self.mg42.kick.standing = {
+		-0.2,
+		0.8,
+		-1,
+		1.4
+	}
+	self.mg42.kick.crouching = self.mg42.kick.standing
+	self.mg42.kick.steelsight = self.mg42.kick.standing
+	self.mg42.crosshair = {}
+	self.mg42.crosshair.standing = {}
+	self.mg42.crosshair.crouching = {}
+	self.mg42.crosshair.steelsight = {}
+	self.mg42.crosshair.standing.offset = 0.16
+	self.mg42.crosshair.standing.moving_offset = 1
+	self.mg42.crosshair.standing.kick_offset = 0.8
+	self.mg42.crosshair.crouching.offset = 0.1
+	self.mg42.crosshair.crouching.moving_offset = 0.6
+	self.mg42.crosshair.crouching.kick_offset = 0.4
+	self.mg42.crosshair.steelsight.hidden = true
+	self.mg42.crosshair.steelsight.offset = 0
+	self.mg42.crosshair.steelsight.moving_offset = 0
+	self.mg42.crosshair.steelsight.kick_offset = 0.14
+	self.mg42.shake = {}
+	self.mg42.shake.fire_multiplier = 0.5
+	self.mg42.shake.fire_steelsight_multiplier = -0.5
+	self.mg42.autohit = autohit_lmg_default
+	self.mg42.aim_assist = aim_assist_lmg_default
+	self.mg42.weapon_hold = "m249"
+	self.mg42.animations = {}
+	self.mg42.animations.equip_id = "equip_mg42"
+	self.mg42.animations.recoil_steelsight = true
+	self.mg42.global_value = "gage_pack_historical"
+	self.mg42.texture_bundle_folder = "gage_pack_historical"
+	self.mg42.panic_suppression_chance = 0.1
+	self.mg42.stats = {
+		damage = 13,
+		spread = 4,
+		recoil = 6,
+		spread_moving = 9,
+		zoom = 1,
+		concealment = 2,
+		suppression = 4,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
+	self.c96 = {}
+	self.c96.category = "pistol"
+	self.c96.damage_melee = damage_melee_default
+	self.c96.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.c96.sounds = {}
+	self.c96.sounds.fire = "c96_fire"
+	self.c96.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.c96.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.c96.sounds.dryfire = "secondary_dryfire"
+	self.c96.timers = {}
+	self.c96.timers.reload_not_empty = 4
+	self.c96.timers.reload_empty = 4.17
+	self.c96.timers.unequip = 0.5
+	self.c96.timers.equip = 0.5
+	self.c96.name_id = "bm_w_c96"
+	self.c96.desc_id = "bm_w_c96_desc"
+	self.c96.description_id = "des_c96"
+	self.c96.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.c96.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.c96.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.c96.use_data = {}
+	self.c96.use_data.selection_index = 1
+	self.c96.DAMAGE = 1
+	self.c96.CLIP_AMMO_MAX = 10
+	self.c96.NR_CLIPS_MAX = math.round(total_damage_secondary / 2 / self.c96.CLIP_AMMO_MAX)
+	self.c96.AMMO_MAX = self.c96.CLIP_AMMO_MAX * self.c96.NR_CLIPS_MAX
+	self.c96.AMMO_PICKUP = self:_pickup_chance(self.c96.AMMO_MAX, 1)
+	self.c96.FIRE_MODE = "single"
+	self.c96.fire_mode_data = {}
+	self.c96.fire_mode_data.fire_rate = 0.09
+	self.c96.single = {}
+	self.c96.single.fire_rate = 0.09
+	self.c96.spread = {}
+	self.c96.spread.standing = self.new_m4.spread.standing * 0.5
+	self.c96.spread.crouching = self.new_m4.spread.standing * 0.5
+	self.c96.spread.steelsight = self.new_m4.spread.steelsight
+	self.c96.spread.moving_standing = self.new_m4.spread.standing * 0.5
+	self.c96.spread.moving_crouching = self.new_m4.spread.standing * 0.5
+	self.c96.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.c96.kick = {}
+	self.c96.kick.standing = self.glock_17.kick.standing
+	self.c96.kick.crouching = self.c96.kick.standing
+	self.c96.kick.steelsight = self.c96.kick.standing
+	self.c96.crosshair = {}
+	self.c96.crosshair.standing = {}
+	self.c96.crosshair.crouching = {}
+	self.c96.crosshair.steelsight = {}
+	self.c96.crosshair.standing.offset = 0.2
+	self.c96.crosshair.standing.moving_offset = 0.6
+	self.c96.crosshair.standing.kick_offset = 0.4
+	self.c96.crosshair.crouching.offset = 0.1
+	self.c96.crosshair.crouching.moving_offset = 0.6
+	self.c96.crosshair.crouching.kick_offset = 0.3
+	self.c96.crosshair.steelsight.hidden = true
+	self.c96.crosshair.steelsight.offset = 0
+	self.c96.crosshair.steelsight.moving_offset = 0
+	self.c96.crosshair.steelsight.kick_offset = 0.1
+	self.c96.shake = {}
+	self.c96.shake.fire_multiplier = 1
+	self.c96.shake.fire_steelsight_multiplier = -1
+	self.c96.autohit = autohit_pistol_default
+	self.c96.aim_assist = aim_assist_pistol_default
+	self.c96.weapon_hold = "glock"
+	self.c96.animations = {}
+	self.c96.animations.equip_id = "equip_glock"
+	self.c96.animations.recoil_steelsight = true
+	self.c96.global_value = "gage_pack_historical"
+	self.c96.texture_bundle_folder = "gage_pack_historical"
+	self.c96.stats = {
+		damage = 14,
+		spread = 6,
+		recoil = 7,
+		spread_moving = 8,
+		zoom = 3,
+		concealment = 28,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.sterling = {}
+	self.sterling.category = "smg"
+	self.sterling.damage_melee = damage_melee_default
+	self.sterling.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.sterling.sounds = {}
+	self.sterling.sounds.fire = "sterling_fire_single"
+	self.sterling.sounds.fire_single = "sterling_fire_single"
+	self.sterling.sounds.fire_auto = "sterling_fire"
+	self.sterling.sounds.stop_fire = "sterling_stop"
+	self.sterling.sounds.dryfire = "secondary_dryfire"
+	self.sterling.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.sterling.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.sterling.timers = {}
+	self.sterling.timers.reload_not_empty = 2.3
+	self.sterling.timers.reload_empty = 3.3
+	self.sterling.timers.unequip = 0.75
+	self.sterling.timers.equip = 0.75
+	self.sterling.name_id = "bm_w_sterling"
+	self.sterling.desc_id = "bm_w_sterling_desc"
+	self.sterling.description_id = "des_sterling"
+	self.sterling.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.sterling.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.sterling.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sterling.use_data = {}
+	self.sterling.use_data.selection_index = 1
+	self.sterling.DAMAGE = 1
+	self.sterling.CLIP_AMMO_MAX = 20
+	self.sterling.NR_CLIPS_MAX = math.round(total_damage_secondary / 2 / self.sterling.CLIP_AMMO_MAX)
+	self.sterling.AMMO_MAX = self.sterling.CLIP_AMMO_MAX * self.sterling.NR_CLIPS_MAX
+	self.sterling.AMMO_PICKUP = self:_pickup_chance(100, 1)
+	self.sterling.FIRE_MODE = "auto"
+	self.sterling.fire_mode_data = {}
+	self.sterling.fire_mode_data.fire_rate = 0.11
+	self.sterling.CAN_TOGGLE_FIREMODE = true
+	self.sterling.auto = {}
+	self.sterling.auto.fire_rate = 0.11
+	self.sterling.spread = {}
+	self.sterling.spread.standing = self.new_m4.spread.standing * 0.8
+	self.sterling.spread.crouching = self.new_m4.spread.standing * 0.8
+	self.sterling.spread.steelsight = self.new_m4.spread.steelsight
+	self.sterling.spread.moving_standing = self.new_m4.spread.standing * 0.8
+	self.sterling.spread.moving_crouching = self.new_m4.spread.standing * 0.8
+	self.sterling.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.sterling.kick = {}
+	self.sterling.kick.standing = self.new_m4.kick.standing
+	self.sterling.kick.crouching = self.sterling.kick.standing
+	self.sterling.kick.steelsight = self.sterling.kick.standing
+	self.sterling.crosshair = {}
+	self.sterling.crosshair.standing = {}
+	self.sterling.crosshair.crouching = {}
+	self.sterling.crosshair.steelsight = {}
+	self.sterling.crosshair.standing.offset = 0.5
+	self.sterling.crosshair.standing.moving_offset = 0.8
+	self.sterling.crosshair.standing.kick_offset = 0.7
+	self.sterling.crosshair.crouching.offset = 0.3
+	self.sterling.crosshair.crouching.moving_offset = 0.6
+	self.sterling.crosshair.crouching.kick_offset = 0.5
+	self.sterling.crosshair.steelsight.hidden = true
+	self.sterling.crosshair.steelsight.offset = 0
+	self.sterling.crosshair.steelsight.moving_offset = 0
+	self.sterling.crosshair.steelsight.kick_offset = 0.3
+	self.sterling.shake = {}
+	self.sterling.shake.fire_multiplier = 1
+	self.sterling.shake.fire_steelsight_multiplier = -1
+	self.sterling.autohit = autohit_smg_default
+	self.sterling.aim_assist = aim_assist_smg_default
+	self.sterling.weapon_hold = "sterling"
+	self.sterling.animations = {}
+	self.sterling.animations.equip_id = "equip_sterling"
+	self.sterling.animations.recoil_steelsight = true
+	self.sterling.global_value = "gage_pack_historical"
+	self.sterling.texture_bundle_folder = "gage_pack_historical"
+	self.sterling.panic_suppression_chance = 0.05
+	self.sterling.stats = {
+		damage = 15,
+		spread = 7,
+		recoil = 7,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 20,
+		suppression = 12,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 7
+	}
+	self.mosin = {}
+	self.mosin.category = "snp"
+	self.mosin.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.mosin.damage_melee = damage_melee_default
+	self.mosin.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.mosin.sounds = {}
+	self.mosin.sounds.fire = "nagant_fire"
+	self.mosin.sounds.dryfire = "primary_dryfire"
+	self.mosin.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.mosin.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.mosin.timers = {}
+	self.mosin.timers.reload_not_empty = 3.85
+	self.mosin.timers.reload_empty = 3.85
+	self.mosin.timers.unequip = 0.9
+	self.mosin.timers.equip = 0.9
+	self.mosin.name_id = "bm_w_mosin"
+	self.mosin.desc_id = "bm_w_mosin_desc"
+	self.mosin.description_id = "des_mosin"
+	self.mosin.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.mosin.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.mosin.use_data = {}
+	self.mosin.use_data.selection_index = 2
+	self.mosin.use_data.align_place = "left_hand"
+	self.mosin.DAMAGE = 1
+	self.mosin.CLIP_AMMO_MAX = 5
+	self.mosin.NR_CLIPS_MAX = 5
+	self.mosin.AMMO_MAX = self.mosin.CLIP_AMMO_MAX * self.mosin.NR_CLIPS_MAX
+	self.mosin.AMMO_PICKUP = {0.7, 1}
+	self.mosin.FIRE_MODE = "single"
+	self.mosin.fire_mode_data = {}
+	self.mosin.fire_mode_data.fire_rate = 1
+	self.mosin.CAN_TOGGLE_FIREMODE = false
+	self.mosin.single = {}
+	self.mosin.single.fire_rate = 20
+	self.mosin.spread = {}
+	self.mosin.spread.standing = 20
+	self.mosin.spread.crouching = 20
+	self.mosin.spread.steelsight = 0
+	self.mosin.spread.moving_standing = 20
+	self.mosin.spread.moving_crouching = 20
+	self.mosin.spread.moving_steelsight = 0
+	self.mosin.kick = {}
+	self.mosin.kick.standing = {
+		3,
+		4.8,
+		-0.3,
+		0.3
+	}
+	self.mosin.kick.crouching = self.mosin.kick.standing
+	self.mosin.kick.steelsight = self.mosin.kick.standing
+	self.mosin.crosshair = {}
+	self.mosin.crosshair.standing = {}
+	self.mosin.crosshair.crouching = {}
+	self.mosin.crosshair.steelsight = {}
+	self.mosin.crosshair.standing.offset = 1.14
+	self.mosin.crosshair.standing.moving_offset = 1.8
+	self.mosin.crosshair.standing.kick_offset = 1.6
+	self.mosin.crosshair.crouching.offset = 1.1
+	self.mosin.crosshair.crouching.moving_offset = 1.6
+	self.mosin.crosshair.crouching.kick_offset = 1.4
+	self.mosin.crosshair.steelsight.hidden = true
+	self.mosin.crosshair.steelsight.offset = 1
+	self.mosin.crosshair.steelsight.moving_offset = 1
+	self.mosin.crosshair.steelsight.kick_offset = 1.14
+	self.mosin.shake = {}
+	self.mosin.shake.fire_multiplier = 3.5
+	self.mosin.shake.fire_steelsight_multiplier = -3.5
+	self.mosin.autohit = autohit_snp_default
+	self.mosin.aim_assist = aim_assist_snp_default
+	self.mosin.weapon_hold = "mosin"
+	self.mosin.animations = {}
+	self.mosin.animations.equip_id = "equip_mosin"
+	self.mosin.animations.recoil_steelsight = true
+	self.mosin.global_value = "gage_pack_historical"
+	self.mosin.texture_bundle_folder = "gage_pack_historical"
+	self.mosin.can_shoot_through_enemy = true
+	self.mosin.can_shoot_through_shield = true
+	self.mosin.can_shoot_through_wall = true
+	self.mosin.panic_suppression_chance = 0.1
+	self.mosin.stats = {
+		damage = 21,
+		spread = 9,
+		recoil = 3,
+		spread_moving = 9,
+		zoom = 1,
+		concealment = 6,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
+	self.mosin.armor_piercing_chance = 1
+	self.mosin.stats_modifiers = {
+		damage = 5.6,
+		suppression = 3,
+		spread = 0.6
 	}
 end
 
@@ -7056,6 +7482,30 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.mg42_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.c96_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.sterling_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mosin_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -7128,4 +7578,8 @@ function WeaponTweakData:_precalculate_values()
 	self.x_deagle_npc.AMMO_MAX = self.x_deagle_npc.CLIP_AMMO_MAX * self.x_deagle_npc.NR_CLIPS_MAX
 	self.g26_npc.AMMO_MAX = 150
 	self.spas12_npc.AMMO_MAX = self.spas12_npc.CLIP_AMMO_MAX * self.spas12_npc.NR_CLIPS_MAX
+	self.mg42_npc.AMMO_MAX = self.mg42_npc.CLIP_AMMO_MAX * self.mg42_npc.NR_CLIPS_MAX
+	self.c96_npc.AMMO_MAX = self.c96_npc.CLIP_AMMO_MAX * self.c96_npc.NR_CLIPS_MAX
+	self.sterling_npc.AMMO_MAX = self.sterling_npc.CLIP_AMMO_MAX * self.sterling_npc.NR_CLIPS_MAX
+	self.mosin_npc.AMMO_MAX = self.mosin_npc.CLIP_AMMO_MAX * self.mosin_npc.NR_CLIPS_MAX
 end

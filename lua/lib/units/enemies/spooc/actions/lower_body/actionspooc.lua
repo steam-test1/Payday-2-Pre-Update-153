@@ -63,6 +63,9 @@ function ActionSpooc:init(action_desc, common_data)
 		end
 	else
 		local attention = self._ext_movement:attention()
+		if not attention then
+			return
+		end
 		self._target_unit = attention and attention.unit
 		is_local = self._target_unit and (self._target_unit:base().is_local_player or is_server and not self._target_unit:base().is_husk_player)
 	end

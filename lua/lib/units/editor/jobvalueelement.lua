@@ -32,10 +32,7 @@ function JobValueUnitElement:_build_panel(panel, panel_sizer)
 	value_sizer:add(value, 2, 0, "ALIGN_CENTER_VERTICAL")
 	value:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = value, value = "value"})
 	value:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = value, value = "value"})
-	local save = EWS:CheckBox(panel, "Save", "")
-	save:set_value(self._hed.save)
-	save:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = save, value = "save"})
-	panel_sizer:add(save, 0, 0, "EXPAND")
+	self:_build_value_checkbox(panel, panel_sizer, "save")
 end
 
 JobValueFilterUnitElement = JobValueFilterUnitElement or class(MissionElement)
@@ -58,31 +55,17 @@ function JobValueFilterUnitElement:_build_panel(panel, panel_sizer)
 	JobValueUnitElement._build_panel(self, panel, panel_sizer)
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local check_type_params = {
-		name = "Check type:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"equal",
-			"less_than",
-			"greater_than",
-			"less_or_equal",
-			"greater_or_equal",
-			"has_key",
-			"not_has_key"
-		},
-		value = self._hed.check_type,
-		tooltip = "Select which check operation to berform",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local check_type = CoreEWS.combobox(check_type_params)
-	check_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = check_type, value = "check_type"})
-	local help = {}
+	self:_build_value_combobox(panel, panel_sizer, "check_type", {
+		"equal",
+		"less_than",
+		"greater_than",
+		"less_or_equal",
+		"greater_or_equal",
+		"has_key",
+		"not_has_key"
+	}, "Select which check operation to perform")
+	local help = {panel = panel, sizer = panel_sizer}
 	help.text = "Key is what to check. Value is what it is supposed to be to pass the filter. Different check types can be used i the value is known to be a number, for example, greater_then checks if the stored value is greater then the input value."
-	help.panel = panel
-	help.sizer = panel_sizer
 	self:add_help_text(help)
 end
 

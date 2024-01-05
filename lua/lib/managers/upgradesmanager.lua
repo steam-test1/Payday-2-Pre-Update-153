@@ -157,7 +157,8 @@ function UpgradesManager:aquire_default(id, identifier)
 	end
 	local identify_key = Idstring(identifier):key()
 	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
-		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id, "identifier", identifier)
+		Application:error("Tried to aquire an upgrade that has already been aquired: " .. id, "identifier", identifier, "id_key", identify_key)
+		Application:stack_dump()
 		return
 	end
 	self._global.aquired[id] = self._global.aquired[id] or {}
@@ -182,7 +183,8 @@ function UpgradesManager:enable_weapon(id, identifier)
 	end
 	local identify_key = Idstring(identifier):key()
 	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
-		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id .. "")
+		Application:error("Tried to aquire an upgrade that has already been aquired: " .. id, "identifier", identifier, "id_key", identify_key)
+		Application:stack_dump()
 		return
 	end
 	self._global.aquired[id] = self._global.aquired[id] or {}
@@ -206,7 +208,8 @@ function UpgradesManager:aquire(id, loading, identifier)
 	end
 	local identify_key = Idstring(identifier):key()
 	if self._global.aquired[id] and self._global.aquired[id][identify_key] then
-		Application:error("Tried to aquire an upgrade that has allready been aquired: " .. id, "identifier", identifier)
+		Application:error("Tried to aquire an upgrade that has already been aquired: " .. id, "identifier", identifier, "id_key", identify_key)
+		Application:stack_dump()
 		return
 	end
 	self._global.aquired[id] = self._global.aquired[id] or {}

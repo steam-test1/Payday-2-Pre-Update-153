@@ -8,30 +8,9 @@ function PickupUnitElement:init(unit)
 	table.insert(self._save_values, "pickup")
 end
 
-function PickupUnitElement.get_options()
-	local pickups = {}
-	for name, _ in pairs(tweak_data.pickups) do
-		table.insert(pickups, name)
-	end
-	return pickups
-end
-
 function PickupUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local pickup_params = {
-		name = "Pickup:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = PickupUnitElement.get_options(),
-		value = self._hed.pickup,
-		default = "remove",
-		tooltip = "Select a pickup to be set or remove.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local pickup = CoreEWS.combobox(pickup_params)
-	pickup:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = pickup, value = "pickup"})
+	self:_build_value_combobox(panel, panel_sizer, "pickup", table.list_add({"remove"}, table.map_keys(tweak_data.pickups)), "Select a pickup to be set or remove.")
 end

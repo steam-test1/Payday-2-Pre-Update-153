@@ -98,48 +98,17 @@ function CoreToggleUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local toggle_params = {
-		name = "Toggle:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"on",
-			"off",
-			"toggle"
-		},
-		value = self._hed.toggle,
-		tooltip = "Select how you want to toggle an element",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local toggle = CoreEWS.combobox(toggle_params)
-	toggle:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = toggle, value = "toggle"})
-	local set_trigger_times_params = {
-		name = "Set trigger times:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.set_trigger_times,
-		floats = 0,
-		tooltip = "Sets the elements trigger times when toggle on (-1 means do not use)",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local set_trigger_times = CoreEWS.number_controller(set_trigger_times_params)
-	set_trigger_times:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = set_trigger_times,
-		value = "set_trigger_times"
-	})
-	set_trigger_times:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = set_trigger_times,
-		value = "set_trigger_times"
-	})
-	self._btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	self._btn_toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	self._btn_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
-	self._btn_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
-	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
-	self._btn_toolbar:realize()
-	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
+	self:_build_value_combobox(panel, panel_sizer, "toggle", {
+		"on",
+		"off",
+		"toggle"
+	}, "Select how you want to toggle an element")
+	self:_build_value_number(panel, panel_sizer, "set_trigger_times", {floats = 0, min = -1}, "Sets the elements trigger times when toggle on (-1 means do not use)")
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("ADD_UNIT_LIST", "Add unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
+	toolbar:add_tool("REMOVE_UNIT_LIST", "Remove unit from unit list", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	toolbar:realize()
+	panel_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
 end

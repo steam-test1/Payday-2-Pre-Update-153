@@ -30,7 +30,8 @@ function ExplosionManager:give_local_player_dmg(pos, range, damage)
 		player:character_damage():damage_explosion({
 			position = pos,
 			range = range,
-			damage = damage
+			damage = damage,
+			variant = "explosion"
 		})
 	end
 end
@@ -52,7 +53,8 @@ function ExplosionManager:detect_and_give_dmg(params)
 		player:character_damage():damage_explosion({
 			position = hit_pos,
 			range = range,
-			damage = player_dmg
+			damage = player_dmg,
+			variant = "explosion"
 		})
 	end
 	local bodies = World:find_bodies("intersect", "sphere", hit_pos, range, slotmask)
@@ -138,7 +140,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 						count_civilians = count_civilians + 1
 					elseif type == "gangster" then
 						count_gangsters = count_gangsters + 1
-					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" then
+					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" or type == "jowi" or type == "hoxton" then
 					else
 						count_cops = count_cops + 1
 					end

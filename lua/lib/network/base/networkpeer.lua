@@ -91,17 +91,161 @@ function NetworkPeer:set_rpc(rpc)
 end
 
 function NetworkPeer:create_ticket()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		return Steam:create_ticket(self._user_id)
+	end
 	return ""
 end
 
 function NetworkPeer:begin_ticket_session(ticket)
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self._ticket_wait_response = true
+		self._begin_ticket_session_called = true
+		local result = Steam:begin_ticket_session(self._user_id, ticket, callback(self, self, "on_verify_ticket"))
+		self._begin_ticket_session_called = nil
+		return result
+	end
 	return true
 end
 
+function NetworkPeer:on_verify_ticket(result, reason)
+	self._ticket_wait_response = nil
+	if not result then
+		print("[NetworkPeer:on_verify_ticket] Steam ID Authentication failed for peer '" .. tostring(self._name) .. "' (ID: " .. tostring(self._id) .. ") because '" .. tostring(reason) .. "'.")
+		if Network:is_server() then
+			if not self._begin_ticket_session_called then
+				managers.network:session():send_to_peers("kick_peer", self._id, 2)
+				managers.network:session():on_peer_kicked(self, self._id, 2)
+			end
+		else
+			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_failed", {
+				name = self._name
+			}))
+		end
+	else
+		print("[NetworkPeer:on_verify_ticket] Steam ID Authentication succeeded for peer '" .. tostring(self._name) .. "' (ID: " .. tostring(self._id) .. ").")
+		if self._profile.outfit_string ~= "" then
+			self:verify_outfit()
+		end
+		if not Network:is_server() then
+			self:verify_job(managers.job:current_job_id())
+		end
+	end
+end
+
 function NetworkPeer:end_ticket_session()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self._ticket_wait_response = nil
+		Steam:end_ticket_session(self._user_id)
+		Steam:destroy_ticket(self._user_id)
+	end
 end
 
 function NetworkPeer:change_ticket_callback()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		Steam:change_ticket_callback(self._user_id, callback(self, self, "on_verify_ticket"))
+	end
+end
+
+function NetworkPeer:verify_job(job)
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		return
+	end
+	local job_tweak = tweak_data.narrative:job_data(job)
+	if not job_tweak or not job_tweak.dlc then
+		return
+	end
+	local dlc_data = Global.dlc_manager.all_dlc_data[job_tweak.dlc]
+	if not dlc_data or not dlc_data.app_id then
+		return
+	end
+	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
+		self:mark_cheater()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_invalid_job", {
+			name = self._name
+		}))
+	end
+end
+
+function NetworkPeer:verify_outfit()
+	local failed = self:_verify_outfit_data()
+	if failed then
+		self:mark_cheater()
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(failed == 1 and "menu_chat_peer_cheated_invalid_mask" or "menu_chat_peer_cheated_invalid_weapon", {
+			name = self._name
+		}))
+	end
+end
+
+function NetworkPeer:_verify_outfit_data()
+	if not managers.network:session() or self._id == managers.network:session():local_peer():id() then
+		return nil
+	end
+	local outfit = self:blackmarket_outfit()
+	local mask_blueprint_lookup = {
+		color = "colors",
+		material = "materials",
+		pattern = "textures"
+	}
+	for item_type, item in pairs(outfit) do
+		if item_type == "mask" then
+			if not self:_verify_content("masks", item.mask_id) then
+				return self:_verify_cheated_outfit("masks", item.mask_id, 1)
+			end
+			for mask_type, mask_item in pairs(item.blueprint) do
+				local mask_type_lookup = mask_blueprint_lookup[mask_type]
+				if not self:_verify_content(mask_type_lookup, mask_item.id) then
+					return self:_verify_cheated_outfit(mask_type_lookup, mask_item.id, 1)
+				end
+			end
+		elseif item_type == "primary" or item_type == "secondary" then
+			if not self:_verify_content("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(item.factory_id)) then
+				return self:_verify_cheated_outfit("weapon", item.factory_id, 2)
+			end
+			for _, mod_item in pairs(item.blueprint) do
+				if not self:_verify_content("weapon_mods", mod_item) then
+					return self:_verify_cheated_outfit("weapon_mods", mod_item, 2)
+				end
+			end
+		elseif item_type == "melee_weapon" and not self:_verify_content("melee_weapons", item) then
+			return self:_verify_cheated_outfit("melee_weapons", item, 2)
+		end
+	end
+	return nil
+end
+
+function NetworkPeer:_verify_cheated_outfit(item_type, item_id, result)
+	self._cheated_items = self._cheated_items or {}
+	local item = tostring(item_type) .. "_" .. tostring(item_id)
+	if self._cheated_items[item] then
+		return
+	end
+	print("[NetworkPeer:_verify_cheated_outfit] Invalid item '" .. tostring(item_id) .. "' on peer '" .. tostring(self._name) .. "'.")
+	self._cheated_items[item] = true
+	return result
+end
+
+function NetworkPeer:_verify_content(item_type, item_id)
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		return true
+	end
+	local dlc_item, item_data
+	if item_type == "weapon" then
+		item_data = tweak_data.weapon[item_id]
+		dlc_item = item_data and item_data.global_value
+	else
+		local item = tweak_data.blackmarket[item_type]
+		item_data = item and item[item_id]
+		dlc_item = item_data and item_data.dlc
+	end
+	if not item_data then
+		return false
+	end
+	local dlc_data = Global.dlc_manager.all_dlc_data[dlc_item]
+	if dlc_data and dlc_data.app_id and not dlc_data.external then
+		return Steam:is_user_product_owned(self._user_id, dlc_data.app_id)
+	end
+	return true
 end
 
 function NetworkPeer:is_cheater()
@@ -722,6 +866,9 @@ function NetworkPeer:set_outfit_string(outfit_string, outfit_version)
 	Application:stack_dump()
 	local old_outfit_string = self._profile.outfit_string
 	self._profile.outfit_string = outfit_string
+	if not self._ticket_wait_response then
+		self:verify_outfit()
+	end
 	if old_outfit_string ~= outfit_string then
 		self:_reload_outfit()
 	end

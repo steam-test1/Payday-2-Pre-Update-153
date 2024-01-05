@@ -309,6 +309,12 @@ function PlayerManager:set_player_state(state)
 	if state == self._current_state then
 		return
 	end
+	if state ~= "standard" and state ~= "carry" then
+		local unit = self:player_unit()
+		if unit then
+			unit:character_damage():disable_berserker()
+		end
+	end
 	if not self._player_states[state] then
 		Application:error("State '" .. tostring(state) .. "' does not exist in list of available states.")
 		state = self._DEFAULT_STATE
@@ -480,7 +486,7 @@ end
 
 function PlayerManager:aquire_upgrade(upgrade)
 	self._global.upgrades[upgrade.category] = self._global.upgrades[upgrade.category] or {}
-	self._global.upgrades[upgrade.category][upgrade.upgrade] = upgrade.value
+	self._global.upgrades[upgrade.category][upgrade.upgrade] = math.max(upgrade.value, self._global.upgrades[upgrade.category][upgrade.upgrade] or 0)
 	local value = tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][upgrade.value]
 	if self[upgrade.upgrade] then
 		self[upgrade.upgrade](self, value)
@@ -782,7 +788,7 @@ end
 
 function PlayerManager:mod_movement_penalty(movement_penalty)
 	local skill_mods = self:upgrade_value("player", "passive_armor_movement_penalty_multiplier", 1)
-	if skill_mods < 1 then
+	if skill_mods < 1 and movement_penalty < 1 then
 		local penalty = 1 - movement_penalty
 		penalty = penalty * skill_mods
 		movement_penalty = 1 - penalty

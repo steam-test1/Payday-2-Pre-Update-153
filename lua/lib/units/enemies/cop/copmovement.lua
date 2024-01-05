@@ -1206,6 +1206,10 @@ function CopMovement:anim_clbk_rope(unit, state)
 	end
 end
 
+function CopMovement:rope_unit()
+	return self._rope
+end
+
 function CopMovement:pos_rsrv_id()
 	return self._pos_rsrv_id
 end

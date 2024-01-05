@@ -19,45 +19,7 @@ function AiGlobalEventUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local wave_mode_params = {
-		name = "Wave Mode:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = ElementAiGlobalEvent._wave_modes,
-		value = self._hed.wave_mode,
-		default = "none",
-		tooltip = "Select a wave mode from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local wave_mode = CoreEWS.combobox(wave_mode_params)
-	wave_mode:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = wave_mode, value = "wave_mode"})
-	local ai_event_params = {
-		name = "AI Event:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = ElementAiGlobalEvent._AI_events,
-		value = self._hed.AI_event,
-		default = "none",
-		tooltip = "Select an AI event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local ai_event = CoreEWS.combobox(ai_event_params)
-	ai_event:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = ai_event, value = "AI_event"})
-	local blame_params = {
-		name = "Blame:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = ElementAiGlobalEvent._blames,
-		value = self._hed.blame,
-		tooltip = "Select a blame from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local blame_event = CoreEWS.combobox(blame_params)
-	blame_event:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = blame_event, value = "blame"})
+	self:_build_value_combobox(panel, panel_sizer, "wave_mode", ElementAiGlobalEvent._wave_modes)
+	self:_build_value_combobox(panel, panel_sizer, "AI_event", ElementAiGlobalEvent._AI_events)
+	self:_build_value_combobox(panel, panel_sizer, "blame", ElementAiGlobalEvent._blames)
 end

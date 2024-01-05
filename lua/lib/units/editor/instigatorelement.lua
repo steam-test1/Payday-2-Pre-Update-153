@@ -10,11 +10,7 @@ function InstigatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local help = {}
-	help.text = "This element is a storage for an instigator. It can be used, set, etc from logic_instigator_operator."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_add_help_text("This element is a storage for an instigator. It can be used, set, etc from logic_instigator_operator.")
 end
 
 InstigatorOperatorUnitElement = InstigatorOperatorUnitElement or class(MissionElement)
@@ -79,41 +75,19 @@ function InstigatorOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = panel_sizer,
-		default = "none",
-		options = {
-			"set",
-			"clear",
-			"add_first",
-			"add_last",
-			"use_first",
-			"use_last",
-			"use_random",
-			"use_all"
-		},
-		value = self._hed.operation,
-		tooltip = "Select an operation for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local operation = CoreEWS.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local keep_on_use = EWS:CheckBox(panel, "Keep on use", "")
-	keep_on_use:set_value(self._hed.keep_on_use)
-	keep_on_use:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = keep_on_use,
-		value = "keep_on_use"
-	})
-	panel_sizer:add(keep_on_use, 0, 0, "EXPAND")
-	local help = {}
-	help.text = "This element is an operator to logic_instigator element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"none",
+		"set",
+		"clear",
+		"add_first",
+		"add_last",
+		"use_first",
+		"use_last",
+		"use_random",
+		"use_all"
+	}, "Select an operation for the selected elements")
+	self:_build_value_checkbox(panel, panel_sizer, "keep_on_use")
+	self:_add_help_text("This element is an operator to logic_instigator element.")
 end
 
 InstigatorTriggerUnitElement = InstigatorTriggerUnitElement or class(MissionElement)
@@ -176,30 +150,11 @@ function InstigatorTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local trigger_type_params = {
-		name = "Trigger Type:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"death",
-			"set",
-			"changed",
-			"cleared"
-		},
-		value = self._hed.trigger_type,
-		tooltip = "Select a trigger type for the selected elements",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local trigger_type = CoreEWS.combobox(trigger_type_params)
-	trigger_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = trigger_type,
-		value = "trigger_type"
-	})
-	local help = {}
-	help.text = "This element is a trigger to logic_instigator element."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "trigger_type", {
+		"death",
+		"set",
+		"changed",
+		"cleared"
+	}, "Select a trigger type for the selected elements")
+	self:_add_help_text("This element is a trigger to logic_instigator element.")
 end

@@ -32,20 +32,7 @@ function LookAtTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local interval_params = {
-		name = "Check interval:",
-		value = self._hed.interval,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "Set the check interval for the look at, in seconds",
-		floats = 2,
-		min = 0.01,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interval = CoreEWS.number_controller(interval_params)
-	interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
+	self:_build_value_number(panel, panel_sizer, "interval", {floats = 2, min = 0.01}, "Set the check interval for the look at, in seconds")
 	local sensitivity_params = {
 		name = "Sensitivity:",
 		panel = panel,
@@ -76,30 +63,10 @@ function LookAtTriggerUnitElement:_build_panel(panel, panel_sizer)
 		ctrlr = sensitivity_params.number_ctrlr,
 		value = "sensitivity"
 	})
-	local distance_params = {
-		name = "Distance:",
-		value = self._hed.distance,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "(Optional) Sets a distance to use with the check (in meters)",
-		floats = 2,
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local distance = CoreEWS.number_controller(distance_params)
-	distance:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = distance, value = "distance"})
-	distance:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = distance, value = "distance"})
-	local in_front = EWS:CheckBox(panel, "Only in front", "")
-	in_front:set_value(self._hed.in_front)
-	in_front:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = in_front, value = "in_front"})
-	panel_sizer:add(in_front, 0, 0, "EXPAND")
-	local help = {}
-	help.text = [[
+	self:_build_value_number(panel, panel_sizer, "distance", {floats = 2, min = 0}, "(Optional) Sets a distance to use with the check (in meters)")
+	self:_build_value_checkbox(panel, panel_sizer, "in_front", "Only in front")
+	self:_add_help_text([[
 Interval defines how offen the check should be done. Sensitivity defines how precise the look angle must be. A sensitivity of 0.999 means that you need to look almost directly at it, 0.5 means that you will get the trigger somewhere at the edge of the screen (might be outside or inside). 
 
-Distance(in meters) can be used as a filter to the trigger (0 means no distance filtering)]]
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+Distance(in meters) can be used as a filter to the trigger (0 means no distance filtering)]])
 end

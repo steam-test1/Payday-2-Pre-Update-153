@@ -102,6 +102,7 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 				managers.job:synced_interupt_stage(interupt_level)
 			end
 			Global.game_settings.world_setting = managers.job:current_world_setting()
+			self._server_peer:verify_job(job_id)
 		end
 		cb(state_index == 1 and "JOINED_LOBBY" or "JOINED_GAME", level_index, difficulty_index, state_index)
 	elseif reply == 2 then

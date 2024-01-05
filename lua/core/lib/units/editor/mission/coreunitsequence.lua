@@ -26,19 +26,24 @@ function CoreUnitSequenceUnitElement:draw_links_unselected(...)
 end
 
 function CoreUnitSequenceUnitElement:_draw_trigger_units(r, g, b)
-	local trigger_data = self._unit:damage():get_editor_trigger_data()
-	if trigger_data and 0 < #trigger_data then
-		for _, data in ipairs(trigger_data) do
-			if alive(data.notify_unit) then
-				local params = {
-					from_unit = self._unit,
-					to_unit = data.notify_unit,
-					r = r,
-					g = g,
-					b = b
-				}
-				self:_draw_link(params)
-				Application:draw(data.notify_unit, r, g, b)
+	local trigger_name_list = self._unit:damage():get_trigger_name_list()
+	if trigger_name_list then
+		for _, trigger_name in ipairs(trigger_name_list) do
+			local trigger_data = self._unit:damage():get_trigger_data_list(trigger_name)
+			if trigger_data and 0 < #trigger_data then
+				for _, data in ipairs(trigger_data) do
+					if alive(data.notify_unit) then
+						local params = {
+							from_unit = self._unit,
+							to_unit = data.notify_unit,
+							r = r,
+							g = g,
+							b = b
+						}
+						self:_draw_link(params)
+						Application:draw(data.notify_unit, r, g, b)
+					end
+				end
 			end
 		end
 	end
@@ -58,16 +63,21 @@ function CoreUnitSequenceUnitElement:_set_trigger_list()
 	self._hed.trigger_list = {}
 	local triggers = managers.sequence:get_trigger_list(self._unit:name())
 	if 0 < #triggers then
-		local trigger_data = self._unit:damage():get_editor_trigger_data()
-		if trigger_data and 0 < #trigger_data then
-			for _, data in ipairs(trigger_data) do
-				table.insert(self._hed.trigger_list, {
-					name = data.trigger_name,
-					id = data.id,
-					notify_unit_id = data.notify_unit:unit_data().unit_id,
-					time = data.time,
-					notify_unit_sequence = data.notify_unit_sequence
-				})
+		local trigger_name_list = self._unit:damage():get_trigger_name_list()
+		if trigger_name_list then
+			for _, trigger_name in ipairs(trigger_name_list) do
+				local trigger_data = self._unit:damage():get_trigger_data_list(trigger_name)
+				if trigger_data and 0 < #trigger_data then
+					for _, data in ipairs(trigger_data) do
+						table.insert(self._hed.trigger_list, {
+							name = data.trigger_name,
+							id = data.id,
+							notify_unit_id = data.notify_unit:unit_data().unit_id,
+							time = data.time,
+							notify_unit_sequence = data.notify_unit_sequence
+						})
+					end
+				end
 			end
 		end
 	end

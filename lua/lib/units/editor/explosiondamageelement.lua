@@ -20,34 +20,10 @@ function ExplosionDamageUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local range_params = {
-		name = "Range:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.range,
+	self:_build_value_number(panel, panel_sizer, "range", {floats = 0, min = 0}, "The range the explosion should reach")
+	self:_build_value_number(panel, panel_sizer, "damage", {
 		floats = 0,
-		tooltip = "The range the explosion should reach",
 		min = 0,
-		max = 1000,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local range = CoreEws.number_controller(range_params)
-	range:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = range, value = "range"})
-	range:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = range, value = "range"})
-	local damage_params = {
-		name = "Damage:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.damage,
-		floats = 0,
-		tooltip = "The damage from the explosion",
-		min = 0,
-		max = 100,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local damage = CoreEws.number_controller(damage_params)
-	damage:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = damage, value = "damage"})
-	damage:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = damage, value = "damage"})
+		max = 100
+	}, "The damage from the explosion")
 end

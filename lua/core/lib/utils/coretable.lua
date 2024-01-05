@@ -79,6 +79,18 @@ function table.map_copy(map)
 	return copy
 end
 
+function table.deep_map_copy(map)
+	local copy = {}
+	for k, v in pairs(map) do
+		if type(v) == "table" then
+			copy[k] = table.deep_map_copy(v)
+		else
+			copy[k] = v
+		end
+	end
+	return copy
+end
+
 function table.list_copy(list)
 	local copy = {}
 	for k, v in ipairs(list) do
@@ -176,6 +188,18 @@ end
 
 function table.random(t)
 	return t[math.random(#t)]
+end
+
+function table.random_key(t)
+	if not next(t) then
+		return
+	end
+	local rand_nr = math.random(table.size(t))
+	local key
+	for i = 1, rand_nr do
+		key = next(t, prev_key)
+	end
+	return prev_key
 end
 
 function table.concat_map(map, concat_values, none_string, wrap, sep, last_sep)

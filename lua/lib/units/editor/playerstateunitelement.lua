@@ -12,31 +12,11 @@ function PlayerStateUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local states_params = {
-		name = "States:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = mixin_add(managers.player:player_states(), {
-			"electrocution"
-		}),
-		value = self._hed.state,
-		tooltip = "Select a state from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local states = CoreEWS.combobox(states_params)
-	states:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = states, value = "state"})
-	local use_instigator = EWS:CheckBox(panel, "On instigator", "")
-	use_instigator:set_value(self._hed.use_instigator)
-	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_instigator,
-		value = "use_instigator"
-	})
-	panel_sizer:add(use_instigator, 0, 0, "EXPAND")
-	local help = {}
+	self:_build_value_combobox(panel, panel_sizer, "state", mixin_add(managers.player:player_states(), {
+		"electrocution"
+	}), "Select a state from the combobox")
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator", "On instigator")
+	local help = {panel = panel, sizer = panel_sizer}
 	help.text = "Set the state the players should change to."
-	help.panel = panel
-	help.sizer = panel_sizer
 	self:add_help_text(help)
 end

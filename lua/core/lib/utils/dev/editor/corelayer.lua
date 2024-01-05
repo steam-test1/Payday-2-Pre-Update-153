@@ -253,13 +253,18 @@ end
 
 function Layer:_update_draw_unit_trigger_sequences(t, dt)
 	if alive(self._selected_unit) and self._selected_unit:damage() and not self._selected_unit:mission_element() then
-		local trigger_data = self._selected_unit:damage():get_editor_trigger_data()
-		if trigger_data and 0 < #trigger_data then
-			for _, data in ipairs(trigger_data) do
-				if alive(data.notify_unit) then
-					Application:draw_line(self._selected_unit:position(), data.notify_unit:position(), 0, 1, 1)
-					Application:draw_sphere(data.notify_unit:position(), 50, 0, 1, 1)
-					Application:draw(data.notify_unit, 0, 1, 1)
+		local trigger_name_list = self._selected_unit:damage():get_trigger_name_list()
+		if trigger_name_list then
+			for _, trigger_name in ipairs(trigger_name_list) do
+				local trigger_data = self._selected_unit:damage():get_trigger_data_list(trigger_name)
+				if trigger_data and 0 < #trigger_data then
+					for _, data in ipairs(trigger_data) do
+						if alive(data.notify_unit) then
+							Application:draw_line(self._selected_unit:position(), data.notify_unit:position(), 0, 1, 1)
+							Application:draw_sphere(data.notify_unit:position(), 50, 0, 1, 1)
+							Application:draw(data.notify_unit, 0, 1, 1)
+						end
+					end
 				end
 			end
 		end

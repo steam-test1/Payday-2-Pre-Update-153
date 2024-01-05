@@ -16,6 +16,8 @@ function AiLayer:init(owner)
 	self:_init_ai_settings()
 	self._patrol_path_brush = Draw:brush()
 	self._only_draw_selected_patrol_path = false
+	self._default_values = {}
+	self._default_values.all_visible = true
 end
 
 function AiLayer:load(world_holder, offset)
@@ -192,6 +194,9 @@ function AiLayer:build_panel(notebook)
 	for name, _ in pairs(self._graph_types) do
 		graphs:append(name)
 	end
+	for i = 0, graphs:nr_items() - 1 do
+		graphs:select_index(i)
+	end
 	graphs_sizer:add(graphs, 1, 0, "EXPAND")
 	local button_sizer1 = EWS:StaticBoxSizer(self._ews_panel, "HORIZONTAL", "Calculate")
 	local calc_btn = EWS:Button(self._ews_panel, "All", "", "BU_EXACTFIT,NO_BORDER")
@@ -220,6 +225,7 @@ function AiLayer:build_panel(notebook)
 	graphs_sizer:add(button_sizer2, 0, 0, "EXPAND")
 	local build_settings = EWS:StaticBoxSizer(self._ews_panel, "VERTICAL", "Build Settings")
 	self._all_visible = EWS:CheckBox(self._ews_panel, "All visible", "", "ALIGN_LEFT")
+	self._all_visible:set_value(self._default_values.all_visible)
 	build_settings:add(self._all_visible, 0, 0, "EXPAND")
 	self._ray_length_params = {
 		name = "Ray length [cm]:",

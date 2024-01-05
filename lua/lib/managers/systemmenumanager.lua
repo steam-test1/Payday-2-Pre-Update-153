@@ -231,6 +231,9 @@ function GenericSystemMenuManager:_show_result(success, data)
 end
 
 function GenericSystemMenuManager:show(data)
+	if _G.setup and _G.setup:has_queued_exec() then
+		return
+	end
 	local success = self:_show_class(data, self.GENERIC_DIALOG_CLASS, self.DIALOG_CLASS, data.force)
 	self:_show_result(success, data)
 end

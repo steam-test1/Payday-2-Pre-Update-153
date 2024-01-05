@@ -707,7 +707,11 @@ function StatisticsManager:_get_stat_tables()
 		"x_b92fs",
 		"x_deagle",
 		"g26",
-		"spas12"
+		"spas12",
+		"mg42",
+		"c96",
+		"sterling",
+		"mosin"
 	}
 	local melee_list = {
 		"weapon",

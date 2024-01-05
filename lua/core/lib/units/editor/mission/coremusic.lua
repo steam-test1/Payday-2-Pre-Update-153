@@ -22,10 +22,10 @@ function CoreMusicUnitElement:stop_test_element()
 	managers.music:stop()
 end
 
-function CoreMusicUnitElement:set_category()
-	local value = self._paths_params.value
-	CoreEWS.update_combobox_options(self._music_params, managers.music:music_events(value))
-	CoreEWS.change_combobox_value(self._music_params, managers.music:music_events(value)[1])
+function CoreMusicUnitElement:_set_category(params)
+	local value = params.value
+	CoreEws.update_combobox_options(self._music_params, managers.music:music_events(value))
+	CoreEws.change_combobox_value(self._music_params, managers.music:music_events(value)[1])
 	self._hed.music_event = self._music_params.value
 end
 
@@ -44,33 +44,14 @@ function CoreMusicUnitElement:_build_panel(panel, panel_sizer)
 	end
 	self._hed.music_event = self._hed.music_event or managers.music:music_events(paths[1])[1]
 	local path_value = managers.music:music_path(self._hed.music_event)
-	self._paths_params = {
+	CoreEws.combobox_and_list({
 		name = "Category:",
 		panel = panel,
 		sizer = panel_sizer,
 		options = paths,
 		value = path_value,
-		tooltip = "Select a category from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local paths = CoreEWS.combobox(self._paths_params)
-	paths:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_category"), nil)
-	self._music_params = {
-		name = "Music:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = managers.music:music_events(self._paths_params.value),
-		value = self._hed.music_event,
-		tooltip = "Select a music event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local music_events = CoreEWS.combobox(self._music_params)
-	music_events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = music_events,
-		value = "music_event"
+		value_changed_cb = callback(self, self, "_set_category")
 	})
+	local _, music_params = self:_build_value_combobox(panel, panel_sizer, "music_event", managers.music:music_events(path_value))
+	self._music_params = music_params
 end

@@ -16,6 +16,8 @@ PlayerStandard.IDS_START_RUNNING = Idstring("start_running")
 PlayerStandard.IDS_STOP_RUNNING = Idstring("stop_running")
 PlayerStandard.IDS_MELEE = Idstring("melee")
 PlayerStandard.IDS_MELEE_MISS = Idstring("melee_miss")
+PlayerStandard.IDS_MELEE_BAYONET = Idstring("melee_bayonet")
+PlayerStandard.IDS_MELEE_MISS_BAYONET = Idstring("melee_miss_bayonet")
 PlayerStandard.IDS_IDLE = Idstring("idle")
 PlayerStandard.IDS_USE = Idstring("use")
 PlayerStandard.IDS_RECOIL = Idstring("recoil")
@@ -1142,6 +1144,14 @@ function PlayerStandard:_start_action_melee(t, input, instant)
 	self._state_data.melee_charge_wanted = nil
 	self._state_data.meleeing = true
 	self._state_data.melee_start_t = nil
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	local primary = managers.blackmarket:equipped_primary()
+	local primary_id = primary.weapon_id
+	local bayonet_id = managers.blackmarket:equipped_bayonet(primary_id)
+	local bayonet_melee = false
+	if bayonet_id and melee_entry == "weapon" and self._equipped_unit:base():selection_index() == 2 then
+		bayonet_melee = true
+	end
 	if instant then
 		self:_do_action_melee(t, input)
 		return
@@ -1204,22 +1214,30 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
+	local primary = managers.blackmarket:equipped_primary()
+	local primary_id = primary.weapon_id
+	local bayonet_id = managers.blackmarket:equipped_bayonet(primary_id)
+	local bayonet_melee = false
+	if bayonet_id and self._equipped_unit:base():selection_index() == 2 then
+		bayonet_melee = true
+	end
 	self._state_data.melee_expire_t = t + tweak_data.blackmarket.melee_weapons[melee_entry].expire_t
 	self._state_data.melee_repeat_expire_t = t + math.min(tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t, tweak_data.blackmarket.melee_weapons[melee_entry].expire_t)
 	if not instant_hit and not skip_damage then
 		self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
 	end
-	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, instant_hit and "melee" or "melee_item")
+	local send_redirect = instant_hit and (bayonet_melee and "melee_bayonet" or "melee") or "melee_item"
+	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, send_redirect)
 	if self._state_data.melee_charge_shake then
 		self._ext_camera:shaker():stop(self._state_data.melee_charge_shake)
 		self._state_data.melee_charge_shake = nil
 	end
 	if instant_hit then
-		local hit = skip_damage or self:_do_melee_damage(t)
+		local hit = skip_damage or self:_do_melee_damage(t, bayonet_melee)
 		if hit then
-			self._ext_camera:play_redirect(self.IDS_MELEE)
+			self._ext_camera:play_redirect(bayonet_melee and self.IDS_MELEE_BAYONET or self.IDS_MELEE)
 		else
-			self._ext_camera:play_redirect(self.IDS_MELEE_MISS)
+			self._ext_camera:play_redirect(bayonet_melee and self.IDS_MELEE_MISS_BAYONET or self.IDS_MELEE_MISS)
 		end
 	else
 		self:_play_melee_sound(melee_entry, "hit_air")
@@ -1231,7 +1249,7 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 	end
 end
 
-function PlayerStandard:_do_melee_damage(t)
+function PlayerStandard:_do_melee_damage(t, bayonet_melee)
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
@@ -1249,7 +1267,11 @@ function PlayerStandard:_do_melee_damage(t)
 		col_ray.sphere_cast_radius = sphere_cast_radius
 		local hit_unit = col_ray.unit
 		if hit_unit:character_damage() then
-			self:_play_melee_sound(melee_entry, "hit_body")
+			if bayonet_melee then
+				self._unit:sound():play("fairbairn_hit_body", nil, false)
+			else
+				self:_play_melee_sound(melee_entry, "hit_body")
+			end
 			if not hit_unit:character_damage()._no_blood then
 				managers.game_play_central:play_impact_flesh({col_ray = col_ray})
 				managers.game_play_central:play_impact_sound_and_effects({
@@ -1259,7 +1281,11 @@ function PlayerStandard:_do_melee_damage(t)
 				})
 			end
 		else
-			self:_play_melee_sound(melee_entry, "hit_gen")
+			if bayonet_melee then
+				self._unit:sound():play("knife_hit_gen", nil, false)
+			else
+				self:_play_melee_sound(melee_entry, "hit_gen")
+			end
 			managers.game_play_central:play_impact_sound_and_effects({
 				col_ray = col_ray,
 				effect = Idstring("effects/payday2/particles/impacts/fallback_impact_pd2"),
@@ -2564,7 +2590,6 @@ function PlayerStandard:_start_action_unequip_weapon(t, data)
 end
 
 function PlayerStandard:_start_action_equip_weapon(t)
-	local speed_multiplier = self:_get_swap_speed_multiplier()
 	if self._change_weapon_data.next then
 		self._ext_inventory:equip_next(false)
 	elseif self._change_weapon_data.previous then
@@ -2572,6 +2597,7 @@ function PlayerStandard:_start_action_equip_weapon(t)
 	elseif self._change_weapon_data.selection_wanted then
 		self._ext_inventory:equip_selection(self._change_weapon_data.selection_wanted, false)
 	end
+	local speed_multiplier = self:_get_swap_speed_multiplier()
 	local tweak_data = self._equipped_unit:base():weapon_tweak_data()
 	self._equip_weapon_expire_t = t + (tweak_data.timers.equip or 0.7) / speed_multiplier
 	self._ext_camera:play_redirect(self.IDS_EQUIP, speed_multiplier)
