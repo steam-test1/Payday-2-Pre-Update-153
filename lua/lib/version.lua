@@ -1,1 +1,1 @@
-Global.version = "v1.1.1"
+Global.version = "v1.1.2"

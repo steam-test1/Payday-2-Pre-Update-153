@@ -28,9 +28,6 @@ function CarryData:update(unit, t, dt)
 	if not Network:is_server() then
 		return
 	end
-	if self._dye_risk and t > self._dye_risk.next_t then
-		self:_check_dye_explode()
-	end
 	if self._explode_t and t > self._explode_t then
 		self._explode_t = nil
 		self:_explode()
@@ -38,11 +35,11 @@ function CarryData:update(unit, t, dt)
 end
 
 function CarryData:_check_dye_explode()
+	do return end
 	local chance = math.rand(1)
 	if chance < 0.25 then
 		self._dye_risk = nil
 		self:_dye_exploded()
-		managers.network:session():send_to_peers_synched("sync_bag_dye_pack_exploded", self._unit)
 		return
 	end
 	self._dye_risk.next_t = Application:time() + 2 + math.random(3)
@@ -53,6 +50,7 @@ function CarryData:sync_dye_exploded()
 end
 
 function CarryData:_dye_exploded()
+	do return end
 	print("CarryData DYE BOOM")
 	self._value = self._value * (1 - self._dye_value_multiplier / 100)
 	self._value = math.round(self._value)

@@ -577,7 +577,7 @@ function WeaponTweakData:_init_data_usp_npc()
 end
 
 function WeaponTweakData:_init_data_m45_npc()
-	self.m45_npc.sounds.prefix = "mac10_npc"
+	self.m45_npc.sounds.prefix = "m45_npc"
 	self.m45_npc.use_data.selection_index = 1
 	self.m45_npc.DAMAGE = 2
 	self.m45_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
@@ -593,7 +593,7 @@ function WeaponTweakData:_init_data_m45_npc()
 end
 
 function WeaponTweakData:_init_data_s552_npc()
-	self.s552_npc.sounds.prefix = "g36_npc"
+	self.s552_npc.sounds.prefix = "sig552_npc"
 	self.s552_npc.use_data.selection_index = 2
 	self.s552_npc.DAMAGE = 2
 	self.s552_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
@@ -610,7 +610,7 @@ function WeaponTweakData:_init_data_s552_npc()
 end
 
 function WeaponTweakData:_init_data_ppk_npc()
-	self.ppk_npc.sounds.prefix = "g17_npc"
+	self.ppk_npc.sounds.prefix = "w_ppk_npc"
 	self.ppk_npc.use_data.selection_index = 1
 	self.ppk_npc.DAMAGE = 1
 	self.ppk_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
