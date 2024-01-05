@@ -79,33 +79,6 @@ function DLCTweakData:init(tweak_data)
 	self.cce.content.upgrades = {
 		"player_crime_net_deal_2"
 	}
-	self.halloween = {}
-	self.halloween.free = true
-	self.halloween.content = {}
-	self.halloween.content.loot_drops = {
-		{
-			{
-				type_items = "masks",
-				item_entry = "pumpkin_king",
-				amount = 1
-			},
-			{
-				type_items = "masks",
-				item_entry = "witch",
-				amount = 1
-			},
-			{
-				type_items = "masks",
-				item_entry = "venomorph",
-				amount = 1
-			},
-			{
-				type_items = "masks",
-				item_entry = "frank",
-				amount = 1
-			}
-		}
-	}
 	self.halloween_nightmare_1 = {}
 	self.halloween_nightmare_1.dlc = "has_achievement"
 	self.halloween_nightmare_1.achievement_id = "halloween_nightmare_1"

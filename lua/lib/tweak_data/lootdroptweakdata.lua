@@ -81,7 +81,7 @@ function LootDropTweakData:init(tweak_data)
 		colors = {6, 11},
 		textures = {7, 12},
 		materials = {7, 12},
-		masks = {25, 30},
+		masks = {10, 15},
 		xp = {8, 0}
 	}
 	for i = min, max, 10 do

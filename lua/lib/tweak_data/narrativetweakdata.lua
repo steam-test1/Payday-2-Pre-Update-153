@@ -1242,8 +1242,7 @@ function NarrativeTweakData:init()
 		"branchbank_cash",
 		"branchbank_gold_prof",
 		"branchbank_prof",
-		"family",
-		"haunted"
+		"family"
 	}
 end
 
