@@ -21,10 +21,7 @@ function MenuComponentManager:init()
 	self._fullscreen_ws = managers.gui_data:create_fullscreen_16_9_workspace()
 	managers.gui_data:layout_workspace(self._ws)
 	self._main_panel = self._ws:panel():panel()
-	self._cached_textures = {}
 	self._requested_textures = {}
-	self._removing_textures = {}
-	self._requested_index = {}
 	self._REFRESH_FRIENDS_TIME = 5
 	self._refresh_friends_t = TimerManager:main():time() + self._REFRESH_FRIENDS_TIME
 	self._sound_source = SoundDevice:create_source("MenuComponentManager")
@@ -297,18 +294,6 @@ function MenuComponentManager:update(t, dt)
 	end
 	if self._mission_briefing_update_tab_wanted then
 		self:update_mission_briefing_tab_positions()
-	end
-	if table.size(self._removing_textures) > 0 then
-		for key, texture_ids in pairs(self._removing_textures) do
-			if self._cached_textures[key] and self._cached_textures[key] ~= 0 then
-				Application:error("[MenuComponentManager] update(): Still holds references of texture!", texture_ids, self._cached_textures[key])
-			end
-			self._cached_textures[key] = nil
-			self._requested_textures[key] = nil
-			self._requested_index[key] = nil
-			TextureCache:unretrieve(texture_ids)
-		end
-		self._removing_textures = {}
 	end
 	self:_update_newsfeed_gui(t, dt)
 	if t > self._refresh_friends_t then
@@ -2921,7 +2906,8 @@ function MenuComponentManager:request_texture(texture, done_cb)
 	if not entry then
 		entry = {
 			next_index = 1,
-			owners = {}
+			owners = {},
+			texture_ids = texture_ids
 		}
 		self._requested_textures[key] = entry
 	end
@@ -3081,12 +3067,12 @@ function MenuComponentManager:close()
 		self._sound_source:stop()
 	end
 	self:_destroy_controller_input()
-	if self._removing_textures then
-		for key, texture_ids in pairs(self._removing_textures) do
-			TextureCache:unretrieve(texture_ids)
+	if self._requested_textures then
+		for key, entry in pairs(self._requested_textures) do
+			TextureCache:unretrieve(entry.texture_ids)
 		end
 	end
-	self._removing_textures = {}
+	self._requested_textures = {}
 end
 
 function MenuComponentManager:play_transition(run_in_pause)

@@ -240,9 +240,9 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_asset_cost_loot_drop_off = 3000
 	self.preplaning_asset_cost_thermal_paste = 3000
 	self.preplaning_asset_cost_branchbank_vault_key = 3000
-	self.preplaning_asset_cost_mia_sniper = 3000
-	self.preplaning_asset_cost_delayed_police = 2000
-	self.preplaning_asset_cost_reduce_mobsters = 2000
+	self.preplaning_mia_cost_sniper = 3000
+	self.preplaning_mia_cost_delayed_police = 2000
+	self.preplaning_mia_cost_reduce_mobsters = 2000
 	self.small_loot = {}
 	if difficulty_index <= 2 then
 		self.small_loot.money_bundle = 1000
