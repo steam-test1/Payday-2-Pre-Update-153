@@ -26,7 +26,7 @@ function NetworkGame:on_network_stopped()
 end
 
 function NetworkGame:load(game_data)
-	if managers.network:session():is_client() then
+	if managers.network:session():is_client() and managers.network:session():server_peer() then
 		Network:set_client(managers.network:session():server_peer():rpc())
 		local is_playing = BaseNetworkHandler._gamestate_filter.any_ingame_playing[game_state_machine:last_queued_state_name()]
 		if is_playing then
@@ -396,6 +396,7 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 		end
 		local member_used_deployable = peer:used_deployable() or false
 		local member_used_cable_ties = peer:used_cable_ties() or 0
+		local member_used_body_bags = peer:used_body_bags()
 		self._members[peer_id]:delete()
 		self._members[peer_id] = nil
 		local peer_ident = SystemInfo:platform() == Idstring("WIN32") and peer:user_id() or peer:name()
@@ -424,6 +425,7 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 						health = member_health,
 						used_deployable = member_used_deployable,
 						used_cable_ties = member_used_cable_ties,
+						used_body_bags = member_used_body_bags,
 						member_dead = member_dead
 					}
 					local trade_entry = managers.trade:replace_player_with_ai(player_character, player_character)

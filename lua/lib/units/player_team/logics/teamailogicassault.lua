@@ -20,7 +20,6 @@ function TeamAILogicAssault.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = old_internal_data and old_internal_data.rsrv_pos or {}
 	my_data.cover_chk_t = data.t + TeamAILogicAssault._COVER_CHK_INTERVAL
 	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
 	if old_internal_data then
@@ -51,15 +50,7 @@ function TeamAILogicAssault.exit(data, new_logic_name, enter_params)
 	if my_data.nearest_cover then
 		managers.navigation:release_cover(my_data.nearest_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 end
 
 function TeamAILogicAssault.update(data)
@@ -207,8 +198,6 @@ function TeamAILogicAssault.action_complete_clbk(data, action)
 	local action_type = action:type()
 	if action_type == "walk" then
 		my_data.advancing = nil
-		my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-		my_data.rsrv_pos.move_dest = nil
 		if my_data.surprised then
 			my_data.surprised = false
 		elseif my_data.moving_to_cover then

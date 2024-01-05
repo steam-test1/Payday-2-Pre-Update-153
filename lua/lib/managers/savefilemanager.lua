@@ -548,8 +548,10 @@ function SavefileManager:_save_cache(slot)
 		managers.skilltree:save(cache)
 		managers.blackmarket:save(cache)
 		managers.mission:save_job_values(cache)
+		managers.job:save(cache)
 		managers.dlc:save(cache)
 		managers.infamy:save(cache)
+		managers.features:save(cache)
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		cache.user_id = self._USER_ID_OVERRRIDE or Steam:userid()
@@ -851,8 +853,10 @@ function SavefileManager:_load_cache(slot)
 			managers.statistics:load(cache, version)
 			managers.skilltree:load(cache, version)
 			managers.mission:load_job_values(cache, version)
+			managers.job:load(cache, version)
 			managers.dlc:load(cache, version)
 			managers.infamy:load(cache, version)
+			managers.features:load(cache, version)
 		end
 	else
 		Application:error("[SavefileManager] Unable to load savefile from slot \"" .. tostring(slot) .. "\".")

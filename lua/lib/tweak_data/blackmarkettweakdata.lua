@@ -1008,6 +1008,34 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.gage_deltaforce.qlvl = 0
 	self.masks.gage_deltaforce.texture_bundle_folder = "gage_pack_lmg"
 	self.masks.gage_deltaforce.dlc = "gage_pack_lmg"
+	self.masks.skullhard = {}
+	self.masks.skullhard.unit = "units/payday2/masks/msk_skullhard/msk_skullhard"
+	self.masks.skullhard.name_id = "bm_msk_skullhard"
+	self.masks.skullhard.pcs = {}
+	self.masks.skullhard.value = 0
+	self.masks.skullhard.qlvl = 0
+	self.masks.skullhard.infamous = true
+	self.masks.skullveryhard = {}
+	self.masks.skullveryhard.unit = "units/payday2/masks/msk_skullveryhard/msk_skullveryhard"
+	self.masks.skullveryhard.name_id = "bm_msk_skullveryhard"
+	self.masks.skullveryhard.pcs = {}
+	self.masks.skullveryhard.value = 0
+	self.masks.skullveryhard.qlvl = 0
+	self.masks.skullveryhard.infamous = true
+	self.masks.skulloverkill = {}
+	self.masks.skulloverkill.unit = "units/payday2/masks/msk_skulloverkill/msk_skulloverkill"
+	self.masks.skulloverkill.name_id = "bm_msk_skulloverkill"
+	self.masks.skulloverkill.pcs = {}
+	self.masks.skulloverkill.value = 0
+	self.masks.skulloverkill.qlvl = 0
+	self.masks.skulloverkill.infamous = true
+	self.masks.skulloverkillplus = {}
+	self.masks.skulloverkillplus.unit = "units/payday2/masks/msk_skulloverkillplus/msk_skulloverkillplus"
+	self.masks.skulloverkillplus.name_id = "bm_msk_skulloverkillplus"
+	self.masks.skulloverkillplus.pcs = {}
+	self.masks.skulloverkillplus.value = 0
+	self.masks.skulloverkillplus.qlvl = 0
+	self.masks.skulloverkillplus.infamous = true
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -4275,7 +4303,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.fists.stats.min_damage_effect = 2
 	self.melee_weapons.fists.stats.max_damage_effect = 4
 	self.melee_weapons.fists.stats.charge_time = 1
-	self.melee_weapons.fists.stats.range = 175
+	self.melee_weapons.fists.stats.range = 150
 	self.melee_weapons.fists.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.fists.stats.weapon_type = "blunt"
 	self.melee_weapons.fists.anim_global_param = "melee_fist"
@@ -4308,7 +4336,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.kabar.stats.max_damage = 7
 	self.melee_weapons.kabar.stats.min_damage_effect = 0.7
 	self.melee_weapons.kabar.stats.max_damage_effect = 0.75
-	self.melee_weapons.kabar.stats.charge_time = 2
+	self.melee_weapons.kabar.stats.charge_time = 1.8
 	self.melee_weapons.kabar.stats.range = 150
 	self.melee_weapons.kabar.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.kabar.stats.weapon_type = "sharp"
@@ -4333,11 +4361,11 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.rambo.type = "knife"
 	self.melee_weapons.rambo.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_mel_rambo/wpn_fps_mel_rambo"
 	self.melee_weapons.rambo.third_unit = "units/pd2_dlc_gage_lmg/weapons/wpn_third_mel_rambo/wpn_third_mel_rambo"
-	self.melee_weapons.rambo.stats.min_damage = 2.5
+	self.melee_weapons.rambo.stats.min_damage = 2.2
 	self.melee_weapons.rambo.stats.max_damage = 10
 	self.melee_weapons.rambo.stats.min_damage_effect = 0.7
 	self.melee_weapons.rambo.stats.max_damage_effect = 0.75
-	self.melee_weapons.rambo.stats.charge_time = 2.75
+	self.melee_weapons.rambo.stats.charge_time = 2
 	self.melee_weapons.rambo.stats.range = 185
 	self.melee_weapons.gerber = deep_clone(self.melee_weapons.kabar)
 	self.melee_weapons.gerber.name_id = "bm_melee_gerber"
@@ -4348,7 +4376,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.gerber.stats.max_damage = 5.2
 	self.melee_weapons.gerber.stats.min_damage_effect = 1
 	self.melee_weapons.gerber.stats.max_damage_effect = 1.15
-	self.melee_weapons.gerber.stats.charge_time = 1.5
+	self.melee_weapons.gerber.stats.charge_time = 1.3
 	self.melee_weapons.gerber.stats.range = 125
 	self.melee_weapons.kampfmesser = deep_clone(self.melee_weapons.kabar)
 	self.melee_weapons.kampfmesser.name_id = "bm_melee_kampfmesser"
@@ -4359,7 +4387,26 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.kampfmesser.stats.max_damage = 7.5
 	self.melee_weapons.kampfmesser.stats.min_damage_effect = 1
 	self.melee_weapons.kampfmesser.stats.max_damage_effect = 1.15
-	self.melee_weapons.kampfmesser.stats.charge_time = 2.25
+	self.melee_weapons.kampfmesser.stats.charge_time = 1.5
 	self.melee_weapons.kampfmesser.stats.range = 150
+	self.melee_weapons.brass_knuckles = deep_clone(self.melee_weapons.fists)
+	self.melee_weapons.brass_knuckles.name_id = "bm_melee_brass_knuckles"
+	self.melee_weapons.brass_knuckles.free = nil
+	self.melee_weapons.brass_knuckles.type = "fists"
+	self.melee_weapons.brass_knuckles.dlc = "pd2_clan"
+	self.melee_weapons.brass_knuckles.align_objects = {
+		"a_weapon_left",
+		"a_weapon_right"
+	}
+	self.melee_weapons.brass_knuckles.unit = "units/payday2/weapons/wpn_fps_mel_brassknuckle/wpn_fps_mel_brassknuckle"
+	self.melee_weapons.brass_knuckles.third_unit = "units/payday2/weapons/wpn_fps_mel_brassknuckle/wpn_third_mel_brassknuckle"
+	self.melee_weapons.brass_knuckles.stats.min_damage = 1.5
+	self.melee_weapons.brass_knuckles.stats.max_damage = 3.5
+	self.melee_weapons.brass_knuckles.stats.min_damage_effect = 2
+	self.melee_weapons.brass_knuckles.stats.max_damage_effect = 4
+	self.melee_weapons.brass_knuckles.stats.charge_time = 1.3
+	self.melee_weapons.brass_knuckles.stats.range = 150
+	self.melee_weapons.brass_knuckles.sounds.hit_gen = "knuckles_hit_gen"
+	self.melee_weapons.brass_knuckles.sounds.hit_body = "knuckles_hit_body"
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

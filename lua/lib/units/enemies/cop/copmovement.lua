@@ -104,9 +104,9 @@ action_variants.sniper = security_variant
 action_variants.gangster = security_variant
 action_variants.dealer = security_variant
 action_variants.biker_escape = security_variant
+action_variants.city_swat = security_variant
 action_variants.shield = clone(security_variant)
 action_variants.shield.hurt = ShieldActionHurt
-action_variants.murky = security_variant
 action_variants.tank = clone(security_variant)
 action_variants.tank.walk = TankCopActionWalk
 action_variants.spooc = security_variant
@@ -354,10 +354,10 @@ function CopMovement:_upd_actions(t)
 			end
 		end
 	end
-	if has_no_action and not self._queued_actions then
+	if has_no_action and (not self._queued_actions or not next(self._queued_actions)) then
 		self:action_request({type = "idle", body_part = 1})
 	end
-	if not a_actions[1] and not a_actions[3] and not self._queued_actions and not self:chk_action_forbidden("action") then
+	if not a_actions[1] and not a_actions[3] and (not self._queued_actions or not next(self._queued_actions)) and not self:chk_action_forbidden("action") then
 		self:action_request({type = "idle", body_part = 3})
 	end
 	self:_upd_stance(t)
@@ -1835,8 +1835,12 @@ function CopMovement:clbk_sync_attention(attention)
 		return
 	end
 	if attention.handler then
-		self._ext_network:send("set_attention", attention.handler:unit(), attention.reaction)
-	elseif self._attention.unit then
+		if attention.handler:unit():id() ~= -1 then
+			self._ext_network:send("set_attention", attention.handler:unit(), attention.reaction)
+		else
+			self._ext_network:send("cop_set_attention_pos", mvector3.copy(attention.handler:get_attention_m_pos()))
+		end
+	elseif self._attention.unit and attention.unit:id() ~= -1 then
 		self._ext_network:send("cop_set_attention_unit", self._attention.unit)
 	end
 end

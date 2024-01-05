@@ -691,8 +691,8 @@ function MenuSceneManager:set_character_armor(armor_id, unit)
 end
 
 function MenuSceneManager:set_character_card(peer_id, rank, unit)
+	local state = unit:play_redirect(Idstring("idle_menu"))
 	if rank and 0 < rank then
-		local state = unit:play_redirect(Idstring("idle_menu"))
 		unit:anim_state_machine():set_parameter(state, "husk_card" .. peer_id, 1)
 		local card = rank - 1
 		local card_unit = World:spawn_unit(Idstring("units/menu/menu_scene/infamy_card"), Vector3(0, 0, 0), Rotation(0, 0, 0))
@@ -701,6 +701,8 @@ function MenuSceneManager:set_character_card(peer_id, rank, unit)
 		self:_delete_character_weapon(unit, "secondary")
 		self._card_units = self._card_units or {}
 		self._card_units[unit:key()] = card_unit
+	else
+		unit:anim_state_machine():set_parameter(state, "husk" .. peer_id, 1)
 	end
 end
 
@@ -1162,7 +1164,7 @@ end
 function MenuSceneManager:destroy_melee_weapon()
 end
 
-function MenuSceneManager:spawn_item_weapon(factory_id, blueprint)
+function MenuSceneManager:spawn_item_weapon(factory_id, blueprint, texture_switches)
 	self:destroy_item_weapon()
 	local factory_weapon = tweak_data.weapon.factory[factory_id]
 	local ids_unit_name = Idstring(factory_weapon.unit)
@@ -1175,6 +1177,7 @@ function MenuSceneManager:spawn_item_weapon(factory_id, blueprint)
 	mrotation.set_zero(self._item_rot)
 	local new_unit = World:spawn_unit(ids_unit_name, self._item_pos, self._item_rot)
 	new_unit:base():set_factory_data(factory_id)
+	new_unit:base():set_texture_switches(texture_switches)
 	if blueprint then
 		new_unit:base():assemble_from_blueprint(factory_id, blueprint, true)
 	else
@@ -1302,9 +1305,10 @@ function MenuSceneManager:spawn_mask(mask_id, blueprint)
 		return
 	end
 	local mask_unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id)
+	local default_blueprint = managers.blackmarket:get_mask_default_blueprint(mask_id)
 	self:_spawn_item(mask_unit_name, nil, nil, "mask", mask_id)
+	self._item_unit:base():apply_blueprint(blueprint or default_blueprint)
 	if blueprint then
-		self._item_unit:base():apply_blueprint(blueprint)
 	end
 	mrotation.set_yaw_pitch_roll(self._item_rot_mod, 0, 90, 0)
 end
@@ -1317,8 +1321,9 @@ function MenuSceneManager:spawn_mask_clbk(params)
 	end
 	local mask_unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id)
 	self:_spawn_item(mask_unit_name, nil, nil, "mask", mask_id)
+	local default_blueprint = managers.blackmarket:get_mask_default_blueprint(mask_id)
+	self._item_unit:base():apply_blueprint(blueprint or default_blueprint)
 	if blueprint then
-		self._item_unit:base():apply_blueprint(blueprint)
 	end
 	mrotation.set_yaw_pitch_roll(self._item_rot_mod, 0, 90, 0)
 end

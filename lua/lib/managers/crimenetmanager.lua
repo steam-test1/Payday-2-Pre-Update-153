@@ -33,6 +33,8 @@ end
 
 function CrimeNetManager:_get_jobs_by_jc()
 	local t = {}
+	local plvl = managers.experience:current_level()
+	local prank = managers.experience:current_rank()
 	for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 		local is_cooldown_ok = managers.job:check_ok_with_cooldown(job_id)
 		local is_not_wrapped = not tweak_data.narrative.jobs[job_id].wrapped_to_job
@@ -40,15 +42,22 @@ function CrimeNetManager:_get_jobs_by_jc()
 		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got
 		if pass_all_tests then
 			local job_data = tweak_data.narrative.jobs[job_id]
-			for i = job_data.professional and 1 or 0, 3 do
-				t[job_data.jc + i * 10] = t[job_data.jc + i * 10] or {}
+			local start_difficulty = job_data.professional and 1 or 0
+			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
+			for i = start_difficulty, num_difficulties do
+				local job_jc = math.clamp(job_data.jc + i * 10, 0, 100)
 				local difficulty_id = 2 + i
 				local difficulty = tweak_data:index_to_difficulty(difficulty_id)
-				table.insert(t[job_data.jc + i * 10], {
-					job_id = job_id,
-					difficulty_id = difficulty_id,
-					difficulty = difficulty
-				})
+				local level_lock = tweak_data.difficulty_level_locks[difficulty_id] or 0
+				local is_not_level_locked = 1 <= prank or plvl >= level_lock
+				if is_not_level_locked then
+					t[job_jc] = t[job_jc] or {}
+					table.insert(t[job_jc], {
+						job_id = job_id,
+						difficulty_id = difficulty_id,
+						difficulty = difficulty
+					})
+				end
 			end
 		else
 			print("SKIP DUE TO COOLDOWN OR THE JOB IS WRAPPED INSIDE AN OTHER JOB", job_id)
@@ -771,8 +780,8 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		text = managers.localization:to_upper_text("menu_cn_legend_show", {
 			BTN_X = managers.localization:btn_macro("menu_toggle_legends")
 		}),
-		font_size = tweak_data.menu.pd2_medium_font_size,
-		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		font = tweak_data.menu.pd2_small_font,
 		color = tweak_data.screen_colors.text,
 		layer = 40,
 		blend_mode = "add"
@@ -847,25 +856,10 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			friends_text:hide()
 			friends_text:set_bottom(host_text:bottom())
 		end
-		local pc_icon = legend_panel:bitmap({
-			texture = "guis/textures/pd2/crimenet_legend_payclass",
-			x = 10,
-			y = friends_text:bottom()
-		})
-		local pc_text = legend_panel:text({
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			x = host_text:left(),
-			y = pc_icon:top(),
-			text = managers.localization:to_upper_text("menu_cn_legend_pc"),
-			color = tweak_data.screen_colors.text,
-			blend_mode = "add"
-		})
-		mw = math.max(mw, self:make_fine_text(pc_text))
 		local risk_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/crimenet_legend_risklevel",
 			x = 10,
-			y = pc_text:bottom()
+			y = friends_text:bottom()
 		})
 		local risk_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
@@ -935,8 +929,8 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			text = managers.localization:to_upper_text(id, {
 				BTN_Y = managers.localization:btn_macro("menu_toggle_filters")
 			}),
-			font_size = tweak_data.menu.pd2_medium_font_size,
-			font = tweak_data.menu.pd2_medium_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
 			color = tweak_data.screen_colors.text,
 			layer = 40,
 			blend_mode = "add"
@@ -1007,6 +1001,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	})
 	self._pan_panel:set_center(self._fullscreen_panel:w() / 2, self._fullscreen_panel:h() / 2)
 	self._jobs = {}
+	self._deleting_jobs = {}
 	self._map_panel = self._fullscreen_panel:panel({
 		name = "map",
 		w = pw,
@@ -1133,6 +1128,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	end
 	self._special_contracts_id = {}
 	self:add_special_contracts(node:parameters().no_casino)
+	managers.features:announce_feature("crimenet_heat")
 	return
 end
 
@@ -1383,7 +1379,7 @@ function CrimeNetGui:add_special_contracts(no_casino)
 end
 
 function CrimeNetGui:add_preset_job(preset_id)
-	self:remove_job(preset_id)
+	self:remove_job(preset_id, true)
 	local preset = managers.crimenet:preset(preset_id)
 	local gui_data = self:_create_job_gui(preset, "preset")
 	gui_data.preset_id = preset_id
@@ -1421,11 +1417,15 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	if not x and not y then
 		x, y, location = self:_get_job_location(data)
 	end
+	if location and location[3] then
+		Application:error("[CrimeNetGui:_create_job_gui] Location already taken!", x, y)
+	end
 	local color = Color.white
 	local friend_color = tweak_data.screen_colors.friend_color
 	local regular_color = tweak_data.screen_colors.regular_color
 	local pro_color = tweak_data.screen_colors.pro_color
 	local side_panel = self._pan_panel:panel({layer = 26, alpha = 0})
+	local heat_glow
 	local stars_panel = side_panel:panel({
 		name = "stars_panel",
 		layer = -1,
@@ -1433,7 +1433,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		w = 100
 	})
 	local num_stars = 0
-	local star_size = 8
+	local star_size = 16
 	local job_num = 0
 	local job_cash = 0
 	local difficulty_name = side_panel:text({
@@ -1446,22 +1446,46 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		blend_mode = "add",
 		layer = 0
 	})
+	local heat_name = side_panel:text({
+		name = "heat_name",
+		text = "",
+		vertical = "center",
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = color,
+		blend_mode = "add",
+		layer = 0
+	})
+	local got_heat = false
+	local job_heat = managers.job:get_job_heat(data.job_id) or 0
+	local job_heat_mul = managers.job:heat_to_experience_multiplier(job_heat) - 1
 	if data.job_id then
 		local x = 0
 		local y = 0
 		local job_stars = math.ceil(tweak_data.narrative.jobs[data.job_id].jc / 10)
 		local difficulty_stars = data.difficulty_id - 2
 		local job_and_difficulty_stars = job_stars + difficulty_stars
-		for i = 1, 10 do
+		local start_difficulty = 1
+		local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or 4
+		for i = start_difficulty, num_difficulties do
 			stars_panel:bitmap({
-				texture = "guis/textures/pd2/crimenet_paygrade_marker",
+				texture = "guis/textures/pd2/cn_miniskull",
 				x = x,
 				y = y,
-				blend_mode = "normal",
+				w = 12,
+				h = 16,
+				texture_rect = {
+					0,
+					0,
+					12,
+					16
+				},
+				alpha = i > difficulty_stars and 0.5 or 1,
+				blend_mode = i > difficulty_stars and "normal" or "add",
 				layer = 0,
-				color = i > job_stars + difficulty_stars and Color.black or i > job_stars and tweak_data.screen_colors.risk or color
+				color = i > difficulty_stars and Color.black or tweak_data.screen_colors.risk
 			})
-			x = x + star_size
+			x = x + 11
 			num_stars = num_stars + 1
 		end
 		job_num = #tweak_data.narrative.jobs[data.job_id].chain
@@ -1470,6 +1494,29 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		local difficulty_string = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[tweak_data.difficulties[data.difficulty_id]])
 		difficulty_name:set_text(difficulty_string)
 		difficulty_name:set_color(0 < difficulty_stars and tweak_data.screen_colors.risk or tweak_data.screen_colors.text)
+		local heat_alpha = math.abs(job_heat) / 100
+		local heat_size = 1
+		local heat_color = managers.job:get_job_heat_color(data.job_id)
+		heat_glow = self._pan_panel:bitmap({
+			texture = "guis/textures/pd2/hot_cold_glow",
+			layer = 11,
+			w = 256 * heat_size,
+			h = 256 * heat_size,
+			blend_mode = "add",
+			color = heat_color,
+			alpha = heat_alpha
+		})
+		if job_heat_mul ~= 0 then
+			job_heat = math.round(job_heat_mul * 100)
+			local job_heat_string = tostring(math.abs(job_heat))
+			if job_heat == 0 and job_heat_mul ~= 0 then
+				job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
+			end
+			local text_string = managers.localization:to_upper_text("menu_heat_" .. (0 < job_heat_mul and "warm_short" or job_heat_mul < 0 and "cold_short" or "ok_short"), {job_heat = job_heat_string})
+			heat_name:set_text(text_string)
+			heat_name:set_color(heat_color)
+			got_heat = true
+		end
 	end
 	local host_string = data.host_name or is_professional and managers.localization:to_upper_text("cn_menu_pro_job") or " "
 	local job_string = data.job_id and managers.localization:to_upper_text(tweak_data.narrative.jobs[data.job_id].name_id) or data.level_name or "NO JOB"
@@ -1521,7 +1568,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		blend_mode = "add",
 		layer = 0
 	})
-	stars_panel:set_w(star_size * math.min(10, #stars_panel:children()))
+	stars_panel:set_w(star_size * math.min(11, #stars_panel:children()))
 	stars_panel:set_h(star_size)
 	local focus = self._pan_panel:bitmap({
 		name = "focus",
@@ -1532,41 +1579,55 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	})
 	do
 		local _, _, w, h = host_name:text_rect()
-		host_name:set_size(w, h)
+		host_name:set_size(w, h - 4)
 		host_name:set_position(0, 0)
 		if not is_server then
 		end
 	end
 	do
 		local _, _, w, h = job_name:text_rect()
-		job_name:set_size(w, h)
+		job_name:set_size(w, h - 4)
 		job_name:set_position(0, host_name:bottom())
 	end
 	do
 		local _, _, w, h = contact_name:text_rect()
-		contact_name:set_size(w, h)
+		contact_name:set_size(w, h - 4)
 		contact_name:set_top(job_name:top())
 		contact_name:set_right(0)
 	end
 	do
 		local _, _, w, h = info_name:text_rect()
-		info_name:set_size(w, h)
+		info_name:set_size(w, h - 4)
 		info_name:set_top(contact_name:bottom())
 		info_name:set_right(0)
 	end
 	do
 		local _, _, w, h = difficulty_name:text_rect()
-		difficulty_name:set_size(w, h)
+		difficulty_name:set_size(w, h - 4)
 		difficulty_name:set_top(info_name:bottom())
 		difficulty_name:set_right(0)
 	end
+	do
+		local _, _, w, h = heat_name:text_rect()
+		heat_name:set_size(w, h - 4)
+		heat_name:set_top(difficulty_name:bottom())
+		heat_name:set_right(0)
+	end
+	if not got_heat then
+		heat_name:set_text(" ")
+		heat_name:set_w(1, 0)
+		heat_name:set_position(0, host_name:bottom())
+	end
 	if is_special then
 		contact_name:set_text(" ")
-		contact_name:set_size(1, 0)
+		contact_name:set_size(0, 0)
 		contact_name:set_position(0, host_name:bottom())
 		difficulty_name:set_text(" ")
-		difficulty_name:set_w(1, 0)
+		difficulty_name:set_w(0, 0)
 		difficulty_name:set_position(0, host_name:bottom())
+		heat_name:set_text(" ")
+		heat_name:set_w(0, 0)
+		heat_name:set_position(0, host_name:bottom())
 	elseif not got_job then
 		job_name:set_text(data.state_name or managers.localization:to_upper_text("menu_lobby_server_state_in_lobby"))
 		local _, _, w, h = job_name:text_rect()
@@ -1581,9 +1642,12 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		difficulty_name:set_text(" ")
 		difficulty_name:set_w(0, 0)
 		difficulty_name:set_position(0, host_name:bottom())
+		heat_name:set_text(" ")
+		heat_name:set_w(0, 0)
+		heat_name:set_position(0, host_name:bottom())
 	end
 	stars_panel:set_position(0, job_name:bottom())
-	side_panel:set_h(math.max(job_name:bottom(), info_name:bottom(), difficulty_name:bottom(), stars_panel:bottom()))
+	side_panel:set_h(math.round(host_name:h() + job_name:h() + stars_panel:h()))
 	side_panel:set_w(300)
 	self._num_layer_jobs = (self._num_layer_jobs + 1) % 1
 	local marker_panel = self._pan_panel:panel({
@@ -1616,15 +1680,15 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	local glow_stretch = glow_panel:bitmap({
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 960,
-		h = 50,
+		h = 75,
 		blend_mode = "add",
 		alpha = 0.55,
 		color = data.pulse_color or is_professional and pro_color or regular_color
 	})
 	local glow_center_dark = glow_panel:bitmap({
 		texture = "guis/textures/pd2/crimenet_marker_glow",
-		w = 150,
-		h = 150,
+		w = 175,
+		h = 175,
 		blend_mode = "normal",
 		alpha = 0.7,
 		color = Color.black,
@@ -1633,9 +1697,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	local glow_stretch_dark = glow_panel:bitmap({
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 990,
-		h = 55,
+		h = 75,
 		blend_mode = "normal",
-		alpha = 0.7,
+		alpha = 0.75,
 		color = Color.black,
 		layer = -1
 	})
@@ -1721,6 +1785,51 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	marker_panel:set_center(x * self._zoom, y * self._zoom)
 	focus:set_center(marker_panel:center())
 	glow_panel:set_world_center(marker_panel:child("select_panel"):world_center())
+	if heat_glow then
+		heat_glow:set_world_center(marker_panel:child("select_panel"):world_center())
+	end
+	local num_containers = managers.job:get_num_containers()
+	local middle_container = math.ceil(num_containers / 2)
+	local job_container_index = managers.job:get_job_container_index(data.job_id) or middle_container
+	local diff_containers = job_container_index - middle_container
+	if diff_containers == 0 then
+		if job_heat_mul < 0 then
+			diff_containers = -1
+		elseif 0 < job_heat_mul then
+			diff_containers = 1
+		end
+	end
+	local container_panel
+	if diff_containers ~= 0 then
+		container_panel = self._pan_panel:panel({
+			layer = 11 + self._num_layer_jobs * 3,
+			alpha = 0
+		})
+		container_panel:set_w(math.abs(num_containers - middle_container) * 10 + 6)
+		container_panel:set_h(8)
+		container_panel:set_center_x(marker_panel:center_x())
+		container_panel:set_bottom(marker_panel:top())
+		container_panel:set_x(math.round(container_panel:x()))
+		local texture = "guis/textures/pd2/blackmarket/stat_plusminus"
+		local texture_rect = 0 < diff_containers and {
+			0,
+			0,
+			8,
+			8
+		} or {
+			8,
+			0,
+			8,
+			8
+		}
+		for i = 1, math.abs(diff_containers) do
+			container_panel:bitmap({
+				texture = texture,
+				texture_rect = texture_rect,
+				x = (i - 1) * 10 + 3
+			})
+		end
+	end
 	local text_on_right = x < self._map_size_w - 200
 	if text_on_right then
 		side_panel:set_left(marker_panel:right())
@@ -1735,10 +1844,11 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		contact_name:set_left(side_panel:w())
 		info_name:set_left(side_panel:w())
 		difficulty_name:set_left(side_panel:w())
+		heat_name:set_left(side_panel:w())
 		stars_panel:set_right(side_panel:w())
 		side_panel:set_right(marker_panel:left())
 	end
-	side_panel:set_center_y(marker_panel:top() + 11)
+	side_panel:set_top(marker_panel:top() - job_name:top() + 1)
 	if icon_panel then
 		if text_on_right then
 			icon_panel:set_right(marker_panel:left())
@@ -1770,6 +1880,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		marker_panel = marker_panel,
 		peers_panel = peers_panel,
 		kick_option = data.kick_option,
+		container_panel = container_panel,
 		timer_rect = timer_rect,
 		side_panel = side_panel,
 		icon_panel = icon_panel,
@@ -1784,22 +1895,100 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		glow_panel = glow_panel,
 		callout = callout,
 		text_on_right = text_on_right,
-		location = location
+		location = location,
+		heat_glow = heat_glow
 	}
 	self:update_job_gui(job, 3)
 	return job
 end
 
-function CrimeNetGui:remove_job(id)
+function CrimeNetGui:remove_job(id, instant)
 	local data = self._jobs[id]
 	if not data then
-		return
+		if self._deleting_jobs[id] then
+			self._deleting_jobs[id].marker_panel:stop()
+			self:_remove_gui_job(self._deleting_jobs[id])
+		end
+		return false
 	end
 	if not alive(self._panel) then
 		return
 	end
+	if instant then
+		self:_remove_gui_job(data)
+	elseif data.server then
+		repeat
+			do break end -- pseudo-goto
+			self:_remove_gui_job(data)
+		until true
+	else
+		self._deleting_jobs[id] = data
+		data.marker_panel:animate(callback(self, self, "_anim_remove_job_gui"), id)
+	end
+	self._jobs[id] = nil
+	return true
+end
+
+function CrimeNetGui:_anim_remove_job_gui(o, id)
+	local data = self._deleting_jobs[id]
+	local side_alpha = data.side_panel:alpha()
+	local glow_alpha = data.glow_panel:alpha()
+	local focus_alpha = data.focus:alpha()
+	local heat_alpha = data.heat_glow and data.heat_glow:alpha()
+	local icon_alpha = data.icon_panel and data.icon_panel:alpha()
+	local peers_alpha = data.peers_panel and data.peers_panel:alpha()
+	local container_alpha = data.container_panel and data.container_panel:alpha()
+	local inv_p
+	data.glow_panel:stop()
+	over(0.2, function(p)
+		inv_p = 1 - p
+		data.glow_panel:set_alpha(glow_alpha * inv_p)
+		data.side_panel:set_alpha(side_alpha * inv_p)
+		data.focus:set_alpha(focus_alpha * inv_p)
+		if data.heat_glow then
+			data.heat_glow:set_alpha(heat_alpha * inv_p)
+		end
+		if data.icon_panel then
+			data.icon_panel:set_alpha(icon_alpha * inv_p)
+		end
+		if data.peers_panel then
+			data.peers_panel:set_alpha(peers_alpha * inv_p)
+		end
+		if data.container_panel then
+			data.container_panel:set_alpha(container_alpha * inv_p)
+		end
+	end)
+	local x, y = data.marker_panel:center()
+	local w, h = data.marker_panel:size()
+	for i, child in ipairs(data.marker_panel:children()) do
+		child:set_halign("scale")
+		child:set_valign("scale")
+	end
+	over(0.1, function(p)
+		inv_p = 1 - p
+		x, y = data.marker_panel:center()
+		data.marker_panel:set_size((w - 5) * inv_p + 5, h)
+		data.marker_panel:set_center(x, y)
+	end)
+	over(0.1, function(p)
+		inv_p = 1 - p
+		x, y = data.marker_panel:center()
+		data.marker_panel:set_size(5 * inv_p, h * inv_p)
+		data.marker_panel:set_center(x, y)
+	end)
+	self._deleting_jobs[id] = nil
+	self:_remove_gui_job(data)
+end
+
+function CrimeNetGui:_remove_gui_job(data)
 	self._pan_panel:remove(data.marker_panel)
 	self._pan_panel:remove(data.glow_panel)
+	if data.heat_glow then
+		self._pan_panel:remove(data.heat_glow)
+	end
+	if data.container_panel then
+		self._pan_panel:remove(data.container_panel)
+	end
 	self._pan_panel:remove(data.side_panel)
 	self._pan_panel:remove(data.focus)
 	if data.icon_panel then
@@ -1811,9 +2000,6 @@ function CrimeNetGui:remove_job(id)
 	if data.peers_panel then
 		self._pan_panel:remove(data.peers_panel)
 	end
-	if data.expanded then
-	end
-	self._jobs[id] = nil
 end
 
 function CrimeNetGui:update_server_job(data, i)
@@ -1844,7 +2030,7 @@ function CrimeNetGui:update_server_job(data, i)
 		local x = job.job_x
 		local y = job.job_y
 		local location = job.location
-		self:remove_job(job_index)
+		self:remove_job(job_index, true)
 		local gui_data = self:_create_job_gui(data, is_server and "server" or "contract", x, y, location)
 		gui_data.server = is_server
 		self._jobs[job_index] = gui_data
@@ -1896,6 +2082,17 @@ function CrimeNetGui:feed_timer(id, t, max_t)
 end
 
 function CrimeNetGui:update(t, dt)
+	if Global.debug_cn_locations and Application:production_build() and is_win32 then
+		self._prev_loc = self._prev_loc or {}
+		for i, d in pairs(self._locations[1][1].dots) do
+			if d[3] and not self._prev_loc[i] then
+				Application:debug("Location taken:", i, d[1], d[2])
+			elseif not d[3] and self._prev_loc[i] then
+				Application:debug("Location removed:", i)
+			end
+			self._prev_loc[i] = d[3]
+		end
+	end
 	self._rasteroverlay:set_texture_rect(0, -math.mod(Application:time() * 5, 32), 32, 640)
 	if self._released_map then
 		self._released_map.dx = math.lerp(self._released_map.dx, 0, dt * 2)
@@ -2278,16 +2475,31 @@ function CrimeNetGui:_set_zoom(zoom, x, y)
 	self._pan_panel:set_center(cx, cy)
 	local w2, h2 = self._pan_panel:size()
 	self:_set_map_position((w1 - w2) * wx1, (h1 - h2) * wy1)
-	for id, job in pairs(self._jobs) do
+	local all_jobs = {}
+	for i, data in pairs(self._jobs) do
+		all_jobs[i] = data
+	end
+	for i, data in pairs(self._deleting_jobs) do
+		all_jobs[i] = data
+	end
+	for id, job in pairs(all_jobs) do
 		job.marker_panel:set_center(job.job_x * self._zoom, job.job_y * self._zoom)
 		job.glow_panel:set_world_center(job.marker_panel:child("select_panel"):world_center())
+		if job.heat_glow then
+			job.heat_glow:set_world_center(job.marker_panel:child("select_panel"):world_center())
+		end
 		job.focus:set_center(job.marker_panel:center())
+		if job.container_panel then
+			job.container_panel:set_center_x(job.marker_panel:center_x())
+			job.container_panel:set_bottom(job.marker_panel:top())
+			job.container_panel:set_x(math.round(job.container_panel:x()))
+		end
 		if job.text_on_right then
 			job.side_panel:set_left(job.marker_panel:right())
 		else
 			job.side_panel:set_right(job.marker_panel:left())
 		end
-		job.side_panel:set_center_y(job.marker_panel:top() + 11)
+		job.side_panel:set_top(job.marker_panel:top() - job.side_panel:child("job_name"):top() + 1)
 		if job.icon_panel then
 			if job.text_on_right then
 				job.icon_panel:set_right(job.marker_panel:left())
@@ -2321,19 +2533,20 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local contact_name = job.side_panel:child("contact_name")
 			local info_name = job.side_panel:child("info_name")
 			local difficulty_name = job.side_panel:child("difficulty_name")
+			local heat_name = job.side_panel:child("heat_name")
 			local stars_panel = job.side_panel:child("stars_panel")
 			local kick_icon
 			if job.icon_panel then
 				kick_icon = job.icon_panel:child("kick_icon")
 			end
 			local base_h = math.round(host_name:h() + job_name:h() + stars_panel:h())
-			local expand_h = math.round(base_h + info_name:h() + difficulty_name:h() + math.max(contact_name:h() - job_name:h(), 0))
+			local expand_h = math.round(base_h + info_name:h() + difficulty_name:h() + heat_name:h() + math.max(contact_name:h() - job_name:h(), 0))
 			local start_x = 0
-			local max_x = math.round(math.max(contact_name:w(), info_name:w(), difficulty_name:w()))
+			local max_x = math.round(math.max(contact_name:w(), info_name:w(), difficulty_name:w(), heat_name:w()))
 			if job.text_on_right then
-				start_x = math.round(math.min(contact_name:right(), info_name:right(), difficulty_name:right()))
+				start_x = math.round(math.max(contact_name:right(), info_name:right(), difficulty_name:right(), heat_name:right()))
 			else
-				start_x = math.round(job.side_panel:w() - math.min(contact_name:left(), info_name:left(), difficulty_name:left()))
+				start_x = math.round(job.side_panel:w() - math.min(contact_name:left(), info_name:left(), difficulty_name:left(), heat_name:left()))
 			end
 			local x = start_x
 			local object_alpha = {}
@@ -2383,7 +2596,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 				if not expand_met and pushout_met then
 					h = math.step(h, inside and expand_h or base_h, (inside and expand_h or base_h) * dt * 4)
 					job.side_panel:set_h(h)
-					job.side_panel:set_center_y(o:top() + 11)
+					job.side_panel:set_top(o:top() - job_name:top() + 1)
 					stars_panel:set_bottom(job.side_panel:h())
 					expand_met = h == (inside and expand_h or base_h)
 					if expand_met then
@@ -2398,11 +2611,13 @@ function CrimeNetGui:update_job_gui(job, inside)
 						contact_name:set_left(math.round(math.min(x - contact_name:w(), 0)))
 						info_name:set_left(math.round(math.min(x - info_name:w(), 0)))
 						difficulty_name:set_left(math.round(math.min(x - difficulty_name:w(), 0)))
+						heat_name:set_left(math.round(math.min(x - heat_name:w(), 0)))
 					else
 						job_name:set_right(math.round(job.side_panel:w() - math.min(x, contact_name:w())))
 						contact_name:set_right(math.round(job.side_panel:w() - math.min(x - contact_name:w(), 0)))
 						info_name:set_right(math.round(job.side_panel:w() - math.min(x - info_name:w(), 0)))
 						difficulty_name:set_right(math.round(job.side_panel:w() - math.min(x - difficulty_name:w(), 0)))
+						heat_name:set_right(math.round(job.side_panel:w() - math.min(x - heat_name:w(), 0)))
 					end
 					pushout_met = x == (inside and max_x or 0)
 				end
@@ -2420,15 +2635,19 @@ function CrimeNetGui:update_job_gui(job, inside)
 			job.marker_panel,
 			job.peers_panel
 		}
+		if job.container_panel then
+			table.insert(objects, job.container_panel)
+		end
 		if not job.pulse then
 			job.glow_panel:stop()
 		end
 		if inside == 1 then
 			managers.menu_component:post_event("highlight")
-			job.side_panel:child("job_name"):set_blend_mode("normal")
-			job.side_panel:child("contact_name"):set_blend_mode("normal")
-			job.side_panel:child("info_name"):set_blend_mode("normal")
-			job.side_panel:child("difficulty_name"):set_blend_mode("normal")
+			job.side_panel:child("job_name"):set_blend_mode("add")
+			job.side_panel:child("contact_name"):set_blend_mode("add")
+			job.side_panel:child("info_name"):set_blend_mode("add")
+			job.side_panel:child("difficulty_name"):set_blend_mode("add")
+			job.side_panel:child("heat_name"):set_blend_mode("add")
 			if job.icon_panel then
 				job.icon_panel:child("kick_icon"):set_blend_mode("add")
 			end
@@ -2436,7 +2655,8 @@ function CrimeNetGui:update_job_gui(job, inside)
 			job.side_panel:child("job_name"):set_blend_mode("add")
 			job.side_panel:child("contact_name"):set_blend_mode("add")
 			job.side_panel:child("info_name"):set_blend_mode("add")
-			job.side_panel:child("difficulty_name"):set_blend_mode("normal")
+			job.side_panel:child("difficulty_name"):set_blend_mode("add")
+			job.side_panel:child("heat_name"):set_blend_mode("add")
 		end
 		job.marker_panel:stop()
 		if job.peers_panel then
@@ -2444,6 +2664,9 @@ function CrimeNetGui:update_job_gui(job, inside)
 		end
 		job.marker_panel:set_layer(inside == 1 and 20 or job.layer)
 		job.glow_panel:set_layer(job.marker_panel:layer() - 1)
+		if job.container_panel then
+			job.container_panel:set_layer(inside == 1 and 20 or job.layer)
+		end
 		job.marker_panel:animate(animate_alpha, objects, job, alphas, inside == 1)
 	end
 end
@@ -2608,7 +2831,7 @@ function CrimeNetGui:close()
 	managers.menu:active_menu().renderer.ws:show()
 	self._ws:panel():remove(self._panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
-	if managers.controller:get_default_wrapper_type() ~= "pc" then
+	if not managers.menu:is_pc_controller() then
 		managers.menu:active_menu().input:deactivate_controller_mouse()
 		managers.mouse_pointer:release_mouse_pointer()
 	end

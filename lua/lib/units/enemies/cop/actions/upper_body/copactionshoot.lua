@@ -380,7 +380,7 @@ function CopActionShoot:update(t)
 				end
 				if 1 < firemode then
 					self._weapon_base:start_autofire(firemode < 4 and firemode)
-					self._autofiring = firemode < 4 and firemode or 5 + math.random(6)
+					self._autofiring = firemode < 4 and firemode or math.random(self._w_usage_tweak.autofire_rounds[1], self._w_usage_tweak.autofire_rounds[2])
 					self._autoshots_fired = 0
 					if vis_state == 1 and not ext_anim.base_no_recoil then
 						self._ext_movement:play_redirect("recoil_auto")

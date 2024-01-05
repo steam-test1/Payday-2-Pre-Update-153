@@ -23,9 +23,7 @@ function CopLogicAttack.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
 		my_data.shooting = old_internal_data.shooting
@@ -56,15 +54,7 @@ function CopLogicAttack.exit(data, new_logic_name, enter_params)
 	if my_data.best_cover then
 		managers.navigation:release_cover(my_data.best_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 	data.unit:brain():set_update_enabled_state(true)
 end
 
@@ -213,7 +203,7 @@ function CopLogicAttack._upd_combat_movement(data)
 	else
 		my_data.flank_cover = nil
 	end
-	if not my_data.turning and not data.unit:movement():chk_action_forbidden("walk") and data.attention_obj.verified and (not in_cover or not in_cover[4]) then
+	if not my_data.turning and not data.unit:movement():chk_action_forbidden("walk") and CopLogicAttack._can_move(data) and data.attention_obj.verified and (not in_cover or not in_cover[4]) then
 		if data.is_suppressed and data.t - data.unit:character_damage():last_suppression_t() < 0.7 then
 			action_taken = CopLogicBase.chk_start_action_dodge(data, "scared")
 		end
@@ -260,17 +250,6 @@ function CopLogicAttack._chk_start_action_move_back(data, my_data, focus_enemy, 
 			my_data.advancing = data.unit:brain():action_request(new_action_data)
 			if my_data.advancing then
 				my_data.surprised = true
-				local reservation = {
-					position = retreat_to,
-					radius = 60,
-					filter = data.pos_rsrv_id
-				}
-				managers.navigation:add_pos_reservation(reservation)
-				my_data.rsrv_pos.move_dest = reservation
-				if my_data.rsrv_pos.stand then
-					managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-					my_data.rsrv_pos.stand = nil
-				end
 				return true
 			end
 		end
@@ -287,34 +266,11 @@ function CopLogicAttack._chk_start_action_move_out_of_the_way(data, my_data)
 	if not managers.navigation:is_pos_free(reservation) then
 		local to_pos = CopLogicTravel._get_pos_on_wall(data.m_pos, 500)
 		if to_pos then
-			local rsrv_pos = my_data.rsrv_pos
-			if rsrv_pos.stand then
-				managers.navigation:unreserve_pos(rsrv_pos.stand)
-				rsrv_pos.stand = nil
-			end
-			if rsrv_pos.move_dest then
-				managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-				rsrv_pos.move_dest = nil
-			end
-			if rsrv_pos.path then
-				managers.navigation:unreserve_pos(rsrv_pos.path)
-			end
-			local reservation = {
-				position = to_pos,
-				radius = 60,
-				filter = data.pos_rsrv_id
-			}
-			managers.navigation:add_pos_reservation(reservation)
-			rsrv_pos.path = reservation
 			local path = {
 				my_tracker:position(),
 				to_pos
 			}
 			CopLogicAttack._chk_request_action_walk_to_cover_shoot_pos(data, my_data, path, "run")
-			if not my_data.advancing then
-				managers.navigation:unreserve_pos(rsrv_pos.path)
-				rsrv_pos.path = nil
-			end
 		end
 	end
 end
@@ -436,10 +392,6 @@ function CopLogicAttack._cancel_walking_to_cover(data, my_data, skip_action)
 			data.unit:brain():action_request(new_action)
 		end
 	elseif my_data.processing_cover_path then
-		if my_data.rsrv_pos.path then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-			my_data.rsrv_pos.path = nil
-		end
 		data.unit:brain():cancel_all_pathing_searches()
 		my_data.cover_path_search_id = nil
 		my_data.processing_cover_path = nil
@@ -468,12 +420,7 @@ function CopLogicAttack._chk_request_action_walk_to_cover(data, my_data)
 		my_data.moving_to_cover = my_data.best_cover
 		my_data.at_cover_shoot_pos = nil
 		my_data.in_cover = nil
-		my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-		my_data.rsrv_pos.path = nil
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
+		data.brain:rem_pos_rsrv("path")
 	end
 end
 
@@ -501,12 +448,7 @@ function CopLogicAttack._chk_request_action_walk_to_cover_shoot_pos(data, my_dat
 		my_data.walking_to_cover_shoot_pos = my_data.advancing
 		my_data.at_cover_shoot_pos = nil
 		my_data.in_cover = nil
-		my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-		my_data.rsrv_pos.path = nil
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
+		data.brain:rem_pos_rsrv("path")
 	end
 end
 
@@ -820,16 +762,6 @@ function CopLogicAttack.action_complete_clbk(data, action)
 		my_data.advancing = nil
 		CopLogicAttack._cancel_cover_pathing(data, my_data)
 		CopLogicAttack._cancel_charge(data, my_data)
-		if action:expired() then
-			my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-		else
-			local reservation = managers.navigation:reserve_pos(data.t, nil, data.m_pos, nil, 60, data.pos_rsrv_id)
-			my_data.rsrv_pos.stand = reservation
-			if my_data.rsrv_pos.move_dest then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.move_dest)
-			end
-		end
-		my_data.rsrv_pos.move_dest = nil
 		if my_data.surprised then
 			my_data.surprised = false
 		elseif my_data.moving_to_cover then
@@ -857,11 +789,6 @@ function CopLogicAttack.action_complete_clbk(data, action)
 			data.dodge_timeout_t = TimerManager:game():time() + math.lerp(timeout[1], timeout[2], math.random())
 		end
 		CopLogicAttack._cancel_cover_pathing(data, my_data)
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-		end
-		local reservation = managers.navigation:reserve_pos(data.t, nil, data.m_pos, nil, 60, data.pos_rsrv_id)
-		my_data.rsrv_pos.stand = reservation
 	end
 end
 

@@ -19,7 +19,6 @@ function CopLogicSniper.enter(data, new_logic_name, enter_params)
 	}
 	my_data.detection = data.char_tweak.detection.recon
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		if old_internal_data.firing then
 			data.unit:movement():set_allow_fire(false)
@@ -37,16 +36,6 @@ function CopLogicSniper.enter(data, new_logic_name, enter_params)
 		end
 	end
 	data.internal_data = my_data
-	my_data.rsrv_pos = my_data.rsrv_pos or {}
-	if not my_data.rsrv_pos.stand then
-		local pos_rsrv = {
-			position = mvector3.copy(data.m_pos),
-			radius = 100,
-			filter = data.pos_rsrv_id
-		}
-		my_data.rsrv_pos.stand = pos_rsrv
-		managers.navigation:add_pos_reservation(pos_rsrv)
-	end
 	local key_str = tostring(data.unit:key())
 	my_data.detection_task_key = "CopLogicSniper._upd_enemy_detection" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicSniper._upd_enemy_detection, data)

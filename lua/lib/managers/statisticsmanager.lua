@@ -143,6 +143,7 @@ function StatisticsManager:_setup(reset)
 			time = 0
 		}
 	end
+	self._defaults.sessions.jobs = {}
 	self._defaults.revives = {npc_count = 0, player_count = 0}
 	self._defaults.cameras = {count = 0}
 	self._defaults.objectives = {count = 0}
@@ -259,10 +260,23 @@ function StatisticsManager:start_session(data)
 	if self._session_started then
 		return
 	end
+	if not self._playing then
+		self._playing = data.from_beginning and "beginning" or "dropin"
+	end
 	if Global.level_data.level_id then
 		self._global.sessions.levels[Global.level_data.level_id].started = self._global.sessions.levels[Global.level_data.level_id].started + 1
 		self._global.sessions.levels[Global.level_data.level_id].from_beginning = self._global.sessions.levels[Global.level_data.level_id].from_beginning + (data.from_beginning and 1 or 0)
 		self._global.sessions.levels[Global.level_data.level_id].drop_in = self._global.sessions.levels[Global.level_data.level_id].drop_in + (data.drop_in and 1 or 0)
+	end
+	local job_id = managers.job:current_job_id()
+	if job_id and managers.job:current_stage() == 1 then
+		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
+		if data.from_beginning then
+			self._global.sessions.jobs[job_stat .. "_started"] = (self._global.sessions.jobs[job_stat .. "_started"] or 0) + 1
+		end
+		if data.drop_in then
+			self._global.sessions.jobs[job_stat .. "_started_dropin"] = (self._global.sessions.jobs[job_stat .. "_started_dropin"] or 0) + 1
+		end
 	end
 	self._global.session = deep_clone(self._defaults)
 	self._global.sessions.count = self._global.sessions.count + 1
@@ -289,6 +303,25 @@ function StatisticsManager:stop_session(data)
 			self._global.sessions.levels[Global.level_data.level_id].quited = self._global.sessions.levels[Global.level_data.level_id].quited + 1
 		end
 	end
+	local job_id = managers.job:current_job_id()
+	if job_id and data then
+		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
+		if data.type == "victory" then
+			if managers.job:on_last_stage() then
+				if self._playing == "beginning" then
+					self._global.sessions.jobs[job_stat .. "_completed"] = (self._global.sessions.jobs[job_stat .. "_completed"] or 0) + 1
+				else
+					self._global.sessions.jobs[job_stat .. "_completed_dropin"] = (self._global.sessions.jobs[job_stat .. "_completed_dropin"] or 0) + 1
+				end
+			end
+		elseif data.type == "gameover" then
+			if self._playing == "beginning" then
+				self._global.sessions.jobs[job_stat .. "_failed"] = (self._global.sessions.jobs[job_stat .. "_failed"] or 0) + 1
+			else
+				self._global.sessions.jobs[job_stat .. "_failed_dropin"] = (self._global.sessions.jobs[job_stat .. "_failed_dropin"] or 0) + 1
+			end
+		end
+	end
 	self._global.sessions.time = self._global.sessions.time + session_time
 	self._global.session.sessions.time = session_time
 	self._global.last_session = deep_clone(self._global.session)
@@ -300,6 +333,9 @@ function StatisticsManager:stop_session(data)
 		last_session = self._global.last_session
 	})
 	managers.challenges:reset("session")
+	if managers.job:on_last_stage() then
+		self._playing = nil
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self:publish_to_steam(self._global.session, success)
 	end
@@ -544,7 +580,9 @@ function StatisticsManager:publish_to_steam(session, success)
 	if tweak_data.blackmarket.masks[mask_id].statistics then
 		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
 	end
-	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
+	if not Global.game_settings.difficulty == "overkill_290" then
+		stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
+	end
 	stats.heist_success = {
 		type = "int",
 		value = success and 1 or 0
@@ -1162,6 +1200,10 @@ function StatisticsManager:killed(data)
 	end
 end
 
+function StatisticsManager:completed_job(job_id, difficulty)
+	return self._global.sessions.jobs[tostring(job_id) .. "_" .. tostring(difficulty) .. "_completed"] or 0
+end
+
 function StatisticsManager:_bullet_challenges(data)
 	managers.challenges:count_up(data.type .. "_kill")
 	managers.challenges:count_up(data.name .. "_kill")
@@ -1491,6 +1533,7 @@ function StatisticsManager:_check_loaded_data()
 		lvl.drop_in = lvl.drop_in or 0
 		lvl.from_beginning = lvl.from_beginning or 0
 	end
+	self._global.sessions.jobs = self._global.sessions.jobs or {}
 	self._global.experience = self._global.experience or deep_clone(self._defaults.experience)
 end
 

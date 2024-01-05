@@ -208,6 +208,18 @@ function NetworkPeer:used_cable_ties()
 	return self._used_cable_ties
 end
 
+function NetworkPeer:set_used_body_bags(used_body_bags)
+	self._used_body_bags = used_body_bags
+end
+
+function NetworkPeer:on_used_body_bags()
+	self._used_body_bags = (self._used_body_bags or 0) + 1
+end
+
+function NetworkPeer:used_body_bags()
+	return self._used_body_bags or 0
+end
+
 function NetworkPeer:waiting_for_player_ready()
 	return self._waiting_for_player_ready
 end
@@ -648,6 +660,13 @@ function NetworkPeer:has_queued_rpcs()
 	end
 	for queue_name, queue in pairs(self._msg_queues) do
 		if next(queue) then
+			print("queued msgs in", queue_name)
+			for i, rpc_info in ipairs(queue) do
+				print(i)
+				for _, blah in ipairs(rpc_info) do
+					print(blah)
+				end
+			end
 			return queue_name
 		end
 	end

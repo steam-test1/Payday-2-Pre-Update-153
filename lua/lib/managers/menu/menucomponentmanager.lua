@@ -1600,8 +1600,16 @@ function MenuComponentManager:_create_blackmarket_gui(node)
 end
 
 function MenuComponentManager:create_blackmarket_gui(node)
-	self:close_blackmarket_gui()
-	self._blackmarket_gui = BlackMarketGui:new(self._ws, self._fullscreen_ws, node)
+	if not node then
+		return
+	end
+	if node:parameters().set_blackmarket_enabled == nil then
+		self:close_blackmarket_gui()
+	end
+	self._blackmarket_gui = self._blackmarket_gui or BlackMarketGui:new(self._ws, self._fullscreen_ws, node)
+	if node:parameters().set_blackmarket_enabled ~= nil then
+		self._blackmarket_gui:set_enabled(node:parameters().set_blackmarket_enabled)
+	end
 end
 
 function MenuComponentManager:set_blackmarket_tab_positions()
@@ -1836,6 +1844,9 @@ function MenuComponentManager:create_lootdrop_casino_gui(node)
 		self._lootdrop_casino_gui = CasinoLootDropScreenGui:new(self._ws, self._fullscreen_ws, self._lootscreen_casino_hud)
 		self._lootdrop_casino_gui:set_layer(parent_layer + 1)
 		self._lootscreen_casino_hud:feed_lootdrop(lootdrop_data)
+		if not managers.menu:is_pc_controller() then
+			managers.menu:active_menu().input:deactivate_controller_mouse()
+		end
 	end
 	if self._lootdrop_casino_gui then
 		self:disable_crimenet()
@@ -1852,6 +1863,9 @@ function MenuComponentManager:close_lootdrop_casino_gui()
 	if self._lootscreen_casino_hud then
 		self._lootscreen_casino_hud:close()
 		self._lootscreen_casino_hud = nil
+		if not managers.menu:is_pc_controller() then
+			managers.menu:active_menu().input:activate_controller_mouse()
+		end
 	end
 end
 
@@ -2421,6 +2435,9 @@ function MenuComponentManager:_request_done_callback(texture_ids)
 end
 
 function MenuComponentManager:request_texture(texture, done_cb)
+	if not DB:has(Idstring("texture"), texture) then
+		return
+	end
 	local texture_ids = Idstring(texture)
 	local key = texture_ids:key()
 	local is_removing = self._removing_textures[key] and true or false
@@ -2485,6 +2502,14 @@ function MenuComponentManager:unretrieve_texture(texture, index)
 	else
 		Application:error("[MenuComponentManager] unretrieve_texture(): Can't unretrieve texture that is not in the system!", texture)
 	end
+end
+
+function MenuComponentManager:retrieve_texture(texture)
+	self._retrieved_textures = self._retrieved_textures or {}
+	local texture_ids = Idstring(texture)
+	if not self._retrieved_textures[texture_ids:key()] then
+	end
+	return TextureCache:retrieve(texture, "NORMAL")
 end
 
 function MenuComponentManager:add_colors_to_text_object(text_object, ...)
@@ -2584,6 +2609,11 @@ function MenuComponentManager:close()
 		TextureCache:unretrieve(texture_ids)
 	end
 	self._requested_textures = {}
+	if self._retrieved_textures then
+		for texture_key, texture in pairs(self._retrieved_textures) do
+			TextureCache:unretrieve(texture)
+		end
+	end
 end
 
 function MenuComponentManager:play_transition()

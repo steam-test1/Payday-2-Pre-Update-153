@@ -2,22 +2,7 @@ TeamAILogicInactive = class(TeamAILogicBase)
 
 function TeamAILogicInactive.enter(data, new_logic_name, enter_params)
 	TeamAILogicBase.enter(data, new_logic_name, enter_params)
-	local my_data = data.internal_data
-	if my_data then
-		local rsrv_pos = my_data.rsrv_pos
-		if rsrv_pos.path then
-			managers.navigation:unreserve_pos(rsrv_pos.path)
-			rsrv_pos.path = nil
-		end
-		if rsrv_pos.move_dest then
-			managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-			rsrv_pos.move_dest = nil
-		end
-		if rsrv_pos.stand then
-			managers.navigation:unreserve_pos(rsrv_pos.stand)
-			rsrv_pos.stand = nil
-		end
-	end
+	data.brain:rem_all_pos_rsrv()
 	CopLogicBase._set_attention_obj(data, nil, nil)
 	CopLogicBase._destroy_all_detected_attention_object_data(data)
 	CopLogicBase._reset_attention(data)

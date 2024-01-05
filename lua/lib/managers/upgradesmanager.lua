@@ -141,7 +141,7 @@ function UpgradesManager:aquire_default(id)
 	end
 	self._global.aquired[id] = true
 	local upgrade = tweak_data.upgrades.definitions[id]
-	self:_aquire_upgrade(upgrade, id)
+	self:_aquire_upgrade(upgrade, id, true)
 end
 
 function UpgradesManager:enable_weapon(id)

@@ -44,6 +44,7 @@ function CrimeNetCasinoGui:init(ws, fullscreen_ws, node)
 	button_exit:set_h(h)
 	button_exit:set_right(self._panel:right())
 	button_exit:set_bottom(self._panel:bottom())
+	button_exit:set_visible(managers.menu:is_pc_controller())
 	local button_bet = self._button_panel:text({
 		name = "button_bet",
 		text = managers.localization:to_upper_text("menu_casino_choice_bet", {
@@ -61,12 +62,15 @@ function CrimeNetCasinoGui:init(ws, fullscreen_ws, node)
 	button_bet:set_h(h)
 	button_bet:set_right(self._panel:right())
 	button_bet:set_bottom(button_exit:top())
+	button_bet:set_visible(managers.menu:is_pc_controller())
 	if managers.menu:is_pc_controller() then
 		button_bet:set_color(tweak_data.screen_colors.button_stage_3)
 		button_exit:set_color(tweak_data.screen_colors.button_stage_3)
 	end
 	self:can_afford()
-	managers.menu:active_menu().input:deactivate_controller_mouse()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:deactivate_controller_mouse()
+	end
 end
 
 function CrimeNetCasinoGui:close()
@@ -132,9 +136,11 @@ function CrimeNetCasinoGui:can_afford()
 			button:set_text(managers.localization:to_upper_text("menu_casino_choice_bet", {
 				BTN_X = managers.localization:btn_macro("menu_casino_bet")
 			}))
+			button:set_visible(managers.menu:is_pc_controller())
 		else
-			button:set_color(Color(1, 0.6, 0.2, 0.2))
+			button:set_color(tweak_data.screen_colors.important_1)
 			button:set_text(managers.localization:to_upper_text("menu_cn_premium_cannot_buy"))
+			button:set_visible(true)
 		end
 		local _, _, w, h = button:text_rect()
 		button:set_w(w)

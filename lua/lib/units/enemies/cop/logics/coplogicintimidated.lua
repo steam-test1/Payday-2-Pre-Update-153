@@ -10,16 +10,12 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	if data.attention_obj then
 		CopLogicBase._set_attention_obj(data, nil, nil)
 	end
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-		if old_internal_data.nearest_cover then
-			my_data.nearest_cover = old_internal_data.nearest_cover
-			managers.navigation:reserve_cover(my_data.nearest_cover[1], data.pos_rsrv_id)
-		end
+	if old_internal_data and old_internal_data.nearest_cover then
+		my_data.nearest_cover = old_internal_data.nearest_cover
+		managers.navigation:reserve_cover(my_data.nearest_cover[1], data.pos_rsrv_id)
 	end
 	my_data.surrender_break_t = data.char_tweak.surrender_break_time and data.t + math.random(data.char_tweak.surrender_break_time[1], data.char_tweak.surrender_break_time[2], math.random())
 	if data.unit:anim_data().hands_tied then
@@ -301,11 +297,7 @@ function CopLogicIntimidated._do_tied(data, aggressor_unit)
 		managers.enemy:unqueue_task(my_data.update_task_key)
 		my_data.update_task_key = nil
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.stand then
-		managers.navigation:unreserve_pos(rsrv_pos.stand)
-		rsrv_pos.stand = nil
-	end
+	data.brain:rem_pos_rsrv("stand")
 	managers.groupai:state():on_enemy_tied(data.unit:key())
 	data.unit:base():set_slot(data.unit, 22)
 	data.unit:interaction():set_tweak_data("hostage_convert")

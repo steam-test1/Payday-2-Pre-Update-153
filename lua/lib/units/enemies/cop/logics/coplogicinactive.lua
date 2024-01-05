@@ -18,19 +18,7 @@ function CopLogicInactive.enter(data, new_logic_name, enter_params)
 			debug_pause_unit(data.unit, "inactive AI engaging player", data.unit, c_data.unit, inspect(attention_obj), inspect(data.attention_obj))
 		end
 	end
-	local rsrv_pos = old_internal_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
-	if rsrv_pos.stand then
-		managers.navigation:unreserve_pos(rsrv_pos.stand)
-		rsrv_pos.stand = nil
-	end
+	data.brain:rem_all_pos_rsrv()
 	if data.objective and data.objective.type == "follow" and data.objective.destroy_clbk_key then
 		data.objective.follow_unit:base():remove_destroy_listener(data.objective.destroy_clbk_key)
 		data.objective.destroy_clbk_key = nil

@@ -73,7 +73,7 @@ function WorldDefinition:_load_world_package()
 		return
 	end
 	local package = self._world_dir .. "world"
-	if not DB:has("package", package) then
+	if not DB:is_bundled() and not DB:has("package", package) then
 		Application:throw_exception("No world.package file found in " .. self._world_dir .. ", please resave level")
 		return
 	end
@@ -82,7 +82,7 @@ function WorldDefinition:_load_world_package()
 		self._current_world_package = package
 	end
 	local package = self._world_dir .. "world_init"
-	if not DB:has("package", package) then
+	if not DB:is_bundled() and not DB:has("package", package) then
 		Application:throw_exception("No world_init.package file found in " .. self._world_dir .. ", please resave level")
 		return
 	end
@@ -95,7 +95,7 @@ end
 
 function WorldDefinition:_load_sound_package()
 	local package = self._world_dir .. "world_sounds"
-	if not DB:has("package", package) then
+	if not DB:is_bundled() and not DB:has("package", package) then
 		Application:error("No world_sounds.package file found in " .. self._world_dir .. ", emitters and ambiences won't work (resave level)")
 		return
 	end
@@ -109,7 +109,7 @@ function WorldDefinition:_load_continent_init_package(path)
 	if Application:editor() then
 		return
 	end
-	if not DB:has("package", path) then
+	if not DB:is_bundled() and not DB:has("package", path) then
 		Application:error("Missing init package for a continent(" .. path .. "), resave level " .. self._world_dir .. ".")
 		return
 	end
@@ -124,7 +124,7 @@ function WorldDefinition:_load_continent_package(path)
 	if Application:editor() then
 		return
 	end
-	if not DB:has("package", path) then
+	if not PackageManager:package_exists(path) then
 		Application:error("Missing package for a continent(" .. path .. "), resave level " .. self._world_dir .. ".")
 		return
 	end
@@ -351,7 +351,10 @@ function WorldDefinition:create(layer, offset)
 		for name, continent in pairs(self._continent_definitions) do
 			if continent.dynamics then
 				for _, values in ipairs(continent.dynamics) do
-					table.insert(return_data, self:_create_dynamics_unit(values, offset))
+					local unit = self:_create_dynamics_unit(values, offset)
+					if unit then
+						table.insert(return_data, unit)
+					end
 				end
 			end
 		end

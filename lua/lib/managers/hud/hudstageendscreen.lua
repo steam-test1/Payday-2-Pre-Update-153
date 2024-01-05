@@ -55,6 +55,17 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 				text_string = managers.localization:text("menu_es_package_armor", {
 					armor = managers.localization:to_upper_text(upgrade_def.name_id)
 				})
+			elseif category == Idstring("melee_weapon") then
+				local bm_tweak_data = tweak_data.blackmarket.melee_weapons[upgrade]
+				local guis_catalog = "guis/"
+				local bundle_folder = bm_tweak_data and bm_tweak_data.texture_bundle_folder
+				if bundle_folder then
+					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+				end
+				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. upgrade
+				text_string = managers.localization:text("menu_es_package_melee_weapon", {
+					melee_weapon = bm_tweak_data and managers.localization:to_upper_text(bm_tweak_data.name_id)
+				})
 			elseif category == Idstring("rep_upgrade") then
 				bitmap_texture = "guis/textures/pd2/endscreen/" .. upgrade_def.category
 				text_string = managers.localization:to_upper_text("menu_es_rep_upgrade", {
@@ -166,7 +177,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		})
 		local pg_text = self._foreground_layer_safe:text({
 			name = "pg_text",
-			text = utf8.to_upper(managers.localization:text("cn_menu_contract_paygrade_header")) .. " ",
+			text = utf8.to_upper(managers.localization:text("menu_risk")),
 			y = padding_y,
 			h = 32,
 			align = "right",
@@ -179,50 +190,46 @@ function HUDStageEndScreen:init(hud, workspace)
 		pg_text:set_size(w, h)
 		local job_stars = managers.job:has_active_job() and managers.job:current_job_stars() or 1
 		local job_and_difficulty_stars = managers.job:has_active_job() and managers.job:current_job_and_difficulty_stars() or 1
-		local difficulty_stars = job_and_difficulty_stars - job_stars
-		local filled_star_rect = {
-			0,
-			32,
-			32,
-			32
-		}
-		local empty_star_rect = {
-			32,
-			32,
-			32,
-			32
-		}
-		local num_stars = 0
-		local x = 0
-		local y = 4
-		local star_size = 18
+		local difficulty_stars = managers.job:has_active_job() and managers.job:current_difficulty_stars() or 0
 		local risk_color = tweak_data.screen_colors.risk
-		local level_data = {
-			texture = "guis/textures/pd2/mission_briefing/difficulty_icons",
-			texture_rect = filled_star_rect,
-			w = 16,
-			h = 16,
-			color = tweak_data.screen_colors.text,
-			alpha = 1
+		local risks = {
+			"risk_swat",
+			"risk_fbi",
+			"risk_death_squad"
 		}
-		local risk_data = {
-			texture = "guis/textures/pd2/crimenet_skull",
-			w = 16,
-			h = 16,
-			color = risk_color,
-			alpha = 1
-		}
-		for i = 1, job_and_difficulty_stars do
-			local is_risk = i > job_stars
-			local star_data = is_risk and risk_data or level_data
-			local star = self._paygrade_panel:bitmap(star_data)
-			star:set_position(x, y)
-			x = x + star_size
-			num_stars = num_stars + 1
+		if not Global.SKIP_OVERKILL_290 then
+			table.insert(risks, "risk_murder_squad")
 		end
-		self._paygrade_panel:set_w(10 * star_size)
+		local panel_w = 0
+		local panel_h = 0
+		local x = 0
+		local y = 0
+		for i, name in ipairs(risks) do
+			local texture, rect = tweak_data.hud_icons:get_icon_data(name)
+			local active = i <= difficulty_stars
+			local color = active and risk_color or tweak_data.screen_colors.text
+			local alpha = active and 1 or 0.25
+			local risk = self._paygrade_panel:bitmap({
+				name = name,
+				texture = texture,
+				texture_rect = rect,
+				x = 0,
+				y = 0,
+				alpha = alpha,
+				color = color
+			})
+			risk:set_position(x, y)
+			x = x + risk:w() + 0
+			panel_w = math.max(panel_w, risk:right())
+			panel_h = math.max(panel_h, risk:h())
+		end
+		pg_text:set_color(risk_color)
+		self._paygrade_panel:set_h(panel_h)
+		self._paygrade_panel:set_w(panel_w)
 		self._paygrade_panel:set_right(self._background_layer_safe:w())
 		pg_text:set_right(self._paygrade_panel:left())
+		pg_text:set_center_y(self._paygrade_panel:center_y())
+		pg_text:set_y(math.round(pg_text:y()))
 	end
 	self._stage_name = managers.job:current_level_id() and managers.localization:to_upper_text(tweak_data.levels[managers.job:current_level_id()].name_id) or ""
 	self._foreground_layer_safe:text({
@@ -547,7 +554,7 @@ function HUDStageEndScreen:bonus_risk(panel, delay, bonus)
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
 	local job_stars = has_active_job and managers.job:current_job_stars() or 1
-	local difficulty_stars = job_and_difficulty_stars - job_stars
+	local difficulty_stars = has_active_job and managers.job:current_difficulty_stars() or 0
 	panel:animate(callback(self, self, "spawn_animation"), delay, "box_tick")
 	local sign_text = panel:text({
 		font = tweak_data.menu.pd2_small_font,
@@ -703,6 +710,79 @@ function HUDStageEndScreen:bonus_failed(panel, delay, bonus)
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		color = tweak_data.screen_colors.important_1,
+		text = managers.money:add_decimal_marks_to_string(tostring(math.abs(bonus))),
+		alpha = 0
+	})
+	value_text:set_world_left(self._lp_xp_curr:world_left())
+	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	return delay + 0
+end
+
+function HUDStageEndScreen:in_custody(panel, delay, bonus)
+	local text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.important_1,
+		text = managers.localization:to_upper_text("menu_es_in_custody_reduction")
+	})
+	local _, _, w, h = text:text_rect()
+	panel:set_h(h)
+	text:set_size(w, h)
+	text:set_center_y(panel:h() / 2)
+	text:set_position(math.round(text:x()), math.round(text:y()))
+	panel:animate(callback(self, self, "spawn_animation"), delay, "box_tick")
+	local sign_text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.important_1,
+		text = "-",
+		alpha = 0,
+		align = "right"
+	})
+	sign_text:set_world_right(self._lp_xp_curr:world_left())
+	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	local value_text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.important_1,
+		text = managers.money:add_decimal_marks_to_string(tostring(math.abs(bonus))),
+		alpha = 0
+	})
+	value_text:set_world_left(self._lp_xp_curr:world_left())
+	value_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	return delay + 0
+end
+
+function HUDStageEndScreen:heat_xp(panel, delay, bonus)
+	local heat = managers.job:last_known_heat() or managers.job:current_job_id() and managers.job:get_job_heat(managers.job:current_job_id()) or 0
+	local heat_color = managers.job:get_heat_color(heat)
+	local text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = heat_color,
+		text = managers.localization:to_upper_text(0 <= bonus and "menu_es_heat_bonus" or "menu_es_heat_reduction")
+	})
+	local _, _, w, h = text:text_rect()
+	panel:set_h(h)
+	text:set_size(w, h)
+	text:set_center_y(panel:h() / 2)
+	text:set_position(math.round(text:x()), math.round(text:y()))
+	panel:animate(callback(self, self, "spawn_animation"), delay, "box_tick")
+	local prefix = 0 <= bonus and "+" or "-"
+	local sign_text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = heat_color,
+		text = prefix,
+		alpha = 0,
+		align = "right"
+	})
+	sign_text:set_world_right(self._lp_xp_curr:world_left())
+	sign_text:animate(callback(self, self, "spawn_animation"), delay + 0, false)
+	local value_text = panel:text({
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = heat_color,
 		text = managers.money:add_decimal_marks_to_string(tostring(math.abs(bonus))),
 		alpha = 0
 	})
@@ -1069,7 +1149,7 @@ function HUDStageEndScreen:stage_init(t, dt)
 	self._lp_circle:show()
 	self._lp_backpanel:child("bg_progress_circle"):show()
 	self._lp_forepanel:child("level_progress_text"):show()
-	if data.gained == 0 then
+	if managers.experience:reached_level_cap() then
 		self._lp_text:set_text(tostring(data.start_t.level))
 		self._lp_circle:set_color(Color(1, 1, 1))
 		managers.menu_component:post_event("box_tick")
@@ -1143,20 +1223,22 @@ function HUDStageEndScreen:stage_init(t, dt)
 	local bonuses_to_string_converter = {
 		"bonus_risk",
 		"bonus_failed",
+		"in_custody",
 		"bonus_days",
 		"bonus_num_players",
-		"bonus_skill"
+		"bonus_skill",
+		"heat_xp"
 	}
 	if data.bonuses.rounding_error ~= 0 then
 		Application:debug("GOT A ROUNDING ERROR IN EXPERIENCE GIVING:", data.bonuses.rounding_error)
 	end
 	local index = 2
 	for i, func_name in ipairs(bonuses_to_string_converter) do
-		local bonus = data.bonuses[func_name]
+		local bonus = data.bonuses[func_name] or 0
 		if bonus and bonus ~= 0 then
 			local panel = self._bonuses_panel:panel({alpha = 0, y = y})
 			delay = (callback(self, self, func_name)(panel, delay, bonus) or delay) + 0.6
-			y = y + panel:h()
+			y = y + panel:h() - 2
 			index = index + 1
 		end
 	end
@@ -1172,14 +1254,16 @@ function HUDStageEndScreen:stage_init(t, dt)
 	end
 	self._lp_xp_gained:set_top(self._lp_xp_gain:top())
 	local sum_text = self._bonuses_panel:text({
+		name = "sum_text",
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		text = "= ",
 		align = "right",
-		alpha = 0
+		alpha = 1
 	})
 	sum_text:set_world_righttop(self._lp_xp_gain:world_left(), self._lp_xp_gain:world_top())
-	sum_text:animate(callback(self, self, "spawn_animation"), delay + 1, "box_tick")
+	sum_text:hide()
+	self._sum_text = sum_text
 	self._lp_circle:set_color(Color(data.start_t.current / data.start_t.total, 1, 1))
 	self._wait_t = t + 1
 	self._start_ramp_up_t = delay
@@ -1216,7 +1300,7 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 			self._lp_text:set_font_size(tweak_data.menu.pd2_massive_font_size)
 			self._lp_text:set_text(tostring(data.start_t.level))
 			self._lp_xp_curr:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(data.start_t.xp))))
-			self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(0))))
+			self._lp_xp_gain:set_text("")
 			self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(tostring(math.floor(data.start_t.total - data.start_t.current))))
 			local clbk = callback(self, self, "spawn_animation")
 			self._lp_curr_xp:show()
@@ -1243,6 +1327,7 @@ function HUDStageEndScreen:stage_show_all(t, dt)
 	self._lp_xp_gain:show()
 	self._lp_xp_curr:show()
 	self._lp_xp_nl:show()
+	self._sum_text:show()
 	self:step_stage_up()
 end
 

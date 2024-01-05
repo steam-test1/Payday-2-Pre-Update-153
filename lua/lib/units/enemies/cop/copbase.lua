@@ -22,7 +22,7 @@ CopBase._anim_lods = {
 		1
 	}
 }
-local material_translation_map = {}
+CopBase._material_translation_map = {}
 do
 	local payday2_characters_map = {
 		"civ_female_bank_1",
@@ -76,6 +76,10 @@ do
 		"ene_biker_4",
 		"ene_bulldozer_1",
 		"ene_bulldozer_2",
+		"ene_bulldozer_3",
+		"ene_city_swat_1",
+		"ene_city_swat_2",
+		"ene_city_swat_3",
 		"ene_cop_1",
 		"ene_cop_2",
 		"ene_cop_3",
@@ -116,8 +120,8 @@ do
 	local character_path = ""
 	for _, character in ipairs(payday2_characters_map) do
 		character_path = path_string .. character .. "/" .. character
-		material_translation_map[tostring(Idstring(character_path):key())] = character_path .. "_contour"
-		material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = character_path
+		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
+		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
 	end
 	local pd2_dlc1_characters_map = {
 		"civ_male_firefighter_1",
@@ -130,8 +134,8 @@ do
 	local character_path = ""
 	for _, character in ipairs(pd2_dlc1_characters_map) do
 		character_path = path_string .. character .. "/" .. character
-		material_translation_map[tostring(Idstring(character_path):key())] = character_path .. "_contour"
-		material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = character_path
+		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
+		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
 	end
 end
 
@@ -260,10 +264,10 @@ function CopBase:load(data)
 end
 
 function CopBase:swap_material_config()
-	local new_material = material_translation_map[tostring(self._unit:material_config():key())]
+	local new_material = self._material_translation_map[tostring(self._unit:material_config():key())]
 	if new_material then
 		self._is_in_original_material = not self._is_in_original_material
-		self._unit:set_material_config(Idstring(new_material), true)
+		self._unit:set_material_config(new_material, true)
 		if self._unit:interaction() then
 			self._unit:interaction():refresh_material()
 		end

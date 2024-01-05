@@ -8,12 +8,14 @@ function PointOfNoReturnElement:init(unit)
 	self._hed.time_hard = 120
 	self._hed.time_overkill = 60
 	self._hed.time_overkill_145 = 30
+	self._hed.time_overkill_290 = 15
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "time_easy")
 	table.insert(self._save_values, "time_normal")
 	table.insert(self._save_values, "time_hard")
 	table.insert(self._save_values, "time_overkill")
 	table.insert(self._save_values, "time_overkill_145")
+	table.insert(self._save_values, "time_overkill_290")
 end
 
 function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
@@ -107,6 +109,26 @@ function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
 	time_overkill_145:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
 		ctrlr = time_overkill_145,
 		value = "time_overkill_145"
+	})
+	local time_params_overkill_290 = {
+		name = "Time left on overkill 290:",
+		panel = panel,
+		sizer = panel_sizer,
+		value = self._hed.time_overkill_290,
+		floats = 0,
+		tooltip = "Set the time left",
+		min = 1,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local time_overkill_290 = CoreEWS.number_controller(time_params_overkill_290)
+	time_overkill_290:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = time_overkill_290,
+		value = "time_overkill_290"
+	})
+	time_overkill_290:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = time_overkill_290,
+		value = "time_overkill_290"
 	})
 end
 

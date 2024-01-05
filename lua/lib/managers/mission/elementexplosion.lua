@@ -31,9 +31,10 @@ function ElementExplosion:on_executed(instigator)
 		managers.explosion:detect_and_give_dmg({
 			hit_pos = pos,
 			range = self._values.range,
-			collision_slotmask = managers.slot:get_mask("bullet_impact_targets"),
+			collision_slotmask = managers.slot:get_mask("explosion_targets"),
 			curve_pow = 5,
 			damage = self._values.damage,
+			no_raycast_check_characters = self._values.no_raycast_check_characters,
 			player_damage = 0
 		})
 		managers.network:session():send_to_peers_synched("element_explode_on_client", pos, rot:z(), self._values.damage, self._values.range, 5)

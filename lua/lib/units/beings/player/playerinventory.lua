@@ -18,6 +18,10 @@ PlayerInventory._index_to_weapon_list = {
 	Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11"),
 	Idstring("units/payday2/weapons/wpn_npc_sniper/wpn_npc_sniper"),
 	Idstring("units/payday2/weapons/wpn_npc_saiga/wpn_npc_saiga"),
+	Idstring("units/payday2/weapons/wpn_npc_lmg_m249/wpn_npc_lmg_m249"),
+	Idstring("units/payday2/weapons/wpn_npc_benelli/wpn_npc_benelli"),
+	Idstring("units/payday2/weapons/wpn_npc_g36/wpn_npc_g36"),
+	Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump"),
 	Idstring("units/payday2/weapons/wpn_fps_pis_g18c/wpn_fps_pis_g18c"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_m4/wpn_fps_ass_m4"),
 	Idstring("units/payday2/weapons/wpn_fps_ass_amcar/wpn_fps_ass_amcar"),
@@ -227,12 +231,13 @@ function PlayerInventory:add_unit_by_name(new_unit_name, equip, instant)
 	self:add_unit(new_unit, equip, instant)
 end
 
-function PlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, blueprint)
+function PlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, blueprint, texture_switches)
 	local factory_weapon = tweak_data.weapon.factory[factory_name]
 	local ids_unit_name = Idstring(factory_weapon.unit)
 	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, "packages/dyn_resources", false)
 	local new_unit = World:spawn_unit(ids_unit_name, Vector3(), Rotation())
 	new_unit:base():set_factory_data(factory_name)
+	new_unit:base():set_texture_switches(texture_switches)
 	if blueprint then
 		new_unit:base():assemble_from_blueprint(factory_name, blueprint)
 	else

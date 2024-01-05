@@ -1,17 +1,46 @@
 core:import("CoreMissionScriptElement")
 ElementSpawnEnemyDummy = ElementSpawnEnemyDummy or class(CoreMissionScriptElement.MissionScriptElement)
 ElementSpawnEnemyDummy._unit_destroy_clbk_key = "ElementSpawnEnemyDummy"
-ElementSpawnEnemyDummy._spawn_stance_types = {
-	"neutral",
-	"hostile",
-	"combat"
+ElementSpawnEnemyDummy.ACCESSIBILITIES = {
+	"any",
+	"walk",
+	"acrobatic"
 }
 
 function ElementSpawnEnemyDummy:init(...)
 	ElementSpawnEnemyDummy.super.init(self, ...)
 	self._enemy_name = self._values.enemy and Idstring(self._values.enemy) or Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
+	self._values.enemy = nil
 	self._units = {}
 	self._events = {}
+	self:_finalize_values()
+end
+
+function ElementSpawnEnemyDummy:_finalize_values()
+	local values = self._values
+	
+	local function _save_boolean(name_in)
+		values[name_in] = values[name_in] or nil
+	end
+	
+	local function _nil_if_none(name_in)
+		if not values[name_in] or values[name_in] == "none" then
+			values[name_in] = nil
+		end
+	end
+	
+	local function _index_or_nil(table_in, name_in)
+		local found_index = table.index_of(table_in, values[name_in])
+		values[name_in] = found_index ~= -1 and found_index or nil
+	end
+	
+	_nil_if_none("force_pickup")
+	_index_or_nil(CopActionAct._act_redirects.enemy_spawn, "spawn_action")
+	_index_or_nil(CopActionAct._act_redirects.civilian_spawn, "state")
+	_save_boolean("participate_to_group_ai")
+	_index_or_nil(self.ACCESSIBILITIES, "accessibility")
+	values.voice = values.voice and values.voice ~= 0 and values.voice or nil
+	self._values = clone(values)
 end
 
 function ElementSpawnEnemyDummy:enemy_name()
@@ -42,7 +71,7 @@ function ElementSpawnEnemyDummy:produce(params)
 		unit:base():add_destroy_listener(self._unit_destroy_clbk_key, callback(self, self, "clbk_unit_destroyed"))
 		unit:unit_data().mission_element = self
 		local objective
-		local action = self:_create_action_data(self._values)
+		local action = self._create_action_data(CopActionAct._act_redirects.enemy_spawn[self._values.spawn_action])
 		local stance = managers.groupai:state():enemy_weapons_hot() and "cbt" or "ntl"
 		if action.type == "act" then
 			objective = {
@@ -56,6 +85,9 @@ function ElementSpawnEnemyDummy:produce(params)
 		if self._values.participate_to_group_ai ~= false then
 			managers.groupai:state():assign_enemy_to_group_ai(unit)
 		end
+		if self._values.voice then
+			unit:sound():set_voice_prefix(self._values.voice)
+		end
 		table.insert(self._units, unit)
 		self:event("spawn", unit)
 		if self._values.force_pickup and self._values.force_pickup ~= "none" then
@@ -63,12 +95,6 @@ function ElementSpawnEnemyDummy:produce(params)
 		end
 	end
 	return self._units[#self._units]
-end
-
-function ElementSpawnEnemyDummy.produce_test(data, unit)
-	local action_desc = ElementSpawnEnemyDummy._create_action_data(nil, data)
-	unit:movement():action_request(action_desc)
-	unit:movement():set_position(unit:position())
 end
 
 function ElementSpawnEnemyDummy:clbk_unit_destroyed(unit)
@@ -105,7 +131,7 @@ function ElementSpawnEnemyDummy:on_executed(instigator)
 end
 
 function ElementSpawnEnemyDummy:_create_spawn_AI_parametric(stance, objective, spawn_properties)
-	local entry_action = self:_create_action_data(spawn_properties)
+	local entry_action = self._create_action_data(CopActionAct._act_redirects.enemy_spawn[self._values.spawn_action])
 	if entry_action.type == "act" then
 		local followup_objective = objective
 		objective = {
@@ -122,9 +148,8 @@ function ElementSpawnEnemyDummy:_create_spawn_AI_parametric(stance, objective, s
 	}
 end
 
-function ElementSpawnEnemyDummy:_create_action_data(spawn_properties)
-	local action_name = spawn_properties.spawn_action or spawn_properties.state
-	if not action_name or action_name == "none" then
+function ElementSpawnEnemyDummy._create_action_data(anim_name)
+	if not anim_name or anim_name == "none" then
 		return {
 			type = "idle",
 			body_part = 1,
@@ -133,7 +158,7 @@ function ElementSpawnEnemyDummy:_create_action_data(spawn_properties)
 	else
 		return {
 			type = "act",
-			variant = action_name,
+			variant = anim_name,
 			body_part = 1,
 			blocks = {
 				action = -1,
@@ -169,4 +194,8 @@ function ElementSpawnEnemyDummy:execute_on_all_units(func)
 			func(unit)
 		end
 	end
+end
+
+function ElementSpawnEnemyDummy:accessibility()
+	return self.ACCESSIBILITIES[self._values.accessibility]
 end

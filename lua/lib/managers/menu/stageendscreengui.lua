@@ -301,11 +301,10 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
 	self._panel:set_bottom(self._safe_workspace:panel():h())
+	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
 	self._continue_button = self._panel:text({
 		name = "ready_button",
-		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {
-			CONTINUE = managers.localization:btn_macro("continue")
-		})),
+		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button})),
 		h = 32,
 		align = "right",
 		vertical = "center",
@@ -322,9 +321,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._continue_button:set_color(tweak_data.screen_colors.item_stage_1)
 	local big_text = self._fullscreen_panel:text({
 		name = "continue_big_text",
-		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {
-			CONTINUE = managers.localization:btn_macro("continue")
-		})),
+		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button})),
 		h = 90,
 		align = "right",
 		vertical = "bottom",

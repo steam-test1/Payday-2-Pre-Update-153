@@ -24,8 +24,20 @@ function PlayerTweakData:_set_overkill_145()
 	self.damage.DOWNED_TIME_MIN = 1
 end
 
+function PlayerTweakData:_set_overkill_290()
+	self.damage.DOWNED_TIME_DEC = 20
+	self.damage.DOWNED_TIME_MIN = 1
+	self.suspicion.max_value = 12
+	self.suspicion.range_mul = 2
+	self.suspicion.buildup_mul = 2
+	self.damage.BLEED_OT_TIME = 10
+	self.damage.LIVES_INIT = 4
+	self.damage.MIN_DAMAGE_INTERVAL = 0.35
+	self.damage.REVIVE_HEALTH_STEPS = {0.1}
+end
+
 function PlayerTweakData:_set_singleplayer()
-	self.damage.REGENERATE_TIME = 1.25
+	self.damage.REGENERATE_TIME = 1.75
 end
 
 function PlayerTweakData:_set_multiplayer()
@@ -62,7 +74,7 @@ function PlayerTweakData:init()
 	if is_console then
 		self.damage.REGENERATE_TIME = 2.35
 	else
-		self.damage.REGENERATE_TIME = 2.7
+		self.damage.REGENERATE_TIME = 3
 	end
 	self.damage.REVIVE_HEALTH_STEPS = {0.4}
 	self.damage.BLEED_OT_TIME = 40
@@ -102,7 +114,7 @@ function PlayerTweakData:init()
 	self.alarm_pager = {
 		ring_delay = {2, 5},
 		ring_reminder = {4, 4},
-		ring_duration = {12, 12},
+		ring_duration = {6, 8},
 		bluff_success_chance = {
 			1,
 			1,

@@ -498,6 +498,9 @@ function CopActionHurt:on_exit()
 		self._machine:allow_modifier(self._head_modifier_name)
 		self._machine:allow_modifier(self._arm_modifier_name)
 	end
+	if self._expired then
+		CopActionWalk._chk_correct_pose(self)
+	end
 	if not self._expired and Network:is_server() then
 		if self._hurt_type == "bleedout" or self._hurt_type == "fatal" or self._variant == "tase" then
 			self._unit:network():send("action_hurt_end")
@@ -508,6 +511,12 @@ function CopActionHurt:on_exit()
 	end
 	if self._hurt_type == "fatal" or self._variant == "tase" then
 		managers.hud:set_mugshot_normal(self._unit:unit_data().mugshot_id)
+	end
+	if Network:is_server() and not self._unit:character_damage():dead() and self._body_part == 1 then
+		self._unit:brain():add_pos_rsrv("stand", {
+			position = mvector3.copy(self._common_data.pos),
+			radius = 30
+		})
 	end
 end
 

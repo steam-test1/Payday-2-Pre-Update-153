@@ -85,6 +85,10 @@ function CriminalsManager.character_names()
 	}
 end
 
+function CriminalsManager.get_num_characters()
+	return 4
+end
+
 function CriminalsManager.character_workname_by_peer_id(peer_id)
 	local t = {
 		"russian",

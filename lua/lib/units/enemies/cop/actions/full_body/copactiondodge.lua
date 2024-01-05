@@ -54,6 +54,12 @@ function CopActionDodge:on_exit()
 	elseif not self._expired then
 		self._common_data.ext_network:send("action_dodge_end")
 	end
+	if Network:is_server() and not self._unit:character_damage():dead() then
+		self._unit:brain():add_pos_rsrv("stand", {
+			position = mvector3.copy(self._common_data.pos),
+			radius = 30
+		})
+	end
 end
 
 function CopActionDodge:update(t)

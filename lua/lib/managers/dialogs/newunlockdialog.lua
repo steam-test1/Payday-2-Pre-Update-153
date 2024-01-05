@@ -25,14 +25,16 @@ function NewUnlockDialog:init(manager, data, is_title_outside)
 		text_blend_mode = data.text_blend_mode
 	}
 	local image_config = {
-		w = 128,
-		h = 128,
+		w = data.image_w or 128,
+		h = data.image_h or 128,
 		padding = 10,
 		layer = 2,
 		keep_ratio = true,
 		texture = data.texture,
 		render_template = data.render_template,
-		shapes = data.shapes
+		shapes = data.shapes,
+		halign = data.image_halign,
+		valign = data.image_valign
 	}
 	if not data.texture and not data.shapes then
 		image_config.w = 0

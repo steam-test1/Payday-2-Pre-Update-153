@@ -375,7 +375,7 @@ function TimerGui:_set_powered(powered, enable_interaction)
 				child:set_color(c)
 			end
 		end
-		self:post_event(self._jam_event)
+		self:post_event(self._power_off_event or self._jam_event)
 		if enable_interaction and self._unit:interaction() then
 			self._powered_interaction_enabled = enable_interaction
 			if self._jammed_tweak_data then
@@ -383,7 +383,7 @@ function TimerGui:_set_powered(powered, enable_interaction)
 			end
 			self._unit:interaction():set_active(true)
 		end
-		self:post_event(self._jam_event)
+		self:post_event(self._power_off_event or self._jam_event)
 	else
 		for _, child in ipairs(self._gui_script.panel:children()) do
 			if child.children then
@@ -424,13 +424,6 @@ function TimerGui:_set_done()
 	self._gui_script.time_header_text:set_visible(false)
 	self._gui_script.time_text:set_visible(false)
 	self._unit:base():done()
-end
-
-function TimerGui:post_event(event)
-	if not event then
-		return
-	end
-	self._unit:sound_source():post_event(event)
 end
 
 function TimerGui:update_sound_event()
@@ -487,6 +480,23 @@ function TimerGui:load(data)
 	end
 	self:set_visible(state.visible)
 	self:set_timer_multiplier(state.timer_multiplier or 1)
+end
+
+function TimerGui:post_event(event)
+	if not event then
+		return
+	end
+	if event == self._start_event or event == self._resume_event or event == self._done_event then
+		if self._skill == 3 then
+			self._unit:sound_source():post_event(event .. "_aced")
+		elseif self._skill == 2 then
+			self._unit:sound_source():post_event(event .. "_basic")
+		else
+			self._unit:sound_source():post_event(event)
+		end
+	else
+		self._unit:sound_source():post_event(event)
+	end
 end
 
 DrillTimerGui = DrillTimerGui or class(TimerGui)

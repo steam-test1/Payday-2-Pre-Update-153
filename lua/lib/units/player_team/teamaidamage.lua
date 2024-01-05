@@ -177,6 +177,29 @@ function TeamAIDamage:damage_explosion(attack_data)
 	return result
 end
 
+function TeamAIDamage:damage_mission(attack_data)
+	if self._dead or self._invulnerable then
+		return
+	end
+	local result
+	local damage_percent = self._HEALTH_GRANULARITY
+	attack_data.damage = self._health
+	attack_data.variant = "explosion"
+	local result = {
+		variant = attack_data.variant
+	}
+	local damage_percent, health_subtracted = self:_apply_damage(attack_data, result)
+	if 0 < health_subtracted then
+		self:_send_damage_drama(attack_data, health_subtracted)
+	end
+	if self._dead then
+		self:_unregister_unit()
+	end
+	self:_call_listeners(attack_data)
+	self:_send_explosion_attack_result(attack_data)
+	return result
+end
+
 function TeamAIDamage:damage_tase()
 	if self:_cannot_take_damage() then
 		return
@@ -388,6 +411,10 @@ end
 
 function TeamAIDamage:fatal()
 	return self._fatal
+end
+
+function TeamAIDamage:is_downed()
+	return self._bleed_out or self._fatal
 end
 
 function TeamAIDamage:_regenerated()

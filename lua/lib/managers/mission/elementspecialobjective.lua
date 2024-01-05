@@ -1,52 +1,155 @@
 core:import("CoreMissionScriptElement")
 ElementSpecialObjective = ElementSpecialObjective or class(CoreMissionScriptElement.MissionScriptElement)
-ElementSpecialObjective._pathing_types = {
+ElementSpecialObjective._AI_GROUPS = {
+	"enemies",
+	"friendlies",
+	"civilians",
+	"bank_manager_old_man",
+	"escort_guy_1",
+	"escort_guy_2",
+	"escort_guy_3",
+	"escort_guy_4",
+	"escort_guy_5",
+	"chavez"
+}
+ElementSpecialObjective._PATHING_STYLES = {
 	"destination",
 	"precise",
 	"coarse"
 }
-ElementSpecialObjective._pathing_type_default = "destination"
+ElementSpecialObjective._ATTITUDES = {"avoid", "engage"}
+ElementSpecialObjective._TRIGGER_ON = {"interact"}
+ElementSpecialObjective._INTERACTION_VOICES = {
+	"default",
+	"cuff_cop",
+	"down_cop",
+	"stop_cop",
+	"escort_keep",
+	"escort_go",
+	"escort",
+	"stop",
+	"down_stay",
+	"down",
+	"bridge_codeword",
+	"bridge_chair",
+	"undercover_interrogate"
+}
+ElementSpecialObjective._STANCES = {
+	"ntl",
+	"hos",
+	"cbt"
+}
+ElementSpecialObjective._POSES = {"crouch", "stand"}
+ElementSpecialObjective._HASTES = {"walk", "run"}
+ElementSpecialObjective._DEFAULT_VALUES = {
+	ai_group = 1,
+	path_style = 1,
+	interval = -1,
+	base_chance = 1,
+	chance_inc = 0,
+	interrupt_dis = -1,
+	interrupt_dmg = 0,
+	interaction_voice = 1,
+	action_duration_min = 0,
+	action_duration_max = 0
+}
 
 function ElementSpecialObjective:init(...)
 	ElementSpecialObjective.super.init(self, ...)
-	if type(self._values.SO_access) ~= "string" then
-		self._values.SO_access = "0"
-	end
-	local access_filter_version = self._values.access_flag_version or 1
-	if access_filter_version ~= managers.navigation.ACCESS_FLAGS_VERSION then
-		print("[ElementSpecialObjective:init] converting access flag", access_filter_version, self._values.SO_access)
-		self._values.SO_access = managers.navigation:upgrade_access_filter(self._values.SO_access, access_filter_version)
-		print("[ElementSpecialObjective:init] converted to", self._values.SO_access)
-	else
-		self._values.SO_access = managers.navigation:convert_access_filter_to_number(self._values.SO_access)
-	end
-	if self._values.follow_up_id then
-		self._values.followup_elements = {
-			self._values.follow_up_id
-		}
-		self._values.follow_up_id = nil
-	end
-	if self._values.followup_elements and not next(self._values.followup_elements) then
-		self._values.followup_elements = nil
-	end
-	if self._values.spawn_instigator_ids and not next(self._values.spawn_instigator_ids) then
-		self._values.spawn_instigator_ids = nil
-	end
-	if self._values.interrupt_on then
-		if self._values.interrupt_on == "obstructed" then
-			self._values.interrupt_dis = 7
-			self._values.interrupt_dmg = 0
-		elseif self._values.interrupt_on == "contact" then
-			self._values.interrupt_dis = -1
-			self._values.interrupt_dmg = 0
-		else
-			self._values.interrupt_dis = 0
-			self._values.interrupt_dmg = -1
-		end
-		print("[function ElementSpecialObjective:init] converted interrupt_on to: interrupt_dis", self._values.interrupt_dis, "interrupt_dmg", self._values.interrupt_dmg)
-		self._values.interrupt_on = nil
-	end
+	self:_finalize_values(self._values)
+	self._values = clone(self._values)
 	self._events = {}
+end
+
+function ElementSpecialObjective:_finalize_values(values)
+	local function _index_or_nil(table_in, name_in)
+		local found_index = table.index_of(table_in, values[name_in])
+		
+		values[name_in] = found_index ~= -1 and found_index or nil
+	end
+	
+	local function _nil_if_default(name_in)
+		if values[name_in] == self._DEFAULT_VALUES[name_in] then
+			values[name_in] = nil
+		end
+	end
+	
+	local function _nil_if_none(name_in)
+		if values[name_in] == "none" then
+			values[name_in] = nil
+		end
+	end
+	
+	local function _save_boolean(name_in)
+		values[name_in] = values[name_in] or nil
+	end
+	
+	_save_boolean("use_instigator")
+	if values.use_instigator then
+		values.ai_group = nil
+		values.interval = nil
+		values.search_distance = nil
+	else
+		values.ai_group = table.index_of(self._AI_GROUPS, values.ai_group)
+		_nil_if_default("ai_group")
+		_nil_if_default("interval")
+	end
+	_save_boolean("is_navigation_link")
+	if values.use_instigator then
+		values.search_position = nil
+	end
+	if values.align_position then
+		_save_boolean("align_position")
+		_save_boolean("align_rotation")
+		_save_boolean("needs_pos_rsrv")
+		_index_or_nil(ElementSpecialObjective._PATHING_STYLES, "path_style")
+		_index_or_nil(ElementSpecialObjective._HASTES, "path_haste")
+		_nil_if_none("patrol_path")
+	else
+		if not values.is_navigation_link then
+			values.position = nil
+		end
+		values.align_position = nil
+		values.align_rotation = nil
+		values.needs_pos_rsrv = nil
+		values.path_style = nil
+		values.path_haste = nil
+		values.patrol_path = nil
+	end
+	if values.align_rotation or values.is_navigation_link then
+		values.rotation = mrotation.yaw(values.rotation)
+	else
+		values.rotation = nil
+	end
+	_nil_if_default("base_chance")
+	if values.base_chance then
+		_nil_if_default("chance_inc")
+	else
+		values.chance_inc = nil
+	end
+	_nil_if_default("action_duration_min")
+	_nil_if_default("action_duration_max")
+	_index_or_nil(ElementSpecialObjective._TRIGGER_ON, "trigger_on")
+	_index_or_nil(ElementSpecialObjective._INTERACTION_VOICES, "interaction_voice")
+	_save_boolean("repeatable")
+	_save_boolean("forced")
+	_save_boolean("no_arrest")
+	_save_boolean("scan")
+	_save_boolean("allow_followup_self")
+	_save_boolean("is_navigation_link")
+	_index_or_nil(ElementSpecialObjective._STANCES, "path_stance")
+	_index_or_nil(ElementSpecialObjective._POSES, "pose")
+	_nil_if_none("so_action")
+	_nil_if_default("interrupt_dis")
+	_nil_if_default("interrupt_dmg")
+	_index_or_nil(ElementSpecialObjective._ATTITUDES, "attitude")
+	if values.followup_elements and not next(values.followup_elements) then
+		values.followup_elements = nil
+	end
+	if values.spawn_instigator_ids and not next(values.spawn_instigator_ids) then
+		values.spawn_instigator_ids = nil
+	end
+	values.SO_access = managers.navigation:convert_access_filter_to_number(values.SO_access)
 end
 
 function ElementSpecialObjective:event(name, unit)
@@ -171,7 +274,7 @@ function ElementSpecialObjective:on_executed(instigator)
 			Application:error("[ElementSpecialObjective:on_executed] Special Objective missing instigator. Possibly improper \"use instigator\" flag use. Element id:", self._id)
 		end
 	elseif self:_is_nav_link() then
-		if self._values.so_action and self._values.so_action ~= "none" then
+		if self._values.so_action then
 			managers.navigation:register_anim_nav_link(self)
 		else
 			Application:error("[ElementSpecialObjective:on_executed] Nav link without animation specified. Element id:", self._id)
@@ -180,23 +283,20 @@ function ElementSpecialObjective:on_executed(instigator)
 		local objective = self:get_objective(instigator)
 		if objective then
 			local search_dis_sq = self._values.search_distance
-			search_dis_sq = search_dis_sq ~= 0 and search_dis_sq * search_dis_sq or nil
+			search_dis_sq = search_dis_sq and search_dis_sq * search_dis_sq or nil
 			local so_descriptor = {
 				objective = objective,
-				base_chance = self._values.base_chance,
-				chance_inc = self._values.chance_inc,
+				base_chance = self:_get_default_value_if_nil("base_chance"),
+				chance_inc = self:_get_default_value_if_nil("chance_inc"),
 				interval = self._values.interval,
 				search_dis_sq = search_dis_sq,
 				search_pos = self._values.search_position,
 				usage_amount = self._values.trigger_times,
-				AI_group = self._values.ai_group or "enemies",
-				access = self._values.SO_access and tonumber(self._values.SO_access) or managers.navigation:convert_SO_AI_group_to_access(self._values.ai_group or "enemies"),
+				AI_group = self._AI_GROUPS[self:_get_default_value_if_nil("ai_group")],
+				access = tonumber(self._values.SO_access),
 				repeatable = self._values.repeatable,
 				admin_clbk = callback(self, self, "clbk_objective_administered")
 			}
-			if so_descriptor.usage_amount and so_descriptor.usage_amount < 1 then
-				so_descriptor.usage_amount = nil
-			end
 			managers.groupai:state():add_special_objective(self._id, so_descriptor)
 		end
 	end
@@ -227,7 +327,6 @@ function ElementSpecialObjective:get_objective(instigator)
 		type = false,
 		pos = pos,
 		rot = rot,
-		path_data = false,
 		path_style = path_style,
 		attitude = attitude,
 		stance = stance,
@@ -265,10 +364,10 @@ function ElementSpecialObjective:get_objective(instigator)
 			end
 		else
 			local path_name = self._values.patrol_path
-			if path_name == "none" then
+			if not path_name then
 				last_pos = pos or self._values.position
 			elseif path_style == "destination" then
-				local path_data = managers.ai_data:destination_path(self._values.position, self._values.rotation)
+				local path_data = managers.ai_data:destination_path(self._values.position, Rotation(self._values.rotation, 0, 0))
 				objective.path_data = path_data
 				last_pos = self._values.position
 			else
@@ -299,7 +398,7 @@ function ElementSpecialObjective:get_objective(instigator)
 		end
 	else
 		local action
-		if self._values.so_action ~= "none" then
+		if self._values.so_action then
 			action = {
 				type = "act",
 				variant = self._values.so_action,
@@ -322,15 +421,12 @@ function ElementSpecialObjective:get_objective(instigator)
 		if self._values.align_position then
 			objective.nav_seg = managers.navigation:get_nav_seg_from_pos(self._values.position)
 			if path_style == "destination" then
-				local path_data = managers.ai_data:destination_path(self._values.position, self._values.rotation)
+				local path_data = managers.ai_data:destination_path(self._values.position, Rotation(self._values.rotation or 0, 0, 0))
 				objective.path_data = path_data
 			else
 				local path_name = self._values.patrol_path
 				local path_data = managers.ai_data:patrol_path(path_name)
 				objective.path_data = path_data
-				if not self._values.align_rotation then
-					objective.rot = nil
-				end
 			end
 		end
 	end
@@ -369,21 +465,25 @@ end
 function ElementSpecialObjective:_get_misc_SO_params()
 	local pose, stance, attitude, path_style, pos, rot, interrupt_dis, interrupt_health, haste, trigger_on, interaction_voice
 	local values = self._values
-	pos = values.align_position and values.position
-	rot = values.align_rotation and values.rotation
-	path_style = values.path_style
-	attitude = values.attitude ~= "none" and values.attitude
-	stance = values.path_stance ~= "none" and values.path_stance
-	pose = values.pose ~= "none" and values.pose
-	if values.interrupt_dis == -1 then
-		interrupt_dis = -1
+	pos = values.align_position and values.position or nil
+	rot = values.align_position and values.align_rotation and Rotation(values.rotation, 0, 0) or nil
+	path_style = values.align_position and self._PATHING_STYLES[self:_get_default_value_if_nil("path_style")] or nil
+	attitude = self._ATTITUDES[values.attitude]
+	stance = self._STANCES[values.path_stance]
+	pose = self._POSES[values.pose]
+	if not values.interrupt_dis then
+		interrupt_dis = self._DEFAULT_VALUES.interrupt_dis
 	elseif values.interrupt_dis ~= 0 then
 		interrupt_dis = values.interrupt_dis * 100
 	end
-	interrupt_health = values.interrupt_dmg < 1 and 1 - values.interrupt_dmg or nil
-	haste = values.path_haste ~= "none" and values.path_haste
-	trigger_on = values.trigger_on ~= "none" and values.trigger_on
-	interaction_voice = values.interaction_voice ~= "default" and values.interaction_voice
+	if values.interrupt_dmg then
+		interrupt_health = values.interrupt_dmg < 1 and 1 - values.interrupt_dmg or nil
+	else
+		interrupt_health = 1
+	end
+	haste = self._HASTES[values.path_haste]
+	trigger_on = self._TRIGGER_ON[values.trigger_on] or nil
+	interaction_voice = values.interaction_voice and self._INTERACTION_VOICES[values.interaction_voice]
 	return pose, stance, attitude, path_style, pos, rot, interrupt_dis, interrupt_health, haste, trigger_on, interaction_voice
 end
 
@@ -392,17 +492,15 @@ function ElementSpecialObjective:nav_link_end_pos()
 end
 
 function ElementSpecialObjective:nav_link_access()
-	local access
-	if self._values.SO_access then
-		access = tonumber(self._values.SO_access)
-	else
-		access = managers.navigation:convert_nav_link_maneuverability_to_SO_access(self._values.navigation_link)
-	end
-	return access
+	return tonumber(self._values.SO_access)
+end
+
+function ElementSpecialObjective:chance()
+	return self:_get_default_value_if_nil("base_chance")
 end
 
 function ElementSpecialObjective:nav_link_delay()
-	return self._values.interval
+	return self:_get_default_value_if_nil("interval")
 end
 
 function ElementSpecialObjective:nav_link()
@@ -441,10 +539,10 @@ function ElementSpecialObjective:_select_units_from_spawners()
 		end
 	end
 	local wanted_nr_units
-	if 0 >= self._values.trigger_times then
-		return candidates, objectives
-	else
+	if self._values.trigger_times and 0 < self._values.trigger_times then
 		wanted_nr_units = self._values.trigger_times
+	else
+		return candidates, objectives
 	end
 	wanted_nr_units = math.min(wanted_nr_units, #candidates)
 	local chosen_units = {}
@@ -459,7 +557,7 @@ function ElementSpecialObjective:_select_units_from_spawners()
 end
 
 function ElementSpecialObjective:get_objective_trigger()
-	return self._values.trigger_on ~= "none" and self._values.trigger_on
+	return self._values.trigger_on
 end
 
 function ElementSpecialObjective:_administer_objective(unit, objective)
@@ -530,16 +628,22 @@ end
 
 function ElementSpecialObjective:get_as_followup(unit, skip_element_ids)
 	if (not unit or managers.navigation:check_access(self._values.SO_access, unit:brain():SO_access(), 0) and self:clbk_verify_administration(unit)) and not skip_element_ids[self._id] then
-		return self, self._values.base_chance
+		return self, self:_get_default_value_if_nil("base_chance")
 	end
 end
 
 function ElementSpecialObjective:_get_action_duration()
-	if not self._values.action_duration_max or self._values.action_duration_max <= 0 then
+	if not self._values.action_duration_max and not self._values.action_duration_min then
 		return
 	else
-		local min = math.min(self._values.action_duration_min, self._values.action_duration_max)
-		local max = math.max(self._values.action_duration_min, self._values.action_duration_max)
+		local val1 = self:_get_default_value_if_nil("action_duration_min")
+		local val2 = self:_get_default_value_if_nil("action_duration_max")
+		local min = math.min(val1, val2)
+		local max = math.max(val1, val2)
 		return math.lerp(min, max, math.random())
 	end
+end
+
+function ElementSpecialObjective:_get_default_value_if_nil(name_in)
+	return self._values[name_in] or self._DEFAULT_VALUES[name_in]
 end

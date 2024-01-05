@@ -23,9 +23,7 @@ function TeamAILogicTravel.enter(data, new_logic_name, enter_params)
 		unit = data.unit
 	}
 	my_data.detection = data.char_tweak.detection.recon
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.attention_unit = old_internal_data.attention_unit
 		if old_internal_data.nearest_cover then
 			my_data.nearest_cover = old_internal_data.nearest_cover
@@ -76,15 +74,7 @@ function TeamAILogicTravel.exit(data, new_logic_name, enter_params)
 	if my_data.best_cover then
 		managers.navigation:release_cover(my_data.best_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 end
 
 function TeamAILogicTravel.update(data)
@@ -499,17 +489,11 @@ function TeamAILogicTravel._get_exact_move_pos(data, nav_index)
 		end
 	end
 	if not reservation and wants_reservation then
-		reservation = {
+		data.brain:add_pos_rsrv("path", {
 			position = mvector3.copy(to_pos),
-			radius = 60,
-			filter = data.pos_rsrv_id
-		}
-		managers.navigation:add_pos_reservation(reservation)
+			radius = 60
+		})
 	end
-	if my_data.rsrv_pos.path then
-		managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-	end
-	my_data.rsrv_pos.path = reservation
 	return to_pos
 end
 
@@ -532,7 +516,7 @@ function TeamAILogicTravel._check_start_path_ahead(data)
 	if objective and objective.follow_unit then
 		prio = 5
 	end
-	local from_pos = my_data.rsrv_pos.move_dest.position
+	local from_pos = data.pos_rsrv.move_dest.position
 	local nav_segs = CopLogicTravel._get_allowed_travel_nav_segs(data, my_data, to_pos)
 	data.unit:brain():search_for_path_from_pos(my_data.advance_path_search_id, from_pos, to_pos, prio, nil, nav_segs)
 end

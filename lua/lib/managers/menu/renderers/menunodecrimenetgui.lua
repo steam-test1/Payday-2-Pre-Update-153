@@ -22,8 +22,8 @@ function MenuNodeCrimenetGui:_setup_item_panel(safe_rect, res)
 	local width = 900
 	local height = 580
 	if SystemInfo:platform() ~= Idstring("WIN32") then
-		width = 850
-		height = 500
+		width = 900
+		height = 525
 	end
 	self.item_panel:set_rightbottom(self.item_panel:parent():w() * 0.5 + width / 2 - 10, self.item_panel:parent():h() * 0.5 + height / 2 - 10)
 	self:_set_topic_position()
@@ -764,7 +764,9 @@ function MenuNodeCrimenetContactInfoGui:init(node, layer, parameters)
 	MenuNodeCrimenetContactInfoGui.super.init(self, node, layer, parameters)
 	managers.menu_component:disable_crimenet()
 	self:_setup_layout()
-	managers.menu:active_menu().input:deactivate_controller_mouse()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:deactivate_controller_mouse()
+	end
 end
 
 function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, override_file)
@@ -1194,7 +1196,9 @@ function MenuNodeCrimenetContactInfoGui:close()
 		active_menu.input:set_force_input(false)
 	end
 	self._sound_source:stop()
-	managers.menu:active_menu().input:activate_controller_mouse()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:activate_controller_mouse()
+	end
 	MenuNodeCrimenetContactInfoGui.super.close(self)
 	managers.menu_component:enable_crimenet()
 end

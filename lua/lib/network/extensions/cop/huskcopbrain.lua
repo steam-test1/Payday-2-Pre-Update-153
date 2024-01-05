@@ -1,4 +1,3 @@
-local tmp_vec1 = Vector3()
 HuskCopBrain = HuskCopBrain or class()
 HuskCopBrain._NET_EVENTS = {weapon_laser_on = 1, weapon_laser_off = 2}
 

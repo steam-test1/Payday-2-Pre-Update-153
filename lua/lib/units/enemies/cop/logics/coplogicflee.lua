@@ -8,9 +8,7 @@ function CopLogicFlee.enter(data, new_logic_name, enter_params)
 		unit = data.unit
 	}
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		if old_internal_data.nearest_cover then
 			my_data.nearest_cover = old_internal_data.nearest_cover
 			managers.navigation:reserve_cover(my_data.nearest_cover[1], data.pos_rsrv_id)
@@ -53,15 +51,7 @@ function CopLogicFlee.exit(data, new_logic_name, enter_params)
 	if my_data.best_cover then
 		managers.navigation:release_cover(my_data.best_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 end
 
 function CopLogicFlee.update(data)
@@ -95,10 +85,6 @@ function CopLogicFlee.update(data)
 				if unit:brain():action_request(new_action_data) then
 					my_data.moving_to_cover = my_data.best_cover
 					my_data.in_cover = nil
-					if my_data.rsrv_pos.stand then
-						managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-						my_data.rsrv_pos.stand = nil
-					end
 				end
 			end
 		elseif my_data.best_cover and my_data.best_cover ~= my_data.in_cover then
@@ -133,13 +119,7 @@ function CopLogicFlee.update(data)
 				my_data.flee_path = nil
 				my_data.advancing = unit:brain():action_request(new_action_data)
 				if my_data.advancing then
-					my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-					my_data.rsrv_pos.path = nil
 					my_data.in_cover = nil
-					if my_data.rsrv_pos.stand then
-						managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-						my_data.rsrv_pos.stand = nil
-					end
 					if my_data.cover_pathing then
 						managers.navigation:cancel_pathing_search(my_data.cover_path_search_id)
 						my_data.cover_pathing = nil
@@ -154,7 +134,6 @@ function CopLogicFlee.update(data)
 				if cur_index == total_nav_points then
 					data.unit:base():set_slot(unit, 0)
 				elseif not my_data.processing_flee_path then
-					my_data.rsrv_pos.path = nil
 					local to_pos
 					if cur_index == total_nav_points - 1 then
 						to_pos = my_data.flee_target.pos
@@ -369,8 +348,6 @@ function CopLogicFlee.action_complete_clbk(data, action)
 	local action_type = action:type()
 	if action_type == "walk" then
 		local my_data = data.internal_data
-		my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-		my_data.rsrv_pos.move_dest = nil
 		if my_data.moving_to_cover then
 			if action:expired() then
 				if my_data.best_cover then

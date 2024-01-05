@@ -42,7 +42,7 @@ logic_variants.sniper = security_variant
 logic_variants.gangster = security_variant
 logic_variants.dealer = security_variant
 logic_variants.biker_escape = security_variant
-logic_variants.murky = security_variant
+logic_variants.city_swat = security_variant
 for _, tweak_table_name in pairs({
 	"shield",
 	"tank",
@@ -85,6 +85,7 @@ function CopBrain:post_init()
 	self:_reset_logic_data()
 	local my_key = tostring(self._unit:key())
 	self._unit:character_damage():add_listener("CopBrain_hurt" .. my_key, {
+		"dmg_rcv",
 		"hurt",
 		"light_hurt",
 		"heavy_hurt",
@@ -96,6 +97,12 @@ function CopBrain:post_init()
 	self:_setup_attention_handler()
 	if not self._current_logic then
 		self:set_init_logic("idle")
+	end
+	if Network:is_server() then
+		self:add_pos_rsrv("stand", {
+			position = mvector3.copy(self._unit:movement():m_pos()),
+			radius = 30
+		})
 	end
 end
 
@@ -189,10 +196,12 @@ end
 function CopBrain:_reset_logic_data()
 	self._logic_data = {
 		unit = self._unit,
+		brain = self,
 		active_searches = {},
 		m_pos = self._unit:movement():m_pos(),
 		char_tweak = tweak_data.character[self._unit:base()._tweak_table],
 		key = self._unit:key(),
+		pos_rsrv = {},
 		pos_rsrv_id = self._unit:movement():pos_rsrv_id(),
 		SO_access = self._SO_access,
 		SO_access_str = tweak_data.character[self._unit:base()._tweak_table].access,
@@ -794,6 +803,59 @@ end
 
 function CopBrain:clbk_surrender_chance_expired()
 	self._logic_data.surrender_window = nil
+end
+
+function CopBrain:add_pos_rsrv(rsrv_name, pos_rsrv)
+	local pos_reservations = self._logic_data.pos_rsrv
+	if pos_reservations[rsrv_name] then
+		managers.navigation:unreserve_pos(pos_reservations[rsrv_name])
+	end
+	pos_rsrv.filter = self._logic_data.pos_rsrv_id
+	managers.navigation:add_pos_reservation(pos_rsrv)
+	pos_reservations[rsrv_name] = pos_rsrv
+	if not pos_rsrv.id then
+		debug_pause_unit(self._unit, "[CopBrain:add_pos_rsrv] missing id", inspect(pos_rsrv))
+		return
+	end
+end
+
+function CopBrain:set_pos_rsrv(rsrv_name, pos_rsrv)
+	local pos_reservations = self._logic_data.pos_rsrv
+	if pos_reservations[rsrv_name] == pos_rsrv then
+		return
+	end
+	if pos_reservations[rsrv_name] then
+		managers.navigation:unreserve_pos(pos_reservations[rsrv_name])
+	end
+	if not pos_rsrv.id then
+		debug_pause_unit(self._unit, "[CopBrain:set_pos_rsrv] missing id", inspect(pos_rsrv))
+		return
+	end
+	pos_reservations[rsrv_name] = pos_rsrv
+end
+
+function CopBrain:rem_pos_rsrv(rsrv_name)
+	local pos_reservations = self._logic_data.pos_rsrv
+	if not pos_reservations[rsrv_name] then
+		return
+	end
+	if not pos_reservations[rsrv_name].id then
+		debug_pause_unit(self._unit, "[CopBrain:rem_pos_rsrv] missing id", inspect(pos_reservations[rsrv_name]))
+		return
+	end
+	managers.navigation:unreserve_pos(pos_reservations[rsrv_name])
+	pos_reservations[rsrv_name] = nil
+end
+
+function CopBrain:get_pos_rsrv(rsrv_name)
+	return self._logic_data.pos_rsrv[rsrv_name]
+end
+
+function CopBrain:rem_all_pos_rsrv()
+	for rsrv_name, pos_rsrv in pairs(self._logic_data.pos_rsrv) do
+		managers.navigation:unreserve_pos(pos_rsrv)
+	end
+	self._logic_data.pos_rsrv = {}
 end
 
 function CopBrain:pre_destroy(unit)

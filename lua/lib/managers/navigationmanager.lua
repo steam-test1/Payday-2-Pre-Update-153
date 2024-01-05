@@ -91,7 +91,7 @@ function NavigationManager:init()
 	self._coarse_searches = {}
 	self._covers = {}
 	self._next_pos_rsrv_expiry = false
-	if Application:editor() then
+	if self._debug then
 		self._nav_links = {}
 	end
 	self._quad_field = World:quad_field()
@@ -110,7 +110,8 @@ function NavigationManager:_init_draw_data()
 	local brush = {}
 	brush.door = Draw:brush(Color(0.1, 0, 1, 1), duration)
 	brush.room_diag = Draw:brush(Color(1, 0.5, 0.5, 0), duration)
-	brush.room_diag_disabled = Draw:brush(Color(1, 1, 0, 0), duration)
+	brush.room_diag_disabled = Draw:brush(Color(0.5, 0.7, 0, 0), duration)
+	brush.room_diag_obstructed = Draw:brush(Color(0.5, 0.5, 0, 0.5), duration)
 	brush.room_border = Draw:brush(Color(1, 0.5, 0.5, 0.5), duration)
 	brush.coarse_graph = Draw:brush(Color(0.2, 0.05, 0.2, 0.9))
 	brush.vis_graph_rooms = Draw:brush(Color(0.6, 0.5, 0.2, 0.9), duration)
@@ -152,6 +153,9 @@ function NavigationManager:update(t, dt)
 			end
 			if options.coarse_graph then
 				self:_draw_coarse_graph()
+			end
+			if options.nav_links then
+				self:_draw_anim_nav_links()
 			end
 			if options.covers then
 				self:_draw_covers()
@@ -263,6 +267,9 @@ end
 function NavigationManager:set_load_data(data)
 	if data.version == NavFieldBuilder._VERSION then
 		local t_ins = table.insert
+		if Application:editor() then
+			self._load_data = deep_clone(data)
+		end
 		local grid_size = self._grid_size
 		local allow_debug_info = self._debug
 		self._rooms = {}
@@ -478,6 +485,9 @@ function NavigationManager:build_complete_clbk(draw_options)
 		self:send_nav_field_to_engine()
 	end
 	self:set_debug_draw_state(draw_options)
+	if self:is_data_ready() then
+		self._load_data = self:get_save_data()
+	end
 	if self._build_complete_clbk then
 		self._build_complete_clbk()
 	end
@@ -561,7 +571,7 @@ function NavigationManager:_draw_rooms(progress)
 	local wanted_index = math.clamp(math.ceil(nr_rooms * progress), 1, nr_rooms)
 	while i_room <= wanted_index and nr_rooms >= i_room do
 		local room = rooms[i_room]
-		if (not room_mask or room_mask[i_room]) and not room.removed then
+		if not room_mask or room_mask[i_room] then
 			self:_draw_room(room)
 		end
 		i_room = i_room + 1
@@ -570,12 +580,6 @@ function NavigationManager:_draw_rooms(progress)
 		data.next_draw_i_room = 1
 	else
 		data.next_draw_i_room = i_room
-	end
-	local obstructed_positions = self._quad_field:get_obstructed_quads()
-	if obstructed_positions then
-		for _, pos in ipairs(obstructed_positions) do
-			Application:draw_cylinder(pos, pos + math.UP * 5000, 12.5, 0.7, 0.2, 0)
-		end
 	end
 end
 
@@ -643,6 +647,9 @@ function NavigationManager:_draw_room(room, instant)
 			brush = brushes.room_diag_disabled
 		else
 			brush = brushes.room_diag
+		end
+		if room.obstructed then
+			brush = brushes.room_diag_obstructed
 		end
 		brush:line(xp_yp_draw, xn_yn_draw)
 		brush:line(xn_yp_draw, xp_yn_draw)
@@ -744,18 +751,13 @@ function NavigationManager:_draw_door(door)
 end
 
 function NavigationManager:_draw_anim_nav_links()
-	local brush = Draw:brush(Color(0.2, 0.8, 0.2, 0.1))
-	local brush_fwd = Draw:brush(Color(0.3, 0.1, 0.9, 0.1))
-	for i_room, room in ipairs(self._rooms) do
-		if room.nav_links then
-			for _, nav_link in ipairs(room.nav_links) do
-				local start_pos = nav_link.element:value("position")
-				brush:cone(nav_link.element:nav_link_end_pos(), start_pos, 20)
-				if nav_link.element:value("align_rotation") then
-					brush_fwd:cylinder(start_pos + nav_link.element:value("rotation"):y() * 100, start_pos, 2)
-				end
-			end
-		end
+	if not self._nav_links then
+		return
+	end
+	local brush = Draw:brush(Color(0.3, 0.8, 0.2, 0.1))
+	for element, _ in pairs(self._nav_links) do
+		local start_pos = element:value("position")
+		brush:cone(element:nav_link_end_pos(), start_pos, 20)
 	end
 end
 
@@ -936,17 +938,19 @@ function NavigationManager:register_cover_units()
 			t_ins(location_script_data.covers, cover)
 		end
 		
-		if cover_data.positions then
+		local tmp_rot = Rotation(0, 0, 0)
+		if cover_data.rotations then
 			local rotations = cover_data.rotations
-			for i, pos in ipairs(cover_data.positions) do
-				local fwd = Rotation(rotations[i]):y()
-				_register_cover(pos, fwd)
+			for i, yaw in ipairs(cover_data.rotations) do
+				mrotation.set_yaw_pitch_roll(tmp_rot, yaw, 0, 0)
+				mrotation.y(tmp_rot, temp_vec1)
+				_register_cover(cover_data.positions[i], mvector3.copy(temp_vec1))
 			end
 		else
 			for _, cover_desc in ipairs(cover_data) do
-				local pos = cover_desc[1]
-				local fwd = Rotation(cover_desc[2]):y()
-				_register_cover(pos, fwd)
+				mrotation.set_yaw_pitch_roll(tmp_rot, cover_desc[2], 0, 0)
+				mrotation.y(tmp_rot, temp_vec1)
+				_register_cover(cover_desc[1], mvector3.copy(temp_vec1))
 			end
 		end
 	else
@@ -1008,7 +1012,7 @@ function NavigationManager:register_anim_nav_link(element)
 	if self._nav_links then
 		self._nav_links[element] = true
 	end
-	local nav_link = self._quad_field:add_nav_link(element:value("position"), element:nav_link_end_pos(), {element = element}, element:nav_link_access(), element:value("base_chance"), element._id)
+	local nav_link = self._quad_field:add_nav_link(element:value("position"), element:nav_link_end_pos(), {element = element}, element:nav_link_access(), element:chance(), element._id)
 	element:set_nav_link(nav_link)
 	local start_nav_seg_id = nav_link:start_nav_segment()
 	local end_nav_seg_id = nav_link:end_nav_segment()
@@ -1484,7 +1488,13 @@ function NavigationManager:search_coarse(params)
 			}
 		end
 	end
-	access_pos = self._quad_field:convert_nav_link_flag_to_bitmask(params.access_pos)
+	if type_name(params.access_pos) == "table" then
+		access_pos = self._quad_field:convert_access_filter_to_number(params.access_pos)
+	elseif type_name(params.access_pos) == "string" then
+		access_pos = self._quad_field:convert_nav_link_flag_to_bitmask(params.access_pos)
+	else
+		access_pos = params.access_pos
+	end
 	if params.access_neg then
 		access_neg = self._quad_field:convert_nav_link_flag_to_bitmask(params.access_neg)
 	else
@@ -1704,22 +1714,13 @@ function NavigationManager:on_simulation_ended()
 		end
 	end
 	self:_unregister_cover_units()
-	local rooms = self._rooms
-	local i_room = #rooms
-	while 0 < i_room do
-		local room = rooms[i_room]
-		if room.added then
-			table.remove(rooms, i_room)
-		else
-			room.removed = nil
-			room.covers = nil
-		end
-		i_room = i_room - 1
-	end
 	for i, obs_data in ipairs(self._obstacles) do
 		self._quad_field:remove_obstacle(obs_data.id)
 	end
 	self._obstacles = {}
+	if self._load_data then
+		self:set_load_data(self._load_data)
+	end
 end
 
 function NavigationManager:nav_field_sanity_check()
@@ -2095,18 +2096,14 @@ function NavigationManager:clbk_navfield(event_name, args, args2, args3)
 			managers.groupai:state():on_nav_seg_neighbours_state(nav_seg_id, args, false)
 		end
 	elseif event_name == "invalidated_script_data" then
-		if type(args) == "table" then
-			for i, k in pairs(args) do
-				if k.covers then
-					for i_cover, cover in ipairs(k.covers) do
-						cover[3]:move(cover[1])
-						local location_script_data = self._quad_field:get_script_data(cover[3], true)
-						if not location_script_data.covers then
-							location_script_data.covers = {}
-						end
-						table.insert(location_script_data.covers, cover)
-					end
+		if args.covers then
+			for i_cover, cover in ipairs(args.covers) do
+				cover[3]:move(cover[1])
+				local location_script_data = self._quad_field:get_script_data(cover[3], true)
+				if not location_script_data.covers then
+					location_script_data.covers = {}
 				end
+				table.insert(location_script_data.covers, cover)
 			end
 		end
 	elseif event_name == "unobstruct_nav_link" then
@@ -2163,36 +2160,55 @@ function NavigationManager:clbk_navfield(event_name, args, args2, args3)
 		for i, k in pairs(args) do
 			self:_add_quad_by_data(k)
 		end
-	elseif event_name == "remove_quads" then
+	elseif event_name == "obstruct_quads" then
 		if not self._debug then
 			return
 		end
 		for i, k in pairs(args) do
-			self:_remove_quad_by_data(k)
+			self:_set_quad_obstructed_by_data(k, args2)
 		end
+	elseif event_name == "alter_quad" then
+		if not self._debug then
+			return
+		end
+		self:_alter_quad_by_data(args)
 	end
 end
 
-function NavigationManager:_remove_quad_by_data(quad_data)
-	local room_c = self._builder:_calculate_room_center(quad_data, true)
-	local closest_dis, closest_i_room
-	for i_room, room in ipairs(self._rooms) do
-		local test_room_c = self._builder:_calculate_room_center(room)
-		local my_dis = mvector3.distance_sq(test_room_c, room_c)
-		if not closest_dis or closest_dis > my_dis then
-			closest_i_room = i_room
-			closest_dis = my_dis
-		end
-	end
-	if closest_i_room then
-		self._rooms[closest_i_room].added = nil
-		self._rooms[closest_i_room].removed = true
+function NavigationManager:_set_quad_obstructed_by_data(quad_data, state)
+	local closest_i_room, room = self:_get_closest_room_by_com(self._builder:_calculate_room_center(quad_data, true))
+	if room then
+		room.obstructed = state
 	end
 end
 
 function NavigationManager:_add_quad_by_data(quad_data)
 	quad_data.added = true
+	local nav_seg = self._nav_segments[quad_data.seg_id]
+	quad_data.seg_id = nil
+	quad_data.vis_group = nav_seg.vis_groups[1]
 	table.insert(self._rooms, quad_data)
+end
+
+function NavigationManager:_alter_quad_by_data(quad_data)
+	local closest_i_room, room = self:_get_closest_room_by_com(quad_data.old_com)
+	if room then
+		room.borders = quad_data.borders
+		room.height = quad_data.height
+	end
+end
+
+function NavigationManager:_get_closest_room_by_com(com)
+	local closest_dis, closest_i_room
+	for i_room, room in ipairs(self._rooms) do
+		local test_room_c = self._builder:_calculate_room_center(room)
+		local my_dis = mvector3.distance_sq(test_room_c, com)
+		if not closest_dis or closest_dis > my_dis then
+			closest_i_room = i_room
+			closest_dis = my_dis
+		end
+	end
+	return closest_i_room, self._rooms[closest_i_room]
 end
 
 function NavigationManager:destroy()

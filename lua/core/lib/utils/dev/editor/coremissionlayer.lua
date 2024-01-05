@@ -258,13 +258,13 @@ function MissionLayer:update(time, rel_time)
 			local selected_unit = unit == self._selected_unit
 			if update_selected or selected_unit then
 				unit:mission_element():update_selected(time, rel_time, self._only_draw_selected_connections and self._selected_unit, all_units)
-			elseif self._override_lod_draw or lod_draw_distance > distance then
+			elseif self._override_lod_draw or self._only_draw_selected_connections and alive(self._selected_unit) or lod_draw_distance > distance then
 				unit:mission_element():update_unselected(time, rel_time, self._only_draw_selected_connections and self._selected_unit, all_units)
 				if not self._only_draw_selected_connections or not self._selected_unit then
 					unit:mission_element():draw_links_unselected(time, rel_time, self._only_draw_selected_connections and self._selected_unit, all_units)
 				end
 			end
-			if self._override_lod_draw or lod_draw_distance > distance then
+			if self._override_lod_draw or self._only_draw_selected_connections and alive(self._selected_unit) or lod_draw_distance > distance then
 				unit:mission_element():draw_links(time, rel_time, self._only_draw_selected_connections and self._selected_unit, all_units)
 			end
 			if selected_unit then

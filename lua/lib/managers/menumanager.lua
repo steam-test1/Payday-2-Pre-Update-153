@@ -936,6 +936,7 @@ function MenuManager:do_clear_progress()
 	managers.blackmarket:reset()
 	managers.dlc:on_reset_profile()
 	managers.mission:on_reset_profile()
+	managers.job:reset_job_heat()
 	managers.infamy:reset()
 	managers.crimenet:reset_seed()
 	if Global.game_settings.difficulty == "overkill_145" then
@@ -1603,9 +1604,15 @@ function MenuCallbackHandler:is_contract_difficulty_allowed(item)
 	if job_data.professional and item:value() < 3 then
 		return false
 	end
+	if job_data.professional or item:value() > 5 then
+	end
 	local job_jc = tweak_data.narrative.jobs[job_data.job_id].jc
 	local difficulty_jc = (item:value() - 2) * 10
-	return managers.job:get_max_jc_for_player() >= job_jc + difficulty_jc
+	local plvl = managers.experience:current_level()
+	local prank = managers.experience:current_rank()
+	local level_lock = tweak_data.difficulty_level_locks[item:value()] or 0
+	local is_not_level_locked = 1 <= prank or plvl >= level_lock
+	return is_not_level_locked and managers.job:get_max_jc_for_player() >= math.clamp(job_jc + difficulty_jc, 0, 100)
 end
 
 function MenuCallbackHandler:buy_crimenet_contract(item, node)
@@ -1626,6 +1633,7 @@ function MenuCallbackHandler:_buy_crimenet_contract(item, node)
 		return
 	end
 	managers.money:on_buy_premium_contract(job_data.job_id, job_data.difficulty_id or 3)
+	managers.job:on_buy_job(job_data.job_id, job_data.difficulty_id or 3)
 	managers.menu:active_menu().logic:navigate_back(true)
 	managers.menu:active_menu().logic:navigate_back(true)
 	self._sound_source:post_event("item_buy")
@@ -2363,9 +2371,9 @@ function MenuCallbackHandler:set_music_volume(item)
 	local old_volume = managers.user:get_setting("music_volume")
 	managers.user:set_setting("music_volume", volume)
 	if volume > old_volume then
-		self._sound_source:post_event("menu_music_increase")
+		self._sound_source:post_event("slider_increase")
 	elseif volume < old_volume then
-		self._sound_source:post_event("menu_music_decrease")
+		self._sound_source:post_event("slider_decrease")
 	end
 end
 
@@ -2374,15 +2382,21 @@ function MenuCallbackHandler:set_sfx_volume(item)
 	local old_volume = managers.user:get_setting("sfx_volume")
 	managers.user:set_setting("sfx_volume", volume)
 	if volume > old_volume then
-		self._sound_source:post_event("menu_sfx_increase")
+		self._sound_source:post_event("slider_increase")
 	elseif volume < old_volume then
-		self._sound_source:post_event("menu_sfx_decrease")
+		self._sound_source:post_event("slider_decrease")
 	end
 end
 
 function MenuCallbackHandler:set_voice_volume(item)
 	local volume = item:value()
+	local old_volume = managers.user:get_setting("voice_volume")
 	managers.user:set_setting("voice_volume", volume)
+	if volume > old_volume then
+		self._sound_source:post_event("slider_increase")
+	elseif volume < old_volume then
+		self._sound_source:post_event("slider_decrease")
+	end
 end
 
 function MenuCallbackHandler:set_brightness(item)
@@ -2533,7 +2547,7 @@ end
 
 function MenuCallbackHandler:give_experience()
 	if managers.job:has_active_job() then
-		managers.experience:debug_add_points(managers.experience:get_xp_dissected(true, 1))
+		managers.experience:debug_add_points(managers.experience:get_xp_dissected(true, 1, true))
 	else
 		managers.experience:debug_add_points(2500, true)
 	end
@@ -3880,8 +3894,7 @@ MenuCustomizeControllerCreator.CONTROLS = {
 	"interact",
 	"use_item",
 	"toggle_chat",
-	"push_to_talk",
-	"continue"
+	"push_to_talk"
 }
 MenuCustomizeControllerCreator.AXIS_ORDERED = {
 	move = {
@@ -4339,6 +4352,138 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 	local new_item = node:create_item(data_node, params)
 	new_item:set_enabled(enabled)
 	node:add_item(new_item)
+end
+
+MenuReticleSwitchInitiator = MenuReticleSwitchInitiator or class(MenuCrimeNetSpecialInitiator)
+
+function MenuReticleSwitchInitiator:modify_node(original_node, data)
+	local node = original_node
+	return self:setup_node(node, data)
+end
+
+function MenuReticleSwitchInitiator:setup_node(node, data)
+	node:clean_items()
+	local part_id = data.name
+	local slot = data.slot
+	local category = data.category
+	local color_index, type_index = managers.blackmarket:get_part_texture_switch_data(category, slot, part_id)
+	if not node:item("divider_end") then
+		local params = {
+			name = "reticle_type",
+			text_id = "menu_reticle_type",
+			callback = "update_weapon_texture_switch",
+			filter = true
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		for index, reticle_data in ipairs(tweak_data.gui.weapon_texture_switches.types.sight) do
+			table.insert(data_node, {
+				_meta = "option",
+				text_id = reticle_data.name_id,
+				value = index
+			})
+		end
+		local new_item = node:create_item(data_node, params)
+		node:add_item(new_item)
+		new_item:set_value(type_index)
+		local params = {
+			name = "reticle_color",
+			text_id = "menu_reticle_color",
+			callback = "update_weapon_texture_switch",
+			filter = true
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		for index, color in ipairs(tweak_data.gui.weapon_texture_switches.color_indexes) do
+			table.insert(data_node, {
+				_meta = "option",
+				text_id = "menu_recticle_color_" .. color,
+				value = index
+			})
+		end
+		local new_item = node:create_item(data_node, params)
+		node:add_item(new_item)
+		new_item:set_value(color_index)
+		self:create_divider(node, "end", nil, 256)
+	end
+	local params = {
+		name = "confirm",
+		text_id = "dialog_ok",
+		previous_node = "true",
+		callback = "set_weapon_texture_switch",
+		align = "right"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	local params = {
+		name = "back",
+		text_id = "dialog_cancel",
+		previous_node = "true",
+		align = "right",
+		last_item = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	node:set_default_item_name("reticle_type")
+	node:select_item("reticle_type")
+	node:parameters().menu_component_data = data
+	node:parameters().set_blackmarket_enabled = false
+	return node
+end
+
+function MenuReticleSwitchInitiator:create_multichoice()
+end
+
+function MenuCallbackHandler:update_weapon_texture_switch(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	local node = managers.menu:active_menu().logic:selected_node()
+	local color = node:item("reticle_color"):value()
+	local type = node:item("reticle_type"):value()
+	local data = node:parameters().menu_component_data
+	local part_id = data.name
+	local data_string = tostring(color) .. " " .. tostring(type)
+	local texture = managers.blackmarket:get_texture_switch_from_data(data_string, part_id)
+	local active_node_gui = managers.menu:active_menu().renderer:active_node_gui()
+	if active_node_gui and active_node_gui.set_reticle_texture and texture and active_node_gui:get_recticle_texture_ids() ~= Idstring(texture) then
+		active_node_gui:set_reticle_texture(texture)
+	end
+	local logic = managers.menu:active_menu().logic
+	if logic then
+		logic:refresh_node()
+	end
+end
+
+function MenuCallbackHandler:set_weapon_texture_switch(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	local node = managers.menu:active_menu().logic:selected_node()
+	local color = node:item("reticle_color"):value()
+	local type = node:item("reticle_type"):value()
+	local data = node:parameters().menu_component_data
+	local part_id = data.name
+	local slot = data.slot
+	local category = data.category
+	local data_string = tostring(color) .. " " .. tostring(type)
+	managers.blackmarket:set_part_texture_switch(category, slot, part_id, data_string)
 end
 
 MenuCrimeNetCasinoInitiator = MenuCrimeNetCasinoInitiator or class()

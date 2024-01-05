@@ -64,6 +64,9 @@ end
 function WeaponTweakData:_set_overkill_145()
 end
 
+function WeaponTweakData:_set_overkill_290()
+end
+
 function WeaponTweakData:_init_data_npc_melee()
 	self.npc_melee = {}
 	self.npc_melee.baton = {}
@@ -231,6 +234,7 @@ function WeaponTweakData:_init_data_r870_npc()
 	self.r870_npc.hud_icon = "r870_shotgun"
 	self.r870_npc.alert_size = 4500
 	self.r870_npc.suppression = 1.8
+	self.benelli_npc = deep_clone(self.r870_npc)
 end
 
 function WeaponTweakData:_init_data_mossberg_npc()
@@ -263,6 +267,7 @@ function WeaponTweakData:_init_data_mp5_npc()
 	self.mp5_npc.suppression = 1
 	self.mp5_tactical_npc = deep_clone(self.mp5_npc)
 	self.mp5_tactical_npc.has_suppressor = "suppressed_a"
+	self.ump_npc = deep_clone(self.mp5_npc)
 end
 
 function WeaponTweakData:_init_data_mac11_npc()
@@ -612,7 +617,7 @@ end
 function WeaponTweakData:_init_data_usp_npc()
 	self.usp_npc.sounds.prefix = "usp45_npc"
 	self.usp_npc.use_data.selection_index = 1
-	self.usp_npc.DAMAGE = 3
+	self.usp_npc.DAMAGE = 1.25
 	self.usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.usp_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
 	self.usp_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
@@ -741,7 +746,7 @@ end
 function WeaponTweakData:_init_data_m249_npc()
 	self.m249_npc.sounds.prefix = "m249_npc"
 	self.m249_npc.use_data.selection_index = 2
-	self.m249_npc.DAMAGE = 1.5
+	self.m249_npc.DAMAGE = 2
 	self.m249_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
 	self.m249_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
 	self.m249_npc.CLIP_AMMO_MAX = 200
@@ -753,6 +758,7 @@ function WeaponTweakData:_init_data_m249_npc()
 	self.m249_npc.suppression = 1
 	self.m249_secondary_npc = deep_clone(self.m249_npc)
 	self.m249_secondary_npc.use_data.selection_index = 1
+	self.m249_secondary_npc.armor_piercing = true
 end
 
 function WeaponTweakData:_init_data_rpk_npc()
@@ -3236,7 +3242,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saw.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
 	self.saw.use_data = {}
 	self.saw.use_data.selection_index = 2
-	self.saw.DAMAGE = 0.05
+	self.saw.DAMAGE = 0.2
 	self.saw.CLIP_AMMO_MAX = 150
 	self.saw.NR_CLIPS_MAX = 2
 	self.saw.AMMO_MAX = self.saw.CLIP_AMMO_MAX * self.saw.NR_CLIPS_MAX
@@ -4070,8 +4076,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m249.texture_bundle_folder = "gage_pack_lmg"
 	self.m249.stats = {
 		damage = 12,
-		spread = 3,
-		recoil = 6,
+		spread = 4,
+		recoil = 7,
 		spread_moving = 9,
 		zoom = 1,
 		concealment = 2,
@@ -4158,7 +4164,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpk.global_value = "gage_pack_lmg"
 	self.rpk.texture_bundle_folder = "gage_pack_lmg"
 	self.rpk.stats = {
-		damage = 12,
+		damage = 13,
 		spread = 5,
 		recoil = 6,
 		spread_moving = 6,
@@ -4315,6 +4321,11 @@ function WeaponTweakData:_create_table_structure()
 		auto = {}
 	}
 	self.r870_npc = {
+		usage = "r870",
+		sounds = {},
+		use_data = {}
+	}
+	self.benelli_npc = {
 		usage = "r870",
 		sounds = {},
 		use_data = {}
@@ -4539,9 +4550,11 @@ function WeaponTweakData:_precalculate_values()
 	self.beretta92_npc.AMMO_MAX = self.beretta92_npc.CLIP_AMMO_MAX * self.beretta92_npc.NR_CLIPS_MAX
 	self.raging_bull_npc.AMMO_MAX = self.raging_bull_npc.CLIP_AMMO_MAX * self.raging_bull_npc.NR_CLIPS_MAX
 	self.r870_npc.AMMO_MAX = self.r870_npc.CLIP_AMMO_MAX * self.r870_npc.NR_CLIPS_MAX
+	self.benelli_npc.AMMO_MAX = self.benelli_npc.CLIP_AMMO_MAX * self.benelli_npc.NR_CLIPS_MAX
 	self.mossberg_npc.AMMO_MAX = self.mossberg_npc.CLIP_AMMO_MAX * self.mossberg_npc.NR_CLIPS_MAX
 	self.mp5_npc.AMMO_MAX = self.mp5_npc.CLIP_AMMO_MAX * self.mp5_npc.NR_CLIPS_MAX
 	self.mp5_tactical_npc.AMMO_MAX = self.mp5_tactical_npc.CLIP_AMMO_MAX * self.mp5_tactical_npc.NR_CLIPS_MAX
+	self.ump_npc.AMMO_MAX = self.ump_npc.CLIP_AMMO_MAX * self.ump_npc.NR_CLIPS_MAX
 	self.mac11_npc.AMMO_MAX = self.mac11_npc.CLIP_AMMO_MAX * self.mac11_npc.NR_CLIPS_MAX
 	self.glock_18_npc.AMMO_MAX = self.glock_18_npc.CLIP_AMMO_MAX * self.glock_18_npc.NR_CLIPS_MAX
 	self.ak47_npc.AMMO_MAX = self.ak47_npc.CLIP_AMMO_MAX * self.ak47_npc.NR_CLIPS_MAX

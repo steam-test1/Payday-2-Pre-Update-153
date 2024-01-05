@@ -22,6 +22,11 @@ function PlayerDamage:init(unit)
 	self._next_allowed_sup_t = -100
 	self._last_received_sup = 0
 	self._supperssion_data = {}
+	self._inflict_damage_body = self._unit:body("inflict_reciever")
+	self._inflict_damage_body:set_extension(self._inflict_damage_body:extension() or {})
+	local body_ext = PlayerBodyDamage:new(self._unit, self, self._inflict_damage_body)
+	self._inflict_damage_body:extension().damage = body_ext
+	managers.sequence:add_inflict_updator_body("fire", self._unit:key(), self._inflict_damage_body:key(), self._inflict_damage_body:extension().damage)
 end
 
 function PlayerDamage:post_init()
@@ -264,7 +269,8 @@ function PlayerDamage:_armor_damage_reduction()
 end
 
 function PlayerDamage:full_health()
-	return self:get_real_health() == self:_max_health()
+	local diff = math.abs(self:get_real_health() - self:_max_health())
+	return diff < 0.001
 end
 
 function PlayerDamage:damage_tase(attack_data)
@@ -908,6 +914,10 @@ function PlayerDamage:need_revive()
 	return self._bleed_out or self._incapacitated
 end
 
+function PlayerDamage:is_downed()
+	return self._bleed_out or self._incapacitated
+end
+
 function PlayerDamage:dead()
 	return self._dead
 end
@@ -1002,6 +1012,7 @@ function PlayerDamage:pre_destroy()
 	managers.environment_controller:set_hurt_value(1)
 	managers.environment_controller:set_health_effect_value(1)
 	managers.environment_controller:set_suppression_value(0)
+	managers.sequence:remove_inflict_updator_body("fire", self._unit:key(), self._inflict_damage_body:key())
 end
 
 function PlayerDamage:_call_listeners(damage_info)

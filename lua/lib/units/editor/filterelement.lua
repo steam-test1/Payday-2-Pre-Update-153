@@ -7,6 +7,7 @@ function FilterUnitElement:init(unit)
 	self._hed.difficulty_hard = true
 	self._hed.difficulty_overkill = true
 	self._hed.difficulty_overkill_145 = true
+	self._hed.difficulty_overkill_290 = nil
 	self._hed.player_1 = true
 	self._hed.player_2 = true
 	self._hed.player_3 = true
@@ -20,6 +21,7 @@ function FilterUnitElement:init(unit)
 	table.insert(self._save_values, "difficulty_hard")
 	table.insert(self._save_values, "difficulty_overkill")
 	table.insert(self._save_values, "difficulty_overkill_145")
+	table.insert(self._save_values, "difficulty_overkill_290")
 	table.insert(self._save_values, "player_1")
 	table.insert(self._save_values, "player_2")
 	table.insert(self._save_values, "player_3")
@@ -30,7 +32,18 @@ function FilterUnitElement:init(unit)
 	table.insert(self._save_values, "mode_control")
 end
 
+function FilterUnitElement:post_init()
+	self:_check_convertion()
+end
+
+function FilterUnitElement:_check_convertion()
+	if self._hed.difficulty_overkill_290 == nil then
+		self._hed.difficulty_overkill_290 = self._hed.difficulty_overkill_145
+	end
+end
+
 function FilterUnitElement:_build_panel(panel, panel_sizer)
+	self:_check_convertion()
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
@@ -73,6 +86,13 @@ function FilterUnitElement:_build_panel(panel, panel_sizer)
 		value = "difficulty_overkill_145"
 	})
 	difficulty_sizer:add(difficulty_overkill_145, 0, 0, "EXPAND")
+	local difficulty_overkill_290 = EWS:CheckBox(panel, "Death Wish", "")
+	difficulty_overkill_290:set_value(self._hed.difficulty_overkill_290)
+	difficulty_overkill_290:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = difficulty_overkill_290,
+		value = "difficulty_overkill_290"
+	})
+	difficulty_sizer:add(difficulty_overkill_290, 0, 0, "EXPAND")
 	local players_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "Players")
 	h_sizer:add(players_sizer, 1, 0, "EXPAND")
 	local player_1 = EWS:CheckBox(panel, "One Player", "")

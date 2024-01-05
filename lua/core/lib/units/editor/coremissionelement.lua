@@ -440,6 +440,9 @@ function CoreMissionElement:new_save_values()
 	for _, value in ipairs(self._save_values) do
 		t[value] = self._hed[value]
 	end
+	if self.save then
+		self:save(t)
+	end
 	return t
 end
 

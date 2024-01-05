@@ -42,8 +42,7 @@ function FPCameraPlayerBase:init(unit)
 	self._tweak_data.look_speed_transition_to_fast = 0.5
 	self._tweak_data.look_speed_transition_zone = 0.8
 	self._tweak_data.look_speed_transition_occluder = 0.95
-	self._tweak_data.overshot_multiplier_yaw = 1
-	self._tweak_data.overshot_multiplier_pitch = 1
+	self._tweak_data.uses_keyboard = true
 	self._tweak_data.aim_assist_speed = 200
 	self._camera_properties.look_speed_current = self._tweak_data.look_speed_standard
 	self._camera_properties.look_speed_transition_timer = 0
@@ -63,8 +62,7 @@ function FPCameraPlayerBase:set_parent_unit(parent_unit)
 		self._look_function = callback(self, self, "_pc_look_function")
 	else
 		self._look_function = callback(self, self, "_gamepad_look_function")
-		self._tweak_data.overshot_multiplier_yaw = 16
-		self._tweak_data.overshot_multiplier_pitch = self._tweak_data.overshot_multiplier_yaw / 3
+		self._tweak_data.uses_keyboard = false
 	end
 end
 
@@ -232,6 +230,7 @@ local mrot3 = Rotation()
 local mvec1 = Vector3()
 local mvec2 = Vector3()
 local mvec3 = Vector3()
+local mvec4 = Vector3()
 
 function FPCameraPlayerBase:_update_movement(t, dt)
 	local data = self._camera_properties
@@ -278,6 +277,8 @@ function FPCameraPlayerBase:_update_movement(t, dt)
 	self:set_position(new_shoulder_pos)
 	self:set_rotation(new_shoulder_rot)
 end
+
+local mvec1 = Vector3()
 
 function FPCameraPlayerBase:_update_rot(axis)
 	local t = managers.player:player_timer():time()
@@ -443,11 +444,12 @@ function FPCameraPlayerBase:_calculate_soft_velocity_overshot(dt)
 		return
 	end
 	local input_yaw, input_pitch, input_x, input_z
+	local mul = self._tweak_data.uses_keyboard and 0.002 / dt or 0.4
 	if stick_input.x >= 0 then
-		local stick_input_x = math.pow(math.abs(math.clamp(0.002 * stick_input.x / dt, 0, 1)), 1.5) * math.sign(stick_input.x) * self._tweak_data.overshot_multiplier_yaw
+		local stick_input_x = math.pow(math.abs(math.clamp(mul * stick_input.x, 0, 1)), 1.5) * math.sign(stick_input.x)
 		input_yaw = stick_input_x * vel_overshot.yaw_pos
 	else
-		local stick_input_x = math.pow(math.abs(math.clamp(0.002 * stick_input.x / dt, -1, 0)), 1.5) * self._tweak_data.overshot_multiplier_yaw
+		local stick_input_x = math.pow(math.abs(math.clamp(mul * stick_input.x, -1, 0)), 1.5)
 		input_yaw = stick_input_x * vel_overshot.yaw_neg
 	end
 	local last_yaw = vel_overshot.last_yaw
@@ -455,7 +457,8 @@ function FPCameraPlayerBase:_calculate_soft_velocity_overshot(dt)
 	local abs_in_yaw = math.abs(input_yaw)
 	local sign_last_yaw = math.sign(last_yaw)
 	local abs_last_yaw = math.abs(last_yaw)
-	vel_overshot.target_yaw = math.step(vel_overshot.target_yaw, input_yaw, 120 * dt)
+	local step_v = self._tweak_data.uses_keyboard and 120 * dt or 2
+	vel_overshot.target_yaw = math.step(vel_overshot.target_yaw, input_yaw, step_v)
 	local final_yaw
 	local diff = math.abs(vel_overshot.target_yaw - last_yaw)
 	local diff_clamp = 40
@@ -464,11 +467,12 @@ function FPCameraPlayerBase:_calculate_soft_velocity_overshot(dt)
 	local step_amount = math.lerp(3, 180, diff_ratio_clamped) * dt
 	final_yaw = math.step(last_yaw, vel_overshot.target_yaw, step_amount)
 	vel_overshot.last_yaw = final_yaw
+	local mul = self._tweak_data.uses_keyboard and 0.002 / dt or 0.4
 	if 0 <= stick_input.y then
-		local stick_input_y = math.pow(math.abs(math.clamp(0.002 * stick_input.y / dt, 0, 1)), 1.5) * math.sign(stick_input.y) * self._tweak_data.overshot_multiplier_pitch
+		local stick_input_y = math.pow(math.abs(math.clamp(mul * stick_input.y, 0, 1)), 1.5) * math.sign(stick_input.y)
 		input_pitch = stick_input_y * vel_overshot.pitch_pos
 	else
-		local stick_input_y = math.pow(math.abs(math.clamp(0.002 * stick_input.y / dt, -1, 0)), 1.5) * self._tweak_data.overshot_multiplier_pitch
+		local stick_input_y = math.pow(math.abs(math.clamp(mul * stick_input.y, -1, 0)), 1.5)
 		input_pitch = stick_input_y * vel_overshot.pitch_neg
 	end
 	local last_pitch = vel_overshot.last_pitch
@@ -476,7 +480,8 @@ function FPCameraPlayerBase:_calculate_soft_velocity_overshot(dt)
 	local abs_in_pitch = math.abs(input_pitch)
 	local sign_last_pitch = math.sign(last_pitch)
 	local abs_last_pitch = math.abs(last_pitch)
-	vel_overshot.target_pitch = math.step(vel_overshot.target_pitch, input_pitch, 120 * dt)
+	local step_v = self._tweak_data.uses_keyboard and 120 * dt or 2
+	vel_overshot.target_pitch = math.step(vel_overshot.target_pitch, input_pitch, step_v)
 	local final_pitch
 	local diff = math.abs(vel_overshot.target_pitch - last_pitch)
 	local diff_clamp = 40
@@ -531,6 +536,15 @@ end
 
 function FPCameraPlayerBase:set_target_tilt(tilt)
 	self._camera_properties.target_tilt = tilt
+end
+
+function FPCameraPlayerBase:set_lean_values(lean_position, lean_rotation)
+	self._camera_properties.lean_position = lean_position
+	self._camera_properties.lean_rotation = lean_rotation
+end
+
+function FPCameraPlayerBase:set_camera_offset(camera_offset)
+	self._camera_properties.camera_offset = camera_offset
 end
 
 function FPCameraPlayerBase:set_stance_instant(stance_name)
@@ -803,27 +817,37 @@ function FPCameraPlayerBase:unspawn_grenade()
 end
 
 function FPCameraPlayerBase:spawn_melee_item()
-	if alive(self._melee_item_unit) then
+	if self._melee_item_units then
 		return
 	end
-	local align_obj_l_name = Idstring("a_weapon_left")
-	local align_obj_r_name = Idstring("a_weapon_right")
-	local align_obj_l = self._unit:get_object(align_obj_l_name)
-	local align_obj_r = self._unit:get_object(align_obj_r_name)
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].unit
 	if unit_name then
-		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj_l:position(), align_obj_l:rotation())
-		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+		local aligns = tweak_data.blackmarket.melee_weapons[melee_entry].align_objects or {
+			"a_weapon_left"
+		}
+		self._melee_item_units = {}
+		for _, align in ipairs(aligns) do
+			local align_obj_name = Idstring(align)
+			local align_obj = self._unit:get_object(align_obj_name)
+			local unit = World:spawn_unit(Idstring(unit_name), align_obj:position(), align_obj:rotation())
+			self._unit:link(align_obj:name(), unit, unit:orientation_object():name())
+			table.insert(self._melee_item_units, unit)
+		end
 	end
 end
 
 function FPCameraPlayerBase:unspawn_melee_item()
-	if alive(self._melee_item_unit) then
-		self._melee_item_unit:unlink()
-		World:delete_unit(self._melee_item_unit)
-		self._melee_item_unit = nil
+	if not self._melee_item_units then
+		return
 	end
+	for _, unit in ipairs(self._melee_item_units) do
+		if alive(unit) then
+			unit:unlink()
+			World:delete_unit(unit)
+		end
+	end
+	self._melee_item_units = nil
 end
 
 function FPCameraPlayerBase:hide_weapon()

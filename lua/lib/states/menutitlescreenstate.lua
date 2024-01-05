@@ -211,7 +211,7 @@ end
 
 function MenuTitlescreenState:_load_savegames_done()
 	local sound_source = SoundDevice:create_source("MenuTitleScreen")
-	sound_source:post_event("menu_start")
+	sound_source:post_event("menu_enter")
 	self:gsm():change_state_by_name("menu_main")
 end
 

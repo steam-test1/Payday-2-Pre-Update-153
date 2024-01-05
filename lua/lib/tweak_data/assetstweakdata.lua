@@ -223,36 +223,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"welcome_to_the_jungle_2"
 	}
 	self.welcome_to_the_jungle_rossy.job_lock = "rossy"
-	self.election_day_2_gold = {}
-	self.election_day_2_gold.name_id = "menu_asset_election_day_2_gold"
-	self.election_day_2_gold.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset05"
-	self.election_day_2_gold.stages = {
-		"election_day_2"
-	}
-	self.election_day_2_gold.visible_if_locked = true
-	self.election_day_2_gold.unlock_desc_id = "menu_asset_election_day_2_gold_desc"
-	self.election_day_2_gold.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.election_day_2_gold.no_mystery = true
-	self.election_day_2_money = {}
-	self.election_day_2_money.name_id = "menu_asset_election_day_2_money"
-	self.election_day_2_money.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_2_money.stages = {
-		"election_day_2"
-	}
-	self.election_day_2_money.visible_if_locked = true
-	self.election_day_2_money.unlock_desc_id = "menu_asset_election_day_2_money_desc"
-	self.election_day_2_money.no_mystery = true
-	self.election_day_2_money.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.election_day_2_painting = {}
-	self.election_day_2_painting.name_id = "menu_asset_election_day_2_painting"
-	self.election_day_2_painting.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_2_painting.stages = {
-		"election_day_2"
-	}
-	self.election_day_2_painting.visible_if_locked = true
-	self.election_day_2_painting.unlock_desc_id = "menu_asset_election_day_2_painting_desc"
-	self.election_day_2_painting.no_mystery = true
-	self.election_day_2_painting.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
 	self.watchdogs_1_ammo = {}
 	self.watchdogs_1_ammo.name_id = "menu_asset_ammo"
 	self.watchdogs_1_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
@@ -472,26 +442,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.framing_frame_3_vent.unlock_desc_id = "menu_asset_framing3_vent_desc"
 	self.framing_frame_3_vent.no_mystery = true
 	self.framing_frame_3_vent.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.election_day_2_ammo = {}
-	self.election_day_2_ammo.name_id = "menu_asset_ammo"
-	self.election_day_2_ammo.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_2_ammo.stages = {
-		"election_day_2"
-	}
-	self.election_day_2_ammo.visible_if_locked = true
-	self.election_day_2_ammo.unlock_desc_id = "menu_asset_ammo_desc"
-	self.election_day_2_ammo.no_mystery = true
-	self.election_day_2_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.election_day_2_health = {}
-	self.election_day_2_health.name_id = "menu_asset_h"
-	self.election_day_2_health.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
-	self.election_day_2_health.stages = {
-		"election_day_2"
-	}
-	self.election_day_2_health.visible_if_locked = true
-	self.election_day_2_health.unlock_desc_id = "menu_asset_health_desc"
-	self.election_day_2_health.no_mystery = true
-	self.election_day_2_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
 	self.election_day_3_ammo = {}
 	self.election_day_3_ammo.name_id = "menu_asset_ammo"
 	self.election_day_3_ammo.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset06"
@@ -799,6 +749,46 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.roberts_plan_b.stages = {"roberts"}
 	self.roberts_plan_b.visible_if_locked = true
 	self.roberts_plan_b.no_mystery = true
+	self.big_thermite = {}
+	self.big_thermite.name_id = "menu_asset_big_thermite"
+	self.big_thermite.texture = "guis/textures/pd2/mission_briefing/assets/rat/day3/asset01"
+	self.big_thermite.stages = {"big"}
+	self.big_thermite.visible_if_locked = true
+	self.big_thermite.unlock_desc_id = "menu_asset_big_thermite_desc"
+	self.big_thermite.no_mystery = true
+	self.big_thermite.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.big_escape_helicopter = {}
+	self.big_escape_helicopter.name_id = "menu_asset_big_escape_helicopter"
+	self.big_escape_helicopter.texture = "guis/textures/pd2/mission_briefing/assets/roberts/asset_pilot_amateur"
+	self.big_escape_helicopter.stages = {"big"}
+	self.big_escape_helicopter.visible_if_locked = true
+	self.big_escape_helicopter.unlock_desc_id = "menu_asset_big_escape_helicopter_desc"
+	self.big_escape_helicopter.no_mystery = true
+	self.big_escape_helicopter.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.big_escape_elevator = {}
+	self.big_escape_elevator.name_id = "menu_asset_big_escape_elevator"
+	self.big_escape_elevator.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_03"
+	self.big_escape_elevator.stages = {"big"}
+	self.big_escape_elevator.visible_if_locked = true
+	self.big_escape_elevator.unlock_desc_id = "menu_asset_big_escape_elevator_desc"
+	self.big_escape_elevator.no_mystery = true
+	self.big_escape_elevator.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.big_escape_fwb = {}
+	self.big_escape_fwb.name_id = "menu_asset_big_escape_fwb"
+	self.big_escape_fwb.texture = "guis/textures/pd2/mission_briefing/assets/nightclub/asset02"
+	self.big_escape_fwb.stages = {"big"}
+	self.big_escape_fwb.visible_if_locked = true
+	self.big_escape_fwb.unlock_desc_id = "menu_asset_big_escape_fwb_desc"
+	self.big_escape_fwb.no_mystery = true
+	self.big_escape_fwb.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
+	self.big_escape_bus = {}
+	self.big_escape_bus.name_id = "menu_asset_big_escape_bus"
+	self.big_escape_bus.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/asset01"
+	self.big_escape_bus.stages = {"big"}
+	self.big_escape_bus.visible_if_locked = true
+	self.big_escape_bus.unlock_desc_id = "menu_asset_big_escape_bus_desc"
+	self.big_escape_bus.no_mystery = true
+	self.big_escape_bus.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

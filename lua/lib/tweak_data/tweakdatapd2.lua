@@ -407,6 +407,15 @@ function TweakData:_init_pd2()
 			30
 		}
 	}
+	self.hud_icons.risk_murder_squad = {
+		texture = "guis/textures/pd2/hud_difficultymarkers",
+		texture_rect = {
+			90,
+			0,
+			30,
+			30
+		}
+	}
 	self.hud_icons.frag_grenade = {
 		texture = "guis/textures/pd2/equipment",
 		texture_rect = {

@@ -107,9 +107,9 @@ function LootDropTweakData:init(tweak_data)
 	self.type_weight_mod_funcs = {}
 	
 	function self.type_weight_mod_funcs.weapon_mods(global_value, category, id)
-		local weapons = managers.weapon_factory:get_weapons_uses_part(id)
-		local primaries = managers.blackmarket:get_crafted_category("primaries")
-		local secondaries = managers.blackmarket:get_crafted_category("secondaries")
+		local weapons = managers.weapon_factory:get_weapons_uses_part(id) or {}
+		local primaries = managers.blackmarket:get_crafted_category("primaries") or {}
+		local secondaries = managers.blackmarket:get_crafted_category("secondaries") or {}
 		local crafted_weapons = {}
 		for _, weapon in pairs(primaries) do
 			table.insert(crafted_weapons, weapon.factory_id)
@@ -224,7 +224,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.pd2_clan.track = true
 	self.global_values.pd2_clan.sort_number = -100
 	self.global_values.pd2_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
-	self.global_values.pd2_clan.category = "pd2_clan"
+	self.global_values.pd2_clan.category = nil
 	self.global_values.halloween = {}
 	self.global_values.halloween.name_id = "bm_global_value_halloween"
 	self.global_values.halloween.desc_id = "menu_l_global_value_halloween"

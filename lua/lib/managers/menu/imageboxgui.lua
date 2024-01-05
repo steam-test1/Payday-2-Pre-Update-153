@@ -29,11 +29,13 @@ function ImageBoxGui:_create_image_box(image_config)
 	local info_area = main:child("info_area")
 	local buttons_panel = info_area:child("buttons_panel")
 	local scroll_panel = info_area:child("scroll_panel")
+	local halign_not_center = image_halign ~= Idstring("center")
+	local valign_not_center = image_valign ~= Idstring("center")
 	local grow_w, grow_h = 0, 0
-	if image_halign ~= Idstring("center") then
+	if halign_not_center then
 		grow_w = image_width + image_padding * 2
 	end
-	if image_valign ~= Idstring("center") then
+	if valign_not_center and not halign_not_center then
 		grow_h = image_height + image_padding * 2
 	end
 	main:grow(grow_w, grow_h)

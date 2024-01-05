@@ -85,6 +85,23 @@ end
 function ContourExt:update_materials()
 	if self._materials then
 		self._materials = self._unit:get_objects_by_type(idstr_material)
+		if self._current then
+			local setup = self._contour_list[self._current]
+			local data = self._types[setup.type]
+			local opacity = data.opacity
+			if data.opacity_silent and data.character and tweak_data.character[self._unit:base()._tweak_table].silent_priority_shout then
+				opacity = data.opacity_silent
+			end
+			setup.color = nil
+			setup.target_color = nil
+			setup.opacity = opacity
+			setup.target_opacity = opacity and 0
+			local color = setup.marking_strength and data.color_strength or data.color
+			for _, material in ipairs(self._materials) do
+				material:set_variable(idstr_contour_color, color)
+				material:set_variable(idstr_contour_opacity, setup.opacity and 0 or 1)
+			end
+		end
 	end
 end
 

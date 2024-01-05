@@ -1,5 +1,7 @@
 local tmp_vec1 = Vector3()
 CivilianLogicSurrender = class(CopLogicBase)
+CivilianLogicSurrender.on_new_objective = CivilianLogicIdle.on_new_objective
+CivilianLogicSurrender.on_rescue_allowed_state = CivilianLogicFlee.on_rescue_allowed_state
 CivilianLogicSurrender.wants_rescue = CivilianLogicFlee.wants_rescue
 
 function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
@@ -10,10 +12,6 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 		unit = data.unit
 	}
 	data.internal_data = my_data
-	my_data.rsrv_pos = {}
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
 	if data.unit:anim_data().tied then
 		managers.groupai:state():on_hostage_state(true, data.key)
 		my_data.is_hostage = true
@@ -34,15 +32,6 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 	my_data.submission_meter = 0
 	my_data.last_upd_t = data.t
 	my_data.nr_random_screams = 0
-	if not my_data.rsrv_pos.stand then
-		local pos_rsrv = {
-			position = mvector3.copy(data.m_pos),
-			radius = 60,
-			filter = data.pos_rsrv_id
-		}
-		my_data.rsrv_pos.stand = pos_rsrv
-		managers.navigation:add_pos_reservation(pos_rsrv)
-	end
 	data.run_away_next_chk_t = nil
 	data.unit:brain():set_update_enabled_state(false)
 	data.unit:movement():set_allow_fire(false)
@@ -133,9 +122,9 @@ function CivilianLogicSurrender.queued_update(rubbish, data)
 		CivilianLogicFlee._chk_add_delayed_rescue_SO(data, my_data)
 		managers.groupai:state():add_to_surrendered(data.unit, callback(CivilianLogicSurrender, CivilianLogicSurrender, "queued_update", data))
 	end
-	if data.unit:anim_data().act and my_data.rsrv_pos.stand then
-		my_data.rsrv_pos.stand.position = mvector3.copy(data.m_pos)
-		managers.navigation:move_pos_rsrv(my_data.rsrv_pos.stand)
+	if data.unit:anim_data().act and data.pos_rsrv.stand then
+		data.pos_rsrv.stand.position = mvector3.copy(data.m_pos)
+		managers.navigation:move_pos_rsrv(data.pos_rsrv.stand)
 	end
 end
 
@@ -222,22 +211,7 @@ end
 function CivilianLogicSurrender.action_complete_clbk(data, action)
 	local my_data = data.internal_data
 	local action_type = action:type()
-	if action_type == "walk" then
-		if action:expired() then
-			my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-			my_data.rsrv_pos.move_dest = nil
-		elseif my_data.rsrv_pos.move_dest then
-			if not my_data.rsrv_pos.stand then
-				my_data.rsrv_pos.stand = managers.navigation:add_pos_reservation({
-					position = mvector3.copy(data.m_pos),
-					radius = 45,
-					filter = data.pos_rsrv_id
-				})
-			end
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.move_dest)
-			my_data.rsrv_pos.move_dest = nil
-		end
-	elseif action_type == "act" and my_data.interaction_active then
+	if action_type == "act" and my_data.interaction_active then
 		data.unit:interaction():set_active(false, true)
 		my_data.interaction_active = nil
 	end
@@ -466,12 +440,4 @@ function CivilianLogicSurrender.is_available_for_assignment(data, objective)
 		return true
 	end
 	return not data.unit:anim_data().tied and (objective and objective.type == "revive" or data.t - data.internal_data.state_enter_t > 5 and data.internal_data.submission_meter / data.internal_data.submission_max < 0.95)
-end
-
-function CivilianLogicSurrender.on_new_objective(data, old_objective)
-	CivilianLogicIdle.on_new_objective(data, old_objective)
-end
-
-function CivilianLogicSurrender.on_rescue_allowed_state(data, state)
-	CivilianLogicFlee.on_rescue_allowed_state(data, state)
 end

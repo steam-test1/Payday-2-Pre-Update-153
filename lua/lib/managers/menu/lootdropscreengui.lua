@@ -153,9 +153,8 @@ function LootDropScreenGui:check_all_ready()
 			else
 			end
 		end
-		local text = managers.localization:to_upper_text(text_id, {
-			CONTINUE = managers.localization:btn_macro("continue")
-		})
+		local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
+		local text = managers.localization:to_upper_text(text_id, {CONTINUE = continue_button})
 		self._continue_button:set_text(text)
 		local _, _, w, h = self._continue_button:text_rect()
 		self._continue_button:set_size(w, h)

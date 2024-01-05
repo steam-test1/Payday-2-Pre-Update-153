@@ -174,7 +174,7 @@ function IngameWaitingForPlayersState:update(t, dt)
 	if in_focus then
 		if self._audio_started and not self._skipped then
 			if self._controller then
-				local btn_skip_press = self._controller:get_input_bool("continue")
+				local btn_skip_press = self._controller:get_input_bool("confirm")
 				if btn_skip_press and not self._skip_data then
 					self._skip_data = {total = 1, current = 0}
 				elseif not btn_skip_press and self._skip_data then

@@ -104,30 +104,23 @@ function MissionEndState:at_enter(old_state, params)
 	self._sound_listener:activate(true)
 	if self._success then
 		if not managers.statistics:is_dropin() then
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
 				diff_pass = not achievement_data.difficulty or Global.game_settings.difficulty == achievement_data.difficulty
 				mask_pass = not achievement_data.mask or managers.blackmarket:equipped_mask().mask_id == achievement_data.mask
+				job_pass = not achievement_data.job or managers.job:on_last_stage() and managers.job:current_job_id() == achievement_data.job
+				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
 				no_shots_pass = not achievement_data.no_shots or managers.statistics:session_total_shots(achievement_data.no_shots) == 0
-				job_pass = not achievement_data.jobs or false
-				if achievement_data.jobs then
+				jobs_pass = not achievement_data.jobs or false
+				if achievement_data.jobs and managers.job:on_last_stage() then
 					for _, job_id in ipairs(achievement_data.jobs) do
 						if managers.job:current_job_id() == job_id then
-							job_pass = true
+							jobs_pass = true
 							break
 						end
 					end
 				end
-				contract_pass = not achievement_data.contracts or false
-				if achievement_data.contracts then
-					for _, contract_id in ipairs(achievement_data.contracts) do
-						if managers.job:current_contact_id() == contract_id then
-							contract_pass = true
-							break
-						end
-					end
-				end
-				if job_pass and contract_pass and diff_pass and mask_pass and no_shots_pass then
+				if job_pass and jobs_pass and contract_pass and diff_pass and mask_pass and no_shots_pass then
 					if achievement_data.stat then
 						managers.achievment:award_progress(achievement_data.stat)
 					elseif achievement_data.award then
@@ -160,16 +153,49 @@ function MissionEndState:at_enter(old_state, params)
 	end
 	self._criminals_completed = self._success and params.num_winners or 0
 	managers.statistics:stop_session({
-		success = self._success
+		success = self._success,
+		type = self._type
 	})
 	managers.statistics:send_statistics()
 	managers.hud:set_statistics_endscreen_hud(self._criminals_completed, self._success)
+	if self._success and not managers.statistics:is_dropin() and managers.job:on_last_stage() then
+		for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_stats_achievements) do
+			if Global.game_settings.difficulty == achievement_data.difficulty then
+				local available_jobs
+				if achievement_data.contact == "all" then
+					available_jobs = {}
+					for _, list in pairs(tweak_data.achievement.job_list) do
+						for _, job in pairs(list) do
+							table.insert(available_jobs, job)
+						end
+					end
+				else
+					available_jobs = deep_clone(tweak_data.achievement.job_list[achievement_data.contact])
+				end
+				for id = #available_jobs, 1, -1 do
+					if 0 < managers.statistics:completed_job(available_jobs[id], achievement_data.difficulty) then
+						table.remove(available_jobs, id)
+					end
+				end
+				if table.size(available_jobs) == 0 then
+					if achievement_data.stat then
+						managers.achievment:award_progress(achievement_data.stat)
+					elseif achievement_data.award then
+						managers.achievment:award(achievement_data.award)
+					end
+				end
+			end
+		end
+	end
 	managers.music:post_event(self._success and "resultscreen_win" or "resultscreen_lose")
 	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
 	if self._type == "victory" or self._type == "gameover" then
-		local total_xp_bonus, bonuses = self:_get_xp_dissected(self._success, params and params.num_winners)
+		local total_xp_bonus, bonuses = self:_get_xp_dissected(self._success, params and params.num_winners, params and params.personal_win)
 		self._bonuses = bonuses
 		self:completion_bonus_done(total_xp_bonus)
+	end
+	if self._success and managers.job:on_last_stage() then
+		managers.job:check_add_heat_to_jobs()
 	end
 	if Network:is_server() then
 		managers.network:session():set_state("game_end")
@@ -180,15 +206,15 @@ function MissionEndState:is_success()
 	return self._success
 end
 
-function MissionEndState:_get_xp_dissected(success, num_winners)
-	return managers.experience:get_xp_dissected(success, num_winners)
+function MissionEndState:_get_xp_dissected(success, num_winners, personal_win)
+	return managers.experience:get_xp_dissected(success, num_winners, personal_win)
 end
 
 function MissionEndState:_get_contract_xp(success)
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
 	local job_stars = has_active_job and managers.job:current_job_stars() or 1
-	local difficulty_stars = job_and_difficulty_stars - job_stars
+	local difficulty_stars = has_active_job and managers.job:current_difficulty_stars() or 0
 	local player_stars = managers.experience:level_to_stars()
 	local total_stars = math.min(job_and_difficulty_stars, player_stars + 1)
 	if job_and_difficulty_stars > total_stars then
@@ -228,9 +254,8 @@ function MissionEndState:_set_continue_button_text()
 	elseif managers.job:stage_success() and managers.job:on_last_stage() then
 		text_id = "menu_victory_goto_payday"
 	end
-	local text = utf8.to_upper(managers.localization:text(text_id, {
-		CONTINUE = managers.localization:btn_macro("continue")
-	}))
+	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
+	local text = utf8.to_upper(managers.localization:text(text_id, {CONTINUE = continue_button}))
 	managers.menu_component:set_endscreen_continue_button_text(text, not_clickable)
 end
 
@@ -483,7 +508,7 @@ function MissionEndState:update(t, dt)
 		self._mission_destroy_t = nil
 	end
 	if self._total_xp_bonus then
-		if self._total_xp_bonus > 0 then
+		if self._total_xp_bonus >= 0 then
 			local data = managers.experience:give_experience(self._total_xp_bonus)
 			data.bonuses = self._bonuses
 			managers.hud:send_xp_data_endscreen_hud(data, callback(self, self, "set_completion_bonus_done"))

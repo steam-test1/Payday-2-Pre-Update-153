@@ -26,10 +26,8 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 	else
 		my_data.detection = data.char_tweak.detection.idle
 	end
-	my_data.rsrv_pos = {}
 	local old_internal_data = data.internal_data
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		if old_internal_data.firing then
 			data.unit:movement():set_allow_fire(false)
@@ -49,15 +47,6 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 		end
 	end
 	data.internal_data = my_data
-	if not my_data.rsrv_pos.stand then
-		local pos_rsrv = {
-			position = mvector3.copy(data.m_pos),
-			radius = 30,
-			filter = data.pos_rsrv_id
-		}
-		my_data.rsrv_pos.stand = pos_rsrv
-		managers.navigation:add_pos_reservation(pos_rsrv)
-	end
 	local key_str = tostring(data.unit:key())
 	my_data.detection_task_key = "CopLogicIdle.update" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, CopLogicIdle.queued_update, data, data.t)
@@ -108,15 +97,7 @@ function CopLogicIdle.exit(data, new_logic_name, enter_params)
 	if my_data.nearest_cover then
 		managers.navigation:release_cover(my_data.nearest_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 end
 
 function CopLogicIdle.queued_update(data)

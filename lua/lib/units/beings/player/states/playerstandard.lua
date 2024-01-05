@@ -143,19 +143,7 @@ function PlayerStandard:_enter(enter_data)
 		self._unit:base():set_detection_multiplier("area", metadata.detection_mul and 1 / metadata.detection_mul or nil)
 	end
 	self._ext_inventory:set_mask_visibility(true)
-	if not self._state_data.ducking then
-		local stand_attention
-		if managers.groupai:state():whisper_mode() then
-			stand_attention = "pl_enemy_stand_mask_on"
-		else
-			stand_attention = "pl_enemy_cbt"
-		end
-		self._ext_movement:set_attention_settings({
-			stand_attention,
-			"pl_team_idle_std",
-			"pl_civ_cbt"
-		})
-	end
+	self:_upd_attention()
 	self._ext_network:send("set_stance", 2)
 end
 
@@ -826,17 +814,7 @@ function PlayerStandard:_start_action_ducking(t)
 	self._unit:kill_mover()
 	self:_activate_mover(PlayerStandard.MOVER_DUCK, velocity)
 	self._ext_network:send("set_pose", 2)
-	local crh_attention
-	if managers.groupai:state():whisper_mode() then
-		crh_attention = "pl_enemy_sneak"
-	else
-		crh_attention = "pl_enemy_cbt_crh"
-	end
-	self._ext_movement:set_attention_settings({
-		crh_attention,
-		"pl_team_idle_std",
-		"pl_civ_sneak"
-	})
+	self:_upd_attention()
 end
 
 function PlayerStandard:_end_action_ducking(t)
@@ -850,17 +828,7 @@ function PlayerStandard:_end_action_ducking(t)
 	self._unit:kill_mover()
 	self:_activate_mover(PlayerStandard.MOVER_STAND, velocity)
 	self._ext_network:send("set_pose", 1)
-	local stand_attention
-	if managers.groupai:state():whisper_mode() then
-		stand_attention = "pl_enemy_stand_mask_on"
-	else
-		stand_attention = "pl_enemy_cbt"
-	end
-	self._ext_movement:set_attention_settings({
-		stand_attention,
-		"pl_team_idle_std",
-		"pl_civ_cbt"
-	})
+	self:_upd_attention()
 end
 
 function PlayerStandard:_interupt_action_ducking(t)
@@ -1277,6 +1245,9 @@ function PlayerStandard:_play_melee_sound(melee_entry, sound_id)
 end
 
 function PlayerStandard:_interupt_action_melee(t)
+	if not self:_is_meleeing() then
+		return
+	end
 	self._state_data.melee_charge_wanted = nil
 	self._state_data.melee_expire_t = nil
 	self._state_data.melee_repeat_expire_t = nil
@@ -2385,6 +2356,34 @@ function PlayerStandard:_find_pickups(t)
 				managers.hud:set_ammo_amount(id, weapon.unit:base():ammo_info())
 			end
 		end
+	end
+end
+
+function PlayerStandard:_upd_attention()
+	if self._state_data.ducking then
+		local crh_attention
+		if managers.groupai:state():whisper_mode() then
+			crh_attention = "pl_enemy_sneak"
+		else
+			crh_attention = "pl_enemy_cbt_crh"
+		end
+		self._ext_movement:set_attention_settings({
+			crh_attention,
+			"pl_team_idle_std",
+			"pl_civ_sneak"
+		})
+	else
+		local stand_attention
+		if managers.groupai:state():whisper_mode() then
+			stand_attention = "pl_enemy_stand_mask_on"
+		else
+			stand_attention = "pl_enemy_cbt"
+		end
+		self._ext_movement:set_attention_settings({
+			stand_attention,
+			"pl_team_idle_std",
+			"pl_civ_cbt"
+		})
 	end
 end
 

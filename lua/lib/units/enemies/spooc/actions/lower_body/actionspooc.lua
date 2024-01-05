@@ -123,6 +123,9 @@ function ActionSpooc:on_exit()
 		self._unit:sound():play("cloaker_detect_stop", nil, nil)
 	else
 		self._unit:sound():play("cloaker_presence_loop", nil, nil)
+		if self._is_local and self._taunt_at_beating_played and not self._unit:sound():speaking(TimerManager:game():time()) then
+			self._unit:sound():say("cloaker_taunt_after_assault", true, true)
+		end
 	end
 	self._unit:damage():run_sequence_simple("kill_spook_lights")
 	if self._root_blend_disabled then
@@ -140,6 +143,12 @@ function ActionSpooc:on_exit()
 	end
 	if alive(self._target_unit) and self._target_unit:base().is_local_player then
 		self._target_unit:movement():on_targetted_for_attack(false, self._common_data.unit)
+	end
+	if Network:is_server() and not self._unit:character_damage():dead() then
+		self._unit:brain():add_pos_rsrv("stand", {
+			position = mvector3.copy(self._common_data.pos),
+			radius = 30
+		})
 	end
 end
 
@@ -212,6 +221,14 @@ function ActionSpooc:_upd_strike_first_frame(t)
 	local redir_result = self._ext_movement:play_redirect("spooc_strike")
 	if redir_result then
 		self._ext_movement:spawn_wanted_items()
+	elseif self._is_local then
+		if Network:is_server() then
+			self:_expire()
+		else
+			self._ext_network:send_to_host("action_spooc_stop", self._ext_movement:m_pos(), 1, self._action_id)
+			self:_wait()
+		end
+		return
 	end
 	if self._is_local then
 		mvector3.set(self._last_sent_pos, self._common_data.pos)
@@ -636,56 +653,48 @@ function ActionSpooc:_upd_wait(t)
 end
 
 function ActionSpooc:_upd_striking(t)
-	if self._ext_anim.act and not self._ext_anim.spooc_enter and not self._taunt_at_beating_played then
-		self._taunt_at_beating_played = true
-		self._unit:sound():say("cloaker_taunt_during_assault", nil, true)
-	end
-	if not self._ext_anim.act or self._stroke_t and t - self._stroke_t > 7 then
-		if not self._unit:sound():speaking(t) then
-			self._unit:sound():say("cloaker_taunt_after_assault", nil, true)
+	local target_unit = (not alive(self._strike_unit) or not self._strike_unit) and alive(self._target_unit) and self._target_unit
+	local my_pos = self._tmp_vec2
+	mvector3.set(my_pos, self._common_data.pos)
+	if target_unit then
+		local my_fwd = self._common_data.fwd
+		local target_pos = target_unit:movement():m_pos()
+		local target_vec = ActionSpooc._tmp_vec1
+		mvector3.direction(target_vec, my_pos, target_pos)
+		if mvector3.dot(my_fwd, target_vec) < 0.98 then
+			local my_fwd_polar = my_fwd:to_polar_with_reference(target_vec, math.UP)
+			local spin_adj = math.step(0, -my_fwd_polar.spin, (self._ext_anim.spooc_enter and 180 or 110) * TimerManager:game():delta_time())
+			mvector3.set(target_vec, my_fwd)
+			mvector3.rotate_with(target_vec, Rotation(spin_adj, 0, 0))
+			self._ext_movement:set_rotation(Rotation(target_vec, math.UP))
 		end
+	end
+	self._ext_movement:upd_ground_ray(my_pos, true)
+	local gnd_z = self._common_data.gnd_ray.position.z
+	if gnd_z < my_pos.z then
+		self._last_vel_z = self._apply_freefall(my_pos, self._last_vel_z, gnd_z, TimerManager:game():delta_time())
+	else
+		if gnd_z > my_pos.z then
+			mvector3.set_z(my_pos, gnd_z)
+		end
+		self._last_vel_z = 0
+	end
+	self._ext_movement:set_position(my_pos)
+	if self._ext_anim.spooc_enter then
+		return
+	end
+	if self._is_local and not self._was_interrupted and (not target_unit or not target_unit:character_damage():is_downed()) then
 		if Network:is_server() then
 			self:_expire()
 		else
+			self._ext_network:send_to_host("action_spooc_stop", self._ext_movement:m_pos(), 1, self._action_id)
 			self:_wait()
 		end
-	elseif self._stroke_t then
-		if self._is_local then
-			if not self._ext_anim.spooc_exit and not self._ext_anim.spooc_enter and (not (alive(self._strike_unit) and self._strike_unit:character_damage().incapacitated) or not self._strike_unit:character_damage():incapacitated()) then
-				self._ext_movement:play_redirect("spooc_exit")
-				return
-			end
-		elseif not self._ext_anim.spooc_exit and not self._ext_anim.spooc_enter and self._end_of_path then
-			self._ext_movement:drop_held_items()
-			self:_start_sprint()
-			return
-		end
-		if alive(self._target_unit) then
-			local my_fwd = self._common_data.fwd
-			local target_pos = self._target_unit:movement():m_pos()
-			local my_pos = self._tmp_vec2
-			mvector3.set(my_pos, self._common_data.pos)
-			local target_vec = ActionSpooc._tmp_vec1
-			mvector3.direction(target_vec, my_pos, target_pos)
-			if mvector3.dot(my_fwd, target_vec) < 0.98 then
-				local my_fwd_polar = my_fwd:to_polar_with_reference(target_vec, math.UP)
-				local spin_adj = math.step(0, -my_fwd_polar.spin, (self._ext_anim.spooc_enter and 180 or 110) * TimerManager:game():delta_time())
-				mvector3.set(target_vec, my_fwd)
-				mvector3.rotate_with(target_vec, Rotation(spin_adj, 0, 0))
-				self._ext_movement:set_rotation(Rotation(target_vec, math.UP))
-			end
-			self._ext_movement:upd_ground_ray(my_pos, true)
-			local gnd_z = self._common_data.gnd_ray.position.z
-			if gnd_z < my_pos.z then
-				self._last_vel_z = self._apply_freefall(my_pos, self._last_vel_z, gnd_z, TimerManager:game():delta_time())
-			else
-				if gnd_z > my_pos.z then
-					mvector3.set_z(my_pos, gnd_z)
-				end
-				self._last_vel_z = 0
-			end
-			self._ext_movement:set_position(my_pos)
-		end
+		return
+	end
+	if not self._taunt_at_beating_played then
+		self._taunt_at_beating_played = true
+		self._unit:sound():say("cloaker_taunt_during_assault", nil, true)
 	end
 end
 
@@ -795,7 +804,7 @@ function ActionSpooc:on_attention(attention)
 end
 
 function ActionSpooc:complete()
-	return self._beating_end_t and TimerManager:game():time() > self._beating_end_t
+	return self._beating_end_t and TimerManager:game():time() > self._beating_end_t and self._last_vel_z >= 0
 end
 
 function ActionSpooc:action_id()
@@ -824,11 +833,6 @@ function ActionSpooc:anim_act_clbk(anim_act)
 				self:_wait()
 			end
 			return
-		end
-		if self:is_flying_strike() then
-			self._beating_end_t = 0
-		else
-			self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
 		end
 		local target_vec = self._tmp_vec1
 		mvector3.set(target_vec, self._target_unit:movement():m_com())
@@ -861,7 +865,17 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			end
 		end
 		self._strike_unit = self._target_unit
-		self._strike_unit:movement():on_SPOOCed(self._unit)
+		local spooc_res = self._strike_unit:movement():on_SPOOCed(self._unit)
+		if not self:is_flying_strike() then
+			if spooc_res and self._strike_unit:character_damage():is_downed() then
+				self._beating_end_t = self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
+			elseif Network:is_server() then
+				self:_expire()
+			else
+				self._ext_network:send_to_host("action_spooc_stop", self._ext_movement:m_pos(), 1, self._action_id)
+			end
+			return
+		end
 		self._unit:sound():say("punch_3rd_person_3p", true)
 		if self._strike_unit:base().is_local_player then
 			self:_play_strike_camera_shake()
@@ -995,49 +1009,61 @@ function ActionSpooc:_upd_flying_strike_first_frame(t)
 end
 
 function ActionSpooc:_upd_flying_strike(t)
-	if not self._ext_anim.act then
-		if Network:is_server() then
-			self:_expire()
-		else
-			self:_wait()
+	if self._ext_anim.act then
+		local strike_data = self._flying_strike_data
+		local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
+		local rot_correction_period = 0.07
+		if seg_rel_t < rot_correction_period then
+			local prog_lerp = (rot_correction_period - seg_rel_t) / rot_correction_period
+			self._ext_movement:set_rotation(strike_data.start_rot:slerp(strike_data.target_rot, prog_lerp))
+		elseif not strike_data.is_rot_aligned then
+			self._ext_movement:set_rotation(strike_data.target_rot)
 		end
-		return
-	end
-	local strike_data = self._flying_strike_data
-	local seg_rel_t = self._machine:segment_relative_time(Idstring("base"))
-	local rot_correction_period = 0.07
-	if seg_rel_t < rot_correction_period then
-		local prog_lerp = (rot_correction_period - seg_rel_t) / rot_correction_period
-		self._ext_movement:set_rotation(strike_data.start_rot:slerp(strike_data.target_rot, prog_lerp))
-	elseif not strike_data.is_rot_aligned then
-		self._ext_movement:set_rotation(strike_data.target_rot)
-	end
-	local delta_pos = self._common_data.unit:get_animation_delta_position()
-	local delta_z = mvector3.z(delta_pos)
-	mvector3.set_static(delta_pos, mvector3.x(delta_pos) * strike_data.travel_dis_scaling_xy, mvector3.y(delta_pos) * strike_data.travel_dis_scaling_xy, delta_z)
-	local new_pos = delta_pos
-	mvector3.add(new_pos, self._common_data.pos)
-	if self._stroke_t then
-		if self._common_data.nav_tracker:lost() then
-			local safe_pos = self._common_data.nav_tracker:field_position()
-			mvector3.set_z(safe_pos, mvector3.z(self._common_data.pos))
-			local dis_before = mvector3.distance_sq(safe_pos, self._common_data.pos)
-			local dis_now = mvector3.distance_sq(self._common_data.pos, new_pos)
-			if dis_before < dis_now then
-				mvector3.set_static(new_pos, mvector3.x(self._common_data.pos), mvector3.y(self._common_data.pos), mvector3.z(new_pos))
-			end
-		else
-			local ray_params = {
-				tracker_from = self._common_data.nav_tracker,
-				pos_to = new_pos
-			}
-			if managers.navigation:raycast(ray_params) then
-				mvector3.set_static(new_pos, mvector3.x(self._common_data.pos), mvector3.y(self._common_data.pos), mvector3.z(new_pos))
+		local delta_pos = self._common_data.unit:get_animation_delta_position()
+		local delta_z = mvector3.z(delta_pos)
+		mvector3.set_static(delta_pos, mvector3.x(delta_pos) * strike_data.travel_dis_scaling_xy, mvector3.y(delta_pos) * strike_data.travel_dis_scaling_xy, delta_z)
+		local new_pos = delta_pos
+		mvector3.add(new_pos, self._common_data.pos)
+		if self._stroke_t then
+			if self._common_data.nav_tracker:lost() then
+				local safe_pos = self._common_data.nav_tracker:field_position()
+				mvector3.set_z(safe_pos, mvector3.z(self._common_data.pos))
+				local dis_before = mvector3.distance_sq(safe_pos, self._common_data.pos)
+				local dis_now = mvector3.distance_sq(self._common_data.pos, new_pos)
+				if dis_before < dis_now then
+					mvector3.set_static(new_pos, mvector3.x(self._common_data.pos), mvector3.y(self._common_data.pos), mvector3.z(new_pos))
+				end
+			else
+				local ray_params = {
+					tracker_from = self._common_data.nav_tracker,
+					pos_to = new_pos
+				}
+				if managers.navigation:raycast(ray_params) then
+					mvector3.set_static(new_pos, mvector3.x(self._common_data.pos), mvector3.y(self._common_data.pos), mvector3.z(new_pos))
+				end
 			end
 		end
-	end
-	if new_pos then
 		self._ext_movement:set_position(new_pos)
+	else
+		local my_pos = self._tmp_vec1
+		mvector3.set(my_pos, self._common_data.pos)
+		self._ext_movement:upd_ground_ray(my_pos, true)
+		local gnd_z = self._common_data.gnd_ray.position.z
+		if gnd_z < my_pos.z then
+			self._last_vel_z = self._apply_freefall(my_pos, self._last_vel_z, gnd_z, TimerManager:game():delta_time())
+		else
+			if gnd_z > my_pos.z then
+				mvector3.set_z(my_pos, gnd_z)
+			end
+			self._last_vel_z = 0
+			self._beating_end_t = 0
+			if Network:is_server() then
+				self:_expire()
+			else
+				self:_wait()
+			end
+		end
+		self._ext_movement:set_position(my_pos)
 	end
 end
 

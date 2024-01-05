@@ -21,7 +21,7 @@ function FragGrenade:_detonate()
 	local pos = self._unit:position()
 	local normal = math.UP
 	local range = self._range
-	local slot_mask = managers.slot:get_mask("bullet_impact_targets")
+	local slot_mask = managers.slot:get_mask("explosion_targets")
 	managers.explosion:give_local_player_dmg(pos, range, self._player_damage)
 	managers.explosion:play_sound_and_effects(pos, normal, range, self._custom_params)
 	local hit_units, splinters = managers.explosion:detect_and_give_dmg({

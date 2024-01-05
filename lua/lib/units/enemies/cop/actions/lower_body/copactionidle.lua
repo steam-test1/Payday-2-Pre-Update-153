@@ -46,6 +46,15 @@ function CopActionIdle:init(action_desc, common_data)
 	self._modifier_name = self._unit:anim_data().ik_type == "head" and idstr_look_head or idstr_look_upper_body
 	self._modifier = self._machine:get_modifier(self._modifier_name)
 	self:on_attention(common_data.attention)
+	if (self._body_part == 1 or self._body_part == 2) and Network:is_server() then
+		local stand_rsrv = self._unit:brain():get_pos_rsrv("stand")
+		if not stand_rsrv or mvector3.distance_sq(stand_rsrv.position, common_data.pos) > 400 then
+			self._unit:brain():add_pos_rsrv("stand", {
+				position = mvector3.copy(common_data.pos),
+				radius = 30
+			})
+		end
+	end
 	if action_desc.sync then
 		self._common_data.ext_network:send("action_idle_start", self._body_part)
 	end

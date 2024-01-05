@@ -4,8 +4,9 @@ NetworkAccountSTEAM.lb_diffs = {
 	easy = "Easy",
 	normal = "Normal",
 	hard = "Hard",
-	overkill = "Overkill",
-	overkill_145 = "Overkill 145+"
+	overkill = "Very Hard",
+	overkill_145 = "Overkill",
+	overkill_290 = "Death Wish"
 }
 NetworkAccountSTEAM.lb_levels = {
 	bank = "First World Bank",
@@ -359,7 +360,8 @@ function NetworkAccountSTEAM.output_global_stats(file)
 		"normal",
 		"hard",
 		"overkill",
-		"overkill_145"
+		"overkill_145",
+		"overkill_290"
 	}
 	local heists = {
 		"bank",

@@ -7,10 +7,8 @@ function ShieldLogicAttack.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	my_data.tmp_vec1 = Vector3()
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
 		my_data.shooting = old_internal_data.shooting
@@ -39,15 +37,7 @@ function ShieldLogicAttack.exit(data, new_logic_name, enter_params)
 	local my_data = data.internal_data
 	data.unit:brain():cancel_all_pathing_searches()
 	CopLogicBase.cancel_queued_tasks(my_data)
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 	data.unit:brain():set_update_enabled_state(true)
 end
 
@@ -123,9 +113,6 @@ function ShieldLogicAttack.queued_update(data)
 				end
 			end
 			if do_move then
-				if my_data.rsrv_pos.path then
-					managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-				end
 				my_data.pathing_to_optimal_pos = true
 				my_data.optimal_path_search_id = tostring(unit:key()) .. "optimal"
 				local reservation = managers.navigation:reserve_pos(nil, nil, to_pos, callback(ShieldLogicAttack, ShieldLogicAttack, "_reserve_pos_step_clbk", {
@@ -136,13 +123,13 @@ function ShieldLogicAttack.queued_update(data)
 				else
 					reservation = {
 						position = mvector3.copy(to_pos),
-						radius = 70,
+						radius = 60,
 						filter = data.pos_rsrv_id
 					}
 					managers.navigation:add_pos_reservation(reservation)
 				end
-				my_data.rsrv_pos.path = reservation
-				unit:brain():search_for_path(my_data.optimal_path_search_id, to_pos)
+				data.brain:set_pos_rsrv("path", reservation)
+				data.brain:search_for_path(my_data.optimal_path_search_id, to_pos)
 			end
 		end
 	end
@@ -198,12 +185,7 @@ function ShieldLogicAttack._chk_request_action_walk_to_optimal_pos(data, my_data
 		my_data.optimal_path = nil
 		my_data.walking_to_optimal_pos = data.unit:brain():action_request(new_action_data)
 		if my_data.walking_to_optimal_pos then
-			my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-			my_data.rsrv_pos.path = nil
-			if my_data.rsrv_pos.stand then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-				my_data.rsrv_pos.stand = nil
-			end
+			data.brain:rem_pos_rsrv("path")
 			if data.group and data.group.leader_key == data.key and data.char_tweak.chatter.follow_me and mvector3.distance(new_action_data.nav_path[#new_action_data.nav_path], data.m_pos) > 800 and not data.unit:sound():speaking(data.t) then
 				managers.groupai:state():chk_say_enemy_chatter(data.unit, data.m_pos, "follow_me")
 			end
@@ -218,10 +200,6 @@ function ShieldLogicAttack._cancel_optimal_attempt(data, my_data)
 		local new_action = {type = "idle", body_part = 2}
 		data.unit:brain():action_request(new_action)
 	elseif my_data.pathing_to_optimal_pos then
-		if my_data.rsrv_pos.path then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-			my_data.rsrv_pos.path = nil
-		end
 		if data.active_searches[my_data.optimal_path_search_id] then
 			managers.navigation:cancel_pathing_search(my_data.optimal_path_search_id)
 			data.active_searches[my_data.optimal_path_search_id] = nil
@@ -253,7 +231,7 @@ function ShieldLogicAttack._upd_enemy_detection(data)
 	local nr_threats = 0
 	local verified_chk_t = data.t - 8
 	for key, enemy_data in pairs(detected_enemies) do
-		if enemy_data.reaction >= AIAttentionObject.REACT_SCARED and enemy_data.identified and enemy_data.verified_t and verified_chk_t < enemy_data.verified_t then
+		if enemy_data.reaction >= AIAttentionObject.REACT_COMBAT and enemy_data.identified and enemy_data.verified_t and verified_chk_t < enemy_data.verified_t then
 			enemies[key] = enemy_data
 			enemies_cpy[key] = enemy_data
 		end
@@ -418,26 +396,6 @@ function ShieldLogicAttack.action_complete_clbk(data, action)
 	local action_type = action:type()
 	if action_type == "walk" then
 		my_data.advancing = nil
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
-		if action:expired() then
-			my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-			my_data.rsrv_pos.move_dest = nil
-		else
-			if my_data.rsrv_pos.move_dest then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.move_dest)
-				my_data.rsrv_pos.move_dest = nil
-			end
-			local reservation = {
-				position = mvector3.copy(data.m_pos),
-				radius = 70,
-				filter = data.pos_rsrv_id
-			}
-			managers.navigation:add_pos_reservation(reservation)
-			my_data.rsrv_pos.stand = reservation
-		end
 		if my_data.walking_to_optimal_pos then
 			my_data.walking_to_optimal_pos = nil
 		end
@@ -451,8 +409,8 @@ function ShieldLogicAttack.action_complete_clbk(data, action)
 end
 
 function ShieldLogicAttack.is_advancing(data)
-	if data.internal_data.walking_to_optimal_pos then
-		return data.internal_data.rsrv_pos.move_dest.position
+	if data.internal_data.walking_to_optimal_pos and data.pos_rsrv.move_dest then
+		return data.pos_rsrv.move_dest.position
 	end
 end
 

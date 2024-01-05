@@ -6,6 +6,7 @@ function CivilianLogicIdle.enter(data, new_logic_name, enter_params)
 	local my_data = {
 		unit = data.unit
 	}
+	data.internal_data = my_data
 	if not data.char_tweak.detection then
 		debug_pause_unit(data.unit, "missing detection tweak_data", data.unit)
 	end
@@ -14,21 +15,6 @@ function CivilianLogicIdle.enter(data, new_logic_name, enter_params)
 		my_data.detection = data.char_tweak.detection.ntl
 	else
 		my_data.detection = data.char_tweak.detection.cbt
-	end
-	my_data.rsrv_pos = {}
-	local old_internal_data = data.internal_data
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
-	data.internal_data = my_data
-	if not my_data.rsrv_pos.stand then
-		local pos_rsrv = {
-			position = mvector3.copy(data.m_pos),
-			radius = 45,
-			filter = data.pos_rsrv_id
-		}
-		my_data.rsrv_pos.stand = pos_rsrv
-		managers.navigation:add_pos_reservation(pos_rsrv)
 	end
 	CopLogicBase._reset_attention(data)
 	data.unit:brain():set_update_enabled_state(false)

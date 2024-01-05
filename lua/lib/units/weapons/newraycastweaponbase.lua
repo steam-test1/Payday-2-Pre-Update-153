@@ -25,6 +25,10 @@ function NewRaycastWeaponBase:skip_queue()
 	return false
 end
 
+function NewRaycastWeaponBase:set_texture_switches(texture_switches)
+	self._texture_switches = texture_switches
+end
+
 function NewRaycastWeaponBase:set_factory_data(factory_id)
 	self._factory_id = factory_id
 end
@@ -74,8 +78,50 @@ function NewRaycastWeaponBase:_assemble_completed(parts, blueprint)
 			end
 		end
 	end
+	self:apply_texture_switches()
 	self:check_npc()
 	self:_set_parts_enabled(self._enabled)
+end
+
+function NewRaycastWeaponBase:apply_texture_switches()
+	local parts_tweak = tweak_data.weapon.factory.parts
+	self._parts_texture_switches = self._parts_texture_switches or {}
+	if self._texture_switches then
+		local texture_switch, part_data, unit, material_ids, material_config, switch_material
+		for part_id, texture_data in pairs(self._texture_switches) do
+			if self._parts_texture_switches[part_id] ~= texture_data then
+				switch_material = nil
+				texture_switch = parts_tweak[part_id] and parts_tweak[part_id].texture_switch
+				part_data = self._parts and self._parts[part_id]
+				if texture_switch and part_data then
+					unit = part_data.unit
+					material_ids = Idstring(texture_switch.material)
+					material_config = unit:get_objects_by_type(Idstring("material"))
+					for _, material in ipairs(material_config) do
+						print(material:name())
+						if material:name() == material_ids then
+							switch_material = material
+							break
+						end
+					end
+					Application:debug(switch_material)
+					if switch_material then
+						local texture_id = managers.blackmarket:get_texture_switch_from_data(texture_data, part_id)
+						if texture_id and DB:has(Idstring("texture"), texture_id) then
+							local retrieved_texture = TextureCache:retrieve(texture_id, "normal")
+							switch_material:set_texture(texture_switch.channel, retrieved_texture)
+							if self._parts_texture_switches[part_id] then
+								TextureCache:unretrieve(Idstring(self._parts_texture_switches[part_id]))
+							end
+							self._parts_texture_switches[part_id] = Idstring(texture_id)
+						else
+							Application:error("[NewRaycastWeaponBase:apply_texture_switches] Switch texture do not exists", texture_id)
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
 function NewRaycastWeaponBase:check_npc()
@@ -501,5 +547,11 @@ end
 
 function NewRaycastWeaponBase:destroy(unit)
 	NewRaycastWeaponBase.super.destroy(self, unit)
+	if self._parts_texture_switches then
+		for part_id, texture_ids in pairs(self._parts_texture_switches) do
+			print("BYE BYE ")
+			TextureCache:unretrieve(texture_ids)
+		end
+	end
 	managers.weapon_factory:disassemble(self._parts)
 end

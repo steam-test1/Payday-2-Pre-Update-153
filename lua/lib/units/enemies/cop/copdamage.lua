@@ -1,5 +1,6 @@
 CopDamage = CopDamage or class()
 CopDamage._all_event_types = {
+	"dmg_rcv",
 	"light_hurt",
 	"hurt",
 	"heavy_hurt",
@@ -72,10 +73,11 @@ function CopDamage:get_damage_type(damage_percent, category)
 		if weight and 0 < weight then
 			total_w = total_w + weight
 			if rand_nr <= total_w then
-				return hurt_type
+				return hurt_type or "dmg_rcv"
 			end
 		end
 	end
+	return "dmg_rcv"
 end
 
 function CopDamage:is_head(body)

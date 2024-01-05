@@ -12,9 +12,7 @@ function TeamAILogicDisabled.enter(data, new_logic_name, enter_params)
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
 	my_data.enemy_detect_slotmask = managers.slot:get_mask("enemies")
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		CopLogicAttack._set_best_cover(data, my_data, old_internal_data.best_cover)
 		CopLogicAttack._set_nearest_cover(my_data, old_internal_data.nearest_cover)
 		my_data.attention_unit = old_internal_data.attention_unit

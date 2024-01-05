@@ -7,6 +7,7 @@ require("lib/managers/menu/renderers/MenuNodeButtonLayoutGui")
 require("lib/managers/menu/renderers/MenuNodeHiddenGui")
 require("lib/managers/menu/renderers/MenuNodeCrimenetGui")
 require("lib/managers/menu/renderers/MenuNodeUpdatesGui")
+require("lib/managers/menu/renderers/MenuNodeReticleSwitchGui")
 MenuRenderer = MenuRenderer or class(CoreMenuRenderer.Renderer)
 
 function MenuRenderer:init(logic, ...)

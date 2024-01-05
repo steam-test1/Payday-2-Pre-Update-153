@@ -138,7 +138,7 @@ function CarryData:_explode()
 	local normal = math.UP
 	local range = CarryData.EXPLOSION_SETTINGS.range
 	local effect = CarryData.EXPLOSION_SETTINGS.effect
-	local slot_mask = managers.slot:get_mask("bullet_impact_targets")
+	local slot_mask = managers.slot:get_mask("explosion_targets")
 	self:_local_player_explosion_damage()
 	managers.explosion:play_sound_and_effects(pos, normal, range, CarryData.EXPLOSION_CUSTOM_PARAMS)
 	local hit_units, splinters = managers.explosion:detect_and_give_dmg({

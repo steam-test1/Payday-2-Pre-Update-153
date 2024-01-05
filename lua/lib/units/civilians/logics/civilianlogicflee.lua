@@ -9,10 +9,6 @@ function CivilianLogicFlee.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.cbt
-	my_data.rsrv_pos = {}
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
 	data.unit:brain():set_update_enabled_state(false)
 	local key_str = tostring(data.key)
 	managers.groupai:state():register_fleeing_civilian(data.key, data.unit)
@@ -143,8 +139,7 @@ function CivilianLogicFlee.update(data)
 					my_data.pathing_to_cover = to_cover
 					unit:brain():search_for_path_to_cover(my_data.flee_path_search_id, to_cover[1], nil, nil)
 				else
-					local reservation = managers.navigation:reserve_pos(nil, nil, to_pos, nil, 30, data.pos_rsrv_id)
-					my_data.rsrv_pos.path = reservation
+					data.brain:add_pos_rsrv("path", {position = to_pos, radius = 30})
 					unit:brain():search_for_path(my_data.flee_path_search_id, to_pos)
 				end
 			end
@@ -219,8 +214,6 @@ function CivilianLogicFlee.action_complete_clbk(data, action)
 	if action:type() == "walk" then
 		my_data.next_action_t = TimerManager:game():time() + math.lerp(2, 8, math.random())
 		if action:expired() then
-			my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-			my_data.rsrv_pos.move_dest = nil
 			if my_data.moving_to_cover then
 				data.unit:sound():say("a03x_any", true)
 				my_data.in_cover = my_data.moving_to_cover
@@ -230,16 +223,6 @@ function CivilianLogicFlee.action_complete_clbk(data, action)
 			if my_data.coarse_path_index then
 				my_data.coarse_path_index = my_data.coarse_path_index + 1
 			end
-		elseif my_data.rsrv_pos.move_dest then
-			if not my_data.rsrv_pos.stand then
-				my_data.rsrv_pos.stand = managers.navigation:add_pos_reservation({
-					position = mvector3.copy(data.m_pos),
-					radius = 45,
-					filter = data.pos_rsrv_id
-				})
-			end
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.move_dest)
-			my_data.rsrv_pos.move_dest = nil
 		end
 		my_data.moving_to_cover = nil
 		my_data.advancing = nil
@@ -544,15 +527,10 @@ function CivilianLogicFlee._start_moving_to_cover(data, my_data)
 	}
 	my_data.advancing = data.unit:brain():action_request(new_action_data)
 	my_data.flee_path = nil
+	data.brain:rem_pos_rsrv("path")
 	if my_data.has_path_to_cover then
 		my_data.moving_to_cover = my_data.has_path_to_cover
 		my_data.has_path_to_cover = nil
-	end
-	my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-	my_data.rsrv_pos.path = nil
-	if my_data.rsrv_pos.stand then
-		managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-		my_data.rsrv_pos.stand = nil
 	end
 end
 

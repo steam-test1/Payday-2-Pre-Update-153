@@ -1,3 +1,9 @@
+local fun = function(key, ...)
+	if tostring(key) == "userdata: 00000694" then
+		Application:set_pause(true)
+		print(...)
+	end
+end
 local tmp_vec1 = Vector3()
 local tmp_vec2 = Vector3()
 CopLogicTravel = class(CopLogicBase)
@@ -21,9 +27,7 @@ function CopLogicTravel.enter(data, new_logic_name, enter_params)
 	else
 		my_data.detection = data.char_tweak.detection.recon
 	end
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
 		my_data.shooting = old_internal_data.shooting
@@ -124,15 +128,7 @@ function CopLogicTravel.exit(data, new_logic_name, enter_params)
 	if my_data.best_cover then
 		managers.navigation:release_cover(my_data.best_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 	data.unit:brain():set_update_enabled_state(true)
 end
 
@@ -189,10 +185,7 @@ function CopLogicTravel.queued_update(data)
 								if guard_pos then
 									local reservation = CopLogicTravel._reserve_pos_along_vec(guard_door.center, guard_pos)
 									if reservation then
-										if my_data.rsrv_pos.path then
-											managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-										end
-										my_data.rsrv_pos.path = reservation
+										data.brain:set_pos_rsrv("path", reservation)
 										local guard_object = {
 											type = "door",
 											door = guard_door,
@@ -212,46 +205,28 @@ function CopLogicTravel.queued_update(data)
 									my_data.moving_to_cover = new_occupation.cover
 								elseif new_occupation.pos then
 									to_pos = new_occupation.pos
-									local reservation = {
+									data.brain:add_pos_rsrv("path", {
 										position = mvector3.copy(to_pos),
-										radius = 60,
-										filter = data.pos_rsrv_id
-									}
-									managers.navigation:add_pos_reservation(reservation)
-									if my_data.rsrv_pos.path then
-										managers.navigation:unreserve_pos(reservation)
-									end
-									my_data.rsrv_pos.path = reservation
+										radius = 30
+									})
 								end
 							else
 								to_pos = new_occupation.pos
 								if to_pos then
-									local reservation = {
+									data.brain:add_pos_rsrv("path", {
 										position = mvector3.copy(to_pos),
-										radius = 60,
-										filter = data.pos_rsrv_id
-									}
-									managers.navigation:add_pos_reservation(reservation)
-									if my_data.rsrv_pos.path then
-										managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-									end
-									my_data.rsrv_pos.path = reservation
+										radius = 30
+									})
 								end
 							end
 						end
 						if not to_pos then
 							to_pos = managers.navigation:find_random_position_in_segment(objective.nav_seg)
 							to_pos = CopLogicTravel._get_pos_on_wall(to_pos)
-							local reservation = {
+							data.brain:add_pos_rsrv("path", {
 								position = mvector3.copy(to_pos),
-								radius = 60,
-								filter = data.pos_rsrv_id
-							}
-							managers.navigation:add_pos_reservation(reservation)
-							if my_data.rsrv_pos.path then
-								managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-							end
-							my_data.rsrv_pos.path = reservation
+								radius = 30
+							})
 						end
 					else
 						local end_pos = coarse_path[cur_index + 1][2]
@@ -374,7 +349,7 @@ function CopLogicTravel._upd_enemy_detection(data)
 	end
 	CopLogicBase._report_detections(data.detected_attention_objects)
 	if new_attention and data.char_tweak.chatter.entrance and not data.entrance and new_attention.criminal_record and new_attention.verified and new_reaction >= AIAttentionObject.REACT_SCARED and math.abs(data.m_pos.z - new_attention.m_pos.z) < 4000 then
-		data.unit:sound():say("entrance", true, nil)
+		data.unit:sound():say(data.brain.entrance_chatter_cue or "entrance", true, nil)
 		data.entrance = true
 	end
 	if data.cool then
@@ -474,8 +449,6 @@ function CopLogicTravel.action_complete_clbk(data, action)
 	local my_data = data.internal_data
 	local action_type = action:type()
 	if action_type == "walk" then
-		my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-		my_data.rsrv_pos.move_dest = nil
 		if action:expired() and not my_data.starting_advance_action and my_data.coarse_path_index and not my_data.has_old_action and my_data.advancing then
 			my_data.coarse_path_index = my_data.coarse_path_index + 1
 			if my_data.coarse_path_index > #my_data.coarse_path then
@@ -609,8 +582,8 @@ function CopLogicTravel.is_available_for_assignment(data, new_objective)
 end
 
 function CopLogicTravel.is_advancing(data)
-	if data.internal_data.advancing then
-		return data.internal_data.rsrv_pos.move_dest.position
+	if data.internal_data.advancing and data.pos_rsrv.move_dest then
+		return data.pos_rsrv.move_dest.position
 	end
 end
 
@@ -626,7 +599,7 @@ function CopLogicTravel._reserve_pos_along_vec(look_pos, wanted_pos)
 		max_pos_mul = max_pos_mul
 	}
 	local step_clbk = callback(CopLogicTravel, CopLogicTravel, "_rsrv_pos_along_vec_step_clbk", data)
-	local res_data = managers.navigation:reserve_pos(nil, nil, wanted_pos, step_clbk, 40, data.pos_rsrv_id)
+	local res_data = managers.navigation:reserve_pos(nil, nil, wanted_pos, step_clbk, 30, data.pos_rsrv_id)
 	return res_data
 end
 
@@ -703,23 +676,7 @@ function CopLogicTravel._chk_request_action_walk_to_advance_pos(data, my_data, s
 		my_data.advancing = data.unit:brain():action_request(new_action_data)
 		my_data.starting_advance_action = false
 		if my_data.advancing then
-			if my_data.rsrv_pos.path then
-				my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-				my_data.rsrv_pos.path = nil
-			else
-				local end_pos = mvector3.copy(path[#path])
-				local rsrv_desc = {
-					filter = data.pos_rsrv_id,
-					position = end_pos,
-					radius = 30
-				}
-				managers.navigation:add_pos_reservation(rsrv_desc)
-				my_data.rsrv_pos.move_dest = rsrv_desc
-			end
-			if my_data.rsrv_pos.stand then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-				my_data.rsrv_pos.stand = nil
-			end
+			data.brain:rem_pos_rsrv("path")
 			if my_data.nearest_cover and (not my_data.delayed_clbks or not my_data.delayed_clbks[my_data.cover_update_task_key]) then
 				CopLogicBase.add_delayed_clbk(my_data, my_data.cover_update_task_key, callback(CopLogicTravel, CopLogicTravel, "_update_cover", data), data.t + 1)
 			end
@@ -909,7 +866,7 @@ function CopLogicTravel.complete_coarse_path(data, my_data, coarse_path)
 				from_seg = nav_seg_id,
 				to_seg = next_nav_seg_id,
 				id = "CopLogicTravel_complete_coarse_path",
-				access_pos = "cop"
+				access_pos = data.SO_access
 			}
 			local ins_coarse_path = managers.navigation:search_coarse(search_params)
 			if not ins_coarse_path then

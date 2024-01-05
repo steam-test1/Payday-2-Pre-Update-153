@@ -51,6 +51,7 @@ function SlotManager:init()
 	self._masks.unit_area_damage = self._masks.players + self._masks.enemies
 	self._masks.area_damage_blocker = World:make_slot_mask(1, 3, 8, 11)
 	self._masks.bullet_impact_targets = World:make_slot_mask(1, 2, 8, 11, 12, 14, 16, 17, 18, 21, 22, 25, 26, 33, 34, 35)
+	self._masks.explosion_targets = self._masks.bullet_impact_targets - 2
 	self._masks.bullet_impact_targets_no_police = World:make_slot_mask(1, 2, 8, 11, 14, 16, 17, 25, 33, 34, 35)
 	self._masks.bullet_impact_targets_no_criminals = World:make_slot_mask(1, 8, 11, 12, 14, 17, 33, 34, 35)
 	self._masks.bullet_impact_targets_sentry_gun = World:make_slot_mask(1, 8, 11, 12, 14, 17, 22, 33, 34, 35)
@@ -69,6 +70,7 @@ function SlotManager:init()
 	self._masks.pickups = World:make_slot_mask(20, 23)
 	self._masks.flesh = World:make_slot_mask(12, 16, 17, 21, 22, 24, 33)
 	self._masks.footstep = World:make_slot_mask(1, 8, 11)
+	self._masks.fire_damage = World:make_slot_mask(1, 2, 11)
 	self._masks.editor_all = self._masks.editor_all + 36 + 38
 	self._masks.statics_layer = self._masks.statics_layer + 36 + 38
 end

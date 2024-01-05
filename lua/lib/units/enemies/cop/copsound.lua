@@ -4,6 +4,7 @@ function CopSound:init(unit)
 	self._unit = unit
 	self._speak_expire_t = 0
 	local char_tweak = tweak_data.character[unit:base()._tweak_table]
+	self:set_voice_prefix(nil)
 	local nr_variations = char_tweak.speech_prefix_count
 	self._prefix = (char_tweak.speech_prefix_p1 or "") .. (nr_variations and tostring(math.random(nr_variations)) or "") .. (char_tweak.speech_prefix_p2 or "") .. "_"
 	if self._unit:base():char_tweak().spawn_sound_event then
@@ -14,6 +15,15 @@ end
 
 function CopSound:destroy(unit)
 	unit:base():pre_destroy(unit)
+end
+
+function CopSound:set_voice_prefix(index)
+	local char_tweak = tweak_data.character[self._unit:base()._tweak_table]
+	local nr_variations = char_tweak.speech_prefix_count
+	if index and (index < 1 or index > nr_variations) then
+		debug_pause_unit(self._unit, "[CopSound:set_voice_prefix] Invalid prefix index:", index, ". nr_variations:", nr_variations)
+	end
+	self._prefix = (char_tweak.speech_prefix_p1 or "") .. (nr_variations and tostring(index or math.random(nr_variations)) or "") .. (char_tweak.speech_prefix_p2 or "") .. "_"
 end
 
 function CopSound:_play(sound_name, source_name)
@@ -36,11 +46,6 @@ function CopSound:play(sound_name, source_name, sync)
 		self._unit:network():send("unit_sound_play", event_id, sync_source_name)
 	end
 	local event = self:_play(event_id or sound_name, source_name)
-	if not event then
-		Application:error("[CopSound:play] event not found in Wwise", sound_name, event_id, self._unit)
-		Application:stack_dump("error")
-		return
-	end
 	return event
 end
 
@@ -92,8 +97,6 @@ function CopSound:say(sound_name, sync, skip_prefix)
 	end
 	self._last_speech = self:_play(event_id or full_sound)
 	if not self._last_speech then
-		Application:error("[CopSound:say] event not found in Wwise", full_sound, event_id, self._unit)
-		Application:stack_dump("error")
 		return
 	end
 	self._speak_expire_t = TimerManager:game():time() + 2

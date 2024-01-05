@@ -14,39 +14,30 @@ function SpecialObjectiveUnitElement:init(unit)
 	self._enemies = {}
 	self._nav_link_filter = {}
 	self._nav_link_filter_check_boxes = {}
-	self._hed.ai_group = "enemies"
+	self._hed.ai_group = "none"
 	self._hed.align_rotation = true
 	self._hed.align_position = true
 	self._hed.needs_pos_rsrv = true
-	self._hed.repeatable = false
-	self._hed.use_instigator = false
-	self._hed.forced = false
-	self._hed.no_arrest = false
 	self._hed.scan = true
 	self._hed.patrol_path = "none"
-	self._hed.path_style = ElementSpecialObjective._pathing_type_default
+	self._hed.path_style = "none"
 	self._hed.path_haste = "none"
 	self._hed.path_stance = "none"
 	self._hed.pose = "none"
 	self._hed.so_action = "none"
 	self._hed.search_position = self._unit:position()
 	self._hed.search_distance = 0
-	self._hed.interval = -1
-	self._hed.base_chance = 1
+	self._hed.interval = ElementSpecialObjective._DEFAULT_VALUES.interval
+	self._hed.base_chance = ElementSpecialObjective._DEFAULT_VALUES.base_chance
 	self._hed.chance_inc = 0
-	self._hed.followup_elements = nil
-	self._hed.allow_followup_self = nil
-	self._hed.action_duration_min = 0
-	self._hed.action_duration_max = 0
+	self._hed.action_duration_min = ElementSpecialObjective._DEFAULT_VALUES.action_duration_min
+	self._hed.action_duration_max = ElementSpecialObjective._DEFAULT_VALUES.action_duration_max
 	self._hed.interrupt_dis = 7
-	self._hed.interrupt_dmg = 0
-	self._hed.attitude = "avoid"
-	self._hed.spawn_instigator_ids = nil
-	self._hed.trigger_on = nil
-	self._hed.interaction_voice = nil
+	self._hed.interrupt_dmg = ElementSpecialObjective._DEFAULT_VALUES.interrupt_dmg
+	self._hed.attitude = "none"
+	self._hed.trigger_on = "none"
+	self._hed.interaction_voice = "none"
 	self._hed.SO_access = "0"
-	self._hed.is_navigation_link = false
-	self._hed.access_flag_version = 1
 	table.insert(self._save_values, "ai_group")
 	table.insert(self._save_values, "align_rotation")
 	table.insert(self._save_values, "align_position")
@@ -79,23 +70,13 @@ function SpecialObjectiveUnitElement:init(unit)
 	table.insert(self._save_values, "interaction_voice")
 	table.insert(self._save_values, "SO_access")
 	table.insert(self._save_values, "is_navigation_link")
-	table.insert(self._save_values, "access_flag_version")
 end
 
 function SpecialObjectiveUnitElement:post_init()
-	if self._hed.follow_up_id then
-		self._hed.followup_elements = {
-			self._hed.follow_up_id
-		}
-	end
-	if self._hed.followup_elements and not next(self._hed.followup_elements) then
-		self._hed.followup_elements = nil
-	end
-	if self._hed.spawn_instigator_ids and not next(self._hed.spawn_instigator_ids) then
-		self._hed.spawn_instigator_ids = nil
-	end
-	self._hed.SO_access = self._hed.SO_access or "0"
 	self._nav_link_filter = managers.navigation:convert_access_filter_to_table(self._hed.SO_access)
+	if type_name(self._hed.SO_access) == "number" then
+		self._hed.SO_access = tostring(self._hed.SO_access)
+	end
 end
 
 function SpecialObjectiveUnitElement:test_element()
@@ -223,6 +204,9 @@ function SpecialObjectiveUnitElement:update_unselected(t, dt, selected_unit, all
 			end
 			i = i - 1
 		end
+		if not next(followup_elements) then
+			self._hed.followup_elements = nil
+		end
 	end
 	if self._hed.spawn_instigator_ids then
 		local spawn_instigator_ids = self._hed.spawn_instigator_ids
@@ -233,6 +217,9 @@ function SpecialObjectiveUnitElement:update_unselected(t, dt, selected_unit, all
 				table.remove(self._hed.spawn_instigator_ids, i)
 			end
 			i = i - 1
+		end
+		if not next(spawn_instigator_ids) then
+			self._hed.spawn_instigator_ids = nil
 		end
 	end
 end
@@ -446,19 +433,9 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "AI group:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {
-			"enemies",
-			"friendlies",
-			"civilians",
-			"bank_manager_old_man",
-			"escort_guy_1",
-			"escort_guy_2",
-			"escort_guy_3",
-			"escort_guy_4",
-			"escort_guy_5",
-			"chavez"
-		},
+		options = clone(ElementSpecialObjective._AI_GROUPS),
 		value = self._hed.ai_group,
+		default = "none",
 		tooltip = "Select an ai group.",
 		name_proportions = 1,
 		ctrlr_proportions = 2,
@@ -591,12 +568,12 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Path style:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._pathing_types),
+		options = clone(ElementSpecialObjective._PATHING_STYLES),
 		value = self._hed.path_style,
+		default = "none",
 		tooltip = "Specifies how the patrol path should be used.",
 		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
+		ctrlr_proportions = 2
 	}
 	local path_style = CoreEws.combobox(path_style_params)
 	path_style:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = path_style, value = "path_style"})
@@ -604,13 +581,12 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Path haste:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {"walk", "run"},
+		options = clone(ElementSpecialObjective._HASTES),
 		value = self._hed.path_haste,
 		default = "none",
 		tooltip = "Select path haste to use.",
 		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
+		ctrlr_proportions = 2
 	}
 	local path_haste = CoreEws.combobox(path_haste_params)
 	path_haste:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = path_haste, value = "path_haste"})
@@ -618,17 +594,12 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Path stance:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {
-			"ntl",
-			"hos",
-			"cbt"
-		},
+		options = clone(ElementSpecialObjective._STANCES),
 		value = self._hed.path_stance,
 		default = "none",
 		tooltip = "Select path stance to use.",
 		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
+		ctrlr_proportions = 2
 	}
 	local path_stance = CoreEws.combobox(path_stance_params)
 	path_stance:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
@@ -639,13 +610,12 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Pose:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {"crouch", "stand"},
+		options = clone(ElementSpecialObjective._POSES),
 		value = self._hed.pose,
 		default = "none",
 		tooltip = "Select path stance to use.",
 		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
+		ctrlr_proportions = 2
 	}
 	local pose = CoreEws.combobox(pose_params)
 	pose:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = pose, value = "pose"})
@@ -653,13 +623,12 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Attitude:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {"avoid", "engage"},
+		options = clone(ElementSpecialObjective._ATTITUDES),
 		value = self._hed.attitude,
 		default = "none",
 		tooltip = "Select combat attitude.",
 		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
+		ctrlr_proportions = 2
 	}
 	local attitude = CoreEws.combobox(attitude_params)
 	attitude:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = attitude, value = "attitude"})
@@ -667,8 +636,9 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Trigger on:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {"none", "interact"},
+		options = clone(ElementSpecialObjective._TRIGGER_ON),
 		value = self._hed.trigger_on,
+		default = "none",
 		tooltip = "Select when to trigger objective.",
 		name_proportions = 1,
 		ctrlr_proportions = 2
@@ -679,22 +649,9 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		name = "Interaction voice:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {
-			"default",
-			"cuff_cop",
-			"down_cop",
-			"stop_cop",
-			"escort_keep",
-			"escort_go",
-			"escort",
-			"stop",
-			"down_stay",
-			"down",
-			"bridge_codeword",
-			"bridge_chair",
-			"undercover_interrogate"
-		},
+		options = clone(ElementSpecialObjective._INTERACTION_VOICES),
 		value = self._hed.interaction_voice,
+		default = "none",
 		tooltip = "Select what voice to use when interacting with the character.",
 		name_proportions = 1,
 		ctrlr_proportions = 2

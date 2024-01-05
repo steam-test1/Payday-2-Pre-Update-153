@@ -255,10 +255,10 @@ function GroupAIStateBase:_init_misc_data()
 	self._hostage_keys = {}
 	self._enemy_chatter = {}
 	self._teamAI_last_combat_chatter_t = 0
+	self:set_difficulty(0)
 	self:_set_rescue_state(true)
 	self._criminal_AI_respawn_clbks = {}
 	self._listener_holder = EventListenerHolder:new()
-	self:set_difficulty(0)
 	self:set_drama_draw_state(Global.drama_draw_state)
 	self._alert_listeners = {}
 	self:_init_unit_type_filters()
@@ -780,7 +780,7 @@ function GroupAIStateBase:_get_spawn_unit_name(weights, wanted_access_type)
 		if suitable and cat_data.max_amount then
 			local special_type = cat_data.special_type
 			local nr_active = self._special_units[special_type] and table.size(self._special_units[special_type]) or 0
-			if nr_active >= cat_data.max_amount then
+			if nr_active >= tweak_data.group_ai.special_unit_spawn_limits[special_type] then
 				suitable = false
 			end
 		end
@@ -969,6 +969,7 @@ function GroupAIStateBase:on_simulation_started()
 	self._police = managers.enemy:all_enemies()
 	self._police_force = table.size(self._police)
 	self._converted_police = {}
+	self:set_difficulty(0)
 	self._criminals = {}
 	self._ai_criminals = {}
 	self._player_criminals = {}
@@ -1367,6 +1368,9 @@ end
 function GroupAIStateBase:on_criminal_neutralized(unit)
 	local criminal_key = unit:key()
 	local record = self._criminals[criminal_key]
+	if not record then
+		return
+	end
 	record.status = "dead"
 	record.arrest_timeout = 0
 	if Network:is_server() then
@@ -1724,7 +1728,6 @@ function GroupAIStateBase:add_special_objective(id, objective_data)
 	if self._special_objectives[id] then
 		self:remove_special_objective(id)
 	end
-	local interval = objective_data.chance_inc >= 0 and 0 <= objective_data.interval and objective_data.interval
 	local chance = objective_data.base_chance
 	local so = {
 		data = objective_data,
@@ -2932,7 +2935,7 @@ function GroupAIStateBase:_map_spawn_points_to_respective_areas(id, spawn_points
 		local amount = new_spawn_point:value("amount")
 		local nav_seg = nav_manager:get_nav_seg_from_pos(pos, true)
 		local area = self:get_area_from_nav_seg_id(nav_seg)
-		local accessibility = new_spawn_point:value("accessibility")
+		local accessibility = new_spawn_point:accessibility()
 		local new_spawn_point_data = {
 			id = id,
 			pos = pos,
@@ -2986,7 +2989,7 @@ function GroupAIStateBase:_map_spawn_groups_to_respective_areas(id, spawn_groups
 				if amount <= 0 then
 					amount = nil
 				end
-				local accessibility = spawn_pt_element:value("accessibility")
+				local accessibility = spawn_pt_element:accessibility()
 				local sp_data = {
 					pos = spawn_pt_element:value("position"),
 					interval = interval,
@@ -4283,4 +4286,14 @@ end
 
 function GroupAIStateBase:get_amount_enemies_converted_to_criminals()
 	return self._converted_police and table.size(self._converted_police)
+end
+
+function GroupAIStateBase._get_group_acces_mask(group)
+	local quadfield = managers.navigation._quad_field
+	local union_mask = quadfield:convert_access_filter_to_number("0")
+	for u_key, u_data in pairs(group.units) do
+		local access_num = u_data.so_access
+		union_mask = quadfield:access_filter_union(access_num, union_mask)
+	end
+	return union_mask
 end

@@ -19,7 +19,9 @@ function CrimeNetFiltersGui:init(ws, fullscreen_ws, node)
 		end)
 	end
 	blur:animate(func)
-	managers.menu:active_menu().input:deactivate_controller_mouse()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:deactivate_controller_mouse()
+	end
 end
 
 function CrimeNetFiltersGui:close()

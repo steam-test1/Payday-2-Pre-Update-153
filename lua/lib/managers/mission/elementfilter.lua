@@ -61,6 +61,10 @@ function ElementFilter:_check_difficulty()
 	if self._values.difficulty_overkill_145 and diff == "overkill_145" then
 		return true
 	end
+	local is_difficulty_overkill_290 = self._values.difficulty_overkill_290 == nil and self._values.difficulty_overkill_145 or self._values.difficulty_overkill_290
+	if is_difficulty_overkill_290 and diff == "overkill_290" then
+		return true
+	end
 	return false
 end
 

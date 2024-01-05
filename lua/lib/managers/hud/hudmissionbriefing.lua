@@ -139,7 +139,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	})
 	local pg_text = self._foreground_layer_one:text({
 		name = "pg_text",
-		text = utf8.to_upper(managers.localization:text("cn_menu_contract_paygrade_header")) .. " ",
+		text = utf8.to_upper(managers.localization:text("menu_risk")),
 		y = padding_y,
 		h = 32,
 		align = "right",
@@ -152,7 +152,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	pg_text:set_size(w, h)
 	local job_stars = managers.job:current_job_stars()
 	local job_and_difficulty_stars = managers.job:current_job_and_difficulty_stars()
-	local difficulty_stars = job_and_difficulty_stars - job_stars
+	local difficulty_stars = managers.job:current_difficulty_stars()
 	local filled_star_rect = {
 		0,
 		32,
@@ -167,33 +167,41 @@ function HUDMissionBriefing:init(hud, workspace)
 	}
 	local num_stars = 0
 	local x = 0
-	local y = 4
+	local y = 0
 	local star_size = 18
+	local panel_w = 0
+	local panel_h = 0
 	local risk_color = tweak_data.screen_colors.risk
-	local level_data = {
-		texture = "guis/textures/pd2/mission_briefing/difficulty_icons",
-		texture_rect = filled_star_rect,
-		w = 16,
-		h = 16,
-		color = tweak_data.screen_colors.text,
-		alpha = 1
+	local risks = {
+		"risk_swat",
+		"risk_fbi",
+		"risk_death_squad"
 	}
-	local risk_data = {
-		texture = "guis/textures/pd2/crimenet_skull",
-		w = 16,
-		h = 16,
-		color = risk_color,
-		alpha = 1
-	}
-	for i = 1, job_and_difficulty_stars do
-		local is_risk = i > job_stars
-		local star_data = is_risk and risk_data or level_data
-		local star = self._paygrade_panel:bitmap(star_data)
-		star:set_position(x, y)
-		x = x + star_size
-		num_stars = num_stars + 1
+	if not Global.SKIP_OVERKILL_290 then
+		table.insert(risks, "risk_murder_squad")
 	end
-	self._paygrade_panel:set_w(10 * star_size)
+	for i, name in ipairs(risks) do
+		local texture, rect = tweak_data.hud_icons:get_icon_data(name)
+		local active = i <= difficulty_stars
+		local color = active and risk_color or tweak_data.screen_colors.text
+		local alpha = active and 1 or 0.25
+		local risk = self._paygrade_panel:bitmap({
+			name = name,
+			texture = texture,
+			texture_rect = rect,
+			x = 0,
+			y = 0,
+			alpha = alpha,
+			color = color
+		})
+		risk:set_position(x, y)
+		x = x + risk:w() + 0
+		panel_w = math.max(panel_w, risk:right())
+		panel_h = math.max(panel_h, risk:h())
+	end
+	pg_text:set_color(risk_color)
+	self._paygrade_panel:set_h(panel_h)
+	self._paygrade_panel:set_w(panel_w)
 	self._paygrade_panel:set_right(self._background_layer_one:w())
 	pg_text:set_right(self._paygrade_panel:left())
 	self._job_schedule_panel = self._background_layer_one:panel({
@@ -301,7 +309,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		text = utf8.to_upper(managers.localization:text("menu_job_overview")),
 		h = content_font_size,
 		align = "left",
-		vertical = "bottom",
+		vertical = "bpttom",
 		font_size = content_font_size,
 		font = content_font,
 		color = tweak_data.screen_colors.text
@@ -309,6 +317,10 @@ function HUDMissionBriefing:init(hud, workspace)
 	local _, _, w, h = job_overview_text:text_rect()
 	job_overview_text:set_size(w, h)
 	job_overview_text:set_leftbottom(self._job_schedule_panel:left(), pg_text:bottom())
+	job_overview_text:set_y(math.round(job_overview_text:y()))
+	self._paygrade_panel:set_center_y(job_overview_text:center_y())
+	pg_text:set_center_y(job_overview_text:center_y())
+	pg_text:set_y(math.round(pg_text:y()))
 	if pg_text:left() <= job_overview_text:right() + 15 then
 		pg_text:move(0, -pg_text:h())
 		self._paygrade_panel:move(0, -pg_text:h())

@@ -8,9 +8,7 @@ function TankCopLogicAttack.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
 		my_data.shooting = old_internal_data.shooting
@@ -38,15 +36,7 @@ function TankCopLogicAttack.exit(data, new_logic_name, enter_params)
 	TankCopLogicAttack._cancel_chase_attempt(data, my_data)
 	data.unit:brain():cancel_all_pathing_searches()
 	CopLogicBase.cancel_queued_tasks(my_data)
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 	data.unit:brain():set_update_enabled_state(true)
 end
 
@@ -114,17 +104,10 @@ function TankCopLogicAttack.update(data)
 			my_data.pathing_to_chase_pos = true
 			local to_pos = my_data.chase_pos
 			my_data.chase_pos = nil
-			if my_data.rsrv_pos.path then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-				my_data.rsrv_pos.path = nil
-			end
-			local reservation = {
+			data.brain:add_pos_rsrv("path", {
 				position = mvector3.copy(to_pos),
-				radius = 70,
-				filter = data.pos_rsrv_id
-			}
-			managers.navigation:add_pos_reservation(reservation)
-			my_data.rsrv_pos.path = reservation
+				radius = 60
+			})
 			unit:brain():search_for_path(my_data.chase_path_search_id, to_pos)
 		elseif focus_enemy.nav_tracker then
 			my_data.chase_pos = CopLogicAttack._find_flank_pos(data, my_data, focus_enemy.nav_tracker)
@@ -167,10 +150,7 @@ function TankCopLogicAttack._cancel_chase_attempt(data, my_data)
 		local new_action = {type = "idle", body_part = 2}
 		data.unit:brain():action_request(new_action)
 	elseif my_data.pathing_to_chase_pos then
-		if my_data.rsrv_pos.path then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.path)
-			my_data.rsrv_pos.path = nil
-		end
+		data.brain:rem_pos_rsrv("path")
 		if data.active_searches[my_data.chase_path_search_id] then
 			managers.navigation:cancel_pathing_search(my_data.chase_path_search_id)
 			data.active_searches[my_data.chase_path_search_id] = nil
@@ -190,26 +170,6 @@ function TankCopLogicAttack.action_complete_clbk(data, action)
 	local my_data = data.internal_data
 	if action_type == "walk" then
 		my_data.advancing = nil
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
-		if action:expired() then
-			my_data.rsrv_pos.stand = my_data.rsrv_pos.move_dest
-			my_data.rsrv_pos.move_dest = nil
-		else
-			if my_data.rsrv_pos.move_dest then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.move_dest)
-				my_data.rsrv_pos.move_dest = nil
-			end
-			local reservation = {
-				position = mvector3.copy(data.m_pos),
-				radius = 70,
-				filter = data.pos_rsrv_id
-			}
-			managers.navigation:add_pos_reservation(reservation)
-			my_data.rsrv_pos.stand = reservation
-		end
 		if my_data.walking_to_chase_pos then
 			my_data.walking_to_chase_pos = nil
 		end
@@ -243,19 +203,14 @@ function TankCopLogicAttack._chk_request_action_walk_to_chase_pos(data, my_data,
 		my_data.chase_path = nil
 		my_data.walking_to_chase_pos = data.unit:brain():action_request(new_action_data)
 		if my_data.walking_to_chase_pos then
-			my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-			my_data.rsrv_pos.path = nil
-			if my_data.rsrv_pos.stand then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-				my_data.rsrv_pos.stand = nil
-			end
+			data.brain:rem_pos_rsrv("path")
 		end
 	end
 end
 
 function TankCopLogicAttack.is_advancing(data)
-	if data.internal_data.walking_to_chase_pos then
-		return data.internal_data.rsrv_pos.move_dest.position
+	if data.internal_data.walking_to_chase_pos and data.pos_rsrv.move_dest then
+		return data.pos_rsrv.move_dest.position
 	end
 end
 

@@ -97,13 +97,16 @@ end
 function BlackMarketManager:_setup_track_global_values()
 	local global_value_items = self._global and self._global.global_value_items or {}
 	Global.blackmarket_manager.global_value_items = global_value_items
+	local new_to_track = false
 	for gv, td in pairs(tweak_data.lootdrop.global_values) do
 		if td.track then
+			new_to_track = new_to_track or not global_value_items[gv] or not global_value_items[gv].crafted_items or not global_value_items[gv].inventory
 			global_value_items[gv] = global_value_items[gv] or {}
 			global_value_items[gv].crafted_items = global_value_items[gv].crafted_items or {}
 			global_value_items[gv].inventory = global_value_items[gv].inventory or {}
 		end
 	end
+	return new_to_track
 end
 
 function BlackMarketManager:_setup_masks()
@@ -441,6 +444,10 @@ end
 function BlackMarketManager:equip_melee_weapon(melee_weapon_id)
 	for s, data in pairs(Global.blackmarket_manager.melee_weapons) do
 		data.equipped = s == melee_weapon_id
+	end
+	local equipped = managers.blackmarket:equipped_melee_weapon()
+	if equipped == tweak_data.achievement.demise_knuckles then
+		managers.achievment:award("death_31")
 	end
 	MenuCallbackHandler:_update_outfit_information()
 end
@@ -1077,7 +1084,13 @@ function BlackMarketManager:fetch_new_items_unlocked()
 	for category, value in pairs(self._global.new_item_type_unlocked) do
 		if value then
 			table.insert(data, {category, value})
-			self._global.new_item_type_unlocked[category] = false
+			if category == "announcements" then
+				for announcement_id, data in pairs(value) do
+					self._global.new_item_type_unlocked[category][announcement_id] = false
+				end
+			else
+				self._global.new_item_type_unlocked[category] = false
+			end
 		end
 	end
 	return data
@@ -1146,7 +1159,7 @@ end
 function BlackMarketManager:got_new_drop(global_value, category, id)
 	local category_ids = Idstring(category)
 	if category_ids == Idstring("primaries") or category_ids == Idstring("secondaries") then
-		local uses_parts = managers.weapon_factory:get_parts_from_factory_id(id)
+		local uses_parts = managers.weapon_factory:get_parts_from_factory_id(id) or {}
 		for type, parts in pairs(uses_parts) do
 			for _, part in ipairs(parts) do
 				if self:check_new_drop("normal", "weapon_mods", part) then
@@ -1166,7 +1179,7 @@ function BlackMarketManager:got_new_drop(global_value, category, id)
 		end
 	elseif category_ids == Idstring("weapon_tabs") then
 		local uses_parts = managers.weapon_factory:get_parts_from_factory_id(id)
-		local tab_parts = uses_parts[global_value] or {}
+		local tab_parts = uses_parts and uses_parts[global_value] or {}
 		for type, part in ipairs(tab_parts) do
 			if self:check_new_drop("normal", "weapon_mods", part) then
 				return true
@@ -1386,11 +1399,7 @@ function BlackMarketManager:get_weapon_stats_with_mod(category, slot, part_id, r
 	if not (blueprint and weapon) or not weapon_tweak_data then
 		return
 	end
-	if remove_mod then
-		managers.weapon_factory:remove_part_from_blueprint(part_id, blueprint)
-	else
-		managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint)
-	end
+	managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint, remove_mod)
 	local weapon_stats = managers.weapon_factory:get_stats(weapon.factory_id, blueprint)
 	for stat, value in pairs(weapon_tweak_data.stats) do
 		weapon_stats[stat] = (weapon_stats[stat] or 0) + weapon_tweak_data.stats[stat]
@@ -1928,9 +1937,14 @@ function BlackMarketManager:on_unaquired_weapon_platform(upgrade, id)
 end
 
 function BlackMarketManager:on_aquired_melee_weapon(upgrade, id, loading)
+	if not self._global.melee_weapons[id] then
+		Application:error("[BlackMarketManager:on_aquired_melee_weapon] Melee weapon do not exist in blackmarket", "melee_weapon_id", id)
+		return
+	end
 	self._global.melee_weapons[id].unlocked = true
 	self._global.melee_weapons[id].owned = true
 	if not loading then
+		print("on_aquired_melee_weapon", inspect(upgrade), id, loading)
 		self._global.new_drops.normal = self._global.new_drops.normal or {}
 		self._global.new_drops.normal.melee_weapons = self._global.new_drops.normal.melee_weapons or {}
 		self._global.new_drops.normal.melee_weapons[id] = true
@@ -2017,7 +2031,7 @@ function BlackMarketManager:on_sell_weapon_part(part_id, global_value)
 	self:remove_item(global_value, "weapon_mods", part_id)
 end
 
-function BlackMarketManager:on_sell_weapon(category, slot)
+function BlackMarketManager:on_sell_weapon(category, slot, skip_verification)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		return
 	end
@@ -2034,11 +2048,13 @@ function BlackMarketManager:on_sell_weapon(category, slot)
 	end
 	managers.money:on_sell_weapon(category, slot)
 	self._global.crafted_items[category][slot] = nil
-	self:_verfify_equipped_category(category)
-	if category == "primaries" then
-		self:_update_menu_scene_primary()
-	elseif category == "secondaries" then
-		self:_update_menu_scene_secondary()
+	if not skip_verification then
+		self:_verfify_equipped_category(category)
+		if category == "primaries" then
+			self:_update_menu_scene_primary()
+		elseif category == "secondaries" then
+			self:_update_menu_scene_secondary()
+		end
 	end
 end
 
@@ -2066,14 +2082,14 @@ function BlackMarketManager:_update_menu_scene_secondary()
 	end
 end
 
-function BlackMarketManager:get_modify_weapon_consequence(category, slot, part_id)
+function BlackMarketManager:get_modify_weapon_consequence(category, slot, part_id, remove_part)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		Application:error("[BlackMarketManager:get_modify_weapon_consequence] Weapon doesn't exist", category, slot)
 		return
 	end
 	local craft_data = self._global.crafted_items[category][slot]
-	local replaces = managers.weapon_factory:get_replaces_parts(craft_data.factory_id, part_id, craft_data.blueprint)
-	local removes = managers.weapon_factory:get_removes_parts(craft_data.factory_id, part_id, craft_data.blueprint)
+	local replaces = managers.weapon_factory:get_replaces_parts(craft_data.factory_id, part_id, craft_data.blueprint, remove_part)
+	local removes = managers.weapon_factory:get_removes_parts(craft_data.factory_id, part_id, craft_data.blueprint, remove_part)
 	return replaces, removes
 end
 
@@ -2083,8 +2099,7 @@ function BlackMarketManager:can_modify_weapon(category, slot, part_id)
 		return
 	end
 	local craft_data = self._global.crafted_items[category][slot]
-	local forbids = managers.weapon_factory:can_add_part(craft_data.factory_id, part_id, craft_data.blueprint)
-	return forbids
+	return managers.weapon_factory:can_add_part(craft_data.factory_id, part_id, craft_data.blueprint)
 end
 
 function BlackMarketManager:remove_weapon_part(category, slot, global_value, part_id)
@@ -2092,8 +2107,10 @@ function BlackMarketManager:remove_weapon_part(category, slot, global_value, par
 		Application:error("[BlackMarketManager:remove_weapon_part] Trying to remove part", part_id, "from weapon that doesn't exist", category, slot)
 		return false
 	end
+	self:modify_weapon(category, slot, global_value, part_id, true)
+	do return true end
 	local craft_data = self._global.crafted_items[category][slot]
-	managers.weapon_factory:remove_part_from_blueprint(part_id, craft_data.blueprint)
+	managers.weapon_factory:change_part_blueprint_only(craft_data.factory_id, part_id, craft_data.blueprint)
 	self:_on_modified_weapon(category, slot)
 	local given_global_value = global_value
 	local global_value = craft_data.global_values or {}
@@ -2110,14 +2127,14 @@ function BlackMarketManager:remove_weapon_part(category, slot, global_value, par
 	return true
 end
 
-function BlackMarketManager:modify_weapon(category, slot, global_value, part_id)
+function BlackMarketManager:modify_weapon(category, slot, global_value, part_id, remove_part)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		Application:error("[BlackMarketManager:modify_weapon] Trying to modify weapon that doesn't exist", category, slot)
 		return
 	end
-	local replaces, removes = self:get_modify_weapon_consequence(category, slot, part_id)
+	local replaces, removes = self:get_modify_weapon_consequence(category, slot, part_id, remove_part)
 	local craft_data = self._global.crafted_items[category][slot]
-	managers.weapon_factory:change_part_blueprint_only(craft_data.factory_id, part_id, craft_data.blueprint)
+	managers.weapon_factory:change_part_blueprint_only(craft_data.factory_id, part_id, craft_data.blueprint, remove_part)
 	craft_data.global_values = craft_data.global_values or {}
 	local old_gv = "" .. (craft_data.global_values[part_id] or "normal")
 	craft_data.global_values[part_id] = global_value or "normal"
@@ -2192,10 +2209,11 @@ function BlackMarketManager:view_weapon(category, slot, open_node_cb)
 		return
 	end
 	local weapon = self._global.crafted_items[category][slot]
+	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, weapon.blueprint)
 	table.insert(self._preloading_list, {
 		done_cb = function()
-			managers.menu_scene:spawn_item_weapon(weapon.factory_id, weapon.blueprint)
+			managers.menu_scene:spawn_item_weapon(weapon.factory_id, weapon.blueprint, texture_switches)
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
@@ -2208,11 +2226,12 @@ function BlackMarketManager:view_weapon_with_mod(category, slot, part_id, open_n
 	end
 	local weapon = self._global.crafted_items[category][slot]
 	local blueprint = deep_clone(weapon.blueprint)
+	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
 	managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, weapon.blueprint)
 	table.insert(self._preloading_list, {
 		done_cb = function()
-			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint)
+			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, texture_switches)
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
@@ -2225,11 +2244,12 @@ function BlackMarketManager:view_weapon_without_mod(category, slot, part_id, ope
 	end
 	local weapon = self._global.crafted_items[category][slot]
 	local blueprint = deep_clone(weapon.blueprint)
-	managers.weapon_factory:remove_part_from_blueprint(part_id, blueprint)
+	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
+	managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint, true)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, blueprint)
 	table.insert(self._preloading_list, {
 		done_cb = function()
-			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint)
+			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, texture_switches)
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
@@ -2244,6 +2264,10 @@ function BlackMarketManager:get_melee_weapon_data(melee_weapon_id)
 end
 
 function BlackMarketManager:on_aquired_armor(upgrade, id, loading)
+	if not self._global.armors[upgrade.armor_id] then
+		Application:error("[BlackMarketManager:on_aquired_armor] Armor do not exist in blackmarket", "armor_id", upgrade.armor_id)
+		return
+	end
 	self._global.armors[upgrade.armor_id].unlocked = true
 	self._global.armors[upgrade.armor_id].owned = true
 	if not loading then
@@ -2297,6 +2321,89 @@ function BlackMarketManager:get_category_default(category)
 	return self._defaults and self._defaults[category]
 end
 
+function BlackMarketManager:set_part_texture_switch(category, slot, part_id, data_string)
+	local part_data = tweak_data.weapon.factory.parts[part_id]
+	if not part_data then
+		Applicaton:error("[BlackMarketManager:set_part_texture_switch] Part do not exist", "category", category, "slot", slot, "part_id", part_id, "texture_id", texture_id)
+		return
+	end
+	if not part_data.texture_switch then
+		return
+	end
+	local crafted_category = self._global.crafted_items[category]
+	local crafted_item = crafted_category and crafted_category[slot]
+	if not crafted_item then
+		Application:error("[BlackMarketManager:set_part_texture_switch] crafted_item do not exist", "category", category, "slot", slot, "part_id", part_id, "texture_id", texture_id)
+		return
+	end
+	crafted_item.texture_switches = crafted_item.texture_switches or {}
+	crafted_item.texture_switches[part_id] = data_string
+end
+
+function BlackMarketManager:get_part_texture_switch_data(category, slot, part_id)
+	local crafted_category = self._global.crafted_items[category]
+	local crafted_item = crafted_category and crafted_category[slot]
+	local texture_switches = crafted_item and crafted_item.texture_switches
+	local data_string = texture_switches and texture_switches[part_id] or ""
+	local color_index, type_index = unpack(string.split(data_string, " "))
+	color_index = tonumber(color_index)
+	type_index = tonumber(type_index)
+	return color_index, type_index
+end
+
+function BlackMarketManager:get_part_texture_switch(category, slot, part_id)
+	local crafted_category = self._global.crafted_items[category]
+	local crafted_item = crafted_category and crafted_category[slot]
+	local texture_switches = crafted_item and crafted_item.texture_switches
+	if not texture_switches then
+		return
+	end
+	local data_string = texture_switches and texture_switches[part_id] or ""
+	return self:get_texture_switch_from_data(data_string, part_id)
+end
+
+function BlackMarketManager:get_texture_switch_from_data(data_string, part_id)
+	local part_data = tweak_data.weapon.factory.parts[part_id]
+	if not part_data then
+		Application:error("[BlackMarketManager:get_part_texture_switch] Part do not exists", "category", category, "slot", slot, "part_id", part_id)
+		return
+	end
+	if not part_data.texture_switch then
+		return
+	end
+	local color_index, type_index = unpack(string.split(data_string, " "))
+	color_index = tonumber(color_index)
+	type_index = tonumber(type_index)
+	local switch_data = tweak_data.gui.weapon_texture_switches.types[part_data.type]
+	local weapon_texture_switch = switch_data and switch_data[type_index]
+	weapon_texture_switch = weapon_texture_switch and weapon_texture_switch.texture_path or ""
+	if color_index == 1 then
+		return weapon_texture_switch
+	end
+	local color = tweak_data.gui.weapon_texture_switches.color_indexes[color_index]
+	if not color then
+		return
+	end
+	local texture
+	local suffix = switch_data.suffix
+	if suffix then
+		local pattern = "(%d+)(" .. suffix .. ")"
+		local replace = "%1_" .. color .. "%2"
+		texture = string.gsub(weapon_texture_switch, pattern, replace)
+	else
+		texture = weapon_texture_switch .. "_" .. color
+	end
+	return texture
+end
+
+function BlackMarketManager:get_weapon_texture_switches(category, slot, weapon)
+	weapon = weapon or self._global.crafted_items[category][slot]
+	if not weapon then
+		return
+	end
+	return weapon.texture_switches
+end
+
 function BlackMarketManager:aquire_default_masks()
 	print("BlackMarketManager:aquire_default_masks()", self._global.crafted_items.masks)
 	if not self._global.crafted_items.masks then
@@ -2322,10 +2429,24 @@ function BlackMarketManager:start_customize_mask(slot)
 	self._customize_mask.slot = slot
 	self._customize_mask.mask_id = mask.mask_id
 	self._customize_mask.global_value = mask.global_value
-	self._customize_mask.textures = {
-		id = "no_color_full_material",
-		global_value = "normal"
-	}
+	self._customize_mask.default_blueprint = self:get_mask_default_blueprint(mask.mask_id) or {}
+	local default_color = self._customize_mask.default_blueprint.color or {}
+	local default_pattern = self._customize_mask.default_blueprint.pattern or {}
+	local default_material = self._customize_mask.default_blueprint.material or {}
+	if default_color.id ~= "nothing" then
+		self._customize_mask.colors = default_color
+	end
+	if default_pattern.id ~= "no_color_no_material" then
+		self._customize_mask.textures = default_pattern
+	else
+		self._customize_mask.textures = {
+			id = "no_color_full_material",
+			global_value = "normal"
+		}
+	end
+	if default_material.id ~= "plastic" then
+		self._customize_mask.materials = default_material
+	end
 	self:view_mask(slot)
 end
 
@@ -2349,18 +2470,81 @@ function BlackMarketManager:customize_mask_category_id(category)
 end
 
 function BlackMarketManager:customize_mask_category_default(category, include_color)
+	local default_blueprint = self._customize_mask and self._customize_mask.default_blueprint or {}
 	if category == "colors" then
 		if include_color then
-			return {id = "nothing", global_value = "normal"}
+			return default_blueprint.colors or {id = "nothing", global_value = "normal"}
 		end
 	elseif category == "textures" then
-		return {
+		return default_blueprint.textures or {
 			id = "no_color_full_material",
 			global_value = "normal"
 		}
 	elseif category == "materials" then
-		return {id = "plastic", global_value = "normal"}
+		return default_blueprint.materials or {id = "plastic", global_value = "normal"}
 	end
+end
+
+function BlackMarketManager:get_mask_default_blueprint(mask_id)
+	local mask_tweak_data = tweak_data.blackmarket.masks[mask_id]
+	local default_blueprint = {}
+	default_blueprint.color = {id = "nothing", global_value = "normal"}
+	default_blueprint.pattern = {
+		id = "no_color_no_material",
+		global_value = "normal"
+	}
+	default_blueprint.material = {id = "plastic", global_value = "normal"}
+	default_blueprint.colors = default_blueprint.color
+	default_blueprint.textures = default_blueprint.pattern
+	default_blueprint.materials = default_blueprint.material
+	if not mask_tweak_data then
+		return default_blueprint
+	end
+	local mask_default_blueprint = mask_tweak_data.default_blueprint
+	if mask_default_blueprint then
+		local get_global_value_func = function(data)
+			local global_value = data.infamous and "infamous" or data.global_value or data.dlc or data.dlcs and data.dlcs[1] or "normal"
+			return global_value
+		end
+		local got_material = false
+		local got_pattern = false
+		local got_color = false
+		local color_id = mask_default_blueprint.color or mask_default_blueprint.colors
+		local color_tweak_data = color_id and tweak_data.blackmarket.colors[color_id]
+		if color_tweak_data then
+			local global_value = get_global_value_func(color_tweak_data)
+			local color = color_tweak_data and {id = color_id, global_value = global_value}
+			default_blueprint.color = color or default_blueprint.color
+			default_blueprint.colors = default_blueprint.color
+			got_color = true
+		end
+		local texture_id = mask_default_blueprint.pattern or mask_default_blueprint.textures
+		local texture_tweak_data = texture_id and tweak_data.blackmarket.textures[texture_id]
+		if texture_tweak_data then
+			local global_value = get_global_value_func(texture_tweak_data)
+			local pattern = texture_tweak_data and {id = texture_id, global_value = global_value}
+			default_blueprint.pattern = pattern or default_blueprint.pattern
+			default_blueprint.textures = default_blueprint.pattern
+			got_pattern = true
+		end
+		local material_id = mask_default_blueprint.material or mask_default_blueprint.materials
+		local material_tweak_data = material_id and tweak_data.blackmarket.materials[material_id]
+		if material_tweak_data then
+			local global_value = get_global_value_func(material_tweak_data)
+			local material = material_tweak_data and {id = material_id, global_value = global_value}
+			default_blueprint.material = material or default_blueprint.material
+			default_blueprint.materials = default_blueprint.material
+			got_material = true
+		end
+		if got_material and not got_pattern then
+			default_blueprint.pattern = {
+				id = "no_color_full_material",
+				global_value = "normal"
+			}
+			default_blueprint.textures = default_blueprint.pattern
+		end
+	end
+	return default_blueprint
 end
 
 function BlackMarketManager:get_customize_mask_id()
@@ -2395,7 +2579,7 @@ function BlackMarketManager:abort_customize_mask()
 	managers.menu_scene:remove_item()
 end
 
-function BlackMarketManager:get_info_from_mask_blueprint(blueprint)
+function BlackMarketManager:get_info_from_mask_blueprint(blueprint, mask_id)
 	local got_material = blueprint.material
 	local got_pattern = blueprint.pattern
 	local got_color = blueprint.color
@@ -2422,13 +2606,13 @@ function BlackMarketManager:get_info_from_mask_blueprint(blueprint)
 		is_good = got_color and true or false
 	})
 	if got_material then
-		status[1].price = managers.money:get_mask_part_price_modified("materials", blueprint.material.id, blueprint.material.global_value)
+		status[1].price = managers.money:get_mask_part_price_modified("materials", blueprint.material.id, blueprint.material.global_value, mask_id)
 	end
 	if got_pattern then
-		status[2].price = managers.money:get_mask_part_price_modified("textures", blueprint.pattern.id, blueprint.pattern.global_value)
+		status[2].price = managers.money:get_mask_part_price_modified("textures", blueprint.pattern.id, blueprint.pattern.global_value, mask_id)
 	end
 	if got_color then
-		status[3].price = managers.money:get_mask_part_price_modified("colors", blueprint.color.id, blueprint.color.global_value)
+		status[3].price = managers.money:get_mask_part_price_modified("colors", blueprint.color.id, blueprint.color.global_value, mask_id)
 	end
 	if status[2].is_good and Idstring(blueprint.pattern.id) == Idstring("no_color_full_material") then
 		status[2].override = "colors"
@@ -2454,7 +2638,7 @@ function BlackMarketManager:get_customize_mask_blueprint()
 end
 
 function BlackMarketManager:info_customize_mask()
-	return self:get_info_from_mask_blueprint(self:get_customize_mask_blueprint())
+	return self:get_info_from_mask_blueprint(self:get_customize_mask_blueprint(), self._customize_mask.mask_id)
 end
 
 function BlackMarketManager:can_view_customized_mask()
@@ -2509,7 +2693,7 @@ function BlackMarketManager:view_customized_mask_with_mod(category, id)
 	blueprint.material = modded.materials
 	if not blueprint.color then
 		blueprint.pattern = self:customize_mask_category_default("textures")
-		blueprint.color = {id = "nothing", global_value = "normal"}
+		blueprint.color = self:customize_mask_category_default("colors", true)
 	end
 	self:view_mask_with_blueprint(slot, blueprint)
 end
@@ -2519,17 +2703,18 @@ function BlackMarketManager:get_customized_mask_blueprint()
 	blueprint.color = self._customize_mask.colors
 	blueprint.pattern = self._customize_mask.textures
 	blueprint.material = self._customize_mask.materials
+	local default_blueprint = self._customize_mask.default_blueprint or {}
 	if not blueprint.color then
-		blueprint.color = {id = "nothing", global_value = "normal"}
+		blueprint.color = default_blueprint.color or {id = "nothing", global_value = "normal"}
 	end
 	if Idstring(blueprint.pattern.id) == Idstring("no_color_full_material") then
-		blueprint.color = {id = "nothing", global_value = "normal"}
+		blueprint.color = default_blueprint.color or {id = "nothing", global_value = "normal"}
 	end
 	if Idstring(blueprint.pattern.id) == Idstring("solidfirst") then
-		blueprint.material = {id = "plastic", global_value = "normal"}
+		blueprint.material = default_blueprint.material or {id = "plastic", global_value = "normal"}
 	end
 	if Idstring(blueprint.pattern.id) == Idstring("solidsecond") then
-		blueprint.material = {id = "plastic", global_value = "normal"}
+		blueprint.material = default_blueprint.material or {id = "plastic", global_value = "normal"}
 	end
 	return blueprint
 end
@@ -2572,26 +2757,43 @@ end
 function BlackMarketManager:finish_customize_mask()
 	print("finish_customize_mask", inspect(self._customize_mask))
 	local blueprint = self:get_customized_mask_blueprint()
+	local default_blueprint = self._customize_mask.default_blueprint or {}
 	local slot = self._customize_mask.slot
-	managers.money:on_buy_mask(self._customize_mask.mask_id, self._customize_mask.global_value, blueprint)
-	self._customize_mask.textures = self._customize_mask.textures or {
+	managers.money:on_buy_mask(self._customize_mask.mask_id, self._customize_mask.global_value, blueprint, default_blueprint)
+	self._customize_mask.textures = self._customize_mask.textures or default_blueprint.textures or {
 		id = "no_color_full_material",
 		global_value = "normal"
 	}
-	self._customize_mask.materials = self._customize_mask.materials or {id = "plastic", global_value = "normal"}
-	if Idstring(blueprint.pattern.id) ~= Idstring("no_color_full_material") then
-		self:remove_item(blueprint.color.global_value, "colors", blueprint.color.id)
-		self:alter_global_value_item(blueprint.color.global_value, "colors", slot, blueprint.color.id, INV_TO_CRAFT)
-		self:remove_item(blueprint.pattern.global_value, "textures", blueprint.pattern.id)
-		self:alter_global_value_item(blueprint.pattern.global_value, "textures", slot, blueprint.pattern.id, INV_TO_CRAFT)
+	self._customize_mask.materials = self._customize_mask.materials or default_blueprint.materials or {id = "plastic", global_value = "normal"}
+	local pattern_ids = Idstring(blueprint.pattern.id)
+	if pattern_ids ~= Idstring("no_color_full_material") then
+		local default_color = self:customize_mask_category_default("colors", true) or {}
+		if blueprint.color.id ~= default_color.id then
+			self:remove_item(blueprint.color.global_value, "colors", blueprint.color.id)
+			self:alter_global_value_item(blueprint.color.global_value, "colors", slot, blueprint.color.id, INV_TO_CRAFT)
+		else
+			Application:debug("default color", blueprint.color.id)
+		end
+		local default_pattern = self:customize_mask_category_default("textures", true) or {}
+		if blueprint.pattern.id ~= default_pattern.id then
+			self:remove_item(blueprint.pattern.global_value, "textures", blueprint.pattern.id)
+			self:alter_global_value_item(blueprint.pattern.global_value, "textures", slot, blueprint.pattern.id, INV_TO_CRAFT)
+		else
+			Application:debug("default pattern", blueprint.pattern.id)
+		end
 	else
-		blueprint.color = {id = "nothing", global_value = "normal"}
+		blueprint.color = default_blueprint.color or {id = "nothing", global_value = "normal"}
 	end
 	if Idstring(blueprint.pattern.id) ~= Idstring("solidfirst") and Idstring(blueprint.pattern.id) ~= Idstring("solidsecond") then
-		self:remove_item(blueprint.material.global_value, "materials", blueprint.material.id)
-		self:alter_global_value_item(blueprint.material.global_value, "materials", slot, blueprint.material.id, INV_TO_CRAFT)
+		local default_material = self:customize_mask_category_default("materials", true) or {}
+		if blueprint.material.id ~= default_material.id then
+			self:remove_item(blueprint.material.global_value, "materials", blueprint.material.id)
+			self:alter_global_value_item(blueprint.material.global_value, "materials", slot, blueprint.material.id, INV_TO_CRAFT)
+		else
+			Application:debug("default material", blueprint.material.id)
+		end
 	else
-		blueprint.material = {id = "plastic", global_value = "normal"}
+		blueprint.material = default_blueprint.material or {id = "plastic", global_value = "normal"}
 	end
 	self._customize_mask = nil
 	self:set_mask_blueprint(slot, blueprint)
@@ -2614,13 +2816,14 @@ end
 function BlackMarketManager:on_buy_mask(mask_id, global_value, slot)
 	local category = "masks"
 	self._global.crafted_items[category] = self._global.crafted_items[category] or {}
+	local default_blueprint = self:get_mask_default_blueprint(mask_id)
 	local blueprint = {}
-	blueprint.color = {id = "nothing", global_value = "normal"}
-	blueprint.pattern = {
+	blueprint.color = default_blueprint.color or {id = "nothing", global_value = "normal"}
+	blueprint.pattern = default_blueprint.pattern or {
 		id = "no_color_no_material",
 		global_value = "normal"
 	}
-	blueprint.material = {id = "plastic", global_value = "normal"}
+	blueprint.material = default_blueprint.material or {id = "plastic", global_value = "normal"}
 	self._global.crafted_items[category][slot] = {
 		mask_id = mask_id,
 		global_value = global_value,
@@ -2655,16 +2858,14 @@ function BlackMarketManager:on_sell_inventory_mask(mask_id, global_value)
 	end
 end
 
-function BlackMarketManager:on_sell_mask(slot)
+function BlackMarketManager:on_sell_mask(slot, skip_verification)
 	local category = "masks"
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		return
 	end
+	local equipped_mask_slot = self:equipped_mask_slot()
 	local mask = self._global.crafted_items[category][slot]
 	managers.money:on_sell_mask(mask.mask_id, mask.global_value, mask.blueprint)
-	if slot == self:equipped_mask_slot() then
-		self:equip_mask(1)
-	end
 	local blueprint = mask.blueprint or {}
 	for category, part in pairs(blueprint) do
 		local converted_category = category == "color" and "colors" or category == "material" and "materials" or category == "pattern" and "textures" or category
@@ -2677,9 +2878,14 @@ function BlackMarketManager:on_sell_mask(slot)
 	end
 	self:alter_global_value_item(mask.global_value, category, slot, mask.mask_id, CRAFT_REMOVE)
 	self._global.crafted_items[category][slot] = nil
-	self:_verfify_equipped_category(category)
 	if managers.money:get_mask_sell_value(mask.mask_id, mask.global_value, {}) == 0 then
 		managers.blackmarket:add_to_inventory(mask.global_value, category, mask.mask_id, true)
+	end
+	if not skip_verification then
+		if slot == equipped_mask_slot then
+			self:equip_mask(1)
+		end
+		self:_verfify_equipped_category(category)
 	end
 end
 
@@ -2922,7 +3128,10 @@ function BlackMarketManager:load(data)
 				self._global.armors[armor].equipped = false
 			end
 		end
-		self._global.armors[self._global.equipped_armor or self._defaults.armor].equipped = true
+		if not self._global.equipped_armor or not self._global.armors[self._global.equipped_armor] then
+			self._global.equipped_armor = self._defaults.armor
+		end
+		self._global.armors[self._global.equipped_armor].equipped = true
 		self._global.equipped_armor = nil
 		self._global.grenades = default_global.grenades or {}
 		if self._global.grenades[self._defaults.grenade] then
@@ -2969,6 +3178,9 @@ function BlackMarketManager:load(data)
 			self._global.weapons[weapon].skill_based = got_parent or not is_default and weapon_level == 0 and not tweak_data.weapon[weapon].global_value
 		end
 		self._global._preferred_character = self._global._preferred_character or self._defaults.preferred_character
+		if not CriminalsManager.convert_old_to_new_character_workname(self._global._preferred_character) then
+			self._global._preferred_character = self._defaults.preferred_character
+		end
 		for character, _ in pairs(tweak_data.blackmarket.characters) do
 			if not self._global.characters[character] then
 				self._global.characters[character] = {
@@ -2996,18 +3208,54 @@ function BlackMarketManager:load(data)
 		end
 		self._global.new_drops = self._global.new_drops or {}
 		self._global.new_item_type_unlocked = self._global.new_item_type_unlocked or {}
+		local old_drops = {}
 		for global_value, categories in pairs(self._global.new_drops) do
 			for category, ids in pairs(categories) do
 				for id in pairs(ids) do
 					if id and tweak_data.blackmarket[category] and not tweak_data.blackmarket[category][id] then
 						Application:error("[BlackMarketManager:load] New drop no longer exists!", "global_value", global_value, "category", category, "id", id)
 						self._global.new_drops[global_value][category][id] = false
+						old_drops[global_value] = old_drops[global_value] or {}
+						old_drops[global_value][category] = old_drops[global_value][category] or {}
+						old_drops[global_value][category][id] = true
+					elseif category == "primaries" or category == "secondaries" then
+						local weapon_id = id or managers.weapon_factory:get_weapon_id_by_factory_id(id)
+						local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(id) or id
+						if not (factory_id and tweak_data.weapon.factory[factory_id] and weapon_id) or not tweak_data.weapon[weapon_id] then
+							Application:error("[BlackMarketManager:load] New drop weapon no longer exists!", "global_value", global_value, "category", category, "weapon_id", weapon_id, "factory_id", factory_id)
+							self._global.new_drops[global_value][category][id] = false
+							old_drops[global_value] = old_drops[global_value] or {}
+							old_drops[global_value][category] = old_drops[global_value][category] or {}
+							old_drops[global_value][category][id] = true
+						end
+					end
+				end
+			end
+		end
+		for global_value, categories in pairs(old_drops) do
+			for category, ids in pairs(categories) do
+				for id in pairs(ids) do
+					if self._global.new_drops[global_value] then
+						if self._global.new_drops[global_value][category] then
+							self._global.new_drops[global_value][category][id] = nil
+							if table.size(self._global.new_drops[global_value][category]) == 0 then
+								self._global.new_drops[global_value][category] = nil
+							end
+						end
+						if table.size(self._global.new_drops[global_value]) == 0 then
+							self._global.new_drops[global_value] = nil
+						end
 					end
 				end
 			end
 		end
 		for category, id in pairs(self._global.new_item_type_unlocked) do
-			if id and tweak_data.blackmarket[category] and not tweak_data.blackmarket[category][id] then
+			if category == "announcements" then
+				if type(id) ~= "table" then
+					Application:error("[BlackMarketManager:load] 'New item type unlocked' announcements was not a table", "announcements", id)
+					self._global.new_item_type_unlocked[category] = {}
+				end
+			elseif id and tweak_data.blackmarket[category] and not tweak_data.blackmarket[category][id] then
 				debug_pause("[BlackMarketManager:load] 'New item type unlocked' no longer exists!", "category", category, "id", id)
 				self._global.new_item_type_unlocked[category] = false
 			elseif category == "primaries" or category == "secondaries" then
@@ -3029,10 +3277,68 @@ function BlackMarketManager:load(data)
 				end
 			end
 		end
-		if not self._global.global_value_items then
-			self:_setup_track_global_values()
+		self._refill_global_values = self:_setup_track_global_values() or nil
+	end
+end
+
+function BlackMarketManager:refill_track_global_values()
+	Application:debug("[BlackMarketManager:refill_track_global_values] Refilling Global.blackmarket_manager.global_value_items")
+	local global_value_items = Global.blackmarket_manager.global_value_items
+	local new_global_value_items = {}
+	for global_value, data in pairs(global_value_items) do
+		new_global_value_items[global_value] = {}
+		new_global_value_items[global_value].crafted_items = {}
+		new_global_value_items[global_value].inventory = {}
+	end
+	local crafted_items = Global.blackmarket_manager.crafted_items or {}
+	local primaries = crafted_items.primaries
+	local secondaries = crafted_items.secondaries
+	local masks = crafted_items.masks
+	local crafted_weapons = {primaries = primaries, secondaries = secondaries}
+	local global_values
+	
+	local function add_crafted_item_func(global_value, category, slot, id)
+		local global_value_item = new_global_value_items[global_value]
+		if global_value_item and global_value_item.crafted_items then
+			global_value_item.crafted_items[category] = global_value_item.crafted_items[category] or {}
+			global_value_item.crafted_items[category][slot] = global_value_item.crafted_items[category][slot] or {}
+			global_value_item.crafted_items[category][slot][id] = (global_value_item.crafted_items[category][slot][id] or 0) + 1
 		end
 	end
+	
+	local function add_inventory_item_func(global_value, category, id, num)
+		local global_value_item = new_global_value_items[global_value]
+		if global_value_item and global_value_item.inventory then
+			global_value_item.inventory[category] = global_value_item.inventory[category] or {}
+			global_value_item.inventory[category][id] = (global_value_item.inventory[category][id] or 0) + (num or 1)
+		end
+	end
+	
+	for category, category_data in pairs(crafted_weapons) do
+		for slot, data in pairs(category_data) do
+			global_values = data.global_values or {}
+			for part_id, global_value in pairs(global_values) do
+				add_crafted_item_func(global_value, category, slot, part_id)
+			end
+		end
+	end
+	for slot, data in pairs(masks) do
+		local mask_global_value = data.global_value
+		add_crafted_item_func(mask_global_value, "masks", slot, data.mask_id)
+		for category, item in pairs(data.blueprint or {}) do
+			local converted_category = category == "color" and "colors" or category == "material" and "materials" or category == "pattern" and "textures" or category
+			add_crafted_item_func(item.global_value, converted_category, slot, item.id)
+		end
+	end
+	for global_value, data in pairs(Global.blackmarket_manager.inventory) do
+		for category, cat_data in pairs(data) do
+			for id, num in pairs(cat_data) do
+				add_inventory_item_func(global_value, category, id, num)
+			end
+		end
+	end
+	Application:debug("[BlackMarketManager:refill_track_global_values] Refill done")
+	Global.blackmarket_manager.global_value_items = new_global_value_items
 end
 
 function BlackMarketManager:_load_done()
@@ -3068,58 +3374,96 @@ end
 
 function BlackMarketManager:verify_dlc_items()
 	self:_cleanup_blackmarket()
+	if self._refill_global_values then
+		self._refill_global_values = nil
+		self:refill_track_global_values()
+	end
 	self:_verify_dlc_items()
 	self:_load_done()
 end
 
 function BlackMarketManager:_cleanup_blackmarket()
+	Application:debug("[BlackMarketManager:_cleanup_blackmarket] STARTING BLACKMARKET CLEANUP")
+	Application:debug("----------------------------------------------------------------------")
 	local crafted_items = self._global.crafted_items
+	for category, data in pairs(crafted_items) do
+		if not data or type(data) ~= "table" then
+			Application:error("BlackMarketManager:_cleanup_blackmarket() Crafted items category invalid", "category", category, "data", inspect(data))
+			self._global.crafted_items[category] = {}
+		end
+	end
 	local crafted_masks = crafted_items.masks
+	local chk_global_value_func = function(global_value)
+		return tweak_data.lootdrop.global_values[global_value or "normal"] and true or false
+	end
 	local cleanup_mask = false
 	for i, mask in pairs(crafted_masks) do
-		if i ~= 1 then
-			cleanup_mask = tweak_data.blackmarket.masks[mask.mask_id] == nil
-			local blueprint = mask.blueprint or {}
-			if not cleanup_mask then
-				for part_type, data in pairs(blueprint) do
-					local converted_category = part_type == "color" and "colors" or part_type == "material" and "materials" or part_type == "pattern" and "textures" or part_type
-					cleanup_mask = tweak_data.blackmarket[converted_category][data.id] == nil
-					if cleanup_mask then
-						break
-					end
+		cleanup_mask = not tweak_data.blackmarket.masks[mask.mask_id]
+		cleanup_mask = cleanup_mask or not chk_global_value_func(mask.global_value)
+		local blueprint = mask.blueprint or {}
+		if not cleanup_mask then
+			for part_type, data in pairs(blueprint) do
+				local converted_category = part_type == "color" and "colors" or part_type == "material" and "materials" or part_type == "pattern" and "textures" or part_type
+				cleanup_mask = not tweak_data.blackmarket[converted_category][data.id]
+				cleanup_mask = cleanup_mask or not chk_global_value_func(data.global_value)
+				if cleanup_mask then
+					break
 				end
 			end
-			if cleanup_mask then
-				Application:debug("Mask or component of mask no longer exist, Selling the mask!", mask.mask_id, inspect(blueprint))
+		end
+		if cleanup_mask then
+			if i == 1 then
+				self._global.crafted_items.masks[i] = false
+				self:on_buy_mask(self._defaults.mask, "normal", 1)
+			else
+				Application:error("BlackMarketManager:_cleanup_blackmarket() Mask or component of mask invalid, Selling the mask!", "mask_id", mask.mask_id, "global_value", mask.global_value, "blueprint", inspect(blueprint))
 				self:on_sell_mask(i)
 			end
 		end
 	end
+	local invalid_weapons = {}
+	local invalid_parts = {}
+	
+	local function invalid_add_weapon_remove_parts_func(slot, item, part_id)
+		table.insert(invalid_weapons, slot)
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Part non-existent, weapon invalid", "weapon_id", item.weapon_id, "slot", slot)
+		for i = #invalid_parts, 1, -1 do
+			if invalid_parts[i] and invalid_parts[i].slot == slot then
+				Application:error("removing part from invalid_parts", "part_id", part_id)
+				table.remove(invalid_parts, i)
+			end
+		end
+	end
+	
 	local factory = tweak_data.weapon.factory
 	for _, category in ipairs({
 		"primaries",
 		"secondaries"
 	}) do
 		local crafted_category = self._global.crafted_items[category]
-		local invalid_weapons = {}
-		local invalid_parts = {}
+		invalid_weapons = {}
+		invalid_parts = {}
 		for slot, item in pairs(crafted_category) do
 			local factory_id = item.factory_id
+			local weapon_id = item.weapon_id
 			local blueprint = item.blueprint
+			local texture_switches = item.texture_switches
 			local index_table = {}
-			if not tweak_data.weapon[item.weapon_id] then
+			local weapon_invalid = not tweak_data.weapon[weapon_id] or not tweak_data.weapon.factory[factory_id] or managers.weapon_factory:get_factory_id_by_weapon_id(weapon_id) ~= factory_id or managers.weapon_factory:get_weapon_id_by_factory_id(factory_id) ~= weapon_id or not chk_global_value_func(tweak_data.weapon[weapon_id].global_value)
+			if weapon_invalid then
 				table.insert(invalid_weapons, slot)
 			else
+				item.global_values = item.global_values or {}
 				for i, part_id in ipairs(factory[factory_id].uses_parts) do
 					index_table[part_id] = i
 				end
 				for i, part_id in ipairs(blueprint) do
-					if not index_table[part_id] then
-						Application:error("BlackMarketManager:_cleanup_blackmarket() Weapon part no longer in uses parts", "part_id", part_id, "weapon_id", item.weapon_id)
+					if not index_table[part_id] or not chk_global_value_func(item.global_values[part_id]) then
+						Application:error("BlackMarketManager:_cleanup_blackmarket() Weapon part no longer in uses parts or bad global value", "part_id", part_id, "weapon_id", item.weapon_id, "part_global_value", item.global_values[part_id])
 						local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
 						if table.contains(default_blueprint, part_id) then
-							print("part is default part")
-							table.insert(invalid_weapons, slot)
+							invalid_add_weapon_remove_parts_func(slot, item, part_id)
+							break
 						else
 							local default_mod
 							if tweak_data.weapon.factory.parts[part_id] then
@@ -3145,27 +3489,144 @@ function BlackMarketManager:_cleanup_blackmarket()
 									})
 								end
 							else
-								table.insert(invalid_weapons, slot)
+								invalid_add_weapon_remove_parts_func(slot, item, part_id)
+								break
+							end
+						end
+					end
+				end
+			end
+			if texture_switches then
+				local invalid_texture_switches = {}
+				for part_id, texture_id in pairs(texture_switches) do
+					if not tweak_data.weapon.factory.parts[part_id] then
+						table.insert(invalid_texture_switches, part_id)
+					else
+						local texture = self:get_part_texture_switch(category, slot, part_id)
+						if not texture or type(texture) ~= "string" or texture == "" then
+							table.insert(invalid_texture_switches, part_id)
+						end
+					end
+				end
+				for _, part_id in ipairs(invalid_texture_switches) do
+					texture_switches[part_id] = nil
+					Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid weapon texture switch", "category", category, "slot", slot, "part_id", part_id)
+				end
+			end
+		end
+		for _, slot in ipairs(invalid_weapons) do
+			Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid Weapon", "slot", slot, "inspect", inspect(crafted_category[slot]))
+			self:on_sell_weapon(category, slot, true)
+		end
+		for _, data in ipairs(invalid_parts) do
+			if crafted_category[data.slot] then
+				Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid Weapon part", "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
+				if data.default_mod then
+					self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true)
+				else
+					self:remove_weapon_part(category, data.slot, data.global_value, data.part_id)
+				end
+				managers.money:refund_weapon_part(crafted_category[data.slot].weapon_id, data.part_id, data.global_value)
+			else
+				Application:error("BlackMarketManager:_cleanup_blackmarket() No crafted item in slot", "category", category, "slot", data.slot)
+			end
+		end
+	end
+	local bm_tweak_data = tweak_data.blackmarket
+	local invalid_items = {}
+	
+	local function add_invalid_global_value_func(global_value)
+		invalid_items[global_value] = true
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory global_value detected", "global_value", global_value)
+	end
+	
+	local function add_invalid_category_func(global_value, category)
+		invalid_items[global_value] = invalid_items[global_value] or {}
+		invalid_items[global_value][category] = true
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory category detected", "global_value", global_value, "category", category)
+	end
+	
+	local function add_invalid_item_func(global_value, category, item)
+		invalid_items[global_value] = invalid_items[global_value] or {}
+		invalid_items[global_value][category] = invalid_items[global_value][category] or {}
+		invalid_items[global_value][category][item] = true
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory item detected", "global_value", global_value, "category", category, "item", item)
+	end
+	
+	for global_value, categories in pairs(self._global.inventory or {}) do
+		if not chk_global_value_func(global_value) then
+			add_invalid_global_value_func(global_value)
+		else
+			for category, items in pairs(categories) do
+				if not bm_tweak_data[category] then
+					add_invalid_category_func(global_value, category)
+				else
+					for item, num in pairs(items) do
+						local item_tweak_data = bm_tweak_data[category][item]
+						if not item_tweak_data then
+							add_invalid_item_func(global_value, category, item)
+						else
+							local global_values = {}
+							if item_tweak_data.infamous then
+								table.insert(global_values, "infamous")
+							end
+							if item_tweak_data.dlc then
+								table.insert(global_values, item_tweak_data.dlc)
+							end
+							if item_tweak_data.dlcs then
+								for _, dlc in ipairs(item_tweak_data.dlcs) do
+									table.insert(global_values, dlc)
+								end
+							end
+							if item_tweak_data.global_value then
+								table.insert(global_values, item_tweak_data.global_value)
+							end
+							if #global_values == 0 then
+								table.insert(global_values, "normal")
+							end
+							global_values = table.list_union(global_values)
+							for _, gv in ipairs(global_values) do
+								if not chk_global_value_func(gv) then
+									add_invalid_item_func(global_value, category, item)
+									break
+								end
 							end
 						end
 					end
 				end
 			end
 		end
-		for _, slot in ipairs(invalid_weapons) do
-			Application:debug("Invalid Weapon", "slot", slot, "inspect", inspect(crafted_category[slot]))
-			self:on_sell_weapon(category, slot)
-		end
-		for _, data in ipairs(invalid_parts) do
-			Application:debug("Invalid Weapon part", "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
-			if data.default_mod then
-				self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true)
-			else
-				self:remove_weapon_part(category, data.slot, data.global_value, data.part_id)
+	end
+	for global_value, categories in pairs(invalid_items) do
+		if type(categories) == "boolean" then
+			self._global.inventory[global_value] = nil
+		else
+			for category, items in pairs(categories) do
+				if type(items) == "boolean" then
+					if not self._global.inventory[global_value] then
+						Application:error("[BlackMarketManager] global_value do not exists in inventory", global_value)
+					else
+						self._global.inventory[global_value][category] = nil
+					end
+				else
+					for item, invalid in pairs(items) do
+						if not self._global.inventory[global_value] then
+							Application:error("[BlackMarketManager] global_value do not exists in inventory", global_value)
+						elseif not self._global.inventory[global_value][category] then
+							Application:error("[BlackMarketManager] category do not exists in inventory", category)
+						else
+							self._global.inventory[global_value][category][item] = nil
+						end
+					end
+				end
 			end
-			managers.money:refund_weapon_part(crafted_category[data.slot].weapon_id, data.part_id, data.global_value)
 		end
 	end
+	Application:debug("----------------------------------------------------------------------")
+	Application:debug("[BlackMarketManager:_cleanup_blackmarket] BLACKMARKET CLEANUP DONE")
+end
+
+function BlackMarketManager:test_clean()
 end
 
 function BlackMarketManager:_verify_dlc_items()
@@ -3245,7 +3706,6 @@ function BlackMarketManager:_verify_dlc_items()
 				local is_locked = mask.global_value == package_id
 				if not is_locked then
 					for _, part in pairs(mask.blueprint) do
-						print("package_id", package_id, "inspect", inspect(part))
 						is_locked = part.global_value == package_id
 						if is_locked then
 							break

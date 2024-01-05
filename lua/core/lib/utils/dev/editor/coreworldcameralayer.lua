@@ -38,9 +38,16 @@ function WorldCameraLayer:save(save_params)
 	SystemFS:close(file)
 end
 
+function WorldCameraLayer:toggle_show_framing_gui(layer_toolbar, event)
+	local visible = layer_toolbar:tool_state(event:get_id())
+	self._forced_show_framing_gui = visible
+	self._workspace:panel():set_alpha(0.5)
+	self:set_gui_visible(visible)
+end
+
 function WorldCameraLayer:set_gui_visible(visible)
-	if self._gui_visible ~= visible then
-		if visible and managers.worldcamera:use_gui() then
+	if self._gui_visible ~= visible or self._forced_show_framing_gui then
+		if visible and (self._forced_show_framing_gui or managers.worldcamera:use_gui()) then
 			self._workspace:show()
 		else
 			self._workspace:hide()
@@ -86,6 +93,12 @@ function WorldCameraLayer:build_panel(notebook)
 	self._main_sizer = EWS:BoxSizer("HORIZONTAL")
 	self._ews_panel:set_sizer(self._main_sizer)
 	self._sizer = EWS:BoxSizer("VERTICAL")
+	local layer_toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_NODIVIDER")
+	layer_toolbar:add_check_tool("WC_FORCE_FRAMING_GUI", "Show framing gui", CoreEws.image_path("toolbar\\find_16x16.png"), "Look through camera")
+	layer_toolbar:set_tool_state("WC_FORCE_FRAMING_GUI", self._look_through_camera)
+	layer_toolbar:connect("WC_FORCE_FRAMING_GUI", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "toggle_show_framing_gui"), layer_toolbar)
+	layer_toolbar:realize()
+	self._sizer:add(layer_toolbar, 0, 0, "EXPAND")
 	local cameras_sizer = EWS:StaticBoxSizer(self._ews_panel, "HORIZONTAL", "Cameras")
 	local cam_toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_VERTICAL,TB_NODIVIDER")
 	cam_toolbar:add_tool("WC_CREATE_NEW", "Create New", CoreEws.image_path("toolbar\\new_16x16.png"), "Create a new world camera")

@@ -13,9 +13,7 @@ function CopLogicArrest.enter(data, new_logic_name, enter_params)
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.guard
 	my_data.arrest_targets = {}
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		if old_internal_data.best_cover then
 			my_data.best_cover = old_internal_data.best_cover
 			managers.navigation:reserve_cover(my_data.best_cover[1], data.pos_rsrv_id)
@@ -174,10 +172,6 @@ function CopLogicArrest._upd_advance(data, my_data, attention_obj, arrest_data)
 			}
 			my_data.advance_path = nil
 			my_data.advancing = data.unit:brain():action_request(new_action_data)
-			if my_data.advancing and my_data.rsrv_pos.stand then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-				my_data.rsrv_pos.stand = nil
-			end
 		end
 	elseif my_data.processing_path then
 		CopLogicArrest._process_pathing_results(data, my_data)

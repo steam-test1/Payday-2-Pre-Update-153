@@ -134,7 +134,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.ene_hostage_lim_1 = {3}
 	self.values.player.civilian_reviver = {true}
 	self.values.player.civilian_gives_ammo = {true}
-	self.values.player.buy_cost_multiplier = {0.9, 0.8}
+	self.values.player.buy_cost_multiplier = {0.9, 0.7}
 	self.values.player.sell_cost_multiplier = {1.25}
 	self.values.doctor_bag.quantity = {1}
 	self.values.doctor_bag.amount_increase = {2}
@@ -240,7 +240,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.silent_drill = {true}
 	self.values.sentry_gun.extra_ammo_multiplier = {1.5, 2.5}
 	self.values.sentry_gun.shield = {true}
-	self.values.trip_mine.explosion_size_multiplier = {1.25, 1.75}
+	self.values.trip_mine.explosion_size_multiplier = {1.25, 2}
 	self.values.trip_mine.quantity_3 = {3}
 	self.values.player.trip_mine_shaped_charge = {true}
 	self.values.sentry_gun.quantity = {1}
@@ -432,11 +432,11 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		black_marketeer = {
 			{"10%"},
-			{"20%", "25%"}
+			{"30%", "25%"}
 		},
 		blast_radius = {
 			{"25%"},
-			{"50%"}
+			{"75%"}
 		},
 		cable_guy = {
 			{"75%"},
@@ -456,7 +456,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		cleaner = {
 			{"5%"},
-			{}
+			{"2"}
 		},
 		combat_medic = {
 			{"25%", "10"},
@@ -951,8 +951,7 @@ function UpgradesTweakData:init()
 	self.level_tree[60] = {
 		name_id = "lvl_60",
 		upgrades = {
-			"rep_upgrade6",
-			"rambo"
+			"rep_upgrade6"
 		}
 	}
 	self.level_tree[61] = {
@@ -4396,6 +4395,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.kampfmesser = {
 		category = "melee_weapon",
 		dlc = "gage_pack_lmg"
+	}
+	self.definitions.brass_knuckles = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
 	}
 end
 

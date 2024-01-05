@@ -2,40 +2,6 @@ AiGlobalEventUnitElement = AiGlobalEventUnitElement or class(MissionElement)
 
 function AiGlobalEventUnitElement:init(unit)
 	AiGlobalEventUnitElement.super.init(self, unit)
-	self._wave_modes = {
-		"none",
-		"assault",
-		"besiege",
-		"blockade",
-		"hunt",
-		"quiet",
-		"passive"
-	}
-	self._AI_events = {
-		"none",
-		"police_called",
-		"police_weapons_hot",
-		"gangsters_called",
-		"gangster_weapons_hot"
-	}
-	self._blames = {
-		"none",
-		"empty",
-		"cop",
-		"gangster",
-		"civilian",
-		"metal_detector",
-		"security_camera",
-		"civilian_alarm",
-		"cop_alarm",
-		"gangster_alarm",
-		"motion_sensor",
-		"glass_alarm",
-		"blackmailer",
-		"gensec",
-		"police_alerted",
-		"csgo_gunfire"
-	}
 	self._hed.blame = "none"
 	table.insert(self._save_values, "wave_mode")
 	table.insert(self._save_values, "AI_event")
@@ -57,7 +23,7 @@ function AiGlobalEventUnitElement:_build_panel(panel, panel_sizer)
 		name = "Wave Mode:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = self._wave_modes,
+		options = ElementAiGlobalEvent._wave_modes,
 		value = self._hed.wave_mode,
 		default = "none",
 		tooltip = "Select a wave mode from the combobox",
@@ -71,7 +37,7 @@ function AiGlobalEventUnitElement:_build_panel(panel, panel_sizer)
 		name = "AI Event:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = self._AI_events,
+		options = ElementAiGlobalEvent._AI_events,
 		value = self._hed.AI_event,
 		default = "none",
 		tooltip = "Select an AI event from the combobox",
@@ -85,7 +51,7 @@ function AiGlobalEventUnitElement:_build_panel(panel, panel_sizer)
 		name = "Blame:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = self._blames,
+		options = ElementAiGlobalEvent._blames,
 		value = self._hed.blame,
 		tooltip = "Select a blame from the combobox",
 		name_proportions = 1,

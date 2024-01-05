@@ -35,6 +35,7 @@ function PlayerManager:init()
 	}
 	self:_setup_rules()
 	self._local_player_minions = 0
+	self._local_player_used_body_bags = 0
 	self._player_states = {
 		standard = "ingame_standard",
 		mask_off = "ingame_mask_off",
@@ -156,10 +157,14 @@ function PlayerManager:_internal_load()
 		return
 	end
 	local secondary = managers.blackmarket:equipped_secondary()
-	player:inventory():add_unit_by_factory_name(secondary.factory_id, true, false, secondary.blueprint)
+	local secondary_slot = managers.blackmarket:equipped_weapon_slot("secondaries")
+	local texture_switches = managers.blackmarket:get_weapon_texture_switches("secondaries", secondary_slot, secondary)
+	player:inventory():add_unit_by_factory_name(secondary.factory_id, true, false, secondary.blueprint, texture_switches)
 	local primary = managers.blackmarket:equipped_primary()
 	if primary then
-		player:inventory():add_unit_by_factory_name(primary.factory_id, false, false, primary.blueprint)
+		local primary_slot = managers.blackmarket:equipped_weapon_slot("primaries")
+		local texture_switches = managers.blackmarket:get_weapon_texture_switches("primaries", primary_slot, primary)
+		player:inventory():add_unit_by_factory_name(primary.factory_id, false, false, primary.blueprint, texture_switches)
 	end
 	player:inventory():set_melee_weapon(managers.blackmarket:equipped_melee_weapon())
 	local peer_id = managers.network:session():local_peer():id()
@@ -218,9 +223,9 @@ function PlayerManager:_add_level_equipment(player)
 	end
 end
 
-function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties)
+function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
 	local player = self:player_unit()
-	print("[PlayerManager:spawn_dropin_penalty]", dead, bleed_out, health, used_deployable, used_cable_ties)
+	print("[PlayerManager:spawn_dropin_penalty]", dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
 	if not alive(player) then
 		return
 	end
@@ -230,6 +235,7 @@ function PlayerManager:spawn_dropin_penalty(dead, bleed_out, health, used_deploy
 	for i = 1, used_cable_ties do
 		self:remove_special("cable_tie")
 	end
+	self:set_used_body_bags(used_body_bags)
 	local min_health
 	if dead or bleed_out then
 		min_health = 0
@@ -1957,6 +1963,22 @@ function PlayerManager:chk_minion_limit_reached()
 	return self._local_player_minions >= self:upgrade_value("player", "convert_enemies_max_minions", 0)
 end
 
+function PlayerManager:set_used_body_bags(used_body_bag)
+	self._local_player_used_body_bags = used_body_bag
+end
+
+function PlayerManager:on_used_body_bag()
+	self._local_player_used_body_bags = self._local_player_used_body_bags + 1
+end
+
+function PlayerManager:reset_used_body_bag()
+	self._local_player_used_body_bags = 0
+end
+
+function PlayerManager:chk_body_bag_limit_reached()
+	return self._local_player_used_body_bags >= 2
+end
+
 function PlayerManager:change_player_look(new_look)
 	self._player_mesh_suffix = new_look
 	for _, unit in pairs(managers.groupai:state():all_char_criminals()) do
@@ -2031,6 +2053,7 @@ end
 
 function PlayerManager:soft_reset()
 	self._listener_holder = EventListenerHolder:new()
+	self:reset_used_body_bag()
 end
 
 function PlayerManager:on_peer_synch_request(peer)

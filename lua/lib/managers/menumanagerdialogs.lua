@@ -374,6 +374,26 @@ function MenuManager:show_NPCommerce_browse_success()
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_announce_crimenet_heat()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("menu_feature_heat_title")
+	dialog_data.text = managers.localization:text("menu_feature_heat_desc", {
+		player = tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
+	})
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	dialog_data.texture = "guis/textures/pd2/feature_crimenet_heat"
+	dialog_data.text_blend_mode = "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 620
+	dialog_data.h = 532
+	dialog_data.image_w = 64
+	dialog_data.image_h = 64
+	dialog_data.image_valign = "top"
+	managers.system_menu:show_new_unlock(dialog_data)
+end
+
 function MenuManager:show_accept_gfx_settings_dialog(func)
 	local count = 10
 	local dialog_data = {}
@@ -479,6 +499,7 @@ function MenuManager:show_new_item_gained(params)
 	elseif category == "textures" then
 		texture = _G.tweak_data.blackmarket.textures[id].texture
 		render_template = Idstring("VertexColorTexturedPatterns")
+	elseif category == "announcements" then
 	else
 		local bundle_folder = tweak_data.blackmarket[category] and tweak_data.blackmarket[category][id] and tweak_data.blackmarket[category][id].texture_bundle_folder
 		if bundle_folder then

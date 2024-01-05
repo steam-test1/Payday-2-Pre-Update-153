@@ -89,27 +89,30 @@ function MoneyTweakData:init()
 		4,
 		9,
 		12,
-		20
+		20,
+		40
 	}
-	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 3, false, 1)
+	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 4, false, 1)
 	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, 4, false, 1)
 	self.limited_bonus_multiplier = 1
 	self.sell_weapon_multiplier = 0.25
 	self.sell_mask_multiplier = 0.25
-	self.killing_civilian_deduction = self._create_value_table(2000, 20000, 10, true, 2)
+	self.killing_civilian_deduction = self._create_value_table(2000, 50000, 10, true, 2)
 	self.buy_premium_multiplier = {
 		easy = 0.5,
 		normal = 0.75,
 		hard = 1.25,
 		overkill = 1.5,
-		overkill_145 = 2
+		overkill_145 = 2,
+		overkill_290 = 4
 	}
 	self.buy_premium_static_fee = {
 		easy = 100000,
 		normal = 100000,
 		hard = 150000,
 		overkill = 200000,
-		overkill_145 = 300000
+		overkill_145 = 300000,
+		overkill_290 = 600000
 	}
 	self.global_value_multipliers = {}
 	self.global_value_multipliers.normal = 1
@@ -175,12 +178,14 @@ function MoneyTweakData:init()
 	self.mission_asset_cost_multiplier_by_risk = {
 		0.5,
 		1,
-		2
+		2,
+		4
 	}
 	self.mission_asset_cost_small = self._create_value_table(2500, 15000, 10, true, 1)
 	self.mission_asset_cost_medium = self._create_value_table(10000, 45000, 10, true, 1)
 	self.mission_asset_cost_large = self._create_value_table(55000, 400000, 10, true, 1)
 	self.small_loot_value_multiplier = {
+		100,
 		100,
 		100,
 		100,

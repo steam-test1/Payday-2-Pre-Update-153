@@ -330,8 +330,8 @@ function HUDStatsScreen:init()
 		name = "paygrade_title",
 		font = tweak_data.menu.pd2_medium_font,
 		font_size = tweak_data.hud_stats.loot_size,
-		text = managers.localization:to_upper_text("cn_menu_contract_paygrade_header"),
-		color = Color.white
+		text = managers.localization:to_upper_text("menu_lobby_difficulty_title"),
+		color = tweak_data.screen_colors.text
 	})
 	managers.hud:make_fine_text(paygrade_title)
 	paygrade_title:set_top(math.round(day_title:bottom()))
@@ -339,43 +339,21 @@ function HUDStatsScreen:init()
 	if job_data then
 		local job_stars = managers.job:current_job_stars()
 		local job_and_difficulty_stars = managers.job:current_job_and_difficulty_stars()
-		local risk_color = tweak_data.screen_colors.risk
-		local filled_star_rect = {
-			0,
-			32,
-			32,
-			32
-		}
-		local empty_star_rect = {
-			32,
-			32,
-			32,
-			32
-		}
-		local cy = paygrade_title:center_y()
-		local sx = paygrade_title:right() + 8
-		local level_data = {
-			texture = "guis/textures/pd2/mission_briefing/difficulty_icons",
-			texture_rect = filled_star_rect,
-			w = 16,
-			h = 16,
-			color = tweak_data.screen_colors.text,
-			alpha = 1
-		}
-		local risk_data = {
-			texture = "guis/textures/pd2/crimenet_skull",
-			w = 16,
-			h = 16,
-			color = risk_color,
-			alpha = 1
-		}
-		for i = 1, job_and_difficulty_stars do
-			local x = sx + (i - 1) * 18
-			local is_risk = i > job_stars
-			local star_data = is_risk and risk_data or level_data
-			local star = day_wrapper_panel:bitmap(star_data)
-			star:set_x(x)
-			star:set_center_y(math.round(cy))
+		local difficulty_stars = managers.job:current_difficulty_stars()
+		local difficulty = tweak_data.difficulties[difficulty_stars + 2] or 1
+		local difficulty_string_id = tweak_data.difficulty_name_ids[difficulty]
+		local risk_text = day_wrapper_panel:text({
+			name = "risk_text",
+			font = tweak_data.menu.pd2_medium_font,
+			font_size = tweak_data.hud_stats.loot_size,
+			text = managers.localization:to_upper_text(difficulty_string_id),
+			color = tweak_data.screen_colors.text
+		})
+		managers.hud:make_fine_text(risk_text)
+		risk_text:set_top(math.round(paygrade_title:top()))
+		risk_text:set_left(paygrade_title:right() + 8)
+		if 0 < difficulty_stars then
+			risk_text:set_color(tweak_data.screen_colors.risk)
 		end
 	end
 	local day_payout = day_wrapper_panel:text({
@@ -559,7 +537,7 @@ function HUDStatsScreen:_create_stats_screen_profile(profile_wrapper_panel)
 	})
 	bg_ring:set_bottom(profile_wrapper_panel:h())
 	exp_ring:set_bottom(profile_wrapper_panel:h())
-	local gain_xp = managers.experience:get_xp_dissected(true, 0)
+	local gain_xp = managers.experience:get_xp_dissected(true, 0, true)
 	local at_max_level = managers.experience:current_level() == managers.experience:level_cap()
 	local can_lvl_up = not at_max_level and gain_xp >= next_level_data.points - next_level_data.current_points
 	local progress = (next_level_data.current_points or 1) / (next_level_data.points or 1)

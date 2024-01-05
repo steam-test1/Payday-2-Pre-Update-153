@@ -355,7 +355,7 @@ function ChatGui:_layout_output_panel(force_update_scroll_indicators)
 		local _, _, w, h = line:text_rect()
 		line:set_h(h)
 		line_bg:set_w(w + line:left() + 2)
-		line_bg:set_h(line_height)
+		line_bg:set_h(h)
 		lines = lines + line:number_of_lines()
 	end
 	local scroll_at_bottom = scroll_panel:bottom() == output_panel:h()
@@ -557,7 +557,7 @@ function ChatGui:mouse_pressed(button, x, y)
 		self:_on_focus()
 		return true
 	end
-	self:_loose_focus()
+	return self:_loose_focus()
 end
 
 function ChatGui:check_grab_scroll_panel(x, y)
@@ -677,7 +677,7 @@ end
 
 function ChatGui:_loose_focus()
 	if not self._focus then
-		return
+		return false
 	end
 	self._one_scroll_up_delay = nil
 	self._one_scroll_dn_delay = nil
@@ -696,6 +696,7 @@ function ChatGui:_loose_focus()
 	self._input_panel:child("input_bg"):stop()
 	self:set_layer(20)
 	self:update_caret()
+	return true
 end
 
 function ChatGui:_shift()
@@ -889,7 +890,7 @@ function ChatGui:send_message(name, message)
 end
 
 function ChatGui:receive_message(name, message, color, icon)
-	if not alive(self._panel) then
+	if not alive(self._panel) or not managers.network:session() then
 		return
 	end
 	local output_panel = self._panel:child("output_panel")
@@ -937,6 +938,7 @@ function ChatGui:receive_message(name, message, color, icon)
 		hvertical = "top"
 	})
 	line_bg:set_h(h)
+	line:set_kern(line:kern())
 	table.insert(self._lines, {
 		line,
 		line_bg,

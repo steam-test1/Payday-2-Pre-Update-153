@@ -166,11 +166,11 @@ function ConnectionNetworkHandler:set_dropin()
 	end
 end
 
-function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties)
+function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame_playing) then
 		return
 	end
-	managers.player:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties)
+	managers.player:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
 end
 
 function ConnectionNetworkHandler:ok_to_load_level(sender)
@@ -254,6 +254,7 @@ function ConnectionNetworkHandler:sync_game_settings(job_index, level_id_index, 
 end
 
 function ConnectionNetworkHandler:sync_stage_settings(level_id_index, stage_num, alternative_stage, interupt_stage_level_id, sender)
+	print("ConnectionNetworkHandler:sync_game_settings", level_id_index, stage_num, alternative_stage, interupt_stage_level_id)
 	local peer = self._verify_sender(sender)
 	if not peer then
 		return
@@ -268,9 +269,9 @@ function ConnectionNetworkHandler:sync_stage_settings(level_id_index, stage_num,
 	end
 	if interupt_stage_level_id ~= 0 then
 		local interupt_level = tweak_data.levels:get_level_name_from_index(interupt_stage_level_id)
-		managers.job:synced_interupt_stage(interupt_level)
+		managers.job:synced_interupt_stage(interupt_level, true)
 	else
-		managers.job:synced_interupt_stage(nil)
+		managers.job:synced_interupt_stage(nil, true)
 	end
 	Global.game_settings.mission = managers.job:current_mission()
 end
@@ -536,8 +537,11 @@ function ConnectionNetworkHandler:sync_outfit(outfit_string, sender)
 	if not peer then
 		return
 	end
+	print("[ConnectionNetworkHandler:sync_outfit]", "peer_id", peer:id(), "outfit_string", outfit_string)
 	peer:set_outfit_string(outfit_string)
-	if managers.menu_scene then
+	local local_peer = managers.network:session() and managers.network:session():local_peer()
+	local in_lobby = local_peer and local_peer:in_lobby() and game_state_machine:current_state_name() ~= "ingame_lobby_menu"
+	if managers.menu_scene and in_lobby then
 		managers.menu_scene:set_lobby_character_out_fit(peer:id(), outfit_string, peer:rank())
 	end
 	local kit_menu = managers.menu:get_menu("kit_menu")

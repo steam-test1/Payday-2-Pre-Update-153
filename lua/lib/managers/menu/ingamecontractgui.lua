@@ -42,7 +42,7 @@ function IngameContractGui:init(ws)
 		text = text,
 		font = tweak_data.menu.pd2_small_font,
 		font_size = font_size,
-		color = Color(1, 1, 1, 1),
+		color = tweak_data.screen_colors.text,
 		align = "left",
 		vertical = "top",
 		wrap = true,
@@ -52,13 +52,51 @@ function IngameContractGui:init(ws)
 	managers.hud:make_fine_text(briefing_description)
 	briefing_description:set_h(briefing_description:h() + 10)
 	briefing_description:set_top(briefing_title:bottom())
+	local modifiers_text = text_panel:text({
+		name = "modifiers_text",
+		text = managers.localization:to_upper_text("menu_cn_modifiers"),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = font_size,
+		color = tweak_data.screen_colors.text,
+		align = "left",
+		vertical = "top"
+	})
+	managers.hud:make_fine_text(modifiers_text)
+	modifiers_text:set_bottom(text_panel:h() / 2)
+	local job_heat_mul = managers.job:get_job_heat_multipliers(managers.job:current_job_id()) - 1
+	local job_heat = math.round(job_heat_mul * 100)
+	local job_heat_string = tostring(math.abs(job_heat))
+	local is_job_heated = job_heat ~= 0 or job_heat_mul ~= 0
+	if job_heat == 0 and job_heat_mul ~= 0 then
+		job_heat_string = string.format("%0.2f", math.abs(job_heat_mul * 100))
+	else
+	end
+	local heat_warning_text
+	local heat_color = managers.job:get_job_heat_color(managers.job:current_job_id())
+	if is_job_heated then
+		heat_warning_text = text_panel:text({
+			name = "heat_warning_text",
+			text = managers.localization:to_upper_text("menu_heat_" .. (0 < job_heat_mul and "warm" or job_heat_mul < 0 and "cold" or "ok"), {job_heat = job_heat_string}),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			color = heat_color,
+			align = "left",
+			vertical = "top",
+			wrap = true,
+			word_wrap = true
+		})
+		managers.hud:make_fine_text(heat_warning_text)
+		heat_warning_text:set_top(modifiers_text:bottom())
+		heat_warning_text:set_left(10)
+	end
+	local pro_warning_text
 	if managers.job:is_current_job_professional() then
-		local pro_warning_text = text_panel:text({
+		pro_warning_text = text_panel:text({
 			name = "pro_warning_text",
 			text = self:get_text("menu_pro_warning"),
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
-			color = Color(255, 255, 50, 53) / 255,
+			color = tweak_data.screen_colors.pro_color,
 			align = "left",
 			vertical = "top",
 			wrap = true,
@@ -66,10 +104,12 @@ function IngameContractGui:init(ws)
 			h = 128
 		})
 		managers.hud:make_fine_text(pro_warning_text)
-		pro_warning_text:set_h(pro_warning_text:h() + 10)
-		pro_warning_text:set_bottom(text_panel:center_y())
+		pro_warning_text:set_h(pro_warning_text:h())
+		pro_warning_text:set_top(is_job_heated and heat_warning_text:bottom() or modifiers_text:bottom())
+		pro_warning_text:set_left(10)
 	end
-	local risk_color = Color(255, 255, 204, 0) / 255
+	modifiers_text:set_visible(heat_warning_text and heat_warning_text:visible() or pro_warning_text and pro_warning_text:visible())
+	local risk_color = tweak_data.screen_colors.risk
 	local risk_title = text_panel:text({
 		font = tweak_data.menu.pd2_small_font,
 		font_size = font_size,
@@ -77,7 +117,8 @@ function IngameContractGui:init(ws)
 		color = risk_color
 	})
 	managers.hud:make_fine_text(risk_title)
-	risk_title:set_top(text_panel:center_y() + 40)
+	risk_title:set_top((pro_warning_text and pro_warning_text:visible() and pro_warning_text:bottom() or heat_warning_text and heat_warning_text:visible() and heat_warning_text:bottom() or math.round(text_panel:h() / 2)) + 5)
+	risk_title:set_visible(job_data and true or false)
 	local menu_risk_id = "menu_risk_pd"
 	if Global.game_settings.difficulty == "hard" then
 		menu_risk_id = "menu_risk_swat"
@@ -85,63 +126,35 @@ function IngameContractGui:init(ws)
 		menu_risk_id = "menu_risk_fbi"
 	elseif Global.game_settings.difficulty == "overkill_145" then
 		menu_risk_id = "menu_risk_special"
+	elseif Global.game_settings.difficulty == "overkill_290" then
+		menu_risk_id = "menu_risk_elite"
 	end
-	local risk_text = text_panel:text({
-		w = text_panel:w(),
-		h = text_panel:h(),
-		name = "risk_text",
-		text = self:get_text(menu_risk_id) .. " ",
-		font = tweak_data.hud_stats.objective_desc_font,
-		font_size = font_size,
-		color = risk_color,
-		align = "left",
-		vertical = "top",
-		wrap = true,
-		word_wrap = true
+	local risk_stats_panel = text_panel:panel({
+		name = "risk_stats_panel"
 	})
-	managers.hud:make_fine_text(risk_text)
-	risk_text:set_h(risk_text:h() + 10)
-	risk_text:set_top(risk_title:bottom() + 10)
-	local potential_rewards_title = text_panel:text({
-		font = tweak_data.menu.pd2_small_font,
-		font_size = font_size,
-		text = self:get_text("menu_potential_rewards"),
-		color = Color.white
-	})
-	managers.hud:make_fine_text(potential_rewards_title)
-	potential_rewards_title:set_top(risk_text:bottom() + 4)
-	local paygrade_title = text_panel:text({
-		font = tweak_data.menu.pd2_small_font,
-		font_size = font_size,
-		text = self:get_text("cn_menu_contract_paygrade_header"),
-		color = Color.white
-	})
-	managers.hud:make_fine_text(paygrade_title)
-	paygrade_title:set_top(potential_rewards_title:bottom() + 4)
-	local experience_title = text_panel:text({
-		font = tweak_data.menu.pd2_small_font,
-		font_size = font_size,
-		text = self:get_text("menu_experience"),
-		color = Color.white
-	})
-	managers.hud:make_fine_text(experience_title)
-	experience_title:set_top(paygrade_title:bottom())
-	local sx = math.max(paygrade_title:w(), experience_title:w())
+	risk_stats_panel:set_h(risk_title:h() + 5)
 	if job_data then
 		local job_stars = managers.job:current_job_stars()
 		local job_and_difficulty_stars = managers.job:current_job_and_difficulty_stars()
-		local difficulty_stars = job_and_difficulty_stars - job_stars
-		local rsx = risk_title:right() + 12
-		for i, name in ipairs({
+		local difficulty_stars = managers.job:current_difficulty_stars()
+		local job_id = managers.job:current_job_id()
+		local rsx = 15
+		local risks = {
 			"risk_pd",
 			"risk_swat",
 			"risk_fbi",
 			"risk_death_squad"
-		}) do
+		}
+		if not Global.SKIP_OVERKILL_290 then
+			table.insert(risks, "risk_murder_squad")
+		end
+		local max_y = 0
+		local max_x = 0
+		for i, name in ipairs(risks) do
 			if i ~= 1 then
 				local texture, rect = tweak_data.hud_icons:get_icon_data(name)
 				local active = i <= difficulty_stars + 1
-				local color = active and i ~= 1 and risk_color or Color.white
+				local color = active and i ~= 1 and risk_color or tweak_data.screen_colors.text
 				local alpha = active and 1 or 0.25
 				local risk = text_panel:bitmap({
 					texture = texture,
@@ -152,10 +165,77 @@ function IngameContractGui:init(ws)
 					color = color
 				})
 				risk:set_x(rsx)
-				risk:set_center_y(risk_title:center_y())
-				rsx = rsx + risk:w() + 12
+				risk:set_top(math.round(risk_title:bottom()))
+				rsx = rsx + risk:w() + 2
+				local stat = managers.statistics:completed_job(job_id, tweak_data:index_to_difficulty(i + 1))
+				local risk_stat = risk_stats_panel:text({
+					name = name,
+					font = tweak_data.menu.pd2_small_font,
+					font_size = font_size,
+					text = tostring(stat),
+					align = "center"
+				})
+				managers.hud:make_fine_text(risk_stat)
+				risk_stat:set_world_center_x(risk:world_center_x())
+				local this_difficulty = i == difficulty_stars + 1
+				active = i <= difficulty_stars + 1
+				color = active and risk_color or Color.white
+				alpha = this_difficulty and 1 or active and 0.5 or 0.25
+				risk_stat:set_color(color)
+				risk_stat:set_alpha(alpha)
+				max_y = math.max(max_y, risk:bottom())
+				max_x = math.max(max_x, risk:right() + 5)
+				max_x = math.max(max_x, risk_stat:right() + risk_stats_panel:left() + 10)
 			end
 		end
+		risk_stats_panel:set_top(math.round(max_y + 2))
+		local stat = managers.statistics:completed_job(job_id, tweak_data:index_to_difficulty(difficulty_stars + 2))
+		local risk_text = text_panel:text({
+			x = max_x,
+			w = text_panel:w() - max_x,
+			h = text_panel:h(),
+			name = "risk_text",
+			text = self:get_text(menu_risk_id) .. " " .. managers.localization:to_upper_text("menu_stat_job_completed", {
+				stat = tostring(stat)
+			}) .. " ",
+			font = tweak_data.hud_stats.objective_desc_font,
+			font_size = font_size,
+			color = risk_color,
+			align = "left",
+			vertical = "top",
+			wrap = true,
+			word_wrap = true
+		})
+		risk_text:set_top(math.round(risk_title:bottom() + 4))
+		risk_text:set_h(risk_stats_panel:bottom() - risk_text:top())
+		local potential_rewards_title = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = self:get_text("menu_potential_rewards"),
+			color = tweak_data.screen_colors.text
+		})
+		managers.hud:make_fine_text(potential_rewards_title)
+		potential_rewards_title:set_top(risk_stats_panel:bottom() + 4)
+		local jobpay_title = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = managers.localization:to_upper_text("cn_menu_contract_jobpay_header"),
+			color = tweak_data.screen_colors.text,
+			x = 10
+		})
+		managers.hud:make_fine_text(jobpay_title)
+		jobpay_title:set_top(math.round(potential_rewards_title:bottom()))
+		local experience_title = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = self:get_text("menu_experience"),
+			color = tweak_data.screen_colors.text,
+			x = 10
+		})
+		managers.hud:make_fine_text(experience_title)
+		experience_title:set_top(math.round(jobpay_title:bottom()))
+		local sx = math.max(jobpay_title:right(), experience_title:right())
+		sx = sx + 8
 		local filled_star_rect = {
 			0,
 			32,
@@ -168,58 +248,95 @@ function IngameContractGui:init(ws)
 			32,
 			32
 		}
-		local cy = paygrade_title:center_y()
-		local level_data = {
-			texture = "guis/textures/pd2/mission_briefing/difficulty_icons",
-			texture_rect = filled_star_rect,
-			w = 20,
-			h = 20,
-			color = tweak_data.screen_colors.text,
-			alpha = 1
-		}
-		local risk_data = {
-			texture = "guis/textures/pd2/crimenet_skull",
-			w = 20,
-			h = 20,
-			color = risk_color,
-			alpha = 1
-		}
-		for i = 1, job_and_difficulty_stars do
-			local star = text_panel:bitmap(job_stars < i and risk_data or level_data)
-			star:set_x(sx + (i - 1) * 22)
-			star:set_center_y(cy)
-		end
+		local cy = jobpay_title:center_y()
 		local plvl = managers.experience:current_level()
 		local player_stars = math.max(math.ceil(plvl / 10), 1)
 		local cy = experience_title:center_y()
 		local num_days = #job_data.chain or 1
 		local days_multiplier = 0
-		local total_xp, base_xp, risk_xp = managers.experience:get_contract_xp_by_stars(job_stars, difficulty_stars, job_data.professional, num_days)
+		local total_xp, base_xp, risk_xp, heat_base_xp, heat_risk_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, num_days)
 		local job_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			text = "",
-			color = Color.white
+			color = tweak_data.screen_colors.text
 		})
-		job_xp:set_text(tostring(math.round(base_xp)))
+		job_xp:set_text(managers.money:add_decimal_marks_to_string(tostring(math.round(base_xp))))
 		managers.hud:make_fine_text(job_xp)
 		job_xp:set_x(sx)
 		job_xp:set_center_y(cy)
+		local heat_xp = math.round(heat_base_xp + heat_risk_xp)
+		local risk_prefix = 0 <= risk_xp and " +" or " -"
+		local heat_prefix = 0 <= heat_xp and " +" or " -"
+		local abs_risk_xp = math.abs(math.round(risk_xp))
+		local abs_heat_xp = math.abs(heat_xp)
 		local add_xp = text_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = font_size,
 			text = "",
 			color = risk_color
 		})
-		add_xp:set_text(" +" .. math.round(risk_xp))
+		add_xp:set_text(risk_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_risk_xp)))
 		managers.hud:make_fine_text(add_xp)
 		add_xp:set_x(job_xp:right())
 		add_xp:set_center_y(cy)
+		local heat_add_xp = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = "",
+			color = heat_color
+		})
+		heat_add_xp:set_text(heat_prefix .. managers.money:add_decimal_marks_to_string(tostring(abs_heat_xp)))
+		managers.hud:make_fine_text(heat_add_xp)
+		heat_add_xp:set_x(math.round(add_xp:right()))
+		heat_add_xp:set_center_y(math.round(cy))
+		heat_add_xp:set_visible(is_job_heated)
+		local gain_xp = total_xp
+		local levels_gained = managers.experience:get_levels_gained_from_xp(gain_xp)
+		local reached_level_cap = managers.experience:reached_level_cap()
+		local levelup_text = reached_level_cap and managers.localization:to_upper_text("menu_reached_level_cap") or managers.localization:to_upper_text("menu_levelup", {
+			levels = string.format("%0.1d%%", levels_gained * 100)
+		})
+		local potential_level_up_text = text_panel:text({
+			layer = 3,
+			name = "potential_level_up_text",
+			blend_mode = "normal",
+			visible = true,
+			text = levelup_text,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			color = tweak_data.hud_stats.potential_xp_color
+		})
+		managers.hud:make_fine_text(potential_level_up_text)
+		potential_level_up_text:set_left(math.round((heat_add_xp:visible() and heat_add_xp:right() or add_xp:right()) + 4))
+		potential_level_up_text:set_top(math.round(heat_add_xp:top()))
+		potential_level_up_text:set_visible(not managers.job:stage_success() or not managers.job:on_last_stage())
 		local total_payout, stage_payout_table, job_payout_table = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, num_days, managers.job:current_job_id())
 		local stage_value = stage_payout_table[1]
 		local stage_risk_value = stage_payout_table[3]
 		local job_value = job_payout_table[1]
 		local job_risk_value = job_payout_table[3]
+		local cy = jobpay_title:center_y()
+		local job_cash = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = "",
+			color = tweak_data.screen_colors.text
+		})
+		job_cash:set_text(managers.experience:cash_string(math.round(job_value)))
+		managers.hud:make_fine_text(job_cash)
+		job_cash:set_x(sx)
+		job_cash:set_center_y(cy)
+		local add_cash = text_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = font_size,
+			text = "",
+			color = risk_color
+		})
+		add_cash:set_text(" +" .. managers.experience:cash_string(math.round(job_risk_value)))
+		managers.hud:make_fine_text(add_cash)
+		add_cash:set_x(job_cash:right())
+		add_cash:set_center_y(cy)
 		local payday_value = total_payout
 		local payday_text = text_panel:text({
 			font = tweak_data.menu.pd2_large_font,
@@ -227,7 +344,7 @@ function IngameContractGui:init(ws)
 			text = self:get_text("menu_payday", {
 				MONEY = managers.experience:cash_string(math.round(payday_value))
 			}),
-			color = Color.white
+			color = tweak_data.screen_colors.text
 		})
 		managers.hud:make_fine_text(payday_text)
 		payday_text:set_bottom(text_panel:h())

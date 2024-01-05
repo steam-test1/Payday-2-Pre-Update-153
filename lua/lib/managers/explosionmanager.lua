@@ -104,13 +104,18 @@ function ExplosionManager:detect_and_give_dmg(params)
 		units_to_push[hit_body:unit():key()] = hit_body:unit()
 		local dir, len, damage, ray_hit
 		if character and not characters_hit[hit_body:unit():key()] then
-			for i_splinter, s_pos in ipairs(splinters) do
-				ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask, "ignore_unit", {
-					hit_body:unit()
-				}, "report")
-				if ray_hit then
-					characters_hit[hit_body:unit():key()] = true
-					break
+			if params.no_raycast_check_characters then
+				ray_hit = true
+				characters_hit[hit_body:unit():key()] = true
+			else
+				for i_splinter, s_pos in ipairs(splinters) do
+					ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask, "ignore_unit", {
+						hit_body:unit()
+					}, "report")
+					if ray_hit then
+						characters_hit[hit_body:unit():key()] = true
+						break
+					end
 				end
 			end
 		elseif apply_dmg or hit_body:dynamic() then

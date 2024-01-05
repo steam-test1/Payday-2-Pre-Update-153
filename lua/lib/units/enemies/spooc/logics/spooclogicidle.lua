@@ -38,10 +38,11 @@ function SpoocLogicIdle._upd_enemy_detection(data)
 end
 
 function SpoocLogicIdle.damage_clbk(data, damage_info)
-	CopLogicIdle.super.damage_clbk(data, damage_info)
+	local res = SpoocLogicIdle.super.damage_clbk(data, damage_info)
 	if data.unit:anim_data().hide then
 		SpoocLogicIdle._exit_hiding(data)
 	end
+	return res
 end
 
 function SpoocLogicIdle._exit_hiding(data)

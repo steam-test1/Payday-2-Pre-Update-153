@@ -279,7 +279,7 @@ function TripMineBase:_explode(col_ray)
 	self._unit:set_extension_update_enabled(Idstring("base"), false)
 	self._deactive_timer = 5
 	self:_play_sound_and_effects()
-	local slotmask = managers.slot:get_mask("bullet_impact_targets")
+	local slotmask = managers.slot:get_mask("explosion_targets")
 	local bodies = World:find_bodies("intersect", "cylinder", self._ray_from_pos, self._ray_to_pos, damage_size, slotmask)
 	local damage = tweak_data.weapon.trip_mines.damage * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
 	local amount = 0
@@ -359,7 +359,7 @@ end
 function TripMineBase:sync_trip_mine_explode(user_unit, ray_from, ray_to, damage_size, damage)
 	self:_play_sound_and_effects()
 	self._unit:set_slot(0)
-	local bodies = World:find_bodies("intersect", "cylinder", ray_from, ray_to, damage_size, managers.slot:get_mask("bullet_impact_targets"))
+	local bodies = World:find_bodies("intersect", "cylinder", ray_from, ray_to, damage_size, managers.slot:get_mask("explosion_targets"))
 	for _, hit_body in ipairs(bodies) do
 		local apply_dmg = hit_body:extension() and hit_body:extension().damage
 		local dir

@@ -9,9 +9,7 @@ function SpoocLogicAttack.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.rsrv_pos = {}
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
 		my_data.shooting = old_internal_data.shooting
@@ -52,15 +50,7 @@ function SpoocLogicAttack.exit(data, new_logic_name, enter_params)
 	if my_data.nearest_cover then
 		managers.navigation:release_cover(my_data.nearest_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 	data.unit:brain():set_update_enabled_state(true)
 end
 
@@ -139,31 +129,17 @@ function SpoocLogicAttack.action_complete_clbk(data, action)
 	elseif action_type == "turn" then
 		my_data.turning = nil
 	elseif action_type == "spooc" then
-		if action:complete() then
-			data.spooc_attack_timeout_t = TimerManager:game():time() + math.lerp(data.char_tweak.spooc_attack_timeout[1], data.char_tweak.spooc_attack_timeout[2], math.random())
-			if data.char_tweak.spooc_attack_use_smoke_chance > 0 and math.random() <= data.char_tweak.spooc_attack_use_smoke_chance and not managers.groupai:state():is_smoke_grenade_active() then
-				managers.groupai:state():detonate_smoke_grenade(data.m_pos + math.UP * 10, data.unit:movement():m_head_pos(), math.lerp(15, 30, math.random()), false)
-			end
+		data.spooc_attack_timeout_t = TimerManager:game():time() + math.lerp(data.char_tweak.spooc_attack_timeout[1], data.char_tweak.spooc_attack_timeout[2], math.random())
+		if action:complete() and data.char_tweak.spooc_attack_use_smoke_chance > 0 and math.random() <= data.char_tweak.spooc_attack_use_smoke_chance and not managers.groupai:state():is_smoke_grenade_active() then
+			managers.groupai:state():detonate_smoke_grenade(data.m_pos + math.UP * 10, data.unit:movement():m_head_pos(), math.lerp(15, 30, math.random()), false)
 		end
-		if my_data.spooc_attack then
-			my_data.spooc_attack = nil
-		end
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-		end
-		local reservation = managers.navigation:reserve_pos(data.t, nil, data.m_pos, nil, 60, data.pos_rsrv_id)
-		my_data.rsrv_pos.stand = reservation
+		my_data.spooc_attack = nil
 	elseif action_type == "dodge" then
 		local timeout = action:timeout()
 		if timeout then
 			data.dodge_timeout_t = TimerManager:game():time() + math.lerp(timeout[1], timeout[2], math.random())
 		end
 		CopLogicAttack._cancel_cover_pathing(data, my_data)
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-		end
-		local reservation = managers.navigation:reserve_pos(data.t, nil, data.m_pos, nil, 60, data.pos_rsrv_id)
-		my_data.rsrv_pos.stand = reservation
 	end
 end
 
@@ -234,13 +210,7 @@ function SpoocLogicAttack._chk_request_action_spooc_attack(data, my_data, flying
 		}
 	end
 	local action = data.unit:brain():action_request(new_action_data)
-	if action then
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
-		return action
-	end
+	return action
 end
 
 function SpoocLogicAttack.chk_should_turn(data, my_data)

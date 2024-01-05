@@ -51,6 +51,25 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan4 = {}
+	self.pd2_clan4.content = {}
+	self.pd2_clan4.dlc = "has_pd2_clan"
+	self.pd2_clan4.content.loot_global_value = "pd2_clan"
+	self.pd2_clan4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "santa_happy",
+			amount = 1
+		}
+	}
+	self.pd2_clan5 = {}
+	self.pd2_clan5.content = {}
+	self.pd2_clan5.dlc = "has_pd2_clan"
+	self.pd2_clan5.content.loot_global_value = "pd2_clan"
+	self.pd2_clan5.content.loot_drops = {}
+	self.pd2_clan5.content.upgrades = {
+		"brass_knuckles"
+	}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}
@@ -373,6 +392,54 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.gage_pack_lmg.content.upgrades = {"rpk", "kabar"}
+	self.skull_mask_1 = {}
+	self.skull_mask_1.dlc = "has_achievement"
+	self.skull_mask_1.achievement_id = "death_27"
+	self.skull_mask_1.content = {}
+	self.skull_mask_1.content.loot_global_value = "infamous"
+	self.skull_mask_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "skullhard",
+			amount = 1
+		}
+	}
+	self.skull_mask_2 = {}
+	self.skull_mask_2.dlc = "has_achievement"
+	self.skull_mask_2.achievement_id = "death_28"
+	self.skull_mask_2.content = {}
+	self.skull_mask_2.content.loot_global_value = "infamous"
+	self.skull_mask_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "skullveryhard",
+			amount = 1
+		}
+	}
+	self.skull_mask_3 = {}
+	self.skull_mask_3.dlc = "has_achievement"
+	self.skull_mask_3.achievement_id = "death_29"
+	self.skull_mask_3.content = {}
+	self.skull_mask_3.content.loot_global_value = "infamous"
+	self.skull_mask_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "skulloverkill",
+			amount = 1
+		}
+	}
+	self.skull_mask_4 = {}
+	self.skull_mask_4.dlc = "has_achievement"
+	self.skull_mask_4.achievement_id = "death_30"
+	self.skull_mask_4.content = {}
+	self.skull_mask_4.content.loot_global_value = "infamous"
+	self.skull_mask_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "skulloverkillplus",
+			amount = 1
+		}
+	}
 	self.charliesierra = {}
 	self.charliesierra.content = {}
 	self.charliesierra.free = true
@@ -381,17 +448,6 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "weapon_mods",
 			item_entry = "wpn_fps_upg_o_acog",
-			amount = 1
-		}
-	}
-	self.pd2_clan4 = {}
-	self.pd2_clan4.content = {}
-	self.pd2_clan4.dlc = "has_pd2_clan"
-	self.pd2_clan4.content.loot_global_value = "pd2_clan"
-	self.pd2_clan4.content.loot_drops = {
-		{
-			type_items = "masks",
-			item_entry = "santa_happy",
 			amount = 1
 		}
 	}

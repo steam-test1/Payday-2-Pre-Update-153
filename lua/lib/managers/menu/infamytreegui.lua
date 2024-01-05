@@ -1,5 +1,5 @@
 require("lib/managers/menu/WalletGuiObject")
-local WIDTH_MULTIPLIER = SystemInfo:platform() == Idstring("WIN32") and 0.6 or 0.6
+local WIDTH_MULTIPLIER = SystemInfo:platform() == Idstring("WIN32") and 0.6 or 0.5
 InfamyTreeGui = InfamyTreeGui or class()
 
 function InfamyTreeGui:init(ws, fullscreen_ws, node)

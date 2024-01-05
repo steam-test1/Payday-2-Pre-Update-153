@@ -95,7 +95,8 @@ function WorldEditor:_init_mission_difficulties()
 		"normal",
 		"hard",
 		"overkill",
-		"overkill_145"
+		"overkill_145",
+		"overkill_290"
 	}
 	self._mission_difficulty = "normal"
 end

@@ -448,6 +448,23 @@ function CoreEnvironmentControllerManager:_update_dof(t, dt)
 	local mvec_set = mvector3.set_static
 	local mvec = mvec1
 	if self._dof_override then
+		if self._dof_override_transition_params then
+			local params = self._dof_override_transition_params
+			params.time = math.max(0, params.time - dt)
+			local lerp_v = math.bezier({
+				0,
+				0,
+				1,
+				1
+			}, 1 - params.time / params.total_t)
+			self._dof_override_near = math.lerp(params.start.near, params.stop.near, lerp_v)
+			self._dof_override_near_pad = math.lerp(params.start.near_pad, params.stop.near_pad, lerp_v)
+			self._dof_override_far = math.lerp(params.start.far, params.stop.far, lerp_v)
+			self._dof_override_far_pad = math.lerp(params.start.far_pad, params.stop.far_pad, lerp_v)
+			if params.time == 0 then
+				self._dof_override_transition_params = nil
+			end
+		end
 		mvec_set(mvec, self._dof_override_near, self._dof_override_near + self._dof_override_near_pad, 0)
 		self._material:set_variable(ids_dof_near_plane, mvec)
 		mvec_set(mvec, self._dof_override_far - self._dof_override_far_pad, self._dof_override_far, 1)
@@ -549,6 +566,23 @@ function CoreEnvironmentControllerManager:set_dof_override_ranges(near, near_pad
 	self._dof_override_near_pad = near_pad
 	self._dof_override_far = far
 	self._dof_override_far_pad = far_pad
+end
+
+function CoreEnvironmentControllerManager:set_dof_override_ranges_transition(time, near, near_pad, far, far_pad)
+	self:set_dof_override(true)
+	self._dof_override_transition_params = {}
+	self._dof_override_transition_params.total_t = time
+	self._dof_override_transition_params.time = time
+	self._dof_override_transition_params.start = {}
+	self._dof_override_transition_params.start.near = self._dof_override_near
+	self._dof_override_transition_params.start.near_pad = self._dof_override_near_pad
+	self._dof_override_transition_params.start.far = self._dof_override_far
+	self._dof_override_transition_params.start.far_pad = self._dof_override_far_pad
+	self._dof_override_transition_params.stop = {}
+	self._dof_override_transition_params.stop.near = near
+	self._dof_override_transition_params.stop.near_pad = near_pad
+	self._dof_override_transition_params.stop.far = far
+	self._dof_override_transition_params.stop.far_pad = far_pad
 end
 
 function CoreEnvironmentControllerManager:set_dome_occ_default()

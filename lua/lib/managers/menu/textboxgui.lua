@@ -363,6 +363,8 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	scroll_down_indicator_arrow:set_rightbottom(scroll_panel:right() + 2, scroll_down_indicator_shade:bottom() - 8)
 	scroll_panel:grow(-scroll_down_indicator_arrow:w(), 0)
 	text:set_w(scroll_panel:w())
+	local _, _, ttw, tth = text:text_rect()
+	text:set_h(tth)
 	local bar_h = scroll_down_indicator_arrow:top() - scroll_up_indicator_arrow:bottom()
 	local scroll_bar = main:panel({
 		name = "scroll_bar",

@@ -468,6 +468,7 @@ function HUDChat:receive_message(name, message, color, icon)
 	local _, _, w, h = line:text_rect()
 	line:set_h(h)
 	table.insert(self._lines, {line, icon_bitmap})
+	line:set_kern(line:kern())
 	self:_layout_output_panel()
 	if not self._focus then
 		local output_panel = self._panel:child("output_panel")

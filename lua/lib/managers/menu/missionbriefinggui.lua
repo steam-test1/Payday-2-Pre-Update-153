@@ -1221,7 +1221,7 @@ function LoadoutItem:create_melee_weapon_loadout()
 		name = "bm_menu_melee_weapons",
 		category = "melee_weapons",
 		on_create_func_name = "populate_melee_weapons",
-		override_slots = {3, 2},
+		override_slots = {3, 3},
 		identifier = Idstring("melee_weapon")
 	})
 	data.topic_id = "menu_loadout_blackmarket"
@@ -1324,10 +1324,13 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		font_size = tweak_data.menu.pd2_small_font_size,
 		font = tweak_data.menu.pd2_small_font,
 		color = slot_color,
-		x = 10,
-		y = 10,
+		x = 5,
+		y = 5,
 		text = utf8.to_upper(CriminalsManager.convert_old_to_new_character_workname(criminal_name) or criminal_name)
 	})
+	if SystemInfo:platform() == Idstring("WIN32") then
+		criminal_text:move(5, 5)
+	end
 	local primary_texture, secondary_texture
 	if outfit.primary.factory_id then
 		local primary_id = managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id)
@@ -2108,7 +2111,7 @@ function NewLoadoutTab:create_melee_weapon_loadout()
 		name = "bm_menu_melee_weapons",
 		category = "melee_weapons",
 		on_create_func_name = "populate_melee_weapons",
-		override_slots = {3, 2},
+		override_slots = {3, 3},
 		identifier = Idstring("melee_weapon")
 	})
 	data.topic_id = "menu_loadout_blackmarket"

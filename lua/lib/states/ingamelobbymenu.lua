@@ -89,13 +89,10 @@ function IngameLobbyMenuState:at_enter()
 	managers.platform:set_rich_presence(Global.game_settings.single_player and "SPEnd" or "MPEnd")
 	managers.hud:remove_updator("point_of_no_return")
 	print("[IngameLobbyMenuState:at_enter()]")
-	if managers.network:session() then
-		if Network:is_server() then
-			managers.network.matchmake:set_server_state("in_lobby")
-			managers.network:session():set_state("in_lobby")
-		else
-			managers.network:session():send_to_peers_loaded("set_peer_entered_lobby")
-		end
+	if managers.network:session() and Network:is_server() then
+		managers.network.matchmake:set_server_state("in_lobby")
+		managers.network:session():set_state("in_lobby")
+	else
 	end
 	managers.mission:pre_destroy()
 	self._continue_block_timer = Application:time() + 0.5

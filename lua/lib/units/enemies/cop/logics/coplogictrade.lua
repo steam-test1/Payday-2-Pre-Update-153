@@ -8,10 +8,6 @@ function CopLogicTrade.enter(data, new_logic_name, enter_params)
 	local my_data = {
 		unit = data.unit
 	}
-	my_data.rsrv_pos = {}
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
 	data.internal_data = my_data
 	data.unit:movement():set_allow_fire(false)
 	CopLogicBase._reset_attention(data)

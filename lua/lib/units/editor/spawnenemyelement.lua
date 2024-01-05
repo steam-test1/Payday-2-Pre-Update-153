@@ -11,6 +11,10 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_biker_4/ene_biker_4",
 	"units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1",
 	"units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2",
+	"units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3",
+	"units/payday2/characters/ene_city_swat_1/ene_city_swat_1",
+	"units/payday2/characters/ene_city_swat_2/ene_city_swat_2",
+	"units/payday2/characters/ene_city_swat_3/ene_city_swat_3",
 	"units/payday2/characters/ene_cop_1/ene_cop_1",
 	"units/payday2/characters/ene_cop_2/ene_cop_2",
 	"units/payday2/characters/ene_cop_3/ene_cop_3",
@@ -64,6 +68,7 @@ function SpawnEnemyUnitElement:init(unit)
 	self._hed.interval = 5
 	self._hed.amount = 0
 	self._hed.accessibility = "any"
+	self._hed.voice = 0
 	table.insert(self._save_values, "enemy")
 	table.insert(self._save_values, "force_pickup")
 	table.insert(self._save_values, "spawn_action")
@@ -71,6 +76,7 @@ function SpawnEnemyUnitElement:init(unit)
 	table.insert(self._save_values, "interval")
 	table.insert(self._save_values, "amount")
 	table.insert(self._save_values, "accessibility")
+	table.insert(self._save_values, "voice")
 end
 
 function SpawnEnemyUnitElement:post_init(...)
@@ -80,10 +86,16 @@ end
 
 function SpawnEnemyUnitElement:test_element()
 	if self._hed.enemy ~= "none" then
-		local enemy = safe_spawn_unit(Idstring(self._hed.enemy), self._unit:position(), self._unit:rotation())
-		table.insert(self._enemies, enemy)
-		ElementSpawnEnemyDummy.produce_test(self._hed, enemy)
+		local unit = safe_spawn_unit(Idstring(self._hed.enemy), self._unit:position(), self._unit:rotation())
+		table.insert(self._enemies, unit)
+		local action_desc = ElementSpawnEnemyDummy._create_action_data(self:get_spawn_anim())
+		unit:movement():action_request(action_desc)
+		unit:movement():set_position(unit:position())
 	end
+end
+
+function SpawnEnemyUnitElement:get_spawn_anim()
+	return self._hed.spawn_action
 end
 
 function SpawnEnemyUnitElement:stop_test_element()
@@ -202,15 +214,26 @@ function SpawnEnemyUnitElement:_build_panel(panel, panel_sizer)
 	local amount = CoreEWS.number_controller(amount_params)
 	amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
 	amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
+	local voice_params = {
+		name = "Voice:",
+		panel = panel,
+		sizer = panel_sizer,
+		value = self._hed.voice,
+		floats = 0,
+		tooltip = "Voice variant. 1-5. 0 for random.",
+		min = 0,
+		max = 5,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local voice = CoreEWS.number_controller(voice_params)
+	voice:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = voice, value = "voice"})
+	voice:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = voice, value = "voice"})
 	local accessibility_params = {
 		name = "Accessibility:",
 		panel = panel,
 		sizer = panel_sizer,
-		options = {
-			"any",
-			"walk",
-			"acrobatic"
-		},
+		options = ElementSpawnEnemyDummy.ACCESSIBILITIES,
 		value = self._hed.accessibility,
 		tooltip = "Only units with this movement type will be spawned from this element.",
 		name_proportions = 1,

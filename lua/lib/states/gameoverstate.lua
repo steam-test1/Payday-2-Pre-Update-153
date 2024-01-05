@@ -32,9 +32,8 @@ end
 
 function GameOverState:_set_continue_button_text()
 	local text_id = self._continue_block_timer and self._continue_block_timer > Application:time() and "menu_es_calculating_experience" or not self._completion_bonus_done and "menu_es_calculating_experience" or (Network:is_server() or managers.dlc:is_trial()) and (managers.job:is_current_job_professional() and (Global.game_settings.single_player and "failed_disconnected_continue" or "debug_mission_end_continue") or "menu_victory_retry_stage") or "victory_client_waiting_for_server"
-	local text = utf8.to_upper(managers.localization:text(text_id, {
-		CONTINUE = managers.localization:btn_macro("continue")
-	}))
+	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
+	local text = utf8.to_upper(managers.localization:text(text_id, {CONTINUE = continue_button}))
 	managers.menu_component:set_endscreen_continue_button_text(text, text_id ~= "failed_disconnected_continue" and text_id ~= "debug_mission_end_continue" and text_id ~= "menu_victory_retry_stage")
 end
 

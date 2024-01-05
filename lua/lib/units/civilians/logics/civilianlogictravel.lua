@@ -18,10 +18,6 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 	else
 		my_data.detection = data.char_tweak.detection.cbt
 	end
-	my_data.rsrv_pos = {}
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
 	data.unit:brain():set_update_enabled_state(true)
 	CivilianLogicEscort._get_objective_path_data(data, my_data)
 	my_data.tmp_vec3 = Vector3()
@@ -101,12 +97,7 @@ function CivilianLogicTravel.update(data)
 		my_data.starting_advance_action = false
 		if my_data.advancing then
 			my_data.advance_path = nil
-			my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-			my_data.rsrv_pos.path = nil
-			if my_data.rsrv_pos.stand then
-				managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-				my_data.rsrv_pos.stand = nil
-			end
+			data.brain:rem_pos_rsrv("path")
 		end
 	elseif objective then
 		if my_data.coarse_path then
@@ -122,7 +113,7 @@ function CivilianLogicTravel.update(data)
 				end
 				return
 			else
-				my_data.rsrv_pos.path = nil
+				data.brain:rem_pos_rsrv("path")
 				local to_pos
 				if objective.pos and cur_index == total_nav_points - 1 then
 					to_pos = objective.pos

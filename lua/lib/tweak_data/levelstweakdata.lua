@@ -557,9 +557,10 @@ function LevelsTweakData:init()
 	self.arm_for.bonus_escape = true
 	self.arm_for.static_experience = {
 		4000,
-		7000,
-		15000,
-		25000
+		4000,
+		4000,
+		4000,
+		4000
 	}
 	self.family = {}
 	self.family.name_id = "heist_family_hl"
@@ -663,15 +664,33 @@ function LevelsTweakData:init()
 	self.monolithic_1.music = "heist"
 	self.monolithic_1.package = "packages/level_debug"
 	self.monolithic_1.cube = "cube_apply_heist_bank"
+	self.blueharvest_1 = {}
+	self.blueharvest_1.name_id = "heist_blueharvest_1_hl"
+	self.blueharvest_1.briefing_id = "heist_blueharvest_1_briefing"
+	self.blueharvest_1.world_name = "narratives/blue_harvest/stage_1"
+	self.blueharvest_1.intro_event = "lol"
+	self.blueharvest_1.outro_event = {"lol", "lolo"}
+	self.blueharvest_1.music = "heist"
+	self.blueharvest_1.package = "packages/level_debug"
+	self.blueharvest_1.cube = "cube_apply_heist_bank"
 	self.blueharvest_2 = {}
 	self.blueharvest_2.name_id = "heist_blueharvest_2_hl"
 	self.blueharvest_2.briefing_id = "heist_blueharvest_2_briefing"
-	self.blueharvest_2.world_name = "wip/blueharvest/stage_2"
+	self.blueharvest_2.world_name = "narratives/blue_harvest/stage_2"
 	self.blueharvest_2.intro_event = "lol"
 	self.blueharvest_2.outro_event = {"lol", "lolo"}
 	self.blueharvest_2.music = "heist"
 	self.blueharvest_2.package = "packages/level_debug"
 	self.blueharvest_2.cube = "cube_apply_heist_bank"
+	self.blueharvest_3 = {}
+	self.blueharvest_3.name_id = "heist_blueharvest_3_hl"
+	self.blueharvest_3.briefing_id = "heist_blueharvest_3_briefing"
+	self.blueharvest_3.world_name = "narratives/blue_harvest/stage_3"
+	self.blueharvest_3.intro_event = "lol"
+	self.blueharvest_3.outro_event = {"lol", "lolo"}
+	self.blueharvest_3.music = "heist"
+	self.blueharvest_3.package = "packages/level_debug"
+	self.blueharvest_3.cube = "cube_apply_heist_bank"
 	self.test01 = {}
 	self.test01.name_id = "heist_test01_hl"
 	self.test01.briefing_id = "heist_test01"
@@ -1208,7 +1227,9 @@ function LevelsTweakData:init()
 		"branchbank_cloaker",
 		"heat",
 		"monolithic_1",
+		"blueharvest_1",
 		"blueharvest_2",
+		"blueharvest_3",
 		"test01",
 		"test02",
 		"test03",
@@ -1234,7 +1255,8 @@ function LevelsTweakData:init()
 		"escape_park_day",
 		"election_day_3",
 		"arm_for",
-		"escape_hell"
+		"escape_hell",
+		"blueharvest_3"
 	}
 end
 

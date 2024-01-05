@@ -24,6 +24,8 @@ function ElementPointOfNoReturn:on_executed(instigator)
 		managers.groupai:state():set_point_of_no_return_timer(self._values.time_overkill, self._id)
 	elseif diff == "overkill_145" then
 		managers.groupai:state():set_point_of_no_return_timer(self._values.time_overkill_145, self._id)
+	elseif diff == "overkill_290" then
+		managers.groupai:state():set_point_of_no_return_timer(self._values.time_overkill_290, self._id)
 	end
 	ElementPointOfNoReturn.super.on_executed(self, instigator)
 end

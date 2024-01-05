@@ -12,10 +12,8 @@ function TeamAILogicIdle.enter(data, new_logic_name, enter_params)
 	}
 	my_data.detection = data.char_tweak.detection.idle
 	my_data.enemy_detect_slotmask = managers.slot:get_mask("enemies")
-	my_data.rsrv_pos = {}
 	local old_internal_data = data.internal_data
 	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
 		if old_internal_data.best_cover then
 			my_data.best_cover = old_internal_data.best_cover
 			managers.navigation:reserve_cover(my_data.best_cover[1], data.pos_rsrv_id)
@@ -149,15 +147,7 @@ function TeamAILogicIdle.exit(data, new_logic_name, enter_params)
 	if my_data.nearest_cover then
 		managers.navigation:release_cover(my_data.nearest_cover[1])
 	end
-	local rsrv_pos = my_data.rsrv_pos
-	if rsrv_pos.path then
-		managers.navigation:unreserve_pos(rsrv_pos.path)
-		rsrv_pos.path = nil
-	end
-	if rsrv_pos.move_dest then
-		managers.navigation:unreserve_pos(rsrv_pos.move_dest)
-		rsrv_pos.move_dest = nil
-	end
+	data.brain:rem_pos_rsrv("path")
 end
 
 function TeamAILogicIdle.update(data)

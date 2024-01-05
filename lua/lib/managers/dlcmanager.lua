@@ -179,15 +179,27 @@ function PS3DLCManager:init()
 		Global.dlc_manager.all_dlc_data = {
 			full_game = {
 				filename = "full_game_key.edat",
-				product_id = "EP4040-BLES01902_00-PAYDAY2NPEU00000"
+				product_id = self.SERVICE_ID .. "-PAYDAY2NPEU00000"
 			},
 			preorder = {
 				filename = "preorder_dlc_key.edat",
-				product_id = "EP4040-BLES01902_00-PPAYDAY2XX000006"
+				product_id = self.SERVICE_ID .. "-PPAYDAY2XX000006"
 			},
 			sweettooth = {
 				filename = "sweettooth_dlc_key.edat",
-				product_id = "EP4040-BLES01902_00-PPAYDAY2SWTTOOTH"
+				product_id = self.SERVICE_ID .. "-PPAYDAY2SWTTOOTH"
+			},
+			armored_transport = {
+				filename = "armored_transport_dlc_key.edat",
+				product_id = self.SERVICE_ID .. "-PPAYDAY2ARMORDTR"
+			},
+			gage_pack = {
+				filename = "gagepack_1_dlc_key.edat",
+				product_id = self.SERVICE_ID .. "-PPAYDAY2GAGEPAK1"
+			},
+			gage_pack_lmg = {
+				filename = "gagepack_2_dlc_key.edat",
+				product_id = self.SERVICE_ID .. "-PPAYDAY2GAGEPAK2"
 			}
 		}
 		self:_verify_dlcs()
@@ -365,15 +377,22 @@ function X360DLCManager:_verify_dlcs()
 		Application:error("XboxLive:check_dlc_availability failed", inspect(found_dlc))
 		return
 	end
-	print("[X360DLCManager:_verify_dlcs] found dlc:", inspect(found_dlc))
+	print("[X360DLCManager:_verify_dlcs] found DLC:")
+	for i, k in pairs(found_dlc) do
+		print(i, k)
+	end
 	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
-		if dlc_data.is_default or found_dlc[dlc_data.index] then
+		if found_dlc[dlc_data.index] == "corrupt" then
+			print("[X360DLCManager:_verify_dlcs] Found corrupt DLC:", dlc_name)
+			dlc_data.is_corrupt = true
+		elseif dlc_data.is_default or found_dlc[dlc_data.index] == true then
 			dlc_data.verified = true
 		else
 			dlc_data.verified = false
 		end
 	end
 	if found_dlc.has_corrupt_data then
+		print("[X360DLCManager:_verify_dlcs] Found at least one corrupt DLC.")
 		self._has_corrupt_data = true
 	end
 end

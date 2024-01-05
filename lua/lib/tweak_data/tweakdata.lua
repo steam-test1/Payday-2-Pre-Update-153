@@ -100,6 +100,8 @@ function TweakData:set_difficulty()
 		self:_set_overkill()
 	elseif Global.game_settings.difficulty == "overkill_145" then
 		self:_set_overkill_145()
+	elseif Global.game_settings.difficulty == "overkill_290" then
+		self:_set_overkill_290()
 	else
 		self:_set_hard()
 	end
@@ -108,7 +110,7 @@ end
 function TweakData:_set_easy()
 	self.player:_set_easy()
 	self.character:_set_easy()
-	self.group_ai:_set_easy()
+	self.group_ai:init(self)
 	self.weapon:_set_easy()
 	self.experience_manager.civilians_killed = 15
 	self.difficulty_name_id = self.difficulty_name_ids.easy
@@ -120,7 +122,7 @@ end
 function TweakData:_set_normal()
 	self.player:_set_normal()
 	self.character:_set_normal()
-	self.group_ai:_set_normal()
+	self.group_ai:init(self)
 	self.weapon:_set_normal()
 	self.experience_manager.civilians_killed = 35
 	self.difficulty_name_id = self.difficulty_name_ids.normal
@@ -132,7 +134,7 @@ end
 function TweakData:_set_hard()
 	self.player:_set_hard()
 	self.character:_set_hard()
-	self.group_ai:_set_hard()
+	self.group_ai:init(self)
 	self.weapon:_set_hard()
 	self.experience_manager.civilians_killed = 75
 	self.difficulty_name_id = self.difficulty_name_ids.hard
@@ -144,7 +146,7 @@ end
 function TweakData:_set_overkill()
 	self.player:_set_overkill()
 	self.character:_set_overkill()
-	self.group_ai:_set_overkill()
+	self.group_ai:init(self)
 	self.weapon:_set_overkill()
 	self.experience_manager.civilians_killed = 150
 	self.difficulty_name_id = self.difficulty_name_ids.overkill
@@ -156,7 +158,7 @@ end
 function TweakData:_set_overkill_145()
 	self.player:_set_overkill_145()
 	self.character:_set_overkill_145()
-	self.group_ai:_set_overkill_145()
+	self.group_ai:init(self)
 	self.weapon:_set_overkill_145()
 	self.experience_manager.civilians_killed = 550
 	self.difficulty_name_id = self.difficulty_name_ids.overkill_145
@@ -165,12 +167,20 @@ function TweakData:_set_overkill_145()
 	self.experience_manager.total_objectives_finished = 3000
 end
 
+function TweakData:_set_overkill_290()
+	self.player:_set_overkill_290()
+	self.character:_set_overkill_290()
+	self.group_ai:init(self)
+	self.weapon:_set_overkill_290()
+	self.experience_manager.civilians_killed = 10000
+	self.difficulty_name_id = self.difficulty_name_ids.overkill_290
+	self.experience_manager.total_level_objectives = 5000
+	self.experience_manager.total_criminals_finished = 2000
+	self.experience_manager.total_objectives_finished = 3000
+end
+
 function TweakData:difficulty_to_index(difficulty)
-	for i, diff in ipairs(self.difficulties) do
-		if diff == difficulty then
-			return i
-		end
-	end
+	return table.index_of(self.difficulties, difficulty)
 end
 
 function TweakData:index_to_difficulty(index)
@@ -178,11 +188,7 @@ function TweakData:index_to_difficulty(index)
 end
 
 function TweakData:permission_to_index(permission)
-	for i, perm in ipairs(self.permissions) do
-		if perm == permission then
-			return i
-		end
-	end
+	return table.index_of(self.permissions, permission)
 end
 
 function TweakData:index_to_permission(index)
@@ -190,11 +196,7 @@ function TweakData:index_to_permission(index)
 end
 
 function TweakData:server_state_to_index(state)
-	for i, server_state in ipairs(self.server_states) do
-		if server_state == state then
-			return i
-		end
-	end
+	return table.index_of(self.server_states, state)
 end
 
 function TweakData:index_to_server_state(index)
@@ -217,6 +219,48 @@ function TweakData:index_to_menu_sync_state(index)
 end
 
 function TweakData:init()
+	self.difficulties = {
+		"easy",
+		"normal",
+		"hard",
+		"overkill",
+		"overkill_145",
+		"overkill_290"
+	}
+	self.difficulty_level_locks = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		80
+	}
+	self.permissions = {
+		"public",
+		"friends_only",
+		"private"
+	}
+	self.server_states = {
+		"in_lobby",
+		"loading",
+		"in_game"
+	}
+	self.menu_sync_states = {
+		"crimenet",
+		"skilltree",
+		"options",
+		"lobby",
+		"blackmarket",
+		"blackmarket_weapon",
+		"blackmarket_mask"
+	}
+	self.difficulty_name_ids = {}
+	self.difficulty_name_ids.easy = "menu_difficulty_easy"
+	self.difficulty_name_ids.normal = "menu_difficulty_normal"
+	self.difficulty_name_ids.hard = "menu_difficulty_hard"
+	self.difficulty_name_ids.overkill = "menu_difficulty_very_hard"
+	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
+	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
 	self.hud_icons = HudIconsTweakData:new()
 	self.weapon = WeaponTweakData:new()
 	self.weapon_upgrades = WeaponUpgradesTweakData:new()
@@ -254,38 +298,6 @@ function TweakData:init()
 	end
 	self:set_scale()
 	self:_init_pd2()
-	self.difficulties = {
-		"easy",
-		"normal",
-		"hard",
-		"overkill",
-		"overkill_145"
-	}
-	self.permissions = {
-		"public",
-		"friends_only",
-		"private"
-	}
-	self.server_states = {
-		"in_lobby",
-		"loading",
-		"in_game"
-	}
-	self.menu_sync_states = {
-		"crimenet",
-		"skilltree",
-		"options",
-		"lobby",
-		"blackmarket",
-		"blackmarket_weapon",
-		"blackmarket_mask"
-	}
-	self.difficulty_name_ids = {}
-	self.difficulty_name_ids.easy = "menu_difficulty_easy"
-	self.difficulty_name_ids.normal = "menu_difficulty_normal"
-	self.difficulty_name_ids.hard = "menu_difficulty_hard"
-	self.difficulty_name_ids.overkill = "menu_difficulty_very_hard"
-	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
 	self.menu_themes = {
 		old = {
 			bg_startscreen = "guis/textures/menu/old_theme/bg_startscreen",
@@ -409,9 +421,18 @@ function TweakData:init()
 	self.screen_colors.regular_color = Color(255, 41, 150, 240) / 255
 	self.screen_colors.pro_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.dlc_color = Color(255, 255, 212, 0) / 255
+	self.screen_colors.heat_cold_color = Color(255, 255, 51, 51) / 255
+	self.screen_colors.heat_warm_color = Color("ff7f00")
+	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
+	self.screen_colors.heat_color = self.screen_colors.heat_standard_color
 	self.screen_colors.stats_positive = Color(255, 191, 221, 125) / 255
 	self.screen_colors.stats_negative = Color(255, 254, 93, 99) / 255
 	self.screen_colors.stats_mods = Color(255, 229, 229, 76) / 255
+	if Global.test_new_colors then
+		for i, d in pairs(self.screen_colors) do
+			self.screen_colors[i] = Color.purple
+		end
+	end
 	if Global.old_colors_purple then
 		self.screen_color_white = Color.purple
 		self.screen_color_red = Color.purple
@@ -1861,11 +1882,21 @@ function TweakData:init()
 	self.interaction.crate_loot = {}
 	self.interaction.crate_loot.text_id = "hud_int_hold_crack_crate"
 	self.interaction.crate_loot.action_text_id = "hud_action_cracking_crate"
+	self.interaction.crate_loot.equipment_text_id = "debug_interact_equipment_crowbar"
+	self.interaction.crate_loot.special_equipment = "crowbar"
 	self.interaction.crate_loot.timer = 2
 	self.interaction.crate_loot.start_active = false
-	self.interaction.crate_loot.sound_start = "bar_crowbar"
-	self.interaction.crate_loot.sound_interupt = "bar_crowbar_cancel"
-	self.interaction.crate_loot.sound_done = "bar_crowbar_end"
+	self.interaction.crate_loot.sound_start = "bar_open_crate"
+	self.interaction.crate_loot.sound_interupt = "bar_open_crate_cancel"
+	self.interaction.crate_loot.sound_done = "bar_open_crate_finished"
+	self.interaction.crate_loot_close = {}
+	self.interaction.crate_loot_close.text_id = "hud_int_hold_close_crate"
+	self.interaction.crate_loot_close.action_text_id = "hud_action_closing_crate"
+	self.interaction.crate_loot_close.timer = 2
+	self.interaction.crate_loot_close.start_active = false
+	self.interaction.crate_loot_close.sound_start = "bar_close_crate"
+	self.interaction.crate_loot_close.sound_interupt = "bar_close_crate_cancel"
+	self.interaction.crate_loot_close.sound_done = "bar_close_crate_finished"
 	self.interaction.halloween_trick = {}
 	self.interaction.halloween_trick.text_id = "hud_int_trick_treat"
 	self.interaction.disassemble_turret = {}
@@ -1927,6 +1958,18 @@ function TweakData:init()
 	self.interaction.uload_database_jammed.sound_interupt = "bar_keyboard_cancel"
 	self.interaction.uload_database_jammed.sound_done = "bar_keyboard_finished"
 	self.interaction.uload_database_jammed.axis = "x"
+	self.interaction.votingmachine2 = {}
+	self.interaction.votingmachine2.text_id = "debug_interact_hack_ipad"
+	self.interaction.votingmachine2.timer = 5
+	self.interaction.votingmachine2.sound_start = "bar_drill_apply"
+	self.interaction.votingmachine2.sound_interupt = "bar_drill_apply_cancel"
+	self.interaction.votingmachine2.sound_done = "bar_drill_apply_finished"
+	self.interaction.votingmachine2_jammed = {}
+	self.interaction.votingmachine2_jammed.text_id = "debug_interact_hack_ipad_jammed"
+	self.interaction.votingmachine2_jammed.timer = 5
+	self.interaction.votingmachine2_jammed.sound_start = "bar_drill_fix"
+	self.interaction.votingmachine2_jammed.sound_interupt = "bar_drill_fix_cancel"
+	self.interaction.votingmachine2_jammed.sound_done = "bar_drill_fix_finished"
 	self.gui = self.gui or {}
 	self.gui.BOOT_SCREEN_LAYER = 1
 	self.gui.TITLE_SCREEN_LAYER = 1
@@ -2187,10 +2230,12 @@ function TweakData:init()
 		4000
 	}
 	self.experience_manager.stage_failed_multiplier = 0.1
+	self.experience_manager.in_custody_multiplier = 0.25
 	self.experience_manager.difficulty_multiplier = {
 		2,
 		5,
-		10
+		10,
+		13
 	}
 	self.experience_manager.alive_humans_multiplier = {
 		1,
@@ -2355,6 +2400,7 @@ function TweakData:init()
 	self.achievement.in_town_you_are_law = {award = "gage2_6", weapon_type = "shotgun"}
 	self.achievement.dont_push_it = {award = "gage2_7", weapon = "deagle"}
 	self.achievement.finally = {award = "gage2_8"}
+	self.achievement.demise_knuckles = "brass_knuckles"
 	self.achievement.enemy_kill_achievements = {
 		try_out_your_usp = {
 			weapon = "usp",
@@ -2436,7 +2482,7 @@ function TweakData:init()
 			stat = "halloween_10_stats",
 			mask = "bear",
 			difficulty = "overkill_145",
-			contracts = {"vlad"}
+			contract = "vlad"
 		},
 		i_take_scores = {
 			stat = "armored_4_stat",
@@ -2444,22 +2490,224 @@ function TweakData:init()
 			difficulty = "overkill_145",
 			jobs = {
 				"arm_cro",
-				"arm_cro_prof",
 				"arm_und",
-				"arm_und_prof",
 				"arm_hcm",
-				"arm_hcm_prof",
 				"arm_par",
-				"arm_par_prof",
-				"arm_fac",
-				"arm_fac_prof"
+				"arm_fac"
 			}
 		},
 		eco_round = {
 			award = "charliesierra_7",
 			no_shots = "primaries",
 			difficulty = "overkill_145",
-			jobs = {"roberts"}
+			job = "roberts"
+		},
+		death_ukranian = {
+			award = "death_1",
+			difficulty = "overkill_290",
+			job = "ukrainian_job_prof"
+		},
+		death_mallcrasher = {
+			award = "death_2",
+			difficulty = "overkill_290",
+			job = "mallcrasher"
+		},
+		death_four_stores = {
+			award = "death_3",
+			difficulty = "overkill_290",
+			job = "four_stores"
+		},
+		death_nightclub = {
+			award = "death_4",
+			difficulty = "overkill_290",
+			job = "nightclub"
+		},
+		death_watchdogs = {
+			award = "death_34",
+			difficulty = "overkill_290",
+			job = "watchdogs"
+		},
+		death_watchdogs_prof = {
+			award = "death_6",
+			difficulty = "overkill_290",
+			job = "watchdogs_prof"
+		},
+		death_rats = {
+			award = "death_33",
+			difficulty = "overkill_290",
+			job = "alex"
+		},
+		death_rats_prof = {
+			award = "death_7",
+			difficulty = "overkill_290",
+			job = "alex_prof"
+		},
+		death_firestarter = {
+			award = "death_32",
+			difficulty = "overkill_290",
+			job = "firestarter"
+		},
+		death_firestarter_prof = {
+			award = "death_8",
+			difficulty = "overkill_290",
+			job = "firestarter_prof"
+		},
+		death_framing_frame = {
+			award = "death_35",
+			difficulty = "overkill_290",
+			job = "framing_frame"
+		},
+		death_framing_frame_prof = {
+			award = "death_10",
+			difficulty = "overkill_290",
+			job = "framing_frame_prof"
+		},
+		death_big_oil = {
+			award = "death_11",
+			difficulty = "overkill_290",
+			job = "welcome_to_the_jungle_prof"
+		},
+		death_jewelry_store = {
+			award = "death_13",
+			difficulty = "overkill_290",
+			job = "jewelry_store"
+		},
+		death_diamond_store = {
+			award = "death_14",
+			difficulty = "overkill_290",
+			job = "family"
+		},
+		death_go_bank = {
+			award = "death_15",
+			difficulty = "overkill_290",
+			job = "roberts"
+		},
+		death_bank_heist = {
+			award = "death_16",
+			difficulty = "overkill_290",
+			job = "branchbank_prof"
+		},
+		death_bank_heist_gold = {
+			award = "death_17",
+			difficulty = "overkill_290",
+			job = "branchbank_gold_prof"
+		},
+		death_bank_heist_cash = {
+			award = "death_18",
+			difficulty = "overkill_290",
+			job = "branchbank_cash"
+		},
+		death_bank_heist_deposit = {
+			award = "death_19",
+			difficulty = "overkill_290",
+			job = "branchbank_deposit"
+		},
+		death_transport_crossroads = {
+			award = "death_20",
+			difficulty = "overkill_290",
+			job = "arm_cro"
+		},
+		death_transport_downtown = {
+			award = "death_21",
+			difficulty = "overkill_290",
+			job = "arm_hcm"
+		},
+		death_transport_harbor = {
+			award = "death_22",
+			difficulty = "overkill_290",
+			job = "arm_fac"
+		},
+		death_transport_park = {
+			award = "death_23",
+			difficulty = "overkill_290",
+			job = "arm_par"
+		},
+		death_transport_underpass = {
+			award = "death_24",
+			difficulty = "overkill_290",
+			job = "arm_und"
+		},
+		death_transport_train = {
+			award = "death_25",
+			difficulty = "overkill_290",
+			job = "arm_for"
+		}
+	}
+	self.achievement.job_list = {}
+	self.achievement.job_list.vlad = {
+		"ukrainian_job_prof",
+		"mallcrasher",
+		"four_stores",
+		"nightclub"
+	}
+	self.achievement.job_list.hector = {
+		"watchdogs",
+		"watchdogs_prof",
+		"alex",
+		"alex_prof",
+		"firestarter",
+		"firestarter_prof"
+	}
+	self.achievement.job_list.elephant = {
+		"framing_frame",
+		"framing_frame_prof",
+		"welcome_to_the_jungle_prof"
+	}
+	self.achievement.job_list.bain = {
+		"jewelry_store",
+		"family",
+		"roberts",
+		"branchbank_prof",
+		"branchbank_gold_prof",
+		"branchbank_cash",
+		"branchbank_deposit",
+		"arm_cro",
+		"arm_hcm",
+		"arm_fac",
+		"arm_par",
+		"arm_und",
+		"arm_for"
+	}
+	self.achievement.complete_heist_stats_achievements = {
+		death_vlad = {
+			award = "death_5",
+			difficulty = "overkill_290",
+			contact = "vlad"
+		},
+		death_hector = {
+			award = "death_9",
+			difficulty = "overkill_290",
+			contact = "hector"
+		},
+		death_elephant = {
+			award = "death_12",
+			difficulty = "overkill_290",
+			contact = "elephant"
+		},
+		death_bain = {
+			award = "death_26",
+			difficulty = "overkill_290",
+			contact = "bain"
+		},
+		skull_hard = {
+			award = "death_27",
+			difficulty = "hard",
+			contact = "all"
+		},
+		skull_very_hard = {
+			award = "death_28",
+			difficulty = "overkill",
+			contact = "all"
+		},
+		skull_overkill = {
+			award = "death_29",
+			difficulty = "overkill_145",
+			contact = "all"
+		},
+		skull_deathwish = {
+			award = "death_30",
+			difficulty = "overkill_290",
+			contact = "all"
 		}
 	}
 	self.achievement.four_mask_achievements = {
@@ -2559,7 +2807,8 @@ function TweakData:init()
 		"track_07",
 		"track_08",
 		"track_09",
-		"track_10"
+		"track_10",
+		"track_12"
 	}
 	self.music.heist.switches_infamous = {"track_11"}
 	self.music.default = deep_clone(self.music.heist)
@@ -3183,13 +3432,13 @@ function TweakData:get_controller_help_coords()
 		}
 		coords.menu_button_throw_grenade = {
 			x = 0,
-			y = 150,
+			y = 145,
 			align = "right",
 			vertical = "center"
 		}
 		coords.menu_button_weapon_firemode = {
 			x = 0,
-			y = 130,
+			y = 87,
 			align = "right",
 			vertical = "center"
 		}

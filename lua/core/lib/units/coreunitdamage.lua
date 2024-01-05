@@ -50,7 +50,7 @@ function CoreUnitDamage:init(unit, default_body_extension_class, body_extension_
 			local body_ext = (body_extension_class_map[body_element._name] or default_body_extension_class):new(self._unit, self, body, body_element)
 			body:extension().damage = body_ext
 			local body_key
-			for _, damage_type in pairs(body_ext:get_endurance_map()) do
+			for damage_type, _ in pairs(body_ext:get_endurance_map()) do
 				if inflict_updator_damage_type_map[damage_type] then
 					body_key = body_key or body:key()
 					self._added_inflict_updator_damage_type_map = self._added_inflict_updator_damage_type_map or {}
@@ -2031,6 +2031,7 @@ function CoreInflictUpdator:set_enabled(enabled)
 		self._enabled = enabled
 		if enabled then
 			self._id = managers.sequence:add_callback(self._update_func)
+			self._check_time = TimerManager:game():time() + math.random() * self._interval
 		elseif self._id then
 			managers.sequence:remove_callback(self._id)
 			self._id = nil
@@ -2113,7 +2114,7 @@ end
 CoreInflictFireUpdator = CoreInflictFireUpdator or class(CoreInflictUpdator)
 CoreInflictUpdator.INFLICT_UPDATOR_DAMAGE_TYPE_MAP.fire = CoreInflictFireUpdator
 CoreInflictFireUpdator.SPHERE_CHECK_SLOTMASK = "fire_damage"
-CoreInflictFireUpdator.SPHERE_CHECK_PADDING = 200
+CoreInflictFireUpdator.SPHERE_CHECK_PADDING = 100
 CoreInflictFireUpdator.DAMAGE_TYPE = "fire"
 
 function CoreInflictFireUpdator:init(unit, body, body_damage_ext, inflict_element, unit_element)
@@ -2189,7 +2190,7 @@ end
 function CoreInflictFireUpdator:save(data)
 	local state = {}
 	local changed = CoreInflictUpdator.save(self, data)
-	if self._original_fire_object_name ~= self._fire_object:name() then
+	if Idstring(self._original_fire_object_name) ~= self._fire_object:name() then
 		state.fire_object_name = self._fire_object:name()
 		changed = true
 	end
@@ -2226,58 +2227,77 @@ function CoreInflictFireUpdator:load(data)
 	end
 end
 
+local mvec1 = Vector3()
+local mvec2 = Vector3()
+local mvec3 = Vector3()
+
 function CoreInflictFireUpdator:check_damage(t, dt)
 	local oobb = self._fire_object:oobb()
 	local oobb_center = oobb:center()
 	local unit_list = self._unit:find_units_quick("sphere", oobb_center, self._sphere_check_range, self._slotmask)
 	local inflicted_damage, exit_inflict_env
 	for _, unit in ipairs(unit_list) do
-		local unit_key = unit:key()
-		local inflict_body_map = managers.sequence:get_inflict_updator_body_map(self.DAMAGE_TYPE, unit_key)
-		if inflict_body_map then
-			for body_key, body_ext in pairs(inflict_body_map) do
-				local body = body_ext:get_body()
-				if alive(body) then
-					local body_center = body:center_of_mass()
-					local distance = oobb:principal_distance(body:oobb())
-					local position, normal
-					local direction = (oobb_center - body_center):normalized()
-					local damage
-					if 0 < distance then
-						position, normal = oobb:raycast(body_center, body_center - Vector3(0, 0, self._fire_height))
-						if position then
-							if self._falloff and 0 < self._fire_height then
-								damage = self._damage * math.clamp(1 - distance / self._fire_height, 0, 1)
-							else
-								damage = self._damage
+		local local_damage = unit == managers.player:player_unit() or unit:id() == -1
+		local sync_damage = not local_damage and Network:is_server() and unit:id() ~= -1
+		local do_damage = sync_damage or local_damage
+		if do_damage then
+			local unit_key = unit:key()
+			local inflict_body_map = managers.sequence:get_inflict_updator_body_map(self.DAMAGE_TYPE, unit_key)
+			if inflict_body_map then
+				for body_key, body_ext in pairs(inflict_body_map) do
+					local body = body_ext:get_body()
+					if alive(body) then
+						local body_center = mvec2
+						mvector3.set(body_center, body:center_of_mass())
+						local distance = oobb:principal_distance(body:oobb())
+						local position, normal
+						local direction = mvec1
+						mvector3.set(direction, oobb_center)
+						mvector3.subtract(direction, body_center)
+						mvector3.normalize(direction)
+						local damage
+						if 0 < distance then
+							local to = mvec3
+							mvector3.set(to, body_center)
+							mvector3.set_z(to, mvector3.z(body_center) - self._fire_height)
+							position, normal = oobb:raycast(body_center, to)
+							if position then
+								if self._falloff and 0 < self._fire_height then
+									damage = self._damage * math.clamp(1 - distance / self._fire_height, 0, 1)
+								else
+									damage = self._damage
+								end
 							end
+						else
+							position, normal = body_center, -direction
+							damage = self._damage
+						end
+						if position then
+							local was_inflicting = self._is_inflicting
+							inflicted_damage = true
+							if not self._is_inflicting then
+								self._is_inflicting = true
+								if self._enter_element_func then
+									local env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, normal, position, direction, damage, self._velocity, {distance = distance}, self._unit_element)
+									self._enter_element_func(env)
+								end
+							end
+							if was_inflicting or self._instant then
+								if self._damage_element_func then
+									local env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, normal, position, direction, damage, self._velocity, {distance = distance}, self._unit_element)
+									self._damage_element_func(env)
+								end
+								body_ext:damage_fire(self._unit, normal, position, direction, damage, self._velocity)
+								if sync_damage then
+									managers.network:session():send_to_peers_synched("sync_inflict_body_damage", body, self._unit, normal, position, direction, damage, self._velocity)
+								end
+							end
+						elseif self._exit_element_func and not exit_inflict_env then
+							exit_inflict_env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, -direction, body_center, direction, damage, self._velocity, {distance = distance}, self._unit_element)
 						end
 					else
-						position, normal = body_center, -direction
-						damage = self._damage
+						managers.sequence:remove_inflict_updator_body(self.DAMAGE_TYPE, unit_key, body_key)
 					end
-					if position then
-						local was_inflicting = self._is_inflicting
-						inflicted_damage = true
-						if not self._is_inflicting then
-							self._is_inflicting = true
-							if self._enter_element_func then
-								local env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, normal, position, direction, damage, self._velocity, {distance = distance}, self._unit_element)
-								self._enter_element_func(env)
-							end
-						end
-						if was_inflicting or self._instant then
-							if self._damage_element_func then
-								local env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, normal, position, direction, damage, self._velocity, {distance = distance}, self._unit_element)
-								self._damage_element_func(env)
-							end
-							body_ext:damage_fire(self._unit, normal, position, direction, damage, self._velocity)
-						end
-					elseif self._exit_element_func and not exit_inflict_env then
-						exit_inflict_env = CoreSequenceManager.SequenceEnvironment:new(self.DAMAGE_TYPE, unit, self._unit, self._body, -direction, body_center, direction, damage, self._velocity, {distance = distance}, self._unit_element)
-					end
-				else
-					managers.sequence:remove_inflict_updator_body(self.DAMAGE_TYPE, unit_key, body_key)
 				end
 			end
 		end

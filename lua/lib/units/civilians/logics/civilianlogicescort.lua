@@ -7,10 +7,6 @@ function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 	local my_data = {
 		unit = data.unit
 	}
-	my_data.rsrv_pos = {}
-	if old_internal_data then
-		my_data.rsrv_pos = old_internal_data.rsrv_pos or my_data.rsrv_pos
-	end
 	data.unit:brain():set_update_enabled_state(true)
 	if data.char_tweak.escort_idle_talk then
 		my_data._say_random_t = Application:time() + 45
@@ -85,7 +81,6 @@ function CivilianLogicEscort.update(data)
 				managers.groupai:state():on_civilian_objective_complete(unit, objective)
 				return
 			else
-				my_data.rsrv_pos.path = nil
 				local to_pos = coarse_path[cur_index + 1][2]
 				my_data.advance_path_search_id = tostring(unit:key()) .. "advance"
 				my_data.processing_advance_path = true
@@ -254,13 +249,7 @@ function CivilianLogicEscort._begin_advance_action(data, my_data)
 	}
 	my_data.advancing = data.unit:brain():action_request(new_action_data)
 	if my_data.advancing then
-		my_data.advance_path = nil
-		my_data.rsrv_pos.move_dest = my_data.rsrv_pos.path
-		my_data.rsrv_pos.path = nil
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
+		data.brain:rem_pos_rsrv("path")
 	else
 		debug_pause("[CivilianLogicEscort._begin_advance_action] failed to start")
 	end

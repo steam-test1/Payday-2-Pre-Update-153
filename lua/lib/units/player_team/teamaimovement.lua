@@ -23,7 +23,10 @@ function TeamAIMovement:set_character_anim_variables()
 	if char_name and self._unit:damage() then
 		local ai_character_id = managers.criminals:character_static_data_by_name(char_name).ai_character_id
 		local sequence = tweak_data.blackmarket.characters[ai_character_id].sequence
-		self._unit:damage():run_sequence_simple(sequence)
+		if sequence ~= self._current_sequence then
+			self._unit:damage():run_sequence_simple(sequence)
+			self._current_sequence = sequence
+		end
 		self._unit:contour():update_materials()
 	end
 	HuskPlayerMovement.set_character_anim_variables(self)

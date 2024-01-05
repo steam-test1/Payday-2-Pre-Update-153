@@ -95,7 +95,7 @@ end
 function CopLogicBase.draw_reserved_positions(data)
 	local my_pos = data.m_pos
 	local my_data = data.internal_data
-	local rsrv_pos = my_data.rsrv_pos
+	local rsrv_pos = data.pos_rsrv
 	if rsrv_pos.path then
 		Application:draw_cylinder(rsrv_pos.path.pos, my_pos, 6, 0, 0.3, 0.3)
 	end
@@ -277,6 +277,7 @@ end
 function CopLogicBase.on_delayed_clbk(internal_data, id)
 	if not internal_data.delayed_clbks or not internal_data.delayed_clbks[id] then
 		debug_pause("[CopLogicBase.on_delayed_clbk] Callback not added", internal_data.unit, id, internal_data.delayed_clbks and inspect(internal_data.delayed_clbks))
+		return
 	end
 	internal_data.delayed_clbks[id] = nil
 	if not next(internal_data.delayed_clbks) then
@@ -1291,10 +1292,6 @@ function CopLogicBase.chk_start_action_dodge(data, reason)
 		CopLogicAttack._cancel_charge(data, my_data)
 		CopLogicAttack._cancel_expected_pos_path(data, my_data)
 		CopLogicAttack._cancel_walking_to_cover(data, my_data, true)
-		if my_data.rsrv_pos.stand then
-			managers.navigation:unreserve_pos(my_data.rsrv_pos.stand)
-			my_data.rsrv_pos.stand = nil
-		end
 	end
 	return action
 end

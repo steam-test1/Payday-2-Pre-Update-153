@@ -8,10 +8,15 @@ function LootBagUnitElement:init(unit)
 	self._hed.push_multiplier = 0
 	self._hed.carry_id = "none"
 	self._hed.from_respawn = false
-	table.insert(self._save_values, "spawn_dir")
-	table.insert(self._save_values, "push_multiplier")
-	table.insert(self._save_values, "carry_id")
-	table.insert(self._save_values, "from_respawn")
+end
+
+function LootBagUnitElement:save(list)
+	if self._hed.push_multiplier ~= 0 then
+		list.spawn_dir = self._hed.spawn_dir
+		list.push_multiplier = self._hed.push_multiplier
+	end
+	list.carry_id = self._hed.carry_id
+	list.from_respawn = self._hed.from_respawn
 end
 
 function LootBagUnitElement:test_element()
@@ -24,7 +29,8 @@ function LootBagUnitElement:test_element()
 	end
 	local unit = safe_spawn_unit(unit_name, self._unit:position(), self._unit:rotation())
 	table.insert(self._test_units, unit)
-	unit:push(100, 600 * self._hed.spawn_dir * self._hed.push_multiplier * throw_distance_multiplier)
+	local push_value = self._hed.push_multiplier and self._hed.spawn_dir * self._hed.push_multiplier or 0
+	unit:push(100, 600 * push_value * throw_distance_multiplier)
 end
 
 function LootBagUnitElement:stop_test_element()
@@ -75,7 +81,7 @@ function LootBagUnitElement:_build_panel(panel, panel_sizer)
 		name = "Push multiplier:",
 		panel = panel,
 		sizer = panel_sizer,
-		value = self._hed.push_multiplier,
+		value = self._hed.push_multiplier or 0,
 		floats = 1,
 		tooltip = "Use this to add a velocity to a physic push on the spawned unit",
 		min = 0,

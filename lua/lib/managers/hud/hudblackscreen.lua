@@ -32,9 +32,8 @@ function HUDBlackScreen:init(hud)
 	mid_text:set_center_x(self._blackscreen_panel:center_x())
 	mid_text:set_center_y(self._blackscreen_panel:h() / 2.5)
 	local is_server = Network:is_server()
-	local text = utf8.to_upper(managers.localization:text("hud_skip_blackscreen", {
-		BTN_ACCEPT = managers.localization:btn_macro("continue")
-	}))
+	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
+	local text = utf8.to_upper(managers.localization:text("hud_skip_blackscreen", {BTN_ACCEPT = continue_button}))
 	local skip_text = self._blackscreen_panel:text({
 		name = "skip_text",
 		visible = is_server,
@@ -108,9 +107,12 @@ function HUDBlackScreen:set_job_data()
 	})
 	local risk_panel = job_panel:panel({})
 	local last_risk_level
+	local blackscreen_risk_textures = tweak_data.gui.blackscreen_risk_textures
 	for i = 1, managers.job:current_difficulty_stars() do
+		local difficulty_name = tweak_data.difficulties[i + 2]
+		local texture = blackscreen_risk_textures[difficulty_name] or "guis/textures/pd2/risklevel_blackscreen"
 		last_risk_level = risk_panel:bitmap({
-			texture = "guis/textures/pd2/risklevel_blackscreen",
+			texture = texture,
 			color = tweak_data.screen_colors.risk
 		})
 		last_risk_level:move((i - 1) * last_risk_level:w(), 0)
