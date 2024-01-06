@@ -438,9 +438,9 @@ function StaticLayer:build_btn_toolbar()
 end
 
 function StaticLayer:add_btns_to_toolbar()
-	self._btn_toolbar:add_tool("HIDE_ALL", "Hide All", CoreEws.image_path("world_editor\\layer_hide_all_16x16.png"), "Hide All")
+	self._btn_toolbar:add_tool("HIDE_ALL", "Hide All", CoreEws.image_path("toolbar\\hide_16x16.png"), "Hide All")
 	self._btn_toolbar:connect("HIDE_ALL", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "hide_all"), nil)
-	self._btn_toolbar:add_tool("UNHIDE_ALL", "Unhide All", CoreEws.image_path("world_editor\\layer_unhide_all_16x16.png"), "Unhide All")
+	self._btn_toolbar:add_tool("UNHIDE_ALL", "Unhide All", CoreEws.image_path("toolbar\\show_16x16.png"), "Unhide All")
 	self._btn_toolbar:connect("UNHIDE_ALL", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "unhide_all"), nil)
 end
 

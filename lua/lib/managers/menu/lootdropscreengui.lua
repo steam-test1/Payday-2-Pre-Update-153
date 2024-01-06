@@ -21,7 +21,7 @@ function LootDropScreenGui:init(saferect_ws, fullrect_ws, lootscreen_hud, saved_
 		font_size = tweak_data.menu.pd2_large_font_size,
 		font = tweak_data.menu.pd2_large_font,
 		color = tweak_data.screen_colors.button_stage_3,
-		layer = 1
+		layer = 2
 	})
 	local _, _, w, h = self._continue_button:text_rect()
 	self._continue_button:set_size(w, h)
@@ -38,7 +38,8 @@ function LootDropScreenGui:init(saferect_ws, fullrect_ws, lootscreen_hud, saved_
 		font_size = tweak_data.menu.pd2_massive_font_size,
 		font = tweak_data.menu.pd2_massive_font,
 		color = tweak_data.screen_colors.button_stage_3,
-		alpha = 0.4
+		alpha = 0.4,
+		layer = 1
 	})
 	local x, y = managers.gui_data:safe_to_full_16_9(self._continue_button:world_right(), self._continue_button:world_center_y())
 	big_text:set_world_right(x)
@@ -243,7 +244,7 @@ function LootDropScreenGui:mouse_pressed(button, x, y)
 	if self._card_chosen then
 		return
 	end
-	local inside = self._lootscreen_hud:check_inside_local_peer(managers.mouse_pointer:modified_fullscreen_16_9_mouse_pos())
+	local inside = self._lootscreen_hud:check_inside_local_peer(x, y)
 	if inside == self._selected then
 		self._card_chosen = true
 		managers.menu_component:post_event("menu_enter")
@@ -278,7 +279,7 @@ function LootDropScreenGui:mouse_moved(x, y)
 		return false
 	end
 	if self._lootscreen_hud then
-		local inside = self._lootscreen_hud:check_inside_local_peer(managers.mouse_pointer:modified_fullscreen_16_9_mouse_pos())
+		local inside = self._lootscreen_hud:check_inside_local_peer(x, y)
 		if inside then
 			self:_set_selected_and_sync(inside)
 		end

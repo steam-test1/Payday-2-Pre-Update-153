@@ -347,6 +347,10 @@ function GroupAIStateBase:remove_alert_listener(id)
 end
 
 function GroupAIStateBase:propagate_alert(alert_data)
+	if managers.network:session() and Network and not Network:is_server() then
+		managers.network:session():send_to_host("propagate_alert", alert_data[1], alert_data[2], alert_data[3], alert_data[4], alert_data[5], alert_data[6])
+		return
+	end
 	local nav_manager = managers.navigation
 	local access_func = nav_manager.check_access
 	local alert_type = alert_data[1]
@@ -3624,7 +3628,7 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	u_data.so_access = unit:brain():SO_access()
 	self:_set_converted_police(u_key, unit)
 	minions[u_key] = u_data
-	unit:movement():set_team(player_unit:movement():team())
+	unit:movement():set_team(self._teams.converted_enemy)
 	local convert_enemies_health_multiplier_level = 0
 	local passive_convert_enemies_health_multiplier_level = 0
 	if alive(peer_unit) then

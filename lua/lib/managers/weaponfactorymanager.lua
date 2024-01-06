@@ -800,13 +800,22 @@ function WeaponFactoryManager:get_parts_from_weapon_id(weapon_id)
 	return self._parts_by_weapon[factory_id]
 end
 
-function WeaponFactoryManager:is_part_standard_issue(part_id)
+function WeaponFactoryManager:is_part_standard_issue(factory_id, part_id)
+	local weapon_factory_tweak_data = tweak_data.weapon.factory[factory_id]
 	local part_tweak_data = tweak_data.weapon.factory.parts[part_id]
 	if not part_tweak_data then
-		Application:error("[WeaponFactoryManager:get_part_name_by_part_id] Found no part with part id", part_id)
+		Application:error("[WeaponFactoryManager:is_part_standard_issue] Found no part with part id", part_id)
 		return false
 	end
-	return Idstring(part_tweak_data.name_id) == Idstring("bm_wp_ksg_fg_standard")
+	if not weapon_factory_tweak_data then
+		Application:error("[WeaponFactoryManager:is_part_standard_issue] Found no weapon with factory id", factory_id)
+		return false
+	end
+	return table.contains(weapon_factory_tweak_data.default_blueprint or {}, part_id)
+end
+
+function WeaponFactoryManager:is_part_standard_issue_by_weapon_id(weapon_id, part_id)
+	return self:is_part_standard_issue(self:get_factory_id_by_weapon_id(weapon_id), part_id)
 end
 
 function WeaponFactoryManager:get_part_desc_by_part_id_from_weapon(part_id, factory_id, blueprint)
@@ -1144,10 +1153,28 @@ end
 function WeaponFactoryManager:get_sound_switch(switch_group, factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	local t = {}
 	for _, part_id in ipairs(blueprint) do
 		if not forbidden[part_id] and factory.parts[part_id].sound_switch and factory.parts[part_id].sound_switch[switch_group] then
-			return factory.parts[part_id].sound_switch[switch_group]
+			table.insert(t, part_id)
 		end
+	end
+	if 0 < #t then
+		if 1 < #t then
+			local part_x, part_y
+			table.sort(t, function(x, y)
+				part_x = factory.parts[x]
+				part_y = factory.parts[y]
+				if part_x.sub_type == "silencer" then
+					return true
+				end
+				if part_y.sub_type == "silencer" then
+					return false
+				end
+				return x < y
+			end)
+		end
+		return factory.parts[t[1]].sound_switch[switch_group]
 	end
 	return nil
 end

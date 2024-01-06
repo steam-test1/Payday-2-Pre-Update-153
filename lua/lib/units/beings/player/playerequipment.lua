@@ -277,7 +277,7 @@ function PlayerEquipment:use_sentry_gun(selected_index)
 			return false
 		else
 			local shield = managers.player:has_category_upgrade("sentry_gun", "shield")
-			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, managers.network:session():local_peer():id())
+			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, managers.network:session():local_peer():id(), false)
 			if sentry_gun_unit then
 				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield)
 			else

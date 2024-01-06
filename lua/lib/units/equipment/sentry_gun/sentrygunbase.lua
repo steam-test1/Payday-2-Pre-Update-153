@@ -61,9 +61,12 @@ function SentryGunBase:post_init()
 	end
 end
 
-function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer_id)
+function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer_id, verify_equipment)
 	local attached_data = SentryGunBase._attach(pos, rot)
 	if not attached_data then
+		return
+	end
+	if verify_equipment and not managers.player:verify_equipment(peer_id, "sentry_gun") then
 		return
 	end
 	local spread_multiplier, rot_speed_multiplier, has_shield

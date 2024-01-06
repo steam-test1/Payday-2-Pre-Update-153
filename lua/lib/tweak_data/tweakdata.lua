@@ -1469,7 +1469,10 @@ function TweakData:init()
 			stat = "gage4_10_stats",
 			enemy = "tank",
 			weapon_type = "shotgun",
-			part_id = "wpn_fps_upg_a_custom"
+			parts = {
+				"wpn_fps_upg_a_custom",
+				"wpn_fps_upg_a_custom_free"
+			}
 		},
 		grind_fest = {
 			stat = "gage5_1_stats",
@@ -2191,8 +2194,7 @@ function TweakData:init()
 		"kosugi",
 		"gallery",
 		"rat",
-		"cage",
-		"hox_3"
+		"cage"
 	}
 	self.achievement.job_list.dentist = {
 		"big",
@@ -2200,7 +2202,8 @@ function TweakData:init()
 		"mia_prof",
 		"hox",
 		"hox_prof",
-		"mus"
+		"mus",
+		"hox_3"
 	}
 	self.achievement.job_list.the_butcher = {
 		"crojob_wrapper",
@@ -2972,11 +2975,11 @@ function TweakData:init()
 	self.grenades.molotov.damage = 3
 	self.grenades.molotov.player_damage = 2
 	self.grenades.molotov.fire_dot_data = {
-		dot_damage = "2",
-		dot_trigger_max_distance = "3000",
-		dot_trigger_chance = "35",
-		dot_length = "3",
-		dot_tick_damage = "0.5"
+		dot_damage = 2,
+		dot_trigger_max_distance = 3000,
+		dot_trigger_chance = 35,
+		dot_length = 3,
+		dot_tick_damage = 0.5
 	}
 	self.grenades.molotov.range = 75
 	self.grenades.molotov.burn_duration = 20
@@ -2989,11 +2992,11 @@ function TweakData:init()
 	self.grenades.launcher_incendiary.curve_pow = 0.1
 	self.grenades.launcher_incendiary.player_damage = 2
 	self.grenades.launcher_incendiary.fire_dot_data = {
-		dot_damage = "2",
-		dot_trigger_max_distance = "3000",
-		dot_trigger_chance = "35",
-		dot_length = "3",
-		dot_tick_damage = "0.5"
+		dot_damage = 2,
+		dot_trigger_max_distance = 3000,
+		dot_trigger_chance = 35,
+		dot_length = 3,
+		dot_tick_damage = 0.5
 	}
 	self.grenades.launcher_incendiary.range = 75
 	self.grenades.launcher_incendiary.init_timer = 2.5

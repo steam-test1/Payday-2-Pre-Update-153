@@ -160,17 +160,18 @@ function ElementCounterOperator:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
+	local amount = self:value("amount")
 	for _, id in ipairs(self._values.elements) do
 		local element = self:get_mission_element(id)
 		if element then
 			if self._values.operation == "add" then
-				element:counter_operation_add(self._values.amount)
+				element:counter_operation_add(amount)
 			elseif self._values.operation == "subtract" then
-				element:counter_operation_subtract(self._values.amount)
+				element:counter_operation_subtract(amount)
 			elseif self._values.operation == "reset" then
-				element:counter_operation_reset(self._values.amount)
+				element:counter_operation_reset(amount)
 			elseif self._values.operation == "set" then
-				element:counter_operation_set(self._values.amount)
+				element:counter_operation_set(amount)
 			end
 		end
 	end

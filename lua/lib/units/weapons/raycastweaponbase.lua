@@ -1196,7 +1196,7 @@ function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit
 		if Network:is_server() then
 			self:on_collision_server(tmp_vec1, col_ray.normal, damage, user_unit, weapon_unit, managers.network:session():local_peer():id())
 		else
-			managers.network:session():send_to_host("sync_explode_bullet", tmp_vec1, col_ray.normal, math.min(16384, network_damage), weapon_unit:base():selection_index())
+			self:on_collision_server(tmp_vec1, col_ray.normal, damage, user_unit, weapon_unit, managers.network:session():local_peer():id())
 		end
 		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
 			local sync_damage = not blank and hit_unit:id() ~= -1

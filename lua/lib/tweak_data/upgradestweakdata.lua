@@ -571,7 +571,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.9, 5},
 		{0.7, 5}
 	}
-	self.values.player.passive_convert_enemies_health_multiplier = {0.4, 0.2}
+	self.values.player.passive_convert_enemies_health_multiplier = {0.6, 0.2}
 	self.values.player.armor_regen_timer_stand_still_multiplier = {0.8}
 	self.values.player.tier_dodge_chance = {
 		0.1,

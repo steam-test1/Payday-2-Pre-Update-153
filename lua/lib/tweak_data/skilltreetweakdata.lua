@@ -243,14 +243,14 @@ function SkillTreeTweakData:init()
 		prerequisites = {"joker"},
 		[1] = {
 			upgrades = {
-				"minion_master_speed_multiplier",
+				"player_minion_master_speed_multiplier",
 				"player_passive_convert_enemies_health_multiplier_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"minion_master_health_multiplier",
+				"player_minion_master_health_multiplier",
 				"player_passive_convert_enemies_health_multiplier_2"
 			},
 			cost = self.costs.hightierpro

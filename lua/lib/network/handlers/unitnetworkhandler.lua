@@ -1109,10 +1109,7 @@ function UnitNetworkHandler:place_sentry_gun(pos, rot, ammo_multiplier, armor_mu
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
-	if not managers.player:verify_equipment(peer:id(), "sentry_gun") then
-		return
-	end
-	local unit = SentryGunBase.spawn(user_unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer:id())
+	local unit = SentryGunBase.spawn(user_unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer:id(), true)
 	if unit then
 		unit:base():set_server_information(peer:id())
 	end

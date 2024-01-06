@@ -76,6 +76,9 @@ function ECMJammerBase:set_owner(owner)
 end
 
 function ECMJammerBase:owner()
+	if not alive(self._owner) then
+		self._owner = managers.network:game():member(self._owner_id):unit()
+	end
 	return self._owner
 end
 
@@ -136,15 +139,15 @@ function ECMJammerBase:set_active(active)
 				self._attached_data.index = 1
 				self._attached_data.max_index = 3
 			end
-			self._alert_filter = self._owner:movement():SO_access()
+			self._alert_filter = self:owner():movement():SO_access()
 			local jam_cameras, jam_pagers
-			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
+			if self._owner_id == 1 then
 				jam_cameras = managers.player:has_category_upgrade("ecm_jammer", "affects_cameras")
 				jam_pagers = managers.player:has_category_upgrade("ecm_jammer", "affects_pagers")
 				self:contour_interaction()
 			else
-				jam_cameras = self._owner:base():upgrade_value("ecm_jammer", "affects_cameras")
-				jam_pagers = self._owner:base():upgrade_value("ecm_jammer", "affects_pagers")
+				jam_cameras = self:owner():base():upgrade_value("ecm_jammer", "affects_cameras")
+				jam_pagers = self:owner():base():upgrade_value("ecm_jammer", "affects_pagers")
 			end
 			managers.groupai:state():register_ecm_jammer(self._unit, {
 				call = true,
@@ -295,12 +298,12 @@ function ECMJammerBase:_set_feedback_active(state)
 			self._feedback_interval = tweak_data.upgrades.ecm_feedback_interval or 1.5
 			self._feedback_range = tweak_data.upgrades.ecm_jammer_base_range
 			local duration_mul = 1
-			if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
+			if self._owner_id == 1 then
 				duration_mul = duration_mul * managers.player:upgrade_value("ecm_jammer", "feedback_duration_boost", 1)
 				duration_mul = duration_mul * managers.player:upgrade_value("ecm_jammer", "feedback_duration_boost_2", 1)
 			else
-				duration_mul = duration_mul * (self._owner:base():upgrade_value("ecm_jammer", "feedback_duration_boost") or 1)
-				duration_mul = duration_mul * (self._owner:base():upgrade_value("ecm_jammer", "feedback_duration_boost_2") or 1)
+				duration_mul = duration_mul * (self:owner():base():upgrade_value("ecm_jammer", "feedback_duration_boost") or 1)
+				duration_mul = duration_mul * (self:owner():base():upgrade_value("ecm_jammer", "feedback_duration_boost_2") or 1)
 			end
 			self._feedback_duration = math.lerp(tweak_data.upgrades.ecm_feedback_min_duration or 15, tweak_data.upgrades.ecm_feedback_max_duration or 20, math.random()) * duration_mul
 			self._feedback_expire_t = t + self._feedback_duration
@@ -315,10 +318,10 @@ function ECMJammerBase:_set_feedback_active(state)
 			self:_send_net_event(self._NET_EVENTS.feedback_stop)
 			if alive(self._owner) then
 				local retrigger = false
-				if managers.network:game():member_from_unit(self._owner):peer():id() == 1 then
+				if self._owner_id == 1 then
 					retrigger = managers.player:has_category_upgrade("ecm_jammer", "can_retrigger")
 				else
-					retrigger = self._owner:base():upgrade_value("ecm_jammer", "can_retrigger")
+					retrigger = self:owner():base():upgrade_value("ecm_jammer", "can_retrigger")
 				end
 				if retrigger then
 					self._chk_feedback_retrigger_t = tweak_data.upgrades.ecm_feedback_retrigger_interval or 60
@@ -365,7 +368,7 @@ function ECMJammerBase:clbk_feedback()
 			self._unit
 		})
 	end
-	self._detect_and_give_dmg(self._position + self._unit:rotation():y() * 15, self._unit, self._owner, self._feedback_range)
+	self._detect_and_give_dmg(self._position + self._unit:rotation():y() * 15, self._unit, self:owner(), self._feedback_range)
 	if t > self._feedback_expire_t then
 		self._feedback_clbk_id = nil
 		self:_set_feedback_active(false)

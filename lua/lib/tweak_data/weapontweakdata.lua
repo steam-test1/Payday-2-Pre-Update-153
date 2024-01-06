@@ -1461,7 +1461,7 @@ function WeaponTweakData:_init_data_flamethrower_mk2_npc()
 	self.flamethrower_mk2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.flamethrower_mk2_npc.CLIP_AMMO_MAX = 150
 	self.flamethrower_mk2_npc.NR_CLIPS_MAX = 4
-	self.flamethrower_mk2_npc.hold = "pistol"
+	self.flamethrower_mk2_npc.hold = "rifle"
 	self.flamethrower_mk2_npc.auto.fire_rate = 0.05
 	self.flamethrower_mk2_npc.hud_icon = "rifle"
 	self.flamethrower_mk2_npc.alert_size = 2500
@@ -2393,7 +2393,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.m16.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.m16.timers = {}
-	self.m16.timers.reload_not_empty = 2.665
+	self.m16.timers.reload_not_empty = 2.75
 	self.m16.timers.reload_empty = 3.73
 	self.m16.timers.unequip = 0.8
 	self.m16.timers.equip = 0.8
@@ -2478,8 +2478,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.olympic.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.olympic.timers = {}
-	self.olympic.timers.reload_not_empty = 3
-	self.olympic.timers.reload_empty = 4.22
+	self.olympic.timers.reload_not_empty = 2.16
+	self.olympic.timers.reload_empty = 3.23
 	self.olympic.timers.unequip = 0.6
 	self.olympic.timers.equip = 0.5
 	self.olympic.name_id = "bm_w_olympic"
@@ -2819,8 +2819,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.akmsu.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.akmsu.timers = {}
-	self.akmsu.timers.reload_not_empty = 2.8
-	self.akmsu.timers.reload_empty = 3.87
+	self.akmsu.timers.reload_not_empty = 2.15
+	self.akmsu.timers.reload_empty = 3.9
 	self.akmsu.timers.unequip = 0.65
 	self.akmsu.timers.equip = 0.6
 	self.akmsu.name_id = "bm_w_akmsu"
@@ -2903,8 +2903,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.saiga.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.saiga.timers = {}
-	self.saiga.timers.reload_not_empty = 2.8
-	self.saiga.timers.reload_empty = 3.87
+	self.saiga.timers.reload_not_empty = 2.65
+	self.saiga.timers.reload_empty = 3.95
 	self.saiga.timers.unequip = 0.85
 	self.saiga.timers.equip = 0.85
 	self.saiga.name_id = "bm_w_saiga"
@@ -2959,9 +2959,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.shake.fire_steelsight_multiplier = 1.25
 	self.saiga.autohit = autohit_shotgun_default
 	self.saiga.aim_assist = aim_assist_shotgun_default
-	self.saiga.weapon_hold = "ak47"
+	self.saiga.weapon_hold = "saiga"
 	self.saiga.animations = {}
-	self.saiga.animations.equip_id = "equip_r870_shotgun"
+	self.saiga.animations.equip_id = "equip_saiga"
 	self.saiga.animations.recoil_steelsight = true
 	self.saiga.stats = {
 		damage = 15,
@@ -2990,8 +2990,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.ak5.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.ak5.timers = {}
-	self.ak5.timers.reload_not_empty = 2.665
-	self.ak5.timers.reload_empty = 3.47
+	self.ak5.timers.reload_not_empty = 2.05
+	self.ak5.timers.reload_empty = 3.08
 	self.ak5.timers.unequip = 0.8
 	self.ak5.timers.equip = 0.8
 	self.ak5.name_id = "bm_w_ak5"
@@ -3156,8 +3156,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.g36.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.g36.timers = {}
-	self.g36.timers.reload_not_empty = 2.5
-	self.g36.timers.reload_empty = 3.45
+	self.g36.timers.reload_not_empty = 2.85
+	self.g36.timers.reload_empty = 3.85
 	self.g36.timers.unequip = 0.85
 	self.g36.timers.equip = 0.85
 	self.g36.name_id = "bm_w_g36"
@@ -3237,8 +3237,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.p90.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.p90.timers = {}
-	self.p90.timers.reload_not_empty = 2.9
-	self.p90.timers.reload_empty = 3.9
+	self.p90.timers.reload_not_empty = 2.55
+	self.p90.timers.reload_empty = 3.4
 	self.p90.timers.unequip = 0.68
 	self.p90.timers.equip = 0.65
 	self.p90.name_id = "bm_w_p90"
@@ -3319,8 +3319,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m14.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.new_m14.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.new_m14.timers = {}
-	self.new_m14.timers.reload_not_empty = 1.97
-	self.new_m14.timers.reload_empty = 3.2
+	self.new_m14.timers.reload_not_empty = 2.65
+	self.new_m14.timers.reload_empty = 3.15
 	self.new_m14.timers.unequip = 0.9
 	self.new_m14.timers.equip = 0.9
 	self.new_m14.name_id = "bm_w_m14"
@@ -3404,7 +3404,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.deagle.single.fire_rate = 0.15
 	self.deagle.timers = {}
 	self.deagle.timers.reload_not_empty = 1.85
-	self.deagle.timers.reload_empty = 2.75
+	self.deagle.timers.reload_empty = 3.1
 	self.deagle.timers.unequip = 0.6
 	self.deagle.timers.equip = 0.6
 	self.deagle.name_id = "bm_w_deagle"
@@ -3479,7 +3479,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.new_mp5.timers = {}
 	self.new_mp5.timers.reload_not_empty = 2.4
-	self.new_mp5.timers.reload_empty = 3.3
+	self.new_mp5.timers.reload_empty = 3.6
 	self.new_mp5.timers.unequip = 0.75
 	self.new_mp5.timers.equip = 0.7
 	self.new_mp5.name_id = "bm_w_mp5"
@@ -3612,6 +3612,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.colt_1911.autohit = autohit_pistol_default
 	self.colt_1911.aim_assist = aim_assist_pistol_default
 	self.colt_1911.animations = {}
+	self.colt_1911.animations.fire = "recoil"
 	self.colt_1911.animations.reload = "reload"
 	self.colt_1911.animations.reload_not_empty = "reload_not_empty"
 	self.colt_1911.animations.equip_id = "equip_glock"
@@ -3642,8 +3643,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.mac10.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.mac10.timers = {}
-	self.mac10.timers.reload_not_empty = 1.7
-	self.mac10.timers.reload_empty = 2.5
+	self.mac10.timers.reload_not_empty = 2
+	self.mac10.timers.reload_empty = 2.7
 	self.mac10.timers.unequip = 0.7
 	self.mac10.timers.equip = 0.5
 	self.mac10.name_id = "bm_w_mac10"
@@ -3691,7 +3692,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.crosshair.steelsight.moving_offset = 0
 	self.mac10.crosshair.steelsight.kick_offset = 0.4
 	self.mac10.shake = {}
-	self.mac10.shake.fire_multiplier = 1
+	self.mac10.shake.fire_multiplier = 0.65
 	self.mac10.shake.fire_steelsight_multiplier = -1
 	self.mac10.autohit = autohit_smg_default
 	self.mac10.aim_assist = aim_assist_smg_default
@@ -4224,7 +4225,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.usp.shake.fire_steelsight_multiplier = -1
 	self.usp.autohit = autohit_pistol_default
 	self.usp.aim_assist = aim_assist_pistol_default
-	self.usp.weapon_hold = "glock"
+	self.usp.weapon_hold = "colt_1911"
 	self.usp.animations = {}
 	self.usp.animations.equip_id = "equip_glock"
 	self.usp.animations.recoil_steelsight = true
@@ -4518,8 +4519,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.s552.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.s552.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.s552.timers = {}
-	self.s552.timers.reload_not_empty = 2.5
-	self.s552.timers.reload_empty = 3.45
+	self.s552.timers.reload_not_empty = 1.65
+	self.s552.timers.reload_empty = 2.4
 	self.s552.timers.unequip = 0.9
 	self.s552.timers.equip = 0.9
 	self.s552.name_id = "bm_w_s552"
@@ -4599,7 +4600,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ppk.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.ppk.sounds.dryfire = "secondary_dryfire"
 	self.ppk.timers = {}
-	self.ppk.timers.reload_not_empty = 1.47
+	self.ppk.timers.reload_not_empty = 1.55
 	self.ppk.timers.reload_empty = 2.12
 	self.ppk.timers.unequip = 0.5
 	self.ppk.timers.equip = 0.5
@@ -4770,7 +4771,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scar.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.scar.timers = {}
 	self.scar.timers.reload_not_empty = 2.2
-	self.scar.timers.reload_empty = 3
+	self.scar.timers.reload_empty = 3.15
 	self.scar.timers.unequip = 0.9
 	self.scar.timers.equip = 0.9
 	self.scar.name_id = "bm_w_scar"
@@ -4902,7 +4903,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p226.shake.fire_steelsight_multiplier = -1
 	self.p226.autohit = autohit_pistol_default
 	self.p226.aim_assist = aim_assist_pistol_default
-	self.p226.weapon_hold = "glock"
+	self.p226.weapon_hold = "colt_1911"
 	self.p226.animations = {}
 	self.p226.animations.equip_id = "equip_glock"
 	self.p226.animations.recoil_steelsight = true
@@ -4934,7 +4935,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hk21.sounds.enter_steelsight = "lmg_steelsight_enter"
 	self.hk21.sounds.leave_steelsight = "lmg_steelsight_exit"
 	self.hk21.timers = {}
-	self.hk21.timers.reload_not_empty = 5.6
+	self.hk21.timers.reload_not_empty = 4.15
 	self.hk21.timers.reload_empty = 6.7
 	self.hk21.timers.unequip = 0.9
 	self.hk21.timers.equip = 0.9
@@ -5312,7 +5313,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.sounds.enter_steelsight = "lmg_steelsight_enter"
 	self.msr.sounds.leave_steelsight = "lmg_steelsight_exit"
 	self.msr.timers = {}
-	self.msr.timers.reload_not_empty = 3
+	self.msr.timers.reload_not_empty = 2.6
 	self.msr.timers.reload_empty = 3.7
 	self.msr.timers.unequip = 0.9
 	self.msr.timers.equip = 0.9
@@ -5961,7 +5962,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g3.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.g3.timers = {}
 	self.g3.timers.reload_not_empty = 2.6
-	self.g3.timers.reload_empty = 4.2
+	self.g3.timers.reload_empty = 3.8
 	self.g3.timers.unequip = 0.9
 	self.g3.timers.equip = 0.9
 	self.g3.name_id = "bm_w_g3"
@@ -8408,11 +8409,11 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.flamethrower_mk2.global_value = "bbq"
 	self.flamethrower_mk2.texture_bundle_folder = "bbq"
 	self.flamethrower_mk2.fire_dot_data = {
-		dot_damage = "2",
-		dot_trigger_max_distance = "3000",
-		dot_trigger_chance = "10",
-		dot_length = "3",
-		dot_tick_damage = "0.5"
+		dot_damage = 2,
+		dot_trigger_max_distance = 3000,
+		dot_trigger_chance = 10,
+		dot_length = 3,
+		dot_tick_damage = 0.5
 	}
 	self.flamethrower_mk2.stats = {
 		damage = 5,

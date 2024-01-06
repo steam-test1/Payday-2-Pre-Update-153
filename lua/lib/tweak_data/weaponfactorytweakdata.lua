@@ -1380,6 +1380,10 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			wpn_fps_gre_m32 = {
 				translation = Vector3(0, 5, -4),
 				rotation = Rotation(0, -5, 0)
+			},
+			wpn_fps_rpg7 = {
+				translation = Vector3(0, 5, 0),
+				rotation = Rotation(0, 0, 0)
 			}
 		},
 		forbids = {
@@ -1541,6 +1545,7 @@ function WeaponFactoryTweakData:_init_content_jobs()
 		name_id = "bm_wp_upg_m4_m_quad",
 		a_obj = "a_m",
 		texture_bundle_folder = "gage_pack_jobs",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_gage_jobs/weapons/wpn_fps_upg_m4_m_quad/wpn_fps_upg_m4_m_quad",
 		stats = {
 			value = 3,
@@ -1612,6 +1617,7 @@ function WeaponFactoryTweakData:_init_content_jobs()
 		name_id = "bm_wp_upg_ak_m_quad",
 		a_obj = "a_m",
 		texture_bundle_folder = "gage_pack_jobs",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_gage_jobs/weapons/wpn_fps_upg_ak_m_quad/wpn_fps_upg_ak_m_quad",
 		stats = {
 			value = 3,
@@ -1620,10 +1626,6 @@ function WeaponFactoryTweakData:_init_content_jobs()
 			extra_ammo = 15,
 			recoil = 1,
 			spread = -1
-		},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
 		},
 		dlc = "gage_pack_jobs"
 	}
@@ -2336,6 +2338,7 @@ function WeaponFactoryTweakData:_init_m4()
 		type = "magazine",
 		name_id = "bm_wp_m4_uupg_m_std",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/payday2/weapons/wpn_fps_ass_m4_pts/wpn_fps_m4_uupg_m_std",
 		stats = {
 			value = 1,
@@ -2446,6 +2449,7 @@ function WeaponFactoryTweakData:_init_m4()
 		type = "magazine",
 		name_id = "bm_wp_m4_m_pmag",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 28},
 		unit = "units/payday2/weapons/wpn_fps_upg_m4_reusable/wpn_fps_upg_m4_m_pmag",
 		stats = {
 			value = 3,
@@ -2464,6 +2468,7 @@ function WeaponFactoryTweakData:_init_m4()
 		type = "magazine",
 		name_id = "bm_wp_m4_m_straight",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/payday2/weapons/wpn_fps_upg_m4_reusable/wpn_fps_upg_m4_m_straight",
 		stats = {
 			value = 2,
@@ -3432,34 +3437,25 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		type = "magazine",
 		name_id = "bm_wp_ak_m_akm",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_upg_ak_m_akm",
-		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 1}
 	}
 	self.parts.wpn_upg_ak_m_akm_gold = {
 		type = "magazine",
 		name_id = "bm_wp_ak_m_akm_gold",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_upg_ak_m_akm_gold",
-		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 1}
 	}
 	self.parts.wpn_upg_ak_m_drum = {
 		type = "magazine",
 		name_id = "bm_wp_ak_m_drum",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_upg_ak_m_drum",
-		stats = {value = 5, concealment = -4},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 5, concealment = -4}
 	}
 	self.parts.wpn_upg_ak_s_adapter = {
 		type = "stock_adapter",
@@ -3560,6 +3556,12 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		a_obj = "a_of",
 		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_fps_ak_extra_ris"
 	}
+	self.parts.wpn_fps_ak_bolt = {
+		type = "drag_handle",
+		name_id = "bm_wp_ak_s_skfoldable",
+		a_obj = "a_bolt",
+		unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_fps_ak_bolt"
+	}
 	self.parts.wpn_upg_ak_fg_combo1.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_fg_combo1"
 	self.parts.wpn_upg_ak_fg_combo2.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_fg_combo2"
 	self.parts.wpn_upg_ak_fg_combo3.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_fg_combo3"
@@ -3576,6 +3578,7 @@ function WeaponFactoryTweakData:_init_ak_parts()
 	self.parts.wpn_upg_ak_s_psl.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_s_psl"
 	self.parts.wpn_upg_ak_s_skfoldable.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_upg_ak_s_skfoldable"
 	self.parts.wpn_fps_ak_extra_ris.third_unit = "units/payday2/weapons/wpn_third_upg_ak_reusable/wpn_third_ak_extra_ris"
+	self.parts.wpn_fps_ak_bolt.third_unit = "units/payday2/weapons/wpn_fps_upg_ak_reusable/wpn_third_ak_bolt"
 	self.parts.wpn_upg_ak_s_folding_vanilla = deep_clone(self.parts.wpn_upg_ak_s_folding)
 	self.parts.wpn_upg_ak_s_folding_vanilla.stats = nil
 	self.parts.wpn_upg_ak_s_folding_vanilla.pcs = nil
@@ -3602,10 +3605,8 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		a_obj = "a_body",
 		unit = "units/payday2/weapons/wpn_fps_ass_akm_pts/wpn_fps_ass_ak_body_lowerreceiver",
 		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			fire = "recoil",
-			fire_steelsight = "recoil"
+		adds = {
+			"wpn_fps_ak_bolt"
 		}
 	}
 	self.parts.wpn_fps_ass_ak_body_lowerreceiver_gold = {
@@ -3614,10 +3615,8 @@ function WeaponFactoryTweakData:_init_ak_parts()
 		a_obj = "a_body",
 		unit = "units/payday2/weapons/wpn_fps_ass_akm_gold_pts/wpn_fps_ass_ak_body_lowerreceiver_gold",
 		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			fire = "recoil",
-			fire_steelsight = "recoil"
+		adds = {
+			"wpn_fps_ak_bolt"
 		}
 	}
 	self.parts.wpn_fps_ass_akm_b_standard = {
@@ -3664,12 +3663,9 @@ function WeaponFactoryTweakData:_init_ak74()
 		type = "magazine",
 		name_id = "bm_wp_74_m_standard",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_ass_74_pts/wpn_fps_ass_74_m_standard",
-		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 1}
 	}
 	self.parts.wpn_fps_ass_74_b_standard.third_unit = "units/payday2/weapons/wpn_third_ass_74_pts/wpn_third_ass_74_b_standard"
 	self.parts.wpn_fps_ass_74_body_upperreceiver.third_unit = "units/payday2/weapons/wpn_third_ass_74_pts/wpn_third_ass_74_body_upperreceiver"
@@ -3677,6 +3673,12 @@ function WeaponFactoryTweakData:_init_ak74()
 	self.wpn_fps_ass_74 = {}
 	self.wpn_fps_ass_74.unit = "units/payday2/weapons/wpn_fps_ass_74/wpn_fps_ass_74"
 	self.wpn_fps_ass_74.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_ass_74.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_ass_74.override = {
 		wpn_fps_upg_ass_ak_b_zastava = {
 			stats = {
@@ -3828,6 +3830,12 @@ function WeaponFactoryTweakData:_init_akm()
 	self.wpn_fps_ass_akm = {}
 	self.wpn_fps_ass_akm.unit = "units/payday2/weapons/wpn_fps_ass_akm/wpn_fps_ass_akm"
 	self.wpn_fps_ass_akm.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_ass_akm.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_ass_akm.optional_types = {
 		"barrel_ext",
 		"gadget",
@@ -3960,6 +3968,12 @@ function WeaponFactoryTweakData:_init_akm_gold()
 	self.wpn_fps_ass_akm_gold = {}
 	self.wpn_fps_ass_akm_gold.unit = "units/payday2/weapons/wpn_fps_ass_akm_gold/wpn_fps_ass_akm_gold"
 	self.wpn_fps_ass_akm_gold.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_ass_akm_gold.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_ass_akm_gold.optional_types = {
 		"barrel_ext",
 		"gadget",
@@ -4102,10 +4116,8 @@ function WeaponFactoryTweakData:_init_akmsu()
 		a_obj = "a_body",
 		unit = "units/payday2/weapons/wpn_fps_smg_akmsu_pts/wpn_fps_smg_akmsu_body_lowerreceiver",
 		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			fire = "recoil",
-			fire_steelsight = "recoil"
+		adds = {
+			"wpn_fps_ak_bolt"
 		}
 	}
 	self.parts.wpn_fps_smg_akmsu_fg_rail = {
@@ -4150,6 +4162,12 @@ function WeaponFactoryTweakData:_init_akmsu()
 	self.wpn_fps_smg_akmsu = {}
 	self.wpn_fps_smg_akmsu.unit = "units/payday2/weapons/wpn_fps_smg_akmsu/wpn_fps_smg_akmsu"
 	self.wpn_fps_smg_akmsu.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_smg_akmsu.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_smg_akmsu.optional_types = {
 		"barrel_ext",
 		"gadget",
@@ -4285,6 +4303,7 @@ function WeaponFactoryTweakData:_init_saiga()
 		type = "magazine",
 		name_id = "bm_wp_saiga_m_5rnd",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_shot_saiga_pts/wpn_fps_shot_saiga_m_5rnd",
 		stats = {value = 1},
 		animations = {
@@ -4346,6 +4365,12 @@ function WeaponFactoryTweakData:_init_saiga()
 	self.wpn_fps_shot_saiga = {}
 	self.wpn_fps_shot_saiga.unit = "units/payday2/weapons/wpn_fps_shot_saiga/wpn_fps_shot_saiga"
 	self.wpn_fps_shot_saiga.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_shot_saiga.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_shot_saiga.optional_types = {
 		"barrel_ext",
 		"gadget",
@@ -4737,6 +4762,7 @@ function WeaponFactoryTweakData:_init_aug()
 		type = "magazine",
 		name_id = "bm_wp_aug_m_pmag",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 21},
 		unit = "units/payday2/weapons/wpn_fps_ass_aug_pts/wpn_fps_aug_m_pmag",
 		stats = {value = 1},
 		animations = {
@@ -4906,6 +4932,7 @@ function WeaponFactoryTweakData:_init_g36()
 		type = "magazine",
 		name_id = "bm_wp_g36_m_standard",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 28},
 		unit = "units/payday2/weapons/wpn_fps_ass_g36_pts/wpn_fps_ass_g36_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -5163,6 +5190,7 @@ function WeaponFactoryTweakData:_init_p90()
 		type = "magazine",
 		name_id = "bm_wp_p90_m_std",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 50},
 		unit = "units/payday2/weapons/wpn_fps_smg_p90_pts/wpn_fps_smg_p90_m_std",
 		stats = {value = 1},
 		animations = {
@@ -5302,6 +5330,7 @@ function WeaponFactoryTweakData:_init_m14()
 		type = "magazine",
 		name_id = "bm_wp_m14_m_standard",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
 		unit = "units/payday2/weapons/wpn_fps_ass_m14_pts/wpn_fps_ass_m14_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -5392,6 +5421,7 @@ function WeaponFactoryTweakData:_init_mp9()
 		type = "magazine",
 		name_id = "bm_wp_mp9_m_extended",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/payday2/weapons/wpn_fps_smg_mp9_pts/wpn_fps_smg_mp9_m_extended",
 		stats = {
 			value = 4,
@@ -5408,6 +5438,7 @@ function WeaponFactoryTweakData:_init_mp9()
 		type = "magazine",
 		name_id = "bm_wp_mp9_m_short",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/payday2/weapons/wpn_fps_smg_mp9_pts/wpn_fps_smg_mp9_m_short",
 		stats = {value = 1},
 		animations = {
@@ -6015,6 +6046,7 @@ function WeaponFactoryTweakData:_init_mp5()
 		type = "magazine",
 		name_id = "bm_wp_mp5_m_std",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_smg_mp5_pts/wpn_fps_smg_mp5_m_std",
 		stats = {value = 1},
 		animations = {
@@ -6550,6 +6582,7 @@ function WeaponFactoryTweakData:_init_mac10()
 		type = "magazine",
 		name_id = "bm_wp_mac10_m_extended",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_smg_mac10_pts/wpn_fps_smg_mac10_m_extended",
 		stats = {
 			value = 2,
@@ -6567,6 +6600,7 @@ function WeaponFactoryTweakData:_init_mac10()
 		type = "magazine",
 		name_id = "bm_wp_mac10_m_short",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_smg_mac10_pts/wpn_fps_smg_mac10_m_short",
 		stats = {value = 1},
 		animations = {
@@ -7531,6 +7565,7 @@ function WeaponFactoryTweakData:_init_b92fs()
 		type = "magazine",
 		name_id = "bm_wp_beretta_m_extended",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_pis_b92fs_pts/wpn_fps_pis_beretta_m_extended",
 		stats = {
 			value = 2,
@@ -7547,6 +7582,7 @@ function WeaponFactoryTweakData:_init_b92fs()
 		type = "magazine",
 		name_id = "bm_wp_beretta_m_std",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/payday2/weapons/wpn_fps_pis_b92fs_pts/wpn_fps_pis_beretta_m_std",
 		stats = {value = 1},
 		animations = {
@@ -8574,6 +8610,7 @@ function WeaponFactoryTweakData:_init_m45()
 		name_id = "bm_wp_shorty_m_extended_short",
 		texture_bundle_folder = "dlc1",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_m_mag",
 		stats = {value = 1},
 		animations = {
@@ -8592,6 +8629,7 @@ function WeaponFactoryTweakData:_init_m45()
 		name_id = "bm_wp_smg_m45_m_extended",
 		texture_bundle_folder = "dlc1",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_m_extended",
 		stats = {
 			value = 4,
@@ -8898,6 +8936,7 @@ function WeaponFactoryTweakData:_init_s552()
 		name_id = "bm_wp_shorty_m_extended_short",
 		texture_bundle_folder = "dlc1",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 28},
 		unit = "units/pd2_dlc1/weapons/wpn_fps_ass_s552_pts/wpn_fps_ass_s552_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -9272,6 +9311,7 @@ function WeaponFactoryTweakData:_init_ppk()
 		name_id = "bm_wp_serbu_s_solid_short",
 		texture_bundle_folder = "dlc1",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc1/weapons/wpn_fps_pis_ppk_pts/wpn_fps_pis_ppk_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -9530,6 +9570,7 @@ function WeaponFactoryTweakData:_init_scar()
 		name_id = "bm_wp_scar_m_standard",
 		texture_bundle_folder = "gage_pack",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_dec5/weapons/wpn_fps_ass_scar_pts/wpn_fps_ass_scar_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -10489,11 +10530,8 @@ function WeaponFactoryTweakData:_init_rpk()
 		a_obj = "a_body",
 		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_fps_lmg_rpk_body_lowerreceiver",
 		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty",
-			fire = "recoil",
-			fire_steelsight = "recoil"
+		adds = {
+			"wpn_fps_ak_bolt"
 		}
 	}
 	self.parts.wpn_fps_lmg_rpk_fg_wood = {
@@ -10540,12 +10578,9 @@ function WeaponFactoryTweakData:_init_rpk()
 		type = "magazine",
 		name_id = "bm_wp_rpk_m_drum",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk_pts/wpn_lmg_rpk_m_drum",
-		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 1}
 	}
 	self.parts.wpn_fps_lmg_rpk_s_standard = {
 		pcs = {
@@ -10584,6 +10619,12 @@ function WeaponFactoryTweakData:_init_rpk()
 	self.wpn_fps_lmg_rpk = {}
 	self.wpn_fps_lmg_rpk.unit = "units/pd2_dlc_gage_lmg/weapons/wpn_fps_lmg_rpk/wpn_fps_lmg_rpk"
 	self.wpn_fps_lmg_rpk.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_lmg_rpk.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire_steelsight = "recoil"
+	}
 	self.wpn_fps_lmg_rpk.optional_types = {
 		"barrel_ext",
 		"gadget",
@@ -11211,6 +11252,7 @@ function WeaponFactoryTweakData:_init_fal()
 		type = "magazine",
 		name_id = "bm_wp_fal_m_01",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_big/weapons/wpn_fps_ass_fal_pts/wpn_fps_ass_fal_m_01",
 		stats = {
 			value = 2,
@@ -11232,6 +11274,7 @@ function WeaponFactoryTweakData:_init_fal()
 		type = "magazine",
 		name_id = "bm_wp_fal_m_standard",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_big/weapons/wpn_fps_ass_fal_pts/wpn_fps_ass_fal_m_standard",
 		stats = {value = 2},
 		animations = {
@@ -14340,11 +14383,11 @@ function WeaponFactoryTweakData:create_ammunition()
 			bullet_class = "FlameBulletBase",
 			muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
 			fire_dot_data = {
-				dot_damage = "2",
-				dot_trigger_max_distance = "3000",
-				dot_trigger_chance = "50",
-				dot_length = "3",
-				dot_tick_damage = "0.5"
+				dot_damage = 2,
+				dot_trigger_max_distance = 3000,
+				dot_trigger_chance = 50,
+				dot_length = 3,
+				dot_tick_damage = 0.5
 			}
 		},
 		muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
@@ -16845,7 +16888,7 @@ function WeaponFactoryTweakData:_init_l85a2()
 		},
 		type = "magazine",
 		name_id = "bm_wp_l85a2_m_emag",
-		bullet_objects = {prefix = "g_bullet_", amount = 2},
+		bullet_objects = {prefix = "g_bullet_", amount = 28},
 		a_obj = "a_m",
 		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_m_emag",
 		stats = {
@@ -17073,6 +17116,7 @@ function WeaponFactoryTweakData:_init_vhs()
 		type = "magazine",
 		name_id = "bm_wp_vhs_m",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
 		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_m",
 		stats = {
 			value = 1,
@@ -18122,6 +18166,7 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 		type = "magazine",
 		name_id = "bm_wp_upg_ak_m_uspalm",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
 		unit = "units/pd2_dlc_akm4_modpack/weapons/wpn_fps_upg_ak_m_uspalm/wpn_fps_upg_ak_m_uspalm",
 		stats = {
 			value = 1,
@@ -18131,11 +18176,7 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 		},
 		texture_bundle_folder = "dlc_akm4",
 		dlc = "akm4_pack",
-		is_a_unlockable = true,
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_upg_ak_s_solidstock = {
 		pcs = {},
@@ -18619,6 +18660,7 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 		type = "magazine",
 		name_id = "bm_wp_upg_m4_m_l5",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/pd2_dlc_akm4_modpack/weapons/wpn_fps_upg_m4_m_l5/wpn_fps_upg_m4_m_l5",
 		stats = {
 			value = 1,
@@ -19480,7 +19522,8 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 			concealment = -2
 		},
 		texture_bundle_folder = "butcher_pack_mods",
-		dlc = "butch_pack_free"
+		dlc = "butch_pack_free",
+		animations = {reload = "reload"}
 	}
 	self.parts.wpn_fps_ass_ak5_b_short = {
 		pcs = {
@@ -19512,6 +19555,7 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 		type = "magazine",
 		name_id = "bm_wp_mp5_m_straight",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
 		unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_smg_mp5_m_straight/wpn_fps_smg_mp5_m_straight",
 		stats = {
 			value = 1,
@@ -19969,6 +20013,12 @@ function WeaponFactoryTweakData:_init_x_g22c()
 				reload_not_empty = "reload_not_empty_right",
 				reload_left = "reload_left",
 				reload_not_empty_left = "reload_not_empty_left"
+			},
+			stats = {
+				value = 3,
+				spread_moving = -2,
+				concealment = -1,
+				extra_ammo = 12
 			}
 		},
 		wpn_fps_pis_g18c_m_mag_17rnd = {
@@ -19977,12 +20027,6 @@ function WeaponFactoryTweakData:_init_x_g22c()
 				reload_not_empty = "reload_not_empty_right",
 				reload_left = "reload_left",
 				reload_not_empty_left = "reload_not_empty_left"
-			},
-			stats = {
-				value = 3,
-				spread_moving = -2,
-				concealment = -1,
-				extra_ammo = 12
 			}
 		},
 		wpn_fps_pis_g22c_b_standard = {
@@ -20146,7 +20190,7 @@ function WeaponFactoryTweakData:_init_x_usp()
 				value = 3,
 				spread_moving = -2,
 				concealment = -1,
-				extra_ammo = 12
+				extra_ammo = 8
 			}
 		},
 		wpn_fps_pis_usp_b_tactical = {

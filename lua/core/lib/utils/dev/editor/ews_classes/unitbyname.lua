@@ -1,7 +1,6 @@
 UnitByName = UnitByName or class(CoreEditorEwsDialog)
 
 function UnitByName:init(name, unit_filter_function, ...)
-	self._filter_with_name_id = true
 	self._dialog_name = self._dialog_name or name or "UnitByName"
 	self._unit_filter_function = unit_filter_function
 	CoreEditorEwsDialog.init(self, nil, self._dialog_name, "", Vector3(300, 150, 0), Vector3(350, 500, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP", ...)
@@ -22,12 +21,20 @@ function UnitByName:init(name, unit_filter_function, ...)
 	list_sizer:add(self._list, 1, 0, "EXPAND")
 	horizontal_ctrlr_sizer:add(list_sizer, 3, 0, "EXPAND")
 	local list_ctrlrs = EWS:BoxSizer("VERTICAL")
-	local filter_with_name_id = EWS:CheckBox(panel, "Filter with name id", "")
-	filter_with_name_id:set_tool_tip("Use this to toggle filter with name id or unit name")
-	filter_with_name_id:set_value(self._filter_with_name_id)
-	filter_with_name_id:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "on_filter_with_name_id"), {ctrlr = filter_with_name_id})
-	filter_with_name_id:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
-	list_ctrlrs:add(filter_with_name_id, 0, 20, "EXPAND,TOP")
+	local filter_type_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "Filter By Type")
+	list_ctrlrs:add(filter_type_sizer, 0, 0, "EXPAND")
+	self._filter_buttons = {}
+	
+	local function add_filter_button(id, name)
+		self._filter_buttons[id] = EWS:RadioButton(panel, name, "filter_type", "")
+		filter_type_sizer:add(self._filter_buttons[id], 0, 0, "")
+	end
+	
+	add_filter_button("by_name_id", "Name ID")
+	add_filter_button("by_unit_name", "Unit name")
+	add_filter_button("by_unit_id", "Unit ID")
+	self._filter_buttons.by_name_id:set_value(true)
+	panel:connect("filter_type", "EVT_COMMAND_RADIOBUTTON_SELECTED", callback(self, self, "_on_set_filter"), nil)
 	self._layer_cbs = {}
 	local layers_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "List Layers")
 	local layers = managers.editor:layers()
@@ -80,9 +87,16 @@ function UnitByName:_build_buttons(panel, sizer)
 	cancel_btn:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
 end
 
-function UnitByName:on_filter_with_name_id(params)
-	self._filter_with_name_id = params.ctrlr:get_value()
+function UnitByName:_on_set_filter()
 	self:fill_unit_list()
+end
+
+function UnitByName:_get_filter_type()
+	for name, ctrlr in pairs(self._filter_buttons) do
+		if ctrlr:get_value() then
+			return name
+		end
+	end
 end
 
 function UnitByName:on_all_layers()
@@ -238,12 +252,12 @@ function UnitByName:update_filter()
 end
 
 function UnitByName:fill_unit_list()
+	self._list:freeze()
 	self._list:delete_all_items()
 	local layers = managers.editor:layers()
 	local j = 1
 	local filter = self._filter:get_value()
 	self._units = {}
-	self._list:freeze()
 	for name, layer in pairs(layers) do
 		if self._layer_cbs[name]:get_value() then
 			for _, unit in ipairs(layer:created_units()) do
@@ -263,7 +277,16 @@ function UnitByName:fill_unit_list()
 end
 
 function UnitByName:_get_filter_string(unit)
-	return self._filter_with_name_id and unit:unit_data().name_id or unit:name():s()
+	local filter = self:_get_filter_type()
+	if filter == "by_unit_id" then
+		return unit:unit_data().unit_id
+	end
+	if filter == "by_unit_name" then
+		return unit:name():s()
+	end
+	if filter == "by_name_id" then
+		return unit:unit_data().name_id
+	end
 end
 
 function UnitByName:_continent_locked(unit)

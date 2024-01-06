@@ -873,8 +873,8 @@ function HUDLootScreen:show_item(peer_id)
 		self:make_fine_text(quality_text)
 		main_text:set_y(0)
 		quality_text:set_y(main_text:bottom())
-		global_value_text:set_y(quality_text:bottom())
-		card_info_panel:set_h(global_value_text:visible() and global_value_text:bottom() or quality_text:bottom())
+		global_value_text:set_y(quality_text:visible() and quality_text:bottom() or main_text:bottom())
+		card_info_panel:set_h(global_value_text:visible() and global_value_text:bottom() or quality_text:visible() and quality_text:bottom() or main_text:bottom())
 		card_info_panel:set_center_y(panel:h() * 0.5)
 		if self:get_local_peer_id() == peer_id then
 			local player_pc = managers.experience:level_to_stars()
@@ -995,6 +995,7 @@ end
 function HUDLootScreen:check_inside_local_peer(x, y)
 	local peer_id = self:get_local_peer_id()
 	local panel = self._peers_panel:child("peer" .. tostring(peer_id))
+	x, y = managers.gui_data:safe_to_full_16_9(x, y)
 	for i = 1, 3 do
 		local inside_check_card = panel:child("inside_check_card" .. tostring(i))
 		if inside_check_card:inside(x, y) then

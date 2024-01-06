@@ -1187,6 +1187,9 @@ function SkillTreeManager:set_current_specialization(tree)
 		self._global.skill_switches[self._global.selected_skill_switch].specialization = self._global.specializations.current_specialization
 	end
 	MenuCallbackHandler:_update_outfit_information()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		managers.statistics:publish_skills_to_steam()
+	end
 end
 
 function SkillTreeManager:debug_print_specialization_data(data, times)

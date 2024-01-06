@@ -228,6 +228,10 @@ function PortalLayer:_auto_fill()
 	if not self._current_group then
 		return
 	end
+	local confirm = EWS:message_box(Global.frame_panel, "Fill group " .. self._current_group:name() .. " with units?", "Portals", "YES_NO,ICON_QUESTION", Vector3(-1, -1, 0))
+	if confirm == "NO" then
+		return
+	end
 	for _, unit in pairs(managers.editor:layer("Statics"):created_units()) do
 		if unit:visible() and not unit:unit_data().only_visible_in_editor and not unit:unit_data().only_exists_in_editor and not self._current_group:unit_in_group(unit) and self._current_group:inside(unit:position()) then
 			self._current_group:add_unit_id(unit)
@@ -337,7 +341,7 @@ function PortalLayer:build_panel(notebook)
 	self._unit_group_toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_NODIVIDER")
 	self._unit_group_toolbar:add_tool("CREATE_NEW", "Create new group", CoreEws.image_path("world_editor\\new_portal_group.png"), "Create new group")
 	self._unit_group_toolbar:connect("CREATE_NEW", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "new_group"), nil)
-	self._unit_group_toolbar:add_tool("RENAME", "Rename group", CoreEws.image_path("toolbar\\rename_16x16.png"), "Rename group")
+	self._unit_group_toolbar:add_tool("RENAME", "Rename group", CoreEws.image_path("toolbar\\rename2_16x16.png"), "Rename group")
 	self._unit_group_toolbar:connect("RENAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "rename_group"), nil)
 	self._unit_group_toolbar:add_tool("DELETE", "Delete group", CoreEws.image_path("toolbar\\delete_16x16.png"), "Delete group")
 	self._unit_group_toolbar:connect("DELETE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "delete_group"), nil)
@@ -345,6 +349,8 @@ function PortalLayer:build_panel(notebook)
 	self._unit_group_toolbar:connect("ADD_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "add_unit_list_btn"), nil)
 	self._unit_group_toolbar:add_tool("REMOVE_UNIT_LIST", "Remove units from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
 	self._unit_group_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
+	self._unit_group_toolbar:add_tool("FILL_WITH_UNITS", "Fill portal group with units", CoreEws.image_path("toolbar\\fill_16x16.png"), nil)
+	self._unit_group_toolbar:connect("FILL_WITH_UNITS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_auto_fill"), nil)
 	self._unit_group_toolbar:realize()
 	self._portal_groups:add(self._unit_group_toolbar, 0, 1, "EXPAND,BOTTOM")
 	local groups = EWS:ListBox(self._ews_panel, "", "LB_SINGLE,LB_HSCROLL,LB_NEEDED_SB,LB_SORT")
@@ -352,9 +358,6 @@ function PortalLayer:build_panel(notebook)
 	self._portal_groups:add(groups, 1, 0, "EXPAND")
 	groups:connect("EVT_COMMAND_LISTBOX_SELECTED", callback(self, self, "select_group"), groups)
 	self._ctrlrs.groups = groups
-	local auto_fill = EWS:Button(self._ews_panel, "Fill portal group with units", "", "BU_EXACTFIT,NO_BORDER")
-	auto_fill:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "_auto_fill"), auto_fill)
-	self._portal_groups:add(auto_fill, 0, 1, "EXPAND,BOTTOM")
 	self._sizer:add(self._portal_groups, 2, 0, "EXPAND")
 	return self._ews_panel
 end
@@ -643,7 +646,7 @@ function PortalLayer:add_unit_list_btn()
 	local f = function(unit)
 		return unit:slot() == 1
 	end
-	local dialog = rawget(_G, "SelectUnitByNameModal"):new("Add Trigger Unit", f)
+	local dialog = rawget(_G, "SelectUnitByNameModal"):new("Add Unit", f)
 	for _, unit in ipairs(dialog:selected_units()) do
 		group:add_unit_id(unit)
 	end
@@ -662,7 +665,7 @@ function PortalLayer:remove_unit_list_btn()
 		return group:ids()[unit:unit_data().unit_id]
 	end
 	
-	local dialog = rawget(_G, "SelectUnitByNameModal"):new("Add Trigger Unit", f)
+	local dialog = rawget(_G, "SelectUnitByNameModal"):new("Remove Unit", f)
 	for _, unit in ipairs(dialog:selected_units()) do
 		group:remove_unit_id(unit)
 	end

@@ -591,17 +591,20 @@ function ConnectionNetworkHandler:sync_explode_bullet(position, normal, damage, 
 		return
 	end
 	if InstantExplosiveBulletBase then
-		if Network:is_server() then
-			local user_unit = managers.criminals and managers.criminals:character_unit_by_peer_id(peer:id())
-			if alive(user_unit) then
-				local weapon_unit = user_unit:inventory():unit_by_selection(peer_id_or_selection_index)
-				if alive(weapon_unit) then
-					InstantExplosiveBulletBase:on_collision_server(position, normal, damage / 163.84, user_unit, weapon_unit, peer:id(), peer_id_or_selection_index)
+		if true then
+			repeat
+				do break end -- pseudo-goto
+				local user_unit = managers.criminals and managers.criminals:character_unit_by_peer_id(peer:id())
+				if alive(user_unit) then
+					local weapon_unit = user_unit:inventory():unit_by_selection(peer_id_or_selection_index)
+					if alive(weapon_unit) then
+						InstantExplosiveBulletBase:on_collision_server(position, normal, damage / 163.84, user_unit, weapon_unit, peer:id(), peer_id_or_selection_index)
+						else
+							InstantExplosiveBulletBase:on_collision_client(position, normal, damage / 163.84, managers.criminals and managers.criminals:character_unit_by_peer_id(peer_id_or_selection_index))
+						end
+					end
 				end
-			end
-		else
-			InstantExplosiveBulletBase:on_collision_client(position, normal, damage / 163.84, managers.criminals and managers.criminals:character_unit_by_peer_id(peer_id_or_selection_index))
-		end
+			until true
 	end
 end
 
@@ -727,4 +730,19 @@ function ConnectionNetworkHandler:voting_data(type, value, result, sender)
 		return
 	end
 	managers.vote:network_package(type, value, result, peer:id())
+end
+
+function ConnectionNetworkHandler:propagate_alert(type, position, range, filter, aggressor, head_position, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	managers.groupai:state():propagate_alert({
+		type,
+		position,
+		range,
+		filter,
+		aggressor,
+		head_position
+	})
 end

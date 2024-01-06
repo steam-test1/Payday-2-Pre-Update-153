@@ -290,7 +290,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		local unit_anim = self._unit.anim_data and self._unit:anim_data()
 		local achievements = tweak_data.achievement.enemy_kill_achievements or {}
 		local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-		local weapons_pass, weapon_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, distance_pass, zipline_pass, rope_pass, weapon_type_pass, level_pass, part_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, all_pass, memory
+		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, all_pass, memory
 		local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
 		for achievement, achievement_data in pairs(achievements) do
 			weapon_type_pass = not achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().category == achievement_data.weapon_type
@@ -307,6 +307,15 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 			level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
 			cop_pass = not achievement_data.is_cop or is_cop
 			part_pass = not achievement_data.part_id or attack_weapon:base():has_part(achievement_data.part_id)
+			parts_pass = not achievement_data.parts
+			if achievement_data.parts then
+				for _, part_id in ipairs(achievement_data.parts) do
+					if attack_weapon:base():has_part(part_id) then
+						parts_pass = true
+						break
+					end
+				end
+			end
 			timer_pass = not achievement_data.timer
 			if achievement_data.timer then
 				memory = managers.job:get_memory(achievement)

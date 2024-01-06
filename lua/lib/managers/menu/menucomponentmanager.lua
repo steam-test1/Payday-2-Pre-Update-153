@@ -2507,9 +2507,11 @@ end
 
 function MenuComponentManager:close_preplanning_map_gui()
 	self:_close_preplanning_map_gui()
-	local active_menu = managers.menu:active_menu()
-	if active_menu then
-		active_menu.input:set_force_input(false)
+	if self._preplanning_map then
+		local active_menu = managers.menu:active_menu()
+		if active_menu then
+			active_menu.input:set_force_input(false)
+		end
 	end
 end
 

@@ -557,6 +557,7 @@ function CoreUnitDamage:save(data)
 			for _, segment in ipairs(state_machine:config():segments()) do
 				local anim_state = state_machine:segment_state(segment)
 				if anim_state ~= Idstring("") then
+					changed = true
 					local anim_time = state_machine:segment_real_time(segment)
 					table.insert(state.state_machine, {anim_state = anim_state, anim_time = anim_time})
 				end

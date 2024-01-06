@@ -120,11 +120,12 @@ end
 
 function CoreMaterialEditorStartDialog:on_exit()
 	self._frame:destroy()
+	self._frame = nil
 	managers.toolhub:close(self._editor.TOOLHUB_NAME)
 end
 
 function CoreMaterialEditorStartDialog:running()
-	return self._running
+	return self._running and alive(self._frame)
 end
 
 function CoreMaterialEditorStartDialog:show_modal()

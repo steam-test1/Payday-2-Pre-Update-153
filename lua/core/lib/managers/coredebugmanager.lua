@@ -2016,7 +2016,7 @@ function MacroDebug:ray()
 	local ray = self:get_ray()
 	if ray then
 		self:print_unit_info(ray.unit)
-		cat_print("debug", "Body: " .. tostring(ray.body:name():s()) .. ", Pos: " .. tostring(ray.position) .. ", Len: " .. string.format("%.3f", ray.distance))
+		cat_print("debug", "Body: " .. tostring(ray.body:name():t()) .. ", Pos: " .. tostring(ray.position) .. ", Len: " .. string.format("%.3f", ray.distance))
 	else
 		cat_error("debug", "No unit found.")
 	end
@@ -2025,7 +2025,7 @@ end
 function MacroDebug:print_unit_info(unit)
 	if alive(unit) then
 		local unit_file, object_file, sequence_file, anim_machine = self:get_unit_files(unit)
-		local unit_string = "Name: " .. tostring(unit:name():s()) .. ", Slot:" .. tostring(unit:slot()) .. ", Author: " .. tostring(unit:author():s())
+		local unit_string = "Name: " .. tostring(unit:name():t()) .. ", Slot:" .. tostring(unit:slot()) .. ", Author: " .. tostring(unit:author():t())
 		if 0 < #anim_machine then
 			unit_string = unit_string .. ", Anim: " .. tostring(anim_machine)
 		end
@@ -2046,12 +2046,12 @@ function MacroDebug:get_unit_files(unit)
 	local object_file, unit_file
 	local unit_data = PackageManager:unit_data(unit:name():id())
 	local base = Application:base_path() .. "..\\..\\assets\\"
-	local unit_name = tostring(unit:name():s())
+	local unit_name = tostring(unit:name():t())
 	local unit_file = base .. unit_name .. ".unit"
 	local object_file = base .. unit_name .. ".object"
 	local relative_sequence_file = managers.sequence:get_sequence_file(unit_name)
-	local sequence_file = relative_sequence_file and base .. tostring(relative_sequence_file:s()) .. "." .. CoreSequenceManager.SequenceManager.SEQUENCE_FILE_EXTENSION
-	return self:get_cleaned_path(unit_file), self:get_cleaned_path(object_file), self:get_cleaned_path(sequence_file), tostring(unit_data:anim() and unit_data:anim():s())
+	local sequence_file = relative_sequence_file and base .. tostring(relative_sequence_file:t()) .. "." .. CoreSequenceManager.SequenceManager.SEQUENCE_FILE_EXTENSION
+	return self:get_cleaned_path(unit_file), self:get_cleaned_path(object_file), self:get_cleaned_path(sequence_file), tostring(unit_data:anim() and unit_data:anim():t())
 end
 
 function MacroDebug:get_cleaned_path(path)
@@ -2071,7 +2071,7 @@ function MacroDebug:ray_push(velocity_dir, velocity_length, mass)
 	local ray = self:get_ray()
 	if ray then
 		self:push(ray.unit, velocity_dir or ray.ray, velocity_length, mass)
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():t()) .. ", Body: " .. tostring(ray.body:name():t()))
 	else
 		cat_error("debug", "No unit found.")
 	end
@@ -2089,7 +2089,7 @@ function MacroDebug:ray_gravitate(multiplier)
 	local ray = self:get_ray()
 	if ray then
 		self:gravitate(ray.unit, multiplier)
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():t()) .. ", Body: " .. tostring(ray.body:name():t()))
 	else
 		cat_error("debug", "No unit found.")
 	end
@@ -2112,7 +2112,7 @@ function MacroDebug:ray_hover(multiplier)
 	local ray = self:get_ray()
 	if ray then
 		self:hover(ray.unit, multiplier)
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():t()) .. ", Body: " .. tostring(ray.body:name():t()))
 	else
 		cat_error("debug", "No unit found.")
 	end
@@ -2147,7 +2147,7 @@ end
 function MacroDebug:ray_run_sequence(sequence, damage_type, source_unit, dest_body, normal, position, direction, damage, velocity, params)
 	local ray = self:get_ray()
 	if ray then
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():t()) .. ", Body: " .. tostring(ray.body:name():t()))
 		local damage_ext = ray.unit:damage()
 		if damage_ext then
 			if damage_ext.run_sequence then
@@ -2166,7 +2166,7 @@ end
 function MacroDebug:ray_select_unit()
 	local ray = self:get_ray()
 	if ray then
-		cat_print("debug", "Unit: " .. tostring(ray.unit:name():s()) .. ", Body: " .. tostring(ray.body:name():s()))
+		cat_print("debug", "Unit: " .. tostring(ray.unit:name():t()) .. ", Body: " .. tostring(ray.body:name():t()))
 		self:select_unit(ray.unit)
 	else
 		cat_error("debug", "No unit found.")
@@ -2212,7 +2212,7 @@ function MacroDebug:spawn(unit_name, pos, rot)
 			self:set_last_unit(unit)
 		end
 	else
-		cat_print("debug", "Tried to spawn non-existing unit \"" .. tostring(unit_name:s()) .. "\".")
+		cat_print("debug", "Tried to spawn non-existing unit \"" .. tostring(unit_name:t()) .. "\".")
 	end
 end
 

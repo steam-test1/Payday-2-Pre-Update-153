@@ -181,6 +181,9 @@ end
 CoreCounterOperatorUnitElement = CoreCounterOperatorUnitElement or class(MissionElement)
 CoreCounterOperatorUnitElement.SAVE_UNIT_POSITION = false
 CoreCounterOperatorUnitElement.SAVE_UNIT_ROTATION = false
+CoreCounterOperatorUnitElement.INSTANCE_VAR_NAMES = {
+	{type = "number", value = "amount"}
+}
 CounterOperatorUnitElement = CounterOperatorUnitElement or class(CoreCounterOperatorUnitElement)
 
 function CounterOperatorUnitElement:init(...)

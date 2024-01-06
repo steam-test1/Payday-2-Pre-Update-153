@@ -154,12 +154,14 @@ function ElementAreaTrigger:project_amount_all()
 end
 
 function ElementAreaTrigger:debug_draw()
-	for _, shape in ipairs(self._shapes) do
-		shape:draw(0, 0, self._values.enabled and 0 or 1, self._values.enabled and 1 or 0, 0, 0.2)
-	end
-	for _, shape_element in ipairs(self._shape_elements) do
-		for _, shape in ipairs(shape_element:get_shapes()) do
+	if self._values.instigator == "loot" or self._values.instigator == "unique_loot" then
+		for _, shape in ipairs(self._shapes) do
 			shape:draw(0, 0, self._values.enabled and 0 or 1, self._values.enabled and 1 or 0, 0, 0.2)
+		end
+		for _, shape_element in ipairs(self._shape_elements) do
+			for _, shape in ipairs(shape_element:get_shapes()) do
+				shape:draw(0, 0, self._values.enabled and 0 or 1, self._values.enabled and 1 or 0, 0, 0.2)
+			end
 		end
 	end
 end
