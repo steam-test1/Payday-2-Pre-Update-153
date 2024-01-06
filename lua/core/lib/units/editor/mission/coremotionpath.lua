@@ -10,10 +10,11 @@ function CoreMotionPathOperatorUnitElement:init(unit)
 	self._hed.operation = "none"
 	self._hed.marker = nil
 	self._hed.elements = {}
-	self.marker_ids = {}
+	self._hed.marker_ids = {}
 	table.insert(self._save_values, "operation")
 	table.insert(self._save_values, "marker")
 	table.insert(self._save_values, "elements")
+	table.insert(self._save_values, "marker_ids")
 end
 
 function CoreMotionPathOperatorUnitElement:draw_links(t, dt, selected_unit, all_units)
@@ -32,7 +33,7 @@ function CoreMotionPathOperatorUnitElement:draw_links(t, dt, selected_unit, all_
 		end
 	end
 	if self._hed.marker then
-		local unit = all_units[self.marker_ids[self._hed.marker]]
+		local unit = all_units[self._hed.marker_ids[self._hed.marker]]
 		local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
 		if draw and alive(unit) and alive(self._unit) then
 			self:_draw_link({
@@ -79,13 +80,13 @@ function CoreMotionPathOperatorUnitElement:add_triggers(vc)
 end
 
 function CoreMotionPathOperatorUnitElement:_motion_path_markers()
-	self.marker_ids = {}
+	self._hed.marker_ids = {}
 	local motion_path_markers = {"none"}
 	local mission_elements = managers.worlddefinition._mission_element_units
 	for _, me in pairs(mission_elements) do
 		if me:name() == Idstring("units/dev_tools/mission_elements/point_motionpath_marker/point_motionpath_marker") then
 			table.insert_sorted(motion_path_markers, me:unit_data().name_id)
-			self.marker_ids[me:unit_data().name_id] = me:unit_data().unit_id
+			self._hed.marker_ids[me:unit_data().name_id] = me:unit_data().unit_id
 		end
 	end
 	return motion_path_markers
@@ -106,7 +107,7 @@ function CoreMotionPathOperatorUnitElement:_build_panel(panel, panel_sizer)
 end
 
 function CoreMotionPathOperatorUnitElement:on_executed_marker_selected()
-	Application:debug("CoreMotionPathOperatorUnitElement:_build_panel( panel, panel_sizer ): ", self._hed.marker, self.marker_ids[self._hed.marker])
+	Application:debug("CoreMotionPathOperatorUnitElement:_build_panel( panel, panel_sizer ): ", self._hed.marker, self._hed.marker_ids[self._hed.marker])
 	if self._hed.marker == "none" then
 		self._hed.marker = nil
 	end
@@ -121,7 +122,7 @@ end
 
 function CoreMotionPathTriggerUnitElement:init(unit)
 	CoreMotionPathTriggerUnitElement.super.init(self, unit)
-	self._hed.outcome = "fail"
+	self._hed.outcome = "marker_reached"
 	self._hed.elements = {}
 	table.insert(self._save_values, "outcome")
 	table.insert(self._save_values, "elements")
@@ -180,6 +181,8 @@ function CoreMotionPathTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	self:_build_value_combobox(panel, panel_sizer, "outcome", {"fail", "success"}, "Select an outcome to trigger on")
+	self:_build_value_combobox(panel, panel_sizer, "outcome", {
+		"marker_reached"
+	}, "Select an outcome to trigger on")
 	self:_add_help_text("This element is a trigger on motion path marker element.")
 end

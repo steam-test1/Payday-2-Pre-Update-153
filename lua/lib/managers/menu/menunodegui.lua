@@ -1089,6 +1089,13 @@ function MenuNodeGui:scroll_update(dt)
 	else
 		self._list_arrows.down:set_color(self._list_arrows.down:color():with_alpha(1))
 	end
+	self:update_item_icon_visibility()
+	if scrolled then
+		local row_item = self._highlighted_item and self:row_item(self._highlighted_item)
+		if row_item then
+			self:_align_marker(row_item)
+		end
+	end
 	return scrolled
 end
 
@@ -1176,7 +1183,7 @@ end
 function MenuNodeGui:update_item_icon_visibility()
 	for _, row_item in pairs(self.row_items) do
 		if alive(row_item.icon) then
-			row_item.icon:set_visible(row_item.item:icon_visible())
+			row_item.icon:set_visible(row_item.item:icon_visible() and row_item.icon:world_y() >= self._item_panel_parent:world_y() and row_item.icon:world_bottom() <= self._item_panel_parent:world_bottom())
 		end
 	end
 end
@@ -1270,8 +1277,8 @@ function MenuNodeGui:_highlight_row_item(row_item, mouse_over)
 end
 
 function MenuNodeGui:_align_marker(row_item)
-	if self.marker_color then
-		self._marker_data.gradient:set_color(row_item.item:enabled() and self.marker_color or self.marker_disabled_color or row_item.disabled_color)
+	if self.marker_color or row_item.marker_color then
+		self._marker_data.gradient:set_color(row_item.item:enabled() and (row_item.marker_color or self.marker_color) or self.marker_disabled_color or row_item.disabled_color)
 	end
 	if row_item.item:parameters().pd2_corner then
 		self._marker_data.marker:set_visible(true)

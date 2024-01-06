@@ -495,7 +495,8 @@ function StatisticsManager:_get_stat_tables()
 		"pines",
 		"crojob2",
 		"crojob3",
-		"crojob3_night"
+		"crojob3_night",
+		"rat"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -540,7 +541,9 @@ function StatisticsManager:_get_stat_tables()
 		"pines",
 		"crojob1",
 		"crojob2",
-		"crojob2_night"
+		"crojob2_night",
+		"rat",
+		"arm_for"
 	}
 	local mask_list = {
 		"character_locked",
@@ -866,7 +869,8 @@ function StatisticsManager:_get_stat_tables()
 		"old_hoxton",
 		"female_1",
 		"dragan",
-		"jacket"
+		"jacket",
+		"bonnie"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end

@@ -129,8 +129,10 @@ end
 
 function AchievmentManager:award(id)
 	if not self:exists(id) then
+		Application:debug("[AchievmentManager:award] Awarding non-existing achievement", "id", id)
 		return
 	end
+	managers.challenge:on_achievement_awarded(id)
 	if self:get_info(id).awarded then
 		return
 	end

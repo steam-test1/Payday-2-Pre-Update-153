@@ -1111,7 +1111,6 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
-		"complete_overkill_pack",
 		"overkill_pack",
 		"akm4_pack",
 		"character_pack_dragan",
@@ -4133,9 +4132,13 @@ function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
 		localize = "false",
 		callback = "set_contact_info",
 		files = files,
-		icon = "guis/textures/scrollarrow",
-		icon_rotation = 270,
-		icon_visible_callback = "is_current_contact_info"
+		icon = contact.icon or "guis/textures/scrollarrow",
+		icon_rotation = contact.icon_rotation or 270,
+		icon_visible_callback = contact.icon_visible_callback or "is_current_contact_info",
+		hightlight_color = contact.hightlight_color,
+		row_item_color = contact.row_item_color,
+		disabled_color = contact.disabled_color,
+		marker_color = contact.marker_color
 	}
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
@@ -6845,4 +6848,440 @@ function MenuCallbackHandler:mod_option_toggle_enabled(item)
 	print("mod_option_toggle_enabled", "mod", item:name(), "status", item:value())
 	local enabled = item:value() == "on"
 	DB:set_mod_enabled(item:name(), enabled)
+end
+
+MenuCrimeNetChallengeInitiator = MenuCrimeNetChallengeInitiator or class(MenuCrimeNetGageAssignmentInitiator)
+
+function MenuCrimeNetChallengeInitiator:modify_node(original_node, data)
+	local node = self:setup_node(original_node)
+	if not managers.challenge:visited_crimenet() then
+		node:set_default_item_name("_introduction")
+		node:select_item("_introduction")
+		managers.menu:active_menu().logic:trigger_item(false, node:item("_introduction"))
+		managers.challenge:visit_crimenet()
+	else
+		node:set_default_item_name("_summary")
+		node:select_item("_summary")
+		managers.menu:active_menu().logic:trigger_item(false, node:item("_summary"))
+	end
+	return node
+end
+
+function MenuCrimeNetChallengeInitiator:refresh_node(node)
+	self:setup_node(node)
+	if not node:selected_item() or not node:item(node:selected_item():name()) then
+		node:set_default_item_name("_summary")
+		node:select_item("_summary")
+		managers.menu:active_menu().logic:trigger_item(false, node:item("_summary"))
+	end
+	return node
+end
+
+function MenuCallbackHandler:is_current_challenge(item)
+	local active_node_gui = managers.menu:active_menu().renderer:active_node_gui()
+	if active_node_gui and active_node_gui.get_contact_info then
+		return active_node_gui:get_contact_info() == item:name() or managers.challenge:is_challenge_completed(item:name()) or managers.challenge:is_challenge_rewarded(item:name())
+	end
+	return false
+end
+
+function MenuCrimeNetChallengeInitiator:setup_node(node)
+	node:clean_items()
+	self:create_divider(node, 1, managers.localization:text("menu_gage_assignment_div_menu"), nil, tweak_data.screen_colors.text)
+	self:create_item(node, {
+		id = "_introduction",
+		name_lozalized = managers.localization:text("menu_challenge_introduction_title")
+	})
+	self:create_item(node, {
+		id = "_summary",
+		name_lozalized = managers.localization:text("menu_challenge_summary_title")
+	})
+	self:create_divider(node, 2)
+	if not managers.challenge:is_retrieving() and managers.challenge:is_validated() then
+		local challenges = {}
+		local categories = {}
+		local category
+		local current_timestamp = managers.challenge:get_timestamp()
+		local timestamp, interval, expire_timestamp, expire_time
+		for assignment, data in pairs(managers.challenge:get_all_active_challenges()) do
+			timestamp = data.timestamp
+			interval = data.interval
+			expire_timestamp = interval + timestamp
+			expire_time = expire_timestamp - current_timestamp
+			if 0 <= expire_time then
+				category = data.category or "daily"
+				table.insert(categories, category)
+				challenges[category] = challenges[category] or {}
+				table.insert(challenges[category], data)
+			end
+		end
+		categories = table.list_union(categories)
+		table.sort(categories)
+		local node_data
+		local selected_item = node:selected_item() and node:selected_item():name()
+		for _, category in ipairs(categories) do
+			self:create_divider(node, category, managers.localization:text("menu_challenge_div_cat_" .. category), nil, tweak_data.screen_colors.text)
+			node_data = {}
+			local hightlight_color, row_item_color, marker_color, icon, icon_rotation, icon_visible_callback
+			for assignment, challenge in pairs(challenges[category]) do
+				hightlight_color = challenge.rewarded and tweak_data.screen_colors.text:with_alpha(0.5) or challenge.completed and tweak_data.screen_colors.challenge_completed_color
+				row_item_color = challenge.rewarded and tweak_data.screen_colors.text:with_alpha(0.5) or challenge.completed and tweak_data.screen_colors.challenge_completed_color
+				marker_color = challenge.rewarded and tweak_data.screen_colors.text:with_alpha(0.5) or challenge.completed and tweak_data.screen_colors.challenge_completed_color:with_alpha(0.15)
+				icon = selected_item ~= challenge.id and (challenge.rewarded and "guis/textures/menu_singletick" or challenge.completed and "guis/textures/pd2/icon_reward") or nil
+				icon_rotation = selected_item ~= challenge.id and (challenge.rewarded and 360 or challenge.completed and 360) or nil
+				icon_visible_callback = "is_current_challenge"
+				table.insert(node_data, {
+					name_lozalized = managers.localization:text(challenge.name_id),
+					interval = challenge.interval,
+					id = challenge.id,
+					hightlight_color = hightlight_color,
+					row_item_color = row_item_color,
+					marker_color = marker_color,
+					icon = icon,
+					icon_rotation = icon_rotation,
+					icon_visible_callback = icon_visible_callback
+				})
+			end
+			table.sort(node_data, function(x, y)
+				if x.interval ~= y.interval then
+					return x.interval < y.interval
+				end
+				return x.id > y.id
+			end)
+			for assignment, data in ipairs(node_data) do
+				self:create_item(node, data)
+			end
+		end
+	else
+		self:create_divider(node, "retrieving", managers.localization:text("menu_challenge_still_retrieving"), nil, tweak_data.screen_colors.text)
+	end
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		previous_node = "true",
+		visible_callback = "is_pc_controller",
+		align = "left",
+		last_item = "true",
+		gui_node_custom = "true",
+		pd2_corner = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	return node
+end
+
+function MenuCallbackHandler:update_challenge_menu_node()
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	if managers.menu:active_menu().logic:selected_node():parameters().name ~= "crimenet_contract_challenge" then
+		return false
+	end
+	MenuCallbackHandler:refresh_node()
+end
+
+function MenuCallbackHandler:give_challenge_reward(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	local id = item:parameters().name
+	local rewards = managers.challenge:on_give_rewards(id)
+	if rewards then
+		managers.menu:active_menu().logic:refresh_node()
+		for _, reward in ipairs(rewards) do
+			if reward.choose_weapon_reward then
+				managers.menu:open_node("choose_weapon_reward")
+			end
+		end
+	end
+end
+
+MenuChooseWeaponRewardInitiator = MenuChooseWeaponRewardInitiator or class()
+
+function MenuChooseWeaponRewardInitiator:modify_node(original_node, data)
+	local node = original_node
+	local all_dlc_data = Global.dlc_manager.all_dlc_data
+	local weapon_tweak = tweak_data.weapon
+	local x_id, y_id, x_level, y_level, x_unlocked, y_unlocked, x_skill, y_skill, x_gv, y_gv, x_sn, y_sn
+	local primaries = managers.blackmarket:get_weapon_category("primaries")
+	local secondaries = managers.blackmarket:get_weapon_category("secondaries")
+	local items = {}
+	local chk_unlocked_func = function(weapon)
+		return not not weapon.unlocked
+	end
+	
+	local function chk_dlc_func(weapon)
+		x_id = weapon.weapon_id
+		x_gv = weapon_tweak[x_id].global_value
+		if all_dlc_data[x_gv] and all_dlc_data[x_gv].app_id and not managers.dlc:is_dlc_unlocked(x_gv) then
+			return false
+		end
+		return true
+	end
+	
+	local chk_dropable_func = function(weapon)
+		local loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon.weapon_id)
+		return loot_table and 0 < #loot_table or false
+	end
+	local category
+	for i, category_data in ipairs({primaries, secondaries}) do
+		for _, weapon_data in ipairs(category_data) do
+			if chk_unlocked_func(weapon_data) and chk_dlc_func(weapon_data) and chk_dropable_func(weapon_data) then
+				category = weapon_tweak[weapon_data.weapon_id].category
+				category = tweak_data.gui.buy_weapon_category_groups[category] or category
+				items[category] = items[category] or {}
+				table.insert(items[category], weapon_data)
+			end
+		end
+	end
+	
+	local function sort_func(x, y)
+		x_unlocked = x.unlocked
+		y_unlocked = y.unlocked
+		if x_unlocked ~= y_unlocked then
+			return x_unlocked
+		end
+		x_id = x.weapon_id
+		y_id = y.weapon_id
+		x_gv = weapon_tweak[x_id].global_value
+		y_gv = weapon_tweak[y_id].global_value
+		x_sn = x_gv and tweak_data.lootdrop.global_values[x_gv].sort_number or 0
+		y_sn = y_gv and tweak_data.lootdrop.global_values[y_gv].sort_number or 0
+		if x_sn ~= y_sn then
+			return x_sn < y_sn
+		end
+		x_skill = x.skill_based
+		y_skill = y.skill_based
+		if x_skill ~= y_skill then
+			return y_skill
+		end
+		x_level = x.level or 0
+		y_level = y.level or 0
+		if x_level ~= y_level then
+			return x_level < y_level
+		end
+		return x_id < y_id
+	end
+	
+	local category_list = {}
+	for category, data in pairs(items) do
+		table.sort(data, sort_func)
+		table.insert(category_list, category)
+	end
+	table.sort(category_list)
+	node:parameters().first_weapons = {}
+	for index, category in ipairs(category_list) do
+		node:parameters().first_weapons[category] = items[category][1].weapon_id
+	end
+	node:parameters().category_list = category_list
+	node:parameters().weapon_items = items
+	node = self:setup_node(node)
+	node:set_default_item_name("choose_weapon_category")
+	node:select_item("choose_weapon_category")
+	return node
+end
+
+function MenuChooseWeaponRewardInitiator:refresh_node(node)
+	self:setup_node(node)
+	return node
+end
+
+function MenuChooseWeaponRewardInitiator:setup_node(node)
+	local listed_category = node:parameters().listed_category or "assault_rifle"
+	local listed_weapon = node:parameters().listed_weapon or "amcar"
+	node:parameters().listed_weapon = listed_weapon
+	node:parameters().listed_category = listed_category
+	node:parameters().block_back = true
+	node:parameters().clicked_category = false
+	node:clean_items()
+	if not node:item("divider_end") then
+		local category_list = node:parameters().category_list
+		local items = node:parameters().weapon_items
+		local params = {
+			name = "choose_weapon_category",
+			text_id = "menu_challenge_choose_weapon_category",
+			callback = "choice_challenge_choose_weapon_category",
+			filter = true,
+			text_offset = 75
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		table.insert(data_node, {
+			_meta = "option",
+			no_text = true,
+			localize = false,
+			text_id = "",
+			value = category_list[#category_list] .. "#"
+		})
+		for index, category in ipairs(category_list) do
+			table.insert(data_node, {
+				_meta = "option",
+				localize = false,
+				text_id = managers.localization:to_upper_text("menu_" .. category),
+				value = category
+			})
+			node:parameters().first_weapons[category] = items[category][1].weapon_id
+		end
+		table.insert(data_node, {
+			_meta = "option",
+			no_text = true,
+			localize = false,
+			text_id = "",
+			value = category_list[1] .. "#"
+		})
+		local new_item = node:create_item(data_node, params)
+		new_item:set_value(listed_category)
+		node:add_item(new_item)
+		local params = {
+			name = "choose_weapon",
+			text_id = "menu_challenge_choose_weapon",
+			callback = "choice_challenge_choose_weapon",
+			filter = true,
+			text_offset = 75
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		table.insert(data_node, {
+			_meta = "option",
+			no_text = true,
+			localize = false,
+			text_id = "",
+			value = items[listed_category][#items[listed_category]].weapon_id .. "#"
+		})
+		for index, weapon_data in ipairs(items[listed_category]) do
+			table.insert(data_node, {
+				_meta = "option",
+				localize = false,
+				text_id = managers.weapon_factory:get_weapon_name_by_weapon_id(weapon_data.weapon_id),
+				value = weapon_data.weapon_id
+			})
+		end
+		table.insert(data_node, {
+			_meta = "option",
+			no_text = true,
+			localize = false,
+			text_id = "",
+			value = items[listed_category][1].weapon_id .. "#"
+		})
+		local new_item = node:create_item(data_node, params)
+		new_item:set_value(listed_weapon)
+		node:add_item(new_item)
+		self:create_divider(node, "divider_end", nil, 32)
+		local params = {
+			name = "get_weapon_mod_reward",
+			text_id = "menu_challenge_get_weapon_mod_reward",
+			callback = "choice_challenge_get_weapon_mod_reward",
+			filter = true,
+			halign = "right",
+			align = "right"
+		}
+		local data_node = {}
+		local new_item = node:create_item(data_node, params)
+		node:add_item(new_item)
+	end
+	return node
+end
+
+function MenuChooseWeaponRewardInitiator:create_divider(node, id, text_id, size, color, align)
+	local params = {
+		name = "divider_" .. id,
+		no_text = not text_id,
+		text_id = text_id,
+		size = size or 8,
+		color = color,
+		halign = align,
+		align = align
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+function MenuCallbackHandler:choice_challenge_choose_weapon_category(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	local node = managers.menu:active_menu().logic:selected_node()
+	node:parameters().listed_category = string.gsub(item:value(), "#", "")
+	if string.find(item:value(), "#") then
+		item:set_value(string.gsub(item:value(), "#", ""))
+	end
+	node:parameters().clicked_category = true
+	node:parameters().listed_weapon = node:parameters().first_weapons[item:value()]
+	MenuCallbackHandler:refresh_node()
+end
+
+function MenuCallbackHandler:choice_challenge_choose_weapon(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	if managers.menu:active_menu().logic:selected_node():parameters().clicked_category then
+		return false
+	end
+	managers.menu:active_menu().logic:selected_node():parameters().listed_weapon = string.gsub(item:value(), "#", "")
+	if string.find(item:value(), "#") then
+		item:set_value(string.gsub(item:value(), "#", ""))
+	end
+	MenuCallbackHandler:refresh_node()
+end
+
+function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	local reward = {}
+	if managers.menu:active_menu().logic:selected_node():parameters().listed_weapon then
+		local entry = MenuCallbackHandler:roll_challenge_give_weapon_mod(managers.menu:active_menu().logic:selected_node():parameters().listed_weapon)
+		managers.menu:active_menu().logic:selected_node():parameters().listed_weapon = nil
+		if entry then
+			reward.amount = 1
+			reward.item_entry = entry[1]
+			reward.type_items = "weapon_mods"
+		end
+	end
+	managers.menu:active_menu().logic:selected_node():parameters().block_back = false
+	managers.menu:back()
+	managers.menu:show_challenge_reward(reward)
+end
+
+function MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id)
+	local loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_id)
+	if 0 < #loot_table then
+		local entry = loot_table[math.random(#loot_table)]
+		managers.blackmarket:add_to_inventory(entry[2] or "normal", "weapon_mods", entry[1])
+		print("[MenuCallbackHandler:roll_challenge_give_weapon_mod] Drop", entry[2] or "normal", "weapon_mods", entry[1])
+		return entry
+	end
 end

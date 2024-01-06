@@ -368,7 +368,11 @@ function MissionEndState:at_enter(old_state, params)
 		else
 			hud_ghost_bonus = ghost_bonus
 		end
-		managers.hud:set_special_packages_endscreen_hud({ghost_bonus = hud_ghost_bonus, gage_assignment = gage_assignment_state})
+		managers.hud:set_special_packages_endscreen_hud({
+			ghost_bonus = hud_ghost_bonus,
+			gage_assignment = gage_assignment_state,
+			challenge_completed = managers.challenge:any_challenge_completed()
+		})
 	end
 	if Network:is_server() then
 		managers.network:session():set_state("game_end")

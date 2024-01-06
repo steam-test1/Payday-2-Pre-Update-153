@@ -1,3 +1,4 @@
+require("lib/managers/menu/renderers/MenuNodeBaseGui")
 local make_fine_text = function(text)
 	local x, y, w, h = text:text_rect()
 	text:set_size(w, h)
@@ -166,7 +167,11 @@ MenuNodeCrimenetSpecialGui = MenuNodeCrimenetSpecialGui or class(MenuNodeCrimene
 
 function MenuNodeCrimenetSpecialGui:_setup_item_panel(safe_rect, res)
 	MenuNodeCrimenetSpecialGui.super._setup_item_panel(self, safe_rect, res)
+	if alive(self.item_panel:parent():child("special_title_text")) then
+		self.item_panel:parent():remove(self.item_panel:parent():child("special_title_text"))
+	end
 	local title_text = self.item_panel:parent():text({
+		name = "special_title_text",
 		text = managers.localization:to_upper_text("menu_cn_contract_broker_title"),
 		font = tweak_data.menu.pd2_medium_font,
 		font_size = tweak_data.menu.pd2_medium_font_size,
@@ -795,7 +800,7 @@ end
 
 function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, override_file)
 	self._files = files
-	local files_menu = self._panel:child("files_menu")
+	local files_menu = self._files_menu
 	local num_files = #files
 	files_menu:clear()
 	if 1 < num_files then
@@ -830,7 +835,7 @@ end
 
 function MenuNodeCrimenetContactInfoGui:set_empty()
 	local video_panel = self._panel:child("video_panel")
-	if alive(video_panel:child("video")) then
+	if video_panel and alive(video_panel:child("video")) then
 		video_panel:remove(video_panel:child("video"))
 	end
 	local contact_desc_text = self._panel:child("contact_desc_text")
@@ -851,6 +856,10 @@ function MenuNodeCrimenetContactInfoGui:set_file(index)
 		index = i
 	end
 	self._current_file = index or 1
+	self:_set_file()
+end
+
+function MenuNodeCrimenetContactInfoGui:_set_file()
 	local file = self._files[self._current_file]
 	local desc_id = file.desc_lozalized
 	local video = file.videos and file.videos[math.random(#file.videos)]
@@ -874,7 +883,7 @@ function MenuNodeCrimenetContactInfoGui:set_file(index)
 			color = tweak_data.screen_colors.button_stage_2
 		})
 	end
-	local files_menu = self._panel:child("files_menu")
+	local files_menu = self._files_menu
 	for i, file in ipairs(files_menu:children()) do
 		local is_locked = self:is_file_locked(self._files[i].lock)
 		local texture_rect = is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or self._file_icons.unselected
@@ -883,7 +892,10 @@ function MenuNodeCrimenetContactInfoGui:set_file(index)
 end
 
 function MenuNodeCrimenetContactInfoGui:is_file_locked(lock_callback)
-	if lock_callback then
+	if not lock_callback then
+		return
+	end
+	if type(lock_callback) == "string" then
 		local callback_handler = managers.menu:active_menu() and managers.menu:active_menu().callback_handler
 		if callback_handler then
 			local clbk = callback(callback_handler, callback_handler, lock_callback)
@@ -891,6 +903,10 @@ function MenuNodeCrimenetContactInfoGui:is_file_locked(lock_callback)
 				return clbk()
 			end
 		end
+	elseif type(lock_callback) == "boolean" then
+		return lock_callback
+	elseif type(lock_callback) == "function" then
+		return lock_callback()
 	end
 	return false
 end
@@ -913,6 +929,7 @@ function MenuNodeCrimenetContactInfoGui:change_file(diff)
 		end
 	end
 	if new_file ~= self._current_file then
+		managers.menu_component:post_event("highlight")
 		self:set_file(new_file)
 	end
 end
@@ -922,24 +939,38 @@ function MenuNodeCrimenetContactInfoGui:get_contact_info()
 end
 
 function MenuNodeCrimenetContactInfoGui:mouse_moved(o, x, y)
-	local files_menu = self._panel:child("files_menu")
+	local files_menu = self._files_menu
 	local is_inside = false
+	local highlighted_file
 	if alive(files_menu) then
 		for i, file in ipairs(files_menu:children()) do
-			local is_locked = self:is_file_locked(self._files[i].lock)
-			local texture_rect = is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or file:inside(x, y) and self._file_icons.selected or self._file_icons.unselected
-			file:set_texture_rect(unpack(texture_rect))
+			local is_locked = self:is_file_locked(self._files[i] and self._files[i].lock)
+			local texture_rect = not self._file_icons or is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or file:inside(x, y) and self._file_icons.selected or self._file_icons.unselected
+			local texture_alpha = not self._file_alphas or is_locked and self._file_alphas.locked or i == self._current_file and self._file_alphas.selected or file:inside(x, y) and self._file_alphas.selected or self._file_alphas.unselected
+			if texture_rect then
+				file:set_texture_rect(unpack(texture_rect))
+			end
+			if texture_alpha then
+				file:set_alpha(texture_alpha)
+			end
 			if file:inside(x, y) then
 				is_inside = i
+				highlighted_file = self._current_file ~= i and i
 			end
 		end
 	end
-	local is_locked = is_inside and self:is_file_locked(self._files[is_inside].lock)
+	if highlighted_file and self._highlighted_file ~= highlighted_file then
+		managers.menu_component:post_event("highlight")
+		self._highlighted_file = highlighted_file
+	elseif not highlighted_file then
+		self._highlighted_file = false
+	end
+	local is_locked = is_inside and self:is_file_locked(self._files[is_inside] and self._files[is_inside].lock)
 	return is_inside, self._file_pressed and (self._file_pressed == is_inside and "link" or "arrow") or not (not is_inside or is_locked) and "link" or "arrow"
 end
 
 function MenuNodeCrimenetContactInfoGui:mouse_pressed(button, x, y)
-	local files_menu = self._panel:child("files_menu")
+	local files_menu = self._files_menu
 	if alive(files_menu) then
 		for i, file in ipairs(files_menu:children()) do
 			if file:inside(x, y) and not self:is_file_locked(self._files[i].lock) then
@@ -953,11 +984,12 @@ end
 
 function MenuNodeCrimenetContactInfoGui:mouse_released(button, x, y)
 	if self._file_pressed and self._file_pressed ~= self._current_file then
-		local files_menu = self._panel:child("files_menu")
+		local files_menu = self._files_menu
 		if alive(files_menu) then
 			local file = files_menu:children()[self._file_pressed]
 			if file and file:inside(x, y) then
 				self:set_file(self._file_pressed)
+				managers.menu_component:post_event("menu_enter")
 			end
 		end
 	end
@@ -1154,6 +1186,7 @@ function MenuNodeCrimenetContactInfoGui:_setup_layout()
 		h = 26,
 		w = video_panel:w()
 	})
+	self._files_menu = files_menu
 	local contact_desc_text = self._panel:text({
 		name = "contact_desc_text",
 		text = "",
@@ -1627,6 +1660,7 @@ function MenuNodeCrimenetGageAssignmentGui:texture_done_clbk(params, texture_ids
 	local panel = params[1]
 	local is_pattern = params[2]
 	local blend_mode = params[3] or "normal"
+	local color = params[4]
 	local image = panel:bitmap({
 		name = "texture",
 		texture = texture_ids,
@@ -1634,6 +1668,9 @@ function MenuNodeCrimenetGageAssignmentGui:texture_done_clbk(params, texture_ids
 	})
 	if is_pattern then
 		image:set_render_template(Idstring("VertexColorTexturedPatterns"))
+	end
+	if color then
+		image:set_color(color)
 	end
 	local texture_width = image:texture_width()
 	local texture_height = image:texture_height()
@@ -1739,4 +1776,728 @@ end
 function MenuNodeCrimenetGageAssignmentGui:close()
 	self:unretrieve_textures()
 	MenuNodeCrimenetGageAssignmentGui.super.close(self)
+end
+
+MenuNodeCrimenetChallengeGui = MenuNodeCrimenetChallengeGui or class(MenuNodeCrimenetGageAssignmentGui)
+MenuNodeCrimenetChallengeGui.WIDTH = 840
+MenuNodeCrimenetChallengeGui.HEIGHT = 460
+MenuNodeCrimenetChallengeGui.MENU_WIDTH = 315
+MenuNodeCrimenetChallengeGui.PADDING = 10
+MenuNodeCrimenetChallengeGui.CODEX_TEXT_ID = "menu_cn_challenge_title"
+MenuNodeCrimenetChallengeGui.SOUND_SOURCE_NAME = "MenuNodeCrimenetChallengeGui"
+
+function MenuNodeCrimenetChallengeGui:init(node, layer, parameters)
+	MenuNodeCrimenetChallengeGui.super.init(self, node, layer, parameters)
+	self._file_icons = nil
+	self._file_alphas = {
+		locked = 0.4,
+		unavailable = 1,
+		selected = 1,
+		unselected = 0.8,
+		mouse_over = 1
+	}
+end
+
+function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override_file)
+	self:unretrieve_textures()
+	self._requested_textures = {}
+	self._info_panel:clear()
+	self._files = {}
+	if not id then
+		local contact_title_text = self._panel:child("contact_title_text")
+		contact_title_text:set_text(" ")
+		make_fine_text(contact_title_text)
+		return
+	end
+	local contact_title = name
+	local ids = Idstring(id)
+	local challenge = managers.challenge:get_active_challenge(id, ids:key())
+	if challenge then
+		contact_title = managers.localization:text("menu_challenge_title_" .. (challenge.category or "daily"), {name = name})
+		local desc_text = self._info_panel:text({
+			name = "desc_text",
+			text = challenge.desc_s or managers.localization:text(challenge.desc_id),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			color = tweak_data.screen_colors.text,
+			wrap = true,
+			word_wrap = true,
+			blend_mode = "add"
+		})
+		desc_text:grow(-desc_text:left(), 0)
+		local _, _, _, h = desc_text:text_rect()
+		desc_text:set_h(h)
+		local y = desc_text:bottom()
+		if challenge.objective_s or challenge.objective_id then
+			local objective_title_text = self._info_panel:text({
+				name = "objective_title_text",
+				text = managers.localization:to_upper_text("menu_challenge_objective_title"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			make_fine_text(objective_title_text)
+			objective_title_text:set_top(y + tweak_data.menu.pd2_small_font_size)
+			local objective_text = self._info_panel:text({
+				name = "objectives_text",
+				text = challenge.objective_s or managers.localization:text(challenge.objective_id),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			objective_text:set_left(objective_title_text:left() + 15)
+			objective_text:set_top(objective_title_text:bottom())
+			objective_text:grow(-objective_text:left(), 0)
+			local _, _, _, h = objective_text:text_rect()
+			objective_text:set_h(h)
+			y = objective_text:bottom()
+		end
+		if challenge.reward_s or challenge.reward_id then
+			local reward_title_text = self._info_panel:text({
+				name = "reward_title_text",
+				text = managers.localization:to_upper_text("menu_challenge_reward_title"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			make_fine_text(reward_title_text)
+			reward_title_text:set_top(y + tweak_data.menu.pd2_small_font_size)
+			local reward_text = self._info_panel:text({
+				name = "rewards_text",
+				text = challenge.reward_s or managers.localization:text(challenge.reward_id),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			reward_text:set_left(reward_title_text:left() + 15)
+			reward_text:set_top(reward_title_text:bottom())
+			reward_text:grow(-reward_text:left(), 0)
+			local _, _, _, h = reward_text:text_rect()
+			reward_text:set_h(h)
+			y = reward_text:bottom()
+		end
+		if not challenge.rewarded then
+			local timestamp = challenge.timestamp
+			local interval = challenge.interval
+			local expire_timestamp = interval + timestamp
+			local current_timestamp = managers.challenge:get_timestamp()
+			local expire_time = expire_timestamp - current_timestamp
+			local expire_text = self._info_panel:text({
+				name = "expire_text",
+				text = expire_time <= 0 and managers.localization:to_upper_text("menu_challenge_about_to_expire") or managers.localization:to_upper_text("menu_challenge_expire_time", {
+					time_left = tostring(expire_time)
+				}),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = expire_time <= 4 and tweak_data.screen_colors.important_1 or tweak_data.screen_colors.important_2,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			make_fine_text(expire_text)
+			expire_text:set_top(y + tweak_data.menu.pd2_small_font_size)
+			y = expire_text:bottom()
+		end
+		if challenge.rewards and 0 < #challenge.rewards then
+			local x = self.PADDING
+			local height = math.min(self._info_panel:h() - y - self.PADDING * 2 - tweak_data.menu.pd2_small_font_size, 128)
+			local width = math.min((self._info_panel:w() - self.PADDING * (#challenge.rewards - 1)) / #challenge.rewards, height)
+			local rewards_panel = self._info_panel:panel({
+				name = "rewards_panel"
+			})
+			rewards_panel:set_h(height)
+			rewards_panel:set_bottom(self._info_panel:h())
+			local files_menu = rewards_panel:panel()
+			local locked
+			local unavailable = not challenge.completed
+			for i, reward in ipairs(challenge.rewards) do
+				local panel = files_menu:panel({
+					name = i,
+					x = x,
+					y = self.PADDING,
+					width = width - 2 * self.PADDING,
+					height = rewards_panel:height() - 2 * self.PADDING
+				})
+				self:create_reward(panel, reward, challenge)
+				x = panel:right() + self.PADDING
+				locked = reward.rewarded
+				table.insert(self._files, {lock = locked, unavailable = unavailable})
+			end
+			self._files_menu = files_menu
+			self:set_file(1)
+			local color = false
+			local rewards_text = self._info_panel:text({
+				name = "rewards_text",
+				text = managers.localization:to_upper_text(challenge.rewarded and "menu_cn_rewarded" or challenge.completed and "menu_cn_completed" or "menu_cn_not_completed"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			make_fine_text(rewards_text)
+			rewards_text:set_bottom(rewards_panel:top())
+			if color then
+				rewards_text:set_color(color)
+			end
+			BoxGuiObject:new(rewards_panel, {
+				sides = {
+					1,
+					1,
+					1,
+					1
+				}
+			})
+		end
+	elseif ids == Idstring("_introduction") then
+		local introduction_text = self._info_panel:text({
+			name = "introduction_text",
+			text = managers.localization:text("menu_challenge_introduction_desc"),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			color = tweak_data.screen_colors.text,
+			wrap = true,
+			word_wrap = true,
+			blend_mode = "add"
+		})
+	else
+		if ids == Idstring("_summary") then
+			local summary_text = self._info_panel:text({
+				name = "summary_text",
+				text = managers.localization:text("menu_challenge_summary_desc"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+		else
+		end
+	end
+	local contact_title_text = self._panel:child("contact_title_text")
+	contact_title_text:set_text(utf8.to_upper(contact_title))
+	make_fine_text(contact_title_text)
+	self._current_contact_info = id
+end
+
+function MenuNodeCrimenetChallengeGui:create_reward(panel, reward, challenge)
+	local texture, texture_path
+	local is_pattern = false
+	local reward_string = ""
+	if reward.name_s or reward.name_id then
+		reward_string = reward.name_s or managers.localization:text(reward.name_id)
+	end
+	local reward_panel = panel:panel({
+		name = "reward_icon",
+		y = tweak_data.menu.pd2_small_font_size * 0,
+		h = panel:h() - tweak_data.menu.pd2_small_font_size * 1
+	})
+	if reward.choose_weapon_reward then
+		texture_path = "guis/textures/pd2/icon_modbox_df"
+		reward_string = managers.localization:text("menu_challenge_choose_weapon_mod")
+	else
+		local id = reward.item_entry
+		local category = reward.type_items
+		local td = tweak_data:get_raw_value("blackmarket", category, id)
+		if td then
+			local guis_catalog = "guis/"
+			local bundle_folder = td.texture_bundle_folder
+			if bundle_folder then
+				guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+			end
+			if category == "textures" then
+				texture_path = td.texture
+				is_pattern = true
+			elseif category == "cash" then
+				texture_path = "guis/textures/pd2/blackmarket/cash_drop"
+				reward_string = managers.localization:text("menu_challenge_cash_drop")
+			elseif category == "xp" then
+				texture_path = "guis/textures/pd2/blackmarket/xp_drop"
+				reward_string = managers.localization:text("menu_challenge_xp_drop")
+			else
+				texture_path = guis_catalog .. "textures/pd2/blackmarket/icons/" .. category .. "/" .. id
+				reward_string = managers.localization:text(td.name_id)
+			end
+		end
+	end
+	local color = false
+	if challenge.completed and not reward.rewarded then
+		local glow = panel:bitmap({
+			texture = "guis/textures/pd2/hot_cold_glow",
+			layer = 0,
+			w = math.min(panel:w(), panel:h()) * 1.5,
+			h = math.min(panel:w(), panel:h()) * 1.5,
+			blend_mode = "add",
+			color = tweak_data.screen_colors.challenge_completed_color,
+			alpha = 0,
+			layer = -1,
+			rotation = 360
+		})
+		glow:set_center(reward_panel:center())
+		local glow_anim = function(o)
+			local dt
+			while true do
+				over(5, function(p)
+					o:set_alpha(math.abs(math.sin(p * 360)) * 0.4)
+				end)
+			end
+		end
+		glow:animate(glow_anim)
+	end
+	local reward_text = panel:text({
+		name = "reward_text",
+		text = reward_string,
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		blend_mode = "add",
+		rotation = 360
+	})
+	make_fine_text(reward_text)
+	reward_text:set_top(reward_panel:bottom() + tweak_data.menu.pd2_small_font_size * 0.5)
+	reward_text:set_center_x(reward_panel:center_x())
+	reward_text:set_visible(true)
+	if color then
+		reward_text:set_color(color)
+	end
+	if DB:has(Idstring("texture"), texture_path) then
+		local texture_count = managers.menu_component:request_texture(texture_path, callback(self, self, "texture_done_clbk", {
+			reward_panel,
+			is_pattern,
+			"add",
+			color
+		}))
+		table.insert(self._requested_textures, {texture_count = texture_count, texture = texture_path})
+	end
+end
+
+function MenuNodeCrimenetChallengeGui:_highlight_row_item(row_item, mouse_over)
+	MenuNodeCrimenetChallengeGui.super._highlight_row_item(self, row_item, mouse_over)
+	self._highlighted_name = row_item.item and row_item.item:name()
+	self:_set_file()
+end
+
+function MenuNodeCrimenetChallengeGui:set_file(index)
+	MenuNodeCrimenetChallengeGui.super.super.set_file(self, index)
+end
+
+function MenuNodeCrimenetChallengeGui:_set_file()
+	local files_menu = self._files_menu
+	if alive(files_menu) then
+		for i, file in ipairs(files_menu:children()) do
+			local is_locked = self:is_file_locked(self._files[i] and self._files[i].lock)
+			local is_unavailable = self:is_file_locked(self._files[i] and self._files[i].unavailable)
+			local texture_alpha = is_locked and self._file_alphas.locked or is_unavailable and self._file_alphas.unavailable or i == self._current_file and self._file_alphas.selected or self._file_alphas.unselected
+			file:set_alpha(texture_alpha)
+			file:child("reward_text"):set_visible(not is_locked and not is_unavailable and i == self._current_file)
+		end
+	end
+end
+
+function MenuNodeCrimenetChallengeGui:set_empty()
+end
+
+function MenuNodeCrimenetChallengeGui:close()
+	MenuNodeCrimenetChallengeGui.super.close(self)
+	MenuCallbackHandler:save_progress()
+end
+
+function MenuNodeCrimenetChallengeGui:mouse_moved(o, x, y)
+	if not self._info_panel:inside(x, y) then
+		return
+	end
+	local files_menu = self._files_menu
+	local is_inside = false
+	local highlighted_file
+	if alive(files_menu) then
+		local inside, inside_text
+		local visible_texts = {}
+		for i, file in ipairs(files_menu:children()) do
+			inside = file:inside(x, y)
+			local is_locked = self:is_file_locked(self._files[i] and self._files[i].lock)
+			local is_unavailable = self:is_file_locked(self._files[i] and self._files[i].unavailable)
+			local texture_alpha = not ((not is_locked or not self._file_alphas.locked) and (not is_unavailable or not self._file_alphas.unavailable) and self._file_alphas) or i == self._current_file and self._file_alphas.selected or inside and self._file_alphas.mouse_over or self._file_alphas.unselected
+			if texture_alpha then
+				file:set_alpha(texture_alpha)
+			end
+			file:child("reward_text"):set_visible(not is_locked and not is_unavailable and i == self._current_file or inside)
+			if file:child("reward_text"):visible() then
+				table.insert(visible_texts, file:child("reward_text"))
+			end
+			if inside then
+				inside_text = file:child("reward_text")
+				is_inside = i
+				highlighted_file = self._current_file ~= i and i
+			end
+		end
+		local texts_colliding = false
+		if 1 < #visible_texts then
+			for i = 1, #visible_texts - 1 do
+				if visible_texts[i]:world_left() < visible_texts[i + 1]:world_right() and visible_texts[i]:world_right() > visible_texts[i + 1]:world_left() then
+					texts_colliding = true
+					break
+				end
+			end
+			if texts_colliding then
+				for i, text in ipairs(visible_texts) do
+					text:hide()
+				end
+				if inside_text then
+					inside_text:show()
+				elseif self._current_file then
+					files_menu[self._current_file]:child("reward_text"):show()
+				end
+			end
+		end
+	end
+	if highlighted_file and self._highlighted_file ~= highlighted_file then
+		managers.menu_component:post_event("highlight")
+		self._highlighted_file = highlighted_file
+	elseif not highlighted_file then
+		self._highlighted_file = false
+	end
+	local is_locked = is_inside and (self:is_file_locked(self._files[is_inside] and self._files[is_inside].lock) or self:is_file_locked(self._files[is_inside] and self._files[is_inside].unavailable))
+	return is_inside, self._file_pressed and (not (self._file_pressed ~= is_inside or is_locked) and "link" or "arrow") or not (not is_inside or is_locked) and "link" or "arrow"
+end
+
+function MenuNodeCrimenetChallengeGui:mouse_pressed(button, x, y)
+	local files_menu = self._files_menu
+	if alive(files_menu) then
+		for i, file in ipairs(files_menu:children()) do
+			if file:inside(x, y) and not self:is_file_locked(self._files[i].lock) and not self:is_file_locked(self._files[i].unavailable) then
+				self._file_pressed = i
+				self:set_file(self._file_pressed)
+				managers.menu_component:post_event("highlight")
+				return
+			end
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetChallengeGui:mouse_released(button, x, y)
+	if self._file_pressed and self._file_pressed == self._current_file then
+		local files_menu = self._files_menu
+		if alive(files_menu) then
+			local file = files_menu:children()[self._file_pressed]
+			if file and file:inside(x, y) then
+				self:claim_reward(self._file_pressed)
+			end
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetChallengeGui:claim_reward(index)
+	local reward = managers.challenge:on_give_reward(self._current_contact_info, nil, index)
+	if reward then
+		if reward.choose_weapon_reward then
+			managers.menu:open_node("choose_weapon_reward")
+		else
+			managers.menu:show_challenge_reward(reward)
+		end
+	end
+end
+
+function MenuNodeCrimenetChallengeGui:special_btn_pressed(button)
+	if button == Idstring("menu_challenge_claim") then
+		self:claim_reward(self._current_file)
+	end
+end
+
+function MenuNodeCrimenetChallengeGui:refresh_gui(node)
+	if not self._init_finish then
+		return
+	end
+	if self._back_row_item and alive(self._back_row_item.gui_pd2_panel) then
+		self._back_row_item.gui_pd2_panel:parent():remove(self._back_row_item.gui_pd2_panel)
+		self._back_row_item = nil
+	end
+	local old_menu_unslected_lefts = {}
+	local old_menu_unslected_tops = {}
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.menu_unselected) then
+			old_menu_unslected_lefts[_] = row_item.menu_unselected:left()
+			old_menu_unslected_tops[_] = row_item.menu_unselected:top()
+		end
+	end
+	local old_y = self.item_panel:world_y()
+	self:_clear_gui()
+	self:_setup_panels(node)
+	self:_setup_item_rows(node)
+	self:_set_item_positions()
+	self:_set_topic_position()
+	self:update_item_icon_visibility()
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.menu_unselected) then
+			if old_menu_unslected_lefts[_] then
+				row_item.menu_unselected:set_left(old_menu_unslected_lefts[_])
+			end
+			if old_menu_unslected_tops[_] then
+				row_item.menu_unselected:set_top(old_menu_unslected_tops[_])
+			end
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+	local selected_item = self._current_contact_info and node:item(self._current_contact_info)
+	if selected_item then
+		local parameters = selected_item:parameters() or {}
+		local id = parameters.name
+		local name_id = parameters.text_id
+		local files = parameters.files
+		self:set_contact_info(id, name_id, files, 1)
+	else
+		self:set_contact_info()
+	end
+	self.item_panel:set_world_y(old_y)
+	managers.menu_component:disable_crimenet()
+end
+
+function MenuNodeCrimenetChallengeGui:_align_marker(row_item)
+	MenuNodeCrimenetChallengeGui.super._align_marker(self, row_item)
+	if row_item.item:parameters().pd2_corner then
+		self._marker_data.marker:set_visible(true)
+		self._marker_data.gradient:set_visible(true)
+		self._marker_data.gradient:set_rotation(360)
+		self._marker_data.marker:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.gradient:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.marker:set_w(self.MENU_WIDTH)
+		self._marker_data.gradient:set_w(self._marker_data.marker:w())
+		self._marker_data.marker:set_left(row_item.menu_unselected:x())
+		self._marker_data.marker:set_world_center_y(row_item.gui_text:world_center_y())
+		self._marker_data.marker:set_y(math.round(self._marker_data.marker:y()))
+		return
+	end
+end
+
+function MenuNodeCrimenetChallengeGui:_clear_gui()
+	local to = #self.row_items
+	for i = 1, to do
+		local row_item = self.row_items[i]
+		if alive(row_item.gui_panel) then
+			row_item.gui_panel:parent():remove(row_item.gui_panel)
+			row_item.gui_panel = nil
+			if alive(row_item.menu_unselected) then
+				row_item.menu_unselected:parent():remove(row_item.menu_unselected)
+				row_item.menu_unselected = nil
+			end
+		end
+		if alive(row_item.gui_info_panel) then
+			self.safe_rect_panel:remove(row_item.gui_info_panel)
+		end
+		if alive(row_item.icon) then
+			row_item.icon:parent():remove(row_item.icon)
+		end
+		self.row_items[i] = nil
+	end
+	self._list_arrows.up:parent():remove(self._list_arrows.up)
+	self._list_arrows.down:parent():remove(self._list_arrows.down)
+	self.item_panel:clear()
+	self.row_items = {}
+end
+
+function MenuNodeCrimenetChallengeGui:_setup_item_panel_parent(safe_rect, shape)
+	local x = safe_rect.x + safe_rect.width / 2 - self.WIDTH / 2 + self.PADDING
+	local y = safe_rect.y + safe_rect.height / 2 - self.HEIGHT / 2 + self.PADDING
+	shape = shape or {}
+	shape.x = shape.x or x
+	shape.y = shape.y or y
+	shape.w = shape.w or self.MENU_WIDTH
+	shape.h = shape.h or self.HEIGHT - 2 * self.PADDING - tweak_data.menu.pd2_small_font_size
+	MenuNodeCrimenetChallengeGui.super._setup_item_panel_parent(self, safe_rect, shape)
+end
+
+function MenuNodeCrimenetChallengeGui:_setup_menu()
+	if not self._init_finish then
+		return
+	end
+	local safe_rect = managers.gui_data:scaled_size()
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("right")
+	end
+	self:_set_topic_position()
+	self.item_panel:set_w(safe_rect.width * (1 - self._align_line_proportions) + 4)
+	self.item_panel:set_world_position(self._panel:world_position())
+	self.item_panel:move(self.PADDING, self.PADDING)
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("left")
+	end
+	self.item_panel:set_w(self.MENU_WIDTH)
+	self._align_data.panel:set_left(self.item_panel:left())
+	self:update_item_icon_visibility()
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+	if self._back_row_item and alive(self._back_row_item.gui_text) then
+		self._back_row_item.gui_text:set_w(self.MENU_WIDTH)
+		self._back_row_item.gui_text:set_world_left(math.round(self._panel:world_left() + self.PADDING * 2))
+		self._back_row_item.gui_text:set_world_bottom(math.round(self._panel:world_bottom() - self.PADDING))
+	end
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.gui_panel) then
+			row_item.gui_panel:set_w(self.MENU_WIDTH)
+		end
+	end
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_world_y(math.round(child:world_y()))
+	end
+	self._list_arrows.up:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.up:set_world_top(self._align_data.panel:world_top())
+	self._list_arrows.up:set_width(self._item_panel_parent:w())
+	self._list_arrows.down:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.down:set_world_bottom(self._align_data.panel:world_bottom())
+	self._list_arrows.down:set_width(self._item_panel_parent:w())
+end
+
+MenuNodeChooseWeaponRewardGui = MenuNodeChooseWeaponRewardGui or class(MenuNodeCrimenetFiltersGui)
+
+function MenuNodeChooseWeaponRewardGui:init(node, layer, parameters)
+	parameters.font = tweak_data.menu.pd2_small_font
+	parameters.font_size = tweak_data.menu.pd2_small_font_size
+	parameters.align = "left"
+	parameters.row_item_blend_mode = "add"
+	parameters.row_item_color = tweak_data.screen_colors.button_stage_3
+	parameters.row_item_hightlight_color = tweak_data.screen_colors.button_stage_2
+	parameters.marker_alpha = 1
+	parameters.to_upper = true
+	self.static_y = node:parameters().static_y
+	MenuNodeChooseWeaponRewardGui.super.init(self, node, layer, parameters)
+	if alive(self.item_panel:parent():child("special_title_text")) then
+		self.item_panel:parent():remove(self.item_panel:parent():child("special_title_text"))
+	end
+	local title_text = self.item_panel:parent():text({
+		name = "special_title_text",
+		text = managers.localization:to_upper_text("menu_challenge_claim_reward_title"),
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		blend_mode = "add",
+		layer = 51
+	})
+	make_fine_text(title_text)
+	title_text:set_left(self.box_panel:left())
+	title_text:set_bottom(self.box_panel:top())
+end
+
+function MenuNodeChooseWeaponRewardGui:_setup_item_panel(safe_rect, res)
+	MenuNodeChooseWeaponRewardGui.super._setup_item_panel(self, safe_rect, res)
+	local max_layer = 10000
+	local min_layer = 0
+	local child_layer = 0
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("right")
+		child_layer = child:layer()
+		if 0 < child_layer then
+			min_layer = math.min(min_layer, child_layer)
+		end
+		max_layer = math.max(max_layer, child_layer)
+	end
+	for _, child in ipairs(self.item_panel:children()) do
+	end
+	self.item_panel:set_w(safe_rect.width * (1 - self._align_line_proportions))
+	self.item_panel:set_center(self.item_panel:parent():w() / 2, self.item_panel:parent():h() / 2)
+	local static_y = self.static_y and safe_rect.height * self.static_y
+	if static_y and static_y < self.item_panel:y() then
+		self.item_panel:set_y(static_y)
+	end
+	self.item_panel:set_position(math.round(self.item_panel:x()), math.round(self.item_panel:y()))
+	self:_rec_round_object(self.item_panel)
+	if alive(self.box_panel) then
+		self.item_panel:parent():remove(self.box_panel)
+		self.box_panel = nil
+	end
+	self.box_panel = self.item_panel:parent():panel()
+	self.box_panel:set_x(self.item_panel:x())
+	self.box_panel:set_w(self.item_panel:w())
+	if self.item_panel:h() > self._align_data.panel:h() then
+		self.box_panel:set_y(0)
+		self.box_panel:set_h(self.item_panel:parent():h())
+	else
+		self.box_panel:set_y(self.item_panel:top())
+		self.box_panel:set_h(self.item_panel:h())
+	end
+	self.box_panel:grow(116, 20)
+	self.box_panel:move(-106, -10)
+	self.box_panel:set_layer(51)
+	self.boxgui = BoxGuiObject:new(self.box_panel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	self.boxgui:set_clipping(false)
+	self.boxgui:set_layer(1000)
+	self.box_panel:rect({
+		color = Color.black,
+		alpha = 0.6,
+		rotation = 360
+	})
+	self._align_data.panel:set_left(self.box_panel:left())
+	self._list_arrows.up:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.up:set_world_top(self._align_data.panel:world_top() - 10)
+	self._list_arrows.up:set_width(self.box_panel:width())
+	self._list_arrows.up:set_rotation(360)
+	self._list_arrows.up:set_layer(1050)
+	self._list_arrows.down:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.down:set_world_bottom(self._align_data.panel:world_bottom() + 10)
+	self._list_arrows.down:set_width(self.box_panel:width())
+	self._list_arrows.down:set_rotation(360)
+	self._list_arrows.down:set_layer(1050)
+	self:_set_topic_position()
+	local icon = self.box_panel:bitmap({
+		texture = "guis/textures/pd2/icon_modbox_df",
+		w = 96,
+		h = 96,
+		blend_mode = "add",
+		layer = 1
+	})
+	icon:set_position(10, 10)
+	local droppable_parts = managers.blackmarket:get_lootdropable_mods_by_weapon_id(self.node:parameters().listed_weapon)
+	local count = 0
+	local inv_count = 0
+	for _, part_data in ipairs(droppable_parts) do
+		count = count + 1
+		if managers.blackmarket:get_item_amount(part_data[2], "weapon_mods", part_data[1], true) ~= 0 then
+			inv_count = inv_count + 1
+		end
+	end
+	local text = self.box_panel:text({
+		text = managers.localization:to_upper_text("menu_challenge_num_owned_mods", {
+			inv_count = tostring(inv_count),
+			count = tostring(count)
+		}),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		blend_mode = "add"
+	})
+	make_fine_text(text)
+	text:set_world_top(self.row_items[2].gui_text:world_bottom() + 22)
+	text:set_world_left(self.row_items[2].gui_text:world_left())
 end

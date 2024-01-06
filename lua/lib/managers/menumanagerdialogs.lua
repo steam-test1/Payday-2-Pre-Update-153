@@ -1381,3 +1381,72 @@ function MenuManager:dialog_gage_assignment_completed(params)
 	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
 	managers.system_menu:show_new_unlock(dialog_data)
 end
+
+function MenuManager:show_challenge_reward(reward)
+	local category = reward.type_items
+	local id = reward.item_entry
+	local td = tweak_data:get_raw_value("blackmarket", category, id)
+	if not td then
+		return
+	end
+	local amount = reward.amount or 1
+	local name_string = td.name_id and managers.localization:text(td.name_id)
+	local params = {}
+	if category == "cash" then
+		local money = tweak_data:get_value("money_manager", "loot_drop_cash", td.value_id) or 100
+		params.cash = managers.experience:cash_string(money * amount)
+	elseif category == "xp" then
+		local xp = tweak_data:get_value("experience_manager", "loot_drop_value", td.value_id) or 0
+		params.xp = managers.experience:experience_string(xp * amount)
+	else
+		params.item = name_string
+		params.amount = managers.money:add_decimal_marks_to_string(tostring(amount))
+	end
+	local dialog_id = category == "cash" and "dialog_challenge_reward_cash" or category == "xp" and "dialog_challenge_reward_xp" or 1 < amount and "dialog_challenge_reward_plural" or "dialog_challenge_reward"
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_challenge_reward_title")
+	dialog_data.text = managers.localization:text(dialog_id, params)
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	
+	function ok_button.callback_func()
+		MenuCallbackHandler:refresh_node()
+	end
+	
+	dialog_data.button_list = {ok_button}
+	local texture_path = "guis/textures/pd2/endscreen/what_is_this"
+	local guis_catalog = "guis/"
+	local bundle_folder = td.texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	if category == "textures" then
+		texture_path = td.texture
+	elseif category == "cash" then
+		texture_path = "guis/textures/pd2/blackmarket/cash_drop"
+	elseif category == "xp" then
+		texture_path = "guis/textures/pd2/blackmarket/xp_drop"
+	elseif category == "colors" then
+	else
+		texture_path = guis_catalog .. "textures/pd2/blackmarket/icons/" .. (category == "weapon_mods" and "mods" or category) .. "/" .. id
+	end
+	dialog_data.texture = texture_path
+	dialog_data.text_blend_mode = "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 400
+	dialog_data.h = 320
+	dialog_data.image_w = 128
+	dialog_data.image_h = 128
+	dialog_data.image_valign = "center"
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
+	managers.system_menu:show_new_unlock(dialog_data)
+	if managers.challenge:any_challenge_rewarded() then
+		managers.menu_component:post_event("sidejob_stinger_long")
+	else
+		managers.menu_component:post_event("sidejob_stinger_short")
+	end
+	managers.menu_component:disable_crimenet()
+end

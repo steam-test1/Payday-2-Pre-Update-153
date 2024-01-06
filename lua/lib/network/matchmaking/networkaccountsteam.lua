@@ -33,7 +33,6 @@ function NetworkAccountSTEAM:init()
 	Steam:sa_handler():stats_store_callback(NetworkAccountSTEAM._on_stats_stored)
 	Steam:sa_handler():init()
 	self._masks = {}
-	Steam:http_request("http://steamcommunity.com/gid/103582791433201592/memberslistxml/?xml=1", NetworkAccountSTEAM._on_troll_group_recieved)
 	self:_set_presences()
 	managers.savefile:add_load_done_callback(callback(self, self, "_load_done"))
 	Steam:lb_handler():register_storage_done_callback(NetworkAccountSTEAM._on_leaderboard_stored)
@@ -284,8 +283,7 @@ function NetworkAccountSTEAM:publish_statistics(stats, force_store)
 			err = true
 		end
 	end
-	if Application:production_build() and err then
-		Application:throw_exception("[NetworkAccountSTEAM:publish_statistics] Missing statistics, needs to be added!!")
+	if not Application:production_build() or err then
 	end
 	if not err then
 		handler:store_data()

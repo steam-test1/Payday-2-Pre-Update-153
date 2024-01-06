@@ -617,6 +617,7 @@ function LevelsTweakData:init()
 	self.arm_for.cube = "cube_apply_heist_bank"
 	self.arm_for.bonus_escape = true
 	self.arm_for.max_bags = 30
+	self.arm_for.ghost_bonus = 0.1
 	self.family = {}
 	self.family.name_id = "heist_family_hl"
 	self.family.briefing_id = "heist_family_briefing"

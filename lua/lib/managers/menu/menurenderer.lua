@@ -436,6 +436,9 @@ function MenuRenderer:back_pressed()
 end
 
 function MenuRenderer:special_btn_pressed(...)
+	if self:active_node_gui() and self:active_node_gui().special_btn_pressed and self:active_node_gui():special_btn_pressed(...) then
+		return true
+	end
 	return managers.menu_component:special_btn_pressed(...)
 end
 

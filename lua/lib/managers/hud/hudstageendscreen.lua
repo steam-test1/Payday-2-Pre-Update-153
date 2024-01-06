@@ -24,6 +24,7 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 	local upgrade = params.upgrade
 	local ghost_bonus = params.ghost_bonus
 	local gage_assignment = params.gage_assignment
+	local challenge_completed = params.challenge_completed
 	local bitmap_texture = "guis/textures/pd2/endscreen/test_icon_package"
 	local text_string = ""
 	local blend_mode = "normal"
@@ -106,6 +107,10 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 			string_id = "menu_es_gage_assignment_package"
 		end
 		text_string = managers.localization:to_upper_text(string_id, {})
+	elseif challenge_completed then
+		bitmap_texture = "guis/textures/pd2/endscreen/announcement"
+		blend_mode = "add"
+		text_string = managers.localization:to_upper_text("menu_es_challenge_completed", {})
 	else
 		Application:debug("HUDPackageUnlockedItem: Something something unknown")
 	end
@@ -1001,7 +1006,7 @@ function HUDStageEndScreen:_check_special_packages()
 	local ghost_string
 	local got_ghost = false
 	local row = 1
-	local ghost_package, gage_package
+	local ghost_package, gage_package, challenge_completed
 	if ghost_bonus_mul and 0 < ghost_bonus_mul then
 		local ghost_bonus = math.round(ghost_bonus_mul * 100)
 		if ghost_bonus == 0 then
@@ -1016,12 +1021,19 @@ function HUDStageEndScreen:_check_special_packages()
 		gage_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {gage_assignment = true}, self)
 		row = row + 1
 	end
+	if self._challenge_completed then
+		challenge_completed = HUDPackageUnlockedItem:new(self._package_forepanel, row, {challenge_completed = true}, self)
+		row = row + 1
+	end
 	local package_items = {}
-	if ghost_package then
+	if ghost_package and (not gage_package or not challenge_completed) then
 		table.insert(package_items, ghost_package)
 	end
 	if gage_package then
 		table.insert(package_items, gage_package)
+	end
+	if challenge_completed then
+		table.insert(package_items, challenge_completed)
 	end
 	if 0 < #package_items then
 		for _, item in ipairs(self._package_items) do
@@ -2007,6 +2019,7 @@ function HUDStageEndScreen:set_success(success, server_left)
 end
 
 function HUDStageEndScreen:set_special_packages(params)
+	self._challenge_completed = params.challenge_completed
 	self._gage_assignment = params.gage_assignment
 	self._ghost_bonus = params.ghost_bonus
 	self:_check_special_packages()

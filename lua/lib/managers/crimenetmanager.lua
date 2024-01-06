@@ -1296,6 +1296,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	end
 	managers.features:announce_feature("crimenet_heat")
 	managers.features:announce_feature("election_changes")
+	managers.challenge:fetch_challenges()
 	return
 end
 

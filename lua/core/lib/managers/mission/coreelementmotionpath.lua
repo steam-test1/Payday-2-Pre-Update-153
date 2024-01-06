@@ -16,7 +16,7 @@ function ElementMotionPathOperator:on_executed(instigator)
 	for _, id in ipairs(self._values.elements) do
 		local element = self:get_mission_element(id)
 		if element and self._values.operation == "goto_marker" then
-			element:motion_operation_goto_marker(element:editor_name(), self._values.marker)
+			element:motion_operation_goto_marker(element:id(), self._values.marker_ids[self._values.marker])
 		end
 	end
 	ElementMotionPathOperator.super.on_executed(self, instigator)

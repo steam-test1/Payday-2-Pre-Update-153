@@ -94,6 +94,7 @@ function NodeGui:_setup_item_rows(node)
 			row_item.row_item_color = params.row_item_color
 			row_item.hightlight_color = params.hightlight_color
 			row_item.disabled_color = params.disabled_color or self.row_item_disabled_text_color
+			row_item.marker_color = params.marker_color or self.marker_color
 			row_item.font = self.font
 			row_item.font_size = self.font_size
 			row_item.text = item_text
@@ -261,7 +262,7 @@ function NodeGui:_reposition_items(highlighted_row_item)
 		if highlighted_row_item.item:parameters().back or highlighted_row_item.item:parameters().pd2_corner then
 			return
 		end
-		local first_item
+		local prev_item, first_item
 		local num_dividers_top = 0
 		for i = 1, #self.row_items do
 			first_item = self.row_items[i]
@@ -278,17 +279,47 @@ function NodeGui:_reposition_items(highlighted_row_item)
 			last_item = self.row_items[i]
 			if last_item.type ~= "divider" and not last_item.item:parameters().back and not last_item.item:parameters().pd2_corner then
 				break
-			elseif first_item.type == "divider" then
+			elseif last_item.type == "divider" then
 				num_dividers_bottom = num_dividers_bottom + 1
 			end
 		end
 		local last = last_item.gui_panel == highlighted_row_item.gui_panel
+		local prev_item, next_item
+		for i, row_item in ipairs(self.row_items) do
+			if row_item.gui_panel == highlighted_row_item.gui_panel then
+				if not first then
+					for index = i - 1, 1, -1 do
+						row_item = self.row_items[index]
+						if row_item.type ~= "divider" and not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
+							prev_item = row_item
+							break
+						end
+					end
+				end
+				if not last then
+					for index = i + 1, #self.row_items do
+						row_item = self.row_items[index]
+						if row_item.type ~= "divider" and not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
+							next_item = row_item
+							break
+						end
+					end
+				end
+				break
+			end
+		end
 		local h = highlighted_row_item.item:get_h(highlighted_row_item, self) or highlighted_row_item.gui_panel:h()
 		local offset = first and h * num_dividers_top or last and h * num_dividers_bottom or h
 		offset = offset + self.height_padding
-		if self._item_panel_parent:world_y() > highlighted_row_item.gui_panel:world_y() - offset then
+		if self._item_panel_parent:world_y() > highlighted_row_item.gui_panel:world_y() - (offset + (prev_item and math.abs(prev_item.gui_panel:y() - highlighted_row_item.gui_panel:y()) - h or 0)) then
+			if prev_item then
+				offset = offset + math.abs(prev_item.gui_panel:y() - highlighted_row_item.gui_panel:y()) - h
+			end
 			dy = -(highlighted_row_item.gui_panel:world_y() - self._item_panel_parent:world_y() - offset)
-		elseif self._item_panel_parent:world_y() + self._item_panel_parent:h() < highlighted_row_item.gui_panel:world_y() + highlighted_row_item.gui_panel:h() + offset then
+		elseif self._item_panel_parent:world_y() + self._item_panel_parent:h() < highlighted_row_item.gui_panel:world_y() + highlighted_row_item.gui_panel:h() + (offset + (next_item and math.abs(next_item.gui_panel:y() - highlighted_row_item.gui_panel:y()) - h or 0)) then
+			if next_item then
+				offset = offset + math.abs(next_item.gui_panel:y() - highlighted_row_item.gui_panel:y()) - h
+			end
 			dy = -(highlighted_row_item.gui_panel:world_y() + highlighted_row_item.gui_panel:h() - (self._item_panel_parent:world_y() + self._item_panel_parent:h()) + offset)
 		end
 		local old_dy = self._scroll_data.dy_left

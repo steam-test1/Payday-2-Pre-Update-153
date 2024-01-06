@@ -417,6 +417,7 @@ function SavefileManager:_save_cache(slot)
 		managers.features:save(cache)
 		managers.gage_assignment:save(cache)
 		managers.music:save_profile(cache)
+		managers.challenge:save(cache)
 	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		cache.user_id = self._USER_ID_OVERRRIDE or Steam:userid()
@@ -697,6 +698,7 @@ function SavefileManager:_load_cache(slot)
 			managers.features:load(cache, version)
 			managers.gage_assignment:load(cache, version)
 			managers.music:load_profile(cache, version)
+			managers.challenge:load(cache, version)
 		end
 	else
 		Application:error("[SavefileManager] Unable to load savefile from slot \"" .. tostring(slot) .. "\".")

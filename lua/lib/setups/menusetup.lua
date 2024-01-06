@@ -171,6 +171,9 @@ function MenuSetup:init_finalize()
 	if managers.music then
 		managers.music:init_finalize()
 	end
+	if managers.challenge then
+		managers.challenge:init_finalize()
+	end
 	managers.dyn_resource:post_init()
 end
 

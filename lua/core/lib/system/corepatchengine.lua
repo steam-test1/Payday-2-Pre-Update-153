@@ -143,14 +143,33 @@ if SteamClass then
 		if not current_request then
 			current_request = table.remove(requests, 1)
 			if current_request then
-				cat_print("jansve", "[Steam:http_request().check_requests]", inspect(current_request))
 				steam_http_request(Steam, current_request[1], request_done_func)
 			end
 		end
 	end
 	
-	function SteamClass:http_request(path, clbk)
-		table.insert(requests, {path, clbk})
+	function SteamClass:http_request(path, clbk, id_key)
+		if id_key then
+			if current_request and current_request[3] and current_request[3] == id_key then
+				return
+			end
+			for _, d in ipairs(requests) do
+				if d[3] and d[3] == id_key then
+					requests[_] = {
+						path,
+						clbk,
+						id_key
+					}
+					check_requests_func()
+					return
+				end
+			end
+		end
+		table.insert(requests, {
+			path,
+			clbk,
+			id_key
+		})
 		check_requests_func()
 	end
 end

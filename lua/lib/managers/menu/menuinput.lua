@@ -526,7 +526,8 @@ function MenuInput:update(t, dt)
 					"menu_toggle_pp_drawboard",
 					"menu_toggle_pp_breakdown",
 					"trigger_left",
-					"trigger_right"
+					"trigger_right",
+					"menu_challenge_claim"
 				}
 				for _, button in ipairs(special_btns) do
 					if self._accept_input and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
@@ -542,6 +543,9 @@ function MenuInput:update(t, dt)
 		end
 		if self._controller:get_input_pressed("menu_casino_bet") then
 			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("start_bet"))
+		end
+		if self._controller:get_input_pressed("menu_challenge_claim") then
+			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_challenge_claim"))
 		end
 		if self._controller:get_input_pressed("toggle_chat") then
 			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("toggle_chat"))
