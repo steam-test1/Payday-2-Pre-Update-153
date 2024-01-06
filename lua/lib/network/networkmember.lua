@@ -149,6 +149,11 @@ function NetworkMember:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 			self._peer:send_queued_sync("spawn_dropin_penalty", spawn_in_custody, spawn_in_custody, health, used_deployable, used_cable_ties, used_body_bags)
 		end
 	end
+	local vehicle = managers.vehicle:find_active_vehicle_with_player()
+	if vehicle then
+		Application:debug("[NetworkMember] Spawning peer_id in vehicle, peer_id:" .. peer_id)
+		managers.player:server_enter_vehicle(vehicle, peer_id, unit)
+	end
 	return unit
 end
 
@@ -243,6 +248,9 @@ function NetworkMember:sync_data(peer)
 	managers.player:update_ammo_info_to_peer(peer)
 	managers.player:update_carry_to_peer(peer)
 	managers.player:update_team_upgrades_to_peer(peer)
+	if Network:is_server() then
+		managers.vehicle:update_vehicles_data_to_peer(peer)
+	end
 	if self._unit then
 	end
 end

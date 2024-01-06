@@ -17,6 +17,24 @@ function ElementAwardAchievment:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	managers.achievment:award(self._values.achievment)
+	local award_achievement = true
+	if self._values.award_instigator and type(instigator) == "userdata" and alive(instigator) then
+		local local_player = managers.player:local_player()
+		award_achievement = alive(local_player) and local_player == instigator
+		if not award_achievement and instigator:vehicle_driving() then
+			do
+				local seat = instigator:vehicle_driving():find_seat_for_player(local_player)
+				if seat and seat.driving then
+					award_achievement = true
+				else
+				end
+			end
+		else
+		end
+	end
+	if award_achievement then
+		print("[ElementAwardAchievment:on_executed]", "achievment", self._values.achievment)
+		managers.achievment:award(self._values.achievment)
+	end
 	ElementAwardAchievment.super.on_executed(self, instigator)
 end

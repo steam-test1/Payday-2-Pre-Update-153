@@ -116,7 +116,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"nightclub",
 		"arm_for",
 		"family",
-		"roberts"
+		"roberts",
+		"cage"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -846,6 +847,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	}
 	self.crojob3_plan.visible_if_locked = true
 	self.crojob3_plan.no_mystery = true
+	self.dumpsters = {}
+	self.dumpsters.name_id = "menu_asset_dumpsters"
+	self.dumpsters.texture = "guis/textures/pd2/mission_briefing/assets/carshop/asset_carshop_dumpster"
+	self.dumpsters.stages = {"cage"}
+	self.dumpsters.visible_if_locked = true
+	self.dumpsters.unlock_desc_id = "menu_asset_dumpsters_desc"
+	self.dumpsters.no_mystery = true
+	self.dumpsters.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

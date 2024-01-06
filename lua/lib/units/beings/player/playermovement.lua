@@ -9,6 +9,7 @@ require("lib/units/beings/player/states/PlayerArrested")
 require("lib/units/beings/player/states/PlayerTased")
 require("lib/units/beings/player/states/PlayerIncapacitated")
 require("lib/units/beings/player/states/PlayerCarry")
+require("lib/units/beings/player/states/PlayerDriving")
 PlayerMovement = PlayerMovement or class()
 PlayerMovement._STAMINA_INIT = tweak_data.player.movement_state.stamina.STAMINA_INIT or 10
 PlayerMovement.OUT_OF_WORLD_Z = -4000
@@ -98,7 +99,8 @@ function PlayerMovement:_setup_states()
 		tased = PlayerTased:new(unit),
 		incapacitated = PlayerIncapacitated:new(unit),
 		clean = PlayerClean:new(unit),
-		carry = PlayerCarry:new(unit)
+		carry = PlayerCarry:new(unit),
+		driving = PlayerDriving:new(unit)
 	}
 end
 

@@ -1920,3 +1920,35 @@ function MissionElementInteractionExt:load(data)
 	self._override_timer_value = state.override_timer_value
 	MissionElementInteractionExt.super.load(self, data)
 end
+
+DrivingInteractionExt = DrivingInteractionExt or class(UseInteractionExt)
+
+function DrivingInteractionExt:init(unit)
+	self.super.init(self, unit)
+end
+
+function DrivingInteractionExt:_timer_value(...)
+	if self._override_timer_value then
+		return self._override_timer_value
+	end
+	return MissionElementInteractionExt.super._timer_value(self, ...)
+end
+
+function DrivingInteractionExt:set_override_timer_value(override_timer_value)
+	self._override_timer_value = override_timer_value
+end
+
+function DrivingInteractionExt:interact(player)
+	DrivingInteractionExt.super.super.interact(self, player)
+	local vehicle_ext = self._unit:vehicle_driving()
+	local action = vehicle_ext:get_action_for_interaction(player:position())
+	local success = false
+	if action == VehicleDrivingExt.INTERACT_ENTER then
+		success = managers.player:enter_vehicle(self._unit)
+	elseif action == VehicleDrivingExt.INTERACT_LOOT then
+		vehicle_ext:give_loot_to_player(player, managers.network:session():local_peer():id())
+	elseif action == VehicleDrivingExt.INTERACT_REPAIR then
+		vehicle_ext:repair_vehicle()
+	end
+	return success
+end

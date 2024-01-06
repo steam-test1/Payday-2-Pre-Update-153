@@ -46,7 +46,8 @@ function PlayerManager:init()
 		incapacitated = "ingame_incapacitated",
 		clean = "ingame_clean",
 		carry = "ingame_standard",
-		bipod = "ingame_standard"
+		bipod = "ingame_standard",
+		driving = "ingame_driving"
 	}
 	self._DEFAULT_STATE = "mask_off"
 	self._current_state = self._DEFAULT_STATE
@@ -97,6 +98,7 @@ function PlayerManager:_setup()
 	Global.player_manager.synced_ammo_info = {}
 	Global.player_manager.synced_carry = {}
 	Global.player_manager.synced_team_upgrades = {}
+	Global.player_manager.synced_vehicle_data = {}
 	self._global = Global.player_manager
 end
 
@@ -360,6 +362,7 @@ end
 function PlayerManager:player_destroyed(id)
 	self._players[id] = nil
 	self._respawn = true
+	self._global.synced_vehicle_data[id] = nil
 end
 
 function PlayerManager:players()
@@ -1517,6 +1520,8 @@ function PlayerManager:peer_dropped_out(peer)
 	self._global.synced_ammo_info[peer_id] = nil
 	self._global.synced_carry[peer_id] = nil
 	self._global.synced_team_upgrades[peer_id] = nil
+	local peer_unit = managers.network:game():member(peer_id):unit()
+	managers.vehicle:remove_player_from_all_vehicles(peer_unit)
 end
 
 function PlayerManager:add_equipment(params)
@@ -2455,6 +2460,92 @@ end
 
 function PlayerManager:on_peer_synch_request(peer)
 	self:player_unit():network():synch_to_peer(peer)
+end
+
+function PlayerManager:enter_vehicle(vehicle)
+	local peer_id = managers.network:session():local_peer():id()
+	local player = self:local_player()
+	if Network:is_server() then
+		self:server_enter_vehicle(vehicle, peer_id, player)
+	else
+		managers.network:session():send_to_host("sync_enter_vehicle_host", vehicle, peer_id, player)
+	end
+end
+
+function PlayerManager:server_enter_vehicle(vehicle, peer_id, player)
+	local vehicle_ext = vehicle:vehicle_driving()
+	local seat = vehicle_ext:reserve_seat(player, player:position())
+	if seat ~= nil then
+		managers.network:session():send_to_peers_synched("sync_vehicle_player", "enter", vehicle, peer_id, player, seat.name)
+		self:_enter_vehicle(vehicle, peer_id, player, seat.name)
+	end
+end
+
+function PlayerManager:sync_enter_vehicle(vehicle, peer_id, player, seat_name)
+	self:_enter_vehicle(vehicle, peer_id, player, seat_name)
+end
+
+function PlayerManager:_enter_vehicle(vehicle, peer_id, player, seat_name)
+	self._global.synced_vehicle_data[peer_id] = {vehicle_unit = vehicle, seat = seat_name}
+	local vehicle_ext = vehicle:vehicle_driving()
+	vehicle_ext:place_player_on_seat(player, seat_name)
+	player:kill_mover()
+	local seat = vehicle_ext:find_seat_for_player(player)
+	local rot = seat.object:rotation()
+	local pos = seat.object:position()
+	player:set_rotation(rot)
+	player:set_position(pos)
+	vehicle:link(Idstring(VehicleDrivingExt.SEAT_PREFIX .. seat_name), player)
+	if self:local_player() == player then
+		self:set_player_state("driving")
+	end
+	managers.vehicle:on_player_entered_vehicle(vehicle, player)
+end
+
+function PlayerManager:get_vehicle()
+	if managers.network:session() then
+		local peer_id = managers.network:session():local_peer():id()
+		local vehicle = self._global.synced_vehicle_data[peer_id]
+		return vehicle
+	else
+		return nil
+	end
+end
+
+function PlayerManager:get_vehicle_for_peer(peer_id)
+	if managers.network:session() then
+		local vehicle = self._global.synced_vehicle_data[peer_id]
+		return vehicle
+	else
+		return nil
+	end
+end
+
+function PlayerManager:exit_vehicle()
+	local peer_id = managers.network:session():local_peer():id()
+	local vehicle_data = self._global.synced_vehicle_data[peer_id]
+	if vehicle_data == nil then
+		return
+	end
+	local player = self:local_player()
+	managers.network:session():send_to_peers_synched("sync_vehicle_player", "exit", nil, peer_id, player, nil)
+	self:_exit_vehicle(peer_id, player)
+end
+
+function PlayerManager:sync_exit_vehicle(peer_id, player)
+	self:_exit_vehicle(peer_id, player)
+end
+
+function PlayerManager:_exit_vehicle(peer_id, player)
+	local vehicle_data = self._global.synced_vehicle_data[peer_id]
+	if vehicle_data == nil then
+		return
+	end
+	player:unlink()
+	local vehicle_ext = vehicle_data.vehicle_unit:vehicle_driving()
+	vehicle_ext:exit_vehicle(player)
+	self._global.synced_vehicle_data[peer_id] = nil
+	managers.vehicle:on_player_exited_vehicle(vehicle_data.vehicle, player)
 end
 
 function PlayerManager:on_hallowSPOOCed()

@@ -91,6 +91,8 @@ require("lib/managers/mission/ElementPlayerSpawner")
 require("lib/managers/mission/ElementAreaTrigger")
 require("lib/managers/mission/ElementSpawnEnemyDummy")
 require("lib/managers/mission/ElementEnemyDummyTrigger")
+require("lib/managers/mission/ElementVehicleTrigger")
+require("lib/managers/mission/ElementVehicleOperator")
 MissionManager = MissionManager or class(CoreMissionManager.MissionManager)
 
 function MissionManager:init(...)
@@ -105,6 +107,8 @@ function MissionManager:init(...)
 	self:add_area_instigator_categories("ai_teammates")
 	self:add_area_instigator_categories("loot")
 	self:add_area_instigator_categories("unique_loot")
+	self:add_area_instigator_categories("vehicle")
+	self:add_area_instigator_categories("vehicle_or_player")
 	self:set_default_area_instigator("player")
 	self:set_global_event_list({
 		"bankmanager_key",

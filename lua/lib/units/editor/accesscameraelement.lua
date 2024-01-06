@@ -79,7 +79,6 @@ end
 function AccessCameraUnitElement:add_camera_uid()
 	print("AccessCameraUnitElement:add_camera_uid")
 	local unit = SecurityCameraUnitElement._find_camera_raycast(self)
-	print("unit", unit)
 	if unit then
 		if self._hed.camera_u_id and self._hed.camera_u_id == unit:unit_data().unit_id then
 			self._hed.camera_u_id = nil

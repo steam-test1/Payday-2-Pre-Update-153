@@ -212,6 +212,16 @@ do
 		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
 		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
 	end
+	local pd2_dlc_kenaz_characters_map = {
+		"civ_female_bank_2"
+	}
+	local path_string = "units/pd2_dlc_cage/characters/"
+	local character_path = ""
+	for _, character in ipairs(pd2_dlc_kenaz_characters_map) do
+		character_path = path_string .. character .. "/" .. character
+		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
+		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
+	end
 end
 
 function CopBase:init(unit)

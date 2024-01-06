@@ -37,7 +37,7 @@ function PlayerStandard:init(unit)
 	PlayerMovementState.init(self, unit)
 	self._tweak_data = tweak_data.player.movement_state.standard
 	self._obj_com = self._unit:get_object(Idstring("rp_mover"))
-	self._slotmask_gnd_ray = managers.slot:get_mask("AI_graph_obstacle_check")
+	self._slotmask_gnd_ray = managers.slot:get_mask("player_ground_check")
 	self._slotmask_fwd_ray = managers.slot:get_mask("bullet_impact_targets")
 	self._slotmask_bullet_impact_targets = managers.slot:get_mask("bullet_impact_targets")
 	self._slotmask_pickups = managers.slot:get_mask("pickups")

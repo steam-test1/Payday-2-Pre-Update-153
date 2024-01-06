@@ -84,7 +84,7 @@ function CoreMotionPathOperatorUnitElement:_motion_path_markers()
 	local motion_path_markers = {"none"}
 	local mission_elements = managers.worlddefinition._mission_element_units
 	for _, me in pairs(mission_elements) do
-		if me:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
+		if alive(me) and me:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 			table.insert_sorted(motion_path_markers, me:unit_data().name_id)
 			self._hed.marker_ids[me:unit_data().name_id] = me:unit_data().unit_id
 		end

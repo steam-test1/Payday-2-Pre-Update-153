@@ -688,8 +688,6 @@ function InteractionTweakData:init()
 	self.apartment_saw = {}
 	self.apartment_saw.icon = "equipment_saw"
 	self.apartment_saw.text_id = "debug_interact_saw"
-	self.apartment_saw.equipment_text_id = "debug_interact_equipment_saw"
-	self.apartment_saw.special_equipment = "saw"
 	self.apartment_saw.timer = 3
 	self.apartment_saw.sound_start = "bar_drill_apply"
 	self.apartment_saw.sound_interupt = "bar_drill_apply_cancel"
@@ -712,8 +710,6 @@ function InteractionTweakData:init()
 	self.secret_stash_saw = {}
 	self.secret_stash_saw.icon = "equipment_saw"
 	self.secret_stash_saw.text_id = "debug_interact_saw"
-	self.secret_stash_saw.equipment_text_id = "debug_interact_equipment_saw"
-	self.secret_stash_saw.special_equipment = "saw"
 	self.secret_stash_saw.timer = 3
 	self.secret_stash_saw.sound_start = "bar_drill_apply"
 	self.secret_stash_saw.sound_interupt = "bar_drill_apply_cancel"
@@ -934,6 +930,15 @@ function InteractionTweakData:init()
 	self.access_camera.icon = "develop"
 	self.access_camera.text_id = "hud_int_access_camera"
 	self.access_camera.interact_distance = 125
+	self.driving_console = {}
+	self.driving_console.icon = "develop"
+	self.driving_console.text_id = "hud_int_driving_console"
+	self.driving_console.interact_distance = 500
+	self.driving_drive = {}
+	self.driving_drive.icon = "develop"
+	self.driving_drive.text_id = "hud_int_driving_drive"
+	self.driving_drive.interact_distance = 450
+	self.driving_drive.timer = 1
 	self.interaction_ball = {}
 	self.interaction_ball.icon = "develop"
 	self.interaction_ball.text_id = "debug_interact_interaction_ball"
@@ -2403,4 +2408,11 @@ function InteractionTweakData:init()
 	self.timelock_hack.sound_start = "bar_hack_fuse_box"
 	self.timelock_hack.sound_interupt = "bar_hack_fuse_box_cancel"
 	self.timelock_hack.sound_done = "bar_hack_fuse_box_finished"
+	self.hold_unlock_car = {}
+	self.hold_unlock_car.text_id = "hud_int_hold_unlock_car"
+	self.hold_unlock_car.action_text_id = "hud_unlocking_car"
+	self.hold_unlock_car.timer = 1
+	self.hold_unlock_car.equipment_text_id = "hud_equipment_need_car_keys"
+	self.hold_unlock_car.special_equipment = "c_keys"
+	self.hold_unlock_car.equipment_consume = true
 end

@@ -2142,3 +2142,66 @@ function UnitNetworkHandler:sync_char_team(unit, team_index, sender)
 	local team_data = managers.groupai:state():team_data(team_id)
 	unit:movement():set_team(team_data)
 end
+
+function UnitNetworkHandler:sync_vehicle_driving(action, unit, player)
+	Application:debug("[DRIVING_NET] sync_vehicle_driving " .. action)
+	if not alive(unit) then
+		return
+	end
+	if action == "start" then
+		unit:vehicle_driving():sync_start(player)
+	elseif action == "stop" then
+		unit:vehicle_driving():sync_stop()
+	end
+end
+
+function UnitNetworkHandler:sync_vehicle_set_input(unit, accelerate, steer, brake, handbrake, gear_up, gear_down, forced_gear)
+	if not alive(unit) then
+		return
+	end
+	unit:vehicle_driving():sync_set_input(accelerate, steer, brake, handbrake, gear_up, gear_down, forced_gear)
+end
+
+function UnitNetworkHandler:sync_vehicle_state(unit, position, rotation, velocity)
+	if not alive(unit) then
+		return
+	end
+	unit:vehicle_driving():sync_state(position, rotation, velocity)
+end
+
+function UnitNetworkHandler:sync_enter_vehicle_host(vehicle, peer_id, player)
+	Application:debug("[DRIVING_NET] sync_enter_vehicle_host")
+	if not alive(vehicle) then
+		return
+	end
+	managers.player:server_enter_vehicle(vehicle, peer_id, player)
+end
+
+function UnitNetworkHandler:sync_vehicle_player(action, vehicle, peer_id, player, seat_name)
+	Application:debug("[DRIVING_NET] sync_vehicle_player " .. action)
+	if action == "enter" then
+		managers.player:sync_enter_vehicle(vehicle, peer_id, player, seat_name)
+	elseif action == "exit" then
+		managers.player:sync_exit_vehicle(peer_id, player)
+	end
+end
+
+function UnitNetworkHandler:sync_vehicles_data(vehicle, state, occupant_driver, occupant_left, occupant_back_left, occupant_back_right)
+	Application:debug("[DRIVING_NET] sync_vehicles_data")
+	if not alive(vehicle) then
+		return
+	end
+	managers.vehicle:sync_vehicles_data(vehicle, state, occupant_driver, occupant_left, occupant_back_left, occupant_back_right)
+end
+
+function UnitNetworkHandler:sync_ai_vehicle_action(action, vehicle, seat_name, unit)
+	Application:debug("[DRIVING_NET] sync_ai_vehicle_action")
+	if not alive(vehicle) or not alive(unit) then
+		return
+	end
+	if action == "health" then
+		vehicle:character_damage():sync_vehicle_health(seat_name)
+	else
+		vehicle:vehicle_driving():sync_ai_vehicle_action(action, seat_name, unit)
+	end
+end

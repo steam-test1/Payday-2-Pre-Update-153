@@ -826,6 +826,17 @@ function LevelsTweakData:init()
 	self.mus.cube = "cube_apply_heist_bank"
 	self.mus.max_bags = 30
 	self.mus.ghost_bonus = 0.15
+	self.cage = {}
+	self.cage.name_id = "heist_cage_hl"
+	self.cage.briefing_id = "heist_cage_briefing"
+	self.cage.briefing_dialog = "Play_pln_ch1_brf_01"
+	self.cage.world_name = "narratives/bain/cage"
+	self.cage.intro_event = "Play_pln_ch1_intro_01"
+	self.cage.outro_event = "Play_pln_ch1_end_01"
+	self.cage.music = "heist"
+	self.cage.package = "packages/narr_cage"
+	self.cage.cube = "cube_apply_heist_bank"
+	self.cage.max_bags = 6
 	self.rat = {}
 	self.rat.name_id = "heist_rat_hl"
 	self.rat.briefing_id = "heist_rat_briefing"
@@ -896,6 +907,7 @@ function LevelsTweakData:init()
 		"hox_1",
 		"hox_2",
 		"pines",
+		"cage",
 		"mus",
 		"crojob2",
 		"crojob3",
@@ -914,8 +926,7 @@ function LevelsTweakData:init()
 		"election_day_3",
 		"arm_for",
 		"escape_hell",
-		"blueharvest_3",
-		"escape_drive"
+		"blueharvest_3"
 	}
 end
 

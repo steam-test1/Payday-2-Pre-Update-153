@@ -84,8 +84,11 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 				})
 				blend_mode = "add"
 				hud_stage_end_screen:give_skill_points(upgrade_def.value or 2)
-			else
+			elseif DB:has(Idstring("texture"), "guis/textures/pd2/endscreen/" .. upgrade_def.category) then
 				bitmap_texture = "guis/textures/pd2/endscreen/" .. upgrade_def.category
+			else
+				bitmap_texture = "guis/textures/pd2/endscreen/what_is_this"
+				Application:error("[HUDPackageUnlockedItem] Unknown category detected!", upgrade_def.category, category)
 			end
 		end
 	elseif ghost_bonus then
@@ -1127,7 +1130,13 @@ function HUDStageEndScreen:create_money_counter(t, dt)
 		y = 10
 	})
 	self._money_panel:grow(-20, -20)
-	local stage_payout, job_payout, bag_payout, small_loot_payout, crew_payout = managers.money:get_payouts()
+	local payouts = managers.money:get_payouts()
+	local stage_payout = payouts.stage_payout
+	local job_payout = payouts.job_payout
+	local bag_payout = payouts.bag_payout
+	local vehicle_payout = payouts.vehicle_payout
+	local small_loot_payout = payouts.small_loot_payout
+	local crew_payout = payouts.crew_payout
 	local check_if_clear = function(data)
 		for _, d in ipairs(data) do
 			if d[2] and d[2] > 0 then
@@ -1148,7 +1157,11 @@ function HUDStageEndScreen:create_money_counter(t, dt)
 		},
 		{
 			"menu_cash_bonus_bags",
-			math.round(bag_payout)
+			math.round(bag_payout or 0)
+		},
+		{
+			"menu_cash_vehicles",
+			math.round(vehicle_payout or 0)
 		},
 		{
 			"menu_cash_crew",

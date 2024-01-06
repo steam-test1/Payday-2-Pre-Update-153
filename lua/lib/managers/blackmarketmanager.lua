@@ -4280,7 +4280,7 @@ function BlackMarketManager:check_frog_1()
 		return false
 	end
 	local frog_1_memory = managers.job:get_memory("frog_1")
-	local is_correct_job = frog_1_memory ~= false and managers.job and managers.job:has_active_job() and (managers.job:current_real_job_id() == "hox" or managers.job:current_real_job_id() == "hox_prof") and Global.game_settings.difficulty == "overkill_145" and true or false
+	local is_correct_job = frog_1_memory ~= false and managers.job and managers.job:has_active_job() and (managers.job:current_real_job_id() == "hox" or managers.job:current_real_job_id() == "hox_prof") and (Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill_290" and true) or false
 	if is_correct_job then
 		local pass_skills, pass_primary, pass_secondary, pass_armor, peer, outfit
 		local all_members = managers.network:game() and managers.network:game():all_members() or {}

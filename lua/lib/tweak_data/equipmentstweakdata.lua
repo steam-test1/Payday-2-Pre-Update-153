@@ -170,6 +170,11 @@ function EquipmentsTweakData:init()
 		action_message = "bank_manager_key_obtained",
 		sync_possession = true
 	}
+	self.specials.c_keys = {
+		text_id = "hud_int_equipment_c_keys",
+		icon = "equipment_generic_key",
+		sync_possession = true
+	}
 	self.specials.keychain = {
 		text_id = "hud_int_equipment_pickup_keychain",
 		icon = "equipment_generic_key",

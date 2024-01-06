@@ -16,6 +16,17 @@ function ElementAreaTrigger:project_instigators()
 	end
 	if self._values.instigator == "player" then
 		table.insert(instigators, managers.player:player_unit())
+	elseif self._values.instigator == "vehicle" then
+		local vehicles = managers.vehicle:get_all_vehicles()
+		for _, v in pairs(vehicles) do
+			table.insert(instigators, v)
+		end
+	elseif self._values.instigator == "vehicle_or_player" then
+		table.insert(instigators, managers.player:player_unit())
+		local vehicles = managers.vehicle:get_all_vehicles()
+		for _, v in pairs(vehicles) do
+			table.insert(instigators, v)
+		end
 	elseif self._values.instigator == "enemies" then
 		if managers.groupai:state():police_hostage_count() <= 0 then
 			for _, data in pairs(managers.enemy:all_enemies()) do

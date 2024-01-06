@@ -28,6 +28,7 @@ require("lib/tweak_data/InfamyTweakData")
 require("lib/tweak_data/GageAssignmentTweakData")
 require("lib/tweak_data/PrePlanningTweakData")
 require("lib/tweak_data/InteractionTweakData")
+require("lib/tweak_data/VehicleTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -91,6 +92,12 @@ function TweakData:_init_wip_player()
 end
 
 function TweakData:_init_wip_criminals(tweak_data)
+end
+
+function TweakData:_init_wip_carry(tweak_data)
+end
+
+function TweakData:_init_wip_vehicle()
 end
 
 require("lib/tweak_data/TweakDataPD2")
@@ -390,6 +397,7 @@ function TweakData:init()
 	self.blackmarket = BlackMarketTweakData:new(self)
 	self._init_wip_blackmarket(self.blackmarket, self)
 	self.carry = CarryTweakData:new(self)
+	self._init_wip_carry(self.carry, self)
 	self.mission_door = MissionDoorTweakData:new()
 	self.attention = AttentionTweakData:new()
 	self.timespeed = TimeSpeedEffectTweakData:new()
@@ -409,6 +417,8 @@ function TweakData:init()
 	self._init_wip_preplanning(self.preplanning, self)
 	self.interaction = InteractionTweakData:new(self)
 	self._init_wip_interaction(self.interaction, self)
+	self.vehicle = VehicleTweakData:new(self)
+	self._init_wip_vehicle(self.vehicle, self)
 	self.criminals = {}
 	self.criminals.character_names = {
 		"russian",

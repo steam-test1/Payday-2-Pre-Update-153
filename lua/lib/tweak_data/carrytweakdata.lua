@@ -255,6 +255,11 @@ function CarryTweakData:init(tweak_data)
 	self.coke_pure.name_id = "hud_carry_coke_pure"
 	self.coke_pure.bag_value = "coke_pure"
 	self.coke_pure.AI_carry = {SO_category = "enemies"}
+	self.evidence_bag = {}
+	self.evidence_bag.type = "light"
+	self.evidence_bag.name_id = "hud_carry_evidence_bag"
+	self.evidence_bag.bag_value = "evidence_bag"
+	self.evidence_bag.AI_carry = {SO_category = "enemies"}
 	self.sandwich = {}
 	self.sandwich.type = "very_heavy"
 	self.sandwich.name_id = "hud_carry_sandwich"
@@ -286,6 +291,14 @@ function CarryTweakData:init(tweak_data)
 	self.ladder_bag.visual_object = "g_cagebag"
 	self.ladder_bag.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 	self.ladder_bag.AI_carry = {SO_category = "enemies"}
+	self.vehicle_falcogini = {}
+	self.vehicle_falcogini.type = "light"
+	self.vehicle_falcogini.name_id = "hud_carry_vehicle_falcogini"
+	self.vehicle_falcogini.skip_exit_secure = false
+	self.vehicle_falcogini.is_vehicle = true
+	self.vehicle_falcogini.visual_object = ""
+	self.vehicle_falcogini.unit = ""
+	self.vehicle_falcogini.AI_carry = {SO_category = ""}
 end
 
 function CarryTweakData:get_carry_ids()

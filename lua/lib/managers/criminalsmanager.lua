@@ -263,6 +263,18 @@ function CriminalsManager:character_peer_id_by_name(name)
 	end
 end
 
+function CriminalsManager:character_peer_id_by_unit(unit)
+	if type_name(unit) ~= "Unit" then
+		return nil
+	end
+	local search_key = unit:key()
+	for id, data in pairs(self._characters) do
+		if data.unit and data.taken and search_key == data.unit:key() then
+			return data.peer_id
+		end
+	end
+end
+
 function CriminalsManager:get_free_character_name()
 	local available = {}
 	for id, data in pairs(self._characters) do

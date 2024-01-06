@@ -552,13 +552,6 @@ function TeamAILogicIdle.action_complete_clbk(data, action)
 		if my_data.performing_act_objective then
 			local old_objective = my_data.performing_act_objective
 			my_data.performing_act_objective = nil
-			if action:expired() then
-				if not my_data.action_timeout_clbk_id then
-					data.objective_complete_clbk(data.unit, old_objective)
-				end
-			else
-				data.objective_failed_clbk(data.unit, old_objective)
-			end
 			if my_data.delayed_clbks and my_data.delayed_clbks[my_data.revive_complete_clbk_id] then
 				CopLogicBase.cancel_delayed_clbk(my_data, my_data.revive_complete_clbk_id)
 				my_data.revive_complete_clbk_id = nil

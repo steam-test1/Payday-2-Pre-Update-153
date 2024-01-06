@@ -2901,4 +2901,16 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.ach_fort_4 = {}
+	self.ach_fort_4.dlc = "has_achievement"
+	self.ach_fort_4.achievement_id = "fort_4"
+	self.ach_fort_4.content = {}
+	self.ach_fort_4.content.loot_global_value = "normal"
+	self.ach_fort_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "simpson",
+			amount = 1
+		}
+	}
 end

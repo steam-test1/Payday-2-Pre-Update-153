@@ -1287,6 +1287,14 @@ function CopMovement:anim_clbk_ik_change(unit)
 	end
 end
 
+function CopMovement:anim_clbk_enter_vehicle(unit)
+	if self.vehicle_seat then
+		self.vehicle_unit:vehicle_driving():on_team_ai_enter(self._unit)
+	else
+		Application:debug("No seat present!", inspect(self))
+	end
+end
+
 function CopMovement:anim_clbk_police_called(unit)
 	if Network:is_server() then
 		if not managers.groupai:state():is_ecm_jammer_active("call") then

@@ -1817,6 +1817,12 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.richard_begins.dlc = "hlm2_deluxe"
 	self.masks.richard_begins.value = 0
 	self.masks.richard_begins.type = "helmet"
+	self.masks.simpson = {}
+	self.masks.simpson.unit = "units/pd2_dlc_cage/masks/simpson/msk_simpson"
+	self.masks.simpson.name_id = "bm_msk_simpson"
+	self.masks.simpson.pcs = {}
+	self.masks.simpson.type = "helmet"
+	self.masks.simpson.value = 0
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

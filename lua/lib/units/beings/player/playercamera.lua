@@ -76,8 +76,18 @@ function PlayerCamera:play_redirect(redirect_name, speed, offset_time)
 	return result ~= PlayerCamera.IDS_NOTHING and result
 end
 
+function PlayerCamera:play_redirect_timeblend(state, redirect_name, offset_time, t)
+	local result = self._camera_unit:base():play_redirect_timeblend(state, redirect_name, offset_time, t)
+	return result ~= PlayerCamera.IDS_NOTHING and result
+end
+
 function PlayerCamera:play_state(state_name, at_time)
 	local result = self._camera_unit:base():play_state(state_name, at_time)
+	return result ~= PlayerCamera.IDS_NOTHING and result
+end
+
+function PlayerCamera:play_raw(name, params)
+	local result = self._camera_unit:base():play_raw(name, params)
 	return result ~= PlayerCamera.IDS_NOTHING and result
 end
 

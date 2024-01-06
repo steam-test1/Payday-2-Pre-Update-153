@@ -2274,6 +2274,71 @@ function NarrativeTweakData:init()
 		620000,
 		800000
 	}
+	self.jobs.cage = {}
+	self.jobs.cage.name_id = "heist_cage"
+	self.jobs.cage.briefing_id = "heist_cage_crimenet"
+	self.jobs.cage.package = "packages/narr_cage"
+	self.jobs.cage.contact = "bain"
+	self.jobs.cage.region = "street"
+	self.jobs.cage.jc = 30
+	self.jobs.cage.chain = {
+		{
+			level_id = "cage",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.cage.briefing_event = "pln_ch1_cbf_01"
+	self.jobs.cage.debrief_event = "pln_ch1_end_01"
+	self.jobs.cage.crimenet_callouts = {
+		"pln_ch1_cnc_01_01",
+		"pln_ch1_cnc_01_02",
+		"pln_ch1_cnc_01_03"
+	}
+	self.jobs.cage.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.cage.payout = {
+		20000,
+		30000,
+		40000,
+		70000,
+		80000
+	}
+	self.jobs.cage.contract_cost = {
+		16000,
+		32000,
+		80000,
+		160000,
+		200000
+	}
+	self.jobs.cage_prof = deep_clone(self.jobs.cage)
+	self.jobs.cage_prof.jc = 70
+	self.jobs.cage_prof.professional = true
+	self.jobs.cage_prof.region = "professional"
+	self.jobs.cage_prof.payout = {
+		290000,
+		580000,
+		1450000,
+		2900000,
+		3800000
+	}
+	self.jobs.cage_prof.experience_mul = {
+		2,
+		2,
+		2,
+		2,
+		2
+	}
+	self.jobs.cage_prof.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
 	self.jobs.crojob1 = {}
 	self.jobs.crojob1.name_id = "heist_crojob1"
 	self.jobs.crojob1.briefing_id = "heist_crojob1_crimenet"
@@ -2460,6 +2525,7 @@ function NarrativeTweakData:init()
 		"hox",
 		"hox_prof",
 		"pines",
+		"cage",
 		"mus",
 		"crojob1",
 		"crojob_wrapper",

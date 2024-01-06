@@ -2,6 +2,7 @@ FPCameraPlayerBase = FPCameraPlayerBase or class(UnitBase)
 FPCameraPlayerBase.IDS_EMPTY = Idstring("empty")
 FPCameraPlayerBase.IDS_NOSTRING = Idstring("")
 FPCameraPlayerBase.bipod_location = nil
+FPCameraPlayerBase.camera_last_pos = nil
 
 function FPCameraPlayerBase:init(unit)
 	UnitBase.init(self, unit, true)
@@ -82,8 +83,10 @@ function FPCameraPlayerBase:update(unit, t, dt)
 	self._parent_unit:base():controller():get_input_axis_clbk("look", callback(self, self, "_update_rot"))
 	self:_update_stance(t, dt)
 	self:_update_movement(t, dt)
-	self._parent_unit:camera():set_position(self._output_data.position)
-	self._parent_unit:camera():set_rotation(self._output_data.rotation)
+	if managers.player:current_state() ~= "driving" then
+		self._parent_unit:camera():set_position(self._output_data.position)
+		self._parent_unit:camera():set_rotation(self._output_data.rotation)
+	end
 	if self._fov.dirty then
 		self._parent_unit:camera():set_FOV(self._fov.fov)
 		self._fov.dirty = nil
@@ -229,6 +232,7 @@ end
 local mrot1 = Rotation()
 local mrot2 = Rotation()
 local mrot3 = Rotation()
+local mrot4 = Rotation()
 local mvec1 = Vector3()
 local mvec2 = Vector3()
 local mvec3 = Vector3()
@@ -342,10 +346,58 @@ function FPCameraPlayerBase:_update_rot(axis)
 	mrotation.multiply(new_shoulder_rot, self._shoulder_stance.rotation)
 	mrotation.multiply(new_shoulder_rot, self._vel_overshot.rotation)
 	local player_state = managers.player:current_state()
-	self:set_position(new_shoulder_pos)
-	self:set_rotation(new_shoulder_rot)
-	self._parent_unit:camera():set_position(self._output_data.position)
-	self._parent_unit:camera():set_rotation(self._output_data.rotation)
+	if player_state == "driving" then
+		local vehicle = managers.player:get_vehicle().vehicle_unit:vehicle()
+		local vehicle_ext = managers.player:get_vehicle().vehicle_unit:vehicle_driving()
+		local obj_pos, obj_rot = vehicle_ext:get_object_placement(managers.player:local_player())
+		if obj_pos == nil or obj_rot == nil then
+			return
+		end
+		local camera_rot = mrot3
+		mrotation.set_zero(camera_rot)
+		mrotation.multiply(camera_rot, obj_rot)
+		mrotation.multiply(camera_rot, self._output_data.rotation)
+		local hands_rot = mrot4
+		mrotation.set_zero(hands_rot)
+		mrotation.multiply(hands_rot, obj_rot)
+		mrotation.multiply(hands_rot, Rotation(-90, 0, 0))
+		local target = Vector3(0, 0, 145)
+		local target_camera = Vector3(0, 0, 145)
+		if vehicle_ext._tweak_data.driver_camera_offset then
+			target_camera = target_camera + vehicle_ext._tweak_data.driver_camera_offset
+		end
+		mvector3.rotate_with(target, vehicle:rotation())
+		mvector3.rotate_with(target_camera, vehicle:rotation())
+		local pos = obj_pos + target
+		local camera_pos = obj_pos + target_camera
+		local seat = vehicle_ext:find_seat_for_player(managers.player:player_unit())
+		if seat.driving then
+			self:set_position(pos)
+			self:set_rotation(hands_rot)
+			self._parent_unit:camera():set_position(camera_pos)
+			self._parent_unit:camera():set_rotation(camera_rot)
+		else
+			local shoulder_pos = mvec3
+			local shoulder_rot = mrot4
+			mrotation.set_zero(shoulder_rot)
+			mrotation.multiply(shoulder_rot, camera_rot)
+			mrotation.multiply(shoulder_rot, self._shoulder_stance.rotation)
+			mrotation.multiply(shoulder_rot, self._vel_overshot.rotation)
+			mvector3.set(shoulder_pos, self._shoulder_stance.translation)
+			mvector3.add(shoulder_pos, self._vel_overshot.translation)
+			mvector3.rotate_with(shoulder_pos, shoulder_rot)
+			mvector3.add(shoulder_pos, pos)
+			self:set_position(shoulder_pos)
+			self:set_rotation(shoulder_rot)
+			self._parent_unit:camera():set_position(pos)
+			self._parent_unit:camera():set_rotation(camera_rot)
+		end
+	else
+		self:set_position(new_shoulder_pos)
+		self:set_rotation(new_shoulder_rot)
+		self._parent_unit:camera():set_position(self._output_data.position)
+		self._parent_unit:camera():set_rotation(self._output_data.rotation)
+	end
 end
 
 function FPCameraPlayerBase:_get_aim_assist(t, dt)
@@ -543,6 +595,25 @@ function FPCameraPlayerBase:play_redirect(redirect_name, speed, offset_time)
 		self._unit:anim_state_machine():set_speed(result, speed)
 	end
 	return result
+end
+
+function FPCameraPlayerBase:play_redirect_timeblend(state, redirect_name, offset_time, t)
+	self:set_anims_enabled(true)
+	self._anim_empty_state_wanted = false
+	self._unit:anim_state_machine():set_parameter(state, "t", t)
+	local result = self._unit:play_redirect(redirect_name, offset_time)
+	if result == self.IDS_NOSTRING then
+		return false
+	end
+	return result
+end
+
+function FPCameraPlayerBase:play_raw(name, params)
+	self:set_anims_enabled(true)
+	self._anim_empty_state_wanted = false
+	local asm = self._unit:anim_state_machine()
+	local result = asm:play_raw(name, params)
+	return result ~= self.IDS_NOSTRING and result
 end
 
 function FPCameraPlayerBase:set_steelsight_anim_enabled(enabled)

@@ -271,6 +271,7 @@ function MusicManager:jukebox_default_tracks()
 		heist_branchbank_gold = "track_04",
 		heist_welcome_to_the_jungle1 = "track_04",
 		heist_welcome_to_the_jungle2 = "track_06",
+		heist_cage = "track_26",
 		heist_rat = "track_08",
 		heist_family = "track_04",
 		heist_election_day1 = "track_04",
@@ -361,7 +362,8 @@ function MusicManager:jukebox_music_tracks()
 		"track_22",
 		"track_23",
 		"track_24",
-		"track_25"
+		"track_25",
+		"track_26"
 	}
 	local pdth_tracks = {
 		"track_pth_01",

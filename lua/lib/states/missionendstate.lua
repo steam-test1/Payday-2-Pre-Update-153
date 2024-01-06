@@ -519,9 +519,17 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 			end
 			stage_cash_summary_string = managers.localization:text(victory_cash_postponed_id)
 		elseif self._success then
-			local stage_payout, job_payout, bag_payout, small_loot_payout, crew_payout = managers.money:get_payouts()
+			local payouts = managers.money:get_payouts()
+			local stage_payout = payouts.stage_payout
+			local job_payout = payouts.job_payout
+			local bag_payout = payouts.bag_payout
+			local vehicle_payout = payouts.vehicle_payout
+			local small_loot_payout = payouts.small_loot_payout
+			local crew_payout = payouts.crew_payout
 			local bonus_bags = managers.loot:get_secured_bonus_bags_amount() + managers.loot:get_secured_mandatory_bags_amount()
 			local bag_cash = bag_payout
+			local vehicle_amount = managers.loot:get_secured_bonus_bags_amount(true) + managers.loot:get_secured_mandatory_bags_amount(true)
+			local vehicle_cash = vehicle_payout
 			local loose_cash = small_loot_payout or 0
 			local cleaner_cost = 0
 			local assets_cost = 0
@@ -543,6 +551,12 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 					bag_cash = managers.experience:cash_string(bag_cash),
 					bag_amount = bonus_bags,
 					bonus_bags = bonus_bags
+				})
+			end
+			if vehicle_amount and 0 < vehicle_payout then
+				stage_cash_summary_string = stage_cash_summary_string .. " " .. managers.localization:text("victory_stage_cash_summary_name_vehicles", {
+					vehicle_cash = managers.experience:cash_string(vehicle_cash),
+					vehicle_amount = vehicle_amount
 				})
 			end
 			if self._criminals_completed and 0 < crew_payout then

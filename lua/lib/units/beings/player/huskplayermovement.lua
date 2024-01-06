@@ -941,6 +941,78 @@ function HuskPlayerMovement:_upd_attention_zipline(dt)
 	end
 end
 
+function HuskPlayerMovement:_upd_attention_driving(dt)
+	if self._driver then
+		local steer = self._vehicle:get_steer()
+		local anim = self._machine:segment_state(self._ids_base)
+		local fwd = 0
+		local r = 0
+		local l = 0
+		if steer < 0 then
+			r = 1
+		end
+		if steer == 0 then
+			fwd = 1
+		end
+		if 0 < steer then
+			l = 1
+		end
+		self._machine:set_parameter(anim, "fwd", fwd)
+		self._machine:set_parameter(anim, "l", l)
+		self._machine:set_parameter(anim, "r", r)
+		return
+	end
+	if self._sync_look_dir then
+		if self._atention_on then
+			if self._ext_anim.reload then
+				self._atention_on = false
+				local blend_out_t = 0.15
+				self._machine:set_modifier_blend(self._head_modifier_name, blend_out_t)
+				self._machine:set_modifier_blend(self._arm_modifier_name, blend_out_t)
+				self._machine:forbid_modifier(self._head_modifier_name)
+				self._machine:forbid_modifier(self._arm_modifier_name)
+			end
+		elseif self._ext_anim.reload then
+			if self._sync_look_dir ~= self._look_dir then
+				self._look_dir = mvector3.copy(self._sync_look_dir)
+			end
+			return
+		else
+			self._atention_on = true
+			self._machine:force_modifier(self._head_modifier_name)
+			self._machine:force_modifier(self._arm_modifier_name)
+		end
+		local tar_look_dir = tmp_vec1
+		mvec3_set(tar_look_dir, self._sync_look_dir)
+		local error_angle = tar_look_dir:angle(self._look_dir)
+		local rot_speed_rel = math.pow(math.min(error_angle / 90, 1), 0.5)
+		local rot_speed = math.lerp(40, 360, rot_speed_rel)
+		local rot_amount = math.min(rot_speed * dt, error_angle)
+		local error_axis = self._look_dir:cross(tar_look_dir)
+		local rot_adj = Rotation(error_axis, rot_amount)
+		self._look_dir = self._look_dir:rotate_with(rot_adj)
+		self._look_modifier:set_target_y(self._look_dir)
+		if rot_amount == error_angle then
+			self._sync_look_dir = nil
+		end
+		self._arm_modifier:set_target_y(self._look_dir)
+		self._head_modifier:set_target_z(self._look_dir)
+		local fwd = self._m_rot:y()
+		local spin = fwd:to_polar_with_reference(self._look_dir, math.UP).spin
+		local anim = self._machine:segment_state(self._ids_base)
+		local max_anim_spin = 70
+		local min_anim_spin = -70
+		local aim_spin = math.clamp(spin, min_anim_spin, max_anim_spin)
+		local anim = self._machine:segment_state(self._ids_base)
+		local fwd = 1 - math.clamp(math.abs(aim_spin / 90), 0, 1)
+		local l = math.clamp(aim_spin / min_anim_spin, 0, 1)
+		local r = math.clamp(aim_spin / max_anim_spin, 0, 1)
+		self._machine:set_parameter(anim, "fwd", fwd)
+		self._machine:set_parameter(anim, "l", l)
+		self._machine:set_parameter(anim, "r", r)
+	end
+end
+
 function HuskPlayerMovement:_upd_attention_tased(dt)
 end
 
@@ -994,6 +1066,8 @@ function HuskPlayerMovement:_upd_sequenced_events(t, dt)
 	elseif event_type == "zipline" then
 		next_event.commencing = true
 		self:_start_zipline(next_event)
+	elseif event_type == "driving" and self:_start_driving(next_event) then
+		table.remove(sequenced_events, 1)
 	end
 end
 
@@ -1289,6 +1363,14 @@ function HuskPlayerMovement:_upd_move_zipline(t, dt)
 	self:set_rotation(new_rot)
 end
 
+function HuskPlayerMovement:_upd_move_driving(t, dt)
+	if self._load_data then
+		return
+	end
+	self:set_position(self.seat_third:position())
+	self:set_rotation(self.seat_third:rotation())
+end
+
 function HuskPlayerMovement:_adjust_move_anim(side, speed)
 	local anim_data = self._ext_anim
 	if anim_data.haste == speed and anim_data["move_" .. side] then
@@ -1577,6 +1659,40 @@ function HuskPlayerMovement:_start_arrested(event_desc)
 	return true
 end
 
+function HuskPlayerMovement:_start_driving(event_desc)
+	local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
+	local vehicle_data = managers.player:get_vehicle_for_peer(peer_id)
+	if not vehicle_data then
+		return false
+	end
+	local vehicle_tweak_data = vehicle_data.vehicle_unit:vehicle_driving()._tweak_data
+	local vehicle_unit = vehicle_data.vehicle_unit
+	local animation = vehicle_tweak_data.animations[vehicle_data.seat]
+	self._vehicle = vehicle_unit:vehicle()
+	self._driver = false
+	if vehicle_data.seat == "driver" then
+		self._driver = true
+	end
+	self:play_redirect(animation)
+	self.seat_third = vehicle_unit:get_object(Idstring(VehicleDrivingExt.THIRD_PREFIX .. vehicle_data.seat))
+	if self._atention_on then
+		self._machine:forbid_modifier(self._look_modifier_name)
+		self._machine:forbid_modifier(self._head_modifier_name)
+		self._machine:forbid_modifier(self._arm_modifier_name)
+		self._machine:forbid_modifier(self._mask_off_modifier_name)
+		self._atention_on = false
+	end
+	self:set_position(self.seat_third:position())
+	self:set_rotation(self.seat_third:rotation())
+	self._look_dir = self._m_rot:y()
+	self._look_modifier:set_target_y(self._look_dir)
+	self._arm_modifier:set_target_y(self._look_dir)
+	self._head_modifier:set_target_z(self._look_dir)
+	self._movement_updator = callback(self, self, "_upd_move_driving")
+	self._attention_updator = callback(self, self, "_upd_attention_driving")
+	return true
+end
+
 function HuskPlayerMovement:_adjust_walk_anim_speed(dt, target_speed)
 	local state = self._machine:segment_state(self._ids_base)
 	local cur_speed = self._machine:get_speed(state)
@@ -1722,6 +1838,9 @@ function HuskPlayerMovement:sync_movement_state(state, down_time)
 		self:_add_sequenced_event(event_desc)
 	elseif state == "carry" then
 		local event_desc = {type = "standard", previous_state = previous_state}
+		self:_add_sequenced_event(event_desc)
+	elseif state == "driving" then
+		local event_desc = {type = "driving", previous_state = previous_state}
 		self:_add_sequenced_event(event_desc)
 	elseif state == "dead" then
 		local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
@@ -2117,4 +2236,18 @@ function HuskPlayerMovement:zipline_unit()
 	if self._sequenced_events[1] and self._sequenced_events[1].zipline_unit then
 		return self._sequenced_events[1].zipline_unit
 	end
+end
+
+function HuskPlayerMovement:on_exit_vehicle()
+	local event_desc = self._sequenced_events[1]
+	if self._atention_on then
+		self._machine:forbid_modifier(self._look_modifier_name)
+		self._machine:forbid_modifier(self._head_modifier_name)
+		self._machine:forbid_modifier(self._arm_modifier_name)
+		self._machine:forbid_modifier(self._mask_off_modifier_name)
+		self._atention_on = false
+	end
+	self._look_modifier:set_target_y(self._look_dir)
+	self._movement_updator = callback(self, self, "_upd_move_standard")
+	self._attention_updator = callback(self, self, "_upd_attention_standard")
 end

@@ -22,6 +22,7 @@ function MoneyManager:_setup()
 	self._bag_payout = 0
 	self._small_loot_payout = 0
 	self._crew_payout = 0
+	self._vehicle_payout = 0
 	self._cash_tousand_separator = managers.localization:text("cash_tousand_separator")
 	self._cash_sign = managers.localization:text("cash_sign")
 end
@@ -140,11 +141,12 @@ function MoneyManager:on_mission_completed(num_winners)
 		managers.loot:set_postponed_small_loot()
 		return
 	end
-	local stage_value, job_value, bag_value, small_value, crew_value, total_payout, risk_table = self:get_real_job_money_values(num_winners)
+	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table = self:get_real_job_money_values(num_winners)
 	managers.loot:clear_postponed_small_loot()
 	self:_set_stage_payout(stage_value + risk_table.stage_risk)
 	self:_set_job_payout(job_value + risk_table.job_risk)
 	self:_set_bag_payout(bag_value + risk_table.bag_risk)
+	self:_set_vehicle_payout(vehicle_value + risk_table.vehicle_risk)
 	self:_set_small_loot_payout(small_value + risk_table.small_risk)
 	self:_set_crew_payout(crew_value)
 	self:_add_to_total(total_payout)
@@ -166,7 +168,7 @@ function MoneyManager:get_contract_money_by_stars(job_stars, risk_stars, job_day
 	params.player_stars = player_stars
 	params.secured_bags = 0
 	params.small_value = 0
-	local stage_value, job_value, bag_value, small_value, crew_value, total_payout, risk_table, job_table = self:get_money_by_params(params)
+	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table, job_table = self:get_money_by_params(params)
 	local stage_risk_value = risk_table.stage_risk
 	local job_risk_value = risk_table.job_risk
 	local total_stage_value = stage_value
@@ -241,16 +243,19 @@ function MoneyManager:get_money_by_params(params)
 	local bonus_bags = params.secured_bags or managers.loot:get_secured_bonus_bags_value(params.level_id)
 	local mandatory_bags = params.secured_bags or managers.loot:get_secured_mandatory_bags_value()
 	local real_small_value = params.small_value or math.round(managers.loot:get_real_total_small_loot_value())
+	local bonus_vehicles = params.vehicle_value or math.round(managers.loot:get_secured_bonus_bags_value(nil, true))
 	local offshore_rate = self:get_tweak_value("money_manager", "offshore_rate")
 	local total_payout = 0
 	local stage_value = 0
 	local job_value = 0
 	local bag_value = 0
+	local vehicle_value = 0
 	local small_value = 0
 	local crew_value = 0
 	local stage_risk = 0
 	local job_risk = 0
 	local bag_risk = 0
+	local vehicle_risk = 0
 	local small_risk = 0
 	local static_value, base_static_value, risk_static_value = self:get_money_by_job(job_id, difficulty_stars + 1)
 	static_value = static_value * cash_skill_bonus
@@ -265,10 +270,14 @@ function MoneyManager:get_money_by_params(params)
 			bag_value = bonus_bags
 			bag_risk = math.round(bag_value * money_multiplier * bag_skill_bonus)
 			bag_value = (bag_value + mandatory_bags) * bag_skill_bonus
-			total_payout = math.max(0, math.round((static_value + bag_value + bag_risk) / offshore_rate + small_value))
+			vehicle_value = bonus_vehicles
+			vehicle_risk = math.round(vehicle_value * money_multiplier)
+			total_payout = math.max(0, math.round((static_value + bag_value + bag_risk + vehicle_value + vehicle_risk) / offshore_rate + small_value))
 			stage_value = 0
 			bag_value = math.max(0, math.round(bag_value / offshore_rate))
 			bag_risk = math.max(0, math.round(bag_risk / offshore_rate))
+			vehicle_value = math.max(0, math.round(vehicle_value / offshore_rate))
+			vehicle_risk = math.max(0, math.round(vehicle_risk / offshore_rate))
 			crew_value = total_payout
 			total_payout = math.max(0, math.round(total_payout * self:get_tweak_value("money_manager", "alive_humans_multiplier", num_winners)))
 			crew_value = total_payout - crew_value
@@ -281,6 +290,8 @@ function MoneyManager:get_money_by_params(params)
 			stage_risk = stage_risk * limited_bonus
 			bag_value = bag_value * limited_bonus
 			bag_risk = bag_risk * limited_bonus
+			vehicle_value = vehicle_value * limited_bonus
+			vehicle_risk = vehicle_risk * limited_bonus
 			small_value = small_value * limited_bonus
 			small_risk = small_risk * limited_bonus
 			crew_value = crew_value * limited_bonus
@@ -351,10 +362,11 @@ function MoneyManager:get_money_by_params(params)
 		local bag_value = math.round((bonus_bag_value + mandatory_bag_value) / offshore_rate)
 		bag_risk = math.round(bag_risk / offshore_rate)
 	end
-	return stage_value, job_value, bag_value, small_value, crew_value, total_payout, {
+	return stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, {
 		stage_risk = stage_risk,
 		job_risk = job_risk,
 		bag_risk = bag_risk,
+		vehicle_risk = vehicle_risk,
 		small_risk = small_risk
 	}, {job_base_payout = base_static_value, job_risk_payout = risk_static_value}
 end
@@ -388,7 +400,7 @@ function MoneyManager:get_secured_bonus_bags_money()
 	local money_multiplier = self:get_contract_difficulty_multiplier(stars)
 	local total_stages = job_id and #tweak_data.narrative:job_chain(job_id) or 1
 	local bag_skill_bonus = managers.player:upgrade_value("player", "secured_bags_money_multiplier", 1)
-	local bonus_bags = managers.loot:get_secured_bonus_bags_value(managers.job:current_level_id())
+	local bonus_bags = managers.loot:get_secured_bonus_bags_value(managers.job:current_level_id()) + managers.loot:get_secured_bonus_bags_value(managers.job:current_level_id(), true)
 	local bag_value = bonus_bags
 	local bag_risk = math.round(bag_value * money_multiplier)
 	return math.round((bag_value + bag_risk) * bag_skill_bonus / self:get_tweak_value("money_manager", "offshore_rate"))
@@ -468,7 +480,7 @@ function MoneyManager:get_contract_difficulty_multiplier(stars)
 end
 
 function MoneyManager:get_potential_payout_from_current_stage()
-	local stage_value, job_value, bag_value, small_value, crew_value, total_payout = self:get_real_job_money_values(1, true)
+	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout = self:get_real_job_money_values(1, true)
 	return total_payout
 end
 
@@ -1123,7 +1135,14 @@ function MoneyManager:heist_offshore()
 end
 
 function MoneyManager:get_payouts()
-	return self._stage_payout, self._job_payout, self._bag_payout, self._small_loot_payout, self._crew_payout
+	return {
+		stage_payout = self._stage_payout,
+		job_payout = self._job_payout,
+		bag_payout = self._bag_payout,
+		vehicle_payout = self._vehicle_payout,
+		small_loot_payout = self._small_loot_payout,
+		crew_payout = self._crew_payout
+	}
 end
 
 function MoneyManager:_set_stage_payout(amount)
@@ -1144,6 +1163,10 @@ end
 
 function MoneyManager:_set_crew_payout(amount)
 	self._crew_payout = amount
+end
+
+function MoneyManager:_set_vehicle_payout(amount)
+	self._vehicle_payout = amount
 end
 
 function MoneyManager:_add(amount)

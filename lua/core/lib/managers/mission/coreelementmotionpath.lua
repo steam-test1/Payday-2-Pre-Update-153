@@ -7,6 +7,7 @@ function ElementMotionPathOperator:init(...)
 end
 
 function ElementMotionPathOperator:client_on_executed(...)
+	self:on_executed(...)
 end
 
 function ElementMotionPathOperator:on_executed(instigator)

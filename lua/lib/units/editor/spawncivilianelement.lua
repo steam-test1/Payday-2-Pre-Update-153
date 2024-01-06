@@ -11,6 +11,7 @@ SpawnCivilianUnitElement.INSTANCE_VAR_NAMES = {
 }
 SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_female_bank_1/civ_female_bank_1",
+	"units/pd2_dlc_cage/characters/civ_female_bank_2/civ_female_bank_2",
 	"units/payday2/characters/civ_female_bank_manager_1/civ_female_bank_manager_1",
 	"units/payday2/characters/civ_female_bikini_1/civ_female_bikini_1",
 	"units/payday2/characters/civ_female_bikini_2/civ_female_bikini_2",

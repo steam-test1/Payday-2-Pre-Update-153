@@ -133,10 +133,11 @@ end
 
 function LootManager:check_achievements(carry_id, multiplier)
 	local real_total_value = self:get_real_total_value()
-	local memory, total_memory_value, all_pass, total_value_pass, jobs_pass, difficulties_pass
+	local memory, total_memory_value, all_pass, total_value_pass, jobs_pass, difficulties_pass, total_time_pass
 	for achievement, achievement_data in pairs(tweak_data.achievement.loot_cash_achievements or {}) do
 		jobs_pass = not achievement_data.jobs or table.contains(achievement_data.jobs, managers.job:current_real_job_id())
 		difficulties_pass = not achievement_data.difficulties or table.contains(achievement_data.difficulties, Global.game_settings.difficulty)
+		total_time_pass = not achievement_data.total_time or managers.game_play_central and managers.game_play_central:get_heist_timer() <= achievement_data.total_time
 		if not achievement_data.timer then
 			total_value_pass = not achievement_data.total_value or real_total_value >= achievement_data.total_value
 		else
@@ -164,7 +165,7 @@ function LootManager:check_achievements(carry_id, multiplier)
 			end
 			total_value_pass = not achievement_data.total_value or total_memory_value >= achievement_data.total_value
 		end
-		all_pass = total_value_pass and jobs_pass and difficulties_pass
+		all_pass = total_value_pass and jobs_pass and difficulties_pass and total_time_pass
 		if all_pass then
 			if achievement_data.stat then
 				managers.achievment:award_progress(achievement_data.stat)
@@ -204,14 +205,14 @@ function LootManager:check_secured_mandatory_bags()
 	return amount >= self._global.mandatory_bags.amount
 end
 
-function LootManager:get_secured_mandatory_bags_amount()
+function LootManager:get_secured_mandatory_bags_amount(is_vehicle)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	if mandatory_bags_amount == 0 then
 		return 0
 	end
 	local amount = 0
 	for _, data in ipairs(self._global.secured) do
-		if not tweak_data.carry.small_loot[data.carry_id] and 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
+		if not tweak_data.carry.small_loot[data.carry_id] and not tweak_data.carry[data.carry_id].is_vehicle == not is_vehicle and 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 			amount = amount + 1
 			mandatory_bags_amount = mandatory_bags_amount - 1
 		end
@@ -219,12 +220,12 @@ function LootManager:get_secured_mandatory_bags_amount()
 	return amount
 end
 
-function LootManager:get_secured_bonus_bags_amount()
+function LootManager:get_secured_bonus_bags_amount(is_vehicle)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	local secured_mandatory_bags_amount = self:get_secured_mandatory_bags_amount()
 	local amount = 0
 	for _, data in ipairs(self._global.secured) do
-		if not tweak_data.carry.small_loot[data.carry_id] then
+		if not tweak_data.carry.small_loot[data.carry_id] and not tweak_data.carry[data.carry_id].is_vehicle == not is_vehicle then
 			if 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 				mandatory_bags_amount = mandatory_bags_amount - 1
 			else
@@ -235,12 +236,12 @@ function LootManager:get_secured_bonus_bags_amount()
 	return amount
 end
 
-function LootManager:get_secured_bonus_bags_value(level_id)
+function LootManager:get_secured_bonus_bags_value(level_id, is_vehicle)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	local amount_bags = tweak_data.levels[level_id] and tweak_data.levels[level_id].max_bags or 20
 	local value = 0
 	for _, data in ipairs(self._global.secured) do
-		if not tweak_data.carry.small_loot[data.carry_id] then
+		if not tweak_data.carry.small_loot[data.carry_id] and not tweak_data.carry[data.carry_id].is_vehicle == not is_vehicle then
 			if 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 				mandatory_bags_amount = mandatory_bags_amount - 1
 			elseif 0 < amount_bags then
@@ -252,11 +253,11 @@ function LootManager:get_secured_bonus_bags_value(level_id)
 	return value
 end
 
-function LootManager:get_secured_mandatory_bags_value()
+function LootManager:get_secured_mandatory_bags_value(is_vehicle)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	local value = 0
 	for _, data in ipairs(self._global.secured) do
-		if not tweak_data.carry.small_loot[data.carry_id] and 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
+		if not tweak_data.carry.small_loot[data.carry_id] and not tweak_data.carry[data.carry_id].is_vehicle == not is_vehicle and 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 			mandatory_bags_amount = mandatory_bags_amount - 1
 			value = value + managers.money:get_bag_value(data.carry_id, data.multiplier)
 		end
@@ -264,13 +265,13 @@ function LootManager:get_secured_mandatory_bags_value()
 	return value
 end
 
-function LootManager:is_bonus_bag(carry_id)
+function LootManager:is_bonus_bag(carry_id, is_vehicle)
 	if self._global.mandatory_bags.carry_id ~= "none" and carry_id and carry_id ~= self._global.mandatory_bags.carry_id then
 		return true
 	end
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	for _, data in ipairs(self._global.secured) do
-		if not tweak_data.carry.small_loot[data.carry_id] then
+		if not tweak_data.carry.small_loot[data.carry_id] and not tweak_data.carry[data.carry_id].is_vehicle == not is_vehicle then
 			if 0 < mandatory_bags_amount and (self._global.mandatory_bags.carry_id == "none" or self._global.mandatory_bags.carry_id == data.carry_id) then
 				mandatory_bags_amount = mandatory_bags_amount - 1
 			elseif mandatory_bags_amount == 0 then

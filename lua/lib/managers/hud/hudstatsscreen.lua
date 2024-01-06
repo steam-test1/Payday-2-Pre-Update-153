@@ -351,7 +351,7 @@ function HUDStatsScreen:init()
 		name = "day_wrapper_panel",
 		x = 0,
 		y = y + math.round(managers.gui_data:scaled_size().height / 2),
-		h = math.round(managers.gui_data:scaled_size().height / 1.5),
+		h = math.round(managers.gui_data:scaled_size().height),
 		w = right_panel:w()
 	})
 	day_wrapper_panel:set_position(days_title:x() + pad, days_title:bottom())
@@ -927,7 +927,7 @@ function HUDStatsScreen:_update_stats_screen_loot(loot_wrapper_panel)
 		end
 	end
 	local bonus_amount = managers.loot:get_secured_bonus_bags_amount()
-	local bonus_vis = 0 < bonus_amount or 0 < secured_amount
+	local bonus_vis = 0 < bonus_amount or 0 < secured_amount or 0 < managers.loot:get_secured_bonus_bags_amount(true)
 	local bonus_bags_title = loot_wrapper_panel:child("bonus_bags_title")
 	bonus_bags_title:set_alpha(bonus_vis and 1 or 0.5)
 	local bonus_bags_panel = loot_wrapper_panel:child("bonus_bags_panel")
