@@ -256,6 +256,7 @@ function StatisticsTweakData:statistics_table()
 		"spackle",
 		"stoneface",
 		"wayfarer",
+		"jw_shades",
 		"smiley",
 		"gumbo",
 		"crazy_lion",
@@ -298,6 +299,14 @@ function StatisticsTweakData:statistics_table()
 		"wolf_glow",
 		"hoxton_glow",
 		"chains_glow",
+		"destroyer",
+		"punk",
+		"pain",
+		"infamy_lurker",
+		"daft",
+		"ranger",
+		"infamy_hood",
+		"balaclava",
 		"jake",
 		"richter",
 		"biker",
@@ -342,7 +351,12 @@ function StatisticsTweakData:statistics_table()
 		"gladiator_helmet",
 		"the_king_mask",
 		"sports_utility_mask",
-		"starvr"
+		"starvr",
+		"ninja_hood",
+		"shirai",
+		"kage",
+		"slicer",
+		"bobblehead_dozer"
 	}
 	local weapon_list = {
 		"ak5",
@@ -371,6 +385,7 @@ function StatisticsTweakData:statistics_table()
 		"r870",
 		"saiga",
 		"saw",
+		"saw_secondary",
 		"serbu",
 		"usp",
 		"m45",
@@ -427,7 +442,10 @@ function StatisticsTweakData:statistics_table()
 		"plainsrider",
 		"mateba",
 		"asval",
-		"sub2000"
+		"sub2000",
+		"hunter",
+		"wa2000",
+		"polymer"
 	}
 	local melee_list = {
 		"weapon",
@@ -481,12 +499,17 @@ function StatisticsTweakData:statistics_table()
 		"switchblade",
 		"taser",
 		"slot_lever",
-		"croupier_rake"
+		"croupier_rake",
+		"twins",
+		"tiger",
+		"fight",
+		"cqc"
 	}
 	local grenade_list = {
 		"frag",
 		"molotov",
-		"dynamite"
+		"dynamite",
+		"wpn_prj_four"
 	}
 	local enemy_list = {
 		"civilian",

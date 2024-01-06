@@ -299,6 +299,13 @@ function MissionEndState:at_enter(old_state, params)
 						else
 							all_pass = false
 						end
+					elseif managers.job:on_last_stage() then
+						for stage, passed in pairs(memory) do
+							if not passed then
+								all_pass = false
+								break
+							end
+						end
 					else
 						all_pass = false
 					end

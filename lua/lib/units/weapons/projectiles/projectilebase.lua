@@ -47,7 +47,7 @@ function ProjectileBase:set_weapon_unit(weapon_unit)
 end
 
 function ProjectileBase:weapon_unit()
-	return alive(self._thrower_unit) and self._thrower_unit or nil
+	return alive(self._weapon_unit) and self._weapon_unit or nil
 end
 
 function ProjectileBase:set_projectile_entry(projectile_entry)
