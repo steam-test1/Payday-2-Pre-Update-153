@@ -243,21 +243,23 @@ function MissionEndState:at_enter(old_state, params)
 				end
 				equipped_team_pass = true
 				if achievement_data.equipped_team then
-					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons
+					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_masks, pass_armors
 					local ad = achievement_data.equipped_team
 					local oufit
 					for _, peer in pairs(managers.network:session():all_peers()) do
 						oufit = peer:blackmarket_outfit()
-						pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
 						pass_deployable = not ad.deployable or ad.deployable == oufit.deployable
+						pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
+						pass_armors = not ad.armors or table.contains(ad.armors, oufit.armor) and table.contains(ad.armors, oufit.armor_current)
 						pass_mask = not ad.mask or ad.mask == oufit.mask.mask_id
+						pass_masks = not ad.masks or table.contains(ad.masks, oufit.mask.mask_id)
 						pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == oufit.melee_weapon
 						pass_melee_weapons = not ad.melee_weapons or table.contains(ad.melee_weapons, oufit.melee_weapon)
 						pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
-						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
 						pass_primaries = not ad.primaries or table.contains(ad.primaries, oufit.primary.factory_id)
-						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
 						pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
+						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
+						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
 						pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
 						pass_skills = not ad.num_skills
 						if not pass_skills then
@@ -270,7 +272,7 @@ function MissionEndState:at_enter(old_state, params)
 						if ad.reverse_deployable then
 							pass_deployable = not pass_deployable
 						end
-						if not (pass_armor and pass_deployable and pass_mask and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills) or not pass_melee_weapons then
+						if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills) or not pass_melee_weapons then
 							equipped_team_pass = false
 							break
 						end

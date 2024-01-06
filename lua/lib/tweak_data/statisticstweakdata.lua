@@ -16,6 +16,10 @@ function StatisticsTweakData:init()
 	}
 end
 
+function StatisticsTweakData:statistics_specializations()
+	return 12
+end
+
 function StatisticsTweakData:statistics_table()
 	local level_list = {
 		"safehouse",
@@ -356,7 +360,10 @@ function StatisticsTweakData:statistics_table()
 		"shirai",
 		"kage",
 		"slicer",
-		"bobblehead_dozer"
+		"bobblehead_dozer",
+		"jiro",
+		"jiro_begins",
+		"king_of_jesters"
 	}
 	local weapon_list = {
 		"ak5",
@@ -445,7 +452,11 @@ function StatisticsTweakData:statistics_table()
 		"sub2000",
 		"hunter",
 		"wa2000",
-		"polymer"
+		"polymer",
+		"arblast",
+		"long",
+		"frankish",
+		"baka"
 	}
 	local melee_list = {
 		"weapon",
@@ -503,13 +514,20 @@ function StatisticsTweakData:statistics_table()
 		"twins",
 		"tiger",
 		"fight",
-		"cqc"
+		"cqc",
+		"sandsteel",
+		"buck",
+		"beardy",
+		"great",
+		"morning"
 	}
 	local grenade_list = {
 		"frag",
 		"molotov",
 		"dynamite",
-		"wpn_prj_four"
+		"wpn_prj_four",
+		"wpn_prj_ace",
+		"wpn_prj_jav"
 	}
 	local enemy_list = {
 		"civilian",
@@ -556,7 +574,26 @@ function StatisticsTweakData:statistics_table()
 		"dragan",
 		"jacket",
 		"bonnie",
-		"sokol"
+		"sokol",
+		"dragon"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, grenade_list, enemy_list, armor_list, character_list
+end
+
+function StatisticsTweakData:resolution_statistics_table()
+	return {
+		"2560x1440",
+		"1920x1200",
+		"1920x1080",
+		"1680x1050",
+		"1600x900",
+		"1536x864",
+		"1440x900",
+		"1366x768",
+		"1360x768",
+		"1280x1024",
+		"1280x800",
+		"1280x720",
+		"1024x768"
+	}
 end
