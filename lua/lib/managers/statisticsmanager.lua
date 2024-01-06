@@ -786,6 +786,24 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			stats["contract_" .. job_id .. "_fail"] = {type = "int", value = 1}
 		end
 	end
+	if (completion == "win_begin" or completion == "win_dropin") and job_id == "shoutout_raid" then
+		stats.crimefest_challenge_dallas_1 = {type = "int", value = 1}
+	end
+	for melee_name, melee_kill in pairs(session.killed_by_melee) do
+		if 0 < melee_kill and melee_name == "whiskey" then
+			stats.crimefest_challenge_chains_1 = {type = "int", value = melee_kill}
+			break
+		end
+	end
+	for enemy_name, enemy_data in pairs(session.killed) do
+		if 0 < enemy_data.count and enemy_name == "spooc" then
+			stats.crimefest_challenge_clover_1 = {
+				type = "int",
+				value = enemy_data.count
+			}
+			break
+		end
+	end
 	managers.network.account:publish_statistics(stats)
 end
 
