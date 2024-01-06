@@ -1,8 +1,8 @@
 EscortWithSuitcaseActionWalk = EscortWithSuitcaseActionWalk or class(CopActionWalk)
 EscortWithSuitcaseActionWalk._walk_anim_velocities = {
 	stand = {
-		ntl = {
-			run = {
+		hos = {
+			walk = {
 				fwd = 138,
 				bwd = 70,
 				l = 93,
@@ -13,8 +13,8 @@ EscortWithSuitcaseActionWalk._walk_anim_velocities = {
 }
 EscortWithSuitcaseActionWalk._walk_anim_lengths = {
 	stand = {
-		ntl = {
-			run = {
+		hos = {
+			walk = {
 				fwd = 28,
 				bwd = 32,
 				l = 45,

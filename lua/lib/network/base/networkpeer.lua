@@ -127,6 +127,7 @@ function NetworkPeer:on_verify_ticket(result, reason)
 		end
 		if not Network:is_server() then
 			self:verify_job(managers.job:current_job_id())
+			self:verify_character()
 		end
 	end
 end
@@ -159,6 +160,23 @@ function NetworkPeer:verify_job(job)
 	end
 	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
 		self:mark_cheater(VoteManager.REASON.invalid_job, Network:is_server())
+	end
+end
+
+function NetworkPeer:verify_character()
+	if not self:is_host() then
+		return
+	end
+	local character_data = tweak_data.blackmarket.characters[self._character]
+	if not character_data or not character_data.dlc then
+		return
+	end
+	local dlc_data = Global.dlc_manager.all_dlc_data[character_data.dlc]
+	if not dlc_data or not dlc_data.app_id then
+		return
+	end
+	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
+		self:mark_cheater(VoteManager.REASON.invalid_character, Network:is_server())
 	end
 end
 
@@ -251,6 +269,9 @@ function NetworkPeer:is_cheater()
 end
 
 function NetworkPeer:mark_cheater(reason, auto_kick)
+	if Application:editor() then
+		return
+	end
 	self._cheater = true
 	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(managers.vote:kick_reason_to_string(reason), {
 		name = self:name()
@@ -546,6 +567,7 @@ end
 function NetworkPeer:set_character(character)
 	self._character = character
 	self:_reload_outfit()
+	self:verify_character()
 end
 
 function NetworkPeer:set_waiting_for_player_ready(state)
@@ -918,6 +940,18 @@ function NetworkPeer:melee_id()
 	local outfit_string = self:profile("outfit_string")
 	local data = string.split(outfit_string, " ")
 	return data[managers.blackmarket:outfit_string_index("melee_weapon")]
+end
+
+function NetworkPeer:throwable_id()
+	local outfit_string = self:profile("outfit_string")
+	local data = string.split(outfit_string, " ")
+	return data[managers.blackmarket:outfit_string_index("throwable")]
+end
+
+function NetworkPeer:skills()
+	local outfit_string = self:profile("outfit_string")
+	local data = string.split(outfit_string, " ")
+	return data[managers.blackmarket:outfit_string_index("skills")]
 end
 
 function NetworkPeer:blackmarket_outfit()

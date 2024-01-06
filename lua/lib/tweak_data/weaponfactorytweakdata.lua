@@ -162,6 +162,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_sterling()
 	self:_init_mosin()
 	self:_init_m1928()
+	self:_init_l85a2()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -730,6 +731,9 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_smg_thompson = {
 				translation = Vector3(0, -24, -4.2)
+			},
+			wpn_fps_ass_l85a2 = {
+				translation = Vector3(0, 2, 1.8)
 			}
 		},
 		forbids = {
@@ -1345,6 +1349,9 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_smg_thompson = {
 				translation = Vector3(0, -24, -4.2)
+			},
+			wpn_fps_ass_l85a2 = {
+				translation = Vector3(0, 8, 1.8)
 			}
 		},
 		forbids = {
@@ -2603,6 +2610,7 @@ function WeaponFactoryTweakData:_init_m4()
 		"wpn_fps_upg_fg_jp",
 		"wpn_fps_upg_fg_smr",
 		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_ass_l85a2_m_emag",
 		"wpn_fps_upg_m4_s_crane",
 		"wpn_fps_upg_m4_s_mk46",
 		"wpn_fps_upg_fl_ass_peq15",
@@ -3061,6 +3069,7 @@ function WeaponFactoryTweakData:_init_m16()
 		"wpn_fps_upg_i_singlefire",
 		"wpn_fps_upg_i_autofire",
 		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_ass_l85a2_m_emag",
 		"wpn_fps_upg_m4_s_crane",
 		"wpn_fps_upg_m4_s_mk46",
 		"wpn_fps_upg_fl_ass_peq15",
@@ -3202,6 +3211,7 @@ function WeaponFactoryTweakData:_init_olympic()
 		"wpn_fps_upg_i_singlefire",
 		"wpn_fps_upg_i_autofire",
 		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_ass_l85a2_m_emag",
 		"wpn_fps_upg_m4_s_crane",
 		"wpn_fps_upg_m4_s_mk46",
 		"wpn_fps_upg_fl_ass_peq15",
@@ -4491,6 +4501,7 @@ function WeaponFactoryTweakData:_init_ak5()
 		"wpn_fps_upg_i_singlefire",
 		"wpn_fps_upg_i_autofire",
 		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_ass_l85a2_m_emag",
 		"wpn_fps_upg_ass_ns_jprifles",
 		"wpn_fps_upg_ass_ns_linear",
 		"wpn_fps_upg_ass_ns_surefire",
@@ -16323,4 +16334,236 @@ function WeaponFactoryTweakData:_init_m1928()
 	}
 	self.wpn_fps_smg_thompson_npc = deep_clone(self.wpn_fps_smg_thompson)
 	self.wpn_fps_smg_thompson_npc.unit = "units/pd2_dlc_pines/weapons/wpn_fps_smg_m1928/wpn_fps_smg_thompson_npc"
+end
+
+function WeaponFactoryTweakData:_init_l85a2()
+	self.parts.wpn_fps_ass_l85a2_body_standard = {
+		type = "upper_reciever",
+		name_id = "bm_wp_l85a2_b_medium",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_body_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover",
+		animations = {
+			reload = "reload",
+			fire_steelsight = "recoil",
+			fire = "recoil"
+		},
+		forbids = {
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_fps_ass_l85a2_m_emag = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_l85a2_m_emag",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_m_emag",
+		stats = {
+			value = 1,
+			recoil = 1,
+			extra_ammo = 2
+		},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_fg_medium = {
+		type = "foregrip",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_fg_medium",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_fg_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "foregrip",
+		name_id = "bm_wp_l85a2_fg_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_fg_short",
+		stats = {
+			value = 1,
+			recoil = 1,
+			concealment = 1
+		},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_l85a2_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_b_long",
+		stats = {
+			value = 1,
+			spread = 1,
+			concealment = -3
+		},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_b_medium = {
+		type = "barrel",
+		name_id = "bm_wp_l85a2_b_medium",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_b_medium",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_b_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_l85a2_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_b_short",
+		stats = {value = 1, concealment = 3},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_l85a2_b_medium",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_g_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_g_worn = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "grip",
+		name_id = "bm_wp_l85a2_g_worn",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_g_worn",
+		stats = {value = 1, recoil = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_ns_standard = {
+		type = "barrel_ext",
+		name_id = "bm_wp_l85a2_b_medium",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_ns_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_o_standard = {
+		type = "sight",
+		name_id = "bm_wp_l85a2_b_medium",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2_pts/wpn_fps_ass_l85a2_o_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_clover",
+		dlc = "character_pack_clover"
+	}
+	self.parts.wpn_fps_ass_l85a2_body_standard.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_body_standard"
+	self.parts.wpn_fps_ass_l85a2_m_emag.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_m_emag"
+	self.parts.wpn_fps_ass_l85a2_fg_medium.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_fg_medium"
+	self.parts.wpn_fps_ass_l85a2_fg_short.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_fg_short"
+	self.parts.wpn_fps_ass_l85a2_b_long.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_b_long"
+	self.parts.wpn_fps_ass_l85a2_b_medium.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_b_medium"
+	self.parts.wpn_fps_ass_l85a2_b_short.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_b_short"
+	self.parts.wpn_fps_ass_l85a2_g_standard.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_g_standard"
+	self.parts.wpn_fps_ass_l85a2_g_worn.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_g_worn"
+	self.parts.wpn_fps_ass_l85a2_ns_standard.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_ns_standard"
+	self.parts.wpn_fps_ass_l85a2_o_standard.third_unit = "units/pd2_dlc_clover/weapons/wpn_third_ass_l85a2_pts/wpn_third_ass_l85a2_o_standard"
+	self.wpn_fps_ass_l85a2 = {}
+	self.wpn_fps_ass_l85a2.unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2/wpn_fps_ass_l85a2"
+	self.wpn_fps_ass_l85a2.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_ass_l85a2.animations = {
+		reload = "reload",
+		reload_not_empty = "reload_not_empty"
+	}
+	self.wpn_fps_ass_l85a2.adds = {}
+	self.wpn_fps_ass_l85a2.default_blueprint = {
+		"wpn_fps_ass_l85a2_body_standard",
+		"wpn_fps_m4_uupg_m_std_vanilla",
+		"wpn_fps_ass_l85a2_fg_medium",
+		"wpn_fps_ass_l85a2_b_medium",
+		"wpn_fps_ass_l85a2_g_standard",
+		"wpn_fps_ass_l85a2_ns_standard",
+		"wpn_fps_ass_l85a2_o_standard"
+	}
+	self.wpn_fps_ass_l85a2.uses_parts = {
+		"wpn_fps_ass_l85a2_body_standard",
+		"wpn_fps_ass_l85a2_fg_medium",
+		"wpn_fps_ass_l85a2_fg_short",
+		"wpn_fps_ass_l85a2_b_long",
+		"wpn_fps_ass_l85a2_b_medium",
+		"wpn_fps_ass_l85a2_b_short",
+		"wpn_fps_ass_l85a2_g_standard",
+		"wpn_fps_ass_l85a2_g_worn",
+		"wpn_fps_ass_l85a2_ns_standard",
+		"wpn_fps_ass_l85a2_o_standard",
+		"wpn_fps_ass_l85a2_m_emag",
+		"wpn_fps_m4_uupg_m_std_vanilla",
+		"wpn_fps_upg_m4_m_drum",
+		"wpn_fps_upg_m4_m_pmag",
+		"wpn_fps_upg_m4_m_straight",
+		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser"
+	}
+	self.wpn_fps_ass_l85a2_npc = deep_clone(self.wpn_fps_ass_l85a2)
+	self.wpn_fps_ass_l85a2_npc.unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2/wpn_fps_ass_l85a2_npc"
 end

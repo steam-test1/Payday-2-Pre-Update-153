@@ -996,6 +996,31 @@ function MoneyManager:on_buy_casino_fee(secured_cards, increase_infamous, prefer
 	self:deduct_from_offshore(amount)
 end
 
+function MoneyManager:has_unlock_skill_switch_cost(selected_skill_switch)
+	return self:get_unlock_skill_switch_spending_cost(selected_skill_switch) ~= 0 or self:get_unlock_skill_switch_offshore_cost(selected_skill_switch) ~= 0
+end
+
+function MoneyManager:get_unlock_skill_switch_spending_cost(selected_skill_switch)
+	return self:get_tweak_value("money_manager", "skill_switch_cost", selected_skill_switch, "spending")
+end
+
+function MoneyManager:get_unlock_skill_switch_offshore_cost(selected_skill_switch)
+	return self:get_tweak_value("money_manager", "skill_switch_cost", selected_skill_switch, "offshore")
+end
+
+function MoneyManager:can_afford_unlock_skill_switch(selected_skill_switch)
+	local spending_cost = self:get_unlock_skill_switch_spending_cost(selected_skill_switch)
+	local offshore_cost = self:get_unlock_skill_switch_offshore_cost(selected_skill_switch)
+	return spending_cost <= self:total() and offshore_cost <= self:offshore()
+end
+
+function MoneyManager:on_unlock_skill_switch(selected_skill_switch)
+	local spending_cost = self:get_unlock_skill_switch_spending_cost(selected_skill_switch)
+	local offshore_cost = self:get_unlock_skill_switch_offshore_cost(selected_skill_switch)
+	self:deduct_from_total(spending_cost)
+	self:deduct_from_offshore(offshore_cost)
+end
+
 function MoneyManager:total()
 	return Application:digest_value(self._global.total, false)
 end

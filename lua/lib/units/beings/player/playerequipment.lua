@@ -323,10 +323,11 @@ function PlayerEquipment:throw_grenade()
 	local pos = from + self._unit:movement():m_head_rot():y() * 30 + Vector3(0, 0, 0)
 	local dir = self._unit:movement():m_head_rot():y()
 	self._unit:sound():play("g43", nil, true)
+	local grenade_index = tweak_data.blackmarket:get_index_from_grenade_id(managers.blackmarket:equipped_grenade())
 	if Network:is_client() then
-		managers.network:session():send_to_host("server_throw_grenade", 1, pos, dir)
+		managers.network:session():send_to_host("server_throw_grenade", grenade_index, pos, dir)
 	else
-		GrenadeBase.server_throw_grenade(1, pos, dir, managers.network:session():local_peer():id())
+		GrenadeBase.server_throw_grenade(grenade_index, pos, dir, managers.network:session():local_peer():id())
 		managers.player:verify_grenade(managers.network:session():local_peer():id())
 	end
 	managers.player:on_throw_grenade()

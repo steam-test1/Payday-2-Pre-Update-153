@@ -391,8 +391,11 @@ function MenuComponentManager:input_focus()
 			return 1
 		end
 	end
-	if self._skilltree_gui and self._skilltree_gui:input_focus() then
-		return 1
+	if self._skilltree_gui then
+		local input_focus = self._skilltree_gui:input_focus()
+		if input_focus then
+			return input_focus
+		end
 	end
 	if self._infamytree_gui and self._infamytree_gui:input_focus() then
 		return 1
@@ -1747,12 +1750,25 @@ end
 function MenuComponentManager:create_skilltree_gui(node)
 	self:close_skilltree_gui()
 	self._skilltree_gui = SkillTreeGui:new(self._ws, self._fullscreen_ws, node)
+	self:enable_skilltree_gui()
 end
 
 function MenuComponentManager:close_skilltree_gui()
 	if self._skilltree_gui then
 		self._skilltree_gui:close()
 		self._skilltree_gui = nil
+	end
+end
+
+function MenuComponentManager:enable_skilltree_gui()
+	if self._skilltree_gui then
+		self._skilltree_gui:enable()
+	end
+end
+
+function MenuComponentManager:disable_skilltree_gui()
+	if self._skilltree_gui then
+		self._skilltree_gui:disable()
 	end
 end
 

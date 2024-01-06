@@ -13,17 +13,14 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 		return
 	end
 	local texture_load_result_clbk = async_clbk and callback(self, self, "clbk_texture_loaded", async_clbk)
-	local material = self._material
-	if not material then
+	if not self._materials then
 		local materials = self._unit:get_objects_by_type(Idstring("material"))
+		self._materials = {}
 		for _, m in ipairs(materials) do
 			if m:variable_exists(Idstring("tint_color_a")) then
-				material = m
-				break
+				table.insert(self._materials, m)
 			end
 		end
-		material = material or materials[#materials]
-		self._material = material
 	end
 	local tint_color_a = mvec1
 	local tint_color_b = mvec2
@@ -32,8 +29,6 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 	local color_data = tweak_data.blackmarket.colors[blueprint.color.id]
 	mvector3.set_static(tint_color_a, color_data.colors[1]:unpack())
 	mvector3.set_static(tint_color_b, color_data.colors[2]:unpack())
-	material:set_variable(Idstring("tint_color_a"), tint_color_a)
-	material:set_variable(Idstring("tint_color_b"), tint_color_b)
 	local old_pattern = self._textures.pattern and self._textures.pattern.name
 	local pattern = Idstring(tweak_data.blackmarket.textures[pattern_id].texture)
 	if old_pattern ~= pattern then
@@ -53,7 +48,11 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 		}
 	end
 	local material_amount = tweak_data.blackmarket.materials[material_id].material_amount or 1
-	material:set_variable(Idstring("material_amount"), material_amount)
+	for _, material in ipairs(self._materials) do
+		material:set_variable(Idstring("tint_color_a"), tint_color_a)
+		material:set_variable(Idstring("tint_color_b"), tint_color_b)
+		material:set_variable(Idstring("material_amount"), material_amount)
+	end
 	self._requesting = async_clbk and true
 	for tex_id, texture_data in pairs(self._textures) do
 		if not texture_data.ready then
@@ -63,7 +62,9 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 			else
 				new_texture = TextureCache:retrieve(texture_data.name, "normal")
 				texture_data.ready = true
-				material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+				for _, material in ipairs(self._materials) do
+					material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+				end
 				TextureCache:unretrieve(texture_data.name)
 			end
 		end
@@ -75,11 +76,16 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 end
 
 function MaskExt:clbk_texture_loaded(async_clbk, tex_name)
+	if not alive(self._unit) then
+		return
+	end
 	for tex_id, texture_data in pairs(self._textures) do
 		if not texture_data.ready and tex_name == texture_data.name then
 			texture_data.ready = true
 			local new_texture = TextureCache:retrieve(tex_name, "normal")
-			self._material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+			for _, material in ipairs(self._materials) do
+				material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+			end
 			TextureCache:unretrieve(tex_name)
 			TextureCache:unretrieve(tex_name)
 		end
@@ -96,7 +102,7 @@ function MaskExt:_chk_load_complete(async_clbk)
 			return
 		end
 	end
-	self._material = nil
+	self._materials = nil
 	async_clbk()
 end
 

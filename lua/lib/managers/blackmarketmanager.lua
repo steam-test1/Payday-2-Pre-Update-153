@@ -61,12 +61,14 @@ end
 function BlackMarketManager:_setup_grenades()
 	local grenades = {}
 	Global.blackmarket_manager.grenades = grenades
-	for grenade, _ in pairs(tweak_data.blackmarket.grenades) do
-		grenades[grenade] = {
-			unlocked = true,
-			equipped = false,
-			amount = 0
-		}
+	for grenade, data in pairs(tweak_data.blackmarket.grenades) do
+		if data.throwable then
+			grenades[grenade] = {
+				unlocked = true,
+				equipped = false,
+				amount = 0
+			}
+		end
 	end
 	grenades[self._defaults.grenade].equipped = true
 	grenades[self._defaults.grenade].unlocked = true
@@ -298,7 +300,7 @@ function BlackMarketManager:equipped_grenade()
 	local grenade
 	for grenade_id, data in pairs(tweak_data.blackmarket.grenades) do
 		grenade = Global.blackmarket_manager.grenades[grenade_id]
-		if grenade.equipped and grenade.unlocked then
+		if data.throwable and grenade.equipped and grenade.unlocked then
 			return grenade_id, grenade.amount or 0
 		end
 	end
@@ -508,6 +510,7 @@ function BlackMarketManager:equip_grenade(grenade_id)
 	for s, data in pairs(Global.blackmarket_manager.grenades) do
 		data.equipped = s == grenade_id
 	end
+	MenuCallbackHandler:_update_outfit_information()
 end
 
 function BlackMarketManager:equip_melee_weapon(melee_weapon_id)
@@ -654,6 +657,12 @@ function BlackMarketManager:outfit_string_index(type)
 	if type == "melee_weapon" then
 		return 14
 	end
+	if type == "throwable" then
+		return 15
+	end
+	if type == "skills" then
+		return 16
+	end
 end
 
 function BlackMarketManager:unpack_outfit_from_string(outfit_string)
@@ -686,9 +695,11 @@ function BlackMarketManager:unpack_outfit_from_string(outfit_string)
 		outfit.secondary.blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(outfit.secondary.factory_id)
 	end
 	outfit.melee_weapon = data[self:outfit_string_index("melee_weapon")] or self._defaults.melee_weapon
+	outfit.throwable = data[self:outfit_string_index("throwable")] or self._defaults.grenade
 	outfit.deployable = data[self:outfit_string_index("deployable")] or nil
 	outfit.deployable_amount = tonumber(data[self:outfit_string_index("deployable_amount")] or "0")
 	outfit.concealment_modifier = data[self:outfit_string_index("concealment_modifier")] or 0
+	outfit.skills = managers.skilltree:unpack_from_string(data[self:outfit_string_index("skills")])
 	return outfit
 end
 
@@ -732,6 +743,9 @@ function BlackMarketManager:outfit_string()
 	s = s .. " " .. tostring(concealment_modifier)
 	local equipped_melee_weapon = self:equipped_melee_weapon()
 	s = s .. " " .. tostring(equipped_melee_weapon)
+	local equipped_grenade = self:equipped_grenade()
+	s = s .. " " .. tostring(equipped_grenade)
+	s = s .. " " .. tostring(managers.skilltree:pack_to_string())
 	return s
 end
 
@@ -1022,10 +1036,10 @@ function BlackMarketManager:update(t, dt)
 				if is_load then
 					if next_in_line.part_id then
 					end
+					if self._preload_ws then
+						self._preload_ws:panel():script().step_progress()
+					end
 					if next_in_line.package then
-						if self._preload_ws then
-							self._preload_ws:panel():script().step_progress()
-						end
 						managers.weapon_factory:load_package(next_in_line.package)
 					else
 						managers.dyn_resource:load(Idstring("unit"), next_in_line.load_me.name, managers.dyn_resource.DYN_RESOURCES_PACKAGE, false)
@@ -4005,7 +4019,7 @@ function BlackMarketManager:_verfify_equipped_category(category)
 				grenade_id = grenade
 			end
 			local grenade_data = tweak_data.blackmarket.grenades[grenade] or {}
-			craft.amount = (not grenade_data.dlc or managers.dlc:has_dlc(grenade_data.dlc)) and managers.player:get_max_grenades() or 0
+			craft.amount = (not grenade_data.dlc or managers.dlc:is_dlc_unlocked(grenade_data.dlc)) and managers.player:get_max_grenades(grenade) or 0
 		end
 		for s, data in pairs(Global.blackmarket_manager.grenades) do
 			data.equipped = s == grenade_id
@@ -4205,6 +4219,45 @@ function BlackMarketManager:recoil_multiplier(name, category, silencer, blueprin
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_recoil_multiplier", 1))
 	end
 	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:check_frog_1()
+	if not managers.statistics or not managers.statistics:started_session_from_beginning() then
+		return false
+	end
+	local frog_1_memory = managers.job:get_memory("frog_1")
+	local is_correct_job = frog_1_memory ~= false and managers.job and managers.job:has_active_job() and (managers.job:current_real_job_id() == "hox" or managers.job:current_real_job_id() == "hox_prof") and Global.game_settings.difficulty == "overkill_145" and true or false
+	if is_correct_job then
+		local pass_skills, pass_primary, pass_secondary, pass_armor, peer, outfit
+		local all_members = managers.network:game() and managers.network:game():all_members() or {}
+		local all_passed = true
+		for id, member in pairs(all_members) do
+			peer = member:peer()
+			if all_passed and peer then
+				if peer:is_outfit_loaded() then
+					outfit = peer:blackmarket_outfit()
+					pass_skills = true
+					for tree, points in pairs(outfit.skills and outfit.skills.skills or {1}) do
+						if tonumber(points) > 0 then
+							pass_skills = false
+							break
+						end
+					end
+					pass_primary = outfit.primary.factory_id == "wpn_fps_ass_akm_gold"
+					pass_secondary = outfit.secondary.factory_id == "wpn_fps_smg_thompson"
+					pass_armor = outfit.armor == "level_1"
+					all_passed = pass_skills and pass_primary and pass_secondary and pass_armor and true or false
+				else
+					all_passed = false
+				end
+			end
+		end
+		frog_1_memory = all_passed
+		managers.job:set_memory("frog_1", frog_1_memory)
+		return frog_1_memory
+	end
+	managers.job:set_memory("frog_1", false)
+	return false
 end
 
 function BlackMarketManager:debug_inventory()

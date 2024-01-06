@@ -93,6 +93,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.chains = "chains"
 	self.masks.character_locked.jowi = "jw_shades"
 	self.masks.character_locked.old_hoxton = "old_hoxton"
+	self.masks.character_locked.female_1 = "msk_grizel"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -152,12 +153,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.chains_clean.infamous = true
 	self.masks.chains_clean.value = 9
 	self.masks.chains_clean.qlvl = 0
-	self.masks.old_hoxton = {}
-	self.masks.old_hoxton.unit = "units/pd2_dlc_old_hoxton/masks/old_hoxton/msk_old_hoxton"
-	self.masks.old_hoxton.name_id = "bm_msk_old_hoxton"
-	self.masks.old_hoxton.pcs = {}
-	self.masks.old_hoxton.value = 0
-	self.masks.old_hoxton.global_value = "infamous"
 	self.masks.dallas = {}
 	self.masks.dallas.unit = "units/payday2/masks/msk_dallas/msk_dallas"
 	self.masks.dallas.name_id = "bm_msk_dallas"
@@ -191,6 +186,12 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.chains.infamous = true
 	self.masks.chains.value = 7
+	self.masks.old_hoxton = {}
+	self.masks.old_hoxton.unit = "units/pd2_dlc_old_hoxton/masks/old_hoxton/msk_old_hoxton"
+	self.masks.old_hoxton.name_id = "bm_msk_old_hoxton"
+	self.masks.old_hoxton.pcs = {}
+	self.masks.old_hoxton.value = 0
+	self.masks.old_hoxton.global_value = "infamous"
 	self.masks.wolf = {}
 	self.masks.wolf.unit = "units/payday2/masks/msk_wolf/msk_wolf"
 	self.masks.wolf.name_id = "bm_msk_wolf"
@@ -1367,6 +1368,54 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.de_gaulle.value = 0
 	self.masks.de_gaulle.dlc = "gage_pack_historical"
 	self.masks.de_gaulle.texture_bundle_folder = "gage_pack_historical"
+	self.masks.msk_grizel = {}
+	self.masks.msk_grizel.unit = "units/pd2_dlc_clover/masks/msk_grizel/msk_grizel"
+	self.masks.msk_grizel.name_id = "bm_msk_msk_grizel"
+	self.masks.msk_grizel.pcs = {}
+	self.masks.msk_grizel.value = 0
+	self.masks.msk_grizel.dlc = "character_pack_clover"
+	self.masks.msk_grizel.texture_bundle_folder = "character_pack_clover"
+	self.masks.grizel_clean = {}
+	self.masks.grizel_clean.unit = "units/pd2_dlc_clover/masks/msk_clover_begins/msk_clover_begins"
+	self.masks.grizel_clean.name_id = "bm_msk_grizel_clean"
+	self.masks.grizel_clean.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.grizel_clean.value = 0
+	self.masks.grizel_clean.dlc = "character_pack_clover"
+	self.masks.grizel_clean.texture_bundle_folder = "character_pack_clover"
+	self.masks.medusa = {}
+	self.masks.medusa.unit = "units/pd2_indiana/masks/medusa/msk_medusa"
+	self.masks.medusa.name_id = "bm_msk_medusa"
+	self.masks.medusa.pcs = {}
+	self.masks.medusa.value = 0
+	self.masks.medusa.dlc = "hope_diamond"
+	self.masks.medusa.texture_bundle_folder = "character_pack_clover"
+	self.masks.anubis = {}
+	self.masks.anubis.unit = "units/pd2_indiana/masks/anubis/msk_anubis"
+	self.masks.anubis.name_id = "bm_msk_anubis"
+	self.masks.anubis.type = "helmet"
+	self.masks.anubis.pcs = {}
+	self.masks.anubis.value = 0
+	self.masks.anubis.dlc = "hope_diamond"
+	self.masks.anubis.texture_bundle_folder = "character_pack_clover"
+	self.masks.pazuzu = {}
+	self.masks.pazuzu.unit = "units/pd2_indiana/masks/pazuzu/msk_pazuzu"
+	self.masks.pazuzu.name_id = "bm_msk_pazuzu"
+	self.masks.pazuzu.pcs = {}
+	self.masks.pazuzu.value = 0
+	self.masks.pazuzu.dlc = "hope_diamond"
+	self.masks.pazuzu.texture_bundle_folder = "character_pack_clover"
+	self.masks.cursed_crown = {}
+	self.masks.cursed_crown.unit = "units/pd2_indiana/masks/msk_cursed_crown/msk_cursed_crown"
+	self.masks.cursed_crown.name_id = "bm_msk_cursed_crown"
+	self.masks.cursed_crown.pcs = {}
+	self.masks.cursed_crown.value = 0
+	self.masks.cursed_crown.dlc = "hope_diamond"
+	self.masks.cursed_crown.texture_bundle_folder = "character_pack_clover"
 	self.masks.area51 = {}
 	self.masks.area51.unit = "units/pd2_dlc_alienware/masks/area51/msk_area51"
 	self.masks.area51.name_id = "bm_msk_area51"
@@ -1434,6 +1483,16 @@ function BlackMarketTweakData:_init_characters()
 		dlc = "freed_old_hoxton",
 		locks = {dlc = "pd2_clan", achievement = "bulldog_1"}
 	}
+	self.characters.female_1 = {}
+	self.characters.female_1.fps_unit = "units/payday2/characters/fps_mover/fps_female_1_mover"
+	self.characters.female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/npc_criminal_female_1"
+	self.characters.female_1.menu_unit = "units/payday2/characters/npc_criminal_female_1/npc_criminal_female_1_menu"
+	self.characters.female_1.texture_bundle_folder = "character_pack_clover"
+	self.characters.female_1.sequence = "var_mtr_fem1"
+	self.characters.female_1.mask_on_sequence = "mask_on"
+	self.characters.female_1.mask_off_sequence = "mask_off"
+	self.characters.female_1.name_id = "bm_character_female_1"
+	self.characters.female_1.dlc = "character_pack_clover"
 	self.characters.ai_hoxton = {}
 	self.characters.ai_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/hoxton/npc_criminal_suit_hoxton"
 	self.characters.ai_hoxton.sequence = "var_mtr_hoxton"
@@ -1458,6 +1517,12 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_old_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/old_hoxton/npc_criminal_suit_old_hoxton"
 	self.characters.ai_old_hoxton.sequence = "var_mtr_old_hoxton"
 	self.characters.ai_old_hoxton.name_id = "bm_character_ai_old_hoxton"
+	self.characters.ai_female_1 = {}
+	self.characters.ai_female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/fem1/npc_criminal_female_fem1"
+	self.characters.ai_female_1.sequence = "var_mtr_fem1"
+	self.characters.ai_female_1.mask_on_sequence = "mask_on"
+	self.characters.ai_female_1.mask_off_sequence = "mask_off"
+	self.characters.ai_female_1.name_id = "bm_character_ai_female_1"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -3320,6 +3385,33 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.redsun.texture = "units/pd2_dlc_gage_historical/materials/matcap_redsun_df"
 	self.materials.redsun.value = 0
 	self.materials.redsun.dlc = "gage_pack_historical"
+	self.materials.diamond = {}
+	self.materials.diamond.name_id = "bm_mtl_diamond"
+	self.materials.diamond.pcs = {}
+	self.materials.diamond.texture = "units/pd2_indiana/materials/matcap_diamond_df"
+	self.materials.diamond.value = 0
+	self.materials.diamond.dlc = "hope_diamond"
+	self.materials.bandages = {}
+	self.materials.bandages.name_id = "bm_mtl_bandages"
+	self.materials.bandages.pcs = {}
+	self.materials.bandages.texture = "units/pd2_indiana/materials/matcap_bandages_df"
+	self.materials.bandages.material_amount = 0
+	self.materials.bandages.value = 0
+	self.materials.bandages.dlc = "hope_diamond"
+	self.materials.rust = {}
+	self.materials.rust.name_id = "bm_mtl_dark_rust"
+	self.materials.rust.pcs = {}
+	self.materials.rust.texture = "units/pd2_indiana/materials/matcap_rust_df"
+	self.materials.rust.material_amount = 0
+	self.materials.rust.value = 0
+	self.materials.rust.dlc = "hope_diamond"
+	self.materials.sand = {}
+	self.materials.sand.name_id = "bm_mtl_dark_sand"
+	self.materials.sand.pcs = {}
+	self.materials.sand.texture = "units/pd2_indiana/materials/matcap_sand_df"
+	self.materials.sand.material_amount = 0
+	self.materials.sand.value = 0
+	self.materials.sand.dlc = "hope_diamond"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -4831,6 +4923,30 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.filthythirteen.texture = "units/pd2_dlc_gage_historical/patterns/pattern_filthythirteen_df"
 	self.textures.filthythirteen.value = 0
 	self.textures.filthythirteen.dlc = "gage_pack_historical"
+	self.textures.hawkhelm = {}
+	self.textures.hawkhelm.name_id = "bm_txt_hawkhelm"
+	self.textures.hawkhelm.pcs = {}
+	self.textures.hawkhelm.texture = "units/pd2_indiana/patterns/pattern_hawkhelm_df"
+	self.textures.hawkhelm.value = 0
+	self.textures.hawkhelm.dlc = "hope_diamond"
+	self.textures.hieroglyphs = {}
+	self.textures.hieroglyphs.name_id = "bm_txt_hieroglyphs"
+	self.textures.hieroglyphs.pcs = {}
+	self.textures.hieroglyphs.texture = "units/pd2_indiana/patterns/pattern_hieroglyphs_df"
+	self.textures.hieroglyphs.value = 0
+	self.textures.hieroglyphs.dlc = "hope_diamond"
+	self.textures.horus = {}
+	self.textures.horus.name_id = "bm_txt_horus"
+	self.textures.horus.pcs = {}
+	self.textures.horus.texture = "units/pd2_indiana/patterns/pattern_horus_df"
+	self.textures.horus.value = 0
+	self.textures.horus.dlc = "hope_diamond"
+	self.textures.runes = {}
+	self.textures.runes.name_id = "bm_txt_runes"
+	self.textures.runes.pcs = {}
+	self.textures.runes.texture = "units/pd2_indiana/patterns/pattern_runes_df"
+	self.textures.runes.value = 0
+	self.textures.runes.dlc = "hope_diamond"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -5065,6 +5181,8 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
 	self.grenades.frag.icon = "frag_grenade"
 	self.grenades.frag.dlc = "gage_pack"
+	self.grenades.frag.throwable = true
+	self.grenades.frag.max_amount = 3
 	self.grenades.launcher_frag = {}
 	self.grenades.launcher_frag.name_id = "bm_launcher_frag"
 	self.grenades.launcher_frag.unit = "units/pd2_dlc_gage_assault/weapons/wpn_launcher_frag_grenade/wpn_launcher_frag_grenade"
@@ -5072,6 +5190,28 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.launcher_frag.no_cheat_count = true
 	self.grenades.launcher_frag.impact_detonation = true
 	self.grenades.launcher_frag.time_cheat = 1
+	self._grenades_index = {
+		"frag",
+		"launcher_frag"
+	}
+	self:_add_desc_from_name_macro(self.grenades)
+end
+
+function BlackMarketTweakData:get_grenades_index()
+	return self._grenades_index
+end
+
+function BlackMarketTweakData:get_index_from_grenade_id(grenade_id)
+	for index, entry_name in ipairs(self._grenades_index) do
+		if entry_name == grenade_id then
+			return index
+		end
+	end
+	return 0
+end
+
+function BlackMarketTweakData:get_grenade_name_from_index(index)
+	return self._grenades_index[index]
 end
 
 function BlackMarketTweakData:_init_melee_weapons()
@@ -5801,5 +5941,32 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.alien_maul.sounds.charge = "alpha_charge"
 	self.melee_weapons.alien_maul.melee_damage_delay = 0.2
 	self.melee_weapons.alien_maul.stats.concealment = 20
+	self.melee_weapons.shillelagh = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.shillelagh.name_id = "bm_melee_shillelagh"
+	self.melee_weapons.shillelagh.dlc = "character_pack_clover"
+	self.melee_weapons.shillelagh.texture_bundle_folder = "character_pack_clover"
+	self.melee_weapons.shillelagh.free = nil
+	self.melee_weapons.shillelagh.anim_global_param = "melee_axe"
+	self.melee_weapons.shillelagh.type = "knife"
+	self.melee_weapons.shillelagh.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.shillelagh.unit = "units/pd2_dlc_clover/weapons/wpn_fps_mel_shillelagh/wpn_fps_mel_shillelagh"
+	self.melee_weapons.shillelagh.third_unit = "units/pd2_dlc_clover/weapons/wpn_fps_mel_shillelagh/wpn_third_mel_shillelagh"
+	self.melee_weapons.shillelagh.stats.weapon_type = "sharp"
+	self.melee_weapons.shillelagh.stats.min_damage = 3.5
+	self.melee_weapons.shillelagh.stats.max_damage = 6.5
+	self.melee_weapons.shillelagh.stats.min_damage_effect = 4
+	self.melee_weapons.shillelagh.stats.max_damage_effect = 3
+	self.melee_weapons.shillelagh.stats.charge_time = 2
+	self.melee_weapons.shillelagh.stats.range = 185
+	self.melee_weapons.shillelagh.sounds = {}
+	self.melee_weapons.shillelagh.sounds.equip = "shillelagh_equip"
+	self.melee_weapons.shillelagh.sounds.hit_air = "baton_hit_air"
+	self.melee_weapons.shillelagh.sounds.hit_gen = "shillelagh_hit_gen"
+	self.melee_weapons.shillelagh.sounds.hit_body = "shillelagh_hit_body"
+	self.melee_weapons.shillelagh.sounds.charge = "baton_charge"
+	self.melee_weapons.shillelagh.repeat_expire_t = 0.8
+	self.melee_weapons.shillelagh.stats.concealment = 26
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

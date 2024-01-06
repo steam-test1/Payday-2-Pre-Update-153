@@ -126,7 +126,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.marked_enemy_extra_damage = {true}
 	self.values.player.marked_enemy_damage_mul = 1.15
 	self.values.cable_tie.interact_speed_multiplier = {0.25}
-	self.values.cable_tie.quantity = {4}
+	self.values.cable_tie.quantity_1 = {4}
 	self.values.cable_tie.can_cable_tie_doors = {true}
 	self.values.temporary.combat_medic_damage_multiplier = {
 		{1.25, 10},
@@ -418,7 +418,6 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.overkill_health_to_damage_multiplier = {0.66}
 	self.values.player.tased_recover_multiplier = {0.5}
-	self.values.player.armor_regen_timer_stand_still_multiplier = {0.9}
 	self.values.player.secured_bags_speed_multiplier = {1.02}
 	self.values.temporary.no_ammo_cost_buff = {
 		{true, 60}
@@ -513,6 +512,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.uncover_multiplier = {1.15}
 	self.values.player.passive_xp_multiplier = {1.45}
 	self.values.player.pick_up_ammo_multiplier_2 = {1.3}
+	self.values.cable_tie.quantity_2 = {4}
 	self.ecm_feedback_retrigger_interval = 240
 	self.ecm_feedback_retrigger_chance = 1
 	self.values.player.revive_damage_reduction_level = {1, 2}
@@ -563,6 +563,20 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.7, 5}
 	}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.4, 0.2}
+	self.values.player.armor_regen_timer_stand_still_multiplier = {0.8}
+	self.values.player.tier_dodge_chance = {
+		0.1,
+		0.15,
+		0.2
+	}
+	self.values.player.stand_still_crouch_camouflage_bonus = {
+		0.95,
+		0.9,
+		0.85
+	}
+	self.values.player.corpse_dispose_speed_multiplier = {0.8}
+	self.values.player.pick_lock_speed_multiplier = {0.8}
+	self.values.player.alarm_pager_speed_multiplier = {0.9}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1216,6 +1230,29 @@ function UpgradesTweakData:_init_pd2_values()
 			{"15%"},
 			{"5%", "20%"},
 			{"10%", "10%"}
+		},
+		{
+			{"10%"},
+			{"25%"},
+			{"10%", "20%"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{
+				"5%",
+				"5%",
+				"20%"
+			},
+			{"135%"},
+			{
+				"5%",
+				"5%",
+				"10%"
+			},
+			{"5%", "20%"},
+			{"20%", "10%"}
 		}
 	}
 	self.specialization_descs = {}
@@ -1331,7 +1368,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[24] = {
 		name_id = "weapons",
-		upgrades = {"model24"}
+		upgrades = {"model24", "l85a2"}
 	}
 	self.level_tree[26] = {
 		name_id = "weapons",
@@ -1377,6 +1414,10 @@ function UpgradesTweakData:init()
 	self.level_tree[36] = {
 		name_id = "weapons",
 		upgrades = {"p90", "deagle"}
+	}
+	self.level_tree[37] = {
+		name_id = "weapons",
+		upgrades = {"shillelagh"}
 	}
 	self.level_tree[39] = {
 		name_id = "weapons",
@@ -1669,6 +1710,7 @@ function UpgradesTweakData:init()
 	self:_sterling_definitions()
 	self:_mosin_definitions()
 	self:_m1928_definitions()
+	self:_l85a2_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -2601,6 +2643,87 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "damage_shake_addend",
+			value = 1
+		}
+	}
+	self.definitions.player_tier_dodge_chance_1 = {
+		category = "feature",
+		name_id = "menu_player_tier_dodge_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "tier_dodge_chance",
+			value = 1
+		}
+	}
+	self.definitions.player_tier_dodge_chance_2 = {
+		category = "feature",
+		name_id = "menu_player_tier_dodge_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "tier_dodge_chance",
+			value = 2
+		}
+	}
+	self.definitions.player_tier_dodge_chance_3 = {
+		category = "feature",
+		name_id = "menu_player_tier_dodge_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "tier_dodge_chance",
+			value = 3
+		}
+	}
+	self.definitions.player_stand_still_crouch_camouflage_bonus_1 = {
+		category = "feature",
+		name_id = "menu_player_stand_still_crouch_camouflage_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "stand_still_crouch_camouflage_bonus",
+			value = 1
+		}
+	}
+	self.definitions.player_stand_still_crouch_camouflage_bonus_2 = {
+		category = "feature",
+		name_id = "menu_player_stand_still_crouch_camouflage_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "stand_still_crouch_camouflage_bonus",
+			value = 2
+		}
+	}
+	self.definitions.player_stand_still_crouch_camouflage_bonus_3 = {
+		category = "feature",
+		name_id = "menu_player_stand_still_crouch_camouflage_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "stand_still_crouch_camouflage_bonus",
+			value = 3
+		}
+	}
+	self.definitions.player_pick_lock_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_player_pick_lock_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "pick_lock_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_corpse_dispose_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_player_corpse_dispose_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "corpse_dispose_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_alarm_pager_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_player_alarm_pager_speed_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "alarm_pager_speed_multiplier",
 			value = 1
 		}
 	}
@@ -4541,7 +4664,16 @@ function UpgradesTweakData:_cable_tie_definitions()
 		name_id = "menu_cable_tie_quantity",
 		upgrade = {
 			category = "cable_tie",
-			upgrade = "quantity",
+			upgrade = "quantity_1",
+			value = 1
+		}
+	}
+	self.definitions.cable_tie_quantity_2 = {
+		category = "equipment_upgrade",
+		name_id = "menu_cable_tie_quantity_2",
+		upgrade = {
+			category = "cable_tie",
+			upgrade = "quantity_2",
 			value = 1
 		}
 	}
@@ -5706,6 +5838,15 @@ function UpgradesTweakData:_m1928_definitions()
 	}
 end
 
+function UpgradesTweakData:_l85a2_definitions()
+	self.definitions.l85a2 = {
+		category = "weapon",
+		weapon_id = "l85a2",
+		factory_id = "wpn_fps_ass_l85a2",
+		dlc = "character_pack_clover"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -5812,6 +5953,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.alien_maul = {
 		category = "melee_weapon",
 		dlc = "alienware_alpha_promo"
+	}
+	self.definitions.shillelagh = {
+		category = "melee_weapon",
+		dlc = "character_pack_clover"
 	}
 end
 

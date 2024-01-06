@@ -156,7 +156,7 @@ function PlayerManager:_internal_load()
 	amount = self:has_grenade(peer_id) and self:get_grenade_amount(peer_id) or amount
 	self:_set_grenade({
 		grenade = grenade,
-		amount = math.min(amount, self:get_max_grenades())
+		amount = math.min(amount, self:get_max_grenades_by_peer_id(peer_id))
 	})
 	self:_set_body_bags_amount(self._local_player_body_bags or self:total_body_bags())
 	if self._respawn then
@@ -829,6 +829,7 @@ end
 
 function PlayerManager:skill_dodge_chance(running, crouching, on_zipline, override_armor, detection_risk)
 	local chance = self:upgrade_value("player", "passive_dodge_chance", 0)
+	chance = chance + self:upgrade_value("player", "tier_dodge_chance", 0)
 	if running then
 		chance = chance + self:upgrade_value("player", "run_dodge_chance", 0)
 	end
@@ -1816,6 +1817,9 @@ function PlayerManager:add_special(params)
 	local special_equipment = self._equipment.specials[name]
 	local amount = params.amount or equipment.quantity
 	local extra = self:_equipped_upgrade_value(equipment) + self:upgrade_value(name, "quantity")
+	if name == "cable_tie" then
+		extra = self:upgrade_value(name, "quantity_1") + self:upgrade_value(name, "quantity_2")
+	end
 	if special_equipment then
 		if equipment.quantity then
 			local dedigested_amount = Application:digest_value(special_equipment.amount, false)
@@ -1962,7 +1966,7 @@ function PlayerManager:add_grenade_amount(amount)
 	local peer_id = managers.network:session():local_peer():id()
 	local grenade = self._global.synced_grenades[peer_id].grenade
 	local icon = tweak_data.blackmarket.grenades[grenade].icon
-	amount = math.min(Application:digest_value(self._global.synced_grenades[peer_id].amount, false) + amount, self:get_max_grenades())
+	amount = math.min(Application:digest_value(self._global.synced_grenades[peer_id].amount, false) + amount, self:get_max_grenades_by_peer_id(peer_id))
 	managers.hud:set_teammate_grenades_amount(HUDManager.PLAYER_PANEL, {icon = icon, amount = amount})
 	self:update_grenades_amount_to_peers(grenade, amount)
 end
@@ -2010,13 +2014,19 @@ function PlayerManager:can_throw_grenade()
 	return self:get_grenade_amount(peer_id) > 0
 end
 
-function PlayerManager:get_max_grenades()
-	return tweak_data.upgrades.max_grenade_amount
+function PlayerManager:get_max_grenades_by_peer_id(peer_id)
+	local peer = managers.network:session() and managers.network:session():peer(peer_id)
+	return peer and self:get_max_grenades(peer:throwable_id()) or 0
+end
+
+function PlayerManager:get_max_grenades(grenade_id)
+	grenade_id = grenade_id or managers.blackmarket:equipped_grenade()
+	return tweak_data:get_raw_value("blackmarket", "grenades", grenade_id, "max_amount") or 0
 end
 
 function PlayerManager:got_max_grenades()
 	local peer_id = managers.network:session():local_peer():id()
-	return self:get_grenade_amount(peer_id) >= self:get_max_grenades()
+	return self:get_grenade_amount(peer_id) >= self:get_max_grenades_by_peer_id(peer_id)
 end
 
 function PlayerManager:has_grenade(peer_id)

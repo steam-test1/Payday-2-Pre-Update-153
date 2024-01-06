@@ -487,9 +487,10 @@ function StatisticsManager:_get_stat_tables()
 		"big",
 		"mia_1",
 		"mia_2",
-		"gallery",
 		"hox_1",
 		"hox_2",
+		"mus",
+		"gallery",
 		"haunted",
 		"pines"
 	}
@@ -525,9 +526,10 @@ function StatisticsManager:_get_stat_tables()
 		"big",
 		"mia",
 		"mia_prof",
-		"gallery",
 		"hox",
 		"hox_prof",
+		"mus",
+		"gallery",
 		"haunted",
 		"pines"
 	}
@@ -671,7 +673,15 @@ function StatisticsManager:_get_stat_tables()
 		"mrs_claus",
 		"strinch",
 		"robo_santa",
-		"almirs_beard"
+		"almirs_beard",
+		"msk_grizel",
+		"medusa",
+		"anubis",
+		"pazuzu",
+		"cursed_crown",
+		"nun_town",
+		"robo_arnold",
+		"arch_nemesis"
 	}
 	local weapon_list = {
 		"ak5",
@@ -736,7 +746,9 @@ function StatisticsManager:_get_stat_tables()
 		"mg42",
 		"c96",
 		"sterling",
-		"mosin"
+		"mosin",
+		"m1928",
+		"l85a2"
 	}
 	local melee_list = {
 		"weapon",
@@ -768,7 +780,8 @@ function StatisticsManager:_get_stat_tables()
 		"freedom",
 		"model24",
 		"swagger",
-		"alien_maul"
+		"alien_maul",
+		"shillelagh"
 	}
 	local enemy_list = {
 		"civilian",
@@ -918,21 +931,6 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		method = "set",
 		value = cash_found and 0 or 1
 	}
-	for weapon_name, weapon_data in pairs(session.shots_by_weapon) do
-		if 0 < weapon_data.total then
-			if table.contains(weapon_list, weapon_name) then
-				stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
-			else
-				Application:error("Statistics Missing: weapon_used_" .. weapon_name)
-			end
-		end
-	end
-	local melee_name = managers.blackmarket:equipped_melee_weapon()
-	if table.contains(melee_list, melee_name) then
-		stats["melee_used_" .. melee_name] = {type = "int", value = 1}
-	elseif melee_name then
-		Application:error("Statistics Missing: melee_used_" .. melee_name)
-	end
 	stats.gadget_used_ammo_bag = {
 		type = "int",
 		value = session.misc.deploy_ammo or 0
@@ -965,25 +963,42 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		type = "int",
 		value = session.misc.deploy_armorbag or 0
 	}
-	local mask_id = managers.blackmarket:equipped_mask().mask_id
-	if table.contains(mask_list, mask_id) then
-		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
-	elseif mask_id then
-		Application:error("Statistics Missing: mask_used_" .. mask_id)
+	if completion == "win_begin" or completion == "win_dropin" or completion == "fail" then
+		for weapon_name, weapon_data in pairs(session.shots_by_weapon) do
+			if 0 < weapon_data.total then
+				if table.contains(weapon_list, weapon_name) then
+					stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
+				else
+					Application:error("Statistics Missing: weapon_used_" .. weapon_name)
+				end
+			end
+		end
+		local melee_name = managers.blackmarket:equipped_melee_weapon()
+		if table.contains(melee_list, melee_name) then
+			stats["melee_used_" .. melee_name] = {type = "int", value = 1}
+		elseif melee_name then
+			Application:error("Statistics Missing: melee_used_" .. melee_name)
+		end
+		local mask_id = managers.blackmarket:equipped_mask().mask_id
+		if table.contains(mask_list, mask_id) then
+			stats["mask_used_" .. mask_id] = {type = "int", value = 1}
+		elseif mask_id then
+			Application:error("Statistics Missing: mask_used_" .. mask_id)
+		end
+		local armor_id = managers.blackmarket:equipped_armor()
+		if table.contains(armor_list, armor_id) then
+			stats["armor_used_" .. armor_id] = {type = "int", value = 1}
+		elseif armor_id then
+			Application:error("Statistics Missing: armor_used_" .. armor_id)
+		end
+		local character_id = managers.network:session() and managers.network:session():local_peer():character()
+		if table.contains(character_list, character_id) then
+			stats["character_used_" .. character_id] = {type = "int", value = 1}
+		elseif character_id then
+			Application:error("Statistics Missing: character_used_" .. character_id)
+		end
+		stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	end
-	local armor_id = managers.blackmarket:equipped_armor()
-	if table.contains(armor_list, armor_id) then
-		stats["armor_used_" .. armor_id] = {type = "int", value = 1}
-	elseif armor_id then
-		Application:error("Statistics Missing: armor_used_" .. armor_id)
-	end
-	local character_id = managers.network:session() and managers.network:session():local_peer():character()
-	if table.contains(character_list, character_id) then
-		stats["character_used_" .. character_id] = {type = "int", value = 1}
-	elseif character_id then
-		Application:error("Statistics Missing: character_used_" .. character_id)
-	end
-	stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	for weapon_name, weapon_data in pairs(session.killed_by_weapon) do
 		if 0 < weapon_data.count then
 			if table.contains(weapon_list, weapon_name) then
@@ -1041,6 +1056,11 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			stats.info_playing_fail_client = {type = "int", value = 1}
 		end
 	end
+	if completion == "win_begin" or completion == "win_dropin" then
+		stats.heist_success = {type = "int", value = 1}
+	elseif completion == "fail" then
+		stats.heist_failed = {type = "int", value = 1}
+	end
 	stats.info_playing_normal = {
 		type = "int",
 		method = "set",
@@ -1051,19 +1071,18 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		method = "set",
 		value = 0
 	}
-	stats.heist_success = {
-		type = "int",
-		value = success and 1 or 0
-	}
-	stats.heist_failed = {
-		type = "int",
-		value = success and 0 or 1
-	}
-	local level_id = managers.job:current_level_id()
-	if table.contains(level_list, level_id) then
-		stats["level_" .. level_id] = {type = "int", value = 1}
-	elseif level_id then
-		Application:error("Statistics Missing: level_" .. level_id)
+	if completion == "win_begin" or completion == "win_dropin" or completion == "fail" then
+		local level_id = managers.job:current_level_id()
+		if table.contains(level_list, level_id) then
+			stats["level_" .. level_id] = {type = "int", value = 1}
+		elseif level_id then
+			Application:error("Statistics Missing: level_" .. level_id)
+		end
+		if level_id == "election_day_2" then
+			local stealth = managers.groupai and managers.groupai:state():whisper_mode()
+			print("[StatisticsManager]: Election Day 2 Voting: " .. (stealth and "Swing Vote" or "Delayed Vote"))
+			stats["stats_election_day_" .. (stealth and "s" or "n")] = {type = "int", value = 1}
+		end
 	end
 	local job_id = managers.job:current_job_id()
 	if table.contains(job_list, job_id) then
@@ -1080,11 +1099,47 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		Application:error("Statistics Missing: contract_" .. job_id .. "_win_dropin")
 		Application:error("Statistics Missing: contract_" .. job_id .. "_fail")
 	end
-	if level_id == "election_day_2" then
-		local stealth = managers.groupai and managers.groupai:state():whisper_mode()
-		print("[StatisticsManager]: Election Day 2 Voting: " .. (stealth and "Swing Vote" or "Delayed Vote"))
-		stats["stats_election_day_" .. (stealth and "s" or "n")] = {type = "int", value = 1}
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:publish_level_to_steam()
+	if Application:editor() then
+		return
 	end
+	local stats = {}
+	local current_level = managers.experience:current_level()
+	stats.player_level = {
+		type = "int",
+		method = "set",
+		value = current_level
+	}
+	for i = 0, 100, 10 do
+		stats["player_level_" .. i] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	local level_range = 100 <= current_level and 100 or math.floor(current_level / 10) * 10
+	stats["player_level_" .. level_range] = {
+		type = "int",
+		method = "set",
+		value = 1
+	}
+	local current_rank = managers.experience:current_rank()
+	local current_rank_range = 5 < current_rank and 5 or current_rank
+	for i = 0, 5 do
+		stats["player_rank_" .. i] = {
+			type = "int",
+			method = "set",
+			value = 0
+		}
+	end
+	stats["player_rank_" .. current_rank_range] = {
+		type = "int",
+		method = "set",
+		value = 1
+	}
 	managers.network.account:publish_statistics(stats)
 end
 

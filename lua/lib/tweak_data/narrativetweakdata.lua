@@ -2144,6 +2144,74 @@ function NarrativeTweakData:init()
 		620000,
 		800000
 	}
+	self.jobs.mus = {}
+	self.jobs.mus.name_id = "heist_mus"
+	self.jobs.mus.briefing_id = "heist_mus_crimenet"
+	self.jobs.mus.contact = "the_dentist"
+	self.jobs.mus.region = "street"
+	self.jobs.mus.jc = 50
+	self.jobs.mus.chain = {
+		{
+			level_id = "mus",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.mus.briefing_event = "dentist_hd1_cbf_01"
+	self.jobs.mus.debrief_event = {
+		"dentist_hd1_debrief_01",
+		"dentist_hd1_debrief_02"
+	}
+	self.jobs.mus.crimenet_callouts = {
+		"dentist_hd1_cnc_01_01",
+		"dentist_hd1_cnc_01_02",
+		"dentist_hd1_cnc_01_03"
+	}
+	self.jobs.mus.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.mus.payout = {
+		8000,
+		16000,
+		40000,
+		80000,
+		100000
+	}
+	self.jobs.mus.dlc = "hope_diamond"
+	self.jobs.mus.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.mus_prof = deep_clone(self.jobs.mus)
+	self.jobs.mus_prof.jc = 70
+	self.jobs.mus_prof.professional = true
+	self.jobs.mus_prof.region = "professional"
+	self.jobs.mus_prof.payout = {
+		290000,
+		580000,
+		1450000,
+		2900000,
+		3800000
+	}
+	self.jobs.mus_prof.experience_mul = {
+		2,
+		2,
+		2,
+		2,
+		2
+	}
+	self.jobs.mus_prof.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -2185,7 +2253,8 @@ function NarrativeTweakData:init()
 		"gallery",
 		"hox",
 		"hox_prof",
-		"pines"
+		"pines",
+		"mus"
 	}
 	self:set_job_wrappers()
 end

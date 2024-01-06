@@ -291,6 +291,14 @@ function GenericDLCManager:has_hlm_game()
 	return Global.dlc_manager.all_dlc_data.hlm_game and Global.dlc_manager.all_dlc_data.hlm_game.verified
 end
 
+function GenericDLCManager:has_character_pack_clover()
+	return Global.dlc_manager.all_dlc_data.character_pack_clover and Global.dlc_manager.all_dlc_data.character_pack_clover.verified
+end
+
+function GenericDLCManager:has_hope_diamond()
+	return Global.dlc_manager.all_dlc_data.hope_diamond and Global.dlc_manager.all_dlc_data.hope_diamond.verified
+end
+
 function GenericDLCManager:has_xmas_soundtrack()
 	return Global.dlc_manager.all_dlc_data.xmas_soundtrack and Global.dlc_manager.all_dlc_data.xmas_soundtrack.verified
 end
@@ -574,6 +582,8 @@ function WINDLCManager:init()
 				no_install = true,
 				external = true
 			},
+			character_pack_clover = {app_id = "337661", no_install = true},
+			hope_diamond = {app_id = "337660", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			humble_pack2 = {app_id = "331040", no_install = true},

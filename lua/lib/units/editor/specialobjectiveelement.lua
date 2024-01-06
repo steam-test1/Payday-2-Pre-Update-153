@@ -44,6 +44,7 @@ function SpecialObjectiveUnitElement:init(unit)
 	self._hed.trigger_on = "none"
 	self._hed.interaction_voice = "none"
 	self._hed.SO_access = "0"
+	self._hed.test_unit = "default"
 	table.insert(self._save_values, "ai_group")
 	table.insert(self._save_values, "align_rotation")
 	table.insert(self._save_values, "align_position")
@@ -86,31 +87,35 @@ function SpecialObjectiveUnitElement:post_init()
 end
 
 function SpecialObjectiveUnitElement:test_element()
-	local SO_access_strings = managers.navigation:convert_access_filter_to_table(self._hed.SO_access)
 	local spawn_unit_name
-	for _, access_category in ipairs(SO_access_strings) do
-		if access_category == "civ_male" then
-			spawn_unit_name = Idstring("units/payday2/characters/civ_male_casual_1/civ_male_casual_1")
-			break
-		elseif access_category == "civ_female" then
-			spawn_unit_name = Idstring("units/payday2/characters/civ_female_casual_1/civ_female_casual_1")
-			break
-		elseif access_category == "spooc" then
-			spawn_unit_name = Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
-			break
-		elseif access_category == "shield" then
-			spawn_unit_name = Idstring("units/payday2/characters/ene_shield_2/ene_shield_2")
-			break
-		elseif access_category == "tank" then
-			spawn_unit_name = Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1")
-			break
-		elseif access_category == "taser" then
-			spawn_unit_name = Idstring("units/payday2/characters/ene_tazer_1/ene_tazer_1")
-			break
-		else
-			spawn_unit_name = Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
-			break
+	if self._hed.test_unit == "default" then
+		local SO_access_strings = managers.navigation:convert_access_filter_to_table(self._hed.SO_access)
+		for _, access_category in ipairs(SO_access_strings) do
+			if access_category == "civ_male" then
+				spawn_unit_name = Idstring("units/payday2/characters/civ_male_casual_1/civ_male_casual_1")
+				break
+			elseif access_category == "civ_female" then
+				spawn_unit_name = Idstring("units/payday2/characters/civ_female_casual_1/civ_female_casual_1")
+				break
+			elseif access_category == "spooc" then
+				spawn_unit_name = Idstring("units/payday2/characters/ene_spook_1/ene_spook_1")
+				break
+			elseif access_category == "shield" then
+				spawn_unit_name = Idstring("units/payday2/characters/ene_shield_2/ene_shield_2")
+				break
+			elseif access_category == "tank" then
+				spawn_unit_name = Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1")
+				break
+			elseif access_category == "taser" then
+				spawn_unit_name = Idstring("units/payday2/characters/ene_tazer_1/ene_tazer_1")
+				break
+			else
+				spawn_unit_name = Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
+				break
+			end
 		end
+	else
+		spawn_unit_name = self._hed.test_unit
 	end
 	spawn_unit_name = spawn_unit_name or Idstring("units/payday2/characters/ene_swat_1/ene_swat_1")
 	local enemy = safe_spawn_unit(spawn_unit_name, self._unit:position(), self._unit:rotation())
@@ -463,6 +468,9 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	}, "Used to specify an incremental chance to happen", "Chance incremental:")
 	self:_build_value_number(panel, panel_sizer, "action_duration_min", {floats = 2, min = 0}, "How long the character stays in his specified action.")
 	self:_build_value_number(panel, panel_sizer, "action_duration_max", {floats = 2, min = 0}, "How long the character stays in his specified action. Zero means indefinitely.")
+	local test_units = table.list_add(SpawnCivilianUnitElement._options, SpawnEnemyUnitElement._options)
+	table.insert(test_units, 1, "default")
+	self:_build_value_combobox(panel, panel_sizer, "test_unit", test_units, "Select the unit to be used when testing.")
 end
 
 function SpecialObjectiveUnitElement:add_to_mission_package()

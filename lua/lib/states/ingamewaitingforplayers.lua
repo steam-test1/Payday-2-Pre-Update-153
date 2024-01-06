@@ -364,6 +364,7 @@ function IngameWaitingForPlayersState:at_exit()
 	managers.game_play_central:start_heist_timer()
 	if not Network:is_server() and managers.network:session() and managers.network:session():server_peer() then
 		managers.network:session():server_peer():verify_job(managers.job:current_job_id())
+		managers.network:session():server_peer():verify_character()
 	end
 end
 

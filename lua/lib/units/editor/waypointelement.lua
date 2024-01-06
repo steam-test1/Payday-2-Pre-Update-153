@@ -23,7 +23,8 @@ function WaypointUnitElement:init(unit)
 		"pd2_goto",
 		"pd2_ladder",
 		"pd2_fix",
-		"pd2_question"
+		"pd2_question",
+		"pd2_defend"
 	}
 	self._hed.icon = "pd2_goto"
 	self._hed.text_id = "debug_none"

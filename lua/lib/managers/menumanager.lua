@@ -957,6 +957,9 @@ function MenuManager:do_clear_progress()
 		Global.game_settings.difficulty = "overkill"
 	end
 	managers.user:set_setting("mask_set", "clowns")
+	if SystemInfo:platform() == Idstring("WIN32") then
+		managers.statistics:publish_level_to_steam()
+	end
 end
 
 function MenuManager:on_user_sign_out()
@@ -1038,6 +1041,16 @@ function MenuCallbackHandler:dlc_buy_armadillo_pc()
 	Steam:overlay_activate("store", 264610)
 end
 
+function MenuCallbackHandler:dlc_buy_character_pack_clover_pc()
+	print("[MenuCallbackHandler:dlc_buy_character_pack_clover_pc]")
+	Steam:overlay_activate("store", 337661)
+end
+
+function MenuCallbackHandler:dlc_buy_hope_diamond_pc()
+	print("[MenuCallbackHandler:dlc_buy_hope_diamond_pc]")
+	Steam:overlay_activate("store", 337660)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1073,6 +1086,8 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"hope_diamond",
+		"character_pack_clover",
 		"gage_pack_historical",
 		"hl_miami",
 		"gage_pack_assault",
@@ -1145,6 +1160,14 @@ end
 
 function MenuCallbackHandler:visible_callback_gage_pack_historical()
 	return self:is_dlc_latest_locked("gage_pack_historical")
+end
+
+function MenuCallbackHandler:visible_callback_character_pack_clover()
+	return self:is_dlc_latest_locked("character_pack_clover")
+end
+
+function MenuCallbackHandler:visible_callback_hope_diamond()
+	return self:is_dlc_latest_locked("hope_diamond")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -2052,6 +2075,9 @@ function MenuCallbackHandler:_increase_infamous()
 	managers.savefile:save_progress()
 	managers.savefile:save_setting(true)
 	self._sound_source:post_event("infamous_player_join_stinger")
+	if SystemInfo:platform() == Idstring("WIN32") then
+		managers.statistics:publish_level_to_steam()
+	end
 end
 
 function MenuCallbackHandler:become_infamous(params)
@@ -2387,7 +2413,7 @@ function MenuCallbackHandler:mute_xbox_player(item)
 end
 
 function MenuCallbackHandler:restart_level(item)
-	if not managers.vote:available() then
+	if not managers.vote:available() or managers.vote:is_restarting() then
 		return
 	end
 	local dialog_data = {}
@@ -2901,6 +2927,12 @@ function PauseMenu:modify_node(node)
 	if item then
 		item:set_enabled(managers.vote:available())
 		item:set_parameter("help_id", managers.vote:help_text() or "")
+	end
+	if managers.vote:is_restarting() then
+		item = node:item("restart_level")
+		if item then
+			item:set_enabled(false)
+		end
 	end
 	return node
 end
@@ -6403,6 +6435,144 @@ function MenuOptionInitiator:modify_network_options(node)
 		net_use_compression_item:set_value(net_use_compression_value)
 	end
 	return node
+end
+
+SkillSwitchInitiator = SkillSwitchInitiator or class()
+
+function SkillSwitchInitiator:modify_node(node, data)
+	node:clean_items()
+	local hightlight_color, row_item_color, callback
+	self:create_divider(node, "title", "menu_st_skill_switch_title_name", nil, tweak_data.screen_colors.text)
+	for skill_switch, data in ipairs(Global.skilltree_manager.skill_switches) do
+		hightlight_color = nil
+		row_item_color = nil
+		callback = nil
+		local unlocked = data.unlocked
+		local can_unlock = managers.skilltree:can_unlock_skill_switch(skill_switch)
+		if unlocked then
+			if managers.skilltree:get_selected_skill_switch() == skill_switch then
+				hightlight_color = tweak_data.screen_colors.text
+				row_item_color = tweak_data.screen_colors.text
+				callback = "menu_back"
+			else
+				hightlight_color = tweak_data.screen_colors.button_stage_2
+				row_item_color = tweak_data.screen_colors.button_stage_3
+				callback = "set_active_skill_switch"
+			end
+		elseif can_unlock then
+			hightlight_color = tweak_data.screen_colors.button_stage_2
+			row_item_color = tweak_data.screen_colors.button_stage_3
+			callback = "unlock_skill_switch"
+		else
+			hightlight_color = tweak_data.screen_colors.important_1
+			row_item_color = tweak_data.screen_colors.important_2
+		end
+		self:create_item(node, {
+			name = skill_switch,
+			text_id = data.unlocked and managers.skilltree:get_skill_switch_name(skill_switch, true) or managers.localization:to_upper_text("menu_st_locked_skill_switch"),
+			enabled = unlocked or can_unlock,
+			disabled_color = row_item_color,
+			localize = false,
+			callback = callback,
+			hightlight_color = hightlight_color,
+			row_item_color = row_item_color
+		})
+	end
+	self:create_divider(node, "back_div")
+	self:add_back_button(node)
+	node:set_default_item_name(1)
+	return node
+end
+
+function SkillSwitchInitiator:refresh_node(node, data)
+	local selected_item = node:selected_item() and node:selected_item():name()
+	node = self:modify_node(node, data)
+	if selected_item then
+		node:select_item(selected_item)
+	end
+	return node
+end
+
+function SkillSwitchInitiator:create_item(node, params)
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	new_item:set_enabled(params.enabled)
+	node:add_item(new_item)
+end
+
+function SkillSwitchInitiator:create_divider(node, id, text_id, size, color)
+	local params = {
+		name = "divider_" .. id,
+		no_text = not text_id,
+		text_id = text_id,
+		size = size or 8,
+		color = color
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+function SkillSwitchInitiator:add_back_button(node)
+	node:delete_item("back")
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		align = "right",
+		previous_node = true
+	}
+	local new_item = node:create_item(nil, params)
+	node:add_item(new_item)
+end
+
+function MenuCallbackHandler:unlock_skill_switch(item)
+	local spending_cost = managers.money:get_unlock_skill_switch_spending_cost(item:parameters().name)
+	local offshore_cost = managers.money:get_unlock_skill_switch_offshore_cost(item:parameters().name)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_unlock_skill_switch_title")
+	local cost_text = ""
+	if spending_cost ~= 0 and offshore_cost ~= 0 then
+		cost_text = managers.localization:text("dialog_unlock_skill_switch_spending_offshore", {
+			spending = managers.experience:cash_string(spending_cost),
+			offshore = managers.experience:cash_string(offshore_cost)
+		})
+	elseif spending_cost ~= 0 then
+		cost_text = managers.localization:text("dialog_unlock_skill_switch_spending", {
+			spending = managers.experience:cash_string(spending_cost)
+		})
+	elseif offshore_cost ~= 0 then
+		cost_text = managers.localization:text("dialog_unlock_skill_switch_offshore", {
+			offshore = managers.experience:cash_string(offshore_cost)
+		})
+	else
+		cost_text = managers.localization:text("dialog_unlock_skill_switch_free")
+	end
+	dialog_data.text = managers.localization:text("dialog_unlock_skill_switch", {cost_text = cost_text})
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	
+	function yes_button.callback_func()
+		managers.skilltree:on_skill_switch_unlocked(item:parameters().name)
+		self:refresh_node()
+	end
+	
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	
+	function no_button.callback_func()
+		self:refresh_node()
+	end
+	
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuCallbackHandler:set_active_skill_switch(item)
+	managers.skilltree:switch_skills(item:parameters().name)
+	self:refresh_node()
 end
 
 function MenuCallbackHandler:has_installed_mods()

@@ -75,6 +75,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_sterling_npc()
 	self:_init_data_mosin_npc()
 	self:_init_data_m1928_npc()
+	self:_init_data_l85a2_npc()
 	self:_precalculate_values()
 end
 
@@ -1192,6 +1193,21 @@ function WeaponTweakData:_init_data_m1928_npc()
 	self.m1928_npc.hold = "rifle"
 	self.m1928_npc.alert_size = 5000
 	self.m1928_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_l85a2_npc()
+	self.l85a2_npc.sounds.prefix = "l85_npc"
+	self.l85a2_npc.use_data.selection_index = 1
+	self.l85a2_npc.DAMAGE = 2
+	self.l85a2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.l85a2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.l85a2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.l85a2_npc.CLIP_AMMO_MAX = 30
+	self.l85a2_npc.NR_CLIPS_MAX = 5
+	self.l85a2_npc.auto.fire_rate = 20
+	self.l85a2_npc.hold = "rifle"
+	self.l85a2_npc.alert_size = 5000
+	self.l85a2_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7095,6 +7111,95 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 9
 	}
+	self.l85a2 = {}
+	self.l85a2.category = "assault_rifle"
+	self.l85a2.damage_melee = damage_melee_default
+	self.l85a2.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.l85a2.sounds = {}
+	self.l85a2.sounds.fire = "l85_fire_single"
+	self.l85a2.sounds.fire_single = "l85_fire_single"
+	self.l85a2.sounds.fire_auto = "l85_fire"
+	self.l85a2.sounds.stop_fire = "l85_stop"
+	self.l85a2.sounds.dryfire = "primary_dryfire"
+	self.l85a2.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.l85a2.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.l85a2.timers = {}
+	self.l85a2.timers.reload_not_empty = 3.5
+	self.l85a2.timers.reload_empty = 4.5
+	self.l85a2.timers.unequip = 0.9
+	self.l85a2.timers.equip = 0.9
+	self.l85a2.name_id = "bm_w_l85a2"
+	self.l85a2.desc_id = "bm_w_l85a2_desc"
+	self.l85a2.description_id = "des_l85a2"
+	self.l85a2.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.l85a2.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.l85a2.use_data = {}
+	self.l85a2.use_data.selection_index = 2
+	self.l85a2.DAMAGE = 1
+	self.l85a2.CLIP_AMMO_MAX = 30
+	self.l85a2.NR_CLIPS_MAX = 6
+	self.l85a2.AMMO_MAX = self.l85a2.CLIP_AMMO_MAX * self.l85a2.NR_CLIPS_MAX
+	self.l85a2.AMMO_PICKUP = self:_pickup_chance(90, 1.5)
+	self.l85a2.FIRE_MODE = "auto"
+	self.l85a2.fire_mode_data = {}
+	self.l85a2.fire_mode_data.fire_rate = 0.083
+	self.l85a2.CAN_TOGGLE_FIREMODE = true
+	self.l85a2.auto = {}
+	self.l85a2.auto.fire_rate = 0.083
+	self.l85a2.spread = {}
+	self.l85a2.spread.standing = 2.8
+	self.l85a2.spread.crouching = 2.6
+	self.l85a2.spread.steelsight = 1
+	self.l85a2.spread.moving_standing = 3.2
+	self.l85a2.spread.moving_crouching = 3.1
+	self.l85a2.spread.moving_steelsight = 3.5
+	self.l85a2.kick = {}
+	self.l85a2.kick.standing = {
+		0.8,
+		1.1,
+		-1.2,
+		1.2
+	}
+	self.l85a2.kick.crouching = self.l85a2.kick.standing
+	self.l85a2.kick.steelsight = self.l85a2.kick.standing
+	self.l85a2.crosshair = {}
+	self.l85a2.crosshair.standing = {}
+	self.l85a2.crosshair.crouching = {}
+	self.l85a2.crosshair.steelsight = {}
+	self.l85a2.crosshair.standing.offset = 0.16
+	self.l85a2.crosshair.standing.moving_offset = 1
+	self.l85a2.crosshair.standing.kick_offset = 0.8
+	self.l85a2.crosshair.crouching.offset = 0.1
+	self.l85a2.crosshair.crouching.moving_offset = 0.6
+	self.l85a2.crosshair.crouching.kick_offset = 0.4
+	self.l85a2.crosshair.steelsight.hidden = true
+	self.l85a2.crosshair.steelsight.offset = 0
+	self.l85a2.crosshair.steelsight.moving_offset = 0
+	self.l85a2.crosshair.steelsight.kick_offset = 0.14
+	self.l85a2.shake = {}
+	self.l85a2.shake.fire_multiplier = 0.4
+	self.l85a2.shake.fire_steelsight_multiplier = -0.4
+	self.l85a2.autohit = autohit_rifle_default
+	self.l85a2.aim_assist = aim_assist_rifle_default
+	self.l85a2.weapon_hold = "l85a2"
+	self.l85a2.animations = {}
+	self.l85a2.animations.equip_id = "equip_l85a2"
+	self.l85a2.animations.recoil_steelsight = true
+	self.l85a2.global_value = "character_pack_clover"
+	self.l85a2.texture_bundle_folder = "character_pack_clover"
+	self.l85a2.stats = {
+		damage = 14,
+		spread = 7,
+		recoil = 10,
+		spread_moving = 6,
+		zoom = 1,
+		concealment = 16,
+		suppression = 12,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -7619,6 +7724,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.l85a2_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -7696,4 +7807,5 @@ function WeaponTweakData:_precalculate_values()
 	self.sterling_npc.AMMO_MAX = self.sterling_npc.CLIP_AMMO_MAX * self.sterling_npc.NR_CLIPS_MAX
 	self.mosin_npc.AMMO_MAX = self.mosin_npc.CLIP_AMMO_MAX * self.mosin_npc.NR_CLIPS_MAX
 	self.m1928_npc.AMMO_MAX = self.m1928_npc.CLIP_AMMO_MAX * self.m1928_npc.NR_CLIPS_MAX
+	self.l85a2_npc.AMMO_MAX = self.l85a2_npc.CLIP_AMMO_MAX * self.l85a2_npc.NR_CLIPS_MAX
 end

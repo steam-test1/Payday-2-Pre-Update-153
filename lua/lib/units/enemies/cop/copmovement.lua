@@ -61,6 +61,9 @@ CopMovement._gadgets = {
 	bbq_fork = {
 		Idstring("units/world/props/barbecue/bbq_fork")
 	},
+	loot_bag = {
+		Idstring("units/pd2_cinematics/props/gen_cs_trailer_lootbag/gen_cs_trailer_lootbag")
+	},
 	money_bag = {
 		Idstring("units/world/architecture/secret_stash/luggage_bag/secret_stash_luggage_bag")
 	},
@@ -317,6 +320,7 @@ function CopMovement:set_character_anim_variables()
 		self._machine:set_global("female", 1)
 	end
 	if self._tweak_data.allowed_stances and not self._tweak_data.allowed_stances.ntl then
+		self:set_cool(false)
 		if self._tweak_data.allowed_stances.hos then
 			self:_change_stance(2)
 		else
@@ -835,7 +839,11 @@ function CopMovement:set_cool(state, giveaway)
 	if not state and old_state then
 		self._not_cool_t = TimerManager:game():time()
 		if Network:is_server() and self._stance.name == "ntl" then
-			self:set_stance("hos", nil, nil)
+			if not self._tweak_data.allowed_stances or self._tweak_data.allowed_stances.hos then
+				self:set_stance("hos", nil, nil)
+			elseif self._tweak_data.allowed_stances.cbt then
+				self:set_stance("cbt", nil, nil)
+			end
 		end
 		if self._unit:unit_data().mission_element and not self._unit:unit_data().alerted_event_called then
 			self._unit:unit_data().alerted_event_called = true
@@ -1531,7 +1539,6 @@ function CopMovement:save(save_data)
 end
 
 function CopMovement:load(load_data)
-	print("[CopMovement:load]", self._unit)
 	local my_load_data = load_data.movement
 	if not my_load_data then
 		return

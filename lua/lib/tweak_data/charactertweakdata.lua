@@ -33,6 +33,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_american(presets)
 	self:_init_jowi(presets)
 	self:_init_old_hoxton(presets)
+	self:_init_clover(presets)
 	self:_init_old_hoxton_mission(presets)
 end
 
@@ -1368,6 +1369,27 @@ function CharacterTweakData:_init_old_hoxton(presets)
 	self.old_hoxton.weapon_voice = "3"
 	self.old_hoxton.access = "teamAI1"
 	self.old_hoxton.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_clover(presets)
+	self.female_1 = {}
+	self.female_1.damage = presets.gang_member_damage
+	self.female_1.weapon = deep_clone(presets.weapon.gang_member)
+	self.female_1.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11")
+	}
+	self.female_1.detection = presets.detection.gang_member
+	self.female_1.move_speed = presets.move_speed.fast
+	self.female_1.crouch_move = false
+	self.female_1.speech_prefix = "rb7"
+	self.female_1.weapon_voice = "3"
+	self.female_1.access = "teamAI1"
+	self.female_1.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240

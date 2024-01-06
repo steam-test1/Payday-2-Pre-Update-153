@@ -1,14 +1,10 @@
 local tmp_vec3 = Vector3()
 GrenadeBase = GrenadeBase or class(UnitBase)
-GrenadeBase.types = {
-	"frag",
-	"launcher_frag"
-}
 GrenadeBase.EVENT_IDS = {detonate = 1}
 GrenadeBase.time_cheat = {}
 
 function GrenadeBase.server_throw_grenade(grenade_type, pos, dir, owner_peer_id)
-	local grenade_entry = GrenadeBase.types[grenade_type]
+	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
 	if not GrenadeBase.check_time_cheat(grenade_type, owner_peer_id) then
 		return
 	end
@@ -34,7 +30,7 @@ function GrenadeBase.check_time_cheat(grenade_type, owner_peer_id)
 	if not owner_peer_id then
 		return true
 	end
-	local grenade_entry = GrenadeBase.types[grenade_type]
+	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
 	if tweak_data.blackmarket.grenades[grenade_entry].time_cheat then
 		GrenadeBase.time_cheat[grenade_type] = GrenadeBase.time_cheat[grenade_type] or {}
 		if GrenadeBase.time_cheat[grenade_type][owner_peer_id] and GrenadeBase.time_cheat[grenade_type][owner_peer_id] > Application:time() then
@@ -74,7 +70,7 @@ function GrenadeBase:set_grenade_entry(grenade_entry)
 end
 
 function GrenadeBase:grenade_entry()
-	return self._grenade_entry or GrenadeBase.types[1]
+	return self._grenade_entry or tweak_data.blackmarket:get_grenade_name_from_index(1)
 end
 
 local mvec1 = Vector3()
@@ -191,7 +187,7 @@ function GrenadeBase._dispose_of_sound(...)
 end
 
 function GrenadeBase:sync_throw_grenade(dir, grenade_type)
-	local grenade_entry = GrenadeBase.types[grenade_type]
+	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
 	self:throw({dir = dir, grenade_entry = grenade_entry})
 end
 

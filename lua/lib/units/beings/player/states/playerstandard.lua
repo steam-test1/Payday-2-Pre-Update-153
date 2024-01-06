@@ -2340,6 +2340,10 @@ function PlayerStandard:running()
 	return self._running
 end
 
+function PlayerStandard:ducking()
+	return self._state_data and self._state_data.ducking
+end
+
 function PlayerStandard:get_zoom_fov(stance_data)
 	local fov = stance_data and stance_data.FOV or 75
 	local fov_multiplier = managers.user:get_setting("fov_multiplier")

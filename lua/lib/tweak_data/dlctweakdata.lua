@@ -17,6 +17,7 @@ function DLCTweakData:init(tweak_data)
 		gage_pack_assault = true,
 		hl_miami = true,
 		gage_pack_historical = true,
+		character_pack_clover = true,
 		alienware_alpha = true,
 		season_pass = true,
 		animal = true
@@ -2238,6 +2239,135 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "almirs_beard",
+			amount = 1
+		}
+	}
+	self.character_pack_clover = {}
+	self.character_pack_clover.content = {}
+	self.character_pack_clover.dlc = "has_character_pack_clover"
+	self.character_pack_clover.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "msk_grizel",
+			amount = 1
+		},
+		{
+			{
+				type_items = "weapon_mods",
+				item_entry = "wpn_fps_ass_l85a2_m_emag",
+				amount = 1
+			},
+			{
+				type_items = "weapon_mods",
+				item_entry = "wpn_fps_ass_l85a2_fg_short",
+				amount = 1
+			},
+			{
+				type_items = "weapon_mods",
+				item_entry = "wpn_fps_ass_l85a2_g_worn",
+				amount = 1
+			},
+			{
+				type_items = "weapon_mods",
+				item_entry = "wpn_fps_ass_l85a2_b_long",
+				amount = 1
+			},
+			{
+				type_items = "weapon_mods",
+				item_entry = "wpn_fps_ass_l85a2_b_short",
+				amount = 1
+			}
+		}
+	}
+	self.hope_diamond = {}
+	self.hope_diamond.content = {}
+	self.hope_diamond.dlc = "has_hope_diamond"
+	self.hope_diamond.content.loot_drops = {}
+	self.ach_bat_2 = {}
+	self.ach_bat_2.dlc = "has_achievement"
+	self.ach_bat_2.achievement_id = "bat_2"
+	self.ach_bat_2.content = {}
+	self.ach_bat_2.content.loot_global_value = "hope_diamond"
+	self.ach_bat_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "cursed_crown",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "sand",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hieroglyphs",
+			amount = 1
+		}
+	}
+	self.ach_bat_3 = {}
+	self.ach_bat_3.dlc = "has_achievement"
+	self.ach_bat_3.achievement_id = "bat_3"
+	self.ach_bat_3.content = {}
+	self.ach_bat_3.content.loot_global_value = "hope_diamond"
+	self.ach_bat_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "medusa",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rust",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "runes",
+			amount = 1
+		}
+	}
+	self.ach_bat_4 = {}
+	self.ach_bat_4.dlc = "has_achievement"
+	self.ach_bat_4.achievement_id = "bat_4"
+	self.ach_bat_4.content = {}
+	self.ach_bat_4.content.loot_global_value = "hope_diamond"
+	self.ach_bat_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pazuzu",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "diamond",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "horus",
+			amount = 1
+		}
+	}
+	self.ach_bat_6 = {}
+	self.ach_bat_6.dlc = "has_achievement"
+	self.ach_bat_6.achievement_id = "bat_6"
+	self.ach_bat_6.content = {}
+	self.ach_bat_6.content.loot_global_value = "hope_diamond"
+	self.ach_bat_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "anubis",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "bandages",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hawkhelm",
 			amount = 1
 		}
 	}

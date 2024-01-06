@@ -31,6 +31,10 @@ ContourExt._types = {
 		color = tweak_data.contour.character.friendly_color
 	},
 	drunk_pilot = {priority = 5},
+	taxman = {
+		priority = 5,
+		color = tweak_data.contour.character_interactable.standard_color
+	},
 	mark_unit = {
 		priority = 4,
 		color = tweak_data.contour.character.dangerous_color,

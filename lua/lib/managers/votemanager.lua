@@ -26,7 +26,8 @@ VoteManager.REASON = {
 	wrong_equipment = 6,
 	invalid_job = 7,
 	invalid_mask = 8,
-	invalid_weapon = 9
+	invalid_weapon = 9,
+	invalid_character = 10
 }
 
 function VoteManager:init()
@@ -38,11 +39,13 @@ end
 
 function VoteManager:kick_auto(reason, peer, loading)
 	if Network:is_server() then
-		if not loading then
-			managers.network:session():send_to_peers("kick_peer", peer:id(), 0)
-			managers.network:session():on_peer_kicked(peer, peer:id(), 0)
+		if not peer:is_host() then
+			if not loading then
+				managers.network:session():send_to_peers("kick_peer", peer:id(), 0)
+				managers.network:session():on_peer_kicked(peer, peer:id(), 0)
+			end
+			managers.network:session():send_to_peers_except(peer:id(), "voting_data", self.VOTE_EVENT.instant_kick, peer:id(), reason)
 		end
-		managers.network:session():send_to_peers_except(peer:id(), "voting_data", self.VOTE_EVENT.instant_kick, peer:id(), reason)
 	elseif managers.network:session():local_peer() then
 		managers.network:session():on_peer_kicked(managers.network:session():local_peer(), managers.network:session():local_peer():id(), 4)
 	end
@@ -90,9 +93,14 @@ function VoteManager:kick_reason_to_string(reason)
 		Network:is_server() and "menu_chat_peer_cheated_wrong_equipment_server" or "menu_chat_peer_cheated_wrong_equipment",
 		"menu_chat_peer_cheated_invalid_job",
 		"menu_chat_peer_cheated_invalid_mask",
-		"menu_chat_peer_cheated_invalid_weapon"
+		"menu_chat_peer_cheated_invalid_weapon",
+		"menu_chat_peer_cheated_invalid_character"
 	}
 	return reason_texts[reason]
+end
+
+function VoteManager:is_restarting()
+	return self._callback_type == "restart"
 end
 
 function VoteManager:_request_vote(vote_type, vote_network, peer_id)

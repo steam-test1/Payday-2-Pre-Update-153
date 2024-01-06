@@ -628,6 +628,16 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.bag_zipline.prio = 1
 	self.types.bag_zipline.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_zipline")
 	self.types.bag_zipline.budget_cost = 2
+	self.types.bag_zipline_stealth_only = {}
+	self.types.bag_zipline_stealth_only.name_id = "menu_pp_asset_bag_zipline_stealth_only"
+	self.types.bag_zipline_stealth_only.desc_id = "menu_pp_asset_bag_zipline_stealth_only_desc"
+	self.types.bag_zipline_stealth_only.category = "mission_equipment"
+	self.types.bag_zipline_stealth_only.icon = 34
+	self.types.bag_zipline_stealth_only.total = 1
+	self.types.bag_zipline_stealth_only.post_event = "gus_preplan_16"
+	self.types.bag_zipline_stealth_only.prio = 1
+	self.types.bag_zipline_stealth_only.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_zipline")
+	self.types.bag_zipline_stealth_only.budget_cost = 2
 	self.types.loot_drop_off = {}
 	self.types.loot_drop_off.name_id = "menu_pp_asset_loot_drop_off"
 	self.types.loot_drop_off.desc_id = "menu_pp_asset_loot_drop_off_desc"
@@ -638,6 +648,16 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.loot_drop_off.prio = 1
 	self.types.loot_drop_off.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_loot_drop_off")
 	self.types.loot_drop_off.budget_cost = 2
+	self.types.loot_drop_off_stealth_only = {}
+	self.types.loot_drop_off_stealth_only.name_id = "menu_pp_asset_loot_drop_off_stealth_only"
+	self.types.loot_drop_off_stealth_only.desc_id = "menu_pp_asset_loot_drop_off_stealth_only_desc"
+	self.types.loot_drop_off_stealth_only.category = "hired_help"
+	self.types.loot_drop_off_stealth_only.icon = 34
+	self.types.loot_drop_off_stealth_only.total = 1
+	self.types.loot_drop_off_stealth_only.post_event = "gus_preplan_16"
+	self.types.loot_drop_off_stealth_only.prio = 1
+	self.types.loot_drop_off_stealth_only.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_loot_drop_off")
+	self.types.loot_drop_off_stealth_only.budget_cost = 2
 	self.types.thermal_paste = {}
 	self.types.thermal_paste.name_id = "menu_pp_asset_thermal_paste"
 	self.types.thermal_paste.desc_id = "menu_pp_asset_thermal_paste_desc"
@@ -691,6 +711,16 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.branchbank_vault_key.budget_cost = 3
 	self.types.branchbank_vault_key.post_event = "gus_preplan_16"
 	self.types.branchbank_vault_key.prio = 2
+	self.types.glass_cutter = {}
+	self.types.glass_cutter.name_id = "menu_pp_asset_glass_cutter"
+	self.types.glass_cutter.desc_id = "menu_pp_asset_glass_cutter_desc"
+	self.types.glass_cutter.category = "mission_equipment"
+	self.types.glass_cutter.icon = 64
+	self.types.glass_cutter.total = 1
+	self.types.glass_cutter.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_glass_cutter")
+	self.types.glass_cutter.budget_cost = 1
+	self.types.glass_cutter.post_event = "gus_preplan_16"
+	self.types.glass_cutter.prio = 2
 end
 
 function PrePlanningTweakData:_create_locations(tweak_data)
@@ -1348,6 +1378,59 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			x2 = 1550,
 			y2 = -650,
 			rotation = 0,
+			custom_points = {}
+		}
+	}
+	self.locations.mus = {
+		default_plans = {},
+		total_budget = 10,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_museum",
+		start_location = {
+			group = "a",
+			x = 1024,
+			y = 512,
+			zoom = 1.5
+		},
+		{
+			name_id = "menu_pp_mus_loc_a",
+			texture = "guis/textures/pd2/pre_planning/mus_1",
+			map_x = -1.05,
+			map_y = 0,
+			map_width = 1,
+			map_height = 2,
+			x1 = -10000,
+			y1 = -5000,
+			x2 = 10000,
+			y2 = 5000,
+			rotation = -90,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mus_loc_b",
+			texture = "guis/textures/pd2/pre_planning/mus_2",
+			map_x = 0,
+			map_y = 0,
+			map_width = 1,
+			map_height = 2,
+			x1 = -10000,
+			y1 = -5000,
+			x2 = 10000,
+			y2 = 5000,
+			rotation = -90,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_mus_loc_c",
+			texture = "guis/textures/pd2/pre_planning/mus_3",
+			map_x = 1.05,
+			map_y = 0,
+			map_width = 1,
+			map_height = 2,
+			x1 = -10000,
+			y1 = -5000,
+			x2 = 10000,
+			y2 = 5000,
+			rotation = -90,
 			custom_points = {}
 		}
 	}

@@ -613,6 +613,15 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_defend = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			160,
+			64,
+			32,
+			32
+		}
+	}
 	self.wp_arrow = {
 		texture = "guis/textures/pd2/pd2_waypoints",
 		texture_rect = {

@@ -40,7 +40,7 @@ function MissionBriefingTabItem:init(panel, text, i)
 	})
 	self._tab_select_rect:set_shape(self._tab_text:shape())
 	self._panel:set_top(self._tab_text:bottom() - 3)
-	self._panel:grow(0, -(self._panel:top() + 70 + tweak_data.menu.pd2_small_font_size * 4 + 35))
+	self._panel:grow(0, -(self._panel:top() + 70 + tweak_data.menu.pd2_small_font_size * 4 + 25))
 	self._selected = true
 	self:deselect()
 end
@@ -1595,7 +1595,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 	local slot_h = player_slot.panel:h()
 	local aspect
 	local x = player_slot.panel:w() / 2
-	local y = player_slot.panel:h() / 17
+	local y = player_slot.panel:h() / 18
 	local w = slot_h / 6 * 1.15
 	local h = w
 	local slot_color = tweak_data.chat_colors[slot]
@@ -2243,6 +2243,12 @@ function NewLoadoutTab:populate_category(category, data)
 			new_data.slot = i
 			new_data.unlocked = true
 			new_data.equipped = false
+			new_data.mid_text = {}
+			new_data.mid_text.noselected_text = new_data.name_localized
+			new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+			new_data.mid_text.selected_text = new_data.mid_text.noselected_text
+			new_data.mid_text.selected_color = new_data.mid_text.noselected_color
+			new_data.mid_text.is_lock_same_color = true
 			data[i] = new_data
 		end
 	end
@@ -2470,7 +2476,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		layer = 6
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
-	self._panel:set_top(185 + tweak_data.menu.pd2_medium_font_size)
+	self._panel:set_top(175 + tweak_data.menu.pd2_medium_font_size)
 	self._panel:grow(0, -self._panel:top())
 	self._ready = managers.network:session():local_peer():waiting_for_player_ready()
 	local ready_text = self:ready_text()
@@ -2593,7 +2599,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 			1
 		}
 	})
-	if managers.assets:is_all_textures_loaded() then
+	if managers.assets:is_all_textures_loaded() or #managers.assets:get_all_asset_ids(true) == 0 then
 		self:create_asset_tab()
 	end
 	self._items[self._selected_item]:select(true)
@@ -2960,7 +2966,6 @@ function MissionBriefingGui:on_ready_pressed(ready)
 	self._ready_tick_box:set_image(self._ready and "guis/textures/pd2/mission_briefing/gui_tickbox_ready" or "guis/textures/pd2/mission_briefing/gui_tickbox")
 	if ready_changed then
 		if self._ready then
-			managers.music:track_listen_stop()
 			if managers.menu:active_menu() and managers.menu:active_menu().logic and managers.menu:active_menu().logic:selected_node() then
 				local item = managers.menu:active_menu().logic:selected_node():item("choose_jukebox_your_choice")
 				if item then
@@ -3194,6 +3199,7 @@ end
 function MissionBriefingGui:close()
 	print("[MissionBriefingGui:close]")
 	WalletGuiObject.close_wallet(self._safe_workspace:panel())
+	managers.music:track_listen_stop()
 	self:close_asset()
 	local requested_asset_textures = self._assets_item and self._assets_item:get_requested_textures()
 	if requested_asset_textures then

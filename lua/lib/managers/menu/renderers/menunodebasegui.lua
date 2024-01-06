@@ -21,6 +21,16 @@ function MenuNodeBaseGui.make_fine_text(text)
 	return text:x(), text:y(), w, h
 end
 
+function MenuNodeBaseGui.rec_round_object(object)
+	if object.children then
+		for i, d in ipairs(object:children()) do
+			MenuNodeBaseGui.rec_round_object(d)
+		end
+	end
+	local x, y = object:position()
+	object:set_position(math.round(x), math.round(y))
+end
+
 function MenuNodeBaseGui:init(node, layer, parameters)
 	MenuNodeBaseGui.super.init(self, node, layer, parameters)
 	self:setup()

@@ -68,10 +68,12 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.painting = 3000
 	self.bag_values.samurai_suit = 5000
 	self.bag_values.artifact_statue = 5000
+	self.bag_values.mus_artifact_bag = 1000
 	self.bag_values.circuit = 1000
 	self.bag_values.shells = 2100
 	self.bag_values.turret = 10000
 	self.bag_values.sandwich = 10000
+	self.bag_values.hope_diamond = 30000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
@@ -152,6 +154,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.hlm_game = 1
 	self.global_value_multipliers.alienware_alpha = 1
 	self.global_value_multipliers.alienware_alpha_promo = 1
+	self.global_value_multipliers.character_pack_clover = 1
+	self.global_value_multipliers.hope_diamond = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -182,6 +186,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.hlm_game = 0.2
 	self.global_value_bonus_multiplier.alienware_alpha = 0.2
 	self.global_value_bonus_multiplier.alienware_alpha_promo = 0.2
+	self.global_value_bonus_multiplier.character_pack_clover = 0.2
+	self.global_value_bonus_multiplier.hope_diamond = 0.2
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -199,6 +205,13 @@ function MoneyTweakData:init(tweak_data)
 	self.masks.material_value = self._create_value_table(smallest_mask_part_cost * 0.5, biggest_mask_part_cost, 10, true, 1.2)
 	self.masks.pattern_value = self._create_value_table(smallest_mask_part_cost * 0.4, biggest_mask_part_cost, 10, true, 1.1)
 	self.masks.color_value = self._create_value_table(smallest_mask_part_cost * 0.3, biggest_mask_part_cost, 10, true, 1)
+	self.skill_switch_cost = {
+		{spending = 0, offshore = 0},
+		{spending = 0, offshore = 0},
+		{spending = 0, offshore = 1000000},
+		{spending = 0, offshore = 10000000},
+		{spending = 0, offshore = 20000000}
+	}
 	self.mission_asset_cost_by_pc = self._create_value_table(1, 1, 10, true, 1)
 	self.mission_asset_cost_multiplier_by_pc = {
 		0,
@@ -254,12 +267,14 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_mia_cost_sniper = 3000
 	self.preplaning_mia_cost_delayed_police = 2000
 	self.preplaning_mia_cost_reduce_mobsters = 2000
+	self.preplaning_asset_cost_glass_cutter = 1000
 	self.small_loot = {}
 	if difficulty_index <= 2 then
 		self.small_loot.money_bundle = 1000
 		self.small_loot.diamondheist_vault_bust = 900
 		self.small_loot.diamondheist_vault_diamond = 1150
 		self.small_loot.diamondheist_big_diamond = 1150
+		self.small_loot.mus_small_artifact = 700
 		self.small_loot.value_gold = 3000
 		self.small_loot.gen_atm = 23000
 		self.small_loot.special_deposit_box = 3500
@@ -282,6 +297,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.diamondheist_vault_bust = 1800
 		self.small_loot.diamondheist_vault_diamond = 2300
 		self.small_loot.diamondheist_big_diamond = 2300
+		self.small_loot.mus_small_artifact = 1450
 		self.small_loot.value_gold = 3000
 		self.small_loot.gen_atm = 46000
 		self.small_loot.special_deposit_box = 3500
@@ -304,6 +320,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.diamondheist_vault_bust = 4500
 		self.small_loot.diamondheist_vault_diamond = 5750
 		self.small_loot.diamondheist_big_diamond = 5750
+		self.small_loot.mus_small_artifact = 3600
 		self.small_loot.value_gold = 3000
 		self.small_loot.gen_atm = 115000
 		self.small_loot.special_deposit_box = 3500
@@ -326,6 +343,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.diamondheist_vault_bust = 9000
 		self.small_loot.diamondheist_vault_diamond = 11500
 		self.small_loot.diamondheist_big_diamond = 11500
+		self.small_loot.mus_small_artifact = 7000
 		self.small_loot.value_gold = 3000
 		self.small_loot.gen_atm = 230000
 		self.small_loot.special_deposit_box = 3500
@@ -348,6 +366,7 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.diamondheist_vault_bust = 12000
 		self.small_loot.diamondheist_vault_diamond = 15000
 		self.small_loot.diamondheist_big_diamond = 15000
+		self.small_loot.mus_small_artifact = 9500
 		self.small_loot.value_gold = 3000
 		self.small_loot.gen_atm = 300000
 		self.small_loot.special_deposit_box = 3500

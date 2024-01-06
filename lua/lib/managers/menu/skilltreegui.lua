@@ -705,7 +705,7 @@ function SkillTreeGui:init(ws, fullscreen_ws, node)
 	managers.menu_component:close_contract_gui()
 	managers.features:announce_feature("perk_deck")
 	self:_setup()
-	self:set_layer(1000)
+	self:set_layer(5)
 end
 
 function SkillTreeGui:make_fine_text(text)
@@ -869,6 +869,38 @@ function SkillTreeGui:_setup()
 	self:make_fine_text(self._skill_tree_panel:child("respec_tree_button"))
 	self._skill_tree_panel:child("respec_tree_button"):set_left(points_text:left())
 	self._respec_text_id = "st_menu_respec_tree"
+	local skill_set_text = self._skill_tree_panel:text({
+		name = "skill_set_text",
+		text = managers.localization:text("menu_st_skill_switch_set", {
+			skill_switch = managers.skilltree:get_skill_switch_name(managers.skilltree:get_selected_skill_switch(), true)
+		}),
+		layer = 1,
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		align = "left",
+		vertical = "top",
+		blend_mode = "add"
+	})
+	local skill_set_bg = self._skill_tree_panel:rect({
+		name = "skill_set_bg",
+		color = tweak_data.screen_colors.button_stage_3,
+		alpha = 0,
+		blend_mode = "add"
+	})
+	self:make_fine_text(skill_set_text)
+	self._skill_tree_panel:text({
+		name = "switch_skills_button",
+		text = prefix .. managers.localization:to_upper_text("menu_st_skill_switch_title"),
+		align = "left",
+		vertical = "top",
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		font = tweak_data.menu.pd2_medium_font,
+		color = Color.black,
+		blend_mode = "add",
+		layer = 0
+	})
+	self:make_fine_text(self._skill_tree_panel:child("switch_skills_button"))
 	local black_rect = self._fullscreen_panel:rect({
 		color = Color(0.4, 0, 0, 0),
 		layer = 1
@@ -1028,6 +1060,14 @@ function SkillTreeGui:_setup()
 	if alive(respec_tree_button) then
 		respec_tree_button:set_top(points_text:bottom())
 	end
+	local switch_skills_button = self._skill_tree_panel:child("switch_skills_button")
+	if alive(switch_skills_button) then
+		skill_set_text:set_top(points_text:top())
+		switch_skills_button:set_top(points_text:bottom())
+		skill_set_bg:set_shape(skill_set_text:left(), skill_set_text:top(), self._skill_tree_panel:w() * WIDTH_MULTIPLIER * 1 / 3 - 10, skill_set_text:h())
+	end
+	self._skill_switch_highlight = true
+	self:check_skill_switch_button()
 	skill_title_panel:set_left(skill_box_panel:left() + 10)
 	skill_title_panel:set_top(skill_box_panel:top() + 10)
 	skill_title_panel:set_w(skill_box_panel:w() - 20)
@@ -1319,7 +1359,20 @@ function SkillTreeGui:_setup()
 			wrap = true,
 			word_wrap = true,
 			valign = "grow",
-			halign = "grow"
+			halign = "grow",
+			color = tweak_data.screen_colors.text,
+			blend_mode = "normal"
+		})
+		self._spec_description_locked = spec_description_panel:text({
+			text = "",
+			font = tweak_data.menu.pd2_medium_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			wrap = true,
+			word_wrap = true,
+			valign = "grow",
+			halign = "grow",
+			color = tweak_data.screen_colors.important_1,
+			blend_mode = "add"
 		})
 		self._spec_description_text = spec_description_panel:text({
 			text = "",
@@ -1328,7 +1381,9 @@ function SkillTreeGui:_setup()
 			wrap = true,
 			word_wrap = true,
 			valign = "grow",
-			halign = "grow"
+			halign = "grow",
+			color = tweak_data.screen_colors.text,
+			blend_mode = "normal"
 		})
 		self._spec_description_progress = spec_description_panel:text({
 			text = "",
@@ -1337,7 +1392,9 @@ function SkillTreeGui:_setup()
 			wrap = true,
 			word_wrap = true,
 			valign = "grow",
-			halign = "grow"
+			halign = "grow",
+			color = tweak_data.screen_colors.text,
+			blend_mode = "normal"
 		})
 	end
 	self:show_btns()
@@ -1541,9 +1598,13 @@ function SkillTreeGui:_set_active_spec_tree(tree_panel_name, play_sound)
 			elseif tab_wr > panel_wr then
 				self._spec_tabs_scroll_panel:move(panel_wr - tab_wr, 0)
 			end
-			local btns = {
-				tab_item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") and "activate_spec" or false
-			}
+			local btns = {}
+			local dlc = tweak_data:get_raw_value("skilltree", "specializations", tab_item:tree(), "dlc")
+			if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
+				btns = {
+					tab_item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") and "activate_spec" or false
+				}
+			end
 			self:show_btns(unpack(btns))
 		else
 			self._spec_tree_items[tree]:deselect()
@@ -1624,12 +1685,14 @@ function SkillTreeGui:update_spec_descriptions()
 	local item = self._selected_spec_item
 	if not item then
 		self._spec_description_title:set_text("")
+		self._spec_description_locked:set_text("")
 		self._spec_description_text:set_text("")
 		self._spec_description_progress:set_text("")
 		return
 	end
 	local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
 	local max_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "max_tier")
+	local locked_string = ""
 	local progress_string = ""
 	if current_tier < max_tier and self._selected_spec_tier and self._selected_spec_tier == current_tier + 1 then
 		local current_points = managers.skilltree:get_specialization_value(item:tree(), "tiers", "next_tier_data", "current_points")
@@ -1675,10 +1738,18 @@ function SkillTreeGui:update_spec_descriptions()
 			self._spec_description_text:set_range_color(start_ci[i], end_ci[i], tweak_data.screen_colors.resource)
 		end
 	end
+	local dlc = tweak_data:get_raw_value("skilltree", "specializations", item:tree(), "dlc")
+	if dlc and not managers.dlc:is_dlc_unlocked(dlc) then
+		local unlock_id = tweak_data:get_raw_value("lootdrop", "global_values", dlc, "unlock_id") or "bm_menu_dlc_locked"
+		locked_string = managers.localization:to_upper_text(unlock_id)
+	end
+	self._spec_description_locked:set_text(locked_string)
 	self._spec_description_title:set_text(name_string)
 	self._spec_description_progress:set_text(progress_string)
 	local x, y, w, h = self._spec_description_title:text_rect()
-	self._spec_description_text:set_y(self._spec_description_title:y() + h + 15)
+	self._spec_description_locked:set_y(self._spec_description_title:y() + h + 15)
+	local x, y, w, h = self._spec_description_locked:text_rect()
+	self._spec_description_text:set_y(self._spec_description_locked:y() + h + 10)
 	local x, y, w, h = self._spec_description_text:text_rect()
 	self._spec_description_progress:set_y(self._spec_description_text:y() + h + 10)
 end
@@ -1702,13 +1773,16 @@ function SkillTreeGui:_set_selected_spec_item(item, no_sound)
 			if not managers.menu:is_pc_controller() then
 				local btns = {}
 				if item.tree then
-					if item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") then
-						table.insert(btns, "activate_spec")
-					end
-					local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
-					if item.tier and item:tier() == current_tier + 1 then
-						table.insert(btns, "add_points")
-						table.insert(btns, "remove_points")
+					local dlc = tweak_data:get_raw_value("skilltree", "specializations", item:tree(), "dlc")
+					if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
+						if item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") then
+							table.insert(btns, "activate_spec")
+						end
+						local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
+						if item.tier and item:tier() == current_tier + 1 then
+							table.insert(btns, "add_points")
+							table.insert(btns, "remove_points")
+						end
 					end
 				end
 				self:show_btns(unpack(btns))
@@ -1874,6 +1948,41 @@ function SkillTreeGui:_set_selected_skill_item(item, no_sound)
 	end
 end
 
+function SkillTreeGui:check_skill_switch_button(x, y, force_text_update)
+	local inside = false
+	if x and y and self._skill_tree_panel:child("switch_skills_button"):inside(x, y) then
+		if not self._skill_switch_highlight then
+			self._skill_switch_highlight = true
+			self._skill_tree_panel:child("switch_skills_button"):set_color(tweak_data.screen_colors.button_stage_2)
+			managers.menu_component:post_event("highlight")
+		end
+		inside = true
+	elseif self._skill_switch_highlight then
+		self._skill_switch_highlight = false
+		self._skill_tree_panel:child("switch_skills_button"):set_color(managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.black)
+	end
+	if x and y and self._skill_tree_panel:child("skill_set_bg"):inside(x, y) then
+		if not self._skill_set_highlight then
+			self._skill_set_highlight = true
+			self._skill_tree_panel:child("skill_set_text"):set_color(tweak_data.screen_colors.button_stage_2)
+			self._skill_tree_panel:child("skill_set_bg"):set_alpha(0.35)
+			managers.menu_component:post_event("highlight")
+		end
+		inside = true
+	elseif self._skill_set_highlight then
+		self._skill_set_highlight = false
+		self._skill_tree_panel:child("skill_set_text"):set_color(tweak_data.screen_colors.text)
+		self._skill_tree_panel:child("skill_set_bg"):set_alpha(0)
+	end
+	if not managers.menu:is_pc_controller() then
+		local text_id = "st_menu_respec_tree"
+		local prefix = managers.localization:get_default_macro("BTN_X")
+		self._skill_tree_panel:child("switch_skills_button"):set_color(tweak_data.screen_colors.text)
+		self._skill_tree_panel:child("switch_skills_button"):set_text(prefix .. managers.localization:to_upper_text("menu_st_skill_switch_title"))
+	end
+	return inside
+end
+
 function SkillTreeGui:check_respec_button(x, y, force_text_update)
 	local text_id = "st_menu_respec_tree"
 	local prefix = not managers.menu:is_pc_controller() and managers.localization:get_default_macro("BTN_Y") or ""
@@ -1908,6 +2017,12 @@ function SkillTreeGui:check_respec_button(x, y, force_text_update)
 end
 
 function SkillTreeGui:mouse_moved(o, x, y)
+	if self._renaming_skill_switch then
+		return true, "link"
+	end
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return true, "grab"
 	end
@@ -1946,6 +2061,9 @@ function SkillTreeGui:mouse_moved(o, x, y)
 		if self:check_respec_button(x, y) then
 			inside = true
 			pointer = "link"
+		elseif self:check_skill_switch_button(x, y) then
+			inside = true
+			pointer = "link"
 		end
 		if self._active_page then
 			for _, item in ipairs(self._active_page._items) do
@@ -1965,9 +2083,9 @@ function SkillTreeGui:mouse_moved(o, x, y)
 			end
 		end
 	else
-		inside, pointer = self:moved_scroll_bar(x, y)
-		if inside then
-			return inside, pointer
+		local inside2, pointer2 = self:moved_scroll_bar(x, y)
+		if inside2 then
+			return inside2, pointer2
 		end
 		if self._specialization_panel:child("spec_tabs_panel"):inside(x, y) then
 			for _, tab_item in ipairs(self._spec_tab_items) do
@@ -2033,6 +2151,9 @@ function SkillTreeGui:mouse_moved(o, x, y)
 end
 
 function SkillTreeGui:mouse_released(button, x, y)
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		self:stop_spec_place_points()
 	end
@@ -2043,6 +2164,13 @@ function SkillTreeGui:mouse_released(button, x, y)
 end
 
 function SkillTreeGui:mouse_pressed(button, x, y)
+	if self._renaming_skill_switch then
+		self:_stop_rename_skill_switch()
+		return
+	end
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2085,6 +2213,14 @@ function SkillTreeGui:mouse_pressed(button, x, y)
 		if self._is_skilltree_page_active then
 			if self._skill_tree_panel:child("respec_tree_button"):inside(x, y) then
 				self:respec_active_tree()
+				return
+			end
+			if self._skill_tree_panel:child("switch_skills_button"):inside(x, y) then
+				managers.menu:open_node("skill_switch", {})
+				return
+			end
+			if self._skill_tree_panel:child("skill_set_bg"):inside(x, y) then
+				self:_start_rename_skill_switch()
 				return
 			end
 			if self._active_page then
@@ -2173,6 +2309,9 @@ function SkillTreeGui:move_spec_item(x, y)
 end
 
 function SkillTreeGui:move_up()
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2188,6 +2327,9 @@ function SkillTreeGui:move_up()
 end
 
 function SkillTreeGui:move_down()
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2203,6 +2345,9 @@ function SkillTreeGui:move_down()
 end
 
 function SkillTreeGui:move_left()
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2218,6 +2363,9 @@ function SkillTreeGui:move_left()
 end
 
 function SkillTreeGui:move_right()
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2233,6 +2381,9 @@ function SkillTreeGui:move_right()
 end
 
 function SkillTreeGui:next_page(play_sound)
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2246,6 +2397,9 @@ function SkillTreeGui:next_page(play_sound)
 end
 
 function SkillTreeGui:previous_page(play_sound)
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2259,6 +2413,13 @@ function SkillTreeGui:previous_page(play_sound)
 end
 
 function SkillTreeGui:confirm_pressed()
+	if self._renaming_skill_switch then
+		self:_stop_rename_skill_switch()
+		return
+	end
+	if not self._enabled then
+		return
+	end
 	if self._is_skilltree_page_active and self._selected_item and self._selected_item._skill_panel then
 		self:place_point(self._selected_item)
 		return true
@@ -2267,6 +2428,9 @@ function SkillTreeGui:confirm_pressed()
 end
 
 function SkillTreeGui:special_btn_pressed(button)
+	if not self._enabled then
+		return
+	end
 	if self._spec_placing_points then
 		return
 	end
@@ -2283,6 +2447,9 @@ function SkillTreeGui:special_btn_pressed(button)
 		if button == Idstring("menu_respec_tree") then
 			self:respec_active_tree()
 			return true
+		elseif button == Idstring("menu_switch_skillset") then
+			managers.menu:open_node("skill_switch", {})
+			return
 		end
 	else
 		return self:press_pc_button(button)
@@ -2485,15 +2652,54 @@ function SkillTreeGui:_post_reload()
 end
 
 function SkillTreeGui:input_focus()
-	return 1
+	if self._one_frame_input_delay then
+		self._one_frame_input_delay = nil
+		return true
+	end
+	return (not self._enabled or not 1) and self._renaming_skill_switch and true
 end
 
 function SkillTreeGui:visible()
 	return self._visible
 end
 
+function SkillTreeGui:is_enabled()
+	return self._enabled
+end
+
+function SkillTreeGui:enable()
+	self._enabled = true
+	if alive(self._disabled_panel) then
+		self._fullscreen_ws:panel():remove(self._disabled_panel)
+		self._disabled_panel = nil
+	end
+end
+
+function SkillTreeGui:disable()
+	self._enabled = false
+	if alive(self._disabled_panel) then
+		self._fullscreen_ws:panel():remove(self._disabled_panel)
+		self._disabled_panel = nil
+	end
+	self._disabled_panel = self._fullscreen_ws:panel():panel({layer = 50})
+	self._disabled_panel:rect({
+		name = "bg",
+		color = Color.black,
+		alpha = 0.4
+	})
+	self._disabled_panel:bitmap({
+		name = "blur",
+		texture = "guis/textures/test_blur_df",
+		render_template = "VertexColorTexturedBlur3D",
+		layer = -1,
+		w = self._disabled_panel:w(),
+		h = self._disabled_panel:h()
+	})
+end
+
 function SkillTreeGui:close()
 	managers.menu:active_menu().renderer.ws:show()
+	self:_cancel_rename_skill_switch()
 	if self._spec_placing_points then
 		self._spec_placing_points = nil
 		self._spec_placing_tree = nil
@@ -2572,6 +2778,9 @@ function SkillTreeGui:press_first_btn(button)
 end
 
 function SkillTreeGui:update(t, dt)
+	if not self._enabled then
+		return
+	end
 	if not managers.menu:is_pc_controller() then
 		local controller_spec_adding_points, controller_spec_removing_points
 		if self._selected_spec_tier == managers.skilltree:get_specialization_value(self._active_spec_tree, "tiers", "current_tier") + 1 then
@@ -2643,6 +2852,10 @@ function SkillTreeGui:start_spec_place_points(dir, tree)
 	end
 	local item = tree_item:place_points_item()
 	if not item then
+		return
+	end
+	local dlc = tweak_data:get_raw_value("skilltree", "specializations", tree, "dlc")
+	if dlc and not managers.dlc:is_dlc_unlocked(dlc) then
 		return
 	end
 	self._spec_placing_points = math.sign(dir)
@@ -2725,6 +2938,9 @@ function SkillTreeGui:show_btns(...)
 end
 
 function SkillTreeGui:press_pc_button(button)
+	if not self._enabled then
+		return
+	end
 	local btn = self._controllers_pc_mapping and self._controllers_pc_mapping[button:key()]
 	if btn and btn:data() and btn:data().callback and (not self._button_press_delay or self._button_press_delay < TimerManager:main():time()) then
 		managers.menu_component:post_event("menu_enter")
@@ -3118,7 +3334,8 @@ function SpecializationTreeItem:refresh()
 	local point_btns_panel = self._parent_panel:child("point_btns_panel" .. tostring(self._tree))
 	local reduce_points = point_btns_panel:child("reduce_points")
 	local increase_points = point_btns_panel:child("increase_points")
-	local can_place_points = current_tier < max_tier
+	local dlc = tweak_data:get_raw_value("skilltree", "specializations", self._tree, "dlc")
+	local can_place_points = current_tier < max_tier and (not dlc or managers.dlc:is_dlc_unlocked(dlc))
 	point_btns_panel:set_alpha(can_place_points and 1 or 0)
 	if can_place_points then
 		point_btns_panel:set_center_x(math.round(self._items[current_tier + 1]:panel():center_x()))
@@ -3568,4 +3785,179 @@ end
 
 function SpecializationGuiButtonItem:btn_text()
 	return self._btn_text:text()
+end
+
+function SkillTreeGui:_start_rename_skill_switch()
+	if not self._renaming_skill_switch then
+		self._enabled = false
+		local selected_skill_switch = managers.skilltree:get_selected_skill_switch()
+		self._renaming_skill_switch = managers.skilltree:has_skill_switch_name(selected_skill_switch) and managers.skilltree:get_skill_switch_name(selected_skill_switch, false) or ""
+		self._ws:connect_keyboard(Input:keyboard())
+		self._skill_tree_panel:enter_text(callback(self, self, "enter_text"))
+		self._skill_tree_panel:key_press(callback(self, self, "key_press"))
+		self._skill_tree_panel:key_release(callback(self, self, "key_release"))
+		self._rename_caret = self._skill_tree_panel:rect({
+			name = "caret",
+			layer = 2,
+			x = 0,
+			y = 0,
+			w = 0,
+			h = 0,
+			color = Color(0.05, 1, 1, 1)
+		})
+		self._rename_caret:animate(self.blink)
+		self._caret_connected = true
+		self:_update_rename_skill_switch()
+	end
+end
+
+function SkillTreeGui:_stop_rename_skill_switch()
+	if self._renaming_skill_switch then
+		self._enabled = true
+		managers.skilltree:set_skill_switch_name(managers.skilltree:get_selected_skill_switch(), self._renaming_skill_switch)
+		self._renaming_skill_switch = nil
+		if self._caret_connected then
+			self._ws:disconnect_keyboard()
+			self._skill_tree_panel:enter_text(nil)
+			self._skill_tree_panel:key_press(nil)
+			self._skill_tree_panel:key_release(nil)
+			self._skill_tree_panel:remove(self._rename_caret)
+			self._rename_caret = nil
+			self._caret_connected = nil
+		end
+		managers.menu_component:post_event("menu_enter")
+		self:_update_rename_skill_switch()
+	end
+end
+
+function SkillTreeGui:_cancel_rename_skill_switch()
+	if self._renaming_skill_switch then
+		self._enabled = true
+		self._renaming_skill_switch = nil
+		if self._caret_connected then
+			self._ws:disconnect_keyboard()
+			self._skill_tree_panel:enter_text(nil)
+			self._skill_tree_panel:key_press(nil)
+			self._skill_tree_panel:key_release(nil)
+			self._skill_tree_panel:remove(self._rename_caret)
+			self._rename_caret = nil
+			self._caret_connected = nil
+		end
+		self._one_frame_input_delay = true
+		self:_update_rename_skill_switch()
+	end
+end
+
+function SkillTreeGui:_update_rename_skill_switch()
+	local skill_set_text = self._skill_tree_panel:child("skill_set_text")
+	if self._renaming_skill_switch then
+		local no_text = self._renaming_skill_switch == ""
+		if no_text then
+			skill_set_text:set_text(managers.skilltree:get_default_skill_switch_name(managers.skilltree:get_selected_skill_switch()))
+			skill_set_text:set_color(tweak_data.screen_colors.text)
+			skill_set_text:set_alpha(0.35)
+		else
+			skill_set_text:set_text(self._renaming_skill_switch)
+			skill_set_text:set_color(tweak_data.screen_colors.text)
+			skill_set_text:set_alpha(1)
+		end
+		self:make_fine_text(skill_set_text)
+		self._rename_caret:set_w(2)
+		self._rename_caret:set_h(skill_set_text:h())
+		self._rename_caret:set_world_position(no_text and skill_set_text:left() or skill_set_text:right(), skill_set_text:top())
+	else
+		skill_set_text:set_text(managers.localization:text("menu_st_skill_switch_set", {
+			skill_switch = managers.skilltree:get_skill_switch_name(managers.skilltree:get_selected_skill_switch(), true)
+		}))
+		skill_set_text:set_color(tweak_data.screen_colors.text)
+		skill_set_text:set_alpha(1)
+		self._skill_set_highlight = nil
+		self:make_fine_text(skill_set_text)
+	end
+end
+
+function SkillTreeGui:_shift()
+	local k = Input:keyboard()
+	return not k:down("left shift") and not k:down("right shift") and k:has_button("shift") and k:down("shift")
+end
+
+function SkillTreeGui.blink(o)
+	while true do
+		o:set_color(Color(0, 1, 1, 1))
+		wait(0.3)
+		o:set_color(Color.white)
+		wait(0.3)
+	end
+end
+
+function SkillTreeGui:enter_text(o, s)
+	if self._renaming_skill_switch then
+		local m = tweak_data:get_raw_value("gui", "rename_skill_set_max_letters") or 15
+		local n = utf8.len(self._renaming_skill_switch)
+		s = s:sub(1, m - n)
+		self._renaming_skill_switch = self._renaming_skill_switch .. tostring(s)
+		self:_update_rename_skill_switch()
+	end
+end
+
+function SkillTreeGui:update_key_down(o, k)
+	wait(0.6)
+	while self._key_pressed == k do
+		if not self._renaming_skill_switch then
+			return
+		end
+		local text = self._renaming_skill_switch
+		local n = utf8.len(text)
+		if self._key_pressed == Idstring("backspace") then
+			text = utf8.sub(text, 0, math.max(n - 1, 0))
+		elseif self._key_pressed == Idstring("delete") then
+		elseif self._key_pressed == Idstring("left") then
+		elseif self._key_pressed == Idstring("right") then
+			self._key_pressed = false
+		elseif self._key_ctrl_pressed == true and k == Idstring("v") then
+			return
+		end
+		if text ~= self._renaming_skill_switch then
+			self._renaming_skill_switch = text
+			self:_update_rename_skill_switch()
+		end
+		wait(0.03)
+	end
+end
+
+function SkillTreeGui:key_release(o, k)
+	if self._key_pressed == k then
+		self._key_pressed = false
+	end
+	if k == Idstring("left ctrl") or k == Idstring("right ctrl") then
+		self._key_ctrl_pressed = false
+	end
+end
+
+function SkillTreeGui:key_press(o, k)
+	local text = self._renaming_skill_switch
+	local n = utf8.len(text)
+	self._key_pressed = k
+	self._skill_tree_panel:stop()
+	self._skill_tree_panel:animate(callback(self, self, "update_key_down"), k)
+	if k == Idstring("backspace") then
+		text = utf8.sub(text, 0, math.max(n - 1, 0))
+	elseif k == Idstring("delete") then
+	elseif k == Idstring("left") then
+	elseif k == Idstring("right") then
+	elseif self._key_pressed == Idstring("end") then
+	elseif self._key_pressed == Idstring("home") then
+	elseif k == Idstring("enter") then
+	elseif k == Idstring("esc") then
+		self:_cancel_rename_skill_switch()
+		return
+	elseif k == Idstring("left ctrl") or k == Idstring("right ctrl") then
+		self._key_ctrl_pressed = true
+	elseif self._key_ctrl_pressed == true and k == Idstring("v") then
+		return
+	end
+	if text ~= self._renaming_skill_switch then
+		self._renaming_skill_switch = text
+		self:_update_rename_skill_switch()
+	end
 end

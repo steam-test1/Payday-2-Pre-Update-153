@@ -305,9 +305,15 @@ function InteractionTweakData:init()
 		category = "player",
 		upgrade = "pick_lock_easy"
 	}
-	self.pick_lock_easy.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
+	self.pick_lock_easy.upgrade_timer_multipliers = {
+		{
+			category = "player",
+			upgrade = "pick_lock_easy_speed_multiplier"
+		},
+		{
+			category = "player",
+			upgrade = "pick_lock_speed_multiplier"
+		}
 	}
 	self.pick_lock_easy.action_text_id = "hud_action_picking_lock"
 	self.pick_lock_easy.sound_start = "bar_pick_lock"
@@ -319,9 +325,15 @@ function InteractionTweakData:init()
 	self.pick_lock_easy_no_skill.text_id = "hud_int_pick_lock"
 	self.pick_lock_easy_no_skill.start_active = true
 	self.pick_lock_easy_no_skill.timer = 7
-	self.pick_lock_easy_no_skill.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
+	self.pick_lock_easy_no_skill.upgrade_timer_multipliers = {
+		{
+			category = "player",
+			upgrade = "pick_lock_easy_speed_multiplier"
+		},
+		{
+			category = "player",
+			upgrade = "pick_lock_speed_multiplier"
+		}
 	}
 	self.pick_lock_easy_no_skill.action_text_id = "hud_action_picking_lock"
 	self.pick_lock_easy_no_skill.interact_distance = 100
@@ -349,9 +361,15 @@ function InteractionTweakData:init()
 	self.pick_lock_hard_no_skill.start_active = true
 	self.pick_lock_hard_no_skill.timer = 20
 	self.pick_lock_hard_no_skill.action_text_id = "hud_action_picking_lock"
-	self.pick_lock_hard_no_skill.upgrade_timer_multiplier = {
-		category = "player",
-		upgrade = "pick_lock_easy_speed_multiplier"
+	self.pick_lock_hard_no_skill.upgrade_timer_multipliers = {
+		{
+			category = "player",
+			upgrade = "pick_lock_easy_speed_multiplier"
+		},
+		{
+			category = "player",
+			upgrade = "pick_lock_speed_multiplier"
+		}
 	}
 	self.pick_lock_hard_no_skill.interact_distance = 100
 	self.pick_lock_hard_no_skill.sound_start = "bar_pick_lock"
@@ -975,6 +993,11 @@ function InteractionTweakData:init()
 	self.circuit_breaker.text_id = "debug_interact_circuit_breaker"
 	self.circuit_breaker.start_active = false
 	self.circuit_breaker.axis = "z"
+	self.hold_circuit_breaker = deep_clone(self.circuit_breaker)
+	self.hold_circuit_breaker.timer = 2
+	self.hold_circuit_breaker.text_id = "hud_int_hold_turn_on_power"
+	self.hold_circuit_breaker.action_text_id = "hud_action_turning_on_power"
+	self.hold_circuit_breaker.axis = "y"
 	self.transformer_box = {}
 	self.transformer_box.icon = "interaction_powerbox"
 	self.transformer_box.text_id = "debug_interact_transformer_box"
@@ -1053,6 +1076,9 @@ function InteractionTweakData:init()
 	self.safe_loot_pickup = deep_clone(self.diamond_pickup)
 	self.safe_loot_pickup.start_active = true
 	self.safe_loot_pickup.text_id = "hud_int_take"
+	self.mus_pku_artifact = deep_clone(self.diamond_pickup)
+	self.mus_pku_artifact.start_active = true
+	self.mus_pku_artifact.text_id = "hud_int_take_artifact"
 	self.tiara_pickup = {}
 	self.tiara_pickup.icon = "develop"
 	self.tiara_pickup.text_id = "hud_int_pickup_tiara"
@@ -1257,6 +1283,10 @@ function InteractionTweakData:init()
 	self.corpse_alarm_pager.contour_preset = "generic_interactable"
 	self.corpse_alarm_pager.contour_preset_selected = "generic_interactable_selected"
 	self.corpse_alarm_pager.contour_flash_interval = 0.15
+	self.corpse_alarm_pager.upgrade_timer_multiplier = {
+		category = "player",
+		upgrade = "alarm_pager_speed_multiplier"
+	}
 	self.corpse_alarm_pager.interact_dont_interupt_on_distance = true
 	self.corpse_dispose = {}
 	self.corpse_dispose.icon = "develop"
@@ -1266,6 +1296,10 @@ function InteractionTweakData:init()
 	self.corpse_dispose.requires_upgrade = {
 		category = "player",
 		upgrade = "corpse_dispose"
+	}
+	self.corpse_dispose.upgrade_timer_multiplier = {
+		category = "player",
+		upgrade = "corpse_dispose_speed_multiplier"
 	}
 	self.corpse_dispose.action_text_id = "hud_action_disposing_corpse"
 	self.corpse_dispose.no_contour = true
@@ -1512,6 +1546,16 @@ function InteractionTweakData:init()
 	self.gen_pku_artifact_statue.sound_interupt = "bar_bag_money_cancel"
 	self.gen_pku_artifact_statue.sound_done = "bar_bag_money_finished"
 	self.gen_pku_artifact_statue.blocked_hint = "carry_block"
+	self.gen_pku_artifact = deep_clone(self.gen_pku_artifact_statue)
+	self.gen_pku_artifact.start_active = true
+	self.gen_pku_artifact.sound_start = "bar_bag_armor"
+	self.gen_pku_artifact.sound_interupt = "bar_bag_armor_cancel"
+	self.gen_pku_artifact.sound_done = "bar_bag_armor_finished"
+	self.gen_pku_artifact_painting = deep_clone(self.gen_pku_artifact_statue)
+	self.gen_pku_artifact_painting.start_active = true
+	self.gen_pku_artifact_painting.sound_start = "bar_steal_painting"
+	self.gen_pku_artifact_painting.sound_interupt = "bar_steal_painting_cancel"
+	self.gen_pku_artifact_painting.sound_done = "bar_steal_painting_finished"
 	self.gen_pku_jewelry = {}
 	self.gen_pku_jewelry.text_id = "hud_int_hold_take_jewelry"
 	self.gen_pku_jewelry.action_text_id = "hud_action_taking_jewelry"
@@ -2206,4 +2250,39 @@ function InteractionTweakData:init()
 	self.hold_open_xmas_present.sound_start = "bar_gift_box_open"
 	self.hold_open_xmas_present.sound_interupt = "bar_gift_box_open_cancel"
 	self.hold_open_xmas_present.sound_done = "bar_gift_box_open_finished"
+	self.cut_glass = {}
+	self.cut_glass.text_id = "hud_int_cut_glass"
+	self.cut_glass.action_text_id = "hud_action_cut_glass"
+	self.cut_glass.timer = 4
+	self.cut_glass.contour = "interactable_icon"
+	self.cut_glass.axis = "y"
+	self.cut_glass.equipment_text_id = "hud_equipment_need_glass_cutter"
+	self.cut_glass.special_equipment = "mus_glas_cutter"
+	self.cut_glass.sound_start = "bar_glasscutter"
+	self.cut_glass.sound_interupt = "bar_glasscutter_cancel"
+	self.cut_glass.sound_done = "bar_glasscutter_finished"
+	self.mus_hold_open_display = {}
+	self.mus_hold_open_display.text_id = "hud_int_hold_open_display"
+	self.mus_hold_open_display.action_text_id = "hud_action_open_display"
+	self.mus_hold_open_display.timer = 1
+	self.mus_take_diamond = {}
+	self.mus_take_diamond.text_id = "debug_interact_diamond"
+	self.rewire_electric_box = {}
+	self.rewire_electric_box.text_id = "hud_int_rewire_box"
+	self.rewire_electric_box.action_text_id = "hud_action_rewire_box"
+	self.rewire_electric_box.timer = 6
+	self.rewire_electric_box.start_active = false
+	self.rewire_electric_box.axis = "y"
+	self.rewire_electric_box.sound_start = "bar_hack_fuse_box"
+	self.rewire_electric_box.sound_interupt = "bar_hack_fuse_box_cancel"
+	self.rewire_electric_box.sound_done = "bar_hack_fuse_box_finished"
+	self.timelock_hack = {}
+	self.timelock_hack.text_id = "hud_int_hack_timelock"
+	self.timelock_hack.action_text_id = "hud_action_hack_timelock"
+	self.timelock_hack.timer = 6
+	self.timelock_hack.start_active = false
+	self.timelock_hack.axis = "y"
+	self.timelock_hack.sound_start = "bar_hack_fuse_box"
+	self.timelock_hack.sound_interupt = "bar_hack_fuse_box_cancel"
+	self.timelock_hack.sound_done = "bar_hack_fuse_box_finished"
 end

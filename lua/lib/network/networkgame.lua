@@ -359,6 +359,7 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 				}))
 			end
 		end
+		managers.blackmarket:check_frog_1()
 		print("Someone left", peer:name(), peer_id)
 		local player_left = false
 		local player_character

@@ -106,6 +106,7 @@ function MenuSceneManager:_set_up_templates()
 	self._scene_templates = {}
 	self._scene_templates.standard = {}
 	self._scene_templates.standard.use_character_grab = true
+	self._scene_templates.standard.character_visible = true
 	self._scene_templates.standard.camera_pos = ref:position()
 	self._scene_templates.standard.target_pos = target_pos
 	self._scene_templates.standard.character_pos = c_ref:position()
@@ -306,19 +307,14 @@ function MenuSceneManager:update(t, dt)
 		local speed = dt * 5
 		self:_set_camera_position(camera_pos)
 		self:_set_target_position(target_pos)
-		if self._character_values then
-			local character_pos = math.lerp(self._character_values.pos_current, self._character_values.pos_target, bezier_value)
-			self._character_unit:set_position(character_pos)
-			if not self._transition_time and 0 < #self._character_dynamic_bodies then
-				self._enabled_character_dynamic_bodies = math.max(self._enabled_character_dynamic_bodies and self._enabled_character_dynamic_bodies or 0, 10)
-			end
+		if self._character_values and not self._transition_time and 0 < #self._character_dynamic_bodies then
+			self._enabled_character_dynamic_bodies = math.max(self._enabled_character_dynamic_bodies and self._enabled_character_dynamic_bodies or 0, 1)
 		end
 	end
 	if self._enabled_character_dynamic_bodies then
 		self._enabled_character_dynamic_bodies = self._enabled_character_dynamic_bodies - 1
 		if self._enabled_character_dynamic_bodies == 0 then
 			self._enabled_character_dynamic_bodies = nil
-			self:_set_character_dynamic_bodies_state("dynamic")
 		end
 	end
 	if self._camera_object and self._new_fov ~= self._current_fov + (self._fov_mod or 0) then
@@ -425,7 +421,7 @@ function MenuSceneManager:_setup_character_dynamic_bodies(unit)
 			table.insert(bodies, unit:body(i))
 		end
 	end
-	self._enabled_character_dynamic_bodies = 31
+	self._enabled_character_dynamic_bodies = 61
 end
 
 function MenuSceneManager:_set_character_dynamic_bodies_state(state)
@@ -844,6 +840,10 @@ function MenuSceneManager:_chk_character_visibility(char_unit)
 		self:_set_character_and_outfit_visibility(char_unit, false)
 		return
 	end
+	if char_unit == self._character_unit and self._current_scene_template ~= "" and not self._scene_templates[self._current_scene_template].character_visible then
+		self:_set_character_and_outfit_visibility(char_unit, false)
+		return
+	end
 	self:_set_character_and_outfit_visibility(char_unit, true)
 end
 
@@ -1140,7 +1140,7 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 		self._character_values = self._character_values or {}
 		self._character_values.pos_current = self._character_values.pos_target or template_data.character_pos
 		self._character_values.pos_target = template_data.character_pos or self._character_values.pos_current
-		self:_set_character_dynamic_bodies_state("keyframed")
+		self:_chk_character_visibility(self._character_unit)
 		self._camera_values.camera_pos_current = self._camera_values.camera_pos_target
 		self._camera_values.target_pos_current = self._camera_values.target_pos_target
 		self._camera_values.fov_current = self._camera_values.fov_target

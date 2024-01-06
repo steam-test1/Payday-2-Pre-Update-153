@@ -162,7 +162,7 @@ function GuiTweakData:init()
 		image = "guis/dlcs/hl_miami/textures/pd2/content_updates/hl_miami"
 	}
 	local crimefest = {
-		id = "hl_crimefest",
+		id = "crimefest",
 		name_id = "menu_content_crimefest",
 		desc_id = "menu_content_crimefest_desc",
 		date_id = "menu_content_crimefest_date",
@@ -170,7 +170,7 @@ function GuiTweakData:init()
 		image = "guis/textures/pd2/content_updates/crimefest"
 	}
 	local jowi = {
-		id = "hl_jowi",
+		id = "jowi",
 		name_id = "menu_content_jowi",
 		desc_id = "menu_content_jowi_desc",
 		date_id = "menu_content_jowi_date",
@@ -178,7 +178,7 @@ function GuiTweakData:init()
 		image = "guis/textures/pd2/content_updates/jowi"
 	}
 	local hoxton_char = {
-		id = "hl_hoxton_char",
+		id = "hoxton_char",
 		name_id = "menu_content_hoxton_char",
 		desc_id = "menu_content_hoxton_char_desc",
 		date_id = "menu_content_hoxton_char_date",
@@ -186,7 +186,7 @@ function GuiTweakData:init()
 		image = "guis/textures/pd2/content_updates/hoxton_char"
 	}
 	local hoxton_job = {
-		id = "hl_hoxton_job",
+		id = "hoxton_job",
 		name_id = "menu_content_hoxton_job",
 		desc_id = "menu_content_hoxton_job_desc",
 		date_id = "menu_content_hoxton_job_date",
@@ -194,7 +194,7 @@ function GuiTweakData:init()
 		image = "guis/textures/pd2/content_updates/hoxton_job"
 	}
 	local halloween_2014 = {
-		id = "hl_halloween_2014",
+		id = "halloween_2014",
 		name_id = "menu_content_halloween_2014",
 		desc_id = "menu_content_halloween_2014_desc",
 		date_id = "menu_content_halloween_2014_date",
@@ -214,8 +214,24 @@ function GuiTweakData:init()
 		name_id = "menu_content_christmas_2014",
 		desc_id = "menu_content_christmas_2014_desc",
 		date_id = "menu_content_christmas_2014_date",
-		webpage = "http://www.media.starbreeze.com/whitechristmas/",
+		webpage = "http://www.overkillsoftware.com/whitechristmas/",
 		image = "guis/dlcs/pines/textures/pd2/content_updates/christmas_2014"
+	}
+	local character_pack_clover = {
+		id = "character_pack_clover",
+		name_id = "menu_content_character_pack_clover",
+		desc_id = "menu_content_character_pack_clover_desc",
+		date_id = "menu_content_character_pack_clover_date",
+		store = 337661,
+		image = "guis/dlcs/character_pack_clover/textures/pd2/content_updates/character_pack_clover"
+	}
+	local hope_diamond = {
+		id = "hope_diamond",
+		name_id = "menu_content_hope_diamond",
+		desc_id = "menu_content_hope_diamond_desc",
+		date_id = "menu_content_hope_diamond_date",
+		store = 337660,
+		image = "guis/dlcs/character_pack_clover/textures/pd2/content_updates/hope_diamond"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -250,7 +266,9 @@ function GuiTweakData:init()
 			hoxton_job,
 			halloween_2014,
 			gage_pack_historical,
-			christmas_2014
+			christmas_2014,
+			character_pack_clover,
+			hope_diamond
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -337,6 +355,7 @@ function GuiTweakData:init()
 	self.crime_net.debug_options.mass_spawn_limit = 100
 	self.crime_net.debug_options.mass_spawn_timer = 0.04
 	self.rename_max_letters = 20
+	self.rename_skill_set_max_letters = 15
 	self.mod_preview_min_fov = -20
 	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
@@ -1476,6 +1495,15 @@ function GuiTweakData:init()
 						"hoxton3"
 					},
 					post_event = "pln_contact_houston"
+				}
+			},
+			{
+				id = "clover",
+				name_id = "menu_clover",
+				{
+					desc_id = "menu_clover_desc_codex",
+					videos = {"clover1", "clover2"},
+					post_event = "pln_contact_clover"
 				}
 			}
 		}

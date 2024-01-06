@@ -1466,7 +1466,7 @@ function UnitNetworkHandler:server_throw_grenade(grenade_type, position, dir, se
 		return
 	end
 	local peer_id = peer:id()
-	local grenade_entry = GrenadeBase.types[grenade_type]
+	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
 	local no_cheat_count = tweak_data.blackmarket.grenades[grenade_entry].no_cheat_count
 	if not no_cheat_count and not managers.player:verify_grenade(peer_id) then
 		return
@@ -1478,7 +1478,7 @@ function UnitNetworkHandler:sync_throw_grenade(unit, dir, grenade_type, peer_id,
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
-	local grenade_entry = GrenadeBase.types[grenade_type]
+	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
 	local no_cheat_count = tweak_data.blackmarket.grenades[grenade_entry].no_cheat_count
 	if not no_cheat_count then
 		managers.player:verify_grenade(peer_id)

@@ -238,7 +238,6 @@ function PlayerDamage:_regenerated(no_messiah)
 	self._revive_health_i = 1
 	managers.environment_controller:set_last_life(false)
 	self._down_time = tweak_data.player.damage.DOWNED_TIME
-	self._regenerate_timer = nil
 	if not no_messiah then
 		self._messiah_charges = managers.player:upgrade_value("player", "pistol_revive_from_bleed_out", 0)
 	end

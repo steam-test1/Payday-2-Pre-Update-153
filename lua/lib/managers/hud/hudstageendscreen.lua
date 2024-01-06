@@ -1347,12 +1347,18 @@ function HUDStageEndScreen:stage_init(t, dt)
 	self._experience_text_panel = exp
 	self._experience_text_panel:set_alpha(0)
 	self._experience_added = 0
-	bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_stage")
-	bonus_params.bonus = data.bonuses.stage_xp
-	local stage = self:_create_bonus(bonus_params)
-	stage:set_right(0)
-	stage:set_top(exp:bottom())
 	self._bonuses = {}
+	if data.bonuses.stage_xp and data.bonuses.stage_xp ~= 0 then
+		bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_stage")
+		bonus_params.bonus = data.bonuses.stage_xp
+		local stage = self:_create_bonus(bonus_params)
+		stage:set_right(0)
+		stage:set_top(exp:bottom())
+		table.insert(self._bonuses, {
+			stage,
+			bonus_params.bonus
+		})
+	end
 	local job
 	if data.bonuses.last_stage and data.bonuses.job_xp ~= 0 then
 		bonus_params.title = managers.localization:to_upper_text("menu_es_base_xp_job")

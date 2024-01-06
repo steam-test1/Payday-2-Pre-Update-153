@@ -2071,6 +2071,27 @@ function SkillTreeTweakData:init()
 		"temporary_first_aid_damage_reduction",
 		"temporary_passive_revive_damage_reduction_2"
 	}
+	self.skill_switches = {
+		{
+			name_id = "menu_st_skill_switch_1"
+		},
+		{
+			name_id = "menu_st_skill_switch_2",
+			locks = {level = 50}
+		},
+		{
+			name_id = "menu_st_skill_switch_3",
+			locks = {level = 75}
+		},
+		{
+			name_id = "menu_st_skill_switch_4",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_5",
+			locks = {level = 100, achievement = "frog_1"}
+		}
+	}
 	self.specialization_convertion_rate = {
 		100,
 		200,
@@ -2240,8 +2261,7 @@ function SkillTreeTweakData:init()
 			},
 			{
 				upgrades = {
-					"player_panic_suppression",
-					"player_passive_suppression_bonus_2"
+					"player_panic_suppression"
 				},
 				cost = 2400,
 				icon_xy = {3, 1},
@@ -2648,6 +2668,102 @@ function SkillTreeTweakData:init()
 				icon_xy = {6, 2},
 				name_id = "menu_deck6_9",
 				desc_id = "menu_deck6_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_7",
+			desc_id = "menu_st_spec_7_desc",
+			dlc = "character_pack_clover",
+			{
+				upgrades = {
+					"player_tier_dodge_chance_1"
+				},
+				cost = 200,
+				icon_xy = {1, 2},
+				name_id = "menu_deck7_1",
+				desc_id = "menu_deck7_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck7_2",
+				desc_id = "menu_deck7_2_desc"
+			},
+			{
+				upgrades = {
+					"player_stand_still_crouch_camouflage_bonus_1",
+					"player_corpse_dispose_speed_multiplier"
+				},
+				cost = 400,
+				icon_xy = {0, 4},
+				name_id = "menu_deck7_3",
+				desc_id = "menu_deck7_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck7_4",
+				desc_id = "menu_deck7_4_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_dodge_chance_2",
+					"player_stand_still_crouch_camouflage_bonus_2",
+					"player_pick_lock_speed_multiplier"
+				},
+				cost = 1000,
+				icon_xy = {7, 3},
+				name_id = "menu_deck7_5",
+				desc_id = "menu_deck7_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck7_6",
+				desc_id = "menu_deck7_6_desc"
+			},
+			{
+				upgrades = {
+					"player_tier_dodge_chance_3",
+					"player_stand_still_crouch_camouflage_bonus_3",
+					"player_alarm_pager_speed_multiplier"
+				},
+				cost = 2400,
+				icon_xy = {1, 4},
+				name_id = "menu_deck7_7",
+				desc_id = "menu_deck7_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck7_8",
+				desc_id = "menu_deck7_8_desc"
+			},
+			{
+				upgrades = {
+					"player_armor_regen_timer_stand_still_multiplier",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {2, 4},
+				name_id = "menu_deck7_9",
+				desc_id = "menu_deck7_9_desc"
 			}
 		}
 	}

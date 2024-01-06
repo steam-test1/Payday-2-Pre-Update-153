@@ -482,6 +482,32 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.gage_pack_historical.track = true
 	self.global_values.gage_pack_historical.sort_number = 89
 	self.global_values.gage_pack_historical.category = "dlc"
+	self.global_values.character_pack_clover = {}
+	self.global_values.character_pack_clover.name_id = "bm_global_value_character_pack_clover"
+	self.global_values.character_pack_clover.desc_id = "menu_l_global_value_character_pack_clover"
+	self.global_values.character_pack_clover.unlock_id = "bm_global_value_character_pack_clover_unlock"
+	self.global_values.character_pack_clover.color = Color(255, 255, 212, 0) / 255
+	self.global_values.character_pack_clover.dlc = true
+	self.global_values.character_pack_clover.chance = 1
+	self.global_values.character_pack_clover.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "character_pack_clover")
+	self.global_values.character_pack_clover.durability_multiplier = 1
+	self.global_values.character_pack_clover.drops = true
+	self.global_values.character_pack_clover.track = true
+	self.global_values.character_pack_clover.sort_number = 90
+	self.global_values.character_pack_clover.category = "dlc"
+	self.global_values.hope_diamond = {}
+	self.global_values.hope_diamond.name_id = "bm_global_value_hope_diamond"
+	self.global_values.hope_diamond.desc_id = "menu_l_global_value_hope_diamond"
+	self.global_values.hope_diamond.unlock_id = "bm_global_value_hope_diamond_unlock"
+	self.global_values.hope_diamond.color = Color(255, 255, 212, 0) / 255
+	self.global_values.hope_diamond.dlc = true
+	self.global_values.hope_diamond.chance = 1
+	self.global_values.hope_diamond.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "hope_diamond")
+	self.global_values.hope_diamond.durability_multiplier = 1
+	self.global_values.hope_diamond.drops = true
+	self.global_values.hope_diamond.track = true
+	self.global_values.hope_diamond.sort_number = 91
+	self.global_values.hope_diamond.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -525,7 +551,8 @@ function LootDropTweakData:init(tweak_data)
 		"gage_pack_assault",
 		"hl_miami",
 		"hlm_game",
-		"gage_pack_historical"
+		"gage_pack_historical",
+		"character_pack_clover"
 	}
 	self:_create_global_value_list_map()
 end

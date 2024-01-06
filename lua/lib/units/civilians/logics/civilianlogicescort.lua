@@ -220,7 +220,7 @@ function CivilianLogicEscort.too_scared_to_move(data)
 	local my_data = data.internal_data
 	local nobody_close = true
 	local min_dis_sq = 1000000
-	for c_key, c_data in pairs(managers.groupai:state():all_criminals()) do
+	for c_key, c_data in pairs(managers.groupai:state():all_char_criminals()) do
 		if min_dis_sq > mvector3.distance_sq(c_data.m_pos, data.m_pos) then
 			nobody_close = nil
 			break
@@ -230,7 +230,7 @@ function CivilianLogicEscort.too_scared_to_move(data)
 		return "abandoned"
 	end
 	local nobody_close = true
-	local min_dis_sq = tweak_data.character[data.unit:base()._tweak_table].escort_scared_dist
+	local min_dis_sq = data.char_tweak.escort_scared_dist
 	min_dis_sq = min_dis_sq * min_dis_sq
 	for c_key, c_data in pairs(managers.enemy:all_enemies()) do
 		if not c_data.unit:anim_data().surrender and c_data.unit:brain()._current_logic_name ~= "trade" and min_dis_sq > mvector3.distance_sq(c_data.m_pos, data.m_pos) and math.abs(c_data.m_pos.z - data.m_pos.z) < 250 then

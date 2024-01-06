@@ -367,6 +367,11 @@ function EquipmentsTweakData:init()
 		icon = "equipment_planks",
 		sync_possession = true
 	}
+	self.specials.mus_glas_cutter = {
+		text_id = "hud_equipment_mus_glass_cutter",
+		icon = "equipment_glasscutter",
+		sync_possession = true
+	}
 	self.max_amount = {
 		ammo_bag = 2,
 		doctor_bag = 2,

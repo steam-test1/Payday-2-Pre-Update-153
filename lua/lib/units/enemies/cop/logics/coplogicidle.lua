@@ -924,8 +924,16 @@ function CopLogicIdle._get_priority_attention(data, attention_objects, reaction_
 				if data.attention_obj and data.attention_obj.u_key == u_key and data.t - attention_data.acquire_t < 4 then
 					old_enemy = true
 				end
-				if attention_data.settings.weight_mul then
-					local weight_mul = 1 / attention_data.settings.weight_mul
+				local weight_mul = attention_data.settings.weight_mul
+				if attention_data.is_local_player then
+					if not att_unit:movement():current_state()._moving and att_unit:movement():current_state():ducking() then
+						weight_mul = (weight_mul or 1) * managers.player:upgrade_value("player", "stand_still_crouch_camouflage_bonus", 1)
+					end
+				elseif att_unit:base() and att_unit:base().upgrade_value and att_unit:movement() and not att_unit:movement()._move_data and att_unit:movement()._pose_code and att_unit:movement()._pose_code == 2 then
+					weight_mul = (weight_mul or 1) * (att_unit:base():upgrade_value("player", "stand_still_crouch_camouflage_bonus") or 1)
+				end
+				if weight_mul and weight_mul ~= 1 then
+					weight_mul = 1 / weight_mul
 					alert_dt = alert_dt and alert_dt * weight_mul
 					dmg_dt = dmg_dt and dmg_dt * weight_mul
 					distance = distance * weight_mul

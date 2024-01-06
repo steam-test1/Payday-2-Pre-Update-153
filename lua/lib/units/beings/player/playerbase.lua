@@ -150,6 +150,10 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("player", "uncover_multiplier") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "uncover_multiplier", 1)
 		end
+		if managers.player:has_category_upgrade("player", "stand_still_crouch_camouflage_bonus") then
+			local level = managers.player:upgrade_level("player", "stand_still_crouch_camouflage_bonus")
+			managers.network:session():send_to_host("sync_upgrade", "player", "stand_still_crouch_camouflage_bonus", level)
+		end
 		if managers.player:has_category_upgrade("sentry_gun", "spread_multiplier") then
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "spread_multiplier", 1)
 		end

@@ -217,6 +217,9 @@ function MissionEndState:at_enter(old_state, params)
 					end
 				end
 			end
+			if managers.blackmarket:check_frog_1() and managers.job:on_last_stage() then
+				managers.achievment:award("frog_1")
+			end
 		end
 		local masks_pass, level_pass, job_pass, jobs_pass, difficulty_pass, difficulties_pass, all_pass, memory, level_id, stage
 		for achievement, achievement_data in pairs(tweak_data.achievement.four_mask_achievements) do

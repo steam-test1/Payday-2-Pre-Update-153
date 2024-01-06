@@ -356,6 +356,16 @@ function MissionDoorTweakData:init()
 			timer = 60
 		}
 	}
+	self.drill_120 = {}
+	self.drill_120.devices = {}
+	self.drill_120.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 120
+		}
+	}
 	self.truck = {}
 	self.truck.devices = {}
 	self.truck.devices.drill = {

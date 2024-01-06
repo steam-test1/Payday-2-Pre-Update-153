@@ -1824,6 +1824,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_available_mods",
 				callback = callback(self, self, "show_available_mods_callback")
 			},
+			bw_buy_dlc = {
+				prio = 4,
+				btn = "BTN_X",
+				pc_btn = Idstring("menu_modify_item"),
+				name = "bm_menu_buy_dlc",
+				callback = callback(self, self, "show_buy_dlc_callback")
+			},
 			mt_choose = {
 				prio = 1,
 				btn = "BTN_A",
@@ -4119,6 +4126,8 @@ function BlackMarketGui:_stop_rename_item()
 			self._rename_caret = nil
 			self._caret_connected = nil
 		end
+		managers.menu_component:post_event("menu_enter")
+		self._rename_highlight = false
 		self:reload()
 	end
 end
@@ -4136,6 +4145,7 @@ function BlackMarketGui:_cancel_rename_item()
 			self._rename_caret = nil
 			self._caret_connected = nil
 		end
+		self._rename_highlight = false
 		self._one_frame_input_delay = true
 		self:update_info_text()
 	end
@@ -4283,6 +4293,7 @@ function BlackMarketGui:update_info_text()
 					}) .. "\n"
 				end
 				updated_texts[3].text = text
+				updated_texts[3].below_stats = true
 			elseif self._slot_data.can_afford == false then
 			end
 			if slot_data.last_weapon then
@@ -4395,7 +4406,7 @@ function BlackMarketGui:update_info_text()
 				updated_texts[3].text = managers.localization:to_upper_text(slot_data.dlc_locked)
 			elseif slot_data.infamy_lock then
 				updated_texts[3].text = managers.localization:to_upper_text("menu_infamy_lock_info")
-			elseif mask_id and achievement_tracker[mask_id] then
+			elseif mask_id and achievement_tracker[mask_id] and (not (type(slot_data.unlocked) == "number" or slot_data.unlocked) or slot_data.unlocked == 0) then
 				local achievement_data = achievement_tracker[mask_id]
 				local max_progress = achievement_data.max_progress
 				local text_id = achievement_data.text_id
@@ -4678,7 +4689,7 @@ function BlackMarketGui:update_info_text()
 				w = mini_icon.w or 32,
 				h = mini_icon.h or 32
 			})
-			table.insert(self._desc_mini_icons, {new_icon, 1})
+			table.insert(self._desc_mini_icons, {new_icon, 2})
 		end
 		updated_texts[2].text = string.rep("     ", table.size(desc_mini_icons)) .. updated_texts[2].text
 	else
@@ -4693,7 +4704,7 @@ function BlackMarketGui:update_info_text()
 			blend_mode = "add"
 		})
 		updated_texts[3].text = "     " .. updated_texts[3].text
-		table.insert(self._desc_mini_icons, {new_icon, 2})
+		table.insert(self._desc_mini_icons, {new_icon, 3})
 	else
 	end
 	if is_renaming_this and self._rename_info_text then
@@ -4743,7 +4754,7 @@ function BlackMarketGui:update_info_text()
 	end
 	for _, desc_mini_icon in ipairs(self._desc_mini_icons) do
 		desc_mini_icon[1]:set_y(title_offset)
-		desc_mini_icon[1]:set_world_top(self._info_texts[desc_mini_icon[2]]:world_bottom() + (2 - (desc_mini_icon[2] - 1) * 3))
+		desc_mini_icon[1]:set_world_top(self._info_texts[desc_mini_icon[2]]:world_top())
 	end
 	if is_renaming_this and self._rename_info_text and self._rename_caret then
 		local info_text = self._info_texts[self._rename_info_text]
@@ -4778,7 +4789,7 @@ function BlackMarketGui:set_info_text(id, new_string, resource_color)
 	local info_text = self._info_texts[id]
 	local text = new_string
 	self._info_texts_bg[id]:set_visible(false)
-	info_text:set_blend_mode("normal")
+	info_text:set_blend_mode("add")
 	info_text:set_color(self._info_texts_color[id] or Color.white)
 	info_text:clear_range_color(0, utf8.len(info_text:text()))
 	local start_ci, end_ci, first_ci
@@ -4954,16 +4965,21 @@ function BlackMarketGui:mouse_moved(o, x, y)
 		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
 		if text_button then
 			if text_button:inside(x, y) then
-				text_button:set_blend_mode("add")
-				text_button:set_color(tweak_data.screen_colors.button_stage_2)
+				if not self._rename_highlight then
+					self._rename_highlight = true
+					text_button:set_blend_mode("add")
+					text_button:set_color(tweak_data.screen_colors.button_stage_2)
+					local bg = self._info_texts_bg[self._rename_info_text]
+					if alive(bg) then
+						bg:set_visible(true)
+						bg:set_color(tweak_data.screen_colors.button_stage_3)
+					end
+					managers.menu_component:post_event("highlight")
+				end
 				used = true
 				pointer = "link"
-				local bg = self._info_texts_bg[self._rename_info_text]
-				if alive(bg) then
-					bg:set_visible(true)
-					bg:set_color(tweak_data.screen_colors.button_stage_3)
-				end
-			else
+			elseif self._rename_highlight then
+				self._rename_highlight = false
 				text_button:set_blend_mode("normal")
 				text_button:set_color(tweak_data.screen_colors.text)
 				local bg = self._info_texts_bg[self._rename_info_text]
@@ -5576,7 +5592,7 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		new_data.price = managers.money:get_weapon_slot_sell_value(category, i)
 		local texture_name = tweak_data.weapon[crafted.weapon_id].texture_name or tostring(crafted.weapon_id)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		new_data.comparision_data = new_data.unlocked and managers.blackmarket:get_weapon_stats(category, i)
+		new_data.comparision_data = managers.blackmarket:get_weapon_stats(category, i)
 		new_data.global_value = tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"
 		new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or nil
 		new_data.lock_texture = self:get_lock_icon(new_data)
@@ -5770,6 +5786,7 @@ function BlackMarketGui:populate_characters(data)
 		new_data.equipped_text = managers.localization:text("bm_menu_preferred")
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
 		new_data.stream = false
+		new_data.global_value = character_table.dlc
 		new_data.lock_texture = self:get_lock_icon(new_data, "guis/textures/pd2/lock_community")
 		if character_table and character_table.locks then
 			local dlc = character_table.locks.dlc
@@ -6708,7 +6725,7 @@ function BlackMarketGui:populate_buy_weapon(data)
 		new_data.equipped = false
 		local texture_name = tweak_data.weapon[new_data.name].texture_name or tostring(new_data.name)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
-		new_data.comparision_data = new_data.unlocked and deep_clone(tweak_data.weapon[new_data.name].stats)
+		new_data.comparision_data = deep_clone(tweak_data.weapon[new_data.name].stats)
 		new_data.skill_name = weapon_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
 		new_data.can_afford = managers.money:can_afford_weapon(new_data.name)
 		new_data.price = managers.money:get_weapon_price_modified(new_data.name)
@@ -6728,8 +6745,10 @@ function BlackMarketGui:populate_buy_weapon(data)
 			if new_data.can_afford then
 				table.insert(new_data, "bw_buy")
 			end
-			table.insert(new_data, "bw_preview")
+		elseif Global.dlc_manager.all_dlc_data[new_data.global_value] and Global.dlc_manager.all_dlc_data[new_data.global_value].app_id and not Global.dlc_manager.all_dlc_data[new_data.global_value].external and not managers.dlc:is_dlc_unlocked(new_data.global_value) then
+			table.insert(new_data, "bw_buy_dlc")
 		end
+		table.insert(new_data, "bw_preview")
 		table.insert(new_data, "bw_available_mods")
 		local new_weapon = managers.blackmarket:got_new_drop(data.category, "weapon_buy", new_data.name)
 		local got_mods = managers.blackmarket:got_new_drop("normal", new_data.category, data.on_create_data[i].factory_id)
@@ -7160,7 +7179,7 @@ function BlackMarketGui:_start_page_data()
 		on_create_func_name = "populate_melee_weapons",
 		allow_preview = true,
 		override_slots = {3, 3},
-		identifier = Idstring("melee_weapon")
+		identifier = self.identifiers.melee_weapon
 	})
 	table.insert(data, {
 		name = "bm_menu_armors",
@@ -7174,7 +7193,7 @@ function BlackMarketGui:_start_page_data()
 		category = "deployables",
 		on_create_func_name = "populate_deployables",
 		override_slots = {4, 2},
-		identifier = Idstring("deployable")
+		identifier = self.identifiers.deployable
 	})
 	table.insert(data, {
 		name = "bm_menu_masks",
@@ -7189,7 +7208,7 @@ function BlackMarketGui:_start_page_data()
 			name = "bm_menu_characters",
 			category = "characters",
 			on_create_func_name = "populate_characters",
-			override_slots = {3, 2},
+			override_slots = {4, 2},
 			identifier = self.identifiers.character
 		})
 	end
@@ -7810,6 +7829,11 @@ function BlackMarketGui:choose_mask_buy_callback(data)
 		y_sn = y_sn + (y_td.sort_number or 0)
 		x_iso = table.get_key(iso, x.mask_id) or 0
 		y_iso = table.get_key(iso, y.mask_id) or 0
+		if x_td.value == 0 and y_td.value ~= 0 then
+			return false
+		elseif x_td.value ~= 0 and y_td.value == 0 then
+			return true
+		end
 		if x_sn ~= y_sn then
 			return x_sn < y_sn
 		end
@@ -8297,6 +8321,14 @@ function BlackMarketGui:show_available_mask_mods_callback(data)
 	managers.menu:show_mask_mods_available(params)
 	if reload_gui then
 		self:reload()
+	end
+end
+
+function BlackMarketGui:show_buy_dlc_callback(data)
+	local dlc_data = Global.dlc_manager.all_dlc_data[data.global_value]
+	local app_id = dlc_data and dlc_data.app_id
+	if app_id and not dlc_data.external then
+		Steam:overlay_activate("store", app_id)
 	end
 end
 

@@ -40,6 +40,8 @@ CopActionAct._act_redirects.script = {
 	"dizzy"
 }
 CopActionAct._act_redirects.enemy_spawn = {
+	"e_sp_ss_dropbag",
+	"e_sp_ss_exitcar_right",
 	"e_sp_car_exit_to_cbt_front_l",
 	"e_sp_car_exit_to_cbt_front_r",
 	"e_sp_car_exit_to_cbt_front_l_var2",
@@ -83,10 +85,17 @@ CopActionAct._act_redirects.enemy_spawn = {
 	"e_sp_dizzy_look_around",
 	"e_sp_car_exit_ntrl_front_r",
 	"e_sp_car_exit_ntrl_front_l",
+	"e_sp_dwn_5m",
+	"e_sp_dwn_10m",
+	"e_sp_dwn_11m_var2",
 	"e_sp_down_5_5m",
+	"e_sp_down_6m",
 	"e_sp_dwn_10_25m",
 	"e_sp_climb_over_2m",
 	"e_sp_dwn_11m",
+	"e_sp_swing_dwn_7m_window",
+	"e_sp_over_1m_dwn_7m",
+	"e_sp_over_1m_swing_dwn_7m_window",
 	"e_sp_up_ledge",
 	"e_sp_stumble_var2",
 	"e_sp_stumble_var1",
@@ -186,9 +195,14 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cf_sp_lean_wall_right",
 	"cf_sp_lean_wall_back",
 	"cf_sp_lying_hurt",
-	"cf_sp_lying_drugged_sleep"
+	"cf_sp_lying_drugged_sleep",
+	"sstash_spawn_crashed_limo1",
+	"sstash_spawn_crashed_limo2",
+	"sstash_spawn_crashed_limo3",
+	"sstash_spawn_crashed_limo4"
 }
 CopActionAct._act_redirects.SO = {
+	"e_nl_ss_run_dunk_hood",
 	"e_nl_plant_run_through",
 	"e_nl_open_door",
 	"e_nl_climb_over_2m",
@@ -298,6 +312,9 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_down_thermite_hole",
 	"e_nl_up_7m_ladder",
 	"e_so_push_button",
+	"e_nl_up_1m_dwn_4_5m_roll",
+	"e_nl_slide_4m_dwn_2m",
+	"e_nl_up_1m_dwn_4_5m",
 	"e_so_throw_grenade",
 	"e_so_ntl_idle_tired",
 	"e_so_ntl_idle_kickpebble",
@@ -347,6 +364,8 @@ CopActionAct._act_redirects.SO = {
 	"e_so_talking_in_megaphone",
 	"e_so_sup_fumble_inplace",
 	"e_so_sup_fumble_run_fwd",
+	"cm_so_ss_goto_trunk",
+	"cm_so_ss_enter_limo",
 	"cm_so_escort_get_up_hesitant",
 	"cm_so_investigate_hi",
 	"cm_so_investigate_low",
@@ -380,7 +399,22 @@ CopActionAct._act_redirects.SO = {
 	"cm_so_drunk_sit",
 	"cm_so_drunk",
 	"cm_so_drink_or_puke",
-	"cm_so_climb_rope_ladder"
+	"cm_so_climb_rope_ladder",
+	"sstash_stand_enter",
+	"sstash_stand_loop",
+	"sstash_sit_enter",
+	"sstash_sit_untied_loop",
+	"sstash_sit_tied_enter",
+	"sstash_sit_tied_loop",
+	"sstash_sit_tied_react",
+	"sstash_sit_tied_react2",
+	"sstash_sit_tied_yes",
+	"sstash_sit_tied_no",
+	"sstash_sit_tied_fwd_hit",
+	"sstash_sit_tied_bwd_hit",
+	"sstash_sit_tied_faint",
+	"sstash_sit_tied_fainted",
+	"sstash_sit_tied_wakeup"
 }
 
 function CopActionAct:init(action_desc, common_data)

@@ -761,7 +761,19 @@ function LevelsTweakData:init()
 	self.pines.music = "heist"
 	self.pines.package = "packages/narr_pines"
 	self.pines.cube = "cube_apply_heist_bank"
-	self.pines.max_bags = 120
+	self.pines.max_bags = 1200
+	self.mus = {}
+	self.mus.name_id = "heist_mus_hl"
+	self.mus.briefing_id = "heist_mus_briefing"
+	self.mus.briefing_dialog = "Play_pln_hd1_brf_01"
+	self.mus.world_name = "narratives/dentist/mus"
+	self.mus.intro_event = "Play_pln_hd1_intro_01"
+	self.mus.outro_event = {"lol", "lolo"}
+	self.mus.music = "heist"
+	self.mus.package = "packages/narr_mus"
+	self.mus.cube = "cube_apply_heist_bank"
+	self.mus.max_bags = 20
+	self.mus.ghost_bonus = 0.15
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -815,7 +827,8 @@ function LevelsTweakData:init()
 		"gallery",
 		"hox_1",
 		"hox_2",
-		"pines"
+		"pines",
+		"mus"
 	}
 	self.escape_levels = {
 		"escape_cafe",

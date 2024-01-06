@@ -48,6 +48,7 @@ function CarryTweakData:init(tweak_data)
 	self.small_loot.diamondheist_vault_bust = tweak_data:get_value("money_manager", "small_loot", "diamondheist_vault_bust")
 	self.small_loot.diamondheist_vault_diamond = tweak_data:get_value("money_manager", "small_loot", "diamondheist_vault_diamond")
 	self.small_loot.diamondheist_big_diamond = tweak_data:get_value("money_manager", "small_loot", "diamondheist_big_diamond")
+	self.small_loot.mus_small_artifact = tweak_data:get_value("money_manager", "small_loot", "mus_small_artifact")
 	self.small_loot.value_gold = tweak_data:get_value("money_manager", "small_loot", "value_gold")
 	self.small_loot.gen_atm = tweak_data:get_value("money_manager", "small_loot", "gen_atm")
 	self.small_loot.special_deposit_box = tweak_data:get_value("money_manager", "small_loot", "special_deposit_box")
@@ -227,6 +228,17 @@ function CarryTweakData:init(tweak_data)
 	self.artifact_statue.name_id = "hud_carry_artifact"
 	self.artifact_statue.bag_value = "artifact_statue"
 	self.artifact_statue.AI_carry = {SO_category = "enemies"}
+	self.mus_artifact = {}
+	self.mus_artifact.type = "medium"
+	self.mus_artifact.name_id = "hud_carry_artifact"
+	self.mus_artifact.bag_value = "mus_artifact_bag"
+	self.mus_artifact.AI_carry = {SO_category = "enemies"}
+	self.mus_artifact_paint = {}
+	self.mus_artifact_paint.type = "medium"
+	self.mus_artifact_paint.name_id = "hud_carry_artifact"
+	self.mus_artifact_paint.bag_value = "mus_artifact_bag"
+	self.mus_artifact_paint.unit = "units/payday2/pickups/gen_pku_canvasbag/gen_pku_canvasbag"
+	self.mus_artifact_paint.AI_carry = {SO_category = "enemies"}
 	self.samurai_suit = {}
 	self.samurai_suit.type = "medium"
 	self.samurai_suit.name_id = "hud_carry_samurai"
@@ -251,6 +263,13 @@ function CarryTweakData:init(tweak_data)
 	self.sandwich.AI_carry = {SO_category = "enemies"}
 	self.sandwich.visual_object = "g_cagebag"
 	self.sandwich.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.hope_diamond = {}
+	self.hope_diamond.type = "coke_light"
+	self.hope_diamond.name_id = "hud_carry_hope_diamond"
+	self.hope_diamond.bag_value = "hope_diamond"
+	self.hope_diamond.AI_carry = {SO_category = "enemies"}
+	self.hope_diamond.visual_object = "g_cagebag"
+	self.hope_diamond.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 end
 
 function CarryTweakData:get_carry_ids()

@@ -113,6 +113,7 @@ end
 function Setup:load_packages()
 	PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	TextureCache:set_streaming_enabled(true)
+	TextureCache:set_LOD_streaming_enabled(true)
 	if not Application:editor() then
 		PackageManager:set_streaming_enabled(true)
 	end

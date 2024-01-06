@@ -1234,7 +1234,7 @@ function CrimeNetContractGui:update(t, dt)
 end
 
 function CrimeNetContractGui:mouse_moved(o, x, y)
-	if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() then
+	if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() and self._step > 2 then
 		if self._briefing_len_panel:child("button_text"):inside(x, y) then
 			if not self._button_highlight then
 				self._button_highlight = true
@@ -1253,7 +1253,7 @@ function CrimeNetContractGui:mouse_moved(o, x, y)
 end
 
 function CrimeNetContractGui:mouse_pressed(o, button, x, y)
-	if alive(self._briefing_len_panel) and self._step > 2 and self._briefing_len_panel:child("button_text"):inside(x, y) then
+	if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() and self._step > 2 and self._briefing_len_panel:child("button_text"):inside(x, y) then
 		self:toggle_post_event()
 	end
 end
@@ -1266,7 +1266,9 @@ end
 
 function CrimeNetContractGui:special_btn_pressed(button)
 	if button == Idstring("voice_message") then
-		self:toggle_post_event()
+		if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() and self._step > 2 then
+			self:toggle_post_event()
+		end
 		return true
 	elseif button == Idstring("menu_toggle_filters") then
 	end
