@@ -148,7 +148,6 @@ function WeaponFactoryTweakData:init()
 	self:_init_galil()
 	self:_init_famas()
 	self:_init_content_jobs()
-	self:_init_flamethrower_mk1()
 	self:_init_scorpion()
 	self:_init_tec9()
 	self:_init_uzi()
@@ -487,65 +486,6 @@ function WeaponFactoryTweakData:_init_gadgets()
 			"wpn_fps_addon_ris"
 		}
 	}
-	self.parts.wpn_fps_upg_g_lmg_lionbipod = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
-		type = "gadget",
-		sub_type = "bipod",
-		name_id = "bm_wp_upg_lmg_lionbipod",
-		a_obj = "a_bp",
-		unit = "units/pd2_dlc_cro/weapons/wpn_fps_upg_g_lmg_lionbipod/wpn_fps_upg_g_lmg_lionbipod",
-		stats = {
-			value = 1,
-			spread_moving = -1,
-			spread = 2,
-			concealment = 1,
-			damage = 3,
-			suppression = 1,
-			recoil = 1,
-			alert_size = 1,
-			zoom = 1,
-			extra_ammo = 1
-		},
-		adds = {
-			"wpn_fps_addon_ris"
-		},
-		forbids = {
-			"wpn_fps_lmg_hk21_fg_short"
-		}
-	}
-	self.parts.wpn_fps_upg_g_lmg_bpd_giraffe = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
-		type = "gadget",
-		sub_type = "bipod",
-		name_id = "bm_wp_upg_lmg_giraffebipod",
-		a_obj = "a_bp",
-		unit = "units/pd2_dlc_cro/weapons/wpn_fps_upg_g_lmg_giraffebipod/wpn_fps_upg_g_lmg_giraffebipod",
-		stats = {
-			value = 1,
-			spread_moving = -1,
-			spread = 2,
-			concealment = 1,
-			damage = 3,
-			suppression = 1,
-			recoil = 1,
-			alert_size = 1,
-			zoom = 1,
-			extra_ammo = 1
-		},
-		adds = {
-			"wpn_fps_addon_ris"
-		}
-	}
 	self.parts.wpn_fps_upg_fl_ass_smg_sho_peqbox = {
 		pcs = {
 			20,
@@ -602,8 +542,6 @@ function WeaponFactoryTweakData:_init_gadgets()
 		}
 	}
 	self.parts.wpn_fps_upg_fl_ass_smg_sho_surefire.third_unit = "units/payday2/weapons/wpn_third_upg_fl_ass_smg_sho_surefire/wpn_third_upg_fl_ass_smg_sho_surefire"
-	self.parts.wpn_fps_upg_g_lmg_lionbipod.third_unit = "units/pd2_dlc_cro/weapons/wpn_third_upg_g_lmg_lionbipod/wpn_third_upg_g_lmg_lionbipod"
-	self.parts.wpn_fps_upg_g_lmg_bpd_giraffe.third_unit = "units/pd2_dlc_cro/weapons/wpn_third_upg_g_lmg_giraffebipod/wpn_third_upg_g_lmg_giraffebipod"
 	self.parts.wpn_fps_upg_fl_ass_smg_sho_peqbox.third_unit = "units/payday2/weapons/wpn_third_upg_fl_ass_smg_sho_peqbox/wpn_third_upg_fl_ass_smg_sho_peqbox"
 	self.parts.wpn_fps_upg_fl_pis_laser.third_unit = "units/payday2/weapons/wpn_third_upg_fl_pis_laser/wpn_third_upg_fl_pis_laser"
 	self.parts.wpn_fps_upg_fl_pis_tlr1.third_unit = "units/payday2/weapons/wpn_third_upg_fl_pis_tlr1/wpn_third_upg_fl_pis_tlr1"
@@ -775,9 +713,6 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_pis_judge = {
 				translation = Vector3(0, -10, -6)
-			},
-			wpn_fps_fla_flamethrower_mk1 = {
-				translation = Vector3(0, 0, -3)
 			},
 			wpn_fps_ass_g3 = {
 				translation = Vector3(0, -8, -3.2)
@@ -10093,9 +10028,6 @@ function WeaponFactoryTweakData:_init_hk21()
 			reload_not_empty = "reload_not_empty",
 			fire = "recoil",
 			fire_steelsight = "recoil"
-		},
-		forbids = {
-			"wpn_fps_upg_g_lmg_lionbipod"
 		}
 	}
 	self.parts.wpn_fps_lmg_hk21_g_ergo = {
@@ -10176,7 +10108,6 @@ function WeaponFactoryTweakData:_init_hk21()
 		"wpn_fps_lmg_hk21_g_ergo",
 		"wpn_fps_lmg_hk21_m_standard",
 		"wpn_fps_lmg_hk21_s_standard",
-		"wpn_fps_upg_g_lmg_lionbipod",
 		"wpn_fps_upg_ns_ass_smg_firepig",
 		"wpn_fps_upg_ns_ass_smg_stubby",
 		"wpn_fps_upg_ns_ass_smg_tank",
@@ -10361,7 +10292,6 @@ function WeaponFactoryTweakData:_init_m249()
 		"wpn_fps_lmg_m249_upper_reciever",
 		"wpn_fps_upg_m4_s_standard",
 		"wpn_fps_upg_m4_s_pts",
-		"wpn_fps_upg_g_lmg_bpd_giraffe",
 		"wpn_fps_upg_ns_ass_smg_firepig",
 		"wpn_fps_upg_ns_ass_smg_stubby",
 		"wpn_fps_upg_ns_ass_smg_tank",
@@ -14187,62 +14117,6 @@ function WeaponFactoryTweakData:create_ammunition()
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_piercing")
 		end
 	end
-end
-
-function WeaponFactoryTweakData:_init_flamethrower_mk1()
-	self.parts.wpn_fps_fla_flamethrower_mk1_b_long = {
-		type = "barrel",
-		name_id = "bm_wp_huntsman_b_long",
-		a_obj = "a_b",
-		unit = "units/payday2/weapons/wpn_fps_shot_huntsman_pts/wpn_fps_shot_huntsman_b_long",
-		stats = {value = 1},
-		animations = {reload = "reload", reload_not_empty = "reload"}
-	}
-	self.parts.wpn_fps_fla_flamethrower_mk1_body_standard = {
-		type = "lower_reciever",
-		name_id = "bm_wp_huntsman_body_standard",
-		a_obj = "a_body",
-		unit = "units/payday2/weapons/wpn_fps_shot_huntsman_pts/wpn_fps_shot_huntsman_body_standard",
-		stats = {value = 1}
-	}
-	self.parts.wpn_fps_fla_flamethrower_mk1_s_long = {
-		type = "stock",
-		name_id = "bm_wp_huntsman_s_long",
-		a_obj = "a_s",
-		unit = "units/payday2/weapons/wpn_fps_shot_huntsman_pts/wpn_fps_shot_huntsman_s_long",
-		stats = {value = 1}
-	}
-	self.parts.wpn_fps_fla_flamethrower_mk1_b_long.third_unit = "units/payday2/weapons/wpn_third_shot_huntsman_pts/wpn_third_shot_huntsman_b_long"
-	self.parts.wpn_fps_fla_flamethrower_mk1_body_standard.third_unit = "units/payday2/weapons/wpn_third_shot_huntsman_pts/wpn_third_shot_huntsman_body_standard"
-	self.parts.wpn_fps_fla_flamethrower_mk1_s_long.third_unit = "units/payday2/weapons/wpn_third_shot_huntsman_pts/wpn_third_shot_huntsman_s_long"
-	self.wpn_fps_fla_flamethrower_mk1 = {}
-	self.wpn_fps_fla_flamethrower_mk1.unit = "units/pd2_dlc_cro/weapons/wpn_fps_fla_flamethrower_mk1/wpn_fps_fla_flamethrower_mk1"
-	self.wpn_fps_fla_flamethrower_mk1.optional_types = {"barrel_ext", "gadget"}
-	self.wpn_fps_fla_flamethrower_mk1.override = {
-		wpn_fps_upg_a_explosive = {
-			custom_stats = {
-				ignore_statistic = true,
-				rays = 1,
-				damage_near_mul = 2,
-				damage_far_mul = 2.5,
-				bullet_class = "InstantExplosiveBulletBase",
-				ammo_pickup_min_mul = 0.5,
-				ammo_pickup_max_mul = 0.7
-			}
-		}
-	}
-	self.wpn_fps_fla_flamethrower_mk1.default_blueprint = {
-		"wpn_fps_shot_huntsman_body_standard",
-		"wpn_fps_shot_huntsman_b_long",
-		"wpn_fps_shot_huntsman_s_long"
-	}
-	self.wpn_fps_fla_flamethrower_mk1.uses_parts = {
-		"wpn_fps_shot_huntsman_body_standard",
-		"wpn_fps_shot_huntsman_b_long",
-		"wpn_fps_shot_huntsman_s_long"
-	}
-	self.wpn_fps_fla_flamethrower_mk1_npc = deep_clone(self.wpn_fps_fla_flamethrower_mk1)
-	self.wpn_fps_fla_flamethrower_mk1_npc.unit = "units/pd2_dlc_cro/weapons/wpn_fps_fla_flamethrower_mk1/wpn_fps_fla_flamethrower_mk1_npc"
 end
 
 function WeaponFactoryTweakData:_init_g26()
