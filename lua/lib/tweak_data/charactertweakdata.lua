@@ -36,6 +36,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_clover(presets)
 	self:_init_dragan(presets)
 	self:_init_jacket(presets)
+	self:_init_bonnie(presets)
 	self:_init_old_hoxton_mission(presets)
 end
 
@@ -1434,6 +1435,27 @@ function CharacterTweakData:_init_jacket(presets)
 	self.jacket.weapon_voice = "3"
 	self.jacket.access = "teamAI1"
 	self.jacket.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_bonnie(presets)
+	self.bonnie = {}
+	self.bonnie.damage = presets.gang_member_damage
+	self.bonnie.weapon = deep_clone(presets.weapon.gang_member)
+	self.bonnie.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11")
+	}
+	self.bonnie.detection = presets.detection.gang_member
+	self.bonnie.move_speed = presets.move_speed.fast
+	self.bonnie.crouch_move = false
+	self.bonnie.speech_prefix = "rb10"
+	self.bonnie.weapon_voice = "3"
+	self.bonnie.access = "teamAI1"
+	self.bonnie.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240

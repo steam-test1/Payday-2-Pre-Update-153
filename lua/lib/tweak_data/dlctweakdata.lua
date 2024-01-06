@@ -7,6 +7,7 @@ function DLCTweakData:init(tweak_data)
 		pd2_million = true,
 		washington_reveal = true,
 		pines = true,
+		character_pack_bonnie = true,
 		dlc1 = true,
 		gage_pack = true,
 		gage_pack_lmg = true,
@@ -296,6 +297,17 @@ function DLCTweakData:init(tweak_data)
 	self.freed_old_hoxton.content.loot_global_value = "pd2_clan"
 	self.freed_old_hoxton.content.loot_drops = {}
 	self.freed_old_hoxton.content.upgrades = {"toothbrush"}
+	self.pd2_clan_bonnie = {}
+	self.pd2_clan_bonnie.content = {}
+	self.pd2_clan_bonnie.dlc = "has_pd2_clan"
+	self.pd2_clan_bonnie.content.loot_global_value = "infamous"
+	self.pd2_clan_bonnie.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "bonnie",
+			amount = 1
+		}
+	}
 	self.preorder = {}
 	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}

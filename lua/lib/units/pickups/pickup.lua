@@ -49,5 +49,8 @@ function Pickup:load(data)
 	end
 end
 
+function Pickup:sync_net_event(event, peer)
+end
+
 function Pickup:destroy(unit)
 end

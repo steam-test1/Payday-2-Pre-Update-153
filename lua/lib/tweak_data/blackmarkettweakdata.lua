@@ -96,6 +96,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.female_1 = "msk_grizel"
 	self.masks.character_locked.dragan = "dragan"
 	self.masks.character_locked.jacket = "richard_returns"
+	self.masks.character_locked.bonnie = "bonnie"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -224,6 +225,25 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.dragan_begins.value = 0
 	self.masks.dragan_begins.texture_bundle_folder = "character_pack_dragan"
 	self.masks.dragan_begins.dlc = "character_pack_dragan"
+	self.masks.bonnie = {}
+	self.masks.bonnie.unit = "units/pd2_dlc_bonnie/masks/bonnie/msk_bonnie"
+	self.masks.bonnie.name_id = "bm_msk_bonnie"
+	self.masks.bonnie.pcs = {}
+	self.masks.bonnie.value = 0
+	self.masks.bonnie.global_value = "infamous"
+	self.masks.bonnie.texture_bundle_folder = "character_pack_bonnie"
+	self.masks.bonnie_begins = {}
+	self.masks.bonnie_begins.unit = "units/pd2_dlc_bonnie/masks/bonnie_begins/msk_bonnie_begins"
+	self.masks.bonnie_begins.name_id = "bm_msk_bonnie_begins"
+	self.masks.bonnie_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.bonnie_begins.value = 0
+	self.masks.bonnie_begins.global_value = "infamous"
+	self.masks.bonnie_begins.texture_bundle_folder = "character_pack_bonnie"
 	self.masks.cthulhu = {}
 	self.masks.cthulhu.unit = "units/payday2/masks/msk_cthulhu/msk_cthulhu"
 	self.masks.cthulhu.name_id = "bm_msk_cthulhu"
@@ -1694,7 +1714,8 @@ function BlackMarketTweakData:_init_masks()
 		old_hoxton = "balaclava_hoxton",
 		female_1 = "balaclava_clover",
 		dragan = "balaclava_dragan",
-		jacket = "balaclava_wolf"
+		jacket = "balaclava_wolf",
+		bonnie = "balaclava_dallas"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -1861,6 +1882,16 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.female_1.mask_off_sequence = "mask_off"
 	self.characters.female_1.name_id = "bm_character_female_1"
 	self.characters.female_1.dlc = "character_pack_clover"
+	self.characters.bonnie = {}
+	self.characters.bonnie.fps_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/fps_bonnie_mover"
+	self.characters.bonnie.npc_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/npc_criminal_bonnie"
+	self.characters.bonnie.menu_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/npc_criminal_bonnie_menu"
+	self.characters.bonnie.texture_bundle_folder = "character_pack_bonnie"
+	self.characters.bonnie.sequence = "var_mtr_bonnie"
+	self.characters.bonnie.mask_on_sequence = "bonnie_mask_on"
+	self.characters.bonnie.mask_off_sequence = "bonnie_mask_off"
+	self.characters.bonnie.name_id = "bm_character_bonnie"
+	self.characters.bonnie.dlc = "pd2_clan"
 	self.characters.ai_hoxton = {}
 	self.characters.ai_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/hoxton/npc_criminal_suit_hoxton"
 	self.characters.ai_hoxton.sequence = "var_mtr_hoxton"
@@ -1899,6 +1930,12 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_jacket.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jacket/npc_criminal_suit_jacket"
 	self.characters.ai_jacket.sequence = "var_mtr_jacket"
 	self.characters.ai_jacket.name_id = "bm_character_ai_jacket"
+	self.characters.ai_bonnie = {}
+	self.characters.ai_bonnie.npc_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/fem1/npc_criminal_female_bonnie_1"
+	self.characters.ai_bonnie.sequence = "var_mtr_bonnie"
+	self.characters.ai_bonnie.mask_on_sequence = "bonnie_mask_on"
+	self.characters.ai_bonnie.mask_off_sequence = "bonnie_mask_off"
+	self.characters.ai_bonnie.name_id = "bm_character_ai_bonnie"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -6663,5 +6700,32 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.hammer.sounds.charge = "hammer_charge"
 	self.melee_weapons.hammer.repeat_expire_t = 0.8
 	self.melee_weapons.hammer.stats.concealment = 27
+	self.melee_weapons.whiskey = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.whiskey.name_id = "bm_melee_whiskey"
+	self.melee_weapons.whiskey.dlc = "pd2_clan"
+	self.melee_weapons.whiskey.texture_bundle_folder = "character_pack_bonnie"
+	self.melee_weapons.whiskey.free = nil
+	self.melee_weapons.whiskey.anim_global_param = "melee_axe"
+	self.melee_weapons.whiskey.type = "axe"
+	self.melee_weapons.whiskey.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.whiskey.unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_mel_whiskey/wpn_fps_mel_whiskey"
+	self.melee_weapons.whiskey.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_mel_whiskey/wpn_third_mel_whiskey"
+	self.melee_weapons.whiskey.stats.weapon_type = "blunt"
+	self.melee_weapons.whiskey.stats.min_damage = 3
+	self.melee_weapons.whiskey.stats.max_damage = 5.5
+	self.melee_weapons.whiskey.stats.min_damage_effect = 3
+	self.melee_weapons.whiskey.stats.max_damage_effect = 2
+	self.melee_weapons.whiskey.stats.charge_time = 2
+	self.melee_weapons.whiskey.stats.range = 185
+	self.melee_weapons.whiskey.sounds = {}
+	self.melee_weapons.whiskey.sounds.equip = "whiskey_equip"
+	self.melee_weapons.whiskey.sounds.hit_air = "whiskey_hit_air"
+	self.melee_weapons.whiskey.sounds.hit_gen = "whiskey_hit_gen"
+	self.melee_weapons.whiskey.sounds.hit_body = "whiskey_hit_body"
+	self.melee_weapons.whiskey.sounds.charge = "whiskey_charge"
+	self.melee_weapons.whiskey.repeat_expire_t = 0.8
+	self.melee_weapons.whiskey.stats.concealment = 27
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

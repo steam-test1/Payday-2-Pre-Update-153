@@ -597,6 +597,31 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.killshot_regen_armor_bonus = {1}
 	self.values.player.killshot_close_regen_armor_bonus = {1}
 	self.values.player.killshot_close_panic_chance = {0.2}
+	self.loose_ammo_restore_health_values = {
+		base = 4,
+		cd = 15,
+		multiplier = 0.1,
+		{0, 2},
+		{2, 4},
+		{4, 6}
+	}
+	self.loose_ammo_give_team_ratio = 0.5
+	self.loose_ammo_give_team_health_ratio = 0.5
+	self.values.temporary.loose_ammo_restore_health = {}
+	for i, data in ipairs(self.loose_ammo_restore_health_values) do
+		local base = self.loose_ammo_restore_health_values.base
+		table.insert(self.values.temporary.loose_ammo_restore_health, {
+			{
+				base + data[1],
+				base + data[2]
+			},
+			self.loose_ammo_restore_health_values.cd
+		})
+	end
+	self.values.temporary.loose_ammo_give_team = {
+		{true, 5}
+	}
+	self.values.player.loose_ammo_restore_health_give_team = {true}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1321,6 +1346,25 @@ function UpgradesTweakData:_init_pd2_values()
 				"3",
 				"10%"
 			}
+		},
+		{
+			{
+				"4",
+				"8",
+				"15"
+			},
+			{"25%"},
+			{"50%", "5"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"50%"},
+			{"135%"},
+			{"2"},
+			{"5%", "20%"},
+			{"2", "10%"}
 		}
 	}
 	self.specialization_descs = {}
@@ -1521,17 +1565,21 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"fal", "tomahawk"}
 	}
+	self.level_tree[43] = {
+		name_id = "weapons",
+		upgrades = {"b682"}
+	}
 	self.level_tree[45] = {
 		name_id = "weapons",
 		upgrades = {"m249", "barbedwire"}
 	}
 	self.level_tree[46] = {
 		name_id = "weapons",
-		upgrades = {"gre_m79"}
+		upgrades = {"gre_m79", "b682"}
 	}
 	self.level_tree[47] = {
 		name_id = "weapons",
-		upgrades = {"freedom"}
+		upgrades = {"freedom", "whiskey"}
 	}
 	self.level_tree[48] = {
 		name_id = "weapons",
@@ -1801,6 +1849,7 @@ function UpgradesTweakData:init()
 	self:_m134_weapon_definitions()
 	self:_rpg7_weapon_definitions()
 	self:_cobray_definitions()
+	self:_b682_weapon_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -3248,6 +3297,15 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "suspicion_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_loose_ammo_restore_health_give_team = {
+		category = "temporary",
+		name_id = "menu_player_loose_ammo_restore_health_give_team",
+		upgrade = {
+			category = "player",
+			upgrade = "loose_ammo_restore_health_give_team",
 			value = 1
 		}
 	}
@@ -6101,6 +6159,15 @@ function UpgradesTweakData:_cobray_definitions()
 	}
 end
 
+function UpgradesTweakData:_b682_weapon_definitions()
+	self.definitions.b682 = {
+		category = "weapon",
+		weapon_id = "b682",
+		factory_id = "wpn_fps_shot_b682",
+		dlc = "pd2_clan"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -6223,6 +6290,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.hammer = {
 		category = "melee_weapon",
 		dlc = "hlm2_deluxe"
+	}
+	self.definitions.whiskey = {
+		category = "melee_weapon",
+		dlc = "pd2_clan"
 	}
 end
 
@@ -7226,6 +7297,42 @@ function UpgradesTweakData:_temporary_definitions()
 			category = "temporary",
 			upgrade = "passive_revive_damage_reduction",
 			value = 2
+		}
+	}
+	self.definitions.temporary_loose_ammo_restore_health_1 = {
+		category = "temporary",
+		name_id = "menu_temporary_loose_ammo_restore_health",
+		upgrade = {
+			category = "temporary",
+			upgrade = "loose_ammo_restore_health",
+			value = 1
+		}
+	}
+	self.definitions.temporary_loose_ammo_restore_health_2 = {
+		category = "temporary",
+		name_id = "menu_temporary_loose_ammo_restore_health",
+		upgrade = {
+			category = "temporary",
+			upgrade = "loose_ammo_restore_health",
+			value = 2
+		}
+	}
+	self.definitions.temporary_loose_ammo_restore_health_3 = {
+		category = "temporary",
+		name_id = "menu_temporary_loose_ammo_restore_health",
+		upgrade = {
+			category = "temporary",
+			upgrade = "loose_ammo_restore_health",
+			value = 3
+		}
+	}
+	self.definitions.temporary_loose_ammo_give_team = {
+		category = "temporary",
+		name_id = "menu_temporary_loose_ammo_give_team",
+		upgrade = {
+			category = "temporary",
+			upgrade = "loose_ammo_give_team",
+			value = 1
 		}
 	}
 end

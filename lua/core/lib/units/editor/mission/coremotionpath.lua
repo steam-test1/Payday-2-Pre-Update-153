@@ -98,7 +98,8 @@ function CoreMotionPathOperatorUnitElement:_build_panel(panel, panel_sizer)
 	panel_sizer = panel_sizer or self._panel_sizer
 	self:_build_value_combobox(panel, panel_sizer, "operation", {
 		"none",
-		"goto_marker"
+		"goto_marker",
+		"teleport"
 	}, "Select an operation for the selected elements.")
 	local markers_combo = self:_build_value_combobox(panel, panel_sizer, "marker", self:_motion_path_markers(), "Select motion path marker.")
 	Application:debug("CoreMotionPathOperatorUnitElement:_build_panel( panel, panel_sizer ): ", markers_combo)

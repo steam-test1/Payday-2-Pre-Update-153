@@ -169,6 +169,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_m134()
 	self:_init_rpg7()
 	self:_init_cobray()
+	self:_init_b682()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -14109,7 +14110,8 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_sho_striker",
 		"wpn_fps_sho_ksg",
 		"wpn_fps_pis_judge",
-		"wpn_fps_sho_spas12"
+		"wpn_fps_sho_spas12",
+		"wpn_fps_shot_b682"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then
@@ -18873,4 +18875,139 @@ function WeaponFactoryTweakData:_init_cobray()
 	self.wpn_fps_smg_cobray_npc.unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray/wpn_fps_smg_cobray_npc"
 	table.insert(self.wpn_fps_smg_mac10.uses_parts, "wpn_fps_smg_cobray_ns_barrelextension")
 	table.insert(self.wpn_fps_smg_mac10.uses_parts, "wpn_fps_smg_cobray_ns_silencer")
+end
+
+function WeaponFactoryTweakData:_init_b682()
+	self.parts.wpn_fps_shot_b682_b_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_b682_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_b_short",
+		stats = {
+			value = 1,
+			spread = -4,
+			recoil = -3,
+			concealment = 10
+		},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan",
+		sound_switch = {suppressed = "regular_b"},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_shot_b682_b_long = {
+		type = "barrel",
+		name_id = "bm_wp_b682_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_b_long",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan",
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_shot_b682_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_b682_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_body_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan",
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_shot_b682_s_long = {
+		type = "stock",
+		name_id = "bm_wp_b682_s_long",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_s_long",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_shot_b682_s_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_b682_s_short",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_s_short",
+		stats = {
+			value = 1,
+			spread = -4,
+			recoil = -3,
+			concealment = 6
+		},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_shot_b682_s_ammopouch = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_b682_s_ammopouch",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_fps_shot_b682_s_ammopouch",
+		stats = {value = 1, total_ammo_mod = 6},
+		texture_bundle_folder = "character_pack_bonnie",
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_shot_b682_b_short.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_b_short"
+	self.parts.wpn_fps_shot_b682_b_long.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_b_long"
+	self.parts.wpn_fps_shot_b682_body_standard.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_body_standard"
+	self.parts.wpn_fps_shot_b682_s_long.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_s_long"
+	self.parts.wpn_fps_shot_b682_s_short.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_s_short"
+	self.parts.wpn_fps_shot_b682_s_ammopouch.third_unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682_pts/wpn_third_shot_b682_s_ammopouch"
+	self.wpn_fps_shot_b682 = {}
+	self.wpn_fps_shot_b682.unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682/wpn_fps_shot_b682"
+	self.wpn_fps_shot_b682.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_shot_b682.override = {
+		wpn_fps_upg_a_explosive = {
+			custom_stats = {
+				ignore_statistic = true,
+				rays = 1,
+				damage_near_mul = 2,
+				damage_far_mul = 2.5,
+				bullet_class = "InstantExplosiveBulletBase",
+				ammo_pickup_min_mul = 0.5,
+				ammo_pickup_max_mul = 0.7
+			}
+		}
+	}
+	self.wpn_fps_shot_b682.default_blueprint = {
+		"wpn_fps_shot_b682_body_standard",
+		"wpn_fps_shot_b682_b_long",
+		"wpn_fps_shot_b682_s_long"
+	}
+	self.wpn_fps_shot_b682.uses_parts = {
+		"wpn_fps_shot_b682_body_standard",
+		"wpn_fps_shot_b682_b_long",
+		"wpn_fps_shot_b682_s_long",
+		"wpn_fps_shot_b682_b_short",
+		"wpn_fps_shot_b682_s_short",
+		"wpn_fps_shot_b682_s_ammopouch"
+	}
+	self.wpn_fps_shot_b682_npc = deep_clone(self.wpn_fps_shot_b682)
+	self.wpn_fps_shot_b682_npc.unit = "units/pd2_dlc_bonnie/weapons/wpn_fps_shot_b682/wpn_fps_shot_b682_npc"
 end

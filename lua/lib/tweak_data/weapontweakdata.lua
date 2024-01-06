@@ -81,6 +81,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_m134_npc()
 	self:_init_data_rpg7_npc()
 	self:_init_data_cobray_npc()
+	self:_init_data_b682_npc()
 	self:_precalculate_values()
 end
 
@@ -1291,6 +1292,20 @@ function WeaponTweakData:_init_data_cobray_npc()
 	self.cobray_npc.hold = "pistol"
 	self.cobray_npc.alert_size = 5000
 	self.cobray_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_b682_npc()
+	self.b682_npc.sounds.prefix = "b682_npc"
+	self.b682_npc.use_data.selection_index = 2
+	self.b682_npc.DAMAGE = 12
+	self.b682_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.b682_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.b682_npc.CLIP_AMMO_MAX = 2
+	self.b682_npc.NR_CLIPS_MAX = 4
+	self.b682_npc.hold = "rifle"
+	self.b682_npc.alert_size = 4500
+	self.b682_npc.suppression = 1.8
+	self.b682_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7752,6 +7767,102 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.b682 = {}
+	self.b682.category = "shotgun"
+	self.b682.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.b682.damage_melee = damage_melee_default
+	self.b682.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.b682.sounds = {}
+	self.b682.sounds.fire = "b682_fire"
+	self.b682.sounds.dryfire = "shotgun_dryfire"
+	self.b682.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.b682.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.b682.timers = {}
+	self.b682.timers.reload_not_empty = 2.5
+	self.b682.timers.reload_empty = 2.7
+	self.b682.timers.unequip = 0.85
+	self.b682.timers.equip = 0.85
+	self.b682.name_id = "bm_w_b682"
+	self.b682.desc_id = "bm_w_b682_desc"
+	self.b682.description_id = "des_b682"
+	self.b682.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.b682.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.b682.use_data = {}
+	self.b682.use_data.selection_index = 2
+	self.b682.use_data.align_place = "right_hand"
+	self.b682.DAMAGE = 6
+	self.b682.damage_near = 1000
+	self.b682.damage_far = 2000
+	self.b682.rays = 6
+	self.b682.CLIP_AMMO_MAX = 2
+	self.b682.NR_CLIPS_MAX = math.round(total_damage_primary / 12 / self.b682.CLIP_AMMO_MAX)
+	self.b682.AMMO_MAX = self.b682.CLIP_AMMO_MAX * self.b682.NR_CLIPS_MAX
+	self.b682.AMMO_PICKUP = self:_pickup_chance(self.b682.AMMO_MAX, 1)
+	self.b682.FIRE_MODE = "single"
+	self.b682.fire_mode_data = {}
+	self.b682.fire_mode_data.fire_rate = 0.12
+	self.b682.single = {}
+	self.b682.single.fire_rate = 0.12
+	self.b682.spread = {}
+	self.b682.spread.standing = self.r870.spread.standing
+	self.b682.spread.crouching = self.r870.spread.crouching
+	self.b682.spread.steelsight = self.r870.spread.steelsight
+	self.b682.spread.moving_standing = self.r870.spread.moving_standing
+	self.b682.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.b682.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.b682.kick = {}
+	self.b682.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.b682.kick.crouching = self.b682.kick.standing
+	self.b682.kick.steelsight = self.b682.kick.standing
+	self.b682.crosshair = {}
+	self.b682.crosshair.standing = {}
+	self.b682.crosshair.crouching = {}
+	self.b682.crosshair.steelsight = {}
+	self.b682.crosshair.standing.offset = 0.16
+	self.b682.crosshair.standing.moving_offset = 0.8
+	self.b682.crosshair.standing.kick_offset = 0.6
+	self.b682.crosshair.standing.hidden = true
+	self.b682.crosshair.crouching.offset = 0.08
+	self.b682.crosshair.crouching.moving_offset = 0.7
+	self.b682.crosshair.crouching.kick_offset = 0.4
+	self.b682.crosshair.crouching.hidden = true
+	self.b682.crosshair.steelsight.hidden = true
+	self.b682.crosshair.steelsight.offset = 0
+	self.b682.crosshair.steelsight.moving_offset = 0
+	self.b682.crosshair.steelsight.kick_offset = 0.1
+	self.b682.shake = {}
+	self.b682.shake.fire_multiplier = 2
+	self.b682.shake.fire_steelsight_multiplier = 2
+	self.b682.autohit = autohit_shotgun_default
+	self.b682.aim_assist = aim_assist_shotgun_default
+	self.b682.animations = {}
+	self.b682.animations.equip_id = "equip_b682"
+	self.b682.animations.recoil_steelsight = true
+	self.b682.global_value = "pd2_clan"
+	self.b682.texture_bundle_folder = "character_pack_bonnie"
+	self.b682.stats = {
+		damage = 31,
+		spread = 8,
+		recoil = 10,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 5,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.b682.stats_modifiers = {damage = 1.38}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -8312,6 +8423,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.b682_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -8395,4 +8512,5 @@ function WeaponTweakData:_precalculate_values()
 	self.m134_npc.AMMO_MAX = self.m134_npc.CLIP_AMMO_MAX * self.m134_npc.NR_CLIPS_MAX
 	self.rpg7_npc.AMMO_MAX = self.rpg7_npc.CLIP_AMMO_MAX * self.rpg7_npc.NR_CLIPS_MAX
 	self.cobray_npc.AMMO_MAX = self.cobray_npc.CLIP_AMMO_MAX * self.cobray_npc.NR_CLIPS_MAX
+	self.b682_npc.AMMO_MAX = self.b682_npc.CLIP_AMMO_MAX * self.b682_npc.NR_CLIPS_MAX
 end

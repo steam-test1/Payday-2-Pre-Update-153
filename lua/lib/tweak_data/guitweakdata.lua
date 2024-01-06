@@ -1649,6 +1649,15 @@ function GuiTweakData:init()
 					videos = {"jacket1", "jacket2"},
 					post_event = "pln_contact_jacket"
 				}
+			},
+			{
+				id = "bonnie",
+				name_id = "menu_bonnie",
+				{
+					desc_id = "menu_bonnie_desc_codex",
+					videos = {"bonnie1"},
+					post_event = "pln_contact_bonnie"
+				}
 			}
 		}
 	}

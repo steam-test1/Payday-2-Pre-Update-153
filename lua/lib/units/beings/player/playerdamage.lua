@@ -209,9 +209,13 @@ function PlayerDamage:_regenerate_armor()
 	self:_send_set_armor()
 end
 
-function PlayerDamage:restore_health(health_restored)
+function PlayerDamage:restore_health(health_restored, is_static)
 	local max_health = self:_max_health()
-	self:change_health(max_health * health_restored)
+	if is_static then
+		self:change_health(health_restored)
+	else
+		self:change_health(max_health * health_restored)
+	end
 end
 
 function PlayerDamage:restore_armor(armor_restored)

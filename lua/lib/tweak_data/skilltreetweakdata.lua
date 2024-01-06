@@ -2950,6 +2950,96 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck9_9",
 				desc_id = "menu_deck9_9_desc"
 			}
+		},
+		{
+			name_id = "menu_st_spec_10",
+			desc_id = "menu_st_spec_10_desc",
+			{
+				upgrades = {
+					"temporary_loose_ammo_restore_health_1"
+				},
+				cost = 200,
+				icon_xy = {4, 5},
+				name_id = "menu_deck10_1",
+				desc_id = "menu_deck10_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck10_2",
+				desc_id = "menu_deck10_2_desc"
+			},
+			{
+				upgrades = {
+					"temporary_loose_ammo_give_team"
+				},
+				cost = 400,
+				icon_xy = {5, 5},
+				name_id = "menu_deck10_3",
+				desc_id = "menu_deck10_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck10_4",
+				desc_id = "menu_deck10_4_desc"
+			},
+			{
+				upgrades = {
+					"player_loose_ammo_restore_health_give_team"
+				},
+				cost = 1000,
+				icon_xy = {6, 5},
+				name_id = "menu_deck10_5",
+				desc_id = "menu_deck10_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck10_6",
+				desc_id = "menu_deck10_6_desc"
+			},
+			{
+				upgrades = {
+					"temporary_loose_ammo_restore_health_2"
+				},
+				cost = 2400,
+				icon_xy = {7, 5},
+				name_id = "menu_deck10_7",
+				desc_id = "menu_deck10_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck10_8",
+				desc_id = "menu_deck10_8_desc"
+			},
+			{
+				upgrades = {
+					"temporary_loose_ammo_restore_health_3",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {0, 6},
+				name_id = "menu_deck10_9",
+				desc_id = "menu_deck10_9_desc"
+			}
 		}
 	}
 end

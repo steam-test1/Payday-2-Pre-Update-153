@@ -487,8 +487,8 @@ function PlayerManager:on_killshot(killed_unit, variant)
 		if variant == "melee" then
 			regen_health_bonus = regen_health_bonus + managers.player:upgrade_value("player", "melee_kill_life_leech", 0)
 		end
-		if 0 < regen_health_bonus then
-			player_unit:character_damage():restore_health(regen_health_bonus)
+		if damage_ext and 0 < regen_health_bonus then
+			damage_ext:restore_health(regen_health_bonus)
 		end
 		self._on_killshot_t = t + (tweak_data.upgrades.on_killshot_cooldown or 0)
 	end

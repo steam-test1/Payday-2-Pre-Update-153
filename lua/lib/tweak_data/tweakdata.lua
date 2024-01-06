@@ -419,7 +419,8 @@ function TweakData:init()
 		"old_hoxton",
 		"female_1",
 		"dragan",
-		"jacket"
+		"jacket",
+		"bonnie"
 	}
 	self.criminals.characters = {
 		{
@@ -518,6 +519,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb9",
 				ai_mask_id = "richard_returns",
+				mask_id = 4
+			}
+		},
+		{
+			name = "bonnie",
+			static_data = {
+				ai_character_id = "ai_bonnie",
+				ssuffix = "q",
+				color_id = 4,
+				voice = "rb10",
+				ai_mask_id = "bonnie",
 				mask_id = 4
 			}
 		}
