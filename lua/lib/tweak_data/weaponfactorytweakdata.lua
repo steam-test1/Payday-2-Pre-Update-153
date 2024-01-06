@@ -16603,7 +16603,7 @@ function WeaponFactoryTweakData:_init_vhs()
 		stats = {
 			value = 1,
 			recoil = 1,
-			extra_ammo = 2
+			extra_ammo = 0
 		},
 		texture_bundle_folder = "character_pack_dragan",
 		dlc = "character_pack_dragan",
@@ -16660,17 +16660,23 @@ function WeaponFactoryTweakData:_init_vhs()
 			40
 		},
 		type = "barrel",
+		sub_type = "silencer",
 		name_id = "bm_wp_vhs_b_silenced",
 		a_obj = "a_b",
 		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_b_silenced",
 		stats = {
-			value = 1,
+			value = 2,
+			suppression = 12,
+			alert_size = 12,
 			damage = -1,
-			recoil = 3,
-			suppression = 12
+			recoil = 3
 		},
 		texture_bundle_folder = "character_pack_dragan",
 		dlc = "character_pack_dragan",
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_c"
+		},
 		forbids = {
 			"wpn_fps_m4_uupg_fg_rail_ext",
 			"wpn_fps_upg_ns_ass_smg_large",

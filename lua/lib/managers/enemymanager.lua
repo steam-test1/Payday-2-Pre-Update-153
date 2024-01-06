@@ -300,6 +300,10 @@ function EnemyManager:all_enemies()
 	return self._enemy_data.unit_data
 end
 
+function EnemyManager:is_enemy(unit)
+	return self._enemy_data.unit_data[unit:key()] and true or false
+end
+
 function EnemyManager:all_civilians()
 	return self._civilian_data.unit_data
 end

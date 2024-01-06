@@ -82,6 +82,8 @@ function FPCameraPlayerBase:update(unit, t, dt)
 	self._parent_unit:base():controller():get_input_axis_clbk("look", callback(self, self, "_update_rot"))
 	self:_update_stance(t, dt)
 	self:_update_movement(t, dt)
+	self._parent_unit:camera():set_position(self._output_data.position)
+	self._parent_unit:camera():set_rotation(self._output_data.rotation)
 	if self._fov.dirty then
 		self._parent_unit:camera():set_FOV(self._fov.fov)
 		self._fov.dirty = nil
@@ -365,8 +367,6 @@ function FPCameraPlayerBase:_vertical_recoil_kick(t, dt)
 	if player_state == "bipod" then
 		return 0
 	end
-	local player = managers.player:player_unit()
-	do return 0 end
 	local r_value = 0
 	if self._recoil_kick.current and self._recoil_kick.current ~= self._recoil_kick.accumulated then
 		local n = math.step(self._recoil_kick.current, self._recoil_kick.accumulated, 40 * dt)
