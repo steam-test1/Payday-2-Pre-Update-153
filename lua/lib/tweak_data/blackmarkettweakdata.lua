@@ -1650,7 +1650,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.destroyer.infamy_lock = "infamy_maskpack_destroyer"
 	self.masks.balaclava_chains = {}
 	self.masks.balaclava_chains.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_chains/msk_balaclava_chains"
-	self.masks.balaclava_chains.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_chains.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_chains.type = "helmet"
 	self.masks.balaclava_wolf = {}
 	self.masks.balaclava_wolf.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_wolf/msk_balaclava_wolf"
@@ -1658,23 +1658,23 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.balaclava_wolf.type = "helmet"
 	self.masks.balaclava_clover = {}
 	self.masks.balaclava_clover.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_clover/msk_balaclava_clover"
-	self.masks.balaclava_clover.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_clover.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_clover.type = "helmet"
 	self.masks.balaclava_dallas = {}
 	self.masks.balaclava_dallas.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_dallas/msk_balaclava_dallas"
-	self.masks.balaclava_dallas.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_dallas.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_dallas.type = "helmet"
 	self.masks.balaclava_dragan = {}
 	self.masks.balaclava_dragan.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_dragan/msk_balaclava_dragan"
-	self.masks.balaclava_dragan.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_dragan.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_dragan.type = "helmet"
 	self.masks.balaclava_hoxton = {}
 	self.masks.balaclava_hoxton.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_hoxton/msk_balaclava_hoxton"
-	self.masks.balaclava_hoxton.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_hoxton.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_hoxton.type = "helmet"
 	self.masks.balaclava_john_wick = {}
 	self.masks.balaclava_john_wick.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_john_wick/msk_balaclava_john_wick"
-	self.masks.balaclava_john_wick.name_id = "bm_msk_balaclava"
+	self.masks.balaclava_john_wick.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_john_wick.type = "helmet"
 	self.masks.balaclava = {}
 	self.masks.balaclava.name_id = "bm_msk_balaclava"
@@ -1694,6 +1694,42 @@ function BlackMarketTweakData:_init_masks()
 		female_1 = "balaclava_clover",
 		dragan = "balaclava_dragan"
 	}
+	self.masks.the_overkill_mask = {}
+	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
+	self.masks.the_overkill_mask.name_id = "bm_msk_the_overkill_mask"
+	self.masks.the_overkill_mask.pcs = {}
+	self.masks.the_overkill_mask.value = 0
+	self.masks.the_overkill_mask.dlc = "overkill_pack"
+	self.masks.the_overkill_mask.texture_bundle_folder = "dlc_pack_overkill"
+	self.masks.the_overkill_mask.type = "glasses"
+	self.masks.dallas_glow = {}
+	self.masks.dallas_glow.unit = "units/pd2_dlc_cop/masks/msk_dallas_glow/msk_dallas_glow"
+	self.masks.dallas_glow.name_id = "bm_msk_dallas_glow"
+	self.masks.dallas_glow.pcs = {}
+	self.masks.dallas_glow.dlc = "complete_overkill_pack"
+	self.masks.dallas_glow.texture_bundle_folder = "dlc_pack_overkill"
+	self.masks.dallas_glow.value = 0
+	self.masks.wolf_glow = {}
+	self.masks.wolf_glow.unit = "units/pd2_dlc_cop/masks/msk_wolf_glow/msk_wolf_glow"
+	self.masks.wolf_glow.name_id = "bm_msk_wolf_glow"
+	self.masks.wolf_glow.pcs = {}
+	self.masks.wolf_glow.dlc = "complete_overkill_pack"
+	self.masks.wolf_glow.texture_bundle_folder = "dlc_pack_overkill"
+	self.masks.wolf_glow.value = 0
+	self.masks.hoxton_glow = {}
+	self.masks.hoxton_glow.unit = "units/pd2_dlc_cop/masks/msk_hoxton_glow/msk_hoxton_glow"
+	self.masks.hoxton_glow.name_id = "bm_msk_hoxton_glow"
+	self.masks.hoxton_glow.pcs = {}
+	self.masks.hoxton_glow.dlc = "complete_overkill_pack"
+	self.masks.hoxton_glow.texture_bundle_folder = "dlc_pack_overkill"
+	self.masks.hoxton_glow.value = 0
+	self.masks.chains_glow = {}
+	self.masks.chains_glow.unit = "units/pd2_dlc_cop/masks/msk_chains_glow/msk_chains_glow"
+	self.masks.chains_glow.name_id = "bm_msk_chains_glow"
+	self.masks.chains_glow.pcs = {}
+	self.masks.chains_glow.dlc = "complete_overkill_pack"
+	self.masks.chains_glow.texture_bundle_folder = "dlc_pack_overkill"
+	self.masks.chains_glow.value = 0
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -5685,9 +5721,19 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.launcher_frag.no_cheat_count = true
 	self.grenades.launcher_frag.impact_detonation = true
 	self.grenades.launcher_frag.time_cheat = 1
+	self.grenades.rocket_frag = {}
+	self.grenades.rocket_frag.name_id = "bm_rocket_frag"
+	self.grenades.rocket_frag.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_fired_rocket/wpn_third_rpg7_fired_rocket"
+	self.grenades.rocket_frag.weapon_id = "rpg7"
+	self.grenades.rocket_frag.no_cheat_count = true
+	self.grenades.rocket_frag.impact_detonation = true
+	self.grenades.rocket_frag.time_cheat = 1
+	self.grenades.rocket_frag.physic_effect = Idstring("physic_effects/anti_gravitate")
+	self.grenades.rocket_frag.adjust_z = 0
 	self._grenades_index = {
 		"frag",
-		"launcher_frag"
+		"launcher_frag",
+		"rocket_frag"
 	}
 	self:_add_desc_from_name_macro(self.grenades)
 end

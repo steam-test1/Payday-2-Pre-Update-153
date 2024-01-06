@@ -21,6 +21,7 @@ function DLCTweakData:init(tweak_data)
 		the_bomb = true,
 		character_pack_dragan = true,
 		dlc_akm4 = 1,
+		dlc_pack_overkill = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
 		alienware_alpha = true,
@@ -2776,6 +2777,56 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "champion_dallas",
+			amount = 1
+		}
+	}
+	self.overkill_pack = {}
+	self.overkill_pack.dlc = "has_overkill_pack"
+	self.overkill_pack.content = {}
+	self.overkill_pack.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "the_overkill_mask",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_lmg_m134_barrel_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_lmg_m134_barrel_extreme",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_lmg_m134_body_upper_light",
+			amount = 1
+		}
+	}
+	self.complete_overkill_pack = {}
+	self.complete_overkill_pack.dlc = "has_complete_overkill_pack"
+	self.complete_overkill_pack.content = {}
+	self.complete_overkill_pack.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dallas_glow",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "wolf_glow",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "hoxton_glow",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "chains_glow",
 			amount = 1
 		}
 	}

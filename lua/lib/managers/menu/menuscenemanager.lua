@@ -43,8 +43,7 @@ function MenuSceneManager:init()
 	}
 	self._global_poses.lmg = {"husk_lmg"}
 	self._global_poses.infamous = {
-		"husk_infamous1",
-		"husk_infamous2"
+		"husk_infamous1"
 	}
 	self._global_poses.famas = {
 		"husk_bullpup"
@@ -77,6 +76,9 @@ function MenuSceneManager:init()
 	self._global_poses.x_deagle = {
 		"husk_akimbo1",
 		"husk_akimbo2"
+	}
+	self._global_poses.m134 = {
+		"husk_minigun"
 	}
 	self._mask_units = {}
 	self._weapon_units = {}

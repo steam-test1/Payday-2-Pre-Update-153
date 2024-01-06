@@ -166,6 +166,8 @@ function WeaponFactoryTweakData:init()
 	self:_init_hs2000()
 	self:_init_vhs()
 	self:_init_modpack_m4_ak()
+	self:_init_m134()
+	self:_init_rpg7()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -18320,4 +18322,274 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 	self.parts.wpn_fps_upg_m4_m_l5.third_unit = "units/pd2_dlc_akm4_modpack/weapons/wpn_third_upg_m4_m_l5/wpn_third_upg_m4_m_l5"
 	self.parts.wpn_fps_upg_m4_s_ubr.third_unit = "units/pd2_dlc_akm4_modpack/weapons/wpn_third_upg_m4_s_ubr/wpn_third_upg_m4_s_ubr"
 	self.parts.wpn_fps_upg_ass_m4_b_beowulf.third_unit = "units/pd2_dlc_akm4_modpack/weapons/wpn_third_upg_ass_m4_b_beowulf/wpn_third_upg_ass_m4_b_beowulf"
+end
+
+function WeaponFactoryTweakData:_init_m134()
+	self.parts.wpn_fps_lmg_m134_body = {
+		type = "lower_reciever",
+		name_id = "bm_wp_m134_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_body",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m134_body_upper = {
+		type = "extra",
+		name_id = "bm_wp_m134_body_upper",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_body_upper",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m134_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_m134_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_lmg_m134_body_upper_light = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "extra",
+		name_id = "bm_wp_m134_body_upper_light",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_body_upper_light",
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 3,
+			concealment = 3,
+			total_ammo_mod = -8
+		},
+		has_description = true,
+		texture_bundle_folder = "dlc_pack_overkill",
+		dlc = "overkill_pack",
+		custom_stats = {movement_speed = 1.155}
+	}
+	self.parts.wpn_fps_lmg_m134_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_m134_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_barrel",
+		stats = {value = 1},
+		animations = {fire = "recoil", fire_steelsight = "recoil"}
+	}
+	self.parts.wpn_fps_lmg_m134_barrel_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_m134_barrel_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_barrel_short",
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 3,
+			concealment = 3
+		},
+		has_description = true,
+		texture_bundle_folder = "dlc_pack_overkill",
+		dlc = "overkill_pack",
+		custom_stats = {movement_speed = 1.155},
+		animations = {fire = "recoil", fire_steelsight = "recoil"}
+	}
+	self.parts.wpn_fps_lmg_m134_barrel_extreme = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_m134_barrel_extreme",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_fps_lmg_m134_barrel_extreme",
+		stats = {
+			value = 1,
+			spread = 1,
+			recoil = -3,
+			concealment = -3
+		},
+		texture_bundle_folder = "dlc_pack_overkill",
+		dlc = "overkill_pack",
+		animations = {fire = "recoil", fire_steelsight = "recoil"}
+	}
+	self.parts.wpn_fps_lmg_m134_body.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_body"
+	self.parts.wpn_fps_lmg_m134_body_upper.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_body_upper"
+	self.parts.wpn_fps_lmg_m134_body_upper_light.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_body_upper_light"
+	self.parts.wpn_fps_lmg_m134_m_standard.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_m_standard"
+	self.parts.wpn_fps_lmg_m134_barrel.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_barrel"
+	self.parts.wpn_fps_lmg_m134_barrel_short.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_barrel_short"
+	self.parts.wpn_fps_lmg_m134_barrel_extreme.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134_pts/wpn_third_lmg_m134_barrel_extreme"
+	self.wpn_fps_lmg_m134 = {}
+	self.wpn_fps_lmg_m134.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134/wpn_fps_lmg_m134"
+	self.wpn_fps_lmg_m134.animations = {reload = "reload", reload_not_empty = "reload"}
+	self.wpn_fps_lmg_m134.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_lmg_m134.default_blueprint = {
+		"wpn_fps_lmg_m134_body",
+		"wpn_fps_lmg_m134_body_upper",
+		"wpn_fps_lmg_m134_m_standard",
+		"wpn_fps_lmg_m134_barrel"
+	}
+	self.wpn_fps_lmg_m134.uses_parts = {
+		"wpn_fps_lmg_m134_body",
+		"wpn_fps_lmg_m134_body_upper",
+		"wpn_fps_lmg_m134_body_upper_light",
+		"wpn_fps_lmg_m134_m_standard",
+		"wpn_fps_lmg_m134_barrel",
+		"wpn_fps_lmg_m134_barrel_short",
+		"wpn_fps_lmg_m134_barrel_extreme",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser"
+	}
+	self.wpn_fps_lmg_m134_npc = deep_clone(self.wpn_fps_lmg_m134)
+	self.wpn_fps_lmg_m134_npc.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_lmg_m134/wpn_fps_lmg_m134_npc"
+end
+
+function WeaponFactoryTweakData:_init_rpg7()
+	self.parts.wpn_fps_rpg7_body = {
+		type = "lower_reciever",
+		name_id = "bm_wp_rpg7_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_body",
+		stats = {value = 1},
+		animations = {
+			fire = "recoil",
+			fire_steelsight = "recoil",
+			reload = "reload"
+		}
+	}
+	self.parts.wpn_fps_rpg7_m_rocket = {
+		type = "magazine",
+		name_id = "bm_wp_rpg7_m_rocket",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_m_rocket",
+		stats = {value = 1},
+		animations = {
+			fire = "recoil",
+			fire_steelsight = "recoil",
+			reload = "reload"
+		}
+	}
+	self.parts.wpn_fps_rpg7_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_rpg7_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_barrel",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_rpg7_sight = {
+		type = "sight",
+		name_id = "bm_wp_rpg7_sight",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_sight",
+		stats = {value = 1},
+		stance_mod = {
+			wpn_fps_rpg7 = {
+				translation = Vector3(0.2, 0, -0.8),
+				rotation = Rotation(0, 0, -5)
+			}
+		}
+	}
+	self.parts.wpn_fps_rpg7_sight_adapter = {
+		type = "sight",
+		name_id = "bm_wp_rpg7_sight_adapter",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_sight_adapter",
+		stats = {value = 1},
+		stance_mod = {
+			wpn_fps_rpg7 = {
+				translation = Vector3(0, 0, -2.25),
+				rotation = Rotation(0, 0, 0)
+			}
+		}
+	}
+	self.parts.wpn_fps_rpg7_body.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_pts/wpn_third_rpg7_body"
+	self.parts.wpn_fps_rpg7_m_rocket.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_pts/wpn_third_rpg7_m_rocket"
+	self.parts.wpn_fps_rpg7_sight.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_pts/wpn_third_rpg7_sight"
+	self.parts.wpn_fps_rpg7_sight_adapter.third_unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_pts/wpn_third_rpg7_sight_adapter"
+	self.wpn_fps_rpg7 = {}
+	self.wpn_fps_rpg7.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7/wpn_fps_rpg7"
+	self.wpn_fps_rpg7.adds = {
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_rpg7_sight_adapter"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_rpg7_sight_adapter"
+		}
+	}
+	self.wpn_fps_rpg7.default_blueprint = {
+		"wpn_fps_rpg7_body",
+		"wpn_fps_rpg7_m_rocket",
+		"wpn_fps_rpg7_barrel",
+		"wpn_fps_rpg7_sight"
+	}
+	self.wpn_fps_rpg7.uses_parts = {
+		"wpn_fps_rpg7_body",
+		"wpn_fps_rpg7_m_rocket",
+		"wpn_fps_rpg7_barrel",
+		"wpn_fps_rpg7_sight",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs"
+	}
+	self.wpn_fps_rpg7_npc = deep_clone(self.wpn_fps_rpg7)
+	self.wpn_fps_rpg7_npc.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7/wpn_fps_rpg7_npc"
 end

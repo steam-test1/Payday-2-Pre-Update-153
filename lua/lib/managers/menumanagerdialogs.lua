@@ -529,7 +529,7 @@ end
 function MenuManager:show_preplanning_help()
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_information_title")
-	dialog_data.text = managers.localization:text("dialog_preplanning_help")
+	dialog_data.text = managers.localization:text("dialog_preplanning_help") .. (MenuCallbackHandler.is_win32() and managers.localization:text("dialog_preplanning_help_controller") or "")
 	local ok_button = {}
 	ok_button.text = managers.localization:text("dialog_ok")
 	dialog_data.button_list = {ok_button}

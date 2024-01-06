@@ -116,6 +116,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.weapon_cost_multiplier.akimbo = 1.4
 	self.weapon_movement_penalty = {}
 	self.weapon_movement_penalty.lmg = 0.8
+	self.weapon_movement_penalty.minigun = 0.6
 	self.explosive_bullet = {}
 	self.explosive_bullet.curve_pow = 0.5
 	self.explosive_bullet.player_dmg_mul = 0.1
@@ -1470,6 +1471,10 @@ function UpgradesTweakData:init()
 		name_id = "weapons",
 		upgrades = {"shillelagh"}
 	}
+	self.level_tree[38] = {
+		name_id = "weapons",
+		upgrades = {"m134", "rpg7"}
+	}
 	self.level_tree[39] = {
 		name_id = "weapons",
 		upgrades = {"m16", "huntsman"}
@@ -1764,6 +1769,8 @@ function UpgradesTweakData:init()
 	self:_l85a2_definitions()
 	self:_vhs_definitions()
 	self:_hs2000_definitions()
+	self:_m134_weapon_definitions()
+	self:_rpg7_weapon_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1835,6 +1842,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.lmg = {}
 	self.values.snp = {}
 	self.values.akimbo = {}
+	self.values.minigun = {}
 	self.values.melee = {}
 	self.values.temporary = {}
 	self.values.team = {}
@@ -5988,6 +5996,24 @@ function UpgradesTweakData:_hs2000_definitions()
 		weapon_id = "hs2000",
 		factory_id = "wpn_fps_pis_hs2000",
 		dlc = "the_bomb"
+	}
+end
+
+function UpgradesTweakData:_m134_weapon_definitions()
+	self.definitions.m134 = {
+		category = "weapon",
+		weapon_id = "m134",
+		factory_id = "wpn_fps_lmg_m134",
+		dlc = "overkill_pack"
+	}
+end
+
+function UpgradesTweakData:_rpg7_weapon_definitions()
+	self.definitions.rpg7 = {
+		category = "weapon",
+		weapon_id = "rpg7",
+		factory_id = "wpn_fps_rpg7",
+		dlc = "overkill_pack"
 	}
 end
 

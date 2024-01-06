@@ -194,11 +194,17 @@ end
 function GrenadeBase:throw(params)
 	self._owner = params.owner
 	local velocity = params.dir * 250
-	velocity = Vector3(velocity.x, velocity.y, velocity.z + 50)
+	local adjust_z = 50
+	adjust_z = params.grenade_entry and tweak_data.blackmarket.grenades[params.grenade_entry].adjust_z or adjust_z
+	velocity = Vector3(velocity.x, velocity.y, velocity.z + adjust_z)
 	local mass_look_up_modifier = self._mass_look_up_modifier or 2
 	local mass = math.max(mass_look_up_modifier * (1 + math.min(0, params.dir.z)), 1)
 	self._unit:push_at(mass, velocity, self._unit:position())
 	if params.grenade_entry then
+		local physic_effect = tweak_data.blackmarket.grenades[params.grenade_entry].physic_effect
+		if physic_effect then
+			World:play_physic_effect(physic_effect, self._unit)
+		end
 		local unit_name = tweak_data.blackmarket.grenades[params.grenade_entry].sprint_unit
 		if unit_name then
 			local sprint = World:spawn_unit(Idstring(unit_name), self._unit:position(), self._unit:rotation())

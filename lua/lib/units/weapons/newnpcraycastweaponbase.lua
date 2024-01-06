@@ -172,6 +172,9 @@ function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 	if self._use_shell_ejection_effect then
 		World:effect_manager():spawn(self._shell_ejection_effect_table)
 	end
+	if self:weapon_tweak_data().has_fire_animation then
+		self:tweak_data_anim_play("fire")
+	end
 	self:_sound_singleshot()
 end
 

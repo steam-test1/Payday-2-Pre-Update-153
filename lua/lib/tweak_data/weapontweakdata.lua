@@ -78,6 +78,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_l85a2_npc()
 	self:_init_data_hs2000_npc()
 	self:_init_data_vhs_npc()
+	self:_init_data_m134_npc()
+	self:_init_data_rpg7_npc()
 	self:_precalculate_values()
 end
 
@@ -1227,6 +1229,40 @@ function WeaponTweakData:_init_data_vhs_npc()
 	self.vhs_npc.suppression = 1
 end
 
+function WeaponTweakData:_init_data_m134_npc()
+	self.m134_npc.sounds.prefix = "mg42_npc"
+	self.m134_npc.use_data.selection_index = 2
+	self.m134_npc.DAMAGE = 2
+	self.m134_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.m134_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.m134_npc.CLIP_AMMO_MAX = 500
+	self.m134_npc.NR_CLIPS_MAX = 1
+	self.m134_npc.auto.fire_rate = 0.05
+	self.m134_npc.hold = "rifle"
+	self.m134_npc.alert_size = 5000
+	self.m134_npc.suppression = 1
+	self.m134_npc.has_fire_animation = true
+	self.m134_secondary_npc = deep_clone(self.m134_npc)
+	self.m134_secondary_npc.use_data.selection_index = 1
+	self.m134_secondary_npc.armor_piercing = true
+end
+
+function WeaponTweakData:_init_data_rpg7_npc()
+	self.rpg7_npc.sounds.prefix = "barrett_npc"
+	self.rpg7_npc.use_data.selection_index = 2
+	self.rpg7_npc.DAMAGE = 2
+	self.rpg7_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.rpg7_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.rpg7_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.rpg7_npc.no_trail = true
+	self.rpg7_npc.CLIP_AMMO_MAX = 1
+	self.rpg7_npc.NR_CLIPS_MAX = 4
+	self.rpg7_npc.auto.fire_rate = 0.1
+	self.rpg7_npc.hold = "rifle"
+	self.rpg7_npc.alert_size = 2800
+	self.rpg7_npc.suppression = 1
+end
+
 function WeaponTweakData:_init_data_hs2000_npc()
 	self.hs2000_npc.sounds.prefix = "p226r_npc"
 	self.hs2000_npc.use_data.selection_index = 1
@@ -1242,7 +1278,7 @@ function WeaponTweakData:_init_data_hs2000_npc()
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
-	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default
+	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
 		autohit_rifle_default = {
 			MIN_RATIO = 0.75,
@@ -1291,6 +1327,14 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 			far_dis = 2500,
 			far_angle = 0.5,
 			near_angle = 4
+		}
+		autohit_minigun_default = {
+			MIN_RATIO = 0,
+			MAX_RATIO = 1,
+			INIT_RATIO = 1,
+			far_dis = 10000,
+			far_angle = 5.0E-4,
+			near_angle = 5.0E-4
 		}
 	else
 		autohit_rifle_default = {
@@ -1341,6 +1385,14 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 			far_angle = 3,
 			near_angle = 3
 		}
+		autohit_minigun_default = {
+			MIN_RATIO = 0,
+			MAX_RATIO = 1,
+			INIT_RATIO = 1,
+			far_dis = 10000,
+			far_angle = 5.0E-4,
+			near_angle = 5.0E-4
+		}
 	end
 	aim_assist_rifle_default = deep_clone(autohit_rifle_default)
 	aim_assist_pistol_default = deep_clone(autohit_pistol_default)
@@ -1348,6 +1400,7 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	aim_assist_lmg_default = deep_clone(autohit_lmg_default)
 	aim_assist_snp_default = deep_clone(autohit_snp_default)
 	aim_assist_smg_default = deep_clone(autohit_smg_default)
+	aim_assist_minigun_default = deep_clone(autohit_minigun_default)
 	aim_assist_rifle_default.near_angle = 40
 	aim_assist_pistol_default.near_angle = 20
 	aim_assist_shotgun_default.near_angle = 40
@@ -1371,8 +1424,8 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	self:_init_stats()
 	self.factory = WeaponFactoryTweakData:new()
 	tweak_data._init_wip_weapon_factory(self.factory, tweak_data)
-	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
-	self:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
+	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
+	self:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, autohit_minigun_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
 end
 
 function WeaponTweakData:_init_stats()
@@ -1584,10 +1637,10 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 	}
 end
 
-function WeaponTweakData:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
+function WeaponTweakData:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
 end
 
-function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default)
+function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
 	local total_damage_primary = 300
 	local total_damage_secondary = 150
 	self.new_m4 = {}
@@ -7401,6 +7454,197 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 4
 	}
+	self.m134 = {}
+	self.m134.category = "minigun"
+	self.m134.has_description = true
+	self.m134.damage_melee = damage_melee_default
+	self.m134.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m134.sounds = {}
+	self.m134.sounds.fire = "minigun_fire_single"
+	self.m134.sounds.fire_single = "minigun_fire_single"
+	self.m134.sounds.fire_auto = "minigun_fire"
+	self.m134.sounds.stop_fire = "minigun_stop"
+	self.m134.sounds.dryfire = "primary_dryfire"
+	self.m134.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.m134.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.m134.timers = {}
+	self.m134.timers.reload_not_empty = 7.8
+	self.m134.timers.reload_empty = 7.8
+	self.m134.timers.unequip = 0.9
+	self.m134.timers.equip = 0.9
+	self.m134.name_id = "bm_w_m134"
+	self.m134.desc_id = "bm_w_m134_desc"
+	self.m134.description_id = "des_m134"
+	self.m134.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.m134.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.m134.use_data = {}
+	self.m134.use_data.selection_index = 2
+	self.m134.use_data.align_place = "left_hand"
+	self.m134.DAMAGE = 1
+	self.m134.CLIP_AMMO_MAX = 750
+	self.m134.NR_CLIPS_MAX = 1
+	self.m134.AMMO_MAX = self.m134.CLIP_AMMO_MAX * self.m134.NR_CLIPS_MAX
+	self.m134.AMMO_PICKUP = self:_pickup_chance(0, 2)
+	self.m134.FIRE_MODE = "auto"
+	self.m134.fire_mode_data = {}
+	self.m134.fire_mode_data.fire_rate = 0.02
+	self.m134.CAN_TOGGLE_FIREMODE = false
+	self.m134.auto = {}
+	self.m134.auto.fire_rate = 0.05
+	self.m134.spread = {}
+	self.m134.spread.standing = 8.6
+	self.m134.spread.crouching = 8
+	self.m134.spread.steelsight = 7.6
+	self.m134.spread.moving_standing = 9
+	self.m134.spread.moving_crouching = 8.2
+	self.m134.spread.moving_steelsight = 7.8
+	self.m134.kick = {}
+	self.m134.kick.standing = {
+		-0.1,
+		0.2,
+		-0.3,
+		0.4
+	}
+	self.m134.kick.crouching = self.m134.kick.standing
+	self.m134.kick.steelsight = self.m134.kick.standing
+	self.m134.crosshair = {}
+	self.m134.crosshair.standing = {}
+	self.m134.crosshair.crouching = {}
+	self.m134.crosshair.steelsight = {}
+	self.m134.crosshair.standing.offset = 0.16
+	self.m134.crosshair.standing.moving_offset = 1
+	self.m134.crosshair.standing.kick_offset = 0.8
+	self.m134.crosshair.crouching.offset = 0.1
+	self.m134.crosshair.crouching.moving_offset = 0.6
+	self.m134.crosshair.crouching.kick_offset = 0.4
+	self.m134.crosshair.steelsight.hidden = true
+	self.m134.crosshair.steelsight.offset = 0
+	self.m134.crosshair.steelsight.moving_offset = 0
+	self.m134.crosshair.steelsight.kick_offset = 0.14
+	self.m134.shake = {}
+	self.m134.shake.fire_multiplier = 0.5
+	self.m134.shake.fire_steelsight_multiplier = -0.5
+	self.m134.autohit = autohit_minigun_default
+	self.m134.aim_assist = aim_assist_lmg_default
+	self.m134.weapon_hold = "m134"
+	self.m134.animations = {}
+	self.m134.animations.equip_id = "equip_m134"
+	self.m134.animations.recoil_steelsight = true
+	self.m134.global_value = "overkill_pack"
+	self.m134.texture_bundle_folder = "dlc_pack_overkill"
+	self.m134.panic_suppression_chance = 0.1
+	self.m134.stats = {
+		damage = 16,
+		spread = 5,
+		recoil = 2,
+		spread_moving = 9,
+		zoom = 1,
+		concealment = 5,
+		suppression = 4,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
+	self.rpg7 = {}
+	self.rpg7.category = "grenade_launcher"
+	self.rpg7.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.rpg7.has_description = true
+	self.rpg7.damage_melee = damage_melee_default
+	self.rpg7.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.rpg7.sounds = {}
+	self.rpg7.sounds.fire = "rpg_fire"
+	self.rpg7.sounds.dryfire = "shotgun_dryfire"
+	self.rpg7.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.rpg7.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.rpg7.timers = {}
+	self.rpg7.timers.reload_not_empty = 4.7
+	self.rpg7.timers.reload_empty = self.rpg7.timers.reload_not_empty
+	self.rpg7.timers.unequip = 0.85
+	self.rpg7.timers.equip = 0.85
+	self.rpg7.name_id = "bm_w_rpg7"
+	self.rpg7.desc_id = "bm_w_rpg7_desc"
+	self.rpg7.description_id = "des_rpg7"
+	self.rpg7.muzzleflash = "effects/payday2/particles/weapons/50cal_auto_fps"
+	self.rpg7.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.rpg7.use_data = {}
+	self.rpg7.use_data.selection_index = 1
+	self.rpg7.use_data.align_place = "right_hand"
+	self.rpg7.DAMAGE = 6
+	self.rpg7.damage_near = 1000
+	self.rpg7.damage_far = 2000
+	self.rpg7.rays = 6
+	self.rpg7.CLIP_AMMO_MAX = 1
+	self.rpg7.NR_CLIPS_MAX = 4
+	self.rpg7.AMMO_MAX = self.rpg7.CLIP_AMMO_MAX * self.rpg7.NR_CLIPS_MAX
+	self.rpg7.AMMO_PICKUP = self:_pickup_chance(0, 1)
+	self.rpg7.FIRE_MODE = "single"
+	self.rpg7.fire_mode_data = {}
+	self.rpg7.fire_mode_data.fire_rate = 2
+	self.rpg7.single = {}
+	self.rpg7.single.fire_rate = 2
+	self.rpg7.spread = {}
+	self.rpg7.spread.standing = self.r870.spread.standing
+	self.rpg7.spread.crouching = self.r870.spread.crouching
+	self.rpg7.spread.steelsight = self.r870.spread.steelsight
+	self.rpg7.spread.moving_standing = self.r870.spread.moving_standing
+	self.rpg7.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.rpg7.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.rpg7.kick = {}
+	self.rpg7.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.rpg7.kick.crouching = self.rpg7.kick.standing
+	self.rpg7.kick.steelsight = self.rpg7.kick.standing
+	self.rpg7.crosshair = {}
+	self.rpg7.crosshair.standing = {}
+	self.rpg7.crosshair.crouching = {}
+	self.rpg7.crosshair.steelsight = {}
+	self.rpg7.crosshair.standing.offset = 0.16
+	self.rpg7.crosshair.standing.moving_offset = 0.8
+	self.rpg7.crosshair.standing.kick_offset = 0.6
+	self.rpg7.crosshair.standing.hidden = true
+	self.rpg7.crosshair.crouching.offset = 0.08
+	self.rpg7.crosshair.crouching.moving_offset = 0.7
+	self.rpg7.crosshair.crouching.kick_offset = 0.4
+	self.rpg7.crosshair.crouching.hidden = true
+	self.rpg7.crosshair.steelsight.hidden = true
+	self.rpg7.crosshair.steelsight.offset = 0
+	self.rpg7.crosshair.steelsight.moving_offset = 0
+	self.rpg7.crosshair.steelsight.kick_offset = 0.1
+	self.rpg7.shake = {}
+	self.rpg7.shake.fire_multiplier = 2
+	self.rpg7.shake.fire_steelsight_multiplier = 2
+	self.rpg7.autohit = autohit_shotgun_default
+	self.rpg7.aim_assist = aim_assist_shotgun_default
+	self.rpg7.animations = {}
+	self.rpg7.animations.equip_id = "equip_rpg7"
+	self.rpg7.animations.recoil_steelsight = true
+	self.rpg7.global_value = "overkill_pack"
+	self.rpg7.texture_bundle_folder = "dlc_pack_overkill"
+	self.rpg7.panic_suppression_chance = 0.3
+	self.rpg7.ignore_damage_upgrades = true
+	self.rpg7.stats = {
+		damage = 31,
+		spread = 10,
+		recoil = 3,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 5,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.rpg7.stats_modifiers = {damage = 100}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -7943,6 +8187,18 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.m134_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.rpg7_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -8023,4 +8279,6 @@ function WeaponTweakData:_precalculate_values()
 	self.l85a2_npc.AMMO_MAX = self.l85a2_npc.CLIP_AMMO_MAX * self.l85a2_npc.NR_CLIPS_MAX
 	self.hs2000_npc.AMMO_MAX = self.hs2000_npc.CLIP_AMMO_MAX * self.hs2000_npc.NR_CLIPS_MAX
 	self.vhs_npc.AMMO_MAX = self.vhs_npc.CLIP_AMMO_MAX * self.vhs_npc.NR_CLIPS_MAX
+	self.m134_npc.AMMO_MAX = self.m134_npc.CLIP_AMMO_MAX * self.m134_npc.NR_CLIPS_MAX
+	self.rpg7_npc.AMMO_MAX = self.rpg7_npc.CLIP_AMMO_MAX * self.rpg7_npc.NR_CLIPS_MAX
 end

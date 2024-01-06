@@ -163,6 +163,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.character_pack_dragan = 1
 	self.global_value_multipliers.the_bomb = 1
 	self.global_value_multipliers.akm4_pack = 1
+	self.global_value_multipliers.overkill_pack = 1
+	self.global_value_multipliers.complete_overkill_pack = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -201,6 +203,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.character_pack_dragan = 0.2
 	self.global_value_bonus_multiplier.the_bomb = 0.2
 	self.global_value_bonus_multiplier.akm4_pack = 0.2
+	self.global_value_bonus_multiplier.overkill_pack = 0.2
+	self.global_value_bonus_multiplier.complete_overkill_pack = 0.3
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)

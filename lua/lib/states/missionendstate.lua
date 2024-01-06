@@ -143,7 +143,7 @@ function MissionEndState:at_enter(old_state, params)
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, stealth_pass, loud_pass, equipped_pass, equipped_team_pass, timer_pass, num_players_pass, all_pass, weapon_data, memory, level_id, stage
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, all_pass, weapon_data, memory, level_id, stage, num_skills
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
 				level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
@@ -153,12 +153,22 @@ function MissionEndState:at_enter(old_state, params)
 				full_job_pass = not achievement_data.full_job_id or managers.job:has_active_job()
 				full_jobs_pass = not achievement_data.full_jobs_id or managers.job:has_active_job()
 				level_pass = not achievement_data.level_id or achievement_data.level_id == level_id
+				levels_pass = not achievement_data.levels or table.contains(achievement_data.levels, level_id)
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
 				no_shots_pass = not achievement_data.no_shots or managers.statistics:session_total_shots(achievement_data.no_shots) == 0
 				stealth_pass = not achievement_data.stealth or managers.groupai and managers.groupai:state():whisper_mode()
 				loud_pass = not achievement_data.loud or managers.groupai and not managers.groupai:state():whisper_mode()
 				timer_pass = not achievement_data.timer or managers.game_play_central and managers.game_play_central:get_heist_timer() <= achievement_data.timer
-				num_players_pass = not achievement_data.num_players or achievement_data.num_players == table.size(managers.network:game():all_members())
+				num_players_pass = not achievement_data.num_players or achievement_data.num_players <= table.size(managers.network:game():all_members())
+				pass_skills = not achievement_data.num_skills
+				if not pass_skills then
+					num_skills = 0
+					for tree, data in ipairs(tweak_data.skilltree.trees) do
+						local points, _ = managers.skilltree:get_tree_progress(tree)
+						num_skills = num_skills + points
+					end
+					pass_skills = num_skills <= achievement_data.num_skills
+				end
 				equipped_pass = not achievement_data.equipped or false
 				if achievement_data.equipped then
 					for category, data in pairs(achievement_data.equipped) do
@@ -199,7 +209,7 @@ function MissionEndState:at_enter(old_state, params)
 						oufit = member:peer():blackmarket_outfit()
 						pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
 						pass_deployable = not ad.deployable or ad.deployable == oufit.deployable
-						pass_mask = not ad.mask or ad.mask.mask_id == oufit.mask
+						pass_mask = not ad.mask or ad.mask == oufit.mask.mask_id
 						pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == oufit.melee_weapon
 						pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
 						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
@@ -216,7 +226,7 @@ function MissionEndState:at_enter(old_state, params)
 						end
 					end
 				end
-				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and level_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass
+				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and level_pass and levels_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass and pass_skills
 				full_job_pass = managers.job:has_active_job() and achievement_data.full_job_id and achievement_data.full_job_id == managers.job:current_real_job_id()
 				full_jobs_pass = managers.job:has_active_job() and achievement_data.full_jobs_id and table.contains(achievement_data.full_jobs_id, managers.job:current_real_job_id())
 				if all_pass and (full_job_pass or full_jobs_pass) then
@@ -579,6 +589,27 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 		}
 	end
 	print("on_statistics_result end")
+	local level_id, all_pass, total_kill_pass, total_accuracy_pass, total_downed_pass, level_pass, levels_pass, num_players_pass, diff_pass
+	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_statistics_achievements or {}) do
+		level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
+		diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
+		num_players_pass = not achievement_data.num_players or achievement_data.num_players <= table.size(managers.network:game():all_members())
+		level_pass = not achievement_data.level_id or achievement_data.level_id == level_id
+		levels_pass = not achievement_data.levels or table.contains(achievement_data.levels, level_id)
+		total_kill_pass = not achievement_data.total_kills or total_kills >= achievement_data.total_kills
+		total_accuracy_pass = not achievement_data.total_accuracy or group_accuracy >= achievement_data.total_accuracy
+		total_downed_pass = not achievement_data.total_downs or group_downs <= achievement_data.total_downs
+		all_pass = diff_pass and num_players_pass and level_pass and levels_pass and total_kill_pass and total_accuracy_pass and total_downed_pass
+		if all_pass then
+			if achievement_data.stat then
+				managers.achievment:award_progress(achievement_data.stat)
+			elseif achievement_data.award then
+				managers.achievment:award(achievement_data.award)
+			else
+				Application:debug("[MissionEndState] complete_heist_achievements:", achievement)
+			end
+		end
+	end
 end
 
 function MissionEndState:_continue_blocked()

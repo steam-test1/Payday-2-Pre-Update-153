@@ -494,7 +494,8 @@ function StatisticsManager:_get_stat_tables()
 		"haunted",
 		"pines",
 		"crojob2",
-		"crojob3"
+		"crojob3",
+		"crojob3_night"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -538,7 +539,8 @@ function StatisticsManager:_get_stat_tables()
 		"haunted",
 		"pines",
 		"crojob1",
-		"crojob2"
+		"crojob2",
+		"crojob2_night"
 	}
 	local mask_list = {
 		"character_locked",
@@ -696,7 +698,19 @@ function StatisticsManager:_get_stat_tables()
 		"butcher",
 		"doctor",
 		"tech_lion",
-		"lady_butcher"
+		"lady_butcher",
+		"carnotaurus",
+		"triceratops",
+		"pachy",
+		"velociraptor",
+		"jake",
+		"richter",
+		"biker",
+		"alex",
+		"corey",
+		"tonys_revenge",
+		"richard_returns",
+		"richard_begins"
 	}
 	local weapon_list = {
 		"ak5",
@@ -765,7 +779,8 @@ function StatisticsManager:_get_stat_tables()
 		"m1928",
 		"l85a2",
 		"vhs",
-		"hs2000"
+		"hs2000",
+		"cobray"
 	}
 	local melee_list = {
 		"weapon",
@@ -800,7 +815,8 @@ function StatisticsManager:_get_stat_tables()
 		"alien_maul",
 		"shillelagh",
 		"boxing_gloves",
-		"meat_cleaver"
+		"meat_cleaver",
+		"hammer"
 	}
 	local enemy_list = {
 		"civilian",
@@ -842,7 +858,8 @@ function StatisticsManager:_get_stat_tables()
 		"jowi",
 		"old_hoxton",
 		"female_1",
-		"dragan"
+		"dragan",
+		"jacket"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end

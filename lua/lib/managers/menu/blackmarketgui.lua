@@ -4311,7 +4311,12 @@ function BlackMarketGui:update_info_text()
 				if movement_penalty < 1 then
 					local penalty_as_string = string.format("%d%%", math.round((1 - movement_penalty) * 100))
 					updated_texts[5].text = updated_texts[5].text .. managers.localization:to_upper_text("bm_menu_weapon_movement_penalty_info", {penalty = penalty_as_string})
-				else
+				end
+				if weapon_tweak.has_description then
+					updated_texts[4].text = updated_texts[4].text .. [[
+
+
+]] .. managers.localization:text(tweak_data.weapon[slot_data.name].desc_id)
 				end
 			end
 			updated_texts[5].below_stats = true
@@ -4497,12 +4502,13 @@ function BlackMarketGui:update_info_text()
 		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget" or perks and table.contains(perks, "gadget")
 		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo" or perks and table.contains(perks, "ammo")
 		local is_bayonet = part_id and tweak_data.weapon.factory.parts[part_id].type == "bayonet" or perks and table.contains(perks, "bayonet")
-		if is_gadget or is_ammo or is_bayonet then
+		local has_desc = part_id and tweak_data.weapon.factory.parts[part_id].has_description == true
+		if is_gadget or is_ammo or is_bayonet or has_desc then
 			local crafted = managers.blackmarket:get_crafted_category_slot(prev_data.category, prev_data.slot)
 			updated_texts[4].text = managers.weapon_factory:get_part_desc_by_part_id_from_weapon(part_id, crafted.factory_id, crafted.blueprint)
 		end
 		if slot_data.global_value and slot_data.global_value ~= "normal" then
-			if is_gadget or is_ammo or is_bayonet then
+			if is_gadget or is_ammo or is_bayonet or has_desc then
 				updated_texts[4].text = updated_texts[4].text .. [[
 
 ##]] .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"
@@ -7564,8 +7570,9 @@ function BlackMarketGui:choose_weapon_buy_callback(data)
 	local item_categories = {}
 	for _, item in ipairs(blackmarket_items) do
 		local weapon_data = tweak_data.weapon[item.weapon_id]
-		item_categories[weapon_data.category] = item_categories[weapon_data.category] or {}
-		table.insert(item_categories[weapon_data.category], item)
+		local category = tweak_data.gui.buy_weapon_category_groups[weapon_data.category] or weapon_data.category
+		item_categories[category] = item_categories[category] or {}
+		table.insert(item_categories[category], item)
 	end
 	local sorted_categories = {}
 	for category, items in pairs(item_categories) do

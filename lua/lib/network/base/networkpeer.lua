@@ -164,6 +164,9 @@ function NetworkPeer:verify_job(job)
 end
 
 function NetworkPeer:verify_character()
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		return
+	end
 	if not self:is_host() then
 		return
 	end
@@ -252,6 +255,9 @@ function NetworkPeer:_verify_content(item_type, item_id)
 	else
 		local item = tweak_data.blackmarket[item_type]
 		item_data = item and item[item_id]
+		if item_type == "masks" and item_data.name_id == "bm_msk_cheat_error" then
+			return false
+		end
 		dlc_item = item_data and item_data.dlc
 		dlc_list = item_data and item_data.dlc_list
 	end

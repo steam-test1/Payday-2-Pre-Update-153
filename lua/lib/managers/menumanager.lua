@@ -1068,12 +1068,12 @@ end
 
 function MenuCallbackHandler:dlc_buy_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_overkill_pack_pc]")
-	Steam:overlay_activate("store", 339480)
+	Steam:overlay_activate("store", 348090)
 end
 
 function MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc]")
-	Steam:overlay_activate("store", 339480)
+	Steam:overlay_activate("store", 348091)
 end
 
 function MenuCallbackHandler:dlc_buy_ps3()
@@ -1111,11 +1111,13 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
-		"the_bomb",
+		"complete_overkill_pack",
+		"overkill_pack",
 		"akm4_pack",
 		"character_pack_dragan",
-		"hope_diamond",
+		"the_bomb",
 		"character_pack_clover",
+		"hope_diamond",
 		"gage_pack_historical",
 		"hl_miami",
 		"gage_pack_assault",
@@ -1208,6 +1210,14 @@ end
 
 function MenuCallbackHandler:visible_callback_akm4_pack()
 	return self:is_dlc_latest_locked("akm4_pack")
+end
+
+function MenuCallbackHandler:visible_callback_overkill_pack()
+	return self:is_dlc_latest_locked("overkill_pack")
+end
+
+function MenuCallbackHandler:visible_callback_complete_overkill_pack()
+	return self:is_dlc_latest_locked("complete_overkill_pack")
 end
 
 function MenuCallbackHandler:visible_callback_overkill_pack()

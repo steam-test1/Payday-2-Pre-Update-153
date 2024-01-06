@@ -2423,6 +2423,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 								weap_base:start_shooting()
 								self._camera_unit:base():start_shooting()
 								self._shooting = true
+								self._shooting_t = t
 								if fire_mode == "auto" then
 									self._unit:camera():play_redirect(self.IDS_RECOIL_ENTER)
 								end
@@ -2486,6 +2487,14 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						cat_print("jansve", "[PlayerStandard] Weapon Recoil Multiplier: " .. tostring(recoil_multiplier))
 						local up, down, left, right = unpack(weap_tweak_data.kick[self._state_data.in_steelsight and "steelsight" or self._state_data.ducking and "crouching" or "standing"])
 						self._camera_unit:base():recoil_kick(up * recoil_multiplier, down * recoil_multiplier, left * recoil_multiplier, right * recoil_multiplier)
+						if self._shooting_t then
+							local time_shooting = t - self._shooting_t
+							local achievement_data = tweak_data.achievement.never_let_you_go
+							if achievement_data and weap_base:get_name_id() == achievement_data.weapon_id and time_shooting >= achievement_data.timer then
+								managers.achievment:award(achievement_data.award)
+								self._shooting_t = nil
+							end
+						end
 						if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
 							self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
 							self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
@@ -2527,6 +2536,7 @@ function PlayerStandard:_check_stop_shooting()
 			self._unit:camera():play_redirect(self.IDS_RECOIL_EXIT)
 		end
 		self._shooting = false
+		self._shooting_t = nil
 	end
 end
 

@@ -984,7 +984,7 @@ function TweakData:init()
 		1.2,
 		1.3
 	}
-	self.experience_manager.limited_bonus_multiplier = 1.7
+	self.experience_manager.limited_bonus_multiplier = 1.9
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
@@ -1175,6 +1175,19 @@ function TweakData:init()
 		count = 50
 	}
 	self.achievement.cavity = {award = "bulldog_4", melee_type = "toothbrush"}
+	self.achievement.double_trouble = {
+		award = "ovk_9",
+		converted_cops = 4,
+		difficulty = {
+			"overkill_145",
+			"overkill_290"
+		}
+	}
+	self.achievement.never_let_you_go = {
+		award = "ovk_3",
+		timer = 25,
+		weapon_id = "m134"
+	}
 	self.achievement.one_man_army = {
 		award = "gage5_3",
 		equipped = {
@@ -1924,6 +1937,74 @@ function TweakData:init()
 				reverse_deployable = true
 			}
 		},
+		anticimex = {
+			award = "ovk_1",
+			full_jobs_id = {"alex", "alex_prof"},
+			num_players = 4,
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
+			equipped_team = {
+				primaries = {
+					"wpn_fps_lmg_m134"
+				},
+				secondaries = {
+					"wpn_fps_rpg7"
+				},
+				mask = "the_overkill_mask",
+				armor = "level_6"
+			}
+		},
+		modern_ninja = {
+			award = "ovk_2",
+			job = "kosugi",
+			equipped = {
+				primaries = {weapon_id = "m134"},
+				secondaries = {weapon_id = "rpg7"}
+			}
+		},
+		newbee = {
+			award = "ovk_4",
+			full_jobs_id = {
+				"watchdogs_wrapper",
+				"watchdogs_wrapper_prof"
+			},
+			num_skills = 0,
+			equipped = {
+				primaries = {weapon_id = "amcar"},
+				secondaries = {weapon_id = "glock_17"}
+			}
+		},
+		intel_thief = {
+			award = "ovk_6",
+			levels = {
+				"welcome_to_the_jungle_1",
+				"welcome_to_the_jungle_1_night"
+			},
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
+			stealth = true
+		},
+		ovk_8 = {
+			award = "ovk_8",
+			full_jobs_id = {
+				"welcome_to_the_jungle_wrapper_prof"
+			},
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
+			num_players = 2,
+			equipped_team = {
+				primaries = {
+					"wpn_fps_x_b92fs"
+				},
+				armor = "level_1"
+			}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -1941,6 +2022,27 @@ function TweakData:init()
 					}
 				}
 			}
+		}
+	}
+	self.achievement.complete_heist_statistics_achievements = {
+		immortal_ballot = {
+			award = "ovk_5",
+			num_players = 4,
+			total_downs = 0,
+			levels = {
+				"election_day_3",
+				"election_day_3_skip1",
+				"election_day_3_skip2"
+			},
+			difficulty = {
+				"overkill_290"
+			}
+		},
+		full_two_twenty = {
+			award = "ovk_7",
+			total_kills = 120,
+			total_accuracy = 120,
+			num_players = 4
 		}
 	}
 	self.achievement.loot_cash_achievements = {
@@ -2742,6 +2844,15 @@ function TweakData:init()
 	self.grenades.launcher_frag.mass_look_up_modifier = 1
 	self.grenades.launcher_frag.sound_event = "gl_explode"
 	self.grenades.launcher_frag.name_id = "bm_launcher_frag"
+	self.grenades.launcher_rocket = {}
+	self.grenades.launcher_rocket.damage = 1000
+	self.grenades.launcher_rocket.curve_pow = 0.1
+	self.grenades.launcher_rocket.player_damage = 40
+	self.grenades.launcher_rocket.range = 500
+	self.grenades.launcher_rocket.init_timer = 2.5
+	self.grenades.launcher_rocket.mass_look_up_modifier = 1
+	self.grenades.launcher_rocket.sound_event = "rpg_explode"
+	self.grenades.launcher_rocket.name_id = "bm_launcher_rocket"
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

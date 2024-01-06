@@ -17,6 +17,7 @@ function NewRaycastWeaponBase:init(unit)
 	NewRaycastWeaponBase.super.init(self, unit)
 	self._has_gadget = false
 	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
+	self._movement_penalty = tweak_data.upgrades.weapon_movement_penalty[self:weapon_tweak_data().category] or 1
 end
 
 function NewRaycastWeaponBase:is_npc()
@@ -243,8 +244,12 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
 	self._can_shoot_through_wall = tweak_data.weapon[self._name_id].can_shoot_through_wall
 	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
+	self._movement_penalty = tweak_data.upgrades.weapon_movement_penalty[self:weapon_tweak_data().category] or 1
 	local custom_stats = managers.weapon_factory:get_custom_stats_from_weapon(self._factory_id, self._blueprint)
 	for part_id, stats in pairs(custom_stats) do
+		if stats.movement_speed then
+			self._movement_penalty = self._movement_penalty * stats.movement_speed
+		end
 		if tweak_data.weapon.factory.parts[part_id].type ~= "ammo" then
 			if stats.ammo_pickup_min_mul then
 				self._ammo_data.ammo_pickup_min_mul = self._ammo_data.ammo_pickup_min_mul and self._ammo_data.ammo_pickup_min_mul * stats.ammo_pickup_min_mul or stats.ammo_pickup_min_mul
@@ -412,6 +417,10 @@ function NewRaycastWeaponBase:calculate_ammo_max_per_clip()
 	end
 	ammo = ammo + (self._extra_ammo or 0)
 	return ammo
+end
+
+function NewRaycastWeaponBase:movement_penalty()
+	return self._movement_penalty or 1
 end
 
 function NewRaycastWeaponBase:armor_piercing_chance()

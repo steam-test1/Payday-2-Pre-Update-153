@@ -270,7 +270,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_infamy_2_0",
 		desc_id = "menu_content_infamy_2_0_desc",
 		date_id = "menu_content_infamy_2_0_date",
-		webpage = "http://www.overkillsoftware.com/infamyupdate/",
+		webpage = "http://www.overkillsoftware.com/games/infamy2/",
 		image = "guis/dlcs/infamous/textures/pd2/content_updates/infamy_2_0"
 	}
 	self.content_updates = {
@@ -405,6 +405,11 @@ function GuiTweakData:init()
 	self.mod_preview_max_fov = 3
 	self.stats_present_multiplier = 10
 	self.armor_damage_shake_base = 1.1
+	self.buy_weapon_category_groups = {
+		grenade_launcher = "wpn_special",
+		saw = "wpn_special",
+		minigun = "wpn_special"
+	}
 	self.LONGEST_CHAR_NAME = "JOHN WICK"
 	self.crime_net.regions = {
 		{

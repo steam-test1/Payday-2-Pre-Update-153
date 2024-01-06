@@ -1706,7 +1706,7 @@ function CopMovement:sync_action_walk_stop()
 	elseif walk_action then
 		walk_action:stop()
 	else
-		debug_pause("[CopMovement:sync_action_walk_stop] no walk action!!!", self._unit, pos)
+		debug_pause("[CopMovement:sync_action_walk_stop] no walk action!!!", self._unit)
 	end
 end
 

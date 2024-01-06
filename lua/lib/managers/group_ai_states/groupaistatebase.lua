@@ -3613,7 +3613,7 @@ function GroupAIStateBase:convert_hostage_to_criminal(unit, peer_unit)
 	end
 	unit:contour():add("friendly")
 	u_data.so_access = unit:brain():SO_access()
-	self._converted_police[u_key] = unit
+	self:_set_converted_police(u_key, unit)
 	minions[u_key] = u_data
 	unit:movement():set_team(player_unit:movement():team())
 	local convert_enemies_health_multiplier_level = 0
@@ -3689,7 +3689,7 @@ function GroupAIStateBase:remove_minion(minion_key, player_key)
 		minion_unit:base():remove_destroy_listener(minion_data.minion_destroyed_clbk_key)
 		minion_data.minion_destroyed_clbk_key = nil
 	end
-	self._converted_police[minion_key] = nil
+	self:_set_converted_police(minion_key, nil)
 	self._criminals[player_key].minions[minion_key] = nil
 	if not next(self._criminals[player_key].minions) then
 		self._criminals[player_key].minions = nil
@@ -3704,12 +3704,28 @@ function GroupAIStateBase:remove_minion(minion_key, player_key)
 	end
 end
 
+function GroupAIStateBase:_set_converted_police(u_key, unit)
+	self._converted_police[u_key] = unit
+	if tweak_data.achievement.double_trouble then
+		local achievement_data = tweak_data.achievement.double_trouble
+		local living_converted_cops = 0
+		for key, unit in pairs(self._converted_police or {}) do
+			if alive(unit) and unit:character_damage() and unit:character_damage().dead and not unit:character_damage():dead() then
+				living_converted_cops = living_converted_cops + 1
+			end
+		end
+		if table.contains(achievement_data.difficulty, Global.game_settings.difficulty) and living_converted_cops >= achievement_data.converted_cops then
+			managers.achievment:award(achievement_data.award)
+		end
+	end
+end
+
 function GroupAIStateBase:sync_converted_enemy(converted_enemy)
 	local u_data = self._police[converted_enemy:key()]
 	if not u_data then
 		return
 	end
-	self._converted_police[converted_enemy:key()] = converted_enemy
+	self:_set_converted_police(converted_enemy:key(), converted_enemy)
 	u_data.is_converted = true
 end
 

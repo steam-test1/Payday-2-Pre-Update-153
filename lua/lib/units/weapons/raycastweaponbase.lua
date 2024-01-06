@@ -625,8 +625,9 @@ function RaycastWeaponBase:force_hit(from_pos, direction, user_unit, impact_pos,
 end
 
 function RaycastWeaponBase:tweak_data_anim_play(anim, ...)
-	if self:weapon_tweak_data().animations[anim] then
-		self:anim_play(self:weapon_tweak_data().animations[anim], ...)
+	local animations = self:weapon_tweak_data().animations
+	if animations and animations[anim] then
+		self:anim_play(animations[anim], ...)
 		return true
 	end
 	return false
@@ -696,16 +697,7 @@ function RaycastWeaponBase:get_ammo_max()
 end
 
 function RaycastWeaponBase:set_ammo_total(ammo_total)
-	if self._ammo_total then
-		if self._ammo_total2 then
-			print("haxor")
-		end
-		self._ammo_total2 = self:digest_value(ammo_total, true)
-		self._ammo_total = nil
-	else
-		self._ammo_total = self:digest_value(ammo_total, true)
-		self._ammo_total2 = nil
-	end
+	self._ammo_total = self:digest_value(ammo_total, true)
 end
 
 function RaycastWeaponBase:get_ammo_total()
@@ -965,7 +957,7 @@ function RaycastWeaponBase:add_ammo()
 	if Application:production_build() then
 		managers.player:add_weapon_ammo_gain(self._name_id, add_amount)
 	end
-	return true
+	return 0 < add_amount
 end
 
 function RaycastWeaponBase:add_ammo_from_bag(available)
