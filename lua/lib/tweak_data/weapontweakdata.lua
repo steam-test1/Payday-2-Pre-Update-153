@@ -80,6 +80,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_vhs_npc()
 	self:_init_data_m134_npc()
 	self:_init_data_rpg7_npc()
+	self:_init_data_cobray_npc()
 	self:_precalculate_values()
 end
 
@@ -1275,6 +1276,21 @@ function WeaponTweakData:_init_data_hs2000_npc()
 	self.hs2000_npc.hold = "pistol"
 	self.hs2000_npc.alert_size = 2500
 	self.hs2000_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_cobray_npc()
+	self.cobray_npc.sounds.prefix = "cobray_npc"
+	self.cobray_npc.use_data.selection_index = 1
+	self.cobray_npc.DAMAGE = 2
+	self.cobray_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.cobray_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.cobray_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.cobray_npc.CLIP_AMMO_MAX = 30
+	self.cobray_npc.NR_CLIPS_MAX = 5
+	self.cobray_npc.auto.fire_rate = 20
+	self.cobray_npc.hold = "pistol"
+	self.cobray_npc.alert_size = 5000
+	self.cobray_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7645,6 +7661,97 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		value = 1
 	}
 	self.rpg7.stats_modifiers = {damage = 100}
+	self.cobray = {}
+	self.cobray.category = "smg"
+	self.cobray.damage_melee = damage_melee_default
+	self.cobray.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.cobray.sounds = {}
+	self.cobray.sounds.fire = "cobray_fire_single"
+	self.cobray.sounds.fire_single = "cobray_fire_single"
+	self.cobray.sounds.fire_auto = "cobray_fire"
+	self.cobray.sounds.stop_fire = "cobray_stop"
+	self.cobray.sounds.dryfire = "secondary_dryfire"
+	self.cobray.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.cobray.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.cobray.timers = {}
+	self.cobray.timers.reload_not_empty = 2.05
+	self.cobray.timers.reload_empty = 4.35
+	self.cobray.timers.unequip = 0.7
+	self.cobray.timers.equip = 0.5
+	self.cobray.name_id = "bm_w_cobray"
+	self.cobray.desc_id = "bm_w_cobray_desc"
+	self.cobray.description_id = "des_cobray"
+	self.cobray.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.cobray.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.cobray.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.cobray.use_data = {}
+	self.cobray.use_data.selection_index = 1
+	self.cobray.DAMAGE = 1
+	self.cobray.CLIP_AMMO_MAX = 32
+	self.cobray.NR_CLIPS_MAX = 4
+	self.cobray.AMMO_MAX = self.cobray.CLIP_AMMO_MAX * self.cobray.NR_CLIPS_MAX
+	self.cobray.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 1)
+	self.cobray.FIRE_MODE = "auto"
+	self.cobray.fire_mode_data = {}
+	self.cobray.fire_mode_data.fire_rate = 0.05
+	self.cobray.CAN_TOGGLE_FIREMODE = true
+	self.cobray.auto = {}
+	self.cobray.auto.fire_rate = 0.05
+	self.cobray.spread = {}
+	self.cobray.spread.standing = self.new_m4.spread.standing * 0.75
+	self.cobray.spread.crouching = self.new_m4.spread.standing * 0.75
+	self.cobray.spread.steelsight = self.new_m4.spread.steelsight
+	self.cobray.spread.moving_standing = self.new_m4.spread.standing * 0.75
+	self.cobray.spread.moving_crouching = self.new_m4.spread.standing * 0.75
+	self.cobray.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.cobray.kick = {}
+	self.cobray.kick.standing = {
+		-0.6,
+		1.2,
+		-1,
+		1
+	}
+	self.cobray.kick.crouching = self.cobray.kick.standing
+	self.cobray.kick.steelsight = self.cobray.kick.standing
+	self.cobray.crosshair = {}
+	self.cobray.crosshair.standing = {}
+	self.cobray.crosshair.crouching = {}
+	self.cobray.crosshair.steelsight = {}
+	self.cobray.crosshair.standing.offset = 0.4
+	self.cobray.crosshair.standing.moving_offset = 0.7
+	self.cobray.crosshair.standing.kick_offset = 0.6
+	self.cobray.crosshair.crouching.offset = 0.3
+	self.cobray.crosshair.crouching.moving_offset = 0.6
+	self.cobray.crosshair.crouching.kick_offset = 0.4
+	self.cobray.crosshair.steelsight.hidden = true
+	self.cobray.crosshair.steelsight.offset = 0
+	self.cobray.crosshair.steelsight.moving_offset = 0
+	self.cobray.crosshair.steelsight.kick_offset = 0.4
+	self.cobray.shake = {}
+	self.cobray.shake.fire_multiplier = 1
+	self.cobray.shake.fire_steelsight_multiplier = -1
+	self.cobray.autohit = autohit_smg_default
+	self.cobray.aim_assist = aim_assist_smg_default
+	self.cobray.weapon_hold = "cobray"
+	self.cobray.animations = {}
+	self.cobray.animations.equip_id = "equip_cobray"
+	self.cobray.animations.recoil_steelsight = true
+	self.cobray.global_value = "hlm2_deluxe"
+	self.cobray.texture_bundle_folder = "hlm2"
+	self.cobray.panic_suppression_chance = 0.05
+	self.cobray.stats = {
+		damage = 11,
+		spread = 4,
+		recoil = 8,
+		spread_moving = 8,
+		zoom = 3,
+		concealment = 25,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -8199,6 +8306,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.cobray_npc = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -8281,4 +8394,5 @@ function WeaponTweakData:_precalculate_values()
 	self.vhs_npc.AMMO_MAX = self.vhs_npc.CLIP_AMMO_MAX * self.vhs_npc.NR_CLIPS_MAX
 	self.m134_npc.AMMO_MAX = self.m134_npc.CLIP_AMMO_MAX * self.m134_npc.NR_CLIPS_MAX
 	self.rpg7_npc.AMMO_MAX = self.rpg7_npc.CLIP_AMMO_MAX * self.rpg7_npc.NR_CLIPS_MAX
+	self.cobray_npc.AMMO_MAX = self.cobray_npc.CLIP_AMMO_MAX * self.cobray_npc.NR_CLIPS_MAX
 end

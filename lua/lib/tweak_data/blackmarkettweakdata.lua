@@ -95,6 +95,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.old_hoxton = "old_hoxton"
 	self.masks.character_locked.female_1 = "msk_grizel"
 	self.masks.character_locked.dragan = "dragan"
+	self.masks.character_locked.jacket = "richard_returns"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1692,7 +1693,8 @@ function BlackMarketTweakData:_init_masks()
 		jowi = "balaclava_john_wick",
 		old_hoxton = "balaclava_hoxton",
 		female_1 = "balaclava_clover",
-		dragan = "balaclava_dragan"
+		dragan = "balaclava_dragan",
+		jacket = "balaclava_wolf"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -1730,6 +1732,70 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.chains_glow.dlc = "complete_overkill_pack"
 	self.masks.chains_glow.texture_bundle_folder = "dlc_pack_overkill"
 	self.masks.chains_glow.value = 0
+	self.masks.jake = {}
+	self.masks.jake.unit = "units/pd2_dlc_hotline2/masks/jake/msk_jake"
+	self.masks.jake.name_id = "bm_msk_jake"
+	self.masks.jake.pcs = {}
+	self.masks.jake.texture_bundle_folder = "hlm2"
+	self.masks.jake.dlc = "hlm2"
+	self.masks.jake.value = 0
+	self.masks.richter = {}
+	self.masks.richter.unit = "units/pd2_dlc_hotline2/masks/richter/msk_richter"
+	self.masks.richter.name_id = "bm_msk_richter"
+	self.masks.richter.pcs = {}
+	self.masks.richter.texture_bundle_folder = "hlm2"
+	self.masks.richter.dlc = "hlm2"
+	self.masks.richter.value = 0
+	self.masks.biker = {}
+	self.masks.biker.unit = "units/pd2_dlc_hotline2/masks/biker/msk_biker"
+	self.masks.biker.name_id = "bm_msk_biker"
+	self.masks.biker.pcs = {}
+	self.masks.biker.texture_bundle_folder = "hlm2"
+	self.masks.biker.dlc = "hlm2"
+	self.masks.biker.value = 0
+	self.masks.biker.type = "helmet"
+	self.masks.alex = {}
+	self.masks.alex.unit = "units/pd2_dlc_hotline2/masks/alex/msk_alex"
+	self.masks.alex.name_id = "bm_msk_alex"
+	self.masks.alex.pcs = {}
+	self.masks.alex.texture_bundle_folder = "hlm2"
+	self.masks.alex.dlc = "hlm2"
+	self.masks.alex.value = 0
+	self.masks.corey = {}
+	self.masks.corey.unit = "units/pd2_dlc_hotline2/masks/corey/msk_corey"
+	self.masks.corey.name_id = "bm_msk_corey"
+	self.masks.corey.pcs = {}
+	self.masks.corey.texture_bundle_folder = "hlm2"
+	self.masks.corey.dlc = "hlm2"
+	self.masks.corey.value = 0
+	self.masks.tonys_revenge = {}
+	self.masks.tonys_revenge.unit = "units/pd2_dlc_hotline2/masks/tonys_revenge/msk_tonys_revenge"
+	self.masks.tonys_revenge.name_id = "bm_msk_tonys_revenge"
+	self.masks.tonys_revenge.pcs = {}
+	self.masks.tonys_revenge.texture_bundle_folder = "hlm2"
+	self.masks.tonys_revenge.dlc = "hlm2"
+	self.masks.tonys_revenge.value = 0
+	self.masks.richard_returns = {}
+	self.masks.richard_returns.unit = "units/pd2_dlc_hotline2/masks/richard_returns/msk_richard_returns"
+	self.masks.richard_returns.name_id = "bm_msk_richard_returns"
+	self.masks.richard_returns.pcs = {}
+	self.masks.richard_returns.texture_bundle_folder = "hlm2"
+	self.masks.richard_returns.dlc = "hlm2_deluxe"
+	self.masks.richard_returns.value = 0
+	self.masks.richard_returns.type = "helmet"
+	self.masks.richard_begins = {}
+	self.masks.richard_begins.unit = "units/pd2_dlc_hotline2/masks/richard_begins/msk_richard_begins"
+	self.masks.richard_begins.name_id = "bm_msk_richard_begins"
+	self.masks.richard_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.richard_begins.texture_bundle_folder = "hlm2"
+	self.masks.richard_begins.dlc = "hlm2_deluxe"
+	self.masks.richard_begins.value = 0
+	self.masks.richard_begins.type = "helmet"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -1780,6 +1846,11 @@ function BlackMarketTweakData:_init_characters()
 		texture_bundle_folder = "character_pack_dragan",
 		dlc = "character_pack_dragan"
 	}
+	self.characters.locked.jacket = {
+		sequence = "var_mtr_jacket",
+		texture_bundle_folder = "hlm2",
+		dlc = "hlm2_deluxe"
+	}
 	self.characters.female_1 = {}
 	self.characters.female_1.fps_unit = "units/payday2/characters/fps_mover/fps_female_1_mover"
 	self.characters.female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/npc_criminal_female_1"
@@ -1824,6 +1895,10 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_dragan.npc_unit = "units/payday2/characters/npc_criminals_suit_1/dragan/npc_criminal_suit_dragan"
 	self.characters.ai_dragan.sequence = "var_mtr_dragan"
 	self.characters.ai_dragan.name_id = "bm_character_ai_dragan"
+	self.characters.ai_jacket = {}
+	self.characters.ai_jacket.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jacket/npc_criminal_suit_jacket"
+	self.characters.ai_jacket.sequence = "var_mtr_jacket"
+	self.characters.ai_jacket.name_id = "bm_character_ai_jacket"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -6561,5 +6636,32 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.meat_cleaver.stats.charge_time = 2
 	self.melee_weapons.meat_cleaver.stats.range = 195
 	self.melee_weapons.meat_cleaver.stats.concealment = 26
+	self.melee_weapons.hammer = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.hammer.name_id = "bm_melee_hammer"
+	self.melee_weapons.hammer.dlc = "hlm2_deluxe"
+	self.melee_weapons.hammer.texture_bundle_folder = "hlm2"
+	self.melee_weapons.hammer.free = nil
+	self.melee_weapons.hammer.anim_global_param = "melee_axe"
+	self.melee_weapons.hammer.type = "axe"
+	self.melee_weapons.hammer.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.hammer.unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_mel_hammer/wpn_fps_mel_hammer"
+	self.melee_weapons.hammer.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_mel_hammer/wpn_third_mel_hammer"
+	self.melee_weapons.hammer.stats.weapon_type = "blunt"
+	self.melee_weapons.hammer.stats.min_damage = 3
+	self.melee_weapons.hammer.stats.max_damage = 6.1
+	self.melee_weapons.hammer.stats.min_damage_effect = 3.2
+	self.melee_weapons.hammer.stats.max_damage_effect = 1.5
+	self.melee_weapons.hammer.stats.charge_time = 2
+	self.melee_weapons.hammer.stats.range = 185
+	self.melee_weapons.hammer.sounds = {}
+	self.melee_weapons.hammer.sounds.equip = "hammer_equip"
+	self.melee_weapons.hammer.sounds.hit_air = "hammer_hit_air"
+	self.melee_weapons.hammer.sounds.hit_gen = "hammer_hit_gen"
+	self.melee_weapons.hammer.sounds.hit_body = "hammer_hit_body"
+	self.melee_weapons.hammer.sounds.charge = "hammer_charge"
+	self.melee_weapons.hammer.repeat_expire_t = 0.8
+	self.melee_weapons.hammer.stats.concealment = 27
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

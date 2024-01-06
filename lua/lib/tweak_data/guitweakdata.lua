@@ -273,6 +273,38 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/games/infamy2/",
 		image = "guis/dlcs/infamous/textures/pd2/content_updates/infamy_2_0"
 	}
+	local overkill_pack = {
+		id = "overkill_pack",
+		name_id = "menu_content_overkill_pack",
+		desc_id = "menu_content_overkill_pack_desc",
+		date_id = "menu_content_overkill_pack_date",
+		store = 348090,
+		image = "guis/dlcs/dlc_pack_overkill/textures/pd2/content_updates/overkill_pack"
+	}
+	local complete_overkill_pack = {
+		id = "complete_overkill_pack",
+		name_id = "menu_content_complete_overkill_pack",
+		desc_id = "menu_content_complete_overkill_pack_desc",
+		date_id = "menu_content_complete_overkill_pack_date",
+		store = 348091,
+		image = "guis/dlcs/dlc_pack_overkill/textures/pd2/content_updates/complete_overkill_pack"
+	}
+	local hlm2 = {
+		id = "hlm2",
+		name_id = "menu_content_hlm2",
+		desc_id = "menu_content_hlm2_desc",
+		date_id = "menu_content_hlm2_date",
+		store = 274170,
+		image = "guis/dlcs/hlm2/textures/pd2/content_updates/hlm2"
+	}
+	local hlm2_deluxe = {
+		id = "hlm2_deluxe",
+		name_id = "menu_content_hlm2_deluxe",
+		desc_id = "menu_content_hlm2_deluxe_desc",
+		date_id = "menu_content_hlm2_deluxe_date",
+		store = 274170,
+		image = "guis/dlcs/hlm2/textures/pd2/content_updates/hlm2_deluxe"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -313,7 +345,11 @@ function GuiTweakData:init()
 			the_bomb,
 			character_pack_dragan,
 			akm4_pack,
-			infamy_2_0
+			infamy_2_0,
+			overkill_pack,
+			complete_overkill_pack,
+			hlm2,
+			hlm2_deluxe
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1581,6 +1617,15 @@ function GuiTweakData:init()
 					},
 					post_event = "pln_contact_dragan"
 				}
+			},
+			{
+				id = "jacket",
+				name_id = "menu_jacket",
+				{
+					desc_id = "menu_jacket_desc_codex",
+					videos = {"jacket1", "jacket2"},
+					post_event = "pln_contact_jacket"
+				}
 			}
 		}
 	}
@@ -1591,7 +1636,8 @@ function GuiTweakData:init()
 				{
 					dots = {
 						{1601, 425},
-						{1630, 945},
+						{1025, 835},
+						{444, 567},
 						{1221, 685},
 						{1603, 555},
 						{1401, 620},
@@ -1646,7 +1692,8 @@ function GuiTweakData:init()
 						"the_elephant",
 						"hector",
 						"bain",
-						"the_dentist"
+						"the_dentist",
+						"the_butcher"
 					},
 					difficulties = {
 						"normal",

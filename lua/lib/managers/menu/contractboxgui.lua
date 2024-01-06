@@ -44,6 +44,12 @@ function ContractBoxGui:init(ws, fullscreen_ws)
 		wfs_text:set_size(w, h)
 		wfs_text:set_rightbottom(self._panel:w(), self._panel:h())
 	end
+	self._bg_rect = self._fullscreen_panel:rect({
+		name = "lobby_bg",
+		layer = -1,
+		color = Color.black,
+		alpha = 0
+	})
 	if not managers.menu:is_pc_controller() and wfs_text then
 		wfs_text:set_rightbottom(self._panel:w() - 40, self._panel:h() - 150)
 	end
@@ -519,6 +525,13 @@ function ContractBoxGui:update_character_menu_state(peer_id, state)
 		return
 	end
 	self._peers_state[peer_id]:set_text(state and managers.localization:to_upper_text("menu_lobby_menu_state_" .. state) or "")
+end
+
+function ContractBoxGui:update_bg_state(peer_id, state)
+	local peer = managers.network:session() and managers.network:session():local_peer() or false
+	if peer and peer:id() == peer_id then
+		self._bg_rect:set_alpha(state == "options" and 0.4 or 0)
+	end
 end
 
 function ContractBoxGui:set_character_panel_alpha(peer_id, alpha)

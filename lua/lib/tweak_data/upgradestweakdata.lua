@@ -111,6 +111,10 @@ function UpgradesTweakData:_init_pd2_values()
 		steamina = 10
 	}
 	self.on_headshot_dealt_cooldown = 3
+	self.on_killshot_cooldown = 3
+	self.on_damage_dealt_cooldown = 3
+	self.close_combat_distance = 800
+	self.killshot_close_panic_range = 1000
 	self.berserker_movement_speed_multiplier = 0.4
 	self.weapon_cost_multiplier = {}
 	self.weapon_cost_multiplier.akimbo = 1.4
@@ -589,6 +593,10 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.melee.stacking_hit_damage_multiplier = {0.1, 0.2}
 	self.values.melee.stacking_hit_expire_t = {6}
+	self.values.player.melee_kill_life_leech = {0.05}
+	self.values.player.killshot_regen_armor_bonus = {1}
+	self.values.player.killshot_close_regen_armor_bonus = {1}
+	self.values.player.killshot_close_panic_chance = {0.2}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1294,6 +1302,25 @@ function UpgradesTweakData:_init_pd2_values()
 				"15",
 				"10%"
 			}
+		},
+		{
+			{"4%"},
+			{"25%"},
+			{"10", "3"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"5%", "3"},
+			{"135%"},
+			{"10", "3"},
+			{"5%", "20%"},
+			{
+				"20%",
+				"3",
+				"10%"
+			}
 		}
 	}
 	self.specialization_descs = {}
@@ -1352,7 +1379,8 @@ function UpgradesTweakData:init()
 	self.level_tree[12] = {
 		name_id = "body_armor3",
 		upgrades = {
-			"body_armor3"
+			"body_armor3",
+			"cobray"
 		}
 	}
 	self.level_tree[13] = {
@@ -1469,7 +1497,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[37] = {
 		name_id = "weapons",
-		upgrades = {"shillelagh"}
+		upgrades = {"shillelagh", "hammer"}
 	}
 	self.level_tree[38] = {
 		name_id = "weapons",
@@ -1769,8 +1797,10 @@ function UpgradesTweakData:init()
 	self:_l85a2_definitions()
 	self:_vhs_definitions()
 	self:_hs2000_definitions()
+	self:_cobray_definitions()
 	self:_m134_weapon_definitions()
 	self:_rpg7_weapon_definitions()
+	self:_cobray_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -2804,6 +2834,42 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "temporary",
 			upgrade = "dmg_dampener_outnumbered_strong",
+			value = 1
+		}
+	}
+	self.definitions.player_melee_kill_life_leech = {
+		category = "feature",
+		name_id = "menu_player_melee_kill_life_leech",
+		upgrade = {
+			category = "player",
+			upgrade = "melee_kill_life_leech",
+			value = 1
+		}
+	}
+	self.definitions.player_killshot_regen_armor_bonus = {
+		category = "feature",
+		name_id = "menu_player_killshot_regen_armor_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "killshot_regen_armor_bonus",
+			value = 1
+		}
+	}
+	self.definitions.player_killshot_close_regen_armor_bonus = {
+		category = "feature",
+		name_id = "menu_player_killshot_close_regen_armor_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "killshot_close_regen_armor_bonus",
+			value = 1
+		}
+	}
+	self.definitions.player_killshot_close_panic_chance = {
+		category = "feature",
+		name_id = "menu_player_killshot_close_panic_chance",
+		upgrade = {
+			category = "player",
+			upgrade = "killshot_close_panic_chance",
 			value = 1
 		}
 	}
@@ -5999,6 +6065,15 @@ function UpgradesTweakData:_hs2000_definitions()
 	}
 end
 
+function UpgradesTweakData:_cobray_definitions()
+	self.definitions.cobray = {
+		category = "weapon",
+		weapon_id = "cobray",
+		factory_id = "wpn_fps_smg_cobray",
+		dlc = "hlm2_deluxe"
+	}
+end
+
 function UpgradesTweakData:_m134_weapon_definitions()
 	self.definitions.m134 = {
 		category = "weapon",
@@ -6014,6 +6089,15 @@ function UpgradesTweakData:_rpg7_weapon_definitions()
 		weapon_id = "rpg7",
 		factory_id = "wpn_fps_rpg7",
 		dlc = "overkill_pack"
+	}
+end
+
+function UpgradesTweakData:_cobray_definitions()
+	self.definitions.cobray = {
+		category = "weapon",
+		weapon_id = "cobray",
+		factory_id = "wpn_fps_smg_cobray",
+		dlc = "hlm2_deluxe"
 	}
 end
 
@@ -6135,6 +6219,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.meat_cleaver = {
 		category = "melee_weapon",
 		dlc = "character_pack_dragan"
+	}
+	self.definitions.hammer = {
+		category = "melee_weapon",
+		dlc = "hlm2_deluxe"
 	}
 end
 

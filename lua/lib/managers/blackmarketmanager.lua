@@ -3172,7 +3172,7 @@ end
 function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
 	if tweak_data.blackmarket.masks[mask_id].characters then
 		local character = self:get_real_character(mask_id, peer_id)
-		if not Application:production_build() then
+		if not tweak_data.blackmarket.masks[mask_id].characters[character] and not Application:production_build() then
 			for index, _ in pairs(tweak_data.blackmarket.masks[mask_id].characters) do
 				character = index
 				break

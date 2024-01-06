@@ -3,7 +3,7 @@ local is_win32 = SystemInfo:platform() == Idstring("WIN32")
 local NOT_WIN_32 = not is_win32
 local WIDTH_MULTIPLIER = NOT_WIN_32 and 0.68 or 0.71
 local BOX_GAP = 13.5
-local GRID_H_MUL = (NOT_WIN_32 and 7 or 6.6) / 8
+local GRID_H_MUL = (NOT_WIN_32 and 7 or 6.9) / 8
 local massive_font = tweak_data.menu.pd2_massive_font
 local large_font = tweak_data.menu.pd2_large_font
 local medium_font = tweak_data.menu.pd2_medium_font
@@ -4359,6 +4359,7 @@ function BlackMarketGui:update_info_text()
 				}) .. "\n"
 			end
 			updated_texts[3].text = text
+			updated_texts[3].below_stats = true
 		end
 		updated_texts[4].resource_color = {}
 		local desc_text = managers.localization:text(tweak_data.blackmarket.melee_weapons[slot_data.name].desc_id)
@@ -4374,6 +4375,7 @@ function BlackMarketGui:update_info_text()
 				level = slot_data.level,
 				SKILL = slot_data.name
 			}))
+			updated_texts[3].below_stats = true
 		end
 	elseif identifier == self.identifiers.mask then
 		local price = slot_data.price
@@ -7214,7 +7216,7 @@ function BlackMarketGui:_start_page_data()
 			name = "bm_menu_characters",
 			category = "characters",
 			on_create_func_name = "populate_characters",
-			override_slots = {4, 2},
+			override_slots = {3, 3},
 			identifier = self.identifiers.character
 		})
 	end

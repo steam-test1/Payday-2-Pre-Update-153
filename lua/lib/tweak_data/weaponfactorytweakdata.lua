@@ -168,6 +168,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_modpack_m4_ak()
 	self:_init_m134()
 	self:_init_rpg7()
+	self:_init_cobray()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -18592,4 +18593,284 @@ function WeaponFactoryTweakData:_init_rpg7()
 	}
 	self.wpn_fps_rpg7_npc = deep_clone(self.wpn_fps_rpg7)
 	self.wpn_fps_rpg7_npc.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7/wpn_fps_rpg7_npc"
+end
+
+function WeaponFactoryTweakData:_init_cobray()
+	self.parts.wpn_fps_smg_cobray_body_lower = {
+		type = "lower_reciever",
+		name_id = "bm_wp_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_body_lower",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_body_lower_jacket = {
+		type = "lower_reciever",
+		name_id = "bm_wp_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_body_lower_jacket",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_body_upper = {
+		type = "upper_reciever",
+		name_id = "bm_wp_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_body_upper",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_body_upper_jacket = {
+		pcs = {},
+		type = "upper_reciever",
+		name_id = "bm_wp_cobray_body_upper_jacket",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_body_upper_jacket",
+		stats = {
+			value = 1,
+			recoil = 5,
+			concealment = -3,
+			damage = 1
+		},
+		texture_bundle_folder = "hlm2",
+		dlc = "hlm2_deluxe",
+		is_a_unlockable = true,
+		override = {
+			wpn_fps_smg_cobray_body_lower = {
+				unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_body_lower_jacket",
+				third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_body_lower_jacket"
+			}
+		}
+	}
+	self.parts.wpn_fps_smg_cobray_bolt = {
+		type = "extra",
+		name_id = "bm_wp_cobray_bolt",
+		a_obj = "a_bolt",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_bolt",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_cobray_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_barrel",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_cobray_m_mag",
+		bullet_objects = {prefix = "g_bullet_", amount = 3},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_ns_barrelextension = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel_ext",
+		name_id = "bm_wp_cobray_ns_barrelext",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_ns_barrelextension",
+		stats = {
+			value = 1,
+			damage = 2,
+			spread = 2,
+			recoil = -2,
+			concealment = -2
+		},
+		texture_bundle_folder = "hlm2",
+		dlc = "hlm2_deluxe"
+	}
+	self.parts.wpn_fps_smg_cobray_ns_silencer = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel_ext",
+		sub_type = "silencer",
+		name_id = "bm_wp_cobray_ns_silencer",
+		parent = "barrel",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_ns_silencer",
+		stats = {
+			value = 1,
+			suppression = 12,
+			alert_size = 12,
+			recoil = 1,
+			spread = 0,
+			concealment = -1,
+			damage = -3
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_c"
+		},
+		texture_bundle_folder = "hlm2",
+		dlc = "hlm2_deluxe"
+	}
+	self.parts.wpn_fps_smg_cobray_s_m4adapter = {
+		type = "extra",
+		name_id = "bm_wp_cobray_s_m4_adapter",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_s_m4adapter",
+		stats = {value = 1},
+		stance_mod = {
+			wpn_fps_smg_cobray = {
+				translation = Vector3(0, -10, 0),
+				rotation = Rotation(0, 0, 0)
+			}
+		}
+	}
+	self.parts.wpn_fps_smg_cobray_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_cobray_s_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_smg_cobray_o_adapter = {
+		type = "extra",
+		name_id = "bm_wp_cobray_o_adapter",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_fps_smg_cobray_o_adapter",
+		stats = {value = 1},
+		stance_mod = {
+			wpn_fps_smg_cobray = {
+				translation = Vector3(0, -14, -4.8)
+			}
+		}
+	}
+	self.parts.wpn_fps_smg_cobray_body_lower.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_body_lower"
+	self.parts.wpn_fps_smg_cobray_body_lower_jacket.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_body_lower_jacket"
+	self.parts.wpn_fps_smg_cobray_body_upper.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_body_upper"
+	self.parts.wpn_fps_smg_cobray_body_upper_jacket.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_body_upper_jacket"
+	self.parts.wpn_fps_smg_cobray_bolt.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_bolt"
+	self.parts.wpn_fps_smg_cobray_barrel.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_barrel"
+	self.parts.wpn_fps_smg_cobray_m_standard.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_m_standard"
+	self.parts.wpn_fps_smg_cobray_ns_barrelextension.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_ns_barrelextension"
+	self.parts.wpn_fps_smg_cobray_ns_silencer.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_ns_silencer"
+	self.parts.wpn_fps_smg_cobray_s_m4adapter.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_s_m4adapter"
+	self.parts.wpn_fps_smg_cobray_s_standard.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_s_standard"
+	self.parts.wpn_fps_smg_cobray_o_adapter.third_unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray_pts/wpn_third_smg_cobray_o_adapter"
+	self.wpn_fps_smg_cobray = {}
+	self.wpn_fps_smg_cobray.unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray/wpn_fps_smg_cobray"
+	self.wpn_fps_smg_cobray.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_smg_cobray.animations = {
+		fire = "recoil",
+		fire_steelsight = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty"
+	}
+	self.wpn_fps_smg_cobray.adds = {
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_smg_cobray_o_adapter"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_smg_cobray_o_adapter"
+		}
+	}
+	self.wpn_fps_smg_cobray.stock_adapter = "wpn_fps_smg_cobray_s_m4adapter"
+	self.wpn_fps_smg_cobray.default_blueprint = {
+		"wpn_fps_smg_cobray_body_lower",
+		"wpn_fps_smg_cobray_body_upper",
+		"wpn_fps_smg_cobray_bolt",
+		"wpn_fps_smg_cobray_m_standard",
+		"wpn_fps_smg_cobray_s_standard",
+		"wpn_fps_smg_cobray_barrel"
+	}
+	self.wpn_fps_smg_cobray.uses_parts = {
+		"wpn_fps_smg_cobray_body_lower",
+		"wpn_fps_smg_cobray_body_upper",
+		"wpn_fps_smg_cobray_body_lower_jacket",
+		"wpn_fps_smg_cobray_body_upper_jacket",
+		"wpn_fps_smg_cobray_bolt",
+		"wpn_fps_smg_cobray_m_standard",
+		"wpn_fps_smg_cobray_ns_barrelextension",
+		"wpn_fps_smg_cobray_ns_silencer",
+		"wpn_fps_smg_cobray_s_m4adapter",
+		"wpn_fps_smg_cobray_s_standard",
+		"wpn_fps_smg_cobray_barrel",
+		"wpn_fps_smg_cobray_o_adapter",
+		"wpn_fps_upg_m4_s_standard",
+		"wpn_fps_upg_m4_s_pts",
+		"wpn_fps_upg_m4_s_crane",
+		"wpn_fps_upg_m4_s_mk46",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_vg_ass_smg_verticalgrip",
+		"wpn_fps_upg_vg_ass_smg_stubby",
+		"wpn_fps_upg_vg_ass_smg_afg",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_m4_s_ubr"
+	}
+	self.wpn_fps_smg_cobray_npc = deep_clone(self.wpn_fps_smg_cobray)
+	self.wpn_fps_smg_cobray_npc.unit = "units/pd2_dlc_hotline2/weapons/wpn_fps_smg_cobray/wpn_fps_smg_cobray_npc"
+	table.insert(self.wpn_fps_smg_mac10.uses_parts, "wpn_fps_smg_cobray_ns_barrelextension")
+	table.insert(self.wpn_fps_smg_mac10.uses_parts, "wpn_fps_smg_cobray_ns_silencer")
 end

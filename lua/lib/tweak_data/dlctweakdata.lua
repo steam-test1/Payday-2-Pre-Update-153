@@ -24,6 +24,7 @@ function DLCTweakData:init(tweak_data)
 		dlc_pack_overkill = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
+		hlm2 = true,
 		alienware_alpha = true,
 		season_pass = true,
 		animal = true
@@ -2827,6 +2828,58 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "chains_glow",
+			amount = 1
+		}
+	}
+	self.hlm2 = {}
+	self.hlm2.dlc = "has_hlm2"
+	self.hlm2.use_custom_func = true
+	self.hlm2.content = {}
+	self.hlm2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "jake",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "richter",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "biker",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "alex",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "corey",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "tonys_revenge",
+			amount = 1
+		}
+	}
+	self.hlm2_deluxe = {}
+	self.hlm2_deluxe.dlc = "has_hlm2_deluxe"
+	self.hlm2_deluxe.use_custom_func = true
+	self.hlm2_deluxe.content = {}
+	self.hlm2_deluxe.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "richard_returns",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_cobray_body_upper_jacket",
 			amount = 1
 		}
 	}

@@ -315,6 +315,14 @@ function GenericDLCManager:has_hlm_game()
 	return Global.dlc_manager.all_dlc_data.hlm_game and Global.dlc_manager.all_dlc_data.hlm_game.verified
 end
 
+function GenericDLCManager:has_hlm2()
+	return (not Global.dlc_manager.all_dlc_data.hlm2 or not Global.dlc_manager.all_dlc_data.hlm2.verified) and Global.dlc_manager.all_dlc_data.hlm2_aus and Global.dlc_manager.all_dlc_data.hlm2_aus.verified
+end
+
+function GenericDLCManager:has_hlm2_deluxe()
+	return (not Global.dlc_manager.all_dlc_data.hlm2_deluxe or not Global.dlc_manager.all_dlc_data.hlm2_deluxe.verified) and Global.dlc_manager.all_dlc_data.hlm2_aus and Global.dlc_manager.all_dlc_data.hlm2_aus.verified
+end
+
 function GenericDLCManager:has_character_pack_clover()
 	return Global.dlc_manager.all_dlc_data.character_pack_clover and Global.dlc_manager.all_dlc_data.character_pack_clover.verified
 end
@@ -614,6 +622,21 @@ function WINDLCManager:init()
 			hl_miami = {app_id = "323500", no_install = true},
 			hlm_game = {
 				app_id = "219150",
+				no_install = true,
+				external = true
+			},
+			hlm2 = {
+				app_id = "274170",
+				no_install = true,
+				external = true
+			},
+			hlm2_deluxe = {
+				app_id = "355390",
+				no_install = true,
+				external = true
+			},
+			hlm2_aus = {
+				app_id = "338951",
 				no_install = true,
 				external = true
 			},

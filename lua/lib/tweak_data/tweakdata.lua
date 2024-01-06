@@ -99,9 +99,14 @@ TweakData.RELOAD = true
 
 function TweakData:digest_tweak_data()
 	Application:debug("TweakData: Digesting tweak_data. <('O'<)")
-	self:digest_recursive(self.money_manager)
-	self:digest_recursive(self.experience_manager)
-	self:digest_recursive(self.casino)
+	self.digested_tables = {
+		"money_manager",
+		"experience_manager",
+		"casino"
+	}
+	for i, digest_me in ipairs(self.digested_tables) do
+		self:digest_recursive(self[digest_me])
+	end
 end
 
 function TweakData:digest_recursive(key, parent)
@@ -413,7 +418,8 @@ function TweakData:init()
 		"jowi",
 		"old_hoxton",
 		"female_1",
-		"dragan"
+		"dragan",
+		"jacket"
 	}
 	self.criminals.characters = {
 		{
@@ -501,6 +507,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb8",
 				ai_mask_id = "dragan",
+				mask_id = 4
+			}
+		},
+		{
+			name = "jacket",
+			static_data = {
+				ai_character_id = "ai_jacket",
+				ssuffix = "p",
+				color_id = 4,
+				voice = "rb9",
+				ai_mask_id = "richard_returns",
 				mask_id = 4
 			}
 		}
@@ -984,7 +1001,7 @@ function TweakData:init()
 		1.2,
 		1.3
 	}
-	self.experience_manager.limited_bonus_multiplier = 1.9
+	self.experience_manager.limited_bonus_multiplier = 2
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
@@ -1970,10 +1987,14 @@ function TweakData:init()
 				"watchdogs_wrapper",
 				"watchdogs_wrapper_prof"
 			},
-			num_skills = 0,
-			equipped = {
-				primaries = {weapon_id = "amcar"},
-				secondaries = {weapon_id = "glock_17"}
+			equipped_team = {
+				num_skills = 0,
+				primaries = {
+					"wpn_fps_ass_amcar"
+				},
+				secondaries = {
+					"wpn_fps_pis_g17"
+				}
 			}
 		},
 		intel_thief = {
@@ -2007,10 +2028,6 @@ function TweakData:init()
 		},
 		not_for_old_men = {
 			award = "gage4_11",
-			full_jobs_id = {
-				"framing_frame",
-				"framing_frame_prof"
-			},
 			stealth = true,
 			equipped = {
 				secondaries = {

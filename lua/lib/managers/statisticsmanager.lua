@@ -703,6 +703,11 @@ function StatisticsManager:_get_stat_tables()
 		"triceratops",
 		"pachy",
 		"velociraptor",
+		"the_overkill_mask",
+		"dallas_glow",
+		"wolf_glow",
+		"hoxton_glow",
+		"chains_glow",
 		"jake",
 		"richter",
 		"biker",
@@ -780,6 +785,8 @@ function StatisticsManager:_get_stat_tables()
 		"l85a2",
 		"vhs",
 		"hs2000",
+		"m134",
+		"rpg7",
 		"cobray"
 	}
 	local melee_list = {

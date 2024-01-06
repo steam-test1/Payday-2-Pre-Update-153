@@ -139,6 +139,9 @@ function LootDropTweakData:init(tweak_data)
 	self.global_value_category.infamous = {}
 	self.global_value_category.infamous.name_id = "bm_global_value_infamous"
 	self.global_value_category.infamous.sort_number = 30
+	self.global_value_category.collaboration = {}
+	self.global_value_category.collaboration.name_id = "bm_global_value_collaboration"
+	self.global_value_category.collaboration.sort_number = 25
 	self.global_values = {}
 	self.global_values.normal = {}
 	self.global_values.normal.name_id = "bm_global_value_normal"
@@ -468,7 +471,35 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.hlm_game.track = true
 	self.global_values.hlm_game.sort_number = 88
 	self.global_values.hlm_game.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
-	self.global_values.hlm_game.category = "normal"
+	self.global_values.hlm_game.category = "collaboration"
+	self.global_values.hlm2 = {}
+	self.global_values.hlm2.name_id = "bm_global_value_hlm2"
+	self.global_values.hlm2.desc_id = "menu_l_global_value_hlm2"
+	self.global_values.hlm2.unlock_id = "bm_global_value_hlm2_unlock"
+	self.global_values.hlm2.color = Color(255, 255, 212, 0) / 255
+	self.global_values.hlm2.dlc = true
+	self.global_values.hlm2.chance = 1
+	self.global_values.hlm2.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "hlm2")
+	self.global_values.hlm2.durability_multiplier = 1
+	self.global_values.hlm2.drops = true
+	self.global_values.hlm2.track = true
+	self.global_values.hlm2.sort_number = 89
+	self.global_values.hlm2.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.hlm2.category = "collaboration"
+	self.global_values.hlm2_deluxe = {}
+	self.global_values.hlm2_deluxe.name_id = "bm_global_value_hlm2_deluxe"
+	self.global_values.hlm2_deluxe.desc_id = "menu_l_global_value_hlm2_deluxe"
+	self.global_values.hlm2_deluxe.unlock_id = "bm_global_value_hlm2_deluxe_unlock"
+	self.global_values.hlm2_deluxe.color = Color(255, 255, 212, 0) / 255
+	self.global_values.hlm2_deluxe.dlc = true
+	self.global_values.hlm2_deluxe.chance = 1
+	self.global_values.hlm2_deluxe.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "hlm2_deluxe")
+	self.global_values.hlm2_deluxe.durability_multiplier = 1
+	self.global_values.hlm2_deluxe.drops = true
+	self.global_values.hlm2_deluxe.track = true
+	self.global_values.hlm2_deluxe.sort_number = 90
+	self.global_values.hlm2_deluxe.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.hlm2_deluxe.category = "collaboration"
 	self.global_values.gage_pack_historical = {}
 	self.global_values.gage_pack_historical.name_id = "bm_global_value_gage_pack_historical"
 	self.global_values.gage_pack_historical.desc_id = "menu_l_global_value_gage_pack_historical"
@@ -657,7 +688,8 @@ function LootDropTweakData:init(tweak_data)
 		"hlm_game",
 		"gage_pack_historical",
 		"character_pack_clover",
-		"character_pack_dragan"
+		"character_pack_dragan",
+		"hlm2_deluxe"
 	}
 	self:_create_global_value_list_map()
 end
