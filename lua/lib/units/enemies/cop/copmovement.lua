@@ -299,12 +299,14 @@ end
 
 function CopMovement:_post_init()
 	self:set_character_anim_variables()
-	if not managers.groupai:state():whisper_mode() then
-		self:set_cool(false)
-	else
-		self:set_cool(true)
+	if Network:is_server() then
+		if not managers.groupai:state():whisper_mode() then
+			self:set_cool(false)
+		else
+			self:set_cool(true)
+		end
+		self._unit:brain():on_cool_state_changed(self._cool)
 	end
-	self._unit:brain():on_cool_state_changed(self._cool)
 end
 
 function CopMovement:set_character_anim_variables()
@@ -1529,6 +1531,7 @@ function CopMovement:save(save_data)
 end
 
 function CopMovement:load(load_data)
+	print("[CopMovement:load]", self._unit)
 	local my_load_data = load_data.movement
 	if not my_load_data then
 		return
