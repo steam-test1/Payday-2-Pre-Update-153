@@ -641,6 +641,9 @@ function CopMovement:set_attention(attention)
 	end
 	self:_remove_attention_destroy_listener(self._attention)
 	if attention then
+		if self._unit:character_damage():dead() then
+			debug_pause_unit(self._unit, "[CopMovement:set_attention] dead AI", self._unit, inspect(attention))
+		end
 		if attention.unit then
 			local attention_unit
 			if attention.handler then
@@ -880,6 +883,9 @@ function CopMovement:not_cool_t()
 end
 
 function CopMovement:synch_attention(attention)
+	if attention and self._unit:character_damage():dead() then
+		debug_pause_unit(self._unit, "[CopMovement:synch_attention] dead AI", self._unit, inspect(attention))
+	end
 	self:_remove_attention_destroy_listener(self._attention)
 	self:_add_attention_destroy_listener(attention)
 	if attention and attention.unit and not attention.destroy_listener_key then
@@ -911,6 +917,11 @@ end
 
 function CopMovement:_remove_attention_destroy_listener(attention)
 	if attention and attention.destroy_listener_key then
+		if not alive(attention.unit) then
+			debug_pause_unit(self._unit, "[CopDamage:_on_damage_received] dead AI", self._unit, inspect(attention))
+			attention.destroy_listener_key = nil
+			return
+		end
 		local listener_class = (not (attention.unit:base() and attention.unit:base().remove_destroy_listener) or not attention.unit:base()) and attention.unit:unit_data() and attention.unit:unit_data().remove_destroy_listener and attention.unit:unit_data()
 		listener_class:remove_destroy_listener(attention.destroy_listener_key)
 		attention.destroy_listener_key = nil
@@ -1103,9 +1114,16 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		end
 		return
 	end
-	if hurt_type == "death" and self._rope then
-		self._rope:base():retract()
-		self._rope = nil
+	if hurt_type == "death" then
+		if self._rope then
+			self._rope:base():retract()
+			self._rope = nil
+		end
+		if Network:is_server() then
+			self:set_attention()
+		else
+			self:synch_attention()
+		end
 	end
 	local attack_dir = damage_info.col_ray and damage_info.col_ray.ray or damage_info.attack_dir
 	local hit_pos = damage_info.col_ray and damage_info.col_ray.position or damage_info.pos
@@ -1950,9 +1968,7 @@ function CopMovement:pre_destroy()
 			action:on_destroy()
 		end
 	end
-	if self._attention and self._attention.destroy_listener_key then
-		self:_remove_attention_destroy_listener(self._attention)
-	end
+	self:_remove_attention_destroy_listener(self._attention)
 end
 
 function CopMovement:on_anim_act_clbk(anim_act)
@@ -1986,18 +2002,12 @@ function CopMovement:set_team(team_data)
 	self._ext_brain:on_team_set(team_data)
 	if Network:is_server() and self._unit:id() ~= -1 then
 		local team_index = tweak_data.levels:get_team_index(team_data.id)
-		if team_index <= 16 then
-			self._ext_network:send("sync_unit_event_id_16", "movement", team_index)
+		if team_index <= 256 then
+			self._ext_network:send("sync_char_team", team_index)
 		else
 			debug_pause_unit(self._unit, "[CopMovement:set_team] team limit reached!", team_data.id)
 		end
 	end
-end
-
-function CopMovement:sync_net_event(event_id, peer)
-	local team_id = tweak_data.levels:get_team_names_indexed()[event_id]
-	local team_data = managers.groupai:state():team_data(team_id)
-	self:set_team(team_data)
 end
 
 function CopMovement:team()

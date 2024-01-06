@@ -9,8 +9,8 @@ SentryGunMovement.friendly_fire = PlayerMovement.friendly_fire
 function SentryGunMovement:init(unit)
 	self._unit = unit
 	self._head_obj = self._unit:get_object(Idstring("a_detect"))
-	self._spin_obj = self._unit:get_object(Idstring("a_shield"))
-	self._pitch_obj = self._unit:get_object(Idstring("a_gun"))
+	self._spin_obj = self._unit:get_object(Idstring(self._spin_obj_name))
+	self._pitch_obj = self._unit:get_object(Idstring(self._pitch_obj_name))
 	self._m_rot = unit:rotation()
 	self._m_head_fwd = self._m_rot:y()
 	self._unit_up = self._m_rot:z()
@@ -27,32 +27,100 @@ function SentryGunMovement:init(unit)
 	else
 		Application:error("[SentryGunBase:setup] Spawned Sentry gun unit with incomplete navigation data.")
 	end
-	self._tweak = tweak_data.weapon.sentry_gun
 	self._sound_source = self._unit:sound_source()
 	self._last_attention_t = 0
 	self._warmup_t = 0
 	self._rot_speed_mul = 1
+	self._updator = callback(self, self, "_update_inactive")
 end
 
 function SentryGunMovement:post_init()
 	self._ext_network = self._unit:network()
+	self._tweak = tweak_data.weapon[self._unit:base():get_name_id()]
+	if self._tweak.VELOCITY_COMPENSATION then
+		self._m_last_attention_pos = Vector3()
+		self._m_last_attention_vel = Vector3()
+	end
+	self:set_team(managers.groupai:state():team_data(tweak_data.levels:get_default_team_ID("player")))
 end
 
 function SentryGunMovement:update(unit, t, dt)
+	self._updator(t, dt)
+end
+
+function SentryGunMovement:_update_inactive(t, dt)
+end
+
+function SentryGunMovement:_update_active(t, dt)
+	self:_upd_hacking(t, dt)
+	self:_upd_mutables()
 	if t > self._warmup_t then
 		self:_upd_movement(dt)
 	end
 end
 
+function SentryGunMovement:_update_activating(t, dt)
+	if not self._unit:anim_is_playing(self._activation_anim_group_name_ids) then
+		self._activating = false
+		self._activated = true
+		self._updator = callback(self, self, "_update_active")
+		self._unit:weapon():update_laser()
+		if managers.game_play_central:flashlights_on() and self._lights_on_sequence_name then
+			self._unit:damage():run_sequence_simple(self._lights_on_sequence_name)
+		end
+	end
+end
+
+function SentryGunMovement:_update_rearming(t, dt)
+	if self._rearm_complete_t and t > self._rearm_complete_t then
+		self:complete_rearming()
+	end
+end
+
+function SentryGunMovement:complete_rearming()
+	if Network:is_server() then
+		self._unit:weapon():set_ammo(self._tweak.CLIP_SIZE)
+	end
+	if self._rearm_complete_snd_event then
+		self._sound_source:post_event(self._rearm_complete_snd_event)
+		self._rearm_event = nil
+	end
+	self._rearming = false
+	self._updator = callback(self, self, "_update_active")
+	self._unit:weapon():update_laser()
+end
+
 function SentryGunMovement:setup(rot_speed_multiplier)
 	self._rot_speed_mul = rot_speed_multiplier
+	self._activated = true
+	self._updator = callback(self, self, "_update_active")
+end
+
+function SentryGunMovement:on_activated()
+	self._tweak = tweak_data.weapon[self._unit:base():get_name_id()]
+	if self._tweak.VELOCITY_COMPENSATION and not self._m_last_attention_pos then
+		self._m_last_attention_pos = Vector3()
+		self._m_last_attention_vel = Vector3()
+	end
+	if self._unit:damage() and self._unit:damage():has_sequence("activate") and self._activation_anim_group_name then
+		self._activation_anim_group_name_ids = Idstring(self._activation_anim_group_name)
+		self._unit:damage():run_sequence_simple("activate")
+		self._activating = true
+		self._updator = callback(self, self, "_update_activating")
+	end
 end
 
 function SentryGunMovement:set_active(state)
 	self._unit:set_extension_update_enabled(Idstring("movement"), state)
-	if not state and self._motor_sound then
-		self._motor_sound:stop()
-		self._motor_sound = false
+	if not state then
+		if self._motor_sound then
+			self._motor_sound:stop()
+			self._motor_sound = false
+		end
+		if self._rearm_event then
+			self._rearm_event:stop()
+			self._rearm_event = false
+		end
 	end
 end
 
@@ -61,36 +129,92 @@ function SentryGunMovement:nav_tracker()
 end
 
 function SentryGunMovement:set_attention(attention)
-	if self._attention and self._attention.destroy_listener_key then
-		self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
+	if not attention and not self._attention then
+		return
 	end
+	if attention and self._attention then
+		local different
+		for i, k in pairs(self._attention) do
+			if attention[i] ~= k then
+				different = true
+				break
+			end
+		end
+		if not different then
+			for i, k in pairs(attention) do
+				if self._attention[i] ~= k then
+					different = true
+					break
+				end
+			end
+		end
+		if not different then
+			return
+		end
+	end
+	CopMovement._remove_attention_destroy_listener(self, self._attention)
 	if attention then
 		if attention.unit then
-			local listener_key = "SentryGunMovement" .. tostring(self._unit:key())
-			attention.destroy_listener_key = listener_key
-			attention.unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
-			self._ext_network:send("set_attention", attention.unit, AIAttentionObject.REACT_IDLE)
+			if attention.handler then
+				if self._m_last_attention_pos then
+					mvector3.set(self._m_last_attention_pos, attention.handler:get_attention_m_pos())
+					mvector3.set_zero(self._m_last_attention_vel)
+					self._last_attention_snapshot_t = TimerManager:game():time() - 0.1
+				end
+				local attention_unit = attention.handler:unit()
+				if attention_unit:id() ~= -1 then
+					self._ext_network:send("set_attention", attention_unit, attention.reaction)
+				else
+					self._ext_network:send("cop_set_attention_pos", mvector3.copy(attention.handler:get_attention_m_pos()))
+				end
+			else
+				local attention_unit = attention.unit
+				if self._m_last_attention_pos then
+					attention_unit:character_damage():shoot_pos_mid(self._m_last_attention_pos)
+					mvector3.set_zero(self._m_last_attention_vel)
+					self._last_attention_snapshot_t = TimerManager:game():time() - 0.1
+				end
+				if attention_unit:id() ~= -1 then
+					self._ext_network:send("set_attention", attention_unit, AIAttentionObject.REACT_IDLE)
+				end
+			end
+			CopMovement._add_attention_destroy_listener(self, attention)
 		else
 			self._ext_network:send("cop_set_attention_pos", attention.pos)
 		end
-	elseif self._attention and Network:is_server() and self._unit:id() ~= -1 then
+	elseif self._attention and self._unit:id() ~= -1 then
 		self._ext_network:send("set_attention", nil, AIAttentionObject.REACT_IDLE)
 	end
-	self:chk_play_alert(attention, self._attention)
 	self._attention = attention
+	self:chk_play_alert(attention, self._attention)
 end
 
 function SentryGunMovement:synch_attention(attention)
-	if self._attention and self._attention.destroy_listener_key then
-		self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
+	CopMovement._remove_attention_destroy_listener(self, self._attention)
+	CopMovement._add_attention_destroy_listener(self, attention)
+	if attention and attention.unit and not attention.destroy_listener_key then
+		debug_pause_unit(attention.unit, "[SentryGunMovement:synch_attention] problematic attention unit", attention.unit)
+		self:synch_attention(nil)
+		return
 	end
 	if attention and attention.unit then
-		local listener_key = "SentryGunMovement" .. tostring(self._unit:key())
-		attention.destroy_listener_key = listener_key
-		attention.unit:base():add_destroy_listener(listener_key, callback(self, self, "attention_unit_destroy_clbk"))
+		if attention.handler then
+			if self._m_last_attention_pos then
+				mvector3.set(self._m_last_attention_pos, attention.handler:get_attention_m_pos())
+				mvector3.set_zero(self._m_last_attention_vel)
+				self._last_attention_snapshot_t = TimerManager:game():time() - 0.1
+			end
+		else
+			local attention_unit = attention.unit
+			if self._m_last_attention_pos then
+				attention_unit:character_damage():shoot_pos_mid(self._m_last_attention_pos)
+				mvector3.set_zero(self._m_last_attention_vel)
+				self._last_attention_snapshot_t = TimerManager:game():time() - 0.1
+			end
+		end
 	end
-	self:chk_play_alert(attention, self._attention)
 	self._attention = attention
+	self:chk_play_alert(attention, self._attention)
 end
 
 function SentryGunMovement:chk_play_alert(attention, old_attention)
@@ -98,7 +222,7 @@ function SentryGunMovement:chk_play_alert(attention, old_attention)
 		self._last_attention_t = TimerManager:game():time()
 	end
 	if attention and not old_attention and TimerManager:game():time() - self._last_attention_t > 3 then
-		self._sound_source:post_event("turret_alert")
+		self._sound_source:post_event(self._attention_acquired_snd_event)
 		self._warmup_t = TimerManager:game():time() + 0.5
 	end
 end
@@ -113,6 +237,15 @@ function SentryGunMovement:attention_unit_destroy_clbk(unit)
 	else
 		self:synch_attention()
 	end
+end
+
+function SentryGunMovement:_upd_mutables()
+	self._head_obj:m_position(self._m_head_pos)
+	self._unit:m_rotation(self._m_rot)
+	self._head_obj:m_rotation(tmp_rot1)
+	mrotation.y(tmp_rot1, self._m_head_fwd)
+	mrotation.y(self._m_rot, self._unit_fwd)
+	mrotation.z(self._m_rot, self._unit_up)
 end
 
 function SentryGunMovement:m_head_pos()
@@ -148,11 +281,11 @@ function SentryGunMovement:set_look_vec3(look_vec3)
 end
 
 function SentryGunMovement:_upd_movement(dt)
-	local target_dir = self:_get_target_dir(self._attention)
+	local target_dir = self:_get_target_dir(self._attention, dt)
 	local unit_fwd_polar = self._unit_fwd:to_polar()
 	local fwd_polar = self._m_head_fwd:to_polar_with_reference(self._unit_fwd, self._unit_up)
 	local error_polar = target_dir:to_polar_with_reference(self._unit_fwd, self._unit_up)
-	error_polar = Polar(1, math.clamp(error_polar.pitch, -55, 35.5), error_polar.spin)
+	error_polar = Polar(1, math.clamp(error_polar.pitch, self._pitch_min, self._pitch_max), error_polar.spin)
 	error_polar = error_polar - fwd_polar
 	
 	local function _ramp_value(value, err, vel, slowdown_at, max_vel, min_vel, acc)
@@ -184,18 +317,16 @@ function SentryGunMovement:_upd_movement(dt)
 	local pitch_end, spin_end, new_vel, new_spin, new_pitch
 	spin_end, new_vel, new_spin = _ramp_value(fwd_polar.spin, error_polar.spin, self._vel.spin, self._tweak.SLOWDOWN_ANGLE_SPIN, self._tweak.MAX_VEL_SPIN * self._rot_speed_mul, self._tweak.MIN_VEL_SPIN, self._tweak.ACC_SPIN * self._rot_speed_mul)
 	self._vel.spin = new_vel
-	if new_vel > self._tweak.MAX_VEL_SPIN * self._rot_speed_mul * 0.25 then
+	local new_vel_abs = math.abs(new_vel)
+	local vel_ratio = math.clamp(1.5 * (new_vel_abs - self._tweak.MIN_VEL_SPIN) / (self._tweak.MAX_VEL_SPIN - self._tweak.MIN_VEL_SPIN), 0, 1)
+	if 0.5 < vel_ratio then
 		if not self._motor_sound then
-			self._sound_source:post_event("turret_spin_start")
-			self._motor_sound = self._sound_source:post_event("turret_spin_loop")
+			self._motor_sound = self._sound_source:post_event(self._spin_start_snd_event)
 		end
-	elseif self._motor_sound and new_vel < self._tweak.MAX_VEL_SPIN * self._rot_speed_mul * 0.2 then
-		self._sound_source:post_event("turret_spin_stop")
+	elseif vel_ratio == 0 and self._motor_sound then
+		self._sound_source:post_event(self._spin_stop_snd_event)
 		self._motor_sound:stop()
 		self._motor_sound = false
-	end
-	if self._motor_sound then
-		self._sound_source:set_rtpc("spin_vel", math.clamp((new_vel - self._tweak.MAX_VEL_SPIN * self._rot_speed_mul * 0.25) / (self._tweak.MAX_VEL_SPIN * self._rot_speed_mul), 0, 1))
 	end
 	pitch_end, new_vel, new_pitch = _ramp_value(fwd_polar.pitch, error_polar.pitch, self._vel.pitch, self._tweak.SLOWDOWN_ANGLE_PITCH, self._tweak.MAX_VEL_PITCH * self._rot_speed_mul, self._tweak.MIN_VEL_PITCH, self._tweak.ACC_PITCH * self._rot_speed_mul)
 	self._vel.pitch = new_vel
@@ -206,6 +337,47 @@ function SentryGunMovement:_upd_movement(dt)
 	self:set_look_vec3(new_fwd_vec3)
 	if pitch_end and spin_end and self._switched_off then
 		self:set_active(false)
+	end
+end
+
+function SentryGunMovement:_upd_hacking(t, dt)
+	if not self._tweak.ECM_HACKABLE then
+		return
+	end
+	local is_hacking_active
+	if Network:is_server() then
+		is_hacking_active = managers.groupai:state():is_ecm_jammer_active("camera")
+	elseif self._team.id == "hacked_turret" then
+		is_hacking_active = true
+	end
+	if self._is_hacked then
+		if not is_hacking_active then
+			self._is_hacked = nil
+			if Network:is_server() then
+				local original_team = self._original_team
+				self._original_team = nil
+				self:set_team(original_team)
+			end
+			if self._hacked_stop_snd_event then
+				self._sound_source:post_event(self._hacked_stop_snd_event)
+			end
+			if Network:is_server() then
+				self._unit:brain():on_hacked_end()
+			end
+		end
+	elseif is_hacking_active then
+		self._is_hacked = true
+		if Network:is_server() then
+			local original_team = self._team
+			self:set_team(managers.groupai:state():team_data("hacked_turret"))
+			self._original_team = original_team
+		end
+		if self._hacked_start_snd_event then
+			self._sound_source:post_event(self._hacked_start_snd_event)
+		end
+		if Network:is_server() then
+			self._unit:brain():on_hacked_start()
+		end
 	end
 end
 
@@ -227,7 +399,7 @@ function SentryGunMovement:give_recoil()
 	self:set_look_vec3(new_fwd_vec3)
 end
 
-function SentryGunMovement:_get_target_dir(attention)
+function SentryGunMovement:_get_target_dir(attention, dt)
 	if not attention then
 		if self._switched_off then
 			mvector3.set(tmp_vec2, self._unit_fwd)
@@ -237,12 +409,37 @@ function SentryGunMovement:_get_target_dir(attention)
 			return self._unit_fwd
 		end
 	else
-		local target_pos
-		if attention.unit then
-			target_pos = tmp_vec1
-			attention.unit:character_damage():shoot_pos_mid(target_pos)
+		local target_pos = tmp_vec1
+		if attention.handler then
+			if self._m_last_attention_pos then
+				mvector3.set(target_pos, self._m_last_attention_vel)
+				mvector3.multiply(target_pos, self._tweak.VELOCITY_COMPENSATION.SNAPSHOT_INTERVAL)
+				mvector3.add(target_pos, self._m_last_attention_pos)
+			else
+				mvector3.set(target_pos, attention.handler:get_attention_m_pos())
+			end
+		elseif attention.unit then
+			if self._m_last_attention_pos then
+				mvector3.set(target_pos, self._m_last_attention_vel)
+				mvector3.multiply(target_pos, self._tweak.VELOCITY_COMPENSATION.SNAPSHOT_INTERVAL)
+				mvector3.add(target_pos, self._m_last_attention_pos)
+				attention.unit:character_damage():shoot_pos_mid(self._m_last_attention_pos)
+			else
+				attention.unit:character_damage():shoot_pos_mid(target_pos)
+			end
 		else
 			target_pos = attention.pos
+		end
+		if attention.unit and self._m_last_attention_pos and TimerManager:game():time() > self._last_attention_snapshot_t + self._tweak.VELOCITY_COMPENSATION.SNAPSHOT_INTERVAL then
+			mvector3.set(self._m_last_attention_vel, self._m_last_attention_pos)
+			if attention.handler then
+				mvector3.set(self._m_last_attention_pos, attention.handler:get_attention_m_pos())
+			else
+				attention.unit:character_damage():shoot_pos_mid(self._m_last_attention_pos)
+			end
+			mvector3.subtract(self._m_last_attention_vel, self._m_last_attention_pos)
+			mvector3.divide(self._m_last_attention_vel, self._last_attention_snapshot_t - TimerManager:game():time())
+			self._last_attention_snapshot_t = TimerManager:game():time()
 		end
 		local target_vec = tmp_vec2
 		mvec3_dir(target_vec, self._m_head_pos, target_pos)
@@ -256,6 +453,7 @@ end
 
 function SentryGunMovement:on_death()
 	self._unit:set_extension_update_enabled(Idstring("movement"), false)
+	self._unit:weapon():set_laser_enabled(nil, nil)
 end
 
 function SentryGunMovement:synch_allow_fire(...)
@@ -264,6 +462,10 @@ end
 
 function SentryGunMovement:warming_up(t)
 	return t < self._warmup_t
+end
+
+function SentryGunMovement:is_activating()
+	return self._activating
 end
 
 function SentryGunMovement:switch_off()
@@ -278,6 +480,7 @@ end
 
 function SentryGunMovement:save(save_data)
 	local my_save_data = {}
+	save_data.movement = my_save_data
 	if self._attention then
 		if self._attention.pos then
 			my_save_data.attention = self._attention
@@ -286,29 +489,44 @@ function SentryGunMovement:save(save_data)
 				pos = self._attention.unit:movement():m_com()
 			}
 		else
-			managers.enemy:add_delayed_clbk("clbk_sync_attention" .. tostring(self._unit:key()), callback(self, CopMovement, "clbk_sync_attention", {
-				self._unit,
-				self._attention.unit
-			}), TimerManager:game():time() + 0.1)
+			managers.enemy:add_delayed_clbk("clbk_sync_attention" .. tostring(self._unit:key()), callback(self, CopMovement, "clbk_sync_attention", self._attention), TimerManager:game():time() + 0.1)
 		end
 	end
 	if self._rot_speed_mul ~= 1 then
 		my_save_data.rot_speed_mul = self._rot_speed_mul
 	end
 	my_save_data.team = self._team.id
-	save_data.movement = my_save_data
+	if self._activating then
+		my_save_data.activating = true
+	elseif self._activated then
+		my_save_data.activated = true
+	end
 end
 
 function SentryGunMovement:load(save_data)
 	if not save_data or not save_data.movement then
 		return
 	end
-	self._rot_speed_mul = save_data.movement.rot_speed_mul or 1
-	if save_data.movement.attention then
-		self._attention = save_data.movement.attention
+	local my_save_data = save_data.movement
+	self._rot_speed_mul = my_save_data.rot_speed_mul or 1
+	self._tweak = tweak_data.weapon[self._unit:base():get_name_id()]
+	if self._tweak.VELOCITY_COMPENSATION and not self._m_last_attention_pos then
+		self._m_last_attention_pos = Vector3()
+		self._m_last_attention_vel = Vector3()
 	end
-	self._team = managers.groupai:state():team_data(save_data.movement.team)
+	if my_save_data.attention then
+		self._attention = my_save_data.attention
+	end
+	self._team = managers.groupai:state():team_data(my_save_data.team)
 	managers.groupai:state():add_listener("SentryGunMovement_team_def_" .. tostring(self._unit:key()), {"team_def"}, callback(self, self, "clbk_team_def"))
+	if my_save_data.activating then
+		self._activating = true
+		self._updator = callback(self, self, "_update_activating")
+	elseif my_save_data.activated then
+		self._activated = true
+		self._updator = callback(self, self, "_update_active")
+	end
+	self._unit:weapon():update_laser()
 end
 
 function SentryGunMovement:clbk_team_def()
@@ -317,26 +535,52 @@ function SentryGunMovement:clbk_team_def()
 end
 
 function SentryGunMovement:set_team(team_data)
+	if self._original_team then
+		self._original_team = team_data
+		return
+	end
 	self._team = team_data
 	self._unit:weapon():on_team_set(team_data)
+	self._unit:brain():on_team_set(team_data)
 	if Network:is_server() and self._unit:id() ~= -1 then
 		local team_index = tweak_data.levels:get_team_index(team_data.id)
-		if team_index <= 16 then
-			self._ext_network:send("sync_unit_event_id_16", "movement", team_index)
+		if team_index <= 256 then
+			self._ext_network:send("sync_char_team", team_index)
 		else
 			debug_pause_unit(self._unit, "[SentryGunMovement:set_team] team limit reached!", team_data.id)
 		end
 	end
+	self._unit:weapon():update_laser()
 end
 
 function SentryGunMovement:team()
 	return self._team
 end
 
-function SentryGunMovement:sync_net_event(event_id, peer)
-	local team_id = tweak_data.levels:get_team_names_indexed()[event_id]
-	local team_data = managers.groupai:state():team_data(team_id)
-	self:set_team(team_data)
+function SentryGunMovement:cool()
+	return managers.groupai:state():whisper_mode()
+end
+
+function SentryGunMovement:not_cool_t()
+	return not managers.groupai:state():whisper_mode() and managers.groupai:state():whisper_mode_change_t()
+end
+
+function SentryGunMovement:rearming()
+	return self._rearming
+end
+
+function SentryGunMovement:rearm()
+	self._updator = callback(self, self, "_update_rearming")
+	self._rearming = true
+	if Network:is_server() then
+		self._rearm_complete_t = TimerManager:game():time() + self._tweak.AUTO_RELOAD_DURATION
+	end
+	self._vel.pitch = 0
+	self._vel.spin = 0
+	if self._rearm_snd_event then
+		self._rearm_event = self._sound_source:post_event(self._rearm_snd_event)
+	end
+	self._unit:weapon():update_laser()
 end
 
 function SentryGunMovement:pre_destroy()

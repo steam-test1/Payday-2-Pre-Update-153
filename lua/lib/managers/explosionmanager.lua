@@ -214,7 +214,7 @@ function ExplosionManager:units_to_push(units_to_push, hit_pos, range)
 		if alive(unit) then
 			local is_character = unit:character_damage() and unit:character_damage().damage_explosion
 			if not is_character or unit:character_damage():dead() then
-				if is_character and unit:movement()._active_actions[1] and unit:movement()._active_actions[1]:type() == "hurt" then
+				if is_character and unit:movement() and unit:movement()._active_actions and unit:movement()._active_actions[1] and unit:movement()._active_actions[1]:type() == "hurt" then
 					unit:movement()._active_actions[1]:force_ragdoll()
 				end
 				local nr_u_bodies = unit:num_bodies()

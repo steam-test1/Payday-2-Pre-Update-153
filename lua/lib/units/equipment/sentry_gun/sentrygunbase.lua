@@ -3,8 +3,10 @@ SentryGunBase = SentryGunBase or class(UnitBase)
 function SentryGunBase:init(unit)
 	SentryGunBase.super.init(self, unit, false)
 	self._unit = unit
-	self._unit:sound_source():post_event("turret_place")
-	if Network:is_client() then
+	if self._place_snd_event then
+		self._unit:sound_source():post_event(self._place_snd_event)
+	end
+	if Network:is_client() and not self._skip_authentication then
 		self._validate_clbk_id = "sentry_gun_validate" .. tostring(unit:key())
 		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
 	end
@@ -45,8 +47,15 @@ function SentryGunBase:_setup_contour()
 end
 
 function SentryGunBase:post_init()
-	self._registered = true
-	managers.groupai:state():register_criminal(self._unit)
+	if self._difficulty_sequences then
+		local difficulty = Global.game_settings and Global.game_settings.difficulty or "normal"
+		local difficulty_index = tweak_data:difficulty_to_index(difficulty)
+		local difficulty_sequences_split = string.split(self._difficulty_sequences, ";")
+		local difficulty_sequence = difficulty_sequences_split[difficulty_index]
+		if difficulty_sequence and difficulty_sequence ~= "" then
+			self._unit:damage():run_sequence_simple(difficulty_sequence)
+		end
+	end
 	if Network:is_client() then
 		self._unit:brain():set_active(true)
 	end
@@ -70,13 +79,48 @@ function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier,
 	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry"), pos, rot)
 	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
 	unit:base():setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
+	local team
+	if owner then
+		team = owner:movement():team()
+	else
+		team = managers.groupai:state():team_data(tweak_data.levels:get_default_team_ID("player"))
+	end
+	unit:movement():set_team(team)
 	unit:brain():set_active(true)
 	SentryGunBase.deployed = (SentryGunBase.deployed or 0) + 1
 	return unit
 end
 
+function SentryGunBase:activate_as_module(team_type, tweak_table_id)
+	self._tweak_table_id = tweak_table_id
+	local team_id = tweak_data.levels:get_default_team_ID(team_type)
+	local team_data = managers.groupai:state():team_data(team_id)
+	self._unit:movement():set_team(team_data)
+	self._unit:movement():on_activated(tweak_table_id)
+	local weapon_setup_data = {
+		user_unit = nil,
+		ignore_units = {
+			self._unit
+		},
+		expend_ammo = true,
+		autoaim = true,
+		alert_AI = false,
+		spread_mul = 1,
+		auto_reload = true,
+		bullet_slotmask = managers.slot:get_mask("bullet_impact_targets")
+	}
+	self._unit:weapon():setup(weapon_setup_data, 1)
+	if Network:is_server() then
+		self._unit:weapon():set_ammo(tweak_data.weapon[tweak_table_id].CLIP_SIZE)
+	end
+	self._unit:character_damage():set_health(tweak_data.weapon[tweak_table_id].HEALTH_INIT, tweak_data.weapon[tweak_table_id].SHIELD_HEALTH_INIT)
+	self._unit:brain():setup(1)
+	self._unit:brain():on_activated(tweak_table_id)
+	self._unit:brain():set_active(true)
+end
+
 function SentryGunBase:get_name_id()
-	return "sentry_gun"
+	return self._tweak_table_id
 end
 
 function SentryGunBase:set_server_information(peer_id)
@@ -89,6 +133,10 @@ function SentryGunBase:server_information()
 end
 
 function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
+	if Network:is_client() and not self._skip_authentication then
+		self._validate_clbk_id = "sentry_gun_validate" .. tostring(unit:key())
+		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
+	end
 	self._attached_data = attached_data
 	self._ammo_multiplier = ammo_multiplier
 	self._armor_multiplier = armor_multiplier
@@ -101,23 +149,26 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 	local ammo_amount = tweak_data.upgrades.sentry_gun_base_ammo * ammo_multiplier
 	self._unit:weapon():set_ammo(ammo_amount)
 	local armor_amount = tweak_data.upgrades.sentry_gun_base_armor * armor_multiplier
-	self._unit:character_damage():set_health(armor_amount)
+	self._unit:character_damage():set_health(armor_amount, 0)
 	self._owner = owner
 	self._owner_id = owner and managers.network:game():member_from_unit(owner):peer():id()
 	self._unit:movement():setup(rot_speed_multiplier)
 	self._unit:brain():setup(1 / rot_speed_multiplier)
+	self:register()
 	self._unit:movement():set_team(owner:movement():team())
-	local setup_data = {}
-	setup_data.user_unit = self._owner
-	setup_data.ignore_units = {
-		self._unit,
-		self._owner
+	local setup_data = {
+		user_unit = self._owner,
+		ignore_units = {
+			self._unit,
+			self._owner
+		},
+		expend_ammo = true,
+		autoaim = true,
+		alert_AI = true,
+		alert_filter = self._owner:movement():SO_access(),
+		spread_mul = spread_multiplier,
+		creates_alerts = true
 	}
-	setup_data.expend_ammo = true
-	setup_data.autoaim = true
-	setup_data.alert_AI = true
-	setup_data.alert_filter = self._owner:movement():SO_access()
-	setup_data.spread_mul = spread_multiplier
 	self._unit:weapon():setup(setup_data, damage_multiplier)
 	self._unit:set_extension_update_enabled(Idstring("base"), true)
 	self:_setup_contour()
@@ -327,13 +378,12 @@ function SentryGunBase:refill(ammo_ratio)
 end
 
 function SentryGunBase:on_death()
-	self._unit:contour():remove("deployable_active")
-	self._unit:contour():remove("deployable_interactable")
-	self._unit:set_extension_update_enabled(Idstring("base"), false)
-	if self._registered then
-		self._registered = nil
-		managers.groupai:state():unregister_criminal(self._unit)
+	if self._unit:contour() then
+		self._unit:contour():remove("deployable_active")
+		self._unit:contour():remove("deployable_interactable")
 	end
+	self._unit:set_extension_update_enabled(Idstring("base"), false)
+	self:unregister()
 end
 
 function SentryGunBase:enable_shield()
@@ -360,8 +410,16 @@ function SentryGunBase:register()
 	managers.groupai:state():register_criminal(self._unit)
 end
 
+function SentryGunBase:save(save_data)
+	local my_save_data = {}
+	save_data.base = my_save_data
+	my_save_data.tweak_table_id = self._tweak_table_id
+end
+
 function SentryGunBase:load(save_data)
 	self._was_dropin = true
+	local my_save_data = save_data.base
+	self._tweak_table_id = my_save_data.tweak_table_id
 end
 
 function SentryGunBase:pre_destroy()

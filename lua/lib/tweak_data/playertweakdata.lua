@@ -939,10 +939,10 @@ function PlayerTweakData:_init_new_stances()
 	self:_init_l85a2()
 	self:_init_hs2000()
 	self:_init_vhs()
-	self:_init_b682()
 	self:_init_m134()
 	self:_init_rpg7()
 	self:_init_cobray()
+	self:_init_b682()
 end
 
 function PlayerTweakData:_init_mg42()

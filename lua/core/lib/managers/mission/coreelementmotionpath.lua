@@ -20,6 +20,10 @@ function ElementMotionPathOperator:on_executed(instigator)
 				element:motion_operation_goto_marker(element:id(), self._values.marker_ids[self._values.marker])
 			elseif self._values.operation == "teleport" then
 				element:motion_operation_teleport_to_marker(element:id(), self._values.marker_ids[self._values.marker])
+			elseif self._values.operation == "move" then
+				element:motion_operation_set_motion_state("move")
+			elseif self._values.operation == "wait" then
+				element:motion_operation_set_motion_state("wait")
 			end
 		end
 	end

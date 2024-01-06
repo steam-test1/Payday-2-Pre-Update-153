@@ -214,7 +214,7 @@ function GroupAIStateBase:set_AI_enabled(state)
 		self._editor_sim_rem_units = nil
 	end
 	if not state then
-		local all_deployed_equipment = World:find_units_quick("all", 14)
+		local all_deployed_equipment = World:find_units_quick("all", 14, 25, 26)
 		for _, unit in ipairs(all_deployed_equipment) do
 			if alive(unit) then
 				World:delete_unit(unit)
@@ -2501,6 +2501,10 @@ function GroupAIStateBase:whisper_mode()
 	return self._whisper_mode
 end
 
+function GroupAIStateBase:whisper_mode_change_t()
+	return self._whisper_mode_change_t
+end
+
 function GroupAIStateBase:set_ambience_flag()
 	if self._whisper_mode then
 		SoundDevice:set_state("ambience_flag", "whisper")
@@ -2517,6 +2521,7 @@ function GroupAIStateBase:set_whisper_mode(enabled)
 		return
 	end
 	self._whisper_mode = enabled
+	self._whisper_mode_change_t = TimerManager:game():time()
 	self:set_ambience_flag()
 	if Network:is_server() and not enabled and not self._switch_to_not_cool_clbk_id then
 		self._switch_to_not_cool_clbk_id = "GroupAI_delayed_not_cool"

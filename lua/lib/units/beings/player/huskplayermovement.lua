@@ -293,6 +293,7 @@ function HuskPlayerMovement:init(unit)
 	self._suspicion_ratio = false
 	self._SO_access = managers.navigation:convert_access_flag("teamAI1")
 	self._slotmask_gnd_ray = managers.slot:get_mask("AI_graph_obstacle_check")
+	self:set_friendly_fire(true)
 end
 
 function HuskPlayerMovement:post_init()

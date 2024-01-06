@@ -598,10 +598,20 @@ end
 function AttentionTweakData:_init_sentry_gun()
 	self.settings.sentry_gun_enemy_cbt = {
 		reaction = "REACT_COMBAT",
-		filter = "all_enemy",
+		filter = "combatant",
+		relation = "foe",
 		verification_interval = 1.5,
 		uncover_range = 300,
 		release_delay = 1
+	}
+	self.settings.sentry_gun_enemy_cbt_hacked = {
+		reaction = "REACT_COMBAT",
+		filter = "combatant",
+		relation = "foe",
+		verification_interval = 1.5,
+		uncover_range = 300,
+		release_delay = 1,
+		weight_mul = 0.2
 	}
 end
 

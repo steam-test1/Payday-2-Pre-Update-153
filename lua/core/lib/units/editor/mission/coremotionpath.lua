@@ -57,7 +57,7 @@ end
 
 function CoreMotionPathOperatorUnitElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
-	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/point_motionpath_marker/point_motionpath_marker") then
+	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
 			table.delete(self._hed.elements, id)
@@ -84,7 +84,7 @@ function CoreMotionPathOperatorUnitElement:_motion_path_markers()
 	local motion_path_markers = {"none"}
 	local mission_elements = managers.worlddefinition._mission_element_units
 	for _, me in pairs(mission_elements) do
-		if me:name() == Idstring("units/dev_tools/mission_elements/point_motionpath_marker/point_motionpath_marker") then
+		if me:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 			table.insert_sorted(motion_path_markers, me:unit_data().name_id)
 			self._hed.marker_ids[me:unit_data().name_id] = me:unit_data().unit_id
 		end
@@ -99,7 +99,9 @@ function CoreMotionPathOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_build_value_combobox(panel, panel_sizer, "operation", {
 		"none",
 		"goto_marker",
-		"teleport"
+		"teleport",
+		"move",
+		"wait"
 	}, "Select an operation for the selected elements.")
 	local markers_combo = self:_build_value_combobox(panel, panel_sizer, "marker", self:_motion_path_markers(), "Select motion path marker.")
 	Application:debug("CoreMotionPathOperatorUnitElement:_build_panel( panel, panel_sizer ): ", markers_combo)
@@ -156,7 +158,7 @@ end
 
 function CoreMotionPathTriggerUnitElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
-	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/point_motionpath_marker/point_motionpath_marker") then
+	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
 			table.delete(self._hed.elements, id)

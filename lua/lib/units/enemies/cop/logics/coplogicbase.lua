@@ -436,7 +436,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 				if _angle_and_dis_chk(attention_info.handler, settings, attention_pos) then
 					local vis_ray = World:raycast("ray", my_pos, attention_pos, "slot_mask", data.visibility_slotmask, "ray_type", "ai_vision")
 					if not vis_ray or vis_ray.unit:key() == u_key then
-						detected_obj[u_key] = CopLogicBase._create_detected_attention_object_data(data, my_data, u_key, attention_info, settings)
+						detected_obj[u_key] = CopLogicBase._create_detected_attention_object_data(data.t, data.unit, u_key, attention_info, settings)
 					end
 				end
 			end
@@ -565,9 +565,9 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 	return delay
 end
 
-function CopLogicBase._create_detected_attention_object_data(data, my_data, u_key, attention_info, settings)
-	local ext_brain = data.unit:brain()
-	attention_info.handler:add_listener("detect_" .. tostring(data.key), callback(ext_brain, ext_brain, "on_detected_attention_obj_modified"))
+function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_key, attention_info, settings)
+	local ext_brain = my_unit:brain()
+	attention_info.handler:add_listener("detect_" .. tostring(my_unit:key()), callback(ext_brain, ext_brain, "on_detected_attention_obj_modified"))
 	local att_unit = attention_info.unit
 	local m_pos = attention_info.handler:get_ground_m_pos()
 	local m_head_pos = attention_info.handler:get_detection_m_pos()
@@ -582,14 +582,14 @@ function CopLogicBase._create_detected_attention_object_data(data, my_data, u_ke
 		end
 		is_very_dangerous = att_unit:base()._tweak_table == "taser" or att_unit:base()._tweak_table == "spooc"
 	end
-	local dis = mvector3.distance(data.unit:movement():m_head_pos(), m_head_pos)
+	local dis = mvector3.distance(my_unit:movement():m_head_pos(), m_head_pos)
 	local new_entry = {
 		settings = settings,
 		unit = attention_info.unit,
 		u_key = u_key,
 		handler = attention_info.handler,
-		next_verify_t = data.t + (settings.notice_interval or settings.verification_interval),
-		prev_notice_chk_t = data.t,
+		next_verify_t = time + (settings.notice_interval or settings.verification_interval),
+		prev_notice_chk_t = time,
 		notice_progress = 0,
 		m_pos = m_pos,
 		m_head_pos = m_head_pos,
@@ -607,7 +607,8 @@ function CopLogicBase._create_detected_attention_object_data(data, my_data, u_ke
 		verified_dis = dis,
 		dis = dis,
 		verified = false,
-		verified_t = false
+		verified_t = false,
+		has_team = att_unit:movement() and att_unit:movement().team
 	}
 	return new_entry
 end
@@ -976,7 +977,7 @@ function CopLogicBase.identify_attention_obj_instant(data, att_u_key)
 		if attention_info then
 			local settings = attention_info.handler:get_attention(data.SO_access, nil, nil, data.team)
 			if settings then
-				att_obj_data = CopLogicBase._create_detected_attention_object_data(data, data.internal_data, att_u_key, attention_info, settings)
+				att_obj_data = CopLogicBase._create_detected_attention_object_data(data.t, data.unit, att_u_key, attention_info, settings)
 				att_obj_data.identified = true
 				att_obj_data.identified_t = data.t
 				att_obj_data.notice_progress = nil

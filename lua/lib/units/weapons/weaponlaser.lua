@@ -28,10 +28,26 @@ function WeaponLaser:init(unit)
 			light = Vector3(10, 0, 0),
 			glow = Vector3(0.2, 0, 0),
 			brush = Color(0.15, 1, 0, 0)
+		},
+		turret_module_active = {
+			light = Vector3(10, 0, 0),
+			glow = Vector3(0.2, 0, 0),
+			brush = Color(0.15, 1, 0, 0)
+		},
+		turret_module_rearming = {
+			light = Vector3(10, 0, 0),
+			glow = Vector3(0.2, 0.2, 0),
+			brush = Color(0.11, 1, 1, 0)
+		},
+		turret_module_mad = {
+			light = Vector3(10, 0, 0),
+			glow = Vector3(0, 0.2, 0),
+			brush = Color(0.15, 0, 1, 0)
 		}
 	}
+	self._theme_type = "default"
 	self._light_color = Vector3()
-	mvector3.set(self._light_color, self._themes.default.light)
+	mvector3.set(self._light_color, self._themes[self._theme_type].light)
 	self._light:set_color(self._light_color)
 	self._light:set_enable(false)
 	self._light_glow = World:create_light("spot|specular")
@@ -39,13 +55,13 @@ function WeaponLaser:init(unit)
 	self._light_glow:set_far_range(75)
 	self._light_glow:set_near_range(40)
 	self._light_glow_color = Vector3()
-	mvector3.set(self._light_color, self._themes.default.glow)
+	mvector3.set(self._light_color, self._themes[self._theme_type].glow)
 	self._light_glow:set_color(self._light_glow_color)
 	self._light_glow:set_enable(false)
 	self._light_glow:link(obj)
 	self._light_glow:set_rotation(Rotation(obj:rotation():z(), -obj:rotation():x(), -obj:rotation():y()))
 	self._slotmask = managers.slot:get_mask("bullet_impact_targets")
-	self._brush = Draw:brush(self._themes.default.brush)
+	self._brush = Draw:brush(self._themes[self._theme_type].brush)
 	self._brush:set_blend_mode("opacity_add")
 end
 
@@ -61,7 +77,7 @@ function WeaponLaser:update(unit, t, dt)
 	mvector3.set(to, mvec_l_dir)
 	mvector3.multiply(to, self._max_distance)
 	mvector3.add(to, from)
-	local ray = self._unit:raycast(from, to, self._slotmask)
+	local ray = self._unit:raycast("ray", from, to, "slot_mask", self._slotmask, self._ray_ignore_units and "ignore_unit" or nil, self._ray_ignore_units)
 	if ray then
 		if not self._is_npc then
 			self._light:set_spot_angle_end(self._spot_angle_end)
@@ -111,12 +127,17 @@ function WeaponLaser:destroy(unit)
 end
 
 function WeaponLaser:set_color_by_theme(type)
+	self._theme_type = type
 	local theme = self._themes[type] or self._themes.default
 	mvector3.set(self._light_color, theme.light)
 	self._light:set_color(self._light_color)
 	mvector3.set(self._light_glow_color, theme.glow)
 	self._light_glow:set_color(self._light_glow_color)
 	self._brush:set_color(theme.brush)
+end
+
+function WeaponLaser:theme_type()
+	return self._theme_type
 end
 
 function WeaponLaser:set_color(color)
@@ -129,4 +150,9 @@ end
 
 function WeaponLaser:set_max_distace(dis)
 	self._max_distance = dis
+end
+
+function WeaponLaser:add_ray_ignore_unit(unit)
+	self._ray_ignore_units = self._ray_ignore_units or {}
+	table.insert(self._ray_ignore_units, unit)
 end

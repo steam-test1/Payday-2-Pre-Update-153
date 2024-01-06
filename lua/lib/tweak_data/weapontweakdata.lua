@@ -38,6 +38,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_huntsman_npc()
 	self:_init_data_saw_npc()
 	self:_init_data_sentry_gun_npc()
+	self:_init_data_swat_van_turret_module_npc()
 	self:_init_data_usp_npc()
 	self:_init_data_g22c_npc()
 	self:_init_data_judge_npc()
@@ -89,18 +90,33 @@ function WeaponTweakData:_set_easy()
 end
 
 function WeaponTweakData:_set_normal()
+	self.swat_van_turret_module.HEALTH_INIT = 7000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 100
+	self.swat_van_turret_module.DAMAGE = 0.2
 end
 
 function WeaponTweakData:_set_hard()
+	self.swat_van_turret_module.HEALTH_INIT = 7000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 100
+	self.swat_van_turret_module.DAMAGE = 0.5
 end
 
 function WeaponTweakData:_set_overkill()
+	self.swat_van_turret_module.HEALTH_INIT = 27500
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 400
+	self.swat_van_turret_module.DAMAGE = 1
 end
 
 function WeaponTweakData:_set_overkill_145()
+	self.swat_van_turret_module.HEALTH_INIT = 50000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 750
+	self.swat_van_turret_module.DAMAGE = 1.5
 end
 
 function WeaponTweakData:_set_overkill_290()
+	self.swat_van_turret_module.HEALTH_INIT = 70000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 1000
+	self.swat_van_turret_module.DAMAGE = 3
 end
 
 function WeaponTweakData:_init_data_npc_melee()
@@ -605,6 +621,7 @@ end
 function WeaponTweakData:_init_data_sentry_gun_npc()
 	self.sentry_gun.name_id = "debug_sentry_gun"
 	self.sentry_gun.DAMAGE = 1
+	self.sentry_gun.SUPPRESSION = 1
 	self.sentry_gun.SPREAD = 5
 	self.sentry_gun.FIRE_RANGE = 5000
 	self.sentry_gun.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
@@ -613,10 +630,16 @@ function WeaponTweakData:_init_data_sentry_gun_npc()
 	self.sentry_gun.alert_size = 2500
 	self.sentry_gun.BAG_DMG_MUL = 0.25
 	self.sentry_gun.SHIELD_DMG_MUL = 0
-	self.sentry_gun.LOST_SIGHT_VERIFICATION = 0.1
 	self.sentry_gun.DEATH_VERIFICATION = {0.4, 0.75}
-	self.sentry_gun.DETECTION_RANGE = 1800
+	self.sentry_gun.DETECTION_RANGE = self.sentry_gun.FIRE_RANGE
 	self.sentry_gun.KEEP_FIRE_ANGLE = 0.8
+	self.sentry_gun.DETECTION_DELAY = {
+		{600, 0.1},
+		{
+			self.sentry_gun.DETECTION_RANGE,
+			0.5
+		}
+	}
 	self.sentry_gun.MAX_VEL_SPIN = 120
 	self.sentry_gun.MIN_VEL_SPIN = self.sentry_gun.MAX_VEL_SPIN * 0.05
 	self.sentry_gun.SLOWDOWN_ANGLE_SPIN = 30
@@ -642,6 +665,76 @@ function WeaponTweakData:_init_data_sentry_gun_npc()
 	self.sentry_gun.challenges.group = "sentry_gun"
 	self.sentry_gun.challenges.weapon = "sentry_gun"
 	self.sentry_gun.suppression = 0.8
+end
+
+function WeaponTweakData:_init_data_swat_van_turret_module_npc()
+	self.swat_van_turret_module.name_id = "debug_sentry_gun"
+	self.swat_van_turret_module.DAMAGE = 3
+	self.swat_van_turret_module.DAMAGE_MUL_RANGE = {
+		{800, 4},
+		{1000, 1.1},
+		{1500, 1}
+	}
+	self.swat_van_turret_module.SUPPRESSION = 1
+	self.swat_van_turret_module.SPREAD = 0.5
+	self.swat_van_turret_module.FIRE_RANGE = 10000
+	self.swat_van_turret_module.CLIP_SIZE = 400
+	self.swat_van_turret_module.AUTO_RELOAD = true
+	self.swat_van_turret_module.AUTO_RELOAD_DURATION = 8
+	self.swat_van_turret_module.ECM_HACKABLE = true
+	self.swat_van_turret_module.FLASH_GRENADE = {
+		range = 800,
+		effect_duration = 6,
+		chance = 0.8,
+		check_interval = {3, 6},
+		quiet_time = {10, 13},
+		requirements = {aggression_history = 10}
+	}
+	self.swat_van_turret_module.HACKABLE_WITH_ECM = true
+	self.swat_van_turret_module.VELOCITY_COMPENSATION = {SNAPSHOT_INTERVAL = 0.3, OVERCOMPENSATION = 50}
+	self.swat_van_turret_module.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.swat_van_turret_module.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.swat_van_turret_module.auto.fire_rate = 0.06
+	self.swat_van_turret_module.alert_size = 2500
+	self.swat_van_turret_module.headshot_dmg_mul = 4
+	self.swat_van_turret_module.EXPLOSION_DMG_MUL = 7
+	self.swat_van_turret_module.BAG_DMG_MUL = 200
+	self.swat_van_turret_module.SHIELD_DMG_MUL = 1
+	self.swat_van_turret_module.HEALTH_INIT = 5000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 1000
+	self.swat_van_turret_module.SHIELD_DAMAGE_CLAMP = 75
+	self.swat_van_turret_module.DEATH_VERIFICATION = {0.4, 0.75}
+	self.swat_van_turret_module.DETECTION_RANGE = self.swat_van_turret_module.FIRE_RANGE
+	self.swat_van_turret_module.DETECTION_DELAY = {
+		{900, 0.3},
+		{3500, 1.5}
+	}
+	self.swat_van_turret_module.KEEP_FIRE_ANGLE = 0.9
+	self.swat_van_turret_module.MAX_VEL_SPIN = 72
+	self.swat_van_turret_module.MIN_VEL_SPIN = self.swat_van_turret_module.MAX_VEL_SPIN * 0.05
+	self.swat_van_turret_module.SLOWDOWN_ANGLE_SPIN = 30
+	self.swat_van_turret_module.ACC_SPIN = self.swat_van_turret_module.MAX_VEL_SPIN * 5
+	self.swat_van_turret_module.MAX_VEL_PITCH = 60
+	self.swat_van_turret_module.MIN_VEL_PITCH = self.swat_van_turret_module.MAX_VEL_PITCH * 0.05
+	self.swat_van_turret_module.SLOWDOWN_ANGLE_PITCH = 20
+	self.swat_van_turret_module.ACC_PITCH = self.swat_van_turret_module.MAX_VEL_PITCH * 5
+	self.swat_van_turret_module.recoil = {}
+	self.swat_van_turret_module.recoil.horizontal = {
+		1,
+		1.5,
+		1,
+		1
+	}
+	self.swat_van_turret_module.recoil.vertical = {
+		1,
+		1.5,
+		1,
+		1
+	}
+	self.swat_van_turret_module.challenges = {}
+	self.swat_van_turret_module.challenges.group = "sentry_gun"
+	self.swat_van_turret_module.challenges.weapon = "sentry_gun"
+	self.swat_van_turret_module.suppression = 0.8
 end
 
 function WeaponTweakData:_init_data_usp_npc()
@@ -3683,7 +3776,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.animations.equip_id = "equip_huntsman"
 	self.huntsman.animations.recoil_steelsight = true
 	self.huntsman.stats = {
-		damage = 28,
+		damage = 31,
 		spread = 7,
 		recoil = 2,
 		spread_moving = 6,
@@ -3695,6 +3788,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.huntsman.stats_modifiers = {damage = 1.38}
 	self.b92fs = {}
 	self.b92fs.category = "pistol"
 	self.b92fs.damage_melee = damage_melee_default
@@ -8161,6 +8255,10 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.saw_secondary_npc = deep_clone(self.saw_npc)
 	self.sentry_gun = {
+		sounds = {},
+		auto = {}
+	}
+	self.swat_van_turret_module = {
 		sounds = {},
 		auto = {}
 	}

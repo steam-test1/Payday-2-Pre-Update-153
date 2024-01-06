@@ -522,21 +522,24 @@ function PortalUnitGroup:unit_in_group(unit)
 	return self._ids[unit:unit_data().unit_id] and true or false
 end
 
-function PortalUnitGroup:draw(t, dt, mul, skip_shapes)
+function PortalUnitGroup:draw(t, dt, mul, skip_shapes, skip_units)
 	local r = self._r * mul
 	local g = self._g * mul
 	local b = self._b * mul
 	local brush = Draw:brush()
 	brush:set_color(Color(0.25, r, g, b))
-	for _, unit in ipairs(managers.editor:layer("Statics"):created_units()) do
-		if self._ids[unit:unit_data().unit_id] then
-			brush:unit(unit)
-			Application:draw(unit, r, g, b)
+	if not skip_units then
+		for _, unit in ipairs(managers.editor:layer("Statics"):created_units()) do
+			if self._ids[unit:unit_data().unit_id] then
+				brush:unit(unit)
+				Application:draw(unit, r, g, b)
+			end
 		end
 	end
 	if not skip_shapes then
 		for _, shape in ipairs(self._shapes) do
 			shape:draw(t, dt, r, g, b)
+			shape:draw_outline(t, dt, r / 2, g / 2, b / 2)
 		end
 	end
 end

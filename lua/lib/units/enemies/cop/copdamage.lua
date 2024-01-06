@@ -1037,6 +1037,9 @@ function CopDamage:_on_damage_received(damage_info)
 			end
 		end
 	end
+	if self._dead and self._unit:movement():attention() then
+		debug_pause_unit(self._unit, "[CopDamage:_on_damage_received] dead AI", self._unit, inspect(self._unit:movement():attention()))
+	end
 end
 
 function CopDamage:_call_listeners(damage_info)

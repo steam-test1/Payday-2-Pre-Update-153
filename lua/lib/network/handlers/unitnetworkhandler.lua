@@ -588,7 +588,10 @@ function UnitNetworkHandler:cop_set_attention_pos(unit, pos)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
 		return
 	end
-	unit:movement():synch_attention({pos = pos})
+	unit:movement():synch_attention({
+		pos = pos,
+		reaction = AIAttentionObject.REACT_IDLE
+	})
 end
 
 function UnitNetworkHandler:set_allow_fire(unit, state)
@@ -1080,7 +1083,10 @@ function UnitNetworkHandler:from_server_sentry_gun_place_result(owner_peer_id, e
 	end
 	sentry_gun_unit:movement():setup(rot_speed_mul)
 	sentry_gun_unit:brain():setup(1 / rot_speed_mul)
-	local setup_data = {spread_mul = spread_mul}
+	local setup_data = {
+		spread_mul = spread_mul,
+		ignore_units = {sentry_gun_unit}
+	}
 	sentry_gun_unit:weapon():setup(setup_data, 1)
 end
 
@@ -1105,6 +1111,27 @@ function UnitNetworkHandler:sentrygun_health(unit, health_ratio)
 		return
 	end
 	unit:character_damage():sync_health(health_ratio)
+end
+
+function UnitNetworkHandler:sync_unit_module(parent_unit, module_unit, align_obj_name, module_id, parent_extension_name)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(parent_unit) or not alive(module_unit) then
+		return
+	end
+	parent_unit[parent_extension_name](parent_unit):spawn_module(module_unit, align_obj_name, module_id)
+end
+
+function UnitNetworkHandler:run_unit_module_function(parent_unit, module_id, parent_extension_name, module_extension_name, func_name, params)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(parent_unit) then
+		return
+	end
+	local params_split = string.split(params, " ")
+	parent_unit[parent_extension_name](parent_unit):run_module_function_unsafe(module_id, module_extension_name, func_name, params_split[1], params_split[2])
 end
 
 function UnitNetworkHandler:sync_equipment_setup(unit, upgrade_lvl, peer_id)
@@ -2102,4 +2129,16 @@ function UnitNetworkHandler:sync_team_relation(team_index_1, team_index_2, relat
 		return
 	end
 	managers.groupai:state():set_team_relation(team_id_1, team_id_2, relation, nil)
+end
+
+function UnitNetworkHandler:sync_char_team(unit, team_index, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not self._verify_character(unit) then
+		return
+	end
+	local team_id = tweak_data.levels:get_team_names_indexed()[team_index]
+	local team_data = managers.groupai:state():team_data(team_id)
+	unit:movement():set_team(team_data)
 end

@@ -339,6 +339,11 @@ function ShapeBox:draw(t, dt, r, g, b)
 	local rot = self:rotation()
 	pos = pos + rot:x() * self._properties.width / 2 + rot:y() * self._properties.depth / 2 + rot:z() * self._properties.height / 2
 	brush:box(pos, rot:x() * self._properties.width / 2, rot:y() * self._properties.depth / 2, rot:z() * self._properties.height / 2)
+	self:draw_outline(t, dt, r, g, b)
+end
+
+function ShapeBox:draw_outline(t, dt, r, g, b)
+	local rot = self:rotation()
 	Application:draw_box_rotation(self:position(), rot, self._properties.width, self._properties.depth, self._properties.height, r, g, b)
 end
 

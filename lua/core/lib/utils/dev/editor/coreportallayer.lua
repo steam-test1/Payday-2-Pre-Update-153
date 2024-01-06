@@ -13,6 +13,7 @@ function PortalLayer:init(owner)
 	self._max = 30000
 	self._only_draw_selected = false
 	self._dont_draw_boxes = false
+	self._dont_draw_units = false
 	self._portal_brush = Draw:brush()
 	self._portal_point_unit = "core/units/portal_point/portal_point"
 	self._portal_shape_unit = "core/units/portal_shape/portal_shape"
@@ -132,11 +133,11 @@ function PortalLayer:update(time, rel_time)
 	if not self._dont_draw then
 		if not self._only_draw_selected then
 			for name, group in pairs(managers.portal:unit_groups()) do
-				group:draw(time, rel_time, 0.6, self._dont_draw_boxes)
+				group:draw(time, rel_time, 0.6, self._dont_draw_boxes, self._dont_draw_units)
 			end
 		end
 		if self._current_group then
-			self._current_group:draw(time, rel_time, 1, self._dont_draw_boxes)
+			self._current_group:draw(time, rel_time, 1, self._dont_draw_boxes, self._dont_draw_units)
 		end
 	end
 	if self._draw_units_in_no_portal_state then
@@ -249,11 +250,11 @@ function PortalLayer:build_panel(notebook)
 	PortalLayer.super.build_panel(self, notebook)
 	local dont_draw = EWS:CheckBox(self._ews_panel, "Don't draw portals", "")
 	dont_draw:set_value(self._dont_draw)
-	self._sizer:add(dont_draw, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(dont_draw, 0, 2, "EXPAND,TOP,BOTTOM")
 	dont_draw:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {cb = dont_draw, value = "_dont_draw"})
 	local only_draw_selected = EWS:CheckBox(self._ews_panel, "Only draw current", "")
 	only_draw_selected:set_value(self._only_draw_selected)
-	self._sizer:add(only_draw_selected, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(only_draw_selected, 0, 2, "EXPAND,TOP,BOTTOM")
 	only_draw_selected:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {
 		cb = only_draw_selected,
 		value = "_only_draw_selected"
@@ -261,28 +262,35 @@ function PortalLayer:build_panel(notebook)
 	only_draw_selected:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "on_only_draw_current"), nil)
 	local dont_draw_boxes = EWS:CheckBox(self._ews_panel, "Don't draw portal shapes", "")
 	dont_draw_boxes:set_value(self._dont_draw_boxes)
-	self._sizer:add(dont_draw_boxes, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(dont_draw_boxes, 0, 2, "EXPAND,TOP,BOTTOM")
 	dont_draw_boxes:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {
 		cb = dont_draw_boxes,
 		value = "_dont_draw_boxes"
 	})
+	local dont_draw_units = EWS:CheckBox(self._ews_panel, "Don't draw portal units", "")
+	dont_draw_units:set_value(self._dont_draw_units)
+	self._sizer:add(dont_draw_units, 0, 2, "EXPAND,TOP,BOTTOM")
+	dont_draw_units:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {
+		cb = dont_draw_units,
+		value = "_dont_draw_units"
+	})
 	local draw_nonportaled = EWS:CheckBox(self._ews_panel, "Draw non-portaled units", "")
 	draw_nonportaled:set_value(self._draw_units_in_no_portal_state)
-	self._sizer:add(draw_nonportaled, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(draw_nonportaled, 0, 2, "EXPAND,TOP,BOTTOM")
 	draw_nonportaled:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {
 		cb = draw_nonportaled,
 		value = "_draw_units_in_no_portal_state"
 	})
 	local draw_not_current = EWS:CheckBox(self._ews_panel, "Draw units not in current portal", "")
 	draw_not_current:set_value(self._draw_not_current)
-	self._sizer:add(draw_not_current, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(draw_not_current, 0, 2, "EXPAND,TOP,BOTTOM")
 	draw_not_current:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "cb_toogle"), {
 		cb = draw_not_current,
 		value = "_draw_not_current"
 	})
 	local draw_not_current = EWS:CheckBox(self._ews_panel, "Activate portal system in editor", "")
 	draw_not_current:set_value(self._use_portal_system)
-	self._sizer:add(draw_not_current, 0, 5, "EXPAND,TOP,BOTTOM")
+	self._sizer:add(draw_not_current, 0, 2, "EXPAND,TOP,BOTTOM")
 	draw_not_current:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "toggle_portal_system"))
 	self._portal_panel = EWS:Panel(self._ews_panel, "", "TAB_TRAVERSAL")
 	local portal_sizer = EWS:StaticBoxSizer(self._portal_panel, "VERTICAL", "Portals")

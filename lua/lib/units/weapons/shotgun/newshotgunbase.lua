@@ -73,9 +73,9 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 	local enemy_died = false
 	
 	local function hit_enemy(col_ray)
-		if col_ray.unit:character_damage() and col_ray.unit:character_damage().is_head then
+		if col_ray.unit:character_damage() then
 			local enemy_key = col_ray.unit:key()
-			if not hit_enemies[enemy_key] or col_ray.unit:character_damage():is_head(col_ray.body) then
+			if not hit_enemies[enemy_key] or col_ray.unit:character_damage().is_head and col_ray.unit:character_damage():is_head(col_ray.body) then
 				hit_enemies[enemy_key] = col_ray
 			end
 		else

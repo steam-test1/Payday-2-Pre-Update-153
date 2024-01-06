@@ -115,7 +115,11 @@ function HuskCopBrain:sync_net_event(event_id)
 end
 
 function HuskCopBrain:pre_destroy()
-	self._unit:movement():set_attention(nil)
+	if Network:is_server() then
+		self._unit:movement():set_attention()
+	else
+		self._unit:movement():synch_attention()
+	end
 	if self._alert_listen_key then
 		managers.groupai:state():remove_alert_listener(self._alert_listen_key)
 		self._alert_listen_key = nil
