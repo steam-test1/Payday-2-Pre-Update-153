@@ -453,6 +453,59 @@ function PlayerManager:aquire_equipment(upgrade, id, loading)
 	self:_verify_equipment_kit(loading)
 end
 
+function PlayerManager:on_killshot(killed_unit, variant)
+	local player_unit = self:player_unit()
+	if not player_unit then
+		return
+	end
+	local t = Application:time()
+	if self._on_killshot_t and t < self._on_killshot_t then
+		return
+	end
+	local damage_ext = player_unit:character_damage()
+	if not CopDamage.is_civilian(killed_unit:base()._tweak_table) then
+		local regen_armor_bonus = managers.player:upgrade_value("player", "killshot_regen_armor_bonus", 0)
+		local dist_sq = mvector3.distance_sq(player_unit:movement():m_pos(), killed_unit:movement():m_pos())
+		local close_combat_sq = tweak_data.upgrades.close_combat_distance * tweak_data.upgrades.close_combat_distance
+		if dist_sq <= close_combat_sq then
+			regen_armor_bonus = regen_armor_bonus + managers.player:upgrade_value("player", "killshot_close_regen_armor_bonus", 0)
+			local panic_chance = managers.player:upgrade_value("player", "killshot_close_panic_chance", 0)
+			if 0 < panic_chance or panic_chance == -1 then
+				local slotmask = managers.slot:get_mask("enemies")
+				local units = World:find_units_quick("sphere", player_unit:movement():m_pos(), tweak_data.upgrades.killshot_close_panic_range, slotmask)
+				for e_key, unit in pairs(units) do
+					if alive(unit) and unit:character_damage() and not unit:character_damage():dead() then
+						unit:character_damage():build_suppression(0, panic_chance)
+					end
+				end
+			end
+		end
+		if damage_ext and 0 < regen_armor_bonus then
+			damage_ext:restore_armor(regen_armor_bonus)
+		end
+		local regen_health_bonus = 0
+		if variant == "melee" then
+			regen_health_bonus = regen_health_bonus + managers.player:upgrade_value("player", "melee_kill_life_leech", 0)
+		end
+		if 0 < regen_health_bonus then
+			player_unit:character_damage():restore_health(regen_health_bonus)
+		end
+		self._on_killshot_t = t + (tweak_data.upgrades.on_killshot_cooldown or 0)
+	end
+end
+
+function PlayerManager:on_damage_dealt()
+	local player_unit = self:player_unit()
+	if not player_unit then
+		return
+	end
+	local t = Application:time()
+	if self._on_damage_dealt_t and t < self._on_damage_dealt_t then
+		return
+	end
+	self._on_damage_dealt_t = t + (tweak_data.upgrades.on_damage_dealt_cooldown or 0)
+end
+
 function PlayerManager:on_headshot_dealt()
 	local player_unit = self:player_unit()
 	if not player_unit then
