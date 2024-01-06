@@ -1559,7 +1559,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_for = {}
 	self.jobs.arm_for.name_id = "heist_arm_for"
 	self.jobs.arm_for.briefing_id = "heist_arm_for_crimenet"
-	self.jobs.arm_for.contact = "wip"
+	self.jobs.arm_for.contact = "bain"
 	self.jobs.arm_for.region = "street"
 	self.jobs.arm_for.jc = 70
 	self.jobs.arm_for.chain = {
@@ -1571,12 +1571,12 @@ function NarrativeTweakData:init()
 			briefing_dialog = nil
 		}
 	}
-	self.jobs.arm_for.briefing_event = "pln_at1_brf_01"
+	self.jobs.arm_for.briefing_event = "pln_tr1b_cbf_01"
 	self.jobs.arm_for.debrief_event = nil
 	self.jobs.arm_for.crimenet_callouts = {
-		"pln_at1_cnc_01_01",
-		"pln_at1_cnc_01_02",
-		"pln_at1_cnc_01_03"
+		"pln_tr1b_cnc_01",
+		"pln_tr1b_cnc_01",
+		"pln_tr1b_cnc_01"
 	}
 	self.jobs.arm_for.crimenet_videos = {
 		"cn_jewel1",
@@ -1584,17 +1584,73 @@ function NarrativeTweakData:init()
 		"cn_jewel1"
 	}
 	self.jobs.arm_for.payout = {
-		40,
-		56,
-		80,
-		100,
-		200
+		26000,
+		37000,
+		81000,
+		101000,
+		202000
+	}
+	self.jobs.arm_for.experience_mul = {
+		1,
+		1,
+		1,
+		1.5,
+		1.5
+	}
+	self.jobs.arm_for.contract_cost = {
+		31000,
+		62000,
+		155000,
+		310000,
+		400000
 	}
 	self.jobs.arm_for.dlc = "armored_transport"
 	self.jobs.arm_for_prof = deep_clone(self.jobs.arm_for)
 	self.jobs.arm_for_prof.jc = 70
 	self.jobs.arm_for_prof.professional = true
 	self.jobs.arm_for_prof.region = "professional"
+	self.jobs.rat = {}
+	self.jobs.rat.name_id = "heist_rat"
+	self.jobs.rat.briefing_id = "heist_rat_crimenet"
+	self.jobs.rat.contact = "bain"
+	self.jobs.rat.region = "street"
+	self.jobs.rat.jc = 60
+	self.jobs.rat.chain = {
+		{
+			level_id = "rat",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.rat.briefing_event = "pln_rt1b_cbf_01"
+	self.jobs.rat.debrief_event = {
+		"Play_pln_rt1b_end_01",
+		"Play_pln_rt1b_end_02",
+		"Play_pln_rt1b_end_03",
+		"Play_pln_rt1b_end_04"
+	}
+	self.jobs.rat.crimenet_callouts = {
+		"pln_rt1b_cnc_01"
+	}
+	self.jobs.rat.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.rat.payout = {
+		90000,
+		135000,
+		180000,
+		310000,
+		380000
+	}
+	self.jobs.rat.contract_cost = {
+		47000,
+		94000,
+		235000,
+		470000,
+		600000
+	}
 	self.jobs.family = {}
 	self.jobs.family.name_id = "heist_family"
 	self.jobs.family.briefing_id = "heist_family_crimenet"
@@ -2396,6 +2452,7 @@ function NarrativeTweakData:init()
 		"arm_hcm",
 		"arm_und",
 		"arm_cro",
+		"arm_for",
 		"big",
 		"mia",
 		"mia_prof",
@@ -2407,7 +2464,8 @@ function NarrativeTweakData:init()
 		"crojob1",
 		"crojob_wrapper",
 		"crojob2",
-		"crojob2_night"
+		"crojob2_night",
+		"rat"
 	}
 	self:set_job_wrappers()
 end

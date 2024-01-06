@@ -21,7 +21,52 @@ function GenericDLCManager:_set_dlc_save_table()
 	end
 end
 
+function GenericDLCManager:_create_achievement_locked_content_table()
+	self._achievement_locked_content = {}
+	for name, dlc in pairs(tweak_data.dlc) do
+		if dlc.achievement_id then
+			local content = dlc.content
+			if content then
+				local loot_drops = content.loot_drops
+				if loot_drops then
+					for _, loot_drop in ipairs(loot_drops) do
+						if loot_drop.type_items then
+							self._achievement_locked_content[loot_drop.type_items] = self._achievement_locked_content[loot_drop.type_items] or {}
+							self._achievement_locked_content[loot_drop.type_items][loot_drop.item_entry] = name
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function GenericDLCManager:achievement_locked_content()
+	return self._achievement_locked_content
+end
+
+function GenericDLCManager:is_mask_achievement_locked(mask_id)
+	return self._achievement_locked_content.masks and self._achievement_locked_content.masks[mask_id]
+end
+
+function GenericDLCManager:is_material_achievement_locked(material_id)
+	return self._achievement_locked_content.materials and self._achievement_locked_content.materials[material_id]
+end
+
+function GenericDLCManager:is_texture_achievement_locked(texture_id)
+	return self._achievement_locked_content.textures and self._achievement_locked_content.textures[texture_id]
+end
+
+function GenericDLCManager:is_weapon_mod_achievement_locked(weapon_mod_id)
+	return self._achievement_locked_content.weapon_mods and self._achievement_locked_content.weapon_mods[weapon_mod_id]
+end
+
+function GenericDLCManager:on_tweak_data_reloaded()
+	self:_create_achievement_locked_content_table()
+end
+
 function GenericDLCManager:init_finalize()
+	self:_create_achievement_locked_content_table()
 	managers.savefile:add_load_sequence_done_callback_handler(callback(self, self, "_load_done"))
 end
 
@@ -265,6 +310,10 @@ end
 
 function GenericDLCManager:has_armored_transport()
 	return Global.dlc_manager.all_dlc_data.armored_transport and Global.dlc_manager.all_dlc_data.armored_transport.verified
+end
+
+function GenericDLCManager:has_armored_transport_and_intel(data)
+	return self:has_armored_transport() and self:has_achievement(data)
 end
 
 function GenericDLCManager:has_gage_pack()

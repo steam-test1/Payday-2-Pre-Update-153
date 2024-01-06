@@ -3,7 +3,9 @@ AnimatedVehicleBase = AnimatedVehicleBase or class(UnitBase)
 function AnimatedVehicleBase:init(unit)
 	AnimatedVehicleBase.super.init(self, unit, false)
 	self._unit = unit
-	self:_set_anim_lod(0)
+	if unit:anim_state_machine() then
+		self:_set_anim_lod(0)
+	end
 	self._body_name = self._body_name or "a_body"
 end
 
@@ -84,5 +86,25 @@ function AnimatedVehicleBase:anim_clbk_animated_driving(unit, state)
 	elseif not state and self._driving ~= "orientation_object" then
 		self._unit:set_driving("orientation_object")
 		self._driving = "orientation_object"
+	end
+end
+
+function AnimatedVehicleBase:anim_clbk_save_pose(unit, pose_id)
+	self._saved_poses = self._saved_poses or {}
+	self._saved_poses[pose_id] = {
+		position = unit:position(),
+		rotation = unit:rotation()
+	}
+end
+
+function AnimatedVehicleBase:anim_clbk_recall_pose(unit, pose_id, delete)
+	local pose_info = self._saved_poses[pose_id]
+	self._unit:set_position(pose_info.position)
+	self._unit:set_rotation(pose_info.rotation)
+	if delete then
+		self._saved_poses[pose_id] = nil
+		if not next(self._saved_poses) then
+			self._saved_poses = nil
+		end
 	end
 end

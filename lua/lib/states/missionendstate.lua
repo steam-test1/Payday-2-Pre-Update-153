@@ -143,15 +143,13 @@ function MissionEndState:at_enter(old_state, params)
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, all_pass, weapon_data, memory, level_id, stage, num_skills
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, all_pass, weapon_data, memory, level_id, stage, num_skills
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
 				level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 				mask_pass = not achievement_data.mask or managers.blackmarket:equipped_mask().mask_id == achievement_data.mask
-				job_pass = not achievement_data.job or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
-				jobs_pass = not achievement_data.jobs or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
-				full_job_pass = not achievement_data.full_job_id or managers.job:has_active_job() and achievement_data.full_job_id and achievement_data.full_job_id == managers.job:current_real_job_id()
-				full_jobs_pass = not achievement_data.full_jobs_id or managers.job:has_active_job() and achievement_data.full_jobs_id and table.contains(achievement_data.full_jobs_id, managers.job:current_real_job_id())
+				job_pass = not achievement_data.job or managers.statistics:started_session_from_beginning() and (managers.job:on_last_stage() or achievement_data.need_full_job) and managers.job:current_real_job_id() == achievement_data.job
+				jobs_pass = not achievement_data.jobs or managers.statistics:started_session_from_beginning() and (managers.job:on_last_stage() or achievement_data.need_full_job) and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
 				level_pass = not achievement_data.level_id or achievement_data.level_id == level_id
 				levels_pass = not achievement_data.levels or table.contains(achievement_data.levels, level_id)
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
@@ -217,7 +215,7 @@ function MissionEndState:at_enter(old_state, params)
 						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
 						pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
 						pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
-						pass_skills = not achievement_data.num_skills
+						pass_skills = not ad.num_skills
 						if not pass_skills then
 							num_skills = 0
 							for tree, points in ipairs(oufit.skills.skills or {0}) do
@@ -235,7 +233,7 @@ function MissionEndState:at_enter(old_state, params)
 					end
 				end
 				all_pass = job_pass and jobs_pass and level_pass and levels_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass and pass_skills
-				if all_pass and (full_job_pass or full_jobs_pass) then
+				if all_pass and achievement_data.need_full_job then
 					if not managers.job:interupt_stage() then
 						memory = managers.job:get_memory(achievement)
 						if not memory then

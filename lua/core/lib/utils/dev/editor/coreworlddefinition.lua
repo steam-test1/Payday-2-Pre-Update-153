@@ -296,9 +296,15 @@ function WorldDefinition:create(layer, offset)
 			end
 		end
 	end
-	if (layer == "ai" or layer == "all") and self._definition.ai_nav_graphs then
-		self:_load_ai_nav_graphs(self._definition.ai_nav_graphs, offset)
-		Application:cleanup_thread_garbage()
+	if layer == "ai" or layer == "all" then
+		if self._definition.ai_nav_graphs then
+			self:_load_ai_nav_graphs(self._definition.ai_nav_graphs, offset)
+			Application:cleanup_thread_garbage()
+		end
+		if self._definition.ai_mop_graphs then
+			self:_load_ai_mop_graphs(self._definition.ai_mop_graphs, offset)
+			Application:cleanup_thread_garbage()
+		end
 	end
 	Application:check_termination()
 	if (layer == "ai_settings" or layer == "all") and self._definition.ai_settings then
@@ -416,6 +422,18 @@ function WorldDefinition:_load_ai_nav_graphs(data, offset)
 	local values = self:_serialize_to_script("nav_data", path)
 	Application:check_termination()
 	managers.navigation:set_load_data(values)
+	values = nil
+end
+
+function WorldDefinition:_load_ai_mop_graphs(data, offset)
+	local path = self:world_dir() .. data.file
+	if not DB:has("mop_data", path) then
+		Application:error("The specified mop data file '" .. path .. ".mop_data' was not found for this level! ", path, "Motion paths will not be loaded!")
+		return
+	end
+	local values = self:_serialize_to_script("mop_data", path)
+	Application:check_termination()
+	managers.motion_path:set_load_data(values)
 	values = nil
 end
 

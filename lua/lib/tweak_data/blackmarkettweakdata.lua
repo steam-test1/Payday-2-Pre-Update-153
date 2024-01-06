@@ -1562,7 +1562,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.champion_dallas = {}
 	self.masks.champion_dallas.unit = "units/pd2_hw_boxing/masks/champion_dallas/msk_champion_dallas"
 	self.masks.champion_dallas.name_id = "bm_msk_champion_dallas"
-	self.masks.champion_dallas.pcs = {0}
+	self.masks.champion_dallas.pcs = {}
 	self.masks.champion_dallas.value = 0
 	self.masks.champion_dallas.dlc = nil
 	self.masks.champion_dallas.texture_bundle_folder = "pd2_hw_boxing"
@@ -6652,7 +6652,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.hammer.stats.min_damage = 3
 	self.melee_weapons.hammer.stats.max_damage = 6.1
 	self.melee_weapons.hammer.stats.min_damage_effect = 3.2
-	self.melee_weapons.hammer.stats.max_damage_effect = 1.5
+	self.melee_weapons.hammer.stats.max_damage_effect = 1.6
 	self.melee_weapons.hammer.stats.charge_time = 2
 	self.melee_weapons.hammer.stats.range = 185
 	self.melee_weapons.hammer.sounds = {}

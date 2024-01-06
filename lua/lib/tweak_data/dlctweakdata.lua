@@ -530,6 +530,12 @@ function DLCTweakData:init(tweak_data)
 		"s552",
 		"ppk"
 	}
+	self.armored_transport_intel = {}
+	self.armored_transport_intel.dlc = "has_armored_transport_and_intel"
+	self.armored_transport_intel.achievement_id = "armored_2"
+	self.armored_transport_intel.use_custom_func = true
+	self.armored_transport_intel.content = {}
+	self.armored_transport_intel.content.loot_drops = {}
 	self.gage_pack = {}
 	self.gage_pack.content = {}
 	self.gage_pack.dlc = "has_gage_pack"

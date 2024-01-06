@@ -162,6 +162,23 @@ function MenuNodeCrimenetFiltersGui:_highlight_row_item(row_item, mouse_over)
 	MenuNodeCrimenetFiltersGui.super._highlight_row_item(self, row_item, mouse_over)
 end
 
+MenuNodeCrimenetSpecialGui = MenuNodeCrimenetSpecialGui or class(MenuNodeCrimenetFiltersGui)
+
+function MenuNodeCrimenetSpecialGui:_setup_item_panel(safe_rect, res)
+	MenuNodeCrimenetSpecialGui.super._setup_item_panel(self, safe_rect, res)
+	local title_text = self.item_panel:parent():text({
+		text = managers.localization:to_upper_text("menu_cn_contract_broker_title"),
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		blend_mode = "add",
+		layer = 51
+	})
+	make_fine_text(title_text)
+	title_text:set_left(self.box_panel:left())
+	title_text:set_bottom(self.box_panel:top())
+end
+
 MenuNodeCrimenetCasinoGui = MenuNodeCrimenetCasinoGui or class(MenuNodeGui)
 
 function MenuNodeCrimenetCasinoGui:init(node, layer, parameters)

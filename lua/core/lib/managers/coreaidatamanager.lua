@@ -13,7 +13,7 @@ end
 
 function AiDataManager:add_patrol_path(name)
 	if self._data.patrol_paths[name] then
-		Application:error("Patrol path with name " .. name .. " allready exists!")
+		Application:error("Patrol path with name " .. name .. " already exists!")
 		return false
 	end
 	self._data.patrol_paths[name] = {
@@ -24,7 +24,7 @@ end
 
 function AiDataManager:remove_patrol_path(name)
 	if not self._data.patrol_paths[name] then
-		Application:error("Patrol path with name " .. name .. " doesnt exists!")
+		Application:error("Patrol path with name " .. name .. " doesn't exist!")
 		return false
 	end
 	self._data.patrol_paths[name] = nil
@@ -33,7 +33,7 @@ end
 
 function AiDataManager:add_patrol_point(name, unit)
 	if not self._data.patrol_paths[name] then
-		Application:error("Patrol path with name " .. name .. " doesn't exist exists!")
+		Application:error("Patrol path with name " .. name .. " doesn't exist!")
 		return
 	end
 	local t = {

@@ -54,6 +54,19 @@ function AiLayer:save(save_params)
 		}
 	}
 	managers.editor:add_save_data(t)
+	if managers.motion_path:paths_exist() then
+		local mop_filename = "mop_manager_data"
+		local mop_path = save_params.dir .. "\\" .. mop_filename .. ".mop_data"
+		local mop_file = managers.editor:_open_file(mop_path, nil, true)
+		mop_file:puts(managers.motion_path:get_save_data())
+		SystemFS:close(mop_file)
+		local t = {
+			entry = "ai_mop_graphs",
+			single_data_block = true,
+			data = {file = mop_filename}
+		}
+		managers.editor:add_save_data(t)
+	end
 end
 
 function AiLayer:_add_project_unit_save_data(unit, data)
@@ -785,6 +798,7 @@ function AiLayer:clear()
 	self:_update_motion_paths_list()
 	self:_select_patrol_path()
 	managers.navigation:clear()
+	managers.motion_path:delete_paths()
 	self._ai_unit_settings_guis.locations.ctrlr:set_enabled(false)
 end
 

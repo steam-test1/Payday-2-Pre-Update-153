@@ -165,7 +165,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_1",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2"
+		"election_day_3_skip2",
+		"rat"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -183,7 +184,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_2",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2"
+		"election_day_3_skip2",
+		"arm_for",
+		"rat"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -198,7 +201,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_2",
 		"election_day_3",
 		"election_day_3_skip1",
-		"election_day_3_skip2"
+		"election_day_3_skip2",
+		"arm_for",
+		"rat"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -621,7 +626,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.rat_1_lights.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/asset01"
 	self.rat_1_lights.stages = {
 		"alex_1",
-		"ratatouille"
+		"ratatouille",
+		"rat"
 	}
 	self.rat_1_lights.visible_if_locked = true
 	self.rat_1_lights.unlock_desc_id = "menu_asset_lights_desc"
@@ -733,19 +739,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.arm_for_info.name_id = "menu_asset_arm_info"
 	self.arm_for_info.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_01"
 	self.arm_for_info.stages = {"arm_for"}
-	self.arm_for_lance = {}
-	self.arm_for_lance.name_id = "menu_asset_arm_for_lance"
-	self.arm_for_lance.texture = "guis/dlcs/dlc1/textures/pd2/mission_briefing/assets/train_03"
-	self.arm_for_lance.stages = {"arm_for"}
-	self.arm_for_lance.visible_if_locked = true
-	self.arm_for_lance.unlock_desc_id = "menu_asset_arm_for_lance_desc"
-	self.arm_for_lance.no_mystery = true
-	self.arm_for_lance.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
 	self.arm_for_ammo = {}
 	self.arm_for_ammo.name_id = "menu_asset_ammo"
 	self.arm_for_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
 	self.arm_for_ammo.stages = {
-		"arm_for",
 		"arm_cro",
 		"arm_und",
 		"arm_par",
@@ -760,7 +757,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.arm_for_health.name_id = "menu_asset_health"
 	self.arm_for_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
 	self.arm_for_health.stages = {
-		"arm_for",
 		"arm_cro",
 		"arm_und",
 		"arm_par",

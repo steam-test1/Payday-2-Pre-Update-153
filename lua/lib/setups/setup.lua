@@ -330,6 +330,7 @@ function Setup:init_finalize()
 	if SystemInfo:platform() == Idstring("WIN32") then
 		AnimationManager:set_anim_cache_size(10485760, 0)
 	end
+	tweak_data:add_reload_callback(self, self.on_tweak_data_reloaded)
 end
 
 function Setup:update(t, dt)
@@ -388,6 +389,10 @@ end
 
 function Setup:add_end_frame_clbk(func)
 	table.insert(self._end_frame_clbks, func)
+end
+
+function Setup:on_tweak_data_reloaded()
+	managers.dlc:on_tweak_data_reloaded()
 end
 
 function Setup:destroy()

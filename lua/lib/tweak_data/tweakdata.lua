@@ -1922,10 +1922,11 @@ function TweakData:init()
 		},
 		pain_train = {
 			award = "ameno_4",
-			full_jobs_id = {
+			jobs = {
 				"firestarter",
 				"firestarter_prof"
 			},
+			need_full_job = true,
 			num_players = 4,
 			difficulty = {
 				"overkill_145",
@@ -1956,7 +1957,8 @@ function TweakData:init()
 		},
 		anticimex = {
 			award = "ovk_1",
-			full_jobs_id = {"alex", "alex_prof"},
+			jobs = {"alex", "alex_prof"},
+			need_full_job = true,
 			num_players = 4,
 			difficulty = {
 				"overkill_145",
@@ -1983,9 +1985,14 @@ function TweakData:init()
 		},
 		newbee = {
 			award = "ovk_4",
-			full_jobs_id = {
+			jobs = {
 				"watchdogs_wrapper",
 				"watchdogs_wrapper_prof"
+			},
+			need_full_job = true,
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
 			},
 			equipped_team = {
 				num_skills = 0,
@@ -2011,9 +2018,10 @@ function TweakData:init()
 		},
 		ovk_8 = {
 			award = "ovk_8",
-			full_jobs_id = {
+			jobs = {
 				"welcome_to_the_jungle_wrapper_prof"
 			},
+			need_full_job = true,
 			difficulty = {
 				"overkill_145",
 				"overkill_290"
@@ -2025,6 +2033,13 @@ function TweakData:init()
 				},
 				armor = "level_1"
 			}
+		},
+		death_rat = {
+			award = "djur_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "rat"
 		},
 		not_for_old_men = {
 			award = "gage4_11",

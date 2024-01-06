@@ -217,7 +217,7 @@ function CarryTweakData:init(tweak_data)
 	self.turret.bag_value = "turret"
 	self.turret.AI_carry = {SO_category = "enemies"}
 	self.ammo = {}
-	self.ammo.type = "explosives"
+	self.ammo.type = "medium"
 	self.ammo.name_id = "hud_carry_ammo"
 	self.ammo.bag_value = "shells"
 	self.ammo.visual_object = "g_explosives_bag"
@@ -250,7 +250,6 @@ function CarryTweakData:init(tweak_data)
 	self.equipment_bag.skip_exit_secure = true
 	self.equipment_bag.visual_object = "g_toolsbag"
 	self.equipment_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
-	self.equipment_bag.AI_carry = {SO_category = "enemies"}
 	self.coke_pure = {}
 	self.coke_pure.type = "coke_light"
 	self.coke_pure.name_id = "hud_carry_coke_pure"

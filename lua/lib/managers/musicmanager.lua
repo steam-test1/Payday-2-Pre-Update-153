@@ -271,6 +271,7 @@ function MusicManager:jukebox_default_tracks()
 		heist_branchbank_gold = "track_04",
 		heist_welcome_to_the_jungle1 = "track_04",
 		heist_welcome_to_the_jungle2 = "track_06",
+		heist_rat = "track_08",
 		heist_family = "track_04",
 		heist_election_day1 = "track_04",
 		heist_election_day2 = "track_05",
@@ -301,6 +302,7 @@ function MusicManager:jukebox_default_tracks()
 		heist_arm_hcm = "all",
 		heist_arm_fac = "all",
 		heist_arm_par = "all",
+		heist_arm_for = "all",
 		heist_arm_und = "all",
 		heist_ukrainian_job = "track_07",
 		heist_watchdogs1 = "track_02",
@@ -313,6 +315,7 @@ function MusicManager:jukebox_default_tracks()
 		default_options.heist_arm_hcm = "track_09"
 		default_options.heist_arm_fac = "track_09"
 		default_options.heist_arm_par = "track_09"
+		default_options.heist_arm_for = "track_09"
 		default_options.heist_arm_und = "track_09"
 	end
 	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then

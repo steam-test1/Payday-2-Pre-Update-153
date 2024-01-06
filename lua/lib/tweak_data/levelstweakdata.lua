@@ -616,14 +616,7 @@ function LevelsTweakData:init()
 	self.arm_for.package = "packages/narr_arm_for"
 	self.arm_for.cube = "cube_apply_heist_bank"
 	self.arm_for.bonus_escape = true
-	self.arm_for.static_experience = {
-		40000,
-		40000,
-		40000,
-		40000,
-		40000
-	}
-	self.arm_for.max_bags = 47
+	self.arm_for.max_bags = 30
 	self.family = {}
 	self.family.name_id = "heist_family_hl"
 	self.family.briefing_id = "heist_family_briefing"
@@ -829,16 +822,22 @@ function LevelsTweakData:init()
 	self.mus.cube = "cube_apply_heist_bank"
 	self.mus.max_bags = 30
 	self.mus.ghost_bonus = 0.15
-	self.drive_esacape_pre = {}
-	self.drive_esacape_pre.name_id = "heist_escape_garage_hl"
-	self.drive_esacape_pre.briefing_id = "heist_escape_garage_briefing"
-	self.drive_esacape_pre.briefing_dialog = "nothing"
-	self.drive_esacape_pre.world_name = "wip/driving_escapes_pre"
-	self.drive_esacape_pre.intro_event = "Play_dr1_a01"
-	self.drive_esacape_pre.outro_event = "nothing"
-	self.drive_esacape_pre.music = "heist"
-	self.drive_esacape_pre.package = "packages/escape_garage"
-	self.drive_esacape_pre.cube = "cube_apply_heist_bank"
+	self.rat = {}
+	self.rat.name_id = "heist_rat_hl"
+	self.rat.briefing_id = "heist_rat_briefing"
+	self.rat.briefing_dialog = "Play_pln_rt1b_brf_01"
+	self.rat.world_name = "narratives/bain/rat"
+	self.rat.intro_event = "Play_pln_rt1b_intro_01"
+	self.rat.outro_event = {
+		"Play_pln_rt1b_end_01",
+		"Play_pln_rt1b_end_02",
+		"Play_pln_rt1b_end_03",
+		"Play_pln_rt1b_end_04"
+	}
+	self.rat.music = "heist"
+	self.rat.package = "packages/narr_alex1"
+	self.rat.cube = "cube_apply_heist_bank"
+	self.rat.max_bags = 1200
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -896,7 +895,8 @@ function LevelsTweakData:init()
 		"mus",
 		"crojob2",
 		"crojob3",
-		"crojob3_night"
+		"crojob3_night",
+		"rat"
 	}
 	self.escape_levels = {
 		"escape_cafe",

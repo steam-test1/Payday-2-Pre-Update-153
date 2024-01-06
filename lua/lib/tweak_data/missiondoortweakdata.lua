@@ -416,8 +416,8 @@ function MissionDoorTweakData:init()
 		{
 			align = "a_drill",
 			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
-			can_jam = true,
-			timer = 180
+			can_jam = false,
+			timer = 60
 		}
 	}
 	self.train_cargo_door.devices.key = {
