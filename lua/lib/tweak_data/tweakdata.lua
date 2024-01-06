@@ -193,6 +193,7 @@ function TweakData:_set_easy()
 	self.player:_set_easy()
 	self.character:_set_easy()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_easy()
 	self.experience_manager.civilians_killed = 15
@@ -206,6 +207,7 @@ function TweakData:_set_normal()
 	self.player:_set_normal()
 	self.character:_set_normal()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_normal()
 	self.experience_manager.civilians_killed = 35
@@ -219,6 +221,7 @@ function TweakData:_set_hard()
 	self.player:_set_hard()
 	self.character:_set_hard()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_hard()
 	self.experience_manager.civilians_killed = 75
@@ -232,6 +235,7 @@ function TweakData:_set_overkill()
 	self.player:_set_overkill()
 	self.character:_set_overkill()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill()
 	self.experience_manager.civilians_killed = 150
@@ -245,6 +249,7 @@ function TweakData:_set_overkill_145()
 	self.player:_set_overkill_145()
 	self.character:_set_overkill_145()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_145()
 	self.experience_manager.civilians_killed = 550
@@ -258,6 +263,7 @@ function TweakData:_set_overkill_290()
 	self.player:_set_overkill_290()
 	self.character:_set_overkill_290()
 	self.money_manager:init(self)
+	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_290()
 	self.experience_manager.civilians_killed = 10000
@@ -1904,6 +1910,10 @@ function TweakData:init()
 		"hox",
 		"hox_prof",
 		"mus"
+	}
+	self.achievement.job_list.the_butcher = {
+		"crojob_wrapper",
+		"crojob1"
 	}
 	self.achievement.complete_heist_stats_achievements = {
 		death_vlad = {

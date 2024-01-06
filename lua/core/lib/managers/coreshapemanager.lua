@@ -68,20 +68,21 @@ function Shape:init(params)
 	self._position = params.position or Vector3()
 	self._rotation = params.rotation or Rotation()
 	self._properties = {}
-	self:build_dialog()
+	if Application:editor() then
+		self._properties_ctrls = {}
+		self._min_value = 10
+		self._max_value = 10000000
+	end
 end
 
 function Shape:build_dialog()
 	if not Application:editor() then
 		return
 	end
-	self._properties_ctrls = {}
 	self._dialog = EWS:Dialog(nil, "Shape properties", "", Vector3(200, 100, 0), Vector3(750, 600, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP")
 	self._dialog_sizer = EWS:BoxSizer("VERTICAL")
 	self._dialog:set_sizer(self._dialog_sizer)
-	self._min_value = 10
-	self._max_value = 10000000
-	self:set_dialog_visible(false)
+	self:build_properties_ctrls()
 end
 
 function Shape:build_properties_ctrls()
@@ -129,7 +130,7 @@ function Shape:set_property(property, value)
 	end
 	value = math.clamp(value, self._min_value, self._max_value)
 	self._properties[property] = value
-	if self._properties_ctrls then
+	if self._properties_ctrls and self._properties_ctrls[property] then
 		for _, ctrl in ipairs(self._properties_ctrls[property]) do
 			ctrl:set_value(string.format("%.2f", value / 100))
 		end
@@ -144,6 +145,9 @@ function Shape:scale()
 end
 
 function Shape:set_dialog_visible(visible)
+	if not self._dialog then
+		self:build_dialog()
+	end
 	self._dialog:set_visible(visible)
 end
 
@@ -156,6 +160,7 @@ end
 
 function Shape:create_panel(parent, sizer)
 	self._panel = EWS:Panel(parent, "", "")
+	self._panel:set_extension({alive = true})
 	self._panel_sizer = EWS:BoxSizer("VERTICAL")
 	self._panel:set_sizer(self._panel_sizer)
 	sizer:add(self._panel, 0, 0, "EXPAND")
@@ -238,7 +243,13 @@ function Shape:save_level_data()
 end
 
 function Shape:destroy()
-	self._dialog:destroy()
+	if self._panel then
+		self._panel:extension().alive = false
+		self._panel:destroy()
+	end
+	if self._dialog then
+		self._dialog:destroy()
+	end
 end
 
 ShapeBox = ShapeBox or class(Shape)
@@ -248,7 +259,6 @@ function ShapeBox:init(params)
 	self._properties.width = params.width or 1000
 	self._properties.depth = params.depth or 1000
 	self._properties.height = params.height or 1000
-	self:build_properties_ctrls()
 end
 
 function ShapeBox:create_panel(parent, sizer)
@@ -424,7 +434,6 @@ ShapeSphere = ShapeSphere or class(Shape)
 function ShapeSphere:init(params)
 	Shape.init(self, params)
 	self._properties.radius = params.radius or 1000
-	self:build_properties_ctrls()
 end
 
 function ShapeSphere:build_properties_ctrls()
@@ -460,7 +469,6 @@ function ShapeCylinder:init(params)
 	Shape.init(self, params)
 	self._properties.radius = params.radius or 1000
 	self._properties.height = params.height or 1000
-	self:build_properties_ctrls()
 end
 
 function ShapeCylinder:build_properties_ctrls()

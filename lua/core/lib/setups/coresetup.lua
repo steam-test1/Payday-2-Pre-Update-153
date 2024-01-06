@@ -170,6 +170,8 @@ function CoreSetup:__pre_init()
 		local frame_panel = EWS:Panel(frame, "", "")
 		local appwin = EWS:AppWindow(frame_panel, appwin_resolution, "SUNKEN_BORDER")
 		appwin:set_max_size(Vector3(-1, -1, 0))
+		Global.application_window = appwin
+		Global.frame = frame
 		appwin:connect("EVT_LEAVE_WINDOW", callback(nil, _G, "leaving_window"))
 		appwin:connect("EVT_ENTER_WINDOW", callback(nil, _G, "entering_window"))
 		appwin:connect("EVT_KILL_FOCUS", callback(nil, _G, "kill_focus"))
@@ -185,9 +187,7 @@ function CoreSetup:__pre_init()
 		frame_panel:set_sizer(top_sizer)
 		Global.main_sizer = main_sizer
 		Global.v_sizer = app_sizer
-		Global.frame = frame
 		Global.frame_panel = frame_panel
-		Global.application_window = appwin
 		Global.left_toolbar_sizer = left_toolbar_sizer
 	end
 end
@@ -476,7 +476,7 @@ function CoreSetup:__entering_window(user_data, event_object)
 end
 
 function CoreSetup:__leaving_window(user_data, event_object)
-	if managers.editor._in_mixed_input_mode then
+	if not managers.editor or managers.editor._in_mixed_input_mode then
 		Input:keyboard():unacquire()
 	end
 end

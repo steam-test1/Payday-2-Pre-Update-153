@@ -458,6 +458,20 @@ function CoreWorldInstanceManager:get_instance_param(instance_name, var_name)
 	return self._instance_params[instance_name][var_name]
 end
 
+function CoreWorldInstanceManager:sync_save(data)
+	local state = {
+		instance_params = self._instance_params
+	}
+	data.CoreWorldInstanceManager = state
+end
+
+function CoreWorldInstanceManager:sync_load(data)
+	local state = data.CoreWorldInstanceManager
+	if state then
+		self._instance_params = state.instance_params
+	end
+end
+
 function CoreWorldInstanceManager:on_simulation_ended()
 	self._registered_input_elements = {}
 	self._registered_output_event_elements = {}

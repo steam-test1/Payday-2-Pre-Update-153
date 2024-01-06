@@ -559,8 +559,10 @@ function InstanceSetParamsUnitElement:init(...)
 	self._panels = {}
 	self._hed.instance = nil
 	self._hed.params = {}
+	self._hed.apply_on_execute = nil
 	table.insert(self._save_values, "instance")
 	table.insert(self._save_values, "params")
+	table.insert(self._save_values, "apply_on_execute")
 end
 
 function InstanceSetParamsUnitElement:update_selected(t, dt)
@@ -826,6 +828,7 @@ function InstanceSetParamsUnitElement:_build_panel(panel, panel_sizer)
 	panel_sizer = panel_sizer or self._panel_sizer
 	local instance_ctrlr, instance_params = self:_build_value_combobox(panel, panel_sizer, "instance", self:_get_options())
 	self._instance_params = instance_params
+	self:_build_value_checkbox(panel, panel_sizer, "apply_on_execute", "If checked, the values will be applied when the element is executed.")
 	self:_on_instance_changed()
 end
 

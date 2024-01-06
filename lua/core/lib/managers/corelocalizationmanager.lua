@@ -26,11 +26,11 @@ function LocalizationManager:set_default_macro(macro, value)
 	if not self._default_macros then
 		self._default_macros = {}
 	end
-	self._default_macros["$" .. macro .. ";"] = tostring(value)
+	self._default_macros[macro] = tostring(value)
 end
 
 function LocalizationManager:get_default_macro(macro)
-	return self._default_macros["$" .. macro .. ";"]
+	return self._default_macros[macro]
 end
 
 function LocalizationManager:exists(string_id)
@@ -55,6 +55,10 @@ function LocalizationManager:text(string_id, macros)
 	return return_string
 end
 
+function LocalizationManager:format_text(text_string)
+	return self:_localizer_post_process(self:_text_localize(text_string, "@", ";"))
+end
+
 function LocalizationManager:_localizer_post_process(string)
 	local localized_string = string
 	local macros = {}
@@ -65,11 +69,38 @@ function LocalizationManager:_localizer_post_process(string)
 		macros[k] = v
 	end
 	for k, v in pairs(self._macro_context) do
-		macros["$" .. k .. ";"] = tostring(v)
+		macros[k] = tostring(v)
 	end
 	if self._pre_process_func then
 		self._pre_process_func(macros)
 	end
-	localized_string = string.gsub(localized_string, "%b$;", macros)
-	return localized_string
+	return self:_text_macroize(localized_string, macros)
+end
+
+function LocalizationManager:_text_localize(text)
+	local function func(id)
+		return self:exists(id) and self:text(id) or false
+	end
+	
+	return self:_text_format(text, "@", ";", func)
+end
+
+function LocalizationManager:_text_macroize(text, macros)
+	local function func(word)
+		return macros[word] or false
+	end
+	
+	return self:_text_format(text, "$", ";", func)
+end
+
+function LocalizationManager:_text_format(text, X, Y, func)
+	local match_string = "%b" .. X .. Y
+	return string.gsub(text, match_string, function(word)
+		local id = string.sub(word, 2, -2)
+		local value = func(id)
+		if value then
+			return value
+		end
+		return X .. self:_text_format(id, X, Y, func) .. Y
+	end)
 end

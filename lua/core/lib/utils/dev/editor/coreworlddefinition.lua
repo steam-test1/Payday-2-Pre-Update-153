@@ -807,7 +807,7 @@ end
 
 function WorldDefinition:_setup_variations(unit, data)
 	if data.mesh_variation and data.mesh_variation ~= "default" then
-		if not Application:editor() or unit:damage():has_sequence(data.mesh_variation) then
+		if not Application:editor() or unit:damage() and unit:damage():has_sequence(data.mesh_variation) then
 			unit:unit_data().mesh_variation = data.mesh_variation
 			managers.sequence:run_sequence_simple2(unit:unit_data().mesh_variation, "change_state", unit)
 		elseif Application:editor() then
@@ -832,6 +832,15 @@ function WorldDefinition:_setup_editable_gui(unit, data)
 	unit:editable_gui():set_text(data.editable_gui.text)
 	unit:editable_gui():set_font_color(data.editable_gui.font_color)
 	unit:editable_gui():set_font_size(data.editable_gui.font_size)
+	unit:editable_gui():set_font(data.editable_gui.font)
+	unit:editable_gui():set_align(data.editable_gui.align)
+	unit:editable_gui():set_vertical(data.editable_gui.vertical)
+	unit:editable_gui():set_blend_mode(data.editable_gui.blend_mode)
+	unit:editable_gui():set_render_template(data.editable_gui.render_template)
+	unit:editable_gui():set_wrap(data.editable_gui.wrap)
+	unit:editable_gui():set_word_wrap(data.editable_gui.word_wrap)
+	unit:editable_gui():set_alpha(data.editable_gui.alpha)
+	unit:editable_gui():set_shape(data.editable_gui.shape)
 	if not Application:editor() then
 		unit:editable_gui():lock_gui()
 	end

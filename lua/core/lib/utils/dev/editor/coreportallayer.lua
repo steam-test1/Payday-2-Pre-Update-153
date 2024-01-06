@@ -455,7 +455,7 @@ function PortalLayer:do_spawn_unit(name, pos, rot)
 end
 
 function PortalLayer:set_portal_shape_gui()
-	if self._current_shape_panel then
+	if self._current_shape_panel and self._current_shape_panel:extension().alive then
 		self._current_shape_panel:set_visible(false)
 	end
 	if alive(self._selected_unit) and self._selected_unit:name() == Idstring(self._portal_shape_unit) then

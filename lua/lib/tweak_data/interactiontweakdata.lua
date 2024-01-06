@@ -2269,6 +2269,7 @@ function InteractionTweakData:init()
 	self.hold_pku_disassemble_cro_loot.blocked_hint = "carry_block"
 	self.hold_pku_disassemble_cro_loot.start_active = false
 	self.hold_pku_disassemble_cro_loot.timer = 2
+	self.hold_pku_disassemble_cro_loot.axis = "x"
 	self.hold_pku_disassemble_cro_loot.sound_start = "bar_bag_generic"
 	self.hold_pku_disassemble_cro_loot.sound_interupt = "bar_bag_generic_cancel"
 	self.hold_pku_disassemble_cro_loot.sound_done = "bar_bag_generic_finished"
@@ -2287,6 +2288,9 @@ function InteractionTweakData:init()
 	self.connect_hose.sound_event = "ammo_bag_drop"
 	self.connect_hose.timer = 4
 	self.connect_hose.interact_distance = 200
+	self.connect_hose.sound_start = "bar_hose_ground_connect"
+	self.connect_hose.sound_interupt = "bar_hose_ground_connect_cancel"
+	self.connect_hose.sound_done = "bar_hose_ground_connect_finished"
 	self.generator_start = {}
 	self.generator_start.text_id = "hud_generator_start"
 	self.generator_start.action_text_id = "hud_action_generator_start"
@@ -2297,7 +2301,7 @@ function InteractionTweakData:init()
 	self.hold_open_bomb_case.action_text_id = "hud_action_int_hold_open_case"
 	self.hold_open_bomb_case.start_active = false
 	self.hold_open_bomb_case.timer = 2
-	self.hold_open_bomb_case.interact_distance = 200
+	self.hold_open_bomb_case.interact_distance = 120
 	self.hold_open_bomb_case.axis = "x"
 	self.press_c4_pku = {}
 	self.press_c4_pku.text_id = "hud_int_take_c4"

@@ -191,10 +191,7 @@ function ElementTimerTrigger:init(...)
 end
 
 function ElementTimerTrigger:on_script_activated()
-	for _, id in ipairs(self._values.elements) do
-		local element = self:get_mission_element(id)
-		element:add_trigger(self._id, self._values.time, callback(self, self, "on_executed"))
-	end
+	self:activate_trigger()
 end
 
 function ElementTimerTrigger:client_on_executed(...)
@@ -205,4 +202,15 @@ function ElementTimerTrigger:on_executed(instigator)
 		return
 	end
 	ElementTimerTrigger.super.on_executed(self, instigator)
+end
+
+function ElementTimerTrigger:activate_trigger()
+	for _, id in ipairs(self._values.elements) do
+		local element = self:get_mission_element(id)
+		element:add_trigger(self._id, self._values.time, callback(self, self, "on_executed"))
+	end
+end
+
+function ElementTimerTrigger:operation_add()
+	self:activate_trigger()
 end

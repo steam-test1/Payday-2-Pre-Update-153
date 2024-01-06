@@ -2374,7 +2374,7 @@ function MacroDebug:test_spawn_all(layer_name, sub_type)
 	end
 end
 
-function MacroDebug:set_draw_unit_enabled(unit_name, is_enabled, draw_camera_line, draw_on_top, red, green, blue)
+function MacroDebug:set_draw_unit_enabled(unit_name, is_enabled, draw_camera_line, draw_on_top, red, green, blue, disabled_color_scale)
 	local unit_name_id
 	if type(unit_name) == "string" then
 		unit_name_id = Idstring(unit_name)
@@ -2397,11 +2397,17 @@ function MacroDebug:set_draw_unit_enabled(unit_name, is_enabled, draw_camera_lin
 		managers.debug:set_enabled(true)
 		managers.debug:set_enabled_paused(true)
 		self:set_enabled(true)
+		disabled_color_scale = disabled_color_scale or 0.5
 		local pen = Draw:pen(Color(red or 1, green or 1, blue or 1), draw_on_top and "no_z" or "normal")
+		local disabled_red = (red or 1) * disabled_color_scale
+		local disabled_green = (red or 1) * disabled_color_scale
+		local disabled_blue = (red or 1) * disabled_color_scale
+		local disabled_pen = Draw:pen(Color(disabled_red, disabled_green, disabled_blue), draw_on_top and "no_z" or "normal")
 		local data = {
 			draw_unit_list = draw_unit_list,
 			draw_camera_line = draw_camera_line,
-			pen = pen
+			pen = pen,
+			disabled_pen = disabled_pen
 		}
 		self._draw_unit_map = self._draw_unit_map or {}
 		self._draw_unit_map[unit_name_id_key] = data
@@ -2596,11 +2602,12 @@ function MacroDebug:update(t, dt)
 					remove_unit_list = remove_unit_list or {}
 					table.insert(remove_unit_list, i)
 				else
-					data.pen:draw(unit)
+					local pen = unit:enabled() and unit:visible() and data.pen or data.disabled_pen
+					pen:draw(unit)
 					if data.draw_camera_line then
 						local cam = managers.viewport:get_current_camera()
 						local rot = cam and cam:rotation() or Rotation()
-						data.pen:line(unit:position(), (cam and cam:position() or Vector3()) + rot:y() * 10 - rot:z() * 1)
+						pen:line(unit:position(), (cam and cam:position() or Vector3()) + rot:y() * 10 - rot:z() * 1)
 					end
 				end
 			end

@@ -254,7 +254,7 @@ function CoreMaterialEditor:_update_material(param)
 			if param._name == "diffuse_color" then
 				material:set_diffuse_color(param._value)
 			elseif param._param_ui_type == "intensity" then
-				material:set_variable(param._name, LightIntensityDB:lookup(param._value))
+				material:set_variable(Idstring(param._name), LightIntensityDB:lookup(Idstring(param._value)))
 			else
 				material:set_variable(Idstring(param._name), param._value)
 			end

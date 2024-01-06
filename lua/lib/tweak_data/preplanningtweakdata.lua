@@ -679,6 +679,8 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.loot_drop_off_stealth_only.prio = 1
 	self.types.loot_drop_off_stealth_only.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_loot_drop_off")
 	self.types.loot_drop_off_stealth_only.budget_cost = 2
+	self.types.loot_drop_off_generic = deep_clone(self.types.loot_drop_off)
+	self.types.loot_drop_off_generic.desc_id = "menu_pp_asset_loot_drop_off_generic_desc"
 	self.types.thermal_paste = {}
 	self.types.thermal_paste.name_id = "menu_pp_asset_thermal_paste"
 	self.types.thermal_paste.desc_id = "menu_pp_asset_thermal_paste_desc"
@@ -1588,16 +1590,16 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 	}
 	self.locations.mus = {
 		default_plans = {},
-		total_budget = 20,
+		total_budget = 10,
 		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_museum",
 		start_location = {
 			group = "a",
-			x = 512,
-			y = 1024,
+			x = 1024,
+			y = 521,
 			zoom = 1.5
 		},
 		{
-			name_id = "menu_pp_branchbank_loc_a",
+			name_id = "menu_pp_mus_loc_a",
 			texture = "guis/textures/pd2/pre_planning/mus_1",
 			map_x = -1.05,
 			map_y = 0,
@@ -1611,7 +1613,7 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			custom_points = {}
 		},
 		{
-			name_id = "menu_pp_branchbank_loc_b",
+			name_id = "menu_pp_mus_loc_b",
 			texture = "guis/textures/pd2/pre_planning/mus_2",
 			map_x = 0,
 			map_y = 0,
@@ -1625,7 +1627,7 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			custom_points = {}
 		},
 		{
-			name_id = "menu_pp_branchbank_loc_c",
+			name_id = "menu_pp_mus_loc_c",
 			texture = "guis/textures/pd2/pre_planning/mus_3",
 			map_x = 1.05,
 			map_y = 0,

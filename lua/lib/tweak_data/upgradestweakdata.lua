@@ -178,7 +178,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.revive_interaction_speed_multiplier = {0.5}
 	self.values.player.long_dis_revive = {0.75, 1}
 	self.values.doctor_bag.interaction_speed_multiplier = {0.8}
-	self.values.team.stamina.passive_multiplier = {1.15, 1.3}
+	self.values.team.stamina.passive_multiplier = {1.5, 1.3}
 	self.values.player.passive_intimidate_range_mul = {1.25}
 	self.values.team.health.passive_multiplier = {1.1}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.25}
@@ -540,7 +540,7 @@ function UpgradesTweakData:_init_pd2_values()
 		0.85,
 		0.8
 	}
-	self.values.player.headshot_regen_armor_bonus = {0.8, 1.6}
+	self.values.player.headshot_regen_armor_bonus = {0.8, 2.4}
 	self.values.pistol.stacking_hit_damage_multiplier = {0.1}
 	self.values.bodybags_bag.quantity = {1}
 	self.values.first_aid_kit.quantity = {3, 10}
@@ -1019,7 +1019,7 @@ function UpgradesTweakData:_init_pd2_values()
 			}
 		},
 		prison_wife = {
-			{"16", "3"},
+			{"8", "3"},
 			{"16", "3"}
 		},
 		mastermind_tier1 = {

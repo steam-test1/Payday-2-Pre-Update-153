@@ -882,6 +882,15 @@ function CoreOldWorldDefinition:assign_unit_data(unit, data)
 		unit:editable_gui():set_text(data._editable_gui.text)
 		unit:editable_gui():set_font_color(data._editable_gui.font_color)
 		unit:editable_gui():set_font_size(data._editable_gui.font_size)
+		unit:editable_gui():set_font(data._editable_gui.font)
+		unit:editable_gui():set_align(data._editable_gui.align)
+		unit:editable_gui():set_vertical(data._editable_gui.vertical)
+		unit:editable_gui():set_blend_mode(data._editable_gui.blend_mode)
+		unit:editable_gui():set_render_template(data._editable_gui.render_template)
+		unit:editable_gui():set_wrap(data._editable_gui.wrap)
+		unit:editable_gui():set_word_wrap(data._editable_gui.word_wrap)
+		unit:editable_gui():set_alpha(data._editable_gui.alpha)
+		unit:editable_gui():set_shape(data._editable_gui.shape)
 		if not is_editor then
 			unit:editable_gui():lock_gui()
 		end
@@ -1510,9 +1519,25 @@ function Generic:parse_editable_gui(node)
 	local text = node:parameter("text")
 	local font_color = math.string_to_vector(node:parameter("font_color"))
 	local font_size = tonumber(node:parameter("font_size"))
+	local align = node:parameter("align")
+	local vertical = node:parameter("vertical")
+	local blend_mode = node:parameter("blend_mode")
+	local render_template = node:parameter("render_template")
+	local wrap = node:parameter("wrap") == "on"
+	local word_wrap = node:parameter("word_wrap") == "on"
+	local alpha = tonumber(node:parameter("alpha"))
+	local shape = string.split(node:parameter("shape"), " ")
 	self._editable_gui = {
 		text = text,
 		font_color = font_color,
-		font_size = font_size
+		font_size = font_size,
+		align = align,
+		vertical = vertical,
+		blend_mode = blend_mode,
+		render_template = render_template,
+		wrap = wrap,
+		word_wrap = word_wrap,
+		alpha = alpha,
+		shape = shape
 	}
 end

@@ -437,6 +437,7 @@ function PortalUnitGroup:add_shape(params)
 end
 
 function PortalUnitGroup:remove_shape(shape)
+	shape:destroy()
 	table.delete(self._shapes, shape)
 end
 

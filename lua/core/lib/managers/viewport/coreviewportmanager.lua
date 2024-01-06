@@ -283,6 +283,14 @@ function ViewportManager:set_resolution(resolution)
 	end
 end
 
+function ViewportManager:is_fullscreen()
+	if self._render_settings_change_map and self._render_settings_change_map.fullscreen ~= nil then
+		return self._render_settings_change_map.fullscreen
+	else
+		return RenderSettings.fullscreen
+	end
+end
+
 function ViewportManager:set_fullscreen(fullscreen)
 	if not RenderSettings.fullscreen ~= not fullscreen or self._render_settings_change_map and not self._render_settings_change_map.fullscreen ~= not fullscreen then
 		self._render_settings_change_map = self._render_settings_change_map or {}
@@ -303,6 +311,13 @@ function ViewportManager:set_vsync(vsync)
 		self._render_settings_change_map = self._render_settings_change_map or {}
 		self._render_settings_change_map.v_sync = vsync
 		self._v_sync = vsync
+	end
+end
+
+function ViewportManager:set_adapter_index(adapter_index)
+	if RenderSettings.adapter_index ~= adapter_index or self._render_settings_change_map and self._render_settings_change_map.adapter_index ~= adapter_index then
+		self._render_settings_change_map = self._render_settings_change_map or {}
+		self._render_settings_change_map.adapter_index = adapter_index
 	end
 end
 
