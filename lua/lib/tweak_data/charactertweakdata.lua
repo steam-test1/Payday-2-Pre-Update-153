@@ -468,6 +468,7 @@ function CharacterTweakData:_init_mobster_boss(presets)
 	self.mobster_boss.HEALTH_INIT = 350
 	self.mobster_boss.headshot_dmg_mul = 2
 	self.mobster_boss.damage.explosion_damage_mul = 1
+	self.mobster_boss.damage.hurt_severity = presets.hurt_severities.base_no_poison
 	self.mobster_boss.move_speed = presets.move_speed.very_slow
 	self.mobster_boss.allowed_poses = {stand = true}
 	self.mobster_boss.no_retreat = true
@@ -583,6 +584,7 @@ end
 
 function CharacterTweakData:_init_hector_boss_no_armor(presets)
 	self.hector_boss_no_armor = deep_clone(self.fbi)
+	self.hector_boss_no_armor.damage.hurt_severity = presets.hurt_severities.base_no_poison
 	self.hector_boss_no_armor.no_retreat = true
 	self.hector_boss_no_armor.no_arrest = true
 	self.hector_boss_no_armor.surrender = nil
@@ -883,7 +885,7 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.move_speed = presets.move_speed.lightning
 	self.spooc.no_retreat = true
 	self.spooc.no_arrest = true
-	self.spooc.damage.hurt_severity = presets.hurt_severities.only_fire_hurts
+	self.spooc.damage.hurt_severity = presets.hurt_severities.only_fire_and_poison_hurts
 	self.spooc.surrender_break_time = {4, 6}
 	self.spooc.suppression = nil
 	self.spooc.surrender = presets.surrender.special
@@ -1628,6 +1630,12 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{none = 1}
 			}
+		},
+		poison = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
 	presets.hurt_severities.only_light_hurt = {
@@ -1653,6 +1661,12 @@ function CharacterTweakData:_presets(tweak_data)
 			health_reference = 1,
 			zones = {
 				{light = 1}
+			}
+		},
+		poison = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
 			}
 		}
 	}
@@ -1680,6 +1694,19 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{fire = 1}
 			}
+		},
+		poison = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
+		}
+	}
+	presets.hurt_severities.light_hurt_fire_poison = deep_clone(presets.hurt_severities.only_light_hurt_and_fire)
+	presets.hurt_severities.light_hurt_fire_poison.poison = {
+		health_reference = 1,
+		zones = {
+			{poison = 1}
 		}
 	}
 	presets.hurt_severities.only_explosion_hurts = {
@@ -1706,9 +1733,15 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{none = 1}
 			}
+		},
+		poison = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
-	presets.hurt_severities.only_fire_hurts = {
+	presets.hurt_severities.only_fire_and_poison_hurts = {
 		bullet = {
 			health_reference = 1,
 			zones = {
@@ -1731,6 +1764,12 @@ function CharacterTweakData:_presets(tweak_data)
 			health_reference = 1,
 			zones = {
 				{fire = 1}
+			}
+		},
+		poison = {
+			health_reference = 1,
+			zones = {
+				{poison = 1}
 			}
 		}
 	}
@@ -1814,6 +1853,19 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{fire = 1}
 			}
+		},
+		poison = {
+			health_reference = "current",
+			zones = {
+				{none = 0, poison = 1}
+			}
+		}
+	}
+	presets.hurt_severities.base_no_poison = deep_clone(presets.hurt_severities.base)
+	presets.hurt_severities.base_no_poison.poison = {
+		health_reference = 1,
+		zones = {
+			{none = 1}
 		}
 	}
 	presets.base = {}
@@ -5354,6 +5406,7 @@ function CharacterTweakData:_set_normal()
 		}
 	}
 	self.hector_boss.HEALTH_INIT = 50
+	self.mobster_boss.HEALTH_INIT = 50
 	self.presets.gang_member_damage.REGENERATE_TIME = 1.5
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.2
 	self.presets.gang_member_damage.HEALTH_INIT = 125
@@ -5431,6 +5484,7 @@ function CharacterTweakData:_set_hard()
 		}
 	}
 	self.hector_boss.HEALTH_INIT = 100
+	self.mobster_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.4
 	self:_set_characters_weapon_preset("normal")
@@ -5547,6 +5601,7 @@ function CharacterTweakData:_set_overkill()
 		}
 	}
 	self.hector_boss.HEALTH_INIT = 300
+	self.mobster_boss.HEALTH_INIT = 300
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.6
 	self.presets.gang_member_damage.HEALTH_INIT = 200
@@ -5663,6 +5718,7 @@ function CharacterTweakData:_set_overkill_145()
 		}
 	}
 	self.hector_boss.HEALTH_INIT = 600
+	self.mobster_boss.HEALTH_INIT = 600
 	self:_multiply_all_speeds(1.05, 1.05)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -5784,6 +5840,7 @@ function CharacterTweakData:_set_overkill_290()
 		}
 	}
 	self.hector_boss.HEALTH_INIT = 900
+	self.mobster_boss.HEALTH_INIT = 900
 	self:_multiply_all_speeds(1.05, 1.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -6157,7 +6214,7 @@ function CharacterTweakData:_set_overkill_290()
 	self.city_swat.HEALTH_INIT = 24
 	self.city_swat.headshot_dmg_mul = self.fbi_swat.HEALTH_INIT / 8
 	self.city_swat.damage.explosion_damage_mul = 0.8
-	self.city_swat.damage.hurt_severity = self.presets.hurt_severities.only_light_hurt_and_fire
+	self.city_swat.damage.hurt_severity = self.presets.hurt_severities.light_hurt_fire_poison
 	self.shield.weapon.mp9.focus_dis = 200
 	self.tank.weapon.saiga.focus_dis = 200
 	self.tank.weapon.r870.focus_dis = 200

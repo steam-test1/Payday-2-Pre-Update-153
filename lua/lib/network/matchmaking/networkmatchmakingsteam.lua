@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.35.0"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.36.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -77,6 +77,10 @@ function NetworkMatchMakingSTEAM:_save_globals()
 	Global.steam.match.lobby_return_count = self._lobby_return_count
 end
 
+function NetworkMatchMakingSTEAM:set_join_invite_pending(lobby_id)
+	self._join_invite_pending = lobby_id
+end
+
 function NetworkMatchMakingSTEAM:update()
 	Steam:update()
 	if self._try_re_enter_lobby then
@@ -106,6 +110,10 @@ function NetworkMatchMakingSTEAM:update()
 			else
 			end
 		end
+	end
+	if self._join_invite_pending and not managers.network:session() then
+		managers.network.matchmake:join_server_with_check(self._join_invite_pending, true)
+		self._join_invite_pending = nil
 	end
 end
 

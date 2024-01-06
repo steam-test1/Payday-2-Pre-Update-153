@@ -13,5 +13,7 @@ end
 
 function NpcVehicleStateBroken:on_enter()
 	print("NpcVehicleStateBroken:on_enter()")
-	self._unit:character_damage():spawn_broken_smoke_effect()
+	if self._unit:damage():has_sequence(VehicleDrivingExt.SEQUENCE_FULL_DAMAGED) then
+		self._unit:damage():run_sequence_simple(VehicleDrivingExt.SEQUENCE_FULL_DAMAGED)
+	end
 end

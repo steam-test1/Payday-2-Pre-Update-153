@@ -2110,6 +2110,46 @@ function SkillTreeTweakData:init()
 		900,
 		1000
 	}
+	local deck2 = {
+		upgrades = {
+			"weapon_passive_headshot_damage_multiplier"
+		},
+		cost = 300,
+		icon_xy = {1, 0},
+		name_id = "menu_deckall_2",
+		desc_id = "menu_deckall_2_desc"
+	}
+	local deck4 = {
+		upgrades = {
+			"passive_player_xp_multiplier",
+			"player_passive_suspicion_bonus",
+			"player_passive_armor_movement_penalty_multiplier"
+		},
+		cost = 600,
+		icon_xy = {3, 0},
+		name_id = "menu_deckall_4",
+		desc_id = "menu_deckall_4_desc"
+	}
+	local deck6 = {
+		upgrades = {
+			"armor_kit",
+			"player_pick_up_ammo_multiplier"
+		},
+		cost = 1600,
+		icon_xy = {5, 0},
+		name_id = "menu_deckall_6",
+		desc_id = "menu_deckall_6_desc"
+	}
+	local deck8 = {
+		upgrades = {
+			"weapon_passive_damage_multiplier",
+			"passive_doctor_bag_interaction_speed_multiplier"
+		},
+		cost = 3200,
+		icon_xy = {7, 0},
+		name_id = "menu_deckall_8",
+		desc_id = "menu_deckall_8_desc"
+	}
 	self.specializations = {
 		{
 			name_id = "menu_st_spec_1",
@@ -2123,15 +2163,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck1_1",
 				desc_id = "menu_deck1_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck1_2",
-				desc_id = "menu_deck1_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"team_passive_stamina_multiplier_1",
@@ -2142,17 +2174,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck1_3",
 				desc_id = "menu_deck1_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck1_4",
-				desc_id = "menu_deck1_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"team_passive_health_multiplier"
@@ -2162,16 +2184,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck1_5",
 				desc_id = "menu_deck1_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck1_6",
-				desc_id = "menu_deck1_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_tier_armor_multiplier_1",
@@ -2182,16 +2195,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck1_7",
 				desc_id = "menu_deck1_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck1_8",
-				desc_id = "menu_deck1_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_passive_loot_drop_multiplier",
@@ -2216,15 +2220,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck2_1",
 				desc_id = "menu_deck2_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck2_2",
-				desc_id = "menu_deck2_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_passive_health_multiplier_2",
@@ -2235,17 +2231,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck2_3",
 				desc_id = "menu_deck2_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck2_4",
-				desc_id = "menu_deck2_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_passive_health_multiplier_3"
@@ -2255,16 +2241,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck2_5",
 				desc_id = "menu_deck2_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck2_6",
-				desc_id = "menu_deck2_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_panic_suppression"
@@ -2274,16 +2251,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck2_7",
 				desc_id = "menu_deck2_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck2_8",
-				desc_id = "menu_deck2_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_passive_health_multiplier_4",
@@ -2308,15 +2276,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck3_1",
 				desc_id = "menu_deck3_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck3_2",
-				desc_id = "menu_deck3_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_tier_armor_multiplier_3"
@@ -2326,17 +2286,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck3_3",
 				desc_id = "menu_deck3_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck3_4",
-				desc_id = "menu_deck3_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_tier_armor_multiplier_4"
@@ -2346,16 +2296,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck3_5",
 				desc_id = "menu_deck3_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck3_6",
-				desc_id = "menu_deck3_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_armor_regen_timer_multiplier_passive"
@@ -2365,16 +2306,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck3_7",
 				desc_id = "menu_deck3_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck3_8",
-				desc_id = "menu_deck3_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_tier_armor_multiplier_5",
@@ -2400,15 +2332,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck4_1",
 				desc_id = "menu_deck4_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck4_2",
-				desc_id = "menu_deck4_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_camouflage_multiplier"
@@ -2418,17 +2342,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck4_3",
 				desc_id = "menu_deck4_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck4_4",
-				desc_id = "menu_deck4_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_passive_dodge_chance_2"
@@ -2438,16 +2352,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck4_5",
 				desc_id = "menu_deck4_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck4_6",
-				desc_id = "menu_deck4_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_passive_dodge_chance_3"
@@ -2457,21 +2362,12 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck4_7",
 				desc_id = "menu_deck4_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck4_8",
-				desc_id = "menu_deck4_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_passive_loot_drop_multiplier",
 					"weapon_passive_armor_piercing_chance",
-					"weapon_passive_swap_speed_multiplier_2"
+					"weapon_passive_swap_speed_multiplier_1"
 				},
 				cost = 4000,
 				icon_xy = {5, 2},
@@ -2491,15 +2387,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck5_1",
 				desc_id = "menu_deck5_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck5_2",
-				desc_id = "menu_deck5_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_2",
@@ -2518,17 +2406,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck5_3",
 				desc_id = "menu_deck5_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck5_4",
-				desc_id = "menu_deck5_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_3",
@@ -2539,16 +2417,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck5_5",
 				desc_id = "menu_deck5_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck5_6",
-				desc_id = "menu_deck5_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_4",
@@ -2559,16 +2428,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck5_7",
 				desc_id = "menu_deck5_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck5_8",
-				desc_id = "menu_deck5_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_5",
@@ -2595,15 +2455,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck6_1",
 				desc_id = "menu_deck6_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck6_2",
-				desc_id = "menu_deck6_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_level_2_dodge_addend_1",
@@ -2615,17 +2467,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck6_3",
 				desc_id = "menu_deck6_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck6_4",
-				desc_id = "menu_deck6_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_level_2_dodge_addend_2",
@@ -2637,16 +2479,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck6_5",
 				desc_id = "menu_deck6_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck6_6",
-				desc_id = "menu_deck6_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_level_2_dodge_addend_3",
@@ -2658,16 +2491,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck6_7",
 				desc_id = "menu_deck6_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck6_8",
-				desc_id = "menu_deck6_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_passive_loot_drop_multiplier",
@@ -2692,15 +2516,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck7_1",
 				desc_id = "menu_deck7_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck7_2",
-				desc_id = "menu_deck7_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_stand_still_crouch_camouflage_bonus_1",
@@ -2711,17 +2527,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck7_3",
 				desc_id = "menu_deck7_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck7_4",
-				desc_id = "menu_deck7_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_tier_dodge_chance_2",
@@ -2733,16 +2539,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck7_5",
 				desc_id = "menu_deck7_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck7_6",
-				desc_id = "menu_deck7_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_tier_dodge_chance_3",
@@ -2754,16 +2551,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck7_7",
 				desc_id = "menu_deck7_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck7_8",
-				desc_id = "menu_deck7_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_armor_regen_timer_stand_still_multiplier",
@@ -2788,15 +2576,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck8_1",
 				desc_id = "menu_deck8_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck8_2",
-				desc_id = "menu_deck8_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_damage_dampener_close_contact_2"
@@ -2806,17 +2586,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck8_3",
 				desc_id = "menu_deck8_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck8_4",
-				desc_id = "menu_deck8_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_damage_dampener_close_contact_3",
@@ -2828,16 +2598,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck8_5",
 				desc_id = "menu_deck8_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck8_6",
-				desc_id = "menu_deck8_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_damage_dampener_outnumbered_strong",
@@ -2848,16 +2609,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck8_7",
 				desc_id = "menu_deck8_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck8_8",
-				desc_id = "menu_deck8_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_melee_life_leech",
@@ -2882,15 +2634,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck9_1",
 				desc_id = "menu_deck9_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck9_2",
-				desc_id = "menu_deck9_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_killshot_regen_armor_bonus"
@@ -2900,17 +2644,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck9_3",
 				desc_id = "menu_deck9_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck9_4",
-				desc_id = "menu_deck9_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_melee_kill_life_leech"
@@ -2920,16 +2654,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck9_5",
 				desc_id = "menu_deck9_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck9_6",
-				desc_id = "menu_deck9_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_killshot_close_regen_armor_bonus"
@@ -2939,16 +2664,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck9_7",
 				desc_id = "menu_deck9_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck9_8",
-				desc_id = "menu_deck9_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_killshot_close_panic_chance",
@@ -2972,15 +2688,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck10_1",
 				desc_id = "menu_deck10_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck10_2",
-				desc_id = "menu_deck10_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"temporary_loose_ammo_give_team"
@@ -2990,17 +2698,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck10_3",
 				desc_id = "menu_deck10_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck10_4",
-				desc_id = "menu_deck10_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_loose_ammo_restore_health_give_team"
@@ -3010,16 +2708,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck10_5",
 				desc_id = "menu_deck10_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck10_6",
-				desc_id = "menu_deck10_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"temporary_loose_ammo_restore_health_2"
@@ -3029,16 +2718,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck10_7",
 				desc_id = "menu_deck10_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck10_8",
-				desc_id = "menu_deck10_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"temporary_loose_ammo_restore_health_3",
@@ -3063,18 +2743,11 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck11_1",
 				desc_id = "menu_deck11_1_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_headshot_damage_multiplier"
-				},
-				cost = 300,
-				icon_xy = {1, 0},
-				name_id = "menu_deck11_2",
-				desc_id = "menu_deck11_2_desc"
-			},
+			deck2,
 			{
 				upgrades = {
 					"player_damage_to_hot_2",
+					"player_passive_health_multiplier_1",
 					"player_passive_health_multiplier_2"
 				},
 				cost = 400,
@@ -3082,17 +2755,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck11_3",
 				desc_id = "menu_deck11_3_desc"
 			},
-			{
-				upgrades = {
-					"passive_player_xp_multiplier",
-					"player_passive_suspicion_bonus",
-					"player_passive_armor_movement_penalty_multiplier"
-				},
-				cost = 600,
-				icon_xy = {3, 0},
-				name_id = "menu_deck11_4",
-				desc_id = "menu_deck11_4_desc"
-			},
+			deck4,
 			{
 				upgrades = {
 					"player_damage_to_hot_3",
@@ -3103,16 +2766,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck11_5",
 				desc_id = "menu_deck11_5_desc"
 			},
-			{
-				upgrades = {
-					"armor_kit",
-					"player_pick_up_ammo_multiplier"
-				},
-				cost = 1600,
-				icon_xy = {5, 0},
-				name_id = "menu_deck11_6",
-				desc_id = "menu_deck11_6_desc"
-			},
+			deck6,
 			{
 				upgrades = {
 					"player_damage_to_hot_4",
@@ -3123,16 +2777,7 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck11_7",
 				desc_id = "menu_deck11_7_desc"
 			},
-			{
-				upgrades = {
-					"weapon_passive_damage_multiplier",
-					"passive_doctor_bag_interaction_speed_multiplier"
-				},
-				cost = 3200,
-				icon_xy = {7, 0},
-				name_id = "menu_deck11_8",
-				desc_id = "menu_deck11_8_desc"
-			},
+			deck8,
 			{
 				upgrades = {
 					"player_damage_to_hot_extra_ticks",

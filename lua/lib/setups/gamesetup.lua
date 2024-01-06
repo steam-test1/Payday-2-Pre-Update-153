@@ -30,6 +30,7 @@ require("lib/managers/CriminalsManager")
 require("lib/managers/FeedBackManager")
 require("lib/managers/TimeSpeedManager")
 require("lib/managers/ExplosionManager")
+require("lib/managers/DOTManager")
 core:import("SequenceManager")
 if Application:editor() then
 	require("lib/utils/dev/tools/WorldEditor")
@@ -199,7 +200,7 @@ function GameSetup:load_packages()
 	local level_package
 	if not Global.level_data or not Global.level_data.level_id then
 		if not Application:editor() then
-			level_package = "packages/level_debug"
+			level_package = "packages/wip/level_debug"
 		end
 	else
 		local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
@@ -310,6 +311,7 @@ function GameSetup:init_managers(managers)
 	managers.game_play_central = GamePlayCentralManager:new()
 	managers.action_messaging = ActionMessagingManager:new()
 	managers.motion_path = MotionPathManager:new()
+	managers.dot = DOTManager:new()
 	if SystemInfo:platform() == Idstring("X360") then
 		managers.blackmarket:load_equipped_weapons()
 	end
@@ -398,6 +400,7 @@ function GameSetup:update(t, dt)
 	managers.objectives:update(t, dt)
 	managers.explosion:update(t, dt)
 	managers.fire:update(t, dt)
+	managers.dot:update(t, dt)
 	managers.motion_path:update(t, dt)
 	if script_data.level_script and script_data.level_script.update then
 		script_data.level_script:update(t, dt)

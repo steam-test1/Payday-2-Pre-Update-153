@@ -16,6 +16,7 @@ function GamePlayCentralManager:init()
 	self._play_sounds = {}
 	self._footsteps = {}
 	self._queue_fire_raycast = {}
+	self._projectile_trails = {}
 	self._effect_manager = World:effect_manager()
 	self._slotmask_flesh = managers.slot:get_mask("flesh")
 	self._slotmask_world_geometry = managers.slot:get_mask("world_geometry")
@@ -159,6 +160,7 @@ function GamePlayCentralManager:update(t, dt)
 			end
 		end
 	end
+	self:_update_projectile_trails(t, dt)
 end
 
 function GamePlayCentralManager:end_update(t, dt)
@@ -611,6 +613,47 @@ function GamePlayCentralManager:do_shotgun_push(unit, hit_pos, dir, distance)
 			World:play_physic_effect(Idstring("physic_effects/shotgun_hit"), u_body, Vector3(dir.x, dir.y, dir.z + 0.5) * 600 * scale, 4 * body_mass / math.random(2), rot_acc, rot_time)
 		end
 		i_u_body = i_u_body + 1
+	end
+end
+
+local default_projectile_trail = Idstring("effects/payday2/particles/weapons/arrow_trail")
+
+function GamePlayCentralManager:add_projectile_trail(unit, object, effect)
+	if self._projectile_trails[unit:key()] then
+		return
+	end
+	local effect_ids = effect and Idstring(effect) or default_projectile_trail
+	local effect = self._effect_manager:spawn({effect = effect_ids, parent = object})
+	self._projectile_trails[unit:key()] = {effect = effect}
+end
+
+function GamePlayCentralManager:remove_projectile_trail(unit)
+	local data = self._projectile_trails[unit:key()]
+	if not data then
+		return
+	end
+	if data.total_t then
+		return
+	end
+	data.total_t = 0.5
+	data.t = data.total_t
+end
+
+local atom_ids = Idstring("Trail - Straight")
+local simulator_ids = Idstring("opacity_1")
+local opacity_ids = Idstring("opacity")
+
+function GamePlayCentralManager:_update_projectile_trails(t, dt)
+	for unit_key, data in pairs(self._projectile_trails) do
+		if data.t then
+			data.t = math.max(data.t - dt, 0)
+			local opacity = data.t / data.total_t
+			World:effect_manager():set_simulator_var_float(data.effect, atom_ids, simulator_ids, opacity_ids, opacity)
+			if data.t == 0 then
+				self._effect_manager:kill(data.effect)
+				self._projectile_trails[unit_key] = nil
+			end
+		end
 	end
 end
 

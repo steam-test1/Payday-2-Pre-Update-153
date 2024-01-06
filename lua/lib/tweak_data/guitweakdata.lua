@@ -330,6 +330,14 @@ function GuiTweakData:init()
 		store = 358150,
 		image = "guis/dlcs/bbq/textures/pd2/content_updates/bbq"
 	}
+	local fpsanimation = {
+		id = "fpsanimation",
+		name_id = "menu_content_fpsanimation",
+		desc_id = "menu_content_fpsanimation_desc",
+		date_id = "menu_content_fpsanimation_date",
+		webpage = "http://www.overkillsoftware.com/animations-update/",
+		image = "guis/textures/pd2/content_updates/fpsanimation"
+	}
 	local springcleaning = {
 		id = "springcleaning",
 		name_id = "menu_content_springcleaning",
@@ -386,6 +394,14 @@ function GuiTweakData:init()
 		store = 374300,
 		image = "guis/dlcs/kenaz/textures/pd2/content_updates/kenaz"
 	}
+	local turtles = {
+		id = "turtles",
+		name_id = "menu_content_turtles",
+		desc_id = "menu_content_turtles_desc",
+		date_id = "menu_content_turtles_date",
+		store = 384021,
+		image = "guis/dlcs/turtles/textures/pd2/content_updates/turtles"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -439,7 +455,8 @@ function GuiTweakData:init()
 			shoutout,
 			arena,
 			kenaz,
-			character_pack_sokol
+			character_pack_sokol,
+			turtles
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -540,7 +557,8 @@ function GuiTweakData:init()
 		saw = "wpn_special",
 		minigun = "wpn_special",
 		flamethrower = "wpn_special",
-		bow = "wpn_special"
+		bow = "wpn_special",
+		crossbow = "wpn_special"
 	}
 	self.LONGEST_CHAR_NAME = "JOHN WICK"
 	self.crime_net.regions = {

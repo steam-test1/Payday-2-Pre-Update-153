@@ -2104,6 +2104,20 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_btn_preview_melee_weapon",
 				callback = callback(self, self, "preview_melee_weapon_callback")
 			},
+			lo_mw_add_favorite = {
+				prio = 3,
+				btn = "BTN_Y",
+				pc_btn = Idstring("menu_modify_item"),
+				name = "bm_menu_btn_add_favorite",
+				callback = callback(self, self, "add_melee_weapon_favorite")
+			},
+			lo_mw_remove_favorite = {
+				prio = 3,
+				btn = "BTN_Y",
+				pc_btn = Idstring("menu_modify_item"),
+				name = "bm_menu_btn_remove_favorite",
+				callback = callback(self, self, "remove_melee_weapon_favorite")
+			},
 			lo_g_equip = {
 				prio = 1,
 				btn = "BTN_A",
@@ -3439,7 +3453,7 @@ function BlackMarketGui:_get_armor_stats(name)
 			local movement_penalty = managers.player:body_armor_value("movement", upgrade_level)
 			local base_value = math.round(movement_penalty * base)
 			base_stats[stat.name] = {value = base_value}
-			local skill_mod = managers.player:movement_speed_multiplier(false, false, upgrade_level)
+			local skill_mod = managers.player:movement_speed_multiplier(false, false, upgrade_level, 1)
 			local skill_value = math.round(skill_mod * base) - base_value
 			skill_stats[stat.name] = {value = skill_value}
 			skill_stats[stat.name].skill_in_effect = 0 < skill_value
@@ -4390,6 +4404,10 @@ function BlackMarketGui:update_info_text()
 		end
 	elseif identifier == self.identifiers.melee_weapon then
 		updated_texts[1].text = self._slot_data.name_localized
+		if tweak_data.blackmarket.melee_weapons[slot_data.name].info_id then
+			updated_texts[2].text = managers.localization:text(tweak_data.blackmarket.melee_weapons[slot_data.name].info_id)
+			updated_texts[2].below_stats = true
+		end
 		if not slot_data.unlocked then
 			local skill_based = slot_data.skill_based
 			local level_based = slot_data.level and 0 < slot_data.level
@@ -5950,9 +5968,6 @@ function BlackMarketGui:populate_grenades(data)
 		yd = y[2]
 		x_td = m_tweak_data[x[1]]
 		y_td = m_tweak_data[y[1]]
-		if not xd.is_favorite ~= not yd.is_favorite then
-			return xd.is_favorite
-		end
 		if xd.unlocked ~= yd.unlocked then
 			return xd.unlocked
 		end
@@ -6054,9 +6069,6 @@ function BlackMarketGui:populate_melee_weapons(data)
 		yd = y[2]
 		x_td = m_tweak_data[x[1]]
 		y_td = m_tweak_data[y[1]]
-		if not xd.is_favorite ~= not yd.is_favorite then
-			return xd.is_favorite
-		end
 		if xd.unlocked ~= yd.unlocked then
 			return xd.unlocked
 		end
@@ -6182,7 +6194,7 @@ function BlackMarketGui:populate_melee_weapons(data)
 		if new_data.unlocked and not new_data.equipped then
 			table.insert(new_data, "lo_mw_equip")
 		end
-		if data.allow_preview and m_tweak_data.unit then
+		if data.allow_preview and m_tweak_data.unit and not m_tweak_data.no_inventory_preview then
 			table.insert(new_data, "lo_mw_preview")
 		end
 		data[i] = new_data
@@ -6350,9 +6362,12 @@ function BlackMarketGui:populate_masks(data)
 				if not crafted.modded and managers.blackmarket:can_modify_mask(i) and i ~= 1 then
 					table.insert(new_data, "m_mod")
 				end
-				if i ~= 1 then
-					table.insert(new_data, "m_preview")
+				table.insert(new_data, "m_preview")
+			else
+				if i ~= 1 and new_data.equipped then
+					table.insert(new_data, "m_move")
 				end
+				table.insert(new_data, "m_preview")
 			end
 			if i ~= 1 then
 				if 0 < managers.money:get_mask_sell_value(new_data.name, new_data.global_value) then
@@ -7189,6 +7204,7 @@ function BlackMarketGui:populate_mask_mod_types(data)
 		end
 		new_data.stream = type ~= "colors"
 		if not new_data.my_part_data.is_good then
+			table.insert(new_data, "mm_preview")
 		elseif type == "colors" then
 			new_data.bitmap_texture = "guis/textures/pd2/blackmarket/icons/colors/color_bg"
 			new_data.extra_bitmaps = {}
@@ -7274,6 +7290,10 @@ function BlackMarketGui:populate_choose_mask_mod(data)
 	local new_data = {}
 	local index = 1
 	local equipped_mod = managers.blackmarket:customize_mask_category_id(data.category)
+	local num_data = #data
+	for i = 1, num_data do
+		data[i] = nil
+	end
 	local type_func = type
 	local guis_catalog = "guis/"
 	for type, mods in pairs(data.on_create_data) do
@@ -7355,6 +7375,7 @@ function BlackMarketGui:populate_choose_mask_mod(data)
 		new_data.unlocked = true
 		new_data.can_afford = true
 		new_data.equipped = false
+		table.insert(new_data, "mm_preview")
 		data[1] = new_data
 	end
 	local max_mask_mods = #data.on_create_data
@@ -7660,6 +7681,18 @@ end
 
 function BlackMarketGui:preview_weapon_callback(data)
 	self:_preview_weapon(data)
+end
+
+function BlackMarketGui:_preview_character_mask(data)
+	local mask_id = tweak_data:get_raw_value("blackmarket", "masks", "character_locked", CriminalsManager.convert_old_to_new_character_workname(data.name))
+	if mask_id then
+		managers.blackmarket:view_mask_with_mask_id(mask_id)
+		managers.menu:open_node("blackmarket_preview_mask_node", {})
+	end
+end
+
+function BlackMarketGui:preview_character_mask_callback(data)
+	self:_preview_character_mask(data)
 end
 
 function BlackMarketGui:_preview_mask(data)
@@ -8037,7 +8070,6 @@ function BlackMarketGui:choose_mask_buy_callback(data)
 				local dlc_tweak, global_value_tweak, global_value
 				for _, dlc in ipairs(dlcs) do
 					global_value = mask.global_value or dlc
-					dlc_tweak = tweak_data.dlc[dlc] or {}
 					global_value_tweak = tweak_data.lootdrop.global_values[global_value] or {}
 					add_dlc = not global_value_tweak.hide_unavailable or managers.dlc:is_dlc_unlocked(dlc)
 					if add_dlc then
