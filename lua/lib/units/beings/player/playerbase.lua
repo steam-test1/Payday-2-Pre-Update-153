@@ -31,7 +31,7 @@ function PlayerBase:post_init()
 		self._unregistered = true
 	end
 	self._unit:character_damage():post_init()
-	local con_mul, index = managers.blackmarket:get_concealment_of_peer(Global.local_member:peer())
+	local con_mul, index = managers.blackmarket:get_concealment_of_peer(managers.network:session():local_peer())
 	self:set_suspicion_multiplier("equipment", 1 / con_mul)
 	self:set_detection_multiplier("equipment", 1 / con_mul)
 end
@@ -67,7 +67,7 @@ function PlayerBase:setup_hud_offset(peer)
 	if not self._suspicion_settings then
 		return
 	end
-	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(peer or Global.local_member:peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
+	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(peer or managers.network:session():local_peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 end
 
 function PlayerBase:_chk_set_unit_upgrades()
@@ -274,7 +274,7 @@ function PlayerBase:id()
 end
 
 function PlayerBase:nick_name()
-	return Global.local_member:peer():name()
+	return managers.network:session():local_peer():name()
 end
 
 function PlayerBase:set_controller_enabled(enabled)
@@ -385,8 +385,11 @@ function PlayerBase:pre_destroy(unit)
 		managers.hud:hide(self.PLAYER_HUD)
 	end
 	self:set_stats_screen_visible(false)
-	if Global.local_member then
-		Global.local_member:set_unit(nil)
+	if managers.network:session() then
+		local peer = managers.network:session():local_peer()
+		if peer then
+			peer:set_unit(nil)
+		end
 	end
 	unit:movement():pre_destroy(unit)
 	unit:inventory():pre_destroy(unit)

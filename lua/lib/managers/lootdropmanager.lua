@@ -342,7 +342,7 @@ function LootDropManager:make_drop(return_data)
 end
 
 function LootDropManager:_make_drop(debug, add_to_inventory, debug_stars, return_data)
-	local human_players = managers.network:game() and managers.network:game():amount_of_alive_players() or 1
+	local human_players = managers.network:session() and managers.network:session():amount_of_alive_players() or 1
 	local all_humans = human_players == 4
 	local plvl = managers.experience:current_level()
 	local stars = debug_stars or managers.job:current_job_stars()

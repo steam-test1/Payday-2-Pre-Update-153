@@ -301,6 +301,7 @@ function GenericDLCManager:has_dlc(dlc)
 	local dlc_data = Global.dlc_manager.all_dlc_data[dlc]
 	if not dlc_data then
 		Application:error("Didn't have dlc data for", dlc)
+		Application:stack_dump()
 		return false
 	end
 	return dlc_data.verified
@@ -486,6 +487,14 @@ end
 
 function GenericDLCManager:has_arena()
 	return Global.dlc_manager.all_dlc_data.arena and Global.dlc_manager.all_dlc_data.arena.verified
+end
+
+function GenericDLCManager:has_character_pack_sokol()
+	return Global.dlc_manager.all_dlc_data.character_pack_sokol and Global.dlc_manager.all_dlc_data.character_pack_sokol.verified
+end
+
+function GenericDLCManager:has_kenaz()
+	return Global.dlc_manager.all_dlc_data.kenaz and Global.dlc_manager.all_dlc_data.kenaz.verified
 end
 
 function GenericDLCManager:has_xmas_soundtrack()
@@ -1303,11 +1312,13 @@ function WINDLCManager:init()
 			},
 			character_pack_clover = {app_id = "337661", no_install = true},
 			character_pack_dragan = {app_id = "344140", no_install = true},
+			character_pack_sokol = {app_id = "374301", no_install = true},
 			hope_diamond = {app_id = "337660", no_install = true},
 			the_bomb = {app_id = "339480", no_install = true},
 			bbq = {app_id = "358150", no_install = true},
 			west = {app_id = "349830", no_install = true},
 			arena = {app_id = "366660", no_install = true},
+			kenaz = {app_id = "374300", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			bsides_soundtrack = {app_id = "368870", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},

@@ -300,7 +300,7 @@ function HUDAssaultCorner:_animate_text(text_panel, bg_box, color)
 end
 
 function HUDAssaultCorner:sync_start_assault(data)
-	if self._point_of_no_return then
+	if self._point_of_no_return or self._casing then
 		return
 	end
 	self:_hide_hostages()
@@ -329,7 +329,7 @@ function HUDAssaultCorner:sync_start_assault(data)
 end
 
 function HUDAssaultCorner:sync_end_assault(result)
-	if self._point_of_no_return then
+	if self._point_of_no_return or self._casing then
 		return
 	end
 	self:_end_assault()
@@ -401,7 +401,9 @@ function HUDAssaultCorner:_hide_icon_assaultbox(icon_assaultbox)
 		icon_assaultbox:set_alpha(alpha)
 	end
 	icon_assaultbox:set_alpha(0)
-	self:_show_hostages()
+	if not self._casing then
+		self:_show_hostages()
+	end
 end
 
 function HUDAssaultCorner:_show_hostages()
@@ -475,7 +477,7 @@ function HUDAssaultCorner:show_casing(mode)
 	text_panel:script().text_list = {}
 	self._casing_bg_box:script().text_list = {}
 	local msg
-	if mode == "clean" then
+	if mode == "civilian" then
 		msg = {
 			"hud_casing_mode_ticker_clean",
 			"hud_assault_end_line",

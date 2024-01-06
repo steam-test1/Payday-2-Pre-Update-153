@@ -72,7 +72,7 @@ end
 
 function ElementFilter:_check_players()
 	local players = Global.running_simulation and managers.editor:mission_player()
-	players = players or managers.network:game() and managers.network:game():amount_of_members()
+	players = players or managers.network:session() and managers.network:session():amount_of_players()
 	if not players then
 		return false
 	end

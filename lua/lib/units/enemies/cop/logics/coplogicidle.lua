@@ -1019,12 +1019,6 @@ function CopLogicIdle._upd_curious_reaction(data)
 	local set_attention = data.unit:movement():attention()
 	if not set_attention or set_attention.u_key ~= attention_obj.u_key then
 		CopLogicBase._set_attention(data, attention_obj)
-		if is_suspicious then
-			local member = managers.network:game():member_from_unit(attention_obj.unit)
-			if not member or member == Global.local_member then
-			else
-			end
-		end
 	end
 	
 	local function _get_spin_to_att_obj()

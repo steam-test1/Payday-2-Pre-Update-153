@@ -659,8 +659,8 @@ function Xbox360UserManager:disconnect_callback(reason)
 	elseif self._in_online_menu then
 		print("leave crimenet")
 		managers.menu:xbox_disconnected()
-	elseif managers.network:game() then
-		managers.network:game():xbox_disconnected()
+	elseif managers.network:session() then
+		managers.network:session():xbox_disconnected()
 	end
 end
 
@@ -911,8 +911,8 @@ function PS4UserManager:disconnect_callback()
 	end
 	if managers.network:session() and managers.network:session():_local_peer_in_lobby() then
 		managers.menu:psn_disconnected()
-	elseif managers.network:game() then
-		managers.network:game():psn_disconnected()
+	elseif managers.network:session() then
+		managers.network:session():psn_disconnected()
 	end
 end
 
@@ -1030,8 +1030,8 @@ function XB1UserManager:disconnect_callback(reason)
 	elseif self._in_online_menu then
 		print("leave crimenet")
 		managers.menu:xbox_disconnected()
-	elseif managers.network:game() then
-		managers.network:game():xbox_disconnected()
+	elseif managers.network:session() then
+		managers.network:session():xbox_disconnected()
 	end
 end
 

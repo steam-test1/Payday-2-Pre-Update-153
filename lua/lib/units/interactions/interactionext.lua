@@ -226,13 +226,10 @@ function BaseInteractionExt:_has_required_upgrade(movement_state)
 	if not movement_state then
 		return true
 	end
-	if movement_state == "mask_off" or movement_state == "clean" then
-		if self._tweak_data.requires_mask_off_upgrade then
-			local category = self._tweak_data.requires_mask_off_upgrade.category
-			local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
-			return managers.player:has_category_upgrade(category, upgrade)
-		end
-		return true
+	if self._tweak_data.requires_mask_off_upgrade and movement_state == "mask_off" then
+		local category = self._tweak_data.requires_mask_off_upgrade.category
+		local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
+		return managers.player:has_category_upgrade(category, upgrade)
 	end
 	if self._tweak_data.requires_upgrade then
 		local category = self._tweak_data.requires_upgrade.category
@@ -257,15 +254,24 @@ function BaseInteractionExt:_allowed_in_movement_state(movement_state)
 end
 
 function BaseInteractionExt:_is_in_required_state(movement_state)
-	if movement_state == "clean" or movement_state == "mask_off" then
-		if self._tweak_data.requires_mask_off_upgrade then
+	if self._tweak_data.can_interact_only_in_civilian then
+		if movement_state == "civilian" then
+			return true
+		else
+			return false
+		end
+	end
+	if movement_state == "civilian" or movement_state == "clean" or movement_state == "mask_off" then
+		if self._tweak_data.requires_mask_off_upgrade and movement_state == "mask_off" then
 			local category = self._tweak_data.requires_mask_off_upgrade.category
 			local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
 			return managers.player:has_category_upgrade(category, upgrade)
+		else
+			return self._tweak_data.can_interact_in_civilian
 		end
-		return self._tweak_data.can_interact_in_casing
+	else
+		return true
 	end
-	return true
 end
 
 function BaseInteractionExt:_interact_say(data)
@@ -383,13 +389,13 @@ function BaseInteractionExt:interact(player)
 end
 
 function BaseInteractionExt:can_interact(player)
-	if (managers.player:current_state() == "clean" or managers.player:current_state() == "mask_off") and not self._tweak_data.can_interact_in_casing then
-		return false
-	end
 	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if not self:_has_required_deployable() then
+		return false
+	end
+	if not self:_is_in_required_state(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
@@ -573,7 +579,7 @@ function UseInteractionExt:sync_interacted(peer, player, status, skip_alive_chec
 	if not self._active then
 		return
 	end
-	local player = managers.network:game():member(peer:id()):unit()
+	local player = peer:unit()
 	if not skip_alive_check and not alive(player) then
 		return
 	end
@@ -1008,6 +1014,58 @@ function C4BagInteractionExt:interact(player)
 	return true
 end
 
+MultipleEquipmentBagInteractionExt = MultipleEquipmentBagInteractionExt or class(UseInteractionExt)
+
+function MultipleEquipmentBagInteractionExt:_interact_blocked(player)
+	return not managers.player:can_pickup_equipment(self._special_equipment or "c4")
+end
+
+function MultipleEquipmentBagInteractionExt:interact(player)
+	MultipleEquipmentBagInteractionExt.super.super.interact(self, player)
+	local equipment_name = self._special_equipment or "c4"
+	local max_player_can_carry = tweak_data.equipments.specials[equipment_name].quantity or 1
+	local player_equipment = managers.player:has_special_equipment(equipment_name)
+	local amount_wanted
+	if player_equipment then
+		amount_wanted = max_player_can_carry - Application:digest_value(player_equipment.amount, false)
+	else
+		amount_wanted = max_player_can_carry
+	end
+	if Network:is_server() then
+		self:sync_interacted(nil, player, amount_wanted)
+	else
+		managers.network:session():send_to_host("sync_multiple_equipment_bag_interacted", self._unit, amount_wanted)
+	end
+end
+
+function MultipleEquipmentBagInteractionExt:sync_interacted(peer, player, amount_wanted)
+	local instigator = player or peer:unit()
+	if Network:is_server() then
+		if self._unit:damage():has_sequence("load") then
+			self._unit:damage():run_sequence_simple("load")
+		end
+		if self._global_event then
+			managers.mission:call_global_event(self._global_event, instigator)
+		end
+	end
+	local equipment_name = self._special_equipment or "c4"
+	local starting_quantity = tweak_data.equipments.specials[equipment_name] and tweak_data.equipments.specials[equipment_name].quantity or 1
+	self._current_quantity = self._current_quantity or starting_quantity
+	local amount_to_give = math.min(self._current_quantity, amount_wanted)
+	if peer then
+		managers.network:session():send_to_peer(peer, "give_equipment", equipment_name, amount_to_give, false)
+	elseif player then
+		managers.player:add_special({name = equipment_name, amount = amount_to_give})
+	end
+	if self._remove_when_empty then
+		self._current_quantity = self._current_quantity - amount_to_give
+		if self._current_quantity <= 0 then
+			self._unit:set_slot(0)
+			managers.network:session():send_to_peers("remove_unit", self._unit)
+		end
+	end
+end
+
 VeilInteractionExt = VeilInteractionExt or class(UseInteractionExt)
 
 function VeilInteractionExt:_interact_blocked(player)
@@ -1226,7 +1284,7 @@ function IntimitateInteractionExt:interact(player)
 			self:set_active(false, true)
 			self._unit:set_slot(0)
 			managers.network:session():send_to_peers_synched("remove_corpse_by_id", u_id, true, managers.network:session():local_peer():id())
-			managers.player:register_carry(managers.network:session():local_peer():id(), "person")
+			managers.player:register_carry(managers.network:session():local_peer(), "person")
 		else
 			managers.network:session():send_to_host("sync_interacted_by_id", u_id, self.tweak_data)
 			player:movement():set_carry_restriction(true)
@@ -1329,8 +1387,7 @@ function IntimitateInteractionExt:sync_interacted(peer, player, status, skip_ali
 		local unit = player
 		
 		if not unit then
-			local member = managers.network:game():member(peer:id())
-			unit = member and member:unit()
+			unit = peer and peer:unit()
 			if not unit then
 				print("[IntimitateInteractionExt:sync_interacted] missing unit", inspect(peer))
 			end
@@ -1393,7 +1450,7 @@ function IntimitateInteractionExt:sync_interacted(peer, player, status, skip_ali
 		end
 	elseif self.tweak_data == "corpse_dispose" then
 		if peer then
-			managers.player:register_carry(peer:id(), "person")
+			managers.player:register_carry(peer, "person")
 		end
 		self:remove_interact()
 		self:set_active(false, true)
@@ -1444,11 +1501,11 @@ function IntimitateInteractionExt:_interact_blocked(player)
 	end
 end
 
-function IntimitateInteractionExt:_is_in_required_state()
+function IntimitateInteractionExt:_is_in_required_state(player)
 	if self.tweak_data == "corpse_dispose" and not managers.groupai:state():whisper_mode() then
 		return false
 	end
-	return IntimitateInteractionExt.super._is_in_required_state(self)
+	return IntimitateInteractionExt.super._is_in_required_state(self, player)
 end
 
 function IntimitateInteractionExt:on_interacting_unit_destroyed(peer, player)
@@ -1480,7 +1537,7 @@ function CarryInteractionExt:interact(player)
 	managers.player:set_carry(self._unit:carry_data():carry_id(), self._unit:carry_data():multiplier(), self._unit:carry_data():dye_pack_data())
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
 	self:sync_interacted(nil, player)
-	managers.player:register_carry(managers.network:session():local_peer():id(), self._unit:carry_data() and self._unit:carry_data():carry_id())
+	managers.player:register_carry(managers.network:session():local_peer(), self._unit:carry_data() and self._unit:carry_data():carry_id())
 	if Network:is_client() then
 		player:movement():set_carry_restriction(true)
 	else
@@ -1489,8 +1546,8 @@ function CarryInteractionExt:interact(player)
 end
 
 function CarryInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
-	player = player or managers.network:game():member(peer:id()):unit()
-	if peer and not managers.player:register_carry(peer:id(), self._unit:carry_data() and self._unit:carry_data():carry_id()) then
+	player = player or peer:unit()
+	if peer and not managers.player:register_carry(peer, self._unit:carry_data() and self._unit:carry_data():carry_id()) then
 		return
 	end
 	if self._unit:damage():has_sequence("interact") then
@@ -1576,7 +1633,7 @@ function LootBankInteractionExt:interact(player)
 end
 
 function LootBankInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
-	local player = player or managers.network:game():member(peer:id()):unit()
+	local player = player or peer:unit()
 	self._unit:damage():run_sequence_simple("unload", {unit = player})
 end
 
@@ -1869,7 +1926,7 @@ function SpecialEquipmentInteractionExt:interact(player)
 end
 
 function SpecialEquipmentInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
-	player = player or managers.network:game():member(peer:id()):unit()
+	player = player or peer:unit()
 	if self._unit:damage():has_sequence("load") then
 		self._unit:damage():run_sequence_simple("load")
 	end
@@ -1912,7 +1969,7 @@ function MissionElementInteractionExt:set_override_timer_value(override_timer_va
 end
 
 function MissionElementInteractionExt:sync_net_event(event_id, peer)
-	local player = managers.network:game():member(peer:id()):unit()
+	local player = peer:unit()
 	if event_id == BaseInteractionExt.EVENT_IDS.at_interact_start then
 		if Network:is_server() then
 			self._mission_element:on_interact_start(player)

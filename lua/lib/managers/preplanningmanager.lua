@@ -407,9 +407,6 @@ end
 
 function PrePlanningManager:on_execute_preplanning()
 	if self:has_current_level_preplanning() then
-		if Network:is_server() then
-			self:_execute_reserved_mission_elements()
-		end
 		managers.money:on_buy_preplanning_types()
 		managers.money:on_buy_preplanning_votes()
 		local current_budget, total_budget = self:get_current_budget()
@@ -436,10 +433,11 @@ function PrePlanningManager:on_execute_preplanning()
 	end
 	self._reserved_mission_elements = {}
 	self._players_votes = {}
+	self._executed_reserved_mission_elements = nil
 end
 
-function PrePlanningManager:_execute_reserved_mission_elements()
-	if Network:is_server() then
+function PrePlanningManager:execute_reserved_mission_elements()
+	if Network:is_server() and not self._executed_reserved_mission_elements then
 		local type, index
 		local current_budget, total_budget = self:get_current_budget()
 		current_budget = 0
@@ -483,6 +481,7 @@ function PrePlanningManager:_execute_reserved_mission_elements()
 			execute_func(type, index, finished_types)
 		end
 		self._finished_preplan = {finished_votes, finished_types}
+		self._executed_reserved_mission_elements = true
 	end
 end
 

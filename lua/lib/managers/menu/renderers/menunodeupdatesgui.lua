@@ -627,7 +627,7 @@ function MenuNodeUpdatesGui:open(content_update)
 		repeat
 			break -- pseudo-goto
 		until true
-		if not managers.dlc:has_dlc(content_update.id) then
+		if not managers.dlc:is_dlc_unlocked(content_update.id) then
 			managers.dlc:buy_product(content_update.id)
 		else
 			play_sound = false

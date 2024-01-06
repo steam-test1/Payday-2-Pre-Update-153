@@ -30,8 +30,11 @@ end
 function HostNetworkSession:create_local_peer(load_outfit)
 	HostNetworkSession.super.create_local_peer(self, load_outfit)
 	self._state_data.local_peer = self._local_peer
-	self._local_peer:set_id(1)
+	self:register_local_peer(1)
 	self:set_state("in_lobby")
+	if Network:multiplayer() then
+		Network:set_server()
+	end
 end
 
 function HostNetworkSession:on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
@@ -214,13 +217,13 @@ function HostNetworkSession:on_peer_save_received(event, event_data)
 			end
 			if self._local_peer:is_expecting_pause_confirmation(peer:id()) then
 				self._local_peer:set_expecting_drop_in_pause_confirmation(peer:id(), nil)
-				managers.network:game():on_drop_in_pause_request_received(peer:id(), peer:name(), false)
+				self:on_drop_in_pause_request_received(peer:id(), peer:name(), false)
 			end
 		end
 		for other_peer_id, other_peer in pairs(self._peers) do
 			self:chk_spawn_member_unit(other_peer, other_peer_id)
 		end
-		managers.network:game():on_peer_sync_complete(peer, peer:id())
+		self:on_peer_sync_complete(peer, peer:id())
 	end
 end
 
@@ -324,7 +327,7 @@ function HostNetworkSession:chk_initiate_dropin_pause(dropin_peer)
 	end
 	if not self._local_peer:is_expecting_pause_confirmation(dropin_peer:id()) then
 		self._local_peer:set_expecting_drop_in_pause_confirmation(dropin_peer:id(), "paused")
-		managers.network:game():on_drop_in_pause_request_received(dropin_peer:id(), dropin_peer:name(), true)
+		self:on_drop_in_pause_request_received(dropin_peer:id(), dropin_peer:name(), true)
 	end
 	dropin_peer:set_expecting_pause_sequence(nil)
 	dropin_peer:set_expecting_dropin(true)
@@ -420,7 +423,7 @@ function HostNetworkSession:remove_peer(peer, peer_id, reason)
 		end
 		if self._local_peer:is_expecting_pause_confirmation(peer_id) then
 			self._local_peer:set_expecting_drop_in_pause_confirmation(peer_id, nil)
-			managers.network:game():on_drop_in_pause_request_received(peer_id, "", false)
+			self:on_drop_in_pause_request_received(peer_id, "", false)
 		end
 		for other_peer_id, other_peer in pairs(self._peers) do
 			self:chk_initiate_dropin_pause(other_peer)
@@ -457,7 +460,7 @@ function HostNetworkSession:on_remove_peer_confirmation(sender_peer, removed_pee
 	end
 	sender_peer:set_handshake_status(removed_peer_id, nil)
 	self:chk_server_joinable_state()
-	managers.network:game():_check_start_game_intro()
+	self:check_start_game_intro()
 end
 
 function HostNetworkSession:on_dead_connection_reported(reporter_peer_id, other_peer_id)
@@ -501,13 +504,12 @@ end
 
 function HostNetworkSession:chk_spawn_member_unit(peer, peer_id)
 	print("[HostNetworkSession:chk_spawn_member_unit]", peer:name(), peer_id)
-	local member = managers.network:game():member(peer_id)
 	if not self._game_started then
 		print("Game not started yet")
 		return
 	end
-	if not (member and not member:spawn_unit_called() and peer:waiting_for_player_ready()) or not peer:is_streaming_complete() then
-		print("not ready to spawn unit: member", member, "member:spawn_unit_called()", member:spawn_unit_called(), "peer:waiting_for_player_ready()", peer:waiting_for_player_ready(), "peer:is_streaming_complete()", peer:is_streaming_complete())
+	if not (not peer:spawn_unit_called() and peer:waiting_for_player_ready()) or not peer:is_streaming_complete() then
+		print("not ready to spawn unit: peer:spawn_unit_called()", peer:spawn_unit_called(), "peer:waiting_for_player_ready()", peer:waiting_for_player_ready(), "peer:is_streaming_complete()", peer:is_streaming_complete())
 		return
 	end
 	for other_peer_id, other_peer in pairs(self._peers) do
@@ -522,7 +524,13 @@ function HostNetworkSession:chk_spawn_member_unit(peer, peer_id)
 	if not self:all_peers_done_loading_outfits() then
 		return
 	end
-	managers.network:game():spawn_dropin_player(peer_id)
+	self:_spawn_dropin_player(peer)
+end
+
+function HostNetworkSession:_spawn_dropin_player(peer)
+	managers.achievment:set_script_data("cant_touch_fail", true)
+	peer:spawn_unit(0, true)
+	managers.groupai:state():fill_criminal_team_with_AI(true)
 end
 
 function HostNetworkSession:chk_server_joinable_state()
@@ -565,33 +573,36 @@ function HostNetworkSession:chk_server_joinable_state()
 	managers.network.matchmake:set_server_joinable(true)
 end
 
-function HostNetworkSession:on_load_complete()
-	HostNetworkSession.super.on_load_complete(self)
-	if Global.load_start_menu_lobby then
-		managers.network.matchmake:set_server_state("in_lobby")
+function HostNetworkSession:on_load_complete(simulation)
+	HostNetworkSession.super.on_load_complete(self, simulation)
+	if not simulation then
+		if Global.load_start_menu_lobby then
+			managers.network.matchmake:set_server_state("in_lobby")
+			self:chk_server_joinable_state()
+			return
+		else
+			managers.network.matchmake:set_server_state("in_game")
+		end
 		self:chk_server_joinable_state()
-		return
-	else
-		managers.network.matchmake:set_server_state("in_game")
-	end
-	self:chk_server_joinable_state()
-	if NetworkManager.DROPIN_ENABLED then
-		for peer_id, peer in pairs(self._peers) do
-			if peer:loaded() then
-				if not managers.network:game():_has_client(peer) then
-					Network:add_client(peer:rpc())
-				end
-				if not peer:synched() then
-					peer:set_expecting_pause_sequence(true)
-					local dropin_pause_ok = self:chk_initiate_dropin_pause(peer)
-					if dropin_pause_ok then
-						self:chk_drop_in_peer(peer)
+		if NetworkManager.DROPIN_ENABLED then
+			for peer_id, peer in pairs(self._peers) do
+				if peer:loaded() then
+					if not self:_has_client(peer) then
+						Network:add_client(peer:rpc())
+					end
+					if not peer:synched() then
+						peer:set_expecting_pause_sequence(true)
+						local dropin_pause_ok = self:chk_initiate_dropin_pause(peer)
+						if dropin_pause_ok then
+							self:chk_drop_in_peer(peer)
+						end
 					end
 				end
 			end
 		end
+		self:_reset_outfit_loading_status_request()
 	end
-	self:_reset_outfit_loading_status_request()
+	self._local_peer:set_synched(true)
 end
 
 function HostNetworkSession:prepare_to_close(...)
@@ -656,7 +667,7 @@ function HostNetworkSession:chk_send_ready_to_unpause()
 	end
 	if self._local_peer:is_expecting_pause_confirmation(self._local_peer:id()) then
 		self._local_peer:set_expecting_drop_in_pause_confirmation(self._local_peer:id(), nil)
-		managers.network:game():on_drop_in_pause_request_received(self._local_peer:id(), "", false)
+		self:on_drop_in_pause_request_received(self._local_peer:id(), "", false)
 	end
 	return true
 end
@@ -729,8 +740,12 @@ function HostNetworkSession:on_peer_finished_loading_outfit(peer, request_id, ou
 	end
 end
 
-function HostNetworkSession:on_set_member_ready(peer_id, ready, state_changed)
-	self:chk_request_peer_outfit_load_status()
+function HostNetworkSession:on_set_member_ready(peer_id, ready, state_changed, from_network)
+	HostNetworkSession.super.on_set_member_ready(self, peer_id, ready, state_changed, from_network)
+	self:check_start_game_intro()
+	if from_network then
+		self:chk_request_peer_outfit_load_status()
+	end
 end
 
 function HostNetworkSession:_increment_outfit_loading_status_request_id()

@@ -32,6 +32,7 @@ function MenuManager:init(is_start_menu)
 	self._is_start_menu = is_start_menu
 	self._active = false
 	self._debug_menu_enabled = Global.DEBUG_MENU_ON or Application:production_build()
+	Global.debug_contour_enabled = nil
 	self:create_controller()
 	if is_start_menu then
 		local menu_main = {
@@ -549,7 +550,6 @@ end
 
 function MenuManager:flush_gpu_command_queue_changed(name, old_value, new_value)
 	RenderSettings.flush_gpu_command_queue = new_value
-	Application:save_render_settings()
 end
 
 function MenuManager:subtitle_changed(name, old_value, new_value)
@@ -1220,6 +1220,16 @@ function MenuCallbackHandler:dlc_buy_arena_pc()
 	Steam:overlay_activate("store", 366660)
 end
 
+function MenuCallbackHandler:dlc_buy_character_pack_sokol_pc()
+	print("[MenuCallbackHandler:dlc_buy_character_pack_sokol_pc]")
+	Steam:overlay_activate("store", 374301)
+end
+
+function MenuCallbackHandler:dlc_buy_kenaz_pc()
+	print("[MenuCallbackHandler:dlc_buy_kenaz_pc]")
+	Steam:overlay_activate("store", 374300)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1267,6 +1277,8 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"character_pack_sokol",
+		"kenaz",
 		"arena",
 		"west",
 		"bbq",
@@ -1388,6 +1400,14 @@ end
 
 function MenuCallbackHandler:visible_callback_arena()
 	return self:is_dlc_latest_locked("arena")
+end
+
+function MenuCallbackHandler:visible_callback_character_pack_sokol()
+	return self:is_dlc_latest_locked("character_pack_sokol")
+end
+
+function MenuCallbackHandler:visible_callback_kenaz()
+	return self:is_dlc_latest_locked("kenaz")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -1707,7 +1727,7 @@ function MenuCallbackHandler:toggle_ready(item)
 	if managers.menu:active_menu() and managers.menu:active_menu().renderer and managers.menu:active_menu().renderer.set_ready_items_enabled then
 		managers.menu:active_menu().renderer:set_ready_items_enabled(not ready)
 	end
-	managers.network:game():on_set_member_ready(managers.network:session():local_peer():id(), ready, true)
+	managers.network:session():on_set_member_ready(managers.network:session():local_peer():id(), ready, true, false)
 end
 
 function MenuCallbackHandler:change_nr_players(item)
@@ -5855,7 +5875,7 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 			if table.contains(contacts, contact) then
 				jobs[contact] = jobs[contact] or {}
 				local dlc = job_tweak.dlc
-				dlc = not dlc or tweak_data.dlc[dlc] and tweak_data.dlc[dlc].free or managers.dlc:has_dlc(dlc)
+				dlc = not dlc or managers.dlc:is_dlc_unlocked(dlc)
 				if not tweak_data.narrative:is_wrapped_to_job(job_id) then
 					table.insert(jobs[contact], {
 						id = job_id,

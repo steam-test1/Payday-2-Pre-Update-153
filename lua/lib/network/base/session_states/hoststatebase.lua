@@ -29,7 +29,7 @@ function HostStateBase:_has_peer_left_PSN(peer_name)
 end
 
 function HostStateBase:_is_in_server_state()
-	return managers.network:game() and Network:is_server()
+	return managers.network:session() and Network:is_server()
 end
 
 function HostStateBase:_introduce_new_peer_to_old_peers(data, new_peer, loading, peer_name, character, mask_set, xuid, xnaddr)
@@ -89,7 +89,7 @@ function HostStateBase:on_handshake_confirmation(data, peer, introduced_peer_id)
 			end
 		end
 	end
-	managers.network:game():_check_start_game_intro()
+	data.session:check_start_game_intro()
 end
 
 function HostStateBase:_is_kicked(data, peer_name, peer_rpc)
