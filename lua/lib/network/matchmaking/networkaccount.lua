@@ -46,3 +46,6 @@ end
 
 function NetworkAccount:_save_globals()
 end
+
+function NetworkAccount:refresh()
+end
