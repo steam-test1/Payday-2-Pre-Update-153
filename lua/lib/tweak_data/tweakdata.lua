@@ -1446,6 +1446,11 @@ function TweakData:init()
 			melee_id = "fairbair",
 			is_not_civilian = true,
 			is_stealth = true
+		},
+		knockout = {
+			award = "gorilla_1",
+			enemy = "tank",
+			melee_id = "boxing_gloves"
 		}
 	}
 	self.achievement.complete_heist_achievements = {

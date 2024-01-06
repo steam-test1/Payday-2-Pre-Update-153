@@ -553,21 +553,26 @@ function HuskPlayerMovement:anim_cbk_set_melee_item_state_vars(unit)
 	self._unit:anim_state_machine():set_parameter(state, anim_global_param, 1)
 end
 
-function HuskPlayerMovement:anim_cbk_spawn_melee_item(unit)
+function HuskPlayerMovement:anim_cbk_spawn_melee_item(unit, graphic_object)
 	if not (not alive(self._melee_item_unit) and managers.network:game()) or not managers.network:game():member_from_unit(self._unit) then
 		return
 	end
-	local align_obj_l_name = Idstring("a_weapon_left_front")
-	local align_obj_r_name = Idstring("a_weapon_right_front")
-	local align_obj_l = self._unit:get_object(align_obj_l_name)
-	local align_obj_r = self._unit:get_object(align_obj_r_name)
+	local align_obj_name = Idstring("a_weapon_left_front")
+	local align_obj = self._unit:get_object(align_obj_name)
 	local peer_id = managers.network:game():member_from_unit(self._unit):peer():id()
 	local peer = managers.network:session():peer(peer_id)
 	local melee_entry = peer:melee_id()
+	local graphic_object_name = Idstring(graphic_object)
+	local graphic_objects = tweak_data.blackmarket.melee_weapons[melee_entry].graphic_objects or {}
 	local unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].third_unit
 	if unit_name then
-		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj_l:position(), align_obj_l:rotation())
-		self._unit:link(align_obj_l:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+		self._melee_item_unit = World:spawn_unit(Idstring(unit_name), align_obj:position(), align_obj:rotation())
+		self._unit:link(align_obj:name(), self._melee_item_unit, self._melee_item_unit:orientation_object():name())
+		for a_object, g_object in pairs(graphic_objects) do
+			local g_obj_name = Idstring(g_object)
+			local g_obj = self._melee_item_unit:get_object(g_obj_name)
+			g_obj:set_visibility(Idstring(a_object) == graphic_object_name)
+		end
 		if alive(self._unit:inventory():equipped_unit()) and self._unit:inventory():equipped_unit():base().AKIMBO then
 			self._unit:inventory():equipped_unit():base():on_melee_item_shown()
 		end

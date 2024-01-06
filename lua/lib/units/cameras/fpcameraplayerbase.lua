@@ -862,12 +862,18 @@ function FPCameraPlayerBase:spawn_melee_item()
 		local aligns = tweak_data.blackmarket.melee_weapons[melee_entry].align_objects or {
 			"a_weapon_left"
 		}
+		local graphic_objects = tweak_data.blackmarket.melee_weapons[melee_entry].graphic_objects or {}
 		self._melee_item_units = {}
 		for _, align in ipairs(aligns) do
 			local align_obj_name = Idstring(align)
 			local align_obj = self._unit:get_object(align_obj_name)
 			local unit = World:spawn_unit(Idstring(unit_name), align_obj:position(), align_obj:rotation())
 			self._unit:link(align_obj:name(), unit, unit:orientation_object():name())
+			for a_object, g_object in pairs(graphic_objects) do
+				local graphic_obj_name = Idstring(g_object)
+				local graphic_obj = unit:get_object(graphic_obj_name)
+				graphic_obj:set_visibility(Idstring(a_object) == align_obj_name)
+			end
 			table.insert(self._melee_item_units, unit)
 		end
 	end

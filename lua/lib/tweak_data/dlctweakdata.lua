@@ -19,6 +19,7 @@ function DLCTweakData:init(tweak_data)
 		gage_pack_historical = true,
 		character_pack_clover = true,
 		pd2_goty = 1,
+		pd2_hw_boxing = true,
 		alienware_alpha = true,
 		season_pass = true,
 		animal = true
@@ -2402,6 +2403,18 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "hawkhelm",
+			amount = 1
+		}
+	}
+	self.ach_gorilla_1 = {}
+	self.ach_gorilla_1.dlc = "has_achievement"
+	self.ach_gorilla_1.achievement_id = "gorilla_1"
+	self.ach_gorilla_1.content = {}
+	self.ach_gorilla_1.content.loot_global_value = "normal"
+	self.ach_gorilla_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "champion_dallas",
 			amount = 1
 		}
 	}

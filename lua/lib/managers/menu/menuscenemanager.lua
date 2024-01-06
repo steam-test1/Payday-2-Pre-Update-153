@@ -1349,11 +1349,16 @@ function MenuSceneManager:spawn_melee_weapon(melee_weapon_id)
 	if not melee_weapon.unit then
 		return
 	end
-	self._one_frame_delayed_clbk = callback(self, self, "spawn_melee_weapon_clbk", melee_weapon.unit)
+	self._one_frame_delayed_clbk = callback(self, self, "spawn_melee_weapon_clbk", melee_weapon_id)
 	return
 end
 
-function MenuSceneManager:spawn_melee_weapon_clbk(melee_weapon_unit)
+function MenuSceneManager:spawn_melee_weapon_clbk(melee_weapon_id)
+	local melee_weapon = tweak_data.blackmarket.melee_weapons[melee_weapon_id]
+	if not melee_weapon.unit then
+		return
+	end
+	local melee_weapon_unit = melee_weapon.unit
 	local ids_unit_name = Idstring(melee_weapon_unit)
 	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
 	self._item_pos = Vector3(0, 0, 0)
@@ -1365,10 +1370,38 @@ function MenuSceneManager:spawn_melee_weapon_clbk(melee_weapon_unit)
 	local new_unit = World:spawn_unit(ids_unit_name, self._item_pos, self._item_rot)
 	self:_set_item_unit(new_unit)
 	mrotation.set_yaw_pitch_roll(self._item_rot_mod, -90, 0, 0)
+	local anim = melee_weapon.menu_scene_anim
+	if anim then
+		local anim_ids = Idstring(anim)
+		local anim_length = new_unit:anim_length(anim_ids)
+		local anim_params = melee_weapon.menu_scene_params or {}
+		if anim_params.loop then
+			new_unit:anim_play_loop(anim_ids, 0, anim_length)
+		else
+			new_unit:anim_play(anim_ids)
+		end
+		if anim_params.start_time then
+			local start_time = anim_params.start_time
+			if start_time == -1 then
+				start_time = anim_length
+			end
+			new_unit:anim_set_time(start_time)
+		end
+		new_unit:set_visible(false)
+		local anim_time = 0.033333335
+		self:add_callback(callback(self, self, "_show_item_unit"), anim_time)
+	end
 	return new_unit
 end
 
 function MenuSceneManager:destroy_melee_weapon()
+end
+
+function MenuSceneManager:_show_item_unit()
+	if not self._item_unit or not alive(self._item_unit.unit) then
+		return
+	end
+	self._item_unit.unit:set_visible(true)
 end
 
 function MenuSceneManager:spawn_item_weapon(factory_id, blueprint, texture_switches)

@@ -1472,6 +1472,14 @@ function BlackMarketTweakData:_init_masks()
 		"gage_pack_historical"
 	}
 	self.masks.arch_nemesis.texture_bundle_folder = "pd2_goty"
+	self.masks.champion_dallas = {}
+	self.masks.champion_dallas.unit = "units/pd2_hw_boxing/masks/champion_dallas/msk_champion_dallas"
+	self.masks.champion_dallas.name_id = "bm_msk_champion_dallas"
+	self.masks.champion_dallas.pcs = {0}
+	self.masks.champion_dallas.value = 0
+	self.masks.champion_dallas.dlc = nil
+	self.masks.champion_dallas.texture_bundle_folder = "pd2_hw_boxing"
+	self.masks.champion_dallas.sort_number = 10
 	self.masks.area51 = {}
 	self.masks.area51.unit = "units/pd2_dlc_alienware/masks/area51/msk_area51"
 	self.masks.area51.name_id = "bm_msk_area51"
@@ -6024,5 +6032,33 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.shillelagh.sounds.charge = "baton_charge"
 	self.melee_weapons.shillelagh.repeat_expire_t = 0.8
 	self.melee_weapons.shillelagh.stats.concealment = 26
+	self.melee_weapons.boxing_gloves = deep_clone(self.melee_weapons.fists)
+	self.melee_weapons.boxing_gloves.name_id = "bm_melee_boxing_gloves"
+	self.melee_weapons.boxing_gloves.free = nil
+	self.melee_weapons.boxing_gloves.type = "fists"
+	self.melee_weapons.boxing_gloves.dlc = nil
+	self.melee_weapons.boxing_gloves.texture_bundle_folder = "pd2_hw_boxing"
+	self.melee_weapons.boxing_gloves.align_objects = {
+		"a_weapon_left",
+		"a_weapon_right"
+	}
+	self.melee_weapons.boxing_gloves.graphic_objects = {a_weapon_left = "g_glove_2", a_weapon_right = "g_glove_1"}
+	self.melee_weapons.boxing_gloves.unit = "units/pd2_hw_boxing/weapons/wpn_fps_mel_boxing_gloves/wpn_fps_mel_boxing_gloves"
+	self.melee_weapons.boxing_gloves.third_unit = "units/pd2_hw_boxing/weapons/wpn_fps_mel_boxing_gloves/wpn_third_mel_boxing_gloves"
+	self.melee_weapons.boxing_gloves.menu_scene_anim = "menu"
+	self.melee_weapons.boxing_gloves.menu_scene_params = {loop = false, start_time = -1}
+	self.melee_weapons.boxing_gloves.anim_global_param = "melee_boxing"
+	self.melee_weapons.boxing_gloves.stats.min_damage = 1.5
+	self.melee_weapons.boxing_gloves.stats.max_damage = 3.5
+	self.melee_weapons.boxing_gloves.stats.min_damage_effect = 4
+	self.melee_weapons.boxing_gloves.stats.max_damage_effect = 3
+	self.melee_weapons.boxing_gloves.stats.charge_time = 1.3
+	self.melee_weapons.boxing_gloves.stats.range = 150
+	self.melee_weapons.boxing_gloves.sounds.hit_gen = "boxing_hit_gen"
+	self.melee_weapons.boxing_gloves.sounds.hit_body = "boxing_hit_body"
+	self.melee_weapons.boxing_gloves.sounds.equip = "boxing_equip"
+	self.melee_weapons.boxing_gloves.sounds.hit_air = "fist_hit_air"
+	self.melee_weapons.boxing_gloves.sounds.charge = "boxing_charge"
+	self.melee_weapons.boxing_gloves.stats.concealment = 30
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

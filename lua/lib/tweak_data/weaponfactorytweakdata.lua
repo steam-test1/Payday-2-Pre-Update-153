@@ -16562,7 +16562,9 @@ function WeaponFactoryTweakData:_init_l85a2()
 		"wpn_fps_upg_ass_ns_linear",
 		"wpn_fps_upg_ass_ns_surefire",
 		"wpn_fps_upg_fl_ass_peq15",
-		"wpn_fps_upg_fl_ass_laser"
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire"
 	}
 	self.wpn_fps_ass_l85a2_npc = deep_clone(self.wpn_fps_ass_l85a2)
 	self.wpn_fps_ass_l85a2_npc.unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2/wpn_fps_ass_l85a2_npc"
