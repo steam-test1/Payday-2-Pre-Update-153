@@ -172,6 +172,7 @@ function NetworkManager:load()
 		self._session:load(Global.network.session)
 		self._game:load(Global.network_game)
 		managers.network.matchmake:_load_globals()
+		managers.network.account:_load_globals()
 		if self._is_x360 then
 			managers.network.voice_chat:resume()
 		else
@@ -195,6 +196,7 @@ function NetworkManager:save()
 			self._session:save(Global.network.session)
 		end
 		managers.network.matchmake:_save_globals()
+		managers.network.account:_save_globals()
 		managers.network.voice_chat:_save_globals(true)
 		self._game:save()
 		if self._is_win32 then

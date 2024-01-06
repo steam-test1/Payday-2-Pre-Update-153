@@ -157,6 +157,10 @@ function ElementAreaTrigger:project_amount_inside()
 	return #self._inside
 end
 
+function ElementAreaTrigger:is_instigator_valid(unit)
+	return true
+end
+
 function ElementAreaTrigger:debug_draw()
 	if self._values.instigator == "loot" or self._values.instigator == "unique_loot" then
 		for _, shape in ipairs(self._shapes) do
@@ -282,7 +286,7 @@ function ElementAreaTrigger:_check_instigator_rules(unit)
 			return false
 		end
 	end
-	return true
+	return self:is_instigator_valid(unit)
 end
 
 function ElementAreaTrigger:_clean_destroyed_units()

@@ -7,13 +7,26 @@ function ElementDisableUnit:init(...)
 end
 
 function ElementDisableUnit:on_script_activated()
+	local elementBroken = false
 	for _, id in ipairs(self._values.unit_ids) do
 		if Global.running_simulation then
-			table.insert(self._units, managers.editor:unit_with_id(id))
+			if not managers.editor:unit_with_id(id) then
+				print("MISSING UNIT WITH ID:", id)
+				elementBroken = true
+			else
+				table.insert(self._units, managers.editor:unit_with_id(id))
+			end
 		else
 			local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "_load_unit"))
 			if unit then
 				table.insert(self._units, unit)
+			end
+		end
+	end
+	if elementBroken then
+		for _, id in ipairs(self._values.unit_ids) do
+			if managers.editor:unit_with_id(id) then
+				print(inspect(managers.editor:unit_with_id(id)))
 			end
 		end
 	end
@@ -22,7 +35,6 @@ function ElementDisableUnit:on_script_activated()
 end
 
 function ElementDisableUnit:_load_unit(unit)
-	Application:stack_dump()
 	table.insert(self._units, unit)
 end
 

@@ -1005,7 +1005,7 @@ function WeaponFactoryTweakData:_init_sights()
 				rotation = Rotation(0, 0, -45)
 			},
 			wpn_fps_snp_msr = {
-				translation = Vector3(-0.9, 8, -12.8),
+				translation = Vector3(-2.4, 8, -11.8),
 				rotation = Rotation(0, 0, -45)
 			},
 			wpn_fps_snp_r93 = {
@@ -2601,6 +2601,11 @@ function WeaponFactoryTweakData:_init_m4()
 		"wpn_fps_upg_m4_s_standard_vanilla",
 		"wpn_fps_m4_uupg_draghandle",
 		"wpn_fps_m4_uupg_o_flipup"
+	}
+	self.wpn_fps_ass_m4.override = {
+		wpn_fps_upg_ass_m4_b_beowulf = {
+			a_obj = "a_b_beowulf"
+		}
 	}
 	self.wpn_fps_ass_m4.uses_parts = {
 		"wpn_fps_m4_lower_reciever",
@@ -5666,6 +5671,7 @@ function WeaponFactoryTweakData:_init_deagle()
 		type = "magazine",
 		name_id = "bm_wp_deagle_m_extended",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 5},
 		unit = "units/payday2/weapons/wpn_fps_pis_deagle_pts/wpn_fps_pis_deagle_m_extended",
 		stats = {
 			value = 7,
@@ -5682,6 +5688,7 @@ function WeaponFactoryTweakData:_init_deagle()
 		type = "magazine",
 		name_id = "bm_wp_deagle_m_standard",
 		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 5},
 		unit = "units/payday2/weapons/wpn_fps_pis_deagle_pts/wpn_fps_pis_deagle_m_standard",
 		stats = {value = 1},
 		animations = {
@@ -11866,7 +11873,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11877,7 +11885,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11888,7 +11897,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11899,7 +11909,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11910,7 +11921,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11921,7 +11933,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11932,7 +11945,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11943,7 +11957,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11954,7 +11969,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11965,7 +11981,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11976,7 +11993,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11987,7 +12005,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -11998,7 +12017,8 @@ function WeaponFactoryTweakData:_init_ksg()
 				wpn_fps_upg_fl_ass_smg_sho_peqbox = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_laser = {a_obj = "a_fl_2"},
 				wpn_fps_upg_fl_ass_peq15 = {a_obj = "a_fl_2"},
-				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"}
+				wpn_fps_upg_fl_ass_peq15_flashlight = {a_obj = "a_fl_2"},
+				wpn_fps_upg_fl_ass_utg = {a_obj = "a_fl_2"}
 			},
 			forbids = {
 				"wpn_fps_addon_ris"
@@ -12006,14 +12026,6 @@ function WeaponFactoryTweakData:_init_ksg()
 		},
 		wpn_fps_ak_extra_ris = {a_obj = "a_fl_90"},
 		wpn_fps_upg_fl_ass_smg_sho_surefire = {
-			forbids = {
-				"wpn_fps_addon_ris"
-			},
-			adds = {
-				"wpn_fps_ak_extra_ris"
-			}
-		},
-		wpn_fps_upg_fl_ass_utg = {
 			forbids = {
 				"wpn_fps_addon_ris"
 			},
@@ -14386,11 +14398,11 @@ function WeaponFactoryTweakData:create_ammunition()
 			bullet_class = "FlameBulletBase",
 			muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
 			fire_dot_data = {
-				dot_damage = 2,
-				dot_trigger_max_distance = 3000,
-				dot_trigger_chance = 50,
-				dot_length = 3,
-				dot_tick_damage = 0.5
+				dot_damage = "2",
+				dot_trigger_max_distance = "3000",
+				dot_trigger_chance = "50",
+				dot_length = "3",
+				dot_tick_damage = "0.5"
 			}
 		},
 		muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
@@ -18558,7 +18570,13 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 		},
 		texture_bundle_folder = "dlc_akm4",
 		dlc = "akm4_pack",
-		is_a_unlockable = true
+		is_a_unlockable = true,
+		override = {
+			wpn_fps_m4_uupg_o_flipup = {
+				unit = "units/payday2/weapons/wpn_fps_ass_m4_pts/wpn_fps_m4_uupg_o_flipup_emo",
+				third_unit = "units/payday2/weapons/wpn_third_ass_m4_pts/wpn_third_m4_uupg_o_flipup_emo"
+			}
+		}
 	}
 	self.parts.wpn_fps_upg_ass_m16_fg_stag = {
 		pcs = {},
@@ -19475,7 +19493,11 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 		name_id = "bm_wp_saw_m_blade_durable",
 		a_obj = "a_m",
 		unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_saw_m_blade_durable/wpn_fps_saw_m_blade_durable",
-		stats = {value = 1, extra_ammo = 25},
+		stats = {
+			value = 1,
+			extra_ammo = 25,
+			total_ammo_mod = 10
+		},
 		texture_bundle_folder = "butcher_pack_mods",
 		dlc = "butch_pack_free",
 		animations = {

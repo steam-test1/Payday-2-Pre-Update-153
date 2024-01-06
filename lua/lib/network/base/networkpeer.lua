@@ -285,7 +285,7 @@ function NetworkPeer:is_cheater()
 end
 
 function NetworkPeer:mark_cheater(reason, auto_kick)
-	if Application:editor() then
+	if Application:editor() or SystemInfo:platform() ~= Idstring("WIN32") then
 		return
 	end
 	self._cheater = true
@@ -914,7 +914,7 @@ function NetworkPeer:set_profile(level, rank)
 	self._profile.rank = rank
 end
 
-function NetworkPeer:set_outfit_string(outfit_string, outfit_version)
+function NetworkPeer:set_outfit_string(outfit_string, outfit_version, outfit_signature)
 	print("[NetworkPeer:set_outfit_string] ID", self._id, outfit_string, outfit_version)
 	Application:stack_dump()
 	local old_outfit_string = self._profile.outfit_string

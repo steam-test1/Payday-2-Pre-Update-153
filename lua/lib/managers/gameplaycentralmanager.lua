@@ -479,6 +479,9 @@ function GamePlayCentralManager:mission_disable_unit(unit)
 		if unit:base() and unit:base().on_unit_set_enabled then
 			unit:base():on_unit_set_enabled(false)
 		end
+		if unit:editable_gui() then
+			unit:editable_gui():on_unit_set_enabled(false)
+		end
 	end
 end
 
@@ -491,6 +494,9 @@ function GamePlayCentralManager:mission_enable_unit(unit)
 		unit:set_enabled(true)
 		if unit:base() and unit:base().on_unit_set_enabled then
 			unit:base():on_unit_set_enabled(true)
+		end
+		if unit:editable_gui() then
+			unit:editable_gui():on_unit_set_enabled(true)
 		end
 	end
 end
@@ -519,6 +525,7 @@ function GamePlayCentralManager:restart_the_game()
 	managers.job:on_retry_job_stage()
 	managers.loot:on_retry_job_stage()
 	managers.mission:on_retry_job_stage()
+	managers.experience:mission_xp_process(false)
 	MenuCallbackHandler:start_the_game()
 end
 

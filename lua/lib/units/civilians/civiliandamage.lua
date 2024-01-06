@@ -15,8 +15,8 @@ function CivilianDamage:die(variant)
 			self._unit:unit_data().mission_element:event("alerted", self._unit)
 		end
 	end
-	if alive(managers.interaction:active_object()) then
-		managers.interaction:active_object():interaction():selected()
+	if alive(managers.interaction:active_unit()) then
+		managers.interaction:active_unit():interaction():selected()
 	end
 	variant = variant or "bullet"
 	self._health = 0
@@ -44,7 +44,7 @@ function CivilianDamage:_unregister_from_enemy_manager(damage_info)
 end
 
 function CivilianDamage:damage_bullet(attack_data)
-	if managers.player:has_category_upgrade("player", "civ_harmless_bullets") and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
+	if managers.player:has_category_upgrade("player", "civ_harmless_bullets") and not self._unit:anim_data().no_intimidation_by_dmg and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
 		self._survive_shot_t = TimerManager:game():time() + 2.5
 		self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
 		return
@@ -68,7 +68,7 @@ function CivilianDamage:damage_fire(attack_data)
 end
 
 function CivilianDamage:damage_melee(attack_data)
-	if managers.player:has_category_upgrade("player", "civ_harmless_melee") and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
+	if managers.player:has_category_upgrade("player", "civ_harmless_melee") and not self._unit:anim_data().no_intimidation_by_dmg and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
 		self._survive_shot_t = TimerManager:game():time() + 2.5
 		self._unit:brain():on_intimidated(1, attack_data.attacker_unit)
 		return

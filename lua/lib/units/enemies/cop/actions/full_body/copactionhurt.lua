@@ -149,6 +149,7 @@ function CopActionHurt:init(action_desc, common_data)
 	local ignite_character = action_desc.ignite_character
 	local is_fire_dot_damage = not action_desc.fire_dot_data
 	local fire_dot_data = action_desc.fire_dot_data
+	local start_dot_damage_roll = action_desc.start_dot_damage_roll or 101
 	if action_type == "fatal" then
 		redir_res = self._ext_movement:play_redirect("fatal")
 		if not redir_res then
@@ -166,18 +167,17 @@ function CopActionHurt:init(action_desc, common_data)
 	elseif action_type == "fire_hurt" or action_type == "light_hurt" and action_desc.variant == "fire" then
 		local fire_dot_max_distance = 3000
 		local fire_dot_trigger_chance = 30
+		local distance = 1000
+		local hit_loc = action_desc.hit_pos
+		local char_tweak = tweak_data.character[self._unit:base()._tweak_table]
+		local use_animation_on_fire_damage
 		if fire_dot_data then
 			fire_dot_max_distance = tonumber(fire_dot_data.dot_trigger_max_distance)
 			fire_dot_trigger_chance = tonumber(fire_dot_data.dot_trigger_chance)
 		end
-		local hit_loc = action_desc.hit_pos
-		local distance = 1000
 		if hit_loc and action_desc.attacker_unit and action_desc.attacker_unit.position then
 			distance = mvector3.distance(hit_loc, action_desc.attacker_unit:position())
 		end
-		local start_dot_damage = math.random(1, 100)
-		local char_tweak = tweak_data.character[self._unit:base()._tweak_table]
-		local use_animation_on_fire_damage
 		if char_tweak.use_animation_on_fire_damage == nil then
 			use_animation_on_fire_damage = true
 		else
@@ -189,7 +189,7 @@ function CopActionHurt:init(action_desc, common_data)
 		else
 			flammable = char_tweak.flammable
 		end
-		if not is_fire_dot_damage and fire_dot_max_distance > distance and fire_dot_trigger_chance >= start_dot_damage and flammable then
+		if not is_fire_dot_damage and fire_dot_max_distance > distance and start_dot_damage_roll <= fire_dot_trigger_chance and flammable then
 			if Network:is_server() then
 				managers.fire:add_doted_enemy(self._unit, t, self._ext_inventory:equipped_unit(), fire_dot_data.dot_length, fire_dot_data.dot_tick_damage)
 			end
@@ -200,7 +200,6 @@ function CopActionHurt:init(action_desc, common_data)
 				local last_fire_recieved = self._unit:character_damage():get_last_time_unit_got_fire_damage()
 				if last_fire_recieved == nil or 5 < t - last_fire_recieved then
 					if use_animation_on_fire_damage then
-						Application:debug("CopActionHurt:init: play_fire hurt")
 						redir_res = self._ext_movement:play_redirect("fire_hurt")
 						local dir_str
 						local fwd_dot = action_desc.direction_vec:dot(common_data.fwd)
@@ -218,7 +217,6 @@ function CopActionHurt:init(action_desc, common_data)
 						self._machine:set_parameter(redir_res, dir_str, 1)
 					end
 					self._unit:character_damage():set_last_time_unit_got_fire_damage(t)
-				else
 				end
 			end
 		end

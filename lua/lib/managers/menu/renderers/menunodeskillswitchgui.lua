@@ -6,6 +6,8 @@ MenuNodeSkillSwitchGui.STATUS_X = 0.75
 function MenuNodeSkillSwitchGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
+	parameters.legends_font = tweak_data.menu.pd2_medium_font
+	parameters.legends_font_size = tweak_data.menu.pd2_medium_font_size
 	parameters.align = "left"
 	parameters.row_item_blend_mode = "add"
 	parameters.row_item_color = tweak_data.screen_colors.button_stage_3
@@ -94,7 +96,8 @@ function MenuNodeSkillSwitchGui:_create_menu_item(row_item)
 			font_size = self.small_font_size,
 			layer = 52,
 			alpha = distribution_after_text and 0.9 or 1,
-			blend_mode = "add"
+			blend_mode = "add",
+			rotation = 360
 		})
 		row_item.skill_points_gui:set_shape(row_item.gui_panel:shape())
 		row_item.skill_points_gui:grow(-row_item.skill_points_gui:w() * self.SKILL_POINTS_X, 0)
@@ -314,6 +317,7 @@ function MenuNodeSkillSwitchGui:_setup_item_panel(safe_rect, res)
 	self._list_arrows.down:set_rotation(360)
 	self._list_arrows.down:set_layer(1050)
 	self:_set_topic_position()
+	self:_layout_legends()
 end
 
 function MenuNodeSkillSwitchGui:_setup_item_panel_parent(safe_rect, shape)
@@ -328,6 +332,14 @@ end
 function MenuNodeSkillSwitchGui:setup()
 	MenuNodeSkillSwitchGui.super.setup(self)
 	managers.menu_component:disable_skilltree_gui()
+end
+
+function MenuNodeSkillSwitchGui:_layout_legends(...)
+	MenuNodeSkillSwitchGui.super._layout_legends(self, ...)
+	if alive(self.box_panel) then
+		self._legends_panel:set_top(self.box_panel:bottom() + 4)
+		self._legends_panel:set_right(self.box_panel:right())
+	end
 end
 
 function MenuNodeSkillSwitchGui:close()

@@ -67,6 +67,10 @@ function MenuItemMultiChoice:add_option(option)
 	table.insert(self._all_options, option)
 end
 
+function MenuItemMultiChoice:clear_options()
+	self._all_options = {}
+end
+
 function MenuItemMultiChoice:options()
 	return self._options
 end

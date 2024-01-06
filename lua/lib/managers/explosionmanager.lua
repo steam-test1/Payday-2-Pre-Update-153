@@ -52,6 +52,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 	local owner = params.owner
 	local push_units = true
 	local results = {}
+	local alert_radius = params.alert_radius or 10000
 	if params.push_units ~= nil then
 		push_units = params.push_units
 	end
@@ -73,7 +74,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 	managers.groupai:state():propagate_alert({
 		"explosion",
 		hit_pos,
-		10000,
+		alert_radius,
 		alert_filter,
 		alert_unit
 	})
@@ -124,10 +125,11 @@ function ExplosionManager:detect_and_give_dmg(params)
 		local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion
 		local apply_dmg = hit_body:extension() and hit_body:extension().damage
 		units_to_push[hit_body:unit():key()] = hit_body:unit()
-		local dir, len, damage, ray_hit
+		local dir, len, damage, ray_hit, damage_character
 		if character and not characters_hit[hit_body:unit():key()] then
 			if params.no_raycast_check_characters then
 				ray_hit = true
+				damage_character = true
 				characters_hit[hit_body:unit():key()] = true
 			else
 				for i_splinter, s_pos in ipairs(splinters) do
@@ -136,6 +138,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 					}, "report")
 					if ray_hit then
 						characters_hit[hit_body:unit():key()] = true
+						damage_character = true
 						break
 					end
 				end
@@ -167,7 +170,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 			damage = math.max(damage, 1)
 			local hit_unit = hit_body:unit()
 			hit_units[hit_unit:key()] = hit_unit
-			if character then
+			if character and damage_character then
 				local dead_before = hit_unit:character_damage():dead()
 				local action_data = {}
 				action_data.variant = "explosion"

@@ -3,6 +3,7 @@ ControllerWrapperSettings = ControllerWrapperSettings or class()
 
 function ControllerWrapperSettings:init(wrapper_type, node, core_setting, debug_path)
 	self._wrapper_type = wrapper_type
+	self._connection_list = {}
 	self._connection_map = {}
 	self._editable_connection_map = {}
 	self._unselectable_input_map = {}
@@ -77,7 +78,7 @@ end
 function ControllerWrapperSettings:merge(setting, overwrite)
 	for name, connection in pairs(setting:get_connection_map()) do
 		if overwrite or not self._connection_map[name] then
-			self._connection_map[name] = connection
+			self:set_connection(name, connection)
 		end
 	end
 	for name, editable_connection in pairs(setting:get_editable_connection_map()) do
@@ -156,6 +157,10 @@ function ControllerWrapperSettings:wrapper_type()
 	return self._wrapper_type
 end
 
+function ControllerWrapperSettings:get_connection_list()
+	return self._connection_list
+end
+
 function ControllerWrapperSettings:get_connection_map()
 	return self._connection_map
 end
@@ -166,6 +171,7 @@ end
 
 function ControllerWrapperSettings:set_connection(name, connection)
 	self._connection_map[name] = connection
+	table.insert(self._connection_list, name)
 end
 
 function ControllerWrapperSettings:get_editable_connection_map()

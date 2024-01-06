@@ -110,7 +110,7 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 		if not skip_types or not skip_types[type] then
 			for i, item in ipairs(items) do
 				local item_tweak = type_tweak[item]
-				local is_infamous = item_tweak.infamous or false
+				local is_infamous = item_tweak.infamous or item_tweak.global_value == "infamous" or false
 				local is_dlc = item_tweak.dlcs or item_tweak.dlc or false
 				local got_qlvl = item_tweak.qlvl or false
 				local fixed_global_value = item_tweak.global_value or false
@@ -122,7 +122,12 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 				if is_infamous then
 					global_value = "infamous"
 				elseif is_dlc then
-					local dlcs = item_tweak.dlcs or {}
+					local dlcs = {}
+					if item_tweak.dlcs then
+						for _, dlc in ipairs(item_tweak.dlcs) do
+							table.insert(dlcs, dlc)
+						end
+					end
 					if item_tweak.dlc then
 						table.insert(dlcs, item_tweak.dlc)
 					end

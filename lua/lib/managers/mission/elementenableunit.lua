@@ -22,7 +22,6 @@ function ElementEnableUnit:on_script_activated()
 end
 
 function ElementEnableUnit:_load_unit(unit)
-	Application:stack_dump()
 	table.insert(self._units, unit)
 end
 

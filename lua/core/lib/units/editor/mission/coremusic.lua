@@ -8,6 +8,7 @@ end
 function CoreMusicUnitElement:init(unit)
 	MissionElement.init(self, unit)
 	table.insert(self._save_values, "music_event")
+	table.insert(self._save_values, "use_instigator")
 end
 
 function CoreMusicUnitElement:test_element()
@@ -54,4 +55,5 @@ function CoreMusicUnitElement:_build_panel(panel, panel_sizer)
 	})
 	local _, music_params = self:_build_value_combobox(panel, panel_sizer, "music_event", managers.music:music_events(path_value))
 	self._music_params = music_params
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator")
 end

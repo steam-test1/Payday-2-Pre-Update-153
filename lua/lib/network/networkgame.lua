@@ -285,45 +285,30 @@ function NetworkGame:on_statistics_recieved(peer_id, peer_kills, peer_specials_k
 	local group_downs = 0
 	local most_downs = {peer_id = nil, score = 0}
 	for _, member in pairs(self._members) do
-		repeat
-			if member:peer():has_statistics() then
-				local stats = member:peer():statistics()
-				total_kills = total_kills + stats.total_kills
-				total_specials_kills = total_specials_kills + stats.total_specials_kills
-				total_head_shots = total_head_shots + stats.total_head_shots
-				group_accuracy = group_accuracy + stats.accuracy
-				group_downs = group_downs + stats.downs
-				if stats.total_kills > best_killer.score or not best_killer.peer_id then
-					best_killer.score = stats.total_kills
-					best_killer.peer_id = member:peer():id()
-				end
-				if stats.total_specials_kills > best_special_killer.score or not best_special_killer.peer_id then
-					best_special_killer.score = stats.total_specials_kills
-					best_special_killer.peer_id = member:peer():id()
-				end
-				if stats.accuracy > best_accuracy.score or not best_accuracy.peer_id then
-					best_accuracy.score = stats.accuracy
-					best_accuracy.peer_id = member:peer():id()
-				end
-				if stats.downs > most_downs.score or not most_downs.peer_id then
-					most_downs.score = stats.downs
-					most_downs.peer_id = member:peer():id()
-				end
-				if stats.downs == 0 and tweak_data.achievement.protect_the_chief and table.contains(tweak_data.achievement.protect_the_chief.difficulty, Global.game_settings.difficulty) and managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and table.contains(tweak_data.achievement.protect_the_chief.jobs, managers.job:current_real_job_id()) then
-					local outfit = member:peer():blackmarket_outfit()
-					if tweak_data.achievement.protect_the_chief.mask == outfit.mask.mask_id and tweak_data.achievement.protect_the_chief.primary == outfit.primary.factory_id and tweak_data.achievement.protect_the_chief.melee_weapon == outfit.melee_weapon then
-						managers.achievment:award(tweak_data.achievement.protect_the_chief.award)
-						managers.network:session():send_to_peers_synched("sync_award_achievement", tweak_data.achievement.protect_the_chief.award)
-					else
-					end
-					do break end -- pseudo-goto
-					break -- pseudo-goto
-				else
-				end
-				do break end -- pseudo-goto
-				break -- pseudo-goto
+		if member:peer():has_statistics() then
+			local stats = member:peer():statistics()
+			total_kills = total_kills + stats.total_kills
+			total_specials_kills = total_specials_kills + stats.total_specials_kills
+			total_head_shots = total_head_shots + stats.total_head_shots
+			group_accuracy = group_accuracy + stats.accuracy
+			group_downs = group_downs + stats.downs
+			if stats.total_kills > best_killer.score or not best_killer.peer_id then
+				best_killer.score = stats.total_kills
+				best_killer.peer_id = member:peer():id()
 			end
-		until true
+			if stats.total_specials_kills > best_special_killer.score or not best_special_killer.peer_id then
+				best_special_killer.score = stats.total_specials_kills
+				best_special_killer.peer_id = member:peer():id()
+			end
+			if stats.accuracy > best_accuracy.score or not best_accuracy.peer_id then
+				best_accuracy.score = stats.accuracy
+				best_accuracy.peer_id = member:peer():id()
+			end
+			if stats.downs > most_downs.score or not most_downs.peer_id then
+				most_downs.score = stats.downs
+				most_downs.peer_id = member:peer():id()
+			end
+		end
 	end
 	group_accuracy = math.floor(group_accuracy / table.size(self._members))
 	print("result is", "total_kills", total_kills, "total_specials_kills", total_specials_kills, "total_head_shots", total_head_shots)
@@ -389,6 +374,18 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 		local member_downed = alive(member_unit) and member_unit:movement():downed()
 		local member_health = 1
 		local member_dead = managers.trade and managers.trade:is_peer_in_custody(peer_id)
+		local hostages_killed = 0
+		local respawn_penalty = 0
+		if member_dead and player_character and managers.trade then
+			hostages_killed = managers.trade:hostages_killed_by_name(player_character)
+			respawn_penalty = managers.trade:respawn_delay_by_name(player_character)
+		elseif alive(member_unit) then
+			local criminal_record = managers.groupai:state():criminal_record(member_unit:key())
+			if criminal_record then
+				hostages_killed = criminal_record.hostages_killed
+				respawn_penalty = criminal_record.respawn_penalty
+			end
+		end
 		if player_left then
 			local mugshot_id = managers.criminals:character_data_by_peer_id(peer_id).mugshot_id
 			local mugshot_data = managers.hud:_get_mugshot_data(mugshot_id)
@@ -426,7 +423,9 @@ function NetworkGame:on_peer_removed(peer, peer_id, reason)
 						used_deployable = member_used_deployable,
 						used_cable_ties = member_used_cable_ties,
 						used_body_bags = member_used_body_bags,
-						member_dead = member_dead
+						member_dead = member_dead,
+						hostages_killed = hostages_killed,
+						respawn_penalty = respawn_penalty
 					}
 					local trade_entry = managers.trade:replace_player_with_ai(player_character, player_character)
 					if unit then

@@ -1,6 +1,7 @@
 DynamicResourceManager = DynamicResourceManager or class()
 DynamicResourceManager.DYN_RESOURCES_PACKAGE = "packages/dyn_resources"
 DynamicResourceManager.listener_events = {file_streamer_workload = 1}
+local ids_unit = Idstring("unit")
 
 function DynamicResourceManager:init()
 	if not Global.dyn_resource_manager_data then
@@ -25,6 +26,7 @@ function DynamicResourceManager:post_init()
 		self:_set_file_streamer_settings(chunk_size_kb, self._streaming_settings.sleep_time)
 	end
 	managers.user:add_setting_changed_callback("max_streaming_chunk", callback(self, self, "clbk_streaming_chunk_size_changed"), true)
+	self:preload_units()
 end
 
 function DynamicResourceManager:update()
@@ -225,4 +227,7 @@ end
 
 function DynamicResourceManager:clbk_streaming_chunk_size_changed(name, old_value, new_value)
 	self:_set_file_streamer_settings(new_value, self._streaming_settings.sleep_time)
+end
+
+function DynamicResourceManager:preload_units()
 end

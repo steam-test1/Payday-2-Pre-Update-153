@@ -9,6 +9,7 @@ require("lib/units/beings/player/states/PlayerArrested")
 require("lib/units/beings/player/states/PlayerTased")
 require("lib/units/beings/player/states/PlayerIncapacitated")
 require("lib/units/beings/player/states/PlayerCarry")
+require("lib/units/beings/player/states/PlayerBipod")
 require("lib/units/beings/player/states/PlayerDriving")
 PlayerMovement = PlayerMovement or class()
 PlayerMovement._STAMINA_INIT = tweak_data.player.movement_state.stamina.STAMINA_INIT or 10
@@ -100,6 +101,7 @@ function PlayerMovement:_setup_states()
 		incapacitated = PlayerIncapacitated:new(unit),
 		clean = PlayerClean:new(unit),
 		carry = PlayerCarry:new(unit),
+		bipod = PlayerBipod:new(unit),
 		driving = PlayerDriving:new(unit)
 	}
 end
@@ -344,6 +346,9 @@ end
 
 function PlayerMovement:on_non_lethal_electrocution()
 	self._state_data.non_lethal_electrocution = true
+	if alive(self._unit) then
+		self._unit:character_damage():on_tased(true)
+	end
 end
 
 function PlayerMovement:on_tase_ended()

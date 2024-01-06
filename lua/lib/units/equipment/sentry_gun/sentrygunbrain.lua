@@ -358,7 +358,7 @@ function SentryGunBrain:_upd_fire(t)
 			if not self._ext_movement:rearming() then
 				self._ext_movement:rearm()
 			end
-		else
+		elseif not self._unit:base():waiting_for_refill() then
 			self:switch_off()
 		end
 	elseif self._ext_movement:rearming() then
@@ -440,7 +440,7 @@ function SentryGunBrain:on_detected_attention_obj_modified(modified_u_key)
 end
 
 function SentryGunBrain:on_damage_received(attacker_unit)
-	if not Network:is_server() then
+	if not Network:is_server() or not attacker_unit then
 		return
 	end
 	local u_key = attacker_unit:key()
@@ -563,4 +563,7 @@ function SentryGunBrain:pre_destroy()
 	if Network:is_server() and self._attention_handler then
 		PlayerMovement.set_attention_settings(self, nil)
 	end
+end
+
+function SentryGunBrain:on_intimidated(amount, aggressor_unit)
 end
