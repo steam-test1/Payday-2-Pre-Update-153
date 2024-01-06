@@ -512,6 +512,11 @@ function StatisticsManager:aquired_money(amount)
 	self:_increment_misc("cash", amount * 1000)
 end
 
+function StatisticsManager:crimefest_stats(name)
+	self._global.session.crimefest = self._global.session.crimefest or {}
+	self._global.session.crimefest[name] = (self._global.session.crimefest[name] or 0) + 1
+end
+
 function StatisticsManager:publish_to_steam(session, success, completion)
 	if Application:editor() or not managers.criminals:local_character_name() then
 		return
@@ -786,9 +791,14 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			stats["contract_" .. job_id .. "_fail"] = {type = "int", value = 1}
 		end
 	end
-	if (completion == "win_begin" or completion == "win_dropin") and job_id == "shoutout_raid" then
-		print("Crimefest Challenge: crimefest_challenge_dallas_1", 1)
-		stats.crimefest_challenge_dallas_1 = {type = "int", value = 1}
+	if completion == "win_begin" or completion == "win_dropin" then
+		if job_id == "shoutout_raid" then
+			print("Crimefest Challenge: crimefest_challenge_dallas_1", 1)
+			stats.crimefest_challenge_dallas_1 = {type = "int", value = 1}
+		elseif job_id == "hox" or job_id == "hox_prof" then
+			print("Crimefest Challenge: crimefest_challenge_houston_1", 1)
+			stats.crimefest_challenge_houston_1 = {type = "int", value = 1}
+		end
 	end
 	for melee_name, melee_kill in pairs(session.killed_by_melee) do
 		if 0 < melee_kill and melee_name == "whiskey" then
@@ -813,6 +823,12 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	if 0 < enemy_kills then
 		print("Crimefest Challenge: crimefest_challenge_houston_2", enemy_kills)
 		stats.crimefest_challenge_houston_2 = {type = "int", value = enemy_kills}
+	end
+	if session.crimefest then
+		for name, count in pairs(session.crimefest) do
+			print("Crimefest Challenge: crimefest_challenge_" .. name, count)
+			stats["crimefest_challenge_" .. name] = {type = "int", value = count}
+		end
 	end
 	managers.network.account:publish_statistics(stats)
 end
