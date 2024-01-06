@@ -2515,7 +2515,11 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						end
 						managers.hud:set_ammo_amount(weap_base:selection_index(), weap_base:ammo_info())
 						local impact = not fired.hit_enemy
-						self._ext_network:send("shot_blank", impact)
+						if weap_base.third_person_important and weap_base:third_person_important() then
+							self._ext_network:send("shot_blank", impact)
+						else
+							self._ext_network:send("shot_blank_reliable", impact)
+						end
 					elseif fire_mode == "single" then
 						new_action = false
 					end

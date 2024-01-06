@@ -75,8 +75,8 @@ function BlackMarketManager:_setup_grenades()
 			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.grenades[grenade_id].dlc
 		end
 	end
-	grenades[self._defaults.grenade].equipped = true
-	grenades[self._defaults.grenade].unlocked = true
+	grenades[self._defaults.grenade].equipped = false
+	grenades[self._defaults.grenade].unlocked = false
 	grenades[self._defaults.grenade].amount = 0
 end
 

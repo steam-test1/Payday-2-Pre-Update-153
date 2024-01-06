@@ -1391,8 +1391,7 @@ function UpgradesTweakData:init()
 		name_id = "body_armor",
 		upgrades = {
 			"body_armor2",
-			"ak74",
-			"molotov"
+			"ak74"
 		}
 	}
 	self.level_tree[2] = {
@@ -6308,8 +6307,8 @@ function UpgradesTweakData:_melee_weapon_definitions()
 end
 
 function UpgradesTweakData:_grenades_definitions()
-	self.definitions.molotov = {category = "grenade", dlc = "hl_miami"}
-	self.definitions.frag = {category = "grenade"}
+	self.definitions.molotov = {category = "grenade", dlc = "bbq"}
+	self.definitions.frag = {category = "grenade", dlc = "gage_pack"}
 end
 
 function UpgradesTweakData:_weapon_definitions()

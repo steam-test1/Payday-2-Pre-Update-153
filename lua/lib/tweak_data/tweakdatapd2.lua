@@ -506,6 +506,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.molotov_grenade = {
+		texture = "guis/textures/pd2/equipment",
+		texture_rect = {
+			64,
+			64,
+			32,
+			32
+		}
+	}
 	self.hud_icons.equipment_body_bag = {
 		texture = "guis/textures/pd2/equipment",
 		texture_rect = {

@@ -11570,14 +11570,12 @@ function WeaponFactoryTweakData:_init_striker()
 			"wpn_fps_upg_shot_ns_king",
 			"wpn_fps_upg_ns_shot_thick",
 			"wpn_fps_upg_ns_shot_shark",
-			"wpn_fps_upg_ns_sho_salvo_large"
+			"wpn_fps_upg_ns_sho_salvo_large",
+			"wpn_fps_upg_a_dragons_breath"
 		},
 		dlc = "gage_pack_shotgun",
 		texture_bundle_folder = "gage_pack_shotgun",
-		is_a_unlockable = true,
-		forbids = {
-			"wpn_fps_upg_a_dragons_breath"
-		}
+		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_sho_striker_b_standard = {
 		type = "barrel",
@@ -20531,13 +20529,11 @@ function WeaponFactoryTweakData:_init_aa12()
 			"wpn_fps_upg_shot_ns_king",
 			"wpn_fps_upg_ns_shot_thick",
 			"wpn_fps_upg_ns_shot_shark",
-			"wpn_fps_upg_ns_sho_salvo_large"
+			"wpn_fps_upg_ns_sho_salvo_large",
+			"wpn_fps_upg_a_dragons_breath"
 		},
 		texture_bundle_folder = "bbq",
-		dlc = "bbq",
-		forbids = {
-			"wpn_fps_upg_a_dragons_breath"
-		}
+		dlc = "bbq"
 	}
 	self.parts.wpn_fps_sho_aa12_body = {
 		type = "lower_reciever",

@@ -5935,6 +5935,7 @@ function BlackMarketGui:populate_grenades(data)
 		new_data.global_value = m_tweak_data.dlc or "normal"
 		new_data.skill_based = grenades_data[2].skill_based
 		new_data.skill_name = "bm_menu_skill_locked_" .. new_data.name
+		new_data.equipped_text = not new_data.unlocked and new_data.equipped and " "
 		if m_tweak_data and m_tweak_data.locks then
 			local dlc = m_tweak_data.locks.dlc
 			local achievement = m_tweak_data.locks.achievement

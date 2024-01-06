@@ -21,7 +21,6 @@ function FireManager:update(t, dt)
 			dot_info.fire_dot_counter = 0
 		end
 		if t > dot_info.fire_damage_received_time + dot_info.dot_length then
-			Application:debug("Removing unit: ", dot_info.enemy_unit)
 			if dot_info.fire_effects then
 				for _, fire_effect_id in ipairs(dot_info.fire_effects) do
 					World:effect_manager():fade_kill(fire_effect_id)
@@ -115,7 +114,8 @@ end
 
 function FireManager:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
 	if enemy_unit then
-		self:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
+		local t = TimerManager:game():time()
+		self:_add_doted_enemy(enemy_unit, t, weapon_unit, dot_length, dot_damage)
 	end
 end
 
@@ -199,7 +199,6 @@ function FireManager:_damage_fire_dot(dot_info)
 		local variant = "fire"
 		local weapon_unit = dot_info.weapon_unit
 		local is_fire_dot_damage = true
-		Application:debug("FireManager:_damage_fire_dot", dot_info.dot_damage)
 		FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_unit, damage, is_fire_dot_damage)
 	end
 end

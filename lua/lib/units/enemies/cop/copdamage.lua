@@ -15,6 +15,9 @@ CopDamage._ATTACK_VARIANTS = {
 	"fire"
 }
 CopDamage._HEALTH_GRANULARITY = 512
+CopDamage.WEAPON_TYPE_GRANADE = 1
+CopDamage.WEAPON_TYPE_BULLET = 2
+CopDamage.WEAPON_TYPE_FLAMER = 3
 CopDamage._hurt_severities = {
 	none = false,
 	light = "light_hurt",
@@ -502,7 +505,6 @@ function CopDamage:damage_fire(attack_data)
 	if attacker_unit and attacker_unit:base() and attacker_unit:base()._grenade_entry == "molotov" then
 		fire_dot = tweak_data.grenades[attacker_unit:base()._grenade_entry].fire_dot_data
 	elseif attack_data.weapon_unit then
-		Application:debug("CopDamage:damage_fire", inspect(attack_data.weapon_unit:base()._ammo_data))
 		if attack_data.weapon_unit and attack_data.weapon_unit.base and attack_data.weapon_unit:base()._ammo_data and attack_data.weapon_unit:base()._ammo_data.fire_dot_data then
 			fire_dot = attack_data.weapon_unit:base()._ammo_data.fire_dot_data
 		elseif attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
@@ -1118,6 +1120,19 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, death, direct
 	local is_fire_dot_damage = false
 	local attack_data = {variant = variant}
 	local result
+	if weapon_type then
+		local fire_dot
+		if weapon_type == CopDamage.WEAPON_TYPE_GRANADE then
+			fire_dot = tweak_data.grenades[weapon_id].fire_dot_data
+		elseif weapon_type == CopDamage.WEAPON_TYPE_BULLET then
+			if tweak_data.weapon.factory.parts[weapon_id].custom_stats then
+				fire_dot = tweak_data.weapon.factory.parts[weapon_id].custom_stats.fire_dot_data
+			end
+		elseif weapon_type == CopDamage.WEAPON_TYPE_FLAMER and tweak_data.weapon[weapon_id].fire_dot_data then
+			fire_dot = tweak_data.weapon[weapon_id].fire_dot_data
+		end
+		attack_data.fire_dot_data = fire_dot
+	end
 	if death then
 		result = {type = "death", variant = variant}
 		self:die(attack_data.variant)
@@ -1140,20 +1155,6 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, death, direct
 	attack_data.damage = damage
 	attack_data.ignite_character = true
 	attack_data.is_fire_dot_damage = is_fire_dot_damage
-	if weapon_type then
-		is_fire_dot_damage = true
-		local fire_dot
-		if weapon_type == 1 then
-			fire_dot = tweak_data.grenades[weapon_id].fire_dot_data
-		elseif weapon_type == 2 then
-			if tweak_data.weapon.factory.parts[weapon_id].custom_stats then
-				fire_dot = tweak_data.weapon.factory.parts[weapon_id].custom_stats.fire_dot_data
-			end
-		elseif weapon_type == 3 and tweak_data.weapon[weapon_id].fire_dot_data then
-			fire_dot = tweak_data.weapon[weapon_id].fire_dot_data
-		end
-		attack_data.fire_dot_data = fire_dot
-	end
 	local attack_dir
 	if direction then
 		attack_dir = direction
@@ -1268,15 +1269,15 @@ end
 function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percent, is_fire_dot_damage, direction)
 	local weapon_type, weapon_unit
 	if attack_data.attacker_unit and attack_data.attacker_unit:base()._grenade_entry == "molotov" then
-		weapon_type = 1
+		weapon_type = CopDamage.WEAPON_TYPE_GRANADE
 		weapon_unit = "molotov"
 	elseif attack_data.weapon_unit ~= nil and attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
-		weapon_type = 3
+		weapon_type = CopDamage.WEAPON_TYPE_FLAMER
 		weapon_unit = attack_data.weapon_unit:base()._name_id
 	elseif attack_data.weapon_unit ~= nil and attack_data.weapon_unit:base()._parts then
 		for part_id, part in pairs(attack_data.weapon_unit:base()._parts) do
 			if tweak_data.weapon.factory.parts[part_id].custom_stats and tweak_data.weapon.factory.parts[part_id].custom_stats.fire_dot_data then
-				weapon_type = 2
+				weapon_type = CopDamage.WEAPON_TYPE_BULLET
 				weapon_unit = part_id
 			end
 		end

@@ -187,3 +187,7 @@ end
 function NewFlamethrowerBase:calculate_vertical_recoil_kick()
 	return 0
 end
+
+function NewFlamethrowerBase:third_person_important()
+	return true
+end

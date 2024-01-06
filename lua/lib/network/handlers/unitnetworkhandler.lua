@@ -312,6 +312,13 @@ function UnitNetworkHandler:shot_blank(shooting_unit, impact, sender)
 	shooting_unit:movement():sync_shot_blank(impact)
 end
 
+function UnitNetworkHandler:shot_blank_reliable(shooting_unit, impact, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(shooting_unit, sender) then
+		return
+	end
+	shooting_unit:movement():sync_shot_blank(impact)
+end
+
 function UnitNetworkHandler:reload_weapon(unit, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
 		return

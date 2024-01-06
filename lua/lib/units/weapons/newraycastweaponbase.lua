@@ -221,10 +221,13 @@ end
 
 function NewRaycastWeaponBase:_update_fire_object()
 	local fire = managers.weapon_factory:get_part_from_weapon_by_type("barrel_ext", self._parts) or managers.weapon_factory:get_part_from_weapon_by_type("slide", self._parts) or managers.weapon_factory:get_part_from_weapon_by_type("barrel", self._parts)
-	if not fire.unit:get_object(Idstring("fire")) then
+	if not fire then
+		debug_pause("[NewRaycastWeaponBase:_update_fire_object] Weapon \"" .. tostring(self._factory_id) .. "\" is missing fire object !")
+	elseif not fire.unit:get_object(Idstring("fire")) then
 		debug_pause("[NewRaycastWeaponBase:_update_fire_object] Weapon \"" .. tostring(self._factory_id) .. "\" is missing fire object for part \"" .. tostring(fire.unit) .. "\"!")
+	else
+		self:change_fire_object(fire.unit:get_object(Idstring("fire")))
 	end
-	self:change_fire_object(fire.unit:get_object(Idstring("fire")))
 end
 
 function NewRaycastWeaponBase:got_silencer()

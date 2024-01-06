@@ -5979,6 +5979,7 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.frag.unit_dummy = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_husk"
 	self.grenades.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
 	self.grenades.frag.icon = "frag_grenade"
+	self.grenades.frag.dlc = "gage_pack"
 	self.grenades.frag.throwable = true
 	self.grenades.frag.max_amount = 3
 	self.grenades.launcher_frag = {}
@@ -6001,7 +6002,7 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.molotov.name_id = "bm_grenade_molotov"
 	self.grenades.molotov.unit = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_third"
 	self.grenades.molotov.unit_dummy = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_husk"
-	self.grenades.molotov.icon = "frag_grenade"
+	self.grenades.molotov.icon = "molotov_grenade"
 	self.grenades.molotov.dlc = "bbq"
 	self.grenades.molotov.no_cheat_count = true
 	self.grenades.molotov.impact_detonation = true

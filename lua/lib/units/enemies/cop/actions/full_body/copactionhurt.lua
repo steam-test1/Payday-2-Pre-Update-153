@@ -191,7 +191,6 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 		if not is_fire_dot_damage and fire_dot_max_distance > distance and fire_dot_trigger_chance >= start_dot_damage and flammable then
 			if Network:is_server() then
-				Application:debug("Added enemy: ", self._unit, t)
 				managers.fire:add_doted_enemy(self._unit, t, self._ext_inventory:equipped_unit(), fire_dot_data.dot_length, fire_dot_data.dot_tick_damage)
 			end
 			if ignite_character == "dragonsbreath" then
@@ -201,6 +200,7 @@ function CopActionHurt:init(action_desc, common_data)
 				local last_fire_recieved = self._unit:character_damage():get_last_time_unit_got_fire_damage()
 				if last_fire_recieved == nil or 5 < t - last_fire_recieved then
 					if use_animation_on_fire_damage then
+						Application:debug("CopActionHurt:init: play_fire hurt")
 						redir_res = self._ext_movement:play_redirect("fire_hurt")
 						local dir_str
 						local fwd_dot = action_desc.direction_vec:dot(common_data.fwd)
