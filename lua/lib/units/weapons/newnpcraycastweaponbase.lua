@@ -81,6 +81,20 @@ function NewNPCRaycastWeaponBase:setup(setup_data)
 	self._setup = setup_data
 end
 
+function NewRaycastWeaponBase:assemble(factory_id)
+	NewNPCRaycastWeaponBase.super:assemble(factory_id)
+	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint) or {}
+	local ammo_muzzle_effect = self._ammo_data and self._ammo_data.muzzleflash
+	if ammo_muzzle_effect then
+		self._muzzle_effect = ammo_muzzle_effect
+		self._muzzle_effect_table = {
+			effect = self._muzzle_effect,
+			parent = self._obj_fire,
+			force_synch = false
+		}
+	end
+end
+
 function NewNPCRaycastWeaponBase:is_npc()
 	return true
 end
@@ -150,20 +164,22 @@ function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 		mvector3.multiply(mto, 20000)
 		mvector3.add(mto, mfrom)
 		local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
-		if alive(self._obj_fire) then
-			self._obj_fire:m_position(self._trail_effect_table.position)
-			mvector3.set(self._trail_effect_table.normal, mspread)
-		end
-		local trail
-		if not self:weapon_tweak_data().no_trail then
-			trail = alive(self._obj_fire) and (not col_ray or col_ray.distance > 650) and World:effect_manager():spawn(self._trail_effect_table) or nil
-		end
-		if col_ray then
-			InstantBulletBase:on_collision(col_ray, self._unit, user_unit, self._damage, true)
-			if trail then
-				World:effect_manager():set_remaining_lifetime(trail, math.clamp((col_ray.distance - 600) / 10000, 0, col_ray.distance))
+		if self._use_trails == nil or self._use_trails == true then
+			if alive(self._obj_fire) then
+				self._obj_fire:m_position(self._trail_effect_table.position)
+				mvector3.set(self._trail_effect_table.normal, mspread)
 			end
-			table.insert(rays, col_ray)
+			local trail
+			if not self:weapon_tweak_data().no_trail then
+				trail = alive(self._obj_fire) and (not col_ray or col_ray.distance > 650) and World:effect_manager():spawn(self._trail_effect_table) or nil
+			end
+			if col_ray then
+				InstantBulletBase:on_collision(col_ray, self._unit, user_unit, self._damage, true)
+				if trail then
+					World:effect_manager():set_remaining_lifetime(trail, math.clamp((col_ray.distance - 600) / 10000, 0, col_ray.distance))
+				end
+				table.insert(rays, col_ray)
+			end
 		end
 	end
 	if alive(self._obj_fire) then

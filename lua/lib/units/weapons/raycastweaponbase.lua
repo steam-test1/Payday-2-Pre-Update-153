@@ -1191,19 +1191,13 @@ function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit
 		mvec3_norm(tmp_vec2)
 		mvec3_mul(tmp_vec2, 20)
 		mvec3_sub(tmp_vec1, tmp_vec2)
-		managers.explosion:play_sound_and_effects(tmp_vec1, col_ray.normal, self.RANGE, self.EFFECT_PARAMS)
-		local hit_units, splinters, results = managers.explosion:detect_and_give_dmg({
-			hit_pos = tmp_vec1,
-			range = self.RANGE,
-			collision_slotmask = slot_mask,
-			curve_pow = self.CURVE_POW,
-			damage = damage,
-			player_damage = damage * self.PLAYER_DMG_MUL,
-			ignore_unit = weapon_unit,
-			user = user_unit,
-			owner = weapon_unit
-		})
-		managers.network:session():send_to_peers_synched("sync_explosive_bullet", col_ray.position, col_ray.normal, math.min(16384, network_damage))
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
+		if Network:is_server() then
+			self:on_collision_server(tmp_vec1, col_ray.normal, damage, user_unit, weapon_unit, managers.network:session():local_peer():id())
+		else
+			managers.network:session():send_to_host("sync_explode_bullet", tmp_vec1, col_ray.normal, math.min(16384, network_damage), weapon_unit:base():selection_index())
+		end
 		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
 			local sync_damage = not blank and hit_unit:id() ~= -1
 			if sync_damage then
@@ -1219,14 +1213,242 @@ function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit
 		end
 		return {
 			col_ray = col_ray,
-			type = hit_unit:character_damage() and hit_unit:character_damage().is_head and hit_unit:character_damage().dead and hit_unit:character_damage():dead() and "death" or nil,
+			type = nil,
 			variant = "explosion"
 		}
 	end
 	return nil
 end
 
+function InstantExplosiveBulletBase:on_collision_server(position, normal, damage, user_unit, weapon_unit, owner_peer_id, owner_selection_index)
+	local slot_mask = managers.slot:get_mask("explosion_targets")
+	managers.explosion:play_sound_and_effects(position, normal, self.RANGE, self.EFFECT_PARAMS)
+	local hit_units, splinters, results = managers.explosion:detect_and_give_dmg({
+		hit_pos = position,
+		range = self.RANGE,
+		collision_slotmask = slot_mask,
+		curve_pow = self.CURVE_POW,
+		damage = damage,
+		player_damage = damage * self.PLAYER_DMG_MUL,
+		ignore_unit = weapon_unit,
+		user = user_unit,
+		owner = weapon_unit
+	})
+	local network_damage = math.ceil(damage * 163.84)
+	managers.network:session():send_to_peers_synched("sync_explode_bullet", position, normal, math.min(16384, network_damage), owner_peer_id)
+	if managers.network:session():local_peer():id() == owner_peer_id then
+		local enemies_hit = (results.count_gangsters or 0) + (results.count_cops or 0)
+		local enemies_killed = (results.count_gangster_kills or 0) + (results.count_cop_kills or 0)
+		managers.statistics:shot_fired({hit = false, weapon_unit = weapon_unit})
+		for i = 1, enemies_hit do
+			managers.statistics:shot_fired({
+				hit = true,
+				weapon_unit = weapon_unit,
+				skip_bullet_count = true
+			})
+		end
+		local weapon_pass, weapon_type_pass, count_pass, all_pass
+		for achievement, achievement_data in pairs(tweak_data.achievement.explosion_achievements) do
+			weapon_pass = not achievement_data.weapon or true
+			weapon_type_pass = not achievement_data.weapon_type or weapon_unit:base() and weapon_unit:base().weapon_tweak_data and weapon_unit:base():weapon_tweak_data().category == achievement_data.weapon_type
+			count_pass = not achievement_data.count or (achievement_data.kill and enemies_killed or enemies_hit) >= achievement_data.count
+			all_pass = weapon_pass and weapon_type_pass and count_pass
+			if all_pass and achievement_data.award then
+				managers.achievment:award(achievement_data.award)
+			end
+		end
+	else
+		local peer = managers.network:session():peer(owner_peer_id)
+		local SYNCH_MIN = 0
+		local SYNCH_MAX = 31
+		local count_cops = math.clamp(results.count_cops, SYNCH_MIN, SYNCH_MAX)
+		local count_gangsters = math.clamp(results.count_gangsters, SYNCH_MIN, SYNCH_MAX)
+		local count_civilians = math.clamp(results.count_civilians, SYNCH_MIN, SYNCH_MAX)
+		local count_cop_kills = math.clamp(results.count_cop_kills, SYNCH_MIN, SYNCH_MAX)
+		local count_gangster_kills = math.clamp(results.count_gangster_kills, SYNCH_MIN, SYNCH_MAX)
+		local count_civilian_kills = math.clamp(results.count_civilian_kills, SYNCH_MIN, SYNCH_MAX)
+		managers.network:session():send_to_peer_synched(peer, "sync_explosion_results", count_cops, count_gangsters, count_civilians, count_cop_kills, count_gangster_kills, count_civilian_kills, owner_selection_index)
+	end
+end
+
 function InstantExplosiveBulletBase:on_collision_client(position, normal, damage, user_unit)
 	managers.explosion:give_local_player_dmg(position, self.RANGE, damage * self.PLAYER_DMG_MUL)
 	managers.explosion:explode_on_client(position, normal, user_unit, damage, self.RANGE, self.CURVE_POW, self.EFFECT_PARAMS)
+end
+
+FlameBulletBase = FlameBulletBase or class(InstantExplosiveBulletBase)
+FlameBulletBase.EFFECT_PARAMS = {
+	sound_event = "round_explode",
+	feedback_range = tweak_data.upgrades.flame_bullet.feedback_range,
+	camera_shake_max_mul = tweak_data.upgrades.flame_bullet.camera_shake_max_mul,
+	sound_muffle_effect = true,
+	on_unit = true,
+	idstr_decal = Idstring("explosion_round"),
+	idstr_effect = Idstring(""),
+	pushunits = tweak_data.upgrades
+}
+
+function FlameBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
+	local hit_unit = col_ray.unit
+	local play_impact_flesh = false
+	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
+		local sync_damage = not blank and hit_unit:id() ~= -1
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
+		if sync_damage then
+			local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
+			local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
+			managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.unit:id() ~= -1 and col_ray.body or nil, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+		end
+		local local_damage = not blank or hit_unit:id() == -1
+		if local_damage then
+			col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+		end
+	end
+	local result
+	if hit_unit:character_damage() and hit_unit:character_damage().damage_fire then
+		local is_alive = not hit_unit:character_damage():dead()
+		result = self:give_fire_damage(col_ray, weapon_unit, user_unit, damage)
+		if result ~= "friendly_fire" then
+			local is_dead = hit_unit:character_damage():dead()
+			if weapon_unit:base()._ammo_data and weapon_unit:base()._ammo_data.push_units then
+				local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
+				managers.game_play_central:physics_push(col_ray, push_multiplier)
+			end
+		else
+			play_impact_flesh = false
+		end
+	elseif weapon_unit:base()._ammo_data and weapon_unit:base()._ammo_data.push_units then
+		managers.game_play_central:physics_push(col_ray)
+	end
+	if play_impact_flesh then
+		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
+		self:play_impact_sound_and_effects(col_ray)
+	end
+	return result
+end
+
+function FlameBulletBase:give_fire_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing)
+	local action_data = {}
+	action_data.variant = "fire"
+	action_data.damage = damage
+	action_data.weapon_unit = weapon_unit
+	action_data.attacker_unit = user_unit
+	action_data.col_ray = col_ray
+	action_data.armor_piercing = armor_piercing
+	if weapon_unit:base()._ammo_data.hit_effect == "dragonsbreath" then
+		action_data.ignite_character = "dragonsbreath"
+	end
+	local defense_data = col_ray.unit:character_damage():damage_fire(action_data)
+	return defense_data
+end
+
+function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, user_unit, damage, is_fire_dot_damage)
+	local action_data = {}
+	action_data.variant = "fire"
+	action_data.damage = damage
+	action_data.weapon_unit = weapon_unit
+	action_data.attacker_unit = user_unit
+	action_data.col_ray = col_ray
+	action_data.is_fire_dot_damage = is_fire_dot_damage
+	local defense_data = {}
+	if col_ray and alive(col_ray.unit) and col_ray.unit and col_ray.unit.character_damage then
+		defense_data = col_ray.unit:character_damage():damage_fire(action_data)
+	end
+	return defense_data
+end
+
+function FlameBulletBase:on_collision_OLD(col_ray, weapon_unit, user_unit, damage, blank)
+	local hit_unit = col_ray.unit
+	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
+	end
+	if blank then
+	else
+		mvec3_set(tmp_vec1, col_ray.position)
+		mvec3_set(tmp_vec2, col_ray.ray)
+		mvec3_norm(tmp_vec2)
+		mvec3_mul(tmp_vec2, 20)
+		mvec3_sub(tmp_vec1, tmp_vec2)
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
+		if Network:is_server() then
+			self:on_collision_server(tmp_vec1, col_ray.normal, damage, user_unit, weapon_unit, managers.network:session():local_peer():id())
+		else
+			managers.network:session():send_to_host("sync_flame_bullet", tmp_vec1, col_ray.normal, math.min(16384, network_damage), weapon_unit:base():selection_index())
+		end
+		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
+			local sync_damage = not blank and hit_unit:id() ~= -1
+			if sync_damage then
+				local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
+				local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
+				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+			end
+			local local_damage = not blank or hit_unit:id() == -1
+			if local_damage then
+				col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+				col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+			end
+		end
+		return {
+			col_ray = col_ray,
+			type = nil,
+			variant = "fire"
+		}
+	end
+	return nil
+end
+
+DragonBreathBulletBase = DragonBreathBulletBase or class(InstantBulletBase)
+
+function DragonBreathBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
+	local hit_unit = col_ray.unit
+	local play_impact_flesh = not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood
+	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
+		local sync_damage = not blank and hit_unit:id() ~= -1
+		local network_damage = math.ceil(damage * 163.84)
+		damage = network_damage / 163.84
+		if sync_damage then
+			local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
+			local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
+			managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.unit:id() ~= -1 and col_ray.body or nil, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
+		end
+		local local_damage = not blank or hit_unit:id() == -1
+		if local_damage then
+			col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
+			col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+		end
+	end
+	local result
+	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
+		local is_alive = not hit_unit:character_damage():dead()
+		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage)
+		if result ~= "friendly_fire" then
+			local is_dead = hit_unit:character_damage():dead()
+			local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
+			managers.game_play_central:physics_push(col_ray, push_multiplier)
+		else
+			play_impact_flesh = false
+		end
+	else
+		managers.game_play_central:physics_push(col_ray)
+	end
+	if play_impact_flesh then
+		managers.game_play_central:play_impact_flesh({col_ray = col_ray})
+		self:play_impact_sound_and_effects(col_ray)
+	end
+	return result
+end
+
+function DragonBreathBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing)
+	local action_data = {}
+	action_data.variant = "bullet"
+	action_data.damage = damage
+	action_data.weapon_unit = weapon_unit
+	action_data.attacker_unit = user_unit
+	action_data.col_ray = col_ray
+	action_data.armor_piercing = armor_piercing
+	action_data.ignite_character = "dragonsbreath"
+	local defense_data = col_ray.unit:character_damage():damage_bullet(action_data)
+	return defense_data
 end

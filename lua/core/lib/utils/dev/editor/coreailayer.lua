@@ -415,7 +415,7 @@ end
 
 function AiLayer:_update_motion_paths_list()
 	self._motion_paths_list:clear()
-	for _, path in pairs(managers.motion_path:get_all_paths()) do
+	for _, path in ipairs(managers.motion_path:get_all_paths()) do
 		self._motion_paths_list:append(path.name)
 	end
 end

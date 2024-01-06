@@ -283,6 +283,8 @@ function NewRaycastWeaponBase:_update_stats_values()
 	end
 	if self._silencer then
 		self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash_silenced or "effects/payday2/particles/weapons/9mm_auto_silence_fps")
+	elseif self._ammo_data and self._ammo_data.muzzleflash ~= nil then
+		self._muzzle_effect = Idstring(self._ammo_data.muzzleflash)
 	else
 		self._muzzle_effect = Idstring(self:weapon_tweak_data().muzzleflash or "effects/particles/test/muzzleflash_maingun")
 	end

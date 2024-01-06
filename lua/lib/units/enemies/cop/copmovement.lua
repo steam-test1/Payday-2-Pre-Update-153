@@ -249,7 +249,8 @@ function CopMovement:post_init()
 		"shield_knock",
 		"counter_tased",
 		"death",
-		"fatal"
+		"fatal",
+		"fire_hurt"
 	}, callback(self, self, "damage_clbk"))
 	self._unit:inventory():add_listener("movement", {"equip", "unequip"}, callback(self, self, "clbk_inventory"))
 	local prim_weap_name = self._ext_base:default_weapon_name("primary")
@@ -1100,10 +1101,14 @@ end
 
 function CopMovement:damage_clbk(my_unit, damage_info)
 	local hurt_type = damage_info.result.type
+	local block_type = hurt_type
+	if hurt_type == "expl_hurt" or hurt_type == "fire_hurt" then
+		block_type = "heavy_hurt"
+	end
 	if hurt_type == "death" and self._queued_actions then
 		self._queued_actions = {}
 	end
-	if not hurt_type or Network:is_server() and self:chk_action_forbidden(hurt_type) then
+	if not hurt_type or Network:is_server() and self:chk_action_forbidden(block_type) then
 		if hurt_type == "death" then
 			debug_pause_unit(self._unit, "[CopMovement:damage_clbk] Death action skipped!!!", self._unit)
 			Application:draw_cylinder(self._m_pos, self._m_pos + math.UP * 5000, 30, 1, 0, 0)
@@ -1147,14 +1152,15 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 			blocks.hurt_sick = -1
 		end
 	end
-	local block_type
 	if damage_info.variant == "tase" then
 		block_type = "bleedout"
+	elseif hurt_type == "expl_hurt" or hurt_type == "fire_hurt" then
+		block_type = "heavy_hurt"
 	else
 		block_type = hurt_type
 	end
 	local client_interrupt
-	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "expl_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "counter_spooc" or hurt_type == "death" or hurt_type == "hurt_sick") then
+	if Network:is_client() and (hurt_type == "light_hurt" or hurt_type == "hurt" and damage_info.variant ~= "tase" or hurt_type == "heavy_hurt" or hurt_type == "expl_hurt" or hurt_type == "shield_knock" or hurt_type == "counter_tased" or hurt_type == "counter_spooc" or hurt_type == "death" or hurt_type == "hurt_sick" or hurt_type == "fire_hurt") then
 		client_interrupt = true
 	end
 	local tweak = self._tweak_data
@@ -1169,7 +1175,10 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		blocks = blocks,
 		client_interrupt = client_interrupt,
 		attacker_unit = damage_info.attacker_unit,
-		death_type = tweak.damage.death_severity and (damage_info.damage / tweak.HEALTH_INIT > tweak.damage.death_severity and "heavy" or "normal") or "normal"
+		death_type = tweak.damage.death_severity and (damage_info.damage / tweak.HEALTH_INIT > tweak.damage.death_severity and "heavy" or "normal") or "normal",
+		ignite_character = damage_info.ignite_character,
+		is_fire_dot_damage = damage_info.is_fire_dot_damage,
+		fire_dot_data = damage_info.fire_dot_data
 	}
 	if Network:is_server() or not self:chk_action_forbidden(action_data) then
 		self:action_request(action_data)
@@ -1851,6 +1860,7 @@ function CopMovement:sync_action_act_start(index, blocks_hurt, clamp_to_graph, s
 		action_data.blocks.hurt = -1
 		action_data.blocks.heavy_hurt = -1
 		action_data.blocks.expl_hurt = -1
+		action_data.blocks.fire_hurt = -1
 	end
 	self:action_request(action_data)
 end

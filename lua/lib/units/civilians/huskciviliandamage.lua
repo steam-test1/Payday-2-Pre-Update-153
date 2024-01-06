@@ -17,3 +17,10 @@ function HuskCivilianDamage:damage_explosion(attack_data)
 	end
 	return CopDamage.damage_explosion(self, attack_data)
 end
+
+function HuskCivilianDamage:damage_fire(attack_data)
+	if attack_data.variant == "fire" then
+		attack_data.damage = 10
+	end
+	return CopDamage.damage_fire(self, attack_data)
+end

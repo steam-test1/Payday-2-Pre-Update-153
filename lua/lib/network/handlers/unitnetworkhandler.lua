@@ -209,14 +209,28 @@ function UnitNetworkHandler:damage_bullet(subject_unit, attacker_unit, damage, i
 	subject_unit:character_damage():sync_damage_bullet(attacker_unit, damage, i_body, height_offset, death)
 end
 
-function UnitNetworkHandler:damage_explosion(subject_unit, attacker_unit, damage, i_attack_variant, death, direction, sender)
+function UnitNetworkHandler:damage_explosion_fire(subject_unit, attacker_unit, damage, i_attack_variant, death, direction, sender)
 	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
 		attacker_unit = nil
 	end
-	subject_unit:character_damage():sync_damage_explosion(attacker_unit, damage, i_attack_variant, death, direction)
+	if i_attack_variant == 3 then
+		subject_unit:character_damage():sync_damage_fire(attacker_unit, damage, i_attack_variant, death, direction)
+	else
+		subject_unit:character_damage():sync_damage_explosion(attacker_unit, damage, i_attack_variant, death, direction)
+	end
+end
+
+function UnitNetworkHandler:damage_fire(subject_unit, attacker_unit, damage, death, direction, weapon_type, weapon_unit, sender)
+	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
+		attacker_unit = nil
+	end
+	subject_unit:character_damage():sync_damage_fire(attacker_unit, damage, death, direction, weapon_type, weapon_unit)
 end
 
 function UnitNetworkHandler:damage_melee(subject_unit, attacker_unit, damage, damage_effect, i_body, height_offset, variant, death, sender)
@@ -239,14 +253,18 @@ function UnitNetworkHandler:from_server_damage_bullet(subject_unit, attacker_uni
 	subject_unit:character_damage():sync_damage_bullet(attacker_unit, hit_offset_height, result_index)
 end
 
-function UnitNetworkHandler:from_server_damage_explosion(subject_unit, attacker_unit, result_index, i_attack_variant, sender)
+function UnitNetworkHandler:from_server_damage_explosion_fire(subject_unit, attacker_unit, result_index, i_attack_variant, sender)
 	if not self._verify_character(subject_unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
 		attacker_unit = nil
 	end
-	subject_unit:character_damage():sync_damage_explosion(attacker_unit, result_index, i_attack_variant)
+	if i_attack_variant == 3 then
+		subject_unit:character_damage():sync_damage_fire(attacker_unit, result_index, i_attack_variant)
+	else
+		subject_unit:character_damage():sync_damage_explosion(attacker_unit, result_index, i_attack_variant)
+	end
 end
 
 function UnitNetworkHandler:from_server_damage_melee(subject_unit, attacker_unit, hit_offset_height, result_index, sender)
@@ -420,6 +438,33 @@ end
 
 function UnitNetworkHandler:sync_body_damage_explosion_no_attacker(body, normal, position, direction, damage, sender)
 	self:sync_body_damage_explosion(body, nil, normal, position, direction, damage, sender)
+end
+
+function UnitNetworkHandler:sync_body_damage_fire(body, attacker, normal, position, direction, damage, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(body) then
+		return
+	end
+	if not body:extension() then
+		print("[UnitNetworkHandler:sync_body_damage_fire] body has no extension", body:name(), body:unit():name())
+		return
+	end
+	if not body:extension().damage then
+		print("[UnitNetworkHandler:sync_body_damage_fire] body has no damage extension", body:name(), body:unit():name())
+		return
+	end
+	if not body:extension().damage.damage_fire then
+		print("[UnitNetworkHandler:sync_body_damage_fire] body has no damage damage_fire function", body:name(), body:unit():name())
+		return
+	end
+	body:extension().damage:damage_fire(attacker, normal, position, direction, damage / 163.84)
+	body:extension().damage:damage_damage(attacker, normal, position, direction, damage / 163.84)
+end
+
+function UnitNetworkHandler:sync_body_damage_fire_no_attacker(body, normal, position, direction, damage, sender)
+	self:sync_body_damage_fire(body, nil, normal, position, direction, damage, sender)
 end
 
 function UnitNetworkHandler:sync_body_damage_melee(body, attacker, normal, position, direction, damage, sender)
@@ -1525,6 +1570,24 @@ function UnitNetworkHandler:sync_throw_grenade(unit, dir, grenade_type, peer_id,
 	local thrower_unit = member and member:unit()
 	unit:base():set_thrower_unit(thrower_unit)
 	unit:base():sync_throw_grenade(dir, grenade_type)
+end
+
+function UnitNetworkHandler:sync_detonate_molotov_grenade(unit, ext_name, event_id, normal, rpc)
+	local peer = self._verify_sender(rpc)
+	if not (peer and alive(unit)) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local extension = unit[ext_name](unit)
+	if not extension then
+		debug_pause("[UnitNetworkHandler:sync_detonate_molotov_grenade] unit", unit, "does not have extension", ext_name)
+		return
+	end
+	extension:sync_detonate_molotov_grenade(event_id, normal, peer)
+end
+
+function UnitNetworkHandler:sync_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, rpc)
+	local peer = self._verify_sender(rpc)
+	managers.fire:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, peer)
 end
 
 function UnitNetworkHandler:server_secure_loot(carry_id, multiplier_level, sender)

@@ -1076,6 +1076,11 @@ function MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc()
 	Steam:overlay_activate("store", 348091)
 end
 
+function MenuCallbackHandler:dlc_buy_bbq_pc()
+	print("[MenuCallbackHandler:dlc_buy_bbq_pc]")
+	Steam:overlay_activate("store", 358150)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1111,6 +1116,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"bbq",
 		"overkill_pack",
 		"akm4_pack",
 		"character_pack_dragan",
@@ -1219,12 +1225,8 @@ function MenuCallbackHandler:visible_callback_complete_overkill_pack()
 	return self:is_dlc_latest_locked("complete_overkill_pack")
 end
 
-function MenuCallbackHandler:visible_callback_overkill_pack()
-	return self:is_dlc_latest_locked("overkill_pack")
-end
-
-function MenuCallbackHandler:visible_callback_complete_overkill_pack()
-	return self:is_dlc_latest_locked("complete_overkill_pack")
+function MenuCallbackHandler:visible_callback_bbq()
+	return self:is_dlc_latest_locked("bbq")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -6650,6 +6652,7 @@ function SkillSwitchInitiator:add_back_button(node)
 	local params = {
 		name = "back",
 		text_id = "menu_back",
+		visible_callback = "is_pc_controller",
 		align = "right",
 		previous_node = true
 	}

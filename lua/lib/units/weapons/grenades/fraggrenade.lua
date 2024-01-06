@@ -24,7 +24,14 @@ function FragGrenade:_setup_frag_data(grenade_entry)
 	}
 end
 
-function FragGrenade:_detonate()
+function FragGrenade:_impact_cbk(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
+	if other_unit and other_unit:vehicle() and other_unit:vehicle():is_active() then
+		return
+	end
+	self:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
+end
+
+function FragGrenade:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
 	local pos = self._unit:position()
 	local normal = math.UP
 	local range = self._range

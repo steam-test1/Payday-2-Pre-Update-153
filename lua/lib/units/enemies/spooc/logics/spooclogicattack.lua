@@ -209,7 +209,8 @@ function SpoocLogicAttack._chk_request_action_spooc_attack(data, my_data, flying
 			light_hurt = -1,
 			hurt = -1,
 			heavy_hurt = -1,
-			expl_hurt = -1
+			expl_hurt = -1,
+			fire_hurt = -1
 		}
 	end
 	local action = data.unit:brain():action_request(new_action_data)

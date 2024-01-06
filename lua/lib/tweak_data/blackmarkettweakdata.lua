@@ -87,6 +87,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks = {}
 	self.masks.character_locked = {}
 	self.masks.character_locked.name_id = "bm_msk_character_locked"
+	self.masks.character_locked.inaccessible = true
 	self.masks.character_locked.dallas = "dallas"
 	self.masks.character_locked.wolf = "wolf"
 	self.masks.character_locked.hoxton = "hoxton"
@@ -1673,30 +1674,37 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.balaclava_chains.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_chains/msk_balaclava_chains"
 	self.masks.balaclava_chains.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_chains.type = "helmet"
+	self.masks.balaclava_chains.inaccessible = true
 	self.masks.balaclava_wolf = {}
 	self.masks.balaclava_wolf.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_wolf/msk_balaclava_wolf"
 	self.masks.balaclava_wolf.name_id = "bm_msk_balaclava"
 	self.masks.balaclava_wolf.type = "helmet"
+	self.masks.balaclava_wolf.inaccessible = true
 	self.masks.balaclava_clover = {}
 	self.masks.balaclava_clover.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_clover/msk_balaclava_clover"
 	self.masks.balaclava_clover.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_clover.type = "helmet"
+	self.masks.balaclava_clover.inaccessible = true
 	self.masks.balaclava_dallas = {}
 	self.masks.balaclava_dallas.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_dallas/msk_balaclava_dallas"
 	self.masks.balaclava_dallas.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_dallas.type = "helmet"
+	self.masks.balaclava_dallas.inaccessible = true
 	self.masks.balaclava_dragan = {}
 	self.masks.balaclava_dragan.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_dragan/msk_balaclava_dragan"
 	self.masks.balaclava_dragan.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_dragan.type = "helmet"
+	self.masks.balaclava_dragan.inaccessible = true
 	self.masks.balaclava_hoxton = {}
 	self.masks.balaclava_hoxton.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_hoxton/msk_balaclava_hoxton"
 	self.masks.balaclava_hoxton.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_hoxton.type = "helmet"
+	self.masks.balaclava_hoxton.inaccessible = true
 	self.masks.balaclava_john_wick = {}
 	self.masks.balaclava_john_wick.unit = "units/pd2_dlc_infamy/masks/msk_balaclava_john_wick/msk_balaclava_john_wick"
 	self.masks.balaclava_john_wick.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_john_wick.type = "helmet"
+	self.masks.balaclava_john_wick.inaccessible = true
 	self.masks.balaclava = {}
 	self.masks.balaclava.name_id = "bm_msk_balaclava"
 	self.masks.balaclava.global_value = "infamy"
@@ -1874,6 +1882,39 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.old_hoxton_begins.global_value = "infamous"
 	self.masks.old_hoxton_begins.value = 0
 	self.masks.old_hoxton_begins.texture_bundle_folder = "hoxton_revenge"
+	self.masks.firedemon = {}
+	self.masks.firedemon.unit = "units/pd2_dlc_bbq/masks/msk_firedemon/msk_firedemon"
+	self.masks.firedemon.name_id = "bm_msk_firedemon"
+	self.masks.firedemon.pcs = {}
+	self.masks.firedemon.value = 0
+	self.masks.firedemon.dlc = "bbq"
+	self.masks.firedemon.texture_bundle_folder = "bbq"
+	self.masks.firedemon.sort_number = 8
+	self.masks.gasmask = {}
+	self.masks.gasmask.unit = "units/pd2_dlc_bbq/masks/msk_gasmask/msk_gasmask"
+	self.masks.gasmask.name_id = "bm_msk_gasmask"
+	self.masks.gasmask.pcs = {}
+	self.masks.gasmask.value = 0
+	self.masks.gasmask.dlc = "bbq"
+	self.masks.gasmask.texture_bundle_folder = "bbq"
+	self.masks.gasmask.sort_number = 8
+	self.masks.firemask = {}
+	self.masks.firemask.unit = "units/pd2_dlc_bbq/masks/msk_firemask/msk_firemask"
+	self.masks.firemask.name_id = "bm_msk_firemask"
+	self.masks.firemask.pcs = {}
+	self.masks.firemask.value = 0
+	self.masks.firemask.dlc = "bbq"
+	self.masks.firemask.texture_bundle_folder = "bbq"
+	self.masks.firemask.sort_number = 8
+	self.masks.chef_hat = {}
+	self.masks.chef_hat.unit = "units/pd2_dlc_bbq/masks/msk_chef_hat/msk_chef_hat"
+	self.masks.chef_hat.name_id = "bm_msk_chef_hat"
+	self.masks.chef_hat.pcs = {}
+	self.masks.chef_hat.value = 0
+	self.masks.chef_hat.dlc = "bbq"
+	self.masks.chef_hat.texture_bundle_folder = "bbq"
+	self.masks.chef_hat.sort_number = 8
+	self.masks.chef_hat.type = "helmet"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -4000,6 +4041,36 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.feathers.value = 0
 	self.materials.feathers.dlc = "akm4_pack"
 	self.materials.feathers.texture_bundle_folder = "dlc_akm4"
+	self.materials.candlelight = {}
+	self.materials.candlelight.name_id = "bm_mtl_candlelight"
+	self.materials.candlelight.pcs = {}
+	self.materials.candlelight.texture = "units/pd2_dlc_bbq/materials/matcap_candlelight_df"
+	self.materials.candlelight.value = 0
+	self.materials.candlelight.dlc = "bbq"
+	self.materials.candlelight.texture_bundle_folder = "bbq"
+	self.materials.burn = {}
+	self.materials.burn.name_id = "bm_mtl_burn"
+	self.materials.burn.pcs = {}
+	self.materials.burn.texture = "units/pd2_dlc_bbq/materials/matcap_burn_df"
+	self.materials.burn.value = 0
+	self.materials.burn.dlc = "bbq"
+	self.materials.burn.texture_bundle_folder = "bbq"
+	self.materials.toast = {}
+	self.materials.toast.name_id = "bm_mtl_toast"
+	self.materials.toast.pcs = {}
+	self.materials.toast.texture = "units/pd2_dlc_bbq/materials/matcap_toast_df"
+	self.materials.toast.value = 0
+	self.materials.toast.material_amount = 0
+	self.materials.toast.dlc = "bbq"
+	self.materials.toast.texture_bundle_folder = "bbq"
+	self.materials.coal = {}
+	self.materials.coal.name_id = "bm_mtl_coal"
+	self.materials.coal.pcs = {}
+	self.materials.coal.texture = "units/pd2_dlc_bbq/materials/matcap_coal_df"
+	self.materials.coal.value = 0
+	self.materials.coal.material_amount = 0
+	self.materials.coal.dlc = "bbq"
+	self.materials.coal.texture_bundle_folder = "bbq"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -4420,7 +4491,7 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.clown.texture = "units/payday2/masks/shared_textures/patterns/pattern_clown_df"
 	self.textures.clown.value = 2
 	self.textures.paint2 = {}
-	self.textures.paint2.name_id = "bm_txt_ouroboros"
+	self.textures.paint2.name_id = "bm_txt_paint2"
 	self.textures.paint2.pcs = {
 		10,
 		20,
@@ -5647,6 +5718,34 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.dinoscars.value = 0
 	self.textures.dinoscars.texture_bundle_folder = "dlc_akm4"
 	self.textures.dinoscars.dlc = "akm4_pack"
+	self.textures.fireborn = {}
+	self.textures.fireborn.name_id = "bm_txt_fireborn"
+	self.textures.fireborn.pcs = {}
+	self.textures.fireborn.texture = "units/pd2_dlc_bbq/masks/patterns/pattern_fireborn_df"
+	self.textures.fireborn.value = 0
+	self.textures.fireborn.dlc = "bbq"
+	self.textures.fireborn.texture_bundle_folder = "bbq"
+	self.textures.flamer = {}
+	self.textures.flamer.name_id = "bm_txt_flamer"
+	self.textures.flamer.pcs = {}
+	self.textures.flamer.texture = "units/pd2_dlc_bbq/masks/patterns/pattern_flamer_df"
+	self.textures.flamer.value = 0
+	self.textures.flamer.dlc = "bbq"
+	self.textures.flamer.texture_bundle_folder = "bbq"
+	self.textures.flammable = {}
+	self.textures.flammable.name_id = "bm_txt_flammable"
+	self.textures.flammable.pcs = {}
+	self.textures.flammable.texture = "units/pd2_dlc_bbq/masks/patterns/pattern_flammable_df"
+	self.textures.flammable.value = 0
+	self.textures.flammable.dlc = "bbq"
+	self.textures.flammable.texture_bundle_folder = "bbq"
+	self.textures.hotflames = {}
+	self.textures.hotflames.name_id = "bm_txt_hotflames"
+	self.textures.hotflames.pcs = {}
+	self.textures.hotflames.texture = "units/pd2_dlc_bbq/masks/patterns/pattern_hotflames_df"
+	self.textures.hotflames.value = 0
+	self.textures.hotflames.dlc = "bbq"
+	self.textures.hotflames.texture_bundle_folder = "bbq"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -5880,7 +5979,6 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.frag.unit_dummy = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_husk"
 	self.grenades.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
 	self.grenades.frag.icon = "frag_grenade"
-	self.grenades.frag.dlc = "gage_pack"
 	self.grenades.frag.throwable = true
 	self.grenades.frag.max_amount = 3
 	self.grenades.launcher_frag = {}
@@ -5899,10 +5997,35 @@ function BlackMarketTweakData:_init_grenades()
 	self.grenades.rocket_frag.time_cheat = 1
 	self.grenades.rocket_frag.physic_effect = Idstring("physic_effects/anti_gravitate")
 	self.grenades.rocket_frag.adjust_z = 0
+	self.grenades.molotov = {}
+	self.grenades.molotov.name_id = "bm_grenade_molotov"
+	self.grenades.molotov.unit = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_third"
+	self.grenades.molotov.unit_dummy = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_husk"
+	self.grenades.molotov.icon = "frag_grenade"
+	self.grenades.molotov.dlc = "bbq"
+	self.grenades.molotov.no_cheat_count = true
+	self.grenades.molotov.impact_detonation = true
+	self.grenades.molotov.time_cheat = 1
+	self.grenades.molotov.throwable = true
+	self.grenades.molotov.max_amount = 3
+	self.grenades.molotov.texture_bundle_folder = "bbq"
+	self.grenades.molotov.physic_effect = Idstring("physic_effects/molotov_throw")
+	self.grenades.launcher_incendiary = {}
+	self.grenades.launcher_incendiary.name_id = "bm_launcher_incendiary"
+	self.grenades.launcher_incendiary.unit = "units/pd2_dlc_bbq/weapons/wpn_launcher_incendiary_grenade/wpn_launcher_incendiary_grenade"
+	self.grenades.launcher_incendiary.weapon_id = "gre_m79"
+	self.grenades.launcher_incendiary.no_cheat_count = true
+	self.grenades.launcher_incendiary.impact_detonation = true
+	self.grenades.launcher_incendiary.time_cheat = 1
+	self.grenades.launcher_frag_m32 = deep_clone(self.grenades.launcher_frag)
+	self.grenades.launcher_frag_m32.weapon_id = "m32"
 	self._grenades_index = {
 		"frag",
 		"launcher_frag",
-		"rocket_frag"
+		"rocket_frag",
+		"molotov",
+		"launcher_incendiary",
+		"launcher_frag_m32"
 	}
 	self:_add_desc_from_name_macro(self.grenades)
 end
@@ -6784,5 +6907,109 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.whiskey.sounds.charge = "whiskey_charge"
 	self.melee_weapons.whiskey.repeat_expire_t = 0.8
 	self.melee_weapons.whiskey.stats.concealment = 27
+	self.melee_weapons.fork = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.fork.name_id = "bm_melee_fork"
+	self.melee_weapons.fork.dlc = "bbq"
+	self.melee_weapons.fork.texture_bundle_folder = "bbq"
+	self.melee_weapons.fork.anim_global_param = "melee_stab"
+	self.melee_weapons.fork.type = "axe"
+	self.melee_weapons.fork.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.fork.unit = "units/pd2_dlc_bbq/weapons/fork/wpn_fps_mel_fork"
+	self.melee_weapons.fork.third_unit = "units/pd2_dlc_bbq/weapons/fork/wpn_third_mel_fork"
+	self.melee_weapons.fork.stats.weapon_type = "sharp"
+	self.melee_weapons.fork.stats.min_damage = 4
+	self.melee_weapons.fork.stats.max_damage = 9
+	self.melee_weapons.fork.stats.min_damage_effect = 0.25
+	self.melee_weapons.fork.stats.max_damage_effect = 0.5
+	self.melee_weapons.fork.stats.charge_time = 2
+	self.melee_weapons.fork.stats.range = 185
+	self.melee_weapons.fork.sounds = {}
+	self.melee_weapons.fork.sounds.equip = "bbq_fork_equip"
+	self.melee_weapons.fork.sounds.hit_air = "bbq_fork_hit_air"
+	self.melee_weapons.fork.sounds.hit_gen = "bbq_fork_hit_gen"
+	self.melee_weapons.fork.sounds.hit_body = "bbq_fork_hit_body"
+	self.melee_weapons.fork.sounds.charge = "bbq_fork_charge"
+	self.melee_weapons.fork.repeat_expire_t = 0.3
+	self.melee_weapons.fork.stats.concealment = 27
+	self.melee_weapons.poker = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.poker.name_id = "bm_melee_poker"
+	self.melee_weapons.poker.dlc = "bbq"
+	self.melee_weapons.poker.texture_bundle_folder = "bbq"
+	self.melee_weapons.poker.anim_global_param = "melee_axe"
+	self.melee_weapons.poker.type = "axe"
+	self.melee_weapons.poker.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.poker.unit = "units/pd2_dlc_bbq/weapons/poker/wpn_fps_mel_poker"
+	self.melee_weapons.poker.third_unit = "units/pd2_dlc_bbq/weapons/poker/wpn_third_mel_poker"
+	self.melee_weapons.poker.stats.weapon_type = "blunt"
+	self.melee_weapons.poker.stats.min_damage = 6
+	self.melee_weapons.poker.stats.max_damage = 12
+	self.melee_weapons.poker.stats.min_damage_effect = 1.7
+	self.melee_weapons.poker.stats.max_damage_effect = 2
+	self.melee_weapons.poker.stats.charge_time = 3
+	self.melee_weapons.poker.stats.range = 185
+	self.melee_weapons.poker.sounds = {}
+	self.melee_weapons.poker.sounds.equip = "bbq_poker_equip"
+	self.melee_weapons.poker.sounds.hit_air = "bbq_poker_hit_air"
+	self.melee_weapons.poker.sounds.hit_gen = "bbq_poker_hit_gen"
+	self.melee_weapons.poker.sounds.hit_body = "bbq_poker_hit_body"
+	self.melee_weapons.poker.sounds.charge = "bbq_poker_charge"
+	self.melee_weapons.poker.repeat_expire_t = 0.8
+	self.melee_weapons.poker.stats.concealment = 27
+	self.melee_weapons.spatula = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.spatula.name_id = "bm_melee_spatula"
+	self.melee_weapons.spatula.dlc = "bbq"
+	self.melee_weapons.spatula.texture_bundle_folder = "bbq"
+	self.melee_weapons.spatula.anim_global_param = "melee_axe"
+	self.melee_weapons.spatula.type = "axe"
+	self.melee_weapons.spatula.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.spatula.unit = "units/pd2_dlc_bbq/weapons/spatula/wpn_fps_mel_spatula"
+	self.melee_weapons.spatula.third_unit = "units/pd2_dlc_bbq/weapons/spatula/wpn_third_mel_spatula"
+	self.melee_weapons.spatula.stats.weapon_type = "blunt"
+	self.melee_weapons.spatula.stats.min_damage = 2
+	self.melee_weapons.spatula.stats.max_damage = 3
+	self.melee_weapons.spatula.stats.min_damage_effect = 1.5
+	self.melee_weapons.spatula.stats.max_damage_effect = 2
+	self.melee_weapons.spatula.stats.charge_time = 1
+	self.melee_weapons.spatula.stats.range = 185
+	self.melee_weapons.spatula.sounds = {}
+	self.melee_weapons.spatula.sounds.equip = "bbq_spatula_equip"
+	self.melee_weapons.spatula.sounds.hit_air = "bbq_spatula_hit_air"
+	self.melee_weapons.spatula.sounds.hit_gen = "bbq_spatula_hit_gen"
+	self.melee_weapons.spatula.sounds.hit_body = "bbq_spatula_hit_body"
+	self.melee_weapons.spatula.sounds.charge = "bbq_spatula_charge"
+	self.melee_weapons.spatula.repeat_expire_t = 0.8
+	self.melee_weapons.spatula.stats.concealment = 27
+	self.melee_weapons.tenderizer = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.tenderizer.name_id = "bm_melee_tenderizer"
+	self.melee_weapons.tenderizer.dlc = "bbq"
+	self.melee_weapons.tenderizer.texture_bundle_folder = "bbq"
+	self.melee_weapons.tenderizer.anim_global_param = "melee_axe"
+	self.melee_weapons.tenderizer.type = "axe"
+	self.melee_weapons.tenderizer.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.tenderizer.unit = "units/pd2_dlc_bbq/weapons/wpn_mel_tenderizer/wpn_fps_mel_tenderizer"
+	self.melee_weapons.tenderizer.third_unit = "units/pd2_dlc_bbq/weapons/wpn_mel_tenderizer/wpn_third_mel_tenderizer"
+	self.melee_weapons.tenderizer.stats.weapon_type = "blunt"
+	self.melee_weapons.tenderizer.stats.min_damage = 3
+	self.melee_weapons.tenderizer.stats.max_damage = 9
+	self.melee_weapons.tenderizer.stats.min_damage_effect = 2
+	self.melee_weapons.tenderizer.stats.max_damage_effect = 1.6
+	self.melee_weapons.tenderizer.stats.charge_time = 3
+	self.melee_weapons.tenderizer.stats.range = 185
+	self.melee_weapons.tenderizer.sounds = {}
+	self.melee_weapons.tenderizer.sounds.equip = "bbq_tenderizer_equip"
+	self.melee_weapons.tenderizer.sounds.hit_air = "bbq_tenderizer_hit_air"
+	self.melee_weapons.tenderizer.sounds.hit_gen = "bbq_tenderizer_hit_gen"
+	self.melee_weapons.tenderizer.sounds.hit_body = "bbq_tenderizer_hit_body"
+	self.melee_weapons.tenderizer.sounds.charge = "bbq_tenderizer_charge"
+	self.melee_weapons.tenderizer.repeat_expire_t = 0.8
+	self.melee_weapons.tenderizer.stats.concealment = 27
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

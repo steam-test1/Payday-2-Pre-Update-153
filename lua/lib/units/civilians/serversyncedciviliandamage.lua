@@ -14,6 +14,10 @@ function ServerSyncedCivilianDamage:_send_explosion_attack_result(attack_data, a
 	self:_send_sync_explosion_attack_result(attack_data)
 end
 
+function ServerSyncedCivilianDamage:_send_fire_attack_result(attack_data, attacker, damage_percent)
+	self:_send_sync_fire_attack_result(attack_data)
+end
+
 function ServerSyncedCivilianDamage:_send_melee_attack_result(attack_data, damage_percent, hit_offset_height)
 	self:_send_sync_melee_attack_result(attack_data, hit_offset_height, 0)
 end
@@ -24,6 +28,10 @@ end
 
 function ServerSyncedCivilianDamage:_send_sync_explosion_attack_result(attack_data)
 	TeamAIDamage._send_explosion_attack_result(self, attack_data)
+end
+
+function ServerSyncedCivilianDamage:_send_sync_fire_attack_result(attack_data)
+	TeamAIDamage._send_fire_attack_result(self, attack_data)
 end
 
 function ServerSyncedCivilianDamage:_send_sync_melee_attack_result(attack_data, hit_offset_height, variant)

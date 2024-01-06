@@ -962,7 +962,12 @@ function PlayerStandard:_start_action_throw_grenade(t, input)
 	self:_interupt_action_steelsight(t)
 	self:_interupt_action_running(t)
 	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, "throw_grenade")
-	self._ext_camera:play_redirect(Idstring("throw_grenade"))
+	local grenade_index = tweak_data.blackmarket:get_index_from_grenade_id(managers.blackmarket:equipped_grenade())
+	if grenade_index == 4 then
+		self._ext_camera:play_redirect(Idstring("throw_molotov"))
+	else
+		self._ext_camera:play_redirect(Idstring("throw_grenade"))
+	end
 	self._state_data.throw_grenade_expire_t = t + 1.1
 	self:_stance_entered()
 end
@@ -1473,6 +1478,7 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 				else
 					self._state_data.reload_exit_expire_t = t + self._equipped_unit:base():reload_not_empty_exit_expire_t() / speed_multiplier
 					self._ext_camera:play_redirect(self.IDS_RELOAD_NOT_EMPTY_EXIT, speed_multiplier)
+					self._equipped_unit:base():tweak_data_anim_play("reload_not_empty_exit", speed_multiplier)
 				end
 			elseif self._equipped_unit then
 				if not interupt then
@@ -2550,6 +2556,7 @@ function PlayerStandard:_start_action_reload_enter(t)
 			local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier()
 			self._ext_camera:play_redirect(Idstring("reload_enter_" .. self._equipped_unit:base().name_id), speed_multiplier)
 			self._state_data.reload_enter_expire_t = t + self._equipped_unit:base():reload_enter_expire_t() / speed_multiplier
+			self._equipped_unit:base():tweak_data_anim_play("reload_enter", speed_multiplier)
 			return
 		end
 		self:_start_action_reload(t)
@@ -2584,6 +2591,7 @@ function PlayerStandard:_interupt_action_reload(t)
 		self._equipped_unit:base():check_bullet_objects()
 	end
 	if self:_is_reloading() then
+		self._equipped_unit:base():tweak_data_anim_stop("reload_enter")
 		self._equipped_unit:base():tweak_data_anim_stop("reload")
 		self._equipped_unit:base():tweak_data_anim_stop("reload_not_empty")
 		self._equipped_unit:base():tweak_data_anim_stop("reload_exit")

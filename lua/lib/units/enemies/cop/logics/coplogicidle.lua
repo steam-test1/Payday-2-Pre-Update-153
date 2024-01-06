@@ -1184,7 +1184,8 @@ function CopLogicIdle._start_idle_action_from_act(data)
 			light_hurt = -1,
 			hurt = -1,
 			heavy_hurt = -1,
-			expl_hurt = -1
+			expl_hurt = -1,
+			fire_hurt = -1
 		}
 	})
 end

@@ -392,6 +392,10 @@ function GenericDLCManager:has_the_bomb()
 	return Global.dlc_manager.all_dlc_data.the_bomb and Global.dlc_manager.all_dlc_data.the_bomb.verified
 end
 
+function GenericDLCManager:has_bbq()
+	return Global.dlc_manager.all_dlc_data.bbq and Global.dlc_manager.all_dlc_data.bbq.verified
+end
+
 function GenericDLCManager:has_xmas_soundtrack()
 	return Global.dlc_manager.all_dlc_data.xmas_soundtrack and Global.dlc_manager.all_dlc_data.xmas_soundtrack.verified
 end
@@ -702,6 +706,7 @@ function WINDLCManager:init()
 			character_pack_dragan = {app_id = "344140", no_install = true},
 			hope_diamond = {app_id = "337660", no_install = true},
 			the_bomb = {app_id = "339480", no_install = true},
+			bbq = {app_id = "358150", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			humble_pack2 = {app_id = "331040", no_install = true},

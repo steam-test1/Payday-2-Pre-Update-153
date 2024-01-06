@@ -86,6 +86,9 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_x_g22c_npc()
 	self:_init_data_x_g17_npc()
 	self:_init_data_x_usp_npc()
+	self:_init_data_flamethrower_mk2_npc()
+	self:_init_data_m32_npc()
+	self:_init_data_aa12_npc()
 	self:_precalculate_values()
 end
 
@@ -701,6 +704,7 @@ function WeaponTweakData:_init_data_swat_van_turret_module_npc()
 	self.swat_van_turret_module.alert_size = 2500
 	self.swat_van_turret_module.headshot_dmg_mul = 4
 	self.swat_van_turret_module.EXPLOSION_DMG_MUL = 7
+	self.swat_van_turret_module.FIRE_DMG_MUL = 1
 	self.swat_van_turret_module.BAG_DMG_MUL = 200
 	self.swat_van_turret_module.SHIELD_DMG_MUL = 1
 	self.swat_van_turret_module.HEALTH_INIT = 5000
@@ -1444,6 +1448,55 @@ function WeaponTweakData:_init_data_x_usp_npc()
 	self.x_usp_npc.hold = "akimbo_pistol"
 	self.x_usp_npc.alert_size = 1800
 	self.x_usp_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_flamethrower_mk2_npc()
+	self.flamethrower_mk2_npc.sounds.prefix = "flamethrower_npc"
+	self.flamethrower_mk2_npc.sounds.fire = "flamethrower_npc_fire"
+	self.flamethrower_mk2_npc.sounds.stop_fire = "flamethrower_npc_fire_stop"
+	self.flamethrower_mk2_npc.use_data.selection_index = 2
+	self.flamethrower_mk2_npc.DAMAGE = 1
+	self.flamethrower_mk2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.flamethrower_mk2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.flamethrower_mk2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.flamethrower_mk2_npc.CLIP_AMMO_MAX = 150
+	self.flamethrower_mk2_npc.NR_CLIPS_MAX = 4
+	self.flamethrower_mk2_npc.hold = "pistol"
+	self.flamethrower_mk2_npc.auto.fire_rate = 0.05
+	self.flamethrower_mk2_npc.hud_icon = "rifle"
+	self.flamethrower_mk2_npc.alert_size = 2500
+	self.flamethrower_mk2_npc.suppression = 0.45
+end
+
+function WeaponTweakData:_init_data_m32_npc()
+	self.m32_npc.sounds.prefix = "gl40_npc"
+	self.m32_npc.use_data.selection_index = 2
+	self.m32_npc.DAMAGE = 2
+	self.m32_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m32_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m32_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m32_npc.no_trail = true
+	self.m32_npc.CLIP_AMMO_MAX = 1
+	self.m32_npc.NR_CLIPS_MAX = 4
+	self.m32_npc.auto.fire_rate = 0.1
+	self.m32_npc.hold = "rifle"
+	self.m32_npc.alert_size = 2800
+	self.m32_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_aa12_npc()
+	self.aa12_npc.sounds.prefix = "aa12_npc"
+	self.aa12_npc.use_data.selection_index = 2
+	self.aa12_npc.DAMAGE = 5
+	self.aa12_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.aa12_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.aa12_npc.auto.fire_rate = 0.2
+	self.aa12_npc.CLIP_AMMO_MAX = 20
+	self.aa12_npc.NR_CLIPS_MAX = 4
+	self.aa12_npc.hold = "rifle"
+	self.aa12_npc.alert_size = 4500
+	self.aa12_npc.suppression = 1.8
+	self.aa12_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -4012,8 +4065,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saw.sounds.enter_steelsight = "secondary_steel_sight_enter"
 	self.saw.sounds.leave_steelsight = "secondary_steel_sight_exit"
 	self.saw.timers = {}
-	self.saw.timers.reload_not_empty = 3.2
-	self.saw.timers.reload_empty = 3.2
+	self.saw.timers.reload_not_empty = 3.75
+	self.saw.timers.reload_empty = 3.75
 	self.saw.timers.unequip = 0.8
 	self.saw.timers.equip = 0.8
 	self.saw.name_id = "bm_w_saw"
@@ -4885,6 +4938,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hk21.timers.reload_empty = 6.7
 	self.hk21.timers.unequip = 0.9
 	self.hk21.timers.equip = 0.9
+	self.hk21.timers.deploy_bipod = 1
+	self.hk21.bipod_camera_spin_limit = 40
+	self.hk21.bipod_camera_pitch_limit = 15
 	self.hk21.name_id = "bm_w_hk21"
 	self.hk21.desc_id = "bm_w_hk21_desc"
 	self.hk21.description_id = "des_hk21"
@@ -4975,6 +5031,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m249.timers.reload_empty = 5.62
 	self.m249.timers.unequip = 0.9
 	self.m249.timers.equip = 0.9
+	self.m249.timers.deploy_bipod = 2
+	self.m249.bipod_camera_spin_limit = 40
+	self.m249.bipod_camera_pitch_limit = 15
 	self.m249.name_id = "bm_w_m249"
 	self.m249.desc_id = "bm_w_m249_desc"
 	self.m249.description_id = "des_m249"
@@ -8269,6 +8328,293 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.flamethrower_mk2 = {}
+	self.flamethrower_mk2.category = "flamethrower"
+	self.flamethrower_mk2.has_description = true
+	self.flamethrower_mk2.damage_melee = damage_melee_default
+	self.flamethrower_mk2.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.flamethrower_mk2.sounds = {}
+	self.flamethrower_mk2.sounds.fire = "flamethrower_fire"
+	self.flamethrower_mk2.sounds.stop_fire = "flamethrower_stop"
+	self.flamethrower_mk2.sounds.dryfire = "flamethrower_dryfire"
+	self.flamethrower_mk2.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.flamethrower_mk2.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.flamethrower_mk2.timers = {}
+	self.flamethrower_mk2.timers.reload_not_empty = 8.5
+	self.flamethrower_mk2.timers.reload_empty = self.flamethrower_mk2.timers.reload_not_empty
+	self.flamethrower_mk2.timers.unequip = 0.85
+	self.flamethrower_mk2.timers.equip = 0.85
+	self.flamethrower_mk2.name_id = "bm_w_flamethrower_mk2"
+	self.flamethrower_mk2.desc_id = "bm_w_flamethrower_mk2_desc"
+	self.flamethrower_mk2.description_id = "des_flamethrower_mk2"
+	self.flamethrower_mk2.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.flamethrower_mk2.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.flamethrower_mk2.use_data = {}
+	self.flamethrower_mk2.use_data.selection_index = 2
+	self.flamethrower_mk2.use_data.align_place = "right_hand"
+	self.flamethrower_mk2.DAMAGE = 1
+	self.flamethrower_mk2.rays = 6
+	self.flamethrower_mk2.CLIP_AMMO_MAX = 150
+	self.flamethrower_mk2.NR_CLIPS_MAX = 4
+	self.flamethrower_mk2.AMMO_MAX = self.flamethrower_mk2.CLIP_AMMO_MAX * self.flamethrower_mk2.NR_CLIPS_MAX
+	self.flamethrower_mk2.AMMO_PICKUP = self:_pickup_chance(0, 1)
+	self.flamethrower_mk2.FIRE_MODE = "auto"
+	self.flamethrower_mk2.fire_mode_data = {}
+	self.flamethrower_mk2.fire_mode_data.fire_rate = 0.03
+	self.flamethrower_mk2.auto = {}
+	self.flamethrower_mk2.auto.fire_rate = 0.05
+	self.flamethrower_mk2.spread = {}
+	self.flamethrower_mk2.spread.standing = self.r870.spread.standing
+	self.flamethrower_mk2.spread.crouching = self.r870.spread.crouching
+	self.flamethrower_mk2.spread.steelsight = self.r870.spread.steelsight
+	self.flamethrower_mk2.spread.moving_standing = self.r870.spread.moving_standing
+	self.flamethrower_mk2.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.flamethrower_mk2.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.flamethrower_mk2.kick = {}
+	self.flamethrower_mk2.kick.standing = {
+		0,
+		0,
+		0,
+		0
+	}
+	self.flamethrower_mk2.kick.crouching = self.flamethrower_mk2.kick.standing
+	self.flamethrower_mk2.kick.steelsight = self.flamethrower_mk2.kick.standing
+	self.flamethrower_mk2.crosshair = {}
+	self.flamethrower_mk2.crosshair.standing = {}
+	self.flamethrower_mk2.crosshair.crouching = {}
+	self.flamethrower_mk2.crosshair.steelsight = {}
+	self.flamethrower_mk2.crosshair.standing.offset = 0.16
+	self.flamethrower_mk2.crosshair.standing.moving_offset = 0.8
+	self.flamethrower_mk2.crosshair.standing.kick_offset = 0.6
+	self.flamethrower_mk2.crosshair.standing.hidden = true
+	self.flamethrower_mk2.crosshair.crouching.offset = 0.08
+	self.flamethrower_mk2.crosshair.crouching.moving_offset = 0.7
+	self.flamethrower_mk2.crosshair.crouching.kick_offset = 0.4
+	self.flamethrower_mk2.crosshair.crouching.hidden = true
+	self.flamethrower_mk2.crosshair.steelsight.hidden = true
+	self.flamethrower_mk2.crosshair.steelsight.offset = 0
+	self.flamethrower_mk2.crosshair.steelsight.moving_offset = 0
+	self.flamethrower_mk2.crosshair.steelsight.kick_offset = 0.1
+	self.flamethrower_mk2.shake = {}
+	self.flamethrower_mk2.shake.fire_multiplier = 0
+	self.flamethrower_mk2.shake.fire_steelsight_multiplier = 0
+	self.flamethrower_mk2.autohit = autohit_shotgun_default
+	self.flamethrower_mk2.aim_assist = aim_assist_shotgun_default
+	self.flamethrower_mk2.animations = {}
+	self.flamethrower_mk2.animations.equip_id = "equip_flamethrower"
+	self.flamethrower_mk2.animations.recoil_steelsight = false
+	self.flamethrower_mk2.flame_max_range = 1000
+	self.flamethrower_mk2.single_flame_effect_duration = 1
+	self.flamethrower_mk2.global_value = "bbq"
+	self.flamethrower_mk2.texture_bundle_folder = "bbq"
+	self.flamethrower_mk2.fire_dot_data = {
+		dot_damage = "2",
+		dot_trigger_max_distance = "3000",
+		dot_trigger_chance = "10",
+		dot_length = "3",
+		dot_tick_damage = "0.5"
+	}
+	self.flamethrower_mk2.stats = {
+		damage = 5,
+		spread = 1,
+		recoil = 0,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 7,
+		suppression = 2,
+		alert_size = 1,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.m32 = {}
+	self.m32.category = "grenade_launcher"
+	self.m32.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.m32.damage_melee = damage_melee_default
+	self.m32.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m32.sounds = {}
+	self.m32.sounds.fire = "mgl_fire"
+	self.m32.sounds.dryfire = "shotgun_dryfire"
+	self.m32.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.m32.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.m32.timers = {}
+	self.m32.timers.shotgun_reload_enter = 1.96
+	self.m32.timers.shotgun_reload_exit_empty = 1.33
+	self.m32.timers.shotgun_reload_exit_not_empty = 1.33
+	self.m32.timers.shotgun_reload_shell = 2
+	self.m32.timers.shotgun_reload_first_shell_offset = 0
+	self.m32.timers.unequip = 0.85
+	self.m32.timers.equip = 0.85
+	self.m32.name_id = "bm_w_m32"
+	self.m32.desc_id = "bm_w_m32_desc"
+	self.m32.description_id = "des_m32"
+	self.m32.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.m32.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.m32.use_data = {}
+	self.m32.use_data.selection_index = 2
+	self.m32.use_data.align_place = "right_hand"
+	self.m32.DAMAGE = 6
+	self.m32.damage_near = 1000
+	self.m32.damage_far = 2000
+	self.m32.rays = 6
+	self.m32.CLIP_AMMO_MAX = 6
+	self.m32.NR_CLIPS_MAX = 2
+	self.m32.AMMO_MAX = self.m32.CLIP_AMMO_MAX * self.m32.NR_CLIPS_MAX
+	self.m32.AMMO_PICKUP = {0.05, 0.65}
+	self.m32.FIRE_MODE = "single"
+	self.m32.fire_mode_data = {}
+	self.m32.fire_mode_data.fire_rate = 1
+	self.m32.single = {}
+	self.m32.single.fire_rate = 1.1
+	self.m32.spread = {}
+	self.m32.spread.standing = self.r870.spread.standing
+	self.m32.spread.crouching = self.r870.spread.crouching
+	self.m32.spread.steelsight = self.r870.spread.steelsight
+	self.m32.spread.moving_standing = self.r870.spread.moving_standing
+	self.m32.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.m32.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.m32.kick = {}
+	self.m32.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.m32.kick.crouching = self.m32.kick.standing
+	self.m32.kick.steelsight = self.m32.kick.standing
+	self.m32.crosshair = {}
+	self.m32.crosshair.standing = {}
+	self.m32.crosshair.crouching = {}
+	self.m32.crosshair.steelsight = {}
+	self.m32.crosshair.standing.offset = 0.16
+	self.m32.crosshair.standing.moving_offset = 0.8
+	self.m32.crosshair.standing.kick_offset = 0.6
+	self.m32.crosshair.standing.hidden = true
+	self.m32.crosshair.crouching.offset = 0.08
+	self.m32.crosshair.crouching.moving_offset = 0.7
+	self.m32.crosshair.crouching.kick_offset = 0.4
+	self.m32.crosshair.crouching.hidden = true
+	self.m32.crosshair.steelsight.hidden = true
+	self.m32.crosshair.steelsight.offset = 0
+	self.m32.crosshair.steelsight.moving_offset = 0
+	self.m32.crosshair.steelsight.kick_offset = 0.1
+	self.m32.shake = {}
+	self.m32.shake.fire_multiplier = 2
+	self.m32.shake.fire_steelsight_multiplier = 2
+	self.m32.autohit = autohit_shotgun_default
+	self.m32.aim_assist = aim_assist_shotgun_default
+	self.m32.animations = {}
+	self.m32.animations.equip_id = "equip_m32"
+	self.m32.animations.recoil_steelsight = true
+	self.m32.global_value = "bbq"
+	self.m32.texture_bundle_folder = "bbq"
+	self.m32.ignore_damage_upgrades = true
+	self.m32.stats = {
+		damage = 31,
+		spread = 3,
+		recoil = 9,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 10,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.m32.stats_modifiers = {damage = 3.4}
+	self.aa12 = {}
+	self.aa12.category = "shotgun"
+	self.aa12.damage_melee = damage_melee_default
+	self.aa12.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.aa12.sounds = {}
+	self.aa12.sounds.fire = "aa12_fire"
+	self.aa12.sounds.fire_single = "aa12_fire_single"
+	self.aa12.sounds.fire_auto = "aa12_fire"
+	self.aa12.sounds.dryfire = "shotgun_dryfire"
+	self.aa12.sounds.stop_fire = "aa12_stop"
+	self.aa12.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.aa12.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.aa12.timers = {}
+	self.aa12.timers.reload_not_empty = 3
+	self.aa12.timers.reload_empty = 4.1
+	self.aa12.timers.unequip = 0.75
+	self.aa12.timers.equip = 0.75
+	self.aa12.name_id = "bm_w_aa12"
+	self.aa12.desc_id = "bm_w_aa12_desc"
+	self.aa12.description_id = "des_aa12"
+	self.aa12.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.aa12.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.aa12.use_data = {}
+	self.aa12.use_data.selection_index = 2
+	self.aa12.use_data.align_place = "right_hand"
+	self.aa12.DAMAGE = 6
+	self.aa12.damage_near = 800
+	self.aa12.damage_far = 2000
+	self.aa12.rays = 5
+	self.aa12.CLIP_AMMO_MAX = 8
+	self.aa12.NR_CLIPS_MAX = math.round(total_damage_primary / 4.5 / self.aa12.CLIP_AMMO_MAX)
+	self.aa12.AMMO_MAX = self.aa12.CLIP_AMMO_MAX * self.aa12.NR_CLIPS_MAX
+	self.aa12.AMMO_PICKUP = self:_pickup_chance(self.aa12.AMMO_MAX, 2)
+	self.aa12.FIRE_MODE = "auto"
+	self.aa12.fire_mode_data = {}
+	self.aa12.fire_mode_data.fire_rate = 0.2
+	self.aa12.CAN_TOGGLE_FIREMODE = true
+	self.aa12.auto = {}
+	self.aa12.auto.fire_rate = 0.2
+	self.aa12.spread = {}
+	self.aa12.spread.standing = self.r870.spread.standing
+	self.aa12.spread.crouching = self.r870.spread.crouching
+	self.aa12.spread.steelsight = self.r870.spread.steelsight
+	self.aa12.spread.moving_standing = self.r870.spread.moving_standing
+	self.aa12.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.aa12.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.aa12.kick = {}
+	self.aa12.kick.standing = self.r870.kick.standing
+	self.aa12.kick.crouching = self.aa12.kick.standing
+	self.aa12.kick.steelsight = self.r870.kick.steelsight
+	self.aa12.crosshair = {}
+	self.aa12.crosshair.standing = {}
+	self.aa12.crosshair.crouching = {}
+	self.aa12.crosshair.steelsight = {}
+	self.aa12.crosshair.standing.offset = 0.7
+	self.aa12.crosshair.standing.moving_offset = 0.7
+	self.aa12.crosshair.standing.kick_offset = 0.8
+	self.aa12.crosshair.crouching.offset = 0.65
+	self.aa12.crosshair.crouching.moving_offset = 0.65
+	self.aa12.crosshair.crouching.kick_offset = 0.75
+	self.aa12.crosshair.steelsight.hidden = true
+	self.aa12.crosshair.steelsight.offset = 0
+	self.aa12.crosshair.steelsight.moving_offset = 0
+	self.aa12.crosshair.steelsight.kick_offset = 0
+	self.aa12.shake = {}
+	self.aa12.shake.fire_multiplier = 2
+	self.aa12.shake.fire_steelsight_multiplier = 1.25
+	self.aa12.autohit = autohit_shotgun_default
+	self.aa12.aim_assist = aim_assist_shotgun_default
+	self.aa12.weapon_hold = "aa12"
+	self.aa12.animations = {}
+	self.aa12.animations.equip_id = "equip_r870_shotgun"
+	self.aa12.animations.recoil_steelsight = true
+	self.aa12.global_value = "bbq"
+	self.aa12.texture_bundle_folder = "bbq"
+	self.aa12.stats = {
+		damage = 16,
+		spread = 7,
+		recoil = 7,
+		spread_moving = 7,
+		zoom = 3,
+		concealment = 9,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -8857,6 +9203,24 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.flamethrower_mk2_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m32_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.aa12_npc = {
+		usage = "saiga",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -8944,4 +9308,7 @@ function WeaponTweakData:_precalculate_values()
 	self.x_g22c_npc.AMMO_MAX = self.x_g22c_npc.CLIP_AMMO_MAX * self.x_g22c_npc.NR_CLIPS_MAX
 	self.x_g17_npc.AMMO_MAX = self.x_g17_npc.CLIP_AMMO_MAX * self.x_g17_npc.NR_CLIPS_MAX
 	self.x_usp_npc.AMMO_MAX = self.x_usp_npc.CLIP_AMMO_MAX * self.x_usp_npc.NR_CLIPS_MAX
+	self.flamethrower_mk2_npc.AMMO_MAX = self.flamethrower_mk2_npc.CLIP_AMMO_MAX * self.flamethrower_mk2_npc.NR_CLIPS_MAX
+	self.m32_npc.AMMO_MAX = self.m32_npc.CLIP_AMMO_MAX * self.m32_npc.NR_CLIPS_MAX
+	self.aa12_npc.AMMO_MAX = self.aa12_npc.CLIP_AMMO_MAX * self.aa12_npc.NR_CLIPS_MAX
 end

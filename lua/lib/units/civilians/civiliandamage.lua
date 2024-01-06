@@ -60,6 +60,13 @@ function CivilianDamage:damage_explosion(attack_data)
 	return CopDamage.damage_explosion(self, attack_data)
 end
 
+function CivilianDamage:damage_fire(attack_data)
+	if attack_data.variant == "fire" then
+		attack_data.damage = 10
+	end
+	return CopDamage.damage_fire(self, attack_data)
+end
+
 function CivilianDamage:damage_melee(attack_data)
 	if managers.player:has_category_upgrade("player", "civ_harmless_melee") and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
 		self._survive_shot_t = TimerManager:game():time() + 2.5

@@ -585,13 +585,96 @@ function ConnectionNetworkHandler:choose_lootcard(card_id, sender)
 	end
 end
 
-function ConnectionNetworkHandler:sync_explosive_bullet(position, normal, damage, sender)
+function ConnectionNetworkHandler:sync_explode_bullet(position, normal, damage, peer_id_or_selection_index, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	if InstantExplosiveBulletBase then
+		if Network:is_server() then
+			local user_unit = managers.criminals and managers.criminals:character_unit_by_peer_id(peer:id())
+			if alive(user_unit) then
+				local weapon_unit = user_unit:inventory():unit_by_selection(peer_id_or_selection_index)
+				if alive(weapon_unit) then
+					InstantExplosiveBulletBase:on_collision_server(position, normal, damage / 163.84, user_unit, weapon_unit, peer:id(), peer_id_or_selection_index)
+				end
+			end
+		else
+			InstantExplosiveBulletBase:on_collision_client(position, normal, damage / 163.84, managers.criminals and managers.criminals:character_unit_by_peer_id(peer_id_or_selection_index))
+		end
+	end
+end
+
+function ConnectionNetworkHandler:sync_flame_bullet(position, normal, damage, peer_id_or_selection_index, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	if FlameBulletBase then
+		if Network:is_server() then
+			local user_unit = managers.criminals and managers.criminals:character_unit_by_peer_id(peer:id())
+			if alive(user_unit) then
+				local weapon_unit = user_unit:inventory():unit_by_selection(peer_id_or_selection_index)
+				if alive(weapon_unit) then
+					FlameBulletBase:on_collision_server(position, normal, damage / 163.84, user_unit, weapon_unit, peer:id(), peer_id_or_selection_index)
+				end
+			end
+		else
+			FlameBulletBase:on_collision_client(position, normal, damage / 163.84, managers.criminals and managers.criminals:character_unit_by_peer_id(peer_id_or_selection_index))
+		end
+	end
+end
+
+function ConnectionNetworkHandler:sync_explosion_results(count_cops, count_gangsters, count_civilians, count_cop_kills, count_gangster_kills, count_civilian_kills, selection_index, sender)
 	local peer = self._verify_sender(sender)
 	if not peer then
 		return
 	end
-	if InstantExplosiveBulletBase then
-		InstantExplosiveBulletBase:on_collision_client(position, normal, damage / 163.84, managers.criminals and managers.criminals:character_unit_by_peer_id(peer:id()))
+	local player = managers.player:local_player()
+	local weapon_unit = alive(player) and player:inventory():unit_by_selection(selection_index)
+	if alive(weapon_unit) then
+		local enemies_hit = (count_gangsters or 0) + (count_cops or 0)
+		local enemies_killed = (count_gangster_kills or 0) + (count_cop_kills or 0)
+		managers.statistics:shot_fired({hit = false, weapon_unit = weapon_unit})
+		for i = 1, enemies_hit do
+			managers.statistics:shot_fired({
+				hit = true,
+				weapon_unit = weapon_unit,
+				skip_bullet_count = true
+			})
+		end
+		local weapon_pass, weapon_type_pass, count_pass, all_pass
+		for achievement, achievement_data in pairs(tweak_data.achievement.explosion_achievements) do
+			weapon_pass = not achievement_data.weapon or true
+			weapon_type_pass = not achievement_data.weapon_type or weapon_unit:base() and weapon_unit:base().weapon_tweak_data and weapon_unit:base():weapon_tweak_data().category == achievement_data.weapon_type
+			count_pass = not achievement_data.count or (achievement_data.kill and enemies_killed or enemies_hit) >= achievement_data.count
+			all_pass = weapon_pass and weapon_type_pass and count_pass
+			if all_pass and achievement_data.award then
+				managers.achievment:award(achievement_data.award)
+			end
+		end
+	end
+end
+
+function ConnectionNetworkHandler:sync_fire_results(count_cops, count_gangsters, count_civilians, count_cop_kills, count_gangster_kills, count_civilian_kills, selection_index, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	local player = managers.player:local_player()
+	local weapon_unit = alive(player) and player:inventory():unit_by_selection(selection_index)
+	if alive(weapon_unit) then
+		local enemies_hit = (count_gangsters or 0) + (count_cops or 0)
+		local enemies_killed = (count_gangster_kills or 0) + (count_cop_kills or 0)
+		managers.statistics:shot_fired({hit = false, weapon_unit = weapon_unit})
+		for i = 1, enemies_hit do
+			managers.statistics:shot_fired({
+				hit = true,
+				weapon_unit = weapon_unit,
+				skip_bullet_count = true
+			})
+		end
+		local weapon_pass, weapon_type_pass, count_pass, all_pass
 	end
 end
 

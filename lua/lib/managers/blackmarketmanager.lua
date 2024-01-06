@@ -61,12 +61,19 @@ end
 function BlackMarketManager:_setup_grenades()
 	local grenades = {}
 	Global.blackmarket_manager.grenades = grenades
-	for grenade, _ in pairs(tweak_data.blackmarket.grenades) do
-		grenades[grenade] = {
-			unlocked = true,
-			equipped = false,
-			amount = 0
-		}
+	for grenade_id, grenade in pairs(tweak_data.blackmarket.grenades) do
+		if grenade.throwable then
+			grenades[grenade_id] = {
+				unlocked = false,
+				equipped = false,
+				level = 0,
+				skill_based = false,
+				amount = 0
+			}
+			local is_default, weapon_level = managers.upgrades:get_value(grenade_id, self._defaults.grenade)
+			grenades[grenade_id].level = weapon_level
+			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.grenades[grenade_id].dlc
+		end
 	end
 	grenades[self._defaults.grenade].equipped = true
 	grenades[self._defaults.grenade].unlocked = true
@@ -669,7 +676,7 @@ function BlackMarketManager:outfit_string_index(type)
 	if type == "melee_weapon" then
 		return 14
 	end
-	if type == "throwable" then
+	if type == "grenade" then
 		return 15
 	end
 	if type == "skills" then
@@ -707,7 +714,7 @@ function BlackMarketManager:unpack_outfit_from_string(outfit_string)
 		outfit.secondary.blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(outfit.secondary.factory_id)
 	end
 	outfit.melee_weapon = data[self:outfit_string_index("melee_weapon")] or self._defaults.melee_weapon
-	outfit.throwable = data[self:outfit_string_index("throwable")] or self._defaults.grenade
+	outfit.grenade = data[self:outfit_string_index("grenade")] or self._defaults.grenade
 	outfit.deployable = data[self:outfit_string_index("deployable")] or nil
 	outfit.deployable_amount = tonumber(data[self:outfit_string_index("deployable_amount")] or "0")
 	outfit.concealment_modifier = data[self:outfit_string_index("concealment_modifier")] or 0
@@ -2129,6 +2136,30 @@ function BlackMarketManager:on_unaquired_melee_weapon(upgrade, id)
 	end
 end
 
+function BlackMarketManager:on_aquired_grenade(upgrade, id, loading)
+	if not self._global.grenades[id] then
+		Application:error("[BlackMarketManager:on_aquired_grenade] Grenade do not exist in blackmarket", "grenade_id", id)
+		return
+	end
+	self._global.grenades[id].unlocked = true
+	self._global.grenades[id].owned = true
+	if not loading then
+		self._global.new_drops.normal = self._global.new_drops.normal or {}
+		self._global.new_drops.normal.grenades = self._global.new_drops.normal.grenades or {}
+		self._global.new_drops.normal.grenades[id] = true
+	end
+end
+
+function BlackMarketManager:on_unaquired_grenade(upgrade, id)
+	self._global.grenades[id].unlocked = false
+	self._global.grenades[id].owned = false
+	local equipped_grenade = managers.blackmarket:equipped_grenade()
+	if equipped_grenade and equipped_grenade == id then
+		equipped_grenade.equipped = false
+		self:_verfify_equipped_category("grenades")
+	end
+end
+
 function BlackMarketManager:aquire_default_weapons(only_enable)
 	local glock_17 = self._global and self._global.weapons and self._global.weapons.glock_17
 	if glock_17 and (not self._global.crafted_items.secondaries or not glock_17.unlocked) and not managers.upgrades:aquired("glock_17", UpgradesManager.AQUIRE_STRINGS[1]) then
@@ -2454,6 +2485,10 @@ function BlackMarketManager:view_weapon_without_mod(category, slot, part_id, ope
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
+end
+
+function BlackMarketManager:preview_grenade(grenade_id)
+	managers.menu_scene:spawn_grenade(grenade_id)
 end
 
 function BlackMarketManager:preview_melee_weapon(melee_weapon_id)

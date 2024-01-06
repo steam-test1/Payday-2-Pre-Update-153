@@ -943,10 +943,10 @@ function NetworkPeer:melee_id()
 	return data[managers.blackmarket:outfit_string_index("melee_weapon")]
 end
 
-function NetworkPeer:throwable_id()
+function NetworkPeer:grenade_id()
 	local outfit_string = self:profile("outfit_string")
 	local data = string.split(outfit_string, " ")
-	return data[managers.blackmarket:outfit_string_index("throwable")]
+	return data[managers.blackmarket:outfit_string_index("grenade")]
 end
 
 function NetworkPeer:skills()

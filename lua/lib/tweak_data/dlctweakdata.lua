@@ -25,6 +25,7 @@ function DLCTweakData:init(tweak_data)
 		character_pack_dragan = true,
 		dlc_akm4 = 1,
 		dlc_pack_overkill = true,
+		bbq = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
 		hlm2 = true,
@@ -3049,6 +3050,144 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "hectors_helmet",
+			amount = 1
+		}
+	}
+	self.bbq = {}
+	self.bbq.dlc = "has_bbq"
+	self.bbq.content = {}
+	self.bbq.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_m32_no_stock",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_m32_barrel_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_aa12_barrel_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_aa12_barrel_silenced",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_aa12_mag_drum",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_dragons_breath",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_grenade_launcher_incendiary",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_fla_mk2_mag_rare",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_fla_mk2_mag_welldone",
+			amount = 1
+		}
+	}
+	self.ach_bbq_1 = {}
+	self.ach_bbq_1.dlc = "has_achievement"
+	self.ach_bbq_1.achievement_id = "grill_1"
+	self.ach_bbq_1.content = {}
+	self.ach_bbq_1.content.loot_global_value = "bbq"
+	self.ach_bbq_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "firedemon",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "coal",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "fireborn",
+			amount = 1
+		}
+	}
+	self.ach_bbq_2 = {}
+	self.ach_bbq_2.dlc = "has_achievement"
+	self.ach_bbq_2.achievement_id = "grill_2"
+	self.ach_bbq_2.content = {}
+	self.ach_bbq_2.content.loot_global_value = "bbq"
+	self.ach_bbq_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "gasmask",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "candlelight",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "flammable",
+			amount = 1
+		}
+	}
+	self.ach_bbq_3 = {}
+	self.ach_bbq_3.dlc = "has_achievement"
+	self.ach_bbq_3.achievement_id = "grill_3"
+	self.ach_bbq_3.content = {}
+	self.ach_bbq_3.content.loot_global_value = "bbq"
+	self.ach_bbq_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "firemask",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "burn",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "flamer",
+			amount = 1
+		}
+	}
+	self.ach_bbq_4 = {}
+	self.ach_bbq_4.dlc = "has_achievement"
+	self.ach_bbq_4.achievement_id = "grill_4"
+	self.ach_bbq_4.content = {}
+	self.ach_bbq_4.content.loot_global_value = "bbq"
+	self.ach_bbq_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "chef_hat",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "toast",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hotflames",
 			amount = 1
 		}
 	}

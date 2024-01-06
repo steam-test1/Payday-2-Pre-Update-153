@@ -182,6 +182,33 @@ function TeamAIDamage:damage_explosion(attack_data)
 	return result
 end
 
+function TeamAIDamage:damage_fire(attack_data)
+	if self:_cannot_take_damage() then
+		return
+	end
+	local attacker_unit = attack_data.attacker_unit
+	if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+		attacker_unit = attacker_unit:base():thrower_unit()
+	end
+	if PlayerDamage.is_friendly_fire(self, attacker_unit) then
+		self:friendly_fire_hit()
+		return
+	end
+	local result = {
+		variant = attack_data.variant
+	}
+	local damage_percent, health_subtracted = self:_apply_damage(attack_data, result)
+	if 0 < health_subtracted then
+		self:_send_damage_drama(attack_data, health_subtracted)
+	end
+	if self._dead then
+		self:_unregister_unit()
+	end
+	self:_call_listeners(attack_data)
+	self:_send_fire_attack_result(attack_data)
+	return result
+end
+
 function TeamAIDamage:damage_mission(attack_data)
 	if self._dead or self._invulnerable then
 		return
@@ -563,6 +590,37 @@ function TeamAIDamage:sync_damage_explosion(attacker_unit, damage, i_attack_vari
 	self:_call_listeners(attack_data)
 end
 
+function TeamAIDamage:sync_damage_fire(attacker_unit, damage, i_attack_variant)
+	if self:_cannot_take_damage() then
+		return
+	end
+	local variant = CopDamage._ATTACK_VARIANTS[i_attack_variant]
+	damage = damage * self._HEALTH_TOTAL_PERCENT
+	local result = {variant = variant}
+	local hit_pos = mvector3.copy(self._unit:movement():m_com())
+	local attack_dir
+	if attacker_unit then
+		attack_dir = hit_pos - attacker_unit:position()
+		mvector3.normalize(attack_dir)
+	else
+		attack_dir = self._unit:rotation():y()
+	end
+	if not self._no_blood then
+		managers.game_play_central:sync_play_impact_flesh(hit_pos, attack_dir)
+	end
+	local attack_data = {
+		variant = variant,
+		attacker_unit = attacker_unit,
+		damage = damage,
+		attack_dir = attack_dir,
+		pos = hit_pos
+	}
+	local damage_percent, health_subtracted = self:_apply_damage(attack_data, result)
+	self:_send_damage_drama(attack_data, health_subtracted)
+	self:_send_fire_attack_result(attack_data)
+	self:_call_listeners(attack_data)
+end
+
 function TeamAIDamage:sync_damage_melee(attacker_unit, damage, damage_effect_percent, i_body, hit_offset_height)
 	if self:_cannot_take_damage() then
 		return
@@ -671,7 +729,16 @@ function TeamAIDamage:_send_explosion_attack_result(attack_data)
 		attacker = self._unit
 	end
 	local result_index = self._RESULT_INDEX_TABLE[attack_data.result.type] or 0
-	self._unit:network():send("from_server_damage_explosion", attacker, result_index, CopDamage._get_attack_variant_index(self, attack_data.variant))
+	self._unit:network():send("from_server_damage_explosion_fire", attacker, result_index, CopDamage._get_attack_variant_index(self, attack_data.variant))
+end
+
+function TeamAIDamage:_send_fire_attack_result(attack_data)
+	local attacker = attack_data.attacker_unit
+	if not attacker or attacker:id() == -1 then
+		attacker = self._unit
+	end
+	local result_index = self._RESULT_INDEX_TABLE[attack_data.result.type] or 0
+	self._unit:network():send("from_server_damage_explosion_fire", attacker, result_index, CopDamage._get_attack_variant_index(self, attack_data.variant))
 end
 
 function TeamAIDamage:_send_melee_attack_result(attack_data, hit_offset_height)

@@ -127,6 +127,12 @@ function UpgradesTweakData:_init_pd2_values()
 	self.explosive_bullet.range = 200
 	self.explosive_bullet.feedback_range = self.explosive_bullet.range
 	self.explosive_bullet.camera_shake_max_mul = 2
+	self.flame_bullet = {}
+	self.flame_bullet.curve_pow = 0.5
+	self.flame_bullet.player_dmg_mul = 0.1
+	self.flame_bullet.range = 200
+	self.flame_bullet.feedback_range = self.explosive_bullet.range
+	self.flame_bullet.camera_shake_max_mul = 2
 	self.values.player.crime_net_deal = {0.9, 0.8}
 	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
@@ -1350,7 +1356,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{
 			{
 				"4",
-				"8",
+				"6",
 				"15"
 			},
 			{"25%"},
@@ -1385,12 +1391,17 @@ function UpgradesTweakData:init()
 		name_id = "body_armor",
 		upgrades = {
 			"body_armor2",
-			"ak74"
+			"ak74",
+			"molotov"
 		}
 	}
 	self.level_tree[2] = {
 		name_id = "weapons",
 		upgrades = {"colt_1911", "mac10"}
+	}
+	self.level_tree[3] = {
+		name_id = "weapons",
+		upgrades = {"spatula", "fork"}
 	}
 	self.level_tree[4] = {
 		name_id = "weapons",
@@ -1567,7 +1578,14 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[43] = {
 		name_id = "weapons",
-		upgrades = {"b682"}
+		upgrades = {"b682", "m32"}
+	}
+	self.level_tree[44] = {
+		name_id = "weapons",
+		upgrades = {
+			"flamethrower_mk2",
+			"poker"
+		}
 	}
 	self.level_tree[45] = {
 		name_id = "weapons",
@@ -1583,7 +1601,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[48] = {
 		name_id = "weapons",
-		upgrades = {"dingdong"}
+		upgrades = {"dingdong", "tenderizer"}
 	}
 	self.level_tree[50] = {
 		name_id = "lvl_50",
@@ -1597,7 +1615,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[52] = {
 		name_id = "weapons",
-		upgrades = {"g3"}
+		upgrades = {"g3", "aa12"}
 	}
 	self.level_tree[54] = {
 		name_id = "weapons",
@@ -1645,12 +1663,6 @@ function UpgradesTweakData:init()
 		name_id = "lvl_90",
 		upgrades = {
 			"rep_upgrade9"
-		}
-	}
-	self.level_tree[95] = {
-		name_id = "menu_es_jobs_available",
-		upgrades = {
-			"lucky_charm"
 		}
 	}
 	self.level_tree[100] = {
@@ -1845,7 +1857,6 @@ function UpgradesTweakData:init()
 	self:_l85a2_definitions()
 	self:_vhs_definitions()
 	self:_hs2000_definitions()
-	self:_cobray_definitions()
 	self:_m134_weapon_definitions()
 	self:_rpg7_weapon_definitions()
 	self:_cobray_definitions()
@@ -1860,7 +1871,12 @@ function UpgradesTweakData:init()
 	self:_shotgun_definitions()
 	self:_lmg_definitions()
 	self:_snp_definitions()
+	self:_flamethrower_mk2_definitions()
+	self:_m32_definitions()
+	self:_aa12_definitions()
+	self:_bbq_weapon_definitions()
 	self:_melee_weapon_definitions()
+	self:_grenades_definitions()
 	self:_carry_definitions()
 	self:_team_definitions()
 	self:_temporary_definitions()
@@ -6126,15 +6142,6 @@ function UpgradesTweakData:_hs2000_definitions()
 	}
 end
 
-function UpgradesTweakData:_cobray_definitions()
-	self.definitions.cobray = {
-		category = "weapon",
-		weapon_id = "cobray",
-		factory_id = "wpn_fps_smg_cobray",
-		dlc = "hlm2_deluxe"
-	}
-end
-
 function UpgradesTweakData:_m134_weapon_definitions()
 	self.definitions.m134 = {
 		category = "weapon",
@@ -6298,6 +6305,11 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "pd2_clan"
 	}
+end
+
+function UpgradesTweakData:_grenades_definitions()
+	self.definitions.molotov = {category = "grenade", dlc = "hl_miami"}
+	self.definitions.frag = {category = "grenade"}
 end
 
 function UpgradesTweakData:_weapon_definitions()
@@ -8635,4 +8647,52 @@ function UpgradesTweakData:_x_usp_definitions()
 		weapon_id = "x_usp",
 		factory_id = "wpn_fps_pis_x_usp"
 	}
+end
+
+function UpgradesTweakData:_flamethrower_mk2_definitions()
+	self.definitions.flamethrower_mk2 = {
+		category = "weapon",
+		weapon_id = "flamethrower_mk2",
+		factory_id = "wpn_fps_fla_mk2",
+		dlc = "bbq"
+	}
+end
+
+function UpgradesTweakData:_m32_definitions()
+	self.definitions.m32 = {
+		category = "weapon",
+		weapon_id = "m32",
+		factory_id = "wpn_fps_gre_m32",
+		dlc = "bbq"
+	}
+end
+
+function UpgradesTweakData:_aa12_definitions()
+	self.definitions.aa12 = {
+		category = "weapon",
+		weapon_id = "aa12",
+		factory_id = "wpn_fps_sho_aa12",
+		dlc = "bbq"
+	}
+end
+
+function UpgradesTweakData:_bbq_weapon_definitions()
+	self.definitions.fork = {
+		category = "melee_weapon",
+		dlc = "bbq"
+	}
+	self.definitions.spatula = {
+		category = "melee_weapon",
+		dlc = "bbq"
+	}
+	self.definitions.poker = {
+		category = "melee_weapon",
+		dlc = "bbq"
+	}
+	self.definitions.tenderizer = {
+		category = "melee_weapon",
+		dlc = "bbq"
+	}
+	self.flame_bullet = {}
+	self.flame_bullet.show_blood_hits = false
 end

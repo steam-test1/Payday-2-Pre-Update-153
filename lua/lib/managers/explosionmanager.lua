@@ -2,6 +2,7 @@ ExplosionManager = ExplosionManager or class()
 local idstr_small_light_fire = Idstring("effects/particles/fire/small_light_fire")
 local idstr_explosion_std = Idstring("explosion_std")
 local empty_idstr = Idstring("")
+local molotov_effect = "effects/payday2/particles/explosions/molotov_grenade"
 local tmp_vec3 = Vector3()
 
 function ExplosionManager:init()
@@ -24,14 +25,15 @@ function ExplosionManager:add_sustain_effect(effect_id, sustain_time)
 	})
 end
 
-function ExplosionManager:give_local_player_dmg(pos, range, damage)
+function ExplosionManager:give_local_player_dmg(pos, range, damage, ignite_character)
 	local player = managers.player:player_unit()
 	if player then
 		player:character_damage():damage_explosion({
 			position = pos,
 			range = range,
 			damage = damage,
-			variant = "explosion"
+			variant = "explosion",
+			ignite_character = ignite_character
 		})
 	end
 end
@@ -48,13 +50,19 @@ function ExplosionManager:detect_and_give_dmg(params)
 	local col_ray = params.col_ray
 	local alert_filter = params.alert_filter or managers.groupai:state():get_unit_type_filter("civilians_enemies")
 	local owner = params.owner
+	local push_units = true
+	local results = {}
+	if params.push_units ~= nil then
+		push_units = params.push_units
+	end
 	local player = managers.player:player_unit()
 	if alive(player) and player_dmg ~= 0 then
 		player:character_damage():damage_explosion({
 			position = hit_pos,
 			range = range,
 			damage = player_dmg,
-			variant = "explosion"
+			variant = "explosion",
+			ignite_character = params.ignite_character
 		})
 	end
 	local bodies = World:find_bodies("intersect", "sphere", hit_pos, range, slotmask)
@@ -170,6 +178,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 					position = hit_body:position(),
 					ray = dir
 				}
+				action_data.ignite_character = params.ignite_character
 				hit_unit:character_damage():damage_explosion(action_data)
 				if not dead_before and hit_unit:base() and hit_unit:base()._tweak_table and hit_unit:character_damage():dead() then
 					type = hit_unit:base()._tweak_table
@@ -185,28 +194,18 @@ function ExplosionManager:detect_and_give_dmg(params)
 			end
 		end
 	end
-	managers.explosion:units_to_push(units_to_push, hit_pos, range)
-	if owner then
-		managers.statistics:shot_fired({hit = false, weapon_unit = owner})
-		for i = 1, count_gangsters + count_cops do
-			managers.statistics:shot_fired({
-				hit = true,
-				weapon_unit = owner,
-				skip_bullet_count = true
-			})
-		end
-		local weapon_pass, weapon_type_pass, count_pass, all_pass
-		for achievement, achievement_data in pairs(tweak_data.achievement.explosion_achievements) do
-			weapon_pass = not achievement_data.weapon or true
-			weapon_type_pass = not achievement_data.weapon_type or owner:base() and owner:base().weapon_tweak_data and owner:base():weapon_tweak_data().category == achievement_data.weapon_type
-			count_pass = not achievement_data.count or (achievement_data.kill and count_cop_kills + count_gangster_kills or count_cops + count_gangsters) >= achievement_data.count
-			all_pass = weapon_pass and weapon_type_pass and count_pass
-			if all_pass and achievement_data.award then
-				managers.achievment:award(achievement_data.award)
-			end
-		end
+	if push_units and push_units == true then
+		managers.explosion:units_to_push(units_to_push, hit_pos, range)
 	end
-	return hit_units, splinters
+	if owner then
+		results.count_cops = count_cops
+		results.count_gangsters = count_gangsters
+		results.count_civilians = count_civilians
+		results.count_cop_kills = count_cop_kills
+		results.count_gangster_kills = count_gangster_kills
+		results.count_civilian_kills = count_civilian_kills
+	end
+	return hit_units, splinters, results
 end
 
 function ExplosionManager:units_to_push(units_to_push, hit_pos, range)
@@ -299,9 +298,9 @@ function ExplosionManager:client_damage_and_push(position, normal, user_unit, dm
 	self:units_to_push(units_to_push, position, range)
 end
 
-function ExplosionManager:play_sound_and_effects(position, normal, range, custom_params)
+function ExplosionManager:play_sound_and_effects(position, normal, range, custom_params, molotov_damage_effect_table)
 	self:player_feedback(position, normal, range, custom_params)
-	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect, custom_params and custom_params.sound_event, custom_params and custom_params.on_unit, custom_params and custom_params.idstr_decal, custom_params and custom_params.idstr_effect)
+	self:spawn_sound_and_effects(position, normal, range, custom_params and custom_params.effect, custom_params and custom_params.sound_event, custom_params and custom_params.on_unit, custom_params and custom_params.idstr_decal, custom_params and custom_params.idstr_effect, molotov_damage_effect_table)
 end
 
 function ExplosionManager:player_feedback(position, normal, range, custom_params)
@@ -362,13 +361,21 @@ end
 local decal_ray_from = Vector3()
 local decal_ray_to = Vector3()
 
-function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event, on_unit, idstr_decal, idstr_effect)
+function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event, on_unit, idstr_decal, idstr_effect, molotov_damage_effect_table)
 	effect_name = effect_name or "effects/particles/explosions/explosion_grenade_launcher"
+	local effect_id
 	if effect_name ~= "none" then
-		World:effect_manager():spawn({
+		effect_id = World:effect_manager():spawn({
 			effect = Idstring(effect_name),
 			position = position,
 			normal = normal
+		})
+	end
+	if molotov_damage_effect_table ~= nil then
+		table.insert(molotov_damage_effect_table, {
+			effect_id = effect_id,
+			detonation_position = position,
+			detonation_normal = normal
 		})
 	end
 	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
@@ -391,15 +398,17 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 		local material_name, _, _ = World:pick_decal_material(ray.unit, decal_ray_from, decal_ray_to, slotmask_world_geometry)
 		sound_switch_name = material_name ~= empty_idstr and material_name
 	end
-	sound_event = sound_event or "trip_mine_explode"
-	if sound_event ~= "no_sound" then
-		local sound_source = SoundDevice:create_source("ExplosionManager")
-		sound_source:set_position(position)
-		if sound_switch_name then
-			sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
+	if effect_name == molotov_effect and molotov_damage_effect_table ~= nil and #molotov_damage_effect_table <= 1 or effect_name ~= molotov_effect then
+		sound_event = sound_event or "trip_mine_explode"
+		if sound_event ~= "no_sound" then
+			local sound_source = SoundDevice:create_source("ExplosionManager")
+			sound_source:set_position(position)
+			if sound_switch_name then
+				sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
+			end
+			sound_source:post_event(sound_event)
+			managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
 		end
-		sound_source:post_event(sound_event)
-		managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
 	end
 	self:project_decal(ray, decal_ray_from, decal_ray_to, on_unit and ray and ray.unit, idstr_decal, idstr_effect)
 end

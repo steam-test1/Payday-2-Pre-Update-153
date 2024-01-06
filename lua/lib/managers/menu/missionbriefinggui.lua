@@ -196,7 +196,7 @@ end
 function MissionBriefingTabItem.animate_select(o, center_helper, instant)
 	o:set_layer(2)
 	local size = o:h()
-	if size == 100 then
+	if size == 85 then
 		return
 	end
 	managers.menu_component:post_event("highlight")
@@ -206,13 +206,13 @@ function MissionBriefingTabItem.animate_select(o, center_helper, instant)
 	end
 	local aspect = o:texture_width() / math.max(1, o:texture_height())
 	if instant then
-		local s = math.lerp(size, 100, 1)
+		local s = math.lerp(size, 85, 1)
 		o:set_size(s * aspect, s)
 		o:set_center(center_x, center_y)
 		return
 	end
-	over(math.abs(100 - size) / 100, function(p)
-		local s = math.lerp(size, 100, p)
+	over(math.abs(85 - size) / 100, function(p)
+		local s = math.lerp(size, 85, p)
 		if alive(center_helper) then
 			center_x, center_y = center_helper:center()
 		end
@@ -362,7 +362,7 @@ function DescriptionItem:_chk_add_scrolling()
 			})
 			local _, _, lw, lh = legend_text:text_rect()
 			legend_text:set_size(lw, lh)
-			legend_text:set_righttop(self._panel:w() - 5, 10)
+			legend_text:set_righttop(self._panel:w() - 5, 5)
 		end
 	elseif self._scrolling then
 	end
@@ -636,7 +636,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		rect:hide()
 		first_rect = first_rect or rect
 		local center_x = math.ceil(i / 2) * w - step
-		local center_y = self._panel:h() * (i % 2 > 0 and 0.245 or 0.765)
+		local center_y = self._panel:h() * (i % 2 > 0 and 0.295 or 0.815)
 		local texture = assets_names[i][1]
 		local asset
 		if texture and DB:has(Idstring("texture"), texture) then
@@ -735,7 +735,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		})
 		local _, _, lw, lh = legend_text:text_rect()
 		legend_text:set_size(lw, lh)
-		legend_text:set_righttop(self._panel:w() - 5, 10)
+		legend_text:set_righttop(self._panel:w() - 5, 5)
 	end
 	local first_rect = self._panel:child("bg_rect_1")
 	if first_rect then
@@ -1261,6 +1261,11 @@ function LoadoutItem:open_node(node)
 		managers.menu:open_node("loadout", {
 			self:create_deployable_loadout()
 		})
+	elseif node == 6 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_grenade_loadout()
+		})
 	end
 	managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
 end
@@ -1446,6 +1451,45 @@ function LoadoutItem:populate_deployables(data)
 	end
 end
 
+function LoadoutItem:populate_grenades(data)
+	local new_data = {}
+	local index = 0
+	local guis_catalog = "guis/"
+	for i, grenade in ipairs(tweak_data.blackmarket.grenades) do
+		guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.grenades[grenade] and tweak_data.blackmarket.grenades[grenade].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		new_data = {}
+		new_data.name = grenade
+		new_data.name_localized = managers.localization:text(tweak_data.upgrades.definitions[grenade].name_id)
+		new_data.category = "grenades"
+		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
+		new_data.slot = i
+		new_data.unlocked = true
+		new_data.equipped = managers.player:equipment_in_slot(1) == grenade
+		new_data.stream = false
+		if not new_data.equipped then
+			table.insert(new_data, "lo_d_grenade")
+		end
+		data[i] = new_data
+		index = i
+	end
+	for i = 1, 9 do
+		if not data[i] then
+			new_data = {}
+			new_data.name = "empty"
+			new_data.name_localized = ""
+			new_data.category = "grenades"
+			new_data.slot = i
+			new_data.unlocked = true
+			new_data.equipped = false
+			data[i] = new_data
+		end
+	end
+end
+
 function LoadoutItem:create_primaries_loadout()
 	local data = {}
 	table.insert(data, {
@@ -1490,6 +1534,22 @@ function LoadoutItem:create_deployable_loadout()
 	data.topic_id = "menu_loadout_blackmarket"
 	data.topic_params = {
 		category = managers.localization:text("bm_menu_deployables")
+	}
+	return data
+end
+
+function LoadoutItem:create_grenade_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_grenades",
+		category = "grenades",
+		on_create_func_name = "populate_grenades",
+		override_slots = {3, 2},
+		identifier = Idstring("grenade")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_grenades")
 	}
 	return data
 end
@@ -1595,7 +1655,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 	local slot_h = player_slot.panel:h()
 	local aspect
 	local x = player_slot.panel:w() / 2
-	local y = player_slot.panel:h() / 18
+	local y = player_slot.panel:h() / 20
 	local w = slot_h / 6 * 1.15
 	local h = w
 	local slot_color = tweak_data.chat_colors[slot]
@@ -1736,6 +1796,24 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			melee_weapon_bitmap:set_center_y(y * 9)
 		end
 	end
+	if outfit.grenade then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.grenades[outfit.grenade] and tweak_data.blackmarket.grenades[outfit.grenade].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		local grenade_bitmap = player_slot.panel:bitmap({
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/grenades/" .. outfit.grenade,
+			w = w,
+			h = h,
+			rotation = math.random(2) - 1.5,
+			alpha = 0.8
+		})
+		aspect = grenade_bitmap:texture_width() / math.max(1, grenade_bitmap:texture_height())
+		grenade_bitmap:set_w(grenade_bitmap:h() * aspect)
+		grenade_bitmap:set_center_x(x)
+		grenade_bitmap:set_center_y(y * 12)
+	end
 	if outfit.armor then
 		local guis_catalog = "guis/"
 		local bundle_folder = tweak_data.blackmarket.armors[outfit.armor] and tweak_data.blackmarket.armors[outfit.armor].texture_bundle_folder
@@ -1752,7 +1830,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		aspect = armor_bitmap:texture_width() / math.max(1, armor_bitmap:texture_height())
 		armor_bitmap:set_w(armor_bitmap:h() * aspect)
 		armor_bitmap:set_center_x(x)
-		armor_bitmap:set_center_y(y * 12)
+		armor_bitmap:set_center_y(y * 15)
 	end
 	if outfit.deployable and outfit.deployable ~= "nil" then
 		local guis_catalog = "guis/"
@@ -1770,7 +1848,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		aspect = deployable_bitmap:texture_width() / math.max(1, deployable_bitmap:texture_height())
 		deployable_bitmap:set_w(deployable_bitmap:h() * aspect)
 		deployable_bitmap:set_center_x(x)
-		deployable_bitmap:set_center_y(y * 15)
+		deployable_bitmap:set_center_y(y * 17)
 		local deployable_amount = tonumber(outfit.deployable_amount) or 0
 		if 1 < deployable_amount then
 			local deployable_text = player_slot.panel:text({
@@ -1947,12 +2025,14 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 	local primary_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local secondary_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local melee_weapon_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local grenade_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local armor_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local empty_string = managers.localization:to_upper_text("menu_loadout_empty")
 	local primary_string = empty_string
 	local secondary_string = empty_string
 	local melee_weapon_string = empty_string
+	local grenade_string = empty_string
 	local armor_string = empty_string
 	local deployable_string = empty_string
 	local primary_perks = {}
@@ -1960,6 +2040,7 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 	local primary = managers.blackmarket:equipped_primary()
 	local secondary = managers.blackmarket:equipped_secondary()
 	local melee_weapon = managers.blackmarket:equipped_melee_weapon()
+	local grenade = managers.blackmarket:equipped_grenade()
 	local armor = managers.blackmarket:equipped_armor()
 	local deployable = managers.player:equipment_in_slot(1)
 	if primary then
@@ -2019,6 +2100,15 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 		end
 		melee_weapon_string = managers.localization:text(tweak_data.blackmarket.melee_weapons[melee_weapon].name_id)
 	end
+	if grenade then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.grenades[grenade] and tweak_data.blackmarket.grenades[grenade].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		grenade_texture = guis_catalog .. "textures/pd2/blackmarket/icons/grenades/" .. tostring(grenade)
+		grenade_string = managers.localization:text(tweak_data.blackmarket.grenades[grenade].name_id)
+	end
 	if armor then
 		local guis_catalog = "guis/"
 		local bundle_folder = tweak_data.blackmarket.armors[armor] and tweak_data.blackmarket.armors[armor].texture_bundle_folder
@@ -2037,6 +2127,15 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 		deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
 	end
+	if grenade then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.grenades[grenade] and tweak_data.blackmarket.grenades[grenade].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		grenade_texture = guis_catalog .. "textures/pd2/blackmarket/icons/grenades/" .. tostring(grenade)
+		grenade_string = managers.localization:text(tweak_data.grenades[grenade].name_id)
+	end
 	local primary = {
 		item_texture = primary_texture,
 		info_text = primary_string,
@@ -2053,12 +2152,14 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 		dual_texture_1 = primary_texture,
 		dual_texture_2 = secondary_texture
 	}
+	local grenade = {item_texture = grenade_texture, info_text = grenade_string}
 	local armor = {item_texture = armor_texture, info_text = armor_string}
 	local deployable = {item_texture = deployable_texture, info_text = deployable_string}
 	local items = {
 		primary,
 		secondary,
 		melee_weapon,
+		grenade,
 		armor,
 		deployable
 	}
@@ -2411,6 +2512,23 @@ function NewLoadoutTab:create_melee_weapon_loadout()
 	return data
 end
 
+function NewLoadoutTab:create_grenade_loadout()
+	local data = {}
+	table.insert(data, {
+		name = "bm_menu_grenades",
+		category = "grenades",
+		on_create_func_name = "populate_grenades",
+		override_slots = {3, 3},
+		identifier = Idstring("grenade")
+	})
+	data.topic_id = "menu_loadout_blackmarket"
+	data.topic_params = {
+		category = managers.localization:text("bm_menu_grenades")
+	}
+	data.is_loadout = true
+	return data
+end
+
 function NewLoadoutTab:create_armor_loadout()
 	local data = {}
 	table.insert(data, {
@@ -2453,9 +2571,14 @@ function NewLoadoutTab:open_node(node)
 	elseif node == 4 then
 		managers.menu_component:post_event("menu_enter")
 		managers.menu:open_node("loadout", {
-			self:create_armor_loadout()
+			self:create_grenade_loadout()
 		})
 	elseif node == 5 then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("loadout", {
+			self:create_armor_loadout()
+		})
+	elseif node == 6 then
 		managers.menu_component:post_event("menu_enter")
 		managers.menu:open_node("loadout", {
 			self:create_deployable_loadout()
@@ -2476,7 +2599,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		layer = 6
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
-	self._panel:set_top(175 + tweak_data.menu.pd2_medium_font_size)
+	self._panel:set_top(165 + tweak_data.menu.pd2_medium_font_size)
 	self._panel:grow(0, -self._panel:top())
 	self._ready = managers.network:session():local_peer():waiting_for_player_ready()
 	local ready_text = self:ready_text()
@@ -2488,7 +2611,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		font_size = tweak_data.menu.pd2_large_font_size,
 		font = tweak_data.menu.pd2_large_font,
 		color = tweak_data.screen_colors.button_stage_3,
-		layer = 1,
+		layer = 2,
 		blend_mode = "add"
 	})
 	local _, _, w, h = self._ready_button:text_rect()
@@ -2498,7 +2621,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._ready_tick_box = self._panel:bitmap({
 		name = "ready_tickbox",
 		texture = "guis/textures/pd2/mission_briefing/gui_tickbox",
-		layer = 1
+		layer = 2
 	})
 	self._ready_tick_box:set_rightbottom(self._panel:w(), self._panel:h())
 	self._ready_tick_box:set_image(self._ready and "guis/textures/pd2/mission_briefing/gui_tickbox_ready" or "guis/textures/pd2/mission_briefing/gui_tickbox")
@@ -2513,7 +2636,8 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		font_size = tweak_data.menu.pd2_massive_font_size,
 		font = tweak_data.menu.pd2_massive_font,
 		color = tweak_data.screen_colors.button_stage_3,
-		alpha = 0.4
+		alpha = 0.4,
+		layer = 1
 	})
 	local _, _, w, h = big_text:text_rect()
 	big_text:set_size(w, h)
@@ -2582,11 +2706,8 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		self._next_page = next_page
 		max_x = next_page:left() - 5
 	end
-	if max_x < self._items[#self._items]._tab_text:right() then
-		for i, tab in ipairs(self._items) do
-			tab:reduce_to_small_font()
-		end
-	end
+	self._reduced_to_small_font = not managers.menu:is_pc_controller()
+	self:chk_reduce_to_small_font()
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
 	local box_panel = self._panel:panel()
@@ -2605,6 +2726,15 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._items[self._selected_item]:select(true)
 	self._enabled = true
 	self:flash_ready()
+end
+
+function MissionBriefingGui:chk_reduce_to_small_font()
+	local max_x = alive(self._next_page) and self._next_page:left() - 5 or self._panel:w()
+	if self._reduced_to_small_font or self._items[#self._items] and alive(self._items[#self._items]._tab_text) and max_x < self._items[#self._items]._tab_text:right() then
+		for i, tab in ipairs(self._items) do
+			tab:reduce_to_small_font()
+		end
+	end
 end
 
 function MissionBriefingGui:update(t, dt)
@@ -2731,6 +2861,7 @@ function MissionBriefingGui:create_asset_tab()
 	if managers.preplanning:has_current_level_preplanning() then
 		self._assets_item:add_preplanning_button()
 	end
+	self:chk_reduce_to_small_font()
 end
 
 function MissionBriefingGui:on_whisper_mode_changed()
@@ -3233,6 +3364,7 @@ function MissionBriefingGui:reload_loadout()
 	self._items[3] = nil
 	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
 	self._items[3] = self._new_loadout_item
+	self:chk_reduce_to_small_font()
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
 	self._items[self._selected_item]:select(true)
 	WalletGuiObject.set_wallet(self._safe_workspace:panel(), 10)

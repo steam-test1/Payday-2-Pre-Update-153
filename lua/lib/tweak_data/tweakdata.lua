@@ -1233,6 +1233,9 @@ function TweakData:init()
 		total_value = 4,
 		timer = 90
 	}
+	self.achievement.drive_away = "fort_2"
+	self.achievement.disco_inferno = "grill_1"
+	self.achievement.overgrill = "grill_4"
 	self.achievement.one_man_army = {
 		award = "gage5_3",
 		equipped = {
@@ -1320,6 +1323,12 @@ function TweakData:init()
 			enemy = "spooc",
 			flying_strike = true,
 			kill = true
+		},
+		not_invited = {
+			grenade_type = "launcher_frag_m32",
+			award = "grill_3",
+			timer = 10,
+			kill_count = 10
 		}
 	}
 	self.achievement.enemy_kill_achievements = {
@@ -1563,6 +1572,12 @@ function TweakData:init()
 			award = "gorilla_1",
 			enemy = "tank",
 			melee_id = "boxing_gloves"
+		},
+		stick_a_fork_in_me = {
+			award = "grill_2",
+			melee_id = "fork",
+			is_on_fire = true,
+			is_not_civilian = true
 		}
 	}
 	self.achievement.complete_heist_achievements = {
@@ -2080,6 +2095,13 @@ function TweakData:init()
 				"overkill_290"
 			},
 			job = "rat"
+		},
+		death_cage = {
+			award = "fort_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "cage"
 		},
 		not_for_old_men = {
 			award = "gage4_11",
@@ -2928,6 +2950,59 @@ function TweakData:init()
 	self.grenades.launcher_rocket.mass_look_up_modifier = 1
 	self.grenades.launcher_rocket.sound_event = "rpg_explode"
 	self.grenades.launcher_rocket.name_id = "bm_launcher_rocket"
+	self.grenades.molotov = {}
+	self.grenades.molotov.damage = 1
+	self.grenades.molotov.player_damage = 1
+	self.grenades.molotov.range = 50
+	self.grenades.molotov.burn_duration = 30
+	self.grenades.molotov.burn_tick_period = 0.5
+	self.grenades.molotov.name_id = "bm_grenade_molotov"
+	self.grenades.launcher_incendiary = {}
+	self.grenades.launcher_incendiary.damage = 34
+	self.grenades.launcher_incendiary.curve_pow = 0.1
+	self.grenades.launcher_incendiary.player_damage = 8
+	self.grenades.launcher_incendiary.range = 350
+	self.grenades.launcher_incendiary.init_timer = 2.5
+	self.grenades.launcher_incendiary.mass_look_up_modifier = 1
+	self.grenades.launcher_incendiary.sound_event = "gl_explode"
+	self.grenades.launcher_incendiary.name_id = "bm_launcher_incendiary"
+	self.grenades.launcher_incendiary.burn_duration = 30
+	self.grenades.launcher_incendiary.burn_tick_period = 0.5
+	self.grenades.molotov = {}
+	self.grenades.molotov.damage = 3
+	self.grenades.molotov.player_damage = 2
+	self.grenades.molotov.fire_dot_data = {
+		dot_damage = "2",
+		dot_trigger_max_distance = "3000",
+		dot_trigger_chance = "35",
+		dot_length = "3",
+		dot_tick_damage = "0.5"
+	}
+	self.grenades.molotov.range = 75
+	self.grenades.molotov.burn_duration = 20
+	self.grenades.molotov.burn_tick_period = 0.5
+	self.grenades.molotov.sound_event = "molotov_impact"
+	self.grenades.molotov.sound_event_impact_duration = 4
+	self.grenades.molotov.name_id = "bm_grenade_molotov"
+	self.grenades.launcher_incendiary = {}
+	self.grenades.launcher_incendiary.damage = 3
+	self.grenades.launcher_incendiary.curve_pow = 0.1
+	self.grenades.launcher_incendiary.player_damage = 2
+	self.grenades.launcher_incendiary.fire_dot_data = {
+		dot_damage = "2",
+		dot_trigger_max_distance = "3000",
+		dot_trigger_chance = "35",
+		dot_length = "3",
+		dot_tick_damage = "0.5"
+	}
+	self.grenades.launcher_incendiary.range = 75
+	self.grenades.launcher_incendiary.init_timer = 2.5
+	self.grenades.launcher_incendiary.mass_look_up_modifier = 1
+	self.grenades.launcher_incendiary.sound_event = "gl_explode"
+	self.grenades.launcher_incendiary.sound_event_impact_duration = 1
+	self.grenades.launcher_incendiary.name_id = "bm_launcher_incendiary"
+	self.grenades.launcher_incendiary.burn_duration = 6
+	self.grenades.launcher_incendiary.burn_tick_period = 0.5
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

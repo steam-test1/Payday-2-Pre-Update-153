@@ -98,6 +98,12 @@ CopActionHurt.hurt_anim_variants = {
 		bwd = 8,
 		l = 7,
 		r = 7
+	},
+	fire_hurt = {
+		fwd = 8,
+		bwd = 8,
+		l = 7,
+		r = 7
 	}
 }
 CopActionHurt.running_hurt_anim_variants = {fwd = 14}
@@ -108,6 +114,19 @@ ShieldActionHurt.hurt_anim_variants.expl_hurt = {
 	bwd = 2,
 	l = 2,
 	r = 2
+}
+ShieldActionHurt.hurt_anim_variants.fire_hurt = {
+	fwd = 2,
+	bwd = 2,
+	l = 2,
+	r = 2
+}
+CopActionHurt.fire_death_anim_variants_length = {
+	9,
+	5,
+	5,
+	7,
+	4
 }
 
 function CopActionHurt:init(action_desc, common_data)
@@ -127,6 +146,9 @@ function CopActionHurt:init(action_desc, common_data)
 	local crouching = self._unit:anim_data().crouch or self._unit:anim_data().hurt and 0 < self._machine:get_parameter(self._machine:segment_state(Idstring("base")), "crh")
 	local redir_res
 	local action_type = action_desc.hurt_type
+	local ignite_character = action_desc.ignite_character
+	local is_fire_dot_damage = not action_desc.fire_dot_data
+	local fire_dot_data = action_desc.fire_dot_data
 	if action_type == "fatal" then
 		redir_res = self._ext_movement:play_redirect("fatal")
 		if not redir_res then
@@ -141,6 +163,65 @@ function CopActionHurt:init(action_desc, common_data)
 			return
 		end
 		managers.hud:set_mugshot_tased(self._unit:unit_data().mugshot_id)
+	elseif action_type == "fire_hurt" or action_type == "light_hurt" and action_desc.variant == "fire" then
+		local fire_dot_max_distance = 3000
+		local fire_dot_trigger_chance = 30
+		if fire_dot_data then
+			fire_dot_max_distance = tonumber(fire_dot_data.dot_trigger_max_distance)
+			fire_dot_trigger_chance = tonumber(fire_dot_data.dot_trigger_chance)
+		end
+		local hit_loc = action_desc.hit_pos
+		local distance = 1000
+		if hit_loc and action_desc.attacker_unit and action_desc.attacker_unit.position then
+			distance = mvector3.distance(hit_loc, action_desc.attacker_unit:position())
+		end
+		local start_dot_damage = math.random(1, 100)
+		local char_tweak = tweak_data.character[self._unit:base()._tweak_table]
+		local use_animation_on_fire_damage
+		if char_tweak.use_animation_on_fire_damage == nil then
+			use_animation_on_fire_damage = true
+		else
+			use_animation_on_fire_damage = char_tweak.use_animation_on_fire_damage
+		end
+		local flammable
+		if char_tweak.flammable == nil then
+			flammable = true
+		else
+			flammable = char_tweak.flammable
+		end
+		if not is_fire_dot_damage and fire_dot_max_distance > distance and fire_dot_trigger_chance >= start_dot_damage and flammable then
+			if Network:is_server() then
+				Application:debug("Added enemy: ", self._unit, t)
+				managers.fire:add_doted_enemy(self._unit, t, self._ext_inventory:equipped_unit(), fire_dot_data.dot_length, fire_dot_data.dot_tick_damage)
+			end
+			if ignite_character == "dragonsbreath" then
+				self:_dragons_breath_sparks()
+			end
+			if self._unit:character_damage() ~= nil and self._unit:character_damage().get_last_time_unit_got_fire_damage ~= nil then
+				local last_fire_recieved = self._unit:character_damage():get_last_time_unit_got_fire_damage()
+				if last_fire_recieved == nil or 5 < t - last_fire_recieved then
+					if use_animation_on_fire_damage then
+						redir_res = self._ext_movement:play_redirect("fire_hurt")
+						local dir_str
+						local fwd_dot = action_desc.direction_vec:dot(common_data.fwd)
+						if fwd_dot < 0 then
+							local hit_pos = action_desc.hit_pos
+							local hit_vec = (hit_pos - common_data.pos):with_z(0):normalized()
+							if 0 < mvector3.dot(hit_vec, common_data.right) then
+								dir_str = "r"
+							else
+								dir_str = "l"
+							end
+						else
+							dir_str = "bwd"
+						end
+						self._machine:set_parameter(redir_res, dir_str, 1)
+					end
+					self._unit:character_damage():set_last_time_unit_got_fire_damage(t)
+				else
+				end
+			end
+		end
 	elseif action_type == "light_hurt" then
 		if not self._ext_anim.upper_body_active or self._ext_anim.upper_body_empty or self._ext_anim.recoil then
 			redir_res = self._ext_movement:play_redirect(action_type)
@@ -198,6 +279,27 @@ function CopActionHurt:init(action_desc, common_data)
 			debug_pause("[CopActionHurt:init] bleedout redirect failed in", self._machine:segment_state(Idstring("base")))
 			return
 		end
+	elseif action_type == "death" and action_desc.variant == "fire" then
+		redir_res = self._ext_movement:play_redirect("death_fire")
+		if not redir_res then
+			debug_pause("[CopActionHurt:init] death_fire redirect failed in", self._machine:segment_state(Idstring("base")))
+			return
+		end
+		local variant_count = #CopActionHurt.fire_death_anim_variants_length or 5
+		local variant = 1
+		if 1 < variant_count then
+			variant = math.random(variant_count)
+		end
+		for i = 1, variant_count do
+			local state_value = 0
+			if i == variant then
+				state_value = 1
+			end
+			self._machine:set_parameter(redir_res, "var" .. tostring(i), state_value)
+		end
+		managers.fire:_remove_flame_effects_from_doted_unit(self._unit)
+		self:_start_enemy_fire_effect_on_death(variant)
+		managers.fire:check_achievemnts(self._unit, t)
 	elseif action_type == "death" and (self._ext_anim.run and self._ext_anim.move_fwd or self._ext_anim.sprint) and not common_data.char_tweak.no_run_death_anim then
 		redir_res = self._ext_movement:play_redirect("death_run")
 		if not redir_res then
@@ -394,12 +496,24 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 	end
 	if not self._unit:base().nick_name then
-		if action_type == "death" then
+		if action_desc.variant == "fire" then
+			if tweak_table ~= "tank" and tweak_table ~= "tank_hw" and tweak_table ~= "shield" then
+				if action_desc.hurt_type == "fire_hurt" and tweak_table ~= "spooc" then
+					self._unit:sound():say("burnhurt")
+				elseif action_desc.hurt_type == "death" then
+					self._unit:sound():say("burndeath")
+				end
+			end
+		elseif action_type == "death" then
 			self._unit:sound():say("x02a_any_3p")
 		elseif action_type == "counter_tased" then
 			self._unit:sound():say("tasered")
 		else
 			self._unit:sound():say("x01a_any_3p")
+		end
+		if (tweak_table == "tank" or tweak_table == "tank_hw") and action_type == "death" then
+			local unit_id = self._unit:id()
+			managers.fire:remove_dead_dozer_from_overgrill(unit_id)
 		end
 		if Network:is_server() then
 			local radius, filter_name
@@ -434,6 +548,65 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 	end
 	return true
+end
+
+function CopActionHurt:_start_fire_animation(redir_res, action_type, t, action_desc, common_data)
+end
+
+function CopActionHurt:_start_enemy_fire_animation(action_type, t, use_animation_on_fire_damage, action_desc, common_data)
+end
+
+function CopActionHurt:_start_enemy_fire_effect_on_death(death_variant)
+	local enemy_effect_name = ""
+	local anim_duration = 3
+	if death_variant == 1 then
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_9s")
+		anim_duration = 9
+	elseif death_variant == 2 then
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_5s")
+		anim_duration = 5
+	elseif death_variant == 3 then
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_5s")
+		anim_duration = 5
+	elseif death_variant == 4 then
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_7s")
+		anim_duration = 7
+	elseif death_variant == 5 then
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire")
+	else
+		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire")
+	end
+	managers.fire:start_burn_body_sound({
+		enemy_unit = self._unit
+	}, anim_duration)
+	local bone_spine = self._unit:get_object(Idstring("Spine"))
+	local bone_left_arm = self._unit:get_object(Idstring("LeftArm"))
+	local bone_right_arm = self._unit:get_object(Idstring("RightArm"))
+	local bone_left_leg = self._unit:get_object(Idstring("LeftLeg"))
+	local bone_right_leg = self._unit:get_object(Idstring("RightLeg"))
+	if bone_spine then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_spine})
+	end
+	if bone_left_arm then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_arm})
+	end
+	if bone_right_arm then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_arm})
+	end
+	if bone_left_leg then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_leg})
+	end
+	if bone_right_leg then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_leg})
+	end
+end
+
+function CopActionHurt:_dragons_breath_sparks()
+	local enemy_effect_name = Idstring("effects/payday2/particles/impacts/sparks/dragons_breath_hit_effect")
+	local bone_spine = self._unit:get_object(Idstring("Spine"))
+	if bone_spine then
+		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_spine})
+	end
 end
 
 function CopActionHurt:_get_floor_normal(at_pos, fwd, right)
@@ -597,6 +770,9 @@ function CopActionHurt:_upd_hurt(t)
 		mrotation.set_yaw_pitch_roll(new_rot, new_rot:yaw(), 0, 0)
 		if self._ext_anim.death then
 			local rel_prog = math.clamp(self._machine:segment_relative_time(Idstring("base")), 0, 1)
+			if self._floor_normal == nil then
+				self._floor_normal = Vector3(0, 0, 1)
+			end
 			local normal = math.lerp(math.UP, self._floor_normal, rel_prog)
 			local fwd = new_rot:y()
 			mvec3_cross(tmp_vec1, fwd, normal)

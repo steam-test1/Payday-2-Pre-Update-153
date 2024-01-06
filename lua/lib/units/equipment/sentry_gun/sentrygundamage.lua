@@ -112,6 +112,39 @@ function SentryGunDamage:damage_bullet(attack_data)
 	end
 end
 
+function SentryGunDamage:damage_fire(attack_data)
+	if self._dead or self._invulnerable or Network:is_client() and self._ignore_client_damage or attack_data.variant == "stun" or not tweak_data.weapon[self._unit:base():get_name_id()].FIRE_DMG_MUL then
+		return
+	end
+	local attacker_unit = attack_data.attacker_unit
+	if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+		attacker_unit = attacker_unit:base():thrower_unit()
+	end
+	if attacker_unit and PlayerDamage.is_friendly_fire(self, attacker_unit) then
+		return
+	end
+	local damage = attack_data.damage * tweak_data.weapon[self._unit:base():get_name_id()].FIRE_DMG_MUL
+	damage = damage + self._sync_dmg_leftover
+	local damage_sync = self:_apply_damage(damage, true, true, true)
+	if self._ignore_client_damage then
+		local health_percent = math.ceil(self._health / self._HEALTH_INIT_PERCENT)
+		self._unit:network():send("sentrygun_health", health_percent)
+	else
+		if not damage_sync or damage_sync == 0 then
+			return
+		end
+		local attacker = attack_data.attacker_unit
+		if attacker:id() == -1 then
+			attacker = self._unit
+		end
+		local i_attack_variant = CopDamage._get_attack_variant_index(self, attack_data.variant)
+		self._unit:network():send("damage_fire", attacker, damage_sync, self._dead and true or false, attack_data.col_ray.ray, nil, nil)
+	end
+	if not self._dead then
+		self._unit:brain():on_damage_received(attack_data.attacker_unit)
+	end
+end
+
 function SentryGunDamage:damage_explosion(attack_data)
 	if self._dead or self._invulnerable or Network:is_client() and self._ignore_client_damage or attack_data.variant == "stun" or not tweak_data.weapon[self._unit:base():get_name_id()].EXPLOSION_DMG_MUL then
 		return
@@ -148,7 +181,7 @@ function SentryGunDamage:damage_explosion(attack_data)
 			attacker = self._unit
 		end
 		local i_attack_variant = CopDamage._get_attack_variant_index(self, attack_data.variant)
-		self._unit:network():send("damage_explosion", attacker, damage_sync, i_attack_variant, self._dead and true or false, attack_data.col_ray.ray)
+		self._unit:network():send("damage_explosion_fire", attacker, damage_sync, i_attack_variant, self._dead and true or false, attack_data.col_ray.ray)
 	end
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)
@@ -200,6 +233,21 @@ function SentryGunDamage:sync_damage_bullet(attacker_unit, damage_percent, i_bod
 	local dmg_shield = hit_shield and self._shield_health > 0
 	local damage = death and "death" or damage_percent * (dmg_shield and self._SHIELD_HEALTH_INIT_PERCENT or self._HEALTH_INIT_PERCENT)
 	self:_apply_damage(damage, dmg_shield, not dmg_shield, false)
+	if not self._dead then
+		self._unit:brain():on_damage_received(attacker_unit)
+	end
+end
+
+function SentryGunDamage:sync_damage_fire(attacker_unit, damage_percent, death, direction)
+	if self._dead then
+		return
+	end
+	if death then
+		self:die()
+		return
+	end
+	local damage = death and "death" or damage_percent * self._HEALTH_INIT_PERCENT
+	self:_apply_damage(damage, true, true, false)
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)
 	end

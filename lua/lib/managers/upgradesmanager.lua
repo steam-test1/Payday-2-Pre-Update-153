@@ -263,6 +263,8 @@ function UpgradesManager:_aquire_upgrade(upgrade, id, loading)
 		self:_aquire_rep_upgrade(upgrade, id, loading)
 	elseif upgrade.category == "melee_weapon" then
 		self:_aquire_melee_weapon(upgrade, id, loading)
+	elseif upgrade.category == "grenade" then
+		self:_aquire_grenade(upgrade, id, loading)
 	end
 end
 
@@ -283,6 +285,8 @@ function UpgradesManager:_unaquire_upgrade(upgrade, id)
 		self:_unaquire_armor(upgrade, id)
 	elseif upgrade.category == "melee_weapon" then
 		self:_unaquire_melee_weapon(upgrade, id)
+	elseif upgrade.category == "grenade" then
+		self:_unaquire_grenade(upgrade, id)
 	end
 end
 
@@ -304,6 +308,16 @@ end
 function UpgradesManager:_unaquire_melee_weapon(upgrade, id)
 	managers.player:unaquire_melee_weapon(upgrade, id)
 	managers.blackmarket:on_unaquired_melee_weapon(upgrade, id)
+end
+
+function UpgradesManager:_aquire_grenade(upgrade, id, loading)
+	managers.player:aquire_grenade(upgrade, id)
+	managers.blackmarket:on_aquired_grenade(upgrade, id, loading)
+end
+
+function UpgradesManager:_unaquire_grenade(upgrade, id)
+	managers.player:unaquire_grenade(upgrade, id)
+	managers.blackmarket:on_unaquired_grenade(upgrade, id)
 end
 
 function UpgradesManager:_aquire_feature(feature)
@@ -427,6 +441,22 @@ function UpgradesManager:get_value(upgrade_id, ...)
 			end
 		end
 		return is_default_weapon, melee_weapon_level
+	elseif upgrade.category == "grenade" then
+		local params = {
+			...
+		}
+		local default_id = params[1] or managers.blackmarket and managers.blackmarket:get_category_default("grenade") or "weapon"
+		local grenade_id = upgrade_id
+		local is_default_weapon = grenade_id == default_id
+		local grenade_level = 0
+		for level, data in pairs(tweak_data.upgrades.level_tree) do
+			local upgrades = data.upgrades
+			if upgrades and table.contains(upgrades, grenade_id) then
+				grenade_level = level
+				break
+			end
+		end
+		return is_default_weapon, grenade_level
 	end
 	print("no value for", upgrade_id, upgrade.category)
 end

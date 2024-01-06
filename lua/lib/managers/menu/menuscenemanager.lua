@@ -1365,6 +1365,33 @@ function MenuSceneManager:_infamy_enable_dragging()
 	self._disable_dragging = nil
 end
 
+function MenuSceneManager:spawn_grenade(grenade_id)
+	local grenade = tweak_data.blackmarket.grenades[grenade_id]
+	if not grenade.unit_dummy then
+		return
+	end
+	self._one_frame_delayed_clbk = callback(self, self, "spawn_grenade_clbk", grenade.unit_dummy)
+	return
+end
+
+function MenuSceneManager:spawn_grenade_clbk(grenade_unit)
+	if not grenade_unit then
+		return
+	end
+	local ids_unit_name = Idstring(grenade_unit)
+	managers.dyn_resource:load(Idstring("unit"), ids_unit_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, false)
+	self._item_pos = Vector3(0, 0, 0)
+	mrotation.set_zero(self._item_rot_mod)
+	self._item_yaw = 0
+	self._item_pitch = 0
+	self._item_roll = 0
+	mrotation.set_zero(self._item_rot)
+	local new_unit = World:spawn_unit(ids_unit_name, self._item_pos, self._item_rot)
+	self:_set_item_unit(new_unit)
+	mrotation.set_yaw_pitch_roll(self._item_rot_mod, -90, 0, 0)
+	return new_unit
+end
+
 function MenuSceneManager:spawn_melee_weapon(melee_weapon_id)
 	local melee_weapon = tweak_data.blackmarket.melee_weapons[melee_weapon_id]
 	if not melee_weapon.unit then

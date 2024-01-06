@@ -286,7 +286,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_complete_overkill_pack",
 		desc_id = "menu_content_complete_overkill_pack_desc",
 		date_id = "menu_content_complete_overkill_pack_date",
-		store = 348091,
+		webpage = "http://www.overkillsoftware.com/thehypetrain/",
 		image = "guis/dlcs/dlc_pack_overkill/textures/pd2/content_updates/complete_overkill_pack"
 	}
 	local hlm2 = {
@@ -304,6 +304,31 @@ function GuiTweakData:init()
 		date_id = "menu_content_hlm2_deluxe_date",
 		store = 274170,
 		image = "guis/dlcs/hlm2/textures/pd2/content_updates/hlm2_deluxe"
+	}
+	local bbq = {
+		id = "bbq",
+		name_id = "menu_content_bbq",
+		desc_id = "menu_content_bbq_desc",
+		date_id = "menu_content_bbq_date",
+		store = 337661,
+		webpage = "http://www.overkillsoftware.com/bbq/",
+		image = "guis/textures/pd2/content_updates/bbq"
+	}
+	local springbreak = {
+		id = "springbreak",
+		name_id = "menu_content_springbreak",
+		desc_id = "menu_content_springbreak_desc",
+		date_id = "menu_content_springbreak_date",
+		webpage = "http://www.overkillsoftware.com/springbreak/",
+		image = "guis/textures/pd2/content_updates/springbreak"
+	}
+	local bbq = {
+		id = "bbq",
+		name_id = "menu_content_bbq",
+		desc_id = "menu_content_bbq_desc",
+		date_id = "menu_content_bbq_date",
+		store = 358150,
+		image = "guis/dlcs/bbq/textures/pd2/content_updates/bbq"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -349,7 +374,9 @@ function GuiTweakData:init()
 			overkill_pack,
 			complete_overkill_pack,
 			hlm2,
-			hlm2_deluxe
+			hlm2_deluxe,
+			springbreak,
+			bbq
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -444,7 +471,8 @@ function GuiTweakData:init()
 	self.buy_weapon_category_groups = {
 		grenade_launcher = "wpn_special",
 		saw = "wpn_special",
-		minigun = "wpn_special"
+		minigun = "wpn_special",
+		flamethrower = "wpn_special"
 	}
 	self.LONGEST_CHAR_NAME = "JOHN WICK"
 	self.crime_net.regions = {

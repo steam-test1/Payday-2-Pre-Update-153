@@ -787,7 +787,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.critical_hits = {
 		damage_mul = self.tank.headshot_dmg_mul * 0.5
 	}
-	self.tank.damage.hurt_severity = presets.hurt_severities.only_light_hurt
+	self.tank.damage.hurt_severity = presets.hurt_severities.only_light_hurt_and_fire
 	self.tank.chatter = {
 		aggressive = true,
 		retreat = true,
@@ -798,6 +798,8 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.announce_incomming = "incomming_tank"
 	self.tank.steal_loot = nil
 	self.tank.calls_in = nil
+	self.tank.use_animation_on_fire_damage = false
+	self.tank.flammable = true
 	self.tank_hw = deep_clone(self.tank)
 	self.tank_hw.move_speed = {
 		stand = {
@@ -861,6 +863,8 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank_hw.HEALTH_INIT = 1100
 	self.tank_hw.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
 	self.tank_hw.damage.explosion_damage_mul = 1
+	self.tank_hw.use_animation_on_fire_damage = false
+	self.tank_hw.flammable = true
 end
 
 function CharacterTweakData:_init_spooc(presets)
@@ -873,7 +877,7 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.move_speed = presets.move_speed.lightning
 	self.spooc.no_retreat = true
 	self.spooc.no_arrest = true
-	self.spooc.damage.hurt_severity = presets.hurt_severities.no_hurts
+	self.spooc.damage.hurt_severity = presets.hurt_severities.only_light_hurt_and_fire
 	self.spooc.surrender_break_time = {4, 6}
 	self.spooc.suppression = nil
 	self.spooc.surrender = presets.surrender.special
@@ -888,6 +892,8 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.speech_prefix_p1 = "clk"
 	self.spooc.speech_prefix_count = nil
 	self.spooc.access = "spooc"
+	self.spooc.use_animation_on_fire_damage = false
+	self.spooc.flammable = true
 	self.spooc.dodge = presets.dodge.ninja
 	self.spooc.dodge_with_grenade = {
 		smoke = {
@@ -939,6 +945,8 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.calls_in = nil
 	self.shield.damage.hurt_severity = presets.hurt_severities.only_explosion_hurts
 	self.shield.damage.shield_knocked = true
+	self.shield.use_animation_on_fire_damage = false
+	self.shield.flammable = true
 	self.shield.weapon.mp9 = {}
 	self.shield.weapon.mp9.aim_delay = {0, 0.1}
 	self.shield.weapon.mp9.focus_delay = 2
@@ -1104,6 +1112,7 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.chatter = presets.enemy_chatter.shield
 	self.shield.announce_incomming = "incomming_shield"
 	self.shield.steal_loot = nil
+	self.shield.use_animation_on_fire_damage = false
 end
 
 function CharacterTweakData:_init_taser(presets)
@@ -1585,6 +1594,12 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{none = 1}
 			}
+		},
+		fire = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
 		}
 	}
 	presets.hurt_severities.only_light_hurt = {
@@ -1605,6 +1620,38 @@ function CharacterTweakData:_presets(tweak_data)
 			zones = {
 				{light = 1}
 			}
+		},
+		fire = {
+			health_reference = 1,
+			zones = {
+				{light = 1}
+			}
+		}
+	}
+	presets.hurt_severities.only_light_hurt_and_fire = {
+		bullet = {
+			health_reference = 1,
+			zones = {
+				{light = 1}
+			}
+		},
+		explosion = {
+			health_reference = 1,
+			zones = {
+				{explode = 1}
+			}
+		},
+		melee = {
+			health_reference = 1,
+			zones = {
+				{light = 1}
+			}
+		},
+		fire = {
+			health_reference = 1,
+			zones = {
+				{fire = 1}
+			}
 		}
 	}
 	presets.hurt_severities.only_explosion_hurts = {
@@ -1621,6 +1668,12 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		},
 		melee = {
+			health_reference = 1,
+			zones = {
+				{none = 1}
+			}
+		},
+		fire = {
 			health_reference = 1,
 			zones = {
 				{none = 1}
@@ -1700,6 +1753,12 @@ function CharacterTweakData:_presets(tweak_data)
 					moderate = 0,
 					heavy = 9
 				}
+			}
+		},
+		fire = {
+			health_reference = "current",
+			zones = {
+				{fire = 1}
 			}
 		}
 	}
@@ -6044,7 +6103,7 @@ function CharacterTweakData:_set_overkill_290()
 	self.city_swat.HEALTH_INIT = 24
 	self.city_swat.headshot_dmg_mul = self.fbi_swat.HEALTH_INIT / 8
 	self.city_swat.damage.explosion_damage_mul = 0.8
-	self.city_swat.damage.hurt_severity = self.presets.hurt_severities.only_light_hurt
+	self.city_swat.damage.hurt_severity = self.presets.hurt_severities.only_light_hurt_and_fire
 	self.shield.weapon.mp9.focus_dis = 200
 	self.tank.weapon.saiga.focus_dis = 200
 	self.tank.weapon.r870.focus_dis = 200

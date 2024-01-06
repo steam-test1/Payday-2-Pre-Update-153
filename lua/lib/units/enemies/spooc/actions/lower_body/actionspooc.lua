@@ -36,7 +36,7 @@ function ActionSpooc:init(action_desc, common_data)
 	self._host_stop_pos_inserted = action_desc.host_stop_pos_inserted
 	self._stop_pos = action_desc.stop_pos
 	self._nav_index = action_desc.path_index or 1
-	self._stroke_t = action_desc.stroke_t
+	self._stroke_t = tonumber(action_desc.stroke_t)
 	self._beating_end_t = self._stroke_t and self._stroke_t + math.lerp(self._common_data.char_tweak.spooc_attack_beating_time[1], self._common_data.char_tweak.spooc_attack_beating_time[2], math.random())
 	self._strike_nav_index = action_desc.strike_nav_index
 	self._haste = "run"

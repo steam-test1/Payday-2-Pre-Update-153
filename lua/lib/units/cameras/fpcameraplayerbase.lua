@@ -1132,6 +1132,26 @@ function FPCameraPlayerBase:anim_clbk_check_bullet_object()
 	end
 end
 
+function FPCameraPlayerBase:anim_clbk_stop_weapon_reload()
+	if alive(self._parent_unit) then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		if alive(weapon) then
+			weapon:base():tweak_data_anim_stop("reload")
+			weapon:base():tweak_data_anim_stop("reload_not_empty")
+		end
+	end
+end
+
+function FPCameraPlayerBase:anim_clbk_stop_weapon_reload_all()
+	if alive(self._parent_unit) then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		if alive(weapon) then
+			weapon:base():tweak_data_anim_stop("reload_enter")
+			weapon:base():tweak_data_anim_stop("reload_exit")
+		end
+	end
+end
+
 function FPCameraPlayerBase:anim_clbk_spawn_shotgun_shell()
 	if alive(self._parent_unit) then
 		local weapon = self._parent_unit:inventory():equipped_unit()

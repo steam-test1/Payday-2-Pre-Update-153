@@ -669,6 +669,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.butch_pack_free.track = true
 	self.global_values.butch_pack_free.sort_number = 100
 	self.global_values.butch_pack_free.category = "dlc"
+	self.global_values.bbq = {}
+	self.global_values.bbq.name_id = "bm_global_value_bbq"
+	self.global_values.bbq.desc_id = "menu_l_global_value_bbq"
+	self.global_values.bbq.unlock_id = "bm_global_value_bbq_unlock"
+	self.global_values.bbq.color = Color(255, 255, 212, 0) / 255
+	self.global_values.bbq.dlc = true
+	self.global_values.bbq.chance = 1
+	self.global_values.bbq.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "bbq")
+	self.global_values.bbq.durability_multiplier = 1
+	self.global_values.bbq.drops = true
+	self.global_values.bbq.track = true
+	self.global_values.bbq.sort_number = 101
+	self.global_values.bbq.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -694,6 +707,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.sweettooth.track = true
 	self.global_values.sweettooth.sort_number = 200
 	self.global_values.sweettooth.category = nil
+	self.global_values.bbq = {}
+	self.global_values.bbq.name_id = "bm_global_value_bbq"
+	self.global_values.bbq.desc_id = "menu_l_global_value_bbq"
+	self.global_values.bbq.unlock_id = "bm_global_value_bbq_unlock"
+	self.global_values.bbq.color = Color(255, 255, 212, 0) / 255
+	self.global_values.bbq.dlc = true
+	self.global_values.bbq.chance = 1
+	self.global_values.bbq.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "bbq")
+	self.global_values.bbq.durability_multiplier = 1
+	self.global_values.bbq.drops = true
+	self.global_values.bbq.track = true
+	self.global_values.bbq.sort_number = 150
+	self.global_values.bbq.category = "dlc"
 	self.global_value_list_index = {
 		"normal",
 		"infamous",
@@ -715,7 +741,8 @@ function LootDropTweakData:init(tweak_data)
 		"gage_pack_historical",
 		"character_pack_clover",
 		"character_pack_dragan",
-		"hlm2_deluxe"
+		"hlm2_deluxe",
+		"bbq"
 	}
 	self:_create_global_value_list_map()
 end

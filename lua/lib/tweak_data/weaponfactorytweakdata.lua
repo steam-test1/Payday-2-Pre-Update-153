@@ -174,6 +174,9 @@ function WeaponFactoryTweakData:init()
 	self:_init_x_g22c()
 	self:_init_x_g17()
 	self:_init_x_usp()
+	self:_init_flamethrower_mk2()
+	self:_init_m32()
+	self:_init_aa12()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -748,6 +751,10 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_ass_vhs = {
 				translation = Vector3(0, -3, -1.1)
+			},
+			wpn_fps_gre_m32 = {
+				translation = Vector3(0, 5, -4),
+				rotation = Rotation(0, -5, 0)
 			}
 		},
 		forbids = {
@@ -1369,6 +1376,10 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_ass_vhs = {
 				translation = Vector3(0, -1, -1.1)
+			},
+			wpn_fps_gre_m32 = {
+				translation = Vector3(0, 5, -4),
+				rotation = Rotation(0, -5, 0)
 			}
 		},
 		forbids = {
@@ -4344,7 +4355,7 @@ function WeaponFactoryTweakData:_init_saiga()
 		wpn_upg_o_marksmansight_rear_vanilla = {a_obj = "a_or"},
 		wpn_upg_o_marksmansight_front = {a_obj = "a_of"}
 	}
-	self.wpn_fps_smg_akmsu.adds = {
+	self.wpn_fps_shot_saiga.adds = {
 		wpn_fps_upg_o_specter = {
 			"wpn_fps_ak_extra_ris"
 		},
@@ -4370,6 +4381,18 @@ function WeaponFactoryTweakData:_init_saiga()
 			"wpn_fps_ak_extra_ris"
 		},
 		wpn_fps_upg_o_cs = {
+			"wpn_fps_ak_extra_ris"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_ak_extra_ris"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_ak_extra_ris"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_ak_extra_ris"
+		},
+		wpn_fps_upg_o_rx01 = {
 			"wpn_fps_ak_extra_ris"
 		}
 	}
@@ -11551,7 +11574,10 @@ function WeaponFactoryTweakData:_init_striker()
 		},
 		dlc = "gage_pack_shotgun",
 		texture_bundle_folder = "gage_pack_shotgun",
-		is_a_unlockable = true
+		is_a_unlockable = true,
+		forbids = {
+			"wpn_fps_upg_a_dragons_breath"
+		}
 	}
 	self.parts.wpn_fps_sho_striker_b_standard = {
 		type = "barrel",
@@ -14285,6 +14311,55 @@ function WeaponFactoryTweakData:create_ammunition()
 		internal_part = true,
 		sub_type = "ammo_piercing"
 	}
+	self.parts.wpn_fps_upg_a_dragons_breath = {
+		dlc = "bbq",
+		pcs = {},
+		type = "ammo",
+		name_id = "bm_wp_upg_a_dragons_breath",
+		a_obj = "a_body",
+		unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		third_unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		texture_bundle_folder = "bbq",
+		is_a_unlockable = true,
+		stats = {
+			value = 5,
+			total_ammo_mod = -6,
+			damage = -2,
+			spread = -1,
+			moving_spread = 3
+		},
+		custom_stats = {
+			ignore_statistic = true,
+			rays = 6,
+			damage_near_mul = 2,
+			damage_far_mul = 1.15,
+			armor_piercing_add = 1,
+			can_shoot_through_enemy = true,
+			can_shoot_through_shield = true,
+			can_shoot_through_wall = true,
+			ammo_pickup_min_mul = 1,
+			ammo_pickup_max_mul = 1,
+			bullet_class = "FlameBulletBase",
+			muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
+			fire_dot_data = {
+				dot_damage = "2",
+				dot_trigger_max_distance = "3000",
+				dot_trigger_chance = "50",
+				dot_length = "3",
+				dot_tick_damage = "0.5"
+			}
+		},
+		muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
+		hit_effect = "dragonsbreath",
+		internal_part = true,
+		sub_type = "ammo_dragons_breath",
+		forbids = {
+			"wpn_fps_upg_ns_shot_thick",
+			"wpn_fps_upg_ns_sho_salvo_large",
+			"wpn_fps_sho_aa12_barrel_silenced",
+			"wpn_fps_sho_striker_b_suppressed"
+		}
+	}
 	local weapons = {
 		"wpn_fps_shot_saiga",
 		"wpn_fps_shot_r870",
@@ -14295,15 +14370,58 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_sho_ksg",
 		"wpn_fps_pis_judge",
 		"wpn_fps_sho_spas12",
-		"wpn_fps_shot_b682"
+		"wpn_fps_shot_b682",
+		"wpn_fps_sho_aa12"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_slug")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_slug")
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_custom")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_custom")
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_custom_free")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_custom_free")
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_explosive")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_explosive")
 			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_piercing")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_piercing")
+			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_dragons_breath")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_dragons_breath")
+		end
+	end
+	self.parts.wpn_fps_upg_a_grenade_launcher_incendiary = {
+		dlc = "bbq",
+		pcs = {},
+		type = "ammo",
+		name_id = "bm_wp_upg_a_grenade_launcher_incendiary",
+		a_obj = "a_body",
+		unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		third_unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		stats = {damage = -30},
+		texture_bundle_folder = "bbq",
+		is_a_unlockable = true,
+		internal_part = true,
+		sub_type = "ammo_dragons_breath",
+		custom_stats = {
+			launcher_grenade = "launcher_incendiary"
+		},
+		override = {
+			wpn_fps_gre_m32_mag = {
+				unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_mag_incendiary"
+			},
+			wpn_fps_gre_m79_grenade = {
+				unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m79_grenade_incendiary"
+			}
+		}
+	}
+	local weapons = {
+		"wpn_fps_gre_m79",
+		"wpn_fps_gre_m32"
+	}
+	for _, factory_id in ipairs(weapons) do
+		if self[factory_id] and self[factory_id].uses_parts then
+			table.insert(self[factory_id].uses_parts, "wpn_fps_upg_a_grenade_launcher_incendiary")
+			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_grenade_launcher_incendiary")
 		end
 	end
 end
@@ -18736,11 +18854,7 @@ function WeaponFactoryTweakData:_init_rpg7()
 		a_obj = "a_m",
 		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_m_rocket",
 		stats = {value = 1},
-		animations = {
-			fire = "recoil",
-			fire_steelsight = "recoil",
-			reload = "reload"
-		}
+		animations = {reload = "reload"}
 	}
 	self.parts.wpn_fps_rpg7_barrel = {
 		type = "barrel",
@@ -19870,7 +19984,7 @@ function WeaponFactoryTweakData:_init_x_g22c()
 				value = 3,
 				spread_moving = -2,
 				concealment = -1,
-				extra_ammo = 6
+				extra_ammo = 12
 			}
 		},
 		wpn_fps_pis_g22c_b_standard = {
@@ -20034,7 +20148,7 @@ function WeaponFactoryTweakData:_init_x_usp()
 				value = 3,
 				spread_moving = -2,
 				concealment = -1,
-				extra_ammo = 6
+				extra_ammo = 12
 			}
 		},
 		wpn_fps_pis_usp_b_tactical = {
@@ -20095,4 +20209,517 @@ function WeaponFactoryTweakData:_init_x_usp()
 	}
 	self.wpn_fps_pis_x_usp_npc = deep_clone(self.wpn_fps_pis_x_usp)
 	self.wpn_fps_pis_x_usp_npc.unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_pis_x_usp/wpn_fps_pis_x_usp_npc"
+end
+
+function WeaponFactoryTweakData:_init_flamethrower_mk2()
+	self.parts.wpn_fps_fla_mk2_empty = {
+		type = "barrel",
+		name_id = "bm_wp_huntsman_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_fps_fla_mk2_empty",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_fla_mk2_body = {
+		type = "lower_reciever",
+		name_id = "bm_wp_huntsman_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_fps_fla_mk2_body",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_fla_mk2_mag_rare = {
+		pcs = {
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_fla_mk2_mag_rare",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_fps_fla_mk2_mag_rare",
+		stats = {
+			value = 1,
+			total_ammo_mod = 5,
+			damage = -3
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_fla_mk2_mag = {
+		type = "magazine",
+		name_id = "bm_wp_fla_mk2_mag_medium",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_fps_fla_mk2_mag",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_fla_mk2_mag_welldone = {
+		pcs = {
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_fla_mk2_mag_welldone",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_fps_fla_mk2_mag_welldone",
+		stats = {
+			value = 1,
+			total_ammo_mod = -5,
+			damage = 3
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_fla_mk2_body.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_third_fla_mk2_body"
+	self.parts.wpn_fps_fla_mk2_mag_rare.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_third_fla_mk2_mag_rare"
+	self.parts.wpn_fps_fla_mk2_mag.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_third_fla_mk2_mag"
+	self.parts.wpn_fps_fla_mk2_mag_welldone.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2_pts/wpn_third_fla_mk2_mag_welldone"
+	self.wpn_fps_fla_mk2 = {}
+	self.wpn_fps_fla_mk2.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2/wpn_fps_fla_mk2"
+	self.wpn_fps_fla_mk2.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_fla_mk2.animations = {reload = "reload", reload_not_empty = "reload"}
+	self.wpn_fps_fla_mk2.default_blueprint = {
+		"wpn_fps_fla_mk2_empty",
+		"wpn_fps_fla_mk2_body",
+		"wpn_fps_fla_mk2_mag"
+	}
+	self.wpn_fps_fla_mk2.uses_parts = {
+		"wpn_fps_fla_mk2_empty",
+		"wpn_fps_fla_mk2_body",
+		"wpn_fps_fla_mk2_mag_rare",
+		"wpn_fps_fla_mk2_mag",
+		"wpn_fps_fla_mk2_mag_welldone"
+	}
+	self.wpn_fps_fla_mk2_npc = deep_clone(self.wpn_fps_fla_mk2)
+	self.wpn_fps_fla_mk2_npc.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_fla_mk2/wpn_fps_fla_mk2_npc"
+end
+
+function WeaponFactoryTweakData:_init_m32()
+	self.parts.wpn_fps_gre_m32_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_barrel",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq",
+		forbids = {
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_fps_gre_m32_barrel_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_m32_barrel_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_barrel_short",
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 5,
+			concealment = 2
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq",
+		forbids = {
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_fps_gre_m32_bolt = {
+		type = "extra",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_bolt",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_bolt",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_gre_m32_lower_reciever = {
+		type = "lower_reciever",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_lower_reciever",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_gre_m32_mag = {
+		type = "magazine",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_mag",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq",
+		animations = {
+			reload_enter = "reload_enter",
+			reload = "reload",
+			reload_not_empty = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_gre_m32_stock_adapter = {
+		type = "stock_adapter",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_stock_adapter",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "pd2_clan"
+	}
+	self.parts.wpn_fps_gre_m32_no_stock = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_m32_no_stock",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_no_stock",
+		stats = {
+			value = 0,
+			concealment = 4,
+			recoil = -4
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq",
+		is_a_unlockable = true
+	}
+	self.parts.wpn_fps_gre_m32_upper_reciever = {
+		type = "upper_reciever",
+		name_id = "bm_wp_l85a2_fg_medium",
+		a_obj = "a_body_2",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_upper_reciever",
+		stats = {value = 1},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_gre_m32_barrel.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_third_gre_m32_barrel"
+	self.parts.wpn_fps_gre_m32_barrel_short.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_third_gre_m32_barrel_short"
+	self.parts.wpn_fps_gre_m32_bolt.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_no_stock"
+	self.parts.wpn_fps_gre_m32_lower_reciever.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_third_gre_m32_lower_reciever"
+	self.parts.wpn_fps_gre_m32_mag.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_no_stock"
+	self.parts.wpn_fps_gre_m32_stock_adapter.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_third_gre_m32_stock_adapter"
+	self.parts.wpn_fps_gre_m32_upper_reciever.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m32_no_stock"
+	self.wpn_fps_gre_m32 = {}
+	self.wpn_fps_gre_m32.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32/wpn_fps_gre_m32"
+	self.wpn_fps_gre_m32.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_gre_m32.animations = {
+		reload_exit = "reload_exit",
+		reload_enter = "reload_enter",
+		reload_not_empty_exit = "reload_exit",
+		fire = "recoil",
+		fire_steelsight = "recoil_zoom"
+	}
+	self.wpn_fps_gre_m32.stock_adapter = "wpn_fps_gre_m32_stock_adapter"
+	self.wpn_fps_gre_m32.forbids = {
+		"wpn_fps_addon_ris"
+	}
+	self.wpn_fps_gre_m32.adds = {}
+	self.wpn_fps_gre_m32.default_blueprint = {
+		"wpn_fps_gre_m32_barrel",
+		"wpn_fps_gre_m32_bolt",
+		"wpn_fps_gre_m32_lower_reciever",
+		"wpn_fps_gre_m32_mag",
+		"wpn_fps_gre_m32_upper_reciever",
+		"wpn_fps_upg_m4_s_standard_vanilla"
+	}
+	self.wpn_fps_gre_m32.uses_parts = {
+		"wpn_fps_gre_m32_barrel",
+		"wpn_fps_gre_m32_barrel_short",
+		"wpn_fps_gre_m32_bolt",
+		"wpn_fps_gre_m32_lower_reciever",
+		"wpn_fps_gre_m32_mag",
+		"wpn_fps_gre_m32_stock_adapter",
+		"wpn_fps_gre_m32_no_stock",
+		"wpn_fps_gre_m32_upper_reciever",
+		"wpn_fps_upg_m4_s_standard_vanilla",
+		"wpn_fps_upg_m4_s_pts",
+		"wpn_fps_upg_m4_s_crane",
+		"wpn_fps_upg_m4_s_mk46",
+		"wpn_fps_upg_m4_s_ubr",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_fl_ass_utg"
+	}
+	self.wpn_fps_gre_m32_npc = deep_clone(self.wpn_fps_gre_m32)
+	self.wpn_fps_gre_m32_npc.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32/wpn_fps_gre_m32_npc"
+end
+
+function WeaponFactoryTweakData:_init_aa12()
+	self.parts.wpn_fps_sho_aa12_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_aa12_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_barrel",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_barrel_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_aa12_barrel_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_barrel_long",
+		stats = {
+			value = 1,
+			spread = 2,
+			recoil = 2,
+			concealment = -2
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_sho_aa12_barrel_silenced = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_aa12_barrel_silenced",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_barrel_silenced",
+		stats = {
+			value = 5,
+			suppression = 12,
+			alert_size = 12,
+			spread = 1,
+			damage = -2,
+			recoil = -2,
+			spread_moving = 1,
+			concealment = -2
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_a"
+		},
+		forbids = {
+			"wpn_fps_upg_shot_ns_king",
+			"wpn_fps_upg_ns_shot_thick",
+			"wpn_fps_upg_ns_shot_shark",
+			"wpn_fps_upg_ns_sho_salvo_large"
+		},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq",
+		forbids = {
+			"wpn_fps_upg_a_dragons_breath"
+		}
+	}
+	self.parts.wpn_fps_sho_aa12_body = {
+		type = "lower_reciever",
+		name_id = "bm_wp_aa12_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_body",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_body_rail = {
+		type = "extra",
+		name_id = "bm_wp_aa12_body_rail ",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_body_rail",
+		stats = {value = 1},
+		stance_mod = {
+			wpn_fps_sho_aa12 = {
+				translation = Vector3(0, 2, -0.8)
+			}
+		},
+		forbids = {
+			"wpn_fps_sho_aa12_body_rear_sight"
+		}
+	}
+	self.parts.wpn_fps_sho_aa12_body_rear_sight = {
+		type = "sight",
+		name_id = "bm_wp_aa12_body_rear_sight",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_body_rear_sight",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_bolt = {
+		type = "extra",
+		name_id = "bm_wp_aa12_bolt",
+		a_obj = "a_bolt",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_bolt",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_dh = {
+		type = "drag_handle",
+		name_id = "bm_wp_aa12_dh",
+		a_obj = "a_dh",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_dh",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_mag_drum = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_aa12_mag_drum",
+		bullet_objects = {prefix = "g_bullet_", amount = 21},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_mag_drum",
+		stats = {
+			value = 1,
+			extra_ammo = 6,
+			concealment = -4
+		},
+		animations = {fire = "recoil", fire_steelsight = "recoil"},
+		texture_bundle_folder = "bbq",
+		dlc = "bbq"
+	}
+	self.parts.wpn_fps_sho_aa12_mag_straight = {
+		type = "magazine",
+		name_id = "bm_wp_aa12_mag_straight",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_fps_sho_aa12_mag_straight",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_aa12_barrel.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_barrel"
+	self.parts.wpn_fps_sho_aa12_barrel_long.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_barrel_long"
+	self.parts.wpn_fps_sho_aa12_barrel_silenced.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_barrel_silenced"
+	self.parts.wpn_fps_sho_aa12_body.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_body"
+	self.parts.wpn_fps_sho_aa12_body_rail.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_body_rail"
+	self.parts.wpn_fps_sho_aa12_body_rear_sight.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_body_rear_sight"
+	self.parts.wpn_fps_sho_aa12_bolt.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_bolt"
+	self.parts.wpn_fps_sho_aa12_dh.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_dh"
+	self.parts.wpn_fps_sho_aa12_mag_drum.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_mag_drum"
+	self.parts.wpn_fps_sho_aa12_mag_straight.third_unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12_pts/wpn_third_sho_aa12_mag_straight"
+	self.wpn_fps_sho_aa12 = {}
+	self.wpn_fps_sho_aa12.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12/wpn_fps_sho_aa12"
+	self.wpn_fps_sho_aa12.stock_adapter = "wpn_upg_ak_s_adapter"
+	self.wpn_fps_sho_aa12.animations = {
+		fire = "recoil",
+		fire_steelsight = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload_not_empty"
+	}
+	self.wpn_fps_sho_aa12.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_sho_aa12.adds = {
+		wpn_fps_upg_o_specter = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_aimpoint = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_aimpoint_2 = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_docter = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_eotech = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_t1micro = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_cmore = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_acog = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_cs = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_eotech_xps = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_reflex = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_rx30 = {
+			"wpn_fps_sho_aa12_body_rail"
+		},
+		wpn_fps_upg_o_rx01 = {
+			"wpn_fps_sho_aa12_body_rail"
+		}
+	}
+	self.wpn_fps_sho_aa12.default_blueprint = {
+		"wpn_fps_sho_aa12_mag_straight",
+		"wpn_fps_sho_aa12_dh",
+		"wpn_fps_sho_aa12_bolt",
+		"wpn_fps_sho_aa12_body",
+		"wpn_fps_sho_aa12_barrel",
+		"wpn_fps_sho_aa12_body_rear_sight"
+	}
+	self.wpn_fps_sho_aa12.uses_parts = {
+		"wpn_fps_sho_aa12_barrel",
+		"wpn_fps_sho_aa12_barrel_long",
+		"wpn_fps_sho_aa12_barrel_silenced",
+		"wpn_fps_sho_aa12_body",
+		"wpn_fps_sho_aa12_body_rail",
+		"wpn_fps_sho_aa12_body_rear_sight",
+		"wpn_fps_sho_aa12_bolt",
+		"wpn_fps_sho_aa12_dh",
+		"wpn_fps_sho_aa12_mag_drum",
+		"wpn_fps_sho_aa12_mag_straight",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_ns_shot_thick",
+		"wpn_fps_upg_ns_shot_shark",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire",
+		"wpn_fps_upg_shot_ns_king",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_upg_ns_sho_salvo_large"
+	}
+	self.wpn_fps_sho_aa12_npc = deep_clone(self.wpn_fps_sho_aa12)
+	self.wpn_fps_sho_aa12_npc.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12/wpn_fps_sho_aa12_npc"
 end

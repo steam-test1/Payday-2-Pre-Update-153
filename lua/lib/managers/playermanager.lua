@@ -78,6 +78,7 @@ function PlayerManager:_setup()
 		Global.player_manager.team_upgrades = {}
 		Global.player_manager.weapons = {}
 		Global.player_manager.equipment = {}
+		Global.player_manager.grenades = {}
 		Global.player_manager.kit = {
 			weapon_slots = {"glock_17"},
 			equipment_slots = {},
@@ -433,6 +434,12 @@ function PlayerManager:aquire_melee_weapon(upgrade, id)
 end
 
 function PlayerManager:unaquire_melee_weapon(upgrade, id)
+end
+
+function PlayerManager:aquire_grenade(upgrade, id)
+end
+
+function PlayerManager:unaquire_grenade(upgrade, id)
 end
 
 function PlayerManager:_verify_equipment_kit(loading)
@@ -2075,7 +2082,7 @@ end
 
 function PlayerManager:get_max_grenades_by_peer_id(peer_id)
 	local peer = managers.network:session() and managers.network:session():peer(peer_id)
-	return peer and self:get_max_grenades(peer:throwable_id()) or 0
+	return peer and self:get_max_grenades(peer:grenade_id()) or 0
 end
 
 function PlayerManager:get_max_grenades(grenade_id)
