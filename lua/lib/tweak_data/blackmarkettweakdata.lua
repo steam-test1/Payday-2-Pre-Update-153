@@ -2029,7 +2029,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.titan.value = 0
 	self.masks.titan.dlc = "humble_pack3"
 	self.masks.titan.texture_bundle_folder = "humble_summer_2015"
-	self.masks.titan.sort_number = 5
+	self.masks.titan.sort_number = 6
 	self.masks.pokachu = {}
 	self.masks.pokachu.unit = "units/pd2_dlc_humble_summer15/masks/pokachu/msk_pokachu"
 	self.masks.pokachu.name_id = "bm_msk_pokachu"
@@ -2037,7 +2037,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.pokachu.value = 0
 	self.masks.pokachu.dlc = "humble_pack3"
 	self.masks.pokachu.texture_bundle_folder = "humble_summer_2015"
-	self.masks.pokachu.sort_number = 5
+	self.masks.pokachu.sort_number = 6
 	self.masks.moon = {}
 	self.masks.moon.unit = "units/pd2_dlc_humble_summer15/masks/moon/msk_moon"
 	self.masks.moon.name_id = "bm_msk_moon"
@@ -2045,7 +2045,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.moon.value = 0
 	self.masks.moon.dlc = "humble_pack4"
 	self.masks.moon.texture_bundle_folder = "humble_summer_2015"
-	self.masks.moon.sort_number = 6
+	self.masks.moon.sort_number = 7
 	self.masks.borsuk = {}
 	self.masks.borsuk.unit = "units/pd2_dlc_humble_summer15/masks/borsuk/msk_borsuk"
 	self.masks.borsuk.name_id = "bm_msk_borsuk"
@@ -2053,7 +2053,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.borsuk.value = 0
 	self.masks.borsuk.dlc = "humble_pack4"
 	self.masks.borsuk.texture_bundle_folder = "humble_summer_2015"
-	self.masks.borsuk.sort_number = 6
+	self.masks.borsuk.sort_number = 7
 	self.masks.card_jack = {}
 	self.masks.card_jack.unit = "units/pd2_dlc_playingcards/masks/msk_card_jack/msk_card_jack"
 	self.masks.card_jack.name_id = "bm_msk_card_jack"
@@ -2061,7 +2061,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.card_jack.dlc = "e3_s15a"
 	self.masks.card_jack.texture_bundle_folder = "humble_summer_2015"
 	self.masks.card_jack.value = 0
-	self.masks.card_jack.sort_number = 7
+	self.masks.card_jack.sort_number = 8
 	self.masks.card_queen = {}
 	self.masks.card_queen.unit = "units/pd2_dlc_playingcards/masks/msk_card_queen/msk_card_queen"
 	self.masks.card_queen.name_id = "bm_msk_card_queen"
@@ -2069,7 +2069,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.card_queen.dlc = "e3_s15b"
 	self.masks.card_queen.texture_bundle_folder = "humble_summer_2015"
 	self.masks.card_queen.value = 0
-	self.masks.card_queen.sort_number = 7
+	self.masks.card_queen.sort_number = 8
 	self.masks.card_king = {}
 	self.masks.card_king.unit = "units/pd2_dlc_playingcards/masks/msk_card_king/msk_card_king"
 	self.masks.card_king.name_id = "bm_msk_card_king"
@@ -2077,7 +2077,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.card_king.dlc = "e3_s15c"
 	self.masks.card_king.texture_bundle_folder = "humble_summer_2015"
 	self.masks.card_king.value = 0
-	self.masks.card_king.sort_number = 7
+	self.masks.card_king.sort_number = 8
 	self.masks.card_joker = {}
 	self.masks.card_joker.unit = "units/pd2_dlc_playingcards/masks/msk_card_joker/msk_card_joker"
 	self.masks.card_joker.name_id = "bm_msk_card_joker"
@@ -2085,7 +2085,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.card_joker.dlc = "e3_s15d"
 	self.masks.card_joker.texture_bundle_folder = "humble_summer_2015"
 	self.masks.card_joker.value = 0
-	self.masks.card_joker.sort_number = 7
+	self.masks.card_joker.sort_number = 8
 	self.masks.sokol = {}
 	self.masks.sokol.unit = "units/pd2_dlc_character_sokol/masks/sokol/msk_sokol"
 	self.masks.sokol.name_id = "bm_msk_sokol"
@@ -2175,6 +2175,15 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.shirai.skip_mask_on_sequence = true
 	self.masks.shirai.texture_bundle_folder = "turtles"
 	self.masks.shirai.dlc = "turtles"
+	self.masks.bobblehead_dozer = {}
+	self.masks.bobblehead_dozer.unit = "units/pd2_merchandise/masks/msk_bobblehead_dozer/msk_bobblehead_dozer"
+	self.masks.bobblehead_dozer.name_id = "bm_msk_bobblehead_dozer"
+	self.masks.bobblehead_dozer.pcs = {}
+	self.masks.bobblehead_dozer.value = 0
+	self.masks.bobblehead_dozer.texture_bundle_folder = "merchandise"
+	self.masks.bobblehead_dozer.dlc = "bobblehead"
+	self.masks.bobblehead_dozer.type = "helmet"
+	self.masks.bobblehead_dozer.sort_number = 9
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
