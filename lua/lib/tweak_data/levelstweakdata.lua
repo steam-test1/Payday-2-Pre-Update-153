@@ -712,13 +712,28 @@ function LevelsTweakData:init()
 			}
 		},
 		law1 = {
-			foes = {mobster1 = true, criminal1 = true}
+			foes = {
+				mobster1 = true,
+				criminal1 = true,
+				converted_enemy = true
+			}
 		},
 		mobster1 = {
-			foes = {law1 = true, criminal1 = true}
+			foes = {
+				law1 = true,
+				criminal1 = true,
+				converted_enemy = true
+			}
 		},
 		mobster_boss = {
-			foes = {criminal1 = true}
+			foes = {criminal1 = true, converted_enemy = true}
+		},
+		converted_enemy = {
+			foes = {
+				mobster1 = true,
+				law1 = true,
+				mobster_boss = true
+			}
 		},
 		neutral1 = {
 			foes = {}
@@ -814,6 +829,16 @@ function LevelsTweakData:init()
 	self.mus.cube = "cube_apply_heist_bank"
 	self.mus.max_bags = 30
 	self.mus.ghost_bonus = 0.15
+	self.drive_esacape_pre = {}
+	self.drive_esacape_pre.name_id = "heist_escape_garage_hl"
+	self.drive_esacape_pre.briefing_id = "heist_escape_garage_briefing"
+	self.drive_esacape_pre.briefing_dialog = "nothing"
+	self.drive_esacape_pre.world_name = "wip/driving_escapes_pre"
+	self.drive_esacape_pre.intro_event = "Play_dr1_a01"
+	self.drive_esacape_pre.outro_event = "nothing"
+	self.drive_esacape_pre.music = "heist"
+	self.drive_esacape_pre.package = "packages/escape_garage"
+	self.drive_esacape_pre.cube = "cube_apply_heist_bank"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -885,7 +910,8 @@ function LevelsTweakData:init()
 		"election_day_3",
 		"arm_for",
 		"escape_hell",
-		"blueharvest_3"
+		"blueharvest_3",
+		"escape_drive"
 	}
 end
 
@@ -1042,10 +1068,21 @@ function LevelsTweakData:get_team_setup()
 				foes = {mobster1 = true, law1 = true}
 			},
 			law1 = {
-				foes = {mobster1 = true, criminal1 = true}
+				foes = {
+					mobster1 = true,
+					criminal1 = true,
+					converted_enemy = true
+				}
 			},
 			mobster1 = {
-				foes = {law1 = true, criminal1 = true}
+				foes = {
+					law1 = true,
+					criminal1 = true,
+					converted_enemy = true
+				}
+			},
+			converted_enemy = {
+				foes = {mobster1 = true, law1 = true}
 			},
 			neutral1 = {
 				foes = {}

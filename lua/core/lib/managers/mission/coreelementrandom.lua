@@ -22,7 +22,7 @@ function ElementRandom:on_executed(instigator)
 		end
 	end
 	self._values.on_executed = {}
-	local amount = self._values.amount or 1
+	local amount = self:_calc_amount()
 	if self._values.counter_id then
 		local element = self:get_mission_element(self._values.counter_id)
 		amount = element:counter_value()
@@ -31,6 +31,14 @@ function ElementRandom:on_executed(instigator)
 		table.insert(self._values.on_executed, self._original_on_executed[self:_get_random_elements()])
 	end
 	ElementRandom.super.on_executed(self, instigator)
+end
+
+function ElementRandom:_calc_amount()
+	local amount = self._values.amount or 1
+	if self._values.amount_random and self._values.amount_random > 0 then
+		amount = amount + math.random(self._values.amount_random + 1) - 1
+	end
+	return amount
 end
 
 function ElementRandom:_get_random_elements()

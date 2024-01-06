@@ -28,6 +28,7 @@ function AiLayer:load(world_holder, offset)
 	end
 	managers.ai_data:load_units(self._created_units)
 	self:_update_patrol_paths_list()
+	self:_update_motion_paths_list()
 	self:_update_settings()
 end
 
@@ -261,6 +262,7 @@ function AiLayer:build_panel(notebook)
 	ai_sizer:add(self:_build_ai_settings(), 0, 0, "EXPAND")
 	ai_sizer:add(self:_build_ai_unit_settings(), 0, 0, "EXPAND")
 	ai_sizer:add(self:_build_ai_data(), 1, 0, "EXPAND")
+	ai_sizer:add(self:_build_motion_path_section(), 1, 0, "EXPAND")
 	self._sizer:add(ai_sizer, 4, 0, "EXPAND")
 	self._graphs = graphs
 	return self._ews_panel
@@ -367,6 +369,64 @@ function AiLayer:_build_ai_data()
 	patrol_paths_sizer:add(self._patrol_paths_list, 1, 0, "EXPAND")
 	ai_data_sizer:add(patrol_paths_sizer, 1, 0, "EXPAND")
 	return ai_data_sizer
+end
+
+function AiLayer:_build_motion_path_section()
+	local motion_paths_sizer = EWS:StaticBoxSizer(self._ews_panel, "VERTICAL", "Motion Paths (Work In Progress)")
+	local create_paths_btn = EWS:Button(self._ews_panel, "Recreate Paths", "", "BU_EXACTFIT,NO_BORDER")
+	motion_paths_sizer:add(create_paths_btn, 0, 5, "RIGHT")
+	create_paths_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "_create_motion_paths"), nil)
+	local motion_paths_list_sizer = EWS:StaticBoxSizer(self._ews_panel, "HORIZONTAL", "Generated motion paths list")
+	local motion_path_toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_VERTICAL,TB_NODIVIDER")
+	motion_path_toolbar:add_tool("GT_DELETE", "Delete", CoreEws.image_path("toolbar\\delete_16x16.png"), "Delete selected motion path and its markers.")
+	motion_path_toolbar:connect("GT_DELETE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_delete_motion_path"), nil)
+	motion_path_toolbar:add_check_tool("ONLY_DRAW_SELECTED_MOTION_PATH", "Toggle draw on selected motion path.", CoreEws.image_path("lock_16x16.png"), "Toggle draw on selected motion path.")
+	motion_path_toolbar:set_tool_state("ONLY_DRAW_SELECTED_MOTION_PATH", self._only_draw_selected_motion_path)
+	motion_path_toolbar:connect("ONLY_DRAW_SELECTED_MOTION_PATH", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_toggle_only_draw_selected_motion_path"), motion_path_toolbar)
+	motion_path_toolbar:realize()
+	motion_paths_list_sizer:add(motion_path_toolbar, 0, 0, "EXPAND")
+	self._motion_paths_list = EWS:ListBox(self._ews_panel, "", "LB_SINGLE,LB_HSCROLL,LB_NEEDED_SB,LB_SORT")
+	self._motion_paths_list:connect("EVT_COMMAND_LISTBOX_SELECTED", callback(self, self, "_select_motion_path"), nil)
+	motion_paths_list_sizer:add(self._motion_paths_list, 1, 0, "EXPAND")
+	motion_paths_sizer:add(motion_paths_list_sizer, 1, 0, "EXPAND")
+	return motion_paths_sizer
+end
+
+function AiLayer:_delete_motion_path()
+	Application:debug("AiLayer:_delete_motion_path()")
+end
+
+function AiLayer:_toggle_only_draw_selected_motion_path(motion_path_toolbar)
+	self._only_draw_selected_motion_path = motion_path_toolbar:tool_state("ONLY_DRAW_SELECTED_MOTION_PATH")
+end
+
+function AiLayer:_update_motion_paths_list()
+	self._motion_paths_list:clear()
+	for _, path in pairs(managers.motion_path:get_all_paths()) do
+		self._motion_paths_list:append(path.name)
+	end
+end
+
+function AiLayer:_create_motion_paths()
+	Application:debug("AiLayer:_create_motion_paths()")
+	managers.motion_path:recreate_paths()
+	self:_update_motion_paths_list()
+end
+
+function AiLayer:_select_motion_path()
+	Application:debug("AiLayer:_select_motion_path()")
+	local motion_path_name = self:_selected_motion_path()
+	print("AiLayer:_select_motion_path() selected: ", motion_path_name)
+	managers.motion_path:select_path(motion_path_name)
+end
+
+function AiLayer:_selected_motion_path()
+	Application:debug("AiLayer:_selected_motion_path()")
+	local index = self._motion_paths_list:selected_index()
+	if index ~= -1 then
+		return self._motion_paths_list:get_string(index)
+	end
+	return nil
 end
 
 function AiLayer:_toggle_only_draw_selected_patrol_path(patrol_path_toolbar)
@@ -722,6 +782,7 @@ function AiLayer:clear()
 	self:_update_settings()
 	managers.ai_data:clear()
 	self:_update_patrol_paths_list()
+	self:_update_motion_paths_list()
 	self:_select_patrol_path()
 	managers.navigation:clear()
 	self._ai_unit_settings_guis.locations.ctrlr:set_enabled(false)

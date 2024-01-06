@@ -20,6 +20,7 @@ function DLCTweakData:init(tweak_data)
 		character_pack_clover = true,
 		the_bomb = true,
 		character_pack_dragan = true,
+		dlc_akm4 = 1,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
 		alienware_alpha = true,
@@ -42,7 +43,7 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.starter_kit.content.upgrades = {"fists"}
+	self.starter_kit.content.upgrades = {"fists", "frag"}
 	do
 		local all_normal_masks = {
 			"alienware",
@@ -2533,6 +2534,226 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "weapon_mods",
 			item_entry = "wpn_fps_pis_hs2000_sl_custom",
+			amount = 1
+		}
+	}
+	self.akm4_pack = {}
+	self.akm4_pack.dlc = "has_akm4_pack"
+	self.akm4_pack.content = {}
+	self.akm4_pack.content.loot_drops = {}
+	self.ach_ameno_1 = {}
+	self.ach_ameno_1.dlc = "has_achievement"
+	self.ach_ameno_1.achievement_id = "ameno_1"
+	self.ach_ameno_1.content = {}
+	self.ach_ameno_1.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_1.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_upper_reciever_core",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_lower_reciever_core",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m16_fg_stag",
+			amount = 1
+		}
+	}
+	self.ach_ameno_2 = {}
+	self.ach_ameno_2.dlc = "has_achievement"
+	self.ach_ameno_2.achievement_id = "ameno_2"
+	self.ach_ameno_2.content = {}
+	self.ach_ameno_2.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_2.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_g_rk3",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_fg_zenit",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_upper_reciever_ballos",
+			amount = 1
+		}
+	}
+	self.ach_ameno_3 = {}
+	self.ach_ameno_3.dlc = "has_achievement"
+	self.ach_ameno_3.achievement_id = "ameno_3"
+	self.ach_ameno_3.content = {}
+	self.ach_ameno_3.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_3.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_ak_scopemount",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_ass_pbs1",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "carnotaurus",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "dawn",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "dinoskull",
+			amount = 1
+		}
+	}
+	self.ach_ameno_4 = {}
+	self.ach_ameno_4.dlc = "has_achievement"
+	self.ach_ameno_4.achievement_id = "ameno_4"
+	self.ach_ameno_4.content = {}
+	self.ach_ameno_4.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_4.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_ak_b_zastava",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_m_uspalm",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "triceratops",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "prehistoric",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "dinostripes",
+			amount = 1
+		}
+	}
+	self.ach_ameno_5 = {}
+	self.ach_ameno_5.dlc = "has_achievement"
+	self.ach_ameno_5.achievement_id = "ameno_5"
+	self.ach_ameno_5.content = {}
+	self.ach_ameno_5.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_5.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_fg_moe",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_smg_olympic_fg_lr300",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_fg_lvoa",
+			amount = 1
+		}
+	}
+	self.ach_ameno_6 = {}
+	self.ach_ameno_6.dlc = "has_achievement"
+	self.ach_ameno_6.achievement_id = "ameno_6"
+	self.ach_ameno_6.content = {}
+	self.ach_ameno_6.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_6.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_s_solidstock",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_m4_s_ubr",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "pachy",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "fossil",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "predator",
+			amount = 1
+		}
+	}
+	self.ach_ameno_7 = {}
+	self.ach_ameno_7.dlc = "has_achievement"
+	self.ach_ameno_7.achievement_id = "ameno_7"
+	self.ach_ameno_7.content = {}
+	self.ach_ameno_7.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_7.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_m4_b_beowulf",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_m4_m_l5",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "velociraptor",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "feathers",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "dinoscars",
+			amount = 1
+		}
+	}
+	self.ach_ameno_8 = {}
+	self.ach_ameno_8.dlc = "has_achievement"
+	self.ach_ameno_8.achievement_id = "ameno_8"
+	self.ach_ameno_8.content = {}
+	self.ach_ameno_8.content.loot_global_value = "akm4_pack"
+	self.ach_ameno_8.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_fg_trax",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_fg_krebs",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_b_ak105",
 			amount = 1
 		}
 	}

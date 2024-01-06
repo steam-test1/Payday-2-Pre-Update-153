@@ -1061,6 +1061,21 @@ function MenuCallbackHandler:dlc_buy_the_bomb_pc()
 	Steam:overlay_activate("store", 339480)
 end
 
+function MenuCallbackHandler:dlc_buy_akm4_pack_pc()
+	print("[MenuCallbackHandler:dlc_buy_akm4_pack_pc]")
+	Steam:overlay_activate("store", 351890)
+end
+
+function MenuCallbackHandler:dlc_buy_overkill_pack_pc()
+	print("[MenuCallbackHandler:dlc_buy_overkill_pack_pc]")
+	Steam:overlay_activate("store", 339480)
+end
+
+function MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc()
+	print("[MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc]")
+	Steam:overlay_activate("store", 339480)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1097,6 +1112,7 @@ end
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
 		"the_bomb",
+		"akm4_pack",
 		"character_pack_dragan",
 		"hope_diamond",
 		"character_pack_clover",
@@ -1190,6 +1206,18 @@ function MenuCallbackHandler:visible_callback_the_bomb()
 	return self:is_dlc_latest_locked("the_bomb")
 end
 
+function MenuCallbackHandler:visible_callback_akm4_pack()
+	return self:is_dlc_latest_locked("akm4_pack")
+end
+
+function MenuCallbackHandler:visible_callback_overkill_pack()
+	return self:is_dlc_latest_locked("overkill_pack")
+end
+
+function MenuCallbackHandler:visible_callback_complete_overkill_pack()
+	return self:is_dlc_latest_locked("complete_overkill_pack")
+end
+
 function MenuCallbackHandler:not_has_all_dlcs()
 	return not self:has_all_dlcs()
 end
@@ -1236,6 +1264,10 @@ end
 
 function MenuCallbackHandler:is_win32()
 	return SystemInfo:platform() == Idstring("WIN32")
+end
+
+function MenuCallbackHandler:is_fullscreen()
+	return managers.viewport:is_fullscreen()
 end
 
 function MenuCallbackHandler:voice_enabled()
@@ -1520,14 +1552,16 @@ end
 
 function MenuCallbackHandler:toggle_fullscreen(item)
 	local fullscreen = item:value() == "on"
-	if RenderSettings.fullscreen == fullscreen then
+	if managers.viewport:is_fullscreen() == fullscreen then
 		return
 	end
 	managers.viewport:set_fullscreen(fullscreen)
 	managers.menu:show_accept_gfx_settings_dialog(function()
 		managers.viewport:set_fullscreen(not fullscreen)
 		item:set_value(not fullscreen and "on" or "off")
+		self:refresh_node()
 	end)
+	self:refresh_node()
 end
 
 function MenuCallbackHandler:toggle_subtitle(item)
@@ -2121,6 +2155,10 @@ function MenuCallbackHandler:become_infamous(params)
 		end
 	end
 	managers.menu:show_confirm_become_infamous(params)
+end
+
+function MenuCallbackHandler:choice_choose_video_adapter(item)
+	managers.viewport:set_adapter_index(item:value())
 end
 
 function MenuCallbackHandler:choice_choose_texture_quality(item)
@@ -6274,10 +6312,26 @@ function MenuOptionInitiator:modify_adv_video(node)
 end
 
 function MenuOptionInitiator:modify_video(node)
+	local adapter_item = node:item("choose_video_adapter")
+	if adapter_item then
+		adapter_item:clear_options()
+		for i = 0, RenderSettings.adapter_count - 1 do
+			local option = CoreMenuItemOption.ItemOption:new({
+				_meta = "option",
+				localize = false,
+				text_id = "" .. i + 1,
+				value = i
+			})
+			adapter_item:add_option(option)
+		end
+		adapter_item:visible()
+		adapter_item:set_value(RenderSettings.adapter_index)
+		adapter_item:set_enabled(managers.viewport:is_fullscreen())
+	end
 	local option_value = "off"
 	local fs_item = node:item("toggle_fullscreen")
 	if fs_item then
-		if RenderSettings.fullscreen then
+		if managers.viewport:is_fullscreen() then
 			option_value = "on"
 		end
 		fs_item:set_value(option_value)

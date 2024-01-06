@@ -143,7 +143,7 @@ function MissionEndState:at_enter(old_state, params)
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, stealth_pass, equipped_pass, all_pass, weapon_data, memory, level_id, stage
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, stealth_pass, loud_pass, equipped_pass, equipped_team_pass, timer_pass, num_players_pass, all_pass, weapon_data, memory, level_id, stage
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
 				level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
@@ -156,6 +156,9 @@ function MissionEndState:at_enter(old_state, params)
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
 				no_shots_pass = not achievement_data.no_shots or managers.statistics:session_total_shots(achievement_data.no_shots) == 0
 				stealth_pass = not achievement_data.stealth or managers.groupai and managers.groupai:state():whisper_mode()
+				loud_pass = not achievement_data.loud or managers.groupai and not managers.groupai:state():whisper_mode()
+				timer_pass = not achievement_data.timer or managers.game_play_central and managers.game_play_central:get_heist_timer() <= achievement_data.timer
+				num_players_pass = not achievement_data.num_players or achievement_data.num_players == table.size(managers.network:game():all_members())
 				equipped_pass = not achievement_data.equipped or false
 				if achievement_data.equipped then
 					for category, data in pairs(achievement_data.equipped) do
@@ -170,11 +173,16 @@ function MissionEndState:at_enter(old_state, params)
 											break
 										end
 									else
+										local found_one = false
 										for _, part_id in ipairs(part_or_parts) do
-											if not table.contains(weapon_data.blueprint, part_id) then
-												equipped_pass = false
+											if table.contains(weapon_data.blueprint, part_id) then
+												found_one = true
 												break
 											end
+										end
+										if not found_one then
+											equipped_pass = false
+											break
 										end
 									end
 								end
@@ -182,7 +190,33 @@ function MissionEndState:at_enter(old_state, params)
 						end
 					end
 				end
-				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and level_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and equipped_pass
+				equipped_team_pass = true
+				if achievement_data.equipped_team then
+					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, timer_pass
+					local ad = achievement_data.equipped_team
+					local oufit
+					for _, member in pairs(managers.network:game():all_members()) do
+						oufit = member:peer():blackmarket_outfit()
+						pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
+						pass_deployable = not ad.deployable or ad.deployable == oufit.deployable
+						pass_mask = not ad.mask or ad.mask.mask_id == oufit.mask
+						pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == oufit.melee_weapon
+						pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
+						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
+						pass_primaries = not ad.primaries or table.contains(ad.primaries, oufit.primary.factory_id)
+						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
+						pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
+						pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
+						if ad.reverse_deployable then
+							pass_deployable = not pass_deployable
+						end
+						if not (pass_armor and pass_deployable and pass_mask and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded) or not pass_secondary_unmodded then
+							equipped_team_pass = false
+							break
+						end
+					end
+				end
+				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and level_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass
 				full_job_pass = managers.job:has_active_job() and achievement_data.full_job_id and achievement_data.full_job_id == managers.job:current_real_job_id()
 				full_jobs_pass = managers.job:has_active_job() and achievement_data.full_jobs_id and table.contains(achievement_data.full_jobs_id, managers.job:current_real_job_id())
 				if all_pass and (full_job_pass or full_jobs_pass) then

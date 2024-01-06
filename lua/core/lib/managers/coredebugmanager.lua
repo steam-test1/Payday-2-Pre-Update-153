@@ -2901,11 +2901,7 @@ function ConsoleDebug:init()
 end
 
 function ConsoleDebug:destroy()
-	self:destroy_controller()
-	if alive(self._workspace) then
-		Overlay:gui():destroy_workspace(self._workspace)
-		self._workspace = nil
-	end
+	self:clear()
 end
 
 function ConsoleDebug:set_enabled(enabled)
@@ -2918,6 +2914,10 @@ function ConsoleDebug:set_enabled(enabled)
 			managers.debug.hijack:hijack_func(Application, "debug", callback(self, self, "hijacked_debug"))
 			managers.debug.hijack:hijack_func(Application, "error", callback(self, self, "hijacked_error"))
 			managers.debug.hijack:hijack_func(Application, "stack_dump", callback(self, self, "hijacked_stack_dump"))
+			if not alive(self._workspace) then
+				self:setup()
+			end
+			self:invalidate()
 		else
 			self:destroy_controller()
 			managers.debug.hijack:unhijack_func(_G, "print", true)
@@ -2974,16 +2974,17 @@ end
 
 function ConsoleDebug:clear()
 	ConsoleDebug.super.clear(self)
-	if self._workspace ~= nil then
+	if alive(self._workspace) then
 		self._workspace:panel():clear()
 		Overlay:gui():destroy_workspace(self._workspace)
-		self._workspace = nil
-		self._panel = nil
-		self._text_gui = nil
-		self._text_list = nil
-		self._scroll = nil
-		self:destroy_controller()
 	end
+	self:destroy_controller()
+	self._workspace = nil
+	self._panel = nil
+	self._text_gui = nil
+	self._text_list = nil
+	self._command_text_gui = nil
+	self._scroll = nil
 end
 
 function ConsoleDebug:toggle_visible()
@@ -2993,12 +2994,13 @@ end
 function ConsoleDebug:set_visible(visible)
 	if not self._visible ~= not visible then
 		self._visible = visible
-		if self._workspace then
-			if visible then
-				self._workspace:show()
-			else
-				self._workspace:hide()
-			end
+		if not alive(self._workspace) then
+			self:setup()
+		end
+		if visible then
+			self._workspace:show()
+		else
+			self._workspace:hide()
 		end
 	end
 end
@@ -3033,7 +3035,7 @@ function ConsoleDebug:get_arg_text(...)
 end
 
 function ConsoleDebug:add_text(text, color)
-	if not self._workspace then
+	if not alive(self._workspace) then
 		self:setup()
 	end
 	local formatted_text = string.gsub(tostring(text), "\t", "    ")
@@ -3050,17 +3052,62 @@ function ConsoleDebug:add_text(text, color)
 end
 
 function ConsoleDebug:invalidate()
-	if self._workspace then
+	if alive(self._workspace) then
+		local old_command_text = ""
+		if alive(self._command_text_gui) then
+			old_command_text = self._command_text_gui:text()
+		end
 		self._panel:clear()
 		local floored_scroll = math.floor(self._scroll)
 		local index = #self._text_list - floored_scroll
-		local y = self._panel:height()
 		local config = {}
 		config.font = "core/fonts/diesel"
 		config.font_size = 15
 		config.layer = 1000000
 		config.wrap = true
 		config.width = self._panel:width()
+		local y = self._panel:height() - config.font_size
+		config.color = Color.white
+		config.text = old_command_text
+		self._command_text_gui = self._panel:text(config)
+		self._command_text_gui:enter_text(function(o, s)
+			o:replace_text(s)
+		end)
+		self._command_text_gui:key_press(function(o, key)
+			local s, e = o:selection()
+			if key == Idstring("enter") or key == Idstring("num enter") then
+				local text = o:text()
+				o:set_text("")
+				Application:console_command(text)
+			elseif key == Idstring("backspace") then
+				if s == e and 0 < s then
+					o:set_selection(s - 1, e)
+				end
+				o:replace_text("")
+			elseif key == Idstring("delete") then
+				if s == e and s < utf8.len(o:text()) then
+					o:set_selection(s, e + 1)
+				end
+				o:replace_text("")
+			elseif key == Idstring("left") then
+				if s < e then
+					o:set_selection(s, s)
+				elseif 0 < s then
+					o:set_selection(s - 1, s - 1)
+				end
+			elseif key == Idstring("right") then
+				if s < e then
+					o:set_selection(e, e)
+				elseif s < utf8.len(o:text()) then
+					o:set_selection(s + 1, s + 1)
+				end
+			end
+		end)
+		local command_text_height = math.max(self._command_text_gui:line_height() * self._command_text_gui:number_of_lines(), config.font_size)
+		y = y - command_text_height
+		self._command_text_gui:set_height(command_text_height)
+		self._command_text_gui:set_y(y)
+		y = y - command_text_height
 		local remainder_scroll = self._scroll - floored_scroll
 		local scroll_first = 0 < remainder_scroll
 		while 0 < index and 0 < y do
@@ -3084,6 +3131,10 @@ end
 function ConsoleDebug:setup()
 	local gui_scene = Overlay:gui()
 	self._workspace = gui_scene:create_screen_workspace()
+	local keyboard = Input:keyboard()
+	if keyboard and keyboard:enabled() and keyboard:connected() then
+		self._workspace:connect_keyboard(keyboard)
+	end
 	local gui = self._workspace:panel():gui(Idstring("core/guis/core_debug_manager"))
 	local safe_rect = managers.viewport:get_safe_rect_pixels()
 	local config = {}

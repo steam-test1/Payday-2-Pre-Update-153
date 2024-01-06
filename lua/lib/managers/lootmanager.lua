@@ -128,6 +128,52 @@ function LootManager:sync_secure_loot(carry_id, multiplier_level, silent)
 		else
 		end
 	end
+	self:check_achievements(carry_id, multiplier)
+end
+
+function LootManager:check_achievements(carry_id, multiplier)
+	local real_total_value = self:get_real_total_value()
+	local memory, total_memory_value, all_pass, total_value_pass, jobs_pass, difficulties_pass
+	for achievement, achievement_data in pairs(tweak_data.achievement.loot_cash_achievements or {}) do
+		jobs_pass = not achievement_data.jobs or table.contains(achievement_data.jobs, managers.job:current_real_job_id())
+		difficulties_pass = not achievement_data.difficulties or table.contains(achievement_data.difficulties, Global.game_settings.difficulty)
+		if not achievement_data.timer then
+			total_value_pass = not achievement_data.total_value or real_total_value >= achievement_data.total_value
+		else
+			memory = managers.job:get_memory(achievement, achievement_data.is_shortterm)
+			local t = Application:time()
+			local new_memory = {
+				time = t,
+				value = self:get_real_value(carry_id, multiplier)
+			}
+			if memory then
+				table.insert(memory, new_memory)
+				for i = #memory, 1, -1 do
+					if t - memory[i].time >= achievement_data.timer then
+						table.remove(memory, i)
+					end
+				end
+				managers.job:set_memory(achievement, memory, achievement_data.is_shortterm)
+			else
+				memory = {new_memory}
+				managers.job:set_memory(achievement, memory, achievement_data.is_shortterm)
+			end
+			total_memory_value = 0
+			for _, m_data in ipairs(memory) do
+				total_memory_value = total_memory_value + m_data.value
+			end
+			total_value_pass = not achievement_data.total_value or total_memory_value >= achievement_data.total_value
+		end
+		all_pass = total_value_pass and jobs_pass and difficulties_pass
+		if all_pass then
+			if achievement_data.stat then
+				managers.achievment:award_progress(achievement_data.stat)
+			end
+			if achievement_data.award then
+				managers.achievment:award(achievement_data.award)
+			end
+		end
+	end
 end
 
 function LootManager:secure_small_loot(type, multiplier_level)

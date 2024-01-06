@@ -233,6 +233,14 @@ function GuiTweakData:init()
 		store = 337660,
 		image = "guis/dlcs/character_pack_clover/textures/pd2/content_updates/hope_diamond"
 	}
+	local hw_boxing = {
+		id = "hw_boxing",
+		name_id = "menu_content_hw_boxing",
+		desc_id = "menu_content_hw_boxing_desc",
+		date_id = "menu_content_hw_boxing_date",
+		webpage = "http://www.overkillsoftware.com/happynewyear/",
+		image = "guis/dlcs/pd2_hw_boxing/textures/pd2/content_updates/hw_boxing"
+	}
 	local character_pack_dragan = {
 		id = "character_pack_dragan",
 		name_id = "menu_content_character_pack_dragan",
@@ -248,6 +256,14 @@ function GuiTweakData:init()
 		date_id = "menu_content_the_bomb_date",
 		store = 339480,
 		image = "guis/dlcs/the_bomb/textures/pd2/content_updates/the_bomb"
+	}
+	local akm4_pack = {
+		id = "akm4_pack",
+		name_id = "menu_content_akm4_pack",
+		desc_id = "menu_content_akm4_pack_desc",
+		date_id = "menu_content_akm4_pack_date",
+		store = 351890,
+		image = "guis/dlcs/dlc_akm4/textures/pd2/content_updates/akm4_pack"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -283,10 +299,12 @@ function GuiTweakData:init()
 			halloween_2014,
 			gage_pack_historical,
 			christmas_2014,
-			character_pack_clover,
 			hope_diamond,
+			character_pack_clover,
+			hw_boxing,
+			the_bomb,
 			character_pack_dragan,
-			the_bomb
+			akm4_pack
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1345,6 +1363,18 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
+		},
+		{
+			id = "casino",
+			name_id = "menu_cn_casino",
+			desc_id = "menu_cn_casino_desc",
+			menu_node = "crimenet_contract_casino",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_casino",
+			unlock = "unlock_level",
+			pulse = true,
+			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {

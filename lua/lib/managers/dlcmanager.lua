@@ -291,6 +291,10 @@ function GenericDLCManager:has_gage_pack_assault()
 	return Global.dlc_manager.all_dlc_data.gage_pack_assault and Global.dlc_manager.all_dlc_data.gage_pack_assault.verified
 end
 
+function GenericDLCManager:has_akm4_pack()
+	return Global.dlc_manager.all_dlc_data.akm4_pack and Global.dlc_manager.all_dlc_data.akm4_pack.verified
+end
+
 function GenericDLCManager:has_big_bank()
 	return Global.dlc_manager.all_dlc_data.big_bank and Global.dlc_manager.all_dlc_data.big_bank.verified
 end
@@ -595,6 +599,7 @@ function WINDLCManager:init()
 			gage_pack_snp = {app_id = "259380", no_install = true},
 			gage_pack_shotgun = {app_id = "311050", no_install = true},
 			gage_pack_assault = {app_id = "320030", no_install = true},
+			akm4_pack = {app_id = "351890", no_install = true},
 			big_bank = {app_id = "306690", no_install = true},
 			hl_miami = {app_id = "323500", no_install = true},
 			hlm_game = {

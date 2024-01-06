@@ -67,6 +67,9 @@ function NewRaycastWeaponBase:clbk_assembly_complete(clbk, parts, blueprint)
 	self._blueprint = blueprint
 	self:_update_fire_object()
 	self:_update_stats_values()
+	if self._setup and self._setup.timer then
+		self:set_timer(self._setup.timer)
+	end
 	local magazine = managers.weapon_factory:get_part_from_weapon_by_type("magazine", self._parts)
 	if magazine then
 		local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type("magazine", "bullet_objects", self._parts)
@@ -235,11 +238,22 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
 	self._locked_fire_mode = (not managers.weapon_factory:has_perk("fire_mode_auto", self._factory_id, self._blueprint) or not ids_auto) and managers.weapon_factory:has_perk("fire_mode_single", self._factory_id, self._blueprint) and ids_single
 	self._fire_mode = self._locked_fire_mode or Idstring(self:weapon_tweak_data().FIRE_MODE or "single")
-	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint)
+	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint) or {}
 	self._can_shoot_through_shield = tweak_data.weapon[self._name_id].can_shoot_through_shield
 	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
 	self._can_shoot_through_wall = tweak_data.weapon[self._name_id].can_shoot_through_wall
 	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
+	local custom_stats = managers.weapon_factory:get_custom_stats_from_weapon(self._factory_id, self._blueprint)
+	for part_id, stats in pairs(custom_stats) do
+		if tweak_data.weapon.factory.parts[part_id].type ~= "ammo" then
+			if stats.ammo_pickup_min_mul then
+				self._ammo_data.ammo_pickup_min_mul = self._ammo_data.ammo_pickup_min_mul and self._ammo_data.ammo_pickup_min_mul * stats.ammo_pickup_min_mul or stats.ammo_pickup_min_mul
+			end
+			if stats.ammo_pickup_max_mul then
+				self._ammo_data.ammo_pickup_max_mul = self._ammo_data.ammo_pickup_max_mul and self._ammo_data.ammo_pickup_max_mul * stats.ammo_pickup_max_mul or stats.ammo_pickup_max_mul
+			end
+		end
+	end
 	if self._ammo_data then
 		if self._ammo_data.can_shoot_through_shield ~= nil then
 			self._can_shoot_through_shield = self._ammo_data.can_shoot_through_shield
@@ -750,9 +764,14 @@ end
 
 function NewRaycastWeaponBase:set_timer(timer, ...)
 	NewRaycastWeaponBase.super.set_timer(self, timer)
-	for _, data in pairs(self._parts) do
-		data.unit:set_timer(timer)
-		data.unit:set_animation_timer(timer)
+	if self._assembly_complete then
+		for id, data in pairs(self._parts) do
+			if not alive(data.unit) then
+				Application:error("[NewRaycastWeaponBase:set_timer] Missing unit in weapon parts!", "weapon id", self._name_id, "part id", id, "part", inspect(data), "parts", inspect(self._parts), "blueprint", inspect(self._blueprint), "assembly_complete", self._assembly_complete, "self", inspect(self))
+			end
+			data.unit:set_timer(timer)
+			data.unit:set_animation_timer(timer)
+		end
 	end
 end
 

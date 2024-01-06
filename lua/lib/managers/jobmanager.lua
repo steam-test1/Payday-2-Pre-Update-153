@@ -827,6 +827,7 @@ end
 
 function JobManager:_on_retry_job_stage()
 	managers.game_play_central:stop_the_game()
+	self._global.shortterm_memory = {}
 	self._global.next_alternative_stage = nil
 	self._global.next_interupt_stage = nil
 end
@@ -857,15 +858,21 @@ function JobManager:interupt_stage()
 	return self._global.interupt_stage
 end
 
-function JobManager:set_memory(key, value)
-	if self._global.memory then
+function JobManager:set_memory(key, value, is_shortterm)
+	if self._global.memory and not is_shortterm then
 		self._global.memory[key] = value
+	elseif self._global.shortterm_memory then
+		self._global.shortterm_memory[key] = value
 	end
 	return false
 end
 
-function JobManager:get_memory(key)
-	return self._global.memory and self._global.memory[key]
+function JobManager:get_memory(key, is_shortterm)
+	if is_shortterm then
+		return self._global.shortterm_memory and self._global.shortterm_memory[key]
+	else
+		return self._global.memory and self._global.memory[key]
+	end
 end
 
 function JobManager:has_active_job()
@@ -914,6 +921,7 @@ function JobManager:activate_job(job_id, current_stage)
 	self._global.start_time = TimerManager:wall_running():time()
 	self:start_accumulate_ghost_bonus(job_id)
 	self._global.memory = {}
+	self._global.shortterm_memory = {}
 	return true
 end
 
@@ -925,6 +933,7 @@ function JobManager:deactivate_current_job()
 	self._global.next_interupt_stage = nil
 	self._global.start_time = nil
 	self._global.memory = nil
+	self._global.shortterm_memory = nil
 	managers.loot:on_job_deactivated()
 	managers.mission:on_job_deactivated()
 	self._global.active_ghost_bonus = nil
@@ -1015,6 +1024,7 @@ end
 function JobManager:set_current_stage(stage_num)
 	self._global.current_job.last_completed_stage = self._global.current_job.current_stage
 	self._global.current_job.current_stage = stage_num
+	self._global.shortterm_memory = {}
 end
 
 function JobManager:current_job_data()

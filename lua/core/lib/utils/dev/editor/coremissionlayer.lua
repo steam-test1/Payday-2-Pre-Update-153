@@ -246,6 +246,12 @@ function MissionLayer:_units_as_pairs(units)
 	return t
 end
 
+function MissionLayer:_on_reference_unit_unselected(unit)
+	if alive(unit) and unit:mission_element().on_unselected ~= nil then
+		unit:mission_element():on_unselected()
+	end
+end
+
 function MissionLayer:update(time, rel_time)
 	MissionLayer.super.update(self, time, rel_time)
 	local update_selected_on_brush = Draw:brush()

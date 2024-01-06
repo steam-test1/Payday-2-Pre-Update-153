@@ -10,9 +10,11 @@ end
 function CoreRandomUnitElement:init(unit)
 	CoreRandomUnitElement.super.init(self, unit)
 	self._hed.amount = 1
+	self._hed.amount_random = 0
 	self._hed.ignore_disabled = true
 	self._hed.counter_id = nil
 	table.insert(self._save_values, "amount")
+	table.insert(self._save_values, "amount_random")
 	table.insert(self._save_values, "ignore_disabled")
 	table.insert(self._save_values, "counter_id")
 end
@@ -64,5 +66,7 @@ function CoreRandomUnitElement:_build_panel(panel, panel_sizer)
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
 	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0, min = 1}, "Specifies the amount of elements to be executed")
+	self:_build_value_number(panel, panel_sizer, "amount_random", {floats = 0, min = 0}, "Add a random amount to amount")
 	self:_build_value_checkbox(panel, panel_sizer, "ignore_disabled")
+	self:_add_help_text("Use 'Amount' only to specify an exact amount of elements to execute. Use 'Amount Random' to add a random amount to 'Amount' ('Amount' + random('Amount Random').")
 end

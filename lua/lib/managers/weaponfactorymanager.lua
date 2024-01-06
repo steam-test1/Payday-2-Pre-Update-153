@@ -372,6 +372,19 @@ function WeaponFactoryManager:_get_forbidden_parts(factory_id, blueprint)
 	local override = self:_get_override_parts(factory_id, blueprint)
 	for _, part_id in ipairs(blueprint) do
 		local part = self:_part_data(part_id, factory_id, override)
+		if part.depends_on then
+			local part_forbidden = true
+			for _, other_part_id in ipairs(blueprint) do
+				local other_part = self:_part_data(other_part_id, factory_id, override)
+				if part.depends_on == other_part.type then
+					part_forbidden = false
+					break
+				end
+			end
+			if part_forbidden then
+				forbidden[part_id] = part.depends_on
+			end
+		end
 		if part.forbids then
 			for _, forbidden_id in ipairs(part.forbids) do
 				forbidden[forbidden_id] = part_id
@@ -390,8 +403,19 @@ end
 function WeaponFactoryManager:_get_override_parts(factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local overridden = {}
+	local override_override = {}
 	for _, part_id in ipairs(blueprint) do
 		local part = self:_part_data(part_id, factory_id)
+		if part.override then
+			for override_id, override_data in pairs(part.override) do
+				if override_data.override then
+					override_override[override_id] = override_data
+				end
+			end
+		end
+	end
+	for _, part_id in ipairs(blueprint) do
+		local part = self:_part_data(part_id, factory_id, override_override)
 		if part.override then
 			for override_id, override_data in pairs(part.override) do
 				overridden[override_id] = override_data
@@ -479,12 +503,12 @@ function WeaponFactoryManager:_part_data(part_id, factory_id, override)
 	local part = deep_clone(factory.parts[part_id])
 	if factory[factory_id].override and factory[factory_id].override[part_id] then
 		for d, v in pairs(factory[factory_id].override[part_id]) do
-			part[d] = v
+			part[d] = type(v) == "table" and deep_clone(v) or v
 		end
 	end
 	if override and override[part_id] then
 		for d, v in pairs(override[part_id]) do
-			part[d] = v
+			part[d] = type(v) == "table" and deep_clone(v) or v
 		end
 	end
 	return part
@@ -693,6 +717,18 @@ function WeaponFactoryManager:get_custom_stats_from_part_id(part_id)
 	return factory[part_id] and factory[part_id].custom_stats or false
 end
 
+function WeaponFactoryManager:get_custom_stats_from_weapon(factory_id, blueprint)
+	local factory = tweak_data.weapon.factory
+	local t = {}
+	for _, id in ipairs(self:get_assembled_blueprint(factory_id, blueprint)) do
+		local part = self:_part_data(id, factory_id)
+		if part.custom_stats then
+			t[id] = part.custom_stats
+		end
+	end
+	return t
+end
+
 function WeaponFactoryManager:get_ammo_data_from_weapon(factory_id, blueprint)
 	local factory = tweak_data.weapon.factory
 	local t = {}
@@ -733,6 +769,21 @@ function WeaponFactoryManager:get_part_data_type_from_weapon_by_type(type, data_
 		end
 	end
 	return false
+end
+
+function WeaponFactoryManager:is_weapon_unmodded(factory_id, blueprint)
+	local weapon_tweak = tweak_data.weapon.factory[factory_id]
+	local blueprint_map = {}
+	for _, part in ipairs(blueprint) do
+		blueprint_map[part] = true
+	end
+	for _, part in ipairs(weapon_tweak.default_blueprint) do
+		if not blueprint_map[part] then
+			return false
+		end
+		blueprint_map[part] = nil
+	end
+	return table.size(blueprint_map) == 0
 end
 
 function WeaponFactoryManager:has_weapon_more_than_default_parts(factory_id)
@@ -854,6 +905,12 @@ function WeaponFactoryManager:change_part_blueprint_only(factory_id, part_id, bl
 	local type = part.type
 	if remove_part then
 		table.delete(blueprint, part_id)
+		local forbidden = WeaponFactoryManager:_get_forbidden_parts(factory_id, blueprint) or {}
+		for _, rem_id in ipairs(blueprint) do
+			if forbidden[rem_id] then
+				table.delete(blueprint, rem_id)
+			end
+		end
 	elseif self._parts_by_weapon[factory_id][type] then
 		if table.contains(self._parts_by_weapon[factory_id][type], part_id) then
 			for _, rem_id in ipairs(blueprint) do
@@ -927,7 +984,9 @@ function WeaponFactoryManager:get_removes_parts(factory_id, part_id, blueprint, 
 end
 
 function WeaponFactoryManager:can_add_part(factory_id, part_id, blueprint)
-	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	local new_blueprint = deep_clone(blueprint)
+	table.insert(new_blueprint, part_id)
+	local forbidden = self:_get_forbidden_parts(factory_id, new_blueprint)
 	for forbid_part_id, forbidder_part_id in pairs(forbidden) do
 		if forbid_part_id == part_id then
 			return forbidder_part_id

@@ -1066,8 +1066,14 @@ function Layer:check_referens_exists()
 end
 
 function Layer:set_reference_unit(unit)
+	if alive(self._selected_unit) and (not alive(unit) or unit ~= self._selected_unit) then
+		self:_on_reference_unit_unselected(self._selected_unit)
+	end
 	self._selected_unit = unit
 	managers.editor:on_reference_unit(self._selected_unit)
+end
+
+function Layer:_on_reference_unit_unselected(unit)
 end
 
 function Layer:recalc_all_locals()

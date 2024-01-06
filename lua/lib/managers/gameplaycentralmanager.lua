@@ -495,6 +495,10 @@ function GamePlayCentralManager:mission_enable_unit(unit)
 	end
 end
 
+function GamePlayCentralManager:get_heist_timer()
+	return self._heist_timer and Application:time() - (self._heist_timer.start_time or 0) + (self._heist_timer.offset_time or 0) or 0
+end
+
 function GamePlayCentralManager:start_heist_timer()
 	self._heist_timer.running = true
 	self._heist_timer.start_time = Application:time()

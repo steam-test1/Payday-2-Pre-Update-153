@@ -1526,6 +1526,38 @@ function BlackMarketTweakData:_init_masks()
 		"gage_pack_historical"
 	}
 	self.masks.arch_nemesis.texture_bundle_folder = "pd2_goty"
+	self.masks.carnotaurus = {}
+	self.masks.carnotaurus.unit = "units/pd2_dlc_akm4_modpack/masks/carnotaurus/msk_carnotaurus"
+	self.masks.carnotaurus.name_id = "bm_msk_carnotaurus"
+	self.masks.carnotaurus.pcs = {}
+	self.masks.carnotaurus.value = 0
+	self.masks.carnotaurus.texture_bundle_folder = "dlc_akm4"
+	self.masks.carnotaurus.dlc = "akm4_pack"
+	self.masks.carnotaurus.sort_number = 9
+	self.masks.triceratops = {}
+	self.masks.triceratops.unit = "units/pd2_dlc_akm4_modpack/masks/triceratops/msk_triceratops"
+	self.masks.triceratops.name_id = "bm_msk_triceratops"
+	self.masks.triceratops.pcs = {}
+	self.masks.triceratops.value = 0
+	self.masks.triceratops.texture_bundle_folder = "dlc_akm4"
+	self.masks.triceratops.dlc = "akm4_pack"
+	self.masks.triceratops.sort_number = 9
+	self.masks.pachy = {}
+	self.masks.pachy.unit = "units/pd2_dlc_akm4_modpack/masks/pachy/msk_pachy"
+	self.masks.pachy.name_id = "bm_msk_pachy"
+	self.masks.pachy.pcs = {}
+	self.masks.pachy.value = 0
+	self.masks.pachy.texture_bundle_folder = "dlc_akm4"
+	self.masks.pachy.dlc = "akm4_pack"
+	self.masks.pachy.sort_number = 9
+	self.masks.velociraptor = {}
+	self.masks.velociraptor.unit = "units/pd2_dlc_akm4_modpack/masks/velociraptor/msk_velociraptor"
+	self.masks.velociraptor.name_id = "bm_msk_velociraptor"
+	self.masks.velociraptor.pcs = {}
+	self.masks.velociraptor.value = 0
+	self.masks.velociraptor.texture_bundle_folder = "dlc_akm4"
+	self.masks.velociraptor.dlc = "akm4_pack"
+	self.masks.velociraptor.sort_number = 9
 	self.masks.champion_dallas = {}
 	self.masks.champion_dallas.unit = "units/pd2_hw_boxing/masks/champion_dallas/msk_champion_dallas"
 	self.masks.champion_dallas.name_id = "bm_msk_champion_dallas"
@@ -3571,6 +3603,36 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.rock_marble.value = 0
 	self.materials.rock_marble.dlc = "the_bomb"
 	self.materials.rock_marble.texture_bundle_folder = "the_bomb"
+	self.materials.dawn = {}
+	self.materials.dawn.name_id = "bm_mtl_dawn"
+	self.materials.dawn.pcs = {}
+	self.materials.dawn.texture = "units/pd2_dlc_akm4_modpack/materials/matcap_dawn_df"
+	self.materials.dawn.value = 0
+	self.materials.dawn.dlc = "akm4_pack"
+	self.materials.dawn.texture_bundle_folder = "dlc_akm4"
+	self.materials.prehistoric = {}
+	self.materials.prehistoric.name_id = "bm_mtl_prehistoric"
+	self.materials.prehistoric.pcs = {}
+	self.materials.prehistoric.texture = "units/pd2_dlc_akm4_modpack/materials/matcap_prehistoric_df"
+	self.materials.prehistoric.value = 0
+	self.materials.prehistoric.dlc = "akm4_pack"
+	self.materials.prehistoric.texture_bundle_folder = "dlc_akm4"
+	self.materials.fossil = {}
+	self.materials.fossil.name_id = "bm_mtl_fossil"
+	self.materials.fossil.pcs = {}
+	self.materials.fossil.texture = "units/pd2_dlc_akm4_modpack/materials/matcap_fossil_df"
+	self.materials.fossil.material_amount = 0
+	self.materials.fossil.value = 0
+	self.materials.fossil.dlc = "akm4_pack"
+	self.materials.fossil.texture_bundle_folder = "dlc_akm4"
+	self.materials.feathers = {}
+	self.materials.feathers.name_id = "bm_mtl_feathers"
+	self.materials.feathers.pcs = {}
+	self.materials.feathers.texture = "units/pd2_dlc_akm4_modpack/materials/matcap_feathers_df"
+	self.materials.feathers.material_amount = 0
+	self.materials.feathers.value = 0
+	self.materials.feathers.dlc = "akm4_pack"
+	self.materials.feathers.texture_bundle_folder = "dlc_akm4"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -5134,6 +5196,34 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.cro_pattern_4.value = 0
 	self.textures.cro_pattern_4.dlc = "the_bomb"
 	self.textures.cro_pattern_4.texture_bundle_folder = "the_bomb"
+	self.textures.dinoskull = {}
+	self.textures.dinoskull.name_id = "bm_txt_dinoskull"
+	self.textures.dinoskull.pcs = {}
+	self.textures.dinoskull.texture = "units/pd2_dlc_akm4_modpack/patterns/pattern_dinoskull_df"
+	self.textures.dinoskull.value = 0
+	self.textures.dinoskull.texture_bundle_folder = "dlc_akm4"
+	self.textures.dinoskull.dlc = "akm4_pack"
+	self.textures.dinostripes = {}
+	self.textures.dinostripes.name_id = "bm_txt_dinostripes"
+	self.textures.dinostripes.pcs = {}
+	self.textures.dinostripes.texture = "units/pd2_dlc_akm4_modpack/patterns/pattern_dinostripes_df"
+	self.textures.dinostripes.value = 0
+	self.textures.dinostripes.texture_bundle_folder = "dlc_akm4"
+	self.textures.dinostripes.dlc = "akm4_pack"
+	self.textures.predator = {}
+	self.textures.predator.name_id = "bm_txt_predator"
+	self.textures.predator.pcs = {}
+	self.textures.predator.texture = "units/pd2_dlc_akm4_modpack/patterns/pattern_predator_df"
+	self.textures.predator.value = 0
+	self.textures.predator.texture_bundle_folder = "dlc_akm4"
+	self.textures.predator.dlc = "akm4_pack"
+	self.textures.dinoscars = {}
+	self.textures.dinoscars.name_id = "bm_txt_dinoscars"
+	self.textures.dinoscars.pcs = {}
+	self.textures.dinoscars.texture = "units/pd2_dlc_akm4_modpack/patterns/pattern_scars_df"
+	self.textures.dinoscars.value = 0
+	self.textures.dinoscars.texture_bundle_folder = "dlc_akm4"
+	self.textures.dinoscars.dlc = "akm4_pack"
 end
 
 function BlackMarketTweakData:_init_cash()

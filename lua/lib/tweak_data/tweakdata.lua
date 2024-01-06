@@ -1408,6 +1408,22 @@ function TweakData:init()
 			weapon = "mg42",
 			timer = 10,
 			count = 10
+		},
+		akm4_shootout = {
+			stat = "ameno_08_stats",
+			is_cop = true,
+			weapons = {
+				"ak74",
+				"akm",
+				"akm_gold",
+				"saiga",
+				"rpk",
+				"amcar",
+				"new_m4",
+				"m16",
+				"akmsu",
+				"olympic"
+			}
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -1846,6 +1862,48 @@ function TweakData:init()
 			},
 			jobs = {"crojob1"}
 		},
+		owe_saw = {
+			award = "ameno_1",
+			job = "nightclub",
+			equipped_team = {
+				primary = "wpn_fps_saw",
+				secondary = "wpn_fps_saw_secondary"
+			}
+		},
+		pain_train = {
+			award = "ameno_4",
+			full_jobs_id = {
+				"firestarter",
+				"firestarter_prof"
+			},
+			num_players = 4,
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
+			loud = true,
+			equipped_team = {
+				primaries = {
+					"wpn_fps_ass_74"
+				},
+				primary_unmodded = true,
+				secondaries = {
+					"wpn_fps_smg_olympic"
+				},
+				secondary_unmodded = true
+			}
+		},
+		turtle_wins = {
+			award = "ameno_6",
+			job = "gallery",
+			stealth = true,
+			timer = 120,
+			equipped_team = {
+				armor = "level_7",
+				deployable = "armor_kit",
+				reverse_deployable = true
+			}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -1863,6 +1921,20 @@ function TweakData:init()
 					}
 				}
 			}
+		}
+	}
+	self.achievement.loot_cash_achievements = {
+		mallrunner = {
+			award = "ameno_3",
+			total_value = 1800000,
+			jobs = {
+				"mallcrasher"
+			},
+			difficulties = {
+				"overkill_145"
+			},
+			timer = 50,
+			is_shortterm = true
 		}
 	}
 	self.achievement.job_list = {}
@@ -2181,6 +2253,39 @@ function TweakData:init()
 		text_id = "bm_wp_eagle_5_achievment",
 		award = "eagle_5"
 	}
+	local ameno_1_achievement = {
+		text_id = "bm_wp_ameno_1_achievment",
+		award = "ameno_1"
+	}
+	local ameno_2_achievement = {
+		text_id = "bm_wp_ameno_2_achievment",
+		award = "ameno_2"
+	}
+	local ameno_3_achievement = {
+		text_id = "bm_wp_ameno_3_achievment",
+		award = "ameno_3"
+	}
+	local ameno_4_achievement = {
+		text_id = "bm_wp_ameno_4_achievment",
+		award = "ameno_4"
+	}
+	local ameno_5_achievement = {
+		text_id = "bm_wp_ameno_5_achievment",
+		award = "ameno_5"
+	}
+	local ameno_6_achievement = {
+		text_id = "bm_wp_ameno_6_achievment",
+		award = "ameno_6"
+	}
+	local ameno_7_achievement = {
+		text_id = "bm_wp_ameno_7_achievment",
+		award = "ameno_7"
+	}
+	local ameno_8_achievement = {
+		text_id = "bm_wp_ameno_8_achievment",
+		stat = "ameno_08_stats",
+		max_progress = 100
+	}
 	self.achievement.mask_tracker = {}
 	self.achievement.weapon_part_tracker = {
 		wpn_fps_snp_m95_barrel_long = {
@@ -2374,7 +2479,27 @@ function TweakData:init()
 		wpn_fps_lmg_mg42_b_vg38 = eagle_3_achievement,
 		wpn_fps_pis_c96_m_extended = eagle_4_achievement,
 		wpn_fps_pis_c96_s_solid = eagle_4_achievement,
-		wpn_fps_lmg_mg42_b_mg34 = eagle_5_achievement
+		wpn_fps_lmg_mg42_b_mg34 = eagle_5_achievement,
+		wpn_fps_upg_ass_m4_upper_reciever_core = ameno_1_achievement,
+		wpn_fps_upg_ass_m4_lower_reciever_core = ameno_1_achievement,
+		wpn_fps_upg_ass_m16_fg_stag = ameno_1_achievement,
+		wpn_fps_upg_ak_g_rk3 = ameno_2_achievement,
+		wpn_fps_upg_ak_fg_zenit = ameno_2_achievement,
+		wpn_fps_upg_ass_m4_upper_reciever_ballos = ameno_2_achievement,
+		wpn_fps_upg_o_ak_scopemount = ameno_3_achievement,
+		wpn_fps_upg_ns_ass_pbs1 = ameno_3_achievement,
+		wpn_fps_upg_ass_ak_b_zastava = ameno_4_achievement,
+		wpn_fps_upg_ak_m_uspalm = ameno_4_achievement,
+		wpn_fps_upg_ass_m4_fg_moe = ameno_5_achievement,
+		wpn_fps_upg_smg_olympic_fg_lr300 = ameno_5_achievement,
+		wpn_fps_upg_ass_m4_fg_lvoa = ameno_5_achievement,
+		wpn_fps_upg_ak_s_solidstock = ameno_6_achievement,
+		wpn_fps_upg_m4_s_ubr = ameno_6_achievement,
+		wpn_fps_upg_ass_m4_b_beowulf = ameno_7_achievement,
+		wpn_fps_upg_m4_m_l5 = ameno_7_achievement,
+		wpn_fps_upg_ak_fg_trax = ameno_8_achievement,
+		wpn_fps_upg_ak_fg_krebs = ameno_8_achievement,
+		wpn_fps_upg_ak_b_ak105 = ameno_8_achievement
 	}
 	self.pickups = {}
 	self.pickups.ammo = {

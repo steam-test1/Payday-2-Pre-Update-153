@@ -2263,7 +2263,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.animations.recoil_steelsight = true
 	self.olympic.panic_suppression_chance = 0.05
 	self.olympic.stats = {
-		damage = 8,
+		damage = 9,
 		spread = 8,
 		recoil = 10,
 		spread_moving = 8,
@@ -2301,7 +2301,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.use_data.selection_index = 2
 	self.ak74.DAMAGE = 1
 	self.ak74.CLIP_AMMO_MAX = 30
-	self.ak74.NR_CLIPS_MAX = math.round(total_damage_primary / 2.5 / self.ak74.CLIP_AMMO_MAX)
+	self.ak74.NR_CLIPS_MAX = math.round(total_damage_primary / 2 / self.ak74.CLIP_AMMO_MAX)
 	self.ak74.AMMO_MAX = self.ak74.CLIP_AMMO_MAX * self.ak74.NR_CLIPS_MAX
 	self.ak74.AMMO_PICKUP = self:_pickup_chance(self.ak74.AMMO_MAX, 2)
 	self.ak74.FIRE_MODE = "auto"
