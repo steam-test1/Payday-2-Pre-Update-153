@@ -1024,7 +1024,7 @@ function TweakData:init()
 		1.2,
 		1.3
 	}
-	self.experience_manager.limited_bonus_multiplier = 2
+	self.experience_manager.limited_bonus_multiplier = 1
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75

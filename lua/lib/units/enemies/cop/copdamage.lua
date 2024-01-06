@@ -504,8 +504,8 @@ function CopDamage:damage_fire(attack_data)
 	local fire_dot
 	if attacker_unit and attacker_unit:base() and attacker_unit:base()._grenade_entry == "molotov" then
 		fire_dot = tweak_data.grenades[attacker_unit:base()._grenade_entry].fire_dot_data
-	elseif attack_data.weapon_unit then
-		if attack_data.weapon_unit and attack_data.weapon_unit.base and attack_data.weapon_unit:base()._ammo_data and attack_data.weapon_unit:base()._ammo_data.fire_dot_data then
+	elseif alive(attack_data.weapon_unit) then
+		if attack_data.weapon_unit.base and attack_data.weapon_unit:base()._ammo_data and attack_data.weapon_unit:base()._ammo_data.fire_dot_data then
 			fire_dot = attack_data.weapon_unit:base()._ammo_data.fire_dot_data
 		elseif attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
 			fire_dot = tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data
@@ -1271,10 +1271,10 @@ function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percen
 	if attack_data.attacker_unit and attack_data.attacker_unit:base()._grenade_entry == "molotov" then
 		weapon_type = CopDamage.WEAPON_TYPE_GRANADE
 		weapon_unit = "molotov"
-	elseif attack_data.weapon_unit ~= nil and attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
+	elseif alive(attack_data.weapon_unit) and attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
 		weapon_type = CopDamage.WEAPON_TYPE_FLAMER
 		weapon_unit = attack_data.weapon_unit:base()._name_id
-	elseif attack_data.weapon_unit ~= nil and attack_data.weapon_unit:base()._parts then
+	elseif alive(attack_data.weapon_unit) and attack_data.weapon_unit:base()._parts then
 		for part_id, part in pairs(attack_data.weapon_unit:base()._parts) do
 			if tweak_data.weapon.factory.parts[part_id].custom_stats and tweak_data.weapon.factory.parts[part_id].custom_stats.fire_dot_data then
 				weapon_type = CopDamage.WEAPON_TYPE_BULLET
