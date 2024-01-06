@@ -33,6 +33,7 @@ require("core/lib/utils/dev/editor/ews_classes/Continents")
 require("core/lib/utils/dev/editor/ews_classes/UnhideByName")
 require("core/lib/utils/dev/editor/ews_classes/CreateWorldSettingFile")
 require("core/lib/utils/dev/editor/ews_classes/SelectNameModal")
+require("core/lib/utils/dev/editor/ews_classes/MissionElementListFlow")
 require("core/lib/utils/dev/SettingsHandling")
 require("core/lib/units/editor/CoreMissionElement")
 require("core/lib/units/data/CoreMissionElementData")
@@ -938,7 +939,7 @@ function CoreEditor:build_editor_controls()
 	self._continents_panel = ContinentPanel:new(sp)
 	self._notebook = EWS:Notebook(sp, "_notebook", "NB_TOP,NB_MULTILINE")
 	self._ews_editor_frame:connect("_notebook", "EVT_COMMAND_NOTEBOOK_PAGE_CHANGED", callback(self, self, "change_layer"), self._notebook)
-	sp:split_horizontally(self._continents_panel:panel(), self._notebook, 140)
+	sp:split_horizontally(self._continents_panel:panel(), self._notebook, 174)
 	sp:set_minimum_pane_size(75)
 	editor_sizer:add(sp, 1, 0, "EXPAND")
 	return editor_sizer
@@ -1087,6 +1088,9 @@ function CoreEditor:set_unit_visible(unit, visible)
 		end
 	else
 		self:delete_hidden_unit(unit)
+		if self._dialogs.hide_by_name then
+			self._dialogs.hide_by_name:unhid_unit(unit)
+		end
 	end
 end
 
@@ -1102,6 +1106,9 @@ function CoreEditor:insert_hidden_unit(unit)
 	table.insert(self._hidden_units, unit)
 	if self._dialogs.unhide_by_name then
 		self._dialogs.unhide_by_name:hid_unit(unit)
+	end
+	if self._dialogs.hide_by_name then
+		self._dialogs.hide_by_name:hid_unit(unit)
 	end
 end
 
@@ -1122,6 +1129,9 @@ function CoreEditor:deleted_unit(unit)
 	end
 	if self._dialogs.global_select_unit then
 		self._dialogs.global_select_unit:deleted_unit(unit)
+	end
+	if self._dialogs.hide_by_name then
+		self._dialogs.hide_by_name:deleted_unit(unit)
 	end
 	for name, dialog in pairs(self._layer_replace_dialogs) do
 		if dialog:visible() then
@@ -1146,6 +1156,9 @@ function CoreEditor:spawned_unit(unit)
 	if self._dialogs.global_select_unit then
 		self._dialogs.global_select_unit:spawned_unit(unit)
 	end
+	if self._dialogs.hide_by_name then
+		self._dialogs.hide_by_name:spawned_unit(unit)
+	end
 	for name, dialog in pairs(self._layer_replace_dialogs) do
 		if dialog:visible() then
 			dialog:spawned_unit(unit)
@@ -1163,6 +1176,9 @@ function CoreEditor:unit_name_changed(unit)
 	end
 	if self._dialogs.unhide_by_name then
 		self._dialogs.unhide_by_name:unit_name_changed(unit)
+	end
+	if self._dialogs.hide_by_name then
+		self._dialogs.hide_by_name:unit_name_changed(unit)
 	end
 end
 
@@ -2048,7 +2064,7 @@ function CoreEditor:_draw_bodies(t, dt)
 						pen:body(body)
 						brush:set_color(self:_body_color(body))
 						local offset = Vector3(0, 0, unit:bounding_sphere_radius())
-						brush:center_text(body:oobb():center(), body:name():s())
+						brush:center_text(body:oobb():center(), utf8.from_latin1(body:name():s()))
 					end
 				end
 			end
@@ -2976,8 +2992,22 @@ function CoreEditor:_save_bundle_info_files(dir)
 	SystemFS:close(file)
 end
 
-function CoreEditor:get_unit_stats()
-	local units = World:find_units_quick("all")
+function CoreEditor:get_unit_stats_from_layers()
+	local units = {}
+	for name, layer in pairs(self._layers) do
+		if name ~= "Mission" and name ~= "Ai" and name ~= "Environment" and name ~= "Portals" and name ~= "Sound" then
+			for _, unit in ipairs(layer:created_units()) do
+				if not self:_unit_only_in_editor(unit) then
+					table.insert(units, unit)
+				end
+			end
+		end
+	end
+	return self:get_unit_stats(units)
+end
+
+function CoreEditor:get_unit_stats(units)
+	units = units or World:find_units_quick("all")
 	local data = {}
 	local total = {}
 	total.amount = 0
@@ -3014,6 +3044,10 @@ function CoreEditor:get_unit_stat(u)
 	t.material_filename = u:material_config():s()
 	t.last_exported_from = u:last_export_source()
 	return t
+end
+
+function CoreEditor:_unit_only_in_editor(u)
+	return u:unit_data() and u:unit_data().only_exists_in_editor
 end
 
 function CoreEditor:vertices_per_tris(u)
@@ -3257,6 +3291,13 @@ function CoreEditor:center_view_on_unit(unit)
 	end
 end
 
+function CoreEditor:look_towards_unit(unit)
+	if alive(unit) then
+		local rot = Rotation:look_at(managers.editor:camera_position(), unit:position(), Vector3(0, 0, 1))
+		self._camera_controller:set_camera_rot(rot)
+	end
+end
+
 function CoreEditor:change_layer_based_on_unit(unit)
 	if not unit then
 		return
@@ -3289,6 +3330,7 @@ function CoreEditor:unit_in_layer_name(unit)
 			return name
 		end
 	end
+	return nil
 end
 
 function CoreEditor:delete_unit(unit)

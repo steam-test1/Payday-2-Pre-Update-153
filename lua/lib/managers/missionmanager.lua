@@ -86,6 +86,7 @@ require("lib/managers/mission/ElementCinematicCamera")
 require("lib/managers/mission/ElementCharacterTeam")
 require("lib/managers/mission/ElementTeamRelation")
 require("lib/managers/mission/ElementSlowMotion")
+require("lib/managers/mission/ElementInteraction")
 require("lib/managers/mission/ElementPlayerSpawner")
 require("lib/managers/mission/ElementAreaTrigger")
 require("lib/managers/mission/ElementSpawnEnemyDummy")
@@ -129,7 +130,9 @@ function MissionManager:init(...)
 		"pku_server",
 		"pku_samurai",
 		"bar_code",
-		"equipment_evidence_lost"
+		"equipment_evidence_lost",
+		"pku_sandwich",
+		"equipment_sandwich"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

@@ -182,6 +182,12 @@ function table.size(v)
 	return i
 end
 
+function table.crop(t, size)
+	while t[size + 1] do
+		table.remove(t, size + 1)
+	end
+end
+
 function table.empty(v)
 	return not next(v)
 end
@@ -321,6 +327,17 @@ end
 function table.for_each_value(t, func)
 	for _, value in ipairs(t) do
 		func(value)
+	end
+end
+
+function table.remove_condition(t, func)
+	local i = 1
+	while next(t) and i <= #t do
+		if func(t[i]) then
+			table.remove(t, i)
+		else
+			i = i + 1
+		end
 	end
 end
 

@@ -10,7 +10,7 @@ function HuskCivilianBase:post_init()
 	self:set_anim_lod(1)
 	self._lod_stage = 1
 	self._allow_invisible = true
-	local spawn_state = self._spawn_state or "civilian/idle/group_1/blend_1/1"
+	local spawn_state = self._spawn_state or "civilian/still/cover/loop"
 	self._ext_movement:play_state(spawn_state)
 	self._ext_movement:post_init()
 	managers.enemy:register_civilian(self._unit)

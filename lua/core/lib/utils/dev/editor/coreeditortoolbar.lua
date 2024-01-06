@@ -16,8 +16,12 @@ function CoreEditor:build_toolbar()
 	self._toolbar:connect("TB PREVIEW UNITS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_unit_tree_browser"), "")
 	self._toolbar:add_tool("TB GLOBAL SELECT UNITS", "Global select unit (" .. self:ctrl_menu_binding("global_select_unit") .. ")", icons_path .. "global_select_unit.bmp", "Global select unit")
 	self._toolbar:connect("TB GLOBAL SELECT UNITS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_global_select_unit"), "")
-	self._toolbar:add_tool("TB_UNHIDE_BY_NAME", "Unhide by name", CoreEWS.image_path("world_editor\\unhide_by_name_16x16.png"), "Opens the unhide by name dialog")
+	self._toolbar:add_separator()
+	self._toolbar:add_tool("TB_HIDE_BY_NAME", "Hide by name", CoreEWS.image_path("sequencer\\zoom_out_16x16.png"), "Opens the hide by name dialog")
+	self._toolbar:connect("TB_HIDE_BY_NAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_hide_by_name"), "")
+	self._toolbar:add_tool("TB_UNHIDE_BY_NAME", "Unhide by name", CoreEWS.image_path("sequencer\\zoom_in_16x16.png"), "Opens the unhide by name dialog")
 	self._toolbar:connect("TB_UNHIDE_BY_NAME", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_unhide_by_name"), "")
+	self._toolbar:add_separator()
 	self._toolbar:add_tool("TB UNIT DEBUG LIST", "Unit debug list", icons_path .. "unit_list.bmp", "Unit debug list")
 	self._toolbar:connect("TB UNIT DEBUG LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_unit_list"), "")
 	self._toolbar:add_separator()
@@ -356,6 +360,10 @@ end
 
 function CoreEditor:on_unhide_by_name()
 	self:show_dialog("unhide_by_name", "UnhideByName")
+end
+
+function CoreEditor:on_hide_by_name()
+	self:show_dialog("hide_by_name", "HideByName")
 end
 
 function CoreEditor:build_widgets_icons(panel, sizer, icons_path)

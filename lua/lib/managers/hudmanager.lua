@@ -1473,6 +1473,7 @@ function HUDManager:on_simulation_ended()
 	self:remove_updator("point_of_no_return")
 	self:end_assault()
 	self._teammate_panels[HUDManager.PLAYER_PANEL]:remove_panel()
+	self._teammate_panels[HUDManager.PLAYER_PANEL]:add_panel()
 end
 
 function HUDManager:debug_show_coordinates()

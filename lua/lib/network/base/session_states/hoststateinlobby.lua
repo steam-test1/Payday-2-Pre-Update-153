@@ -95,6 +95,7 @@ function HostStateInLobby:on_join_request_received(data, peer_name, client_prefe
 	if SystemInfo:platform() == Idstring("X360") then
 		new_peer:send("request_player_name_reply", managers.network:session():local_peer():name())
 	end
+	managers.vote:sync_server_kick_option(new_peer)
 	self:_introduce_new_peer_to_old_peers(data, new_peer, false, peer_name, new_peer:character(), "remove", new_peer:xuid(), new_peer:xnaddr())
 	self:_introduce_old_peers_to_new_peer(data, new_peer)
 	self:on_handshake_confirmation(data, new_peer, 1)

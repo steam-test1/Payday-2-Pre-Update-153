@@ -1,4 +1,7 @@
 BaseInteractionExt = BaseInteractionExt or class()
+BaseInteractionExt.EVENT_IDS = {}
+BaseInteractionExt.EVENT_IDS.at_interact_start = 1
+BaseInteractionExt.EVENT_IDS.at_interact_interupt = 2
 BaseInteractionExt.SKILL_IDS = {}
 BaseInteractionExt.SKILL_IDS.none = 1
 BaseInteractionExt.SKILL_IDS.basic = 2
@@ -268,13 +271,13 @@ function BaseInteractionExt:interact_start(player)
 	local has_equipment = not self._tweak_data.special_equipment and true or managers.player:has_special_equipment(self._tweak_data.special_equipment)
 	local sound = has_equipment and (self._tweak_data.say_waiting or "") or self.say_waiting
 	if sound and sound ~= "" then
-		local delay = (self._tweak_data.timer or 0) * managers.player:toolset_value()
+		local delay = (self:_timer_value() or 0) * managers.player:toolset_value()
 		delay = delay / 3 + math.random() * delay / 3
 		local say_t = Application:time() + delay
 		self._interact_say_clbk = "interact_say_waiting"
 		managers.enemy:add_delayed_clbk(self._interact_say_clbk, callback(self, self, "_interact_say", {player, sound}), say_t)
 	end
-	if self._tweak_data.timer then
+	if self:_timer_value() then
 		if not self:can_interact(player) then
 			if self._tweak_data.blocked_hint then
 				managers.hint:show_hint(self._tweak_data.blocked_hint)
@@ -291,6 +294,10 @@ function BaseInteractionExt:interact_start(player)
 	return self:interact(player)
 end
 
+function BaseInteractionExt:_timer_value()
+	return self._tweak_data.timer
+end
+
 function BaseInteractionExt:_get_timer()
 	local modified_timer = self:_get_modified_timer()
 	if modified_timer then
@@ -305,7 +312,7 @@ function BaseInteractionExt:_get_timer()
 		local player_level = managers.experience:current_level() or 0
 		multiplier = multiplier * (1 - (data[1] or 0) * math.ceil(player_level / (data[2] or 1)))
 	end
-	return self._tweak_data.timer * multiplier * managers.player:toolset_value()
+	return self:_timer_value() * multiplier * managers.player:toolset_value()
 end
 
 function BaseInteractionExt:_get_modified_timer()
@@ -547,6 +554,7 @@ function UseInteractionExt:sync_interacted(peer, player, status, skip_alive_chec
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
 	end
+	return player
 end
 
 function UseInteractionExt:destroy()
@@ -1829,4 +1837,81 @@ function AccessCameraInteractionExt:interact(player)
 	AccessCameraInteractionExt.super.super.interact(self, player)
 	game_state_machine:change_state_by_name("ingame_access_camera")
 	return true
+end
+
+MissionElementInteractionExt = MissionElementInteractionExt or class(UseInteractionExt)
+MissionElementInteractionExt.drop_in_sync_tweak_data = true
+
+function MissionElementInteractionExt:set_mission_element(mission_element)
+	self._mission_element = mission_element
+end
+
+function MissionElementInteractionExt:_timer_value(...)
+	if self._override_timer_value then
+		return self._override_timer_value
+	end
+	return MissionElementInteractionExt.super._timer_value(self, ...)
+end
+
+function MissionElementInteractionExt:set_override_timer_value(override_timer_value)
+	self._override_timer_value = override_timer_value
+end
+
+function MissionElementInteractionExt:sync_net_event(event_id, peer)
+	local player = managers.network:game():member(peer:id()):unit()
+	if event_id == BaseInteractionExt.EVENT_IDS.at_interact_start then
+		if Network:is_server() then
+			self._mission_element:on_interact_start(player)
+		end
+	elseif event_id == BaseInteractionExt.EVENT_IDS.at_interact_interupt and Network:is_server() then
+		self._mission_element:on_interact_interupt(player)
+	end
+end
+
+function MissionElementInteractionExt:_at_interact_start(player, ...)
+	MissionElementInteractionExt.super._at_interact_start(self, player, ...)
+	if Network:is_server() then
+		self._mission_element:on_interact_start(player)
+	else
+		managers.network:session():send_to_host("sync_unit_event_id_16", self._unit, "interaction", BaseInteractionExt.EVENT_IDS.at_interact_start)
+	end
+end
+
+function MissionElementInteractionExt:_at_interact_interupt(player, complete)
+	MissionElementInteractionExt.super._at_interact_interupt(self, player, complete)
+	if not complete then
+		if Network:is_server() then
+			self._mission_element:on_interact_interupt(player)
+		else
+			managers.network:session():send_to_host("sync_unit_event_id_16", self._unit, "interaction", BaseInteractionExt.EVENT_IDS.at_interact_interupt)
+		end
+	end
+end
+
+function MissionElementInteractionExt:interact(player, ...)
+	MissionElementInteractionExt.super.interact(self, player, ...)
+	if Network:is_server() then
+		self._mission_element:on_interacted(player)
+	end
+	return true
+end
+
+function MissionElementInteractionExt:sync_interacted(peer, player, ...)
+	player = MissionElementInteractionExt.super.sync_interacted(self, peer, player, ...)
+	if Network:is_server() and alive(player) then
+		self._mission_element:on_interacted(player)
+	end
+end
+
+function MissionElementInteractionExt:save(data)
+	MissionElementInteractionExt.super.save(self, data)
+	local state = {}
+	state.override_timer_value = self._override_timer_value
+	data.MissionElementInteractionExt = state
+end
+
+function MissionElementInteractionExt:load(data)
+	local state = data.MissionElementInteractionExt
+	self._override_timer_value = state.override_timer_value
+	MissionElementInteractionExt.super.load(self, data)
 end

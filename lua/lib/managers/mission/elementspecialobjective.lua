@@ -356,6 +356,9 @@ function ElementSpecialObjective:get_objective(instigator)
 		end
 	end
 	if is_AI_SO then
+		if Application:editor() and not Global.running_simulation then
+			return
+		end
 		local objective_type = string.sub(self._values.so_action, 4)
 		local last_pos, nav_seg
 		if objective_type == "hunt" then
@@ -378,10 +381,7 @@ function ElementSpecialObjective:get_objective(instigator)
 				last_pos = points[#points].position
 			end
 		end
-		if objective_type == "search" or objective_type == "hunt" then
-			objective.type = "investigate_area"
-			objective.nav_seg = nav_seg or last_pos and managers.navigation:get_nav_seg_from_pos(last_pos)
-		elseif objective_type == "defend" then
+		if objective_type == "defend" or objective_type == "search" or objective_type == "hunt" then
 			objective.type = "defend_area"
 			objective.nav_seg = nav_seg or last_pos and managers.navigation:get_nav_seg_from_pos(last_pos)
 		elseif objective_type == "idle" then

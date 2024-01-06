@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.21.0"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.22.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -277,7 +277,7 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 			"num_players",
 			"drop_in",
 			"min_level",
-			"kicking_allowed",
+			"kick_option",
 			"job_class_min",
 			"job_class_max"
 		}
@@ -634,7 +634,7 @@ function NetworkMatchMakingSTEAM:set_attributes(settings)
 		num_players = self._num_players or 1,
 		drop_in = settings.numbers[6] or 1,
 		job_id = job_index or 0,
-		kicking_allowed = settings.numbers[8] or 0,
+		kick_option = settings.numbers[8] or 0,
 		job_class_min = settings.numbers[9] or 10,
 		job_class_max = settings.numbers[9] or 10
 	}
@@ -655,7 +655,7 @@ function NetworkMatchMakingSTEAM:_lobby_to_numbers(lobby)
 		tonumber(lobby:key_value("num_players")),
 		tonumber(lobby:key_value("drop_in")),
 		tonumber(lobby:key_value("min_level")),
-		tonumber(lobby:key_value("kicking_allowed")),
+		tonumber(lobby:key_value("kick_option")),
 		tonumber(lobby:key_value("job_class"))
 	}
 end

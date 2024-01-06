@@ -9,7 +9,7 @@ function TeamAILogicInactive.enter(data, new_logic_name, enter_params)
 	data.internal_data = {}
 	data.unit:brain():set_update_enabled_state(false)
 	if data.objective then
-		managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective, true)
+		data.objective_failed_clbk(data.unit, data.objective, true)
 		data.unit:brain():set_objective(nil)
 	end
 end

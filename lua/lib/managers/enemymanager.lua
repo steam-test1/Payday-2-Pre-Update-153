@@ -53,12 +53,9 @@ function EnemyManager:_update_gfx_lod()
 			local occ_skip_units = managers.occlusion._skip_occlusion
 			local world_in_view_with_options = World.in_view_with_options
 			for i, state in ipairs(states) do
-				if not state and (occ_skip_units[units[i]:key()] or (not pl_tracker or chk_vis_func(pl_tracker, trackers[i])) and not unit_occluded(units[i])) then
-					local distance = mvec3_dir(tmp_vec1, cam_pos, com[i])
-					if world_in_view_with_options(World, com[i], 0, 110, 18000) then
-						states[i] = 1
-						units[i]:base():set_visibility_state(1)
-					end
+				if not state and (occ_skip_units[units[i]:key()] or (not pl_tracker or chk_vis_func(pl_tracker, trackers[i])) and not unit_occluded(units[i])) and world_in_view_with_options(World, com[i], 0, 110, 18000) then
+					states[i] = 1
+					units[i]:base():set_visibility_state(1)
 				end
 			end
 			if 0 < #states then

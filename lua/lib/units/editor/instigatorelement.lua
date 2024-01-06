@@ -44,6 +44,11 @@ function InstigatorOperatorUnitElement:draw_links(t, dt, selected_unit, all_unit
 	end
 end
 
+function InstigatorOperatorUnitElement:get_links_to_unit(...)
+	InstigatorOperatorUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function InstigatorOperatorUnitElement:update_editing()
 end
 
@@ -117,6 +122,11 @@ function InstigatorTriggerUnitElement:draw_links(t, dt, selected_unit, all_units
 			})
 		end
 	end
+end
+
+function InstigatorTriggerUnitElement:get_links_to_unit(...)
+	InstigatorTriggerUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "trigger", ...)
 end
 
 function InstigatorTriggerUnitElement:update_editing()

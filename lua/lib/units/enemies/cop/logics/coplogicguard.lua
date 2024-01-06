@@ -86,26 +86,11 @@ function CopLogicGuard.on_area_safety(data, nav_seg, safe, event)
 			else
 				CopLogicBase._exit(data.unit, "idle")
 			end
-			managers.groupai:state():on_objective_complete(data.unit, objective)
+			data.objective_complete_clbk(data.unit, objective)
 		else
 			my_data.from_seg_safe = nil
 		end
-	elseif nav_seg == data.unit:movement():nav_tracker():nav_segment() then
-		if not safe then
-			CopLogicBase._exit(data.unit, "attack")
-		end
-	elseif event.reason == "criminal" then
-		local new_occupation = managers.groupai:state():verify_occupation_in_area(objective)
-		if new_occupation then
-			new_occupation.type = "guard"
-			local new_objective = {
-				type = "investigate_area",
-				nav_seg = objective.nav_seg,
-				status = "in_progress",
-				guard_obj = new_occupation,
-				scan = true
-			}
-			data.unit:brain():set_objective(new_objective)
-		end
+	elseif nav_seg == data.unit:movement():nav_tracker():nav_segment() and not safe then
+		CopLogicBase._exit(data.unit, "attack")
 	end
 end

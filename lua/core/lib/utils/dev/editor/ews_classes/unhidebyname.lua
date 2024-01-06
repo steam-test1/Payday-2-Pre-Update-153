@@ -1,7 +1,7 @@
 UnhideByName = UnhideByName or class(CoreEditorEwsDialog)
 
 function UnhideByName:init(...)
-	CoreEditorEwsDialog.init(self, nil, "Unhide by name", "", Vector3(300, 150, 0), Vector3(350, 500, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP", ...)
+	CoreEditorEwsDialog.init(self, nil, self.TITLE or "Unhide by name", "", Vector3(300, 150, 0), Vector3(350, 500, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER", ...)
 	self:create_panel("VERTICAL")
 	local horizontal_ctrlr_sizer = EWS:BoxSizer("HORIZONTAL")
 	local list_sizer = EWS:BoxSizer("VERTICAL")
@@ -71,7 +71,7 @@ function UnhideByName:init(...)
 	self._list:connect("EVT_COMMAND_LIST_ITEM_ACTIVATED", callback(self, self, "on_unhide"), nil)
 	self._list:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
 	local button_sizer = EWS:BoxSizer("HORIZONTAL")
-	local unhide_btn = EWS:Button(self._panel, "Unhide", "", "BU_BOTTOM")
+	local unhide_btn = EWS:Button(self._panel, self.BTN_NAME or "Unhide", "", "BU_BOTTOM")
 	button_sizer:add(unhide_btn, 0, 2, "RIGHT,LEFT")
 	unhide_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_unhide"), "")
 	unhide_btn:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
@@ -167,7 +167,11 @@ end
 function UnhideByName:on_unhide()
 	managers.editor:freeze_gui_lists()
 	for _, unit in ipairs(self:_selected_item_units()) do
-		managers.editor:set_unit_visible(unit, true)
+		if self.IS_HIDE_BY_NAME then
+			managers.editor:set_unit_visible(unit, false)
+		else
+			managers.editor:set_unit_visible(unit, true)
+		end
 	end
 	managers.editor:thaw_gui_lists()
 end
@@ -204,6 +208,10 @@ function UnhideByName:select_unit(unit)
 end
 
 function UnhideByName:hid_unit(unit)
+	self:_append_unit_to_list(unit)
+end
+
+function UnhideByName:_append_unit_to_list(unit)
 	local i = self._list:append_item(unit:unit_data().name_id)
 	local j = #self._units + 1
 	self._units[j] = unit
@@ -211,6 +219,10 @@ function UnhideByName:hid_unit(unit)
 end
 
 function UnhideByName:unhid_unit(unit)
+	self:_remove_unit_from_list(unit)
+end
+
+function UnhideByName:_remove_unit_from_list(unit)
 	for i = 0, self._list:item_count() - 1 do
 		if self._units[self._list:get_item_data(i)] == unit then
 			self._list:delete_item(i)
@@ -252,16 +264,20 @@ function UnhideByName:update_filter()
 end
 
 function UnhideByName:fill_unit_list()
+	self._list:freeze()
 	self._list:delete_all_items()
 	local layers = managers.editor:layers()
 	local j = 1
 	local filter = self._filter:get_value()
 	self._units = {}
-	self._list:freeze()
+	local hidden = {}
+	for _, unit in ipairs(managers.editor:hidden_units()) do
+		hidden[unit:key()] = unit
+	end
 	for name, layer in pairs(layers) do
 		if self._layer_cbs[name]:get_value() then
 			for _, unit in ipairs(layer:created_units()) do
-				if self:_continent_ok(unit) and table.contains(managers.editor:hidden_units(), unit) and string.find(unit:unit_data().name_id, filter, 1, true) then
+				if self:_continent_ok(unit) and (not self.IS_HIDE_BY_NAME and hidden[unit:key()] or self.IS_HIDE_BY_NAME and not hidden[unit:key()]) and string.find(unit:unit_data().name_id, filter, 1, true) then
 					local i = self._list:append_item(unit:unit_data().name_id)
 					self._units[j] = unit
 					self._list:set_item_data(i, j)
@@ -270,8 +286,8 @@ function UnhideByName:fill_unit_list()
 			end
 		end
 	end
-	self._list:thaw()
 	self._list:autosize_column(0)
+	self._list:thaw()
 end
 
 function UnhideByName:_continent_ok(unit)
@@ -279,7 +295,7 @@ function UnhideByName:_continent_ok(unit)
 	if not continent then
 		return true
 	end
-	return self._continents_cbs[continent:name()]:get_value()
+	return self._continents_cbs[continent:name()] and self._continents_cbs[continent:name()]:get_value()
 end
 
 function UnhideByName:reset()
@@ -302,4 +318,29 @@ function UnhideByName:recreate()
 	self:build_continent_cbs()
 	self:fill_unit_list()
 	self._panel:layout()
+end
+
+HideByName = HideByName or class(UnhideByName)
+HideByName.TITLE = "Hide by Name"
+HideByName.BTN_NAME = "Hide"
+HideByName.IS_HIDE_BY_NAME = true
+
+function HideByName:init(...)
+	HideByName.super.init(self, ...)
+end
+
+function HideByName:hid_unit(unit)
+	self:_remove_unit_from_list(unit)
+end
+
+function HideByName:unhid_unit(unit)
+	self:_append_unit_to_list(unit)
+end
+
+function HideByName:spawned_unit(unit)
+	self:_append_unit_to_list(unit)
+end
+
+function HideByName:deleted_unit(unit)
+	self:_remove_unit_from_list(unit)
 end

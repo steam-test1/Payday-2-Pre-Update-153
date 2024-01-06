@@ -86,6 +86,15 @@ function CoreUnitSequenceTriggerUnitElement:draw_links_unselected(...)
 	end
 end
 
+function CoreUnitSequenceTriggerUnitElement:get_links_to_unit(to_unit, links, all_units)
+	CoreUnitSequenceTriggerUnitElement.super.get_links_to_unit(self, to_unit, links, all_units)
+	if to_unit == self._unit then
+		for id, unit in pairs(self._sequence_units) do
+			table.insert(links.executers, {unit = unit, alternative = "unit"})
+		end
+	end
+end
+
 function CoreUnitSequenceTriggerUnitElement:update_editing()
 	local ray = managers.editor:unit_by_raycast({
 		sample = true,

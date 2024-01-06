@@ -8,6 +8,10 @@ function PickupUnitElement:init(unit)
 	table.insert(self._save_values, "pickup")
 end
 
+function PickupUnitElement.get_options()
+	return table.map_keys(tweak_data.pickups)
+end
+
 function PickupUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel

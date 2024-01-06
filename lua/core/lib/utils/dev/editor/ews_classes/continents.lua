@@ -56,7 +56,7 @@ end
 
 function ContinentPanel:create_continent_panel(parent, orientation)
 	self._continent_panel = EWS:ScrolledWindow(parent, "", "VSCROLL,TAB_TRAVERSAL,SIMPLE_BORDER")
-	self._continent_panel:set_scroll_rate(Vector3(0, 1, 0))
+	self._continent_panel:set_scroll_rate(Vector3(0, 20, 0))
 	self._continent_panel:set_virtual_size_hints(Vector3(0, 0, 0), Vector3(1, -1, -1))
 	self._continent_panel:set_background_colour(255, 255, 255)
 	self._continent_panel:refresh()

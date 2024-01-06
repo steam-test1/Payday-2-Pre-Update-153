@@ -155,11 +155,11 @@ function IngameLobbyMenuState:at_enter()
 			if managers.job:is_current_job_professional() then
 				MenuCallbackHandler:load_start_menu_lobby()
 			else
-				MenuCallbackHandler:retry_job_stage()
+				managers.game_play_central:restart_the_game()
 			end
 		else
 			MenuCallbackHandler:on_stage_success()
-			MenuCallbackHandler:lobby_start_the_game()
+			MenuCallbackHandler:start_the_game()
 		end
 	end
 end

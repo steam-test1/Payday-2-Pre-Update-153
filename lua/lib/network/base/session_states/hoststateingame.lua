@@ -101,6 +101,7 @@ function HostStateInGame:on_join_request_received(data, peer_name, client_prefer
 	if SystemInfo:platform() == Idstring("X360") then
 		new_peer:send("request_player_name_reply", managers.network:session():local_peer():name())
 	end
+	managers.vote:sync_server_kick_option(new_peer)
 	data.session:send_ok_to_load_level()
 	self:on_handshake_confirmation(data, new_peer, 1)
 end

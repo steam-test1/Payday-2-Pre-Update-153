@@ -226,6 +226,19 @@ function NetworkAccountSTEAM:publish_statistics(stats, force_store)
 		print("[NetworkAccountSTEAM:publish_statistics] Error, SA handler not initialized! Not sending stats.")
 		return
 	end
+	if Application:production_build() and not force_store then
+		local err = false
+		for key, _ in pairs(stats) do
+			if not handler:set_stat(key, handler:get_stat(key)) then
+				Application:error("[NetworkAccountSTEAM:publish_statistics] WARNING - Stat is missing on Steam: '" .. key .. "'")
+				err = true
+			end
+		end
+		if err then
+			Application:throw_exception("[NetworkAccountSTEAM:publish_statistics] Missing statistics, needs to be added!!")
+		end
+		return
+	end
 	local err = false
 	for key, stat in pairs(stats) do
 		local res
@@ -271,13 +284,8 @@ function NetworkAccountSTEAM:publish_statistics(stats, force_store)
 			err = true
 		end
 	end
-	if Application:production_build() then
-		if err then
-			Application:throw_exception("[NetworkAccountSTEAM:publish_statistics] Missing statistics, needs to be added!!")
-		end
-		if not force_store then
-			return
-		end
+	if Application:production_build() and err then
+		Application:throw_exception("[NetworkAccountSTEAM:publish_statistics] Missing statistics, needs to be added!!")
 	end
 	if not err then
 		handler:store_data()

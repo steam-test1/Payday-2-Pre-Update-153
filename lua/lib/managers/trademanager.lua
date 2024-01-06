@@ -490,7 +490,6 @@ function TradeManager:sync_hostage_trade_dialog(i)
 		return
 	end
 	if i == 1 then
-		print("Playing mga_t01a_con_plu")
 		self:_get_megaphone_sound_source():post_event("mga_t01a_con_plu")
 	elseif i == 2 then
 		managers.dialog:queue_dialog("ban_h02a", {})
@@ -502,6 +501,8 @@ function TradeManager:sync_hostage_trade_dialog(i)
 		managers.dialog:queue_dialog("ban_h02d", {})
 	elseif i == 6 then
 		managers.dialog:queue_dialog("Play_ban_h50x", {})
+	elseif i == 7 then
+		managers.dialog:queue_dialog("Play_ban_h02", {})
 	end
 end
 
@@ -519,6 +520,7 @@ function TradeManager:clbk_begin_hostage_trade_dialog(i)
 	if not respawn_criminal then
 		return
 	end
+	local char_sync_index = i
 	if i == 1 then
 		self._megaphone_sound_source = self:_get_megaphone_sound_source()
 		self._speaker_snd_event = self._megaphone_sound_source:post_event("mga_t01a_con_plu", callback(self, self, "clbk_vo_end_begin_hostage_trade_dialog", {
@@ -532,20 +534,22 @@ function TradeManager:clbk_begin_hostage_trade_dialog(i)
 	elseif i == 2 then
 		local ssuffix = managers.criminals:character_static_data_by_name(respawn_criminal.id).ssuffix
 		if ssuffix == "a" then
-			i = 2
+			char_sync_index = 2
 		elseif ssuffix == "b" then
-			i = 3
+			char_sync_index = 3
 		elseif ssuffix == "c" then
-			i = 4
+			char_sync_index = 4
 		elseif ssuffix == "d" then
-			i = 5
+			char_sync_index = 5
+		else
+			char_sync_index = 7
 		end
-		self:sync_hostage_trade_dialog(i)
+		self:sync_hostage_trade_dialog(char_sync_index)
 		local respawn_t = self._t + 5
 		self._hostage_trade_clbk = "TradeManager"
 		managers.enemy:add_delayed_clbk(self._hostage_trade_clbk, callback(self, self, "clbk_begin_hostage_trade"), respawn_t)
 	end
-	managers.network:session():send_to_peers_synched("hostage_trade_dialog", i)
+	managers.network:session():send_to_peers_synched("hostage_trade_dialog", char_sync_index)
 end
 
 function TradeManager:clbk_begin_hostage_trade()

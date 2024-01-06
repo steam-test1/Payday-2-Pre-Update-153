@@ -2,6 +2,9 @@ Pickup = Pickup or class(UnitBase)
 
 function Pickup:init(unit)
 	Pickup.super.init(self, unit, false)
+	if not Network:is_server() and unit:slot() == 23 then
+		unit:set_slot(20)
+	end
 	self._unit = unit
 	self._active = true
 end

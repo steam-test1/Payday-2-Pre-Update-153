@@ -30,6 +30,7 @@ ContourExt._types = {
 		material_swap_required = true,
 		color = tweak_data.contour.character.friendly_color
 	},
+	drunk_pilot = {priority = 5},
 	mark_unit = {
 		priority = 4,
 		color = tweak_data.contour.character.dangerous_color,

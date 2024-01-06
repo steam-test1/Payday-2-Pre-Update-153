@@ -1287,7 +1287,7 @@ function CopLogicAttack._chk_exit_attack_logic(data, new_reaction)
 			local allow_trans, obj_failed = CopLogicBase.is_obstructed(data, data.objective, nil, nil)
 			if allow_trans then
 				if obj_failed then
-					managers.groupai:state():on_objective_failed(data.unit, data.objective)
+					data.objective_failed_clbk(data.unit, data.objective)
 				elseif wanted_state ~= "idle" or not managers.groupai:state():on_cop_jobless(data.unit) then
 					CopLogicBase._exit(data.unit, wanted_state)
 				end

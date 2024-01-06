@@ -148,7 +148,9 @@ function CivilianLogicIdle.on_alert(data, alert_data)
 					is_intimidation = true
 				end
 				if is_intimidation then
-					data.unit:brain():on_intimidated(1, aggressor)
+					if not data.brain:interaction_voice() then
+						data.unit:brain():on_intimidated(1, aggressor)
+					end
 					return
 				end
 			end
@@ -159,7 +161,7 @@ function CivilianLogicIdle.on_alert(data, alert_data)
 	if alert_data[5] then
 		local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, alert_data[5]:key())
 	end
-	if my_data == data.internal_data then
+	if my_data == data.internal_data and not data.char_tweak.ignores_aggression then
 		my_dis = my_dis or alert_epicenter and mvector3.distance(my_listen_pos, alert_epicenter) or 3000
 		alert_delay = math.lerp(1, 4, math.min(1, my_dis / 2000)) * math.random()
 		if not my_data.delayed_alert_id then
@@ -277,10 +279,10 @@ function CivilianLogicIdle.action_complete_clbk(data, action)
 		my_data.acting = nil
 		if action:expired() then
 			if not my_data.action_timeout_clbk_id then
-				managers.groupai:state():on_civilian_objective_complete(data.unit, data.objective)
+				data.objective_complete_clbk(data.unit, data.objective)
 			end
 		else
-			managers.groupai:state():on_civilian_objective_failed(data.unit, data.objective)
+			data.objective_failed_clbk(data.unit, data.objective)
 		end
 	end
 end
@@ -361,7 +363,7 @@ function CivilianLogicIdle.clbk_action_timeout(ignore_this, data)
 		managers.enemy:force_delayed_clbk(my_data.delayed_alert_id)
 	end
 	if data.objective == old_objective then
-		managers.groupai:state():on_civilian_objective_complete(data.unit, old_objective)
+		data.objective_complete_clbk(data.unit, old_objective)
 	end
 end
 

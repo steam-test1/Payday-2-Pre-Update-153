@@ -119,7 +119,7 @@ function PrePlanningPoint:init(map_panel, element, shape, rotation, active_node,
 					local vote_panel = self._extras[type]:panel({name = "plan"})
 					local new_icon
 					local x = 0
-					for i = 1, managers.criminals.get_num_characters() do
+					for i = 1, managers.criminals.MAX_NR_CRIMINALS do
 						new_icon = vote_panel:bitmap({
 							x = x,
 							texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_voting",
@@ -540,7 +540,7 @@ function PrePlanningPoint:animate_size_mod(o)
 end
 
 function PrePlanningPoint:_set_size_mod(size_mod)
-	local info_box_alpha = self._mouse_selected and 1 or 0
+	local info_box_alpha = self._current_state ~= Idstring("hidden") and self._mouse_selected and 1 or 0
 	if self._size_mod ~= size_mod or info_box_alpha ~= self._info_box_alpha then
 		self._info_box_alpha = info_box_alpha
 		self._size_mod = size_mod
@@ -650,17 +650,17 @@ function PrePlanningPoint:_update_state()
 		self._has_majority = has_majority
 		local selectable = not self._active_node.current_plan or self._properties.category[self._active_node.current_plan] or self._plan_icon:visible()
 		if has_majority then
-			self:_set_size_mod(selected and 1.2 or 1.1)
 			self:_set_selected()
+			self:_set_size_mod(selected and 1.2 or 1.1)
 		elseif selected then
-			self:_set_size_mod(1.2)
 			self:_set_selectable()
+			self:_set_size_mod(1.2)
 		elseif selectable then
-			self:_set_size_mod(self._plan_icon:visible() and 1 or 0.8)
 			self:_set_visible()
+			self:_set_size_mod(self._plan_icon:visible() and 1 or 0.8)
 		else
-			self:_set_size_mod(1)
 			self:_set_hidden()
+			self:_set_size_mod(1)
 		end
 		self._plan_icon:set_alpha(self._box:alpha())
 	else
@@ -668,20 +668,20 @@ function PrePlanningPoint:_update_state()
 		local category_selected = self._properties.category[self._active_node.current_category] and self._active_node.node:selected_item() and self._properties.type[self._active_node.node:selected_item():name()]
 		local visible = self._properties.type[self._active_node.current_type] or self._properties.category[self._active_node.current_category]
 		if selected then
-			self:_set_size_mod(1.2)
 			self:_set_selected()
+			self:_set_size_mod(1.2)
 		elseif selectable then
-			self:_set_size_mod(alive(self._reserved_icon) and 1 or 0.8)
 			self:_set_selectable()
+			self:_set_size_mod(alive(self._reserved_icon) and 1 or 0.8)
 		elseif category_selected then
+			self:_set_visible()
 			self:_set_size_mod(1.1)
-			self:_set_visible()
 		elseif visible then
-			self:_set_size_mod(1)
 			self:_set_visible()
-		else
 			self:_set_size_mod(1)
+		else
 			self:_set_hidden()
+			self:_set_size_mod(1)
 		end
 	end
 end
@@ -850,7 +850,7 @@ function PrePlanningCustomPoint:init(map_panel, data, texture_width, texture_hei
 		blend_mode = "add"
 	})
 	make_fine_text(self._info_box)
-	self._info_box:set_rotation(rotation + location_rotation)
+	self._info_box:set_rotation(rotation + location_rotation == 0 and 360 or rotation + location_rotation)
 	self._info_box:set_left(gui_icon:right() + 5)
 	self._info_box:set_center_y(gui_icon:center_y())
 	self._info_box:set_alpha(0)
@@ -883,14 +883,14 @@ function PrePlanningCustomPoint:_update_state()
 	local visible = self._active_node.current_custom == "custom_points"
 	self._selected = selected
 	if selected then
-		self:_set_size_mod(1.2)
 		self:_set_selected()
+		self:_set_size_mod(1.2)
 	elseif visible then
-		self:_set_size_mod(1)
 		self:_set_visible()
-	else
 		self:_set_size_mod(1)
+	else
 		self:_set_hidden()
+		self:_set_size_mod(1)
 	end
 end
 
@@ -956,7 +956,7 @@ function PrePlanningCustomPoint:mouse_moved(x, y, used)
 		self:dirty()
 	end
 	if mouse_check then
-		return true, "link", true
+		return true, "link", true, true
 	end
 end
 
@@ -1257,6 +1257,9 @@ function PrePlanningLocation:_update_active_points()
 			end
 		end
 	end
+	if self._selected_point and not table.contains(active_points, self._selected_point) then
+		table.insert(active_points, self._selected_point)
+	end
 	self._active_points = active_points
 	return self._active_points
 end
@@ -1270,11 +1273,15 @@ function PrePlanningLocation:_get_active_points()
 end
 
 function PrePlanningLocation:mouse_moved(x, y)
-	local used, icon, eused, eicon, eother
+	local used, icon, eused, eicon, eother, remember_point
 	for _, point in ipairs(self:_get_active_points()) do
-		eused, eicon, eother = point:mouse_moved(x, y, used)
+		eused, eicon, eother, remember_point = point:mouse_moved(x, y, used)
 		if eused and not used then
 			used, icon = eused, eicon
+			if remember_point and self._selected_point ~= point then
+				self._selected_point = point
+				self:clear_active_points()
+			end
 			if eother then
 				if point:element() then
 					if self._active_node.current_plan or self._active_node.current_type then
@@ -1545,7 +1552,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 	breakdown_panel:hide()
 	self:_update_breakdown()
 	self._location_size = math.min(self._panel:w(), self._panel:h())
-	self._map_size = math.max(self._panel:w(), self._panel:h()) * 2
+	self._map_size = math.max(self._panel:w(), self._panel:h()) * 20
 	self._map_panel = self._panel:panel({
 		name = "map",
 		layer = 0,
@@ -1652,18 +1659,19 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 	})
 	local ratio = self._fullscreen_panel:w() / self._fullscreen_panel:h()
 	local safe_scaled_size = managers.gui_data:corner_scaled_size()
-	local min_zoom = 1
+	local min_zoom = location_data.min_zoom or 1
+	local max_zoom = location_data.max_zoom or 5
 	if grid_height < grid_width / ratio then
 		min_zoom = (self._location_size + safe_scaled_size.y * 2) / grid_height
 	else
 		min_zoom = (self._location_size + safe_scaled_size.x * 2) / (grid_width / ratio)
 	end
-	self._min_zoom = math.lerp(1, min_zoom, 0.5)
-	self._max_zoom = 5
+	self._min_zoom = math.lerp(min_zoom, 1, math.clamp(location_data.min_zoom or 0.5, 0, 1))
+	self._max_zoom = max_zoom
 	self._num_draw_points = 0
 	self._peer_draw_lines = {}
 	self._peer_draw_line_index = {}
-	for i = 1, managers.criminals.get_num_characters() do
+	for i = 1, managers.criminals.MAX_NR_CRIMINALS do
 		self._peer_draw_lines[i] = {}
 		self._peer_draw_line_index[i] = false
 		self._grid_panel:panel({
@@ -1767,7 +1775,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 	local button_index
 	offset = 10
 	self._peer_buttons = {}
-	for i = 1, managers.criminals.get_num_characters() do
+	for i = 1, managers.criminals.MAX_NR_CRIMINALS do
 		params.texture_rect_on = {
 			88,
 			32,
@@ -2444,12 +2452,6 @@ function PrePlanningMapGui:set_selected_element_index(index)
 end
 
 function PrePlanningMapGui:update_element(type, id)
-	if not self._active_node.node or not self._enabled then
-		return
-	end
-	for i, location in pairs(self._locations) do
-		location:update_element(type, id)
-	end
 	local current_budget, total_budget = managers.preplanning:get_current_budget()
 	self._panel:child("budget_text"):set_text(managers.localization:to_upper_text("menu_pp_budget", {
 		current = string.format("%.2d", total_budget - current_budget),
@@ -2462,6 +2464,12 @@ function PrePlanningMapGui:update_element(type, id)
 	make_fine_text(self._panel:child("total_cost"))
 	self:_update_drawboard()
 	self:_update_breakdown()
+	if not self._active_node.node or not self._enabled then
+		return
+	end
+	for i, location in pairs(self._locations) do
+		location:update_element(type, id)
+	end
 	local logic = managers.menu:active_menu().logic
 	if logic then
 		logic:refresh_node_stack()

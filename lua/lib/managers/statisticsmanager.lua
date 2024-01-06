@@ -415,6 +415,18 @@ function StatisticsManager:use_sentry_gun()
 	self:_increment_misc("deploy_sentry", 1)
 end
 
+function StatisticsManager:use_first_aid()
+	self:_increment_misc("deploy_firstaid", 1)
+end
+
+function StatisticsManager:use_body_bag()
+	self:_increment_misc("deploy_bodybag", 1)
+end
+
+function StatisticsManager:use_armor_bag()
+	self:_increment_misc("deploy_armorbag", 1)
+end
+
 function StatisticsManager:in_custody()
 	self:_increment_misc("in_custody", 1)
 end
@@ -478,7 +490,8 @@ function StatisticsManager:_get_stat_tables()
 		"gallery",
 		"hox_1",
 		"hox_2",
-		"haunted"
+		"haunted",
+		"pines"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -515,7 +528,8 @@ function StatisticsManager:_get_stat_tables()
 		"gallery",
 		"hox",
 		"hox_prof",
-		"haunted"
+		"haunted",
+		"pines"
 	}
 	local mask_list = {
 		"character_locked",
@@ -646,7 +660,18 @@ function StatisticsManager:_get_stat_tables()
 		"crazy_lion",
 		"old_hoxton",
 		"the_one_below",
-		"lycan"
+		"lycan",
+		"churchill",
+		"red_hurricane",
+		"patton",
+		"de_gaulle",
+		"area51",
+		"alien_helmet",
+		"krampus",
+		"mrs_claus",
+		"strinch",
+		"robo_santa",
+		"almirs_beard"
 	}
 	local weapon_list = {
 		"ak5",
@@ -738,7 +763,12 @@ function StatisticsManager:_get_stat_tables()
 		"briefcase",
 		"kabartanto",
 		"toothbrush",
-		"chef"
+		"chef",
+		"fairbair",
+		"freedom",
+		"model24",
+		"swagger",
+		"alien_maul"
 	}
 	local enemy_list = {
 		"civilian",
@@ -778,7 +808,8 @@ function StatisticsManager:_get_stat_tables()
 		"spanish",
 		"american",
 		"jowi",
-		"old_hoxton"
+		"old_hoxton",
+		"female_1"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end
@@ -922,6 +953,18 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		type = "int",
 		value = session.misc.deploy_jammer or 0
 	}
+	stats.gadget_used_first_aid = {
+		type = "int",
+		value = session.misc.deploy_firstaid or 0
+	}
+	stats.gadget_used_body_bag = {
+		type = "int",
+		value = session.misc.deploy_bodybag or 0
+	}
+	stats.gadget_used_armor_bag = {
+		type = "int",
+		value = session.misc.deploy_armorbag or 0
+	}
 	local mask_id = managers.blackmarket:equipped_mask().mask_id
 	if table.contains(mask_list, mask_id) then
 		stats["mask_used_" .. mask_id] = {type = "int", value = 1}
@@ -974,6 +1017,40 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			end
 		end
 	end
+	if completion == "win_begin" then
+		if Network:is_server() then
+			if Global.game_settings.kick_option == 1 then
+				stats.option_decide_host = {type = "int", value = 1}
+			elseif Global.game_settings.kick_option == 2 then
+				stats.option_decide_vote = {type = "int", value = 1}
+			elseif Global.game_settings.kick_option == 0 then
+				stats.option_decide_none = {type = "int", value = 1}
+			end
+			stats.info_playing_win_host = {type = "int", value = 1}
+		else
+			stats.info_playing_win_client = {type = "int", value = 1}
+		end
+	elseif completion == "win_dropin" then
+		if not Network:is_server() then
+			stats.info_playing_win_client_dropin = {type = "int", value = 1}
+		end
+	elseif completion == "fail" then
+		if Network:is_server() then
+			stats.info_playing_fail_host = {type = "int", value = 1}
+		else
+			stats.info_playing_fail_client = {type = "int", value = 1}
+		end
+	end
+	stats.info_playing_normal = {
+		type = "int",
+		method = "set",
+		value = 1
+	}
+	stats.info_playing_beta = {
+		type = "int",
+		method = "set",
+		value = 0
+	}
 	stats.heist_success = {
 		type = "int",
 		value = success and 1 or 0
@@ -1562,6 +1639,20 @@ function StatisticsManager:favourite_weapon()
 		end
 	end
 	return weapon_id and managers.localization:text(tweak_data.weapon[weapon_id].name_id) or managers.localization:text("debug_undecided")
+end
+
+function StatisticsManager:favourite_stat(list, stat_prefix, stat_suffix)
+	stat_suffix = stat_suffix or ""
+	local fav_name
+	local fav_uses = 0
+	for _, name in ipairs(list) do
+		local used = managers.network.account:get_stat(stat_prefix .. name .. stat_suffix)
+		if fav_uses < used then
+			fav_name = name
+			fav_uses = used
+		end
+	end
+	return fav_name
 end
 
 function StatisticsManager:total_kills()

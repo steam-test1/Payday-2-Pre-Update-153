@@ -465,7 +465,7 @@ function InstancesLayer:_draw_instance(t, dt, instance_name, r, g, b)
 			if managers.viewport:get_current_camera() then
 				local cam_up = managers.viewport:get_current_camera():rotation():z()
 				local cam_right = managers.viewport:get_current_camera():rotation():x()
-				name_brush:center_text(element.values.position + Vector3(0, 0, 25), element.editor_name, cam_right, -cam_up)
+				name_brush:center_text(element.values.position + Vector3(0, 0, 25), utf8.from_latin1(element.editor_name), cam_right, -cam_up)
 			end
 			if element.values.rotation then
 				local rotation = CoreClass.type_name(element.values.rotation) == "Rotation" and element.values.rotation or Rotation(element.values.rotation, 0, 0)
@@ -496,6 +496,14 @@ end
 
 function InstancesLayer:use_widget_rotation(rot)
 	self:set_instance_rotations(rot * self:widget_affect_object():rotation():inverse())
+end
+
+function InstancesLayer:set_unit_positions(pos)
+	self:set_instance_positions(pos)
+end
+
+function InstancesLayer:set_unit_rotations(rot)
+	self:set_instance_rotations(rot)
 end
 
 function InstancesLayer:set_instance_positions(pos)
@@ -944,6 +952,11 @@ function InstancesLayer:on_simulation_started()
 			self._stashed_instance_units[instance_data.name] = nil
 		end
 	end
+end
+
+function InstancesLayer:update_unit_settings(...)
+	InstancesLayer.super.update_unit_settings(self, ...)
+	managers.editor:on_reference_unit(self._selected_instance)
 end
 
 function InstancesLayer:activate()

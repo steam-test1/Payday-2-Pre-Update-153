@@ -16,6 +16,8 @@ function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 	data.unit:contour():add("highlight")
 	data.unit:movement():set_cool(false, "escort")
 	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
+	my_data.advance_path_search_id = "CivilianLogicEscort_detailed" .. tostring(data.key)
+	my_data.coarse_path_search_id = "CivilianLogicEscort_coarse" .. tostring(data.key)
 	if data.unit:anim_data().tied then
 		local action_data = {
 			type = "act",
@@ -29,6 +31,11 @@ function CivilianLogicEscort.enter(data, new_logic_name, enter_params)
 		my_data.outline_detection_task_key = "CivilianLogicIdle._upd_outline_detection" .. tostring(data.key)
 		CopLogicBase.queue_task(my_data, my_data.outline_detection_task_key, CivilianLogicIdle._upd_outline_detection, data, data.t + 2)
 	end
+	local attention_settings = {
+		"civ_enemy_cbt",
+		"civ_civ_cbt"
+	}
+	data.unit:brain():set_attention_settings(attention_settings)
 end
 
 function CivilianLogicEscort.exit(data, new_logic_name, enter_params)
@@ -48,10 +55,15 @@ function CivilianLogicEscort.update(data)
 	local objective = data.objective
 	local t = data.t
 	if my_data._say_random_t and t > my_data._say_random_t then
-		data.unit:sound():say("a02", true)
+		data.unit:sound():say("a02x_any", true)
 		my_data._say_random_t = t + math.random(30, 60)
 	end
-	if CivilianLogicEscort.too_scared_to_move(data) and not data.unit:anim_data().panic then
+	if my_data.has_old_action then
+		CivilianLogicTravel._upd_stop_old_action(data, my_data)
+		return
+	end
+	local scared_reason = CivilianLogicEscort.too_scared_to_move(data)
+	if scared_reason and not data.unit:anim_data().panic then
 		my_data.commanded_to_move = nil
 		data.unit:movement():action_request({
 			type = "act",
@@ -78,20 +90,15 @@ function CivilianLogicEscort.update(data)
 			local total_nav_points = #coarse_path
 			if cur_index == total_nav_points then
 				objective.in_place = true
-				managers.groupai:state():on_civilian_objective_complete(unit, objective)
+				data.objective_complete_clbk(unit, objective)
 				return
 			else
 				local to_pos = coarse_path[cur_index + 1][2]
-				my_data.advance_path_search_id = tostring(unit:key()) .. "advance"
 				my_data.processing_advance_path = true
 				unit:brain():search_for_path(my_data.advance_path_search_id, to_pos)
 			end
-		else
-			local search_id = tostring(unit:key()) .. "coarse"
-			if unit:brain():search_for_coarse_path(search_id, objective.nav_seg) then
-				my_data.coarse_path_search_id = search_id
-				my_data.processing_coarse_path = true
-			end
+		elseif unit:brain():search_for_coarse_path(my_data.coarse_path_search_id, objective.nav_seg) then
+			my_data.processing_coarse_path = true
 		end
 	else
 		CopLogicBase._exit(data.unit, "idle")
@@ -101,18 +108,20 @@ end
 function CivilianLogicEscort.on_intimidated(data, amount, aggressor_unit)
 	local scared_reason = CivilianLogicEscort.too_scared_to_move(data)
 	if scared_reason then
-		data.unit:sound():say("a01", true)
+		data.unit:sound():say("a01x_any", true)
 	else
 		data.internal_data.commanded_to_move = true
 	end
 end
 
 function CivilianLogicEscort.action_complete_clbk(data, action)
-	CopLogicTravel.action_complete_clbk(data, action)
 	local my_data = data.internal_data
 	local action_type = action:type()
 	if action_type == "walk" then
 		my_data.advancing = nil
+		if action:expired() then
+			my_data.coarse_path_index = my_data.coarse_path_index + 1
+		end
 	elseif action_type == "act" and my_data.getting_up then
 		my_data.getting_up = nil
 	end
@@ -123,26 +132,24 @@ function CivilianLogicEscort._upd_pathing(data, my_data)
 		local pathing_results = data.pathing_results
 		data.pathing_results = nil
 		local path = pathing_results[my_data.advance_path_search_id]
-		if path then
+		if path and my_data.processing_advance_path then
 			my_data.processing_advance_path = nil
-			my_data.advance_path_search_id = nil
 			if path ~= "failed" then
 				my_data.advance_path = path
 			else
 				print("[CivilianLogicEscort:_upd_pathing] advance_path failed")
-				managers.groupai:state():on_civilian_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 				return
 			end
 		end
 		path = pathing_results[my_data.coarse_path_search_id]
-		if path then
+		if path and my_data.processing_coarse_path then
 			my_data.processing_coarse_path = nil
-			my_data.coarse_path_search_id = nil
 			if path ~= "failed" then
 				my_data.coarse_path = path
 				my_data.coarse_path_index = 1
 			else
-				managers.groupai:state():on_civilian_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 				return
 			end
 		end
@@ -250,6 +257,7 @@ function CivilianLogicEscort._begin_advance_action(data, my_data)
 	my_data.advancing = data.unit:brain():action_request(new_action_data)
 	if my_data.advancing then
 		data.brain:rem_pos_rsrv("path")
+		my_data.advance_path = nil
 	else
 		debug_pause("[CivilianLogicEscort._begin_advance_action] failed to start")
 	end
@@ -258,7 +266,7 @@ end
 function CivilianLogicEscort._begin_stand_hesitant_action(data, my_data)
 	local action = {
 		type = "act",
-		variant = "so_escort_get_up_hesitant",
+		variant = "cm_so_escort_get_up_hesitant",
 		body_part = 1,
 		clamp_to_graph = true,
 		blocks = {

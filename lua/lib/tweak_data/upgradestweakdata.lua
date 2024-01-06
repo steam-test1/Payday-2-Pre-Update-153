@@ -1283,7 +1283,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[14] = {
 		name_id = "weapons",
-		upgrades = {"bayonet"}
+		upgrades = {"bayonet", "m1928"}
 	}
 	self.level_tree[15] = {
 		name_id = "weapons",
@@ -1668,6 +1668,7 @@ function UpgradesTweakData:init()
 	self:_c96_definitions()
 	self:_sterling_definitions()
 	self:_mosin_definitions()
+	self:_m1928_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -5693,6 +5694,15 @@ function UpgradesTweakData:_mosin_definitions()
 		weapon_id = "mosin",
 		factory_id = "wpn_fps_snp_mosin",
 		dlc = "gage_pack_historical"
+	}
+end
+
+function UpgradesTweakData:_m1928_definitions()
+	self.definitions.m1928 = {
+		category = "weapon",
+		weapon_id = "m1928",
+		factory_id = "wpn_fps_smg_thompson",
+		dlc = "pd2_clan"
 	}
 end
 

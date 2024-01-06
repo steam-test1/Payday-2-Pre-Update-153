@@ -239,6 +239,18 @@ function CarryTweakData:init(tweak_data)
 	self.equipment_bag.visual_object = "g_toolsbag"
 	self.equipment_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
 	self.equipment_bag.AI_carry = {SO_category = "enemies"}
+	self.coke_pure = {}
+	self.coke_pure.type = "coke_light"
+	self.coke_pure.name_id = "hud_carry_coke_pure"
+	self.coke_pure.bag_value = "coke_pure"
+	self.coke_pure.AI_carry = {SO_category = "enemies"}
+	self.sandwich = {}
+	self.sandwich.type = "very_heavy"
+	self.sandwich.name_id = "hud_carry_sandwich"
+	self.sandwich.bag_value = "sandwich"
+	self.sandwich.AI_carry = {SO_category = "enemies"}
+	self.sandwich.visual_object = "g_cagebag"
+	self.sandwich.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 end
 
 function CarryTweakData:get_carry_ids()

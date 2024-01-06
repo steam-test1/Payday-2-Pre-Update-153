@@ -35,7 +35,7 @@ function TeamAILogicSurrender.enter(data, new_logic_name, enter_params)
 	managers.groupai:state():on_criminal_neutralized(data.unit)
 	TeamAILogicDisabled._register_revive_SO(data, my_data, "untie")
 	if data.objective then
-		managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective, true)
+		data.objective_failed_clbk(data.unit, data.objective, true)
 		data.unit:brain():set_objective(nil)
 	end
 end

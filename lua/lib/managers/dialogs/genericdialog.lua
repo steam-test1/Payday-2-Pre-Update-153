@@ -132,9 +132,9 @@ function GenericDialog:update_input(t, dt)
 	end
 	local dir, move_time
 	local move = self._controller:get_input_axis("menu_move")
-	if self._controller:get_input_bool("menu_down") or move.y > self.MOVE_AXIS_LIMIT then
+	if self._controller:get_input_bool("menu_down") or move.y < -self.MOVE_AXIS_LIMIT then
 		dir = 1
-	elseif self._controller:get_input_bool("menu_up") or move.y < -self.MOVE_AXIS_LIMIT then
+	elseif self._controller:get_input_bool("menu_up") or move.y > self.MOVE_AXIS_LIMIT then
 		dir = -1
 	end
 	if dir then

@@ -6,6 +6,7 @@ function DLCTweakData:init(tweak_data)
 		twitch_pack = 1,
 		pd2_million = true,
 		washington_reveal = true,
+		pines = true,
 		dlc1 = true,
 		gage_pack = true,
 		gage_pack_lmg = true,
@@ -2180,4 +2181,64 @@ function DLCTweakData:init(tweak_data)
 	self.alienware_alpha_promo.content = {}
 	self.alienware_alpha_promo.content.loot_drops = {}
 	self.alienware_alpha_promo.content.upgrades = {"alien_maul"}
+	self.ach_deer_1 = {}
+	self.ach_deer_1.dlc = "has_achievement"
+	self.ach_deer_1.achievement_id = "deer_1"
+	self.ach_deer_1.content = {}
+	self.ach_deer_1.content.loot_global_value = "normal"
+	self.ach_deer_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mrs_claus",
+			amount = 1
+		}
+	}
+	self.ach_deer_2 = {}
+	self.ach_deer_2.dlc = "has_achievement"
+	self.ach_deer_2.achievement_id = "deer_2"
+	self.ach_deer_2.content = {}
+	self.ach_deer_2.content.loot_global_value = "normal"
+	self.ach_deer_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "strinch",
+			amount = 1
+		}
+	}
+	self.ach_deer_3 = {}
+	self.ach_deer_3.dlc = "has_achievement"
+	self.ach_deer_3.achievement_id = "deer_3"
+	self.ach_deer_3.content = {}
+	self.ach_deer_3.content.loot_global_value = "normal"
+	self.ach_deer_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "krampus",
+			amount = 1
+		}
+	}
+	self.ach_deer_4 = {}
+	self.ach_deer_4.dlc = "has_achievement"
+	self.ach_deer_4.achievement_id = "deer_4"
+	self.ach_deer_4.content = {}
+	self.ach_deer_4.content.loot_global_value = "normal"
+	self.ach_deer_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "robo_santa",
+			amount = 1
+		}
+	}
+	self.ach_deer_6 = {}
+	self.ach_deer_6.dlc = "has_achievement"
+	self.ach_deer_6.achievement_id = "deer_6"
+	self.ach_deer_6.content = {}
+	self.ach_deer_6.content.loot_global_value = "normal"
+	self.ach_deer_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "almirs_beard",
+			amount = 1
+		}
+	}
 end

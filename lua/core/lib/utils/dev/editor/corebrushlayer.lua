@@ -35,6 +35,7 @@ end
 
 function BrushLayer:load(world_holder, offset)
 	world_holder:create_world("world", self._save_name, offset)
+	self._amount_dirty = true
 end
 
 function BrushLayer:save(save_params)
@@ -96,6 +97,7 @@ function BrushLayer:reposition_all()
 						if ray then
 							local brush_header = self:add_brush_header(name)
 							local correct_pos = brush_header:spawn_brush(ray.position, rotations[counter])
+							self._amount_dirty = true
 							local nudge_length = (ray.position - correct_pos):length()
 							if 0.05 < nudge_length then
 								nudged_units = nudged_units + 1
@@ -126,6 +128,7 @@ function BrushLayer:clear_all()
 		return
 	end
 	MassUnitManager:delete_all_units()
+	self._amount_dirty = true
 end
 
 function BrushLayer:clear_unit()
@@ -135,6 +138,25 @@ function BrushLayer:clear_unit()
 	end
 	for _, name in ipairs(self._brush_names) do
 		MassUnitManager:delete_units(Idstring(name))
+	end
+	self._amount_more_dirty = true
+end
+
+function BrushLayer:clear_units_by_name(name)
+	local confirm = EWS:message_box(Global.frame_panel, "This will delete all " .. name .. " brushes in this level, are you sure?", "Brush", "YES_NO,ICON_QUESTION", Vector3(-1, -1, 0))
+	if confirm == "NO" then
+		return
+	end
+	MassUnitManager:delete_units(Idstring(name))
+	self._amount_more_dirty = true
+end
+
+function BrushLayer:_on_amount_updated()
+	local brush_stats, total = self:get_brush_stats()
+	self._debug_units_total:set_label("Units Total: " .. total.amount)
+	self._debug_units_unique:set_label("Units Unique: " .. total.unique)
+	if self._debug_list and self._debug_list:visible() then
+		self._debug_list:fill_unit_list()
 	end
 end
 
@@ -175,6 +197,14 @@ function BrushLayer:erase_units_release()
 end
 
 function BrushLayer:update(time, rel_time)
+	if self._amount_dirty then
+		self._amount_dirty = nil
+		self:_on_amount_updated()
+	end
+	if self._amount_more_dirty then
+		self._amount_more_dirty = nil
+		self._amount_dirty = true
+	end
 	local from = self._owner:get_cursor_look_point(0)
 	local to = self._owner:get_cursor_look_point(5000)
 	local ray_type = self._brush_on_editor_bodies and "body editor" or "body"
@@ -232,6 +262,7 @@ function BrushLayer:update(time, rel_time)
 					end
 					if found then
 						World:delete_unit(units[removed])
+						self._amount_dirty = true
 					end
 				end
 				if self._brush_density == 0 then
@@ -241,9 +272,22 @@ function BrushLayer:update(time, rel_time)
 				for _, brush in ipairs(units) do
 					if not self._erase_with_units or self._erase_with_units and table.contains(self._brush_names, brush:name():s()) then
 						World:delete_unit(brush)
+						self._amount_dirty = true
 					end
 				end
 			end
+		end
+	end
+	if self._debug_draw_unit_orientation then
+		self:_draw_unit_orientations()
+	end
+end
+
+function BrushLayer:_draw_unit_orientations()
+	local brush_stats = self:get_brush_stats()
+	for _, stats in ipairs(brush_stats) do
+		for i = 1, stats.amount do
+			Application:draw_rotation(stats.positions[i], stats.rotations[i])
 		end
 	end
 end
@@ -285,6 +329,7 @@ function BrushLayer:create_brush(ray)
 			at = up:cross(right)
 		end
 		brush_type:spawn_brush(ray.position + up * self._offset, Rotation(right, at, up))
+		self._amount_dirty = true
 	end
 end
 
@@ -355,6 +400,24 @@ function BrushLayer:build_panel(notebook)
 	btn_sizer:add(visible_cb, 1, 10, "ALIGN_CENTER_VERTICAL,RIGHT")
 	visible_cb:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_visibility"), visible_cb)
 	self._sizer:add(btn_sizer, 0, 0, "EXPAND")
+	local debug_sizer = EWS:StaticBoxSizer(self._ews_panel, "VERTICAL", "Debug")
+	self._sizer:add(debug_sizer, 0, 0, "EXPAND")
+	local toolbar = EWS:ToolBar(self._ews_panel, "", "TB_FLAT,TB_NODIVIDER")
+	debug_sizer:add(toolbar, 1, 1, "EXPAND,BOTTOM")
+	toolbar:add_check_tool("DEBUG_DRAW", "Draw unit orientations", CoreEws.image_path("image_16x16.png"), "Draw unit orientations")
+	toolbar:set_tool_state("DEBUG_DRAW", self._debug_draw_unit_orientation)
+	toolbar:connect("DEBUG_DRAW", "EVT_COMMAND_MENU_SELECTED", callback(nil, CoreEditorUtils, "toolbar_toggle"), {
+		class = self,
+		value = "_debug_draw_unit_orientation",
+		toolbar = toolbar
+	})
+	toolbar:add_tool("DEBUG_LIST", "Open debug list", CoreEws.image_path("magnifying_glass_16x16.png"), "Open debug list")
+	toolbar:connect("DEBUG_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_open_debug_list"), nil)
+	toolbar:realize()
+	self._debug_units_total = EWS:StaticText(self._ews_panel, "Units Total:", "", "ALIGN_LEFT")
+	self._debug_units_unique = EWS:StaticText(self._ews_panel, "Units Unique:", "", "ALIGN_LEFT")
+	debug_sizer:add(self._debug_units_total, 0, 0, "EXPAND")
+	debug_sizer:add(self._debug_units_unique, 0, 0, "EXPAND")
 	local units_params = {
 		style = "LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING",
 		unit_events = {
@@ -498,8 +561,48 @@ function BrushLayer:update_slider(data)
 	self[data.value] = data.slider_params.value
 end
 
+function BrushLayer:_on_gui_open_debug_list()
+	self._debug_list = _G.BrushLayerDebug:new()
+end
+
+function BrushLayer:get_brush_stats()
+	local brush_stats = {}
+	local total = {amount = 0, unique = 0}
+	for _, unit_name in ipairs(MassUnitManager:list()) do
+		local rotations = MassUnitManager:unit_rotations(unit_name)
+		local positions = MassUnitManager:unit_positions(unit_name)
+		local stats = {
+			unit_name = unit_name,
+			amount = #rotations,
+			positions = positions,
+			rotations = rotations
+		}
+		table.insert(brush_stats, stats)
+		total.amount = total.amount + #rotations
+		total.unique = total.unique + 1
+	end
+	return brush_stats, total
+end
+
+function BrushLayer:activate(...)
+	BrushLayer.super.activate(self, ...)
+	if self._debug_list then
+		self._debug_list:set_visible(self._was_debug_list_visible)
+		self._was_debug_list_visible = nil
+	end
+end
+
+function BrushLayer:deactivate(...)
+	BrushLayer.super.deactivate(self, ...)
+	if self._debug_list then
+		self._was_debug_list_visible = self._debug_list:visible()
+		self._debug_list:set_visible(false)
+	end
+end
+
 function BrushLayer:clear()
 	MassUnitManager:delete_all_units()
+	self._amount_dirty = true
 end
 
 function BrushLayer:add_triggers()

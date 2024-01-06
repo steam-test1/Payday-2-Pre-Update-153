@@ -363,10 +363,11 @@ function CoreMissionElement:panel(id, parent, parent_sizer)
 end
 
 function CoreMissionElement:_add_panel(parent, parent_sizer)
-	local panel = EWS:Panel(parent, "", "TAB_TRAVERSAL")
+	local panel = EWS:ScrolledWindow(parent, "", "VSCROLL,TAB_TRAVERSAL")
+	panel:set_scroll_rate(Vector3(0, 20, 0))
+	panel:set_virtual_size_hints(Vector3(0, 0, 0), Vector3(1, -1, -1))
 	local panel_sizer = EWS:BoxSizer("VERTICAL")
 	panel:set_sizer(panel_sizer)
-	panel_sizer:add(EWS:StaticLine(panel, "", "LI_HORIZONTAL"), 0, 0, "EXPAND")
 	parent_sizer:add(panel, 1, 0, "EXPAND")
 	panel:set_visible(false)
 	panel:set_extension({alive = true})
@@ -1035,4 +1036,43 @@ function CoreMissionElement:_build_value_checkbox(panel, sizer, value_name, tool
 	checkbox:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = checkbox, value = value_name})
 	sizer:add(checkbox, 0, 0, "EXPAND")
 	return checkbox
+end
+
+function CoreMissionElement:get_links_to_unit(to_unit, links, all_units)
+	if to_unit == self._unit then
+		for _, data in ipairs(self._hed.on_executed) do
+			local on_executed_unit = all_units[data.id]
+			local type = "on_executed" .. (data.alternative and " " .. data.alternative or "")
+			table.insert(links.on_executed, {unit = on_executed_unit, alternative = type})
+		end
+	end
+	for _, data in ipairs(self._hed.on_executed) do
+		local unit = all_units[data.id]
+		if unit == to_unit then
+			local type = "on_executed" .. (data.alternative and " " .. data.alternative or "")
+			table.insert(links.executers, {
+				unit = self._unit,
+				alternative = type
+			})
+		end
+	end
+end
+
+function CoreMissionElement:_get_links_of_type_from_elements(elements, type, to_unit, links, all_units)
+	local links1 = type == "operator" and links.on_executed or type == "trigger" and links.executers or type == "filter" and links.executers
+	local links2 = type == "operator" and links.executers or type == "trigger" and links.on_executed or type == "filter" and links.on_executed
+	local to_unit_id = to_unit:unit_data().unit_id
+	for _, id in ipairs(self._hed.elements) do
+		if to_unit == self._unit then
+			table.insert(links1, {
+				unit = all_units[id],
+				alternative = type
+			})
+		elseif id == to_unit_id then
+			table.insert(links2, {
+				unit = self._unit,
+				alternative = type
+			})
+		end
+	end
 end

@@ -1281,38 +1281,22 @@ function TweakData:init()
 		lord_of_flies = {
 			stat = "gage3_3_stats",
 			in_head = true,
-			weapons = {
-				"m95",
-				"msr",
-				"r93"
-			}
+			weapon_type = "snp"
 		},
 		arachnes_curse = {
 			stat = "gage3_4_stats",
 			in_head = true,
-			weapons = {
-				"m95",
-				"msr",
-				"r93"
-			}
+			weapon_type = "snp"
 		},
 		pest_control = {
 			stat = "gage3_5_stats",
 			in_head = true,
-			weapons = {
-				"m95",
-				"msr",
-				"r93"
-			}
+			weapon_type = "snp"
 		},
 		seer_of_death = {
 			stat = "gage3_6_stats",
 			in_head = true,
-			weapons = {
-				"m95",
-				"msr",
-				"r93"
-			}
+			weapon_type = "snp"
 		},
 		far_far_away = {
 			stat = "gage3_7_stats",
@@ -1334,11 +1318,7 @@ function TweakData:init()
 		didnt_see_this_coming = {
 			stat = "gage3_13_stats",
 			on_zipline = true,
-			weapons = {
-				"m95",
-				"msr",
-				"r93"
-			}
+			weapon_type = "snp"
 		},
 		grand_master_sniper = {
 			stat = "gage3_14_stats",
@@ -1751,6 +1731,35 @@ function TweakData:init()
 			award = "bulldog_1",
 			jobs = {"hox", "hox_prof"}
 		},
+		complete_pines_normal = {
+			award = "deer_1",
+			difficulty = {"normal"},
+			jobs = {"pines", "pines_prof"}
+		},
+		complete_pines_hard = {
+			award = "deer_2",
+			difficulty = {"hard"},
+			jobs = {"pines", "pines_prof"}
+		},
+		complete_pines_veryhard = {
+			award = "deer_3",
+			difficulty = {"overkill"},
+			jobs = {"pines", "pines_prof"}
+		},
+		complete_pines_overkill = {
+			award = "deer_4",
+			difficulty = {
+				"overkill_145"
+			},
+			jobs = {"pines", "pines_prof"}
+		},
+		complete_pines_deathwish = {
+			award = "deer_5",
+			difficulty = {
+				"overkill_290"
+			},
+			jobs = {"pines", "pines_prof"}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -1949,6 +1958,19 @@ function TweakData:init()
 				"red_hurricane",
 				"patton",
 				"de_gaulle"
+			}
+		},
+		xmas_2014 = {
+			award = "deer_6",
+			jobs = {"pines", "pines_prof"},
+			difficulties = {
+				"overkill_290"
+			},
+			masks = {
+				"krampus",
+				"mrs_claus",
+				"strinch",
+				"robo_santa"
 			}
 		}
 	}
@@ -2468,6 +2490,10 @@ function TweakData:init()
 	self.grenades.launcher_frag.init_timer = 2.5
 	self.grenades.launcher_frag.mass_look_up_modifier = 1
 	self.grenades.launcher_frag.sound_event = "gl_explode"
+	self.voting = {}
+	self.voting.timeout = 30
+	self.voting.cooldown = 50
+	self.voting.restart_delay = 5
 	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()

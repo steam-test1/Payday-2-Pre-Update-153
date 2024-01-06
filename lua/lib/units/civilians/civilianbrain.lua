@@ -43,6 +43,8 @@ end
 function CivilianBrain:_reset_logic_data()
 	CopBrain._reset_logic_data(self)
 	self._logic_data.enemy_slotmask = nil
+	self._logic_data.objective_complete_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_civilian_objective_complete")
+	self._logic_data.objective_failed_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_civilian_objective_failed")
 end
 
 function CivilianBrain:is_available_for_assignment(objective)

@@ -34,7 +34,19 @@ function StaticLayer:clone_unit()
 	end
 end
 
-function StaticLayer:clone()
+function StaticLayer:move_to_continent(name)
+	local delete_units = self._selected_units
+	self:clone(name)
+	managers.editor:freeze_gui_lists()
+	for _, unit in ipairs(delete_units) do
+		print("delete_unit", unit)
+		self:delete_unit(unit)
+	end
+	managers.editor:set_continent(name)
+	managers.editor:thaw_gui_lists()
+end
+
+function StaticLayer:clone(to_continent)
 	managers.editor:freeze_gui_lists()
 	if self._selected_unit and not self:condition() then
 		local clone_units = self._selected_units
@@ -47,7 +59,7 @@ function StaticLayer:clone()
 			local rot = unit:rotation()
 			self._unit_name = unit:name():s()
 			local old_unit = unit
-			local new_unit = self:do_spawn_unit(self._unit_name, pos, rot)
+			local new_unit = self:do_spawn_unit(self._unit_name, pos, rot, to_continent)
 			self:remove_name_id(new_unit)
 			new_unit:unit_data().name_id = self:get_name_id(new_unit, old_unit:unit_data().name_id)
 			managers.editor:unit_name_changed(new_unit)
@@ -65,11 +77,9 @@ function StaticLayer:spawn_unit()
 	end
 end
 
-function StaticLayer:do_spawn_unit(name, pos, rot)
-	local unit = StaticLayer.super.do_spawn_unit(self, name, pos, rot)
+function StaticLayer:do_spawn_unit(...)
+	local unit = StaticLayer.super.do_spawn_unit(self, ...)
 	if unit then
-		table.insert(self._created_units, unit)
-		self._created_units_pairs[unit:unit_data().unit_id] = unit
 		self:set_bodies_keyframed(unit)
 	end
 	return unit
@@ -235,7 +245,7 @@ function StaticLayer:delete_selected_unit(btn, pressed)
 			if table.contains(self._created_units, unit) then
 				self:delete_unit(unit)
 			else
-				managers.editor:output_warning("" .. unit:unit_data().name_id .. " belongs to " .. managers.editor:unit_in_layer_name(unit) .. " and cannot be deleted from here.")
+				managers.editor:output_warning("" .. tostring(unit:unit_data().name_id) .. " belongs to " .. tostring(managers.editor:unit_in_layer_name(unit)) .. " and cannot be deleted from here.")
 			end
 		end
 	end
@@ -407,7 +417,7 @@ end
 function StaticLayer:build_panel(notebook, settings)
 	cat_print("editor", "StaticLayer:build_panel")
 	self._ews_panel = EWS:ScrolledWindow(notebook, "", "VSCROLL")
-	self._ews_panel:set_scroll_rate(Vector3(0, 1, 0))
+	self._ews_panel:set_scroll_rate(Vector3(0, 20, 0))
 	self._ews_panel:set_virtual_size_hints(Vector3(0, 0, 0), Vector3(1, -1, -1))
 	self._main_sizer = EWS:BoxSizer("VERTICAL")
 	self._ews_panel:set_sizer(self._main_sizer)

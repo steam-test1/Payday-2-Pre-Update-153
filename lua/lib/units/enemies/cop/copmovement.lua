@@ -76,6 +76,15 @@ CopMovement._gadgets = {
 	brush = {
 		Idstring("units/payday2/props/gen_prop_scrubbing_brush/gen_prop_scrubbing_brush")
 	},
+	puke = {
+		Idstring("units/pd2_dlc_pines/characters/gen_civ_acc_puking_effect/gen_civ_acc_puking_effect")
+	},
+	bottle = {
+		Idstring("units/payday2/props/com_prop_store_wines/com_prop_store_wines_red2")
+	},
+	rag = {
+		Idstring("units/payday2/characters/civ_acc_janitor_rag_1/civ_acc_janitor_rag_1")
+	},
 	clipboard_paper = {
 		Idstring("units/world/architecture/hospital/props/clipboard01/clipboard_paper")
 	}
@@ -129,6 +138,7 @@ action_variants.civilian = {
 }
 action_variants.civilian_female = action_variants.civilian
 action_variants.bank_manager = action_variants.civilian
+action_variants.drunk_pilot = action_variants.civilian
 action_variants.escort = action_variants.civilian
 action_variants.escort_suitcase = clone(action_variants.civilian)
 action_variants.escort_suitcase.walk = EscortWithSuitcaseActionWalk
@@ -246,7 +256,7 @@ function CopMovement:post_init()
 		self._unit:inventory():add_unit_by_name(sec_weap_name)
 	end
 	if self._unit:inventory():is_selection_available(2) then
-		if managers.groupai:state():enemy_weapons_hot() or not self._unit:inventory():is_selection_available(1) then
+		if managers.groupai:state():whisper_mode() or not self._unit:inventory():is_selection_available(1) then
 			self._unit:inventory():equip_selection(2, true)
 		else
 			self._unit:inventory():equip_selection(1, true)
@@ -254,7 +264,7 @@ function CopMovement:post_init()
 	elseif self._unit:inventory():is_selection_available(1) then
 		self._unit:inventory():equip_selection(1, true)
 	end
-	if self._ext_inventory:equipped_selection() == 2 then
+	if self._ext_inventory:equipped_selection() == 2 and managers.groupai:state():whisper_mode() then
 		self._ext_inventory:set_weapon_enabled(false)
 	end
 	local weap_name = self._ext_base:default_weapon_name(managers.groupai:state():enemy_weapons_hot() and "primary" or "secondary")
@@ -289,7 +299,7 @@ end
 
 function CopMovement:_post_init()
 	self:set_character_anim_variables()
-	if managers.groupai:state():enemy_weapons_hot() then
+	if not managers.groupai:state():whisper_mode() then
 		self:set_cool(false)
 	else
 		self:set_cool(true)

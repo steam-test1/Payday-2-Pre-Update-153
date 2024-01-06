@@ -73,7 +73,11 @@ function NodeGui:_setup_item_rows(node)
 				end
 			end
 			if params.help_id then
-				help_text = managers.localization:text(params.help_id)
+				if self.localize_strings and params.localize_help ~= false and params.localize_help ~= "false" then
+					help_text = managers.localization:text(params.help_id)
+				else
+					help_text = params.help_id
+				end
 			end
 			local row_item = {}
 			table.insert(self.row_items, row_item)
@@ -125,7 +129,11 @@ function NodeGui:_insert_row_item(item, node, i)
 			end
 		end
 		if params.help_id then
-			help_text = managers.localization:text(params.help_id)
+			if self.localize_strings and params.localize_help ~= false and params.localize_help ~= "false" then
+				help_text = managers.localization:text(params.help_id)
+			else
+				help_text = params.help_id
+			end
 		end
 		local row_item = {}
 		table.insert(self.row_items, i, row_item)

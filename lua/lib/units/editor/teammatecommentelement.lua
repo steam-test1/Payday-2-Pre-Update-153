@@ -6,6 +6,7 @@ function TeammateCommentUnitElement:init(unit)
 	self._hed.close_to_element = false
 	self._hed.use_instigator = false
 	self._hed.radius = 0
+	self._hed.test_robber = 1
 	table.insert(self._save_values, "comment")
 	table.insert(self._save_values, "close_to_element")
 	table.insert(self._save_values, "use_instigator")
@@ -37,7 +38,7 @@ function TeammateCommentUnitElement:test_element()
 		self._ss:set_position(self._unit:position())
 		self._ss:set_orientation(self._unit:rotation())
 		self._ss:set_switch("int_ext", "third")
-		for i = 1, 4 do
+		for i = self._hed.test_robber, 4 do
 			self._ss:set_switch("robber", "rb" .. tostring(i))
 			if self._ss:post_event(self._hed.comment) then
 				break
@@ -54,76 +55,16 @@ function TeammateCommentUnitElement:stop_test_element()
 	end
 end
 
-function TeammateCommentUnitElement:select_comment_btn()
-	local dialog = SelectNameModal:new("Select comment", managers.groupai:state().teammate_comment_names)
-	if dialog:cancelled() then
-		return
-	end
-	for _, comment in ipairs(dialog:_selected_item_assets()) do
-		self._hed.comment = comment
-		CoreEws.change_combobox_value(self._comment_params, self._hed.comment)
-	end
-end
-
 function TeammateCommentUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local comment_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(comment_sizer, 0, 1, "EXPAND,LEFT")
-	self._comment_params = {
-		name = "Comment:",
-		panel = panel,
-		sizer = comment_sizer,
-		options = managers.groupai:state().teammate_comment_names,
-		value = self._hed.comment,
-		default = "none",
-		tooltip = "Select a comment from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local comment = CoreEWS.combobox(self._comment_params)
-	comment:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = comment, value = "comment"})
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT", "Select comment", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_comment_btn"), nil)
-	toolbar:realize()
-	comment_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	local close_to_element = EWS:CheckBox(panel, "Play close to element", "")
-	close_to_element:set_value(self._hed.close_to_element)
-	close_to_element:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = close_to_element,
-		value = "close_to_element"
-	})
-	panel_sizer:add(close_to_element, 0, 0, "EXPAND")
-	local use_instigator = EWS:CheckBox(panel, "Play on instigator", "")
-	use_instigator:set_value(self._hed.use_instigator)
-	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_instigator,
-		value = "use_instigator"
-	})
-	panel_sizer:add(use_instigator, 0, 0, "EXPAND")
-	local radius_params = {
-		name = "Radius:",
-		value = self._hed.radius,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "(Optional) Sets a distance to use with the check (in cm)",
-		floats = 0,
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local radius = CoreEWS.number_controller(radius_params)
-	radius:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = radius, value = "radius"})
-	radius:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = radius, value = "radius"})
-	local help = {}
-	help.text = "If \"Play close to element\" is checked, the comment will be played on a teammate close to the element position, otherwise close to the player."
-	help.panel = panel
-	help.sizer = panel_sizer
-	self:add_help_text(help)
+	self:_build_value_combobox(panel, panel_sizer, "comment", table.list_add({"none"}, managers.groupai:state().teammate_comment_names), "Select a comment")
+	self:_build_value_checkbox(panel, panel_sizer, "close_to_element", "Play close to element", "Play close to element")
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator", "Play on instigator", "Play on instigator")
+	self:_build_value_number(panel, panel_sizer, "radius", {floats = 0, min = 0}, "(Optional) Sets a distance to use with the check (in cm)")
+	self:_build_value_number(panel, panel_sizer, "test_robber", {floats = 0, min = 0}, "Can be used to test different robber voice (not saved/loaded)")
+	self:_add_help_text("If \"Play close to element\" is checked, the comment will be played on a teammate close to the element position, otherwise close to the player.")
 end
 
 function TeammateCommentUnitElement:destroy()

@@ -202,7 +202,7 @@ function CoreEditor:build_menubar()
 	view_menu:append_item("SHOW_NEWS", "News...", "Show the news list")
 	Global.frame:connect("SHOW_NEWS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "show_news"), nil)
 	view_menu:append_separator()
-	view_menu:append_item("LIGHTING", "Deffered Lighting", "Change visualization to Deffered Lighting")
+	view_menu:append_item("LIGHTING", "Deferred Lighting", "Change visualization to Deferred Lighting")
 	view_menu:append_item("ALBEDO", "Albedo", "Change visualization to Albedo")
 	view_menu:append_item("NORMAL", "Normal", "Change visualization to Normal")
 	view_menu:append_item("SPECULAR", "Specular", "Change visualization to Specular")
@@ -809,7 +809,7 @@ function CoreEditor:toggle_show_markers(data)
 end
 
 function CoreEditor:on_using_the_editor()
-	EWS:launch_url("http://ganon/wiki_artistwiki/index.php/Using_Editor")
+	EWS:launch_url("http://serben01/wiki/index.php/Category:Level_Design")
 end
 
 function CoreEditor:on_help()

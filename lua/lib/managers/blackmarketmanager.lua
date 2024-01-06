@@ -3141,8 +3141,7 @@ function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
 		return mask_id
 	end
 	local character = self:get_preferred_character()
-	if managers.network and managers.network:session() and peer_id then
-		print("HERE", managers.network:session(), peer_id)
+	if managers.network and managers.network:session() and managers.network:session():peer(peer_id) then
 		character = managers.network:session():peer(peer_id):character()
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)

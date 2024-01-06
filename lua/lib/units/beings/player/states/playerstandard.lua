@@ -130,6 +130,8 @@ function PlayerStandard:_enter(enter_data)
 				self._camera_unit:anim_state_machine():set_global("glasses_equip", 1)
 			elseif equipped_mask_type == "helmet" then
 				self._camera_unit:anim_state_machine():set_global("helmet_equip", 1)
+			elseif equipped_mask_type == "beard" then
+				self._camera_unit:anim_state_machine():set_global("beard_equip", 1)
 			end
 			self:_start_action_equip(self.IDS_MASK_EQUIP, 1.6)
 		else
@@ -561,19 +563,6 @@ function PlayerStandard:_update_movement(t, dt)
 		self._ext_network:send("action_walk_nav_point", cur_pos)
 		mvector3.set(self._last_sent_pos, cur_pos)
 		self._last_sent_pos_t = t
-		if self._move_dir and self._running and not self._state_data.ducking and not managers.groupai:state():enemy_weapons_hot() then
-			local alert_epicenter = mvector3.copy(self._last_sent_pos)
-			mvector3.set_z(alert_epicenter, alert_epicenter.z + 150)
-			local alert_rad = 450 * mvector3.length(self._move_dir)
-			local footstep_alert = {
-				"footstep",
-				alert_epicenter,
-				alert_rad,
-				managers.groupai:state():get_unit_type_filter("civilians_enemies"),
-				self._unit
-			}
-			managers.groupai:state():propagate_alert(footstep_alert)
-		end
 	end
 end
 
@@ -1039,7 +1028,6 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self._ext_camera:play_redirect(self.IDS_UNEQUIP)
 	self._equipped_unit:base():tweak_data_anim_play("unequip")
 	managers.hud:show_interaction_bar(0, timer)
-	self._unit:base():set_detection_multiplier("interact", 0.5)
 	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, timer, false)
 end
 
@@ -1058,14 +1046,12 @@ function PlayerStandard:_interupt_action_interact(t, input, complete)
 		local result = self._ext_camera:play_redirect(self.IDS_EQUIP)
 		managers.hud:hide_interaction_bar(complete)
 		self._equipped_unit:base():tweak_data_anim_stop("unequip")
-		self._unit:base():set_detection_multiplier("interact", nil)
 	end
 end
 
 function PlayerStandard:_end_action_interact()
 	self:_interupt_action_interact(nil, nil, true)
 	managers.interaction:end_action_interact(self._unit)
-	self._unit:base():set_detection_multiplier("interact", nil)
 end
 
 function PlayerStandard:_interacting()
@@ -1721,9 +1707,9 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 					voice_type = "cuff_cop"
 				elseif prime_target.unit:anim_data().surrender then
 					voice_type = "down_cop"
-				elseif is_whisper_mode and prime_target.unit:movement():cool() and tweak_data.character[prime_target.unit:base()._tweak_table].silent_priority_shout then
+				elseif is_whisper_mode and prime_target.unit:movement():cool() and prime_target.unit:base():char_tweak().silent_priority_shout then
 					voice_type = "mark_cop_quiet"
-				elseif tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout then
+				elseif prime_target.unit:base():char_tweak().priority_shout then
 					voice_type = "mark_cop"
 				else
 					voice_type = "stop_cop"
@@ -1731,7 +1717,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 			elseif prime_target.unit_type == unit_type_camera then
 				plural = false
 				voice_type = "mark_camera"
-			elseif tweak_data.character[prime_target.unit:base()._tweak_table].is_escort then
+			elseif prime_target.unit:base():char_tweak().is_escort then
 				plural = false
 				local e_guy = prime_target.unit
 				if e_guy:anim_data().move then
@@ -1952,13 +1938,7 @@ function PlayerStandard:_start_action_intimidate(t)
 			sound_name = "e05x_" .. sound_suffix
 		elseif voice_type == "escort_go" then
 			interact_type = "cmd_point"
-			local e_guy = prime_target.unit
-			local stopped_t = 0
-			if t < stopped_t + 2 then
-				sound_name = "e02x_" .. sound_suffix
-			else
-				sound_name = "e03x_" .. sound_suffix
-			end
+			sound_name = "f40_any"
 		elseif voice_type == "bridge_codeword" then
 			sound_name = "bri_14"
 			interact_type = "cmd_point"
@@ -2216,7 +2196,7 @@ function PlayerStandard:_update_omniscience(t, dt)
 	if t >= self._state_data.omniscience_t then
 		local sensed_targets = World:find_units_quick("sphere", self._unit:movement():m_pos(), tweak_data.player.omniscience.sense_radius, managers.slot:get_mask("trip_mine_targets"))
 		for _, unit in ipairs(sensed_targets) do
-			if alive(unit) and not tweak_data.character[unit:base()._tweak_table].is_escort then
+			if alive(unit) and not unit:base():char_tweak().is_escort then
 				self._state_data.omniscience_units_detected = self._state_data.omniscience_units_detected or {}
 				if not self._state_data.omniscience_units_detected[unit:key()] or t >= self._state_data.omniscience_units_detected[unit:key()] then
 					self._state_data.omniscience_units_detected[unit:key()] = t + tweak_data.player.omniscience.target_resense_t

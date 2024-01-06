@@ -168,7 +168,7 @@ end
 
 function toolbar_toggle(data, event)
 	local c = data.class
-	local toolbar = c[data.toolbar]
+	local toolbar = _G.type_name(data.toolbar) == "string" and c[data.toolbar] or data.toolbar
 	c[data.value] = toolbar:tool_state(event:get_id())
 	if c[data.menu] then
 		c[data.menu]:set_checked(event:get_id(), c[data.value])

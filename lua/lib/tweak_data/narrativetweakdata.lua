@@ -1763,7 +1763,7 @@ function NarrativeTweakData:init()
 	self.jobs.haunted = {}
 	self.jobs.haunted.name_id = "heist_haunted"
 	self.jobs.haunted.briefing_id = "heist_haunted_crimenet"
-	self.jobs.haunted.contact = "bain"
+	self.jobs.haunted.contact = "wip"
 	self.jobs.haunted.region = "street"
 	self.jobs.haunted.jc = 10
 	self.jobs.haunted.chain = {
@@ -2073,6 +2073,77 @@ function NarrativeTweakData:init()
 		620000,
 		800000
 	}
+	self.jobs.pines = {}
+	self.jobs.pines.name_id = "heist_pines"
+	self.jobs.pines.briefing_id = "heist_pines_crimenet"
+	self.jobs.pines.contact = "vlad"
+	self.jobs.pines.region = "street"
+	self.jobs.pines.jc = 40
+	self.jobs.pines.chain = {
+		{
+			level_id = "pines",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.pines.briefing_event = "vld_cp1_cbf_01"
+	self.jobs.pines.debrief_event = nil
+	self.jobs.pines.crimenet_callouts = {
+		"vld_cp1_cnc_02",
+		"vld_cp1_cnc_01",
+		"vld_cp1_cnc_03"
+	}
+	self.jobs.pines.crimenet_videos = {
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
+	}
+	self.jobs.pines.payout = {
+		8000,
+		16000,
+		40000,
+		80000,
+		100000
+	}
+	self.jobs.pines.experience_mul = {
+		1,
+		1,
+		1,
+		1,
+		1
+	}
+	self.jobs.pines.contract_cost = {
+		24000,
+		48000,
+		120000,
+		240000,
+		300000
+	}
+	self.jobs.pines_prof = deep_clone(self.jobs.pines)
+	self.jobs.pines_prof.jc = 70
+	self.jobs.pines_prof.professional = true
+	self.jobs.pines_prof.region = "professional"
+	self.jobs.pines_prof.payout = {
+		290000,
+		580000,
+		1450000,
+		2900000,
+		3800000
+	}
+	self.jobs.pines_prof.experience_mul = {
+		2,
+		2,
+		2,
+		2,
+		2
+	}
+	self.jobs.pines_prof.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -2113,7 +2184,8 @@ function NarrativeTweakData:init()
 		"mia_prof",
 		"gallery",
 		"hox",
-		"hox_prof"
+		"hox_prof",
+		"pines"
 	}
 	self:set_job_wrappers()
 end

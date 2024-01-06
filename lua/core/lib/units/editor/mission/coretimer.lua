@@ -209,6 +209,11 @@ function CoreTimerOperatorUnitElement:draw_links(t, dt, selected_unit, all_units
 	end
 end
 
+function CoreTimerOperatorUnitElement:get_links_to_unit(...)
+	CoreTimerOperatorUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function CoreTimerOperatorUnitElement:update_editing()
 end
 
@@ -283,6 +288,11 @@ function CoreTimerTriggerUnitElement:draw_links(t, dt, selected_unit, all_units)
 			})
 		end
 	end
+end
+
+function CoreTimerTriggerUnitElement:get_links_to_unit(...)
+	CoreTimerTriggerUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "trigger", ...)
 end
 
 function CoreTimerTriggerUnitElement:update_editing()

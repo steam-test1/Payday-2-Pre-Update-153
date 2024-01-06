@@ -809,6 +809,7 @@ end
 
 function PlayerManager:body_armor_regen_multiplier(moving)
 	local multiplier = 1
+	multiplier = multiplier * self:upgrade_value("player", "armor_regen_timer_multiplier_tier", 1)
 	multiplier = multiplier * self:upgrade_value("player", "armor_regen_timer_multiplier", 1)
 	multiplier = multiplier * self:upgrade_value("player", "armor_regen_timer_multiplier_passive", 1)
 	multiplier = multiplier * self:team_upgrade_value("armor", "regen_time_multiplier", 1)
@@ -1745,10 +1746,7 @@ function PlayerManager:verify_equipment(peer_id, equipment_id)
 		self._asset_equipment = self._asset_equipment or {}
 		if not tweak_data.equipments.max_amount[id] or self._asset_equipment[id] and self._asset_equipment[id] + 1 > tweak_data.equipments.max_amount[id] then
 			local peer = managers.network:session():server_peer()
-			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
-				name = peer:name()
-			}))
-			peer:mark_cheater()
+			peer:mark_cheater(VoteManager.REASON.many_assets)
 			return false
 		end
 		self._asset_equipment[id] = (self._asset_equipment[id] or 0) + 1
@@ -1786,10 +1784,7 @@ function PlayerManager:verify_carry(peer_id, carry_id)
 		self._total_bags = self._total_bags and self._total_bags + 1 or 1
 		if amount_bags < self._total_bags then
 			local peer = managers.network:session():server_peer()
-			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_bags", {
-				name = peer:name()
-			}))
-			peer:mark_cheater()
+			peer:mark_cheater(VoteManager.REASON.many_bags)
 			return false
 		end
 	end

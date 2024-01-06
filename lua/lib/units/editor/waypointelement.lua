@@ -41,41 +41,23 @@ function WaypointUnitElement:_add_wp_options()
 	end
 end
 
-function WaypointUnitElement:set_text()
+function WaypointUnitElement:_set_text()
 	self._text:set_value(managers.localization:text(self._hed.text_id))
+end
+
+function WaypointUnitElement:set_element_data(params, ...)
+	WaypointUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "text_id" then
+		self:_set_text()
+	end
 end
 
 function WaypointUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local icon_params = {
-		name = "Icon:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = self._icon_options,
-		value = self._hed.icon,
-		tooltip = "Select an icon from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local icon = CoreEWS.combobox(icon_params)
-	icon:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = icon, value = "icon"})
-	local text_params = {
-		name = "Text id:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = self._text_options,
-		value = self._hed.text_id,
-		tooltip = "Select a text id from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local text = CoreEWS.combobox(text_params)
-	text:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = text, value = "text_id"})
-	text:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_text"), nil)
+	self:_build_value_combobox(panel, panel_sizer, "icon", self._icon_options, "Select an icon")
+	self:_build_value_combobox(panel, panel_sizer, "text_id", self._text_options, "Select a text id")
 	local text_sizer = EWS:BoxSizer("HORIZONTAL")
 	text_sizer:add(EWS:StaticText(panel, "Text: ", "", ""), 1, 2, "ALIGN_CENTER_VERTICAL,RIGHT,EXPAND")
 	self._text = EWS:StaticText(panel, managers.localization:text(self._hed.text_id), "", "")

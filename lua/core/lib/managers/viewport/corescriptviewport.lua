@@ -196,7 +196,15 @@ end
 
 function _ScriptViewport:set_visualization_mode(effect_name)
 	local scene = self._render_params[1]
-	self._vp:set_post_processor_effect(scene, Idstring("hdr_post_processor"), Idstring("empty")):set_visibility(effect_name == "deferred_lighting")
+	local hdr_effect_interface = self._vp:get_post_processor_effect(scene, Idstring("hdr_post_processor"))
+	local bloom_effect_interface = self._vp:get_post_processor_effect(scene, Idstring("bloom_combine_post_processor"))
+	local is_deferred = effect_name == "deferred_lighting"
+	if hdr_effect_interface then
+		hdr_effect_interface:set_visibility(is_deferred)
+	end
+	if bloom_effect_interface then
+		bloom_effect_interface:set_visibility(is_deferred)
+	end
 	self._vp:set_post_processor_effect(scene, Idstring("deferred"), Idstring(effect_name)):set_visibility(true)
 end
 

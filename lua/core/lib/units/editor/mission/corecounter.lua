@@ -214,6 +214,11 @@ function CoreCounterOperatorUnitElement:draw_links(t, dt, selected_unit, all_uni
 	end
 end
 
+function CoreCounterOperatorUnitElement:get_links_to_unit(...)
+	CoreCounterOperatorUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function CoreCounterOperatorUnitElement:update_editing()
 end
 
@@ -290,6 +295,11 @@ function CoreCounterTriggerUnitElement:draw_links(t, dt, selected_unit, all_unit
 			})
 		end
 	end
+end
+
+function CoreCounterTriggerUnitElement:get_links_to_unit(...)
+	CoreCounterTriggerUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "trigger", ...)
 end
 
 function CoreCounterTriggerUnitElement:update_editing()
@@ -371,6 +381,11 @@ function CoreCounterFilterUnitElement:draw_links(t, dt, selected_unit, all_units
 			})
 		end
 	end
+end
+
+function CoreCounterFilterUnitElement:get_links_to_unit(...)
+	CoreCounterFilterUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "filter", ...)
 end
 
 function CoreCounterFilterUnitElement:update_editing()

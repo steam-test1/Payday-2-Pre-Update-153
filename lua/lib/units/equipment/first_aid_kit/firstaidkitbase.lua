@@ -31,10 +31,7 @@ function FirstAidKitBase:_clbk_validate()
 	self._validate_clbk_id = nil
 	if not self._was_dropin then
 		local peer = managers.network:session():server_peer()
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_many_assets", {
-			name = peer:name()
-		}))
-		peer:mark_cheater()
+		peer:mark_cheater(VoteManager.REASON.many_assets)
 	end
 end
 

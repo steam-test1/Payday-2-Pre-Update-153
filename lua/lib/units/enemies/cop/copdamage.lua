@@ -198,7 +198,7 @@ function CopDamage:damage_bullet(attack_data)
 			local attacker_state = managers.player:current_state()
 			data.attacker_state = attacker_state
 			managers.statistics:killed(data)
-			if attack_data.attacker_unit:character_damage():bleed_out() and not self:_type_civilian(self._unit:base()._tweak_table) then
+			if attack_data.attacker_unit:character_damage():bleed_out() and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
 				local messiah_revive = false
 				if managers.player:has_category_upgrade("player", "pistol_revive_from_bleed_out") then
 					local weapon_category = data.weapon_unit:base():weapon_tweak_data().category
@@ -211,13 +211,13 @@ function CopDamage:damage_bullet(attack_data)
 				end
 			end
 			self:_check_damage_achievements(attack_data, head)
-			if not self:_type_civilian(self._unit:base()._tweak_table) and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") then
+			if not CopDamage.is_civilian(self._unit:base()._tweak_table) and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") then
 				local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
 				if weapon_category == "shotgun" or weapon_category == "saw" then
 					managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 				end
 			end
-			if self:_type_civilian(self._unit:base()._tweak_table) then
+			if CopDamage.is_civilian(self._unit:base()._tweak_table) then
 				managers.money:civilian_killed()
 			end
 		elseif attack_data.attacker_unit:in_slot(managers.slot:get_mask("criminals_no_deployables")) then
@@ -247,7 +247,7 @@ end
 
 function CopDamage:_check_damage_achievements(attack_data, head)
 	local attack_weapon = attack_data.weapon_unit
-	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not self:_type_civilian(self._unit:base()._tweak_table) then
+	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
 		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():weapon_tweak_data().category == "shotgun" then
 			managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
 		end
@@ -313,14 +313,6 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 	end
 end
 
-function CopDamage:_type_civilian(type)
-	return type == "civilian" or type == "civilian_female" or type == "bank_manager"
-end
-
-function CopDamage:_type_gangster(type)
-	return type == "gangster"
-end
-
 function CopDamage.is_civilian(type)
 	return type == "civilian" or type == "civilian_female" or type == "bank_manager"
 end
@@ -334,7 +326,7 @@ function CopDamage.is_cop(type)
 end
 
 function CopDamage:_show_death_hint(type)
-	if not self:_type_civilian(type) or not self._unit:base().enemy then
+	if not CopDamage.is_civilian(type) or not self._unit:base().enemy then
 	end
 end
 
@@ -440,7 +432,7 @@ function CopDamage:damage_explosion(attack_data)
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
-			if self:_type_civilian(self._unit:base()._tweak_table) then
+			if CopDamage.is_civilian(self._unit:base()._tweak_table) then
 				managers.money:civilian_killed()
 			end
 			self:_check_damage_achievements(attack_data, false)
@@ -494,7 +486,7 @@ function CopDamage:damage_melee(attack_data)
 		else
 			managers.hud:on_hit_confirmed()
 		end
-		if tweak_data.achievement.cavity.melee_type == attack_data.name_id and not self:_type_civilian(self._unit:base()._tweak_table) then
+		if tweak_data.achievement.cavity.melee_type == attack_data.name_id and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
 			managers.achievment:award(tweak_data.achievement.cavity.award)
 		end
 	end
@@ -547,8 +539,8 @@ function CopDamage:damage_melee(attack_data)
 			self:_comment_death(attack_data.attacker_unit, self._unit:base()._tweak_table)
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
-			local is_civlian = self:_type_civilian(self._unit:base()._tweak_table)
-			local is_gangster = self:_type_gangster(self._unit:base()._tweak_table)
+			local is_civlian = CopDamage.is_civilian(self._unit:base()._tweak_table)
+			local is_gangster = CopDamage.is_gangster(self._unit:base()._tweak_table)
 			local is_cop = not is_civlian and not is_gangster
 			if not is_civlian and managers.groupai:state():whisper_mode() and managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.cant_hear_you_scream.mask then
 				managers.achievment:award_progress(tweak_data.achievement.cant_hear_you_scream.stat)
@@ -923,7 +915,7 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
-			if self:_type_civilian(self._unit:base()._tweak_table) then
+			if CopDamage.is_civilian(self._unit:base()._tweak_table) then
 				managers.money:civilian_killed()
 			end
 		end

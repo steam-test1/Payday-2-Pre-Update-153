@@ -79,7 +79,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"jewelry_store",
 		"four_stores",
 		"nightclub",
-		"branchbank",
 		"arm_fac",
 		"arm_par",
 		"arm_hcm",
@@ -103,7 +102,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
-		"framing_frame_3",
 		"election_day_1",
 		"election_day_2",
 		"firestarter_2",
@@ -112,11 +110,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"jewelry_store",
 		"four_stores",
 		"nightclub",
-		"branchbank",
 		"arm_for",
 		"family",
-		"roberts",
-		"kosugi"
+		"roberts"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -133,9 +129,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.spotter.stages = {
 		"election_day_1",
 		"election_day_2",
-		"framing_frame_3",
-		"firestarter_2",
-		"kosugi"
+		"firestarter_2"
 	}
 	self.spotter.visible_if_locked = true
 	self.spotter.unlock_desc_id = "menu_asset_spotter_desc"
@@ -158,10 +152,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"welcome_to_the_jungle_1_night",
 		"welcome_to_the_jungle_2",
 		"alex_1",
+		"ratatouille",
 		"firestarter_1",
 		"firestarter_2",
 		"firestarter_3",
-		"branchbank",
 		"arm_for",
 		"roberts",
 		"election_day_1",
@@ -256,7 +250,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_rats1 = {}
 	self.sniper_spot_rats1.name_id = "menu_asset_sniper_spot"
 	self.sniper_spot_rats1.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/sniper_spot_rats1"
-	self.sniper_spot_rats1.stages = {"alex_1"}
+	self.sniper_spot_rats1.stages = {
+		"alex_1",
+		"ratatouille"
+	}
 	self.sniper_spot_rats1.visible_if_locked = true
 	self.sniper_spot_rats1.unlock_desc_id = "menu_asset_sniper_spot_desc"
 	self.sniper_spot_rats1.no_mystery = true
@@ -277,8 +274,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_firestarter3.name_id = "menu_asset_sniper_spot"
 	self.sniper_spot_firestarter3.texture = "guis/textures/pd2/mission_briefing/assets/bank/sniper_spot_harvest"
 	self.sniper_spot_firestarter3.stages = {
-		"firestarter_3",
-		"branchbank"
+		"firestarter_3"
 	}
 	self.sniper_spot_firestarter3.visible_if_locked = true
 	self.sniper_spot_firestarter3.unlock_desc_id = "menu_asset_sniper_spot_desc"
@@ -298,18 +294,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_firestarter1.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
 	self.sniper_spot_firestarter1.dlc_lock = "gage_pack_snp"
 	self.sniper_spot_firestarter1.server_lock = true
-	self.sniper_spot_framing3 = {}
-	self.sniper_spot_framing3.name_id = "menu_asset_sniper_spot"
-	self.sniper_spot_framing3.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day3/sniper_spot_framing3"
-	self.sniper_spot_framing3.stages = {
-		"framing_frame_3"
-	}
-	self.sniper_spot_framing3.visible_if_locked = true
-	self.sniper_spot_framing3.unlock_desc_id = "menu_asset_sniper_spot_desc"
-	self.sniper_spot_framing3.no_mystery = true
-	self.sniper_spot_framing3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.sniper_spot_framing3.dlc_lock = "gage_pack_snp"
-	self.sniper_spot_framing3.server_lock = true
 	self.ukrainian_job_tiara = {}
 	self.ukrainian_job_tiara.name_id = "menu_asset_test_jewelry_store_tiara"
 	self.ukrainian_job_tiara.texture = "guis/textures/pd2/mission_briefing/assets/ukranian_job/asset01"
@@ -535,36 +519,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.framing_frame_2_sniper.unlock_desc_id = "menu_asset_sniper_desc"
 	self.framing_frame_2_sniper.no_mystery = true
 	self.framing_frame_2_sniper.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 6)
-	self.framing_frame_3_ammo = {}
-	self.framing_frame_3_ammo.name_id = "menu_asset_ammo"
-	self.framing_frame_3_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
-	self.framing_frame_3_ammo.stages = {
-		"framing_frame_3"
-	}
-	self.framing_frame_3_ammo.visible_if_locked = true
-	self.framing_frame_3_ammo.unlock_desc_id = "menu_asset_ammo_desc"
-	self.framing_frame_3_ammo.no_mystery = true
-	self.framing_frame_3_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.framing_frame_3_health = {}
-	self.framing_frame_3_health.name_id = "menu_asset_health"
-	self.framing_frame_3_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
-	self.framing_frame_3_health.stages = {
-		"framing_frame_3"
-	}
-	self.framing_frame_3_health.visible_if_locked = true
-	self.framing_frame_3_health.unlock_desc_id = "menu_asset_health_desc"
-	self.framing_frame_3_health.no_mystery = true
-	self.framing_frame_3_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.framing_frame_3_vent = {}
-	self.framing_frame_3_vent.name_id = "menu_asset_framing3_vent"
-	self.framing_frame_3_vent.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day3/asset01"
-	self.framing_frame_3_vent.stages = {
-		"framing_frame_3"
-	}
-	self.framing_frame_3_vent.visible_if_locked = true
-	self.framing_frame_3_vent.unlock_desc_id = "menu_asset_framing3_vent_desc"
-	self.framing_frame_3_vent.no_mystery = true
-	self.framing_frame_3_vent.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
 	self.election_day_1_keycard = {}
 	self.election_day_1_keycard.name_id = "menu_asset_election1_keycard"
 	self.election_day_1_keycard.texture = "guis/textures/pd2/mission_briefing/assets/election_day/day1/assets_election_day_1_keycard"
@@ -635,50 +589,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.jungle_2_ammo.unlock_desc_id = "menu_asset_jungle_2_ammo_desc"
 	self.jungle_2_ammo.no_mystery = true
 	self.jungle_2_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.branchbank_ammo = {}
-	self.branchbank_ammo.name_id = "menu_asset_branchbank_ammo"
-	self.branchbank_ammo.texture = "guis/textures/pd2/mission_briefing/assets/bank/assets_bank_ammo"
-	self.branchbank_ammo.stages = {"branchbank"}
-	self.branchbank_ammo.visible_if_locked = true
-	self.branchbank_ammo.unlock_desc_id = "menu_asset_branchbank_ammo_desc"
-	self.branchbank_ammo.no_mystery = true
-	self.branchbank_ammo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.branchbank_health = {}
-	self.branchbank_health.name_id = "menu_asset_health"
-	self.branchbank_health.texture = "guis/textures/pd2/mission_briefing/assets/bank/assets_bank_medicbag"
-	self.branchbank_health.stages = {"branchbank"}
-	self.branchbank_health.visible_if_locked = true
-	self.branchbank_health.unlock_desc_id = "menu_asset_health_desc"
-	self.branchbank_health.no_mystery = true
-	self.branchbank_health.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 3)
-	self.branchbank_cam = {}
-	self.branchbank_cam.name_id = "menu_asset_cam"
-	self.branchbank_cam.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day2/asset03"
-	self.branchbank_cam.stages = {"branchbank"}
-	self.branchbank_cam.visible_if_locked = true
-	self.branchbank_cam.unlock_desc_id = "menu_asset_cam_desc"
-	self.branchbank_cam.no_mystery = true
-	self.branchbank_cam.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 6)
-	self.branchbank_insiderinfo = {}
-	self.branchbank_insiderinfo.name_id = "menu_asset_branchbank_insiderinfo"
-	self.branchbank_insiderinfo.texture = "guis/textures/pd2/mission_briefing/assets/bank/assets_bank_insiderinfo"
-	self.branchbank_insiderinfo.stages = {"branchbank"}
-	self.branchbank_insiderinfo.visible_if_locked = true
-	self.branchbank_insiderinfo.unlock_desc_id = "menu_asset_branchbank_insiderinfo_desc"
-	self.branchbank_insiderinfo.no_mystery = true
-	self.branchbank_insiderinfo.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
-	self.branchbank_map_basic = {}
-	self.branchbank_map_basic.name_id = "menu_asset_branchbank_blueprint"
-	self.branchbank_map_basic.texture = "guis/textures/pd2/mission_briefing/assets/bank/assets_bank_blueprint"
-	self.branchbank_map_basic.stages = {"branchbank"}
-	self.branchbank_map_basic.visible_if_locked = true
-	self.branchbank_map_basic.unlock_desc_id = "menu_asset_branchbank_blueprint_unlock_desc"
-	self.branchbank_map_basic.no_mystery = true
 	self.rat_1_ammo = {}
 	self.rat_1_ammo.name_id = "menu_asset_ammo"
 	self.rat_1_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
 	self.rat_1_ammo.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset01"
-	self.rat_1_ammo.stages = {"alex_1"}
+	self.rat_1_ammo.stages = {
+		"alex_1",
+		"ratatouille"
+	}
 	self.rat_1_ammo.visible_if_locked = true
 	self.rat_1_ammo.unlock_desc_id = "menu_asset_ammo_desc"
 	self.rat_1_ammo.no_mystery = true
@@ -686,7 +604,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.rat_1_health = {}
 	self.rat_1_health.name_id = "menu_asset_health"
 	self.rat_1_health.texture = "guis/textures/pd2/mission_briefing/assets/watch_dogs/day1/asset02"
-	self.rat_1_health.stages = {"alex_1"}
+	self.rat_1_health.stages = {
+		"alex_1",
+		"ratatouille"
+	}
 	self.rat_1_health.visible_if_locked = true
 	self.rat_1_health.unlock_desc_id = "menu_asset_health_desc"
 	self.rat_1_health.no_mystery = true
@@ -694,7 +615,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.rat_1_lights = {}
 	self.rat_1_lights.name_id = "menu_asset_lights"
 	self.rat_1_lights.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/asset01"
-	self.rat_1_lights.stages = {"alex_1"}
+	self.rat_1_lights.stages = {
+		"alex_1",
+		"ratatouille"
+	}
 	self.rat_1_lights.visible_if_locked = true
 	self.rat_1_lights.unlock_desc_id = "menu_asset_lights_desc"
 	self.rat_1_lights.no_mystery = true
@@ -895,30 +819,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.hox_2.stages = {"hox_2"}
 	self.hox_2.visible_if_locked = true
 	self.hox_2.no_mystery = true
-	self.kosugi_speedboat = {}
-	self.kosugi_speedboat.name_id = "menu_asset_kosugi_speedboat"
-	self.kosugi_speedboat.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_lootdrop"
-	self.kosugi_speedboat.stages = {"kosugi"}
-	self.kosugi_speedboat.visible_if_locked = true
-	self.kosugi_speedboat.unlock_desc_id = "menu_asset_kosugi_speedboat_desc"
-	self.kosugi_speedboat.no_mystery = true
-	self.kosugi_speedboat.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.kosugi_zipline = {}
-	self.kosugi_zipline.name_id = "menu_asset_kosugi_zipline"
-	self.kosugi_zipline.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_zipline"
-	self.kosugi_zipline.stages = {"kosugi"}
-	self.kosugi_zipline.visible_if_locked = true
-	self.kosugi_zipline.unlock_desc_id = "menu_asset_kosugi_zipline_desc"
-	self.kosugi_zipline.no_mystery = true
-	self.kosugi_zipline.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.kosugi_thermite = {}
-	self.kosugi_thermite.name_id = "menu_asset_kosugi_thermite"
-	self.kosugi_thermite.texture = "guis/textures/pd2/mission_briefing/assets/kosugi/assets_thermite"
-	self.kosugi_thermite.stages = {"kosugi"}
-	self.kosugi_thermite.visible_if_locked = true
-	self.kosugi_thermite.unlock_desc_id = "menu_asset_kosugi_thermite_desc"
-	self.kosugi_thermite.no_mystery = true
-	self.kosugi_thermite.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

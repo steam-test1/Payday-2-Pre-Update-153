@@ -120,14 +120,22 @@ function ActionSpooc:init(action_desc, common_data)
 	else
 		self:_wait()
 	end
-	self._unit:sound():play("cloaker_detect_mono", nil, nil)
+	if Global.level_data.level_id == "pines" then
+		self._unit:sound():play("cloaker_detect_christmas_mono", nil, nil)
+	else
+		self._unit:sound():play("cloaker_detect_mono", nil, nil)
+	end
 	self._unit:damage():run_sequence_simple("turn_on_spook_lights")
 	return true
 end
 
 function ActionSpooc:on_exit()
 	if self._unit:character_damage():dead() then
-		self._unit:sound():play("cloaker_detect_stop", nil, nil)
+		if Global.level_data.level_id == "pines" then
+			self._unit:sound():play("cloaker_detect_christmas_stop", nil, nil)
+		else
+			self._unit:sound():play("cloaker_detect_stop", nil, nil)
+		end
 	else
 		self._unit:sound():play("cloaker_presence_loop", nil, nil)
 		if self._is_local and self._taunt_at_beating_played and not self._unit:sound():speaking(TimerManager:game():time()) then
@@ -825,7 +833,11 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			return
 		end
 		self._stroke_t = TimerManager:game():time()
-		self._unit:sound():play("cloaker_detect_stop", nil, nil)
+		if Global.level_data.level_id == "pines" then
+			self._unit:sound():play("cloaker_detect_christmas_stop", nil, nil)
+		else
+			self._unit:sound():play("cloaker_detect_stop", nil, nil)
+		end
 		if not self._is_local then
 			self._unit:sound():say("punch_3rd_person_3p", true)
 			self._beating_end_t = self._stroke_t + 1

@@ -8,9 +8,13 @@ function HuskCopBase:post_init()
 	self:set_anim_lod(1)
 	self._lod_stage = 1
 	managers.enemy:register_enemy(self._unit)
+	self:_chk_spawn_gear()
 end
 
 function HuskCopBase:pre_destroy(unit)
+	if alive(self._headwear_unit) then
+		self._headwear_unit:set_slot(0)
+	end
 	self._unit:brain():pre_destroy()
 	self._ext_movement:pre_destroy()
 	if unit:inventory() then

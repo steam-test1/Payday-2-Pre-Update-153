@@ -602,7 +602,7 @@ function ConnectionNetworkHandler:preplanning_reserved(type, id, peer_id, state,
 	if state == 0 then
 		managers.preplanning:client_reserve_mission_element(type, id, peer_id)
 	elseif state == 1 then
-		managers.preplanning:client_unreserve_mission_element(id)
+		managers.preplanning:client_unreserve_mission_element(id, peer_id)
 	elseif state == 2 then
 		managers.preplanning:client_vote_on_plan(type, id, peer_id)
 	end
@@ -636,4 +636,12 @@ function ConnectionNetworkHandler:draw_preplanning_event(event_id, var1, var2, s
 		return
 	end
 	managers.menu_component:sync_preplanning_draw_event(peer:id(), event_id, var1, var2)
+end
+
+function ConnectionNetworkHandler:voting_data(type, value, result, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.vote:network_package(type, value, result, peer:id())
 end

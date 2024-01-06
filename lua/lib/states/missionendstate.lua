@@ -38,6 +38,9 @@ function MissionEndState:at_enter(old_state, params)
 				if not tweak_data.carry[data.carry_id].skip_exit_secure then
 					managers.loot:secure(data.carry_id, data.multiplier)
 				end
+				if data.carry_id == "sandwich" then
+					managers.mission:call_global_event("equipment_sandwich")
+				end
 			end
 		end
 	end
@@ -292,7 +295,6 @@ function MissionEndState:at_enter(old_state, params)
 		end
 	end
 	managers.music:post_event(self._success and managers.music:jukebox_menu_track("heistresult") or managers.music:jukebox_menu_track("heistlost"))
-	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
 	local ghost_bonus = 0
 	if self._type == "victory" or self._type == "gameover" then
 		local total_xp_bonus, bonuses = self:_get_xp_dissected(self._success, params and params.num_winners, params and params.personal_win)

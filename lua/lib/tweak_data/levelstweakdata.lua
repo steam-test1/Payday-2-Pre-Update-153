@@ -751,6 +751,17 @@ function LevelsTweakData:init()
 	self.hox_2.package = "packages/narr_hox_2"
 	self.hox_2.cube = "cube_apply_heist_bank"
 	self.hox_2.block_AIs = {old_hoxton = true}
+	self.pines = {}
+	self.pines.name_id = "heist_pines_hl"
+	self.pines.briefing_id = "heist_pines_briefing"
+	self.pines.briefing_dialog = "Play_pln_cp1_brf_01"
+	self.pines.world_name = "narratives/vlad/pines"
+	self.pines.intro_event = "Play_pln_cp1_intro_01"
+	self.pines.outro_event = "Play_vld_cp1_end"
+	self.pines.music = "heist"
+	self.pines.package = "packages/narr_pines"
+	self.pines.cube = "cube_apply_heist_bank"
+	self.pines.max_bags = 120
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -803,7 +814,8 @@ function LevelsTweakData:init()
 		"kosugi",
 		"gallery",
 		"hox_1",
-		"hox_2"
+		"hox_2",
+		"pines"
 	}
 	self.escape_levels = {
 		"escape_cafe",

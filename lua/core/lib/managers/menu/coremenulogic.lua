@@ -108,7 +108,7 @@ end
 
 function Logic:_refresh_node(node_name, ...)
 	local node = self:selected_node()
-	if node:parameters().refresh then
+	if node and node:parameters().refresh then
 		for _, refresh_func in ipairs(node:parameters().refresh) do
 			node = refresh_func(node, ...)
 		end

@@ -511,6 +511,22 @@ function GamePlayCentralManager:sync_heist_time(heist_time)
 	self._heist_timer.start_time = Application:time()
 end
 
+function GamePlayCentralManager:restart_the_game()
+	managers.job:on_retry_job_stage()
+	managers.loot:on_retry_job_stage()
+	managers.mission:on_retry_job_stage()
+	MenuCallbackHandler:start_the_game()
+end
+
+function GamePlayCentralManager:stop_the_game()
+	managers.statistics:stop_session()
+	managers.savefile:save_progress()
+	managers.groupai:state():set_AI_enabled(false)
+	if Network:multiplayer() and managers.network:game() and Global.local_member then
+		Global.local_member:delete()
+	end
+end
+
 function GamePlayCentralManager:queue_fire_raycast(expire_t, weapon_unit, ...)
 	self._queue_fire_raycast = self._queue_fire_raycast or {}
 	local data = {

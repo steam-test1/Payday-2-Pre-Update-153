@@ -97,7 +97,7 @@ end
 UnitList = UnitList or class()
 
 function UnitList:init()
-	self._dialog = EWS:Dialog(nil, "Unit debug list", "", Vector3(100, 100, 0), Vector3(850, 600, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP")
+	self._dialog = EWS:Dialog(nil, "Unit debug list", "", Vector3(100, 100, 0), Vector3(850, 600, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER")
 	local dialog_sizer = EWS:BoxSizer("HORIZONTAL")
 	self._dialog:set_sizer(dialog_sizer)
 	local panel = EWS:Panel(self._dialog, "", "")
@@ -182,7 +182,10 @@ function UnitList:init()
 	local stats_sizer = EWS:BoxSizer("VERTICAL")
 	local update_btn = EWS:Button(panel, "Update", "", "BU_BOTTOM")
 	stats_sizer:add(update_btn, 0, 5, "EXPAND,LEFT,TOP")
-	update_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "fill_unit_list"), "")
+	update_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "fill_unit_list"), "all")
+	local update_btn = EWS:Button(panel, "Update Limited", "", "BU_BOTTOM")
+	stats_sizer:add(update_btn, 0, 5, "EXPAND,LEFT,TOP")
+	update_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "fill_unit_list"), "limited")
 	local total_units_sizer = EWS:BoxSizer("HORIZONTAL")
 	total_units_sizer:add(EWS:StaticText(panel, "Total units:", "", ""), 1, 0, "ALIGN_CENTER_VERTICAL")
 	self._total_units = EWS:StaticText(panel, "0", "", "")
@@ -209,7 +212,7 @@ function UnitList:init()
 	cancel_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_cancel"), "")
 	panel_sizer:add(button_sizer, 0, 0, "ALIGN_RIGHT")
 	dialog_sizer:add(panel, 1, 0, "EXPAND")
-	self:fill_unit_list()
+	self:fill_unit_list("all")
 	self._dialog:set_visible(true)
 end
 
@@ -337,11 +340,12 @@ function UnitList:on_select_unit_list_unit()
 end
 
 function UnitList:reset()
-	self:fill_unit_list()
+	self:fill_unit_list("all")
 	self._unit_list:delete_all_items()
 end
 
 function UnitList:deleted_unit(unit)
+	self:freeze()
 	local index = self._list:selected_item()
 	for i = 0, self._list:item_count() - 1 do
 		if self._list:get_item(i, 0) == unit:name():s() then
@@ -353,12 +357,15 @@ function UnitList:deleted_unit(unit)
 			if index ~= -1 and index == i then
 				self:on_select_unit_list(unit)
 			end
+			self:thaw()
 			return
 		end
 	end
+	self:thaw()
 end
 
 function UnitList:spawned_unit(unit)
+	self:freeze()
 	local index = self._list:selected_item()
 	for i = 0, self._list:item_count() - 1 do
 		if self._list:get_item(i, 0) == unit:name():s() then
@@ -367,6 +374,7 @@ function UnitList:spawned_unit(unit)
 			if index ~= -1 and index == i then
 				self:on_select_unit_list()
 			end
+			self:thaw()
 			return
 		end
 	end
@@ -374,6 +382,7 @@ function UnitList:spawned_unit(unit)
 	stats.amount = 1
 	self:append_item(unit:name():s(), stats)
 	self:_autosize_columns()
+	self:thaw()
 end
 
 function UnitList:selected_unit(unit)
@@ -411,10 +420,16 @@ function UnitList:unit_name_changed(unit)
 	end
 end
 
-function UnitList:fill_unit_list()
+function UnitList:fill_unit_list(type)
+	self:freeze()
 	local list = self._list
 	list:delete_all_items()
-	local data, total = managers.editor:get_unit_stats()
+	local data, total
+	if type == "limited" then
+		data, total = managers.editor:get_unit_stats_from_layers()
+	else
+		data, total = managers.editor:get_unit_stats()
+	end
 	local unique = 0
 	for name, t in pairs(data) do
 		unique = unique + 1
@@ -425,6 +440,7 @@ function UnitList:fill_unit_list()
 	self._total_geometry:set_value(total.geometry_memory)
 	self._panel:layout()
 	self:_autosize_columns()
+	self:thaw()
 end
 
 function UnitList:_autosize_columns()
@@ -1082,6 +1098,7 @@ function LayerReplaceUnit:on_only_list_used_units(data)
 end
 
 function LayerReplaceUnit:update_list(current)
+	self._units:freeze()
 	local filter = self._filter:get_value()
 	self._units:clear()
 	if self._only_list_used_units then
@@ -1098,6 +1115,7 @@ function LayerReplaceUnit:update_list(current)
 			end
 		end
 	end
+	self._units:thaw()
 end
 
 function LayerReplaceUnit:set_visible(visible)
@@ -1792,4 +1810,141 @@ end
 
 function UnitDuality:on_check_again()
 	managers.editor:on_check_duality()
+end
+
+BrushLayerDebug = BrushLayerDebug or class(CoreEditorEwsDialog)
+
+function BrushLayerDebug:init(...)
+	CoreEditorEwsDialog.init(self, nil, "Brush layer debug", "", Vector3(300, 150, 0), Vector3(600, 400, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER", ...)
+	self:create_panel("VERTICAL")
+	self._column_states = {}
+	table.insert(self._column_states, {value = "name", state = "ascending"})
+	table.insert(self._column_states, {value = "amount", state = "random"})
+	local toolbar_sizer = EWS:BoxSizer("VERTICAL")
+	self._panel_sizer:add(toolbar_sizer, 0, 0, "EXPAND")
+	local toolbar = EWS:ToolBar(self._panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("DELETE", "Delete", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("DELETE", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_delete"), nil)
+	toolbar:add_tool("HELP", "Help", CoreEws.image_path("help_16x16.png"), nil)
+	toolbar:connect("HELP", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_help"), nil)
+	toolbar:realize()
+	toolbar_sizer:add(toolbar, 0, 0, "EXPAND,LEFT")
+	local selected_sizer = EWS:BoxSizer("VERTICAL")
+	self._panel_sizer:add(selected_sizer, 1, 0, "EXPAND")
+	self._unit_list = EWS:ListCtrl(self._panel, "", "LC_REPORT,LC_SORT_ASCENDING,NO_BORDER")
+	self._unit_list:clear_all()
+	self._unit_list:append_column("Name")
+	self._unit_list:append_column("Amount")
+	selected_sizer:add(self._unit_list, 1, 0, "EXPAND")
+	self._unit_list:connect("EVT_COMMAND_LIST_ITEM_RIGHT_CLICK", callback(self, self, "_right_clicked"), self._unit_list)
+	self._unit_list:connect("EVT_COMMAND_LIST_ITEM_ACTIVATED", callback(self, self, "_on_select_unit"), nil)
+	self._unit_list:connect("EVT_COMMAND_LIST_COL_CLICK", callback(self, self, "column_click_list"), nil)
+	self._unit_list:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
+	local button_sizer = EWS:BoxSizer("HORIZONTAL")
+	local close_btn = EWS:Button(self._panel, "Close", "", "")
+	button_sizer:add(close_btn, 0, 2, "RIGHT,LEFT")
+	close_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_cancel"), "")
+	close_btn:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
+	self._panel_sizer:add(button_sizer, 0, 0, "ALIGN_RIGHT")
+	self._dialog_sizer:add(self._panel, 1, 0, "EXPAND")
+	self._dialog:set_visible(true)
+	self:fill_unit_list()
+end
+
+function BrushLayerDebug:_toolbar_toggle(params, event)
+	self[params.value] = params.toolbar:tool_state(event:get_id())
+end
+
+function BrushLayerDebug:_on_gui_delete()
+	local current_data = self:_current_data()
+	print(inspect(current_data))
+	print(current_data and current_data.name)
+	if current_data then
+		managers.editor:layer("Brush"):clear_units_by_name(current_data.name)
+	end
+end
+
+function BrushLayerDebug:_on_gui_help()
+	local text = "Since brush units are not always visible, this dialog shows actual amount of units in the level."
+	text = text .. [[
+
+
+Sorting can be done by clicking the column namnes.]]
+	text = text .. [[
+
+
+Delete all units with a certain name by clicking the delete icon on toolbar.]]
+	EWS:message_box(self._panel, text, "Help", "OK", Vector3())
+end
+
+function BrushLayerDebug:fill_unit_list()
+	self:freeze()
+	self._unit_list:delete_all_items()
+	local brush_stats = managers.editor:layer("Brush"):get_brush_stats()
+	for _, stats in ipairs(brush_stats) do
+		local i = self._unit_list:append_item(stats.unit_name:s())
+		self._unit_list:set_item(i, 1, "" .. stats.amount)
+		self._unit_list:set_item_data(i, {
+			name = stats.unit_name:s(),
+			amount = stats.amount
+		})
+	end
+	self:_autosize_columns(self._unit_list)
+	self:thaw()
+end
+
+function BrushLayerDebug:_autosize_columns(list)
+	for i = 0, list:column_count() - 1 do
+		list:autosize_column(i)
+	end
+end
+
+function BrushLayerDebug:key_cancel(ctrlr, event)
+	event:skip()
+	if EWS:name_to_key_code("K_ESCAPE") == event:key_code() then
+		self:on_cancel()
+	end
+end
+
+function BrushLayerDebug:_on_select_unit()
+	local current_data = self:_current_data()
+	if current_data and current_data.unit and self._use_look_at then
+		managers.editor:look_towards_unit(current_data.unit)
+	end
+end
+
+function BrushLayerDebug:column_click_list(...)
+	self._list = self._unit_list
+	UnitList.column_click_list(self, ...)
+end
+
+function BrushLayerDebug:_right_clicked(list)
+	local item_data = self:_selected_list_data(list)
+end
+
+function BrushLayerDebug:_current_data()
+	local index = self._unit_list:selected_item()
+	if index == -1 then
+		return
+	end
+	return self._unit_list:get_item_data_ref(index)
+end
+
+function BrushLayerDebug:_selected_list_data(list)
+	local index = list:selected_item()
+	if index == -1 then
+		return
+	end
+	return list:get_item_data_ref(index)
+end
+
+function BrushLayerDebug:reset()
+end
+
+function BrushLayerDebug:freeze()
+	self._unit_list:freeze()
+end
+
+function BrushLayerDebug:thaw()
+	self._unit_list:thaw()
 end

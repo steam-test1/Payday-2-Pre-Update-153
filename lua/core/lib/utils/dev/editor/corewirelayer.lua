@@ -65,7 +65,6 @@ function WireLayer:spawn_unit()
 		local unit = self:do_spawn_unit(self._unit_name, self._current_pos, self._current_rot)
 		if self._selected_unit then
 			self._creating_wire = true
-			table.insert(self._created_units, self._selected_unit)
 			self._selected_unit:orientation_object():set_position(self._current_pos)
 			self._selected_unit:get_object(self._target_name):set_position(self._current_pos)
 			self._selected_point = nil

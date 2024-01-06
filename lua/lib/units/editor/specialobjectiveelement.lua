@@ -336,7 +336,7 @@ function SpecialObjectiveUnitElement:selected()
 	if not managers.ai_data:patrol_path(self._hed.patrol_path) then
 		self._hed.patrol_path = "none"
 	end
-	CoreEws.update_combobox_options(self._patrol_path_params, managers.ai_data:patrol_path_names())
+	CoreEws.update_combobox_options(self._patrol_path_params, table.list_add({"none"}, managers.ai_data:patrol_path_names()))
 	CoreEws.change_combobox_value(self._patrol_path_params, self._hed.patrol_path)
 end
 
@@ -384,17 +384,6 @@ function SpecialObjectiveUnitElement:_toggle_nav_link_filter_value(params)
 	self._hed.SO_access = managers.navigation:convert_access_filter_to_string(self._nav_link_filter)
 end
 
-function SpecialObjectiveUnitElement:select_action_btn()
-	local dialog = SelectNameModal:new("Select action", CopActionAct._act_redirects.SO)
-	if dialog:cancelled() then
-		return
-	end
-	for _, action in ipairs(dialog:_selected_item_assets()) do
-		self._hed.so_action = action
-		CoreEws.change_combobox_value(self._so_action_params, self._hed.so_action)
-	end
-end
-
 function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
@@ -436,368 +425,44 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	filter_sizer:add(opt3_sizer, 1, 0, "EXPAND")
 	opt_sizer:add(filter_sizer, 1, 0, "EXPAND")
 	panel_sizer:add(opt_sizer, 0, 0, "EXPAND")
-	local ai_group_params = {
-		name = "AI group:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._AI_GROUPS),
-		value = self._hed.ai_group,
-		default = "none",
-		tooltip = "Select an ai group.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local ai_group = CoreEWS.combobox(ai_group_params)
-	ai_group:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = ai_group, value = "ai_group"})
-	local is_navigation_link = EWS:CheckBox(panel, "Navigation link", "")
-	is_navigation_link:set_value(self._hed.is_navigation_link)
-	is_navigation_link:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = is_navigation_link,
-		value = "is_navigation_link"
-	})
-	panel_sizer:add(is_navigation_link, 0, 0, "EXPAND")
-	local align_rotation = EWS:CheckBox(panel, "Align rotation", "")
-	align_rotation:set_value(self._hed.align_rotation)
-	align_rotation:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = align_rotation,
-		value = "align_rotation"
-	})
-	panel_sizer:add(align_rotation, 0, 0, "EXPAND")
-	local align_position = EWS:CheckBox(panel, "Align position", "")
-	align_position:set_value(self._hed.align_position)
-	align_position:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = align_position,
-		value = "align_position"
-	})
-	panel_sizer:add(align_position, 0, 0, "EXPAND")
-	local needs_pos_rsrv = EWS:CheckBox(panel, "Reserve position", "")
-	needs_pos_rsrv:set_value(self._hed.needs_pos_rsrv)
-	needs_pos_rsrv:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = needs_pos_rsrv,
-		value = "needs_pos_rsrv"
-	})
-	panel_sizer:add(needs_pos_rsrv, 0, 0, "EXPAND")
-	local repeatable = EWS:CheckBox(panel, "Repeatable", "")
-	repeatable:set_value(self._hed.repeatable)
-	repeatable:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = repeatable, value = "repeatable"})
-	panel_sizer:add(repeatable, 0, 0, "EXPAND")
-	local use_instigator = EWS:CheckBox(panel, "Use instigator", "")
-	use_instigator:set_value(self._hed.use_instigator)
-	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_instigator,
-		value = "use_instigator"
-	})
-	panel_sizer:add(use_instigator, 0, 0, "EXPAND")
-	local forced = EWS:CheckBox(panel, "Forced", "")
-	forced:set_value(self._hed.forced)
-	forced:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = forced, value = "forced"})
-	panel_sizer:add(forced, 0, 0, "EXPAND")
-	local no_arrest = EWS:CheckBox(panel, "No Arrest", "")
-	no_arrest:set_value(self._hed.no_arrest)
-	no_arrest:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = no_arrest, value = "no_arrest"})
-	panel_sizer:add(no_arrest, 0, 0, "EXPAND")
-	local idle_scan = EWS:CheckBox(panel, "Idle scan", "")
-	idle_scan:set_value(self._hed.scan)
-	idle_scan:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = idle_scan, value = "scan"})
-	panel_sizer:add(idle_scan, 0, 0, "EXPAND")
-	local allow_followup_self = EWS:CheckBox(panel, "Allow self-followup", "")
-	allow_followup_self:set_value(self._hed.allow_followup_self)
-	allow_followup_self:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = allow_followup_self,
-		value = "allow_followup_self"
-	})
-	panel_sizer:add(allow_followup_self, 0, 0, "EXPAND")
-	local search_distance_params = {
-		name = "Search distance:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.search_distance,
-		floats = 0,
-		tooltip = "Used to specify the distance to use when searching for an AI",
+	self:_build_value_combobox(panel, panel_sizer, "ai_group", table.list_add({"none"}, clone(ElementSpecialObjective._AI_GROUPS)), "Select an ai group.")
+	self:_build_value_checkbox(panel, panel_sizer, "is_navigation_link", "Navigation link", "Navigation link")
+	self:_build_value_checkbox(panel, panel_sizer, "align_rotation", "Align rotation")
+	self:_build_value_checkbox(panel, panel_sizer, "align_position", "Align position")
+	self:_build_value_checkbox(panel, panel_sizer, "needs_pos_rsrv", "Reserve position", "Reserve position")
+	self:_build_value_checkbox(panel, panel_sizer, "repeatable", "Repeatable")
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator", "Use instigator")
+	self:_build_value_checkbox(panel, panel_sizer, "forced", "Forced")
+	self:_build_value_checkbox(panel, panel_sizer, "no_arrest", "No Arrest")
+	self:_build_value_checkbox(panel, panel_sizer, "scan", "Idle scan", "Idle scan")
+	self:_build_value_checkbox(panel, panel_sizer, "allow_followup_self", "Allow self-followup", "Allow self-followup")
+	self:_build_value_number(panel, panel_sizer, "search_distance", {floats = 0, min = 0}, "Used to specify the distance to use when searching for an AI")
+	local options = table.list_add({"none"}, clone(CopActionAct._act_redirects.SO))
+	self:_build_value_combobox(panel, panel_sizer, "so_action", table.list_add(options, self._AI_SO_types), "Select a action that the unit should start with.")
+	local ctrlr, params = self:_build_value_combobox(panel, panel_sizer, "patrol_path", table.list_add({"none"}, managers.ai_data:patrol_path_names()), "Select a patrol path to use from the spawn point. Different objectives and behaviors will interpet the path different.")
+	self._patrol_path_params = params
+	self:_build_value_combobox(panel, panel_sizer, "path_style", table.list_add({"none"}, ElementSpecialObjective._PATHING_STYLES), "Specifies how the patrol path should be used.")
+	self:_build_value_combobox(panel, panel_sizer, "path_haste", table.list_add({"none"}, ElementSpecialObjective._HASTES), "Select path haste to use.")
+	self:_build_value_combobox(panel, panel_sizer, "path_stance", table.list_add({"none"}, ElementSpecialObjective._STANCES), "Select path stance to use.")
+	self:_build_value_combobox(panel, panel_sizer, "pose", table.list_add({"none"}, ElementSpecialObjective._POSES), "Select pose to use.")
+	self:_build_value_combobox(panel, panel_sizer, "attitude", table.list_add({"none"}, ElementSpecialObjective._ATTITUDES), "Select combat attitude.")
+	self:_build_value_combobox(panel, panel_sizer, "trigger_on", table.list_add({"none"}, ElementSpecialObjective._TRIGGER_ON), "Select when to trigger objective.")
+	self:_build_value_combobox(panel, panel_sizer, "interaction_voice", table.list_add({"none"}, ElementSpecialObjective._INTERACTION_VOICES), "Select what voice to use when interacting with the character.")
+	self:_build_value_number(panel, panel_sizer, "interrupt_dis", {floats = 1, min = -1}, "Interrupt if a threat is detected closer than this distance (meters). -1 means at any distance. For non-visible threats this value is multiplied with 0.7.", "Interrupt Distance:")
+	self:_build_value_number(panel, panel_sizer, "interrupt_dmg", {floats = 2, min = -1}, "Interrupt if total damage received as a ratio of total health exceeds this ratio. value: 0-1.", "Interrupt Damage:")
+	self:_build_value_number(panel, panel_sizer, "interval", {floats = 2, min = -1}, "Used to specify how often the SO should search for an actor. A negative value means it will check only once.")
+	self:_build_value_number(panel, panel_sizer, "base_chance", {
+		floats = 2,
 		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local search_distance = CoreEws.number_controller(search_distance_params)
-	search_distance:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = search_distance,
-		value = "search_distance"
-	})
-	search_distance:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = search_distance,
-		value = "search_distance"
-	})
-	local action_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(action_sizer, 0, 1, "EXPAND,LEFT")
-	local so_action_params = {
-		name = "Action:",
-		panel = panel,
-		sizer = action_sizer,
-		options = clone(CopActionAct._act_redirects.SO),
-		value = self._hed.so_action,
-		default = "none",
-		tooltip = "Select a action that the unit should start with.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	for _, val in ipairs(self._AI_SO_types) do
-		table.insert(so_action_params.options, val)
-	end
-	local so_action = CoreEws.combobox(so_action_params)
-	self._so_action_params = so_action_params
-	so_action:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = so_action, value = "so_action"})
-	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
-	toolbar:add_tool("SELECT", "Select action", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
-	toolbar:connect("SELECT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "select_action_btn"), nil)
-	toolbar:realize()
-	action_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
-	self._patrol_path_params = {
-		name = "Patrol path:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = managers.ai_data:patrol_path_names(),
-		value = self._hed.patrol_path,
-		default = "none",
-		tooltip = "Select a patrol path to use from the spawn point. Different objectives and behaviors will interpet the path different.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local patrol_path = CoreEws.combobox(self._patrol_path_params)
-	patrol_path:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = patrol_path,
-		value = "patrol_path"
-	})
-	local path_style_params = {
-		name = "Path style:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._PATHING_STYLES),
-		value = self._hed.path_style,
-		default = "none",
-		tooltip = "Specifies how the patrol path should be used.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local path_style = CoreEws.combobox(path_style_params)
-	path_style:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = path_style, value = "path_style"})
-	local path_haste_params = {
-		name = "Path haste:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._HASTES),
-		value = self._hed.path_haste,
-		default = "none",
-		tooltip = "Select path haste to use.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local path_haste = CoreEws.combobox(path_haste_params)
-	path_haste:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = path_haste, value = "path_haste"})
-	local path_stance_params = {
-		name = "Path stance:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._STANCES),
-		value = self._hed.path_stance,
-		default = "none",
-		tooltip = "Select path stance to use.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local path_stance = CoreEws.combobox(path_stance_params)
-	path_stance:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = path_stance,
-		value = "path_stance"
-	})
-	local pose_params = {
-		name = "Pose:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._POSES),
-		value = self._hed.pose,
-		default = "none",
-		tooltip = "Select path stance to use.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local pose = CoreEws.combobox(pose_params)
-	pose:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = pose, value = "pose"})
-	local attitude_params = {
-		name = "Attitude:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._ATTITUDES),
-		value = self._hed.attitude,
-		default = "none",
-		tooltip = "Select combat attitude.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local attitude = CoreEws.combobox(attitude_params)
-	attitude:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = attitude, value = "attitude"})
-	local trigger_on_params = {
-		name = "Trigger on:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._TRIGGER_ON),
-		value = self._hed.trigger_on,
-		default = "none",
-		tooltip = "Select when to trigger objective.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local trigger_on = CoreEws.combobox(trigger_on_params)
-	trigger_on:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = trigger_on, value = "trigger_on"})
-	local interaction_voice_params = {
-		name = "Interaction voice:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = clone(ElementSpecialObjective._INTERACTION_VOICES),
-		value = self._hed.interaction_voice,
-		default = "none",
-		tooltip = "Select what voice to use when interacting with the character.",
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interaction_voice = CoreEws.combobox(interaction_voice_params)
-	interaction_voice:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {
-		ctrlr = interaction_voice,
-		value = "interaction_voice"
-	})
-	local interrupt_dis_params = {
-		name = "Interrupt Distance:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.interrupt_dis,
-		floats = 1,
-		tooltip = "Interrupt if a threat is detected closer than this distance (meters). -1 means at any distance. For non-visible threats this value is multiplied with 0.7.",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interrupt_dis = CoreEws.number_controller(interrupt_dis_params)
-	interrupt_dis:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = interrupt_dis,
-		value = "interrupt_dis"
-	})
-	interrupt_dis:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = interrupt_dis,
-		value = "interrupt_dis"
-	})
-	local interrupt_dmg_params = {
-		name = "Interrupt Damage:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.interrupt_dmg,
+		max = 1
+	}, "Used to specify chance to happen (1==absolutely!)")
+	self:_build_value_number(panel, panel_sizer, "chance_inc", {
 		floats = 2,
-		tooltip = "Interrupt if total damage received as a ratio of total health exceeds this ratio. value: 0-1.",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interrupt_dmg = CoreEws.number_controller(interrupt_dmg_params)
-	interrupt_dmg:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = interrupt_dmg,
-		value = "interrupt_dmg"
-	})
-	interrupt_dmg:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = interrupt_dmg,
-		value = "interrupt_dmg"
-	})
-	local interval_params = {
-		name = "Interval:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.interval,
-		floats = 2,
-		tooltip = "Used to specify how often the SO should search for an actor. A negative value means it will check only once.",
-		min = -1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interval = CoreEws.number_controller(interval_params)
-	interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	local base_chance_params = {
-		name = "Base chance:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.base_chance,
-		floats = 2,
-		tooltip = "Used to specify chance to happen (1==absolutely!)",
 		min = 0,
-		max = 1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local base_chance = CoreEws.number_controller(base_chance_params)
-	base_chance:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = base_chance,
-		value = "base_chance"
-	})
-	base_chance:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = base_chance,
-		value = "base_chance"
-	})
-	local chance_inc_params = {
-		name = "Chance incremental:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.chance_inc,
-		floats = 2,
-		tooltip = "Used to specify an incremental chance to happen",
-		min = 0,
-		max = 1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local chance_inc = CoreEws.number_controller(chance_inc_params)
-	chance_inc:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = chance_inc, value = "chance_inc"})
-	chance_inc:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = chance_inc, value = "chance_inc"})
-	local action_duration_min_params = {
-		name = "Action duration min:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.action_duration_min,
-		floats = 2,
-		tooltip = "How long the character stays in his specified action.",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local action_duration_min = CoreEws.number_controller(action_duration_min_params)
-	action_duration_min:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = action_duration_min,
-		value = "action_duration_min"
-	})
-	action_duration_min:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = action_duration_min,
-		value = "action_duration_min"
-	})
-	local action_duration_max_params = {
-		name = "Action duration max:",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.action_duration_max,
-		floats = 2,
-		tooltip = "How long the character stays in his specified action. Zero means indefinitely.",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local action_duration_max = CoreEws.number_controller(action_duration_max_params)
-	action_duration_max:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = action_duration_max,
-		value = "action_duration_max"
-	})
-	action_duration_max:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = action_duration_max,
-		value = "action_duration_max"
-	})
+		max = 1
+	}, "Used to specify an incremental chance to happen", "Chance incremental:")
+	self:_build_value_number(panel, panel_sizer, "action_duration_min", {floats = 2, min = 0}, "How long the character stays in his specified action.")
+	self:_build_value_number(panel, panel_sizer, "action_duration_max", {floats = 2, min = 0}, "How long the character stays in his specified action. Zero means indefinitely.")
 end
 
 function SpecialObjectiveUnitElement:add_to_mission_package()

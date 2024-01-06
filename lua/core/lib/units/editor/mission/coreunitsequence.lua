@@ -20,12 +20,22 @@ function CoreUnitSequenceUnitElement:update_selected(...)
 	self:_draw_trigger_units(0, 1, 1)
 end
 
+function CoreUnitSequenceUnitElement:get_links_to_unit(to_unit, links, all_units)
+	CoreUnitSequenceUnitElement.super.get_links_to_unit(self, to_unit, links, all_units)
+	if to_unit == self._unit then
+		for _, unit in ipairs(self:_get_sequence_units()) do
+			table.insert(links.on_executed, {unit = unit, alternative = "unit"})
+		end
+	end
+end
+
 function CoreUnitSequenceUnitElement:draw_links_unselected(...)
 	CoreUnitSequenceUnitElement.super.draw_links_unselected(self, ...)
 	self:_draw_trigger_units(0, 0.75, 0.75)
 end
 
-function CoreUnitSequenceUnitElement:_draw_trigger_units(r, g, b)
+function CoreUnitSequenceUnitElement:_get_sequence_units()
+	local units = {}
 	local trigger_name_list = self._unit:damage():get_trigger_name_list()
 	if trigger_name_list then
 		for _, trigger_name in ipairs(trigger_name_list) do
@@ -33,19 +43,26 @@ function CoreUnitSequenceUnitElement:_draw_trigger_units(r, g, b)
 			if trigger_data and 0 < #trigger_data then
 				for _, data in ipairs(trigger_data) do
 					if alive(data.notify_unit) then
-						local params = {
-							from_unit = self._unit,
-							to_unit = data.notify_unit,
-							r = r,
-							g = g,
-							b = b
-						}
-						self:_draw_link(params)
-						Application:draw(data.notify_unit, r, g, b)
+						table.insert(units, data.notify_unit)
 					end
 				end
 			end
 		end
+	end
+	return units
+end
+
+function CoreUnitSequenceUnitElement:_draw_trigger_units(r, g, b)
+	for _, unit in ipairs(self:_get_sequence_units()) do
+		local params = {
+			from_unit = self._unit,
+			to_unit = unit,
+			r = r,
+			g = g,
+			b = b
+		}
+		self:_draw_link(params)
+		Application:draw(unit, r, g, b)
 	end
 end
 

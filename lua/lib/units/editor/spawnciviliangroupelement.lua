@@ -65,46 +65,8 @@ function SpawnCivilianGroupUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local random = EWS:CheckBox(panel, "Random", "")
-	random:set_tool_tip("Select spawn points randomly")
-	random:set_value(self._hed.random)
-	random:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = random, value = "random"})
-	panel_sizer:add(random, 0, 0, "EXPAND")
-	local ignore_disabled = EWS:CheckBox(panel, "Ignore disabled", "")
-	ignore_disabled:set_tool_tip("Select if disabled spawn points should be ignored or not")
-	ignore_disabled:set_value(self._hed.ignore_disabled)
-	ignore_disabled:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = ignore_disabled,
-		value = "ignore_disabled"
-	})
-	panel_sizer:add(ignore_disabled, 0, 0, "EXPAND")
-	local amount_params = {
-		name = "Amount :",
-		panel = panel,
-		sizer = panel_sizer,
-		value = self._hed.amount,
-		floats = 0,
-		tooltip = "Specify amount of enemies to spawn from group",
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local amount = CoreEWS.number_controller(amount_params)
-	amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = amount, value = "amount"})
-	local team_params = {
-		name = "Team:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = tweak_data.levels:get_team_names_indexed(),
-		value = self._hed.team,
-		default = "default",
-		tooltip = "Select the group's team (overrides character team).",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = true
-	}
-	local team_combo_box = CoreEWS.combobox(team_params)
-	team_combo_box:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
-	team_combo_box:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = team_combo_box, value = "team"})
+	self:_build_value_checkbox(panel, panel_sizer, "random", "Select spawn points randomly")
+	self:_build_value_checkbox(panel, panel_sizer, "ignore_disabled", "Select if disabled spawn points should be ignored or not")
+	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0, min = 0}, "Specify amount of civilians to spawn from group")
+	self:_build_value_combobox(panel, panel_sizer, "team", table.list_add({"default"}, tweak_data.levels:get_team_names_indexed()), "Select the group's team (overrides character team).")
 end

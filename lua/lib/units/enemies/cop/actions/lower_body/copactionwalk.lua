@@ -56,14 +56,11 @@ CopActionWalk._walk_anim_velocities = {
 				r = 411.9
 			},
 			sprint = {
-				fwd = 672,
-				79,
-				bwd = 547,
-				35,
+				fwd = 672.79,
+				bwd = 547.35,
 				l = 488,
 				14,
-				r = 547,
-				9
+				r = 547.09
 			}
 		}
 	},
@@ -771,7 +768,7 @@ function CopActionWalk:on_exit()
 		self._nav_link_invul_on = nil
 		self._common_data.ext_damage:set_invulnerable(false)
 	end
-	if self._ext_anim.act and not self._unit:character_damage():dead() and self._unit:movement():chk_action_forbidden("walk") then
+	if self._ext_anim.act and not self._ext_anim.walk and not self._unit:character_damage():dead() and self._unit:movement():chk_action_forbidden("walk") then
 		debug_pause("[CopActionWalk:on_exit] possible illegal exit!", self._unit, self._machine:segment_state(idstr_base))
 		Application:draw_cylinder(self._common_data.pos, self._common_data.pos + math.UP * 5000, 30, 1, 0, 0)
 	end
@@ -825,7 +822,7 @@ function CopActionWalk:update(t)
 		self._last_upd_t = TimerManager:game():time()
 	end
 	local pos_new
-	if self._end_of_path then
+	if self._end_of_path and (not self._ext_anim.act or not self._ext_anim.walk) then
 		if self._next_is_nav_link then
 			self:_set_updator("_upd_nav_link_first_frame")
 			self:update(t)
@@ -845,7 +842,7 @@ function CopActionWalk:update(t)
 	mvec3_set(move_dir, self._last_pos)
 	mvec3_sub(move_dir, self._common_data.pos)
 	mvec3_set_z(move_dir, 0)
-	if self._cur_vel < 0.1 then
+	if self._cur_vel < 0.1 or self._ext_anim.act and self._ext_anim.walk then
 		move_dir = nil
 	end
 	local anim_data = self._ext_anim
@@ -1257,9 +1254,19 @@ function CopActionWalk:_nav_chk_walk(t, dt, vis_state)
 	local s_path = self._simplified_path
 	local c_path = self._curve_path
 	local c_index = self._curve_path_index
-	local vel = self:_get_current_max_walk_speed(self._ext_anim.move_side or "fwd")
-	if not self._sync and not self._start_run and self:_husk_needs_speedup() then
-		vel = 1.25 * vel
+	local vel
+	if self._ext_anim.act and self._ext_anim.walk then
+		local new_anim_pos = self._unit:get_animation_delta_position()
+		local anim_displacement = mvector3.length(new_anim_pos)
+		vel = anim_displacement / dt
+		if vel == 0 then
+			return
+		end
+	else
+		vel = self:_get_current_max_walk_speed(self._ext_anim.move_side or "fwd")
+		if not self._sync and not self._start_run and self:_husk_needs_speedup() then
+			vel = 1.25 * vel
+		end
 	end
 	local walk_dis = vel * dt
 	local footstep_length = 200
@@ -1930,7 +1937,7 @@ function CopActionWalk:_play_nav_link_anim(t)
 end
 
 function CopActionWalk:_upd_nav_link(t)
-	if self._ext_anim.act then
+	if self._ext_anim.act and not self._ext_anim.walk then
 		self._last_pos = self._unit:position()
 		self._ext_movement:set_m_pos(self._last_pos)
 		self._ext_movement:set_m_rot(self._unit:rotation())

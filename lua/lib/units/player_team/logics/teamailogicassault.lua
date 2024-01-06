@@ -244,7 +244,7 @@ function TeamAILogicAssault._chk_exit_attack_logic(data, new_reaction)
 		local allow_trans, obj_failed = CopLogicBase.is_obstructed(data, data.objective, nil, nil)
 		if allow_trans or wanted_state == "idle" then
 			if obj_failed then
-				managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 			else
 				TeamAILogicBase._exit(data.unit, wanted_state)
 			end

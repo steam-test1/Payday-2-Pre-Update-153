@@ -392,6 +392,7 @@ end
 function HostNetworkSession:remove_peer(peer, peer_id, reason)
 	print("[HostNetworkSession:remove_peer]", inspect(peer), peer_id, reason)
 	HostNetworkSession.super.remove_peer(self, peer, peer_id, reason)
+	managers.vote:abort_vote(peer_id)
 	if self._dead_con_reports then
 		local i = #self._dead_con_reports
 		while 0 < i do

@@ -303,6 +303,8 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.delay_police_20.icon = 42
 	self.types.delay_police_20.category = "data_hacking"
 	self.types.delay_police_20.total = 1
+	self.types.delay_police_20.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_delay20")
+	self.types.delay_police_20.budget_cost = 1
 	self.types.delay_police_20.post_event = "gus_preplan_04"
 	self.types.delay_police_20.prio = 6
 	self.types.delay_police_30 = {}
@@ -580,7 +582,7 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.disable_alarm_button.total = 1
 	self.types.disable_alarm_button.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_disable_alarm_button")
 	self.types.disable_alarm_button.budget_cost = 3
-	self.types.disable_alarm_button.post_event = "gus_preplan_09"
+	self.types.disable_alarm_button.post_event = "gus_preplan_16"
 	self.types.disable_alarm_button.prio = 1
 	self.types.safe_escape = {}
 	self.types.safe_escape.name_id = "menu_pp_asset_safe_escape"
@@ -594,29 +596,25 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.safe_escape.total = 1
 	self.types.safe_escape.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_safe_escape")
 	self.types.safe_escape.budget_cost = 3
-	self.types.safe_escape.post_event = "gus_preplan_09"
+	self.types.safe_escape.post_event = "gus_preplan_16"
 	self.types.safe_escape.prio = 1
 	self.types.sniper_spot = {}
 	self.types.sniper_spot.name_id = "menu_pp_asset_sniper_spot"
 	self.types.sniper_spot.desc_id = "menu_pp_asset_sniper_spot_desc"
-	self.types.sniper_spot.category = "insider_help"
-	self.types.sniper_spot.upgrade_lock = {
-		category = "player",
-		upgrade = "additional_assets"
-	}
-	self.types.sniper_spot.icon = 35
+	self.types.sniper_spot.category = "hired_help"
+	self.types.sniper_spot.icon = 55
 	self.types.sniper_spot.total = 1
 	self.types.sniper_spot.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_sniper_spot")
 	self.types.sniper_spot.budget_cost = 3
-	self.types.sniper_spot.post_event = "gus_preplan_09"
+	self.types.sniper_spot.post_event = "gus_preplan_16"
 	self.types.sniper_spot.prio = 1
 	self.types.bag_shortcut = {}
 	self.types.bag_shortcut.name_id = "menu_pp_asset_bag_shortcut"
 	self.types.bag_shortcut.desc_id = "menu_pp_asset_bag_shortcut_desc"
 	self.types.bag_shortcut.category = "mission_equipment"
-	self.types.bag_shortcut.icon = 23
+	self.types.bag_shortcut.icon = 34
 	self.types.bag_shortcut.total = 1
-	self.types.bag_shortcut.post_event = "gus_preplan_07"
+	self.types.bag_shortcut.post_event = "gus_preplan_16"
 	self.types.bag_shortcut.prio = 1
 	self.types.bag_shortcut.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_shortcut")
 	self.types.bag_shortcut.budget_cost = 2
@@ -624,9 +622,9 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.bag_zipline.name_id = "menu_pp_asset_bag_zipline"
 	self.types.bag_zipline.desc_id = "menu_pp_asset_bag_zipline_desc"
 	self.types.bag_zipline.category = "mission_equipment"
-	self.types.bag_zipline.icon = 23
+	self.types.bag_zipline.icon = 34
 	self.types.bag_zipline.total = 1
-	self.types.bag_zipline.post_event = "gus_preplan_07"
+	self.types.bag_zipline.post_event = "gus_preplan_16"
 	self.types.bag_zipline.prio = 1
 	self.types.bag_zipline.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_bag_zipline")
 	self.types.bag_zipline.budget_cost = 2
@@ -634,19 +632,19 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.loot_drop_off.name_id = "menu_pp_asset_loot_drop_off"
 	self.types.loot_drop_off.desc_id = "menu_pp_asset_loot_drop_off_desc"
 	self.types.loot_drop_off.category = "hired_help"
-	self.types.loot_drop_off.icon = 23
+	self.types.loot_drop_off.icon = 34
 	self.types.loot_drop_off.total = 1
-	self.types.loot_drop_off.post_event = "gus_preplan_07"
+	self.types.loot_drop_off.post_event = "gus_preplan_16"
 	self.types.loot_drop_off.prio = 1
 	self.types.loot_drop_off.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_loot_drop_off")
-	self.types.loot_drop_off.budget_cost = 3
+	self.types.loot_drop_off.budget_cost = 2
 	self.types.thermal_paste = {}
 	self.types.thermal_paste.name_id = "menu_pp_asset_thermal_paste"
 	self.types.thermal_paste.desc_id = "menu_pp_asset_thermal_paste_desc"
 	self.types.thermal_paste.category = "dead_drop"
 	self.types.thermal_paste.icon = 51
 	self.types.thermal_paste.total = 1
-	self.types.thermal_paste.post_event = "gus_preplan_07"
+	self.types.thermal_paste.post_event = "gus_preplan_16"
 	self.types.thermal_paste.prio = 1
 	self.types.thermal_paste.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_thermal_paste")
 	self.types.thermal_paste.budget_cost = 3
@@ -655,7 +653,7 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.framing_frame_1_truck.name_id = "menu_pp_asset_framing_frame_1_truck"
 	self.types.framing_frame_1_truck.desc_id = "menu_pp_asset_framing_frame_1_truck_desc"
 	self.types.framing_frame_1_truck.category = "mission_equipment"
-	self.types.framing_frame_1_truck.icon = 23
+	self.types.framing_frame_1_truck.icon = 63
 	self.types.framing_frame_1_truck.total = 1
 	self.types.framing_frame_1_truck.post_event = "gus_preplan_07"
 	self.types.framing_frame_1_truck.prio = 1
@@ -665,12 +663,34 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.framing_frame_1_entry_point.name_id = "menu_pp_asset_framing_frame_1_entry_point"
 	self.types.framing_frame_1_entry_point.desc_id = "menu_pp_asset_framing_frame_1_entry_point_desc"
 	self.types.framing_frame_1_entry_point.category = "mission_equipment"
-	self.types.framing_frame_1_entry_point.icon = 23
+	self.types.framing_frame_1_entry_point.icon = 41
 	self.types.framing_frame_1_entry_point.total = 1
 	self.types.framing_frame_1_entry_point.post_event = "gus_preplan_07"
 	self.types.framing_frame_1_entry_point.prio = 1
 	self.types.framing_frame_1_entry_point.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_framing_frame_1_entry_point")
 	self.types.framing_frame_1_entry_point.budget_cost = 2
+	self.types.branchbank_lance = {}
+	self.types.branchbank_lance.name_id = "menu_pp_branchbank_lance"
+	self.types.branchbank_lance.desc_id = "menu_pp_branchbank_lance_desc"
+	self.types.branchbank_lance.plan = "vault_plan"
+	self.types.branchbank_lance.pos_not_important = false
+	self.types.branchbank_lance.category = "vault_plan"
+	self.types.branchbank_lance.icon = 12
+	self.types.branchbank_lance.total = 1
+	self.types.branchbank_lance.cost = 0
+	self.types.branchbank_lance.budget_cost = 0
+	self.types.branchbank_lance.post_event = "gus_preplan_17"
+	self.types.branchbank_lance.prio = 5
+	self.types.branchbank_vault_key = {}
+	self.types.branchbank_vault_key.name_id = "menu_pp_asset_branchbank_vault_key"
+	self.types.branchbank_vault_key.desc_id = "menu_pp_asset_branchbank_vault_key_desc"
+	self.types.branchbank_vault_key.category = "mission_equipment"
+	self.types.branchbank_vault_key.icon = 43
+	self.types.branchbank_vault_key.total = 1
+	self.types.branchbank_vault_key.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_branchbank_vault_key")
+	self.types.branchbank_vault_key.budget_cost = 3
+	self.types.branchbank_vault_key.post_event = "gus_preplan_16"
+	self.types.branchbank_vault_key.prio = 2
 end
 
 function PrePlanningTweakData:_create_locations(tweak_data)
@@ -1175,6 +1195,162 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 		}
 	}
 	self.locations.gallery = deep_clone(self.locations.framing_frame_1)
+	self.locations.branchbank = {
+		default_plans = {
+			vault_plan = "branchbank_lance"
+		},
+		total_budget = 8,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_big",
+		start_location = {
+			group = "a",
+			x = 512,
+			y = 512,
+			zoom = 1
+		},
+		{
+			name_id = "menu_pp_branchbank_loc_a",
+			texture = "guis/textures/pd2/pre_planning/branchbank_1",
+			map_x = -0.6,
+			map_y = 0,
+			map_size = 1,
+			x1 = -3500,
+			y1 = -300,
+			x2 = 500,
+			y2 = 3700,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_branchbank_loc_b",
+			texture = "guis/textures/pd2/pre_planning/branchbank_2",
+			map_x = 0.6,
+			map_y = 0,
+			map_size = 1,
+			x1 = -5500,
+			y1 = -3200,
+			x2 = 2500,
+			y2 = 4800,
+			rotation = 0,
+			custom_points = {}
+		}
+	}
+	self.locations.framing_frame_3 = {
+		default_plans = {},
+		total_budget = 8,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_framingframe3",
+		start_location = {
+			group = "a",
+			x = 512,
+			y = 512,
+			zoom = 1
+		},
+		grid_width_mul = 2.2,
+		grid_height_mul = 1.5,
+		min_zoom = 0.7,
+		{
+			name_id = "menu_pp_framing_frame_3_loc_b",
+			texture = "guis/textures/pd2/pre_planning/framing_frame_3_1",
+			map_x = -1.1,
+			map_y = 0,
+			map_size = 1,
+			x1 = -6600,
+			y1 = 600,
+			x2 = -1400,
+			y2 = 5800,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_framing_frame_3_loc_a",
+			texture = "guis/textures/pd2/pre_planning/framing_frame_3_2",
+			map_x = 0,
+			map_y = 0,
+			map_size = 1,
+			x1 = -6600,
+			y1 = 700,
+			x2 = -1400,
+			y2 = 5900,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_framing_frame_3_loc_c",
+			texture = "guis/textures/pd2/pre_planning/framing_frame_3_3",
+			map_x = 1.1,
+			map_y = 0,
+			map_size = 1,
+			x1 = -7325,
+			y1 = 625,
+			x2 = -1325,
+			y2 = 6625,
+			rotation = 0,
+			custom_points = {}
+		}
+	}
+	self.locations.kosugi = {
+		default_plans = {},
+		total_budget = 8,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_shadowraid",
+		start_location = {
+			group = "a",
+			x = 2048,
+			y = 1024,
+			zoom = 0.8
+		},
+		min_zoom = 0.4,
+		{
+			name_id = "menu_pp_shadow_raid_loc_a",
+			texture = "guis/textures/pd2/pre_planning/shadow_raid_1",
+			map_x = -0.59999996,
+			map_y = -0.59999996,
+			map_size = 2,
+			x1 = -5650,
+			y1 = -7850,
+			x2 = 6850,
+			y2 = 4650,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_shadow_raid_loc_b",
+			texture = "guis/textures/pd2/pre_planning/shadow_raid_2",
+			map_x = 1.1,
+			map_y = -1.1000001,
+			map_size = 1,
+			x1 = -3950,
+			y1 = -6150,
+			x2 = 1550,
+			y2 = -650,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_shadow_raid_loc_c",
+			texture = "guis/textures/pd2/pre_planning/shadow_raid_3",
+			map_x = 1.1,
+			map_y = 0,
+			map_size = 1,
+			x1 = -3950,
+			y1 = -6150,
+			x2 = 1550,
+			y2 = -650,
+			rotation = 0,
+			custom_points = {}
+		},
+		{
+			name_id = "menu_pp_shadow_raid_loc_d",
+			texture = "guis/textures/pd2/pre_planning/shadow_raid_4",
+			map_x = 1.1,
+			map_y = 1.1,
+			map_size = 1,
+			x1 = -3950,
+			y1 = -6150,
+			x2 = 1550,
+			y2 = -650,
+			rotation = 0,
+			custom_points = {}
+		}
+	}
 end
 
 function PrePlanningTweakData:get_level_data(level_id)

@@ -826,6 +826,7 @@ function JobManager:synced_on_retry_job_stage()
 end
 
 function JobManager:_on_retry_job_stage()
+	managers.game_play_central:stop_the_game()
 	self._global.next_alternative_stage = nil
 	self._global.next_interupt_stage = nil
 end

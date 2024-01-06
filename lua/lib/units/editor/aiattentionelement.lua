@@ -264,68 +264,14 @@ function AIAttentionElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local use_instigator = EWS:CheckBox(panel, "Use instigator", "")
-	use_instigator:set_value(self._hed.use_instigator)
-	use_instigator:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = use_instigator,
-		value = "use_instigator"
-	})
-	panel_sizer:add(use_instigator, 0, 0, "EXPAND")
-	local preset_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(preset_sizer, 0, 1, "EXPAND,LEFT")
-	local preset_names = clone(tweak_data.attention.indexes)
-	local preset_params = {
-		name = "Preset:",
-		panel = panel,
-		sizer = preset_sizer,
-		options = preset_names,
-		value = self._hed.preset,
-		default = "none",
-		tooltip = "Select the attention preset.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local preset = CoreEws.combobox(preset_params)
-	preset:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = preset, value = "preset"})
-	local preset_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(preset_sizer, 0, 1, "EXPAND,LEFT")
-	local operation_params = {
-		name = "Operation:",
-		panel = panel,
-		sizer = preset_sizer,
-		options = {
-			"set",
-			"add",
-			"override"
-		},
-		value = self._hed.operation,
-		tooltip = "Select the attention preset.",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local operation = CoreEws.combobox(operation_params)
-	operation:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = operation, value = "operation"})
-	local override_sizer = EWS:BoxSizer("HORIZONTAL")
-	panel_sizer:add(override_sizer, 0, 1, "EXPAND,LEFT")
-	local override_params = {
-		name = "Override:",
-		panel = panel,
-		sizer = override_sizer,
-		options = preset_names,
-		value = self._hed.override,
-		default = "none",
-		tooltip = "Select the attention preset to be overriden. (valid only with override operation)",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sizer_proportions = 1,
-		sorted = true
-	}
-	local override = CoreEws.combobox(override_params)
-	override:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = override, value = "override"})
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator")
+	self:_build_value_combobox(panel, panel_sizer, "preset", table.list_add({"none"}, tweak_data.attention.indexes), "Select the attention preset.")
+	self:_build_value_combobox(panel, panel_sizer, "operation", {
+		"set",
+		"add",
+		"override"
+	}, "Select an operation.")
+	self:_build_value_combobox(panel, panel_sizer, "override", table.list_add({"none"}, tweak_data.attention.indexes), "Select the attention preset to be overriden. (valid only with override operation)")
 end
 
 function AIAttentionElement:add_to_mission_package()

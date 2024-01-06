@@ -56,6 +56,11 @@ function CoreLogicChanceOperatorUnitElement:draw_links(t, dt, selected_unit, all
 	end
 end
 
+function CoreLogicChanceOperatorUnitElement:get_links_to_unit(...)
+	CoreLogicChanceOperatorUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function CoreLogicChanceOperatorUnitElement:update_editing()
 end
 
@@ -132,6 +137,11 @@ function CoreLogicChanceTriggerUnitElement:draw_links(t, dt, selected_unit, all_
 			})
 		end
 	end
+end
+
+function CoreLogicChanceTriggerUnitElement:get_links_to_unit(...)
+	CoreLogicChanceTriggerUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "trigger", ...)
 end
 
 function CoreLogicChanceTriggerUnitElement:update_editing()

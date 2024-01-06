@@ -209,6 +209,14 @@ function GuiTweakData:init()
 		store = 331900,
 		image = "guis/dlcs/gage_pack_historical/textures/pd2/content_updates/gage_pack_historical"
 	}
+	local christmas_2014 = {
+		id = "christmas_2014",
+		name_id = "menu_content_christmas_2014",
+		desc_id = "menu_content_christmas_2014_desc",
+		date_id = "menu_content_christmas_2014_date",
+		webpage = "http://www.media.starbreeze.com/whitechristmas/",
+		image = "guis/dlcs/pines/textures/pd2/content_updates/christmas_2014"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -241,7 +249,8 @@ function GuiTweakData:init()
 			hoxton_char,
 			hoxton_job,
 			halloween_2014,
-			gage_pack_historical
+			gage_pack_historical,
+			christmas_2014
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

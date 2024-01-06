@@ -347,9 +347,12 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 		result.enemies_in_cone = suppression_enemies
 	end
 	if hit_unit and hit_unit.type == "death" and self:weapon_tweak_data().category == tweak_data.achievement.easy_as_breathing.weapon_type then
-		self._kills_without_releasing_trigger = (self._kills_without_releasing_trigger or 0) + 1
-		if self._kills_without_releasing_trigger >= tweak_data.achievement.easy_as_breathing.count then
-			managers.achievment:award(tweak_data.achievement.easy_as_breathing.award)
+		local unit_type = col_ray.unit:base() and col_ray.unit:base()._tweak_table
+		if unit_type and not CopDamage.is_civilian(unit_type) then
+			self._kills_without_releasing_trigger = (self._kills_without_releasing_trigger or 0) + 1
+			if self._kills_without_releasing_trigger >= tweak_data.achievement.easy_as_breathing.count then
+				managers.achievment:award(tweak_data.achievement.easy_as_breathing.award)
+			end
 		end
 	end
 	if (col_ray and col_ray.distance > 600 or not col_ray) and alive(self._obj_fire) then
@@ -372,7 +375,7 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 				else
 					local killed = hit_unit.type == "death"
 					local unit_type = col_ray.unit:base() and col_ray.unit:base()._tweak_table
-					local is_enemy = unit_type ~= "civilian" and unit_type ~= "civilian_female" and unit_type ~= "bank_manager"
+					local is_enemy = not CopDamage.is_civilian(unit_type)
 					kills = (shoot_through_data and shoot_through_data.kills or 0) + (killed and is_enemy and 1 or 0)
 					self._shoot_through_data.kills = kills
 					if 0.1 > col_ray.distance or ray_distance - col_ray.distance < 50 then

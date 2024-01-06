@@ -122,7 +122,7 @@ function CopActionHurt:init(action_desc, common_data)
 	self._action_desc = action_desc
 	local t = TimerManager:game():time()
 	local tweak_table = self._unit:base()._tweak_table
-	local is_civilian = tweak_table == "civilian" or tweak_table == "civilian_female" or tweak_table == "bank_manager"
+	local is_civilian = CopDamage.is_civilian(tweak_table)
 	local is_female = (self._machine:get_global("female") or 0) == 1
 	local crouching = self._unit:anim_data().crouch or self._unit:anim_data().hurt and 0 < self._machine:get_parameter(self._machine:segment_state(Idstring("base")), "crh")
 	local redir_res
@@ -403,23 +403,17 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 		if Network:is_server() then
 			local radius, filter_name
+			local default_radius = managers.groupai:state():whisper_mode() and tweak_data.upgrades.cop_hurt_alert_radius_whisper or tweak_data.upgrades.cop_hurt_alert_radius
 			if action_desc.attacker_unit and action_desc.attacker_unit:base().upgrade_value then
-				radius = action_desc.attacker_unit:base():upgrade_value("player", "silent_kill")
+				radius = action_desc.attacker_unit:base():upgrade_value("player", "silent_kill") or default_radius
 			elseif action_desc.attacker_unit and action_desc.attacker_unit:base().is_local_player then
-				radius = managers.player:upgrade_value("player", "silent_kill", nil)
-			end
-			if managers.groupai:state():whisper_mode() then
-				radius = radius or tweak_data.upgrades.cop_hurt_alert_radius_whisper or 600
-				filter_name = "civilians_enemies"
-			else
-				radius = radius or tweak_data.upgrades.cop_hurt_alert_radius or 400
-				filter_name = "enemies"
+				radius = managers.player:upgrade_value("player", "silent_kill", default_radius)
 			end
 			local new_alert = {
 				"vo_distress",
 				common_data.ext_movement:m_head_pos(),
-				radius,
-				managers.groupai:state():get_unit_type_filter(filter_name),
+				radius or default_radius,
+				self._unit:brain():SO_access(),
 				self._unit
 			}
 			managers.groupai:state():propagate_alert(new_alert)
@@ -432,7 +426,7 @@ function CopActionHurt:init(action_desc, common_data)
 	self._ext_movement:enable_update()
 	if (self._body_part == 1 or self._body_part == 2) and Network:is_server() then
 		local stand_rsrv = self._unit:brain():get_pos_rsrv("stand")
-		if not stand_rsrv or 400 < mvector3.distance_sq(stand_rsrv.position, common_data.pos) then
+		if not stand_rsrv or mvector3.distance_sq(stand_rsrv.position, common_data.pos) > 400 then
 			self._unit:brain():add_pos_rsrv("stand", {
 				position = mvector3.copy(common_data.pos),
 				radius = 30

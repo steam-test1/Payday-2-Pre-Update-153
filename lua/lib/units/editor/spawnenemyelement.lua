@@ -60,6 +60,7 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_gang_mobster_3/ene_gang_mobster_3",
 	"units/payday2/characters/ene_gang_mobster_4/ene_gang_mobster_4",
 	"units/payday2/characters/ene_gang_mobster_boss/ene_gang_mobster_boss",
+	"units/payday2/characters/ene_male_tgt_1/ene_male_tgt_1",
 	"units/payday2/characters/ene_prisonguard_female_1/ene_prisonguard_female_1",
 	"units/payday2/characters/ene_prisonguard_male_1/ene_prisonguard_male_1",
 	"units/payday2/characters/ene_secret_service_1/ene_secret_service_1",
@@ -88,7 +89,8 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_security_4/ene_security_4",
 	"units/payday2/characters/ene_security_5/ene_security_5",
 	"units/payday2/characters/ene_security_6/ene_security_6",
-	"units/payday2/characters/ene_security_7/ene_security_7"
+	"units/payday2/characters/ene_security_7/ene_security_7",
+	"units/payday2/characters/ene_security_8/ene_security_8"
 }
 
 function SpawnEnemyUnitElement:init(unit)
@@ -120,9 +122,10 @@ function SpawnEnemyUnitElement:post_init(...)
 end
 
 function SpawnEnemyUnitElement:test_element()
-	if self._hed.enemy ~= "none" then
+	if self._hed.enemy ~= "none" and managers.groupai:state():is_AI_enabled() then
 		local unit = safe_spawn_unit(Idstring(self._hed.enemy), self._unit:position(), self._unit:rotation())
 		table.insert(self._enemies, unit)
+		unit:brain():set_logic("inactive", nil)
 		local team_id = self:_resolve_team(unit)
 		managers.groupai:state():set_char_team(unit, team_id)
 		local action_desc = ElementSpawnEnemyDummy._create_action_data(self:get_spawn_anim())

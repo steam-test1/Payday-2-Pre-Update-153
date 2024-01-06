@@ -129,6 +129,7 @@ function PlayerEquipment:use_first_aid_kit()
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
 		PlayerStandard.say_line(self, "s12")
+		managers.statistics:use_first_aid()
 		local upgrade_lvl = managers.player:has_category_upgrade("first_aid_kit", "damage_reduction_upgrade") and 1 or 0
 		if Network:is_client() then
 			managers.network:session():send_to_host("place_deployable_bag", "FirstAidKitBase", pos, rot, upgrade_lvl)
@@ -147,6 +148,7 @@ function PlayerEquipment:use_armor_kit()
 		else
 			managers.network:session():local_peer():set_used_deployable(true)
 		end
+		managers.statistics:use_armor_bag()
 		MenuCallbackHandler:_update_outfit_information()
 	end
 	return true, redirect
@@ -164,6 +166,7 @@ function PlayerEquipment:use_bodybags_bag()
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
 		PlayerStandard.say_line(self, "s13")
+		managers.statistics:use_body_bag()
 		local amount_upgrade_lvl = 0
 		if Network:is_client() then
 			managers.network:session():send_to_host("place_deployable_bag", "BodyBagsBagBase", pos, rot, amount_upgrade_lvl)

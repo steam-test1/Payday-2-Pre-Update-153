@@ -492,7 +492,7 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 				local difficulty_id = attributes_numbers[2]
 				local difficulty = tweak_data:index_to_difficulty(difficulty_id)
 				local job_id = tweak_data.narrative:get_job_name_from_index(math.floor(attributes_numbers[1] / 1000))
-				local kick_option = attributes_numbers[8] == 0 and 0 or 1
+				local kick_option = attributes_numbers[8]
 				local state_string_id = tweak_data:index_to_server_state(attributes_numbers[4])
 				local state_name = state_string_id and managers.localization:text("menu_lobby_server_state_" .. state_string_id) or "UNKNOWN"
 				local state = attributes_numbers[4]
@@ -899,12 +899,12 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			color = tweak_data.screen_colors.ghost_color
 		})
 		mw = math.max(mw, self:make_fine_text(ghost_text))
-		local kick_icon = legend_panel:bitmap({
+		local kick_none_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_kick_marker",
 			x = 10,
 			y = ghost_text:bottom() + 2
 		})
-		local kick_text = legend_panel:text({
+		local kick_none_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			x = host_text:left(),
@@ -912,13 +912,29 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			text = managers.localization:to_upper_text("menu_cn_kick_disabled"),
 			blend_mode = "add"
 		})
-		mw = math.max(mw, self:make_fine_text(kick_text))
+		mw = math.max(mw, self:make_fine_text(kick_none_text))
+		local kick_vote_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/cn_votekick_marker",
+			x = 10,
+			y = kick_none_text:bottom() + 2
+		})
+		local kick_vote_text = legend_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			x = host_text:left(),
+			y = kick_none_text:bottom(),
+			text = managers.localization:to_upper_text("menu_kick_vote"),
+			blend_mode = "add"
+		})
+		mw = math.max(mw, self:make_fine_text(kick_vote_text))
 		if managers.crimenet:no_servers() then
-			kick_icon:hide()
-			kick_text:hide()
-			kick_text:set_bottom(ghost_text:bottom())
+			kick_none_icon:hide()
+			kick_none_text:hide()
+			kick_vote_icon:hide()
+			kick_vote_text:hide()
+			kick_vote_text:set_bottom(ghost_text:bottom())
 		end
-		legend_panel:set_size(host_text:left() + mw + 10, kick_text:bottom() + 10)
+		legend_panel:set_size(host_text:left() + mw + 10, kick_vote_text:bottom() + 10)
 		legend_panel:rect({
 			color = Color.black,
 			alpha = 0.4,
@@ -2011,9 +2027,15 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			})
 			player_marker:set_position(cx, cy)
 		end
-		local kick_icon = icon_panel:bitmap({
-			name = "kick_icon",
+		local kick_none_icon = icon_panel:bitmap({
+			name = "kick_none_icon",
 			texture = "guis/textures/pd2/cn_kick_marker",
+			blend_mode = "add",
+			alpha = 0
+		})
+		local kick_vote_icon = icon_panel:bitmap({
+			name = "kick_vote_icon",
+			texture = "guis/textures/pd2/cn_votekick_marker",
 			blend_mode = "add",
 			alpha = 0
 		})
@@ -2021,7 +2043,8 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		for i = 1, #icon_panel:children() - 1 do
 			y = math.max(y, icon_panel:children()[i]:bottom())
 		end
-		kick_icon:set_y(y)
+		kick_none_icon:set_y(y)
+		kick_vote_icon:set_y(y)
 	elseif not is_special then
 		timer_rect = marker_panel:bitmap({
 			name = "timer_rect",
@@ -2789,7 +2812,8 @@ function CrimeNetGui:update_job_gui(job, inside)
 		local function animate_alpha(o, objects, job, alphas, inside)
 			local wanted_alpha = alphas[1]
 			local wanted_text_alpha = alphas[2]
-			local wanted_icon_alpha = inside and (job.kick_option == 0 and 1 or 0) or 0
+			local wanted_icon_alpha = inside and (job.kick_option ~= 1 and 1 or 0) or 0
+			local kick_icon = job.kick_option == 0 and "kick_none_icon" or "kick_vote_icon"
 			local start_h = job.side_panel:h()
 			local h = start_h
 			local host_name = job.side_panel:child("host_name")
@@ -2811,7 +2835,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local x = start_x
 			local object_alpha = {}
 			local text_alpha = job.side_panel:alpha()
-			local icon_alpha = job.icon_panel and job.icon_panel:child("kick_icon") and job.icon_panel:child("kick_icon"):alpha() or 0
+			local icon_alpha = job.icon_panel and job.icon_panel:child(kick_icon) and job.icon_panel:child(kick_icon):alpha() or 0
 			local alpha_met = false
 			local glow_met = false
 			local expand_met = false
@@ -2834,9 +2858,9 @@ function CrimeNetGui:update_job_gui(job, inside)
 					if job.icon_panel then
 						job.icon_panel:set_alpha(text_alpha)
 					end
-					if job.icon_panel and job.icon_panel:child("kick_icon") then
+					if job.icon_panel and job.icon_panel:child(kick_icon) then
 						icon_alpha = math.step(icon_alpha, wanted_icon_alpha, dt * 2)
-						job.icon_panel:child("kick_icon"):set_alpha(icon_alpha)
+						job.icon_panel:child(kick_icon):set_alpha(icon_alpha)
 					end
 					alpha_met = alpha_met and text_alpha == wanted_text_alpha and icon_alpha == wanted_icon_alpha
 					if not alpha_met or inside then

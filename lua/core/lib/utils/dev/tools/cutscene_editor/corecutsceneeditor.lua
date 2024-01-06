@@ -1773,7 +1773,7 @@ function CoreCutsceneEditor:_draw_object_hierarchy(object, parent, max_z)
 end
 
 function CoreCutsceneEditor:_draw_label(text, position)
-	self:_text_brush():center_text(position, text)
+	self:_text_brush():center_text(position, utf8.from_latin1(text))
 end
 
 function CoreCutsceneEditor:_draw_joint(start_object, end_object, radius)

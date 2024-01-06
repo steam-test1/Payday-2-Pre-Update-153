@@ -20,7 +20,6 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 	end
 	data.unit:brain():set_update_enabled_state(true)
 	CivilianLogicEscort._get_objective_path_data(data, my_data)
-	my_data.tmp_vec3 = Vector3()
 	if data.is_tied then
 		managers.groupai:state():on_hostage_state(true, data.key, nil, true)
 		my_data.is_hostage = true
@@ -32,6 +31,8 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 	end
 	my_data.detection_task_key = "CivilianLogicTravel_upd_detection" .. key_str
 	CopLogicBase.queue_task(my_data, my_data.detection_task_key, CivilianLogicIdle._upd_detection, data, data.t + 1)
+	my_data.advance_path_search_id = "CivilianLogicTravel_detailed" .. tostring(data.key)
+	my_data.coarse_path_search_id = "CivilianLogicTravel_coarse" .. tostring(data.key)
 	if not data.unit:movement():cool() then
 		my_data.registered_as_fleeing = true
 		managers.groupai:state():register_fleeing_civilian(data.key, data.unit)
@@ -116,7 +117,7 @@ function CivilianLogicTravel.update(data)
 			if cur_index >= total_nav_points then
 				objective.in_place = true
 				if objective.type ~= "escort" and objective.type ~= "act" and objective.type ~= "follow" and not objective.action_duration then
-					managers.groupai:state():on_civilian_objective_complete(unit, objective)
+					data.objective_complete_clbk(unit, objective)
 				else
 					CivilianLogicTravel.on_new_objective(data)
 				end
@@ -129,7 +130,6 @@ function CivilianLogicTravel.update(data)
 				else
 					to_pos = coarse_path[cur_index + 1][2]
 				end
-				my_data.advance_path_search_id = tostring(unit:key()) .. "advance"
 				my_data.processing_advance_path = true
 				unit:brain():search_for_path(my_data.advance_path_search_id, to_pos)
 			end
@@ -140,9 +140,7 @@ function CivilianLogicTravel.update(data)
 			else
 				nav_seg = objective.nav_seg
 			end
-			local search_id = "CivilianLogicTravelcoarse" .. tostring(unit:key())
-			if unit:brain():search_for_coarse_path(search_id, nav_seg) then
-				my_data.coarse_path_search_id = search_id
+			if unit:brain():search_for_coarse_path(my_data.coarse_path_search_id, nav_seg) then
 				my_data.processing_coarse_path = true
 			end
 		end

@@ -86,17 +86,5 @@ function SpecialObjectiveTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local event_params = {
-		name = "Event:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = self._options,
-		value = self._hed.event,
-		tooltip = "Select an event from the combobox",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local events = CoreEWS.combobox(event_params)
-	events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = events, value = "event"})
+	self:_build_value_combobox(panel, panel_sizer, "event", self._options, "Select an event from the combobox")
 end

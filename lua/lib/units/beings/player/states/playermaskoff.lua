@@ -67,7 +67,6 @@ function PlayerMaskOff:_start_action_interact(t, input, timer, interact_object)
 		tweak_data = interact_object:interaction().tweak_data
 	}
 	managers.hud:show_interaction_bar(0, timer)
-	self._unit:base():set_detection_multiplier("interact", 0.5)
 	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, timer, false)
 end
 
@@ -82,14 +81,12 @@ function PlayerMaskOff:_interupt_action_interact(t, input, complete)
 		managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, false, self._interact_params.tweak_data, 0, complete and true or false)
 		self._interact_params = nil
 		managers.hud:hide_interaction_bar(complete)
-		self._unit:base():set_detection_multiplier("interact", nil)
 	end
 end
 
 function PlayerMaskOff:_end_action_interact()
 	self:_interupt_action_interact(nil, nil, true)
 	managers.interaction:end_action_interact(self._unit)
-	self._unit:base():set_detection_multiplier("interact", nil)
 end
 
 function PlayerMaskOff:_start_action_use_item(t)

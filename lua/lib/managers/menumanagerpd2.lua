@@ -140,7 +140,7 @@ function MenuCallbackHandler:start_single_player_job(job_data)
 	Global.game_settings.mission = managers.job:current_mission()
 	Global.game_settings.difficulty = job_data.difficulty
 	Global.game_settings.world_setting = managers.job:current_world_setting()
-	self:lobby_start_the_game()
+	MenuCallbackHandler:start_the_game()
 end
 
 function MenuCallbackHandler:crimenet_focus_changed(node, in_focus)

@@ -280,16 +280,7 @@ function NetworkMember:place_deployable(id)
 		end
 	end
 	local peer = Network:is_server() and self._peer or managers.network:session():server_peer()
-	if self._deployable ~= id then
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_wrong_equipment_server" or "menu_chat_peer_cheated_wrong_equipment", {
-			name = peer:name()
-		}))
-	else
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_many_equipments_server" or "menu_chat_peer_cheated_many_equipments", {
-			name = peer:name()
-		}))
-	end
-	peer:mark_cheater()
+	peer:mark_cheater(self._deployable ~= id and VoteManager.REASON.wrong_equipment or VoteManager.REASON.many_equipments, Network:is_server())
 	print("[NetworkMember:place_deployable]: Failed to deploy equipment", self._peer:id(), id, self._deployable, self._depolyable_count)
 	return false
 end
@@ -313,16 +304,7 @@ function NetworkMember:place_bag(carry_id, amount)
 			return true
 		end
 		local peer = Network:is_server() and self._peer or managers.network:session():server_peer()
-		if amount < 0 then
-			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_many_bags_server" or "menu_chat_peer_cheated_many_bags", {
-				name = peer:name()
-			}))
-		else
-			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_many_bags_pickup_server" or "menu_chat_peer_cheated_many_bags_pickup", {
-				name = peer:name()
-			}))
-		end
-		peer:mark_cheater()
+		peer:mark_cheater(amount < 0 and VoteManager.REASON.many_bags or VoteManager.REASON.many_bags_pickup, Network:is_server())
 		print("[NetworkMember:place_bag]: Failed to place bag", self._peer:id(), self._carry_id, carry_id, amount)
 		return false
 	end
@@ -332,10 +314,7 @@ end
 function NetworkMember:set_grenade(value)
 	if self._grenades and self._grenades + value > tweak_data.equipments.max_amount.grenades then
 		local peer = Network:is_server() and self._peer or managers.network:session():server_peer()
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(Network:is_server() and "menu_chat_peer_cheated_many_grenades_server" or "menu_chat_peer_cheated_many_grenades", {
-			name = peer:name()
-		}))
-		peer:mark_cheater()
+		peer:mark_cheater(VoteManager.REASON.many_grenades, Network:is_server())
 		print("[NetworkMember:set_grenade]: Failed to use grenade", self._peer:id(), self._grenades, value)
 		return false
 	end

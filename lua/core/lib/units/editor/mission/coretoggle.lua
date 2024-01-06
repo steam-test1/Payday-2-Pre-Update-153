@@ -34,6 +34,11 @@ function CoreToggleUnitElement:draw_links(t, dt, selected_unit, all_units)
 	end
 end
 
+function CoreToggleUnitElement:get_links_to_unit(...)
+	CoreToggleUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function CoreToggleUnitElement:update_editing()
 end
 

@@ -16,7 +16,7 @@ end
 function TeamAILogicBase.on_objective_unit_destroyed(data, unit)
 	data.objective.destroy_clbk_key = nil
 	data.objective.death_clbk_key = nil
-	managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective)
+	data.objective_failed_clbk(data.unit, data.objective)
 end
 
 function TeamAILogicBase._get_logic_state_from_reaction(data, reaction)

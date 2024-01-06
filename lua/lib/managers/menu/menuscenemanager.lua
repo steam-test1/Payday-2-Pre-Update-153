@@ -64,6 +64,7 @@ function MenuSceneManager:init()
 		"husk_mosconi"
 	}
 	self._global_poses.m249 = {"husk_m249"}
+	self._global_poses.mg42 = {"husk_mg42"}
 	self._mask_units = {}
 	self._weapon_units = {}
 	self._character_visibilities = {}
@@ -281,11 +282,12 @@ function MenuSceneManager:update(t, dt)
 	if self._delayed_callbacks then
 		local callbacks = self._delayed_callbacks
 		if callbacks[1] and t > callbacks[1][1] then
-			local clbk = table.remove(callbacks, 1)[2]
+			local clbk_data = table.remove(callbacks, 1)
+			local clbk = clbk_data[2]
 			if #callbacks == 0 then
 				self._delayed_callbacks = nil
 			end
-			clbk()
+			clbk(clbk_data[3])
 		end
 	end
 	if self._camera_values and self._transition_time then
@@ -307,6 +309,16 @@ function MenuSceneManager:update(t, dt)
 		if self._character_values then
 			local character_pos = math.lerp(self._character_values.pos_current, self._character_values.pos_target, bezier_value)
 			self._character_unit:set_position(character_pos)
+			if not self._transition_time and 0 < #self._character_dynamic_bodies then
+				self._enabled_character_dynamic_bodies = math.max(self._enabled_character_dynamic_bodies and self._enabled_character_dynamic_bodies or 0, 10)
+			end
+		end
+	end
+	if self._enabled_character_dynamic_bodies then
+		self._enabled_character_dynamic_bodies = self._enabled_character_dynamic_bodies - 1
+		if self._enabled_character_dynamic_bodies == 0 then
+			self._enabled_character_dynamic_bodies = nil
+			self:_set_character_dynamic_bodies_state("dynamic")
 		end
 	end
 	if self._camera_object and self._new_fov ~= self._current_fov + (self._fov_mod or 0) then
@@ -354,18 +366,19 @@ function MenuSceneManager:update(t, dt)
 	end
 end
 
-function MenuSceneManager:add_callback(clbk, delay)
+function MenuSceneManager:add_callback(clbk, delay, param)
 	if not clbk then
 		debug_pause("[MenuSceneManager:add_callback] Empty callback object!")
 	end
 	local clbk_data = {
 		Application:time() + delay,
-		clbk
+		clbk,
+		param
 	}
 	self._delayed_callbacks = self._delayed_callbacks or {}
 	local callbacks = self._delayed_callbacks
 	local i = #callbacks
-	while 0 < i and delay < callbacks[i][1] do
+	while 0 < i and callbacks[i][1] > clbk_data[1] do
 		i = i - 1
 	end
 	table.insert(callbacks, i + 1, clbk_data)
@@ -399,8 +412,27 @@ end
 
 function MenuSceneManager:_set_player_character_unit(unit_name)
 	self._character_unit = self:_set_character_unit(unit_name, self._character_unit)
+	self:_setup_character_dynamic_bodies(self._character_unit)
 	self._character_visibilities[self._character_unit:key()] = true
 	self:_set_character_equipment()
+end
+
+function MenuSceneManager:_setup_character_dynamic_bodies(unit)
+	self._character_dynamic_bodies = {}
+	local bodies = self._character_dynamic_bodies
+	for i = 0, unit:num_bodies() - 1 do
+		if unit:body(i):dynamic() then
+			table.insert(bodies, unit:body(i))
+		end
+	end
+	self._enabled_character_dynamic_bodies = 31
+end
+
+function MenuSceneManager:_set_character_dynamic_bodies_state(state)
+	local func_name = state == "keyframed" and "set_keyframed" or "set_dynamic"
+	for _, body in ipairs(self._character_dynamic_bodies) do
+		body[func_name](body)
+	end
 end
 
 function MenuSceneManager:_set_character_unit(unit_name, unit)
@@ -414,8 +446,8 @@ function MenuSceneManager:_set_character_unit(unit_name, unit)
 	end
 	local a = self._bg_unit:get_object(Idstring("a_reference"))
 	unit = World:spawn_unit(Idstring(unit_name), pos or a:position(), rot or a:rotation())
-	self._character_yaw = a:rotation():yaw()
-	self._character_pitch = a:rotation():pitch()
+	self._character_yaw = (rot or a:rotation()):yaw()
+	self._character_pitch = (rot or a:rotation()):pitch()
 	self:_set_character_unit_pose("husk_rifle1", unit)
 	return unit
 end
@@ -643,6 +675,9 @@ function MenuSceneManager:set_lobby_character_out_fit(i, outfit_string, rank)
 	local outfit = managers.blackmarket:unpack_outfit_from_string(outfit_string)
 	local character = outfit.character
 	if managers.network:session() then
+		if not managers.network:session():peer(i) then
+			return
+		end
 		character = managers.network:session():peer(i):character_id()
 	end
 	self:change_lobby_character(i, character)
@@ -1105,6 +1140,7 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 		self._character_values = self._character_values or {}
 		self._character_values.pos_current = self._character_values.pos_target or template_data.character_pos
 		self._character_values.pos_target = template_data.character_pos or self._character_values.pos_current
+		self:_set_character_dynamic_bodies_state("keyframed")
 		self._camera_values.camera_pos_current = self._camera_values.camera_pos_target
 		self._camera_values.target_pos_current = self._camera_values.target_pos_target
 		self._camera_values.fov_current = self._camera_values.fov_target

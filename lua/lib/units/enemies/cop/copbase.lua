@@ -40,6 +40,8 @@ do
 		"civ_female_casual_9",
 		"civ_female_casual_10",
 		"civ_female_crackwhore_1",
+		"civ_female_curator_1",
+		"civ_female_curator_2",
 		"civ_female_hostess_apron_1",
 		"civ_female_hostess_jacket_1",
 		"civ_female_hostess_shirt_1",
@@ -54,6 +56,8 @@ do
 		"civ_male_bank_manager_1",
 		"civ_male_bank_manager_3",
 		"civ_male_bank_manager_4",
+		"civ_male_bartender_1",
+		"civ_male_bartender_2",
 		"civ_male_business_1",
 		"civ_male_business_2",
 		"civ_male_casual_1",
@@ -68,6 +72,9 @@ do
 		"civ_male_casual_12",
 		"civ_male_casual_13",
 		"civ_male_casual_14",
+		"civ_male_curator_1",
+		"civ_male_curator_2",
+		"civ_male_curator_3",
 		"civ_male_dj_1",
 		"civ_male_italian_robe_1",
 		"civ_male_janitor_1",
@@ -77,6 +84,7 @@ do
 		"civ_male_party_1",
 		"civ_male_party_2",
 		"civ_male_party_3",
+		"civ_male_pilot_1",
 		"civ_male_scientist_1",
 		"civ_male_miami_store_clerk_1",
 		"civ_male_trucker_1",
@@ -151,6 +159,7 @@ do
 		"ene_security_5",
 		"ene_security_6",
 		"ene_security_7",
+		"ene_security_8",
 		"ene_shield_1",
 		"ene_shield_2",
 		"ene_sniper_1",
@@ -221,6 +230,16 @@ function CopBase:post_init()
 	self._unit:brain():post_init()
 	managers.enemy:register_enemy(self._unit)
 	self._allow_invisible = true
+	self:_chk_spawn_gear()
+end
+
+function CopBase:_chk_spawn_gear()
+	if Global.level_data.level_id == "pines" and self._tweak_table == "spooc" then
+		local align_obj_name = Idstring("Head")
+		local align_obj = self._unit:get_object(align_obj_name)
+		self._headwear_unit = World:spawn_unit(Idstring("units/payday2/characters/ene_acc_spook_santa_hat/ene_acc_spook_santa_hat"), Vector3(), Rotation())
+		self._unit:link(align_obj_name, self._headwear_unit, self._headwear_unit:orientation_object():name())
+	end
 end
 
 function CopBase:default_weapon_name()
@@ -265,6 +284,9 @@ function CopBase:set_visibility_state(stage)
 			inventory:set_visibility_state(state)
 		end
 		unit:set_visible(state)
+		if self._headwear_unit then
+			self._headwear_unit:set_visible(state)
+		end
 		if state or self._ext_anim.can_freeze and self._ext_anim.upper_body_empty then
 			unit:set_animatable_enabled(ids_lod, state)
 			unit:set_animatable_enabled(ids_ik_aim, state)
@@ -375,6 +397,9 @@ function CopBase:melee_weapon()
 end
 
 function CopBase:pre_destroy(unit)
+	if alive(self._headwear_unit) then
+		self._headwear_unit:set_slot(0)
+	end
 	unit:brain():pre_destroy(unit)
 	self._ext_movement:pre_destroy()
 	self._unit:inventory():pre_destroy()

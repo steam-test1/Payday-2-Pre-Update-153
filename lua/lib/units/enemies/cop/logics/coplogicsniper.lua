@@ -98,7 +98,7 @@ function CopLogicSniper._upd_enemy_detection(data)
 		end
 		if wanted_state and wanted_state ~= data.name then
 			if obj_failed then
-				managers.groupai:state():on_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 			end
 			if my_data == data.internal_data then
 				CopLogicBase._exit(data.unit, wanted_state)

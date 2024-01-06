@@ -34,7 +34,6 @@ end
 function DynamicLayer:do_spawn_unit(name, pos, rot)
 	local unit = DynamicLayer.super.do_spawn_unit(self, name, pos, rot)
 	if unit then
-		table.insert(self._created_units, unit)
 		self:set_distance(math.clamp(unit:bounding_sphere_radius() * 2, 100, 1500))
 		self:pickup_unit()
 	end

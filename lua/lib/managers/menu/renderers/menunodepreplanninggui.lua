@@ -450,7 +450,7 @@ function MenuNodePrePlanningGui:_set_item_positions()
 						prev_icon = new_icon
 					end
 				end
-				for i = 1, managers.criminals.get_num_characters() - num_votes do
+				for i = 1, managers.criminals.MAX_NR_CRIMINALS - num_votes do
 					new_icon = self._icon_panel:bitmap({
 						texture = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_voting",
 						texture_rect = {

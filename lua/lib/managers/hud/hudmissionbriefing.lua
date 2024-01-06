@@ -570,6 +570,9 @@ function HUDMissionBriefing:set_slot_outfit(peer_id, criminal_name, outfit)
 	if not slot or not alive(slot) then
 		return
 	end
+	if managers.network:session() and not managers.network:session():peer(peer_id) then
+		return
+	end
 	local detection, reached = managers.blackmarket:get_suspicion_offset_of_outfit_string(outfit, tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 	local detection_panel = slot:child("detection")
 	detection_panel:child("detection_left"):set_color(Color(0.5 + detection * 0.5, 1, 1))

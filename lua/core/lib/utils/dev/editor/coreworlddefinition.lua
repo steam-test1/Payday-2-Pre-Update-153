@@ -519,7 +519,7 @@ function WorldDefinition:_create_massunit(data, offset)
 		end
 	end
 	MassUnitManager:delete_all_units()
-	MassUnitManager:load(path:id(), offset, self._massunit_replace_names)
+	MassUnitManager:load(path:id(), offset, Rotation(), self._massunit_replace_names)
 end
 
 function WorldDefinition:sky_rotation_modifier()

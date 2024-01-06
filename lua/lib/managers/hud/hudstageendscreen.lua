@@ -200,8 +200,8 @@ function HUDStageEndScreen:init(hud, workspace)
 	self._backdrop:set_panel_to_saferect(self._foreground_layer_safe)
 	if managers.job:has_active_job() then
 		local current_contact_data = managers.job:current_contact_data()
-		local contact_gui = self._background_layer_full:gui(current_contact_data.assets_gui, {empty = true})
-		local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
+		local contact_gui = current_contact_data and self._background_layer_full:gui(current_contact_data.assets_gui, {empty = true})
+		local contact_pattern = contact_gui and contact_gui:has_script() and contact_gui:script().pattern
 		if contact_pattern then
 			self._backdrop:set_pattern(contact_pattern)
 		end
@@ -1666,9 +1666,10 @@ end
 
 function HUDStageEndScreen:stage_spin_slowdown(t, dt)
 	local data = self._data
-	local xp_gained_frame = dt * self._speed * math.max(data.end_t.total * 0.1, 450)
+	local level_cap = data.end_t.level == managers.experience:level_cap()
+	local xp_gained_frame = dt * self._speed * math.max(data.end_t.total * 0.1, 450, (level_cap and self._experience_added or 0) * 0.075)
 	local total_xp = data.end_t.total - data.end_t.current
-	if data.end_t.level == managers.experience:level_cap() then
+	if level_cap then
 		if not self._endgame_setup then
 			self._endgame_setup = true
 			self._experience_text_panel:show()

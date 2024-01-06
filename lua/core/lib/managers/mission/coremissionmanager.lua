@@ -468,7 +468,7 @@ function MissionScript:_debug_draw(t, dt)
 			if managers.viewport:get_current_camera() then
 				local cam_up = managers.viewport:get_current_camera():rotation():z()
 				local cam_right = managers.viewport:get_current_camera():rotation():x()
-				name_brush:center_text(element:value("position") + Vector3(0, 0, 30), element:editor_name(), cam_right, -cam_up)
+				name_brush:center_text(element:value("position") + Vector3(0, 0, 30), utf8.from_latin1(element:editor_name()), cam_right, -cam_up)
 			end
 		end
 		if element:value("rotation") then

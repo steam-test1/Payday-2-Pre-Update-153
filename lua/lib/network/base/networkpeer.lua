@@ -158,20 +158,14 @@ function NetworkPeer:verify_job(job)
 		return
 	end
 	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
-		self:mark_cheater()
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_cheated_invalid_job", {
-			name = self._name
-		}))
+		self:mark_cheater(VoteManager.REASON.invalid_job, Network:is_server())
 	end
 end
 
 function NetworkPeer:verify_outfit()
 	local failed = self:_verify_outfit_data()
 	if failed then
-		self:mark_cheater()
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(failed == 1 and "menu_chat_peer_cheated_invalid_mask" or "menu_chat_peer_cheated_invalid_weapon", {
-			name = self._name
-		}))
+		self:mark_cheater(failed == 1 and VoteManager.REASON.invalid_mask or VoteManager.REASON.invalid_weapon, Network:is_server())
 	end
 end
 
@@ -256,13 +250,16 @@ function NetworkPeer:is_cheater()
 	return self._cheater
 end
 
-function NetworkPeer:mark_cheater()
+function NetworkPeer:mark_cheater(reason, auto_kick)
 	self._cheater = true
-	if managers.hud then
+	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text(managers.vote:kick_reason_to_string(reason), {
+		name = self:name()
+	}))
+	if auto_kick and Global.game_settings.auto_kick then
+		managers.vote:kick_auto(reason, self, self._begin_ticket_session_called)
+	elseif managers.hud then
 		managers.hud:mark_cheater(self._id)
-		return true
 	end
-	return false
 end
 
 function NetworkPeer:set_steam_rpc(rpc)
@@ -1097,6 +1094,13 @@ function NetworkPeer:_reload_outfit()
 	for part_id, part in pairs(secondary_w_parts) do
 		new_outfit_assets.unit["sec_w_part_" .. tostring(part_id)] = {
 			name = part.name
+		}
+	end
+	local melee_tweak_data = tweak_data.blackmarket.melee_weapons[complete_outfit.melee_weapon]
+	local melee_u_name = is_local_peer and melee_tweak_data.unit or melee_tweak_data.third_unit
+	if melee_u_name then
+		new_outfit_assets.unit.melee_w = {
+			name = Idstring(melee_u_name)
 		}
 	end
 	self._outfit_assets = new_outfit_assets

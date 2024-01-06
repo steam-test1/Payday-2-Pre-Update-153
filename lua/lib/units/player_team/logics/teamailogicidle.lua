@@ -408,7 +408,7 @@ function TeamAILogicIdle._upd_enemy_detection(data)
 		end
 		if wanted_state and wanted_state ~= data.name then
 			if obj_failed then
-				managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 			end
 			if my_data == data.internal_data then
 				CopLogicBase._exit(data.unit, wanted_state)
@@ -554,10 +554,10 @@ function TeamAILogicIdle.action_complete_clbk(data, action)
 			my_data.performing_act_objective = nil
 			if action:expired() then
 				if not my_data.action_timeout_clbk_id then
-					managers.groupai:state():on_objective_complete(data.unit, old_objective)
+					data.objective_complete_clbk(data.unit, old_objective)
 				end
 			else
-				managers.groupai:state():on_objective_failed(data.unit, old_objective)
+				data.objective_failed_clbk(data.unit, old_objective)
 			end
 			if my_data.delayed_clbks and my_data.delayed_clbks[my_data.revive_complete_clbk_id] then
 				CopLogicBase.cancel_delayed_clbk(my_data, my_data.revive_complete_clbk_id)
@@ -573,13 +573,13 @@ function TeamAILogicIdle.action_complete_clbk(data, action)
 					revive_unit:character_damage():unpause_downed_timer()
 				end
 				my_data.reviving = nil
-				managers.groupai:state():on_criminal_objective_failed(data.unit, old_objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 			elseif action:expired() then
 				if not my_data.action_timeout_clbk_id then
-					managers.groupai:state():on_criminal_objective_complete(data.unit, old_objective)
+					data.objective_complete_clbk(data.unit, old_objective)
 				end
 			else
-				managers.groupai:state():on_criminal_objective_failed(data.unit, old_objective)
+				data.objective_failed_clbk(data.unit, old_objective)
 			end
 		end
 	end
@@ -622,7 +622,7 @@ function TeamAILogicIdle.clbk_revive_complete(ignore_this, data)
 	local revive_unit = my_data.reviving
 	my_data.reviving = nil
 	if alive(revive_unit) then
-		managers.groupai:state():on_criminal_objective_complete(data.unit, my_data.performing_act_objective)
+		data.objective_complete_clbk(data.unit, my_data.performing_act_objective)
 		if revive_unit:interaction() then
 			if revive_unit:interaction():active() then
 				revive_unit:interaction():interact(data.unit)
@@ -634,7 +634,7 @@ function TeamAILogicIdle.clbk_revive_complete(ignore_this, data)
 		end
 	else
 		print("[TeamAILogicIdle.clbk_revive_complete] Revive unit dead.", revive_unit, data.unit)
-		managers.groupai:state():on_criminal_objective_failed(data.unit, my_data.performing_act_objective)
+		data.objective_failed_clbk(data.unit, data.performing_act_objective)
 	end
 end
 
@@ -651,7 +651,7 @@ function TeamAILogicIdle.clbk_action_timeout(ignore_this, data)
 		debug_pause_unit(data.unit, "[TeamAILogicIdle.clbk_action_timeout] missing objective")
 		return
 	end
-	managers.groupai:state():on_criminal_objective_complete(data.unit, old_objective)
+	data.objective_complete_clbk(data.unit, old_objective)
 end
 
 function TeamAILogicIdle._check_should_relocate(data, my_data, objective)

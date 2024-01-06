@@ -61,6 +61,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.gold = 2875
 	self.bag_values.diamonds = 1000
 	self.bag_values.coke = 2000
+	self.bag_values.coke_pure = 3000
 	self.bag_values.meth = 13000
 	self.bag_values.weapon = 3000
 	self.bag_values.weapons = 3000
@@ -70,6 +71,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.circuit = 1000
 	self.bag_values.shells = 2100
 	self.bag_values.turret = 10000
+	self.bag_values.sandwich = 10000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
@@ -226,6 +228,7 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_asset_cost_thermite = 15000
 	self.preplaning_asset_cost_escapebig = 10000
 	self.preplaning_asset_cost_spycam = 1000
+	self.preplaning_asset_cost_delay20 = 1000
 	self.preplaning_asset_cost_delay30 = 2000
 	self.preplaning_asset_cost_timelock60 = 2000
 	self.preplaning_asset_cost_cake = 3000

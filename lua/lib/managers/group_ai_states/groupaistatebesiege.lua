@@ -1008,7 +1008,7 @@ function GroupAIStateBesiege:_upd_group_spawning()
 		local hopeless = true
 		for _, sp_data in ipairs(spawn_points) do
 			local category = group_ai_tweak.unit_categories[u_type_name]
-			if (sp_data.accessibility == "any" or category.access[sp_data.accessibility]) and (not sp_data.amount or sp_data.amount > 0) then
+			if (sp_data.accessibility == "any" or category.access[sp_data.accessibility]) and (not sp_data.amount or sp_data.amount > 0) and sp_data.mission_element:enabled() then
 				hopeless = false
 				if self._t > sp_data.delay_t then
 					produce_data.name = category.units[math.random(#category.units)]
@@ -1158,7 +1158,7 @@ function GroupAIStateBesiege:_upd_reenforce_tasks()
 				if 0 < overshot then
 					local closest_group, closest_group_size
 					for group_id, group in pairs(self._groups) do
-						if group.has_spawned and (group.objective.target_area or group.objective.area) == task_data.target_area and group.objective.type == "reenforce area" and (not closest_group_size or closest_group_size < group.size) and overshot >= group.size then
+						if group.has_spawned and (group.objective.target_area or group.objective.area) == task_data.target_area and group.objective.type == "reenforce_area" and (not closest_group_size or closest_group_size < group.size) and overshot >= group.size then
 							closest_group = group
 							closest_group_size = group.size
 						end
@@ -1169,6 +1169,11 @@ function GroupAIStateBesiege:_upd_reenforce_tasks()
 				end
 			end
 		else
+			for group_id, group in pairs(self._groups) do
+				if group.has_spawned and (group.objective.target_area or group.objective.area) == task_data.target_area and group.objective.type == "reenforce_area" then
+					self:_assign_group_to_retire(group)
+				end
+			end
 			reenforce_tasks[i] = reenforce_tasks[#reenforce_tasks]
 			table.remove(reenforce_tasks)
 		end
@@ -1248,28 +1253,12 @@ function GroupAIStateBesiege:on_objective_complete(unit, objective)
 				end
 			end
 		end
-		if not new_objective then
-			if objective.type == "investigate_area" then
-				if objective.guard_obj then
-					new_objective = {
-						type = "guard",
-						nav_seg = seg,
-						vis_group = objective.vis_group,
-						guard_obj = objective.guard_obj,
-						interrupt_dis = 700,
-						interrupt_health = 0.75,
-						in_place = true,
-						scan = objective.scan,
-						attitude = objective.attitude
-					}
-				end
-			elseif objective.type == "free" then
-				new_objective = {
-					type = "free",
-					is_default = true,
-					attitude = objective.attitude
-				}
-			end
+		if not new_objective and objective.type == "free" then
+			new_objective = {
+				type = "free",
+				is_default = true,
+				attitude = objective.attitude
+			}
 		end
 		if not area_data.is_safe then
 			area_data.is_safe = true
@@ -1409,8 +1398,6 @@ function GroupAIStateBesiege:_draw_enemy_activity(t)
 		local objective_type = objective and objective.type
 		if objective_type == "guard" then
 			brush = draw_data.brush_guard
-		elseif objective_type == "investigate_area" then
-			brush = draw_data.brush_investigate
 		elseif objective_type == "defend_area" then
 			brush = draw_data.brush_defend
 		elseif objective_type == "free" or objective_type == "follow" or objective_type == "surrender" then

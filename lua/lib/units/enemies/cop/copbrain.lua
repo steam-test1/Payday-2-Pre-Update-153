@@ -229,7 +229,9 @@ function CopBrain:_reset_logic_data()
 		attention_handler = self._attention_handler,
 		visibility_slotmask = managers.slot:get_mask("AI_visibility"),
 		enemy_slotmask = self._slotmask_enemies,
-		cool = self._unit:movement():cool()
+		cool = self._unit:movement():cool(),
+		objective_complete_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_objective_complete"),
+		objective_failed_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_objective_failed")
 	}
 	if Application:production_build() then
 		self._logic_data.debug_name = self._unit:name()
@@ -382,6 +384,13 @@ function CopBrain:cancel_all_pathing_searches()
 	self._logic_data.pathing_results = nil
 end
 
+function CopBrain:abort_detailed_pathing(search_id)
+	if self._logic_data.active_searches[search_id] then
+		self._logic_data.active_searches[search_id] = nil
+		managers.navigation:cancel_pathing_search(search_id)
+	end
+end
+
 function CopBrain:clbk_damage(my_unit, damage_info)
 	if damage_info.attacker_unit and damage_info.attacker_unit:in_slot(self._slotmask_enemies) then
 		self._current_logic.damage_clbk(self._logic_data, damage_info)
@@ -436,9 +445,10 @@ function CopBrain:interaction_voice()
 end
 
 function CopBrain:on_intimidated(amount, aggressor_unit)
-	if self._logic_data.objective and self._logic_data.objective.followup_objective and self._logic_data.objective.followup_objective.trigger_on == "interact" and (not (self._logic_data.objective and self._logic_data.objective.nav_seg) or not not self._logic_data.objective.in_place) and not self._unit:anim_data().unintimidateable then
+	local interaction_voice = self:interaction_voice()
+	if interaction_voice then
 		self:set_objective(self._logic_data.objective.followup_objective)
-		return self._logic_data.objective.interaction_voice
+		return interaction_voice
 	else
 		self._current_logic.on_intimidated(self._logic_data, amount, aggressor_unit)
 	end
@@ -778,6 +788,8 @@ function CopBrain:convert_to_criminal(mastermind_criminal)
 	weapon_unit:base():add_damage_multiplier(damage_multiplier)
 	self:set_objective(nil)
 	self:set_logic("idle", nil)
+	self._logic_data.objective_complete_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_criminal_objective_complete")
+	self._logic_data.objective_failed_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_criminal_objective_failed")
 	managers.groupai:state():on_criminal_jobless(self._unit)
 	self._unit:base():set_slot(self._unit, 16)
 	self._unit:movement():set_stance("hos")

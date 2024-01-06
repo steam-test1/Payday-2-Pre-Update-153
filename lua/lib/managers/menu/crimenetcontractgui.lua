@@ -1123,8 +1123,7 @@ function CrimeNetContractGui:set_all(t, dt)
 	self:make_fine_text(gui_panel:child("payday_text"))
 	local can_afford = managers.money:can_afford_buy_premium_contract(job_data.job_id, job_data.difficulty_id)
 	local text_string = managers.localization:to_upper_text("menu_cn_premium_buy_fee", {
-		contract_fee = "##" .. managers.experience:cash_string(managers.money:get_cost_of_premium_contract(job_data.job_id, job_data.difficulty_id)) .. "##",
-		offshore = "##" .. managers.experience:cash_string(managers.money:offshore()) .. "##"
+		contract_fee = "##" .. managers.experience:cash_string(managers.money:get_cost_of_premium_contract(job_data.job_id, job_data.difficulty_id)) .. "##"
 	})
 	local text_dissected = utf8.characters(text_string)
 	local idsp = Idstring("#")

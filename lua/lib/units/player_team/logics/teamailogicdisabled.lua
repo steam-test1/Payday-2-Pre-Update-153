@@ -30,7 +30,7 @@ function TeamAILogicDisabled.enter(data, new_logic_name, enter_params)
 		data.unit:character_damage():set_invulnerable(true)
 	end
 	if data.objective then
-		managers.groupai:state():on_criminal_objective_failed(data.unit, data.objective, true)
+		data.objective_failed_clbk(data.unit, data.objective, true)
 		data.unit:brain():set_objective(nil)
 	end
 end

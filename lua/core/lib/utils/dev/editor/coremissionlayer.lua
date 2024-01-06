@@ -151,6 +151,9 @@ function MissionLayer:set_select_unit(unit, ...)
 	if not self:_add_on_executed(unit) then
 		MissionLayer.super.set_select_unit(self, unit, ...)
 	end
+	if self._list_flow and self._list_flow:visible() then
+		self._list_flow:on_unit_selected(self._selected_unit)
+	end
 end
 
 function MissionLayer:_add_on_executed(unit)
@@ -175,6 +178,9 @@ function MissionLayer:delete_unit(del_unit)
 		del_unit:mission_element():delete_unit(self._created_units)
 		del_unit:mission_element():clear()
 		MissionLayer.super.delete_unit(self, del_unit)
+	end
+	if self._list_flow then
+		self._list_flow:on_unit_selected(self._selected_unit)
 	end
 end
 
@@ -299,7 +305,7 @@ function MissionLayer:update(time, rel_time)
 				else
 					offset = Vector3(0, 0, unit:bounding_sphere_radius())
 				end
-				self._name_brush:center_text(unit:position() + offset, unit:unit_data().name_id, cam_right, -cam_up)
+				self._name_brush:center_text(unit:position() + offset, utf8.from_latin1(unit:unit_data().name_id), cam_right, -cam_up)
 			end
 		end
 	end
@@ -315,6 +321,7 @@ end
 function MissionLayer:update_unit_settings()
 	MissionLayer.super.update_unit_settings(self)
 	self:set_current_panel_visible(false)
+	self._element_toolbar:set_enabled(self._selected_unit and true or false)
 	self._element_toolbar:set_tool_state("EDIT_ELEMENT", self._editing_mission_element)
 	self._element_toolbar:set_tool_enabled("EDIT_ELEMENT", false)
 	self._element_toolbar:set_tool_enabled("TEST_ELEMENT", false)
@@ -366,6 +373,11 @@ function MissionLayer:toggle_update_selected_on()
 	self._selected_unit:mission_element():set_update_selected_on(self._element_toolbar:tool_state("UPDATE_SELECTED_ON"))
 end
 
+function MissionLayer:_on_gui_mission_element_help()
+	local short_name = self:_stripped_unit_name(self._selected_unit:name():s())
+	EWS:launch_url("http://serben01/wiki/index.php/" .. short_name)
+end
+
 function MissionLayer:toolbar_toggle(data, event)
 	CoreEditorUtils.toolbar_toggle(data, event)
 	if data.value == "_editing_mission_element" then
@@ -403,14 +415,13 @@ end
 
 function MissionLayer:do_layout()
 	self._missionelement_panel:layout()
-	self._ews_panel:fit_inside()
 	self._ews_panel:refresh()
 end
 
 function MissionLayer:build_panel(notebook)
 	MissionLayer.super.build_panel(self, notebook, {
 		units_noteboook_proportion = 0,
-		units_notebook_min_size = Vector3(-1, 240, 0)
+		units_notebook_min_size = Vector3(-1, 160, 0)
 	})
 	cat_print("editor", "MissionLayer:build_panel")
 	self:_build_scripts()
@@ -439,6 +450,9 @@ function MissionLayer:build_panel(notebook)
 	self._element_toolbar:connect("STOP_ELEMENT", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "stop_test_element"), nil)
 	self._element_toolbar:add_check_tool("UPDATE_SELECTED_ON", "Turns on/off update off drawing even if not selected", CoreEws.image_path("world_editor\\he_update_selected_on_16x16.png"), "Turns on/off update off drawing even if not selected")
 	self._element_toolbar:connect("UPDATE_SELECTED_ON", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "toggle_update_selected_on"), nil)
+	self._element_toolbar:add_separator()
+	self._element_toolbar:add_tool("HELP", "Help", CoreEws.image_path("help_16x16.png"), nil)
+	self._element_toolbar:connect("HELP", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_mission_element_help"), nil)
 	self._element_toolbar:realize()
 	btn_sizer:add(self._element_toolbar, 1, 1, "EXPAND,BOTTOM")
 	self._sizer:add(btn_sizer, 0, 0, "EXPAND")
@@ -521,10 +535,21 @@ function MissionLayer:add_btns_to_toolbar(...)
 		menu = nil,
 		toolbar = "_btn_toolbar"
 	})
+	self._btn_toolbar:add_separator()
+	self._btn_toolbar:add_tool("SHOW_LIST_FLOW", "Opens mission flow dialog", CoreEws.image_path("world_editor\\he_timeline_16x16.png"), "Opens mission flow dialog")
+	self._btn_toolbar:connect("SHOW_LIST_FLOW", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_show_list_flow"), {})
 end
 
 function MissionLayer:toggle_persistent_debug(params)
 	managers.mission:set_persistent_debug_enabled(self._btn_toolbar:tool_state("PERSISTENT_DEBUG"))
+end
+
+function MissionLayer:_show_list_flow()
+	self._list_flow = self._list_flow or _G.MissionElementListFlow:new()
+	if not self._list_flow:visible() then
+		self._list_flow:set_visible(true)
+	end
+	self._list_flow:on_unit_selected(self._selected_unit)
 end
 
 function MissionLayer:_on_activate_on_parsed()
@@ -779,10 +804,40 @@ function MissionLayer:clear()
 	MissionLayer.super.clear(self)
 	self:_reset_scripts()
 	self:update_unit_settings()
+	if self._list_flow then
+		self._list_flow:on_unit_selected(nil)
+	end
 end
 
 function MissionLayer:simulate_with_current_script()
 	return self._simulate_with_current_script
+end
+
+function MissionLayer:get_unit_links(to_unit)
+	local links = {
+		executers = {},
+		on_executed = {}
+	}
+	for _, unit in ipairs(self._created_units) do
+		unit:mission_element():get_links_to_unit(to_unit, links, self._created_units_pairs)
+	end
+	return links
+end
+
+function MissionLayer:activate(...)
+	MissionLayer.super.activate(self, ...)
+	if self._list_flow then
+		self._list_flow:set_visible(self._was_list_flow_visible)
+		self._was_list_flow_visible = nil
+	end
+end
+
+function MissionLayer:deactivate(...)
+	MissionLayer.super.deactivate(self, ...)
+	if self._list_flow then
+		self._was_list_flow_visible = self._list_flow:visible()
+		self._list_flow:set_visible(false)
+	end
 end
 
 function MissionLayer:add_triggers()

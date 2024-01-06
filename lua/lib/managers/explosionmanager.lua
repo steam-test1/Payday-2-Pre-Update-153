@@ -136,9 +136,9 @@ function ExplosionManager:detect_and_give_dmg(params)
 				local hit_unit = hit_body:unit()
 				if hit_unit:base() and hit_unit:base()._tweak_table and not hit_unit:character_damage():dead() then
 					type = hit_unit:base()._tweak_table
-					if type == "civilian" or type == "civilian_female" or type == "bank_manager" then
+					if CopDamage.is_civilian(type) then
 						count_civilians = count_civilians + 1
-					elseif type == "gangster" then
+					elseif CopDamage.is_gangster(type) then
 						count_gangsters = count_gangsters + 1
 					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" or type == "jowi" or type == "hoxton" then
 					else
@@ -173,9 +173,9 @@ function ExplosionManager:detect_and_give_dmg(params)
 				hit_unit:character_damage():damage_explosion(action_data)
 				if not dead_before and hit_unit:base() and hit_unit:base()._tweak_table and hit_unit:character_damage():dead() then
 					type = hit_unit:base()._tweak_table
-					if type == "civilian" or type == "civilian_female" or type == "bank_manager" then
+					if CopDamage.is_civilian(type) then
 						count_civilian_kills = count_civilian_kills + 1
-					elseif type == "gangster" then
+					elseif CopDamage.is_gangster(type) then
 						count_gangster_kills = count_gangster_kills + 1
 					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" then
 					else

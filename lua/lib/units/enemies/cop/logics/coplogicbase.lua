@@ -295,7 +295,7 @@ function CopLogicBase.on_objective_unit_destroyed(data, unit)
 	end
 	data.objective.destroy_clbk_key = nil
 	data.objective.death_clbk_key = nil
-	managers.groupai:state():on_objective_failed(data.unit, data.objective)
+	data.objective_failed_clbk(data.unit, data.objective)
 end
 
 function CopLogicBase.on_new_objective(data, old_objective)
@@ -845,7 +845,7 @@ function CopLogicBase._upd_suspicion(data, my_data, attention_obj)
 		local allow_trans, obj_failed = CopLogicBase.is_obstructed(data, data.objective, nil, attention_obj)
 		if allow_trans then
 			if obj_failed then
-				managers.groupai:state():on_objective_failed(data.unit, data.objective)
+				data.objective_failed_clbk(data.unit, data.objective)
 				if my_data ~= data.internal_data then
 					return true
 				end
@@ -944,7 +944,7 @@ function CopLogicBase._chk_call_the_police(data)
 	local allow_trans, obj_failed = CopLogicBase.is_obstructed(data, data.objective, nil, nil)
 	if allow_trans and data.logic.is_available_for_assignment(data) and not data.is_converted and not data.unit:movement():cool() and not managers.groupai:state():is_police_called() and (not (data.attention_obj and data.attention_obj.verified_t) or data.t - data.attention_obj.verified_t > 6 or data.attention_obj.reaction <= AIAttentionObject.REACT_ARREST) then
 		if obj_failed then
-			managers.groupai:state():on_objective_failed(data.unit, data.objective)
+			data.objective_failed_clbk(data.unit, data.objective)
 		end
 		if (not data.objective or data.objective.is_default) and not managers.groupai:state():chk_enemy_calling_in_area(managers.groupai:state():get_area_from_nav_seg_id(data.unit:movement():nav_tracker():nav_segment()), data.key) then
 			CopLogicBase._exit(data.unit, "arrest")
@@ -1155,7 +1155,7 @@ function CopLogicBase.on_suppressed_state(data)
 	if data.is_suppressed and data.objective then
 		local allow_trans, interrupt = CopLogicBase.is_obstructed(data, data.objective, nil, nil)
 		if interrupt then
-			managers.groupai:state():on_objective_failed(data.unit, data.objective)
+			data.objective_failed_clbk(data.unit, data.objective)
 		end
 	end
 end

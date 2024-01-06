@@ -74,6 +74,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_c96_npc()
 	self:_init_data_sterling_npc()
 	self:_init_data_mosin_npc()
+	self:_init_data_m1928_npc()
 	self:_precalculate_values()
 end
 
@@ -1176,6 +1177,21 @@ function WeaponTweakData:_init_data_mosin_npc()
 	self.mosin_npc.suppression = 1
 	self.mosin_secondary_npc = deep_clone(self.mosin_npc)
 	self.mosin_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_m1928_npc()
+	self.m1928_npc.sounds.prefix = "m1928_npc"
+	self.m1928_npc.use_data.selection_index = 1
+	self.m1928_npc.DAMAGE = 2
+	self.m1928_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m1928_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m1928_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m1928_npc.CLIP_AMMO_MAX = 50
+	self.m1928_npc.NR_CLIPS_MAX = 3
+	self.m1928_npc.auto.fire_rate = 20
+	self.m1928_npc.hold = "rifle"
+	self.m1928_npc.alert_size = 5000
+	self.m1928_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -6988,6 +7004,97 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		suppression = 3,
 		spread = 0.6
 	}
+	self.m1928 = {}
+	self.m1928.category = "smg"
+	self.m1928.damage_melee = damage_melee_default
+	self.m1928.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m1928.sounds = {}
+	self.m1928.sounds.fire = "m1928_fire_single"
+	self.m1928.sounds.fire_single = "m1928_fire_single"
+	self.m1928.sounds.fire_auto = "m1928_fire"
+	self.m1928.sounds.stop_fire = "m1928_stop"
+	self.m1928.sounds.dryfire = "primary_dryfire"
+	self.m1928.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.m1928.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.m1928.timers = {}
+	self.m1928.timers.reload_not_empty = 3.5
+	self.m1928.timers.reload_empty = 4.5
+	self.m1928.timers.unequip = 0.9
+	self.m1928.timers.equip = 0.9
+	self.m1928.name_id = "bm_w_m1928"
+	self.m1928.desc_id = "bm_w_m1928_desc"
+	self.m1928.description_id = "des_m1928"
+	self.m1928.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.m1928.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.m1928.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m1928.use_data = {}
+	self.m1928.use_data.selection_index = 1
+	self.m1928.DAMAGE = 1
+	self.m1928.CLIP_AMMO_MAX = 50
+	self.m1928.NR_CLIPS_MAX = 3
+	self.m1928.AMMO_MAX = self.m1928.CLIP_AMMO_MAX * self.m1928.NR_CLIPS_MAX
+	self.m1928.AMMO_PICKUP = self:_pickup_chance(90, 1.5)
+	self.m1928.FIRE_MODE = "auto"
+	self.m1928.fire_mode_data = {}
+	self.m1928.fire_mode_data.fire_rate = 0.083
+	self.m1928.CAN_TOGGLE_FIREMODE = true
+	self.m1928.auto = {}
+	self.m1928.auto.fire_rate = 0.083
+	self.m1928.spread = {}
+	self.m1928.spread.standing = 2.4
+	self.m1928.spread.crouching = 2.2
+	self.m1928.spread.steelsight = 0.9
+	self.m1928.spread.moving_standing = 2.8
+	self.m1928.spread.moving_crouching = 2.4
+	self.m1928.spread.moving_steelsight = 1.5
+	self.m1928.kick = {}
+	self.m1928.kick.standing = {
+		0.3,
+		1.5,
+		-1.2,
+		1.2
+	}
+	self.m1928.kick.crouching = self.m1928.kick.standing
+	self.m1928.kick.steelsight = self.m1928.kick.standing
+	self.m1928.crosshair = {}
+	self.m1928.crosshair.standing = {}
+	self.m1928.crosshair.crouching = {}
+	self.m1928.crosshair.steelsight = {}
+	self.m1928.crosshair.standing.offset = 0.16
+	self.m1928.crosshair.standing.moving_offset = 1
+	self.m1928.crosshair.standing.kick_offset = 0.8
+	self.m1928.crosshair.crouching.offset = 0.1
+	self.m1928.crosshair.crouching.moving_offset = 0.6
+	self.m1928.crosshair.crouching.kick_offset = 0.4
+	self.m1928.crosshair.steelsight.hidden = true
+	self.m1928.crosshair.steelsight.offset = 0
+	self.m1928.crosshair.steelsight.moving_offset = 0
+	self.m1928.crosshair.steelsight.kick_offset = 0.14
+	self.m1928.shake = {}
+	self.m1928.shake.fire_multiplier = 0.4
+	self.m1928.shake.fire_steelsight_multiplier = -0.4
+	self.m1928.autohit = autohit_smg_default
+	self.m1928.aim_assist = aim_assist_smg_default
+	self.m1928.weapon_hold = "tommy"
+	self.m1928.animations = {}
+	self.m1928.animations.equip_id = "equip_m1928"
+	self.m1928.animations.recoil_steelsight = true
+	self.m1928.global_value = "pd2_clan"
+	self.m1928.texture_bundle_folder = "pines"
+	self.m1928.panic_suppression_chance = 0.1
+	self.m1928.stats = {
+		damage = 10,
+		spread = 7,
+		recoil = 10,
+		spread_moving = 6,
+		zoom = 1,
+		concealment = 18,
+		suppression = 12,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -7506,6 +7613,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.m1928_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -7582,4 +7695,5 @@ function WeaponTweakData:_precalculate_values()
 	self.c96_npc.AMMO_MAX = self.c96_npc.CLIP_AMMO_MAX * self.c96_npc.NR_CLIPS_MAX
 	self.sterling_npc.AMMO_MAX = self.sterling_npc.CLIP_AMMO_MAX * self.sterling_npc.NR_CLIPS_MAX
 	self.mosin_npc.AMMO_MAX = self.mosin_npc.CLIP_AMMO_MAX * self.mosin_npc.NR_CLIPS_MAX
+	self.m1928_npc.AMMO_MAX = self.m1928_npc.CLIP_AMMO_MAX * self.m1928_npc.NR_CLIPS_MAX
 end

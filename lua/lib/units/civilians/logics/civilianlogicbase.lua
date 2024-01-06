@@ -8,5 +8,5 @@ function CivilianLogicBase.on_objective_unit_destroyed(data, unit)
 	end
 	data.objective.destroy_clbk_key = nil
 	data.objective.death_clbk_key = nil
-	managers.groupai:state():on_civilian_objective_failed(data.unit, data.objective)
+	data.objective_failed_clbk(data.unit, data.objective)
 end

@@ -269,6 +269,8 @@ function BaseNetworkSession:on_peer_kicked(peer, peer_id, message_id)
 			Global.on_remove_peer_message = "dialog_authentication_fail"
 		elseif message_id == 3 then
 			Global.on_remove_peer_message = "dialog_authentication_host_fail"
+		elseif message_id == 4 then
+			Global.on_remove_peer_message = "dialog_cheated_host"
 		end
 		print("IVE BEEN KICKED!")
 		if self:_local_peer_in_lobby() then

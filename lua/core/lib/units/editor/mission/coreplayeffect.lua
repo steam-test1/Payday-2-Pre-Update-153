@@ -121,6 +121,11 @@ function CoreStopEffectUnitElement:draw_links(t, dt, selected_unit)
 	end
 end
 
+function CoreStopEffectUnitElement:get_links_to_unit(...)
+	CoreStopEffectUnitElement.super.get_links_to_unit(self, ...)
+	self:_get_links_of_type_from_elements(self._hed.elements, "operator", ...)
+end
+
 function CoreStopEffectUnitElement:update_editing()
 end
 

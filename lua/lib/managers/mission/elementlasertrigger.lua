@@ -78,6 +78,7 @@ end
 function ElementLaserTrigger:set_enabled(enabled)
 	ElementLaserTrigger.super.set_enabled(self, enabled)
 	if enabled then
+		self._delayed_remove = nil
 		self:add_callback()
 	else
 		self:remove_callback()
@@ -98,7 +99,13 @@ function ElementLaserTrigger:remove_callback()
 		self._mission_script:remove(self._callback)
 		self._callback = nil
 	end
-	self._mission_script:remove_updator(self._id)
+	if self._values.flicker_remove then
+		self._delayed_remove = 7
+		self._delayed_remove_t = 0
+		self._delayed_remove_state_on = true
+	else
+		self._mission_script:remove_updator(self._id)
+	end
 end
 
 function ElementLaserTrigger:client_on_executed(...)
@@ -118,8 +125,30 @@ function ElementLaserTrigger:instigators()
 	return ElementAreaTrigger.project_instigators(self)
 end
 
+function ElementLaserTrigger:_check_delayed_remove(t, dt)
+	if not self._delayed_remove then
+		return false
+	end
+	if self._delayed_remove_t <= 0 then
+		self._delayed_remove_state_on = not self._delayed_remove_state_on
+		self._delayed_remove_t = 0.05 + math.rand(0.05)
+		self._delayed_remove = self._delayed_remove - 1
+		if self._delayed_remove <= 0 then
+			self._mission_script:remove_updator(self._id)
+		end
+	end
+	self._delayed_remove_t = self._delayed_remove_t - dt
+	if not self._delayed_remove_state_on then
+		return true
+	end
+	return false
+end
+
 function ElementLaserTrigger:update_laser_draw(t, dt)
 	if #self._connections == 0 then
+		return
+	end
+	if self:_check_delayed_remove(t, dt) then
 		return
 	end
 	for _, connection in ipairs(self._connections) do

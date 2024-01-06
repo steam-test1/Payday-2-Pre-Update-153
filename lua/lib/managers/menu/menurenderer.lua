@@ -84,7 +84,7 @@ function MenuRenderer:_create_bottom_text()
 	self._bottom_text:set_right(self._bottom_text:parent():w())
 end
 
-function MenuRenderer:set_bottom_text(id)
+function MenuRenderer:set_bottom_text(id, localize)
 	if not alive(self._bottom_text) then
 		return
 	end
@@ -92,7 +92,7 @@ function MenuRenderer:set_bottom_text(id)
 		self._bottom_text:set_text("")
 		return
 	end
-	self._bottom_text:set_text(utf8.to_upper(managers.localization:text(id)))
+	self._bottom_text:set_text(utf8.to_upper(localize and managers.localization:text(id) or id))
 	local _, _, _, h = self._bottom_text:text_rect()
 	self._bottom_text:set_h(h)
 end

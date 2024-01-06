@@ -26,7 +26,7 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	end
 	data.unit:movement():set_allow_fire(false)
 	if data.objective then
-		managers.groupai:state():on_objective_failed(data.unit, data.objective)
+		data.objective_failed_clbk(data.unit, data.objective)
 	end
 	if managers.groupai:state():rescue_state() then
 		CopLogicIntimidated._add_delayed_rescue_SO(data, my_data)

@@ -2609,7 +2609,7 @@ function MenuComponentManager:sync_preplanning_draw_event(peer_id, event_id, var
 		elseif event_id == 5 then
 			local server_peer = managers.network and managers.network:session() and managers.network:session():server_peer()
 			if server_peer and server_peer:id() == peer_id then
-				for i = 1, managers.criminals.get_num_characters() do
+				for i = 1, managers.criminals.MAX_NR_CRIMINALS do
 					self._preplanning_map:sync_erase_drawing(i)
 				end
 			end

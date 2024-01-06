@@ -60,6 +60,8 @@ end
 function TeamAIBrain:_reset_logic_data()
 	TeamAIBrain.super._reset_logic_data(self)
 	self._logic_data.enemy_slotmask = managers.slot:get_mask("enemies")
+	self._logic_data.objective_complete_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_criminal_objective_complete")
+	self._logic_data.objective_failed_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_criminal_objective_failed")
 end
 
 function TeamAIBrain:set_spawn_ai(spawn_ai)

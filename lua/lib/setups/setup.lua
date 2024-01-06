@@ -67,6 +67,7 @@ require("lib/managers/MissionAssetsManager")
 require("lib/managers/GageAssignmentManager")
 require("lib/managers/PrePlanningManager")
 require("lib/managers/MusicManager")
+require("lib/managers/VoteManager")
 require("lib/units/UnitDamage")
 require("lib/units/props/DigitalGui")
 require("lib/units/props/TextGui")
@@ -111,8 +112,8 @@ end
 
 function Setup:load_packages()
 	PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
+	TextureCache:set_streaming_enabled(true)
 	if not Application:editor() then
-		TextureCache:set_streaming_enabled(true)
 		PackageManager:set_streaming_enabled(true)
 	end
 	if not PackageManager:loaded("packages/base") then
@@ -131,8 +132,9 @@ function Setup:init_managers(managers)
 		team_ai = true,
 		reputation_permission = 0,
 		drop_in_allowed = true,
-		kicking_allowed = true,
-		search_appropriate_jobs = true
+		kick_option = 1,
+		search_appropriate_jobs = true,
+		auto_kick = true
 	}
 	managers.dyn_resource = DynamicResourceManager:new()
 	managers.gui_data = CoreGuiDataManager.GuiDataManager:new()
@@ -164,6 +166,7 @@ function Setup:init_managers(managers)
 	managers.gage_assignment = GageAssignmentManager:new()
 	managers.assets = MissionAssetsManager:new()
 	managers.preplanning = PrePlanningManager:new()
+	managers.vote = VoteManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 
@@ -339,6 +342,7 @@ function Setup:update(t, dt)
 	managers.menu:update(main_t, main_dt)
 	managers.player:update(t, dt)
 	managers.blackmarket:update(t, dt)
+	managers.vote:update(t, dt)
 	game_state_machine:update(t, dt)
 	if self._main_thread_loading_screen_gui_visible then
 		self._main_thread_loading_screen_gui_script:update(-1, dt)

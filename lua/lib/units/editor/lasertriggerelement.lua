@@ -40,6 +40,7 @@ function LaserTriggerUnitElement:init(unit)
 	self._hed.cycle_random = false
 	self._hed.cycle_active_amount = 1
 	self._hed.cycle_type = "flow"
+	self._hed.flicker_remove = nil
 	self._hed.points = {}
 	self._hed.connections = {}
 	table.insert(self._save_values, "interval")
@@ -51,6 +52,7 @@ function LaserTriggerUnitElement:init(unit)
 	table.insert(self._save_values, "cycle_random")
 	table.insert(self._save_values, "cycle_active_amount")
 	table.insert(self._save_values, "cycle_type")
+	table.insert(self._save_values, "flicker_remove")
 	table.insert(self._save_values, "points")
 	table.insert(self._save_values, "connections")
 end
@@ -335,134 +337,31 @@ function LaserTriggerUnitElement:_move_connection_down()
 	self:_on_clicked_connections_box()
 end
 
+function LaserTriggerUnitElement:set_element_data(params, ...)
+	LaserTriggerUnitElement.super.set_element_data(self, params, ...)
+	if params.value == "instigator" and self._hed.instigator == "criminals" then
+		EWS:message_box(Global.frame_panel, "Criminals is deprecated, you should probably use local_criminals. Ask Martin or Ilija why.", "Instigator Warning", "ICON_WARNING", Vector3(-1, -1, 0))
+	end
+end
+
 function LaserTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	local interval_params = {
-		name = "Check interval:",
-		value = self._hed.interval,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "Set the check interval for the laser, in seconds",
-		floats = 2,
-		min = 0.01,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local interval = CoreEWS.number_controller(interval_params)
-	interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = interval, value = "interval"})
-	local instigator_params = {
-		name = "Instigator:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = managers.mission:area_instigator_categories(),
-		value = self._hed.instigator,
-		tooltip = "Select an instigator type for the area",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local instigator = CoreEWS.combobox(instigator_params)
-	instigator:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = instigator, value = "instigator"})
-	local f = function(ctrlr)
-		if ctrlr:get_value() == "criminals" then
-			EWS:message_box(Global.frame_panel, "Criminals is deprecated, you should probably use local_criminals. Ask Martin or Ilija why.", "Instigator Warning", "ICON_WARNING", Vector3(-1, -1, 0))
-		end
-	end
-	instigator:connect("EVT_COMMAND_COMBOBOX_SELECTED", f, instigator)
-	local color_params = {
-		name = "Color:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {
-			"red",
-			"green",
-			"blue"
-		},
-		value = self._hed.color,
-		tooltip = "Select a color",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local color = CoreEWS.combobox(color_params)
-	color:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = color, value = "color"})
-	local visual_only = EWS:CheckBox(panel, "Visual only", "")
-	visual_only:set_value(self._hed.visual_only)
-	visual_only:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = visual_only,
-		value = "visual_only"
-	})
-	panel_sizer:add(visual_only, 0, 0, "EXPAND")
-	local skip_dummies = EWS:CheckBox(panel, "Skip dummies", "")
-	skip_dummies:set_value(self._hed.skip_dummies)
-	skip_dummies:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = skip_dummies,
-		value = "skip_dummies"
-	})
-	panel_sizer:add(skip_dummies, 0, 0, "EXPAND")
-	local cycle_interval_params = {
-		name = "Cycle interval:",
-		value = self._hed.cycle_interval,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "Set the check cycle interval for the laser, in seconds (0 == disabled)",
-		floats = 2,
-		min = 0,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local cycle_interval = CoreEWS.number_controller(cycle_interval_params)
-	cycle_interval:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = cycle_interval,
-		value = "cycle_interval"
-	})
-	cycle_interval:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = cycle_interval,
-		value = "cycle_interval"
-	})
-	local cycle_active_amount_params = {
-		name = "Cycle active amount:",
-		value = self._hed.cycle_active_amount,
-		panel = panel,
-		sizer = panel_sizer,
-		tooltip = "Defines how many are active during cycle",
-		floats = 0,
-		min = 1,
-		name_proportions = 1,
-		ctrlr_proportions = 2
-	}
-	local cycle_active_amount = CoreEWS.number_controller(cycle_active_amount_params)
-	cycle_active_amount:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
-		ctrlr = cycle_active_amount,
-		value = "cycle_active_amount"
-	})
-	cycle_active_amount:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
-		ctrlr = cycle_active_amount,
-		value = "cycle_active_amount"
-	})
-	local cycle_type_params = {
-		name = "Cycle type:",
-		panel = panel,
-		sizer = panel_sizer,
-		options = {"flow", "pop"},
-		value = self._hed.cycle_type,
-		tooltip = "Select a cycle type",
-		name_proportions = 1,
-		ctrlr_proportions = 2,
-		sorted = false
-	}
-	local cycle_type = CoreEWS.combobox(cycle_type_params)
-	cycle_type:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "set_element_data"), {ctrlr = cycle_type, value = "cycle_type"})
-	local cycle_random = EWS:CheckBox(panel, "Cycle random", "")
-	cycle_random:set_value(self._hed.cycle_random)
-	cycle_random:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
-		ctrlr = cycle_random,
-		value = "cycle_random"
-	})
-	panel_sizer:add(cycle_random, 0, 0, "EXPAND")
+	self:_build_value_number(panel, panel_sizer, "interval", {floats = 2, min = 0.01}, "Set the check interval for the laser, in seconds", "Check interval:")
+	self:_build_value_combobox(panel, panel_sizer, "instigator", managers.mission:area_instigator_categories(), "Select an instigator type")
+	self:_build_value_combobox(panel, panel_sizer, "color", {
+		"red",
+		"green",
+		"blue"
+	}, "Select a color")
+	self:_build_value_checkbox(panel, panel_sizer, "visual_only")
+	self:_build_value_checkbox(panel, panel_sizer, "skip_dummies")
+	self:_build_value_checkbox(panel, panel_sizer, "flicker_remove", "Will flicker the lasers when removed")
+	self:_build_value_number(panel, panel_sizer, "cycle_interval", {floats = 2, min = 0}, "Set the check cycle interval for the laser, in seconds (0 == disabled)")
+	self:_build_value_number(panel, panel_sizer, "cycle_active_amount", {floats = 0, min = 1}, "Defines how many are active during cycle")
+	self:_build_value_combobox(panel, panel_sizer, "cycle_type", {"flow", "pop"}, "Select a cycle type")
+	self:_build_value_checkbox(panel, panel_sizer, "cycle_random")
 	local connections_sizer = EWS:BoxSizer("HORIZONTAL")
 	panel_sizer:add(connections_sizer, 0, 1, "LEFT,EXPAND")
 	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER,TB_VERTICAL")

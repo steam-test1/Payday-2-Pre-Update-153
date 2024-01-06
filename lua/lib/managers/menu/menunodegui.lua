@@ -1207,7 +1207,7 @@ function MenuNodeGui:_highlight_row_item(row_item, mouse_over)
 		row_item.highlighted = true
 		local active_menu = managers.menu:active_menu()
 		if active_menu then
-			active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id)
+			active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id, row_item.item:parameters().localize_help ~= false)
 		end
 		self:_align_marker(row_item)
 		row_item.color = row_item.item:enabled() and (row_item.hightlight_color or self.row_item_hightlight_color) or row_item.disabled_color
@@ -1524,7 +1524,7 @@ function MenuNodeGui:set_visible(visible)
 		if visible and self.row_items and #self.row_items > 0 then
 			for _, row_item in ipairs(self.row_items) do
 				if row_item.highlighted then
-					active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id)
+					active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id, row_item.item:parameters().localize_help ~= false)
 					break
 				end
 			end

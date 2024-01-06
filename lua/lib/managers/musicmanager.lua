@@ -302,6 +302,7 @@ function MusicManager:jukebox_default_tracks()
 		heist_ukrainian_job = "track_07",
 		heist_watchdogs1 = "track_02",
 		heist_watchdogs2 = "track_06",
+		heist_pines = "track_23",
 		escape = "track_16"
 	}
 	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
@@ -344,7 +345,8 @@ function MusicManager:jukebox_music_tracks()
 		"track_19",
 		"track_20",
 		"track_21",
-		"track_22"
+		"track_22",
+		"track_23"
 	}
 	local pdth_tracks = {
 		"track_pth_01",

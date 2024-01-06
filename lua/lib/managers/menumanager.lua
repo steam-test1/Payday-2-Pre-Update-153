@@ -199,6 +199,7 @@ function MenuManager:get_peer_state(peer_id)
 end
 
 function MenuManager:_node_selected(menu_name, node)
+	managers.vote:message_vote()
 	self:set_and_send_sync_state(node and node:parameters().sync_state)
 end
 
@@ -1234,10 +1235,6 @@ function MenuCallbackHandler:has_dropin()
 	return NetworkManager.DROPIN_ENABLED
 end
 
-function MenuCallbackHandler:kicking_allowed()
-	return Global.game_settings.kicking_allowed
-end
-
 function MenuCallbackHandler:is_server()
 	return Network:is_server()
 end
@@ -1279,7 +1276,27 @@ function MenuCallbackHandler:singleplayer_restart()
 end
 
 function MenuCallbackHandler:kick_player_visible()
-	return self:is_server() and self:is_multiplayer() and managers.platform:presence() ~= "Mission_end" and Global.game_settings.kicking_allowed
+	return self:is_server() and self:is_multiplayer() and managers.platform:presence() ~= "Mission_end" and managers.vote:option_host_kick()
+end
+
+function MenuCallbackHandler:kick_vote_visible()
+	return self:is_multiplayer() and managers.platform:presence() ~= "Mission_end" and managers.vote:option_vote_kick()
+end
+
+function MenuCallbackHandler:_restart_level_visible()
+	if not self:is_multiplayer() or self:is_prof_job() or managers.job:stage_success() then
+		return false
+	end
+	local state = game_state_machine:current_state_name()
+	return state ~= "ingame_waiting_for_players" and state ~= "ingame_lobby_menu" and state ~= "empty"
+end
+
+function MenuCallbackHandler:restart_level_visible()
+	return self:is_server() and self:_restart_level_visible() and managers.vote:option_host_restart()
+end
+
+function MenuCallbackHandler:restart_vote_visible()
+	return self:_restart_level_visible() and managers.vote:option_vote_restart()
 end
 
 function MenuCallbackHandler:abort_mission_visible()
@@ -1611,12 +1628,12 @@ function MenuCallbackHandler:choice_new_servers_only(item)
 	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 end
 
-function MenuCallbackHandler:choice_kicking_allowed(item)
+function MenuCallbackHandler:choice_kick_option(item)
 	local kicking_filter = item:value()
-	if managers.network.matchmake:get_lobby_filter("kicking_allowed") == kicking_filter then
+	if managers.network.matchmake:get_lobby_filter("kick_option") == kicking_filter then
 		return
 	end
-	managers.network.matchmake:add_lobby_filter("kicking_allowed", kicking_filter, "equal")
+	managers.network.matchmake:add_lobby_filter("kick_option", kicking_filter, "equal")
 	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 end
 
@@ -1831,7 +1848,7 @@ end
 
 function MenuCallbackHandler:lobby_start_campaign(item)
 	MenuCallbackHandler:choice_lobby_campaign(item)
-	MenuCallbackHandler:lobby_start_the_game(item)
+	MenuCallbackHandler:start_the_game()
 end
 
 function MenuCallbackHandler:lobby_create_campaign(item)
@@ -1895,8 +1912,7 @@ function MenuCallbackHandler:choice_drop_in(item)
 end
 
 function MenuCallbackHandler:choice_kicking_option(item)
-	local kick_option = item:value() == "on"
-	Global.game_settings.kicking_allowed = kick_option
+	Global.game_settings.kick_option = item:value()
 end
 
 function MenuCallbackHandler:choice_crimenet_lobby_permission(item)
@@ -1912,6 +1928,10 @@ end
 function MenuCallbackHandler:choice_crimenet_team_ai(item)
 	local team_ai = item:value() == "on"
 	Global.game_settings.team_ai = team_ai
+end
+
+function MenuCallbackHandler:choice_crimenet_auto_kick(item)
+	Global.game_settings.auto_kick = item:value() == "on"
 end
 
 function MenuCallbackHandler:choice_crimenet_drop_in(item)
@@ -1965,8 +1985,8 @@ function MenuCallbackHandler:get_matchmake_attributes()
 		}
 	}
 	if self:is_win32() then
-		local kicking_allowed = Global.game_settings.kicking_allowed and 1 or 0
-		table.insert(attributes.numbers, kicking_allowed)
+		local kick_option = Global.game_settings.kick_option
+		table.insert(attributes.numbers, kick_option)
 		local job_class = managers.job:calculate_job_class(managers.job:current_real_job_id(), difficulty_id)
 		table.insert(attributes.numbers, job_class)
 	end
@@ -2166,27 +2186,12 @@ function MenuCallbackHandler:toggle_headbob(item)
 	managers.user:set_setting("use_headbob", item:value() == "on")
 end
 
-function MenuCallbackHandler:retry_job_stage()
-	managers.loot:on_retry_job_stage()
-	managers.job:on_retry_job_stage()
-	managers.mission:on_retry_job_stage()
-	self:lobby_start_the_game()
-end
-
 function MenuCallbackHandler:on_stage_success()
 	managers.mission:on_stage_success()
 end
 
 function MenuCallbackHandler:lobby_start_the_game()
-	local level_id = Global.game_settings.level_id
-	local level_name = level_id and tweak_data.levels[level_id].world_name
-	if Global.boot_invite then
-		Global.boot_invite.used = true
-		Global.boot_invite.pending = false
-	end
-	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
-	local world_setting = Global.game_settings.world_setting
-	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
+	MenuCallbackHandler:start_the_game()
 end
 
 function MenuCallbackHandler:leave_lobby()
@@ -2360,26 +2365,11 @@ function MenuCallbackHandler:view_invites()
 end
 
 function MenuCallbackHandler:kick_player(item)
-	local dialog_data = {}
-	dialog_data.title = managers.localization:text("dialog_mp_kick_player_title")
-	dialog_data.text = managers.localization:text("dialog_mp_kick_player_message", {
-		PLAYER = item:parameters().peer:name()
-	})
-	local yes_button = {}
-	yes_button.text = managers.localization:text("dialog_yes")
-	
-	function yes_button.callback_func()
-		local peer = item:parameters().peer
-		managers.network:session():send_to_peers("kick_peer", peer:id(), 0)
-		managers.network:session():on_peer_kicked(peer, peer:id(), 0)
-		managers.menu:back(true)
+	if managers.vote:option_host_kick() then
+		managers.vote:message_host_kick(item:parameters().peer)
+	elseif managers.vote:option_vote_kick() then
+		managers.vote:kick(item:parameters().peer:id())
 	end
-	
-	local no_button = {}
-	no_button.text = managers.localization:text("dialog_no")
-	no_button.cancel_button = true
-	dialog_data.button_list = {yes_button, no_button}
-	managers.system_menu:show(dialog_data)
 end
 
 function MenuCallbackHandler:mute_player(item)
@@ -2394,6 +2384,31 @@ function MenuCallbackHandler:mute_xbox_player(item)
 		managers.network.voice_chat:set_muted(item:parameters().xuid, item:value() == "on")
 		item:parameters().peer:set_muted(item:value() == "on")
 	end
+end
+
+function MenuCallbackHandler:restart_level(item)
+	if not managers.vote:available() then
+		return
+	end
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_mp_restart_level_title")
+	dialog_data.text = managers.localization:text(managers.vote:option_vote_restart() and "dialog_mp_restart_level_message" or "dialog_mp_restart_level_host_message")
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	
+	function yes_button.callback_func()
+		if managers.vote:option_vote_restart() then
+			managers.vote:restart()
+		else
+			managers.vote:restart_auto()
+		end
+	end
+	
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
 end
 
 function MenuCallbackHandler:view_gamer_card(item)
@@ -2432,6 +2447,18 @@ function MenuCallbackHandler:save_game_callback()
 	managers.menu:back()
 end
 
+function MenuCallbackHandler:start_the_game()
+	local level_id = Global.game_settings.level_id
+	local level_name = level_id and tweak_data.levels[level_id].world_name
+	if Global.boot_invite then
+		Global.boot_invite.used = true
+		Global.boot_invite.pending = false
+	end
+	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
+	local world_setting = Global.game_settings.world_setting
+	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
+end
+
 function MenuCallbackHandler:restart_game(item)
 	managers.menu:show_restart_game_dialog({
 		yes_func = function()
@@ -2439,13 +2466,7 @@ function MenuCallbackHandler:restart_game(item)
 				print("No restart after stage success")
 				return
 			end
-			managers.statistics:stop_session()
-			managers.savefile:save_progress()
-			managers.groupai:state():set_AI_enabled(false)
-			if Network:multiplayer() and managers.network:game() and Global.local_member then
-				Global.local_member:delete()
-			end
-			self:retry_job_stage()
+			managers.game_play_central:restart_the_game()
 		end
 	})
 end
@@ -2873,10 +2894,25 @@ end
 function InviteFriendsSTEAM:update_node(node)
 end
 
+PauseMenu = PauseMenu or class()
+
+function PauseMenu:modify_node(node)
+	local item = node:item("restart_vote")
+	if item then
+		item:set_enabled(managers.vote:available())
+		item:set_parameter("help_id", managers.vote:help_text() or "")
+	end
+	return node
+end
+
+function PauseMenu:refresh_node(node)
+	return self:modify_node(node)
+end
+
 KickPlayer = KickPlayer or class()
 
 function KickPlayer:modify_node(node, up)
-	local new_node = deep_clone(node)
+	node:clean_items()
 	if managers.network:session() then
 		for _, peer in pairs(managers.network:session():peers()) do
 			local params = {
@@ -2884,16 +2920,25 @@ function KickPlayer:modify_node(node, up)
 				text_id = peer:name() .. " (" .. (peer:rank() > 0 and managers.experience:rank_string(peer:rank()) .. "-" or "") .. (peer:level() or "") .. ")",
 				callback = "kick_player",
 				to_upper = false,
-				localize = "false",
 				rpc = peer:rpc(),
-				peer = peer
+				peer = peer,
+				help_id = peer:is_host() and managers.localization:text("menu_vote_kick_is_host") or managers.vote:option_vote_kick() and managers.vote:help_text() or "",
+				localize = false,
+				localize_help = false
 			}
 			local new_item = node:create_item(nil, params)
-			new_node:add_item(new_item)
+			if peer:is_host() or managers.vote:option_vote_kick() and not managers.vote:available() then
+				new_item:set_enabled(false)
+			end
+			node:add_item(new_item)
 		end
 	end
-	managers.menu:add_back_button(new_node)
-	return new_node
+	managers.menu:add_back_button(node)
+	return node
+end
+
+function KickPlayer:refresh_node(node)
+	return self:modify_node(node)
 end
 
 MutePlayer = MutePlayer or class()
@@ -3668,6 +3713,10 @@ function LobbyOptionInitiator:modify_node(node)
 	if item_lobby_toggle_ai then
 		item_lobby_toggle_ai:set_value(Global.game_settings.team_ai and "on" or "off")
 	end
+	local item_lobby_toggle_auto_kick = node:item("toggle_auto_kick")
+	if item_lobby_toggle_auto_kick then
+		item_lobby_toggle_auto_kick:set_value(Global.game_settings.auto_kick and "on" or "off")
+	end
 	local character_item = node:item("choose_character")
 	if character_item then
 		local value = managers.network:session() and managers.network:session():local_peer():character() or "random"
@@ -3845,11 +3894,12 @@ function MenuCrimeNetContractInitiator:modify_node(original_node, data)
 	if Global.game_settings.single_player then
 		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
 	elseif not data.server then
-		node:item("lobby_kicking_option"):set_value(Global.game_settings.kicking_allowed and "on" or "off")
+		node:item("lobby_kicking_option"):set_value(Global.game_settings.kick_option)
 		node:item("lobby_permission"):set_value(Global.game_settings.permission)
 		node:item("lobby_reputation_permission"):set_value(Global.game_settings.reputation_permission)
 		node:item("toggle_drop_in"):set_value(Global.game_settings.drop_in_allowed and "on" or "off")
 		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+		node:item("toggle_auto_kick"):set_value(Global.game_settings.auto_kick and "on" or "off")
 	end
 	if data.customize_contract then
 		node:set_default_item_name("buy_contract")
@@ -5975,7 +6025,7 @@ function MenuCrimeNetFiltersInitiator:modify_node(original_node, data)
 		node:item("max_lobbies_filter"):set_enabled(not_friends_only)
 		node:item("server_filter"):set_enabled(not_friends_only)
 		node:item("difficulty_filter"):set_enabled(not_friends_only)
-		node:item("kicking_allowed_filter"):set_enabled(not_friends_only)
+		node:item("kick_option_filter"):set_enabled(not_friends_only)
 		node:item("job_id_filter"):set_enabled(not_friends_only)
 	end
 	if data and data.back_callback then
@@ -5994,7 +6044,7 @@ function MenuCrimeNetFiltersInitiator:update_node(node)
 		node:item("max_lobbies_filter"):set_enabled(not_friends_only)
 		node:item("server_filter"):set_enabled(not_friends_only)
 		node:item("difficulty_filter"):set_enabled(not_friends_only)
-		node:item("kicking_allowed_filter"):set_enabled(not_friends_only)
+		node:item("kick_option_filter"):set_enabled(not_friends_only)
 		node:item("job_id_filter"):set_enabled(not_friends_only)
 	end
 end
@@ -6008,7 +6058,7 @@ function MenuCrimeNetFiltersInitiator:refresh_node(node)
 		node:item("max_lobbies_filter"):set_enabled(not_friends_only)
 		node:item("server_filter"):set_enabled(not_friends_only)
 		node:item("difficulty_filter"):set_enabled(not_friends_only)
-		node:item("kicking_allowed_filter"):set_enabled(not_friends_only)
+		node:item("kick_option_filter"):set_enabled(not_friends_only)
 		node:item("job_id_filter"):set_enabled(not_friends_only)
 	end
 end
@@ -6053,10 +6103,10 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 	new_item:set_value(managers.network.matchmake:get_lobby_filter("job_id") or -1)
 	node:add_item(new_item)
 	local params = {
-		name = "kicking_allowed_filter",
+		name = "kick_option_filter",
 		text_id = "menu_kicking_allowed_filter",
 		visible_callback = "is_multiplayer is_win32",
-		callback = "choice_kicking_allowed",
+		callback = "choice_kick_option",
 		filter = true
 	}
 	local data_node = {
@@ -6073,6 +6123,10 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 			value = 1
 		},
 		{
+			text_id = "menu_kick_vote",
+			value = 2
+		},
+		{
 			text_id = "menu_kick_disabled",
 			value = 0
 		}
@@ -6085,7 +6139,7 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 		})
 	end
 	local new_item = node:create_item(data_node, params)
-	new_item:set_value(managers.network.matchmake:get_lobby_filter("kicking_allowed") or -1)
+	new_item:set_value(managers.network.matchmake:get_lobby_filter("kick_option") or -1)
 	node:add_item(new_item)
 	local params = {
 		name = "divider_end",

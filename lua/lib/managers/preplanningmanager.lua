@@ -183,7 +183,7 @@ function PrePlanningManager:_server_unreserve_mission_element(id, peer_id)
 	end
 end
 
-function PrePlanningManager:client_unreserve_mission_element(id)
+function PrePlanningManager:client_unreserve_mission_element(id, peer_id)
 	if self._reserved_mission_elements[id] then
 		local type, index = unpack(self._reserved_mission_elements[id].pack)
 		local mission_element = self._mission_elements_by_type[type][index]
@@ -193,7 +193,7 @@ function PrePlanningManager:client_unreserve_mission_element(id)
 				self:_change_disabled_type(type, -1)
 			end
 		end
-		local peer = managers.network:session() and managers.network:session():peer(self._reserved_mission_elements[id].peer_id or 1)
+		local peer = managers.network:session() and managers.network:session():peer(peer_id or self._reserved_mission_elements[id].peer_id or 1)
 		if peer then
 			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_preplanning_unreserved", {
 				name = peer:name(),

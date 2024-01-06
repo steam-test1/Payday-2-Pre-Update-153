@@ -25,6 +25,8 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_taser(presets)
 	self:_init_civilian(presets)
 	self:_init_bank_manager(presets)
+	self:_init_drunk_pilot(presets)
+	self:_init_escort(presets)
 	self:_init_russian(presets)
 	self:_init_german(presets)
 	self:_init_spanish(presets)
@@ -1134,7 +1136,6 @@ function CharacterTweakData:_init_civilian(presets)
 	self.civilian.submission_intimidate = 120
 	self.civilian.run_away_delay = {5, 20}
 	self.civilian.damage = presets.hurt_severities.no_hurts
-	self.civilian.ecm_vulnerability = 0
 	self.civilian.ecm_hurts = {}
 	self.civilian.experience.cable_tie = "tie_civ"
 	self.civilian.speech_prefix_p1 = "cm"
@@ -1184,6 +1185,47 @@ function CharacterTweakData:_init_bank_manager(presets)
 	self.bank_manager.outline_on_discover = true
 end
 
+function CharacterTweakData:_init_drunk_pilot(presets)
+	self.drunk_pilot = deep_clone(self.civilian)
+	self.drunk_pilot.move_speed = presets.move_speed.civ_fast
+	self.drunk_pilot.flee_type = "hide"
+	self.drunk_pilot.access = "civ_male"
+	self.drunk_pilot.intimidateable = nil
+	self.drunk_pilot.challenges = {type = "civilians"}
+	self.drunk_pilot.calls_in = nil
+	self.drunk_pilot.ignores_aggression = true
+end
+
+function CharacterTweakData:_init_escort(presets)
+	self.escort = {
+		experience = {},
+		escort = {}
+	}
+	self.escort.detection = presets.detection.civilian
+	self.escort.HEALTH_INIT = 0.9
+	self.escort.headshot_dmg_mul = 1
+	self.escort.move_speed = presets.move_speed.civ_fast
+	self.escort.flee_type = "hide"
+	self.escort.scare_max = {10, 20}
+	self.escort.scare_shot = 1
+	self.escort.scare_intimidate = -5
+	self.escort.submission_max = {60, 120}
+	self.escort.submission_intimidate = 120
+	self.escort.run_away_delay = {5, 20}
+	self.escort.damage = presets.hurt_severities.no_hurts
+	self.escort.ecm_hurts = {}
+	self.escort.experience.cable_tie = "tie_civ"
+	self.escort.speech_prefix_p1 = "cm"
+	self.escort.speech_prefix_count = 2
+	self.escort.access = "civ_male"
+	self.escort.intimidateable = false
+	self.escort.challenges = {type = "civilians"}
+	self.escort.calls_in = nil
+	self.escort.is_escort = true
+	self.escort.escort_idle_talk = true
+	self.escort.escort_scared_dist = 600
+end
+
 function CharacterTweakData:_init_old_hoxton_mission(presets)
 	self.old_hoxton_mission = deep_clone(presets.base)
 	self.old_hoxton_mission.experience = {}
@@ -1195,7 +1237,6 @@ function CharacterTweakData:_init_old_hoxton_mission(presets)
 	self.old_hoxton_mission.surrender_break_time = {6, 10}
 	self.old_hoxton_mission.suppression = presets.suppression.hard_def
 	self.old_hoxton_mission.surrender = false
-	self.old_hoxton_mission.ecm_vulnerability = false
 	self.old_hoxton_mission.weapon_voice = "1"
 	self.old_hoxton_mission.experience.cable_tie = "tie_swat"
 	self.old_hoxton_mission.speech_prefix_p1 = "rb2"

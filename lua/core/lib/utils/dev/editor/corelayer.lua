@@ -1097,10 +1097,13 @@ function Layer:selected_unit()
 	return self._selected_unit
 end
 
-function Layer:create_unit(name, pos, rot)
+function Layer:create_unit(name, pos, rot, to_continent_name)
 	local unit = CoreUnit.safe_spawn_unit(name, pos, rot)
-	if self:uses_continents() and managers.editor:current_continent() then
-		managers.editor:current_continent():add_unit(unit)
+	if self:uses_continents() then
+		local continent = to_continent_name and managers.editor:continent(to_continent_name) or managers.editor:current_continent()
+		if continent then
+			continent:add_unit(unit)
+		end
 	end
 	unit:unit_data().world_pos = pos
 	unit:unit_data().unit_id = self._owner:get_unit_id(unit)
@@ -1110,15 +1113,18 @@ function Layer:create_unit(name, pos, rot)
 	return unit
 end
 
-function Layer:do_spawn_unit(name, pos, rot)
-	if managers.editor:current_continent():value("locked") and not self._continent_locked_picked then
+function Layer:do_spawn_unit(name, pos, rot, to_continent_name)
+	local continent = to_continent_name and managers.editor:continent(to_continent_name) or managers.editor:current_continent()
+	if continent:value("locked") and not self._continent_locked_picked then
 		managers.editor:output_warning("Can't create units in continent " .. managers.editor:current_continent():name() .. " because it is locked!")
 		return
 	end
 	if name:s() ~= "" then
 		pos = pos or self._current_pos
 		rot = rot or Rotation(Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1))
-		local unit = self:create_unit(name, pos, rot)
+		local unit = self:create_unit(name, pos, rot, to_continent_name)
+		table.insert(self._created_units, unit)
+		self._created_units_pairs[unit:unit_data().unit_id] = unit
 		self:set_select_unit(unit)
 		return unit
 	end
