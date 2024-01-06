@@ -78,7 +78,7 @@ function HUDMissionBriefing:init(hud, workspace)
 			})
 			local status = slot_panel:text({
 				name = "status",
-				visible = true,
+				visible = false,
 				text = "  ",
 				font = text_font,
 				font_size = text_font_size,
@@ -460,6 +460,21 @@ function HUDMissionBriefing:hide()
 	if alive(self._background_layer_two) then
 		self._background_layer_two:clear()
 	end
+end
+
+function HUDMissionBriefing:inside_slot(peer_id, child, x, y)
+	local slot = self._ready_slot_panel:child("slot_" .. tostring(peer_id))
+	if not slot or not alive(slot) then
+		return nil
+	end
+	local object = slot:child(child)
+	if not object or not alive(object) then
+		return nil
+	end
+	if not (slot:child("status") and alive(slot:child("status"))) or not slot:child("status"):visible() then
+		return
+	end
+	return object:inside(x, y)
 end
 
 function HUDMissionBriefing:set_player_slot(nr, params)

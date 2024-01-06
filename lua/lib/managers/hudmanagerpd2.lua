@@ -99,7 +99,6 @@ end
 
 function HUDManager:add_weapon(data)
 	self:_set_weapon(data)
-	print("add_weapon", inspect(data))
 	local teammate_panel = self._teammate_panels[HUDManager.PLAYER_PANEL]:panel()
 	self._hud.weapons[data.inventory_index] = {
 		inventory_index = data.inventory_index,
@@ -642,6 +641,14 @@ end
 
 function HUDManager:hide_casing()
 	self._hud_assault_corner:hide_casing()
+end
+
+function HUDManager:sync_set_assault_mode(mode)
+	self._hud_assault_corner:sync_set_assault_mode(mode)
+end
+
+function HUDManager:set_buff_enabled(buff_name, enabled)
+	self._hud_assault_corner:set_buff_enabled(buff_name, enabled)
 end
 
 function HUDManager:_additional_layout()
@@ -1421,6 +1428,10 @@ end
 
 function HUDManager:remove_player_slot_by_peer_id(peer, reason)
 	self._hud_mission_briefing:remove_player_slot_by_peer_id(peer, reason)
+end
+
+function HUDManager:is_inside_mission_briefing_slot(peer_id, child, x, y)
+	return self._hud_mission_briefing:inside_slot(peer_id, child, x, y)
 end
 
 function HUDManager:setup_endscreen_hud()
