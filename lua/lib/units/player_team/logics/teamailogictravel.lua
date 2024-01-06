@@ -64,6 +64,12 @@ function TeamAILogicTravel.enter(data, new_logic_name, enter_params)
 		local new_action = {type = "idle", body_part = 2}
 		data.unit:brain():action_request(new_action)
 	end
+	if Application:production_build() then
+		my_data.pathing_debug = {
+			from_pos = Vector3(),
+			to_pos = Vector3()
+		}
+	end
 end
 
 function TeamAILogicTravel.exit(data, new_logic_name, enter_params)

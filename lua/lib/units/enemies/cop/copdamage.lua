@@ -124,6 +124,9 @@ function CopDamage:damage_bullet(attack_data)
 	local body_index = self._unit:get_body_index(attack_data.col_ray.body:name())
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local damage = attack_data.damage
+	if self._unit:base():char_tweak().DAMAGE_CLAMP_BULLET then
+		damage = math.min(damage, self._unit:base():char_tweak().DAMAGE_CLAMP_BULLET)
+	end
 	damage = damage * (self._marked_dmg_mul or 1)
 	if self._unit:movement():cool() then
 		damage = self._HEALTH_INIT
@@ -368,7 +371,11 @@ function CopDamage:damage_explosion(attack_data)
 		return
 	end
 	local result
-	local damage = attack_data.damage * (self._char_tweak.damage.explosion_damage_mul or 1)
+	local damage = attack_data.damage
+	if self._unit:base():char_tweak().DAMAGE_CLAMP_EXPLOSION then
+		damage = math.min(damage, self._unit:base():char_tweak().DAMAGE_CLAMP_EXPLOSION)
+	end
+	damage = damage * (self._char_tweak.damage.explosion_damage_mul or 1)
 	damage = damage * (self._marked_dmg_mul or 1)
 	if attack_data.attacker_unit == managers.player:player_unit() then
 		local critical_hit, crit_damage = self:roll_critical_hit(damage)

@@ -19,6 +19,8 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_biker_escape(presets)
 	self:_init_mobster(presets)
 	self:_init_mobster_boss(presets)
+	self:_init_hector_boss(presets)
+	self:_init_hector_boss_no_armor(presets)
 	self:_init_tank(presets)
 	self:_init_spooc(presets)
 	self:_init_shield(presets)
@@ -487,6 +489,106 @@ function CharacterTweakData:_init_mobster_boss(presets)
 	self.mobster_boss.calls_in = nil
 	self.mobster_boss.chatter = presets.enemy_chatter.no_chatter
 	self.mobster_boss.use_radio = nil
+end
+
+function CharacterTweakData:_init_hector_boss(presets)
+	self.hector_boss = deep_clone(self.mobster_boss)
+	self.hector_boss.DAMAGE_CLAMP_BULLET = 320
+	self.hector_boss.DAMAGE_CLAMP_EXPLOSION = 550
+	self.hector_boss.melee_weapon_dmg_multiplier = 2.5
+	self.hector_boss.HEALTH_INIT = 900
+	self.hector_boss.weapon.saiga = {}
+	self.hector_boss.weapon.saiga.aim_delay = {0.1, 0.1}
+	self.hector_boss.weapon.saiga.focus_delay = 4
+	self.hector_boss.weapon.saiga.focus_dis = 200
+	self.hector_boss.weapon.saiga.spread = 20
+	self.hector_boss.weapon.saiga.miss_dis = 40
+	self.hector_boss.weapon.saiga.RELOAD_SPEED = 0.5
+	self.hector_boss.weapon.saiga.melee_speed = 1
+	self.hector_boss.weapon.saiga.melee_dmg = 25
+	self.hector_boss.weapon.saiga.melee_retry_delay = {1, 2}
+	self.hector_boss.weapon.saiga.range = {
+		close = 1000,
+		optimal = 2000,
+		far = 5000
+	}
+	self.hector_boss.weapon.saiga.autofire_rounds = presets.weapon.deathwish.m4.autofire_rounds
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 2.2,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 1.75,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 1.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 1.25,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 1,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self:_process_weapon_usage_table(self.hector_boss.weapon)
+end
+
+function CharacterTweakData:_init_hector_boss_no_armor(presets)
+	self.hector_boss_no_armor = deep_clone(self.fbi)
+	self.hector_boss_no_armor.no_retreat = true
+	self.hector_boss_no_armor.no_arrest = true
+	self.hector_boss_no_armor.surrender = nil
+	self.hector_boss_no_armor.access = "gangster"
+	self.hector_boss_no_armor.rescue_hostages = false
+	self.hector_boss_no_armor.steal_loot = nil
+	self.hector_boss_no_armor.calls_in = nil
+	self.hector_boss_no_armor.chatter = presets.enemy_chatter.no_chatter
+	self.hector_boss_no_armor.use_radio = nil
 end
 
 function CharacterTweakData:_init_tank(presets)
@@ -5076,6 +5178,69 @@ function CharacterTweakData:_set_normal()
 	self:_multiply_weapon_delay(self.presets.weapon.expert, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.sniper, 3)
 	self:_multiply_weapon_delay(self.presets.weapon.gang_member, 0)
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 0.22,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 0.18,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 0.15,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 0.13,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 0.1,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self.hector_boss.HEALTH_INIT = 50
 	self.presets.gang_member_damage.REGENERATE_TIME = 1.5
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.2
 	self.presets.gang_member_damage.HEALTH_INIT = 125
@@ -5090,6 +5255,69 @@ function CharacterTweakData:_set_hard()
 	self:_multiply_weapon_delay(self.presets.weapon.expert, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.sniper, 3)
 	self:_multiply_weapon_delay(self.presets.weapon.gang_member, 0)
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 0.44,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 0.35,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 0.3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 0.25,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 0.2,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self.hector_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.4
 	self:_set_characters_weapon_preset("normal")
@@ -5143,6 +5371,69 @@ function CharacterTweakData:_set_overkill()
 	self:_multiply_weapon_delay(self.presets.weapon.expert, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.sniper, 3)
 	self:_multiply_weapon_delay(self.presets.weapon.gang_member, 0)
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 1.1,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 0.88,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 0.75,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 0.63,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 0.5,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self.hector_boss.HEALTH_INIT = 300
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.6
 	self.presets.gang_member_damage.HEALTH_INIT = 200
@@ -5196,6 +5487,69 @@ function CharacterTweakData:_set_overkill_145()
 	else
 		self:_multiply_all_hp(1, 1)
 	end
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 2.2,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 1.75,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 1.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 1.25,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 1,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self.hector_boss.HEALTH_INIT = 600
 	self:_multiply_all_speeds(1.05, 1.05)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -5254,6 +5608,69 @@ function CharacterTweakData:_set_overkill_290()
 	else
 		self:_multiply_all_hp(1.7, 0.75)
 	end
+	self.hector_boss.weapon.saiga.FALLOFF = {
+		{
+			r = 200,
+			acc = {0.6, 0.9},
+			dmg_mul = 3.14,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.9},
+			dmg_mul = 2.5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.8},
+			dmg_mul = 2.1,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 1.8,
+			recoil = {0.45, 0.8},
+			mode = {
+				3,
+				2,
+				2,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 1.4,
+			recoil = {1, 1.2},
+			mode = {
+				3,
+				1,
+				1,
+				0
+			}
+		}
+	}
+	self.hector_boss.HEALTH_INIT = 900
 	self:_multiply_all_speeds(1.05, 1.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)

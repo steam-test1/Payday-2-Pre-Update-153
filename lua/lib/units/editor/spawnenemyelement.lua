@@ -90,7 +90,11 @@ SpawnEnemyUnitElement._options = {
 	"units/payday2/characters/ene_security_5/ene_security_5",
 	"units/payday2/characters/ene_security_6/ene_security_6",
 	"units/payday2/characters/ene_security_7/ene_security_7",
-	"units/payday2/characters/ene_security_8/ene_security_8"
+	"units/payday2/characters/ene_security_8/ene_security_8",
+	"units/pd2_mcmansion/characters/ene_male_hector_1/ene_male_hector_1",
+	"units/pd2_mcmansion/characters/ene_male_hector_2/ene_male_hector_2",
+	"units/pd2_mcmansion/characters/ene_hoxton_breakout_guard_1/ene_hoxton_breakout_guard_1",
+	"units/pd2_mcmansion/characters/ene_hoxton_breakout_guard_2/ene_hoxton_breakout_guard_2"
 }
 
 function SpawnEnemyUnitElement:init(unit)

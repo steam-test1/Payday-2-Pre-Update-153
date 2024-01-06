@@ -1940,6 +1940,18 @@ function TweakData:init()
 			},
 			jobs = {"crojob1"}
 		},
+		death_hox_3 = {
+			award = "payback_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "hox_3"
+		},
+		hox_3_silent = {
+			award = "payback_2",
+			stealth = true,
+			job = "hox_3"
+		},
 		owe_saw = {
 			award = "ameno_1",
 			job = "nightclub",
@@ -2156,7 +2168,9 @@ function TweakData:init()
 		"arm_und",
 		"kosugi",
 		"gallery",
-		"rat"
+		"rat",
+		"cage",
+		"hox_3"
 	}
 	self.achievement.job_list.dentist = {
 		"big",

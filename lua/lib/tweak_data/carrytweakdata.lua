@@ -298,6 +298,7 @@ function CarryTweakData:init(tweak_data)
 	self.vehicle_falcogini.is_vehicle = true
 	self.vehicle_falcogini.visual_object = ""
 	self.vehicle_falcogini.unit = ""
+	self.vehicle_falcogini.bag_value = "vehicle_falcogini"
 	self.vehicle_falcogini.AI_carry = {SO_category = ""}
 end
 

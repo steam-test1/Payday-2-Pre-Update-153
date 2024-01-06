@@ -117,7 +117,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arm_for",
 		"family",
 		"roberts",
-		"cage"
+		"cage",
+		"hox_3"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -167,7 +168,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3",
 		"election_day_3_skip1",
 		"election_day_3_skip2",
-		"rat"
+		"rat",
+		"hox_3"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -187,7 +189,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3_skip1",
 		"election_day_3_skip2",
 		"arm_for",
-		"rat"
+		"rat",
+		"hox_3"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -204,7 +207,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_3_skip1",
 		"election_day_3_skip2",
 		"arm_for",
-		"rat"
+		"rat",
+		"hox_3"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -262,7 +266,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_rats1.texture = "guis/textures/pd2/mission_briefing/assets/rat/day1/sniper_spot_rats1"
 	self.sniper_spot_rats1.stages = {
 		"alex_1",
-		"ratatouille"
+		"ratatouille",
+		"rat"
 	}
 	self.sniper_spot_rats1.visible_if_locked = true
 	self.sniper_spot_rats1.unlock_desc_id = "menu_asset_sniper_spot_desc"
@@ -855,6 +860,12 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.dumpsters.unlock_desc_id = "menu_asset_dumpsters_desc"
 	self.dumpsters.no_mystery = true
 	self.dumpsters.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
+	self.hox_3_alarm = {}
+	self.hox_3_alarm.name_id = "heist_hox_3_alarm"
+	self.hox_3_alarm.texture = "guis/textures/pd2/mission_briefing/assets/hox3/asset_hox3_alertbox"
+	self.hox_3_alarm.stages = {"hox_3"}
+	self.hox_3_alarm.visible_if_locked = true
+	self.hox_3_alarm.no_mystery = true
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

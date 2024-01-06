@@ -756,7 +756,7 @@ function CopLogicIdle._chk_relocate(data)
 			end
 			return
 		end
-		if data.is_tied and data.objective.loose_track_dis and data.objective.loose_track_dis * data.objective.loose_track_dis < mvector3.distance_sq(data.m_pos, data.objective.follow_unit:movement():m_pos()) then
+		if data.is_tied and data.objective.lose_track_dis and data.objective.lose_track_dis * data.objective.lose_track_dis < mvector3.distance_sq(data.m_pos, data.objective.follow_unit:movement():m_pos()) then
 			data.brain:set_objective(nil)
 			return true
 		end

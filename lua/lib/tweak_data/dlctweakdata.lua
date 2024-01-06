@@ -9,6 +9,7 @@ function DLCTweakData:init(tweak_data)
 		pines = true,
 		character_pack_bonnie = true,
 		butcher_pack_mods = true,
+		hoxton_revenge = 1,
 		dlc1 = true,
 		gage_pack = true,
 		gage_pack_lmg = true,
@@ -3036,6 +3037,18 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "speedrunner",
+			amount = 1
+		}
+	}
+	self.ach_payback_3 = {}
+	self.ach_payback_3.dlc = "has_achievement"
+	self.ach_payback_3.achievement_id = "payback_3"
+	self.ach_payback_3.content = {}
+	self.ach_payback_3.content.loot_global_value = "infamous"
+	self.ach_payback_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "hectors_helmet",
 			amount = 1
 		}
 	}

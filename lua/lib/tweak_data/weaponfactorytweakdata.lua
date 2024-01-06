@@ -19282,8 +19282,8 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 		unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_saw_body_silent/wpn_fps_saw_body_silent",
 		stats = {
 			value = 1,
-			suppression = 6,
-			alert_size = 6
+			suppression = 9,
+			alert_size = 9
 		},
 		texture_bundle_folder = "butcher_pack_mods",
 		dlc = "butch_pack_free",
@@ -19746,7 +19746,7 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 		parent = "slide",
 		unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_upg_ns_ass_filter/wpn_fps_upg_ns_ass_filter",
 		stats = {
-			value = 5,
+			value = 0,
 			suppression = 12,
 			alert_size = 12,
 			damage = -3,
@@ -19775,7 +19775,7 @@ function WeaponFactoryTweakData:_init_butchermodpack()
 		parent = "slide",
 		unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_upg_ns_pis_jungle/wpn_fps_upg_ns_pis_jungle",
 		stats = {
-			value = 0,
+			value = 5,
 			suppression = 12,
 			alert_size = 12,
 			spread = 1,

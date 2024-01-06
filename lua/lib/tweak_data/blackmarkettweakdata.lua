@@ -1854,6 +1854,26 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.speedrunner.texture_bundle_folder = "speedrunners"
 	self.masks.speedrunner.dlc = "speedrunners"
 	self.masks.speedrunner.value = 0
+	self.masks.hectors_helmet = {}
+	self.masks.hectors_helmet.unit = "units/pd2_mcmansion/masks/msk_hectors_helmet/msk_hectors_helmet"
+	self.masks.hectors_helmet.name_id = "bm_msk_hectors_helmet"
+	self.masks.hectors_helmet.type = "helmet"
+	self.masks.hectors_helmet.infamous = true
+	self.masks.hectors_helmet.pcs = {}
+	self.masks.hectors_helmet.value = 0
+	self.masks.hectors_helmet.texture_bundle_folder = "hoxton_revenge"
+	self.masks.old_hoxton_begins = {}
+	self.masks.old_hoxton_begins.unit = "units/pd2_mcmansion/masks/old_hoxton_begins/msk_old_hoxton_begins"
+	self.masks.old_hoxton_begins.name_id = "bm_msk_old_hoxton_begins"
+	self.masks.old_hoxton_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.old_hoxton_begins.global_value = "infamous"
+	self.masks.old_hoxton_begins.value = 0
+	self.masks.old_hoxton_begins.texture_bundle_folder = "hoxton_revenge"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

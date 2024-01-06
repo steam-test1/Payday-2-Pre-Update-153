@@ -6884,6 +6884,7 @@ function BlackMarketGui:populate_buy_mask(data)
 				table.insert(new_data, "bm_sell")
 			end
 		else
+			table.insert(new_data, "bm_preview")
 			new_data.mid_text = ""
 			new_data.lock_texture = new_data.lock_texture or true
 		end

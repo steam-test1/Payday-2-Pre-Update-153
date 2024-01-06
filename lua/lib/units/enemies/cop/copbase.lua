@@ -149,6 +149,8 @@ do
 		"ene_gang_mobster_4",
 		"ene_gang_mobster_boss",
 		"ene_guard_national_1",
+		"ene_hoxton_breakout_guard_1",
+		"ene_hoxton_breakout_guard_2",
 		"ene_male_tgt_1",
 		"ene_murkywater_1",
 		"ene_murkywater_2",
@@ -201,13 +203,26 @@ do
 		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
 		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
 	end
-	local pd2_dlc1_characters_map = {
+	local pd2_dlc2_characters_map = {
 		"civ_female_bank_assistant_1",
 		"civ_female_bank_assistant_2"
 	}
 	local path_string = "units/pd2_dlc2/characters/"
 	local character_path = ""
-	for _, character in ipairs(pd2_dlc1_characters_map) do
+	for _, character in ipairs(pd2_dlc2_characters_map) do
+		character_path = path_string .. character .. "/" .. character
+		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
+		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)
+	end
+	local pd2_dlc_mansion_characters_map = {
+		"ene_male_hector_1",
+		"ene_male_hector_2",
+		"ene_hoxton_breakout_guard_1",
+		"ene_hoxton_breakout_guard_2"
+	}
+	local path_string = "units/pd2_mcmansion/characters/"
+	local character_path = ""
+	for _, character in ipairs(pd2_dlc_mansion_characters_map) do
 		character_path = path_string .. character .. "/" .. character
 		CopBase._material_translation_map[tostring(Idstring(character_path):key())] = Idstring(character_path .. "_contour")
 		CopBase._material_translation_map[tostring(Idstring(character_path .. "_contour"):key())] = Idstring(character_path)

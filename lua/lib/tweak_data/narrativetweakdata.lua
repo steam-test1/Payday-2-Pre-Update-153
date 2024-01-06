@@ -2339,6 +2339,46 @@ function NarrativeTweakData:init()
 		620000,
 		800000
 	}
+	self.jobs.hox_3 = {}
+	self.jobs.hox_3.name_id = "heist_hox_3"
+	self.jobs.hox_3.briefing_id = "heist_hox_3_crimenet"
+	self.jobs.hox_3.package = "packages/job_hox"
+	self.jobs.hox_3.contact = "the_dentist"
+	self.jobs.hox_3.region = "street"
+	self.jobs.hox_3.jc = 40
+	self.jobs.hox_3.chain = {
+		{
+			level_id = "hox_3",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.hox_3.briefing_event = "hoxton_hb3_cbf_01"
+	self.jobs.hox_3.debrief_event = "hoxton_hb3_debrief_01"
+	self.jobs.hox_3.crimenet_callouts = {
+		"hoxton_hb3_cnc_01_01",
+		"hoxton_hb3_cnc_01_02",
+		"hoxton_hb3_cnc_01_03"
+	}
+	self.jobs.hox_3.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.hox_3.payout = {
+		8000,
+		16000,
+		40000,
+		80000,
+		100000
+	}
+	self.jobs.hox_3.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
 	self.jobs.crojob1 = {}
 	self.jobs.crojob1.name_id = "heist_crojob1"
 	self.jobs.crojob1.briefing_id = "heist_crojob1_crimenet"
@@ -2524,6 +2564,7 @@ function NarrativeTweakData:init()
 		"gallery",
 		"hox",
 		"hox_prof",
+		"hox_3",
 		"pines",
 		"cage",
 		"mus",

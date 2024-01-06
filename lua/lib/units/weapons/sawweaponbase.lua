@@ -63,7 +63,7 @@ end
 function SawWeaponBase:setup(setup_data)
 	SawWeaponBase.super.setup(self, setup_data)
 	self._no_hit_alert_size = self._alert_size
-	self._hit_alert_size = tweak_data.weapon.stats.alert_size[math.clamp(self:check_stats().suppression - (self:weapon_tweak_data().hit_alert_size_increase or 0), 1, #tweak_data.weapon.stats.alert_size)]
+	self._hit_alert_size = tweak_data.weapon.stats.alert_size[math.clamp(self:check_stats().alert_size - (self:weapon_tweak_data().hit_alert_size_increase or 0), 1, #tweak_data.weapon.stats.alert_size)]
 end
 
 function SawWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, target_unit)

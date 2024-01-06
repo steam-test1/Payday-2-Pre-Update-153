@@ -837,6 +837,18 @@ function LevelsTweakData:init()
 	self.cage.package = "packages/narr_cage"
 	self.cage.cube = "cube_apply_heist_bank"
 	self.cage.max_bags = 6
+	self.hox_3 = {}
+	self.hox_3.name_id = "heist_hox_3_hl"
+	self.hox_3.briefing_id = "heist_hox_3_briefing"
+	self.hox_3.briefing_dialog = "Play_pln_hb3_brf_01"
+	self.hox_3.world_name = "narratives/bain/revenge"
+	self.hox_3.intro_event = "Play_pln_hb3_01"
+	self.hox_3.outro_event = "lol"
+	self.hox_3.music = "heist"
+	self.hox_3.package = "packages/narr_hox_3"
+	self.hox_3.cube = "cube_apply_heist_bank"
+	self.hox_3.max_bags = 10
+	self.hox_3.ghost_bonus = 0.1
 	self.rat = {}
 	self.rat.name_id = "heist_rat_hl"
 	self.rat.briefing_id = "heist_rat_briefing"
@@ -908,6 +920,7 @@ function LevelsTweakData:init()
 		"hox_2",
 		"pines",
 		"cage",
+		"hox_3",
 		"mus",
 		"crojob2",
 		"crojob3",

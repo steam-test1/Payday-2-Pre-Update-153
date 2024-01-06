@@ -3312,20 +3312,24 @@ function GroupAIStateBase:add_area(area_id, nav_segs, area_pos)
 	local all_nav_segs = managers.navigation._nav_segments
 	for _, seg_id in ipairs(nav_segs) do
 		local nav_seg = all_nav_segs[seg_id]
-		if not nav_seg.disabled then
-			for neighbour_seg_id, door_list in pairs(nav_seg.neighbours) do
-				local neighbour_nav_seg = all_nav_segs[neighbour_seg_id]
-				if not neighbour_nav_seg.disabled then
-					for other_area_id, other_area in pairs(all_areas) do
-						if other_area.nav_segs[neighbour_seg_id] then
-							new_area.neighbours[other_area_id] = other_area
-							if neighbour_nav_seg.neighbours[seg_id] then
-								other_area.neighbours[new_area.id] = new_area
+		if nav_seg then
+			if not nav_seg.disabled then
+				for neighbour_seg_id, door_list in pairs(nav_seg.neighbours) do
+					local neighbour_nav_seg = all_nav_segs[neighbour_seg_id]
+					if not neighbour_nav_seg.disabled then
+						for other_area_id, other_area in pairs(all_areas) do
+							if other_area.nav_segs[neighbour_seg_id] then
+								new_area.neighbours[other_area_id] = other_area
+								if neighbour_nav_seg.neighbours[seg_id] then
+									other_area.neighbours[new_area.id] = new_area
+								end
 							end
 						end
 					end
 				end
 			end
+		else
+			debug_pause("[GroupAIStateBase:add_area] area", area_id, "includes removed nav_segment", seg_id)
 		end
 	end
 	all_areas[area_id] = new_area
@@ -3748,7 +3752,16 @@ function GroupAIStateBase:register_security_camera(unit, state)
 end
 
 function GroupAIStateBase:register_ecm_jammer(unit, jam_settings)
+	local was_jammer_active = next(self._ecm_jammers) and true or false
 	self._ecm_jammers[unit:key()] = jam_settings and {unit = unit, settings = jam_settings} or nil
+	local is_jammer_active = next(self._ecm_jammers) and true or false
+	if was_jammer_active then
+		if not is_jammer_active then
+			managers.mission:call_global_event("ecm_jammer_off", unit)
+		end
+	elseif is_jammer_active then
+		managers.mission:call_global_event("ecm_jammer_on", unit)
+	end
 end
 
 function GroupAIStateBase:is_ecm_jammer_active(medium)

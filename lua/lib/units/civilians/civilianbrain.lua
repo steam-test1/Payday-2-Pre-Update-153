@@ -127,7 +127,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 			nav_seg = interacting_unit:movement():nav_tracker():nav_segment(),
 			interrupt_dis = 0,
 			interrupt_health = 0,
-			loose_track_dis = 2000,
+			lose_track_dis = 2000,
 			distance = 500,
 			stance = "cbt",
 			fail_clbk = callback(self, self, "on_hostage_follow_objective_failed")
@@ -173,7 +173,9 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 		managers.groupai:state():on_hostage_follow(interacting_unit, self._unit, false)
 	elseif command == "release" then
 		self._logic_data.is_tied = nil
-		self:set_objective(nil)
+		if self._logic_data.objective and self._logic_data.objective.type == "follow" then
+			self:set_objective(nil)
+		end
 		self._unit:movement():set_stance("hos", nil, true)
 		local stand_action_desc = {
 			type = "act",
@@ -197,7 +199,11 @@ end
 
 function CivilianBrain:on_hostage_follow_objective_failed(unit)
 	if not unit:character_damage():dead() then
-		self:on_hostage_move_interaction(nil, "stay")
+		if not self._logic_data.objective or self._logic_data.objective.is_default or self._logic_data.objective.type == "surrender" then
+			self:on_hostage_move_interaction(nil, "stay")
+		else
+			self:on_hostage_move_interaction(nil, "release")
+		end
 	end
 end
 

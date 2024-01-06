@@ -137,7 +137,11 @@ function MissionManager:init(...)
 		"bar_code",
 		"equipment_evidence_lost",
 		"pku_sandwich",
-		"equipment_sandwich"
+		"equipment_sandwich",
+		"hotel_room_key",
+		"pku_evidence_bag",
+		"ecm_jammer_on",
+		"ecm_jammer_off"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then
