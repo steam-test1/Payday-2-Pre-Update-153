@@ -2179,4 +2179,5 @@ function DLCTweakData:init(tweak_data)
 	self.alienware_alpha_promo.dlc = "has_alienware_alpha_promo"
 	self.alienware_alpha_promo.content = {}
 	self.alienware_alpha_promo.content.loot_drops = {}
+	self.alienware_alpha_promo.content.upgrades = {"alien_maul"}
 end

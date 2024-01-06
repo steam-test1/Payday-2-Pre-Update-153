@@ -3922,11 +3922,19 @@ function BlackMarketManager:_verify_dlc_items()
 				local mask = managers.blackmarket:equipped_mask()
 				if mask then
 					local is_locked = mask.global_value == package_id
+					local default_blueprint = tweak_data.blackmarket.masks[mask.mask_id] and tweak_data.blackmarket.masks[mask.mask_id].default_blueprint or {}
+					local name_converter = {
+						material = "materials",
+						pattern = "textures",
+						color = "colors"
+					}
 					if not is_locked then
-						for _, part in pairs(mask.blueprint) do
-							is_locked = part.global_value == package_id
-							if is_locked then
-								break
+						for type, part in pairs(mask.blueprint) do
+							if default_blueprint[type] ~= part.id and default_blueprint[name_converter[type]] ~= part.id then
+								is_locked = part.global_value == package_id
+								if is_locked then
+									break
+								end
 							end
 						end
 					end

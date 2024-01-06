@@ -6065,8 +6065,14 @@ function BlackMarketGui:populate_masks(data)
 		local is_locked = tweak_data.lootdrop.global_values[new_data.global_value] and tweak_data.lootdrop.global_values[new_data.global_value].dlc and not tweak_data.dlc[new_data.global_value].free and not managers.dlc:has_dlc(new_data.global_value)
 		local locked_parts = {}
 		if not is_locked then
+			local name_converter = {
+				material = "materials",
+				pattern = "textures",
+				color = "colors"
+			}
+			local default_blueprint = tweak_data.blackmarket.masks[crafted.mask_id] and tweak_data.blackmarket.masks[crafted.mask_id].default_blueprint or {}
 			for type, part in pairs(crafted.blueprint) do
-				if tweak_data.lootdrop.global_values[part.global_value] and tweak_data.lootdrop.global_values[part.global_value].dlc and not tweak_data.dlc[part.global_value].free and not managers.dlc:has_dlc(part.global_value) then
+				if default_blueprint[type] ~= part.id and default_blueprint[name_converter[type]] ~= part.id and tweak_data.lootdrop.global_values[part.global_value] and tweak_data.lootdrop.global_values[part.global_value].dlc and not tweak_data.dlc[part.global_value].free and not managers.dlc:has_dlc(part.global_value) then
 					locked_parts[type] = part.global_value
 					is_locked = true
 				end
@@ -7013,6 +7019,7 @@ function BlackMarketGui:populate_choose_mask_mod(data)
 	local new_data = {}
 	local index = 1
 	local equipped_mod = managers.blackmarket:customize_mask_category_id(data.category)
+	local type_func = type
 	local guis_catalog = "guis/"
 	for type, mods in pairs(data.on_create_data) do
 		guis_catalog = "guis/"
@@ -7033,7 +7040,7 @@ function BlackMarketGui:populate_choose_mask_mod(data)
 		new_data.stream = data.category ~= "colors"
 		new_data.global_value = mods.global_value
 		local is_locked = false
-		if tweak_data.lootdrop.global_values[new_data.global_value] and tweak_data.lootdrop.global_values[new_data.global_value].dlc and not tweak_data.dlc[new_data.global_value].free and not managers.dlc:has_dlc(new_data.global_value) then
+		if new_data.unlocked and type_func(new_data.unlocked) == "number" and tweak_data.lootdrop.global_values[new_data.global_value] and tweak_data.lootdrop.global_values[new_data.global_value].dlc and not tweak_data.dlc[new_data.global_value].free and not managers.dlc:has_dlc(new_data.global_value) then
 			new_data.unlocked = -math.abs(new_data.unlocked)
 			new_data.lock_texture = self:get_lock_icon(new_data)
 			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"

@@ -1410,7 +1410,7 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[48] = {
 		name_id = "weapons",
-		upgrades = {"dingdong", "alien_maul"}
+		upgrades = {"dingdong"}
 	}
 	self.level_tree[50] = {
 		name_id = "lvl_50",
