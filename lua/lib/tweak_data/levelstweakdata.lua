@@ -768,7 +768,10 @@ function LevelsTweakData:init()
 	self.mus.briefing_dialog = "Play_pln_hd1_brf_01"
 	self.mus.world_name = "narratives/dentist/mus"
 	self.mus.intro_event = "Play_pln_hd1_intro_01"
-	self.mus.outro_event = {"lol", "lolo"}
+	self.mus.outro_event = {
+		"dentist_hd1_debrief_01",
+		"dentist_hd1_debrief_02"
+	}
 	self.mus.music = "heist"
 	self.mus.package = "packages/narr_mus"
 	self.mus.cube = "cube_apply_heist_bank"

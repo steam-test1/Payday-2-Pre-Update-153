@@ -380,7 +380,7 @@ function EquipmentsTweakData:init()
 		trip_mine = 6,
 		first_aid_kit = 14,
 		bodybags_bag = 2,
-		grenades = 3,
+		grenades = 4,
 		asset_ammo_bag = 4,
 		asset_doctor_bag = 3,
 		asset_grenade_crate = 3,

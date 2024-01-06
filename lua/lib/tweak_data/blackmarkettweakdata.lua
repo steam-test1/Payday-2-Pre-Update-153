@@ -1416,6 +1416,62 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cursed_crown.value = 0
 	self.masks.cursed_crown.dlc = "hope_diamond"
 	self.masks.cursed_crown.texture_bundle_folder = "character_pack_clover"
+	self.masks.nun_town = {}
+	self.masks.nun_town.unit = "units/pd2_dlc_goty/masks/nun_town/msk_nun_town"
+	self.masks.nun_town.name_id = "bm_msk_nun_town"
+	self.masks.nun_town.pcs = {}
+	self.masks.nun_town.value = 0
+	self.masks.nun_town.dlc = "goty_heist_bundle_2014"
+	self.masks.nun_town.dlc_list = {
+		"armored_transport",
+		"big_bank",
+		"hl_miami",
+		"hope_diamond"
+	}
+	self.masks.nun_town.texture_bundle_folder = "pd2_goty"
+	self.masks.robo_arnold = {}
+	self.masks.robo_arnold.unit = "units/pd2_dlc_goty/masks/robo_arnold/msk_robo_arnold"
+	self.masks.robo_arnold.name_id = "bm_msk_robo_arnold"
+	self.masks.robo_arnold.pcs = {}
+	self.masks.robo_arnold.value = 0
+	self.masks.robo_arnold.dlc = "goty_weapon_bundle_2014"
+	self.masks.robo_arnold.dlc_list = {
+		"gage_pack",
+		"gage_pack_lmg",
+		"gage_pack_jobs",
+		"gage_pack_snp",
+		"gage_pack_shotgun",
+		"gage_pack_assault",
+		"gage_pack_historical"
+	}
+	self.masks.robo_arnold.texture_bundle_folder = "pd2_goty"
+	self.masks.arch_nemesis = {}
+	self.masks.arch_nemesis.unit = "units/pd2_dlc_goty/masks/arch_nemesis/msk_arch_nemesis"
+	self.masks.arch_nemesis.name_id = "bm_msk_arch_nemesis"
+	self.masks.arch_nemesis.pcs = {}
+	self.masks.arch_nemesis.value = 0
+	self.masks.arch_nemesis.type = "helmet"
+	self.masks.arch_nemesis.default_blueprint = {
+		textures = "no_color_full_material",
+		materials = "deep_bronze"
+	}
+	self.masks.arch_nemesis.dlc = "goty_dlc_bundle_2014"
+	self.masks.arch_nemesis.dlc_list = {
+		"character_pack_clover",
+		"xmas_soundtrack",
+		"armored_transport",
+		"big_bank",
+		"hl_miami",
+		"hope_diamond",
+		"gage_pack",
+		"gage_pack_lmg",
+		"gage_pack_jobs",
+		"gage_pack_snp",
+		"gage_pack_shotgun",
+		"gage_pack_assault",
+		"gage_pack_historical"
+	}
+	self.masks.arch_nemesis.texture_bundle_folder = "pd2_goty"
 	self.masks.area51 = {}
 	self.masks.area51.unit = "units/pd2_dlc_alienware/masks/area51/msk_area51"
 	self.masks.area51.name_id = "bm_msk_area51"

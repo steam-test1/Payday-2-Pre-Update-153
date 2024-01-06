@@ -2147,6 +2147,7 @@ function NarrativeTweakData:init()
 	self.jobs.mus = {}
 	self.jobs.mus.name_id = "heist_mus"
 	self.jobs.mus.briefing_id = "heist_mus_crimenet"
+	self.jobs.mus.package = "packages/job_mus"
 	self.jobs.mus.contact = "the_dentist"
 	self.jobs.mus.region = "street"
 	self.jobs.mus.jc = 50

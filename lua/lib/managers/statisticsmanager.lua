@@ -675,6 +675,7 @@ function StatisticsManager:_get_stat_tables()
 		"robo_santa",
 		"almirs_beard",
 		"msk_grizel",
+		"grizel_clean",
 		"medusa",
 		"anubis",
 		"pazuzu",

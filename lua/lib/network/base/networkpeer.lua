@@ -245,7 +245,7 @@ function NetworkPeer:_verify_content(item_type, item_id)
 	if SystemInfo:platform() ~= Idstring("WIN32") then
 		return true
 	end
-	local dlc_item, item_data
+	local dlc_item, dlc_list, item_data
 	if item_type == "weapon" then
 		item_data = tweak_data.weapon[item_id]
 		dlc_item = item_data and item_data.global_value
@@ -253,13 +253,23 @@ function NetworkPeer:_verify_content(item_type, item_id)
 		local item = tweak_data.blackmarket[item_type]
 		item_data = item and item[item_id]
 		dlc_item = item_data and item_data.dlc
+		dlc_list = item_data and item_data.dlc_list
 	end
 	if not item_data then
 		return false
 	end
-	local dlc_data = Global.dlc_manager.all_dlc_data[dlc_item]
-	if dlc_data and dlc_data.app_id and not dlc_data.external then
-		return Steam:is_user_product_owned(self._user_id, dlc_data.app_id)
+	if dlc_list then
+		for _, dlc in pairs(dlc_list) do
+			local dlc_data = Global.dlc_manager.all_dlc_data[dlc]
+			if dlc_data and dlc_data.app_id and not dlc_data.external and not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
+				return false
+			end
+		end
+	else
+		local dlc_data = Global.dlc_manager.all_dlc_data[dlc_item]
+		if dlc_data and dlc_data.app_id and not dlc_data.external then
+			return Steam:is_user_product_owned(self._user_id, dlc_data.app_id)
+		end
 	end
 	return true
 end

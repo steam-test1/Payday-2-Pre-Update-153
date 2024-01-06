@@ -219,6 +219,18 @@ function GenericDLCManager:has_cce()
 	return Global.dlc_manager.all_dlc_data.career_criminal_edition and Global.dlc_manager.all_dlc_data.career_criminal_edition.verified
 end
 
+function GenericDLCManager:has_goty_weapon_bundle_2014()
+	return self:has_gage_pack() and self:has_gage_pack_lmg() and self:has_gage_pack_jobs() and self:has_gage_pack_snp() and self:has_gage_pack_shotgun() and self:has_gage_pack_assault() and self:has_gage_pack_historical()
+end
+
+function GenericDLCManager:has_goty_heist_bundle_2014()
+	return self:has_armored_transport() and self:has_big_bank() and self:has_hl_miami() and self:has_hope_diamond()
+end
+
+function GenericDLCManager:has_goty_all_dlc_bundle_2014()
+	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:has_soundtrack_or_cce() and self:has_xmas_soundtrack() and self:has_character_pack_clover()
+end
+
 function GenericDLCManager:has_soundtrack()
 	return Global.dlc_manager.all_dlc_data.soundtrack and Global.dlc_manager.all_dlc_data.soundtrack.verified
 end

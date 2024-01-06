@@ -18,6 +18,7 @@ function DLCTweakData:init(tweak_data)
 		hl_miami = true,
 		gage_pack_historical = true,
 		character_pack_clover = true,
+		pd2_goty = 1,
 		alienware_alpha = true,
 		season_pass = true,
 		animal = true
@@ -2182,6 +2183,39 @@ function DLCTweakData:init(tweak_data)
 	self.alienware_alpha_promo.content = {}
 	self.alienware_alpha_promo.content.loot_drops = {}
 	self.alienware_alpha_promo.content.upgrades = {"alien_maul"}
+	self.goty_weapon_bundle_2014 = {}
+	self.goty_weapon_bundle_2014.dlc = "has_goty_weapon_bundle_2014"
+	self.goty_weapon_bundle_2014.use_custom_func = true
+	self.goty_weapon_bundle_2014.content = {}
+	self.goty_weapon_bundle_2014.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "robo_arnold",
+			amount = 1
+		}
+	}
+	self.goty_heist_bundle_2014 = {}
+	self.goty_heist_bundle_2014.dlc = "has_goty_heist_bundle_2014"
+	self.goty_heist_bundle_2014.use_custom_func = true
+	self.goty_heist_bundle_2014.content = {}
+	self.goty_heist_bundle_2014.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "nun_town",
+			amount = 1
+		}
+	}
+	self.goty_dlc_bundle_2014 = {}
+	self.goty_dlc_bundle_2014.dlc = "has_goty_all_dlc_bundle_2014"
+	self.goty_dlc_bundle_2014.use_custom_func = true
+	self.goty_dlc_bundle_2014.content = {}
+	self.goty_dlc_bundle_2014.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "arch_nemesis",
+			amount = 1
+		}
+	}
 	self.ach_deer_1 = {}
 	self.ach_deer_1.dlc = "has_achievement"
 	self.ach_deer_1.achievement_id = "deer_1"
