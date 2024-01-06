@@ -3014,4 +3014,29 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.speedrunners = {}
+	self.speedrunners.dlc = "has_speedrunners"
+	self.speedrunners.content = {}
+	self.speedrunners.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "hothead",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "falcon",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "unic",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "speedrunner",
+			amount = 1
+		}
+	}
 end

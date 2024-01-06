@@ -55,6 +55,10 @@ end
 function CoreMotionPathOperatorUnitElement:update_editing()
 end
 
+function CoreMotionPathOperatorUnitElement:update_selected()
+	Application:draw_cone(self._unit:position(), self._unit:position() + self._unit:rotation():y() * 75, 35, 1, 1, 1)
+end
+
 function CoreMotionPathOperatorUnitElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
 	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
@@ -101,7 +105,8 @@ function CoreMotionPathOperatorUnitElement:_build_panel(panel, panel_sizer)
 		"goto_marker",
 		"teleport",
 		"move",
-		"wait"
+		"wait",
+		"rotate"
 	}, "Select an operation for the selected elements.")
 	local markers_combo = self:_build_value_combobox(panel, panel_sizer, "marker", self:_motion_path_markers(), "Select motion path marker.")
 	Application:debug("CoreMotionPathOperatorUnitElement:_build_panel( panel, panel_sizer ): ", markers_combo)

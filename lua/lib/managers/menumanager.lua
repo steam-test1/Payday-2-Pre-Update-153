@@ -7231,10 +7231,11 @@ function MenuChooseWeaponRewardInitiator:setup_node(node)
 				value = global_values[#global_values] .. "#"
 			})
 		end
+		local gv_all_text_id = #global_values == 1 and tweak_data:get_raw_value("lootdrop", "global_values", global_values[1], "name_id") or "menu_challenge_global_value_all"
 		table.insert(data_node, {
 			_meta = "option",
 			localize = false,
-			text_id = managers.localization:text("menu_challenge_global_value_all"),
+			text_id = managers.localization:text(gv_all_text_id),
 			value = "all"
 		})
 		if 1 < #global_values then

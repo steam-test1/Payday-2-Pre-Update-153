@@ -63,7 +63,7 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 	self.weapon_mods = {}
 	for id, data in pairs(tweak_data.weapon.factory.parts) do
 		self.weapon_mods[id] = {
-			max_in_inventory = 2,
+			max_in_inventory = data.is_a_unlockable and 1 or 2,
 			pc = data.pc,
 			pcs = data.pcs,
 			dlc = data.dlc,
@@ -1823,6 +1823,37 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.simpson.pcs = {}
 	self.masks.simpson.type = "helmet"
 	self.masks.simpson.value = 0
+	self.masks.hothead = {}
+	self.masks.hothead.unit = "units/pd2_speedrunners/masks/hothead/msk_hothead"
+	self.masks.hothead.name_id = "bm_msk_hothead"
+	self.masks.hothead.pcs = {}
+	self.masks.hothead.texture_bundle_folder = "speedrunners"
+	self.masks.hothead.dlc = "speedrunners"
+	self.masks.hothead.value = 0
+	self.masks.falcon = {}
+	self.masks.falcon.unit = "units/pd2_speedrunners/masks/falcon/msk_falcon"
+	self.masks.falcon.name_id = "bm_msk_falcon"
+	self.masks.falcon.pcs = {}
+	self.masks.falcon.type = "helmet"
+	self.masks.falcon.texture_bundle_folder = "speedrunners"
+	self.masks.falcon.dlc = "speedrunners"
+	self.masks.falcon.value = 0
+	self.masks.unic = {}
+	self.masks.unic.unit = "units/pd2_speedrunners/masks/unic/msk_unic"
+	self.masks.unic.name_id = "bm_msk_unic"
+	self.masks.unic.pcs = {}
+	self.masks.unic.type = "helmet"
+	self.masks.unic.texture_bundle_folder = "speedrunners"
+	self.masks.unic.dlc = "speedrunners"
+	self.masks.unic.value = 0
+	self.masks.speedrunner = {}
+	self.masks.speedrunner.unit = "units/pd2_speedrunners/masks/speedrunner/msk_speedrunner"
+	self.masks.speedrunner.name_id = "bm_msk_speedrunner"
+	self.masks.speedrunner.pcs = {}
+	self.masks.speedrunner.type = "helmet"
+	self.masks.speedrunner.texture_bundle_folder = "speedrunners"
+	self.masks.speedrunner.dlc = "speedrunners"
+	self.masks.speedrunner.value = 0
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"

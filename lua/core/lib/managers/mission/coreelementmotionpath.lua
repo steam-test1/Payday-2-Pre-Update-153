@@ -25,6 +25,8 @@ function ElementMotionPathOperator:on_executed(instigator)
 				element:motion_operation_set_motion_state("move")
 			elseif self._values.operation == "wait" then
 				element:motion_operation_set_motion_state("wait")
+			elseif self._values.operation == "rotate" then
+				element:motion_operation_set_rotation(self._id)
 			end
 		end
 	end

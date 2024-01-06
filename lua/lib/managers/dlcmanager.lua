@@ -372,6 +372,10 @@ function GenericDLCManager:has_hlm2_deluxe()
 	return (not Global.dlc_manager.all_dlc_data.hlm2_deluxe or not Global.dlc_manager.all_dlc_data.hlm2_deluxe.verified) and Global.dlc_manager.all_dlc_data.hlm2_aus and Global.dlc_manager.all_dlc_data.hlm2_aus.verified
 end
 
+function GenericDLCManager:has_speedrunners()
+	return Global.dlc_manager.all_dlc_data.speedrunners and Global.dlc_manager.all_dlc_data.speedrunners.verified
+end
+
 function GenericDLCManager:has_character_pack_clover()
 	return Global.dlc_manager.all_dlc_data.character_pack_clover and Global.dlc_manager.all_dlc_data.character_pack_clover.verified
 end
@@ -686,6 +690,11 @@ function WINDLCManager:init()
 			},
 			hlm2_aus = {
 				app_id = "338951",
+				no_install = true,
+				external = true
+			},
+			speedrunners = {
+				app_id = "207140",
 				no_install = true,
 				external = true
 			},
