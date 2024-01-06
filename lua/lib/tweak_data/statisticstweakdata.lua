@@ -75,7 +75,8 @@ function StatisticsTweakData:statistics_table()
 		"crojob3_night",
 		"rat",
 		"cage",
-		"hox_3"
+		"hox_3",
+		"shoutout_raid"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -124,7 +125,8 @@ function StatisticsTweakData:statistics_table()
 		"rat",
 		"arm_for",
 		"cage",
-		"hox_3"
+		"hox_3",
+		"shoutout_raid"
 	}
 	local mask_list = {
 		"character_locked",
@@ -316,7 +318,8 @@ function StatisticsTweakData:statistics_table()
 		"bandit",
 		"bullskull",
 		"kangee",
-		"lone"
+		"lone",
+		"grendel"
 	}
 	local weapon_list = {
 		"ak5",

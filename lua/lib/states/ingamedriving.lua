@@ -22,11 +22,6 @@ function IngameDriving:_update_driving_hud()
 end
 
 function IngameDriving:update(t, dt)
-	if managers.player:get_vehicle() then
-		local player = managers.player:player_unit()
-		local vehicle_ext = managers.player:get_vehicle().vehicle_unit:vehicle_driving()
-		local seat = vehicle_ext:find_seat_for_player(player)
-	end
 end
 
 function IngameDriving:update_player_stamina(t, dt)
