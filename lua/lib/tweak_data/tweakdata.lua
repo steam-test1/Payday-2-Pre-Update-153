@@ -984,7 +984,7 @@ function TweakData:init()
 		1.2,
 		1.3
 	}
-	self.experience_manager.limited_bonus_multiplier = 1
+	self.experience_manager.limited_bonus_multiplier = 1.7
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
@@ -1121,7 +1121,27 @@ function TweakData:init()
 		"ignominy_2",
 		"ignominy_3",
 		"ignominy_4",
-		"ignominy_5"
+		"ignominy_5",
+		"ignominy_6",
+		"ignominy_7",
+		"ignominy_8",
+		"ignominy_9",
+		"ignominy_10",
+		"ignominy_11",
+		"ignominy_12",
+		"ignominy_13",
+		"ignominy_14",
+		"ignominy_15",
+		"ignominy_16",
+		"ignominy_17",
+		"ignominy_18",
+		"ignominy_19",
+		"ignominy_20",
+		"ignominy_21",
+		"ignominy_22",
+		"ignominy_23",
+		"ignominy_24",
+		"ignominy_25"
 	}
 	self.achievement.final_rule = {
 		stat = "gage2_3_stats",

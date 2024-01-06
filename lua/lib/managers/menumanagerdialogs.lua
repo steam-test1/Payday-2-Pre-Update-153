@@ -1275,7 +1275,10 @@ function MenuManager:show_confirm_become_infamous(params)
 		local yes_button = {}
 		yes_button.text = managers.localization:text("dialog_yes")
 		yes_button.callback_func = params.yes_func
-		dialog_data.text = managers.localization:text("menu_dialog_become_infamous", {
+		dialog_data.text = params.free and managers.localization:text("menu_dialog_become_infamous_free", {
+			level = 100,
+			cash = params.cost
+		}) or managers.localization:text("menu_dialog_become_infamous", {
 			level = 100,
 			cash = params.cost
 		})

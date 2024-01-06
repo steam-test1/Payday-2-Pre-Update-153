@@ -147,6 +147,9 @@ function ItemSlider:setup_gui(node, row_item)
 end
 
 function ItemSlider:reload(row_item, node)
+	if not row_item then
+		return
+	end
 	local value = self:show_value() and string.format("%.0f", self:value()) or string.format("%.0f", self:percentage()) .. "%"
 	row_item.gui_slider_text:set_text(value)
 	local where = row_item.gui_slider:left() + row_item.gui_slider:w() * (self:percentage() / 100)

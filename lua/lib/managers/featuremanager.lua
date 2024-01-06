@@ -15,6 +15,7 @@ function FeatureManager:_setup()
 	self._default.announcements.join_pd2_clan = 50
 	self._default.announcements.perk_deck = 3
 	self._default.announcements.freed_old_hoxton = 1
+	self._default.announcements.infamy_2_0 = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -166,6 +167,15 @@ function FeatureManager:freed_old_hoxton()
 	managers.menu:show_new_message_dialog({
 		title = "menu_feature_freed_old_hoxton",
 		text = "menu_feature_freed_old_hoxton_desc"
+	})
+	return true
+end
+
+function FeatureManager:infamy_2_0()
+	print("FeatureManager:infamy_2_0()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_infamy_2_0",
+		text = "menu_feature_infamy_2_0_desc"
 	})
 	return true
 end

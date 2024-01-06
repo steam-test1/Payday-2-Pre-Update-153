@@ -33,7 +33,16 @@ function InfamyManager:_set_points(value)
 end
 
 function InfamyManager:_reset_points()
-	self:_set_points(0)
+	local points = math.abs(self:points())
+	for item, unlocked in pairs(self._global.unlocks) do
+		if unlocked then
+			points = points + Application:digest_value(tweak_data.infamy.items[item].cost, false)
+		end
+	end
+	Global.infamy_manager = nil
+	self:_setup(true)
+	self:_set_points(points)
+	self:_verify_loaded_data()
 end
 
 function InfamyManager:required_points(item)
@@ -69,19 +78,41 @@ function InfamyManager:available(item)
 	local tier_count = 0
 	local points_curr_tier = 0
 	local points_prev_tier = 0
-	if tweak_data.infamy.tree[1] == item then
+	if item == "infamy_root" then
 		return true
 	end
+	local tree_cols = tweak_data.infamy.tree_cols or 3
+	local tree_rows = tweak_data.infamy.tree_rows or 3
+	local up, down, left, right, new_x, new_y
 	for index, name in pairs(tweak_data.infamy.tree) do
 		if item == name then
-			return 0 < points_prev_tier
-		end
-		points_curr_tier = points_curr_tier + (self._global.unlocks[name] and 1 or 0)
-		tier_count = tier_count + 1
-		if index == 1 or tier_count == 4 then
-			tier_count = 0
-			points_prev_tier = points_curr_tier
-			points_curr_tier = 0
+			local item_x = (index - 1) % tree_cols + 1
+			local item_y = math.floor((index - 1) / tree_cols) + 1
+			new_x = math.clamp(item_x + 0, 1, tree_cols)
+			new_y = math.clamp(item_y - 1, 1, tree_rows)
+			up = (new_y - 1) * tree_cols + new_x
+			if self._global.unlocks[tweak_data.infamy.tree[up]] then
+				return true
+			end
+			new_x = math.clamp(item_x + 0, 1, tree_cols)
+			new_y = math.clamp(item_y + 1, 1, tree_rows)
+			down = (new_y - 1) * tree_cols + new_x
+			if self._global.unlocks[tweak_data.infamy.tree[down]] then
+				return true
+			end
+			new_x = math.clamp(item_x - 1, 1, tree_cols)
+			new_y = math.clamp(item_y + 0, 1, tree_rows)
+			left = (new_y - 1) * tree_cols + new_x
+			if self._global.unlocks[tweak_data.infamy.tree[left]] then
+				return true
+			end
+			new_x = math.clamp(item_x + 1, 1, tree_cols)
+			new_y = math.clamp(item_y + 0, 1, tree_rows)
+			right = (new_y - 1) * tree_cols + new_x
+			if self._global.unlocks[tweak_data.infamy.tree[right]] then
+				return true
+			end
+			return false
 		end
 	end
 	return false
@@ -124,6 +155,34 @@ function InfamyManager:load(data, version)
 		if not self._global.VERSION or self._global.VERSION < InfamyManager.VERSION then
 			managers.savefile:add_load_done_callback(callback(self, self, "reset_items"))
 		end
+		self:_verify_loaded_data()
+	end
+end
+
+function InfamyManager:_verify_loaded_data()
+	local assumed_points = managers.experience:current_rank()
+	local points = assumed_points
+	local tree_map = {}
+	for i, item in ipairs(tweak_data.infamy.tree) do
+		tree_map[item] = i
+	end
+	for item, unlocked in pairs(clone(self._global.unlocks)) do
+		if not tweak_data.infamy.items[item] then
+			Application:error("[InfamyManager:_verify_loaded_data] Removing non-existing Infamy Item", item)
+			self._global.unlocks[item] = nil
+		elseif not tree_map[item] then
+			Application:error("[InfamyManager:_verify_loaded_data] Removing unused Infamy Item", item)
+			self._global.unlocks[item] = nil
+		elseif unlocked then
+			points = points - Application:digest_value(tweak_data.infamy.items[item].cost, false)
+		end
+	end
+	if points < 0 then
+		Application:error("[InfamyManager:_verify_loaded_data] There is more infamy points unlocked then the amount of points given. Resetting unlockes!")
+		self:_reset_points()
+	elseif self:points() ~= points then
+		Application:error("[InfamyManager:_verify_loaded_data] Points do not match", "saved_points", self:points(), "assumed_points", points)
+		self:_set_points(points)
 	end
 end
 

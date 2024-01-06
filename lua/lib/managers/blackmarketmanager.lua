@@ -3159,18 +3159,34 @@ function BlackMarketManager:set_mask_blueprint(slot, blueprint)
 	self._global.crafted_items[category][slot].blueprint = blueprint
 end
 
+function BlackMarketManager:get_real_character(mask_id, peer_id)
+	local character
+	if managers.network and managers.network:session() and managers.network:session():peer(peer_id) then
+		character = managers.network:session():peer(peer_id):character()
+	else
+		character = self:get_preferred_character()
+	end
+	return CriminalsManager.convert_old_to_new_character_workname(character)
+end
+
 function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
+	if tweak_data.blackmarket.masks[mask_id].characters then
+		local character = self:get_real_character(mask_id, peer_id)
+		if not Application:production_build() then
+			for index, _ in pairs(tweak_data.blackmarket.masks[mask_id].characters) do
+				character = index
+				break
+			end
+		end
+		return tweak_data.blackmarket.masks[mask_id].characters[character]
+	end
 	if mask_id ~= "character_locked" then
 		if not tweak_data.blackmarket.masks[mask_id] then
 			print("Missing mask:" .. mask_id)
 		end
 		return mask_id
 	end
-	local character = self:get_preferred_character()
-	if managers.network and managers.network:session() and managers.network:session():peer(peer_id) then
-		character = managers.network:session():peer(peer_id):character()
-	end
-	character = CriminalsManager.convert_old_to_new_character_workname(character)
+	local character = self:get_real_character(mask_id, peer_id)
 	return tweak_data.blackmarket.masks[mask_id][character]
 end
 

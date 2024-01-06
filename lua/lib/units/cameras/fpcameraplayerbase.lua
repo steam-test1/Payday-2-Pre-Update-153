@@ -951,6 +951,10 @@ function FPCameraPlayerBase:spawn_mask()
 		for i = 1, 5 do
 			glow_id_strings[Idstring("glow" .. tostring(i)):key()] = true
 		end
+		local sweep_id_strings = {}
+		for i = 1, 5 do
+			sweep_id_strings[Idstring("sweep" .. tostring(i)):key()] = true
+		end
 		for _, material in ipairs(self._mask_unit:get_objects_by_type(Idstring("material"))) do
 			if material:name() == glass_id_string then
 				material:set_render_template(Idstring("opacity:CUBE_ENVIRONMENT_MAPPING:CUBE_FRESNEL:DIFFUSE_TEXTURE:FPS"))
@@ -958,6 +962,8 @@ function FPCameraPlayerBase:spawn_mask()
 			elseif material:name() == mtr_hair_effect_id_string then
 			elseif glow_id_strings[material:name():key()] then
 				material:set_render_template(Idstring("effect:BLEND_ADD:DIFFUSE0_TEXTURE"))
+			elseif sweep_id_strings[material:name():key()] then
+				material:set_render_template(Idstring("effect:BLEND_ADD:DIFFUSE0_TEXTURE:DIFFUSE0_THRESHOLD_SWEEP"))
 			else
 				material:set_render_template(Idstring("solid_mask:DEPTH_SCALING"))
 			end

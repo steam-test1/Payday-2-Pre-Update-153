@@ -265,6 +265,14 @@ function GuiTweakData:init()
 		store = 351890,
 		image = "guis/dlcs/dlc_akm4/textures/pd2/content_updates/akm4_pack"
 	}
+	local infamy_2_0 = {
+		id = "infamy_2_0",
+		name_id = "menu_content_infamy_2_0",
+		desc_id = "menu_content_infamy_2_0_desc",
+		date_id = "menu_content_infamy_2_0_date",
+		webpage = "http://www.overkillsoftware.com/infamyupdate/",
+		image = "guis/dlcs/infamous/textures/pd2/content_updates/infamy_2_0"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -304,7 +312,8 @@ function GuiTweakData:init()
 			hw_boxing,
 			the_bomb,
 			character_pack_dragan,
-			akm4_pack
+			akm4_pack,
+			infamy_2_0
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1363,18 +1372,6 @@ function GuiTweakData:init()
 			x = 912,
 			y = 905,
 			icon = "guis/textures/pd2/crimenet_marker_codex"
-		},
-		{
-			id = "casino",
-			name_id = "menu_cn_casino",
-			desc_id = "menu_cn_casino_desc",
-			menu_node = "crimenet_contract_casino",
-			x = 347,
-			y = 716,
-			icon = "guis/textures/pd2/crimenet_casino",
-			unlock = "unlock_level",
-			pulse = true,
-			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	self.crime_net.codex = {

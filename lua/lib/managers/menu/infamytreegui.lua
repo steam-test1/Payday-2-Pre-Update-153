@@ -1,6 +1,6 @@
 require("lib/managers/menu/WalletGuiObject")
 local is_win_32 = SystemInfo:platform() == Idstring("WIN32")
-local WIDTH_MULTIPLIER = is_win_32 and 0.6 or 0.5
+local WIDTH_MULTIPLIER = is_win_32 and 0.7 or 0.5
 InfamyTreeGui = InfamyTreeGui or class()
 
 function InfamyTreeGui:init(ws, fullscreen_ws, node)
@@ -12,9 +12,6 @@ function InfamyTreeGui:init(ws, fullscreen_ws, node)
 	self:_setup()
 	self:set_layer(1000)
 end
-
-InfamyTreeGui.tree_rows = 3
-InfamyTreeGui.tree_cols = 4
 
 function InfamyTreeGui:_setup()
 	if alive(self._panel) then
@@ -56,24 +53,26 @@ function InfamyTreeGui:_setup()
 	title_bg_text:set_world_center_y(y)
 	title_bg_text:move(-13, 9)
 	MenuBackdropGUI.animate_bg_text(self, title_bg_text)
-	self._tree_panel = self._panel:panel({name = "tree_panel"})
-	self._tree_panel:set_w(math.round(self._panel:w() * WIDTH_MULTIPLIER - 10))
-	self._tree_panel:set_h(math.round(self._panel:h() * 0.75))
-	self._tree_panel:set_top(title_text:bottom() + 32)
+	self._tree_main_panel = self._panel:panel({})
+	self._tree_main_panel:set_w(math.round(self._panel:w() * WIDTH_MULTIPLIER - 10))
+	self._tree_main_panel:set_h(math.round(self._panel:h() - title_text:bottom() - 70 - 4))
+	self._tree_main_panel:set_top(title_text:bottom() + 2)
+	self._tree_panel = self._tree_main_panel:panel({name = "tree_panel"})
+	local size = math.min(self._tree_main_panel:w(), self._tree_main_panel:h())
 	BoxGuiObject:new(self._tree_panel, {
 		sides = {
-			1,
-			1,
-			1,
-			1
+			0,
+			0,
+			0,
+			0
 		}
 	})
 	self._description_panel = self._panel:panel({
 		name = "description_panel"
 	})
 	self._description_panel:set_w(math.round(self._panel:w() * (1 - WIDTH_MULTIPLIER) - 10))
-	self._description_panel:set_h(math.round(self._panel:h() * 0.75))
-	self._description_panel:set_top(title_text:bottom() + 32)
+	self._description_panel:set_h(math.round(self._panel:h() - title_text:bottom() - 70 - 4))
+	self._description_panel:set_top(title_text:bottom() + 2)
 	self._description_panel:set_right(self._panel:w())
 	self._description_panel:text({
 		name = "description_title",
@@ -132,26 +131,22 @@ function InfamyTreeGui:_setup()
 			1
 		}
 	})
-	local tree_rows = InfamyTreeGui.tree_rows
-	local tree_cols = InfamyTreeGui.tree_cols
+	local tree_rows = tweak_data.infamy.tree_rows or 3
+	local tree_cols = tweak_data.infamy.tree_cols or 3
 	local item_width = self._tree_panel:w() / tree_cols
-	local item_height = self._tree_panel:h() / (tree_rows + 2)
-	local x = 0
-	local y = item_height * (tree_rows + 1)
+	local item_height = self._tree_panel:h() / tree_rows
 	self._tree_items = {}
-	local x = self._tree_panel:w() / 2 - item_width / 2
-	local y = y
-	local item = {
-		panel = self._tree_panel:panel({
-			x = x,
-			y = y,
-			w = item_width,
-			h = item_height
-		})
-	}
-	table.insert(self._tree_items, item)
-	x = 0
-	y = y - item_height
+	local x = 0
+	local y = 0
+	local item
+	local fw = math.random(item_width)
+	local fh = 0
+	local fhs = {}
+	for i = 1, tree_cols do
+		fhs[i] = i
+	end
+	local c = 0
+	local texture_rect_x, texture_rect_y
 	for count = 1, tree_rows * tree_cols do
 		item = {
 			panel = self._tree_panel:panel({
@@ -162,40 +157,123 @@ function InfamyTreeGui:_setup()
 			})
 		}
 		table.insert(self._tree_items, item)
+		if 0 < c then
+			item.neighbour_left = {}
+			local connector = self._tree_panel:bitmap({
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df",
+				alpha = 0.5,
+				blend_mode = "add",
+				w = item_width,
+				h = 16,
+				wrap_mode = "wrap"
+			})
+			connector:set_texture_coordinates(Vector3(0 + fw, 0, 0), Vector3(item_width + fw, 0, 0), Vector3(0 + fw, 16, 0), Vector3(item_width + fw, 16, 0))
+			connector:set_right(item.panel:center_x())
+			connector:set_center_y(item.panel:center_y())
+			item.neighbour_left[1] = connector
+			local connector = self._tree_panel:bitmap({
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df",
+				alpha = 0.5,
+				blend_mode = "add",
+				w = item_width,
+				h = 16,
+				wrap_mode = "wrap"
+			})
+			connector:set_texture_coordinates(Vector3(0 - fw, 0, 0), Vector3(item_width - fw, 0, 0), Vector3(0 - fw, 16, 0), Vector3(item_width - fw, 16, 0))
+			connector:set_right(item.panel:center_x())
+			connector:set_center_y(item.panel:center_y())
+			item.neighbour_left[2] = connector
+			fw = fw + item_width
+			item.fw = fw
+		end
+		if count > tree_cols then
+			item.neighbour_top = {}
+			fh = fhs[c + 1]
+			local connector = self._tree_panel:bitmap({
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df",
+				alpha = 0.5,
+				blend_mode = "add",
+				w = 16,
+				h = item_height,
+				wrap_mode = "wrap"
+			})
+			connector:set_texture_coordinates(Vector3(0 + fh, 16, 0), Vector3(0 + fh, 0, 0), Vector3(item_height + fh, 16, 0), Vector3(item_height + fh, 0, 0))
+			connector:set_center_x(item.panel:center_x())
+			connector:set_bottom(item.panel:center_y())
+			item.neighbour_top[1] = connector
+			local connector = self._tree_panel:bitmap({
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df",
+				alpha = 0.5,
+				blend_mode = "add",
+				w = 16,
+				h = item_height,
+				wrap_mode = "wrap"
+			})
+			connector:set_texture_coordinates(Vector3(0 - fh, 16, 0), Vector3(0 - fh, 0, 0), Vector3(item_height - fh, 16, 0), Vector3(item_height - fh, 0, 0))
+			connector:set_center_x(item.panel:center_x())
+			connector:set_bottom(item.panel:center_y())
+			item.neighbour_top[2] = connector
+			item.fh = fh
+			fhs[c + 1] = fhs[c + 1] + item_height
+		end
 		x = x + item_width
-		if x >= self._tree_panel:w() then
+		c = c + 1
+		if tree_cols <= c then
+			c = 0
 			x = 0
-			y = y - item_height
+			y = y + item_height
+			fw = math.random(item_width)
 		end
 	end
 	x = self._tree_panel:w() / 2 - item_width / 2
-	item = {
-		panel = self._tree_panel:panel({
-			x = x,
-			y = y,
-			w = item_width,
-			h = item_height
-		})
-	}
-	table.insert(self._tree_items, item)
 	local border_size = 2
-	local size = item_height - border_size
+	local size = item_height - border_size * 2
+	self._owned_selected_size = math.floor(size)
+	self._owned_unselected_size = math.floor(size * 0.8)
+	self._unlocked_selected_size = math.floor(size * 0.9)
+	self._unlocked_unselected_size = math.floor(size * 0.7)
+	self._locked_selected_size = math.floor(size * 0.5)
+	self._locked_unselected_size = math.floor(size * 0.4)
 	local pos = item_width / 2 - size / 2
 	local secret_count = 1
+	local start_item = 1
+	local neighbour_top, neighbour_left
+	local neighbour_non_alpha = 0.3
 	for index, item in pairs(self._tree_items) do
 		if tweak_data.infamy.tree[index] then
+			if tweak_data.infamy.tree[index] == "infamy_root" then
+				start_item = index
+			end
 			local infamy_tweak = tweak_data.infamy.items[tweak_data.infamy.tree[index]]
 			local texture_rect_x = infamy_tweak.icon_xy and infamy_tweak.icon_xy[1] or 0
 			local texture_rect_y = infamy_tweak.icon_xy and infamy_tweak.icon_xy[2] or 0
 			item.owned = managers.infamy:owned(tweak_data.infamy.tree[index])
 			item.unlocked = managers.infamy:available(tweak_data.infamy.tree[index])
+			if item.neighbour_left then
+				neighbour_left = index - 1
+				if self._tree_items[neighbour_left] then
+					item.neighbour_left[1]:set_image(item.owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_left[2]:set_image(self._tree_items[neighbour_left].owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_left[1]:set_alpha((item.owned and 1 or item.unlocked and 0.7 or 0.1) * (self._tree_items[neighbour_left].owned and 1 or 0.5))
+					item.neighbour_left[2]:set_alpha((self._tree_items[neighbour_left].owned and 1 or self._tree_items[neighbour_left].unlocked and 0.7 or 0.1) * (item.owned and 1 or 0.6))
+				end
+			end
+			if item.neighbour_top then
+				neighbour_top = index - tree_cols
+				if self._tree_items[neighbour_top] then
+					item.neighbour_top[1]:set_image(item.owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_top[2]:set_image(self._tree_items[neighbour_top].owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_top[1]:set_alpha((item.owned and 1 or item.unlocked and 0.7 or 0.1) * (self._tree_items[neighbour_top].owned and 1 or 0.5))
+					item.neighbour_top[2]:set_alpha((self._tree_items[neighbour_top].owned and 1 or self._tree_items[neighbour_top].unlocked and 0.7 or 0.1) * (item.owned and 1 or 0.6))
+				end
+			end
+			item.select_size = item.owned and self._owned_selected_size or item.unlocked and self._unlocked_selected_size or self._locked_selected_size
+			item.unselect_size = item.owned and self._owned_unselected_size or item.unlocked and self._unlocked_unselected_size or self._locked_unselected_size
 			local color = item.owned and tweak_data.screen_colors.item_stage_1 or item.unlocked and tweak_data.screen_colors.item_stage_2 or tweak_data.screen_colors.item_stage_3
-			item.panel:bitmap({
+			local image = item.panel:bitmap({
 				name = "image",
-				x = pos,
-				y = border_size,
-				w = size,
-				h = size,
+				w = item.unselect_size,
+				h = item.unselect_size,
 				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/infamous_tree_atlas",
 				texture_rect = {
 					texture_rect_x * 128,
@@ -207,6 +285,7 @@ function InfamyTreeGui:_setup()
 				layer = 1,
 				blend_mode = "add"
 			})
+			image:set_center(item.panel:w() / 2, item.panel:h() / 2)
 			item.panel:text({
 				name = "text",
 				x = 0,
@@ -218,52 +297,134 @@ function InfamyTreeGui:_setup()
 				word_wrap = false,
 				font = tweak_data.menu.pd2_small_font,
 				font_size = tweak_data.menu.pd2_small_font_size,
-				align = "center"
+				align = "center",
+				visible = true,
+				alpha = 0
 			})
-			local glow = item.panel:bitmap({
+			local glow_size = size * 1.25
+			local glow = item.panel:panel({
 				name = "unlock_glow",
-				w = size * 2,
-				h = size * 2,
-				texture = "guis/textures/pd2/crimenet_marker_glow",
-				blend_mode = "add",
-				color = tweak_data.screen_colors.button_stage_3,
-				rotation = 360
+				w = glow_size,
+				h = glow_size
 			})
-			glow:set_center(item.panel:child("image"):center_x(), item.panel:child("image"):center_y() - 25)
+			glow:bitmap({
+				name = "glow1",
+				w = glow_size,
+				h = glow_size,
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/spinner_01_df",
+				blend_mode = "add",
+				color = tweak_data.screen_colors.text,
+				rotation = 360,
+				halign = "scale",
+				valign = "scale"
+			})
+			glow:bitmap({
+				name = "glow2",
+				w = glow_size,
+				h = glow_size,
+				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/spinner_02_df",
+				blend_mode = "add",
+				color = tweak_data.screen_colors.text,
+				rotation = 360,
+				halign = "scale",
+				valign = "scale"
+			})
+			glow:set_center(item.panel:w() / 2, item.panel:h() / 2)
 			glow:set_visible(item.owned)
-			local anim_pulse_glow = function(o)
+			glow:set_alpha(item.owned and 1 or item.unlocked and 0.25 or 0.25)
+			item.glow_alpha = false
+			
+			local function anim_pulse_glow(o)
 				local t = 0
+				local old_t = 0
 				local dt = 0
+				local speed = math.random() * 0.1 + 0.4
+				local glow1 = o:child("glow1")
+				local glow2 = o:child("glow2")
+				local r1 = (0.5 + math.rand(0.3)) * 95
+				local r2 = -(0.5 + math.rand(0.3)) * 95
+				glow1:set_alpha(1)
+				glow2:set_alpha(1)
+				item.glow_alpha = item.glow_alpha or o:alpha()
+				local wanted_alpha = item.glow_alpha
+				local wanted_size = item.unselect_size
+				local cur_size = image:w()
+				local neighbour_left = neighbour_left
+				local neighbour_top = neighbour_top
+				local connector_speed
+				local speed_mul = 0.75
+				local cx, cy, s
 				while true do
 					dt = coroutine.yield()
-					t = (t + dt * 0.5) % 1
-					o:set_alpha((math.sin(t * 180) * 0.5 + 0.5) * 0.8)
+					t = (t + dt * speed) % 1
+					wanted_alpha = (math.sin(t * 180) * 0.4 + 0.6) * 1 * item.glow_alpha
+					o:set_alpha(math.step(o:alpha(), wanted_alpha, dt * speed * 2))
+					glow1:rotate(dt * r1)
+					glow2:rotate(dt * r2)
+					cx, cy = glow:center()
+					s = (math.sin(t * 180) * 0.1 + 0.9) * glow_size * 1.05
+					glow:set_size(s, s)
+					glow:set_center(cx, cy)
+					if item.neighbour_left and self._tree_items[neighbour_left] then
+						connector_speed = (self._tree_items[neighbour_left].unlocked and 1 or speed_mul) * (self._tree_items[neighbour_left].owned and 1 or speed_mul) * (item.unlocked and 1 or speed_mul) * (item.unlocked and 1 or speed_mul)
+						item.fw = (item.fw + dt * 10 * connector_speed) % item.neighbour_left[1]:texture_width()
+						item.neighbour_left[1]:set_texture_coordinates(Vector3(0 + item.fw, 0, 0), Vector3(item_width + item.fw, 0, 0), Vector3(0 + item.fw, 16, 0), Vector3(item_width + item.fw, 16, 0))
+						item.neighbour_left[2]:set_texture_coordinates(Vector3(0 - item.fw, 0, 0), Vector3(item_width - item.fw, 0, 0), Vector3(0 - item.fw, 16, 0), Vector3(item_width - item.fw, 16, 0))
+					end
+					if item.neighbour_top and self._tree_items[neighbour_top] then
+						connector_speed = (self._tree_items[neighbour_top].unlocked and 1 or speed_mul) * (self._tree_items[neighbour_top].owned and 1 or speed_mul) * (item.unlocked and 1 or speed_mul) * (item.unlocked and 1 or speed_mul)
+						item.fh = (item.fh + dt * 10 * connector_speed) % item.neighbour_top[1]:texture_width()
+						item.neighbour_top[1]:set_texture_coordinates(Vector3(0 + item.fh, 16, 0), Vector3(0 + item.fh, 0, 0), Vector3(item_height + item.fh, 16, 0), Vector3(item_height + item.fh, 0, 0))
+						item.neighbour_top[2]:set_texture_coordinates(Vector3(0 - item.fh, 16, 0), Vector3(0 - item.fh, 0, 0), Vector3(item_height - item.fh, 16, 0), Vector3(item_height - item.fh, 0, 0))
+					end
+					if self._selected_item == index and item.panel:child("text"):alpha() ~= 1 then
+						item.panel:child("text"):set_alpha(math.lerp(item.panel:child("text"):alpha(), 1, dt * 10))
+					end
+					wanted_size = self._selected_item == index and item.select_size or item.unselect_size
+					if cur_size ~= wanted_size then
+						cx, cy = image:center()
+						cur_size = math.lerp(cur_size, wanted_size, dt * 6)
+						cur_size = math.step(cur_size, wanted_size, dt * 25)
+						image:set_size(cur_size, cur_size)
+						image:set_center(cx, cy)
+					end
+					if old_t > t then
+						speed = math.random() * 0.1 + 0.4
+					end
+					old_t = t
 				end
 			end
+			
 			glow:animate(anim_pulse_glow)
 		else
-			local infamy_tweak = tweak_data.infamy.items["infamy_secret_" .. secret_count]
-			secret_count = secret_count + 1
-			local texture_rect_x = infamy_tweak.icon_xy and infamy_tweak.icon_xy[1] or 0
-			local texture_rect_y = infamy_tweak.icon_xy and infamy_tweak.icon_xy[2] or 0
 			item.owned = false
 			item.unlocked = false
-			item.panel:bitmap({
+			if item.neighbour_left then
+				neighbour_left = index - 1
+				if self._tree_items[neighbour_left] then
+					item.neighbour_left[1]:set_image("guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_left[2]:set_image("guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_left[1]:set_alpha(neighbour_non_alpha * neighbour_non_alpha * neighbour_non_alpha)
+					item.neighbour_left[2]:set_alpha(neighbour_non_alpha * neighbour_non_alpha * neighbour_non_alpha)
+				end
+			end
+			if item.neighbour_top then
+				neighbour_top = index - tree_cols
+				if self._tree_items[neighbour_top] then
+					item.neighbour_top[1]:set_image("guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_top[2]:set_image("guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+					item.neighbour_top[1]:set_alpha(neighbour_non_alpha * neighbour_non_alpha * neighbour_non_alpha)
+					item.neighbour_top[2]:set_alpha(neighbour_non_alpha * neighbour_non_alpha * neighbour_non_alpha)
+				end
+			end
+			item.panel:rect({
 				name = "image",
-				x = pos,
+				x = border_size,
 				y = border_size,
 				w = size,
 				h = size,
-				texture = "guis/dlcs/infamous/textures/pd2/infamous_tree/infamous_tree_atlas",
-				texture_rect = {
-					texture_rect_x * 128,
-					texture_rect_y * 128,
-					128,
-					128
-				},
-				color = tweak_data.screen_colors.item_stage_3,
-				layer = 1,
-				blend_mode = "add"
+				blend_mode = "add",
+				alpha = 0
 			})
 			item.panel:text({
 				name = "text",
@@ -299,12 +460,12 @@ function InfamyTreeGui:_setup()
 		font = tweak_data.menu.pd2_medium_font,
 		font_size = tweak_data.menu.pd2_medium_font_size,
 		color = tweak_data.screen_colors.text,
-		align = "right"
+		align = "center"
 	})
 	local _, _, w, h = points_text:text_rect()
-	points_text:set_size(self._tree_panel:w(), h)
-	points_text:set_top(self._tree_panel:bottom() + 5)
-	points_text:set_right(self._tree_panel:right())
+	points_text:set_size(self._tree_main_panel:w(), h)
+	points_text:set_top(self._tree_main_panel:bottom() + 5)
+	points_text:set_center_x(self._tree_panel:center_x())
 	if managers.menu:is_pc_controller() then
 		local back_text = self._panel:text({
 			name = "back_button",
@@ -358,10 +519,11 @@ function InfamyTreeGui:_setup()
 		end)
 	end
 	blur:animate(func)
-	self:_select_item(1)
+	self:_select_item(start_item)
 	if managers.experience:current_rank() == 0 then
 		managers.menu:show_infamous_message(MenuCallbackHandler:can_become_infamous() and managers.money:offshore() >= Application:digest_value(tweak_data.infamy.ranks[managers.experience:current_rank() + 1], false))
 	end
+	managers.features:announce_feature("infamy_2_0")
 end
 
 function InfamyTreeGui:_flash_item(item)
@@ -616,6 +778,14 @@ function InfamyTreeGui:_unlock_item(index)
 end
 
 function InfamyTreeGui:_select_item(index)
+	if type(index) == "string" then
+		for i, name in ipairs(tweak_data.infamy.tree) do
+			if name == index then
+				index = i
+				break
+			end
+		end
+	end
 	if self._selected_item ~= index then
 		if self._selected_item then
 			local selected_item = self._tree_items[self._selected_item]
@@ -630,6 +800,7 @@ function InfamyTreeGui:_select_item(index)
 			})
 			selected_item.panel:child("image"):set_color(self._tree_items[self._selected_item].owned and tweak_data.screen_colors.item_stage_1 or self._tree_items[self._selected_item].unlocked and tweak_data.screen_colors.item_stage_2 or tweak_data.screen_colors.item_stage_3)
 			selected_item.panel:child("text"):set_text("")
+			selected_item.panel:child("text"):set_alpha(0)
 		end
 		self._selected_item = index
 		local infamy_name = tweak_data.infamy.tree[index]
@@ -639,13 +810,14 @@ function InfamyTreeGui:_select_item(index)
 			points = infamy_name and Application:digest_value(tweak_data.infamy.items[infamy_name].cost, false) or 0
 		})))
 		item.panel:child("text"):set_color(tweak_data.screen_colors.text)
+		item.panel:child("text"):set_alpha(0)
 		item.panel:child("image"):set_color(tweak_data.screen_colors.item_stage_1)
 		item.border:create_sides(item.panel, {
 			sides = {
-				2,
-				2,
-				2,
-				2
+				0,
+				0,
+				0,
+				0
 			}
 		})
 		self:_update_description(infamy_name, item.unlocked)
@@ -658,18 +830,57 @@ function InfamyTreeGui:_dialog_confirm_yes(index)
 	managers.infamy:unlock_item(infamy_name)
 	infamy_item.owned = true
 	infamy_item.panel:child("image"):set_color(tweak_data.screen_colors.item_stage_1)
-	infamy_item.panel:child("unlock_glow"):show()
 	managers.menu_component:post_event("menu_skill_investment")
-	SimpleGUIEffectSpewer.infamous_up(infamy_item.panel:child("image"):center_x(), infamy_item.panel:child("image"):center_y() - 20, infamy_item.panel)
+	SimpleGUIEffectSpewer.infamous_up(infamy_item.panel:child("image"):center_x(), infamy_item.panel:child("image"):center_y(), infamy_item.panel)
 	self._panel:child("points"):set_text(utf8.to_upper(managers.localization:text("st_menu_infamy_available_points", {
 		points = managers.infamy:points()
 	})))
 	if self._selected_item == index then
 		infamy_item.panel:child("text"):set_text(utf8.to_upper(managers.localization:text("st_menu_skill_owned")))
 	end
+	self:reload()
+end
+
+function InfamyTreeGui:reload()
+	local tree_rows = tweak_data.infamy.tree_rows or 3
+	local tree_cols = tweak_data.infamy.tree_cols or 3
+	local neighbour_non_alpha = 0.55
 	for index, item in pairs(self._tree_items) do
 		item.unlocked = managers.infamy:available(tweak_data.infamy.tree[index])
 		item.panel:child("image"):set_color(item.owned and tweak_data.screen_colors.item_stage_1 or item.unlocked and tweak_data.screen_colors.item_stage_2 or tweak_data.screen_colors.item_stage_3)
+		item.select_size = item.owned and self._owned_selected_size or item.unlocked and self._unlocked_selected_size or self._locked_selected_size
+		item.unselect_size = item.owned and self._owned_unselected_size or item.unlocked and self._unlocked_unselected_size or self._locked_unselected_size
+		if item.neighbour_left then
+			local neighbour_left = index - 1
+			if self._tree_items[neighbour_left] then
+				item.neighbour_left[1]:set_image(item.owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+				item.neighbour_left[2]:set_image(self._tree_items[neighbour_left].owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+				item.neighbour_left[1]:set_texture_coordinates(Vector3(0 + item.fw, 0, 0), Vector3(item.panel:width() + item.fw, 0, 0), Vector3(0 + item.fw, 16, 0), Vector3(item.panel:width() + item.fw, 16, 0))
+				item.neighbour_left[2]:set_texture_coordinates(Vector3(0 - item.fw, 0, 0), Vector3(item.panel:width() - item.fw, 0, 0), Vector3(0 - item.fw, 16, 0), Vector3(item.panel:width() - item.fw, 16, 0))
+				item.neighbour_left[1]:set_alpha((item.owned and 1 or item.unlocked and 0.7 or 0.1) * (self._tree_items[neighbour_left].owned and 1 or 0.5))
+				item.neighbour_left[2]:set_alpha((self._tree_items[neighbour_left].owned and 1 or self._tree_items[neighbour_left].unlocked and 0.7 or 0.1) * (item.owned and 1 or 0.5))
+			end
+		end
+		if item.neighbour_top then
+			local neighbour_top = index - tree_cols
+			if self._tree_items[neighbour_top] then
+				item.neighbour_top[1]:set_image(item.owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+				item.neighbour_top[2]:set_image(self._tree_items[neighbour_top].owned and "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df" or "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_2_df")
+				item.neighbour_top[1]:set_texture_coordinates(Vector3(0 + item.fh, 16, 0), Vector3(0 + item.fh, 0, 0), Vector3(item.panel:height() + item.fh, 16, 0), Vector3(item.panel:height() + item.fh, 0, 0))
+				item.neighbour_top[2]:set_texture_coordinates(Vector3(0 - item.fh, 16, 0), Vector3(0 - item.fh, 0, 0), Vector3(item.panel:height() - item.fh, 16, 0), Vector3(item.panel:height() - item.fh, 0, 0))
+				item.neighbour_top[1]:set_alpha((item.owned and 1 or item.unlocked and 0.7 or 0.1) * (self._tree_items[neighbour_top].owned and 1 or 0.6))
+				item.neighbour_top[2]:set_alpha((self._tree_items[neighbour_top].owned and 1 or self._tree_items[neighbour_top].unlocked and 0.7 or 0.1) * (item.owned and 1 or 0.6))
+			end
+		end
+		if alive(item.panel:child("unlock_glow")) then
+			item.panel:child("unlock_glow"):set_visible(item.owned)
+			item.glow_alpha = item.owned and 1 or item.unlocked and 0.25 or 0.25
+		end
+	end
+	local selected_item = self._tree_items[self._selected_item]
+	if selected_item then
+		local infamy_name = tweak_data.infamy.tree[self._selected_item]
+		self:_update_description(infamy_name, selected_item.unlocked)
 	end
 end
 
@@ -682,28 +893,36 @@ function InfamyTreeGui:input_focus()
 end
 
 function InfamyTreeGui:mouse_moved(o, x, y)
+	local used = false
+	local pointer = "arrow"
 	for index, item in pairs(self._tree_items) do
 		if item.panel:inside(x, y) then
-			self:_select_item(index)
-			return true
+			used = true
+			pointer = "link"
+			if self._selected_item ~= index then
+				self:_select_item(index)
+				managers.menu_component:post_event("highlight")
+			end
 		end
 	end
 	if managers.menu:is_pc_controller() then
 		local back_button = self._panel:child("back_button")
-		if back_button:inside(x, y) then
+		if not used and back_button:inside(x, y) then
+			used = true
+			pointer = "link"
 			if not self._back_highlight then
 				self._back_highlight = true
 				back_button:set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
+				self:_select_item("infamy_root")
 			end
-		else
+		elseif self._back_highlight then
 			self._back_highlight = false
 			back_button:set_color(tweak_data.screen_colors.button_stage_3)
 		end
 	end
-	if self._panel:inside(x, y) then
-		return true
-	end
+	used = used or self._panel:inside(x, y)
+	return used, pointer
 end
 
 function InfamyTreeGui:mouse_pressed(button, x, y)
@@ -721,49 +940,46 @@ function InfamyTreeGui:mouse_pressed(button, x, y)
 	end
 end
 
+function InfamyTreeGui:move(x, y)
+	local tree_cols = tweak_data.infamy.tree_cols or 3
+	local tree_rows = tweak_data.infamy.tree_rows or 3
+	local item_x = (self._selected_item - 1) % tree_cols + 1
+	local item_y = math.floor((self._selected_item - 1) / tree_cols) + 1
+	item_x = math.clamp(item_x + x, 1, tree_cols)
+	item_y = math.clamp(item_y + y, 1, tree_rows)
+	local new_selected = (item_y - 1) * tree_cols + item_x
+	self:_select_item(new_selected)
+end
+
 function InfamyTreeGui:move_up()
 	if not self._selected_item then
-		self:_select_item(1)
-	elseif self._selected_item == 1 then
-		self:_select_item(3)
-	elseif self._selected_item + 4 <= #self._tree_items - 1 then
-		self:_select_item(self._selected_item + 4)
+		self:_select_item("infamy_root")
 	else
-		self:_select_item(#self._tree_items)
+		self:move(0, -1)
 	end
 end
 
 function InfamyTreeGui:move_down()
 	if not self._selected_item then
-		self:_select_item(1)
-	elseif self._selected_item == #self._tree_items then
-		self:_select_item(#self._tree_items - 2)
-	elseif self._selected_item > 1 then
-		self:_select_item(math.max(1, self._selected_item - 4))
+		self:_select_item("infamy_root")
+	else
+		self:move(0, 1)
 	end
 end
 
 function InfamyTreeGui:move_left()
 	if not self._selected_item then
-		self:_select_item(1)
-	elseif self._selected_item == 1 then
-		self:_select_item(2)
-	elseif self._selected_item == #self._tree_items then
-		self:_select_item(#self._tree_items - 4)
-	elseif self._selected_item % 4 ~= 2 then
-		self:_select_item(self._selected_item - 1)
+		self:_select_item("infamy_root")
+	else
+		self:move(-1, 0)
 	end
 end
 
 function InfamyTreeGui:move_right()
 	if not self._selected_item then
-		self:_select_item(1)
-	elseif self._selected_item == 1 then
-		self:_select_item(5)
-	elseif self._selected_item == #self._tree_items then
-		self:_select_item(#self._tree_items - 1)
-	elseif self._selected_item % 4 ~= 1 then
-		self:_select_item(self._selected_item + 1)
+		self:_select_item("infamy_root")
+	else
+		self:move(1, 0)
 	end
 end
 

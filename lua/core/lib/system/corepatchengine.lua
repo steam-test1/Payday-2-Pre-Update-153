@@ -124,3 +124,33 @@ if Draw then
 		self:cone(to, arrow_end_pos, 40 * scale)
 	end
 end
+local SteamClass = getmetatable(Steam)
+if SteamClass then
+	local steam_http_request = Steam.http_request
+	local requests = {}
+	local current_request, check_requests_func, request_done_func
+	
+	function request_done_func(success, page)
+		if current_request then
+			local request_clbk = current_request[2]
+			current_request = nil
+			request_clbk(success, page)
+		end
+		check_requests_func()
+	end
+	
+	function check_requests_func()
+		if not current_request then
+			current_request = table.remove(requests, 1)
+			if current_request then
+				cat_print("jansve", "[Steam:http_request().check_requests]", inspect(current_request))
+				steam_http_request(Steam, current_request[1], request_done_func)
+			end
+		end
+	end
+	
+	function SteamClass:http_request(path, clbk)
+		table.insert(requests, {path, clbk})
+		check_requests_func()
+	end
+end

@@ -2111,8 +2111,11 @@ function MenuCallbackHandler:_increase_infamous()
 	local rank = managers.experience:current_rank() + 1
 	managers.experience:reset()
 	managers.experience:set_current_rank(rank)
-	managers.money:deduct_from_total(managers.money:total())
-	managers.money:deduct_from_offshore(Application:digest_value(tweak_data.infamy.ranks[rank], false))
+	local offshore_cost = Application:digest_value(tweak_data.infamy.ranks[rank], false)
+	if 0 < offshore_cost then
+		managers.money:deduct_from_total(managers.money:total())
+		managers.money:deduct_from_offshore(offshore_cost)
+	end
 	managers.skilltree:infamy_reset()
 	managers.blackmarket:reset_equipped()
 	if managers.menu_component then
@@ -2122,9 +2125,6 @@ function MenuCallbackHandler:_increase_infamous()
 	if logic then
 		logic:refresh_node()
 		logic:select_item("crimenet")
-	end
-	if rank <= #tweak_data.achievement.infamous then
-		managers.achievment:award(tweak_data.achievement.infamous[rank])
 	end
 	managers.savefile:save_progress()
 	managers.savefile:save_setting(true)
@@ -2141,6 +2141,7 @@ function MenuCallbackHandler:become_infamous(params)
 	local infamous_cost = Application:digest_value(tweak_data.infamy.ranks[managers.experience:current_rank() + 1], false)
 	local params = {}
 	params.cost = managers.experience:cash_string(infamous_cost)
+	params.free = infamous_cost == 0
 	if infamous_cost <= managers.money:offshore() and managers.experience:current_level() >= 100 then
 		function params.yes_func()
 			local rank = managers.experience:current_rank() + 1
