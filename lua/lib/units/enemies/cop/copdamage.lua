@@ -321,7 +321,7 @@ function CopDamage:damage_bullet(attack_data)
 				end
 			end
 			self:_check_damage_achievements(attack_data, head)
-			if self._unit:base()._tweak_table == "tank" and attack_data.weapon_unit:base():weapon_tweak_data().category == "smg" then
+			if self._unit:base()._tweak_table == "tank" and alive(attack_data.weapon_unit) and attack_data.weapon_unit:base() and attack_data.weapon_unit:base().weapon_tweak_data and attack_data.weapon_unit:base():weapon_tweak_data().category == "smg" then
 				managers.statistics:crimefest_stats("dallas_2")
 			end
 			if not CopDamage.is_civilian(self._unit:base()._tweak_table) and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and not attack_data.weapon_unit:base().thrower_unit then
@@ -929,7 +929,7 @@ end
 function CopDamage:_dismember_condition(attack_data)
 	local dismember_victim = false
 	local target_is_spook = false
-	if attack_data.col_ray.unit then
+	if alive(attack_data.col_ray.unit) and attack_data.col_ray.unit:base() then
 		target_is_spook = attack_data.col_ray.unit:base()._tweak_table == "spooc"
 	end
 	local criminal_name = managers.criminals:local_character_name()

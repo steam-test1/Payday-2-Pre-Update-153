@@ -955,6 +955,10 @@ function MenuManager:show_buy_weapon(params, weapon, cost)
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuCallbackHandler:on_visit_crimefest_challenges()
+	Steam:overlay_activate("url", tweak_data.gui.crimefest_challenges_webpage)
+end
+
 function MenuCallbackHandler:on_visit_fbi_files()
 	Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
 end
