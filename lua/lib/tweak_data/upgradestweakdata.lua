@@ -9338,7 +9338,7 @@ function UpgradesTweakData:_arblast_weapon_definitions()
 		category = "weapon",
 		weapon_id = "arblast",
 		factory_id = "wpn_fps_bow_arblast",
-		dlc = "pd2_clan"
+		dlc = "steel"
 	}
 end
 
@@ -9347,7 +9347,7 @@ function UpgradesTweakData:_frankish_weapon_definitions()
 		category = "weapon",
 		weapon_id = "frankish",
 		factory_id = "wpn_fps_bow_frankish",
-		dlc = "pd2_clan"
+		dlc = "steel"
 	}
 end
 
@@ -9356,6 +9356,6 @@ function UpgradesTweakData:_long_weapon_definitions()
 		category = "weapon",
 		weapon_id = "long",
 		factory_id = "wpn_fps_bow_long",
-		dlc = "pd2_clan"
+		dlc = "steel"
 	}
 end
