@@ -211,15 +211,15 @@ function PlayerDamage:_regenerate_armor()
 	self:_send_set_armor()
 end
 
-function PlayerDamage:restore_health(health_restored, is_static)
-	if managers.player:is_damage_health_ratio_active(self:health_ratio()) then
-		return
+function PlayerDamage:restore_health(health_restored, is_static, chk_health_ratio)
+	if chk_health_ratio and managers.player:is_damage_health_ratio_active(self:health_ratio()) then
+		return false
 	end
 	if is_static then
-		self:change_health(health_restored)
+		return self:change_health(health_restored)
 	else
 		local max_health = self:_max_health()
-		self:change_health(max_health * health_restored)
+		return self:change_health(max_health * health_restored)
 	end
 end
 
@@ -278,7 +278,7 @@ function PlayerDamage:get_real_armor()
 end
 
 function PlayerDamage:change_health(change_of_health)
-	self:set_health(self:get_real_health() + change_of_health)
+	return self:set_health(self:get_real_health() + change_of_health)
 end
 
 function PlayerDamage:set_health(health)
@@ -291,6 +291,7 @@ function PlayerDamage:set_health(health)
 		health = health + math.max(0, diff_health_ratio * max_health)
 		self._current_max_health = max_health
 	end
+	local prev_health = self._health and Application:digest_value(self._health, false) or health
 	self._health = Application:digest_value(math.clamp(health, 0, max_health), true)
 	self:_send_set_health()
 	self:_set_health_effect()
@@ -302,6 +303,7 @@ function PlayerDamage:set_health(health)
 		total = max_health,
 		revives = Application:digest_value(self._revives, false)
 	})
+	return prev_health ~= Application:digest_value(self._health, false)
 end
 
 function PlayerDamage:set_armor(armor)
@@ -403,10 +405,7 @@ function PlayerDamage:damage_melee(attack_data)
 			normal = rot
 		})
 	end
-	local dmg_mul = managers.player:upgrade_value("player", "melee_damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
-	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
-		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
-	end
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("melee", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
 	attack_data.damage = attack_data.damage * dmg_mul
 	self._unit:sound():play("melee_hit_body", nil, nil)
 	local result = self:damage_bullet(attack_data)
@@ -451,13 +450,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
 	}
-	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
-	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
-		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
-	end
-	if CopDamage.is_gangster(attack_data.attacker_unit:base()._tweak_table) then
-		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "gangster_damage_dampener", 1)
-	end
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("bullet", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
 	attack_data.damage = attack_data.damage * dmg_mul
 	local dodge_roll = math.rand(1)
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
@@ -726,10 +719,7 @@ function PlayerDamage:damage_explosion(attack_data)
 	if self._bleed_out then
 		return
 	end
-	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
-	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
-		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
-	end
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("explosion", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
 	attack_data.damage = damage * dmg_mul
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)
@@ -760,10 +750,7 @@ function PlayerDamage:damage_fire(attack_data)
 	if self._bleed_out then
 		return
 	end
-	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
-	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
-		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
-	end
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("fire", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
 	attack_data.damage = damage * dmg_mul
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)

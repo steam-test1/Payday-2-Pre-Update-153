@@ -2200,7 +2200,8 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_passive_loot_drop_multiplier",
 					"team_hostage_health_multiplier",
-					"team_hostage_stamina_multiplier"
+					"team_hostage_stamina_multiplier",
+					"team_hostage_damage_dampener_multiplier"
 				},
 				cost = 4000,
 				icon_xy = {0, 1},
@@ -2255,6 +2256,7 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_passive_health_multiplier_4",
+					"player_passive_health_regen",
 					"player_passive_loot_drop_multiplier"
 				},
 				cost = 4000,
@@ -2460,7 +2462,10 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_level_2_dodge_addend_1",
 					"player_level_3_dodge_addend_1",
-					"player_level_4_dodge_addend_1"
+					"player_level_4_dodge_addend_1",
+					"player_level_2_armor_multiplier_1",
+					"player_level_3_armor_multiplier_1",
+					"player_level_4_armor_multiplier_1"
 				},
 				cost = 400,
 				icon_xy = {4, 3},
@@ -2472,7 +2477,10 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_level_2_dodge_addend_2",
 					"player_level_3_dodge_addend_2",
-					"player_level_4_dodge_addend_2"
+					"player_level_4_dodge_addend_2",
+					"player_level_2_armor_multiplier_2",
+					"player_level_3_armor_multiplier_2",
+					"player_level_4_armor_multiplier_2"
 				},
 				cost = 1000,
 				icon_xy = {5, 3},
@@ -2484,7 +2492,10 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_level_2_dodge_addend_3",
 					"player_level_3_dodge_addend_3",
-					"player_level_4_dodge_addend_3"
+					"player_level_4_dodge_addend_3",
+					"player_level_2_armor_multiplier_3",
+					"player_level_3_armor_multiplier_3",
+					"player_level_4_armor_multiplier_3"
 				},
 				cost = 2400,
 				icon_xy = {6, 3},
