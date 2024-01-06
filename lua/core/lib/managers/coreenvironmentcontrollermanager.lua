@@ -608,14 +608,14 @@ function CoreEnvironmentControllerManager:_refresh_occ_params(vp)
 			if dome_occ_feed then
 				dome_occ_feed:set_variable(Idstring("dome_occ_pos"), self._occ_pos)
 				dome_occ_feed:set_variable(Idstring("dome_occ_size"), self._occ_size)
-				Application:set_material_texture(dome_occ_feed, Idstring("filter_color_texture"), Idstring(self._occ_texture), Idstring("normal"))
+				Application:set_material_texture(dome_occ_feed, Idstring("filter_color_texture"), Idstring(self._occ_texture), Idstring("normal"), 0)
 			end
 		end
 		local shadow = deferred_processor:modifier(Idstring("move_global_occ"))
 		if shadow then
 			local dome_occ_feed_ps3 = shadow:material()
 			if dome_occ_feed_ps3 then
-				Application:set_material_texture(dome_occ_feed_ps3, Idstring("filter_color_texture"), Idstring(self._occ_texture), Idstring("normal"))
+				Application:set_material_texture(dome_occ_feed_ps3, Idstring("filter_color_texture"), Idstring(self._occ_texture), Idstring("normal"), 0)
 			end
 		end
 	end

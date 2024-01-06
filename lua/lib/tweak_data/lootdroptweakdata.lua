@@ -547,6 +547,32 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.goty_dlc_bundle_2014.track = true
 	self.global_values.goty_dlc_bundle_2014.sort_number = 94
 	self.global_values.goty_dlc_bundle_2014.category = "dlc"
+	self.global_values.character_pack_dragan = {}
+	self.global_values.character_pack_dragan.name_id = "bm_global_value_character_pack_dragan"
+	self.global_values.character_pack_dragan.desc_id = "menu_l_global_value_character_pack_dragan"
+	self.global_values.character_pack_dragan.unlock_id = "bm_global_value_character_pack_dragan_unlock"
+	self.global_values.character_pack_dragan.color = Color(255, 255, 212, 0) / 255
+	self.global_values.character_pack_dragan.dlc = true
+	self.global_values.character_pack_dragan.chance = 1
+	self.global_values.character_pack_dragan.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "character_pack_dragan")
+	self.global_values.character_pack_dragan.durability_multiplier = 1
+	self.global_values.character_pack_dragan.drops = true
+	self.global_values.character_pack_dragan.track = true
+	self.global_values.character_pack_dragan.sort_number = 95
+	self.global_values.character_pack_dragan.category = "dlc"
+	self.global_values.the_bomb = {}
+	self.global_values.the_bomb.name_id = "bm_global_value_the_bomb"
+	self.global_values.the_bomb.desc_id = "menu_l_global_value_the_bomb"
+	self.global_values.the_bomb.unlock_id = "bm_global_value_the_bomb_unlock"
+	self.global_values.the_bomb.color = Color(255, 255, 212, 0) / 255
+	self.global_values.the_bomb.dlc = true
+	self.global_values.the_bomb.chance = 1
+	self.global_values.the_bomb.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "the_bomb")
+	self.global_values.the_bomb.durability_multiplier = 1
+	self.global_values.the_bomb.drops = true
+	self.global_values.the_bomb.track = true
+	self.global_values.the_bomb.sort_number = 150
+	self.global_values.the_bomb.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -591,7 +617,8 @@ function LootDropTweakData:init(tweak_data)
 		"hl_miami",
 		"hlm_game",
 		"gage_pack_historical",
-		"character_pack_clover"
+		"character_pack_clover",
+		"character_pack_dragan"
 	}
 	self:_create_global_value_list_map()
 end

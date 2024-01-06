@@ -294,6 +294,8 @@ function MusicManager:jukebox_default_tracks()
 		heist_alex3 = "track_02",
 		heist_haunted = "track_22",
 		heist_big = "all",
+		heist_crojob1 = "all",
+		heist_crojob2 = "all",
 		heist_mus = "all",
 		heist_arm_cro = "all",
 		heist_arm_hcm = "all",
@@ -323,6 +325,10 @@ function MusicManager:jukebox_default_tracks()
 	if managers.dlc:has_hope_diamond() or managers.dlc:has_soundtrack_or_cce() then
 		default_options.heist_mus = "track_24"
 	end
+	if managers.dlc:has_the_bomb() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_crojob1 = "track_25"
+		default_options.heist_crojob2 = "track_25"
+	end
 	return default_options
 end
 
@@ -351,7 +357,8 @@ function MusicManager:jukebox_music_tracks()
 		"track_21",
 		"track_22",
 		"track_23",
-		"track_24"
+		"track_24",
+		"track_25"
 	}
 	local pdth_tracks = {
 		"track_pth_01",
@@ -374,6 +381,7 @@ function MusicManager:jukebox_music_tracks()
 	self:_jukebox_unlock_track(tracks_locked, "track_18", "miami", not managers.dlc or managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce())
 	self:_jukebox_unlock_track(tracks_locked, "track_19", "miami", not managers.dlc or managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce())
 	self:_jukebox_unlock_track(tracks_locked, "track_24", "diamond", not managers.dlc or managers.dlc:has_hope_diamond() or managers.dlc:has_soundtrack_or_cce())
+	self:_jukebox_unlock_track(tracks_locked, "track_25", "thebomb", not managers.dlc or managers.dlc:has_the_bomb() or managers.dlc:has_soundtrack_or_cce())
 	if managers.dlc and not managers.dlc:has_pdth_soundtrack() then
 		for _, sound in ipairs(pdth_tracks) do
 			tracks_locked[sound] = "payday"

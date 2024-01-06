@@ -372,6 +372,23 @@ function EquipmentsTweakData:init()
 		icon = "equipment_glasscutter",
 		sync_possession = true
 	}
+	self.specials.c4_x1 = {
+		text_id = "hud_equipment_pickup_c4",
+		icon = "pd2_c4",
+		action_message = "c4_obtained",
+		quantity = 1,
+		sync_possession = true
+	}
+	self.specials.chainsaw = {
+		text_id = "hud_equipment_chainsaw",
+		icon = "equipment_chainsaw",
+		sync_possession = true
+	}
+	self.specials.manifest = {
+		text_id = "hud_equipment_manifest",
+		icon = "equipment_manifest",
+		sync_possession = true
+	}
 	self.max_amount = {
 		ammo_bag = 2,
 		doctor_bag = 2,

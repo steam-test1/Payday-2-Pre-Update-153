@@ -94,6 +94,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.jowi = "jw_shades"
 	self.masks.character_locked.old_hoxton = "old_hoxton"
 	self.masks.character_locked.female_1 = "msk_grizel"
+	self.masks.character_locked.dragan = "dragan"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -203,6 +204,25 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.wolf.infamous = true
 	self.masks.wolf.value = 7
+	self.masks.dragan = {}
+	self.masks.dragan.unit = "units/pd2_dlc_dragan/masks/dragan/msk_dragan"
+	self.masks.dragan.name_id = "bm_msk_dragan"
+	self.masks.dragan.pcs = {}
+	self.masks.dragan.value = 0
+	self.masks.dragan.texture_bundle_folder = "character_pack_dragan"
+	self.masks.dragan.dlc = "character_pack_dragan"
+	self.masks.dragan_begins = {}
+	self.masks.dragan_begins.unit = "units/pd2_dlc_dragan/masks/dragan_begins/msk_dragan_begins"
+	self.masks.dragan_begins.name_id = "bm_msk_dragan_begins"
+	self.masks.dragan_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.dragan_begins.value = 0
+	self.masks.dragan_begins.texture_bundle_folder = "character_pack_dragan"
+	self.masks.dragan_begins.dlc = "character_pack_dragan"
 	self.masks.cthulhu = {}
 	self.masks.cthulhu.unit = "units/payday2/masks/msk_cthulhu/msk_cthulhu"
 	self.masks.cthulhu.name_id = "bm_msk_cthulhu"
@@ -1416,6 +1436,40 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cursed_crown.value = 0
 	self.masks.cursed_crown.dlc = "hope_diamond"
 	self.masks.cursed_crown.texture_bundle_folder = "character_pack_clover"
+	self.masks.butcher = {}
+	self.masks.butcher.unit = "units/pd2_dlc_dragan/masks/butcher/msk_butcher"
+	self.masks.butcher.name_id = "bm_msk_butcher"
+	self.masks.butcher.pcs = {}
+	self.masks.butcher.value = 0
+	self.masks.butcher.dlc = "the_bomb"
+	self.masks.butcher.sort_number = 8
+	self.masks.butcher.texture_bundle_folder = "the_bomb"
+	self.masks.doctor = {}
+	self.masks.doctor.unit = "units/pd2_dlc_cro/masks/msk_doctor/msk_doctor"
+	self.masks.doctor.name_id = "bm_msk_doctor"
+	self.masks.doctor.pcs = {}
+	self.masks.doctor.value = 0
+	self.masks.doctor.dlc = "the_bomb"
+	self.masks.doctor.type = "helmet"
+	self.masks.doctor.texture_bundle_folder = "the_bomb"
+	self.masks.doctor.skip_mask_on_sequence = true
+	self.masks.doctor.sort_number = 8
+	self.masks.tech_lion = {}
+	self.masks.tech_lion.unit = "units/pd2_dlc_cro/masks/msk_tech_lion/msk_tech_lion"
+	self.masks.tech_lion.name_id = "bm_msk_tech_lion"
+	self.masks.tech_lion.pcs = {}
+	self.masks.tech_lion.value = 0
+	self.masks.tech_lion.dlc = "the_bomb"
+	self.masks.tech_lion.texture_bundle_folder = "the_bomb"
+	self.masks.tech_lion.sort_number = 8
+	self.masks.lady_butcher = {}
+	self.masks.lady_butcher.unit = "units/pd2_dlc_cro/masks/msk_butcher/msk_butcher"
+	self.masks.lady_butcher.name_id = "bm_msk_lady_butcher"
+	self.masks.lady_butcher.pcs = {}
+	self.masks.lady_butcher.value = 0
+	self.masks.lady_butcher.dlc = "the_bomb"
+	self.masks.lady_butcher.texture_bundle_folder = "the_bomb"
+	self.masks.lady_butcher.sort_number = 8
 	self.masks.nun_town = {}
 	self.masks.nun_town.unit = "units/pd2_dlc_goty/masks/nun_town/msk_nun_town"
 	self.masks.nun_town.name_id = "bm_msk_nun_town"
@@ -1547,6 +1601,11 @@ function BlackMarketTweakData:_init_characters()
 		dlc = "freed_old_hoxton",
 		locks = {dlc = "pd2_clan", achievement = "bulldog_1"}
 	}
+	self.characters.locked.dragan = {
+		sequence = "var_mtr_dragan",
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan"
+	}
 	self.characters.female_1 = {}
 	self.characters.female_1.fps_unit = "units/payday2/characters/fps_mover/fps_female_1_mover"
 	self.characters.female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/npc_criminal_female_1"
@@ -1587,6 +1646,10 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_female_1.mask_on_sequence = "mask_on"
 	self.characters.ai_female_1.mask_off_sequence = "mask_off"
 	self.characters.ai_female_1.name_id = "bm_character_ai_female_1"
+	self.characters.ai_dragan = {}
+	self.characters.ai_dragan.npc_unit = "units/payday2/characters/npc_criminals_suit_1/dragan/npc_criminal_suit_dragan"
+	self.characters.ai_dragan.sequence = "var_mtr_dragan"
+	self.characters.ai_dragan.name_id = "bm_character_ai_dragan"
 end
 
 function BlackMarketTweakData:_init_colors()
@@ -3476,6 +3539,38 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.sand.material_amount = 0
 	self.materials.sand.value = 0
 	self.materials.sand.dlc = "hope_diamond"
+	self.materials.meat = {}
+	self.materials.meat.name_id = "bm_mtl_meat"
+	self.materials.meat.pcs = {}
+	self.materials.meat.texture = "units/pd2_dlc_cro/matcaps/matcaps_meat_df"
+	self.materials.meat.material_amount = 0
+	self.materials.meat.value = 0
+	self.materials.meat.dlc = "the_bomb"
+	self.materials.meat.texture_bundle_folder = "the_bomb"
+	self.materials.plywood = {}
+	self.materials.plywood.name_id = "bm_mtl_plywood"
+	self.materials.plywood.pcs = {}
+	self.materials.plywood.texture = "units/pd2_dlc_cro/matcaps/matcaps_plywood_df"
+	self.materials.plywood.material_amount = 0
+	self.materials.plywood.value = 0
+	self.materials.plywood.dlc = "the_bomb"
+	self.materials.plywood.texture_bundle_folder = "the_bomb"
+	self.materials.rhino_skin = {}
+	self.materials.rhino_skin.name_id = "bm_mtl_rhino"
+	self.materials.rhino_skin.pcs = {}
+	self.materials.rhino_skin.texture = "units/pd2_dlc_cro/matcaps/matcaps_rhino_df"
+	self.materials.rhino_skin.material_amount = 0
+	self.materials.rhino_skin.value = 0
+	self.materials.rhino_skin.dlc = "the_bomb"
+	self.materials.rhino_skin.texture_bundle_folder = "the_bomb"
+	self.materials.rock_marble = {}
+	self.materials.rock_marble.name_id = "bm_mtl_rock_marble"
+	self.materials.rock_marble.pcs = {}
+	self.materials.rock_marble.texture = "units/pd2_dlc_cro/matcaps/matcaps_rock_marble_df"
+	self.materials.rock_marble.material_amount = 0
+	self.materials.rock_marble.value = 0
+	self.materials.rock_marble.dlc = "the_bomb"
+	self.materials.rock_marble.texture_bundle_folder = "the_bomb"
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -5011,6 +5106,34 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.runes.texture = "units/pd2_indiana/patterns/pattern_runes_df"
 	self.textures.runes.value = 0
 	self.textures.runes.dlc = "hope_diamond"
+	self.textures.cro_pattern_1 = {}
+	self.textures.cro_pattern_1.name_id = "bm_txt_caduceus"
+	self.textures.cro_pattern_1.pcs = {}
+	self.textures.cro_pattern_1.texture = "units/pd2_dlc_cro/masks/patterns/caduceus"
+	self.textures.cro_pattern_1.value = 0
+	self.textures.cro_pattern_1.dlc = "the_bomb"
+	self.textures.cro_pattern_1.texture_bundle_folder = "the_bomb"
+	self.textures.cro_pattern_2 = {}
+	self.textures.cro_pattern_2.name_id = "bm_txt_checkerboard"
+	self.textures.cro_pattern_2.pcs = {}
+	self.textures.cro_pattern_2.texture = "units/pd2_dlc_cro/masks/patterns/checkerboard"
+	self.textures.cro_pattern_2.value = 0
+	self.textures.cro_pattern_2.dlc = "the_bomb"
+	self.textures.cro_pattern_2.texture_bundle_folder = "the_bomb"
+	self.textures.cro_pattern_3 = {}
+	self.textures.cro_pattern_3.name_id = "bm_txt_liongamelion"
+	self.textures.cro_pattern_3.pcs = {}
+	self.textures.cro_pattern_3.texture = "units/pd2_dlc_cro/masks/patterns/liongamelion"
+	self.textures.cro_pattern_3.value = 0
+	self.textures.cro_pattern_3.dlc = "the_bomb"
+	self.textures.cro_pattern_3.texture_bundle_folder = "the_bomb"
+	self.textures.cro_pattern_4 = {}
+	self.textures.cro_pattern_4.name_id = "bm_txt_pleter"
+	self.textures.cro_pattern_4.pcs = {}
+	self.textures.cro_pattern_4.texture = "units/pd2_dlc_cro/masks/patterns/pleter"
+	self.textures.cro_pattern_4.value = 0
+	self.textures.cro_pattern_4.dlc = "the_bomb"
+	self.textures.cro_pattern_4.texture_bundle_folder = "the_bomb"
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -6060,5 +6183,29 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.boxing_gloves.sounds.hit_air = "fist_hit_air"
 	self.melee_weapons.boxing_gloves.sounds.charge = "boxing_charge"
 	self.melee_weapons.boxing_gloves.stats.concealment = 30
+	self.melee_weapons.meat_cleaver = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.meat_cleaver.name_id = "bm_melee_meat_cleaver"
+	self.melee_weapons.meat_cleaver.anim_global_param = "melee_axe"
+	self.melee_weapons.meat_cleaver.dlc = "character_pack_dragan"
+	self.melee_weapons.meat_cleaver.texture_bundle_folder = "character_pack_dragan"
+	self.melee_weapons.meat_cleaver.type = "axe"
+	self.melee_weapons.meat_cleaver.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.meat_cleaver.unit = "units/pd2_dlc_dragan/weapons/wpn_fps_mel_meat_cleaver/wpn_fps_mel_meat_cleaver"
+	self.melee_weapons.meat_cleaver.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_mel_meat_cleaver/wpn_third_mel_meat_cleaver"
+	self.melee_weapons.meat_cleaver.sounds = {}
+	self.melee_weapons.meat_cleaver.sounds.equip = "cleaver_equip"
+	self.melee_weapons.meat_cleaver.sounds.hit_air = "cleaver_hit_air"
+	self.melee_weapons.meat_cleaver.sounds.hit_gen = "cleaver_hit_gen"
+	self.melee_weapons.meat_cleaver.sounds.hit_body = "cleaver_hit_body"
+	self.melee_weapons.meat_cleaver.sounds.charge = "cleaver_charge"
+	self.melee_weapons.meat_cleaver.stats.min_damage = 3
+	self.melee_weapons.meat_cleaver.stats.max_damage = 7.5
+	self.melee_weapons.meat_cleaver.stats.min_damage_effect = 0.5
+	self.melee_weapons.meat_cleaver.stats.max_damage_effect = 0.6
+	self.melee_weapons.meat_cleaver.stats.charge_time = 2
+	self.melee_weapons.meat_cleaver.stats.range = 195
+	self.melee_weapons.meat_cleaver.stats.concealment = 26
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

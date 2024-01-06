@@ -61,14 +61,12 @@ end
 function BlackMarketManager:_setup_grenades()
 	local grenades = {}
 	Global.blackmarket_manager.grenades = grenades
-	for grenade, data in pairs(tweak_data.blackmarket.grenades) do
-		if data.throwable then
-			grenades[grenade] = {
-				unlocked = true,
-				equipped = false,
-				amount = 0
-			}
-		end
+	for grenade, _ in pairs(tweak_data.blackmarket.grenades) do
+		grenades[grenade] = {
+			unlocked = true,
+			equipped = false,
+			amount = 0
+		}
 	end
 	grenades[self._defaults.grenade].equipped = true
 	grenades[self._defaults.grenade].unlocked = true
@@ -246,6 +244,8 @@ function BlackMarketManager:equipped_item(category)
 		return self:equipped_armor()
 	elseif category == "melee_weapons" then
 		return self:equipped_melee_weapon()
+	elseif category == "grenades" then
+		return self:equipped_grenade()
 	end
 end
 
@@ -375,6 +375,18 @@ function BlackMarketManager:equipped_armor_slot()
 		return nil
 	end
 	for slot, data in pairs(Global.blackmarket_manager.armors) do
+		if data.equipped then
+			return slot
+		end
+	end
+	return nil
+end
+
+function BlackMarketManager:equipped_grenade_slot()
+	if not Global.blackmarket_manager.grenades then
+		return nil
+	end
+	for slot, data in pairs(Global.blackmarket_manager.grenades) do
 		if data.equipped then
 			return slot
 		end
@@ -1777,11 +1789,11 @@ function BlackMarketManager:apply_mask_craft_on_unit(unit, blueprint)
 	local pattern = tweak_data.blackmarket.textures[pattern_id].texture
 	print("pattern", pattern)
 	local material_texture = TextureCache:retrieve(pattern, "normal")
-	material:set_texture("material_texture", material_texture)
+	Application:set_material_texture(material, Idstring("material_texture"), material_texture)
 	local reflection = tweak_data.blackmarket.materials[material_id].texture
 	local material_amount = tweak_data.blackmarket.materials[material_id].material_amount or 1
 	local reflection_texture = TextureCache:retrieve(reflection, "normal")
-	material:set_texture("reflection_texture", reflection_texture)
+	Application:set_material_texture(material, Idstring("reflection_texture"), reflection_texture)
 	material:set_variable(Idstring("material_amount"), material_amount)
 	return material_texture, reflection_texture
 end
@@ -3358,6 +3370,10 @@ function BlackMarketManager:load(data)
 			self._global.grenades[self._global.equipped_grenade].equipped = true
 		else
 			self._global.grenades[self._defaults.grenade].equipped = true
+		end
+		for grenade, data in pairs(self._global.grenades) do
+			self._global.grenades[grenade].level = 0
+			self._global.grenades[grenade].skill_based = false
 		end
 		self._global.equipped_grenade = nil
 		self._global.melee_weapons = default_global.melee_weapons or {}

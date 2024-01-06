@@ -18,6 +18,8 @@ function DLCTweakData:init(tweak_data)
 		hl_miami = true,
 		gage_pack_historical = true,
 		character_pack_clover = true,
+		the_bomb = true,
+		character_pack_dragan = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
 		alienware_alpha = true,
@@ -2403,6 +2405,144 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "hawkhelm",
+			amount = 1
+		}
+	}
+	self.the_bomb = {}
+	self.the_bomb.dlc = "has_the_bomb"
+	self.the_bomb.content = {}
+	self.the_bomb.content.loot_drops = {}
+	self.ach_cow_3 = {}
+	self.ach_cow_3.dlc = "has_achievement"
+	self.ach_cow_3.achievement_id = "cow_3"
+	self.ach_cow_3.content = {}
+	self.ach_cow_3.content.loot_global_value = "the_bomb"
+	self.ach_cow_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "butcher",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "meat",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "cro_pattern_4",
+			amount = 1
+		}
+	}
+	self.ach_cow_4 = {}
+	self.ach_cow_4.dlc = "has_achievement"
+	self.ach_cow_4.achievement_id = "cow_4"
+	self.ach_cow_4.content = {}
+	self.ach_cow_4.content.loot_global_value = "the_bomb"
+	self.ach_cow_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "tech_lion",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rock_marble",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "cro_pattern_3",
+			amount = 1
+		}
+	}
+	self.ach_cow_5 = {}
+	self.ach_cow_5.dlc = "has_achievement"
+	self.ach_cow_5.achievement_id = "cow_5"
+	self.ach_cow_5.content = {}
+	self.ach_cow_5.content.loot_global_value = "the_bomb"
+	self.ach_cow_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "doctor",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "plywood",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "cro_pattern_1",
+			amount = 1
+		}
+	}
+	self.ach_cow_8 = {}
+	self.ach_cow_8.dlc = "has_achievement"
+	self.ach_cow_8.achievement_id = "cow_8"
+	self.ach_cow_8.content = {}
+	self.ach_cow_8.content.loot_global_value = "the_bomb"
+	self.ach_cow_8.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "lady_butcher",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rhino_skin",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "cro_pattern_2",
+			amount = 1
+		}
+	}
+	self.ach_cow_9 = {}
+	self.ach_cow_9.dlc = "has_achievement"
+	self.ach_cow_9.achievement_id = "cow_9"
+	self.ach_cow_9.content = {}
+	self.ach_cow_9.content.loot_global_value = "the_bomb"
+	self.ach_cow_9.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_hs2000_m_extended",
+			amount = 1
+		}
+	}
+	self.ach_cow_10 = {}
+	self.ach_cow_10.dlc = "has_achievement"
+	self.ach_cow_10.achievement_id = "cow_10"
+	self.ach_cow_10.content = {}
+	self.ach_cow_10.content.loot_global_value = "the_bomb"
+	self.ach_cow_10.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_hs2000_sl_long",
+			amount = 1
+		}
+	}
+	self.ach_cow_11 = {}
+	self.ach_cow_11.dlc = "has_achievement"
+	self.ach_cow_11.achievement_id = "cow_11"
+	self.ach_cow_11.content = {}
+	self.ach_cow_11.content.loot_global_value = "the_bomb"
+	self.ach_cow_11.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_hs2000_sl_custom",
+			amount = 1
+		}
+	}
+	self.character_pack_dragan = {}
+	self.character_pack_dragan.content = {}
+	self.character_pack_dragan.dlc = "has_character_pack_dragan"
+	self.character_pack_dragan.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dragan",
 			amount = 1
 		}
 	}

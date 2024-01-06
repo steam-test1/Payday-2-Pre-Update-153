@@ -45,7 +45,8 @@ function PlayerManager:init()
 		tased = "ingame_electrified",
 		incapacitated = "ingame_incapacitated",
 		clean = "ingame_clean",
-		carry = "ingame_standard"
+		carry = "ingame_standard",
+		bipod = "ingame_standard"
 	}
 	self._DEFAULT_STATE = "mask_off"
 	self._current_state = self._DEFAULT_STATE
@@ -156,7 +157,7 @@ function PlayerManager:_internal_load()
 	amount = self:has_grenade(peer_id) and self:get_grenade_amount(peer_id) or amount
 	self:_set_grenade({
 		grenade = grenade,
-		amount = math.min(amount, self:get_max_grenades_by_peer_id(peer_id))
+		amount = math.min(amount, self:get_max_grenades())
 	})
 	self:_set_body_bags_amount(self._local_player_body_bags or self:total_body_bags())
 	if self._respawn then

@@ -34,6 +34,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_jowi(presets)
 	self:_init_old_hoxton(presets)
 	self:_init_clover(presets)
+	self:_init_dragan(presets)
 	self:_init_old_hoxton_mission(presets)
 end
 
@@ -1390,6 +1391,27 @@ function CharacterTweakData:_init_clover(presets)
 	self.female_1.weapon_voice = "3"
 	self.female_1.access = "teamAI1"
 	self.female_1.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_dragan(presets)
+	self.dragan = {}
+	self.dragan.damage = presets.gang_member_damage
+	self.dragan.weapon = deep_clone(presets.weapon.gang_member)
+	self.dragan.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45")
+	}
+	self.dragan.detection = presets.detection.gang_member
+	self.dragan.move_speed = presets.move_speed.fast
+	self.dragan.crouch_move = false
+	self.dragan.speech_prefix = "rb8"
+	self.dragan.weapon_voice = "3"
+	self.dragan.access = "teamAI1"
+	self.dragan.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240

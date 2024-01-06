@@ -209,6 +209,11 @@ function PlayerDamage:_regenerate_armor()
 	self:_send_set_armor()
 end
 
+function PlayerDamage:restore_health(health_restored)
+	local max_health = self:_max_health()
+	self:change_health(max_health * health_restored)
+end
+
 function PlayerDamage:restore_armor(armor_restored)
 	if self._dead or self._bleed_out or self._check_berserker_done then
 		return
@@ -382,7 +387,7 @@ function PlayerDamage:damage_melee(attack_data)
 			normal = rot
 		})
 	end
-	local dmg_mul = managers.player:upgrade_value("player", "melee_damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
+	local dmg_mul = managers.player:upgrade_value("player", "melee_damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
 	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
 		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
 	end
@@ -425,7 +430,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
 	}
-	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
+	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
 	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
 		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
 	end
@@ -700,7 +705,7 @@ function PlayerDamage:damage_explosion(attack_data)
 	if self._bleed_out then
 		return
 	end
-	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
+	local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1) * managers.player:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1) * managers.player:upgrade_value("player", "damage_dampener", 1) * managers.player:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1) * managers.player:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
 	if self._unit:movement()._current_state and self._unit:movement()._current_state:_interacting() then
 		dmg_mul = dmg_mul * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
 	end
@@ -1132,7 +1137,7 @@ end
 
 function PlayerDamage:_chk_dmg_too_soon(damage)
 	local next_allowed_dmg_t = type(self._next_allowed_dmg_t) == "number" and self._next_allowed_dmg_t or Application:digest_value(self._next_allowed_dmg_t, false)
-	if damage <= self._last_received_dmg and next_allowed_dmg_t > managers.player:player_timer():time() then
+	if damage <= self._last_received_dmg + 0.01 and next_allowed_dmg_t > managers.player:player_timer():time() then
 		return true
 	end
 end

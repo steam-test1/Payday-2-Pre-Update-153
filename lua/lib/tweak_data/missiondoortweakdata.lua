@@ -494,4 +494,12 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.cuttable_tree = {}
+	self.cuttable_tree.devices = {}
+	self.cuttable_tree.devices.c4 = {
+		{
+			align = "c4_icon_locator",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
 end

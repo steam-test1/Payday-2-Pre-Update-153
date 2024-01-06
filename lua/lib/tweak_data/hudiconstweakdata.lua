@@ -505,6 +505,24 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_generic_saw = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			192,
+			64,
+			32,
+			32
+		}
+	}
+	self.pd2_chainsaw = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			224,
+			64,
+			32,
+			32
+		}
+	}
 	self.pd2_power = {
 		texture = "guis/textures/pd2/pd2_waypoints",
 		texture_rect = {
@@ -1155,6 +1173,24 @@ function HudIconsTweakData:init()
 		texture_rect = {
 			32,
 			128,
+			32,
+			32
+		}
+	}
+	self.equipment_chainsaw = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			96,
+			128,
+			32,
+			32
+		}
+	}
+	self.equipment_manifest = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			0,
+			160,
 			32,
 			32
 		}

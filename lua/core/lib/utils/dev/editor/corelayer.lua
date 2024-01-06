@@ -1245,6 +1245,16 @@ function Layer:clone_edited_values(unit, source)
 		new_light:set_spot_angle_start(light:spot_angle_start())
 		new_light:set_spot_angle_end(light:spot_angle_end())
 		new_light:set_clipping_values(light:clipping_values())
+		local projection_texture = source:unit_data().projection_textures and source:unit_data().projection_textures[light:name():s()]
+		if projection_texture then
+			local is_projection = CoreEditorUtils.is_projection_light(source, light, "projection")
+			local is_spot = (not string.match(light:properties(), "omni") or false) and true
+			if is_projection and is_spot then
+				new_light:set_projection_texture(Idstring(projection_texture), false, false)
+				unit:unit_data().projection_textures = unit:unit_data().projection_textures or {}
+				unit:unit_data().projection_textures[light:name():s()] = projection_texture
+			end
+		end
 	end
 	unit:unit_data().mesh_variation = source:unit_data().mesh_variation
 	if unit:unit_data().mesh_variation and unit:unit_data().mesh_variation ~= "default" then

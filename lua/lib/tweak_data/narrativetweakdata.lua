@@ -193,6 +193,11 @@ function NarrativeTweakData:init()
 	self.contacts.the_dentist.description_id = "heist_contact_the_dentist_description"
 	self.contacts.the_dentist.package = "packages/contact_the_dentist"
 	self.contacts.the_dentist.assets_gui = Idstring("guis/dlcs/big_bank/guis/preload_contact_the_dentist")
+	self.contacts.the_butcher = {}
+	self.contacts.the_butcher.name_id = "heist_contact_the_butcher"
+	self.contacts.the_butcher.description_id = "heist_contact_the_butcher_description"
+	self.contacts.the_butcher.package = "packages/contact_the_butcher"
+	self.contacts.the_butcher.assets_gui = Idstring("guis/dlcs/the_bomb/guis/preload_contact_the_butcher")
 	self.contacts.interupt = {}
 	self.contacts.interupt.name_id = "heist_contact_interupt"
 	self.contacts.interupt.description_id = "heist_contact_interupt_description"
@@ -2213,6 +2218,149 @@ function NarrativeTweakData:init()
 		620000,
 		800000
 	}
+	self.jobs.crojob1 = {}
+	self.jobs.crojob1.name_id = "heist_crojob1"
+	self.jobs.crojob1.briefing_id = "heist_crojob1_crimenet"
+	self.jobs.crojob1.package = "packages/job_crojob"
+	self.jobs.crojob1.contact = "the_butcher"
+	self.jobs.crojob1.jc = 60
+	self.jobs.crojob1.chain = {
+		{
+			level_id = "crojob2",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {1}
+		}
+	}
+	self.jobs.crojob1.briefing_event = "butcher_cr1_cbf_02"
+	self.jobs.crojob1.debrief_event = {
+		"butcher_cr1_debrief_01",
+		"butcher_cr1_debrief_02"
+	}
+	self.jobs.crojob1.crimenet_callouts = {
+		"butcher_cr1_cnc_01",
+		"butcher_cr1_cnc_01",
+		"butcher_cr1_cnc_01"
+	}
+	self.jobs.crojob1.crimenet_videos = {
+		"cn_cro1",
+		"cn_cro2",
+		"cn_cro3"
+	}
+	self.jobs.crojob1.payout = {
+		8000,
+		16000,
+		40000,
+		80000,
+		100000
+	}
+	self.jobs.crojob1.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.crojob1.experience_mul = {
+		1.1,
+		1.1,
+		1.1,
+		1.1,
+		1.1
+	}
+	self.jobs.crojob1.dlc = "the_bomb"
+	self.jobs.crojob1_prof = deep_clone(self.jobs.crojob1)
+	self.jobs.crojob1_prof.jc = 70
+	self.jobs.crojob1_prof.professional = true
+	self.jobs.crojob1_prof.region = "professional"
+	self.jobs.crojob1_prof.payout = {
+		25000,
+		35000,
+		50000,
+		65000,
+		100000
+	}
+	self.jobs.crojob1_prof.contract_cost = {
+		120000,
+		135000,
+		200000,
+		420000,
+		500000
+	}
+	self.jobs.crojob1_prof.experience_mul = {
+		12.5,
+		12.5,
+		12.5,
+		12.5,
+		12.5
+	}
+	self.jobs.crojob1_prof.dlc = "the_bomb"
+	self.jobs.crojob_wrapper = {}
+	self.jobs.crojob_wrapper.name_id = "heist_crojob2"
+	self.jobs.crojob_wrapper.briefing_id = "heist_crojob2_crimenet"
+	self.jobs.crojob_wrapper.contact = "the_butcher"
+	self.jobs.crojob_wrapper.jc = 60
+	self.jobs.crojob_wrapper.chain = {
+		{}
+	}
+	self.jobs.crojob_wrapper.job_wrapper = {
+		"crojob2",
+		"crojob2_night"
+	}
+	self.jobs.crojob_wrapper.wrapper_weights = {9, 1}
+	self.jobs.crojob_wrapper.briefing_event = "butcher_cr1_cbf_03"
+	self.jobs.crojob_wrapper.debrief_event = "butcher_cr1_debrief_03"
+	self.jobs.crojob_wrapper.crimenet_callouts = {
+		"butcher_cr1_cnc_01",
+		"butcher_cr1_cnc_01",
+		"butcher_cr1_cnc_01"
+	}
+	self.jobs.crojob_wrapper.crimenet_videos = {
+		"cn_cro1",
+		"cn_cro1",
+		"cn_cro1"
+	}
+	self.jobs.crojob_wrapper.payout = {
+		8000,
+		16000,
+		40000,
+		80000,
+		100000
+	}
+	self.jobs.crojob_wrapper.experience_mul = {
+		1.4,
+		1.4,
+		1.4,
+		1.4,
+		1.4
+	}
+	self.jobs.crojob_wrapper.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.crojob_wrapper.dlc = "the_bomb"
+	self.jobs.crojob2 = {}
+	self.jobs.crojob2.package = "packages/job_crojob"
+	self.jobs.crojob2.chain = {
+		{
+			level_id = "crojob3",
+			type_id = "heist_type_survive",
+			type = "d",
+			world_setting = "day"
+		}
+	}
+	self.jobs.crojob2_night = deep_clone(self.jobs.crojob2)
+	self.jobs.crojob2_night.chain = {
+		{
+			level_id = "crojob3_night",
+			type_id = "heist_type_survive",
+			type = "d",
+			world_setting = "night"
+		}
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -2255,7 +2403,11 @@ function NarrativeTweakData:init()
 		"hox",
 		"hox_prof",
 		"pines",
-		"mus"
+		"mus",
+		"crojob1",
+		"crojob_wrapper",
+		"crojob2",
+		"crojob2_night"
 	}
 	self:set_job_wrappers()
 end

@@ -9,7 +9,7 @@ end
 function ElementAreaTrigger:project_instigators()
 	local instigators = {}
 	if Network:is_client() then
-		if self._values.instigator == "player" or self._values.instigator == "local_criminals" then
+		if self._values.instigator == "player" or self._values.instigator == "local_criminals" or self._values.instigator == "persons" then
 			table.insert(instigators, managers.player:player_unit())
 		end
 		return instigators
@@ -47,6 +47,17 @@ function ElementAreaTrigger:project_instigators()
 		for _, data in pairs(managers.groupai:state():all_AI_criminals()) do
 			table.insert(instigators, data.unit)
 		end
+	elseif self._values.instigator == "persons" then
+		table.insert(instigators, managers.player:player_unit())
+		for _, data in pairs(managers.groupai:state():all_char_criminals()) do
+			table.insert(instigators, data.unit)
+		end
+		for _, data in pairs(managers.enemy:all_civilians()) do
+			table.insert(instigators, data.unit)
+		end
+		for _, data in pairs(managers.enemy:all_enemies()) do
+			table.insert(instigators, data.unit)
+		end
 	elseif self._values.instigator == "ai_teammates" then
 		for _, data in pairs(managers.groupai:state():all_AI_criminals()) do
 			table.insert(instigators, data.unit)
@@ -58,7 +69,7 @@ function ElementAreaTrigger:project_instigators()
 			function filter_func(carry_data)
 				local carry_id = carry_data:carry_id()
 				
-				if carry_id == "gold" or carry_id == "money" or carry_id == "diamonds" or carry_id == "coke" or carry_id == "coke_pure" or carry_id == "sandwich" or carry_id == "weapon" or carry_id == "painting" or carry_id == "circuit" or carry_id == "diamonds" or carry_id == "engine_01" or carry_id == "engine_02" or carry_id == "engine_03" or carry_id == "engine_04" or carry_id == "engine_05" or carry_id == "engine_06" or carry_id == "engine_07" or carry_id == "engine_08" or carry_id == "engine_09" or carry_id == "engine_10" or carry_id == "engine_11" or carry_id == "engine_12" or carry_id == "meth" or carry_id == "lance_bag" or carry_id == "lance_bag_large" or carry_id == "grenades" or carry_id == "ammo" or carry_id == "cage_bag" or carry_id == "turret" or carry_id == "artifact_statue" or carry_id == "samurai_suit" or carry_id == "equipment_bag" or carry_id == "hope_diamond" or carry_id == "mus_artifact" or carry_id == "mus_artifact_paint" then
+				if carry_id == "gold" or carry_id == "money" or carry_id == "diamonds" or carry_id == "coke" or carry_id == "coke_pure" or carry_id == "sandwich" or carry_id == "weapon" or carry_id == "painting" or carry_id == "circuit" or carry_id == "diamonds" or carry_id == "engine_01" or carry_id == "engine_02" or carry_id == "engine_03" or carry_id == "engine_04" or carry_id == "engine_05" or carry_id == "engine_06" or carry_id == "engine_07" or carry_id == "engine_08" or carry_id == "engine_09" or carry_id == "engine_10" or carry_id == "engine_11" or carry_id == "engine_12" or carry_id == "meth" or carry_id == "lance_bag" or carry_id == "lance_bag_large" or carry_id == "grenades" or carry_id == "ammo" or carry_id == "cage_bag" or carry_id == "turret" or carry_id == "artifact_statue" or carry_id == "samurai_suit" or carry_id == "equipment_bag" or carry_id == "cro_loot1" or carry_id == "cro_loot2" or carry_id == "ladder_bag" or carry_id == "hope_diamond" or carry_id == "mus_artifact" or carry_id == "mus_artifact_paint" then
 					return true
 				end
 			end

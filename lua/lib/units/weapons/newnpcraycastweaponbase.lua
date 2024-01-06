@@ -167,12 +167,16 @@ function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 		end
 	end
 	if alive(self._obj_fire) then
-		World:effect_manager():spawn(self._muzzle_effect_table)
+		self:_spawn_muzzle_effect(mfrom, direction)
 	end
 	if self._use_shell_ejection_effect then
 		World:effect_manager():spawn(self._shell_ejection_effect_table)
 	end
 	self:_sound_singleshot()
+end
+
+function NewNPCRaycastWeaponBase:_spawn_muzzle_effect(from_pos, direction)
+	World:effect_manager():spawn(self._muzzle_effect_table)
 end
 
 function NewNPCRaycastWeaponBase:destroy(unit)

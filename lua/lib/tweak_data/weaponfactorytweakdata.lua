@@ -163,6 +163,8 @@ function WeaponFactoryTweakData:init()
 	self:_init_mosin()
 	self:_init_m1928()
 	self:_init_l85a2()
+	self:_init_hs2000()
+	self:_init_vhs()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -734,6 +736,9 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_ass_l85a2 = {
 				translation = Vector3(0, 2, 1.8)
+			},
+			wpn_fps_ass_vhs = {
+				translation = Vector3(0, -3, -1.1)
 			}
 		},
 		forbids = {
@@ -1352,6 +1357,9 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_ass_l85a2 = {
 				translation = Vector3(0, 8, 1.8)
+			},
+			wpn_fps_ass_vhs = {
+				translation = Vector3(0, -1, -1.1)
 			}
 		},
 		forbids = {
@@ -1919,6 +1927,9 @@ function WeaponFactoryTweakData:_init_content_jobs()
 			},
 			wpn_fps_pis_c96 = {
 				translation = Vector3(0, 0, -1.2)
+			},
+			wpn_fps_pis_hs2000 = {
+				translation = Vector3(0, 0, -0.75)
 			}
 		},
 		dlc = "gage_pack_jobs",
@@ -16568,4 +16579,402 @@ function WeaponFactoryTweakData:_init_l85a2()
 	}
 	self.wpn_fps_ass_l85a2_npc = deep_clone(self.wpn_fps_ass_l85a2)
 	self.wpn_fps_ass_l85a2_npc.unit = "units/pd2_dlc_clover/weapons/wpn_fps_ass_l85a2/wpn_fps_ass_l85a2_npc"
+end
+
+function WeaponFactoryTweakData:_init_vhs()
+	self.parts.wpn_fps_ass_vhs_body = {
+		type = "upper_reciever",
+		name_id = "bm_wp_vhs_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_body",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan",
+		animations = {reload = "reload"},
+		forbids = {
+			"wpn_fps_addon_ris"
+		}
+	}
+	self.parts.wpn_fps_ass_vhs_m = {
+		type = "magazine",
+		name_id = "bm_wp_vhs_m",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_m",
+		stats = {
+			value = 1,
+			recoil = 1,
+			extra_ammo = 2
+		},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan",
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_ass_vhs_ns_vhs = {
+		type = "barrel_ext",
+		name_id = "bm_wp_vhs_ns_vhs",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan"
+	}
+	self.parts.wpn_fps_ass_vhs_ns_vhs_no = {
+		type = "barrel_ext",
+		name_id = "bm_wp_vhs_ns_vhs_no",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs_no",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan"
+	}
+	self.parts.wpn_fps_ass_vhs_b_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_vhs_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_b_short",
+		stats = {
+			value = 1,
+			concealment = 3,
+			recoil = 1,
+			spread = -1
+		},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan"
+	}
+	self.parts.wpn_fps_ass_vhs_b_silenced = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_vhs_b_silenced",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_b_silenced",
+		stats = {
+			value = 1,
+			damage = -1,
+			recoil = 3,
+			suppression = 12
+		},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan",
+		forbids = {
+			"wpn_fps_m4_uupg_fg_rail_ext",
+			"wpn_fps_upg_ns_ass_smg_large",
+			"wpn_fps_upg_ns_ass_smg_medium",
+			"wpn_fps_upg_ns_ass_smg_small",
+			"wpn_fps_upg_ns_ass_smg_firepig",
+			"wpn_fps_upg_ns_ass_smg_stubby",
+			"wpn_fps_upg_ns_ass_smg_tank",
+			"wpn_fps_upg_ass_ns_jprifles",
+			"wpn_fps_upg_ass_ns_linear",
+			"wpn_fps_upg_ass_ns_surefire"
+		},
+		override = {
+			wpn_fps_ass_vhs_ns_vhs = {
+				unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs_no",
+				third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs_no"
+			}
+		}
+	}
+	self.parts.wpn_fps_ass_vhs_b_sniper = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_vhs_b_sniper",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_b_sniper",
+		stats = {
+			value = 1,
+			spread = 1,
+			concealment = -2
+		},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan",
+		override = {
+			wpn_fps_ass_vhs_ns_vhs = {
+				unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs_no",
+				third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs_no"
+			}
+		}
+	}
+	self.parts.wpn_fps_ass_vhs_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_vhs_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_b_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan",
+		override = {
+			wpn_fps_ass_vhs_ns_vhs_no = {
+				unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_ns_vhs",
+				third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_ns_vhs"
+			}
+		}
+	}
+	self.parts.wpn_fps_ass_vhs_o_standard = {
+		type = "sight",
+		name_id = "bm_wp_vhs_o_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_fps_ass_vhs_o_standard",
+		stats = {value = 1},
+		texture_bundle_folder = "character_pack_dragan",
+		dlc = "character_pack_dragan"
+	}
+	self.parts.wpn_fps_ass_vhs_body.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_body"
+	self.parts.wpn_fps_ass_vhs_m.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_m"
+	self.parts.wpn_fps_ass_vhs_b_short.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_b_short"
+	self.parts.wpn_fps_ass_vhs_b_silenced.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_b_silenced"
+	self.parts.wpn_fps_ass_vhs_b_sniper.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_b_sniper"
+	self.parts.wpn_fps_ass_vhs_b_standard.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_b_standard"
+	self.parts.wpn_fps_ass_vhs_o_standard.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_o_standard"
+	self.parts.wpn_fps_ass_vhs_ns_vhs.third_unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs_pts/wpn_third_ass_vhs_ns_vhs"
+	self.wpn_fps_ass_vhs = {}
+	self.wpn_fps_ass_vhs.unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs/wpn_fps_ass_vhs"
+	self.wpn_fps_ass_vhs.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_ass_vhs.adds = {}
+	self.wpn_fps_ass_vhs.forbids = {
+		"wpn_fps_addon_ris"
+	}
+	self.wpn_fps_ass_vhs.default_blueprint = {
+		"wpn_fps_ass_vhs_body",
+		"wpn_fps_ass_vhs_m",
+		"wpn_fps_ass_vhs_b_standard",
+		"wpn_fps_ass_vhs_o_standard",
+		"wpn_fps_ass_vhs_ns_vhs"
+	}
+	self.wpn_fps_ass_vhs.uses_parts = {
+		"wpn_fps_ass_vhs_body",
+		"wpn_fps_ass_vhs_m",
+		"wpn_fps_ass_vhs_b_short",
+		"wpn_fps_ass_vhs_b_silenced",
+		"wpn_fps_ass_vhs_b_sniper",
+		"wpn_fps_ass_vhs_b_standard",
+		"wpn_fps_ass_vhs_o_standard",
+		"wpn_fps_ass_vhs_ns_vhs",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire"
+	}
+	self.wpn_fps_ass_vhs_npc = deep_clone(self.wpn_fps_ass_vhs)
+	self.wpn_fps_ass_vhs_npc.unit = "units/pd2_dlc_dragan/weapons/wpn_fps_ass_vhs/wpn_fps_ass_vhs_npc"
+end
+
+function WeaponFactoryTweakData:_init_hs2000()
+	self.parts.wpn_fps_pis_hs2000_sl_standard = {
+		type = "slide",
+		name_id = "bm_wp_hs2000_sl_standard",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_sl",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_sl_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_hs2000_sl_custom = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_hs2000_sl_custom",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_sl",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_sl_custom",
+		stats = {
+			value = 4,
+			suppression = -2,
+			recoil = 1,
+			damage = 2,
+			spread_moving = 1
+		},
+		dlc = "the_bomb",
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_hs2000_sl_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_hs2000_sl_long",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_sl",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_sl_long",
+		stats = {
+			value = 6,
+			damage = 1,
+			spread = 2,
+			recoil = 1,
+			concealment = -3,
+			spread_moving = -3
+		},
+		dlc = "the_bomb",
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		},
+		stance_mod = {
+			wpn_fps_pis_hs2000 = {
+				translation = Vector3(0, 0, -0.25)
+			}
+		},
+		override = {
+			wpn_fps_upg_o_rmr = {
+				stance_mod = {
+					wpn_fps_pis_hs2000 = {
+						translation = Vector3(0, 0, -0.5)
+					}
+				}
+			}
+		}
+	}
+	self.parts.wpn_fps_pis_hs2000_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_hs2000_body_standard",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_hs2000_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_hs2000_m_standard",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_pis_hs2000_m_extended = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "magazine",
+		name_id = "bm_wp_hs2000_m_extended",
+		texture_bundle_folder = "the_bomb",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_fps_pis_hs2000_m_extended",
+		stats = {
+			value = 1,
+			extra_ammo = 4,
+			spread_moving = -2
+		},
+		dlc = "the_bomb",
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_pis_hs2000_sl_standard.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_sl_standard"
+	self.parts.wpn_fps_pis_hs2000_sl_custom.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_sl_custom"
+	self.parts.wpn_fps_pis_hs2000_sl_long.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_sl_long"
+	self.parts.wpn_fps_pis_hs2000_body_standard.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_body_standard"
+	self.parts.wpn_fps_pis_hs2000_m_standard.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_m_standard"
+	self.parts.wpn_fps_pis_hs2000_m_extended.third_unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000_pts/wpn_third_pis_hs2000_m_extended"
+	self.wpn_fps_pis_hs2000 = {}
+	self.wpn_fps_pis_hs2000.unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000/wpn_fps_pis_hs2000"
+	self.wpn_fps_pis_hs2000.animations = {
+		fire = "recoil",
+		fire_steelsight = "recoil",
+		reload = "reload"
+	}
+	self.wpn_fps_pis_hs2000.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_pis_hs2000.override = {
+		wpn_fps_upg_o_rmr = {parent = "slide"}
+	}
+	self.wpn_fps_pis_hs2000.default_blueprint = {
+		"wpn_fps_pis_hs2000_body_standard",
+		"wpn_fps_pis_hs2000_m_standard",
+		"wpn_fps_pis_hs2000_sl_standard"
+	}
+	self.wpn_fps_pis_hs2000.uses_parts = {
+		"wpn_fps_pis_hs2000_body_standard",
+		"wpn_fps_pis_hs2000_m_standard",
+		"wpn_fps_pis_hs2000_m_extended",
+		"wpn_fps_pis_hs2000_sl_standard",
+		"wpn_fps_pis_hs2000_sl_custom",
+		"wpn_fps_pis_hs2000_sl_long",
+		"wpn_fps_upg_fl_pis_laser",
+		"wpn_fps_upg_fl_pis_tlr1",
+		"wpn_fps_upg_ns_pis_large",
+		"wpn_fps_upg_ns_pis_medium",
+		"wpn_fps_upg_ns_pis_small",
+		"wpn_fps_upg_ns_pis_large_kac",
+		"wpn_fps_upg_ns_pis_medium_gem",
+		"wpn_fps_upg_o_rmr",
+		"wpn_fps_upg_ns_pis_medium_slim",
+		"wpn_fps_upg_pis_ns_flash",
+		"wpn_fps_upg_fl_pis_crimson",
+		"wpn_fps_upg_fl_pis_x400v",
+		"wpn_fps_upg_ns_pis_meatgrinder",
+		"wpn_fps_upg_ns_pis_ipsccomp"
+	}
+	self.wpn_fps_pis_hs2000_npc = deep_clone(self.wpn_fps_pis_hs2000)
+	self.wpn_fps_pis_hs2000_npc.unit = "units/pd2_dlc_the_bomb/weapons/wpn_fps_pis_hs2000/wpn_fps_pis_hs2000_npc"
 end

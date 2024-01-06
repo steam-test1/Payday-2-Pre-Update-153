@@ -3597,7 +3597,7 @@ end
 
 function ConstraintElement.load(unit, data)
 	for constraint_name, func_name in pairs(data) do
-		unit[func_name](unit, constraint_name)
+		unit[func_name](unit, Idstring(constraint_name))
 	end
 end
 

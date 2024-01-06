@@ -27,8 +27,8 @@ function HostNetworkSession:init()
 	print("[HostNetworkSession:init] self._load_counter", self._load_counter)
 end
 
-function HostNetworkSession:create_local_peer()
-	HostNetworkSession.super.create_local_peer(self)
+function HostNetworkSession:create_local_peer(load_outfit)
+	HostNetworkSession.super.create_local_peer(self, load_outfit)
 	self._state_data.local_peer = self._local_peer
 	self._local_peer:set_id(1)
 	self:set_state("in_lobby")

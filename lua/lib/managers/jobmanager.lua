@@ -879,7 +879,24 @@ function JobManager:activate_job(job_id, current_stage)
 		return
 	end
 	if job.job_wrapper then
-		return self:activate_job(job.job_wrapper[math.random(#job.job_wrapper)], current_stage)
+		local wrapped_job_id
+		if job.wrapper_weights then
+			local total_weight = 0
+			for job_index, weight in ipairs(job.wrapper_weights) do
+				total_weight = total_weight + weight
+			end
+			local roll = math.rand(total_weight)
+			for job_index, job_id in ipairs(job.job_wrapper) do
+				roll = roll - (job.wrapper_weights[job_index] or 1)
+				if roll <= 0 then
+					wrapped_job_id = job_id
+					break
+				end
+			end
+		else
+			wrapped_job_id = job.job_wrapper[math.random(#job.job_wrapper)]
+		end
+		return self:activate_job(wrapped_job_id, current_stage)
 	end
 	local job_wrapper_id
 	local wrapped_job_id = job_id

@@ -77,6 +77,15 @@ function LootManager:on_retry_job_stage()
 	self._global.secured = self._global.saved_secured
 end
 
+function LootManager:get_secured()
+	return table.remove(self._global.secured, 1)
+end
+
+function LootManager:get_secured_random()
+	local entry = math.random(#self._global.secured)
+	return table.remove(self._global.secured, entry)
+end
+
 function LootManager:get_distribute()
 	return table.remove(self._global.distribute, 1)
 end

@@ -112,12 +112,11 @@ function NewRaycastWeaponBase:apply_texture_switches()
 							break
 						end
 					end
-					Application:debug(switch_material)
 					if switch_material then
 						local texture_id = managers.blackmarket:get_texture_switch_from_data(texture_data, part_id)
 						if texture_id and DB:has(Idstring("texture"), texture_id) then
 							local retrieved_texture = TextureCache:retrieve(texture_id, "normal")
-							switch_material:set_texture(texture_switch.channel, retrieved_texture)
+							Application:set_material_texture(switch_material, Idstring(texture_switch.channel), retrieved_texture)
 							if self._parts_texture_switches[part_id] then
 								TextureCache:unretrieve(Idstring(self._parts_texture_switches[part_id]))
 							end

@@ -49,6 +49,8 @@ function PrePlanningTweakData:init(tweak_data)
 	self.plans.escape_plan.category = "escape_plan"
 	self.plans.vault_plan = {}
 	self.plans.vault_plan.category = "vault_plan"
+	self.plans.plan_of_action = {}
+	self.plans.plan_of_action.category = "plan_of_action"
 	self.gui = {}
 	self.gui.custom_icons_path = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_icon_types"
 	self.gui.type_icons_path = "guis/dlcs/big_bank/textures/pd2/pre_planning/preplan_icon_types"
@@ -108,6 +110,13 @@ function PrePlanningTweakData:init(tweak_data)
 	self.categories.escape_plan.icon = 12
 	self.categories.escape_plan.total = 1
 	self.categories.escape_plan.prio = 1
+	self.categories.plan_of_action = {}
+	self.categories.plan_of_action.name_id = "menu_pp_cat_plan_of_action"
+	self.categories.plan_of_action.desc_id = "menu_pp_cat_plan_of_action_desc"
+	self.categories.plan_of_action.plan = "plan_of_action"
+	self.categories.plan_of_action.icon = 12
+	self.categories.plan_of_action.total = 1
+	self.categories.plan_of_action.prio = 1
 	self.types = {}
 	self.types.ammo_bag = {}
 	self.types.ammo_bag.name_id = "menu_pp_asset_ammo"
@@ -182,6 +191,8 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.zipline.prio = 1
 	self.types.zipline.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_zipline")
 	self.types.zipline.budget_cost = 2
+	self.types.zipline_generic = deep_clone(self.types.zipline)
+	self.types.zipline_generic.desc_id = "menu_pp_asset_zipline_generic_desc"
 	self.types.unlocked_door = {}
 	self.types.unlocked_door.name_id = "menu_pp_asset_unlocked_door"
 	self.types.unlocked_door.desc_id = "menu_pp_asset_unlocked_door_desc"
@@ -296,6 +307,10 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.delay_police_10.total = 1
 	self.types.delay_police_10.post_event = "gus_preplan_04"
 	self.types.delay_police_10.prio = 7
+	self.types.delay_police_10_no_pos = deep_clone(self.types.delay_police_10)
+	self.types.delay_police_10_no_pos.budget_cost = 1
+	self.types.delay_police_10_no_pos.cost = tweak_data:get_value("money_manager", "preplaning_asset_cost_delay10")
+	self.types.delay_police_10_no_pos.pos_not_important = true
 	self.types.delay_police_20 = {}
 	self.types.delay_police_20.name_id = "menu_pp_asset_delay_police_20"
 	self.types.delay_police_20.desc_id = "menu_pp_asset_delay_police_20_desc"
@@ -318,6 +333,8 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.delay_police_30.budget_cost = 2
 	self.types.delay_police_30.post_event = "gus_preplan_10"
 	self.types.delay_police_30.prio = 5
+	self.types.delay_police_30_no_pos = deep_clone(self.types.delay_police_30)
+	self.types.delay_police_30_no_pos.pos_not_important = true
 	self.types.delay_police_60 = {}
 	self.types.delay_police_60.name_id = "menu_pp_asset_delay_police_60"
 	self.types.delay_police_60.desc_id = "menu_pp_asset_delay_police_60_desc"
@@ -395,6 +412,10 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.spotter.budget_cost = 2
 	self.types.spotter.post_event = "gus_preplan_13"
 	self.types.spotter.prio = 4
+	self.types.spotter_des = deep_clone(self.types.spotter)
+	self.types.spotter_des.budget_cost = 3
+	self.types.spotter_des.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_spotter")
+	self.types.spotter_des.desc_id = "menu_pp_asset_spotter_desc"
 	self.types.sniper = {}
 	self.types.sniper.name_id = "menu_pp_asset_sniper"
 	self.types.sniper.desc_id = "menu_pp_asset_sniper_desc"
@@ -711,6 +732,190 @@ function PrePlanningTweakData:init(tweak_data)
 	self.types.branchbank_vault_key.budget_cost = 3
 	self.types.branchbank_vault_key.post_event = "gus_preplan_16"
 	self.types.branchbank_vault_key.prio = 2
+	self.types.crojob_stealth = {}
+	self.types.crojob_stealth.name_id = "menu_pp_crojob_stealth"
+	self.types.crojob_stealth.desc_id = "menu_pp_crojob_stealth_desc"
+	self.types.crojob_stealth.plan = "plan_of_action"
+	self.types.crojob_stealth.pos_not_important = true
+	self.types.crojob_stealth.category = "plan_of_action"
+	self.types.crojob_stealth.icon = 54
+	self.types.crojob_stealth.total = 0
+	self.types.crojob_stealth.cost = 0
+	self.types.crojob_stealth.budget_cost = 0
+	self.types.crojob_stealth.post_event = ""
+	self.types.crojob_stealth.prio = 3
+	self.types.crojob_loud = {}
+	self.types.crojob_loud.name_id = "menu_pp_crojob_loud"
+	self.types.crojob_loud.desc_id = "menu_pp_crojob_loud_desc"
+	self.types.crojob_loud.plan = "plan_of_action"
+	self.types.crojob_loud.pos_not_important = true
+	self.types.crojob_loud.category = "plan_of_action"
+	self.types.crojob_loud.icon = 54
+	self.types.crojob_loud.total = 0
+	self.types.crojob_loud.cost = 0
+	self.types.crojob_loud.budget_cost = 0
+	self.types.crojob_loud.post_event = ""
+	self.types.crojob_loud.prio = 3
+	self.types.crojob2_escape_van = {}
+	self.types.crojob2_escape_van.name_id = "menu_pp_crojob2_escape_van"
+	self.types.crojob2_escape_van.desc_id = "menu_pp_crojob2_escape_van_desc"
+	self.types.crojob2_escape_van.plan = "escape_plan"
+	self.types.crojob2_escape_van.pos_not_important = false
+	self.types.crojob2_escape_van.category = "escape_plan"
+	self.types.crojob2_escape_van.icon = 54
+	self.types.crojob2_escape_van.total = 1
+	self.types.crojob2_escape_van.cost = 0
+	self.types.crojob2_escape_van.budget_cost = 0
+	self.types.crojob2_escape_van.post_event = "gus_preplan_12"
+	self.types.crojob2_escape_van.prio = 3
+	self.types.crojob2_escape_helicopter = {}
+	self.types.crojob2_escape_helicopter.name_id = "menu_pp_crojob2_escape_helicopter"
+	self.types.crojob2_escape_helicopter.desc_id = "menu_pp_crojob2_escape_helicopter_desc"
+	self.types.crojob2_escape_helicopter.plan = "escape_plan"
+	self.types.crojob2_escape_helicopter.pos_not_important = false
+	self.types.crojob2_escape_helicopter.category = "escape_plan"
+	self.types.crojob2_escape_helicopter.icon = 54
+	self.types.crojob2_escape_helicopter.total = 1
+	self.types.crojob2_escape_helicopter.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_escape_mid")
+	self.types.crojob2_escape_helicopter.budget_cost = 4
+	self.types.crojob2_escape_helicopter.post_event = "gus_preplan_17"
+	self.types.crojob2_escape_helicopter.prio = 3
+	self.types.crojob2_escape_boat = {}
+	self.types.crojob2_escape_boat.name_id = "menu_pp_crojob2_escape_boat"
+	self.types.crojob2_escape_boat.desc_id = "menu_pp_crojob2_escape_boat_desc"
+	self.types.crojob2_escape_boat.plan = "escape_plan"
+	self.types.crojob2_escape_boat.pos_not_important = false
+	self.types.crojob2_escape_boat.category = "escape_plan"
+	self.types.crojob2_escape_boat.icon = 54
+	self.types.crojob2_escape_boat.total = 1
+	self.types.crojob2_escape_boat.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_escape_close")
+	self.types.crojob2_escape_boat.budget_cost = 8
+	self.types.crojob2_escape_boat.post_event = "gus_preplan_13"
+	self.types.crojob2_escape_boat.prio = 3
+	self.types.crojob2_better_hacker = {}
+	self.types.crojob2_better_hacker.name_id = "menu_pp_asset_crojob2_better_hacker"
+	self.types.crojob2_better_hacker.desc_id = "menu_pp_asset_crojob2_better_hacker_desc"
+	self.types.crojob2_better_hacker.icon = 15
+	self.types.crojob2_better_hacker.pos_not_important = true
+	self.types.crojob2_better_hacker.category = "hired_help"
+	self.types.crojob2_better_hacker.total = 1
+	self.types.crojob2_better_hacker.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_hacker")
+	self.types.crojob2_better_hacker.budget_cost = 3
+	self.types.crojob2_better_hacker.post_event = "gus_preplan_10"
+	self.types.crojob2_better_hacker.prio = 3
+	self.types.crojob2_better_pilot = {}
+	self.types.crojob2_better_pilot.name_id = "menu_pp_asset_crojob2_better_pilot"
+	self.types.crojob2_better_pilot.desc_id = "menu_pp_asset_crojob2_better_pilot_desc"
+	self.types.crojob2_better_pilot.icon = 73
+	self.types.crojob2_better_pilot.pos_not_important = true
+	self.types.crojob2_better_pilot.category = "hired_help"
+	self.types.crojob2_better_pilot.total = 1
+	self.types.crojob2_better_pilot.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_pilot")
+	self.types.crojob2_better_pilot.budget_cost = 3
+	self.types.crojob2_better_pilot.post_event = "gus_preplan_17"
+	self.types.crojob2_better_pilot.prio = 3
+	self.types.crojob2_manifest = {}
+	self.types.crojob2_manifest.name_id = "menu_pp_asset_crojob2_manifest"
+	self.types.crojob2_manifest.desc_id = "menu_pp_asset_crojob2_manifest_desc"
+	self.types.crojob2_manifest.icon = 71
+	self.types.crojob2_manifest.pos_not_important = true
+	self.types.crojob2_manifest.category = "mission_equipment"
+	self.types.crojob2_manifest.total = 1
+	self.types.crojob2_manifest.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_manifest")
+	self.types.crojob2_manifest.budget_cost = 2
+	self.types.crojob2_manifest.post_event = "gus_preplan_14"
+	self.types.crojob2_manifest.prio = 3
+	self.types.crojob3_escape_boat = {}
+	self.types.crojob3_escape_boat.name_id = "menu_pp_crojob3_escape_boat"
+	self.types.crojob3_escape_boat.desc_id = "menu_pp_crojob3_escape_boat_desc"
+	self.types.crojob3_escape_boat.plan = "escape_plan"
+	self.types.crojob3_escape_boat.pos_not_important = false
+	self.types.crojob3_escape_boat.category = "escape_plan"
+	self.types.crojob3_escape_boat.icon = 54
+	self.types.crojob3_escape_boat.total = 1
+	self.types.crojob3_escape_boat.cost = 0
+	self.types.crojob3_escape_boat.budget_cost = 0
+	self.types.crojob3_escape_boat.post_event = "gus_preplan_16"
+	self.types.crojob3_escape_boat.prio = 3
+	self.types.crojob3_escape_plane = {}
+	self.types.crojob3_escape_plane.name_id = "menu_pp_crojob3_escape_plane"
+	self.types.crojob3_escape_plane.desc_id = "menu_pp_crojob3_escape_plane_desc"
+	self.types.crojob3_escape_plane.plan = "escape_plan"
+	self.types.crojob3_escape_plane.pos_not_important = false
+	self.types.crojob3_escape_plane.category = "escape_plan"
+	self.types.crojob3_escape_plane.icon = 54
+	self.types.crojob3_escape_plane.total = 1
+	self.types.crojob3_escape_plane.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_escape_mid")
+	self.types.crojob3_escape_plane.budget_cost = 4
+	self.types.crojob3_escape_plane.post_event = "gus_preplan_13"
+	self.types.crojob3_escape_plane.prio = 3
+	self.types.crojob3_escape_helicopter = {}
+	self.types.crojob3_escape_helicopter.name_id = "menu_pp_crojob3_escape_helicopter"
+	self.types.crojob3_escape_helicopter.desc_id = "menu_pp_crojob3_escape_helicopter_desc"
+	self.types.crojob3_escape_helicopter.plan = "escape_plan"
+	self.types.crojob3_escape_helicopter.pos_not_important = false
+	self.types.crojob3_escape_helicopter.category = "escape_plan"
+	self.types.crojob3_escape_helicopter.icon = 54
+	self.types.crojob3_escape_helicopter.total = 1
+	self.types.crojob3_escape_helicopter.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_escape_close")
+	self.types.crojob3_escape_helicopter.budget_cost = 8
+	self.types.crojob3_escape_helicopter.post_event = "gus_preplan_14"
+	self.types.crojob3_escape_helicopter.prio = 3
+	self.types.crojob3_demolition_expert = {}
+	self.types.crojob3_demolition_expert.name_id = "menu_pp_asset_crojob3_demolition_expert"
+	self.types.crojob3_demolition_expert.desc_id = "menu_pp_asset_crojob3_demolition_expert_desc"
+	self.types.crojob3_demolition_expert.pos_not_important = false
+	self.types.crojob3_demolition_expert.icon = 65
+	self.types.crojob3_demolition_expert.category = "hired_help"
+	self.types.crojob3_demolition_expert.total = 3
+	self.types.crojob3_demolition_expert.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_demolition")
+	self.types.crojob3_demolition_expert.budget_cost = 1
+	self.types.crojob3_demolition_expert.post_event = "gus_preplan_14"
+	self.types.crojob3_demolition_expert.prio = 3
+	self.types.crojob3_better_pilot = {}
+	self.types.crojob3_better_pilot.name_id = "menu_pp_asset_crojob3_better_pilot"
+	self.types.crojob3_better_pilot.desc_id = "menu_pp_asset_crojob3_better_pilot_desc"
+	self.types.crojob3_better_pilot.pos_not_important = true
+	self.types.crojob3_better_pilot.icon = 73
+	self.types.crojob3_better_pilot.category = "hired_help"
+	self.types.crojob3_better_pilot.total = 1
+	self.types.crojob3_better_pilot.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_pilot")
+	self.types.crojob3_better_pilot.budget_cost = 4
+	self.types.crojob3_better_pilot.post_event = "gus_preplan_17"
+	self.types.crojob3_better_pilot.prio = 3
+	self.types.crojob3_sniper = {}
+	self.types.crojob3_sniper.name_id = "menu_pp_asset_sniper"
+	self.types.crojob3_sniper.desc_id = "menu_pp_asset_sniper_desc"
+	self.types.crojob3_sniper.pos_not_important = false
+	self.types.crojob3_sniper.icon = 55
+	self.types.crojob3_sniper.category = "hired_help"
+	self.types.crojob3_sniper.total = 1
+	self.types.crojob3_sniper.cost = tweak_data:get_value("money_manager", "preplaning_mia_cost_sniper")
+	self.types.crojob3_sniper.budget_cost = 4
+	self.types.crojob3_sniper.post_event = "gus_preplan_13"
+	self.types.crojob3_sniper.prio = 3
+	self.types.crojob3_ladder = {}
+	self.types.crojob3_ladder.name_id = "menu_pp_asset_crojob3_ladder"
+	self.types.crojob3_ladder.desc_id = "menu_pp_asset_crojob3_ladder_desc"
+	self.types.crojob3_ladder.pos_not_important = false
+	self.types.crojob3_ladder.icon = 63
+	self.types.crojob3_ladder.category = "mission_equipment"
+	self.types.crojob3_ladder.total = 1
+	self.types.crojob3_ladder.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_ladder")
+	self.types.crojob3_ladder.budget_cost = 1
+	self.types.crojob3_ladder.post_event = "gus_preplan_15"
+	self.types.crojob3_ladder.prio = 5
+	self.types.crojob3_crowbar = {}
+	self.types.crojob3_crowbar.name_id = "menu_pp_asset_crojob3_crowbar"
+	self.types.crojob3_crowbar.desc_id = "menu_pp_asset_crojob3_crowbar_desc"
+	self.types.crojob3_crowbar.pos_not_important = false
+	self.types.crojob3_crowbar.icon = 72
+	self.types.crojob3_crowbar.category = "mission_equipment"
+	self.types.crojob3_crowbar.total = 1
+	self.types.crojob3_crowbar.cost = tweak_data:get_value("money_manager", "preplaning_thebomb_cost_crowbar")
+	self.types.crojob3_crowbar.budget_cost = 1
+	self.types.crojob3_crowbar.post_event = "gus_preplan_15"
+	self.types.crojob3_crowbar.prio = 5
 	self.types.glass_cutter = {}
 	self.types.glass_cutter.name_id = "menu_pp_asset_glass_cutter"
 	self.types.glass_cutter.desc_id = "menu_pp_asset_glass_cutter_desc"
@@ -1383,16 +1588,16 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 	}
 	self.locations.mus = {
 		default_plans = {},
-		total_budget = 10,
+		total_budget = 20,
 		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_museum",
 		start_location = {
 			group = "a",
-			x = 1024,
-			y = 512,
+			x = 512,
+			y = 1024,
 			zoom = 1.5
 		},
 		{
-			name_id = "menu_pp_mus_loc_a",
+			name_id = "menu_pp_branchbank_loc_a",
 			texture = "guis/textures/pd2/pre_planning/mus_1",
 			map_x = -1.05,
 			map_y = 0,
@@ -1406,7 +1611,7 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			custom_points = {}
 		},
 		{
-			name_id = "menu_pp_mus_loc_b",
+			name_id = "menu_pp_branchbank_loc_b",
 			texture = "guis/textures/pd2/pre_planning/mus_2",
 			map_x = 0,
 			map_y = 0,
@@ -1420,7 +1625,7 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			custom_points = {}
 		},
 		{
-			name_id = "menu_pp_mus_loc_c",
+			name_id = "menu_pp_branchbank_loc_c",
 			texture = "guis/textures/pd2/pre_planning/mus_3",
 			map_x = 1.05,
 			map_y = 0,
@@ -1432,6 +1637,268 @@ function PrePlanningTweakData:_create_locations(tweak_data)
 			y2 = 5000,
 			rotation = -90,
 			custom_points = {}
+		}
+	}
+	self.locations.crojob2 = {
+		default_plans = {
+			escape_plan = "crojob2_escape_van"
+		},
+		total_budget = 10,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_crojob_stealth",
+		start_location = {
+			group = "a",
+			x = 1024,
+			y = 1024,
+			zoom = 1.5
+		},
+		{
+			name_id = "menu_pp_crojob_stage_2_loc_a",
+			texture = "guis/dlcs/the_bomb/textures/pd2/pre_planning/crojob_stage_2_a",
+			map_x = 0,
+			map_y = 0,
+			map_size = 1,
+			x1 = -9500,
+			y1 = -8500,
+			x2 = 10500,
+			y2 = 11500,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 964,
+					y = 1134,
+					text_id = "menu_pp_info_crojob2_ship",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_14"
+				},
+				{
+					x = 454,
+					y = 538,
+					text_id = "menu_pp_info_crojob2_loading_dock_3B",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_105"
+				},
+				{
+					x = 964,
+					y = 770,
+					text_id = "menu_pp_info_crojob2_dock_gate",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_106"
+				},
+				{
+					x = 1134,
+					y = 768,
+					text_id = "menu_pp_info_crojob2_control_room_right",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_107"
+				},
+				{
+					x = 798,
+					y = 768,
+					text_id = "menu_pp_info_crojob2_control_room_left",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_108"
+				},
+				{
+					x = 82,
+					y = 702,
+					text_id = "menu_pp_info_crojob2_fence_gate",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_109"
+				},
+				{
+					x = 1524,
+					y = 1508,
+					text_id = "menu_pp_info_crojob2_locker_room",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_110"
+				},
+				{
+					x = 1526,
+					y = 1336,
+					text_id = "menu_pp_info_crojob2_office",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_111"
+				},
+				{
+					x = 348,
+					y = 1122,
+					text_id = "menu_pp_info_crojob2_storage_room",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_112"
+				},
+				{
+					x = 350,
+					y = 1420,
+					text_id = "menu_pp_info_crojob2_ship_control_room_left",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_113"
+				},
+				{
+					x = 1424,
+					y = 1118,
+					text_id = "menu_pp_info_crojob2_ship_control_room_right",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr2_114"
+				}
+			}
+		}
+	}
+	self.locations.crojob3 = {
+		default_plans = {
+			escape_plan = "crojob3_escape_boat"
+		},
+		total_budget = 10,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_crojob_loud",
+		start_location = {
+			group = "a",
+			x = 512,
+			y = 512,
+			zoom = 1
+		},
+		{
+			name_id = "menu_pp_crojob_stage_3_loc_a",
+			texture = "guis/dlcs/the_bomb/textures/pd2/pre_planning/crojob_stage_3_a",
+			map_x = 0,
+			map_y = -0.5,
+			map_size = 1,
+			x1 = -50,
+			y1 = -4225,
+			x2 = 14950,
+			y2 = 10775,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 512,
+					y = 550,
+					text_id = "menu_pp_info_crojob3_vault",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_48"
+				},
+				{
+					x = 846,
+					y = 584,
+					text_id = "menu_pp_info_crojob3_water_pump",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_50"
+				}
+			}
+		},
+		{
+			name_id = "menu_pp_crojob_stage_3_loc_b",
+			texture = "guis/dlcs/the_bomb/textures/pd2/pre_planning/crojob_stage_3_b",
+			map_x = 0,
+			map_y = 0.5,
+			map_size = 1,
+			x1 = -50,
+			y1 = -19225,
+			x2 = 13250,
+			y2 = -4225,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 533,
+					y = 566,
+					text_id = "menu_pp_info_crojob3_thermite",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_49"
+				}
+			}
+		}
+	}
+	self.locations.crojob3_night = {
+		default_plans = {
+			escape_plan = "crojob3_escape_boat"
+		},
+		total_budget = 10,
+		mission_briefing_texture = "guis/textures/pd2/pre_planning/mission_briefing_crojob_loud",
+		start_location = {
+			group = "a",
+			x = 512,
+			y = 512,
+			zoom = 1
+		},
+		{
+			name_id = "menu_pp_crojob_stage_3_loc_a",
+			texture = "guis/dlcs/the_bomb/textures/pd2/pre_planning/crojob_stage_3_a",
+			map_x = 0,
+			map_y = -0.5,
+			map_size = 1,
+			x1 = -50,
+			y1 = -4225,
+			x2 = 14950,
+			y2 = 10775,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 512,
+					y = 550,
+					text_id = "menu_pp_info_crojob3_vault",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_48"
+				},
+				{
+					x = 846,
+					y = 584,
+					text_id = "menu_pp_info_crojob3_water_pump",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_50"
+				}
+			}
+		},
+		{
+			name_id = "menu_pp_crojob_stage_3_loc_b",
+			texture = "guis/dlcs/the_bomb/textures/pd2/pre_planning/crojob_stage_3_b",
+			map_x = 0,
+			map_y = 0.5,
+			map_size = 1,
+			x1 = -50,
+			y1 = -19225,
+			x2 = 13250,
+			y2 = -4225,
+			rotation = 0,
+			custom_points = {
+				{
+					x = 533,
+					y = 566,
+					text_id = "menu_pp_info_crojob3_thermite",
+					to_upper = true,
+					icon = 45,
+					rotation = 0,
+					post_event = "Play_pln_cr3_49"
+				}
+			}
 		}
 	}
 end

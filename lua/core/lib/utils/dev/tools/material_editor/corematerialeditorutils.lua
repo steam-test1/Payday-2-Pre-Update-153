@@ -248,7 +248,8 @@ function CoreMaterialEditor:_update_material(param)
 	local material = self:_get_material()
 	if material then
 		if param._param_type == "texture" then
-			Application:set_material_texture(material, param._name, param._value, material:texture_type(param._name))
+			local name_ids = Idstring(param._name)
+			Application:set_material_texture(material, name_ids, Idstring(param._value), material:texture_type(name_ids), 0)
 		elseif param._param_type == "vector3" or param._param_type == "scalar" then
 			if param._name == "diffuse_color" then
 				material:set_diffuse_color(param._value)

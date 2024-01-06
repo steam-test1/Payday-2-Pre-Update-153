@@ -76,6 +76,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_mosin_npc()
 	self:_init_data_m1928_npc()
 	self:_init_data_l85a2_npc()
+	self:_init_data_hs2000_npc()
+	self:_init_data_vhs_npc()
 	self:_precalculate_values()
 end
 
@@ -1208,6 +1210,35 @@ function WeaponTweakData:_init_data_l85a2_npc()
 	self.l85a2_npc.hold = "rifle"
 	self.l85a2_npc.alert_size = 5000
 	self.l85a2_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_vhs_npc()
+	self.vhs_npc.sounds.prefix = "vhs_npc"
+	self.vhs_npc.use_data.selection_index = 1
+	self.vhs_npc.DAMAGE = 2
+	self.vhs_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.vhs_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.vhs_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.vhs_npc.CLIP_AMMO_MAX = 30
+	self.vhs_npc.NR_CLIPS_MAX = 5
+	self.vhs_npc.auto.fire_rate = 20
+	self.vhs_npc.hold = "rifle"
+	self.vhs_npc.alert_size = 5000
+	self.vhs_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hs2000_npc()
+	self.hs2000_npc.sounds.prefix = "p226r_npc"
+	self.hs2000_npc.use_data.selection_index = 1
+	self.hs2000_npc.DAMAGE = 1
+	self.hs2000_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.hs2000_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.hs2000_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.hs2000_npc.CLIP_AMMO_MAX = 10
+	self.hs2000_npc.NR_CLIPS_MAX = 5
+	self.hs2000_npc.hold = "pistol"
+	self.hs2000_npc.alert_size = 2500
+	self.hs2000_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7200,6 +7231,176 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 9
 	}
+	self.vhs = {}
+	self.vhs.category = "assault_rifle"
+	self.vhs.damage_melee = damage_melee_default
+	self.vhs.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.vhs.sounds = {}
+	self.vhs.sounds.fire = "vhs_fire_single"
+	self.vhs.sounds.fire_single = "vhs_fire_single"
+	self.vhs.sounds.fire_auto = "vhs_fire"
+	self.vhs.sounds.stop_fire = "vhs_stop"
+	self.vhs.sounds.dryfire = "primary_dryfire"
+	self.vhs.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.vhs.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.vhs.timers = {}
+	self.vhs.timers.reload_not_empty = 3.2
+	self.vhs.timers.reload_empty = 4.75
+	self.vhs.timers.unequip = 0.9
+	self.vhs.timers.equip = 0.9
+	self.vhs.name_id = "bm_w_vhs"
+	self.vhs.desc_id = "bm_w_vhs_desc"
+	self.vhs.description_id = "des_vhs"
+	self.vhs.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.vhs.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.vhs.use_data = {}
+	self.vhs.use_data.selection_index = 2
+	self.vhs.DAMAGE = 1
+	self.vhs.CLIP_AMMO_MAX = 30
+	self.vhs.NR_CLIPS_MAX = 5
+	self.vhs.AMMO_MAX = self.vhs.CLIP_AMMO_MAX * self.vhs.NR_CLIPS_MAX
+	self.vhs.AMMO_PICKUP = self:_pickup_chance(self.vhs.AMMO_MAX, 2)
+	self.vhs.FIRE_MODE = "auto"
+	self.vhs.fire_mode_data = {}
+	self.vhs.fire_mode_data.fire_rate = 0.07
+	self.vhs.CAN_TOGGLE_FIREMODE = true
+	self.vhs.auto = {}
+	self.vhs.auto.fire_rate = 0.07
+	self.vhs.spread = {}
+	self.vhs.spread.standing = 2.8
+	self.vhs.spread.crouching = 2.6
+	self.vhs.spread.steelsight = 1
+	self.vhs.spread.moving_standing = 3.2
+	self.vhs.spread.moving_crouching = 3.1
+	self.vhs.spread.moving_steelsight = 3.5
+	self.vhs.kick = {}
+	self.vhs.kick.standing = {
+		0.6,
+		0.8,
+		-1,
+		1
+	}
+	self.vhs.kick.crouching = self.vhs.kick.standing
+	self.vhs.kick.steelsight = self.vhs.kick.standing
+	self.vhs.crosshair = {}
+	self.vhs.crosshair.standing = {}
+	self.vhs.crosshair.crouching = {}
+	self.vhs.crosshair.steelsight = {}
+	self.vhs.crosshair.standing.offset = 0.16
+	self.vhs.crosshair.standing.moving_offset = 1
+	self.vhs.crosshair.standing.kick_offset = 0.8
+	self.vhs.crosshair.crouching.offset = 0.1
+	self.vhs.crosshair.crouching.moving_offset = 0.6
+	self.vhs.crosshair.crouching.kick_offset = 0.4
+	self.vhs.crosshair.steelsight.hidden = true
+	self.vhs.crosshair.steelsight.offset = 0
+	self.vhs.crosshair.steelsight.moving_offset = 0
+	self.vhs.crosshair.steelsight.kick_offset = 0.14
+	self.vhs.shake = {}
+	self.vhs.shake.fire_multiplier = 0.3
+	self.vhs.shake.fire_steelsight_multiplier = -0.3
+	self.vhs.autohit = autohit_rifle_default
+	self.vhs.aim_assist = aim_assist_rifle_default
+	self.vhs.weapon_hold = "vhs"
+	self.vhs.animations = {}
+	self.vhs.animations.equip_id = "equip_vhs"
+	self.vhs.animations.recoil_steelsight = true
+	self.vhs.global_value = "character_pack_dragan"
+	self.vhs.texture_bundle_folder = "character_pack_dragan"
+	self.vhs.stats = {
+		damage = 14,
+		spread = 9,
+		recoil = 4,
+		spread_moving = 6,
+		zoom = 1,
+		concealment = 17,
+		suppression = 12,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
+	self.hs2000 = {}
+	self.hs2000.category = "pistol"
+	self.hs2000.damage_melee = damage_melee_default
+	self.hs2000.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.hs2000.sounds = {}
+	self.hs2000.sounds.fire = "p226r_fire"
+	self.hs2000.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.hs2000.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.hs2000.sounds.dryfire = "secondary_dryfire"
+	self.hs2000.timers = {}
+	self.hs2000.timers.reload_not_empty = 1.47
+	self.hs2000.timers.reload_empty = 2.12
+	self.hs2000.timers.unequip = 0.5
+	self.hs2000.timers.equip = 0.5
+	self.hs2000.name_id = "bm_w_hs2000"
+	self.hs2000.desc_id = "bm_w_hs2000_desc"
+	self.hs2000.description_id = "des_hs2000"
+	self.hs2000.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.hs2000.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.hs2000.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.hs2000.use_data = {}
+	self.hs2000.use_data.selection_index = 1
+	self.hs2000.DAMAGE = 1
+	self.hs2000.CLIP_AMMO_MAX = 19
+	self.hs2000.NR_CLIPS_MAX = math.round(total_damage_secondary / 1.2 / self.hs2000.CLIP_AMMO_MAX)
+	self.hs2000.AMMO_MAX = self.hs2000.CLIP_AMMO_MAX * self.hs2000.NR_CLIPS_MAX
+	self.hs2000.AMMO_PICKUP = self:_pickup_chance(self.hs2000.AMMO_MAX, 1)
+	self.hs2000.FIRE_MODE = "single"
+	self.hs2000.fire_mode_data = {}
+	self.hs2000.fire_mode_data.fire_rate = 0.09
+	self.hs2000.single = {}
+	self.hs2000.single.fire_rate = 0.09
+	self.hs2000.spread = {}
+	self.hs2000.spread.standing = self.new_m4.spread.standing * 0.3
+	self.hs2000.spread.crouching = self.new_m4.spread.standing * 0.3
+	self.hs2000.spread.steelsight = self.new_m4.spread.steelsight
+	self.hs2000.spread.moving_standing = self.new_m4.spread.standing * 0.3
+	self.hs2000.spread.moving_crouching = self.new_m4.spread.standing * 0.3
+	self.hs2000.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.hs2000.kick = {}
+	self.hs2000.kick.standing = self.glock_17.kick.standing
+	self.hs2000.kick.crouching = self.hs2000.kick.standing
+	self.hs2000.kick.steelsight = self.hs2000.kick.standing
+	self.hs2000.crosshair = {}
+	self.hs2000.crosshair.standing = {}
+	self.hs2000.crosshair.crouching = {}
+	self.hs2000.crosshair.steelsight = {}
+	self.hs2000.crosshair.standing.offset = 0.1
+	self.hs2000.crosshair.standing.moving_offset = 0.4
+	self.hs2000.crosshair.standing.kick_offset = 0.3
+	self.hs2000.crosshair.crouching.offset = 0.1
+	self.hs2000.crosshair.crouching.moving_offset = 0.5
+	self.hs2000.crosshair.crouching.kick_offset = 0.2
+	self.hs2000.crosshair.steelsight.hidden = true
+	self.hs2000.crosshair.steelsight.offset = 0
+	self.hs2000.crosshair.steelsight.moving_offset = 0
+	self.hs2000.crosshair.steelsight.kick_offset = 0.1
+	self.hs2000.shake = {}
+	self.hs2000.shake.fire_multiplier = 1
+	self.hs2000.shake.fire_steelsight_multiplier = -1
+	self.hs2000.autohit = autohit_pistol_default
+	self.hs2000.aim_assist = aim_assist_pistol_default
+	self.hs2000.weapon_hold = "glock"
+	self.hs2000.animations = {}
+	self.hs2000.animations.equip_id = "equip_glock"
+	self.hs2000.animations.recoil_steelsight = true
+	self.hs2000.global_value = "the_bomb"
+	self.hs2000.texture_bundle_folder = "the_bomb"
+	self.hs2000.stats = {
+		damage = 8,
+		spread = 7,
+		recoil = 7,
+		spread_moving = 7,
+		zoom = 3,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -7730,6 +7931,18 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.hs2000_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.vhs_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -7808,4 +8021,6 @@ function WeaponTweakData:_precalculate_values()
 	self.mosin_npc.AMMO_MAX = self.mosin_npc.CLIP_AMMO_MAX * self.mosin_npc.NR_CLIPS_MAX
 	self.m1928_npc.AMMO_MAX = self.m1928_npc.CLIP_AMMO_MAX * self.m1928_npc.NR_CLIPS_MAX
 	self.l85a2_npc.AMMO_MAX = self.l85a2_npc.CLIP_AMMO_MAX * self.l85a2_npc.NR_CLIPS_MAX
+	self.hs2000_npc.AMMO_MAX = self.hs2000_npc.CLIP_AMMO_MAX * self.hs2000_npc.NR_CLIPS_MAX
+	self.vhs_npc.AMMO_MAX = self.vhs_npc.CLIP_AMMO_MAX * self.vhs_npc.NR_CLIPS_MAX
 end

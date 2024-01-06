@@ -143,14 +143,16 @@ function MissionEndState:at_enter(old_state, params)
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, stealth_pass, equipped_pass, all_pass, weapon_data, memory, level_id, stage
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, full_job_pass, full_jobs_pass, level_pass, stealth_pass, equipped_pass, all_pass, weapon_data, memory, level_id, stage
 			for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
+				level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 				diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 				mask_pass = not achievement_data.mask or managers.blackmarket:equipped_mask().mask_id == achievement_data.mask
 				job_pass = not achievement_data.job or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == achievement_data.job
 				jobs_pass = not achievement_data.jobs or managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and table.contains(achievement_data.jobs, managers.job:current_real_job_id())
 				full_job_pass = not achievement_data.full_job_id or managers.job:has_active_job()
 				full_jobs_pass = not achievement_data.full_jobs_id or managers.job:has_active_job()
+				level_pass = not achievement_data.level_id or achievement_data.level_id == level_id
 				contract_pass = not achievement_data.contract or managers.job:current_contact_id() == achievement_data.contract
 				no_shots_pass = not achievement_data.no_shots or managers.statistics:session_total_shots(achievement_data.no_shots) == 0
 				stealth_pass = not achievement_data.stealth or managers.groupai and managers.groupai:state():whisper_mode()
@@ -180,7 +182,7 @@ function MissionEndState:at_enter(old_state, params)
 						end
 					end
 				end
-				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and equipped_pass
+				all_pass = full_job_pass and full_jobs_pass and job_pass and jobs_pass and level_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and equipped_pass
 				full_job_pass = managers.job:has_active_job() and achievement_data.full_job_id and achievement_data.full_job_id == managers.job:current_real_job_id()
 				full_jobs_pass = managers.job:has_active_job() and achievement_data.full_jobs_id and table.contains(achievement_data.full_jobs_id, managers.job:current_real_job_id())
 				if all_pass and (full_job_pass or full_jobs_pass) then
@@ -214,6 +216,8 @@ function MissionEndState:at_enter(old_state, params)
 						managers.achievment:award_progress(achievement_data.stat)
 					elseif achievement_data.award then
 						managers.achievment:award(achievement_data.award)
+					else
+						Application:debug("[MissionEndState] complete_heist_achievements:", achievement)
 					end
 				end
 			end
@@ -626,9 +630,13 @@ function MissionEndState:update(t, dt)
 	end
 	if self._total_xp_bonus then
 		if self._total_xp_bonus >= 0 then
+			local level = managers.experience:current_level()
 			local data = managers.experience:give_experience(self._total_xp_bonus)
 			data.bonuses = self._bonuses
 			managers.hud:send_xp_data_endscreen_hud(data, callback(self, self, "set_completion_bonus_done"))
+			if SystemInfo:platform() == Idstring("WIN32") and level ~= managers.experience:current_level() then
+				managers.statistics:publish_level_to_steam()
+			end
 		else
 			self:set_completion_bonus_done(true)
 		end

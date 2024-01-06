@@ -241,7 +241,11 @@ function combobox(params)
 		table.sort(options)
 	end
 	local ctrlr = EWS:ComboBox(panel, "", "", styles)
-	ctrlr:set_tool_tip(tooltip)
+	if params.value then
+		ctrlr:set_tool_tip(params.tooltip .. "\n" .. params.value)
+	else
+		ctrlr:set_tool_tip(tooltip)
+	end
 	ctrlr:freeze()
 	if default then
 		ctrlr:append(default)
@@ -266,9 +270,13 @@ function _set_combobox_value(params)
 	if params.value_changed_cb then
 		params.value_changed_cb(params)
 	end
+	if params.value then
+		params.ctrlr:set_tool_tip(params.tooltip .. "\n" .. params.value)
+	end
 end
 
 function update_combobox_options(params, options)
+	params.ctrlr:freeze()
 	params.ctrlr:clear()
 	if params.sorted then
 		table.sort(options)
@@ -280,6 +288,7 @@ function update_combobox_options(params, options)
 		params.ctrlr:append(option)
 	end
 	params.options = options
+	params.ctrlr:thaw()
 end
 
 function change_combobox_value(params, value)
@@ -288,6 +297,9 @@ function change_combobox_value(params, value)
 	params.ctrlr:set_value(value)
 	if params.value_changed_cb then
 		params.value_changed_cb(params)
+	end
+	if params.value then
+		params.ctrlr:set_tool_tip(params.tooltip .. "\n" .. params.value)
 	end
 end
 

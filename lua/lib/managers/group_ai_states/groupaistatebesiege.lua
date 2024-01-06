@@ -2152,6 +2152,7 @@ end
 
 function GroupAIStateBesiege:_upd_groups()
 	for group_id, group in pairs(self._groups) do
+		self:_verify_group_objective(group)
 		for u_key, u_data in pairs(group.units) do
 			local brain = u_data.unit:brain()
 			local current_objective = brain:objective()
@@ -2923,6 +2924,58 @@ function GroupAIStateBesiege:_count_criminals_engaged_force(max_count)
 		end
 	end
 	return count
+end
+
+function GroupAIStateBesiege:_verify_group_objective(group)
+	local is_objective_broken
+	local grp_objective = group.objective
+	local coarse_path = grp_objective.coarse_path
+	local nav_segments = managers.navigation._nav_segments
+	if coarse_path then
+		for i_node, node in ipairs(coarse_path) do
+			local nav_seg_id = node[1]
+			if nav_segments[nav_seg_id].disabled then
+				is_objective_broken = true
+				break
+			end
+		end
+	end
+	if not is_objective_broken then
+		return
+	end
+	local new_area
+	local tested_nav_seg_ids = {}
+	for u_key, u_data in pairs(group.units) do
+		u_data.tracker:move(u_data.m_pos)
+		local nav_seg_id = u_data.tracker:nav_segment()
+		if not tested_nav_seg_ids[nav_seg_id] then
+			tested_nav_seg_ids[nav_seg_id] = true
+			local areas = self:get_areas_from_nav_seg_id(nav_seg_id)
+			for _, test_area in pairs(areas) do
+				for test_nav_seg, _ in pairs(test_area.nav_segs) do
+					if not nav_segments[test_nav_seg].disabled then
+						new_area = test_area
+						break
+					end
+				end
+				if new_area then
+					break
+				end
+			end
+		end
+		if new_area then
+			break
+		end
+	end
+	if not new_area then
+		print("[GroupAIStateBesiege:_verify_group_objective] could not find replacement area to", grp_objective.area)
+		return
+	end
+	group.objective = {
+		type = grp_objective.type,
+		area = new_area,
+		moving_out = false
+	}
 end
 
 function GroupAIStateBesiege:team_data(team_id)

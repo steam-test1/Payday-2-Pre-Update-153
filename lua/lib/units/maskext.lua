@@ -60,12 +60,10 @@ function MaskExt:apply_blueprint(blueprint, async_clbk)
 			if async_clbk then
 				TextureCache:request(texture_data.name, "normal", texture_load_result_clbk, 90)
 			else
-				new_texture = TextureCache:retrieve(texture_data.name, "normal")
 				texture_data.ready = true
 				for _, material in ipairs(self._materials) do
-					material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+					Application:set_material_texture(material, Idstring(tex_id == "pattern" and "material_texture" or "reflection_texture"), texture_data.name, Idstring("normal"), 0)
 				end
-				TextureCache:unretrieve(texture_data.name)
 			end
 		end
 	end
@@ -82,11 +80,9 @@ function MaskExt:clbk_texture_loaded(async_clbk, tex_name)
 	for tex_id, texture_data in pairs(self._textures) do
 		if not texture_data.ready and tex_name == texture_data.name then
 			texture_data.ready = true
-			local new_texture = TextureCache:retrieve(tex_name, "normal")
 			for _, material in ipairs(self._materials) do
-				material:set_texture(tex_id == "pattern" and "material_texture" or "reflection_texture", new_texture)
+				Application:set_material_texture(material, Idstring(tex_id == "pattern" and "material_texture" or "reflection_texture"), tex_name, Idstring("normal"), 0)
 			end
-			TextureCache:unretrieve(tex_name)
 			TextureCache:unretrieve(tex_name)
 		end
 	end

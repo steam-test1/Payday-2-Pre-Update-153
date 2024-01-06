@@ -100,7 +100,8 @@ function UpgradesTweakData:_init_pd2_values()
 	self.morale_boost_time = 10
 	self.morale_boost_reload_speed_bonus = 1.2
 	self.morale_boost_base_cooldown = 3.5
-	self.max_weapon_dmg_mul_stacks = 6
+	self.max_weapon_dmg_mul_stacks = 4
+	self.max_melee_weapon_dmg_mul_stacks = 4
 	self.hostage_near_player_radius = 1000
 	self.hostage_near_player_check_t = 0.5
 	self.hostage_near_player_multiplier = 1.25
@@ -423,7 +424,6 @@ function UpgradesTweakData:_init_pd2_values()
 		{true, 60}
 	}
 	self.values.player.secured_bags_money_multiplier = {1.02}
-	self.values.pistol.stacking_hit_damage_multiplier = {0.05}
 	self.values.pistol.stacking_hit_expire_t = {2, 8}
 	self.values.carry.movement_penalty_nullifier = {true}
 	self.values.temporary.berserker_damage_multiplier = {
@@ -469,7 +469,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.sentry_gun.armor_piercing_chance = {0.15}
 	self.values.sentry_gun.armor_piercing_chance_2 = {0.05}
 	self.values.weapon.armor_piercing_chance_2 = {0.05}
-	self.values.player.headshot_regen_armor_bonus = {0.4, 1.2}
 	self.values.player.resist_firing_tased = {true}
 	self.values.player.crouch_dodge_chance = {0.05, 0.15}
 	self.values.player.climb_speed_multiplier = {1.2, 1.75}
@@ -543,7 +542,6 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.headshot_regen_armor_bonus = {0.8, 1.6}
 	self.values.pistol.stacking_hit_damage_multiplier = {0.1}
-	self.max_weapon_dmg_mul_stacks = 4
 	self.values.bodybags_bag.quantity = {1}
 	self.values.first_aid_kit.quantity = {3, 10}
 	self.values.first_aid_kit.deploy_time_multiplier = {0.5}
@@ -577,6 +575,19 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.corpse_dispose_speed_multiplier = {0.8}
 	self.values.player.pick_lock_speed_multiplier = {0.8}
 	self.values.player.alarm_pager_speed_multiplier = {0.9}
+	self.values.temporary.melee_life_leech = {
+		{0.1, 15}
+	}
+	self.values.temporary.dmg_dampener_outnumbered_strong = {
+		{0.92, 7}
+	}
+	self.values.temporary.dmg_dampener_close_contact = {
+		{0.96, 7},
+		{0.92, 7},
+		{0.88, 7}
+	}
+	self.values.melee.stacking_hit_damage_multiplier = {0.1, 0.2}
+	self.values.melee.stacking_hit_expire_t = {6}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -689,7 +700,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		gun_fighter = {
 			{"50%"},
-			{"50%"}
+			{"15"}
 		},
 		hardware_expert = {
 			{"25%", "20%"},
@@ -1253,6 +1264,35 @@ function UpgradesTweakData:_init_pd2_values()
 			},
 			{"5%", "20%"},
 			{"20%", "10%"}
+		},
+		{
+			{"4%"},
+			{"25%"},
+			{"4%"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{
+				"4%",
+				"10%",
+				"6",
+				"4"
+			},
+			{"135%"},
+			{
+				"8%",
+				"10%",
+				"6",
+				"4"
+			},
+			{"5%", "20%"},
+			{
+				"10%",
+				"15",
+				"10%"
+			}
 		}
 	}
 	self.specialization_descs = {}
@@ -1373,7 +1413,8 @@ function UpgradesTweakData:init()
 	self.level_tree[25] = {
 		name_id = "weapons",
 		upgrades = {
-			"boxing_gloves"
+			"boxing_gloves",
+			"meat_cleaver"
 		}
 	}
 	self.level_tree[26] = {
@@ -1383,6 +1424,10 @@ function UpgradesTweakData:init()
 	self.level_tree[27] = {
 		name_id = "weapons",
 		upgrades = {"famas", "g26"}
+	}
+	self.level_tree[28] = {
+		name_id = "weapons",
+		upgrades = {"hs2000", "vhs"}
 	}
 	self.level_tree[29] = {
 		name_id = "weapons",
@@ -1717,6 +1762,8 @@ function UpgradesTweakData:init()
 	self:_mosin_definitions()
 	self:_m1928_definitions()
 	self:_l85a2_definitions()
+	self:_vhs_definitions()
+	self:_hs2000_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -1788,6 +1835,7 @@ function UpgradesTweakData:_init_value_tables()
 	self.values.lmg = {}
 	self.values.snp = {}
 	self.values.akimbo = {}
+	self.values.melee = {}
 	self.values.temporary = {}
 	self.values.team = {}
 	self.values.team.player = {}
@@ -2730,6 +2778,78 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "alarm_pager_speed_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_melee_life_leech = {
+		category = "temporary",
+		name_id = "menu_player_melee_life_leech",
+		upgrade = {
+			category = "temporary",
+			upgrade = "melee_life_leech",
+			value = 1
+		}
+	}
+	self.definitions.player_damage_dampener_outnumbered_strong = {
+		category = "temporary",
+		name_id = "menu_player_dmg_dampener_outnumbered_strong",
+		upgrade = {
+			category = "temporary",
+			upgrade = "dmg_dampener_outnumbered_strong",
+			value = 1
+		}
+	}
+	self.definitions.player_damage_dampener_close_contact_1 = {
+		category = "temporary",
+		name_id = "menu_player_dmg_dampener_close_contact",
+		upgrade = {
+			category = "temporary",
+			upgrade = "dmg_dampener_close_contact",
+			value = 1
+		}
+	}
+	self.definitions.player_damage_dampener_close_contact_2 = {
+		category = "temporary",
+		name_id = "menu_player_dmg_dampener_close_contact",
+		upgrade = {
+			category = "temporary",
+			upgrade = "dmg_dampener_close_contact",
+			value = 2
+		}
+	}
+	self.definitions.player_damage_dampener_close_contact_3 = {
+		category = "temporary",
+		name_id = "menu_player_dmg_dampener_close_contact",
+		upgrade = {
+			category = "temporary",
+			upgrade = "dmg_dampener_close_contact",
+			value = 3
+		}
+	}
+	self.definitions.melee_stacking_hit_damage_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_melee_stacking_hit_damage_multiplier",
+		upgrade = {
+			category = "melee",
+			upgrade = "stacking_hit_damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.melee_stacking_hit_damage_multiplier_2 = {
+		category = "feature",
+		name_id = "menu_melee_stacking_hit_damage_multiplier",
+		upgrade = {
+			category = "melee",
+			upgrade = "stacking_hit_damage_multiplier",
+			value = 2
+		}
+	}
+	self.definitions.melee_stacking_hit_expire_t = {
+		category = "feature",
+		name_id = "menu_melee_stacking_hit_expire_t",
+		upgrade = {
+			category = "melee",
+			upgrade = "stacking_hit_expire_t",
 			value = 1
 		}
 	}
@@ -5853,6 +5973,24 @@ function UpgradesTweakData:_l85a2_definitions()
 	}
 end
 
+function UpgradesTweakData:_vhs_definitions()
+	self.definitions.vhs = {
+		category = "weapon",
+		weapon_id = "vhs",
+		factory_id = "wpn_fps_ass_vhs",
+		dlc = "character_pack_dragan"
+	}
+end
+
+function UpgradesTweakData:_hs2000_definitions()
+	self.definitions.hs2000 = {
+		category = "weapon",
+		weapon_id = "hs2000",
+		factory_id = "wpn_fps_pis_hs2000",
+		dlc = "the_bomb"
+	}
+end
+
 function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.weapon = {
 		category = "melee_weapon"
@@ -5967,6 +6105,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.boxing_gloves = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
+	}
+	self.definitions.meat_cleaver = {
+		category = "melee_weapon",
+		dlc = "character_pack_dragan"
 	}
 end
 

@@ -345,15 +345,7 @@ function NetworkPeer:load(data)
 	self._rank = data.rank
 	self._streaming_status = data.streaming_status
 	self._ticket_wait_response = data.wait_ticket_response
-	self._loading_outfit_assets = data.loading_outfit_assets
-	if self._loading_outfit_assets then
-		self._outfit_assets = Global.peer_loading_outfit_assets[self._id]
-		Global.peer_loading_outfit_assets[self._id] = nil
-		if not next(Global.peer_loading_outfit_assets) then
-			Global.peer_loading_outfit_assets = nil
-		end
-		self:_chk_outfit_loading_complete()
-	end
+	self._outfit_assets = data.outfit_assets
 	self._other_peer_outfits_loaded = data.other_peer_outfits_loaded
 	self._outfit_version = data.outfit_version
 	if self._ticket_wait_response then
@@ -396,14 +388,7 @@ function NetworkPeer:save(data)
 	data.wait_ticket_response = self._ticket_wait_response
 	data.other_peer_outfits_loaded = self._other_peer_outfits_loaded
 	data.outfit_version = self._outfit_version
-	if self._loading_outfit_assets then
-		data.loading_outfit_assets = true
-		Global.peer_loading_outfit_assets = Global.peer_loading_outfit_assets or {}
-		Global.peer_loading_outfit_assets[self._id] = self._outfit_assets
-	else
-		data.loading_outfit_assets = self._loading_outfit_assets
-		data.outfit_assets = self._outfit_assets
-	end
+	data.outfit_assets = self._outfit_assets
 	print("[NetworkPeer:save]", inspect(data))
 end
 
@@ -1067,6 +1052,10 @@ end
 
 function NetworkPeer:is_outfit_loaded()
 	return not self._loading_outfit_assets and self._profile.outfit_string ~= ""
+end
+
+function NetworkPeer:is_loading_outfit_assets()
+	return self._loading_outfit_assets
 end
 
 function NetworkPeer:_unload_outfit()

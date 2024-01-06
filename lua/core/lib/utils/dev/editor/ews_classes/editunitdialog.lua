@@ -35,6 +35,7 @@ end
 function EditUnitDialog:set_enabled(unit, units)
 	for _, page in ipairs(self._pages) do
 		if page.class then
+			page.panel:set_enabled(true)
 			page.panel:set_enabled(page.class:is_editable(unit, units))
 			self._notebook:set_page_text(page.nr, page.panel:enabled() and page.name .. "*" or page.name)
 		end

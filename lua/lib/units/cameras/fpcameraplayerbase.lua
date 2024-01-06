@@ -1,6 +1,7 @@
 FPCameraPlayerBase = FPCameraPlayerBase or class(UnitBase)
 FPCameraPlayerBase.IDS_EMPTY = Idstring("empty")
 FPCameraPlayerBase.IDS_NOSTRING = Idstring("")
+FPCameraPlayerBase.bipod_location = nil
 
 function FPCameraPlayerBase:init(unit)
 	UnitBase.init(self, unit, true)
@@ -81,8 +82,6 @@ function FPCameraPlayerBase:update(unit, t, dt)
 	self._parent_unit:base():controller():get_input_axis_clbk("look", callback(self, self, "_update_rot"))
 	self:_update_stance(t, dt)
 	self:_update_movement(t, dt)
-	self._parent_unit:camera():set_position(self._output_data.position)
-	self._parent_unit:camera():set_rotation(self._output_data.rotation)
 	if self._fov.dirty then
 		self._parent_unit:camera():set_FOV(self._fov.fov)
 		self._fov.dirty = nil
@@ -327,6 +326,11 @@ function FPCameraPlayerBase:_update_rot(axis)
 	if self._camera_properties.current_tilt ~= 0 then
 		self._output_data.rotation = Rotation(self._output_data.rotation:yaw(), self._output_data.rotation:pitch(), self._output_data.rotation:roll() + self._camera_properties.current_tilt)
 	end
+	local bipod_pos = Vector3(new_shoulder_pos.x, new_shoulder_pos.y, new_shoulder_pos.z)
+	local bipod_rot = new_shoulder_rot
+	mvector3.set(bipod_pos, Vector3(-12, 20, 0))
+	mvector3.rotate_with(bipod_pos, self._output_data.rotation)
+	mvector3.add(bipod_pos, new_head_pos)
 	mvector3.set(new_shoulder_pos, self._shoulder_stance.translation)
 	mvector3.add(new_shoulder_pos, self._vel_overshot.translation)
 	mvector3.rotate_with(new_shoulder_pos, self._output_data.rotation)
@@ -335,6 +339,7 @@ function FPCameraPlayerBase:_update_rot(axis)
 	mrotation.multiply(new_shoulder_rot, self._output_data.rotation)
 	mrotation.multiply(new_shoulder_rot, self._shoulder_stance.rotation)
 	mrotation.multiply(new_shoulder_rot, self._vel_overshot.rotation)
+	local player_state = managers.player:current_state()
 	self:set_position(new_shoulder_pos)
 	self:set_rotation(new_shoulder_rot)
 	self._parent_unit:camera():set_position(self._output_data.position)
@@ -356,6 +361,12 @@ function FPCameraPlayerBase:_get_aim_assist(t, dt)
 end
 
 function FPCameraPlayerBase:_vertical_recoil_kick(t, dt)
+	local player_state = managers.player:current_state()
+	if player_state == "bipod" then
+		return 0
+	end
+	local player = managers.player:player_unit()
+	do return 0 end
 	local r_value = 0
 	if self._recoil_kick.current and self._recoil_kick.current ~= self._recoil_kick.accumulated then
 		local n = math.step(self._recoil_kick.current, self._recoil_kick.accumulated, 40 * dt)
@@ -375,6 +386,10 @@ function FPCameraPlayerBase:_vertical_recoil_kick(t, dt)
 end
 
 function FPCameraPlayerBase:_horizonatal_recoil_kick(t, dt)
+	local player_state = managers.player:current_state()
+	if player_state == "bipod" then
+		return 0
+	end
 	local r_value = 0
 	if self._recoil_kick.h.current and self._recoil_kick.h.current ~= self._recoil_kick.h.accumulated then
 		local n = math.step(self._recoil_kick.h.current, self._recoil_kick.h.accumulated, 40 * dt)
@@ -1101,4 +1116,12 @@ function FPCameraPlayerBase:destroy()
 	if self._mask_backface_loaded then
 		self._mask_backface_loaded = nil
 	end
+end
+
+function FPCameraPlayerBase:set_spin(_spin)
+	self._camera_properties.spin = _spin
+end
+
+function FPCameraPlayerBase:set_pitch(_pitch)
+	self._camera_properties.pitch = _pitch
 end

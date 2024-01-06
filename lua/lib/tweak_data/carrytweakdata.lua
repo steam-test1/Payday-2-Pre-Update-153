@@ -270,6 +270,23 @@ function CarryTweakData:init(tweak_data)
 	self.hope_diamond.AI_carry = {SO_category = "enemies"}
 	self.hope_diamond.visual_object = "g_cagebag"
 	self.hope_diamond.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.cro_loot1 = {}
+	self.cro_loot1.type = "medium"
+	self.cro_loot1.name_id = "hud_carry_cro_loot"
+	self.cro_loot1.bag_value = "cro_loot"
+	self.cro_loot1.AI_carry = {SO_category = "enemies"}
+	self.cro_loot2 = {}
+	self.cro_loot2.type = "heavy"
+	self.cro_loot2.name_id = "hud_carry_cro_loot"
+	self.cro_loot2.bag_value = "cro_loot"
+	self.cro_loot2.AI_carry = {SO_category = "enemies"}
+	self.ladder_bag = {}
+	self.ladder_bag.type = "light"
+	self.ladder_bag.name_id = "hud_carry_ladder_bag"
+	self.ladder_bag.skip_exit_secure = true
+	self.lance_bag.visual_object = "g_toolsbag"
+	self.lance_bag.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
+	self.ladder_bag.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

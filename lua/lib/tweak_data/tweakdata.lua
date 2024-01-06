@@ -406,7 +406,8 @@ function TweakData:init()
 		"american",
 		"jowi",
 		"old_hoxton",
-		"female_1"
+		"female_1",
+		"dragan"
 	}
 	self.criminals.characters = {
 		{
@@ -483,6 +484,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb7",
 				ai_mask_id = "msk_grizel",
+				mask_id = 4
+			}
+		},
+		{
+			name = "dragan",
+			static_data = {
+				ai_character_id = "ai_dragan",
+				ssuffix = "o",
+				color_id = 4,
+				voice = "rb8",
+				ai_mask_id = "dragan",
 				mask_id = 4
 			}
 		}
@@ -1784,6 +1796,50 @@ function TweakData:init()
 			},
 			jobs = {"pines", "pines_prof"}
 		},
+		complete_crojob_for_all = {
+			award = "cow_1",
+			difficulty = {
+				"normal",
+				"hard",
+				"overkill",
+				"overkill_145",
+				"overkill_290"
+			},
+			jobs = {
+				"crojob_wrapper",
+				"crojob2",
+				"crojob2_night"
+			}
+		},
+		complete_crojob_for_deathwish = {
+			award = "cow_2",
+			difficulty = {
+				"overkill_290"
+			},
+			jobs = {
+				"crojob_wrapper",
+				"crojob2",
+				"crojob2_night"
+			}
+		},
+		complete_crojob_dock_all = {
+			award = "cow_6",
+			difficulty = {
+				"normal",
+				"hard",
+				"overkill",
+				"overkill_145",
+				"overkill_290"
+			},
+			jobs = {"crojob1"}
+		},
+		complete_crojob_dock_deathwish = {
+			award = "cow_7",
+			difficulty = {
+				"overkill_290"
+			},
+			jobs = {"crojob1"}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			full_jobs_id = {
@@ -2521,6 +2577,7 @@ function TweakData:init()
 	self.grenades.frag.damage = 30
 	self.grenades.frag.player_damage = 10
 	self.grenades.frag.range = 1000
+	self.grenades.frag.name_id = "bm_grenade_frag"
 	self.grenades.launcher_frag = {}
 	self.grenades.launcher_frag.damage = 34
 	self.grenades.launcher_frag.curve_pow = 0.1
@@ -2529,6 +2586,7 @@ function TweakData:init()
 	self.grenades.launcher_frag.init_timer = 2.5
 	self.grenades.launcher_frag.mass_look_up_modifier = 1
 	self.grenades.launcher_frag.sound_event = "gl_explode"
+	self.grenades.launcher_frag.name_id = "bm_launcher_frag"
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

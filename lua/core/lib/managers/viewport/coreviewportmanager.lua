@@ -114,6 +114,14 @@ function ViewportManager:resolution_changed()
 	self._resolution_changed_event_handler:dispatch()
 end
 
+function ViewportManager:editor_reload_environment(name)
+	self._env_manager:editor_reload(name)
+end
+
+function ViewportManager:editor_add_environment_created_callback(func)
+	self._env_manager:editor_add_created_callback(func)
+end
+
 function ViewportManager:preload_environment(name)
 	self._env_manager:preload_environment(name)
 end

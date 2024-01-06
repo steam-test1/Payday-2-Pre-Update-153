@@ -148,7 +148,10 @@ function EnvironmentLayer:_load_environment_areas()
 	for _, area in ipairs(managers.environment_area:areas()) do
 		local unit = EnvironmentLayer.super.do_spawn_unit(self, self._environment_area_unit, area:position(), area:rotation())
 		unit:unit_data().environment_area = area
-		unit:unit_data().environment_area:set_unit(unit)
+		local new_name_id = unit:unit_data().environment_area:set_unit(unit)
+		if new_name_id then
+			self:set_name_id(unit, new_name_id)
+		end
 	end
 end
 
@@ -198,7 +201,10 @@ function EnvironmentLayer:old_load(environment)
 	for _, area in ipairs(managers.environment_area:areas()) do
 		local unit = EnvironmentLayer.super.do_spawn_unit(self, self._environment_area_unit, area:position(), area:rotation())
 		unit:unit_data().environment_area = area
-		unit:unit_data().environment_area:set_unit(unit)
+		local new_name_id = unit:unit_data().environment_area:set_unit(unit)
+		if new_name_id then
+			self:set_name_id(unit, new_name_id)
+		end
 	end
 	if environment._units then
 		for _, unit in ipairs(environment._units) do
@@ -337,6 +343,16 @@ function EnvironmentLayer:_build_environment_combobox_and_list()
 		end
 	})
 	self._environments_combobox = combobox_params
+	managers.viewport:editor_add_environment_created_callback(callback(self, self, "on_environment_list_changed"))
+end
+
+function EnvironmentLayer:on_environment_list_changed()
+	local list = managers.database:list_entries_of_type("environment")
+	local selected_value = self._environments_combobox.ctrlr:get_value()
+	CoreEws.update_combobox_options(self._environments_combobox, list)
+	if table.contains(list, selected_value) then
+		self._environments_combobox.ctrlr:set_value(selected_value)
+	end
 end
 
 function EnvironmentLayer:build_panel(notebook)
@@ -413,14 +429,23 @@ function EnvironmentLayer:build_panel(notebook)
 		filter_count = filter_count + 1
 	end
 	self._environment_sizer:add(environment_filter_sizer, 0, 0, "EXPAND")
-	local transition_sizer = EWS:BoxSizer("HORIZONTAL")
-	transition_sizer:add(EWS:StaticText(self._env_panel, "Fade Time [sec]: ", "", ""), 2, 0, "ALIGN_CENTER_VERTICAL")
-	local transition = EWS:TextCtrl(self._env_panel, "0.10", "", "TE_CENTRE")
-	transition_sizer:add(transition, 3, 0, "EXPAND")
+	local transition_prio_sizer = EWS:BoxSizer("HORIZONTAL")
+	transition_prio_sizer:add(EWS:StaticText(self._env_panel, "Fade Time [sec]: ", "", ""), 0, 0, "ALIGN_CENTER_VERTICAL")
+	local default_transition_text = string.format("%.2f", managers.environment_area:default_transition_time())
+	local transition = EWS:TextCtrl(self._env_panel, default_transition_text, "", "TE_CENTRE")
+	transition_prio_sizer:add(transition, 3, 0, "EXPAND")
 	transition:connect("EVT_CHAR", callback(nil, _G, "verify_number"), transition)
 	transition:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_transition_time"), nil)
 	transition:connect("EVT_KILL_FOCUS", callback(self, self, "set_transition_time"), nil)
-	self._environment_sizer:add(transition_sizer, 0, 0, "EXPAND")
+	transition_prio_sizer:add_spacer(10, 0)
+	transition_prio_sizer:add(EWS:StaticText(self._env_panel, "Prio (1=highest): ", "", ""), 0, 0, "ALIGN_CENTER_VERTICAL")
+	local default_prio_text = tostring(managers.environment_area:default_prio())
+	local prio = EWS:TextCtrl(self._env_panel, default_prio_text, "", "TE_CENTRE")
+	transition_prio_sizer:add(prio, 3, 0, "EXPAND")
+	prio:connect("EVT_CHAR", callback(nil, _G, "verify_number"), prio)
+	prio:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_prio"), nil)
+	prio:connect("EVT_KILL_FOCUS", callback(self, self, "set_prio"), nil)
+	self._environment_sizer:add(transition_prio_sizer, 0, 0, "EXPAND")
 	local permanent_cb = EWS:CheckBox(self._env_panel, "Permanent", "")
 	permanent_cb:set_value(false)
 	permanent_cb:set_tool_tip("This is only useful when it's a linear single player game.")
@@ -428,6 +453,7 @@ function EnvironmentLayer:build_panel(notebook)
 	self._environment_sizer:add(permanent_cb, 0, 0, "EXPAND")
 	permanent_cb:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_permanent"), nil)
 	self._environment_area_ctrls.transition_time = transition
+	self._environment_area_ctrls.prio = prio
 	self._environment_area_ctrls.permanent_cb = permanent_cb
 	self._env_sizer:add(self._environment_sizer, 0, 0, "EXPAND")
 	self._dome_occ_sizer = EWS:StaticBoxSizer(self._env_panel, "VERTICAL", "Dome Occlusion Shape")
@@ -601,6 +627,14 @@ function EnvironmentLayer:set_transition_time()
 	area:set_transition_time(value)
 end
 
+function EnvironmentLayer:set_prio()
+	local area = self._selected_unit:unit_data().environment_area
+	local value = tonumber(self._environment_area_ctrls.prio:get_value())
+	value = math.clamp(value, 1, 100000000)
+	self._environment_area_ctrls.prio:change_value(tostring(value))
+	area:set_prio(value)
+end
+
 function EnvironmentLayer:set_env_filter(name)
 	local area = self._selected_unit:unit_data().environment_area
 	local filter_list = {}
@@ -732,6 +766,7 @@ function EnvironmentLayer:clone_edited_values(unit, source)
 		area:set_filter_list(source_area:filter_list() and table.list_copy(source_area:filter_list()))
 		area:set_bezier_curve(source_area:bezier_curve() and table.list_copy(source_area:bezier_curve()))
 		area:set_transition_time(source_area:transition_time())
+		area:set_prio(source_area:prio())
 		area:set_permanent(source_area:permanent())
 		area:set_property("width", source_area:property("width"))
 		area:set_property("depth", source_area:property("depth"))
@@ -802,6 +837,7 @@ function EnvironmentLayer:set_environment_area_parameters()
 	CoreEws.set_combobox_and_list_enabled(self._environment_area_ctrls.environment_combobox, false)
 	self._environment_area_ctrls.permanent_cb:set_enabled(false)
 	self._environment_area_ctrls.transition_time:set_enabled(false)
+	self._environment_area_ctrls.prio:set_enabled(false)
 	for _, env_filter_cb in pairs(self._environment_area_ctrls.env_filter_cb_map) do
 		env_filter_cb:set_enabled(false)
 	end
@@ -819,6 +855,8 @@ function EnvironmentLayer:set_environment_area_parameters()
 			self._environment_area_ctrls.permanent_cb:set_value(self.ENABLE_PERMANENT and area:permanent())
 			self._environment_area_ctrls.transition_time:set_enabled(true)
 			self._environment_area_ctrls.transition_time:set_value(string.format("%.2f", area:transition_time()))
+			self._environment_area_ctrls.prio:set_enabled(true)
+			self._environment_area_ctrls.prio:set_value(tostring(area:prio()))
 			local filter_map = managers.viewport:get_predefined_environment_filter_map()
 			local filter_list = area:filter_list()
 			for name, env_filter_cb in pairs(self._environment_area_ctrls.env_filter_cb_map) do

@@ -2765,6 +2765,100 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck7_9",
 				desc_id = "menu_deck7_9_desc"
 			}
+		},
+		{
+			name_id = "menu_st_spec_8",
+			desc_id = "menu_st_spec_8_desc",
+			dlc = "character_pack_dragan",
+			{
+				upgrades = {
+					"player_damage_dampener_close_contact_1"
+				},
+				cost = 200,
+				icon_xy = {3, 4},
+				name_id = "menu_deck8_1",
+				desc_id = "menu_deck8_1_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_headshot_damage_multiplier"
+				},
+				cost = 300,
+				icon_xy = {1, 0},
+				name_id = "menu_deck8_2",
+				desc_id = "menu_deck8_2_desc"
+			},
+			{
+				upgrades = {
+					"player_damage_dampener_close_contact_2"
+				},
+				cost = 400,
+				icon_xy = {4, 4},
+				name_id = "menu_deck8_3",
+				desc_id = "menu_deck8_3_desc"
+			},
+			{
+				upgrades = {
+					"passive_player_xp_multiplier",
+					"player_passive_suspicion_bonus",
+					"player_passive_armor_movement_penalty_multiplier"
+				},
+				cost = 600,
+				icon_xy = {3, 0},
+				name_id = "menu_deck8_4",
+				desc_id = "menu_deck8_4_desc"
+			},
+			{
+				upgrades = {
+					"player_damage_dampener_close_contact_3",
+					"melee_stacking_hit_expire_t",
+					"melee_stacking_hit_damage_multiplier_1"
+				},
+				cost = 1000,
+				icon_xy = {5, 4},
+				name_id = "menu_deck8_5",
+				desc_id = "menu_deck8_5_desc"
+			},
+			{
+				upgrades = {
+					"armor_kit",
+					"player_pick_up_ammo_multiplier"
+				},
+				cost = 1600,
+				icon_xy = {5, 0},
+				name_id = "menu_deck8_6",
+				desc_id = "menu_deck8_6_desc"
+			},
+			{
+				upgrades = {
+					"player_damage_dampener_outnumbered_strong",
+					"melee_stacking_hit_damage_multiplier_2"
+				},
+				cost = 2400,
+				icon_xy = {6, 4},
+				name_id = "menu_deck8_7",
+				desc_id = "menu_deck8_7_desc"
+			},
+			{
+				upgrades = {
+					"weapon_passive_damage_multiplier",
+					"passive_doctor_bag_interaction_speed_multiplier"
+				},
+				cost = 3200,
+				icon_xy = {7, 0},
+				name_id = "menu_deck8_8",
+				desc_id = "menu_deck8_8_desc"
+			},
+			{
+				upgrades = {
+					"player_melee_life_leech",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {7, 4},
+				name_id = "menu_deck8_9",
+				desc_id = "menu_deck8_9_desc"
+			}
 		}
 	}
 end

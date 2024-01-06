@@ -2861,6 +2861,8 @@ function CrimeNetGui:update_job_gui(job, inside)
 					if job.icon_panel and job.icon_panel:child(kick_icon) then
 						icon_alpha = math.step(icon_alpha, wanted_icon_alpha, dt * 2)
 						job.icon_panel:child(kick_icon):set_alpha(icon_alpha)
+					else
+						icon_alpha = wanted_icon_alpha
 					end
 					alpha_met = alpha_met and text_alpha == wanted_text_alpha and icon_alpha == wanted_icon_alpha
 					if not alpha_met or inside then

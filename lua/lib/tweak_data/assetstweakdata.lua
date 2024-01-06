@@ -39,19 +39,19 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_pd.name_id = "menu_asset_risklevel_0"
 	self.risk_pd.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_0"
 	self.risk_pd.stages = "all"
-	self.risk_pd.exclude_stages = {"safehouse"}
+	self.risk_pd.exclude_stages = {"safehouse", "crojob1"}
 	self.risk_pd.risk_lock = 0
 	self.risk_swat = {}
 	self.risk_swat.name_id = "menu_asset_risklevel_1"
 	self.risk_swat.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_1"
 	self.risk_swat.stages = "all"
-	self.risk_swat.exclude_stages = {"safehouse"}
+	self.risk_swat.exclude_stages = {"safehouse", "crojob1"}
 	self.risk_swat.risk_lock = 1
 	self.risk_fbi = {}
 	self.risk_fbi.name_id = "menu_asset_risklevel_2"
 	self.risk_fbi.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_2"
 	self.risk_fbi.stages = "all"
-	self.risk_fbi.exclude_stages = {"safehouse"}
+	self.risk_fbi.exclude_stages = {"safehouse", "crojob1"}
 	self.risk_fbi.risk_lock = 2
 	self.risk_death_squad = {}
 	self.risk_death_squad.name_id = "menu_asset_risklevel_3"
@@ -66,7 +66,11 @@ function AssetsTweakData:_init_gage_assets(tweak_data)
 	self.gage_assignment.name_id = "menu_asset_gage_assignment"
 	self.gage_assignment.texture = "guis/dlcs/gage_pack_jobs/textures/pd2/mission_briefing/assets/gage_assignment"
 	self.gage_assignment.stages = "all"
-	self.gage_assignment.exclude_stages = {"safehouse", "haunted"}
+	self.gage_assignment.exclude_stages = {
+		"safehouse",
+		"haunted",
+		"crojob1"
+	}
 end
 
 function AssetsTweakData:_init_assets(tweak_data)
@@ -819,6 +823,33 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.hox_2.stages = {"hox_2"}
 	self.hox_2.visible_if_locked = true
 	self.hox_2.no_mystery = true
+	self.crojob1_plan = {}
+	self.crojob1_plan.name_id = "menu_asset_arm_info"
+	self.crojob1_plan.texture = "guis/textures/pd2/mission_briefing/assets/crojob/stage_1/assets_crojob_insiderinfo_bomb"
+	self.crojob1_plan.stages = {"crojob1"}
+	self.crojob1_plan.visible_if_locked = true
+	self.crojob1_plan.no_mystery = true
+	self.crojob2_plan_a = {}
+	self.crojob2_plan_a.name_id = "menu_asset_roberts_plan_a"
+	self.crojob2_plan_a.texture = "guis/textures/pd2/mission_briefing/assets/crojob/stage_2/assets_crojob_insiderinfo_stealth"
+	self.crojob2_plan_a.stages = {"crojob2"}
+	self.crojob2_plan_a.visible_if_locked = true
+	self.crojob2_plan_a.no_mystery = true
+	self.crojob2_plan_b = {}
+	self.crojob2_plan_b.name_id = "menu_asset_roberts_plan_b"
+	self.crojob2_plan_b.texture = "guis/textures/pd2/mission_briefing/assets/crojob/stage_2/assets_crojob_insiderinfo_loud"
+	self.crojob2_plan_b.stages = {"crojob2"}
+	self.crojob2_plan_b.visible_if_locked = true
+	self.crojob2_plan_b.no_mystery = true
+	self.crojob3_plan = {}
+	self.crojob3_plan.name_id = "menu_asset_roberts_plan_a"
+	self.crojob3_plan.texture = "guis/textures/pd2/mission_briefing/assets/crojob/stage_3/assets_crojob_insiderinfo"
+	self.crojob3_plan.stages = {
+		"crojob3",
+		"crojob3_night"
+	}
+	self.crojob3_plan.visible_if_locked = true
+	self.crojob3_plan.no_mystery = true
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

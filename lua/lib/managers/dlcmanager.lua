@@ -307,8 +307,16 @@ function GenericDLCManager:has_character_pack_clover()
 	return Global.dlc_manager.all_dlc_data.character_pack_clover and Global.dlc_manager.all_dlc_data.character_pack_clover.verified
 end
 
+function GenericDLCManager:has_character_pack_dragan()
+	return Global.dlc_manager.all_dlc_data.character_pack_dragan and Global.dlc_manager.all_dlc_data.character_pack_dragan.verified
+end
+
 function GenericDLCManager:has_hope_diamond()
 	return Global.dlc_manager.all_dlc_data.hope_diamond and Global.dlc_manager.all_dlc_data.hope_diamond.verified
+end
+
+function GenericDLCManager:has_the_bomb()
+	return Global.dlc_manager.all_dlc_data.the_bomb and Global.dlc_manager.all_dlc_data.the_bomb.verified
 end
 
 function GenericDLCManager:has_xmas_soundtrack()
@@ -595,7 +603,9 @@ function WINDLCManager:init()
 				external = true
 			},
 			character_pack_clover = {app_id = "337661", no_install = true},
+			character_pack_dragan = {app_id = "344140", no_install = true},
 			hope_diamond = {app_id = "337660", no_install = true},
+			the_bomb = {app_id = "339480", no_install = true},
 			xmas_soundtrack = {app_id = "267381", no_install = true},
 			twitch_pack = {app_id = "306110", no_install = true},
 			humble_pack2 = {app_id = "331040", no_install = true},

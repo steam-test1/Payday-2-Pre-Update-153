@@ -6,7 +6,6 @@ TeamAILogicTravel.damage_clbk = TeamAILogicIdle.damage_clbk
 TeamAILogicTravel.on_cop_neutralized = TeamAILogicIdle.on_cop_neutralized
 TeamAILogicTravel.on_objective_unit_damaged = TeamAILogicIdle.on_objective_unit_damaged
 TeamAILogicTravel.on_alert = TeamAILogicIdle.on_alert
-TeamAILogicTravel.is_available_for_assignment = TeamAILogicIdle.is_available_for_assignment
 TeamAILogicTravel.on_long_dis_interacted = TeamAILogicIdle.on_long_dis_interacted
 TeamAILogicTravel.on_new_objective = TeamAILogicIdle.on_new_objective
 TeamAILogicTravel.clbk_heat = TeamAILogicIdle.clbk_heat
@@ -142,4 +141,14 @@ function TeamAILogicTravel._remove_enemy_attention(param)
 		return
 	end
 	CopLogicBase._reset_attention(data)
+end
+
+function TeamAILogicTravel.is_available_for_assignment(data, new_objective)
+	if new_objective and new_objective.forced then
+		return true
+	elseif data.objective and data.objective.type == "act" then
+		return
+	else
+		return TeamAILogicAssault.is_available_for_assignment(data, new_objective)
+	end
 end

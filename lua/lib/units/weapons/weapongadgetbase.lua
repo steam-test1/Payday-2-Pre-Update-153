@@ -17,6 +17,11 @@ function WeaponGadgetBase:set_state(on, sound_source)
 	self:_check_state()
 end
 
+function WeaponGadgetBase:is_usable()
+	print("WeaponGadgetBase:is_usable()")
+	return true
+end
+
 function WeaponGadgetBase:set_on()
 	self._on = true
 	self:_check_state()

@@ -673,7 +673,8 @@ function PlayerStandard:_stance_entered(unequipped)
 	else
 		stances = tweak_data.player.stances[stance_id] or tweak_data.player.stances.default
 	end
-	local misc_attribs = self._state_data.in_steelsight and stances.steelsight or self._state_data.ducking and stances.crouched or stances.standard
+	local misc_attribs
+	misc_attribs = self._state_data.in_steelsight and stances.steelsight or self._state_data.ducking and stances.crouched or stances.standard
 	local duration = tweak_data.player.TRANSITION_DURATION + (self._equipped_unit:base():transition_duration() or 0)
 	local duration_multiplier = self._state_data.in_steelsight and 1 / self._equipped_unit:base():enter_steelsight_speed_multiplier() or 1
 	local new_fov = self:get_zoom_fov(misc_attribs) + 0
@@ -1302,12 +1303,26 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee)
 				dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_damage_multiplier", 1)
 			end
 			dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_" .. tostring(tweak_data.blackmarket.melee_weapons[melee_entry].stats.weapon_type) .. "_damage_multiplier", 1)
+			if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
+				self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+				self._state_data.stacking_dmg_mul.melee = self._state_data.stacking_dmg_mul.melee or {nil, 0}
+				local stack = self._state_data.stacking_dmg_mul.melee
+				if stack[1] and t < stack[1] then
+					dmg_multiplier = dmg_multiplier * (1 + managers.player:upgrade_value("melee", "stacking_hit_damage_multiplier", 0) * stack[2])
+				else
+					stack[2] = 0
+				end
+			end
 			local health_ratio = self._ext_damage:health_ratio()
 			if health_ratio <= tweak_data.upgrades.player_damage_health_ratio_threshold then
 				local damage_ratio = 1 - health_ratio / math.max(0.01, tweak_data.upgrades.player_damage_health_ratio_threshold)
 				dmg_multiplier = dmg_multiplier * (1 + managers.player:upgrade_value("player", "melee_damage_health_ratio_multiplier", 0) * damage_ratio)
 			end
 			dmg_multiplier = dmg_multiplier * managers.player:temporary_upgrade_value("temporary", "berserker_damage_multiplier", 1)
+			if not managers.enemy:is_civilian(character_unit) and managers.player:has_category_upgrade("temporary", "melee_life_leech") and not managers.player:has_activate_temporary_upgrade("temporary", "melee_life_leech") then
+				managers.player:activate_temporary_upgrade("temporary", "melee_life_leech")
+				self._unit:character_damage():restore_health(managers.player:temporary_upgrade_value("temporary", "melee_life_leech", 1))
+			end
 			local action_data = {}
 			action_data.variant = "melee"
 			action_data.damage = shield_knock and 0 or damage * dmg_multiplier
@@ -1316,10 +1331,29 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee)
 			action_data.col_ray = col_ray
 			action_data.shield_knock = can_shield_knock
 			action_data.name_id = melee_entry
+			if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
+				self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+				self._state_data.stacking_dmg_mul.melee = self._state_data.stacking_dmg_mul.melee or {nil, 0}
+				local stack = self._state_data.stacking_dmg_mul.melee
+				if character_unit:character_damage().dead and not character_unit:character_damage():dead() then
+					stack[1] = t + managers.player:upgrade_value("melee", "stacking_hit_expire_t", 1)
+					stack[2] = math.min(stack[2] + 1, tweak_data.upgrades.max_melee_weapon_dmg_mul_stacks or 5)
+				else
+					stack[1] = nil
+					stack[2] = 0
+				end
+			end
 			local defense_data = character_unit:character_damage():damage_melee(action_data)
 			return defense_data
 		end
 	else
+	end
+	if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
+		self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+		self._state_data.stacking_dmg_mul.melee = self._state_data.stacking_dmg_mul.melee or {nil, 0}
+		local stack = self._state_data.stacking_dmg_mul.melee
+		stack[1] = nil
+		stack[2] = 0
 	end
 	return col_ray
 end

@@ -419,6 +419,7 @@ function CoreEnvEditor:write_to_disk(path, new_name)
 		file:print("</environment>\n")
 		file:close()
 	end
+	managers.viewport:editor_reload_environment(managers.database:entry_path(path))
 end
 
 function CoreEnvEditor:write_sky_orientation(file)

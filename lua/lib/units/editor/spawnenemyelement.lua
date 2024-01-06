@@ -122,6 +122,10 @@ function SpawnEnemyUnitElement:post_init(...)
 end
 
 function SpawnEnemyUnitElement:test_element()
+	if not managers.navigation:is_data_ready() then
+		EWS:message_box(Global.frame_panel, "Can't test spawn unit without ready navigation data (AI-graph)", "Spawn", "OK,ICON_ERROR", Vector3(-1, -1, 0))
+		return
+	end
 	if self._hed.enemy ~= "none" and managers.groupai:state():is_AI_enabled() then
 		local unit = safe_spawn_unit(Idstring(self._hed.enemy), self._unit:position(), self._unit:rotation())
 		table.insert(self._enemies, unit)

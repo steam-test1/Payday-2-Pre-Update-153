@@ -34,6 +34,10 @@ SpawnCivilianUnitElement._options = {
 	"units/payday2/characters/civ_female_party_2/civ_female_party_2",
 	"units/payday2/characters/civ_female_party_3/civ_female_party_3",
 	"units/payday2/characters/civ_female_party_4/civ_female_party_4",
+	"units/payday2/characters/civ_female_waitress_1/civ_female_waitress_1",
+	"units/payday2/characters/civ_female_waitress_2/civ_female_waitress_2",
+	"units/payday2/characters/civ_female_waitress_3/civ_female_waitress_3",
+	"units/payday2/characters/civ_female_waitress_4/civ_female_waitress_4",
 	"units/payday2/characters/civ_female_wife_trophy_1/civ_female_wife_trophy_1",
 	"units/payday2/characters/civ_female_wife_trophy_2/civ_female_wife_trophy_2",
 	"units/payday2/characters/civ_male_bank_1/civ_male_bank_1",
@@ -89,7 +93,10 @@ SpawnCivilianUnitElement._options = {
 	"units/pd2_dlc1/characters/civ_male_casual_11/civ_male_casual_11",
 	"units/pd2_dlc1/characters/civ_male_bank_manager_2/civ_male_bank_manager_2",
 	"units/pd2_dlc2/characters/civ_female_bank_assistant_1/civ_female_bank_assistant_1",
-	"units/pd2_dlc2/characters/civ_female_bank_assistant_2/civ_female_bank_assistant_2"
+	"units/pd2_dlc2/characters/civ_female_bank_assistant_2/civ_female_bank_assistant_2",
+	"units/pd2_dlc3/characters/civ_female_casino_1/civ_female_casino_1",
+	"units/pd2_dlc3/characters/civ_female_casino_2/civ_female_casino_2",
+	"units/pd2_dlc3/characters/civ_female_casino_3/civ_female_casino_3"
 }
 
 function SpawnCivilianUnitElement:init(unit)

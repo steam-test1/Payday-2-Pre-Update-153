@@ -73,6 +73,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.shells = 2100
 	self.bag_values.turret = 10000
 	self.bag_values.sandwich = 10000
+	self.bag_values.cro_loot = 10000
 	self.bag_values.hope_diamond = 30000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
@@ -159,6 +160,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.goty_weapon_bundle_2014 = 1
 	self.global_value_multipliers.goty_heist_bundle_2014 = 1
 	self.global_value_multipliers.goty_dlc_bundle_2014 = 1
+	self.global_value_multipliers.character_pack_dragan = 1
+	self.global_value_multipliers.the_bomb = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -194,6 +197,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.goty_weapon_bundle_2014 = 0.2
 	self.global_value_bonus_multiplier.goty_heist_bundle_2014 = 0.2
 	self.global_value_bonus_multiplier.goty_dlc_bundle_2014 = 0.2
+	self.global_value_bonus_multiplier.character_pack_dragan = 0.2
+	self.global_value_bonus_multiplier.the_bomb = 0.2
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -247,6 +252,7 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_asset_cost_thermite = 15000
 	self.preplaning_asset_cost_escapebig = 10000
 	self.preplaning_asset_cost_spycam = 1000
+	self.preplaning_asset_cost_delay10 = 1000
 	self.preplaning_asset_cost_delay20 = 1000
 	self.preplaning_asset_cost_delay30 = 2000
 	self.preplaning_asset_cost_timelock60 = 2000
@@ -274,6 +280,15 @@ function MoneyTweakData:init(tweak_data)
 	self.preplaning_mia_cost_delayed_police = 2000
 	self.preplaning_mia_cost_reduce_mobsters = 2000
 	self.preplaning_asset_cost_glass_cutter = 1000
+	self.preplaning_thebomb_cost_spotter = 4000
+	self.preplaning_thebomb_cost_crowbar = 1000
+	self.preplaning_thebomb_cost_ladder = 1000
+	self.preplaning_thebomb_cost_hacker = 3000
+	self.preplaning_thebomb_cost_manifest = 2000
+	self.preplaning_thebomb_cost_pilot = 3000
+	self.preplaning_thebomb_cost_escape_mid = 6000
+	self.preplaning_thebomb_cost_escape_close = 10000
+	self.preplaning_thebomb_cost_demolition = 500
 	self.small_loot = {}
 	if difficulty_index <= 2 then
 		self.small_loot.money_bundle = 1000

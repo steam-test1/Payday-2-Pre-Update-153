@@ -3,7 +3,8 @@ core:import("CoreClass")
 core:import("CoreEnvironmentHandler")
 core:import("CoreEnvironmentFeeder")
 EnvironmentManager = EnvironmentManager or CoreClass.class()
-local extension_id = Idstring("environment")
+local extension = "environment"
+local ids_extension = Idstring(extension)
 
 function EnvironmentManager:init()
 	self._env_data_map = {}
@@ -240,6 +241,41 @@ function EnvironmentManager:_set_global_feeder(feeder)
 	return old_feeder
 end
 
+function EnvironmentManager:editor_add_created_callback(func)
+	self._created_callback_list = self._created_callback_list or {}
+	table.insert(self._created_callback_list, func)
+end
+
+function EnvironmentManager:editor_reload(path)
+	local entry_path = managers.database:entry_relative_path(path .. "." .. extension)
+	local is_new = not managers.database:has(entry_path)
+	local source_files = {entry_path}
+	for _, old_path in ipairs(managers.database:list_entries_of_type("environment")) do
+		table.insert(source_files, old_path .. "." .. extension)
+	end
+	local compile_settings = {
+		platform = string.lower(SystemInfo:platform():s()),
+		source_root = managers.database:base_path(),
+		target_db_root = Application:base_path() .. "/assets",
+		target_db_name = "all",
+		source_files = source_files,
+		verbose = false,
+		send_idstrings = false
+	}
+	Application:data_compile(compile_settings)
+	DB:reload()
+	managers.database:clear_all_cached_indices()
+	PackageManager:reload(ids_extension, path:id())
+	if self._env_data_map[path] then
+		self._env_data_map[path] = self:_load(path)
+	end
+	if is_new and self._created_callback_list then
+		for _, func in ipairs(self._created_callback_list) do
+			func(path)
+		end
+	end
+end
+
 function EnvironmentManager:_get_data(path)
 	local env_data = self._env_data_map[path]
 	if not env_data then
@@ -264,9 +300,9 @@ end
 function EnvironmentManager:_load(path)
 	local raw_data
 	if Application:editor() then
-		raw_data = PackageManager:editor_load_script_data(extension_id, path:id())
+		raw_data = PackageManager:editor_load_script_data(ids_extension, path:id())
 	else
-		raw_data = PackageManager:script_data(extension_id, path:id())
+		raw_data = PackageManager:script_data(ids_extension, path:id())
 	end
 	local env_data = {}
 	self:_load_env_data(nil, env_data, raw_data.data)

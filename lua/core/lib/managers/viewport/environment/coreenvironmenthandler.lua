@@ -212,15 +212,14 @@ end
 
 function EnvironmentHandler:update_environment_area(check_pos, area_list)
 	if self._current_area then
-		if self._current_area:still_inside(check_pos) then
-			return
+		local is_still_inside = self._current_area:still_inside(check_pos)
+		local is_inside_new = self:_check_inside(check_pos, area_list, is_still_inside and self._current_area:prio() or nil)
+		if not is_still_inside and not is_inside_new then
+			self:_leave_current_area()
 		end
-		if self:_check_inside(check_pos, area_list) then
-			return
-		end
-		self:_leave_current_area()
+	else
+		self:_check_inside(check_pos, area_list, nil)
 	end
-	self:_check_inside(check_pos, area_list)
 end
 
 function EnvironmentHandler:on_environment_area_removed(area)
@@ -250,29 +249,40 @@ function EnvironmentHandler:set_first_viewport(is_first_viewport)
 	end
 end
 
-function EnvironmentHandler:_check_inside(check_pos, area_list)
+function EnvironmentHandler:_check_inside(check_pos, area_list, min_prio)
 	local area_count = #area_list
 	if 0 < area_count then
-		for i = 1, self.AREAS_PER_FRAME do
+		local areas_per_frame = self.AREAS_PER_FRAME
+		local check_count = 0
+		for i = 1, area_count do
 			local area = area_list[self._area_iterator]
 			self._area_iterator = math.mod(self._area_iterator, area_count) + 1
-			if area:is_inside(check_pos) then
-				if self._current_area ~= area then
-					local environment = area:environment()
-					local blend_duration = area:transition_time()
-					local blend_bezier_curve = area:bezier_curve()
-					local filter_list = area:filter_list()
-					if area:permanent() then
-						managers.viewport:set_default_environment(environment, blend_duration, blend_bezier_curve)
-						if self._current_area then
-							self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._env_manager:default_environment())
+			if area:is_higher_prio(min_prio) then
+				if area:is_inside(check_pos) then
+					local id = area:id()
+					if self._current_area_id ~= id then
+						local environment = area:environment()
+						local blend_duration = area:transition_time()
+						local blend_bezier_curve = area:bezier_curve()
+						local filter_list = area:filter_list()
+						if area:permanent() then
+							managers.viewport:set_default_environment(environment, blend_duration, blend_bezier_curve)
+							if self._current_area then
+								self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._env_manager:default_environment())
+							end
+						else
+							self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._current_area ~= nil and self._env_manager:default_environment())
 						end
-					else
-						self:set_environment(environment, blend_duration, blend_bezier_curve, filter_list, self._current_area ~= nil and self._env_manager:default_environment())
 					end
+					self._current_area = area
+					self._current_area_id = id
+					self._area_iterator = 1
+					return true
 				end
-				self._current_area = area
-				return true
+				check_count = check_count + 1
+				if areas_per_frame <= check_count then
+					break
+				end
 			end
 		end
 	end
@@ -282,6 +292,7 @@ end
 function EnvironmentHandler:_leave_current_area()
 	self:set_environment(self._env_manager:default_environment(), self._current_area:transition_time(), self._current_area:bezier_curve(), nil, nil)
 	self._current_area = nil
+	self._current_area_id = nil
 end
 
 function EnvironmentHandler:_get_post_processor_modifier_material(viewport, scene, id, ids_processor_name, ids_effect_name, ids_modifier)

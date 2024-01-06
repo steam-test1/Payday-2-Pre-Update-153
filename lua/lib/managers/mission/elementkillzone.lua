@@ -13,12 +13,14 @@ function ElementKillZone:on_executed(instigator)
 		self._values.type = self._values.type or "sniper"
 		if instigator == managers.player:player_unit() then
 			managers.killzone:set_unit(instigator, self._values.type)
-		else
+		elseif instigator:network() then
 			local rpc_params = {
 				"killzone_set_unit",
 				self._values.type
 			}
 			instigator:network():send_to_unit(rpc_params)
+		else
+			Application:error("Unsupported unit type added to killzone:   " .. inspect(instigator))
 		end
 	end
 	ElementKillZone.super.on_executed(self, self._unit or instigator)

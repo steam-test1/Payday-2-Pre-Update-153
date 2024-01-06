@@ -807,8 +807,12 @@ end
 
 function WorldDefinition:_setup_variations(unit, data)
 	if data.mesh_variation and data.mesh_variation ~= "default" then
-		unit:unit_data().mesh_variation = data.mesh_variation
-		managers.sequence:run_sequence_simple2(unit:unit_data().mesh_variation, "change_state", unit)
+		if not Application:editor() or unit:damage():has_sequence(data.mesh_variation) then
+			unit:unit_data().mesh_variation = data.mesh_variation
+			managers.sequence:run_sequence_simple2(unit:unit_data().mesh_variation, "change_state", unit)
+		elseif Application:editor() then
+			managers.editor:output_info("Removed variation sequence " .. data.mesh_variation .. " from unit " .. unit:name():s())
+		end
 	end
 	if data.material_variation and data.material_variation ~= "default" then
 		unit:unit_data().material = data.material_variation

@@ -32,7 +32,7 @@ function SlotManager:init()
 	C_UnitManager:set_slot_infinite(36)
 	C_UnitManager:set_slot_infinite(37)
 	C_UnitManager:set_slot_infinite(38)
-	self._masks.all = World:make_slot_mask(1, 2, 3, 10, 11, 12, 19, 29, 33, 34, 35, 36, 37, 38)
+	self._masks.all = World:make_slot_mask(1, 2, 3, 10, 11, 12, 19, 29, 33, 34, 35, 36, 37, 38, 39)
 	self._masks.players = World:make_slot_mask(2, 3, 4, 5)
 	self._masks.criminals = World:make_slot_mask(2, 3, 16, 25)
 	self._masks.civilians = World:make_slot_mask(21)
@@ -72,8 +72,8 @@ function SlotManager:init()
 	self._masks.flesh = World:make_slot_mask(12, 16, 17, 21, 22, 24, 33)
 	self._masks.footstep = World:make_slot_mask(1, 8, 11)
 	self._masks.fire_damage = World:make_slot_mask(1, 2, 11)
-	self._masks.editor_all = self._masks.editor_all + 36 + 38
-	self._masks.statics_layer = self._masks.statics_layer + 36 + 38
+	self._masks.editor_all = self._masks.editor_all + 36 + 38 + 39
+	self._masks.statics_layer = self._masks.statics_layer + 36 + 38 + 39
 end
 
 CoreClass.override_class(CoreSlotManager.SlotManager, SlotManager)

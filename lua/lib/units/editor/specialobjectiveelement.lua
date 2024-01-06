@@ -87,6 +87,10 @@ function SpecialObjectiveUnitElement:post_init()
 end
 
 function SpecialObjectiveUnitElement:test_element()
+	if not managers.navigation:is_data_ready() then
+		EWS:message_box(Global.frame_panel, "Can't test spawn unit without ready navigation data (AI-graph)", "Spawn", "OK,ICON_ERROR", Vector3(-1, -1, 0))
+		return
+	end
 	local spawn_unit_name
 	if self._hed.test_unit == "default" then
 		local SO_access_strings = managers.navigation:convert_access_filter_to_table(self._hed.SO_access)

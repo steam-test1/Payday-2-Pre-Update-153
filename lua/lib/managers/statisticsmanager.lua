@@ -492,7 +492,9 @@ function StatisticsManager:_get_stat_tables()
 		"mus",
 		"gallery",
 		"haunted",
-		"pines"
+		"pines",
+		"crojob2",
+		"crojob3"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -510,9 +512,12 @@ function StatisticsManager:_get_stat_tables()
 		"alex_prof",
 		"watchdogs",
 		"watchdogs_prof",
+		"watchdogs_night",
+		"watchdogs_night_prof",
 		"firestarter",
 		"firestarter_prof",
 		"welcome_to_the_jungle_prof",
+		"welcome_to_the_jungle_night_prof",
 		"family",
 		"arm_fac",
 		"arm_par",
@@ -531,7 +536,9 @@ function StatisticsManager:_get_stat_tables()
 		"mus",
 		"gallery",
 		"haunted",
-		"pines"
+		"pines",
+		"crojob1",
+		"crojob2"
 	}
 	local mask_list = {
 		"character_locked",
@@ -682,7 +689,14 @@ function StatisticsManager:_get_stat_tables()
 		"cursed_crown",
 		"nun_town",
 		"robo_arnold",
-		"arch_nemesis"
+		"arch_nemesis",
+		"champion_dallas",
+		"dragan",
+		"dragan_begins",
+		"butcher",
+		"doctor",
+		"tech_lion",
+		"lady_butcher"
 	}
 	local weapon_list = {
 		"ak5",
@@ -749,7 +763,9 @@ function StatisticsManager:_get_stat_tables()
 		"sterling",
 		"mosin",
 		"m1928",
-		"l85a2"
+		"l85a2",
+		"vhs",
+		"hs2000"
 	}
 	local melee_list = {
 		"weapon",
@@ -782,7 +798,9 @@ function StatisticsManager:_get_stat_tables()
 		"model24",
 		"swagger",
 		"alien_maul",
-		"shillelagh"
+		"shillelagh",
+		"boxing_gloves",
+		"meat_cleaver"
 	}
 	local enemy_list = {
 		"civilian",
@@ -823,7 +841,8 @@ function StatisticsManager:_get_stat_tables()
 		"american",
 		"jowi",
 		"old_hoxton",
-		"female_1"
+		"female_1",
+		"dragan"
 	}
 	return level_list, job_list, mask_list, weapon_list, melee_list, enemy_list, armor_list, character_list
 end
@@ -970,7 +989,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 				if table.contains(weapon_list, weapon_name) then
 					stats["weapon_used_" .. weapon_name] = {type = "int", value = 1}
 				else
-					Application:error("Statistics Missing: weapon_used_" .. weapon_name)
+					print("Statistics Missing: weapon_used_" .. weapon_name)
 				end
 			end
 		end
@@ -978,25 +997,25 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		if table.contains(melee_list, melee_name) then
 			stats["melee_used_" .. melee_name] = {type = "int", value = 1}
 		elseif melee_name then
-			Application:error("Statistics Missing: melee_used_" .. melee_name)
+			print("Statistics Missing: melee_used_" .. melee_name)
 		end
 		local mask_id = managers.blackmarket:equipped_mask().mask_id
 		if table.contains(mask_list, mask_id) then
 			stats["mask_used_" .. mask_id] = {type = "int", value = 1}
 		elseif mask_id then
-			Application:error("Statistics Missing: mask_used_" .. mask_id)
+			print("Statistics Missing: mask_used_" .. mask_id)
 		end
 		local armor_id = managers.blackmarket:equipped_armor()
 		if table.contains(armor_list, armor_id) then
 			stats["armor_used_" .. armor_id] = {type = "int", value = 1}
 		elseif armor_id then
-			Application:error("Statistics Missing: armor_used_" .. armor_id)
+			print("Statistics Missing: armor_used_" .. armor_id)
 		end
 		local character_id = managers.network:session() and managers.network:session():local_peer():character()
 		if table.contains(character_list, character_id) then
 			stats["character_used_" .. character_id] = {type = "int", value = 1}
 		elseif character_id then
-			Application:error("Statistics Missing: character_used_" .. character_id)
+			print("Statistics Missing: character_used_" .. character_id)
 		end
 		stats["difficulty_" .. Global.game_settings.difficulty] = {type = "int", value = 1}
 	end
@@ -1008,7 +1027,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 					value = weapon_data.count
 				}
 			else
-				Application:error("Statistics Missing: weapon_kills_" .. weapon_name)
+				print("Statistics Missing: weapon_kills_" .. weapon_name)
 			end
 		end
 	end
@@ -1017,7 +1036,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			if table.contains(melee_list, melee_name) then
 				stats["melee_kills_" .. melee_name] = {type = "int", value = melee_kill}
 			else
-				Application:error("Statistics Missing: melee_kills_" .. melee_name)
+				print("Statistics Missing: melee_kills_" .. melee_name)
 			end
 		end
 	end
@@ -1029,7 +1048,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 					value = enemy_data.count
 				}
 			else
-				Application:error("Statistics Missing: enemy_kills_" .. enemy_name)
+				print("Statistics Missing: enemy_kills_" .. enemy_name)
 			end
 		end
 	end
@@ -1077,7 +1096,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		if table.contains(level_list, level_id) then
 			stats["level_" .. level_id] = {type = "int", value = 1}
 		elseif level_id then
-			Application:error("Statistics Missing: level_" .. level_id)
+			print("Statistics Missing: level_" .. level_id)
 		end
 		if level_id == "election_day_2" then
 			local stealth = managers.groupai and managers.groupai:state():whisper_mode()
@@ -1096,9 +1115,9 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			stats["contract_" .. job_id .. "_fail"] = {type = "int", value = 1}
 		end
 	elseif job_id then
-		Application:error("Statistics Missing: contract_" .. job_id .. "_win")
-		Application:error("Statistics Missing: contract_" .. job_id .. "_win_dropin")
-		Application:error("Statistics Missing: contract_" .. job_id .. "_fail")
+		print("Statistics Missing: contract_" .. job_id .. "_win")
+		print("Statistics Missing: contract_" .. job_id .. "_win_dropin")
+		print("Statistics Missing: contract_" .. job_id .. "_fail")
 	end
 	managers.network.account:publish_statistics(stats)
 end

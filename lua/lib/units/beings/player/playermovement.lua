@@ -39,7 +39,7 @@ function PlayerMovement:init(unit)
 		chk_t = 6,
 		nr_enemies = 2,
 		max_dis_sq = 640000,
-		has_dmg_dampener = managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered"),
+		has_dmg_dampener = managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered") or managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered_strong"),
 		has_dmg_mul = managers.player:has_category_upgrade("temporary", "dmg_multiplier_outnumbered")
 	}
 	if managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_category_upgrade("player", "long_dis_revive") then
@@ -606,10 +606,14 @@ function PlayerMovement:_upd_underdog_skill(t)
 				end
 				if data.has_dmg_dampener then
 					managers.player:activate_temporary_upgrade("temporary", "dmg_dampener_outnumbered")
+					managers.player:activate_temporary_upgrade("temporary", "dmg_dampener_outnumbered_strong")
 				end
 				break
 			end
 		end
+	end
+	if 1 <= nr_guys then
+		managers.player:activate_temporary_upgrade("temporary", "dmg_dampener_close_contact")
 	end
 	data.chk_t = t + (activated and data.chk_interval_active or data.chk_interval_inactive)
 end

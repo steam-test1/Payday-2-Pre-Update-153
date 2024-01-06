@@ -168,38 +168,35 @@ function SoundLayer:build_panel(notebook)
 	self._sound_sizer:add(soundbank_sizer, 0, 0, "EXPAND")
 	local h_sound_emitter_sizer = EWS:BoxSizer("HORIZONTAL")
 	self._sound_emitter_sizer = EWS:StaticBoxSizer(self._sound_panel, "VERTICAL", "Sound Emitter")
-	local emitter_soundbanks_sizer = EWS:BoxSizer("HORIZONTAL")
-	emitter_soundbanks_sizer:add(EWS:StaticText(self._sound_panel, "Categories", "", "ALIGN_LEFT"), 1, 0, "EXPAND")
 	local default_emitter_path = managers.sound_environment:game_default_emitter_path()
 	local emitter_paths = managers.sound_environment:emitter_paths()
-	self._emitter_paths = EWS:ComboBox(self._sound_panel, "", "", "CB_DROPDOWN,CB_READONLY")
-	if 0 < #emitter_paths then
-		for _, path in ipairs(emitter_paths) do
-			self._emitter_paths:append(path)
+	local ctrlr, combobox_params = CoreEws.combobox_and_list({
+		name = "Categories",
+		panel = self._sound_panel,
+		sizer = self._sound_emitter_sizer,
+		options = 0 < #emitter_paths and emitter_paths or {
+			"- No emitter paths in project -"
+		},
+		value = 0 < #emitter_paths and default_emitter_path or "- No emitter paths in project -",
+		value_changed_cb = function(params)
+			self:select_emitter_path(params.value)
 		end
-		self._emitter_paths:set_value(default_emitter_path)
-	else
-		self._emitter_paths:append("- No emitter paths in project -")
-		self._emitter_paths:set_value("- No emitter paths in project -")
-	end
-	self._emitter_paths:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "select_emitter_path"), nil)
-	emitter_soundbanks_sizer:add(self._emitter_paths, 3, 0, "EXPAND")
-	self._sound_emitter_sizer:add(emitter_soundbanks_sizer, 1, 0, "EXPAND")
-	local emitter_events_sizer = EWS:BoxSizer("HORIZONTAL")
-	emitter_events_sizer:add(EWS:StaticText(self._sound_panel, "Events", "", "ALIGN_LEFT"), 1, 0, "EXPAND")
-	self._emitter_events = EWS:ComboBox(self._sound_panel, "", "", "CB_DROPDOWN,CB_READONLY")
-	if default_emitter_path then
-		for _, event in ipairs(managers.sound_environment:emitter_events(default_emitter_path)) do
-			self._emitter_events:append(event)
+	})
+	self._emitter_path_combobox = combobox_params
+	local ctrlr, combobox_params = CoreEws.combobox_and_list({
+		name = "Events",
+		panel = self._sound_panel,
+		sizer = self._sound_emitter_sizer,
+		options = default_emitter_path and managers.sound_environment:emitter_events(default_emitter_path) or {
+			"- Talk to your sound designer -"
+		},
+		value = default_emitter_path and managers.sound_environment:emitter_events(default_emitter_path)[1] or "- Talk to your sound designer -",
+		sorted = true,
+		value_changed_cb = function(params)
+			self:select_emitter_event(params.value)
 		end
-		self._emitter_events:set_value(managers.sound_environment:emitter_events(default_emitter_path)[1])
-	else
-		self._emitter_events:append("- Talk to your sound designer -")
-		self._emitter_events:set_value("- Talk to your sound designer -")
-	end
-	self._emitter_events:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "select_emitter_event"), self._emitter_events)
-	emitter_events_sizer:add(self._emitter_events, 3, 0, "EXPAND")
-	self._sound_emitter_sizer:add(emitter_events_sizer, 1, 0, "EXPAND")
+	})
+	self._emitter_events_combobox = combobox_params
 	h_sound_emitter_sizer:add(self._sound_emitter_sizer, 1, 0, "EXPAND")
 	local restart_emitters = EWS:BitmapButton(self._sound_panel, CoreEws.image_path("toolbar\\refresh_16x16.png"), "", "NO_BORDER")
 	restart_emitters:set_tool_tip("Restarts all emitters.")
@@ -269,6 +266,21 @@ end
 
 function SoundLayer:_build_environment()
 	local sound_environment_sizer = EWS:StaticBoxSizer(self._sound_panel, "VERTICAL", "Sound Environment")
+	self._priority_params = {
+		name = "Priority:",
+		panel = self._sound_panel,
+		sizer = sound_environment_sizer,
+		value = 9,
+		floats = 0,
+		tooltip = "DISABLED",
+		min = 1,
+		max = 9,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local priority = CoreEws.number_controller(self._priority_params)
+	priority:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_environment_priority"), nil)
+	priority:connect("EVT_KILL_FOCUS", callback(self, self, "set_environment_priority"), nil)
 	local environment_sizer = EWS:BoxSizer("HORIZONTAL")
 	self._effect_params = {
 		name = "Effect:",
@@ -357,23 +369,24 @@ function SoundLayer:select_default_sound_environment(environments)
 	managers.sound_environment:set_default_environment(self._default_environment.value)
 end
 
-function SoundLayer:select_emitter_path()
+function SoundLayer:select_emitter_path(path)
 	local emitter = self._selected_unit:sound_data().emitter
-	emitter:set_emitter_path(self._emitter_paths:get_value())
-	self:set_sound_emitter_events(self._emitter_paths:get_value())
-	self._emitter_events:set_value(emitter:emitter_event())
+	emitter:set_emitter_path(path)
+	self:set_sound_emitter_events(path)
+	CoreEws.change_combobox_value(self._emitter_events_combobox, emitter:emitter_event())
 end
 
 function SoundLayer:set_sound_emitter_events(path)
-	self._emitter_events:clear()
-	for _, event in ipairs(managers.sound_environment:emitter_events(path)) do
-		self._emitter_events:append(event)
-	end
+	CoreEws.update_combobox_options(self._emitter_events_combobox, managers.sound_environment:emitter_events(path))
 end
 
-function SoundLayer:select_emitter_event()
+function SoundLayer:select_emitter_event(value)
 	local emitter = self._selected_unit:sound_data().emitter
-	emitter:set_emitter_event(self._emitter_events:get_value())
+	emitter:set_emitter_event(value)
+end
+
+function SoundLayer:set_environment_priority()
+	local area = self._selected_unit:sound_data().environment_area
 end
 
 function SoundLayer:select_sound_environment()
@@ -520,6 +533,7 @@ function SoundLayer:update_unit_settings()
 end
 
 function SoundLayer:set_sound_environment_parameters()
+	self._priority_params.number_ctrlr:set_enabled(false)
 	self._effect_params.ctrlr:set_enabled(false)
 	self._ambience_params.ctrlr:set_enabled(false)
 	self._occasional_params.ctrlr:set_enabled(false)
@@ -531,6 +545,7 @@ function SoundLayer:set_sound_environment_parameters()
 		if area then
 			self._current_shape_panel = area:panel(self._sound_panel, self._sound_environment_sizer)
 			self._current_shape_panel:set_visible(true)
+			self._priority_params.number_ctrlr:set_enabled(false)
 			self._effect_params.ctrlr:set_enabled(true)
 			self._ambience_params.ctrlr:set_enabled(true)
 			self._occasional_params.ctrlr:set_enabled(true)
@@ -549,16 +564,19 @@ function SoundLayer:set_sound_environment_parameters()
 end
 
 function SoundLayer:set_sound_emitter_parameters()
-	self._emitter_paths:set_enabled(false)
-	self._emitter_events:set_enabled(false)
+	self._emitter_path_combobox.ctrlr:set_enabled(false)
+	self._emitter_path_combobox.toolbar:set_enabled(false)
+	self._emitter_events_combobox.ctrlr:set_enabled(false)
+	self._emitter_events_combobox.toolbar:set_enabled(false)
 	if alive(self._selected_unit) and (self._selected_unit:name() == Idstring(self._emitter_unit) or self._selected_unit:name() == Idstring(self._area_emitter_unit)) then
 		local emitter = self._selected_unit:sound_data().emitter
 		if emitter then
-			self._emitter_paths:set_enabled(true)
-			self._emitter_paths:set_value(emitter:emitter_path())
-			self:set_sound_emitter_events(emitter:emitter_path())
-			self._emitter_events:set_enabled(true)
-			self._emitter_events:set_value(emitter:emitter_event())
+			self._emitter_path_combobox.ctrlr:set_enabled(true)
+			self._emitter_path_combobox.toolbar:set_enabled(true)
+			CoreEws.change_combobox_value(self._emitter_path_combobox, emitter:emitter_path())
+			self._emitter_events_combobox.ctrlr:set_enabled(true)
+			self._emitter_events_combobox.toolbar:set_enabled(true)
+			CoreEws.change_combobox_value(self._emitter_events_combobox, emitter:emitter_event())
 		end
 		if self._selected_unit:name() == Idstring(self._area_emitter_unit) then
 			local area = self._selected_unit:sound_data().emitter

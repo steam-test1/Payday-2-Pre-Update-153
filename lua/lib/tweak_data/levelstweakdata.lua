@@ -475,6 +475,43 @@ function LevelsTweakData:init()
 	self.safehouse.package = "packages/safehouse"
 	self.safehouse.cube = "cube_apply_heist_bank"
 	self.safehouse.team_ai_off = true
+	self.crojob2 = {}
+	self.crojob2.name_id = "heist_crojob2_hl"
+	self.crojob2.briefing_id = "heist_crojob2_briefing"
+	self.crojob2.briefing_dialog = "Play_pln_cr2_brf_01"
+	self.crojob2.world_name = "narratives/butcher/thebomb/stage_2"
+	self.crojob2.intro_event = "Play_pln_cr2_intro_01"
+	self.crojob2.outro_event = {
+		"butcher_cr1_debrief_01",
+		"butcher_cr1_debrief_02"
+	}
+	self.crojob2.music = "heist"
+	self.crojob2.package = {
+		"packages/dlcs/the_bomb/crojob_stage_2"
+	}
+	self.crojob2.cube = "cube_apply_heist_bank"
+	self.crojob2.ghost_bonus = 0.2
+	self.crojob2.max_bags = 21
+	self.crojob3 = {}
+	self.crojob3.name_id = "heist_crojob3_hl"
+	self.crojob3.briefing_id = "heist_crojob3_briefing"
+	self.crojob3.briefing_dialog = "Play_pln_cr3_brf_01"
+	self.crojob3.world_name = "narratives/butcher/thebomb/stage_3"
+	self.crojob3.intro_event = "Play_pln_cr3_intro_01"
+	self.crojob3.outro_event = "lol"
+	self.crojob3.music = "heist"
+	self.crojob3.package = {
+		"packages/dlcs/the_bomb/crojob_stage_3"
+	}
+	self.crojob3.cube = "cube_apply_heist_bank"
+	self.crojob3.max_bags = 16
+	self.crojob3_night = deep_clone(self.crojob3)
+	self.crojob3_night.env_params = {
+		environment = "environments/pd2_env_cro_night/pd2_env_cro_night"
+	}
+	self.crojob3_night.package = {
+		"packages/dlcs/the_bomb/crojob_stage_3_night"
+	}
 	self.arm_cro = {}
 	self.arm_cro.name_id = "heist_arm_cro_hl"
 	self.arm_cro.briefing_id = "heist_arm_cro_briefing"
@@ -716,7 +753,7 @@ function LevelsTweakData:init()
 	self.kosugi.package = "packages/kosugi"
 	self.kosugi.cube = "cube_apply_heist_bank"
 	self.kosugi.ghost_bonus = 0.05
-	self.kosugi.max_bags = 25
+	self.kosugi.max_bags = 30
 	self.gallery = deep_clone(self.framing_frame_1)
 	self.gallery.name_id = "heist_gallery_hl"
 	self.gallery.briefing_id = "heist_gallery_briefing"
@@ -775,7 +812,7 @@ function LevelsTweakData:init()
 	self.mus.music = "heist"
 	self.mus.package = "packages/narr_mus"
 	self.mus.cube = "cube_apply_heist_bank"
-	self.mus.max_bags = 20
+	self.mus.max_bags = 30
 	self.mus.ghost_bonus = 0.15
 	self._level_index = {
 		"welcome_to_the_jungle_1",
@@ -831,7 +868,10 @@ function LevelsTweakData:init()
 		"hox_1",
 		"hox_2",
 		"pines",
-		"mus"
+		"mus",
+		"crojob2",
+		"crojob3",
+		"crojob3_night"
 	}
 	self.escape_levels = {
 		"escape_cafe",

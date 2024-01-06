@@ -251,7 +251,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	local user_unit = self._setup.user_unit
 	self:_check_ammo_total(user_unit)
 	if alive(self._obj_fire) then
-		World:effect_manager():spawn(self._muzzle_effect_table)
+		self:_spawn_muzzle_effect(from_pos, direction)
 	end
 	if self._use_shell_ejection_effect then
 		World:effect_manager():spawn(self._shell_ejection_effect_table)
@@ -268,6 +268,10 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 		end
 	end
 	return ray_res
+end
+
+function RaycastWeaponBase:_spawn_muzzle_effect()
+	World:effect_manager():spawn(self._muzzle_effect_table)
 end
 
 function RaycastWeaponBase:_check_ammo_total(unit)
@@ -865,6 +869,7 @@ function RaycastWeaponBase:ammo_info()
 end
 
 function RaycastWeaponBase:set_ammo(ammo)
+	Application:debug(" .......... RaycastWeaponBase:set_ammo ")
 	local ammo_num = math.floor(ammo * self:get_ammo_max())
 	self:set_ammo_total(ammo_num)
 	self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), ammo_num))

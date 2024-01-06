@@ -38,6 +38,7 @@ end
 
 function CopLogicInactive.exit(data, new_logic_name, enter_params)
 	CopLogicBase.exit(data, new_logic_name, enter_params)
+	data.unit:brain():set_update_enabled_state(true)
 	local my_data = data.internal_data
 	CopLogicBase.cancel_delayed_clbks(my_data)
 end

@@ -233,6 +233,22 @@ function GuiTweakData:init()
 		store = 337660,
 		image = "guis/dlcs/character_pack_clover/textures/pd2/content_updates/hope_diamond"
 	}
+	local character_pack_dragan = {
+		id = "character_pack_dragan",
+		name_id = "menu_content_character_pack_dragan",
+		desc_id = "menu_content_character_pack_dragan_desc",
+		date_id = "menu_content_character_pack_dragan_date",
+		store = 344140,
+		image = "guis/dlcs/character_pack_dragan/textures/pd2/content_updates/dragan"
+	}
+	local the_bomb = {
+		id = "the_bomb",
+		name_id = "menu_content_the_bomb",
+		desc_id = "menu_content_the_bomb_desc",
+		date_id = "menu_content_the_bomb_date",
+		store = 339480,
+		image = "guis/dlcs/the_bomb/textures/pd2/content_updates/the_bomb"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -268,7 +284,9 @@ function GuiTweakData:init()
 			gage_pack_historical,
 			christmas_2014,
 			character_pack_clover,
-			hope_diamond
+			hope_diamond,
+			character_pack_dragan,
+			the_bomb
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1409,6 +1427,19 @@ function GuiTweakData:init()
 					},
 					post_event = "dentist_quote_set_a"
 				}
+			},
+			{
+				id = "the_butcher",
+				name_id = "heist_contact_the_butcher",
+				{
+					desc_id = "heist_contact_the_butcher_description",
+					videos = {
+						"the_butcher1",
+						"the_butcher2",
+						"the_butcher3"
+					},
+					post_event = "butcher_quote_set_a"
+				}
 			}
 		},
 		{
@@ -1504,6 +1535,19 @@ function GuiTweakData:init()
 					desc_id = "menu_clover_desc_codex",
 					videos = {"clover1", "clover2"},
 					post_event = "pln_contact_clover"
+				}
+			},
+			{
+				id = "dragan",
+				name_id = "menu_dragan",
+				{
+					desc_id = "menu_dragan_desc_codex",
+					videos = {
+						"dragan1",
+						"dragan2",
+						"dragan3"
+					},
+					post_event = "pln_contact_dragan"
 				}
 			}
 		}

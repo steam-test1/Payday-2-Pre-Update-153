@@ -41,9 +41,7 @@ function MenuSceneManager:init()
 	self._global_poses.snp = {
 		"husk_bullpup"
 	}
-	self._global_poses.lmg = {
-		"husk_bullpup"
-	}
+	self._global_poses.lmg = {"husk_lmg"}
 	self._global_poses.infamous = {
 		"husk_infamous1",
 		"husk_infamous2"
@@ -64,7 +62,22 @@ function MenuSceneManager:init()
 		"husk_mosconi"
 	}
 	self._global_poses.m249 = {"husk_m249"}
-	self._global_poses.mg42 = {"husk_mg42"}
+	self._global_poses.jowi = {
+		"husk_akimbo1",
+		"husk_akimbo2"
+	}
+	self._global_poses.x_1911 = {
+		"husk_akimbo1",
+		"husk_akimbo2"
+	}
+	self._global_poses.x_b92fs = {
+		"husk_akimbo1",
+		"husk_akimbo2"
+	}
+	self._global_poses.x_deagle = {
+		"husk_akimbo1",
+		"husk_akimbo2"
+	}
 	self._mask_units = {}
 	self._weapon_units = {}
 	self._character_visibilities = {}
@@ -1095,6 +1108,12 @@ function MenuSceneManager:_set_dimensions()
 		if screen_aspect < aspect_ratio then
 			width_mul = aspect_ratio
 		elseif screen_aspect > aspect_ratio then
+			local screen_res = Application:screen_resolution()
+			local new_height = screen_res.x / width_mul
+			if 0 < new_height % 2 then
+				local new_width = new_height * width_mul
+				width_mul = new_width / (new_height - 1)
+			end
 			y = (1 - aspect_ratio / width_mul) / 2
 			h = aspect_ratio / width_mul
 		end

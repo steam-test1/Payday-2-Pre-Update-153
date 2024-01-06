@@ -33,8 +33,6 @@ local ids_shadow_processor = Idstring("shadow_processor")
 local ids_shadow_rendering = Idstring("shadow_rendering")
 local ids_shadow_modifier = Idstring("shadow_modifier")
 local ids_shadow_modifier_id = Idstring("post_effect/shadow_processor/shadow_rendering/shadow_modifier"):key()
-local ref_cam_obj = ref_cam_obj
-local sky_material = sky_material
 local zero_rotation = Rotation(0, 0, 0)
 local zero_vector3 = Vector3(0, 0, 0)
 local temp_rotation = Rotation(0, 0, 0)
@@ -168,9 +166,9 @@ function UnderlayPathFeeder:apply(handler, viewport, scene)
 	Global._underlay_ref_camera:set_near_range(1000)
 	Global._underlay_ref_camera:set_far_range(10000000)
 	Global._underlay_ref_camera:set_fov(75)
-	sky_material = Underlay:material(ids_sky)
-	ref_cam_obj = Underlay:get_object(ids_ref_cam_obj)
-	Global._underlay_ref_camera:set_local_position(ref_cam_obj:position())
+	UnderlayPathFeeder.sky_material = Underlay:material(ids_sky)
+	UnderlayPathFeeder.ref_cam_obj = Underlay:get_object(ids_ref_cam_obj)
+	Global._underlay_ref_camera:set_local_position(UnderlayPathFeeder.ref_cam_obj:position())
 	Underlay:set_reference_camera(Global._underlay_ref_camera)
 	Global._current_underlay_name = self._current
 end
@@ -220,9 +218,9 @@ SkyRotationFeeder.IS_GLOBAL = true
 SkyRotationFeeder.FILTER_CATEGORY = false
 
 function SkyRotationFeeder:apply(handler, viewport, scene)
-	if ref_cam_obj then
+	if UnderlayPathFeeder.ref_cam_obj then
 		mrotation.set_yaw_pitch_roll(temp_rotation, -self._current, 0, 0)
-		ref_cam_obj:set_rotation(temp_rotation)
+		UnderlayPathFeeder.ref_cam_obj:set_rotation(temp_rotation)
 	end
 end
 
@@ -233,15 +231,15 @@ UnderlaySkyTopColorFeeder.IS_GLOBAL = true
 UnderlaySkyTopColorFeeder.FILTER_CATEGORY = "Sky"
 
 function UnderlaySkyTopColorFeeder:apply(handler, viewport, scene)
-	if sky_material then
+	if UnderlayPathFeeder.sky_material then
 		local color = handler:get_value(UnderlaySkyTopColorFeeder.DATA_PATH_KEY)
 		if color then
 			local color_scale = handler:get_value(UnderlaySkyTopColorScaleFeeder.DATA_PATH_KEY) or 1
 			mvector3.set(temp_vector3, color)
 			mvector3.multiply(temp_vector3, color_scale)
-			sky_material:set_variable(ids_top_color, temp_vector3)
+			UnderlayPathFeeder.sky_material:set_variable(ids_top_color, temp_vector3)
 		else
-			sky_material:set_variable(ids_top_color, zero_vector3)
+			UnderlayPathFeeder.sky_material:set_variable(ids_top_color, zero_vector3)
 		end
 	end
 end
@@ -259,15 +257,15 @@ UnderlaySkyBottomColorFeeder.IS_GLOBAL = true
 UnderlaySkyBottomColorFeeder.FILTER_CATEGORY = "Sky"
 
 function UnderlaySkyBottomColorFeeder:apply(handler, viewport, scene)
-	if sky_material then
+	if UnderlayPathFeeder.sky_material then
 		local color = handler:get_value(UnderlaySkyBottomColorFeeder.DATA_PATH_KEY)
 		if color then
 			local color_scale = handler:get_value(UnderlaySkyBottomColorScaleFeeder.DATA_PATH_KEY) or 1
 			mvector3.set(temp_vector3, color)
 			mvector3.multiply(temp_vector3, color_scale)
-			sky_material:set_variable(ids_bottom_color, temp_vector3)
+			UnderlayPathFeeder.sky_material:set_variable(ids_bottom_color, temp_vector3)
 		else
-			sky_material:set_variable(ids_bottom_color, zero_vector3)
+			UnderlayPathFeeder.sky_material:set_variable(ids_bottom_color, zero_vector3)
 		end
 	end
 end

@@ -22,11 +22,13 @@ function BaseNetworkSession:init()
 	self._dropin_complete_event_manager_id = EventManager:register_listener(Idstring("net_save_received"), callback(self, self, "on_peer_save_received"))
 end
 
-function BaseNetworkSession:create_local_peer()
+function BaseNetworkSession:create_local_peer(load_outfit)
 	local my_name = managers.network.account:username_id()
 	local my_user_id = SystemInfo:platform() == self._ids_WIN32 and Steam:userid() or false
 	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 0, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
-	self._local_peer:set_outfit_string(managers.blackmarket:outfit_string(), nil)
+	if load_outfit then
+		self._local_peer:set_outfit_string(managers.blackmarket:outfit_string(), nil)
+	end
 end
 
 function BaseNetworkSession:load(data)
@@ -443,6 +445,9 @@ function BaseNetworkSession:is_ready_to_close()
 	for peer_id, peer in pairs(self._peers) do
 		if peer:has_queued_rpcs() then
 			print("[BaseNetworkSession:is_ready_to_close] waiting queued rpcs", peer_id)
+		end
+		if peer:is_loading_outfit_assets() then
+			return false
 		end
 		if not peer:rpc() then
 			print("[BaseNetworkSession:is_ready_to_close] waiting rpc", peer_id)
