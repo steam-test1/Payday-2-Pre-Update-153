@@ -700,6 +700,9 @@ function CopActionWalk:_calculate_curved_path(path, index, curvature_factor, ent
 	
 	local function _on_fail()
 		if curvature_factor < 1 then
+			while 1 < #curved_path do
+				table.remove(curved_path)
+			end
 			table.insert(curved_path, mvec3_cpy(p4))
 			return curved_path
 		else
@@ -1296,7 +1299,7 @@ function CopActionWalk:_nav_chk_walk(t, dt, vis_state)
 			else
 				self:_advance_simplified_path()
 				local next_pos = self._nav_point_pos(s_path[2])
-				if not (self._sync and not self._next_is_nav_link and s_path[3]) or not self:_reserve_nav_pos(next_pos, self._nav_point_pos(s_path[3]), self._nav_point_pos(c_path[#c_path]), vel) then
+				if not (self._sync and not self._action_desc.path_simplified and not self._next_is_nav_link and s_path[3]) or not self:_reserve_nav_pos(next_pos, self._nav_point_pos(s_path[3]), self._nav_point_pos(c_path[#c_path]), vel) then
 				end
 				if not s_path[1].x then
 					debug_pause_unit(self._unit, "[CopActionWalk:_nav_chk_walk] missed nav_link", self._unit, inspect(s_path))
@@ -1304,7 +1307,7 @@ function CopActionWalk:_nav_chk_walk(t, dt, vis_state)
 				end
 				local dis_sq = mvec3_dis_sq(s_path[1], next_pos)
 				local new_c_path
-				if 490000 < dis_sq and self._ext_base:lod_stage() == 1 then
+				if 490000 < dis_sq and not self._action_desc.path_simplified and self._ext_base:lod_stage() == 1 then
 					new_c_path = self:_calculate_curved_path(s_path, 1, 1)
 				else
 					new_c_path = {

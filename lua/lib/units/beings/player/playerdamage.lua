@@ -642,6 +642,8 @@ function PlayerDamage:damage_fall(data)
 		return
 	elseif self:incapacitated() then
 		return
+	elseif self._damage_fall_disabled then
+		return
 	end
 	local height_limit = 300
 	local death_limit = 631
@@ -1081,6 +1083,10 @@ end
 
 function PlayerDamage:dead()
 	return self._dead
+end
+
+function PlayerDamage:set_damage_fall_disabled(disabled)
+	self._damage_fall_disabled = disabled
 end
 
 function PlayerDamage:set_god_mode(state)

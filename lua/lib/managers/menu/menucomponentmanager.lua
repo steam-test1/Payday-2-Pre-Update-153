@@ -365,6 +365,9 @@ function MenuComponentManager:update(t, dt)
 	if self._preplanning_map then
 		self._preplanning_map:update(t, dt)
 	end
+	if self._blackmarket_gui then
+		self._blackmarket_gui:update(t, dt)
+	end
 end
 
 function MenuComponentManager:get_left_controller_axis()
@@ -1430,11 +1433,15 @@ function MenuComponentManager:criment_goto_lobby(...)
 end
 
 function MenuComponentManager:set_crimenet_players_online(amount)
-	self._crimenet_gui:set_players_online(amount)
+	if self._crimenet_gui then
+		self._crimenet_gui:set_players_online(amount)
+	end
 end
 
 function MenuComponentManager:add_crimenet_gui_preset_job(id)
-	self._crimenet_gui:add_preset_job(id)
+	if self._crimenet_gui then
+		self._crimenet_gui:add_preset_job(id)
+	end
 end
 
 function MenuComponentManager:add_crimenet_server_job(...)
@@ -1451,6 +1458,10 @@ end
 
 function MenuComponentManager:has_crimenet_gui()
 	return not not self._crimenet_gui
+end
+
+function MenuComponentManager:has_blackmarket_gui()
+	return not not self._blackmarket_gui
 end
 
 function MenuComponentManager:close_crimenet_gui()
@@ -1914,6 +1925,20 @@ function MenuComponentManager:close_blackmarket_gui()
 	end
 end
 
+function MenuComponentManager:set_blackmarket_enabled(enabled)
+	if self._blackmarket_gui then
+		self._blackmarket_gui:set_enabled(enabled)
+	end
+end
+
+function MenuComponentManager:set_blackmarket_disable_fetching(disabled)
+	self._blackmarket_disable_fetching = disabled
+end
+
+function MenuComponentManager:blackmarket_fetching_disable()
+	return self._blackmarket_disable_fetching
+end
+
 function MenuComponentManager:_create_server_info_gui()
 	if self._server_info_gui then
 		self:close_server_info_gui()
@@ -2171,9 +2196,6 @@ function MenuComponentManager:create_lootdrop_casino_gui(node)
 		self._lootscreen_casino_hud:make_lootdrop(lootdrop_data)
 		if not managers.menu:is_pc_controller() then
 			managers.menu:active_menu().input:deactivate_controller_mouse()
-		end
-		if SystemInfo:platform() == Idstring("WIN32") then
-			managers.statistics:publish_lootdrop_to_steam()
 		end
 	end
 	if self._lootdrop_casino_gui then
@@ -2909,6 +2931,12 @@ end
 function MenuComponentManager:get_game_chat_button_shape()
 	if self._game_chat_gui then
 		return self._game_chat_gui:get_chat_button_shape()
+	end
+end
+
+function MenuComponentManager:set_blackmarket_tradable_loaded(error)
+	if self._blackmarket_gui then
+		self._blackmarket_gui:set_tradable_loaded(error)
 	end
 end
 

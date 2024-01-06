@@ -140,7 +140,7 @@ function CoreAreaTriggerUnitElement:add_element()
 				table.insert(self._hed.spawn_unit_elements, id)
 			end
 		end
-		if string.find(ray.unit:name():s(), "trigger_area", 1, true) or string.find(ray.unit:name():s(), "point_shape", 1, true) then
+		if ray.unit:name():s() == "core/units/mission_elements/trigger_area/trigger_area" or string.find(ray.unit:name():s(), "point_shape", 1, true) then
 			self._hed.use_shape_element_ids = self._hed.use_shape_element_ids or {}
 			local id = ray.unit:unit_data().unit_id
 			if table.contains(self._hed.use_shape_element_ids, id) then
@@ -265,6 +265,12 @@ function CoreAreaTriggerUnitElement:_create_shapes()
 	self._cylinder_shape:set_unit(self._unit)
 end
 
+function CoreAreaTriggerUnitElement:_recreate_shapes()
+	self._shape = nil
+	self._cylinder_shape = nil
+	self:_create_shapes()
+end
+
 function CoreAreaTriggerUnitElement:set_element_data(params, ...)
 	CoreAreaTriggerUnitElement.super.set_element_data(self, params, ...)
 	if params.value == "instigator" and self._hed.instigator == "criminals" then
@@ -382,6 +388,11 @@ function CoreAreaTriggerUnitElement:size_release(params)
 	params.ctrlr:set_value(100)
 end
 
+function CoreAreaTriggerUnitElement:clone_data(...)
+	CoreAreaTriggerUnitElement.super.clone_data(self, ...)
+	self:_recreate_shapes()
+end
+
 CoreAreaOperatorUnitElement = CoreAreaOperatorUnitElement or class(MissionElement)
 CoreAreaOperatorUnitElement.SAVE_UNIT_POSITION = false
 CoreAreaOperatorUnitElement.SAVE_UNIT_ROTATION = false
@@ -436,7 +447,7 @@ end
 
 function CoreAreaOperatorUnitElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
-	if ray and ray.unit and string.find(ray.unit:name():s(), "trigger_area", 1, true) then
+	if ray and ray.unit and ray.unit:name():s() == "core/units/mission_elements/trigger_area/trigger_area" then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
 			table.delete(self._hed.elements, id)
@@ -462,6 +473,10 @@ function CoreAreaOperatorUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	local exact_names = {
+		"core/units/mission_elements/trigger_area/trigger_area"
+	}
+	self:_build_add_remove_unit_from_list(panel, panel_sizer, self._hed.elements, nil, exact_names)
 	CoreAreaTriggerUnitElement.create_values_ctrlrs(self, panel, panel_sizer, {
 		trigger_type = true,
 		instigator = true,

@@ -37,7 +37,7 @@ function CoreMaterialEditorGlobalDialog:destroy(clean)
 			n._parent:remove_child_at(n._parent:index_of_child(n._node))
 		end
 	end
-	self._editor:_save_global_to_disk()
+	self._editor:_save_global_to_disk(true)
 	self._dialog:end_modal("")
 end
 

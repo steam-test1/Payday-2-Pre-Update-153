@@ -1014,10 +1014,12 @@ function BaseNetworkSession:load_counter()
 end
 
 function BaseNetworkSession:check_send_outfit(peer)
-	if peer then
-		peer:send_queued_sync("sync_outfit", managers.blackmarket:outfit_string(), self:local_peer():outfit_version(), "")
-	else
-		self:send_to_peers_loaded("sync_outfit", managers.blackmarket:outfit_string(), self:local_peer():outfit_version(), "")
+	if managers.blackmarket:signature() then
+		if peer then
+			peer:send_queued_sync("sync_outfit", managers.blackmarket:outfit_string(), self:local_peer():outfit_version(), managers.blackmarket:signature())
+		else
+			self:send_to_peers_loaded("sync_outfit", managers.blackmarket:outfit_string(), self:local_peer():outfit_version(), managers.blackmarket:signature())
+		end
 	end
 end
 
@@ -1057,8 +1059,11 @@ function BaseNetworkSession:check_peer_preferred_character(preferred_character)
 		local character = peer:character()
 		table.delete(free_characters, character)
 	end
-	if table.contains(free_characters, preferred_character) then
-		return preferred_character
+	local preferreds = string.split(preferred_character, " ")
+	for _, preferred in ipairs(preferreds) do
+		if table.contains(free_characters, preferred) then
+			return preferred
+		end
 	end
 	local character = free_characters[math.random(#free_characters)]
 	print("Player will be", character, "instead of", preferred_character)

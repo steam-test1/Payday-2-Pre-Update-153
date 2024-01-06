@@ -4,6 +4,9 @@ function NetworkAccount:init()
 	self._postprocess_username = callback(self, self, "_standard_username")
 end
 
+function NetworkAccount:update()
+end
+
 function NetworkAccount:create_account(name, password, email)
 end
 
@@ -47,5 +50,32 @@ end
 function NetworkAccount:_save_globals()
 end
 
-function NetworkAccount:refresh()
+function NetworkAccount:inventory_load()
+end
+
+function NetworkAccount:inventory_is_loading()
+end
+
+function NetworkAccount:inventory_reward(item)
+	return false
+end
+
+function NetworkAccount:inventory_reward_dlc()
+end
+
+function NetworkAccount:inventory_reward_unlock(box, key)
+end
+
+function NetworkAccount:inventory_outfit_refresh()
+end
+
+function NetworkAccount:inventory_outfit_verify(id, outfit_data, outfit_callback)
+end
+
+function NetworkAccount:inventory_outfit_signature()
+	return ""
+end
+
+function NetworkAccount:is_ready_to_close()
+	return true
 end

@@ -262,17 +262,17 @@ function SkillTreeTweakData:init()
 		icon_xy = {7, 7},
 		[1] = {
 			upgrades = {
-				"team_pistol_recoil_multiplier",
-				"team_akimbo_recoil_multiplier",
-				"team_pistol_suppression_recoil_multiplier",
-				"team_akimbo_suppression_recoil_multiplier"
+				"team_pistol_recoil_index_addend",
+				"team_akimbo_recoil_index_addend",
+				"team_pistol_suppression_recoil_index_addend",
+				"team_akimbo_suppression_recoil_index_addend"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"team_weapon_recoil_multiplier",
-				"team_weapon_suppression_recoil_multiplier"
+				"team_weapon_recoil_index_addend",
+				"team_weapon_suppression_recoil_index_addend"
 			},
 			cost = self.costs.pro
 		}
@@ -423,9 +423,9 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_move_spread_multiplier",
+				"assault_rifle_move_spread_index_addend",
 				"player_run_and_reload",
-				"snp_move_spread_multiplier"
+				"snp_move_spread_index_addend"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -436,9 +436,9 @@ function SkillTreeTweakData:init()
 		icon_xy = {3, 9},
 		[1] = {
 			upgrades = {
-				"pistol_spread_multiplier",
+				"pistol_spread_index_addend",
 				"pistol_swap_speed_multiplier",
-				"akimbo_spread_multiplier",
+				"akimbo_spread_index_addend",
 				"akimbo_swap_speed_multiplier"
 			},
 			cost = self.costs.default
@@ -640,7 +640,7 @@ function SkillTreeTweakData:init()
 		icon_xy = {5, 0},
 		[1] = {
 			upgrades = {
-				"shotgun_recoil_multiplier"
+				"shotgun_recoil_index_addend"
 			},
 			cost = self.costs.default
 		},
@@ -724,18 +724,13 @@ function SkillTreeTweakData:init()
 		icon_xy = {4, 1},
 		[1] = {
 			upgrades = {
-				"shotgun_hip_fire_spread_multiplier"
+				"shotgun_hip_fire_spread_index_addend"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_hip_fire_spread_multiplier",
-				"saw_hip_fire_spread_multiplier",
-				"pistol_hip_fire_spread_multiplier",
-				"smg_hip_fire_spread_multiplier",
-				"snp_hip_fire_spread_multiplier",
-				"lmg_hip_fire_spread_multiplier"
+				"weapon_hip_fire_spread_index_addend"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -998,14 +993,14 @@ function SkillTreeTweakData:init()
 		icon_xy = {6, 5},
 		[1] = {
 			upgrades = {
-				"weapon_single_spread_multiplier"
+				"weapon_single_spread_index_addend"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_recoil_multiplier",
-				"snp_recoil_multiplier"
+				"assault_rifle_recoil_index_addend",
+				"snp_recoil_index_addend"
 			},
 			cost = self.costs.pro
 		}
@@ -1504,14 +1499,14 @@ function SkillTreeTweakData:init()
 		icon_xy = {4, 4},
 		[1] = {
 			upgrades = {
-				"weapon_silencer_recoil_multiplier",
+				"weapon_silencer_recoil_index_addend",
 				"weapon_silencer_enter_steelsight_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"weapon_silencer_spread_multiplier",
+				"weapon_silencer_spread_index_addend",
 				"weapon_silencer_armor_piercing_chance_2"
 			},
 			cost = self.costs.hightierpro
@@ -1836,8 +1831,8 @@ function SkillTreeTweakData:init()
 				"x_g22c",
 				"x_g17",
 				"x_usp",
-				"akimbo_recoil_multiplier_1",
-				"akimbo_recoil_multiplier_2"
+				"akimbo_recoil_index_addend_1",
+				"akimbo_recoil_index_addend_2"
 			},
 			cost = self.costs.hightier
 		},
@@ -1845,7 +1840,7 @@ function SkillTreeTweakData:init()
 			upgrades = {
 				"akimbo_extra_ammo_multiplier_1",
 				"akimbo_extra_ammo_multiplier_2",
-				"akimbo_recoil_multiplier_3"
+				"akimbo_recoil_index_addend_3"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -2394,7 +2389,7 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_2",
 					"player_perk_armor_loss_multiplier_1",
-					"akimbo_recoil_multiplier_1",
+					"akimbo_recoil_index_addend_1",
 					"jowi",
 					"x_1911",
 					"x_b92fs",
@@ -2436,7 +2431,7 @@ function SkillTreeTweakData:init()
 					"player_perk_armor_regen_timer_multiplier_5",
 					"player_perk_armor_loss_multiplier_4",
 					"player_passive_loot_drop_multiplier",
-					"akimbo_recoil_multiplier_2",
+					"akimbo_recoil_index_addend_2",
 					"akimbo_extra_ammo_multiplier_1"
 				},
 				cost = 4000,

@@ -132,6 +132,7 @@ end
 
 function GenericDLCManager:give_dlc_and_verify_blackmarket()
 	self:give_dlc_package()
+	managers.network.account:inventory_reward_dlc()
 	if managers.blackmarket then
 		managers.blackmarket:verify_dlc_items()
 	else
@@ -1353,8 +1354,8 @@ function WINDLCManager:init()
 			e3_s15d = {app_id = "375385", no_install = true},
 			pdcon_2015 = {app_id = "338950", no_install = true},
 			gage_pack_historical = {app_id = "331900", no_install = true},
-			bobblehead = {app_id = "328860", no_install = true},
 			steel = {app_id = "401650", no_install = true},
+			bobblehead = {app_id = "328860", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			}

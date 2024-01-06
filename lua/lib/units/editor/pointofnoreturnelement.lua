@@ -22,6 +22,10 @@ function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	local exact_names = {
+		"core/units/mission_elements/trigger_area/trigger_area"
+	}
+	self:_build_add_remove_unit_from_list(panel, panel_sizer, self._hed.elements, nil, exact_names)
 	local time_params_easy = {
 		name = "Time left on easy:",
 		panel = panel,
@@ -157,7 +161,7 @@ end
 
 function PointOfNoReturnElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
-	if ray and ray.unit and string.find(ray.unit:name():s(), "trigger_area", 1, true) then
+	if ray and ray.unit and ray.unit:name():s() == "core/units/mission_elements/trigger_area/trigger_area" then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
 			table.delete(self._hed.elements, id)

@@ -50,7 +50,6 @@ function EnemyDummyTriggerUnitElement:_correct_unit(u_name)
 		"ai_spawn_enemy",
 		"ai_enemy_group",
 		"ai_spawn_civilian",
-		"ai_spawn_civilian",
 		"ai_civilian_group"
 	}
 	for _, name in ipairs(names) do
@@ -77,6 +76,13 @@ function EnemyDummyTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	local names = {
+		"ai_spawn_enemy",
+		"ai_enemy_group",
+		"ai_spawn_civilian",
+		"ai_civilian_group"
+	}
+	self:_build_add_remove_unit_from_list(panel, panel_sizer, self._hed.elements, names)
 	local options = {
 		"alerted",
 		"death",

@@ -251,7 +251,6 @@ end
 
 function GageAssignmentManager:on_simulation_started()
 	self:activate_assignments()
-	Application:debug("[GageAssignmentManager:on_simulation_started] Active assignments", inspect(self._active_assignments))
 end
 
 function GageAssignmentManager:queue_spawn(position, rotation)

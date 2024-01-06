@@ -288,6 +288,9 @@ function FreeFlight:enabled()
 end
 
 function FreeFlight:_on_F9()
+	if Application:editor() and not Global.running_simulation then
+		return
+	end
 	if self._state == FF_ON then
 		self:disable()
 	elseif self._state == FF_OFF then
@@ -315,7 +318,6 @@ function FreeFlight:_action_execute()
 end
 
 function FreeFlight:_quick_action_execute()
-	print("_quick_action_execute")
 	self:_current_action():do_action()
 end
 

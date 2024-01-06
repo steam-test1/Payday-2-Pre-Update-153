@@ -397,7 +397,7 @@ end
 
 function EditUnitLight:is_editable(unit, units)
 	if alive(unit) then
-		local lights = CoreEditorUtils.get_editable_lights(unit)
+		local lights = CoreEditorUtils.get_editable_lights(unit) or {}
 		local options = {}
 		for _, light in ipairs(lights) do
 			table.insert(options, light:name():s())

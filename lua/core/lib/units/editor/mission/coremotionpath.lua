@@ -27,7 +27,7 @@ function CoreMotionPathOperatorUnitElement:draw_links(t, dt, selected_unit, all_
 				from_unit = self._unit,
 				to_unit = unit,
 				r = 0.75,
-				g = 0.75,
+				g = 0.25,
 				b = 0.25
 			})
 		end
@@ -53,6 +53,14 @@ function CoreMotionPathOperatorUnitElement:get_links_to_unit(...)
 end
 
 function CoreMotionPathOperatorUnitElement:update_editing()
+	local ray = managers.editor:unit_by_raycast({
+		sample = true,
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
+	if ray and ray.unit then
+		Application:draw(ray.unit, 0, 1, 0)
+	end
 end
 
 function CoreMotionPathOperatorUnitElement:update_selected()
@@ -60,7 +68,10 @@ function CoreMotionPathOperatorUnitElement:update_selected()
 end
 
 function CoreMotionPathOperatorUnitElement:add_element()
-	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
+	local ray = managers.editor:unit_by_raycast({
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
 	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
@@ -161,10 +172,21 @@ function CoreMotionPathTriggerUnitElement:get_links_to_unit(...)
 end
 
 function CoreMotionPathTriggerUnitElement:update_editing()
+	local ray = managers.editor:unit_by_raycast({
+		sample = true,
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
+	if ray and ray.unit then
+		Application:draw(ray.unit, 0, 1, 0)
+	end
 end
 
 function CoreMotionPathTriggerUnitElement:add_element()
-	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
+	local ray = managers.editor:unit_by_raycast({
+		mask = managers.slot:get_mask("all"),
+		ray_type = "body editor"
+	})
 	if ray and ray.unit and ray.unit:name() == Idstring("units/dev_tools/mission_elements/motion_path_marker/motion_path_marker") then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
