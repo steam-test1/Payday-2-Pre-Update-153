@@ -25,7 +25,6 @@ function IngameMaskOffState:at_enter()
 	local player = managers.player:player_unit()
 	if player then
 		player:base():set_enabled(true)
-		player:character_damage():set_invulnerable(true)
 	end
 end
 
@@ -33,7 +32,6 @@ function IngameMaskOffState:at_exit()
 	local player = managers.player:player_unit()
 	if player then
 		player:base():set_enabled(false)
-		player:character_damage():set_invulnerable(false)
 	end
 	managers.hud:hide(self._MASK_OFF_HUD)
 	managers.hud:hide(PlayerBase.PLAYER_INFO_HUD)

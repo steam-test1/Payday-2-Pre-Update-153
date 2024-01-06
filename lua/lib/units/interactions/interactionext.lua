@@ -154,7 +154,7 @@ function BaseInteractionExt:can_select(player)
 	if not self:_has_required_deployable() then
 		return false
 	end
-	if not self:_is_in_required_state() then
+	if not self:_is_in_required_state(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
 	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
@@ -226,13 +226,13 @@ function BaseInteractionExt:_has_required_upgrade(movement_state)
 	if not movement_state then
 		return true
 	end
-	if movement_state == "mask_off" then
+	if movement_state == "mask_off" or movement_state == "clean" then
 		if self._tweak_data.requires_mask_off_upgrade then
 			local category = self._tweak_data.requires_mask_off_upgrade.category
 			local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
 			return managers.player:has_category_upgrade(category, upgrade)
 		end
-		return false
+		return true
 	end
 	if self._tweak_data.requires_upgrade then
 		local category = self._tweak_data.requires_upgrade.category
@@ -256,7 +256,15 @@ function BaseInteractionExt:_allowed_in_movement_state(movement_state)
 	return true
 end
 
-function BaseInteractionExt:_is_in_required_state()
+function BaseInteractionExt:_is_in_required_state(movement_state)
+	if movement_state == "clean" or movement_state == "mask_off" then
+		if self._tweak_data.requires_mask_off_upgrade then
+			local category = self._tweak_data.requires_mask_off_upgrade.category
+			local upgrade = self._tweak_data.requires_mask_off_upgrade.upgrade
+			return managers.player:has_category_upgrade(category, upgrade)
+		end
+		return self._tweak_data.can_interact_in_casing
+	end
 	return true
 end
 
@@ -375,6 +383,9 @@ function BaseInteractionExt:interact(player)
 end
 
 function BaseInteractionExt:can_interact(player)
+	if (managers.player:current_state() == "clean" or managers.player:current_state() == "mask_off") and not self._tweak_data.can_interact_in_casing then
+		return false
+	end
 	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
@@ -1437,7 +1448,7 @@ function IntimitateInteractionExt:_is_in_required_state()
 	if self.tweak_data == "corpse_dispose" and not managers.groupai:state():whisper_mode() then
 		return false
 	end
-	return true
+	return IntimitateInteractionExt.super._is_in_required_state(self)
 end
 
 function IntimitateInteractionExt:on_interacting_unit_destroyed(peer, player)
@@ -1836,7 +1847,8 @@ end
 SpecialEquipmentInteractionExt = SpecialEquipmentInteractionExt or class(UseInteractionExt)
 
 function SpecialEquipmentInteractionExt:_interact_blocked(player)
-	return not managers.player:can_pickup_equipment(self._special_equipment)
+	local can_pickup, has_max_quantity = managers.player:can_pickup_equipment(self._special_equipment)
+	return not can_pickup, false, has_max_quantity and "max_special_equipment" or nil
 end
 
 function SpecialEquipmentInteractionExt:interact(player)

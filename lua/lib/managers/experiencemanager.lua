@@ -261,6 +261,7 @@ end
 function ExperienceManager:_set_current_level(value)
 	value = math.max(value, 0)
 	self._global.level = Application:digest_value(value, true)
+	self:update_progress()
 end
 
 function ExperienceManager:set_current_rank(value)
@@ -268,6 +269,7 @@ function ExperienceManager:set_current_rank(value)
 		managers.infamy:aquire_point()
 		self._global.rank = Application:digest_value(value, true)
 		managers.achievment:award("ignominy_" .. tostring(value))
+		self:update_progress()
 	end
 end
 
@@ -692,6 +694,15 @@ function ExperienceManager:reset()
 	managers.player:reset()
 	Global.experience_manager = nil
 	self:_setup()
+	self:update_progress()
+end
+
+function ExperienceManager:update_progress()
+	if self:current_rank() > 0 then
+		managers.platform:set_progress(1)
+	else
+		managers.platform:set_progress(math.clamp(self:current_level() / self:level_cap(), 0, 1))
+	end
 end
 
 function ExperienceManager:chk_ask_use_backup(savegame_data, backup_savegame_data)

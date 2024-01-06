@@ -598,10 +598,10 @@ function NewRaycastWeaponBase:gadget_on()
 end
 
 function NewRaycastWeaponBase:gadget_off()
-	self:set_gadget_on(0, true)
+	self:set_gadget_on(0, true, nil, true)
 end
 
-function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
+function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets, ignore_bipod)
 	if not ignore_enable and not self._enabled then
 		return
 	end
@@ -628,7 +628,10 @@ function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
 		for i, id in ipairs(gadgets) do
 			gadget = self._parts[id]
 			if gadget then
-				gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
+				local is_bipod = ignore_bipod and gadget.unit:base():is_bipod()
+				if not is_bipod then
+					gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
+				end
 			end
 		end
 	end
@@ -663,6 +666,34 @@ end
 
 function NewRaycastWeaponBase:gadget_update()
 	self:set_gadget_on(false, true)
+end
+
+function NewRaycastWeaponBase:is_gadget_usable()
+	local retval = false
+	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
+	if gadgets then
+		local xd, yd
+		local part_factory = tweak_data.weapon.factory.parts
+		table.sort(gadgets, function(x, y)
+			xd = self._parts[x]
+			yd = self._parts[y]
+			if not xd then
+				return false
+			end
+			if not yd then
+				return true
+			end
+			return xd.unit:base().GADGET_TYPE > yd.unit:base().GADGET_TYPE
+		end)
+		local gadget
+		for i, id in ipairs(gadgets) do
+			gadget = self._parts[id]
+			if gadget and gadget.unit:base().is_usable then
+				retval = gadget.unit:base():is_usable()
+			end
+		end
+	end
+	return retval
 end
 
 function NewRaycastWeaponBase:gadget_toggle_requires_stance_update()

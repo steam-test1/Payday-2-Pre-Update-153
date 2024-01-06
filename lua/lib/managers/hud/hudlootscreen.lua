@@ -612,6 +612,10 @@ function HUDLootScreen:make_lootdrop(lootdrop_data)
 end
 
 function HUDLootScreen:texture_loaded_clbk(params, texture_idstring)
+	if not alive(self._peers_panel) then
+		TextureCache:unretrieve(texture_idstring)
+		return
+	end
 	local peer_id = params[1]
 	local is_pattern = params[2]
 	local panel = self._peers_panel:child("peer" .. tostring(peer_id)):child("item")

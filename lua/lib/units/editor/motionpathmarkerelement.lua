@@ -64,7 +64,10 @@ function MotionpathMarkerUnitElement:clear()
 	if path then
 		MotionpathMarkerUnitElement._linked_markers = {}
 		for _, marker_id in ipairs(path.markers) do
-			table.insert(MotionpathMarkerUnitElement._linked_markers, self:_get_unit(marker_id))
+			local marker_unit = self:_get_unit(marker_id)
+			if marker_unit then
+				table.insert(MotionpathMarkerUnitElement._linked_markers, marker_unit)
+			end
 		end
 	end
 	local victim_id = self._unit:unit_data().unit_id
@@ -173,11 +176,19 @@ function MotionpathMarkerUnitElement:add_element()
 					self._hed.markers.units = {}
 				end
 				print("MotionpathMarkerUnitElement:add_element() Adding unit_id: ", unit_id, self._unit:unit_data().unit_id)
+				managers.motion_path:remove_unit_from_paths(unit_id)
 				table.insert(self._hed.markers.units, unit_id)
 				print(inspect(self._hed.markers.units))
 			end
 		end
 		self:_recreate_motion_path(self._unit, true, false)
+	end
+end
+
+function MotionpathMarkerUnitElement:remove_unit(unit_id)
+	local index = table.index_of(self._hed.markers.units, unit_id)
+	if self._hed.markers.units and -1 < index then
+		table.remove(self._hed.markers.units, index)
 	end
 end
 
@@ -379,10 +390,11 @@ function MotionpathMarkerUnitElement:_get_middle_point(path, selected_marker_id,
 end
 
 function MotionpathMarkerUnitElement:_recreate_motion_path(selected_unit, force_update, skip_recreate)
-	if not force_update and self._last_marker_pos == selected_unit:position() then
+	if not force_update and (self._last_marker_pos == selected_unit:position() or self._last_marker_pos == selected_unit:position()) then
 		return
 	end
 	self._last_marker_pos = selected_unit:position()
+	self._last_marker_rot = selected_unit:rotation()
 	local current_marker_unit = selected_unit
 	local parent_marker_unit = self:_get_unit(selected_unit:mission_element_data().markers.parent)
 	while parent_marker_unit and alive(parent_marker_unit) do
@@ -427,7 +439,7 @@ function MotionpathMarkerUnitElement:_recreate_motion_path(selected_unit, force_
 							target_checkpoint = #entire_path_points + 1,
 							initial_checkpoint = #entire_path_points + 1
 						}
-						print("adding unit: ", linked_unit_id)
+						print("adding unit: ", linked_unit_id, inspect(from_unit:mission_element_data()))
 						table.insert(units_on_path, unit_and_position)
 					end
 				end

@@ -10,7 +10,6 @@ function NetworkVoiceChatDisabled:init(quiet)
 end
 
 function NetworkVoiceChatDisabled:check_status_information()
-	self:_display_warning()
 end
 
 function NetworkVoiceChatDisabled:open()
@@ -47,14 +46,12 @@ function NetworkVoiceChatDisabled:num_peers()
 end
 
 function NetworkVoiceChatDisabled:open_session(roomid)
-	self:_display_warning()
 end
 
 function NetworkVoiceChatDisabled:close_session()
 end
 
 function NetworkVoiceChatDisabled:open_channel_to(player_info, context)
-	self:_display_warning()
 end
 
 function NetworkVoiceChatDisabled:close_channel_to(player_info)
@@ -73,6 +70,9 @@ function NetworkVoiceChatDisabled:peer_team(xuid, team, rpc)
 end
 
 function NetworkVoiceChatDisabled:_open_close_peers()
+end
+
+function NetworkVoiceChatDisabled:mute_player(mute, peer)
 end
 
 function NetworkVoiceChatDisabled:update()

@@ -755,7 +755,5 @@ function CopActionShoot:anim_clbk_melee_strike()
 		}
 		self._unit:character_damage():damage_melee(action_data)
 		return
-	elseif defense_data then
-		self._common_data.unit:sound():play("melee_hit_body", nil, nil)
 	end
 end

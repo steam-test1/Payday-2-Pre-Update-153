@@ -7,6 +7,9 @@ end
 function NpcBaseVehicleState:on_enter(npc_driving_ext)
 end
 
+function NpcBaseVehicleState:on_exit(npc_driving_ext)
+end
+
 function NpcBaseVehicleState:update(t, dt)
 end
 

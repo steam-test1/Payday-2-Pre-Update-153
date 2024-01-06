@@ -44,7 +44,7 @@ function LootDropManager:_setup_items()
 			end
 			local has_dlc = #dlcs == 0
 			for _, dlc in pairs(dlcs) do
-				has_dlc = has_dlc or managers.dlc:has_dlc(dlc)
+				has_dlc = has_dlc or managers.dlc:is_dlc_unlocked(dlc)
 			end
 			if has_dlc then
 				if item_data.pc then
@@ -133,7 +133,7 @@ function LootDropManager:droppable_items(item_pc, infamous_success, skip_types)
 					end
 					local dlc_global_values = {}
 					for _, dlc in ipairs(dlcs) do
-						if managers.dlc:has_dlc(dlc) then
+						if managers.dlc:is_dlc_unlocked(dlc) then
 							table.insert(dlc_global_values, dlc)
 						end
 					end
@@ -463,7 +463,7 @@ function LootDropManager:_make_drop(debug, add_to_inventory, debug_stars, return
 				end
 				local dlc_global_values = {}
 				for _, dlc in pairs(dlcs) do
-					if managers.dlc:has_dlc(dlc) then
+					if managers.dlc:is_dlc_unlocked(dlc) then
 						table.insert(dlc_global_values, dlc)
 					else
 						block_item = true
@@ -478,7 +478,7 @@ function LootDropManager:_make_drop(debug, add_to_inventory, debug_stars, return
 				if not debug then
 					print("Item drop got blocked!", "type_items", type_items, "item_entry", item_entry, "global_value", global_value)
 				end
-			elseif tweak_data.blackmarket[type_items][item_entry].max_in_inventory and managers.blackmarket:get_item_amount(global_value, type_items, item_entry) >= tweak_data.blackmarket[type_items][item_entry].max_in_inventory then
+			elseif tweak_data.blackmarket[type_items][item_entry].max_in_inventory and managers.blackmarket:get_item_amount(global_value, type_items, item_entry, true) >= tweak_data.blackmarket[type_items][item_entry].max_in_inventory then
 				if not debug then
 					print("Already got max of this item", item_entry)
 				end
@@ -555,7 +555,7 @@ function LootDropManager:can_drop_weapon_mods()
 				end
 				local dlc_global_values = {}
 				for _, dlc in pairs(dlcs) do
-					if managers.dlc:has_dlc(dlc) then
+					if managers.dlc:is_dlc_unlocked(dlc) then
 						table.insert(dlc_global_values, dlc)
 					end
 				end
@@ -619,15 +619,52 @@ function LootDropManager:new_fake_loot_pc(debug_pc, skip_mods)
 end
 
 function LootDropManager:debug_check_items(check_type)
+	local t = {}
 	for type, data in pairs(tweak_data.blackmarket) do
 		if not check_type or type == check_type then
 			for id, item_data in pairs(data) do
+				print("id", id)
 				if not item_data.pc and not item_data.pcs then
 					print("Item", id, "of type", type, "hasn't been assigned a pay class")
+					table.insert(t, id)
+				elseif not item_data.pc and #item_data.pcs == 0 then
+					print(id, "of type", type, "has no pay classes")
+					table.insert(t, id)
 				end
 			end
 		end
 	end
+	return t
+end
+
+function LootDropManager:debug_loot_aquire_method(type)
+	local no_pcs = managers.lootdrop:debug_check_items(type)
+	local t = {
+		ach = {},
+		dlc = {},
+		non = {}
+	}
+	for _, id in ipairs(no_pcs) do
+		local ach = managers.dlc._achievement_locked_content[type] and managers.dlc._achievement_locked_content[type][id]
+		local dlc = managers.dlc._dlc_locked_content[type] and managers.dlc._dlc_locked_content[type][id]
+		if ach then
+			table.insert(t.ach, {id, ach})
+		elseif dlc then
+			table.insert(t.dlc, {id, dlc})
+		else
+			table.insert(t.non, {id})
+		end
+	end
+	for _, data in ipairs(t.ach) do
+		print("ach", data[1], data[2])
+	end
+	for _, data in ipairs(t.dlc) do
+		print("dlc", data[1], data[2])
+	end
+	for _, data in ipairs(t.non) do
+		print("non", data[1])
+	end
+	return t
 end
 
 function LootDropManager:debug_print_pc_items(check_type)

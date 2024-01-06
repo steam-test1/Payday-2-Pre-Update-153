@@ -69,6 +69,14 @@ function GrenadeBase:add_damage_result(unit, is_dead, damage_percent)
 	for i, death in ipairs(self._damage_results) do
 		kill_count = kill_count + (death and 1 or 0)
 	end
+	self:_check_achievements(unit, is_dead, damage_percent, hit_count, kill_count)
+end
+
+function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_count, kill_count)
+	local unit_type = unit:base()._tweak_table
+	local is_gangster = unit:character_damage().is_gangster(unit_type)
+	local is_cop = unit:character_damage().is_cop(unit_type)
+	local weapon_id = tweak_data.blackmarket.projectiles[self:projectile_entry()].weapon_id
 	local count_pass, grenade_type_pass, kill_pass, distance_pass, enemy_pass, flying_strike_pass, timer_pass, all_pass, memory
 	for achievement, achievement_data in pairs(tweak_data.achievement.grenade_achievements) do
 		count_pass = not achievement_data.count or (achievement_data.kill and kill_count or hit_count) >= achievement_data.count
@@ -112,6 +120,10 @@ function GrenadeBase:add_damage_result(unit, is_dead, damage_percent)
 				managers.achievment:award_progress(achievement_data.stat)
 			elseif achievement_data.award then
 				managers.achievment:award(achievement_data.award)
+			elseif achievement_data.challenge_stat then
+				managers.challenge:award_progress(achievement_data.challenge_stat)
+			elseif achievement_data.challenge_award then
+				managers.challenge:award(achievement_data.challenge_award)
 			end
 		end
 	end

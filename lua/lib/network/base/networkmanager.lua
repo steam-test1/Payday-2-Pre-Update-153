@@ -28,11 +28,15 @@ require("lib/units/beings/player/PlayerMovement")
 NetworkManager = NetworkManager or class()
 if SystemInfo:platform() == Idstring("X360") then
 	NetworkManager.DEFAULT_PORT = 1000
+elseif SystemInfo:platform() == Idstring("XB1") then
+	NetworkManager.DEFAULT_PORT = 43210
+elseif SystemInfo:platform() == Idstring("PS4") then
+	NetworkManager.DEFAULT_PORT = 22222
 else
 	NetworkManager.DEFAULT_PORT = 9899
 end
 NetworkManager.DROPIN_ENABLED = true
-if SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("PS3") then
+if SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("PS3") or SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1") then
 	NetworkManager.PROTOCOL_TYPE = "TCP_IP"
 else
 	NetworkManager.PROTOCOL_TYPE = "STEAM"
@@ -56,6 +60,10 @@ function NetworkManager:init(game_class)
 		self._is_ps3 = true
 	elseif SystemInfo:platform() == Idstring("X360") then
 		self._is_x360 = true
+	elseif SystemInfo:platform() == Idstring("PS4") then
+		self._is_ps4 = true
+	elseif SystemInfo:platform() == Idstring("XB1") then
+		self._is_xb1 = true
 	else
 		self._is_win32 = true
 	end
@@ -66,6 +74,15 @@ function NetworkManager:init(game_class)
 			PSN:init_matchmaking()
 		end
 		self:_register_PSN_matchmaking_callbacks()
+	elseif self._is_ps4 then
+		Network:set_use_psn_network(true)
+		if #PSN:get_world_list() == 0 then
+			PSN:init_matchmaking()
+		end
+		self:_register_PSN_matchmaking_callbacks()
+	elseif self._is_xb1 then
+		self.account = NetworkAccountXBL:new()
+		self.voice_chat = NetworkVoiceChatXBL:new()
 	elseif self._is_win32 then
 		self.account = NetworkAccountSTEAM:new()
 		self.voice_chat = NetworkVoiceChatSTEAM:new()
@@ -95,6 +112,20 @@ function NetworkManager:_create_lobby()
 	if self._is_win32 then
 		cat_print("lobby", "Online Lobby is PC")
 		self.matchmake = NetworkMatchMakingSTEAM:new()
+	elseif self._is_ps4 then
+		cat_print("lobby", "Online Lobby is PS4")
+		self.friends = NetworkFriendsPSN:new()
+		self.group = NetworkGroupLobbyPSN:new()
+		self.matchmake = NetworkMatchMakingPSN:new()
+		self.shared_psn = NetworkGenericPSN:new()
+		self.shared = self.shared_psn
+		self.account = NetworkAccountPSN:new()
+		self.match = nil
+		self:ps3_determine_voice()
+		self._shared_update = self.shared_psn
+	elseif self._is_xb1 then
+		self.friends = NetworkFriendsXBL:new()
+		self.matchmake = NetworkMatchMakingXBL:new()
 	elseif self._is_ps3 then
 		cat_print("lobby", "Online Lobby is PS3")
 		self.friends = NetworkFriendsPSN:new()
@@ -104,6 +135,7 @@ function NetworkManager:_create_lobby()
 		self.shared = self.shared_psn
 		self.account = NetworkAccountPSN:new()
 		self.match = nil
+		print("voice chat _create_lobby")
 		self:ps3_determine_voice()
 		self._shared_update = self.shared_psn
 	elseif self._is_x360 then
@@ -183,6 +215,9 @@ function NetworkManager:load()
 		if self._is_win32 then
 			managers.network.voice_chat:open()
 		end
+	end
+	if Network.set_loading_state then
+		Network:set_loading_state(false)
 	end
 end
 
@@ -490,7 +525,7 @@ function NetworkManager:protocol_type()
 end
 
 function NetworkManager:set_packet_throttling_enabled(state)
-	if self._session then
+	if self._session and self._is_win32 then
 		self._session:set_packet_throttling_enabled(state)
 	end
 end

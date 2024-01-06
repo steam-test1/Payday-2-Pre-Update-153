@@ -364,6 +364,8 @@ function CopLogicIdle.on_new_objective(data, old_objective)
 			CopLogicBase._exit(data.unit, "idle")
 		elseif objective_type == "sniper" then
 			CopLogicBase._exit(data.unit, "sniper")
+		elseif objective_type == "surrender" then
+			CopLogicBase._exit(data.unit, "intimidated", new_objective.params)
 		elseif objective_type == "free" and my_data.exiting then
 		elseif not (not new_objective.action and data.attention_obj) or not (data.attention_obj.reaction >= AIAttentionObject.REACT_AIM) then
 			CopLogicBase._exit(data.unit, "idle")
@@ -435,7 +437,6 @@ function CopLogicIdle.on_criminal_neutralized(data, criminal_key)
 end
 
 function CopLogicIdle.on_intimidated(data, amount, aggressor_unit)
-	print(data.unit, "[CopLogicIdle.on_intimidated]", data.unit, amount, aggressor_unit)
 	local surrender = false
 	local my_data = data.internal_data
 	data.t = TimerManager:game():time()
@@ -483,10 +484,7 @@ end
 
 function CopLogicIdle._surrender(data, amount, aggressor_unit)
 	local params = {effect = amount, aggressor_unit = aggressor_unit}
-	data.unit:brain():set_logic("intimidated", params)
-	if data.objective then
-		data.objective_failed_clbk(data.unit, data.objective)
-	end
+	data.brain:set_objective({type = "surrender", params = params})
 end
 
 function CopLogicIdle._chk_stare_into_wall_1(data)
