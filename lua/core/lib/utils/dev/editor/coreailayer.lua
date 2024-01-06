@@ -14,6 +14,7 @@ function AiLayer:init(owner)
 	self._nav_surface_unit = Idstring("core/units/nav_surface/nav_surface")
 	self._patrol_point_unit = Idstring("core/units/patrol_point/patrol_point")
 	self:_init_ai_settings()
+	self:_init_mop_settings()
 	self._patrol_path_brush = Draw:brush()
 	self._only_draw_selected_patrol_path = false
 	self._default_values = {}
@@ -402,7 +403,63 @@ function AiLayer:_build_motion_path_section()
 	self._motion_paths_list:connect("EVT_COMMAND_LISTBOX_SELECTED", callback(self, self, "_select_motion_path"), nil)
 	motion_paths_list_sizer:add(self._motion_paths_list, 1, 0, "EXPAND")
 	motion_paths_sizer:add(motion_paths_list_sizer, 1, 0, "EXPAND")
+	local mop_type = {
+		name = "Selected path type:",
+		panel = self._ews_panel,
+		sizer = motion_paths_sizer,
+		options = managers.motion_path:get_path_types(),
+		value = self._motion_path_settings.path_type,
+		tooltip = "Path is used for either ground or airborne units.",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sorted = false
+	}
+	local path_type_ctrlr = CoreEws.combobox(mop_type)
+	path_type_ctrlr:connect("EVT_COMMAND_COMBOBOX_SELECTED", callback(self, self, "_set_mop_type"), nil)
+	local speed_limit = {
+		name = "Default Speed Limit [km/h]:",
+		panel = self._ews_panel,
+		sizer = motion_paths_sizer,
+		value = 50,
+		floats = 1,
+		tooltip = "Default speed limit for units moved along this path. -1 for no limit.",
+		min = -1,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local speed_limit_ctrlr = CoreEws.number_controller(speed_limit)
+	speed_limit_ctrlr:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "_set_mop_speed_limit"), nil)
+	speed_limit_ctrlr:connect("EVT_KILL_FOCUS", callback(self, self, "_set_mop_speed_limit"), nil)
+	self.motion_path_settings_guis = {}
+	self.motion_path_settings_guis.default_speed_limit = speed_limit
+	self.motion_path_settings_guis.default_speed_limit_ctrlr = speed_limit_ctrlr
+	self.motion_path_settings_guis.path_type = mop_type
+	self.motion_path_settings_guis.path_type_ctrlr = path_type_ctrlr
 	return motion_paths_sizer
+end
+
+function AiLayer:_set_mop_type()
+	local selected_path = self:_selected_motion_path()
+	if selected_path then
+		if not self._motion_path_settings[selected_path] then
+			self._motion_path_settings[selected_path] = {}
+		end
+		local path_type = self.motion_path_settings_guis.path_type.value
+		self._motion_path_settings[selected_path].path_type = path_type
+		managers.motion_path:set_path_type(path_type)
+	end
+end
+
+function AiLayer:_set_mop_speed_limit()
+	local speed_limit = self.motion_path_settings_guis.default_speed_limit.value
+	local selected_path = self:_selected_motion_path()
+	if selected_path then
+		if not self._motion_path_settings[selected_path] then
+			self._motion_path_settings[selected_path] = {}
+		end
+		self._motion_path_settings[selected_path].speed_limit = speed_limit
+	end
+	managers.motion_path:set_default_speed_limit(speed_limit)
 end
 
 function AiLayer:_delete_motion_path()
@@ -415,26 +472,50 @@ end
 
 function AiLayer:_update_motion_paths_list()
 	self._motion_paths_list:clear()
+	self._motion_path_settings = {}
 	for _, path in ipairs(managers.motion_path:get_all_paths()) do
-		self._motion_paths_list:append(path.name)
+		self._motion_paths_list:append(path.id)
+		self._motion_path_settings[path.id] = {}
+		if not path.default_speed_limit then
+			path.default_speed_limit = -1
+		end
+		if not path.path_type then
+			local all_path_types = managers.motion_path:get_path_types()
+			if all_path_types then
+				path.path_type = all_path_types[1]
+			else
+				path.path_type = "airborne"
+			end
+		end
+		self.motion_path_settings_guis.default_speed_limit_ctrlr:set_value(path.default_speed_limit)
+		self._motion_path_settings[path.id].speed_limit = path.default_speed_limit
+		self._motion_path_settings[path.id].path_type = path.path_type
+		self.motion_path_settings_guis.path_type_ctrlr:set_value(path.path_type)
+	end
+	self._motion_paths_list:select_index(0)
+	local selected_path = self:_selected_motion_path()
+	if selected_path then
+		self.motion_path_settings_guis.default_speed_limit_ctrlr:set_value(self._motion_path_settings[selected_path].speed_limit)
+		self.motion_path_settings_guis.path_type_ctrlr:set_value(self._motion_path_settings[selected_path].path_type)
+		managers.motion_path:select_path(selected_path)
 	end
 end
 
 function AiLayer:_create_motion_paths()
-	Application:debug("AiLayer:_create_motion_paths()")
 	managers.motion_path:recreate_paths()
 	self:_update_motion_paths_list()
 end
 
 function AiLayer:_select_motion_path()
-	Application:debug("AiLayer:_select_motion_path()")
 	local motion_path_name = self:_selected_motion_path()
-	print("AiLayer:_select_motion_path() selected: ", motion_path_name)
 	managers.motion_path:select_path(motion_path_name)
+	if self._motion_path_settings[motion_path_name] then
+		self.motion_path_settings_guis.default_speed_limit_ctrlr:set_value(self._motion_path_settings[motion_path_name].speed_limit)
+		self.motion_path_settings_guis.path_type_ctrlr:set_value(self._motion_path_settings[motion_path_name].path_type)
+	end
 end
 
 function AiLayer:_selected_motion_path()
-	Application:debug("AiLayer:_selected_motion_path()")
 	local index = self._motion_paths_list:selected_index()
 	if index ~= -1 then
 		return self._motion_paths_list:get_string(index)
@@ -787,6 +868,14 @@ function AiLayer:_init_ai_settings()
 	self._ai_settings = {}
 	self._ai_settings.group_state = "besiege"
 	managers.groupai:set_state(self._ai_settings.group_state)
+end
+
+function AiLayer:_init_mop_settings()
+	self._motion_path_settings = {}
+	local path_types = managers.motion_path:get_path_types()
+	if path_types then
+		self._motion_path_settings.path_type = path_types[1]
+	end
 end
 
 function AiLayer:clear()

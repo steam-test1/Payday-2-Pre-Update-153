@@ -153,6 +153,10 @@ function ElementAreaTrigger:project_amount_all()
 	return nil
 end
 
+function ElementAreaTrigger:project_amount_inside()
+	return #self._inside
+end
+
 function ElementAreaTrigger:debug_draw()
 	if self._values.instigator == "loot" or self._values.instigator == "unique_loot" then
 		for _, shape in ipairs(self._shapes) do
@@ -225,7 +229,8 @@ function ElementAreaTrigger:_check_amount(unit)
 		local amount = self._values.amount == "all" and self:project_amount_all()
 		amount = amount or tonumber(self._values.amount)
 		self:_clean_destroyed_units()
-		if #self._inside > 0 and (amount and amount <= #self._inside or not amount) then
+		local inside = self:project_amount_inside()
+		if 0 < inside and (amount and amount <= inside or not amount) then
 			self:on_executed(unit)
 		end
 	else

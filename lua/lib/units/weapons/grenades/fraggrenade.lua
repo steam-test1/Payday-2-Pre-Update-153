@@ -1,12 +1,8 @@
 FragGrenade = FragGrenade or class(GrenadeBase)
 
-function FragGrenade:init(unit)
-	self:_setup_frag_data(self._tweak_grenade_entry or "frag")
-	FragGrenade.super.init(self, unit)
-end
-
-function FragGrenade:_setup_frag_data(grenade_entry)
-	local tweak_entry = tweak_data.grenades[grenade_entry]
+function FragGrenade:_setup_from_tweak_data()
+	local grenade_entry = self._tweak_projectile_entry or "frag"
+	local tweak_entry = tweak_data.projectiles[grenade_entry]
 	self._init_timer = tweak_entry.init_timer or 2.5
 	self._mass_look_up_modifier = tweak_entry.mass_look_up_modifier
 	self._range = tweak_entry.range
@@ -24,11 +20,18 @@ function FragGrenade:_setup_frag_data(grenade_entry)
 	}
 end
 
-function FragGrenade:_impact_cbk(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
+function FragGrenade:clbk_impact(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
 	if other_unit and other_unit:vehicle() and other_unit:vehicle():is_active() then
 		return
 	end
 	self:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
+end
+
+function FragGrenade:_on_collision(col_ray)
+	if col_ray and col_ray.unit:vehicle() and col_ray.unit:vehicle():is_active() then
+		return
+	end
+	self:_detonate()
 end
 
 function FragGrenade:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)

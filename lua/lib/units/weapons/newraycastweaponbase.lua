@@ -17,6 +17,7 @@ function NewRaycastWeaponBase:init(unit)
 	NewRaycastWeaponBase.super.init(self, unit)
 	self._has_gadget = false
 	self._armor_piercing_chance = self:weapon_tweak_data().armor_piercing_chance or 0
+	self._use_shotgun_reload = self:weapon_tweak_data().use_shotgun_reload
 	self._movement_penalty = tweak_data.upgrades.weapon_movement_penalty[self:weapon_tweak_data().category] or 1
 end
 
@@ -82,6 +83,23 @@ function NewRaycastWeaponBase:clbk_assembly_complete(clbk, parts, blueprint)
 				if object then
 					self._bullet_objects[i] = self._bullet_objects[i] or {}
 					table.insert(self._bullet_objects[i], object)
+				end
+			end
+		end
+	end
+	if not self._bullet_objects or #self._bullet_objects == 0 then
+		local ammo = managers.weapon_factory:get_part_from_weapon_by_type("ammo", self._parts)
+		if ammo then
+			local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type("ammo", "bullet_objects", self._parts)
+			if bullet_objects then
+				self._bullet_objects = {}
+				local prefix = bullet_objects.prefix
+				for i = 1, bullet_objects.amount do
+					local object = ammo.unit:get_object(Idstring(prefix .. i))
+					if object then
+						self._bullet_objects[i] = self._bullet_objects[i] or {}
+						table.insert(self._bullet_objects[i], object)
+					end
 				end
 			end
 		end
@@ -774,6 +792,91 @@ function NewRaycastWeaponBase:reload_speed_multiplier()
 		end
 	end
 	return self:_convert_add_to_mul(multiplier)
+end
+
+function NewRaycastWeaponBase:reload_expire_t()
+	if self._use_shotgun_reload then
+		local ammo_remaining_in_clip = self:get_ammo_remaining_in_clip()
+		return math.min(self:get_ammo_total() - ammo_remaining_in_clip, self:get_ammo_max_per_clip() - ammo_remaining_in_clip) * self:reload_shell_expire_t()
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:reload_enter_expire_t()
+	if self._use_shotgun_reload then
+		return self:weapon_tweak_data().timers.shotgun_reload_enter or 0.3
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:reload_exit_expire_t()
+	if self._use_shotgun_reload then
+		return self:weapon_tweak_data().timers.shotgun_reload_exit_empty or 0.7
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:reload_not_empty_exit_expire_t()
+	if self._use_shotgun_reload then
+		return self:weapon_tweak_data().timers.shotgun_reload_exit_not_empty or 0.3
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:reload_shell_expire_t()
+	if self._use_shotgun_reload then
+		return self:weapon_tweak_data().timers.shotgun_reload_shell or 0.56666666
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:_first_shell_reload_expire_t()
+	if self._use_shotgun_reload then
+		return self:reload_shell_expire_t() - (self:weapon_tweak_data().timers.shotgun_reload_first_shell_offset or 0.33)
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:start_reload(...)
+	NewRaycastWeaponBase.super.start_reload(self, ...)
+	if self._use_shotgun_reload then
+		self._started_reload_empty = self:clip_empty()
+		local speed_multiplier = self:reload_speed_multiplier()
+		self._next_shell_reloded_t = managers.player:player_timer():time() + self:_first_shell_reload_expire_t() / speed_multiplier
+	end
+end
+
+function NewRaycastWeaponBase:started_reload_empty()
+	if self._use_shotgun_reload then
+		return self._started_reload_empty
+	end
+	return nil
+end
+
+function NewRaycastWeaponBase:update_reloading(t, dt, time_left)
+	if self._use_shotgun_reload and t > self._next_shell_reloded_t then
+		local speed_multiplier = self:reload_speed_multiplier()
+		self._next_shell_reloded_t = self._next_shell_reloded_t + self:reload_shell_expire_t() / speed_multiplier
+		self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), self:get_ammo_remaining_in_clip() + 1))
+		return true
+	end
+end
+
+function NewRaycastWeaponBase:reload_interuptable()
+	if self._use_shotgun_reload then
+		return true
+	end
+	return false
+end
+
+function NewRaycastWeaponBase:shotgun_shell_data()
+	if self._use_shotgun_reload then
+		local reload_shell_data = self:weapon_tweak_data().animations.reload_shell_data
+		local unit_name = reload_shell_data and reload_shell_data.unit_name or "units/payday2/weapons/wpn_fps_shell/wpn_fps_shell"
+		local align = reload_shell_data and reload_shell_data.align or nil
+		return {unit_name = unit_name, align = align}
+	end
+	return nil
 end
 
 function NewRaycastWeaponBase:set_timer(timer, ...)

@@ -407,7 +407,7 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 				sound_source:set_switch("materials", managers.game_play_central:material_name(sound_switch_name))
 			end
 			sound_source:post_event(sound_event)
-			managers.enemy:add_delayed_clbk("ExplosionManager", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
+			managers.enemy:add_delayed_clbk("ExplosionManager", callback(ProjectileBase, ProjectileBase, "_dispose_of_sound", {sound_source = sound_source}), TimerManager:game():time() + 4)
 		end
 	end
 	self:project_decal(ray, decal_ray_from, decal_ray_to, on_unit and ray and ray.unit, idstr_decal, idstr_effect)

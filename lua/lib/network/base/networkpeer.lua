@@ -381,6 +381,7 @@ function NetworkPeer:save(data)
 	data.loaded = self._loaded
 	data.loading = self._loading
 	data.expected_dropin_pause_confirmations = self._expected_dropin_pause_confirmations
+	self:_clean_queue()
 	data.msg_queues = self._msg_queues
 	data.user_id = self._user_id
 	data.force_open_lobby = self._force_open_lobby
@@ -676,6 +677,34 @@ function NetworkPeer:_push_to_queue(queue_name, ...)
 	table.insert(self._msg_queues[queue_name], {
 		...
 	})
+end
+
+function NetworkPeer:_clean_queue()
+	if not self._msg_queues then
+		return
+	end
+	for type, msg_queue in pairs(self._msg_queues) do
+		local ok
+		for i, msg in ipairs(msg_queue) do
+			ok = true
+			for _, param in ipairs(msg) do
+				local param_type = type_name(param)
+				if param_type == "Unit" then
+					if not alive(param) or param:id() == -1 then
+						ok = nil
+						break
+					end
+				elseif param_type == "Body" and not alive(param) then
+					ok = nil
+					break
+				end
+			end
+			if not ok then
+				print("[NetworkPeer:_clean_queue]: Removing Message:", i)
+				msg_queue[i] = nil
+			end
+		end
+	end
 end
 
 function NetworkPeer:_flush_queue(queue_name)

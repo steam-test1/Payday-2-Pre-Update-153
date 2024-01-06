@@ -857,6 +857,10 @@ function TeamAIDamage:last_suppression_t()
 	return self._last_received_dmg_t
 end
 
+function TeamAIDamage:can_attach_projectiles()
+	return false
+end
+
 function TeamAIDamage:save(data)
 	if self._arrested_timer then
 		data.char_dmg = data.char_dmg or {}

@@ -12,7 +12,7 @@ end
 
 function SpawnGrenadeUnitElement:test_element()
 	if self._hed.grenade_type == "frag" then
-		GrenadeBase.server_throw_grenade(1, self._unit:position(), self._hed.spawn_dir * self._hed.strength)
+		ProjectileBase.throw_projectile(1, self._unit:position(), self._hed.spawn_dir * self._hed.strength)
 	end
 end
 
@@ -51,7 +51,7 @@ function SpawnGrenadeUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	self:_build_value_combobox(panel, panel_sizer, "grenade_type", table.map_keys(tweak_data.blackmarket.grenades), "Select what type of grenade will be spawned.")
+	self:_build_value_combobox(panel, panel_sizer, "grenade_type", table.map_keys(tweak_data.blackmarket.projectiles), "Select what type of grenade will be spawned.")
 	self:_build_value_number(panel, panel_sizer, "strength", {floats = 1}, "Use this to add a strength to a physic push on the spawned grenade")
 	self:_add_help_text("Spawns a grenade.")
 end

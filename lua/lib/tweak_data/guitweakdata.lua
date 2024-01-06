@@ -330,6 +330,14 @@ function GuiTweakData:init()
 		store = 358150,
 		image = "guis/dlcs/bbq/textures/pd2/content_updates/bbq"
 	}
+	local west = {
+		id = "west",
+		name_id = "menu_content_west",
+		desc_id = "menu_content_west_desc",
+		date_id = "menu_content_west_date",
+		store = 349830,
+		image = "guis/dlcs/west/textures/pd2/content_updates/west"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -376,7 +384,8 @@ function GuiTweakData:init()
 			hlm2,
 			hlm2_deluxe,
 			springbreak,
-			bbq
+			bbq,
+			west
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -472,7 +481,8 @@ function GuiTweakData:init()
 		grenade_launcher = "wpn_special",
 		saw = "wpn_special",
 		minigun = "wpn_special",
-		flamethrower = "wpn_special"
+		flamethrower = "wpn_special",
+		bow = "wpn_special"
 	}
 	self.LONGEST_CHAR_NAME = "JOHN WICK"
 	self.crime_net.regions = {

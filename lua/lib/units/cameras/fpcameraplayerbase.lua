@@ -926,7 +926,7 @@ function FPCameraPlayerBase:spawn_grenade()
 	local align_obj_l = self._unit:get_object(align_obj_l_name)
 	local align_obj_r = self._unit:get_object(align_obj_r_name)
 	local grenade_entry = managers.blackmarket:equipped_grenade()
-	self._grenade_unit = World:spawn_unit(Idstring(tweak_data.blackmarket.grenades[grenade_entry].unit_dummy), align_obj_r:position(), align_obj_r:rotation())
+	self._grenade_unit = World:spawn_unit(Idstring(tweak_data.blackmarket.projectiles[grenade_entry].unit_dummy), align_obj_r:position(), align_obj_r:rotation())
 	self._unit:link(align_obj_r:name(), self._grenade_unit, self._grenade_unit:orientation_object():name())
 end
 

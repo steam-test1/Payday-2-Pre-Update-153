@@ -177,6 +177,9 @@ function WeaponFactoryTweakData:init()
 	self:_init_flamethrower_mk2()
 	self:_init_m32()
 	self:_init_aa12()
+	self:_init_peacemaker()
+	self:_init_winchester1874()
+	self:_init_plainsrider()
 	self:create_ammunition()
 	self:_init_content_unfinished()
 end
@@ -20762,4 +20765,366 @@ function WeaponFactoryTweakData:_init_aa12()
 	}
 	self.wpn_fps_sho_aa12_npc = deep_clone(self.wpn_fps_sho_aa12)
 	self.wpn_fps_sho_aa12_npc.unit = "units/pd2_dlc_bbq/weapons/wpn_fps_sho_aa12/wpn_fps_sho_aa12_npc"
+end
+
+function WeaponFactoryTweakData:_init_peacemaker()
+	self.parts.wpn_fps_pis_peacemaker_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_peacemaker_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_body_standard",
+		stats = {value = 1},
+		animations = {
+			reload_exit = "reload_exit",
+			reload_enter = "reload_enter",
+			reload_not_empty_exit = "reload_exit",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_peacemaker_b_standard = {
+		type = "slide",
+		name_id = "bm_wp_peacemaker_barrel_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_peacemaker_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_peacemaker_barrel_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_b_long",
+		stats = {
+			value = 1,
+			spread = 1,
+			spread_moving = -1,
+			concealment = -2
+		},
+		dlc = "west",
+		texture_bundle_folder = "west"
+	}
+	self.parts.wpn_fps_pis_peacemaker_b_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "slide",
+		name_id = "bm_wp_peacemaker_barrel_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_b_short",
+		stats = {
+			value = 1,
+			spread = -1,
+			spread_moving = -1,
+			concealment = 2
+		},
+		dlc = "west",
+		texture_bundle_folder = "west"
+	}
+	self.parts.wpn_fps_pis_peacemaker_m_standard = {
+		type = "upper_reciever",
+		name_id = "bm_wp_peacemaker_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_m_standard",
+		stats = {value = 1},
+		animations = {
+			reload_enter = "reload_enter",
+			reload = "reload",
+			reload_not_empty = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_pis_peacemaker_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_peacemaker_handle_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_peacemaker_g_bling = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "grip",
+		name_id = "bm_wp_peacemaker_handle_bling",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_g_bling",
+		stats = {
+			value = 1,
+			recoil = 1,
+			concealment = -1
+		},
+		dlc = "west",
+		texture_bundle_folder = "west"
+	}
+	self.parts.wpn_fps_pis_peacemaker_s_skeletal = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_peacemaker_rifle_stock",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker_pts/wpn_fps_pis_peacemaker_s_skeletal",
+		stats = {
+			value = 1,
+			recoil = 2,
+			concealment = -2
+		},
+		dlc = "west",
+		texture_bundle_folder = "west"
+	}
+	self.parts.wpn_fps_pis_peacemaker_body_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_body_standard"
+	self.parts.wpn_fps_pis_peacemaker_b_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_b_standard"
+	self.parts.wpn_fps_pis_peacemaker_b_long.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_b_long"
+	self.parts.wpn_fps_pis_peacemaker_b_short.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_b_short"
+	self.parts.wpn_fps_pis_peacemaker_m_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_m_standard"
+	self.parts.wpn_fps_pis_peacemaker_g_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_g_standard"
+	self.parts.wpn_fps_pis_peacemaker_g_bling.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_g_bling"
+	self.parts.wpn_fps_pis_peacemaker_s_skeletal.third_unit = "units/pd2_dlc_west/weapons/wpn_third_pis_peacemaker_pts/wpn_third_pis_peacemaker_s_skeletal"
+	self.wpn_fps_pis_peacemaker = {}
+	self.wpn_fps_pis_peacemaker.unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker/wpn_fps_pis_peacemaker"
+	self.wpn_fps_pis_peacemaker.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight"
+	}
+	self.wpn_fps_pis_peacemaker.default_blueprint = {
+		"wpn_fps_pis_peacemaker_body_standard",
+		"wpn_fps_pis_peacemaker_b_standard",
+		"wpn_fps_pis_peacemaker_m_standard",
+		"wpn_fps_pis_peacemaker_g_standard"
+	}
+	self.wpn_fps_pis_peacemaker.uses_parts = {
+		"wpn_fps_pis_peacemaker_body_standard",
+		"wpn_fps_pis_peacemaker_b_standard",
+		"wpn_fps_pis_peacemaker_b_long",
+		"wpn_fps_pis_peacemaker_b_short",
+		"wpn_fps_pis_peacemaker_m_standard",
+		"wpn_fps_pis_peacemaker_g_standard",
+		"wpn_fps_pis_peacemaker_g_bling",
+		"wpn_fps_pis_peacemaker_s_skeletal"
+	}
+	self.wpn_fps_pis_peacemaker_npc = deep_clone(self.wpn_fps_pis_peacemaker)
+	self.wpn_fps_pis_peacemaker_npc.unit = "units/pd2_dlc_west/weapons/wpn_fps_pis_peacemaker/wpn_fps_pis_peacemaker_npc"
+end
+
+function WeaponFactoryTweakData:_init_winchester1874()
+	self.parts.wpn_fps_snp_winchester_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_winchester_b_medium",
+		texture_bundle_folder = "west",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_snp_winchester_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_winchester_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_b_long",
+		dlc = "west",
+		texture_bundle_folder = "west",
+		stats = {
+			value = 1,
+			spread = 1,
+			recoil = 0,
+			concealment = -2
+		}
+	}
+	self.parts.wpn_fps_snp_winchester_b_suppressed = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		sub_type = "silencer",
+		name_id = "bm_wp_winchester_b_suppressed",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_b_suppressed",
+		texture_bundle_folder = "west",
+		dlc = "west",
+		stats = {
+			value = 6,
+			suppression = 12,
+			alert_size = 12,
+			spread = -1,
+			recoil = 3,
+			spread_moving = -2,
+			concealment = -2,
+			damage = -3
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_a"
+		}
+	}
+	self.parts.wpn_fps_snp_winchester_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_winchester_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_body_standard",
+		stats = {value = 1},
+		animations = {
+			reload_exit = "reload_exit",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_snp_winchester_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_m14_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_m_standard",
+		stats = {value = 1},
+		animations = {reload = "reload", reload_not_empty = "reload"}
+	}
+	self.parts.wpn_fps_snp_winchester_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_winchester_body_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_snp_winchester_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_upg_winchester_o_classic = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "sight",
+		name_id = "bm_wp_winchester_sniper_scope",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester_pts/wpn_fps_upg_winchester_o_classic",
+		stats = {
+			value = 0,
+			zoom = 10,
+			recoil = 1,
+			concealment = -3
+		},
+		stance_mod = {
+			wpn_fps_snp_winchester = {
+				translation = Vector3(0, -28, -1.855)
+			}
+		},
+		dlc = "west",
+		texture_bundle_folder = "west"
+	}
+	self.parts.wpn_fps_snp_winchester_b_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_b_standard"
+	self.parts.wpn_fps_snp_winchester_b_long.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_b_long"
+	self.parts.wpn_fps_snp_winchester_b_suppressed.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_b_suppressed"
+	self.parts.wpn_fps_snp_winchester_body_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_body_standard"
+	self.parts.wpn_fps_snp_winchester_m_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_m_standard"
+	self.parts.wpn_fps_snp_winchester_s_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_snp_winchester_s_standard"
+	self.parts.wpn_fps_upg_winchester_o_classic.third_unit = "units/pd2_dlc_west/weapons/wpn_third_snp_winchester/wpn_third_upg_winchester_o_classic"
+	self.wpn_fps_snp_winchester = {}
+	self.wpn_fps_snp_winchester.unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester/wpn_fps_snp_winchester"
+	self.wpn_fps_snp_winchester.optional_types = {"gadget", "sight"}
+	self.wpn_fps_snp_winchester.default_blueprint = {
+		"wpn_fps_snp_winchester_b_standard",
+		"wpn_fps_snp_winchester_body_standard",
+		"wpn_fps_snp_winchester_m_standard",
+		"wpn_fps_snp_winchester_s_standard"
+	}
+	self.wpn_fps_snp_winchester.uses_parts = {
+		"wpn_fps_snp_winchester_b_standard",
+		"wpn_fps_snp_winchester_b_long",
+		"wpn_fps_snp_winchester_b_suppressed",
+		"wpn_fps_snp_winchester_body_standard",
+		"wpn_fps_snp_winchester_m_standard",
+		"wpn_fps_snp_winchester_s_standard",
+		"wpn_fps_upg_winchester_o_classic"
+	}
+	self.wpn_fps_snp_winchester_npc = deep_clone(self.wpn_fps_snp_winchester)
+	self.wpn_fps_snp_winchester_npc.unit = "units/pd2_dlc_west/weapons/wpn_fps_snp_winchester/wpn_fps_snp_winchester_npc"
+end
+
+function WeaponFactoryTweakData:_init_plainsrider()
+	self.parts.wpn_fps_bow_plainsrider_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_plainsrider_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_fps_bow_plainsrider_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_bow_plainsrider_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_plainsrider_barrel",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_fps_bow_plainsrider_body_standard",
+		stats = {value = 1},
+		animations = {
+			fire = "recoil",
+			fire_steelsight = "recoil",
+			reload = "reload",
+			charge = "charge"
+		}
+	}
+	self.parts.wpn_fps_bow_plainsrider_m_standard = {
+		type = "ammo",
+		name_id = "bm_wp_plainsrider_barrel",
+		a_obj = "a_m",
+		parent = "lower_reciever",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_fps_bow_plainsrider_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_upg_a_bow_explosion = {
+		pcs = {},
+		type = "ammo",
+		name_id = "bm_wpn_fps_upg_a_bow_explosion",
+		a_obj = "a_m",
+		parent = "lower_reciever",
+		bullet_objects = {prefix = "g_bullet_", amount = 1},
+		unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_fps_bow_plainsrider_m_explosive",
+		third_unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_third_bow_plainsrider_m_explosive",
+		stats = {damage = 4},
+		custom_stats = {
+			launcher_grenade = "west_arrow_exp"
+		},
+		dlc = "west",
+		texture_bundle_folder = "west",
+		sub_type = "ammo_explosive",
+		is_a_unlockable = true
+	}
+	self.parts.wpn_fps_bow_plainsrider_body_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_third_bow_plainsrider_body_standard"
+	self.parts.wpn_fps_bow_plainsrider_m_standard.third_unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider_pts/wpn_third_bow_plainsrider_m_standard"
+	self.wpn_fps_bow_plainsrider = {}
+	self.wpn_fps_bow_plainsrider.unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider/wpn_fps_bow_plainsrider"
+	self.wpn_fps_bow_plainsrider.default_blueprint = {
+		"wpn_fps_bow_plainsrider_b_standard",
+		"wpn_fps_bow_plainsrider_body_standard",
+		"wpn_fps_bow_plainsrider_m_standard"
+	}
+	self.wpn_fps_bow_plainsrider.uses_parts = {
+		"wpn_fps_bow_plainsrider_b_standard",
+		"wpn_fps_bow_plainsrider_body_standard",
+		"wpn_fps_bow_plainsrider_m_standard",
+		"wpn_fps_upg_a_bow_explosion"
+	}
+	self.wpn_fps_bow_plainsrider_npc = deep_clone(self.wpn_fps_bow_plainsrider)
+	self.wpn_fps_bow_plainsrider_npc.unit = "units/pd2_dlc_west/weapons/wpn_fps_bow_plainsrider/wpn_fps_bow_plainsrider_npc"
 end

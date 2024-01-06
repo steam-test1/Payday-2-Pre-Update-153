@@ -417,7 +417,7 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 				end
 				local peer_grenades = managers.player:get_synced_grenades(peer_id)
 				if peer_grenades then
-					local icon = tweak_data.blackmarket.grenades[peer_grenades.grenade].icon
+					local icon = tweak_data.blackmarket.projectiles[peer_grenades.grenade].icon
 					self:set_teammate_grenades(i, {
 						icon = icon,
 						amount = Application:digest_value(peer_grenades.amount, false)

@@ -11,7 +11,7 @@ function BlackMarketTweakData:init(tweak_data)
 	self:_init_weapon_mods(tweak_data)
 	self:_init_armors()
 	self:_init_deployables(tweak_data)
-	self:_init_grenades()
+	self:_init_projectiles()
 	self:_init_melee_weapons()
 end
 
@@ -1915,6 +1915,38 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.chef_hat.texture_bundle_folder = "bbq"
 	self.masks.chef_hat.sort_number = 8
 	self.masks.chef_hat.type = "helmet"
+	self.masks.bandit = {}
+	self.masks.bandit.unit = "units/pd2_dlc_west/masks/msk_bandit/msk_bandit"
+	self.masks.bandit.name_id = "bm_msk_bandit"
+	self.masks.bandit.pcs = {}
+	self.masks.bandit.dlc = "west"
+	self.masks.bandit.texture_bundle_folder = "west"
+	self.masks.bandit.value = 0
+	self.masks.bandit.type = "helmet"
+	self.masks.bandit.skip_mask_on_sequence = true
+	self.masks.bullskull = {}
+	self.masks.bullskull.unit = "units/pd2_dlc_west/masks/msk_bullskull/msk_bullskull"
+	self.masks.bullskull.name_id = "bm_msk_bullskull"
+	self.masks.bullskull.pcs = {}
+	self.masks.bullskull.dlc = "west"
+	self.masks.bullskull.texture_bundle_folder = "west"
+	self.masks.bullskull.value = 0
+	self.masks.kangee = {}
+	self.masks.kangee.unit = "units/pd2_dlc_west/masks/msk_kangee/msk_kangee"
+	self.masks.kangee.name_id = "bm_msk_kangee"
+	self.masks.kangee.pcs = {}
+	self.masks.kangee.dlc = "west"
+	self.masks.kangee.texture_bundle_folder = "west"
+	self.masks.kangee.value = 0
+	self.masks.lone = {}
+	self.masks.lone.unit = "units/pd2_dlc_west/masks/msk_lone/msk_lone"
+	self.masks.lone.name_id = "bm_msk_lone"
+	self.masks.lone.pcs = {}
+	self.masks.lone.dlc = "west"
+	self.masks.lone.texture_bundle_folder = "west"
+	self.masks.lone.value = 0
+	self.masks.lone.type = "helmet"
+	self.masks.lone.skip_mask_on_sequence = true
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/payday2/masks/msk_sweettooth/msk_sweettooth"
@@ -4071,6 +4103,32 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.coal.material_amount = 0
 	self.materials.coal.dlc = "bbq"
 	self.materials.coal.texture_bundle_folder = "bbq"
+	self.materials.goldfever = {}
+	self.materials.goldfever.name_id = "bm_mtl_goldfever"
+	self.materials.goldfever.pcs = {}
+	self.materials.goldfever.texture = "units/pd2_dlc_west/masks/materials/matcap_goldfever_df"
+	self.materials.goldfever.dlc = "west"
+	self.materials.goldfever.value = 0
+	self.materials.westernsunset = {}
+	self.materials.westernsunset.name_id = "bm_mtl_westernsunset"
+	self.materials.westernsunset.pcs = {}
+	self.materials.westernsunset.texture = "units/pd2_dlc_west/masks/materials/matcap_westernsunset_df"
+	self.materials.westernsunset.dlc = "west"
+	self.materials.westernsunset.value = 0
+	self.materials.scorpion = {}
+	self.materials.scorpion.name_id = "bm_mtl_scorpion"
+	self.materials.scorpion.pcs = {}
+	self.materials.scorpion.texture = "units/pd2_dlc_west/masks/materials/matcap_scorpion_df"
+	self.materials.scorpion.dlc = "west"
+	self.materials.scorpion.material_amount = 0
+	self.materials.scorpion.value = 0
+	self.materials.cactus = {}
+	self.materials.cactus.name_id = "bm_mtl_cactus"
+	self.materials.cactus.pcs = {}
+	self.materials.cactus.texture = "units/pd2_dlc_west/masks/materials/matcap_cactus_df"
+	self.materials.cactus.dlc = "west"
+	self.materials.cactus.material_amount = 0
+	self.materials.cactus.value = 0
 end
 
 function BlackMarketTweakData:_init_textures()
@@ -5746,6 +5804,30 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.hotflames.value = 0
 	self.textures.hotflames.dlc = "bbq"
 	self.textures.hotflames.texture_bundle_folder = "bbq"
+	self.textures.coyote = {}
+	self.textures.coyote.name_id = "bm_txt_coyote"
+	self.textures.coyote.pcs = {}
+	self.textures.coyote.texture = "units/pd2_dlc_west/masks/patterns/pattern_coyote_df"
+	self.textures.coyote.dlc = "west"
+	self.textures.coyote.value = 0
+	self.textures.native = {}
+	self.textures.native.name_id = "bm_txt_native"
+	self.textures.native.pcs = {}
+	self.textures.native.texture = "units/pd2_dlc_west/masks/patterns/pattern_native_df"
+	self.textures.native.dlc = "west"
+	self.textures.native.value = 0
+	self.textures.pattern = {}
+	self.textures.pattern.name_id = "bm_txt_pattern"
+	self.textures.pattern.pcs = {}
+	self.textures.pattern.texture = "units/pd2_dlc_west/masks/patterns/pattern_pattern_df"
+	self.textures.pattern.dlc = "west"
+	self.textures.pattern.value = 0
+	self.textures.totem = {}
+	self.textures.totem.name_id = "bm_txt_totem"
+	self.textures.totem.pcs = {}
+	self.textures.totem.texture = "units/pd2_dlc_west/masks/patterns/pattern_totem_df"
+	self.textures.totem.dlc = "west"
+	self.textures.totem.value = 0
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -5971,81 +6053,109 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self:_add_desc_from_name_macro(self.deployables)
 end
 
-function BlackMarketTweakData:_init_grenades()
-	self.grenades = {}
-	self.grenades.frag = {}
-	self.grenades.frag.name_id = "bm_grenade_frag"
-	self.grenades.frag.unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade"
-	self.grenades.frag.unit_dummy = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_husk"
-	self.grenades.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
-	self.grenades.frag.icon = "frag_grenade"
-	self.grenades.frag.dlc = "gage_pack"
-	self.grenades.frag.throwable = true
-	self.grenades.frag.max_amount = 3
-	self.grenades.launcher_frag = {}
-	self.grenades.launcher_frag.name_id = "bm_launcher_frag"
-	self.grenades.launcher_frag.unit = "units/pd2_dlc_gage_assault/weapons/wpn_launcher_frag_grenade/wpn_launcher_frag_grenade"
-	self.grenades.launcher_frag.weapon_id = "gre_m79"
-	self.grenades.launcher_frag.no_cheat_count = true
-	self.grenades.launcher_frag.impact_detonation = true
-	self.grenades.launcher_frag.time_cheat = 1
-	self.grenades.rocket_frag = {}
-	self.grenades.rocket_frag.name_id = "bm_rocket_frag"
-	self.grenades.rocket_frag.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_fired_rocket/wpn_third_rpg7_fired_rocket"
-	self.grenades.rocket_frag.weapon_id = "rpg7"
-	self.grenades.rocket_frag.no_cheat_count = true
-	self.grenades.rocket_frag.impact_detonation = true
-	self.grenades.rocket_frag.time_cheat = 1
-	self.grenades.rocket_frag.physic_effect = Idstring("physic_effects/anti_gravitate")
-	self.grenades.rocket_frag.adjust_z = 0
-	self.grenades.molotov = {}
-	self.grenades.molotov.name_id = "bm_grenade_molotov"
-	self.grenades.molotov.unit = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_third"
-	self.grenades.molotov.unit_dummy = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_husk"
-	self.grenades.molotov.icon = "molotov_grenade"
-	self.grenades.molotov.dlc = "bbq"
-	self.grenades.molotov.no_cheat_count = true
-	self.grenades.molotov.impact_detonation = true
-	self.grenades.molotov.time_cheat = 1
-	self.grenades.molotov.throwable = true
-	self.grenades.molotov.max_amount = 3
-	self.grenades.molotov.texture_bundle_folder = "bbq"
-	self.grenades.molotov.physic_effect = Idstring("physic_effects/molotov_throw")
-	self.grenades.launcher_incendiary = {}
-	self.grenades.launcher_incendiary.name_id = "bm_launcher_incendiary"
-	self.grenades.launcher_incendiary.unit = "units/pd2_dlc_bbq/weapons/wpn_launcher_incendiary_grenade/wpn_launcher_incendiary_grenade"
-	self.grenades.launcher_incendiary.weapon_id = "gre_m79"
-	self.grenades.launcher_incendiary.no_cheat_count = true
-	self.grenades.launcher_incendiary.impact_detonation = true
-	self.grenades.launcher_incendiary.time_cheat = 1
-	self.grenades.launcher_frag_m32 = deep_clone(self.grenades.launcher_frag)
-	self.grenades.launcher_frag_m32.weapon_id = "m32"
-	self._grenades_index = {
+function BlackMarketTweakData:_init_projectiles()
+	self.projectiles = {}
+	self.projectiles.frag = {}
+	self.projectiles.frag.name_id = "bm_grenade_frag"
+	self.projectiles.frag.unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade"
+	self.projectiles.frag.unit_dummy = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_husk"
+	self.projectiles.frag.sprint_unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade_sprint"
+	self.projectiles.frag.icon = "frag_grenade"
+	self.projectiles.frag.dlc = "gage_pack"
+	self.projectiles.frag.throwable = true
+	self.projectiles.frag.max_amount = 3
+	self.projectiles.launcher_frag = {}
+	self.projectiles.launcher_frag.name_id = "bm_launcher_frag"
+	self.projectiles.launcher_frag.unit = "units/pd2_dlc_gage_assault/weapons/wpn_launcher_frag_grenade/wpn_launcher_frag_grenade"
+	self.projectiles.launcher_frag.weapon_id = "gre_m79"
+	self.projectiles.launcher_frag.no_cheat_count = true
+	self.projectiles.launcher_frag.impact_detonation = true
+	self.projectiles.launcher_frag.time_cheat = 1
+	self.projectiles.rocket_frag = {}
+	self.projectiles.rocket_frag.name_id = "bm_rocket_frag"
+	self.projectiles.rocket_frag.unit = "units/pd2_dlc_overkill_pack/weapons/wpn_third_rpg7_fired_rocket/wpn_third_rpg7_fired_rocket"
+	self.projectiles.rocket_frag.weapon_id = "rpg7"
+	self.projectiles.rocket_frag.no_cheat_count = true
+	self.projectiles.rocket_frag.impact_detonation = true
+	self.projectiles.rocket_frag.time_cheat = 1
+	self.projectiles.rocket_frag.physic_effect = Idstring("physic_effects/anti_gravitate")
+	self.projectiles.rocket_frag.adjust_z = 0
+	self.projectiles.molotov = {}
+	self.projectiles.molotov.name_id = "bm_grenade_molotov"
+	self.projectiles.molotov.unit = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_third"
+	self.projectiles.molotov.unit_dummy = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_husk"
+	self.projectiles.molotov.icon = "molotov_grenade"
+	self.projectiles.molotov.dlc = "bbq"
+	self.projectiles.molotov.no_cheat_count = true
+	self.projectiles.molotov.impact_detonation = true
+	self.projectiles.molotov.time_cheat = 1
+	self.projectiles.molotov.throwable = true
+	self.projectiles.molotov.max_amount = 3
+	self.projectiles.molotov.texture_bundle_folder = "bbq"
+	self.projectiles.molotov.physic_effect = Idstring("physic_effects/molotov_throw")
+	self.projectiles.launcher_incendiary = {}
+	self.projectiles.launcher_incendiary.name_id = "bm_launcher_incendiary"
+	self.projectiles.launcher_incendiary.unit = "units/pd2_dlc_bbq/weapons/wpn_launcher_incendiary_grenade/wpn_launcher_incendiary_grenade"
+	self.projectiles.launcher_incendiary.weapon_id = "gre_m79"
+	self.projectiles.launcher_incendiary.no_cheat_count = true
+	self.projectiles.launcher_incendiary.impact_detonation = true
+	self.projectiles.launcher_incendiary.time_cheat = 1
+	self.projectiles.launcher_frag_m32 = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_frag_m32.weapon_id = "m32"
+	self.projectiles.west_arrow = {}
+	self.projectiles.west_arrow.name_id = "bm_launcher_frag"
+	self.projectiles.west_arrow.unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow"
+	self.projectiles.west_arrow.local_unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow_local"
+	self.projectiles.west_arrow.weapon_id = "plainsrider"
+	self.projectiles.west_arrow.no_cheat_count = true
+	self.projectiles.west_arrow.impact_detonation = true
+	self.projectiles.west_arrow.client_authoritative = true
+	self.projectiles.west_arrow_exp = {}
+	self.projectiles.west_arrow_exp.name_id = "bm_launcher_frag"
+	self.projectiles.west_arrow_exp.unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow_exp"
+	self.projectiles.west_arrow_exp.local_unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow_exp_local"
+	self.projectiles.west_arrow_exp.weapon_id = "plainsrider"
+	self.projectiles.west_arrow_exp.no_cheat_count = true
+	self.projectiles.west_arrow_exp.impact_detonation = true
+	self.projectiles.west_arrow_exp.client_authoritative = true
+	self.projectiles.dynamite = {}
+	self.projectiles.dynamite.name_id = "bm_dynamite"
+	self.projectiles.dynamite.unit = "units/pd2_dlc_west/weapons/wpn_gre_dynamite/wpn_gre_dynamite"
+	self.projectiles.dynamite.unit_dummy = "units/pd2_dlc_west/weapons/wpn_gre_dynamite/wpn_gre_dynamite_husk"
+	self.projectiles.dynamite.icon = "dynamite_grenade"
+	self.projectiles.dynamite.dlc = "west"
+	self.projectiles.dynamite.texture_bundle_folder = "west"
+	self.projectiles.dynamite.throwable = true
+	self.projectiles.dynamite.max_amount = 3
+	self._projectiles_index = {
 		"frag",
 		"launcher_frag",
 		"rocket_frag",
 		"molotov",
 		"launcher_incendiary",
-		"launcher_frag_m32"
+		"launcher_frag_m32",
+		"west_arrow",
+		"west_arrow_exp",
+		"dynamite"
 	}
-	self:_add_desc_from_name_macro(self.grenades)
+	self:_add_desc_from_name_macro(self.projectiles)
 end
 
-function BlackMarketTweakData:get_grenades_index()
-	return self._grenades_index
+function BlackMarketTweakData:get_projectiles_index()
+	return self._projectiles_index
 end
 
-function BlackMarketTweakData:get_index_from_grenade_id(grenade_id)
-	for index, entry_name in ipairs(self._grenades_index) do
-		if entry_name == grenade_id then
+function BlackMarketTweakData:get_index_from_projectile_id(projectile_id)
+	for index, entry_name in ipairs(self._projectiles_index) do
+		if entry_name == projectile_id then
 			return index
 		end
 	end
 	return 0
 end
 
-function BlackMarketTweakData:get_grenade_name_from_index(index)
-	return self._grenades_index[index]
+function BlackMarketTweakData:get_projectile_name_from_index(index)
+	return self._projectiles_index[index]
 end
 
 function BlackMarketTweakData:_init_melee_weapons()
@@ -6696,7 +6806,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.model24.dlc = "gage_pack_historical"
 	self.melee_weapons.model24.texture_bundle_folder = "gage_pack_historical"
 	self.melee_weapons.model24.free = nil
-	self.melee_weapons.model24.anim_global_param = "melee_axe"
+	self.melee_weapons.model24.anim_global_param = "melee_blunt"
 	self.melee_weapons.model24.type = "knife"
 	self.melee_weapons.model24.align_objects = {
 		"a_weapon_right"
@@ -6780,7 +6890,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.shillelagh.dlc = "character_pack_clover"
 	self.melee_weapons.shillelagh.texture_bundle_folder = "character_pack_clover"
 	self.melee_weapons.shillelagh.free = nil
-	self.melee_weapons.shillelagh.anim_global_param = "melee_axe"
+	self.melee_weapons.shillelagh.anim_global_param = "melee_blunt"
 	self.melee_weapons.shillelagh.type = "knife"
 	self.melee_weapons.shillelagh.align_objects = {
 		"a_weapon_right"
@@ -6859,7 +6969,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.hammer.dlc = "hlm2_deluxe"
 	self.melee_weapons.hammer.texture_bundle_folder = "hlm2"
 	self.melee_weapons.hammer.free = nil
-	self.melee_weapons.hammer.anim_global_param = "melee_axe"
+	self.melee_weapons.hammer.anim_global_param = "melee_blunt"
 	self.melee_weapons.hammer.type = "axe"
 	self.melee_weapons.hammer.align_objects = {
 		"a_weapon_right"
@@ -6886,7 +6996,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.whiskey.dlc = "pd2_clan"
 	self.melee_weapons.whiskey.texture_bundle_folder = "character_pack_bonnie"
 	self.melee_weapons.whiskey.free = nil
-	self.melee_weapons.whiskey.anim_global_param = "melee_axe"
+	self.melee_weapons.whiskey.anim_global_param = "melee_blunt"
 	self.melee_weapons.whiskey.type = "axe"
 	self.melee_weapons.whiskey.align_objects = {
 		"a_weapon_right"
@@ -6938,7 +7048,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.poker.name_id = "bm_melee_poker"
 	self.melee_weapons.poker.dlc = "bbq"
 	self.melee_weapons.poker.texture_bundle_folder = "bbq"
-	self.melee_weapons.poker.anim_global_param = "melee_axe"
+	self.melee_weapons.poker.anim_global_param = "melee_blunt"
 	self.melee_weapons.poker.type = "axe"
 	self.melee_weapons.poker.align_objects = {
 		"a_weapon_right"
@@ -6990,7 +7100,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.tenderizer.name_id = "bm_melee_tenderizer"
 	self.melee_weapons.tenderizer.dlc = "bbq"
 	self.melee_weapons.tenderizer.texture_bundle_folder = "bbq"
-	self.melee_weapons.tenderizer.anim_global_param = "melee_axe"
+	self.melee_weapons.tenderizer.anim_global_param = "melee_blunt"
 	self.melee_weapons.tenderizer.type = "axe"
 	self.melee_weapons.tenderizer.align_objects = {
 		"a_weapon_right"
@@ -7012,5 +7122,117 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.tenderizer.sounds.charge = "bbq_tenderizer_charge"
 	self.melee_weapons.tenderizer.repeat_expire_t = 0.8
 	self.melee_weapons.tenderizer.stats.concealment = 27
+	self.melee_weapons.scalper = deep_clone(self.melee_weapons.tomahawk)
+	self.melee_weapons.scalper.name_id = "bm_melee_scalper"
+	self.melee_weapons.scalper.dlc = "west"
+	self.melee_weapons.scalper.texture_bundle_folder = "west"
+	self.melee_weapons.scalper.anim_global_param = "melee_axe"
+	self.melee_weapons.scalper.type = "axe"
+	self.melee_weapons.scalper.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.scalper.unit = "units/pd2_dlc_west/weapons/wpn_fps_mel_scalper/wpn_fps_mel_scalper"
+	self.melee_weapons.scalper.third_unit = "units/pd2_dlc_west/weapons/wpn_third_mel_scalper/wpn_third_mel_scalper"
+	self.melee_weapons.scalper.stats.weapon_type = "sharp"
+	self.melee_weapons.scalper.stats.min_damage = 4
+	self.melee_weapons.scalper.stats.max_damage = 6.64
+	self.melee_weapons.scalper.stats.min_damage_effect = 0.5
+	self.melee_weapons.scalper.stats.max_damage_effect = 0.6
+	self.melee_weapons.scalper.stats.charge_time = 2
+	self.melee_weapons.scalper.stats.range = 200
+	self.melee_weapons.scalper.expire_t = 1.1
+	self.melee_weapons.scalper.repeat_expire_t = 0.8
+	self.melee_weapons.scalper.attack_allowed_expire_t = 0.1
+	self.melee_weapons.scalper.sounds = {}
+	self.melee_weapons.scalper.sounds.equip = "tomahawk_equip"
+	self.melee_weapons.scalper.sounds.hit_air = "tomahawk_hit_air"
+	self.melee_weapons.scalper.sounds.hit_gen = "tomahawk_hit_gen"
+	self.melee_weapons.scalper.sounds.hit_body = "tomahawk_hit_body"
+	self.melee_weapons.scalper.sounds.charge = "tomahawk_charge"
+	self.melee_weapons.scalper.stats.concealment = 25
+	self.melee_weapons.mining_pick = deep_clone(self.melee_weapons.tomahawk)
+	self.melee_weapons.mining_pick.name_id = "bm_melee_mining_pick"
+	self.melee_weapons.mining_pick.dlc = "west"
+	self.melee_weapons.mining_pick.texture_bundle_folder = "west"
+	self.melee_weapons.mining_pick.anim_global_param = "melee_pickaxe"
+	self.melee_weapons.mining_pick.type = "axe"
+	self.melee_weapons.mining_pick.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.mining_pick.unit = "units/pd2_dlc_west/weapons/wpn_fps_mel_miningpick/wpn_fps_mel_miningpick"
+	self.melee_weapons.mining_pick.third_unit = "units/pd2_dlc_west/weapons/wpn_third_mel_miningpick/wpn_third_mel_miningpick"
+	self.melee_weapons.mining_pick.stats.weapon_type = "sharp"
+	self.melee_weapons.mining_pick.stats.min_damage = 3.5
+	self.melee_weapons.mining_pick.stats.max_damage = 8
+	self.melee_weapons.mining_pick.stats.min_damage_effect = 0.5
+	self.melee_weapons.mining_pick.stats.max_damage_effect = 0.6
+	self.melee_weapons.mining_pick.stats.charge_time = 3
+	self.melee_weapons.mining_pick.stats.range = 225
+	self.melee_weapons.mining_pick.expire_t = 1.1
+	self.melee_weapons.mining_pick.repeat_expire_t = 0.8
+	self.melee_weapons.mining_pick.attack_allowed_expire_t = 0.1
+	self.melee_weapons.mining_pick.sounds = {}
+	self.melee_weapons.mining_pick.sounds.equip = "mining_pick_equip"
+	self.melee_weapons.mining_pick.sounds.hit_air = "mining_pick_hit_air"
+	self.melee_weapons.mining_pick.sounds.hit_gen = "mining_pick_hit_gen"
+	self.melee_weapons.mining_pick.sounds.hit_body = "mining_pick_hit_body"
+	self.melee_weapons.mining_pick.sounds.charge = "mining_pick_charge"
+	self.melee_weapons.mining_pick.stats.concealment = 20
+	self.melee_weapons.branding_iron = deep_clone(self.melee_weapons.tomahawk)
+	self.melee_weapons.branding_iron.name_id = "bm_melee_branding_iron"
+	self.melee_weapons.branding_iron.dlc = "west"
+	self.melee_weapons.branding_iron.texture_bundle_folder = "west"
+	self.melee_weapons.branding_iron.anim_global_param = "melee_blunt"
+	self.melee_weapons.branding_iron.type = "axe"
+	self.melee_weapons.branding_iron.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.branding_iron.unit = "units/pd2_dlc_west/weapons/wpn_fps_mel_branding/wpn_fps_mel_branding"
+	self.melee_weapons.branding_iron.third_unit = "units/pd2_dlc_west/weapons/wpn_third_mel_branding/wpn_third_mel_branding"
+	self.melee_weapons.branding_iron.stats.weapon_type = "sharp"
+	self.melee_weapons.branding_iron.stats.min_damage = 3
+	self.melee_weapons.branding_iron.stats.max_damage = 6.1
+	self.melee_weapons.branding_iron.stats.min_damage_effect = 3.2
+	self.melee_weapons.branding_iron.stats.max_damage_effect = 1.6
+	self.melee_weapons.branding_iron.stats.charge_time = 2
+	self.melee_weapons.branding_iron.stats.range = 225
+	self.melee_weapons.branding_iron.expire_t = 1.1
+	self.melee_weapons.branding_iron.repeat_expire_t = 0.8
+	self.melee_weapons.branding_iron.attack_allowed_expire_t = 0.1
+	self.melee_weapons.branding_iron.sounds = {}
+	self.melee_weapons.branding_iron.sounds.equip = "branding_iron_equip"
+	self.melee_weapons.branding_iron.sounds.hit_air = "branding_iron_hit_air"
+	self.melee_weapons.branding_iron.sounds.hit_gen = "branding_iron_hit_gen"
+	self.melee_weapons.branding_iron.sounds.hit_body = "branding_iron_hit_body"
+	self.melee_weapons.branding_iron.sounds.charge = "branding_iron_charge"
+	self.melee_weapons.branding_iron.stats.concealment = 20
+	self.melee_weapons.bowie = deep_clone(self.melee_weapons.tomahawk)
+	self.melee_weapons.bowie.name_id = "bm_melee_bowie"
+	self.melee_weapons.bowie.dlc = "west"
+	self.melee_weapons.bowie.texture_bundle_folder = "west"
+	self.melee_weapons.bowie.anim_global_param = "melee_knife"
+	self.melee_weapons.bowie.type = "knife"
+	self.melee_weapons.bowie.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.bowie.unit = "units/pd2_dlc_west/weapons/wpn_fps_mel_bowie/wpn_fps_mel_bowie"
+	self.melee_weapons.bowie.third_unit = "units/pd2_dlc_west/weapons/wpn_third_mel_bowie/wpn_third_mel_bowie"
+	self.melee_weapons.bowie.stats.weapon_type = "sharp"
+	self.melee_weapons.bowie.stats.min_damage = 3
+	self.melee_weapons.bowie.stats.max_damage = 6.1
+	self.melee_weapons.bowie.stats.min_damage_effect = 3.2
+	self.melee_weapons.bowie.stats.max_damage_effect = 1.5
+	self.melee_weapons.bowie.stats.charge_time = 2
+	self.melee_weapons.bowie.stats.range = 225
+	self.melee_weapons.bowie.expire_t = 1.1
+	self.melee_weapons.bowie.repeat_expire_t = 0.8
+	self.melee_weapons.bowie.attack_allowed_expire_t = 0.1
+	self.melee_weapons.bowie.sounds = {}
+	self.melee_weapons.bowie.sounds.equip = "knife_equip"
+	self.melee_weapons.bowie.sounds.hit_air = "knife_hit_air"
+	self.melee_weapons.bowie.sounds.hit_gen = "knife_hit_gen"
+	self.melee_weapons.bowie.sounds.hit_body = "knife_hit_body"
+	self.melee_weapons.bowie.sounds.charge = "knife_charge"
+	self.melee_weapons.bowie.stats.concealment = 27
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

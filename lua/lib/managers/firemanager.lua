@@ -516,7 +516,7 @@ function FireManager:_dispose_of_impact_sound(custom_params)
 	local sound_source_burning_loop = SoundDevice:create_source("MolotovBurning")
 	sound_source_burning_loop:set_position(custom_params.position)
 	sound_source_burning_loop:post_event("burn_loop_gen")
-	local molotov_tweak = tweak_data.grenades.molotov
+	local molotov_tweak = tweak_data.projectiles.molotov
 	managers.enemy:add_delayed_clbk("MolotovBurning", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source_burning_loop}), TimerManager:game():time() + tonumber(molotov_tweak.burn_duration) - custom_params.sound_event_impact_duration)
 end
 

@@ -171,6 +171,10 @@ function RaycastWeaponBase:fire_mode()
 	return self._fire_mode
 end
 
+function RaycastWeaponBase:fire_on_release()
+	return false
+end
+
 function RaycastWeaponBase:dryfire()
 	self:play_tweak_data_sound("dryfire")
 end
@@ -331,6 +335,7 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 				self._autohit_current = (self._autohit_current + weight) / (1 + weight)
 				damage = self:get_damage_falloff(damage, autoaim, user_unit)
 				hit_unit = self._bullet_class:on_collision(autoaim, self._unit, user_unit, damage)
+				col_ray = autoaim
 			else
 				self._autohit_current = self._autohit_current / (1 + weight)
 			end
@@ -461,7 +466,7 @@ function RaycastWeaponBase:check_autoaim(from_pos, direction, max_dist, use_aim_
 	local suppression_enemies
 	for u_key, enemy_data in pairs(enemies) do
 		local enemy = enemy_data.unit
-		if enemy:base():lod_stage() == 1 then
+		if enemy:base():lod_stage() == 1 and not enemy:in_slot(16) then
 			local com = enemy:movement():m_com()
 			mvec3_set(tar_vec, com)
 			mvec3_sub(tar_vec, from_pos)
@@ -643,7 +648,8 @@ function RaycastWeaponBase:anim_play(anim, speed_multiplier)
 end
 
 function RaycastWeaponBase:tweak_data_anim_stop(anim, ...)
-	if self:weapon_tweak_data().animations[anim] then
+	local animations = self:weapon_tweak_data().animations
+	if animations and animations[anim] then
 		self:anim_stop(self:weapon_tweak_data().animations[anim], ...)
 		return true
 	end
@@ -861,7 +867,6 @@ function RaycastWeaponBase:ammo_info()
 end
 
 function RaycastWeaponBase:set_ammo(ammo)
-	Application:debug(" .......... RaycastWeaponBase:set_ammo ")
 	local ammo_num = math.floor(ammo * self:get_ammo_max())
 	self:set_ammo_total(ammo_num)
 	self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), ammo_num))
@@ -934,7 +939,7 @@ function RaycastWeaponBase:can_reload()
 	return self:get_ammo_total() > self:get_ammo_remaining_in_clip()
 end
 
-function RaycastWeaponBase:add_ammo()
+function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
 	if self:ammo_max() then
 		return false
 	end
@@ -952,12 +957,19 @@ function RaycastWeaponBase:add_ammo()
 		multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
 		multiplier_max = multiplier_max + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
 	end
-	local add_amount = math.max(0, math.round(math.lerp(self._ammo_pickup[1] * multiplier_min, self._ammo_pickup[2] * multiplier_max, math.random())))
+	local add_amount = add_amount_override
+	local picked_up = true
+	if not add_amount then
+		local rng_ammo = math.lerp(self._ammo_pickup[1] * multiplier_min, self._ammo_pickup[2] * multiplier_max, math.random())
+		picked_up = 0 < rng_ammo
+		add_amount = math.max(0, math.round(rng_ammo))
+	end
+	add_amount = math.floor(add_amount * (ratio or 1))
 	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
 	if Application:production_build() then
 		managers.player:add_weapon_ammo_gain(self._name_id, add_amount)
 	end
-	return 0 < add_amount
+	return picked_up
 end
 
 function RaycastWeaponBase:add_ammo_from_bag(available)
@@ -1102,7 +1114,7 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 end
 
 function InstantBulletBase:_get_character_push_multiplier(weapon_unit, died)
-	if alive(weapon_unit) and weapon_unit:base():weapon_tweak_data().category == "shotgun" then
+	if alive(weapon_unit) and weapon_unit:base().weapon_tweak_data and weapon_unit:base():weapon_tweak_data().category == "shotgun" then
 		return nil
 	end
 	return died and 2.5 or nil
@@ -1177,15 +1189,12 @@ function InstantExplosiveBulletBase:play_impact_sound_and_effects(col_ray)
 end
 
 function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
-	local slot_mask = managers.slot:get_mask("explosion_targets")
 	local hit_unit = col_ray.unit
 	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
 		self:play_impact_sound_and_effects(col_ray)
 	end
 	if blank then
 	else
-		local network_damage = math.ceil(damage * 163.84)
-		damage = network_damage / 163.84
 		mvec3_set(tmp_vec1, col_ray.position)
 		mvec3_set(tmp_vec2, col_ray.ray)
 		mvec3_norm(tmp_vec2)
@@ -1337,6 +1346,7 @@ function FlameBulletBase:give_fire_damage(col_ray, weapon_unit, user_unit, damag
 	action_data.attacker_unit = user_unit
 	action_data.col_ray = col_ray
 	action_data.armor_piercing = armor_piercing
+	action_data.start_dot_damage_roll = -1
 	if weapon_unit:base()._ammo_data.hit_effect == "dragonsbreath" then
 		action_data.ignite_character = "dragonsbreath"
 	end
@@ -1357,46 +1367,6 @@ function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, user_unit, d
 		defense_data = col_ray.unit:character_damage():damage_fire(action_data)
 	end
 	return defense_data
-end
-
-function FlameBulletBase:on_collision_OLD(col_ray, weapon_unit, user_unit, damage, blank)
-	local hit_unit = col_ray.unit
-	if not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood then
-	end
-	if blank then
-	else
-		mvec3_set(tmp_vec1, col_ray.position)
-		mvec3_set(tmp_vec2, col_ray.ray)
-		mvec3_norm(tmp_vec2)
-		mvec3_mul(tmp_vec2, 20)
-		mvec3_sub(tmp_vec1, tmp_vec2)
-		local network_damage = math.ceil(damage * 163.84)
-		damage = network_damage / 163.84
-		if Network:is_server() then
-			self:on_collision_server(tmp_vec1, col_ray.normal, damage, user_unit, weapon_unit, managers.network:session():local_peer():id())
-		else
-			managers.network:session():send_to_host("sync_flame_bullet", tmp_vec1, col_ray.normal, math.min(16384, network_damage), weapon_unit:base():selection_index())
-		end
-		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
-			local sync_damage = not blank and hit_unit:id() ~= -1
-			if sync_damage then
-				local normal_vec_yaw, normal_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.normal, 128, 64)
-				local dir_vec_yaw, dir_vec_pitch = self._get_vector_sync_yaw_pitch(col_ray.ray, 128, 64)
-				managers.network:session():send_to_peers_synched("sync_body_damage_bullet", col_ray.body, user_unit:id() ~= -1 and user_unit or nil, normal_vec_yaw, normal_vec_pitch, col_ray.position, dir_vec_yaw, dir_vec_pitch, math.min(16384, network_damage))
-			end
-			local local_damage = not blank or hit_unit:id() == -1
-			if local_damage then
-				col_ray.body:extension().damage:damage_bullet(user_unit, col_ray.normal, col_ray.position, col_ray.ray, 1)
-				col_ray.body:extension().damage:damage_damage(user_unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-			end
-		end
-		return {
-			col_ray = col_ray,
-			type = nil,
-			variant = "fire"
-		}
-	end
-	return nil
 end
 
 DragonBreathBulletBase = DragonBreathBulletBase or class(InstantBulletBase)

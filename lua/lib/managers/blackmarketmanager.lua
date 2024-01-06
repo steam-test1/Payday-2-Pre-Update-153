@@ -61,7 +61,7 @@ end
 function BlackMarketManager:_setup_grenades()
 	local grenades = {}
 	Global.blackmarket_manager.grenades = grenades
-	for grenade_id, grenade in pairs(tweak_data.blackmarket.grenades) do
+	for grenade_id, grenade in pairs(tweak_data.blackmarket.projectiles) do
 		if grenade.throwable then
 			grenades[grenade_id] = {
 				unlocked = false,
@@ -72,7 +72,7 @@ function BlackMarketManager:_setup_grenades()
 			}
 			local is_default, weapon_level = managers.upgrades:get_value(grenade_id, self._defaults.grenade)
 			grenades[grenade_id].level = weapon_level
-			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.grenades[grenade_id].dlc
+			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.projectiles[grenade_id].dlc
 		end
 	end
 	grenades[self._defaults.grenade].equipped = false
@@ -305,7 +305,7 @@ end
 
 function BlackMarketManager:equipped_grenade()
 	local grenade
-	for grenade_id, data in pairs(tweak_data.blackmarket.grenades) do
+	for grenade_id, data in pairs(tweak_data.blackmarket.projectiles) do
 		grenade = Global.blackmarket_manager.grenades[grenade_id]
 		if data.throwable and grenade.equipped and grenade.unlocked then
 			return grenade_id, grenade.amount or 0
@@ -4110,7 +4110,7 @@ function BlackMarketManager:_verfify_equipped_category(category)
 			if craft.equipped and craft.unlocked then
 				grenade_id = grenade
 			end
-			local grenade_data = tweak_data.blackmarket.grenades[grenade] or {}
+			local grenade_data = tweak_data.blackmarket.projectiles[grenade] or {}
 			craft.amount = (not grenade_data.dlc or managers.dlc:is_dlc_unlocked(grenade_data.dlc)) and managers.player:get_max_grenades(grenade) or 0
 		end
 		for s, data in pairs(Global.blackmarket_manager.grenades) do

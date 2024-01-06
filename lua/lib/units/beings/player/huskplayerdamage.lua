@@ -32,6 +32,10 @@ function HuskPlayerDamage:shoot_pos_mid(m_pos)
 	self._spine2_obj:m_position(m_pos)
 end
 
+function HuskPlayerDamage:can_attach_projectiles()
+	return false
+end
+
 function HuskPlayerDamage:set_last_down_time(down_time)
 	self._last_down_time = down_time
 end

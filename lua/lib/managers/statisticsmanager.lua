@@ -982,6 +982,8 @@ function StatisticsManager:killed(data)
 		self._global.session.killed_by_weapon[name_id] = self._global.session.killed_by_weapon[name_id] or {count = 0, headshots = 0}
 		self._global.session.killed_by_weapon[name_id].count = self._global.session.killed_by_weapon[name_id].count + 1
 		self._global.session.killed_by_weapon[name_id].headshots = self._global.session.killed_by_weapon[name_id].headshots + (data.head_shot and 1 or 0)
+		self._global.session.killed_by_weapon[name_id][data.name] = self._global.session.killed_by_weapon[name_id][data.name] or {count = 0}
+		self._global.session.killed_by_weapon[name_id][data.name].count = self._global.session.killed_by_weapon[name_id][data.name].count + 1
 		self._global.killed_by_weapon[name_id] = self._global.killed_by_weapon[name_id] or {count = 0, headshots = 0}
 		self._global.killed_by_weapon[name_id].count = self._global.killed_by_weapon[name_id].count + 1
 		self._global.killed_by_weapon[name_id].headshots = (self._global.killed_by_weapon[name_id].headshots or 0) + (data.head_shot and 1 or 0)
@@ -990,6 +992,9 @@ function StatisticsManager:killed(data)
 			if category == tweak_data.achievement.first_blood.weapon_type then
 				managers.achievment:award(tweak_data.achievement.first_blood.award)
 			end
+		end
+		if tweak_data.achievement.sitting_bullseye and data.name == tweak_data.achievement.sitting_bullseye.enemy and name_id == tweak_data.achievement.sitting_bullseye.weapon and self._global.session.killed_by_weapon[name_id][data.name].count == tweak_data.achievement.sitting_bullseye.count then
+			managers.achievment:award(tweak_data.achievement.sitting_bullseye.award)
 		end
 		if data.name == "tank" then
 			managers.achievment:set_script_data("dodge_this_active", true)
@@ -1001,8 +1006,8 @@ function StatisticsManager:killed(data)
 	elseif by_explosion then
 		local name_id
 		if data.weapon_unit then
-			if data.weapon_unit:base().grenade_entry then
-				name_id = tweak_data.blackmarket.grenades[data.weapon_unit:base():grenade_entry()].weapon_id
+			if data.weapon_unit:base().projectile_entry then
+				name_id = tweak_data.blackmarket.projectiles[data.weapon_unit:base():projectile_entry()].weapon_id
 			elseif data.weapon_unit:base().get_name_id then
 				name_id = data.weapon_unit and data.weapon_unit:base():get_name_id()
 			end

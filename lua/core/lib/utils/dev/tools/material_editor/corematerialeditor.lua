@@ -358,7 +358,7 @@ Defaulting to ]] .. self.DEFAULT_TEXTURE .. ".", "Writing To Disk", "OK,ICON_WAR
 	managers.database:recompile(path)
 	self:_update_output()
 	if not self._disable_live_feedback then
-		Application:reload_material_config(managers.database:entry_path(path))
+		Application:reload_material_config(Idstring(managers.database:entry_path(path)))
 	end
 	self._text_in_node = node:to_xml()
 	self:_save_global_to_disk()

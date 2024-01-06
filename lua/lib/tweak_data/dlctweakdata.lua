@@ -26,6 +26,7 @@ function DLCTweakData:init(tweak_data)
 		dlc_akm4 = 1,
 		dlc_pack_overkill = true,
 		bbq = true,
+		west = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
 		hlm2 = true,
@@ -52,7 +53,8 @@ function DLCTweakData:init(tweak_data)
 	self.starter_kit.content.upgrades = {
 		"fists",
 		"molotov",
-		"frag"
+		"frag",
+		"dynamite"
 	}
 	do
 		local all_normal_masks = {
@@ -3192,6 +3194,139 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "hotflames",
+			amount = 1
+		}
+	}
+	self.west = {}
+	self.west.dlc = "has_west"
+	self.west.content = {}
+	self.west.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_bow_explosion",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_winchester_o_classic",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_winchester_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_winchester_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_peacemaker_s_skeletal",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_peacemaker_g_bling",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_peacemaker_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_peacemaker_b_long",
+			amount = 1
+		}
+	}
+	self.ach_west_1 = {}
+	self.ach_west_1.dlc = "has_achievement"
+	self.ach_west_1.achievement_id = "scorpion_1"
+	self.ach_west_1.content = {}
+	self.ach_west_1.content.loot_global_value = "west"
+	self.ach_west_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "bullskull",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "westernsunset",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "pattern",
+			amount = 1
+		}
+	}
+	self.ach_west_2 = {}
+	self.ach_west_2.dlc = "has_achievement"
+	self.ach_west_2.achievement_id = "scorpion_2"
+	self.ach_west_2.content = {}
+	self.ach_west_2.content.loot_global_value = "west"
+	self.ach_west_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "bandit",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "cactus",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "coyote",
+			amount = 1
+		}
+	}
+	self.ach_west_3 = {}
+	self.ach_west_3.dlc = "has_achievement"
+	self.ach_west_3.achievement_id = "scorpion_3"
+	self.ach_west_3.content = {}
+	self.ach_west_3.content.loot_global_value = "west"
+	self.ach_west_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "lone",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "scorpion",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "totem",
+			amount = 1
+		}
+	}
+	self.ach_west_4 = {}
+	self.ach_west_4.dlc = "has_achievement"
+	self.ach_west_4.achievement_id = "scorpion_4"
+	self.ach_west_4.content = {}
+	self.ach_west_4.content.loot_global_value = "west"
+	self.ach_west_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "kangee",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "goldfever",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "native",
 			amount = 1
 		}
 	}

@@ -355,8 +355,14 @@ function HostNetworkSession:chk_drop_in_peer(dropin_peer)
 	dropin_peer:set_expecting_dropin(nil)
 	dropin_peer:on_sync_start()
 	dropin_peer:chk_enable_queue()
+	self._dropin_peer = dropin_peer
 	Network:drop_in(dropin_peer:rpc())
+	self._dropin_peer = nil
 	return true
+end
+
+function HostNetworkSession:dropin_peer()
+	return self._dropin_peer
 end
 
 function HostNetworkSession:add_peer(name, rpc, in_lobby, loading, synched, id, character, user_id, xuid, xnaddr)

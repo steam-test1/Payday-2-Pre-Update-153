@@ -4408,7 +4408,7 @@ function BlackMarketGui:update_info_text()
 			updated_texts[3].text = text
 		end
 		updated_texts[4].resource_color = {}
-		local desc_text = managers.localization:text(tweak_data.blackmarket.grenades[slot_data.name].desc_id)
+		local desc_text = managers.localization:text(tweak_data.blackmarket.projectiles[slot_data.name].desc_id)
 		updated_texts[4].text = desc_text .. "\n"
 		if slot_data.global_value and slot_data.global_value ~= "normal" then
 			updated_texts[4].text = updated_texts[4].text .. "##" .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"
@@ -5882,7 +5882,7 @@ function BlackMarketGui:populate_grenades(data)
 	local new_data = {}
 	local sort_data = {}
 	local xd, yd, x_td, y_td, x_sn, y_sn, x_gv, y_gv
-	local m_tweak_data = tweak_data.blackmarket.grenades
+	local m_tweak_data = tweak_data.blackmarket.projectiles
 	local l_tweak_data = tweak_data.lootdrop.global_values
 	for id, d in pairs(Global.blackmarket_manager.grenades) do
 		table.insert(sort_data, {id, d})
@@ -5917,7 +5917,7 @@ function BlackMarketGui:populate_grenades(data)
 	local guis_catalog, m_tweak_data, melee_weapon_id
 	for i, grenades_data in ipairs(sort_data) do
 		melee_weapon_id = grenades_data[1]
-		m_tweak_data = tweak_data.blackmarket.grenades[grenades_data[1]] or {}
+		m_tweak_data = tweak_data.blackmarket.projectiles[grenades_data[1]] or {}
 		guis_catalog = "guis/"
 		local bundle_folder = m_tweak_data.texture_bundle_folder
 		if bundle_folder then
@@ -5925,7 +5925,7 @@ function BlackMarketGui:populate_grenades(data)
 		end
 		new_data = {}
 		new_data.name = melee_weapon_id
-		new_data.name_localized = managers.localization:text(tweak_data.blackmarket.grenades[new_data.name].name_id)
+		new_data.name_localized = managers.localization:text(tweak_data.blackmarket.projectiles[new_data.name].name_id)
 		new_data.category = "grenades"
 		new_data.slot = i
 		new_data.unlocked = grenades_data[2].unlocked

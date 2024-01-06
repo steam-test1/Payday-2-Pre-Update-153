@@ -76,7 +76,7 @@ function ECMJammerBase:set_owner(owner)
 end
 
 function ECMJammerBase:owner()
-	if not alive(self._owner) then
+	if not alive(self._owner) and managers.network:game():member(self._owner_id) then
 		self._owner = managers.network:game():member(self._owner_id):unit()
 	end
 	return self._owner
@@ -483,13 +483,15 @@ function ECMJammerBase:save(data)
 	local state = {
 		jammer_active = self._jammer_active or nil,
 		feedback_active = self._feedback_active or nil,
-		low_battery = self._battery_low or nil
+		low_battery = self._battery_low or nil,
+		owner_id = self._owner_id
 	}
 	data.ECMJammerBase = state
 end
 
 function ECMJammerBase:load(data)
 	local state = data.ECMJammerBase
+	self._owner_id = state.owner_id
 	if state.jammer_active then
 		self:set_active(true)
 		if state.low_battery then

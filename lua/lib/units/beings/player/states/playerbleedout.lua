@@ -12,7 +12,7 @@ function PlayerBleedOut:enter(state_data, enter_data)
 	self:_start_action_bleedout(managers.player:player_timer():time())
 	self._tilt_wait_t = managers.player:player_timer():time() + 1
 	self._old_selection = nil
-	if not managers.player:has_category_upgrade("player", "primary_weapon_when_downed") and self._unit:inventory():equipped_selection() ~= 1 then
+	if (not managers.player:has_category_upgrade("player", "primary_weapon_when_downed") or self._unit:inventory():equipped_unit():base():weapon_tweak_data().not_allowed_in_bleedout) and self._unit:inventory():equipped_selection() ~= 1 then
 		self._old_selection = self._unit:inventory():equipped_selection()
 		self:_start_action_unequip_weapon(managers.player:player_timer():time(), {selection_wanted = 1})
 		self._unit:inventory():unit_by_selection(1):base():on_reload()
@@ -137,6 +137,10 @@ function PlayerBleedOut:_check_action_interact(t, input)
 end
 
 function PlayerBleedOut:_check_change_weapon(...)
+	local primary = self._unit:inventory():unit_by_selection(2)
+	if alive(primary) and primary:base():weapon_tweak_data().not_allowed_in_bleedout then
+		return false
+	end
 	if managers.player:has_category_upgrade("player", "primary_weapon_when_downed") then
 		return PlayerBleedOut.super._check_change_weapon(self, ...)
 	end
@@ -144,6 +148,10 @@ function PlayerBleedOut:_check_change_weapon(...)
 end
 
 function PlayerBleedOut:_check_action_equip(...)
+	local primary = self._unit:inventory():unit_by_selection(2)
+	if alive(primary) and primary:base():weapon_tweak_data().not_allowed_in_bleedout then
+		return false
+	end
 	if managers.player:has_category_upgrade("player", "primary_weapon_when_downed") then
 		return PlayerBleedOut.super._check_action_equip(self, ...)
 	end

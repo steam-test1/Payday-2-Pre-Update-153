@@ -89,6 +89,9 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_flamethrower_mk2_npc()
 	self:_init_data_m32_npc()
 	self:_init_data_aa12_npc()
+	self:_init_data_peacemaker_npc()
+	self:_init_data_winchester1874_npc()
+	self:_init_data_plainsrider_npc()
 	self:_precalculate_values()
 end
 
@@ -1497,6 +1500,54 @@ function WeaponTweakData:_init_data_aa12_npc()
 	self.aa12_npc.alert_size = 4500
 	self.aa12_npc.suppression = 1.8
 	self.aa12_npc.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_peacemaker_npc()
+	self.peacemaker_npc.sounds.prefix = "pmkr45_npc"
+	self.peacemaker_npc.use_data.selection_index = 1
+	self.peacemaker_npc.DAMAGE = 4
+	self.peacemaker_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.peacemaker_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.peacemaker_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.peacemaker_npc.CLIP_AMMO_MAX = 6
+	self.peacemaker_npc.NR_CLIPS_MAX = 8
+	self.peacemaker_npc.hold = "pistol"
+	self.peacemaker_npc.alert_size = 5000
+	self.peacemaker_npc.suppression = 1.8
+end
+
+function WeaponTweakData:_init_data_winchester1874_npc()
+	self.winchester1874_npc.sounds.prefix = "m1873_npc"
+	self.winchester1874_npc.use_data.selection_index = 2
+	self.winchester1874_npc.DAMAGE = 2
+	self.winchester1874_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.winchester1874_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.winchester1874_npc.CLIP_AMMO_MAX = 5
+	self.winchester1874_npc.NR_CLIPS_MAX = 8
+	self.winchester1874_npc.auto.fire_rate = 20
+	self.winchester1874_npc.hold = "rifle"
+	self.winchester1874_npc.alert_size = 5000
+	self.winchester1874_npc.suppression = 1
+	self.winchester1874_secondary_npc = deep_clone(self.winchester1874_npc)
+	self.winchester1874_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_plainsrider_npc()
+	self.plainsrider_npc.sounds.prefix = "bow_npc"
+	self.plainsrider_npc.use_data.selection_index = 2
+	self.plainsrider_npc.use_data.align_place = "left_hand"
+	self.plainsrider_npc.DAMAGE = 2
+	self.plainsrider_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.plainsrider_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.plainsrider_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.plainsrider_npc.no_trail = true
+	self.plainsrider_npc.CLIP_AMMO_MAX = 1
+	self.plainsrider_npc.NR_CLIPS_MAX = 4
+	self.plainsrider_npc.auto.fire_rate = 0.1
+	self.plainsrider_npc.hold = "bow"
+	self.plainsrider_npc.has_fire_animation = true
+	self.plainsrider_npc.alert_size = 2800
+	self.plainsrider_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7784,6 +7835,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		}
 	}
 	self.rpg7.has_description = true
+	self.rpg7.projectile_type_index = 3
 	self.rpg7.damage_melee = damage_melee_default
 	self.rpg7.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.rpg7.sounds = {}
@@ -8435,6 +8487,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 			"clip_ammo_increase"
 		}
 	}
+	self.m32.projectile_type_index = 6
 	self.m32.damage_melee = damage_melee_default
 	self.m32.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.m32.sounds = {}
@@ -8616,6 +8669,293 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.peacemaker = {}
+	self.peacemaker.category = "pistol"
+	self.peacemaker.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.peacemaker.use_shotgun_reload = true
+	self.peacemaker.damage_melee = damage_melee_default
+	self.peacemaker.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.peacemaker.sounds = {}
+	self.peacemaker.sounds.fire = "pmkr45_fire"
+	self.peacemaker.sounds.dryfire = "pmkr45_dryfire"
+	self.peacemaker.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.peacemaker.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.peacemaker.timers = {}
+	self.peacemaker.timers.shotgun_reload_enter = 1.4333333
+	self.peacemaker.timers.shotgun_reload_exit_empty = 0.33333334
+	self.peacemaker.timers.shotgun_reload_exit_not_empty = 0.33333334
+	self.peacemaker.timers.shotgun_reload_shell = 1
+	self.peacemaker.timers.shotgun_reload_first_shell_offset = 0
+	self.peacemaker.timers.unequip = 0.65
+	self.peacemaker.timers.equip = 0.65
+	self.peacemaker.FIRE_MODE = "single"
+	self.peacemaker.fire_mode_data = {}
+	self.peacemaker.fire_mode_data.fire_rate = 0.25
+	self.peacemaker.CAN_TOGGLE_FIREMODE = false
+	self.peacemaker.single = {}
+	self.peacemaker.single.fire_rate = 0.25
+	self.peacemaker.auto = {}
+	self.peacemaker.auto.fire_rate = 0.25
+	self.peacemaker.name_id = "bm_w_peacemaker"
+	self.peacemaker.desc_id = "bm_w_peacemaker_desc"
+	self.peacemaker.description_id = "des_peacemaker"
+	self.peacemaker.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.peacemaker.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.peacemaker.use_data = {}
+	self.peacemaker.use_data.selection_index = 1
+	self.peacemaker.DAMAGE = 6
+	self.peacemaker.CLIP_AMMO_MAX = 6
+	self.peacemaker.NR_CLIPS_MAX = 6
+	self.peacemaker.AMMO_MAX = self.peacemaker.CLIP_AMMO_MAX * self.peacemaker.NR_CLIPS_MAX
+	self.peacemaker.AMMO_PICKUP = self:_pickup_chance(self.peacemaker.AMMO_MAX, 1)
+	self.peacemaker.spread = {}
+	self.peacemaker.spread.standing = self.r870.spread.standing
+	self.peacemaker.spread.crouching = self.r870.spread.crouching
+	self.peacemaker.spread.steelsight = self.r870.spread.steelsight
+	self.peacemaker.spread.moving_standing = self.r870.spread.moving_standing
+	self.peacemaker.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.peacemaker.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.peacemaker.kick = {}
+	self.peacemaker.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.peacemaker.kick.crouching = self.peacemaker.kick.standing
+	self.peacemaker.kick.steelsight = self.peacemaker.kick.standing
+	self.peacemaker.crosshair = {}
+	self.peacemaker.crosshair.standing = {}
+	self.peacemaker.crosshair.crouching = {}
+	self.peacemaker.crosshair.steelsight = {}
+	self.peacemaker.crosshair.standing.offset = 0.2
+	self.peacemaker.crosshair.standing.moving_offset = 0.8
+	self.peacemaker.crosshair.standing.kick_offset = 0.6
+	self.peacemaker.crosshair.crouching.offset = 0.1
+	self.peacemaker.crosshair.crouching.moving_offset = 0.7
+	self.peacemaker.crosshair.crouching.kick_offset = 0.4
+	self.peacemaker.crosshair.steelsight.hidden = true
+	self.peacemaker.crosshair.steelsight.offset = 0
+	self.peacemaker.crosshair.steelsight.moving_offset = 0
+	self.peacemaker.crosshair.steelsight.kick_offset = 0.1
+	self.peacemaker.shake = {}
+	self.peacemaker.shake.fire_multiplier = 2
+	self.peacemaker.shake.fire_steelsight_multiplier = 2
+	self.peacemaker.autohit = autohit_pistol_default
+	self.peacemaker.aim_assist = aim_assist_pistol_default
+	self.peacemaker.animations = {}
+	self.peacemaker.animations.equip_id = "equip_peacemaker"
+	self.peacemaker.animations.recoil_steelsight = true
+	self.peacemaker.global_value = "west"
+	self.peacemaker.texture_bundle_folder = "west"
+	self.peacemaker.stats = {
+		damage = 23,
+		spread = 8,
+		recoil = 6,
+		spread_moving = 9,
+		zoom = 5,
+		concealment = 26,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.peacemaker.stats_modifiers = {damage = 2.4}
+	self.winchester1874 = {}
+	self.winchester1874.category = "snp"
+	self.winchester1874.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.winchester1874.use_shotgun_reload = true
+	self.winchester1874.damage_melee = damage_melee_default
+	self.winchester1874.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.winchester1874.sounds = {}
+	self.winchester1874.sounds.fire = "m1873_fire"
+	self.winchester1874.sounds.dryfire = "primary_dryfire"
+	self.winchester1874.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.winchester1874.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.winchester1874.timers = {}
+	self.winchester1874.timers.shotgun_reload_enter = 0.43333334
+	self.winchester1874.timers.shotgun_reload_exit_empty = 0.76666665
+	self.winchester1874.timers.shotgun_reload_exit_not_empty = 0.4
+	self.winchester1874.timers.shotgun_reload_shell = 0.56666666
+	self.winchester1874.timers.shotgun_reload_first_shell_offset = 0.2
+	self.winchester1874.timers.unequip = 0.9
+	self.winchester1874.timers.equip = 0.9
+	self.winchester1874.name_id = "bm_w_winchester1874"
+	self.winchester1874.desc_id = "bm_w_winchester1874_desc"
+	self.winchester1874.description_id = "des_winchester1874"
+	self.winchester1874.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.winchester1874.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_9mm"
+	self.winchester1874.use_data = {}
+	self.winchester1874.use_data.selection_index = 2
+	self.winchester1874.use_data.align_place = "left_hand"
+	self.winchester1874.DAMAGE = 1
+	self.winchester1874.CLIP_AMMO_MAX = 15
+	self.winchester1874.NR_CLIPS_MAX = 3
+	self.winchester1874.AMMO_MAX = self.winchester1874.CLIP_AMMO_MAX * self.winchester1874.NR_CLIPS_MAX
+	self.winchester1874.AMMO_PICKUP = {0.7, 1}
+	self.winchester1874.FIRE_MODE = "single"
+	self.winchester1874.fire_mode_data = {}
+	self.winchester1874.fire_mode_data.fire_rate = 0.7
+	self.winchester1874.CAN_TOGGLE_FIREMODE = false
+	self.winchester1874.single = {}
+	self.winchester1874.single.fire_rate = 0.7
+	self.winchester1874.spread = {}
+	self.winchester1874.spread.standing = 20
+	self.winchester1874.spread.crouching = 20
+	self.winchester1874.spread.steelsight = 0
+	self.winchester1874.spread.moving_standing = 20
+	self.winchester1874.spread.moving_crouching = 20
+	self.winchester1874.spread.moving_steelsight = 0
+	self.winchester1874.kick = {}
+	self.winchester1874.kick.standing = {
+		3,
+		4.8,
+		-0.3,
+		0.3
+	}
+	self.winchester1874.kick.crouching = self.winchester1874.kick.standing
+	self.winchester1874.kick.steelsight = self.winchester1874.kick.standing
+	self.winchester1874.crosshair = {}
+	self.winchester1874.crosshair.standing = {}
+	self.winchester1874.crosshair.crouching = {}
+	self.winchester1874.crosshair.steelsight = {}
+	self.winchester1874.crosshair.standing.offset = 1.14
+	self.winchester1874.crosshair.standing.moving_offset = 1.8
+	self.winchester1874.crosshair.standing.kick_offset = 1.6
+	self.winchester1874.crosshair.crouching.offset = 1.1
+	self.winchester1874.crosshair.crouching.moving_offset = 1.6
+	self.winchester1874.crosshair.crouching.kick_offset = 1.4
+	self.winchester1874.crosshair.steelsight.hidden = true
+	self.winchester1874.crosshair.steelsight.offset = 1
+	self.winchester1874.crosshair.steelsight.moving_offset = 1
+	self.winchester1874.crosshair.steelsight.kick_offset = 1.14
+	self.winchester1874.shake = {}
+	self.winchester1874.shake.fire_multiplier = 2
+	self.winchester1874.shake.fire_steelsight_multiplier = -2
+	self.winchester1874.autohit = autohit_snp_default
+	self.winchester1874.aim_assist = aim_assist_snp_default
+	self.winchester1874.animations = {}
+	self.winchester1874.animations.equip_id = "equip_winchester1874"
+	self.winchester1874.animations.recoil_steelsight = true
+	self.winchester1874.global_value = "west"
+	self.winchester1874.texture_bundle_folder = "west"
+	self.winchester1874.can_shoot_through_enemy = true
+	self.winchester1874.can_shoot_through_shield = true
+	self.winchester1874.can_shoot_through_wall = true
+	self.winchester1874.panic_suppression_chance = 0.1
+	self.winchester1874.stats = {
+		damage = 14,
+		spread = 8,
+		recoil = 5,
+		spread_moving = 9,
+		zoom = 1,
+		concealment = 12,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9
+	}
+	self.winchester1874.armor_piercing_chance = 1
+	self.winchester1874.stats_modifiers = {
+		damage = 5.3,
+		suppression = 3,
+		spread = 0.6
+	}
+	self.plainsrider = {}
+	self.plainsrider.category = "bow"
+	self.plainsrider.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.plainsrider.projectile_type_index = 7
+	self.plainsrider.not_allowed_in_bleedout = true
+	self.plainsrider.damage_melee = damage_melee_default
+	self.plainsrider.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.plainsrider.sounds = {}
+	self.plainsrider.sounds.charge_release = "bow_release"
+	self.plainsrider.sounds.charge_release_fail = "bow_release_fail"
+	self.plainsrider.sounds.charge = "bow_charge"
+	self.plainsrider.sounds.charge_cancel = "bow_charge_cancel"
+	self.plainsrider.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.plainsrider.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.plainsrider.timers = {}
+	self.plainsrider.timers.reload_not_empty = 1
+	self.plainsrider.timers.reload_empty = self.plainsrider.timers.reload_not_empty
+	self.plainsrider.timers.unequip = 0.85
+	self.plainsrider.timers.equip = 0.85
+	self.plainsrider.charge_data = {}
+	self.plainsrider.charge_data.max_t = 1
+	self.plainsrider.name_id = "bm_w_plainsrider"
+	self.plainsrider.desc_id = "bm_w_plainsrider_desc"
+	self.plainsrider.description_id = "des_plainsrider"
+	self.plainsrider.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.plainsrider.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.plainsrider.use_data = {}
+	self.plainsrider.use_data.selection_index = 2
+	self.plainsrider.use_data.align_place = "left_hand"
+	self.plainsrider.DAMAGE = 6
+	self.plainsrider.CLIP_AMMO_MAX = 1
+	self.plainsrider.NR_CLIPS_MAX = 50
+	self.plainsrider.AMMO_MAX = self.plainsrider.CLIP_AMMO_MAX * self.plainsrider.NR_CLIPS_MAX
+	self.plainsrider.AMMO_PICKUP = self:_pickup_chance(0, self.plainsrider.use_data.selection_index)
+	self.plainsrider.FIRE_MODE = "single"
+	self.plainsrider.fire_mode_data = {}
+	self.plainsrider.fire_mode_data.fire_rate = 0.2
+	self.plainsrider.single = {}
+	self.plainsrider.single.fire_rate = 0.2
+	self.plainsrider.spread = {}
+	self.plainsrider.spread.standing = self.r870.spread.standing
+	self.plainsrider.spread.crouching = self.r870.spread.crouching
+	self.plainsrider.spread.steelsight = self.r870.spread.steelsight
+	self.plainsrider.spread.moving_standing = self.r870.spread.moving_standing
+	self.plainsrider.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.plainsrider.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.plainsrider.kick = {}
+	self.plainsrider.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.plainsrider.kick.crouching = self.plainsrider.kick.standing
+	self.plainsrider.kick.steelsight = self.plainsrider.kick.standing
+	self.plainsrider.shake = {}
+	self.plainsrider.shake.fire_multiplier = 2
+	self.plainsrider.shake.fire_steelsight_multiplier = 2
+	self.plainsrider.autohit = autohit_shotgun_default
+	self.plainsrider.aim_assist = aim_assist_shotgun_default
+	self.plainsrider.animations = {}
+	self.plainsrider.animations.equip_id = "equip_plainsrider"
+	self.plainsrider.animations.recoil_steelsight = false
+	self.plainsrider.global_value = "west"
+	self.plainsrider.texture_bundle_folder = "west"
+	self.plainsrider.panic_suppression_chance = 0.3
+	self.plainsrider.ignore_damage_upgrades = true
+	self.plainsrider.stats = {
+		damage = 13,
+		spread = 10,
+		recoil = 14,
+		spread_moving = 12,
+		zoom = 5,
+		concealment = 30,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.plainsrider.stats_modifiers = {damage = 6.5}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -9222,6 +9562,24 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.peacemaker_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.winchester1874_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.plainsrider_npc = {
+		usage = "bow",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -9312,4 +9670,7 @@ function WeaponTweakData:_precalculate_values()
 	self.flamethrower_mk2_npc.AMMO_MAX = self.flamethrower_mk2_npc.CLIP_AMMO_MAX * self.flamethrower_mk2_npc.NR_CLIPS_MAX
 	self.m32_npc.AMMO_MAX = self.m32_npc.CLIP_AMMO_MAX * self.m32_npc.NR_CLIPS_MAX
 	self.aa12_npc.AMMO_MAX = self.aa12_npc.CLIP_AMMO_MAX * self.aa12_npc.NR_CLIPS_MAX
+	self.peacemaker_npc.AMMO_MAX = self.peacemaker_npc.CLIP_AMMO_MAX * self.peacemaker_npc.NR_CLIPS_MAX
+	self.winchester1874_npc.AMMO_MAX = self.winchester1874_npc.CLIP_AMMO_MAX * self.winchester1874_npc.NR_CLIPS_MAX
+	self.plainsrider_npc.AMMO_MAX = self.plainsrider_npc.CLIP_AMMO_MAX * self.plainsrider_npc.NR_CLIPS_MAX
 end

@@ -732,6 +732,13 @@ function ConnectionNetworkHandler:voting_data(type, value, result, sender)
 	managers.vote:network_package(type, value, result, peer:id())
 end
 
+function ConnectionNetworkHandler:sync_award_achievement(achievement_id, sender)
+	if not self._verify_sender(sender) then
+		return
+	end
+	print("ConnectionNetworkHandler:sync_award_achievement():", achievement_id)
+end
+
 function ConnectionNetworkHandler:propagate_alert(type, position, range, filter, aggressor, head_position, sender)
 	local peer = self._verify_sender(sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then

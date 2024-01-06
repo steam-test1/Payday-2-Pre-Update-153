@@ -42,6 +42,7 @@ function MenuSceneManager:init()
 		"husk_bullpup"
 	}
 	self._global_poses.lmg = {"husk_lmg"}
+	self._global_poses.bow = {"husk_bow1", "husk_bow2"}
 	self._global_poses.infamous = {
 		"husk_infamous1",
 		"husk_infamous3",
@@ -528,6 +529,8 @@ function MenuSceneManager:_select_character_pose()
 				pose = self._global_poses.lmg[math.random(#self._global_poses.lmg)]
 			elseif category == "snp" then
 				pose = self._global_poses.snp[math.random(#self._global_poses.snp)]
+			elseif category == "bow" then
+				pose = self._global_poses.bow[math.random(#self._global_poses.bow)]
 			end
 		end
 		if pose then
@@ -1390,7 +1393,7 @@ function MenuSceneManager:_infamy_enable_dragging()
 end
 
 function MenuSceneManager:spawn_grenade(grenade_id)
-	local grenade = tweak_data.blackmarket.grenades[grenade_id]
+	local grenade = tweak_data.blackmarket.projectiles[grenade_id]
 	if not grenade.unit_dummy then
 		return
 	end

@@ -1,18 +1,14 @@
 MolotovGrenade = MolotovGrenade or class(GrenadeBase)
 
-function MolotovGrenade:init(unit)
-	self:_setup_molotov_data(self._tweak_grenade_entry or "molotov")
-	MolotovGrenade.super.init(self, unit)
-end
-
 function MolotovGrenade:destroy(unit)
 	for _, damage_effect_entry in pairs(self._molotov_damage_effect_table) do
 		World:effect_manager():fade_kill(damage_effect_entry.effect_id)
 	end
 end
 
-function MolotovGrenade:_setup_molotov_data(grenade_entry)
-	self._tweak_data = tweak_data.grenades[grenade_entry]
+function MolotovGrenade:_setup_from_tweak_data(grenade_entry)
+	local grenade_entry = self._tweak_projectile_entry or "molotov"
+	self._tweak_data = tweak_data.projectiles[grenade_entry]
 	self._init_timer = 10
 	self._mass_look_up_modifier = self._tweak_data.mass_look_up_modifier
 	self._range = self._tweak_data.range
@@ -136,7 +132,7 @@ function MolotovGrenade:_do_damage()
 	self._burn_tick_temp_counter = 0
 end
 
-function MolotovGrenade:_impact_cbk(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity)
+function MolotovGrenade:clbk_impact(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity)
 	self:_detonate(normal)
 end
 

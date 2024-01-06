@@ -2021,7 +2021,7 @@ end
 
 function PlayerManager:_set_grenade(params)
 	local grenade = params.grenade
-	local tweak_data = tweak_data.blackmarket.grenades[grenade]
+	local tweak_data = tweak_data.blackmarket.projectiles[grenade]
 	local amount = params.amount
 	local icon = tweak_data.icon
 	self:update_grenades_amount_to_peers(grenade, amount)
@@ -2031,7 +2031,7 @@ end
 function PlayerManager:add_grenade_amount(amount)
 	local peer_id = managers.network:session():local_peer():id()
 	local grenade = self._global.synced_grenades[peer_id].grenade
-	local icon = tweak_data.blackmarket.grenades[grenade].icon
+	local icon = tweak_data.blackmarket.projectiles[grenade].icon
 	amount = math.min(Application:digest_value(self._global.synced_grenades[peer_id].amount, false) + amount, self:get_max_grenades_by_peer_id(peer_id))
 	managers.hud:set_teammate_grenades_amount(HUDManager.PLAYER_PANEL, {icon = icon, amount = amount})
 	self:update_grenades_amount_to_peers(grenade, amount)
@@ -2058,7 +2058,7 @@ function PlayerManager:set_synced_grenades(peer_id, grenade, amount)
 	self._global.synced_grenades[peer_id] = {grenade = grenade, amount = digested_amount}
 	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
 	if character_data and character_data.panel_id then
-		local icon = tweak_data.blackmarket.grenades[grenade].icon
+		local icon = tweak_data.blackmarket.projectiles[grenade].icon
 		if only_update_amount then
 			managers.hud:set_teammate_grenades_amount(character_data.panel_id, {icon = icon, amount = amount})
 		else
@@ -2087,7 +2087,7 @@ end
 
 function PlayerManager:get_max_grenades(grenade_id)
 	grenade_id = grenade_id or managers.blackmarket:equipped_grenade()
-	return tweak_data:get_raw_value("blackmarket", "grenades", grenade_id, "max_amount") or 0
+	return tweak_data:get_raw_value("blackmarket", "projectiles", grenade_id, "max_amount") or 0
 end
 
 function PlayerManager:got_max_grenades()

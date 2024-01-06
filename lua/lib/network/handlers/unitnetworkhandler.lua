@@ -1094,7 +1094,7 @@ function UnitNetworkHandler:m79grenade_explode_on_client(position, normal, user,
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(user, sender) then
 		return
 	end
-	GrenadeBase._explode_on_client(position, normal, user, damage, range, curve_pow)
+	ProjectileBase._explode_on_client(position, normal, user, damage, range, curve_pow)
 end
 
 function UnitNetworkHandler:element_explode_on_client(position, normal, damage, range, curve_pow, sender)
@@ -1246,7 +1246,13 @@ function UnitNetworkHandler:sync_pickup(unit, sender)
 	if not alive(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	unit:base():sync_pickup(self._verify_sender(sender))
+	local pickup_extension = unit:base()
+	if not pickup_extension or not pickup_extension.sync_pickup then
+		pickup_extension = unit:pickup()
+	end
+	if pickup_extension and pickup_extension.sync_pickup then
+		pickup_extension:sync_pickup(self._verify_sender(sender))
+	end
 end
 
 function UnitNetworkHandler:unit_sound_play(unit, event_id, source, sender)
@@ -1547,33 +1553,83 @@ function UnitNetworkHandler:sync_carry_data(unit, carry_id, carry_multiplier, dy
 	managers.player:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit)
 end
 
-function UnitNetworkHandler:server_throw_grenade(grenade_type, position, dir, sender)
+function UnitNetworkHandler:request_throw_projectile(projectile_type, position, dir, sender)
 	local peer = self._verify_sender(sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
 		return
 	end
 	local peer_id = peer:id()
-	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
-	local no_cheat_count = tweak_data.blackmarket.grenades[grenade_entry].no_cheat_count
+	local projectile_entry = tweak_data.blackmarket:get_projectile_name_from_index(projectile_type)
+	local no_cheat_count = tweak_data.blackmarket.projectiles[projectile_entry].no_cheat_count
 	if not no_cheat_count and not managers.player:verify_grenade(peer_id) then
 		return
 	end
-	GrenadeBase.server_throw_grenade(grenade_type, position, dir, peer_id)
+	ProjectileBase.throw_projectile(projectile_type, position, dir, peer_id)
 end
 
-function UnitNetworkHandler:sync_throw_grenade(unit, dir, grenade_type, peer_id, sender)
-	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
+function UnitNetworkHandler:sync_throw_projectile(unit, pos, dir, projectile_type, peer_id, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		print("_verify failed!!!")
 		return
 	end
-	local grenade_entry = tweak_data.blackmarket:get_grenade_name_from_index(grenade_type)
-	local no_cheat_count = tweak_data.blackmarket.grenades[grenade_entry].no_cheat_count
+	local projectile_entry = tweak_data.blackmarket:get_projectile_name_from_index(projectile_type)
+	local tweak_entry = tweak_data.blackmarket.projectiles[projectile_entry]
+	if tweak_entry.client_authoritative then
+		if not unit then
+			local unit_name = Idstring(tweak_entry.local_unit)
+			unit = World:spawn_unit(unit_name, pos, Rotation(dir, math.UP))
+		end
+		unit:base():set_owner_peer_id(peer_id)
+	end
+	if not alive(unit) then
+		print("unit is not alive!!!")
+		return
+	end
+	local server_peer = managers.network:session():server_peer()
+	if tweak_entry.throwable and not peer == server_peer then
+		print("projectile is throwable, should not be thrown by client!!!")
+		return
+	end
+	local no_cheat_count = tweak_entry.no_cheat_count
 	if not no_cheat_count then
 		managers.player:verify_grenade(peer_id)
 	end
 	local member = managers.network:game():member(peer_id)
 	local thrower_unit = member and member:unit()
 	unit:base():set_thrower_unit(thrower_unit)
-	unit:base():sync_throw_grenade(dir, grenade_type)
+	if not tweak_entry.throwable and thrower_unit:movement() and thrower_unit:movement():current_state() then
+		unit:base():set_weapon_unit(thrower_unit:movement():current_state()._equipped_unit)
+	end
+	unit:base():sync_throw_projectile(dir, projectile_type)
+end
+
+function UnitNetworkHandler:sync_attach_projectile(unit, instant_dynamic_pickup, parent_unit, parent_body, parent_object, local_pos, dir, projectile_type, peer_id, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		print("_verify failed!!!")
+		return
+	end
+	local world_position = parent_object and local_pos:rotate_with(parent_object:rotation()) + parent_object:position() or local_pos
+	if Network:is_server() then
+		local projectile_entry = tweak_data.blackmarket:get_projectile_name_from_index(projectile_type)
+		local tweak_entry = tweak_data.blackmarket.projectiles[projectile_entry]
+		local unit_name = Idstring(tweak_entry.unit)
+		local synced_unit = World:spawn_unit(unit_name, world_position, Rotation(dir, math.UP))
+		managers.network:session():send_to_peers_synched("sync_attach_projectile", synced_unit, instant_dynamic_pickup, alive(parent_unit) and parent_unit:id() ~= -1 and parent_unit or nil, alive(parent_unit) and parent_unit:id() ~= -1 and parent_body or nil, alive(parent_unit) and parent_unit:id() ~= -1 and parent_object or nil, local_pos, dir, projectile_type, peer_id)
+		synced_unit:base():set_thrower_unit_by_peer_id(peer_id)
+		synced_unit:base():sync_attach_to_unit(instant_dynamic_pickup, parent_unit, parent_body, parent_object, local_pos, dir)
+	elseif unit then
+		unit:set_position(world_position)
+		unit:base():set_thrower_unit_by_peer_id(peer_id)
+		unit:base():sync_attach_to_unit(instant_dynamic_pickup, parent_unit, parent_body, parent_object, local_pos, dir)
+	end
+	if peer_id ~= 1 then
+		local dummy_unit = ArrowBase.find_nearest_arrow(peer_id, world_position)
+		if dummy_unit then
+			dummy_unit:set_slot(0)
+		end
+	end
 end
 
 function UnitNetworkHandler:sync_detonate_molotov_grenade(unit, ext_name, event_id, normal, rpc)

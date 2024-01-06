@@ -11,3 +11,4 @@ GrenadeLauncherBase = GrenadeLauncherBase or class(NewRaycastWeaponBase)
 GrenadeLauncherContinousReloadBase = GrenadeLauncherContinousReloadBase or class(NewRaycastWeaponBase)
 AkimboWeaponBase = AkimboWeaponBase or class(NewRaycastWeaponBase)
 AkimboWeaponBase.AKIMBO = true
+BowWeaponBase = BowWeaponBase or class(NewRaycastWeaponBase)

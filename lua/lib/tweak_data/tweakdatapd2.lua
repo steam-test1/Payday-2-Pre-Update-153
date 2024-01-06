@@ -335,6 +335,15 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.equipment_body_bag = {
+		texture = "guis/textures/pd2/equipment",
+		texture_rect = {
+			96,
+			32,
+			32,
+			32
+		}
+	}
 	self.hud_icons.ak = {
 		texture = "guis/textures/pd2/weapons",
 		texture_rect = {
@@ -515,11 +524,11 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
-	self.hud_icons.equipment_body_bag = {
+	self.hud_icons.dynamite_grenade = {
 		texture = "guis/textures/pd2/equipment",
 		texture_rect = {
 			96,
-			32,
+			64,
 			32,
 			32
 		}
