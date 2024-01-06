@@ -1850,6 +1850,9 @@ function UpgradesTweakData:init()
 	self:_rpg7_weapon_definitions()
 	self:_cobray_definitions()
 	self:_b682_weapon_definitions()
+	self:_x_g22c_definitions()
+	self:_x_g17_definitions()
+	self:_x_usp_definitions()
 	self:_weapon_definitions()
 	self:_pistol_definitions()
 	self:_assault_rifle_definitions()
@@ -8607,5 +8610,29 @@ function UpgradesTweakData:_chef_definitions()
 	self.definitions.chef = {
 		category = "melee_weapon",
 		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_x_g22c_definitions()
+	self.definitions.x_g22c = {
+		category = "weapon",
+		weapon_id = "x_g22c",
+		factory_id = "wpn_fps_pis_x_g22c"
+	}
+end
+
+function UpgradesTweakData:_x_g17_definitions()
+	self.definitions.x_g17 = {
+		category = "weapon",
+		weapon_id = "x_g17",
+		factory_id = "wpn_fps_pis_x_g17"
+	}
+end
+
+function UpgradesTweakData:_x_usp_definitions()
+	self.definitions.x_usp = {
+		category = "weapon",
+		weapon_id = "x_usp",
+		factory_id = "wpn_fps_pis_x_usp"
 	}
 end

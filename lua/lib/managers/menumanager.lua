@@ -7033,14 +7033,19 @@ function MenuChooseWeaponRewardInitiator:modify_node(original_node, data)
 		local loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon.weapon_id)
 		return loot_table and 0 < #loot_table or false
 	end
-	local category
+	local category, loot_table, data
 	for i, category_data in ipairs({primaries, secondaries}) do
 		for _, weapon_data in ipairs(category_data) do
-			if chk_unlocked_func(weapon_data) and chk_dlc_func(weapon_data) and chk_dropable_func(weapon_data) then
-				category = weapon_tweak[weapon_data.weapon_id].category
-				category = tweak_data.gui.buy_weapon_category_groups[category] or category
-				items[category] = items[category] or {}
-				table.insert(items[category], weapon_data)
+			if chk_unlocked_func(weapon_data) and chk_dlc_func(weapon_data) then
+				loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_data.weapon_id)
+				if 0 < #loot_table then
+					data = deep_clone(weapon_data)
+					data.loot_table = loot_table
+					category = weapon_tweak[weapon_data.weapon_id].category
+					category = tweak_data.gui.buy_weapon_category_groups[category] or category
+					items[category] = items[category] or {}
+					table.insert(items[category], data)
+				end
 			end
 		end
 	end
@@ -7099,6 +7104,8 @@ end
 function MenuChooseWeaponRewardInitiator:setup_node(node)
 	local listed_category = node:parameters().listed_category or "assault_rifle"
 	local listed_weapon = node:parameters().listed_weapon or "amcar"
+	local listed_global_value = node:parameters().listed_global_value or "all"
+	node:parameters().listed_global_value = listed_global_value
 	node:parameters().listed_weapon = listed_weapon
 	node:parameters().listed_category = listed_category
 	node:parameters().block_back = true
@@ -7143,6 +7150,7 @@ function MenuChooseWeaponRewardInitiator:setup_node(node)
 		local new_item = node:create_item(data_node, params)
 		new_item:set_value(listed_category)
 		node:add_item(new_item)
+		local current_weapon_data
 		local params = {
 			name = "choose_weapon",
 			text_id = "menu_challenge_choose_weapon",
@@ -7167,6 +7175,9 @@ function MenuChooseWeaponRewardInitiator:setup_node(node)
 				text_id = managers.weapon_factory:get_weapon_name_by_weapon_id(weapon_data.weapon_id),
 				value = weapon_data.weapon_id
 			})
+			if weapon_data.weapon_id == listed_weapon then
+				current_weapon_data = weapon_data
+			end
 		end
 		table.insert(data_node, {
 			_meta = "option",
@@ -7177,6 +7188,76 @@ function MenuChooseWeaponRewardInitiator:setup_node(node)
 		})
 		local new_item = node:create_item(data_node, params)
 		new_item:set_value(listed_weapon)
+		node:add_item(new_item)
+		local weapon_data = current_weapon_data or {}
+		local global_values = {}
+		for _, data in pairs(weapon_data.loot_table or {}) do
+			table.insert(global_values, data[2])
+		end
+		global_values = table.list_union(global_values)
+		local x_sn, y_sn
+		
+		local function sort_func(x, y)
+			if x == "normal" then
+				return true
+			elseif y == "normal" then
+				return false
+			end
+			x_sn = tweak_data.lootdrop.global_values[x].sort_number or 0
+			y_sn = tweak_data.lootdrop.global_values[y].sort_number or 0
+			if x_sn ~= y_sn then
+				return x_sn < y_sn
+			end
+			return x < y
+		end
+		
+		table.sort(global_values, sort_func)
+		local params = {
+			name = "choose_global_value",
+			text_id = "menu_challenge_choose_global_value",
+			callback = "choice_challenge_choose_global_value",
+			filter = true,
+			text_offset = 75
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		if 1 < #global_values then
+			table.insert(data_node, {
+				_meta = "option",
+				no_text = true,
+				localize = false,
+				text_id = "",
+				value = global_values[#global_values] .. "#"
+			})
+		end
+		table.insert(data_node, {
+			_meta = "option",
+			localize = false,
+			text_id = managers.localization:text("menu_challenge_global_value_all"),
+			value = "all"
+		})
+		if 1 < #global_values then
+			for index, global_value in ipairs(global_values) do
+				table.insert(data_node, {
+					_meta = "option",
+					localize = false,
+					text_id = managers.localization:text(tweak_data:get_raw_value("lootdrop", "global_values", global_value, "name_id")),
+					value = global_value
+				})
+			end
+			table.insert(data_node, {
+				_meta = "option",
+				no_text = true,
+				localize = false,
+				text_id = "",
+				value = "all#"
+			})
+		end
+		node:parameters().listed_global_value = table.contains(global_values, listed_global_value) and listed_global_value or "all"
+		listed_global_value = node:parameters().listed_global_value
+		local new_item = node:create_item(data_node, params)
+		new_item:set_value(listed_global_value)
 		node:add_item(new_item)
 		self:create_divider(node, "divider_end", nil, 32)
 		local params = {
@@ -7251,6 +7332,26 @@ function MenuCallbackHandler:choice_challenge_choose_weapon(item)
 	MenuCallbackHandler:refresh_node()
 end
 
+function MenuCallbackHandler:choice_challenge_choose_global_value(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	if managers.menu:active_menu().logic:selected_node():parameters().clicked_category then
+		return false
+	end
+	managers.menu:active_menu().logic:selected_node():parameters().listed_global_value = string.gsub(item:value(), "#", "")
+	if string.find(item:value(), "#") then
+		item:set_value(string.gsub(item:value(), "#", ""))
+	end
+	MenuCallbackHandler:refresh_node()
+end
+
 function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
 	if not managers.menu:active_menu() then
 		return false
@@ -7263,7 +7364,9 @@ function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
 	end
 	local reward = {}
 	if managers.menu:active_menu().logic:selected_node():parameters().listed_weapon then
-		local entry = MenuCallbackHandler:roll_challenge_give_weapon_mod(managers.menu:active_menu().logic:selected_node():parameters().listed_weapon)
+		local weapon_id = managers.menu:active_menu().logic:selected_node():parameters().listed_weapon
+		local global_value = managers.menu:active_menu().logic:selected_node():parameters().listed_global_value
+		local entry = MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id, global_value)
 		managers.menu:active_menu().logic:selected_node():parameters().listed_weapon = nil
 		if entry then
 			reward.amount = 1
@@ -7276,8 +7379,8 @@ function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
 	managers.menu:show_challenge_reward(reward)
 end
 
-function MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id)
-	local loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_id)
+function MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id, global_value)
+	local loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_id, global_value)
 	if 0 < #loot_table then
 		local entry = loot_table[math.random(#loot_table)]
 		managers.blackmarket:add_to_inventory(entry[2] or "normal", "weapon_mods", entry[1])

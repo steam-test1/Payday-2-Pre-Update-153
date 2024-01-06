@@ -1672,9 +1672,12 @@ function BlackMarketManager:concealment_modifier(type)
 	return modifier
 end
 
-function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, weapon_data)
-	local droppable_parts = self:get_dropable_mods_by_weapon_id(weapon_id, weapon_data)
+function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, global_value)
+	local droppable_parts = self:get_dropable_mods_by_weapon_id(weapon_id)
 	local loot_table = {}
+	if global_value == "all" then
+		global_value = false
+	end
 	local chk_dlc_func = function(global_value)
 		local all_dlc_data = Global.dlc_manager.all_dlc_data
 		if all_dlc_data[global_value] and all_dlc_data[global_value].app_id and not managers.dlc:is_dlc_unlocked(global_value) then
@@ -1682,11 +1685,11 @@ function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, weapon
 		end
 		return true
 	end
-	local global_value
+	local gv
 	for category, parts in pairs(droppable_parts) do
 		for _, part_data in ipairs(parts) do
-			global_value = part_data[2] or "normal"
-			if tweak_data.lootdrop.global_values[global_value] and (not tweak_data.lootdrop.global_values[global_value].dlc or managers.dlc:is_dlc_unlocked(global_value)) and tweak_data.weapon.factory.parts[part_data[1]] and (tweak_data.weapon.factory.parts[part_data[1]].pc or tweak_data.weapon.factory.parts[part_data[1]].pcs and #tweak_data.weapon.factory.parts[part_data[1]].pcs > 0) then
+			gv = part_data[2] or "normal"
+			if (not global_value or gv == global_value) and tweak_data.lootdrop.global_values[gv] and (not tweak_data.lootdrop.global_values[gv].dlc or managers.dlc:is_dlc_unlocked(gv)) and tweak_data.weapon.factory.parts[part_data[1]] and (tweak_data.weapon.factory.parts[part_data[1]].pc or tweak_data.weapon.factory.parts[part_data[1]].pcs and #tweak_data.weapon.factory.parts[part_data[1]].pcs > 0) then
 				table.insert(loot_table, part_data)
 			end
 		end

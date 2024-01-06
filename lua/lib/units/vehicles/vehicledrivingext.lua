@@ -429,14 +429,16 @@ function VehicleDrivingExt:find_exit_position(player)
 	local seat = self:find_seat_for_player(player)
 	local exit_position = self._unit:get_object(Idstring(VehicleDrivingExt.EXIT_PREFIX .. seat.name))
 	local found_exit = true
-	local z_offset = Vector3(0, 0, 100)
+	local rot = self._vehicle:rotation()
+	local offset = Vector3(0, 0, 100)
+	mvector3.rotate_with(offset, rot)
 	local slot_mask = World:make_slot_mask(1, 11)
-	local ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + z_offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
+	local ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
 	if ray and ray.unit then
 		found_exit = false
 		for _, seat in pairs(self._tweak_data.seats) do
 			exit_position = self._unit:get_object(Idstring(VehicleDrivingExt.EXIT_PREFIX .. seat.name))
-			ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + z_offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
+			ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
 			if not ray or not ray.unit then
 				found_exit = true
 				break
@@ -446,7 +448,7 @@ function VehicleDrivingExt:find_exit_position(player)
 			local i_alt = 1
 			exit_position = self._unit:get_object(Idstring("v_exit_alternate_" .. i_alt))
 			while exit_position do
-				ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + z_offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
+				ray = World:raycast("ray_type", "body bag mover", "ray", player:position(), exit_position:position() + offset, "sphere_cast_radius", 35, "slot_mask", slot_mask)
 				if not ray or not ray.unit then
 					found_exit = true
 					break

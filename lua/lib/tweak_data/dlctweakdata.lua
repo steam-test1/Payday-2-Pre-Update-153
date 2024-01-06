@@ -8,6 +8,7 @@ function DLCTweakData:init(tweak_data)
 		washington_reveal = true,
 		pines = true,
 		character_pack_bonnie = true,
+		butcher_pack_mods = true,
 		dlc1 = true,
 		gage_pack = true,
 		gage_pack_lmg = true,
@@ -2774,6 +2775,106 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "weapon_mods",
 			item_entry = "wpn_fps_upg_ak_b_ak105",
+			amount = 1
+		}
+	}
+	self.butch_pack_free = {}
+	self.butch_pack_free.free = true
+	self.butch_pack_free.content = {}
+	self.butch_pack_free.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_saw_body_silent",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_saw_body_speed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_saw_m_blade_durable",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_saw_m_blade_sharp",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_aug_body_f90",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_ak5_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_mp5_m_straight",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_mp9_b_suppressed",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_p90_b_civilian",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_p90_b_ninja",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_m14_scopemount",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_1911_g_engraved",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_beretta_g_engraved",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_fl_ass_utg",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_fl_pis_m3x",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ass_ns_battle",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_ass_filter",
+			amount = 5
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_pis_jungle",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_sho_salvo_large",
 			amount = 1
 		}
 	}

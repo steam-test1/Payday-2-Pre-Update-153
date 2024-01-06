@@ -83,6 +83,9 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_rpg7_npc()
 	self:_init_data_cobray_npc()
 	self:_init_data_b682_npc()
+	self:_init_data_x_g22c_npc()
+	self:_init_data_x_g17_npc()
+	self:_init_data_x_usp_npc()
 	self:_precalculate_values()
 end
 
@@ -1399,6 +1402,48 @@ function WeaponTweakData:_init_data_b682_npc()
 	self.b682_npc.alert_size = 4500
 	self.b682_npc.suppression = 1.8
 	self.b682_npc.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_x_g22c_npc()
+	self.x_g22c_npc.sounds.prefix = "g22_npc"
+	self.x_g22c_npc.use_data.selection_index = 2
+	self.x_g22c_npc.DAMAGE = 1.25
+	self.x_g22c_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_g22c_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_g22c_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g22c_npc.CLIP_AMMO_MAX = 80
+	self.x_g22c_npc.NR_CLIPS_MAX = 5
+	self.x_g22c_npc.hold = "akimbo_pistol"
+	self.x_g22c_npc.alert_size = 1800
+	self.x_g22c_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_g17_npc()
+	self.x_g17_npc.sounds.prefix = "g22_npc"
+	self.x_g17_npc.use_data.selection_index = 2
+	self.x_g17_npc.DAMAGE = 1.25
+	self.x_g17_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_g17_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_g17_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g17_npc.CLIP_AMMO_MAX = 80
+	self.x_g17_npc.NR_CLIPS_MAX = 5
+	self.x_g17_npc.hold = "akimbo_pistol"
+	self.x_g17_npc.alert_size = 1800
+	self.x_g17_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_usp_npc()
+	self.x_usp_npc.sounds.prefix = "g22_npc"
+	self.x_usp_npc.use_data.selection_index = 2
+	self.x_usp_npc.DAMAGE = 1.25
+	self.x_usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_usp_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_usp_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_usp_npc.CLIP_AMMO_MAX = 80
+	self.x_usp_npc.NR_CLIPS_MAX = 5
+	self.x_usp_npc.hold = "akimbo_pistol"
+	self.x_usp_npc.alert_size = 1800
+	self.x_usp_npc.suppression = 2
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7957,6 +8002,273 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		value = 1
 	}
 	self.b682.stats_modifiers = {damage = 1.38}
+	self.x_g22c = {}
+	self.x_g22c.category = "akimbo"
+	self.x_g22c.damage_melee = damage_melee_default
+	self.x_g22c.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_g22c.sounds = {}
+	self.x_g22c.sounds.fire = "g22_fire"
+	self.x_g22c.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_g22c.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_g22c.sounds.dryfire = "secondary_dryfire"
+	self.x_g22c.timers = {}
+	self.x_g22c.timers.reload_not_empty = 3.17
+	self.x_g22c.timers.reload_empty = 4
+	self.x_g22c.timers.unequip = 0.5
+	self.x_g22c.timers.equip = 0.5
+	self.x_g22c.name_id = "bm_w_x_g22c"
+	self.x_g22c.desc_id = "bm_w_x_g22c_desc"
+	self.x_g22c.description_id = "des_x_g22c"
+	self.x_g22c.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_g22c.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_g22c.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g22c.use_data = {}
+	self.x_g22c.use_data.selection_index = 2
+	self.x_g22c.DAMAGE = 1
+	self.x_g22c.CLIP_AMMO_MAX = 32
+	self.x_g22c.NR_CLIPS_MAX = math.round(total_damage_primary / 2 / self.x_g22c.CLIP_AMMO_MAX)
+	self.x_g22c.AMMO_MAX = self.x_g22c.CLIP_AMMO_MAX * self.x_g22c.NR_CLIPS_MAX
+	self.x_g22c.AMMO_PICKUP = self:_pickup_chance(self.x_g22c.AMMO_MAX, 1)
+	self.x_g22c.FIRE_MODE = "single"
+	self.x_g22c.fire_mode_data = {}
+	self.x_g22c.fire_mode_data.fire_rate = 0.12
+	self.x_g22c.single = {}
+	self.x_g22c.single.fire_rate = 0.12
+	self.x_g22c.spread = {}
+	self.x_g22c.spread.standing = 1.4
+	self.x_g22c.spread.crouching = self.x_g22c.spread.standing * 1.1
+	self.x_g22c.spread.steelsight = 0.6
+	self.x_g22c.spread.moving_standing = self.x_g22c.spread.standing * 1.8
+	self.x_g22c.spread.moving_crouching = self.x_g22c.spread.standing * 1.9
+	self.x_g22c.spread.moving_steelsight = self.x_g22c.spread.steelsight * 1.2
+	self.x_g22c.kick = {}
+	self.x_g22c.kick.standing = {
+		1.6,
+		1.3,
+		-0.3,
+		0.3
+	}
+	self.x_g22c.kick.crouching = self.x_g22c.kick.standing
+	self.x_g22c.kick.steelsight = self.x_g22c.kick.standing
+	self.x_g22c.crosshair = {}
+	self.x_g22c.crosshair.standing = {}
+	self.x_g22c.crosshair.crouching = {}
+	self.x_g22c.crosshair.steelsight = {}
+	self.x_g22c.crosshair.standing.offset = 0.2
+	self.x_g22c.crosshair.standing.moving_offset = 0.6
+	self.x_g22c.crosshair.standing.kick_offset = 0.4
+	self.x_g22c.crosshair.crouching.offset = 0.1
+	self.x_g22c.crosshair.crouching.moving_offset = 0.6
+	self.x_g22c.crosshair.crouching.kick_offset = 0.3
+	self.x_g22c.crosshair.steelsight.hidden = true
+	self.x_g22c.crosshair.steelsight.offset = 0
+	self.x_g22c.crosshair.steelsight.moving_offset = 0
+	self.x_g22c.crosshair.steelsight.kick_offset = 0.1
+	self.x_g22c.shake = {}
+	self.x_g22c.shake.fire_multiplier = 1
+	self.x_g22c.shake.fire_steelsight_multiplier = -1
+	self.x_g22c.autohit = autohit_pistol_default
+	self.x_g22c.aim_assist = aim_assist_pistol_default
+	self.x_g22c.weapon_hold = "jowi_pistol"
+	self.x_g22c.animations = {}
+	self.x_g22c.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_g22c.animations.has_steelsight_stance = true
+	self.x_g22c.animations.recoil_steelsight = true
+	self.x_g22c.texture_bundle_folder = "butcher_pack_mods"
+	self.x_g22c.stats = {
+		damage = 10,
+		spread = 6,
+		recoil = 13,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.x_g17 = {}
+	self.x_g17.category = "akimbo"
+	self.x_g17.damage_melee = damage_melee_default
+	self.x_g17.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_g17.sounds = {}
+	self.x_g17.sounds.fire = "g17_fire"
+	self.x_g17.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_g17.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_g17.sounds.dryfire = "secondary_dryfire"
+	self.x_g17.timers = {}
+	self.x_g17.timers.reload_not_empty = 3.17
+	self.x_g17.timers.reload_empty = 4
+	self.x_g17.timers.unequip = 0.5
+	self.x_g17.timers.equip = 0.5
+	self.x_g17.name_id = "bm_w_x_g17"
+	self.x_g17.desc_id = "bm_w_x_g17_desc"
+	self.x_g17.description_id = "des_x_g17"
+	self.x_g17.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_g17.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_g17.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g17.use_data = {}
+	self.x_g17.use_data.selection_index = 2
+	self.x_g17.DAMAGE = 1
+	self.x_g17.CLIP_AMMO_MAX = 34
+	self.x_g17.NR_CLIPS_MAX = math.round(total_damage_primary / 2 / self.x_g17.CLIP_AMMO_MAX)
+	self.x_g17.AMMO_MAX = self.x_g17.CLIP_AMMO_MAX * self.x_g17.NR_CLIPS_MAX
+	self.x_g17.AMMO_PICKUP = self:_pickup_chance(self.x_g17.AMMO_MAX, 1)
+	self.x_g17.FIRE_MODE = "single"
+	self.x_g17.fire_mode_data = {}
+	self.x_g17.fire_mode_data.fire_rate = 0.12
+	self.x_g17.single = {}
+	self.x_g17.single.fire_rate = 0.12
+	self.x_g17.spread = {}
+	self.x_g17.spread.standing = 1.4
+	self.x_g17.spread.crouching = self.x_g17.spread.standing * 1.1
+	self.x_g17.spread.steelsight = 0.6
+	self.x_g17.spread.moving_standing = self.x_g17.spread.standing * 1.8
+	self.x_g17.spread.moving_crouching = self.x_g17.spread.standing * 1.9
+	self.x_g17.spread.moving_steelsight = self.x_g17.spread.steelsight * 1.2
+	self.x_g17.kick = {}
+	self.x_g17.kick.standing = {
+		1.6,
+		1.3,
+		-0.3,
+		0.3
+	}
+	self.x_g17.kick.crouching = self.x_g17.kick.standing
+	self.x_g17.kick.steelsight = self.x_g17.kick.standing
+	self.x_g17.crosshair = {}
+	self.x_g17.crosshair.standing = {}
+	self.x_g17.crosshair.crouching = {}
+	self.x_g17.crosshair.steelsight = {}
+	self.x_g17.crosshair.standing.offset = 0.2
+	self.x_g17.crosshair.standing.moving_offset = 0.6
+	self.x_g17.crosshair.standing.kick_offset = 0.4
+	self.x_g17.crosshair.crouching.offset = 0.1
+	self.x_g17.crosshair.crouching.moving_offset = 0.6
+	self.x_g17.crosshair.crouching.kick_offset = 0.3
+	self.x_g17.crosshair.steelsight.hidden = true
+	self.x_g17.crosshair.steelsight.offset = 0
+	self.x_g17.crosshair.steelsight.moving_offset = 0
+	self.x_g17.crosshair.steelsight.kick_offset = 0.1
+	self.x_g17.shake = {}
+	self.x_g17.shake.fire_multiplier = 1
+	self.x_g17.shake.fire_steelsight_multiplier = -1
+	self.x_g17.autohit = autohit_pistol_default
+	self.x_g17.aim_assist = aim_assist_pistol_default
+	self.x_g17.weapon_hold = "jowi_pistol"
+	self.x_g17.animations = {}
+	self.x_g17.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_g17.animations.has_steelsight_stance = true
+	self.x_g17.animations.recoil_steelsight = true
+	self.x_g17.texture_bundle_folder = "butcher_pack_mods"
+	self.x_g17.stats = {
+		damage = 6,
+		spread = 7,
+		recoil = 7,
+		spread_moving = 7,
+		zoom = 1,
+		concealment = 30,
+		suppression = 16,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.x_usp = {}
+	self.x_usp.category = "akimbo"
+	self.x_usp.damage_melee = damage_melee_default
+	self.x_usp.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_usp.sounds = {}
+	self.x_usp.sounds.fire = "usp45_fire"
+	self.x_usp.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_usp.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_usp.sounds.dryfire = "secondary_dryfire"
+	self.x_usp.timers = {}
+	self.x_usp.timers.reload_not_empty = 3.17
+	self.x_usp.timers.reload_empty = 4
+	self.x_usp.timers.unequip = 0.5
+	self.x_usp.timers.equip = 0.5
+	self.x_usp.name_id = "bm_w_x_usp"
+	self.x_usp.desc_id = "bm_w_x_usp_desc"
+	self.x_usp.description_id = "des_x_usp"
+	self.x_usp.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_usp.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_usp.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_usp.use_data = {}
+	self.x_usp.use_data.selection_index = 2
+	self.x_usp.DAMAGE = 1
+	self.x_usp.CLIP_AMMO_MAX = 26
+	self.x_usp.NR_CLIPS_MAX = math.round(total_damage_primary / 2 / self.x_usp.CLIP_AMMO_MAX)
+	self.x_usp.AMMO_MAX = self.x_usp.CLIP_AMMO_MAX * self.x_usp.NR_CLIPS_MAX
+	self.x_usp.AMMO_PICKUP = self:_pickup_chance(self.x_usp.AMMO_MAX, 1)
+	self.x_usp.FIRE_MODE = "single"
+	self.x_usp.fire_mode_data = {}
+	self.x_usp.fire_mode_data.fire_rate = 0.12
+	self.x_usp.single = {}
+	self.x_usp.single.fire_rate = 0.12
+	self.x_usp.spread = {}
+	self.x_usp.spread.standing = 1.4
+	self.x_usp.spread.crouching = self.x_usp.spread.standing * 1.1
+	self.x_usp.spread.steelsight = 0.6
+	self.x_usp.spread.moving_standing = self.x_usp.spread.standing * 1.8
+	self.x_usp.spread.moving_crouching = self.x_usp.spread.standing * 1.9
+	self.x_usp.spread.moving_steelsight = self.x_usp.spread.steelsight * 1.2
+	self.x_usp.kick = {}
+	self.x_usp.kick.standing = {
+		1.6,
+		1.3,
+		-0.3,
+		0.3
+	}
+	self.x_usp.kick.crouching = self.x_usp.kick.standing
+	self.x_usp.kick.steelsight = self.x_usp.kick.standing
+	self.x_usp.crosshair = {}
+	self.x_usp.crosshair.standing = {}
+	self.x_usp.crosshair.crouching = {}
+	self.x_usp.crosshair.steelsight = {}
+	self.x_usp.crosshair.standing.offset = 0.2
+	self.x_usp.crosshair.standing.moving_offset = 0.6
+	self.x_usp.crosshair.standing.kick_offset = 0.4
+	self.x_usp.crosshair.crouching.offset = 0.1
+	self.x_usp.crosshair.crouching.moving_offset = 0.6
+	self.x_usp.crosshair.crouching.kick_offset = 0.3
+	self.x_usp.crosshair.steelsight.hidden = true
+	self.x_usp.crosshair.steelsight.offset = 0
+	self.x_usp.crosshair.steelsight.moving_offset = 0
+	self.x_usp.crosshair.steelsight.kick_offset = 0.1
+	self.x_usp.shake = {}
+	self.x_usp.shake.fire_multiplier = 1
+	self.x_usp.shake.fire_steelsight_multiplier = -1
+	self.x_usp.autohit = autohit_pistol_default
+	self.x_usp.aim_assist = aim_assist_pistol_default
+	self.x_usp.weapon_hold = "jowi_pistol"
+	self.x_usp.animations = {}
+	self.x_usp.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_usp.animations.has_steelsight_stance = true
+	self.x_usp.animations.recoil_steelsight = true
+	self.x_usp.texture_bundle_folder = "butcher_pack_mods"
+	self.x_usp.stats = {
+		damage = 9,
+		spread = 7,
+		recoil = 9,
+		spread_moving = 8,
+		zoom = 1,
+		concealment = 29,
+		suppression = 16,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -8527,6 +8839,24 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.x_g22c_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_g17_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_usp_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -8611,4 +8941,7 @@ function WeaponTweakData:_precalculate_values()
 	self.rpg7_npc.AMMO_MAX = self.rpg7_npc.CLIP_AMMO_MAX * self.rpg7_npc.NR_CLIPS_MAX
 	self.cobray_npc.AMMO_MAX = self.cobray_npc.CLIP_AMMO_MAX * self.cobray_npc.NR_CLIPS_MAX
 	self.b682_npc.AMMO_MAX = self.b682_npc.CLIP_AMMO_MAX * self.b682_npc.NR_CLIPS_MAX
+	self.x_g22c_npc.AMMO_MAX = self.x_g22c_npc.CLIP_AMMO_MAX * self.x_g22c_npc.NR_CLIPS_MAX
+	self.x_g17_npc.AMMO_MAX = self.x_g17_npc.CLIP_AMMO_MAX * self.x_g17_npc.NR_CLIPS_MAX
+	self.x_usp_npc.AMMO_MAX = self.x_usp_npc.CLIP_AMMO_MAX * self.x_usp_npc.NR_CLIPS_MAX
 end

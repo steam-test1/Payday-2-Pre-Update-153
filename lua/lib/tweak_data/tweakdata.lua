@@ -1228,6 +1228,11 @@ function TweakData:init()
 		timer = 25,
 		weapon_id = "m134"
 	}
+	self.achievement.nothing_to_see_here = {
+		award = "slakt_2",
+		total_value = 4,
+		timer = 90
+	}
 	self.achievement.one_man_army = {
 		award = "gage5_3",
 		equipped = {

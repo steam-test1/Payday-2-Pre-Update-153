@@ -1168,6 +1168,31 @@ function IntimitateInteractionExt:interact(player)
 		else
 			managers.network:session():send_to_host("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 3)
 		end
+		if tweak_data.achievement.nothing_to_see_here and managers.player:local_player() == player then
+			local achievement_data = tweak_data.achievement.nothing_to_see_here
+			local achievement = "nothing_to_see_here"
+			local memory = managers.job:get_memory(achievement, true)
+			local t = Application:time()
+			local new_memory = {time = t, value = 1}
+			if memory then
+				table.insert(memory, new_memory)
+				for i = #memory, 1, -1 do
+					if t - memory[i].time >= achievement_data.timer then
+						table.remove(memory, i)
+					end
+				end
+			else
+				memory = {new_memory}
+			end
+			managers.job:set_memory(achievement, memory, true)
+			local total_memory_value = 0
+			for _, m_data in ipairs(memory) do
+				total_memory_value = total_memory_value + m_data.value
+			end
+			if total_memory_value >= achievement_data.total_value then
+				managers.achievment:award(achievement_data.award)
+			end
+		end
 		self:remove_interact()
 	elseif self.tweak_data == "corpse_dispose" then
 		managers.player:set_carry("person", 0)

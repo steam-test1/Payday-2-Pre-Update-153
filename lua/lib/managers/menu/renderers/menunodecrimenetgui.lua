@@ -2479,7 +2479,7 @@ function MenuNodeChooseWeaponRewardGui:_setup_item_panel(safe_rect, res)
 		layer = 1
 	})
 	icon:set_position(10, 10)
-	local droppable_parts = managers.blackmarket:get_lootdropable_mods_by_weapon_id(self.node:parameters().listed_weapon)
+	local droppable_parts = managers.blackmarket:get_lootdropable_mods_by_weapon_id(self.node:parameters().listed_weapon, self.node:parameters().listed_global_value)
 	local count = 0
 	local inv_count = 0
 	for _, part_data in ipairs(droppable_parts) do
@@ -2488,7 +2488,7 @@ function MenuNodeChooseWeaponRewardGui:_setup_item_panel(safe_rect, res)
 			inv_count = inv_count + 1
 		end
 	end
-	local text = self.box_panel:text({
+	self._owned_text = self.box_panel:text({
 		text = managers.localization:to_upper_text("menu_challenge_num_owned_mods", {
 			inv_count = tostring(inv_count),
 			count = tostring(count)
@@ -2497,7 +2497,13 @@ function MenuNodeChooseWeaponRewardGui:_setup_item_panel(safe_rect, res)
 		font_size = tweak_data.menu.pd2_small_font_size,
 		blend_mode = "add"
 	})
-	make_fine_text(text)
-	text:set_world_top(self.row_items[2].gui_text:world_bottom() + 22)
-	text:set_world_left(self.row_items[2].gui_text:world_left())
+	make_fine_text(self._owned_text)
+end
+
+function MenuNodeChooseWeaponRewardGui:_reposition_items(highlighted_row_item)
+	MenuNodeChooseWeaponRewardGui.super._reposition_items(self, highlighted_row_item)
+	if alive(self._owned_text) then
+		self._owned_text:set_world_top(self.row_items[3].gui_text:world_bottom())
+		self._owned_text:set_world_left(self.row_items[3].gui_text:world_left())
+	end
 end

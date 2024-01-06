@@ -1830,6 +1830,9 @@ function SkillTreeTweakData:init()
 				"x_1911",
 				"x_b92fs",
 				"x_deagle",
+				"x_g22c",
+				"x_g17",
+				"x_usp",
 				"akimbo_recoil_multiplier_1",
 				"akimbo_recoil_multiplier_2"
 			},
@@ -2502,7 +2505,10 @@ function SkillTreeTweakData:init()
 					"jowi",
 					"x_1911",
 					"x_b92fs",
-					"x_deagle"
+					"x_deagle",
+					"x_g22c",
+					"x_g17",
+					"x_usp"
 				},
 				cost = 400,
 				icon_xy = {7, 2},
