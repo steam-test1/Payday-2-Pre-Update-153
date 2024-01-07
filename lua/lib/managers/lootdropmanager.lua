@@ -541,7 +541,7 @@ function LootDropManager:can_drop_weapon_mods()
 			local is_infamous = item_tweak.infamous or false
 			local is_dlc = item_tweak.dlcs or item_tweak.dlc or false
 			local got_qlvl = item_tweak.qlvl or false
-			local pass_infamous = not is_infamous or infamous_success
+			local pass_infamous = true
 			local pass_dlc = true
 			local pass_qlvl = not got_qlvl or plvl >= got_qlvl
 			local pass_max_in_inventory
