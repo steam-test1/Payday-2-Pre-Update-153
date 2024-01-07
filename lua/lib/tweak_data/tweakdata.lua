@@ -2343,6 +2343,13 @@ Play the full version soon to get your full PAYDAY!]],
 			jobs = {"kenaz"},
 			timer = 840
 		},
+		death_sinus = {
+			award = "sinus_2",
+			job = "jolly",
+			difficulty = {
+				"overkill_290"
+			}
+		},
 		not_for_old_men = {
 			award = "gage4_11",
 			stealth = true,
@@ -3210,6 +3217,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_27"},
 		{track = "track_28"},
 		{track = "track_29", lock = "kenaz"},
+		{track = "track_30"},
 		{
 			track = "track_pth_01",
 			lock = "payday"
