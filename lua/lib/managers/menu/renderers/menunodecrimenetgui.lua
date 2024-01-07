@@ -1712,9 +1712,11 @@ function MenuNodeCrimenetGageAssignmentGui:texture_done_clbk(params, texture_ids
 	local is_pattern = params[2]
 	local blend_mode = params[3] or "normal"
 	local color = params[4]
+	local texture_rect = params[5]
 	local image = panel:bitmap({
 		name = "texture",
 		texture = texture_ids,
+		texture_rect = texture_rect,
 		blend_mode = blend_mode
 	})
 	if is_pattern then
@@ -1723,8 +1725,8 @@ function MenuNodeCrimenetGageAssignmentGui:texture_done_clbk(params, texture_ids
 	if color then
 		image:set_color(color)
 	end
-	local texture_width = image:texture_width()
-	local texture_height = image:texture_height()
+	local texture_width = texture_rect and texture_rect[3] or image:texture_width()
+	local texture_height = texture_rect and texture_rect[4] or image:texture_height()
 	local panel_width = panel:w()
 	local panel_height = panel:h()
 	local tw = texture_width
@@ -1840,13 +1842,21 @@ MenuNodeCrimenetChallengeGui.SOUND_SOURCE_NAME = "MenuNodeCrimenetChallengeGui"
 function MenuNodeCrimenetChallengeGui:init(node, layer, parameters)
 	MenuNodeCrimenetChallengeGui.super.init(self, node, layer, parameters)
 	self._file_icons = nil
-	self._file_alphas = {
+	self._file_alphas_all = {
 		locked = 0.4,
 		unavailable = 1,
 		selected = 1,
 		unselected = 0.8,
 		mouse_over = 1
 	}
+	self._file_alphas_single = {
+		locked = 0.4,
+		unavailable = 1,
+		selected = 1,
+		unselected = 0.4,
+		mouse_over = 1
+	}
+	self._file_alphas = self._file_alphas_all
 end
 
 function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override_file)
@@ -1863,7 +1873,13 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 	local contact_title = name
 	local ids = Idstring(id)
 	local challenge = managers.challenge:get_active_challenge(id, ids:key())
+	self._set_file_on_mouse_over = false
+	self._file_alphas = self._file_alphas_all
+	self._confirm_reward = false
 	if challenge then
+		self._file_alphas = self._file_alphas_single
+		self._set_file_on_mouse_over = challenge.reward_type == "single"
+		self._confirm_reward = challenge.reward_type == "single"
 		contact_title = managers.localization:text("menu_challenge_title_" .. (challenge.category or "daily"), {name = name})
 		local desc_text = self._info_panel:text({
 			name = "desc_text",
@@ -1980,11 +1996,15 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 			local expire_timestamp = interval + timestamp
 			local current_timestamp = managers.challenge:get_timestamp()
 			local expire_time = expire_timestamp - current_timestamp
+			local expire_string = expire_time <= 0 and managers.localization:to_upper_text("menu_challenge_about_to_expire") or expire_time <= 24 and managers.localization:to_upper_text("menu_challenge_expire_time", {
+				time_left = tostring(expire_time)
+			}) or managers.localization:to_upper_text("menu_challenge_expire_time_detailed", {
+				hours = tostring(expire_time % 24),
+				days = tostring(math.floor(expire_time / 24))
+			})
 			local expire_text = self._info_panel:text({
 				name = "expire_text",
-				text = expire_time <= 0 and managers.localization:to_upper_text("menu_challenge_about_to_expire") or managers.localization:to_upper_text("menu_challenge_expire_time", {
-					time_left = tostring(expire_time)
-				}),
+				text = expire_string,
 				font = tweak_data.menu.pd2_small_font,
 				font_size = tweak_data.menu.pd2_small_font_size,
 				color = expire_time <= 4 and tweak_data.screen_colors.important_1 or tweak_data.screen_colors.important_2,
@@ -2007,19 +2027,25 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 			})
 			rewards_panel:set_h(height)
 			rewards_panel:set_bottom(self._info_panel:h())
-			local files_menu = rewards_panel:panel()
+			local files_menu = rewards_panel:panel({name = "files_menu"})
 			local locked
 			local unavailable = not challenge.completed
+			local next_x
+			if challenge.reward_type == "single" then
+				local num_reward = #challenge.rewards
+				next_x = (files_menu:w() - self.PADDING * 2) / (num_reward + 1)
+				x = next_x - width / 2 + self.PADDING
+			end
 			for i, reward in ipairs(challenge.rewards) do
 				local panel = files_menu:panel({
-					name = i,
+					name = tostring(i),
 					x = x,
 					y = self.PADDING,
 					width = width - 2 * self.PADDING,
 					height = rewards_panel:height() - 2 * self.PADDING
 				})
 				self:create_reward(panel, reward, challenge)
-				x = panel:right() + self.PADDING
+				x = next_x and x + next_x or panel:right() + self.PADDING
 				locked = reward.rewarded
 				table.insert(self._files, {lock = locked, unavailable = unavailable})
 			end
@@ -2029,7 +2055,7 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 			local rewards_text = self._info_panel:text({
 				name = "rewards_text",
 				layer = 10,
-				text = managers.localization:to_upper_text(challenge.rewarded and "menu_cn_rewarded" or challenge.completed and "menu_cn_completed" or "menu_cn_not_completed"),
+				text = managers.localization:to_upper_text(challenge.rewarded and "menu_cn_rewarded" or challenge.completed and (challenge.reward_type == "single" and "menu_cn_completed_single_reward" or "menu_cn_completed") or challenge.reward_type == "single" and "menu_cn_not_completed_single_reward" or "menu_cn_not_completed"),
 				font = tweak_data.menu.pd2_small_font,
 				font_size = tweak_data.menu.pd2_small_font_size,
 				color = tweak_data.screen_colors.text,
@@ -2095,7 +2121,7 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 end
 
 function MenuNodeCrimenetChallengeGui:create_reward(panel, reward, challenge)
-	local texture, texture_path
+	local texture, texture_path, texture_rect
 	local is_pattern = false
 	local reward_string = ""
 	if reward.name_s or reward.name_id then
@@ -2109,6 +2135,10 @@ function MenuNodeCrimenetChallengeGui:create_reward(panel, reward, challenge)
 	if reward.choose_weapon_reward then
 		texture_path = "guis/textures/pd2/icon_modbox_df"
 		reward_string = managers.localization:text("menu_challenge_choose_weapon_mod")
+	elseif 0 < #reward then
+		texture_path = reward.texture_path or "guis/textures/pd2/icon_reward"
+		texture_rect = reward.texture_rect
+		reward_string = reward.name_s or managers.localization:text(reward.name_id or "menu_challenge_choose_reward")
 	else
 		local id = reward.item_entry
 		local category = reward.type_items
@@ -2129,6 +2159,9 @@ function MenuNodeCrimenetChallengeGui:create_reward(panel, reward, challenge)
 				texture_path = "guis/textures/pd2/blackmarket/xp_drop"
 				reward_string = managers.localization:text("menu_challenge_xp_drop")
 			else
+				if category == "weapon_mods" or category == "weapon_bonus" then
+					category = "mods"
+				end
 				texture_path = guis_catalog .. "textures/pd2/blackmarket/icons/" .. category .. "/" .. id
 				reward_string = managers.localization:text(td.name_id)
 			end
@@ -2178,10 +2211,12 @@ function MenuNodeCrimenetChallengeGui:create_reward(panel, reward, challenge)
 			reward_panel,
 			is_pattern,
 			"add",
-			color
+			color,
+			texture_rect
 		}))
 		table.insert(self._requested_textures, {texture_count = texture_count, texture = texture_path})
 	end
+	panel:set_script({texture_path = texture_path})
 end
 
 function MenuNodeCrimenetChallengeGui:_highlight_row_item(row_item, mouse_over)
@@ -2266,6 +2301,9 @@ function MenuNodeCrimenetChallengeGui:mouse_moved(o, x, y)
 	if highlighted_file and self._highlighted_file ~= highlighted_file then
 		managers.menu_component:post_event("highlight")
 		self._highlighted_file = highlighted_file
+		if self._set_file_on_mouse_over then
+			self:set_file(self._highlighted_file)
+		end
 	elseif not highlighted_file then
 		self._highlighted_file = false
 	end
@@ -2291,10 +2329,28 @@ end
 function MenuNodeCrimenetChallengeGui:mouse_released(button, x, y)
 	if self._file_pressed and self._file_pressed == self._current_file then
 		local files_menu = self._files_menu
-		if alive(files_menu) then
+		if alive(files_menu) and button == Idstring("0") then
 			local file = files_menu:children()[self._file_pressed]
 			if file and file:inside(x, y) then
-				self:claim_reward(self._file_pressed)
+				if self._confirm_reward then
+					local rewards_panel = self._info_panel:child("rewards_panel")
+					local files_menu = rewards_panel:child("files_menu")
+					local reward = files_menu:child(tostring(self._file_pressed))
+					if reward and reward:child("reward_text") then
+						local file_pressed = self._file_pressed
+						local params = {}
+						params.reward = reward:child("reward_text"):text()
+						params.image = reward:has_script() and reward:script().texture_path
+						
+						function params.yes_func()
+							self:claim_reward(file_pressed)
+						end
+						
+						managers.menu:show_challenge_warn_choose_reward(params)
+					end
+				else
+					self:claim_reward(self._file_pressed)
+				end
 			end
 		end
 	end

@@ -1320,12 +1320,21 @@ function MenuComponentManager:mouse_moved(o, x, y)
 	return false, wanted_pointer
 end
 
+function MenuComponentManager:peer_outfit_updated(peer_id)
+	if self._contract_gui then
+		self._contract_gui:refresh()
+	end
+end
+
 function MenuComponentManager:on_peer_removed(peer, reason)
 	if self._lootdrop_gui then
 		self._lootdrop_gui:on_peer_removed(peer, reason)
 	end
 	if self._lootdrop_casino_gui then
 		self._lootdrop_casino_gui:on_peer_removed(peer, reason)
+	end
+	if self._contract_gui then
+		self._contract_gui:refresh()
 	end
 end
 
@@ -2523,7 +2532,7 @@ function MenuComponentManager:get_texture_from_mod_type(type, sub_type, gadget, 
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. (sub_type or is_auto and "autofire" or "singlefire")
 	elseif type == "sight" then
 		texture = "guis/textures/pd2/blackmarket/inv_mod_scope"
-	elseif type == "ammo" or type == "bonus" then
+	elseif type == "ammo" then
 		if equipped then
 			texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
 		elseif mods and 0 < #mods then
@@ -2532,6 +2541,13 @@ function MenuComponentManager:get_texture_from_mod_type(type, sub_type, gadget, 
 			type = weapon_factory_tweak_data[part_id].type
 			sub_type = weapon_factory_tweak_data[part_id].sub_type
 			texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
+		end
+		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
+	elseif type == "bonus" then
+		if equipped then
+			texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
+		else
+			texture = "guis/textures/pd2/blackmarket/inv_mod_bonus"
 		end
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
 	else

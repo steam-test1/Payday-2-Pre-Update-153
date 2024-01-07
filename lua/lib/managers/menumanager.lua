@@ -7590,7 +7590,9 @@ function MenuCrimeNetChallengeInitiator:setup_node(node)
 			end
 		end
 		categories = table.list_union(categories)
-		table.sort(categories)
+		table.sort(categories, function(x, y)
+			return challenges[x][1].interval < challenges[y][1].interval
+		end)
 		local node_data
 		local selected_item = node:selected_item() and node:selected_item():name()
 		for _, category in ipairs(categories) do
