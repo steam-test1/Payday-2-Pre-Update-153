@@ -1570,7 +1570,8 @@ function UpgradesTweakData:init()
 	self.level_tree[10] = {
 		name_id = "lvl_10",
 		upgrades = {
-			"rep_upgrade1"
+			"rep_upgrade1",
+			"cutters"
 		}
 	}
 	self.level_tree[12] = {
@@ -6857,6 +6858,9 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.morning = {
 		category = "melee_weapon",
 		dlc = "steel"
+	}
+	self.definitions.cutters = {
+		category = "melee_weapon"
 	}
 end
 

@@ -175,7 +175,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arena",
 		"jolly",
 		"red2",
-		"dinner"
+		"dinner",
+		"nail"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -201,7 +202,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arena",
 		"jolly",
 		"red2",
-		"dinner"
+		"dinner",
+		"nail"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -224,7 +226,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arena",
 		"jolly",
 		"red2",
-		"dinner"
+		"dinner",
+		"nail"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"

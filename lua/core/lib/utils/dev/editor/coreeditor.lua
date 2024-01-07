@@ -3152,6 +3152,7 @@ Path is invalid.]]
 		self:output("Wrong file format!")
 	end
 	self:update_load_progress(100)
+	self._load_progress:destroy()
 end
 
 function CoreEditor:do_load()
