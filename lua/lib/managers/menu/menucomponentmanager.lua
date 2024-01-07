@@ -204,6 +204,9 @@ function MenuComponentManager:_destroy_controller_input()
 end
 
 function MenuComponentManager:key_press_controller_support(o, k)
+	if not MenuCallbackHandler:can_toggle_chat() then
+		return
+	end
 	local toggle_chat = Idstring(managers.controller:get_settings("pc"):get_connection("toggle_chat"):get_input_name_list()[1])
 	if k == toggle_chat then
 		if self._game_chat_gui and self._game_chat_gui:enabled() then
@@ -1385,6 +1388,7 @@ function MenuComponentManager:_create_crimenet_gui(...)
 		return
 	end
 	self._crimenet_gui = CrimeNetGui:new(self._ws, self._fullscreen_ws, ...)
+	managers.features:announce_feature("crimenet_hacked")
 end
 
 function MenuComponentManager:start_crimenet_job()
@@ -1453,6 +1457,12 @@ end
 function MenuComponentManager:remove_crimenet_gui_job(id)
 	if self._crimenet_gui then
 		self._crimenet_gui:remove_job(id)
+	end
+end
+
+function MenuComponentManager:set_crimenet_gui_getting_hacked(hacked)
+	if self._crimenet_gui then
+		self._crimenet_gui:set_getting_hacked(hacked)
 	end
 end
 
