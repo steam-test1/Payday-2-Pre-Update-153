@@ -244,7 +244,7 @@ function MissionEndState:at_enter(old_state, params)
 				end
 				equipped_team_pass = true
 				if achievement_data.equipped_team then
-					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_masks, pass_armors
+					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_masks, pass_armors, pass_characters
 					local ad = achievement_data.equipped_team
 					local oufit
 					for _, peer in pairs(managers.network:session():all_peers()) do
@@ -262,6 +262,7 @@ function MissionEndState:at_enter(old_state, params)
 						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
 						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
 						pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
+						pass_characters = not ad.characters or table.contains(ad.characters, peer:character())
 						pass_skills = not ad.num_skills
 						if not pass_skills then
 							num_skills = 0
@@ -273,7 +274,7 @@ function MissionEndState:at_enter(old_state, params)
 						if ad.reverse_deployable then
 							pass_deployable = not pass_deployable
 						end
-						if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills) or not pass_melee_weapons then
+						if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons) or not pass_characters then
 							equipped_team_pass = false
 							break
 						end
