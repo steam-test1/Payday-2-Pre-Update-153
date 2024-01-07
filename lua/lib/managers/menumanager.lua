@@ -1306,16 +1306,25 @@ function MenuCallbackHandler:show_game_is_installing_menu()
 end
 
 function MenuCallbackHandler:bang_active()
-	return false
+	return true
 end
 
 function MenuCallbackHandler:choice_crimenet_lobby_job_plan(item)
+	Global.game_settings.job_plan = item:value()
 end
 
 function MenuCallbackHandler:choice_lobby_job_plan(item)
+	Global.game_settings.job_plan = item:value()
+	self:update_matchmake_attributes()
 end
 
 function MenuCallbackHandler:choice_job_plan_filter(item)
+	local job_plan_filter = item:value()
+	if managers.network.matchmake:get_lobby_filter("job_plan") == job_plan_filter then
+		return
+	end
+	managers.network.matchmake:add_lobby_filter("job_plan", job_plan_filter, "equal")
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
