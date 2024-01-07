@@ -1837,8 +1837,7 @@ function UnitNetworkHandler:server_place_mission_door_device(unit, player, sende
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
-	local result = unit:interaction():server_place_mission_door_device(player)
-	sender:result_place_mission_door_device(unit, result)
+	local result = unit:interaction():server_place_mission_door_device(player, sender)
 end
 
 function UnitNetworkHandler:result_place_mission_door_device(unit, result, sender)

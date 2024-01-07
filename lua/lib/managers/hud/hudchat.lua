@@ -236,6 +236,14 @@ function HUDChat:_loose_focus()
 	self:update_caret()
 end
 
+function HUDChat:clear()
+	local text = self._input_panel:child("input_text")
+	text:set_text("")
+	text:set_selection(0, 0)
+	self:_loose_focus()
+	managers.hud:set_chat_focus(false)
+end
+
 function HUDChat:_shift()
 	local k = Input:keyboard()
 	return not k:down("left shift") and not k:down("right shift") and k:has_button("shift") and k:down("shift")

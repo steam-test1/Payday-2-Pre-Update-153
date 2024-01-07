@@ -1525,18 +1525,21 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 	local player_level = managers.experience:current_level()
 	local positions_tweak_data = tweak_data.gui.crime_net.map_start_positions
 	local start_position
-	for _, position in ipairs(positions_tweak_data) do
-		if player_level <= position.max_level then
-			start_position = position
-			break
+	if true then
+		for _, position in ipairs(positions_tweak_data) do
+			if player_level <= position.max_level then
+				start_position = position
+				break
+			end
 		end
+		if start_position then
+			self:_goto_map_position(start_position.x, start_position.y)
+		end
+		self._special_contracts_id = {}
+		self:add_special_contracts(node:parameters().no_casino)
+	else
+		if managers.features:can_announce("crimenet_hacked") then
 	end
-	if start_position then
-		self:_goto_map_position(start_position.x, start_position.y)
-	end
-	self._special_contracts_id = {}
-	self:add_special_contracts(node:parameters().no_casino)
-	if managers.features:can_announce("crimenet_hacked") then
 	else
 		managers.features:announce_feature("crimenet_welcome")
 		if is_win32 then

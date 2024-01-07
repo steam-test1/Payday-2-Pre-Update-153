@@ -8059,7 +8059,7 @@ function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
 end
 
 function MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id, global_value)
-	local loot_table, limited_loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_id, global_value)
+	local loot_table, limited_loot_table = managers.blackmarket:get_lootdropable_mods_by_weapon_id(weapon_id, global_value, true)
 	local my_loot_table = 0 < #limited_loot_table and limited_loot_table or loot_table
 	if 0 < #my_loot_table then
 		local entry = my_loot_table[math.random(#my_loot_table)]

@@ -2526,6 +2526,18 @@ Play the full version soon to get your full PAYDAY!]],
 				armor = "level_1"
 			}
 		},
+		death_cane = {
+			award = "cane_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "cane"
+		},
+		cane_4 = {
+			award = "cane_4",
+			job = "cane",
+			equipped_team = {primary_category = "shotgun", secondary_category = "shotgun"}
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -2600,6 +2612,13 @@ Play the full version soon to get your full PAYDAY!]],
 				"overkill_145"
 			},
 			total_time = 50
+		},
+		cane_5 = {
+			award = "cane_5",
+			job = "cane",
+			secured = {carry_id = "present", amount = 10},
+			no_assets = true,
+			no_deployable = true
 		}
 	}
 	self.achievement.job_list = {}
@@ -2610,7 +2629,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"nightclub",
 		"pines",
 		"shoutout_raid",
-		"jolly"
+		"jolly",
+		"cane"
 	}
 	self.achievement.job_list.hector = {
 		"watchdogs_wrapper",
@@ -2661,6 +2681,7 @@ Play the full version soon to get your full PAYDAY!]],
 		"crojob1"
 	}
 	self.achievement.job_list.classic = {"red2", "dinner"}
+	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self.achievement.job_list.bain, "roberts")
 	end
@@ -3367,6 +3388,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_36"},
 		{track = "track_37", lock = "berry"},
 		{track = "track_38", lock = "berry"},
+		{track = "track_39"},
 		{
 			track = "track_32_lcv"
 		},

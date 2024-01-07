@@ -367,65 +367,84 @@ end
 function Drill:set_skill_upgrades(upgrades)
 	local background_icons = {}
 	local timer_gui_ext = self._unit:timer_gui()
-	if self.is_hacking_device then
-	else
-		local drill_speed_multiplier = tweak_data.upgrades.values.player.drill_speed_multiplier
-		local drill_alert_rad = tweak_data.upgrades.values.player.drill_alert_rad[1]
-		local drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[1]
-		local timer_multiplier = 1
-		local background_icon_template = {
-			texture = "guis/textures/pd2/skilltree/",
-			w = 128,
-			h = 128,
-			x = 30,
-			y = 100,
-			alpha = 1,
-			layer = 2
-		}
-		local background_icon_x = 30
-		
-		local function add_bg_icon_func(bg_icon_table, texture_name, color)
-			local icon_data = deep_clone(background_icon_template)
-			icon_data.texture = icon_data.texture .. texture_name
-			icon_data.color = color
-			icon_data.x = background_icon_x
-			table.insert(bg_icon_table, icon_data)
-			background_icon_x = background_icon_x + icon_data.w + 2
-		end
-		
-		if self._skill_upgrades[2] or upgrades[2] then
-			timer_multiplier = drill_speed_multiplier[2]
-			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
-		elseif self._skill_upgrades[1] or upgrades[1] then
-			timer_multiplier = drill_speed_multiplier[1]
-			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-		else
-			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-		end
-		local got_reduced_alert = self._skill_upgrades[3] or upgrades[3] or false
-		local got_silent_drill = self._skill_upgrades[4] or upgrades[4] or false
-		local got_auto_repair = self._skill_upgrades[5] or upgrades[5] or false
-		timer_gui_ext:set_timer_multiplier(timer_multiplier)
-		if got_silent_drill then
-			self:set_alert_radius(nil)
-			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.aced)
-			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
-		elseif got_reduced_alert then
-			self:set_alert_radius(drill_alert_rad)
-			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.basic)
-			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-		else
-			self:set_alert_radius(tweak_data.upgrades.drill_alert_radius or 2500)
-			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
-			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-		end
-		if got_auto_repair then
-			if Network:is_server() and drill_autorepair_chance > math.random() then
-				self:set_autorepair(true)
+	local background_icon_template = {
+		texture = "guis/textures/pd2/skilltree/",
+		w = 128,
+		h = 128,
+		x = 30,
+		y = 100,
+		alpha = 1,
+		layer = 2
+	}
+	local background_icon_x = 30
+	
+	local function add_bg_icon_func(bg_icon_table, texture_name, color)
+		local icon_data = deep_clone(background_icon_template)
+		icon_data.texture = icon_data.texture .. texture_name
+		icon_data.color = color
+		icon_data.x = background_icon_x
+		table.insert(bg_icon_table, icon_data)
+		background_icon_x = background_icon_x + icon_data.w + 2
+	end
+	
+	if true then
+		repeat
+			do break end -- pseudo-goto
+			local saw_speed_multiplier = tweak_data.upgrades.values.player.saw_speed_multiplier
+			local timer_multiplier = 1
+			if self._skill_upgrades[2] or upgrades[2] then
+				timer_multiplier = saw_speed_multiplier[2]
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
+			elseif self._skill_upgrades[1] or upgrades[1] then
+				timer_multiplier = saw_speed_multiplier[1]
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			else
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
 			end
-			add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			timer_gui_ext:set_timer_multiplier(timer_multiplier)
+		until true
+	elseif self.is_hacking_device then
+	else
+		if self.is_drill or self.is_saw then
+			local drill_speed_multiplier = tweak_data.upgrades.values.player.drill_speed_multiplier
+			local drill_alert_rad = tweak_data.upgrades.values.player.drill_alert_rad[1]
+			local drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[1]
+			local timer_multiplier = 1
+			if self._skill_upgrades[2] or upgrades[2] then
+				timer_multiplier = drill_speed_multiplier[2]
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
+			elseif self._skill_upgrades[1] or upgrades[1] then
+				timer_multiplier = drill_speed_multiplier[1]
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			else
+				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+			end
+			local got_reduced_alert = self._skill_upgrades[3] or upgrades[3] or false
+			local got_silent_drill = self._skill_upgrades[4] or upgrades[4] or false
+			local got_auto_repair = self._skill_upgrades[5] or upgrades[5] or false
+			timer_gui_ext:set_timer_multiplier(timer_multiplier)
+			if got_silent_drill then
+				self:set_alert_radius(nil)
+				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.aced)
+				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
+			elseif got_reduced_alert then
+				self:set_alert_radius(drill_alert_rad)
+				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.basic)
+				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			else
+				self:set_alert_radius(tweak_data.upgrades.drill_alert_radius or 2500)
+				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
+				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+			end
+			if got_auto_repair then
+				if Network:is_server() and drill_autorepair_chance > math.random() then
+					self:set_autorepair(true)
+				end
+				add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			else
+				add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+			end
 		else
-			add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
 		end
 	end
 	for i in pairs(upgrades) do

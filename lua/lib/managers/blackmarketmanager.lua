@@ -1817,7 +1817,7 @@ function BlackMarketManager:_calculate_weapon_concealment(weapon)
 		return 0
 	end
 	local bonus_stats = {}
-	if weapon.cosmetics and weapon.cosmetics.id and weapon.cosmetics.bonus and not managers.job:is_current_job_competitive() then
+	if weapon.cosmetics and weapon.cosmetics.id and weapon.cosmetics.bonus and not managers.job:is_current_job_competitive() and not managers.weapon_factory:has_perk("bonus", factory_id, blueprint) then
 		bonus_stats = tweak_data:get_raw_value("economy", "bonuses", tweak_data.blackmarket.weapon_skins[weapon.cosmetics.id].bonus, "stats") or {}
 	end
 	local parts_stats = managers.weapon_factory:get_stats(factory_id, blueprint)
@@ -1947,7 +1947,7 @@ function BlackMarketManager:concealment_modifier(type)
 	return modifier
 end
 
-function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, global_value)
+function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, global_value, is_challenge_drop)
 	local droppable_parts = self:get_dropable_mods_by_weapon_id(weapon_id)
 	local loot_table = {}
 	local limited_loot_table = {}
@@ -1966,7 +1966,7 @@ function BlackMarketManager:get_lootdropable_mods_by_weapon_id(weapon_id, global
 		for _, part_data in ipairs(parts) do
 			part_id = part_data[1]
 			gv = part_data[2] or "normal"
-			if (not global_value or gv == global_value) and tweak_data.lootdrop.global_values[gv] and (not tweak_data.lootdrop.global_values[gv].dlc or managers.dlc:is_dlc_unlocked(gv)) and tweak_data.weapon.factory.parts[part_id] and (tweak_data.weapon.factory.parts[part_id].pc or tweak_data.weapon.factory.parts[part_id].pcs and #tweak_data.weapon.factory.parts[part_id].pcs > 0) then
+			if (not global_value or gv == global_value) and tweak_data.lootdrop.global_values[gv] and (not tweak_data.lootdrop.global_values[gv].dlc or managers.dlc:is_dlc_unlocked(gv)) and tweak_data.weapon.factory.parts[part_id] and (tweak_data.weapon.factory.parts[part_id].pc or tweak_data.weapon.factory.parts[part_id].pcs and #tweak_data.weapon.factory.parts[part_id].pcs > 0) and (not is_challenge_drop or not tweak_data.weapon.factory.parts[part_id].exclude_from_challenge) then
 				table.insert(loot_table, part_data)
 				amount_in_inventory = managers.blackmarket:get_item_amount(gv, "weapon_mods", part_id, true)
 				if tweak_data.blackmarket.weapon_mods[part_id] and tweak_data.blackmarket.weapon_mods[part_id].max_in_inventory and amount_in_inventory < tweak_data.blackmarket.weapon_mods[part_id].max_in_inventory then
@@ -2519,7 +2519,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		item_texture = character_texture or false,
 		info_text = character_string
 	}
-	return {
+	local data = {
 		primary = primary,
 		secondary = secondary,
 		melee_weapon = melee_weapon,
@@ -2529,6 +2529,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		mask = mask,
 		character = character
 	}
+	return data
 end
 
 function BlackMarketManager:equip_previous_weapon(category)
@@ -5995,4 +5996,104 @@ function BlackMarketManager:debug_inventory()
 		end
 	end
 	print(inspect(t))
+end
+
+function BlackMarketManager:debug_add_random_tradable(amount)
+	local qualities = {}
+	for k, v in pairs(tweak_data.economy.qualities) do
+		table.insert(qualities, k)
+	end
+	local weapon_skins = {}
+	for k, v in pairs(tweak_data.blackmarket.weapon_skins) do
+		table.insert(weapon_skins, k)
+	end
+	local safes = {}
+	for k, v in pairs(tweak_data.economy.safes) do
+		table.insert(safes, k)
+	end
+	local drills = {}
+	for k, v in pairs(tweak_data.economy.safes) do
+		table.insert(drills, k)
+	end
+	local items = {
+		weapon_skins = weapon_skins,
+		safes = safes,
+		drills = drills
+	}
+	local list = {}
+	for instance_id, data in pairs(self._global.inventory_tradable) do
+		table.insert(list, {
+			instance_id = instance_id,
+			category = data.category,
+			entry = data.entry,
+			quality = data.quality,
+			data.bonus,
+			amount = data.amount
+		})
+	end
+	local categories = {"safes", "drills"}
+	for i = 1, amount do
+		local category = categories[math.random(#categories)]
+		local entry = items[category][math.random(#items[category])]
+		local quality = category == "weapon_skins" and qualities[math.random(#qualities)] or "mint"
+		local bonus = category == "weapon_skins" and math.random(10) == 1 or false
+		table.insert(list, {
+			instance_id = tostring(math.random(10000000)),
+			category = category,
+			entry = entry,
+			quality = quality,
+			bonus,
+			amount = 1
+		})
+	end
+	managers.blackmarket:tradable_update(list)
+	managers.menu_component:set_blackmarket_tradable_loaded(nil)
+	if managers.menu_scene then
+		managers.menu_scene:set_blackmarket_tradable_loaded()
+	end
+end
+
+function BlackMarketManager:debug_set_random_tradable(amount)
+	local qualities = {}
+	for k, v in pairs(tweak_data.economy.qualities) do
+		table.insert(qualities, k)
+	end
+	local weapon_skins = {}
+	for k, v in pairs(tweak_data.blackmarket.weapon_skins) do
+		table.insert(weapon_skins, k)
+	end
+	local safes = {}
+	for k, v in pairs(tweak_data.economy.safes) do
+		table.insert(safes, k)
+	end
+	local drills = {}
+	for k, v in pairs(tweak_data.economy.safes) do
+		table.insert(drills, k)
+	end
+	local items = {
+		weapon_skins = weapon_skins,
+		safes = safes,
+		drills = drills
+	}
+	local list = {}
+	local categories = {"safes", "drills"}
+	for i = 1, amount do
+		local category = categories[math.random(#categories)]
+		local entry = items[category][math.random(#items[category])]
+		local quality = category == "weapon_skins" and qualities[math.random(#qualities)] or "mint"
+		local bonus = category == "weapon_skins" and math.random(10) == 1 or false
+		table.insert(list, {
+			instance_id = tostring(math.random(10000000)),
+			category = category,
+			entry = entry,
+			quality = quality,
+			bonus,
+			amount = 1
+		})
+	end
+	managers.blackmarket:tradable_update(list)
+	managers.menu_component:set_blackmarket_tradable_loaded(nil)
+	if managers.menu_scene then
+		managers.menu_scene:set_blackmarket_tradable_loaded()
+	end
 end

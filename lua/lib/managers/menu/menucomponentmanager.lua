@@ -1388,7 +1388,6 @@ function MenuComponentManager:_create_crimenet_gui(...)
 		return
 	end
 	self._crimenet_gui = CrimeNetGui:new(self._ws, self._fullscreen_ws, ...)
-	managers.features:announce_feature("crimenet_hacked")
 end
 
 function MenuComponentManager:start_crimenet_job()
@@ -2524,7 +2523,7 @@ function MenuComponentManager:get_texture_from_mod_type(type, sub_type, gadget, 
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. (sub_type or is_auto and "autofire" or "singlefire")
 	elseif type == "sight" then
 		texture = "guis/textures/pd2/blackmarket/inv_mod_scope"
-	elseif type == "ammo" then
+	elseif type == "ammo" or type == "bonus" then
 		if equipped then
 			texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
 		elseif mods and 0 < #mods then
@@ -2600,7 +2599,7 @@ function MenuComponentManager:create_weapon_mod_icon_list(weapon, category, fact
 			local is_auto = tweak_data.weapon[weapon] and tweak_data.weapon[weapon].FIRE_MODE == "auto"
 			local weapon_skin_bonus = false
 			if types.weapon_skin_bonuses and table.contains(types.weapon_skin_bonuses, name) then
-				equipped = not managers.job:is_current_job_competitive()
+				equipped = not managers.job:is_current_job_competitive() and not managers.weapon_factory:has_perk("bonus", crafted.factory_id, crafted.blueprint)
 				weapon_skin_bonus = true
 			elseif name == "weapon_cosmetics" then
 				equipped = not not managers.blackmarket:get_weapon_cosmetics(category, slot)

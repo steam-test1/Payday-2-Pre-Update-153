@@ -130,7 +130,7 @@ function CopLogicPhalanxVip.register_in_group_ai(unit)
 end
 
 function CopLogicPhalanxVip._set_final_health_limit(data)
-	data.unit:base():char_tweak().LOWER_HEALTH_PERCENTAGE_LIMIT = data.unit:base():char_tweak().FINAL_LOWER_HEALTH_PERCENTAGE_LIMIT
+	data.unit:character_damage():host_set_final_lower_health_percentage_limit()
 end
 
 function CopLogicPhalanxVip._chk_should_breakup(data)
