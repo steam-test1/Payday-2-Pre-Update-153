@@ -265,3 +265,10 @@ function _ScriptViewport:_set_width_multiplier()
 		camera:set_width_multiplier(CoreMath.width_mul(self._vpm:aspect_ratio()) * (vp_pixel_aspect / screen_pixel_aspect))
 	end
 end
+
+function _ScriptViewport:set_active(state)
+	_ScriptViewport.super.set_active(self, state)
+	if alive(self._vp) then
+		self._vp:set_LOD_active(state)
+	end
+end

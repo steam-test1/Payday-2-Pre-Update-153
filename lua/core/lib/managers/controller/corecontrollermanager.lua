@@ -6,6 +6,7 @@ core:import("CoreControllerWrapperXbox360")
 core:import("CoreControllerWrapperPS3")
 core:import("CoreControllerWrapperPS4")
 core:import("CoreControllerWrapperXB1")
+core:import("CoreControllerWrapperSteam")
 core:import("CoreControllerWrapperDebug")
 core:import("CoreManagerBase")
 core:import("CoreEvent")
@@ -37,6 +38,7 @@ function ControllerManager:init(path, default_settings_path)
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self._supported_wrapper_types[CoreControllerWrapperPC.ControllerWrapperPC.TYPE] = CoreControllerWrapperPC.ControllerWrapperPC
 		self._supported_wrapper_types[CoreControllerWrapperXbox360.ControllerWrapperXbox360.TYPE] = CoreControllerWrapperXbox360.ControllerWrapperXbox360
+		self._supported_wrapper_types[CoreControllerWrapperSteam.ControllerWrapperSteam.TYPE] = CoreControllerWrapperSteam.ControllerWrapperSteam
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self._supported_wrapper_types[CoreControllerWrapperPS3.ControllerWrapperPS3.TYPE] = CoreControllerWrapperPS3.ControllerWrapperPS3
 	elseif SystemInfo:platform() == Idstring("PS4") then
@@ -432,6 +434,24 @@ end
 
 function ControllerManager:set_settings_path(path)
 	self._settings_path = path
+end
+
+function ControllerManager:change_default_wrapper_mode(mode)
+	if not mode or mode == self._default_wrapper_mode then
+		return
+	end
+	local index = Global.controller_manager.default_wrapper_index or self:get_preferred_default_wrapper_index()
+	local wrapper_class = self._wrapper_class_map[index]
+	if not wrapper_class or not wrapper_class.change_mode then
+		return
+	end
+	local controller_index = self._wrapper_to_controller_list[index][1]
+	local controller = Input:controller(controller_index)
+	self._default_wrapper_mode = wrapper_class.change_mode(controller, mode)
+end
+
+function ControllerManager:get_default_wrapper_mode()
+	return self._default_wrapper_mode
 end
 
 function ControllerManager:create_virtual_pad()

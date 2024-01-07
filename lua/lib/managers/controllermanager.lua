@@ -6,6 +6,7 @@ ControllerManager = ControllerManager or class(CoreControllerManager.ControllerM
 function ControllerManager:init(path, default_settings_path)
 	default_settings_path = "settings/controller_settings"
 	path = default_settings_path
+	self._menu_mode_enabled = 0
 	ControllerManager.super.init(self, path, default_settings_path)
 end
 
@@ -34,7 +35,7 @@ function ControllerManager:clear_user_mod(category, CONTROLS_INFO)
 	Global.controller_manager.user_mod = Global.controller_manager.user_mod or {}
 	local names = table.map_keys(Global.controller_manager.user_mod)
 	for _, name in ipairs(names) do
-		if CONTROLS_INFO[name].category == category then
+		if CONTROLS_INFO[name] and CONTROLS_INFO[name].category == category then
 			Global.controller_manager.user_mod[name] = nil
 		end
 	end
@@ -110,6 +111,40 @@ function ControllerManager:_show_controller_changed_dialog()
 	managers.system_menu:show(data)
 end
 
+function ControllerManager:_change_mode(mode)
+	self:change_default_wrapper_mode(mode)
+end
+
+function ControllerManager:set_menu_mode_enabled(enabled)
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self._menu_mode_enabled = self._menu_mode_enabled or 0
+		self._menu_mode_enabled = self._menu_mode_enabled + (enabled and 1 or -1)
+		if self:get_menu_mode_enabled() then
+			self:_change_mode("menu")
+		else
+			self:set_ingame_mode()
+		end
+		if self._menu_mode_enabled < 0 then
+			Application:error("[ControllerManager:set_menu_mode_enabled] Controller menu mode counter reached negative refs!")
+		end
+	end
+end
+
+function ControllerManager:get_menu_mode_enabled()
+	return self._menu_mode_enabled and self._menu_mode_enabled > 0
+end
+
+function ControllerManager:set_ingame_mode(mode)
+	if SystemInfo:platform() == Idstring("WIN32") then
+		if mode then
+			self._ingame_mode = mode
+		end
+		if not self:get_menu_mode_enabled() then
+			self:_change_mode(self._ingame_mode)
+		end
+	end
+end
+
 function ControllerManager:_close_controller_changed_dialog()
 	if Global.controller_manager.connect_controller_dialog_visible or self:_controller_changed_dialog_active() then
 		managers.system_menu:close("connect_controller_dialog")
@@ -119,6 +154,19 @@ end
 
 function ControllerManager:connect_controller_dialog_callback()
 	Global.controller_manager.connect_controller_dialog_visible = nil
+end
+
+function ControllerManager:get_mouse_controller()
+	local index = Global.controller_manager.default_wrapper_index or self:get_preferred_default_wrapper_index()
+	local wrapper_class = self._wrapper_class_map and self._wrapper_class_map[index]
+	if wrapper_class and wrapper_class.TYPE == "steam" then
+		local controller_index = self._wrapper_to_controller_list[index][1]
+		local controller = Input:controller(controller_index)
+		local index = Global.controller_manager.default_wrapper_index or self:get_preferred_default_wrapper_index()
+		local wrapper_class = self._wrapper_class_map[index]
+		return controller
+	end
+	return Input:mouse()
 end
 
 CoreClass.override_class(CoreControllerManager.ControllerManager, ControllerManager)

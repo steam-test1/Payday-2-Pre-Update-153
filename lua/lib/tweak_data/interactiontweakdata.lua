@@ -3227,4 +3227,20 @@ function InteractionTweakData:init()
 	self.hold_pku_present.start_active = false
 	self.hold_pku_present.timer = 3
 	self.hold_pku_present.blocked_hint = "carry_block"
+	self.hold_grab_goat = {}
+	self.hold_grab_goat.text_id = "hud_int_hold_grab_goat"
+	self.hold_grab_goat.sound_event = "ammo_bag_drop"
+	self.hold_grab_goat.timer = 1
+	self.hold_grab_goat.force_update_position = true
+	self.hold_grab_goat.start_active = false
+	self.hold_grab_goat.action_text_id = "hud_action_grabbing_goat"
+	self.hold_grab_goat.blocked_hint = "carry_block"
+	self.hold_remove_debris = {}
+	self.hold_remove_debris.text_id = "hud_int_hold_remove_debris"
+	self.hold_remove_debris.action_text_id = "hud_action_removing_debris"
+	self.hold_remove_debris.timer = 3
+	self.hold_remove_debris.sound_start = "bar_break_wood"
+	self.hold_remove_debris.sound_interupt = "bar_break_wood_cancel"
+	self.hold_remove_debris.sound_done = "bar_break_wood_end"
+	self.hold_remove_debris.start_activate = false
 end

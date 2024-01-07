@@ -15,8 +15,6 @@ function MousePointerManager:_setup()
 	self._enabled = true
 	self._ws = managers.gui_data:create_fullscreen_workspace()
 	local x, y = 640, 360
-	self._ws:connect_mouse(Input:mouse())
-	self._ws:feed_mouse_position(x, y)
 	self._mouse = self._ws:panel():panel({
 		name_s = "mouse",
 		name = "mouse",
@@ -169,7 +167,7 @@ function MousePointerManager:change_controller_to_mouse()
 		self._mouse:stop(self._controller_updater)
 		self._ws:disconnect_all_controllers()
 		self:_deactivate()
-		self._ws:connect_mouse(Input:mouse())
+		self._ws:connect_mouse(managers.controller:get_mouse_controller())
 		self._controller_updater = nil
 		self._controller_acc_x = 0
 		self._controller_acc_y = 0
@@ -212,6 +210,7 @@ function MousePointerManager:_activate()
 	self._active = true
 	self._enabled = true
 	self._ws:show()
+	self._ws:connect_mouse(managers.controller:get_mouse_controller())
 	self._ws:feed_mouse_position(self._mouse:world_position())
 	if not self._controller_updater then
 		self._mouse:mouse_move(callback(self, self, "_mouse_move"))
@@ -279,25 +278,53 @@ function MousePointerManager:_mouse_move(o, x, y)
 	end
 end
 
+function MousePointerManager:_modify_mouse_button(button)
+	if MenuCallbackHandler:is_steam_controller() then
+		if button == Idstring("l_grip") then
+			return Idstring("0")
+		elseif button == Idstring("r_grip") then
+			return Idstring("1")
+		end
+		return nil
+	end
+	return button
+end
+
 function MousePointerManager:_mouse_press(o, button, x, y)
+	button = self:_modify_mouse_button(button)
+	if not button then
+		return
+	end
 	if self._mouse_callbacks[#self._mouse_callbacks] and self._mouse_callbacks[#self._mouse_callbacks].mouse_press then
 		self._mouse_callbacks[#self._mouse_callbacks].mouse_press(o, button, x, y)
 	end
 end
 
 function MousePointerManager:_mouse_release(o, button, x, y)
+	button = self:_modify_mouse_button(button)
+	if not button then
+		return
+	end
 	if self._mouse_callbacks[#self._mouse_callbacks] and self._mouse_callbacks[#self._mouse_callbacks].mouse_release then
 		self._mouse_callbacks[#self._mouse_callbacks].mouse_release(o, button, x, y)
 	end
 end
 
 function MousePointerManager:_mouse_click(o, button, x, y)
+	button = self:_modify_mouse_button(button)
+	if not button then
+		return
+	end
 	if self._mouse_callbacks[#self._mouse_callbacks] and self._mouse_callbacks[#self._mouse_callbacks].mouse_click then
 		self._mouse_callbacks[#self._mouse_callbacks].mouse_click(o, button, x, y)
 	end
 end
 
 function MousePointerManager:_mouse_double_click(o, button, x, y)
+	button = self:_modify_mouse_button(button)
+	if not button then
+		return
+	end
 	if self._mouse_callbacks[#self._mouse_callbacks] and self._mouse_callbacks[#self._mouse_callbacks].mouse_double_click then
 		self._mouse_callbacks[#self._mouse_callbacks].mouse_double_click(o, button, x, y)
 	end

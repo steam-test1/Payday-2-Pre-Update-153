@@ -3034,13 +3034,15 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 	if button ~= Idstring("0") then
 		return
 	end
-	local fx, fy = managers.mouse_pointer:modified_fullscreen_16_9_mouse_pos()
-	for peer_id = 1, CriminalsManager.MAX_NR_CRIMINALS do
-		if managers.hud:is_inside_mission_briefing_slot(peer_id, "name", fx, fy) then
-			local peer = managers.network:session() and managers.network:session():peer(peer_id)
-			if peer then
-				Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. "/suspect/" .. peer:user_id() .. "/")
-				return
+	if MenuCallbackHandler:is_overlay_enabled() then
+		local fx, fy = managers.mouse_pointer:modified_fullscreen_16_9_mouse_pos()
+		for peer_id = 1, CriminalsManager.MAX_NR_CRIMINALS do
+			if managers.hud:is_inside_mission_briefing_slot(peer_id, "name", fx, fy) then
+				local peer = managers.network:session() and managers.network:session():peer(peer_id)
+				if peer then
+					Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. "/suspect/" .. peer:user_id() .. "/")
+					return
+				end
 			end
 		end
 	end

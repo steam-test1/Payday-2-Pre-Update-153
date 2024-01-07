@@ -158,18 +158,6 @@ function NetworkAccountSTEAM:_on_gamepad_text_submitted(submitted, submitted_tex
 end
 
 function NetworkAccountSTEAM:show_gamepad_text_input(id, callback, params)
-	local is_password, is_multi_line, description_text, max_characters, start_text
-	if params then
-		is_password = params.is_password or params.password or params[1]
-		is_multi_line = params.is_multi_line or params.multi or params[2]
-		description_text = params.description_text or params.desc or params[3]
-		max_characters = params.max_characters or params.max_chars or params[4]
-		start_text = params.start_text or params[5]
-	end
-	if Steam:show_gamepad_text_input(is_password and "password" or "normal", is_multi_line and "multi" or "single", description_text or "", max_characters or 20, start_text or "") then
-		self:add_gamepad_text_listener(id, callback)
-		return true
-	end
 	return false
 end
 

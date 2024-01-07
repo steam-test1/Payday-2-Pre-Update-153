@@ -1625,7 +1625,8 @@ function UpgradesTweakData:init()
 		name_id = "lvl_10",
 		upgrades = {
 			"rep_upgrade1",
-			"cutters"
+			"cutters",
+			"shawn"
 		}
 	}
 	self.level_tree[12] = {
@@ -1728,7 +1729,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"bullseye",
 			"c96",
-			"par"
+			"par",
+			"m37"
 		}
 	}
 	self.level_tree[24] = {
@@ -1761,7 +1763,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"famas",
 			"g26",
-			"twins"
+			"twins",
+			"pitchfork"
 		}
 	}
 	self.level_tree[28] = {
@@ -1842,14 +1845,19 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[37] = {
 		name_id = "weapons",
-		upgrades = {"shillelagh", "hammer"}
+		upgrades = {
+			"shillelagh",
+			"hammer",
+			"stick"
+		}
 	}
 	self.level_tree[38] = {
 		name_id = "weapons",
 		upgrades = {
 			"m134",
 			"rpg7",
-			"arblast"
+			"arblast",
+			"scoutknife"
 		}
 	}
 	self.level_tree[39] = {
@@ -2201,6 +2209,7 @@ function UpgradesTweakData:init()
 	self:_par_weapon_definitions()
 	self:_sparrow_weapon_definitions()
 	self:_model70_weapon_definitions()
+	self:_m37_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -6992,6 +7001,22 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "berry"
 	}
+	self.definitions.shawn = {
+		category = "melee_weapon",
+		dlc = "peta"
+	}
+	self.definitions.stick = {
+		category = "melee_weapon",
+		dlc = "peta"
+	}
+	self.definitions.pitchfork = {
+		category = "melee_weapon",
+		dlc = "peta"
+	}
+	self.definitions.scoutknife = {
+		category = "melee_weapon",
+		dlc = "peta"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -9743,5 +9768,14 @@ function UpgradesTweakData:_model70_weapon_definitions()
 		category = "weapon",
 		weapon_id = "model70",
 		factory_id = "wpn_fps_snp_model70"
+	}
+end
+
+function UpgradesTweakData:_m37_weapon_definitions()
+	self.definitions.m37 = {
+		category = "weapon",
+		weapon_id = "m37",
+		factory_id = "wpn_fps_shot_m37",
+		dlc = "peta"
 	}
 end

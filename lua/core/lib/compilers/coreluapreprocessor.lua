@@ -36,7 +36,7 @@ function CoreLuaPreprocessor:_parse_next_block(constants_table, current_pos, sou
 	repeat
 		local sussess, finished = self:_parse_next_conditional_statement(source_str, source_len, current_pos, constants_table, statements_list)
 		if not sussess then
-			Application:error("[CoreLuaPreprocessor:_process_next_block] " .. self._IF_STATEMENT .. " statement parsing error. file: " .. self._source_path .. ". (" .. tostring(self:_line_number_at_pos(constants_end_pos + 1)) .. ")")
+			self:print_error("[CoreLuaPreprocessor:_process_next_block] " .. self._IF_STATEMENT .. " statement parsing error. file: " .. self._source_path .. ". (" .. tostring(self:_line_number_at_pos(constants_end_pos + 1)) .. ")")
 			return
 		end
 		current_pos = next(statements_list) and statements_list[#statements_list].bracket_close_pos + 1 or current_pos
@@ -71,7 +71,7 @@ function CoreLuaPreprocessor:_parse_next_conditional_statement(source_str, sourc
 				return true, true
 			end
 			search_pos = if_end_pos and if_end_pos + 1
-		until (if_start_pos == 1 or self._WHITESPACE_CHARACTERS[string.sub(source_str, if_start_pos - 1, if_start_pos - 1)]) and self._WHITESPACE_CHARACTERS[string.sub(source_str, if_end_pos + 1, if_end_pos + 1)]
+		until (if_start_pos == 1 or self:_is_whitespace_or_singleline_comment(source_str, if_start_pos - 1)) and self:_is_whitespace(source_str, if_end_pos + 1)
 		statement_info = self:_parse_statement(source_str, source_len, if_end_pos + 1, constants_table, statements_list)
 		if start_pos ~= if_start_pos then
 			statement_info.whitespace = string.sub(source_str, start_pos, if_start_pos - 1)
@@ -82,12 +82,12 @@ function CoreLuaPreprocessor:_parse_next_conditional_statement(source_str, sourc
 		repeat
 			elseif_start_pos, elseif_end_pos = string.find(source_str, self._ELSEIF_STATEMENT, search_pos, true)
 			search_pos = elseif_end_pos and elseif_end_pos + 1
-		until not elseif_start_pos or self._WHITESPACE_CHARACTERS[string.sub(source_str, elseif_end_pos + 1, elseif_end_pos + 1)]
+		until not elseif_start_pos or self:_is_whitespace(source_str, elseif_end_pos + 1)
 		search_pos = start_pos
 		repeat
 			else_start_pos, else_end_pos = string.find(source_str, self._ELSE_STATEMENT, search_pos, true)
 			search_pos = else_end_pos and else_end_pos + 1
-		until not else_start_pos or self._WHITESPACE_CHARACTERS[string.sub(source_str, else_end_pos + 1, else_end_pos + 1)]
+		until not else_start_pos or self:_is_whitespace(source_str, else_end_pos + 1)
 		if elseif_start_pos and (elseif_start_pos == start_pos or self:_is_whitespace(source_str, start_pos, elseif_start_pos - 1)) then
 			statement_info = self:_parse_statement(source_str, source_len, elseif_end_pos + 1, constants_table, statements_list)
 			if not statement_info then
@@ -132,7 +132,7 @@ end
 function CoreLuaPreprocessor:_extract_constants(source_str, start_pos)
 	local bracket_open_pos = string.find(source_str, self._OPENING_BRACKET, start_pos, true)
 	if not bracket_open_pos then
-		Application:error("[CoreLuaPreprocessor:_process_next_block] statement without opening bracket. file: " .. self._source_path .. ". (" .. tostring(self:_line_number_at_pos(start_pos)) .. ")")
+		self:print_error("[CoreLuaPreprocessor:_process_next_block] statement without opening bracket. file: " .. self._source_path .. ". (" .. tostring(self:_line_number_at_pos(start_pos)) .. ")")
 		return
 	end
 	local constants_statement_str = string.sub(source_str, start_pos, bracket_open_pos - 1)
@@ -177,7 +177,7 @@ function CoreLuaPreprocessor:_find_corresponding_closing_bracket(source_str, sou
 			nr_open_brackets = nr_open_brackets + self:_count_opening_brackets(source_str, current_pos, closing_bracket_pos - 1)
 			current_pos = closing_bracket_pos + 1
 		else
-			Application:error("[CoreLuaPreprocessor:_find_corresponding_closing_bracket_pos] Did not find corresponding closing bracket for opening bracket at " .. tostring(self:_line_number_at_pos(bracket_open_pos)) .. ". file: ", self._source_path)
+			self:print_error("[CoreLuaPreprocessor:_find_corresponding_closing_bracket_pos] Did not find corresponding closing bracket for opening bracket at " .. tostring(self:_line_number_at_pos(bracket_open_pos)) .. ". file: ", self._source_path)
 			break
 		end
 	end
@@ -219,6 +219,7 @@ function CoreLuaPreprocessor:_line_number_at_pos(source_str, end_pos)
 end
 
 function CoreLuaPreprocessor:_is_whitespace(source_str, start_pos, end_pos)
+	end_pos = end_pos or start_pos
 	local search_pos = start_pos
 	repeat
 		local test_char = string.sub(source_str, search_pos, search_pos)
@@ -231,6 +232,19 @@ function CoreLuaPreprocessor:_is_whitespace(source_str, start_pos, end_pos)
 	return true
 end
 
+function CoreLuaPreprocessor:_is_whitespace_or_singleline_comment(source_str, start_pos)
+	if self:_is_whitespace(source_str, start_pos) then
+		return true
+	end
+	if start_pos == 1 then
+		return false
+	end
+	if string.sub(source_str, start_pos, start_pos) == "-" and string.sub(source_str, start_pos - 1, start_pos - 1) == "-" then
+		return true
+	end
+	return false
+end
+
 function CoreLuaPreprocessor:_get_only_newlines(source_str, start_pos, end_pos)
 	local out = ""
 	local search_pos = start_pos
@@ -238,7 +252,7 @@ function CoreLuaPreprocessor:_get_only_newlines(source_str, start_pos, end_pos)
 		local pos = string.find(source_str, "\n", search_pos, true)
 		if pos then
 			if end_pos >= pos then
-				out = out .. "\n"
+				out = out .. "\r\n"
 				search_pos = pos + 1
 			else
 				pos = nil
@@ -256,6 +270,8 @@ function CoreLuaPreprocessor:_test_constants_truth(constants_statement_table, co
 	end
 end
 
-function string.starts(str, start)
-	return string.sub(str, 1, string.len(start)) == start
+function CoreLuaPreprocessor:print_error(text)
+	print([[
+
+[ERROR] ]] .. text .. "\n")
 end

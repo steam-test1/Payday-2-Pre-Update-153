@@ -649,6 +649,15 @@ function HudIconsTweakData:init()
 			15
 		}
 	}
+	self.pd2_car = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			32,
+			96,
+			32,
+			32
+		}
+	}
 	self.wp_vial = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {

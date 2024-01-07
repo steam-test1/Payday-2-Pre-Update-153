@@ -153,6 +153,7 @@ action_variants.civilian = {
 action_variants.civilian_female = action_variants.civilian
 action_variants.bank_manager = action_variants.civilian
 action_variants.drunk_pilot = action_variants.civilian
+action_variants.boris = action_variants.civilian
 action_variants.escort = action_variants.civilian
 action_variants.escort_suitcase = clone(action_variants.civilian)
 action_variants.escort_suitcase.walk = EscortWithSuitcaseActionWalk

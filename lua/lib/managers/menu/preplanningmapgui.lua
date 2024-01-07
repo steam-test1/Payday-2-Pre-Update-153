@@ -1860,6 +1860,18 @@ function PrePlanningMapGui:_setup_blackborders()
 		color = Color.black,
 		rotation = 360
 	})
+	local left_border = self._blackborder_workspace:panel():rect({
+		name = "left_border",
+		layer = tweak_data.gui.MOUSE_LAYER - 100,
+		color = Color.black,
+		rotation = 360
+	})
+	local right_border = self._blackborder_workspace:panel():rect({
+		name = "right_border",
+		layer = tweak_data.gui.MOUSE_LAYER - 100,
+		color = Color.black,
+		rotation = 360
+	})
 	managers.gui_data:layout_fullscreen_workspace(self._blackborder_workspace)
 	local border_w = self._blackborder_workspace:panel():w()
 	local border_h = (self._blackborder_workspace:panel():h() - 720) / 2
@@ -1867,6 +1879,12 @@ function PrePlanningMapGui:_setup_blackborders()
 	top_border:set_size(border_w, border_h + 2)
 	bottom_border:set_position(0, 720 + border_h)
 	bottom_border:set_size(border_w, border_h + 2)
+	local border_w = (self._blackborder_workspace:panel():w() - 1280) / 2
+	local border_h = self._blackborder_workspace:panel():h()
+	left_border:set_left(0)
+	left_border:set_size(border_w, border_h + 2)
+	right_border:set_size(border_w, border_h + 2)
+	right_border:set_right(self._blackborder_workspace:panel():w())
 end
 
 function PrePlanningMapGui:set_drawboard_button_position(x, y)

@@ -196,6 +196,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_par()
 	self:_init_sparrow()
 	self:_init_model70()
+	self:_init_m37()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -784,6 +785,10 @@ function WeaponFactoryTweakData:_init_sights()
 				rotation = Rotation(0, 0, 0)
 			},
 			wpn_fps_snp_model70 = {
+				translation = Vector3(0, -10, -4.05),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_shot_m37 = {
 				translation = Vector3(0, -10, -4.05),
 				rotation = Rotation(0, 0, 0)
 			}
@@ -1462,6 +1467,10 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 				rotation = Rotation(0, 0, 0)
 			},
 			wpn_fps_snp_model70 = {
+				translation = Vector3(0, -10, -4.05),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_shot_m37 = {
 				translation = Vector3(0, -10, -4.05),
 				rotation = Rotation(0, 0, 0)
 			}
@@ -14853,7 +14862,8 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_pis_judge",
 		"wpn_fps_sho_spas12",
 		"wpn_fps_shot_b682",
-		"wpn_fps_sho_aa12"
+		"wpn_fps_sho_aa12",
+		"wpn_fps_shot_m37"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then
@@ -24443,4 +24453,128 @@ function WeaponFactoryTweakData:_init_bipods()
 	table.list_append(self.wpn_fps_lmg_par_npc.uses_parts, {
 		"wpn_fps_upg_bp_lmg_lionbipod"
 	})
+end
+
+function WeaponFactoryTweakData:_init_m37()
+	self.parts.wpn_fps_shot_m37_b_short = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_m37_b_short",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_b_short",
+		stats = {
+			value = 1,
+			spread = -2,
+			concealment = 2
+		},
+		texture_bundle_folder = "peta",
+		dlc = "peta"
+	}
+	self.parts.wpn_fps_shot_m37_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_m37_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_shot_m37_s_short = {
+		pcs = {},
+		type = "stock",
+		name_id = "bm_wp_m37_s_short",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_s_short",
+		stats = {
+			value = 1,
+			recoil = -2,
+			concealment = 2
+		},
+		texture_bundle_folder = "peta",
+		dlc = "peta"
+	}
+	self.parts.wpn_fps_shot_m37_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_m37_s_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_shot_m37_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_m37_m_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_shot_m37_body_standard = {
+		type = "lower_reciever",
+		name_id = "bm_wp_m37_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_shot_m37_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_m37_fg_standard",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37_pts/wpn_fps_shot_m37_fg_standard",
+		stats = {value = 1},
+		animations = {
+			reload_exit = "reload_exit",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_shot_m37_b_short.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_b_short"
+	self.parts.wpn_fps_shot_m37_b_standard.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_b_standard"
+	self.parts.wpn_fps_shot_m37_s_short.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_s_short"
+	self.parts.wpn_fps_shot_m37_s_standard.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_s_standard"
+	self.parts.wpn_fps_shot_m37_m_standard.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_m_standard"
+	self.parts.wpn_fps_shot_m37_body_standard.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_body_standard"
+	self.parts.wpn_fps_shot_m37_fg_standard.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_shot_m37_pts/wpn_third_shot_m37_fg_standard"
+	self.wpn_fps_shot_m37 = {}
+	self.wpn_fps_shot_m37.unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37/wpn_fps_shot_m37"
+	self.wpn_fps_shot_m37.animations = {
+		fire = "recoil",
+		reload_exit = "reload_exit",
+		fire_steelsight = "recoil"
+	}
+	self.wpn_fps_shot_m37.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_shot_m37.override = {
+		wpn_fps_upg_fl_ass_smg_sho_peqbox = {parent = "foregrip", a_obj = "a_fl"},
+		wpn_fps_upg_fl_ass_smg_sho_surefire = {parent = "foregrip", a_obj = "a_fl"},
+		wpn_fps_upg_fl_ass_peq15 = {parent = "foregrip", a_obj = "a_fl"},
+		wpn_fps_upg_fl_ass_laser = {parent = "foregrip", a_obj = "a_fl"},
+		wpn_fps_upg_fl_ass_utg = {parent = "foregrip", a_obj = "a_fl"}
+	}
+	self.wpn_fps_shot_m37.default_blueprint = {
+		"wpn_fps_shot_m37_b_standard",
+		"wpn_fps_shot_m37_s_standard",
+		"wpn_fps_shot_m37_m_standard",
+		"wpn_fps_shot_m37_body_standard",
+		"wpn_fps_shot_m37_fg_standard"
+	}
+	self.wpn_fps_shot_m37.uses_parts = {
+		"wpn_fps_shot_m37_b_short",
+		"wpn_fps_shot_m37_b_standard",
+		"wpn_fps_shot_m37_s_short",
+		"wpn_fps_shot_m37_s_standard",
+		"wpn_fps_shot_m37_m_standard",
+		"wpn_fps_shot_m37_body_standard",
+		"wpn_fps_shot_m37_fg_standard",
+		"wpn_fps_upg_ns_shot_thick",
+		"wpn_fps_upg_ns_shot_shark",
+		"wpn_fps_upg_shot_ns_king",
+		"wpn_fps_upg_ns_sho_salvo_large",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_fl_ass_utg"
+	}
+	self.wpn_fps_shot_m37_npc = deep_clone(self.wpn_fps_shot_m37)
+	self.wpn_fps_shot_m37_npc.unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37/wpn_fps_shot_m37_npc"
 end

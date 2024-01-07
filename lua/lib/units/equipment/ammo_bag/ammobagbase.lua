@@ -116,6 +116,7 @@ function AmmoBagBase:take_ammo(unit)
 		unit:sound():play("pickup_ammo")
 		managers.network:session():send_to_peers_synched("sync_ammo_bag_ammo_taken", self._unit, taken)
 	end
+	print("Ammo Bag: " .. taken .. " ammo was taken and " .. self._ammo_amount .. " remains.")
 	if 0 >= self._ammo_amount then
 		self:_set_empty()
 	else
@@ -146,11 +147,12 @@ end
 function AmmoBagBase:_take_ammo(unit)
 	local taken = 0
 	local inventory = unit:inventory()
+	local mult = 1000000
 	if inventory then
 		for _, weapon in pairs(inventory:available_selections()) do
 			local took = weapon.unit:base():add_ammo_from_bag(self._ammo_amount)
 			taken = taken + took
-			self._ammo_amount = self._ammo_amount - took
+			self._ammo_amount = math.floor((self._ammo_amount - took) * mult) / mult
 			if 0 >= self._ammo_amount then
 				self:_set_empty()
 				return taken

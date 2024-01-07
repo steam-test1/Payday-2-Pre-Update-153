@@ -68,7 +68,8 @@ function ElementSpawnEnemyDummy:produce(params)
 		table.insert(self._units, unit)
 		self:event("spawn", unit)
 		if self._values.force_pickup and self._values.force_pickup ~= "none" then
-			unit:character_damage():set_pickup(self._values.force_pickup)
+			local pickup_name = self._values.force_pickup ~= "no_pickup" and self._values.force_pickup or nil
+			unit:character_damage():set_pickup(pickup_name)
 		end
 	else
 		local enemy_name = self:value("enemy") or self._enemy_name
@@ -99,7 +100,8 @@ function ElementSpawnEnemyDummy:produce(params)
 		table.insert(self._units, unit)
 		self:event("spawn", unit)
 		if self._values.force_pickup and self._values.force_pickup ~= "none" then
-			unit:character_damage():set_pickup(self._values.force_pickup)
+			local pickup_name = self._values.force_pickup ~= "no_pickup" and self._values.force_pickup or nil
+			unit:character_damage():set_pickup(pickup_name)
 		end
 	end
 	return self._units[#self._units]

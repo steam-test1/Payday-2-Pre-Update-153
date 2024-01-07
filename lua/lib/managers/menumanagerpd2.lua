@@ -1021,12 +1021,20 @@ function MenuCallbackHandler:can_toggle_chat()
 end
 
 function MenuCallbackHandler:on_visit_fbi_files()
-	Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
+	if MenuCallbackHandler:is_overlay_enabled() then
+		Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
+	else
+		managers.menu:show_enable_steam_overlay()
+	end
 end
 
 function MenuCallbackHandler:on_visit_fbi_files_suspect(item)
 	if item then
-		Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. (item and "/suspect/" .. item:name() .. "/" or ""))
+		if MenuCallbackHandler:is_overlay_enabled() then
+			Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. (item and "/suspect/" .. item:name() .. "/" or ""))
+		else
+			managers.menu:show_enable_steam_overlay()
+		end
 	end
 end
 
@@ -1315,11 +1323,8 @@ function MenuCallbackHandler:steam_buy_drill(item, data)
 	local drill = data.drill
 	local quantity = quantity_item and tonumber(quantity_item:value()) or 1
 	local def_id = tweak_data.economy.drills[drill] and tweak_data.economy.drills[drill].def_id
-	if true then
-		repeat
-			do break end -- pseudo-goto
-			managers.menu:show_enable_steam_overlay_tradable_item()
-		until true
+	if not MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_enable_steam_overlay_tradable_item()
 	elseif def_id then
 		managers.network.account:add_overlay_listener("steam_transaction_tradable_item", {
 			"overlay_close"
@@ -1338,11 +1343,8 @@ function MenuCallbackHandler:steam_buy_safe_from_community(item, data)
 	end
 	local safe = data.safe
 	local quantity = quantity_item and tonumber(quantity_item:value()) or 1
-	if true then
-		repeat
-			do break end -- pseudo-goto
-			managers.menu:show_enable_steam_overlay_tradable_item()
-		until true
+	if not MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_enable_steam_overlay_tradable_item()
 	elseif safe then
 		managers.network.account:add_overlay_listener("steam_transaction_tradable_item", {
 			"overlay_close"
@@ -1361,11 +1363,8 @@ function MenuCallbackHandler:steam_find_item_from_community(item, data)
 	end
 	local cosmetic_id = data.cosmetic_id
 	local weapon_id = data.weapon_id
-	if true then
-		repeat
-			do break end -- pseudo-goto
-			managers.menu:show_enable_steam_overlay_tradable_item()
-		until true
+	if not MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_enable_steam_overlay_tradable_item()
 	elseif cosmetic_id and weapon_id then
 		managers.network.account:add_overlay_listener("steam_transaction_tradable_item", {
 			"overlay_close"
@@ -1378,11 +1377,8 @@ end
 function MenuCallbackHandler:steam_sell_item(item)
 	local steam_id = Steam:userid()
 	local instance_id = item.instance_id
-	if true then
-		repeat
-			do break end -- pseudo-goto
-			managers.menu:show_enable_steam_overlay_tradable_item()
-		until true
+	if not MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_enable_steam_overlay_tradable_item()
 	elseif steam_id and instance_id then
 		print("selling item", "steam_id", steam_id, "instance_id", instance_id)
 		managers.network.account:add_overlay_listener("steam_transaction_tradable_item", {

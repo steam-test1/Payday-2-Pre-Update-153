@@ -898,6 +898,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.berry.track = true
 	self.global_values.berry.sort_number = 109
 	self.global_values.berry.category = "dlc"
+	self.global_values.peta = {}
+	self.global_values.peta.name_id = "bm_global_value_peta"
+	self.global_values.peta.desc_id = "menu_l_global_value_peta"
+	self.global_values.peta.unlock_id = "bm_global_value_peta_unlock"
+	self.global_values.peta.color = Color(255, 255, 212, 0) / 255
+	self.global_values.peta.dlc = true
+	self.global_values.peta.chance = 1
+	self.global_values.peta.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "peta")
+	self.global_values.peta.durability_multiplier = 1
+	self.global_values.peta.drops = true
+	self.global_values.peta.track = true
+	self.global_values.peta.sort_number = 110
+	self.global_values.peta.category = "dlc"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -962,7 +975,8 @@ function LootDropTweakData:init(tweak_data)
 		"turtles",
 		"dragon",
 		"steel",
-		"berry"
+		"berry",
+		"peta"
 	}
 	self:_create_global_value_list_map()
 end

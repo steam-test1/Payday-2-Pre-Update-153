@@ -42,7 +42,7 @@ function MenuInput:back(...)
 end
 
 function MenuInput:activate_mouse(position, controller_activated)
-	if not controller_activated and managers.controller:get_default_wrapper_type() ~= "pc" then
+	if not controller_activated and managers.controller:get_default_wrapper_type() ~= "pc" and managers.controller:get_default_wrapper_type() ~= "steam" then
 		return
 	end
 	self._mouse_active = true
@@ -102,11 +102,13 @@ function MenuInput:open(position, ...)
 		y = self.AXIS_STATUS_UP
 	}
 	self:activate_mouse(position)
+	managers.controller:set_menu_mode_enabled(true)
 end
 
 function MenuInput:close(...)
 	MenuInput.super.close(self, ...)
 	self:deactivate_mouse()
+	managers.controller:set_menu_mode_enabled(false)
 end
 
 function MenuInput:set_page_timer(time)

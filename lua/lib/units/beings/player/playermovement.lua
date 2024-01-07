@@ -475,7 +475,9 @@ function PlayerMovement:set_attention_settings(settings_list)
 end
 
 function PlayerMovement:clbk_attention_notice_sneak(observer_unit, status)
-	self:on_suspicion(observer_unit, status)
+	if alive(observer_unit) then
+		self:on_suspicion(observer_unit, status)
+	end
 end
 
 function PlayerMovement:on_suspicion(observer_unit, status)

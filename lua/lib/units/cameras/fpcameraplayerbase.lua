@@ -64,6 +64,9 @@ function FPCameraPlayerBase:set_parent_unit(parent_unit)
 	local controller_type = self._parent_unit:base():controller():get_default_controller_id()
 	if controller_type == "keyboard" then
 		self._look_function = callback(self, self, "_pc_look_function")
+	elseif controller_type == "steampad" then
+		self._look_function = callback(self, self, "_steampad_look_function")
+		self._tweak_data.uses_keyboard = true
 	else
 		self._look_function = callback(self, self, "_gamepad_look_function")
 		self._tweak_data.uses_keyboard = false
@@ -540,6 +543,18 @@ function FPCameraPlayerBase:_gamepad_look_function(stick_input, stick_input_mult
 		local look_speed = self:_get_look_speed(stick_input, stick_input_multiplier, dt)
 		local stick_input_x = stick_input.x * dt * look_speed
 		local stick_input_y = stick_input.y * dt * look_speed
+		return stick_input_x, stick_input_y
+	end
+	return 0, 0
+end
+
+function FPCameraPlayerBase:_steampad_look_function(stick_input, stick_input_multiplier, dt)
+	if mvector3.length(stick_input) > self._tweak_data.look_speed_dead_zone * stick_input_multiplier.x then
+		local x = stick_input.x
+		local y = stick_input.y
+		local look_speed = self._tweak_data.look_speed_standard * (alive(self._parent_unit) and self._parent_unit:base():controller():get_input_bool("change_sensitivity") and 1 or 0.5)
+		local stick_input_x = x * dt * look_speed
+		local stick_input_y = y * dt * look_speed
 		return stick_input_x, stick_input_y
 	end
 	return 0, 0

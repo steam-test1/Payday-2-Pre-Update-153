@@ -16,6 +16,7 @@ function IngameAccessCamera:_setup_controller()
 	self._controller:add_trigger("primary_attack", self._prev_camera_cb)
 	self._controller:add_trigger("secondary_attack", self._next_camera_cb)
 	self._controller:set_enabled(true)
+	managers.controller:set_ingame_mode("access_camera")
 end
 
 function IngameAccessCamera:_clear_controller()
@@ -26,6 +27,7 @@ function IngameAccessCamera:_clear_controller()
 		self._controller:set_enabled(false)
 		self._controller:destroy()
 		self._controller = nil
+		managers.controller:set_ingame_mode("main")
 	end
 end
 

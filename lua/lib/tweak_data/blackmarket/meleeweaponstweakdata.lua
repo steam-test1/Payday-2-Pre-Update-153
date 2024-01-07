@@ -1788,5 +1788,153 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.pugio.repeat_expire_t = 0.3
 	self.melee_weapons.pugio.expire_t = 1
 	self.melee_weapons.pugio.melee_damage_delay = 0.1
+	self.melee_weapons.shawn = {}
+	self.melee_weapons.shawn.name_id = "bm_melee_shawn"
+	self.melee_weapons.shawn.animation = nil
+	self.melee_weapons.shawn.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.shawn.anim_global_param = "melee_psycho"
+	self.melee_weapons.shawn.dlc = "peta"
+	self.melee_weapons.shawn.texture_bundle_folder = "peta"
+	self.melee_weapons.shawn.type = "knife"
+	self.melee_weapons.shawn.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.shawn.unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_shawn/wpn_fps_mel_shawn"
+	self.melee_weapons.shawn.third_unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_shawn/wpn_third_mel_shawn"
+	self.melee_weapons.shawn.sounds = {}
+	self.melee_weapons.shawn.sounds.equip = "scis_equip"
+	self.melee_weapons.shawn.sounds.hit_air = "scis_hit_air"
+	self.melee_weapons.shawn.sounds.hit_gen = "scis_hit_gen"
+	self.melee_weapons.shawn.sounds.hit_body = "scis_hit_body"
+	self.melee_weapons.shawn.sounds.charge = "scis_charge"
+	self.melee_weapons.shawn.stats = {}
+	self.melee_weapons.shawn.stats.weapon_type = "sharp"
+	self.melee_weapons.shawn.stats.min_damage = 3
+	self.melee_weapons.shawn.stats.max_damage = 8
+	self.melee_weapons.shawn.stats.min_damage_effect = 1
+	self.melee_weapons.shawn.stats.max_damage_effect = 1
+	self.melee_weapons.shawn.stats.charge_time = 2
+	self.melee_weapons.shawn.stats.range = 150
+	self.melee_weapons.shawn.stats.concealment = 29
+	self.melee_weapons.shawn.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.shawn.repeat_expire_t = 0.36
+	self.melee_weapons.shawn.expire_t = 1.8
+	self.melee_weapons.stick = {}
+	self.melee_weapons.stick.name_id = "bm_melee_stick"
+	self.melee_weapons.stick.animation = nil
+	self.melee_weapons.stick.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.stick.anim_global_param = "melee_baseballbat"
+	self.melee_weapons.stick.dlc = "peta"
+	self.melee_weapons.stick.texture_bundle_folder = "peta"
+	self.melee_weapons.stick.type = "blunt"
+	self.melee_weapons.stick.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.stick.unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_stick/wpn_fps_mel_stick"
+	self.melee_weapons.stick.third_unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_stick/wpn_third_mel_stick"
+	self.melee_weapons.stick.sounds = {}
+	self.melee_weapons.stick.sounds.equip = "stick_equip"
+	self.melee_weapons.stick.sounds.hit_air = "stick_hit_air"
+	self.melee_weapons.stick.sounds.hit_gen = "stick_hit_gen"
+	self.melee_weapons.stick.sounds.hit_body = "stick_hit_body"
+	self.melee_weapons.stick.sounds.charge = "stick_charge"
+	self.melee_weapons.stick.stats = {}
+	self.melee_weapons.stick.stats.weapon_type = "blunt"
+	self.melee_weapons.stick.stats.min_damage = 3
+	self.melee_weapons.stick.stats.max_damage = 9
+	self.melee_weapons.stick.stats.min_damage_effect = 5
+	self.melee_weapons.stick.stats.max_damage_effect = 3
+	self.melee_weapons.stick.melee_damage_delay = 0.15
+	self.melee_weapons.stick.stats.charge_time = 3
+	self.melee_weapons.stick.stats.range = 225
+	self.melee_weapons.stick.stats.concealment = 27
+	self.melee_weapons.stick.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.stick.repeat_expire_t = 0.8
+	self.melee_weapons.stick.expire_t = 1.8
+	self.melee_weapons.stick.melee_damage_delay = 0.2
+	self.melee_weapons.pitchfork = {}
+	self.melee_weapons.pitchfork.name_id = "bm_melee_pitchfork"
+	self.melee_weapons.pitchfork.animation = nil
+	self.melee_weapons.pitchfork.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.pitchfork.anim_global_param = "melee_pitchfork"
+	self.melee_weapons.pitchfork.dlc = "peta"
+	self.melee_weapons.pitchfork.texture_bundle_folder = "peta"
+	self.melee_weapons.pitchfork.type = "knife"
+	self.melee_weapons.pitchfork.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.pitchfork.unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_fork/wpn_fps_mel_pitchfork"
+	self.melee_weapons.pitchfork.third_unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_fork/wpn_third_mel_pitchfork"
+	self.melee_weapons.pitchfork.sounds = {}
+	self.melee_weapons.pitchfork.sounds.equip = "pitchfork_equip"
+	self.melee_weapons.pitchfork.sounds.hit_air = "pitchfork_hit_air"
+	self.melee_weapons.pitchfork.sounds.hit_gen = "pitchfork_hit_gen"
+	self.melee_weapons.pitchfork.sounds.hit_body = "pitchfork_hit_body"
+	self.melee_weapons.pitchfork.sounds.charge = "pitchfork_charge"
+	self.melee_weapons.pitchfork.stats = {}
+	self.melee_weapons.pitchfork.stats.weapon_type = "sharp"
+	self.melee_weapons.pitchfork.stats.min_damage = 7
+	self.melee_weapons.pitchfork.stats.max_damage = 45
+	self.melee_weapons.pitchfork.stats.min_damage_effect = 1
+	self.melee_weapons.pitchfork.stats.max_damage_effect = 1
+	self.melee_weapons.pitchfork.melee_damage_delay = 0.19
+	self.melee_weapons.pitchfork.stats.charge_time = 4
+	self.melee_weapons.pitchfork.stats.range = 225
+	self.melee_weapons.pitchfork.stats.concealment = 27
+	self.melee_weapons.pitchfork.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.pitchfork.repeat_expire_t = 0.8
+	self.melee_weapons.pitchfork.expire_t = 1.8
+	self.melee_weapons.pitchfork.melee_damage_delay = 0.3
+	self.melee_weapons.scoutknife = {}
+	self.melee_weapons.scoutknife.name_id = "bm_melee_scoutknife"
+	self.melee_weapons.scoutknife.animation = nil
+	self.melee_weapons.scoutknife.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.scoutknife.anim_global_param = "melee_knife"
+	self.melee_weapons.scoutknife.dlc = "peta"
+	self.melee_weapons.scoutknife.texture_bundle_folder = "peta"
+	self.melee_weapons.scoutknife.type = "knife"
+	self.melee_weapons.scoutknife.align_objects = {
+		"a_weapon_left"
+	}
+	self.melee_weapons.scoutknife.unit = "units/pd2_dlc_peta/weapons/wpn_fps_mel_scoutknife/wpn_fps_mel_scoutknife"
+	self.melee_weapons.scoutknife.third_unit = "units/pd2_dlc_peta/weapons/wpn_third_mel_scoutknife/wpn_third_mel_scoutknife"
+	self.melee_weapons.scoutknife.sounds = {}
+	self.melee_weapons.scoutknife.sounds.equip = "knife_equip"
+	self.melee_weapons.scoutknife.sounds.hit_air = "knife_hit_air"
+	self.melee_weapons.scoutknife.sounds.hit_gen = "knife_hit_gen"
+	self.melee_weapons.scoutknife.sounds.hit_body = "knife_hit_body"
+	self.melee_weapons.scoutknife.sounds.charge = "knife_charge"
+	self.melee_weapons.scoutknife.stats = {}
+	self.melee_weapons.scoutknife.stats.weapon_type = "sharp"
+	self.melee_weapons.scoutknife.stats.min_damage = 3
+	self.melee_weapons.scoutknife.stats.max_damage = 8
+	self.melee_weapons.scoutknife.stats.min_damage_effect = 1
+	self.melee_weapons.scoutknife.stats.max_damage_effect = 1
+	self.melee_weapons.scoutknife.stats.charge_time = 2
+	self.melee_weapons.scoutknife.stats.range = 150
+	self.melee_weapons.scoutknife.stats.concealment = 29
+	self.melee_weapons.scoutknife.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.scoutknife.repeat_expire_t = 0.36
+	self.melee_weapons.scoutknife.expire_t = 1.8
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

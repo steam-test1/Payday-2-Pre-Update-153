@@ -6220,9 +6220,13 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 	if self._rename_info_text then
 		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
 		if self._slot_data and not self._slot_data.customize_locked and text_button and text_button:inside(x, y) then
-			local category = self._slot_data.category
-			local slot = self._slot_data.slot
-			self:_start_rename_item(category, slot)
+			if managers.menu:is_steam_controller() then
+				self:rename_item_with_gamepad_callback(self._slot_data)
+			else
+				local category = self._slot_data.category
+				local slot = self._slot_data.slot
+				self:_start_rename_item(category, slot)
+			end
 			return
 		end
 	end
@@ -6751,7 +6755,7 @@ function BlackMarketGui:show_btns(slot)
 	self._controllers_mapping = {}
 	self._controllers_pc_mapping = {}
 	for i, btn in ipairs(btns) do
-		if not managers.menu:is_pc_controller() and not btn._data.no_btn then
+		if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and not btn._data.no_btn then
 			btn:set_text_btn_prefix(btn._data.btn)
 		end
 		if btn._data.pc_btn then
@@ -6915,8 +6919,6 @@ function BlackMarketGui:populate_weapon_category(category, data)
 				table.insert(new_data, "w_move")
 			end
 			table.insert(new_data, "w_preview")
-			if not is_win32 or not managers.menu:is_pc_controller() then
-			end
 		end
 		data[i] = new_data
 		index = i
@@ -7658,8 +7660,6 @@ function BlackMarketGui:populate_masks(data)
 					table.insert(new_data, "m_sell")
 				else
 					table.insert(new_data, "m_remove")
-				end
-				if not is_win32 or not managers.menu:is_pc_controller() then
 				end
 			end
 		end
@@ -8403,8 +8403,6 @@ function BlackMarketGui:populate_weapon_category_new(data)
 						table.insert(new_data, "w_move")
 					end
 					table.insert(new_data, "w_preview")
-					if not is_win32 or not managers.menu:is_pc_controller() then
-					end
 				end
 			end
 			data[i] = new_data
@@ -9941,7 +9939,7 @@ function BlackMarketGui:rename_item_with_gamepad_callback(data)
 				custom_name = custom_name
 			}
 			self._rename_clbk_id = key
-		elseif Steam:overlay_enabled() then
+		elseif MenuCallbackHandler:is_overlay_enabled() then
 			managers.menu:show_requires_big_picture()
 		else
 			managers.menu:show_enable_steam_overlay()
@@ -11119,7 +11117,7 @@ end
 function BlackMarketGui:show_buy_dlc_callback(data)
 	local dlc_data = Global.dlc_manager.all_dlc_data[data.global_value]
 	local app_id = dlc_data and dlc_data.app_id
-	if app_id and not dlc_data.external then
+	if app_id and not dlc_data.external and MenuCallbackHandler:is_overlay_enabled() then
 		Steam:overlay_activate("store", app_id)
 	end
 end

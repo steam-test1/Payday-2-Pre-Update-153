@@ -944,3 +944,7 @@ end
 function ControllerWrapper:__tostring()
 	return string.format("[Controller][Wrapper][ID: %s, Type: %s, Name: %s, Enabled: %s, Debug: %s]", tostring(self._id), tostring(self:get_type()), tostring(self._name or "N/A"), tostring(self._enabled and "Yes" or "No"), tostring(self._debug and "Yes" or "No"))
 end
+
+function ControllerWrapper.change_mode(controller, mode)
+	return nil
+end

@@ -635,3 +635,11 @@ function CarryData:destroy()
 	end
 	self:_unregister_steal_SO()
 end
+
+function CarryData:set_latest_peer_id(peer_id)
+	self._latest_peer_id = peer_id
+end
+
+function CarryData:latest_peer_id()
+	return self._latest_peer_id
+end

@@ -3549,6 +3549,85 @@ function NarrativeTweakData:init()
 		3785000,
 		3785000
 	}
+	self.jobs.peta = {}
+	self.jobs.peta.name_id = "heist_peta"
+	self.jobs.peta.briefing_id = "heist_peta_crimenet"
+	self.jobs.peta.package = "packages/narr_peta"
+	self.jobs.peta.contact = "vlad"
+	self.jobs.peta.region = "street"
+	self.jobs.peta.dlc = "peta"
+	self.jobs.peta.jc = 30
+	self.jobs.peta.chain = {
+		{
+			level_id = "peta",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "peta2",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.peta.briefing_event = "vld_pt1_cbf_01"
+	self.jobs.peta.debrief_event = nil
+	self.jobs.peta.crimenet_callouts = {
+		"vld_pt1_cnc_01",
+		"vld_pt1_cnc_01",
+		"vld_pt1_cnc_01"
+	}
+	self.jobs.peta.crimenet_videos = {
+		"cn_jewel1",
+		"cn_jewel2",
+		"cn_jewel3"
+	}
+	self.jobs.peta.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.peta.payout = {
+		250000,
+		500000,
+		1250000,
+		2500000,
+		3200000
+	}
+	self.jobs.peta.contract_visuals = {}
+	self.jobs.peta.contract_visuals.min_mission_xp = {
+		38000,
+		38000,
+		38000,
+		38000,
+		38000
+	}
+	self.jobs.peta.contract_visuals.max_mission_xp = {
+		122000,
+		122000,
+		122000,
+		122000,
+		122000
+	}
+	self.jobs.peta_prof = deep_clone(self.jobs.peta)
+	self.jobs.peta_prof.jc = 70
+	self.jobs.peta_prof.professional = true
+	self.jobs.peta_prof.region = "professional"
+	self.jobs.peta_prof.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.peta_prof.payout = {
+		290000,
+		580000,
+		1450000,
+		2900000,
+		3800000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -3608,7 +3687,9 @@ function NarrativeTweakData:init()
 		"nail",
 		"cane",
 		"pbr",
-		"pbr2"
+		"pbr2",
+		"peta",
+		"peta_prof"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self._jobs_index, "roberts")

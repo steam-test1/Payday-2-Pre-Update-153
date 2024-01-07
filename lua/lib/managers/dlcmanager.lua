@@ -566,6 +566,10 @@ function GenericDLCManager:has_pdcon_2015()
 	return Global.dlc_manager.all_dlc_data.pdcon_2015 and Global.dlc_manager.all_dlc_data.pdcon_2015.verified
 end
 
+function GenericDLCManager:has_peta()
+	return Global.dlc_manager.all_dlc_data.peta and Global.dlc_manager.all_dlc_data.peta.verified
+end
+
 function GenericDLCManager:has_achievement(data)
 	local achievement = managers.achievment and data and data.achievement_id and managers.achievment:get_info(data.achievement_id)
 	return achievement and achievement.awarded or false
@@ -1361,6 +1365,7 @@ function WINDLCManager:init()
 			gage_pack_historical = {app_id = "331900", no_install = true},
 			steel = {app_id = "401650", no_install = true},
 			bobblehead = {app_id = "328860", no_install = true},
+			peta = {app_id = "433730", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			}

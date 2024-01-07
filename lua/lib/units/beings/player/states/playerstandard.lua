@@ -138,17 +138,7 @@ function PlayerStandard:_enter(enter_data)
 			local peer_id = managers.network:session() and managers.network:session():local_peer():id()
 			local mask_id = managers.blackmarket:get_real_mask_id(equipped_mask.mask_id, peer_id)
 			local equipped_mask_type = tweak_data.blackmarket.masks[mask_id].type
-			if not equipped_mask_type then
-				self._camera_unit:anim_state_machine():set_global("mask_equip", 1)
-			elseif equipped_mask_type == "glasses" then
-				self._camera_unit:anim_state_machine():set_global("glasses_equip", 1)
-			elseif equipped_mask_type == "helmet" then
-				self._camera_unit:anim_state_machine():set_global("helmet_equip", 1)
-			elseif equipped_mask_type == "beard" then
-				self._camera_unit:anim_state_machine():set_global("beard_equip", 1)
-			elseif equipped_mask_type == "tiara" then
-				self._camera_unit:anim_state_machine():set_global("tiara_equip", 1)
-			end
+			self._camera_unit:anim_state_machine():set_global((equipped_mask_type or "mask") .. "_equip", 1)
 			self:_start_action_equip(self.IDS_MASK_EQUIP, 1.6)
 		else
 			self:_start_action_equip(self.IDS_EQUIP)

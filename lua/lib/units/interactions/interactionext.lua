@@ -1533,6 +1533,13 @@ function CarryInteractionExt:interact(player)
 	CarryInteractionExt.super.super.interact(self, player)
 	if self._has_modified_timer then
 		managers.achievment:award("murphys_laws")
+		if self._unit:carry_data():latest_peer_id() == managers.network:session():local_peer():id() then
+			local kill_count_no_carry = managers.job:get_memory("kill_count_no_carry", true) or 0
+			local peta_4_data = tweak_data.achievement.peta_4
+			if peta_4_data and self._unit:carry_data():carry_id() == peta_4_data.carry_id and kill_count_no_carry >= peta_4_data.count then
+				managers.achievment:award(peta_4_data.award)
+			end
+		end
 	end
 	managers.player:set_carry(self._unit:carry_data():carry_id(), self._unit:carry_data():multiplier(), self._unit:carry_data():dye_pack_data())
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
@@ -1600,6 +1607,10 @@ function CarryInteractionExt:register_collision_callbacks()
 end
 
 function CarryInteractionExt:_collision_callback(tag, unit, body, other_unit, other_body, position, normal, velocity, ...)
+	if unit:key() == other_unit:key() then
+		self._unit:set_body_collision_callback(callback(self, self, "_collision_callback"))
+		return
+	end
 	if self._has_modified_timer then
 		self._has_modified_timer = nil
 	end

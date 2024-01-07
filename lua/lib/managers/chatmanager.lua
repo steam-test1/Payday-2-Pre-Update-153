@@ -461,6 +461,36 @@ function ChatGui:get_chat_button_shape()
 end
 
 function ChatGui:_show_crimenet_chat()
+	if SystemInfo:platform() == Idstring("WIN32") and managers.controller:get_default_wrapper_type() ~= "pc" then
+		local desc = managers.localization:text("menu_chat_input")
+		local id = Idstring("ChatGui:_show_crimenet_chat")
+		local key = id:key()
+		local params = {
+			nil,
+			nil,
+			desc,
+			60,
+			""
+		}
+		
+		local function func(submitted, submitted_text)
+			if submitted then
+				self:enter_text(nil, submitted_text)
+				self:enter_key_callback()
+			end
+		end
+		
+		if managers.network.account:show_gamepad_text_input(key, func, params) then
+			return
+		elseif Input:keyboard() then
+		elseif MenuCallbackHandler:is_overlay_enabled() then
+			managers.menu:show_requires_big_picture()
+			return
+		else
+			managers.menu:show_enable_steam_overlay()
+			return
+		end
+	end
 	local chat_bg = self._panel:child("chat_bg")
 	local chat_blur = self._panel:child("chat_blur")
 	local hud_blur = self._hud_blur

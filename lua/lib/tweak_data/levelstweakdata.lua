@@ -1032,6 +1032,26 @@ function LevelsTweakData:init()
 	}
 	self.nail.cube = "cube_apply_heist_bank"
 	self.nail.max_bags = 1000
+	self.peta = {}
+	self.peta.name_id = "heist_peta_hl"
+	self.peta.briefing_id = "heist_peta_briefing"
+	self.peta.briefing_dialog = "Play_pln_pt1_brf"
+	self.peta.world_name = "narratives/vlad/peta/stage1"
+	self.peta.intro_event = "Play_vld_pt1_intro"
+	self.peta.outro_event = "Play_vld_pt1_07"
+	self.peta.music = "heist"
+	self.peta.package = "packages/narr_peta"
+	self.peta.cube = "cube_apply_heist_bank"
+	self.peta2 = {}
+	self.peta2.name_id = "heist_peta2_hl"
+	self.peta2.briefing_id = "heist_peta2_briefing"
+	self.peta2.briefing_dialog = "Play_pln_pt2_brf"
+	self.peta2.world_name = "narratives/vlad/peta/stage2"
+	self.peta2.intro_event = "Play_brs_pt2_intro"
+	self.peta2.outro_event = "Play_vld_pt2_04"
+	self.peta2.music = "heist"
+	self.peta2.package = "packages/narr_peta2"
+	self.peta2.cube = "cube_apply_heist_bank"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1103,6 +1123,8 @@ function LevelsTweakData:init()
 		"dinner",
 		"pbr",
 		"pbr2",
+		"peta",
+		"peta2",
 		"nail"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then

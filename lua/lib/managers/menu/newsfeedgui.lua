@@ -161,7 +161,11 @@ function NewsFeedGui:mouse_pressed(button, x, y)
 		return
 	end
 	if button == Idstring("0") and self._panel:inside(x, y) then
-		Steam:overlay_activate("url", self._links[self._news.i])
+		if MenuCallbackHandler:is_overlay_enabled() then
+			Steam:overlay_activate("url", self._links[self._news.i])
+		else
+			managers.menu:show_enable_steam_overlay()
+		end
 		return true
 	end
 end

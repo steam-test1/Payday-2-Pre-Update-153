@@ -807,7 +807,7 @@ function TextBoxGui:check_minimize(x, y)
 end
 
 function TextBoxGui:check_grab_scroll_bar(x, y)
-	if not self:can_take_input() or not self._text_box:child("scroll_bar"):visible() then
+	if not (self:can_take_input() and alive(self._text_box)) or not self._text_box:child("scroll_bar"):visible() then
 		return false
 	end
 	if self._allow_moving and self._text_box:inside(x, y) and self._text_box:child("top_line"):inside(x, y) then

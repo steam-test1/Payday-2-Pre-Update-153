@@ -267,6 +267,7 @@ end
 function PlayerBase:_setup_controller()
 	self._controller = managers.controller:create_controller("player_" .. tostring(self._id), nil, false)
 	managers.rumble:register_controller(self._controller, self._rumble_pos_callback)
+	managers.controller:set_ingame_mode("main")
 end
 
 function PlayerBase:id()

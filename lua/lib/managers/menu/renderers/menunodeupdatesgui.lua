@@ -609,7 +609,10 @@ function MenuNodeUpdatesGui:open(content_update)
 	managers.player:set_content_update_viewed(content_update.id)
 	local play_sound = true
 	if SystemInfo:platform() == Idstring("WIN32") then
-		if content_update.webpage then
+		if not MenuCallbackHandler:is_overlay_enabled() then
+			managers.menu:show_enable_steam_overlay()
+			play_sound = false
+		elseif content_update.webpage then
 			Steam:overlay_activate("url", content_update.webpage)
 		elseif content_update.store then
 			Steam:overlay_activate("store", content_update.store)
@@ -641,8 +644,10 @@ function MenuNodeUpdatesGui:open(content_update)
 end
 
 function MenuNodeUpdatesGui:open_url(url)
-	Steam:overlay_activate("url", url)
-	managers.menu_component:post_event("menu_enter")
+	if SystemInfo:platform() == Idstring("WIN32") then
+		Steam:overlay_activate("url", url)
+		managers.menu_component:post_event("menu_enter")
+	end
 end
 
 function MenuNodeUpdatesGui:input_focus()

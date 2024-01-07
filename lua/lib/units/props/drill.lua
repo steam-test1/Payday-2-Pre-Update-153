@@ -153,13 +153,18 @@ function Drill:_change_num_jammed_drills(d)
 	end
 end
 
+Drill.REMINDER_COMMENTS = {}
+Drill.REMINDER_COMMENTS.default = {nil, nil}
+Drill.REMINDER_COMMENTS.drill = {"d01x_sin", "d02x_sin"}
+Drill.REMINDER_COMMENTS.hacking_device = {nil, nil}
+Drill.REMINDER_COMMENTS.saw = {"d05", "d05"}
+
 function Drill:_drill_remind_clbk()
-	if not self.is_hacking_device and not managers.groupai:state():whisper_mode() then
-		local suffix = "sin"
-		if self._jammed_count <= 1 then
-			managers.groupai:state():teammate_comment(nil, (self.is_saw and "d03_" or "d01x_") .. suffix, nil, false, nil, false)
-		else
-			managers.groupai:state():teammate_comment(nil, (self.is_saw and "d04_" or "d02x_") .. suffix, nil, false, nil, false)
+	if not managers.groupai:state():whisper_mode() then
+		local device = self.is_drill and "drill" or self.is_saw and "saw" or self.is_hacking_device and "hacking_device" or "default"
+		local reminder = (Drill.REMINDER_COMMENTS[device] or Drill.REMINDER_COMMENTS.default)[self._jammed_count <= 1 and 1 or 2]
+		if reminder then
+			managers.groupai:state():teammate_comment(nil, reminder, nil, false, nil, false)
 		end
 	elseif managers.groupai:state():bain_state() then
 	end

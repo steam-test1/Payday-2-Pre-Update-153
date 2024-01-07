@@ -1324,6 +1324,11 @@ Play the full version soon to get your full PAYDAY!]],
 			armor = "level_7"
 		}
 	}
+	self.achievement.peta_4 = {
+		award = "peta_4",
+		count = 1,
+		carry_id = "goat"
+	}
 	self.achievement.weapons_owned = {
 		gage4_2 = {
 			"huntsman",
@@ -2538,6 +2543,13 @@ Play the full version soon to get your full PAYDAY!]],
 			job = "cane",
 			equipped_team = {primary_category = "shotgun", secondary_category = "shotgun"}
 		},
+		death_peta = {
+			award = "peta_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "peta"
+		},
 		flake_1 = {
 			award = "flake_1",
 			jobs = {
@@ -2712,7 +2724,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"pines",
 		"shoutout_raid",
 		"jolly",
-		"cane"
+		"cane",
+		"peta"
 	}
 	self.achievement.job_list.hector = {
 		"watchdogs_wrapper",
@@ -2981,22 +2994,6 @@ Play the full version soon to get your full PAYDAY!]],
 		}
 	}
 	self.achievement.inventory = {
-		green_7 = {
-			rewards = {
-				safes = {"event_red"},
-				drills = {"event_red"}
-			}
-		},
-		farm_6 = {
-			rewards = {
-				safes = {
-					"event_dinner"
-				},
-				drills = {
-					"event_dinner"
-				}
-			}
-		},
 		flake_1 = {
 			rewards = {
 				safes = {
@@ -3481,6 +3478,8 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_37", lock = "berry"},
 		{track = "track_38", lock = "berry"},
 		{track = "track_39"},
+		{track = "track_40", lock = "peta"},
+		{track = "track_41", lock = "peta"},
 		{
 			track = "track_32_lcv"
 		},
@@ -4468,7 +4467,7 @@ if (not tweak_data or tweak_data.RELOAD) and managers.dlc then
 end
 
 function TweakData:get_controller_help_coords()
-	if managers.controller:get_default_wrapper_type() == "pc" then
+	if managers.controller:get_default_wrapper_type() == "pc" or managers.controller:get_default_wrapper_type() == "steam" then
 		return false
 	end
 	local coords = {

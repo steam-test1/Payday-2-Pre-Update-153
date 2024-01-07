@@ -403,6 +403,12 @@ function CarryTweakData:init(tweak_data)
 	self.present.name_id = "hud_carry_present"
 	self.present.bag_value = "present"
 	self.present.AI_carry = {SO_category = "enemies"}
+	self.goat = {}
+	self.goat.type = "medium"
+	self.goat.name_id = "hud_carry_goat"
+	self.goat.visual_object = "g_g_bag"
+	self.goat.unit = "units/pd2_dlc_peta/pickups/pta_pku_goatbag/pta_pku_goatbag"
+	self.goat.AI_carry = {SO_category = "enemies"}
 	self.masterpiece_painting = {}
 	self.masterpiece_painting.type = "light"
 	self.masterpiece_painting.name_id = "hud_carry_masterpiece_painting"

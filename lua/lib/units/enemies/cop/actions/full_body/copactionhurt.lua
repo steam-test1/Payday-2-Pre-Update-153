@@ -358,6 +358,7 @@ function CopActionHurt:init(action_desc, common_data)
 		if action_desc.variant == "bleeding" then
 		else
 			local nr_variants = self._ext_anim.base_nr_variants
+			local death_type
 			if nr_variants then
 				variant = math.random(nr_variants)
 			else
@@ -379,7 +380,7 @@ function CopActionHurt:init(action_desc, common_data)
 				local hit_z = action_desc.hit_pos.z
 				height = hit_z > self._ext_movement:m_com().z and "high" or "low"
 				if action_type == "death" then
-					local death_type = is_civilian and "normal" or action_desc.death_type
+					death_type = is_civilian and "normal" or action_desc.death_type
 					if is_female then
 						variant = self.death_anim_fe_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
 					else
@@ -418,7 +419,7 @@ function CopActionHurt:init(action_desc, common_data)
 				self._machine:set_parameter(redir_res, "mod", 1)
 			elseif action_type == "heavy_hurt" then
 				self._machine:set_parameter(redir_res, "hvy", 1)
-			elseif action_type == "death" and action_desc.death_type == "heavy" and not is_civilian then
+			elseif action_type == "death" and (death_type or action_desc.death_type) == "heavy" and not is_civilian then
 				self._machine:set_parameter(redir_res, "heavy", 1)
 			elseif action_type == "expl_hurt" then
 				self._machine:set_parameter(redir_res, "expl", 1)

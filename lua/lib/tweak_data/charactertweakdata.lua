@@ -32,6 +32,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_civilian(presets)
 	self:_init_bank_manager(presets)
 	self:_init_drunk_pilot(presets)
+	self:_init_boris(presets)
 	self:_init_escort(presets)
 	self:_init_russian(presets)
 	self:_init_german(presets)
@@ -1383,6 +1384,16 @@ function CharacterTweakData:_init_drunk_pilot(presets)
 	self.drunk_pilot.challenges = {type = "civilians"}
 	self.drunk_pilot.calls_in = nil
 	self.drunk_pilot.ignores_aggression = true
+end
+
+function CharacterTweakData:_init_boris(presets)
+	self.boris = deep_clone(self.civilian)
+	self.boris.flee_type = "hide"
+	self.boris.access = "civ_male"
+	self.boris.intimidateable = nil
+	self.boris.challenges = {type = "civilians"}
+	self.boris.calls_in = nil
+	self.boris.ignores_aggression = true
 end
 
 function CharacterTweakData:_init_escort(presets)
@@ -6790,6 +6801,12 @@ function CharacterTweakData:character_map()
 			list = {
 				"ene_murkywater_no_light",
 				"npc_locke"
+			}
+		},
+		berry = {
+			path = "units/pd2_dlc_peta/characters/",
+			list = {
+				"civ_male_boris"
 			}
 		}
 	}

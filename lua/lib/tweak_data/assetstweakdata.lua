@@ -182,9 +182,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"jolly",
 		"red2",
 		"pbr2",
+		"nail",
 		"dinner",
 		"cane",
-		"nail"
+		"peta",
+		"peta2"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -211,9 +213,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"jolly",
 		"red2",
 		"pbr2",
+		"nail",
 		"dinner",
 		"cane",
-		"nail"
+		"peta",
+		"peta2"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -237,9 +241,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"jolly",
 		"red2",
 		"pbr2",
+		"nail",
 		"dinner",
 		"cane",
-		"nail"
+		"peta",
+		"peta2"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -906,6 +912,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.extra_cutter.no_mystery = true
 	self.extra_cutter.unlock_desc_id = "menu_asset_extra_cutter_desc"
 	self.extra_cutter.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_medium", 3)
+	self.planks = {}
+	self.planks.name_id = "menu_asset_planks"
+	self.planks.texture = "guis/dlcs/peta/textures/pd2/mission_briefing/assets/asset_barn_planks"
+	self.planks.stages = {"peta2"}
+	self.planks.visible_if_locked = true
+	self.planks.unlock_desc_id = "menu_asset_planks_desc"
+	self.planks.no_mystery = true
+	self.planks.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

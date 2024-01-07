@@ -450,6 +450,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/games/christmas2015/",
 		image = "guis/textures/pd2/content_updates/xmas2015"
 	}
+	local peta = {
+		id = "peta",
+		name_id = "menu_content_peta",
+		desc_id = "menu_content_peta_desc",
+		date_id = "menu_content_peta_date",
+		store = 433730,
+		image = "guis/dlcs/peta/textures/pd2/content_updates/peta"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -510,7 +518,8 @@ function GuiTweakData:init()
 			gordon,
 			berry,
 			rip,
-			cane
+			cane,
+			peta
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

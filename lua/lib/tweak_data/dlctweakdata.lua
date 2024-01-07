@@ -34,6 +34,7 @@ function DLCTweakData:init(tweak_data)
 		turtles = true,
 		dragon = true,
 		steel = true,
+		peta = true,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4320,6 +4321,98 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.peta = {}
+	self.peta.dlc = "has_peta"
+	self.peta.content = {}
+	self.peta.content.loot_drops = {}
+	self.ach_peta_2 = {}
+	self.ach_peta_2.dlc = "has_achievement"
+	self.ach_peta_2.achievement_id = "peta_2"
+	self.ach_peta_2.content = {}
+	self.ach_peta_2.content.loot_global_value = "peta"
+	self.ach_peta_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "tall_goat",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "goateye",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "giraffe",
+			amount = 1
+		}
+	}
+	self.ach_peta_3 = {}
+	self.ach_peta_3.dlc = "has_achievement"
+	self.ach_peta_3.achievement_id = "peta_3"
+	self.ach_peta_3.content = {}
+	self.ach_peta_3.content.loot_global_value = "peta"
+	self.ach_peta_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "goat_goat",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "flamingoeye",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "illumigoati",
+			amount = 1
+		}
+	}
+	self.ach_peta_4 = {}
+	self.ach_peta_4.dlc = "has_achievement"
+	self.ach_peta_4.achievement_id = "peta_4"
+	self.ach_peta_4.content = {}
+	self.ach_peta_4.content.loot_global_value = "peta"
+	self.ach_peta_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "wet_goat",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "hay",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "goatface",
+			amount = 1
+		}
+	}
+	self.ach_peta_5 = {}
+	self.ach_peta_5.dlc = "has_achievement"
+	self.ach_peta_5.achievement_id = "peta_5"
+	self.ach_peta_5.content = {}
+	self.ach_peta_5.content.loot_global_value = "peta"
+	self.ach_peta_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "fancy_goat",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "tongue",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "fur",
+			amount = 1
+		}
+	}
 	self.pdcon_2015 = {}
 	self.pdcon_2015.dlc = "has_pdcon_2015"
 	self.pdcon_2015.content = {}
@@ -4341,5 +4434,22 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	if SystemInfo:platform() == Idstring("XB1") then
+		self.xone_bonus = {}
+		self.xone_bonus.free = true
+		self.xone_bonus.content = {}
+		self.xone_bonus.content_on_consoles = true
+		self.xone_bonus.content.loot_global_value = "infamous"
+		self.xone_bonus.content.loot_drops = {
+			{
+				type_items = "cash",
+				item_entry = "xone_bonus",
+				amount = 1
+			},
+			{
+				type_items = "masks",
+				item_entry = "unforsaken",
+				amount = 1
+			}
+		}
 	end
 end

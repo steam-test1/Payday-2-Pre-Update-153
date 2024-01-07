@@ -58,6 +58,7 @@ function PlayerDriving:_enter(enter_data)
 	self._unit:camera():set_shaker_parameter("breathing", "amplitude", 0)
 	self._unit:camera()._camera_unit:base():animate_fov(self._vehicle_ext._tweak_data.fov, 0.33)
 	self._controller = self._unit:base():controller()
+	managers.controller:set_ingame_mode("driving")
 	self:_upd_attention()
 end
 
@@ -113,6 +114,7 @@ function PlayerDriving:exit(state_data, new_state_name)
 	self:_remove_camera_limits()
 	self._camera_unit:base():animate_fov(75, 0.33)
 	self._camera_unit:anim_state_machine():set_global(self._vehicle_ext._tweak_data.animations.vehicle_id, 0)
+	managers.controller:set_ingame_mode("main")
 	return exit_data
 end
 

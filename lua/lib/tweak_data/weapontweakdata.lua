@@ -106,6 +106,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_par_npc()
 	self:_init_data_sparrow_npc()
 	self:_init_data_model70_npc()
+	self:_init_data_m37_npc()
 	self:_precalculate_values()
 end
 
@@ -1861,6 +1862,21 @@ function WeaponTweakData:_init_data_model70_npc()
 	self.model70_secondary_npc.use_data.selection_index = 1
 end
 
+function WeaponTweakData:_init_data_m37_npc()
+	self.m37_npc.sounds.prefix = "m37_npc"
+	self.m37_npc.use_data.selection_index = 1
+	self.m37_npc.DAMAGE = 5
+	self.m37_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.m37_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.m37_npc.auto.fire_rate = 0.14
+	self.m37_npc.CLIP_AMMO_MAX = 7
+	self.m37_npc.NR_CLIPS_MAX = 6
+	self.m37_npc.hold = "rifle"
+	self.m37_npc.alert_size = 4500
+	self.m37_npc.suppression = 1.8
+	self.m37_npc.is_shotgun = true
+end
+
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -2458,8 +2474,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.timers = {}
 	self.new_m4.timers.reload_not_empty = 2.665
 	self.new_m4.timers.reload_empty = 3.43
-	self.new_m4.timers.unequip = 0.75
-	self.new_m4.timers.equip = 0.7
+	self.new_m4.timers.unequip = 0.6
+	self.new_m4.timers.equip = 0.6
 	self.new_m4.name_id = "bm_w_m4"
 	self.new_m4.desc_id = "bm_w_m4_desc"
 	self.new_m4.description_id = "des_m4"
@@ -2538,7 +2554,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_17.timers.reload_not_empty = 1.47
 	self.glock_17.timers.reload_empty = 2.12
 	self.glock_17.timers.unequip = 0.5
-	self.glock_17.timers.equip = 0.5
+	self.glock_17.timers.equip = 0.35
 	self.glock_17.name_id = "bm_w_glock_17"
 	self.glock_17.desc_id = "bm_w_glock_17_desc"
 	self.glock_17.description_id = "des_glock_17"
@@ -2621,8 +2637,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.timers = {}
 	self.mp9.timers.reload_not_empty = 1.51
 	self.mp9.timers.reload_empty = 2.48
-	self.mp9.timers.unequip = 0.7
-	self.mp9.timers.equip = 0.55
+	self.mp9.timers.unequip = 0.5
+	self.mp9.timers.equip = 0.4
 	self.mp9.name_id = "bm_w_mp9"
 	self.mp9.desc_id = "bm_w_mp9_desc"
 	self.mp9.description_id = "des_mp9"
@@ -2800,8 +2816,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.glock_18c.timers = {}
 	self.glock_18c.timers.reload_not_empty = 1.47
 	self.glock_18c.timers.reload_empty = 2.12
-	self.glock_18c.timers.unequip = 0.55
-	self.glock_18c.timers.equip = 0.55
+	self.glock_18c.timers.unequip = 0.5
+	self.glock_18c.timers.equip = 0.35
 	self.glock_18c.name_id = "bm_w_glock_18c"
 	self.glock_18c.desc_id = "bm_w_glock_18c_desc"
 	self.glock_18c.description_id = "des_glock"
@@ -2892,8 +2908,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.amcar.timers = {}
 	self.amcar.timers.reload_not_empty = 2.25
 	self.amcar.timers.reload_empty = 3
-	self.amcar.timers.unequip = 0.8
-	self.amcar.timers.equip = 0.7
+	self.amcar.timers.unequip = 0.6
+	self.amcar.timers.equip = 0.55
 	self.amcar.name_id = "bm_w_amcar"
 	self.amcar.desc_id = "bm_w_amcar_desc"
 	self.amcar.description_id = "des_m4"
@@ -2978,8 +2994,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m16.timers = {}
 	self.m16.timers.reload_not_empty = 2.75
 	self.m16.timers.reload_empty = 3.73
-	self.m16.timers.unequip = 0.8
-	self.m16.timers.equip = 0.8
+	self.m16.timers.unequip = 0.6
+	self.m16.timers.equip = 0.6
 	self.m16.name_id = "bm_w_m16"
 	self.m16.desc_id = "bm_w_m16_desc"
 	self.m16.description_id = "des_m4"
@@ -3149,8 +3165,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.timers = {}
 	self.ak74.timers.reload_not_empty = 2.8
 	self.ak74.timers.reload_empty = 3.87
-	self.ak74.timers.unequip = 0.8
-	self.ak74.timers.equip = 0.8
+	self.ak74.timers.unequip = 0.5
+	self.ak74.timers.equip = 0.5
 	self.ak74.name_id = "bm_w_ak74"
 	self.ak74.desc_id = "bm_w_ak74_desc"
 	self.ak74.description_id = "des_ak47"
@@ -3235,8 +3251,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm.timers = {}
 	self.akm.timers.reload_not_empty = 2.8
 	self.akm.timers.reload_empty = 3.87
-	self.akm.timers.unequip = 0.8
-	self.akm.timers.equip = 0.8
+	self.akm.timers.unequip = 0.5
+	self.akm.timers.equip = 0.5
 	self.akm.name_id = "bm_w_akm"
 	self.akm.desc_id = "bm_w_akm_desc"
 	self.akm.description_id = "des_ak47"
@@ -3321,8 +3337,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akm_gold.timers = {}
 	self.akm_gold.timers.reload_not_empty = 2.8
 	self.akm_gold.timers.reload_empty = 3.87
-	self.akm_gold.timers.unequip = 0.8
-	self.akm_gold.timers.equip = 0.8
+	self.akm_gold.timers.unequip = 0.5
+	self.akm_gold.timers.equip = 0.5
 	self.akm_gold.name_id = "bm_w_akm_gold"
 	self.akm_gold.desc_id = "bm_w_akm_gold_desc"
 	self.akm_gold.description_id = "des_ak47"
@@ -3408,7 +3424,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.akmsu.timers = {}
 	self.akmsu.timers.reload_not_empty = 2.15
 	self.akmsu.timers.reload_empty = 3.9
-	self.akmsu.timers.unequip = 0.65
+	self.akmsu.timers.unequip = 0.55
 	self.akmsu.timers.equip = 0.6
 	self.akmsu.name_id = "bm_w_akmsu"
 	self.akmsu.desc_id = "bm_w_akmsu_desc"
@@ -3492,8 +3508,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.timers = {}
 	self.saiga.timers.reload_not_empty = 2.65
 	self.saiga.timers.reload_empty = 3.95
-	self.saiga.timers.unequip = 0.85
-	self.saiga.timers.equip = 0.85
+	self.saiga.timers.unequip = 0.6
+	self.saiga.timers.equip = 0.6
 	self.saiga.name_id = "bm_w_saiga"
 	self.saiga.desc_id = "bm_w_saiga_desc"
 	self.saiga.description_id = "des_saiga"
@@ -3580,8 +3596,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.timers = {}
 	self.ak5.timers.reload_not_empty = 2.05
 	self.ak5.timers.reload_empty = 3.08
-	self.ak5.timers.unequip = 0.8
-	self.ak5.timers.equip = 0.8
+	self.ak5.timers.unequip = 0.6
+	self.ak5.timers.equip = 0.45
 	self.ak5.name_id = "bm_w_ak5"
 	self.ak5.desc_id = "bm_w_ak5_desc"
 	self.ak5.description_id = "des_m4"
@@ -3665,8 +3681,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aug.timers = {}
 	self.aug.timers.reload_not_empty = 2.5
 	self.aug.timers.reload_empty = 3.3
-	self.aug.timers.unequip = 0.8
-	self.aug.timers.equip = 0.8
+	self.aug.timers.unequip = 0.5
+	self.aug.timers.equip = 0.5
 	self.aug.name_id = "bm_w_aug"
 	self.aug.desc_id = "bm_w_aug_desc"
 	self.aug.description_id = "des_aug"
@@ -3748,8 +3764,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.timers = {}
 	self.g36.timers.reload_not_empty = 2.85
 	self.g36.timers.reload_empty = 3.85
-	self.g36.timers.unequip = 0.85
-	self.g36.timers.equip = 0.85
+	self.g36.timers.unequip = 0.6
+	self.g36.timers.equip = 0.6
 	self.g36.name_id = "bm_w_g36"
 	self.g36.desc_id = "bm_w_g36_desc"
 	self.g36.description_id = "des_m4"
@@ -3912,8 +3928,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m14.timers = {}
 	self.new_m14.timers.reload_not_empty = 2.65
 	self.new_m14.timers.reload_empty = 3.15
-	self.new_m14.timers.unequip = 0.9
-	self.new_m14.timers.equip = 0.9
+	self.new_m14.timers.unequip = 0.6
+	self.new_m14.timers.equip = 0.55
 	self.new_m14.name_id = "bm_w_m14"
 	self.new_m14.desc_id = "bm_w_m14_desc"
 	self.new_m14.description_id = "des_m14"
@@ -3997,8 +4013,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.deagle.timers = {}
 	self.deagle.timers.reload_not_empty = 1.85
 	self.deagle.timers.reload_empty = 3.1
-	self.deagle.timers.unequip = 0.6
-	self.deagle.timers.equip = 0.6
+	self.deagle.timers.unequip = 0.5
+	self.deagle.timers.equip = 0.35
 	self.deagle.name_id = "bm_w_deagle"
 	self.deagle.desc_id = "bm_w_deagle_desc"
 	self.deagle.description_id = "des_deagle"
@@ -4073,8 +4089,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.timers = {}
 	self.new_mp5.timers.reload_not_empty = 2.4
 	self.new_mp5.timers.reload_empty = 3.6
-	self.new_mp5.timers.unequip = 0.75
-	self.new_mp5.timers.equip = 0.7
+	self.new_mp5.timers.unequip = 0.6
+	self.new_mp5.timers.equip = 0.6
 	self.new_mp5.name_id = "bm_w_mp5"
 	self.new_mp5.desc_id = "bm_w_mp5_desc"
 	self.new_mp5.description_id = "des_mp5"
@@ -4159,8 +4175,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.colt_1911.timers = {}
 	self.colt_1911.timers.reload_not_empty = 1.47
 	self.colt_1911.timers.reload_empty = 2.12
-	self.colt_1911.timers.unequip = 0.55
-	self.colt_1911.timers.equip = 0.55
+	self.colt_1911.timers.unequip = 0.5
+	self.colt_1911.timers.equip = 0.35
 	self.colt_1911.name_id = "bm_w_colt_1911"
 	self.colt_1911.desc_id = "bm_w_colt_1911_desc"
 	self.colt_1911.description_id = "des_colt_1911"
@@ -4239,7 +4255,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.timers = {}
 	self.mac10.timers.reload_not_empty = 2
 	self.mac10.timers.reload_empty = 2.7
-	self.mac10.timers.unequip = 0.7
+	self.mac10.timers.unequip = 0.5
 	self.mac10.timers.equip = 0.5
 	self.mac10.name_id = "bm_w_mac10"
 	self.mac10.desc_id = "bm_w_mac10_desc"
@@ -4406,8 +4422,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.timers = {}
 	self.huntsman.timers.reload_not_empty = 2.5
 	self.huntsman.timers.reload_empty = self.huntsman.timers.reload_not_empty
-	self.huntsman.timers.unequip = 0.85
-	self.huntsman.timers.equip = 0.85
+	self.huntsman.timers.unequip = 0.6
+	self.huntsman.timers.equip = 0.6
 	self.huntsman.name_id = "bm_w_huntsman"
 	self.huntsman.desc_id = "bm_w_huntsman_desc"
 	self.huntsman.description_id = "des_huntsman"
@@ -4496,8 +4512,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b92fs.timers = {}
 	self.b92fs.timers.reload_not_empty = 1.47
 	self.b92fs.timers.reload_empty = 2.12
-	self.b92fs.timers.unequip = 0.55
-	self.b92fs.timers.equip = 0.55
+	self.b92fs.timers.unequip = 0.5
+	self.b92fs.timers.equip = 0.35
 	self.b92fs.name_id = "bm_w_b92fs"
 	self.b92fs.desc_id = "bm_w_b92fs_desc"
 	self.b92fs.description_id = "des_b92fs"
@@ -4581,8 +4597,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_raging_bull.timers = {}
 	self.new_raging_bull.timers.reload_not_empty = 2.25
 	self.new_raging_bull.timers.reload_empty = 2.25
-	self.new_raging_bull.timers.unequip = 0.65
-	self.new_raging_bull.timers.equip = 0.65
+	self.new_raging_bull.timers.unequip = 0.5
+	self.new_raging_bull.timers.equip = 0.45
 	self.new_raging_bull.FIRE_MODE = "single"
 	self.new_raging_bull.fire_mode_data = {}
 	self.new_raging_bull.fire_mode_data.fire_rate = 0.21
@@ -4768,8 +4784,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.usp.timers = {}
 	self.usp.timers.reload_not_empty = 1.47
 	self.usp.timers.reload_empty = 2.2
-	self.usp.timers.unequip = 0.55
-	self.usp.timers.equip = 0.55
+	self.usp.timers.unequip = 0.5
+	self.usp.timers.equip = 0.35
 	self.usp.name_id = "bm_w_usp"
 	self.usp.desc_id = "bm_w_usp_desc"
 	self.usp.description_id = "des_usp"
@@ -4854,8 +4870,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g22c.timers = {}
 	self.g22c.timers.reload_not_empty = 1.47
 	self.g22c.timers.reload_empty = 2.2
-	self.g22c.timers.unequip = 0.55
-	self.g22c.timers.equip = 0.55
+	self.g22c.timers.unequip = 0.5
+	self.g22c.timers.equip = 0.35
 	self.g22c.name_id = "bm_w_g22c"
 	self.g22c.desc_id = "bm_w_g22c_desc"
 	self.g22c.description_id = "des_g22c"
@@ -4945,8 +4961,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.judge.timers = {}
 	self.judge.timers.reload_not_empty = 2.25
 	self.judge.timers.reload_empty = 2.25
-	self.judge.timers.unequip = 0.65
-	self.judge.timers.equip = 0.65
+	self.judge.timers.unequip = 0.5
+	self.judge.timers.equip = 0.45
 	self.judge.FIRE_MODE = "single"
 	self.judge.fire_mode_data = {}
 	self.judge.fire_mode_data.fire_rate = 0.12
@@ -5038,8 +5054,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m45.timers = {}
 	self.m45.timers.reload_not_empty = 2.85
 	self.m45.timers.reload_empty = 3.9
-	self.m45.timers.unequip = 0.75
-	self.m45.timers.equip = 0.75
+	self.m45.timers.unequip = 0.5
+	self.m45.timers.equip = 0.6
 	self.m45.name_id = "bm_w_m45"
 	self.m45.desc_id = "bm_w_m45_desc"
 	self.m45.description_id = "des_m45"
@@ -5123,8 +5139,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.s552.timers = {}
 	self.s552.timers.reload_not_empty = 1.65
 	self.s552.timers.reload_empty = 2.4
-	self.s552.timers.unequip = 0.9
-	self.s552.timers.equip = 0.9
+	self.s552.timers.unequip = 0.55
+	self.s552.timers.equip = 0.7
 	self.s552.name_id = "bm_w_s552"
 	self.s552.desc_id = "bm_w_s552_desc"
 	self.s552.description_id = "des_s552"
@@ -5206,7 +5222,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ppk.timers.reload_not_empty = 1.55
 	self.ppk.timers.reload_empty = 2.12
 	self.ppk.timers.unequip = 0.5
-	self.ppk.timers.equip = 0.5
+	self.ppk.timers.equip = 0.35
 	self.ppk.name_id = "bm_w_ppk"
 	self.ppk.desc_id = "bm_w_ppk_desc"
 	self.ppk.description_id = "des_ppk"
@@ -5290,8 +5306,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.timers = {}
 	self.mp7.timers.reload_not_empty = 1.96
 	self.mp7.timers.reload_empty = 2.45
-	self.mp7.timers.unequip = 0.75
-	self.mp7.timers.equip = 0.75
+	self.mp7.timers.unequip = 0.6
+	self.mp7.timers.equip = 0.5
 	self.mp7.name_id = "bm_w_mp7"
 	self.mp7.desc_id = "bm_w_mp7_desc"
 	self.mp7.description_id = "des_mp7"
@@ -5376,8 +5392,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scar.timers = {}
 	self.scar.timers.reload_not_empty = 2.2
 	self.scar.timers.reload_empty = 3.15
-	self.scar.timers.unequip = 0.9
-	self.scar.timers.equip = 0.9
+	self.scar.timers.unequip = 0.6
+	self.scar.timers.equip = 0.5
 	self.scar.name_id = "bm_w_scar"
 	self.scar.desc_id = "bm_w_scar_desc"
 	self.scar.description_id = "des_scar"
@@ -5459,7 +5475,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p226.timers.reload_not_empty = 1.47
 	self.p226.timers.reload_empty = 2.12
 	self.p226.timers.unequip = 0.5
-	self.p226.timers.equip = 0.5
+	self.p226.timers.equip = 0.35
 	self.p226.name_id = "bm_w_p226"
 	self.p226.desc_id = "bm_w_p226_desc"
 	self.p226.description_id = "des_p226"
@@ -5941,8 +5957,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.timers = {}
 	self.msr.timers.reload_not_empty = 2.6
 	self.msr.timers.reload_empty = 3.7
-	self.msr.timers.unequip = 0.9
-	self.msr.timers.equip = 0.9
+	self.msr.timers.unequip = 0.6
+	self.msr.timers.equip = 0.7
 	self.msr.name_id = "bm_w_msr"
 	self.msr.desc_id = "bm_w_msr_desc"
 	self.msr.description_id = "des_msr"
@@ -6040,8 +6056,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r93.timers = {}
 	self.r93.timers.reload_not_empty = 2.82
 	self.r93.timers.reload_empty = 3.82
-	self.r93.timers.unequip = 0.9
-	self.r93.timers.equip = 0.9
+	self.r93.timers.unequip = 0.7
+	self.r93.timers.equip = 0.65
 	self.r93.name_id = "bm_w_r93"
 	self.r93.desc_id = "bm_w_r93_desc"
 	self.r93.description_id = "des_r93"
@@ -6136,8 +6152,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.fal.timers = {}
 	self.fal.timers.reload_not_empty = 2.2
 	self.fal.timers.reload_empty = 3.28
-	self.fal.timers.unequip = 0.9
-	self.fal.timers.equip = 0.9
+	self.fal.timers.unequip = 0.6
+	self.fal.timers.equip = 0.6
 	self.fal.name_id = "bm_w_fal"
 	self.fal.desc_id = "bm_w_fal_desc"
 	self.fal.description_id = "des_fal"
@@ -6305,7 +6321,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.striker.timers.shotgun_reload_exit_not_empty = 0.4
 	self.striker.timers.shotgun_reload_shell = 0.6
 	self.striker.timers.shotgun_reload_first_shell_offset = 0.13333334
-	self.striker.timers.unequip = 0.85
+	self.striker.timers.unequip = 0.6
 	self.striker.timers.equip = 0.85
 	self.striker.name_id = "bm_w_striker"
 	self.striker.desc_id = "bm_w_striker_desc"
@@ -6389,8 +6405,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ksg.sounds.enter_steelsight = "primary_steel_sight_enter"
 	self.ksg.sounds.leave_steelsight = "primary_steel_sight_exit"
 	self.ksg.timers = {}
-	self.ksg.timers.unequip = 0.85
-	self.ksg.timers.equip = 0.85
+	self.ksg.timers.unequip = 0.6
+	self.ksg.timers.equip = 0.55
 	self.ksg.name_id = "bm_w_ksg"
 	self.ksg.desc_id = "bm_w_ksg_desc"
 	self.ksg.description_id = "des_ksg"
@@ -6489,8 +6505,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.gre_m79.timers = {}
 	self.gre_m79.timers.reload_not_empty = 3.1
 	self.gre_m79.timers.reload_empty = self.gre_m79.timers.reload_not_empty
-	self.gre_m79.timers.unequip = 0.85
-	self.gre_m79.timers.equip = 0.85
+	self.gre_m79.timers.unequip = 0.6
+	self.gre_m79.timers.equip = 0.6
 	self.gre_m79.name_id = "bm_w_gre_m79"
 	self.gre_m79.desc_id = "bm_w_gre_m79_desc"
 	self.gre_m79.description_id = "des_gre_m79"
@@ -6585,8 +6601,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g3.timers = {}
 	self.g3.timers.reload_not_empty = 2.6
 	self.g3.timers.reload_empty = 3.8
-	self.g3.timers.unequip = 0.9
-	self.g3.timers.equip = 0.9
+	self.g3.timers.unequip = 0.6
+	self.g3.timers.equip = 0.65
 	self.g3.name_id = "bm_w_g3"
 	self.g3.desc_id = "bm_w_g3_desc"
 	self.g3.description_id = "des_g3"
@@ -6669,8 +6685,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.galil.timers = {}
 	self.galil.timers.reload_not_empty = 3
 	self.galil.timers.reload_empty = 4.2
-	self.galil.timers.unequip = 0.9
-	self.galil.timers.equip = 0.9
+	self.galil.timers.unequip = 0.6
+	self.galil.timers.equip = 0.6
 	self.galil.name_id = "bm_w_galil"
 	self.galil.desc_id = "bm_w_galil_desc"
 	self.galil.description_id = "des_galil"
@@ -6755,8 +6771,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.famas.timers = {}
 	self.famas.timers.reload_not_empty = 2.72
 	self.famas.timers.reload_empty = 3.78
-	self.famas.timers.unequip = 0.9
-	self.famas.timers.equip = 0.9
+	self.famas.timers.unequip = 0.55
+	self.famas.timers.equip = 0.6
 	self.famas.name_id = "bm_w_famas"
 	self.famas.desc_id = "bm_w_famas_desc"
 	self.famas.description_id = "des_famas"
@@ -6839,8 +6855,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scorpion.timers = {}
 	self.scorpion.timers.reload_not_empty = 2
 	self.scorpion.timers.reload_empty = 2.75
-	self.scorpion.timers.unequip = 0.75
-	self.scorpion.timers.equip = 0.75
+	self.scorpion.timers.unequip = 0.7
+	self.scorpion.timers.equip = 0.5
 	self.scorpion.name_id = "bm_w_scorpion"
 	self.scorpion.desc_id = "bm_w_scorpion_desc"
 	self.scorpion.description_id = "des_scorpion"
@@ -6925,8 +6941,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.tec9.timers = {}
 	self.tec9.timers.reload_not_empty = 2.315
 	self.tec9.timers.reload_empty = 3.28
-	self.tec9.timers.unequip = 0.75
-	self.tec9.timers.equip = 0.75
+	self.tec9.timers.unequip = 0.6
+	self.tec9.timers.equip = 0.5
 	self.tec9.name_id = "bm_w_tec9"
 	self.tec9.desc_id = "bm_w_tec9_desc"
 	self.tec9.description_id = "des_tec9"
@@ -7011,8 +7027,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.uzi.timers = {}
 	self.uzi.timers.reload_not_empty = 2.45
 	self.uzi.timers.reload_empty = 3.52
-	self.uzi.timers.unequip = 0.75
-	self.uzi.timers.equip = 0.75
+	self.uzi.timers.unequip = 0.55
+	self.uzi.timers.equip = 0.6
 	self.uzi.name_id = "bm_w_uzi"
 	self.uzi.desc_id = "bm_w_uzi_desc"
 	self.uzi.description_id = "des_uzi"
@@ -7450,7 +7466,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g26.timers.reload_not_empty = 1.47
 	self.g26.timers.reload_empty = 2.12
 	self.g26.timers.unequip = 0.5
-	self.g26.timers.equip = 0.5
+	self.g26.timers.equip = 0.35
 	self.g26.name_id = "bm_wp_pis_g26"
 	self.g26.desc_id = "bm_wp_pis_g26_desc"
 	self.g26.description_id = "des_g26"
@@ -7719,7 +7735,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.c96.timers.reload_not_empty = 4
 	self.c96.timers.reload_empty = 4.17
 	self.c96.timers.unequip = 0.5
-	self.c96.timers.equip = 0.5
+	self.c96.timers.equip = 0.35
 	self.c96.name_id = "bm_w_c96"
 	self.c96.desc_id = "bm_w_c96_desc"
 	self.c96.description_id = "des_c96"
@@ -7803,8 +7819,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sterling.timers = {}
 	self.sterling.timers.reload_not_empty = 2.3
 	self.sterling.timers.reload_empty = 3.3
-	self.sterling.timers.unequip = 0.75
-	self.sterling.timers.equip = 0.75
+	self.sterling.timers.unequip = 0.55
+	self.sterling.timers.equip = 0.65
 	self.sterling.name_id = "bm_w_sterling"
 	self.sterling.desc_id = "bm_w_sterling_desc"
 	self.sterling.description_id = "des_sterling"
@@ -7891,8 +7907,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mosin.timers = {}
 	self.mosin.timers.reload_not_empty = 3.85
 	self.mosin.timers.reload_empty = 3.85
-	self.mosin.timers.unequip = 0.9
-	self.mosin.timers.equip = 0.9
+	self.mosin.timers.unequip = 0.6
+	self.mosin.timers.equip = 0.5
 	self.mosin.name_id = "bm_w_mosin"
 	self.mosin.desc_id = "bm_w_mosin_desc"
 	self.mosin.description_id = "des_mosin"
@@ -7987,8 +8003,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m1928.timers = {}
 	self.m1928.timers.reload_not_empty = 3.5
 	self.m1928.timers.reload_empty = 4.5
-	self.m1928.timers.unequip = 0.9
-	self.m1928.timers.equip = 0.9
+	self.m1928.timers.unequip = 0.6
+	self.m1928.timers.equip = 0.75
 	self.m1928.name_id = "bm_w_m1928"
 	self.m1928.desc_id = "bm_w_m1928_desc"
 	self.m1928.description_id = "des_m1928"
@@ -8078,8 +8094,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.l85a2.timers = {}
 	self.l85a2.timers.reload_not_empty = 3.5
 	self.l85a2.timers.reload_empty = 4.5
-	self.l85a2.timers.unequip = 0.9
-	self.l85a2.timers.equip = 0.9
+	self.l85a2.timers.unequip = 0.45
+	self.l85a2.timers.equip = 0.75
 	self.l85a2.name_id = "bm_w_l85a2"
 	self.l85a2.desc_id = "bm_w_l85a2_desc"
 	self.l85a2.description_id = "des_l85a2"
@@ -8168,8 +8184,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.vhs.timers = {}
 	self.vhs.timers.reload_not_empty = 3.2
 	self.vhs.timers.reload_empty = 4.75
-	self.vhs.timers.unequip = 0.9
-	self.vhs.timers.equip = 0.9
+	self.vhs.timers.unequip = 0.6
+	self.vhs.timers.equip = 0.6
 	self.vhs.name_id = "bm_w_vhs"
 	self.vhs.desc_id = "bm_w_vhs_desc"
 	self.vhs.description_id = "des_vhs"
@@ -8533,7 +8549,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.cobray.timers = {}
 	self.cobray.timers.reload_not_empty = 2.05
 	self.cobray.timers.reload_empty = 4.35
-	self.cobray.timers.unequip = 0.7
+	self.cobray.timers.unequip = 0.55
 	self.cobray.timers.equip = 0.5
 	self.cobray.name_id = "bm_w_cobray"
 	self.cobray.desc_id = "bm_w_cobray_desc"
@@ -8626,8 +8642,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b682.timers = {}
 	self.b682.timers.reload_not_empty = 2.5
 	self.b682.timers.reload_empty = 2.7
-	self.b682.timers.unequip = 0.85
-	self.b682.timers.equip = 0.85
+	self.b682.timers.unequip = 0.55
+	self.b682.timers.equip = 0.55
 	self.b682.name_id = "bm_w_b682"
 	self.b682.desc_id = "bm_w_b682_desc"
 	self.b682.description_id = "des_b682"
@@ -9193,8 +9209,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aa12.timers = {}
 	self.aa12.timers.reload_not_empty = 3
 	self.aa12.timers.reload_empty = 4.1
-	self.aa12.timers.unequip = 0.75
-	self.aa12.timers.equip = 0.75
+	self.aa12.timers.unequip = 0.55
+	self.aa12.timers.equip = 0.55
 	self.aa12.name_id = "bm_w_aa12"
 	self.aa12.desc_id = "bm_w_aa12_desc"
 	self.aa12.description_id = "des_aa12"
@@ -9487,8 +9503,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.plainsrider.timers = {}
 	self.plainsrider.timers.reload_not_empty = 1
 	self.plainsrider.timers.reload_empty = self.plainsrider.timers.reload_not_empty
-	self.plainsrider.timers.unequip = 0.85
-	self.plainsrider.timers.equip = 0.85
+	self.plainsrider.timers.unequip = 0.55
+	self.plainsrider.timers.equip = 0.55
 	self.plainsrider.bow_reload_speed_multiplier = 3
 	self.plainsrider.charge_data = {}
 	self.plainsrider.charge_data.max_t = 1
@@ -9569,8 +9585,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mateba.timers = {}
 	self.mateba.timers.reload_not_empty = 3.6
 	self.mateba.timers.reload_empty = 3.6
-	self.mateba.timers.unequip = 0.65
-	self.mateba.timers.equip = 0.65
+	self.mateba.timers.unequip = 0.5
+	self.mateba.timers.equip = 0.45
 	self.mateba.FIRE_MODE = "single"
 	self.mateba.fire_mode_data = {}
 	self.mateba.fire_mode_data.fire_rate = 0.21
@@ -9653,8 +9669,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.asval.timers = {}
 	self.asval.timers.reload_not_empty = 2.6
 	self.asval.timers.reload_empty = 3.7
-	self.asval.timers.unequip = 0.8
-	self.asval.timers.equip = 0.8
+	self.asval.timers.unequip = 0.5
+	self.asval.timers.equip = 0.5
 	self.asval.name_id = "bm_w_asval"
 	self.asval.desc_id = "bm_w_asval_desc"
 	self.asval.description_id = "des_asval"
@@ -9921,7 +9937,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.polymer.timers = {}
 	self.polymer.timers.reload_not_empty = 2
 	self.polymer.timers.reload_empty = 2.5
-	self.polymer.timers.unequip = 0.7
+	self.polymer.timers.unequip = 0.6
 	self.polymer.timers.equip = 0.5
 	self.polymer.name_id = "bm_w_polymer"
 	self.polymer.desc_id = "bm_w_polymer_desc"
@@ -10017,7 +10033,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hunter.timers = {}
 	self.hunter.timers.reload_not_empty = 1.8
 	self.hunter.timers.reload_empty = 1.2
-	self.hunter.timers.unequip = 0.7
+	self.hunter.timers.unequip = 0.55
 	self.hunter.timers.equip = 0.5
 	self.hunter.name_id = "bm_w_hunter"
 	self.hunter.desc_id = "bm_w_hunter_desc"
@@ -10576,7 +10592,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sparrow.timers.reload_not_empty = 1.47
 	self.sparrow.timers.reload_empty = 2.12
 	self.sparrow.timers.unequip = 0.5
-	self.sparrow.timers.equip = 0.5
+	self.sparrow.timers.equip = 0.35
 	self.sparrow.name_id = "bm_w_sparrow"
 	self.sparrow.desc_id = "bm_w_sparrow_desc"
 	self.sparrow.description_id = "des_sparrow"
@@ -10742,6 +10758,104 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.model70.armor_piercing_chance = 1
 	self.model70.stats_modifiers = {damage = 2}
+	self.m37 = {}
+	self.m37.category = "shotgun"
+	self.m37.damage_melee = damage_melee_default
+	self.m37.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.m37.sounds = {}
+	self.m37.sounds.fire = "m37_fire"
+	self.m37.sounds.dryfire = "shotgun_dryfire"
+	self.m37.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.m37.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.m37.timers = {}
+	self.m37.timers.shotgun_reload_enter = 0.5
+	self.m37.timers.shotgun_reload_exit_empty = 0.7
+	self.m37.timers.shotgun_reload_exit_not_empty = 0.3
+	self.m37.timers.shotgun_reload_shell = 0.65
+	self.m37.timers.shotgun_reload_first_shell_offset = 0
+	self.m37.timers.unequip = 0.85
+	self.m37.timers.equip = 0.85
+	self.m37.name_id = "bm_w_m37"
+	self.m37.desc_id = "bm_w_m37_desc"
+	self.m37.description_id = "des_m37"
+	self.m37.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.m37.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
+	self.m37.use_data = {}
+	self.m37.use_data.selection_index = 1
+	self.m37.use_data.align_place = "right_hand"
+	self.m37.DAMAGE = 6
+	self.m37.damage_near = 1000
+	self.m37.damage_far = 2000
+	self.m37.rays = 12
+	self.m37.CLIP_AMMO_MAX = 7
+	self.m37.NR_CLIPS_MAX = 6
+	self.m37.AMMO_MAX = self.m37.CLIP_AMMO_MAX * self.m37.NR_CLIPS_MAX
+	self.m37.AMMO_PICKUP = self:_pickup_chance(self.m37.AMMO_MAX, 1)
+	self.m37.FIRE_MODE = "single"
+	self.m37.fire_mode_data = {}
+	self.m37.fire_mode_data.fire_rate = 0.575
+	self.m37.single = {}
+	self.m37.single.fire_rate = 0.575
+	self.m37.spread = {}
+	self.m37.spread.standing = self.r870.spread.standing
+	self.m37.spread.crouching = self.r870.spread.crouching
+	self.m37.spread.steelsight = self.r870.spread.steelsight
+	self.m37.spread.moving_standing = self.r870.spread.moving_standing
+	self.m37.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.m37.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.m37.kick = {}
+	self.m37.kick.standing = {
+		1.9,
+		2,
+		-0.2,
+		0.2
+	}
+	self.m37.kick.crouching = self.m37.kick.standing
+	self.m37.kick.steelsight = {
+		1.5,
+		1.7,
+		-0.2,
+		0.2
+	}
+	self.m37.crosshair = {}
+	self.m37.crosshair.standing = {}
+	self.m37.crosshair.crouching = {}
+	self.m37.crosshair.steelsight = {}
+	self.m37.crosshair.standing.offset = 0.7
+	self.m37.crosshair.standing.moving_offset = 0.7
+	self.m37.crosshair.standing.kick_offset = 0.8
+	self.m37.crosshair.crouching.offset = 0.65
+	self.m37.crosshair.crouching.moving_offset = 0.65
+	self.m37.crosshair.crouching.kick_offset = 0.75
+	self.m37.crosshair.steelsight.hidden = true
+	self.m37.crosshair.steelsight.offset = 0
+	self.m37.crosshair.steelsight.moving_offset = 0
+	self.m37.crosshair.steelsight.kick_offset = 0
+	self.m37.shake = {}
+	self.m37.shake.fire_multiplier = 1
+	self.m37.shake.fire_steelsight_multiplier = -1
+	self.m37.autohit = autohit_shotgun_default
+	self.m37.aim_assist = aim_assist_shotgun_default
+	self.m37.weapon_hold = "m37"
+	self.m37.animations = {}
+	self.m37.animations.equip_id = "equip_r870_shotgun"
+	self.m37.animations.recoil_steelsight = true
+	self.m37.texture_bundle_folder = "peta"
+	self.m37.global_value = "peta"
+	self.m37.panic_suppression_chance = 0.2
+	self.m37.stats = {
+		damage = 59,
+		spread = 12,
+		recoil = 14,
+		spread_moving = 12,
+		zoom = 3,
+		concealment = 22,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -11448,6 +11562,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.m37_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -11554,4 +11674,5 @@ function WeaponTweakData:_precalculate_values()
 	self.par_npc.AMMO_MAX = self.par_npc.CLIP_AMMO_MAX * self.par_npc.NR_CLIPS_MAX
 	self.sparrow_npc.AMMO_MAX = self.sparrow_npc.CLIP_AMMO_MAX * self.sparrow_npc.NR_CLIPS_MAX
 	self.model70_npc.AMMO_MAX = self.model70_npc.CLIP_AMMO_MAX * self.model70_npc.NR_CLIPS_MAX
+	self.m37_npc.AMMO_MAX = self.m37_npc.CLIP_AMMO_MAX * self.m37_npc.NR_CLIPS_MAX
 end

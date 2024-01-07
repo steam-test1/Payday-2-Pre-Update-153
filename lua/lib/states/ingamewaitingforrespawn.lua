@@ -24,6 +24,7 @@ function IngameWaitingForRespawnState:_setup_controller()
 	self._controller:add_trigger("primary_attack", self._prev_player_cb)
 	self._controller:add_trigger("secondary_attack", self._next_player_cb)
 	self._controller:set_enabled(true)
+	managers.controller:set_ingame_mode("main")
 end
 
 function IngameWaitingForRespawnState:_clear_controller()

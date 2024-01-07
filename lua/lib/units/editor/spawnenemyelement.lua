@@ -115,19 +115,20 @@ function SpawnEnemyUnitElement:_build_panel(panel, panel_sizer)
 	self:_build_value_combobox(panel, panel_sizer, "accessibility", ElementSpawnEnemyDummy.ACCESSIBILITIES, "Only units with this movement type will be spawned from this element.")
 	local pickups = table.map_keys(tweak_data.pickups)
 	table.insert(pickups, "none")
+	table.insert(pickups, "no_pickup")
 	self:_build_value_combobox(panel, panel_sizer, "force_pickup", pickups)
 	self:_build_value_combobox(panel, panel_sizer, "team", table.list_add({"default"}, tweak_data.levels:get_team_names_indexed()), "Select the character's team.")
 end
 
 function SpawnEnemyUnitElement:_load_pickup()
-	if self._hed.force_pickup ~= "none" then
+	if self._hed.force_pickup ~= "none" and self._hed.force_pickup ~= "no_pickup" then
 		local unit_name = tweak_data.pickups[self._hed.force_pickup].unit
 		CoreUnit.editor_load_unit(unit_name)
 	end
 end
 
 function SpawnEnemyUnitElement:add_to_mission_package()
-	if self._hed.force_pickup ~= "none" then
+	if self._hed.force_pickup ~= "none" and self._hed.force_pickup ~= "no_pickup" then
 		local unit_name = tweak_data.pickups[self._hed.force_pickup].unit
 		managers.editor:add_to_world_package({
 			category = "units",

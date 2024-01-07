@@ -222,6 +222,16 @@ function AnimatedVehicleBase:save(save_data)
 		save_data.anim_vehicle_base = save_data.anim_vehicle_base or {}
 		save_data.anim_vehicle_base.saved_poses = self._saved_poses
 	end
+	if self._sync_objects then
+		save_data.anim_vehicle_base = save_data.anim_vehicle_base or {}
+		save_data.anim_vehicle_base.sync_objects = {}
+		for _, name in ipairs(self._sync_objects) do
+			save_data.anim_vehicle_base.sync_objects[name] = {
+				pos = self._unit:get_object(Idstring(name)):position(),
+				rot = self._unit:get_object(Idstring(name)):rotation()
+			}
+		end
+	end
 end
 
 function AnimatedVehicleBase:load(save_data)
@@ -229,6 +239,12 @@ function AnimatedVehicleBase:load(save_data)
 		return
 	end
 	self._saved_poses = save_data.anim_vehicle_base.saved_poses
+	if save_data.anim_vehicle_base.sync_objects then
+		for name, object in pairs(save_data.anim_vehicle_base.sync_objects) do
+			self._unit:get_object(Idstring(name)):set_position(object.pos)
+			self._unit:get_object(Idstring(name)):set_rotation(object.rot)
+		end
+	end
 end
 
 function AnimatedVehicleBase:destroy(unit)
