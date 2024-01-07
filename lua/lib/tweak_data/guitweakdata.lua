@@ -4502,6 +4502,9 @@ function GuiTweakData:tradable_inventory_sort_func(index)
 			if x_quality.index ~= y_quality.index then
 				return x_quality.index > y_quality.index
 			end
+			if x_item.entry ~= y_item.entry then
+				return x_item.entry < y_item.entry
+			end
 			return y < x
 		end
 	elseif index == 4 then
@@ -4517,6 +4520,9 @@ function GuiTweakData:tradable_inventory_sort_func(index)
 			if x_rarity.index ~= y_rarity.index then
 				return x_rarity.index > y_rarity.index
 			end
+			if x_item.entry ~= y_item.entry then
+				return x_item.entry < y_item.entry
+			end
 			return y < x
 		end
 	elseif index == 5 then
@@ -4526,7 +4532,10 @@ function GuiTweakData:tradable_inventory_sort_func(index)
 			x_item = inventory_tradable[x]
 			y_item = inventory_tradable[y]
 			if x_item.category ~= y_item.category then
-				return x_item.category > y_item.category
+				return x_item.category < y_item.category
+			end
+			if x_item.entry ~= y_item.entry then
+				return x_item.entry < y_item.entry
 			end
 			return y < x
 		end
@@ -4538,6 +4547,9 @@ function GuiTweakData:tradable_inventory_sort_func(index)
 			y_item = inventory_tradable[y]
 			if x_item.bonus ~= y_item.bonus then
 				return x_item.bonus
+			end
+			if x_item.entry ~= y_item.entry then
+				return x_item.entry < y_item.entry
 			end
 			return y < x
 		end
