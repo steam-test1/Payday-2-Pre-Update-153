@@ -215,8 +215,8 @@ function MenuManager:active_menu(node_name, parameter_list)
 	end
 end
 
-function MenuManager:open_menu(menu_name, position)
-	MenuManager.super.open_menu(self, menu_name, position)
+function MenuManager:open_menu(menu_name, position, ...)
+	MenuManager.super.open_menu(self, menu_name, position, ...)
 	self:activate()
 end
 
@@ -625,9 +625,9 @@ end
 function MenuManager:_recompile(dir)
 	local source_files = self:_source_files(dir)
 	local t = {
-		platform = "win32",
+		platform = string.lower(SystemInfo:platform():s()),
 		source_root = managers.database:root_path() .. "/assets",
-		target_db_root = managers.database:root_path() .. "/packages/win32/assets",
+		target_db_root = Application:base_path() .. "assets",
 		target_db_name = "all",
 		source_files = source_files,
 		verbose = false,
@@ -1261,6 +1261,11 @@ function MenuCallbackHandler:dlc_buy_steel_pc()
 	Steam:overlay_activate("store", 401650)
 end
 
+function MenuCallbackHandler:dlc_buy_berry_pc()
+	print("[MenuCallbackHandler:dlc_buy_berry_pc]")
+	Steam:overlay_activate("store", 422400)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1317,6 +1322,10 @@ end
 function MenuCallbackHandler:choice_lobby_job_plan(item)
 	Global.game_settings.job_plan = item:value()
 	self:update_matchmake_attributes()
+	self:_on_host_setting_updated()
+end
+
+function MenuCallbackHandler:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_job_plan_filter(item)
@@ -1330,6 +1339,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"berry",
 		"steel",
 		"dragon",
 		"turtles",
@@ -1476,6 +1486,10 @@ end
 
 function MenuCallbackHandler:visible_callback_steel()
 	return self:is_dlc_latest_locked("steel")
+end
+
+function MenuCallbackHandler:visible_callback_berry()
+	return self:is_dlc_latest_locked("berry")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -1953,6 +1967,23 @@ function MenuCallbackHandler:choice_premium_contact(item)
 	end
 end
 
+function MenuCallbackHandler:choice_controller_type(item)
+	if not managers.menu:active_menu() then
+		return false
+	end
+	if not managers.menu:active_menu().logic then
+		return false
+	end
+	if not managers.menu:active_menu().logic:selected_node() then
+		return false
+	end
+	managers.menu:active_menu().logic:selected_node():parameters().controller_category = item:value()
+	local logic = managers.menu:active_menu().logic
+	if logic then
+		logic:refresh_node()
+	end
+end
+
 function MenuCallbackHandler:choice_max_lobbies_filter(item)
 	if not managers.crimenet then
 		return
@@ -2033,12 +2064,14 @@ end
 function MenuCallbackHandler:open_contract_node(item)
 	local job_tweak = tweak_data.narrative:job_data(item:parameters().id)
 	local is_professional = job_tweak and job_tweak.professional or false
+	local is_competitive = job_tweak and job_tweak.competitive or false
 	managers.menu:open_node(Global.game_settings.single_player and "crimenet_contract_singleplayer" or "crimenet_contract_host", {
 		{
 			job_id = item:parameters().id,
-			difficulty = is_professional and "hard" or "normal",
-			difficulty_id = is_professional and 3 or 2,
+			difficulty = is_competitive and "overkill_290" or is_professional and "hard" or "normal",
+			difficulty_id = is_competitive and 6 or is_professional and 3 or 2,
 			professional = is_professional,
+			competitive = is_competitive,
 			customize_contract = true,
 			contract_visuals = job_tweak.contract_visuals
 		}
@@ -2060,6 +2093,9 @@ function MenuCallbackHandler:is_contract_difficulty_allowed(item)
 	end
 	local job_data = managers.menu:active_menu().logic:selected_node():parameters().menu_component_data
 	if not job_data.job_id then
+		return false
+	end
+	if job_data.competitive and item:value() < 6 then
 		return false
 	end
 	if job_data.professional and item:value() < 3 then
@@ -2261,12 +2297,14 @@ function MenuCallbackHandler:choice_lobby_permission(item)
 	local level_id = item:value()
 	Global.game_settings.permission = permission
 	self:update_matchmake_attributes()
+	self:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_lobby_reputation_permission(item)
 	local reputation_permission = item:value()
 	Global.game_settings.reputation_permission = reputation_permission
 	self:update_matchmake_attributes()
+	self:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_team_ai(item)
@@ -2281,6 +2319,7 @@ function MenuCallbackHandler:choice_drop_in(item)
 	if managers.network:session() then
 		managers.network:session():chk_server_joinable_state()
 	end
+	self:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_kicking_option(item)
@@ -2300,10 +2339,12 @@ end
 function MenuCallbackHandler:choice_crimenet_team_ai(item)
 	local team_ai = item:value() == "on"
 	Global.game_settings.team_ai = team_ai
+	self:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_crimenet_auto_kick(item)
 	Global.game_settings.auto_kick = item:value() == "on"
+	self:_on_host_setting_updated()
 end
 
 function MenuCallbackHandler:choice_crimenet_drop_in(item)
@@ -3213,11 +3254,19 @@ function MenuCallbackHandler:set_default_controller(item)
 		text = managers.localization:text("dialog_use_default_keys_message"),
 		callback = function()
 			managers.controller:load_settings("settings/controller_settings")
-			managers.controller:clear_user_mod()
-			managers.menu:back(true)
+			managers.controller:clear_user_mod(item:parameters().category, MenuCustomizeControllerCreator.CONTROLS_INFO)
+			local logic = managers.menu:active_menu().logic
+			if logic then
+				logic:refresh_node()
+			end
 		end
 	}
 	managers.menu:show_default_option_dialog(params)
+end
+
+function MenuCallbackHandler:choice_button_layout_category(item)
+	local node_gui = managers.menu:active_menu().renderer:active_node_gui()
+	node_gui:set_current_category(item:value())
 end
 
 function MenuCallbackHandler:debug_goto_custody()
@@ -4304,7 +4353,6 @@ function LobbyOptionInitiator:modify_node(node)
 	end
 	local reputation_permission_item = node:item("lobby_reputation_permission")
 	if reputation_permission_item then
-		print("reputation_permission_item", "set value", Global.game_settings.reputation_permission, type_name(Global.game_settings.reputation_permission))
 		reputation_permission_item:set_value(Global.game_settings.reputation_permission)
 	end
 	local item_lobby_job_plan = node:item("lobby_job_plan")
@@ -4342,7 +4390,13 @@ MenuCustomizeControllerCreator.CONTROLS = {
 	"toggle_chat",
 	"push_to_talk",
 	"cash_inspect",
-	"deploy_bipod"
+	"deploy_bipod",
+	"drive",
+	"hand_brake",
+	"vehicle_change_camera",
+	"vehicle_rear_camera",
+	"vehicle_shooting_stance",
+	"vehicle_exit"
 }
 MenuCustomizeControllerCreator.AXIS_ORDERED = {
 	move = {
@@ -4350,86 +4404,198 @@ MenuCustomizeControllerCreator.AXIS_ORDERED = {
 		"down",
 		"left",
 		"right"
+	},
+	drive = {
+		"accelerate",
+		"brake",
+		"turn_left",
+		"turn_right"
 	}
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO = {}
+MenuCustomizeControllerCreator.CONTROLS_INFO.move = {hidden = true, category = "normal"}
 MenuCustomizeControllerCreator.CONTROLS_INFO.up = {
-	text_id = "menu_button_move_forward"
+	text_id = "menu_button_move_forward",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.down = {
-	text_id = "menu_button_move_back"
+	text_id = "menu_button_move_back",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.left = {
-	text_id = "menu_button_move_left"
+	text_id = "menu_button_move_left",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.right = {
-	text_id = "menu_button_move_right"
+	text_id = "menu_button_move_right",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.primary_attack = {
-	text_id = "menu_button_fire_weapon"
+	text_id = "menu_button_fire_weapon",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.secondary_attack = {
-	text_id = "menu_button_aim_down_sight"
+	text_id = "menu_button_aim_down_sight",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.primary_choice1 = {
-	text_id = "menu_button_weapon_slot1"
+	text_id = "menu_button_weapon_slot1",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.primary_choice2 = {
-	text_id = "menu_button_weapon_slot2"
+	text_id = "menu_button_weapon_slot2",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.switch_weapon = {
-	text_id = "menu_button_switch_weapon"
+	text_id = "menu_button_switch_weapon",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.reload = {
-	text_id = "menu_button_reload"
+	text_id = "menu_button_reload",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.weapon_gadget = {
-	text_id = "menu_button_weapon_gadget"
+	text_id = "menu_button_weapon_gadget",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.run = {
-	text_id = "menu_button_sprint"
+	text_id = "menu_button_sprint",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.jump = {
-	text_id = "menu_button_jump"
+	text_id = "menu_button_jump",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.duck = {
-	text_id = "menu_button_crouch"
+	text_id = "menu_button_crouch",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.melee = {
-	text_id = "menu_button_melee"
+	text_id = "menu_button_melee",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.interact = {
-	text_id = "menu_button_shout"
+	text_id = "menu_button_shout",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.use_item = {
-	text_id = "menu_button_deploy"
+	text_id = "menu_button_deploy",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.toggle_chat = {
-	text_id = "menu_button_chat_message"
+	text_id = "menu_button_chat_message",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.push_to_talk = {
-	text_id = "menu_button_push_to_talk"
+	text_id = "menu_button_push_to_talk",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.continue = {
-	text_id = "menu_button_continue"
+	text_id = "menu_button_continue",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.throw_grenade = {
-	text_id = "menu_button_throw_grenade"
+	text_id = "menu_button_throw_grenade",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.weapon_firemode = {
-	text_id = "menu_button_weapon_firemode"
+	text_id = "menu_button_weapon_firemode",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.cash_inspect = {
-	text_id = "menu_button_cash_inspect"
+	text_id = "menu_button_cash_inspect",
+	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.deploy_bipod = {
-	text_id = "menu_button_deploy_bipod"
+	text_id = "menu_button_deploy_bipod",
+	category = "normal"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.drive = {hidden = true, category = "vehicle"}
+MenuCustomizeControllerCreator.CONTROLS_INFO.accelerate = {
+	text_id = "menu_button_accelerate",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.brake = {
+	text_id = "menu_button_brake",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.turn_left = {
+	text_id = "menu_button_turn_left",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.turn_right = {
+	text_id = "menu_button_turn_right",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.hand_brake = {
+	text_id = "menu_button_handbrake",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.vehicle_change_camera = {
+	text_id = "menu_button_vehicle_change_camera",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.vehicle_rear_camera = {
+	text_id = "menu_button_vehicle_rear_camera",
+	category = "vehicle"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.vehicle_shooting_stance = {
+	text_id = "menu_button_vehicle_shooting_stance",
+	category = "vehicle",
+	block = {"normal"}
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.vehicle_exit = {
+	text_id = "menu_button_vehicle_exit",
+	category = "vehicle"
 }
 
-function MenuCustomizeControllerCreator:modify_node(node)
-	local new_node = deep_clone(node)
+function MenuCustomizeControllerCreator.controls_info_by_category(category)
+	local t = {}
+	for _, name in ipairs(MenuCustomizeControllerCreator.CONTROLS) do
+		if MenuCustomizeControllerCreator.CONTROLS_INFO[name].category == category then
+			table.insert(t, name)
+		end
+	end
+	return t
+end
+
+function MenuCustomizeControllerCreator:modify_node(original_node, data)
+	local node = original_node
+	return self:setup_node(node)
+end
+
+function MenuCustomizeControllerCreator:refresh_node(node)
+	self:setup_node(node)
+	return node
+end
+
+function MenuCustomizeControllerCreator:setup_node(node)
+	local new_node = node
+	local controller_category = node:parameters().controller_category or "normal"
+	node:clean_items()
+	local params = {
+		name = "controller_type",
+		text_id = "menu_controller_type",
+		callback = "choice_controller_type"
+	}
+	local data_node = {
+		type = "MenuItemMultiChoice"
+	}
+	table.insert(data_node, {
+		_meta = "option",
+		text_id = "menu_controller_normal",
+		value = "normal"
+	})
+	table.insert(data_node, {
+		_meta = "option",
+		text_id = "menu_controller_vehicle",
+		value = "vehicle"
+	})
+	local new_item = node:create_item(data_node, params)
+	new_item:set_value(controller_category)
+	node:add_item(new_item)
 	local connections = managers.controller:get_settings(managers.controller:get_default_wrapper_type()):get_connection_map()
-	for _, name in ipairs(self.CONTROLS) do
+	for _, name in ipairs(self.controls_info_by_category(controller_category)) do
 		local name_id = name
 		local connection = connections[name]
 		if connection._btn_connections then
@@ -4471,7 +4637,8 @@ function MenuCustomizeControllerCreator:modify_node(node)
 	local params = {
 		name = "set_default_controller",
 		text_id = "menu_set_default_controller",
-		callback = "set_default_controller"
+		callback = "set_default_controller",
+		category = controller_category
 	}
 	local new_item = new_node:create_item(nil, params)
 	new_node:add_item(new_item)
@@ -4853,7 +5020,7 @@ end
 
 function MenuJukeboxHeistTracks:_have_music(job_id)
 	local job_tweak = tweak_data.narrative.jobs[job_id]
-	if not job_tweak or job_tweak.contact == "wip" or job_tweak.wrapped_to_job then
+	if not job_tweak or job_tweak.contact == "tests" or job_tweak.wrapped_to_job then
 		return false
 	end
 	if job_tweak.job_wrapper then
@@ -5972,7 +6139,7 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 				if not tweak_data.narrative:is_wrapped_to_job(job_id) then
 					table.insert(jobs[contact], {
 						id = job_id,
-						enabled = dlc and max_jc >= (job_tweak.jc or 0) + (job_tweak.professional and 10 or 0)
+						enabled = dlc and max_jc >= (job_tweak.jc or 0) + (job_tweak.competitive and 40 or job_tweak.professional and 10 or 0)
 					})
 				end
 			end
@@ -6094,7 +6261,7 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 		local player_stars = managers.experience:level_to_stars()
 		local max_jc = managers.job:get_max_jc_for_player()
 		local job_tweak = tweak_data.narrative:job_data(id)
-		local jc_lock = math.clamp(job_tweak.jc + (job_tweak.professional and 10 or 0), 0, 100)
+		local jc_lock = math.clamp(job_tweak.jc + (job_tweak.competitive and 40 or job_tweak.professional and 10 or 0), 0, 100)
 		local min_stars = #tweak_data.narrative.STARS
 		for i, d in ipairs(tweak_data.narrative.STARS) do
 			if jc_lock <= d.jcs[1] then
@@ -6730,7 +6897,7 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 		}
 	}
 	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "wip" then
+		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "tests" then
 			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
 			local params = {
 				_meta = "option",

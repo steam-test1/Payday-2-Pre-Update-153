@@ -71,6 +71,13 @@ function TeamAIMovement:on_SPOOCed(enemy_unit)
 	self._unit:character_damage():on_incapacitated()
 end
 
+function TeamAIMovement:is_SPOOC_attack_allowed()
+	if alive(self.vehicle_unit) then
+		return false
+	end
+	return true
+end
+
 function TeamAIMovement:on_discovered()
 	if self._cool then
 		self:_switch_to_not_cool()
@@ -168,6 +175,10 @@ function TeamAIMovement:_switch_to_not_cool_clbk_func()
 end
 
 function TeamAIMovement:zipline_unit()
+	return nil
+end
+
+function TeamAIMovement:current_state_name()
 	return nil
 end
 

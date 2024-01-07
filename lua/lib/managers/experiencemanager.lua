@@ -134,13 +134,6 @@ function ExperienceManager:mission_xp_process(stage_success, stage_final)
 		self._global.mission_xp_current = nil
 		return
 	end
-	if not stage_final then
-		local current_xp = self._global.mission_xp_current and Application:digest_value(self._global.mission_xp_current, false) or 0
-		local total_xp = self._global.mission_xp_total and Application:digest_value(self._global.mission_xp_total, false) or 0
-		self._global.mission_xp_total = Application:digest_value(total_xp + current_xp, true)
-		self._global.mission_xp_current = nil
-		return
-	end
 	self._global.mission_xp_total = nil
 	self._global.mission_xp_current = nil
 end
@@ -581,7 +574,7 @@ function ExperienceManager:get_xp_by_params(params)
 	static_stage_experience = static_stage_experience and static_stage_experience[difficulty_stars + 1]
 	stage_xp_dissect = static_stage_experience or managers.experience:get_stage_xp_by_stars(total_stars)
 	level_limit_dissect = level_limit_dissect + (static_stage_experience or managers.experience:get_stage_xp_by_stars(job_stars))
-	if success and on_last_stage then
+	if success then
 		mission_xp_dissect = params.mission_xp or self:mission_xp()
 	end
 	base_xp = job_xp_dissect + stage_xp_dissect + mission_xp_dissect

@@ -1111,8 +1111,7 @@ function BlackMarketManager:create_preload_ws()
 		for i, child in ipairs(square_panel:children()) do
 			child:set_color(progress > i and Color.white or Color(0.3, 0.3, 0.3))
 			if i == progress then
-				progress_rect:set_world_position(child:world_position())
-				progress_rect:move(-3, -3)
+				progress_rect:set_world_center(child:world_center())
 				progress_rect:show()
 			end
 		end
@@ -1142,8 +1141,8 @@ function BlackMarketManager:create_preload_ws()
 		last_rect = square_panel:rect({
 			x = x,
 			y = y,
-			w = 14,
-			h = 14,
+			w = 15,
+			h = 15,
 			color = Color(0.3, 0.3, 0.3),
 			blend_mode = "add"
 		})
@@ -1159,8 +1158,8 @@ function BlackMarketManager:create_preload_ws()
 	square_panel:set_size(max_w, max_h)
 	panel:rect({
 		name = "progress",
-		w = 20,
-		h = 20,
+		w = 19,
+		h = 19,
 		color = Color(0.3, 0.3, 0.3),
 		layer = 2,
 		blend_mode = "add"
@@ -1169,8 +1168,8 @@ function BlackMarketManager:create_preload_ws()
 		color = Color.black,
 		alpha = 0.8
 	})
-	local width = square_panel:w() + 20
-	local height = square_panel:h() + 20
+	local width = square_panel:w() + 19
+	local height = square_panel:h() + 19
 	bg:set_size(width, height)
 	bg:set_center(panel:w() / 2, panel:h() / 2)
 	square_panel:set_center(bg:center())
@@ -1818,7 +1817,7 @@ function BlackMarketManager:_calculate_weapon_concealment(weapon)
 		return 0
 	end
 	local bonus_stats = {}
-	if weapon.cosmetics and weapon.cosmetics.id and weapon.cosmetics.bonus then
+	if weapon.cosmetics and weapon.cosmetics.id and weapon.cosmetics.bonus and not managers.job:is_current_job_competitive() then
 		bonus_stats = tweak_data:get_raw_value("economy", "bonuses", tweak_data.blackmarket.weapon_skins[weapon.cosmetics.id].bonus, "stats") or {}
 	end
 	local parts_stats = managers.weapon_factory:get_stats(factory_id, blueprint)
@@ -4607,7 +4606,7 @@ function BlackMarketManager:on_equip_weapon_cosmetics(category, slot, instance_i
 		id = item_data.entry,
 		instance_id = instance_id,
 		quality = quality,
-		bonus = bonus
+		bonus = bonus or false
 	}
 	if managers.menu_scene then
 		local data = category == "primaries" and self:equipped_primary() or self:equipped_secondary()
@@ -4726,7 +4725,7 @@ function BlackMarketManager:tradable_add_item(instance_id, category, entry, qual
 		if item.category ~= category or item.entry ~= entry then
 		end
 		item.amount = amount
-	elseif category and entry and amount and category and entry and amount ~= "nil" and entry ~= "nil" and category ~= "nil" then
+	elseif category and entry and amount and category and entry and amount ~= "nil" and entry ~= "nil" and category ~= "nil" and (bonus == nil or type(bonus) == "boolean") then
 		self._global.inventory_tradable[instance_id] = {
 			category = category,
 			entry = entry,
@@ -4735,7 +4734,7 @@ function BlackMarketManager:tradable_add_item(instance_id, category, entry, qual
 			amount = amount
 		}
 	else
-		Application:error("[BlackMarketManager:tradable_add_item] Invalid tradable item detected!", "instance_id", instance_id, "category", category, "entry", entry, "amount", amount)
+		Application:error("[BlackMarketManager:tradable_add_item] Invalid tradable item detected!", "instance_id", instance_id, "category", category, "entry", entry, "bonus", bonus, "amount", amount)
 	end
 end
 

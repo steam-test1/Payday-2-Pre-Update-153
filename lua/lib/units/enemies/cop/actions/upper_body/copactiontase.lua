@@ -144,6 +144,16 @@ function CopActionTase:on_exit()
 	end
 end
 
+function CopActionTase:on_destroy()
+	if self._tase_effect then
+		World:effect_manager():fade_kill(self._tase_effect)
+	end
+	if self._malfunction_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._malfunction_clbk_id)
+		self._malfunction_clbk_id = nil
+	end
+end
+
 function CopActionTase:update(t)
 	if self._expired then
 		return

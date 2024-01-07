@@ -52,7 +52,6 @@ function ElementInstanceInputEvent:init(...)
 end
 
 function ElementInstanceInputEvent:on_created()
-	print("ElementInstanceInputEvent:on_created()")
 end
 
 function ElementInstanceInputEvent:client_on_executed(...)

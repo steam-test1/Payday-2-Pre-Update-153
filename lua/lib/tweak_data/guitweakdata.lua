@@ -426,6 +426,22 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/fbifiles/",
 		image = "guis/dlcs/gordon/textures/pd2/content_updates/gordon"
 	}
+	local rip = {
+		id = "rip",
+		name_id = "menu_content_rip",
+		desc_id = "menu_content_rip_desc",
+		date_id = "menu_content_rip_date",
+		store = 422430,
+		image = "guis/dlcs/rip/textures/pd2/content_updates/rip"
+	}
+	local berry = {
+		id = "berry",
+		name_id = "menu_content_berry",
+		desc_id = "menu_content_berry_desc",
+		date_id = "menu_content_berry_date",
+		store = 422400,
+		image = "guis/dlcs/berry/textures/pd2/content_updates/berry"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -483,7 +499,9 @@ function GuiTweakData:init()
 			turtles,
 			dragon,
 			steel,
-			gordon
+			gordon,
+			berry,
+			rip
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1682,6 +1700,15 @@ function GuiTweakData:init()
 					},
 					post_event = "butcher_quote_set_a"
 				}
+			},
+			{
+				id = "locke",
+				name_id = "heist_contact_locke",
+				{
+					desc_id = "heist_contact_locke_description",
+					videos = {"locke1"},
+					post_event = "loc_quote_set_a"
+				}
 			}
 		},
 		{
@@ -1826,6 +1853,15 @@ function GuiTweakData:init()
 					desc_id = "menu_dragon_desc_codex",
 					videos = {"dragon1"},
 					post_event = "pln_contact_jiro"
+				}
+			},
+			{
+				id = "bodhi",
+				name_id = "menu_bodhi",
+				{
+					desc_id = "menu_bodhi_desc_codex",
+					videos = {"bodhi1"},
+					post_event = "pln_contact_bodhi"
 				}
 			}
 		}

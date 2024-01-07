@@ -156,7 +156,7 @@ function MissionEndState:at_enter(old_state, params)
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, job_value_pass, phalanx_vip_alive_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, killed_by_weapons_pass, killed_by_melee_pass, killed_by_grenade_pass, civilians_killed_pass, complete_job_pass, memory_pass, all_pass, weapon_data, memory, level_id, stage, num_skills
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, job_value_pass, phalanx_vip_alive_pass, used_weapon_category_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, killed_by_weapons_pass, killed_by_melee_pass, killed_by_grenade_pass, civilians_killed_pass, complete_job_pass, memory_pass, all_pass, weapon_data, memory, level_id, stage, num_skills
 			local killed_by_weapons = managers.statistics:session_killed_by_weapons()
 			local killed_by_melee = managers.statistics:session_killed_by_melee()
 			local killed_by_grenade = managers.statistics:session_killed_by_grenade()
@@ -186,6 +186,21 @@ function MissionEndState:at_enter(old_state, params)
 				job_value_pass = not achievement_data.job_value or managers.mission:get_job_value(achievement_data.job_value.key) == achievement_data.job_value.value
 				memory_pass = not achievement_data.memory or managers.job:get_memory(achievement, achievement_data.memory.is_shortterm) == achievement_data.memory.value
 				phalanx_vip_alive_pass = not achievement_data.phalanx_vip_alive or phalanx_vip_alive
+				used_weapon_category_pass = true
+				if achievement_data.used_weapon_category then
+					local used_weapons = managers.statistics:session_used_weapons()
+					if used_weapons then
+						local category = achievement_data.used_weapon_category
+						local weapon_tweak
+						for _, weapon_id in ipairs(used_weapons) do
+							weapon_tweak = tweak_data.weapon[weapon_id]
+							if not weapon_tweak or weapon_tweak.category ~= category and (category ~= "pistol" or weapon_tweak.category ~= "akimbo") then
+								used_weapon_category_pass = false
+								break
+							end
+						end
+					end
+				end
 				killed_by_weapons_pass = not achievement_data.killed_by_weapons
 				if achievement_data.killed_by_weapons then
 					if achievement_data.killed_by_weapons == 0 then
@@ -231,7 +246,7 @@ function MissionEndState:at_enter(old_state, params)
 				if achievement_data.equipped then
 					for category, data in pairs(achievement_data.equipped) do
 						weapon_data = managers.blackmarket:equipped_item(category)
-						if category == "grenades" and data == weapon_data then
+						if (category == "grenades" or category == "armors") and data == weapon_data then
 							equipped_pass = true
 						elseif data.weapon_id and weapon_data and weapon_data.weapon_id and data.weapon_id == weapon_data.weapon_id then
 							equipped_pass = true
@@ -262,7 +277,7 @@ function MissionEndState:at_enter(old_state, params)
 				end
 				equipped_team_pass = true
 				if achievement_data.equipped_team then
-					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_masks, pass_armors, pass_characters
+					local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters
 					local ad = achievement_data.equipped_team
 					local oufit
 					for _, peer in pairs(managers.network:session():all_peers()) do
@@ -277,9 +292,11 @@ function MissionEndState:at_enter(old_state, params)
 						pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
 						pass_primaries = not ad.primaries or table.contains(ad.primaries, oufit.primary.factory_id)
 						pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
+						pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.primary.factory_id), "category")
 						pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
 						pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
 						pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
+						pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.secondary.factory_id), "category")
 						pass_characters = not ad.characters or table.contains(ad.characters, peer:character())
 						pass_skills = not ad.num_skills
 						if not pass_skills then
@@ -292,13 +309,13 @@ function MissionEndState:at_enter(old_state, params)
 						if ad.reverse_deployable then
 							pass_deployable = not pass_deployable
 						end
-						if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons) or not pass_characters then
+						if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category) or not pass_secondary_category then
 							equipped_team_pass = false
 							break
 						end
 					end
 				end
-				all_pass = job_pass and jobs_pass and level_pass and levels_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass and pass_skills and timer_pass and killed_by_weapons_pass and killed_by_melee_pass and killed_by_grenade_pass and complete_job_pass and job_value_pass and memory_pass and phalanx_vip_alive_pass
+				all_pass = job_pass and jobs_pass and level_pass and levels_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass and pass_skills and timer_pass and killed_by_weapons_pass and killed_by_melee_pass and killed_by_grenade_pass and complete_job_pass and job_value_pass and memory_pass and phalanx_vip_alive_pass and used_weapon_category_pass
 				if all_pass and achievement_data.need_full_job and managers.job:has_active_job() then
 					if not managers.job:interupt_stage() then
 						memory = managers.job:get_memory(achievement)
@@ -705,7 +722,7 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 		}
 	end
 	print("on_statistics_result end")
-	local level_id, all_pass, total_kill_pass, total_accuracy_pass, total_downed_pass, level_pass, levels_pass, num_players_pass, diff_pass
+	local level_id, all_pass, total_kill_pass, total_accuracy_pass, total_downed_pass, level_pass, levels_pass, num_players_pass, diff_pass, is_dropin_pass
 	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_statistics_achievements or {}) do
 		level_id = managers.job:has_active_job() and managers.job:current_level_id() or ""
 		diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
@@ -715,7 +732,8 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 		total_kill_pass = not achievement_data.total_kills or total_kills >= achievement_data.total_kills
 		total_accuracy_pass = not achievement_data.total_accuracy or group_accuracy >= achievement_data.total_accuracy
 		total_downed_pass = not achievement_data.total_downs or group_downs <= achievement_data.total_downs
-		all_pass = diff_pass and num_players_pass and level_pass and levels_pass and total_kill_pass and total_accuracy_pass and total_downed_pass
+		is_dropin_pass = achievement_data.is_dropin == nil or achievement_data.is_dropin == managers.statistics:is_dropin()
+		all_pass = diff_pass and num_players_pass and level_pass and levels_pass and total_kill_pass and total_accuracy_pass and total_downed_pass and is_dropin_pass
 		if all_pass then
 			if achievement_data.stat then
 				managers.achievment:award_progress(achievement_data.stat)
