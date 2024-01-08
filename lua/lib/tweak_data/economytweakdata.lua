@@ -298,6 +298,34 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.event_flake_legendary.rarity = "legendary"
+	self.contents.event_bah = {}
+	self.contents.event_bah.def_id = 10014
+	self.contents.event_bah.contains = {
+		weapon_skins = {
+			"ak5_baaah",
+			"wa2000_baaah",
+			"r870_baaah",
+			"x_g22c_baaah",
+			"usp_baaah",
+			"polymer_baaah",
+			"m16_baaah",
+			"m249_baaah",
+			"x_1911_baaah",
+			"ksg_baaah"
+		},
+		contents = {
+			"event_bah_legendary"
+		}
+	}
+	self.contents.event_bah.type = "limited"
+	self.contents.event_bah_legendary = {}
+	self.contents.event_bah_legendary.def_id = 10015
+	self.contents.event_bah_legendary.contains = {
+		weapon_skins = {
+			"model70_baaah"
+		}
+	}
+	self.contents.event_bah_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -362,6 +390,15 @@ function EconomyTweakData:init()
 	self.safes.event_flake.unit_name = "units/payday2_cash/safes/flake/safe/eco_safe_event_flake"
 	self.safes.event_flake.texture_bundle_folder = "cash/safes/flake"
 	self.safes.event_flake.achievement = "flake_1"
+	self.safes.event_bah = {}
+	self.safes.event_bah.def_id = 50008
+	self.safes.event_bah.promo = true
+	self.safes.event_bah.drill = "event_bah"
+	self.safes.event_bah.content = "event_bah"
+	self.safes.event_bah.unit_name = "units/payday2_cash/safes/bah/safe/eco_safe_bah"
+	self.safes.event_bah.name_id = "bm_menu_safe_event_bah"
+	self.safes.event_bah.texture_bundle_folder = "cash/safes/bah"
+	self.safes.event_bah.achievement = "bah_1"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -430,6 +467,15 @@ function EconomyTweakData:init()
 	self.drills.event_flake.desc_id = "bm_menu_drill_event_flake_desc"
 	self.drills.event_flake.texture_bundle_folder = "cash/safes/flake"
 	self.drills.event_flake.achievement = "flake_1"
+	self.drills.event_bah = {}
+	self.drills.event_bah.def_id = 70008
+	self.drills.event_bah.safe = "event_bah"
+	self.drills.event_bah.promo = true
+	self.drills.event_bah.unit_name = "units/payday2_cash/safes/bah/drill/eco_drill_bah"
+	self.drills.event_bah.name_id = "bm_menu_drill_event_bah"
+	self.drills.event_bah.desc_id = "bm_menu_drill_event_bah_desc"
+	self.drills.event_bah.texture_bundle_folder = "cash/safes/bah"
+	self.drills.event_bah.achievement = "bah_1"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

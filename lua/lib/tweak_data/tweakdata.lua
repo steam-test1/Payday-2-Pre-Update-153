@@ -2777,6 +2777,7 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.job_list.classic = {"red2", "dinner"}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
+	self.achievement.job_list.events = {"nail"}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self.achievement.job_list.bain, "roberts")
 	end
@@ -3002,6 +3003,12 @@ Play the full version soon to get your full PAYDAY!]],
 				drills = {
 					"event_flake"
 				}
+			}
+		},
+		bah_1 = {
+			rewards = {
+				safes = {"event_bah"},
+				drills = {"event_bah"}
 			}
 		}
 	}

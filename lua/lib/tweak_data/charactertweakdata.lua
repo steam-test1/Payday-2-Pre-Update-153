@@ -334,7 +334,6 @@ function CharacterTweakData:_init_sniper(presets)
 	self.sniper.speech_prefix_p1 = "l"
 	self.sniper.speech_prefix_p2 = "n"
 	self.sniper.speech_prefix_count = 4
-	self.sniper.priority_shout = "f34"
 	self.sniper.access = "sniper"
 	self.sniper.no_retreat = true
 	self.sniper.no_arrest = true
@@ -802,7 +801,6 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.speech_prefix_p1 = "bdz"
 	self.tank.speech_prefix_p2 = nil
 	self.tank.speech_prefix_count = nil
-	self.tank.priority_shout = "f30"
 	self.tank.rescue_hostages = false
 	self.tank.deathguard = true
 	self.tank.melee_weapon = "fists"
@@ -906,8 +904,6 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.surrender_break_time = {4, 6}
 	self.spooc.suppression = nil
 	self.spooc.surrender = presets.surrender.special
-	self.spooc.priority_shout = "f33"
-	self.spooc.priority_shout_max_dis = 700
 	self.spooc.rescue_hostages = false
 	self.spooc.spooc_attack_timeout = {10, 10}
 	self.spooc.spooc_attack_beating_time = {3, 3}
@@ -961,7 +957,6 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.ecm_hurts = {
 		ears = {min_duration = 7, max_duration = 9}
 	}
-	self.shield.priority_shout = "f31"
 	self.shield.rescue_hostages = false
 	self.shield.deathguard = false
 	self.shield.no_equip_anim = true
@@ -1154,7 +1149,6 @@ function CharacterTweakData:_init_phalanx_minion(presets)
 	self.phalanx_minion.damage.shield_knocked = false
 	self.phalanx_minion.ecm_vulnerability = nil
 	self.phalanx_minion.ecm_hurts = {}
-	self.phalanx_minion.priority_shout = "f45"
 end
 
 function CharacterTweakData:_init_phalanx_vip(presets)
@@ -1273,7 +1267,6 @@ function CharacterTweakData:_init_taser(presets)
 	self.taser.speech_prefix_count = nil
 	self.taser.access = "taser"
 	self.taser.dodge = presets.dodge.athletic
-	self.taser.priority_shout = "f32"
 	self.taser.rescue_hostages = false
 	self.taser.deathguard = true
 	self.taser.chatter = {

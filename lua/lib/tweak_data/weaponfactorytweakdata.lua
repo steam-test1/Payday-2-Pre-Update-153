@@ -24173,7 +24173,9 @@ function WeaponFactoryTweakData:_init_model70()
 		"wpn_fps_upg_fl_ass_smg_sho_surefire",
 		"wpn_fps_upg_fl_ass_utg",
 		"wpn_fps_upg_fl_ass_peq15",
-		"wpn_fps_upg_fl_ass_laser"
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_snp_model70_b_legend",
+		"wpn_fps_snp_model70_s_legend"
 	}
 	self.wpn_fps_snp_model70_npc = deep_clone(self.wpn_fps_snp_model70)
 	self.wpn_fps_snp_model70_npc.unit = "units/pd2_dlc_berry/weapons/wpn_fps_snp_model70/wpn_fps_snp_model70_npc"
@@ -24378,6 +24380,36 @@ function WeaponFactoryTweakData:_init_legendary()
 	}
 	self.parts.wpn_fps_pis_1911_g_legendary.third_unit = "units/payday2_cash/safes/flake/weapons/wpn_fps_pis_1911_g_legendary/wpn_third_pis_1911_g_legendary"
 	self.parts.wpn_fps_pis_1911_fl_legendary.third_unit = "units/payday2_cash/safes/flake/weapons/wpn_fps_pis_1911_fl_legendary/wpn_third_pis_1911_fl_legendary"
+	self.parts.wpn_fps_snp_model70_b_legend = {
+		type = "barrel",
+		name_id = "bm_wp_model70_b_standard",
+		texture_bundle_folder = "berry",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/bah/weapons/wpn_fps_snp_model70_legendary_pts/wpn_fps_snp_model70_b_legend",
+		stats = {value = 1},
+		unatainable = true,
+		stance_mod = {
+			wpn_fps_snp_model70 = {
+				translation = Vector3(0, -5, 0)
+			}
+		}
+	}
+	self.parts.wpn_fps_snp_model70_s_legend = {
+		type = "stock",
+		name_id = "bm_wp_model70_s_standard",
+		texture_bundle_folder = "berry",
+		a_obj = "a_s",
+		unit = "units/payday2_cash/safes/bah/weapons/wpn_fps_snp_model70_legendary_pts/wpn_fps_snp_model70_s_legend",
+		stats = {
+			value = 1,
+			spread = 3,
+			concealment = 1,
+			recoil = 1
+		},
+		unatainable = true
+	}
+	self.parts.wpn_fps_snp_model70_b_legend.third_unit = "units/payday2_cash/safes/bah/weapons/wpn_fps_snp_model70_legendary_pts/wpn_third_snp_model70_b_legend"
+	self.parts.wpn_fps_snp_model70_s_legend.third_unit = "units/payday2_cash/safes/bah/weapons/wpn_fps_snp_model70_legendary_pts/wpn_third_snp_model70_s_legend"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()
