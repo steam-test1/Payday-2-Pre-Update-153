@@ -1,4 +1,5 @@
 AmmoBagBase = AmmoBagBase or class(UnitBase)
+local dec_mul = 1000000
 
 function AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, peer_id)
 	local unit_name = "units/payday2/equipment/gen_equipment_ammobag/gen_equipment_ammobag"
@@ -116,7 +117,6 @@ function AmmoBagBase:take_ammo(unit)
 		unit:sound():play("pickup_ammo")
 		managers.network:session():send_to_peers_synched("sync_ammo_bag_ammo_taken", self._unit, taken)
 	end
-	print("Ammo Bag: " .. taken .. " ammo was taken and " .. self._ammo_amount .. " remains.")
 	if 0 >= self._ammo_amount then
 		self:_set_empty()
 	else
@@ -136,7 +136,7 @@ function AmmoBagBase:_set_visual_stage()
 end
 
 function AmmoBagBase:sync_ammo_taken(amount)
-	self._ammo_amount = self._ammo_amount - amount
+	self._ammo_amount = math.floor((self._ammo_amount - amount) * dec_mul) / dec_mul
 	if self._ammo_amount <= 0 then
 		self:_set_empty()
 	else
@@ -147,12 +147,11 @@ end
 function AmmoBagBase:_take_ammo(unit)
 	local taken = 0
 	local inventory = unit:inventory()
-	local mult = 1000000
 	if inventory then
 		for _, weapon in pairs(inventory:available_selections()) do
 			local took = weapon.unit:base():add_ammo_from_bag(self._ammo_amount)
 			taken = taken + took
-			self._ammo_amount = math.floor((self._ammo_amount - took) * mult) / mult
+			self._ammo_amount = math.floor((self._ammo_amount - took) * dec_mul) / dec_mul
 			if 0 >= self._ammo_amount then
 				self:_set_empty()
 				return taken

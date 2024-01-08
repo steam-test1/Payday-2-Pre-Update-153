@@ -4413,6 +4413,22 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.dbd_clan_award = {}
+	self.dbd_clan_award.content = {}
+	self.dbd_clan_award.dlc = "has_dbd_clan"
+	self.dbd_clan_award.content.loot_global_value = "dbd_clan"
+	self.dbd_clan_award.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "devourer",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "unborn",
+			amount = 1
+		}
+	}
 	self.pdcon_2015 = {}
 	self.pdcon_2015.dlc = "has_pdcon_2015"
 	self.pdcon_2015.content = {}

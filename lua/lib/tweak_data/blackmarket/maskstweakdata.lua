@@ -2445,6 +2445,20 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.fancy_goat.sort_number = 14
 	self.masks.fancy_goat.dlc = "peta"
 	self.masks.fancy_goat.texture_bundle_folder = "peta"
+	self.masks.devourer = {}
+	self.masks.devourer.unit = "units/pd2_dlc_dbd_community/masks/devourer/msk_devourer"
+	self.masks.devourer.name_id = "bm_msk_devourer"
+	self.masks.devourer.pcs = {}
+	self.masks.devourer.value = 0
+	self.masks.devourer.dlc = "dbd_clan"
+	self.masks.devourer.texture_bundle_folder = "daylight"
+	self.masks.unborn = {}
+	self.masks.unborn.unit = "units/pd2_dlc_dbd_community/masks/unborn/msk_unborn"
+	self.masks.unborn.name_id = "bm_msk_unborn"
+	self.masks.unborn.pcs = {}
+	self.masks.unborn.value = 0
+	self.masks.unborn.dlc = "dbd_clan"
+	self.masks.unborn.texture_bundle_folder = "daylight"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"

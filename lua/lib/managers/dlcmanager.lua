@@ -570,6 +570,10 @@ function GenericDLCManager:has_peta()
 	return Global.dlc_manager.all_dlc_data.peta and Global.dlc_manager.all_dlc_data.peta.verified
 end
 
+function GenericDLCManager:has_dbd_clan()
+	return Global.dlc_manager.all_dlc_data.dbd_clan and Global.dlc_manager.all_dlc_data.dbd_clan.verified
+end
+
 function GenericDLCManager:has_achievement(data)
 	local achievement = managers.achievment and data and data.achievement_id and managers.achievment:get_info(data.achievement_id)
 	return achievement and achievement.awarded or false
@@ -1368,6 +1372,9 @@ function WINDLCManager:init()
 			peta = {app_id = "433730", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
+			},
+			dbd_clan = {
+				source_id = "103582791441335905"
 			}
 		}
 		self:_verify_dlcs()
