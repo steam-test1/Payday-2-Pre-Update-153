@@ -320,7 +320,7 @@ function CharacterTweakData:_init_sniper(presets)
 	self.sniper.experience = {}
 	self.sniper.weapon = presets.weapon.sniper
 	self.sniper.detection = presets.detection.sniper
-	self.sniper.HEALTH_INIT = 4
+	self.sniper.HEALTH_INIT = 3.4
 	self.sniper.headshot_dmg_mul = self.sniper.HEALTH_INIT / 2
 	self.sniper.move_speed = presets.move_speed.normal
 	self.sniper.shooting_death = false
@@ -779,7 +779,7 @@ function CharacterTweakData:_init_tank(presets)
 	}
 	self:_process_weapon_usage_table(self.tank.weapon)
 	self.tank.detection = presets.detection.normal
-	self.tank.HEALTH_INIT = 550
+	self.tank.HEALTH_INIT = 467.5
 	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
 	self.tank.damage.explosion_damage_mul = 1
 	self.tank.move_speed = presets.move_speed.very_slow
@@ -895,7 +895,7 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.experience = {}
 	self.spooc.weapon = deep_clone(presets.weapon.good)
 	self.spooc.detection = presets.detection.normal
-	self.spooc.HEALTH_INIT = 60
+	self.spooc.HEALTH_INIT = 51
 	self.spooc.headshot_dmg_mul = self.spooc.HEALTH_INIT / 14
 	self.spooc.move_speed = presets.move_speed.lightning
 	self.spooc.no_retreat = true
@@ -942,7 +942,7 @@ function CharacterTweakData:_init_shield(presets)
 	self.shield.experience = {}
 	self.shield.weapon = deep_clone(presets.weapon.normal)
 	self.shield.detection = presets.detection.normal
-	self.shield.HEALTH_INIT = 10
+	self.shield.HEALTH_INIT = 8.5
 	self.shield.headshot_dmg_mul = self.shield.HEALTH_INIT / 6
 	self.shield.allowed_stances = {cbt = true}
 	self.shield.allowed_poses = {crouch = true}
@@ -1141,7 +1141,7 @@ function CharacterTweakData:_init_phalanx_minion(presets)
 	self.phalanx_minion.weapon = deep_clone(presets.weapon.normal)
 	self.phalanx_minion.detection = presets.detection.normal
 	self.phalanx_minion.headshot_dmg_mul = 5
-	self.phalanx_minion.HEALTH_INIT = 150
+	self.phalanx_minion.HEALTH_INIT = 127.5
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 70
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
 	self.phalanx_minion.damage.explosion_damage_mul = 6
@@ -1155,7 +1155,7 @@ function CharacterTweakData:_init_phalanx_vip(presets)
 	self.phalanx_vip = deep_clone(self.phalanx_minion)
 	self.phalanx_vip.LOWER_HEALTH_PERCENTAGE_LIMIT = 1
 	self.phalanx_vip.FINAL_LOWER_HEALTH_PERCENTAGE_LIMIT = 0.2
-	self.phalanx_vip.HEALTH_INIT = 300
+	self.phalanx_vip.HEALTH_INIT = 255
 	self.phalanx_vip.DAMAGE_CLAMP_BULLET = 100
 	self.phalanx_vip.DAMAGE_CLAMP_EXPLOSION = self.phalanx_vip.DAMAGE_CLAMP_BULLET
 	self.phalanx_vip.can_be_tased = false
@@ -1248,7 +1248,7 @@ function CharacterTweakData:_init_taser(presets)
 		}
 	}
 	self.taser.detection = presets.detection.normal
-	self.taser.HEALTH_INIT = 36
+	self.taser.HEALTH_INIT = 30.6
 	self.taser.headshot_dmg_mul = self.taser.HEALTH_INIT / 20
 	self.taser.move_speed = presets.move_speed.fast
 	self.taser.no_retreat = true
@@ -5752,10 +5752,10 @@ function CharacterTweakData:_set_overkill()
 	}
 	self.hector_boss.HEALTH_INIT = 300
 	self.mobster_boss.HEALTH_INIT = 300
-	self.phalanx_minion.HEALTH_INIT = 150
+	self.phalanx_minion.HEALTH_INIT = 127.5
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 15
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
-	self.phalanx_vip.HEALTH_INIT = 300
+	self.phalanx_vip.HEALTH_INIT = 255
 	self.phalanx_vip.DAMAGE_CLAMP_BULLET = 30
 	self.phalanx_vip.DAMAGE_CLAMP_EXPLOSION = self.phalanx_vip.DAMAGE_CLAMP_BULLET
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
@@ -5875,10 +5875,10 @@ function CharacterTweakData:_set_overkill_145()
 	}
 	self.hector_boss.HEALTH_INIT = 600
 	self.mobster_boss.HEALTH_INIT = 600
-	self.phalanx_minion.HEALTH_INIT = 300
+	self.phalanx_minion.HEALTH_INIT = 255
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 30
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
-	self.phalanx_vip.HEALTH_INIT = 600
+	self.phalanx_vip.HEALTH_INIT = 510
 	self.phalanx_vip.DAMAGE_CLAMP_BULLET = 60
 	self.phalanx_vip.DAMAGE_CLAMP_EXPLOSION = self.phalanx_vip.DAMAGE_CLAMP_BULLET
 	self:_multiply_all_speeds(1.05, 1.05)
@@ -6380,10 +6380,10 @@ function CharacterTweakData:_set_overkill_290()
 	self.shield.weapon.mp9.focus_dis = 200
 	self.tank.weapon.saiga.focus_dis = 200
 	self.tank.weapon.r870.focus_dis = 200
-	self.phalanx_minion.HEALTH_INIT = 400
+	self.phalanx_minion.HEALTH_INIT = 340
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 40
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
-	self.phalanx_vip.HEALTH_INIT = 800
+	self.phalanx_vip.HEALTH_INIT = 680
 	self.phalanx_vip.DAMAGE_CLAMP_BULLET = 80
 	self.phalanx_vip.DAMAGE_CLAMP_EXPLOSION = self.phalanx_vip.DAMAGE_CLAMP_BULLET
 	self.flashbang_multiplier = 2
