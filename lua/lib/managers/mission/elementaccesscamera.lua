@@ -98,6 +98,39 @@ function ElementAccessCamera:camera_position()
 	return self:value("position")
 end
 
+function ElementAccessCamera:camera_rotation()
+	return self:value("rotation")
+end
+
+function ElementAccessCamera:is_moving()
+	return alive(self._camera_unit) and self._camera_unit:base() and self._camera_unit:base().update_position
+end
+
+function ElementAccessCamera:m_camera_rotation(m_rot)
+	if not m_rot then
+		return self:camera_rotation()
+	end
+	if alive(self._camera_unit) then
+		self._camera_unit:get_object(Idstring("CameraLens")):m_rotation(m_rot)
+		return m_rot
+	end
+	mrotation.set_zero(m_rot)
+	mrotation.multiply(m_rot, self:value("rotation"))
+	return m_rot
+end
+
+function ElementAccessCamera:m_camera_position(m_vec)
+	if not m_vec then
+		return self:camera_position()
+	end
+	if alive(self._camera_unit) then
+		self._camera_unit:get_object(Idstring("CameraLens")):m_position(m_vec)
+		return m_vec
+	end
+	mvector3.set(m_vec, self:value("position"))
+	return m_vec
+end
+
 function ElementAccessCamera:save(data)
 	data.enabled = self._values.enabled
 	data.destroyed = self._values.destroyed

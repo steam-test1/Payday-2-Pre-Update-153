@@ -1013,6 +1013,7 @@ function MenuCallbackHandler:got_new_steam_lootdrop(item)
 end
 
 function MenuCallbackHandler:leave_steam_inventory(item)
+	MenuCallbackHandler:leave_blackmarket(item)
 end
 
 function MenuCallbackHandler:can_toggle_chat()

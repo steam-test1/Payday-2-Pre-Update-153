@@ -426,7 +426,12 @@ function StatisticsTweakData:statistics_table()
 		"divided",
 		"viking",
 		"nutcracker",
-		"horned_king"
+		"horned_king",
+		"hunter",
+		"megacthulhu",
+		"cop_skull",
+		"cop_plague_doctor",
+		"cop_kawaii"
 	}
 	local weapon_list = {
 		"ak5",

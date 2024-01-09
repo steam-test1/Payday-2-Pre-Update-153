@@ -805,7 +805,7 @@ end
 
 function TeamAILogicIdle.mark_sneak_char(data, criminal, to_mark, play_sound, play_action)
 	if play_sound then
-		criminal:sound():say(to_mark:base():char_tweak().silent_priority_shout .. "x_any", nil, true)
+		criminal:sound():say(to_mark:base():char_tweak().silent_priority_shout .. "x_any", true, false)
 	end
 	if play_action and not criminal:movement():chk_action_forbidden("action") then
 		local new_action = {

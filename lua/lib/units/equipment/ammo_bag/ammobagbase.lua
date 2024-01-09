@@ -115,6 +115,9 @@ function AmmoBagBase:take_ammo(unit)
 	local taken = self:_take_ammo(unit)
 	if 0 < taken then
 		unit:sound():play("pickup_ammo")
+		if 0 >= self._ammo_amount then
+			taken = 1
+		end
 		managers.network:session():send_to_peers_synched("sync_ammo_bag_ammo_taken", self._unit, taken)
 	end
 	if 0 >= self._ammo_amount then

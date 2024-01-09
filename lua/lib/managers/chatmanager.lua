@@ -1248,6 +1248,16 @@ function ChatGui:update_key_down(o, k)
 			text:replace_text("")
 			if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
 			end
+		elseif self._key_pressed == Idstring("insert") then
+			local clipboard = Application:get_clipboard() or ""
+			text:replace_text(clipboard)
+			local lbs = text:line_breaks()
+			if 1 < #lbs then
+				local s = lbs[2]
+				local e = utf8.len(text:text())
+				text:set_selection(s, e)
+				text:replace_text("")
+			end
 		elseif self._key_pressed == Idstring("left") then
 			if s < e then
 				text:set_selection(s, s)
@@ -1305,6 +1315,16 @@ function ChatGui:key_press(o, k)
 		end
 		text:replace_text("")
 		if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
+		end
+	elseif k == Idstring("insert") then
+		local clipboard = Application:get_clipboard() or ""
+		text:replace_text(clipboard)
+		local lbs = text:line_breaks()
+		if 1 < #lbs then
+			local s = lbs[2]
+			local e = utf8.len(text:text())
+			text:set_selection(s, e)
+			text:replace_text("")
 		end
 	elseif k == Idstring("left") then
 		if s < e then

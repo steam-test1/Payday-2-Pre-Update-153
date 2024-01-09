@@ -80,7 +80,7 @@ function PlayerSound:play_whizby(params)
 	self:_play("bullet_whizby_medium")
 end
 
-function PlayerSound:say(sound_name, important_say, sync)
+function PlayerSound:say(sound_name, sync, important_say)
 	if self._last_speech and self._speaking then
 		self._last_speech:stop()
 		self._speaking = nil

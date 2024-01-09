@@ -2,6 +2,8 @@ require("lib/states/GameState")
 IngameAccessCamera = IngameAccessCamera or class(IngamePlayerBaseState)
 IngameAccessCamera.GUI_SAFERECT = Idstring("guis/access_camera_saferect")
 IngameAccessCamera.GUI_FULLSCREEN = Idstring("guis/access_camera_fullrect")
+local tmp_vec1 = Vector3()
+local tmp_rot1 = Rotation()
 
 function IngameAccessCamera:init(game_state_machine)
 	IngameAccessCamera.super.init(self, "ingame_access_camera", game_state_machine)
@@ -124,6 +126,17 @@ function IngameAccessCamera:update(t, dt)
 	end
 	t = managers.player:player_timer():time()
 	dt = managers.player:player_timer():delta_time()
+	local roll = 0
+	local access_camera = self._cameras[self._camera_data.index].access_camera
+	if access_camera and access_camera.is_moving and access_camera:is_moving() then
+		local m_rot = self._cam_unit:camera():get_original_rotation()
+		if m_rot then
+			access_camera:m_camera_rotation(m_rot)
+		end
+		access_camera:m_camera_position(tmp_vec1)
+		self._cam_unit:set_position(tmp_vec1)
+		roll = mrotation.roll(m_rot)
+	end
 	local look_d = self._controller:get_input_axis("look")
 	local zoomed_value = self._cam_unit:camera():zoomed_value()
 	self._target_yaw = self._target_yaw - look_d.x * zoomed_value
@@ -136,12 +149,11 @@ function IngameAccessCamera:update(t, dt)
 	end
 	self._yaw = math.step(self._yaw, self._target_yaw, dt * 10)
 	self._pitch = math.step(self._pitch, self._target_pitch, dt * 10)
-	self._cam_unit:camera():set_offset_rotation(self._yaw, self._pitch)
+	self._cam_unit:camera():set_offset_rotation(self._yaw, self._pitch, roll)
 	local move_d = self._controller:get_input_axis("move")
 	self._cam_unit:camera():modify_fov(-move_d.y * (dt * 12))
 	if self._do_show_camera then
 		self._do_show_camera = false
-		local access_camera = self._cameras[self._camera_data.index].access_camera
 		managers.hud:set_access_camera_destroyed(access_camera:value("destroyed"))
 	end
 	local units = World:find_units_quick("all", 3, 16, 21, managers.slot:get_mask("enemies"))

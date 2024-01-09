@@ -188,7 +188,7 @@ function PlayerProfileGuiObject:init(ws)
 	max_right_len = math.max(max_right_len, hoxton_text:w())
 	self._panel = panel
 	self._panel:set_size(exp_ring:w() + max_left_len + 15 + max_right_len + 10, math.max(skill_text and skill_text:bottom() or total_money_text:bottom(), hoxton_text:bottom()) + 8)
-	self._panel:set_bottom(self._panel:parent():h() - 70)
+	self._panel:set_bottom(self._panel:parent():h() - 60)
 	BoxGuiObject:new(self._panel, {
 		sides = {
 			1,

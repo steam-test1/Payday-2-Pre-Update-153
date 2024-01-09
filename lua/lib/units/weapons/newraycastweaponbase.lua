@@ -237,10 +237,11 @@ function NewRaycastWeaponBase:check_highlight_unit(unit)
 		return
 	end
 	unit = unit:in_slot(8) and alive(unit:parent()) and unit:parent() or unit
-	if not unit:in_slot(managers.slot:get_mask("enemies")) then
+	if not unit:in_slot(managers.slot:get_mask("enemies")) and (not unit:base() or not unit:base().is_security_camera) then
 		return
 	end
-	if unit:base()._tweak_table and (managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout) then
+	local highlight = not (not unit:base().is_security_camera and unit:base()._tweak_table) or managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout
+	if highlight then
 		managers.game_play_central:auto_highlight_enemy(unit, true)
 	end
 end

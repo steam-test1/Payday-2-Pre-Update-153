@@ -399,6 +399,18 @@ function PlayerManager:local_player()
 	return self:player_unit()
 end
 
+function PlayerManager:num_players_with_more_health()
+	local num_players = 0
+	local count = #self._player_list
+	local local_health = self:player_unit():character_damage():health_ratio_100()
+	for i = 1, count do
+		if local_health < self._player_list[i].health then
+			num_players = num_players + 1
+		end
+	end
+	return num_players
+end
+
 function PlayerManager:warp_to(pos, rot, id)
 	local player = self._players[id or 1]
 	if alive(player) then
@@ -745,6 +757,20 @@ function PlayerManager:has_activate_temporary_upgrade(category, upgrade)
 		return false
 	end
 	return self._temporary_upgrades[category][upgrade].expire_time > Application:time()
+end
+
+function PlayerManager:has_inactivate_temporary_upgrade(category, upgrade)
+	local upgrade_value = self:upgrade_value(category, upgrade)
+	if upgrade_value == 0 then
+		return false
+	end
+	if not self._temporary_upgrades[category] then
+		return true
+	end
+	if not self._temporary_upgrades[category][upgrade] then
+		return true
+	end
+	return self._temporary_upgrades[category][upgrade].expire_time <= Application:time()
 end
 
 function PlayerManager:get_activate_temporary_expire_time(category, upgrade)
@@ -1150,6 +1176,15 @@ function PlayerManager:damage_reduction_skill_multiplier(damage_type, current_st
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "passive_revive_damage_reduction", 1)
 	multiplier = multiplier * self:get_hostage_bonus_multiplier("damage_dampener")
+	local dmg_red_mul = self:team_upgrade_value("damage_dampener", "team_damage_reduction", 1)
+	if self:has_category_upgrade("player", "passive_damage_reduction") then
+		local health_ratio = self:player_unit():character_damage():health_ratio()
+		local min_ratio = self:upgrade_value("player", "passive_damage_reduction")
+		if health_ratio < min_ratio then
+			dmg_red_mul = dmg_red_mul - (1 - dmg_red_mul)
+		end
+	end
+	multiplier = multiplier * dmg_red_mul
 	if damage_type == "melee" then
 		multiplier = multiplier * managers.player:upgrade_value("player", "melee_damage_dampener", 1)
 	end

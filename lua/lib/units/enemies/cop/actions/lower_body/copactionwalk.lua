@@ -1157,7 +1157,7 @@ function CopActionWalk:on_attention(attention)
 			if attention.unit then
 				self._attention_pos = attention.unit:movement():m_pos()
 			else
-				self._attention_pos = attention.pos
+				self._attention_pos = false
 			end
 		end
 	else

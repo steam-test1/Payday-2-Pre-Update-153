@@ -31,6 +31,9 @@ function PlayerDamage:init(unit)
 	self._doh_data = tweak_data.upgrades.damage_to_hot_data or {}
 	self._damage_to_hot_stack = {}
 	self._armor_stored_health = 0
+	self._can_take_dmg_timer = 0
+	self._regen_on_the_side_timer = 0
+	self._regen_on_the_side = false
 end
 
 function PlayerDamage:post_init()
@@ -60,6 +63,8 @@ function PlayerDamage:force_into_bleedout()
 end
 
 function PlayerDamage:update(unit, t, dt)
+	self:_update_can_take_dmg_timer(dt)
+	self:_update_regen_on_the_side(dt)
 	if not self._armor_stored_health_max_set then
 		self._armor_stored_health_max_set = true
 		self:update_armor_stored_health()
@@ -477,6 +482,9 @@ end
 local mvec1 = Vector3()
 
 function PlayerDamage:damage_melee(attack_data)
+	if not self:_chk_can_take_dmg() then
+		return
+	end
 	local can_counter_strike = managers.player:has_category_upgrade("player", "counter_strike_melee")
 	if can_counter_strike and self._unit:movement():current_state().in_melee and self._unit:movement():current_state():in_melee() then
 		self._unit:movement():current_state():discharge_melee()
@@ -537,6 +545,9 @@ function PlayerDamage:clbk_kill_taunt(attack_data)
 end
 
 function PlayerDamage:damage_bullet(attack_data)
+	if not self:_chk_can_take_dmg() then
+		return
+	end
 	local damage_info = {
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
@@ -643,6 +654,11 @@ function PlayerDamage:_calc_armor_damage(attack_data)
 			self._unit:sound():play("player_armor_gone_stinger")
 			if attack_data.armor_piercing then
 				self._unit:sound():play("player_sniper_hit_armor_gone")
+			end
+			self:_start_regen_on_the_side(managers.player:upgrade_value("player", "passive_always_regen_armor", 0))
+			if managers.player:has_inactivate_temporary_upgrade("temporary", "armor_break_invulnerable") then
+				managers.player:activate_temporary_upgrade("temporary", "armor_break_invulnerable")
+				self._can_take_dmg_timer = managers.player:temporary_upgrade_value("temporary", "armor_break_invulnerable", 0)
 			end
 		end
 	end
@@ -799,6 +815,9 @@ function PlayerDamage:damage_fall(data)
 end
 
 function PlayerDamage:damage_explosion(attack_data)
+	if not self:_chk_can_take_dmg() then
+		return
+	end
 	local damage_info = {
 		result = {type = "hurt", variant = "explosion"}
 	}
@@ -825,6 +844,9 @@ function PlayerDamage:damage_explosion(attack_data)
 end
 
 function PlayerDamage:damage_fire(attack_data)
+	if not self:_chk_can_take_dmg() then
+		return
+	end
 	local damage_info = {
 		result = {type = "hurt", variant = "fire"}
 	}
@@ -1500,6 +1522,31 @@ function PlayerDamage:_stop_tinnitus()
 	end
 	self._unit:sound():play("tinnitus_beep_stop")
 	self._tinnitus_data = nil
+end
+
+function PlayerDamage:_chk_can_take_dmg()
+	return self._can_take_dmg_timer <= 0
+end
+
+function PlayerDamage:_update_can_take_dmg_timer(dt)
+	self._can_take_dmg_timer = math.max(self._can_take_dmg_timer - dt, 0)
+end
+
+function PlayerDamage:_start_regen_on_the_side(time)
+	if self._regen_on_the_side_timer <= 0 and 0 < time then
+		self._regen_on_the_side_timer = time
+		self._regen_on_the_side = true
+	end
+end
+
+function PlayerDamage:_update_regen_on_the_side(dt)
+	if self._regen_on_the_side then
+		self._regen_on_the_side_timer = math.max(self._regen_on_the_side_timer - dt, 0)
+		if self._regen_on_the_side_timer <= 0 then
+			self._regen_on_the_side = false
+			self:_regenerate_armor()
+		end
+	end
 end
 
 PlayerBodyDamage = PlayerBodyDamage or class()

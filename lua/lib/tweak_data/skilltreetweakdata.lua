@@ -2151,7 +2151,8 @@ function SkillTreeTweakData:init()
 			desc_id = "menu_st_spec_1_desc",
 			{
 				upgrades = {
-					"player_passive_health_multiplier_1"
+					"team_damage_reduction_1",
+					"player_passive_damage_reduction_1"
 				},
 				cost = 200,
 				icon_xy = {0, 0},
@@ -2172,7 +2173,8 @@ function SkillTreeTweakData:init()
 			deck4,
 			{
 				upgrades = {
-					"team_passive_health_multiplier"
+					"team_passive_health_multiplier",
+					"player_passive_health_multiplier_1"
 				},
 				cost = 1000,
 				icon_xy = {4, 0},
@@ -2296,7 +2298,8 @@ function SkillTreeTweakData:init()
 			deck6,
 			{
 				upgrades = {
-					"player_armor_regen_timer_multiplier_passive"
+					"player_armor_regen_timer_multiplier_passive",
+					"temporary_armor_break_invulnerable_1"
 				},
 				cost = 2400,
 				icon_xy = {6, 1},
@@ -2388,8 +2391,8 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_2",
-					"player_perk_armor_loss_multiplier_1",
-					"akimbo_recoil_index_addend_1",
+					"akimbo_recoil_index_addend_2",
+					"akimbo_extra_ammo_multiplier_1",
 					"jowi",
 					"x_1911",
 					"x_b92fs",
@@ -2406,8 +2409,7 @@ function SkillTreeTweakData:init()
 			deck4,
 			{
 				upgrades = {
-					"player_perk_armor_regen_timer_multiplier_3",
-					"player_perk_armor_loss_multiplier_2"
+					"player_perk_armor_regen_timer_multiplier_3"
 				},
 				cost = 1000,
 				icon_xy = {0, 3},
@@ -2417,8 +2419,7 @@ function SkillTreeTweakData:init()
 			deck6,
 			{
 				upgrades = {
-					"player_perk_armor_regen_timer_multiplier_4",
-					"player_perk_armor_loss_multiplier_3"
+					"player_perk_armor_regen_timer_multiplier_4"
 				},
 				cost = 2400,
 				icon_xy = {1, 3},
@@ -2429,10 +2430,8 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_5",
-					"player_perk_armor_loss_multiplier_4",
 					"player_passive_loot_drop_multiplier",
-					"akimbo_recoil_index_addend_2",
-					"akimbo_extra_ammo_multiplier_1"
+					"player_passive_always_regen_armor_1"
 				},
 				cost = 4000,
 				icon_xy = {3, 3},
@@ -2561,7 +2560,8 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_armor_regen_timer_stand_still_multiplier",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"player_crouch_speed_multiplier_2"
 				},
 				cost = 4000,
 				icon_xy = {2, 4},
@@ -2687,7 +2687,8 @@ function SkillTreeTweakData:init()
 			desc_id = "menu_st_spec_10_desc",
 			{
 				upgrades = {
-					"temporary_loose_ammo_restore_health_1"
+					"temporary_loose_ammo_restore_health_1",
+					"player_gain_life_per_players"
 				},
 				cost = 200,
 				icon_xy = {4, 5},

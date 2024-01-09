@@ -1876,8 +1876,12 @@ function CopDamage:_on_damage_received(damage_info)
 		debug_pause_unit(self._unit, "[CopDamage:_on_damage_received] dead AI", self._unit, inspect(self._unit:movement():attention()))
 	end
 	local attacker_unit = damage_info and damage_info.attacker_unit
-	if alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().thrower_unit then
-		attacker_unit = attacker_unit:base():thrower_unit()
+	if alive(attacker_unit) and attacker_unit:base() then
+		if attacker_unit:base().thrower_unit then
+			attacker_unit = attacker_unit:base():thrower_unit()
+		elseif attacker_unit:base().sentry_gun then
+			attacker_unit = attacker_unit:base():get_owner()
+		end
 	end
 	if attacker_unit == managers.player:player_unit() and damage_info then
 		managers.player:on_damage_dealt(self._unit, damage_info)

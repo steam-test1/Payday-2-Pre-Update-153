@@ -211,7 +211,7 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 end
 
 function SentryGunBase:get_owner()
-	return self._owner
+	return not self._owner and self._owner_id and managers.network:session() and managers.network:session():peer(self._owner_id) and managers.network:session():peer(self._owner_id):unit()
 end
 
 function SentryGunBase:update(unit, t, dt)

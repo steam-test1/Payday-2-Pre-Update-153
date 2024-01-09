@@ -1372,7 +1372,7 @@ function UnitNetworkHandler:say(unit, event_id, sender)
 		return
 	end
 	if unit:in_slot(managers.slot:get_mask("all_criminals")) and not managers.groupai:state():is_enemy_converted_to_criminal(unit) then
-		unit:sound():say(event_id, true, nil)
+		unit:sound():say(event_id, nil, false)
 	else
 		unit:sound():say(event_id, nil, true)
 	end

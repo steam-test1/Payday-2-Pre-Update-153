@@ -94,9 +94,6 @@ CopMovement._gadgets = {
 	},
 	wine_glass = {
 		Idstring("units/pd2_dlc_casino/props/cas_prop_int_dinning_set/cas_prop_int_dinning_set_table_glass_02_anim")
-	},
-	blowtorch = {
-		Idstring("units/pd2_dlc_dark/pickups/drk_pku_blowtorch/drk_prop_blowtorch")
 	}
 }
 local action_variants = {
@@ -1143,6 +1140,9 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		if self._rope then
 			self._rope:base():retract()
 			self._rope = nil
+			if self._unit:sound().anim_clbk_play_sound then
+				self._unit:sound():anim_clbk_play_sound(self._unit, "repel_end")
+			end
 		end
 		if Network:is_server() then
 			self:set_attention()
@@ -1271,6 +1271,8 @@ function CopMovement:anim_clbk_rope(unit, state)
 	if state == "on" then
 		if self._rope then
 			self._rope:base():retract()
+		elseif self._unit:sound().anim_clbk_play_sound then
+			self._unit:sound():anim_clbk_play_sound(self._unit, "repel_loop")
 		end
 		local hips_obj = self._unit:get_object(Idstring("Hips"))
 		self._rope = World:spawn_unit(Idstring("units/payday2/characters/ene_acc_rope/ene_acc_rope"), hips_obj:position(), Rotation())
@@ -1278,6 +1280,9 @@ function CopMovement:anim_clbk_rope(unit, state)
 	elseif self._rope then
 		self._rope:base():retract()
 		self._rope = nil
+		if self._unit:sound().anim_clbk_play_sound then
+			self._unit:sound():anim_clbk_play_sound(self._unit, "repel_end")
+		end
 	end
 end
 
@@ -2002,6 +2007,9 @@ function CopMovement:pre_destroy()
 	if alive(self._rope) then
 		self._rope:base():retract()
 		self._rope = nil
+		if self._unit:sound().anim_clbk_play_sound then
+			self._unit:sound():anim_clbk_play_sound(self._unit, "repel_end")
+		end
 	end
 	if self._nav_tracker then
 		managers.navigation:destroy_nav_tracker(self._nav_tracker)

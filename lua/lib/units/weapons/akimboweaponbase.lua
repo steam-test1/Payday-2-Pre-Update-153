@@ -39,6 +39,11 @@ function AkimboWeaponBase:create_second_gun()
 	self._setup.user_unit:camera()._camera_unit:link(Idstring("a_weapon_left"), self._second_gun, self._second_gun:orientation_object():name())
 end
 
+function AkimboWeaponBase:start_shooting()
+	AkimboWeaponBase.super.start_shooting(self)
+	self._fire_second_sound = not self._fire_second_gun_next and not self:fire_mode() == "auto"
+end
+
 function AkimboWeaponBase:fire(...)
 	if not self._manual_fire_second_gun then
 		local result = AkimboWeaponBase.super.fire(self, ...)
@@ -54,7 +59,10 @@ function AkimboWeaponBase:fire(...)
 			if alive(self._second_gun) then
 				result = self._second_gun:base().super.fire(self._second_gun:base(), ...)
 				if result then
-					self._second_gun:base():_fire_sound()
+					if self._fire_second_sound then
+						self._fire_second_sound = false
+						self._second_gun:base():_fire_sound()
+					end
 					managers.hud:set_ammo_amount(self:selection_index(), self:ammo_info())
 					self._second_gun:base():tweak_data_anim_play("fire")
 				end
@@ -72,7 +80,10 @@ function AkimboWeaponBase:_fire_second(params)
 	if alive(self._second_gun) and self._setup and alive(self._setup.user_unit) then
 		local fired = self._second_gun:base().super.fire(self._second_gun:base(), unpack(params))
 		if fired then
-			self._second_gun:base():_fire_sound()
+			if self._fire_second_sound then
+				self._fire_second_sound = false
+				self._second_gun:base():_fire_sound()
+			end
 			managers.hud:set_ammo_amount(self:selection_index(), self:ammo_info())
 			self._second_gun:base():tweak_data_anim_play("fire")
 		end

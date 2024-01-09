@@ -1197,7 +1197,7 @@ function JobManager:calculate_job_class(job_id, difficulty_id)
 		local job_jc = tweak_data.narrative:job_data(job_id).jc or 10
 		local difficulty_jc = math.max((difficulty_id or 1) - 2, 0) * 10
 		Application:debug("[calculate_job_class]", job_jc + difficulty_jc)
-		return job_jc + difficulty_jc
+		return math.min(job_jc + difficulty_jc, 100)
 	end
 	return 10
 end

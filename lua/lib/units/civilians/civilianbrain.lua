@@ -135,7 +135,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 		self:set_objective(follow_objective)
 		self._unit:interaction():set_tweak_data("hostage_stay")
 		self._unit:interaction():set_active(true, true)
-		interacting_unit:sound():say("f38_any", false, true)
+		interacting_unit:sound():say("f38_any", true, false)
 		self._following_hostage_contour_id = self._unit:contour():add("friendly", true)
 		managers.groupai:state():on_hostage_follow(interacting_unit, self._unit, true)
 	elseif command == "stay" then
@@ -164,7 +164,7 @@ function CivilianBrain:on_hostage_move_interaction(interacting_unit, command)
 		self._unit:interaction():set_tweak_data("hostage_move")
 		self._unit:interaction():set_active(true, true)
 		if alive(interacting_unit) then
-			interacting_unit:sound():say("f02x_sin", false, true)
+			interacting_unit:sound():say("f02x_sin", true, false)
 		end
 		if self._following_hostage_contour_id then
 			self._unit:contour():remove_by_id(self._following_hostage_contour_id, true)

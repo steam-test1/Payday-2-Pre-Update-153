@@ -4403,7 +4403,12 @@ end
 function GroupAIStateBase._create_hud_suspicion_icon(obs_key, u_observer, icon_name, color, icon_id)
 	local icon_pos = mvector3.copy(math.UP)
 	mvector3.multiply(icon_pos, 28)
-	mvector3.add(icon_pos, u_observer:movement() and u_observer:movement():m_head_pos() or u_observer:position())
+	local observer_pos = u_observer:movement() and u_observer:movement():m_head_pos()
+	if not observer_pos then
+		u_observer:m_position(tmp_vec1)
+		observer_pos = tmp_vec1
+	end
+	mvector3.add(icon_pos, observer_pos)
 	local icon = managers.hud:add_waypoint(icon_id, {
 		icon = icon_name,
 		distance = false,
@@ -4583,10 +4588,15 @@ function GroupAIStateBase:_upd_criminal_suspicion_progress()
 		return
 	end
 	for obs_key, obs_susp_data in pairs(susp_data) do
-		if obs_susp_data.u_observer:movement() then
+		if alive(obs_susp_data.u_observer) then
 			mvector3.set(obs_susp_data.icon_pos, math.UP)
 			mvector3.multiply(obs_susp_data.icon_pos, 28)
-			mvector3.add(obs_susp_data.icon_pos, obs_susp_data.u_observer:movement():m_head_pos())
+			local observer_pos = obs_susp_data.u_observer:movement() and obs_susp_data.u_observer:movement():m_head_pos()
+			if not observer_pos then
+				obs_susp_data.u_observer:m_position(tmp_vec1)
+				observer_pos = tmp_vec1
+			end
+			mvector3.add(obs_susp_data.icon_pos, observer_pos)
 			if obs_susp_data.icon_pos2 then
 				mvector3.set(obs_susp_data.icon_pos2, obs_susp_data.icon_pos)
 			end

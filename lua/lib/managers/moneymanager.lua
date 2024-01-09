@@ -817,8 +817,12 @@ function MoneyManager:on_sell_mask(mask_id, global_value, blueprint)
 	self:_add_to_total(amount, {no_offshore = true})
 end
 
+function MoneyManager:get_loot_drop_cash_value(value_id)
+	return self:get_tweak_value("money_manager", "loot_drop_cash", value_id) or 100
+end
+
 function MoneyManager:on_loot_drop_cash(value_id)
-	local amount = self:get_tweak_value("money_manager", "loot_drop_cash", value_id) or 100
+	local amount = self:get_loot_drop_cash_value(value_id)
 	self:_add_to_total(amount, {no_offshore = true})
 end
 

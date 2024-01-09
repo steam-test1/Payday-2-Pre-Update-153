@@ -52,9 +52,13 @@ function AmmoClip:_pickup(unit)
 					local values = managers.player:temporary_upgrade_value("temporary", "loose_ammo_restore_health", 0)
 					if values ~= 0 then
 						local restore_value = math.random(values[1], values[2])
+						local num_more_hp = managers.player:num_players_with_more_health() + managers.criminals:nr_AI_criminals()
 						local base = tweak_data.upgrades.loose_ammo_restore_health_values.base
 						local sync_value = math.round(math.clamp(restore_value - base, 0, 13))
 						restore_value = restore_value * (tweak_data.upgrades.loose_ammo_restore_health_values.multiplier or 0.1)
+						local percent_inc = managers.player:upgrade_value("player", "gain_life_per_players", 0) * num_more_hp + 1
+						print("[AmmoClip:_pickup] Percent increase for health pickup is: ", percent_inc - 1)
+						restore_value = restore_value * percent_inc
 						local damage_ext = unit:character_damage()
 						if not damage_ext:need_revive() and not damage_ext:dead() and not damage_ext:is_berserker() then
 							damage_ext:restore_health(restore_value, true)

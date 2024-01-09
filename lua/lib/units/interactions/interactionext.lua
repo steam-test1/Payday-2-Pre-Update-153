@@ -942,7 +942,7 @@ end
 function GageAssignmentInteractionExt:interact(player)
 	GageAssignmentInteractionExt.super.super.interact(self, player)
 	if alive(player) and player:sound() then
-		player:sound():say("g92", false, true)
+		player:sound():say("g92", true, false)
 	end
 	return self._unit:base():pickup(player)
 end
@@ -1356,7 +1356,7 @@ function IntimitateInteractionExt:_at_interact_interupt(player, complete)
 		if not self._in_progress then
 			return
 		end
-		player:sound():say("dsp_stop_all", false, true)
+		player:sound():say("dsp_stop_all", true, false)
 		if not complete then
 			self._unit:base():set_material_state(true)
 			if Network:is_server() then

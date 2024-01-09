@@ -735,6 +735,7 @@ function TweakData:init()
 	self.screen_colors.heat_warm_color = Color("ff7f00")
 	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
 	self.screen_colors.heat_color = self.screen_colors.heat_standard_color
+	self.screen_colors.challenge_title = Color(255, 255, 168, 0) / 255
 	self.screen_colors.stats_positive = Color(255, 191, 221, 125) / 255
 	self.screen_colors.stats_negative = Color(255, 254, 93, 99) / 255
 	self.screen_colors.stats_mods = Color(255, 229, 229, 76) / 255
@@ -2309,6 +2310,7 @@ Play the full version soon to get your full PAYDAY!]],
 		modern_ninja = {
 			award = "ovk_2",
 			job = "kosugi",
+			stealth = true,
 			equipped = {
 				primaries = {weapon_id = "m134"},
 				secondaries = {weapon_id = "rpg7"}

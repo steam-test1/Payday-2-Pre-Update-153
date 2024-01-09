@@ -581,9 +581,12 @@ function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades, 
 	if not unit:contour() then
 		debug_pause_unit(unit, "[GamePlayCentralManager:auto_highlight_enemy]: Unit doesn't have Contour Extension")
 	end
-	local contour_type = "mark_enemy"
 	local time_multiplier = 1
-	if use_player_upgrades then
+	local contour_type = "mark_enemy"
+	if unit:base() and unit:base().is_security_camera then
+		contour_type = "mark_unit"
+		time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
+	elseif use_player_upgrades then
 		contour_type = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
 		time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
 	else

@@ -6028,4 +6028,141 @@ function BlackMarketTweakData:_init_weapon_skins()
 			uv_offset_rot = Vector3(-0.208212, 1.05303, 2.0874)
 		}
 	}
+	self.weapon_skins.olympic_cola = {}
+	self.weapon_skins.olympic_cola.name_id = "bm_wskn_olympic_cola"
+	self.weapon_skins.olympic_cola.desc_id = "bm_wskn_olympic_cola_desc"
+	self.weapon_skins.olympic_cola.weapon_id = "olympic"
+	self.weapon_skins.olympic_cola.rarity = "rare"
+	self.weapon_skins.olympic_cola.bonus = "recoil_p1"
+	self.weapon_skins.olympic_cola.reserve_quality = true
+	self.weapon_skins.olympic_cola.texture_bundle_folder = "cash/safes/cola"
+	self.weapon_skins.olympic_cola.base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_012_df")
+	self.weapon_skins.olympic_cola.default_blueprint = {
+		"wpn_fps_m4_uupg_draghandle",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_m4_uupg_b_short_vanilla",
+		"wpn_fps_upg_smg_olympic_fg_lr300",
+		"wpn_fps_upg_m4_g_hgrip",
+		"wpn_fps_upg_ass_m4_lower_reciever_core",
+		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_upg_m4_s_ubr",
+		"wpn_fps_upg_ass_m4_upper_reciever_ballos",
+		"wpn_fps_upg_o_rx30"
+	}
+	self.weapon_skins.olympic_cola.types = {
+		drag_handle = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_012_b_df")
+		},
+		foregrip = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_012_c_df")
+		},
+		stock_adapter = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_012_b_df")
+		}
+	}
+	self.weapon_skins.g3_cola = {}
+	self.weapon_skins.g3_cola.name_id = "bm_wskn_g3_cola"
+	self.weapon_skins.g3_cola.desc_id = "bm_wskn_g3_cola_desc"
+	self.weapon_skins.g3_cola.weapon_id = "g3"
+	self.weapon_skins.g3_cola.rarity = "rare"
+	self.weapon_skins.g3_cola.bonus = "recoil_p1"
+	self.weapon_skins.g3_cola.reserve_quality = true
+	self.weapon_skins.g3_cola.texture_bundle_folder = "cash/safes/cola"
+	self.weapon_skins.g3_cola.base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_013_df")
+	self.weapon_skins.g3_cola.default_blueprint = {
+		"wpn_fps_ass_g3_b_long",
+		"wpn_fps_ass_g3_body_lower",
+		"wpn_fps_ass_g3_body_upper",
+		"wpn_fps_ass_g3_m_mag",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_ass_g3_fg_railed",
+		"wpn_fps_ass_g3_g_sniper",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_ass_g3_s_wood"
+	}
+	self.weapon_skins.g3_cola.parts = {
+		wpn_fps_ass_g3_body_upper = {
+			[Idstring("g3_upperbody"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_013_df")
+			}
+		}
+	}
+	self.weapon_skins.g3_cola.types = {
+		barrel = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_013_a_df")
+		},
+		grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_013_c_df")
+		},
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_013_b_df")
+		}
+	}
+	self.weapon_skins.b682_cola = {}
+	self.weapon_skins.b682_cola.name_id = "bm_wskn_b682_cola"
+	self.weapon_skins.b682_cola.desc_id = "bm_wskn_b682_cola_desc"
+	self.weapon_skins.b682_cola.weapon_id = "b682"
+	self.weapon_skins.b682_cola.rarity = "epic"
+	self.weapon_skins.b682_cola.bonus = "recoil_p1"
+	self.weapon_skins.b682_cola.reserve_quality = true
+	self.weapon_skins.b682_cola.texture_bundle_folder = "cash/safes/cola"
+	self.weapon_skins.b682_cola.base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_014_df")
+	self.weapon_skins.b682_cola.default_blueprint = {
+		"wpn_fps_shot_b682_body_standard",
+		"wpn_fps_shot_b682_b_long",
+		"wpn_fps_shot_b682_s_ammopouch"
+	}
+	self.weapon_skins.b682_cola.parts = {
+		wpn_fps_shot_b682_s_ammopouch = {
+			[Idstring("mtr_bag"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_014_a_df")
+			}
+		}
+	}
+	self.weapon_skins.gre_m79_cola = {}
+	self.weapon_skins.gre_m79_cola.name_id = "bm_wskn_gre_m79_cola"
+	self.weapon_skins.gre_m79_cola.desc_id = "bm_wskn_gre_m79_cola_desc"
+	self.weapon_skins.gre_m79_cola.weapon_id = "gre_m79"
+	self.weapon_skins.gre_m79_cola.rarity = "epic"
+	self.weapon_skins.gre_m79_cola.bonus = "recoil_p1"
+	self.weapon_skins.gre_m79_cola.reserve_quality = true
+	self.weapon_skins.gre_m79_cola.texture_bundle_folder = "cash/safes/cola"
+	self.weapon_skins.gre_m79_cola.base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_015_df")
+	self.weapon_skins.gre_m79_cola.pattern_gradient = Idstring("units/payday2_cash/safes/cf15/pattern_gradient/gradient_cf15_003_df")
+	self.weapon_skins.gre_m79_cola.pattern = Idstring("units/payday2_cash/safes/cola/pattern/cola_pattern_003_df")
+	self.weapon_skins.gre_m79_cola.types = {
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_015_b_df")
+		}
+	}
+	self.weapon_skins.m16_cola = {}
+	self.weapon_skins.m16_cola.name_id = "bm_wskn_m16_cola"
+	self.weapon_skins.m16_cola.desc_id = "bm_wskn_m16_cola_desc"
+	self.weapon_skins.m16_cola.weapon_id = "m16"
+	self.weapon_skins.m16_cola.rarity = "legendary"
+	self.weapon_skins.m16_cola.bonus = "recoil_p1"
+	self.weapon_skins.m16_cola.reserve_quality = true
+	self.weapon_skins.m16_cola.texture_bundle_folder = "cash/safes/cola"
+	self.weapon_skins.m16_cola.unique_name_id = "bm_wskn_m16_cola"
+	self.weapon_skins.m16_cola.locked = true
+	self.weapon_skins.m16_cola.base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_016_df")
+	self.weapon_skins.m16_cola.default_blueprint = {
+		"wpn_fps_m4_uupg_draghandle",
+		"wpn_fps_upg_m4_m_pmag",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_ass_m16_b_legend",
+		"wpn_fps_ass_m16_fg_legend",
+		"wpn_fps_ass_m16_s_legend",
+		"wpn_fps_upg_m4_g_mgrip",
+		"wpn_fps_upg_ass_m4_lower_reciever_core",
+		"wpn_fps_upg_ass_m4_upper_reciever_core"
+	}
+	self.weapon_skins.m16_cola.types = {
+		lower_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_017_df")
+		},
+		upper_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_017_df")
+		}
+	}
 end

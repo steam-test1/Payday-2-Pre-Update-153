@@ -2453,7 +2453,7 @@ function MenuCallbackHandler:play_safehouse(params)
 	managers.menu:show_play_safehouse_question({yes_func = yes_func})
 end
 
-function MenuCallbackHandler:_increase_infamous()
+function MenuCallbackHandler:_increase_infamous(yes_clbk)
 	managers.menu_scene:destroy_infamy_card()
 	if managers.experience:current_level() < 100 or managers.experience:current_rank() >= #tweak_data.infamy.ranks then
 		return
@@ -2478,7 +2478,10 @@ function MenuCallbackHandler:_increase_infamous()
 	end
 	managers.savefile:save_progress()
 	managers.savefile:save_setting(true)
-	self._sound_source:post_event("infamous_player_join_stinger")
+	managers.menu:post_event("infamous_player_join_stinger")
+	if yes_clbk then
+		yes_clbk()
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		managers.statistics:publish_level_to_steam()
 	end
@@ -2489,6 +2492,8 @@ function MenuCallbackHandler:become_infamous(params)
 		return
 	end
 	local infamous_cost = Application:digest_value(tweak_data.infamy.ranks[managers.experience:current_rank() + 1], false)
+	local yes_clbk = params and params.yes_clbk or false
+	local no_clbk = params and params.no_clbk
 	local params = {}
 	params.cost = managers.experience:cash_string(infamous_cost)
 	params.free = infamous_cost == 0
@@ -2498,13 +2503,20 @@ function MenuCallbackHandler:become_infamous(params)
 			
 			managers.menu:open_node("blackmarket_preview_node", {
 				{
-					back_callback = callback(self, self, "_increase_infamous")
+					back_callback = callback(MenuCallbackHandler, MenuCallbackHandler, "_increase_infamous", yes_clbk)
 				}
 			})
+			managers.menu:post_event("infamous_stinger_level_" .. (rank < 10 and "0" or "") .. tostring(rank))
 			managers.menu_scene:spawn_infamy_card(rank)
-			self._sound_source:post_event("infamous_stinger_level_" .. (rank < 10 and "0" or "") .. tostring(rank))
 		end
 	end
+	
+	function params.no_func()
+		if no_clbk then
+			no_clbk()
+		end
+	end
+	
 	managers.menu:show_confirm_become_infamous(params)
 end
 

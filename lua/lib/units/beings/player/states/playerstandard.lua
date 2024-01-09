@@ -2342,7 +2342,7 @@ function PlayerStandard:_do_action_intimidate(t, interact_type, sound_name, skip
 end
 
 function PlayerStandard:say_line(sound_name, skip_alert)
-	self._unit:sound():say(sound_name, nil, true)
+	self._unit:sound():say(sound_name, true, false)
 	skip_alert = skip_alert or managers.groupai:state():whisper_mode()
 	if not skip_alert then
 		local alert_rad = 500

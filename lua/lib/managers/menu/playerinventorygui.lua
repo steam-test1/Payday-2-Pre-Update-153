@@ -1364,6 +1364,15 @@ end
 
 function PlayerInventoryGui:set_info_text(text, color_ranges, recursive)
 	self._info_text:set_text(text)
+	if color_ranges then
+		if color_ranges.add_colors_to_text_object then
+			managers.menu_component:add_colors_to_text_object(self._info_text, unpack(color_ranges))
+		else
+			for _, color_range in ipairs(color_ranges) do
+				self._info_text:set_range_color(color_range.start, color_range.stop, color_range.color)
+			end
+		end
+	end
 	local _, _, _, h = self._info_text:text_rect()
 	self._info_text:set_h(h)
 	if not recursive and self._info_text:bottom() > self._info_panel:parent():h() then
@@ -1374,15 +1383,6 @@ function PlayerInventoryGui:set_info_text(text, color_ranges, recursive)
 		text = utf8.sub(text, 1, index)
 		text = text .. "..."
 		return self:set_info_text(text, color_ranges, true)
-	end
-	if color_ranges then
-		if color_ranges.add_colors_to_text_object then
-			managers.menu_component:add_colors_to_text_object(self._info_text, unpack(color_ranges))
-		else
-			for _, color_range in ipairs(color_ranges) do
-				self._info_text:set_range_color(color_range.start, color_range.stop, color_range.color)
-			end
-		end
 	end
 	self._info_panel:set_top(self._info_text:bottom())
 	self._info_panel:set_h(self._info_panel:parent():h() - self._info_panel:top())
@@ -3753,6 +3753,13 @@ function PlayerInventoryGui:previous_character()
 		if alive(self._character_text) then
 			self._character_text:set_text(not managers.network:session() and managers.blackmarket:get_preferred_character_real_name() or managers.localization:to_upper_text("menu_" .. tostring(managers.network:session():local_peer():character())))
 		end
+		local box = self._boxes_by_name.mask
+		if box then
+			self:update_box(box, {
+				text = player_loadout_data.mask.info_text,
+				image = player_loadout_data.mask.item_texture
+			})
+		end
 	end
 end
 
@@ -3767,6 +3774,13 @@ function PlayerInventoryGui:next_character()
 		self:_update_info_character("character")
 		if alive(self._character_text) then
 			self._character_text:set_text(not managers.network:session() and managers.blackmarket:get_preferred_character_real_name() or managers.localization:to_upper_text("menu_" .. tostring(managers.network:session():local_peer():character())))
+		end
+		local box = self._boxes_by_name.mask
+		if box then
+			self:update_box(box, {
+				text = player_loadout_data.mask.info_text,
+				image = player_loadout_data.mask.item_texture
+			})
 		end
 	end
 end

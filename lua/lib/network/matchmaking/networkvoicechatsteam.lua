@@ -90,9 +90,9 @@ function NetworkVoiceChatSTEAM:update()
 	end
 end
 
-function NetworkVoiceChatSTEAM:on_member_added(peer)
+function NetworkVoiceChatSTEAM:on_member_added(peer, mute)
 	if peer:rpc() then
-		self.handler:add_receiver(peer:id(), peer:rpc())
+		self.handler:add_receiver(peer:id(), peer:rpc(), mute)
 	end
 end
 

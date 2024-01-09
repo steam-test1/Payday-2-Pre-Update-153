@@ -1,6 +1,7 @@
 SecurityCamera = SecurityCamera or class()
 SecurityCamera.cameras = SecurityCamera.cameras or {}
 SecurityCamera.active_tape_loop_unit = nil
+SecurityCamera.is_security_camera = true
 SecurityCamera._NET_EVENTS = {
 	sound_off = 1,
 	alarm_start = 2,
@@ -16,10 +17,12 @@ SecurityCamera._NET_EVENTS = {
 	request_start_tape_loop_2 = 12,
 	deactivate_tape_loop = 13
 }
+local tmp_rot1 = Rotation()
 
 function SecurityCamera:init(unit)
 	self._unit = unit
 	self:set_update_enabled(false)
+	self:_set_driving_state(self.update_position)
 	table.insert(SecurityCamera.cameras, self._unit)
 end
 
@@ -133,10 +136,32 @@ function SecurityCamera:apply_rotations(yaw, pitch)
 	self._pitch = pitch
 end
 
+function SecurityCamera:_set_driving_state(state)
+	if state and self._driving ~= "animation" then
+		self._unit:set_driving("animation")
+		self._driving = "animation"
+	elseif not state and self._driving ~= "orientation_object" then
+		self._unit:set_driving("orientation_object")
+		self._driving = "orientation_object"
+	end
+end
+
+function SecurityCamera:set_update_position(state)
+	self.update_position = state
+	self:_set_driving_state(state)
+end
+
 function SecurityCamera:_upd_detection(t)
 	local dt = t - self._last_detect_t
 	if dt > self._detection_interval then
 		self._last_detect_t = t
+		if self.update_position then
+			self._yaw_obj:m_position(self._pos)
+			if self._look_fwd then
+				self._look_obj:m_rotation(tmp_rot1)
+				mrotation.y(tmp_rot1, self._look_fwd)
+			end
+		end
 		if managers.groupai:state()._draw_enabled then
 			self._brush = self._brush or Draw:brush(Color(0.2, 1, 1, 1), self._detection_interval)
 			self._look_obj:m_position(self._tmp_vec1)
@@ -147,7 +172,7 @@ function SecurityCamera:_upd_detection(t)
 			self._brush:cone(self._tmp_vec1, cone_base, cone_base_rad, 8)
 		end
 		if not self._look_fwd then
-			local tmp_rot1 = self._look_obj:rotation()
+			self._look_obj:m_rotation(tmp_rot1)
 			self._look_fwd = Vector3()
 			mrotation.y(tmp_rot1, self._look_fwd)
 		end

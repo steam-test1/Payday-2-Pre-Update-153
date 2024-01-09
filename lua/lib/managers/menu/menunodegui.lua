@@ -221,7 +221,11 @@ function MenuNodeGui:_create_legends(node)
 	local res = RenderSettings.resolution
 	local visible = not managers.menu:is_pc_controller()
 	local is_pc = managers.menu:is_pc_controller()
+	if alive(self.ws:panel():child("legend_panel")) then
+		self.ws:panel():remove(self.ws:panel():child("legend_panel"))
+	end
 	self._legends_panel = self.ws:panel():panel({
+		name = "legend_panel",
 		visible = visible,
 		x = safe_rect_pixels.x,
 		y = safe_rect_pixels.y,

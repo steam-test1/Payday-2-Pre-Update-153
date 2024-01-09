@@ -6446,12 +6446,12 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ksg.single = {}
 	self.ksg.single.fire_rate = 0.575
 	self.ksg.spread = {}
-	self.ksg.spread.standing = self.new_m4.spread.standing
-	self.ksg.spread.crouching = self.new_m4.spread.crouching
-	self.ksg.spread.steelsight = self.new_m4.spread.steelsight
-	self.ksg.spread.moving_standing = self.new_m4.spread.moving_standing
-	self.ksg.spread.moving_crouching = self.new_m4.spread.moving_crouching
-	self.ksg.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.ksg.spread.standing = self.r870.spread.standing
+	self.ksg.spread.crouching = self.r870.spread.crouching
+	self.ksg.spread.steelsight = self.r870.spread.steelsight
+	self.ksg.spread.moving_standing = self.r870.spread.moving_standing
+	self.ksg.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.ksg.spread.moving_steelsight = self.r870.spread.moving_steelsight
 	self.ksg.kick = {}
 	self.ksg.kick.standing = {
 		1.9,

@@ -995,7 +995,7 @@ function HUDLootScreen:show_item(peer_id)
 		local item_pc = lootdrop_data[6]
 		local loot_tweak = tweak_data.blackmarket[item_category] and tweak_data.blackmarket[item_category][item_id]
 		loot_tweak = loot_tweak or tweak_data.economy[item_category] and tweak_data.economy[item_category][item_id]
-		local item_text = managers.localization:text(loot_tweak and loot_tweak.name_id or "")
+		local item_text = loot_tweak and loot_tweak.name_id and managers.localization:text(loot_tweak.name_id) or "?"
 		if item_category == "cash" then
 			local value_id = tweak_data.blackmarket[item_category][item_id].value_id
 			local money = tweak_data:get_value("money_manager", "loot_drop_cash", value_id) or 100
@@ -1007,7 +1007,7 @@ function HUDLootScreen:show_item(peer_id)
 		end
 		if item_category then
 			main_text:set_text(managers.localization:to_upper_text("menu_l_you_got", {
-				category = managers.localization:text("bm_menu_" .. item_category),
+				category = managers.localization:text("bm_menu_" .. tostring(item_category)),
 				item = item_text
 			}))
 		end
@@ -1016,7 +1016,7 @@ function HUDLootScreen:show_item(peer_id)
 		}))
 		if global_value and global_value ~= "normal" then
 			local gv_tweak_data = tweak_data.lootdrop.global_values[global_value] or {}
-			global_value_text:set_text(managers.localization:to_upper_text(gv_tweak_data.desc_id))
+			global_value_text:set_text(gv_tweak_data.desc_id and managers.localization:to_upper_text(gv_tweak_data.desc_id) or "?")
 			global_value_text:set_color(gv_tweak_data.color)
 			self:make_fine_text(global_value_text)
 			global_value_text:set_visible(true)

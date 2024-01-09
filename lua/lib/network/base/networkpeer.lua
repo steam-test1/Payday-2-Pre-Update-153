@@ -62,7 +62,7 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 	end
 	self._creation_t = TimerManager:wall_running():time()
 	if self._rpc and not self._loading and managers.network.voice_chat.on_member_added and self._rpc:ip_at_index(0) ~= Network:self("TCP_IP"):ip_at_index(0) then
-		managers.network.voice_chat:on_member_added(self)
+		managers.network.voice_chat:on_member_added(self, self._muted)
 	end
 	self._profile = {
 		level = nil,
@@ -90,7 +90,7 @@ function NetworkPeer:set_rpc(rpc)
 			PSNVoice:send_to(self._name, self._rpc)
 		end
 		if managers.network.voice_chat.on_member_added then
-			managers.network.voice_chat:on_member_added(self)
+			managers.network.voice_chat:on_member_added(self, self._muted)
 		end
 	end
 end
@@ -492,7 +492,7 @@ function NetworkPeer:load(data)
 	self:chk_enable_queue()
 	self:_chk_flush_msg_queues()
 	if self._rpc and not self._loading and managers.network.voice_chat.on_member_added then
-		managers.network.voice_chat:on_member_added(self)
+		managers.network.voice_chat:on_member_added(self, self._muted)
 	end
 	local local_peer = managers.network:session():local_peer()
 	if self == local_peer and Global.player_manager.kit.equipment_slots[1] == "armor_kit" then
@@ -657,7 +657,7 @@ function NetworkPeer:set_loading(state)
 			managers.network.voice_chat:on_member_removed(self)
 		end
 	elseif self._rpc and managers.network.voice_chat.on_member_added then
-		managers.network.voice_chat:on_member_added(self)
+		managers.network.voice_chat:on_member_added(self, self._muted)
 	end
 end
 
