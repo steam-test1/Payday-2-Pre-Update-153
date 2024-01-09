@@ -9,6 +9,8 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	self._menu_tweak_data = arg.load_level_data.menu_tweak_data
 	self._scale_tweak_data = arg.load_level_data.scale_tweak_data
 	self._coords = arg.load_level_data.controller_coords or false
+	self._coords_font = arg.load_level_data.coords_font or "fonts/font_medium_mf"
+	self._coords_font_size = arg.load_level_data.coords_font_size or 24
 	self._gui_data = arg.load_level_data.gui_data
 	self._workspace_size = self._gui_data.workspace_size
 	self._saferect_size = self._gui_data.saferect_size
@@ -27,7 +29,6 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 		layer = 0
 	})
 	level_image:set_alpha(0.5)
-	print("self._gui_data.bg_texture", self._gui_data.bg_texture)
 	level_image:set_size(level_image:parent():h() * (level_image:texture_width() / level_image:texture_height()), level_image:parent():h())
 	level_image:set_position(0, 0)
 	local background_fullpanel = self._back_drop_gui:get_new_background_layer()
@@ -73,19 +74,51 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	bg_loading_text:move(13, 3)
 	self._back_drop_gui:animate_bg_text(bg_loading_text)
 	if self._coords then
-		self._controller = background_safepanel:bitmap({
-			texture = "guis/textures/controller",
-			layer = 1,
-			w = 512,
-			h = 256
-		})
-		self._controller:set_center(background_safepanel:w() / 2, background_safepanel:h() / 2)
+		self._controller_shapes = arg.load_level_data.controller_shapes or {
+			{
+				position = {cx = 0.5, cy = 0.5},
+				texture_rect = {
+					0,
+					0,
+					512,
+					256
+				}
+			}
+		}
+		self._controllers = {}
+		local controller, position
+		for i, shape in ipairs(self._controller_shapes) do
+			controller = background_safepanel:bitmap({
+				texture = arg.load_level_data.controller_image or "guis/textures/controller",
+				layer = i,
+				texture_rect = shape.texture_rect
+			})
+			position = shape.position or {}
+			controller:set_center(background_safepanel:w() * (position.cx or 0.5), background_safepanel:h() * (position.cy or 0.5))
+			if position.x then
+				if 0 > position.x then
+					controller:set_right(background_safepanel:w() + position.x)
+				else
+					controller:set_left(position.x)
+				end
+			end
+			if position.y then
+				if 0 > position.y then
+					controller:set_bottom(background_safepanel:h() + position.y)
+				else
+					controller:set_top(position.y)
+				end
+			end
+			controller:move(position.mx or 0, position.my or 0)
+			table.insert(self._controllers, controller)
+		end
 		for id, data in pairs(self._coords) do
+			controller = self._controllers[data.c or 1]
 			data.text = background_safepanel:text({
 				name = data.id,
 				text = data.string,
-				font_size = 24,
-				font = "fonts/font_medium_mf",
+				font_size = self._coords_font_size,
+				font = self._coords_font,
 				align = data.align,
 				vertical = data.vertical,
 				halign = "center",
@@ -95,8 +128,8 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 			local _, _, w, h = data.text:text_rect()
 			data.text:set_size(w, h)
 			if data.x then
-				local x = self._controller:x() + data.x
-				local y = self._controller:y() + data.y
+				local x = controller:x() + data.x
+				local y = controller:y() + data.y
 				if data.align == "left" then
 					data.text:set_left(x)
 				elseif data.align == "right" then

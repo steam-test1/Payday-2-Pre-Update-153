@@ -458,6 +458,14 @@ function GuiTweakData:init()
 		store = 433730,
 		image = "guis/dlcs/peta/textures/pd2/content_updates/peta"
 	}
+	local pal = {
+		id = "pal",
+		name_id = "menu_content_pal",
+		desc_id = "menu_content_pal_desc",
+		date_id = "menu_content_pal_date",
+		store = 441600,
+		image = "guis/dlcs/lupus/textures/pd2/content_updates/lupus"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -519,7 +527,8 @@ function GuiTweakData:init()
 			berry,
 			rip,
 			cane,
-			peta
+			peta,
+			pal
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1609,10 +1618,8 @@ function GuiTweakData:init()
 			x = 347,
 			y = 716,
 			icon = "guis/textures/pd2/crimenet_challenge"
-		}
-	}
-	if Application:production_build() or SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1") then
-		table.insert(self.crime_net.special_contracts, {
+		},
+		{
 			id = "casino",
 			name_id = "menu_cn_casino",
 			desc_id = "menu_cn_casino_desc",
@@ -1621,10 +1628,10 @@ function GuiTweakData:init()
 			y = 790,
 			icon = "guis/textures/pd2/crimenet_casino",
 			unlock = "unlock_level",
-			pulse = true,
+			pulse = false,
 			pulse_color = Color(204, 255, 209, 32) / 255
-		})
-	end
+		}
+	}
 	self.crime_net.codex = {
 		{
 			id = "contacts",

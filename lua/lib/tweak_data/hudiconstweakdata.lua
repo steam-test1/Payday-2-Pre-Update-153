@@ -658,6 +658,24 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_melee = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			64,
+			96,
+			32,
+			32
+		}
+	}
+	self.pd2_water_tap = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			96,
+			96,
+			32,
+			32
+		}
+	}
 	self.wp_vial = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {
@@ -1124,12 +1142,12 @@ function HudIconsTweakData:init()
 		}
 	}
 	self.equipment_stash_server = {
-		texture = "guis/textures/hud_icons",
+		texture = "guis/textures/pd2/hud_pickups",
 		texture_rect = {
-			272,
-			288,
-			48,
-			48
+			96,
+			224,
+			32,
+			32
 		}
 	}
 	self.equipment_vialOK = {
@@ -1299,6 +1317,33 @@ function HudIconsTweakData:init()
 		texture_rect = {
 			96,
 			192,
+			32,
+			32
+		}
+	}
+	self.equipment_printer_ink = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			0,
+			224,
+			32,
+			32
+		}
+	}
+	self.equipment_plates = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			32,
+			224,
+			32,
+			32
+		}
+	}
+	self.equipment_paper_roll = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			64,
+			224,
 			32,
 			32
 		}

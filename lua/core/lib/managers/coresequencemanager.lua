@@ -5175,6 +5175,10 @@ function WwiseElement:play(env)
 		self:print_attribute_error("event", event, nil, true, env, nil)
 		return
 	end
+	if not sound_source then
+		Application:throw_exception("[WwiseElement:play]: Unable to play environment sound.")
+		return
+	end
 	if switch then
 		local switches = string.split(switch, " ")
 		local i = 1

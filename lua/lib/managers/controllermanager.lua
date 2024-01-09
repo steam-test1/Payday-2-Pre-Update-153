@@ -48,13 +48,13 @@ function ControllerManager:load_user_mod()
 	if Global.controller_manager.user_mod then
 		local connections = managers.controller:get_settings(managers.user:get_setting("controller_mod_type")):get_connection_map()
 		for connection_name, params in pairs(Global.controller_manager.user_mod) do
-			if params.axis then
+			if params.axis and connections[params.axis] then
 				for button, button_params in pairs(params) do
-					if type(button_params) == "table" then
+					if type(button_params) == "table" and button_params.button and connections[params.axis]._btn_connections[button_params.button] then
 						connections[params.axis]._btn_connections[button_params.button].name = button_params.connection
 					end
 				end
-			elseif connections[params.button] then
+			elseif params.button and connections[params.button] then
 				connections[params.button]:set_controller_id(params.controller_id)
 				connections[params.button]:set_input_name_list({
 					params.connection

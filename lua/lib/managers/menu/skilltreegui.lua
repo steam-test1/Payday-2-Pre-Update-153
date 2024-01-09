@@ -859,7 +859,7 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 		bg_back:move(13, -9)
 		MenuBackdropGUI.animate_bg_text(self, bg_back)
 	end
-	local prefix = not managers.menu:is_pc_controller() and managers.localization:get_default_macro("BTN_Y") or ""
+	local prefix = (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and managers.localization:get_default_macro("BTN_Y") or ""
 	self._skill_tree_panel:text({
 		name = "respec_tree_button",
 		text = prefix .. managers.localization:to_upper_text("st_menu_respec_tree"),
@@ -1006,7 +1006,8 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 		w = tree_tabs_panel:w() * WIDTH_MULTIPLIER
 	})
 	local tab_x = 0
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
+		local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_l") or managers.localization:get_default_macro("BTN_BOTTOM_L")
 		local prev_page = controller_page_tab_panel:text({
 			name = "prev_page",
 			y = 0,
@@ -1015,7 +1016,7 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			font = tweak_data.menu.pd2_medium_font,
 			layer = 2,
-			text = managers.localization:get_default_macro("BTN_BOTTOM_L")
+			text = button
 		})
 		local _, _, w = prev_page:text_rect()
 		prev_page:set_w(w)
@@ -1097,7 +1098,8 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 			1
 		}
 	})
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
+		local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_r") or managers.localization:get_default_macro("BTN_BOTTOM_R")
 		local next_page = controller_page_tab_panel:text({
 			name = "next_page",
 			y = 0,
@@ -1106,7 +1108,7 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			font = tweak_data.menu.pd2_medium_font,
 			layer = 2,
-			text = managers.localization:get_default_macro("BTN_BOTTOM_R")
+			text = button
 		})
 		local _, _, w = next_page:text_rect()
 		next_page:set_w(w)
@@ -1146,21 +1148,21 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 			activate_spec = {
 				prio = 1,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "menu_st_activate_spec",
 				callback = callback(self, self, "activate_specialization")
 			},
 			add_points = {
 				prio = 2,
 				btn = "BTN_A",
-				pc_btn = "",
+				pc_btn = nil,
 				name = "menu_st_add_spec_points",
 				callback = nil
 			},
 			remove_points = {
 				prio = 3,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "menu_st_remove_spec_points",
 				callback = nil
 			}
@@ -1213,7 +1215,8 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 		})
 		controller_page_tab_panel:set_shape(spec_tabs_panel:shape())
 		local tab_x = 0
-		if not managers.menu:is_pc_controller() then
+		if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
+			local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_l") or managers.localization:get_default_macro("BTN_BOTTOM_L")
 			local prev_page = controller_page_tab_panel:text({
 				name = "prev_page",
 				y = 0,
@@ -1222,7 +1225,7 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 				font_size = tweak_data.menu.pd2_medium_font_size,
 				font = tweak_data.menu.pd2_medium_font,
 				layer = 2,
-				text = managers.localization:get_default_macro("BTN_BOTTOM_L")
+				text = button
 			})
 			local _, _, w = prev_page:text_rect()
 			prev_page:set_w(w)
@@ -1265,7 +1268,8 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 		self._spec_scroll_up_box:set_visible(false)
 		self._spec_scroll_down_box:set_visible(#self._spec_tree_items > NUM_TREES_PER_PAGE)
 		self._spec_tree_height = self._spec_tree_items[2]:panel():top()
-		if not managers.menu:is_pc_controller() then
+		if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
+			local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_r") or managers.localization:get_default_macro("BTN_BOTTOM_R")
 			local next_page = controller_page_tab_panel:text({
 				name = "next_page",
 				y = 0,
@@ -1274,7 +1278,7 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 				font_size = tweak_data.menu.pd2_medium_font_size,
 				font = tweak_data.menu.pd2_medium_font,
 				layer = 2,
-				text = managers.localization:get_default_macro("BTN_BOTTOM_R")
+				text = button
 			})
 			local _, _, w = next_page:text_rect()
 			next_page:set_w(w)
@@ -1789,7 +1793,7 @@ function SkillTreeGui:_set_selected_spec_item(item, no_sound)
 			item:select(no_sound)
 			self._selected_spec_item = item
 			self:update_spec_descriptions()
-			if not managers.menu:is_pc_controller() then
+			if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 				local btns = {}
 				if item.tree then
 					local dlc = tweak_data:get_raw_value("skilltree", "specializations", item:tree(), "dlc")
@@ -1993,7 +1997,7 @@ function SkillTreeGui:check_skill_switch_button(x, y, force_text_update)
 		self._skill_tree_panel:child("skill_set_text"):set_color(tweak_data.screen_colors.text)
 		self._skill_tree_panel:child("skill_set_bg"):set_alpha(0)
 	end
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 		local text_id = "st_menu_respec_tree"
 		local prefix = managers.localization:get_default_macro("BTN_X")
 		self._skill_tree_panel:child("switch_skills_button"):set_color(tweak_data.screen_colors.text)
@@ -2004,9 +2008,9 @@ end
 
 function SkillTreeGui:check_respec_button(x, y, force_text_update)
 	local text_id = "st_menu_respec_tree"
-	local prefix = not managers.menu:is_pc_controller() and managers.localization:get_default_macro("BTN_Y") or ""
+	local prefix = (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and managers.localization:get_default_macro("BTN_Y") or ""
 	local macroes = {}
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 		self._skill_tree_panel:child("respec_tree_button"):set_color(tweak_data.screen_colors.text)
 	end
 	if managers.skilltree:points_spent(self._active_tree) == 0 then
@@ -2021,7 +2025,7 @@ function SkillTreeGui:check_respec_button(x, y, force_text_update)
 		end
 	else
 		self._respec_highlight = false
-		if not managers.menu:is_pc_controller() then
+		if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 			self._skill_tree_panel:child("respec_tree_button"):set_color(tweak_data.screen_colors.text)
 		else
 			self._skill_tree_panel:child("respec_tree_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -2816,7 +2820,7 @@ function SkillTreeGui:update(t, dt)
 	if not self._enabled then
 		return
 	end
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 		local controller_spec_adding_points, controller_spec_removing_points
 		if self._selected_spec_tier == managers.skilltree:get_specialization_value(self._active_spec_tree, "tiers", "current_tier") + 1 then
 			controller_spec_adding_points = not self._is_skilltree_page_active and managers.menu_component:get_controller_input_bool("upgrade_alternative1")
@@ -2945,7 +2949,7 @@ function SkillTreeGui:show_btns(...)
 			table.insert(btns, self._btns[btn])
 		end
 	end
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 		local back_btn = self._btns.back_btn
 		if back_btn then
 			back_btn:show()
@@ -2959,11 +2963,11 @@ function SkillTreeGui:show_btns(...)
 	self._controllers_mapping = {}
 	self._controllers_pc_mapping = {}
 	for i, btn in ipairs(btns) do
-		if not managers.menu:is_pc_controller() and not btn:data().no_btn then
+		if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and not btn:data().no_btn then
 			btn:set_text_btn_prefix(btn:data().btn)
 		end
 		if btn:data().pc_btn then
-			self._controllers_pc_mapping[btn:data().pc_btn:key()] = btn
+			self._controllers_pc_mapping[Idstring(btn:data().pc_btn):key()] = btn
 		end
 		self._controllers_mapping[btn:data().btn:key()] = btn
 		btn:set_text_params(data.btn_text_params)
@@ -3036,7 +3040,7 @@ end
 function SkillTreeGui:activate_specialization(tree, tier)
 	if tree then
 		managers.skilltree:set_current_specialization(tree)
-		if not managers.menu:is_pc_controller() then
+		if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 			local btns = {}
 			local item = self._selected_spec_item
 			if item and item.tree then
@@ -3471,9 +3475,14 @@ function SpecializationTierItem:init(tier_data, tree_panel, tree, tier, x, y, w,
 	unlocked_bg:set_center(tier_panel:w() / 2, tier_panel:h() / 2)
 	local texture_rect_x = tier_data.icon_xy and tier_data.icon_xy[1] or 0
 	local texture_rect_y = tier_data.icon_xy and tier_data.icon_xy[2] or 0
+	local guis_catalog = "guis/"
+	if tier_data.texture_bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(tier_data.texture_bundle_folder) .. "/"
+	end
+	local icon_atlas_texture = guis_catalog .. "textures/pd2/specialization/icons_atlas"
 	local tier_icon = tier_panel:bitmap({
 		name = tostring(math.random(1000000)),
-		texture = "guis/textures/pd2/specialization/icons_atlas",
+		texture = icon_atlas_texture,
 		texture_rect = {
 			texture_rect_x * 64,
 			texture_rect_y * 64,
@@ -3794,6 +3803,7 @@ function SpecializationGuiButtonItem:init(main_panel, data, x)
 	})
 	self._btn_text_id = data.name
 	self._btn_text_legends = data.legends
+	self._pc_btn = data.pc_btn
 	make_fine_text(self._btn_text)
 	self._panel:set_size(main_panel:w() - x * 2, medium_font_size)
 	self._panel:rect({
@@ -3804,7 +3814,7 @@ function SpecializationGuiButtonItem:init(main_panel, data, x)
 		valign = "scale",
 		halign = "scale"
 	})
-	if not managers.menu:is_pc_controller() then
+	if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
 		self._btn_text:set_color(tweak_data.screen_colors.text)
 	end
 	self._panel:set_left(x)
@@ -3845,6 +3855,10 @@ end
 function SpecializationGuiButtonItem:set_text_params(params)
 	local prefix = self._btn_prefix and managers.localization:get_default_macro(self._btn_prefix) or ""
 	local btn_text = prefix
+	if managers.menu:is_steam_controller() then
+		prefix = self._pc_btn or "skip_cutscene"
+		btn_text = managers.localization:btn_macro(prefix)
+	end
 	if self._btn_text_id then
 		btn_text = btn_text .. utf8.to_upper(managers.localization:text(self._btn_text_id, params))
 	end

@@ -1839,6 +1839,7 @@ function NarrativeTweakData:init()
 	self.jobs.arm_for.contact = "bain"
 	self.jobs.arm_for.region = "street"
 	self.jobs.arm_for.jc = 70
+	self.jobs.arm_for.package = "packages/job_arm_for"
 	self.jobs.arm_for.chain = {
 		{
 			level_id = "arm_for",
@@ -1905,6 +1906,7 @@ function NarrativeTweakData:init()
 	self.jobs.rat.contact = "bain"
 	self.jobs.rat.region = "street"
 	self.jobs.rat.jc = 60
+	self.jobs.rat.package = "packages/narr_rat"
 	self.jobs.rat.chain = {
 		{
 			level_id = "rat",
@@ -2173,6 +2175,7 @@ function NarrativeTweakData:init()
 	self.jobs.kosugi.contact = "bain"
 	self.jobs.kosugi.region = "street"
 	self.jobs.kosugi.jc = 30
+	self.jobs.kosugi.package = "packages/narr_kosugi"
 	self.jobs.kosugi.chain = {
 		{
 			level_id = "kosugi",
@@ -2250,6 +2253,7 @@ function NarrativeTweakData:init()
 	self.jobs.mia.contact = "the_dentist"
 	self.jobs.mia.region = "street"
 	self.jobs.mia.jc = 60
+	self.jobs.mia.package = "packages/narr_mia"
 	self.jobs.mia.chain = {
 		{
 			level_id = "mia_1",
@@ -2500,6 +2504,7 @@ function NarrativeTweakData:init()
 	self.jobs.pines = {}
 	self.jobs.pines.name_id = "heist_pines"
 	self.jobs.pines.briefing_id = "heist_pines_crimenet"
+	self.jobs.pines.package = "packages/job_pines"
 	self.jobs.pines.contact = "vlad"
 	self.jobs.pines.region = "street"
 	self.jobs.pines.jc = 40
@@ -2947,6 +2952,7 @@ function NarrativeTweakData:init()
 	self.jobs.shoutout_raid = {}
 	self.jobs.shoutout_raid.name_id = "heist_shoutout_raid"
 	self.jobs.shoutout_raid.briefing_id = "heist_shoutout_raid_crimenet"
+	self.jobs.shoutout_raid.package = "packages/narr_shoutout"
 	self.jobs.shoutout_raid.contact = "vlad"
 	self.jobs.shoutout_raid.region = "street"
 	self.jobs.shoutout_raid.jc = 30
@@ -3443,6 +3449,60 @@ function NarrativeTweakData:init()
 		31100,
 		31100
 	}
+	self.jobs.pal = {}
+	self.jobs.pal.name_id = "heist_pal"
+	self.jobs.pal.briefing_id = "heist_pal_crimenet"
+	self.jobs.pal.package = "packages/job_pal"
+	self.jobs.pal.contact = "classic"
+	self.jobs.pal.region = "street"
+	self.jobs.pal.dlc = "pal"
+	self.jobs.pal.jc = 30
+	self.jobs.pal.chain = {
+		{
+			level_id = "pal",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.pal.briefing_event = "pln_pal_cbf_01"
+	self.jobs.pal.debrief_event = nil
+	self.jobs.pal.crimenet_callouts = {
+		"pln_pal_cnc_01"
+	}
+	self.jobs.pal.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.pal.payout = {
+		115000,
+		230000,
+		575000,
+		1150000,
+		1500000
+	}
+	self.jobs.pal.contract_cost = {
+		31000,
+		62000,
+		155000,
+		310000,
+		400000
+	}
+	self.jobs.pal.contract_visuals = {}
+	self.jobs.pal.contract_visuals.min_mission_xp = {
+		21000,
+		21000,
+		21000,
+		21000,
+		21000
+	}
+	self.jobs.pal.contract_visuals.max_mission_xp = {
+		3621000,
+		3621000,
+		3621000,
+		3621000,
+		3621000
+	}
 	self.jobs.cane = {}
 	self.jobs.cane.name_id = "heist_cane"
 	self.jobs.cane.briefing_id = "heist_cane_crimenet"
@@ -3552,7 +3612,7 @@ function NarrativeTweakData:init()
 	self.jobs.peta = {}
 	self.jobs.peta.name_id = "heist_peta"
 	self.jobs.peta.briefing_id = "heist_peta_crimenet"
-	self.jobs.peta.package = "packages/narr_peta"
+	self.jobs.peta.package = "packages/job_peta"
 	self.jobs.peta.contact = "vlad"
 	self.jobs.peta.region = "street"
 	self.jobs.peta.dlc = "peta"
@@ -3628,6 +3688,59 @@ function NarrativeTweakData:init()
 		2900000,
 		3800000
 	}
+	self.jobs.man = {}
+	self.jobs.man.name_id = "heist_man"
+	self.jobs.man.briefing_id = "heist_man_crimenet"
+	self.jobs.man.contact = "classic"
+	self.jobs.man.region = "street"
+	self.jobs.man.dlc = "pal"
+	self.jobs.man.jc = 30
+	self.jobs.man.chain = {
+		{
+			level_id = "man",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.man.briefing_event = "pln_man_cbf_01"
+	self.jobs.man.debrief_event = nil
+	self.jobs.man.crimenet_callouts = {
+		"pln_man_cnc_01"
+	}
+	self.jobs.man.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.man.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.man.payout = {
+		135000,
+		275000,
+		692307,
+		1350000,
+		1800000
+	}
+	self.jobs.man.contract_visuals = {}
+	self.jobs.man.contract_visuals.min_mission_xp = {
+		27500,
+		27500,
+		27500,
+		27500,
+		27500
+	}
+	self.jobs.man.contract_visuals.max_mission_xp = {
+		28500,
+		28500,
+		28500,
+		28500,
+		28500
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -3689,7 +3802,9 @@ function NarrativeTweakData:init()
 		"pbr",
 		"pbr2",
 		"peta",
-		"peta_prof"
+		"peta_prof",
+		"pal",
+		"man"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self._jobs_index, "roberts")

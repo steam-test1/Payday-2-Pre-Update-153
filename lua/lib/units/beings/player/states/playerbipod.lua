@@ -121,34 +121,26 @@ function PlayerBipod:_update_check_actions(t, dt)
 		self._unit:base():set_stats_screen_visible(false)
 	end
 	self:_update_foley(t, input)
-	local new_action
-	new_action = new_action or self:_check_action_weapon_gadget(t, input)
-	new_action = new_action or self:_check_action_weapon_firemode(t, input)
-	new_action = new_action or self:_check_action_melee(t, input)
-	new_action = new_action or self:_check_action_reload(t, input)
-	new_action = new_action or self:_check_change_weapon(t, input)
-	new_action = new_action or self:_check_action_equip(t, input)
+	local new_action = false
+	new_action = self:_check_action_reload(t, input)
 	if not new_action then
 		new_action = self:_check_action_primary_attack(t, input)
 		self._shooting = new_action
 	end
+	new_action = new_action or self:_check_action_jump(t, input)
+	new_action = new_action or self:_check_action_run(t, input)
+	new_action = new_action or self:_check_change_weapon(t, input)
+	new_action = new_action or self:_check_action_unmount_bipod(t, input)
 	if not new_action then
 		local projectile_entry = managers.blackmarket:equipped_projectile()
 		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-			new_action = self:_check_action_throw_grenade(t, input)
+			self:_check_action_throw_grenade(t, input)
 		else
-			new_action = self:_check_action_throw_projectile(t, input)
+			self:_check_action_throw_projectile(t, input)
 		end
 	end
-	self:_check_action_interact(t, input)
-	self:_check_action_jump(t, input)
-	self:_check_action_run(t, input)
-	self:_check_action_ladder(t, input)
-	self:_check_action_zipline(t, input)
-	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_check_use_item(t, input)
-	self:_check_action_unmount_bipod(t, input)
 	self:_find_pickups(t)
 end
 
@@ -171,16 +163,15 @@ function PlayerBipod:_check_action_reload(t, input)
 	return new_action
 end
 
-function PlayerBipod:_check_action_run(...)
-end
-
-function PlayerBipod:_check_use_item(t, input)
-end
-
 function PlayerBipod:_check_action_unmount_bipod(t, input)
 	if not input.btn_deploy_bipod then
-		return
+		return false
 	end
+	self:_unmount_bipod()
+	return true
+end
+
+function PlayerBipod:_unmount_bipod()
 	local weapon = self._equipped_unit:base()
 	local bipod_part = managers.weapon_factory:get_parts_from_weapon_by_perk("bipod", weapon._parts)
 	if bipod_part and bipod_part[1] then
@@ -191,22 +182,80 @@ function PlayerBipod:_check_action_unmount_bipod(t, input)
 	end
 end
 
-function PlayerBipod:_check_change_weapon(t, input)
-	local new_action
-	local action_wanted = input.btn_switch_weapon_press
-	if action_wanted then
-		local action_forbidden = self:_changing_weapon()
-		action_forbidden = action_forbidden or self._use_item_expire_t or self._change_item_expire_t
-		action_forbidden = action_forbidden or self._unit:inventory():num_selections() == 1
-		if not action_forbidden then
-			local data = {}
-			data.next = true
-			self:exit(nil, "standard")
-			managers.player:set_player_state("standard")
-			new_action = true
+function PlayerBipod:_check_action_jump(t, input)
+	if input.btn_jump_press then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_check_action_jump(t, input)
 		end
+		return true
 	end
-	return new_action
+	return false
+end
+
+function PlayerBipod:_check_action_run(t, input)
+	local move = self._controller:get_input_axis("move")
+	if input.btn_run_state and move.y > 0.1 then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_start_action_running(t)
+		end
+		return true
+	end
+	return false
+end
+
+function PlayerBipod:_check_change_weapon(t, input)
+	if input.btn_switch_weapon_press or input.btn_primary_choice == 1 then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_check_change_weapon(t, input)
+			current_state:_check_action_equip(t, input)
+		end
+		return true
+	end
+	return false
+end
+
+function PlayerBipod:_check_use_item(t, input)
+	if input.btn_use_item_press then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_check_use_item(t, input)
+		end
+		return true
+	end
+	return false
+end
+
+function PlayerBipod:_check_action_throw_grenade(t, input)
+	local action_forbidden = not PlayerBase.USE_GRENADES or self._unit:base():stats_screen_visible()
+	if input.btn_throw_grenade_press and managers.player:can_throw_grenade() and not action_forbidden then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_start_action_throw_grenade(t, input)
+		end
+		return true
+	end
+	return false
+end
+
+function PlayerBipod:_check_action_throw_projectile(t, input)
+	local action_forbidden = not PlayerBase.USE_GRENADES or not managers.player:can_throw_grenade() or not self:_projectile_repeat_allowed()
+	if input.btn_projectile_press and not action_forbidden then
+		self:_unmount_bipod()
+		local current_state = managers.player:get_current_state()
+		if current_state then
+			current_state:_start_action_throw_projectile(t, input)
+		end
+		return true
+	end
+	return false
 end
 
 function PlayerBipod:_check_action_equip(t, input)
@@ -218,8 +267,7 @@ function PlayerBipod:_check_action_equip(t, input)
 		if not action_forbidden then
 			local new_action = not self._ext_inventory:is_equipped(selection_wanted)
 			if new_action then
-				self:exit(nil, "standard")
-				managers.player:set_player_state("standard")
+				self:_unmount_bipod()
 			end
 		end
 	end

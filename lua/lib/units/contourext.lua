@@ -162,7 +162,8 @@ function ContourExt:add(type, sync, multiplier)
 	local setup = {
 		type = type,
 		fadeout_t = fadeout and TimerManager:game():time() + fadeout or nil,
-		ref_c = 1
+		ref_c = 1,
+		sync = sync
 	}
 	local old_preset_type = self._contour_list[1] and self._contour_list[1].type
 	local i = 1
@@ -432,5 +433,22 @@ function ContourExt:update_materials()
 		self:_upd_color()
 		self._last_opacity = nil
 		self:_upd_opacity(1)
+	end
+end
+
+function ContourExt:save(data)
+	if self._contour_list then
+		for _, setup in ipairs(self._contour_list) do
+			if setup.type == "highlight_character" and setup.sync then
+				data.highlight_character = setup
+				return
+			end
+		end
+	end
+end
+
+function ContourExt:load(data)
+	if data and data.highlight_character then
+		self:add(data.highlight_character.type)
 	end
 end

@@ -63,7 +63,7 @@ CopMovement._gadgets = {
 		Idstring("units/world/props/barbecue/bbq_fork")
 	},
 	loot_bag = {
-		Idstring("units/pd2_cinematics/props/gen_cs_trailer_lootbag/gen_cs_trailer_lootbag")
+		Idstring("units/pd2_dlc_man/props/man_static_loot_bag/man_static_loot_bag")
 	},
 	money_bag = {
 		Idstring("units/world/architecture/secret_stash/luggage_bag/secret_stash_luggage_bag")
@@ -692,6 +692,9 @@ function CopMovement:set_attention(attention)
 end
 
 function CopMovement:set_stance(new_stance_name, instant, execute_queued)
+	if not Network:is_server() then
+		return
+	end
 	for i_stance, stance_name in ipairs(CopMovement._stance.names) do
 		if stance_name == new_stance_name then
 			self:set_stance_by_code(i_stance, instant, execute_queued)
@@ -701,7 +704,7 @@ function CopMovement:set_stance(new_stance_name, instant, execute_queued)
 end
 
 function CopMovement:set_stance_by_code(new_stance_code, instant, execute_queued)
-	if self._stance.code ~= new_stance_code then
+	if self._stance.code ~= new_stance_code and Network:is_server() then
 		self._ext_network:send("set_stance", new_stance_code, instant or false, execute_queued or false)
 		self:_change_stance(new_stance_code, instant)
 	end

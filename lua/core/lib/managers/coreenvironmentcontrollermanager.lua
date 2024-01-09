@@ -48,6 +48,9 @@ function CoreEnvironmentControllerManager:init()
 	self._dof_override_far = 5000
 	self._dof_override_far_pad = 1000
 	self:set_dome_occ_default()
+	self._default_fov_value = 75
+	self._current_fov_value = 75
+	self._fov_ratio = 1
 end
 
 function CoreEnvironmentControllerManager:update(t, dt)
@@ -62,6 +65,43 @@ function CoreEnvironmentControllerManager:_update_values(t, dt)
 	if Global.debug_post_effects_enabled and self._current_suppression_value ~= self._suppression_value then
 		self._current_suppression_value = math.step(self._current_suppression_value, self._suppression_value, 2 * dt)
 	end
+end
+
+function CoreEnvironmentControllerManager:_refresh_fov_ratio_params(vp)
+end
+
+function CoreEnvironmentControllerManager:_update_fov_ratio()
+	if self._current_fov_value == 0 then
+		self._fov_ratio = 1
+		return
+	end
+	self._fov_ratio = math.pow(self._default_fov_value / self._current_fov_value, 0.5)
+end
+
+function CoreEnvironmentControllerManager:fov_ratio()
+	return self._fov_ratio
+end
+
+function CoreEnvironmentControllerManager:set_current_fov_value(current_fov_value)
+	if self._current_fov_value ~= current_fov_value then
+		self._current_fov_value = current_fov_value
+		self._fov_ratio_dirty = true
+	end
+end
+
+function CoreEnvironmentControllerManager:current_fov_value()
+	return self._current_fov_value
+end
+
+function CoreEnvironmentControllerManager:set_default_fov_value(default_fov_value)
+	if self._default_fov_value ~= default_fov_value then
+		self._default_fov_value = default_fov_value
+		self._fov_ratio_dirty = true
+	end
+end
+
+function CoreEnvironmentControllerManager:default_fov_value()
+	return self._default_fov_value
 end
 
 function CoreEnvironmentControllerManager:set_dof_distance(distance, in_steelsight, position)
@@ -331,6 +371,10 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 		self._occ_dirty = false
 		self:_refresh_occ_params(vp)
 	end
+	if self._fov_ratio_dirty then
+		self:_refresh_fov_ratio_params(vp)
+		self._fov_ratio_dirty = false
+	end
 	if self._vp ~= vp then
 		local hdr_post_processor = vp:vp():get_post_processor_effect("World", ids_hdr_post_processor)
 		if hdr_post_processor then
@@ -351,6 +395,7 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 	end
 	if self._old_vp ~= vp then
 		self._occ_dirty = true
+		self._fov_ratio_dirty = true
 		self:refresh_render_settings()
 		self._old_vp = vp
 	end

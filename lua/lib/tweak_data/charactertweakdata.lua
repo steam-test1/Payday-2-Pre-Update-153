@@ -34,6 +34,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_drunk_pilot(presets)
 	self:_init_boris(presets)
 	self:_init_escort(presets)
+	self:_init_escort_undercover(presets)
 	self:_init_russian(presets)
 	self:_init_german(presets)
 	self:_init_spanish(presets)
@@ -1424,6 +1425,25 @@ function CharacterTweakData:_init_escort(presets)
 	self.escort.is_escort = true
 	self.escort.escort_idle_talk = true
 	self.escort.escort_scared_dist = 600
+end
+
+function CharacterTweakData:_init_escort_undercover(presets)
+	self.escort_undercover = deep_clone(self.civilian)
+	self.escort_undercover.move_speed = presets.move_speed.slow
+	self.escort_undercover.allowed_stances = {hos = true}
+	self.escort_undercover.allowed_poses = {stand = true}
+	self.escort_undercover.no_run_start = true
+	self.escort_undercover.no_run_stop = true
+	self.escort_undercover.flee_type = "hide"
+	self.escort_undercover.speech_prefix_p1 = "cm"
+	self.escort_undercover.speech_prefix_count = 2
+	self.escort_undercover.speech_escort = "undercover_escort"
+	self.escort_undercover.access = "civ_male"
+	self.escort_undercover.intimidateable = false
+	self.escort_undercover.calls_in = false
+	self.escort_undercover.escort_scared_dist = 200
+	self.escort_undercover.is_escort = true
+	self.escort_undercover.escort_idle_talk = true
 end
 
 function CharacterTweakData:_init_old_hoxton_mission(presets)
@@ -6785,6 +6805,12 @@ function CharacterTweakData:character_map()
 			list = {
 				"civ_male_butcher_2",
 				"civ_male_butcher_1"
+			}
+		},
+		pal = {
+			path = "units/pd2_dlc_pal/characters/",
+			list = {
+				"civ_male_mitch"
 			}
 		},
 		cane = {

@@ -1739,26 +1739,54 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		local perks = managers.blackmarket:get_perks_from_weapon_blueprint(outfit.primary.factory_id, outfit.primary.blueprint)
 		if 0 < table.size(perks) then
 			for perk in pairs(perks) do
-				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
-				if DB:has(Idstring("texture"), texture) then
-					local perk_object = player_slot.panel:bitmap({
-						texture = texture,
-						w = 16,
-						h = 16,
-						rotation = math.random(2) - 1.5,
-						alpha = 0.8,
-						layer = 2
-					})
-					perk_object:set_rightbottom(math.round(primary_bitmap:right() - perk_index * 16), math.round(primary_bitmap:bottom() - 5))
-					perk_index = perk_index + 1
+				if perk ~= "bonus" then
+					local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
+					if DB:has(Idstring("texture"), texture) then
+						local perk_object = player_slot.panel:bitmap({
+							texture = texture,
+							w = 16,
+							h = 16,
+							rotation = math.random(2) - 1.5,
+							alpha = 0.8,
+							layer = 2
+						})
+						perk_object:set_rightbottom(math.round(primary_bitmap:right() - perk_index * 16), math.round(primary_bitmap:bottom() - 5))
+						perk_index = perk_index + 1
+					end
 				end
 			end
 		end
-		if outfit.primary.cosmetics and outfit.primary.cosmetics.bonus and not managers.job:is_current_job_competitive() and not managers.weapon_factory:has_perk("bonus", outfit.primary.factory_id, outfit.primary.blueprint) then
+		local factory = tweak_data.weapon.factory.parts
+		local parts = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("bonus", outfit.primary.factory_id, outfit.primary.blueprint) or {}
+		local stats, custom_stats, has_stat, has_team
+		local textures = {}
+		for _, part_id in ipairs(parts) do
+			stats = factory[part_id] and factory[part_id].stats or false
+			custom_stats = factory[part_id] and factory[part_id].custom_stats or false
+			has_stat = stats and 1 < table.size(stats) and true or false
+			has_team = custom_stats and (custom_stats.exp_multiplier or custom_stats.money_multiplier and true) or false
+			if has_stat then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_stats")
+			end
+			if has_team then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_team")
+			end
+		end
+		if #textures == 0 and outfit.primary.cosmetics and outfit.primary.cosmetics.bonus and not managers.job:is_current_job_competitive() then
 			local bonus_data = tweak_data.economy.bonuses[tweak_data.blackmarket.weapon_skins[outfit.primary.cosmetics.id].bonus]
-			if bonus_data and (bonus_data.exp_multiplier or bonus_data.money_multiplier) then
+			has_stat = bonus_data and bonus_data.stats and true or false
+			has_team = bonus_data and (bonus_data.exp_multiplier or bonus_data.money_multiplier and true) or false
+			if has_stat then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_stats")
+			end
+			if has_team then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_team")
+			end
+		end
+		for _, texture in ipairs(table.list_union(textures)) do
+			if DB:has(Idstring("texture"), texture) then
 				local perk_object = player_slot.panel:bitmap({
-					texture = "guis/dlcs/cash/textures/pd2/safe_raffle/teamboost_icon",
+					texture = texture,
 					w = 16,
 					h = 16,
 					rotation = math.random(2) - 1.5,
@@ -1814,26 +1842,54 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		local perks = managers.blackmarket:get_perks_from_weapon_blueprint(outfit.secondary.factory_id, outfit.secondary.blueprint)
 		if 0 < table.size(perks) then
 			for perk in pairs(perks) do
-				local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
-				if DB:has(Idstring("texture"), texture) then
-					local perk_object = player_slot.panel:bitmap({
-						texture = texture,
-						w = 16,
-						h = 16,
-						rotation = math.random(2) - 1.5,
-						alpha = 0.8,
-						layer = 2
-					})
-					perk_object:set_rightbottom(secondary_bitmap:right() - perk_index * 16, secondary_bitmap:bottom() - 5)
-					perk_index = perk_index + 1
+				if perk ~= "bonus" then
+					local texture = "guis/textures/pd2/blackmarket/inv_mod_" .. perk
+					if DB:has(Idstring("texture"), texture) then
+						local perk_object = player_slot.panel:bitmap({
+							texture = texture,
+							w = 16,
+							h = 16,
+							rotation = math.random(2) - 1.5,
+							alpha = 0.8,
+							layer = 2
+						})
+						perk_object:set_rightbottom(secondary_bitmap:right() - perk_index * 16, secondary_bitmap:bottom() - 5)
+						perk_index = perk_index + 1
+					end
 				end
 			end
 		end
-		if outfit.secondary.cosmetics and outfit.secondary.cosmetics.bonus and not managers.job:is_current_job_competitive() and not managers.weapon_factory:has_perk("bonus", outfit.primary.factory_id, outfit.primary.blueprint) then
+		local factory = tweak_data.weapon.factory.parts
+		local parts = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("bonus", outfit.secondary.factory_id, outfit.secondary.blueprint) or {}
+		local stats, custom_stats, has_stat, has_team
+		local textures = {}
+		for _, part_id in ipairs(parts) do
+			stats = factory[part_id] and factory[part_id].stats or false
+			custom_stats = factory[part_id] and factory[part_id].custom_stats or false
+			has_stat = stats and 1 < table.size(stats) and true or false
+			has_team = custom_stats and (custom_stats.exp_multiplier or custom_stats.money_multiplier and true) or false
+			if has_stat then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_stats")
+			end
+			if has_team then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_team")
+			end
+		end
+		if #textures == 0 and outfit.secondary.cosmetics and outfit.secondary.cosmetics.bonus and not managers.job:is_current_job_competitive() then
 			local bonus_data = tweak_data.economy.bonuses[tweak_data.blackmarket.weapon_skins[outfit.secondary.cosmetics.id].bonus]
-			if bonus_data and (bonus_data.exp_multiplier or bonus_data.money_multiplier) then
+			has_stat = bonus_data and bonus_data.stats and true or false
+			has_team = bonus_data and (bonus_data.exp_multiplier or bonus_data.money_multiplier and true) or false
+			if has_stat then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_stats")
+			end
+			if has_team then
+				table.insert(textures, "guis/textures/pd2/blackmarket/inv_mod_bonus_team")
+			end
+		end
+		for _, texture in ipairs(table.list_union(textures)) do
+			if DB:has(Idstring("texture"), texture) then
 				local perk_object = player_slot.panel:bitmap({
-					texture = "guis/dlcs/cash/textures/pd2/safe_raffle/teamboost_icon",
+					texture = texture,
 					w = 16,
 					h = 16,
 					rotation = math.random(2) - 1.5,

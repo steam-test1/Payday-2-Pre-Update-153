@@ -107,6 +107,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_sparrow_npc()
 	self:_init_data_model70_npc()
 	self:_init_data_m37_npc()
+	self:_init_data_china_npc()
 	self:_precalculate_values()
 end
 
@@ -1875,6 +1876,22 @@ function WeaponTweakData:_init_data_m37_npc()
 	self.m37_npc.alert_size = 4500
 	self.m37_npc.suppression = 1.8
 	self.m37_npc.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_china_npc()
+	self.china_npc.sounds.prefix = "china_npc"
+	self.china_npc.use_data.selection_index = 1
+	self.china_npc.DAMAGE = 2
+	self.china_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.china_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.china_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.china_npc.no_trail = true
+	self.china_npc.CLIP_AMMO_MAX = 3
+	self.china_npc.NR_CLIPS_MAX = 2
+	self.china_npc.auto.fire_rate = 0.1
+	self.china_npc.hold = "rifle"
+	self.china_npc.alert_size = 2800
+	self.china_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -10856,6 +10873,108 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.china = {}
+	self.china.category = "grenade_launcher"
+	self.china.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.china.projectile_type_index = 6
+	self.china.damage_melee = damage_melee_default
+	self.china.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.china.sounds = {}
+	self.china.sounds.fire = "china_fire"
+	self.china.sounds.dryfire = "shotgun_dryfire"
+	self.china.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.china.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.china.timers = {}
+	self.china.timers.shotgun_reload_enter = 0.83
+	self.china.timers.shotgun_reload_exit_empty = 2
+	self.china.timers.shotgun_reload_exit_not_empty = 1
+	self.china.timers.shotgun_reload_shell = 0.83
+	self.china.timers.shotgun_reload_first_shell_offset = 0
+	self.china.timers.unequip = 0.6
+	self.china.timers.equip = 1
+	self.china.name_id = "bm_w_china"
+	self.china.desc_id = "bm_w_china_desc"
+	self.china.description_id = "des_china"
+	self.china.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.china.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.china.use_data = {}
+	self.china.use_data.selection_index = 1
+	self.china.use_data.align_place = "right_hand"
+	self.china.DAMAGE = 6
+	self.china.damage_near = 1000
+	self.china.damage_far = 2000
+	self.china.rays = 6
+	self.china.CLIP_AMMO_MAX = 3
+	self.china.NR_CLIPS_MAX = 2
+	self.china.AMMO_MAX = self.china.CLIP_AMMO_MAX * self.china.NR_CLIPS_MAX
+	self.china.AMMO_PICKUP = {0.05, 0.65}
+	self.china.FIRE_MODE = "single"
+	self.china.fire_mode_data = {}
+	self.china.fire_mode_data.fire_rate = 1.2
+	self.china.single = {}
+	self.china.single.fire_rate = 1.2
+	self.china.spread = {}
+	self.china.spread.standing = self.r870.spread.standing
+	self.china.spread.crouching = self.r870.spread.crouching
+	self.china.spread.steelsight = self.r870.spread.steelsight
+	self.china.spread.moving_standing = self.r870.spread.moving_standing
+	self.china.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.china.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.china.kick = {}
+	self.china.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.china.kick.crouching = self.china.kick.standing
+	self.china.kick.steelsight = self.china.kick.standing
+	self.china.crosshair = {}
+	self.china.crosshair.standing = {}
+	self.china.crosshair.crouching = {}
+	self.china.crosshair.steelsight = {}
+	self.china.crosshair.standing.offset = 0.16
+	self.china.crosshair.standing.moving_offset = 0.8
+	self.china.crosshair.standing.kick_offset = 0.6
+	self.china.crosshair.standing.hidden = true
+	self.china.crosshair.crouching.offset = 0.08
+	self.china.crosshair.crouching.moving_offset = 0.7
+	self.china.crosshair.crouching.kick_offset = 0.4
+	self.china.crosshair.crouching.hidden = true
+	self.china.crosshair.steelsight.hidden = true
+	self.china.crosshair.steelsight.offset = 0
+	self.china.crosshair.steelsight.moving_offset = 0
+	self.china.crosshair.steelsight.kick_offset = 0.1
+	self.china.shake = {}
+	self.china.shake.fire_multiplier = 2
+	self.china.shake.fire_steelsight_multiplier = 2
+	self.china.autohit = autohit_shotgun_default
+	self.china.aim_assist = aim_assist_shotgun_default
+	self.china.animations = {}
+	self.china.animations.equip_id = "equip_china"
+	self.china.animations.recoil_steelsight = true
+	self.china.global_value = "pal"
+	self.china.texture_bundle_folder = "lupus"
+	self.china.panic_suppression_chance = 0.2
+	self.china.ignore_damage_upgrades = true
+	self.china.stats = {
+		damage = 170,
+		spread = 25,
+		recoil = 25,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 18,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.china.stats_modifiers = {damage = 2}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -11568,6 +11687,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.china_npc = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -11675,4 +11800,5 @@ function WeaponTweakData:_precalculate_values()
 	self.sparrow_npc.AMMO_MAX = self.sparrow_npc.CLIP_AMMO_MAX * self.sparrow_npc.NR_CLIPS_MAX
 	self.model70_npc.AMMO_MAX = self.model70_npc.CLIP_AMMO_MAX * self.model70_npc.NR_CLIPS_MAX
 	self.m37_npc.AMMO_MAX = self.m37_npc.CLIP_AMMO_MAX * self.m37_npc.NR_CLIPS_MAX
+	self.china_npc.AMMO_MAX = self.china_npc.CLIP_AMMO_MAX * self.china_npc.NR_CLIPS_MAX
 end

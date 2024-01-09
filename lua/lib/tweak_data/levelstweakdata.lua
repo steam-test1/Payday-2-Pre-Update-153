@@ -1052,6 +1052,30 @@ function LevelsTweakData:init()
 	self.peta2.music = "heist"
 	self.peta2.package = "packages/narr_peta2"
 	self.peta2.cube = "cube_apply_heist_bank"
+	self.pal = {}
+	self.pal.name_id = "heist_pal_hl"
+	self.pal.briefing_id = "heist_pal_briefing"
+	self.pal.briefing_dialog = "Play_pln_pal_brf"
+	self.pal.world_name = "narratives/classics/pal"
+	self.pal.intro_event = "Play_pln_pal_intro"
+	self.pal.outro_event = "Play_pln_pal_81"
+	self.pal.music = "heist"
+	self.pal.package = {
+		"packages/narr_pal"
+	}
+	self.pal.cube = "cube_apply_heist_bank"
+	self.pal.max_bags = 1200
+	self.man = {}
+	self.man.name_id = "heist_man_hl"
+	self.man.briefing_id = "heist_man_briefing"
+	self.man.briefing_dialog = "Play_pln_man_brf"
+	self.man.world_name = "narratives/classics/man"
+	self.man.intro_event = "Play_pln_man_intro"
+	self.man.outro_event = "Play_pln_man_81"
+	self.man.music = "heist"
+	self.man.package = "packages/narr_man"
+	self.man.cube = "cube_apply_heist_bank"
+	self.man.max_bags = 10
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1125,7 +1149,9 @@ function LevelsTweakData:init()
 		"pbr2",
 		"peta",
 		"peta2",
-		"nail"
+		"pal",
+		"nail",
+		"man"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self._level_index, "roberts")

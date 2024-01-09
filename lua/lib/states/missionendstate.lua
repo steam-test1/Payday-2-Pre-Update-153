@@ -637,11 +637,24 @@ function MissionEndState:chk_complete_heist_achievements()
 					managers.achievment:award(shotgun_one_o_one.award)
 				end
 			end
-			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, job_value_pass, phalanx_vip_alive_pass, used_weapon_category_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, killed_by_weapons_pass, killed_by_melee_pass, killed_by_grenade_pass, civilians_killed_pass, complete_job_pass, memory_pass, all_pass, weapon_data, memory, level_id, stage, num_skills
 			local killed_by_weapons = managers.statistics:session_killed_by_weapons()
 			local killed_by_melee = managers.statistics:session_killed_by_melee()
 			local killed_by_grenade = managers.statistics:session_killed_by_grenade()
 			local civilians_killed = managers.statistics:session_total_civilian_kills()
+			local man_5 = tweak_data.achievement.man_5
+			if managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == man_5.job and table.contains(man_5.difficulty, Global.game_settings.difficulty) and killed_by_melee == 0 and killed_by_grenade == 0 then
+				local passed = true
+				for i, weapon_id in ipairs(managers.statistics:session_used_weapons()) do
+					if man_5.weapon_category ~= tweak_data:get_raw_value("weapon", weapon_id, "category") then
+						passed = false
+						break
+					end
+				end
+				if passed then
+					managers.achievment:award(man_5.award)
+				end
+			end
+			local mask_pass, diff_pass, no_shots_pass, contract_pass, job_pass, jobs_pass, level_pass, levels_pass, stealth_pass, loud_pass, equipped_pass, job_value_pass, phalanx_vip_alive_pass, used_weapon_category_pass, equipped_team_pass, timer_pass, num_players_pass, pass_skills, killed_by_weapons_pass, killed_by_melee_pass, killed_by_grenade_pass, civilians_killed_pass, complete_job_pass, memory_pass, all_pass, weapon_data, memory, level_id, stage, num_skills
 			local phalanx_vip_alive = false
 			for _, enemy in pairs(managers.enemy:all_enemies() or {}) do
 				phalanx_vip_alive = alive(enemy.unit) and enemy.unit:base()._tweak_table == "phalanx_vip"
@@ -729,7 +742,7 @@ function MissionEndState:chk_complete_heist_achievements()
 						weapon_data = managers.blackmarket:equipped_item(category)
 						if (category == "grenades" or category == "armors") and data == weapon_data then
 							equipped_pass = true
-						elseif data.weapon_id and weapon_data and weapon_data.weapon_id and data.weapon_id == weapon_data.weapon_id then
+						elseif weapon_data and weapon_data.weapon_id and (data.weapon_id and data.weapon_id == weapon_data.weapon_id or data.category and data.category == tweak_data:get_raw_value("weapon", weapon_data.weapon_id, "category")) then
 							equipped_pass = true
 							if data.blueprint and weapon_data.blueprint then
 								for _, part_or_parts in ipairs(data.blueprint) do

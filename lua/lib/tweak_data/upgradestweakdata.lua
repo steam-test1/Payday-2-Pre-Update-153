@@ -1584,7 +1584,8 @@ function UpgradesTweakData:init()
 		name_id = "body_armor",
 		upgrades = {
 			"body_armor2",
-			"ak74"
+			"ak74",
+			"nin"
 		}
 	}
 	self.level_tree[2] = {
@@ -1865,7 +1866,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"m16",
 			"huntsman",
-			"polymer"
+			"polymer",
+			"china"
 		}
 	}
 	self.level_tree[40] = {
@@ -2210,6 +2212,7 @@ function UpgradesTweakData:init()
 	self:_sparrow_weapon_definitions()
 	self:_model70_weapon_definitions()
 	self:_m37_weapon_definitions()
+	self:_china_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -7017,6 +7020,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "peta"
 	}
+	self.definitions.nin = {
+		category = "melee_weapon",
+		dlc = "pal"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -9777,5 +9784,14 @@ function UpgradesTweakData:_m37_weapon_definitions()
 		weapon_id = "m37",
 		factory_id = "wpn_fps_shot_m37",
 		dlc = "peta"
+	}
+end
+
+function UpgradesTweakData:_china_weapon_definitions()
+	self.definitions.china = {
+		category = "weapon",
+		weapon_id = "china",
+		factory_id = "wpn_fps_gre_china",
+		dlc = "pal"
 	}
 end

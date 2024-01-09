@@ -7,6 +7,7 @@ function PlayerManager:init()
 	self._nr_players = Global.nr_players or 1
 	self._last_id = 1
 	self._viewport_configs = {}
+	self._player_list = {}
 	self._viewport_configs[1] = {}
 	self._viewport_configs[1][1] = {
 		dimensions = {
@@ -1748,6 +1749,7 @@ function PlayerManager:peer_dropped_out(peer)
 	self._global.synced_team_upgrades[peer_id] = nil
 	self._global.synced_bipod[peer_id] = nil
 	local peer_unit = peer:unit()
+	self:remove_from_player_list(peer_unit)
 	managers.vehicle:remove_player_from_all_vehicles(peer_unit)
 end
 
@@ -2500,6 +2502,11 @@ function PlayerManager:is_damage_health_ratio_active(health_ratio)
 	return self:has_category_upgrade("player", "melee_damage_health_ratio_multiplier") and self:get_damage_health_ratio(health_ratio, "melee") > 0 or self:has_category_upgrade("player", "armor_regen_damage_health_ratio_multiplier") and 0 < self:get_damage_health_ratio(health_ratio, "armor_regen") or self:has_category_upgrade("player", "damage_health_ratio_multiplier") and 0 < self:get_damage_health_ratio(health_ratio, "damage") or self:has_category_upgrade("player", "movement_speed_damage_health_ratio_multiplier") and 0 < self:get_damage_health_ratio(health_ratio, "movement_speed")
 end
 
+function PlayerManager:get_current_state()
+	local player = self:player_unit()
+	return player:movement()._current_state
+end
+
 function PlayerManager:is_carrying()
 	return self:get_my_carry_data() and true or false
 end
@@ -2863,6 +2870,37 @@ function PlayerManager:_exit_vehicle(peer_id, player)
 	self._global.synced_vehicle_data[peer_id] = nil
 	managers.hud:update_vehicle_label_by_id(vehicle_data.vehicle_unit:unit_data().name_label_id, vehicle_ext:_number_in_the_vehicle())
 	managers.vehicle:on_player_exited_vehicle(vehicle_data.vehicle, player)
+end
+
+function PlayerManager:update_player_list(unit, health)
+	for i in pairs(self._player_list) do
+		local p = self._player_list[i]
+		if p.unit == unit then
+			p.health = health
+			return
+		end
+	end
+	table.insert(self._player_list, {unit = unit, health = health})
+end
+
+function PlayerManager:debug_print_player_status()
+	local count = 0
+	for i in pairs(self._player_list) do
+		local p = self._player_list[i]
+		print("Player: ", i, ", health: ", p.health, " , unit: ", p.unit)
+		count = count + 1
+	end
+	print("num players: ", count)
+end
+
+function PlayerManager:remove_from_player_list(unit)
+	for i in pairs(self._player_list) do
+		local p = self._player_list[i]
+		if p.unit == unit then
+			table.remove(self._player_list, i)
+			return
+		end
+	end
 end
 
 function PlayerManager:on_hallowSPOOCed()

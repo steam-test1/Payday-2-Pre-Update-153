@@ -1088,7 +1088,7 @@ Play the full version soon to get your full PAYDAY!]],
 		1.2,
 		1.3
 	}
-	self.experience_manager.limited_bonus_multiplier = 1.25
+	self.experience_manager.limited_bonus_multiplier = 1
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
 	self.experience_manager.level_limit.low_cap_multiplier = 0.75
@@ -1323,6 +1323,15 @@ Play the full version soon to get your full PAYDAY!]],
 			secondary = "serbu",
 			armor = "level_7"
 		}
+	}
+	self.achievement.man_5 = {
+		award = "man_5",
+		job = "man",
+		difficulty = {
+			"overkill_145",
+			"overkill_290"
+		},
+		weapon_category = "grenade_launcher"
 	}
 	self.achievement.peta_4 = {
 		award = "peta_4",
@@ -2548,7 +2557,21 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = {
 				"overkill_290"
 			},
-			job = "peta"
+			jobs = {"peta", "peta_prof"}
+		},
+		death_pal = {
+			award = "pal_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "pal"
+		},
+		death_man = {
+			award = "man_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "man"
 		},
 		flake_1 = {
 			award = "flake_1",
@@ -2713,6 +2736,14 @@ Play the full version soon to get your full PAYDAY!]],
 			secured = {carry_id = "present", amount = 10},
 			no_assets = true,
 			no_deployable = true
+		},
+		pal_2 = {
+			award = "pal_2",
+			job = "pal",
+			secured = {
+				carry_id = "counterfeit_money",
+				value = 1000000
+			}
 		}
 	}
 	self.achievement.job_list = {}
@@ -2725,7 +2756,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"shoutout_raid",
 		"jolly",
 		"cane",
-		"peta"
+		"peta",
+		"peta_prof"
 	}
 	self.achievement.job_list.hector = {
 		"watchdogs_wrapper",
@@ -2775,7 +2807,12 @@ Play the full version soon to get your full PAYDAY!]],
 		"crojob_wrapper",
 		"crojob1"
 	}
-	self.achievement.job_list.classic = {"red2", "dinner"}
+	self.achievement.job_list.classic = {
+		"red2",
+		"dinner",
+		"pal",
+		"man"
+	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.events = {"nail"}
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -3487,6 +3524,8 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_39"},
 		{track = "track_40", lock = "peta"},
 		{track = "track_41", lock = "peta"},
+		{track = "track_42", lock = "pal"},
+		{track = "track_43", lock = "pal"},
 		{
 			track = "track_32_lcv"
 		},

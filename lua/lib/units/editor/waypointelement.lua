@@ -27,7 +27,9 @@ function WaypointUnitElement:init(unit)
 		"pd2_defend",
 		"pd2_generic_saw",
 		"pd2_chainsaw",
-		"pd2_car"
+		"pd2_car",
+		"pd2_melee",
+		"pd2_water_tap"
 	}
 	self._hed.icon = "pd2_goto"
 	self._hed.text_id = "debug_none"

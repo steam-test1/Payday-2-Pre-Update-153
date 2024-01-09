@@ -82,12 +82,20 @@ end
 
 function CoreEnvEditor:shadow_feed_params(feed_params)
 	local interface_params = self._posteffect.post_processors.shadow_processor.modifiers.shadow_modifier.params
-	local s0 = Vector3(0, interface_params.d0:get_value(), 0)
-	local s1 = Vector3(interface_params.d0:get_value() - interface_params.o1:get_value(), interface_params.d1:get_value(), 0)
-	local s2 = Vector3(interface_params.d1:get_value() - interface_params.o2:get_value(), interface_params.d2:get_value(), 0)
-	local s3 = Vector3(interface_params.d2:get_value() - interface_params.o3:get_value(), interface_params.d3:get_value(), 0)
-	local shadow_slice_depths = Vector3(interface_params.d0:get_value(), interface_params.d1:get_value(), interface_params.d2:get_value())
-	local shadow_slice_overlaps = Vector3(interface_params.o1:get_value(), interface_params.o2:get_value(), interface_params.o3:get_value())
+	local fov_ratio = managers.environment_controller:fov_ratio()
+	local d0 = interface_params.d0:get_value() * fov_ratio
+	local d1 = interface_params.d1:get_value() * fov_ratio
+	local d2 = interface_params.d2:get_value() * fov_ratio
+	local d3 = interface_params.d3:get_value() * fov_ratio
+	local o1 = interface_params.o1:get_value() * fov_ratio
+	local o2 = interface_params.o2:get_value() * fov_ratio
+	local o3 = interface_params.o3:get_value() * fov_ratio
+	local s0 = Vector3(0, d0, 0)
+	local s1 = Vector3(d0 - o1, d1, 0)
+	local s2 = Vector3(d1 - o2, d2, 0)
+	local s3 = Vector3(d2 - o3, d3, 0)
+	local shadow_slice_depths = Vector3(d0, d1, d2)
+	local shadow_slice_overlaps = Vector3(o1, o2, o3)
 	feed_params.slice0 = s0
 	feed_params.slice1 = s1
 	feed_params.slice2 = s2

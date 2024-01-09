@@ -81,6 +81,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.warhead = 4600
 	self.bag_values.unknown = 5000
 	self.bag_values.safe = 4600
+	self.bag_values.counterfeit_money = 1100
 	self.bag_values.masterpiece_painting = 10000
 	self.bag_values.master_server = 10000
 	self.bag_values.lost_artifact = 10000
@@ -197,6 +198,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.steel = 1
 	self.global_value_multipliers.berry = 1
 	self.global_value_multipliers.peta = 1
+	self.global_value_multipliers.pal = 1
 	self.global_value_multipliers.dbd_clan = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
@@ -260,6 +262,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.steel = 0.2
 	self.global_value_bonus_multiplier.berry = 0.2
 	self.global_value_bonus_multiplier.peta = 0.2
+	self.global_value_bonus_multiplier.pal = 0.2
 	self.global_value_bonus_multiplier.dbd_clan = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40

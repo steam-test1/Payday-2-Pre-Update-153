@@ -417,12 +417,11 @@ function ElementAreaReportTrigger:_check_state(unit)
 		if table.contains(self._inside, unit) then
 			if not inside or not rule_ok then
 				self:_remove_inside(unit)
+			elseif inside and rule_ok then
+				self:_while_inside(unit)
 			end
 		elseif inside and rule_ok then
 			self:_add_inside(unit)
-		end
-		if inside and rule_ok then
-			self:_while_inside(unit)
 		end
 	end
 	local project_amount_all = self:project_amount_all()
@@ -436,7 +435,11 @@ end
 
 function ElementAreaReportTrigger:_add_inside(unit)
 	table.insert(self._inside, unit)
-	self:on_executed(unit, "enter")
+	if self:_has_on_executed_alternative("while_inside") then
+		self:on_executed(unit, "while_inside")
+	else
+		self:on_executed(unit, "enter")
+	end
 	self:_check_on_executed_reached_amount(unit)
 end
 

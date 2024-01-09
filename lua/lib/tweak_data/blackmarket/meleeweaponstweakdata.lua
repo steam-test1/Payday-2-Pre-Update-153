@@ -1854,7 +1854,6 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.stick.stats.max_damage = 9
 	self.melee_weapons.stick.stats.min_damage_effect = 5
 	self.melee_weapons.stick.stats.max_damage_effect = 3
-	self.melee_weapons.stick.melee_damage_delay = 0.15
 	self.melee_weapons.stick.stats.charge_time = 3
 	self.melee_weapons.stick.stats.range = 225
 	self.melee_weapons.stick.stats.concealment = 27
@@ -1892,7 +1891,6 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.pitchfork.stats.max_damage = 45
 	self.melee_weapons.pitchfork.stats.min_damage_effect = 1
 	self.melee_weapons.pitchfork.stats.max_damage_effect = 1
-	self.melee_weapons.pitchfork.melee_damage_delay = 0.19
 	self.melee_weapons.pitchfork.stats.charge_time = 4
 	self.melee_weapons.pitchfork.stats.range = 225
 	self.melee_weapons.pitchfork.stats.concealment = 27
@@ -1936,5 +1934,43 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.scoutknife.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.scoutknife.repeat_expire_t = 0.36
 	self.melee_weapons.scoutknife.expire_t = 1.8
+	self.melee_weapons.nin = {}
+	self.melee_weapons.nin.name_id = "bm_melee_nin"
+	self.melee_weapons.nin.animation = nil
+	self.melee_weapons.nin.hit_pre_calculation = true
+	self.melee_weapons.nin.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.nin.anim_global_param = "melee_nin"
+	self.melee_weapons.nin.dlc = "pal"
+	self.melee_weapons.nin.texture_bundle_folder = "lupus"
+	self.melee_weapons.nin.type = "knife"
+	self.melee_weapons.nin.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.nin.unit = "units/pd2_dlc_lupus/weapons/wpn_fps_mel_nin/wpn_fps_mel_nin"
+	self.melee_weapons.nin.third_unit = "units/pd2_dlc_lupus/weapons/wpn_fps_mel_nin/wpn_third_mel_nin"
+	self.melee_weapons.nin.sounds = {}
+	self.melee_weapons.nin.sounds.equip = "nin_equip"
+	self.melee_weapons.nin.sounds.hit_air = "nin_hit_air"
+	self.melee_weapons.nin.sounds.hit_gen = "nin_hit_gen"
+	self.melee_weapons.nin.sounds.hit_body = "nin_hit_body"
+	self.melee_weapons.nin.sounds.charge = "nin_charge"
+	self.melee_weapons.nin.stats = {}
+	self.melee_weapons.nin.stats.weapon_type = "sharp"
+	self.melee_weapons.nin.stats.min_damage = 3
+	self.melee_weapons.nin.stats.max_damage = 8
+	self.melee_weapons.nin.stats.min_damage_effect = 1
+	self.melee_weapons.nin.stats.max_damage_effect = 1
+	self.melee_weapons.nin.stats.charge_time = 2
+	self.melee_weapons.nin.stats.range = 185
+	self.melee_weapons.nin.stats.concealment = 27
+	self.melee_weapons.nin.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.nin.repeat_expire_t = 0.65
+	self.melee_weapons.nin.expire_t = 1.2
+	self.melee_weapons.nin.melee_damage_delay = 0.1
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

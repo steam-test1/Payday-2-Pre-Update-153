@@ -478,6 +478,22 @@ function EquipmentsTweakData:init()
 		icon = "equipment_winch_hook",
 		sync_possession = true
 	}
+	self.specials.printer_ink = {
+		text_id = "hud_int_equipment_printer_ink",
+		icon = "equipment_printer_ink",
+		sync_possession = true,
+		transfer_quantity = 4
+	}
+	self.specials.plates = {
+		text_id = "hud_int_equipment_plates",
+		icon = "equipment_plates",
+		sync_possession = true
+	}
+	self.specials.paper_roll = {
+		text_id = "hud_int_equipment_paper_roll",
+		icon = "equipment_paper_roll",
+		sync_possession = true
+	}
 	self.specials.blow_torch = {
 		text_id = "hud_int_equipment_blow_torch",
 		icon = "equipment_blow_torch",

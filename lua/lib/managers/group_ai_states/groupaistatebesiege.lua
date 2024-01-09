@@ -420,11 +420,12 @@ function GroupAIStateBesiege:_upd_assault_task()
 						task_data.said_retreat = true
 						self:_police_announce_retreat()
 					end
-				elseif t > task_data.phase_end_t and self._drama_data.amount < tweak_data.drama.assault_fade_end and self:_count_criminals_engaged_force(4) <= 3 then
-					end_assault = true
+				else
+					if t > task_data.phase_end_t and self._drama_data.amount < tweak_data.drama.assault_fade_end and self:_count_criminals_engaged_force(4) <= 3 then
+						end_assault = true
+					else
+					end
 				end
-			else
-				print("kill more enemies to end fade phase: ", min_enemies_left - enemies_left)
 			end
 			if task_data.force_end or end_assault then
 				print("assault task clear")
@@ -439,7 +440,6 @@ function GroupAIStateBesiege:_upd_assault_task()
 				return
 			end
 		else
-			print("disable hunt mode to end fade phase")
 		end
 	end
 	if self._drama_data.amount <= tweak_data.drama.low then

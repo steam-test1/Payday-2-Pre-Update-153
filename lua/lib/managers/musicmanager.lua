@@ -316,8 +316,10 @@ function MusicManager:jukebox_default_tracks()
 		heist_pbr = "all",
 		heist_pbr2 = "all",
 		heist_cane = "track_39",
-		heist_peta1 = "track_40",
-		heist_peta2 = "track_41"
+		heist_peta1 = "all",
+		heist_peta2 = "all",
+		heist_man = "all",
+		heist_pal = "all"
 	}
 	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
 		default_options.heist_arm_cro = "track_09"
@@ -354,6 +356,10 @@ function MusicManager:jukebox_default_tracks()
 		default_options.heist_peta1 = "track_40"
 		default_options.heist_peta2 = "track_41"
 	end
+	if managers.dlc:has_peta() or managers.dlc:has_pal() then
+		default_options.heist_man = "track_42"
+		default_options.heist_pal = "track_43"
+	end
 	return default_options
 end
 
@@ -372,7 +378,8 @@ function MusicManager:jukebox_music_tracks()
 		kenaz = not managers.dlc or managers.dlc:has_kenaz() or managers.dlc:has_soundtrack_or_cce(),
 		payday = managers.dlc and managers.dlc:has_pdth_soundtrack(),
 		berry = not managers.dlc or managers.dlc:has_berry() or managers.dlc:has_soundtrack_or_cce(),
-		peta = not managers.dlc or managers.dlc:has_peta() or managers.dlc:has_soundtrack_or_cce()
+		peta = not managers.dlc or managers.dlc:has_peta() or managers.dlc:has_soundtrack_or_cce(),
+		pal = not managers.dlc or managers.dlc:has_pal() or managers.dlc:has_soundtrack_or_cce()
 	}
 	for _, data in ipairs(tweak_data.music.track_list) do
 		table.insert(tracks, data.track)

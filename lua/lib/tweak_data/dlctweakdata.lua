@@ -35,6 +35,7 @@ function DLCTweakData:init(tweak_data)
 		dragon = true,
 		steel = true,
 		peta = true,
+		pal = true,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4410,6 +4411,98 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "fur",
+			amount = 1
+		}
+	}
+	self.pal = {}
+	self.pal.dlc = "has_pal"
+	self.pal.content = {}
+	self.pal.content.loot_drops = {}
+	self.ach_pal_2 = {}
+	self.ach_pal_2.dlc = "has_achievement"
+	self.ach_pal_2.achievement_id = "pal_2"
+	self.ach_pal_2.content = {}
+	self.ach_pal_2.content.loot_global_value = "pal"
+	self.ach_pal_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "horned_king",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "houndstooth",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "fenris",
+			amount = 1
+		}
+	}
+	self.ach_pal_3 = {}
+	self.ach_pal_3.dlc = "has_achievement"
+	self.ach_pal_3.achievement_id = "pal_3"
+	self.ach_pal_3.content = {}
+	self.ach_pal_3.content.loot_global_value = "pal"
+	self.ach_pal_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "viking",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "day",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "kurbits",
+			amount = 1
+		}
+	}
+	self.ach_man_3 = {}
+	self.ach_man_3.dlc = "has_achievement"
+	self.ach_man_3.achievement_id = "man_3"
+	self.ach_man_3.content = {}
+	self.ach_man_3.content.loot_global_value = "pal"
+	self.ach_man_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "nutcracker",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "redwhite",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "luse",
+			amount = 1
+		}
+	}
+	self.ach_man_4 = {}
+	self.ach_man_4.dlc = "has_achievement"
+	self.ach_man_4.achievement_id = "man_4"
+	self.ach_man_4.content = {}
+	self.ach_man_4.content.loot_global_value = "pal"
+	self.ach_man_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "divided",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "mushroom_cloud",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "split",
 			amount = 1
 		}
 	}

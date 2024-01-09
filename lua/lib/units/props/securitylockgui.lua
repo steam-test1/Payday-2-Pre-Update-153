@@ -233,9 +233,9 @@ function SecurityLockGui:load(data)
 	end
 	if state.update_enabled then
 		self:_start(state.current_bar, state.timer, state.current_timer)
-		if not state.powered then
-			self:_set_powered(state.powered)
-		end
+	end
+	if not state.powered then
+		self:_set_powered(state.powered)
 	end
 	self:set_visible(state.visible)
 end

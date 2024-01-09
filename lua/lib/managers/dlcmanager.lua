@@ -570,6 +570,10 @@ function GenericDLCManager:has_peta()
 	return Global.dlc_manager.all_dlc_data.peta and Global.dlc_manager.all_dlc_data.peta.verified
 end
 
+function GenericDLCManager:has_pal()
+	return Global.dlc_manager.all_dlc_data.pal and Global.dlc_manager.all_dlc_data.pal.verified
+end
+
 function GenericDLCManager:has_dbd_clan()
 	return Global.dlc_manager.all_dlc_data.dbd_clan and Global.dlc_manager.all_dlc_data.dbd_clan.verified
 end
@@ -1370,6 +1374,7 @@ function WINDLCManager:init()
 			steel = {app_id = "401650", no_install = true},
 			bobblehead = {app_id = "328860", no_install = true},
 			peta = {app_id = "433730", no_install = true},
+			pal = {app_id = "441600", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

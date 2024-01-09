@@ -398,6 +398,10 @@ function PlayerDamage:health_ratio()
 	return self:get_real_health() / self:_max_health()
 end
 
+function PlayerDamage:health_ratio_100()
+	return math.floor(self:get_real_health() / self:_max_health() * 100)
+end
+
 function PlayerDamage:_max_health()
 	local base_max_health = self._HEALTH_INIT + managers.player:thick_skin_value()
 	local mul = managers.player:health_skill_multiplier()

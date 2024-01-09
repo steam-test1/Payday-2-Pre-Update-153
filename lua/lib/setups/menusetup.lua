@@ -219,6 +219,7 @@ end
 
 function MenuSetup:destroy()
 	MenuSetup.super.destroy(self)
+	managers.menu_scene:destroy()
 end
 
 return MenuSetup

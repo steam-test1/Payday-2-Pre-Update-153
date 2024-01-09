@@ -1615,6 +1615,7 @@ function BlackMarketGuiButtonItem:init(main_panel, data, x)
 	})
 	self._btn_text_id = data.name
 	self._btn_text_legends = data.legends
+	self._pc_btn = data.pc_btn
 	BlackMarketGui.make_fine_text(self, self._btn_text)
 	self._panel:set_size(main_panel:w() - x * 2, medium_font_size)
 	self._panel:rect({
@@ -1666,6 +1667,10 @@ end
 function BlackMarketGuiButtonItem:set_text_params(params)
 	local prefix = self._btn_prefix and managers.localization:get_default_macro(self._btn_prefix) or ""
 	local btn_text = prefix
+	if managers.menu:is_steam_controller() then
+		prefix = self._pc_btn or "skip_cutscene"
+		btn_text = managers.localization:btn_macro(prefix)
+	end
 	if self._btn_text_id then
 		btn_text = btn_text .. utf8.to_upper(managers.localization:text(self._btn_text_id, params))
 	end
@@ -2283,21 +2288,21 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			i_stop_move = {
 				prio = 2,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_stop_move",
 				callback = callback(self, self, "drop_hold_crafted_item_callback")
 			},
 			i_rename = {
 				prio = 2,
 				btn = "BTN_BACK",
-				pc_btn = Idstring("toggle_chat"),
+				pc_btn = "toggle_chat",
 				name = "bm_menu_btn_rename_item",
 				callback = callback(self, self, "rename_item_with_gamepad_callback")
 			},
 			w_mod = {
 				prio = 2,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_btn_mod",
 				callback = callback(self, self, "choose_weapon_mods_callback")
 			},
@@ -2311,14 +2316,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			w_preview = {
 				prio = 3,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview",
 				callback = callback(self, self, "preview_weapon_callback")
 			},
 			w_sell = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_sell",
 				callback = callback(self, self, "sell_item_callback")
 			},
@@ -2346,21 +2351,21 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			bw_preview = {
 				prio = 3,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview",
 				callback = callback(self, self, "preview_buy_weapon_callback")
 			},
 			bw_available_mods = {
 				prio = 2,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_preview_item_alt"),
+				pc_btn = "menu_preview_item_alt",
 				name = "bm_menu_available_mods",
 				callback = callback(self, self, "show_available_mods_callback")
 			},
 			bw_buy_dlc = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_buy_dlc",
 				callback = callback(self, self, "show_buy_dlc_callback")
 			},
@@ -2381,49 +2386,49 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			wm_preview = {
 				prio = 3,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_preview_item_alt"),
+				pc_btn = "menu_preview_item_alt",
 				name = "bm_menu_btn_preview",
 				callback = callback(self, self, "preview_weapon_mod_callback")
 			},
 			wm_preview_mod = {
 				prio = 4,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_with_mod",
 				callback = callback(self, self, "preview_weapon_with_mod_callback")
 			},
 			wm_remove_buy = {
 				prio = 2,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_remove_mod",
 				callback = callback(self, self, "remove_mod_callback")
 			},
 			wm_remove_preview_mod = {
 				prio = 4,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_with_mod",
 				callback = callback(self, self, "preview_weapon_mod_callback")
 			},
 			wm_remove_preview = {
 				prio = 3,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_preview_item_alt"),
+				pc_btn = "menu_preview_item_alt",
 				name = "bm_menu_btn_preview_no_mod",
 				callback = callback(self, self, "preview_weapon_without_mod_callback")
 			},
 			wm_sell = {
 				prio = 2,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_sell",
 				callback = callback(self, self, "sell_weapon_mods_callback")
 			},
 			wm_reticle_switch_menu = {
 				prio = 1,
 				btn = "BTN_A",
-				pc_btn = Idstring("bm_menu_btn_craft_mod"),
+				pc_btn = "bm_menu_btn_craft_mod",
 				name = "bm_menu_btn_switch_reticle",
 				callback = callback(self, self, "open_reticle_switch_menu")
 			},
@@ -2451,7 +2456,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			wcc_preview = {
 				prio = 3,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_weapon_cosmetic",
 				callback = callback(self, self, "preview_cosmetic_on_weapon_callback")
 			},
@@ -2472,7 +2477,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			it_wcc_preview = {
 				prio = 3,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_weapon_cosmetic",
 				callback = callback(self, self, "preview_weapon_cosmetics_callback")
 			},
@@ -2486,7 +2491,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			it_sell = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_sell_tradable",
 				callback = callback(self, self, "sell_tradable_item")
 			},
@@ -2507,28 +2512,28 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			m_mod = {
 				prio = 2,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_btn_mod_mask",
 				callback = callback(self, self, "mask_mods_callback")
 			},
 			m_preview = {
 				prio = 3,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_mask",
 				callback = callback(self, self, "preview_mask_callback")
 			},
 			m_sell = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_sell_mask",
 				callback = callback(self, self, "sell_mask_callback")
 			},
 			m_remove = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_remove_mask",
 				callback = callback(self, self, "remove_mask_callback")
 			},
@@ -2556,28 +2561,28 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			em_available_mods = {
 				prio = 3,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_preview_item_alt"),
+				pc_btn = "menu_preview_item_alt",
 				name = "bm_menu_buy_mask_title",
 				callback = callback(self, self, "show_available_mask_mods_callback")
 			},
 			mm_choose_textures = {
 				prio = 1,
 				btn = "BTN_A",
-				pc_btn = "",
+				pc_btn = nil,
 				name = "bm_menu_choose_pattern",
 				callback = callback(self, self, "choose_mask_mod_callback", "textures")
 			},
 			mm_choose_materials = {
 				prio = 2,
 				btn = "BTN_A",
-				pc_btn = "",
+				pc_btn = nil,
 				name = "bm_menu_choose_material",
 				callback = callback(self, self, "choose_mask_mod_callback", "materials")
 			},
 			mm_choose_colors = {
 				prio = 3,
 				btn = "BTN_A",
-				pc_btn = "",
+				pc_btn = nil,
 				name = "bm_menu_choose_color",
 				callback = callback(self, self, "choose_mask_mod_callback", "colors")
 			},
@@ -2591,14 +2596,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			mm_buy = {
 				prio = 5,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_btn_customize_mask",
 				callback = callback(self, self, "buy_customized_mask_callback")
 			},
 			mm_preview = {
 				prio = 4,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_mask",
 				callback = callback(self, self, "preview_customized_mask_callback")
 			},
@@ -2612,14 +2617,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			mp_preview = {
 				prio = 2,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_mask",
 				callback = callback(self, self, "preview_customized_mask_callback")
 			},
 			mp_preview_mod = {
 				prio = 2,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_mask",
 				callback = callback(self, self, "preview_customized_mask_with_mod_callback")
 			},
@@ -2633,14 +2638,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			bm_preview = {
 				prio = 2,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_mask",
 				callback = callback(self, self, "preview_buy_mask_callback")
 			},
 			bm_sell = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_sell_mask",
 				callback = callback(self, self, "sell_stashed_mask_callback")
 			},
@@ -2668,7 +2673,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			c_clear_slots = {
 				prio = 2,
 				btn = "BTN_X",
-				pc_btn = Idstring("menu_remove_item"),
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_clear_preferred",
 				callback = callback(self, self, "clear_preferred_characters_callback")
 			},
@@ -2696,21 +2701,21 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			lo_mw_preview = {
 				prio = 2,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_melee_weapon",
 				callback = callback(self, self, "preview_melee_weapon_callback")
 			},
 			lo_mw_add_favorite = {
 				prio = 3,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_btn_add_favorite",
 				callback = callback(self, self, "add_melee_weapon_favorite")
 			},
 			lo_mw_remove_favorite = {
 				prio = 3,
 				btn = "BTN_Y",
-				pc_btn = Idstring("menu_modify_item"),
+				pc_btn = "menu_modify_item",
 				name = "bm_menu_btn_remove_favorite",
 				callback = callback(self, self, "remove_melee_weapon_favorite")
 			},
@@ -2724,7 +2729,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			lo_g_preview = {
 				prio = 2,
 				btn = "BTN_STICK_R",
-				pc_btn = Idstring("menu_preview_item"),
+				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_grenade",
 				callback = callback(self, self, "preview_grenade_callback")
 			}
@@ -3408,7 +3413,8 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			self._info_panel:set_rightbottom(self._panel:w() - 10, self._btn_panel:top() - 10)
 		end
 		local tab_x = 0
-		if not managers.menu:is_pc_controller() and #self._tabs > 1 then
+		if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and #self._tabs > 1 then
+			local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_l") or managers.localization:get_default_macro("BTN_BOTTOM_L")
 			local prev_page = self._panel:text({
 				name = "prev_page",
 				y = 0,
@@ -3416,10 +3422,10 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				font = medium_font,
 				layer = 2,
 				color = tweak_data.screen_colors.text,
-				text = managers.localization:get_default_macro("BTN_BOTTOM_L")
+				text = button
 			})
 			local _, _, w, h = prev_page:text_rect()
-			prev_page:set_w(w)
+			prev_page:set_size(w, h)
 			prev_page:set_top(top_padding)
 			prev_page:set_left(tab_x)
 			prev_page:set_visible(self._selected > 1)
@@ -3429,7 +3435,8 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		for _, tab in ipairs(self._tabs) do
 			tab_x = tab:set_tab_position(tab_x)
 		end
-		if not managers.menu:is_pc_controller() and #self._tabs > 1 then
+		if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and #self._tabs > 1 then
+			local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_r") or managers.localization:get_default_macro("BTN_BOTTOM_R")
 			local next_page = self._panel:text({
 				name = "next_page",
 				y = 0,
@@ -3437,7 +3444,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				font = medium_font,
 				layer = 2,
 				color = tweak_data.screen_colors.text,
-				text = managers.localization:get_default_macro("BTN_BOTTOM_R")
+				text = button
 			})
 			local _, _, w, h = next_page:text_rect()
 			next_page:set_size(w, h)
@@ -3446,7 +3453,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			next_page:set_visible(self._selected < #self._tabs)
 			self._tab_scroll_panel:grow(-(w + 15), 0)
 		end
-		if managers.menu:is_pc_controller() and self._tab_scroll_table[#self._tab_scroll_table]:right() > self._tab_scroll_table.panel:w() then
+		if managers.menu:is_pc_controller() and not managers.menu:is_steam_controller() and self._tab_scroll_table[#self._tab_scroll_table]:right() > self._tab_scroll_table.panel:w() then
 			local prev_page = self._panel:text({
 				name = "prev_page",
 				y = 0,
@@ -3614,7 +3621,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			render_template = Idstring("VertexColorTextured")
 		})
 		local arrow_left, arrow_right
-		if managers.menu:is_pc_controller() then
+		if managers.menu:is_pc_controller() and not managers.menu:is_steam_controller() then
 			local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
 			arrow_left = gui_panel:bitmap({
 				texture = "guis/textures/menu_arrows",
@@ -3644,15 +3651,19 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				blend_mode = "add"
 			})
 		else
+			local BTN_TOP_L = managers.menu:is_steam_controller() and managers.localization:steam_btn("trigger_l") or managers.localization:get_default_macro("BTN_TOP_L")
+			local BTN_TOP_R = managers.menu:is_steam_controller() and managers.localization:steam_btn("trigger_r") or managers.localization:get_default_macro("BTN_TOP_R")
 			arrow_left = gui_panel:text({
-				text = managers.localization:get_default_macro("BTN_TOP_L"),
+				text = BTN_TOP_L,
+				color = managers.menu:is_steam_controller() and tweak_data.screen_colors.button_stage_3,
 				font = small_font,
 				font_size = small_font_size,
 				layer = 1,
 				blend_mode = "add"
 			})
 			arrow_right = gui_panel:text({
-				text = managers.localization:get_default_macro("BTN_TOP_R"),
+				text = BTN_TOP_R,
+				color = managers.menu:is_steam_controller() and tweak_data.screen_colors.button_stage_3,
 				font = small_font,
 				font_size = small_font_size,
 				layer = 1,
@@ -6424,7 +6435,7 @@ function BlackMarketGui:set_tab_positions()
 			tab_x = tab:set_tab_position(tab_x)
 		end
 	end
-	if managers.menu:is_pc_controller() then
+	if managers.menu:is_pc_controller() and not managers.menu:is_steam_controller() then
 		if self._tab_scroll_table.left then
 			if 1 < self._selected then
 				self._tab_scroll_table.left_klick = true
@@ -6759,7 +6770,7 @@ function BlackMarketGui:show_btns(slot)
 			btn:set_text_btn_prefix(btn._data.btn)
 		end
 		if btn._data.pc_btn then
-			self._controllers_pc_mapping[btn._data.pc_btn:key()] = btn
+			self._controllers_pc_mapping[Idstring(btn._data.pc_btn):key()] = btn
 		end
 		self._controllers_mapping[btn._data.btn:key()] = btn
 		btn:set_text_params(data.btn_text_params)

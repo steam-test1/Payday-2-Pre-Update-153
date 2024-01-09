@@ -4396,6 +4396,10 @@ function BlackMarketManager:get_real_character(mask_id, peer_id)
 end
 
 function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
+	if not tweak_data.blackmarket.masks[mask_id] then
+		Application:error("[BlackMarketManager:get_real_mask_id] Missing mask:" .. mask_id .. ". Using dallas mask!")
+		return "dallas"
+	end
 	if tweak_data.blackmarket.masks[mask_id].characters then
 		local character = self:get_real_character(mask_id, peer_id)
 		if not tweak_data.blackmarket.masks[mask_id].characters[character] and not Application:production_build() then
@@ -4404,16 +4408,13 @@ function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
 				break
 			end
 		end
-		return tweak_data.blackmarket.masks[mask_id].characters[character]
+		return tweak_data.blackmarket.masks[mask_id].characters[character] or "dallas"
 	end
 	if mask_id ~= "character_locked" then
-		if not tweak_data.blackmarket.masks[mask_id] then
-			print("Missing mask:" .. mask_id)
-		end
 		return mask_id
 	end
 	local character = self:get_real_character(mask_id, peer_id)
-	return tweak_data.blackmarket.masks[mask_id][character]
+	return tweak_data.blackmarket.masks[mask_id][character] or "dallas"
 end
 
 function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)

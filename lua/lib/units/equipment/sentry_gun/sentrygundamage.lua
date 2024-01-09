@@ -325,7 +325,8 @@ function SentryGunDamage:sync_damage_explosion(attacker_unit, damage_percent, i_
 end
 
 function SentryGunDamage:_apply_damage(damage, dmg_shield, dmg_body, is_local)
-	if dmg_shield and self._shield_health > 0 then
+	self._sync_dmg_leftover = 0
+	if dmg_shield and 0 < self._shield_health then
 		local damage_percent
 		local shield_dmg = damage ~= "death" and damage or self._SHIELD_HEALTH_INIT
 		if tweak_data.weapon[self._unit:base():get_name_id()].SHIELD_DAMAGE_CLAMP then

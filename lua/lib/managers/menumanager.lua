@@ -1275,6 +1275,11 @@ function MenuCallbackHandler:dlc_buy_peta_pc()
 	Steam:overlay_activate("store", 433730)
 end
 
+function MenuCallbackHandler:dlc_buy_pal_pc()
+	print("[MenuCallbackHandler:dlc_buy_pal_pc]")
+	Steam:overlay_activate("store", 441600)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1348,6 +1353,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"pal",
 		"peta",
 		"berry",
 		"steel",
@@ -1504,6 +1510,10 @@ end
 
 function MenuCallbackHandler:visible_callback_peta()
 	return self:is_dlc_latest_locked("peta")
+end
+
+function MenuCallbackHandler:visible_callback_pal()
+	return self:is_dlc_latest_locked("pal")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -3153,6 +3163,19 @@ end
 function MenuCallbackHandler:_reset_mainmusic()
 	managers.music:post_event("stop_all_music")
 	managers.music:post_event(managers.music:jukebox_menu_track("mainmenu"))
+end
+
+function MenuCallbackHandler:show_steam_controller_binding_panel()
+	if MenuCallbackHandler:is_not_steam_controller() then
+		return
+	end
+	local controller = managers.controller:get_default_controller()
+	if not controller or controller:show_binding_panel() then
+	elseif MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_requires_big_picture()
+	else
+		managers.menu:show_enable_steam_overlay()
+	end
 end
 
 function MenuCallbackHandler:set_default_options()
@@ -7223,31 +7246,6 @@ function MenuOptionInitiator:modify_controls(node)
 end
 
 function MenuOptionInitiator:modify_debug_options(node)
-	local option_value = "off"
-	local players_item = node:item("toggle_players")
-	if players_item then
-		players_item:set_value(Global.nr_players)
-	end
-	local god_mode_item = node:item("toggle_god_mode")
-	if god_mode_item then
-		local god_mode_value = Global.god_mode and "on" or "off"
-		god_mode_item:set_value(god_mode_value)
-	end
-	local post_effects_item = node:item("toggle_post_effects")
-	if post_effects_item then
-		local post_effects_value = Global.debug_post_effects_enabled and "on" or "off"
-		post_effects_item:set_value(post_effects_value)
-	end
-	local team_AI_mode_item = node:item("toggle_team_AI")
-	if team_AI_mode_item then
-		local team_AI_mode_value = managers.groupai:state():team_ai_enabled() and "on" or "off"
-		team_AI_mode_item:set_value(team_AI_mode_value)
-	end
-	local toggle_coordinates_item = node:item("toggle_coordinates")
-	if toggle_coordinates_item then
-		local toggle_coordinates_value = Global.debug_show_coords and "on" or "off"
-		toggle_coordinates_item:set_value(toggle_coordinates_value)
-	end
 	return node
 end
 

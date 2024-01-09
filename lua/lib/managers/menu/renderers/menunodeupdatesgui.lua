@@ -412,9 +412,11 @@ function MenuNodeUpdatesGui:setup()
 			w = tweak_data.menu.pd2_medium_font_size,
 			h = tweak_data.menu.pd2_medium_font_size
 		})
+		local prev_button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_l") or managers.menu:is_pc_controller() and "<" or managers.localization:get_default_macro("BTN_BOTTOM_L")
+		local next_button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_r") or managers.menu:is_pc_controller() and ">" or managers.localization:get_default_macro("BTN_BOTTOM_R")
 		local prev_text = self._prev_page:text({
 			name = "text_obj",
-			text = managers.menu:is_pc_controller() and "<" or managers.localization:get_default_macro("BTN_BOTTOM_L"),
+			text = prev_button,
 			font = tweak_data.menu.pd2_medium_font,
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			align = "center",
@@ -422,7 +424,7 @@ function MenuNodeUpdatesGui:setup()
 		})
 		local next_text = self._next_page:text({
 			name = "text_obj",
-			text = managers.menu:is_pc_controller() and ">" or managers.localization:get_default_macro("BTN_BOTTOM_R"),
+			text = next_button,
 			font = tweak_data.menu.pd2_medium_font,
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			align = "center",

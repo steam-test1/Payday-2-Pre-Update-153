@@ -197,6 +197,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_sparrow()
 	self:_init_model70()
 	self:_init_m37()
+	self:_init_china()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -12281,6 +12282,10 @@ function WeaponFactoryTweakData:_init_gre_m79()
 			wpn_fps_gre_m79 = {
 				translation = Vector3(0, -8, -2),
 				rotation = Rotation(0, -5, 0)
+			},
+			wpn_fps_gre_china = {
+				translation = Vector3(0, -12, -4),
+				rotation = Rotation(0, -5, 0)
 			}
 		},
 		perks = {"gadget"}
@@ -14907,12 +14912,16 @@ function WeaponFactoryTweakData:create_ammunition()
 			},
 			wpn_fps_gre_m79_grenade = {
 				unit = "units/pd2_dlc_bbq/weapons/wpn_fps_gre_m32_pts/wpn_fps_gre_m79_grenade_incendiary"
+			},
+			wpn_fps_gre_m79_grenade_whole = {
+				unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_m79_grenade_whole_incendiary"
 			}
 		}
 	}
 	local weapons = {
 		"wpn_fps_gre_m79",
-		"wpn_fps_gre_m32"
+		"wpn_fps_gre_m32",
+		"wpn_fps_gre_china"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then
@@ -24489,7 +24498,12 @@ end
 
 function WeaponFactoryTweakData:_init_m37()
 	self.parts.wpn_fps_shot_m37_b_short = {
-		pcs = {},
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
 		type = "barrel",
 		name_id = "bm_wp_m37_b_short",
 		a_obj = "a_b",
@@ -24510,7 +24524,12 @@ function WeaponFactoryTweakData:_init_m37()
 		stats = {value = 1}
 	}
 	self.parts.wpn_fps_shot_m37_s_short = {
-		pcs = {},
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
 		type = "stock",
 		name_id = "bm_wp_m37_s_short",
 		a_obj = "a_s",
@@ -24609,4 +24628,112 @@ function WeaponFactoryTweakData:_init_m37()
 	}
 	self.wpn_fps_shot_m37_npc = deep_clone(self.wpn_fps_shot_m37)
 	self.wpn_fps_shot_m37_npc.unit = "units/pd2_dlc_peta/weapons/wpn_fps_shot_m37/wpn_fps_shot_m37_npc"
+end
+
+function WeaponFactoryTweakData:_init_china()
+	self.parts.wpn_fps_gre_china_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_gre_china_barrel",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_china_body_standard = {
+		type = "lower_receiver",
+		name_id = "bm_wp_china_receiver",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_body_standard",
+		stats = {value = 1},
+		animations = {
+			reload_enter = "reload_enter",
+			reload_exit = "reload_exit",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_gre_china_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_china_receiver",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_fg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_china_m_standard = {
+		type = "extra",
+		name_id = "bm_wp_gre_china_m_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_china_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_china_stock_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_m79_grenade_whole = {
+		type = "magazine",
+		name_id = "bm_wp_gre_m79_grenade",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_grenade_", amount = 1},
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_m79_grenade_whole",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_china_s_short = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "stock",
+		name_id = "bm_wp_china_stock_short",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china_pts/wpn_fps_gre_china_s_short",
+		stats = {
+			value = 1,
+			recoil = -1,
+			spread = 0,
+			concealment = 4
+		},
+		texture_bundle_folder = "lupus",
+		dlc = "pal"
+	}
+	self.parts.wpn_fps_gre_china_b_standard.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_b_standard"
+	self.parts.wpn_fps_gre_china_body_standard.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_body_standard"
+	self.parts.wpn_fps_gre_china_fg_standard.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_fg_standard"
+	self.parts.wpn_fps_gre_china_m_standard.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_m_standard"
+	self.parts.wpn_fps_gre_china_s_short.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_s_short"
+	self.parts.wpn_fps_gre_china_s_standard.third_unit = "units/pd2_dlc_lupus/weapons/wpn_third_gre_china_pts/wpn_third_gre_china_s_standard"
+	self.parts.wpn_fps_gre_m79_grenade_whole.third_unit = "units/pd2_dlc_gage_assault/weapons/wpn_fps_gre_m79_pts/wpn_third_gre_m79_grenade"
+	self.wpn_fps_gre_china = {}
+	self.wpn_fps_gre_china.unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china/wpn_fps_gre_china"
+	self.wpn_fps_gre_china.animations = {
+		reload_enter = "reload_enter",
+		reload_exit = "reload_exit",
+		fire = "recoil",
+		fire_steelsight = "recoil"
+	}
+	self.wpn_fps_gre_china.default_blueprint = {
+		"wpn_fps_gre_china_b_standard",
+		"wpn_fps_gre_china_body_standard",
+		"wpn_fps_gre_china_fg_standard",
+		"wpn_fps_gre_m79_sight_up",
+		"wpn_fps_gre_china_m_standard",
+		"wpn_fps_gre_china_s_standard",
+		"wpn_fps_gre_m79_grenade_whole"
+	}
+	self.wpn_fps_gre_china.uses_parts = {
+		"wpn_fps_gre_china_b_standard",
+		"wpn_fps_gre_china_body_standard",
+		"wpn_fps_gre_china_fg_standard",
+		"wpn_fps_gre_m79_sight_up",
+		"wpn_fps_gre_china_m_standard",
+		"wpn_fps_gre_china_s_standard",
+		"wpn_fps_gre_m79_grenade_whole",
+		"wpn_fps_gre_china_s_short"
+	}
+	self.wpn_fps_gre_china_npc = deep_clone(self.wpn_fps_gre_china)
+	self.wpn_fps_gre_china_npc.unit = "units/pd2_dlc_lupus/weapons/wpn_fps_gre_china/wpn_fps_gre_china_npc"
 end

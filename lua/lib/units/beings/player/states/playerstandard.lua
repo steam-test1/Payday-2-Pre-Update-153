@@ -1474,7 +1474,9 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 	self._state_data.meleeing = nil
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
+	local pre_calc_hit_ray = tweak_data.blackmarket.melee_weapons[melee_entry].hit_pre_calculation
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
+	melee_damage_delay = math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
 	local primary = managers.blackmarket:equipped_primary()
 	local primary_id = primary.weapon_id
 	local bayonet_id = managers.blackmarket:equipped_bayonet(primary_id)
@@ -1485,7 +1487,12 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 	self._state_data.melee_expire_t = t + tweak_data.blackmarket.melee_weapons[melee_entry].expire_t
 	self._state_data.melee_repeat_expire_t = t + math.min(tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t, tweak_data.blackmarket.melee_weapons[melee_entry].expire_t)
 	if not instant_hit and not skip_damage then
-		self._state_data.melee_damage_delay_t = t + math.min(melee_damage_delay, tweak_data.blackmarket.melee_weapons[melee_entry].repeat_expire_t)
+		self._state_data.melee_damage_delay_t = t + melee_damage_delay
+		if pre_calc_hit_ray then
+			self._state_data.melee_hit_ray = self:_calc_melee_hit_ray(t, 20) or true
+		else
+			self._state_data.melee_hit_ray = nil
+		end
 	end
 	local send_redirect = instant_hit and (bayonet_melee and "melee_bayonet" or "melee") or "melee_item"
 	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, send_redirect)
@@ -1507,21 +1514,34 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 		if anim_attack_vars then
 			self._camera_unit:anim_state_machine():set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
 		end
+		if self._state_data.melee_hit_ray and self._state_data.melee_hit_ray ~= true then
+			self._camera_unit:anim_state_machine():set_parameter(state, "hit", 1)
+		end
 	end
 end
 
-function PlayerStandard:_do_melee_damage(t, bayonet_melee)
+function PlayerStandard:_calc_melee_hit_ray(t, sphere_cast_radius)
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	local range = tweak_data.blackmarket.melee_weapons[melee_entry].stats.range or 175
+	local from = self._unit:movement():m_head_pos()
+	local to = from + self._unit:movement():m_head_rot():y() * range
+	return self._unit:raycast("ray", from, to, "slot_mask", self._slotmask_bullet_impact_targets, "sphere_cast_radius", sphere_cast_radius, "ray_type", "body melee")
+end
+
+function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
 	local melee_damage_delay = tweak_data.blackmarket.melee_weapons[melee_entry].melee_damage_delay or 0
 	local charge_lerp_value = instant_hit and 0 or self:_get_melee_charge_lerp_value(t, melee_damage_delay)
 	self._ext_camera:play_shaker(melee_vars[math.random(#melee_vars)], math.max(0.3, charge_lerp_value))
-	local range = tweak_data.blackmarket.melee_weapons[melee_entry].stats.range or 175
-	local from = self._unit:movement():m_head_pos()
-	local to = from + self._unit:movement():m_head_rot():y() * range
 	local sphere_cast_radius = 20
-	local col_ray = self._unit:raycast("ray", from, to, "slot_mask", self._slotmask_bullet_impact_targets, "sphere_cast_radius", sphere_cast_radius, "ray_type", "body melee")
-	if col_ray then
+	local col_ray
+	if melee_hit_ray then
+		col_ray = melee_hit_ray ~= true and melee_hit_ray or nil
+	else
+		col_ray = self:_calc_melee_hit_ray(t, sphere_cast_radius)
+	end
+	if col_ray and alive(col_ray.unit) then
 		local damage, damage_effect = managers.blackmarket:equipped_melee_weapon_damage_info(charge_lerp_value)
 		local damage_effect_mul = math.max(managers.player:upgrade_value("player", "melee_knockdown_mul", 1), managers.player:upgrade_value(self._equipped_unit:base():weapon_tweak_data().category, "melee_knockdown_mul", 1))
 		damage_effect = damage_effect * damage_effect_mul
@@ -1664,6 +1684,7 @@ function PlayerStandard:_interupt_action_melee(t)
 	if not self:_is_meleeing() then
 		return
 	end
+	self._state_data.melee_hit_ray = nil
 	self._state_data.melee_charge_wanted = nil
 	self._state_data.melee_expire_t = nil
 	self._state_data.melee_repeat_expire_t = nil
@@ -1702,8 +1723,9 @@ function PlayerStandard:_update_melee_timers(t, input)
 		end
 	end
 	if self._state_data.melee_damage_delay_t and t >= self._state_data.melee_damage_delay_t then
-		self:_do_melee_damage(t)
+		self:_do_melee_damage(t, nil, self._state_data.melee_hit_ray)
 		self._state_data.melee_damage_delay_t = nil
+		self._state_data.melee_hit_ray = nil
 	end
 	if self._state_data.melee_attack_allowed_t and t >= self._state_data.melee_attack_allowed_t then
 		self._state_data.melee_start_t = t
@@ -2063,7 +2085,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 				elseif e_guy:anim_data().panic then
 					voice_type = "escort_go"
 				else
-					voice_type = "escort"
+					voice_type = prime_target.unit:base():char_tweak().speech_escort or "escort"
 				end
 			else
 				if prime_target.unit:movement():stance_name() == "cbt" and prime_target.unit:anim_data().stand then
@@ -2292,7 +2314,10 @@ function PlayerStandard:_start_action_intimidate(t)
 			sound_name = "bri_29"
 			interact_type = "cmd_point"
 		elseif voice_type == "undercover_interrogate" then
-			sound_name = "und_18"
+			sound_name = "f46x_any"
+			interact_type = "cmd_point"
+		elseif voice_type == "undercover_escort" then
+			sound_name = "f41_any"
 			interact_type = "cmd_point"
 		elseif voice_type == "mark_camera" then
 			sound_name = "f39_any"

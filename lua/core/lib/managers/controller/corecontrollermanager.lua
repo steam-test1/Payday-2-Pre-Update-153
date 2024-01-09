@@ -38,7 +38,6 @@ function ControllerManager:init(path, default_settings_path)
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self._supported_wrapper_types[CoreControllerWrapperPC.ControllerWrapperPC.TYPE] = CoreControllerWrapperPC.ControllerWrapperPC
 		self._supported_wrapper_types[CoreControllerWrapperXbox360.ControllerWrapperXbox360.TYPE] = CoreControllerWrapperXbox360.ControllerWrapperXbox360
-		self._supported_wrapper_types[CoreControllerWrapperSteam.ControllerWrapperSteam.TYPE] = CoreControllerWrapperSteam.ControllerWrapperSteam
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self._supported_wrapper_types[CoreControllerWrapperPS3.ControllerWrapperPS3.TYPE] = CoreControllerWrapperPS3.ControllerWrapperPS3
 	elseif SystemInfo:platform() == Idstring("PS4") then
@@ -452,6 +451,12 @@ end
 
 function ControllerManager:get_default_wrapper_mode()
 	return self._default_wrapper_mode
+end
+
+function ControllerManager:get_default_controller()
+	local index = Global.controller_manager.default_wrapper_index or self:get_preferred_default_wrapper_index()
+	local controller_index = self._wrapper_to_controller_list[index] and self._wrapper_to_controller_list[index][1]
+	return controller_index and Input:controller(controller_index)
 end
 
 function ControllerManager:create_virtual_pad()

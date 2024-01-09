@@ -143,12 +143,19 @@ function LootManager:check_achievements(carry_id, multiplier)
 		secured_pass = not achievement_data.secured
 		if achievement_data.secured then
 			local amount = 0
+			local value = 0
 			for _, data in ipairs(self._global.secured) do
 				if data.carry_id == achievement_data.secured.carry_id then
 					amount = amount + 1
+					local is_small_loot = not not tweak_data.carry.small_loot[data.carry_id]
+					if is_small_loot then
+						value = value + self:get_real_value(data.carry_id, data.multiplier)
+					else
+						value = value + managers.money:get_secured_bonus_bag_value(data.carry_id, data.multiplier)
+					end
 				end
 			end
-			secured_pass = amount >= achievement_data.secured.amount
+			secured_pass = achievement_data.secured.amount and amount >= achievement_data.secured.amount or achievement_data.secured.value and value >= achievement_data.secured.value
 		end
 		if not achievement_data.timer then
 			total_value_pass = not achievement_data.total_value or real_total_value >= achievement_data.total_value

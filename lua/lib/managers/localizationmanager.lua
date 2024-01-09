@@ -106,7 +106,8 @@ function LocalizationManager:btn_macro(button, to_upper)
 		return
 	end
 	local type = managers.controller:get_default_wrapper_type()
-	local text = "[" .. tostring(managers.controller:get_settings(type):get_connection(button):get_input_name_list()[1]) .. "]"
+	local key = tostring(managers.controller:get_settings(type):get_connection(button):get_input_name_list()[1])
+	local text = "[" .. key .. "]"
 	return to_upper and utf8.to_upper(text) or text
 end
 
@@ -116,6 +117,10 @@ end
 
 function LocalizationManager:to_upper_text(string_id, macros)
 	return utf8.to_upper(self:text(string_id, macros))
+end
+
+function LocalizationManager:steam_btn(button)
+	return button
 end
 
 function LocalizationManager:debug_file(file)
