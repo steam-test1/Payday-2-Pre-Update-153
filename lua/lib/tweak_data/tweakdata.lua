@@ -2557,7 +2557,14 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = {
 				"overkill_290"
 			},
-			jobs = {"peta", "peta_prof"}
+			jobs = {"peta"}
+		},
+		death_peta_prof = {
+			award = "peta_1_prof",
+			difficulty = {
+				"overkill_290"
+			},
+			jobs = {"peta_prof"}
 		},
 		death_pal = {
 			award = "pal_1",
@@ -3977,6 +3984,9 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.launcher_incendiary.burn_duration = 6
 	self.projectiles.launcher_incendiary.burn_tick_period = 0.5
 	self.projectiles.launcher_frag_m32 = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_incendiary_m32 = deep_clone(self.projectiles.launcher_incendiary)
+	self.projectiles.launcher_frag_china = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_incendiary_china = deep_clone(self.projectiles.launcher_incendiary)
 	self.projectiles.rocket_frag = {}
 	self.projectiles.rocket_frag.launch_speed = 2500
 	self.projectiles.rocket_frag.adjust_z = 0

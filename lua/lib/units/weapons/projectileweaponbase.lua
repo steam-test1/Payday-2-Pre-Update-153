@@ -16,7 +16,11 @@ function ProjectileWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_
 	end
 	local projectile_type_index = self._projectile_type_index or 2
 	if self._ammo_data and self._ammo_data.launcher_grenade then
-		projectile_type_index = tweak_data.blackmarket:get_index_from_projectile_id(self._ammo_data.launcher_grenade)
+		if self:weapon_tweak_data().projectile_type_indices and self:weapon_tweak_data().projectile_type_indices[self._ammo_data.launcher_grenade] then
+			projectile_type_index = self:weapon_tweak_data().projectile_type_indices[self._ammo_data.launcher_grenade]
+		else
+			projectile_type_index = tweak_data.blackmarket:get_index_from_projectile_id(self._ammo_data.launcher_grenade)
+		end
 	end
 	self:_adjust_throw_z(mvec_spread_direction)
 	mvec_spread_direction = mvec_spread_direction * self:projectile_speed_multiplier()

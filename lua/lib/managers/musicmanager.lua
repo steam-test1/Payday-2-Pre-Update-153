@@ -356,9 +356,9 @@ function MusicManager:jukebox_default_tracks()
 		default_options.heist_peta1 = "track_40"
 		default_options.heist_peta2 = "track_41"
 	end
-	if managers.dlc:has_peta() or managers.dlc:has_pal() then
-		default_options.heist_man = "track_42"
-		default_options.heist_pal = "track_43"
+	if managers.dlc:has_pal() or managers.dlc:has_soundtrack_or_cce() then
+		default_options.heist_man = "track_43"
+		default_options.heist_pal = "track_42"
 	end
 	return default_options
 end

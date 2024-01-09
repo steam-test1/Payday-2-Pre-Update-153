@@ -284,12 +284,6 @@ function CoreSetup:__init()
 	self.__gsm = assert(self:init_game(), "self:init_game must return a GameStateMachine.")
 	if Global.DEBUG_MENU_ON or Application:production_build() then
 		self.__freeflight = CoreFreeFlight.FreeFlight:new(self.__gsm, managers.viewport, managers.controller)
-	else
-		self._temp_camera_object = World:create_camera()
-		self._temp_camera_object:set_far_range(250000)
-		self._temp_camera_object:set_fov(75)
-		self._temp_vp = managers.viewport:new_vp(0, 0, 1, 1, "freeflight", 10)
-		self._temp_vp:set_camera(self._temp_camera_object)
 	end
 	if Application:editor() then
 		managers.editor = (rawget(_G, "WorldEditor") or rawget(_G, "CoreEditor")):new(self.__gsm, self._session:session())

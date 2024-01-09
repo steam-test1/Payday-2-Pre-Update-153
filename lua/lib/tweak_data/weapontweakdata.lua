@@ -9117,6 +9117,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		}
 	}
 	self.m32.projectile_type_index = 6
+	self.m32.projectile_type_indices = {launcher_incendiary = 26}
 	self.m32.damage_melee = damage_melee_default
 	self.m32.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.m32.sounds = {}
@@ -10880,7 +10881,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 			"clip_ammo_increase"
 		}
 	}
-	self.china.projectile_type_index = 6
+	self.china.projectile_type_index = 27
+	self.china.projectile_type_indices = {launcher_incendiary = 28}
 	self.china.damage_melee = damage_melee_default
 	self.china.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.china.sounds = {}

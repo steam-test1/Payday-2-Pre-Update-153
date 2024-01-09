@@ -1180,7 +1180,16 @@ function StatisticsManager:killed(data)
 			"benelli",
 			"judge",
 			"rpg7",
-			"m32"
+			"m32",
+			"china",
+			"b682",
+			"m37",
+			"spas12",
+			"frankish",
+			"arblast",
+			"hunter",
+			"plainsrider",
+			"long"
 		}
 		if name_id and table.contains(boom_guns, name_id) then
 			self:_add_to_killed_by_weapon(name_id, data)

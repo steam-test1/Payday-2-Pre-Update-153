@@ -1961,11 +1961,11 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.nin.sounds.charge = "nin_charge"
 	self.melee_weapons.nin.stats = {}
 	self.melee_weapons.nin.stats.weapon_type = "sharp"
-	self.melee_weapons.nin.stats.min_damage = 3
-	self.melee_weapons.nin.stats.max_damage = 8
+	self.melee_weapons.nin.stats.min_damage = 7
+	self.melee_weapons.nin.stats.max_damage = 45
 	self.melee_weapons.nin.stats.min_damage_effect = 1
 	self.melee_weapons.nin.stats.max_damage_effect = 1
-	self.melee_weapons.nin.stats.charge_time = 2
+	self.melee_weapons.nin.stats.charge_time = 4
 	self.melee_weapons.nin.stats.range = 185
 	self.melee_weapons.nin.stats.concealment = 27
 	self.melee_weapons.nin.stats.remove_weapon_movement_penalty = true

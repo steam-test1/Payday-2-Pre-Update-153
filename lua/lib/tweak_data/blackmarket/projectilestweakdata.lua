@@ -109,6 +109,12 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.launcher_incendiary.time_cheat = 1
 	self.projectiles.launcher_frag_m32 = deep_clone(self.projectiles.launcher_frag)
 	self.projectiles.launcher_frag_m32.weapon_id = "m32"
+	self.projectiles.launcher_incendiary_m32 = deep_clone(self.projectiles.launcher_incendiary)
+	self.projectiles.launcher_incendiary_m32.weapon_id = "m32"
+	self.projectiles.launcher_frag_china = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_frag_china.weapon_id = "china"
+	self.projectiles.launcher_incendiary_china = deep_clone(self.projectiles.launcher_incendiary)
+	self.projectiles.launcher_incendiary_china.weapon_id = "china"
 	self.projectiles.west_arrow = {}
 	self.projectiles.west_arrow.name_id = "bm_launcher_frag"
 	self.projectiles.west_arrow.unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow"
@@ -260,7 +266,10 @@ function BlackMarketTweakData:_init_projectiles()
 		"frankish_arrow_exp",
 		"long_arrow",
 		"long_poison_arrow",
-		"long_arrow_exp"
+		"long_arrow_exp",
+		"launcher_incendiary_m32",
+		"launcher_frag_china",
+		"launcher_incendiary_china"
 	}
 	self:_add_desc_from_name_macro(self.projectiles)
 end
