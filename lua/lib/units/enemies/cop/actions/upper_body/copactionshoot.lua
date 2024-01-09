@@ -53,6 +53,9 @@ function CopActionShoot:init(action_desc, common_data)
 	self._ik_preset = preset_data
 	self[preset_data.start](self)
 	local weapon_unit = self._ext_inventory:equipped_unit()
+	if not weapon_unit then
+		return false
+	end
 	local weap_tweak = weapon_unit:base():weapon_tweak_data()
 	local weapon_usage_tweak = common_data.char_tweak.weapon[weap_tweak.usage]
 	self._weapon_unit = weapon_unit

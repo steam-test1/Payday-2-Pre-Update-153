@@ -14,6 +14,7 @@ function PlayerParachuting:enter(state_data, enter_data)
 	self._original_damping = self._unit:mover():damping()
 	self._unit:mover():set_damping(self._tweak_data.gravity / self._tweak_data.terminal_velocity)
 	self._unit:sound():play("parachute_open", nil, false)
+	self.parachuting = true
 end
 
 function PlayerParachuting:_enter(enter_data)
@@ -33,6 +34,7 @@ function PlayerParachuting:exit(state_data, new_state_name)
 	self:_remove_camera_limits()
 	self._state_data.in_air = false
 	self._unit:sound():play("parachute_land", nil, false)
+	self.parachuting = false
 end
 
 function PlayerParachuting:interaction_blocked()

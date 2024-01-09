@@ -493,31 +493,6 @@ function MenuManager:southpaw_changed(name, old_value, new_value)
 	local move_connection = setup:get_connection("move")
 	local look_input_name_list = look_connection:get_input_name_list()
 	local move_input_name_list = move_connection:get_input_name_list()
-	if Application:production_build() then
-		local got_input_left = 0
-		local got_input_right = 0
-		for _, input_name in ipairs(look_input_name_list) do
-			if input_name == "left" then
-				got_input_left = got_input_left + 1
-			elseif input_name == "right" then
-				got_input_right = got_input_right + 1
-			else
-				Application:error("[MenuManager:southpaw_changed] Active controller got some other input other than left and right on look!", input_name)
-			end
-		end
-		for _, input_name in ipairs(move_input_name_list) do
-			if input_name == "left" then
-				got_input_left = got_input_left + 1
-			elseif input_name == "right" then
-				got_input_right = got_input_right + 1
-			else
-				Application:error("[MenuManager:southpaw_changed] Active controller got some other input other than left and right on move!", input_name)
-			end
-		end
-		if got_input_left ~= 1 or got_input_right ~= 1 then
-			Application:error("[MenuManager:southpaw_changed] Controller look and move are not binded as expected", "got_input_left: " .. tostring(got_input_left), "got_input_right: " .. tostring(got_input_right), "look_input_name_list: " .. inspect(look_input_name_list), "move_input_name_list: " .. inspect(move_input_name_list))
-		end
-	end
 	if new_value then
 		move_connection:set_input_name_list({"right"})
 		look_connection:set_input_name_list({"left"})
@@ -3142,7 +3117,7 @@ end
 
 function MenuCallbackHandler:load_start_menu_lobby()
 	managers.job:clear_saved_ghost_bonus()
-	managers.experience:mission_xp_clear()
+	managers.job:cleanup_data()
 	managers.network:session():load_lobby()
 end
 
@@ -6464,10 +6439,6 @@ function MenuCallbackHandler:is_reticle_applicable(node)
 	local color = node:item("reticle_color"):value()
 	local type_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "types", "sight", type)
 	local color_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes", color)
-	if Application:production_build() then
-		assert(type_data, "Missing sight type in tweak data", type)
-		assert(color_data, "Missing sight color in tweak data", color)
-	end
 	local type_dlc = type_data and type_data.dlc or false
 	local color_dlc = color_data and color_data.dlc or false
 	local pass_type = not type_dlc or managers.dlc:is_dlc_unlocked(type_dlc)

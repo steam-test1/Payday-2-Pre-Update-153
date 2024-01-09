@@ -244,9 +244,6 @@ function CopBrain:_reset_logic_data()
 		objective_complete_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_objective_complete"),
 		objective_failed_clbk = callback(managers.groupai:state(), managers.groupai:state(), "on_objective_failed")
 	}
-	if Application:production_build() then
-		self._logic_data.debug_name = self._unit:name()
-	end
 end
 
 function CopBrain:set_init_logic(name, enter_params)

@@ -38,6 +38,7 @@ function EnvironmentManager:init()
 		CoreEnvironmentFeeder.PostFogFarLowColorFeeder,
 		CoreEnvironmentFeeder.PostFogMinRangeFeeder,
 		CoreEnvironmentFeeder.PostFogMaxRangeFeeder,
+		CoreEnvironmentFeeder.PostFogMaxDensityFeeder,
 		CoreEnvironmentFeeder.PostAmbientScaleFeeder,
 		CoreEnvironmentFeeder.PostEffectLightScaleFeeder,
 		CoreEnvironmentFeeder.PostShadowSlice0Feeder,

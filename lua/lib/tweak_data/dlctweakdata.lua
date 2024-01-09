@@ -38,6 +38,7 @@ function DLCTweakData:init(tweak_data)
 		pal = true,
 		coco = true,
 		super = 1,
+		mad = true,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4491,6 +4492,110 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "jimmy_duct",
+			amount = 1
+		}
+	}
+	self.mad = {}
+	self.mad.content = {}
+	self.mad.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_pl14_b_comp",
+			amount = 1,
+			global_value = "normal"
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_pl14_m_extended",
+			amount = 1,
+			global_value = "normal"
+		}
+	}
+	self.ach_mad_2 = {}
+	self.ach_mad_2.dlc = "has_achievement"
+	self.ach_mad_2.achievement_id = "mad_2"
+	self.ach_mad_2.content = {}
+	self.ach_mad_2.content.loot_global_value = "normal"
+	self.ach_mad_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mad_mask",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "nebula",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hexagons",
+			amount = 1
+		}
+	}
+	self.ach_mad_3 = {}
+	self.ach_mad_3.dlc = "has_achievement"
+	self.ach_mad_3.achievement_id = "mad_3"
+	self.ach_mad_3.content = {}
+	self.ach_mad_3.content.loot_global_value = "normal"
+	self.ach_mad_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "visor",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "planet",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "jimmy_phoenix",
+			amount = 1
+		}
+	}
+	self.ach_dark_2 = {}
+	self.ach_dark_2.dlc = "has_achievement"
+	self.ach_dark_2.achievement_id = "dark_2"
+	self.ach_dark_2.content = {}
+	self.ach_dark_2.content.loot_global_value = "normal"
+	self.ach_dark_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mad_goggles",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "rusty",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "rebel",
+			amount = 1
+		}
+	}
+	self.ach_dark_3 = {}
+	self.ach_dark_3.dlc = "has_achievement"
+	self.ach_dark_3.achievement_id = "dark_3"
+	self.ach_dark_3.content = {}
+	self.ach_dark_3.content.loot_global_value = "normal"
+	self.ach_dark_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "half_mask",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "spaceship",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "squares",
 			amount = 1
 		}
 	}

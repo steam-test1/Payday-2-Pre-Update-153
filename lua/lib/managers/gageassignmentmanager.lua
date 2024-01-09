@@ -523,14 +523,4 @@ function GageAssignmentManager:load(data, version)
 end
 
 function GageAssignmentManager:debug_show_units(persistance)
-	if Application:production_build() and self._spawned_units then
-		local brush = Draw:brush(Color.red:with_alpha(0.5))
-		brush:set_persistance(persistance or 10)
-		brush:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:NORMALMAP:VERTEX_COLOR"))
-		for i, unit in ipairs(self._spawned_units) do
-			if alive(unit) then
-				brush:sphere(unit:position(), 50)
-			end
-		end
-	end
 end

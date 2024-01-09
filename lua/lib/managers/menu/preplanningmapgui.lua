@@ -51,9 +51,6 @@ function PrePlanningPoint:init(map_panel, element, shape, rotation, active_node,
 	self._element = element
 	self._map_panel = map_panel
 	self._location_index = location_index
-	if Application:production_build() and (self._x < 0 or 1 < self._x or self._y < 0 or 1 < self._y) then
-		Application:error("[PrePlanningPoint] Point outside location group!", "Point: " .. self._element:editor_name(), "Location Group: " .. self._map_panel:name(), "X: " .. self._x, "Y: " .. self._y)
-	end
 	self._panel = map_panel:panel({
 		layer = 10,
 		w = width,

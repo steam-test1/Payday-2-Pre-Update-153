@@ -15,6 +15,7 @@ local ids_sky_top_color = Idstring("sky_top_color")
 local ids_sky_bottom_color = Idstring("sky_bottom_color")
 local ids_fog_start_color = Idstring("fog_start_color")
 local ids_fog_far_low_color = Idstring("fog_far_low_color")
+local ids_fog_max_density = Idstring("fog_max_density")
 local ids_fog_max_range = Idstring("fog_max_range")
 local ids_fog_min_range = Idstring("fog_min_range")
 local ids_ambient_scale = Idstring("ambient_scale")
@@ -428,6 +429,17 @@ PostFogMaxRangeFeeder.FILTER_CATEGORY = "Fog"
 function PostFogMaxRangeFeeder:apply(handler, viewport, scene)
 	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_apply_ambient_id, ids_deferred, ids_deferred_lighting, ids_apply_ambient)
 	material:set_variable(ids_fog_max_range, self._current)
+end
+
+PostFogMaxDensityFeeder = PostFogMaxDensityFeeder or CoreClass.class(Feeder)
+PostFogMaxDensityFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/fog_max_density"):key()
+PostFogMaxDensityFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostFogMaxDensityFeeder.IS_GLOBAL = nil
+PostFogMaxDensityFeeder.FILTER_CATEGORY = "Fog"
+
+function PostFogMaxDensityFeeder:apply(handler, viewport, scene)
+	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_apply_ambient_id, ids_deferred, ids_deferred_lighting, ids_apply_ambient)
+	material:set_variable(ids_fog_max_density, self._current)
 end
 
 PostAmbientScaleFeeder = PostAmbientScaleFeeder or CoreClass.class(Feeder)

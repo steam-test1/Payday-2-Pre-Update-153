@@ -25,37 +25,6 @@ function BlackMarketTweakData:init(tweak_data)
 end
 
 function BlackMarketTweakData:print_missing_strings(skip_print_id)
-	if Application:production_build() then
-		local ignore_name = {"xp", "cash"}
-		local ignore_desc = {
-			"xp",
-			"cash",
-			"weapon_mods",
-			"melee_weapons"
-		}
-		for id, data in pairs(self) do
-			for i, d in pairs(data) do
-				if id ~= "weapon_mods" or tweak_data.weapon.factory.parts[i].pc or tweak_data.weapon.factory.parts[i].pcs then
-					local name_id = d.name_id
-					if not table.contains(ignore_name, id) and name_id and not managers.localization:exists(name_id) then
-						if skip_print_id then
-							Application:debug(name_id)
-						else
-							Application:debug(name_id, "", "", id)
-						end
-					end
-					local desc_id = d.desc_id
-					if not table.contains(ignore_desc, id) and desc_id and not managers.localization:exists(desc_id) then
-						if skip_print_id then
-							Application:debug(desc_id)
-						else
-							Application:debug(desc_id, "", "", id)
-						end
-					end
-				end
-			end
-		end
-	end
 end
 
 function BlackMarketTweakData:_add_desc_from_name_macro(tweak_data)
@@ -94,9 +63,6 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 		}
 	end
 	self:_add_desc_from_name_macro(self.weapon_mods)
-	if Application:production_build() and managers.lootdrop then
-		managers.lootdrop:add_qlvl_to_weapon_mods(self.weapon_mods)
-	end
 end
 
 function BlackMarketTweakData:_init_characters()

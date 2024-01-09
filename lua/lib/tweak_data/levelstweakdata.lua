@@ -1149,6 +1149,33 @@ function LevelsTweakData:init()
 	self.man.package = "packages/narr_man"
 	self.man.cube = "cube_apply_heist_bank"
 	self.man.max_bags = 10
+	self.dark = {}
+	self.dark.name_id = "heist_dark_hl"
+	self.dark.briefing_id = "heist_dark_briefing"
+	self.dark.briefing_dialog = "Play_pln_drk_brf"
+	self.dark.world_name = "narratives/elephant/dark"
+	self.dark.intro_event = "Play_pln_drk_intro_01"
+	self.dark.outro_event = {
+		"Play_rb14_drk_outro_01 , Play_rb14_drk_outro_02"
+	}
+	self.dark.music = "no_music"
+	self.dark.music_ext = "music_dark"
+	self.dark.music_ext_start = "suspense_1"
+	self.dark.package = "packages/job_dark"
+	self.dark.cube = "cube_apply_heist_bank"
+	self.dark.max_bags = 20
+	self.dark.ghost_bonus = 0.15
+	self.mad = {}
+	self.mad.name_id = "heist_mad_hl"
+	self.mad.briefing_id = "heist_mad_briefing"
+	self.mad.briefing_dialog = "Play_pln_mad_brf_01"
+	self.mad.world_name = "narratives/elephant/mad"
+	self.mad.intro_event = "Play_plt_mad_intro_01"
+	self.mad.outro_event = "Play_rb14_mad_outro_01"
+	self.mad.music = "heist"
+	self.mad.package = "packages/lvl_mad"
+	self.mad.cube = "cube_apply_heist_bank"
+	self.mad.ai_group_type = russia
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1224,7 +1251,9 @@ function LevelsTweakData:init()
 		"peta2",
 		"pal",
 		"nail",
-		"man"
+		"man",
+		"dark",
+		"mad"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self._level_index, "roberts")

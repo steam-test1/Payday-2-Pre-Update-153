@@ -474,6 +474,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/games/hardcorehenry/",
 		image = "guis/dlcs/coco/textures/pd2/content_updates/coco"
 	}
+	local mad = {
+		id = "mad",
+		name_id = "menu_content_mad",
+		desc_id = "menu_content_mad_desc",
+		date_id = "menu_content_mad_date",
+		store = 218620,
+		image = "guis/dlcs/mad/textures/pd2/content_updates/mad"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -537,7 +545,8 @@ function GuiTweakData:init()
 			cane,
 			peta,
 			pal,
-			coco
+			coco,
+			mad
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1742,6 +1751,15 @@ function GuiTweakData:init()
 					desc_id = "heist_contact_locke_description",
 					videos = {"locke1"},
 					post_event = "loc_quote_set_a"
+				}
+			},
+			{
+				id = "jimmy",
+				name_id = "menu_jimmy",
+				{
+					desc_id = "menu_jimmy_desc_codex",
+					videos = {"jimmy1"},
+					post_event = "pln_contact_jimmy"
 				}
 			}
 		},
@@ -4498,12 +4516,6 @@ function GuiTweakData:create_narrative_locations(locations)
 end
 
 function GuiTweakData:print_locations()
-	if Application:production_build() then
-		local save_me = self:serializeTable(self.crime_net.locations, "self.crime_net.locations", true, 0)
-		local file = SystemFS:open("crime_net_locations.txt", "w")
-		file:print(save_me)
-		file:close()
-	end
 end
 
 function GuiTweakData:serializeTable(val, name, skipnewlines, depth)

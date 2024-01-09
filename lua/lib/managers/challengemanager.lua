@@ -432,17 +432,6 @@ function ChallengeManager:save(data)
 	local save_data = {}
 	save_data.active_challenges = deep_clone(self._global.active_challenges)
 	save_data.visited_crimenet = self._global.visited_crimenet
-	if Application:production_build() then
-		local debug_list = {}
-		for key, challenge in pairs(save_data.active_challenges) do
-			if challenge.category == "debug" then
-				table.insert(debug_list, key)
-			end
-		end
-		for _, key in ipairs(debug_list) do
-			save_data.active_challenges[key] = nil
-		end
-	end
 	if self._global.mission_values then
 		save_data.mission_values = deep_clone(self._global.mission_values)
 	end

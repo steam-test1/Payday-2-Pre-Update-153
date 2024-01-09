@@ -697,7 +697,7 @@ function CharacterTweakData:_init_tank(presets)
 		{
 			r = 100,
 			acc = {0.6, 0.9},
-			dmg_mul = 3,
+			dmg_mul = 2,
 			recoil = {0.4, 0.7},
 			mode = {
 				0,
@@ -5531,7 +5531,13 @@ function CharacterTweakData:_create_table_structure()
 		"benelli",
 		"g36",
 		"ump",
-		"scar_murky"
+		"scar_murky",
+		"rpk_lmg",
+		"svd_snp",
+		"akmsu_smg",
+		"asval_smg",
+		"sr2_smg",
+		"ak47_ass"
 	}
 	self.weap_unit_names = {
 		Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
@@ -5551,7 +5557,13 @@ function CharacterTweakData:_create_table_structure()
 		Idstring("units/payday2/weapons/wpn_npc_benelli/wpn_npc_benelli"),
 		Idstring("units/payday2/weapons/wpn_npc_g36/wpn_npc_g36"),
 		Idstring("units/payday2/weapons/wpn_npc_ump/wpn_npc_ump"),
-		Idstring("units/payday2/weapons/wpn_npc_scar_murkywater/wpn_npc_scar_murkywater")
+		Idstring("units/payday2/weapons/wpn_npc_scar_murkywater/wpn_npc_scar_murkywater"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_rpk/wpn_npc_rpk"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_svd/wpn_npc_svd"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_akmsu/wpn_npc_akmsu"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_asval/wpn_npc_asval"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_sr2/wpn_npc_sr2"),
+		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_ak47/wpn_npc_ak47")
 	}
 end
 
@@ -6909,10 +6921,34 @@ function CharacterTweakData:character_map()
 			list = {
 				"civ_male_boris"
 			}
+		},
+		mad = {
+			path = "units/pd2_dlc_mad/characters/",
+			list = {
+				"civ_male_scientist_01",
+				"civ_male_scientist_02",
+				"ene_akan_fbi_heavy_g36",
+				"ene_akan_fbi_shield_sr2_smg",
+				"ene_akan_fbi_spooc_asval_smg",
+				"ene_akan_fbi_swat_ak47_ass",
+				"ene_akan_fbi_swat_dw_ak47_ass",
+				"ene_akan_fbi_swat_dw_r870",
+				"ene_akan_fbi_swat_r870",
+				"ene_akan_fbi_tank_r870",
+				"ene_akan_fbi_tank_rpk_lmg",
+				"ene_akan_fbi_tank_saiga",
+				"ene_akan_cs_cop_ak47_ass",
+				"ene_akan_cs_cop_akmsu_smg",
+				"ene_akan_cs_cop_asval_smg",
+				"ene_akan_cs_cop_r870",
+				"ene_akan_cs_heavy_ak47_ass",
+				"ene_akan_cs_shield_c45",
+				"ene_akan_cs_swat_ak47_ass",
+				"ene_akan_cs_swat_r870",
+				"ene_akan_cs_swat_sniper_svd_snp",
+				"ene_akan_cs_tazer_ak47_ass"
+			}
 		}
 	}
-	if TweakData._init_wip_character_map then
-		TweakData._init_wip_character_map(char_map)
-	end
 	return char_map
 end

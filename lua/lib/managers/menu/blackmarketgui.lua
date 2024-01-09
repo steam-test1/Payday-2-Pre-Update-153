@@ -5173,9 +5173,6 @@ function BlackMarketGui:update_info_text()
 ##]] .. managers.localization:to_upper_text(tweak_data.lootdrop.global_values[slot_data.global_value].desc_id) .. "##"
 					updated_texts[4].resource_color = tweak_data.lootdrop.global_values[slot_data.global_value].color
 				end
-				if Application:production_build() and not desc_id then
-					updated_texts[4].resource_color = Color.red
-				end
 			end
 		elseif slot_data.locked_slot then
 			ignore_lock = true

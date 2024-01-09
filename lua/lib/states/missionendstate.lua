@@ -14,15 +14,11 @@ end
 function MissionEndState:setup_controller()
 	if not self._controller then
 		self._controller = managers.controller:create_controller("victoryscreen", managers.controller:get_default_wrapper_index(), false)
-		if Network:is_server() then
-		end
 		self._controller:set_enabled(true)
 	end
 end
 
 function MissionEndState:set_controller_enabled(enabled)
-	if self._controller then
-	end
 end
 
 function MissionEndState:at_enter(old_state, params)
@@ -154,6 +150,7 @@ function MissionEndState:at_enter(old_state, params)
 		end
 	end
 	managers.music:post_event(self._success and managers.music:jukebox_menu_track("heistresult") or managers.music:jukebox_menu_track("heistlost"))
+	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
 	local ghost_bonus = 0
 	if self._type == "victory" or self._type == "gameover" then
 		local total_xp_bonus, bonuses = self:_get_xp_dissected(self._success, params and params.num_winners, params and params.personal_win)
@@ -253,8 +250,8 @@ function MissionEndState:play_finishing_sound(success)
 	if self._server_left then
 		return
 	end
-	if managers.groupai:state():bain_state() then
-		managers.dialog:queue_dialog(success and "Play_ban_g02x" or "Play_ban_g01x", {})
+	if not success and managers.groupai:state():bain_state() then
+		managers.dialog:queue_dialog("Play_ban_g01x", {})
 	end
 end
 
@@ -499,8 +496,6 @@ end
 function MissionEndState:_clear_controller()
 	if not self._controller then
 		return
-	end
-	if Network:is_server() then
 	end
 	self._controller:set_enabled(false)
 	self._controller:destroy()

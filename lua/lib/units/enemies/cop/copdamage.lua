@@ -21,6 +21,14 @@ CopDamage.WEAPON_TYPE_BULLET = 2
 CopDamage.WEAPON_TYPE_FLAMER = 3
 CopDamage.EVENT_IDS = {FINAL_LOWER_HEALTH_PERCENTAGE_LIMIT = 1}
 CopDamage.DEBUG_HP = CopDamage.DEBUG_HP or false
+
+function CopDamage.MAD_3_ACHIEVEMENT(attack_data)
+	if attack_data.variant ~= "melee" and attack_data.attacker_unit and not attack_data.attacker_unit:base().tased then
+		managers.job:set_memory("mad_3", false)
+		print("fail mad_3")
+	end
+end
+
 CopDamage._hurt_severities = {
 	none = false,
 	light = "light_hurt",
@@ -1317,6 +1325,8 @@ end
 
 function CopDamage:die(attack_data)
 	local variant = attack_data.variant
+	print(inspect(attack_data))
+	CopDamage.MAD_3_ACHIEVEMENT(attack_data)
 	self:_remove_debug_gui()
 	self._unit:base():set_slot(self._unit, 17)
 	if alive(managers.interaction:active_unit()) then

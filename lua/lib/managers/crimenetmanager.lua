@@ -17,9 +17,6 @@ function CrimeNetManager:_setup_vars()
 	self._max_active_server_jobs = self._tweak_data.job_vars.max_active_server_jobs
 	self._refresh_server_t = 0
 	self._REFRESH_SERVERS_TIME = self._tweak_data.job_vars.refresh_servers_time
-	if Application:production_build() then
-		self._debug_mass_spawning = tweak_data.gui.crime_net.debug_options.mass_spawn or false
-	end
 	self._active_server_jobs = {}
 end
 
@@ -238,13 +235,16 @@ function CrimeNetManager:activate_job()
 	while i ~= i - 1 do
 		local chance = self._presets[i].chance
 		local roll = math.rand(1)
-		if chance >= roll and not self._active_jobs[i] and i ~= 0 then
-			print("-- activate", math.round(chance * 100) .. "%", self._presets[i].job_id, roll, chance)
-			self._active_jobs[i] = {
-				added = false,
-				active_timer = self._active_job_time + math.random(5)
-			}
-			return
+		if chance >= roll then
+			local contact = tweak_data.narrative.jobs[self._presets[i].job_id].contact
+			if not self._active_jobs[i] and i ~= 0 and contact ~= "wip" and contact ~= "tests" then
+				print("-- activate", math.round(chance * 100) .. "%", self._presets[i].job_id, roll, chance)
+				self._active_jobs[i] = {
+					added = false,
+					active_timer = self._active_job_time + math.random(5)
+				}
+				return
+			end
 		end
 		i = 1 + math.mod(i, #self._presets)
 	end
@@ -1700,25 +1700,6 @@ function CrimeNetGui:_create_polylines()
 			end
 		end
 	end
-	if Application:production_build() and tweak_data.gui.crime_net.debug_options.regions then
-		for _, data in ipairs(tweak_data.gui.crime_net.locations) do
-			local location = data[1]
-			if location and location.dots then
-				for _, dot in ipairs(location.dots) do
-					self._region_panel:rect({
-						w = 1,
-						h = 1,
-						color = Color.red,
-						x = dot[1] / tw * self._map_size_w * self._zoom,
-						y = dot[2] / th * self._map_size_h * self._zoom,
-						halign = "scale",
-						valign = "scale",
-						layer = 1000
-					})
-				end
-			end
-		end
-	end
 end
 
 function CrimeNetGui:set_players_online(players)
@@ -2569,8 +2550,6 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		peers_panel:set_center_x(marker_panel:center_x())
 		peers_panel:set_center_y(marker_panel:center_y())
 	end
-	if not Application:production_build() or peers_panel then
-	end
 	local callout
 	if narrative_data and narrative_data.crimenet_callouts and 0 < #narrative_data.crimenet_callouts then
 		local variant = math.random(#narrative_data.crimenet_callouts)
@@ -2796,17 +2775,6 @@ function CrimeNetGui:feed_timer(id, t, max_t)
 end
 
 function CrimeNetGui:update(t, dt)
-	if Global.debug_cn_locations and Application:production_build() and is_win32 then
-		self._prev_loc = self._prev_loc or {}
-		for i, d in pairs(self._locations[1][1].dots) do
-			if d[3] and not self._prev_loc[i] then
-				Application:debug("Location taken:", i, d[1], d[2])
-			elseif not d[3] and self._prev_loc[i] then
-				Application:debug("Location removed:", i)
-			end
-			self._prev_loc[i] = d[3]
-		end
-	end
 	self._rasteroverlay:set_texture_rect(0, -math.mod(Application:time() * 5, 32), 32, 640)
 	if self._getting_hacked then
 		self._hacked_t = self._hacked_t - dt

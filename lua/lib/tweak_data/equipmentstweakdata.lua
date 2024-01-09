@@ -521,6 +521,11 @@ function EquipmentsTweakData:init()
 		FirstAidKitBase = "first_aid_kit",
 		BodyBagsBagBase = "bodybags_bag"
 	}
+	self.specials.hand = {
+		text_id = "hud_int_equipment_hand",
+		icon = "equipment_hand",
+		sync_possession = true
+	}
 	self.specials.briefcase = {
 		text_id = "hud_int_equipment_briefcase",
 		icon = "equipment_briefcase",

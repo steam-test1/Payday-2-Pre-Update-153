@@ -491,6 +491,47 @@ function CarryTweakData:init(tweak_data)
 	self.parachute.visual_unit_name = "units/pd2_dlc_jerry/characters/npc_acc_parachute_1/npc_acc_parachute_1"
 	self.parachute.unit = "units/pd2_dlc_jerry/pickups/gen_pku_parachute_bag/gen_pku_parachute_bag"
 	self.parachute.AI_carry = {SO_category = "enemies"}
+	self.drk_bomb_part = {}
+	self.drk_bomb_part.type = "heavy"
+	self.drk_bomb_part.name_id = "hud_carry_cro_loot"
+	self.drk_bomb_part.bag_value = "drk_bomb_part"
+	self.drk_bomb_part.unit = "units/pd2_dlc1/pickups/gen_pku_explosivesbag/gen_pku_explosivesbag"
+	self.drk_bomb_part.visual_unit_name = "units/payday2/characters/npc_acc_explosives_bag_1/npc_acc_explosives_bag_1"
+	self.drk_bomb_part.AI_carry = {SO_category = "enemies"}
+	self.weapon_glock = {}
+	self.weapon_glock.type = "light"
+	self.weapon_glock.name_id = "hud_carry_weapon_glock"
+	self.weapon_glock.bag_value = "weapon_glock"
+	self.weapon_glock.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.weapon_scar = {}
+	self.weapon_scar.type = "medium"
+	self.weapon_scar.name_id = "hud_carry_weapon_scar"
+	self.weapon_scar.bag_value = "weapon_scar"
+	self.weapon_scar.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.mad_master_server_value_1 = {}
+	self.mad_master_server_value_1.type = "heavy"
+	self.mad_master_server_value_1.name_id = "hud_carry_master_server"
+	self.mad_master_server_value_1.bag_value = "mad_master_server_value_1"
+	self.mad_master_server_value_1.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.mad_master_server_value_1.AI_carry = {SO_category = "enemies"}
+	self.mad_master_server_value_2 = {}
+	self.mad_master_server_value_2.type = "heavy"
+	self.mad_master_server_value_2.name_id = "hud_carry_master_server"
+	self.mad_master_server_value_2.bag_value = "mad_master_server_value_2"
+	self.mad_master_server_value_2.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.mad_master_server_value_2.AI_carry = {SO_category = "enemies"}
+	self.mad_master_server_value_3 = {}
+	self.mad_master_server_value_3.type = "heavy"
+	self.mad_master_server_value_3.name_id = "hud_carry_master_server"
+	self.mad_master_server_value_3.bag_value = "mad_master_server_value_3"
+	self.mad_master_server_value_3.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.mad_master_server_value_3.AI_carry = {SO_category = "enemies"}
+	self.mad_master_server_value_4 = {}
+	self.mad_master_server_value_4.type = "heavy"
+	self.mad_master_server_value_4.name_id = "hud_carry_master_server"
+	self.mad_master_server_value_4.bag_value = "mad_master_server_value_4"
+	self.mad_master_server_value_4.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.mad_master_server_value_4.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

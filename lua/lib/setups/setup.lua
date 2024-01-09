@@ -13,9 +13,6 @@ core:import("CoreSetup")
 require("lib/managers/DLCManager")
 managers.dlc = DLCManager:new()
 require("lib/tweak_data/TweakData")
-if Application:production_build() then
-	core:import("DebugManager")
-end
 require("lib/utils/EventListenerHolder")
 require("lib/managers/UpgradesManager")
 require("lib/managers/ExperienceManager")

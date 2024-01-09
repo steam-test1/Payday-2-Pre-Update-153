@@ -39,31 +39,43 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_pd.name_id = "menu_asset_risklevel_0"
 	self.risk_pd.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_0"
 	self.risk_pd.stages = "all"
-	self.risk_pd.exclude_stages = {"safehouse", "crojob1"}
+	self.risk_pd.exclude_stages = {
+		"safehouse",
+		"crojob1",
+		"mad"
+	}
 	self.risk_pd.risk_lock = 0
 	self.risk_swat = {}
 	self.risk_swat.name_id = "menu_asset_risklevel_1"
 	self.risk_swat.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_1"
 	self.risk_swat.stages = "all"
-	self.risk_swat.exclude_stages = {"safehouse", "crojob1"}
+	self.risk_swat.exclude_stages = {
+		"safehouse",
+		"crojob1",
+		"mad"
+	}
 	self.risk_swat.risk_lock = 1
 	self.risk_fbi = {}
 	self.risk_fbi.name_id = "menu_asset_risklevel_2"
 	self.risk_fbi.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_2"
 	self.risk_fbi.stages = "all"
-	self.risk_fbi.exclude_stages = {"safehouse", "crojob1"}
+	self.risk_fbi.exclude_stages = {
+		"safehouse",
+		"crojob1",
+		"mad"
+	}
 	self.risk_fbi.risk_lock = 2
 	self.risk_death_squad = {}
 	self.risk_death_squad.name_id = "menu_asset_risklevel_3"
 	self.risk_death_squad.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_3"
 	self.risk_death_squad.stages = "all"
-	self.risk_death_squad.exclude_stages = {"safehouse"}
+	self.risk_death_squad.exclude_stages = {"safehouse", "mad"}
 	self.risk_death_squad.risk_lock = 3
 	self.risk_death_wish = {}
 	self.risk_death_wish.name_id = "menu_asset_risklevel_4"
 	self.risk_death_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_4"
 	self.risk_death_wish.stages = "all"
-	self.risk_death_wish.exclude_stages = {"safehouse"}
+	self.risk_death_wish.exclude_stages = {"safehouse", "mad"}
 	self.risk_death_wish.risk_lock = 4
 end
 
@@ -126,7 +138,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"cage",
 		"hox_3",
 		"arena",
-		"red2"
+		"red2",
+		"dark"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -188,7 +201,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta",
 		"peta2",
 		"man",
-		"pal"
+		"pal",
+		"mad"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -221,7 +235,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta",
 		"peta2",
 		"man",
-		"pal"
+		"pal",
+		"mad"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -251,7 +266,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta",
 		"peta2",
 		"man",
-		"pal"
+		"pal",
+		"mad"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -926,6 +942,30 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.planks.unlock_desc_id = "menu_asset_planks_desc"
 	self.planks.no_mystery = true
 	self.planks.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
+	self.mad_briefcase = {}
+	self.mad_briefcase.name_id = "menu_asset_mad_briefcase"
+	self.mad_briefcase.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/mad_briefcase"
+	self.mad_briefcase.stages = {"mad"}
+	self.mad_russian_merc_cameras = {}
+	self.mad_russian_merc_cameras.name_id = "menu_asset_mad_russian_merc"
+	self.mad_russian_merc_cameras.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/mad_russian_merc"
+	self.mad_russian_merc_cameras.stages = {"mad"}
+	self.dark_emp = {}
+	self.dark_emp.name_id = "menu_asset_dark_emp"
+	self.dark_emp.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/dark_emp"
+	self.dark_emp.stages = {"dark"}
+	self.dark_drone = {}
+	self.dark_drone.name_id = "menu_asset_dark_drone"
+	self.dark_drone.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/dark_drone"
+	self.dark_drone.stages = {"dark"}
+	self.dark_additional_cameras = {}
+	self.dark_additional_cameras.name_id = "menu_asset_dark_additional_cameras"
+	self.dark_additional_cameras.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/dark_additional_cameras"
+	self.dark_additional_cameras.stages = {"dark"}
+	self.dark_additional_cameras.visible_if_locked = true
+	self.dark_additional_cameras.unlock_desc_id = "menu_asset_dark_additional_cameras_desc"
+	self.dark_additional_cameras.no_mystery = true
+	self.dark_additional_cameras.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

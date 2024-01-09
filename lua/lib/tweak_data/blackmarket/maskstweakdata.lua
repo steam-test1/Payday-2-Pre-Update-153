@@ -1495,10 +1495,9 @@ function BlackMarketTweakData:_init_masks()
 		textures = "no_color_full_material",
 		materials = "deep_bronze"
 	}
-	self.masks.arch_nemesis.dlc = "goty_dlc_bundle_2014"
+	self.masks.arch_nemesis.dlc = nil
 	self.masks.arch_nemesis.dlc_list = {
 		"character_pack_clover",
-		"xmas_soundtrack",
 		"armored_transport",
 		"big_bank",
 		"hl_miami",
@@ -2562,6 +2561,37 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.jimmy_duct.global_value = "infamous"
 	self.masks.jimmy_duct.texture_bundle_folder = "coco"
 	self.masks.jimmy_duct.sort_number = 16
+	self.masks.half_mask = {}
+	self.masks.half_mask.unit = "units/pd2_dlc_mad/masks/mad_halv_mask/msk_half_mask"
+	self.masks.half_mask.name_id = "bm_msk_andromeda"
+	self.masks.half_mask.pcs = {}
+	self.masks.half_mask.value = 0
+	self.masks.half_mask.type = "helmet"
+	self.masks.half_mask.texture_bundle_folder = "mad"
+	self.masks.half_mask.sort_number = 17
+	self.masks.visor = {}
+	self.masks.visor.unit = "units/pd2_dlc_mad/masks/mad_helmet_mask/msk_visor"
+	self.masks.visor.name_id = "bm_msk_visor"
+	self.masks.visor.pcs = {}
+	self.masks.visor.value = 0
+	self.masks.visor.type = "helmet"
+	self.masks.visor.texture_bundle_folder = "mad"
+	self.masks.visor.sort_number = 17
+	self.masks.mad_goggles = {}
+	self.masks.mad_goggles.unit = "units/pd2_dlc_mad/masks/mad_goggles/msk_mad_goggles"
+	self.masks.mad_goggles.name_id = "bm_msk_goggles"
+	self.masks.mad_goggles.pcs = {}
+	self.masks.mad_goggles.value = 0
+	self.masks.mad_goggles.type = "helmet"
+	self.masks.mad_goggles.texture_bundle_folder = "mad"
+	self.masks.mad_goggles.sort_number = 17
+	self.masks.mad_mask = {}
+	self.masks.mad_mask.unit = "units/pd2_dlc_mad/masks/mad_mask/msk_mad_mask"
+	self.masks.mad_mask.name_id = "bm_msk_mad_mask"
+	self.masks.mad_mask.pcs = {}
+	self.masks.mad_mask.value = 0
+	self.masks.mad_mask.texture_bundle_folder = "mad"
+	self.masks.mad_mask.sort_number = 17
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"

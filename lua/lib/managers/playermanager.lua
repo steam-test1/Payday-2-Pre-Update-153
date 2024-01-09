@@ -1,5 +1,6 @@
 PlayerManager = PlayerManager or class()
 PlayerManager.WEAPON_SLOTS = 2
+PlayerManager.TARGET_COCAINE_AMOUNT = 1500
 
 function PlayerManager:init()
 	self._player_name = Idstring("units/multiplayer/mp_fps_mover/mp_fps_mover")
@@ -137,13 +138,24 @@ function PlayerManager:update(t, dt)
 		self:need_send_player_status()
 	end
 	self._sent_player_status_this_frame = nil
+	local local_player = self:local_player()
 	if self:has_category_upgrade("player", "close_to_hostage_boost") and (not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t) then
-		local local_player = self:local_player()
 		self._is_local_close_to_hostage = alive(local_player) and managers.groupai and managers.groupai:state():is_a_hostage_within(local_player:movement():m_pos(), tweak_data.upgrades.hostage_near_player_radius)
 		self._hostage_close_to_local_t = t + tweak_data.upgrades.hostage_near_player_check_t
 	end
 	self:_update_hostage_skills()
 	self:_update_damage_dealt(t, dt)
+	if #self._global.synced_cocaine_stacks >= 4 then
+		local amount = 0
+		for i, stack in pairs(self._global.synced_cocaine_stacks) do
+			if stack.in_use then
+				amount = amount + stack.amount
+			end
+			if amount >= PlayerManager.TARGET_COCAINE_AMOUNT then
+				managers.achievment:award("mad_5")
+			end
+		end
+	end
 end
 
 function PlayerManager:add_listener(key, events, clbk)
@@ -2896,21 +2908,9 @@ function PlayerManager:player_timer()
 end
 
 function PlayerManager:add_weapon_ammo_gain(name_id, amount)
-	if Application:production_build() then
-		self._debug_weapon_ammo_gains = self._debug_weapon_ammo_gains or {}
-		self._debug_weapon_ammo_gains[name_id] = self._debug_weapon_ammo_gains[name_id] or {total = 0, index = 0}
-		self._debug_weapon_ammo_gains[name_id].total = self._debug_weapon_ammo_gains[name_id].total + amount
-		self._debug_weapon_ammo_gains[name_id].index = self._debug_weapon_ammo_gains[name_id].index + 1
-	end
 end
 
 function PlayerManager:report_weapon_ammo_gains()
-	if Application:production_build() then
-		self._debug_weapon_ammo_gains = self._debug_weapon_ammo_gains or {}
-		for name_id, data in pairs(self._debug_weapon_ammo_gains) do
-			print("WEAPON: " .. tostring(name_id), "AVERAGE AMMO PICKUP: " .. string.format("%3.2f%%", data.total / data.index * 100))
-		end
-	end
 end
 
 function PlayerManager:save(data)

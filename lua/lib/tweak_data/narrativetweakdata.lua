@@ -220,6 +220,11 @@ function NarrativeTweakData:init()
 	self.contacts.locke.description_id = "heist_contact_locke_description"
 	self.contacts.locke.package = "packages/contact_locke"
 	self.contacts.locke.assets_gui = Idstring("guis/dlcs/berry/guis/preload_contact_locke")
+	self.contacts.jimmy = {}
+	self.contacts.jimmy.name_id = "heist_contact_jimmy"
+	self.contacts.jimmy.description_id = "heist_contact_jimmy_description"
+	self.contacts.jimmy.package = "packages/contact_jimmy"
+	self.contacts.jimmy.assets_gui = Idstring("guis/dlcs/mad/guis/preload_contact_jimmy")
 	self.jobs = {}
 	self.jobs.firestarter = {}
 	self.jobs.firestarter.name_id = "heist_firestarter"
@@ -3741,6 +3746,102 @@ function NarrativeTweakData:init()
 		28500,
 		28500
 	}
+	self.jobs.dark = {}
+	self.jobs.dark.name_id = "heist_dark"
+	self.jobs.dark.briefing_id = "heist_dark_crimenet"
+	self.jobs.dark.contact = "jimmy"
+	self.jobs.dark.region = "street"
+	self.jobs.dark.jc = 30
+	self.jobs.dark.chain = {
+		{
+			level_id = "dark",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.dark.briefing_event = "rb14_drk_cbf_01"
+	self.jobs.dark.debrief_event = nil
+	self.jobs.dark.crimenet_callouts = {
+		"rb14_drk_cnc_01"
+	}
+	self.jobs.dark.crimenet_videos = {"cn_dark"}
+	self.jobs.dark.contract_cost = {
+		24000,
+		48000,
+		120000,
+		240000,
+		300000
+	}
+	self.jobs.dark.payout = {
+		10000,
+		20000,
+		30000,
+		40000,
+		80000
+	}
+	self.jobs.dark.contract_visuals = {}
+	self.jobs.dark.contract_visuals.min_mission_xp = {
+		14000,
+		14000,
+		14000,
+		14000,
+		14000
+	}
+	self.jobs.dark.contract_visuals.max_mission_xp = {
+		32000,
+		32000,
+		32000,
+		32000,
+		32000
+	}
+	self.jobs.mad = {}
+	self.jobs.mad.name_id = "heist_mad"
+	self.jobs.mad.briefing_id = "heist_mad_crimenet"
+	self.jobs.mad.contact = "jimmy"
+	self.jobs.mad.region = "street"
+	self.jobs.mad.jc = 30
+	self.jobs.mad.chain = {
+		{
+			level_id = "mad",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.mad.briefing_event = "rb14_mad_cbf_01"
+	self.jobs.mad.debrief_event = nil
+	self.jobs.mad.crimenet_callouts = {
+		"rb14_mad_cnc_01"
+	}
+	self.jobs.mad.crimenet_videos = {"cn_mad"}
+	self.jobs.mad.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.mad.payout = {
+		135000,
+		275000,
+		692307,
+		1350000,
+		1800000
+	}
+	self.jobs.mad.contract_visuals = {}
+	self.jobs.mad.contract_visuals.min_mission_xp = {
+		36000,
+		36000,
+		36000,
+		36000,
+		36000
+	}
+	self.jobs.mad.contract_visuals.max_mission_xp = {
+		66000,
+		66000,
+		66000,
+		66000,
+		66000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -3804,7 +3905,9 @@ function NarrativeTweakData:init()
 		"peta",
 		"peta_prof",
 		"pal",
-		"man"
+		"man",
+		"mad",
+		"dark"
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self._jobs_index, "roberts")

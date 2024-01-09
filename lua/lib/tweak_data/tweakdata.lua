@@ -35,13 +35,7 @@ TweakData = TweakData or class()
 function TweakData:_init_wip_tweak_data()
 end
 
-function TweakData:_init_wip_hud_icons()
-end
-
 function TweakData:_init_wip_blackmarket(tweak_data)
-end
-
-function TweakData:_init_wip_character(tweak_data)
 end
 
 function TweakData:_init_wip_levels()
@@ -53,31 +47,7 @@ end
 function TweakData:_init_wip_assets(tweak_data)
 end
 
-function TweakData:_init_wip_dlc(tweak_data)
-end
-
-function TweakData:_init_wip_lootdrop(tweak_data)
-end
-
-function TweakData:_init_wip_gui(tweak_data)
-end
-
-function TweakData:_init_wip_preplanning(tweak_data)
-end
-
-function TweakData:_init_wip_money_manager(tweak_data)
-end
-
-function TweakData:_init_wip_weapon(tweak_data)
-end
-
 function TweakData:_init_wip_weapon_factory(tweak_data)
-end
-
-function TweakData:_init_wip_infamy(tweak_data)
-end
-
-function TweakData:_init_wip_interaction()
 end
 
 function TweakData:_init_wip_skilltree()
@@ -86,26 +56,10 @@ end
 function TweakData:_init_wip_upgrades()
 end
 
-function TweakData:_init_wip_equipments()
-end
-
-function TweakData:_init_wip_player()
-end
-
-function TweakData:_init_wip_criminals(tweak_data)
-end
-
-function TweakData:_init_wip_carry(tweak_data)
-end
-
-function TweakData:_init_wip_vehicle()
-end
-
 function TweakData:_init_wip_economy()
 end
 
 require("lib/tweak_data/TweakDataPD2")
-require("lib/tweak_data/TweakDataWip")
 TweakData.RELOAD = true
 
 function TweakData:digest_tweak_data()
@@ -209,7 +163,6 @@ function TweakData:_set_easy()
 	self.player:_set_easy()
 	self.character:_set_easy()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_easy()
 	self.experience_manager.civilians_killed = 15
@@ -223,7 +176,6 @@ function TweakData:_set_normal()
 	self.player:_set_normal()
 	self.character:_set_normal()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_normal()
 	self.experience_manager.civilians_killed = 35
@@ -237,7 +189,6 @@ function TweakData:_set_hard()
 	self.player:_set_hard()
 	self.character:_set_hard()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_hard()
 	self.experience_manager.civilians_killed = 75
@@ -251,7 +202,6 @@ function TweakData:_set_overkill()
 	self.player:_set_overkill()
 	self.character:_set_overkill()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill()
 	self.experience_manager.civilians_killed = 150
@@ -265,7 +215,6 @@ function TweakData:_set_overkill_145()
 	self.player:_set_overkill_145()
 	self.character:_set_overkill_145()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_145()
 	self.experience_manager.civilians_killed = 550
@@ -279,7 +228,6 @@ function TweakData:_set_overkill_290()
 	self.player:_set_overkill_290()
 	self.character:_set_overkill_290()
 	self.money_manager:init(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.group_ai:init(self)
 	self.weapon:_set_overkill_290()
 	self.experience_manager.civilians_killed = 10000
@@ -373,18 +321,13 @@ function TweakData:init()
 	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
 	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
 	self.hud_icons = HudIconsTweakData:new()
-	self._init_wip_hud_icons(self.hud_icons)
 	self.weapon = WeaponTweakData:new(self)
-	self._init_wip_weapon(self.weapon, self)
 	self.weapon_upgrades = WeaponUpgradesTweakData:new()
 	self.equipments = EquipmentsTweakData:new()
-	self._init_wip_equipments(self.equipments)
 	self.player = PlayerTweakData:new()
-	self._init_wip_player(self.player)
 	self.levels = LevelsTweakData:new()
 	self._init_wip_levels(self.levels)
 	self.character = CharacterTweakData:new(self)
-	self._init_wip_character(self.character, self)
 	self.statistics = StatisticsTweakData:new()
 	self.narrative = NarrativeTweakData:new()
 	self._init_wip_narrative(self.narrative)
@@ -397,32 +340,23 @@ function TweakData:init()
 	self.upgrades.visual = UpgradesVisualTweakData:new()
 	self.tips = TipsTweakData:new()
 	self.money_manager = MoneyTweakData:new(self)
-	self._init_wip_money_manager(self.money_manager, self)
 	self.blackmarket = BlackMarketTweakData:new(self)
 	self._init_wip_blackmarket(self.blackmarket, self)
 	self.carry = CarryTweakData:new(self)
-	self._init_wip_carry(self.carry, self)
 	self.mission_door = MissionDoorTweakData:new()
 	self.attention = AttentionTweakData:new()
 	self.timespeed = TimeSpeedEffectTweakData:new()
 	self.sound = SoundTweakData:new()
 	self.lootdrop = LootDropTweakData:new(self)
-	self._init_wip_lootdrop(self.lootdrop, self)
 	self.gui = GuiTweakData:new()
-	self._init_wip_gui(self.gui)
 	self.assets = AssetsTweakData:new(self)
 	self._init_wip_assets(self.assets, self)
 	self.dlc = DLCTweakData:new(self)
-	self._init_wip_dlc(self.dlc, self)
 	self.infamy = InfamyTweakData:new(self)
-	self._init_wip_infamy(self.infamy, self)
 	self.gage_assignment = GageAssignmentTweakData:new(self)
 	self.preplanning = PrePlanningTweakData:new(self)
-	self._init_wip_preplanning(self.preplanning, self)
 	self.interaction = InteractionTweakData:new(self)
-	self._init_wip_interaction(self.interaction, self)
 	self.vehicle = VehicleTweakData:new(self)
-	self._init_wip_vehicle(self.vehicle, self)
 	self.economy = EconomyTweakData:new(self)
 	self._init_wip_economy(self.economy, self)
 	self.criminals = {}
@@ -598,7 +532,6 @@ function TweakData:init()
 			}
 		}
 	}
-	self._init_wip_criminals(self.criminals, self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -1349,6 +1282,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		weapon_category = "grenade_launcher"
 	}
+	self.achievement.mad_5 = "mad_5"
 	self.achievement.peta_4 = {
 		award = "peta_4",
 		count = 1,
@@ -2597,6 +2531,46 @@ Play the full version soon to get your full PAYDAY!]],
 			},
 			job = "man"
 		},
+		death_dark = {
+			award = "dark_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "dark"
+		},
+		death_mad = {
+			award = "mad_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "mad"
+		},
+		mad_3 = {
+			award = "mad_3",
+			difficulty = {
+				"normal",
+				"hard",
+				"overkill",
+				"overkill_145",
+				"overkill_290"
+			},
+			memory = {value = true, is_shortterm = false},
+			job = "mad"
+		},
+		mad_4 = {
+			award = "mad_4",
+			difficulty = {
+				"overkill_145",
+				"overkill_290"
+			},
+			job = "mad",
+			equipped_team = {
+				primaries = {
+					"wpn_fps_ass_akm_gold"
+				},
+				masks = {"rus_hat"}
+			}
+		},
 		flake_1 = {
 			award = "flake_1",
 			jobs = {
@@ -2796,7 +2770,9 @@ Play the full version soon to get your full PAYDAY!]],
 		"framing_frame_prof",
 		"welcome_to_the_jungle_wrapper_prof",
 		"election_day",
-		"election_day_prof"
+		"election_day_prof",
+		"dark",
+		"mad"
 	}
 	self.achievement.job_list.bain = {
 		"jewelry_store",
@@ -3550,6 +3526,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_41", lock = "peta"},
 		{track = "track_42", lock = "pal"},
 		{track = "track_43", lock = "pal"},
+		{track = "track_44"},
 		{
 			track = "track_32_lcv"
 		},
@@ -3668,6 +3645,12 @@ Play the full version soon to get your full PAYDAY!]],
 		{
 			track = "pb_take_me_down",
 			lock = "berry"
+		},
+		{
+			track = "biting_elbows_bad_motherfucker"
+		},
+		{
+			track = "biting_elbows_for_the_kill"
 		},
 		{
 			track = "bsides_04_double_lmgs",

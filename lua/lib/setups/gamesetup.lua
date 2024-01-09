@@ -34,12 +34,6 @@ require("lib/managers/DOTManager")
 core:import("SequenceManager")
 if Application:editor() then
 	require("lib/utils/dev/tools/WorldEditor")
-	if Application:production_build() then
-		require("lib/utils/dev/tools/ParseAllDramas")
-	end
-end
-if Application:production_build() then
-	require("lib/units/SimpleCharacter")
 end
 require("lib/units/ScriptUnitData")
 require("lib/units/UnitBase")
@@ -484,25 +478,6 @@ function GameSetup:load(data)
 end
 
 function GameSetup:_update_debug_input()
-	local editor_ok = not Application:editor() or Global.running_simulation
-	local debug_on_ok = Global.DEBUG_MENU_ON or Application:production_build()
-	if not editor_ok or not debug_on_ok then
-		return
-	end
-	if self._keyboard then
-		if self._keyboard:pressed(59) then
-			print("[GameSetup:_update_debug_input]", Application:paused() and "UNPAUSING" or "PAUSING")
-			Application:set_pause(not Application:paused())
-		elseif self._keyboard:pressed(60) then
-			if self._framerate_low then
-				self._framerate_low = nil
-				Application:cap_framerate(managers.user:get_setting("fps_cap"))
-			else
-				self._framerate_low = true
-				Application:cap_framerate(30)
-			end
-		end
-	end
 end
 
 return GameSetup

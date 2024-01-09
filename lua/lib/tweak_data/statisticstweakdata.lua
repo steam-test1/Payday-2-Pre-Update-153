@@ -93,7 +93,9 @@ function StatisticsTweakData:statistics_table()
 		"peta",
 		"peta2",
 		"pal",
-		"man"
+		"man",
+		"dark",
+		"mad"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -156,7 +158,9 @@ function StatisticsTweakData:statistics_table()
 		"peta",
 		"peta_prof",
 		"pal",
-		"man"
+		"man",
+		"dark",
+		"mad"
 	}
 	local mask_list = {
 		"character_locked",
@@ -433,7 +437,11 @@ function StatisticsTweakData:statistics_table()
 		"cop_plague_doctor",
 		"cop_kawaii",
 		"jimmy",
-		"jimmy_duct"
+		"jimmy_duct",
+		"mad_mask",
+		"half_mask",
+		"mad_goggles",
+		"visor"
 	}
 	local weapon_list = {
 		"ak5",
@@ -533,7 +541,8 @@ function StatisticsTweakData:statistics_table()
 		"m37",
 		"china",
 		"sr2",
-		"x_sr2"
+		"x_sr2",
+		"pl14"
 	}
 	local melee_list = {
 		"weapon",
@@ -608,7 +617,8 @@ function StatisticsTweakData:statistics_table()
 		"scoutknife",
 		"shawn",
 		"nin",
-		"ballistic"
+		"ballistic",
+		"zeus"
 	}
 	local grenade_list = {
 		"frag",

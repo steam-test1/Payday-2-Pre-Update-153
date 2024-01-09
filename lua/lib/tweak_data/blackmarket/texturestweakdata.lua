@@ -1933,4 +1933,24 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.luse.texture = "units/pd2_dlc_lupus/patterns/pattern_luse_df"
 	self.textures.luse.value = 0
 	self.textures.luse.dlc = "pal"
+	self.textures.jimmy_phoenix = {}
+	self.textures.jimmy_phoenix.name_id = "bm_txt_jimmy_phoenix"
+	self.textures.jimmy_phoenix.pcs = {}
+	self.textures.jimmy_phoenix.texture = "units/pd2_dlc_mad/masks/patterns/pattern_jimmy_phoenix_df"
+	self.textures.jimmy_phoenix.value = 0
+	self.textures.hexagons = {}
+	self.textures.hexagons.name_id = "bm_txt_hexagons"
+	self.textures.hexagons.pcs = {}
+	self.textures.hexagons.texture = "units/pd2_dlc_mad/masks/patterns/pattern_hexagons_df"
+	self.textures.hexagons.value = 0
+	self.textures.squares = {}
+	self.textures.squares.name_id = "bm_txt_squares"
+	self.textures.squares.pcs = {}
+	self.textures.squares.texture = "units/pd2_dlc_mad/masks/patterns/pattern_squares_df"
+	self.textures.squares.value = 0
+	self.textures.rebel = {}
+	self.textures.rebel.name_id = "bm_txt_rebel"
+	self.textures.rebel.pcs = {}
+	self.textures.rebel.texture = "units/pd2_dlc_mad/masks/patterns/pattern_rebel_df"
+	self.textures.rebel.value = 0
 end

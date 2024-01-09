@@ -1403,9 +1403,6 @@ function NetworkMatchMakingPSN:_error_message_solver(info)
 		["8002231d"] = self._creating_lobby and "dialog_err_failed_creating_lobby" or self._searching_lobbys and "dialog_err_failed_searching_lobbys" or self._joining_lobby and "dialog_err_failed_joining_lobby" or nil
 	}
 	local text_id = error_texts[info.error]
-	if not Application:production_build() and not text_id then
-		return
-	end
 	local title = managers.localization:text("dialog_error_title") .. (Application:production_build() and " [" .. info.error .. "]" or "")
 	local dialog_data = {}
 	dialog_data.title = title

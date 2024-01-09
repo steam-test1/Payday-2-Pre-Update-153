@@ -1190,4 +1190,26 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.mushroom_cloud.texture = "units/pd2_dlc_lupus/materials/matcap_mushroom_cloud_df"
 	self.materials.mushroom_cloud.value = 0
 	self.materials.mushroom_cloud.dlc = "pal"
+	self.materials.nebula = {}
+	self.materials.nebula.name_id = "bm_mtl_nebula"
+	self.materials.nebula.pcs = {}
+	self.materials.nebula.texture = "units/pd2_dlc_mad/masks/materials/matcap_nebula_df"
+	self.materials.nebula.value = 0
+	self.materials.planet = {}
+	self.materials.planet.name_id = "bm_mtl_planet"
+	self.materials.planet.pcs = {}
+	self.materials.planet.texture = "units/pd2_dlc_mad/masks/materials/matcap_planet_df"
+	self.materials.planet.value = 0
+	self.materials.rusty = {}
+	self.materials.rusty.name_id = "bm_mtl_rusty"
+	self.materials.rusty.pcs = {}
+	self.materials.rusty.texture = "units/pd2_dlc_mad/masks/materials/matcap_rusty_df"
+	self.materials.rusty.material_amount = 0
+	self.materials.rusty.value = 0
+	self.materials.spaceship = {}
+	self.materials.spaceship.name_id = "bm_mtl_spaceship"
+	self.materials.spaceship.pcs = {}
+	self.materials.spaceship.texture = "units/pd2_dlc_mad/masks/materials/matcap_spaceship_df"
+	self.materials.spaceship.material_amount = 0
+	self.materials.spaceship.value = 0
 end

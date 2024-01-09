@@ -3,7 +3,6 @@ WeaponTweakData = WeaponTweakData or class()
 
 function WeaponTweakData:init(tweak_data)
 	self:_create_table_structure()
-	self:_create_table_structure_wip()
 	self:_init_data_npc_melee()
 	self:_init_data_player_weapons(tweak_data)
 	self:_init_data_m4_npc()
@@ -110,6 +109,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_china_npc()
 	self:_init_data_sr2_npc()
 	self:_init_data_x_sr2_npc()
+	self:_init_data_pl14_npc()
 	self:_precalculate_values()
 end
 
@@ -625,7 +625,7 @@ end
 function WeaponTweakData:_init_data_saiga_npc()
 	self.saiga_npc.sounds.prefix = "saiga_npc"
 	self.saiga_npc.use_data.selection_index = 2
-	self.saiga_npc.DAMAGE = 5
+	self.saiga_npc.DAMAGE = 3
 	self.saiga_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
 	self.saiga_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
 	self.saiga_npc.auto.fire_rate = 0.14
@@ -1929,6 +1929,20 @@ function WeaponTweakData:_init_data_x_sr2_npc()
 	self.x_sr2_npc.suppression = 2
 end
 
+function WeaponTweakData:_init_data_pl14_npc()
+	self.pl14_npc.sounds.prefix = "pl14_npc"
+	self.pl14_npc.use_data.selection_index = 1
+	self.pl14_npc.DAMAGE = 1
+	self.pl14_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.pl14_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.pl14_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.pl14_npc.CLIP_AMMO_MAX = 10
+	self.pl14_npc.NR_CLIPS_MAX = 5
+	self.pl14_npc.hold = "pistol"
+	self.pl14_npc.alert_size = 2500
+	self.pl14_npc.suppression = 1
+end
+
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -2078,7 +2092,6 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	self.factory = WeaponFactoryTweakData:new()
 	tweak_data._init_wip_weapon_factory(self.factory, tweak_data)
 	self:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
-	self:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, damage_melee_default, autohit_minigun_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
 end
 
 function WeaponTweakData:_init_stats()
@@ -2502,9 +2515,6 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 		max_ammo * low,
 		max_ammo * high
 	}
-end
-
-function WeaponTweakData:_init_new_weapons_wip(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
 end
 
 function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, damage_melee_default, damage_melee_effect_multiplier_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default)
@@ -11202,6 +11212,87 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.pl14 = {}
+	self.pl14.category = "pistol"
+	self.pl14.damage_melee = damage_melee_default
+	self.pl14.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.pl14.sounds = {}
+	self.pl14.sounds.fire = "pl14_fire"
+	self.pl14.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.pl14.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.pl14.sounds.dryfire = "secondary_dryfire"
+	self.pl14.timers = {}
+	self.pl14.timers.reload_not_empty = 1.47
+	self.pl14.timers.reload_empty = 2.12
+	self.pl14.timers.unequip = 0.5
+	self.pl14.timers.equip = 0.35
+	self.pl14.name_id = "bm_w_pl14"
+	self.pl14.desc_id = "bm_w_pl14_desc"
+	self.pl14.description_id = "des_pl14"
+	self.pl14.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.pl14.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.pl14.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.pl14.use_data = {}
+	self.pl14.use_data.selection_index = 1
+	self.pl14.DAMAGE = 1
+	self.pl14.CLIP_AMMO_MAX = 12
+	self.pl14.NR_CLIPS_MAX = 5
+	self.pl14.AMMO_MAX = self.pl14.CLIP_AMMO_MAX * self.pl14.NR_CLIPS_MAX
+	self.pl14.AMMO_PICKUP = self:_pickup_chance(self.pl14.AMMO_MAX, 1)
+	self.pl14.FIRE_MODE = "single"
+	self.pl14.fire_mode_data = {}
+	self.pl14.fire_mode_data.fire_rate = 0.09
+	self.pl14.single = {}
+	self.pl14.single.fire_rate = 0.09
+	self.pl14.spread = {}
+	self.pl14.spread.standing = self.new_m4.spread.standing
+	self.pl14.spread.crouching = self.new_m4.spread.crouching
+	self.pl14.spread.steelsight = self.new_m4.spread.steelsight
+	self.pl14.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.pl14.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.pl14.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.pl14.kick = {}
+	self.pl14.kick.standing = self.glock_17.kick.standing
+	self.pl14.kick.crouching = self.pl14.kick.standing
+	self.pl14.kick.steelsight = self.pl14.kick.standing
+	self.pl14.crosshair = {}
+	self.pl14.crosshair.standing = {}
+	self.pl14.crosshair.crouching = {}
+	self.pl14.crosshair.steelsight = {}
+	self.pl14.crosshair.standing.offset = 0.1
+	self.pl14.crosshair.standing.moving_offset = 0.4
+	self.pl14.crosshair.standing.kick_offset = 0.3
+	self.pl14.crosshair.crouching.offset = 0.1
+	self.pl14.crosshair.crouching.moving_offset = 0.5
+	self.pl14.crosshair.crouching.kick_offset = 0.2
+	self.pl14.crosshair.steelsight.hidden = true
+	self.pl14.crosshair.steelsight.offset = 0
+	self.pl14.crosshair.steelsight.moving_offset = 0
+	self.pl14.crosshair.steelsight.kick_offset = 0.1
+	self.pl14.shake = {}
+	self.pl14.shake.fire_multiplier = 1
+	self.pl14.shake.fire_steelsight_multiplier = -1
+	self.pl14.autohit = autohit_pistol_default
+	self.pl14.aim_assist = aim_assist_pistol_default
+	self.pl14.weapon_hold = "colt_1911"
+	self.pl14.animations = {}
+	self.pl14.animations.equip_id = "equip_glock"
+	self.pl14.animations.recoil_steelsight = true
+	self.pl14.texture_bundle_folder = "mad"
+	self.pl14.panic_suppression_chance = 0.2
+	self.pl14.stats = {
+		damage = 145,
+		spread = 18,
+		recoil = 9,
+		spread_moving = 18,
+		zoom = 3,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -11295,9 +11386,6 @@ function WeaponTweakData:_init_data_offhand_weapons()
 	self.m4_secondary.texture_name = "new_m4"
 	self.m4_secondary.weapon_hold = "new_m4"
 	self.m4_secondary.AMMO_MAX = math.round(self.m4_secondary.AMMO_MAX * 0.75)
-end
-
-function WeaponTweakData:_create_table_structure_wip()
 end
 
 function WeaponTweakData:_create_table_structure()
@@ -11932,6 +12020,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.pl14_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -12042,4 +12136,11 @@ function WeaponTweakData:_precalculate_values()
 	self.china_npc.AMMO_MAX = self.china_npc.CLIP_AMMO_MAX * self.china_npc.NR_CLIPS_MAX
 	self.sr2_npc.AMMO_MAX = self.sr2_npc.CLIP_AMMO_MAX * self.sr2_npc.NR_CLIPS_MAX
 	self.x_sr2_npc.AMMO_MAX = self.x_sr2_npc.CLIP_AMMO_MAX * self.x_sr2_npc.NR_CLIPS_MAX
+	self.pl14_npc.AMMO_MAX = self.pl14_npc.CLIP_AMMO_MAX * self.pl14_npc.NR_CLIPS_MAX
+	self.rpk_lmg_npc.AMMO_MAX = self.rpk_lmg_npc.CLIP_AMMO_MAX * self.rpk_lmg_npc.NR_CLIPS_MAX
+	self.svd_snp_npc.AMMO_MAX = self.svd_snp_npc.CLIP_AMMO_MAX * self.svd_snp_npc.NR_CLIPS_MAX
+	self.akmsu_smg_npc.AMMO_MAX = self.akmsu_smg_npc.CLIP_AMMO_MAX * self.akmsu_smg_npc.NR_CLIPS_MAX
+	self.asval_smg_npc.AMMO_MAX = self.asval_smg_npc.CLIP_AMMO_MAX * self.asval_smg_npc.NR_CLIPS_MAX
+	self.sr2_smg_npc.AMMO_MAX = self.sr2_smg_npc.CLIP_AMMO_MAX * self.sr2_smg_npc.NR_CLIPS_MAX
+	self.ak47_ass_npc.AMMO_MAX = self.ak47_ass_npc.CLIP_AMMO_MAX * self.ak47_ass_npc.NR_CLIPS_MAX
 end

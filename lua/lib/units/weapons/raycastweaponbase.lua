@@ -1017,9 +1017,6 @@ function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
 	end
 	add_amount = math.floor(add_amount * (ratio or 1))
 	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
-	if Application:production_build() then
-		managers.player:add_weapon_ammo_gain(self._name_id, add_amount)
-	end
 	return picked_up, add_amount
 end
 

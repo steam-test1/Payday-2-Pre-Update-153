@@ -920,7 +920,7 @@ function JobManager:activate_job(job_id, current_stage)
 	}
 	self._global.start_time = TimerManager:wall_running():time()
 	self:start_accumulate_ghost_bonus(job_id)
-	managers.experience:mission_xp_clear()
+	self:cleanup_data()
 	self._global.memory = {}
 	self._global.shortterm_memory = {}
 	return true
@@ -937,9 +937,16 @@ function JobManager:deactivate_current_job()
 	self._global.shortterm_memory = nil
 	managers.loot:on_job_deactivated()
 	managers.mission:on_job_deactivated()
-	managers.experience:mission_xp_clear()
+	self:cleanup_data()
 	self._global.active_ghost_bonus = nil
 	self._global.accumulated_ghost_bonus = nil
+end
+
+function JobManager:cleanup_data()
+	managers.experience:mission_xp_clear()
+	local source = SoundDevice:create_source("cleanup")
+	source:post_event("bain_static_disable")
+	source = nil
 end
 
 function JobManager:complete_stage()

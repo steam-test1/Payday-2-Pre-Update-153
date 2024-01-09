@@ -231,18 +231,6 @@ function NetworkAccountSTEAM:publish_statistics(stats, force_store)
 	end
 	local handler = Steam:sa_handler()
 	print("[NetworkAccountSTEAM:publish_statistics] Publishing statistics to Steam!")
-	if Application:production_build() and not force_store then
-		local err = false
-		for key, _ in pairs(stats) do
-			if not handler:set_stat(key, handler:get_stat(key)) then
-				Application:error("[NetworkAccountSTEAM:publish_statistics] ERROR - Stat is missing on Steam: '" .. key .. "'")
-				err = true
-			end
-		end
-		if err then
-		end
-		return
-	end
 	local err = false
 	for key, stat in pairs(stats) do
 		local res

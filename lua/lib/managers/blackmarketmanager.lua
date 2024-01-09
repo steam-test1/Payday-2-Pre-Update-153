@@ -1035,9 +1035,6 @@ function BlackMarketManager:preload_weapon_blueprint(category, factory_id, bluep
 			else
 				new_loading = {load_me = part}
 			end
-			if Application:production_build() then
-				new_loading.part_id = part_id
-			end
 			table.insert(self._preloading_list, new_loading)
 			loading_parts[part_id] = part
 		end

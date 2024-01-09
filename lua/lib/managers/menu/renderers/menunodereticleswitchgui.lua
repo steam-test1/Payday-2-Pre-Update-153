@@ -102,10 +102,6 @@ function MenuNodeReticleSwitchGui:update_item_dlc_locks()
 	local color = node:item("reticle_color"):value()
 	local type_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "types", "sight", type)
 	local color_data = tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes", color)
-	if Application:production_build() then
-		assert(type_data, "Missing sight type in tweak data", type)
-		assert(color_data, "Missing sight color in tweak data", color)
-	end
 	local type_dlc = type_data and type_data.dlc or false
 	local color_dlc = color_data and color_data.dlc or false
 	local pass_type = not type_dlc or managers.dlc:is_dlc_unlocked(type_dlc)

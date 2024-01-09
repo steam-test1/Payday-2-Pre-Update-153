@@ -2000,5 +2000,29 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.ballistic.repeat_expire_t = 0.6
 	self.melee_weapons.ballistic.stats.concealment = 29
 	self.melee_weapons.ballistic.dlc = nil
+	self.melee_weapons.zeus = deep_clone(self.melee_weapons.fists)
+	self.melee_weapons.zeus.name_id = "bm_melee_zeus"
+	self.melee_weapons.zeus.type = "fists"
+	self.melee_weapons.zeus.special_weapon = "taser"
+	self.melee_weapons.zeus.texture_bundle_folder = "mad"
+	self.melee_weapons.zeus.free = nil
+	self.melee_weapons.zeus.align_objects = {
+		"a_weapon_left",
+		"a_weapon_right"
+	}
+	self.melee_weapons.zeus.unit = "units/pd2_dlc_mad/weapons/wpn_fps_mel_zeus/wpn_fps_mel_zeus"
+	self.melee_weapons.zeus.third_unit = "units/pd2_dlc_mad/weapons/wpn_fps_mel_zeus/wpn_third_mel_zeus"
+	self.melee_weapons.zeus.stats.min_damage = 2
+	self.melee_weapons.zeus.stats.max_damage = 2
+	self.melee_weapons.zeus.stats.min_damage_effect = 1
+	self.melee_weapons.zeus.stats.max_damage_effect = 1
+	self.melee_weapons.zeus.stats.charge_time = 2
+	self.melee_weapons.zeus.stats.range = 200
+	self.melee_weapons.zeus.sounds.equip = "zeus_equip"
+	self.melee_weapons.zeus.sounds.hit_air = "zeus_hit_air"
+	self.melee_weapons.zeus.sounds.hit_gen = "zeus_hit_gen"
+	self.melee_weapons.zeus.sounds.hit_body = "zeus_hit_body"
+	self.melee_weapons.zeus.sounds.charge = "zeus_charge"
+	self.melee_weapons.zeus.stats.concealment = 30
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end
