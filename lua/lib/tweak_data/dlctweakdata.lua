@@ -36,6 +36,7 @@ function DLCTweakData:init(tweak_data)
 		steel = true,
 		peta = true,
 		pal = true,
+		super = 1,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -142,7 +143,6 @@ function DLCTweakData:init(tweak_data)
 	end
 	self.pd2_clan = {}
 	self.pd2_clan.content = {}
-	self.pd2_clan.dlc = "has_pd2_clan"
 	self.pd2_clan.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -317,7 +317,6 @@ function DLCTweakData:init(tweak_data)
 	self.ach_bulldog_1 = {}
 	self.ach_bulldog_1.dlc = "has_achievement"
 	self.ach_bulldog_1.achievement_id = "bulldog_1"
-	self.ach_bulldog_1.use_custom_func = true
 	self.ach_bulldog_1.content = {}
 	self.ach_bulldog_1.content.loot_global_value = "infamous"
 	self.ach_bulldog_1.content.loot_drops = {
@@ -330,7 +329,6 @@ function DLCTweakData:init(tweak_data)
 	self.freed_old_hoxton = {}
 	self.freed_old_hoxton.dlc = "has_freed_old_hoxton"
 	self.freed_old_hoxton.achievement_id = "bulldog_1"
-	self.freed_old_hoxton.use_custom_func = true
 	self.freed_old_hoxton.content = {}
 	self.freed_old_hoxton.content.loot_global_value = "pd2_clan"
 	self.freed_old_hoxton.content.loot_drops = {}
@@ -500,7 +498,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.preorder = {}
-	self.preorder.dlc = "has_preorder"
 	self.preorder.content = {}
 	self.preorder.content_on_consoles = true
 	self.preorder.content.loot_drops = {
@@ -547,19 +544,16 @@ function DLCTweakData:init(tweak_data)
 		})
 	end
 	self.cce = {}
-	self.cce.dlc = "has_cce"
 	self.cce.content = {}
 	self.cce.content.loot_drops = {}
 	self.cce.content.upgrades = {
 		"player_crime_net_deal_2"
 	}
 	self.soundtrack = {}
-	self.soundtrack.dlc = "has_soundtrack"
 	self.soundtrack.content = {}
 	self.soundtrack.content.loot_drops = {}
 	self.poetry_soundtrack = {}
 	self.poetry_soundtrack.dlc = "has_soundtrack_or_cce"
-	self.poetry_soundtrack.use_custom_func = true
 	self.poetry_soundtrack.content = {}
 	self.poetry_soundtrack.content.loot_drops = {
 		{
@@ -649,7 +643,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.armored_transport = {}
 	self.armored_transport.content = {}
-	self.armored_transport.dlc = "has_armored_transport"
 	self.armored_transport.content.loot_drops = {
 		{
 			{
@@ -726,12 +719,10 @@ function DLCTweakData:init(tweak_data)
 	self.armored_transport_intel = {}
 	self.armored_transport_intel.dlc = "has_armored_transport_and_intel"
 	self.armored_transport_intel.achievement_id = "armored_2"
-	self.armored_transport_intel.use_custom_func = true
 	self.armored_transport_intel.content = {}
 	self.armored_transport_intel.content.loot_drops = {}
 	self.gage_pack = {}
 	self.gage_pack.content = {}
-	self.gage_pack.dlc = "has_gage_pack"
 	self.gage_pack.content.loot_drops = {
 		{
 			type_items = "weapon_mods",
@@ -829,7 +820,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	end
 	self.gage_pack_shotgun = {}
-	self.gage_pack_shotgun.dlc = "has_gage_pack_shotgun"
 	self.gage_pack_shotgun.content = {}
 	self.gage_pack_shotgun.content.loot_drops = {
 		{
@@ -1022,7 +1012,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.gage_pack_assault = {}
-	self.gage_pack_assault.dlc = "has_gage_pack_assault"
 	self.gage_pack_assault.content = {}
 	self.gage_pack_assault.content.loot_drops = {}
 	self.ach_gage5_1 = {}
@@ -1297,7 +1286,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.gage_pack_lmg = {}
 	self.gage_pack_lmg.content = {}
-	self.gage_pack_lmg.dlc = "has_gage_pack_lmg"
 	self.gage_pack_lmg.content.loot_drops = {
 		{
 			{
@@ -1369,7 +1357,6 @@ function DLCTweakData:init(tweak_data)
 	self.gage_pack_lmg.content.upgrades = {"rpk", "kabar"}
 	self.gage_pack_snp = {}
 	self.gage_pack_snp.content = {}
-	self.gage_pack_snp.dlc = "has_gage_pack_snp"
 	self.gage_pack_snp.content.loot_drops = {}
 	self.gage_pack_snp.content.upgrades = {}
 	self.ach_gage3_3 = {}
@@ -1593,7 +1580,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.big_bank = {}
-	self.big_bank.dlc = "has_big_bank"
 	self.big_bank.content = {}
 	self.big_bank.content.loot_drops = {}
 	self.ach_bigbank_1 = {}
@@ -1825,7 +1811,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.xmas_soundtrack = {}
 	self.xmas_soundtrack.content = {}
-	self.xmas_soundtrack.dlc = "has_xmas_soundtrack"
 	self.xmas_soundtrack.content.loot_drops = {
 		{
 			{
@@ -1848,7 +1833,6 @@ function DLCTweakData:init(tweak_data)
 	self.gage_pack_jobs = {}
 	self.gage_pack_jobs = {}
 	self.gage_pack_jobs.content = {}
-	self.gage_pack_jobs.dlc = "has_gage_pack_jobs"
 	self.gage_pack_jobs.content.loot_drops = {}
 	self.kosugi_4 = {}
 	self.kosugi_4.dlc = "has_achievement"
@@ -1864,7 +1848,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.twitch_pack = {}
 	self.twitch_pack.content = {}
-	self.twitch_pack.dlc = "has_twitch_pack"
 	self.twitch_pack.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1895,7 +1878,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.humble_pack2 = {}
 	self.humble_pack2.content = {}
-	self.humble_pack2.dlc = "has_humble_pack2"
 	self.humble_pack2.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1910,7 +1892,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.humble_pack3 = {}
 	self.humble_pack3.content = {}
-	self.humble_pack3.dlc = "has_humble_pack3"
 	self.humble_pack3.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1925,7 +1906,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.humble_pack4 = {}
 	self.humble_pack4.content = {}
-	self.humble_pack4.dlc = "has_humble_pack4"
 	self.humble_pack4.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1940,7 +1920,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.e3_s15a = {}
 	self.e3_s15a.content = {}
-	self.e3_s15a.dlc = "has_e3_s15a"
 	self.e3_s15a.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1950,7 +1929,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.e3_s15b = {}
 	self.e3_s15b.content = {}
-	self.e3_s15b.dlc = "has_e3_s15b"
 	self.e3_s15b.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1960,7 +1938,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.e3_s15c = {}
 	self.e3_s15c.content = {}
-	self.e3_s15c.dlc = "has_e3_s15c"
 	self.e3_s15c.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1970,7 +1947,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.e3_s15d = {}
 	self.e3_s15d.content = {}
-	self.e3_s15d.dlc = "has_e3_s15d"
 	self.e3_s15d.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1980,7 +1956,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.sweettooth = {}
 	self.sweettooth.content = {}
-	self.sweettooth.dlc = "has_sweettooth"
 	self.sweettooth.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -1989,11 +1964,9 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.hl_miami = {}
-	self.hl_miami.dlc = "has_hl_miami"
 	self.hl_miami.content = {}
 	self.hl_miami.content.loot_drops = {}
 	self.hlm_game = {}
-	self.hlm_game.dlc = "has_hlm_game"
 	self.hlm_game.content = {}
 	self.hlm_game.content.loot_drops = {
 		{
@@ -2424,7 +2397,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.gage_pack_historical = {}
-	self.gage_pack_historical.dlc = "has_gage_pack_historical"
 	self.gage_pack_historical.content = {}
 	self.gage_pack_historical.content.loot_global_value = "gage_pack_historical"
 	self.gage_pack_historical.content.loot_drops = {
@@ -2442,7 +2414,6 @@ function DLCTweakData:init(tweak_data)
 	self.gage_pack_historical.content.upgrades = {"swagger"}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.alienware_alpha = {}
-		self.alienware_alpha.dlc = "has_alienware_alpha"
 		self.alienware_alpha.content = {}
 		self.alienware_alpha.content.loot_drops = {
 			{
@@ -2457,14 +2428,12 @@ function DLCTweakData:init(tweak_data)
 			}
 		}
 		self.alienware_alpha_promo = {}
-		self.alienware_alpha_promo.dlc = "has_alienware_alpha_promo"
 		self.alienware_alpha_promo.content = {}
 		self.alienware_alpha_promo.content.loot_drops = {}
 		self.alienware_alpha_promo.content.upgrades = {"alien_maul"}
 	end
 	self.goty_weapon_bundle_2014 = {}
 	self.goty_weapon_bundle_2014.dlc = "has_goty_weapon_bundle_2014"
-	self.goty_weapon_bundle_2014.use_custom_func = true
 	self.goty_weapon_bundle_2014.content = {}
 	self.goty_weapon_bundle_2014.content.loot_drops = {
 		{
@@ -2475,7 +2444,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.goty_heist_bundle_2014 = {}
 	self.goty_heist_bundle_2014.dlc = "has_goty_heist_bundle_2014"
-	self.goty_heist_bundle_2014.use_custom_func = true
 	self.goty_heist_bundle_2014.content = {}
 	self.goty_heist_bundle_2014.content.loot_drops = {
 		{
@@ -2486,7 +2454,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.goty_dlc_bundle_2014 = {}
 	self.goty_dlc_bundle_2014.dlc = "has_goty_all_dlc_bundle_2014"
-	self.goty_dlc_bundle_2014.use_custom_func = true
 	self.goty_dlc_bundle_2014.content = {}
 	self.goty_dlc_bundle_2014.content.loot_drops = {
 		{
@@ -2557,7 +2524,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.character_pack_clover = {}
 	self.character_pack_clover.content = {}
-	self.character_pack_clover.dlc = "has_character_pack_clover"
 	self.character_pack_clover.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -2594,7 +2560,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.hope_diamond = {}
 	self.hope_diamond.content = {}
-	self.hope_diamond.dlc = "has_hope_diamond"
 	self.hope_diamond.content.loot_drops = {}
 	self.ach_bat_2 = {}
 	self.ach_bat_2.dlc = "has_achievement"
@@ -2685,7 +2650,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.the_bomb = {}
-	self.the_bomb.dlc = "has_the_bomb"
 	self.the_bomb.content = {}
 	self.the_bomb.content.loot_drops = {}
 	self.ach_cow_3 = {}
@@ -2813,7 +2777,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.akm4_pack = {}
-	self.akm4_pack.dlc = "has_akm4_pack"
 	self.akm4_pack.content = {}
 	self.akm4_pack.content.loot_drops = {}
 	self.ach_ameno_1 = {}
@@ -3134,7 +3097,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.character_pack_dragan = {}
 	self.character_pack_dragan.content = {}
-	self.character_pack_dragan.dlc = "has_character_pack_dragan"
 	self.character_pack_dragan.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -3155,7 +3117,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.overkill_pack = {}
-	self.overkill_pack.dlc = "has_overkill_pack"
 	self.overkill_pack.content = {}
 	self.overkill_pack.content.loot_drops = {
 		{
@@ -3180,7 +3141,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.complete_overkill_pack = {}
-	self.complete_overkill_pack.dlc = "has_complete_overkill_pack"
 	self.complete_overkill_pack.content = {}
 	self.complete_overkill_pack.content.loot_drops = {
 		{
@@ -3204,9 +3164,40 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.complete_overkill_pack2 = {}
+	self.complete_overkill_pack2.dlc = "has_parent_dlc"
+	self.complete_overkill_pack2.parent_dlc = "complete_overkill_pack"
+	self.complete_overkill_pack2.content = {}
+	self.complete_overkill_pack2.content.loot_global_value = "complete_overkill_pack"
+	self.complete_overkill_pack2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "megacthulhu",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "hunter",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "cop_skull",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "cop_plague_doctor",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "cop_kawaii",
+			amount = 1
+		}
+	}
 	self.hlm2 = {}
 	self.hlm2.dlc = "has_hlm2"
-	self.hlm2.use_custom_func = true
 	self.hlm2.content = {}
 	self.hlm2.content.loot_drops = {
 		{
@@ -3242,7 +3233,6 @@ function DLCTweakData:init(tweak_data)
 	}
 	self.hlm2_deluxe = {}
 	self.hlm2_deluxe.dlc = "has_hlm2_deluxe"
-	self.hlm2_deluxe.use_custom_func = true
 	self.hlm2_deluxe.content = {}
 	self.hlm2_deluxe.content.loot_drops = {
 		{
@@ -3269,7 +3259,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.speedrunners = {}
-	self.speedrunners.dlc = "has_speedrunners"
 	self.speedrunners.content = {}
 	self.speedrunners.content.loot_drops = {
 		{
@@ -3306,7 +3295,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.bbq = {}
-	self.bbq.dlc = "has_bbq"
 	self.bbq.content = {}
 	self.bbq.content.loot_drops = {
 		{
@@ -3444,7 +3432,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.west = {}
-	self.west.dlc = "has_west"
 	self.west.content = {}
 	self.west.content.loot_drops = {
 		{
@@ -3589,7 +3576,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.arena = {}
-	self.arena.dlc = "has_arena"
 	self.arena.content = {}
 	self.arena.content.loot_drops = {
 		{
@@ -3702,7 +3688,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.character_pack_sokol = {}
-	self.character_pack_sokol.dlc = "has_character_pack_sokol"
 	self.character_pack_sokol.content = {}
 	self.character_pack_sokol.content.loot_drops = {
 		{
@@ -3722,7 +3707,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.kenaz = {}
-	self.kenaz.dlc = "has_kenaz"
 	self.kenaz.content = {}
 	self.kenaz.content.loot_drops = {
 		{
@@ -3830,7 +3814,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.turtles = {}
-	self.turtles.dlc = "has_turtles"
 	self.turtles.content = {}
 	self.turtles.content.loot_drops = {
 		{
@@ -4005,7 +3988,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.dragon = {}
-	self.dragon.dlc = "has_dragon"
 	self.dragon.content = {}
 	self.dragon.content.loot_drops = {
 		{
@@ -4051,7 +4033,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.steel = {}
-	self.steel.dlc = "has_steel"
 	self.steel.content = {}
 	self.steel.content.loot_drops = {}
 	self.steel_free = {}
@@ -4196,7 +4177,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.berry = {}
-	self.berry.dlc = "has_berry"
 	self.berry.content = {}
 	self.berry.content.loot_drops = {}
 	self.ach_berry_2 = {}
@@ -4323,7 +4303,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.peta = {}
-	self.peta.dlc = "has_peta"
 	self.peta.content = {}
 	self.peta.content.loot_drops = {}
 	self.ach_peta_2 = {}
@@ -4415,7 +4394,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.pal = {}
-	self.pal.dlc = "has_pal"
 	self.pal.content = {}
 	self.pal.content.loot_drops = {}
 	self.ach_pal_2 = {}
@@ -4507,8 +4485,8 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.dbd_clan_award = {}
-	self.dbd_clan_award.content = {}
 	self.dbd_clan_award.dlc = "has_dbd_clan"
+	self.dbd_clan_award.content = {}
 	self.dbd_clan_award.content.loot_global_value = "dbd_clan"
 	self.dbd_clan_award.content.loot_drops = {
 		{
@@ -4523,7 +4501,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.pdcon_2015 = {}
-	self.pdcon_2015.dlc = "has_pdcon_2015"
 	self.pdcon_2015.content = {}
 	self.pdcon_2015.content.loot_drops = {
 		{
@@ -4533,7 +4510,6 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.bobblehead = {}
-	self.bobblehead.dlc = "has_bobblehead"
 	self.bobblehead.content = {}
 	self.bobblehead.content.loot_drops = {
 		{

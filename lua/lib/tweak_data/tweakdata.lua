@@ -1026,9 +1026,11 @@ Play the full version soon to get your full PAYDAY!]],
 	self.materials[Idstring("tile"):key()] = "tile"
 	self.materials[Idstring("water_deep"):key()] = "water_deep"
 	self.materials[Idstring("water_puddle"):key()] = "water_puddle"
-	self.materials[Idstring("water_shallow"):key()] = "water_shallow"
+	self.materials[Idstring("water_shallow"):key()] = "water_puddle"
 	self.materials[Idstring("shield"):key()] = "shield"
 	self.materials[Idstring("heavy_swat_steel_no_decal"):key()] = "shield"
+	self.materials[Idstring("snow"):key()] = "snow"
+	self.materials[Idstring("ice"):key()] = "ice_thick"
 	self.screen = {}
 	self.screen.fadein_delay = 1
 	self.experience_manager = {}
@@ -1088,6 +1090,7 @@ Play the full version soon to get your full PAYDAY!]],
 		1.2,
 		1.3
 	}
+	self.experience_manager.alive_humans_multiplier[0] = 1
 	self.experience_manager.limited_bonus_multiplier = 1
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1

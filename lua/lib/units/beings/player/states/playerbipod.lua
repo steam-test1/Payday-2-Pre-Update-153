@@ -123,6 +123,7 @@ function PlayerBipod:_update_check_actions(t, dt)
 	self:_update_foley(t, input)
 	local new_action = false
 	new_action = self:_check_action_reload(t, input)
+	new_action = new_action or self:_check_action_weapon_gadget(t, input)
 	if not new_action then
 		new_action = self:_check_action_primary_attack(t, input)
 		self._shooting = new_action
@@ -131,6 +132,7 @@ function PlayerBipod:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_run(t, input)
 	new_action = new_action or self:_check_change_weapon(t, input)
 	new_action = new_action or self:_check_action_unmount_bipod(t, input)
+	new_action = new_action or self:_check_action_intimidate(t, input)
 	if not new_action then
 		local projectile_entry = managers.blackmarket:equipped_projectile()
 		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
@@ -161,6 +163,17 @@ function PlayerBipod:_check_action_reload(t, input)
 		new_action = true
 	end
 	return new_action
+end
+
+function PlayerBipod:_check_action_intimidate(t, input)
+	if not input.btn_interact_press then
+		return
+	end
+	local action_forbidden = self:chk_action_forbidden("interact") or self._unit:base():stats_screen_visible() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_projectile() or self:_on_zipline()
+	if action_forbidden then
+		return
+	end
+	return self:_start_action_intimidate(t)
 end
 
 function PlayerBipod:_check_action_unmount_bipod(t, input)

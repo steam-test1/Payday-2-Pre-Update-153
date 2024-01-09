@@ -4727,7 +4727,7 @@ function BlackMarketManager:tradable_add_item(instance_id, category, entry, qual
 		if item.category ~= category or item.entry ~= entry then
 		end
 		item.amount = amount
-	elseif category and entry and amount and category and entry and amount ~= "nil" and entry ~= "nil" and category ~= "nil" and (bonus == nil or type(bonus) == "boolean") then
+	elseif category and entry and amount and amount ~= "nil" and entry ~= "nil" and category ~= "nil" and (bonus == nil or type(bonus) == "boolean") then
 		self._global.inventory_tradable[instance_id] = {
 			category = category,
 			entry = entry,

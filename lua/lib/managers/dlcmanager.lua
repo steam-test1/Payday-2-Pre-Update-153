@@ -146,23 +146,23 @@ end
 
 function GenericDLCManager:give_dlc_package()
 	for package_id, data in pairs(tweak_data.dlc) do
-		print("package_id", package_id, inspect(data))
-		if data.free or self[data.dlc](self, data) then
-			print("[DLC] Ownes dlc", data.free, data.dlc)
+		cat_print("debug", "package_id", package_id, inspect(data))
+		if self:is_dlc_unlocked(package_id) then
+			cat_print("debug", "[DLC] Ownes dlc", data.free, data.dlc)
 			if not Global.dlc_save.packages[package_id] then
 				Global.dlc_save.packages[package_id] = true
 				for _, loot_drop in ipairs(data.content.loot_drops or {}) do
-					print("  loot_drop", inspect(loot_drop))
+					cat_print("debug", "  loot_drop", inspect(loot_drop))
 					local loot_drop = 0 < #loot_drop and loot_drop[math.random(#loot_drop)] or loot_drop
 					for i = 1, loot_drop.amount do
 						local entry = tweak_data.blackmarket[loot_drop.type_items][loot_drop.item_entry]
 						local global_value = loot_drop.global_value or data.content.loot_global_value or package_id
-						print(i .. "  give", loot_drop.type_items, loot_drop.item_entry, global_value)
+						cat_print("debug", i .. "  give", loot_drop.type_items, loot_drop.item_entry, global_value)
 						managers.blackmarket:add_to_inventory(global_value, loot_drop.type_items, loot_drop.item_entry)
 					end
 				end
 			else
-				print("[DLC] Allready been given dlc package", package_id)
+				cat_print("debug", "[DLC] Already been given dlc package", package_id)
 			end
 			local identifier = UpgradesManager.AQUIRE_STRINGS[5] .. tostring(package_id)
 			for _, upgrade in ipairs(data.content.upgrades or {}) do
@@ -171,7 +171,7 @@ function GenericDLCManager:give_dlc_package()
 				end
 			end
 		else
-			print("[DLC] Didn't own DLC package", package_id)
+			cat_print("debug", "[DLC] Didn't own DLC package", package_id)
 			local identifier = UpgradesManager.AQUIRE_STRINGS[5] .. tostring(package_id)
 			for _, upgrade in ipairs(data.content.upgrades or {}) do
 				if managers.upgrades:aquired(upgrade, identifier) then
@@ -190,7 +190,7 @@ function GenericDLCManager:give_missing_package()
 	}
 	local entry, global_value, passed, has_item, name
 	for package_id, data in pairs(tweak_data.dlc) do
-		if Global.dlc_save.packages[package_id] and (data.free or self[data.dlc](self, data)) then
+		if Global.dlc_save.packages[package_id] and self:is_dlc_unlocked(package_id) then
 			for _, loot_drop in ipairs(data.content and data.content.loot_drops or {}) do
 				if #loot_drop == 0 then
 					entry = tweak_data.blackmarket[loot_drop.type_items][loot_drop.item_entry]
@@ -288,13 +288,27 @@ end
 function GenericDLCManager:on_signin_complete()
 end
 
+function GenericDLCManager:is_dlcs_unlocked(list_of_dlcs)
+	for _, dlc in ipairs(list_of_dlcs) do
+		if not self:is_dlc_unlocked(dlc) then
+			return false
+		end
+	end
+	return true
+end
+
 function GenericDLCManager:is_dlc_unlocked(dlc)
 	return tweak_data.dlc[dlc] and tweak_data.dlc[dlc].free or self:has_dlc(dlc)
 end
 
 function GenericDLCManager:has_dlc(dlc)
-	if tweak_data.dlc[dlc] and tweak_data.dlc[dlc].use_custom_func and tweak_data.dlc[dlc].dlc then
-		return self[tweak_data.dlc[dlc].dlc](self, tweak_data.dlc[dlc])
+	if tweak_data.dlc[dlc] and tweak_data.dlc[dlc].dlc then
+		if self[tweak_data.dlc[dlc].dlc] then
+			return self[tweak_data.dlc[dlc].dlc](self, tweak_data.dlc[dlc])
+		else
+			Application:error("Didn't have dlc has function for", dlc, "has_dlc()", tweak_data.dlc[dlc].dlc)
+			Application:stack_dump()
+		end
 	end
 	if dlc == "cce" then
 		dlc = "career_criminal_edition"
@@ -327,7 +341,7 @@ end
 
 function GenericDLCManager:dlcs_string()
 	local s = ""
-	s = s .. (self:has_preorder() and "preorder " or "")
+	s = s .. (self:is_dlc_unlocked("preorder") and "preorder " or "")
 	return s
 end
 
@@ -336,251 +350,150 @@ function GenericDLCManager:has_corrupt_data()
 end
 
 function GenericDLCManager:has_all_dlcs()
-	return self:has_armored_transport() and self:has_gage_pack()
-end
-
-function GenericDLCManager:has_preorder()
-	return Global.dlc_manager.all_dlc_data.preorder and Global.dlc_manager.all_dlc_data.preorder.verified
-end
-
-function GenericDLCManager:has_cce()
-	return Global.dlc_manager.all_dlc_data.career_criminal_edition and Global.dlc_manager.all_dlc_data.career_criminal_edition.verified
+	return self:is_dlcs_unlocked({
+		"armored_transport",
+		"gage_pack"
+	})
 end
 
 function GenericDLCManager:has_goty_weapon_bundle_2014()
-	return self:has_gage_pack() and self:has_gage_pack_lmg() and self:has_gage_pack_jobs() and self:has_gage_pack_snp() and self:has_gage_pack_shotgun() and self:has_gage_pack_assault() and self:has_gage_pack_historical()
+	return self:is_dlcs_unlocked({
+		"gage_pack",
+		"gage_pack_lmg",
+		"gage_pack_jobs",
+		"gage_pack_snp",
+		"gage_pack_shotgun",
+		"gage_pack_assault",
+		"gage_pack_historical"
+	})
 end
 
 function GenericDLCManager:has_goty_heist_bundle_2014()
-	return self:has_armored_transport() and self:has_big_bank() and self:has_hl_miami() and self:has_hope_diamond()
-end
-
-function GenericDLCManager:has_goty_all_dlc_bundle_2014()
-	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:has_soundtrack_or_cce() and self:has_xmas_soundtrack() and self:has_character_pack_clover()
-end
-
-function GenericDLCManager:has_soundtrack()
-	return Global.dlc_manager.all_dlc_data.soundtrack and Global.dlc_manager.all_dlc_data.soundtrack.verified
-end
-
-function GenericDLCManager:has_soundtrack_or_cce()
-	return self:has_soundtrack() or self:has_cce()
-end
-
-function GenericDLCManager:has_pdth_soundtrack()
-	return Global.dlc_manager.all_dlc_data.pdth_soundtrack and Global.dlc_manager.all_dlc_data.pdth_soundtrack.verified
+	return self:is_dlcs_unlocked({
+		"armored_transport",
+		"big_bank",
+		"hl_miami",
+		"hope_diamond"
+	})
 end
 
 function GenericDLCManager:has_pd2_clan()
-	return Global.dlc_manager.all_dlc_data.pd2_clan and Global.dlc_manager.all_dlc_data.pd2_clan.verified
+	return self:is_dlc_unlocked("pd2_clan")
+end
+
+function GenericDLCManager:has_twitch_pack()
+	return self:is_dlc_unlocked("twitch_pack")
+end
+
+function GenericDLCManager:has_turtles()
+	return self:is_dlc_unlocked("turtles")
+end
+
+function GenericDLCManager:has_dragon()
+	return self:is_dlc_unlocked("dragon")
+end
+
+function GenericDLCManager:has_dbd_clan()
+	return self:is_dlc_unlocked("dbd_clan")
+end
+
+function GenericDLCManager:has_goty_all_dlc_bundle_2014()
+	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:has_soundtrack_or_cce() and self:is_dlcs_unlocked({
+		"xmas_soundtrack",
+		"character_pack_clover"
+	})
+end
+
+function GenericDLCManager:has_soundtrack_or_cce()
+	return self:is_dlc_unlocked("soundtrack") or self:is_dlc_unlocked("cce")
 end
 
 function GenericDLCManager:has_freed_old_hoxton(data)
 	if SystemInfo:platform() == Idstring("WIN32") then
-		return self:has_pd2_clan() and self:has_achievement(data)
+		return self:is_dlc_unlocked("pd2_clan") and self:has_achievement(data)
 	end
 	return true
 end
 
-function GenericDLCManager:has_sweettooth()
-	return Global.dlc_manager.all_dlc_data.sweettooth and Global.dlc_manager.all_dlc_data.sweettooth.verified
-end
-
-function GenericDLCManager:has_alienware_alpha()
-	return Global.dlc_manager.all_dlc_data.alienware_alpha and Global.dlc_manager.all_dlc_data.alienware_alpha.verified
-end
-
-function GenericDLCManager:has_alienware_alpha_promo()
-	return Global.dlc_manager.all_dlc_data.alienware_alpha_promo and Global.dlc_manager.all_dlc_data.alienware_alpha_promo.verified
-end
-
-function GenericDLCManager:has_armored_transport()
-	return Global.dlc_manager.all_dlc_data.armored_transport and Global.dlc_manager.all_dlc_data.armored_transport.verified
-end
-
 function GenericDLCManager:has_armored_transport_and_intel(data)
-	return self:has_armored_transport() and self:has_achievement(data)
-end
-
-function GenericDLCManager:has_gage_pack()
-	return Global.dlc_manager.all_dlc_data.gage_pack and Global.dlc_manager.all_dlc_data.gage_pack.verified
-end
-
-function GenericDLCManager:has_gage_pack_lmg()
-	return Global.dlc_manager.all_dlc_data.gage_pack_lmg and Global.dlc_manager.all_dlc_data.gage_pack_lmg.verified
-end
-
-function GenericDLCManager:has_gage_pack_jobs()
-	return Global.dlc_manager.all_dlc_data.gage_pack_jobs and Global.dlc_manager.all_dlc_data.gage_pack_jobs.verified
-end
-
-function GenericDLCManager:has_gage_pack_snp()
-	return Global.dlc_manager.all_dlc_data.gage_pack_snp and Global.dlc_manager.all_dlc_data.gage_pack_snp.verified
-end
-
-function GenericDLCManager:has_gage_pack_shotgun()
-	return Global.dlc_manager.all_dlc_data.gage_pack_shotgun and Global.dlc_manager.all_dlc_data.gage_pack_shotgun.verified
-end
-
-function GenericDLCManager:has_gage_pack_assault()
-	return Global.dlc_manager.all_dlc_data.gage_pack_assault and Global.dlc_manager.all_dlc_data.gage_pack_assault.verified
-end
-
-function GenericDLCManager:has_overkill_pack()
-	return Global.dlc_manager.all_dlc_data.overkill_pack and Global.dlc_manager.all_dlc_data.overkill_pack.verified
-end
-
-function GenericDLCManager:has_complete_overkill_pack()
-	return Global.dlc_manager.all_dlc_data.complete_overkill_pack and Global.dlc_manager.all_dlc_data.complete_overkill_pack.verified
-end
-
-function GenericDLCManager:has_akm4_pack()
-	return Global.dlc_manager.all_dlc_data.akm4_pack and Global.dlc_manager.all_dlc_data.akm4_pack.verified
-end
-
-function GenericDLCManager:has_big_bank()
-	return Global.dlc_manager.all_dlc_data.big_bank and Global.dlc_manager.all_dlc_data.big_bank.verified
-end
-
-function GenericDLCManager:has_hl_miami()
-	return Global.dlc_manager.all_dlc_data.hl_miami and Global.dlc_manager.all_dlc_data.hl_miami.verified
-end
-
-function GenericDLCManager:has_hlm_game()
-	return Global.dlc_manager.all_dlc_data.hlm_game and Global.dlc_manager.all_dlc_data.hlm_game.verified
+	return self:is_dlc_unlocked("armored_transport") and self:has_achievement(data)
 end
 
 function GenericDLCManager:has_hlm2()
-	return (not Global.dlc_manager.all_dlc_data.hlm2 or not Global.dlc_manager.all_dlc_data.hlm2.verified) and Global.dlc_manager.all_dlc_data.hlm2_aus and Global.dlc_manager.all_dlc_data.hlm2_aus.verified
+	return Global.dlc_manager.all_dlc_data.hlm2 and Global.dlc_manager.all_dlc_data.hlm2.verified or self:is_dlc_unlocked("hlm2_aus")
 end
 
 function GenericDLCManager:has_hlm2_deluxe()
-	return (not Global.dlc_manager.all_dlc_data.hlm2_deluxe or not Global.dlc_manager.all_dlc_data.hlm2_deluxe.verified) and Global.dlc_manager.all_dlc_data.hlm2_aus and Global.dlc_manager.all_dlc_data.hlm2_aus.verified
+	return Global.dlc_manager.all_dlc_data.hlm2_deluxe and Global.dlc_manager.all_dlc_data.hlm2_deluxe.verified or self:is_dlc_unlocked("hlm2_aus")
 end
 
-function GenericDLCManager:has_speedrunners()
-	return Global.dlc_manager.all_dlc_data.speedrunners and Global.dlc_manager.all_dlc_data.speedrunners.verified
-end
-
-function GenericDLCManager:has_character_pack_clover()
-	return Global.dlc_manager.all_dlc_data.character_pack_clover and Global.dlc_manager.all_dlc_data.character_pack_clover.verified
-end
-
-function GenericDLCManager:has_character_pack_dragan()
-	return Global.dlc_manager.all_dlc_data.character_pack_dragan and Global.dlc_manager.all_dlc_data.character_pack_dragan.verified
-end
-
-function GenericDLCManager:has_hope_diamond()
-	return Global.dlc_manager.all_dlc_data.hope_diamond and Global.dlc_manager.all_dlc_data.hope_diamond.verified
-end
-
-function GenericDLCManager:has_the_bomb()
-	return Global.dlc_manager.all_dlc_data.the_bomb and Global.dlc_manager.all_dlc_data.the_bomb.verified
-end
-
-function GenericDLCManager:has_bbq()
-	return Global.dlc_manager.all_dlc_data.bbq and Global.dlc_manager.all_dlc_data.bbq.verified
-end
-
-function GenericDLCManager:has_west()
-	return Global.dlc_manager.all_dlc_data.west and Global.dlc_manager.all_dlc_data.west.verified
-end
-
-function GenericDLCManager:has_berry()
-	return Global.dlc_manager.all_dlc_data.berry and Global.dlc_manager.all_dlc_data.berry.verified
-end
-
-function GenericDLCManager:has_arena()
-	return Global.dlc_manager.all_dlc_data.arena and Global.dlc_manager.all_dlc_data.arena.verified
-end
-
-function GenericDLCManager:has_character_pack_sokol()
-	return Global.dlc_manager.all_dlc_data.character_pack_sokol and Global.dlc_manager.all_dlc_data.character_pack_sokol.verified
-end
-
-function GenericDLCManager:has_kenaz()
-	return Global.dlc_manager.all_dlc_data.kenaz and Global.dlc_manager.all_dlc_data.kenaz.verified
-end
-
-function GenericDLCManager:has_turtles()
-	return Global.dlc_manager.all_dlc_data.turtles and Global.dlc_manager.all_dlc_data.turtles.verified
-end
-
-function GenericDLCManager:has_dragon()
-	return Global.dlc_manager.all_dlc_data.dragon and Global.dlc_manager.all_dlc_data.dragon.verified
-end
-
-function GenericDLCManager:has_xmas_soundtrack()
-	return Global.dlc_manager.all_dlc_data.xmas_soundtrack and Global.dlc_manager.all_dlc_data.xmas_soundtrack.verified
-end
-
-function GenericDLCManager:has_bsides_soundtrack()
-	return Global.dlc_manager.all_dlc_data.bsides_soundtrack and Global.dlc_manager.all_dlc_data.bsides_soundtrack.verified
-end
-
-function GenericDLCManager:has_twitch_pack()
-	return Global.dlc_manager.all_dlc_data.twitch_pack and Global.dlc_manager.all_dlc_data.twitch_pack.verified
-end
-
-function GenericDLCManager:has_humble_pack2()
-	return Global.dlc_manager.all_dlc_data.humble_pack2 and Global.dlc_manager.all_dlc_data.humble_pack2.verified
-end
-
-function GenericDLCManager:has_humble_pack3()
-	return Global.dlc_manager.all_dlc_data.humble_pack3 and Global.dlc_manager.all_dlc_data.humble_pack3.verified
-end
-
-function GenericDLCManager:has_humble_pack4()
-	return Global.dlc_manager.all_dlc_data.humble_pack4 and Global.dlc_manager.all_dlc_data.humble_pack4.verified
-end
-
-function GenericDLCManager:has_e3_s15a()
-	return Global.dlc_manager.all_dlc_data.e3_s15a and Global.dlc_manager.all_dlc_data.e3_s15a.verified
-end
-
-function GenericDLCManager:has_e3_s15b()
-	return Global.dlc_manager.all_dlc_data.e3_s15b and Global.dlc_manager.all_dlc_data.e3_s15b.verified
-end
-
-function GenericDLCManager:has_e3_s15c()
-	return Global.dlc_manager.all_dlc_data.e3_s15c and Global.dlc_manager.all_dlc_data.e3_s15c.verified
-end
-
-function GenericDLCManager:has_e3_s15d()
-	return Global.dlc_manager.all_dlc_data.e3_s15d and Global.dlc_manager.all_dlc_data.e3_s15d.verified
-end
-
-function GenericDLCManager:has_gage_pack_historical()
-	return Global.dlc_manager.all_dlc_data.gage_pack_historical and Global.dlc_manager.all_dlc_data.gage_pack_historical.verified
-end
-
-function GenericDLCManager:has_steel()
-	return Global.dlc_manager.all_dlc_data.steel and Global.dlc_manager.all_dlc_data.steel.verified
-end
-
-function GenericDLCManager:has_bobblehead()
-	return Global.dlc_manager.all_dlc_data.bobblehead and Global.dlc_manager.all_dlc_data.bobblehead.verified
-end
-
-function GenericDLCManager:has_pdcon_2015()
-	return Global.dlc_manager.all_dlc_data.pdcon_2015 and Global.dlc_manager.all_dlc_data.pdcon_2015.verified
-end
-
-function GenericDLCManager:has_peta()
-	return Global.dlc_manager.all_dlc_data.peta and Global.dlc_manager.all_dlc_data.peta.verified
-end
-
-function GenericDLCManager:has_pal()
-	return Global.dlc_manager.all_dlc_data.pal and Global.dlc_manager.all_dlc_data.pal.verified
-end
-
-function GenericDLCManager:has_dbd_clan()
-	return Global.dlc_manager.all_dlc_data.dbd_clan and Global.dlc_manager.all_dlc_data.dbd_clan.verified
+function GenericDLCManager:has_parent_dlc(data)
+	return data and data.parent_dlc and self:is_dlc_unlocked(data.parent_dlc)
 end
 
 function GenericDLCManager:has_achievement(data)
 	local achievement = managers.achievment and data and data.achievement_id and managers.achievment:get_info(data.achievement_id)
 	return achievement and achievement.awarded or false
+end
+
+function GenericDLCManager:has_dlc_or_soundtrack_or_cce(dlc)
+	return managers.dlc:is_dlc_unlocked(dlc) or managers.dlc:has_soundtrack_or_cce()
+end
+
+function GenericDLCManager:has_soundtrack_armored_transport()
+	return self:has_dlc_or_soundtrack_or_cce("armored_transport")
+end
+
+function GenericDLCManager:has_soundtrack_big_bank()
+	return self:has_dlc_or_soundtrack_or_cce("big_bank")
+end
+
+function GenericDLCManager:has_soundtrack_hl_miami()
+	return self:has_dlc_or_soundtrack_or_cce("hl_miami")
+end
+
+function GenericDLCManager:has_soundtrack_hope_diamond()
+	return self:has_dlc_or_soundtrack_or_cce("hope_diamond")
+end
+
+function GenericDLCManager:has_soundtrack_the_bomb()
+	return self:has_dlc_or_soundtrack_or_cce("the_bomb")
+end
+
+function GenericDLCManager:has_soundtrack_kenaz()
+	return self:has_dlc_or_soundtrack_or_cce("kenaz")
+end
+
+function GenericDLCManager:has_soundtrack_gage_pack_assault()
+	return self:has_dlc_or_soundtrack_or_cce("gage_pack_assault")
+end
+
+function GenericDLCManager:has_soundtrack_berry()
+	return self:has_dlc_or_soundtrack_or_cce("berry")
+end
+
+function GenericDLCManager:has_soundtrack_peta()
+	return self:has_dlc_or_soundtrack_or_cce("peta")
+end
+
+function GenericDLCManager:has_soundtrack_pal()
+	return self:has_dlc_or_soundtrack_or_cce("pal")
+end
+
+function GenericDLCManager:has_soundtrack_pdth()
+	return managers.dlc:is_dlc_unlocked("pdth_soundtrack")
+end
+
+function GenericDLCManager:has_soundtrack_bsides_soundtrack()
+	return managers.dlc:is_dlc_unlocked("bsides_soundtrack")
+end
+
+function GenericDLCManager:has_soundtrack_xmas_soundtrack()
+	return managers.dlc:is_dlc_unlocked("xmas_soundtrack")
+end
+
+function GenericDLCManager:has_soundtrack_arena()
+	return managers.dlc:is_dlc_unlocked("arena")
 end
 
 PS3DLCManager = PS3DLCManager or class(GenericDLCManager)

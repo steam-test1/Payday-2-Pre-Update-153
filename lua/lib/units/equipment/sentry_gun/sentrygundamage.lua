@@ -63,6 +63,14 @@ function SentryGunDamage:shoot_pos_mid(m_pos)
 	mvector3.set(m_pos, self._ext_movement:m_head_pos())
 end
 
+function SentryGunDamage:on_marked_state(state)
+	if state then
+		self._marked_dmg_mul = self._marked_dmg_mul or tweak_data.upgrades.values.player.marked_enemy_damage_mul
+	else
+		self._marked_dmg_mul = nil
+	end
+end
+
 function SentryGunDamage:damage_bullet(attack_data)
 	if self._dead or self._invulnerable or Network:is_client() and self._ignore_client_damage or PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		return
@@ -85,6 +93,7 @@ function SentryGunDamage:damage_bullet(attack_data)
 			managers.hud:on_hit_confirmed()
 		end
 	end
+	dmg_adjusted = dmg_adjusted * (self._marked_dmg_mul or 1)
 	if hit_shield then
 		dmg_adjusted = dmg_adjusted * tweak_data.weapon[self._unit:base():get_name_id()].SHIELD_DMG_MUL
 	elseif hit_bag then
@@ -139,6 +148,7 @@ function SentryGunDamage:damage_fire(attack_data)
 		return
 	end
 	local damage = attack_data.damage * tweak_data.weapon[self._unit:base():get_name_id()].FIRE_DMG_MUL
+	damage = damage * (self._marked_dmg_mul or 1)
 	damage = damage + self._sync_dmg_leftover
 	local damage_sync = self:_apply_damage(damage, true, true, true)
 	if self._ignore_client_damage then
@@ -189,6 +199,7 @@ function SentryGunDamage:damage_explosion(attack_data)
 			managers.hud:on_hit_confirmed()
 		end
 	end
+	damage = damage * (self._marked_dmg_mul or 1)
 	damage = damage + self._sync_dmg_leftover
 	local damage_sync = self:_apply_damage(damage, true, true, true)
 	if self._ignore_client_damage then

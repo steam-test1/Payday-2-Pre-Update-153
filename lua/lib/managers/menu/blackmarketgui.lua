@@ -6656,7 +6656,7 @@ function BlackMarketGui:confirm_pressed()
 		self:_stop_rename_item()
 		return
 	end
-	if managers.menu:is_pc_controller() then
+	if managers.menu:is_pc_controller() and not managers.menu:is_steam_controller() then
 		return self:press_first_btn(Idstring("0"))
 	else
 		return self:press_button("BTN_A")

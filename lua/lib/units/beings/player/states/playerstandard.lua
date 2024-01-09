@@ -1134,7 +1134,6 @@ end
 
 function PlayerStandard:_do_action_throw_projectile(t, input, drop_projectile)
 	local current_state_name = self._camera_unit:anim_state_machine():segment_state(PlayerStandard.IDS_BASE)
-	print(current_state_name)
 	self._state_data.throwing_projectile = nil
 	local projectile_entry = managers.blackmarket:equipped_projectile()
 	local projectile_data = tweak_data.blackmarket.projectiles[projectile_entry]
@@ -2326,7 +2325,7 @@ function PlayerStandard:_start_action_intimidate(t)
 		elseif voice_type == "mark_turret" then
 			sound_name = "f44x_any"
 			interact_type = "cmd_point"
-			prime_target.unit:contour():add("mark_unit_dangerous", true)
+			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_unit_dangerous_damage_bonus" or "mark_unit_dangerous", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
 	end

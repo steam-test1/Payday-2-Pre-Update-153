@@ -377,7 +377,8 @@ function NetworkPeer:tradable_verify_outfit(signature)
 		return
 	end
 	local outfit = self:blackmarket_outfit()
-	if outfit.primary and outfit.primary.cosmetics or outfit.secondary and outfit.secondary.cosmetics then
+	local tradable_items
+	if outfit.primary and outfit.primary.cosmetics or outfit.secondary and outfit.secondary.cosmetics or tradable_items then
 		self._wait_for_verify_tradable_outfit = true
 		managers.network.account:inventory_outfit_verify(self._user_id, signature, callback(self, self, "on_verify_tradable_outfit", self._outfit_version))
 	end
@@ -395,19 +396,19 @@ function NetworkPeer:on_verify_tradable_outfit(outfit_version, error, list)
 		return
 	end
 	if outfit.primary and outfit.primary.cosmetics and not managers.blackmarket:tradable_verify("weapon_skins", outfit.primary.cosmetics.id, outfit.primary.cosmetics.quality, outfit.primary.cosmetics.bonus, list) then
-		self:tradable_verification_failed("primary", outfit)
+		self:tradable_verification_failed("primary_skin", outfit)
 	end
 	if outfit.secondary and outfit.secondary.cosmetics and not managers.blackmarket:tradable_verify("weapon_skins", outfit.secondary.cosmetics.id, outfit.secondary.cosmetics.quality, outfit.secondary.cosmetics.bonus, list) then
-		self:tradable_verification_failed("secondary", outfit)
+		self:tradable_verification_failed("secondary_skin", outfit)
 	end
 end
 
 function NetworkPeer:tradable_verification_failed(group, outfit)
 	Application:error("[NetworkPeer:tradable_verification_failed] Failed to verify peer " .. tostring(self._id) .. "'s tradable item.")
-	if not group or group == "primary" then
+	if not group or group == "primary_skin" then
 		outfit.primary.cosmetics = nil
 	end
-	if not group or group == "secondary" then
+	if not group or group == "secondary_skin" then
 		outfit.secondary.cosmetics = nil
 	end
 	self._profile.outfit_string = managers.blackmarket:outfit_string_from_list(outfit)
@@ -423,6 +424,10 @@ function NetworkPeer:tradable_verification_failed(group, outfit)
 	end
 	if managers.criminals then
 		managers.criminals:set_data(self:character())
+		if alive(self._unit) and self._unit:inventory()._mask_visibility then
+			self._unit:inventory():set_mask_visibility(false)
+			self._unit:inventory():set_mask_visibility(true)
+		end
 	end
 end
 

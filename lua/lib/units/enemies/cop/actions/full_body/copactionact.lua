@@ -524,6 +524,8 @@ CopActionAct._act_redirects.SO = {
 	"e_so_blow_torch_work",
 	"e_so_blow_torch_empty",
 	"e_so_blow_torch_react",
+	"e_so_blow_torch_to_work",
+	"e_so_blow_torch_to_empty",
 	"e_so_plant_c4_low",
 	"e_so_plant_c4_hi",
 	"e_so_interact_mid",

@@ -348,7 +348,7 @@ function MenuInput:select_node()
 end
 
 function MenuInput:any_keyboard_used()
-	if not (not self._keyboard_used and self._controller) or managers.controller:get_default_wrapper_type() ~= "pc" then
+	if not (not self._keyboard_used and self._controller) or managers.controller:get_default_wrapper_type() ~= "pc" and managers.controller:get_default_wrapper_type() ~= "steam" then
 		return
 	end
 	for _, key in ipairs({

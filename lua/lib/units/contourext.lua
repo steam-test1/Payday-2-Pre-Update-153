@@ -46,6 +46,12 @@ ContourExt._types = {
 		color = tweak_data.contour.character.dangerous_color,
 		fadeout = 9
 	},
+	mark_unit_dangerous_damage_bonus = {
+		priority = 4,
+		color = tweak_data.contour.character.dangerous_color,
+		fadeout = 9,
+		damage_bonus = true
+	},
 	mark_unit_friendly = {
 		priority = 3,
 		color = tweak_data.contour.character.friendly_color

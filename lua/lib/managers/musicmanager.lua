@@ -321,7 +321,7 @@ function MusicManager:jukebox_default_tracks()
 		heist_man = "all",
 		heist_pal = "all"
 	}
-	if managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_armored_transport() then
 		default_options.heist_arm_cro = "track_09"
 		default_options.heist_arm_hcm = "track_09"
 		default_options.heist_arm_fac = "track_09"
@@ -329,34 +329,34 @@ function MusicManager:jukebox_default_tracks()
 		default_options.heist_arm_for = "track_09"
 		default_options.heist_arm_und = "track_09"
 	end
-	if managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_big_bank() then
 		default_options.heist_big = "track_14"
 	end
-	if managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_hl_miami() then
 		default_options.heist_mia1 = "track_18"
 		default_options.heist_mia2 = "track_19"
 	end
-	if managers.dlc:has_hope_diamond() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_hope_diamond() then
 		default_options.heist_mus = "track_24"
 	end
-	if managers.dlc:has_the_bomb() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_the_bomb() then
 		default_options.heist_crojob1 = "track_25"
 		default_options.heist_crojob2 = "track_25"
 	end
-	if managers.dlc:has_kenaz() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_kenaz() then
 		default_options.heist_kenaz_full = "track_29"
 	end
-	if managers.dlc:has_berry() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_berry() then
 		default_options.heist_pbr = "track_37"
 	end
-	if managers.dlc:has_berry() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_berry() then
 		default_options.heist_pbr2 = "track_38"
 	end
-	if managers.dlc:has_peta() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_peta() then
 		default_options.heist_peta1 = "track_40"
 		default_options.heist_peta2 = "track_41"
 	end
-	if managers.dlc:has_pal() or managers.dlc:has_soundtrack_or_cce() then
+	if managers.dlc:has_soundtrack_pal() then
 		default_options.heist_man = "track_43"
 		default_options.heist_pal = "track_42"
 	end
@@ -367,19 +367,19 @@ function MusicManager:jukebox_music_tracks()
 	local tracks = {}
 	local tracks_locked = {}
 	local lock_data = {
-		armored = not managers.dlc or managers.dlc:has_armored_transport() or managers.dlc:has_soundtrack_or_cce(),
+		armored = managers.dlc and managers.dlc:has_soundtrack_armored_transport(),
 		infamy = managers.experience and managers.experience:current_rank() > 0,
 		deathwish = managers.experience and (managers.experience:current_rank() > 0 or managers.experience:current_level() >= tweak_data.difficulty_level_locks[tweak_data:difficulty_to_index("overkill_290")]),
-		bigbank = not managers.dlc or managers.dlc:has_big_bank() or managers.dlc:has_soundtrack_or_cce(),
-		assault = not managers.dlc or managers.dlc:has_gage_pack_assault() or managers.dlc:has_soundtrack_or_cce(),
-		miami = not managers.dlc or managers.dlc:has_hl_miami() or managers.dlc:has_soundtrack_or_cce(),
-		diamond = not managers.dlc or managers.dlc:has_hope_diamond() or managers.dlc:has_soundtrack_or_cce(),
-		thebomb = not managers.dlc or managers.dlc:has_the_bomb() or managers.dlc:has_soundtrack_or_cce(),
-		kenaz = not managers.dlc or managers.dlc:has_kenaz() or managers.dlc:has_soundtrack_or_cce(),
-		payday = managers.dlc and managers.dlc:has_pdth_soundtrack(),
-		berry = not managers.dlc or managers.dlc:has_berry() or managers.dlc:has_soundtrack_or_cce(),
-		peta = not managers.dlc or managers.dlc:has_peta() or managers.dlc:has_soundtrack_or_cce(),
-		pal = not managers.dlc or managers.dlc:has_pal() or managers.dlc:has_soundtrack_or_cce()
+		bigbank = managers.dlc and managers.dlc:has_soundtrack_big_bank(),
+		assault = managers.dlc and managers.dlc:has_soundtrack_gage_pack_assault(),
+		miami = managers.dlc and managers.dlc:has_soundtrack_hl_miami(),
+		diamond = managers.dlc and managers.dlc:has_soundtrack_hope_diamond(),
+		thebomb = managers.dlc and managers.dlc:has_soundtrack_the_bomb(),
+		kenaz = managers.dlc and managers.dlc:has_soundtrack_kenaz(),
+		payday = managers.dlc and managers.dlc:has_soundtrack_pdth(),
+		berry = managers.dlc and managers.dlc:has_soundtrack_berry(),
+		peta = managers.dlc and managers.dlc:has_soundtrack_peta(),
+		pal = managers.dlc and managers.dlc:has_soundtrack_pal()
 	}
 	for _, data in ipairs(tweak_data.music.track_list) do
 		table.insert(tracks, data.track)
@@ -400,11 +400,11 @@ function MusicManager:jukebox_menu_tracks()
 	local tracks_locked = {}
 	local lock_data = {
 		soundtrack = managers.dlc and managers.dlc:has_soundtrack_or_cce(),
-		bsides = managers.dlc and managers.dlc:has_bsides_soundtrack(),
-		payday = managers.dlc and managers.dlc:has_pdth_soundtrack(),
-		xmas = managers.dlc and managers.dlc:has_xmas_soundtrack(),
-		alesso = managers.dlc and managers.dlc:has_arena(),
-		berry = not managers.dlc or managers.dlc:has_berry() or managers.dlc:has_soundtrack_or_cce()
+		bsides = managers.dlc and managers.dlc:has_soundtrack_bsides_soundtrack(),
+		payday = managers.dlc and managers.dlc:has_soundtrack_pdth(),
+		xmas = managers.dlc and managers.dlc:has_soundtrack_xmas_soundtrack(),
+		alesso = managers.dlc and managers.dlc:has_soundtrack_arena(),
+		berry = managers.dlc and managers.dlc:has_soundtrack_berry()
 	}
 	for _, data in ipairs(tweak_data.music.track_menu_list) do
 		table.insert(tracks, data.track)

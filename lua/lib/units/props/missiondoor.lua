@@ -118,7 +118,7 @@ end
 
 function MissionDoor:device_placed(unit, type)
 	local device_unit_data = self:_get_device_unit_data(unit, type)
-	if device_unit_data.placed then
+	if not device_unit_data or device_unit_data.placed then
 		CoreDebug.cat_debug("gaspode", "MissionDoor:device_placed", "Allready placed")
 		return
 	end

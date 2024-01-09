@@ -492,7 +492,8 @@ function EquipmentsTweakData:init()
 	self.specials.paper_roll = {
 		text_id = "hud_int_equipment_paper_roll",
 		icon = "equipment_paper_roll",
-		sync_possession = true
+		sync_possession = true,
+		transfer_quantity = 4
 	}
 	self.specials.blow_torch = {
 		text_id = "hud_int_equipment_blow_torch",

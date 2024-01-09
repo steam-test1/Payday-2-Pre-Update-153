@@ -1545,7 +1545,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		if is_win32 then
 			managers.features:announce_feature("thq_feature")
 		end
-		if is_win32 and Steam:logged_on() and not managers.dlc:has_pd2_clan() and math.random() < 0.2 then
+		if is_win32 and Steam:logged_on() and not managers.dlc:is_dlc_unlocked("pd2_clan") and math.random() < 0.2 then
 			managers.features:announce_feature("join_pd2_clan")
 		end
 		if managers.dlc:is_dlc_unlocked("gage_pack_jobs") then

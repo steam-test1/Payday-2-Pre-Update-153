@@ -1756,19 +1756,6 @@ function MenuNodeCrimenetGageAssignmentGui:_setup_layout()
 	end
 	local panel = ws:panel():panel({name = "main_panel"})
 	self._fullscreen_panel = mc_full_ws:panel():panel({layer = 50})
-	local blur = self._fullscreen_panel:bitmap({
-		texture = "guis/textures/test_blur_df",
-		w = self._fullscreen_panel:w(),
-		h = self._fullscreen_panel:h(),
-		render_template = "VertexColorTexturedBlur3D"
-	})
-	local func = function(o)
-		local start_blur = 0
-		over(0.6, function(p)
-			o:set_alpha(math.lerp(start_blur, 1, p))
-		end)
-	end
-	blur:animate(func)
 	local width = self.WIDTH
 	local height = self.HEIGHT
 	self._panel = panel:panel({
@@ -1776,7 +1763,7 @@ function MenuNodeCrimenetGageAssignmentGui:_setup_layout()
 		w = width,
 		layer = 51
 	})
-	self._panel:set_center(panel:w() / 2, panel:h() / 2)
+	self:_set_panel_position(panel)
 	self._panel:rect({
 		color = Color.black,
 		alpha = 0.6,
@@ -1819,8 +1806,29 @@ function MenuNodeCrimenetGageAssignmentGui:_setup_layout()
 	})
 	self._info_panel:set_w(self._panel:w() - self._info_panel:x() - self.PADDING)
 	self._info_panel:set_h(self._panel:h() - self._info_panel:y() - self.PADDING)
+	self:_setup_blur()
 	self._init_finish = true
 	self:_setup_menu()
+end
+
+function MenuNodeCrimenetGageAssignmentGui:_setup_blur()
+	local blur = self._fullscreen_panel:bitmap({
+		texture = "guis/textures/test_blur_df",
+		w = self._fullscreen_panel:w(),
+		h = self._fullscreen_panel:h(),
+		render_template = "VertexColorTexturedBlur3D"
+	})
+	local func = function(o)
+		local start_blur = 0
+		over(0.6, function(p)
+			o:set_alpha(math.lerp(start_blur, 1, p))
+		end)
+	end
+	blur:animate(func)
+end
+
+function MenuNodeCrimenetGageAssignmentGui:_set_panel_position(panel)
+	self._panel:set_center(panel:w() / 2, panel:h() / 2)
 end
 
 function MenuNodeCrimenetGageAssignmentGui:set_file(index)

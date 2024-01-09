@@ -27,9 +27,7 @@ function MenuNodeCreditsGui:_build_credits_panel(file)
 	local global_scale = 1
 	local side_padding = 200
 	self._fullscreen_ws = managers.gui_data:create_fullscreen_16_9_workspace()
-	self._clipping_panel = self._fullscreen_ws:panel():panel({
-		layer = self.layers.background
-	})
+	self._clipping_panel = self._fullscreen_ws:panel():panel({})
 	local bg = self._clipping_panel:rect({
 		visible = true,
 		color = Color.black / 2,

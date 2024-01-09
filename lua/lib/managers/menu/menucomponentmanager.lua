@@ -3372,21 +3372,20 @@ end
 
 function MenuComponentManager:close()
 	print("[MenuComponentManager:close]")
+	for _, component in pairs(self._active_components) do
+		component:close()
+	end
 	self:close_friends_gui()
-	self:close_newsfeed_gui()
 	self:close_profile_gui()
-	self:close_player_profile_gui()
 	self:close_contract_gui()
 	self:close_server_info_gui()
 	self:close_chat_gui()
-	self:close_crimenet_gui()
-	self:close_blackmarket_gui()
 	self:close_stage_endscreen_gui()
 	self:close_lootdrop_gui()
-	self:close_lootdrop_casino_gui()
 	self:close_mission_briefing_gui()
 	self:close_debug_fonts_gui()
 	self:kill_preplanning_map_gui()
+	self._active_components = {}
 	if self._resolution_changed_callback_id then
 		managers.viewport:remove_resolution_changed_func(self._resolution_changed_callback_id)
 	end
@@ -3401,6 +3400,14 @@ function MenuComponentManager:close()
 	end
 	self._requested_textures = {}
 	self._block_texture_requests = true
+	if alive(self._ws) then
+		Overlay:gui():destroy_workspace(self._ws)
+		self._ws = nil
+	end
+	if alive(self._fullscreen_ws) then
+		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		self._fullscreen_ws = nil
+	end
 end
 
 function MenuComponentManager:play_transition(run_in_pause)

@@ -43,6 +43,9 @@ function PlayerDamage:send_set_status()
 end
 
 function PlayerDamage:force_into_bleedout()
+	if self:incapacitated() or self:arrested() then
+		return
+	end
 	self:set_health(0)
 	self:_chk_cheat_death()
 	self:_damage_screen()
@@ -95,6 +98,10 @@ function PlayerDamage:update(unit, t, dt)
 	if self._bleed_out_blocked_by_movement_state and not self._unit:movement():current_state():bleed_out_blocked() then
 		self:force_into_bleedout()
 		self._bleed_out_blocked_by_movement_state = nil
+	end
+	if self._bleed_out_blocked_by_tased and not self._unit:movement():tased() then
+		self:force_into_bleedout()
+		self._bleed_out_blocked_by_tased = nil
 	end
 	if self._regenerate_timer and not self._dead and not self._bleed_out and not self._check_berserker_done then
 		if not is_berserker_active and not self._bleed_out_blocked_by_zipline then
@@ -454,8 +461,8 @@ function PlayerDamage:damage_tase(attack_data)
 end
 
 function PlayerDamage:on_tased(non_lethal)
-	if self:get_real_health() == 0 and self._check_berserker_done then
-		self:change_health(1)
+	if self._check_berserker_done then
+		self._bleed_out_blocked_by_tased = true
 	end
 end
 
