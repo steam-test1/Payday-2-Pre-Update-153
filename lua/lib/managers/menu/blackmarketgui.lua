@@ -2428,7 +2428,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			wm_reticle_switch_menu = {
 				prio = 1,
 				btn = "BTN_A",
-				pc_btn = "bm_menu_btn_craft_mod",
+				pc_btn = nil,
 				name = "bm_menu_btn_switch_reticle",
 				callback = callback(self, self, "open_reticle_switch_menu")
 			},

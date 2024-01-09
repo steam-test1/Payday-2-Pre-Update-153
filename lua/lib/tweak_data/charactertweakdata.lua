@@ -2,9 +2,60 @@ CharacterTweakData = CharacterTweakData or class()
 
 function CharacterTweakData:init(tweak_data)
 	self:_create_table_structure()
+	local r = LevelsTweakData.LevelType.Russia
+	local ai_type = tweak_data.levels:get_ai_group_type()
 	self.flashbang_multiplier = 1
+	self._default_chatter = "dispatch_generic_message"
+	if ai_type == r then
+		self._default_chatter = "dsp_radio_russian"
+	end
 	local presets = self:_presets(tweak_data)
 	self.presets = presets
+	self._prefix_data_p1 = {
+		swat = function()
+			if ai_type == r then
+				return "r"
+			else
+				return "l"
+			end
+		end,
+		cop = function()
+			if ai_type == r then
+				return "r"
+			else
+				return "l"
+			end
+		end,
+		heavy_swat = function()
+			if ai_type == r then
+				return "r"
+			else
+				return "l"
+			end
+		end,
+		taser = function()
+			if ai_type == r then
+				return "rtsr"
+			else
+				return "tsr"
+			end
+		end,
+		cloaker = function()
+			if ai_type == r then
+				return "rclk"
+			else
+				return "clk"
+			end
+		end,
+		bulldozer = function()
+			if ai_type == r then
+				return "rbdz"
+			else
+				return "bdz"
+			end
+		end
+	}
+	self.tweak_data = tweak_data
 	self:_init_security(presets)
 	self:_init_gensec(presets)
 	self:_init_cop(presets)
@@ -48,7 +99,10 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_sokol(presets)
 	self:_init_dragon(presets)
 	self:_init_bodhi(presets)
+	self:_init_jimmy(presets)
 	self:_init_old_hoxton_mission(presets)
+	self._prefix_data = nil
+	self._prefix_data_p1 = nil
 end
 
 function CharacterTweakData:_init_security(presets)
@@ -134,7 +188,7 @@ function CharacterTweakData:_init_cop(presets)
 	}
 	self.cop.weapon_voice = "1"
 	self.cop.experience.cable_tie = "tie_swat"
-	self.cop.speech_prefix_p1 = "l"
+	self.cop.speech_prefix_p1 = self._prefix_data_p1.swat()
 	self.cop.speech_prefix_p2 = "n"
 	self.cop.speech_prefix_count = 4
 	self.cop.access = "cop"
@@ -191,7 +245,7 @@ function CharacterTweakData:_init_swat(presets)
 	}
 	self.swat.weapon_voice = "2"
 	self.swat.experience.cable_tie = "tie_swat"
-	self.swat.speech_prefix_p1 = "l"
+	self.swat.speech_prefix_p1 = self._prefix_data_p1.swat()
 	self.swat.speech_prefix_p2 = "n"
 	self.swat.speech_prefix_count = 4
 	self.swat.access = "swat"
@@ -221,7 +275,7 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	}
 	self.heavy_swat.weapon_voice = "2"
 	self.heavy_swat.experience.cable_tie = "tie_swat"
-	self.heavy_swat.speech_prefix_p1 = "l"
+	self.heavy_swat.speech_prefix_p1 = self._prefix_data_p1.heavy_swat()
 	self.heavy_swat.speech_prefix_p2 = "n"
 	self.heavy_swat.speech_prefix_count = 4
 	self.heavy_swat.access = "swat"
@@ -800,7 +854,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.weapon_voice = "3"
 	self.tank.experience.cable_tie = "tie_swat"
 	self.tank.access = "tank"
-	self.tank.speech_prefix_p1 = "bdz"
+	self.tank.speech_prefix_p1 = self._prefix_data_p1.bulldozer()
 	self.tank.speech_prefix_p2 = nil
 	self.tank.speech_prefix_count = nil
 	self.tank.priority_shout = "f30"
@@ -915,7 +969,7 @@ function CharacterTweakData:_init_spooc(presets)
 	self.spooc.spooc_attack_use_smoke_chance = 1
 	self.spooc.weapon_voice = "3"
 	self.spooc.experience.cable_tie = "tie_swat"
-	self.spooc.speech_prefix_p1 = "clk"
+	self.spooc.speech_prefix_p1 = self._prefix_data_p1.cloaker()
 	self.spooc.speech_prefix_count = nil
 	self.spooc.access = "spooc"
 	self.spooc.use_animation_on_fire_damage = false
@@ -1269,7 +1323,7 @@ function CharacterTweakData:_init_taser(presets)
 	self.taser.suppression = nil
 	self.taser.weapon_voice = "3"
 	self.taser.experience.cable_tie = "tie_swat"
-	self.taser.speech_prefix_p1 = "tsr"
+	self.taser.speech_prefix_p1 = self._prefix_data_p1.taser()
 	self.taser.speech_prefix_p2 = nil
 	self.taser.speech_prefix_count = nil
 	self.taser.access = "taser"
@@ -1742,6 +1796,27 @@ function CharacterTweakData:_init_bodhi(presets)
 	}
 end
 
+function CharacterTweakData:_init_jimmy(presets)
+	self.jimmy = {}
+	self.jimmy.damage = presets.gang_member_damage
+	self.jimmy.weapon = deep_clone(presets.weapon.gang_member)
+	self.jimmy.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_c45")
+	}
+	self.jimmy.detection = presets.detection.gang_member
+	self.jimmy.move_speed = presets.move_speed.fast
+	self.jimmy.crouch_move = false
+	self.jimmy.speech_prefix = "rb14"
+	self.jimmy.weapon_voice = "3"
+	self.jimmy.access = "teamAI1"
+	self.jimmy.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
 function CharacterTweakData:_presets(tweak_data)
 	local presets = {}
 	presets.hurt_severities = {}
@@ -2033,7 +2108,7 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.base.speech_prefix = "po"
 	presets.base.speech_prefix_count = 1
 	presets.base.rescue_hostages = true
-	presets.base.use_radio = "dispatch_generic_message"
+	presets.base.use_radio = self._default_chatter
 	presets.base.dodge = nil
 	presets.base.challenges = {type = "law"}
 	presets.base.calls_in = true

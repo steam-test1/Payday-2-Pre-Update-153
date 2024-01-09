@@ -37,14 +37,6 @@ function FreeFlight:init(gsm, viewport_manager, controller_manager)
 end
 
 function FreeFlight:_setup_F9_key()
-	if Global.DEBUG_MENU_ON or Application:production_build() then
-		local keyboard = Input:keyboard()
-		if keyboard and keyboard:has_button(Idstring("f9")) then
-			self._f9_con = Input:create_virtual_controller()
-			self._f9_con:connect(keyboard, Idstring("f9"), Idstring("btn_toggle"))
-			self._f9_con:add_trigger(Idstring("btn_toggle"), callback(self, self, "_on_F9"))
-		end
-	end
 end
 
 function FreeFlight:_setup_modifiers()

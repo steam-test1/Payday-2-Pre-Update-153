@@ -146,23 +146,18 @@ end
 
 function GenericDLCManager:give_dlc_package()
 	for package_id, data in pairs(tweak_data.dlc) do
-		cat_print("debug", "package_id", package_id, inspect(data))
 		if self:is_dlc_unlocked(package_id) then
-			cat_print("debug", "[DLC] Ownes dlc", data.free, data.dlc)
 			if not Global.dlc_save.packages[package_id] then
 				Global.dlc_save.packages[package_id] = true
 				for _, loot_drop in ipairs(data.content.loot_drops or {}) do
-					cat_print("debug", "  loot_drop", inspect(loot_drop))
 					local loot_drop = 0 < #loot_drop and loot_drop[math.random(#loot_drop)] or loot_drop
 					for i = 1, loot_drop.amount do
 						local entry = tweak_data.blackmarket[loot_drop.type_items][loot_drop.item_entry]
 						local global_value = loot_drop.global_value or data.content.loot_global_value or package_id
-						cat_print("debug", i .. "  give", loot_drop.type_items, loot_drop.item_entry, global_value)
 						managers.blackmarket:add_to_inventory(global_value, loot_drop.type_items, loot_drop.item_entry)
 					end
 				end
 			else
-				cat_print("debug", "[DLC] Already been given dlc package", package_id)
 			end
 			local identifier = UpgradesManager.AQUIRE_STRINGS[5] .. tostring(package_id)
 			for _, upgrade in ipairs(data.content.upgrades or {}) do
@@ -171,7 +166,6 @@ function GenericDLCManager:give_dlc_package()
 				end
 			end
 		else
-			cat_print("debug", "[DLC] Didn't own DLC package", package_id)
 			local identifier = UpgradesManager.AQUIRE_STRINGS[5] .. tostring(package_id)
 			for _, upgrade in ipairs(data.content.upgrades or {}) do
 				if managers.upgrades:aquired(upgrade, identifier) then
@@ -438,62 +432,6 @@ end
 
 function GenericDLCManager:has_dlc_or_soundtrack_or_cce(dlc)
 	return managers.dlc:is_dlc_unlocked(dlc) or managers.dlc:has_soundtrack_or_cce()
-end
-
-function GenericDLCManager:has_soundtrack_armored_transport()
-	return self:has_dlc_or_soundtrack_or_cce("armored_transport")
-end
-
-function GenericDLCManager:has_soundtrack_big_bank()
-	return self:has_dlc_or_soundtrack_or_cce("big_bank")
-end
-
-function GenericDLCManager:has_soundtrack_hl_miami()
-	return self:has_dlc_or_soundtrack_or_cce("hl_miami")
-end
-
-function GenericDLCManager:has_soundtrack_hope_diamond()
-	return self:has_dlc_or_soundtrack_or_cce("hope_diamond")
-end
-
-function GenericDLCManager:has_soundtrack_the_bomb()
-	return self:has_dlc_or_soundtrack_or_cce("the_bomb")
-end
-
-function GenericDLCManager:has_soundtrack_kenaz()
-	return self:has_dlc_or_soundtrack_or_cce("kenaz")
-end
-
-function GenericDLCManager:has_soundtrack_gage_pack_assault()
-	return self:has_dlc_or_soundtrack_or_cce("gage_pack_assault")
-end
-
-function GenericDLCManager:has_soundtrack_berry()
-	return self:has_dlc_or_soundtrack_or_cce("berry")
-end
-
-function GenericDLCManager:has_soundtrack_peta()
-	return self:has_dlc_or_soundtrack_or_cce("peta")
-end
-
-function GenericDLCManager:has_soundtrack_pal()
-	return self:has_dlc_or_soundtrack_or_cce("pal")
-end
-
-function GenericDLCManager:has_soundtrack_pdth()
-	return managers.dlc:is_dlc_unlocked("pdth_soundtrack")
-end
-
-function GenericDLCManager:has_soundtrack_bsides_soundtrack()
-	return managers.dlc:is_dlc_unlocked("bsides_soundtrack")
-end
-
-function GenericDLCManager:has_soundtrack_xmas_soundtrack()
-	return managers.dlc:is_dlc_unlocked("xmas_soundtrack")
-end
-
-function GenericDLCManager:has_soundtrack_arena()
-	return managers.dlc:is_dlc_unlocked("arena")
 end
 
 PS3DLCManager = PS3DLCManager or class(GenericDLCManager)

@@ -75,6 +75,9 @@ end
 
 function ElementAccessCamera:enabled(...)
 	if alive(self._camera_unit) then
+		if self._camera_unit:base() and self._camera_unit:base().is_security_camera and self._camera_unit:base().access_enabled then
+			return self._camera_unit:base():access_enabled()
+		end
 		return self._camera_unit:enabled()
 	end
 	return ElementAccessCamera.super.enabled(self, ...)

@@ -206,14 +206,12 @@ function SkillTreeTweakData:init()
 		icon_xy = {0, 9},
 		[1] = {
 			upgrades = {
-				"pistol_reload_speed_multiplier",
-				"akimbo_reload_speed_multiplier"
+				"pistol_reload_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"akimbo_damage_addend",
 				"pistol_damage_addend"
 			},
 			cost = self.costs.hightierpro
@@ -263,9 +261,7 @@ function SkillTreeTweakData:init()
 		[1] = {
 			upgrades = {
 				"team_pistol_recoil_index_addend",
-				"team_akimbo_recoil_index_addend",
-				"team_pistol_suppression_recoil_index_addend",
-				"team_akimbo_suppression_recoil_index_addend"
+				"team_pistol_suppression_recoil_index_addend"
 			},
 			cost = self.costs.default
 		},
@@ -437,16 +433,13 @@ function SkillTreeTweakData:init()
 		[1] = {
 			upgrades = {
 				"pistol_spread_index_addend",
-				"pistol_swap_speed_multiplier",
-				"akimbo_spread_index_addend",
-				"akimbo_swap_speed_multiplier"
+				"pistol_swap_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"pistol_fire_rate_multiplier",
-				"akimbo_fire_rate_multiplier"
+				"pistol_fire_rate_multiplier"
 			},
 			cost = self.costs.pro
 		}
@@ -867,15 +860,13 @@ function SkillTreeTweakData:init()
 		icon_xy = {2, 0},
 		[1] = {
 			upgrades = {
-				"weapon_clip_ammo_increase_1",
-				"akimbo_clip_ammo_increase_1"
+				"weapon_clip_ammo_increase_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"weapon_clip_ammo_increase_2",
-				"akimbo_clip_ammo_increase_2"
+				"weapon_clip_ammo_increase_2"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -1831,6 +1822,7 @@ function SkillTreeTweakData:init()
 				"x_g22c",
 				"x_g17",
 				"x_usp",
+				"x_sr2",
 				"akimbo_recoil_index_addend_1",
 				"akimbo_recoil_index_addend_2"
 			},
@@ -2399,7 +2391,8 @@ function SkillTreeTweakData:init()
 					"x_deagle",
 					"x_g22c",
 					"x_g17",
-					"x_usp"
+					"x_usp",
+					"x_sr2"
 				},
 				cost = 400,
 				icon_xy = {7, 2},
@@ -2915,6 +2908,65 @@ function SkillTreeTweakData:init()
 				icon_xy = {7, 7},
 				name_id = "menu_deck13_9",
 				desc_id = "menu_deck13_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_14",
+			desc_id = "menu_st_spec_14_desc",
+			{
+				upgrades = {
+					"player_cocaine_stacking_1"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				texture_bundle_folder = "coco",
+				name_id = "menu_deck14_1",
+				desc_id = "menu_deck14_1_desc"
+			},
+			deck2,
+			{
+				upgrades = {
+					"player_sync_cocaine_stacks"
+				},
+				cost = 400,
+				icon_xy = {1, 0},
+				texture_bundle_folder = "coco",
+				name_id = "menu_deck14_3",
+				desc_id = "menu_deck14_3_desc"
+			},
+			deck4,
+			{
+				upgrades = {
+					"player_cocaine_stacks_decay_multiplier_1"
+				},
+				cost = 1000,
+				icon_xy = {2, 0},
+				texture_bundle_folder = "coco",
+				name_id = "menu_deck14_5",
+				desc_id = "menu_deck14_5_desc"
+			},
+			deck6,
+			{
+				upgrades = {
+					"player_sync_cocaine_upgrade_level_1"
+				},
+				cost = 2400,
+				icon_xy = {3, 0},
+				texture_bundle_folder = "coco",
+				name_id = "menu_deck14_7",
+				desc_id = "menu_deck14_7_desc"
+			},
+			deck8,
+			{
+				upgrades = {
+					"player_cocaine_stack_absorption_multiplier_1",
+					"player_passive_loot_drop_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				texture_bundle_folder = "coco",
+				name_id = "menu_deck14_9",
+				desc_id = "menu_deck14_9_desc"
 			}
 		}
 	}

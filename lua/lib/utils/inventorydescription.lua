@@ -347,20 +347,20 @@ function WeaponDescription._get_skill_stats(name, category, slot, base_stats, mo
 				multiplier = 1
 				modifier = 0
 				if stat.name == "damage" then
-					multiplier = managers.blackmarket:damage_multiplier(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint)
-					modifier = math.floor(managers.blackmarket:damage_addend(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint) * tweak_data.gui.stats_present_multiplier * multiplier)
+					multiplier = managers.blackmarket:damage_multiplier(name, weapon_tweak.category, weapon_tweak.sub_category, silencer, detection_risk, nil, blueprint)
+					modifier = math.floor(managers.blackmarket:damage_addend(name, weapon_tweak.category, weapon_tweak.sub_category, silencer, detection_risk, nil, blueprint) * tweak_data.gui.stats_present_multiplier * multiplier)
 				elseif stat.name == "spread" then
 					local fire_mode = single_mod and "single" or auto_mod and "auto" or weapon_tweak.FIRE_MODE or "single"
-					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, silencer, nil, nil, fire_mode, blueprint)
-					modifier = managers.blackmarket:accuracy_addend(name, weapon_tweak.category, base_index, silencer, nil, fire_mode, blueprint) * tweak_data.gui.stats_present_multiplier
+					multiplier = managers.blackmarket:accuracy_multiplier(name, weapon_tweak.category, weapon_tweak.sub_category, silencer, nil, nil, fire_mode, blueprint)
+					modifier = managers.blackmarket:accuracy_addend(name, weapon_tweak.category, weapon_tweak.sub_category, base_index, silencer, nil, fire_mode, blueprint) * tweak_data.gui.stats_present_multiplier
 				elseif stat.name == "recoil" then
-					multiplier = managers.blackmarket:recoil_multiplier(name, weapon_tweak.category, silencer, blueprint)
-					modifier = managers.blackmarket:recoil_addend(name, weapon_tweak.category, base_index, silencer, blueprint) * tweak_data.gui.stats_present_multiplier
+					multiplier = managers.blackmarket:recoil_multiplier(name, weapon_tweak.category, weapon_tweak.sub_category, silencer, blueprint)
+					modifier = managers.blackmarket:recoil_addend(name, weapon_tweak.category, weapon_tweak.sub_category, base_index, silencer, blueprint) * tweak_data.gui.stats_present_multiplier
 				elseif stat.name == "suppression" then
-					multiplier = managers.blackmarket:threat_multiplier(name, weapon_tweak.category, silencer)
+					multiplier = managers.blackmarket:threat_multiplier(name, weapon_tweak.category, weapon_tweak.sub_category, silencer)
 				elseif stat.name == "concealment" then
 				elseif stat.name == "fire_rate" then
-					multiplier = managers.blackmarket:fire_rate_multiplier(name, weapon_tweak.category, silencer, detection_risk, nil, blueprint)
+					multiplier = managers.blackmarket:fire_rate_multiplier(name, weapon_tweak.category, weapon_tweak.sub_category, silencer, detection_risk, nil, blueprint)
 				end
 				if modifier ~= 0 then
 					local offset = math.min(tweak_stats[stat.name][1], tweak_stats[stat.name][#tweak_stats[stat.name]]) * tweak_data.gui.stats_present_multiplier

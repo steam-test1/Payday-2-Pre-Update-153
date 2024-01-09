@@ -86,12 +86,7 @@ function PlayerParachuting:_update_check_actions(t, dt)
 		local cam_flat_rot = Rotation(self._cam_fwd_flat, math.UP)
 		mvector3.rotate_with(self._move_dir, cam_flat_rot)
 	end
-	local projectile_entry = managers.blackmarket:equipped_projectile()
-	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-		self:_update_throw_grenade_timers(t, input)
-	else
-		self:_update_throw_projectile_timers(t, input)
-	end
+	self:_update_throw_projectile_timers(t, input)
 	self:_update_reload_timers(t, dt, input)
 	self:_update_melee_timers(t, input)
 	self:_update_charging_weapon_timers(t, input)
@@ -119,14 +114,7 @@ function PlayerParachuting:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_change_weapon(t, input)
 	new_action = new_action or self:_check_action_primary_attack(t, input)
 	new_action = new_action or self:_check_action_equip(t, input)
-	if not new_action then
-		local projectile_entry = managers.blackmarket:equipped_projectile()
-		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-			new_action = self:_check_action_throw_grenade(t, input)
-		else
-			new_action = self:_check_action_throw_projectile(t, input)
-		end
-	end
+	new_action = new_action or self:_check_action_throw_projectile(t, input)
 	self:_check_action_steelsight(t, input)
 end
 

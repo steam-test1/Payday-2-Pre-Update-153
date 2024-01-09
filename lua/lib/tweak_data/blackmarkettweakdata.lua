@@ -154,6 +154,12 @@ function BlackMarketTweakData:_init_characters()
 		sequence = "var_mtr_bodhi",
 		texture_bundle_folder = "rip"
 	}
+	self.characters.locked.jimmy = {
+		sequence = "var_mtr_jimmy",
+		mask_on_sequence = "mask_on_jimmy",
+		mask_off_sequence = "mask_off_jimmy",
+		texture_bundle_folder = "coco"
+	}
 	self.characters.female_1 = {}
 	self.characters.female_1.fps_unit = "units/payday2/characters/fps_mover/fps_female_1_mover"
 	self.characters.female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/npc_criminal_female_1"
@@ -230,6 +236,9 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_bodhi = {}
 	self.characters.ai_bodhi.npc_unit = "units/payday2/characters/npc_criminals_suit_1/bodhi/npc_criminal_suit_bodhi"
 	self.characters.ai_bodhi.sequence = "var_mtr_bodhi"
+	self.characters.ai_jimmy = {}
+	self.characters.ai_jimmy.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jimmy/npc_criminal_suit_jimmy"
+	self.characters.ai_jimmy.sequence = "var_mtr_jimmy"
 end
 
 function BlackMarketTweakData:_init_cash()

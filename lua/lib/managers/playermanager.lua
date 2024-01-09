@@ -108,6 +108,7 @@ function PlayerManager:_setup()
 	Global.player_manager.synced_team_upgrades = {}
 	Global.player_manager.synced_vehicle_data = {}
 	Global.player_manager.synced_bipod = {}
+	Global.player_manager.synced_cocaine_stacks = {}
 	self._global = Global.player_manager
 end
 
@@ -131,12 +132,18 @@ function PlayerManager:aquire_default_upgrades()
 end
 
 function PlayerManager:update(t, dt)
+	if self._need_to_send_player_status then
+		self._need_to_send_player_status = nil
+		self:need_send_player_status()
+	end
+	self._sent_player_status_this_frame = nil
 	if self:has_category_upgrade("player", "close_to_hostage_boost") and (not self._hostage_close_to_local_t or t >= self._hostage_close_to_local_t) then
 		local local_player = self:local_player()
 		self._is_local_close_to_hostage = alive(local_player) and managers.groupai and managers.groupai:state():is_a_hostage_within(local_player:movement():m_pos(), tweak_data.upgrades.hostage_near_player_radius)
 		self._hostage_close_to_local_t = t + tweak_data.upgrades.hostage_near_player_check_t
 	end
 	self:_update_hostage_skills()
+	self:_update_damage_dealt(t, dt)
 end
 
 function PlayerManager:add_listener(key, events, clbk)
@@ -148,6 +155,18 @@ function PlayerManager:remove_listener(key)
 end
 
 function PlayerManager:preload()
+end
+
+function PlayerManager:need_send_player_status()
+	local player = self:player_unit()
+	if not player then
+		self._need_to_send_player_status = true
+		return
+	elseif self._sent_player_status_this_frame then
+		return
+	end
+	self._sent_player_status_this_frame = true
+	player:character_damage():send_set_status()
 end
 
 function PlayerManager:_internal_load()
@@ -208,6 +227,16 @@ function PlayerManager:_internal_load()
 			break
 		end
 	end
+	if self:has_category_upgrade("player", "cocaine_stacking") then
+		self:update_synced_cocaine_stacks_to_peers(0, self:upgrade_value("player", "sync_cocaine_upgrade_level", 1), self:upgrade_level("player", "cocaine_stack_absorption_multiplier", 0))
+		managers.hud:set_info_meter(nil, {
+			icon = "guis/dlcs/coco/textures/pd2/hud_absorb_stack_icon_01",
+			current = self:get_local_cocaine_damage_absorption_ratio(),
+			total = self:get_local_cocaine_damage_absorption_max_ratio(),
+			max = 1
+		})
+	end
+	self:update_cocaine_hud()
 end
 
 function PlayerManager:_add_level_equipment(player)
@@ -330,7 +359,7 @@ function PlayerManager:set_player_state(state)
 	if state == self._current_state then
 		return
 	end
-	if state ~= "standard" and state ~= "carry" and state ~= "bipod" and state ~= "jerry1" and state ~= "jerry2" then
+	if state ~= "standard" and state ~= "carry" and state ~= "bipod" and state ~= "jerry1" and state ~= "jerry2" and state ~= "tased" then
 		local unit = self:player_unit()
 		if unit then
 			unit:character_damage():disable_berserker()
@@ -409,6 +438,10 @@ function PlayerManager:num_players_with_more_health()
 		end
 	end
 	return num_players
+end
+
+function PlayerManager:num_connected_players()
+	return #self._player_list
 end
 
 function PlayerManager:warp_to(pos, rot, id)
@@ -557,6 +590,34 @@ function PlayerManager:chk_store_armor_health_kill_counter(killed_unit, variant)
 	end
 end
 
+function PlayerManager:_update_damage_dealt(t, dt)
+	local local_peer_id = managers.network:session() and managers.network:session():local_peer():id()
+	if not local_peer_id or not self:has_category_upgrade("player", "cocaine_stacking") then
+		return
+	end
+	self._damage_dealt_to_cops_t = self._damage_dealt_to_cops_t or t + (tweak_data.upgrades.cocaine_stacks_tick_t or 1)
+	self._damage_dealt_to_cops_decay_t = self._damage_dealt_to_cops_decay_t or t + (tweak_data.upgrades.cocaine_stacks_decay_t or 5)
+	local cocaine_stack = self:get_synced_cocaine_stacks(local_peer_id)
+	local amount = cocaine_stack and cocaine_stack.amount or 0
+	local new_amount = amount
+	if t >= self._damage_dealt_to_cops_t then
+		self._damage_dealt_to_cops_t = t + (tweak_data.upgrades.cocaine_stacks_tick_t or 1)
+		local new_stacks = (self._damage_dealt_to_cops or 0) * (tweak_data.gui.stats_present_multiplier or 10) * self:upgrade_value("player", "cocaine_stacking", 0)
+		self._damage_dealt_to_cops = 0
+		new_amount = new_amount + math.min(new_stacks, tweak_data.upgrades.max_cocaine_stacks_per_tick or 20)
+	end
+	if t >= self._damage_dealt_to_cops_decay_t then
+		self._damage_dealt_to_cops_decay_t = t + (tweak_data.upgrades.cocaine_stacks_decay_t or 5)
+		local decay = amount * (tweak_data.upgrades.cocaine_stacks_decay_percentage_per_tick or 0)
+		decay = decay + (tweak_data.upgrades.cocaine_stacks_decay_amount_per_tick or 20) * self:upgrade_value("player", "cocaine_stacks_decay_multiplier", 1)
+		new_amount = new_amount - decay
+	end
+	new_amount = math.clamp(math.floor(new_amount), 0, tweak_data.upgrades.max_total_cocaine_stacks or 2047)
+	if new_amount ~= amount then
+		self:update_synced_cocaine_stacks_to_peers(new_amount, self:upgrade_value("player", "sync_cocaine_upgrade_level", 1), self:upgrade_level("player", "cocaine_stack_absorption_multiplier", 0))
+	end
+end
+
 function PlayerManager:on_damage_dealt(unit, damage_info)
 	local player_unit = self:player_unit()
 	if not player_unit then
@@ -564,10 +625,28 @@ function PlayerManager:on_damage_dealt(unit, damage_info)
 	end
 	local t = Application:time()
 	self:_check_damage_to_hot(t, unit, damage_info)
+	self:_check_damage_to_cops(t, unit, damage_info)
 	if self._on_damage_dealt_t and t < self._on_damage_dealt_t then
 		return
 	end
 	self._on_damage_dealt_t = t + (tweak_data.upgrades.on_damage_dealt_cooldown or 0)
+end
+
+function PlayerManager:_check_damage_to_cops(t, unit, damage_info)
+	local player_unit = self:player_unit()
+	if not alive(player_unit) or player_unit:character_damage():need_revive() or player_unit:character_damage():dead() then
+	end
+	if not (alive(unit) and unit:base()) or not damage_info then
+		return
+	end
+	if damage_info.is_fire_dot_damage then
+		return
+	end
+	if CopDamage.is_civilian(unit:base()._tweak_table) then
+		return
+	end
+	self._damage_dealt_to_cops = self._damage_dealt_to_cops or 0
+	self._damage_dealt_to_cops = self._damage_dealt_to_cops + (damage_info.damage or 0)
 end
 
 function PlayerManager:on_headshot_dealt()
@@ -700,7 +779,9 @@ function PlayerManager:upgrade_value(category, upgrade, default)
 	end
 	local level = self._global.upgrades[category][upgrade]
 	local value = tweak_data.upgrades.values[category][upgrade][level]
-	return value
+	if value ~= false then
+	end
+	return value or default or 0 or false
 end
 
 function PlayerManager:list_level_rewards(dlcs)
@@ -1625,6 +1706,150 @@ function PlayerManager:add_synced_team_upgrade(peer_id, category, upgrade, level
 	self._global.synced_team_upgrades[peer_id][category][upgrade] = level
 end
 
+function PlayerManager:update_cocaine_stacks_to_peer(peer)
+	local peer_id = managers.network:session():local_peer():id()
+	if self._global.synced_cocaine_stacks[peer_id] then
+		local amount = self._global.synced_cocaine_stacks[peer_id].amount or 0
+		local upgrade_level = self._global.synced_cocaine_stacks[peer_id].upgrade_level or 1
+		local power_level = self._global.synced_cocaine_stacks[peer_id].power_level or 1
+		peer:send_queued_sync("sync_cocaine_stacks", amount, self:has_category_upgrade("player", "sync_cocaine_stacks"), upgrade_level, power_level)
+	end
+end
+
+function PlayerManager:update_synced_cocaine_stacks_to_peers(amount, upgrade_level, power_level)
+	local peer_id = managers.network:session():local_peer():id()
+	managers.network:session():send_to_peers_synched("sync_cocaine_stacks", amount, self:has_category_upgrade("player", "sync_cocaine_stacks"), upgrade_level, power_level)
+	self:set_synced_cocaine_stacks(peer_id, amount, true, upgrade_level, power_level)
+end
+
+function PlayerManager:set_synced_cocaine_stacks(peer_id, amount, in_use, upgrade_level, power_level)
+	self._global.synced_cocaine_stacks[peer_id] = {
+		amount = amount,
+		in_use = in_use,
+		upgrade_level = upgrade_level,
+		power_level = power_level
+	}
+	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
+	if character_data and in_use then
+		managers.hud:set_info_meter(character_data.panel_id, {
+			icon = "guis/dlcs/coco/textures/pd2/hud_absorb_stack_icon_01",
+			current = self:get_peer_cocaine_damage_absorption_ratio(peer_id),
+			total = self:get_peer_cocaine_damage_absorption_max_ratio(peer_id),
+			max = 1
+		})
+	end
+	self:update_cocaine_hud()
+end
+
+function PlayerManager:update_cocaine_hud()
+	if not (managers.network:session() and managers.criminals) or not managers.hud then
+		return
+	end
+	local my_peer_id = managers.network:session():local_peer():id()
+	for _, peer in pairs(managers.network:session():all_peers()) do
+		local peer_id = peer:id()
+		local character_data = managers.criminals:character_data_by_peer_id(peer_id)
+		if character_data then
+			local best_damage_absorption = self:get_best_cocaine_damage_absorption(peer_id)
+			managers.hud:set_absorb_active(character_data.panel_id, best_damage_absorption)
+		end
+	end
+end
+
+function PlayerManager:get_synced_cocaine_stacks(peer_id)
+	return self._global.synced_cocaine_stacks[peer_id]
+end
+
+function PlayerManager:get_cocaine_damage_absorption_from_peer_id(peer_id, multiplier_peer_id)
+	local data = self._global.synced_cocaine_stacks[peer_id] or {}
+	local absorption = self:_get_cocaine_damage_absorption_from_data(data)
+	local data = self._global.synced_cocaine_stacks[multiplier_peer_id or peer_id] or {}
+	local multiplier = self:upgrade_value_by_level("player", "cocaine_stack_absorption_multiplier", data.power_level or 0, 1)
+	return absorption * multiplier
+end
+
+function PlayerManager:_get_cocaine_damage_absorption_from_data(data)
+	local amount = data.amount or 0
+	local upgrade_level = data.upgrade_level or 1
+	if amount == 0 then
+		return 0
+	end
+	return amount / (tweak_data.upgrades.cocaine_stacks_convert_levels and tweak_data.upgrades.cocaine_stacks_convert_levels[upgrade_level] or 20) * (tweak_data.upgrades.cocaine_stacks_dmg_absorption_value or 0.1)
+end
+
+function PlayerManager:get_best_cocaine_damage_absorption(my_peer_id)
+	local data = self._global.synced_cocaine_stacks[my_peer_id] or {}
+	local multiplier = self:upgrade_value_by_level("player", "cocaine_stack_absorption_multiplier", data.power_level or 0, 1)
+	local absorption = 0
+	local best_peer_id = 0
+	if self._global.synced_cocaine_stacks then
+		local peer_absorption
+		for peer_id, data in pairs(self._global.synced_cocaine_stacks) do
+			if peer_id == my_peer_id or data.in_use then
+				peer_absorption = self:_get_cocaine_damage_absorption_from_data(data)
+				best_peer_id = absorption < peer_absorption and peer_id or best_peer_id
+				absorption = math.max(absorption, peer_absorption)
+			end
+		end
+	end
+	return absorption * multiplier, best_peer_id
+end
+
+function PlayerManager:get_local_cocaine_damage_absorption_max()
+	local upgrade_tweak = tweak_data.upgrades
+	local amount = upgrade_tweak.max_total_cocaine_stacks or 2047
+	local upgrade_level = upgrade_tweak.cocaine_stacks_convert_levels and #upgrade_tweak.cocaine_stacks_convert_levels or 1
+	local multiplier = self:upgrade_value("player", "cocaine_stack_absorption_multiplier", 1)
+	local max_absorption = math.max(self:_get_cocaine_damage_absorption_from_data({amount = amount, upgrade_level = upgrade_level}), 1)
+	return max_absorption * multiplier
+end
+
+function PlayerManager:get_best_cocaine_damage_absorption_ratio()
+	local best_ratio = 0
+	for peer_id, data in pairs(self._global.synced_cocaine_stacks) do
+		best_ratio = math.max(self:get_peer_cocaine_damage_absorption_ratio(peer_id), best_ratio)
+	end
+	return best_ratio
+end
+
+function PlayerManager:_get_best_max_cocaine_damage_absorption_ratio()
+	local upgrade_tweak = tweak_data.upgrades
+	local amount = upgrade_tweak.max_total_cocaine_stacks or 2047
+	local upgrade_level = upgrade_tweak.cocaine_stacks_convert_levels and #upgrade_tweak.cocaine_stacks_convert_levels or 1
+	local multiplier = upgrade_tweak.values.player.cocaine_stack_absorption_multiplier and upgrade_tweak.values.player.cocaine_stack_absorption_multiplier[#upgrade_tweak.values.player.cocaine_stack_absorption_multiplier] or 1
+	local max_absorption = math.max(self:_get_cocaine_damage_absorption_from_data({amount = amount, upgrade_level = upgrade_level}), 1) * multiplier
+	return max_absorption
+end
+
+function PlayerManager:get_peer_cocaine_damage_absorption_ratio(peer_id)
+	local max_absorption = self:_get_best_max_cocaine_damage_absorption_ratio()
+	local data = self._global.synced_cocaine_stacks[peer_id] or {}
+	local multiplier = self:upgrade_value_by_level("player", "cocaine_stack_absorption_multiplier", data.power_level or 0, 1)
+	local absorption = self:_get_cocaine_damage_absorption_from_data(data) * multiplier
+	return math.clamp(absorption / max_absorption, 0, 1)
+end
+
+function PlayerManager:get_peer_cocaine_damage_absorption_max_ratio(peer_id)
+	local upgrade_tweak = tweak_data.upgrades
+	local max_absorption = self:_get_best_max_cocaine_damage_absorption_ratio()
+	local data = self._global.synced_cocaine_stacks[peer_id] or {}
+	local upgrade_level = data.upgrade_level or 1
+	local amount = upgrade_tweak.max_total_cocaine_stacks or 2047
+	local multiplier = self:upgrade_value_by_level("player", "cocaine_stack_absorption_multiplier", data.power_level or 0, 1)
+	local absorption = self:_get_cocaine_damage_absorption_from_data({amount = amount, upgrade_level = upgrade_level}) * multiplier
+	return math.clamp(absorption / max_absorption, 0, 1)
+end
+
+function PlayerManager:get_local_cocaine_damage_absorption_ratio()
+	local peer_id = managers.network:session():local_peer():id()
+	return self:get_peer_cocaine_damage_absorption_ratio(peer_id)
+end
+
+function PlayerManager:get_local_cocaine_damage_absorption_max_ratio()
+	local peer_id = managers.network:session():local_peer():id()
+	return self:get_peer_cocaine_damage_absorption_max_ratio(peer_id)
+end
+
 function PlayerManager:remove_equipment_possession(peer_id, equipment)
 	if not self._global.synced_equipment_possession[peer_id] then
 		return
@@ -1783,6 +2008,8 @@ function PlayerManager:peer_dropped_out(peer)
 	self._global.synced_carry[peer_id] = nil
 	self._global.synced_team_upgrades[peer_id] = nil
 	self._global.synced_bipod[peer_id] = nil
+	self._global.synced_cocaine_stacks[peer_id] = nil
+	self:update_cocaine_hud()
 	local peer_unit = peer:unit()
 	self:remove_from_player_list(peer_unit)
 	managers.vehicle:remove_player_from_all_vehicles(peer_unit)

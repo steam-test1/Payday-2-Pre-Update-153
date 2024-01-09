@@ -1484,6 +1484,7 @@ function NetworkPeer:sync_data(peer)
 	managers.player:update_carry_to_peer(peer)
 	managers.player:update_team_upgrades_to_peer(peer)
 	managers.player:update_husk_bipod_to_peer(peer)
+	managers.player:update_cocaine_stacks_to_peer(peer)
 	if Network:is_server() then
 		managers.vehicle:update_vehicles_data_to_peer(peer)
 	end
@@ -1546,9 +1547,6 @@ function NetworkPeer:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	local team_id = tweak_data.levels:get_default_team_ID("player")
 	self:set_unit(unit, character_name, team_id)
 	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self:profile().outfit_string, self:outfit_version(), self._id, team_id)
-	if is_local_peer then
-		unit:character_damage():send_set_status()
-	end
 	if is_drop_in then
 		managers.groupai:state():set_dropin_hostages_killed(unit, hostages_killed, respawn_penalty)
 		self:set_used_deployable(used_deployable)
@@ -1596,6 +1594,7 @@ end
 function NetworkPeer:set_unit(unit, character_name, team_id)
 	local is_new_unit = unit and (not self._unit or self._unit:key() ~= unit:key())
 	self._unit = unit
+	managers.player:need_send_player_status()
 	if is_new_unit and self._id == managers.network:session():local_peer():id() then
 		managers.player:spawned_player(1, unit)
 	end

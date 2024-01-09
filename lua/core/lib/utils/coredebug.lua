@@ -313,22 +313,7 @@ function trace_ref_add_destroy_all(class_name, func_name)
 end
 
 function debug_pause(...)
-	if Application:production_build() then
-		Application:error("[debug_pause]", ...)
-		Application:stack_dump("error")
-		if not Application:editor() or Global.running_simulation then
-			Application:set_pause(true)
-		end
-	end
 end
 
 function debug_pause_unit(unit, ...)
-	if Application:production_build() then
-		debug_pause(...)
-		if alive(unit) then
-			Application:draw_cylinder(unit:position(), unit:position() + math.UP * 5000, 30, 1, 0, 0)
-		else
-			Application:error("[debug_pause] DEAD UNIT")
-		end
-	end
 end

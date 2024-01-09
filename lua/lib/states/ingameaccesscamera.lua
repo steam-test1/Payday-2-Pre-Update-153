@@ -235,6 +235,18 @@ function IngameAccessCamera:_any_enabled_cameras()
 	return false
 end
 
+function IngameAccessCamera:on_camera_access_changed(camera_unit)
+	local access_camera = self._camera_data.index and self._cameras[self._camera_data.index] and self._cameras[self._camera_data.index].access_camera
+	self._no_feeds = not self:_any_enabled_cameras()
+	if access_camera then
+		managers.hud:set_access_camera_destroyed(not access_camera:enabled(), self._no_feeds)
+	elseif self._no_feeds then
+		managers.hud:set_access_camera_destroyed(true, true)
+	else
+		self:_next_camera()
+	end
+end
+
 function IngameAccessCamera:at_exit()
 	self._sound_source:post_event("camera_monitor_leave")
 	managers.environment_controller:set_default_color_grading(self._saved_default_color_grading)

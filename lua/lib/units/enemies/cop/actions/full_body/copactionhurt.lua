@@ -509,11 +509,11 @@ function CopActionHurt:init(action_desc, common_data)
 				end
 			end
 		elseif action_type == "death" then
-			self._unit:sound():say("x02a_any_3p")
+			self._unit:sound():say("l1n_x02a_any_3p", true, true)
 		elseif action_type == "counter_tased" or action_type == "taser_tased" then
 			self._unit:sound():say("tasered")
 		else
-			self._unit:sound():say("x01a_any_3p")
+			self._unit:sound():say("l1n_x01a_any_3p", true, true)
 		end
 		if (tweak_table == "tank" or tweak_table == "tank_hw") and action_type == "death" then
 			local unit_id = self._unit:id()

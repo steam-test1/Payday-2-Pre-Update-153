@@ -495,6 +495,46 @@ function CoreEnvironmentControllerManager:set_dof_setting(setting)
 	end
 end
 
+local set_modifier_transform = function(effect, id, transform)
+	local modifier = effect:modifier(Idstring(id))
+	if modifier then
+		transform(modifier)
+		return
+	end
+	local count = 1
+	while true do
+		local id = Idstring(id .. "_" .. count)
+		modifier = effect:modifier(id)
+		if modifier then
+			transform(modifier)
+		else
+			break
+		end
+		count = count + 1
+	end
+end
+
+local function set_modifier_visibility(effect, id, visibility_state)
+	set_modifier_transform(effect, id, function(mod)
+		mod:set_visibility(visibility_state)
+	end)
+end
+
+local function set_post_material_parameter(post_id, modifier_name, parameter_id, value)
+	local vp = managers.viewport:first_active_viewport()
+	if vp then
+		local deferred_processor = vp:vp():get_post_processor_effect("World", post_id)
+		if deferred_processor then
+			set_modifier_transform(deferred_processor, modifier_name, function(modifier)
+				local material = modifier:material()
+				if material then
+					material:set_variable(parameter_id, value)
+				end
+			end)
+		end
+	end
+end
+
 function CoreEnvironmentControllerManager:remove_dof_tweak_data(remove_setting_name)
 	if not self._dof_tweaks[new_setting_name] then
 		Application:error("[CoreEnvironmentControllerManager:remove_dof_tweak_data] DOF setting do not exist!", remove_setting_name)

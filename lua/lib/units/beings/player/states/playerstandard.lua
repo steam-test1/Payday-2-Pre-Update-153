@@ -501,12 +501,7 @@ function PlayerStandard:_update_check_actions(t, dt)
 	local input = self:_get_input()
 	self:_determine_move_direction()
 	self:_update_interaction_timers(t)
-	local projectile_entry = managers.blackmarket:equipped_projectile()
-	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-		self:_update_throw_grenade_timers(t, input)
-	else
-		self:_update_throw_projectile_timers(t, input)
-	end
+	self:_update_throw_projectile_timers(t, input)
 	self:_update_reload_timers(t, dt, input)
 	self:_update_melee_timers(t, input)
 	self:_update_charging_weapon_timers(t, input)
@@ -537,14 +532,7 @@ function PlayerStandard:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_primary_attack(t, input)
 	new_action = new_action or self:_check_action_equip(t, input)
 	new_action = new_action or self:_check_use_item(t, input)
-	if not new_action then
-		local projectile_entry = managers.blackmarket:equipped_projectile()
-		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-			new_action = self:_check_action_throw_grenade(t, input)
-		else
-			new_action = self:_check_action_throw_projectile(t, input)
-		end
-	end
+	new_action = new_action or self:_check_action_throw_projectile(t, input)
 	new_action = new_action or self:_check_action_interact(t, input)
 	self:_check_action_jump(t, input)
 	self:_check_action_run(t, input)
@@ -721,7 +709,7 @@ function PlayerStandard:_check_step(t)
 		return
 	end
 	self._last_step_pos = self._last_step_pos or Vector3()
-	local step_length = self._state_data.on_ladder and 50 or self._state_data.in_steelsight and 100 or self._state_data.ducking and 125 or self._running and 175 or 150
+	local step_length = self._state_data.on_ladder and 50 or self._state_data.in_steelsight and (managers.player:has_category_upgrade("player", "steelsight_normal_movement_speed") and 150 or 100) or self._state_data.ducking and 125 or self._running and 175 or 150
 	if mvector3.distance_sq(self._last_step_pos, self._pos) > step_length * step_length then
 		mvector3.set(self._last_step_pos, self._pos)
 		self._unit:base():anim_data_clbk_footstep()
@@ -1051,6 +1039,10 @@ function PlayerStandard:_start_action_equip(redirect, extra_time)
 end
 
 function PlayerStandard:_check_action_throw_projectile(t, input)
+	local projectile_entry = managers.blackmarket:equipped_projectile()
+	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
+		return self:_check_action_throw_grenade(t, input)
+	end
 	if not managers.player:can_throw_grenade() then
 		self._state_data.projectile_throw_wanted = nil
 		self._state_data.projectile_idle_wanted = nil
@@ -1164,6 +1156,10 @@ function PlayerStandard:_interupt_action_throw_projectile(t)
 end
 
 function PlayerStandard:_update_throw_projectile_timers(t, input)
+	local projectile_entry = managers.blackmarket:equipped_projectile()
+	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
+		return self:_update_throw_grenade_timers(t, input)
+	end
 	if self._state_data.throwing_projectile then
 	end
 	if self._state_data.projectile_throw_allowed_t and t >= self._state_data.projectile_throw_allowed_t then
@@ -2047,11 +2043,6 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 				})
 			elseif voice_type == "revive" then
 			elseif voice_type == "boost" then
-				if Network:is_server() then
-					prime_target.unit:brain():on_long_dis_interacted(amount, self._unit)
-				else
-					managers.network:session():send_to_host("long_dis_interaction", prime_target.unit, amount, self._unit)
-				end
 			end
 			voice_type = voice_type or "come"
 			plural = false

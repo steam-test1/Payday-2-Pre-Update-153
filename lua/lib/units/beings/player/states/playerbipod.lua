@@ -104,12 +104,7 @@ function PlayerBipod:_update_check_actions(t, dt)
 	local input = self:_get_input()
 	self:_determine_move_direction()
 	self:_update_interaction_timers(t)
-	local projectile_entry = managers.blackmarket:equipped_projectile()
-	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-		self:_update_throw_grenade_timers(t, input)
-	else
-		self:_update_throw_projectile_timers(t, input)
-	end
+	self:_update_throw_projectile_timers(t, input)
 	self:_update_reload_timers(t, dt, input)
 	self:_update_melee_timers(t, input)
 	self:_update_equip_weapon_timers(t, input)
@@ -133,14 +128,7 @@ function PlayerBipod:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_change_weapon(t, input)
 	new_action = new_action or self:_check_action_unmount_bipod(t, input)
 	new_action = new_action or self:_check_action_intimidate(t, input)
-	if not new_action then
-		local projectile_entry = managers.blackmarket:equipped_projectile()
-		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-			self:_check_action_throw_grenade(t, input)
-		else
-			self:_check_action_throw_projectile(t, input)
-		end
-	end
+	new_action = new_action or self:_check_action_throw_projectile(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_check_use_item(t, input)
 	self:_find_pickups(t)
@@ -259,6 +247,10 @@ function PlayerBipod:_check_action_throw_grenade(t, input)
 end
 
 function PlayerBipod:_check_action_throw_projectile(t, input)
+	local projectile_entry = managers.blackmarket:equipped_projectile()
+	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
+		return self:_check_action_throw_grenade(t, input)
+	end
 	local action_forbidden = not PlayerBase.USE_GRENADES or not managers.player:can_throw_grenade() or not self:_projectile_repeat_allowed()
 	if input.btn_projectile_press and not action_forbidden then
 		self:_unmount_bipod()

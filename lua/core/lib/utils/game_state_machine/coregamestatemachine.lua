@@ -49,11 +49,6 @@ function GameStateMachine:change_state(state, params)
 	local transition_debug_string = string.format("'%s' --> '%s'", tostring(self:last_queued_state_name()), tostring(state:name()))
 	cat_print("game_state_machine", "[GameStateMachine] Requested state change " .. transition_debug_string)
 	if not self:can_change_state(state) then
-		if Application:production_build() then
-			Application:set_pause(true)
-			print("[GameStateMachine] Requesting invalid transition " .. transition_debug_string)
-			Application:stack_dump()
-		end
 	else
 		self._queued_transitions = self._queued_transitions or {}
 		table.insert(self._queued_transitions, {state, params})

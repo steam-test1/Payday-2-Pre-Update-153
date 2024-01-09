@@ -423,7 +423,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_gordon",
 		desc_id = "menu_content_gordon_desc",
 		date_id = "menu_content_gordon_date",
-		webpage = "http://www.overkillsoftware.com/fbifiles/",
+		webpage = "http://www.overkillsoftware.com/games/fbifiles/",
 		image = "guis/dlcs/gordon/textures/pd2/content_updates/gordon"
 	}
 	local rip = {
@@ -431,7 +431,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_rip",
 		desc_id = "menu_content_rip_desc",
 		date_id = "menu_content_rip_date",
-		store = 422430,
+		webpage = "http://www.overkillsoftware.com/games/pointbreak/",
 		image = "guis/dlcs/rip/textures/pd2/content_updates/rip"
 	}
 	local berry = {
@@ -465,6 +465,14 @@ function GuiTweakData:init()
 		date_id = "menu_content_pal_date",
 		store = 441600,
 		image = "guis/dlcs/lupus/textures/pd2/content_updates/lupus"
+	}
+	local coco = {
+		id = "coco",
+		name_id = "menu_content_coco",
+		desc_id = "menu_content_coco_desc",
+		date_id = "menu_content_coco_date",
+		webpage = "http://www.overkillsoftware.com/games/hardcorehenry/",
+		image = "guis/dlcs/coco/textures/pd2/content_updates/coco"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -528,7 +536,8 @@ function GuiTweakData:init()
 			rip,
 			cane,
 			peta,
-			pal
+			pal,
+			coco
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1887,6 +1896,15 @@ function GuiTweakData:init()
 					desc_id = "menu_bodhi_desc_codex",
 					videos = {"bodhi1"},
 					post_event = "pln_contact_bodhi"
+				}
+			},
+			{
+				id = "jimmy",
+				name_id = "menu_jimmy",
+				{
+					desc_id = "menu_jimmy_desc_codex",
+					videos = {"jimmy1"},
+					post_event = "pln_contact_jimmy"
 				}
 			}
 		}

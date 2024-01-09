@@ -738,16 +738,18 @@ function TeamAILogicIdle._get_priority_attention(data, attention_objects, reacti
 				local dangerous_special = attention_data.is_very_dangerous
 				local target_priority = distance
 				local target_priority_slot = 0
-				if visible and (dangerous_special or been_marked) and distance < 1600 then
-					target_priority_slot = 1
-				elseif visible and near and (has_alerted and has_damaged or been_marked) then
-					target_priority_slot = 2
-				elseif visible and near and has_alerted then
-					target_priority_slot = 3
-				elseif visible and has_alerted then
-					target_priority_slot = 4
-				elseif visible then
-					target_priority_slot = 5
+				if visible then
+					if (dangerous_special or been_marked) and distance < 1600 then
+						target_priority_slot = 1
+					elseif near and (has_alerted and has_damaged or been_marked) then
+						target_priority_slot = 2
+					elseif near and has_alerted then
+						target_priority_slot = 3
+					elseif has_alerted then
+						target_priority_slot = 4
+					else
+						target_priority_slot = 5
+					end
 				elseif has_alerted then
 					target_priority_slot = 6
 				else

@@ -211,7 +211,7 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		alpha = 1,
 		w = radial_health_panel:w(),
 		h = radial_health_panel:h(),
-		layer = 3
+		layer = 5
 	})
 	radial_custom:set_color(Color(1, 0, 0, 0))
 	radial_custom:hide()
@@ -252,6 +252,83 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		})
 		radial_rip_bg:set_color(Color(1, 0, 0, 0))
 		radial_rip_bg:hide()
+	end
+	do
+		local radial_absorb_shield_active = radial_health_panel:bitmap({
+			name = "radial_absorb_shield_active",
+			texture = "guis/dlcs/coco/textures/pd2/hud_absorb_shield",
+			texture_rect = {
+				0,
+				0,
+				64,
+				64
+			},
+			render_template = "VertexColorTexturedRadial",
+			blend_mode = "normal",
+			alpha = 1,
+			w = radial_health_panel:w(),
+			h = radial_health_panel:h(),
+			layer = 5
+		})
+		radial_absorb_shield_active:set_color(Color(1, 0, 0, 0))
+		radial_absorb_shield_active:hide()
+		local radial_absorb_health_active = radial_health_panel:bitmap({
+			name = "radial_absorb_health_active",
+			texture = "guis/dlcs/coco/textures/pd2/hud_absorb_health",
+			texture_rect = {
+				0,
+				0,
+				64,
+				64
+			},
+			render_template = "VertexColorTexturedRadial",
+			blend_mode = "normal",
+			alpha = 1,
+			w = radial_health_panel:w(),
+			h = radial_health_panel:h(),
+			layer = 5
+		})
+		radial_absorb_health_active:set_color(Color(1, 0, 0, 0))
+		radial_absorb_health_active:hide()
+		radial_absorb_health_active:animate(callback(self, self, "animate_update_absorb_active"))
+		local radial_info_meter = radial_health_panel:bitmap({
+			name = "radial_info_meter",
+			texture = "guis/dlcs/coco/textures/pd2/hud_absorb_stack_fg",
+			texture_rect = {
+				0,
+				0,
+				64,
+				64
+			},
+			render_template = "VertexColorTexturedRadial",
+			blend_mode = "add",
+			alpha = 1,
+			w = radial_health_panel:w(),
+			h = radial_health_panel:h(),
+			layer = 3
+		})
+		radial_info_meter:set_color(Color(1, 0, 0, 0))
+		radial_info_meter:hide()
+		local radial_info_meter_bg = radial_health_panel:bitmap({
+			name = "radial_info_meter_bg",
+			texture = "guis/dlcs/coco/textures/pd2/hud_absorb_stack_bg",
+			texture_rect = {
+				64,
+				0,
+				-64,
+				64
+			},
+			render_template = "VertexColorTexturedRadial",
+			blend_mode = "normal",
+			alpha = 1,
+			w = radial_health_panel:w(),
+			h = radial_health_panel:h(),
+			layer = 1
+		})
+		radial_info_meter_bg:set_color(Color(1, 0, 0, 0))
+		radial_info_meter_bg:hide()
+	end
+	if main_player then
 	end
 	local x, y, w, h = radial_health_panel:shape()
 	teammate_panel:bitmap({
@@ -898,6 +975,11 @@ function HUDTeammate:remove_panel()
 	self._player_panel:child("carry_panel"):set_visible(false)
 	self._player_panel:child("carry_panel"):child("value"):set_text("")
 	self:set_cheater(false)
+	self:set_info_meter({
+		current = 0,
+		total = 0,
+		max = 1
+	})
 	self:stop_timer()
 	self:teammate_progress(false, false, false, false)
 	self._peer_id = nil
@@ -974,6 +1056,7 @@ function HUDTeammate:set_ammo_amount_by_type(type, max_clip, current_clip, curre
 end
 
 function HUDTeammate:set_health(data)
+	self._health_data = data
 	local teammate_panel = self._panel:child("player")
 	local radial_health_panel = teammate_panel:child("radial_health_panel")
 	local radial_health = radial_health_panel:child("radial_health")
@@ -1005,6 +1088,7 @@ end
 
 function HUDTeammate:set_armor(data)
 	local teammate_panel = self._panel:child("player")
+	self._armor_data = data
 	local radial_health_panel = teammate_panel:child("radial_health_panel")
 	local radial_shield = radial_health_panel:child("radial_shield")
 	local red = data.current / data.total
@@ -1436,4 +1520,107 @@ function HUDTeammate:set_stored_health(stored_health_ratio)
 			end)
 		end
 	end
+end
+
+function HUDTeammate:_animate_update_absorb(o, radial_absorb_shield_name, radial_absorb_health_name, var_name, blink)
+	repeat
+		coroutine.yield()
+	until alive(self._panel) and self[var_name] and self._armor_data and self._health_data
+	local teammate_panel = self._panel:child("player")
+	local radial_health_panel = teammate_panel:child("radial_health_panel")
+	local radial_shield = radial_health_panel:child("radial_shield")
+	local radial_health = radial_health_panel:child("radial_health")
+	local radial_absorb_shield = radial_health_panel:child(radial_absorb_shield_name)
+	local radial_absorb_health = radial_health_panel:child(radial_absorb_health_name)
+	local radial_shield_rot = radial_shield:color().r
+	local radial_health_rot = radial_health:color().r
+	radial_absorb_shield:set_rotation((1 - radial_shield_rot) * 360)
+	radial_absorb_health:set_rotation((1 - radial_health_rot) * 360)
+	local current_absorb = 0
+	local current_shield, current_health
+	local step_speed = 1
+	local lerp_speed = 1
+	local dt, update_absorb
+	local t = 0
+	while alive(teammate_panel) do
+		dt = coroutine.yield()
+		if self[var_name] and self._armor_data and self._health_data then
+			update_absorb = false
+			current_shield = self._armor_data.current
+			current_health = self._health_data.current
+			if radial_shield:color().r ~= radial_shield_rot or radial_health:color().r ~= radial_health_rot then
+				radial_shield_rot = radial_shield:color().r
+				radial_health_rot = radial_health:color().r
+				radial_absorb_shield:set_rotation((1 - radial_shield_rot) * 360)
+				radial_absorb_health:set_rotation((1 - radial_health_rot) * 360)
+				update_absorb = true
+			end
+			if current_absorb ~= self[var_name] then
+				current_absorb = math.lerp(current_absorb, self[var_name], lerp_speed * dt)
+				current_absorb = math.step(current_absorb, self[var_name], step_speed * dt)
+				update_absorb = true
+			end
+			if blink then
+				t = (t + dt * 0.5) % 1
+				radial_absorb_shield:set_alpha(math.abs(math.sin(t * 180)) * 0.25 + 0.75)
+				radial_absorb_health:set_alpha(math.abs(math.sin(t * 180)) * 0.25 + 0.75)
+			end
+			if update_absorb and 0 < current_absorb then
+				local shield_ratio = current_shield == 0 and 0 or math.min(current_absorb / current_shield, 1)
+				local health_ratio = current_health == 0 and 0 or math.min((current_absorb - shield_ratio * current_shield) / current_health, 1)
+				local shield = math.clamp(shield_ratio * radial_shield_rot, 0, 1)
+				local health = math.clamp(health_ratio * radial_health_rot, 0, 1)
+				radial_absorb_shield:set_color(Color(1, shield, 1, 1))
+				radial_absorb_health:set_color(Color(1, health, 1, 1))
+				radial_absorb_shield:set_visible(0 < shield)
+				radial_absorb_health:set_visible(0 < health)
+			end
+		end
+	end
+end
+
+function HUDTeammate:animate_update_absorb_max(o)
+	self:_animate_update_absorb(o, "radial_absorb_shield_max", "radial_absorb_health_max", "_absorb_max_amount")
+end
+
+function HUDTeammate:animate_update_absorb(o)
+	self:_animate_update_absorb(o, "radial_absorb_shield", "radial_absorb_health", "_absorb_personal_amount")
+end
+
+function HUDTeammate:animate_update_absorb_active(o)
+	self:_animate_update_absorb(o, "radial_absorb_shield_active", "radial_absorb_health_active", "_absorb_active_amount", true)
+end
+
+function HUDTeammate:set_absorb_max(absorb_amount)
+	self._absorb_max_amount = absorb_amount
+end
+
+function HUDTeammate:set_absorb_personal(absorb_amount)
+	self._absorb_personal_amount = absorb_amount
+end
+
+function HUDTeammate:set_absorb_active(absorb_amount)
+	self._absorb_active_amount = absorb_amount
+end
+
+function HUDTeammate:set_info_meter(data)
+	local teammate_panel = self._panel:child("player")
+	local radial_health_panel = teammate_panel:child("radial_health_panel")
+	local radial_info_meter = radial_health_panel:child("radial_info_meter")
+	local radial_info_meter_bg = radial_health_panel:child("radial_info_meter_bg")
+	local red = math.clamp(data.total / data.max, 0, 1)
+	radial_info_meter_bg:set_color(Color(1, red, 1, 1))
+	radial_info_meter_bg:set_visible(0 < red)
+	radial_info_meter_bg:set_rotation(red * 360)
+	local red = math.clamp(data.current / data.max, 0, 1)
+	radial_info_meter:stop()
+	radial_info_meter:animate(function(o)
+		local s = radial_info_meter:color().r
+		local e = red
+		over(0.2, function(p)
+			local c = math.lerp(s, e, p)
+			radial_info_meter:set_color(Color(1, c, 1, 1))
+			radial_info_meter:set_visible(0 < c)
+		end)
+	end)
 end

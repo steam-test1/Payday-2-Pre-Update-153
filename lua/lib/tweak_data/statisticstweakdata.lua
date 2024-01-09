@@ -17,7 +17,7 @@ function StatisticsTweakData:init()
 end
 
 function StatisticsTweakData:statistics_specializations()
-	return 13
+	return 14
 end
 
 function StatisticsTweakData:statistics_table()
@@ -431,7 +431,9 @@ function StatisticsTweakData:statistics_table()
 		"megacthulhu",
 		"cop_skull",
 		"cop_plague_doctor",
-		"cop_kawaii"
+		"cop_kawaii",
+		"jimmy",
+		"jimmy_duct"
 	}
 	local weapon_list = {
 		"ak5",
@@ -529,7 +531,9 @@ function StatisticsTweakData:statistics_table()
 		"model70",
 		"sparrow",
 		"m37",
-		"china"
+		"china",
+		"sr2",
+		"x_sr2"
 	}
 	local melee_list = {
 		"weapon",
@@ -603,7 +607,8 @@ function StatisticsTweakData:statistics_table()
 		"pitchfork",
 		"scoutknife",
 		"shawn",
-		"nin"
+		"nin",
+		"ballistic"
 	}
 	local grenade_list = {
 		"frag",
@@ -670,7 +675,8 @@ function StatisticsTweakData:statistics_table()
 		"bonnie",
 		"sokol",
 		"dragon",
-		"bodhi"
+		"bodhi",
+		"jimmy"
 	}
 	local deployable_list = {
 		"ammo_bag",

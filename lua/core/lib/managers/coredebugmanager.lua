@@ -2134,9 +2134,6 @@ end
 function MacroDebug:effect(effect)
 	local cam = managers.viewport:get_current_camera()
 	local effect_manager = World:effect_manager()
-	if Application:production_build() then
-		CoreEngineAccess._editor_load(Idstring("effect"), effect:id())
-	end
 	effect_manager:spawn({
 		effect = effect:id(),
 		position = (cam and cam:position() or Vector3()) + (cam and cam:rotation():y() or math.Y) * 200,

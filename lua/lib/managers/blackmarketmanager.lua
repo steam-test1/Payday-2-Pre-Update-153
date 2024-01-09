@@ -388,6 +388,7 @@ function BlackMarketManager:equipped_secondary()
 		end
 	end
 	self:aquire_default_weapons()
+	return Global.blackmarket_manager.crafted_items.secondaries[1]
 end
 
 function BlackMarketManager:equipped_primary()
@@ -399,7 +400,8 @@ function BlackMarketManager:equipped_primary()
 			return data
 		end
 	end
-	return nil
+	self:aquire_default_weapons()
+	return Global.blackmarket_manager.crafted_items.primaries[1]
 end
 
 function BlackMarketManager:equipped_weapon_slot(category)
@@ -4914,6 +4916,7 @@ function BlackMarketManager:reset_equipped()
 	self:_verify_dlc_items()
 	self:aquire_default_weapons(true)
 	self:_verfify_equipped()
+	managers.statistics:publish_equipped_to_steam()
 	if managers.menu_scene then
 		managers.menu_scene:on_blackmarket_reset()
 	end
@@ -5255,6 +5258,7 @@ function BlackMarketManager:verify_dlc_items()
 	end
 	self:_verify_dlc_items()
 	self:_load_done()
+	managers.statistics:publish_equipped_to_steam()
 	managers.dlc:give_missing_package()
 end
 
@@ -5560,10 +5564,8 @@ function BlackMarketManager:_verify_dlc_items()
 	for package_id, data in pairs(tweak_data.dlc) do
 		if tweak_data.lootdrop.global_values[package_id] then
 			owns_dlc = not tweak_data.lootdrop.global_values[package_id].dlc or managers.dlc:is_dlc_unlocked(package_id) or false
-			print("owns_dlc", owns_dlc, "dlc", package_id, "is a dlc", tweak_data.lootdrop.global_values[package_id].dlc, "is free", data.free, "is_dlc_unlocked", managers.dlc:is_dlc_unlocked(package_id))
 			if owns_dlc then
 			elseif self._global.global_value_items[package_id] then
-				print("You do not own " .. package_id .. ", will lock all related items.")
 				local all_crafted_items = self._global.global_value_items[package_id].crafted_items or {}
 				local primaries = all_crafted_items.primaries or {}
 				local secondaries = all_crafted_items.secondaries or {}
@@ -5647,7 +5649,6 @@ function BlackMarketManager:_verify_dlc_items()
 					equipped = true
 				}
 				managers.money:on_buy_weapon_platform(weapon_id, true)
-				managers.statistics:publish_equipped_to_steam()
 			end
 		end
 	end
@@ -5676,7 +5677,6 @@ function BlackMarketManager:_verfify_equipped_category(category)
 		if managers.menu_scene then
 			managers.menu_scene:set_character_armor(armor_id)
 		end
-		managers.statistics:publish_equipped_to_steam()
 		return
 	end
 	if category == "grenades" then
@@ -5691,7 +5691,6 @@ function BlackMarketManager:_verfify_equipped_category(category)
 		for s, data in pairs(Global.blackmarket_manager.grenades) do
 			data.equipped = s == grenade_id
 		end
-		managers.statistics:publish_equipped_to_steam()
 		return
 	end
 	if category == "melee_weapons" then
@@ -5705,7 +5704,6 @@ function BlackMarketManager:_verfify_equipped_category(category)
 		for s, data in pairs(Global.blackmarket_manager.melee_weapons) do
 			data.equipped = s == melee_weapon_id
 		end
-		managers.statistics:publish_equipped_to_steam()
 		return
 	end
 	if not self._global.crafted_items[category] then
@@ -5751,7 +5749,6 @@ function BlackMarketManager:_verfify_equipped_category(category)
 		equipped = true
 	}
 	managers.money:on_buy_weapon_platform(weapon_id, true)
-	managers.statistics:publish_equipped_to_steam()
 	return
 end
 
@@ -5765,13 +5762,16 @@ function BlackMarketManager:_convert_add_to_mul(value)
 	end
 end
 
-function BlackMarketManager:fire_rate_multiplier(name, category, silencer, detection_risk, current_state, blueprint)
+function BlackMarketManager:fire_rate_multiplier(name, category, sub_category, silencer, detection_risk, current_state, blueprint)
 	local multiplier = managers.player:upgrade_value(category, "fire_rate_multiplier", 1)
+	if sub_category then
+		multiplier = multiplier * managers.player:upgrade_value(sub_category, "fire_rate_multiplier", 1)
+	end
 	multiplier = multiplier * managers.player:upgrade_value(name, "fire_rate_multiplier", 1)
 	return multiplier
 end
 
-function BlackMarketManager:damage_addend(name, category, silencer, detection_risk, current_state, blueprint)
+function BlackMarketManager:damage_addend(name, category, sub_category, silencer, detection_risk, current_state, blueprint)
 	local value = 0
 	if tweak_data.weapon[name] and tweak_data.weapon[name].ignore_damage_upgrades then
 		return value
@@ -5779,16 +5779,22 @@ function BlackMarketManager:damage_addend(name, category, silencer, detection_ri
 	value = value + managers.player:upgrade_value("player", "damage_addend", 0)
 	value = value + managers.player:upgrade_value("weapon", "damage_addend", 0)
 	value = value + managers.player:upgrade_value(category, "damage_addend", 0)
+	if sub_category then
+		value = value + managers.player:upgrade_value(sub_category, "damage_addend", 0)
+	end
 	value = value + managers.player:upgrade_value(name, "damage_addend", 0)
 	return value
 end
 
-function BlackMarketManager:damage_multiplier(name, category, silencer, detection_risk, current_state, blueprint)
+function BlackMarketManager:damage_multiplier(name, category, sub_category, silencer, detection_risk, current_state, blueprint)
 	local multiplier = 1
 	if tweak_data.weapon[name] and tweak_data.weapon[name].ignore_damage_upgrades then
 		return multiplier
 	end
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "damage_multiplier", 1))
+	if sub_category then
+		multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "damage_multiplier", 1))
+	end
 	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "damage_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "passive_damage_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "passive_damage_multiplier", 1))
@@ -5804,6 +5810,9 @@ function BlackMarketManager:damage_multiplier(name, category, silencer, detectio
 	if not current_state or current_state:in_steelsight() then
 	else
 		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "hip_fire_damage_multiplier", 1))
+		if sub_category then
+			multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "hip_fire_damage_multiplier", 1))
+		end
 	end
 	if blueprint and self:is_weapon_modified(managers.weapon_factory:get_factory_id_by_weapon_id(name), blueprint) then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_damage_multiplier", 1))
@@ -5811,7 +5820,7 @@ function BlackMarketManager:damage_multiplier(name, category, silencer, detectio
 	return self:_convert_add_to_mul(multiplier)
 end
 
-function BlackMarketManager:threat_multiplier(name, category, silencer)
+function BlackMarketManager:threat_multiplier(name, category, sub_category, silencer)
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "suppression_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value("player", "suppression_multiplier2", 1))
@@ -5819,7 +5828,7 @@ function BlackMarketManager:threat_multiplier(name, category, silencer)
 	return self:_convert_add_to_mul(multiplier)
 end
 
-function BlackMarketManager:accuracy_addend(name, category, spread_index, silencer, current_state, fire_mode, blueprint)
+function BlackMarketManager:accuracy_addend(name, category, sub_category, spread_index, silencer, current_state, fire_mode, blueprint)
 	local addend = 0
 	if spread_index and 1 <= spread_index and spread_index <= (current_state and current_state._moving and #tweak_data.weapon.stats.spread_moving or #tweak_data.weapon.stats.spread) then
 		local index = spread_index
@@ -5835,6 +5844,16 @@ function BlackMarketManager:accuracy_addend(name, category, spread_index, silenc
 			index = index + managers.player:upgrade_value("weapon", "move_spread_index_addend", 0)
 			index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
 		end
+		if sub_category then
+			index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)
+			index = index + managers.player:upgrade_value(sub_category, fire_mode .. "_spread_index_addend", 0)
+			if silencer then
+				index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+			end
+			if current_state and current_state._moving then
+				index = index + managers.player:upgrade_value(sub_category, "move_spread_index_addend", 0)
+			end
+		end
 		index = math.clamp(index, 1, #tweak_data.weapon.stats.spread)
 		if index ~= spread_index then
 			local diff = tweak_data.weapon.stats.spread[index] - tweak_data.weapon.stats.spread[spread_index]
@@ -5844,19 +5863,28 @@ function BlackMarketManager:accuracy_addend(name, category, spread_index, silenc
 	return addend
 end
 
-function BlackMarketManager:accuracy_multiplier(name, category, silencer, current_state, spread_moving, fire_mode, blueprint)
+function BlackMarketManager:accuracy_multiplier(name, category, sub_category, silencer, current_state, spread_moving, fire_mode, blueprint)
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "spread_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "spread_multiplier", 1))
+	if sub_category then
+		multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "spread_multiplier", 1))
+	end
 	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", fire_mode .. "_spread_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "spread_multiplier", 1))
 	if silencer then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_spread_multiplier", 1))
 		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "silencer_spread_multiplier", 1))
+		if sub_category then
+			multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "silencer_spread_multiplier", 1))
+		end
 	end
 	if current_state then
 		if current_state._moving then
 			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "move_spread_multiplier", 1))
+			if sub_category then
+				multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "move_spread_multiplier", 1))
+			end
 			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "move_spread_multiplier", 1))
 			multiplier = multiplier + (1 - (spread_moving or 1))
 		end
@@ -5864,6 +5892,9 @@ function BlackMarketManager:accuracy_multiplier(name, category, silencer, curren
 			multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_steelsight" or "steelsight"])
 		else
 			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "hip_fire_spread_multiplier", 1))
+			if sub_category then
+				multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "hip_fire_spread_multiplier", 1))
+			end
 			if current_state._state_data.ducking and not current_state._unit_deploy_position then
 				multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_crouching" or "crouching"])
 			else
@@ -5877,7 +5908,7 @@ function BlackMarketManager:accuracy_multiplier(name, category, silencer, curren
 	return self:_convert_add_to_mul(multiplier)
 end
 
-function BlackMarketManager:recoil_addend(name, category, recoil_index, silencer, blueprint)
+function BlackMarketManager:recoil_addend(name, category, sub_category, recoil_index, silencer, blueprint)
 	local addend = 0
 	if recoil_index and 1 <= recoil_index and recoil_index <= #tweak_data.weapon.stats.recoil then
 		local index = recoil_index
@@ -5903,6 +5934,19 @@ function BlackMarketManager:recoil_addend(name, category, recoil_index, silencer
 			index = index + managers.player:upgrade_value("weapon", "silencer_recoil_index_addend", 0)
 			index = index + managers.player:upgrade_value(category, "silencer_recoil_index_addend", 0)
 		end
+		if sub_category then
+			index = index + managers.player:upgrade_value(sub_category, "recoil_index_addend", 0)
+			if managers.player:player_unit() and managers.player:player_unit():character_damage():is_suppressed() then
+				if managers.player:has_team_category_upgrade(sub_category, "suppression_recoil_index_addend") then
+					index = index + managers.player:team_upgrade_value(sub_category, "suppression_recoil_index_addend", 0)
+				end
+			elseif managers.player:has_team_category_upgrade(sub_category, "recoil_index_addend") then
+				index = index + managers.player:team_upgrade_value(sub_category, "recoil_index_addend", 0)
+			end
+			if silencer then
+				index = index + managers.player:upgrade_value(sub_category, "silencer_recoil_index_addend", 0)
+			end
+		end
 		if blueprint and self:is_weapon_modified(managers.weapon_factory:get_factory_id_by_weapon_id(name), blueprint) then
 			index = index + managers.player:upgrade_value("weapon", "modded_recoil_index_addend", 0)
 		end
@@ -5915,7 +5959,7 @@ function BlackMarketManager:recoil_addend(name, category, recoil_index, silencer
 	return addend
 end
 
-function BlackMarketManager:recoil_multiplier(name, category, silencer, blueprint)
+function BlackMarketManager:recoil_multiplier(name, category, sub_category, silencer, blueprint)
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "recoil_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "passive_recoil_multiplier", 1))
@@ -5940,6 +5984,20 @@ function BlackMarketManager:recoil_multiplier(name, category, silencer, blueprin
 	if silencer then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_recoil_multiplier", 1))
 		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "silencer_recoil_multiplier", 1))
+	end
+	if sub_category then
+		multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "recoil_multiplier", 1))
+		multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "passive_recoil_multiplier", 1))
+		if managers.player:player_unit() and managers.player:player_unit():character_damage():is_suppressed() then
+			if managers.player:has_team_category_upgrade(sub_category, "suppression_recoil_multiplier") then
+				multiplier = multiplier + (1 - managers.player:team_upgrade_value(sub_category, "suppression_recoil_multiplier", 1))
+			end
+		elseif managers.player:has_team_category_upgrade(sub_category, "recoil_multiplier") then
+			multiplier = multiplier + (1 - managers.player:team_upgrade_value(sub_category, "recoil_multiplier", 1))
+		end
+		if silencer then
+			multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "silencer_recoil_multiplier", 1))
+		end
 	end
 	if blueprint and self:is_weapon_modified(managers.weapon_factory:get_factory_id_by_weapon_id(name), blueprint) then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_recoil_multiplier", 1))

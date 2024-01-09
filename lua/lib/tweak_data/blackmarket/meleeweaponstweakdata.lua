@@ -1972,5 +1972,33 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.nin.repeat_expire_t = 0.65
 	self.melee_weapons.nin.expire_t = 1.2
 	self.melee_weapons.nin.melee_damage_delay = 0.1
+	self.melee_weapons.ballistic = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.ballistic.name_id = "bm_melee_ballistic"
+	self.melee_weapons.ballistic.texture_bundle_folder = "coco"
+	self.melee_weapons.ballistic.free = nil
+	self.melee_weapons.ballistic.anim_global_param = "melee_ballistic"
+	self.melee_weapons.ballistic.type = "knife"
+	self.melee_weapons.ballistic.align_objects = {
+		"a_weapon_right",
+		"a_weapon_left"
+	}
+	self.melee_weapons.ballistic.unit = "units/pd2_dlc_coco/weapons/wpn_fps_mel_ballistic/wpn_fps_mel_ballistic"
+	self.melee_weapons.ballistic.third_unit = "units/pd2_dlc_coco/weapons/wpn_fps_mel_ballistic/wpn_third_mel_ballistic"
+	self.melee_weapons.ballistic.stats.weapon_type = "sharp"
+	self.melee_weapons.ballistic.stats.min_damage = 3
+	self.melee_weapons.ballistic.stats.max_damage = 8
+	self.melee_weapons.ballistic.stats.min_damage_effect = 1
+	self.melee_weapons.ballistic.stats.max_damage_effect = 1
+	self.melee_weapons.ballistic.stats.charge_time = 2
+	self.melee_weapons.ballistic.stats.range = 200
+	self.melee_weapons.ballistic.sounds = {}
+	self.melee_weapons.ballistic.sounds.equip = "twin_equip"
+	self.melee_weapons.ballistic.sounds.hit_air = "twin_hit_air"
+	self.melee_weapons.ballistic.sounds.hit_gen = "twin_hit_gen"
+	self.melee_weapons.ballistic.sounds.hit_body = "twin_hit_body"
+	self.melee_weapons.ballistic.sounds.charge = "twin_charge"
+	self.melee_weapons.ballistic.repeat_expire_t = 0.6
+	self.melee_weapons.ballistic.stats.concealment = 29
+	self.melee_weapons.ballistic.dlc = nil
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

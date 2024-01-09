@@ -426,6 +426,15 @@ function MenuInput:mouse_pressed(o, button, x, y)
 end
 
 function MenuInput:mouse_released(o, button, x, y)
+	if not self._accept_input then
+		return
+	end
+	if managers.blackmarket and managers.blackmarket:is_preloading_weapons() then
+		return
+	end
+	if not managers.menu:active_menu() then
+		return
+	end
 	x, y = self:_modified_mouse_pos(x, y)
 	if self._slider_marker then
 		self:post_event("slider_release")
@@ -440,6 +449,15 @@ function MenuInput:mouse_released(o, button, x, y)
 end
 
 function MenuInput:mouse_clicked(o, button, x, y)
+	if not self._accept_input then
+		return
+	end
+	if managers.blackmarket and managers.blackmarket:is_preloading_weapons() then
+		return
+	end
+	if not managers.menu:active_menu() then
+		return
+	end
 	x, y = self:_modified_mouse_pos(x, y)
 	for i, clbk in pairs(self._callback_map.mouse_clicked) do
 		clbk(o, button, x, y)
@@ -451,6 +469,15 @@ function MenuInput:mouse_clicked(o, button, x, y)
 end
 
 function MenuInput:mouse_double_click(o, button, x, y)
+	if not self._accept_input then
+		return
+	end
+	if managers.blackmarket and managers.blackmarket:is_preloading_weapons() then
+		return
+	end
+	if not managers.menu:active_menu() then
+		return
+	end
 	x, y = self:_modified_mouse_pos(x, y)
 	for i, clbk in pairs(self._callback_map.mouse_double_click) do
 		clbk(o, button, x, y)

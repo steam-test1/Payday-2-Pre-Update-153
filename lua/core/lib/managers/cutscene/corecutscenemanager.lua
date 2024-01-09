@@ -183,9 +183,6 @@ function CoreCutsceneManager:update()
 	do return end
 	local time = self._timer:time()
 	local delta_time = self._timer:delta_time()
-	if Application:production_build() then
-		self:start_delayed_cutscene()
-	end
 	if self._stop_playback then
 		self:_cleanup()
 		self._stop_playback = nil

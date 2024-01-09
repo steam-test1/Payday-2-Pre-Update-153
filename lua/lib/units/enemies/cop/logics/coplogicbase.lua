@@ -604,7 +604,8 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 	local att_unit = attention_info.unit
 	local m_pos = attention_info.handler:get_ground_m_pos()
 	local m_head_pos = attention_info.handler:get_detection_m_pos()
-	local is_local_player, is_husk_player, is_deployable, is_person, is_very_dangerous, nav_tracker, char_tweak
+	local is_local_player, is_husk_player, is_deployable, is_person, is_very_dangerous, nav_tracker, char_tweak, m_rot, is_shield
+	local is_alive = true
 	if att_unit:base() then
 		is_local_player = att_unit:base().is_local_player
 		is_husk_player = att_unit:base().is_husk_player
@@ -614,6 +615,13 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 			char_tweak = att_unit:base():char_tweak()
 		end
 		is_very_dangerous = att_unit:base()._tweak_table == "taser" or att_unit:base()._tweak_table == "spooc"
+		is_shield = att_unit:base()._tweak_table == "shield" or att_unit:base()._tweak_table == "phalanx_minion"
+	end
+	if att_unit:movement() and att_unit:movement().m_rot then
+		m_rot = att_unit:movement():m_rot()
+	end
+	if att_unit:character_damage() and att_unit:character_damage().dead then
+		is_alive = not att_unit:character_damage():dead()
 	end
 	local dis = mvector3.distance(my_unit:movement():m_head_pos(), m_head_pos)
 	local new_entry = {
@@ -624,6 +632,7 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 		next_verify_t = time + (settings.notice_interval or settings.verification_interval),
 		prev_notice_chk_t = time,
 		notice_progress = 0,
+		m_rot = m_rot,
 		m_pos = m_pos,
 		m_head_pos = m_head_pos,
 		nav_tracker = attention_info.nav_tracker,
@@ -633,6 +642,8 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 		is_deployable = is_deployable,
 		is_person = is_person,
 		is_very_dangerous = is_very_dangerous,
+		is_shield = is_shield,
+		is_alive = is_alive,
 		reaction = settings.reaction,
 		criminal_record = managers.groupai:state():criminal_record(u_key),
 		char_tweak = char_tweak,

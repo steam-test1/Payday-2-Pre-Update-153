@@ -65,10 +65,12 @@ function GroupAIStateBesiege:assign_enemy_to_group_ai(unit, team_id)
 	local u_tracker = unit:movement():nav_tracker()
 	local seg = u_tracker:nav_segment()
 	local area = self:get_area_from_nav_seg_id(seg)
+	local current_unit_type = tweak_data.levels:get_ai_group_type()
 	local u_name = unit:name()
 	local u_category
 	for cat_name, category in pairs(tweak_data.group_ai.unit_categories) do
-		for _, test_u_name in ipairs(category.units) do
+		local units = category.unit_types[current_unit_type]
+		for _, test_u_name in ipairs(units) do
 			if u_name == test_u_name then
 				u_category = cat_name
 				break
@@ -1056,12 +1058,14 @@ function GroupAIStateBesiege:_upd_group_spawning()
 			return
 		end
 		local hopeless = true
+		local current_unit_type = tweak_data.levels:get_ai_group_type()
 		for _, sp_data in ipairs(spawn_points) do
 			local category = group_ai_tweak.unit_categories[u_type_name]
 			if (sp_data.accessibility == "any" or category.access[sp_data.accessibility]) and (not sp_data.amount or sp_data.amount > 0) and sp_data.mission_element:enabled() then
 				hopeless = false
 				if self._t > sp_data.delay_t then
-					produce_data.name = category.units[math.random(#category.units)]
+					local units = category.unit_types[current_unit_type]
+					produce_data.name = units[math.random(#units)]
 					local spawned_unit = sp_data.mission_element:produce(produce_data)
 					local u_key = spawned_unit:key()
 					local objective

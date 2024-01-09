@@ -108,6 +108,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_model70_npc()
 	self:_init_data_m37_npc()
 	self:_init_data_china_npc()
+	self:_init_data_sr2_npc()
+	self:_init_data_x_sr2_npc()
 	self:_precalculate_values()
 end
 
@@ -269,6 +271,7 @@ function WeaponTweakData:_init_data_m4_npc()
 	self.m4_npc.suppression = 1
 	self.m4_secondary_npc = deep_clone(self.m4_npc)
 	self.m4_secondary_npc.use_data.selection_index = 1
+	self.ak47_ass_npc = deep_clone(self.m4_npc)
 end
 
 function WeaponTweakData:_init_data_ak47_npc()
@@ -311,6 +314,7 @@ function WeaponTweakData:_init_data_m14_sniper_npc()
 	self.m14_sniper_npc.alert_size = 5000
 	self.m14_sniper_npc.suppression = 1
 	self.m14_sniper_npc.armor_piercing = true
+	self.svd_snp_npc = deep_clone(self.m14_sniper_npc)
 end
 
 function WeaponTweakData:_init_data_r870_npc()
@@ -358,6 +362,9 @@ function WeaponTweakData:_init_data_mp5_npc()
 	self.mp5_tactical_npc = deep_clone(self.mp5_npc)
 	self.mp5_tactical_npc.has_suppressor = "suppressed_a"
 	self.ump_npc = deep_clone(self.mp5_npc)
+	self.akmsu_smg_npc = deep_clone(self.mp5_npc)
+	self.asval_smg_npc = deep_clone(self.mp5_npc)
+	self.asval_smg_npc.has_suppressor = "suppressed_a"
 end
 
 function WeaponTweakData:_init_data_mac11_npc()
@@ -416,6 +423,7 @@ function WeaponTweakData:_init_data_mp9_npc()
 	self.mp9_npc.hold = "pistol"
 	self.mp9_npc.alert_size = 1000
 	self.mp9_npc.suppression = 1
+	self.sr2_smg_npc = deep_clone(self.mp9_npc)
 end
 
 function WeaponTweakData:_init_data_olympic_npc()
@@ -1023,9 +1031,7 @@ function WeaponTweakData:_init_data_m249_npc()
 	self.m249_npc.hold = "rifle"
 	self.m249_npc.alert_size = 5000
 	self.m249_npc.suppression = 1
-	self.m249_secondary_npc = deep_clone(self.m249_npc)
-	self.m249_secondary_npc.use_data.selection_index = 1
-	self.m249_secondary_npc.armor_piercing = true
+	self.rpk_lmg_npc = deep_clone(self.m249_npc)
 end
 
 function WeaponTweakData:_init_data_rpk_npc()
@@ -1892,6 +1898,35 @@ function WeaponTweakData:_init_data_china_npc()
 	self.china_npc.hold = "rifle"
 	self.china_npc.alert_size = 2800
 	self.china_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_sr2_npc()
+	self.sr2_npc.sounds.prefix = "sr2_npc"
+	self.sr2_npc.use_data.selection_index = 1
+	self.sr2_npc.DAMAGE = 2
+	self.sr2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sr2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sr2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sr2_npc.CLIP_AMMO_MAX = 30
+	self.sr2_npc.NR_CLIPS_MAX = 5
+	self.sr2_npc.auto.fire_rate = 20
+	self.sr2_npc.hold = "pistol"
+	self.sr2_npc.alert_size = 5000
+	self.sr2_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_sr2_npc()
+	self.x_sr2_npc.sounds.prefix = "sr2_x_npc"
+	self.x_sr2_npc.use_data.selection_index = 2
+	self.x_sr2_npc.DAMAGE = 1.25
+	self.x_sr2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_sr2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_sr2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_sr2_npc.CLIP_AMMO_MAX = 80
+	self.x_sr2_npc.NR_CLIPS_MAX = 5
+	self.x_sr2_npc.hold = "akimbo_pistol"
+	self.x_sr2_npc.alert_size = 1800
+	self.x_sr2_npc.suppression = 2
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -7117,6 +7152,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.jowi = {}
 	self.jowi.category = "akimbo"
+	self.jowi.sub_category = "pistol"
 	self.jowi.damage_melee = damage_melee_default
 	self.jowi.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.jowi.sounds = {}
@@ -7206,6 +7242,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.x_1911 = {}
 	self.x_1911.category = "akimbo"
+	self.x_1911.sub_category = "pistol"
 	self.x_1911.damage_melee = damage_melee_default
 	self.x_1911.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_1911.sounds = {}
@@ -7295,6 +7332,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.x_b92fs = {}
 	self.x_b92fs.category = "akimbo"
+	self.x_b92fs.sub_category = "pistol"
 	self.x_b92fs.damage_melee = damage_melee_default
 	self.x_b92fs.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_b92fs.sounds = {}
@@ -7384,6 +7422,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.x_deagle = {}
 	self.x_deagle.category = "akimbo"
+	self.x_deagle.sub_category = "pistol"
 	self.x_deagle.damage_melee = damage_melee_default
 	self.x_deagle.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_deagle.sounds = {}
@@ -8741,6 +8780,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b682.stats_modifiers = {damage = 1}
 	self.x_g22c = {}
 	self.x_g22c.category = "akimbo"
+	self.x_g22c.sub_category = "pistol"
 	self.x_g22c.damage_melee = damage_melee_default
 	self.x_g22c.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_g22c.sounds = {}
@@ -8831,6 +8871,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.x_g17 = {}
 	self.x_g17.category = "akimbo"
+	self.x_g17.sub_category = "pistol"
 	self.x_g17.damage_melee = damage_melee_default
 	self.x_g17.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_g17.sounds = {}
@@ -8921,6 +8962,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.x_usp = {}
 	self.x_usp.category = "akimbo"
+	self.x_usp.sub_category = "pistol"
 	self.x_usp.damage_melee = damage_melee_default
 	self.x_usp.damage_melee_effect_mul = damage_melee_effect_multiplier_default
 	self.x_usp.sounds = {}
@@ -10977,6 +11019,189 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		value = 1
 	}
 	self.china.stats_modifiers = {damage = 2}
+	self.sr2 = {}
+	self.sr2.category = "smg"
+	self.sr2.damage_melee = damage_melee_default
+	self.sr2.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.sr2.sounds = {}
+	self.sr2.sounds.fire = "sr2_fire_single"
+	self.sr2.sounds.fire_single = "sr2_fire_single"
+	self.sr2.sounds.fire_auto = "sr2_fire"
+	self.sr2.sounds.stop_fire = "sr2_stop"
+	self.sr2.sounds.dryfire = "secondary_dryfire"
+	self.sr2.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.sr2.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.sr2.timers = {}
+	self.sr2.timers.reload_not_empty = 2.07
+	self.sr2.timers.reload_empty = 4
+	self.sr2.timers.unequip = 0.55
+	self.sr2.timers.equip = 0.5
+	self.sr2.name_id = "bm_w_sr2"
+	self.sr2.desc_id = "bm_w_sr2_desc"
+	self.sr2.description_id = "des_sr2"
+	self.sr2.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.sr2.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.sr2.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sr2.use_data = {}
+	self.sr2.use_data.selection_index = 1
+	self.sr2.DAMAGE = 1
+	self.sr2.CLIP_AMMO_MAX = 32
+	self.sr2.NR_CLIPS_MAX = 5
+	self.sr2.AMMO_MAX = self.cobray.CLIP_AMMO_MAX * self.cobray.NR_CLIPS_MAX
+	self.sr2.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 1)
+	self.sr2.FIRE_MODE = "auto"
+	self.sr2.fire_mode_data = {}
+	self.sr2.fire_mode_data.fire_rate = 0.08
+	self.sr2.CAN_TOGGLE_FIREMODE = true
+	self.sr2.auto = {}
+	self.sr2.auto.fire_rate = 0.08
+	self.sr2.spread = {}
+	self.sr2.spread.standing = self.new_m4.spread.standing
+	self.sr2.spread.crouching = self.new_m4.spread.crouching
+	self.sr2.spread.steelsight = self.new_m4.spread.steelsight
+	self.sr2.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.sr2.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.sr2.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.sr2.kick = {}
+	self.sr2.kick.standing = {
+		-0.6,
+		1.2,
+		-1,
+		1
+	}
+	self.sr2.kick.crouching = self.cobray.kick.standing
+	self.sr2.kick.steelsight = self.cobray.kick.standing
+	self.sr2.crosshair = {}
+	self.sr2.crosshair.standing = {}
+	self.sr2.crosshair.crouching = {}
+	self.sr2.crosshair.steelsight = {}
+	self.sr2.crosshair.standing.offset = 0.4
+	self.sr2.crosshair.standing.moving_offset = 0.7
+	self.sr2.crosshair.standing.kick_offset = 0.6
+	self.sr2.crosshair.crouching.offset = 0.3
+	self.sr2.crosshair.crouching.moving_offset = 0.6
+	self.sr2.crosshair.crouching.kick_offset = 0.4
+	self.sr2.crosshair.steelsight.hidden = true
+	self.sr2.crosshair.steelsight.offset = 0
+	self.sr2.crosshair.steelsight.moving_offset = 0
+	self.sr2.crosshair.steelsight.kick_offset = 0.4
+	self.sr2.shake = {}
+	self.sr2.shake.fire_multiplier = 1
+	self.sr2.shake.fire_steelsight_multiplier = -1
+	self.sr2.autohit = autohit_smg_default
+	self.sr2.aim_assist = aim_assist_smg_default
+	self.sr2.animations = {}
+	self.sr2.animations.equip_id = "equip_cobray"
+	self.sr2.animations.recoil_steelsight = true
+	self.sr2.texture_bundle_folder = "coco"
+	self.sr2.panic_suppression_chance = 0.2
+	self.sr2.stats = {
+		damage = 40,
+		spread = 14,
+		recoil = 12,
+		spread_moving = 14,
+		zoom = 3,
+		concealment = 25,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.x_sr2 = {}
+	self.x_sr2.category = "akimbo"
+	self.x_sr2.sub_category = "smg"
+	self.x_sr2.damage_melee = damage_melee_default
+	self.x_sr2.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_sr2.sounds = {}
+	self.x_sr2.sounds.fire = "sr2_x_fire"
+	self.x_sr2.sounds.fire_single = "sr2_x_fire_single"
+	self.x_sr2.sounds.fire_auto = "sr2_x_fire"
+	self.x_sr2.sounds.stop_fire = "sr2_x_stop"
+	self.x_sr2.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_sr2.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_sr2.sounds.dryfire = "secondary_dryfire"
+	self.x_sr2.timers = {}
+	self.x_sr2.timers.reload_not_empty = 3.6
+	self.x_sr2.timers.reload_empty = 4.4
+	self.x_sr2.timers.unequip = 0.5
+	self.x_sr2.timers.equip = 0.5
+	self.x_sr2.name_id = "bm_w_x_sr2"
+	self.x_sr2.desc_id = "bm_w_x_sr2_desc"
+	self.x_sr2.description_id = "des_x_sr2"
+	self.x_sr2.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_sr2.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_sr2.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_sr2.use_data = {}
+	self.x_sr2.use_data.selection_index = 2
+	self.x_sr2.DAMAGE = 1
+	self.x_sr2.CLIP_AMMO_MAX = 64
+	self.x_sr2.NR_CLIPS_MAX = 6
+	self.x_sr2.AMMO_MAX = self.jowi.CLIP_AMMO_MAX * self.jowi.NR_CLIPS_MAX
+	self.x_sr2.AMMO_PICKUP = self:_pickup_chance(self.jowi.AMMO_MAX, 1)
+	self.x_sr2.FIRE_MODE = "auto"
+	self.x_sr2.fire_mode_data = {}
+	self.x_sr2.fire_mode_data.fire_rate = 0.08
+	self.x_sr2.single = {}
+	self.x_sr2.single.fire_rate = 0.08
+	self.x_sr2.spread = {}
+	self.x_sr2.spread.standing = self.new_m4.spread.standing
+	self.x_sr2.spread.crouching = self.new_m4.spread.crouching
+	self.x_sr2.spread.steelsight = self.new_m4.spread.steelsight
+	self.x_sr2.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.x_sr2.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.x_sr2.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.x_sr2.kick = {}
+	self.x_sr2.kick.standing = {
+		1.4,
+		1.2,
+		-0.5,
+		0.5
+	}
+	self.x_sr2.kick.crouching = self.jowi.kick.standing
+	self.x_sr2.kick.steelsight = self.jowi.kick.standing
+	self.x_sr2.crosshair = {}
+	self.x_sr2.crosshair.standing = {}
+	self.x_sr2.crosshair.crouching = {}
+	self.x_sr2.crosshair.steelsight = {}
+	self.x_sr2.crosshair.standing.offset = 0.2
+	self.x_sr2.crosshair.standing.moving_offset = 0.6
+	self.x_sr2.crosshair.standing.kick_offset = 0.4
+	self.x_sr2.crosshair.crouching.offset = 0.1
+	self.x_sr2.crosshair.crouching.moving_offset = 0.6
+	self.x_sr2.crosshair.crouching.kick_offset = 0.3
+	self.x_sr2.crosshair.steelsight.hidden = true
+	self.x_sr2.crosshair.steelsight.offset = 0
+	self.x_sr2.crosshair.steelsight.moving_offset = 0
+	self.x_sr2.crosshair.steelsight.kick_offset = 0.1
+	self.x_sr2.shake = {}
+	self.x_sr2.shake.fire_multiplier = 1
+	self.x_sr2.shake.fire_steelsight_multiplier = -1
+	self.x_sr2.autohit = autohit_pistol_default
+	self.x_sr2.aim_assist = aim_assist_pistol_default
+	self.x_sr2.weapon_hold = "x_sr2"
+	self.x_sr2.animations = {}
+	self.x_sr2.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_sr2.animations.has_steelsight_stance = true
+	self.x_sr2.animations.recoil_steelsight = true
+	self.x_sr2.panic_suppression_chance = 0.2
+	self.x_sr2.texture_bundle_folder = "coco"
+	self.x_sr2.stats = {
+		damage = 40,
+		spread = 14,
+		recoil = 12,
+		spread_moving = 14,
+		zoom = 3,
+		concealment = 25,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -11695,6 +11920,18 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.sr2_npc = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_sr2_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -11803,4 +12040,6 @@ function WeaponTweakData:_precalculate_values()
 	self.model70_npc.AMMO_MAX = self.model70_npc.CLIP_AMMO_MAX * self.model70_npc.NR_CLIPS_MAX
 	self.m37_npc.AMMO_MAX = self.m37_npc.CLIP_AMMO_MAX * self.m37_npc.NR_CLIPS_MAX
 	self.china_npc.AMMO_MAX = self.china_npc.CLIP_AMMO_MAX * self.china_npc.NR_CLIPS_MAX
+	self.sr2_npc.AMMO_MAX = self.sr2_npc.CLIP_AMMO_MAX * self.sr2_npc.NR_CLIPS_MAX
+	self.x_sr2_npc.AMMO_MAX = self.x_sr2_npc.CLIP_AMMO_MAX * self.x_sr2_npc.NR_CLIPS_MAX
 end

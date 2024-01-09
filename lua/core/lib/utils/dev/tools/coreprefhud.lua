@@ -164,9 +164,6 @@ local ids_f1 = Idstring("f1")
 local is_win32 = SystemInfo:platform() == ids_win32
 
 function PrefHud:update_keys()
-	if Application:production_build() and is_win32 and Input:keyboard():down(ids_left_ctrl) and Input:keyboard():pressed(ids_f1) then
-		self:toggle()
-	end
 end
 
 function PrefHud:update(t, dt)

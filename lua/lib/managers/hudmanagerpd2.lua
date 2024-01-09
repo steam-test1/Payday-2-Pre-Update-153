@@ -264,6 +264,26 @@ function HUDManager:set_stored_health_max(stored_health_ratio)
 	self._teammate_panels[HUDManager.PLAYER_PANEL]:set_stored_health_max(stored_health_ratio)
 end
 
+function HUDManager:update_cocaine_hud()
+	for _, panel in pairs(self._teammate_panels) do
+	end
+end
+
+function HUDManager:set_info_meter(i, data)
+	self._teammate_panels[i or HUDManager.PLAYER_PANEL]:set_info_meter(data)
+end
+
+function HUDManager:set_absorb_max(absorb_amount)
+end
+
+function HUDManager:set_absorb_personal(i, absorb_amount)
+	self._teammate_panels[i or HUDManager.PLAYER_PANEL]:set_absorb_personal(absorb_amount)
+end
+
+function HUDManager:set_absorb_active(i, absorb_amount)
+	self._teammate_panels[i or HUDManager.PLAYER_PANEL]:set_absorb_active(absorb_amount)
+end
+
 function HUDManager:add_item(data)
 	self:set_deployable_equipment(HUDManager.PLAYER_PANEL, data)
 end
@@ -426,6 +446,15 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 			self:set_teammate_callsign(i, ai and 5 or peer_id)
 			self:set_teammate_name(i, player_name)
 			self:set_teammate_state(i, ai and "ai" or "player")
+			local synced_cocaine_stacks = managers.player:get_synced_cocaine_stacks(peer_id)
+			if synced_cocaine_stacks and synced_cocaine_stacks.in_use then
+				self:set_info_meter(i, {
+					icon = "guis/dlcs/coco/textures/pd2/hud_absorb_stack_icon_01",
+					current = managers.player:get_peer_cocaine_damage_absorption_ratio(peer_id),
+					total = managers.player:get_peer_cocaine_damage_absorption_max_ratio(peer_id),
+					max = 1
+				})
+			end
 			if peer_id then
 				local peer_equipment = managers.player:get_synced_equipment_possession(peer_id) or {}
 				for equipment, amount in pairs(peer_equipment) do

@@ -94,7 +94,6 @@ function AchievmentManager.fetch_achievments(error_str)
 	if error_str == "success" then
 		for id, ach in pairs(managers.achievment.achievments) do
 			if managers.achievment.handler:has_achievement(ach.id) then
-				print("Achievment awarded", ach.id)
 				ach.awarded = true
 			end
 		end
@@ -189,7 +188,6 @@ function AchievmentManager:total_unlocked()
 end
 
 function AchievmentManager:award(id)
-	print("[AchievmentManager:award] ", id)
 	if not self:exists(id) then
 		Application:debug("[AchievmentManager:award] Awarding non-existing achievement", "id", id)
 		return

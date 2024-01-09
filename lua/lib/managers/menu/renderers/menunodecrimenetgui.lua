@@ -1871,10 +1871,10 @@ function MenuNodeCrimenetChallengeGui:_create_timestamp_string_extended(timestam
 	local minutes = 59 - tonumber(Application:date("%M"))
 	local seconds = 59 - tonumber(Application:date("%S"))
 	local expire_string = ""
-	if 24 < timestamp then
+	if 24 <= timestamp then
 		expire_string = managers.localization:text("menu_challenge_expire_time_extended_with_days", {
-			days = timestamp % 24,
-			hours = math.floor(timestamp / 24),
+			days = math.floor(timestamp / 24),
+			hours = timestamp % 24,
 			minutes = minutes,
 			seconds = seconds
 		})
@@ -1985,31 +1985,11 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 				y = math.max(name_text:bottom(), desc_text:bottom())
 			end
 		end
-		if not challenge.rewarded then
-			local timestamp = challenge.timestamp
-			local interval = challenge.interval
-			local expire_timestamp = interval + timestamp
-			local current_timestamp = managers.challenge:get_timestamp()
-			local expire_time = expire_timestamp - current_timestamp
-			local expire_string = self:_create_timestamp_string_extended(expire_time)
-			local expire_text = self._info_panel:text({
-				name = "expire_text",
-				text = expire_string,
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				color = expire_time <= 4 and tweak_data.screen_colors.important_1 or tweak_data.screen_colors.important_2,
-				alpha = expire_time == 0 and 1 or 0.9,
-				blend_mode = "add"
-			})
-			make_fine_text(expire_text)
-			expire_text:set_bottom(self._info_panel:h())
-			self._expire_text = expire_text
-		end
 		local rewards_panel
 		if challenge.rewards and 0 < #challenge.rewards then
 			local x = self.PADDING
 			local min_height = 64
-			local height = math.clamp(self._info_panel:h() - y - self.PADDING * 2 - tweak_data.menu.pd2_small_font_size - (alive(self._expire_text) and self._expire_text:h() or 0), min_height, 128)
+			local height = math.clamp(self._info_panel:h() - y - self.PADDING * 2 - tweak_data.menu.pd2_small_font_size - 0, min_height, 128)
 			local width = math.min((self._info_panel:w() - self.PADDING * (#challenge.rewards - 1)) / #challenge.rewards, height)
 			rewards_panel = self._info_panel:panel({
 				name = "rewards_panel",
@@ -2017,7 +1997,7 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 			})
 			rewards_panel:set_w((width - 2 * self.PADDING) * #challenge.rewards + self.PADDING * (#challenge.rewards + 1))
 			rewards_panel:set_h(height)
-			rewards_panel:set_bottom(self._info_panel:h() - (alive(self._expire_text) and self._expire_text:h() or 0))
+			rewards_panel:set_bottom(self._info_panel:h() - 0)
 			rewards_panel:set_right(self._info_panel:w())
 			local files_menu = rewards_panel:panel({name = "files_menu"})
 			local locked
@@ -2084,6 +2064,35 @@ function MenuNodeCrimenetChallengeGui:set_contact_info(id, name, files, override
 			reward_text:set_h(h)
 			y = reward_text:bottom()
 		end
+		if not challenge.rewarded then
+			local timestamp = challenge.timestamp
+			local interval = challenge.interval
+			local expire_timestamp = interval + timestamp
+			local current_timestamp = managers.challenge:get_timestamp()
+			local expire_time = expire_timestamp - current_timestamp
+			local expire_string = self:_create_timestamp_string_extended(expire_time)
+			local expire_text = self._info_panel:text({
+				name = "expire_text",
+				text = utf8.to_upper(expire_string),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = expire_time <= 4 and tweak_data.screen_colors.important_1 or tweak_data.screen_colors.important_2,
+				alpha = 1,
+				blend_mode = "add"
+			})
+			make_fine_text(expire_text)
+			expire_text:set_bottom((alive(rewards_panel) and rewards_panel:top() or self._info_panel:h()) - self.PADDING)
+			expire_text:set_width(self._info_panel:w())
+			expire_text:set_align("center")
+			local expire_bg = self._info_panel:rect({
+				name = "expire_bg",
+				color = tweak_data.screen_colors.important_2,
+				alpha = expire_time == 0 and 0.6 or expire_time <= 4 and 0.5 or 0.3,
+				blend_mode = "add"
+			})
+			expire_bg:set_shape(expire_text:shape())
+			self._expire_text = expire_text
+		end
 	elseif ids == Idstring("_introduction") then
 		local introduction_text = self._info_panel:text({
 			name = "introduction_text",
@@ -2129,11 +2138,9 @@ function MenuNodeCrimenetChallengeGui:update(t, dt)
 		local current_timestamp = managers.challenge:get_timestamp()
 		local expire_time = expire_timestamp - current_timestamp
 		local expire_string = self:_create_timestamp_string_extended(expire_time)
-		self._expire_text:set_text(expire_string)
+		self._expire_text:set_text(utf8.to_upper(expire_string))
 		self._expire_text:set_color(expire_time <= 4 and tweak_data.screen_colors.important_1 or tweak_data.screen_colors.important_2)
 		self._expire_text:set_alpha(expire_time == 0 and 1 or 0.9)
-		make_fine_text(self._expire_text)
-		self._expire_text:set_bottom(self._info_panel:h())
 	end
 end
 

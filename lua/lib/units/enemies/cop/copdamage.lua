@@ -347,8 +347,8 @@ function CopDamage:damage_bullet(attack_data)
 			if attack_data.attacker_unit:character_damage():bleed_out() and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
 				local messiah_revive = false
 				if managers.player:has_category_upgrade("player", "pistol_revive_from_bleed_out") and not data.weapon_unit:base().thrower_unit then
-					local weapon_category = data.weapon_unit:base():weapon_tweak_data().category
-					if (weapon_category == "pistol" or weapon_category == "akimbo") and attack_data.attacker_unit:character_damage():consume_messiah_charge() then
+					local weapon_data = data.weapon_unit:base():weapon_tweak_data()
+					if (weapon_data.category == "pistol" or weapon_data.sub_category == "pistol") and attack_data.attacker_unit:character_damage():consume_messiah_charge() then
 						messiah_revive = true
 					end
 				end

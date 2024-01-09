@@ -353,38 +353,6 @@ function NewRaycastWeaponBase:check_stats()
 	return stats
 end
 
-function NewRaycastWeaponBase:spread_multiplier()
-	local multiplier = NewRaycastWeaponBase.super.spread_multiplier(self)
-	if self._silencer then
-		multiplier = multiplier * managers.player:upgrade_value("weapon", "silencer_spread_multiplier", 1)
-		multiplier = multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_spread_multiplier", 1)
-	end
-	return multiplier
-end
-
-function NewRaycastWeaponBase:recoil_addend()
-	return managers.blackmarket:recoil_addend(self._name_id, self:weapon_tweak_data().category, self._current_stats_indices and self._current_stats_indices.recoil, self._silencer, self._blueprint)
-end
-
-function NewRaycastWeaponBase:recoil_multiplier()
-	local multiplier = NewRaycastWeaponBase.super.recoil_multiplier(self)
-	multiplier = multiplier * managers.player:upgrade_value("weapon", "passive_recoil_multiplier", 1)
-	if self._silencer then
-		multiplier = multiplier * managers.player:upgrade_value("weapon", "silencer_recoil_multiplier", 1)
-		multiplier = multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_recoil_multiplier", 1)
-	end
-	return multiplier
-end
-
-function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()
-	local multiplier = NewRaycastWeaponBase.super.enter_steelsight_speed_multiplier(self)
-	if self._silencer then
-		multiplier = multiplier * managers.player:upgrade_value("weapon", "silencer_enter_steelsight_speed_multiplier", 1)
-		multiplier = multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_enter_steelsight_speed_multiplier", 1)
-	end
-	return multiplier
-end
-
 function NewRaycastWeaponBase:destroy(unit)
 	if self._parts_texture_switches then
 		for part_id, texture_ids in pairs(self._parts_texture_switches) do

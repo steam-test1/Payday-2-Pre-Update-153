@@ -126,6 +126,14 @@ function ActionSpooc:init(action_desc, common_data)
 		self._unit:sound():play("cloaker_detect_mono", nil, nil)
 	end
 	self._unit:damage():run_sequence_simple("turn_on_spook_lights")
+	local r = LevelsTweakData.LevelType.Russia
+	local ai_type = tweak_data.levels:get_ai_group_type()
+	self._taunt_during_assault = "cloaker_taunt_during_assault"
+	self._taunt_after_assault = "cloaker_taunt_after_assault"
+	if ai_type == r then
+		self._taunt_during_assault = "rcloaker_taunt_during_assault"
+		self._taunt_after_assault = "rcloaker_taunt_after_assault"
+	end
 	return true
 end
 
@@ -139,7 +147,7 @@ function ActionSpooc:on_exit()
 	else
 		self._unit:sound():play("cloaker_presence_loop", nil, nil)
 		if self._is_local and self._taunt_at_beating_played and not self._unit:sound():speaking(TimerManager:game():time()) then
-			self._unit:sound():say("cloaker_taunt_after_assault", true, true)
+			self._unit:sound():say(self._taunt_after_assault, true, true)
 		end
 	end
 	self._unit:damage():run_sequence_simple("kill_spook_lights")
@@ -710,7 +718,7 @@ function ActionSpooc:_upd_striking(t)
 	end
 	if not self._taunt_at_beating_played then
 		self._taunt_at_beating_played = true
-		self._unit:sound():say("cloaker_taunt_during_assault", nil, true)
+		self._unit:sound():say(self._taunt_during_assault, nil, true)
 	end
 end
 
@@ -829,9 +837,10 @@ end
 
 function ActionSpooc:anim_act_clbk(anim_act)
 	if anim_act == "strike" then
+		local sound_string = "clk_punch_3rd_person_3p"
 		if self._stroke_t then
 			if self._strike_unit then
-				self._unit:sound():say("punch_3rd_person_3p", true)
+				self._unit:sound():say(sound_string, true, true)
 			end
 			return
 		end
@@ -842,7 +851,7 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			self._unit:sound():play("cloaker_detect_stop", nil, nil)
 		end
 		if not self._is_local then
-			self._unit:sound():say("punch_3rd_person_3p", true)
+			self._unit:sound():say(sound_string, true, true)
 			self._beating_end_t = self._stroke_t + 1
 			return
 		end
@@ -913,7 +922,7 @@ function ActionSpooc:anim_act_clbk(anim_act)
 			end
 			return
 		end
-		self._unit:sound():say("punch_3rd_person_3p", true)
+		self._unit:sound():say(sound_string, true, true)
 		if self._strike_unit:base().is_local_player then
 			self:_play_strike_camera_shake()
 			mvector3.negate(target_vec)

@@ -382,14 +382,6 @@ function CoreCutscenePlayer:invoke_callback_in_gui(gui_name, function_name, ...)
 		local script = gui_object:script()
 		local callback_func = rawget(script, function_name)
 		if type(callback_func) == "function" then
-			if Application:production_build() then
-				local argument_string = table.concat(table.collect({
-					...
-				}, function(arg)
-					return type(arg) == "string" and string.format("%q", arg) or tostring(arg)
-				end), ", ")
-				cat_print("cutscene", string.format("[CoreCutscenePlayer] Calling %s(%s) in Gui \"%s\".", function_name, argument_string, gui_name))
-			end
 			callback_func(...)
 		end
 	end

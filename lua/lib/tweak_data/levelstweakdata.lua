@@ -1,6 +1,15 @@
 LevelsTweakData = LevelsTweakData or class()
+LevelsTweakData.LevelType = {}
+LevelsTweakData.LevelType.America = "america"
+LevelsTweakData.LevelType.Russia = "russia"
 
 function LevelsTweakData:init()
+	local america = LevelsTweakData.LevelType.America
+	local russia = LevelsTweakData.LevelType.Russia
+	self.ai_groups = {}
+	self.ai_groups.default = america
+	self.ai_groups.america = america
+	self.ai_groups.russia = russia
 	self.framing_frame_1 = {}
 	self.framing_frame_1.name_id = "heist_framing_frame_1_hl"
 	self.framing_frame_1.briefing_id = "heist_framing_frame_1_briefing"
@@ -18,6 +27,7 @@ function LevelsTweakData:init()
 	self.framing_frame_1.cube = "cube_apply_heist_bank"
 	self.framing_frame_1.ghost_bonus = 0.075
 	self.framing_frame_1.max_bags = 13
+	self.framing_frame_1.ai_group_type = america
 	self.framing_frame_2 = {}
 	self.framing_frame_2.name_id = "heist_framing_frame_2_hl"
 	self.framing_frame_2.briefing_id = "heist_framing_frame_2_briefing"
@@ -35,6 +45,7 @@ function LevelsTweakData:init()
 	self.framing_frame_2.cube = "cube_apply_heist_bank"
 	self.framing_frame_2.ghost_bonus = 0.025
 	self.framing_frame_2.max_bags = 13
+	self.framing_frame_2.ai_group_type = america
 	self.framing_frame_3 = {}
 	self.framing_frame_3.name_id = "heist_framing_frame_3_hl"
 	self.framing_frame_3.briefing_id = "heist_framing_frame_3_briefing"
@@ -51,6 +62,7 @@ function LevelsTweakData:init()
 	self.framing_frame_3.cube = "cube_apply_heist_bank"
 	self.framing_frame_3.ghost_bonus = 0.15
 	self.framing_frame_3.max_bags = 21
+	self.framing_frame_3.ai_group_type = america
 	self.election_day_1 = {}
 	self.election_day_1.name_id = "heist_election_day_1_hl"
 	self.election_day_1.briefing_id = "eday1_brief"
@@ -69,6 +81,7 @@ function LevelsTweakData:init()
 	self.election_day_1.cube = "cube_apply_heist_bank"
 	self.election_day_1.ghost_bonus = 0.05
 	self.election_day_1.max_bags = 0
+	self.election_day_1.ai_group_type = america
 	self.election_day_2 = {}
 	self.election_day_2.name_id = "heist_election_day_2_hl"
 	self.election_day_2.briefing_id = "eday2_brief"
@@ -86,6 +99,7 @@ function LevelsTweakData:init()
 	self.election_day_2.cube = "cube_apply_heist_bank"
 	self.election_day_2.ghost_bonus = 0.15
 	self.election_day_2.max_bags = 21
+	self.election_day_2.ai_group_type = america
 	self.election_day_3 = {}
 	self.election_day_3.name_id = "heist_election_day_3_hl"
 	self.election_day_3.briefing_id = "eday3_brief_skip1"
@@ -97,6 +111,7 @@ function LevelsTweakData:init()
 	self.election_day_3.package = "packages/narr_election3"
 	self.election_day_3.cube = "cube_apply_heist_bank"
 	self.election_day_3.max_bags = 16
+	self.election_day_3.ai_group_type = america
 	self.election_day_3_skip1 = deep_clone(self.election_day_3)
 	self.election_day_3_skip1.briefing_id = "eday3_brief_skip1"
 	self.election_day_3_skip1.briefing_dialog = "Play_pln_ed3_brf_b"
@@ -118,6 +133,7 @@ function LevelsTweakData:init()
 	self.alex_1.package = "packages/narr_alex1"
 	self.alex_1.cube = "cube_apply_heist_bank"
 	self.alex_1.max_bags = 11
+	self.alex_1.ai_group_type = america
 	self.alex_2 = {}
 	self.alex_2.name_id = "heist_alex_2_hl"
 	self.alex_2.briefing_id = "heist_alex_2_briefing"
@@ -135,6 +151,7 @@ function LevelsTweakData:init()
 	self.alex_2.package = "packages/narr_alex2"
 	self.alex_2.cube = "cube_apply_heist_bank"
 	self.alex_2.max_bags = 19
+	self.alex_2.ai_group_type = america
 	self.alex_3 = {}
 	self.alex_3.name_id = "heist_alex_3_hl"
 	self.alex_3.briefing_id = "heist_alex_3_briefing"
@@ -150,6 +167,7 @@ function LevelsTweakData:init()
 	self.alex_3.package = "packages/narr_alex3"
 	self.alex_3.cube = "cube_apply_heist_bank"
 	self.alex_3.max_bags = 34
+	self.alex_3.ai_group_type = america
 	self.watchdogs_1 = {}
 	self.watchdogs_1.name_id = "heist_watchdogs_1_hl"
 	self.watchdogs_1.briefing_id = "heist_watchdogs_1_briefing"
@@ -167,6 +185,7 @@ function LevelsTweakData:init()
 	}
 	self.watchdogs_1.cube = "cube_apply_heist_bank"
 	self.watchdogs_1.max_bags = 16
+	self.watchdogs_1.ai_group_type = america
 	self.watchdogs_1_night = deep_clone(self.watchdogs_1)
 	self.watchdogs_1_night.env_params = {
 		environment = "environments/pd2_env_night/pd2_env_night"
@@ -194,6 +213,7 @@ function LevelsTweakData:init()
 	}
 	self.watchdogs_2.cube = "cube_apply_heist_bank"
 	self.watchdogs_2.max_bags = 16
+	self.watchdogs_2.ai_group_type = america
 	self.watchdogs_2_day = deep_clone(self.watchdogs_2)
 	self.watchdogs_2_day.env_params = {
 		environment = "environments/pd2_env_wd2_evening/pd2_env_wd2_evening"
@@ -215,6 +235,7 @@ function LevelsTweakData:init()
 	self.firestarter_1.package = "packages/narr_firestarter1"
 	self.firestarter_1.cube = "cube_apply_heist_bank"
 	self.firestarter_1.max_bags = 16
+	self.firestarter_1.ai_group_type = america
 	self.firestarter_2 = {}
 	self.firestarter_2.name_id = "heist_firestarter_2_hl"
 	self.firestarter_2.briefing_id = "heist_firestarter_2_briefing"
@@ -230,6 +251,7 @@ function LevelsTweakData:init()
 	self.firestarter_2.cube = "cube_apply_heist_bank"
 	self.firestarter_2.ghost_bonus = 0.15
 	self.firestarter_2.max_bags = 34
+	self.firestarter_2.ai_group_type = america
 	self.firestarter_3 = {}
 	self.firestarter_3.name_id = "heist_firestarter_3_hl"
 	self.firestarter_3.briefing_id = "heist_firestarter_3_briefing"
@@ -248,6 +270,7 @@ function LevelsTweakData:init()
 	}
 	self.firestarter_3.ghost_bonus = 0.05
 	self.firestarter_3.max_bags = 54
+	self.firestarter_3.ai_group_type = america
 	self.welcome_to_the_jungle_1 = {}
 	self.welcome_to_the_jungle_1.name_id = "heist_welcome_to_the_jungle_1_hl"
 	self.welcome_to_the_jungle_1.briefing_id = "heist_welcome_to_the_jungle_1_briefing"
@@ -266,6 +289,7 @@ function LevelsTweakData:init()
 	self.welcome_to_the_jungle_1.cube = "cube_apply_heist_bank"
 	self.welcome_to_the_jungle_1.ghost_bonus = 0.15
 	self.welcome_to_the_jungle_1.max_bags = 14
+	self.welcome_to_the_jungle_1.ai_group_type = america
 	self.welcome_to_the_jungle_1_night = deep_clone(self.welcome_to_the_jungle_1)
 	self.welcome_to_the_jungle_1_night.env_params = {
 		environment = "environments/pd2_env_night/pd2_env_night"
@@ -290,6 +314,7 @@ function LevelsTweakData:init()
 	}
 	self.welcome_to_the_jungle_2.cube = "cube_apply_heist_bank"
 	self.welcome_to_the_jungle_2.max_bags = 15
+	self.welcome_to_the_jungle_2.ai_group_type = america
 	self.ukrainian_job = {}
 	self.ukrainian_job.name_id = "heist_ukrainian_job_hl"
 	self.ukrainian_job.briefing_id = "heist_ukrainian_job_briefing"
@@ -310,6 +335,7 @@ function LevelsTweakData:init()
 	self.ukrainian_job.group_ai_preset = "small_urban"
 	self.ukrainian_job.ghost_bonus = 0.05
 	self.ukrainian_job.max_bags = 16
+	self.ukrainian_job.ai_group_type = america
 	self.four_stores = {}
 	self.four_stores.name_id = "heist_four_stores_hl"
 	self.four_stores.briefing_id = "heist_four_stores_briefing"
@@ -325,6 +351,7 @@ function LevelsTweakData:init()
 	self.four_stores.cube = "cube_apply_heist_bank"
 	self.four_stores.ghost_bonus = 0.05
 	self.four_stores.max_bags = 5
+	self.four_stores.ai_group_type = america
 	self.jewelry_store = {}
 	self.jewelry_store.name_id = "heist_jewelry_store_hl"
 	self.jewelry_store.briefing_id = "heist_jewelry_store_briefing"
@@ -344,6 +371,7 @@ function LevelsTweakData:init()
 	self.jewelry_store.cube = "cube_apply_heist_bank"
 	self.jewelry_store.ghost_bonus = 0.05
 	self.jewelry_store.max_bags = 16
+	self.jewelry_store.ai_group_type = america
 	self.mallcrasher = {}
 	self.mallcrasher.name_id = "heist_mallcrasher_hl"
 	self.mallcrasher.briefing_id = "heist_mallcrasher_briefing"
@@ -358,6 +386,7 @@ function LevelsTweakData:init()
 	self.mallcrasher.package = "packages/vlad_mallcrasher"
 	self.mallcrasher.cube = "cube_apply_heist_bank"
 	self.mallcrasher.max_bags = 12
+	self.mallcrasher.ai_group_type = america
 	self.nightclub = {}
 	self.nightclub.name_id = "heist_nightclub_hl"
 	self.nightclub.briefing_id = "heist_nightclub_briefing"
@@ -373,6 +402,7 @@ function LevelsTweakData:init()
 	self.nightclub.cube = "cube_apply_heist_bank"
 	self.nightclub.ghost_bonus = 0.1
 	self.nightclub.max_bags = 28
+	self.nightclub.ai_group_type = america
 	self.branchbank = {}
 	self.branchbank.name_id = "heist_branchbank_hl"
 	self.branchbank.briefing_id = "heist_branchbank_briefing"
@@ -387,6 +417,7 @@ function LevelsTweakData:init()
 	self.branchbank.outro_event = "Play_pln_branchbank_stage1_end"
 	self.branchbank.ghost_bonus = 0.1
 	self.branchbank.max_bags = 24
+	self.branchbank.ai_group_type = america
 	self.branchbank.music = "heist"
 	self.branchbank.package = "packages/narr_firestarter3"
 	self.branchbank.cube = "cube_apply_heist_bank"
@@ -403,6 +434,7 @@ function LevelsTweakData:init()
 	self.escape_cafe_day.music = "heist"
 	self.escape_cafe_day.package = "packages/escape_cafe"
 	self.escape_cafe_day.cube = "cube_apply_heist_bank"
+	self.escape_cafe_day.ai_group_type = america
 	self.escape_park_day = {}
 	self.escape_park_day.name_id = "heist_escape_park_hl"
 	self.escape_park_day.briefing_id = "heist_escape_park_briefing"
@@ -423,6 +455,7 @@ function LevelsTweakData:init()
 	self.escape_cafe.music = "heist"
 	self.escape_cafe.package = "packages/escape_cafe"
 	self.escape_cafe.cube = "cube_apply_heist_bank"
+	self.escape_cafe.ai_group_type = america
 	self.escape_park = {}
 	self.escape_park.name_id = "heist_escape_park_hl"
 	self.escape_park.briefing_id = "heist_escape_park_briefing"
@@ -433,6 +466,7 @@ function LevelsTweakData:init()
 	self.escape_park.music = "heist"
 	self.escape_park.package = "packages/escape_park"
 	self.escape_park.cube = "cube_apply_heist_bank"
+	self.escape_park.ai_group_type = america
 	self.escape_street = {}
 	self.escape_street.name_id = "heist_escape_street_hl"
 	self.escape_street.briefing_id = "heist_escape_street_briefing"
@@ -443,6 +477,7 @@ function LevelsTweakData:init()
 	self.escape_street.music = "heist"
 	self.escape_street.package = "packages/escape_street"
 	self.escape_street.cube = "cube_apply_heist_bank"
+	self.escape_street.ai_group_type = america
 	self.escape_overpass = {}
 	self.escape_overpass.name_id = "heist_escape_overpass_hl"
 	self.escape_overpass.briefing_id = "heist_escape_overpass_briefing"
@@ -453,6 +488,7 @@ function LevelsTweakData:init()
 	self.escape_overpass.music = "heist"
 	self.escape_overpass.package = "packages/escape_overpass"
 	self.escape_overpass.cube = "cube_apply_heist_bank"
+	self.escape_overpass.ai_group_type = america
 	self.escape_overpass_night = deep_clone(self.escape_overpass)
 	self.escape_garage = {}
 	self.escape_garage.name_id = "heist_escape_garage_hl"
@@ -464,6 +500,7 @@ function LevelsTweakData:init()
 	self.escape_garage.music = "heist"
 	self.escape_garage.package = "packages/escape_garage"
 	self.escape_garage.cube = "cube_apply_heist_bank"
+	self.escape_garage.ai_group_type = america
 	self.driving_escapes_industry_day = {}
 	self.driving_escapes_industry_day.name_id = "heist_driving_escapes_industry_hl"
 	self.driving_escapes_industry_day.briefing_id = "heist_driving_escapes_industry_briefing"
@@ -474,6 +511,7 @@ function LevelsTweakData:init()
 	self.driving_escapes_industry_day.music = "heist"
 	self.driving_escapes_industry_day.package = "packages/escape_2_industry"
 	self.driving_escapes_industry_day.cube = "cube_apply_heist_bank"
+	self.driving_escapes_industry_day.ai_group_type = america
 	self.driving_escapes_city_day = {}
 	self.driving_escapes_city_day.name_id = "heist_driving_escapes_city_hl"
 	self.driving_escapes_city_day.briefing_id = "heist_driving_escapes_city_briefing"
@@ -484,6 +522,7 @@ function LevelsTweakData:init()
 	self.driving_escapes_city_day.music = "heist"
 	self.driving_escapes_city_day.package = "packages/escape_2_city"
 	self.driving_escapes_city_day.cube = "cube_apply_heist_bank"
+	self.driving_escapes_city_day.ai_group_type = america
 	self.safehouse = {}
 	self.safehouse.name_id = "heist_safehouse_hl"
 	self.safehouse.briefing_id = "heist_safehouse_briefing"
@@ -495,6 +534,7 @@ function LevelsTweakData:init()
 	self.safehouse.package = "packages/safehouse"
 	self.safehouse.cube = "cube_apply_heist_bank"
 	self.safehouse.team_ai_off = true
+	self.safehouse.ai_group_type = america
 	self.crojob2 = {}
 	self.crojob2.name_id = "heist_crojob2_hl"
 	self.crojob2.briefing_id = "heist_crojob2_briefing"
@@ -512,6 +552,7 @@ function LevelsTweakData:init()
 	self.crojob2.cube = "cube_apply_heist_bank"
 	self.crojob2.ghost_bonus = 0.2
 	self.crojob2.max_bags = 21
+	self.crojob2.ai_group_type = america
 	self.crojob3 = {}
 	self.crojob3.name_id = "heist_crojob3_hl"
 	self.crojob3.briefing_id = "heist_crojob3_briefing"
@@ -525,6 +566,7 @@ function LevelsTweakData:init()
 	}
 	self.crojob3.cube = "cube_apply_heist_bank"
 	self.crojob3.max_bags = 16
+	self.crojob3.ai_group_type = america
 	self.crojob3_night = deep_clone(self.crojob3)
 	self.crojob3_night.env_params = {
 		environment = "environments/pd2_env_cro_night/pd2_env_cro_night"
@@ -550,6 +592,7 @@ function LevelsTweakData:init()
 	self.arm_cro.package = "packages/narr_arm_cro"
 	self.arm_cro.cube = "cube_apply_heist_bank"
 	self.arm_cro.max_bags = 22
+	self.arm_cro.ai_group_type = america
 	self.arm_und = {}
 	self.arm_und.name_id = "heist_arm_und_hl"
 	self.arm_und.briefing_id = "heist_arm_und_briefing"
@@ -568,6 +611,7 @@ function LevelsTweakData:init()
 	self.arm_und.package = "packages/narr_arm_und"
 	self.arm_und.cube = "cube_apply_heist_bank"
 	self.arm_und.max_bags = 22
+	self.arm_und.ai_group_type = america
 	self.arm_hcm = {}
 	self.arm_hcm.name_id = "heist_arm_hcm_hl"
 	self.arm_hcm.briefing_id = "heist_arm_hcm_briefing"
@@ -586,6 +630,7 @@ function LevelsTweakData:init()
 	self.arm_hcm.package = "packages/narr_arm_hcm"
 	self.arm_hcm.cube = "cube_apply_heist_bank"
 	self.arm_hcm.max_bags = 22
+	self.arm_hcm.ai_group_type = america
 	self.arm_par = {}
 	self.arm_par.name_id = "heist_arm_par_hl"
 	self.arm_par.briefing_id = "heist_arm_par_briefing"
@@ -604,6 +649,7 @@ function LevelsTweakData:init()
 	self.arm_par.package = "packages/narr_arm_par"
 	self.arm_par.cube = "cube_apply_heist_bank"
 	self.arm_par.max_bags = 22
+	self.arm_par.ai_group_type = america
 	self.arm_fac = {}
 	self.arm_fac.name_id = "heist_arm_fac_hl"
 	self.arm_fac.briefing_id = "heist_arm_fac_briefing"
@@ -622,6 +668,7 @@ function LevelsTweakData:init()
 	self.arm_fac.package = "packages/narr_arm_fac"
 	self.arm_fac.cube = "cube_apply_heist_bank"
 	self.arm_fac.max_bags = 22
+	self.arm_fac.ai_group_type = america
 	self.arm_for = {}
 	self.arm_for.name_id = "heist_arm_for_hl"
 	self.arm_for.briefing_id = "heist_arm_for_briefing"
@@ -638,6 +685,7 @@ function LevelsTweakData:init()
 	self.arm_for.bonus_escape = true
 	self.arm_for.max_bags = 30
 	self.arm_for.ghost_bonus = 0.1
+	self.arm_for.ai_group_type = america
 	self.family = {}
 	self.family.name_id = "heist_family_hl"
 	self.family.briefing_id = "heist_family_briefing"
@@ -653,6 +701,7 @@ function LevelsTweakData:init()
 	self.family.cube = "cube_apply_heist_bank"
 	self.family.ghost_bonus = 0.05
 	self.family.max_bags = 24
+	self.family.ai_group_type = america
 	self.big = {}
 	self.big.name_id = "heist_big_hl"
 	self.big.briefing_id = "heist_big_briefing"
@@ -670,6 +719,7 @@ function LevelsTweakData:init()
 	self.big.cube = "cube_apply_heist_bank"
 	self.big.ghost_bonus = 0.15
 	self.big.max_bags = 28
+	self.big.ai_group_type = america
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.roberts = {}
 		self.roberts.name_id = "heist_roberts_hl"
@@ -687,6 +737,7 @@ function LevelsTweakData:init()
 		self.roberts.cube = "cube_apply_heist_bank"
 		self.roberts.ghost_bonus = 0.1
 		self.roberts.max_bags = 14
+		self.roberts.ai_group_type = america
 	end
 	self.mia_1 = {}
 	self.mia_1.name_id = "heist_mia_1_hl"
@@ -699,6 +750,7 @@ function LevelsTweakData:init()
 	self.mia_1.package = "packages/narr_mia_1"
 	self.mia_1.cube = "cube_apply_heist_bank"
 	self.mia_1.max_bags = 15
+	self.mia_1.ai_group_type = america
 	self.mia_2 = {}
 	self.mia_2.name_id = "heist_mia_2_hl"
 	self.mia_2.briefing_id = "heist_mia_2_briefing"
@@ -712,6 +764,7 @@ function LevelsTweakData:init()
 	self.mia_2.package = "packages/narr_mia_2"
 	self.mia_2.cube = "cube_apply_heist_bank"
 	self.mia_2.max_bags = 20
+	self.mia_2.ai_group_type = america
 	self.mia_2.teams = {
 		criminal1 = {
 			foes = {
@@ -772,6 +825,7 @@ function LevelsTweakData:init()
 	self.mia2_new.package = "packages/narr_mia_2"
 	self.mia2_new.cube = "cube_apply_heist_bank"
 	self.mia2_new.teams = self.mia_2.teams
+	self.mia2_new.ai_group_type = america
 	self.kosugi = {}
 	self.kosugi.name_id = "heist_kosugi_hl"
 	self.kosugi.briefing_id = "heist_kosugi_briefing"
@@ -788,6 +842,7 @@ function LevelsTweakData:init()
 	self.kosugi.cube = "cube_apply_heist_bank"
 	self.kosugi.ghost_bonus = 0.05
 	self.kosugi.max_bags = 30
+	self.kosugi.ai_group_type = america
 	self.gallery = deep_clone(self.framing_frame_1)
 	self.gallery.name_id = "heist_gallery_hl"
 	self.gallery.briefing_id = "heist_gallery_briefing"
@@ -809,6 +864,7 @@ function LevelsTweakData:init()
 	self.hox_1.package = "packages/narr_hox_1"
 	self.hox_1.cube = "cube_apply_heist_bank"
 	self.hox_1.block_AIs = {old_hoxton = true}
+	self.hox_1.ai_group_type = america
 	self.hox_2 = {}
 	self.hox_2.name_id = "heist_hox_2_hl"
 	self.hox_2.briefing_id = "heist_hox_2_briefing"
@@ -822,6 +878,7 @@ function LevelsTweakData:init()
 	self.hox_2.package = "packages/narr_hox_2"
 	self.hox_2.cube = "cube_apply_heist_bank"
 	self.hox_2.block_AIs = {old_hoxton = true}
+	self.hox_2.ai_group_type = america
 	self.pines = {}
 	self.pines.name_id = "heist_pines_hl"
 	self.pines.briefing_id = "heist_pines_briefing"
@@ -833,6 +890,7 @@ function LevelsTweakData:init()
 	self.pines.package = "packages/narr_pines"
 	self.pines.cube = "cube_apply_heist_bank"
 	self.pines.max_bags = 1200
+	self.pines.ai_group_type = america
 	self.mus = {}
 	self.mus.name_id = "heist_mus_hl"
 	self.mus.briefing_id = "heist_mus_briefing"
@@ -848,6 +906,7 @@ function LevelsTweakData:init()
 	self.mus.cube = "cube_apply_heist_bank"
 	self.mus.max_bags = 30
 	self.mus.ghost_bonus = 0.15
+	self.mus.ai_group_type = america
 	self.cage = {}
 	self.cage.name_id = "heist_cage_hl"
 	self.cage.briefing_id = "heist_cage_briefing"
@@ -859,6 +918,7 @@ function LevelsTweakData:init()
 	self.cage.package = "packages/narr_cage"
 	self.cage.cube = "cube_apply_heist_bank"
 	self.cage.max_bags = 6
+	self.cage.ai_group_type = america
 	self.hox_3 = {}
 	self.hox_3.name_id = "heist_hox_3_hl"
 	self.hox_3.briefing_id = "heist_hox_3_briefing"
@@ -871,6 +931,7 @@ function LevelsTweakData:init()
 	self.hox_3.cube = "cube_apply_heist_bank"
 	self.hox_3.max_bags = 10
 	self.hox_3.ghost_bonus = 0.1
+	self.hox_3.ai_group_type = america
 	self.rat = {}
 	self.rat.name_id = "heist_rat_hl"
 	self.rat.briefing_id = "heist_rat_briefing"
@@ -887,6 +948,7 @@ function LevelsTweakData:init()
 	self.rat.package = "packages/narr_alex1"
 	self.rat.cube = "cube_apply_heist_bank"
 	self.rat.max_bags = 1200
+	self.rat.ai_group_type = america
 	self.shoutout_raid = {}
 	self.shoutout_raid.name_id = "heist_shoutout_raid_hl"
 	self.shoutout_raid.briefing_id = "heist_shoutout_raid_briefing"
@@ -898,6 +960,7 @@ function LevelsTweakData:init()
 	self.shoutout_raid.package = "packages/vlad_shout"
 	self.shoutout_raid.cube = "cube_apply_heist_bank"
 	self.shoutout_raid.max_bags = 20
+	self.shoutout_raid.ai_group_type = america
 	self.arena = {}
 	self.arena.name_id = "heist_arena_hl"
 	self.arena.briefing_id = "heist_arena_briefing"
@@ -915,6 +978,7 @@ function LevelsTweakData:init()
 	self.arena.cube = "cube_apply_heist_bank"
 	self.arena.max_bags = 25
 	self.arena.ghost_bonus = 0.1
+	self.arena.ai_group_type = america
 	self.kenaz = {}
 	self.kenaz.name_id = "heist_kenaz_hl"
 	self.kenaz.briefing_id = "heist_kenaz_briefing"
@@ -935,6 +999,7 @@ function LevelsTweakData:init()
 	self.kenaz.cube = "cube_apply_heist_bank"
 	self.kenaz.ghost_bonus = 0.1
 	self.kenaz.max_bags = 40
+	self.kenaz.ai_group_type = america
 	self.jolly = {}
 	self.jolly.name_id = "heist_jolly_hl"
 	self.jolly.briefing_id = "heist_jolly_briefing"
@@ -946,6 +1011,7 @@ function LevelsTweakData:init()
 	self.jolly.package = "packages/jolly"
 	self.jolly.cube = "cube_apply_heist_bank"
 	self.jolly.max_bags = 15
+	self.jolly.ai_group_type = america
 	self.red2 = {}
 	self.red2.name_id = "heist_red2_hl"
 	self.red2.briefing_id = "heist_red2_briefing"
@@ -963,6 +1029,7 @@ function LevelsTweakData:init()
 	self.red2.cube = "cube_apply_heist_bank"
 	self.red2.max_bags = 84
 	self.red2.ghost_bonus = 0.15
+	self.red2.ai_group_type = america
 	self.dinner = {}
 	self.dinner.name_id = "heist_dinner_hl"
 	self.dinner.briefing_id = "heist_dinner_briefing"
@@ -978,6 +1045,7 @@ function LevelsTweakData:init()
 	}
 	self.dinner.cube = "cube_apply_heist_bank"
 	self.dinner.max_bags = 20
+	self.dinner.ai_group_type = america
 	self.pbr = {}
 	self.pbr.name_id = "heist_pbr_hl"
 	self.pbr.briefing_id = "heist_pbr_briefing"
@@ -1004,6 +1072,7 @@ function LevelsTweakData:init()
 	}
 	self.pbr2.cube = "cube_apply_heist_bank"
 	self.pbr.max_bags = 20
+	self.pbr.ai_group_type = america
 	self.cane = {}
 	self.cane.name_id = "heist_cane_hl"
 	self.cane.briefing_id = "heist_cane_briefing"
@@ -1014,6 +1083,7 @@ function LevelsTweakData:init()
 	self.cane.package = "packages/cane"
 	self.cane.cube = "cube_apply_heist_bank"
 	self.cane.max_bags = 3600
+	self.cane.ai_group_type = america
 	self.nail = {}
 	self.nail.name_id = "heist_nail_hl"
 	self.nail.briefing_id = "heist_nail_briefing"
@@ -1032,6 +1102,7 @@ function LevelsTweakData:init()
 	}
 	self.nail.cube = "cube_apply_heist_bank"
 	self.nail.max_bags = 1000
+	self.nail.ai_group_type = america
 	self.peta = {}
 	self.peta.name_id = "heist_peta_hl"
 	self.peta.briefing_id = "heist_peta_briefing"
@@ -1042,6 +1113,7 @@ function LevelsTweakData:init()
 	self.peta.music = "heist"
 	self.peta.package = "packages/narr_peta"
 	self.peta.cube = "cube_apply_heist_bank"
+	self.peta.ai_group_type = america
 	self.peta2 = {}
 	self.peta2.name_id = "heist_peta2_hl"
 	self.peta2.briefing_id = "heist_peta2_briefing"
@@ -1052,6 +1124,7 @@ function LevelsTweakData:init()
 	self.peta2.music = "heist"
 	self.peta2.package = "packages/narr_peta2"
 	self.peta2.cube = "cube_apply_heist_bank"
+	self.peta2.ai_group_type = america
 	self.pal = {}
 	self.pal.name_id = "heist_pal_hl"
 	self.pal.briefing_id = "heist_pal_briefing"
@@ -1401,4 +1474,16 @@ function LevelsTweakData:get_team_index(team_id)
 			return index
 		end
 	end
+end
+
+function LevelsTweakData:get_ai_group_type()
+	local level_data = Global.level_data and Global.level_data.level_id and self[Global.level_data.level_id]
+	if level_data then
+		local ai_group_type = level_data.ai_group_type
+		if ai_group_type then
+			return ai_group_type
+		end
+	end
+	print("[LevelsTweakData:get_ai_group_type] group is not defined for this level, fallback on default")
+	return self.ai_groups.default
 end

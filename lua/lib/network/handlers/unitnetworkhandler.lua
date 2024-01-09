@@ -1670,6 +1670,19 @@ function UnitNetworkHandler:sync_carry_data(unit, carry_id, carry_multiplier, dy
 	managers.player:sync_carry_data(unit, carry_id, carry_multiplier, dye_initiated, has_dye_pack, dye_value_multiplier, position, dir, throw_distance_multiplier_upgrade_level, zipline_unit, peer_id)
 end
 
+function UnitNetworkHandler:sync_cocaine_stacks(amount, in_use, upgrade_level, power_level, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	local peer_id = peer:id()
+	local current_cocaine_stacks = managers.player:get_synced_cocaine_stacks(peer_id)
+	if current_cocaine_stacks then
+		amount = math.min((current_cocaine_stacks and current_cocaine_stacks.amount or 0) + (tweak_data.upgrades.max_cocaine_stacks_per_tick or 20), amount)
+	end
+	managers.player:set_synced_cocaine_stacks(peer_id, amount, in_use, upgrade_level, power_level)
+end
+
 function UnitNetworkHandler:request_throw_projectile(projectile_type, position, dir, sender)
 	local peer = self._verify_sender(sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
@@ -1847,7 +1860,7 @@ function UnitNetworkHandler:result_place_mission_door_device(unit, result, sende
 	unit:interaction():result_place_mission_door_device(result)
 end
 
-function UnitNetworkHandler:set_armor(unit, percent, sender)
+function UnitNetworkHandler:set_armor(unit, percent, max_mul, sender)
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
@@ -1856,16 +1869,16 @@ function UnitNetworkHandler:set_armor(unit, percent, sender)
 	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
 	if character_data and character_data.panel_id then
 		managers.hud:set_teammate_armor(character_data.panel_id, {
-			current = percent / 100,
-			total = 1,
-			max = 1
+			current = percent * max_mul,
+			total = 100 * max_mul,
+			max = 100 * max_mul
 		})
 	else
 		managers.hud:set_mugshot_armor(unit:unit_data().mugshot_id, percent / 100)
 	end
 end
 
-function UnitNetworkHandler:set_health(unit, percent, sender)
+function UnitNetworkHandler:set_health(unit, percent, max_mul, sender)
 	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
 		return
 	end
@@ -1874,9 +1887,9 @@ function UnitNetworkHandler:set_health(unit, percent, sender)
 	local character_data = managers.criminals:character_data_by_peer_id(peer_id)
 	if character_data and character_data.panel_id then
 		managers.hud:set_teammate_health(character_data.panel_id, {
-			current = percent / 100,
-			total = 1,
-			max = 1
+			current = percent * max_mul,
+			total = 100 * max_mul,
+			max = 100 * max_mul
 		})
 	else
 		managers.hud:set_mugshot_health(unit:unit_data().mugshot_id, percent / 100)

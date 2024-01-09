@@ -1198,6 +1198,8 @@ function InteractionTweakData:init()
 	self.money_wrap.sound_start = "bar_bag_money"
 	self.money_wrap.sound_interupt = "bar_bag_money_cancel"
 	self.money_wrap.sound_done = "bar_bag_money_finished"
+	self.weapon_case_axis_x = deep_clone(self.money_wrap)
+	self.weapon_case_axis_x.axis = "x"
 	self.suburbia_money_wrap = {}
 	self.suburbia_money_wrap.icon = "interaction_money_wrap"
 	self.suburbia_money_wrap.text_id = "debug_interact_money_printed_take_money"
@@ -1225,6 +1227,8 @@ function InteractionTweakData:init()
 	self.gold_pile.timer = 1
 	self.gold_pile.action_text_id = "hud_action_taking_gold"
 	self.gold_pile.blocked_hint = "carry_block"
+	self.gold_pile_axis_x = deep_clone(self.gold_pile)
+	self.gold_pile_axis_x.axis = "x"
 	self.gold_bag = {}
 	self.gold_bag.icon = "interaction_gold"
 	self.gold_bag.text_id = "debug_interact_gold_bag"

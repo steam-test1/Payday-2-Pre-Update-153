@@ -108,12 +108,7 @@ end
 function PlayerBleedOut:_update_check_actions(t, dt)
 	local input = self:_get_input()
 	self._unit:camera():set_shaker_parameter("headbob", "amplitude", 0)
-	local projectile_entry = managers.blackmarket:equipped_projectile()
-	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-		self:_update_throw_grenade_timers(t, input)
-	else
-		self:_update_throw_projectile_timers(t, input)
-	end
+	self:_update_throw_projectile_timers(t, input)
 	self:_update_reload_timers(t, dt, input)
 	self:_update_equip_weapon_timers(t, input)
 	if input.btn_stats_screen_press then
@@ -131,14 +126,7 @@ function PlayerBleedOut:_update_check_actions(t, dt)
 		new_action = self:_check_action_primary_attack(t, input)
 		self._shooting = new_action
 	end
-	if not new_action then
-		local projectile_entry = managers.blackmarket:equipped_projectile()
-		if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
-			new_action = self:_check_action_throw_grenade(t, input)
-		else
-			new_action = self:_check_action_throw_projectile(t, input)
-		end
-	end
+	new_action = new_action or self:_check_action_throw_projectile(t, input)
 	new_action = new_action or self:_check_action_equip(t, input)
 	new_action = new_action or self:_check_action_interact(t, input)
 	new_action = new_action or self:_check_action_steelsight(t, input)

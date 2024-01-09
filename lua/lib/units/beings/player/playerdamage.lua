@@ -49,6 +49,7 @@ function PlayerDamage:force_into_bleedout()
 	if self:incapacitated() or self:arrested() then
 		return
 	end
+	self._check_berserker_done = nil
 	self:set_health(0)
 	self:_chk_cheat_death()
 	self:_damage_screen()
@@ -72,14 +73,18 @@ function PlayerDamage:update(unit, t, dt)
 	local is_berserker_active = managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier")
 	if self._check_berserker_done then
 		if not is_berserker_active then
-			self._check_berserker_done = nil
-			managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_normal", "")
-			managers.hud:set_player_custom_radial({
-				current = 0,
-				total = self:_max_health(),
-				revives = Application:digest_value(self._revives, false)
-			})
-			self:force_into_bleedout()
+			if self._unit:movement():tased() then
+				self._bleed_out_blocked_by_tased = true
+			else
+				self._check_berserker_done = nil
+				managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_normal", "")
+				managers.hud:set_player_custom_radial({
+					current = 0,
+					total = self:_max_health(),
+					revives = Application:digest_value(self._revives, false)
+				})
+				self:force_into_bleedout()
+			end
 		else
 			local expire_time = managers.player:get_activate_temporary_expire_time("temporary", "berserker_damage_multiplier")
 			local total_time = managers.player:upgrade_value("temporary", "berserker_damage_multiplier")
@@ -466,9 +471,6 @@ function PlayerDamage:damage_tase(attack_data)
 end
 
 function PlayerDamage:on_tased(non_lethal)
-	if self._check_berserker_done then
-		self._bleed_out_blocked_by_tased = true
-	end
 end
 
 function PlayerDamage:tase_data()
@@ -554,6 +556,10 @@ function PlayerDamage:damage_bullet(attack_data)
 	}
 	local dmg_mul = managers.player:damage_reduction_skill_multiplier("bullet", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
 	attack_data.damage = attack_data.damage * dmg_mul
+	local damage_absorption = managers.player:get_best_cocaine_damage_absorption()
+	if 0 < damage_absorption then
+		attack_data.damage = math.max(0, attack_data.damage - damage_absorption)
+	end
 	local dodge_roll = math.rand(1)
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
 	local armor_dodge_chance = managers.player:body_armor_value("dodge")
@@ -1275,7 +1281,8 @@ end
 function PlayerDamage:_send_set_health()
 	if self._unit:network() then
 		local hp = math.round(self:get_real_health() / self:_max_health() * 100)
-		self._unit:network():send("set_health", math.clamp(hp, 0, 100))
+		local max_mul = math.min(self:_max_health() / 100, 1)
+		self._unit:network():send("set_health", math.clamp(hp, 0, 100), max_mul)
 		if hp ~= 100 then
 			managers.mission:call_global_event("player_damaged")
 		end
@@ -1291,7 +1298,8 @@ end
 function PlayerDamage:_send_set_armor()
 	if self._unit:network() then
 		local armor = math.round(self:get_real_armor() / self:_total_armor() * 100)
-		self._unit:network():send("set_armor", math.clamp(armor, 0, 100))
+		local max_mul = math.min(self:_total_armor() / 100, 1)
+		self._unit:network():send("set_armor", math.clamp(armor, 0, 100), max_mul)
 	end
 end
 

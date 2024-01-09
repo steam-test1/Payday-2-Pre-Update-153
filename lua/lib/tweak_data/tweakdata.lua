@@ -381,11 +381,11 @@ function TweakData:init()
 	self._init_wip_equipments(self.equipments)
 	self.player = PlayerTweakData:new()
 	self._init_wip_player(self.player)
+	self.levels = LevelsTweakData:new()
+	self._init_wip_levels(self.levels)
 	self.character = CharacterTweakData:new(self)
 	self._init_wip_character(self.character, self)
 	self.statistics = StatisticsTweakData:new()
-	self.levels = LevelsTweakData:new()
-	self._init_wip_levels(self.levels)
 	self.narrative = NarrativeTweakData:new()
 	self._init_wip_narrative(self.narrative)
 	self.group_ai = GroupAITweakData:new(self)
@@ -439,7 +439,8 @@ function TweakData:init()
 		"bonnie",
 		"sokol",
 		"dragon",
-		"bodhi"
+		"bodhi",
+		"jimmy"
 	}
 	self.criminals.characters = {
 		{
@@ -582,6 +583,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb13",
 				ai_mask_id = "bodhi",
+				mask_id = 4
+			}
+		},
+		{
+			name = "jimmy",
+			static_data = {
+				ai_character_id = "ai_jimmy",
+				ssuffix = "u",
+				color_id = 4,
+				voice = "rb14",
+				ai_mask_id = "jimmy",
 				mask_id = 4
 			}
 		}

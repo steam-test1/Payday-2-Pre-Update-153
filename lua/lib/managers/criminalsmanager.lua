@@ -171,7 +171,6 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 					managers.hud:reset_player_hpbar()
 				end
 				unit:sound():set_voice(data.static_data.voice)
-				unit:inventory():set_mask_visibility(unit:inventory()._mask_visibility)
 				break
 			end
 			data.data.mugshot_id = managers.hud:add_mugshot_without_unit(name, ai, peer_id, ai and managers.localization:text("menu_" .. name) or managers.network:session():peer(peer_id):name())

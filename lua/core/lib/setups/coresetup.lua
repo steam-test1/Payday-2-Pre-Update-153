@@ -55,16 +55,6 @@ if Application:ews_enabled() then
 	require("core/lib/utils/dev/tools/particle_editor/CoreParticleEditor")
 	require("core/lib/utils/dev/tools/cutscene_editor/CoreCutsceneEditor")
 end
-if Application:production_build() then
-	core:import("CoreDebugManager")
-	core:import("CorePrefHud")
-end
-if Global.DEBUG_MENU_ON or Application:production_build() then
-	core:import("CoreFreeFlight")
-end
-if Application:editor() then
-	require("core/lib/utils/dev/editor/CoreEditor")
-end
 CoreSetup = CoreSetup or class()
 local _CoreSetup = CoreSetup
 
@@ -198,12 +188,6 @@ function CoreSetup:__init()
 	if not PackageManager:loaded("core/packages/base") then
 		PackageManager:load("core/packages/base")
 	end
-	if Application:ews_enabled() and not PackageManager:loaded("core/packages/editor") then
-		PackageManager:load("core/packages/editor")
-	end
-	if Application:production_build() and not PackageManager:loaded("core/packages/debug") then
-		PackageManager:load("core/packages/debug")
-	end
 	managers.global_texture = managers.global_texture or CoreGTextureManager.GTextureManager:new()
 	if not Global.__coresetup_bootdone then
 		self:start_boot_loading_screen()
@@ -260,11 +244,6 @@ function CoreSetup:__init()
 	self._session = CoreSessionManager.SessionManager:new(self.session_factory, self._input)
 	self._smoketest = CoreSmoketestManager.Manager:new(self._session:session())
 	managers.sequence:internal_load()
-	if Application:production_build() then
-		managers.prefhud = CorePrefHud.PrefHud:new()
-		managers.debug = CoreDebugManager.DebugManager:new()
-		rawset(_G, "d", managers.debug)
-	end
 	self:init_managers(managers)
 	if Application:ews_enabled() then
 		managers.news = CoreNewsReportManager.NewsReportManager:new()
@@ -282,13 +261,6 @@ function CoreSetup:__init()
 		managers.toolhub:buildmenu()
 	end
 	self.__gsm = assert(self:init_game(), "self:init_game must return a GameStateMachine.")
-	if Global.DEBUG_MENU_ON or Application:production_build() then
-		self.__freeflight = CoreFreeFlight.FreeFlight:new(self.__gsm, managers.viewport, managers.controller)
-	end
-	if Application:editor() then
-		managers.editor = (rawget(_G, "WorldEditor") or rawget(_G, "CoreEditor")):new(self.__gsm, self._session:session())
-		managers.editor:toggle()
-	end
 	managers.cutscene:post_init()
 	self._smoketest:post_init()
 	if not Application:editor() then
@@ -305,16 +277,6 @@ function CoreSetup:__destroy()
 	managers.viewport:destroy()
 	managers.worldcamera:destroy()
 	managers.overlay_effect:destroy()
-	if Application:ews_enabled() then
-		managers.toolhub:destroy()
-	end
-	if Application:production_build() then
-		managers.prefhud:destroy()
-		managers.debug:destroy()
-	end
-	if Application:editor() then
-		managers.editor:destroy()
-	end
 	self._session:destroy()
 	self._input:destroy()
 	self._smoketest:destroy()
@@ -345,19 +307,6 @@ function CoreSetup:__update(t, dt)
 	self._input:update(t, dt)
 	self._smoketest:update(t, dt)
 	managers.environment_controller:update(t, dt)
-	if Application:production_build() then
-		managers.prefhud:update(t, dt)
-		managers.debug:update(TimerManager:wall():time(), TimerManager:wall():delta_time())
-	end
-	if Global.DEBUG_MENU_ON or Application:production_build() then
-		self.__freeflight:update(t, dt)
-	end
-	if Application:ews_enabled() then
-		managers.toolhub:update(t, dt)
-	end
-	if Application:editor() then
-		managers.editor:update(t, dt)
-	end
 	self:update(t, dt)
 end
 
@@ -370,18 +319,6 @@ function CoreSetup:__paused_update(t, dt)
 	self._session:update(t, dt)
 	self._input:update(t, dt)
 	self._smoketest:update(t, dt)
-	if Application:production_build() then
-		managers.debug:paused_update(TimerManager:wall():time(), TimerManager:wall():delta_time())
-	end
-	if Global.DEBUG_MENU_ON or Application:production_build() then
-		self.__freeflight:update(t, dt)
-	end
-	if Application:ews_enabled() then
-		managers.toolhub:paused_update(t, dt)
-	end
-	if Application:editor() then
-		managers.editor:update(t, dt)
-	end
 	self:paused_update(t, dt)
 end
 

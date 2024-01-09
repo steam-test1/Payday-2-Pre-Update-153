@@ -60,10 +60,6 @@ function Renderer:show_node(node, parameters)
 	local layer = self._base_layer
 	local previous_node_gui = self:active_node_gui()
 	if previous_node_gui then
-		if Application:production_build() then
-			previous_node_gui.safe_rect_panel:set_debug(Global.render_debug.menu_debug and false)
-			previous_node_gui._item_panel_parent:set_debug(Global.render_debug.menu_debug and false)
-		end
 		layer = previous_node_gui:layer()
 		previous_node_gui:set_visible(false)
 	end
@@ -72,10 +68,6 @@ function Renderer:show_node(node, parameters)
 		new_node_gui = parameters.node_gui_class:new(node, layer + 1, parameters)
 	else
 		new_node_gui = CoreMenuNodeGui.NodeGui:new(node, layer + 1, parameters)
-	end
-	if Application:production_build() then
-		new_node_gui.safe_rect_panel:set_debug(Global.render_debug.menu_debug and true)
-		new_node_gui._item_panel_parent:set_debug(Global.render_debug.menu_debug and true)
 	end
 	table.insert(self._node_gui_stack, new_node_gui)
 	if not managers.system_menu:is_active() then
@@ -126,10 +118,6 @@ function Renderer:navigate_back()
 		active_node_gui:close()
 		table.remove(self._node_gui_stack, #self._node_gui_stack)
 		self:active_node_gui():set_visible(true)
-		if Application:production_build() then
-			self:active_node_gui().safe_rect_panel:set_debug(Global.render_debug.menu_debug and true)
-			self:active_node_gui()._item_panel_parent:set_debug(Global.render_debug.menu_debug and true)
-		end
 		self:disable_input(0.2)
 	end
 end

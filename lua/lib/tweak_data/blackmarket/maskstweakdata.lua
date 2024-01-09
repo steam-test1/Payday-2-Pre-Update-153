@@ -18,6 +18,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.sokol = "sokol"
 	self.masks.character_locked.dragon = "jiro"
 	self.masks.character_locked.bodhi = "bodhi"
+	self.masks.character_locked.jimmy = "jimmy_duct"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1300,9 +1301,16 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.jw_shades = {}
 	self.masks.jw_shades.unit = "units/pd2_crimefest_2014/oct22/masks/jw_shades/msk_jw_shades"
 	self.masks.jw_shades.name_id = "bm_msk_jw_shades"
+	self.masks.jw_shades.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.jw_shades.value = 0
 	self.masks.jw_shades.type = "glasses"
 	self.masks.jw_shades.skip_mask_on_sequence = true
+	self.masks.jw_shades.global_value = "infamous"
 	self.masks.stoneface = {}
 	self.masks.stoneface.unit = "units/pd2_crimefest_2014/oct22/masks/stoneface/msk_stoneface"
 	self.masks.stoneface.name_id = "bm_msk_stoneface"
@@ -1685,7 +1693,8 @@ function BlackMarketTweakData:_init_masks()
 		bonnie = "balaclava_dallas",
 		sokol = "balaclava_sokol",
 		dragon = "balaclava_dallas",
-		bodhi = "balaclava_dallas"
+		bodhi = "balaclava_dallas",
+		jimmy = "balaclava_dallas"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -2532,6 +2541,27 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cop_kawaii.texture_bundle_folder = "super"
 	self.masks.cop_kawaii.value = 0
 	self.masks.cop_kawaii.sort_number = 1
+	self.masks.jimmy = {}
+	self.masks.jimmy.unit = "units/pd2_dlc_coco/masks/jimmy/msk_jimmy"
+	self.masks.jimmy.name_id = "bm_msk_jimmy"
+	self.masks.jimmy.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.jimmy.value = 0
+	self.masks.jimmy.global_value = "infamous"
+	self.masks.jimmy.texture_bundle_folder = "coco"
+	self.masks.jimmy.sort_number = 16
+	self.masks.jimmy_duct = {}
+	self.masks.jimmy_duct.unit = "units/pd2_dlc_coco/masks/jimmy_duct/msk_jimmy_duct"
+	self.masks.jimmy_duct.name_id = "bm_msk_jimmy_duct"
+	self.masks.jimmy_duct.pcs = {}
+	self.masks.jimmy_duct.value = 0
+	self.masks.jimmy_duct.global_value = "infamous"
+	self.masks.jimmy_duct.texture_bundle_folder = "coco"
+	self.masks.jimmy_duct.sort_number = 16
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"

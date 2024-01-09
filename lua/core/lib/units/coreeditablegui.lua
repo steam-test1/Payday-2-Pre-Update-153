@@ -207,11 +207,6 @@ function CoreEditableGui:shape()
 end
 
 function CoreEditableGui:set_debug(enabled)
-	if Application:production_build() then
-		for _, gui in ipairs(self._guis) do
-			gui.gui:set_debug(enabled)
-		end
-	end
 end
 
 function CoreEditableGui:on_unit_set_enabled(enabled)

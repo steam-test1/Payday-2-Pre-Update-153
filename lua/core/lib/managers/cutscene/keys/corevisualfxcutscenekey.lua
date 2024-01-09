@@ -21,9 +21,6 @@ function CoreVisualFXCutsceneKey:can_evaluate_with_player(player)
 end
 
 function CoreVisualFXCutsceneKey:prime(player)
-	if Application:production_build() then
-		CoreEngineAccess._editor_load(Idstring("effect"), self:effect():id())
-	end
 end
 
 function CoreVisualFXCutsceneKey:unload(player)

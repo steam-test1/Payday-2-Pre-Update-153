@@ -254,7 +254,7 @@ function MissionEndState:play_finishing_sound(success)
 		return
 	end
 	if managers.groupai:state():bain_state() then
-	else
+		managers.dialog:queue_dialog(success and "Play_ban_g02x" or "Play_ban_g01x", {})
 	end
 end
 
@@ -688,7 +688,7 @@ function MissionEndState:chk_complete_heist_achievements()
 						local weapon_tweak
 						for _, weapon_id in ipairs(used_weapons) do
 							weapon_tweak = tweak_data.weapon[weapon_id]
-							if not weapon_tweak or weapon_tweak.category ~= category and (category ~= "pistol" or weapon_tweak.category ~= "akimbo") then
+							if not weapon_tweak or weapon_tweak.category ~= category and (category ~= "pistol" or weapon_tweak.sub_category ~= "pistol") then
 								used_weapon_category_pass = false
 								break
 							end

@@ -1811,20 +1811,6 @@ function BaseElement:print_attribute_error(attribute_name, attribute_value, vali
 end
 
 function BaseElement:print_error(msg, recoverable, env_to_print, node)
-	if Application:production_build() then
-		if env_to_print then
-			env_to_print.print_vars()
-		else
-			cat_print("debug", self:get_xml_origin(node))
-		end
-		local error_msg = "Error: " .. msg .. "\n"
-		recoverable = false
-		if recoverable then
-			Application:stack_dump_error(error_msg)
-		else
-			Application:throw_exception(error_msg)
-		end
-	end
 end
 
 function BaseElement:get_xml_origin(node)
@@ -2136,10 +2122,6 @@ function UnitElement:run_sequence(name, endurance_type, source_unit, dest_unit, 
 	else
 		SequenceEnvironment.self = env
 		SequenceEnvironment.element = self
-		if Application:production_build() then
-			local supported_values = SequenceManager:get_keys_as_string(self:get_sequence_name_list(), "", true, true)
-			self:print_error("Unable to run non-existing sequence \"" .. tostring(name) .. "\" on unit \"" .. self._name:t() .. "\". Available sequences: " .. tostring(supported_values), true, env)
-		end
 	end
 end
 

@@ -21,6 +21,7 @@ local tmp_rot1 = Rotation()
 
 function SecurityCamera:init(unit)
 	self._unit = unit
+	self._set_access_camera_enabled = true
 	self:set_update_enabled(false)
 	self:_set_driving_state(self.update_position)
 	table.insert(SecurityCamera.cameras, self._unit)
@@ -807,6 +808,22 @@ function SecurityCamera:can_apply_tape_loop()
 	return not self._tape_loop_end_t or self._tape_loop_end_t < Application:time()
 end
 
+function SecurityCamera:on_camera_access_changed()
+	local current_state = game_state_machine:current_state()
+	if current_state and current_state.on_camera_access_changed then
+		current_state:on_camera_access_changed(self._unit)
+	end
+end
+
+function SecurityCamera:set_access_camera_enabled(enabled)
+	self._set_access_camera_enabled = enabled
+	self:on_camera_access_changed()
+end
+
+function SecurityCamera:access_enabled()
+	return self._unit:enabled() and self._set_access_camera_enabled
+end
+
 function SecurityCamera:on_unit_set_enabled(enabled)
 	if self._destroyed then
 		return
@@ -814,6 +831,7 @@ function SecurityCamera:on_unit_set_enabled(enabled)
 	if self._unit:interaction() then
 		self._unit:interaction():set_active(enabled)
 	end
+	self:on_camera_access_changed()
 end
 
 function SecurityCamera:save(data)

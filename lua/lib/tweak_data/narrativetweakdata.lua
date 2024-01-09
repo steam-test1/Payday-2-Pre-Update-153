@@ -3703,7 +3703,7 @@ function NarrativeTweakData:init()
 		}
 	}
 	self.jobs.man.briefing_event = "pln_man_cbf_01"
-	self.jobs.man.debrief_event = "Play_pln_man_81"
+	self.jobs.man.debrief_event = nil
 	self.jobs.man.crimenet_callouts = {
 		"pln_man_cnc_01"
 	}

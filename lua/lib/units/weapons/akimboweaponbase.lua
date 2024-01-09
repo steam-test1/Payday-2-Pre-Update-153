@@ -41,7 +41,7 @@ end
 
 function AkimboWeaponBase:start_shooting()
 	AkimboWeaponBase.super.start_shooting(self)
-	self._fire_second_sound = not self._fire_second_gun_next and not self:fire_mode() == "auto"
+	self._fire_second_sound = not self._fire_second_gun_next and self:fire_mode() ~= "auto"
 end
 
 function AkimboWeaponBase:fire(...)

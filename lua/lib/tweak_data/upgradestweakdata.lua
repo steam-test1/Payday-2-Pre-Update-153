@@ -191,7 +191,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.pistol.reload_speed_multiplier = {1.5}
 	self.values.akimbo.reload_speed_multiplier = self.values.pistol.reload_speed_multiplier
 	self.values.pistol.damage_addend = {1.5}
-	self.values.akimbo.damage_addend = {1.5}
 	self.values.pistol.damage_multiplier = {1.5}
 	self.values.assault_rifle.reload_speed_multiplier = {1.25}
 	self.values.assault_rifle.move_spread_multiplier = {0.5}
@@ -199,9 +198,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.pistol.spread_multiplier = {0.9}
 	self.values.akimbo.spread_multiplier = self.values.pistol.spread_multiplier
 	self.values.pistol.swap_speed_multiplier = {1.5}
-	self.values.akimbo.swap_speed_multiplier = self.values.pistol.swap_speed_multiplier
 	self.values.pistol.fire_rate_multiplier = {2}
-	self.values.akimbo.fire_rate_multiplier = self.values.pistol.fire_rate_multiplier
 	self.values.player.revive_interaction_speed_multiplier = {0.5}
 	self.values.player.long_dis_revive = {0.75, 1}
 	self.values.doctor_bag.interaction_speed_multiplier = {0.8}
@@ -700,16 +697,13 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.assault_rifle.move_spread_index_addend = {2}
 	self.values.snp.move_spread_index_addend = {2}
 	self.values.pistol.spread_index_addend = {1}
-	self.values.akimbo.spread_index_addend = self.values.pistol.spread_index_addend
 	self.values.shotgun.hip_fire_spread_index_addend = {1}
 	self.values.weapon.hip_fire_spread_index_addend = {1}
 	self.values.weapon.single_spread_index_addend = {1}
 	self.values.weapon.silencer_spread_index_addend = {2}
 	self.values.team.pistol.recoil_index_addend = {1}
-	self.values.team.akimbo.recoil_index_addend = self.values.team.pistol.recoil_index_addend
 	self.values.team.weapon.recoil_index_addend = {2}
 	self.values.team.pistol.suppression_recoil_index_addend = self.values.team.pistol.recoil_index_addend
-	self.values.team.akimbo.suppression_recoil_index_addend = self.values.team.akimbo.recoil_index_addend
 	self.values.team.weapon.suppression_recoil_index_addend = self.values.team.weapon.recoil_index_addend
 	self.values.shotgun.recoil_index_addend = {1}
 	self.values.assault_rifle.recoil_index_addend = {2}
@@ -735,6 +729,19 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.passive_always_regen_armor = {5}
 	self.values.player.passive_damage_reduction = {0.5}
+	self.cocaine_stacks_convert_levels = {30, 25}
+	self.cocaine_stacks_dmg_absorption_value = 0.1
+	self.cocaine_stacks_tick_t = 4
+	self.max_cocaine_stacks_per_tick = 240
+	self.max_total_cocaine_stacks = 600
+	self.cocaine_stacks_decay_t = 8
+	self.cocaine_stacks_decay_amount_per_tick = 80
+	self.cocaine_stacks_decay_percentage_per_tick = 0.6
+	self.values.player.cocaine_stacking = {1}
+	self.values.player.sync_cocaine_stacks = {true}
+	self.values.player.cocaine_stacks_decay_multiplier = {0.5}
+	self.values.player.sync_cocaine_upgrade_level = {2}
+	self.values.player.cocaine_stack_absorption_multiplier = {1.5}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -1583,6 +1590,30 @@ function UpgradesTweakData:_init_pd2_values()
 			},
 			{"5%", "20%"},
 			{"20%", "10%"}
+		},
+		{
+			{
+				"40%",
+				"240",
+				"4",
+				"600",
+				"1",
+				"30",
+				"60% + 80",
+				"8"
+			},
+			{"25%"},
+			{},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"60% + 40", "8"},
+			{"135%"},
+			{"1", "25"},
+			{"5%", "20%"},
+			{"50%", "10%"}
 		}
 	}
 	self.specialization_descs = {}
@@ -1717,7 +1748,8 @@ function UpgradesTweakData:init()
 			"olympic",
 			"mp9",
 			"baka",
-			"pugio"
+			"pugio",
+			"ballistic"
 		}
 	}
 	self.level_tree[20] = {
@@ -1767,7 +1799,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"boxing_gloves",
 			"meat_cleaver",
-			"wpn_prj_four"
+			"wpn_prj_four",
+			"sr2"
 		}
 	}
 	self.level_tree[26] = {
@@ -2232,6 +2265,8 @@ function UpgradesTweakData:init()
 	self:_model70_weapon_definitions()
 	self:_m37_weapon_definitions()
 	self:_china_weapon_definitions()
+	self:_sr2_weapon_definitions()
+	self:_x_sr2_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -5139,6 +5174,51 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_cocaine_stacking_1 = {
+		category = "feature",
+		name_id = "menu_player_cocaine_stacking_1",
+		upgrade = {
+			category = "player",
+			upgrade = "cocaine_stacking",
+			value = 1
+		}
+	}
+	self.definitions.player_sync_cocaine_stacks = {
+		category = "feature",
+		name_id = "menu_player_sync_cocaine_stacks",
+		upgrade = {
+			category = "player",
+			upgrade = "sync_cocaine_stacks",
+			value = 1
+		}
+	}
+	self.definitions.player_cocaine_stacks_decay_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_player_cocaine_stacks_decay_multiplier_1",
+		upgrade = {
+			category = "player",
+			upgrade = "cocaine_stacks_decay_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.player_sync_cocaine_upgrade_level_1 = {
+		category = "feature",
+		name_id = "menu_player_sync_cocaine_upgrade_level_1",
+		upgrade = {
+			category = "player",
+			upgrade = "sync_cocaine_upgrade_level",
+			value = 1
+		}
+	}
+	self.definitions.player_cocaine_stack_absorption_multiplier_1 = {
+		category = "feature",
+		name_id = "menu_player_cocaine_stack_absorption_multiplier_1",
+		upgrade = {
+			category = "player",
+			upgrade = "cocaine_stack_absorption_multiplier",
+			value = 1
+		}
+	}
 	self.definitions.toolset = {
 		tree = 4,
 		step = 1,
@@ -7081,6 +7161,9 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "pal"
 	}
+	self.definitions.ballistic = {
+		category = "melee_weapon"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -7125,15 +7208,6 @@ function UpgradesTweakData:_weapon_definitions()
 		name_id = "menu_pistol_spread_index_addend",
 		upgrade = {
 			category = "pistol",
-			upgrade = "spread_index_addend",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_spread_index_addend = {
-		category = "feature",
-		name_id = "menu_akimbo_spread_index_addend",
-		upgrade = {
-			category = "akimbo",
 			upgrade = "spread_index_addend",
 			value = 1
 		}
@@ -7954,15 +8028,6 @@ function UpgradesTweakData:_team_definitions()
 			value = 1
 		}
 	}
-	self.definitions.team_akimbo_recoil_index_addend = {
-		category = "team",
-		name_id = "menu_team_akimbo_recoil_index_addend",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "recoil_index_addend",
-			value = 1
-		}
-	}
 	self.definitions.team_weapon_recoil_index_addend = {
 		category = "team",
 		name_id = "menu_team_weapon_recoil_index_addend",
@@ -7977,15 +8042,6 @@ function UpgradesTweakData:_team_definitions()
 		name_id = "menu_team_pistol_suppression_recoil_index_addend",
 		upgrade = {
 			category = "pistol",
-			upgrade = "suppression_recoil_index_addend",
-			value = 1
-		}
-	}
-	self.definitions.team_akimbo_suppression_recoil_index_addend = {
-		category = "team",
-		name_id = "menu_team_akimbo_suppression_recoil_index_addend",
-		upgrade = {
-			category = "akimbo",
 			upgrade = "suppression_recoil_index_addend",
 			value = 1
 		}
@@ -9435,66 +9491,12 @@ function UpgradesTweakData:_akimbo_definitions()
 			value = 3
 		}
 	}
-	self.definitions.akimbo_clip_ammo_increase_1 = {
-		category = "feature",
-		name_id = "menu_akimbo_clip_ammo_increase_1",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "clip_ammo_increase",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_clip_ammo_increase_2 = {
-		category = "feature",
-		name_id = "menu_akimbo_clip_ammo_increase_2",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "clip_ammo_increase",
-			value = 2
-		}
-	}
-	self.definitions.akimbo_reload_speed_multiplier = {
-		category = "feature",
-		name_id = "menu_pistol_reload_speed",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "reload_speed_multiplier",
-			value = 1
-		}
-	}
 	self.definitions.akimbo_spread_multiplier = {
 		category = "feature",
 		name_id = "menu_pistol_spread_multiplier",
 		upgrade = {
 			category = "akimbo",
 			upgrade = "spread_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_swap_speed_multiplier = {
-		category = "feature",
-		name_id = "menu_pistol_swap_speed_multiplier",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "swap_speed_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_fire_rate_multiplier = {
-		category = "feature",
-		name_id = "menu_pistol_fire_rate_multiplier",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "fire_rate_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.akimbo_damage_addend = {
-		category = "feature",
-		name_id = "menu_akimbo_damage_addend",
-		upgrade = {
-			category = "akimbo",
-			upgrade = "damage_addend",
 			value = 1
 		}
 	}
@@ -9868,5 +9870,21 @@ function UpgradesTweakData:_china_weapon_definitions()
 		weapon_id = "china",
 		factory_id = "wpn_fps_gre_china",
 		dlc = "pal"
+	}
+end
+
+function UpgradesTweakData:_sr2_weapon_definitions()
+	self.definitions.sr2 = {
+		category = "weapon",
+		weapon_id = "sr2",
+		factory_id = "wpn_fps_smg_sr2"
+	}
+end
+
+function UpgradesTweakData:_x_sr2_weapon_definitions()
+	self.definitions.x_sr2 = {
+		category = "weapon",
+		weapon_id = "x_sr2",
+		factory_id = "wpn_fps_smg_x_sr2"
 	}
 end

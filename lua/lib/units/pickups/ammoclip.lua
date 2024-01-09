@@ -52,7 +52,10 @@ function AmmoClip:_pickup(unit)
 					local values = managers.player:temporary_upgrade_value("temporary", "loose_ammo_restore_health", 0)
 					if values ~= 0 then
 						local restore_value = math.random(values[1], values[2])
-						local num_more_hp = managers.player:num_players_with_more_health() + managers.criminals:nr_AI_criminals()
+						local num_more_hp = 1
+						if 0 < managers.player:num_connected_players() then
+							num_more_hp = managers.player:num_players_with_more_health()
+						end
 						local base = tweak_data.upgrades.loose_ammo_restore_health_values.base
 						local sync_value = math.round(math.clamp(restore_value - base, 0, 13))
 						restore_value = restore_value * (tweak_data.upgrades.loose_ammo_restore_health_values.multiplier or 0.1)

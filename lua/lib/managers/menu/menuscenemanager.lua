@@ -101,6 +101,10 @@ function MenuSceneManager:init()
 	self._global_poses.m134 = {
 		"husk_minigun"
 	}
+	self._global_poses.x_sr2 = {
+		"husk_akimbo1",
+		"husk_akimbo2"
+	}
 	self:_init_lobby_poses()
 	self._mask_units = {}
 	self._weapon_units = {}
