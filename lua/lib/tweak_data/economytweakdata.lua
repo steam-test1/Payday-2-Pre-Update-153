@@ -326,6 +326,36 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.event_bah_legendary.rarity = "legendary"
+	self.contents.pack_01 = {}
+	self.contents.pack_01.def_id = 10016
+	self.contents.pack_01.contains = {
+		weapon_skins = {
+			"striker_wolf",
+			"mosin_wolf",
+			"colt_1911_wolf",
+			"scar_wolf",
+			"saiga_wolf",
+			"g22c_wolf",
+			"mac10_wolf",
+			"p226_wolf",
+			"akm_wolf",
+			"baka_wolf",
+			"aug_wolf",
+			"asval_wolf",
+			"x_deagle_wolf",
+			"s552_wolf",
+			"m16_wolf"
+		},
+		contents = {
+			"pack_01_legendary"
+		}
+	}
+	self.contents.pack_01_legendary = {}
+	self.contents.pack_01_legendary.def_id = 10017
+	self.contents.pack_01_legendary.contains = {
+		weapon_skins = {"par_wolf"}
+	}
+	self.contents.pack_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -399,6 +429,13 @@ function EconomyTweakData:init()
 	self.safes.event_bah.name_id = "bm_menu_safe_event_bah"
 	self.safes.event_bah.texture_bundle_folder = "cash/safes/bah"
 	self.safes.event_bah.achievement = "bah_1"
+	self.safes.pack_01 = {}
+	self.safes.pack_01.drill = "pack_01"
+	self.safes.pack_01.content = "pack_01"
+	self.safes.pack_01.name_id = "bm_menu_safe_pack_01"
+	self.safes.pack_01.unit_name = "units/payday2_cash/safes/pack/safe/eco_safe_pack"
+	self.safes.pack_01.texture_bundle_folder = "cash/safes/pack"
+	self.safes.pack_01.market_link = "https://steamcommunity.com/market/listings/218620/Wolf%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -476,6 +513,14 @@ function EconomyTweakData:init()
 	self.drills.event_bah.desc_id = "bm_menu_drill_event_bah_desc"
 	self.drills.event_bah.texture_bundle_folder = "cash/safes/bah"
 	self.drills.event_bah.achievement = "bah_1"
+	self.drills.pack_01 = {}
+	self.drills.pack_01.safe = "pack_01"
+	self.drills.pack_01.def_id = 70009
+	self.drills.pack_01.price = "2.49"
+	self.drills.pack_01.name_id = "bm_menu_drill_pack_01"
+	self.drills.pack_01.desc_id = "bm_menu_drill_pack_01_desc"
+	self.drills.pack_01.unit_name = "units/payday2_cash/safes/pack/drill/eco_drill_pack"
+	self.drills.pack_01.texture_bundle_folder = "cash/safes/pack"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

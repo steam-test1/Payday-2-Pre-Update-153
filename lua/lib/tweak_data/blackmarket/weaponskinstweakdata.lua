@@ -5206,4 +5206,826 @@ function BlackMarketTweakData:_init_weapon_skins()
 			}
 		}
 	}
+	self.weapon_skins.striker_wolf = {}
+	self.weapon_skins.striker_wolf.name_id = "bm_wskn_striker_wolf"
+	self.weapon_skins.striker_wolf.desc_id = "bm_wskn_striker_wolf_desc"
+	self.weapon_skins.striker_wolf.weapon_id = "striker"
+	self.weapon_skins.striker_wolf.rarity = "common"
+	self.weapon_skins.striker_wolf.bonus = "recoil_p1"
+	self.weapon_skins.striker_wolf.reserve_quality = true
+	self.weapon_skins.striker_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.striker_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+	self.weapon_skins.striker_wolf.pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_005_df")
+	self.weapon_skins.striker_wolf.pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df")
+	self.weapon_skins.striker_wolf.pattern_tweak = Vector3(2.11305, 0, 1)
+	self.weapon_skins.striker_wolf.cubemap_pattern_control = Vector3(1, 0, 0)
+	self.weapon_skins.striker_wolf.parts = {
+		wpn_fps_sho_striker_body_standard = {
+			[Idstring("mtr_sling"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_001_df"),
+				pattern_pos = Vector3(0.0980584, 0.206535, 0),
+				pattern_tweak = Vector3(2.63773, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/bah/pattern_gradient/gradient_bah_009_df")
+			}
+		}
+	}
+	self.weapon_skins.mosin_wolf = {}
+	self.weapon_skins.mosin_wolf.name_id = "bm_wskn_mosin_wolf"
+	self.weapon_skins.mosin_wolf.desc_id = "bm_wskn_mosin_wolf_desc"
+	self.weapon_skins.mosin_wolf.weapon_id = "mosin"
+	self.weapon_skins.mosin_wolf.rarity = "common"
+	self.weapon_skins.mosin_wolf.bonus = "concealment_p1"
+	self.weapon_skins.mosin_wolf.reserve_quality = true
+	self.weapon_skins.mosin_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.mosin_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_002_df")
+	self.weapon_skins.mosin_wolf.parts = {
+		wpn_fps_upg_o_leupold = {
+			[Idstring("leupold"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_007_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0, 0.254233, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df"),
+				pattern_tweak = Vector3(2.44694, 0, 1)
+			}
+		},
+		wpn_fps_snp_mosin_b_sniper = {
+			[Idstring("mtr_sniper"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_b_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_002_df"),
+				pattern_pos = Vector3(-0.117815, -0.117815, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_002_df"),
+				pattern_tweak = Vector3(14.6101, 0, 0)
+			}
+		},
+		wpn_fps_snp_mosin_b_short = {
+			[Idstring("mtr_b_short"):key()] = {
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0.120677, 0.168376, 0),
+				pattern_tweak = Vector3(1.92225, 6.20826, 0.477701),
+				uv_offset_rot = Vector3(0.006, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_snp_mosin_b_medium = {
+			[Idstring("mtr_b_medium"):key()] = {
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0.120677, 0.168376, 0),
+				pattern_tweak = Vector3(1.92225, 6.20826, 0.477701),
+				uv_offset_rot = Vector3(0.006, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_snp_mosin_b_standard = {
+			[Idstring("mtr_b_standard"):key()] = {
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0.120677, 0.168376, 0),
+				pattern_tweak = Vector3(1.92225, 6.20826, 0.477701),
+				uv_offset_rot = Vector3(0.006, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_snp_mosin_body_standard = {
+			[Idstring("mtr_bolt"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+			},
+			[Idstring("mtr_body"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0.008, 0.0691378, 0),
+				pattern_tweak = Vector3(2.68543, 6.20826, 0.272597),
+				uv_offset_rot = Vector3(0.006, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_snp_mosin_body_black = {
+			[Idstring("mtr_bolt"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+			},
+			[Idstring("mtr_body"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				pattern_pos = Vector3(0.008, 0.0691378, 0),
+				pattern_tweak = Vector3(2.68543, 6.20826, 0.272597),
+				uv_offset_rot = Vector3(0.006, 0, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		}
+	}
+	self.weapon_skins.mosin_wolf.types = {
+		sight = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+		},
+		gadget = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df")
+		}
+	}
+	self.weapon_skins.colt_1911_wolf = {}
+	self.weapon_skins.colt_1911_wolf.name_id = "bm_wskn_colt_1911_wolf"
+	self.weapon_skins.colt_1911_wolf.desc_id = "bm_wskn_colt_1911_wolf_desc"
+	self.weapon_skins.colt_1911_wolf.weapon_id = "colt_1911"
+	self.weapon_skins.colt_1911_wolf.rarity = "common"
+	self.weapon_skins.colt_1911_wolf.bonus = "spread_p1"
+	self.weapon_skins.colt_1911_wolf.reserve_quality = true
+	self.weapon_skins.colt_1911_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.colt_1911_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_011_df")
+	self.weapon_skins.colt_1911_wolf.parts = {
+		wpn_fps_pis_1911_g_bling = {
+			[Idstring("bling"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+			}
+		}
+	}
+	self.weapon_skins.colt_1911_wolf.types = {
+		slide = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+		},
+		extra = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+		},
+		barrel_ext = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df")
+		},
+		sight = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+		},
+		grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_007_df"),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_007_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_tweak = Vector3(1.30217, 0, 0)
+		}
+	}
+	self.weapon_skins.scar_wolf = {}
+	self.weapon_skins.scar_wolf.name_id = "bm_wskn_scar_wolf"
+	self.weapon_skins.scar_wolf.desc_id = "bm_wskn_scar_wolf_desc"
+	self.weapon_skins.scar_wolf.weapon_id = "scar"
+	self.weapon_skins.scar_wolf.rarity = "common"
+	self.weapon_skins.scar_wolf.bonus = "recoil_p1"
+	self.weapon_skins.scar_wolf.reserve_quality = true
+	self.weapon_skins.scar_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.scar_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df")
+	self.weapon_skins.scar_wolf.parts = {
+		wpn_fps_ass_scar_body_standard = {
+			[Idstring("mtr_railcover"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+			}
+		},
+		wpn_fps_upg_vg_ass_smg_afg = {
+			[Idstring("afg"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+			}
+		}
+	}
+	self.weapon_skins.scar_wolf.types = {
+		barrel = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df")
+		},
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_007_df")
+		},
+		upper_reciever = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_fosterland_df"),
+			uv_scale = Vector3(9.32087, 9.32087, 1),
+			uv_offset_rot = Vector3(-0.0787356, 0.595663, 6.16331)
+		},
+		magazine = {
+			pattern_pos = Vector3(0.161297, 0.0634394, 0),
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_b_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_004_df"),
+			pattern_tweak = Vector3(6.07203, 0, 1)
+		},
+		grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+		}
+	}
+	self.weapon_skins.saiga_wolf = {}
+	self.weapon_skins.saiga_wolf.name_id = "bm_wskn_saiga_wolf"
+	self.weapon_skins.saiga_wolf.desc_id = "bm_wskn_saiga_wolf_desc"
+	self.weapon_skins.saiga_wolf.weapon_id = "saiga"
+	self.weapon_skins.saiga_wolf.rarity = "common"
+	self.weapon_skins.saiga_wolf.bonus = "recoil_p1"
+	self.weapon_skins.saiga_wolf.reserve_quality = true
+	self.weapon_skins.saiga_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.saiga_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_b_df")
+	self.weapon_skins.saiga_wolf.pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_006_df")
+	self.weapon_skins.saiga_wolf.pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df")
+	self.weapon_skins.saiga_wolf.pattern_tweak = Vector3(1.44527, 0, 1)
+	self.weapon_skins.saiga_wolf.types = {
+		sight = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df"),
+			pattern_tweak = Vector3(1, 0, 0.565943)
+		},
+		magazine = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_010_df"),
+			pattern = Idstring("units/payday2_cash/safes/default/pattern/pattern_default_df")
+		}
+	}
+	self.weapon_skins.g22c_wolf = {}
+	self.weapon_skins.g22c_wolf.name_id = "bm_wskn_g22c_wolf"
+	self.weapon_skins.g22c_wolf.desc_id = "bm_wskn_g22c_wolf_desc"
+	self.weapon_skins.g22c_wolf.weapon_id = "g22c"
+	self.weapon_skins.g22c_wolf.rarity = "common"
+	self.weapon_skins.g22c_wolf.bonus = "spread_p1"
+	self.weapon_skins.g22c_wolf.reserve_quality = true
+	self.weapon_skins.g22c_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.g22c_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df")
+	self.weapon_skins.g22c_wolf.pattern_tweak = Vector3(1, 0, 0)
+	self.weapon_skins.g22c_wolf.types = {
+		slide = {
+			pattern_pos = Vector3(0.137297, -0.308609, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/sputnik/pattern_gradient/gradient_sput_003_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_003_df"),
+			pattern_tweak = Vector3(0.872886, 0.753743, 0.678035)
+		},
+		lower_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+		}
+	}
+	self.weapon_skins.mac10_wolf = {}
+	self.weapon_skins.mac10_wolf.name_id = "bm_wskn_mac10_wolf"
+	self.weapon_skins.mac10_wolf.desc_id = "bm_wskn_mac10_wolf_desc"
+	self.weapon_skins.mac10_wolf.weapon_id = "mac10"
+	self.weapon_skins.mac10_wolf.rarity = "uncommon"
+	self.weapon_skins.mac10_wolf.bonus = "spread_p1"
+	self.weapon_skins.mac10_wolf.reserve_quality = true
+	self.weapon_skins.mac10_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.mac10_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_012_df")
+	self.weapon_skins.mac10_wolf.pattern_tweak = Vector3(0, 0, 1)
+	self.weapon_skins.mac10_wolf.pattern_pos = Vector3(0, 0.00620103, 0)
+	self.weapon_skins.mac10_wolf.types = {
+		lower_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_012_b_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_004_df"),
+			pattern_pos = Vector3(-0.0982754, 0.203075, 0),
+			pattern_tweak = Vector3(13.3222, 0, 1),
+			pattern_gradient = Idstring("units/payday2_cash/safes/cop/pattern_gradient/gradient_cop_003_df")
+		},
+		barrel_ext = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df")
+		},
+		stock = {
+			pattern_pos = Vector3(0, 0.177916, 0),
+			pattern_tweak = Vector3(13.7038, 0, 1)
+		},
+		magazine = {
+			pattern_pos = Vector3(-0.127355, 0.00620103, 0),
+			pattern_tweak = Vector3(6.45361, 0, 1)
+		}
+	}
+	self.weapon_skins.p226_wolf = {}
+	self.weapon_skins.p226_wolf.name_id = "bm_wskn_p226_wolf"
+	self.weapon_skins.p226_wolf.desc_id = "bm_wskn_p226_wolf_desc"
+	self.weapon_skins.p226_wolf.weapon_id = "p226"
+	self.weapon_skins.p226_wolf.rarity = "uncommon"
+	self.weapon_skins.p226_wolf.bonus = "spread_p1"
+	self.weapon_skins.p226_wolf.reserve_quality = true
+	self.weapon_skins.p226_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.p226_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+	self.weapon_skins.p226_wolf.default_blueprint = {
+		"wpn_fps_pis_p226_b_standard",
+		"wpn_fps_pis_p226_body_standard",
+		"wpn_fps_pis_p226_g_standard",
+		"wpn_fps_pis_p226_m_standard",
+		"wpn_fps_pis_p226_o_standard"
+	}
+	self.weapon_skins.p226_wolf.types = {
+		lower_reciever = {
+			pattern_pos = Vector3(0.025201, -0.0371799, 0),
+			pattern_tweak = Vector3(11.462, 0, 1)
+		},
+		magazine = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_002_df")
+		},
+		slide = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_pos = Vector3(0.101598, 0.36871, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/bah/pattern_gradient/gradient_bah_009_df"),
+			pattern_tweak = Vector3(4.97496, 0.40909, 0.129502)
+		},
+		grip = {
+			pattern_tweak = Vector3(12.3205, 0, 1)
+		}
+	}
+	self.weapon_skins.akm_wolf = {}
+	self.weapon_skins.akm_wolf.name_id = "bm_wskn_akm_wolf"
+	self.weapon_skins.akm_wolf.desc_id = "bm_wskn_akm_wolf_desc"
+	self.weapon_skins.akm_wolf.weapon_id = "akm"
+	self.weapon_skins.akm_wolf.rarity = "uncommon"
+	self.weapon_skins.akm_wolf.bonus = "spread_p1"
+	self.weapon_skins.akm_wolf.reserve_quality = true
+	self.weapon_skins.akm_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.akm_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+	self.weapon_skins.akm_wolf.parts = {
+		wpn_upg_ak_fg_standard = {
+			[Idstring("handguard_upper_wood"):key()] = {
+				pattern_pos = Vector3(-0.04, 0.13, 0)
+			},
+			[Idstring("handguard_lower_wood"):key()] = {
+				pattern_pos = Vector3(0.157836, 0.089979, 0),
+				pattern_tweak = Vector3(5.11806, 0, 1)
+			}
+		},
+		wpn_fps_upg_ak_m_uspalm = {
+			[Idstring("mtr_uspalm"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_011_df")
+			}
+		},
+		wpn_fps_upg_ak_m_quad = {
+			[Idstring("mtr_quadstack"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_011_df")
+			}
+		},
+		wpn_fps_upg_fg_midwest = {
+			[Idstring("mtr_midwest"):key()] = {
+				pattern_pos = Vector3(0.158836, 0.120677, 0),
+				pattern_tweak = Vector3(6.07203, 0, 1)
+			}
+		},
+		wpn_fps_upg_ak_fg_krebs = {
+			[Idstring("mtr_krebs"):key()] = {
+				pattern_pos = Vector3(0.0157406, -0.0128784, 0),
+				pattern_tweak = Vector3(8.60005, 0, 1)
+			}
+		},
+		wpn_fps_upg_ak_fg_tapco = {
+			[Idstring("mtr_tapco"):key()] = {
+				pattern_pos = Vector3(0.0684394, 0.0654394, 0),
+				pattern_tweak = Vector3(6.33022, 3.15133, 1)
+			},
+			[Idstring("ultimak"):key()] = {
+				pattern_pos = Vector3(0.0252805, 0.130217, 0),
+				pattern_tweak = Vector3(4.11639, 0, 1)
+			}
+		},
+		wpn_fps_upg_ak_fg_trax = {
+			[Idstring("mtr_trax"):key()] = {
+				pattern_pos = Vector3(0.177916, 0.406869, 0),
+				pattern_tweak = Vector3(6.64441, 0, 1)
+			}
+		}
+	}
+	self.weapon_skins.akm_wolf.types = {
+		lower_reciever = {
+			pattern_pos = Vector3(1.58032, 1.02695, 0),
+			pattern_tweak = Vector3(2.11305, 0.019, 0.585023)
+		},
+		upper_reciever = {
+			pattern_pos = Vector3(-0.0207517, -0.220292, 0),
+			pattern_tweak = Vector3(1.34987, 0.023, 1)
+		},
+		sight = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+		},
+		magazine = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_pos = Vector3(-0.62342, -0.241831, 0),
+			pattern_tweak = Vector3(3.01932, 0.573924, 1),
+			cubemap_pattern_control = Vector3(0, 1, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_004_df")
+		},
+		foregrip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_013_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_002_df"),
+			pattern_pos = Vector3(-0.585261, -0.926451, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/bah/pattern_gradient/gradient_bah_002_df"),
+			pattern_tweak = Vector3(2.82853, 0, 0.999)
+		},
+		grip = {
+			pattern_pos = Vector3(0, -0.001, 0),
+			pattern_tweak = Vector3(1.82686, 0, 1)
+		}
+	}
+	self.weapon_skins.baka_wolf = {}
+	self.weapon_skins.baka_wolf.name_id = "bm_wskn_baka_wolf"
+	self.weapon_skins.baka_wolf.desc_id = "bm_wskn_baka_wolf_desc"
+	self.weapon_skins.baka_wolf.weapon_id = "baka"
+	self.weapon_skins.baka_wolf.rarity = "uncommon"
+	self.weapon_skins.baka_wolf.bonus = "spread_p1"
+	self.weapon_skins.baka_wolf.reserve_quality = true
+	self.weapon_skins.baka_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.baka_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_013_df")
+	self.weapon_skins.baka_wolf.types = {
+		gadget = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+		},
+		barrel = {
+			pattern_pos = Vector3(-0.0701165, 0.139757, 0),
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df"),
+			pattern_tweak = Vector3(3.06702, 0, 1)
+		},
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_014_df")
+		},
+		upper_reciever = {
+			pattern_pos = Vector3(-0.470784, -0.022418, 0),
+			pattern_tweak = Vector3(0.634393, 0, 0),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_002_df")
+		},
+		magazine = {
+			pattern_pos = Vector3(0.225614, 0.590282, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_002_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_tweak = Vector3(1.34987, 0, 1)
+		},
+		barrel_ext = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df")
+		},
+		grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df")
+		}
+	}
+	self.weapon_skins.asval_wolf = {}
+	self.weapon_skins.asval_wolf.name_id = "bm_wskn_asval_wolf"
+	self.weapon_skins.asval_wolf.desc_id = "bm_wskn_asval_wolf_desc"
+	self.weapon_skins.asval_wolf.weapon_id = "asval"
+	self.weapon_skins.asval_wolf.rarity = "rare"
+	self.weapon_skins.asval_wolf.bonus = "spread_p1"
+	self.weapon_skins.asval_wolf.reserve_quality = true
+	self.weapon_skins.asval_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.asval_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_010_df")
+	self.weapon_skins.asval_wolf.default_blueprint = {
+		"wpn_fps_ass_asval_body_standard",
+		"wpn_fps_ass_asval_fg_standard",
+		"wpn_fps_ass_asval_m_standard",
+		"wpn_fps_ass_asval_s_solid",
+		"wpn_fps_ass_asval_b_standard",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_fl_ass_utg"
+	}
+	self.weapon_skins.asval_wolf.parts = {
+		wpn_fps_ass_asval_s_solid = {
+			[Idstring("mtr_solid"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_vargtimmer_df"),
+				uv_scale = Vector3(4.21968, 14.4697, 1),
+				uv_offset_rot = Vector3(-0.127355, 0.951092, 6.2682)
+			}
+		},
+		wpn_fps_ass_asval_b_standard = {
+			[Idstring("mtr_clamp"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_007_df"),
+				pattern = Idstring("units/payday2_cash/safes/default/pattern/pattern_default_df"),
+				pattern_gradient = Idstring("units/payday2_cash/safes/default/pattern_gradient/gradient_default_df")
+			},
+			[Idstring("mtr_barrel"):key()] = {
+				cubemap_pattern_control = Vector3(0, 1, 0)
+			}
+		},
+		wpn_fps_ass_asval_scopemount = {
+			[Idstring("mtr_mount_budget"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_vargtimmer_df"),
+				uv_scale = Vector3(3.21851, 9.27319, 0),
+				uv_offset_rot = Vector3(0.247154, 0.746298, 0)
+			}
+		},
+		wpn_fps_ass_asval_fg_standard = {
+			[Idstring("mtr_foregrip"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_drill_model_df"),
+				uv_scale = Vector3(3.36153, 6.36504, 1),
+				uv_offset_rot = Vector3(-0.148434, 0.783156, 0)
+			}
+		}
+	}
+	self.weapon_skins.asval_wolf.types = {
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df")
+		},
+		barrel = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005_df"),
+			uv_offset_rot = Vector3(-0.184593, 0.941092, 0),
+			pattern_tweak = Vector3(12.0343, 1.92257, 1),
+			pattern_pos = Vector3(0, -0.00333858, 0),
+			uv_scale = Vector3(1.0008, 1.00012, 1),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_drill_df"),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+		}
+	}
+	self.weapon_skins.aug_wolf = {}
+	self.weapon_skins.aug_wolf.name_id = "bm_wskn_aug_wolf"
+	self.weapon_skins.aug_wolf.desc_id = "bm_wskn_aug_wolf_desc"
+	self.weapon_skins.aug_wolf.weapon_id = "aug"
+	self.weapon_skins.aug_wolf.rarity = "rare"
+	self.weapon_skins.aug_wolf.bonus = "spread_p1"
+	self.weapon_skins.aug_wolf.reserve_quality = true
+	self.weapon_skins.aug_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.aug_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_009_df")
+	self.weapon_skins.aug_wolf.default_blueprint = {
+		"wpn_fps_upg_vg_ass_smg_verticalgrip",
+		"wpn_fps_aug_m_pmag",
+		"wpn_fps_aug_b_long",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_aug_fg_a3",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_aug_body_f90"
+	}
+	self.weapon_skins.aug_wolf.parts = {
+		wpn_fps_aug_body_f90 = {
+			[Idstring("mtr_f90"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_vargtimmer_df"),
+				uv_scale = Vector3(4.64875, 20, 0.489626),
+				uv_offset_rot = Vector3(0.0825188, 0.962172, 0)
+			}
+		},
+		wpn_fps_aug_fg_a3 = {
+			[Idstring("a3"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_drill_model_df"),
+				pattern = Idstring("units/payday2_cash/safes/sputnik/pattern/pattern_flag_stripes_df"),
+				pattern_tweak = Vector3(1, 2.35713, 1),
+				pattern_pos = Vector3(0, 0.244694, 0),
+				uv_scale = Vector3(7.55691, 13.7069, 1),
+				uv_offset_rot = Vector3(-0.26599, 0.930553, 0),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_aug_body_aug = {
+			[Idstring("aug"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_vargtimmer_df"),
+				uv_scale = Vector3(4.50573, 12.9441, 0),
+				uv_offset_rot = Vector3(0.0217406, 0.959172, 6.28319)
+			}
+		}
+	}
+	self.weapon_skins.aug_wolf.types = {
+		vertical_grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df")
+		},
+		barrel_ext = {
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_drill_df"),
+			pattern_tweak = Vector3(4.97496, 1.02347, 0.730503)
+		},
+		barrel = {
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_drill_df"),
+			pattern_tweak = Vector3(10, 0.813683, 0.730503),
+			uv_offset_rot = Vector3(0, 0, 1.66782),
+			uv_scale = Vector3(4.31503, 1, 1),
+			cubemap_pattern_control = Vector3(0.49678, 0, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+		},
+		magazine = {
+			base_gradient = Idstring("units/payday2_cash/safes/bah/base_gradient/base_bah_003_b_df")
+		}
+	}
+	self.weapon_skins.x_deagle_wolf = {}
+	self.weapon_skins.x_deagle_wolf.name_id = "bm_wskn_x_deagle_wolf"
+	self.weapon_skins.x_deagle_wolf.desc_id = "bm_wskn_x_deagle_wolf_desc"
+	self.weapon_skins.x_deagle_wolf.weapon_id = "x_deagle"
+	self.weapon_skins.x_deagle_wolf.rarity = "rare"
+	self.weapon_skins.x_deagle_wolf.bonus = "recoil_p1"
+	self.weapon_skins.x_deagle_wolf.reserve_quality = true
+	self.weapon_skins.x_deagle_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.x_deagle_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+	self.weapon_skins.x_deagle_wolf.default_blueprint = {
+		"wpn_fps_pis_deagle_body_standard",
+		"wpn_fps_pis_deagle_m_extended",
+		"wpn_fps_pis_deagle_b_long",
+		"wpn_fps_pis_deagle_g_bling"
+	}
+	self.weapon_skins.x_deagle_wolf.parts = {
+		wpn_fps_pis_deagle_g_bling = {
+			[Idstring("bling"):key()] = {
+				uv_scale = Vector3(1.50222, 1.07315, 0),
+				uv_offset_rot = Vector3(-0.232212, 1.00987, 4.73974)
+			}
+		},
+		wpn_fps_pis_deagle_g_ergo = {
+			[Idstring("ergo"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/default/sticker/sticker_default_df")
+			}
+		},
+		wpn_fps_pis_deagle_b_standard = {
+			[Idstring("barrel"):key()] = {
+				uv_scale = Vector3(1.54989, 1.59757, 1),
+				uv_offset_rot = Vector3(-0.535102, 0.989251, 4.06541)
+			}
+		}
+	}
+	self.weapon_skins.x_deagle_wolf.types = {
+		lower_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_015_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_pos = Vector3(-0.671118, 0.969712, 0),
+			pattern_tweak = Vector3(1.30217, 0.184315, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+		},
+		slide = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_fenris_df"),
+			uv_scale = Vector3(2.16967, 2.12199, 1),
+			uv_offset_rot = Vector3(-0.527023, 0.987251, 4.06541)
+		},
+		barrel_ext = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_015_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_001_df"),
+			pattern_pos = Vector3(-1.30074, 0.196995, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_004_df"),
+			pattern_tweak = Vector3(0.348202, 3.55593, 1)
+		},
+		magazine = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_fenris_df"),
+			uv_scale = Vector3(1.12082, 1.12082, 1),
+			uv_offset_rot = Vector3(-0.00333858, 1.2132, 2.47701)
+		},
+		grip = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_001_df"),
+			uv_offset_rot = Vector3(-0.207212, 1.00787, 4.72475),
+			pattern_tweak = Vector3(1, 4.96451, 1),
+			uv_scale = Vector3(1.54989, 0.977799, 0),
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_015_df"),
+			pattern_gradient = Idstring("units/payday2_cash/safes/red/pattern_gradient/gradient_france_df")
+		}
+	}
+	self.weapon_skins.s552_wolf = {}
+	self.weapon_skins.s552_wolf.name_id = "bm_wskn_s552_wolf"
+	self.weapon_skins.s552_wolf.desc_id = "bm_wskn_s552_wolf_desc"
+	self.weapon_skins.s552_wolf.weapon_id = "s552"
+	self.weapon_skins.s552_wolf.rarity = "epic"
+	self.weapon_skins.s552_wolf.bonus = "recoil_p1"
+	self.weapon_skins.s552_wolf.reserve_quality = true
+	self.weapon_skins.s552_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.s552_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+	self.weapon_skins.s552_wolf.pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_001_df")
+	self.weapon_skins.s552_wolf.pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df")
+	self.weapon_skins.s552_wolf.pattern_tweak = Vector3(0.72979, 0, 1)
+	self.weapon_skins.s552_wolf.default_blueprint = {
+		"wpn_fps_ass_s552_m_standard",
+		"wpn_fps_ass_s552_b_long",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_ass_s552_fg_standard_green",
+		"wpn_fps_ass_s552_g_standard_green",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_ass_s552_s_standard_green",
+		"wpn_fps_ass_s552_body_standard"
+	}
+	self.weapon_skins.s552_wolf.parts = {
+		wpn_fps_ass_s552_s_standard_green = {
+			[Idstring("mtr_stock"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_002_df"),
+				uv_scale = Vector3(7.36621, 6.93714, 0),
+				uv_offset_rot = Vector3(0.210535, 0.967172, 5.30916)
+			}
+		},
+		wpn_fps_ass_s552_fg_railed = {
+			[Idstring("mtr_railed_handguard"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+			}
+		}
+	}
+	self.weapon_skins.s552_wolf.types = {
+		foregrip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df"),
+			pattern = Idstring("units/payday2_cash/safes/bah/pattern/bah_pattern_002_df"),
+			pattern_pos = Vector3(-0.966849, 0.259773, 0),
+			pattern_tweak = Vector3(0.589296, 4.70782, 1),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_007_df")
+		},
+		barrel = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_004_df")
+		},
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_b_df"),
+			pattern = Idstring("units/payday2_cash/safes/bah/pattern/bah_pattern_002_df"),
+			pattern_pos = Vector3(-1.54877, -1.71095, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/shared/pattern_gradient/gradient_shared_007_df"),
+			pattern_tweak = Vector3(0.267106, 1.51798, 0)
+		},
+		upper_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_002_df")
+		}
+	}
+	self.weapon_skins.m16_wolf = {}
+	self.weapon_skins.m16_wolf.name_id = "bm_wskn_m16_wolf"
+	self.weapon_skins.m16_wolf.desc_id = "bm_wskn_m16_wolf_desc"
+	self.weapon_skins.m16_wolf.weapon_id = "m16"
+	self.weapon_skins.m16_wolf.rarity = "epic"
+	self.weapon_skins.m16_wolf.bonus = "spread_p1"
+	self.weapon_skins.m16_wolf.reserve_quality = true
+	self.weapon_skins.m16_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.m16_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_011_df")
+	self.weapon_skins.m16_wolf.pattern_gradient = Idstring("units/payday2_cash/safes/cop/pattern_gradient/gradient_cop_004_df")
+	self.weapon_skins.m16_wolf.pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_003_df")
+	self.weapon_skins.m16_wolf.pattern_tweak = Vector3(0.491297, 0, 0)
+	self.weapon_skins.m16_wolf.pattern_pos = Vector3(1.41808, 0.69306, 0)
+	self.weapon_skins.m16_wolf.default_blueprint = {
+		"wpn_fps_m4_lower_reciever",
+		"wpn_fps_m4_uupg_draghandle",
+		"wpn_fps_m4_uupg_b_long",
+		"wpn_fps_upg_ass_m16_fg_stag",
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_upg_m4_g_hgrip",
+		"wpn_fps_upg_m4_m_quad",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_m4_s_mk46",
+		"wpn_fps_upg_ass_m4_upper_reciever_ballos",
+		"wpn_fps_upg_ass_ns_surefire"
+	}
+	self.weapon_skins.m16_wolf.types = {
+		stock = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_012_df")
+		},
+		upper_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df")
+		},
+		foregrip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_006_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_001_df"),
+			pattern_pos = Vector3(0.301932, -0.0510372, 0),
+			pattern_tweak = Vector3(1.10638, 0, 1),
+			pattern_gradient = Idstring("units/payday2_cash/safes/cop/pattern_gradient/gradient_cop_smoker_df")
+		},
+		magazine = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_013_df"),
+			pattern_pos = Vector3(-0.0605769, 1.2559, 0),
+			pattern_tweak = Vector3(1, 5.57889, 1)
+		},
+		sight = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_008_df")
+		},
+		grip = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_df")
+		}
+	}
+	self.weapon_skins.par_wolf = {}
+	self.weapon_skins.par_wolf.name_id = "bm_wskn_par_wolf"
+	self.weapon_skins.par_wolf.desc_id = "bm_wskn_par_wolf_desc"
+	self.weapon_skins.par_wolf.weapon_id = "par"
+	self.weapon_skins.par_wolf.rarity = "legendary"
+	self.weapon_skins.par_wolf.bonus = "spread_p1"
+	self.weapon_skins.par_wolf.reserve_quality = true
+	self.weapon_skins.par_wolf.texture_bundle_folder = "cash/safes/pack"
+	self.weapon_skins.par_wolf.unique_name_id = "bm_wskn_par_wolf"
+	self.weapon_skins.par_wolf.locked = true
+	self.weapon_skins.par_wolf.base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_df")
+	self.weapon_skins.par_wolf.default_blueprint = {
+		"wpn_fps_lmg_svinet_b_standard",
+		"wpn_fps_lmg_par_body_standard",
+		"wpn_fps_lmg_par_m_standard",
+		"wpn_fps_lmg_svinet_s_legend",
+		"wpn_fps_lmg_par_upper_reciever",
+		"wpn_fps_upg_bp_lmg_lionbipod",
+		"wpn_fps_upg_fl_ass_utg"
+	}
+	self.weapon_skins.par_wolf.parts = {
+		wpn_fps_lmg_par_body_standard = {
+			[Idstring("mtr_carry"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005b_df")
+			},
+			[Idstring("mtr_body"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_004_df"),
+				pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+				base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005b_df"),
+				uv_offset_rot = Vector3(0.0443599, 0.941092, 0),
+				pattern_pos = Vector3(-0.017, 0.301932, 0),
+				uv_scale = Vector3(3.74293, 4.98247, 1),
+				pattern_tweak = Vector3(3.92559, 0, 0.291677),
+				pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+			}
+		},
+		wpn_fps_lmg_svinet_b_standard = {
+			[Idstring("mtr_barrel"):key()] = {
+				sticker = Idstring("units/payday2_cash/safes/default/sticker/sticker_default_df")
+			}
+		}
+	}
+	self.weapon_skins.par_wolf.types = {
+		barrel = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_004_df"),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			uv_offset_rot = Vector3(-0.346768, 0.881774, 0.214285),
+			pattern_pos = Vector3(0, -0.0605769, 0),
+			uv_scale = Vector3(1.26385, 2.45571, 1),
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_b_df"),
+			pattern_tweak = Vector3(1.49297, 1.02347, 1)
+		},
+		stock = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_002_df"),
+			pattern_tweak = Vector3(3.7348, 0.603894, 1),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_001_b_df"),
+			pattern_pos = Vector3(0.235154, 0, 0),
+			uv_scale = Vector3(20, 16.4244, 1),
+			uv_offset_rot = Vector3(-0.220292, 0.972791, 5.74373),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+		},
+		upper_reciever = {
+			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_005b_df"),
+			pattern = Idstring("units/payday2_cash/safes/pack/pattern/pack_pattern_005_df"),
+			pattern_pos = Vector3(0, 0.263773, 0),
+			pattern_tweak = Vector3(5.59504, 0, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/pack/pattern_gradient/gradient_pack_002_df")
+		},
+		magazine = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_003_df"),
+			uv_scale = Vector3(11.8, 9.89297, 1),
+			uv_offset_rot = Vector3(-0.014418, 0.716679, 6.22325)
+		},
+		lower_reciever = {
+			sticker = Idstring("units/payday2_cash/safes/pack/sticker/sticker_pack_002_df"),
+			uv_scale = Vector3(20, 20, 1),
+			uv_offset_rot = Vector3(-0.208212, 1.05303, 2.0874)
+		}
+	}
 end

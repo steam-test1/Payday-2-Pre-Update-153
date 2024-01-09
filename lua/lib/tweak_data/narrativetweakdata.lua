@@ -3100,7 +3100,7 @@ function NarrativeTweakData:init()
 		}
 	}
 	self.jobs.kenaz.briefing_event = "dentist_ca1_cbf_01"
-	self.jobs.kenaz.debrief_event = "kenaz_debrief"
+	self.jobs.kenaz.debrief_event = "nul"
 	self.jobs.kenaz.intro_event = {
 		"Play_pln_ca1_intro_01",
 		"Play_pln_ca1_intro_02"
@@ -3703,7 +3703,7 @@ function NarrativeTweakData:init()
 		}
 	}
 	self.jobs.man.briefing_event = "pln_man_cbf_01"
-	self.jobs.man.debrief_event = nil
+	self.jobs.man.debrief_event = "Play_pln_man_81"
 	self.jobs.man.crimenet_callouts = {
 		"pln_man_cnc_01"
 	}

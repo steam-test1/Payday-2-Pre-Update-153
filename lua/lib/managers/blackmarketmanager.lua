@@ -5985,16 +5985,3 @@ function BlackMarketManager:check_frog_1()
 	managers.job:set_memory("frog_1", false)
 	return false
 end
-
-function BlackMarketManager:debug_inventory()
-	local t = {}
-	for gv, cat in pairs(self._global.inventory) do
-		for type, entry in pairs(cat) do
-			t[type] = t[type] or {amount = 0}
-			for name, amount in pairs(entry) do
-				t[type].amount = t[type].amount + amount
-			end
-		end
-	end
-	print(inspect(t))
-end

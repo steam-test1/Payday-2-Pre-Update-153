@@ -1182,12 +1182,12 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.redwhite.name_id = "bm_mtl_matcap_redwhite_df"
 	self.materials.redwhite.pcs = {}
 	self.materials.redwhite.texture = "units/pd2_dlc_lupus/materials/matcap_redwhite_df"
-	self.materials.redwhite.value = 4
+	self.materials.redwhite.value = 0
 	self.materials.redwhite.dlc = "pal"
 	self.materials.mushroom_cloud = {}
 	self.materials.mushroom_cloud.name_id = "bm_mtl_matcap_mushroom_cloud_df"
 	self.materials.mushroom_cloud.pcs = {}
 	self.materials.mushroom_cloud.texture = "units/pd2_dlc_lupus/materials/matcap_mushroom_cloud_df"
-	self.materials.mushroom_cloud.value = 4
+	self.materials.mushroom_cloud.value = 0
 	self.materials.mushroom_cloud.dlc = "pal"
 end

@@ -396,10 +396,6 @@ function NetworkAccountSTEAM:is_ready_to_close()
 end
 
 function NetworkAccountSTEAM:inventory_load()
-	print("[NetworkAccountSTEAM:inventory_load]", "self._inventory_is_loading: ", self._inventory_is_loading)
-	if NetworkAccountSTEAM.TEST_INVENTORY then
-		return
-	end
 	if self._inventory_is_loading then
 		return
 	end
@@ -412,9 +408,6 @@ function NetworkAccountSTEAM:inventory_is_loading()
 end
 
 function NetworkAccountSTEAM:inventory_reward(reward_callback)
-	if NetworkAccountSTEAM.TEST_INVENTORY then
-		return false
-	end
 	Steam:inventory_reward(reward_callback)
 	return true
 end
@@ -433,16 +426,6 @@ function NetworkAccount:inventory_reward_unlock(safe, safe_instance_id, drill_in
 	drill_instance_id = drill_instance_id or managers.blackmarket:tradable_instance_id("drills", safe_tweak.drill)
 	local safe_item = managers.blackmarket:tradable_receive_item_by_instance_id(safe_instance_id)
 	local drill_item = managers.blackmarket:tradable_receive_item_by_instance_id(drill_instance_id)
-	if NetworkAccountSTEAM.TEST_INVENTORY then
-		local params = {
-			safe = safe,
-			callback = reward_unlock_callback,
-			safe_instance_id = safe_instance_id,
-			drill_instance_id = drill_instance_id
-		}
-		managers.menu_scene:add_callback(callback(self, self, "_clbk_inventory_reward", params), 2)
-		return
-	end
 	if not safe_instance_id or not drill_instance_id then
 		if reward_unlock_callback then
 			reward_unlock_callback("invalid_open")
@@ -453,17 +436,10 @@ function NetworkAccount:inventory_reward_unlock(safe, safe_instance_id, drill_in
 end
 
 function NetworkAccountSTEAM:inventory_reward_dlc(def_id, reward_promo_callback)
-	if NetworkAccountSTEAM.TEST_INVENTORY then
-		return false
-	end
 	Steam:inventory_reward_promo(def_id, reward_promo_callback)
 end
 
 function NetworkAccountSTEAM:inventory_outfit_refresh()
-	if NetworkAccountSTEAM.TEST_INVENTORY then
-		self._outfit_signature = ""
-		return
-	end
 	self._inventory_outfit_refresh_requested = true
 end
 

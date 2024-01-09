@@ -925,8 +925,8 @@ function LevelsTweakData:init()
 		"Play_pln_ca1_intro_02"
 	}
 	self.kenaz.outro_event = {
-		"butcher_cr1_debrief_01",
-		"butcher_cr1_debrief_02"
+		"dentist_ca1_debrief_01",
+		"dentist_ca1_debrief_02"
 	}
 	self.kenaz.music = "heist"
 	self.kenaz.package = {

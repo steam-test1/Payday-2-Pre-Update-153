@@ -443,8 +443,8 @@ function ChallengeManager:save(data)
 			save_data.active_challenges[key] = nil
 		end
 	end
-	if self._mission_values then
-		save_data.mission_values = deep_clone(self._mission_values)
+	if self._global.mission_values then
+		save_data.mission_values = deep_clone(self._global.mission_values)
 	end
 	data.ChallengeManager = save_data
 end
@@ -465,7 +465,7 @@ function ChallengeManager:load(data, version)
 			end
 		end
 		if state.mission_values then
-			self._mission_values = deep_clone(state.mission_values)
+			self._global.mission_values = deep_clone(state.mission_values)
 		end
 		self._global.validated = false
 	end
@@ -477,12 +477,12 @@ function ChallengeManager:_load_done()
 end
 
 function ChallengeManager:mission_value(variable)
-	return self._mission_values and self._mission_values[variable]
+	return self._global.mission_values and self._global.mission_values[variable]
 end
 
 function ChallengeManager:mission_set_value(variable, activated)
-	self._mission_values = self._mission_values or {}
+	self._global.mission_values = self._global.mission_values or {}
 	if variable and variable ~= "" then
-		self._mission_values[variable] = activated or nil
+		self._global.mission_values[variable] = activated or nil
 	end
 end
