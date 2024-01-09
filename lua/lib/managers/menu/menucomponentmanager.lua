@@ -245,6 +245,9 @@ function MenuComponentManager:_axis_move(o, axis_name, axis_vector, controller)
 end
 
 function MenuComponentManager:set_active_components(components, node)
+	if not alive(self._ws) or not alive(self._fullscreen_ws) then
+		return
+	end
 	local to_close = {}
 	for component, _ in pairs(self._active_components) do
 		to_close[component] = true
