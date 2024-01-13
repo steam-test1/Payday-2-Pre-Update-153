@@ -3291,7 +3291,10 @@ function WeaponFactoryTweakData:_init_m16()
 		"wpn_fps_upg_ass_m4_b_beowulf",
 		"wpn_fps_upg_ass_m16_fg_stag",
 		"wpn_fps_upg_ass_ns_battle",
-		"wpn_fps_upg_fl_ass_utg"
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_ass_m16_b_legend",
+		"wpn_fps_ass_m16_fg_legend",
+		"wpn_fps_ass_m16_s_legend"
 	}
 	self.wpn_fps_ass_m16_npc = deep_clone(self.wpn_fps_ass_m16)
 	self.wpn_fps_ass_m16_npc.unit = "units/payday2/weapons/wpn_fps_ass_m16/wpn_fps_ass_m16_npc"
@@ -24457,6 +24460,57 @@ function WeaponFactoryTweakData:_init_legendary()
 	}
 	self.parts.wpn_fps_lmg_svinet_b_standard.third_unit = "units/payday2_cash/safes/pack/weapons/wpn_fps_lmg_ksp58_b_legendary/wpn_third_lmg_svinet_b_legend"
 	self.parts.wpn_fps_lmg_svinet_s_legend.third_unit = "units/payday2_cash/safes/pack/weapons/wpn_fps_lmg_ksp58_s_legendary/wpn_third_lmg_svinet_s_legend"
+	self.parts.wpn_fps_ass_m16_b_legend = {
+		type = "barrel",
+		name_id = "bm_wp_m16_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_fps_ass_m16_b_legend",
+		stats = {
+			value = 1,
+			spread = 3,
+			recoil = 3
+		},
+		unatainable = true,
+		forbids = {
+			"wpn_fps_ass_m16_os_frontsight"
+		}
+	}
+	self.parts.wpn_fps_ass_m16_fg_legend = {
+		type = "gadget",
+		name_id = "bm_wp_m16_fg_legend",
+		a_obj = "a_fg",
+		unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_fps_ass_m16_fg_legend",
+		stats = {value = 1},
+		unatainable = true,
+		stance_mod = {
+			wpn_fps_ass_m16 = {
+				translation = Vector3(0, 10, -0.12)
+			}
+		},
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_ass_m16_s_legend = {
+		type = "stock",
+		name_id = "bm_wp_m16_s_legend",
+		a_obj = "a_s",
+		unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_fps_ass_m16_s_legend",
+		stats = {
+			value = 1,
+			spread = 6,
+			recoil = 10,
+			damage = 3,
+			concealment = -6
+		},
+		unatainable = true,
+		stance_mod = {
+			wpn_fps_ass_m16 = {
+				translation = Vector3(0, 10, -0.12)
+			}
+		}
+	}
+	self.parts.wpn_fps_ass_m16_b_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_b_legend"
+	self.parts.wpn_fps_ass_m16_fg_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_fg_legend"
+	self.parts.wpn_fps_ass_m16_s_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_s_legend"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()

@@ -302,7 +302,7 @@ function CharacterTweakData:_init_fbi_swat(presets)
 	}
 	self.fbi_swat.weapon_voice = "2"
 	self.fbi_swat.experience.cable_tie = "tie_swat"
-	self.fbi_swat.speech_prefix_p1 = "l"
+	self.fbi_swat.speech_prefix_p1 = self._prefix_data_p1.heavy_swat()
 	self.fbi_swat.speech_prefix_p2 = "n"
 	self.fbi_swat.speech_prefix_count = 4
 	self.fbi_swat.access = "swat"
@@ -331,7 +331,7 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	}
 	self.fbi_heavy_swat.weapon_voice = "2"
 	self.fbi_heavy_swat.experience.cable_tie = "tie_swat"
-	self.fbi_heavy_swat.speech_prefix_p1 = "l"
+	self.fbi_heavy_swat.speech_prefix_p1 = self._prefix_data_p1.heavy_swat()
 	self.fbi_heavy_swat.speech_prefix_p2 = "n"
 	self.fbi_heavy_swat.speech_prefix_count = 4
 	self.fbi_heavy_swat.access = "swat"
@@ -359,7 +359,7 @@ function CharacterTweakData:_init_city_swat(presets)
 	self.city_swat.weapon_voice = "2"
 	self.city_swat.experience.cable_tie = "tie_swat"
 	self.city_swat.silent_priority_shout = "f37"
-	self.city_swat.speech_prefix_p1 = "l"
+	self.city_swat.speech_prefix_p1 = self._prefix_data_p1.heavy_swat()
 	self.city_swat.speech_prefix_p2 = "n"
 	self.city_swat.speech_prefix_count = 4
 	self.city_swat.access = "swat"

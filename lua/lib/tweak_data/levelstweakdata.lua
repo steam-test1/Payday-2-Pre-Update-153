@@ -1156,7 +1156,8 @@ function LevelsTweakData:init()
 	self.dark.world_name = "narratives/elephant/dark"
 	self.dark.intro_event = "Play_pln_drk_intro_01"
 	self.dark.outro_event = {
-		"Play_rb14_drk_outro_01 , Play_rb14_drk_outro_02"
+		"Play_rb14_drk_outro_01",
+		"Play_rb14_drk_outro_02"
 	}
 	self.dark.music = "no_music"
 	self.dark.music_ext = "music_dark"

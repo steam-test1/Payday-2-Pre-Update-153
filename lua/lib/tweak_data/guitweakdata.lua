@@ -479,7 +479,7 @@ function GuiTweakData:init()
 		name_id = "menu_content_mad",
 		desc_id = "menu_content_mad_desc",
 		date_id = "menu_content_mad_date",
-		store = 218620,
+		webpage = "http://www.overkillsoftware.com/games/hardcorehenry/",
 		image = "guis/dlcs/mad/textures/pd2/content_updates/mad"
 	}
 	self.content_updates = {

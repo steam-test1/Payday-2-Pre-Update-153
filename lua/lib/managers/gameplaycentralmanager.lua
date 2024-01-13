@@ -179,7 +179,7 @@ end
 function GamePlayCentralManager:request_play_footstep(unit, m_pos)
 	if self._camera_pos then
 		local dis = mvector3.distance_sq(self._camera_pos, m_pos)
-		if dis < 250000 and #self._footsteps < 3 then
+		if dis < 2000000 and #self._footsteps < 3 then
 			table.insert(self._footsteps, {unit = unit, dis = dis})
 		end
 	end
@@ -386,7 +386,7 @@ function GamePlayCentralManager:_flush_footsteps()
 	local footstep = table.remove(self._footsteps, 1)
 	if footstep and alive(footstep.unit) then
 		local sound_switch_name
-		if footstep.dis < 2000 then
+		if footstep.dis < 2000000 then
 			local ext_movement = footstep.unit:movement()
 			local decal_ray_from = tmp_vec1
 			local decal_ray_to = tmp_vec2
