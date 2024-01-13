@@ -800,6 +800,23 @@ function WeaponFactoryManager:is_weapon_unmodded(factory_id, blueprint)
 	return table.size(blueprint_map) == 0
 end
 
+function WeaponFactoryManager:get_duplicate_parts_by_type(blueprint)
+	local duplicate_parts = {}
+	local types_gotten = {}
+	local parts_tweak = tweak_data.weapon.factory.parts
+	local part_type
+	for _, part_id in ipairs(blueprint) do
+		part_type = parts_tweak[part_id] and parts_tweak[part_id].type
+		if part_type then
+			if types_gotten[part_type] then
+				table.insert(duplicate_parts, part_id)
+			end
+			types_gotten[part_type] = true
+		end
+	end
+	return duplicate_parts
+end
+
 function WeaponFactoryManager:has_weapon_more_than_default_parts(factory_id)
 	local weapon_tweak = tweak_data.weapon.factory[factory_id]
 	return #weapon_tweak.uses_parts > #weapon_tweak.default_blueprint

@@ -33,7 +33,6 @@ function NetworkAccountSTEAM:init()
 	end
 	Steam:sa_handler():stats_store_callback(NetworkAccountSTEAM._on_stats_stored)
 	Steam:sa_handler():init()
-	self._masks = {}
 	self:_set_presences()
 	managers.savefile:add_load_done_callback(callback(self, self, "_load_done"))
 	Steam:lb_handler():register_storage_done_callback(NetworkAccountSTEAM._on_leaderboard_stored)
@@ -78,18 +77,12 @@ function NetworkAccountSTEAM:set_lightfx()
 		print("[NetworkAccountSTEAM:init] Initializing LightFX...")
 		self._has_alienware = LightFX:initialize() and LightFX:has_lamps()
 		if self._has_alienware then
-			self._masks.alienware = true
 			LightFX:set_lamps(0, 255, 0, 255)
 		end
 		print("[NetworkAccountSTEAM:init] Initializing LightFX done")
 	else
 		self._has_alienware = nil
-		self._masks.alienware = nil
 	end
-end
-
-function NetworkAccountSTEAM:has_mask(mask)
-	return self._masks[mask]
 end
 
 function NetworkAccountSTEAM._on_troll_group_recieved(success, page)

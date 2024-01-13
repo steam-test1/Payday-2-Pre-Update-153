@@ -34,6 +34,17 @@ function AkimboWeaponBase:_create_second_gun()
 	end
 end
 
+function AkimboWeaponBase:toggle_firemode(skip_post_event)
+	if AkimboWeaponBase.super.toggle_firemode(self, skip_post_event) then
+		if alive(self._second_gun) then
+			return self._second_gun:base():toggle_firemode(true)
+		else
+			return true
+		end
+	end
+	return false
+end
+
 function AkimboWeaponBase:create_second_gun()
 	self:_create_second_gun()
 	self._setup.user_unit:camera()._camera_unit:link(Idstring("a_weapon_left"), self._second_gun, self._second_gun:orientation_object():name())

@@ -184,7 +184,12 @@ function MenuCallbackHandler:open_blackmarket_node()
 	managers.menu:active_menu().logic:select_node("blackmarket")
 end
 
-function MenuCallbackHandler:leave_blackmarket(...)
+function MenuCallbackHandler:leave_blackmarket(item)
+	self:_leave_blackmarket()
+	managers.blackmarket:remove_all_new_drop()
+end
+
+function MenuCallbackHandler:_leave_blackmarket()
 	managers.menu_component:close_weapon_box()
 	managers.menu_scene:remove_item()
 	managers.menu_scene:delete_workbench_room()
@@ -1013,7 +1018,7 @@ function MenuCallbackHandler:got_new_steam_lootdrop(item)
 end
 
 function MenuCallbackHandler:leave_steam_inventory(item)
-	MenuCallbackHandler:leave_blackmarket(item)
+	MenuCallbackHandler:_leave_blackmarket()
 end
 
 function MenuCallbackHandler:can_toggle_chat()

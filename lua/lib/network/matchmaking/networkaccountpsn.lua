@@ -71,10 +71,6 @@ function NetworkAccountPSN:_lan_ip()
 	return "player_lan"
 end
 
-function NetworkAccountPSN:has_mask(mask)
-	return false
-end
-
 function NetworkAccountPSN:publish_statistics(stats, force_store)
 	Application:error("NetworkAccountPSN:publish_statistics( stats, force_store )")
 	Application:stack_dump()

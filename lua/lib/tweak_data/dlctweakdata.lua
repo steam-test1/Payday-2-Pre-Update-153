@@ -39,6 +39,7 @@ function DLCTweakData:init(tweak_data)
 		coco = true,
 		super = 1,
 		mad = true,
+		dos = true,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4034,9 +4035,6 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.steel = {}
-	self.steel.content = {}
-	self.steel.content.loot_drops = {}
 	self.steel_free = {}
 	self.steel_free.free = true
 	self.steel_free.content = {}
@@ -4178,9 +4176,6 @@ function DLCTweakData:init(tweak_data)
 			global_value = "normal"
 		}
 	}
-	self.berry = {}
-	self.berry.content = {}
-	self.berry.content.loot_drops = {}
 	self.ach_berry_2 = {}
 	self.ach_berry_2.dlc = "has_achievement"
 	self.ach_berry_2.achievement_id = "berry_2"
@@ -4304,9 +4299,6 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.peta = {}
-	self.peta.content = {}
-	self.peta.content.loot_drops = {}
 	self.ach_peta_2 = {}
 	self.ach_peta_2.dlc = "has_achievement"
 	self.ach_peta_2.achievement_id = "peta_2"
@@ -4395,9 +4387,6 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.pal = {}
-	self.pal.content = {}
-	self.pal.content.loot_drops = {}
 	self.ach_pal_2 = {}
 	self.ach_pal_2.dlc = "has_achievement"
 	self.ach_pal_2.achievement_id = "pal_2"
@@ -4487,7 +4476,9 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.coco = {}
+	self.coco.free = true
 	self.coco.content = {}
+	self.coco.content.loot_global_value = "infamous"
 	self.coco.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -4496,6 +4487,7 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.mad = {}
+	self.mad.free = true
 	self.mad.content = {}
 	self.mad.content.loot_drops = {
 		{
@@ -4599,6 +4591,12 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.dos = {}
+	self.dos.free = true
+	self.dos.content = {}
+	self.dos.content.loot_global_value = "normal"
+	self.dos.content.loot_drops = {}
+	self.dos.content.upgrades = {}
 	self.dbd_clan_award = {}
 	self.dbd_clan_award.dlc = "has_dbd_clan"
 	self.dbd_clan_award.content = {}
@@ -4630,6 +4628,28 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "bobblehead_dozer",
+			amount = 1
+		}
+	}
+	self.free_jwshades = {}
+	self.free_jwshades.free = true
+	self.free_jwshades.content = {}
+	self.free_jwshades.content.loot_global_value = "infamous"
+	self.free_jwshades.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "jw_shades",
+			amount = 1
+		}
+	}
+	self.dbd_boo_4_award = {}
+	self.dbd_boo_4_award.dlc = "has_dbd_clan"
+	self.dbd_boo_4_award.content = {}
+	self.dbd_boo_4_award.content.loot_global_value = "dbd_clan"
+	self.dbd_boo_4_award.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dbd_slasher",
 			amount = 1
 		}
 	}

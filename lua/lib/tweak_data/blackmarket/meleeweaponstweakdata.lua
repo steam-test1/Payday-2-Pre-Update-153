@@ -1758,7 +1758,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.gator.stats.max_damage_effect = 1
 	self.melee_weapons.gator.stats.charge_time = 2
 	self.melee_weapons.gator.stats.range = 225
-	self.melee_weapons.gator.expire_t = 1.1
+	self.melee_weapons.gator.expire_t = 0.8
 	self.melee_weapons.gator.repeat_expire_t = 0.8
 	self.melee_weapons.gator.stats.concealment = 29
 	self.melee_weapons.pugio = deep_clone(self.melee_weapons.kabar)
@@ -1933,7 +1933,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.scoutknife.stats.concealment = 29
 	self.melee_weapons.scoutknife.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.scoutknife.repeat_expire_t = 0.36
-	self.melee_weapons.scoutknife.expire_t = 1.8
+	self.melee_weapons.scoutknife.expire_t = 1
 	self.melee_weapons.nin = {}
 	self.melee_weapons.nin.name_id = "bm_melee_nin"
 	self.melee_weapons.nin.animation = nil

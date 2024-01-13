@@ -1388,7 +1388,6 @@ function CopMovement:_equip_item(item_type, align_place, droppable)
 		return
 	end
 	local item_name = available_items[math.random(available_items)]
-	print("[CopMovement:_equip_item]", item_name)
 	local item_unit = World:spawn_unit(item_name, align_obj:position(), align_obj:rotation())
 	self._unit:link(align_name, item_unit, item_unit:orientation_object():name())
 	self._equipped_gadgets = self._equipped_gadgets or {}

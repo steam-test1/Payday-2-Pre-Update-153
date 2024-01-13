@@ -48,6 +48,7 @@ function CarryTweakData:init(tweak_data)
 	self.types.explosives.can_explode = true
 	self.small_loot = {}
 	self.small_loot.money_bundle = tweak_data:get_value("money_manager", "small_loot", "money_bundle")
+	self.small_loot.ring_band = tweak_data:get_value("money_manager", "small_loot", "ring_band")
 	self.small_loot.diamondheist_vault_bust = tweak_data:get_value("money_manager", "small_loot", "diamondheist_vault_bust")
 	self.small_loot.diamondheist_vault_diamond = tweak_data:get_value("money_manager", "small_loot", "diamondheist_vault_diamond")
 	self.small_loot.diamondheist_big_diamond = tweak_data:get_value("money_manager", "small_loot", "diamondheist_big_diamond")

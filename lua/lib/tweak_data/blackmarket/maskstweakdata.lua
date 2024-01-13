@@ -1301,12 +1301,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.jw_shades = {}
 	self.masks.jw_shades.unit = "units/pd2_crimefest_2014/oct22/masks/jw_shades/msk_jw_shades"
 	self.masks.jw_shades.name_id = "bm_msk_jw_shades"
-	self.masks.jw_shades.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
+	self.masks.jw_shades.pcs = {}
 	self.masks.jw_shades.value = 0
 	self.masks.jw_shades.type = "glasses"
 	self.masks.jw_shades.skip_mask_on_sequence = true
@@ -2592,6 +2587,15 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.mad_mask.value = 0
 	self.masks.mad_mask.texture_bundle_folder = "mad"
 	self.masks.mad_mask.sort_number = 17
+	self.masks.dbd_slasher = {}
+	self.masks.dbd_slasher.unit = "units/pd2_dlc_boo_4/masks/msk_dbd_slasher"
+	self.masks.dbd_slasher.name_id = "bm_msk_dbd_04"
+	self.masks.dbd_slasher.pcs = {}
+	self.masks.dbd_slasher.value = 0
+	self.masks.dbd_slasher.type = "helmet"
+	self.masks.dbd_slasher.texture_bundle_folder = "boo_4"
+	self.masks.dbd_slasher.dlc = "dbd_clan"
+	self.masks.dbd_slasher.sort_number = 22
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"

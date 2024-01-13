@@ -110,6 +110,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_sr2_npc()
 	self:_init_data_x_sr2_npc()
 	self:_init_data_pl14_npc()
+	self:_init_data_x_mp5_npc()
+	self:_init_data_x_akmsu_npc()
 	self:_precalculate_values()
 end
 
@@ -1943,6 +1945,34 @@ function WeaponTweakData:_init_data_pl14_npc()
 	self.pl14_npc.suppression = 1
 end
 
+function WeaponTweakData:_init_data_x_mp5_npc()
+	self.x_mp5_npc.sounds.prefix = "mp5_x_npc"
+	self.x_mp5_npc.use_data.selection_index = 2
+	self.x_mp5_npc.DAMAGE = 1.25
+	self.x_mp5_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_mp5_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_mp5_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_mp5_npc.CLIP_AMMO_MAX = 80
+	self.x_mp5_npc.NR_CLIPS_MAX = 5
+	self.x_mp5_npc.hold = "akimbo_pistol"
+	self.x_mp5_npc.alert_size = 1800
+	self.x_mp5_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_akmsu_npc()
+	self.x_akmsu_npc.sounds.prefix = "akmsu_x_npc"
+	self.x_akmsu_npc.use_data.selection_index = 2
+	self.x_akmsu_npc.DAMAGE = 1.25
+	self.x_akmsu_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.x_akmsu_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_akmsu_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.x_akmsu_npc.CLIP_AMMO_MAX = 80
+	self.x_akmsu_npc.NR_CLIPS_MAX = 5
+	self.x_akmsu_npc.hold = "akimbo_pistol"
+	self.x_akmsu_npc.alert_size = 1800
+	self.x_akmsu_npc.suppression = 2
+end
+
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -2493,7 +2523,7 @@ function WeaponTweakData:_init_stats()
 		1.6
 	}
 	self.stats.extra_ammo = {}
-	for i = -10, 50, 2 do
+	for i = -10, 100, 2 do
 		table.insert(self.stats.extra_ammo, i)
 	end
 	self.stats.total_ammo_mod = {}
@@ -11132,8 +11162,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.x_sr2.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.x_sr2.sounds.dryfire = "secondary_dryfire"
 	self.x_sr2.timers = {}
-	self.x_sr2.timers.reload_not_empty = 3.6
-	self.x_sr2.timers.reload_empty = 4.4
+	self.x_sr2.timers.reload_not_empty = 2
+	self.x_sr2.timers.reload_empty = 2.5
 	self.x_sr2.timers.unequip = 0.5
 	self.x_sr2.timers.equip = 0.5
 	self.x_sr2.name_id = "bm_w_x_sr2"
@@ -11146,14 +11176,15 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.x_sr2.use_data.selection_index = 2
 	self.x_sr2.DAMAGE = 1
 	self.x_sr2.CLIP_AMMO_MAX = 64
-	self.x_sr2.NR_CLIPS_MAX = 6
-	self.x_sr2.AMMO_MAX = self.jowi.CLIP_AMMO_MAX * self.jowi.NR_CLIPS_MAX
-	self.x_sr2.AMMO_PICKUP = self:_pickup_chance(self.jowi.AMMO_MAX, 1)
+	self.x_sr2.NR_CLIPS_MAX = 3
+	self.x_sr2.AMMO_MAX = self.x_sr2.CLIP_AMMO_MAX * self.x_sr2.NR_CLIPS_MAX
+	self.x_sr2.AMMO_PICKUP = self:_pickup_chance(self.x_sr2.AMMO_MAX, 1)
 	self.x_sr2.FIRE_MODE = "auto"
 	self.x_sr2.fire_mode_data = {}
 	self.x_sr2.fire_mode_data.fire_rate = 0.08
 	self.x_sr2.single = {}
 	self.x_sr2.single.fire_rate = 0.08
+	self.x_sr2.CAN_TOGGLE_FIREMODE = true
 	self.x_sr2.spread = {}
 	self.x_sr2.spread.standing = self.new_m4.spread.standing
 	self.x_sr2.spread.crouching = self.new_m4.spread.crouching
@@ -11168,8 +11199,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		-0.5,
 		0.5
 	}
-	self.x_sr2.kick.crouching = self.jowi.kick.standing
-	self.x_sr2.kick.steelsight = self.jowi.kick.standing
+	self.x_sr2.kick.crouching = self.x_sr2.kick.standing
+	self.x_sr2.kick.steelsight = self.x_sr2.kick.standing
 	self.x_sr2.crosshair = {}
 	self.x_sr2.crosshair.standing = {}
 	self.x_sr2.crosshair.crouching = {}
@@ -11187,8 +11218,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.x_sr2.shake = {}
 	self.x_sr2.shake.fire_multiplier = 1
 	self.x_sr2.shake.fire_steelsight_multiplier = -1
-	self.x_sr2.autohit = autohit_pistol_default
-	self.x_sr2.aim_assist = aim_assist_pistol_default
+	self.x_sr2.autohit = autohit_smg_default
+	self.x_sr2.aim_assist = aim_assist_smg_default
 	self.x_sr2.weapon_hold = "x_sr2"
 	self.x_sr2.animations = {}
 	self.x_sr2.animations.second_gun_versions = {
@@ -11292,6 +11323,188 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		extra_ammo = 6,
 		total_ammo_mod = 21,
 		value = 4
+	}
+	self.x_mp5 = {}
+	self.x_mp5.category = "akimbo"
+	self.x_mp5.sub_category = "smg"
+	self.x_mp5.damage_melee = damage_melee_default
+	self.x_mp5.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_mp5.sounds = {}
+	self.x_mp5.sounds.fire = "mp5_x_fire"
+	self.x_mp5.sounds.fire_single = "mp5_x_fire_single"
+	self.x_mp5.sounds.fire_auto = "mp5_x_fire"
+	self.x_mp5.sounds.stop_fire = "mp5_x_stop"
+	self.x_mp5.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_mp5.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_mp5.sounds.dryfire = "secondary_dryfire"
+	self.x_mp5.timers = {}
+	self.x_mp5.timers.reload_not_empty = 2.5
+	self.x_mp5.timers.reload_empty = 3
+	self.x_mp5.timers.unequip = 0.5
+	self.x_mp5.timers.equip = 0.5
+	self.x_mp5.name_id = "bm_w_x_mp5"
+	self.x_mp5.desc_id = "bm_w_x_mp5_desc"
+	self.x_mp5.description_id = "des_x_mp5"
+	self.x_mp5.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_mp5.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_mp5.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_mp5.use_data = {}
+	self.x_mp5.use_data.selection_index = 2
+	self.x_mp5.DAMAGE = 1
+	self.x_mp5.CLIP_AMMO_MAX = 60
+	self.x_mp5.NR_CLIPS_MAX = 4
+	self.x_mp5.AMMO_MAX = self.x_mp5.CLIP_AMMO_MAX * self.x_mp5.NR_CLIPS_MAX
+	self.x_mp5.AMMO_PICKUP = self:_pickup_chance(self.x_mp5.AMMO_MAX, 1)
+	self.x_mp5.FIRE_MODE = "auto"
+	self.x_mp5.fire_mode_data = {}
+	self.x_mp5.fire_mode_data.fire_rate = 0.08
+	self.x_mp5.single = {}
+	self.x_mp5.single.fire_rate = 0.08
+	self.x_mp5.CAN_TOGGLE_FIREMODE = true
+	self.x_mp5.spread = {}
+	self.x_mp5.spread.standing = self.new_m4.spread.standing
+	self.x_mp5.spread.crouching = self.new_m4.spread.crouching
+	self.x_mp5.spread.steelsight = self.new_m4.spread.steelsight
+	self.x_mp5.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.x_mp5.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.x_mp5.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.x_mp5.kick = {}
+	self.x_mp5.kick.standing = {
+		1.4,
+		1.2,
+		-0.5,
+		0.5
+	}
+	self.x_mp5.kick.crouching = self.x_mp5.kick.standing
+	self.x_mp5.kick.steelsight = self.x_mp5.kick.standing
+	self.x_mp5.crosshair = {}
+	self.x_mp5.crosshair.standing = {}
+	self.x_mp5.crosshair.crouching = {}
+	self.x_mp5.crosshair.steelsight = {}
+	self.x_mp5.crosshair.standing.offset = 0.2
+	self.x_mp5.crosshair.standing.moving_offset = 0.6
+	self.x_mp5.crosshair.standing.kick_offset = 0.4
+	self.x_mp5.crosshair.crouching.offset = 0.1
+	self.x_mp5.crosshair.crouching.moving_offset = 0.6
+	self.x_mp5.crosshair.crouching.kick_offset = 0.3
+	self.x_mp5.crosshair.steelsight.hidden = true
+	self.x_mp5.crosshair.steelsight.offset = 0
+	self.x_mp5.crosshair.steelsight.moving_offset = 0
+	self.x_mp5.crosshair.steelsight.kick_offset = 0.1
+	self.x_mp5.shake = {}
+	self.x_mp5.shake.fire_multiplier = 1
+	self.x_mp5.shake.fire_steelsight_multiplier = -1
+	self.x_mp5.autohit = autohit_smg_default
+	self.x_mp5.aim_assist = aim_assist_smg_default
+	self.x_mp5.weapon_hold = "x_akmsu"
+	self.x_mp5.animations = {}
+	self.x_mp5.animations.has_steelsight_stance = true
+	self.x_mp5.animations.recoil_steelsight = true
+	self.x_mp5.panic_suppression_chance = 0.2
+	self.x_mp5.texture_bundle_folder = "dos"
+	self.x_mp5.stats = {
+		damage = 36,
+		spread = 8,
+		recoil = 20,
+		spread_moving = 8,
+		zoom = 3,
+		concealment = 23,
+		suppression = 17,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.x_akmsu = {}
+	self.x_akmsu.category = "akimbo"
+	self.x_akmsu.sub_category = "smg"
+	self.x_akmsu.damage_melee = damage_melee_default
+	self.x_akmsu.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_akmsu.sounds = {}
+	self.x_akmsu.sounds.fire = "akmsu_x_fire"
+	self.x_akmsu.sounds.fire_single = "akmsu_x_fire_single"
+	self.x_akmsu.sounds.fire_auto = "akmsu_x_fire"
+	self.x_akmsu.sounds.stop_fire = "akmsu_x_stop"
+	self.x_akmsu.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_akmsu.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_akmsu.sounds.dryfire = "secondary_dryfire"
+	self.x_akmsu.timers = {}
+	self.x_akmsu.timers.reload_not_empty = 3
+	self.x_akmsu.timers.reload_empty = 3.5
+	self.x_akmsu.timers.unequip = 0.5
+	self.x_akmsu.timers.equip = 0.5
+	self.x_akmsu.name_id = "bm_w_x_akmsu"
+	self.x_akmsu.desc_id = "bm_w_x_akmsu_desc"
+	self.x_akmsu.description_id = "des_x_akmsu"
+	self.x_akmsu.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.x_akmsu.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_akmsu.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.x_akmsu.use_data = {}
+	self.x_akmsu.use_data.selection_index = 2
+	self.x_akmsu.DAMAGE = 1
+	self.x_akmsu.CLIP_AMMO_MAX = 60
+	self.x_akmsu.NR_CLIPS_MAX = 2
+	self.x_akmsu.AMMO_MAX = self.x_akmsu.CLIP_AMMO_MAX * self.x_akmsu.NR_CLIPS_MAX
+	self.x_akmsu.AMMO_PICKUP = self:_pickup_chance(self.x_akmsu.AMMO_MAX, 1)
+	self.x_akmsu.FIRE_MODE = "auto"
+	self.x_akmsu.fire_mode_data = {}
+	self.x_akmsu.fire_mode_data.fire_rate = 0.073
+	self.x_akmsu.single = {}
+	self.x_akmsu.single.fire_rate = 0.073
+	self.x_akmsu.CAN_TOGGLE_FIREMODE = true
+	self.x_akmsu.spread = {}
+	self.x_akmsu.spread.standing = self.new_m4.spread.standing
+	self.x_akmsu.spread.crouching = self.new_m4.spread.crouching
+	self.x_akmsu.spread.steelsight = self.new_m4.spread.steelsight
+	self.x_akmsu.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.x_akmsu.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.x_akmsu.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.x_akmsu.kick = {}
+	self.x_akmsu.kick.standing = {
+		1.4,
+		1.2,
+		-0.5,
+		0.5
+	}
+	self.x_akmsu.kick.crouching = self.x_akmsu.kick.standing
+	self.x_akmsu.kick.steelsight = self.x_akmsu.kick.standing
+	self.x_akmsu.crosshair = {}
+	self.x_akmsu.crosshair.standing = {}
+	self.x_akmsu.crosshair.crouching = {}
+	self.x_akmsu.crosshair.steelsight = {}
+	self.x_akmsu.crosshair.standing.offset = 0.2
+	self.x_akmsu.crosshair.standing.moving_offset = 0.6
+	self.x_akmsu.crosshair.standing.kick_offset = 0.4
+	self.x_akmsu.crosshair.crouching.offset = 0.1
+	self.x_akmsu.crosshair.crouching.moving_offset = 0.6
+	self.x_akmsu.crosshair.crouching.kick_offset = 0.3
+	self.x_akmsu.crosshair.steelsight.hidden = true
+	self.x_akmsu.crosshair.steelsight.offset = 0
+	self.x_akmsu.crosshair.steelsight.moving_offset = 0
+	self.x_akmsu.crosshair.steelsight.kick_offset = 0.1
+	self.x_akmsu.shake = {}
+	self.x_akmsu.shake.fire_multiplier = 1
+	self.x_akmsu.shake.fire_steelsight_multiplier = -1
+	self.x_akmsu.autohit = autohit_smg_default
+	self.x_akmsu.aim_assist = aim_assist_smg_default
+	self.x_akmsu.weapon_hold = "x_akmsu"
+	self.x_akmsu.animations = {}
+	self.x_akmsu.animations.has_steelsight_stance = true
+	self.x_akmsu.animations.recoil_steelsight = true
+	self.x_akmsu.panic_suppression_chance = 0.2
+	self.x_akmsu.texture_bundle_folder = "dos"
+	self.x_akmsu.stats = {
+		damage = 80,
+		spread = 16,
+		recoil = 12,
+		spread_moving = 16,
+		zoom = 3,
+		concealment = 21,
+		suppression = 8,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
 	}
 end
 
@@ -12026,6 +12239,18 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.x_mp5_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_akmsu_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -12143,4 +12368,6 @@ function WeaponTweakData:_precalculate_values()
 	self.asval_smg_npc.AMMO_MAX = self.asval_smg_npc.CLIP_AMMO_MAX * self.asval_smg_npc.NR_CLIPS_MAX
 	self.sr2_smg_npc.AMMO_MAX = self.sr2_smg_npc.CLIP_AMMO_MAX * self.sr2_smg_npc.NR_CLIPS_MAX
 	self.ak47_ass_npc.AMMO_MAX = self.ak47_ass_npc.CLIP_AMMO_MAX * self.ak47_ass_npc.NR_CLIPS_MAX
+	self.x_mp5_npc.AMMO_MAX = self.x_mp5_npc.CLIP_AMMO_MAX * self.x_mp5_npc.NR_CLIPS_MAX
+	self.x_akmsu_npc.AMMO_MAX = self.x_akmsu_npc.CLIP_AMMO_MAX * self.x_akmsu_npc.NR_CLIPS_MAX
 end

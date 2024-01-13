@@ -42,6 +42,10 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_pd.exclude_stages = {
 		"safehouse",
 		"crojob1",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
 		"mad"
 	}
 	self.risk_pd.risk_lock = 0
@@ -52,6 +56,10 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_swat.exclude_stages = {
 		"safehouse",
 		"crojob1",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
 		"mad"
 	}
 	self.risk_swat.risk_lock = 1
@@ -62,6 +70,10 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_fbi.exclude_stages = {
 		"safehouse",
 		"crojob1",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
 		"mad"
 	}
 	self.risk_fbi.risk_lock = 2
@@ -69,13 +81,27 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 	self.risk_death_squad.name_id = "menu_asset_risklevel_3"
 	self.risk_death_squad.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_3"
 	self.risk_death_squad.stages = "all"
-	self.risk_death_squad.exclude_stages = {"safehouse", "mad"}
+	self.risk_death_squad.exclude_stages = {
+		"safehouse",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
+		"mad"
+	}
 	self.risk_death_squad.risk_lock = 3
 	self.risk_death_wish = {}
 	self.risk_death_wish.name_id = "menu_asset_risklevel_4"
 	self.risk_death_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_4"
 	self.risk_death_wish.stages = "all"
-	self.risk_death_wish.exclude_stages = {"safehouse", "mad"}
+	self.risk_death_wish.exclude_stages = {
+		"safehouse",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
+		"mad"
+	}
 	self.risk_death_wish.risk_lock = 4
 end
 

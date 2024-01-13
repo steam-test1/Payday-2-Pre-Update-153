@@ -622,15 +622,19 @@ function NewRaycastWeaponBase:can_toggle_firemode()
 	return tweak_data.weapon[self._name_id].CAN_TOGGLE_FIREMODE
 end
 
-function NewRaycastWeaponBase:toggle_firemode()
+function NewRaycastWeaponBase:toggle_firemode(skip_post_event)
 	local can_toggle = not self._locked_fire_mode and self:can_toggle_firemode()
 	if can_toggle then
 		if self._fire_mode == ids_single then
 			self._fire_mode = ids_auto
-			self._sound_fire:post_event("wp_auto_switch_on")
+			if not skip_post_event then
+				self._sound_fire:post_event("wp_auto_switch_on")
+			end
 		else
 			self._fire_mode = ids_single
-			self._sound_fire:post_event("wp_auto_switch_off")
+			if not skip_post_event then
+				self._sound_fire:post_event("wp_auto_switch_off")
+			end
 		end
 		return true
 	end

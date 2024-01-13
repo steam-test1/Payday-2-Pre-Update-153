@@ -527,7 +527,7 @@ function TweakData:init()
 				ssuffix = "u",
 				color_id = 4,
 				voice = "rb14",
-				ai_mask_id = "jimmy",
+				ai_mask_id = "jimmy_duct",
 				mask_id = 4
 			}
 		}
@@ -2768,9 +2768,7 @@ Play the full version soon to get your full PAYDAY!]],
 		"framing_frame_prof",
 		"welcome_to_the_jungle_wrapper_prof",
 		"election_day",
-		"election_day_prof",
-		"dark",
-		"mad"
+		"election_day_prof"
 	}
 	self.achievement.job_list.bain = {
 		"jewelry_store",
@@ -3030,24 +3028,7 @@ Play the full version soon to get your full PAYDAY!]],
 			multi_kill = 2
 		}
 	}
-	self.achievement.inventory = {
-		flake_1 = {
-			rewards = {
-				safes = {
-					"event_flake"
-				},
-				drills = {
-					"event_flake"
-				}
-			}
-		},
-		bah_1 = {
-			rewards = {
-				safes = {"event_bah"},
-				drills = {"event_bah"}
-			}
-		}
-	}
+	self.achievement.inventory = {}
 	local gage_5_1_achievement = {
 		text_id = "bm_wp_gage5_1_achievment",
 		stat = "gage5_1_stats",

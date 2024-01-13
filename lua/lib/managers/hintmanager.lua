@@ -85,6 +85,8 @@ function HintManager:_show_hint(id, time, params)
 		self._cooldown[id] = Application:time() + 2
 		self:hint(id).trigger_count = self:hint(id).trigger_count + 1
 		self._last_shown_id = id
+		params = params or {}
+		params.BTN_INTERACT = managers.localization:btn_macro("interact")
 		managers.hud:show_hint({
 			text = managers.localization:text(self:hint(id).text_id, params),
 			event = self:hint(id).event,
@@ -94,9 +96,10 @@ function HintManager:_show_hint(id, time, params)
 end
 
 function HintManager:sync_show_hint(id)
-	self:_show_hint(id, nil, {
+	local buttons = {
 		BTN_INTERACT = managers.localization:btn_macro("interact")
-	})
+	}
+	self:_show_hint(id, nil, buttons)
 end
 
 function HintManager:last_shown_id()

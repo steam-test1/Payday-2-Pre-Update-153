@@ -1543,7 +1543,6 @@ function CarryInteractionExt:interact(player)
 	managers.player:register_carry(managers.network:session():local_peer(), self._unit:carry_data() and self._unit:carry_data():carry_id())
 	if Network:is_client() then
 		player:movement():set_carry_restriction(true)
-	else
 	end
 	return true
 end

@@ -6704,6 +6704,8 @@ function CharacterTweakData:character_map()
 				"civ_male_worker_docks_1",
 				"civ_male_worker_docks_2",
 				"civ_male_worker_docks_3",
+				"civ_male_dog_abuser_1",
+				"civ_male_dog_abuser_2",
 				"ene_biker_1",
 				"ene_biker_2",
 				"ene_biker_3",

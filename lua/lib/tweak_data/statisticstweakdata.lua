@@ -441,7 +441,8 @@ function StatisticsTweakData:statistics_table()
 		"mad_mask",
 		"half_mask",
 		"mad_goggles",
-		"visor"
+		"visor",
+		"dbd_slasher"
 	}
 	local weapon_list = {
 		"ak5",
@@ -542,7 +543,9 @@ function StatisticsTweakData:statistics_table()
 		"china",
 		"sr2",
 		"x_sr2",
-		"pl14"
+		"pl14",
+		"x_mp5",
+		"x_akmsu"
 	}
 	local melee_list = {
 		"weapon",

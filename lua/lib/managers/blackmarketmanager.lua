@@ -1437,6 +1437,10 @@ function BlackMarketManager:remove_new_drop(global_value, category, id)
 	end
 end
 
+function BlackMarketManager:remove_all_new_drop()
+	self._global.new_drops = {}
+end
+
 function BlackMarketManager:get_weapon_new_part_drops(id)
 	local uses_parts = managers.weapon_factory:get_parts_from_factory_id(id) or {}
 	local new_parts = {}
@@ -3178,7 +3182,9 @@ function BlackMarketManager:on_sell_weapon(category, slot, skip_verification)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		return
 	end
-	self:add_crafted_weapon_blueprint_to_inventory(category, slot)
+	local crafted = self._global.crafted_items[category][slot]
+	local cosmetics_blueprint = crafted and crafted.cosmetics and crafted.cosmetics.id and tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id] and tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id].default_blueprint
+	self:add_crafted_weapon_blueprint_to_inventory(category, slot, cosmetics_blueprint)
 	managers.money:on_sell_weapon(category, slot)
 	self._global.crafted_items[category][slot] = nil
 	if not skip_verification then
@@ -5260,8 +5266,8 @@ function BlackMarketManager:verify_dlc_items()
 end
 
 function BlackMarketManager:_cleanup_blackmarket()
-	Application:debug("[BlackMarketManager:_cleanup_blackmarket] STARTING BLACKMARKET CLEANUP")
-	Application:debug("----------------------------------------------------------------------")
+	Application:error("[BlackMarketManager:_cleanup_blackmarket] STARTING BLACKMARKET CLEANUP")
+	Application:error("----------------------------------------------------------------------")
 	local crafted_items = self._global.crafted_items
 	for category, data in pairs(crafted_items) do
 		if not data or type(data) ~= "table" then
@@ -5328,6 +5334,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 			local texture_switches = item.texture_switches
 			local cosmetics = item.cosmetics
 			local index_table = {}
+			local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
 			local weapon_invalid = not tweak_data.weapon[weapon_id] or not tweak_data.weapon.factory[factory_id] or managers.weapon_factory:get_factory_id_by_weapon_id(weapon_id) ~= factory_id or managers.weapon_factory:get_weapon_id_by_factory_id(factory_id) ~= weapon_id or not chk_global_value_func(tweak_data.weapon[weapon_id].global_value)
 			if weapon_invalid then
 				table.insert(invalid_weapons, slot)
@@ -5339,7 +5346,6 @@ function BlackMarketManager:_cleanup_blackmarket()
 				for i, part_id in ipairs(blueprint) do
 					if not index_table[part_id] or not chk_global_value_func(item.global_values[part_id]) then
 						Application:error("BlackMarketManager:_cleanup_blackmarket() Weapon part no longer in uses parts or bad global value", "part_id", part_id, "weapon_id", item.weapon_id, "part_global_value", item.global_values[part_id])
-						local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
 						if table.contains(default_blueprint, part_id) then
 							invalid_add_weapon_remove_parts_func(slot, item, part_id)
 							break
@@ -5374,6 +5380,31 @@ function BlackMarketManager:_cleanup_blackmarket()
 						end
 					end
 				end
+				local duplicate_parts = managers.weapon_factory:get_duplicate_parts_by_type(blueprint)
+				for _, part_id in ipairs(duplicate_parts) do
+					local default_mod
+					local ids_id = Idstring(tweak_data.weapon.factory.parts[part_id].type)
+					for i, d_mod in ipairs(default_blueprint) do
+						if Idstring(tweak_data.weapon.factory.parts[d_mod].type) == ids_id then
+							default_mod = d_mod
+							break
+						end
+					end
+					if default_mod then
+						table.insert(invalid_parts, {
+							slot = slot,
+							global_value = "normal",
+							default_mod = default_mod,
+							part_id = part_id
+						})
+					else
+						table.insert(invalid_parts, {
+							slot = slot,
+							global_value = item.global_values[part_id] or "normal",
+							part_id = part_id
+						})
+					end
+				end
 				if cosmetics then
 					local invalid_cosmetic = not cosmetics.id or not tweak_data.blackmarket.weapon_skins[cosmetics.id]
 					if invalid_cosmetic then
@@ -5403,7 +5434,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 			local t = {}
 			for part_id, gv in pairs(global_values) do
 				if not table.contains(blueprint, part_id) then
-					Application:debug("BlackMarketManager:_cleanup_blackmarket() part exists in weapons global values but not in its blueprint. Removing it", "category", category, "slot", slot, "part_id", part_id, "global_value", gv)
+					Application:error("BlackMarketManager:_cleanup_blackmarket() part exists in weapons global values but not in its blueprint. Removing it", "category", category, "slot", slot, "part_id", part_id, "global_value", gv)
 					table.insert(t, part_id)
 				end
 			end
@@ -5434,20 +5465,20 @@ function BlackMarketManager:_cleanup_blackmarket()
 	
 	local function add_invalid_global_value_func(global_value)
 		invalid_items[global_value] = true
-		Application:debug("BlackMarketManager:_cleanup_blackmarket() Invalid inventory global_value detected", "global_value", global_value)
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory global_value detected", "global_value", global_value)
 	end
 	
 	local function add_invalid_category_func(global_value, category)
 		invalid_items[global_value] = invalid_items[global_value] or {}
 		invalid_items[global_value][category] = true
-		Application:debug("BlackMarketManager:_cleanup_blackmarket() Invalid inventory category detected", "global_value", global_value, "category", category)
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory category detected", "global_value", global_value, "category", category)
 	end
 	
 	local function add_invalid_item_func(global_value, category, item)
 		invalid_items[global_value] = invalid_items[global_value] or {}
 		invalid_items[global_value][category] = invalid_items[global_value][category] or {}
 		invalid_items[global_value][category][item] = true
-		Application:debug("BlackMarketManager:_cleanup_blackmarket() Invalid inventory item detected", "global_value", global_value, "category", category, "item", item)
+		Application:error("BlackMarketManager:_cleanup_blackmarket() Invalid inventory item detected", "global_value", global_value, "category", category, "item", item)
 	end
 	
 	if self._global.inventory.normal and self._global.inventory.normal.masks and self._global.inventory.normal.masks.arch_nemesis then
@@ -5487,10 +5518,14 @@ function BlackMarketManager:_cleanup_blackmarket()
 								table.insert(global_values, "normal")
 							end
 							global_values = table.list_union(global_values)
-							for _, gv in ipairs(global_values) do
-								if not chk_global_value_func(gv) then
-									add_invalid_item_func(global_value, category, item)
-									break
+							if not table.contains(global_values, global_value) then
+								add_invalid_item_func(global_value, category, item)
+							else
+								for _, gv in ipairs(global_values) do
+									if not chk_global_value_func(gv) then
+										add_invalid_item_func(global_value, category, item)
+										break
+									end
 								end
 							end
 						end
@@ -5502,6 +5537,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 	for global_value, categories in pairs(invalid_items) do
 		if type(categories) == "boolean" then
 			self._global.inventory[global_value] = nil
+			self._global.new_drops[global_value] = nil
 		else
 			for category, items in pairs(categories) do
 				if type(items) == "boolean" then
@@ -5509,6 +5545,9 @@ function BlackMarketManager:_cleanup_blackmarket()
 						Application:error("[BlackMarketManager] global_value do not exists in inventory", global_value)
 					else
 						self._global.inventory[global_value][category] = nil
+						if self._global.new_drops[global_value] then
+							self._global.new_drops[global_value][category] = nil
+						end
 					end
 				else
 					for item, invalid in pairs(items) do
@@ -5518,6 +5557,9 @@ function BlackMarketManager:_cleanup_blackmarket()
 							Application:error("[BlackMarketManager] category do not exists in inventory", category)
 						else
 							self._global.inventory[global_value][category][item] = nil
+							if self._global.new_drops[global_value] and self._global.new_drops[global_value][category] then
+								self._global.new_drops[global_value][category][item] = nil
+							end
 						end
 					end
 				end
@@ -5535,8 +5577,8 @@ function BlackMarketManager:_cleanup_blackmarket()
 			self._global.inventory_tradable[instance_id] = nil
 		end
 	end
-	Application:debug("----------------------------------------------------------------------")
-	Application:debug("[BlackMarketManager:_cleanup_blackmarket] BLACKMARKET CLEANUP DONE")
+	Application:error("----------------------------------------------------------------------")
+	Application:error("[BlackMarketManager:_cleanup_blackmarket] BLACKMARKET CLEANUP DONE")
 end
 
 function BlackMarketManager:test_clean()

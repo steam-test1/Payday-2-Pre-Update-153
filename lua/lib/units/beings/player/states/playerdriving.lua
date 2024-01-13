@@ -378,11 +378,23 @@ end
 
 function PlayerDriving:_set_camera_limits(mode)
 	if mode == "driving" then
-		self._camera_unit:base():set_limits(60, 20)
+		if not self._vehicle_ext._tweak_data.camera_limits or not self._vehicle_ext._tweak_data.camera_limits.driver then
+			self._camera_unit:base():set_limits(60, 20)
+		else
+			self._camera_unit:base():set_limits(self._vehicle_ext._tweak_data.camera_limits.driver.yaw, self._vehicle_ext._tweak_data.camera_limits.driver.pitch)
+		end
 	elseif mode == "passenger" then
-		self._camera_unit:base():set_limits(80, 30)
+		if not self._vehicle_ext._tweak_data.camera_limits or not self._vehicle_ext._tweak_data.camera_limits.passenger then
+			self._camera_unit:base():set_limits(80, 30)
+		else
+			self._camera_unit:base():set_limits(self._vehicle_ext._tweak_data.camera_limits.passenger.yaw, self._vehicle_ext._tweak_data.camera_limits.passenger.pitch)
+		end
 	elseif mode == "shooting" then
-		self._camera_unit:base():set_limits(nil, 40)
+		if not self._vehicle_ext._tweak_data.camera_limits or not self._vehicle_ext._tweak_data.camera_limits.shooting then
+			self._camera_unit:base():set_limits(nil, 40)
+		else
+			self._camera_unit:base():set_limits(self._vehicle_ext._tweak_data.camera_limits.shooting.yaw, self._vehicle_ext._tweak_data.camera_limits.shooting.pitch)
+		end
 	end
 end
 

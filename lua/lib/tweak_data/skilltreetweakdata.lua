@@ -1823,6 +1823,8 @@ function SkillTreeTweakData:init()
 				"x_g17",
 				"x_usp",
 				"x_sr2",
+				"x_mp5",
+				"x_akmsu",
 				"akimbo_recoil_index_addend_1",
 				"akimbo_recoil_index_addend_2"
 			},
@@ -2392,7 +2394,9 @@ function SkillTreeTweakData:init()
 					"x_g22c",
 					"x_g17",
 					"x_usp",
-					"x_sr2"
+					"x_sr2",
+					"x_mp5",
+					"x_akmsu"
 				},
 				cost = 400,
 				icon_xy = {7, 2},

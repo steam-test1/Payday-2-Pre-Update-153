@@ -11340,7 +11340,8 @@ end
 function BlackMarketGui:_remove_mod_callback(data)
 	managers.menu_component:post_event("item_sell")
 	if data.default_mod then
-		managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, data.global_value, data.default_mod, true, true)
+		local global_value = tweak_data.blackmarket.weapon_mods[data.default_mod] and (tweak_data.blackmarket.weapon_mods[data.default_mod].infamous and "infamous" or tweak_data.blackmarket.weapon_mods[data.default_mod].dlc) or "normal"
+		managers.blackmarket:buy_and_modify_weapon(data.category, data.slot, global_value, data.default_mod, true, true)
 	else
 		managers.blackmarket:remove_weapon_part(data.category, data.slot, data.global_value, data.name)
 	end

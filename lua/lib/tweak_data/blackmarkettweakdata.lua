@@ -59,7 +59,8 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 			weight = data.weight,
 			texture_bundle_folder = data.texture_bundle_folder,
 			is_a_unlockable = data.is_a_unlockable,
-			unatainable = data.unatainable
+			unatainable = data.unatainable,
+			inaccessible = data.inaccessible
 		}
 	end
 	self:_add_desc_from_name_macro(self.weapon_mods)

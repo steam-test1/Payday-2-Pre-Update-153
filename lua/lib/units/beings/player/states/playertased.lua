@@ -37,6 +37,7 @@ function PlayerTased:enter(state_data, enter_data)
 	self:_interupt_action_charging_weapon(managers.player:player_timer():time())
 	self._rumble_electrified = managers.rumble:play("electrified")
 	self.tased = true
+	self._state_data = state_data
 end
 
 function PlayerTased:_enter(enter_data)
@@ -75,6 +76,7 @@ function PlayerTased:exit(state_data, enter_data)
 	self._counter_taser_unit = nil
 	self._num_shocks = nil
 	self.tased = false
+	self._state_data.non_lethal_electrocution = nil
 end
 
 function PlayerTased:interaction_blocked()

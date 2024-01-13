@@ -3473,4 +3473,6 @@ function InteractionTweakData:init()
 	self.hold_fire_missile.start_active = false
 	self.hold_fire_missile.axis = "z"
 	self.hold_fire_missile.timer = 1
+	self.ring_band = deep_clone(self.money_wrap_single_bundle)
+	self.ring_band.text_id = "hud_int_take"
 end

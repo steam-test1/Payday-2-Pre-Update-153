@@ -1687,6 +1687,7 @@ function PlayerStandard:_interupt_action_melee(t)
 	self._state_data.melee_damage_delay_t = nil
 	self._state_data.meleeing = nil
 	self._unit:sound():play("interupt_melee", nil, false)
+	self:_play_melee_sound(managers.blackmarket:equipped_melee_weapon(), "hit_air")
 	self._ext_camera:play_redirect(self.IDS_EQUIP)
 	self._equipped_unit:base():tweak_data_anim_stop("unequip")
 	self._equipped_unit:base():tweak_data_anim_play("equip")
