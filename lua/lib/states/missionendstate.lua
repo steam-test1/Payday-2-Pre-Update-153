@@ -50,6 +50,7 @@ function MissionEndState:at_enter(old_state, params)
 		player:camera():play_redirect(Idstring("idle"))
 		player:character_damage():disable_berserker()
 	end
+	managers.job:stop_sounds()
 	managers.dialog:quit_dialog()
 	Application:debug("1 second to managers.mission:pre_destroy()")
 	self._mission_destroy_t = Application:time() + 1

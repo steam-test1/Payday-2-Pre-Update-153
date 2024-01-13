@@ -3117,7 +3117,8 @@ end
 
 function MenuCallbackHandler:load_start_menu_lobby()
 	managers.job:clear_saved_ghost_bonus()
-	managers.job:cleanup_data()
+	managers.job:stop_sounds()
+	managers.experience:mission_xp_clear()
 	managers.network:session():load_lobby()
 end
 

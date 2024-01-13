@@ -1495,7 +1495,7 @@ function BlackMarketTweakData:_init_masks()
 		textures = "no_color_full_material",
 		materials = "deep_bronze"
 	}
-	self.masks.arch_nemesis.dlc = nil
+	self.masks.arch_nemesis.dlc = "goty_dlc_bundle_2014"
 	self.masks.arch_nemesis.dlc_list = {
 		"character_pack_clover",
 		"armored_transport",

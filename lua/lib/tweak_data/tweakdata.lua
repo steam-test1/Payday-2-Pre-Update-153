@@ -2814,6 +2814,7 @@ Play the full version soon to get your full PAYDAY!]],
 		"man"
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
+	self.achievement.job_list.jimmy = {"mad", "dark"}
 	self.achievement.job_list.events = {"nail"}
 	if SystemInfo:platform() == Idstring("WIN32") then
 		table.insert(self.achievement.job_list.bain, "roberts")

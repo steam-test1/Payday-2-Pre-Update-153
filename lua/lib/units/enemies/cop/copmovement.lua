@@ -96,7 +96,7 @@ CopMovement._gadgets = {
 		Idstring("units/pd2_dlc_casino/props/cas_prop_int_dinning_set/cas_prop_int_dinning_set_table_glass_02_anim")
 	},
 	blowtorch = {
-		Idstring("units/pd2_dlc_dark/pickups/drk_pku_blowtorch/drk_prop_blowtorch")
+		Idstring("units/pd2_dlc_dark/character/ene_acc_dark_blowtorch/ene_acc_dark_blowtorch")
 	}
 }
 local action_variants = {

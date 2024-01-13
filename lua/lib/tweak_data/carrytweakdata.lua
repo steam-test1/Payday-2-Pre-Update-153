@@ -492,7 +492,7 @@ function CarryTweakData:init(tweak_data)
 	self.parachute.unit = "units/pd2_dlc_jerry/pickups/gen_pku_parachute_bag/gen_pku_parachute_bag"
 	self.parachute.AI_carry = {SO_category = "enemies"}
 	self.drk_bomb_part = {}
-	self.drk_bomb_part.type = "heavy"
+	self.drk_bomb_part.type = "medium"
 	self.drk_bomb_part.name_id = "hud_carry_cro_loot"
 	self.drk_bomb_part.bag_value = "drk_bomb_part"
 	self.drk_bomb_part.unit = "units/pd2_dlc1/pickups/gen_pku_explosivesbag/gen_pku_explosivesbag"

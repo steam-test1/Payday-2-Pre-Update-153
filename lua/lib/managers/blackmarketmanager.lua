@@ -5450,6 +5450,9 @@ function BlackMarketManager:_cleanup_blackmarket()
 		Application:debug("BlackMarketManager:_cleanup_blackmarket() Invalid inventory item detected", "global_value", global_value, "category", category, "item", item)
 	end
 	
+	if self._global.inventory.normal and self._global.inventory.normal.masks and self._global.inventory.normal.masks.arch_nemesis then
+		self._global.inventory.normal.masks.arch_nemesis = nil
+	end
 	for global_value, categories in pairs(self._global.inventory or {}) do
 		if not chk_global_value_func(global_value) then
 			add_invalid_global_value_func(global_value)
