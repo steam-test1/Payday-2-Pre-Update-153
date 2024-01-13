@@ -388,6 +388,16 @@ function SkillTreeManager:on_respec_tree(tree, forced_respec_multiplier)
 	end
 end
 
+function SkillTreeManager:_respec_tree_version7(tree, forced_respec_multiplier)
+	local points_spent = self:points_spent(tree)
+	local unlocked = self:trees_unlocked()
+	if 0 < unlocked then
+		points_spent = points_spent + Application:digest_value(tweak_data.skilltree.unlock_tree_cost[unlocked], false)
+	end
+	self:_reset_skilltree7(tree, forced_respec_multiplier)
+	self:_aquire_points(points_spent, true)
+end
+
 function SkillTreeManager:_respec_tree_version5(tree, forced_respec_multiplier)
 	local points_spent = self:points_spent(tree)
 	local unlocked = self:trees_unlocked()
@@ -408,6 +418,19 @@ function SkillTreeManager:_reset_skilltree(tree, forced_respec_multiplier)
 	self:_set_points_spent(tree, 0)
 	self._global.trees[tree].unlocked = false
 	managers.money:on_respec_skilltree(tree, forced_respec_multiplier)
+	local tree_data = tweak_data.skilltree.trees[tree]
+	for i = #tree_data.tiers, 1, -1 do
+		local tier = tree_data.tiers[i]
+		for _, skill in ipairs(tier) do
+			self:_unaquire_skill(skill)
+		end
+	end
+	self:_unaquire_skill(tree_data.skill)
+end
+
+function SkillTreeManager:_reset_skilltree7(tree, forced_respec_multiplier)
+	self:_set_points_spent(tree, 0)
+	self._global.trees[tree].unlocked = false
 	local tree_data = tweak_data.skilltree.trees[tree]
 	for i = #tree_data.tiers, 1, -1 do
 		local tier = tree_data.tiers[i]
@@ -688,9 +711,13 @@ function SkillTreeManager:reset_skilltrees()
 		for tree_id, tree_data in pairs(self._global.trees) do
 			self:_respec_tree_version4(tree_id, 1)
 		end
-	else
+	elseif self._global.VERSION < 7 then
 		for tree_id, tree_data in pairs(self._global.trees) do
 			self:_respec_tree_version5(tree_id, 1)
+		end
+	else
+		for tree_id, tree_data in pairs(self._global.trees) do
+			self:_respec_tree_version7(tree_id, 1)
 		end
 	end
 	self:_setup_skill_switches()
