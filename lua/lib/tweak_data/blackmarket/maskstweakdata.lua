@@ -2597,6 +2597,15 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.dbd_04.texture_bundle_folder = "boo"
 	self.masks.dbd_04.dlc = "dbd_clan"
 	self.masks.dbd_04.sort_number = 18
+	self.masks.dbd_01 = {}
+	self.masks.dbd_01.unit = "units/pd2_dlc_boo_1/masks/msk_dbd_01"
+	self.masks.dbd_01.name_id = "bm_msk_dbd_01"
+	self.masks.dbd_01.pcs = {}
+	self.masks.dbd_01.value = 0
+	self.masks.dbd_01.type = "helmet"
+	self.masks.dbd_01.texture_bundle_folder = "boo_1"
+	self.masks.dbd_01.dlc = "dbd_clan"
+	self.masks.dbd_01.sort_number = 19
 	self.masks.dbd_slasher = {}
 	self.masks.dbd_slasher.unit = "units/pd2_dlc_boo_4/masks/msk_dbd_slasher"
 	self.masks.dbd_slasher.name_id = "bm_msk_dbd_04"
