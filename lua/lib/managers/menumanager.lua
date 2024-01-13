@@ -933,14 +933,21 @@ function MenuManager:created_lobby()
 end
 
 function MenuManager:exit_online_menues()
+	local must_show_controller_disconnect
+	if Global.controller_manager.connect_controller_dialog_visible then
+		must_show_controller_disconnect = true
+		managers.controller:_close_controller_changed_dialog(true)
+	end
 	managers.system_menu:force_close_all()
-	Global.controller_manager.connect_controller_dialog_visible = nil
 	self:_close_lobby_menu_components()
 	if self:active_menu() then
 		self:close_menu(self:active_menu().name)
 	end
 	self:open_menu("menu_main")
 	if not managers.menu:is_pc_controller() then
+	end
+	if must_show_controller_disconnect then
+		managers.controller:_show_controller_changed_dialog()
 	end
 end
 
@@ -1552,12 +1559,20 @@ function MenuCallbackHandler:is_xb1()
 	return SystemInfo:platform() == Idstring("XB1")
 end
 
+function MenuCallbackHandler:is_not_xb1()
+	return not self:is_xb1()
+end
+
 function MenuCallbackHandler:is_not_x360()
 	return not self:is_x360()
 end
 
 function MenuCallbackHandler:is_not_xbox()
 	return not self:is_x360()
+end
+
+function MenuCallbackHandler:is_not_x360_or_xb1()
+	return not self:is_x360() and not self:is_xb1()
 end
 
 function MenuCallbackHandler:is_not_nextgen()
@@ -4674,6 +4689,7 @@ function MenuCrimeNetContractInitiator:modify_node(original_node, data)
 	local node = deep_clone(original_node)
 	if Global.game_settings.single_player then
 		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+	elseif data.smart_matchmaking then
 	elseif not data.server then
 		node:item("lobby_job_plan"):set_value(Global.game_settings.job_plan)
 		node:item("lobby_kicking_option"):set_value(Global.game_settings.kick_option)
@@ -6126,6 +6142,8 @@ function MenuCrimeNetGageAssignmentInitiator:modify_node(original_node, data)
 end
 
 MenuCrimeNetSpecialInitiator = MenuCrimeNetSpecialInitiator or class()
+MenuCrimeNetSpecialInitiator.job_callback = nil
+MenuCrimeNetSpecialInitiator.choose_any_job = nil
 
 function MenuCrimeNetSpecialInitiator:modify_node(original_node, data)
 	local node = original_node
@@ -6142,6 +6160,9 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 	MenuCallbackHandler:chk_dlc_content_updated()
 	node:clean_items()
 	if not node:item("divider_end") then
+		if self.pre_create_clbk then
+			self:pre_create_clbk(node)
+		end
 		local contacts = {}
 		for contact in pairs(tweak_data.narrative.contacts) do
 			table.insert(contacts, contact)
@@ -6161,7 +6182,7 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 				if not tweak_data.narrative:is_wrapped_to_job(job_id) then
 					table.insert(jobs[contact], {
 						id = job_id,
-						enabled = dlc and max_jc >= (job_tweak.jc or 0) + (job_tweak.competitive and 40 or job_tweak.professional and 10 or 0)
+						enabled = self.choose_any_job or dlc and max_jc >= (job_tweak.jc or 0) + (job_tweak.professional and 10 or 0)
 					})
 				end
 			end
@@ -6230,11 +6251,14 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		new_item:set_value(listed_contact)
 		node:add_item(new_item)
 		self:create_divider(node, "1")
-		self:create_divider(node, "title", "menu_cn_premium_buy_title", nil, tweak_data.screen_colors.text)
+		self:create_divider(node, "title", self.contract_divider_id or "menu_cn_premium_buy_title", nil, tweak_data.screen_colors.text)
 		if jobs[listed_contact] then
 			for _, contract in pairs(jobs[listed_contact]) do
 				self:create_job(node, contract)
 			end
+		end
+		if self.post_create_clbk then
+			self:post_create_clbk(node)
 		end
 		self:create_divider(node, "end")
 	end
@@ -6249,8 +6273,8 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
 	node:add_item(new_item)
-	node:set_default_item_name("contact_filter")
-	node:select_item("contact_filter")
+	node:set_default_item_name(self.default_item or "contact_filter")
+	node:select_item(self.default_item or "contact_filter")
 	return node
 end
 
@@ -6323,7 +6347,7 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 		text_id = text_id,
 		color_ranges = color_ranges,
 		localize = "false",
-		callback = enabled and "open_contract_node",
+		callback = enabled and (self.job_callback or "open_contract_node"),
 		disabled_color = tweak_data.screen_colors.important_1,
 		id = id,
 		customize_contract = "true"
@@ -6983,6 +7007,114 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 	}
 	local new_item = node:create_item(data_node, params)
 	node:add_item(new_item)
+end
+
+MenuCrimeNetSmartmatchmakeInitiator = MenuCrimeNetSmartmatchmakeInitiator or class()
+
+function MenuCrimeNetSmartmatchmakeInitiator:modify_node(original_node, data)
+	local node = original_node
+	self:add_filters(node)
+	if data and data.back_callback then
+		table.insert(node:parameters().back_callback, data.back_callback)
+	end
+	node:parameters().menu_component_data = data
+	return node
+end
+
+function MenuCrimeNetSmartmatchmakeInitiator:add_filters(node)
+	if node:item("divider_end") then
+		return
+	end
+	local params = {
+		name = "job_id_filter",
+		text_id = "menu_smm_job_id",
+		visible_callback = "is_multiplayer",
+		filter = true
+	}
+	local data_node = {
+		type = "MenuItemMultiChoice",
+		{
+			_meta = "option",
+			text_id = "menu_any",
+			value = -1
+		}
+	}
+	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
+		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "wip" then
+			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
+			local params = {
+				_meta = "option",
+				text_id = text_id,
+				value = index,
+				localize = false
+			}
+			for count, color in ipairs(color_data) do
+				params["color" .. count] = color.color
+				params["color_start" .. count] = color.start
+				params["color_stop" .. count] = color.stop
+			end
+			table.insert(data_node, params)
+		end
+	end
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	local params = {
+		name = "divider_end",
+		no_text = true,
+		size = 8
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+function MenuCallbackHandler:start_smart_matchmaking(item)
+	if item:name() == "quick_join" then
+		local jobs = managers.crimenet:get_jobs_by_player_stars()
+		local random_job = jobs[math.random(#jobs)]
+		print("[MenuCallbackHandler:start_smart_matchmaking] QUICK JOIN", "difficulty_filter", random_job.difficulty_id, "job_id_filter", random_job.job_id)
+		managers.network.matchmake:join_by_smartmatch(-1, random_job.difficulty_id)
+	else
+		managers.menu:active_menu().logic:navigate_back(true)
+		local job_data = item:parameters().gui_node.node:parameters().menu_component_data
+		local difficulty_filter = job_data.difficulty_id
+		local job_id_filter = job_data.job_id
+		print("[MenuCallbackHandler:start_smart_matchmaking] SEARCH", "difficulty_filter", difficulty_filter, "job_id_filter", job_id_filter)
+		managers.network.matchmake:join_by_smartmatch(job_id_filter, difficulty_filter)
+	end
+end
+
+function MenuCallbackHandler:open_contract_smart_matchmaking_node(item)
+	local job_tweak = tweak_data.narrative:job_data(item:parameters().id)
+	local is_professional = job_tweak and job_tweak.professional or false
+	managers.menu:open_node("crimenet_join_smart_matchmaking", {
+		{
+			smart_matchmaking = true,
+			job_id = item:parameters().id,
+			difficulty = is_professional and "hard" or "normal",
+			difficulty_id = is_professional and 3 or 2,
+			professional = is_professional
+		}
+	})
+end
+
+MenuCrimeNetSmartMatchmakingInitiator = MenuCrimeNetSmartMatchmakingInitiator or class(MenuCrimeNetSpecialInitiator)
+MenuCrimeNetSmartMatchmakingInitiator.job_callback = "open_contract_smart_matchmaking_node"
+MenuCrimeNetSmartMatchmakingInitiator.choose_any_job = true
+MenuCrimeNetSmartMatchmakingInitiator.contract_divider_id = "menu_cn_smart_matchmaking_divider_title"
+
+function MenuCrimeNetSmartMatchmakingInitiator:pre_create_clbk(node)
+	local params = {
+		name = "quick_join",
+		text_id = "menu_cn_quick_join",
+		callback = "start_smart_matchmaking"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	self:create_divider(node, "smart")
 end
 
 MenuOptionInitiator = MenuOptionInitiator or class()

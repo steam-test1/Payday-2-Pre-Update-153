@@ -341,6 +341,9 @@ local hit_feedback_rlu = Idstring("hit_feedback_rlu")
 local hit_feedback_d = Idstring("hit_feedback_d")
 local ids_hdr_post_processor = Idstring("hdr_post_processor")
 local ids_hdr_post_composite = Idstring("post_DOF")
+local ids_anti_aliasing_processor = Idstring("anti_aliasing_post_processor")
+local ids_ao_post_processor = Idstring("ao_post_processor")
+local ids_ao_mask_post_processor = Idstring("ao_mask_post_processor")
 local mvec1 = Vector3()
 local mvec2 = Vector3()
 local new_cam_fwd = Vector3()
@@ -387,6 +390,7 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 				return
 			end
 			self._vp = vp
+			self:_update_post_effects()
 		end
 	end
 	local camera = vp:camera()
@@ -465,6 +469,10 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 	end
 	self._lut_modifier_material:set_variable(ids_LUT_settings_b, Vector3(last_life, flash_2 + math.clamp(hit_some_mod * 2, 0, 1) * 0.25 + blur_zone_val * 0.15, 0))
 	self._lut_modifier_material:set_variable(ids_LUT_contrast, flashbang * 0.5)
+end
+
+function CoreEnvironmentControllerManager:_update_post_effects()
+	print("Update post FX")
 end
 
 function CoreEnvironmentControllerManager:_create_dof_tweak_data()

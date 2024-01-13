@@ -79,7 +79,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 		"var4"
 	}
 	self.melee_weapons.kabar.repeat_expire_t = 0.6
-	self.melee_weapons.kabar.expire_t = 1.1
+	self.melee_weapons.kabar.expire_t = 0.6
 	self.melee_weapons.kabar.melee_damage_delay = 0.1
 	self.melee_weapons.kabar.sounds = {}
 	self.melee_weapons.kabar.sounds.equip = "knife_equip"
@@ -169,7 +169,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.tomahawk.stats.max_damage_effect = 1
 	self.melee_weapons.tomahawk.stats.charge_time = 2
 	self.melee_weapons.tomahawk.stats.range = 225
-	self.melee_weapons.tomahawk.expire_t = 1.1
+	self.melee_weapons.tomahawk.expire_t = 0.6
 	self.melee_weapons.tomahawk.repeat_expire_t = 0.8
 	self.melee_weapons.tomahawk.attack_allowed_expire_t = 0.1
 	self.melee_weapons.tomahawk.sounds = {}
@@ -487,7 +487,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.machete.stats.max_damage_effect = 1
 	self.melee_weapons.machete.stats.charge_time = 2
 	self.melee_weapons.machete.stats.range = 225
-	self.melee_weapons.machete.expire_t = 1.1
+	self.melee_weapons.machete.expire_t = 0.6
 	self.melee_weapons.machete.repeat_expire_t = 0.8
 	self.melee_weapons.machete.stats.concealment = 29
 	self.melee_weapons.briefcase = deep_clone(self.melee_weapons.kabar)
@@ -981,7 +981,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.scalper.stats.max_damage_effect = 1
 	self.melee_weapons.scalper.stats.charge_time = 2
 	self.melee_weapons.scalper.stats.range = 200
-	self.melee_weapons.scalper.expire_t = 1.1
+	self.melee_weapons.scalper.expire_t = 0.6
 	self.melee_weapons.scalper.repeat_expire_t = 0.8
 	self.melee_weapons.scalper.attack_allowed_expire_t = 0.1
 	self.melee_weapons.scalper.sounds = {}
@@ -1295,7 +1295,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.slot_lever.stats.charge_time = 2
 	self.melee_weapons.slot_lever.stats.range = 225
 	self.melee_weapons.slot_lever.stats.concealment = 28
-	self.melee_weapons.slot_lever.expire_t = 1
+	self.melee_weapons.slot_lever.expire_t = 0.6
 	self.melee_weapons.slot_lever.repeat_expire_t = 0.7
 	self.melee_weapons.slot_lever.melee_damage_delay = 0.1
 	self.melee_weapons.croupier_rake = deep_clone(self.melee_weapons.kabar)
@@ -1322,7 +1322,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.croupier_rake.stats.charge_time = 3
 	self.melee_weapons.croupier_rake.stats.range = 250
 	self.melee_weapons.croupier_rake.stats.concealment = 28
-	self.melee_weapons.croupier_rake.expire_t = 1
+	self.melee_weapons.croupier_rake.expire_t = 0.6
 	self.melee_weapons.croupier_rake.repeat_expire_t = 0.7
 	self.melee_weapons.croupier_rake.melee_damage_delay = 0.1
 	self.melee_weapons.fight = {}
@@ -1662,7 +1662,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.cutters.stats.concealment = 27
 	self.melee_weapons.cutters.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.cutters.repeat_expire_t = 0.8
-	self.melee_weapons.cutters.expire_t = 1.8
+	self.melee_weapons.cutters.expire_t = 1.2
 	self.melee_weapons.cutters.melee_damage_delay = 0.3
 	self.melee_weapons.boxcutter = {}
 	self.melee_weapons.boxcutter.name_id = "bm_melee_boxcutter"
@@ -1720,6 +1720,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.selfie.stats.charge_time = 3
 	self.melee_weapons.selfie.stats.range = 250
 	self.melee_weapons.selfie.stats.concealment = 30
+	self.melee_weapons.selfie.expire_t = 0.6
 	self.melee_weapons.iceaxe = deep_clone(self.melee_weapons.tomahawk)
 	self.melee_weapons.iceaxe.name_id = "bm_melee_topaz"
 	self.melee_weapons.iceaxe.unit = "units/pd2_dlc_berry/weapons/rp_wpn_fps_mel_topaz2000/wpn_fps_mel_topaz2000"
@@ -1740,6 +1741,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.iceaxe.stats.charge_time = 4
 	self.melee_weapons.iceaxe.stats.range = 250
 	self.melee_weapons.iceaxe.stats.concealment = 30
+	self.melee_weapons.iceaxe.expire_t = 0.6
 	self.melee_weapons.gator = deep_clone(self.melee_weapons.machete)
 	self.melee_weapons.gator.name_id = "bm_melee_gator"
 	self.melee_weapons.gator.unit = "units/pd2_dlc_berry/weapons/wpn_fps_mel_gator/wpn_fps_mel_gator"
@@ -1758,7 +1760,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.gator.stats.max_damage_effect = 1
 	self.melee_weapons.gator.stats.charge_time = 2
 	self.melee_weapons.gator.stats.range = 225
-	self.melee_weapons.gator.expire_t = 0.8
+	self.melee_weapons.gator.expire_t = 0.6
 	self.melee_weapons.gator.repeat_expire_t = 0.8
 	self.melee_weapons.gator.stats.concealment = 29
 	self.melee_weapons.pugio = deep_clone(self.melee_weapons.kabar)
@@ -1933,7 +1935,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.scoutknife.stats.concealment = 29
 	self.melee_weapons.scoutknife.stats.remove_weapon_movement_penalty = true
 	self.melee_weapons.scoutknife.repeat_expire_t = 0.36
-	self.melee_weapons.scoutknife.expire_t = 1
+	self.melee_weapons.scoutknife.expire_t = 1.2
 	self.melee_weapons.nin = {}
 	self.melee_weapons.nin.name_id = "bm_melee_nin"
 	self.melee_weapons.nin.animation = nil

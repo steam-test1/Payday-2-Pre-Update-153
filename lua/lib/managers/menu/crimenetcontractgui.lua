@@ -13,6 +13,7 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	self._node = node
 	local job_data = self._node:parameters().menu_component_data
 	self._customizable = job_data.customize_contract or false
+	self._smart_matchmaking = job_data.smart_matchmaking or false
 	local is_win_32 = SystemInfo:platform() == Idstring("WIN32")
 	local is_nextgen = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
 	local width = 900
@@ -644,6 +645,15 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		self._contact_text_header:set_text(managers.localization:to_upper_text("menu_cn_premium_buy_desc") .. ": " .. managers.localization:to_upper_text(narrative.name_id))
 		self._step = 1
 		self._steps = {
+			"start_sound",
+			"set_all",
+			"free_memory"
+		}
+	elseif self._smart_matchmaking then
+		self._contact_text_header:set_text(managers.localization:to_upper_text("menu_smm_search_job") .. ": " .. managers.localization:to_upper_text(narrative.name_id))
+		self._step = 1
+		self._steps = {
+			"set_time",
 			"start_sound",
 			"set_all",
 			"free_memory"
@@ -1291,13 +1301,15 @@ function CrimeNetContractGui:set_all(t, dt)
 		end
 	end
 	text_string = string.gsub(text_string, "##", "")
-	gui_panel:child("premium_text"):set_text(text_string)
-	gui_panel:child("premium_text"):clear_range_color(1, utf8.len(text_string))
-	if #start_ci ~= #end_ci then
-		Application:error("CrimeNetContractGui: Not even amount of ##'s in skill description string!", #start_ci, #end_ci)
-	else
-		for i = 1, #start_ci do
-			gui_panel:child("premium_text"):set_range_color(start_ci[i], end_ci[i], not (i ~= 1 or can_afford) and tweak_data.screen_colors.pro_color or tweak_data.screen_colors.button_stage_2)
+	if alive(gui_panel:child("premium_text")) then
+		gui_panel:child("premium_text"):set_text(text_string)
+		gui_panel:child("premium_text"):clear_range_color(1, utf8.len(text_string))
+		if #start_ci ~= #end_ci then
+			Application:error("CrimeNetContractGui: Not even amount of ##'s in skill description string!", #start_ci, #end_ci)
+		else
+			for i = 1, #start_ci do
+				gui_panel:child("premium_text"):set_range_color(start_ci[i], end_ci[i], not (i ~= 1 or can_afford) and tweak_data.screen_colors.pro_color or tweak_data.screen_colors.button_stage_2)
+			end
 		end
 	end
 	if self._step == 2 then
@@ -1444,7 +1456,7 @@ function CrimeNetContractGui:_toggle_potential_rewards()
 end
 
 function CrimeNetContractGui:special_btn_pressed(button)
-	if button == Idstring("voice_message") then
+	if button == Idstring("voice_message") or self._smart_matchmaking and button == Idstring("menu_toggle_voice_message") then
 		if alive(self._briefing_len_panel) and self._briefing_len_panel:visible() and self._step > 2 then
 			self:toggle_post_event()
 		end

@@ -10,6 +10,25 @@ function ControllerManager:init(path, default_settings_path)
 	ControllerManager.super.init(self, path, default_settings_path)
 end
 
+function ControllerManager:update(t, dt)
+	ControllerManager.super.update(self, t, dt)
+	self:_poll_reconnected_controller()
+end
+
+function ControllerManager:_poll_reconnected_controller()
+	if SystemInfo:platform() == Idstring("XB1") and Global.controller_manager.connect_controller_dialog_visible then
+		local active_xuid = XboxLive:current_user()
+		local nr_controllers = Input:num_controllers()
+		for i_controller = 0, nr_controllers - 1 do
+			local controller = Input:controller(i_controller)
+			if controller:type() == "xb1_controller" and (controller:down(12) or controller:pressed(12)) and controller:user_xuid() == active_xuid then
+				self:_close_controller_changed_dialog()
+				self:replace_active_controller(i_controller, controller)
+			end
+		end
+	end
+end
+
 function ControllerManager:controller_mod_changed()
 	if not Global.controller_manager.user_mod then
 		Global.controller_manager.user_mod = managers.user:get_setting("controller_mod")
@@ -101,11 +120,15 @@ function ControllerManager:_show_controller_changed_dialog()
 	data.text = managers.localization:text("dialog_connect_controller_text", {
 		NR = Global.controller_manager.default_wrapper_index or 1
 	})
-	data.button_list = {
-		{
-			text = managers.localization:text("dialog_ok")
+	if SystemInfo:platform() == Idstring("XB1") then
+		data.no_buttons = true
+	else
+		data.button_list = {
+			{
+				text = managers.localization:text("dialog_ok")
+			}
 		}
-	}
+	end
 	data.id = "connect_controller_dialog"
 	data.force = true
 	managers.system_menu:show(data)
@@ -145,9 +168,10 @@ function ControllerManager:set_ingame_mode(mode)
 	end
 end
 
-function ControllerManager:_close_controller_changed_dialog()
+function ControllerManager:_close_controller_changed_dialog(hard)
 	if Global.controller_manager.connect_controller_dialog_visible or self:_controller_changed_dialog_active() then
-		managers.system_menu:close("connect_controller_dialog")
+		print("[ControllerManager:_close_controller_changed_dialog] closing")
+		managers.system_menu:close("connect_controller_dialog", hard)
 		self:connect_controller_dialog_callback()
 	end
 end

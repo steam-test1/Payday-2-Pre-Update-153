@@ -28,6 +28,36 @@ function CrimeNetManager:get_max_active_server_jobs()
 	return self._max_active_server_jobs
 end
 
+function CrimeNetManager:get_jobs_by_player_stars(span)
+	local t = {}
+	local pstars = managers.experience:level_to_stars() * 10
+	span = span or 20
+	for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
+		local pass_all_tests = true
+		if pass_all_tests then
+			local job_data = tweak_data.narrative:job_data(job_id)
+			local start_difficulty = job_data.professional and 1 or 0
+			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
+			for i = start_difficulty, num_difficulties do
+				local job_jc = math.clamp(job_data.jc + i * 10, 0, 100)
+				local difficulty_id = 2 + i
+				local difficulty = tweak_data:index_to_difficulty(difficulty_id)
+				if job_jc <= pstars + span and job_jc >= pstars - span then
+					table.insert(t, {
+						job_jc = job_jc,
+						job_id = job_id,
+						difficulty_id = difficulty_id,
+						difficulty = difficulty
+					})
+				end
+			end
+		else
+			print("SKIP DUE TO COOLDOWN OR THE JOB IS WRAPPED INSIDE AN OTHER JOB", job_id)
+		end
+	end
+	return t
+end
+
 function CrimeNetManager:_get_jobs_by_jc()
 	local t = {}
 	local plvl = managers.experience:current_level()
@@ -186,8 +216,8 @@ function CrimeNetManager:update(t, dt)
 	managers.menu_component:update_crimenet_gui(t, dt)
 	if not self._skip_servers then
 		if self._refresh_server_t < Application:time() then
-			self:find_online_games(Global.game_settings.search_friends_only)
 			self._refresh_server_t = Application:time() + self._REFRESH_SERVERS_TIME
+			self:find_online_games(Global.game_settings.search_friends_only)
 		end
 	elseif self._refresh_server_t < Application:time() then
 		self._refresh_server_t = Application:time() + self._REFRESH_SERVERS_TIME
@@ -199,6 +229,9 @@ function CrimeNetManager:start_no_servers()
 end
 
 function CrimeNetManager:start(skip_servers)
+	if not skip_servers and SystemInfo:platform() == Idstring("XB1") then
+		XboxLive:refresh_friends_list()
+	end
 	self:_setup()
 	self._active_jobs = {}
 	self._active = true
@@ -362,9 +395,12 @@ function CrimeNetManager:_find_online_games_xbox360(friends_only)
 end
 
 function CrimeNetManager:_find_online_games_xb1(friends_only)
+	if managers.network.matchmake:searching_lobbys() then
+		self._refresh_server_t = Application:time() + 5
+		return
+	end
+	
 	local function f(info)
-		local friends = managers.network.friends:get_friends_by_name()
-		
 		managers.network.matchmake:search_lobby_done()
 		local room_list = info.room_list
 		local attribute_list = info.attribute_list
@@ -386,7 +422,7 @@ function CrimeNetManager:_find_online_games_xb1(friends_only)
 			local state_name = state_string_id and managers.localization:text("menu_lobby_server_state_" .. state_string_id) or "UNKNOWN"
 			local state = attributes_numbers[4]
 			local num_plrs = attributes_numbers[5]
-			local is_friend = friends[host_name] and true or false
+			local is_friend = XboxLive:is_friend(room.xuid)
 			local is_ok = (not friends_only or is_friend) and managers.network.matchmake:is_server_ok(friends_only, room.owner_id, attributes_numbers)
 			if is_ok then
 				dead_list[room.room_id] = nil
@@ -1062,7 +1098,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		})
 		mw = math.max(mw, self:make_fine_text(friends_text))
 		self:make_color_text(friends_text, tweak_data.screen_colors.friend_color)
-		if managers.crimenet:no_servers() then
+		if managers.crimenet:no_servers() or is_xb1 then
 			join_icon:hide()
 			join_text:hide()
 			friends_text:hide()
@@ -1170,7 +1206,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			mw = math.max(mw, self:make_fine_text(job_plan_stealth_text))
 			last_text = job_plan_stealth_text
 		end
-		if managers.crimenet:no_servers() then
+		if managers.crimenet:no_servers() or is_xb1 then
 			kick_none_icon:hide()
 			kick_none_text:hide()
 			kick_vote_icon:hide()
@@ -1387,6 +1423,29 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			end
 			self._ps3_invites_controller:set_enabled(true)
 		end
+	elseif not no_servers and is_xb1 then
+		local id = "menu_cn_smart_matchmaking"
+		local smart_matchmaking_button = self._panel:text({
+			name = "smart_matchmaking_button",
+			text = managers.localization:to_upper_text(id, {
+				BTN_Y = managers.localization:btn_macro("menu_toggle_filters")
+			}),
+			font_size = tweak_data.menu.pd2_large_font_size,
+			font = tweak_data.menu.pd2_large_font,
+			color = Color(0.9764706, 0.92941177, 0.105882354),
+			layer = 40,
+			blend_mode = "add"
+		})
+		self:make_fine_text(smart_matchmaking_button)
+		smart_matchmaking_button:set_right(self._panel:w() - 10)
+		smart_matchmaking_button:set_top(10)
+		local blur_object = self._panel:bitmap({
+			name = "smart_matchmaking_button_blur",
+			texture = "guis/textures/test_blur_df",
+			render_template = "VertexColorTexturedBlur3D",
+			layer = smart_matchmaking_button:layer() - 1
+		})
+		blur_object:set_shape(smart_matchmaking_button:shape())
 	end
 	self._map_size_w = 2048
 	self._map_size_h = 1024
@@ -2910,15 +2969,20 @@ function CrimeNetGui:special_btn_pressed(button)
 		self:toggle_legend()
 		return true
 	end
-	if self._panel:child("filter_button") and button == Idstring("menu_toggle_filters") then
-		managers.menu_component:post_event("menu_enter")
-		if is_x360 then
-			XboxLive:show_friends_ui(managers.user:get_platform_id())
-		elseif is_xb1 then
-		else
-			managers.menu:open_node("crimenet_filters", {})
+	if self._panel:child("filter_button") then
+		if button == Idstring("menu_toggle_filters") then
+			managers.menu_component:post_event("menu_enter")
+			if is_x360 then
+				XboxLive:show_friends_ui(managers.user:get_platform_id())
+			elseif is_xb1 then
+			else
+				managers.menu:open_node("crimenet_filters", {})
+			end
+			return true
 		end
-		return true
+	elseif self._panel:child("smart_matchmaking_button") and button == Idstring("menu_toggle_filters") then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("crimenet_contract_smart_matchmaking", {})
 	end
 	return false
 end

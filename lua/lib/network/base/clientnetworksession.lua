@@ -1,6 +1,7 @@
 ClientNetworkSession = ClientNetworkSession or class(BaseNetworkSession)
 ClientNetworkSession.HOST_SANITY_CHECK_INTERVAL = 4
 ClientNetworkSession.HOST_REQUEST_JOIN_INTERVAL = 2
+ClientNetworkSession.JOIN_REQUEST_TIMEOUT = 20
 
 function ClientNetworkSession:request_join_host(host_rpc, result_cb)
 	print("[ClientNetworkSession:request_join_host]", host_rpc, result_cb)
@@ -34,7 +35,8 @@ function ClientNetworkSession:request_join_host(host_rpc, result_cb)
 		}
 	}
 	request_rpc:request_join(unpack(self._join_request_params.params))
-	self._last_join_request_t = TimerManager:wall():time()
+	self._first_join_request_t = TimerManager:wall():time()
+	self._last_join_request_t = self._first_join_request_t
 end
 
 function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_character, level_index, difficulty_index, state_index, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
@@ -235,16 +237,19 @@ function ClientNetworkSession:peer_handshake(name, peer_id, peer_user_id, in_lob
 		rpc = Network:handshake(peer_user_id, nil, "STEAM")
 		Network:add_co_client(rpc)
 	end
-	if SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1") then
-		local ip = managers.network.matchmake:internal_address(xnaddr)
+	if SystemInfo:platform() == Idstring("X360") then
+		local ip = managers.network.matchmake:internal_address(xuid)
 		rpc = Network:handshake(ip, managers.network.DEFAULT_PORT, "TCP_IP")
 		Network:add_co_client(rpc)
 	end
-	peer_user_id = SystemInfo:platform() == self._ids_WIN32 and peer_user_id or false
+	if SystemInfo:platform() == self._ids_WIN32 then
+	else
+		peer_user_id = false
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		name = managers.network.account:username_by_id(peer_user_id)
 	end
-	local id, peer = self:add_peer(name, rpc, in_lobby, loading, synched, peer_id, character, peer_user_id, xuid, xnaddr)
+	local id, peer = self:add_peer(name, rpc, in_lobby, loading, synched, peer_id, character, peer_user_id, xuid, nil)
 	cat_print("multiplayer_base", "[ClientNetworkSession:peer_handshake]", name, peer_user_id, loading, synched, id, inspect(peer))
 	local check_peer = (SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1")) and peer or nil
 	self:chk_send_connection_established(name, peer_user_id, check_peer)
@@ -351,6 +356,13 @@ function ClientNetworkSession:update()
 			self._host_sanity_send_t = wall_time + self.HOST_SANITY_CHECK_INTERVAL
 		end
 		self:_upd_request_join_resend(wall_time)
+		if SystemInfo:platform() == Idstring("XB1") then
+			for peer_id, peer in pairs(self._peers) do
+				if peer ~= self._server_peer and not peer:rpc() then
+					self:chk_send_connection_established(peer:name(), peer:user_id(), peer)
+				end
+			end
+		end
 	end
 end
 
@@ -410,9 +422,19 @@ function ClientNetworkSession:_get_join_attempt_identifier()
 end
 
 function ClientNetworkSession:_upd_request_join_resend(wall_time)
-	if self._last_join_request_t and wall_time - self._last_join_request_t > ClientNetworkSession.HOST_REQUEST_JOIN_INTERVAL then
-		self._join_request_params.host_rpc:request_join(unpack(self._join_request_params.params))
-		self._last_join_request_t = wall_time
+	if self._last_join_request_t then
+		if wall_time - self._first_join_request_t > ClientNetworkSession.JOIN_REQUEST_TIMEOUT and self._server_peer and self._cb_find_game then
+			self._last_join_request_t = nil
+			local cb = self._cb_find_game
+			self._cb_find_game = nil
+			self:remove_peer(self._server_peer, 1)
+			cb("FAILED_CONNECT")
+			return
+		end
+		if self._last_join_request_t and wall_time - self._last_join_request_t > ClientNetworkSession.HOST_REQUEST_JOIN_INTERVAL then
+			self._join_request_params.host_rpc:request_join(unpack(self._join_request_params.params))
+			self._last_join_request_t = wall_time
+		end
 	end
 end
 

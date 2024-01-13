@@ -84,6 +84,56 @@ function MenuManager:show_failed_joining_dialog()
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_smartmatch_contract_not_found_dialog()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("menu_smm_contract_not_found_title")
+	dialog_data.text = managers.localization:text("menu_smm_contract_not_found_body")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_smartmatch_inexact_match_dialog(params)
+	local dialog_data = {}
+	dialog_data.id = "confirm_inexact_match"
+	dialog_data.title = managers.localization:text("menu_smm_contract_inexact_match_title", {
+		timeout = params.timeout
+	})
+	dialog_data.text = managers.localization:text("menu_smm_contract_inexact_match_body", {
+		host = params.host_name,
+		job_name = params.job_name,
+		difficulty = params.difficulty
+	})
+	local yes_button = {
+		text = managers.localization:text("dialog_inexact_match_yes"),
+		callback_func = params.yes_clbk
+	}
+	local no_button = {
+		text = managers.localization:text("dialog_inexact_match_no"),
+		callback_func = params.no_clbk
+	}
+	dialog_data.button_list = {yes_button, no_button}
+	dialog_data.focus_button = 1
+	local count = params.timeout
+	dialog_data.counter = {
+		1,
+		function()
+			count = count - 1
+			if count < 0 then
+				params.timeout_clbk()
+				managers.system_menu:close(dialog_data.id)
+			else
+				local dlg = managers.system_menu:get_dialog(dialog_data.id)
+				if dlg then
+					dlg:set_title(utf8.to_upper(managers.localization:text("menu_smm_contract_inexact_match_title", {timeout = count})))
+				end
+			end
+		end
+	}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_cant_join_from_game_dialog()
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_error_title")
@@ -110,6 +160,21 @@ function MenuManager:show_joining_lobby_dialog()
 	dialog_data.text = managers.localization:text("dialog_wait")
 	dialog_data.id = "join_server"
 	dialog_data.no_buttons = true
+	dialog_data.indicator = true
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_searching_match_dialog(params)
+	local cancel_button = {
+		text = managers.localization:text("dialog_cancel"),
+		callback_func = params.cancel_func,
+		cancel_button = true
+	}
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("menu_smm_searching_for_contract")
+	dialog_data.text = managers.localization:text("dialog_wait")
+	dialog_data.id = "search_match"
+	dialog_data.button_list = {cancel_button}
 	dialog_data.indicator = true
 	managers.system_menu:show(dialog_data)
 end
@@ -1580,10 +1645,7 @@ function MenuManager:show_confirm_become_infamous(params)
 		local yes_button = {}
 		yes_button.text = managers.localization:text("dialog_yes")
 		yes_button.callback_func = params.yes_func
-		dialog_data.text = params.free and managers.localization:text("menu_dialog_become_infamous_free", {
-			level = 100,
-			cash = params.cost
-		}) or managers.localization:text("menu_dialog_become_infamous", {
+		dialog_data.text = managers.localization:text("menu_dialog_become_infamous", {
 			level = 100,
 			cash = params.cost
 		})

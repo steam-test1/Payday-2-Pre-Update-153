@@ -1028,6 +1028,31 @@ function FPCameraPlayerBase:unspawn_grenade()
 	end
 end
 
+function FPCameraPlayerBase:play_anim_melee_item(tweak_name)
+	if not self._melee_item_units then
+		return
+	end
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	local anims = tweak_data.blackmarket.melee_weapons[melee_entry].anims
+	local anim_data = anims and anims[tweak_name]
+	if not anim_data then
+		return
+	end
+	local ids = anim_data.anim and Idstring(anim_data.anim)
+	for _, unit in ipairs(self._melee_item_units) do
+		unit:anim_stop(self._melee_item_anim)
+		if ids then
+			local length = unit:anim_length(ids)
+			if anim_data.loop then
+				unit:anim_play_loop(ids, 0, length, 1)
+			else
+				unit:anim_play_to(ids, length, 1)
+			end
+		end
+	end
+	self._melee_item_anim = ids
+end
+
 function FPCameraPlayerBase:spawn_melee_item()
 	if self._melee_item_units then
 		return
@@ -1052,6 +1077,7 @@ function FPCameraPlayerBase:spawn_melee_item()
 			end
 			table.insert(self._melee_item_units, unit)
 		end
+		self:play_anim_melee_item("charge")
 	end
 end
 
@@ -1066,6 +1092,7 @@ function FPCameraPlayerBase:unspawn_melee_item()
 		end
 	end
 	self._melee_item_units = nil
+	self._melee_item_anim = nil
 end
 
 function FPCameraPlayerBase:hide_weapon()

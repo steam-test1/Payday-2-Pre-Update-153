@@ -111,19 +111,25 @@ function MenuTitlescreenState:update(t, dt)
 			self:_load_savegames_done()
 		end
 		return
+	else
+		self._user_has_changed = nil
 	end
 	self:check_confirm_pressed()
 	if managers.system_menu:is_active() then
 		self:reset_attract_video()
 	else
-		if Global.exe_argument_level then
-			self._controller_index = 1
-		else
-			self._controller_index = self:get_start_pressed_controller_index()
-		end
+		self._controller_index = self:get_start_pressed_controller_index()
 		if self._controller_index then
-			managers.controller:set_default_wrapper_index(self._controller_index)
-			managers.user:set_index(self._controller_index)
+			if is_xb1 then
+				local controller_wrapper = self._controller_list[self._controller_index]
+				local xb1_ctrl = controller_wrapper:get_controller_map().xb1pad
+				local xuid = xb1_ctrl:user_xuid()
+				managers.controller:set_default_wrapper_index(self._controller_index)
+				managers.user:set_index(xuid)
+			else
+				managers.controller:set_default_wrapper_index(self._controller_index)
+				managers.user:set_index(self._controller_index)
+			end
 			managers.user:check_user(callback(self, self, "check_user_callback"), true)
 			if managers.dlc:has_corrupt_data() and not Global.corrupt_dlc_msg_shown then
 				Global.corrupt_dlc_msg_shown = true

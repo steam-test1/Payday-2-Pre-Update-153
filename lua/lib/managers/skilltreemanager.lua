@@ -649,12 +649,9 @@ function SkillTreeManager:get_times_respeced()
 	return self._global.times_respeced
 end
 
-function SkillTreeManager:reset_skilltrees_and_specialization(points_aquired_during_load)
+function SkillTreeManager:version_reset_skilltrees(points_aquired_during_load)
 	self:reset_skilltrees()
-	self:reset_specializations()
-	local level_points = managers.experience:current_level()
-	local assumed_points = level_points + points_aquired_during_load
-	self:_set_points(assumed_points)
+	self:_verify_loaded_data(points_aquired_during_load)
 	self._global.VERSION = SkillTreeManager.VERSION
 	self._global.reset_message = true
 	self._global.times_respeced = 1
@@ -945,7 +942,7 @@ function SkillTreeManager:load(data, version)
 		self._global.reset_message = state.reset_message
 		self._global.times_respeced = state.times_respeced
 		if not self._global.VERSION or self._global.VERSION ~= SkillTreeManager.VERSION then
-			managers.savefile:add_load_done_callback(callback(self, self, "reset_skilltrees_and_specialization", points_aquired_during_load))
+			managers.savefile:add_load_done_callback(callback(self, self, "version_reset_skilltrees", points_aquired_during_load))
 		end
 	end
 end

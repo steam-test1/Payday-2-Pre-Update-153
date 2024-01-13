@@ -46,7 +46,7 @@ function NetworkVoiceChatXBL:resume()
 end
 
 function NetworkVoiceChatXBL:open_channel_to(player_info, context)
-	cat_print("lobby", "Opening Voice Channel to ", tostring(player_info.name))
+	print("Opening Voice Channel to ", inspect(player_info))
 	local player_index = managers.user:get_platform_id()
 	if not player_index then
 		Application:error("Player map not ready yet.")
@@ -61,7 +61,7 @@ function NetworkVoiceChatXBL:open_channel_to(player_info, context)
 	if session == nil then
 		Application:throw_exception("Session retreived from context '" .. tostring(context) .. "' is nil")
 	end
-	local internal_address = XboxLive:internal_address(session, player_info.external_address)
+	local internal_address = managers.network:session():is_host() and tostring(player_info.external_address) or XboxLive:internal_address(session, player_info.player_id)
 	player_info.voice_rpc = Network:handshake(internal_address, managers.network.DEFAULT_PORT, "TCP_IP")
 	if player_info.voice_rpc then
 		print("Voice: Created rpc")
@@ -228,8 +228,9 @@ end
 
 function NetworkVoiceChatXBL:_update_numberofusers()
 	self._number_of_users = 0
-	for i = 0, 3 do
-		if XboxLive:signin_state(i) ~= "not_signed_in" then
+	local xuids = XboxLive:all_user_XUIDs()
+	for _, xuid in pairs(xuids) do
+		if XboxLive:signin_state(xuid) ~= "not_signed_in" then
 			self._number_of_users = self._number_of_users + 1
 		end
 	end
@@ -255,8 +256,9 @@ function NetworkVoiceChatXBL:_check_privilege()
 	local cancommunicate = true
 	local friendsonly = false
 	local usercancommunicate, userfriendsonly
-	for i = 0, 3 do
-		usercancommunicate, userfriendsonly = self:_get_privilege(i)
+	local xuids = XboxLive:all_user_XUIDs()
+	for _, xuid in pairs(xuids) do
+		usercancommunicate, userfriendsonly = self:_get_privilege(xuid)
 		if usercancommunicate == false then
 			cancommunicate = false
 		end

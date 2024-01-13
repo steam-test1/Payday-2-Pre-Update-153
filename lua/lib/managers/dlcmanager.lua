@@ -973,16 +973,16 @@ function XB1DLCManager:init()
 	if not Global.dlc_manager then
 		Global.dlc_manager = {}
 		Global.dlc_manager.all_dlc_data = {
+			full_game = {
+				index = 0,
+				is_default = true,
+				verified = true
+			},
 			preorder = {
 				index = 1,
 				is_default = false,
 				product_id = "f4bfed8e-a74c-4bd5-baad-5b985d0ef15d",
 				no_install = true
-			},
-			full_game = {
-				index = 0,
-				is_default = true,
-				verified = true
 			},
 			career_criminal_edition = {
 				index = 2,

@@ -170,8 +170,17 @@ function CoreMaterialEditor:_get_make_params()
 	return make_params, temp_params
 end
 
+function CoreMaterialEditor:_cleanup_temp_files(temp_params)
+	for k, v in pairs(temp_params) do
+		os.remove(v)
+	end
+	os.remove(Application:nice_path(managers.database:base_path() .. self.TEMP_PATH .. "make.xml", false))
+	os.remove(Application:nice_path(managers.database:base_path() .. self.TEMP_PATH .. "compile_log.txt", false))
+end
+
 function CoreMaterialEditor:_insert_libs_in_database(temp_params, make_params)
 	assert(SystemFS:copy_file(temp_params.render_templates, make_params.render_templates), string.format("Could not copy %s -> %s", temp_params.render_templates, make_params.render_templates))
+	self:_cleanup_temp_files(temp_params)
 	managers.database:recompile()
 end
 

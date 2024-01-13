@@ -16,8 +16,14 @@ end
 
 function Xbox360SelectUserDialog:show()
 	self._manager:event_dialog_shown(self)
-	XboxLive:show_signin_ui(self:count())
-	self._show_time = TimerManager:main():time()
+	local wrapper_index = managers.controller:get_default_wrapper_index()
+	local controller_index = managers.controller:get_controller_index_list(wrapper_index)
+	local controller = Input:controller(controller_index)
+	print("[Xbox360SelectUserDialog:show] wrapper_index", wrapper_index, "controller_index", controller_index, "controller:type()", controller:type())
+	if controller:type() == "xb1_controller" then
+		XboxLive:show_signin_ui(controller)
+		self._show_time = TimerManager:main():time()
+	end
 	return true
 end
 

@@ -71,8 +71,13 @@ function ControllerManager:setup_default_controller_list()
 	if Global.controller_manager.default_wrapper_index then
 		local controller_index_list = self._wrapper_to_controller_list[Global.controller_manager.default_wrapper_index]
 		self._default_controller_list = {}
+		self._controller_device_id = false
 		for _, controller_index in ipairs(controller_index_list) do
-			table.insert(self._default_controller_list, Input:controller(controller_index))
+			local controller = Input:controller(controller_index)
+			table.insert(self._default_controller_list, controller)
+			if not self._controller_device_id and controller:type() == "xb1_controller" and SystemInfo:platform() == Idstring("XB1") then
+				self._controller_device_id = controller:device_id()
+			end
 		end
 	end
 end
@@ -95,17 +100,77 @@ function ControllerManager:paused_update(t, dt)
 	self:check_connect_change()
 end
 
+function ControllerManager:replace_active_controller(replacement_ctrl_index, replacement_ctrl)
+	local old_ctrl = self._default_controller_list[1]
+	self._default_controller_list[1] = replacement_ctrl
+	local new_indexes = {}
+	for wrapper_index, controller_index in pairs(self._wrapper_to_controller_list) do
+		new_indexes[wrapper_index] = {replacement_ctrl}
+	end
+	self._wrapper_to_controller_list = new_indexes
+	for wrapper_id, wrapper in pairs(self._controller_wrapper_list) do
+		if wrapper:get_type() == "xb1" then
+			wrapper:get_controller_map().xb1pad = replacement_ctrl
+			wrapper:rebind_connections(nil, nil)
+		end
+	end
+	self._controller_device_id = replacement_ctrl:device_id()
+end
+
 function ControllerManager:check_connect_change()
-	if self._default_controller_list then
-		local connected
+	if SystemInfo:platform() == Idstring("WIN32") then
+		if self._default_controller_list then
+			local connected
+			for _, controller in ipairs(self._default_controller_list) do
+				connected = controller:connected()
+				if not connected then
+					break
+				end
+			end
+			if not Global.controller_manager.default_controller_connected ~= not connected then
+				self:default_controller_connect_change(connected)
+				Global.controller_manager.default_controller_connected = connected
+			end
+		end
+	elseif (SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")) and self._default_controller_list then
+		local connected = true
 		for _, controller in ipairs(self._default_controller_list) do
-			connected = controller:connected()
-			if not connected then
+			if not controller:connected() then
+				connected = false
 				break
+			elseif SystemInfo:platform() == Idstring("XB1") and controller:type() == "xb1_controller" and (controller:device_id() ~= self._controller_device_id or XboxLive:current_user() and controller:user_xuid() ~= XboxLive:current_user()) then
+				connected = false
+				print("[ControllerManager:check_connect_change] not connected controller:device_id()", controller:device_id(), "self._controller_device_id", self._controller_device_id, "controller:connected()", controller:connected(), "controller:user_xuid()", controller:user_xuid(), "XboxLive:current_user()", XboxLive:current_user())
+				break
+			end
+		end
+		if not connected and SystemInfo:platform() == Idstring("XB1") then
+			print("[ControllerManager:check_connect_change] not connected")
+			local current_user = XboxLive:current_user()
+			local old_ctrl_device_id = self._controller_device_id
+			local replacement_xb1_ctrl, replacement_xb1_ctrl_index
+			local nr_controllers = Input:num_controllers()
+			for i_controller = 0, nr_controllers - 1 do
+				local controller = Input:controller(i_controller)
+				print("[ControllerManager:check_connect_change] testing controller", controller, i_controller, controller:connected(), controller:type())
+				if controller:connected() and controller:type() == "xb1_controller" and controller:user_xuid() == current_user then
+					print("[ControllerManager:check_connect_change] re-acquired controller", controller, i_controller)
+					print("[ControllerManager:check_connect_change] Global.controller_manager.default_controller_connected", Global.controller_manager.default_controller_connected)
+					replacement_xb1_ctrl = controller
+					replacement_xb1_ctrl_index = i_controller
+					connected = true
+					break
+				elseif controller:type() == "xb1_controller" then
+					print("[ControllerManager:check_connect_change] no match", controller:connected(), controller:device_id(), controller:user_xuid())
+				end
+			end
+			if replacement_xb1_ctrl then
+				self:replace_active_controller(replacement_xb1_ctrl_index, replacement_xb1_ctrl)
 			end
 		end
 		if not Global.controller_manager.default_controller_connected ~= not connected then
 			self:default_controller_connect_change(connected)
+			print("[ControllerManager:check_connect_change] setting Global.controller_manager.default_controller_connected", Global.controller_manager.default_controller_connected, "->", connected)
 			Global.controller_manager.default_controller_connected = connected
 		end
 	end
@@ -262,6 +327,7 @@ function ControllerManager:remove_default_wrapper_index_change_callback(id)
 end
 
 function ControllerManager:set_default_wrapper_index(default_wrapper_index)
+	print("[ControllerManager:set_default_wrapper_index] default_wrapper_index", default_wrapper_index, "Global.controller_manager.default_wrapper_index", Global.controller_manager.default_wrapper_index)
 	if Global.controller_manager.default_wrapper_index ~= default_wrapper_index then
 		local controller_index_list = default_wrapper_index and self._wrapper_to_controller_list[default_wrapper_index]
 		if not default_wrapper_index or controller_index_list then

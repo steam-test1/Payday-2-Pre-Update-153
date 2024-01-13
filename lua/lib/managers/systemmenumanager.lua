@@ -180,13 +180,17 @@ function GenericSystemMenuManager:get_dialog(id)
 	end
 end
 
-function GenericSystemMenuManager:close(id)
+function GenericSystemMenuManager:close(id, hard)
 	if not id then
 		return
 	end
 	print("close active dialog", self._active_dialog and self._active_dialog:id(), id)
 	if self._active_dialog and self._active_dialog:id() == id then
-		self._active_dialog:fade_out_close()
+		if hard then
+			self._active_dialog:close()
+		else
+			self._active_dialog:fade_out_close()
+		end
 	end
 	if not self._dialog_queue then
 		return

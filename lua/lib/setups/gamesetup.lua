@@ -184,6 +184,9 @@ function GameSetup:load_packages()
 		if not PackageManager:loaded("packages/game_base") and PackageManager:package_exists("packages/game_base") then
 			PackageManager:load("packages/game_base")
 		end
+		if not PackageManager:loaded("packages/wip/game_base") and PackageManager:package_exists("packages/wip/game_base") then
+			PackageManager:load("packages/wip/game_base")
+		end
 		local prefix = "packages/dlcs/"
 		local sufix = "/game_base"
 		local package = ""

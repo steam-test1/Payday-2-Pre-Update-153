@@ -337,13 +337,16 @@ function GenericUserManager:check_user_state_change(old_user_data, user_data, ig
 	local signin_state = user_data and user_data.signin_state or self.NOT_SIGNED_IN_STATE
 	local old_signin_state = old_user_data and old_user_data.signin_state or self.NOT_SIGNED_IN_STATE
 	local old_username = old_user_data and old_user_data.username
+	local username_changed = old_username ~= username
 	local old_user_has_signed_out = old_user_data and old_user_data.has_signed_out
 	local user_changed, active_user_changed
 	local was_signed_in = old_signin_state ~= self.NOT_SIGNED_IN_STATE
 	local is_signed_in = signin_state ~= self.NOT_SIGNED_IN_STATE
+	local sign_in_state_changed = was_signed_in ~= is_signed_in
 	local user_index = user_data and user_data.user_index or old_user_data and old_user_data.user_index
-	if was_signed_in ~= is_signed_in or not ignore_username_change and old_username ~= username or old_user_has_signed_out then
-		if user_index == self:get_index() then
+	local was_active_user = user_index == self:get_index()
+	if sign_in_state_changed or not ignore_username_change and username_changed or old_user_has_signed_out then
+		if was_active_user then
 			active_user_changed = true
 		end
 		if Global.category_print.user_manager then
@@ -390,6 +393,7 @@ end
 
 function GenericUserManager:perform_load_start_menu()
 	managers.system_menu:force_close_all()
+	self:set_index(nil)
 	managers.menu:on_user_sign_out()
 	if managers.groupai then
 		managers.groupai:state():set_AI_enabled(false)
@@ -397,7 +401,6 @@ function GenericUserManager:perform_load_start_menu()
 	_G.setup:load_start_menu()
 	_G.game_state_machine:set_boot_from_sign_out(true)
 	self:set_active_user_state_change_quit(false)
-	self:set_index(nil)
 end
 
 function GenericUserManager:storage_changed(old_user_data, user_data)
@@ -660,8 +663,8 @@ function Xbox360UserManager:disconnect_callback(reason)
 	elseif self._in_online_menu then
 		print("leave crimenet")
 		managers.menu:xbox_disconnected()
-	elseif managers.network:session() then
-		managers.network:session():xbox_disconnected()
+	elseif managers.network:game() then
+		managers.network:game():xbox_disconnected()
 	end
 end
 
@@ -912,8 +915,8 @@ function PS4UserManager:disconnect_callback()
 	end
 	if managers.network:session() and managers.network:session():_local_peer_in_lobby() then
 		managers.menu:psn_disconnected()
-	elseif managers.network:session() then
-		managers.network:session():psn_disconnected()
+	elseif managers.network:game() then
+		managers.network:game():psn_disconnected()
 	end
 end
 
@@ -1021,8 +1024,12 @@ function XB1UserManager:_check_privilege_callback(is_success)
 end
 
 function XB1UserManager:disconnect_callback(reason)
-	print("  XB1UserManager:disconnect_callback", reason, XboxLive:signin_state(0))
+	print("  XB1UserManager:disconnect_callback", reason)
 	if Global.game_settings.single_player then
+		return
+	end
+	if self._disconnected then
+		print("[XB1UserManager:disconnect_callback] Already disconnected. No action taken.")
 		return
 	end
 	self._disconnected = true
@@ -1031,8 +1038,8 @@ function XB1UserManager:disconnect_callback(reason)
 	elseif self._in_online_menu then
 		print("leave crimenet")
 		managers.menu:xbox_disconnected()
-	elseif managers.network:session() then
-		managers.network:session():xbox_disconnected()
+	elseif managers.network:game() then
+		managers.network:game():xbox_disconnected()
 	end
 end
 
@@ -1134,28 +1141,24 @@ function XB1UserManager:_save_setting_map_callback(callback_func, success)
 	end
 end
 
-function XB1UserManager:signin_changed_callback(...)
-	for user_index, signed_in in ipairs({
-		...
-	}) do
-		local was_signed_in = self:is_signed_in(user_index)
-		Global.user_manager.user_map[user_index].has_signed_out = was_signed_in and not signed_in
-		if Global.user_manager.user_index == user_index and not was_signed_in and signed_in and self._active_check_user_callback_func then
-			print("RUN ACTIVE USER CALLBACK FUNC")
-			managers.system_menu:close("show_select_user_question_dialog")
-			self._active_check_user_callback_func(true)
-			self._active_check_user_callback_func = nil
-		end
-		if not signed_in ~= not was_signed_in then
-			self:update_user(user_index, false)
-		else
-			local platform_id = user_index - 1
-			local signin_state = XboxLive:signin_state(platform_id)
-			local old_signin_state = Global.user_manager.user_map[user_index].signin_state
-			if old_signin_state ~= signin_state then
-				Global.user_manager.user_map[user_index].signin_state = signin_state
-			end
-		end
+function XB1UserManager:signin_changed_callback(selected_xuid)
+	print("[XB1UserManager:signin_changed_callback] selected_xuid", selected_xuid)
+	local selected_user_index = selected_xuid and tostring(selected_xuid)
+	local old_user_index = self:get_index()
+	for user_index, user_data in pairs(Global.user_manager.user_map) do
+		local was_signed_in = user_data.signin_state ~= self.NOT_SIGNED_IN_STATE
+		local is_signed_in = XboxLive:signin_state(user_data.platform_id) ~= "not_signed_in"
+		user_data.has_signed_out = was_signed_in and not is_signed_in
+	end
+	if selected_user_index and self._active_check_user_callback_func then
+		print("[XB1UserManager:signin_changed_callback] executing _active_check_user_callback_func")
+		managers.system_menu:close("show_select_user_question_dialog")
+		self._active_check_user_callback_func(true)
+		self._active_check_user_callback_func = nil
+	end
+	self:update_all_users()
+	if selected_xuid then
+		self:set_index(selected_xuid)
 	end
 end
 
@@ -1163,24 +1166,47 @@ function XB1UserManager:profile_setting_changed_callback(...)
 end
 
 function XB1UserManager:update_all_users()
-	for user_index = 1, 4 do
-		self:update_user(user_index, false)
+	local old_user_indexes = {}
+	for user_index, user_data in pairs(Global.user_manager.user_map) do
+		table.insert(old_user_indexes, user_index)
+	end
+	local xuids = XboxLive:all_user_XUIDs()
+	for _, xuid in pairs(xuids) do
+		self:update_user(xuid, false)
+	end
+	for _, user_index in ipairs(old_user_indexes) do
+		local found
+		for _, xuid in pairs(xuids) do
+			if user_index == tostring(xuid) then
+				found = true
+				break
+			end
+		end
+		if not found then
+			self:update_user(Global.user_manager.user_map[user_index].platform_id, false)
+			Global.user_manager.user_map[user_index] = nil
+		end
 	end
 end
 
-function XB1UserManager:update_user(user_index, ignore_username_change)
-	local platform_id = user_index - 1
-	local signin_state = XboxLive:signin_state(platform_id)
+function XB1UserManager:update_user(xuid, ignore_username_change)
+	if type(xuid) == "string" then
+		xuid = Xuid.from_string(xuid)
+	end
+	local signin_state = XboxLive:signin_state(xuid)
 	local is_signed_in = signin_state ~= self.NOT_SIGNED_IN_STATE
 	local storage_id, username
+	print("[XB1UserManager:update_user] xuid", xuid, "signin_state", signin_state, "is_signed_in", is_signed_in)
 	if is_signed_in then
-		username = XboxLive:name(platform_id)
-		storage_id = Application:current_storage_device_id(platform_id)
+		username = XboxLive:name(xuid)
+		storage_id = Application:current_storage_device_id(xuid)
+		print(" username", username, "storage_id", storage_id)
 		if storage_id == 0 then
 			storage_id = nil
 		end
 	end
-	self:set_user(user_index, platform_id, storage_id, username, signin_state, ignore_username_change)
+	local user_index = tostring(xuid)
+	self:set_user(user_index, xuid, storage_id, username, signin_state, ignore_username_change)
 end
 
 function XB1UserManager:storage_devices_changed_callback()
@@ -1194,8 +1220,22 @@ end
 
 function XB1UserManager:get_xuid(user_index)
 	local platform_id = self:get_platform_id(user_index)
-	return XboxLive:xuid(platform_id)
+	return platform_id
 end
 
 function XB1UserManager:invite_accepted_by_inactive_user()
+end
+
+function XB1UserManager:set_index(user_index)
+	local old_user_index = Global.user_manager.user_index
+	print("[XB1UserManager:set_index]", user_index, "old_user_index", old_user_index)
+	Application:stack_dump()
+	local user_index_str = user_index and tostring(user_index) or nil
+	if old_user_index ~= user_index_str then
+		XboxLive:set_current_user(user_index)
+		if user_index then
+			self:update_user(user_index, false)
+		end
+	end
+	XB1UserManager.super.set_index(self, user_index_str)
 end

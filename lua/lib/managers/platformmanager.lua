@@ -107,9 +107,9 @@ function Xbox360PlatformManager:set_rich_presence(name, callback)
 	print("Xbox360PlatformManager:set_rich_presence", name)
 	GenericPlatformManager.set_rich_presence(self, name)
 	if callback then
-		XboxLive:set_context(managers.user:get_platform_id(), "presence", name, callback)
+		XboxLive:set_context("presence", name, callback)
 	else
-		XboxLive:set_context(managers.user:get_platform_id(), "presence", name, function()
+		XboxLive:set_context("presence", name, function()
 		end)
 	end
 end
@@ -135,9 +135,9 @@ function XB1PlatformManager:set_rich_presence(name, callback)
 	print("XB1PlatformManager:set_rich_presence", name)
 	GenericPlatformManager.set_rich_presence(self, name)
 	if callback then
-		XboxLive:set_context(managers.user:get_platform_id(), "presence", name, callback)
+		XboxLive:set_context("presence", name, callback)
 	else
-		XboxLive:set_context(managers.user:get_platform_id(), "presence", name, function()
+		XboxLive:set_context("presence", name, function()
 		end)
 	end
 end

@@ -47,7 +47,7 @@ end
 function ControllerWrapperDebug:rebind_connections(setup, setup_map)
 	ControllerWrapperDebug.super.rebind_connections(self)
 	for _, controller_wrapper in ipairs(self._controller_wrapper_list) do
-		controller_wrapper:rebind_connections(setup_map[controller_wrapper:get_type()], setup_map)
+		controller_wrapper:rebind_connections(setup_map and setup_map[controller_wrapper:get_type()], setup_map)
 	end
 end
 

@@ -1495,6 +1495,7 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 		self._ext_camera:shaker():stop(self._state_data.melee_charge_shake)
 		self._state_data.melee_charge_shake = nil
 	end
+	self._melee_attack_var = 0
 	if instant_hit then
 		local hit = skip_damage or self:_do_melee_damage(t, bayonet_melee)
 		if hit then
@@ -1503,15 +1504,24 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 			self._ext_camera:play_redirect(bayonet_melee and self.IDS_MELEE_MISS_BAYONET or self.IDS_MELEE_MISS)
 		end
 	else
-		self:_play_melee_sound(melee_entry, "hit_air")
 		local state = self._ext_camera:play_redirect(PlayerStandard.IDS_MELEE_ATTACK)
 		local anim_attack_vars = tweak_data.blackmarket.melee_weapons[melee_entry].anim_attack_vars
-		if anim_attack_vars then
-			self._camera_unit:anim_state_machine():set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
+		self._melee_attack_var = anim_attack_vars and math.random(#anim_attack_vars)
+		self:_play_melee_sound(melee_entry, "hit_air", self._melee_attack_var)
+		local melee_item_tweak_anim = "attack"
+		local melee_item_prefix = ""
+		local melee_item_suffix = ""
+		local anim_attack_param = anim_attack_vars and anim_attack_vars[self._melee_attack_var]
+		if anim_attack_param then
+			self._camera_unit:anim_state_machine():set_parameter(state, anim_attack_param, 1)
+			melee_item_prefix = anim_attack_param .. "_"
 		end
 		if self._state_data.melee_hit_ray and self._state_data.melee_hit_ray ~= true then
 			self._camera_unit:anim_state_machine():set_parameter(state, "hit", 1)
+			melee_item_suffix = "_hit"
 		end
+		melee_item_tweak_anim = melee_item_prefix .. melee_item_tweak_anim .. melee_item_suffix
+		self._camera_unit:base():play_anim_melee_item(melee_item_tweak_anim)
 	end
 end
 
@@ -1546,7 +1556,7 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 			if bayonet_melee then
 				self._unit:sound():play("fairbairn_hit_body", nil, false)
 			else
-				self:_play_melee_sound(melee_entry, "hit_body")
+				self:_play_melee_sound(melee_entry, "hit_body", self._melee_attack_var)
 			end
 			if not hit_unit:character_damage()._no_blood then
 				managers.game_play_central:play_impact_flesh({col_ray = col_ray})
@@ -1556,12 +1566,14 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 					no_sound = true
 				})
 			end
+			self._camera_unit:base():play_anim_melee_item("hit_body")
 		else
 			if bayonet_melee then
 				self._unit:sound():play("knife_hit_gen", nil, false)
 			else
-				self:_play_melee_sound(melee_entry, "hit_gen")
+				self:_play_melee_sound(melee_entry, "hit_gen", self._melee_attack_var)
 			end
+			self._camera_unit:base():play_anim_melee_item("hit_gen")
 			managers.game_play_central:play_impact_sound_and_effects({
 				col_ray = col_ray,
 				effect = Idstring("effects/payday2/particles/impacts/fallback_impact_pd2"),
@@ -1667,12 +1679,16 @@ function PlayerStandard:_check_melee_dot_damage(col_ray, defense_data, melee_ent
 	damage_class:start_dot_damage(col_ray, nil, data)
 end
 
-function PlayerStandard:_play_melee_sound(melee_entry, sound_id)
+function PlayerStandard:_play_melee_sound(melee_entry, sound_id, variation)
 	local tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
 	if not tweak_data.sounds or not tweak_data.sounds[sound_id] then
 		return
 	end
-	self._unit:sound():play(tweak_data.sounds[sound_id], nil, false)
+	local post_event = tweak_data.sounds[sound_id]
+	if type(post_event) == "table" then
+		post_event = post_event[variation] or post_event[1]
+	end
+	self._unit:sound():play(post_event, nil, false)
 end
 
 function PlayerStandard:_interupt_action_melee(t)
@@ -1687,7 +1703,7 @@ function PlayerStandard:_interupt_action_melee(t)
 	self._state_data.melee_damage_delay_t = nil
 	self._state_data.meleeing = nil
 	self._unit:sound():play("interupt_melee", nil, false)
-	self:_play_melee_sound(managers.blackmarket:equipped_melee_weapon(), "hit_air")
+	self:_play_melee_sound(managers.blackmarket:equipped_melee_weapon(), "hit_air", self._melee_attack_var)
 	self._ext_camera:play_redirect(self.IDS_EQUIP)
 	self._equipped_unit:base():tweak_data_anim_stop("unequip")
 	self._equipped_unit:base():tweak_data_anim_play("equip")

@@ -434,6 +434,7 @@ function GroupAIStateBesiege:_upd_assault_task()
 				task_data.active = nil
 				task_data.phase = nil
 				task_data.said_retreat = nil
+				task_data.force_end = nil
 				if self._draw_drama then
 					self._draw_drama.assault_hist[#self._draw_drama.assault_hist][2] = t
 				end

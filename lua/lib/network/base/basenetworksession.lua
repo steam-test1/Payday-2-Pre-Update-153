@@ -202,7 +202,9 @@ function BaseNetworkSession:add_peer(name, rpc, in_lobby, loading, synched, id, 
 	print("[BaseNetworkSession:add_peer]", name, rpc, in_lobby, loading, synched, id, character, user_id, xuid, xnaddr)
 	local peer = NetworkPeer:new(name, rpc, id, loading, synched, in_lobby, character, user_id)
 	peer:set_xuid(xuid)
-	peer:set_xnaddr(xnaddr)
+	if SystemInfo:platform() == Idstring("X360") or self:is_host() then
+		peer:set_xnaddr(xnaddr)
+	end
 	if SystemInfo:platform() == Idstring("WIN32") then
 		Steam:set_played_with(peer:user_id())
 	end
@@ -613,7 +615,12 @@ function BaseNetworkSession:clbk_network_send(target_rpc, post_send)
 				end
 			end
 		else
-			local peer = target_rpc:protocol_at_index(0) == "TCP_IP" and self:peer_by_ip(target_ip) or self:peer_by_user_id(target_ip)
+			local peer
+			if target_rpc:protocol_at_index(0) == "TCP_IP" then
+				peer = self:peer_by_ip(target_ip)
+			else
+				peer = self:peer_by_user_id(target_ip)
+			end
 			if not peer then
 				self:add_connection_to_trash(target_rpc)
 			end
@@ -890,6 +897,22 @@ function BaseNetworkSession:chk_send_connection_established(name, user_id, peer)
 		local rpc = Network:handshake(connection_info.external_ip, connection_info.port, "TCP_IP")
 		peer:set_rpc(rpc)
 		Network:add_co_client(rpc)
+		self:remove_connection_from_trash(rpc)
+		self:remove_connection_from_soft_remove_peers(rpc)
+	elseif SystemInfo:platform() == Idstring("XB1") then
+		local xnaddr = managers.network.matchmake:internal_address(peer:xuid())
+		if not xnaddr then
+			return
+		end
+		peer:set_xnaddr(xnaddr)
+		local rpc = Network:handshake(xnaddr, managers.network.DEFAULT_PORT, "TCP_IP")
+		peer:set_rpc(rpc)
+		Network:add_co_client(rpc)
+		local player_info = {}
+		player_info.name = peer:name()
+		player_info.player_id = peer:xuid()
+		player_info.external_address = peer:xnaddr()
+		managers.network.voice_chat:open_channel_to(player_info, "game")
 		self:remove_connection_from_trash(rpc)
 		self:remove_connection_from_soft_remove_peers(rpc)
 	else

@@ -2019,6 +2019,9 @@ function MenuComponentManager:_create_mission_briefing_gui(node)
 end
 
 function MenuComponentManager:create_mission_briefing_gui(node)
+	if Global.load_start_menu then
+		return
+	end
 	if not self._mission_briefing_gui then
 		self._mission_briefing_gui = MissionBriefingGui:new(self._ws, self._fullscreen_ws, node)
 		if managers.groupai and managers.groupai:state() and not self._whisper_listener then

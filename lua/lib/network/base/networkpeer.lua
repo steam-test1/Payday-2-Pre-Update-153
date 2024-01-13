@@ -9,7 +9,6 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 	self._id = id
 	self._user_id = user_id
 	self._xuid = ""
-	self._xnaddr = ""
 	local is_local_peer
 	if self._rpc then
 		if self._rpc:ip_at_index(0) == Network:self("TCP_IP"):ip_at_index(0) then

@@ -538,6 +538,14 @@ function InteractionTweakData:init()
 	self.hack_suburbia.sound_done = "bar_keyboard_finished"
 	self.hack_suburbia.axis = "y"
 	self.hack_suburbia.contour = "contour_off"
+	self.hack_suburbia_outline = {}
+	self.hack_suburbia_outline.icon = "equipment_hack_ipad"
+	self.hack_suburbia_outline.text_id = "debug_interact_hack_ipad"
+	self.hack_suburbia_outline.timer = 5
+	self.hack_suburbia_outline.sound_start = "bar_keyboard"
+	self.hack_suburbia_outline.sound_interupt = "bar_keyboard_cancel"
+	self.hack_suburbia_outline.sound_done = "bar_keyboard_finished"
+	self.hack_suburbia_outline.axis = "y"
 	self.hack_suburbia_jammed = {}
 	self.hack_suburbia_jammed.icon = "equipment_hack_ipad"
 	self.hack_suburbia_jammed.text_id = "debug_interact_hack_ipad_jammed"
