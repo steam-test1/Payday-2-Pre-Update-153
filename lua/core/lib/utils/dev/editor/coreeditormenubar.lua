@@ -210,11 +210,38 @@ function CoreEditor:build_menubar()
 	view_menu:append_item("DEPTH", "Depth", "Change visualization to Depth")
 	view_menu:append_separator()
 	local post_processor_effects_menu = EWS:Menu("")
-	for _, effect in ipairs({"empty", "default"}) do
-		post_processor_effects_menu:append_radio_item(effect, effect, "")
-		Global.frame:connect(effect, "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_post_processor_effect"), effect)
+	self._post_processor_effects_menu = post_processor_effects_menu
+	local post_effects = {
+		{
+			id = "POSTFX_none",
+			text = "None",
+			help = "No post effects"
+		},
+		{
+			id = "POSTFX_default",
+			text = "Default",
+			help = "Default post effects"
+		},
+		{
+			id = "POSTFX_bloom",
+			text = "Bloom",
+			help = "Bloom"
+		},
+		{
+			id = "POSTFX_aa",
+			text = "Anti aliasing",
+			help = "Anti aliasing"
+		},
+		{
+			id = "POSTFX_ssao",
+			text = "SSAO",
+			help = "SSAO"
+		}
+	}
+	for _, pe in ipairs(post_effects) do
+		post_processor_effects_menu:append_check_item(pe.id, pe.text, pe.help)
+		Global.frame:connect(pe.id, "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_post_processor_effect"), pe)
 	end
-	post_processor_effects_menu:set_checked("empty", true)
 	view_menu:append_menu("POST_PROCESSOR_MENU", "Post processor effects", post_processor_effects_menu, "Post processor effects")
 	view_menu:append_separator()
 	view_menu:append_check_item("LOCK_1280_720", "Lock 1280x720", "Toggle lock resolution of application window to/from 1280x720")
@@ -620,15 +647,35 @@ function CoreEditor:show_news()
 end
 
 function CoreEditor:change_visualization(viz)
+	if viz ~= "deferred_lighting" then
+		self:disable_all_post_effects(true)
+	else
+		self:update_post_effects()
+	end
 	for _, vp in ipairs(managers.viewport:viewports()) do
 		vp:set_visualization_mode(viz)
 	end
 end
 
-function CoreEditor:on_post_processor_effect(effect)
-	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring(effect))
-	local bloom_combine_effect = Idstring(effect) == Idstring("empty") and Idstring("bloom_combine_empty") or Idstring("bloom_combine")
-	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), bloom_combine_effect)
+function CoreEditor:on_post_processor_effect(pe)
+	if pe.id == "POSTFX_none" then
+		self:disable_all_post_effects()
+		self._post_processor_effects_menu:set_checked(pe.id, false)
+	elseif pe.id == "POSTFX_default" then
+		self:enable_all_post_effects()
+		self._post_processor_effects_menu:set_checked(pe.id, false)
+	else
+		local effect = self._post_effects[pe.id]
+		if effect then
+			if self._post_processor_effects_menu:is_checked(pe.id) then
+				effect:on()
+				effect.enable = true
+			else
+				effect:off()
+				effect.enable = false
+			end
+		end
+	end
 end
 
 function CoreEditor:toggle_lock_1280_720(data)

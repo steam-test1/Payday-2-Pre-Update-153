@@ -394,6 +394,7 @@ function EconomyTweakData:init()
 	self.safes.overkill_01.unit_name = "units/payday2_cash/safes/eco_safe_overkill_01/eco_safe_overkill_01"
 	self.safes.overkill_01.name_id = "bm_menu_safe_overkill_01"
 	self.safes.overkill_01.texture_bundle_folder = "cash/safes/cop"
+	self.safes.overkill_01.dlc = "complete_overkill_pack"
 	self.safes.event_01 = {}
 	self.safes.event_01.drill = "event_01"
 	self.safes.event_01.content = "event_01"
@@ -480,6 +481,7 @@ function EconomyTweakData:init()
 	self.drills.overkill_01.name_id = "bm_menu_drill_overkill_01"
 	self.drills.overkill_01.desc_id = "bm_menu_drill_overkill_01_desc"
 	self.drills.overkill_01.texture_bundle_folder = "cash/safes/cop"
+	self.drills.overkill_01.dlc = "complete_overkill_pack"
 	self.drills.event_01 = {}
 	self.drills.event_01.safe = "event_01"
 	self.drills.event_01.def_id = 70001

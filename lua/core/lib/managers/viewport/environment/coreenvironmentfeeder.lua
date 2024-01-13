@@ -26,6 +26,13 @@ local ids_slice2 = Idstring("slice2")
 local ids_slice3 = Idstring("slice3")
 local ids_shadow_slice_depths = Idstring("shadow_slice_depths")
 local ids_shadow_slice_overlap = Idstring("shadow_slice_overlap")
+local ids_bloom_combine_processor = Idstring("bloom_combine_post_processor")
+local ids_bloom_combine = Idstring("bloom_combine")
+local ids_bloom_lense = Idstring("bloom_lense")
+local ids_bloom_lense_id = Idstring("post_effect/bloom_combine_post_processor/bloom_combine/bloom_lense"):key()
+local ids_bloom_threshold = Idstring("bloom_threshold")
+local ids_bloom_intensity = Idstring("bloom_intensity")
+local ids_lense_intensity = Idstring("lense_intensity")
 local ids_deferred = Idstring("deferred")
 local ids_deferred_lighting = Idstring("deferred_lighting")
 local ids_apply_ambient = Idstring("apply_ambient")
@@ -43,6 +50,7 @@ Feeder.APPLY_GROUP_ID = 0
 Feeder.DATA_PATH_KEY = nil
 Feeder.IS_GLOBAL = nil
 Feeder.AFFECTED_LIST = nil
+Feeder.DEFAULT_VALUE = nil
 Feeder.FILTER_CATEGORY = "Others"
 
 function Feeder:init(current)
@@ -70,6 +78,10 @@ end
 
 function Feeder:get_current()
 	return self._current
+end
+
+function Feeder:get_default_value()
+	return Feeder.DEFAULT_VALUE
 end
 
 function Feeder:set(current)
@@ -536,6 +548,53 @@ function PostShadowSliceOverlapFeeder:apply(handler, viewport, scene)
 	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_shadow_modifier_id, ids_shadow_processor, ids_shadow_rendering, ids_shadow_modifier)
 	_apply_fov_ratio(self._current)
 	material:set_variable(ids_shadow_slice_overlap, self._current)
+end
+
+PostEffectBloomThresholdFeeder = PostEffectBloomThresholdFeeder or CoreClass.class(Feeder)
+PostEffectBloomThresholdFeeder.DATA_PATH_KEY = Idstring("post_effect/deferred/deferred_lighting/apply_ambient/bloom_threshold"):key()
+PostEffectBloomThresholdFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostEffectBloomThresholdFeeder.IS_GLOBAL = nil
+PostEffectBloomThresholdFeeder.DEFAULT_VALUE = 0.55
+PostEffectBloomThresholdFeeder.FILTER_CATEGORY = "Effect"
+
+function PostEffectBloomThresholdFeeder:apply(handler, viewport, scene)
+	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_apply_ambient_id, ids_deferred, ids_deferred_lighting, ids_apply_ambient)
+	material:set_variable(ids_bloom_threshold, self._current)
+end
+
+PostEffectBloomIntensityFeeder = PostEffectBloomIntensityFeeder or CoreClass.class(Feeder)
+PostEffectBloomIntensityFeeder.DATA_PATH_KEY = Idstring("post_effect/bloom_combine_post_processor/bloom_combine/bloom_lense/bloom_intensity"):key()
+PostEffectBloomIntensityFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostEffectBloomIntensityFeeder.IS_GLOBAL = nil
+PostEffectBloomIntensityFeeder.DEFAULT_VALUE = 0.5
+PostEffectBloomIntensityFeeder.FILTER_CATEGORY = "Effect"
+
+function PostEffectBloomIntensityFeeder:apply(handler, viewport, scene)
+	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_bloom_lense_id, ids_bloom_combine_processor, ids_bloom_combine, ids_bloom_lense)
+	material:set_variable(ids_bloom_intensity, self._current)
+end
+
+PostEffectBloomBlurSizeFeeder = PostEffectBloomBlurSizeFeeder or CoreClass.class(Feeder)
+PostEffectBloomBlurSizeFeeder.DATA_PATH_KEY = Idstring("post_effect/bloom_combine_post_processor/bloom_combine/bloom_lense/bloom_blur_size"):key()
+PostEffectBloomBlurSizeFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostEffectBloomBlurSizeFeeder.IS_GLOBAL = nil
+PostEffectBloomBlurSizeFeeder.DEFAULT_VALUE = 4
+PostEffectBloomBlurSizeFeeder.FILTER_CATEGORY = "Effect"
+
+function PostEffectBloomBlurSizeFeeder:apply(handler, viewport, scene)
+	managers.environment_controller:bloom_blur_size(self._current, viewport)
+end
+
+PostEffectLenseIntensityFeeder = PostEffectLenseIntensityFeeder or CoreClass.class(Feeder)
+PostEffectLenseIntensityFeeder.DATA_PATH_KEY = Idstring("post_effect/bloom_combine_post_processor/bloom_combine/bloom_lense/lense_intensity"):key()
+PostEffectLenseIntensityFeeder.APPLY_GROUP_ID = Feeder.get_next_id()
+PostEffectLenseIntensityFeeder.IS_GLOBAL = nil
+PostEffectLenseIntensityFeeder.DEFAULT_VALUE = 0.5
+PostEffectLenseIntensityFeeder.FILTER_CATEGORY = "Effect"
+
+function PostEffectLenseIntensityFeeder:apply(handler, viewport, scene)
+	local material = handler:_get_post_processor_modifier_material(viewport, scene, ids_bloom_lense_id, ids_bloom_combine_processor, ids_bloom_combine, ids_bloom_lense)
+	material:set_variable(ids_lense_intensity, self._current)
 end
 
 UnderlayPathFeeder.AFFECTED_LIST = {

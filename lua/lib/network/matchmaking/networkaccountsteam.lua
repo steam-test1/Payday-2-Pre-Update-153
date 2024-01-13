@@ -197,6 +197,10 @@ function NetworkAccountSTEAM:get_stat(key)
 	return Steam:sa_handler():get_stat(key)
 end
 
+function NetworkAccountSTEAM:get_lifetime_stat(key)
+	return Steam:sa_handler():get_lifetime_stat(key)
+end
+
 function NetworkAccountSTEAM:get_global_stat(key, days)
 	local value = 0
 	local global_stat

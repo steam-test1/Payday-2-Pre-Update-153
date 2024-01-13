@@ -1010,6 +1010,7 @@ function PlayerTweakData:_init_new_stances()
 	self:_init_pl14()
 	self:_init_x_mp5()
 	self:_init_x_akmsu()
+	self:_init_tecci()
 end
 
 function PlayerTweakData:_init_hs2000()
@@ -3246,4 +3247,32 @@ function PlayerTweakData:_init_x_akmsu()
 	self.stances.x_akmsu.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
 	self.stances.x_akmsu.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
 	self.stances.x_akmsu.crouched.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -36, 0)
+end
+
+function PlayerTweakData:_init_tecci()
+	self.stances.tecci = deep_clone(self.stances.default)
+	local pivot_shoulder_translation = Vector3(11.2307, 11.2773, -3.55915)
+	local pivot_shoulder_rotation = Rotation(5.14897E-5, 0.00122516, -3.32118E-4)
+	local pivot_head_translation = Vector3(8.5, 12, -1.2)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.tecci.standard.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.tecci.standard.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.tecci.standard.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
+	self.stances.tecci.steelsight.vel_overshot.pitch_neg = -17
+	self.stances.tecci.steelsight.vel_overshot.pitch_pos = 17
+	local pivot_head_translation = Vector3(0, 10, 0)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.tecci.steelsight.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.tecci.steelsight.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.tecci.steelsight.FOV = self.stances.tecci.standard.FOV
+	self.stances.tecci.steelsight.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -7, 0)
+	self.stances.tecci.steelsight.vel_overshot.yaw_neg = 8
+	self.stances.tecci.steelsight.vel_overshot.yaw_pos = -8
+	self.stances.tecci.steelsight.vel_overshot.pitch_neg = -17
+	self.stances.tecci.steelsight.vel_overshot.pitch_pos = 17
+	local pivot_head_translation = Vector3(8.5, 11.5, -2.2)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.tecci.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.tecci.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.tecci.crouched.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
 end

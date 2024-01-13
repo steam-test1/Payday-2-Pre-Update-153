@@ -778,7 +778,7 @@ function MenuSceneManager:_set_character_equipment()
 	else
 		self:_delete_character_weapon(self._character_unit, "primary")
 	end
-	self:set_character_deployable(Global.player_manager.kit.equipment_slots[1], false, 0)
+	self:set_character_deployable(managers.blackmarket:equipped_deployable(), false, 0)
 end
 
 function MenuSceneManager:get_current_scene_template()
@@ -1543,7 +1543,7 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 		self._can_move_item = template_data.can_move_item or false
 		self._change_fov_sensitivity = template_data.change_fov_sensitivity or 1
 		self._characters_deployable_visible = template_data.characters_deployable_visible or false
-		self:set_character_deployable(Global.player_manager.kit.equipment_slots[1], false, 0)
+		self:set_character_deployable(managers.blackmarket:equipped_deployable(), false, 0)
 		if template_data.remove_infamy_card and self._card_units and self._card_units[self._character_unit:key()] then
 			local secondary = managers.blackmarket:equipped_secondary()
 			if secondary then

@@ -112,6 +112,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_pl14_npc()
 	self:_init_data_x_mp5_npc()
 	self:_init_data_x_akmsu_npc()
+	self:_init_data_tecci_npc()
 	self:_precalculate_values()
 end
 
@@ -1971,6 +1972,20 @@ function WeaponTweakData:_init_data_x_akmsu_npc()
 	self.x_akmsu_npc.hold = "akimbo_pistol"
 	self.x_akmsu_npc.alert_size = 1800
 	self.x_akmsu_npc.suppression = 2
+end
+
+function WeaponTweakData:_init_data_tecci_npc()
+	self.tecci_npc.sounds.prefix = "tecci_npc"
+	self.tecci_npc.use_data.selection_index = 2
+	self.tecci_npc.DAMAGE = 2
+	self.tecci_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.tecci_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.tecci_npc.CLIP_AMMO_MAX = 20
+	self.tecci_npc.NR_CLIPS_MAX = 5
+	self.tecci_npc.auto.fire_rate = 0.15
+	self.tecci_npc.hold = "rifle"
+	self.tecci_npc.alert_size = 5000
+	self.tecci_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -11506,6 +11521,84 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.tecci = {}
+	self.tecci.category = "assault_rifle"
+	self.tecci.damage_melee = damage_melee_default
+	self.tecci.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.tecci.sounds = {}
+	self.tecci.sounds.fire = "tecci_fire_single"
+	self.tecci.sounds.fire_single = "tecci_fire_single"
+	self.tecci.sounds.fire_auto = "tecci_fire"
+	self.tecci.sounds.stop_fire = "tecci_stop"
+	self.tecci.sounds.dryfire = "primary_dryfire"
+	self.tecci.sounds.enter_steelsight = "m4_tighten"
+	self.tecci.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.tecci.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.tecci.timers = {}
+	self.tecci.timers.reload_not_empty = 3.8
+	self.tecci.timers.reload_empty = 4.7
+	self.tecci.timers.unequip = 0.6
+	self.tecci.timers.equip = 0.6
+	self.tecci.name_id = "bm_w_tecci"
+	self.tecci.desc_id = "bm_w_tecci_desc"
+	self.tecci.description_id = "des_tecci"
+	self.tecci.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.tecci.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.tecci.use_data = {}
+	self.tecci.use_data.selection_index = 2
+	self.tecci.DAMAGE = 1
+	self.tecci.CLIP_AMMO_MAX = 100
+	self.tecci.NR_CLIPS_MAX = 2
+	self.tecci.AMMO_MAX = self.tecci.CLIP_AMMO_MAX * self.tecci.NR_CLIPS_MAX
+	self.tecci.AMMO_PICKUP = self:_pickup_chance(self.tecci.AMMO_MAX, 1)
+	self.tecci.FIRE_MODE = "auto"
+	self.tecci.fire_mode_data = {}
+	self.tecci.fire_mode_data.fire_rate = 0.09
+	self.tecci.CAN_TOGGLE_FIREMODE = true
+	self.tecci.auto = {}
+	self.tecci.auto.fire_rate = 0.1
+	self.tecci.spread = {}
+	self.tecci.spread.standing = 3
+	self.tecci.spread.crouching = self.tecci.spread.standing * 0.4
+	self.tecci.spread.steelsight = self.tecci.spread.standing * 0.4
+	self.tecci.spread.moving_standing = self.tecci.spread.standing
+	self.tecci.spread.moving_crouching = self.tecci.spread.standing
+	self.tecci.spread.moving_steelsight = self.tecci.spread.steelsight
+	self.tecci.kick = {}
+	self.tecci.kick.standing = {
+		0.6,
+		0.8,
+		-1,
+		1
+	}
+	self.tecci.kick.crouching = self.tecci.kick.standing
+	self.tecci.kick.steelsight = self.tecci.kick.standing
+	self.tecci.shake = {}
+	self.tecci.shake.fire_multiplier = 0.6
+	self.tecci.shake.fire_steelsight_multiplier = -0.6
+	self.tecci.autohit = autohit_rifle_default
+	self.tecci.aim_assist = aim_assist_rifle_default
+	self.tecci.weapon_hold = "tecci"
+	self.tecci.animations = {}
+	self.famas.animations.equip_id = "equip_tecci"
+	self.tecci.animations.recoil_steelsight = true
+	self.tecci.global_value = "opera"
+	self.tecci.texture_bundle_folder = "opera"
+	self.tecci.transition_duration = 0.02
+	self.tecci.panic_suppression_chance = 0.2
+	self.tecci.stats = {
+		damage = 38,
+		spread = 7,
+		recoil = 14,
+		spread_moving = 10,
+		zoom = 3,
+		concealment = 20,
+		suppression = 10,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -12251,6 +12344,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.tecci_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -12370,4 +12469,5 @@ function WeaponTweakData:_precalculate_values()
 	self.ak47_ass_npc.AMMO_MAX = self.ak47_ass_npc.CLIP_AMMO_MAX * self.ak47_ass_npc.NR_CLIPS_MAX
 	self.x_mp5_npc.AMMO_MAX = self.x_mp5_npc.CLIP_AMMO_MAX * self.x_mp5_npc.NR_CLIPS_MAX
 	self.x_akmsu_npc.AMMO_MAX = self.x_akmsu_npc.CLIP_AMMO_MAX * self.x_akmsu_npc.NR_CLIPS_MAX
+	self.tecci_npc.AMMO_MAX = self.tecci_npc.CLIP_AMMO_MAX * self.tecci_npc.NR_CLIPS_MAX
 end

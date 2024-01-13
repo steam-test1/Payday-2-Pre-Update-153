@@ -1104,7 +1104,6 @@ function AssetsItem:move_left()
 	self._asset_selected = self._asset_selected or 0
 	local new_selected = math.max(self._asset_selected - 1, 1)
 	self:select_asset(new_selected)
-	return
 end
 
 function AssetsItem:move_up()
@@ -1124,7 +1123,6 @@ function AssetsItem:move_right()
 	self._asset_selected = self._asset_selected or 0
 	local new_selected = math.min(self._asset_selected + 1, #self._assets_list)
 	self:select_asset(new_selected)
-	return
 end
 
 function AssetsItem:confirm_pressed()
@@ -1450,7 +1448,7 @@ function LoadoutItem:populate_deployables(data)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		new_data.slot = i
 		new_data.unlocked = true
-		new_data.equipped = managers.player:equipment_in_slot(1) == deployable
+		new_data.equipped = managers.blackmarket:equipped_deployable() == deployable
 		new_data.stream = false
 		if not new_data.equipped then
 			table.insert(new_data, "lo_d_equip")
@@ -1489,7 +1487,7 @@ function LoadoutItem:populate_grenades(data)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		new_data.slot = i
 		new_data.unlocked = true
-		new_data.equipped = managers.player:equipment_in_slot(1) == grenade
+		new_data.equipped = managers.blackmarket:equipped_deployable() == grenade
 		new_data.stream = false
 		if not new_data.equipped then
 			table.insert(new_data, "lo_d_grenade")
@@ -2471,7 +2469,7 @@ function NewLoadoutTab:populate_deployables(data)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(deployable)
 		new_data.slot = i
 		new_data.unlocked = true
-		new_data.equipped = managers.player:equipment_in_slot(1) == deployable
+		new_data.equipped = managers.blackmarket:equipped_deployable() == deployable
 		new_data.stream = false
 		if not new_data.equipped then
 			table.insert(new_data, "lo_d_equip")

@@ -183,7 +183,6 @@ end
 
 function MenuLobbyRenderer:set_slot_voice(peer, peer_id, active)
 	managers.hud:set_slot_voice(peer, peer_id, active)
-	return
 end
 
 function MenuLobbyRenderer:_set_player_slot(nr, params)
@@ -418,7 +417,6 @@ function MenuLobbyRenderer:_layout_info_panel()
 	self._difficulty_title:set_w(w)
 	self._difficulty_text:set_lefttop(self._difficulty_title:righttop())
 	self._difficulty_text:set_w(self._gui_info_panel:w())
-	return
 end
 
 function MenuLobbyRenderer:_layout_video()

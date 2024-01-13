@@ -6,12 +6,14 @@ require("core/lib/utils/dev/tools/CoreEnvEditorTabs")
 require("core/lib/utils/dev/tools/CoreEnvEditorDialogs")
 require("core/lib/utils/dev/tools/CoreEnvEditorFormulas")
 require("core/lib/utils/dev/tools/CoreEnvEditorShadowTab")
+require("core/lib/utils/dev/tools/CoreEnvEditorEffectsTab")
 CoreEnvEditor = CoreEnvEditor or class()
 CoreEnvEditor.TEMPLATE_IDENTIFIER = "template"
 CoreEnvEditor.MIX_MUL = 200
 CoreEnvEditor.REMOVE_DEPRECATED_DURING_LOAD = true
 
 function CoreEnvEditor:init(env_file_name)
+	managers.editor:enable_all_post_effects()
 	self._env_path = assert(managers.viewport:first_active_viewport():get_environment_path()) or "core/environments/default"
 	self._env_name = self._env_path
 	self:read_mode()
@@ -49,6 +51,7 @@ function CoreEnvEditor:init(env_file_name)
 	self._underlays_to_remove = {}
 	self._environments_to_remove = {}
 	self:init_shadow_tab()
+	self:init_effects_tab()
 	self._debug_draw = Global.render_debug.draw_enabled
 	Global.render_debug.draw_enabled = true
 	self._prev_environment = self._env_path
@@ -109,17 +112,19 @@ function CoreEnvEditor:check_news(new_only)
 end
 
 function CoreEnvEditor:feed(handler, viewport, scene)
-	for kpro, vpro in pairs(self._posteffect.post_processors) do
-		if kpro == "shadow_processor" then
+	for postprocessor_name, post_processor in pairs(self._posteffect.post_processors) do
+		if postprocessor_name == "shadow_processor" then
 			local shadow_param_map = {}
 			self:shadow_feed_params(shadow_param_map)
 			for kpar, vpar in pairs(shadow_param_map) do
-				self:set_data_path("post_effect/" .. kpro .. "/shadow_rendering/shadow_modifier/" .. kpar, handler, vpar)
+				self:set_data_path("post_effect/" .. postprocessor_name .. "/shadow_rendering/shadow_modifier/" .. kpar, handler, vpar)
 			end
 		else
-			for kmod, vmod in pairs(vpro.modifiers) do
-				for kpar, vpar in pairs(vmod.params) do
-					self:set_data_path("post_effect/" .. kpro .. "/deferred_lighting/" .. kmod .. "/" .. kpar, handler, vpar:get_value())
+			for effect_name, effect in pairs(post_processor.effects) do
+				for modifier_name, modifier in pairs(effect.modifiers) do
+					for param_name, param in pairs(modifier.params) do
+						self:set_data_path("post_effect/" .. postprocessor_name .. "/" .. effect_name .. "/" .. modifier_name .. "/" .. param_name, handler, param:get_value())
+					end
 				end
 			end
 		end
@@ -180,34 +185,42 @@ function CoreEnvEditor:create_main_frame()
 	self._main_frame:set_visible(true)
 end
 
-function CoreEnvEditor:add_post_processors_param(pro, mod, param, gui)
+function CoreEnvEditor:add_post_processors_param(pro, effect, mod, param, gui)
 	if not self._posteffect.post_processors then
 		self._posteffect.post_processors = {}
 	end
 	if not self._posteffect.post_processors[pro] then
 		self._posteffect.post_processors[pro] = {}
 	end
-	if not self._posteffect.post_processors[pro].modifiers then
-		self._posteffect.post_processors[pro].modifiers = {}
+	if not self._posteffect.post_processors[pro].effects then
+		self._posteffect.post_processors[pro].effects = {}
 	end
-	if not self._posteffect.post_processors[pro].modifiers[mod] then
-		self._posteffect.post_processors[pro].modifiers[mod] = {}
+	if not self._posteffect.post_processors[pro].effects[effect] then
+		self._posteffect.post_processors[pro].effects[effect] = {}
 	end
-	if not self._posteffect.post_processors[pro].modifiers[mod].params then
-		self._posteffect.post_processors[pro].modifiers[mod].params = {}
+	if not self._posteffect.post_processors[pro].effects[effect].modifiers then
+		self._posteffect.post_processors[pro].effects[effect].modifiers = {}
 	end
-	self._posteffect.post_processors[pro].modifiers[mod].params[param] = gui
-	local e = "default"
-	if pro == "deferred" then
-		e = "deferred_lighting"
+	if not self._posteffect.post_processors[pro].effects[effect].modifiers[mod] then
+		self._posteffect.post_processors[pro].effects[effect].modifiers[mod] = {}
 	end
+	if not self._posteffect.post_processors[pro].effects[effect].modifiers[mod].params then
+		self._posteffect.post_processors[pro].effects[effect].modifiers[mod].params = {}
+	end
+	self._posteffect.post_processors[pro].effects[effect].modifiers[mod].params[param] = gui
 	local processor = managers.viewport:first_active_viewport():vp():get_post_processor_effect("World", Idstring(pro))
 	if processor then
-		local modifier = processor:modifier(Idstring(mod))
-		if modifier and modifier:material():variable_exists(Idstring(param)) then
-			local value = modifier:material():get_variable(Idstring(param))
-			if value then
-				gui:set_value(value)
+		local key = Idstring("post_effect/" .. pro .. "/" .. effect .. "/" .. mod .. "/" .. param):key()
+		local value = managers.viewport:first_active_viewport():get_environment_default_value(key)
+		if value then
+			gui:set_value(value)
+		else
+			local modifier = processor:modifier(Idstring(mod))
+			if modifier and modifier:material():variable_exists(Idstring(param)) then
+				local value = modifier:material():get_variable(Idstring(param))
+				if value then
+					gui:set_value(value)
+				end
 			end
 		end
 	end
@@ -431,34 +444,32 @@ end
 function CoreEnvEditor:write_posteffect(file)
 	file:print("\t\t<post_effect>\n")
 	for post_processor_name, post_processor in pairs(self._posteffect.post_processors) do
-		if next(post_processor.modifiers) then
+		if next(post_processor.effects) then
 			file:print("\t\t\t<" .. post_processor_name .. ">\n")
 			if post_processor_name == "shadow_processor" then
 				self:write_shadow_params(file)
 			else
-				local e = "default"
-				if post_processor_name == "deferred" then
-					e = "deferred_lighting"
-				elseif post_processor_name == "shadow_processor" then
-					e = "shadow_rendering"
-				end
-				file:print("\t\t\t\t<" .. e .. ">\n")
-				for modifier_name, mod in pairs(post_processor.modifiers) do
-					if next(mod.params) then
-						file:print("\t\t\t\t\t<" .. modifier_name .. ">\n")
-						for param_name, param in pairs(mod.params) do
-							local v = param:get_value()
-							if getmetatable(v) == _G.Vector3 then
-								v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
-							else
-								v = tostring(param:get_value())
+				for effect_name, effect in pairs(post_processor.effects) do
+					if next(effect.modifiers) then
+						file:print("\t\t\t\t<" .. effect_name .. ">\n")
+						for modifier_name, mod in pairs(effect.modifiers) do
+							if next(mod.params) then
+								file:print("\t\t\t\t\t<" .. modifier_name .. ">\n")
+								for param_name, param in pairs(mod.params) do
+									local v = param:get_value()
+									if getmetatable(v) == _G.Vector3 then
+										v = "" .. param:get_value().x .. " " .. param:get_value().y .. " " .. param:get_value().z
+									else
+										v = tostring(param:get_value())
+									end
+									file:print("\t\t\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
+								end
+								file:print("\t\t\t\t\t</" .. modifier_name .. ">\n")
 							end
-							file:print("\t\t\t\t\t\t<param key=\"" .. param_name .. "\" value=\"" .. v .. "\"/>\n")
 						end
-						file:print("\t\t\t\t\t</" .. modifier_name .. ">\n")
+						file:print("\t\t\t\t</" .. effect_name .. ">\n")
 					end
 				end
-				file:print("\t\t\t\t</" .. e .. ">\n")
 			end
 			file:print("\t\t\t</" .. post_processor_name .. ">\n")
 		end
@@ -527,15 +538,20 @@ function CoreEnvEditor:database_load_posteffect(post_effect_node)
 		if not post_pro then
 			self._posteffect.post_processors[post_processor:name()] = {}
 			post_pro = self._posteffect.post_processors[post_processor:name()]
-			post_pro.modifiers = {}
+			post_pro.effects = {}
 		end
 		for effect in post_processor:children() do
-			post_pro._effect = effect:name()
+			local eff = post_pro.effects[effect:name()]
+			if not eff then
+				post_pro.effects[effect:name()] = {}
+				eff = post_pro.effects[effect:name()]
+				eff.modifiers = {}
+			end
 			for modifier in effect:children() do
-				local mod = post_pro.modifiers[modifier:name()]
+				local mod = eff.modifiers[modifier:name()]
 				if not mod then
-					post_pro.modifiers[modifier:name()] = {}
-					mod = post_pro.modifiers[modifier:name()]
+					eff.modifiers[modifier:name()] = {}
+					mod = eff.modifiers[modifier:name()]
 					mod.params = {}
 				end
 				for param in modifier:children() do
@@ -857,92 +873,6 @@ end
 
 function CoreEnvEditor:sync()
 	local undo_struct = {}
-	if self._out_sky then
-		undo_struct._sky = {}
-		undo_struct._sky.params = {}
-		for key, value in pairs(self._sky.params) do
-			self._out_sky:set_value(key, value:get_value())
-			local v = value:get_value()
-			if not v then
-				cat_print("debug", "[CoreEnvEditor] Deprecated! Open this environment in the advanced environment editor and save it again.")
-			else
-				local out
-				if type(v) ~= "string" and type(v) ~= "number" then
-					out = Vector3(v.x, v.y, v.z)
-				elseif type(v) == "number" then
-					out = v
-				elseif string.sub(v, 1, 1) == "#" then
-					out = self:value_database_lookup(string.sub(v, 2))
-				else
-					out = v
-				end
-				undo_struct._sky.params[key] = out
-			end
-		end
-	end
-	if self._out_underlayeffect then
-		undo_struct._underlay = {}
-		undo_struct._underlay.materials = {}
-		for material, material_value in pairs(self._underlayeffect.materials) do
-			undo_struct._underlay.materials[material] = {}
-			undo_struct._underlay.materials[material].params = {}
-			for key, value in pairs(material_value.params) do
-				self._out_underlayeffect:set_value(material, key, value:get_value())
-				local v = value:get_value()
-				if not v then
-					cat_print("debug", "[CoreEnvEditor] Deprecated! Open this environment in the advanced environment editor and save it again.")
-				else
-					local out
-					if type(v) ~= "string" and type(v) ~= "number" then
-						out = Vector3(v.x, v.y, v.z)
-					elseif type(v) == "number" then
-						out = v
-					elseif string.sub(v, 1, 1) == "#" then
-						out = self:value_database_lookup(string.sub(v, 2))
-					else
-						out = v
-					end
-					undo_struct._underlay.materials[material].params[key] = out
-				end
-			end
-		end
-	end
-	if self._out_posteffect then
-		undo_struct._posteffect = {}
-		undo_struct._posteffect.post_processors = {}
-		for post_processor, post_processor_value in pairs(self._posteffect.post_processors) do
-			undo_struct._posteffect.post_processors[post_processor] = {}
-			undo_struct._posteffect.post_processors[post_processor].modifiers = {}
-			for modifier, modifier_value in pairs(post_processor_value.modifiers) do
-				undo_struct._posteffect.post_processors[post_processor].modifiers[modifier] = {}
-				undo_struct._posteffect.post_processors[post_processor].modifiers[modifier].params = {}
-				for key, value in pairs(modifier_value.params) do
-					self._out_posteffect:set_value(post_processor, modifier, key, value:get_value())
-					local v = value:get_value()
-					if not v then
-						cat_print("debug", "[CoreEnvEditor] Deprecated! Open this environment in the advanced environment editor and save it again.")
-					else
-						local out
-						if type(v) ~= "string" and type(v) ~= "number" then
-							out = Vector3(v.x, v.y, v.z)
-						elseif type(v) == "number" then
-							out = v
-						elseif string.sub(v, 1, 1) == "#" then
-							out = self:value_database_lookup(string.sub(v, 2))
-						else
-							out = v
-						end
-						undo_struct._posteffect.post_processors[post_processor].modifiers[modifier].params[key] = out
-					end
-					local e = "default"
-					if post_processor == "deferred" then
-						e = "deferred_lighting"
-					end
-					self._out_posteffect._post_processors[post_processor]._effect = e
-				end
-			end
-		end
-	end
 	if self._value_is_changed then
 		self._max_undo_index = self._undo_index
 		self._undo_index = self._undo_index + 1

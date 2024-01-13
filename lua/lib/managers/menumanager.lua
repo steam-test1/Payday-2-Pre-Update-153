@@ -1267,6 +1267,11 @@ function MenuCallbackHandler:dlc_buy_coco_pc()
 	Steam:overlay_activate("store", 218620)
 end
 
+function MenuCallbackHandler:dlc_buy_opera_pc()
+	print("[MenuCallbackHandler:dlc_buy_opera_pc]")
+	Steam:overlay_activate("store", 468410)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1340,6 +1345,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"opera",
 		"pal",
 		"peta",
 		"berry",
@@ -1489,6 +1495,10 @@ end
 
 function MenuCallbackHandler:visible_callback_pal()
 	return self:is_dlc_latest_locked("pal")
+end
+
+function MenuCallbackHandler:visible_callback_opera()
+	return self:is_dlc_latest_locked("opera")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -4532,7 +4542,7 @@ MenuCustomizeControllerCreator.CONTROLS_INFO.continue = {
 	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.throw_grenade = {
-	text_id = "menu_button_throw_grenade",
+	text_id = "menu_button_throwable",
 	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.weapon_firemode = {

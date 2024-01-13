@@ -153,7 +153,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"election_day_1",
 		"election_day_2",
 		"firestarter_2",
-		"firestarter_3",
 		"ukrainian_job",
 		"jewelry_store",
 		"four_stores",
@@ -208,7 +207,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"ratatouille",
 		"firestarter_1",
 		"firestarter_2",
-		"firestarter_3",
 		"arm_for",
 		"roberts",
 		"election_day_1",
@@ -370,18 +368,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_rats3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
 	self.sniper_spot_rats3.dlc_lock = "gage_pack_snp"
 	self.sniper_spot_rats3.server_lock = true
-	self.sniper_spot_firestarter3 = {}
-	self.sniper_spot_firestarter3.name_id = "menu_asset_sniper_spot"
-	self.sniper_spot_firestarter3.texture = "guis/textures/pd2/mission_briefing/assets/bank/sniper_spot_harvest"
-	self.sniper_spot_firestarter3.stages = {
-		"firestarter_3"
-	}
-	self.sniper_spot_firestarter3.visible_if_locked = true
-	self.sniper_spot_firestarter3.unlock_desc_id = "menu_asset_sniper_spot_desc"
-	self.sniper_spot_firestarter3.no_mystery = true
-	self.sniper_spot_firestarter3.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 4)
-	self.sniper_spot_firestarter3.dlc_lock = "gage_pack_snp"
-	self.sniper_spot_firestarter3.server_lock = true
 	self.sniper_spot_firestarter1 = {}
 	self.sniper_spot_firestarter1.name_id = "menu_asset_sniper_spot"
 	self.sniper_spot_firestarter1.texture = "guis/textures/pd2/mission_briefing/assets/firestarter/day1/sniper_spot_firestarter1"

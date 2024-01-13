@@ -1,4 +1,5 @@
 core:import("CoreEnvironmentEffectsManager")
+local is_editor = Application:editor()
 EnvironmentEffectsManager = EnvironmentEffectsManager or class(CoreEnvironmentEffectsManager.EnvironmentEffectsManager)
 
 function EnvironmentEffectsManager:init()
@@ -47,6 +48,9 @@ function EnvironmentEffect:default()
 end
 
 RainEffect = RainEffect or class(EnvironmentEffect)
+local ids_rain_post_processor = Idstring("rain_post_processor")
+local ids_rain_ripples = Idstring("rain_ripples")
+local ids_rain_off = Idstring("rain_off")
 
 function RainEffect:init()
 	EnvironmentEffect.init(self)
@@ -54,14 +58,17 @@ function RainEffect:init()
 end
 
 function RainEffect:load_effects()
+	if is_editor then
+		CoreEngineAccess._editor_load(Idstring("effect"), self._effect_name)
+	end
 end
 
 function RainEffect:update(t, dt)
 	local vp = managers.viewport:first_active_viewport()
 	if vp and self._vp ~= vp then
-		vp:vp():set_post_processor_effect("World", Idstring("streaks"), Idstring("streaks_rain"))
+		vp:vp():set_post_processor_effect("World", ids_rain_post_processor, ids_rain_ripples)
 		if alive(self._vp) then
-			self._vp:vp():set_post_processor_effect("World", Idstring("streaks"), Idstring("streaks"))
+			self._vp:vp():set_post_processor_effect("World", ids_rain_post_processor, ids_rain_off)
 		end
 		self._vp = vp
 	end
@@ -88,7 +95,7 @@ function RainEffect:stop()
 	World:effect_manager():kill(self._effect)
 	self._effect = nil
 	if alive(self._vp) then
-		self._vp:vp():set_post_processor_effect("World", Idstring("streaks"), Idstring("streaks"))
+		self._vp:vp():set_post_processor_effect("World", ids_rain_post_processor, ids_rain_off)
 		self._vp = nil
 	end
 end
@@ -109,13 +116,15 @@ function LightningEffect:_update_wait_start()
 end
 
 function LightningEffect:_update(t, dt)
+	if not self._sky_material or not self._sky_material:alive() then
+		self._sky_material = Underlay:material(Idstring("sky"))
+	end
 	if self._flashing then
 		self:_update_function(t, dt)
 	end
 	if self._sound_delay then
 		self._sound_delay = self._sound_delay - dt
 		if self._sound_delay <= 0 then
-			self._sound_source:post_event("thunder")
 			self._sound_delay = nil
 		end
 	end
@@ -146,6 +155,7 @@ function LightningEffect:start()
 end
 
 function LightningEffect:stop()
+	self:_set_original_values()
 end
 
 function LightningEffect:_update_first(t, dt)
@@ -197,7 +207,9 @@ function LightningEffect:_set_lightning_values()
 	if c_pos then
 		local sound_speed = 30000
 		self._sound_delay = self._distance * 2
-		self._sound_source:set_rtpc("lightning_distance", self._distance * 4000)
+		if self._sound_source then
+			self._sound_source:set_rtpc("lightning_distance", self._distance * 4000)
+		end
 	end
 end
 
@@ -214,6 +226,9 @@ function RainDropEffect:init()
 end
 
 function RainDropEffect:load_effects()
+	if is_editor then
+		CoreEngineAccess._editor_load(Idstring("effect"), self._effect_name)
+	end
 end
 
 function RainDropEffect:update(t, dt)

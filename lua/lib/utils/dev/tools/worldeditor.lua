@@ -192,6 +192,8 @@ function WorldEditor:project_run_simulation(with_mission)
 	managers.network:session():on_load_complete(true)
 	managers.network:session():spawn_players()
 	managers.mission:set_mission_filter(self:layer("Level Settings"):get_mission_filter())
+	local level_id = self:layer("Level Settings"):get_setting("simulation_level_id")
+	managers.game_play_central:setup_effects(level_id)
 	managers.game_play_central:start_heist_timer()
 end
 

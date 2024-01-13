@@ -1226,6 +1226,7 @@ function WINDLCManager:init()
 			peta = {app_id = "433730", no_install = true},
 			pal = {app_id = "441600", no_install = true},
 			mad = {app_id = "218620", no_install = true},
+			opera = {app_id = "468410", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

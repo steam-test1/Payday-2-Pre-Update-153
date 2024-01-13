@@ -162,7 +162,7 @@ function EquipmentsTweakData:init()
 	self.specials.toolset = {
 		text_id = "debug_toolset",
 		description_id = "des_toolset",
-		icon = "equipment_toolset"
+		icon = "equipment_mill_tool"
 	}
 	self.specials.bank_manager_key = {
 		text_id = "hud_int_equipment_pickup_keycard",

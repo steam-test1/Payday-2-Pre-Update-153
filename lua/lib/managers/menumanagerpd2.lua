@@ -284,12 +284,6 @@ function MenuCallbackHandler:clicked_weapon_upgrade_type(item)
 	managers.menu_scene:clicked_weapon_upgrade_type(item:parameters().name)
 end
 
-function MenuCallbackHandler:clicked_weapon_upgrade(item)
-	local weapon_id = item:parameter("weapon_id")
-	local upgrade = item:parameter("weapon_upgrade")
-	managers.menu_scene:view_weapon_upgrade(weapon_id, tweak_data.weapon_upgrades.upgrades[upgrade].visual_upgrade)
-end
-
 function MenuCallbackHandler:can_buy_weapon_upgrade(item)
 	return not self:owns_weapon_upgrade(item)
 end
@@ -301,30 +295,11 @@ end
 function MenuCallbackHandler:buy_weapon_upgrades(item)
 end
 
-function MenuCallbackHandler:buy_weapon_upgrade(item)
-	local name = managers.localization:text(tweak_data.weapon_upgrades.upgrades[item:parameter("weapon_upgrade")].name_id)
-	local cost = 10000
-	local yes_func = callback(self, self, "_on_buy_weapon_upgrade_yes", {item = item, cost = cost})
-	managers.menu:show_buy_weapon({yes_func = yes_func}, name, "$" .. cost)
-end
-
 function MenuCallbackHandler:_on_buy_weapon_upgrade_yes(params)
 	Global.blackmarket_manager.weapon_upgrades[params.item:parameter("weapon_id")][params.item:parameter("weapon_upgrade")].owned = true
 	params.item:parameter("parent_item"):parameters().owned = true
 	params.item:dirty()
 	params.item:parameters().parent_item:on_buy(params.item:parameters().gui_node)
-end
-
-function MenuCallbackHandler:attach_weapon_upgrade(item)
-	local weapon_id = item:parameter("weapon_id")
-	local upgrade = item:parameter("weapon_upgrade")
-	local attach = not Global.blackmarket_manager.weapon_upgrades[weapon_id][upgrade].attached
-	Global.blackmarket_manager.weapon_upgrades[weapon_id][upgrade].attached = not Global.blackmarket_manager.weapon_upgrades[weapon_id][upgrade].attached
-	for _, _upgrade in ipairs(tweak_data.weapon_upgrades.weapon[weapon_id][item:parameter("upgrade_type")]) do
-		if _upgrade ~= upgrade then
-			Global.blackmarket_manager.weapon_upgrades[weapon_id][_upgrade].attached = false
-		end
-	end
 end
 
 function MenuCallbackHandler:clicked_customize_character_category(item)
@@ -794,56 +769,6 @@ function MenuMarketItemInitiator:_add_expand_armor(item)
 end
 
 MenuBlackMarketInitiator = MenuBlackMarketInitiator or class(MenuMarketItemInitiator)
-MenuBuyUpgradesInitiator = MenuBuyUpgradesInitiator or class()
-
-function MenuBuyUpgradesInitiator:modify_node(original_node, weapon_id, p2, p3)
-	local node = deep_clone(original_node)
-	local node_name = node:parameters().name
-	node:parameters().topic_id = tweak_data.weapon[weapon_id].name_id
-	local scopes_item = node:item("scopes")
-	self:_add_expand_upgrade(scopes_item, weapon_id, "scopes")
-	local barrels_item = node:item("barrels")
-	self:_add_expand_upgrade(barrels_item, weapon_id, "barrels")
-	local grips_item = node:item("grips")
-	self:_add_expand_upgrade(grips_item, weapon_id, "grips")
-	return node
-end
-
-function MenuBuyUpgradesInitiator:_add_expand_upgrade(item, weapon_id, upgrade)
-	local i = 0
-	local j = 0
-	local weapon_upgrades = tweak_data.weapon_upgrades.weapon[weapon_id]
-	if weapon_upgrades then
-		local upgrades = weapon_upgrades[upgrade]
-		if upgrades then
-			for _, w_upgrade in ipairs(upgrades) do
-				i = i + 1
-				local owned = Global.blackmarket_manager.weapon_upgrades[weapon_id][w_upgrade].owned
-				if owned then
-					j = j + 1
-				end
-				local params = {
-					type = "MenuItemWeaponUpgradeExpand",
-					name = w_upgrade,
-					text_id = tweak_data.weapon_upgrades.upgrades[w_upgrade].name_id,
-					callback = "clicked_weapon_upgrade",
-					weapon_upgrade = w_upgrade,
-					weapon_id = weapon_id,
-					unlocked = Global.blackmarket_manager.weapon_upgrades[weapon_id][w_upgrade].unlocked,
-					attached = Global.blackmarket_manager.weapon_upgrades[weapon_id][w_upgrade].attached,
-					owned = owned,
-					upgrade_type = upgrade
-				}
-				local upgrade_item = CoreMenuNode.MenuNode.create_item(item, params)
-				item:add_item(upgrade_item)
-			end
-		end
-	end
-	item:set_parameter("current", j)
-	item:set_parameter("total", i)
-	item:_show_items(nil)
-end
-
 MenuComponentInitiator = MenuComponentInitiator or class()
 
 function MenuComponentInitiator:modify_node(original_node, data)

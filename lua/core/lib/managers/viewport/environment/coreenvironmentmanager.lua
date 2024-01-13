@@ -46,7 +46,11 @@ function EnvironmentManager:init()
 		CoreEnvironmentFeeder.PostShadowSlice2Feeder,
 		CoreEnvironmentFeeder.PostShadowSlice3Feeder,
 		CoreEnvironmentFeeder.PostShadowSliceDepthsFeeder,
-		CoreEnvironmentFeeder.PostShadowSliceOverlapFeeder
+		CoreEnvironmentFeeder.PostShadowSliceOverlapFeeder,
+		CoreEnvironmentFeeder.PostEffectBloomThresholdFeeder,
+		CoreEnvironmentFeeder.PostEffectBloomIntensityFeeder,
+		CoreEnvironmentFeeder.PostEffectBloomBlurSizeFeeder,
+		CoreEnvironmentFeeder.PostEffectLenseIntensityFeeder
 	}
 	for _, feeder_class in ipairs(feeder_class_list) do
 		self._feeder_class_map[feeder_class.DATA_PATH_KEY] = feeder_class
@@ -203,6 +207,14 @@ end
 
 function EnvironmentManager:get_predefined_environment_filter_map()
 	return self._predefined_environment_filter_map
+end
+
+function EnvironmentManager:get_default_value(data_path_key)
+	local feeder = self._feeder_class_map[data_path_key]
+	if not feeder then
+		return nil
+	end
+	return feeder.DEFAULT_VALUE
 end
 
 function EnvironmentManager:get_value(path, data_path_key)

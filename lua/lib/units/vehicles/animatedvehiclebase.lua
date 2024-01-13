@@ -7,6 +7,9 @@ function AnimatedVehicleBase:init(unit)
 		self:_set_anim_lod(0)
 	end
 	self._body_name = self._body_name or "a_body"
+	self._allow_sync = false
+	self._stored_pos = nil
+	self._stored_rot = nil
 end
 
 function AnimatedVehicleBase:update(unit, t, dt)
@@ -256,4 +259,27 @@ function AnimatedVehicleBase:destroy(unit)
 			entry.unit:set_slot(0)
 		end
 	end
+end
+
+function AnimatedVehicleBase:allow_sync_stored_pos(sync)
+	self._allow_sync = sync
+end
+
+function AnimatedVehicleBase:store_current_pos()
+	self._stored_pos = self._unit:position()
+	self._stored_rot = self._unit:rotation()
+end
+
+function AnimatedVehicleBase:move_to_stored_pos()
+	if self._stored_pos ~= nil and self._stored_rot ~= nil then
+		self._unit:play_state(Idstring("std/empty"))
+		self._unit:set_position(self._stored_pos)
+		self._unit:set_rotation(self._stored_rot)
+	end
+end
+
+function AnimatedVehicleBase:sync_stored_pos(sync, pos, rot)
+	self._allow_sync = sync
+	self._stored_pos = pos
+	self._stored_rot = rot
 end

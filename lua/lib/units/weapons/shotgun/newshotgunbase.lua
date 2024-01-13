@@ -90,8 +90,6 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 	
 	local spread = self:_get_spread(user_unit)
 	mvector3.set(mvec_direction, direction)
-	if spread then
-	end
 	for i = 1, shoot_through_data and 1 or self._rays do
 		mvector3.set(mvec_spread_direction, mvec_direction)
 		if spread then

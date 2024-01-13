@@ -44,6 +44,16 @@ function GamePlayCentralManager:init()
 	self._block_blood_decals = is_x360
 end
 
+function GamePlayCentralManager:setup_effects(level_id)
+	local lvl_id = level_id or Global.level_data and Global.level_data.level_id
+	local lvl_tweak_data = Global.level_data and tweak_data.levels[lvl_id]
+	if lvl_tweak_data and lvl_tweak_data.environment_effects then
+		for _, effect in ipairs(lvl_tweak_data.environment_effects) do
+			managers.environment_effects:use(effect)
+		end
+	end
+end
+
 function GamePlayCentralManager:restart_portal_effects()
 	if not self._portal_effects_restarted then
 		self._portal_effects_restarted = true

@@ -51,8 +51,7 @@ function CoreEditor:create_projection_light(type)
 	for _, data in ipairs(self._saved_all_lights) do
 		data.light:set_enable(false)
 	end
-	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("empty"))
-	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
+	managers.editor:disable_all_post_effects(true)
 	self:viewport():vp():set_post_processor_effect("World", Idstring("deferred"), Idstring("projection_generation"))
 	self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("depth_project"))
 	local saved_environment = managers.viewport:default_environment()
@@ -166,9 +165,7 @@ function CoreEditor:cube_map_done()
 		self._saved_all_lights = nil
 	end
 	if self._cubemap_params.lights then
-		self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), self._default_post_processor_effect)
-		local bloom_combine_effect = self._default_post_processor_effect == Idstring("empty") and Idstring("bloom_combine_empty") or Idstring("bloom_combine")
-		self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), bloom_combine_effect)
+		managers.editor:update_post_effects()
 		self:viewport():vp():set_post_processor_effect("World", Idstring("deferred"), Idstring("deferred_lighting"))
 		self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("depth_project_empty"))
 		self:_recompile(self._cubemap_params.output_path)

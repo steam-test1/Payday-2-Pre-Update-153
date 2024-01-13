@@ -79,7 +79,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 		"var4"
 	}
 	self.melee_weapons.kabar.repeat_expire_t = 0.6
-	self.melee_weapons.kabar.expire_t = 0.6
+	self.melee_weapons.kabar.expire_t = 1.2
 	self.melee_weapons.kabar.melee_damage_delay = 0.1
 	self.melee_weapons.kabar.sounds = {}
 	self.melee_weapons.kabar.sounds.equip = "knife_equip"
@@ -2026,5 +2026,66 @@ function BlackMarketTweakData:_init_melee_weapons()
 	self.melee_weapons.zeus.sounds.hit_body = "zeus_hit_body"
 	self.melee_weapons.zeus.sounds.charge = "zeus_charge"
 	self.melee_weapons.zeus.stats.concealment = 30
+	self.melee_weapons.wing = {}
+	self.melee_weapons.wing.name_id = "bm_melee_wing"
+	self.melee_weapons.wing.animation = nil
+	self.melee_weapons.wing.hit_pre_calculation = true
+	self.melee_weapons.wing.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.wing.anim_global_param = "melee_wing"
+	self.melee_weapons.wing.dlc = "opera"
+	self.melee_weapons.wing.texture_bundle_folder = "opera"
+	self.melee_weapons.wing.type = "knife"
+	self.melee_weapons.wing.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.wing.unit = "units/pd2_dlc_opera/weapons/wpn_fps_mel_wing/wpn_fps_mel_wing"
+	self.melee_weapons.wing.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_mel_wing/wpn_third_mel_wing"
+	self.melee_weapons.wing.sounds = {}
+	self.melee_weapons.wing.sounds.equip = "wing_equip"
+	self.melee_weapons.wing.sounds.hit_air = {
+		"wing_hit_air",
+		"wing_hit_air",
+		"wing_hit_air",
+		"wing_hit_air"
+	}
+	self.melee_weapons.wing.sounds.hit_gen = {
+		"wing_hit_gen",
+		"wing_hit_gen",
+		"wing_hit_gen",
+		"wing_hit_gen"
+	}
+	self.melee_weapons.wing.sounds.hit_body = {
+		"wing_hit_body",
+		"wing_hit_body",
+		"wing_hit_body",
+		"wing_hit_body"
+	}
+	self.melee_weapons.wing.sounds.charge = "wing_charge"
+	self.melee_weapons.wing.melee_charge_shaker = "player_melee_charge_wing"
+	self.melee_weapons.wing.stats = {}
+	self.melee_weapons.wing.stats.weapon_type = "sharp"
+	self.melee_weapons.wing.stats.min_damage = 3
+	self.melee_weapons.wing.stats.max_damage = 8
+	self.melee_weapons.wing.stats.min_damage_effect = 1
+	self.melee_weapons.wing.stats.max_damage_effect = 1
+	self.melee_weapons.wing.stats.charge_time = 2
+	self.melee_weapons.wing.stats.range = 185
+	self.melee_weapons.wing.stats.concealment = 29
+	self.melee_weapons.wing.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.wing.repeat_expire_t = 0.85
+	self.melee_weapons.wing.expire_t = 1.2
+	self.melee_weapons.wing.melee_damage_delay = 0.1
+	self.melee_weapons.wing.anims = {
+		var1_attack = {anim = "var1"},
+		var2_attack = {anim = "var2"},
+		var3_attack = {anim = "var3"},
+		var4_attack = {anim = "var4"},
+		charge = {anim = "charge", loop = true}
+	}
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

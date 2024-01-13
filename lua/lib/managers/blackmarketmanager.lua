@@ -154,36 +154,6 @@ function BlackMarketManager:_setup_characters()
 	}
 end
 
-function BlackMarketManager:_setup_weapon_upgrades()
-	local weapon_upgrades = {}
-	Global.blackmarket_manager.weapon_upgrades = weapon_upgrades
-	for weapon, _ in pairs(tweak_data.weapon_upgrades.weapon) do
-		weapon_upgrades[weapon] = {}
-		for upgrades, data in pairs(tweak_data.weapon_upgrades.weapon[weapon]) do
-			for _, upgrade in ipairs(data) do
-				weapon_upgrades[weapon][upgrade] = {
-					unlocked = true,
-					owned = true,
-					attached = false
-				}
-			end
-		end
-	end
-	weapon_upgrades.m4.m4_scope1.attached = false
-	weapon_upgrades.m4.scope2.owned = false
-	weapon_upgrades.m4.scope3.unlocked = false
-	weapon_upgrades.m4.scope3.owned = false
-	weapon_upgrades.m4.grip1.unlocked = false
-	weapon_upgrades.m4.grip1.owned = false
-	weapon_upgrades.m14.m14_scope1.attached = true
-	weapon_upgrades.m14.m14_scope2.owned = false
-	weapon_upgrades.m14.barrel1.owned = false
-	weapon_upgrades.m14.scope3.unlocked = false
-	weapon_upgrades.m14.scope3.owned = false
-	weapon_upgrades.raging_bull.grip1.unlocked = false
-	weapon_upgrades.raging_bull.grip1.owned = false
-end
-
 function BlackMarketManager:_setup_unlocked_mask_slots()
 	local unlocked_mask_slots = {}
 	Global.blackmarket_manager.unlocked_mask_slots = unlocked_mask_slots
@@ -321,7 +291,7 @@ function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
 		return self._defaults.armor
 	end
 	if chk_armor_kit then
-		local equipped_deployable = Global.player_manager.kit.equipment_slots[1]
+		local equipped_deployable = self:equipped_deployable()
 		if equipped_deployable == "armor_kit" and (not managers.player:has_equipment(equipped_deployable) or managers.player:has_deployable_left(equipped_deployable)) then
 			return self._defaults.armor
 		end
@@ -556,7 +526,7 @@ function BlackMarketManager:equip_weapon(category, slot)
 end
 
 function BlackMarketManager:equip_deployable(deployable_id, loading)
-	Global.player_manager.kit.equipment_slots[1] = deployable_id
+	managers.player:set_equipment_in_slot(deployable_id)
 	if managers.menu_scene then
 		managers.menu_scene:set_character_deployable(deployable_id, false, 0)
 	end
@@ -857,7 +827,7 @@ function BlackMarketManager:outfit_string()
 	else
 		s = s .. " " .. "nil" .. " " .. "0"
 	end
-	local equipped_deployable = Global.player_manager.kit.equipment_slots[1]
+	local equipped_deployable = self:equipped_deployable()
 	if equipped_deployable then
 		s = s .. " " .. tostring(equipped_deployable)
 		local deployable_tweak_data = tweak_data.equipments[equipped_deployable]
@@ -2386,7 +2356,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 	local melee_weapon = self:equipped_melee_weapon()
 	local grenade, grenade_amount = self:equipped_grenade()
 	local armor = self:equipped_armor()
-	local deployable = managers.player:equipment_in_slot(1)
+	local deployable = self:equipped_deployable()
 	local mask = self:equipped_mask()
 	local character = self:get_preferred_character()
 	if primary then
@@ -5242,7 +5212,7 @@ function BlackMarketManager:_load_done()
 		if primary then
 			managers.menu_scene:set_character_equipped_weapon(nil, primary.factory_id, primary.blueprint, "primary", primary.cosmetics)
 		end
-		local deployable_id = Global.player_manager.kit.equipment_slots[1]
+		local deployable_id = self:equipped_deployable()
 		if deployable_id then
 			managers.menu_scene:set_character_deployable(deployable_id, false, 0)
 		end

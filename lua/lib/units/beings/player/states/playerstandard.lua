@@ -60,6 +60,7 @@ function PlayerStandard:init(unit)
 	self._ext_inventory = unit:inventory()
 	self._ext_anim = unit:anim_data()
 	self._ext_network = unit:network()
+	self._ext_event_listener = unit:event_listener()
 	self._camera_unit = self._ext_camera._camera_unit
 	self._camera_unit_anim_data = self._camera_unit:anim_data()
 	self._machine = unit:anim_state_machine()

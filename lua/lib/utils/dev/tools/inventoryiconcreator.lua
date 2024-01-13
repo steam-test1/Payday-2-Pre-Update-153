@@ -379,7 +379,7 @@ function InventoryIconCreator:start_create()
 	managers.editor._layer_draw_marker = false
 	self:_setup_camera()
 	self:_create_backdrop()
-	managers.editor:on_post_processor_effect("default")
+	managers.editor:enable_all_post_effects()
 	managers.environment_controller:set_dof_setting("none")
 	managers.environment_controller:set_base_chromatic_amount(0)
 	managers.environment_controller:set_base_contrast(0)

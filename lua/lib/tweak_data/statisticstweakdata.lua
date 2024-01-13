@@ -17,7 +17,7 @@ function StatisticsTweakData:init()
 end
 
 function StatisticsTweakData:statistics_specializations()
-	return 14
+	return 15
 end
 
 function StatisticsTweakData:statistics_table()
@@ -442,7 +442,9 @@ function StatisticsTweakData:statistics_table()
 		"half_mask",
 		"mad_goggles",
 		"visor",
-		"dbd_slasher"
+		"dbd_slasher",
+		"sydney",
+		"sydney_begins"
 	}
 	local weapon_list = {
 		"ak5",
@@ -545,7 +547,8 @@ function StatisticsTweakData:statistics_table()
 		"x_sr2",
 		"pl14",
 		"x_mp5",
-		"x_akmsu"
+		"x_akmsu",
+		"tecci"
 	}
 	local melee_list = {
 		"weapon",
@@ -621,7 +624,8 @@ function StatisticsTweakData:statistics_table()
 		"shawn",
 		"nin",
 		"ballistic",
-		"zeus"
+		"zeus",
+		"wing"
 	}
 	local grenade_list = {
 		"frag",
@@ -689,7 +693,8 @@ function StatisticsTweakData:statistics_table()
 		"sokol",
 		"dragon",
 		"bodhi",
-		"jimmy"
+		"jimmy",
+		"sydney"
 	}
 	local deployable_list = {
 		"ammo_bag",

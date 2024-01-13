@@ -482,6 +482,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/games/hardcorehenry/",
 		image = "guis/dlcs/mad/textures/pd2/content_updates/mad"
 	}
+	local opera = {
+		id = "opera",
+		name_id = "menu_content_opera",
+		desc_id = "menu_content_opera_desc",
+		date_id = "menu_content_opera_date",
+		store = 218620,
+		image = "guis/dlcs/opera/textures/pd2/content_updates/opera"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -546,7 +554,8 @@ function GuiTweakData:init()
 			peta,
 			pal,
 			coco,
-			mad
+			mad,
+			opera
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1914,6 +1923,15 @@ function GuiTweakData:init()
 					desc_id = "menu_bodhi_desc_codex",
 					videos = {"bodhi1"},
 					post_event = "pln_contact_bodhi"
+				}
+			},
+			{
+				id = "sydney",
+				name_id = "menu_sydney",
+				{
+					desc_id = "menu_sydney_desc_codex",
+					videos = {"sydney1"},
+					post_event = "pln_contact_sydney"
 				}
 			},
 			{

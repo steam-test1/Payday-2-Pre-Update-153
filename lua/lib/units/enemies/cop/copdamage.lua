@@ -21,6 +21,19 @@ CopDamage.WEAPON_TYPE_BULLET = 2
 CopDamage.WEAPON_TYPE_FLAMER = 3
 CopDamage.EVENT_IDS = {FINAL_LOWER_HEALTH_PERCENTAGE_LIMIT = 1}
 CopDamage.DEBUG_HP = CopDamage.DEBUG_HP or false
+CopDamage._event_listeners = EventListenerHolder:new()
+
+function CopDamage.register_listener(key, event_types, clbk)
+	CopDamage._event_listeners:add(key, event_types, clbk)
+end
+
+function CopDamage.unregister_listener(key)
+	CopDamage._event_listeners:remove(key)
+end
+
+function CopDamage._notify_listeners(event, ...)
+	CopDamage._event_listeners:call(event, ...)
+end
 
 function CopDamage.MAD_3_ACHIEVEMENT(attack_data)
 	if attack_data.variant ~= "melee" and attack_data.attacker_unit and not attack_data.attacker_unit:base().tased then
@@ -1866,6 +1879,7 @@ end
 function CopDamage:_on_damage_received(damage_info)
 	self:build_suppression("max", nil)
 	self:_call_listeners(damage_info)
+	CopDamage._notify_listeners("on_damage", damage_info)
 	if damage_info.result.type == "death" then
 		managers.enemy:on_enemy_died(self._unit, damage_info)
 		for c_key, c_data in pairs(managers.groupai:state():all_char_criminals()) do

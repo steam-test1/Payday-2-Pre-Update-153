@@ -100,6 +100,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_dragon(presets)
 	self:_init_bodhi(presets)
 	self:_init_jimmy(presets)
+	self:_init_sydney(presets)
 	self:_init_old_hoxton_mission(presets)
 	self._prefix_data = nil
 	self._prefix_data_p1 = nil
@@ -1811,6 +1812,27 @@ function CharacterTweakData:_init_jimmy(presets)
 	self.jimmy.weapon_voice = "3"
 	self.jimmy.access = "teamAI1"
 	self.jimmy.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_sydney(presets)
+	self.sydney = {}
+	self.sydney.damage = presets.gang_member_damage
+	self.sydney.weapon = deep_clone(presets.weapon.gang_member)
+	self.sydney.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11")
+	}
+	self.sydney.detection = presets.detection.gang_member
+	self.sydney.move_speed = presets.move_speed.fast
+	self.sydney.crouch_move = false
+	self.sydney.speech_prefix = "rb15"
+	self.sydney.weapon_voice = "3"
+	self.sydney.access = "teamAI1"
+	self.sydney.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240
@@ -6914,7 +6936,7 @@ function CharacterTweakData:character_map()
 				"npc_locke"
 			}
 		},
-		berry = {
+		peta = {
 			path = "units/pd2_dlc_peta/characters/",
 			list = {
 				"civ_male_boris"

@@ -229,6 +229,9 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.extra_ammo_multiplier = {1.25}
 	self.values.player.pick_up_ammo_multiplier = {1.35, 1.75}
+	self.values.player.regain_throwable_from_ammo = {
+		{chance = 0.3, chance_inc = 1.1}
+	}
 	self.values.player.damage_shake_multiplier = {0.5}
 	self.values.player.bleed_out_health_multiplier = {1.25}
 	self.values.shotgun.recoil_multiplier = {0.75}
@@ -694,6 +697,34 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.movement_speed_damage_health_ratio_multiplier = {0.2}
 	self.values.player.armor_regen_damage_health_ratio_threshold_multiplier = {2}
 	self.values.player.movement_speed_damage_health_ratio_threshold_multiplier = {2}
+	self.values.player.armor_grinding = {
+		{
+			{1, 2},
+			{1.5, 3},
+			{2, 4},
+			{2.5, 5},
+			{3.5, 7},
+			{4.5, 9},
+			{8.5, 17}
+		}
+	}
+	self.values.player.health_decrease = {0.5}
+	self.values.player.armor_increase = {
+		1,
+		1.1,
+		1.2
+	}
+	self.values.player.damage_to_armor = {
+		{
+			{3, 1.5},
+			{3, 1.5},
+			{3, 1.5},
+			{3, 1.5},
+			{3, 1.5},
+			{3, 1.5},
+			{3, 1.5}
+		}
+	}
 	self.values.assault_rifle.move_spread_index_addend = {2}
 	self.values.snp.move_spread_index_addend = {2}
 	self.values.pistol.spread_index_addend = {1}
@@ -1614,6 +1645,34 @@ function UpgradesTweakData:_init_pd2_values()
 			{"1", "25"},
 			{"5%", "20%"},
 			{"50%", "10%"}
+		},
+		{
+			{
+				"40%",
+				"240",
+				"4",
+				"600",
+				"1",
+				"30",
+				"60% + 80",
+				"8"
+			},
+			{"25%"},
+			{"50%", "100%"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"50%", "110%"},
+			{"135%"},
+			{"50%", "120%"},
+			{"5%", "20%"},
+			{
+				"10",
+				"1.5",
+				"10%"
+			}
 		}
 	}
 	self.specialization_descs = {}
@@ -1765,7 +1824,9 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"body_armor4",
 			"kampfmesser",
-			"buck"
+			"buck",
+			"tecci",
+			"wing"
 		}
 	}
 	self.level_tree[22] = {
@@ -1887,7 +1948,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"r93",
 			"judge",
-			"mining_pick"
+			"mining_pick",
+			"wing"
 		}
 	}
 	self.level_tree[36] = {
@@ -2272,6 +2334,7 @@ function UpgradesTweakData:init()
 	self:_pl14_weapon_definitions()
 	self:_x_mp5_weapon_definitions()
 	self:_x_akmsu_weapon_definitions()
+	self:_tecci_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -2730,6 +2793,15 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "pick_up_ammo_multiplier",
 			value = 2
+		}
+	}
+	self.definitions.player_regain_throwable_from_ammo_1 = {
+		category = "feature",
+		name_id = "menu_player_regain_throwable_from_ammo",
+		upgrade = {
+			category = "player",
+			upgrade = "regain_throwable_from_ammo",
+			value = 1
 		}
 	}
 	self.definitions.player_panic_suppression = {
@@ -3532,6 +3604,60 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "kill_change_regenerate_speed",
+			value = 1
+		}
+	}
+	self.definitions.player_armor_grinding_1 = {
+		category = "feature",
+		name_id = "menu_player_armor_grinding",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_grinding",
+			value = 1
+		}
+	}
+	self.definitions.player_armor_increase_1 = {
+		category = "feature",
+		name_id = "menu_player_health_to_armor_conversion",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_increase",
+			value = 1
+		}
+	}
+	self.definitions.player_armor_increase_2 = {
+		category = "feature",
+		name_id = "menu_player_health_to_armor_conversion",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_increase",
+			value = 2
+		}
+	}
+	self.definitions.player_armor_increase_3 = {
+		category = "feature",
+		name_id = "menu_player_health_to_armor_conversion",
+		upgrade = {
+			category = "player",
+			upgrade = "armor_increase",
+			value = 3
+		}
+	}
+	self.definitions.player_health_decrease_1 = {
+		category = "feature",
+		name_id = "menu_player_health_decrease",
+		upgrade = {
+			category = "player",
+			upgrade = "health_decrease",
+			value = 1
+		}
+	}
+	self.definitions.player_damage_to_armor_1 = {
+		category = "feature",
+		name_id = "menu_player_damage_to_armor",
+		upgrade = {
+			category = "player",
+			upgrade = "damage_to_armor",
 			value = 1
 		}
 	}
@@ -7172,6 +7298,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.zeus = {
 		category = "melee_weapon"
 	}
+	self.definitions.wing = {
+		category = "melee_weapon",
+		dlc = "opera"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -9918,5 +10048,14 @@ function UpgradesTweakData:_x_akmsu_weapon_definitions()
 		category = "weapon",
 		weapon_id = "x_akmsu",
 		factory_id = "wpn_fps_smg_x_akmsu"
+	}
+end
+
+function UpgradesTweakData:_tecci_weapon_definitions()
+	self.definitions.tecci = {
+		category = "weapon",
+		weapon_id = "tecci",
+		factory_id = "wpn_fps_ass_tecci",
+		dlc = "opera"
 	}
 end

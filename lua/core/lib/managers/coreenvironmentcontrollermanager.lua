@@ -472,7 +472,6 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 end
 
 function CoreEnvironmentControllerManager:_update_post_effects()
-	print("Update post FX")
 end
 
 function CoreEnvironmentControllerManager:_create_dof_tweak_data()
@@ -531,14 +530,35 @@ end
 local function set_post_material_parameter(post_id, modifier_name, parameter_id, value)
 	local vp = managers.viewport:first_active_viewport()
 	if vp then
-		local deferred_processor = vp:vp():get_post_processor_effect("World", post_id)
-		if deferred_processor then
-			set_modifier_transform(deferred_processor, modifier_name, function(modifier)
+		local effect = vp:vp():get_post_processor_effect("World", post_id)
+		if effect then
+			set_modifier_transform(effect, modifier_name, function(modifier)
 				local material = modifier:material()
 				if material then
 					material:set_variable(parameter_id, value)
 				end
 			end)
+		end
+	end
+end
+
+function CoreEnvironmentControllerManager:bloom_blur_size(size, vp)
+	local effects = {
+		Idstring("bloom_blur_1"),
+		Idstring("bloom_blur_2"),
+		Idstring("bloom_blur_3")
+	}
+	vp = vp or self._vp:vp()
+	if vp then
+		local effect = vp:get_post_processor_effect("World", Idstring("bloom_combine_post_processor"))
+		if effect then
+			for i = 1, table.getn(effects) do
+				local visibility = i >= 5 - size
+				local mod = effect:modifier(effects[i])
+				if mod then
+					mod:set_visibility(visibility)
+				end
+			end
 		end
 	end
 end

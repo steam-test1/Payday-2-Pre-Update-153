@@ -605,7 +605,8 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"player_pick_up_ammo_multiplier",
-				"player_pick_up_ammo_multiplier_2"
+				"player_pick_up_ammo_multiplier_2",
+				"player_regain_throwable_from_ammo_1"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -2971,6 +2972,67 @@ function SkillTreeTweakData:init()
 				texture_bundle_folder = "coco",
 				name_id = "menu_deck14_9",
 				desc_id = "menu_deck14_9_desc"
+			}
+		},
+		{
+			name_id = "menu_st_spec_15",
+			desc_id = "menu_st_spec_15_desc",
+			dlc = "opera",
+			{
+				upgrades = {
+					"player_armor_grinding_1",
+					"temporary_armor_break_invulnerable_1"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				texture_bundle_folder = "opera",
+				name_id = "menu_deck15_1",
+				desc_id = "menu_deck15_1_desc"
+			},
+			deck2,
+			{
+				upgrades = {
+					"player_health_decrease_1",
+					"player_armor_increase_1"
+				},
+				cost = 400,
+				icon_xy = {1, 0},
+				texture_bundle_folder = "opera",
+				name_id = "menu_deck15_3",
+				desc_id = "menu_deck15_3_desc"
+			},
+			deck4,
+			{
+				upgrades = {
+					"player_armor_increase_2"
+				},
+				cost = 1000,
+				icon_xy = {2, 0},
+				texture_bundle_folder = "opera",
+				name_id = "menu_deck15_5",
+				desc_id = "menu_deck15_5_desc"
+			},
+			deck6,
+			{
+				upgrades = {
+					"player_armor_increase_3"
+				},
+				cost = 2400,
+				icon_xy = {3, 0},
+				texture_bundle_folder = "opera",
+				name_id = "menu_deck15_7",
+				desc_id = "menu_deck15_7_desc"
+			},
+			deck8,
+			{
+				upgrades = {
+					"player_damage_to_armor_1"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				texture_bundle_folder = "opera",
+				name_id = "menu_deck15_9",
+				desc_id = "menu_deck15_9_desc"
 			}
 		}
 	}

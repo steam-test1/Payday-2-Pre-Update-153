@@ -1032,6 +1032,12 @@ function FPCameraPlayerBase:play_anim_melee_item(tweak_name)
 	if not self._melee_item_units then
 		return
 	end
+	if self._melee_item_anim then
+		for _, unit in ipairs(self._melee_item_units) do
+			unit:anim_stop(self._melee_item_anim)
+		end
+		self._melee_item_anim = nil
+	end
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local anims = tweak_data.blackmarket.melee_weapons[melee_entry].anims
 	local anim_data = anims and anims[tweak_name]
@@ -1039,9 +1045,8 @@ function FPCameraPlayerBase:play_anim_melee_item(tweak_name)
 		return
 	end
 	local ids = anim_data.anim and Idstring(anim_data.anim)
-	for _, unit in ipairs(self._melee_item_units) do
-		unit:anim_stop(self._melee_item_anim)
-		if ids then
+	if ids then
+		for _, unit in ipairs(self._melee_item_units) do
 			local length = unit:anim_length(ids)
 			if anim_data.loop then
 				unit:anim_play_loop(ids, 0, length, 1)
@@ -1049,8 +1054,8 @@ function FPCameraPlayerBase:play_anim_melee_item(tweak_name)
 				unit:anim_play_to(ids, length, 1)
 			end
 		end
+		self._melee_item_anim = ids
 	end
-	self._melee_item_anim = ids
 end
 
 function FPCameraPlayerBase:spawn_melee_item()

@@ -206,6 +206,22 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_jimmy = {}
 	self.characters.ai_jimmy.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jimmy/npc_criminal_suit_jimmy"
 	self.characters.ai_jimmy.sequence = "var_mtr_jimmy"
+	self.characters.sydney = {}
+	self.characters.sydney.fps_unit = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/fps_sydney_mover"
+	self.characters.sydney.npc_unit = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/npc_criminal_sydney"
+	self.characters.sydney.menu_unit = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/npc_criminal_sydney_menu"
+	self.characters.sydney.texture_bundle_folder = "opera"
+	self.characters.sydney.sequence = "var_mtr_sydney"
+	self.characters.sydney.mask_on_sequence = "mask_on"
+	self.characters.sydney.mask_off_sequence = "mask_off"
+	self.characters.sydney.name_id = "bm_character_sydney"
+	self.characters.sydney.dlc = "opera"
+	self.characters.ai_sydney = {}
+	self.characters.ai_sydney.npc_unit = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/fem3/npc_criminal_female_3"
+	self.characters.ai_sydney.sequence = "var_mtr_sydney"
+	self.characters.ai_sydney.mask_on_sequence = "mask_on"
+	self.characters.ai_sydney.mask_off_sequence = "mask_off"
+	self.characters.ai_sydney.name_id = "bm_character_ai_sydney"
 end
 
 function BlackMarketTweakData:_init_cash()

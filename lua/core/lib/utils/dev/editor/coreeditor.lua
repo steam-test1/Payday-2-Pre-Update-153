@@ -670,12 +670,11 @@ function CoreEditor:pickup_tool()
 		self:load_layout()
 		self:check_news()
 		self:_init_edit_unit_dialog()
+		self:_init_post_effects()
 	end
 	self._enabled = true
 	self:_set_vp_active(true)
-	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), self._default_post_processor_effect)
-	local bloom_combine_effect = self._default_post_processor_effect == Idstring("empty") and Idstring("bloom_combine_empty") or Idstring("bloom_combine")
-	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), bloom_combine_effect)
+	self:update_post_effects()
 	self._workspace:connect_controller(self._ctrl, false)
 	self:add_triggers()
 	Application:set_pause(false)
@@ -845,6 +844,7 @@ function CoreEditor:stop_simulation()
 	managers.editor:output("End simulation.", nil, Vector3(0, 0, 255))
 	managers.mission:stop_simulation()
 	managers.worldcamera:stop_simulation()
+	managers.environment_effects:stop_all()
 	managers.environment_effects:kill_all_mission_effects()
 	managers.music:stop()
 	managers.world_instance:on_simulation_ended()
@@ -1816,8 +1816,7 @@ function CoreEditor:putdown_tool()
 	self:set_wanted_mute(false)
 	self:set_listener_active(false)
 	managers.sound_environment:set_check_object_active(self._sound_check_object, false)
-	self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("default"))
-	self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine"))
+	self:update_post_effects()
 end
 
 function CoreEditor:set_listener_enabled(enabled)
@@ -3794,5 +3793,76 @@ end
 function CoreEditorContinent:delete()
 	for _, unit in ipairs(clone(self._units)) do
 		managers.editor:delete_unit(unit)
+	end
+end
+
+function CoreEditor:_init_post_effects()
+	self._post_effects = {
+		POSTFX_bloom = {
+			on = function()
+				self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("default"))
+				self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine"))
+				self:viewport():force_apply_feeders()
+			end,
+			off = function()
+				self:viewport():vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("empty"))
+				self:viewport():vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
+			end,
+			enable = false
+		},
+		POSTFX_ssao = {
+			on = function()
+				managers.environment_controller:set_ao_setting("ssao_low", self:viewport():vp())
+			end,
+			off = function()
+				managers.environment_controller:set_ao_setting("off", self:viewport():vp())
+			end,
+			enable = false
+		},
+		POSTFX_aa = {
+			on = function()
+				managers.environment_controller:set_aa_setting("smaa_x1", self:viewport():vp())
+			end,
+			off = function()
+				managers.environment_controller:set_aa_setting("off", self:viewport():vp())
+			end,
+			enable = false
+		}
+	}
+	self:disable_all_post_effects()
+end
+
+function CoreEditor:disable_all_post_effects(no_keep_state)
+	for id, pe in pairs(self._post_effects) do
+		pe.off()
+		if not no_keep_state then
+			pe.enable = false
+		end
+		if self._post_processor_effects_menu then
+			self._post_processor_effects_menu:set_checked(id, false)
+		end
+	end
+end
+
+function CoreEditor:enable_all_post_effects()
+	for id, pe in pairs(self._post_effects) do
+		pe.on()
+		pe.enable = true
+		if self._post_processor_effects_menu then
+			self._post_processor_effects_menu:set_checked(id, true)
+		end
+	end
+end
+
+function CoreEditor:update_post_effects()
+	for id, pe in pairs(self._post_effects) do
+		if pe.enable then
+			pe.on()
+		else
+			pe.off()
+		end
+		if self._post_processor_effects_menu then
+			self._post_processor_effects_menu:set_checked(id, pe.enable)
+		end
 	end
 end

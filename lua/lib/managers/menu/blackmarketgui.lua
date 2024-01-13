@@ -7536,7 +7536,7 @@ function BlackMarketGui:populate_deployables(data)
 		new_data.slot = i
 		new_data.unlocked = table.contains(managers.player:availible_equipment(1), new_data.name)
 		new_data.level = 0
-		new_data.equipped = managers.player:equipment_in_slot(1) == new_data.name
+		new_data.equipped = managers.blackmarket:equipped_deployable() == new_data.name
 		new_data.stream = false
 		new_data.skill_based = new_data.level == 0
 		new_data.skill_name = "bm_menu_skill_locked_" .. new_data.name

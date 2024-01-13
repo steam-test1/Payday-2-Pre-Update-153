@@ -39,6 +39,7 @@ function DLCTweakData:init(tweak_data)
 		coco = true,
 		super = 1,
 		mad = true,
+		opera = true,
 		dos = true,
 		rip = true,
 		pd2_goty = 1,
@@ -4588,6 +4589,26 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "squares",
+			amount = 1
+		}
+	}
+	self.opera = {}
+	self.opera.content = {}
+	self.opera.content.loot_global_value = "opera"
+	self.opera.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sydney",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_tecci_ns_special",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_tecci_b_long",
 			amount = 1
 		}
 	}

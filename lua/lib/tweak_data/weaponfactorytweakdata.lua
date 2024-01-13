@@ -203,6 +203,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_pl14()
 	self:_init_x_mp5()
 	self:_init_x_akmsu()
+	self:_init_tecci()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -25491,4 +25492,227 @@ function WeaponFactoryTweakData:_init_x_akmsu()
 	}
 	self.wpn_fps_smg_x_akmsu_npc = deep_clone(self.wpn_fps_smg_x_akmsu)
 	self.wpn_fps_smg_x_akmsu_npc.unit = "units/pd2_dlc_dos/weapons/wpn_fps_smg_x_akmsu/wpn_fps_smg_x_akmsu_npc"
+end
+
+function WeaponFactoryTweakData:_init_tecci()
+	self.parts.wpn_fps_ass_tecci_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_b_long = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_tecci_b_long",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_b_long",
+		stats = {
+			value = 1,
+			recoil = 3,
+			spread = 1,
+			concealment = -3
+		},
+		dlc = "opera",
+		texture_bundle_folder = "opera"
+	}
+	self.parts.wpn_fps_ass_tecci_dh_standard = {
+		type = "drag_handle",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_dh",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_dh_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_fg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_lower_reciever = {
+		type = "lower_reciever",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_lower_reciever",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_m_drum = {
+		type = "magazine",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 100},
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_m_drum",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload_not_empty"
+		}
+	}
+	self.parts.wpn_fps_ass_tecci_ns_standard = {
+		type = "barrel_ext",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_ns_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_ns_special = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel_ext",
+		name_id = "bm_wp_tecci_ns_special",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_ns_special",
+		stats = {
+			value = 1,
+			suppression = -1,
+			damage = 2,
+			recoil = 3,
+			spread = 1,
+			concealment = -2
+		},
+		dlc = "opera",
+		texture_bundle_folder = "opera"
+	}
+	self.parts.wpn_fps_ass_tecci_o_standard = {
+		type = "sight",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_o_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_upper_reciever = {
+		type = "upper_reciever",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_upper_reciever",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_vg_standard = {
+		type = "vertical_grip",
+		name_id = "bm_wp_m4_lower_reciever",
+		a_obj = "a_vg",
+		unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_fps_ass_tecci_vg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_tecci_b_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_b_standard"
+	self.parts.wpn_fps_ass_tecci_b_long.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_b_standard"
+	self.parts.wpn_fps_ass_tecci_dh_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_dh_standard"
+	self.parts.wpn_fps_ass_tecci_fg_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_fg_standard"
+	self.parts.wpn_fps_ass_tecci_g_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_g_standard"
+	self.parts.wpn_fps_ass_tecci_lower_reciever.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_lower_reciever"
+	self.parts.wpn_fps_ass_tecci_m_drum.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_m_drum"
+	self.parts.wpn_fps_ass_tecci_ns_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_ns_standard"
+	self.parts.wpn_fps_ass_tecci_ns_special.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_ns_special"
+	self.parts.wpn_fps_ass_tecci_o_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_o_standard"
+	self.parts.wpn_fps_ass_tecci_s_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_s_standard"
+	self.parts.wpn_fps_ass_tecci_upper_reciever.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_upper_reciever"
+	self.parts.wpn_fps_ass_tecci_vg_standard.third_unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci_pts/wpn_third_ass_tecci_vg_standard"
+	self.wpn_fps_ass_tecci = {}
+	self.wpn_fps_ass_tecci.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_ass_tecci.unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci/wpn_fps_ass_tecci"
+	self.wpn_fps_ass_tecci.stock_adapter = "wpn_fps_upg_m4_s_adapter"
+	self.wpn_fps_ass_tecci.default_blueprint = {
+		"wpn_fps_ass_tecci_b_standard",
+		"wpn_fps_ass_tecci_dh_standard",
+		"wpn_fps_ass_tecci_fg_standard",
+		"wpn_fps_ass_tecci_g_standard",
+		"wpn_fps_ass_tecci_lower_reciever",
+		"wpn_fps_ass_tecci_m_drum",
+		"wpn_fps_ass_tecci_ns_standard",
+		"wpn_fps_ass_tecci_o_standard",
+		"wpn_fps_ass_tecci_s_standard",
+		"wpn_fps_ass_tecci_upper_reciever",
+		"wpn_fps_ass_tecci_vg_standard"
+	}
+	self.wpn_fps_ass_tecci.uses_parts = {
+		"wpn_fps_ass_tecci_b_standard",
+		"wpn_fps_ass_tecci_b_long",
+		"wpn_fps_ass_tecci_dh_standard",
+		"wpn_fps_ass_tecci_fg_standard",
+		"wpn_fps_ass_tecci_g_standard",
+		"wpn_fps_ass_tecci_lower_reciever",
+		"wpn_fps_ass_tecci_m_drum",
+		"wpn_fps_ass_tecci_ns_standard",
+		"wpn_fps_ass_tecci_ns_special",
+		"wpn_fps_ass_tecci_o_standard",
+		"wpn_fps_ass_tecci_s_standard",
+		"wpn_fps_ass_tecci_upper_reciever",
+		"wpn_fps_ass_tecci_vg_standard",
+		"wpn_fps_upg_m4_s_adapter",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire",
+		"wpn_fps_upg_m4_s_crane",
+		"wpn_fps_upg_m4_s_mk46",
+		"wpn_fps_upg_m4_s_ubr",
+		"wpn_fps_m4_uupg_s_fold",
+		"wpn_fps_upg_m4_s_standard_vanilla",
+		"wpn_fps_upg_m4_s_pts",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ass_ns_battle",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_m4_g_hgrip",
+		"wpn_fps_upg_m4_g_mgrip",
+		"wpn_fps_upg_m4_g_sniper",
+		"wpn_fps_upg_m4_g_standard_vanilla",
+		"wpn_fps_upg_m4_g_ergo",
+		"wpn_fps_m4_uupg_o_flipup",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_eotech_xps"
+	}
+	self.wpn_fps_ass_tecci_npc = deep_clone(self.wpn_fps_ass_tecci)
+	self.wpn_fps_ass_tecci_npc.unit = "units/pd2_dlc_opera/weapons/wpn_fps_ass_tecci/wpn_fps_ass_tecci_npc"
 end

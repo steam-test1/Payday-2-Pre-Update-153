@@ -195,8 +195,6 @@ function TeamAILogicDisabled._register_revive_SO(data, my_data, rescue_type)
 		destroy_clbk_key = false,
 		nav_seg = data.unit:movement():nav_tracker():nav_segment(),
 		fail_clbk = callback(TeamAILogicDisabled, TeamAILogicDisabled, "on_revive_SO_failed", data),
-		interrupt_dis = 400,
-		interrupt_health = 0.25,
 		action = {
 			type = "act",
 			variant = rescue_type,

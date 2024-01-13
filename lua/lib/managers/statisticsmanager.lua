@@ -761,15 +761,10 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	elseif completion == "fail" then
 		stats.heist_failed = {type = "int", value = 1}
 	end
-	stats.info_playing_normal = {
+	stats.info_playing_pc = {
 		type = "int",
 		method = "set",
 		value = 1
-	}
-	stats.info_playing_beta = {
-		type = "int",
-		method = "set",
-		value = 0
 	}
 	local level_id = managers.job:current_level_id()
 	if completion then

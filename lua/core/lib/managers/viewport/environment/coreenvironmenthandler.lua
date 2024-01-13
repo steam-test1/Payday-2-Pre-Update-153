@@ -141,6 +141,10 @@ function EnvironmentHandler:get_value(data_path_key)
 	end
 end
 
+function EnvironmentHandler:get_default_value(data_path_key)
+	return self._env_manager:get_default_value(data_path_key)
+end
+
 function EnvironmentHandler:editor_set_value(data_path_key, value)
 	local feeder = self._feeder_map[data_path_key]
 	if not feeder and self._env_manager:has_data_path_key(data_path_key) then
@@ -187,6 +191,13 @@ function EnvironmentHandler:update(is_first_viewport, viewport, dt)
 		for _, data_path_key in ipairs(remove_update_list) do
 			self._update_feeder_map[data_path_key] = nil
 		end
+	end
+end
+
+function EnvironmentHandler:force_apply_feeders()
+	self._post_processor_modifier_material_map = {}
+	for _, feeder in pairs(self._feeder_map) do
+		self:_add_apply_feeder(feeder)
 	end
 end
 

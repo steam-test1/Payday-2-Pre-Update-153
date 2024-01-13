@@ -19,6 +19,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.dragon = "jiro"
 	self.masks.character_locked.bodhi = "bodhi"
 	self.masks.character_locked.jimmy = "jimmy_duct"
+	self.masks.character_locked.sydney = "sydney"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1688,7 +1689,8 @@ function BlackMarketTweakData:_init_masks()
 		sokol = "balaclava_sokol",
 		dragon = "balaclava_dallas",
 		bodhi = "balaclava_dallas",
-		jimmy = "balaclava_dallas"
+		jimmy = "balaclava_dallas",
+		sydney = "balaclava_sokol"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -2596,6 +2598,27 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.dbd_slasher.texture_bundle_folder = "boo_4"
 	self.masks.dbd_slasher.dlc = "dbd_clan"
 	self.masks.dbd_slasher.sort_number = 22
+	self.masks.sydney = {}
+	self.masks.sydney.unit = "units/pd2_dlc_opera/masks/sydney/msk_sydney"
+	self.masks.sydney.name_id = "bm_msk_sydney"
+	self.masks.sydney.pcs = {}
+	self.masks.sydney.value = 0
+	self.masks.sydney.dlc = "opera"
+	self.masks.sydney.texture_bundle_folder = "opera"
+	self.masks.sydney.sort_number = 19
+	self.masks.sydney_begins = {}
+	self.masks.sydney_begins.unit = "units/pd2_dlc_opera/masks/sydney_begins/msk_sydney_begins"
+	self.masks.sydney_begins.name_id = "bm_msk_sydney_begins"
+	self.masks.sydney_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.sydney_begins.value = 0
+	self.masks.sydney_begins.dlc = "opera"
+	self.masks.sydney_begins.texture_bundle_folder = "opera"
+	self.masks.sydney_begins.sort_number = 19
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.masks.sweettooth = {}
 		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"

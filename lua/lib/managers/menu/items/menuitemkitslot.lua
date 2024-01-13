@@ -40,10 +40,10 @@ function MenuItemKitSlot:next()
 	end
 	self._current_index = self._current_index == #self._options and 1 or self._current_index + 1
 	if self._parameters.category == "weapon" then
-		Global.player_manager.kit.weapon_slots[self._parameters.slot] = self._options[self._current_index]
+		managers.player:set_equipment_in_slot(self._options[self._current_index], self._parameters.slot)
 	end
 	if self._parameters.category == "equipment" then
-		Global.player_manager.kit.equipment_slots[self._parameters.slot] = self._options[self._current_index]
+		managers.player:set_equipment_in_slot(self._options[self._current_index], self._parameters.slot)
 	end
 	if not managers.network:session() then
 		return
@@ -68,7 +68,7 @@ function MenuItemKitSlot:previous()
 		Global.player_manager.kit.weapon_slots[self._parameters.slot] = self._options[self._current_index]
 	end
 	if self._parameters.category == "equipment" then
-		Global.player_manager.kit.equipment_slots[self._parameters.slot] = self._options[self._current_index]
+		managers.player:set_equipment_in_slot(self._options[self._current_index], self._parameters.slot)
 	end
 	if not managers.network:session() then
 		return

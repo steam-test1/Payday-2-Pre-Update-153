@@ -938,6 +938,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.mad.track = true
 	self.global_values.mad.sort_number = 114
 	self.global_values.mad.category = "dlc"
+	self.global_values.opera = {}
+	self.global_values.opera.name_id = "bm_global_value_opera"
+	self.global_values.opera.desc_id = "menu_l_global_value_opera"
+	self.global_values.opera.unlock_id = "bm_global_value_opera_unlock"
+	self.global_values.opera.color = Color(255, 255, 212, 0) / 255
+	self.global_values.opera.dlc = true
+	self.global_values.opera.chance = 1
+	self.global_values.opera.value_multiplier = 1
+	self.global_values.opera.durability_multiplier = 1
+	self.global_values.opera.drops = true
+	self.global_values.opera.track = true
+	self.global_values.opera.sort_number = 116
+	self.global_values.opera.category = "dlc"
 	self.global_values.dbd_clan = {}
 	self.global_values.dbd_clan.name_id = "bm_global_value_dbd_clan"
 	self.global_values.dbd_clan.desc_id = "menu_l_global_value_dbd_clan"
@@ -1020,7 +1033,8 @@ function LootDropTweakData:init(tweak_data)
 		"berry",
 		"peta",
 		"pal",
-		"dbd_clan"
+		"dbd_clan",
+		"opera"
 	}
 	self:_create_global_value_list_map()
 end

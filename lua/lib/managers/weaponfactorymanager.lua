@@ -1198,7 +1198,7 @@ function WeaponFactoryManager:get_sound_switch(switch_group, factory_id, bluepri
 	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
 	local t = {}
 	for _, part_id in ipairs(blueprint) do
-		if not forbidden[part_id] and factory.parts[part_id].sound_switch and factory.parts[part_id].sound_switch[switch_group] then
+		if not forbidden[part_id] and factory.parts[part_id].sound_switch and factory.parts[part_id].sound_switch[switch_group] and not table.contains(t, part_id) then
 			table.insert(t, part_id)
 		end
 	end

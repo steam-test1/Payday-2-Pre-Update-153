@@ -35,17 +35,20 @@ end
 
 function EventListenerHolder:_remove(key)
 	local listeners = self._listeners
-	for _, event in pairs(self._listener_keys[key]) do
-		listeners[event][key] = nil
-		if not next(listeners[event]) then
-			listeners[event] = nil
+	local listeners_keys = self._listener_keys[key]
+	if listeners_keys then
+		for _, event in pairs(listeners_keys) do
+			listeners[event][key] = nil
+			if not next(listeners[event]) then
+				listeners[event] = nil
+			end
 		end
-	end
-	if next(listeners) then
-		self._listener_keys[key] = nil
-	else
-		self._listeners = nil
-		self._listener_keys = nil
+		if next(listeners) then
+			self._listener_keys[key] = nil
+		else
+			self._listeners = nil
+			self._listener_keys = nil
+		end
 	end
 end
 

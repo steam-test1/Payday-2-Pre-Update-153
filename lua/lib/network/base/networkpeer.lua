@@ -494,7 +494,7 @@ function NetworkPeer:load(data)
 		managers.network.voice_chat:on_member_added(self, self._muted)
 	end
 	local local_peer = managers.network:session():local_peer()
-	if self == local_peer and Global.player_manager.kit.equipment_slots[1] == "armor_kit" then
+	if self == local_peer and managers.blackmarket:equipped_deployable() == "armor_kit" then
 		local_peer:set_outfit_string(managers.blackmarket:outfit_string())
 		managers.network:session():check_send_outfit(local_peer)
 	end
