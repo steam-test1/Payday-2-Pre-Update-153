@@ -70,7 +70,15 @@ function CoreMaterialEditorTexture:on_pick_global_texture()
 end
 
 function CoreMaterialEditorTexture:_on_browse()
-	local node, path = managers.database:load_node_dialog(self._right_panel, "Textures (*.dds)|*.dds")
+	local current_path
+	if self._value then
+		current_path = string.match(self._value, ".*/")
+		if current_path then
+			current_path = string.gsub(current_path, "/", "\\")
+			current_path = managers.database:base_path() .. current_path
+		end
+	end
+	local node, path = managers.database:load_node_dialog(self._right_panel, "Textures (*.dds)|*.dds", current_path)
 	if path then
 		self._global_texture = false
 		self._value = managers.database:entry_path(path)

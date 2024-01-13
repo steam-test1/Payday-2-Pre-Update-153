@@ -4663,6 +4663,17 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.dbd_boo_0_award = {}
+	self.dbd_boo_0_award.dlc = "has_dbd_clan"
+	self.dbd_boo_0_award.content = {}
+	self.dbd_boo_0_award.content.loot_global_value = "dbd_clan"
+	self.dbd_boo_0_award.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dbd_04",
+			amount = 1
+		}
+	}
 	self.dbd_boo_4_award = {}
 	self.dbd_boo_4_award.dlc = "has_dbd_clan"
 	self.dbd_boo_4_award.content = {}

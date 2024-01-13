@@ -386,6 +386,36 @@ function EconomyTweakData:init()
 		weapon_skins = {"m16_cola"}
 	}
 	self.contents.cola_01_legendary.rarity = "legendary"
+	self.contents.burn_01 = {}
+	self.contents.burn_01.def_id = 10020
+	self.contents.burn_01.contains = {
+		weapon_skins = {
+			"gre_m79_burn",
+			"b682_burn",
+			"g3_burn",
+			"mp9_burn",
+			"hs2000_burn",
+			"hunter_burn",
+			"benelli_burn",
+			"sparrow_burn",
+			"m37_burn",
+			"spas12_burn",
+			"fal_burn",
+			"glock_18c_burn",
+			"uzi_burn",
+			"glock_17_burn",
+			"scorpion_burn"
+		},
+		contents = {
+			"burn_01_legendary"
+		}
+	}
+	self.contents.burn_01_legendary = {}
+	self.contents.burn_01_legendary.def_id = 10021
+	self.contents.burn_01_legendary.contains = {
+		weapon_skins = {"judge_burn"}
+	}
+	self.contents.burn_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -473,6 +503,13 @@ function EconomyTweakData:init()
 	self.safes.cola_01.unit_name = "units/payday2_cash/safes/cola/safe/eco_safe_cola"
 	self.safes.cola_01.texture_bundle_folder = "cash/safes/cola"
 	self.safes.cola_01.market_link = "https://steamcommunity.com/market/listings/218620/Jimmy%20Safe"
+	self.safes.burn_01 = {}
+	self.safes.burn_01.drill = "burn_01"
+	self.safes.burn_01.content = "burn_01"
+	self.safes.burn_01.name_id = "bm_menu_safe_burn_01"
+	self.safes.burn_01.unit_name = "units/payday2_cash/safes/burn/safe/eco_safe_burn"
+	self.safes.burn_01.texture_bundle_folder = "cash/safes/burn"
+	self.safes.burn_01.market_link = "https://steamcommunity.com/market/listings/218620/Sydney%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -566,6 +603,14 @@ function EconomyTweakData:init()
 	self.drills.cola_01.desc_id = "bm_menu_drill_cola_01_desc"
 	self.drills.cola_01.unit_name = "units/payday2_cash/safes/cola/drill/eco_drill_cola"
 	self.drills.cola_01.texture_bundle_folder = "cash/safes/cola"
+	self.drills.burn_01 = {}
+	self.drills.burn_01.safe = "burn_01"
+	self.drills.burn_01.def_id = 70011
+	self.drills.burn_01.price = "2.49"
+	self.drills.burn_01.name_id = "bm_menu_drill_burn_01"
+	self.drills.burn_01.desc_id = "bm_menu_drill_burn_01_desc"
+	self.drills.burn_01.unit_name = "units/payday2_cash/safes/burn/drill/eco_drill_burn"
+	self.drills.burn_01.texture_bundle_folder = "cash/safes/burn"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

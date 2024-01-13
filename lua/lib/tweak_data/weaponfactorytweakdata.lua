@@ -8824,7 +8824,9 @@ function WeaponFactoryTweakData:_init_judge()
 		"wpn_fps_upg_o_rx30",
 		"wpn_fps_upg_o_cs",
 		"wpn_fps_upg_fl_ass_utg",
-		"wpn_fps_upg_ns_sho_salvo_large"
+		"wpn_fps_upg_ns_sho_salvo_large",
+		"wpn_fps_pis_judge_b_legend",
+		"wpn_fps_pis_judge_g_legend"
 	}
 	self.wpn_fps_pis_judge_npc = deep_clone(self.wpn_fps_pis_judge)
 	self.wpn_fps_pis_judge_npc.unit = "units/pd2_million/weapons/wpn_fps_pis_judge/wpn_fps_pis_judge_npc"
@@ -24532,6 +24534,30 @@ function WeaponFactoryTweakData:_init_legendary()
 	self.parts.wpn_fps_ass_m16_b_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_b_legend"
 	self.parts.wpn_fps_ass_m16_fg_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_fg_legend"
 	self.parts.wpn_fps_ass_m16_s_legend.third_unit = "units/payday2_cash/safes/cola/weapons/wpn_fps_ass_m16_legendary/wpn_third_ass_m16_s_legend"
+	self.parts.wpn_fps_pis_judge_b_legend = {
+		type = "barrel",
+		name_id = "bm_wp_judge_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_b_legend/wpn_fps_pis_judge_b_legend",
+		stats = {
+			value = 1,
+			spread = -3,
+			recoil = 6,
+			total_ammo_mod = 2
+		},
+		unatainable = true,
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_pis_judge_g_legend = {
+		type = "grip",
+		name_id = "bm_wp_judge_g_legend",
+		a_obj = "a_g",
+		unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_g_legend/wpn_fps_pis_judge_g_legend",
+		stats = {value = 1},
+		unatainable = true
+	}
+	self.parts.wpn_fps_pis_judge_b_legend.third_unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_b_legend/wpn_third_pis_judge_b_legend"
+	self.parts.wpn_fps_pis_judge_g_legend.third_unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_g_legend/wpn_third_pis_judge_g_legend"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()
