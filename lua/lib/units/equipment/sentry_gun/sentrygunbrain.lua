@@ -371,7 +371,7 @@ function SentryGunBrain:_upd_fire(t)
 		end
 	elseif self._ext_movement:rearming() then
 		self._ext_movement:complete_rearming()
-	elseif attention and attention.reaction >= AIAttentionObject.REACT_SHOOT and not self._ext_movement:warming_up(t) then
+	elseif attention and attention.reaction and attention.reaction >= AIAttentionObject.REACT_SHOOT and not self._ext_movement:warming_up(t) then
 		local expend_ammo = Network:is_server()
 		local damage_player = attention.unit:base() and attention.unit:base().is_local_player
 		if self._firing then

@@ -766,3 +766,7 @@ function ConnectionNetworkHandler:set_auto_assault_ai_trade(character_name, time
 	end
 	managers.trade:sync_set_auto_assault_ai_trade(character_name, time)
 end
+
+function ConnectionNetworkHandler:auto_respawn_player(pos, peer_id)
+	managers.player:init_auto_respawn_callback(pos, peer_id)
+end

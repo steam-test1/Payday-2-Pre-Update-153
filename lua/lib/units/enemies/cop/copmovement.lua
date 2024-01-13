@@ -260,6 +260,8 @@ function CopMovement:post_init()
 		"hurt",
 		"hurt_sick",
 		"shield_knock",
+		"knock_down",
+		"stagger",
 		"counter_tased",
 		"taser_tased",
 		"death",
@@ -1119,6 +1121,9 @@ end
 
 function CopMovement:damage_clbk(my_unit, damage_info)
 	local hurt_type = damage_info.result.type
+	if hurt_type == "knock_down" or hurt_type == "stagger" then
+		hurt_type = "heavy_hurt"
+	end
 	local block_type = hurt_type
 	if hurt_type == "expl_hurt" or hurt_type == "fire_hurt" or hurt_type == "poison_hurt" or hurt_type == "taser_tased" then
 		block_type = "heavy_hurt"

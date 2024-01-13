@@ -2,6 +2,7 @@ NetworkAccount = NetworkAccount or class()
 
 function NetworkAccount:init()
 	self._postprocess_username = callback(self, self, "_standard_username")
+	self:set_lightfx()
 end
 
 function NetworkAccount:update()
@@ -28,6 +29,37 @@ end
 
 function NetworkAccount:username()
 	return self._postprocess_username(self:username_id())
+end
+
+function NetworkAccount:username_id()
+	return 0
+end
+
+function NetworkAccount:username_by_id()
+	return ""
+end
+
+function NetworkAccount:signin_state()
+	return "not signed in"
+end
+
+function NetworkAccount:set_lightfx()
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		return
+	end
+	if managers.user:get_setting("use_lightfx") then
+		print("[NetworkAccount:init] Initializing LightFX...")
+		self._has_alienware = LightFX:initialize() and LightFX:has_lamps()
+		if self._has_alienware then
+			LightFX:set_lamps(0, 255, 0, 255)
+		end
+	else
+		self._has_alienware = nil
+	end
+end
+
+function NetworkAccount:has_alienware()
+	return self._has_alienware
 end
 
 function NetworkAccount:clan_tag()

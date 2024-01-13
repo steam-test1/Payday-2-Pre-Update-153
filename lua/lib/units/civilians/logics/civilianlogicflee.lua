@@ -714,7 +714,11 @@ function CivilianLogicFlee.on_rescue_SO_completed(ignore_this, data, good_pig)
 end
 
 function CivilianLogicFlee._get_coarse_flee_path(data)
+	if data.cannot_flee then
+		return
+	end
 	local flee_point = managers.groupai:state():safe_flee_point(data.unit:movement():nav_tracker():nav_segment())
+	local test = false
 	if not flee_point then
 		return
 	end

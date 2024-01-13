@@ -635,7 +635,7 @@ function GroupAIStateBase:hostage_count()
 end
 
 function GroupAIStateBase:has_room_for_police_hostage()
-	local nr_hostages_allowed = 0
+	local nr_hostages_allowed = 4
 	for u_key, u_data in pairs(self._player_criminals) do
 		if u_data.unit:base().is_local_player then
 			if managers.player:has_category_upgrade("player", "intimidate_enemies") then
@@ -2208,17 +2208,18 @@ function GroupAIStateBase:_update_point_of_no_return(t, dt)
 	end
 end
 
-function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, spawn_on_unit)
+function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, pos, rotation, start)
 	if not (managers.groupai:state():team_ai_enabled() and self._ai_enabled) or not managers.criminals:character_taken_by_name(char_name) and managers.criminals:nr_AI_criminals() >= managers.criminals.MAX_NR_TEAM_AI then
 		return
 	end
 	local objective = self:_determine_spawn_objective_for_criminal_AI()
 	if objective and objective.type == "follow" then
-		local player = spawn_on_unit or objective.follow_unit
-		local player_pos = player:position()
+		local player = objective.follow_unit
+		local player_pos = pos or player:position()
 		local tracker = player:movement():nav_tracker()
-		local spawn_pos, spawn_rot
-		if (is_drop_in or spawn_on_unit) and not self:whisper_mode() then
+		local spawn_pos = player_pos
+		local spawn_rot
+		if is_drop_in and not self:whisper_mode() then
 			local spawn_fwd = player:movement():m_head_rot():y()
 			mvector3.set_z(spawn_fwd, 0)
 			mvector3.normalize(spawn_fwd)
@@ -2240,9 +2241,14 @@ function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, spawn_on_unit)
 				end
 			end
 		else
-			local spawn_point = managers.network:session():get_next_spawn_point()
-			spawn_pos = spawn_point.pos_rot[1]
-			spawn_rot = spawn_point.pos_rot[2]
+			if start then
+				local spawn_point = managers.network:session():get_next_spawn_point()
+				spawn_pos = spawn_point.pos_rot[1]
+				spawn_rot = spawn_point.pos_rot[2]
+			else
+				spawn_pos = player_pos
+				spawn_rot = rotation
+			end
 			objective.in_place = true
 		end
 		local character_name = char_name or managers.criminals:get_free_character_name()
@@ -2327,7 +2333,7 @@ end
 function GroupAIStateBase:fill_criminal_team_with_AI(is_drop_in)
 	if managers.navigation:is_data_ready() and self._ai_enabled and managers.groupai:state():team_ai_enabled() then
 		while true do
-			if not (managers.criminals:nr_taken_criminals() < CriminalsManager.MAX_NR_CRIMINALS and managers.criminals:nr_AI_criminals() < managers.criminals.MAX_NR_TEAM_AI) or not self:spawn_one_teamAI(is_drop_in) then
+			if not (managers.criminals:nr_taken_criminals() < CriminalsManager.MAX_NR_CRIMINALS and managers.criminals:nr_AI_criminals() < managers.criminals.MAX_NR_TEAM_AI) or not self:spawn_one_teamAI(is_drop_in, nil, nil, nil, true) then
 				break
 			end
 		end
@@ -2932,6 +2938,9 @@ function GroupAIStateBase:sync_hostage_headcount(nr_hostages)
 		self._hostage_headcount = nr_hostages
 	elseif Network:is_server() then
 		managers.network:session():send_to_peers_synched("sync_hostage_headcount", math.min(self._hostage_headcount, 63))
+	end
+	if managers.player:has_team_category_upgrade("damage", "hostage_absorption") then
+		managers.player:set_damage_absorption(managers.player:team_upgrade_value("damage", "hostage_absorption", 0) * math.min(self._hostage_headcount, tweak_data.upgrades.values.team.damage.hostage_absorption_limit))
 	end
 	managers.hud:set_control_info({
 		nr_hostages = self._hostage_headcount
@@ -4767,6 +4776,18 @@ function GroupAIStateBase:get_following_hostages(owner)
 		return
 	end
 	return owner_data.following_hostages
+end
+
+function GroupAIStateBase:check_criminals_dead()
+	local all_criminals = self:all_char_criminals()
+	local total_count = #all_criminals
+	local count = 0
+	for u_key, u_data in pairs(all_criminals) do
+		if u_data == "dead" then
+			count = count + 1
+		end
+	end
+	return count == total_count
 end
 
 function GroupAIStateBase:register_turret(unit)

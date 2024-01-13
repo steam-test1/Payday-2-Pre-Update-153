@@ -58,7 +58,7 @@ function PlayerClean:update(t, dt)
 end
 
 function PlayerClean:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	self._stick_move = self._controller:get_input_axis("move")
 	if mvector3.length(self._stick_move) < 0.1 then
 		self._move_dir = nil

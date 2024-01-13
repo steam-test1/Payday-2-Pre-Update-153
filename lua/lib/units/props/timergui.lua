@@ -89,6 +89,18 @@ function TimerGui:set_can_jam(can_jam)
 	self._can_jam = can_jam
 end
 
+function TimerGui:set_jam_times(amount)
+	if not self._can_jam then
+		Application:error("[Drill]", "This Drill cannot jam, use another one.")
+		return
+	end
+	if amount == 0 then
+		Application:error("[Drill]", "jam times cannot be set below 1")
+		return
+	end
+	self._jam_times = amount
+end
+
 function TimerGui:set_override_timer(override_timer)
 	self._override_timer = override_timer
 end

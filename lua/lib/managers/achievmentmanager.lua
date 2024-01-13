@@ -11,18 +11,29 @@ function AchievmentManager:init()
 	}
 	self.script_data = {}
 	if SystemInfo:platform() == Idstring("WIN32") then
-		AchievmentManager.do_award = AchievmentManager.award_steam
-		if not Global.achievment_manager then
-			self:_parse_achievments("Steam")
-			self.handler = Steam:sa_handler()
-			self.handler:initialized_callback(AchievmentManager.fetch_achievments)
-			self.handler:init()
-			Global.achievment_manager = {
-				handler = self.handler,
-				achievments = self.achievments
-			}
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			AchievmentManager.do_award = AchievmentManager.award_steam
+			if not Global.achievment_manager then
+				self:_parse_achievments("Steam")
+				self.handler = Steam:sa_handler()
+				self.handler:initialized_callback(AchievmentManager.fetch_achievments)
+				self.handler:init()
+				Global.achievment_manager = {
+					handler = self.handler,
+					achievments = self.achievments
+				}
+			else
+				self.handler = Global.achievment_manager.handler
+				self.achievments = Global.achievment_manager.achievments
+			end
 		else
-			self.handler = Global.achievment_manager.handler
+			AchievmentManager.do_award = AchievmentManager.award_none
+			self:_parse_achievments()
+			if not Global.achievment_manager then
+				Global.achievment_manager = {
+					achievments = self.achievments
+				}
+			end
 			self.achievments = Global.achievment_manager.achievments
 		end
 	elseif SystemInfo:platform() == Idstring("PS3") then
@@ -143,7 +154,7 @@ function AchievmentManager:_parse_achievments(platform)
 	for _, ach in ipairs(list) do
 		if ach._meta == "achievment" then
 			for _, reward in ipairs(ach) do
-				if reward._meta == "reward" and (Application:editor() or platform == reward.platform) then
+				if reward._meta == "reward" and (not (not Application:editor() and platform) or platform == reward.platform) then
 					self.achievments[ach.id] = {
 						id = reward.id,
 						name = ach.name,
@@ -235,6 +246,10 @@ function AchievmentManager:get_stat(stat)
 		return managers.network.account:get_stat(stat)
 	end
 	return false
+end
+
+function AchievmentManager:award_none(id)
+	Application:debug("[AchievmentManager:award_none] Awarded achievment", id)
 end
 
 function AchievmentManager:award_steam(id)

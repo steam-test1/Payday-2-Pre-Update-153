@@ -35,6 +35,9 @@ end
 
 function EventListenerHolder:_remove(key)
 	local listeners = self._listeners
+	if not self._listener_keys then
+		return
+	end
 	local listeners_keys = self._listener_keys[key]
 	if listeners_keys then
 		for _, event in pairs(listeners_keys) do

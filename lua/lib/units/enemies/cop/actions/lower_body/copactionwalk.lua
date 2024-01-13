@@ -348,6 +348,7 @@ function CopActionWalk:init(action_desc, common_data)
 		return
 	end
 	self._ext_movement:enable_update()
+	self._is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
 	return true
 end
 
@@ -359,6 +360,9 @@ function CopActionWalk:_init()
 	self._walk_velocity = self:_get_max_walk_speed()
 	local action_desc = self._action_desc
 	local common_data = self._common_data
+	if self._is_civilian then
+		print("common_data ", inspect(common_data))
+	end
 	if self._sync then
 		if managers.groupai:state():all_AI_criminals()[common_data.unit:key()] then
 			self._nav_link_invul = true
@@ -1174,7 +1178,8 @@ function CopActionWalk:_get_current_max_walk_speed(move_dir)
 	if move_dir == "l" or move_dir == "r" then
 		move_dir = "strafe"
 	end
-	return self._common_data.char_tweak.move_speed[self._ext_anim.pose][self._haste][self._stance.name][move_dir]
+	local multiplier = self._unit:brain().is_hostage and self._unit:brain():is_hostage() and self._common_data.char_tweak.hostage_move_speed or 1
+	return self._common_data.char_tweak.move_speed[self._ext_anim.pose][self._haste][self._stance.name][move_dir] * multiplier
 end
 
 function CopActionWalk:save(save_data)

@@ -829,7 +829,7 @@ function CopLogicAttack._upd_aim(data, my_data)
 					local running = my_data.advancing and not my_data.advancing:stopping() and my_data.advancing:haste() == "run"
 					if last_sup_t and data.t - last_sup_t < 7 * (running and 0.3 or 1) * (focus_enemy.verified and 1 or focus_enemy.vis_ray and focus_enemy.vis_ray.distance > 500 and 0.5 or 0.2) then
 						shoot = true
-					elseif focus_enemy.verified and focus_enemy.verified_dis < data.internal_data.weapon_range.close then
+					elseif focus_enemy.verified and data.internal_data.weapon_range and focus_enemy.verified_dis < data.internal_data.weapon_range.close then
 						shoot = true
 					elseif focus_enemy.verified and focus_enemy.criminal_record and focus_enemy.criminal_record.assault_t and data.t - focus_enemy.criminal_record.assault_t < 2 then
 						shoot = true

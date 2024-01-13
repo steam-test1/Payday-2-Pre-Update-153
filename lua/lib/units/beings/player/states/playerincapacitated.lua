@@ -78,7 +78,7 @@ function PlayerIncapacitated:update(t, dt)
 end
 
 function PlayerIncapacitated:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	if t > self._next_shock then
 		self._unit:camera():play_shaker("player_taser_shock", 0.5, 10)
 		self._next_shock = t + 0.5 + math.rand(2.5)

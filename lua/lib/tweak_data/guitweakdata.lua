@@ -487,8 +487,16 @@ function GuiTweakData:init()
 		name_id = "menu_content_opera",
 		desc_id = "menu_content_opera_desc",
 		date_id = "menu_content_opera_date",
-		store = 218620,
+		store = 468410,
 		image = "guis/dlcs/opera/textures/pd2/content_updates/opera"
+	}
+	local update100 = {
+		id = "update100",
+		name_id = "menu_content_update100",
+		desc_id = "menu_content_update100_desc",
+		date_id = "menu_content_update100_date",
+		webpage = "http://www.overkillsoftware.com/games/update100/",
+		image = "guis/textures/pd2/content_updates/update100"
 	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
@@ -555,7 +563,8 @@ function GuiTweakData:init()
 			pal,
 			coco,
 			mad,
-			opera
+			opera,
+			update100
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

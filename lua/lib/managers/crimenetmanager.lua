@@ -1604,7 +1604,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		if is_win32 then
 			managers.features:announce_feature("thq_feature")
 		end
-		if is_win32 and Steam:logged_on() and not managers.dlc:is_dlc_unlocked("pd2_clan") and math.random() < 0.2 then
+		if is_win32 and SystemInfo:distribution() == Idstring("STEAM") and Steam:logged_on() and not managers.dlc:is_dlc_unlocked("pd2_clan") and math.random() < 0.2 then
 			managers.features:announce_feature("join_pd2_clan")
 		end
 		if managers.dlc:is_dlc_unlocked("gage_pack_jobs") then
@@ -3044,7 +3044,7 @@ function CrimeNetGui:check_job_pressed(x, y)
 			elseif is_win32 then
 				local dlc_data = Global.dlc_manager.all_dlc_data[data.dlc]
 				local app_id = dlc_data and dlc_data.app_id
-				if app_id then
+				if app_id and SystemInfo:distribution() == Idstring("STEAM") then
 					Steam:overlay_activate("store", app_id)
 				end
 			end

@@ -4,6 +4,8 @@ function CoreEditor:init_create_dome_occlusion(shape, res)
 	print("CoreEditor:init_create_dome_occlusion()")
 	managers.editor:disable_all_post_effects(true)
 	self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("render_dome_occ"))
+	self._aa_setting = managers.environment_controller:get_aa_setting()
+	managers.environment_controller:set_aa_setting("AA_off")
 	local saved_environment = managers.viewport:default_environment()
 	local params = {
 		res = res,

@@ -559,6 +559,7 @@ function MenuInput:update(t, dt)
 			end
 			if self._controller then
 				local special_btns = {
+					"menu_remove_skill",
 					"menu_toggle_voice_message",
 					"menu_respec_tree",
 					"menu_switch_skillset",

@@ -75,16 +75,20 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.locked.sequence = "var_material_01"
 	self.characters.locked.name_id = "bm_character_locked"
 	self.characters.locked.dallas = {
-		sequence = "var_mtr_dallas"
+		sequence = "var_mtr_dallas",
+		installed = true
 	}
 	self.characters.locked.wolf = {
-		sequence = "var_mtr_wolf"
+		sequence = "var_mtr_wolf",
+		installed = true
 	}
 	self.characters.locked.hoxton = {
-		sequence = "var_mtr_hoxton"
+		sequence = "var_mtr_hoxton",
+		installed = true
 	}
 	self.characters.locked.chains = {
-		sequence = "var_mtr_chains"
+		sequence = "var_mtr_chains",
+		installed = true
 	}
 	self.characters.locked.jowi = {
 		sequence = "var_mtr_john_wick",
@@ -442,6 +446,8 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.ecm_jammer.name_id = "bm_equipment_ecm_jammer"
 	self.deployables.sentry_gun = {}
 	self.deployables.sentry_gun.name_id = "bm_equipment_sentry_gun"
+	self.deployables.sentry_gun_silent = {}
+	self.deployables.sentry_gun_silent.name_id = "bm_equipment_sentry_gun_silent"
 	self.deployables.trip_mine = {}
 	self.deployables.trip_mine.name_id = "bm_equipment_trip_mine"
 	self.deployables.armor_kit = {}

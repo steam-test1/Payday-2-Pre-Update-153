@@ -98,6 +98,9 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(45, "net_forwarding", true)
 	self:setup_setting(46, "flush_gpu_command_queue", true)
 	self:setup_setting(47, "use_thq_weapon_parts", false)
+	self:setup_setting(48, "video_ao", "aob")
+	self:setup_setting(49, "parallax_mapping", true)
+	self:setup_setting(50, "video_aa", "fxaa")
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)
@@ -166,7 +169,10 @@ function GenericUserManager:reset_video_setting_map()
 		"video_streaks",
 		"fov_standard",
 		"fov_zoom",
-		"light_adaption"
+		"light_adaption",
+		"video_ao",
+		"parallax_mapping",
+		"video_aa"
 	}
 	for _, name in pairs(settings) do
 		self:set_setting(name, self:get_default_setting(name))

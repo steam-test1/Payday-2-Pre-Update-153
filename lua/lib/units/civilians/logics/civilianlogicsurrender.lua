@@ -123,11 +123,12 @@ function CivilianLogicSurrender.queued_update(rubbish, data)
 	end
 end
 
-function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
+function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied, can_flee)
 	local my_data = data.internal_data
 	if data.is_tied then
 		return
 	end
+	data.cannot_flee = not can_flee
 	if not_tied then
 		if data.has_outline then
 			data.unit:contour():remove("highlight")
@@ -158,6 +159,7 @@ function CivilianLogicSurrender.on_tied(data, aggressor_unit, not_tied)
 			managers.groupai:state():on_hostage_state(true, data.key, nil, nil)
 			my_data.is_hostage = true
 			data.is_tied = true
+			my_data.aggressor_id = aggressor_unit:base():id()
 			data.unit:interaction():set_tweak_data("hostage_move")
 			data.unit:interaction():set_active(true, true)
 			if data.has_outline then

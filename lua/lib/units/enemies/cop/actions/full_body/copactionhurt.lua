@@ -509,11 +509,11 @@ function CopActionHurt:init(action_desc, common_data)
 				end
 			end
 		elseif action_type == "death" then
-			self._unit:sound():say("l1n_x02a_any_3p", true, true)
+			self._unit:sound():say("x02a_any_3p", true)
 		elseif action_type == "counter_tased" or action_type == "taser_tased" then
 			self._unit:sound():say("tasered")
 		else
-			self._unit:sound():say("l1n_x01a_any_3p", true, true)
+			self._unit:sound():say("x01a_any_3p", true)
 		end
 		if (tweak_table == "tank" or tweak_table == "tank_hw") and action_type == "death" then
 			local unit_id = self._unit:id()
@@ -522,9 +522,9 @@ function CopActionHurt:init(action_desc, common_data)
 		if Network:is_server() then
 			local radius, filter_name
 			local default_radius = managers.groupai:state():whisper_mode() and tweak_data.upgrades.cop_hurt_alert_radius_whisper or tweak_data.upgrades.cop_hurt_alert_radius
-			if action_desc.attacker_unit and action_desc.attacker_unit:base().upgrade_value then
+			if action_desc.attacker_unit and alive(action_desc.attacker_unit) and action_desc.attacker_unit:base().upgrade_value then
 				radius = action_desc.attacker_unit:base():upgrade_value("player", "silent_kill") or default_radius
-			elseif action_desc.attacker_unit and action_desc.attacker_unit:base().is_local_player then
+			elseif action_desc.attacker_unit and alive(action_desc.attacker_unit) and action_desc.attacker_unit:base().is_local_player then
 				radius = managers.player:upgrade_value("player", "silent_kill", default_radius)
 			end
 			local new_alert = {

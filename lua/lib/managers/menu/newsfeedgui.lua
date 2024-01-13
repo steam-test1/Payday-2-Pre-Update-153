@@ -56,8 +56,10 @@ function NewsFeedGui:update(t, dt)
 end
 
 function NewsFeedGui:make_news_request()
-	print("make_news_request()")
-	Steam:http_request("http://steamcommunity.com/games/218620/rss", callback(self, self, "news_result"))
+	if SystemInfo:distribution() == Idstring("STEAM") then
+		print("make_news_request()")
+		Steam:http_request("http://steamcommunity.com/games/218620/rss", callback(self, self, "news_result"))
+	end
 end
 
 function NewsFeedGui:news_result(success, body)

@@ -341,6 +341,21 @@ function CoreSoundEnvironmentManager:remove_area(area)
 	table.delete(self._areas, area)
 end
 
+function CoreSoundEnvironmentManager:enable_area(unit_id, enable)
+	for _, area in pairs(self._areas) do
+		if area:unit() and area:unit():unit_data().unit_id == unit_id then
+			if enable then
+				area:_add_environment()
+				area:enable(true)
+			else
+				area:_remove_environment()
+				area:enable(false)
+			end
+			return
+		end
+	end
+end
+
 function CoreSoundEnvironmentManager:add_emitter(emitter_params)
 	local emitter = SoundEnvironmentEmitter:new(emitter_params)
 	table.insert(self._emitters, emitter)
@@ -690,6 +705,7 @@ function SoundEnvironmentArea:init(params)
 	self._use_occasional = params.use_occasional or params.use_occasional == nil and true
 	self._gain = params.gain or 0
 	self._name = params.name or ""
+	self._enable = true
 	self:_init_environment_effect()
 	self:_init_event()
 	self._environment_shape = EnvironmentShape(self:position(), self:size(), self:rotation())
@@ -735,6 +751,10 @@ function SoundEnvironmentArea:_remove_environment()
 		SoundDevice:remove_environment(self._environment_id)
 		self._environment_id = nil
 	end
+end
+
+function SoundEnvironmentArea:enable(enable)
+	self._enable = enable
 end
 
 function SoundEnvironmentArea:name()
@@ -852,14 +872,14 @@ function SoundEnvironmentArea:remove()
 end
 
 function SoundEnvironmentArea:still_inside(pos)
-	if not self._use_ambience then
+	if not self._enable or not self._use_ambience then
 		return false
 	end
 	return SoundEnvironmentArea.super.still_inside(self, pos)
 end
 
 function SoundEnvironmentArea:is_inside(pos)
-	if not self._use_ambience then
+	if not self._enable or not self._use_ambience then
 		return false
 	end
 	return SoundEnvironmentArea.super.is_inside(self, pos)

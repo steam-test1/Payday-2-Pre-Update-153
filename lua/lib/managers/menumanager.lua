@@ -129,6 +129,12 @@ function MenuManager:init(is_start_menu)
 	self:dof_setting_changed("dof_setting", nil, managers.user:get_setting("dof_setting"))
 	managers.system_menu:add_active_changed_callback(callback(self, self, "system_menu_active_changed"))
 	self._sound_source = SoundDevice:create_source("MenuManager")
+	managers.user:add_setting_changed_callback("video_ao", callback(self, self, "video_ao_changed"), true)
+	self:video_ao_changed(nil, nil, managers.user:get_setting("video_ao"))
+	managers.user:add_setting_changed_callback("parallax_mapping", callback(self, self, "parallax_mapping_changed"), true)
+	self:parallax_mapping_changed(nil, nil, managers.user:get_setting("parallax_mapping"))
+	managers.user:add_setting_changed_callback("video_aa", callback(self, self, "video_aa_changed"), true)
+	self:video_aa_changed(nil, nil, managers.user:get_setting("video_aa"))
 end
 
 function MenuManager:post_event(event)
@@ -415,6 +421,24 @@ end
 
 function MenuManager:remove_active_changed_callback(callback_func)
 	self._active_changed_callback_handler:remove(callback_func)
+end
+
+function MenuManager:video_ao_changed(name, old_value, new_value)
+	if managers.environment_controller then
+		managers.environment_controller:set_ao_setting(new_value)
+	end
+end
+
+function MenuManager:parallax_mapping_changed(name, old_value, new_value)
+	if managers.environment_controller then
+		managers.environment_controller:set_parallax_setting(new_value)
+	end
+end
+
+function MenuManager:video_aa_changed(name, old_value, new_value)
+	if managers.environment_controller then
+		managers.environment_controller:set_aa_setting(new_value)
+	end
 end
 
 function MenuManager:brightness_changed(name, old_value, new_value)
@@ -1088,7 +1112,7 @@ function MenuManager:do_clear_progress()
 		Global.game_settings.difficulty = "overkill"
 	end
 	managers.user:set_setting("mask_set", "clowns")
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_level_to_steam()
 	end
 end
@@ -1531,6 +1555,10 @@ end
 
 function MenuCallbackHandler:is_win32()
 	return SystemInfo:platform() == Idstring("WIN32")
+end
+
+function MenuCallbackHandler:is_steam()
+	return SystemInfo:distribution() == Idstring("STEAM")
 end
 
 function MenuCallbackHandler:is_fullscreen()
@@ -2487,7 +2515,7 @@ function MenuCallbackHandler:_increase_infamous(yes_clbk)
 	if yes_clbk then
 		yes_clbk()
 	end
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_level_to_steam()
 	end
 end
@@ -2601,6 +2629,18 @@ end
 
 function MenuCallbackHandler:choice_choose_menu_theme(item)
 	managers.menu:change_theme(item:value())
+end
+
+function MenuCallbackHandler:choice_choose_ao(item)
+	managers.user:set_setting("video_ao", item:value())
+end
+
+function MenuCallbackHandler:toggle_parallax(item)
+	managers.user:set_setting("parallax_mapping", item:value() == "on")
+end
+
+function MenuCallbackHandler:choice_choose_aa(item)
+	managers.user:set_setting("video_aa", item:value())
 end
 
 function MenuCallbackHandler:choice_choose_anti_alias(item)
@@ -4734,9 +4774,10 @@ function MenuCallbackHandler:set_contact_info(item)
 	local id = parameters.name
 	local name_id = parameters.text_id
 	local files = parameters.files
+	local sub_text = parameters.sub_text
 	local active_node_gui = managers.menu:active_menu().renderer:active_node_gui()
 	if active_node_gui and active_node_gui.set_contact_info and active_node_gui:get_contact_info() ~= item:name() then
-		active_node_gui:set_contact_info(id, name_id, files, 1)
+		active_node_gui:set_contact_info(id, name_id, files, 1, sub_text)
 	end
 	local logic = managers.menu:active_menu().logic
 	if logic then
@@ -4753,28 +4794,43 @@ function MenuCallbackHandler:is_current_contact_info(item)
 end
 
 MenuCrimeNetContactInfoInitiator = MenuCrimeNetContactInfoInitiator or class()
+MenuCrimeNetContactInfoInitiator.TWEAK_DATA = tweak_data.gui.crime_net.codex
+MenuCrimeNetContactInfoInitiator.COUNT_ITEMS = true
+MenuCrimeNetContactInfoInitiator.ALLOW_IMAGES = false
+MenuCrimeNetContactInfoInitiator.USE_SUBTEXT = false
+MenuCrimeNetContactInfoInitiator.DEFAULT_ITEM = "bain"
 
 function MenuCrimeNetContactInfoInitiator:modify_node(original_node, data)
 	local node = original_node
 	local codex_data = {}
 	local contacts = {}
-	for _, codex_d in ipairs(tweak_data.gui.crime_net.codex) do
+	for _, codex_d in ipairs(self.TWEAK_DATA) do
 		local codex = {}
+		local codex_string = managers.localization:to_upper_text(codex_d.name_id)
 		codex.id = codex_d.id
-		codex.name_lozalized = managers.localization:to_upper_text(codex_d.name_id) .. " (" .. tostring(#codex_d) .. ")"
+		codex.name_localized = codex_string .. (self.COUNT_ITEMS and " (" .. tostring(#codex_d) .. ")" or "")
 		for _, info_data in ipairs(codex_d) do
 			local data = {}
 			data.id = info_data.id
-			data.name_lozalized = managers.localization:to_upper_text(info_data.name_id)
+			data.name_localized = managers.localization:to_upper_text(info_data.name_id)
 			data.files = {}
+			data.sub_text = self.USE_SUBTEXT and codex_string or nil
 			for page, file_data in ipairs(info_data) do
 				local file = {}
-				file.desc_lozalized = file_data.desc_id and managers.localization:text(file_data.desc_id) or ""
+				file.desc_localized = file_data.desc_id and managers.localization:text(file_data.desc_id) or ""
 				file.post_event = file_data.post_event
 				file.videos = file_data.videos and deep_clone(file_data.videos) or {}
 				file.lock = file_data.lock
+				file.icon = file_data.icon
+				file.icon_rect = file_data.icon_rect
 				if file_data.video then
 					table.insert(file.videos, file_data.video)
+				end
+				if self.ALLOW_IMAGES then
+					file.images = file_data.images and deep_clone(file_data.images) or {}
+					if file_data.image then
+						table.insert(file.images, file_data.image)
+					end
 				end
 				table.insert(data.files, file)
 			end
@@ -4784,7 +4840,7 @@ function MenuCrimeNetContactInfoInitiator:modify_node(original_node, data)
 	end
 	node:clean_items()
 	for i, codex in ipairs(codex_data) do
-		self:create_divider(node, codex.id, codex.name_lozalized, nil, tweak_data.screen_colors.text)
+		self:create_divider(node, codex.id, codex.name_localized, nil, tweak_data.screen_colors.text)
 		for i, info_data in ipairs(codex) do
 			self:create_item(node, info_data)
 		end
@@ -4803,8 +4859,8 @@ function MenuCrimeNetContactInfoInitiator:modify_node(original_node, data)
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
 	node:add_item(new_item)
-	node:set_default_item_name("bain")
-	node:select_item("bain")
+	node:set_default_item_name(self.DEFAULT_ITEM)
+	node:select_item(self.DEFAULT_ITEM)
 	return node
 end
 
@@ -4829,7 +4885,8 @@ function MenuCrimeNetContactInfoInitiator:create_divider(node, id, text_id, size
 end
 
 function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
-	local text_id = contact.name_lozalized
+	local text_id = contact.name_localized
+	local sub_text = contact.sub_text
 	local files = contact.files
 	local video_id = contact.video
 	local color_ranges
@@ -4840,6 +4897,7 @@ function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
 		localize = "false",
 		callback = "set_contact_info",
 		files = files,
+		sub_text = sub_text,
 		icon = contact.icon or "guis/textures/scrollarrow",
 		icon_rotation = contact.icon_rotation or 270,
 		icon_visible_callback = contact.icon_visible_callback or "is_current_contact_info",
@@ -6096,16 +6154,16 @@ function MenuCrimeNetGageAssignmentInitiator:modify_node(original_node, data)
 	self:create_divider(node, 1, managers.localization:text("menu_gage_assignment_div_menu"), nil, tweak_data.screen_colors.text)
 	self:create_item(node, {
 		id = "_introduction",
-		name_lozalized = managers.localization:text("menu_gage_assignment_introduction_title")
+		name_localized = managers.localization:text("menu_gage_assignment_introduction_title")
 	})
 	self:create_item(node, {
 		id = "_summary",
-		name_lozalized = managers.localization:text("menu_gage_assignment_summary_title")
+		name_localized = managers.localization:text("menu_gage_assignment_summary_title")
 	})
 	if SystemInfo:platform() ~= Idstring("XB1") then
 		self:create_item(node, {
 			id = "_video",
-			name_lozalized = managers.localization:text("menu_gage_assignment_video_title")
+			name_localized = managers.localization:text("menu_gage_assignment_video_title")
 		})
 	end
 	self:create_divider(node, 2)
@@ -6114,7 +6172,7 @@ function MenuCrimeNetGageAssignmentInitiator:modify_node(original_node, data)
 	for assignment, data in pairs(tweak_data.gage_assignment:get_assignments()) do
 		table.insert(node_data, {
 			id = assignment,
-			name_lozalized = managers.localization:text(data.name_id),
+			name_localized = managers.localization:text(data.name_id),
 			aquire = data.aquire or 1
 		})
 	end
@@ -7197,6 +7255,15 @@ function MenuOptionInitiator:modify_adv_video(node)
 		end
 		dof_setting_item:set_value(option_value)
 	end
+	if node:item("choose_ao") then
+		node:item("choose_ao"):set_value(managers.user:get_setting("video_ao"))
+	end
+	if node:item("toggle_parallax") then
+		node:item("toggle_parallax"):set_value(managers.user:get_setting("parallax_mapping") and "on" or "off")
+	end
+	if node:item("choose_aa") then
+		node:item("choose_aa"):set_value(managers.user:get_setting("video_aa"))
+	end
 	return node
 end
 
@@ -7699,11 +7766,11 @@ function MenuCrimeNetChallengeInitiator:setup_node(node)
 	self:create_divider(node, 1, managers.localization:text("menu_gage_assignment_div_menu"), nil, tweak_data.screen_colors.text)
 	self:create_item(node, {
 		id = "_introduction",
-		name_lozalized = managers.localization:text("menu_challenge_introduction_title")
+		name_localized = managers.localization:text("menu_challenge_introduction_title")
 	})
 	self:create_item(node, {
 		id = "_summary",
-		name_lozalized = managers.localization:text("menu_challenge_summary_title")
+		name_localized = managers.localization:text("menu_challenge_summary_title")
 	})
 	self:create_divider(node, 2)
 	local first_item
@@ -7743,7 +7810,7 @@ function MenuCrimeNetChallengeInitiator:setup_node(node)
 				icon_rotation = selected_item ~= challenge.id and (challenge.rewarded and 360 or challenge.completed and 360) or nil
 				icon_visible_callback = "is_current_challenge"
 				table.insert(node_data, {
-					name_lozalized = challenge.name_s or managers.localization:text(challenge.name_id),
+					name_localized = challenge.name_s or managers.localization:text(challenge.name_id),
 					interval = challenge.interval,
 					id = challenge.id,
 					completed = challenge.completed,
@@ -7762,7 +7829,7 @@ function MenuCrimeNetChallengeInitiator:setup_node(node)
 				if x.interval ~= y.interval then
 					return x.interval < y.interval
 				end
-				return x.name_lozalized < y.name_lozalized
+				return x.name_localized < y.name_localized
 			end)
 			for assignment, data in ipairs(node_data) do
 				self:create_item(node, data)

@@ -277,11 +277,11 @@ end
 
 function PlayerInventory:unequip_selection(selection_index, instant)
 	if not selection_index or selection_index == self._equipped_selection then
+		self:_call_listeners("unequip")
 		self:equipped_unit():base():set_flashlight_enabled(false)
 		selection_index = selection_index or self._equipped_selection
 		self:_place_selection(selection_index, false)
 		self._equipped_selection = nil
-		self:_call_listeners("unequip")
 	end
 end
 

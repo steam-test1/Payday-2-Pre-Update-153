@@ -86,7 +86,7 @@ function PlayerFatal:update(t, dt)
 end
 
 function PlayerFatal:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	self:_update_foley(t, input)
 	local new_action
 	if input.btn_stats_screen_press then

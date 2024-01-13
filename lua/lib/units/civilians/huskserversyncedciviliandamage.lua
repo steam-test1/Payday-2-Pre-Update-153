@@ -143,7 +143,7 @@ function HuskServerSyncedCivilianDamage:damage_bullet(attack_data)
 		if attacker:id() == -1 then
 			attacker = self._unit
 		end
-		self._unit:network():send_to_host("damage_bullet", attacker, damage_percent, body_index, hit_offset_height)
+		self._unit:network():send_to_host("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, 0, false)
 	end
 end
 

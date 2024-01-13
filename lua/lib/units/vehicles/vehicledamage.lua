@@ -133,10 +133,10 @@ function VehicleDamage:damage_bullet(attack_data)
 end
 
 function VehicleDamage:_send_bullet_attack_result(attack_data, attacker, damage_percent, body_index, hit_offset_height)
-	self._unit:network():send("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, self:dead() and true or false)
+	self._unit:network():send("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, 0, self:dead() and true or false)
 end
 
-function VehicleDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit_offset_height, death)
+function VehicleDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit_offset_height, variant, death)
 	if self:dead() then
 		return
 	end

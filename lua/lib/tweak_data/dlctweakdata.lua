@@ -810,7 +810,7 @@ function DLCTweakData:init(tweak_data)
 		"scar",
 		"p226"
 	}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self.gage_pack_shotgun_free = {}
 		self.gage_pack_shotgun_free.free = true
 		self.gage_pack_shotgun_free.content = {}
@@ -2416,7 +2416,7 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.gage_pack_historical.content.upgrades = {"swagger"}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self.alienware_alpha = {}
 		self.alienware_alpha.content = {}
 		self.alienware_alpha.content.loot_drops = {
@@ -4618,6 +4618,9 @@ function DLCTweakData:init(tweak_data)
 	self.dos.content.loot_global_value = "normal"
 	self.dos.content.loot_drops = {}
 	self.dos.content.upgrades = {}
+	self.dbd_clan = {}
+	self.dbd_clan.content = {}
+	self.dbd_clan.content.loot_drops = {}
 	self.dbd_clan_award = {}
 	self.dbd_clan_award.dlc = "has_dbd_clan"
 	self.dbd_clan_award.content = {}

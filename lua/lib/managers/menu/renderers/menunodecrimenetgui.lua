@@ -790,6 +790,27 @@ MenuNodeCrimenetContactInfoGui.MENU_WIDTH = 220
 MenuNodeCrimenetContactInfoGui.PADDING = 10
 MenuNodeCrimenetContactInfoGui.CODEX_TEXT_ID = "menu_contact_info_title"
 MenuNodeCrimenetContactInfoGui.SOUND_SOURCE_NAME = "MenuNodeCrimenetContactInfoGui"
+MenuNodeCrimenetContactInfoGui.FILE_ICONS_TEXTURE = "guis/textures/pd2/codex_pages"
+MenuNodeCrimenetContactInfoGui.FILE_ICONS = {
+	selected = {
+		0,
+		0,
+		17,
+		23
+	},
+	unselected = {
+		20,
+		0,
+		17,
+		23
+	},
+	locked = {
+		40,
+		0,
+		17,
+		23
+	}
+}
 
 function MenuNodeCrimenetContactInfoGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
@@ -807,25 +828,7 @@ function MenuNodeCrimenetContactInfoGui:init(node, layer, parameters)
 	if active_menu then
 		active_menu.input:set_force_input(true)
 	end
-	self._file_icons = {}
-	self._file_icons.selected = {
-		0,
-		0,
-		17,
-		23
-	}
-	self._file_icons.unselected = {
-		20,
-		0,
-		17,
-		23
-	}
-	self._file_icons.locked = {
-		40,
-		0,
-		17,
-		23
-	}
+	self._file_icons = self.FILE_ICONS
 	MenuNodeCrimenetContactInfoGui.super.init(self, node, layer, parameters)
 	managers.menu_component:disable_crimenet()
 	self:_setup_layout()
@@ -845,7 +848,7 @@ function MenuNodeCrimenetContactInfoGui:_setup_item_panel_parent(safe_rect, shap
 	MenuNodeCrimenetContactInfoGui.super._setup_item_panel_parent(self, safe_rect, shape)
 end
 
-function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, override_file)
+function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, override_file, sub_text)
 	self._files = files
 	local files_menu = self._files_menu
 	local num_files = #files
@@ -854,10 +857,11 @@ function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, overri
 		files_menu:set_h(26)
 		local size = files_menu:h() - 4
 		for i = 1, num_files do
+			local file_icons = self._files[i] and self._files[i].icon_rect or self._file_icons
 			local is_locked = self._files[i] and self:is_file_locked(self._files[i].lock)
-			local texture_rect = is_locked and self._file_icons.locked or self._file_icons.unselected
+			local texture_rect = is_locked and file_icons.locked or file_icons.unselected
 			files_menu:bitmap({
-				texture = "guis/textures/pd2/codex_pages",
+				texture = self._files[i] and self._files[i].icon or self.FILE_ICONS_TEXTURE,
 				texture_rect = texture_rect,
 				x = (i - 1) * 20,
 				y = 0,
@@ -871,10 +875,10 @@ function MenuNodeCrimenetContactInfoGui:set_contact_info(id, name, files, overri
 	local contact_desc_text = self._panel:child("contact_desc_text")
 	contact_desc_text:set_top(files_menu:bottom())
 	local contact_title_text = self._panel:child("contact_title_text")
-	contact_title_text:set_text(self._codex_text .. ": " .. name)
+	contact_title_text:set_text((sub_text or self._codex_text) .. ": " .. name)
 	make_fine_text(contact_title_text)
 	local contact_desc_title_text = self._panel:child("contact_desc_title_text")
-	contact_desc_title_text:set_text(self._codex_text .. ": " .. name)
+	contact_desc_title_text:set_text((sub_text or self._codex_text) .. ": " .. name)
 	make_fine_text(contact_desc_title_text)
 	self:set_file(override_file)
 	self._current_contact_info = id
@@ -884,6 +888,9 @@ function MenuNodeCrimenetContactInfoGui:set_empty()
 	local video_panel = self._panel:child("video_panel")
 	if video_panel and alive(video_panel:child("video")) then
 		video_panel:remove(video_panel:child("video"))
+	end
+	if video_panel and alive(video_panel:child("image")) then
+		video_panel:remove(video_panel:child("image"))
 	end
 	local contact_desc_text = self._panel:child("contact_desc_text")
 	contact_desc_text:set_text("")
@@ -908,8 +915,9 @@ end
 
 function MenuNodeCrimenetContactInfoGui:_set_file()
 	local file = self._files[self._current_file]
-	local desc_id = file.desc_lozalized
+	local desc_id = file.desc_localized
 	local video = file.videos and file.videos[math.random(#file.videos)]
+	local image = file.images and file.images[math.random(#file.images)]
 	local post_event = file.post_event
 	local lock = file.lock
 	local contact_desc_text = self._panel:child("contact_desc_text")
@@ -930,10 +938,32 @@ function MenuNodeCrimenetContactInfoGui:_set_file()
 			color = tweak_data.screen_colors.button_stage_2
 		})
 	end
+	if image then
+		local image_gui = video_panel:bitmap({
+			name = "image",
+			texture = image,
+			width = video_panel:w(),
+			height = video_panel:h(),
+			blend_mode = "add"
+		})
+		local texture_width = image_gui:texture_width()
+		local texture_height = image_gui:texture_height()
+		local panel_width = video_panel:w()
+		local panel_height = video_panel:h()
+		local tw = texture_width
+		local th = texture_height
+		local pw = panel_width
+		local ph = panel_height
+		local sw = math.min(pw, ph * (tw / th))
+		local sh = math.min(ph, pw / (tw / th))
+		image_gui:set_size(math.round(sw), math.round(sh))
+		image_gui:set_center(video_panel:w() * 0.5, video_panel:h() * 0.5)
+	end
 	local files_menu = self._files_menu
 	for i, file in ipairs(files_menu:children()) do
+		local file_icons = self._files[i] and self._files[i].icon_rect or self._file_icons
 		local is_locked = self:is_file_locked(self._files[i].lock)
-		local texture_rect = is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or self._file_icons.unselected
+		local texture_rect = is_locked and file_icons.locked or i == self._current_file and file_icons.selected or file_icons.unselected
 		file:set_texture_rect(unpack(texture_rect))
 	end
 end
@@ -991,8 +1021,9 @@ function MenuNodeCrimenetContactInfoGui:mouse_moved(o, x, y)
 	local highlighted_file
 	if alive(files_menu) then
 		for i, file in ipairs(files_menu:children()) do
-			local is_locked = self:is_file_locked(self._files[i] and self._files[i].lock)
-			local texture_rect = not self._file_icons or is_locked and self._file_icons.locked or i == self._current_file and self._file_icons.selected or file:inside(x, y) and self._file_icons.selected or self._file_icons.unselected
+			local file_icons = self._files[i] and self._files[i].icon_rect or self._file_icons
+			local is_locked = self._files[i] and self:is_file_locked(self._files[i].lock)
+			local texture_rect = file_icons and (is_locked and file_icons.locked or i == self._current_file and file_icons.selected or file:inside(x, y) and file_icons.selected or file_icons.unselected)
 			local texture_alpha = not self._file_alphas or is_locked and self._file_alphas.locked or i == self._current_file and self._file_alphas.selected or file:inside(x, y) and self._file_alphas.selected or self._file_alphas.unselected
 			if texture_rect then
 				file:set_texture_rect(unpack(texture_rect))

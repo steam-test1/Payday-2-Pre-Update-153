@@ -295,16 +295,32 @@ function HUDManager:add_item(data)
 	self:set_deployable_equipment(HUDManager.PLAYER_PANEL, data)
 end
 
+function HUDManager:add_item_from_string(data)
+	self:set_deployable_equipment_from_string(HUDManager.PLAYER_PANEL, data)
+end
+
 function HUDManager:set_deployable_equipment(i, data)
 	self._teammate_panels[i]:set_deployable_equipment(data)
+end
+
+function HUDManager:set_deployable_equipment_from_string(i, data)
+	self._teammate_panels[i]:set_deployable_equipment_from_string(data)
 end
 
 function HUDManager:set_item_amount(index, amount)
 	self:set_teammate_deployable_equipment_amount(HUDManager.PLAYER_PANEL, index, {amount = amount})
 end
 
+function HUDManager:set_item_amount_from_string(index, amount_str, amount)
+	self:set_teammate_deployable_equipment_amount_from_string(HUDManager.PLAYER_PANEL, index, {amount_str = amount_str, amount = amount})
+end
+
 function HUDManager:set_teammate_deployable_equipment_amount(i, index, data)
 	self._teammate_panels[i]:set_deployable_equipment_amount(index, data)
+end
+
+function HUDManager:set_teammate_deployable_equipment_amount_from_string(i, index, data)
+	self._teammate_panels[i]:set_deployable_equipment_amount_from_string(index, data)
 end
 
 function HUDManager:set_teammate_grenades(i, data)

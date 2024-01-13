@@ -1,10 +1,12 @@
 DoctorBagBase = DoctorBagBase or class(UnitBase)
+DoctorBagBase.amount_upgrade_lvl_shift = 2
+DoctorBagBase.damage_reduce_lvl_shift = 4
 
-function DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl, peer_id)
+function DoctorBagBase.spawn(pos, rot, bits, peer_id)
 	local unit_name = "units/payday2/equipment/gen_equipment_medicbag/gen_equipment_medicbag"
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, amount_upgrade_lvl, peer_id or 0)
-	unit:base():setup(amount_upgrade_lvl)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, bits, peer_id or 0)
+	unit:base():setup(bits)
 	return unit
 end
 
@@ -27,6 +29,7 @@ function DoctorBagBase:init(unit)
 		self._validate_clbk_id = "doctor_bag_validate" .. tostring(unit:key())
 		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
 	end
+	self._damage_reduction_upgrade = false
 end
 
 function DoctorBagBase:_clbk_validate()
@@ -37,16 +40,18 @@ function DoctorBagBase:_clbk_validate()
 	end
 end
 
-function DoctorBagBase:sync_setup(amount_upgrade_lvl, peer_id)
+function DoctorBagBase:sync_setup(bits, peer_id)
 	if self._validate_clbk_id then
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
 	managers.player:verify_equipment(peer_id, "doctor_bag")
-	self:setup(amount_upgrade_lvl)
+	self:setup(bits)
 end
 
-function DoctorBagBase:setup(amount_upgrade_lvl)
+function DoctorBagBase:setup(bits)
+	local amount_upgrade_lvl, dmg_reduction_lvl = self:_get_upgrade_levels(bits)
+	self._damage_reduction_upgrade = dmg_reduction_lvl ~= 0
 	self._amount = tweak_data.upgrades.doctor_bag_base + managers.player:upgrade_value_by_level("doctor_bag", "amount_increase", amount_upgrade_lvl)
 	self:_set_visual_stage()
 	if Network:is_server() and self._is_attachable then
@@ -111,6 +116,9 @@ function DoctorBagBase:take(unit)
 	if self._empty then
 		return
 	end
+	if self._damage_reduction_upgrade then
+		managers.player:activate_temporary_upgrade("temporary", "first_aid_damage_reduction")
+	end
 	local taken = self:_take(unit)
 	if 0 < taken then
 		unit:sound():play("pickup_ammo")
@@ -149,7 +157,7 @@ function DoctorBagBase:_take(unit)
 	unit:character_damage():recover_health()
 	local rally_skill_data = unit:movement():rally_skill_data()
 	if rally_skill_data then
-		rally_skill_data.morale_boost_delay_t = (managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_category_upgrade("player", "long_dis_revive")) and 0 or nil
+		rally_skill_data.morale_boost_delay_t = (managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_enabled_cooldown_upgrade("cooldown", "long_dis_revive")) and 0 or nil
 	end
 	return taken
 end
@@ -157,6 +165,12 @@ end
 function DoctorBagBase:_set_empty()
 	self._empty = true
 	self._unit:set_slot(0)
+end
+
+function DoctorBagBase:_get_upgrade_levels(bits)
+	local dmg_reduction = Bitwise:rshift(bits, DoctorBagBase.damage_reduce_lvl_shift)
+	local amount_lvl = Bitwise:rshift(bits, DoctorBagBase.amount_upgrade_lvl_shift) % 2 ^ DoctorBagBase.amount_upgrade_lvl_shift
+	return amount_lvl, dmg_reduction
 end
 
 function DoctorBagBase:save(data)

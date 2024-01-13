@@ -37,7 +37,7 @@ function PlayerEquipment:use_trip_mine()
 		managers.statistics:use_trip_mine()
 		local sensor_upgrade = managers.player:has_category_upgrade("trip_mine", "sensor_toggle")
 		if Network:is_client() then
-			managers.network:session():send_to_host("attach_device", ray.position, ray.normal, sensor_upgrade)
+			managers.network:session():send_to_host("place_trip_mine", ray.position, ray.normal, sensor_upgrade)
 		else
 			local rot = Rotation(ray.normal, math.UP)
 			local unit = TripMineBase.spawn(ray.position, rot, sensor_upgrade, managers.network:session():local_peer():id())
@@ -87,13 +87,11 @@ function PlayerEquipment:use_ammo_bag()
 		PlayerStandard.say_line(self, "s01x_plu")
 		managers.statistics:use_ammo_bag()
 		local ammo_upgrade_lvl = managers.player:upgrade_level("ammo_bag", "ammo_increase")
+		local bullet_storm_level = managers.player:upgrade_level("player", "no_ammo_cost")
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_deployable_bag", "AmmoBagBase", pos, rot, ammo_upgrade_lvl)
+			managers.network:session():send_to_host("place_ammo_bag", pos, rot, ammo_upgrade_lvl, bullet_storm_level)
 		else
-			local unit = AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, managers.network:session():local_peer():id())
-		end
-		if managers.player:has_category_upgrade("temporary", "no_ammo_cost") then
-			managers.player:activate_temporary_upgrade("temporary", "no_ammo_cost")
+			local unit = AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, managers.network:session():local_peer():id(), bullet_storm_level)
 		end
 		return true
 	end
@@ -111,11 +109,15 @@ function PlayerEquipment:use_doctor_bag()
 			managers.achievment:award_progress(tweak_data.achievement.no_we_cant.stat)
 		end
 		managers.statistics:use_doctor_bag()
+		local upgrade_lvl = managers.player:upgrade_level("first_aid_kit", "damage_reduction_upgrade")
 		local amount_upgrade_lvl = managers.player:upgrade_level("doctor_bag", "amount_increase")
+		upgrade_lvl = math.clamp(upgrade_lvl, 0, 2)
+		amount_upgrade_lvl = math.clamp(amount_upgrade_lvl, 0, 2)
+		local bits = Bitwise:lshift(upgrade_lvl, DoctorBagBase.damage_reduce_lvl_shift) + Bitwise:lshift(amount_upgrade_lvl, DoctorBagBase.amount_upgrade_lvl_shift)
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_deployable_bag", "DoctorBagBase", pos, rot, amount_upgrade_lvl)
+			managers.network:session():send_to_host("place_deployable_bag", "DoctorBagBase", pos, rot, bits)
 		else
-			local unit = DoctorBagBase.spawn(pos, rot, amount_upgrade_lvl, managers.network:session():local_peer():id())
+			local unit = DoctorBagBase.spawn(pos, rot, bits, managers.network:session():local_peer():id())
 		end
 		return true
 	end
@@ -131,10 +133,12 @@ function PlayerEquipment:use_first_aid_kit()
 		PlayerStandard.say_line(self, "s12")
 		managers.statistics:use_first_aid()
 		local upgrade_lvl = managers.player:has_category_upgrade("first_aid_kit", "damage_reduction_upgrade") and 1 or 0
+		local auto_recovery = managers.player:has_category_upgrade("first_aid_kit", "first_aid_kit_auto_recovery") and 1 or 0
+		local bits = Bitwise:lshift(auto_recovery, FirstAidKitBase.auto_recovery_shift) + Bitwise:lshift(upgrade_lvl, FirstAidKitBase.upgrade_lvl_shift)
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_deployable_bag", "FirstAidKitBase", pos, rot, upgrade_lvl)
+			managers.network:session():send_to_host("place_deployable_bag", "FirstAidKitBase", pos, rot, bits)
 		else
-			local unit = FirstAidKitBase.spawn(pos, rot, upgrade_lvl, managers.network:session():local_peer():id())
+			local unit = FirstAidKitBase.spawn(pos, rot, bits, managers.network:session():local_peer():id())
 		end
 		return true
 	end
@@ -258,12 +262,43 @@ function PlayerEquipment:valid_shape_placement(equipment_id, equipment_data)
 	return valid and ray
 end
 
-function PlayerEquipment:use_sentry_gun(selected_index)
+function PlayerEquipment:_can_place(eq_id)
+	if eq_id == "sentry_gun" then
+		local equipment_data = managers.player:selected_equipment()
+		if not equipment_data then
+			return false
+		end
+		local equipment_tweak_data = tweak_data.equipments[equipment_data.equipment]
+		if not equipment_tweak_data.min_ammo_cost then
+			return true
+		end
+		local current_weapon = managers.player:get_current_state():get_equipped_weapon()
+		if current_weapon:get_ammo_ratio_excluding_clip() < equipment_tweak_data.min_ammo_cost then
+			managers.hint:show_hint("sentry_not_enough_ammo_to_place")
+			return false
+		end
+	end
+	return true
+end
+
+function PlayerEquipment:_sentry_gun_ammo_cost()
+	local equipment_data = managers.player:selected_equipment()
+	if not equipment_data then
+		return
+	end
+	local equipment_tweak_data = tweak_data.equipments[equipment_data.equipment]
+	if not equipment_tweak_data.ammo_cost then
+		return
+	end
+	managers.player:remove_ammo_from_pool(math.min(equipment_tweak_data.ammo_cost * managers.player:upgrade_value("sentry_gun", "cost_reduction", 1), 0.99))
+end
+
+function PlayerEquipment:use_sentry_gun(selected_index, unit_idstring_index)
 	if self._sentrygun_placement_requested then
 		return
 	end
 	local ray = self:valid_shape_placement()
-	if ray then
+	if ray and self:_can_place("sentry_gun") then
 		local pos = ray.position
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
@@ -272,14 +307,17 @@ function PlayerEquipment:use_sentry_gun(selected_index)
 		local armor_multiplier = 1 + (managers.player:upgrade_value("sentry_gun", "armor_multiplier", 1) - 1) + (managers.player:upgrade_value("sentry_gun", "armor_multiplier2", 1) - 1)
 		local damage_multiplier = managers.player:upgrade_value("sentry_gun", "damage_multiplier", 1)
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_sentry_gun", pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, selected_index, self._unit)
+			managers.network:session():send_to_host("place_sentry_gun", pos, rot, selected_index, self._unit, unit_idstring_index)
 			self._sentrygun_placement_requested = true
 			return false
 		else
 			local shield = managers.player:has_category_upgrade("sentry_gun", "shield")
-			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, managers.network:session():local_peer():id(), false)
+			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, managers.network:session():local_peer():id(), false, unit_idstring_index)
 			if sentry_gun_unit then
-				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield)
+				self:_sentry_gun_ammo_cost()
+				local less_noisy = managers.player:has_category_upgrade("sentry_gun", "less_noisy")
+				local fire_rate_reduction = managers.player:upgrade_value("sentry_gun", "fire_rate_reduction", 1)
+				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield, damage_multiplier)
 			else
 				return false
 			end
@@ -365,6 +403,9 @@ function PlayerEquipment:use_duck()
 end
 
 function PlayerEquipment:from_server_sentry_gun_place_result()
+	if self._sentrygun_placement_requested then
+		self:_sentry_gun_ammo_cost()
+	end
 	self._sentrygun_placement_requested = nil
 end
 

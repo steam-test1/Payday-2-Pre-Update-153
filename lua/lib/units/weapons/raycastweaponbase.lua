@@ -14,6 +14,8 @@ local tmp_vec2 = Vector3()
 local tmp_rot1 = Rotation()
 RaycastWeaponBase = RaycastWeaponBase or class(UnitBase)
 RaycastWeaponBase.TRAIL_EFFECT = Idstring("effects/particles/weapons/weapon_trail")
+local MIN_KNOCK_BACK = 200
+local KNOCK_BACK_CHANCE = 0.8
 
 function RaycastWeaponBase:init(unit)
 	UnitBase.init(self, unit, false)
@@ -125,7 +127,7 @@ function RaycastWeaponBase:get_use_data(character_setup)
 	return self._use_data[character_setup]
 end
 
-function RaycastWeaponBase:setup(setup_data)
+function RaycastWeaponBase:setup(setup_data, damage_multiplier)
 	self._autoaim = setup_data.autoaim
 	local stats = tweak_data.weapon[self._name_id].stats
 	self._alert_events = setup_data.alert_AI and {} or nil
@@ -219,6 +221,14 @@ function RaycastWeaponBase:trigger_pressed(...)
 	return fired
 end
 
+function RaycastWeaponBase:is_single_shot()
+	return self:fire_mode() == "single" and self:weapon_tweak_data().category ~= "shotgun" and self:weapon_tweak_data().category ~= "pistol"
+end
+
+function RaycastWeaponBase:category()
+	return self:weapon_tweak_data().category
+end
+
 function RaycastWeaponBase:trigger_held(...)
 	local fired
 	if self._next_fire_allowed <= self._unit:timer():time() then
@@ -237,8 +247,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 			managers.player:activate_temporary_upgrade("temporary", "no_ammo_cost")
 		end
 	end
-	local consume_ammo = self:weapon_tweak_data().category == "grenade_launcher" or self:weapon_tweak_data().sub_category == "grenade_launcher"
-	consume_ammo = consume_ammo or not managers.player:has_activate_temporary_upgrade("temporary", "no_ammo_cost") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost"))
+	local consume_ammo = not managers.player:has_active_temporary_property("bullet_storm") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost"))
 	if consume_ammo then
 		local base = self.parent_weapon and self.parent_weapon:base() or self
 		if base:get_ammo_remaining_in_clip() == 0 then
@@ -723,6 +732,17 @@ function RaycastWeaponBase:set_ammo_total(ammo_total)
 	self._ammo_total = self:digest_value(ammo_total, true)
 end
 
+function RaycastWeaponBase:add_ammo_to_pool(ammo, index)
+	local max_ammo = self:get_ammo_max()
+	local current_ammo = self:get_ammo_total()
+	local new_ammo = current_ammo + ammo
+	if max_ammo < new_ammo then
+		new_ammo = max_ammo
+	end
+	self:set_ammo_total(new_ammo)
+	managers.hud:set_ammo_amount(index, self:ammo_info())
+end
+
 function RaycastWeaponBase:get_ammo_total()
 	return self._ammo_total and self:digest_value(self._ammo_total, false) or self:digest_value(self._ammo_total2, false)
 end
@@ -731,6 +751,32 @@ function RaycastWeaponBase:get_ammo_ratio()
 	local ammo_max = self:get_ammo_max()
 	local ammo_total = self:get_ammo_total()
 	return ammo_total / math.max(ammo_max, 1)
+end
+
+function RaycastWeaponBase:get_ammo_ratio_excluding_clip()
+	local ammo_in_clip = self:get_ammo_max_per_clip()
+	local max_ammo = self:get_ammo_max() - ammo_in_clip
+	local current_ammo = self:get_ammo_total() - ammo_in_clip
+	if current_ammo == 0 then
+		return 0
+	end
+	return current_ammo / max_ammo
+end
+
+function RaycastWeaponBase:get_max_ammo_excluding_clip()
+	local ammo_in_clip = self:get_ammo_max_per_clip()
+	local max_ammo = self:get_ammo_max() - ammo_in_clip
+	return max_ammo
+end
+
+function RaycastWeaponBase:remove_ammo_from_pool(percent)
+	local ammo_in_clip = self:get_ammo_max_per_clip()
+	local current_ammo = self:get_ammo_total() - ammo_in_clip
+	if 0 < current_ammo then
+		current_ammo = current_ammo * percent
+		current_ammo = math.floor(current_ammo)
+		self:set_ammo_total(ammo_in_clip + current_ammo)
+	end
 end
 
 function RaycastWeaponBase:set_ammo_remaining_in_clip(ammo_remaining_in_clip)
@@ -889,12 +935,6 @@ function RaycastWeaponBase:enter_steelsight_speed_multiplier()
 end
 
 function RaycastWeaponBase:fire_rate_multiplier()
-	local multiplier = managers.player:upgrade_value(self:weapon_tweak_data().category, "fire_rate_multiplier", 1)
-	if self:weapon_tweak_data().sub_category then
-		multiplier = multiplier * managers.player:upgrade_value(self:weapon_tweak_data().sub_category, "fire_rate_multiplier", 1)
-	end
-	multiplier = multiplier * managers.player:upgrade_value(self._name_id, "fire_rate_multiplier", 1)
-	return multiplier
 end
 
 function RaycastWeaponBase:upgrade_value(value, default)
@@ -928,6 +968,10 @@ end
 
 function RaycastWeaponBase:clip_full()
 	return self:get_ammo_remaining_in_clip() == self:get_ammo_max_per_clip()
+end
+
+function RaycastWeaponBase:clip_ratio()
+	return self:get_ammo_max_per_clip() / self:get_ammo_remaining_in_clip()
 end
 
 function RaycastWeaponBase:clip_empty()
@@ -1047,10 +1091,10 @@ function RaycastWeaponBase:reduce_ammo_by_procentage_of_total(ammo_procentage)
 	self:set_ammo_remaining_in_clip(math.round(math.min(ammo_after_reduction, ammo_remaining_in_clip)))
 end
 
-function RaycastWeaponBase:on_equip()
+function RaycastWeaponBase:on_equip(user_unit)
 end
 
-function RaycastWeaponBase:on_unequip()
+function RaycastWeaponBase:on_unequip(user_unit)
 end
 
 function RaycastWeaponBase:on_enabled()
@@ -1130,6 +1174,30 @@ InstantBulletBase = InstantBulletBase or class()
 
 function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank, no_sound)
 	local hit_unit = col_ray.unit
+	local shield_knock = false
+	local is_shield = hit_unit:in_slot(8) and alive(hit_unit:parent())
+	if is_shield and not hit_unit:parent():character_damage():is_immune_to_shield_knockback() and weapon_unit then
+		shield_knock = weapon_unit:base()._shield_knock
+		local dmg_ratio = math.min(damage, MIN_KNOCK_BACK)
+		dmg_ratio = dmg_ratio / MIN_KNOCK_BACK + 1
+		local rand = math.random() * dmg_ratio
+		if rand > KNOCK_BACK_CHANCE then
+			local enemy_unit = hit_unit:parent()
+			if shield_knock and enemy_unit:character_damage() then
+				local damage_info = {
+					type = "shield_knock",
+					variant = "melee",
+					col_ray = col_ray,
+					result = {
+						type = "shield_knock",
+						variant = "melee"
+					},
+					damage = 0
+				}
+				enemy_unit:character_damage():_call_listeners(damage_info)
+			end
+		end
+	end
 	local play_impact_flesh = not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood
 	if hit_unit:damage() and managers.network:session() and col_ray.body:extension() and col_ray.body:extension().damage then
 		local sync_damage = not blank and hit_unit:id() ~= -1
@@ -1149,7 +1217,8 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 	local result
 	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
 		local is_alive = not hit_unit:character_damage():dead()
-		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage)
+		local knock_down = weapon_unit:base()._knock_down and 0 < weapon_unit:base()._knock_down and math.random() < weapon_unit:base()._knock_down
+		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage, weapon_unit:base()._use_armor_piercing, false, knock_down, weapon_unit:base()._stagger)
 		if result ~= "friendly_fire" then
 			local is_dead = hit_unit:character_damage():dead()
 			local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
@@ -1192,7 +1261,7 @@ function InstantBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
 	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_sound = no_sound})
 end
 
-function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing)
+function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing, shield_knock, knock_down, stagger)
 	local action_data = {}
 	action_data.variant = "bullet"
 	action_data.damage = damage
@@ -1200,6 +1269,13 @@ function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, d
 	action_data.attacker_unit = user_unit
 	action_data.col_ray = col_ray
 	action_data.armor_piercing = armor_piercing
+	action_data.shield_knock = shield_knock
+	action_data.origin = user_unit:position()
+	action_data.knock_down = knock_down
+	if weapon_unit:base().get_add_head_shot_mul then
+		action_data.add_head_shot_mul = weapon_unit:base():get_add_head_shot_mul()
+	end
+	action_data.stagger = stagger
 	local defense_data = col_ray.unit:character_damage():damage_bullet(action_data)
 	return defense_data
 end

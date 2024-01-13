@@ -105,11 +105,13 @@ function CopLogicTrade.exit(data, new_logic_name, enter_params)
 	data.unit:network():send("set_unit_invulnerable", false)
 end
 
-function CopLogicTrade.on_trade(data, trading_unit)
+function CopLogicTrade.on_trade(data, pos, rotation, free_criminal)
 	if not data.internal_data._trade_enabled then
 		return
 	end
-	managers.trade:on_hostage_traded(trading_unit)
+	if free_criminal then
+		managers.trade:on_hostage_traded(pos, rotation)
+	end
 	data.internal_data._trade_enabled = false
 	data.unit:network():send("hostage_trade", false, true)
 	CopLogicTrade.hostage_trade(data.unit, false, true)

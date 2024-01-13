@@ -29,6 +29,7 @@ require("lib/tweak_data/PrePlanningTweakData")
 require("lib/tweak_data/InteractionTweakData")
 require("lib/tweak_data/VehicleTweakData")
 require("lib/tweak_data/EconomyTweakData")
+require("lib/tweak_data/EnvEffectTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -357,6 +358,7 @@ function TweakData:init()
 	self.vehicle = VehicleTweakData:new(self)
 	self.economy = EconomyTweakData:new(self)
 	self._init_wip_economy(self.economy, self)
+	self.env_effect = EnvEffectTweakData:new()
 	self.criminals = {}
 	self.criminals.character_names = {
 		"russian",
@@ -2822,7 +2824,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
 	self.achievement.job_list.events = {"nail"}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self.achievement.job_list.bain, "roberts")
 	end
 	local jobs = {}
@@ -3906,9 +3908,10 @@ Play the full version soon to get your full PAYDAY!]],
 	self.casino.infamous_chance = 3
 	self.projectiles = {}
 	self.projectiles.frag = {}
-	self.projectiles.frag.damage = 30
+	self.projectiles.frag.damage = 60
+	self.projectiles.frag.curve_pow = 0.1
 	self.projectiles.frag.player_damage = 10
-	self.projectiles.frag.range = 1000
+	self.projectiles.frag.range = 500
 	self.projectiles.frag.name_id = "bm_grenade_frag"
 	self.projectiles.launcher_frag = {}
 	self.projectiles.launcher_frag.damage = 34
@@ -3941,7 +3944,7 @@ Play the full version soon to get your full PAYDAY!]],
 		dot_tick_period = 0.5
 	}
 	self.projectiles.molotov.range = 75
-	self.projectiles.molotov.burn_duration = 20
+	self.projectiles.molotov.burn_duration = 10
 	self.projectiles.molotov.burn_tick_period = 0.5
 	self.projectiles.molotov.sound_event = "molotov_impact"
 	self.projectiles.molotov.sound_event_impact_duration = 4
@@ -3992,9 +3995,10 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.west_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.west_arrow_exp.remove_on_impact = true
 	self.projectiles.dynamite = {}
-	self.projectiles.dynamite.damage = 30
+	self.projectiles.dynamite.damage = 60
+	self.projectiles.dynamite.curve_pow = 0.1
 	self.projectiles.dynamite.player_damage = 10
-	self.projectiles.dynamite.range = 1000
+	self.projectiles.dynamite.range = 500
 	self.projectiles.dynamite.name_id = "bm_grenade_frag"
 	self.projectiles.dynamite.effect_name = "effects/payday2/particles/explosions/dynamite_explosion"
 	self.projectiles.bow_poison_arrow = deep_clone(self.projectiles.west_arrow)
@@ -4087,6 +4091,22 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.long_arrow_exp.damage = 85
 	self.projectiles.long_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.long_arrow_exp.remove_on_impact = true
+	self.projectiles.wpn_prj_hur = {}
+	self.projectiles.wpn_prj_hur.damage = 10
+	self.projectiles.wpn_prj_hur.launch_speed = 1000
+	self.projectiles.wpn_prj_hur.adjust_z = 120
+	self.projectiles.wpn_prj_hur.mass_look_up_modifier = 1
+	self.projectiles.wpn_prj_hur.name_id = "bm_prj_hur"
+	self.projectiles.wpn_prj_hur.push_at_body_index = "dynamic_body_spinn"
+	self.projectiles.wpn_prj_hur.sounds = {}
+	self.projectiles.wpn_prj_hur.sounds.flyby = "throwing_star_flyby"
+	self.projectiles.wpn_prj_hur.sounds.flyby_stop = "throwing_star_flyby_stop"
+	self.projectiles.wpn_prj_hur.sounds.impact = "throwables_impact_gen"
+	self.projectiles.frag_com = {}
+	self.projectiles.frag_com.damage = 60
+	self.projectiles.frag_com.curve_pow = 0.1
+	self.projectiles.frag_com.range = 1000
+	self.projectiles.frag_com.name_id = "bm_grenade_frag_com"
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

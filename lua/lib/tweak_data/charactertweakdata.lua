@@ -150,7 +150,7 @@ function CharacterTweakData:_init_gensec(presets)
 	self.gensec.crouch_move = nil
 	self.gensec.surrender_break_time = {20, 30}
 	self.gensec.suppression = presets.suppression.hard
-	self.gensec.surrender = presets.surrender.hard
+	self.gensec.surrender = presets.surrender.easy
 	self.gensec.ecm_vulnerability = 1
 	self.gensec.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -182,7 +182,7 @@ function CharacterTweakData:_init_cop(presets)
 	self.cop.move_speed = presets.move_speed.normal
 	self.cop.surrender_break_time = {10, 15}
 	self.cop.suppression = presets.suppression.easy
-	self.cop.surrender = presets.surrender.normal
+	self.cop.surrender = presets.surrender.easy
 	self.cop.ecm_vulnerability = 1
 	self.cop.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -211,7 +211,7 @@ function CharacterTweakData:_init_fbi(presets)
 	self.fbi.move_speed = presets.move_speed.very_fast
 	self.fbi.surrender_break_time = {7, 12}
 	self.fbi.suppression = presets.suppression.hard_def
-	self.fbi.surrender = presets.surrender.normal
+	self.fbi.surrender = presets.surrender.easy
 	self.fbi.ecm_vulnerability = 1
 	self.fbi.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -239,7 +239,7 @@ function CharacterTweakData:_init_swat(presets)
 	self.swat.move_speed = presets.move_speed.fast
 	self.swat.surrender_break_time = {6, 10}
 	self.swat.suppression = presets.suppression.hard_agg
-	self.swat.surrender = presets.surrender.hard
+	self.swat.surrender = presets.surrender.easy
 	self.swat.ecm_vulnerability = 1
 	self.swat.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -269,7 +269,7 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.move_speed = presets.move_speed.fast
 	self.heavy_swat.surrender_break_time = {6, 8}
 	self.heavy_swat.suppression = presets.suppression.hard_agg
-	self.heavy_swat.surrender = presets.surrender.hard
+	self.heavy_swat.surrender = presets.surrender.easy
 	self.heavy_swat.ecm_vulnerability = 1
 	self.heavy_swat.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -296,7 +296,7 @@ function CharacterTweakData:_init_fbi_swat(presets)
 	self.fbi_swat.move_speed = presets.move_speed.very_fast
 	self.fbi_swat.surrender_break_time = {6, 10}
 	self.fbi_swat.suppression = presets.suppression.hard_def
-	self.fbi_swat.surrender = presets.surrender.hard
+	self.fbi_swat.surrender = presets.surrender.easy
 	self.fbi_swat.ecm_vulnerability = 1
 	self.fbi_swat.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -325,7 +325,7 @@ function CharacterTweakData:_init_fbi_heavy_swat(presets)
 	self.fbi_heavy_swat.move_speed = presets.move_speed.fast
 	self.fbi_heavy_swat.surrender_break_time = {6, 8}
 	self.fbi_heavy_swat.suppression = presets.suppression.hard_agg
-	self.fbi_heavy_swat.surrender = presets.surrender.hard
+	self.fbi_heavy_swat.surrender = presets.surrender.easy
 	self.fbi_heavy_swat.ecm_vulnerability = 1
 	self.fbi_heavy_swat.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -352,7 +352,7 @@ function CharacterTweakData:_init_city_swat(presets)
 	self.city_swat.move_speed = presets.move_speed.very_fast
 	self.city_swat.surrender_break_time = {6, 10}
 	self.city_swat.suppression = presets.suppression.hard_def
-	self.city_swat.surrender = presets.surrender.hard
+	self.city_swat.surrender = presets.surrender.easy
 	self.city_swat.ecm_vulnerability = 1
 	self.city_swat.ecm_hurts = {
 		ears = {min_duration = 8, max_duration = 10}
@@ -837,7 +837,7 @@ function CharacterTweakData:_init_tank(presets)
 	self:_process_weapon_usage_table(self.tank.weapon)
 	self.tank.detection = presets.detection.normal
 	self.tank.HEALTH_INIT = 550
-	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
+	self.tank.headshot_dmg_mul = self.tank.HEALTH_INIT / 40
 	self.tank.damage.explosion_damage_mul = 1
 	self.tank.move_speed = presets.move_speed.very_slow
 	self.tank.allowed_stances = {cbt = true}
@@ -880,6 +880,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.use_animation_on_fire_damage = false
 	self.tank.flammable = true
 	self.tank.can_be_tased = false
+	self.tank.immune_to_knock_down = true
 	self.tank_hw = deep_clone(self.tank)
 	self.tank_hw.move_speed = {
 		stand = {
@@ -941,7 +942,7 @@ function CharacterTweakData:_init_tank(presets)
 		}
 	}
 	self.tank_hw.HEALTH_INIT = 1100
-	self.tank_hw.headshot_dmg_mul = self.tank.HEALTH_INIT / 24
+	self.tank_hw.headshot_dmg_mul = self.tank.HEALTH_INIT / 40
 	self.tank_hw.damage.explosion_damage_mul = 1
 	self.tank_hw.use_animation_on_fire_damage = false
 	self.tank_hw.flammable = true
@@ -1060,7 +1061,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 700,
 			acc = {0.5, 0.75},
-			dmg_mul = 3,
+			dmg_mul = 3.5,
 			recoil = {0.35, 0.55},
 			mode = {
 				0.2,
@@ -1072,7 +1073,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 1000,
 			acc = {0.45, 0.65},
-			dmg_mul = 2,
+			dmg_mul = 3,
 			recoil = {0.35, 0.55},
 			mode = {
 				0.2,
@@ -1084,7 +1085,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 2000,
 			acc = {0.3, 0.5},
-			dmg_mul = 2,
+			dmg_mul = 3,
 			recoil = {0.35, 1.2},
 			mode = {
 				2,
@@ -1096,7 +1097,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 3000,
 			acc = {0.1, 0.25},
-			dmg_mul = 1,
+			dmg_mul = 2,
 			recoil = {0.35, 1.5},
 			mode = {
 				6,
@@ -1137,7 +1138,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 700,
 			acc = {0.5, 0.8},
-			dmg_mul = 1.5,
+			dmg_mul = 3,
 			recoil = {0.35, 0.55},
 			mode = {
 				1,
@@ -1149,7 +1150,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 1000,
 			acc = {0.4, 0.6},
-			dmg_mul = 1.25,
+			dmg_mul = 2.5,
 			recoil = {0.35, 0.55},
 			mode = {
 				1,
@@ -1161,7 +1162,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 2000,
 			acc = {0.15, 0.5},
-			dmg_mul = 1,
+			dmg_mul = 2,
 			recoil = {0.35, 0.75},
 			mode = {
 				1,
@@ -1173,7 +1174,7 @@ function CharacterTweakData:_init_shield(presets)
 		{
 			r = 3000,
 			acc = {0, 0.25},
-			dmg_mul = 1,
+			dmg_mul = 2,
 			recoil = {0.35, 1.5},
 			mode = {
 				1,
@@ -1208,6 +1209,7 @@ function CharacterTweakData:_init_phalanx_minion(presets)
 	self.phalanx_minion.damage.explosion_damage_mul = 6
 	self.phalanx_minion.damage.hurt_severity = presets.hurt_severities.no_hurts_no_tase
 	self.phalanx_minion.damage.shield_knocked = false
+	self.phalanx_minion.damage.immune_to_knockback = true
 	self.phalanx_minion.ecm_vulnerability = nil
 	self.phalanx_minion.ecm_hurts = {}
 	self.phalanx_minion.priority_shout = "f45"
@@ -1399,6 +1401,7 @@ function CharacterTweakData:_init_civilian(presets)
 	self.civilian.intimidateable = true
 	self.civilian.challenges = {type = "civilians"}
 	self.civilian.calls_in = true
+	self.civilian.hostage_move_speed = 1.25
 	self.civilian_female = deep_clone(self.civilian)
 	self.civilian_female.speech_prefix_p1 = "cf"
 	self.civilian_female.speech_prefix_count = 5
@@ -5392,25 +5395,25 @@ function CharacterTweakData:_presets(tweak_data)
 	end
 	presets.surrender = {}
 	presets.surrender.easy = {
-		base_chance = 0.75,
-		significant_chance = 0.1,
+		base_chance = 0.3,
+		significant_chance = 0.35,
 		violence_timeout = 2,
 		reasons = {
 			health = {
-				[1] = 0.2,
-				[0.3] = 1
+				[1] = 0.1,
+				[0.9] = 0.4
 			},
-			weapon_down = 0.8,
+			weapon_down = 0.5,
 			pants_down = 1,
-			isolated = 0.1
+			isolated = 0.08
 		},
 		factors = {
-			flanked = 0.07,
-			unaware_of_aggressor = 0.08,
-			enemy_weap_cold = 0.15,
+			flanked = 0.05,
+			unaware_of_aggressor = 0.1,
+			enemy_weap_cold = 0.11,
 			aggressor_dis = {
-				[1000] = 0.02,
-				[300] = 0.15
+				[1000] = 0,
+				[300] = 0.2
 			}
 		}
 	}

@@ -105,7 +105,8 @@ function PlayerBase:_chk_set_unit_upgrades()
 			managers.network:session():send_to_host("sync_upgrade", "player", "drill_alert_rad", 1)
 		end
 		if managers.player:has_category_upgrade("player", "drill_autorepair") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair", 1)
+			local level = managers.player:upgrade_level("player", "drill_autorepair")
+			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair", level)
 		end
 		if managers.player:has_category_upgrade("player", "intimidate_enemies") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "intimidate_enemies", 1)
@@ -163,6 +164,24 @@ function PlayerBase:_chk_set_unit_upgrades()
 		end
 		if managers.player:has_category_upgrade("sentry_gun", "shield") then
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "shield", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "extra_ammo_multiplier") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "extra_ammo_multiplier", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "armor_multiplier") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_multiplier", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "armor_multiplier2") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_multiplier2", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "damage_multiplier") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "damage_multiplier", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "less_noisy") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "less_noisy", 1)
+		end
+		if managers.player:has_category_upgrade("sentry_gun", "fire_rate_reduction") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "fire_rate_reduction", 1)
 		end
 		if managers.player:has_category_upgrade("ecm_jammer", "affects_cameras") then
 			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "affects_cameras", 1)

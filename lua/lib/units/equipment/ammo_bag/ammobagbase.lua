@@ -1,11 +1,12 @@
 AmmoBagBase = AmmoBagBase or class(UnitBase)
+AmmoBagBase._BULLET_STORM = {2.5, 10}
 local dec_mul = 10000
+local unit_name = "units/payday2/equipment/gen_equipment_ammobag/gen_equipment_ammobag"
 
-function AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, peer_id)
-	local unit_name = "units/payday2/equipment/gen_equipment_ammobag/gen_equipment_ammobag"
+function AmmoBagBase.spawn(pos, rot, ammo_upgrade_lvl, peer_id, bullet_storm_level)
 	local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, ammo_upgrade_lvl, peer_id or 0)
-	unit:base():setup(ammo_upgrade_lvl)
+	managers.network:session():send_to_peers_synched("sync_ammo_bag_setup", unit, ammo_upgrade_lvl, peer_id or 0, bullet_storm_level)
+	unit:base():setup(ammo_upgrade_lvl, bullet_storm_level)
 	return unit
 end
 
@@ -22,6 +23,7 @@ function AmmoBagBase:init(unit)
 	UnitBase.init(self, unit, false)
 	self._unit = unit
 	self._is_attachable = true
+	self._bullet_storm_level = 0
 	self._max_ammo_amount = tweak_data.upgrades.ammo_bag_base + managers.player:upgrade_value_by_level("ammo_bag", "ammo_increase", 1)
 	self._unit:sound_source():post_event("ammo_bag_drop")
 	if Network:is_client() then
@@ -38,16 +40,17 @@ function AmmoBagBase:_clbk_validate()
 	end
 end
 
-function AmmoBagBase:sync_setup(ammo_upgrade_lvl, peer_id)
+function AmmoBagBase:sync_setup(ammo_upgrade_lvl, peer_id, bullet_storm_level)
 	if self._validate_clbk_id then
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
 	managers.player:verify_equipment(peer_id, "ammo_bag")
-	self:setup(ammo_upgrade_lvl)
+	self:setup(ammo_upgrade_lvl, bullet_storm_level)
 end
 
-function AmmoBagBase:setup(ammo_upgrade_lvl)
+function AmmoBagBase:setup(ammo_upgrade_lvl, bullet_storm_level)
+	self._bullet_storm_level = bullet_storm_level
 	self._ammo_amount = tweak_data.upgrades.ammo_bag_base + managers.player:upgrade_value_by_level("ammo_bag", "ammo_increase", ammo_upgrade_lvl)
 	self:_set_visual_stage()
 	if Network:is_server() and self._is_attachable then
@@ -125,7 +128,11 @@ function AmmoBagBase:take_ammo(unit)
 	else
 		self:_set_visual_stage()
 	end
-	return 0 < taken
+	local bullet_storm = false
+	if self._bullet_storm_level and 0 < self._bullet_storm_level then
+		bullet_storm = self._BULLET_STORM[self._bullet_storm_level] * taken
+	end
+	return 0 < taken, bullet_storm
 end
 
 function AmmoBagBase:_set_visual_stage()
@@ -175,12 +182,14 @@ function AmmoBagBase:save(data)
 	local state = {}
 	state.ammo_amount = self._ammo_amount
 	state.is_dynamic = self._is_dynamic
+	state.bullet_storm_level = self._bullet_storm_level
 	data.AmmoBagBase = state
 end
 
 function AmmoBagBase:load(data)
 	local state = data.AmmoBagBase
 	self._ammo_amount = state.ammo_amount
+	self._bullet_storm_level = state.bullet_storm_level
 	if state.is_dynamic then
 		self:_set_dynamic()
 	end

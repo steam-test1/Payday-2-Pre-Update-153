@@ -186,7 +186,9 @@ end
 
 function MenuCallbackHandler:leave_blackmarket(item)
 	self:_leave_blackmarket()
-	managers.blackmarket:remove_all_new_drop()
+	if managers.blackmarket:remove_all_new_drop() then
+		managers.savefile:save_progress()
+	end
 end
 
 function MenuCallbackHandler:_leave_blackmarket()
@@ -341,7 +343,7 @@ end
 
 function MenuCallbackHandler:_update_outfit_information()
 	local outfit_string = managers.blackmarket:outfit_string()
-	if self:is_win32() then
+	if self:is_steam() then
 		Steam:set_rich_presence("outfit", outfit_string)
 	end
 	if managers.network:session() then
@@ -843,11 +845,13 @@ function MenuCrimeNetInitiator:refresh_node(node)
 	end
 	local online = {}
 	local offline = {}
-	for _, user in ipairs(Steam:friends()) do
-		if math.random(2) == 1 and user:state() == "online" or user:state() == "away" then
-			table.insert(online, user)
-		else
-			table.insert(offline, user)
+	if SystemInfo:distribution() == Idstring("STEAM") then
+		for _, user in ipairs(Steam:friends()) do
+			if math.random(2) == 1 and user:state() == "online" or user:state() == "away" then
+				table.insert(online, user)
+			else
+				table.insert(offline, user)
+			end
 		end
 	end
 	node:delete_item("online")
@@ -902,8 +906,6 @@ function MenuCrimeNetInitiator:refresh_node(node)
 		local new_item = node:create_item(nil, params)
 		node:add_item(new_item)
 	end
-	for name, _ in pairs(dead_list) do
-	end
 	managers.menu:add_back_button(node)
 	return node
 end
@@ -935,7 +937,9 @@ function MenuManager:show_buy_weapon(params, weapon, cost)
 end
 
 function MenuCallbackHandler:on_visit_crimefest_challenges()
-	Steam:overlay_activate("url", tweak_data.gui.crimefest_challenges_webpage)
+	if SystemInfo:distribution() == Idstring("STEAM") then
+		Steam:overlay_activate("url", tweak_data.gui.crimefest_challenges_webpage)
+	end
 end
 
 function MenuCallbackHandler:got_new_steam_lootdrop(item)
@@ -952,15 +956,17 @@ function MenuCallbackHandler:can_toggle_chat()
 end
 
 function MenuCallbackHandler:on_visit_fbi_files()
-	if MenuCallbackHandler:is_overlay_enabled() then
-		Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
-	else
-		managers.menu:show_enable_steam_overlay()
+	if SystemInfo:distribution() == Idstring("STEAM") then
+		if MenuCallbackHandler:is_overlay_enabled() then
+			Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
+		else
+			managers.menu:show_enable_steam_overlay()
+		end
 	end
 end
 
 function MenuCallbackHandler:on_visit_fbi_files_suspect(item)
-	if item then
+	if item and SystemInfo:distribution() == Idstring("STEAM") then
 		if MenuCallbackHandler:is_overlay_enabled() then
 			Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. (item and "/suspect/" .. item:name() .. "/" or ""))
 		else

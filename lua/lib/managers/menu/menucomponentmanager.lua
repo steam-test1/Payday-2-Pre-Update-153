@@ -16,6 +16,7 @@ require("lib/managers/menu/PrePlanningMapGui")
 require("lib/managers/menu/GameInstallingGui")
 require("lib/managers/menu/PlayerInventoryGui")
 require("lib/managers/hud/HUDLootScreen")
+require("lib/managers/menu/SkillTreeGuiNew")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -155,6 +156,10 @@ function MenuComponentManager:init()
 	self._active_components.inventory = {
 		create = callback(self, self, "create_inventory_gui"),
 		close = callback(self, self, "close_inventory_gui")
+	}
+	self._active_components.skilltree_new = {
+		create = callback(self, self, "_create_skilltree_new_gui"),
+		close = callback(self, self, "close_skilltree_new_gui")
 	}
 end
 
@@ -1829,6 +1834,25 @@ function MenuComponentManager:close_contract_gui()
 	end
 end
 
+function MenuComponentManager:_create_skilltree_new_gui(node)
+	self:create_skilltree_new_gui(node)
+end
+
+function MenuComponentManager:create_skilltree_new_gui(node)
+	self:close_skilltree_new_gui()
+	self._skilltree_gui = NewSkillTreeGui:new(self._ws, self._fullscreen_ws, node)
+	self._new_skilltree_gui_active = true
+	self:enable_skilltree_gui()
+end
+
+function MenuComponentManager:close_skilltree_new_gui()
+	if self._skilltree_gui and not self._old_skilltree_gui_active then
+		self._skilltree_gui:close()
+		self._skilltree_gui = nil
+		self._new_skilltree_gui_active = nil
+	end
+end
+
 function MenuComponentManager:_create_skilltree_gui(node)
 	self:create_skilltree_gui(node)
 end
@@ -1836,13 +1860,15 @@ end
 function MenuComponentManager:create_skilltree_gui(node)
 	self:close_skilltree_gui()
 	self._skilltree_gui = SkillTreeGui:new(self._ws, self._fullscreen_ws, node)
+	self._old_skilltree_gui_active = true
 	self:enable_skilltree_gui()
 end
 
 function MenuComponentManager:close_skilltree_gui()
-	if self._skilltree_gui then
+	if self._skilltree_gui and not self._new_skilltree_gui_active then
 		self._skilltree_gui:close()
 		self._skilltree_gui = nil
+		self._old_skilltree_gui_active = nil
 	end
 end
 
@@ -1861,12 +1887,6 @@ end
 function MenuComponentManager:on_tier_unlocked(...)
 	if self._skilltree_gui then
 		self._skilltree_gui:on_tier_unlocked(...)
-	end
-end
-
-function MenuComponentManager:on_skill_unlocked(...)
-	if self._skilltree_gui then
-		self._skilltree_gui:on_skill_unlocked(...)
 	end
 end
 

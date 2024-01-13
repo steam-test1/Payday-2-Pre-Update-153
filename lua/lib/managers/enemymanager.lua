@@ -709,6 +709,21 @@ function EnemyManager:on_simulation_started()
 	self._destroyed = nil
 end
 
+function EnemyManager:get_my_hostages(id)
+	local civilians = self:all_civilians()
+	local all_hostages = managers.groupai:state():all_hostages()
+	local all_enemies = self:all_enemies()
+	local list = {}
+	for _, h_key in ipairs(all_hostages) do
+		local civ = civilians[h_key]
+		local hostage = civ or all_enemies[h_key]
+		if hostage and hostage.unit and hostage.unit:brain() and hostage.unit:brain()._logic_data and hostage.unit:brain()._logic_data.internal_data and id == hostage.unit:brain()._logic_data.internal_data.aggressor_id then
+			table.insert(list, hostage)
+		end
+	end
+	return list
+end
+
 function EnemyManager:dispose_all_corpses()
 	self._destroyed = true
 	while true do

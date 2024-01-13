@@ -633,7 +633,7 @@ function ChatGui:enter_key_callback()
 	if command_key and command_list[command_key:key()] then
 		if command_key == Idstring("ready") then
 			managers.menu_component:on_ready_pressed_mission_briefing_gui()
-		elseif SystemInfo:platform() == Idstring("WIN32") then
+		elseif SystemInfo:distribution() == Idstring("STEAM") then
 			if command_key == Idstring("fbi_files") then
 				Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage)
 			elseif command_key == Idstring("fbi_search") then

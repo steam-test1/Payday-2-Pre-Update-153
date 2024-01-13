@@ -2101,7 +2101,7 @@ function NarrativeTweakData:init()
 		70000,
 		140000
 	}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self.jobs.roberts = {}
 		self.jobs.roberts.name_id = "heist_roberts"
 		self.jobs.roberts.briefing_id = "heist_roberts_crimenet"
@@ -3105,7 +3105,10 @@ function NarrativeTweakData:init()
 		}
 	}
 	self.jobs.kenaz.briefing_event = "dentist_ca1_cbf_01"
-	self.jobs.kenaz.debrief_event = "nul"
+	self.jobs.kenaz.debrief_event = {
+		"dentist_ca1_debrief_01",
+		"dentist_ca1_debrief_02"
+	}
 	self.jobs.kenaz.intro_event = {
 		"Play_pln_ca1_intro_01",
 		"Play_pln_ca1_intro_02"
@@ -3909,7 +3912,7 @@ function NarrativeTweakData:init()
 		"mad",
 		"dark"
 	}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")
 	end
 	self:set_job_wrappers()
@@ -3985,7 +3988,7 @@ function NarrativeTweakData:create_job_name(job_id, skip_professional)
 	local job_tweak = self:job_data(job_id)
 	local text_id = managers.localization:to_upper_text(job_tweak.name_id)
 	if job_tweak.dlc and tweak_data.dlc[job_tweak.dlc] and not tweak_data.dlc[job_tweak.dlc].free then
-		local pro_text = "  " .. (job_tweak.dlc == "pd2_clan" and (SystemInfo:platform() == Idstring("WIN32") and managers.localization:to_upper_text("cn_menu_community") or "") or managers.localization:to_upper_text("cn_menu_dlc"))
+		local pro_text = "  " .. (job_tweak.dlc == "pd2_clan" and (SystemInfo:distribution() == Idstring("STEAM") and managers.localization:to_upper_text("cn_menu_community") or "") or managers.localization:to_upper_text("cn_menu_dlc"))
 		local s_len = utf8.len(text_id)
 		text_id = text_id .. pro_text
 		local e_len = utf8.len(text_id)

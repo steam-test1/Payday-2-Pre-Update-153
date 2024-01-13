@@ -188,10 +188,13 @@ function TeamAIDamage:damage_fire(attack_data)
 		return
 	end
 	local attacker_unit = attack_data.attacker_unit
-	if attacker_unit and attacker_unit:base() and attacker_unit:base().thrower_unit then
+	if attacker_unit and alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().thrower_unit then
 		attacker_unit = attacker_unit:base():thrower_unit()
 	end
-	if PlayerDamage.is_friendly_fire(self, attacker_unit) then
+	if attacker_unit and not alive(attacker_unit) then
+		return
+	end
+	if attacker_unit and alive(attacker_unit) and PlayerDamage.is_friendly_fire(self, attacker_unit) then
 		self:friendly_fire_hit()
 		return
 	end

@@ -1543,7 +1543,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.champion_dallas.dlc = nil
 	self.masks.champion_dallas.texture_bundle_folder = "pd2_hw_boxing"
 	self.masks.champion_dallas.sort_number = 10
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self.masks.area51 = {}
 		self.masks.area51.unit = "units/pd2_dlc_alienware/masks/area51/msk_area51"
 		self.masks.area51.name_id = "bm_msk_area51"
@@ -2589,14 +2589,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.mad_mask.value = 0
 	self.masks.mad_mask.texture_bundle_folder = "mad"
 	self.masks.mad_mask.sort_number = 17
-	self.masks.dbd_04 = {}
-	self.masks.dbd_04.unit = "units/pd2_dlc_boo/masks/dbd_04/msk_boo_dbd_04"
-	self.masks.dbd_04.name_id = "bm_msk_dbd_00"
-	self.masks.dbd_04.pcs = {}
-	self.masks.dbd_04.value = 0
-	self.masks.dbd_04.texture_bundle_folder = "boo"
-	self.masks.dbd_04.dlc = "dbd_clan"
-	self.masks.dbd_04.sort_number = 18
 	self.masks.dbd_01 = {}
 	self.masks.dbd_01.unit = "units/pd2_dlc_boo_1/masks/msk_dbd_01"
 	self.masks.dbd_01.name_id = "bm_msk_dbd_01"
@@ -2606,6 +2598,14 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.dbd_01.texture_bundle_folder = "boo_1"
 	self.masks.dbd_01.dlc = "dbd_clan"
 	self.masks.dbd_01.sort_number = 19
+	self.masks.dbd_04 = {}
+	self.masks.dbd_04.unit = "units/pd2_dlc_boo/masks/dbd_04/msk_boo_dbd_04"
+	self.masks.dbd_04.name_id = "bm_msk_dbd_00"
+	self.masks.dbd_04.pcs = {}
+	self.masks.dbd_04.value = 0
+	self.masks.dbd_04.texture_bundle_folder = "boo"
+	self.masks.dbd_04.dlc = "dbd_clan"
+	self.masks.dbd_04.sort_number = 18
 	self.masks.dbd_slasher = {}
 	self.masks.dbd_slasher.unit = "units/pd2_dlc_boo_4/masks/msk_dbd_slasher"
 	self.masks.dbd_slasher.name_id = "bm_msk_dbd_04"
@@ -2636,60 +2636,5 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.sydney_begins.dlc = "opera"
 	self.masks.sydney_begins.texture_bundle_folder = "opera"
 	self.masks.sydney_begins.sort_number = 19
-	if SystemInfo:platform() == Idstring("PS3") then
-		self.masks.sweettooth = {}
-		self.masks.sweettooth.unit = "units/pd2_dlc_consoles/masks/msk_sweettooth/msk_sweettooth"
-		self.masks.sweettooth.name_id = "bm_msk_sweettooth"
-		self.masks.sweettooth.pcs = {
-			10,
-			20,
-			30,
-			40
-		}
-		self.masks.sweettooth.dlc = "sweettooth"
-		self.masks.sweettooth.value = 1
-		self.masks.sweettooth.texture_bundle_folder = "consoles"
-	elseif SystemInfo:platform() == Idstring("X360") then
-		self.masks.thespian = {}
-		self.masks.thespian.unit = "units/pd2_dlc_consoles/masks/pd2_thespian_mask/msk_thespian"
-		self.masks.thespian.name_id = "bm_msk_thespian"
-		self.masks.thespian.pcs = {}
-		self.masks.thespian.value = 0
-		self.masks.thespian.type = "helmet"
-		self.masks.thespian.texture_bundle_folder = "consoles"
-	elseif SystemInfo:platform() == Idstring("PS4") then
-		self.masks.finger = {}
-		self.masks.finger.unit = "units/pd2_nextgen/masks/finger/msk_finger"
-		self.masks.finger.name_id = "bm_msk_finger"
-		self.masks.finger.pcs = {
-			10,
-			20,
-			30,
-			40
-		}
-		self.masks.finger.dlc = "preorder"
-		self.masks.finger.value = 7
-		self.masks.finger.texture_bundle_folder = "nextgen"
-	elseif SystemInfo:platform() == Idstring("XB1") then
-		self.masks.instinct = {}
-		self.masks.instinct.unit = "units/pd2_nextgen/masks/instinct/msk_instinct"
-		self.masks.instinct.name_id = "bm_msk_instinct"
-		self.masks.instinct.pcs = {
-			10,
-			20,
-			30,
-			40
-		}
-		self.masks.instinct.dlc = "preorder"
-		self.masks.instinct.value = 7
-		self.masks.instinct.texture_bundle_folder = "nextgen"
-		self.masks.unforsaken = {}
-		self.masks.unforsaken.unit = "units/pd2_nextgen/masks/unforsaken/msk_unforsaken"
-		self.masks.unforsaken.name_id = "bm_msk_unforsaken"
-		self.masks.unforsaken.pcs = {}
-		self.masks.unforsaken.value = 0
-		self.masks.unforsaken.infamous = true
-		self.masks.unforsaken.texture_bundle_folder = "nextgen"
-	end
 	self:_add_desc_from_name_macro(self.masks)
 end

@@ -444,7 +444,7 @@ function StatisticsManager:stop_session(data)
 	if data and (managers.job:on_last_stage() and data.type == "victory" or data.quit) then
 		Global.statistics_manager.playing_from_start = nil
 	end
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self:publish_to_steam(self._global.session, success, completion)
 	end
 end
@@ -939,11 +939,6 @@ function StatisticsManager:publish_skills_to_steam(skip_version_check)
 	for tree_index, tree in ipairs(tree_data) do
 		if tree.statistics ~= false then
 			skill_amount[tree_index] = 0
-			stats["skill_" .. tree.skill .. "_unlocked"] = {
-				type = "int",
-				method = "set",
-				value = managers.skilltree:tree_unlocked(tree_index) and 1 or 0
-			}
 			for _, tier in ipairs(tree.tiers) do
 				for _, skill in ipairs(tier) do
 					if skill_data[skill].statistics ~= false then
@@ -1366,6 +1361,10 @@ end
 
 function StatisticsManager:get_killed()
 	return self._global.killed
+end
+
+function StatisticsManager:get_play_time()
+	return self._global and self._global.play_time and self._global.play_time.minutes or 0
 end
 
 function StatisticsManager:count_up(id)

@@ -279,6 +279,8 @@ function UpgradesManager:_aquire_upgrade(upgrade, id, loading)
 		self:_aquire_equipment_upgrade(upgrade, id, loading)
 	elseif upgrade.category == "temporary" then
 		self:_aquire_temporary(upgrade, id, loading)
+	elseif upgrade.category == "cooldown" then
+		self:_aquire_cooldown(upgrade, id, loading)
 	elseif upgrade.category == "team" then
 		self:_aquire_team(upgrade, id, loading)
 	elseif upgrade.category == "armor" then
@@ -303,6 +305,8 @@ function UpgradesManager:_unaquire_upgrade(upgrade, id)
 		self:_unaquire_equipment_upgrade(upgrade, id)
 	elseif upgrade.category == "temporary" then
 		self:_unaquire_temporary(upgrade, id)
+	elseif upgrade.category == "cooldown" then
+		self:_unaquire_cooldown(upgrade, id)
 	elseif upgrade.category == "team" then
 		self:_unaquire_team(upgrade, id)
 	elseif upgrade.category == "armor" then
@@ -400,6 +404,14 @@ function UpgradesManager:_unaquire_temporary(temporary, id)
 	end
 end
 
+function UpgradesManager:_aquire_cooldown(cooldown, id)
+	managers.player:aquire_cooldown_upgrade(cooldown.upgrade, id)
+end
+
+function UpgradesManager:_unaquire_cooldown(cooldown, id)
+	managers.player:unaquire_cooldown_upgrade(cooldown.upgrade)
+end
+
 function UpgradesManager:_aquire_team(team, id)
 	managers.player:aquire_team_upgrade(team.upgrade, id)
 end
@@ -435,6 +447,9 @@ function UpgradesManager:get_value(upgrade_id, ...)
 	elseif upgrade.category == "temporary" then
 		local temporary = tweak_data.upgrades.values[u.category][u.upgrade][u.value]
 		return "Value: " .. tostring(temporary[1]) .. " Time: " .. temporary[2]
+	elseif upgrade.category == "cooldown" then
+		local cooldown = tweak_data.upgrades.values[u.category][u.upgrade][u.value]
+		return "Value: " .. tostring(cooldown[1]) .. " Time: " .. cooldown[2]
 	elseif upgrade.category == "team" then
 		local value = tweak_data.upgrades.values.team[u.category][u.upgrade][u.value]
 		return value

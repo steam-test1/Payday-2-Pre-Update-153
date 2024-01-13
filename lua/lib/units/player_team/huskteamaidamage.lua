@@ -29,13 +29,13 @@ function HuskTeamAIDamage:damage_bullet(attack_data)
 			attacker = self._unit
 		end
 		managers.hud:set_mugshot_damage_taken(self._unit:unit_data().mugshot_id)
-		self._unit:network():send_to_host("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, false)
+		self._unit:network():send_to_host("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, 0, false)
 		self:_send_damage_drama(attack_data, damage_abs)
 	end
 end
 
 function HuskTeamAIDamage:damage_explosion(attack_data)
-	if self._dead or self._fatal then
+	if self._dead or self._fatal or PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
 		return
 	end
 	local damage_abs, damage_percent = self:_clamp_health_percentage(attack_data.damage, true)

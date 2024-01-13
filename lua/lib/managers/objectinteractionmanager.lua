@@ -21,9 +21,9 @@ function ObjectInteractionManager:update(t, dt)
 	end
 end
 
-function ObjectInteractionManager:interact(player)
+function ObjectInteractionManager:interact(player, data)
 	if alive(self._active_unit) then
-		local interacted, timer = self._active_unit:interaction():interact_start(player)
+		local interacted, timer = self._active_unit:interaction():interact_start(player, data)
 		if timer then
 			self._active_object_locked_data = true
 		end
@@ -79,7 +79,8 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 	if #self._close_units > 0 then
 		for k, unit in pairs(self._close_units) do
 			if alive(unit) and unit:interaction():active() then
-				if mvec3_dis(player_pos, unit:interaction():interact_position()) > unit:interaction():interact_distance() then
+				local distance = mvec3_dis(player_pos, unit:interaction():interact_position())
+				if distance > unit:interaction():interact_distance() or distance < unit:interaction():max_interact_distance() then
 					table.remove(self._close_units, k)
 				end
 			else
@@ -94,8 +95,11 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 			self._close_index = self._close_index + 1
 		end
 		local unit = self._interactive_units[self._close_index]
-		if alive(unit) and unit:interaction():active() and not self:_in_close_list(unit) and mvec3_dis(player_pos, unit:interaction():interact_position()) <= unit:interaction():interact_distance() then
-			table.insert(self._close_units, unit)
+		if alive(unit) and unit:interaction():active() and not self:_in_close_list(unit) then
+			local distance = mvec3_dis(player_pos, unit:interaction():interact_position())
+			if distance <= unit:interaction():interact_distance() and distance >= unit:interaction():max_interact_distance() then
+				table.insert(self._close_units, unit)
+			end
 		end
 	end
 	local locked = false
@@ -103,7 +107,8 @@ function ObjectInteractionManager:_update_targeted(player_pos, player_unit)
 		if not alive(self._active_unit) or not self._active_unit:interaction():active() then
 			self._active_object_locked_data = nil
 		else
-			locked = self._active_unit:interaction():interact_dont_interupt_on_distance() or mvec3_dis(player_pos, self._active_unit:interaction():interact_position()) <= self._active_unit:interaction():interact_distance()
+			local distance = mvec3_dis(player_pos, self._active_unit:interaction():interact_position())
+			locked = self._active_unit:interaction():interact_dont_interupt_on_distance() or distance <= self._active_unit:interaction():interact_distance()
 		end
 	end
 	if locked then
@@ -232,4 +237,10 @@ function ObjectInteractionManager:_in_close_list(unit)
 		end
 	end
 	return false
+end
+
+function ObjectInteractionManager:on_interaction_released(data)
+	if self._active_unit then
+		self._active_unit:interaction():on_interaction_released(data)
+	end
 end

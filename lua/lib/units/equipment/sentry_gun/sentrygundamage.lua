@@ -121,7 +121,7 @@ function SentryGunDamage:damage_bullet(attack_data)
 			attacker = self._unit
 		end
 		local body_index = self._unit:get_body_index(hit_body_name)
-		self._unit:network():send("damage_bullet", attacker, damage_sync, body_index, 0, self._dead and true or false)
+		self._unit:network():send("damage_bullet", attacker, damage_sync, body_index, 0, 0, self._dead and true or false)
 	end
 	if not self._dead then
 		self._unit:brain():on_damage_received(attack_data.attacker_unit)
@@ -263,6 +263,7 @@ end
 function SentryGunDamage:die()
 	self._health = 0
 	self._dead = true
+	self._unit:weapon():remove_fire_mode_interaction()
 	self._unit:set_slot(26)
 	self._unit:brain():set_active(false)
 	self._unit:movement():set_active(false)
@@ -275,9 +276,6 @@ function SentryGunDamage:die()
 	elseif self._death_sequence_name then
 		self._unit:damage():run_sequence_simple(self._death_sequence_name)
 	end
-	if self._unit:interaction() then
-		self._unit:interaction():set_tweak_data("sentry_gun_revive")
-	end
 	local turret_units = managers.groupai:state():turrets()
 	if turret_units and table.contains(turret_units, self._unit) then
 		self._unit:contour():remove("mark_unit_friendly", true)
@@ -286,7 +284,7 @@ function SentryGunDamage:die()
 	end
 end
 
-function SentryGunDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit_offset_height, death)
+function SentryGunDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit_offset_height, variant, death)
 	if self._dead then
 		return
 	end

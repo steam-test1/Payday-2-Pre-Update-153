@@ -63,7 +63,7 @@ function MenuMainState:at_enter(old_state)
 		end
 		Global.psn_boot_invite_checked = true
 	elseif SystemInfo:platform() == Idstring("WIN32") then
-		if Global.boot_invite then
+		if SystemInfo:distribution() == Idstring("STEAM") and Global.boot_invite then
 			has_invite = true
 			local lobby = Global.boot_invite
 			Global.boot_invite = nil
@@ -76,11 +76,16 @@ function MenuMainState:at_enter(old_state)
 	if Global.open_trial_buy then
 		Global.open_trial_buy = nil
 		managers.menu:open_node("trial_info")
-	elseif not has_invite and not managers.network:session() and not Global.mission_manager.has_played_tutorial then
-		local yes_func = function()
-			MenuCallbackHandler:play_safehouse({skip_question = true})
+	elseif not has_invite and not managers.network:session() then
+		if managers.statistics:get_play_time() < 300 then
+			managers.features:announce_feature("short_heist")
 		end
-		managers.menu:show_question_start_tutorial({yes_func = yes_func})
+		if not Global.mission_manager.has_played_tutorial then
+			local yes_func = function()
+				MenuCallbackHandler:play_safehouse({skip_question = true})
+			end
+			managers.menu:show_question_start_tutorial({yes_func = yes_func})
+		end
 	end
 	if Global.savefile_manager.backup_save_enabled then
 		managers.savefile:save_progress("local_hdd")

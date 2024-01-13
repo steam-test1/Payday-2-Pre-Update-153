@@ -51,12 +51,12 @@ function PlayerMovement:init(unit)
 		has_dmg_dampener = managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered") or managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered_strong"),
 		has_dmg_mul = managers.player:has_category_upgrade("temporary", "dmg_multiplier_outnumbered")
 	}
-	if managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_category_upgrade("player", "long_dis_revive") then
+	if managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_category_upgrade("cooldown", "long_dis_revive") then
 		self._rally_skill_data = {
 			range_sq = 490000,
 			morale_boost_delay_t = managers.player:has_category_upgrade("player", "morale_boost") and 0 or nil,
-			long_dis_revive = managers.player:has_category_upgrade("player", "long_dis_revive"),
-			revive_chance = managers.player:upgrade_value("player", "long_dis_revive", 1),
+			long_dis_revive = managers.player:has_category_upgrade("cooldown", "long_dis_revive"),
+			revive_chance = managers.player:cooldown_upgrade_value("cooldown", "long_dis_revive", 0),
 			morale_boost_cooldown_t = tweak_data.upgrades.morale_boost_base_cooldown * managers.player:upgrade_value("player", "morale_boost_cooldown_multiplier", 1)
 		}
 	end
@@ -70,7 +70,11 @@ function PlayerMovement:post_init()
 		self._nav_tracker = managers.navigation:create_nav_tracker(self._unit:position())
 		self._pos_rsrv_id = managers.navigation:get_pos_reservation_id()
 	end
-	self._unit:inventory():add_listener("PlayerMovement" .. tostring(self._unit:key()), {"add", "equip"}, callback(self, self, "inventory_clbk_listener"))
+	self._unit:inventory():add_listener("PlayerMovement" .. tostring(self._unit:key()), {
+		"add",
+		"equip",
+		"unequip"
+	}, callback(self, self, "inventory_clbk_listener"))
 	self:_setup_states()
 	self._attention_handler = CharacterAttentionObject:new(self._unit, true)
 	self._enemy_weapons_hot_listen_id = "PlayerMovement" .. tostring(self._unit:key())

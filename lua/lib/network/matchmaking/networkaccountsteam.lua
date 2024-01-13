@@ -226,6 +226,11 @@ function NetworkAccountSTEAM:publish_statistics(stats, force_store)
 	if managers.dlc:is_trial() then
 		return
 	end
+	local disable_me = true
+	if disable_me then
+		print("[NetworkAccountSTEAM:publish_statistics] Currently disabled due to skill tree changes")
+		return
+	end
 	local handler = Steam:sa_handler()
 	print("[NetworkAccountSTEAM:publish_statistics] Publishing statistics to Steam!")
 	local err = false

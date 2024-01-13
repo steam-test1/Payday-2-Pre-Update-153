@@ -10,6 +10,7 @@ function SentryGunBase:init(unit)
 		self._validate_clbk_id = "sentry_gun_validate" .. tostring(unit:key())
 		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
 	end
+	self.sentry_gun = true
 end
 
 function SentryGunBase:_clbk_validate()
@@ -31,6 +32,7 @@ end
 
 function SentryGunBase:set_owner_id(owner_id)
 	self._owner_id = owner_id
+	self._unit:interaction():set_owner_id(owner_id)
 	self:_setup_contour()
 end
 
@@ -65,7 +67,7 @@ function SentryGunBase:post_init()
 	end
 end
 
-function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier, damage_multiplier, peer_id, verify_equipment)
+function SentryGunBase.spawn(owner, pos, rot, peer_id, verify_equipment, unit_idstring_index)
 	local attached_data = SentryGunBase._attach(pos, rot)
 	if not attached_data then
 		return
@@ -73,19 +75,31 @@ function SentryGunBase.spawn(owner, pos, rot, ammo_multiplier, armor_multiplier,
 	if verify_equipment and not managers.player:verify_equipment(peer_id, "sentry_gun") then
 		return
 	end
-	local spread_multiplier, rot_speed_multiplier, has_shield
+	local sentry_owner
 	if owner and owner:base().upgrade_value then
-		spread_multiplier = owner:base():upgrade_value("sentry_gun", "spread_multiplier") or 1
-		rot_speed_multiplier = owner:base():upgrade_value("sentry_gun", "rot_speed_multiplier") or 1
-		has_shield = owner:base():upgrade_value("sentry_gun", "shield")
-	else
-		spread_multiplier = managers.player:upgrade_value("sentry_gun", "spread_multiplier", 1)
-		rot_speed_multiplier = managers.player:upgrade_value("sentry_gun", "rot_speed_multiplier", 1)
-		has_shield = managers.player:has_category_upgrade("sentry_gun", "shield")
+		sentry_owner = owner
 	end
-	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry"), pos, rot)
+	local player_skill = PlayerSkill
+	local ammo_multiplier = player_skill.skill_data("sentry_gun", "extra_ammo_multiplier", 1, sentry_owner)
+	local armor_multiplier = 1 + (player_skill.skill_data("sentry_gun", "armor_multiplier", 1, sentry_owner) - 1) + (player_skill.skill_data("sentry_gun", "armor_multiplier2", 1, sentry_owner) - 1)
+	local damage_multiplier = player_skill.skill_data("sentry_gun", "damage_multiplier", 1, sentry_owner)
+	local spread_multiplier = player_skill.skill_data("sentry_gun", "spread_multiplier", 1, sentry_owner)
+	local rot_speed_multiplier = player_skill.skill_data("sentry_gun", "rot_speed_multiplier", 1, sentry_owner)
+	local ap_bullets = player_skill.skill_data("sentry_gun", "ap_bullets", 1, sentry_owner)
+	local has_shield = player_skill.has_skill("sentry_gun", "shield", sentry_owner)
+	local id_string = Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry")
+	if unit_idstring_index then
+		id_string = tweak_data.equipments.sentry_id_strings[unit_idstring_index]
+	end
+	local unit = World:spawn_unit(id_string, pos, rot)
 	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
 	unit:base():setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
+	local owner_id = unit:base():get_owner_id()
+	if ap_bullets and owner_id then
+		local fire_mode_unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry_fire_mode"), unit:position(), unit:rotation())
+		unit:weapon():interaction_setup(fire_mode_unit, owner_id)
+		managers.network:session():send_to_peers_synched("sync_fire_mode_interaction", unit, fire_mode_unit, owner_id)
+	end
 	local team
 	if owner then
 		team = owner:movement():team()
@@ -185,6 +199,7 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 		local peer = managers.network:session():peer_by_unit(owner)
 		if peer then
 			self._owner_id = peer:id()
+			self._unit:interaction():set_owner_id(self._owner_id)
 		end
 	end
 	self._unit:movement():setup(rot_speed_multiplier)
@@ -212,6 +227,14 @@ end
 
 function SentryGunBase:get_owner()
 	return not self._owner and self._owner_id and managers.network:session() and managers.network:session():peer(self._owner_id) and managers.network:session():peer(self._owner_id):unit()
+end
+
+function SentryGunBase:get_owner_id()
+	return self._owner_id
+end
+
+function SentryGunBase:get_type()
+	return self._type or "sentry_gun"
 end
 
 function SentryGunBase:update(unit, t, dt)
@@ -372,7 +395,7 @@ function SentryGunBase:get_net_event_id(player)
 end
 
 function SentryGunBase:interaction_text_id()
-	return "debug_interact_sentry_gun_reload"
+	return "hud_interact_sentry_gun_switch_fire_mode"
 end
 
 function SentryGunBase:add_string_macros(macroes)
@@ -463,10 +486,7 @@ end
 
 function SentryGunBase:enable_shield()
 	self._has_shield = true
-	self._unit:get_object(Idstring("g_shield")):set_visibility(true)
-	self._unit:get_object(Idstring("s_shield")):set_visibility(true)
-	self._unit:decal_surface():set_mesh_enabled(Idstring("dm_metal_shield"), true)
-	self._unit:body("shield"):set_enabled(true)
+	self._unit:damage():run_sequence_simple("shield_on")
 end
 
 function SentryGunBase:has_shield()
@@ -490,6 +510,10 @@ function SentryGunBase:save(save_data)
 	save_data.base = my_save_data
 	my_save_data.tweak_table_id = self._tweak_table_id
 	my_save_data.is_module = self._is_module
+end
+
+function SentryGunBase:ammo_ratio()
+	return self._unit:weapon():ammo_ratio()
 end
 
 function SentryGunBase:load(save_data)

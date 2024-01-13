@@ -4499,22 +4499,10 @@ function WeaponFactoryTweakData:_init_saiga()
 			"wpn_fps_smg_mac10_body_ris_special"
 		}
 	}
-	self.parts.wpn_upg_saiga_m_20rnd = {
-		type = "magazine",
-		name_id = "bm_wp_saiga_m_20rnd",
-		a_obj = "a_m",
-		unit = "units/payday2/weapons/wpn_fps_shot_saiga_pts/wpn_upg_saiga_m_20rnd",
-		stats = {value = 1, extra_ammo = 6},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
-	}
 	self.parts.wpn_fps_shot_saiga_b_standard.third_unit = "units/payday2/weapons/wpn_third_shot_saiga_pts/wpn_third_shot_saiga_b_standard"
 	self.parts.wpn_fps_shot_saiga_m_5rnd.third_unit = "units/payday2/weapons/wpn_third_shot_saiga_pts/wpn_third_shot_saiga_m_5rnd"
 	self.parts.wpn_upg_saiga_fg_standard.third_unit = "units/payday2/weapons/wpn_third_shot_saiga_pts/wpn_third_upg_saiga_fg_standard"
 	self.parts.wpn_upg_saiga_fg_lowerrail.third_unit = "units/payday2/weapons/wpn_third_shot_saiga_pts/wpn_third_upg_saiga_fg_lowerrail"
-	self.parts.wpn_upg_saiga_m_20rnd.third_unit = "units/payday2/weapons/wpn_third_shot_saiga_pts/wpn_third_saiga_m_20rnd"
 	self.wpn_fps_shot_saiga = {}
 	self.wpn_fps_shot_saiga.unit = "units/payday2/weapons/wpn_fps_shot_saiga/wpn_fps_shot_saiga"
 	self.wpn_fps_shot_saiga.stock_adapter = "wpn_upg_ak_s_adapter"
@@ -4591,7 +4579,6 @@ function WeaponFactoryTweakData:_init_saiga()
 		"wpn_upg_saiga_fg_lowerrail",
 		"wpn_fps_shot_saiga_b_standard",
 		"wpn_fps_shot_saiga_m_5rnd",
-		"wpn_upg_saiga_m_20rnd",
 		"wpn_upg_ak_g_standard",
 		"wpn_fps_upg_o_specter",
 		"wpn_fps_upg_o_aimpoint",
@@ -7479,14 +7466,12 @@ function WeaponFactoryTweakData:_init_serbu()
 				armor_piercing_add = 1,
 				can_shoot_through_enemy = true,
 				can_shoot_through_shield = true,
-				can_shoot_through_wall = true,
-				ammo_pickup_min_mul = 0.5,
-				ammo_pickup_max_mul = 0.5
+				can_shoot_through_wall = true
 			}
 		},
 		wpn_fps_upg_a_custom = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
-			custom_stats = {ammo_pickup_min_mul = 0.7, ammo_pickup_max_mul = 0.7}
+			custom_stats = {}
 		},
 		wpn_fps_upg_a_custom_free = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
@@ -8030,9 +8015,7 @@ function WeaponFactoryTweakData:_init_huntsman()
 				rays = 1,
 				damage_near_mul = 2,
 				damage_far_mul = 2.5,
-				bullet_class = "InstantExplosiveBulletBase",
-				ammo_pickup_min_mul = 0.5,
-				ammo_pickup_max_mul = 0.7
+				bullet_class = "InstantExplosiveBulletBase"
 			}
 		}
 	}
@@ -8721,9 +8704,7 @@ function WeaponFactoryTweakData:_init_judge()
 			custom_stats = {
 				damage_near_mul = 2,
 				damage_far_mul = 1.7,
-				armor_piercing_add = 1,
-				ammo_pickup_min_mul = 0.9,
-				ammo_pickup_max_mul = 1
+				armor_piercing_add = 1
 			}
 		},
 		wpn_fps_upg_a_explosive = {
@@ -8732,9 +8713,7 @@ function WeaponFactoryTweakData:_init_judge()
 				rays = 1,
 				damage_near_mul = 2,
 				damage_far_mul = 2.5,
-				bullet_class = "InstantExplosiveBulletBase",
-				ammo_pickup_min_mul = 0.7,
-				ammo_pickup_max_mul = 0.9
+				bullet_class = "InstantExplosiveBulletBase"
 			}
 		}
 	}
@@ -11889,14 +11868,12 @@ function WeaponFactoryTweakData:_init_striker()
 				armor_piercing_add = 1,
 				can_shoot_through_enemy = true,
 				can_shoot_through_shield = true,
-				can_shoot_through_wall = true,
-				ammo_pickup_min_mul = 0.5,
-				ammo_pickup_max_mul = 0.5
+				can_shoot_through_wall = true
 			}
 		},
 		wpn_fps_upg_a_custom = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
-			custom_stats = {ammo_pickup_min_mul = 0.7, ammo_pickup_max_mul = 0.7}
+			custom_stats = {}
 		},
 		wpn_fps_upg_a_custom_free = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
@@ -14752,7 +14729,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		is_a_unlockable = true,
 		stats = {
 			value = 5,
-			total_ammo_mod = -6,
+			total_ammo_mod = -3,
 			damage = 15,
 			spread = 2,
 			moving_spread = 2
@@ -14764,9 +14741,7 @@ function WeaponFactoryTweakData:create_ammunition()
 			armor_piercing_add = 1,
 			can_shoot_through_enemy = true,
 			can_shoot_through_shield = true,
-			can_shoot_through_wall = true,
-			ammo_pickup_min_mul = 1,
-			ammo_pickup_max_mul = 1
+			can_shoot_through_wall = true
 		},
 		internal_part = true,
 		sub_type = "ammo_slug"
@@ -14781,12 +14756,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		dlc = "gage_pack_shotgun",
 		texture_bundle_folder = "gage_pack_shotgun",
 		is_a_unlockable = true,
-		stats = {
-			value = 5,
-			total_ammo_mod = -6,
-			damage = 15
-		},
-		custom_stats = {ammo_pickup_min_mul = 1, ammo_pickup_max_mul = 1},
+		stats = {value = 5, damage = 15},
 		internal_part = true,
 		sub_type = "ammo_custom"
 	}
@@ -14807,7 +14777,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		is_a_unlockable = true,
 		stats = {
 			value = 5,
-			total_ammo_mod = -5,
+			total_ammo_mod = -2,
 			damage = 3,
 			spread = -3,
 			moving_spread = 3
@@ -14817,9 +14787,7 @@ function WeaponFactoryTweakData:create_ammunition()
 			rays = 1,
 			damage_near_mul = 2,
 			damage_far_mul = 2.5,
-			bullet_class = "InstantExplosiveBulletBase",
-			ammo_pickup_min_mul = 1,
-			ammo_pickup_max_mul = 1
+			bullet_class = "InstantExplosiveBulletBase"
 		},
 		internal_part = true,
 		sub_type = "ammo_explosive"
@@ -14842,9 +14810,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		custom_stats = {
 			damage_near_mul = 2,
 			damage_far_mul = 1.7,
-			armor_piercing_add = 1,
-			ammo_pickup_min_mul = 1,
-			ammo_pickup_max_mul = 1
+			armor_piercing_add = 1
 		},
 		internal_part = true,
 		sub_type = "ammo_piercing"
@@ -14861,7 +14827,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		is_a_unlockable = true,
 		stats = {
 			value = 5,
-			total_ammo_mod = -4,
+			total_ammo_mod = -2,
 			damage = -6,
 			spread = -1,
 			moving_spread = 3
@@ -14873,14 +14839,12 @@ function WeaponFactoryTweakData:create_ammunition()
 			damage_far_mul = 1.15,
 			armor_piercing_add = 1,
 			can_shoot_through_shield = true,
-			ammo_pickup_min_mul = 1,
-			ammo_pickup_max_mul = 1,
 			bullet_class = "FlameBulletBase",
 			muzzleflash = "effects/payday2/particles/weapons/shotgun/sho_muzzleflash_dragons_breath",
 			fire_dot_data = {
 				dot_damage = "1",
 				dot_trigger_max_distance = "3000",
-				dot_trigger_chance = "50",
+				dot_trigger_chance = "100",
 				dot_length = "3.1",
 				dot_tick_period = "0.5"
 			}
@@ -19909,9 +19873,7 @@ function WeaponFactoryTweakData:_init_b682()
 				rays = 1,
 				damage_near_mul = 2,
 				damage_far_mul = 2.5,
-				bullet_class = "InstantExplosiveBulletBase",
-				ammo_pickup_min_mul = 0.5,
-				ammo_pickup_max_mul = 0.7
+				bullet_class = "InstantExplosiveBulletBase"
 			}
 		}
 	}
@@ -21539,7 +21501,7 @@ function WeaponFactoryTweakData:_init_winchester1874()
 		},
 		stance_mod = {
 			wpn_fps_snp_winchester = {
-				translation = Vector3(0, -28, -1.855)
+				translation = Vector3(0, -28, -1.69)
 			}
 		},
 		dlc = "west",
@@ -24564,8 +24526,12 @@ function WeaponFactoryTweakData:_init_cc_material_config()
 	local parts = self.parts
 	parts.wpn_fps_smg_m45_s_folded.material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_s_standard")
 	parts.wpn_fps_smg_m45_s_folded.thq_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_s_standard_thq")
+	parts.wpn_fps_smg_m45_s_folded.cc_thq_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_s_standard_cc_thq")
+	parts.wpn_fps_smg_m45_s_folded.cc_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_s_standard_cc")
 	parts.wpn_fps_smg_m45_b_small.bmaterial_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_b_standard")
 	parts.wpn_fps_smg_m45_b_small.thq_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_b_standard_thq")
+	parts.wpn_fps_smg_m45_b_small.cc_thq_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_b_standard_cc_thq")
+	parts.wpn_fps_smg_m45_b_small.cc_material_config = Idstring("units/pd2_dlc1/weapons/wpn_fps_smg_m45_pts/wpn_fps_smg_m45_b_standard_cc")
 	parts.wpn_fps_pis_c96_nozzle.material_config = Idstring("units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_body_standard")
 	parts.wpn_fps_pis_c96_nozzle.thq_material_config = Idstring("units/pd2_dlc_gage_historical/weapons/wpn_fps_pis_c96_pts/wpn_fps_pis_c96_body_standard_thq")
 	parts.wpn_fps_pis_g18c_body_frame.material_config = Idstring("units/payday2/weapons/wpn_fps_pis_g18c_pts/wpn_fps_pis_g18c_frame")
@@ -25080,6 +25046,7 @@ function WeaponFactoryTweakData:_init_sr2()
 		"wpn_fps_upg_o_cmore",
 		"wpn_fps_upg_o_aimpoint_2",
 		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_o_specter",
 		"wpn_fps_upg_o_eotech_xps",
 		"wpn_fps_upg_o_reflex",
 		"wpn_fps_upg_o_rx01",

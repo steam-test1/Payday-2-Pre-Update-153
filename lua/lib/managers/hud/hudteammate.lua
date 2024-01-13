@@ -328,8 +328,6 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		radial_info_meter_bg:set_color(Color(1, 0, 0, 0))
 		radial_info_meter_bg:hide()
 	end
-	if main_player then
-	end
 	local x, y, w, h = radial_health_panel:shape()
 	teammate_panel:bitmap({
 		name = "condition_icon",
@@ -1217,6 +1215,15 @@ function HUDTeammate:set_deployable_equipment(data)
 	self:set_deployable_equipment_amount(1, data)
 end
 
+function HUDTeammate:set_deployable_equipment_from_string(data)
+	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(data.icon)
+	local deployable_equipment_panel = self._player_panel:child("deployable_equipment_panel")
+	local equipment = deployable_equipment_panel:child("equipment")
+	equipment:set_visible(true)
+	equipment:set_image(icon, unpack(texture_rect))
+	self:set_deployable_equipment_amount_from_string(1, data)
+end
+
 function HUDTeammate:set_deployable_equipment_amount(index, data)
 	local teammate_panel = self._panel:child("player")
 	local deployable_equipment_panel = self._player_panel:child("deployable_equipment_panel")
@@ -1224,6 +1231,21 @@ function HUDTeammate:set_deployable_equipment_amount(index, data)
 	deployable_equipment_panel:child("equipment"):set_visible(data.amount ~= 0)
 	self:_set_amount_string(amount, data.amount)
 	amount:set_visible(data.amount ~= 0)
+end
+
+function HUDTeammate:set_deployable_equipment_amount_from_string(index, data)
+	local teammate_panel = self._panel:child("player")
+	local deployable_equipment_panel = self._player_panel:child("deployable_equipment_panel")
+	local amount = deployable_equipment_panel:child("amount")
+	local visible = false
+	for i = 1, #data.amount do
+		if data.amount[i] > 0 then
+			visible = true
+		end
+	end
+	deployable_equipment_panel:child("equipment"):set_visible(visible)
+	amount:set_text(data.amount_str)
+	amount:set_visible(visible)
 end
 
 function HUDTeammate:set_grenades(data)

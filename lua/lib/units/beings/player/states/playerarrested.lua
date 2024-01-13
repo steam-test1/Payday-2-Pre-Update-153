@@ -85,7 +85,7 @@ function PlayerArrested:update(t, dt)
 end
 
 function PlayerArrested:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
 	elseif input.btn_stats_screen_release then

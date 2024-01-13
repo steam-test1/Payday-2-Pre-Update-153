@@ -3,6 +3,7 @@ InteractionTweakData = InteractionTweakData or class()
 function InteractionTweakData:init()
 	self.CULLING_DISTANCE = 2000
 	self.INTERACT_DISTANCE = 200
+	self.MAX_INTERACT_DISTANCE = 0
 	self.copy_machine_smuggle = {}
 	self.copy_machine_smuggle.icon = "equipment_thermite"
 	self.copy_machine_smuggle.text_id = "debug_interact_copy_machine"
@@ -294,6 +295,13 @@ function InteractionTweakData:init()
 	self.take_weapons.timer = 3
 	self.take_weapons.axis = "x"
 	self.take_weapons.interact_distance = 120
+	self.take_weapons_axis_z = {}
+	self.take_weapons_axis_z.icon = "develop"
+	self.take_weapons_axis_z.text_id = "hud_int_take_weapons"
+	self.take_weapons_axis_z.action_text_id = "hud_action_taking_weapons"
+	self.take_weapons_axis_z.timer = 3
+	self.take_weapons_axis_z.axis = "z"
+	self.take_weapons_axis_z.interact_distance = 150
 	self.take_weapons_not_active = deep_clone(self.take_weapons)
 	self.take_weapons_not_active.start_active = false
 	self.pick_lock_easy = {}
@@ -465,6 +473,7 @@ function InteractionTweakData:init()
 		upgrade = "drill_fix_interaction_speed_multiplier"
 	}
 	self.drill_jammed.action_text_id = "hud_action_fixing_drill"
+	self.drill_jammed.block_upgrade = true
 	self.lance = {}
 	self.lance.icon = "equipment_drill"
 	self.lance.contour = "interactable_icon"
@@ -488,6 +497,7 @@ function InteractionTweakData:init()
 		upgrade = "drill_fix_interaction_speed_multiplier"
 	}
 	self.lance_jammed.action_text_id = "hud_action_fixing_lance"
+	self.lance_jammed.block_upgrade = true
 	self.lance_upgrade = {}
 	self.lance_upgrade.icon = "equipment_drill"
 	self.lance_upgrade.contour = "upgradable"
@@ -514,6 +524,7 @@ function InteractionTweakData:init()
 	self.glass_cutter_jammed.sound_start = "bar_drill_fix"
 	self.glass_cutter_jammed.sound_interupt = "bar_drill_fix_cancel"
 	self.glass_cutter_jammed.sound_done = "bar_drill_fix_finished"
+	self.glass_cutter_jammed.block_upgrade = true
 	self.hack_ipad = {}
 	self.hack_ipad.icon = "equipment_hack_ipad"
 	self.hack_ipad.text_id = "debug_interact_hack_ipad"
@@ -632,6 +643,7 @@ function InteractionTweakData:init()
 	self.apartment_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
 	self.apartment_drill_jammed.sound_done = "bar_drill_fix_finished"
 	self.apartment_drill_jammed.interact_distance = 200
+	self.apartment_drill_jammed.block_upgrade = true
 	self.suburbia_drill = {}
 	self.suburbia_drill.icon = "equipment_drill"
 	self.suburbia_drill.text_id = "debug_interact_drill"
@@ -650,6 +662,7 @@ function InteractionTweakData:init()
 	self.suburbia_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
 	self.suburbia_drill_jammed.sound_done = "bar_drill_fix_finished"
 	self.suburbia_drill_jammed.interact_distance = 200
+	self.suburbia_drill_jammed.block_upgrade = true
 	self.goldheist_drill = {}
 	self.goldheist_drill.icon = "equipment_drill"
 	self.goldheist_drill.text_id = "debug_interact_drill"
@@ -668,6 +681,7 @@ function InteractionTweakData:init()
 	self.goldheist_drill_jammed.sound_interupt = "bar_drill_fix_cancel"
 	self.goldheist_drill_jammed.sound_done = "bar_drill_fix_finished"
 	self.goldheist_drill_jammed.interact_distance = 200
+	self.goldheist_drill_jammed.block_upgrade = true
 	self.hospital_saw_teddy = {}
 	self.hospital_saw_teddy.icon = "equipment_saw"
 	self.hospital_saw_teddy.text_id = "debug_interact_hospital_saw_teddy"
@@ -697,6 +711,7 @@ function InteractionTweakData:init()
 		category = "player",
 		upgrade = "drill_fix_interaction_speed_multiplier"
 	}
+	self.hospital_saw_jammed.block_upgrade = true
 	self.apartment_saw = {}
 	self.apartment_saw.icon = "equipment_saw"
 	self.apartment_saw.text_id = "debug_interact_saw"
@@ -719,6 +734,7 @@ function InteractionTweakData:init()
 		category = "player",
 		upgrade = "drill_fix_interaction_speed_multiplier"
 	}
+	self.apartment_saw_jammed.block_upgrade = true
 	self.secret_stash_saw = {}
 	self.secret_stash_saw.icon = "equipment_saw"
 	self.secret_stash_saw.text_id = "debug_interact_saw"
@@ -741,6 +757,7 @@ function InteractionTweakData:init()
 		category = "player",
 		upgrade = "drill_fix_interaction_speed_multiplier"
 	}
+	self.secret_stash_saw_jammed.block_upgrade = true
 	self.revive = {}
 	self.revive.icon = "interaction_help"
 	self.revive.text_id = "debug_interact_revive"
@@ -829,6 +846,31 @@ function InteractionTweakData:init()
 	self.sentry_gun_revive.sound_done = "bar_bag_generic_finished"
 	self.sentry_gun_revive.action_text_id = "hud_action_reload_sentry"
 	self.sentry_gun_revive.no_contour = true
+	self.sentry_gun = {}
+	self.sentry_gun.icon = "equipment_ammo_bag"
+	self.sentry_gun.timer = 0.5
+	self.sentry_gun.text_id = "hud_interact_pickup_sentry_gun"
+	self.sentry_gun.blocked_hint = "hint_reload_sentry"
+	self.sentry_gun.sound_start = "bar_bag_generic"
+	self.sentry_gun.sound_interupt = "bar_bag_generic_cancel"
+	self.sentry_gun.sound_done = "bar_bag_generic_finished"
+	self.sentry_gun.action_text_id = "hud_action_pickup_sentry_gun"
+	self.sentry_gun.interact_distance = 200
+	self.sentry_gun.no_contour = true
+	self.sentry_gun.verify_owner = true
+	self.sentry_gun_fire_mode = {}
+	self.sentry_gun_fire_mode.icon = "equipment_ammo_bag"
+	self.sentry_gun_fire_mode.requires_upgrade = {category = "sentry_gun", upgrade = "ap_bullets"}
+	self.sentry_gun_fire_mode.text_id = "hud_interact_sentry_gun_switch_fire_mode"
+	self.sentry_gun_fire_mode.blocked_hint = "hint_reload_sentry"
+	self.sentry_gun_fire_mode.sound_start = "bar_bag_generic"
+	self.sentry_gun_fire_mode.sound_interupt = "bar_bag_generic_cancel"
+	self.sentry_gun_fire_mode.sound_done = "bar_bag_generic_finished"
+	self.sentry_gun_fire_mode.action_text_id = "hud_action_sentry_gun_switch_fire_mode"
+	self.sentry_gun_fire_mode.interact_distance = 800
+	self.sentry_gun_fire_mode.max_interact_distance = 200
+	self.sentry_gun_fire_mode.no_contour = true
+	self.sentry_gun_fire_mode.verify_owner = true
 	self.bodybags_bag = {}
 	self.bodybags_bag.icon = "equipment_ammo_bag"
 	self.bodybags_bag.text_id = "debug_interact_bodybags_bag_take_bodybag"
@@ -859,6 +901,10 @@ function InteractionTweakData:init()
 	self.ammo_bag.sound_interupt = "bar_bag_generic_cancel"
 	self.ammo_bag.sound_done = "bar_bag_generic_finished"
 	self.ammo_bag.action_text_id = "hud_action_taking_ammo"
+	self.ammo_bag.upgrade_timer_multiplier = {
+		category = "player",
+		upgrade = "deploy_interact_faster"
+	}
 	self.doctor_bag = {}
 	self.doctor_bag.icon = "equipment_doctor_bag"
 	self.doctor_bag.text_id = "debug_interact_doctor_bag_heal"
@@ -869,9 +915,15 @@ function InteractionTweakData:init()
 	self.doctor_bag.sound_interupt = "bar_helpup_cancel"
 	self.doctor_bag.sound_done = "bar_helpup_finished"
 	self.doctor_bag.action_text_id = "hud_action_healing"
-	self.doctor_bag.upgrade_timer_multiplier = {
-		category = "doctor_bag",
-		upgrade = "interaction_speed_multiplier"
+	self.doctor_bag.upgrade_timer_multipliers = {
+		{
+			category = "doctor_bag",
+			upgrade = "interaction_speed_multiplier"
+		},
+		{
+			category = "player",
+			upgrade = "deploy_interact_faster"
+		}
 	}
 	self.ecm_jammer = {}
 	self.ecm_jammer.icon = "equipment_ecm_jammer"
@@ -880,9 +932,15 @@ function InteractionTweakData:init()
 		category = "ecm_jammer",
 		upgrade = "can_activate_feedback"
 	}
-	self.ecm_jammer.upgrade_timer_multiplier = {
-		category = "ecm_jammer",
-		upgrade = "interaction_speed_multiplier"
+	self.ecm_jammer.upgrade_timer_multipliers = {
+		{
+			category = "ecm_jammer",
+			upgrade = "interaction_speed_multiplier"
+		},
+		{
+			category = "player",
+			upgrade = "deploy_interact_faster"
+		}
 	}
 	self.ecm_jammer.timer = 2
 	self.ecm_jammer.no_contour = true
@@ -981,6 +1039,9 @@ function InteractionTweakData:init()
 	self.weapon_case = deep_clone(self.invisible_interaction_open)
 	self.weapon_case.axis = "x"
 	self.weapon_case.interact_distance = 110
+	self.weapon_case_axis_z = deep_clone(self.invisible_interaction_open)
+	self.weapon_case_axis_z.axis = "z"
+	self.weapon_case_axis_z.interact_distance = 120
 	self.weapon_case_close = deep_clone(self.weapon_case)
 	self.weapon_case_close.text_id = "hud_int_invisible_interaction_close"
 	self.invisible_interaction_close = deep_clone(self.invisible_interaction_open)
@@ -1343,11 +1404,9 @@ function InteractionTweakData:init()
 	self.shaped_sharge.sound_start = "bar_c4_apply"
 	self.shaped_sharge.sound_interupt = "bar_c4_apply_cancel"
 	self.shaped_sharge.sound_done = "bar_c4_apply_finished"
-	self.shaped_sharge.requires_upgrade = {
-		category = "player",
-		upgrade = "trip_mine_shaped_charge"
-	}
 	self.shaped_sharge.action_text_id = "hud_action_placing_shaped_charge"
+	self.shaped_sharge.slot = 2
+	self.shaped_sharge.blocked_hint = ""
 	self.shaped_charge_single = deep_clone(self.shaped_sharge)
 	self.shaped_charge_single.axis = "z"
 	self.hostage_convert = {}
@@ -1498,6 +1557,11 @@ function InteractionTweakData:init()
 	self.open_from_inside.interact_distance = 100
 	self.open_from_inside.timer = 0.2
 	self.open_from_inside.axis = "x"
+	self.open_hatch_generic = {}
+	self.open_hatch_generic.text_id = "hud_int_invisible_interaction_open"
+	self.open_hatch_generic.start_active = true
+	self.open_hatch_generic.interact_distance = 100
+	self.open_hatch_generic.timer = 0.2
 	self.money_luggage = deep_clone(self.money_wrap)
 	self.money_luggage.start_active = true
 	self.money_luggage.axis = "x"

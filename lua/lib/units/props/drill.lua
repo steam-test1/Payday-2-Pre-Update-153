@@ -1,7 +1,32 @@
 Drill = Drill or class(UnitBase)
 Drill.active_drills = Drill.active_drills or 0
 Drill.jammed_drills = Drill.jammed_drills or 0
+Drill.on_hit_autorepair_chance = 0.5
 Drill._drill_remind_clbk_id = "_drill_remind_clbk"
+
+function Drill.get_upgrades(drill_unit, player)
+	local is_drill = drill_unit:base() and drill_unit:base().is_drill
+	local is_saw = drill_unit:base() and drill_unit:base().is_saw
+	local upgrades
+	if is_drill or is_saw then
+		local player_skill = PlayerSkill
+		upgrades = {}
+		upgrades.auto_repair_level = player_skill.skill_level("player", "drill_autorepair", 0, player)
+		upgrades.speed_upgrade_level = player_skill.skill_level("player", "drill_speed_multiplier", 0, player)
+		upgrades.silent_drill = player_skill.has_skill("player", "silent_drill", player)
+		upgrades.reduced_alert = player_skill.has_skill("player", "drill_alert_rad", player)
+	end
+	return upgrades
+end
+
+function Drill.create_upgrades(auto_repair_level, speed_upgrade_level, silent_drill, reduced_alert)
+	return {
+		auto_repair_level = auto_repair_level,
+		speed_upgrade_level = speed_upgrade_level,
+		silent_drill = silent_drill,
+		reduced_alert = reduced_alert
+	}
+end
 
 function Drill:init(unit)
 	Drill.super.init(self, unit, false)
@@ -14,6 +39,8 @@ function Drill:init(unit)
 	self._pos = unit:position()
 	self._skill_upgrades = {}
 	managers.groupai:state():on_editor_sim_unit_spawned(unit)
+	self._peer_ids = {}
+	self._auto_restart_chance = false
 end
 
 function Drill:start()
@@ -112,6 +139,7 @@ function Drill:set_jammed(jammed)
 			params.parent = self._unit:get_object(Idstring("e_drill_particles"))
 			self._jammed_effect = World:effect_manager():spawn(params)
 		end
+		self:_reset_melee_autorepair()
 		if self._autorepair and not self._autorepair_clbk_id then
 			self._autorepair_clbk_id = "Drill_autorepair" .. tostring(self._unit:key())
 			managers.enemy:add_delayed_clbk(self._autorepair_clbk_id, callback(self, self, "clbk_autorepair"), TimerManager:game():time() + 5 + 15 * math.random())
@@ -392,68 +420,63 @@ function Drill:set_skill_upgrades(upgrades)
 		background_icon_x = background_icon_x + icon_data.w + 2
 	end
 	
-	if true then
-		repeat
-			do break end -- pseudo-goto
-			local saw_speed_multiplier = tweak_data.upgrades.values.player.saw_speed_multiplier
-			local timer_multiplier = 1
-			if self._skill_upgrades[2] or upgrades[2] then
-				timer_multiplier = saw_speed_multiplier[2]
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
-			elseif self._skill_upgrades[1] or upgrades[1] then
-				timer_multiplier = saw_speed_multiplier[1]
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-			else
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-			end
-			timer_gui_ext:set_timer_multiplier(timer_multiplier)
-		until true
-	elseif self.is_hacking_device then
-	else
-		if self.is_drill or self.is_saw then
-			local drill_speed_multiplier = tweak_data.upgrades.values.player.drill_speed_multiplier
-			local drill_alert_rad = tweak_data.upgrades.values.player.drill_alert_rad[1]
-			local drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[1]
-			local timer_multiplier = 1
-			if self._skill_upgrades[2] or upgrades[2] then
-				timer_multiplier = drill_speed_multiplier[2]
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
-			elseif self._skill_upgrades[1] or upgrades[1] then
-				timer_multiplier = drill_speed_multiplier[1]
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-			else
-				add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-			end
-			local got_reduced_alert = self._skill_upgrades[3] or upgrades[3] or false
-			local got_silent_drill = self._skill_upgrades[4] or upgrades[4] or false
-			local got_auto_repair = self._skill_upgrades[5] or upgrades[5] or false
-			timer_gui_ext:set_timer_multiplier(timer_multiplier)
-			if got_silent_drill then
-				self:set_alert_radius(nil)
-				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.aced)
-				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
-			elseif got_reduced_alert then
-				self:set_alert_radius(drill_alert_rad)
-				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.basic)
-				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-			else
-				self:set_alert_radius(tweak_data.upgrades.drill_alert_radius or 2500)
-				timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
-				add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-			end
-			if got_auto_repair then
-				if Network:is_server() and drill_autorepair_chance > math.random() then
-					self:set_autorepair(true)
-				end
-				add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
-			else
-				add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
-			end
+	if self.is_drill or self.is_saw then
+		local drill_speed_multiplier = tweak_data.upgrades.values.player.drill_speed_multiplier
+		local drill_alert_rad = tweak_data.upgrades.values.player.drill_alert_rad[1]
+		local current_speed_upgrade = self._skill_upgrades.speed_upgrade_level or 0
+		local timer_multiplier = 1
+		if upgrades.speed_upgrade_level and 2 <= upgrades.speed_upgrade_level or 2 <= current_speed_upgrade then
+			timer_multiplier = drill_speed_multiplier[2]
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
+			upgrades.speed_upgrade_level = 2
+		elseif upgrades.speed_upgrade_level and 1 <= upgrades.speed_upgrade_level or 1 <= current_speed_upgrade then
+			timer_multiplier = drill_speed_multiplier[1]
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+			upgrades.speed_upgrade_level = 1
 		else
+			add_bg_icon_func(background_icons, "drillgui_icon_faster", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+			upgrades.speed_upgrade_level = 0
 		end
-	end
-	for i in pairs(upgrades) do
-		self._skill_upgrades[i] = true
+		local got_reduced_alert = upgrades.reduced_alert or false
+		local current_reduced_alert = self._skill_upgrades.reduced_alert or false
+		local got_silent_drill = upgrades.silent_drill or false
+		local current_silent_drill = self._skill_upgrades.silent_drill or false
+		local auto_repair_level = upgrades.auto_repair_level or 0
+		local current_auto_repair_level = self._skill_upgrades.auto_repair_level or 0
+		timer_gui_ext:set_timer_multiplier(timer_multiplier)
+		if got_silent_drill or current_silent_drill then
+			self:set_alert_radius(nil)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.aced)
+			upgrades.silent_drill = true
+			upgrades.reduced_alert = true
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_2"))
+		elseif got_reduced_alert or current_reduced_alert then
+			self:set_alert_radius(drill_alert_rad)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.basic)
+			upgrades.reduced_alert = true
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+		else
+			self:set_alert_radius(tweak_data.upgrades.drill_alert_radius or 2500)
+			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
+			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+		end
+		if 0 < auto_repair_level or 0 < current_auto_repair_level then
+			local drill_autorepair_chance = 0
+			if auto_repair_level > current_auto_repair_level then
+				drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[auto_repair_level]
+				upgrades.auto_repair_level = auto_repair_level
+			else
+				drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[current_auto_repair_level]
+				upgrades.auto_repair_level = current_auto_repair_level
+			end
+			if Network:is_server() and drill_autorepair_chance > math.random() then
+				self:set_autorepair(true)
+			end
+			add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_1"))
+		else
+			add_bg_icon_func(background_icons, "drillgui_icon_restarter", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
+		end
+		self._skill_upgrades = deep_clone(upgrades)
 	end
 	timer_gui_ext:set_background_icons(background_icons)
 	timer_gui_ext:update_sound_event()
@@ -464,7 +487,7 @@ function Drill:get_skill_upgrades()
 end
 
 function Drill:set_autorepair(state)
-	if self._skill_upgrades[5] then
+	if self._skill_upgrades.auto_repair_level and self._skill_upgrades.auto_repair_level > 0 then
 		return
 	end
 	self._autorepair = state
@@ -481,8 +504,10 @@ end
 
 function Drill:clbk_autorepair()
 	self._autorepair_clbk_id = nil
-	self._unit:timer_gui():set_jammed(false)
-	self._unit:interaction():set_active(false, true)
+	if alive(self._unit) then
+		self._unit:timer_gui():set_jammed(false)
+		self._unit:interaction():set_active(false, true)
+	end
 end
 
 function Drill:_set_alert_state(state)
@@ -663,4 +688,40 @@ function Drill:destroy()
 	self:_kill_jammed_effect()
 	self:_kill_drill_effect()
 	self:set_jammed(false)
+end
+
+function Drill:_reset_melee_autorepair()
+	self._peer_ids = {}
+end
+
+function Drill:on_melee_hit(peer_id)
+	if self._disable_upgrades then
+		return
+	end
+	if not self:_does_peer_exist(peer_id) and self._jammed then
+		table.insert(self._peer_ids, peer_id)
+		local rand = math.random()
+		if rand < Drill.on_hit_autorepair_chance then
+			self._unit:timer_gui():set_jammed(false)
+			self._unit:interaction():set_active(false, true)
+			self._unit:interaction():check_for_upgrade()
+		end
+	end
+end
+
+function Drill:_does_peer_exist(peer_id)
+	local count = #self._peer_ids
+	for i = 1, count do
+		if self._peer_ids[i] == peer_id then
+			return true
+		end
+	end
+	return false
+end
+
+function Drill:compare_skill_upgrades(skill_upgrades)
+	if self._disable_upgrades then
+		return false
+	end
+	return skill_upgrades.auto_repair_level > self._skill_upgrades.auto_repair_level or skill_upgrades.speed_upgrade_level > self._skill_upgrades.speed_upgrade_level or skill_upgrades.silent_drill and not self._skill_upgrades.silent_drill or skill_upgrades.reduced_alert and not self._skill_upgrades.reduced_alert
 end

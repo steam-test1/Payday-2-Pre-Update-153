@@ -176,8 +176,10 @@ function SkillTreeSkillItem:init(skill_id, tier_panel, num_skills, i, tree, tier
 		h = h - 10
 	})
 	self._inside_panel:set_center(skill_panel:w() / 2, skill_panel:h() / 2)
-	local cx = tier_panel:w() / num_skills
-	skill_panel:set_x((i - 1) * w)
+	local half_box = w * 0.5
+	local center_x = tier_panel:w() * 0.5 - (num_skills - 1) * half_box
+	local pos_x = center_x + w * (i - 1)
+	skill_panel:set_center_x(pos_x)
 	self._box = BoxGuiObject:new(skill_panel, {
 		sides = {
 			2,
@@ -406,8 +408,9 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 	self._bg_image:set_right(fullscreen_panel:w())
 	self._bg_image:set_center_y(fullscreen_panel:h() / 2)
 	local panel_h = 0
-	local h = (parent_panel:h() - tree_tab_h - TOP_ADJUSTMENT) / (8 - CONSOLE_PAGE_ADJUSTMENT)
-	for i = 1, 7 do
+	local count = #tweak_data.skilltree.tier_unlocks + 1
+	local h = (parent_panel:h() - tree_tab_h - TOP_ADJUSTMENT) / (count - CONSOLE_PAGE_ADJUSTMENT)
+	for i = 1, count do
 		local color = Color.black
 		local rect = tree_panel:rect({
 			name = "rect" .. i,
@@ -427,16 +430,6 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 	local tier_panels = tree_panel:panel({
 		name = "tier_panels"
 	})
-	if data.skill then
-		local tier_panel = tier_panels:panel({
-			name = "tier_panel0",
-			h = h
-		})
-		tier_panel:set_bottom(tree_panel:child("rect1"):top())
-		local item = SkillTreeUnlockItem:new(data.skill, tier_panel, tree, tier_panel:w() / 3, h)
-		table.insert(self._items, item)
-		item:refresh(false)
-	end
 	for tier, tier_data in ipairs(data.tiers) do
 		local unlocked = managers.skilltree:tier_unlocked(tree, tier)
 		local tier_panel = tier_panels:panel({
@@ -444,9 +437,9 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 			h = h
 		})
 		local num_skills = #tier_data
-		tier_panel:set_bottom(tree_panel:child("rect" .. tostring(tier + 1)):top())
+		tier_panel:set_bottom(tree_panel:child("rect" .. tostring(tier)):top())
 		local base_size = h
-		local base_w = tier_panel:w() / math.max(#tier_data, 1)
+		local base_w = math.min(tier_panel:w() / math.max(#tier_data, 1), tier_panel:w() / 4)
 		for i, skill_id in ipairs(tier_data) do
 			local item = SkillTreeSkillItem:new(skill_id, tier_panel, num_skills, i, tree, tier, base_w, base_size, skill_prerequisites[skill_id])
 			table.insert(self._items, item)
@@ -468,7 +461,7 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 			blend_mode = "add",
 			rotation = 360
 		})
-		debug_text:set_world_bottom(tree_panel:child("rect" .. tostring(tier + 1)):world_top() + 2)
+		debug_text:set_world_bottom(tree_panel:child("rect" .. tostring(tier)):world_top() + 2)
 		local _, _, tw, _ = debug_text:text_rect()
 		debug_text:move(tw * 2, 0)
 		local lock_image = tier_panel:bitmap({
@@ -520,7 +513,7 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 			local x, y, w, h = cost_text:text_rect()
 			cost_text:set_size(w, h)
 		end
-		cost_text:set_world_bottom(tree_panel:child("rect" .. tostring(tier + 1)):world_top() + 2)
+		cost_text:set_world_bottom(tree_panel:child("rect" .. tostring(tier)):world_top() + 2)
 		cost_text:set_x(debug_text:right() + tw * 3)
 		if add_infamy_glow then
 			local glow = tier_panel:bitmap({
@@ -562,7 +555,8 @@ function SkillTreePage:init(tree, data, parent_panel, fullscreen_panel, tree_tab
 	local prev_tier_p = 0
 	local next_tier_p = max_points
 	local ct = 0
-	for i = 1, 6 do
+	local count = #tweak_data.skilltree.tier_unlocks
+	for i = 1, count do
 		local tier_unlocks = managers.skilltree:tier_cost(self._tree, i)
 		if ps < tier_unlocks then
 			next_tier_p = tier_unlocks
@@ -637,7 +631,8 @@ function SkillTreePage:on_points_spent()
 	local prev_tier_p = 0
 	local next_tier_p = max_points
 	local ct = 0
-	for i = 1, 6 do
+	local count = #tweak_data.skilltree.tier_unlocks
+	for i = 1, count do
 		local tier_unlocks = managers.skilltree:tier_cost(self._tree, i)
 		if ps < tier_unlocks then
 			next_tier_p = tier_unlocks

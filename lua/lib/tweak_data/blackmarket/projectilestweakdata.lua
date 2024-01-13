@@ -10,6 +10,7 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.frag.dlc = "gage_pack"
 	self.projectiles.frag.throwable = true
 	self.projectiles.frag.max_amount = 3
+	self.projectiles.frag.animation = "throw_grenade"
 	self.projectiles.frag.anim_global_param = "projectile_frag"
 	self.projectiles.frag.throw_allowed_expire_t = 0.1
 	self.projectiles.frag.expire_t = 1.1
@@ -28,6 +29,7 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.molotov.max_amount = 3
 	self.projectiles.molotov.texture_bundle_folder = "bbq"
 	self.projectiles.molotov.physic_effect = Idstring("physic_effects/molotov_throw")
+	self.projectiles.molotov.animation = "throw_molotov"
 	self.projectiles.molotov.anim_global_param = "projectile_molotov"
 	self.projectiles.molotov.throw_allowed_expire_t = 0.1
 	self.projectiles.molotov.expire_t = 1.3
@@ -42,7 +44,8 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.dynamite.texture_bundle_folder = "west"
 	self.projectiles.dynamite.max_amount = 3
 	self.projectiles.dynamite.throwable = true
-	self.projectiles.dynamite.anim_global_param = "projectile_molotov"
+	self.projectiles.dynamite.animation = "throw_dynamite"
+	self.projectiles.dynamite.anim_global_param = "projectile_dynamite"
 	self.projectiles.dynamite.throw_allowed_expire_t = 0.1
 	self.projectiles.dynamite.expire_t = 1.3
 	self.projectiles.dynamite.repeat_expire_t = 1.5
@@ -241,6 +244,22 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.long_arrow_exp.no_cheat_count = true
 	self.projectiles.long_arrow_exp.impact_detonation = true
 	self.projectiles.long_arrow_exp.client_authoritative = true
+	self.projectiles.frag_com = {}
+	self.projectiles.frag_com.name_id = "bm_grenade_frag_com"
+	self.projectiles.frag_com.desc_id = "bm_grenade_frag_com_desc"
+	self.projectiles.frag_com.unit = "units/payday2/weapons/wpn_frag_grenade_com/wpn_frag_grenade_com"
+	self.projectiles.frag_com.unit_dummy = "units/payday2/weapons/wpn_frag_grenade_com/wpn_frag_grenade_com_husk"
+	self.projectiles.frag_com.sprint_unit = "units/payday2/weapons/wpn_frag_grenade_com/wpn_frag_grenade_com_sprint"
+	self.projectiles.frag_com.icon = "frag_grenade"
+	self.projectiles.frag_com.throwable = true
+	self.projectiles.frag_com.max_amount = 3
+	self.projectiles.frag_com.animation = "throw_grenade_com"
+	self.projectiles.frag_com.anim_global_param = "projectile_frag_com"
+	self.projectiles.frag_com.throw_allowed_expire_t = 0.1
+	self.projectiles.frag_com.expire_t = 1.1
+	self.projectiles.frag_com.repeat_expire_t = 1.5
+	self.projectiles.frag_com.is_a_grenade = true
+	self.projectiles.frag_com.dlc = "pd2_clan"
 	self._projectiles_index = {
 		"frag",
 		"launcher_frag",
@@ -269,7 +288,8 @@ function BlackMarketTweakData:_init_projectiles()
 		"long_arrow_exp",
 		"launcher_incendiary_m32",
 		"launcher_frag_china",
-		"launcher_incendiary_china"
+		"launcher_incendiary_china",
+		"frag_com"
 	}
 	self:_add_desc_from_name_macro(self.projectiles)
 end

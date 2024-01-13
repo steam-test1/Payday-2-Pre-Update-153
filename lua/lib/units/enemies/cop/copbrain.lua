@@ -469,12 +469,12 @@ function CopBrain:on_intimidated(amount, aggressor_unit)
 	end
 end
 
-function CopBrain:on_tied(aggressor_unit, not_tied)
-	return self._current_logic.on_tied(self._logic_data, aggressor_unit, not_tied)
+function CopBrain:on_tied(aggressor_unit, not_tied, can_flee)
+	return self._current_logic.on_tied(self._logic_data, aggressor_unit, not_tied, can_flee)
 end
 
-function CopBrain:on_trade(aggressor_unit)
-	return self._current_logic.on_trade(self._logic_data, aggressor_unit)
+function CopBrain:on_trade(pos, rotation, free_criminal)
+	return self._current_logic.on_trade(self._logic_data, pos, rotation, free_criminal)
 end
 
 function CopBrain:on_detected_enemy_destroyed(destroyed_unit)

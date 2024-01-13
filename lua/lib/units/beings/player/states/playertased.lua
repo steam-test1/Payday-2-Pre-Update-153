@@ -1,6 +1,10 @@
 PlayerTased = PlayerTased or class(PlayerStandard)
 PlayerTased._update_movement = PlayerBleedOut._update_movement
 
+function PlayerTased:init(unit)
+	PlayerTased.super.init(self, unit)
+end
+
 function PlayerTased:enter(state_data, enter_data)
 	PlayerTased.super.enter(self, state_data, enter_data)
 	self._ids_tased_boost = Idstring("tased_boost")
@@ -38,6 +42,28 @@ function PlayerTased:enter(state_data, enter_data)
 	self._rumble_electrified = managers.rumble:play("electrified")
 	self.tased = true
 	self._state_data = state_data
+	if managers.player:has_category_upgrade("player", "taser_malfunction") then
+		local data = managers.player:upgrade_value("player", "taser_malfunction")
+		if data then
+			managers.player:register_message(Message.SendTaserMalfunction, "taser_malfunction", function()
+				self:_on_malfunction_to_taser_event()
+			end)
+			managers.player:add_coroutine("taser_malfunction", PlayerAction.TaserMalfunction, managers.player, data.interval, data.chance_to_trigger)
+		end
+	end
+	if managers.player:has_category_upgrade("player", "escape_taser") then
+		local target_time = managers.player:upgrade_value("player", "escape_taser", 2)
+		managers.player:add_coroutine("escape_tase", PlayerAction.EscapeTase, managers.player, Application:time() + target_time)
+		
+		local function clbk()
+			self:give_shock_to_taser_no_damage()
+		end
+		
+		managers.player:register_message(Message.EscapeTase, "escape_tase", clbk)
+	end
+	CopDamage.register_listener("on_criminal_tased", {
+		"on_criminal_tased"
+	}, callback(self, self, "_on_tased_event"))
 end
 
 function PlayerTased:_enter(enter_data)
@@ -77,6 +103,9 @@ function PlayerTased:exit(state_data, enter_data)
 	self._num_shocks = nil
 	self.tased = false
 	self._state_data.non_lethal_electrocution = nil
+	managers.player:unregister_message(Message.SendTaserMalfunction, "taser_malfunction")
+	managers.player:unregister_message(Message.EscapeTase, "escape_tase")
+	CopDamage.unregister_listener("on_criminal_tased")
 end
 
 function PlayerTased:interaction_blocked()
@@ -88,7 +117,7 @@ function PlayerTased:update(t, dt)
 end
 
 function PlayerTased:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	if t > self._next_shock then
 		self._num_shocks = self._num_shocks + 1
 		self._next_shock = t + 0.25 + math.rand(1)
@@ -136,8 +165,6 @@ function PlayerTased:_update_check_actions(t, dt)
 	end
 	self:_update_foley(t, input)
 	local new_action
-	if not new_action then
-	end
 	self:_check_action_interact(t, input)
 	local new_action
 end
@@ -194,16 +221,7 @@ function PlayerTased:_check_action_primary_attack(t, input)
 						dmg_mul = dmg_mul * (1 + managers.player:upgrade_value("player", upgrade_name, 0) * damage_ratio)
 					end
 					dmg_mul = dmg_mul * managers.player:temporary_upgrade_value("temporary", "berserker_damage_multiplier", 1)
-					if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
-						self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
-						self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
-						local stack = self._state_data.stacking_dmg_mul[weapon_category]
-						if stack[1] and t < stack[1] then
-							dmg_mul = dmg_mul * (1 + managers.player:upgrade_value(weapon_category, "stacking_hit_damage_multiplier", 0) * stack[2])
-						else
-							stack[2] = 0
-						end
-					end
+					dmg_mul = dmg_mul * managers.player:get_property("trigger_happy", 1)
 					local fired
 					if fire_mode == "single" then
 						if input.btn_primary_attack_press then
@@ -224,9 +242,6 @@ function PlayerTased:_check_action_primary_attack(t, input)
 					new_action = true
 					if fired then
 						local weap_tweak_data = tweak_data.weapon[weap_base:get_name_id()]
-						if not self._state_data.in_steelsight then
-						elseif weap_tweak_data.animations.recoil_steelsight then
-						end
 						local recoil_multiplier = weap_base:recoil() * weap_base:recoil_multiplier() + weap_base:recoil_addend()
 						local up, down, left, right = unpack(weap_tweak_data.kick[self._state_data.in_steelsight and "steelsight" or self._state_data.ducking and "crouching" or "standing"])
 						self._camera_unit:base():recoil_kick(up * recoil_multiplier, down * recoil_multiplier, left * recoil_multiplier, right * recoil_multiplier)
@@ -288,9 +303,6 @@ function PlayerTased:call_teammate(line, t, no_gesture, skip_alert)
 			queue_name = "s07x_sin"
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
 				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
-			end
-			if not self._tase_ended and managers.player:has_category_upgrade("player", "taser_self_shock") and prime_target.unit:key() == self._unit:character_damage():tase_data().attacker_unit:key() then
-				self:_start_action_counter_tase(t, prime_target)
 			end
 		end
 	end
@@ -363,16 +375,25 @@ function PlayerTased:on_tase_ended()
 		self._recover_delayed_clbk = "PlayerTased_recover_delayed_clbk"
 		managers.enemy:add_delayed_clbk(self._recover_delayed_clbk, callback(self, self, "clbk_exit_to_std"), TimerManager:game():time() + tweak_data.player.damage.TASED_RECOVER_TIME)
 	end
+	self._taser_unit = nil
+end
+
+function PlayerTased:_on_tased_event(taser_unit, tased_unit)
+	if self._unit == tased_unit then
+		self._taser_unit = taser_unit
+	end
 end
 
 function PlayerTased:give_shock_to_taser()
 	if not alive(self._counter_taser_unit) then
 		return
 	end
+	do return end
 	self:_give_shock_to_taser(self._counter_taser_unit)
 end
 
 function PlayerTased:_give_shock_to_taser(taser_unit)
+	do return end
 	local action_data = {
 		variant = "counter_tased",
 		damage = taser_unit:character_damage()._HEALTH_INIT * (tweak_data.upgrades.counter_taser_damage or 0.2),
@@ -385,4 +406,46 @@ function PlayerTased:_give_shock_to_taser(taser_unit)
 		}
 	}
 	taser_unit:character_damage():damage_melee(action_data)
+end
+
+function PlayerTased:give_shock_to_taser_no_damage()
+	if not alive(self._taser_unit) then
+		return
+	end
+	local action_data = {
+		variant = "counter_tased",
+		damage = 0,
+		damage_effect = self._taser_unit:character_damage()._HEALTH_INIT * 2,
+		attacker_unit = self._unit,
+		attack_dir = -self._taser_unit:movement()._action_common_data.fwd,
+		col_ray = {
+			position = mvector3.copy(self._taser_unit:movement():m_head_pos()),
+			body = self._taser_unit:body("body")
+		}
+	}
+	self._taser_unit:character_damage():damage_melee(action_data)
+	self._unit:sound():play("tase_counter_attack")
+end
+
+function PlayerTased:_on_malfunction_to_taser_event()
+	if not alive(self._taser_unit) then
+		return
+	end
+	World:effect_manager():spawn({
+		effect = Idstring("effects/payday2/particles/character/taser_stop"),
+		position = self._taser_unit:movement():m_head_pos(),
+		normal = math.UP
+	})
+	local action_data = {
+		variant = "melee",
+		damage = 0,
+		damage_effect = self._taser_unit:character_damage()._HEALTH_INIT * 10,
+		attacker_unit = self._unit,
+		attack_dir = -self._taser_unit:movement()._action_common_data.fwd,
+		col_ray = {
+			position = mvector3.copy(self._taser_unit:movement():m_head_pos()),
+			body = self._taser_unit:body("body")
+		}
+	}
+	self._taser_unit:character_damage():damage_melee(action_data)
 end

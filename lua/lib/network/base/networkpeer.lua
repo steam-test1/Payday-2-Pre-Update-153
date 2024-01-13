@@ -31,7 +31,7 @@ function NetworkPeer:init(name, rpc, id, loading, synced, in_lobby, character, u
 		end
 		self._ip = self._rpc:ip_at_index(0)
 	end
-	if user_id and SystemInfo:platform() == Idstring("WIN32") then
+	if user_id and SystemInfo:distribution() == Idstring("STEAM") then
 		self._steam_rpc = Network:handshake(user_id, nil, "STEAM")
 		Network:set_connection_persistent(self._steam_rpc, true)
 		if not is_local_peer then
@@ -95,14 +95,14 @@ function NetworkPeer:set_rpc(rpc)
 end
 
 function NetworkPeer:create_ticket()
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		return Steam:create_ticket(self._user_id)
 	end
 	return ""
 end
 
 function NetworkPeer:begin_ticket_session(ticket)
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self._ticket_wait_response = true
 		self._begin_ticket_session_called = true
 		local result = Steam:begin_ticket_session(self._user_id, ticket, callback(self, self, "on_verify_ticket"))
@@ -137,7 +137,7 @@ function NetworkPeer:on_verify_ticket(result, reason)
 end
 
 function NetworkPeer:end_ticket_session()
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self._ticket_wait_response = nil
 		Steam:end_ticket_session(self._user_id)
 		Steam:destroy_ticket(self._user_id)
@@ -145,7 +145,7 @@ function NetworkPeer:end_ticket_session()
 end
 
 function NetworkPeer:change_ticket_callback()
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		Steam:change_ticket_callback(self._user_id, callback(self, self, "on_verify_ticket"))
 	end
 end
@@ -162,7 +162,7 @@ function NetworkPeer:verify_job(job)
 	if not dlc_data or not dlc_data.app_id then
 		return
 	end
-	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
+	if SystemInfo:distribution() == Idstring("STEAM") and not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
 		self:mark_cheater(VoteManager.REASON.invalid_job, Network:is_server())
 	end
 end
@@ -182,7 +182,7 @@ function NetworkPeer:verify_character()
 	if not dlc_data or not dlc_data.app_id then
 		return
 	end
-	if not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
+	if SystemInfo:distribution() == Idstring("STEAM") and not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then
 		self:mark_cheater(VoteManager.REASON.invalid_character, Network:is_server())
 	end
 end
@@ -281,7 +281,7 @@ function NetworkPeer:_verify_content(item_type, item_id)
 		end
 	else
 		local dlc_data = Global.dlc_manager.all_dlc_data[dlc_item]
-		if dlc_data and dlc_data.app_id and not dlc_data.external then
+		if dlc_data and dlc_data.app_id and not dlc_data.external and SystemInfo:distribution() == Idstring("STEAM") then
 			return Steam:is_user_product_owned(self._user_id, dlc_data.app_id)
 		end
 	end
@@ -328,27 +328,25 @@ function NetworkPeer:verify_bag(carry_id, pickup)
 end
 
 function NetworkPeer:verify_deployable(id)
-	if tweak_data.equipments.max_amount[id] then
-		if not self._deployable then
-			self._deployable = id
-			self._depolyable_count = 1
+	local max_amount = tweak_data.equipments.max_amount[id]
+	if max_amount then
+		if max_amount < 0 then
 			return true
-		elseif self._deployable == id and self._depolyable_count < tweak_data.equipments.max_amount[id] then
-			self._depolyable_count = self._depolyable_count + 1
+		elseif not self._deployable or not self._deployable[id] and table.size(self._deployable) < 2 then
+			self._deployable = self._deployable or {}
+			self._deployable[id] = 1
 			return true
-		elseif not self._deployable_swap and (self._deployable == "sentry_gun" and id == "trip_mine" or self._deployable == "trip_mine" and id == "sentry_gun") then
-			self._deployable_swap = true
-			self._deployable = id
-			self._depolyable_count = 1
+		elseif self._deployable[id] and max_amount > self._deployable[id] then
+			self._deployable[id] = self._deployable[id] + 1
 			return true
 		end
 	end
 	if Network:is_server() then
-		self:mark_cheater(self._deployable ~= id and VoteManager.REASON.wrong_equipment or VoteManager.REASON.many_equipments, true)
+		self:mark_cheater(self._deployable and table.size(self._deployable) > 2 and VoteManager.REASON.wrong_equipment or VoteManager.REASON.many_equipments, true)
 	else
-		managers.network:session():server_peer():mark_cheater(self._deployable ~= id and VoteManager.REASON.wrong_equipment or VoteManager.REASON.many_equipments, Network:is_server())
+		managers.network:session():server_peer():mark_cheater(self._deployable and table.size(self._deployable) > 2 and VoteManager.REASON.wrong_equipment or VoteManager.REASON.many_equipments, Network:is_server())
 	end
-	print("[NetworkPeer:verify_deployable]: Failed to deploy equipment", self:id(), id, self._deployable, self._depolyable_count)
+	print("[NetworkPeer:verify_deployable]: Failed to deploy equipment", self:id(), id, inspect(self._deployable))
 	return false
 end
 

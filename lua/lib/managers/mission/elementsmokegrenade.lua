@@ -30,6 +30,5 @@ function ElementSmokeGrenade:on_executed(instigator)
 			is_flashbang
 		}
 	end
-	print(is_flashbang and "FLAAAASHBAAAAANG" or "SMOOOOOOOKEEEEEEEE")
 	ElementSmokeGrenade.super.on_executed(self, instigator)
 end

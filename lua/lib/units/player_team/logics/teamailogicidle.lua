@@ -437,7 +437,7 @@ function TeamAILogicIdle._find_intimidateable_civilians(criminal, use_default_sh
 	local my_tracker = criminal:movement():nav_tracker()
 	local chk_vis_func = my_tracker.check_visibility
 	for key, unit in pairs(managers.groupai:state():fleeing_civilians()) do
-		if chk_vis_func(my_tracker, unit:movement():nav_tracker()) and tweak_data.character[unit:base()._tweak_table].intimidateable and not unit:base().unintimidateable and not unit:anim_data().unintimidateable and not unit:brain():is_tied() then
+		if chk_vis_func(my_tracker, unit:movement():nav_tracker()) and tweak_data.character[unit:base()._tweak_table].intimidateable and not unit:base().unintimidateable and not unit:anim_data().unintimidateable and not unit:brain():is_tied() and not unit:unit_data().disable_shout then
 			local u_head_pos = unit:movement():m_head_pos() + math.UP * 30
 			local vec = u_head_pos - head_pos
 			local dis = mvector3.normalize(vec)
@@ -472,6 +472,9 @@ function TeamAILogicIdle._find_intimidateable_civilians(criminal, use_default_sh
 end
 
 function TeamAILogicIdle.intimidate_civilians(data, criminal, play_sound, play_action, primary_target)
+	if primary_target and primary_target:unit_data().disable_shout then
+		return false
+	end
 	if primary_target and (not alive(primary_target) or not managers.groupai:state():fleeing_civilians()[primary_target:key()]) then
 		primary_target = nil
 	end
@@ -529,6 +532,9 @@ function TeamAILogicIdle.intimidate_civilians(data, criminal, play_sound, play_a
 			data.unit
 		}
 		managers.groupai:state():propagate_alert(alert)
+	end
+	if not primary_target and best_civ and best_civ:unit_data().disable_shout then
+		return false
 	end
 	return primary_target or best_civ
 end

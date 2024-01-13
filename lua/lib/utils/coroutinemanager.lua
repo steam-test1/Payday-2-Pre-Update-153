@@ -16,9 +16,10 @@ function CoroutineManager:update(t, dt)
 	for i = 1, size do
 		for key, value in pairs(self._coroutines[i]) do
 			if value then
-				local result = coroutine.resume(value.co, t, dt, unpack(value.arg))
+				local result = coroutine.resume(value.co, unpack(value.arg))
 				local status = coroutine.status(value.co)
 				if status == "dead" then
+					print("[CoroutineManager:update] ", value, " has ended ", result)
 					self._coroutines[i][key] = nil
 				end
 			end
@@ -34,6 +35,15 @@ function CoroutineManager:add_coroutine(name, func, ...)
 			func = func,
 			arg = arg
 		}
+	end
+end
+
+function CoroutineManager:add_and_run_coroutine(name, func, ...)
+	local co = coroutine.create(func.Function)
+	local result = coroutine.resume(co, unpack(arg))
+	local status = coroutine.status(co)
+	if status ~= "dead" then
+		self._coroutines[func.Priority][name] = {co = co, arg = arg}
 	end
 end
 

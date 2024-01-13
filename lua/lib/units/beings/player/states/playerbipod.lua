@@ -20,7 +20,7 @@ function PlayerBipod:_enter(enter_data)
 	local player = managers.player:player_unit()
 	if player and self._unit:base().is_local_player then
 		local tweak_data = self._equipped_unit:base():weapon_tweak_data()
-		local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier()
+		local speed_multiplier = self._equipped_unit:base():get_property("bipod_deploy_multiplier") or 1
 		local reload_name_id = tweak_data.animations.reload_name_id or self._equipped_unit:base().name_id
 		local equipped_unit_id = self._equipped_unit:base().name_id
 		self._unit_deploy_position = player:position()
@@ -45,7 +45,7 @@ end
 function PlayerBipod:exit(state_data, new_state_name)
 	PlayerBipod.super.exit(self, state_data or self._state_data, new_state_name)
 	local tweak_data = self._equipped_unit:base():weapon_tweak_data()
-	local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier()
+	local speed_multiplier = self._equipped_unit:base():get_property("bipod_deploy_multiplier") or 1
 	local equipped_unit_id = self._equipped_unit:base().name_id
 	self._equipped_unit:base():tweak_data_anim_stop("deploy")
 	local result = self._ext_camera:play_redirect(Idstring(tweak_data.animations.bipod_exit .. "_" .. equipped_unit_id), speed_multiplier)
@@ -101,7 +101,7 @@ function PlayerBipod:set_tweak_data(name)
 end
 
 function PlayerBipod:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	self:_determine_move_direction()
 	self:_update_interaction_timers(t)
 	self:_update_throw_projectile_timers(t, input)

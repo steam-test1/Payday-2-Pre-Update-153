@@ -720,7 +720,7 @@ function LevelsTweakData:init()
 	self.big.ghost_bonus = 0.15
 	self.big.max_bags = 28
 	self.big.ai_group_type = america
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		self.roberts = {}
 		self.roberts.name_id = "heist_roberts_hl"
 		self.roberts.briefing_id = "heist_roberts_briefing"
@@ -1256,7 +1256,7 @@ function LevelsTweakData:init()
 		"dark",
 		"mad"
 	}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")
 	end
 	self.escape_levels = {

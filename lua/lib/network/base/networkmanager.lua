@@ -12,6 +12,7 @@ require("lib/network/matchmaking/NetworkFriendsXBL")
 require("lib/network/matchmaking/NetworkGenericPSN")
 require("lib/network/matchmaking/NetworkGroupLobby")
 require("lib/network/matchmaking/NetworkGroupLobbyPSN")
+require("lib/network/matchmaking/NetworkMatchMaking")
 require("lib/network/matchmaking/NetworkMatchMakingPSN")
 require("lib/network/matchmaking/NetworkMatchMakingSTEAM")
 require("lib/network/matchmaking/NetworkMatchMakingXBL")
@@ -86,8 +87,13 @@ function NetworkManager:init()
 		self.account = NetworkAccountXBL:new()
 		self.voice_chat = NetworkVoiceChatXBL:new()
 	elseif self._is_win32 then
-		self.account = NetworkAccountSTEAM:new()
-		self.voice_chat = NetworkVoiceChatSTEAM:new()
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			self.account = NetworkAccountSTEAM:new()
+			self.voice_chat = NetworkVoiceChatSTEAM:new()
+		else
+			self.account = NetworkAccount:new()
+			self.voice_chat = NetworkVoiceChatDisabled:new()
+		end
 	elseif self._is_x360 then
 		self.account = NetworkAccountXBL:new()
 		self.voice_chat = NetworkVoiceChatXBL:new()
@@ -111,7 +117,11 @@ end
 function NetworkManager:_create_lobby()
 	if self._is_win32 then
 		cat_print("lobby", "Online Lobby is PC")
-		self.matchmake = NetworkMatchMakingSTEAM:new()
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			self.matchmake = NetworkMatchMakingSTEAM:new()
+		else
+			self.matchmake = NetworkMatchMaking:new()
+		end
 	elseif self._is_ps4 then
 		cat_print("lobby", "Online Lobby is PS4")
 		self.friends = NetworkFriendsPSN:new()

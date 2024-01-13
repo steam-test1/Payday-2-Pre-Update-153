@@ -266,15 +266,19 @@ function AnimatedVehicleBase:allow_sync_stored_pos(sync)
 end
 
 function AnimatedVehicleBase:store_current_pos()
-	self._stored_pos = self._unit:position()
-	self._stored_rot = self._unit:rotation()
+	local pos = Vector3(self._unit:position().x / 10, self._unit:position().y / 10, self._unit:position().z / 10)
+	local rot = Vector3(self._unit:rotation():yaw() / 10, self._unit:rotation():pitch() / 10, self._unit:rotation():roll() / 10)
+	self._stored_pos = pos
+	self._stored_rot = rot
 end
 
 function AnimatedVehicleBase:move_to_stored_pos()
 	if self._stored_pos ~= nil and self._stored_rot ~= nil then
 		self._unit:play_state(Idstring("std/empty"))
-		self._unit:set_position(self._stored_pos)
-		self._unit:set_rotation(self._stored_rot)
+		local pos = Vector3(self._stored_pos.x * 10, self._stored_pos.y * 10, self._stored_pos.z * 10)
+		local rot = Vector3(self._stored_rot.x * 10, self._stored_rot.y * 10, self._stored_rot.z * 10)
+		self._unit:set_position(pos)
+		self._unit:set_rotation(Rotation(rot.x, rot.y, rot.z))
 	end
 end
 

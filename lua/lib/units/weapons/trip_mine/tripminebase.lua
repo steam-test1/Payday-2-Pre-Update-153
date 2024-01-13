@@ -313,7 +313,7 @@ function TripMineBase:_explode(col_ray)
 	if not managers.network:session() then
 		return
 	end
-	local damage_size = tweak_data.weapon.trip_mines.damage_size * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier_1", 1) * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier_2", 1) * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
+	local damage_size = tweak_data.weapon.trip_mines.damage_size * managers.player:upgrade_value("trip_mine", "explosion_size_multiplier_1", 1) * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
 	local player = managers.player:player_unit()
 	managers.explosion:give_local_player_dmg(self._position, damage_size, tweak_data.weapon.trip_mines.player_damage)
 	self._unit:set_extension_update_enabled(Idstring("base"), false)
@@ -322,7 +322,6 @@ function TripMineBase:_explode(col_ray)
 	local slotmask = managers.slot:get_mask("explosion_targets")
 	local bodies = World:find_bodies("intersect", "cylinder", self._ray_from_pos, self._ray_to_pos, damage_size, slotmask)
 	local damage = tweak_data.weapon.trip_mines.damage * managers.player:upgrade_value("trip_mine", "damage_multiplier", 1)
-	local amount = 0
 	local characters_hit = {}
 	for _, hit_body in ipairs(bodies) do
 		if alive(hit_body) then
@@ -364,14 +363,21 @@ function TripMineBase:_explode(col_ray)
 				end
 				if character then
 					self:_give_explosion_damage(col_ray, hit_body:unit(), damage)
-					amount = amount + 1
 				end
 			end
 		end
 	end
 	if managers.network:session() then
 		if player then
-			managers.network:session():send_to_peers_synched("sync_trip_mine_explode", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
+			if managers.player:has_category_upgrade("trip_mine", "fire_trap") then
+				local fire_trap_data = managers.player:upgrade_value("trip_mine", "fire_trap", nil)
+				if fire_trap_data then
+					managers.network:session():send_to_peers_synched("sync_trip_mine_explode_spawn_fire", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage, fire_trap_data[1], fire_trap_data[2])
+					self:_spawn_environment_fire(player, fire_trap_data[1], fire_trap_data[2])
+				end
+			else
+				managers.network:session():send_to_peers_synched("sync_trip_mine_explode", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
+			end
 		else
 			managers.network:session():send_to_peers_synched("sync_trip_mine_explode_no_user", self._unit, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
 		end
@@ -387,6 +393,11 @@ function TripMineBase:_explode(col_ray)
 		managers.groupai:state():propagate_alert(alert_event)
 	end
 	self._unit:set_slot(0)
+end
+
+function TripMineBase:sync_trip_mine_explode_and_spawn_fire(user_unit, ray_from, ray_to, damage_size, damage, added_time, range_multiplier)
+	self:_spawn_environment_fire(user_unit, added_time, range_multiplier)
+	self:sync_trip_mine_explode(user_unit, ray_from, ray_to, damage_size, damage)
 end
 
 function TripMineBase:sync_trip_mine_explode(user_unit, ray_from, ray_to, damage_size, damage)
@@ -412,6 +423,18 @@ function TripMineBase:sync_trip_mine_explode(user_unit, ray_from, ray_to, damage
 			end
 		end
 	end
+end
+
+function TripMineBase:_spawn_environment_fire(user_unit, added_time, range_multiplier)
+	local position = self._unit:position()
+	local rotation = self._unit:rotation()
+	local data = tweak_data.env_effect:trip_mine_fire()
+	local normal = self._unit:rotation():y()
+	local dir = Vector3()
+	mvector3.set(dir, normal)
+	mvector3.multiply(dir, 20)
+	mvector3.add(position, dir)
+	EnvironmentFire.spawn(position, rotation, data, normal, user_unit, added_time, range_multiplier)
 end
 
 function TripMineBase:_play_sound_and_effects()

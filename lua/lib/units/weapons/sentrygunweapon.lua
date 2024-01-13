@@ -1,16 +1,19 @@
 SentryGunWeapon = SentryGunWeapon or class()
+SentryGunWeapon._AP_ROUNDS_FIRE_RATE = 3.5
 local tmp_rot1 = Rotation()
 
 function SentryGunWeapon:init(unit)
 	self._unit = unit
+	self._current_damage_mul = 1
 	self._timer = TimerManager:game()
 	self._character_slotmask = managers.slot:get_mask("raycastable_characters")
 	self._next_fire_allowed = -1000
 	self._obj_fire = self._unit:get_object(Idstring("a_detect"))
 	self._effect_align = {
-		self._unit:get_object(Idstring("fire")),
-		self._unit:get_object(Idstring("fire"))
+		self._unit:get_object(Idstring(self._muzzle_flash_parent or "fire")),
+		self._unit:get_object(Idstring(self._muzzle_flash_parent or "fire"))
 	}
+	self._muzzle_flash_parent = nil
 	if self._laser_align_name then
 		self._laser_align = self._unit:get_object(Idstring(self._laser_align_name))
 	end
@@ -29,6 +32,43 @@ function SentryGunWeapon:init(unit)
 		self._ammo_ratio = 1
 	end
 	self._spread_mul = 1
+	self._use_armor_piercing = false
+	self._slow_fire_rate = false
+	self._fire_rate_reduction = 1
+	self._name_id = self._unit:base():get_name_id()
+	local my_tweak_data = tweak_data.weapon[self._name_id]
+	self._default_alert_size = my_tweak_data.alert_size
+	self._from = Vector3()
+	self._to = Vector3()
+end
+
+function SentryGunWeapon:switch_fire_mode()
+	self:_switch_fire_mode()
+	if self._use_armor_piercing then
+		managers.hint:show_hint("sentry_set_ap_rounds")
+	else
+		managers.hint:show_hint("sentry_normal_ammo")
+	end
+	managers.network:session():send_to_peers_synched("sentrygun_sync_state", self._unit)
+	self._unit:sound_source():post_event("wp_sentrygun_swap_ammo")
+end
+
+function SentryGunWeapon:_switch_fire_mode()
+	self._use_armor_piercing = not self._use_armor_piercing
+	self._fire_rate_reduction = self._use_armor_piercing and self._AP_ROUNDS_FIRE_RATE or not self._use_armor_piercing and 1
+	self._current_damage_mul = self._use_armor_piercing and self._damage_multiplier or not self._use_armor_piercing and 1
+	self:flip_fire_sound()
+end
+
+function SentryGunWeapon:switch_fire_mode_net()
+	self:_switch_fire_mode()
+end
+
+function SentryGunWeapon:flip_fire_sound()
+	if self._shooting then
+		self:_sound_autofire_end()
+		self:_sound_autofire_start()
+	end
 end
 
 function SentryGunWeapon:_init()
@@ -37,6 +77,8 @@ function SentryGunWeapon:_init()
 	self._bullet_slotmask = managers.slot:get_mask(Network:is_server() and "bullet_impact_targets" or "bullet_blank_impact_targets")
 	self._character_slotmask = managers.slot:get_mask("raycastable_characters")
 	self._muzzle_effect = Idstring(my_tweak_data.muzzleflash or "effects/particles/test/muzzleflash_maingun")
+	local muzzle_offset = Vector3()
+	mvector3.set_static(muzzle_offset, 0, 10, 0)
 	self._muzzle_effect_table = {
 		{
 			effect = self._muzzle_effect,
@@ -60,7 +102,6 @@ function SentryGunWeapon:_init()
 	end
 	self._damage = my_tweak_data.DAMAGE
 	self._alert_events = {}
-	self._alert_size = my_tweak_data.alert_size
 	self._alert_fires = {}
 	self._suppression = my_tweak_data.SUPPRESSION
 end
@@ -68,10 +109,13 @@ end
 function SentryGunWeapon:setup(setup_data, damage_multiplier)
 	self:_init()
 	self._setup = setup_data
+	self._default_alert_size = self._alert_size
+	self._damage_multiplier = damage_multiplier
+	self._current_damage_mul = 1
 	self._owner = setup_data.user_unit
-	self._damage = tweak_data.weapon[self._name_id].DAMAGE * damage_multiplier
 	self._spread_mul = setup_data.spread_mul
 	self._auto_reload = setup_data.auto_reload
+	self._fire_rate_reduction = 1
 	if setup_data.alert_AI then
 		self._alert_events = {}
 		self._alert_size = tweak_data.weapon[self._name_id].alert_size
@@ -158,6 +202,7 @@ function SentryGunWeapon:stop_autofire()
 		return
 	end
 	if self:out_of_ammo() then
+		self:remove_fire_mode_interaction()
 		self:_sound_autofire_end_empty()
 	elseif self._timer:time() - self._fire_start_t > 3 then
 		self:_sound_autofire_end_cooldown()
@@ -172,11 +217,18 @@ function SentryGunWeapon:trigger_held(blanks, expend_ammo, shoot_player, target_
 	if self._next_fire_allowed <= self._timer:time() then
 		fired = self:fire(blanks, expend_ammo, shoot_player, target_unit)
 		if fired then
-			self._next_fire_allowed = self._next_fire_allowed + tweak_data.weapon[self._name_id].auto.fire_rate
+			local fire_rate = tweak_data.weapon[self._name_id].auto.fire_rate * self._fire_rate_reduction
+			self._next_fire_allowed = self._next_fire_allowed + fire_rate
 			self._interleaving_fire = self._interleaving_fire == 1 and 2 or 1
 		end
 	end
 	return fired
+end
+
+function SentryGunWeapon:interaction_setup(fire_mode_unit, owner_id)
+	self._fire_mode_unit = fire_mode_unit
+	self._fire_mode_unit:interaction():setup(self)
+	self._fire_mode_unit:interaction():set_owner_id(owner_id)
 end
 
 function SentryGunWeapon:fire(blanks, expend_ammo, shoot_player, target_unit)
@@ -206,11 +258,24 @@ local mvec_to = Vector3()
 
 function SentryGunWeapon:_fire_raycast(from_pos, direction, shoot_player, target_unit)
 	local result = {}
-	local hit_unit
+	local hit_unit, col_ray
 	mvector3.set(mvec_to, direction)
 	mvector3.multiply(mvec_to, tweak_data.weapon[self._name_id].FIRE_RANGE)
 	mvector3.add(mvec_to, from_pos)
-	local col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
+	self._from = from_pos
+	self._to = mvec_to
+	if not self._setup.ignore_units then
+		return
+	end
+	if self._use_armor_piercing then
+		local col_rays = World:raycast_all("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
+		col_ray = col_rays[1]
+		if col_ray and col_ray.unit:in_slot(8) and alive(col_ray.unit:parent()) then
+			col_ray = col_rays[2] or col_ray
+		end
+	else
+		col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
+	end
 	local player_hit, player_ray_data
 	if shoot_player then
 		player_hit, player_ray_data = RaycastWeaponBase.damage_player(self, col_ray, from_pos, direction)
@@ -219,10 +284,9 @@ function SentryGunWeapon:_fire_raycast(from_pos, direction, shoot_player, target
 			InstantBulletBase:on_hit_player(col_ray or player_ray_data, self._unit, self._unit, damage)
 		end
 	end
-	local char_hit
 	if not player_hit and col_ray then
 		local damage = self:_apply_dmg_mul(self._damage, col_ray, from_pos)
-		char_hit = InstantBulletBase:on_collision(col_ray, self._unit, self._unit, damage)
+		hit_unit = InstantBulletBase:on_collision(col_ray, self._unit, self._unit, damage)
 	end
 	if (not col_ray or col_ray.unit ~= target_unit) and target_unit and target_unit:character_damage() and target_unit:character_damage().build_suppression then
 		target_unit:character_damage():build_suppression(self._suppression)
@@ -238,7 +302,7 @@ function SentryGunWeapon:_fire_raycast(from_pos, direction, shoot_player, target
 end
 
 function SentryGunWeapon:_apply_dmg_mul(damage, col_ray, from_pos)
-	local damage_out = damage
+	local damage_out = damage * self._current_damage_mul
 	if tweak_data.weapon[self._name_id].DAMAGE_MUL_RANGE then
 		local ray_dis = col_ray.distance or mvector3.distance(from_pos, col_ray.position)
 		local ranges = tweak_data.weapon[self._name_id].DAMAGE_MUL_RANGE
@@ -260,7 +324,7 @@ function SentryGunWeapon:_apply_dmg_mul(damage, col_ray, from_pos)
 end
 
 function SentryGunWeapon:_sound_autofire_start()
-	self._autofire_sound_event = self._unit:sound_source():post_event(self._fire_start_snd_event)
+	self._autofire_sound_event = self._unit:sound_source():post_event(self:auto_fire_start_event())
 end
 
 function SentryGunWeapon:_sound_autofire_end()
@@ -268,7 +332,7 @@ function SentryGunWeapon:_sound_autofire_end()
 		self._autofire_sound_event:stop()
 		self._autofire_sound_event = nil
 	end
-	self._unit:sound_source():post_event(self._fire_stop_snd_event)
+	self._unit:sound_source():post_event(self:auto_fire_end_event())
 end
 
 function SentryGunWeapon:_sound_autofire_end_empty()
@@ -304,6 +368,22 @@ function SentryGunWeapon:out_of_ammo()
 		return self._ammo_total == 0
 	else
 		return self._ammo_ratio == 0
+	end
+end
+
+function SentryGunWeapon:auto_fire_start_event()
+	if self._use_armor_piercing then
+		return self._fire_start_snd_event_ap
+	else
+		return self._fire_start_snd_event
+	end
+end
+
+function SentryGunWeapon:auto_fire_end_event()
+	if self._use_armor_piercing then
+		return self._fire_stop_snd_event_ap
+	else
+		return self._fire_stop_snd_event
 	end
 end
 
@@ -435,5 +515,13 @@ function SentryGunWeapon:load(save_data)
 end
 
 function SentryGunWeapon:destroy(unit)
+	self:remove_fire_mode_interaction()
 	self:_set_laser_state(nil)
+end
+
+function SentryGunWeapon:remove_fire_mode_interaction()
+	if self._fire_mode_unit and alive(self._fire_mode_unit) then
+		self._fire_mode_unit:set_slot(0)
+		self._fire_mode_unit = nil
+	end
 end

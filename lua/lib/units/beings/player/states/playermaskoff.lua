@@ -67,7 +67,7 @@ function PlayerMaskOff:update(t, dt)
 end
 
 function PlayerMaskOff:_update_check_actions(t, dt)
-	local input = self:_get_input()
+	local input = self:_get_input(t, dt)
 	self._stick_move = self._controller:get_input_axis("move")
 	if mvector3.length(self._stick_move) < 0.1 or self:_interacting() then
 		self._move_dir = nil
@@ -93,6 +93,7 @@ function PlayerMaskOff:_update_check_actions(t, dt)
 	self:_check_action_jump(t, input)
 	self:_check_action_duck(t, input)
 	self:_check_action_run(t, input)
+	self:_check_action_change_equipment(input)
 end
 
 function PlayerMaskOff:_check_action_interact(t, input)

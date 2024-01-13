@@ -472,6 +472,9 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 end
 
 function CoreEnvironmentControllerManager:_update_post_effects()
+	self:set_ao_setting(managers.user:get_setting("video_ao"))
+	self:set_parallax_setting(managers.user:get_setting("parallax_mapping"))
+	self:set_aa_setting(managers.user:get_setting("video_aa"))
 end
 
 function CoreEnvironmentControllerManager:_create_dof_tweak_data()
@@ -542,6 +545,26 @@ local function set_post_material_parameter(post_id, modifier_name, parameter_id,
 	end
 end
 
+function CoreEnvironmentControllerManager:get_aa_setting()
+	return self._aa_setting or "AA_off"
+end
+
+function CoreEnvironmentControllerManager:set_aa_setting(setting, vp)
+	local effect = "AA_" .. setting
+	self._aa_setting = effect
+	vp = vp or self._vp and self._vp:vp() or nil
+	if vp then
+		vp:set_post_processor_effect("World", ids_anti_aliasing_processor, Idstring(effect))
+	end
+end
+
+function CoreEnvironmentControllerManager:set_parallax_setting(setting)
+	local global_material = Application:global_material()
+	if global_material then
+		global_material:set_variable(Idstring("use_parallax"), setting and 1 or 0)
+	end
+end
+
 function CoreEnvironmentControllerManager:bloom_blur_size(size, vp)
 	local effects = {
 		Idstring("bloom_blur_1"),
@@ -558,6 +581,36 @@ function CoreEnvironmentControllerManager:bloom_blur_size(size, vp)
 				if mod then
 					mod:set_visibility(visibility)
 				end
+			end
+		end
+	end
+end
+
+function CoreEnvironmentControllerManager:set_ssao_radius(value)
+	set_post_material_parameter(ids_ao_post_processor, "post_SSAO", Idstring("ssao_radius"), value)
+end
+
+function CoreEnvironmentControllerManager:set_ssao_range(k, i)
+	set_post_material_parameter(ids_ao_post_processor, "post_SSAO", Idstring("ssao_steepness"), k)
+	set_post_material_parameter(ids_ao_post_processor, "post_SSAO", Idstring("ssao_inflexion"), i)
+end
+
+function CoreEnvironmentControllerManager:get_ao_setting()
+	return self._ao_setting or "AO_off"
+end
+
+function CoreEnvironmentControllerManager:set_ao_setting(setting, vp)
+	local effect = "AO_" .. setting
+	self._ao_setting = effect
+	vp = vp or self._vp and self._vp:vp() or nil
+	if vp then
+		local effect = vp:set_post_processor_effect("World", ids_ao_post_processor, Idstring(effect))
+		vp:set_post_processor_effect("World", ids_ao_mask_post_processor, setting ~= "off" and Idstring("AO_mask_weapon") or Idstring("AO_off"))
+		local deferred_processor = vp:get_post_processor_effect("World", Idstring("deferred"))
+		if deferred_processor then
+			local apply_ambient = deferred_processor:modifier(Idstring("apply_ambient"))
+			if apply_ambient then
+				apply_ambient:material():set_variable(Idstring("use_ssao"), setting ~= "off" and effect and 1 or 0)
 			end
 		end
 	end

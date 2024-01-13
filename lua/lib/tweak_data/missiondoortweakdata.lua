@@ -122,6 +122,29 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_interactable_door_keycard/gen_interactable_door_keycard_jammer")
 		}
 	}
+	self.reinforced_drill_shape_door = deep_clone(self.reinforced_door)
+	self.reinforced_drill_shape_door.devices.c4 = {
+		{
+			align = "a_shp_charge_1",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_2",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_3",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
+	self.reinforced_drill_shape_door.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small_jam_once"),
+			can_jam = true,
+			timer = 60
+		}
+	}
 	self.drill_door = {}
 	self.drill_door.devices = {}
 	self.drill_door.devices.c4 = {

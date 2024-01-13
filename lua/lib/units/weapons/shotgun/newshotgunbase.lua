@@ -3,6 +3,9 @@ NewShotgunBase = NewShotgunBase or class(NewRaycastWeaponBase)
 function NewShotgunBase:init(...)
 	NewShotgunBase.super.init(self, ...)
 	self:setup_default()
+	self._player_run_and_shoot = managers.player:has_category_upgrade("player", "run_and_shoot")
+	self._run_and_shoot = managers.player:has_category_upgrade("shotgun", "hip_run_and_shoot") or self._player_run_and_shoot
+	self._hip_fire_rate_inc = 0
 end
 
 function NewShotgunBase:setup_default()
@@ -11,6 +14,9 @@ function NewShotgunBase:setup_default()
 	self._rays = tweak_data.weapon[self._name_id].rays or 6
 	self._range = self._damage_far
 	self._use_shotgun_reload = self._use_shotgun_reload or self._use_shotgun_reload == nil
+	if not self:weapon_tweak_data().has_magazine then
+		self._hip_fire_rate_inc = managers.player:upgrade_value("shotgun", "hip_rate_of_fire", 0)
+	end
 end
 
 function NewShotgunBase:_create_use_setups()
@@ -23,6 +29,37 @@ function NewShotgunBase:_create_use_setups()
 	player_setup.unequip = {align_place = "back"}
 	use_data.player = player_setup
 	self._use_data = use_data
+end
+
+function NewShotgunBase:fire_rate_multiplier()
+	local fire_rate_mul = self._fire_rate_multiplier
+	if self._hip_fire_rate_inc ~= 0 then
+		local user_unit = self._setup and self._setup.user_unit
+		local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
+		if current_state and not current_state:in_steelsight() then
+			fire_rate_mul = fire_rate_mul + (1 - self._hip_fire_rate_inc)
+			fire_rate_mul = self:_convert_add_to_mul(fire_rate_mul)
+		end
+	end
+	return fire_rate_mul
+end
+
+function NewShotgunBase:on_equip(user_unit)
+	if user_unit and not self._player_run_and_shoot then
+		local current_state = user_unit:movement()._current_state
+		if current_state then
+			current_state.RUN_AND_SHOOT = self._run_and_shoot
+		end
+	end
+end
+
+function NewShotgunBase:on_unequip(user_unit)
+	if user_unit and not self._player_run_and_shoot then
+		local current_state = user_unit:movement()._current_state
+		if current_state then
+			current_state.RUN_AND_SHOOT = false
+		end
+	end
 end
 
 function NewShotgunBase:_update_stats_values()
@@ -50,7 +87,12 @@ end
 
 function NewShotgunBase:get_damage_falloff(damage, col_ray, user_unit)
 	local distance = col_ray.distance or mvector3.distance(col_ray.unit:position(), user_unit:position())
-	return (1 - math.min(1, math.max(0, distance - self._damage_near) / self._damage_far)) * damage
+	local inc_range_mul = 1
+	local current_state = user_unit:movement()._current_state
+	if current_state and current_state:in_steelsight() then
+		inc_range_mul = managers.player:upgrade_value("shotgun", "steelsight_range_inc", 1)
+	end
+	return (1 - math.min(1, math.max(0, distance - self._damage_near * inc_range_mul) / (self._damage_far * inc_range_mul))) * damage
 end
 
 local mvec_temp = Vector3()

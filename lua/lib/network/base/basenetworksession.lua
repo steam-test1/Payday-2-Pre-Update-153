@@ -32,7 +32,7 @@ end
 
 function BaseNetworkSession:create_local_peer(load_outfit)
 	local my_name = managers.network.account:username_id()
-	local my_user_id = SystemInfo:platform() == self._ids_WIN32 and Steam:userid() or false
+	local my_user_id = SystemInfo:distribution() == Idstring("STEAM") and Steam:userid() or false
 	self._local_peer = NetworkPeer:new(my_name, Network:self("TCP_IP"), 0, false, false, false, managers.blackmarket:get_preferred_character(), my_user_id)
 	if load_outfit then
 		self._local_peer:set_outfit_string(managers.blackmarket:outfit_string(), nil)
@@ -205,7 +205,7 @@ function BaseNetworkSession:add_peer(name, rpc, in_lobby, loading, synched, id, 
 	if SystemInfo:platform() == Idstring("X360") or self:is_host() then
 		peer:set_xnaddr(xnaddr)
 	end
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		Steam:set_played_with(peer:user_id())
 	end
 	self._peers[id] = peer

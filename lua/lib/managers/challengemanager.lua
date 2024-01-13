@@ -62,7 +62,7 @@ end
 function ChallengeManager:_fetch_challenges()
 	local done_clbk = callback(self, self, "_fetch_done_clbk")
 	self._global.retrieving = true
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		Steam:http_request("http://media.overkillsoftware.com/stats/missions.json", done_clbk, Idstring("ChallengeManager:_fetch_challenges()"):key())
 	else
 	end

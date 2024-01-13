@@ -5,6 +5,7 @@ function MessageSystem:init()
 	self._listeners = {}
 	self._remove_list = {}
 	self._add_list = {}
+	self._messages = {}
 end
 
 function MessageSystem:register(message, uid, func)
@@ -20,15 +21,41 @@ function MessageSystem:unregister(message, uid)
 end
 
 function MessageSystem:notify(message, uid, ...)
-	self:flush()
+	table.insert(self._messages, {
+		message = message,
+		uid = uid,
+		arg = arg
+	})
+end
+
+function MessageSystem:notify_now(message, uid, ...)
 	if self._listeners[message] then
-		if uid then
-			if self._listeners[message][uid] then
-				self._listeners[message][uid](unpack(arg))
-			end
+		if uid and self._listeners[message][uid] then
+			self._listeners[message][uid](unpack(arg))
 		else
 			for key, value in pairs(self._listeners[message]) do
 				value(unpack(arg))
+			end
+		end
+	end
+end
+
+function MessageSystem:_notify()
+	local messages = deep_clone(self._messages)
+	local count = #self._messages
+	for i = 1, count do
+		self._messages[i] = nil
+	end
+	self._messages = nil
+	self._messages = {}
+	for i = 1, count do
+		if self._listeners[messages[i].message] then
+			if messages[i].uid then
+				self._listeners[messages[i].message][messages[i].uid](unpack(messages[i].arg))
+			else
+				for key, value in pairs(self._listeners[messages[i].message]) do
+					value(unpack(messages[i].arg))
+				end
 			end
 		end
 	end
@@ -41,6 +68,11 @@ function MessageSystem:flush()
 	if 0 < #self._add_list then
 		self:_add()
 	end
+end
+
+function MessageSystem:update()
+	self:flush()
+	self:_notify()
 end
 
 function MessageSystem:_remove()

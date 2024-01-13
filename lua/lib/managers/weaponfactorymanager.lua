@@ -867,7 +867,6 @@ function WeaponFactoryManager:get_part_desc_by_part_id_from_weapon(part_id, fact
 end
 
 function WeaponFactoryManager:get_part_data_by_part_id_from_weapon(part_id, factory_id, blueprint)
-	local factory = tweak_data.weapon.factory
 	local override = self:_get_override_parts(factory_id, blueprint)
 	return self:_part_data(part_id, factory_id, override)
 end
@@ -1158,6 +1157,21 @@ function WeaponFactoryManager:has_perk(perk_name, factory_id, blueprint)
 		end
 	end
 	return false
+end
+
+function WeaponFactoryManager:get_perk_stats(perk_name, factory_id, blueprint)
+	local factory = tweak_data.weapon.factory
+	local forbidden = self:_get_forbidden_parts(factory_id, blueprint)
+	for _, part_id in ipairs(blueprint) do
+		if not forbidden[part_id] and factory.parts[part_id].perks then
+			for _, perk in ipairs(factory.parts[part_id].perks) do
+				if perk == perk_name then
+					return factory.parts[part_id].stats
+				end
+			end
+		end
+	end
+	return nil
 end
 
 function WeaponFactoryManager:get_type_from_part_id(part_id)

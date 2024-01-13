@@ -5,15 +5,13 @@ function SkillTreeTweakData:init()
 		return Application:digest_value(value, true)
 	end
 	self.tier_unlocks = {
+		digest(0),
 		digest(1),
-		digest(5),
-		digest(10),
-		digest(20),
-		digest(30),
-		digest(40)
+		digest(3),
+		digest(18)
 	}
 	self.costs = {
-		unlock_tree = digest(1),
+		unlock_tree = digest(0),
 		default = digest(1),
 		pro = digest(3),
 		hightier = digest(4),
@@ -26,166 +24,46 @@ function SkillTreeTweakData:init()
 		digest(0),
 		digest(0)
 	}
+	self.skill_pages_order = {
+		"mastermind",
+		"enforcer",
+		"technician",
+		"ghost",
+		"hoxton"
+	}
+	self.tier_cost = {
+		{1, 3},
+		{2, 4},
+		{3, 6},
+		{4, 8}
+	}
+	self.num_tiers = #self.tier_cost
 	self.HIDE_TIER_BONUS = true
 	self.skills = {}
-	self.skills.mastermind = {
-		name_id = "menu_mastermind",
-		desc_id = "menu_mastermind_desc",
-		icon_xy = {2, 7},
-		[1] = {
-			upgrades = {"doctor_bag"},
-			cost = self.costs.unlock_tree,
-			desc_id = "menu_mastermind_tier_1"
-		},
-		[2] = {
-			upgrades = {},
-			desc_id = "menu_mastermind_tier_2"
-		},
-		[3] = {
-			upgrades = {},
-			desc_id = "menu_mastermind_tier_3"
-		},
-		[4] = {
-			upgrades = {},
-			desc_id = "menu_mastermind_tier_4"
-		},
-		[5] = {
-			upgrades = {},
-			desc_id = "menu_mastermind_tier_5"
-		},
-		[6] = {
-			upgrades = {},
-			desc_id = "menu_mastermind_tier_6"
-		}
+	self.skilltree = {}
+	self.skilltree.mastermind = {
+		name_id = "st_menu_mastermind",
+		desc_id = "st_menu_mastermind_desc"
 	}
-	self.skills.enforcer = {
-		name_id = "menu_enforcer",
-		desc_id = "menu_enforcer_desc",
-		icon_xy = {1, 0},
-		[1] = {
-			upgrades = {"ammo_bag"},
-			cost = self.costs.unlock_tree,
-			desc_id = "menu_menu_enforcer_tier_1"
-		},
-		[2] = {
-			upgrades = {},
-			desc_id = "menu_menu_enforcer_tier_2"
-		},
-		[3] = {
-			upgrades = {},
-			desc_id = "menu_menu_enforcer_tier_3"
-		},
-		[4] = {
-			upgrades = {},
-			desc_id = "menu_menu_enforcer_tier_4"
-		},
-		[5] = {
-			upgrades = {},
-			desc_id = "menu_menu_enforcer_tier_5"
-		},
-		[6] = {
-			upgrades = {},
-			desc_id = "menu_menu_enforcer_tier_6"
-		}
+	self.skilltree.enforcer = {
+		name_id = "st_menu_enforcer",
+		desc_id = "st_menu_enforcer_desc"
 	}
-	self.skills.technician = {
-		name_id = "menu_technician",
-		desc_id = "menu_technician_desc",
-		icon_xy = {7, 4},
-		[1] = {
-			upgrades = {"trip_mine"},
-			cost = self.costs.unlock_tree,
-			desc_id = "menu_technician_tier_1"
-		},
-		[2] = {
-			upgrades = {},
-			desc_id = "menu_technician_tier_2"
-		},
-		[3] = {
-			upgrades = {},
-			desc_id = "menu_technician_tier_3"
-		},
-		[4] = {
-			upgrades = {},
-			desc_id = "menu_technician_tier_4"
-		},
-		[5] = {
-			upgrades = {},
-			desc_id = "menu_technician_tier_5"
-		},
-		[6] = {
-			upgrades = {},
-			desc_id = "menu_technician_tier_6"
-		}
+	self.skilltree.technician = {
+		name_id = "st_menu_technician",
+		desc_id = "st_menu_technician_desc"
 	}
-	self.skills.ghost = {
-		name_id = "menu_ghost",
-		desc_id = "menu_ghost_desc",
-		icon_xy = {1, 4},
-		[1] = {
-			upgrades = {
-				"ecm_jammer",
-				"ecm_jammer_affects_cameras"
-			},
-			cost = self.costs.unlock_tree,
-			desc_id = "menu_ghost_tier_1"
-		},
-		[2] = {
-			upgrades = {},
-			desc_id = "menu_ghost_tier_2"
-		},
-		[3] = {
-			upgrades = {},
-			desc_id = "menu_ghost_tier_3"
-		},
-		[4] = {
-			upgrades = {},
-			desc_id = "menu_ghost_tier_4"
-		},
-		[5] = {
-			upgrades = {},
-			desc_id = "menu_ghost_tier_5"
-		},
-		[6] = {
-			upgrades = {},
-			desc_id = "menu_ghost_tier_6"
-		}
+	self.skilltree.ghost = {
+		name_id = "st_menu_ghost",
+		desc_id = "st_menu_ghost_desc"
 	}
-	self.skills.hoxton = {
-		name_id = "menu_hoxton_pack",
-		desc_id = "menu_hoxton_pack_desc",
-		icon_xy = {3, 10},
-		[1] = {
-			upgrades = {
-				"first_aid_kit"
-			},
-			cost = self.costs.unlock_tree,
-			desc_id = "menu_hoxton_tier_1"
-		},
-		[2] = {
-			upgrades = {},
-			desc_id = "menu_hoxton_tier_2"
-		},
-		[3] = {
-			upgrades = {},
-			desc_id = "menu_hoxton_tier_3"
-		},
-		[4] = {
-			upgrades = {},
-			desc_id = "menu_hoxton_tier_4"
-		},
-		[5] = {
-			upgrades = {},
-			desc_id = "menu_hoxton_tier_5"
-		},
-		[6] = {
-			upgrades = {},
-			desc_id = "menu_hoxton_tier_6"
-		}
+	self.skilltree.hoxton = {
+		name_id = "st_menu_hoxton_pack",
+		desc_id = "st_menu_hoxton_pack_desc"
 	}
 	self.skills.black_marketeer = {
-		name_id = "menu_black_marketeer",
-		desc_id = "menu_black_marketeer_desc",
+		name_id = "menu_black_marketeer_beta",
+		desc_id = "menu_black_marketeer_beta_desc",
 		icon_xy = {2, 10},
 		[1] = {
 			upgrades = {
@@ -201,29 +79,30 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.gun_fighter = {
-		name_id = "menu_gun_fighter",
-		desc_id = "menu_gun_fighter_desc",
-		icon_xy = {0, 9},
+		name_id = "menu_gun_fighter_beta",
+		desc_id = "menu_gun_fighter_beta_desc",
+		icon_xy = {7, 11},
 		[1] = {
 			upgrades = {
-				"pistol_reload_speed_multiplier"
+				"pistol_damage_addend_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"pistol_damage_addend"
+				"pistol_damage_addend_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.combat_medic = {
-		name_id = "menu_combat_medic",
-		desc_id = "menu_combat_medic_desc",
+		name_id = "menu_combat_medic_beta",
+		desc_id = "menu_combat_medic_beta_desc",
 		icon_xy = {5, 7},
 		[1] = {
 			upgrades = {
-				"temporary_combat_medic_damage_multiplier1"
+				"temporary_revive_damage_reduction_1",
+				"player_revive_damage_reduction_1"
 			},
 			cost = self.costs.default
 		},
@@ -235,10 +114,9 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.control_freak = {
-		name_id = "menu_control_freak",
-		desc_id = "menu_control_freak_desc",
+		name_id = "menu_control_freak_beta",
+		desc_id = "menu_control_freak_beta_desc",
 		icon_xy = {1, 10},
-		prerequisites = {"joker"},
 		[1] = {
 			upgrades = {
 				"player_minion_master_speed_multiplier",
@@ -255,8 +133,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.leadership = {
-		name_id = "menu_leadership",
-		desc_id = "menu_leadership_desc",
+		name_id = "menu_leadership_beta",
+		desc_id = "menu_leadership_beta_desc",
 		icon_xy = {7, 7},
 		[1] = {
 			upgrades = {
@@ -274,8 +152,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.inside_man = {
-		name_id = "menu_inside_man",
-		desc_id = "menu_inside_man_desc",
+		name_id = "menu_inside_man_beta",
+		desc_id = "menu_inside_man_beta_desc",
 		icon_xy = {6, 7},
 		[1] = {
 			upgrades = {
@@ -292,8 +170,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.target_mark = {
-		name_id = "menu_target_mark",
-		desc_id = "menu_target_mark_desc",
+		name_id = "menu_target_mark_beta",
+		desc_id = "menu_target_mark_beta_desc",
 		icon_xy = {3, 7},
 		[1] = {
 			upgrades = {},
@@ -304,13 +182,11 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.dominator = {
-		name_id = "menu_dominator",
-		desc_id = "menu_dominator_desc",
+		name_id = "menu_dominator_beta",
+		desc_id = "menu_dominator_beta_desc",
 		icon_xy = {2, 8},
 		[1] = {
-			upgrades = {
-				"player_intimidate_enemies"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
@@ -322,8 +198,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.fast_learner = {
-		name_id = "menu_fast_learner",
-		desc_id = "menu_fast_learner_desc",
+		name_id = "menu_fast_learner_beta",
+		desc_id = "menu_fast_learner_beta_desc",
 		icon_xy = {0, 10},
 		[1] = {
 			upgrades = {
@@ -339,42 +215,44 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.stockholm_syndrome = {
-		name_id = "menu_stockholm_syndrome",
-		desc_id = "menu_stockholm_syndrome_desc",
+		name_id = "menu_stockholm_syndrome_beta",
+		desc_id = "menu_stockholm_syndrome_beta_desc",
 		icon_xy = {3, 8},
 		[1] = {
 			upgrades = {
-				"player_civilian_reviver"
+				"player_civ_calming_alerts",
+				"player_civ_intimidation_mul"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_civilian_gives_ammo"
+				"player_super_syndrome_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.cable_guy = {
-		name_id = "menu_cable_guy",
-		desc_id = "menu_cable_guy_desc",
-		icon_xy = {4, 7},
+		name_id = "menu_cable_guy_beta",
+		desc_id = "menu_cable_guy_beta_desc",
+		icon_xy = {2, 8},
 		[1] = {
 			upgrades = {
-				"cable_tie_interact_speed_multiplier"
+				"player_intimidate_range_mul",
+				"player_intimidate_aura"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"cable_tie_quantity"
+				"player_convert_enemies_max_minions_2"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.tactician = {
-		name_id = "menu_tactician",
-		desc_id = "menu_tactician_desc",
+		name_id = "menu_tactician_beta",
+		desc_id = "menu_tactician_beta_desc",
 		icon_xy = {3, 7},
 		[1] = {
 			upgrades = {
@@ -390,25 +268,26 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.triathlete = {
-		name_id = "menu_triathlete",
-		desc_id = "menu_triathlete_desc",
-		icon_xy = {1, 8},
+		name_id = "menu_triathlete_beta",
+		desc_id = "menu_triathlete_beta_desc",
+		icon_xy = {4, 7},
 		[1] = {
 			upgrades = {
-				"player_stamina_multiplier"
+				"cable_tie_quantity",
+				"cable_tie_interact_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"team_stamina_multiplier"
+				"team_damage_hostage_absorption"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.kilmer = {
-		name_id = "menu_kilmer",
-		desc_id = "menu_kilmer_desc",
+		name_id = "menu_kilmer_beta",
+		desc_id = "menu_kilmer_beta_desc",
 		icon_xy = {1, 9},
 		[1] = {
 			upgrades = {
@@ -420,44 +299,46 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"assault_rifle_move_spread_index_addend",
-				"player_run_and_reload",
 				"snp_move_spread_index_addend"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.equilibrium = {
-		name_id = "menu_equilibrium",
-		desc_id = "menu_equilibrium_desc",
+		name_id = "menu_equilibrium_beta",
+		desc_id = "menu_equilibrium_beta_desc",
 		icon_xy = {3, 9},
 		[1] = {
 			upgrades = {
-				"pistol_spread_index_addend",
 				"pistol_swap_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"pistol_fire_rate_multiplier"
+				"pistol_spread_index_addend"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.negotiator = {
-		name_id = "menu_negotiator",
-		desc_id = "menu_negotiator_desc",
+		name_id = "menu_negotiator_beta",
+		desc_id = "menu_negotiator_beta_desc",
 		icon_xy = {7, 8},
 		[1] = {
+			upgrades = {},
 			cost = self.costs.hightier
 		},
 		[2] = {
+			upgrades = {
+				"pistol_fire_rate_multiplier"
+			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.medic_2x = {
-		name_id = "menu_medic_2x",
-		desc_id = "menu_medic_2x_desc",
+		name_id = "menu_medic_2x_beta",
+		desc_id = "menu_medic_2x_beta_desc",
 		icon_xy = {5, 8},
 		[1] = {
 			upgrades = {
@@ -473,10 +354,9 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.joker = {
-		name_id = "menu_joker",
-		desc_id = "menu_joker_desc",
+		name_id = "menu_joker_beta",
+		desc_id = "menu_joker_beta_desc",
 		icon_xy = {6, 8},
-		prerequisites = {"dominator"},
 		[1] = {
 			upgrades = {
 				"player_convert_enemies",
@@ -494,8 +374,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.inspire = {
-		name_id = "menu_inspire",
-		desc_id = "menu_inspire_desc",
+		name_id = "menu_inspire_beta",
+		desc_id = "menu_inspire_beta_desc",
 		icon_xy = {4, 9},
 		[1] = {
 			upgrades = {
@@ -506,31 +386,31 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_long_dis_revive"
+				"cooldown_long_dis_revive"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
-	self.skills.pistol_messiah = {
-		name_id = "menu_pistol_messiah",
-		desc_id = "menu_pistol_messiah_desc",
+	self.skills.messiah = {
+		name_id = "menu_pistol_beta_messiah",
+		desc_id = "menu_pistol_beta_messiah_desc",
 		icon_xy = {2, 9},
 		[1] = {
 			upgrades = {
-				"player_pistol_revive_from_bleed_out_1"
+				"player_messiah_revive_from_bleed_out_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_pistol_revive_from_bleed_out_2"
+				"player_recharge_messiah_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.ammo_reservoir = {
-		name_id = "menu_ammo_reservoir",
-		desc_id = "menu_ammo_reservoir_desc",
+		name_id = "menu_ammo_reservoir_beta",
+		desc_id = "menu_ammo_reservoir_beta_desc",
 		icon_xy = {4, 5},
 		[1] = {
 			upgrades = {
@@ -546,8 +426,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.demolition_man = {
-		name_id = "menu_demolition_man",
-		desc_id = "menu_demolition_man_desc",
+		name_id = "menu_demolition_man_beta",
+		desc_id = "menu_demolition_man_beta_desc",
 		icon_xy = {4, 5},
 		[1] = {
 			upgrades = {},
@@ -559,26 +439,27 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.oppressor = {
-		name_id = "menu_oppressor",
-		desc_id = "menu_oppressor_desc",
-		icon_xy = {7, 0},
+		name_id = "menu_oppressor_beta",
+		desc_id = "menu_oppressor_beta_desc",
+		icon_xy = {2, 12},
 		[1] = {
 			upgrades = {
-				"player_suppression_bonus"
+				"player_armor_regen_time_mul_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_suppression_mul_2"
+				"player_flashbang_multiplier_1",
+				"player_flashbang_multiplier_2"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.steroids = {
-		name_id = "menu_steroids",
-		desc_id = "menu_steroids_desc",
-		icon_xy = {4, 0},
+		name_id = "menu_steroids_beta",
+		desc_id = "menu_steroids_beta_desc",
+		icon_xy = {1, 3},
 		[1] = {
 			upgrades = {
 				"player_non_special_melee_multiplier"
@@ -593,8 +474,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.bandoliers = {
-		name_id = "menu_bandoliers",
-		desc_id = "menu_bandoliers_desc",
+		name_id = "menu_bandoliers_beta",
+		desc_id = "menu_bandoliers_beta_desc",
 		icon_xy = {3, 0},
 		[1] = {
 			upgrades = {
@@ -612,58 +493,63 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.pack_mule = {
-		name_id = "menu_pack_mule",
-		desc_id = "menu_pack_mule_desc",
-		icon_xy = {6, 0},
+		name_id = "menu_pack_mule_beta",
+		desc_id = "menu_pack_mule_beta_desc",
+		icon_xy = {8, 8},
 		[1] = {
 			upgrades = {
-				"carry_movement_speed_multiplier"
+				"carry_throw_distance_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"carry_throw_distance_multiplier"
+				"player_armor_carry_bonus_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.shotgun_impact = {
-		name_id = "menu_shotgun_impact",
-		desc_id = "menu_shotgun_impact_desc",
-		icon_xy = {5, 0},
+		name_id = "menu_shotgun_impact_beta",
+		desc_id = "menu_shotgun_impact_beta_desc",
+		icon_xy = {4, 1},
 		[1] = {
 			upgrades = {
-				"shotgun_recoil_index_addend"
+				"shotgun_recoil_index_addend",
+				"shotgun_damage_multiplier_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"shotgun_damage_multiplier"
+				"shotgun_damage_multiplier_2"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.portable_saw = {
-		name_id = "menu_portable_saw",
-		desc_id = "menu_portable_saw_desc",
+		name_id = "menu_portable_saw_beta",
+		desc_id = "menu_portable_saw_beta_desc",
 		icon_xy = {0, 1},
 		[1] = {
-			upgrades = {"saw"},
+			upgrades = {
+				"saw_secondary"
+			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"saw_extra_ammo_multiplier"
+				"saw_extra_ammo_multiplier",
+				"player_saw_speed_multiplier_2",
+				"saw_lock_damage_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.tough_guy = {
-		name_id = "menu_tough_guy",
-		desc_id = "menu_tough_guy_desc",
-		icon_xy = {1, 1},
+		name_id = "menu_tough_guy_beta",
+		desc_id = "menu_tough_guy_beta_desc",
+		icon_xy = {0, 0},
 		[1] = {
 			upgrades = {
 				"player_damage_shake_multiplier"
@@ -678,8 +564,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.underdog = {
-		name_id = "menu_underdog",
-		desc_id = "menu_underdog_desc",
+		name_id = "menu_underdog_beta",
+		desc_id = "menu_underdog_beta_desc",
 		icon_xy = {2, 1},
 		[1] = {
 			upgrades = {
@@ -695,26 +581,25 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.juggernaut = {
-		name_id = "menu_juggernaut",
-		desc_id = "menu_juggernaut_desc",
+		name_id = "menu_juggernaut_beta",
+		desc_id = "menu_juggernaut_beta_desc",
 		icon_xy = {3, 1},
 		[1] = {
 			upgrades = {
-				"body_armor6"
+				"player_armor_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_shield_knock",
-				"player_run_and_shoot"
+				"body_armor6"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.from_the_hip = {
-		name_id = "menu_from_the_hip",
-		desc_id = "menu_from_the_hip_desc",
+		name_id = "menu_from_the_hip_beta",
+		desc_id = "menu_from_the_hip_beta_desc",
 		icon_xy = {4, 1},
 		[1] = {
 			upgrades = {
@@ -730,25 +615,26 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.shotgun_cqb = {
-		name_id = "menu_shotgun_cqb",
-		desc_id = "menu_shotgun_cqb_desc",
-		icon_xy = {5, 1},
+		name_id = "menu_shotgun_cqb_beta",
+		desc_id = "menu_shotgun_cqb_beta_desc",
+		icon_xy = {8, 7},
 		[1] = {
 			upgrades = {
-				"shotgun_reload_speed_multiplier"
+				"shotgun_reload_speed_multiplier_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"shotgun_enter_steelsight_speed_multiplier"
+				"shotgun_enter_steelsight_speed_multiplier",
+				"shotgun_reload_speed_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.shades = {
-		name_id = "menu_shades",
-		desc_id = "menu_shades_desc",
+		name_id = "menu_shades_beta",
+		desc_id = "menu_shades_beta_desc",
 		icon_xy = {6, 1},
 		[1] = {
 			upgrades = {
@@ -764,8 +650,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.ammo_2x = {
-		name_id = "menu_ammo_2x",
-		desc_id = "menu_ammo_2x_desc",
+		name_id = "menu_ammo_2x_beta",
+		desc_id = "menu_ammo_2x_beta_desc",
 		icon_xy = {7, 1},
 		[1] = {
 			upgrades = {
@@ -781,49 +667,45 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.carbon_blade = {
-		name_id = "menu_carbon_blade",
-		desc_id = "menu_carbon_blade_desc",
+		name_id = "menu_carbon_blade_beta",
+		desc_id = "menu_carbon_blade_beta_desc",
 		icon_xy = {0, 2},
-		prerequisites = {
-			"portable_saw"
-		},
 		[1] = {
 			upgrades = {
-				"player_saw_speed_multiplier_1",
-				"saw_lock_damage_multiplier_1"
+				"saw_enemy_slicer"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_saw_speed_multiplier_2",
-				"saw_lock_damage_multiplier_2",
-				"saw_enemy_slicer",
-				"saw_secondary"
+				"saw_ignore_shields_1",
+				"saw_panic_when_kill_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.show_of_force = {
-		name_id = "menu_show_of_force",
-		desc_id = "menu_show_of_force_desc",
-		icon_xy = {1, 2},
+		name_id = "menu_show_of_force_beta",
+		desc_id = "menu_show_of_force_beta_desc",
+		icon_xy = {8, 9},
 		[1] = {
 			upgrades = {
-				"player_primary_weapon_when_downed"
+				"player_interacting_damage_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_armor_regen_timer_multiplier"
+				"player_level_2_armor_addend",
+				"player_level_3_armor_addend",
+				"player_level_4_armor_addend"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.wolverine = {
-		name_id = "menu_wolverine",
-		desc_id = "menu_wolverine_desc",
+		name_id = "menu_wolverine_beta",
+		desc_id = "menu_wolverine_beta_desc",
 		icon_xy = {2, 2},
 		[1] = {
 			upgrades = {
@@ -839,8 +721,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.overkill = {
-		name_id = "menu_overkill",
-		desc_id = "menu_overkill_desc",
+		name_id = "menu_overkill_beta",
+		desc_id = "menu_overkill_beta_desc",
 		icon_xy = {3, 2},
 		[1] = {
 			upgrades = {
@@ -850,14 +732,15 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_overkill_all_weapons"
+				"player_overkill_all_weapons",
+				"weapon_swap_speed_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.mag_plus = {
-		name_id = "menu_mag_plus",
-		desc_id = "menu_mag_plus_desc",
+		name_id = "menu_mag_plus_beta",
+		desc_id = "menu_mag_plus_beta_desc",
 		icon_xy = {2, 0},
 		[1] = {
 			upgrades = {
@@ -873,49 +756,50 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.iron_man = {
-		name_id = "menu_iron_man",
-		desc_id = "menu_iron_man_desc",
-		icon_xy = {6, 4},
+		name_id = "menu_iron_man_beta",
+		desc_id = "menu_iron_man_beta_desc",
+		icon_xy = {8, 10},
 		[1] = {
 			upgrades = {
-				"player_armor_multiplier"
+				"team_armor_regen_time_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"team_armor_regen_time_multiplier"
+				"player_shield_knock"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.rifleman = {
-		name_id = "menu_rifleman",
-		desc_id = "menu_rifleman_desc",
-		icon_xy = {0, 5},
+		name_id = "menu_rifleman_beta",
+		desc_id = "menu_rifleman_beta_desc",
+		icon_xy = {6, 5},
 		[1] = {
 			upgrades = {
 				"assault_rifle_enter_steelsight_speed_multiplier",
-				"snp_enter_steelsight_speed_multiplier"
+				"snp_enter_steelsight_speed_multiplier",
+				"player_steelsight_normal_movement_speed"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
 				"assault_rifle_zoom_increase",
-				"snp_zoom_increase"
+				"snp_zoom_increase",
+				"assault_rifle_move_spread_index_addend",
+				"snp_move_spread_index_addend"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.blast_radius = {
-		name_id = "menu_blast_radius",
-		desc_id = "menu_blast_radius_desc",
+		name_id = "menu_blast_radius_beta",
+		desc_id = "menu_blast_radius_beta_desc",
 		icon_xy = {7, 9},
 		[1] = {
-			upgrades = {
-				"trip_mine_explosion_size_multiplier_2"
-			},
+			upgrades = {},
 			cost = self.costs.hightier
 		},
 		[2] = {
@@ -926,8 +810,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.insulation = {
-		name_id = "menu_insulation",
-		desc_id = "menu_insulation_desc",
+		name_id = "menu_insulation_beta",
+		desc_id = "menu_insulation_beta_desc",
 		icon_xy = {3, 5},
 		[1] = {
 			upgrades = {
@@ -937,52 +821,49 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"player_taser_self_shock"
+				"player_taser_self_shock",
+				"player_escape_taser_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.hardware_expert = {
-		name_id = "menu_hardware_expert",
-		desc_id = "menu_hardware_expert_desc",
-		icon_xy = {5, 5},
+		name_id = "menu_hardware_expert_beta",
+		desc_id = "menu_hardware_expert_beta_desc",
+		icon_xy = {9, 6},
 		[1] = {
 			upgrades = {
 				"player_drill_fix_interaction_speed_multiplier",
-				"player_trip_mine_deploy_time_multiplier_2"
+				"player_trip_mine_deploy_time_multiplier_2",
+				"player_drill_alert",
+				"player_silent_drill"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_drill_autorepair",
-				"player_sentry_gun_deploy_time_multiplier"
+				"player_drill_autorepair_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.trip_mine_expert = {
-		name_id = "menu_trip_mine_expert",
-		desc_id = "menu_trip_mine_expert_desc",
-		icon_xy = {4, 6},
+		name_id = "menu_trip_mine_expert_beta",
+		desc_id = "menu_trip_mine_expert_beta_desc",
+		icon_xy = {8, 0},
 		[1] = {
-			upgrades = {
-				"trip_mine_can_switch_on_off"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
-			upgrades = {
-				"trip_mine_sensor_toggle",
-				"trip_mine_sensor_highlight"
-			},
+			upgrades = {},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.sharpshooter = {
-		name_id = "menu_sharpshooter",
-		desc_id = "menu_sharpshooter_desc",
-		icon_xy = {6, 5},
+		name_id = "menu_sharpshooter_beta",
+		desc_id = "menu_sharpshooter_beta_desc",
+		icon_xy = {8, 1},
 		[1] = {
 			upgrades = {
 				"weapon_single_spread_index_addend"
@@ -991,15 +872,14 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"assault_rifle_recoil_index_addend",
-				"snp_recoil_index_addend"
+				"single_shot_accuracy_inc_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.sentry_gun = {
-		name_id = "menu_sentry_gun",
-		desc_id = "menu_sentry_gun_desc",
+		name_id = "menu_sentry_gun_beta",
+		desc_id = "menu_sentry_gun_beta_desc",
 		icon_xy = {7, 5},
 		[1] = {
 			upgrades = {"sentry_gun"},
@@ -1013,10 +893,9 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.sentry_targeting_package = {
-		name_id = "menu_sentry_targeting_package",
-		desc_id = "menu_sentry_targeting_package_desc",
-		icon_xy = {1, 6},
-		prerequisites = {"sentry_gun"},
+		name_id = "menu_sentry_targeting_package_beta",
+		desc_id = "menu_sentry_targeting_package_beta_desc",
+		icon_xy = {9, 1},
 		[1] = {
 			upgrades = {
 				"sentry_gun_spread_multiplier"
@@ -1032,10 +911,9 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.sentry_2_0 = {
-		name_id = "menu_sentry_2_0",
-		desc_id = "menu_sentry_2_0_desc",
+		name_id = "menu_sentry_2_0_beta",
+		desc_id = "menu_sentry_2_0_beta_desc",
 		icon_xy = {5, 6},
-		prerequisites = {"sentry_gun"},
 		[1] = {
 			upgrades = {
 				"sentry_gun_can_reload"
@@ -1050,8 +928,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.drill_expert = {
-		name_id = "menu_drill_expert",
-		desc_id = "menu_drill_expert_desc",
+		name_id = "menu_drill_expert_beta",
+		desc_id = "menu_drill_expert_beta_desc",
 		icon_xy = {3, 6},
 		[1] = {
 			upgrades = {
@@ -1067,8 +945,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.military_grade = {
-		name_id = "menu_military_grade",
-		desc_id = "menu_military_grade_desc",
+		name_id = "menu_military_grade_beta",
+		desc_id = "menu_military_grade_beta_desc",
 		icon_xy = {4, 6},
 		[1] = {
 			upgrades = {
@@ -1082,8 +960,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.dye_pack_removal = {
-		name_id = "menu_dye_pack_removal",
-		desc_id = "menu_dye_pack_removal_desc",
+		name_id = "menu_dye_pack_removal_beta",
+		desc_id = "menu_dye_pack_removal_beta_desc",
 		icon_xy = {0, 6},
 		[1] = {
 			upgrades = {
@@ -1099,25 +977,21 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.silent_drilling = {
-		name_id = "menu_silent_drilling",
-		desc_id = "menu_silent_drilling_desc",
+		name_id = "menu_silent_drilling_beta",
+		desc_id = "menu_silent_drilling_beta_desc",
 		icon_xy = {2, 6},
 		[1] = {
-			upgrades = {
-				"player_drill_alert"
-			},
+			upgrades = {},
 			cost = self.costs.hightier
 		},
 		[2] = {
-			upgrades = {
-				"player_silent_drill"
-			},
+			upgrades = {},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.discipline = {
-		name_id = "menu_discipline",
-		desc_id = "menu_discipline_desc",
+		name_id = "menu_discipline_beta",
+		desc_id = "menu_discipline_beta_desc",
 		icon_xy = {6, 6},
 		[1] = {
 			upgrades = {
@@ -1133,8 +1007,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.trip_miner = {
-		name_id = "menu_trip_miner",
-		desc_id = "menu_trip_miner_desc",
+		name_id = "menu_trip_miner_beta",
+		desc_id = "menu_trip_miner_beta_desc",
 		icon_xy = {2, 5},
 		[1] = {
 			upgrades = {
@@ -1150,12 +1024,12 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.shaped_charge = {
-		name_id = "menu_shaped_charge",
-		desc_id = "menu_shaped_charge_desc",
+		name_id = "menu_shaped_charge_beta",
+		desc_id = "menu_shaped_charge_beta_desc",
 		icon_xy = {0, 7},
 		[1] = {
 			upgrades = {
-				"trip_mine_quantity_increase_3"
+				"trip_mine_quantity_increase_2"
 			},
 			cost = self.costs.hightier
 		},
@@ -1167,8 +1041,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.master_craftsman = {
-		name_id = "menu_master_craftsman",
-		desc_id = "menu_master_craftsman_desc",
+		name_id = "menu_master_craftsman_beta",
+		desc_id = "menu_master_craftsman_beta_desc",
 		icon_xy = {6, 9},
 		[1] = {
 			upgrades = {
@@ -1183,31 +1057,14 @@ function SkillTreeTweakData:init()
 			cost = self.costs.pro
 		}
 	}
-	self.skills.sentry_gun_2x = {
-		name_id = "menu_sentry_gun_2x",
-		desc_id = "menu_sentry_gun_2x_desc",
-		icon_xy = {7, 6},
-		prerequisites = {"sentry_gun"},
-		[1] = {
-			upgrades = {
-				"sentry_gun_quantity_increase"
-			},
-			cost = self.costs.hightier
-		},
-		[2] = {
-			upgrades = {
-				"sentry_gun_damage_multiplier"
-			},
-			cost = self.costs.hightierpro
-		}
-	}
 	self.skills.ecm_booster = {
-		name_id = "menu_ecm_booster",
-		desc_id = "menu_ecm_booster_desc",
+		name_id = "menu_ecm_booster_beta",
+		desc_id = "menu_ecm_booster_beta_desc",
 		icon_xy = {6, 3},
 		[1] = {
 			upgrades = {
-				"ecm_jammer_duration_multiplier"
+				"ecm_jammer_duration_multiplier",
+				"ecm_jammer_feedback_duration_boost"
 			},
 			cost = self.costs.hightier
 		},
@@ -1219,27 +1076,27 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.sprinter = {
-		name_id = "menu_sprinter",
-		desc_id = "menu_sprinter_desc",
-		icon_xy = {7, 3},
+		name_id = "menu_sprinter_beta",
+		desc_id = "menu_sprinter_beta_desc",
+		icon_xy = {10, 5},
 		[1] = {
 			upgrades = {
 				"player_stamina_regen_timer_multiplier",
-				"player_stamina_regen_multiplier"
+				"player_stamina_regen_multiplier",
+				"player_run_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_run_dodge_chance",
-				"player_run_speed_multiplier"
+				"player_run_dodge_chance"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.smg_training = {
-		name_id = "menu_smg_training",
-		desc_id = "menu_smg_training_desc",
+		name_id = "menu_smg_training_beta",
+		desc_id = "menu_smg_training_beta_desc",
 		icon_xy = {3, 3},
 		[1] = {
 			upgrades = {
@@ -1255,8 +1112,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.smg_master = {
-		name_id = "menu_smg_master",
-		desc_id = "menu_smg_master_desc",
+		name_id = "menu_smg_master_beta",
+		desc_id = "menu_smg_master_beta_desc",
 		icon_xy = {3, 3},
 		[1] = {
 			upgrades = {
@@ -1272,8 +1129,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.transporter = {
-		name_id = "menu_transporter",
-		desc_id = "menu_transporter_desc",
+		name_id = "menu_transporter_beta",
+		desc_id = "menu_transporter_beta_desc",
 		icon_xy = {4, 3},
 		[1] = {
 			upgrades = {
@@ -1283,69 +1140,67 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"carry_interact_speed_multiplier_2"
+				"player_armor_carry_bonus_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.cat_burglar = {
-		name_id = "menu_cat_burglar",
-		desc_id = "menu_cat_burglar_desc",
+		name_id = "menu_cat_burglar_beta",
+		desc_id = "menu_cat_burglar_beta_desc",
 		icon_xy = {0, 4},
 		[1] = {
-			upgrades = {
-				"player_fall_damage_multiplier"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_fall_health_damage_multiplier",
 				"player_respawn_time_multiplier"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.chameleon = {
-		name_id = "menu_chameleon",
-		desc_id = "menu_chameleon_desc",
-		icon_xy = {5, 3},
+		name_id = "menu_chameleon_beta",
+		desc_id = "menu_chameleon_beta_desc",
+		icon_xy = {6, 10},
 		[1] = {
 			upgrades = {
-				"player_suspicion_bonus",
-				"player_sec_camera_highlight_mask_off",
-				"player_special_enemy_highlight_mask_off"
+				"player_standstill_omniscience"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_camouflage_bonus"
+				"player_buy_bodybags_asset",
+				"player_additional_assets",
+				"player_cleaner_cost_multiplier",
+				"player_buy_spotter_asset"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.cleaner = {
-		name_id = "menu_cleaner",
-		desc_id = "menu_cleaner_desc",
+		name_id = "menu_cleaner_beta",
+		desc_id = "menu_cleaner_beta_desc",
 		icon_xy = {7, 2},
 		[1] = {
 			upgrades = {
-				"player_buy_bodybags_asset",
-				"weapon_special_damage_taken_multiplier"
+				"player_corpse_dispose_amount_2",
+				"player_extra_corpse_dispose_amount"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_corpse_dispose_amount_2"
+				"bodybags_bag_quantity"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.ecm_2x = {
-		name_id = "menu_ecm_2x",
-		desc_id = "menu_ecm_2x_desc",
+		name_id = "menu_ecm_2x_beta",
+		desc_id = "menu_ecm_2x_beta_desc",
 		icon_xy = {3, 4},
 		[1] = {
 			upgrades = {
@@ -1363,8 +1218,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.assassin = {
-		name_id = "menu_assassin",
-		desc_id = "menu_assassin_desc",
+		name_id = "menu_assassin_beta",
+		desc_id = "menu_assassin_beta_desc",
 		icon_xy = {0, 3},
 		[1] = {
 			upgrades = {
@@ -1381,9 +1236,9 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.martial_arts = {
-		name_id = "menu_martial_arts",
-		desc_id = "menu_martial_arts_desc",
-		icon_xy = {1, 3},
+		name_id = "menu_martial_arts_beta",
+		desc_id = "menu_martial_arts_beta_desc",
+		icon_xy = {11, 7},
 		[1] = {
 			upgrades = {
 				"player_melee_knockdown_mul"
@@ -1398,44 +1253,38 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.nine_lives = {
-		name_id = "menu_nine_lives",
-		desc_id = "menu_nine_lives_desc",
+		name_id = "menu_nine_lives_beta",
+		desc_id = "menu_nine_lives_beta_desc",
 		icon_xy = {5, 2},
 		[1] = {
 			upgrades = {
-				"player_additional_lives_1"
+				"player_bleed_out_health_multiplier"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"player_cheat_death_chance"
+				"player_additional_lives_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.ecm_feedback = {
-		name_id = "menu_ecm_feedback",
-		desc_id = "menu_ecm_feedback_desc",
+		name_id = "menu_ecm_feedback_beta",
+		desc_id = "menu_ecm_feedback_beta_desc",
 		icon_xy = {6, 2},
 		[1] = {
-			upgrades = {
-				"ecm_jammer_can_activate_feedback"
-			},
+			upgrades = {},
 			cost = self.costs.hightier
 		},
 		[2] = {
-			upgrades = {
-				"ecm_jammer_feedback_duration_boost",
-				"ecm_jammer_interaction_speed_multiplier",
-				"ecm_jammer_can_retrigger"
-			},
+			upgrades = {},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.moving_target = {
-		name_id = "menu_moving_target",
-		desc_id = "menu_moving_target_desc",
+		name_id = "menu_moving_target_beta",
+		desc_id = "menu_moving_target_beta_desc",
 		icon_xy = {2, 4},
 		[1] = {
 			upgrades = {
@@ -1444,32 +1293,30 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightier
 		},
 		[2] = {
-			upgrades = {
-				"player_can_free_run"
-			},
+			upgrades = {},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.scavenger = {
-		name_id = "menu_scavenger",
-		desc_id = "menu_scavenger_desc",
-		icon_xy = {2, 3},
+		name_id = "menu_scavenger_beta",
+		desc_id = "menu_scavenger_beta_desc",
+		icon_xy = {10, 9},
 		[1] = {
 			upgrades = {
-				"player_small_loot_multiplier1"
+				"temporary_damage_speed_multiplier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_small_loot_multiplier2"
+				"player_damage_speed_multiplier_send"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.hitman = {
-		name_id = "menu_hitman",
-		desc_id = "menu_hitman_desc",
+		name_id = "menu_hitman_beta",
+		desc_id = "menu_hitman_beta_desc",
 		icon_xy = {5, 9},
 		[1] = {
 			upgrades = {
@@ -1479,15 +1326,14 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"weapon_silencer_damage_multiplier_2",
-				"weapon_silencer_armor_piercing_chance_1"
+				"weapon_silencer_damage_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.silence_expert = {
-		name_id = "menu_silence_expert",
-		desc_id = "menu_silence_expert_desc",
+		name_id = "menu_silence_expert_beta",
+		desc_id = "menu_silence_expert_beta_desc",
 		icon_xy = {4, 4},
 		[1] = {
 			upgrades = {
@@ -1498,15 +1344,14 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"weapon_silencer_spread_index_addend",
-				"weapon_silencer_armor_piercing_chance_2"
+				"weapon_silencer_spread_index_addend"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.good_luck_charm = {
-		name_id = "menu_good_luck_charm",
-		desc_id = "menu_good_luck_charm_desc",
+		name_id = "menu_good_luck_charm_beta",
+		desc_id = "menu_good_luck_charm_beta_desc",
 		icon_xy = {4, 2},
 		[1] = {
 			upgrades = {
@@ -1515,15 +1360,13 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightier
 		},
 		[2] = {
-			upgrades = {
-				"player_tape_loop_duration_2"
-			},
+			upgrades = {},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.disguise = {
-		name_id = "menu_disguise",
-		desc_id = "menu_disguise_desc",
+		name_id = "menu_disguise_beta",
+		desc_id = "menu_disguise_beta_desc",
 		icon_xy = {6, 4},
 		[1] = {
 			cost = self.costs.hightier
@@ -1533,8 +1376,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.magic_touch = {
-		name_id = "menu_magic_touch",
-		desc_id = "menu_magic_touch_desc",
+		name_id = "menu_magic_touch_beta",
+		desc_id = "menu_magic_touch_beta_desc",
 		icon_xy = {5, 4},
 		[1] = {
 			upgrades = {
@@ -1544,21 +1387,16 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightier
 		},
 		[2] = {
-			upgrades = {
-				"player_pick_lock_hard",
-				"player_pick_lock_easy_speed_multiplier_2"
-			},
+			upgrades = {},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.freedom_call = {
-		name_id = "menu_freedom_call",
-		desc_id = "menu_freedom_call_desc",
+		name_id = "menu_freedom_call_beta",
+		desc_id = "menu_freedom_call_beta_desc",
 		icon_xy = {5, 10},
 		[1] = {
-			upgrades = {
-				"player_climb_speed_multiplier_1"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
@@ -1569,25 +1407,21 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.hidden_blade = {
-		name_id = "menu_hidden_blade",
-		desc_id = "menu_hidden_blade_desc",
+		name_id = "menu_hidden_blade_beta",
+		desc_id = "menu_hidden_blade_beta_desc",
 		icon_xy = {4, 10},
 		[1] = {
-			upgrades = {
-				"player_melee_concealment_modifier"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
-			upgrades = {
-				"player_silent_kill"
-			},
+			upgrades = {},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.tea_time = {
-		name_id = "menu_tea_time",
-		desc_id = "menu_tea_time_desc",
+		name_id = "menu_tea_time_beta",
+		desc_id = "menu_tea_time_beta_desc",
 		icon_xy = {1, 11},
 		[1] = {
 			upgrades = {
@@ -1603,25 +1437,27 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.awareness = {
-		name_id = "menu_awareness",
-		desc_id = "menu_awareness_desc",
-		icon_xy = {7, 10},
+		name_id = "menu_awareness_beta",
+		desc_id = "menu_awareness_beta_desc",
+		icon_xy = {10, 6},
 		[1] = {
 			upgrades = {
-				"player_movement_speed_multiplier"
+				"player_movement_speed_multiplier",
+				"player_climb_speed_multiplier_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_steelsight_normal_movement_speed"
+				"player_can_free_run",
+				"player_run_and_reload"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.alpha_dog = {
-		name_id = "menu_alpha_dog",
-		desc_id = "menu_alpha_dog_desc",
+		name_id = "menu_alpha_dog_beta",
+		desc_id = "menu_alpha_dog_beta_desc",
 		icon_xy = {0, 11},
 		[1] = {
 			upgrades = {
@@ -1630,15 +1466,13 @@ function SkillTreeTweakData:init()
 			cost = self.costs.default
 		},
 		[2] = {
-			upgrades = {
-				"player_crouch_dodge_chance_2"
-			},
+			upgrades = {},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.tea_cookies = {
-		name_id = "menu_tea_cookies",
-		desc_id = "menu_tea_cookies_desc",
+		name_id = "menu_tea_cookies_beta",
+		desc_id = "menu_tea_cookies_beta_desc",
 		icon_xy = {2, 11},
 		[1] = {
 			upgrades = {
@@ -1648,67 +1482,64 @@ function SkillTreeTweakData:init()
 		},
 		[2] = {
 			upgrades = {
-				"first_aid_kit_quantity_increase_2"
+				"first_aid_kit_quantity_increase_2",
+				"first_aid_kit_auto_recovery_1"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.cell_mates = {
-		name_id = "menu_cell_mates",
-		desc_id = "menu_cell_mates_desc",
+		name_id = "menu_cell_mates_beta",
+		desc_id = "menu_cell_mates_beta_desc",
 		icon_xy = {4, 11},
 		[1] = {
 			upgrades = {
-				"player_gangster_damage_dampener_1"
+				"player_cheat_death_chance_1"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_gangster_damage_dampener_2"
+				"player_cheat_death_chance_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.thug_life = {
-		name_id = "menu_thug_life",
-		desc_id = "menu_thug_life_desc",
+		name_id = "menu_thug_life_beta",
+		desc_id = "menu_thug_life_beta_desc",
 		icon_xy = {3, 12},
 		[1] = {
-			upgrades = {
-				"player_extra_corpse_dispose_amount"
-			},
+			upgrades = {},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_cleaner_cost_multiplier"
+				"pistol_reload_speed_multiplier"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.thick_skin = {
-		name_id = "menu_thick_skin",
-		desc_id = "menu_thick_skin_desc",
-		icon_xy = {2, 12},
+		name_id = "menu_thick_skin_beta",
+		desc_id = "menu_thick_skin_beta_desc",
+		icon_xy = {10, 7},
 		[1] = {
 			upgrades = {
-				"player_damage_shake_addend"
+				"player_melee_concealment_modifier"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_level_2_armor_addend",
-				"player_level_3_armor_addend",
-				"player_level_4_armor_addend"
+				"player_ballistic_vest_concealment_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.backstab = {
-		name_id = "menu_backstab",
-		desc_id = "menu_backstab_desc",
+		name_id = "menu_backstab_beta",
+		desc_id = "menu_backstab_beta_desc",
 		icon_xy = {0, 12},
 		[1] = {
 			upgrades = {
@@ -1724,8 +1555,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.drop_soap = {
-		name_id = "menu_drop_soap",
-		desc_id = "menu_drop_soap_desc",
+		name_id = "menu_drop_soap_beta",
+		desc_id = "menu_drop_soap_beta_desc",
 		icon_xy = {4, 12},
 		[1] = {
 			upgrades = {
@@ -1741,43 +1572,44 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.second_chances = {
-		name_id = "menu_second_chances",
-		desc_id = "menu_second_chances_desc",
-		icon_xy = {5, 11},
+		name_id = "menu_second_chances_beta",
+		desc_id = "menu_second_chances_beta_desc",
+		icon_xy = {10, 4},
 		[1] = {
 			upgrades = {
-				"bodybags_bag"
+				"player_tape_loop_duration_1",
+				"player_tape_loop_duration_2"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"bodybags_bag_quantity"
+				"player_pick_lock_hard",
+				"player_pick_lock_easy_speed_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.trigger_happy = {
-		name_id = "menu_trigger_happy",
-		desc_id = "menu_trigger_happy_desc",
-		icon_xy = {7, 11},
+		name_id = "menu_trigger_happy_beta",
+		desc_id = "menu_trigger_happy_beta_desc",
+		icon_xy = {11, 2},
 		[1] = {
 			upgrades = {
-				"pistol_stacking_hit_expire_t_1",
-				"pistol_stacking_hit_damage_multiplier"
+				"pistol_stacking_hit_damage_multiplier_1"
 			},
 			cost = self.costs.hightier
 		},
 		[2] = {
 			upgrades = {
-				"pistol_stacking_hit_expire_t_2"
+				"pistol_stacking_hit_damage_multiplier_2"
 			},
 			cost = self.costs.hightierpro
 		}
 	}
 	self.skills.perseverance = {
-		name_id = "menu_perseverance",
-		desc_id = "menu_perseverance_desc",
+		name_id = "menu_perseverance_beta",
+		desc_id = "menu_perseverance_beta_desc",
 		icon_xy = {5, 12},
 		[1] = {
 			upgrades = {
@@ -1794,39 +1626,31 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.jail_workout = {
-		name_id = "menu_jail_workout",
-		desc_id = "menu_jail_workout_desc",
-		icon_xy = {6, 10},
+		name_id = "menu_jail_workout_beta",
+		desc_id = "menu_jail_workout_beta_desc",
+		icon_xy = {5, 3},
 		[1] = {
 			upgrades = {
-				"player_standstill_omniscience"
+				"player_suspicion_bonus",
+				"player_sec_camera_highlight_mask_off",
+				"player_special_enemy_highlight_mask_off"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_mask_off_pickup"
+				"player_mask_off_pickup",
+				"player_small_loot_multiplier_1"
 			},
 			cost = self.costs.pro
 		}
 	}
 	self.skills.akimbo = {
-		name_id = "menu_akimbo_skill",
-		desc_id = "menu_akimbo_skill_desc",
+		name_id = "menu_akimbo_skill_beta",
+		desc_id = "menu_akimbo_skill_beta_desc",
 		icon_xy = {3, 11},
 		[1] = {
 			upgrades = {
-				"jowi",
-				"x_1911",
-				"x_b92fs",
-				"x_deagle",
-				"x_g22c",
-				"x_g17",
-				"x_usp",
-				"x_sr2",
-				"x_mp5",
-				"x_akmsu",
-				"akimbo_recoil_index_addend_1",
 				"akimbo_recoil_index_addend_2"
 			},
 			cost = self.costs.hightier
@@ -1841,8 +1665,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.jail_diet = {
-		name_id = "menu_jail_diet",
-		desc_id = "menu_jail_diet_desc",
+		name_id = "menu_jail_diet_beta",
+		desc_id = "menu_jail_diet_beta_desc",
 		icon_xy = {1, 12},
 		[1] = {
 			upgrades = {
@@ -1858,8 +1682,8 @@ function SkillTreeTweakData:init()
 		}
 	}
 	self.skills.prison_wife = {
-		name_id = "menu_prison_wife",
-		desc_id = "menu_prison_wife_desc",
+		name_id = "menu_prison_wife_beta",
+		desc_id = "menu_prison_wife_beta_desc",
 		icon_xy = {6, 11},
 		[1] = {
 			upgrades = {
@@ -1874,198 +1698,890 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightierpro
 		}
 	}
-	self.trees = {}
-	self.trees[1] = {
-		name_id = "st_menu_mastermind",
-		skill = "mastermind",
-		background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
-		tiers = {}
+	self.skills.stable_shot = {
+		name_id = "menu_stable_shot_beta",
+		desc_id = "menu_stable_shot_beta_desc",
+		icon_xy = {0, 5},
+		[1] = {
+			upgrades = {
+				"player_stability_increase_bonus_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_not_moving_accuracy_increase_bonus_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2] = {
-		name_id = "st_menu_enforcer",
-		skill = "enforcer",
-		background_texture = "guis/textures/pd2/skilltree/bg_enforcer",
-		tiers = {}
+	self.skills.spotter_teamwork = {
+		name_id = "menu_spotter_teamwork_beta",
+		desc_id = "menu_spotter_teamwork_beta_desc",
+		icon_xy = {8, 2},
+		[1] = {
+			upgrades = {
+				"player_marked_enemy_extra_damage"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_marked_inc_dmg_distance_1",
+				"weapon_steelsight_highlight_specials",
+				"player_mark_enemy_time_multiplier"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3] = {
-		name_id = "st_menu_technician",
-		skill = "technician",
-		background_texture = "guis/textures/pd2/skilltree/bg_technician",
-		tiers = {}
+	self.skills.single_shot_ammo_return = {
+		name_id = "menu_single_shot_ammo_return_beta",
+		desc_id = "menu_single_shot_ammo_return_beta_desc",
+		icon_xy = {8, 4},
+		[1] = {
+			upgrades = {
+				"head_shot_ammo_return_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"head_shot_ammo_return_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4] = {
-		name_id = "st_menu_ghost",
-		skill = "ghost",
-		background_texture = "guis/textures/pd2/skilltree/bg_ghost",
-		tiers = {}
+	self.skills.speedy_reload = {
+		name_id = "menu_speedy_reload_beta",
+		desc_id = "menu_speedy_reload_beta_desc",
+		icon_xy = {8, 3},
+		[1] = {
+			upgrades = {
+				"assault_rifle_reload_speed_multiplier"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"temporary_single_shot_fast_reload_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[5] = {
-		name_id = "st_menu_hoxton_pack",
-		skill = "hoxton",
-		background_texture = "guis/textures/pd2/skilltree/bg_fugitive",
-		tiers = {}
+	self.skills.far_away = {
+		name_id = "menu_far_away_beta",
+		desc_id = "menu_far_away_beta_desc",
+		icon_xy = {8, 5},
+		[1] = {
+			upgrades = {
+				"shotgun_steelsight_accuracy_inc_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"shotgun_steelsight_range_inc_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[1] = {
-		"cable_guy",
-		"combat_medic",
-		"triathlete"
+	self.skills.close_by = {
+		name_id = "menu_close_by_beta",
+		desc_id = "menu_close_by_beta_desc",
+		icon_xy = {8, 6},
+		[1] = {
+			upgrades = {
+				"shotgun_hip_run_and_shoot_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"shotgun_hip_rate_of_fire_1",
+				"shotgun_magazine_capacity_inc_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[2] = {
-		"inside_man",
-		"fast_learner",
-		"leadership"
+	self.skills.scavenging = {
+		name_id = "menu_scavenging_beta",
+		desc_id = "menu_scavenging_beta_desc",
+		icon_xy = {8, 11},
+		[1] = {
+			upgrades = {
+				"player_increased_pickup_area_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_double_drop_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[3] = {
-		"tactician",
-		"equilibrium",
-		"dominator"
+	self.skills.defense_up = {
+		name_id = "menu_defense_up_beta",
+		desc_id = "menu_defense_up_beta_desc",
+		icon_xy = {9, 0},
+		[1] = {
+			upgrades = {
+				"sentry_gun_cost_reduction_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"sentry_gun_shield"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[4] = {
-		"stockholm_syndrome",
-		"medic_2x",
-		"joker"
+	self.skills.eco_sentry = {
+		name_id = "menu_eco_sentry_beta",
+		desc_id = "menu_eco_sentry_beta_desc",
+		icon_xy = {9, 2},
+		[1] = {
+			upgrades = {
+				"sentry_gun_cost_reduction_2"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"sentry_gun_armor_multiplier"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[5] = {
-		"kilmer",
-		"gun_fighter",
-		"control_freak"
+	self.skills.engineering = {
+		name_id = "menu_engineering_beta",
+		desc_id = "menu_engineering_beta_desc",
+		icon_xy = {9, 3},
+		[1] = {
+			upgrades = {
+				"sentry_gun_silent"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"sentry_gun_ap_bullets",
+				"sentry_gun_damage_multiplier",
+				"sentry_gun_fire_rate_reduction_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[1].tiers[6] = {
-		"black_marketeer",
-		"pistol_messiah",
-		"inspire"
+	self.skills.jack_of_all_trades = {
+		name_id = "menu_jack_of_all_trades_beta",
+		desc_id = "menu_jack_of_all_trades_beta_desc",
+		icon_xy = {9, 4},
+		[1] = {
+			upgrades = {
+				"deploy_interact_faster_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"second_deployable_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[1] = {
-		"oppressor",
-		"ammo_reservoir",
-		"pack_mule"
+	self.skills.tower_defense = {
+		name_id = "menu_tower_defense_beta",
+		desc_id = "menu_tower_defense_beta_desc",
+		icon_xy = {9, 5},
+		[1] = {
+			upgrades = {
+				"sentry_gun_quantity_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"sentry_gun_quantity_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[2] = {
-		"show_of_force",
-		"underdog",
-		"steroids"
+	self.skills.kick_starter = {
+		name_id = "menu_kick_starter_beta",
+		desc_id = "menu_kick_starter_beta_desc",
+		icon_xy = {9, 8},
+		[1] = {
+			upgrades = {
+				"player_drill_autorepair_2"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_drill_melee_hit_restart_chance_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[3] = {
-		"shotgun_impact",
-		"shades",
-		"tough_guy"
+	self.skills.fire_trap = {
+		name_id = "menu_fire_trap_beta",
+		desc_id = "menu_fire_trap_beta_desc",
+		icon_xy = {9, 9},
+		[1] = {
+			upgrades = {
+				"trip_mine_fire_trap_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"trip_mine_fire_trap_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[4] = {
-		"shotgun_cqb",
-		"ammo_2x",
-		"wolverine"
+	self.skills.fast_fire = {
+		name_id = "menu_fast_fire_beta",
+		desc_id = "menu_fast_fire_beta_desc",
+		icon_xy = {10, 2},
+		[1] = {
+			upgrades = {
+				"player_automatic_mag_increase_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_ap_bullets_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[5] = {
-		"from_the_hip",
-		"bandoliers",
-		"portable_saw"
+	self.skills.steady_grip = {
+		name_id = "menu_steady_grip_beta",
+		desc_id = "menu_steady_grip_beta_desc",
+		icon_xy = {9, 11},
+		[1] = {
+			upgrades = {
+				"player_weapon_accuracy_increase_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_stability_increase_bonus_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[2].tiers[6] = {
-		"overkill",
-		"juggernaut",
-		"carbon_blade"
+	self.skills.fire_control = {
+		name_id = "menu_fire_control_beta",
+		desc_id = "menu_fire_control_beta_desc",
+		icon_xy = {9, 10},
+		[1] = {
+			upgrades = {
+				"player_hip_fire_accuracy_inc_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_weapon_movement_stability_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[1] = {
-		"rifleman",
-		"trip_miner",
-		"discipline"
+	self.skills.shock_and_awe = {
+		name_id = "menu_shock_and_awe_beta",
+		desc_id = "menu_shock_and_awe_beta_desc",
+		icon_xy = {10, 0},
+		[1] = {
+			upgrades = {
+				"player_run_and_shoot_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_automatic_faster_reload_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[2] = {
-		"sharpshooter",
-		"trip_mine_expert",
-		"hardware_expert"
+	self.skills.heavy_impact = {
+		name_id = "menu_heavy_impact_beta",
+		desc_id = "menu_heavy_impact_beta_desc",
+		icon_xy = {10, 1},
+		[1] = {
+			upgrades = {
+				"weapon_knock_down_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"weapon_knock_down_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[3] = {
-		"sentry_gun",
-		"master_craftsman",
-		"drill_expert"
+	self.skills.body_expertise = {
+		name_id = "menu_body_expertise_beta",
+		desc_id = "menu_body_expertise_beta_desc",
+		icon_xy = {10, 3},
+		[1] = {
+			upgrades = {
+				"weapon_automatic_head_shot_add_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"weapon_automatic_head_shot_add_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[4] = {
-		"sentry_targeting_package",
-		"blast_radius",
-		"silent_drilling"
+	self.skills.unseen_strike = {
+		name_id = "menu_unseen_strike_beta",
+		desc_id = "menu_unseen_strike_beta_desc",
+		icon_xy = {10, 11},
+		[1] = {
+			upgrades = {
+				"player_unseen_increased_crit_chance_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_unseen_increased_crit_chance_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[5] = {
-		"sentry_2_0",
-		"shaped_charge",
-		"insulation"
+	self.skills.dire_need = {
+		name_id = "menu_dire_need_beta",
+		desc_id = "menu_dire_need_beta_desc",
+		icon_xy = {10, 8},
+		[1] = {
+			upgrades = {
+				"player_armor_depleted_stagger_shot_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_armor_depleted_stagger_shot_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[3].tiers[6] = {
-		"sentry_gun_2x",
-		"mag_plus",
-		"iron_man"
+	self.skills.up_you_go = {
+		name_id = "menu_up_you_go_beta",
+		desc_id = "menu_up_you_go_beta_desc",
+		icon_xy = {11, 4},
+		[1] = {
+			upgrades = {
+				"player_revived_damage_resist_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_revived_health_regain_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[1] = {
-		"scavenger",
-		"sprinter",
-		"cat_burglar"
+	self.skills.running_from_death = {
+		name_id = "menu_running_from_death_beta",
+		desc_id = "menu_running_from_death_beta_desc",
+		icon_xy = {11, 3},
+		[1] = {
+			upgrades = {
+				"player_temp_swap_weapon_faster_1",
+				"player_temp_reload_weapon_faster_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_temp_increased_movement_speed_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[2] = {
-		"transporter",
-		"chameleon",
-		"cleaner"
+	self.skills.dance_instructor = {
+		name_id = "menu_dance_instructor",
+		desc_id = "menu_dance_instructor_desc",
+		icon_xy = {11, 0},
+		[1] = {
+			upgrades = {
+				"pistol_magazine_capacity_inc_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"pistol_fire_rate_multiplier"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[3] = {
-		"assassin",
-		"martial_arts",
-		"smg_master"
+	self.skills.expert_handling = {
+		name_id = "menu_expert_handling",
+		desc_id = "menu_expert_handling_desc",
+		icon_xy = {11, 1},
+		[1] = {
+			upgrades = {
+				"pistol_stacked_accuracy_bonus_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"pistol_reload_speed_multiplier"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[4] = {
-		"nine_lives",
-		"ecm_2x",
-		"hitman"
+	self.skills.bloodthirst = {
+		name_id = "menu_bloodthirst",
+		desc_id = "menu_bloodthirst_desc",
+		icon_xy = {11, 6},
+		[1] = {
+			upgrades = {
+				"player_melee_damage_stacking_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_temp_melee_kill_increase_reload_speed_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[5] = {
-		"magic_touch",
-		"ecm_booster",
-		"silence_expert"
+	self.skills.feign_death = {
+		name_id = "menu_feign_death",
+		desc_id = "menu_feign_death_desc",
+		icon_xy = {11, 5},
+		[1] = {
+			upgrades = {
+				"player_cheat_death_chance_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_cheat_death_chance_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[4].tiers[6] = {
-		"good_luck_charm",
-		"ecm_feedback",
-		"moving_target"
+	self.skills.frenzy = {
+		name_id = "menu_frenzy",
+		desc_id = "menu_frenzy_desc",
+		icon_xy = {11, 8},
+		[1] = {
+			upgrades = {
+				"player_healing_reduction_1",
+				"player_health_damage_reduction_1",
+				"player_max_health_reduction_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_healing_reduction_2",
+				"player_health_damage_reduction_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[5].tiers[1] = {
-		"freedom_call",
-		"hidden_blade",
-		"thick_skin"
+	self.skills.optic_illusions = {
+		name_id = "menu_optic_illusions",
+		desc_id = "menu_optic_illusions_desc",
+		icon_xy = {10, 10},
+		[1] = {
+			upgrades = {
+				"player_camouflage_bonus_1",
+				"player_camouflage_bonus_2"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"player_silencer_concealment_penalty_decrease_1",
+				"player_silencer_concealment_increase_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[5].tiers[2] = {
-		"awareness",
-		"jail_workout",
-		"alpha_dog"
+	self.skills.more_fire_power = {
+		name_id = "menu_more_fire_power",
+		desc_id = "menu_more_fire_power_desc",
+		icon_xy = {9, 7},
+		[1] = {
+			upgrades = {
+				"shape_charge_quantity_increase_1",
+				"trip_mine_quantity_increase_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"shape_charge_quantity_increase_2",
+				"trip_mine_quantity_increase_2"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[5].tiers[3] = {
-		"cell_mates",
-		"thug_life",
-		"tea_time"
+	self.skills.combat_engineering = {
+		name_id = "menu_combat_engineering",
+		desc_id = "menu_combat_engineering_desc",
+		icon_xy = {1, 5},
+		[1] = {
+			upgrades = {
+				"trip_mine_explosion_size_multiplier_1"
+			},
+			cost = self.costs.hightier
+		},
+		[2] = {
+			upgrades = {
+				"trip_mine_damage_multiplier_1"
+			},
+			cost = self.costs.hightierpro
+		}
 	}
-	self.trees[5].tiers[4] = {
-		"perseverance",
-		"second_chances",
-		"tea_cookies"
-	}
-	self.trees[5].tiers[5] = {
-		"trigger_happy",
-		"backstab",
-		"drop_soap"
-	}
-	self.trees[5].tiers[6] = {
-		"prison_wife",
-		"jail_diet",
-		"akimbo"
+	self.trees = {
+		{
+			name_id = "st_menu_mastermind_inspire",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "mastermind",
+			tiers = {
+				{
+					"combat_medic"
+				},
+				{
+					"tea_time",
+					"fast_learner"
+				},
+				{
+					"tea_cookies",
+					"medic_2x"
+				},
+				{"inspire"}
+			}
+		},
+		{
+			name_id = "st_menu_mastermind_dominate",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "mastermind",
+			tiers = {
+				{"triathlete"},
+				{"cable_guy", "joker"},
+				{
+					"stockholm_syndrome",
+					"control_freak"
+				},
+				{
+					"black_marketeer"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_mastermind_single_shot",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "mastermind",
+			tiers = {
+				{
+					"stable_shot"
+				},
+				{
+					"rifleman",
+					"sharpshooter"
+				},
+				{
+					"spotter_teamwork",
+					"speedy_reload"
+				},
+				{
+					"single_shot_ammo_return"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_enforce_shotgun",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "enforcer",
+			tiers = {
+				{"underdog"},
+				{
+					"shotgun_cqb",
+					"shotgun_impact"
+				},
+				{"far_away", "close_by"},
+				{"overkill"}
+			}
+		},
+		{
+			name_id = "st_menu_enforcer_armor",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "enforcer",
+			tiers = {
+				{"oppressor"},
+				{
+					"show_of_force",
+					"pack_mule"
+				},
+				{
+					"iron_man",
+					"prison_wife"
+				},
+				{"juggernaut"}
+			}
+		},
+		{
+			name_id = "st_menu_enforcer_ammo",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "enforcer",
+			tiers = {
+				{"scavenging"},
+				{
+					"ammo_reservoir",
+					"portable_saw"
+				},
+				{
+					"ammo_2x",
+					"carbon_blade"
+				},
+				{"bandoliers"}
+			}
+		},
+		{
+			name_id = "st_menu_technician_sentry",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "technician",
+			tiers = {
+				{"defense_up"},
+				{
+					"sentry_targeting_package",
+					"eco_sentry"
+				},
+				{
+					"engineering",
+					"jack_of_all_trades"
+				},
+				{
+					"tower_defense"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_technician_breaching",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "technician",
+			tiers = {
+				{
+					"hardware_expert"
+				},
+				{
+					"combat_engineering",
+					"drill_expert"
+				},
+				{
+					"more_fire_power",
+					"kick_starter"
+				},
+				{"fire_trap"}
+			}
+		},
+		{
+			name_id = "st_menu_technician_auto",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "technician",
+			tiers = {
+				{
+					"steady_grip"
+				},
+				{
+					"heavy_impact",
+					"fire_control"
+				},
+				{
+					"shock_and_awe",
+					"fast_fire"
+				},
+				{
+					"body_expertise"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_ghost_stealth",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "ghost",
+			tiers = {
+				{
+					"jail_workout"
+				},
+				{"cleaner", "chameleon"},
+				{
+					"second_chances",
+					"ecm_booster"
+				},
+				{"ecm_2x"}
+			}
+		},
+		{
+			name_id = "st_menu_ghost_concealed",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "ghost",
+			tiers = {
+				{"sprinter"},
+				{"awareness", "thick_skin"},
+				{"dire_need", "insulation"},
+				{"jail_diet"}
+			}
+		},
+		{
+			name_id = "st_menu_ghost_silencer",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "ghost",
+			tiers = {
+				{"scavenger"},
+				{
+					"optic_illusions",
+					"silence_expert"
+				},
+				{"backstab", "hitman"},
+				{
+					"unseen_strike"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_fugitive_pistol_akimbo",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "hoxton",
+			tiers = {
+				{
+					"equilibrium"
+				},
+				{
+					"dance_instructor",
+					"akimbo"
+				},
+				{
+					"gun_fighter",
+					"expert_handling"
+				},
+				{
+					"trigger_happy"
+				}
+			}
+		},
+		{
+			name_id = "st_menu_fugitive_undead",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "hoxton",
+			tiers = {
+				{"nine_lives"},
+				{
+					"running_from_death",
+					"up_you_go"
+				},
+				{
+					"perseverance",
+					"feign_death"
+				},
+				{"messiah"}
+			}
+		},
+		{
+			name_id = "st_menu_fugitive_berserker",
+			background_texture = "guis/textures/pd2/skilltree/bg_mastermind",
+			unlocked = true,
+			skill = "hoxton",
+			tiers = {
+				{
+					"martial_arts"
+				},
+				{
+					"bloodthirst",
+					"steroids"
+				},
+				{"drop_soap", "wolverine"},
+				{"frenzy"}
+			}
+		}
 	}
 	self.default_upgrades = {
-		"cable_tie",
+		"player_fall_damage_multiplier",
+		"player_fall_health_damage_multiplier",
+		"player_silent_kill",
+		"player_primary_weapon_when_downed",
+		"player_intimidate_enemies",
+		"player_stamina_multiplier",
+		"team_stamina_multiplier",
 		"player_special_enemy_highlight",
 		"player_hostage_trade",
 		"player_sec_camera_highlight",
 		"player_corpse_dispose",
 		"player_corpse_dispose_amount_1",
 		"player_civ_harmless_melee",
+		"player_walk_speed_multiplier",
+		"player_steelsight_when_downed",
+		"player_crouch_speed_multiplier",
+		"carry_interact_speed_multiplier_1",
+		"carry_interact_speed_multiplier_2",
+		"carry_movement_speed_multiplier",
+		"trip_mine_sensor_toggle",
+		"trip_mine_sensor_highlight",
+		"trip_mine_can_switch_on_off",
+		"ecm_jammer_can_activate_feedback",
+		"ecm_jammer_interaction_speed_multiplier",
+		"ecm_jammer_can_retrigger",
+		"ecm_jammer_affects_cameras",
 		"striker_reload_speed_default",
 		"temporary_first_aid_damage_reduction",
-		"temporary_passive_revive_damage_reduction_2"
+		"temporary_passive_revive_damage_reduction_2",
+		"akimbo_recoil_index_addend_1",
+		"doctor_bag",
+		"ammo_bag",
+		"trip_mine",
+		"ecm_jammer",
+		"first_aid_kit",
+		"sentry_gun",
+		"bodybags_bag",
+		"saw",
+		"cable_tie",
+		"jowi",
+		"x_1911",
+		"x_b92fs",
+		"x_deagle",
+		"x_g22c",
+		"x_g17",
+		"x_usp",
+		"x_sr2",
+		"x_mp5",
+		"x_akmsu"
 	}
 	self.skill_switches = {
 		{
@@ -2387,17 +2903,7 @@ function SkillTreeTweakData:init()
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_2",
 					"akimbo_recoil_index_addend_2",
-					"akimbo_extra_ammo_multiplier_1",
-					"jowi",
-					"x_1911",
-					"x_b92fs",
-					"x_deagle",
-					"x_g22c",
-					"x_g17",
-					"x_usp",
-					"x_sr2",
-					"x_mp5",
-					"x_akmsu"
+					"akimbo_extra_ammo_multiplier_1"
 				},
 				cost = 400,
 				icon_xy = {7, 2},
@@ -2867,10 +3373,7 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_armor_health_store_amount_2",
-					"player_passive_health_multiplier_1",
-					"player_level_2_dodge_addend_1",
-					"player_level_3_dodge_addend_1",
-					"player_level_4_dodge_addend_1"
+					"player_passive_health_multiplier_1"
 				},
 				cost = 400,
 				icon_xy = {4, 7},
@@ -2893,10 +3396,7 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_armor_health_store_amount_3",
-					"player_passive_health_multiplier_3",
-					"player_level_2_dodge_addend_2",
-					"player_level_3_dodge_addend_2",
-					"player_level_4_dodge_addend_2"
+					"player_passive_health_multiplier_3"
 				},
 				cost = 2400,
 				icon_xy = {6, 7},
@@ -3036,4 +3536,48 @@ function SkillTreeTweakData:init()
 			}
 		}
 	}
+end
+
+function SkillTreeTweakData:get_tier_position_from_skill_name(skill_name)
+	for tree_idx in pairs(self.trees) do
+		local count = 0
+		local tree = self.trees[tree_idx]
+		for tier_idx in pairs(tree.tiers) do
+			count = count + 1
+			local tier = tree.tiers[tier_idx]
+			for skill_idx in pairs(tier) do
+				if skill_name == tier[skill_idx] then
+					return count
+				end
+			end
+		end
+	end
+	return -1
+end
+
+function SkillTreeTweakData:get_tree(tree_name)
+	local list = {}
+	for i, tree in ipairs(self.trees) do
+		if tree.skill == tree_name then
+			table.insert(list, tree)
+		end
+	end
+	return list
+end
+
+function SkillTreeTweakData:get_tiers(tree_idx)
+	local tiers = deep_clone(self.trees[tree_idx].tiers)
+	return tiers
+end
+
+function SkillTreeTweakData:get_tier_unlocks()
+	local digest = function(value)
+		return Application:digest_value(value, false)
+	end
+	local tier_unlocks = self.tier_unlocks
+	local unlock_values = {}
+	for i = 1, #tier_unlocks do
+		table.insert(unlock_values, digest(tier_unlocks[i]))
+	end
+	return unlock_values
 end

@@ -220,6 +220,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
+		"glace",
 		"dinner",
 		"cane",
 		"peta",
@@ -254,6 +255,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
+		"glace",
 		"dinner",
 		"cane",
 		"peta",
@@ -285,6 +287,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
+		"glace",
 		"dinner",
 		"cane",
 		"peta",
@@ -978,6 +981,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.dark_additional_cameras.unlock_desc_id = "menu_asset_dark_additional_cameras_desc"
 	self.dark_additional_cameras.no_mystery = true
 	self.dark_additional_cameras.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
+	self.cop_delay_30s = {}
+	self.cop_delay_30s.name_id = "menu_asset_cop_delay_30s"
+	self.cop_delay_30s.texture = "guis/dlcs/mad/textures/pd2/mission_briefing/assets/dark_additional_cameras"
+	self.cop_delay_30s.stages = {}
+	self.cop_delay_30s.visible_if_locked = true
+	self.cop_delay_30s.unlock_desc_id = "menu_asset_cop_delay_30s_desc"
+	self.cop_delay_30s.no_mystery = true
+	self.cop_delay_30s.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 7)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

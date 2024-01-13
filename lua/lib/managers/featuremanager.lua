@@ -28,7 +28,6 @@ function FeatureManager:_setup()
 		Global.feature_manager.announcements.dlc_gage_pack_jobs = 1
 		Global.feature_manager.announcements.join_pd2_clan = 50
 		Global.feature_manager.announcements.freed_old_hoxton = 1
-		Global.feature_manager.announcements.crimenet_hacked = 1
 		Global.feature_manager.announced = {}
 	end
 	self._global = Global.feature_manager

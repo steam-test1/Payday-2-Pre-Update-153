@@ -381,7 +381,7 @@ function SavefileManager:_save(slot, cache_only, save_system)
 		task_data.data = {
 			meta_data.cache
 		}
-		if SystemInfo:platform() == Idstring("WIN32") then
+		if SystemInfo:distribution() == Idstring("STEAM") then
 			task_data.save_system = save_system or "steam_cloud"
 		end
 		self:_on_task_queued(task_data)
@@ -425,7 +425,7 @@ function SavefileManager:_save_cache(slot)
 		managers.music:save_profile(cache)
 		managers.challenge:save(cache)
 	end
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		cache.user_id = self._USER_ID_OVERRRIDE or Steam:userid()
 		cat_print("savefile_manager", "[SavefileManager:_save_cache] user_id:", cache.user_id)
 	end
@@ -484,7 +484,7 @@ function SavefileManager:_load(slot, cache_only, save_system)
 			if SystemInfo:platform() == Idstring("PS3") then
 				task_data.disable_ownership_check = is_setting_slot
 			end
-			if SystemInfo:platform() == Idstring("WIN32") then
+			if SystemInfo:distribution() == Idstring("STEAM") then
 				task_data.save_system = save_system or "steam_cloud"
 			end
 			local load_callback_obj = task_data.save_system == "local_hdd" and callback(self, self, "clbk_result_load_backup") or callback(self, self, "clbk_result_load")
@@ -658,7 +658,7 @@ function SavefileManager:_remove(slot, save_system)
 		user_index = managers.user:get_platform_id(),
 		queued_in_save_manager = true
 	}
-	if SystemInfo:platform() == Idstring("WIN32") then
+	if SystemInfo:distribution() == Idstring("STEAM") then
 		task_data.save_system = save_system or "steam_cloud"
 	end
 	self._save_slots_to_load[slot] = nil
@@ -927,7 +927,7 @@ function SavefileManager:clbk_result_load(task_data, result_data)
 				cache = nil
 				wrong_version = true
 			end
-			if cache and SystemInfo:platform() == Idstring("WIN32") and cache.user_id ~= (self._USER_ID_OVERRRIDE or Steam:userid()) then
+			if cache and SystemInfo:distribution() == Idstring("STEAM") and cache.user_id ~= (self._USER_ID_OVERRRIDE or Steam:userid()) then
 				cat_print("savefile_manager", "[SavefileManager:clbk_result_load] User ID missmatch. cache.user_id:", cache.user_id, ". expected user id:", self._USER_ID_OVERRRIDE or Steam:userid())
 				cache = nil
 				wrong_user = true
@@ -955,7 +955,7 @@ function SavefileManager:clbk_result_load_backup(task_data, result_data)
 					local cache = slot_data.data
 					local version = cache.version or 0
 					local version_name = cache.version_name
-					if SystemInfo:platform() == Idstring("WIN32") and cache.user_id ~= (self._USER_ID_OVERRRIDE or Steam:userid()) then
+					if SystemInfo:distribution() == Idstring("STEAM") and cache.user_id ~= (self._USER_ID_OVERRRIDE or Steam:userid()) then
 						cat_print("savefile_manager", "[SavefileManager:clbk_result_load_backup] User ID missmatch. cache.user_id:", cache.user_id, ". expected user id:", self._USER_ID_OVERRRIDE or Steam:userid())
 					elseif version <= SavefileManager.VERSION then
 						cat_print("savefile_manager", "[SavefileManager:clbk_result_load_backup] backup loaded")

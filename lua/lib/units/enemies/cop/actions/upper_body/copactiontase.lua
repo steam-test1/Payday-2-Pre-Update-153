@@ -230,6 +230,7 @@ function CopActionTase:update(t)
 						attacker_unit = self._unit
 					}
 					self._attention.unit:character_damage():damage_tase(attack_data)
+					CopDamage._notify_listeners("on_criminal_tased", self._unit, self._attention.unit)
 					self._discharging = true
 					if not self._tasing_local_unit:base().is_local_player then
 						self._tasered_sound = self._unit:sound():play("tasered_3rd", nil)
@@ -239,11 +240,6 @@ function CopActionTase:update(t)
 						self._machine:set_parameter(redir_res, "hvy", 0)
 					end
 					self._shoot_t = nil
-					if managers.player:has_category_upgrade("player", "taser_malfunction") and not managers.groupai:state():all_AI_criminals()[self._attention.unit:key()] then
-						self._malfunction_clbk_id = "tase_malf" .. tostring(self._unit:key())
-						local delay = math.rand(tweak_data.upgrades.taser_malfunction_min or 1, tweak_data.upgrades.taser_malfunction_max or 3)
-						managers.enemy:add_delayed_clbk(self._malfunction_clbk_id, callback(self, self, "clbk_malfunction"), t + delay)
-					end
 				end
 			end
 		elseif not self._tasing_local_unit then

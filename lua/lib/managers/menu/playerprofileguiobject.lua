@@ -111,7 +111,7 @@ function PlayerProfileGuiObject:init(ws)
 		skill_glow:set_center_y(skill_icon:center_y())
 	end
 	local font_scale = 1
-	local mastermind_ponts, num_skills = managers.skilltree:get_tree_progress("mastermind")
+	local mastermind_ponts, num_skills = managers.skilltree:get_tree_progress_2("mastermind")
 	mastermind_ponts = string.format("%02d", mastermind_ponts)
 	local mastermind_text = panel:text({
 		text = self:get_text("menu_profession_progress", {
@@ -126,7 +126,7 @@ function PlayerProfileGuiObject:init(ws)
 	})
 	self:_make_fine_text(mastermind_text)
 	max_right_len = math.max(max_right_len, mastermind_text:w())
-	local enforcer_ponts, num_skills = managers.skilltree:get_tree_progress("enforcer")
+	local enforcer_ponts, num_skills = managers.skilltree:get_tree_progress_2("enforcer")
 	enforcer_ponts = string.format("%02d", enforcer_ponts)
 	local enforcer_text = panel:text({
 		text = self:get_text("menu_profession_progress", {
@@ -141,7 +141,7 @@ function PlayerProfileGuiObject:init(ws)
 	self:_make_fine_text(enforcer_text)
 	enforcer_text:set_top(math.round(mastermind_text:bottom()))
 	max_right_len = math.max(max_right_len, enforcer_text:w())
-	local technician_ponts, num_skills = managers.skilltree:get_tree_progress("technician")
+	local technician_ponts, num_skills = managers.skilltree:get_tree_progress_2("technician")
 	technician_ponts = string.format("%02d", technician_ponts)
 	local technician_text = panel:text({
 		text = self:get_text("menu_profession_progress", {
@@ -156,7 +156,7 @@ function PlayerProfileGuiObject:init(ws)
 	self:_make_fine_text(technician_text)
 	technician_text:set_top(math.round(enforcer_text:bottom()))
 	max_right_len = math.max(max_right_len, technician_text:w())
-	local ghost_ponts, num_skills = managers.skilltree:get_tree_progress("ghost")
+	local ghost_ponts, num_skills = managers.skilltree:get_tree_progress_2("ghost")
 	ghost_ponts = string.format("%02d", ghost_ponts)
 	local ghost_text = panel:text({
 		text = self:get_text("menu_profession_progress", {
@@ -171,7 +171,7 @@ function PlayerProfileGuiObject:init(ws)
 	self:_make_fine_text(ghost_text)
 	ghost_text:set_top(math.round(technician_text:bottom()))
 	max_right_len = math.max(max_right_len, ghost_text:w())
-	local hoxton_ponts, num_skills = managers.skilltree:get_tree_progress("hoxton")
+	local hoxton_ponts, num_skills = managers.skilltree:get_tree_progress_2("hoxton")
 	hoxton_ponts = string.format("%02d", hoxton_ponts)
 	local hoxton_text = panel:text({
 		text = self:get_text("menu_profession_progress", {

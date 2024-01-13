@@ -15,6 +15,7 @@ function CoreShaderLibCompiler:compile(file, dest, force_recompile)
 		if target() == "win32" then
 			dest:skip_update("shaders", "core/temp/" .. self.SHADER_NAME, {"d3d9"})
 			dest:skip_update("shaders", "core/temp/" .. self.SHADER_NAME, {"d3d11"})
+			dest:skip_update("shaders", "core/temp/" .. self.SHADER_NAME, {"ogl"})
 		elseif target() == "ps3" then
 			dest:skip_update("shaders", "core/temp/" .. self.SHADER_NAME, {})
 		elseif target() == "ps4" then
@@ -36,6 +37,7 @@ function CoreShaderLibCompiler:compile(file, dest, force_recompile)
 	if target() == "win32" then
 		self:copy_file(self:base_path() .. self.TEMP_PATH .. self.SHADER_NAME .. ".d3d9.win32.shaders", "core/temp/" .. self.SHADER_NAME, {"d3d9"}, dest)
 		self:copy_file(self:base_path() .. self.TEMP_PATH .. self.SHADER_NAME .. ".d3d11.win32.shaders", "core/temp/" .. self.SHADER_NAME, {"d3d11"}, dest)
+		self:copy_file(self:base_path() .. self.TEMP_PATH .. self.SHADER_NAME .. ".ogl.win32.shaders", "core/temp/" .. self.SHADER_NAME, {"ogl"}, dest)
 	elseif target() == "ps3" then
 		self:copy_file(self:base_path() .. self.TEMP_PATH .. self.SHADER_NAME .. ".ps3.shaders", "core/temp/" .. self.SHADER_NAME, {}, dest)
 	elseif target() == "xb1" then
@@ -58,6 +60,7 @@ function CoreShaderLibCompiler:cleanup(params)
 	os.remove(params.win32d3d9)
 	os.remove(params.win32d3d10)
 	os.remove(params.win32d3d11)
+	os.remove(params.ogl)
 	os.remove(params.ps3)
 	os.remove(params.ps4)
 	os.remove(params.xb1)
@@ -144,6 +147,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = tmp .. self.SHADER_NAME .. ".d3d9.win32.shaders"
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = tmp .. self.SHADER_NAME .. ".d3d11.win32.shaders"
+		make_params.ogl = tmp .. self.SHADER_NAME .. ".ogl.win32.shaders"
 		make_params.ps3 = ""
 		make_params.ps4 = ""
 		make_params.xb1 = ""
@@ -153,6 +157,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = ""
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = ""
+		make_params.ogl = ""
 		make_params.ps3 = tmp .. self.SHADER_NAME .. ".ps3.shaders"
 		make_params.ps4 = ""
 		make_params.xb1 = ""
@@ -162,6 +167,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = ""
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = ""
+		make_params.ogl = ""
 		make_params.ps3 = ""
 		make_params.ps4 = tmp .. self.SHADER_NAME .. ".ps4.shaders"
 		make_params.xb1 = ""
@@ -171,6 +177,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = ""
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = ""
+		make_params.ogl = ""
 		make_params.ps3 = ""
 		make_params.ps4 = ""
 		make_params.xb1 = tmp .. self.SHADER_NAME .. ".xb1.shaders"
@@ -180,6 +187,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = ""
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = ""
+		make_params.ogl = ""
 		make_params.ps3 = ""
 		make_params.ps4 = ""
 		make_params.xb1 = ""
@@ -189,6 +197,7 @@ function CoreShaderLibCompiler:get_make_params()
 		make_params.win32d3d9 = ""
 		make_params.win32d3d10 = ""
 		make_params.win32d3d11 = ""
+		make_params.ogl = ""
 		make_params.ps3 = ""
 		make_params.ps4 = ""
 		make_params.xb1 = ""

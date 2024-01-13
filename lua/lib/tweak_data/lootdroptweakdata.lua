@@ -231,7 +231,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.pd2_clan.track = true
 	self.global_values.pd2_clan.sort_number = -100
 	self.global_values.pd2_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
-	self.global_values.pd2_clan.category = SystemInfo:platform() ~= Idstring("WIN32") and "normal" or nil
+	self.global_values.pd2_clan.category = SystemInfo:distribution() ~= Idstring("STEAM") and "normal" or nil
 	self.global_values.poetry_soundtrack = {}
 	self.global_values.poetry_soundtrack.name_id = "bm_global_value_poetry_soundtrack"
 	self.global_values.poetry_soundtrack.desc_id = "menu_l_global_value_poetry_soundtrack"
@@ -965,7 +965,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.dbd_clan.sort_number = -100
 	self.global_values.dbd_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
 	self.global_values.dbd_clan.sort_number = 2
-	self.global_values.dbd_clan.category = SystemInfo:platform() ~= Idstring("WIN32") and "normal" or "pd2_clan"
+	self.global_values.dbd_clan.category = SystemInfo:distribution() ~= Idstring("STEAM") and "normal" or "pd2_clan"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
