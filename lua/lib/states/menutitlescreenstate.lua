@@ -25,7 +25,7 @@ function MenuTitlescreenState:setup()
 	self._back_drop_gui = MenuBackdropGUI:new()
 	self._back_drop_gui:hide()
 	local bitmap = self._workspace:panel():bitmap({
-		texture = "guis/textures/menu_title_screen_sale",
+		texture = "guis/textures/menu_title_screen",
 		layer = 1
 	})
 	bitmap:set_center(self._workspace:panel():w() / 2, self._workspace:panel():h() / 2)
@@ -46,7 +46,7 @@ function MenuTitlescreenState:setup()
 		h = self._workspace:panel():h(),
 		layer = 2
 	})
-	text:set_bottom(self._workspace:panel():h() / 1.05)
+	text:set_bottom(self._workspace:panel():h() / 1.25)
 	self._controller_list = {}
 	for index = 1, managers.controller:get_wrapper_count() do
 		self._controller_list[index] = managers.controller:create_controller("title_" .. index, index, false)
