@@ -3914,19 +3914,19 @@ function NarrativeTweakData:init()
 	self.jobs.born_pro.jc = 70
 	self.jobs.born_pro.professional = true
 	self.jobs.born_pro.region = "professional"
-	self.jobs.born_pro.payout = {
-		25000,
-		35000,
-		50000,
-		65000,
-		100000
-	}
 	self.jobs.born_pro.contract_cost = {
 		62000,
 		124000,
 		310000,
 		620000,
 		800000
+	}
+	self.jobs.born_pro.payout = {
+		175000,
+		357000,
+		900307,
+		1750000,
+		2370000
 	}
 	self.jobs.born_pro.experience_mul = {
 		1.5,

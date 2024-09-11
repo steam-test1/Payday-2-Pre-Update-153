@@ -592,7 +592,6 @@ end
 
 function SkillTreeManager:_reset_skilltree(tree, forced_respec_multiplier)
 	self:_set_points_spent(tree, 0)
-	managers.money:on_respec_skilltree(tree, forced_respec_multiplier)
 	local tree_data = tweak_data.skilltree.trees[tree]
 	for i = #tree_data.tiers, 1, -1 do
 		local tier = tree_data.tiers[i]
