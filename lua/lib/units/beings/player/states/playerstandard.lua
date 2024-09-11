@@ -208,6 +208,7 @@ function PlayerStandard:exit(state_data, new_state_name)
 	}
 	self._state_data.using_bipod = managers.player:current_state() == "bipod"
 	self:_update_network_jump(nil, true)
+	self._state_data.previous_state = "standard"
 	return exit_data
 end
 
@@ -245,6 +246,15 @@ function PlayerStandard:update(t, dt)
 	self:_upd_nav_data()
 	managers.hud:_update_crosshair_offset(t, dt)
 	self:_update_omniscience(t, dt)
+	if self._last_equipped then
+		if self._last_equipped ~= self._equipped_unit then
+			self._equipped_visibility_timer = t + 0.1
+		end
+		if self._equipped_visibility_timer and t > self._equipped_visibility_timer then
+			self._equipped_unit:base():set_visibility_state(true)
+		end
+	end
+	self._last_equipped = self._equipped_unit
 end
 
 function PlayerStandard:in_air()
@@ -987,7 +997,7 @@ function PlayerStandard:_start_action_ducking(t)
 	local velocity = self._unit:mover():velocity()
 	self._unit:kill_mover()
 	self:_activate_mover(PlayerStandard.MOVER_DUCK, velocity)
-	self._ext_network:send("set_pose", 2)
+	self._ext_network:send("action_change_pose", 2, self._unit:position())
 	self:_upd_attention()
 end
 
@@ -1001,7 +1011,7 @@ function PlayerStandard:_end_action_ducking(t, skip_can_stand_check)
 	local velocity = self._unit:mover():velocity()
 	self._unit:kill_mover()
 	self:_activate_mover(PlayerStandard.MOVER_STAND, velocity)
-	self._ext_network:send("set_pose", 1)
+	self._ext_network:send("action_change_pose", 1, self._unit:position())
 	self:_upd_attention()
 end
 
@@ -3147,7 +3157,7 @@ function PlayerStandard:_start_action_reload_enter(t)
 			self:_interupt_action_running(t)
 		end
 		if self._equipped_unit:base():reload_enter_expire_t() then
-			local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier(true)
+			local speed_multiplier = self._equipped_unit:base():reload_speed_multiplier()
 			self._ext_camera:play_redirect(Idstring("reload_enter_" .. self._equipped_unit:base().name_id), speed_multiplier)
 			self._state_data.reload_enter_expire_t = t + self._equipped_unit:base():reload_enter_expire_t() / speed_multiplier
 			self._equipped_unit:base():tweak_data_anim_play("reload_enter", speed_multiplier)
@@ -3161,7 +3171,7 @@ function PlayerStandard:_start_action_reload(t)
 	local weapon = self._equipped_unit:base()
 	if weapon and weapon:can_reload() then
 		weapon:tweak_data_anim_stop("fire")
-		local speed_multiplier = weapon:reload_speed_multiplier(true)
+		local speed_multiplier = weapon:reload_speed_multiplier()
 		local tweak_data = weapon:weapon_tweak_data()
 		local reload_anim = "reload"
 		local reload_name_id = tweak_data.animations.reload_name_id or weapon.name_id

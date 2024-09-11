@@ -73,7 +73,7 @@ function SentryGunBase.spawn(owner, pos, rot, peer_id, verify_equipment, unit_id
 	local damage_multiplier = player_skill.skill_data("sentry_gun", "damage_multiplier", 1, sentry_owner)
 	local spread_multiplier = player_skill.skill_data("sentry_gun", "spread_multiplier", 1, sentry_owner)
 	local rot_speed_multiplier = player_skill.skill_data("sentry_gun", "rot_speed_multiplier", 1, sentry_owner)
-	local ap_bullets = player_skill.skill_data("sentry_gun", "ap_bullets", 1, sentry_owner)
+	local ap_bullets = player_skill.has_skill("sentry_gun", "ap_bullets", sentry_owner)
 	local has_shield = player_skill.has_skill("sentry_gun", "shield", sentry_owner)
 	local id_string = Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry")
 	if unit_idstring_index then

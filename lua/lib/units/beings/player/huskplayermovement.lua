@@ -1157,6 +1157,9 @@ function HuskPlayerMovement:_upd_sequenced_events(t, dt)
 		end
 	elseif event_type == "jump" then
 		self:_start_jumping(next_event)
+	elseif event_type == "pose" then
+		self:_change_pose(next_event.code)
+		table.remove(sequenced_events, 1)
 	end
 	local event_type = next_event and not next_event.commencing and next_event.type
 	if event_type == "jerry1" then
@@ -1565,6 +1568,23 @@ function HuskPlayerMovement:sync_action_walk_nav_point(pos)
 		}
 		self:_add_sequenced_event(event_desc)
 	end
+end
+
+function HuskPlayerMovement:sync_action_change_pose(pose_code, pos)
+	local count = #self._sequenced_events
+	local skip_nav = false
+	for i = count, 1, -1 do
+		local event_desc = self._sequenced_events[i]
+		if event_desc.type == "jump" then
+			skip_nav = true
+			break
+		end
+	end
+	if not skip_nav then
+		self:sync_action_walk_nav_point(pos)
+	end
+	local event_desc = {type = "pose", code = pose_code}
+	self:_add_sequenced_event(event_desc)
 end
 
 function HuskPlayerMovement:current_state()

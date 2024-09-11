@@ -286,8 +286,19 @@ function BlackMarketManager:equipped_mask_slot()
 	end
 end
 
-function BlackMarketManager:equipped_deployable()
-	return managers.player and managers.player:equipment_in_slot(1)
+function BlackMarketManager:equipped_deployable(slot)
+	slot = slot or 1
+	return managers.player and managers.player:equipment_in_slot(slot)
+end
+
+function BlackMarketManager:equipped_deployable_slot(deployable_name)
+	for slot, name in pairs(managers.player:equipment_slots()) do
+		if name == deployable_name then
+			return slot
+		end
+	end
+	Application:error("Failed to get slot of equipment: " .. deployable_name .. ", probably not equipped")
+	return nil
 end
 
 function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
@@ -5968,7 +5979,7 @@ function BlackMarketManager:accuracy_addend(name, category, sub_category, spread
 		if not is_moving and game_state_machine:current_state_name() ~= "menu_main" then
 			index = index + managers.player:upgrade_value("player", "not_moving_accuracy_increase", 0)
 		end
-		if is_single_shot then
+		if is_single_shot and (category == "assault_rifle" or category == "snp" or category == "smg") then
 			index = index + managers.player:upgrade_value("weapon", "single" .. "_spread_index_addend", 0)
 		elseif fire_mode ~= "single" then
 			index = index + managers.player:upgrade_value("weapon", fire_mode .. "_spread_index_addend", 0)

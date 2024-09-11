@@ -64,6 +64,7 @@ function PlayerBipod:exit(state_data, new_state_name)
 	local peer_id = managers.network:session():peer_by_unit(self._unit):id()
 	Application:trace("PlayerBipod:exit: ", peer_id)
 	managers.player:set_bipod_data_for_peer({peer_id = peer_id})
+	self._state_data.previous_state = "bipod"
 	return exit_data
 end
 
@@ -196,6 +197,9 @@ function PlayerBipod:_check_action_jump(t, input)
 end
 
 function PlayerBipod:_check_action_run(t, input)
+	if self._state_data.previous_state and self._state_data.previous_state == "carry" then
+		return
+	end
 	local move = self._controller:get_input_axis("move")
 	if input.btn_run_state and move.y > 0.1 then
 		self:_unmount_bipod()

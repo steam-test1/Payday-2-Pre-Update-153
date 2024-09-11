@@ -672,6 +672,21 @@ function NewRaycastWeaponBase:on_disabled(...)
 	self:_set_parts_enabled(false)
 end
 
+function NewRaycastWeaponBase:_set_parts_visible(visible)
+	if self._parts then
+		for part_id, data in pairs(self._parts) do
+			if alive(data.unit) then
+				data.unit:set_visible(visible)
+			end
+		end
+	end
+end
+
+function NewRaycastWeaponBase:set_visibility_state(state)
+	NewRaycastWeaponBase.super.set_visibility_state(self, state)
+	self:_set_parts_visible(state)
+end
+
 function NewRaycastWeaponBase:fire_mode()
 	self._fire_mode = self._locked_fire_mode or self._fire_mode or Idstring(tweak_data.weapon[self._name_id].FIRE_MODE or "single")
 	return self._fire_mode == ids_single and "single" or "auto"
@@ -975,6 +990,7 @@ function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()
 	multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "enter_steelsight_speed_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:temporary_upgrade_value("temporary", "combat_medic_enter_steelsight_speed_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:upgrade_value(self._name_id, "enter_steelsight_speed_multiplier", 1))
+	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "enter_steelsight_speed_multiplier", 1))
 	if self._silencer then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_enter_steelsight_speed_multiplier", 1))
 		multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "silencer_enter_steelsight_speed_multiplier", 1))
@@ -988,7 +1004,7 @@ function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()
 	return self:_convert_add_to_mul(multiplier)
 end
 
-function NewRaycastWeaponBase:reload_speed_multiplier(use_consumable)
+function NewRaycastWeaponBase:reload_speed_multiplier()
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "reload_speed_multiplier", 1))
 	if self:weapon_tweak_data().sub_category then
@@ -1005,18 +1021,11 @@ function NewRaycastWeaponBase:reload_speed_multiplier(use_consumable)
 	if managers.player:has_activate_temporary_upgrade("temporary", "reload_weapon_faster") then
 		multiplier = multiplier + (1 - managers.player:temporary_upgrade_value("temporary", "reload_weapon_faster", 1))
 	end
-	if managers.player:has_activate_temporary_upgrade("temporary", "melee_kill_increase_reload_speed") then
-		self._bloodthist_value_during_reload = 1 - managers.player:temporary_upgrade_value("temporary", "melee_kill_increase_reload_speed", 1)
-		multiplier = multiplier + self._bloodthist_value_during_reload
-	elseif self._bloodthist_value_during_reload ~= 0 then
-		multiplier = multiplier + self._bloodthist_value_during_reload
-	end
 	if managers.player:has_activate_temporary_upgrade("temporary", "single_shot_fast_reload") then
 		multiplier = multiplier + (1 - managers.player:temporary_upgrade_value("temporary", "single_shot_fast_reload", 1))
 	end
 	multiplier = multiplier + (1 - managers.player:get_property("shock_and_awe_reload_multiplier", 1))
-	if use_consumable then
-	end
+	multiplier = multiplier + (1 - managers.player:get_temporary_property("bloodthirst_reload_speed", 1))
 	return self:_convert_add_to_mul(multiplier)
 end
 
@@ -1168,4 +1177,8 @@ function NewRaycastWeaponBase:destroy(unit)
 		end
 	end
 	managers.weapon_factory:disassemble(self._parts)
+end
+
+function NewRaycastWeaponBase:is_single_shot()
+	return self:fire_mode() == "single"
 end

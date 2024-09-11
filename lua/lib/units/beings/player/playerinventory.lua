@@ -310,6 +310,7 @@ function PlayerInventory:_place_selection(selection_index, is_equip)
 		local res = self:_link_weapon(unit, align_place)
 	else
 		unit:unlink()
+		unit:base():set_visibility_state(false)
 		unit:set_enabled(false)
 		unit:base():on_disabled()
 		if unit:base().gadget_on and self._unit:movement().set_cbt_permanent then

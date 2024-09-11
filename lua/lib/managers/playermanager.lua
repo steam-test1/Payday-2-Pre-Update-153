@@ -163,6 +163,9 @@ function PlayerManager:init()
 		self._ammo_efficiency = self:upgrade_value("player", "head_shot_ammo_return", nil)
 		self._message_system:register(Message.OnHeadShot, "ammo_efficiency", callback(self, self, "_on_enter_ammo_efficiency_event"))
 	end
+	if self:has_category_upgrade("player", "melee_kill_increase_reload_speed") then
+		self._message_system:register(Message.OnEnemyKilled, "bloodthirst_reload_speed", callback(self, self, "_on_enemy_killed_bloodthirst"))
+	end
 	self._has_super_syndrome = self:has_category_upgrade("player", "super_syndrome")
 end
 
@@ -183,6 +186,15 @@ function PlayerManager:_on_enter_trigger_happy_event()
 	end
 end
 
+function PlayerManager:_on_enemy_killed_bloodthirst(equipped_unit, variant, killed_unit)
+	if variant == "melee" then
+		local data = self:upgrade_value("player", "melee_kill_increase_reload_speed", 0)
+		if data ~= 0 then
+			self._temporary_properties:activate_property("bloodthirst_reload_speed", data[2], data[1])
+		end
+	end
+end
+
 function PlayerManager:_on_enter_ammo_efficiency_event()
 	if not self._coroutine_mgr:is_running("ammo_efficiency") then
 		local weapon_unit = self:equipped_weapon_unit()
@@ -193,13 +205,11 @@ function PlayerManager:_on_enter_ammo_efficiency_event()
 end
 
 function PlayerManager:_on_activate_aggressive_reload_event()
-	if self:has_inactivate_temporary_upgrade("temporary", "single_shot_fast_reload") then
-		local weapon_unit = self:equipped_weapon_unit()
-		if weapon_unit then
-			local weapon = weapon_unit:base()
-			if weapon and weapon:fire_mode() == "single" and weapon:is_category("smg", "assault_rifle", "snp") then
-				self:activate_temporary_upgrade("temporary", "single_shot_fast_reload")
-			end
+	local weapon_unit = self:equipped_weapon_unit()
+	if weapon_unit then
+		local weapon = weapon_unit:base()
+		if weapon and weapon:fire_mode() == "single" and weapon:is_category("smg", "assault_rifle", "snp") then
+			self:activate_temporary_upgrade("temporary", "single_shot_fast_reload")
 		end
 	end
 end
@@ -845,9 +855,6 @@ function PlayerManager:on_killshot(killed_unit, variant, headshot)
 	end
 	if CopDamage.is_civilian(killed_unit:base()._tweak_table) then
 		return
-	end
-	if variant == "melee" and self:has_inactivate_temporary_upgrade("temporary", "melee_kill_increase_reload_speed") then
-		self:activate_temporary_upgrade("temporary", "melee_kill_increase_reload_speed")
 	end
 	local equipped_unit = self:get_current_state()._equipped_unit
 	self._num_kills = self._num_kills + 1
@@ -1764,10 +1771,12 @@ function PlayerManager:damage_reduction_skill_multiplier(damage_type, current_st
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1)
 	multiplier = multiplier * self:upgrade_value("player", "damage_dampener", 1)
+	multiplier = multiplier * self:upgrade_value("player", "health_damage_reduction", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "revive_damage_reduction", 1)
 	multiplier = multiplier * self:get_hostage_bonus_multiplier("damage_dampener")
 	multiplier = multiplier * self._properties:get_property("revive_damage_reduction", 1)
+	multiplier = multiplier * self._temporary_properties:get_property("revived_damage_reduction", 1)
 	local dmg_red_mul = self:team_upgrade_value("damage_dampener", "team_damage_reduction", 1)
 	if self:has_category_upgrade("player", "passive_damage_reduction") then
 		local health_ratio = self:player_unit():character_damage():health_ratio()
@@ -1972,9 +1981,7 @@ end
 
 function PlayerManager:update_deployable_selection_to_peers()
 	local equipment = self:selected_equipment()
-	print("hmmm")
 	if equipment then
-		print("hello")
 		local amount = Application:digest_value(equipment.amount[1], false)
 		self:update_deployable_equipment_amount_to_peers(equipment.equipment, amount)
 	end

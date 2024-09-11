@@ -233,15 +233,16 @@ function NewSkillTreeGui:_setup()
 	for index, page in ipairs(tweak_data.skilltree.skill_pages_order) do
 		page_data = pages[page]
 		if page_data and tweak_data.skilltree.skilltree[page] then
-			local tab_item = NewSkillTreeTabItem:new(tab_panel, page, tab_x, index)
-			tab_x = tab_item:next_page_position()
-			table.insert(self._tab_items, tab_item)
 			page_tree_title_panel = tree_title_panel:panel()
 			page_tree_panel = tree_panel:panel()
 			local tree = NewSkillTreePage:new(page, page_data, page_tree_title_panel, page_tree_panel, self._fullscreen_panel, self)
 			table.insert(self._tree_items, tree)
+			local tab_item = NewSkillTreeTabItem:new(tab_panel, page, tab_x, index, self, tree)
+			tab_x = tab_item:next_page_position()
+			table.insert(self._tab_items, tab_item)
 		end
 	end
+	self._selected_page = self._tree_items[1]
 	local legends_panel = self._panel:panel({
 		name = "LegendsPanel",
 		w = self._panel:w() * 0.75,
@@ -251,6 +252,22 @@ function NewSkillTreeGui:_setup()
 	legends_panel:text({
 		name = "LegendText",
 		text = "",
+		font = small_font,
+		font_size = small_font_size,
+		color = tweak_data.screen_colors.text,
+		blend_mode = "add",
+		align = "right",
+		vertical = "top"
+	})
+	local legend_panel_reset_skills = self._panel:panel({
+		name = "LegendPanelResetSkills",
+		w = self._panel:w() * 0.75,
+		h = tweak_data.menu.pd2_medium_font_size
+	})
+	legend_panel_reset_skills:set_righttop(self._panel:w(), tweak_data.menu.pd2_medium_font_size)
+	legend_panel_reset_skills:text({
+		name = "LegendTextResetSkills",
+		text = "RESET SKILLS",
 		font = small_font,
 		font_size = small_font_size,
 		color = tweak_data.screen_colors.text,
@@ -308,9 +325,45 @@ function NewSkillTreeGui:set_skill_point_text(skill_points)
 	self._skill_points_text:set_color(color)
 end
 
+function NewSkillTreeGui:refresh_reset_skills_legends(trees_idx)
+	local legend_panel_reset_skills = self._panel:child("LegendPanelResetSkills")
+	legend_panel_reset_skills:clear()
+	local localization = managers.localization
+	local right = legend_panel_reset_skills:w()
+	if self:has_spent_skill_points() then
+		local text = legend_panel_reset_skills:text({
+			text = localization:to_upper_text("skill_tree_reset_all_skills_button", {
+				BTN_RESET_ALL_SKILLS = localization:btn_macro("menu_respec_tree_all")
+			}),
+			font = small_font,
+			font_size = small_font_size,
+			blend_mode = "add"
+		})
+		make_fine_text(text)
+		text:set_right(right)
+		right = text:left()
+	else
+		return
+	end
+	if self:has_tree_spent_points(trees_idx) then
+		local text = legend_panel_reset_skills:text({
+			text = localization:to_upper_text("skill_tree_reset_skills_button", {
+				BTN_RESET_SKILLS = localization:btn_macro("menu_respec_tree")
+			}),
+			font = small_font,
+			font_size = small_font_size,
+			blend_mode = "add"
+		})
+		make_fine_text(text)
+		text:set_right(right)
+	end
+end
+
 function NewSkillTreeGui:_on_refresh_event()
 	local points = self._skilltree:points()
 	self:set_skill_point_text(points)
+	WalletGuiObject.refresh()
+	self:refresh_reset_skills_legends(self._selected_page:trees_idx())
 end
 
 function NewSkillTreeGui:_rec_round_object(object)
@@ -365,6 +418,7 @@ function NewSkillTreeGui:set_active_page(new_page, play_sound)
 	end
 	if new_tab then
 		new_tab:set_active(true)
+		self._selected_page = new_tab:page()
 	end
 	if item then
 		self:set_selected_item(item)
@@ -711,6 +765,7 @@ function NewSkillTreeGui:invest_point(item)
 		self:update_item()
 		self:reload_connections()
 		WalletGuiObject.refresh()
+		self:refresh_reset_skills_legends(self._selected_page:trees_idx())
 	end
 end
 
@@ -730,6 +785,7 @@ function NewSkillTreeGui:refund_point(item)
 		self:update_item()
 		self:reload_connections()
 		WalletGuiObject.refresh()
+		self:refresh_reset_skills_legends(self._selected_page:trees_idx())
 	else
 		item:flash()
 	end
@@ -759,6 +815,12 @@ function NewSkillTreeGui:special_btn_pressed(button)
 		return true
 	elseif button == Idstring("menu_switch_skillset") then
 		managers.menu:open_node("skill_switch", {})
+		return
+	elseif button == Idstring("menu_respec_tree") then
+		self:respec_page(self._tree_items[self._active_page])
+		return
+	elseif button == Idstring("menu_respec_tree_all") then
+		self:respec_all()
 		return
 	end
 	return false
@@ -843,6 +905,29 @@ function NewSkillTreeGui:_dialog_respec_all_yes()
 end
 
 function NewSkillTreeGui:_dialog_respec_no()
+end
+
+function NewSkillTreeGui:has_tree_spent_points(trees_idx)
+	for i = 1, #trees_idx do
+		local tree_idx = trees_idx[i]
+		if self._skilltree:points_spent(tree_idx) > 0 then
+			return true
+		end
+	end
+	return false
+end
+
+function NewSkillTreeGui:has_spent_skill_points()
+	for i = 1, #self._tree_items do
+		local trees_idx = self._tree_items[i]:trees_idx()
+		for j = 1, #trees_idx do
+			local tree_idx = trees_idx[j]
+			if self._skilltree:points_spent(tree_idx) > 0 then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 function NewSkillTreeGui:on_skilltree_reset(tree)
@@ -1141,12 +1226,14 @@ end
 
 NewSkillTreeTabItem = NewSkillTreeTabItem or class(NewSkillTreeItem)
 
-function NewSkillTreeTabItem:init(page_tab_panel, page, tab_x, index)
+function NewSkillTreeTabItem:init(page_tab_panel, page, tab_x, index, gui, page_item)
 	NewSkillTreeTabItem.super.init(self)
 	self._index = index
 	self._page = page
 	self._active = false
 	self._selected = false
+	self._gui = gui
+	self._page_item = page_item
 	local page_panel = page_tab_panel:panel({
 		name = "Page" .. string.capitalize(tostring(page)),
 		x = tab_x
@@ -1177,6 +1264,10 @@ end
 
 function NewSkillTreeTabItem:index()
 	return self._index
+end
+
+function NewSkillTreeTabItem:page()
+	return self._page_item
 end
 
 function NewSkillTreeTabItem:prev_page_position()
@@ -1256,7 +1347,7 @@ function NewSkillTreePage:init(page, page_data, tree_title_panel, tree_panel, fu
 			name = "Tree" .. tostring(tree),
 			w = tree_width,
 			x = (index - 1) * (tree_width + tree_space)
-		}), fullscreen_panel, gui)
+		}), fullscreen_panel, gui, self)
 		table.insert(self._trees, panel)
 	end
 	for tree, tree_item in ipairs(self._trees) do
@@ -1330,6 +1421,10 @@ end
 function NewSkillTreePage:set_active(active)
 	self._active = active
 	self:refresh()
+	if active then
+		Application:stack_dump()
+		self._gui:refresh_reset_skills_legends(self:trees_idx())
+	end
 	return active and self:item(1, 1)
 end
 
@@ -1351,13 +1446,14 @@ end
 
 NewSkillTreeTreeItem = NewSkillTreeTreeItem or class(NewSkillTreeItem)
 
-function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel, gui)
+function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel, gui, page)
 	NewSkillTreeTreeItem.super.init(self)
 	self._gui = gui
 	self._selected = false
 	self._tiers = {}
 	self._tree_panel = tree_panel
 	self._tree = tree
+	self._page = page
 	self._event_listener = gui:event_listener()
 	self._event_listener:add(tree_data, {"refresh"}, callback(self, self, "_on_refresh_event"))
 	local num_tiers = #tree_data.tiers

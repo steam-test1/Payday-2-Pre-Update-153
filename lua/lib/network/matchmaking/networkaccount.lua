@@ -98,6 +98,9 @@ end
 function NetworkAccount:inventory_reward_unlock(box, key)
 end
 
+function NetworkAccount:inventory_reward_open(item)
+end
+
 function NetworkAccount:inventory_outfit_refresh()
 end
 

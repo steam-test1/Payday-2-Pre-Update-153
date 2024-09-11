@@ -78,7 +78,7 @@ function SawWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spread_m
 		local ammo_usage = 5
 		if ray_res.hit_enemy then
 			if managers.player:has_category_upgrade("saw", "enemy_slicer") then
-				ammo_usage = 10
+				ammo_usage = managers.player:upgrade_value("saw", "enemy_slicer", 10)
 			else
 				ammo_usage = 15
 			end

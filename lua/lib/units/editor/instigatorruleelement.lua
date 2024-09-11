@@ -14,6 +14,7 @@ end
 
 function InstigatorRuleUnitElement:destroy(unit)
 	managers.vehicle:remove_listener(unit:name():s())
+	InstigatorRuleUnitElement.super.destroy(self, unit)
 end
 
 function InstigatorRuleUnitElement:_rule_updated(category, value)
@@ -50,7 +51,7 @@ function InstigatorRuleUnitElement:_build_panel(panel, panel_sizer)
 	self._rules_panel:destroy_children()
 	panel_sizer:add(self._rules_panel, 1, 1, "EXPAND")
 	self:_update_rules_panel()
-	managers.vehicle:add_listener(unit:name():s(), {"on_add", "on_remove"}, callback(self, self, "_update_rules_panel"))
+	managers.vehicle:add_listener(self._unit:name():s(), {"on_add", "on_remove"}, callback(self, self, "_update_rules_panel"))
 end
 
 function InstigatorRuleUnitElement:_update_rules_panel(panel, panel_sizer)

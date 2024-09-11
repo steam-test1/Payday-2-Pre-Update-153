@@ -1232,7 +1232,11 @@ function WINDLCManager:init()
 			steel = {app_id = "401650", no_install = true},
 			bobblehead = {app_id = "328860", no_install = true},
 			peta = {app_id = "433730", no_install = true},
-			pal = {app_id = "441600", no_install = true},
+			pal = {
+				app_id = "441600",
+				no_install = true,
+				external = true
+			},
 			opera = {app_id = "468410", no_install = true},
 			jigg = {app_id = "486610", no_install = true},
 			wild = {app_id = "450660", no_install = true},

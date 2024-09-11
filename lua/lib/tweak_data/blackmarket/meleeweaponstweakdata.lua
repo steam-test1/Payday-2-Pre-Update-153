@@ -2131,5 +2131,6 @@ function BlackMarketTweakData:_init_melee_weapons()
 		var4_attack = {anim = "var2"},
 		charge = {anim = "charge", loop = true}
 	}
+	self:give_free_dlcs(self.melee_weapons)
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

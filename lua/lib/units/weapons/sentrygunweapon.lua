@@ -43,6 +43,10 @@ function SentryGunWeapon:init(unit)
 	self._to = Vector3()
 end
 
+function SentryGunWeapon:unit()
+	return self._unit
+end
+
 function SentryGunWeapon:get_damage_multiplier()
 	return self._damage_multiplier or 1
 end
@@ -243,6 +247,7 @@ function SentryGunWeapon:fire(blanks, expend_ammo, shoot_player, target_unit)
 		RaycastWeaponBase._check_alert(self, ray_res.rays, from_pos, direction, self._unit)
 	end
 	self._unit:movement():give_recoil()
+	self._unit:event_listener():call("on_fire")
 	return ray_res
 end
 

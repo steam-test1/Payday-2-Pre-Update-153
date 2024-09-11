@@ -1245,7 +1245,8 @@ function MenuCallbackHandler:have_safe_and_drill_for_container(data)
 	end
 	local drill = data.drill
 	local safe = data.safe
-	local have_drill = managers.blackmarket:have_inventory_tradable_item("drills", drill)
+	local safe_free = tweak_data.economy.safes[safe] and tweak_data.economy.safes[safe].free
+	local have_drill = safe_free or managers.blackmarket:have_inventory_tradable_item("drills", drill)
 	local have_safe = managers.blackmarket:have_inventory_tradable_item("safes", safe)
 	return have_drill and have_safe
 end
@@ -1341,6 +1342,7 @@ function MenuCallbackHandler:steam_open_container(item)
 		return
 	end
 	local safe_entry = data.safe
+	local safe_tweak = tweak_data.economy.safes[safe_entry]
 	
 	local function ready_clbk()
 		print("ECONOMY SAFE READY CALLBACK")
@@ -1355,7 +1357,11 @@ function MenuCallbackHandler:steam_open_container(item)
 	managers.menu_component:set_blackmarket_disable_fetching(true)
 	managers.menu_component:set_blackmarket_enabled(false)
 	managers.menu_scene:create_economy_safe_scene(safe_entry, ready_clbk)
-	managers.network.account:inventory_reward_unlock(data.safe, data.safe_id, data.drill_id, callback(MenuCallbackHandler, MenuCallbackHandler, "_safe_result_recieved"))
+	if safe_tweak and safe_tweak.free then
+		managers.network.account:inventory_reward_open(safe_entry, data.safe_id, callback(MenuCallbackHandler, MenuCallbackHandler, "_safe_result_recieved"))
+	else
+		managers.network.account:inventory_reward_unlock(safe_entry, data.safe_id, data.drill_id, callback(MenuCallbackHandler, MenuCallbackHandler, "_safe_result_recieved"))
+	end
 end
 
 function MenuCallbackHandler:_safe_result_recieved(error, items_new, items_removed)

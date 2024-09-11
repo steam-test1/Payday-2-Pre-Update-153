@@ -470,3 +470,12 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.bodybags_bag.name_id = "bm_equipment_bodybags_bag"
 	self:_add_desc_from_name_macro(self.deployables)
 end
+
+function BlackMarketTweakData:give_free_dlcs(data_list)
+	local free_dlcs = {}
+	for _, data in pairs(data_list) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
+end

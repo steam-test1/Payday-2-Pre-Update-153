@@ -141,6 +141,13 @@ function UnitNetworkHandler:action_walk_nav_link(unit, pos, yaw, anim_index, fro
 	unit:movement():sync_action_walk_nav_link(pos, rot, anim_index, from_idle)
 end
 
+function UnitNetworkHandler:action_change_pose(unit, pose_code, pos)
+	if not self._verify_character(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	unit:movement():sync_action_change_pose(pose_code, pos)
+end
+
 function UnitNetworkHandler:action_spooc_start(unit, target_u_pos, flying_strike, action_id)
 	if not self._verify_character(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
@@ -916,7 +923,9 @@ function UnitNetworkHandler:revive_player(revive_health_level, revive_damage_red
 		player:character_damage():set_revive_boost(revive_health_level)
 	end
 	if 0 < revive_damage_reduction then
-		managers.player:activate_temporary_upgrade_by_level("temporary", "passive_revive_damage_reduction", revive_damage_reduction)
+		revive_damage_reduction = math.clamp(revive_damage_reduction, 1, 2)
+		local tweak = tweak_data.upgrades.first_aid_kit.revived_damage_reduction[revive_damage_reduction]
+		managers.player:activate_temporary_property("revived_damage_reduction", tweak[2], tweak[1])
 	end
 	if alive(player) then
 		player:character_damage():revive()

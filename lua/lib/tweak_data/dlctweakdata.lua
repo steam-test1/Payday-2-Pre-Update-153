@@ -3203,6 +3203,38 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.complete_overkill_pack3 = {}
+	self.complete_overkill_pack3.dlc = "has_parent_dlc"
+	self.complete_overkill_pack3.parent_dlc = "complete_overkill_pack"
+	self.complete_overkill_pack3.content = {}
+	self.complete_overkill_pack3.content.loot_global_value = "complete_overkill_pack"
+	self.complete_overkill_pack3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "fab_mega_grin",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fab_mega_doctor",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fab_mega_alien",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "cop_mega_gage_blade",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fab_mega_mark",
+			amount = 1
+		}
+	}
 	self.hlm2 = {}
 	self.hlm2.dlc = "has_hlm2"
 	self.hlm2.content = {}
@@ -4858,11 +4890,6 @@ function DLCTweakData:init(tweak_data)
 		self.xone_bonus.content_on_consoles = true
 		self.xone_bonus.content.loot_global_value = "infamous"
 		self.xone_bonus.content.loot_drops = {
-			{
-				type_items = "cash",
-				item_entry = "xone_bonus",
-				amount = 1
-			},
 			{
 				type_items = "masks",
 				item_entry = "unforsaken",

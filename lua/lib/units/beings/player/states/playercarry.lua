@@ -58,6 +58,7 @@ function PlayerCarry:exit(state_data, new_state_name)
 	self._dye_risk = nil
 	managers.job:set_memory("kill_count_carry", nil, true)
 	managers.job:set_memory("kill_count_no_carry", nil, true)
+	self._state_data.previous_state = "carry"
 	return exit_data
 end
 

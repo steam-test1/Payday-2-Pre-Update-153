@@ -113,6 +113,11 @@ function UpgradesTweakData:_init_pd2_values()
 	self.sentry_gun_base_ammo = 100
 	self.sentry_gun_base_armor = 10
 	self.doctor_bag_base = 2
+	self.first_aid_kit = {}
+	self.first_aid_kit.revived_damage_reduction = {
+		{0.7, 5},
+		{0.5, 5}
+	}
 	self.grenade_crate_base = 3
 	self.max_grenade_amount = 3
 	self.bodybag_crate_base = 3
@@ -180,7 +185,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.temporary.reload_weapon_faster = {
 		{1.8, 10}
 	}
-	self.values.temporary.melee_kill_increase_reload_speed = {
+	self.values.player.melee_kill_increase_reload_speed = {
 		{1.5, 10}
 	}
 	self.values.player.civ_harmless_bullets = {true}
@@ -193,6 +198,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.team.pistol.suppression_recoil_multiplier = self.values.team.pistol.recoil_multiplier
 	self.values.team.akimbo.suppression_recoil_multiplier = self.values.team.akimbo.recoil_multiplier
 	self.values.team.weapon.suppression_recoil_multiplier = self.values.team.weapon.recoil_multiplier
+	self.values.weapon.enter_steelsight_speed_multiplier = {2}
 	self.values.player.assets_cost_multiplier = {0.5}
 	self.values.player.additional_assets = {true}
 	self.values.player.stamina_multiplier = {2}
@@ -223,7 +229,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.pistol.magazine_capacity_inc = {5}
 	self.values.pistol.stacked_accuracy_bonus = {
 		{
-			accuracy_bonus = 1.1,
+			accuracy_bonus = 0.9,
 			max_stacks = 4,
 			max_time = 10
 		}
@@ -295,10 +301,11 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.pistol.hip_fire_spread_multiplier = {0.8}
 	self.values.assault_rifle.hip_fire_spread_multiplier = {0.8}
 	self.values.smg.hip_fire_spread_multiplier = {0.8}
+	self.values.smg.zoom_increase = {2}
 	self.values.saw.hip_fire_spread_multiplier = {0.8}
 	self.values.player.saw_speed_multiplier = {0.95, 0.65}
 	self.values.saw.lock_damage_multiplier = {1.2, 1.4}
-	self.values.saw.enemy_slicer = {true}
+	self.values.saw.enemy_slicer = {7}
 	self.values.player.melee_damage_health_ratio_multiplier = {2.5}
 	self.values.player.damage_health_ratio_multiplier = {1}
 	self.player_damage_health_ratio_threshold = 0.5
@@ -652,7 +659,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.team.armor.multiplier = {1.05}
 	self.values.player.armor_regen_timer_multiplier_passive = {0.9}
 	self.values.player.armor_regen_timer_multiplier_tier = {0.9}
-	self.values.player.armor_regen_time_mul = {1.15}
+	self.values.player.armor_regen_time_mul = {0.85}
 	self.values.player.camouflage_multiplier = {0.85}
 	self.values.player.uncover_multiplier = {1.15}
 	self.values.player.passive_xp_multiplier = {1.45}
@@ -869,6 +876,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.assault_rifle.move_spread_index_addend = {2}
 	self.values.snp.move_spread_index_addend = {2}
+	self.values.smg.move_spread_index_addend = {2}
 	self.values.pistol.spread_index_addend = {2}
 	self.values.shotgun.hip_fire_spread_index_addend = {1}
 	self.values.weapon.hip_fire_spread_index_addend = {1}
@@ -2135,7 +2143,10 @@ function UpgradesTweakData:init()
 			"body_armor2",
 			"ak74",
 			"nin",
-			"frag_com"
+			"frag_com",
+			"frag",
+			"dynamite",
+			"molotov"
 		}
 	}
 	self.level_tree[2] = {
@@ -4312,7 +4323,7 @@ function UpgradesTweakData:_player_definitions()
 		category = "temporary",
 		name_id = "menu_player_temp_melee_kill_increase_reload_speed",
 		upgrade = {
-			category = "temporary",
+			category = "player",
 			upgrade = "melee_kill_increase_reload_speed",
 			value = 1
 		}
@@ -8448,6 +8459,15 @@ function UpgradesTweakData:_weapon_definitions()
 			value = 1
 		}
 	}
+	self.definitions.smg_move_spread_index_addend = {
+		category = "feature",
+		name_id = "menu_snp_move_spread_index_addend",
+		upgrade = {
+			category = "smg",
+			upgrade = "move_spread_index_addend",
+			value = 1
+		}
+	}
 	self.definitions.weapon_silencer_spread_index_addend = {
 		category = "feature",
 		name_id = "menu_weapon_silencer_spread_index_addend",
@@ -8706,6 +8726,15 @@ function UpgradesTweakData:_weapon_definitions()
 		upgrade = {
 			category = "weapon",
 			upgrade = "silencer_spread_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.weapon_enter_steelsight_speed_multiplier = {
+		category = "feature",
+		name_id = "menu_weapon_enter_steelsight_speed_multiplier",
+		upgrade = {
+			category = "weapon",
+			upgrade = "enter_steelsight_speed_multiplier",
 			value = 1
 		}
 	}
@@ -9198,6 +9227,15 @@ function UpgradesTweakData:_smg_definitions()
 		upgrade = {
 			category = "smg",
 			upgrade = "hip_fire_damage_multiplier",
+			value = 1
+		}
+	}
+	self.definitions.smg_zoom_increase = {
+		category = "feature",
+		name_id = "menu_snp_zoom_increase",
+		upgrade = {
+			category = "smg",
+			upgrade = "zoom_increase",
 			value = 1
 		}
 	}

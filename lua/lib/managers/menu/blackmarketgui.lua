@@ -2178,34 +2178,40 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 					if bundle_folder then
 						guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 					end
-					local path = "drills/"
-					local texture_path = guis_catalog .. path .. bundle.drill
-					drill_panel = panel:panel({
-						name = "drill",
-						y = small_font_size + padding * 0.5,
-						w = size,
-						h = size,
-						alpha = 0.9
-					})
-					drill_panel:set_center_x(w * 0.75)
-					self:request_texture(texture_path, drill_panel, true, "normal")
-					drill_text = panel:text({
-						text = managers.localization:to_upper_text("menu_steam_market_buy_drill"),
-						font = small_font,
-						font_size = small_font_size,
-						x = drill_panel:x(),
-						y = drill_panel:bottom() + 1,
-						color = tweak_data.screen_colors.button_stage_3
-					})
-					self:make_fine_text(drill_text)
-					drill_text:set_center_x(drill_panel:center_x())
-					drill_text:set_x(math.round(drill_text:x()))
-					drill_market_panel = panel:panel({
-						x = drill_panel:x(),
-						y = drill_panel:y(),
-						w = drill_panel:w(),
-						h = drill_panel:h() + small_font_size
-					})
+					if not tweak_data.economy.safes[bundle.safe].free then
+						local path = "drills/"
+						local texture_path = guis_catalog .. path .. bundle.drill
+						drill_panel = panel:panel({
+							name = "drill",
+							y = small_font_size + padding * 0.5,
+							w = size,
+							h = size,
+							alpha = 0.9
+						})
+						drill_panel:set_center_x(w * 0.75)
+						self:request_texture(texture_path, drill_panel, true, "normal")
+						drill_text = panel:text({
+							text = managers.localization:to_upper_text("menu_steam_market_buy_drill"),
+							font = small_font,
+							font_size = small_font_size,
+							x = drill_panel:x(),
+							y = drill_panel:bottom() + 1,
+							color = tweak_data.screen_colors.button_stage_3
+						})
+						self:make_fine_text(drill_text)
+						drill_text:set_center_x(drill_panel:center_x())
+						drill_text:set_x(math.round(drill_text:x()))
+						drill_market_panel = panel:panel({
+							x = drill_panel:x(),
+							y = drill_panel:y(),
+							w = drill_panel:w(),
+							h = drill_panel:h() + small_font_size
+						})
+					else
+						drill_text = nil
+						drill_panel = nil
+						drill_market_panel = nil
+					end
 					self._market_bundles[i] = {
 						panel = panel,
 						show_content = {
@@ -2704,6 +2710,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				pc_btn = "menu_remove_item",
 				name = "bm_menu_btn_equip_secondary_deployable",
 				callback = callback(self, self, "lo_equip_deployable_callback_secondary")
+			},
+			lo_d_unequip = {
+				prio = 1,
+				btn = "BTN_X",
+				pc_btn = "menu_remove_item",
+				name = "bm_menu_btn_unequip_deployable",
+				callback = callback(self, self, "lo_unequip_deployable_callback")
 			},
 			lo_mw_equip = {
 				prio = 1,
@@ -6198,7 +6211,7 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 				managers.menu_component:post_event("menu_enter")
 				return
 			end
-			if active_bundle.drill.text:inside(x, y) or active_bundle.drill.image:inside(x, y) then
+			if active_bundle.drill.text and active_bundle.drill.text:inside(x, y) or active_bundle.drill.image and active_bundle.drill.image:inside(x, y) then
 				MenuCallbackHandler:steam_buy_drill(nil, {
 					drill = active_bundle.drill.entry
 				})
@@ -6321,7 +6334,6 @@ function BlackMarketGui:update(t, dt)
 		self._reload_in_t = self._reload_in_t - dt
 		if 0 >= self._reload_in_t then
 			self._reload_in_t = nil
-			print("RELOAD")
 			self:reload()
 		end
 	end
@@ -7596,8 +7608,11 @@ function BlackMarketGui:populate_deployables(data)
 		if new_data.unlocked and not new_data.equipped and second_deployable then
 			table.insert(new_data, "lo_d_equip_primary")
 		end
-		if second_deployable and new_data.unlocked and not new_data.equipped then
+		if second_deployable and managers.blackmarket:equipped_deployable(1) and new_data.unlocked and not new_data.equipped then
 			table.insert(new_data, "lo_d_equip_secondary")
+		end
+		if new_data.equipped then
+			table.insert(new_data, "lo_d_unequip")
 		end
 		data[i] = new_data
 		index = i
@@ -11457,6 +11472,24 @@ end
 function BlackMarketGui:lo_equip_deployable_callback_secondary(data)
 	data.target_slot = 2
 	managers.blackmarket:equip_deployable(data)
+	self:reload()
+end
+
+function BlackMarketGui:lo_unequip_deployable_callback(data)
+	data.target_slot = managers.blackmarket:equipped_deployable_slot(data.name)
+	if not data.target_slot then
+		return
+	end
+	data.name = nil
+	managers.blackmarket:equip_deployable(data)
+	if data.target_slot == 1 and managers.player:has_category_upgrade("player", "second_deployable") and managers.blackmarket:equipped_deployable(2) then
+		local secondary_data = {
+			name = managers.blackmarket:equipped_deployable(2),
+			target_slot = 1
+		}
+		managers.blackmarket:equip_deployable({name = nil, target_slot = 2})
+		managers.blackmarket:equip_deployable(secondary_data)
+	end
 	self:reload()
 end
 

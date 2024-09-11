@@ -781,7 +781,7 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.bear.value = 3
 	self.masks.bear.qlvl = 0
-	self.masks.bear.dlcs = {"pd2_clan"}
+	self.masks.bear.dlc = "pd2_clan"
 	self.masks.bear.sort_number = 1
 	self.masks.clinton = {}
 	self.masks.clinton.unit = "units/pd2_dlc1/masks/msk_clinton/msk_clinton"
@@ -891,7 +891,6 @@ function BlackMarketTweakData:_init_masks()
 	}
 	self.masks.santa_happy.value = 4
 	self.masks.santa_happy.dlc = "pd2_clan"
-	self.masks.santa_happy.global_value = "pd2_clan"
 	self.masks.santa_happy.sort_number = 3
 	self.masks.santa_mad = {}
 	self.masks.santa_mad.unit = "units/pd2_dlc_xmas/masks/msk_santa_mad/msk_santa_mad"
@@ -1140,7 +1139,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.unicorn.pcs = {}
 	self.masks.unicorn.value = 0
 	self.masks.unicorn.dlc = "pd2_clan"
-	self.masks.unicorn.global_value = "pd2_clan"
 	self.masks.unicorn.sort_number = 4
 	self.masks.franklin = {}
 	self.masks.franklin.unit = "units/pd2_dlc_big/masks/msk_franklin/msk_franklin"
@@ -1893,7 +1891,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.bandit.texture_bundle_folder = "west"
 	self.masks.bandit.value = 0
 	self.masks.bandit.type = "helmet"
-	self.masks.bandit.skip_mask_on_sequence = true
 	self.masks.bullskull = {}
 	self.masks.bullskull.unit = "units/pd2_dlc_west/masks/msk_bullskull/msk_bullskull"
 	self.masks.bullskull.name_id = "bm_msk_bullskull"
@@ -2509,7 +2506,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.megacthulhu.dlc = "complete_overkill_pack"
 	self.masks.megacthulhu.texture_bundle_folder = "super"
 	self.masks.megacthulhu.value = 0
-	self.masks.megacthulhu.sort_number = 1
 	self.masks.hunter = {}
 	self.masks.hunter.unit = "units/pd2_dlc_super/masks/hunter/msk_hunter"
 	self.masks.hunter.name_id = "bm_msk_hunter"
@@ -2517,7 +2513,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.hunter.dlc = "complete_overkill_pack"
 	self.masks.hunter.texture_bundle_folder = "super"
 	self.masks.hunter.value = 0
-	self.masks.hunter.sort_number = 1
 	self.masks.cop_skull = {}
 	self.masks.cop_skull.unit = "units/pd2_dlc_super/masks/cop_skull/msk_cop_skull"
 	self.masks.cop_skull.name_id = "bm_cop_mega_skull"
@@ -2525,7 +2520,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cop_skull.dlc = "complete_overkill_pack"
 	self.masks.cop_skull.texture_bundle_folder = "super"
 	self.masks.cop_skull.value = 0
-	self.masks.cop_skull.sort_number = 1
 	self.masks.cop_plague_doctor = {}
 	self.masks.cop_plague_doctor.unit = "units/pd2_dlc_super/masks/cop_plague_doctor/msk_cop_plague_doctor"
 	self.masks.cop_plague_doctor.name_id = "bm_cop_plague_doctor"
@@ -2533,7 +2527,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cop_plague_doctor.dlc = "complete_overkill_pack"
 	self.masks.cop_plague_doctor.texture_bundle_folder = "super"
 	self.masks.cop_plague_doctor.value = 0
-	self.masks.cop_plague_doctor.sort_number = 1
 	self.masks.cop_kawaii = {}
 	self.masks.cop_kawaii.unit = "units/pd2_dlc_super/masks/cop_kawaii/msk_cop_kawaii"
 	self.masks.cop_kawaii.name_id = "bm_cop_kawaii"
@@ -2541,7 +2534,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.cop_kawaii.dlc = "complete_overkill_pack"
 	self.masks.cop_kawaii.texture_bundle_folder = "super"
 	self.masks.cop_kawaii.value = 0
-	self.masks.cop_kawaii.sort_number = 1
 	self.masks.jimmy = {}
 	self.masks.jimmy.unit = "units/pd2_dlc_coco/masks/jimmy/msk_jimmy"
 	self.masks.jimmy.name_id = "bm_msk_jimmy"
@@ -2734,6 +2726,41 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.rust_begins.texture_bundle_folder = "wild"
 	self.masks.rust_begins.sort_number = 30
 	self.masks.rust_begins.dlc = "wild"
+	self.masks.fab_mega_grin = {}
+	self.masks.fab_mega_grin.unit = "units/pd2_dlc_fab/masks/mega_grin/msk_fab_mega_grin"
+	self.masks.fab_mega_grin.name_id = "bm_msk_mega_grin"
+	self.masks.fab_mega_grin.pcs = {}
+	self.masks.fab_mega_grin.value = 0
+	self.masks.fab_mega_grin.texture_bundle_folder = "fab"
+	self.masks.fab_mega_grin.dlc = "complete_overkill_pack"
+	self.masks.fab_mega_doctor = {}
+	self.masks.fab_mega_doctor.unit = "units/pd2_dlc_fab/masks/mega_doctor/msk_fab_mega_doctor"
+	self.masks.fab_mega_doctor.name_id = "bm_msk_mega_doctor"
+	self.masks.fab_mega_doctor.pcs = {}
+	self.masks.fab_mega_doctor.value = 0
+	self.masks.fab_mega_doctor.texture_bundle_folder = "fab"
+	self.masks.fab_mega_doctor.dlc = "complete_overkill_pack"
+	self.masks.fab_mega_alien = {}
+	self.masks.fab_mega_alien.unit = "units/pd2_dlc_fab/masks/mega_alien/msk_fab_mega_alien"
+	self.masks.fab_mega_alien.name_id = "bm_msk_mega_alien"
+	self.masks.fab_mega_alien.pcs = {}
+	self.masks.fab_mega_alien.value = 0
+	self.masks.fab_mega_alien.texture_bundle_folder = "fab"
+	self.masks.fab_mega_alien.dlc = "complete_overkill_pack"
+	self.masks.cop_mega_gage_blade = {}
+	self.masks.cop_mega_gage_blade.unit = "units/pd2_dlc_fab/masks/cop_mega_gage_blade/msk_cop_mega_gage_blade"
+	self.masks.cop_mega_gage_blade.name_id = "bm_msk_mega_blade"
+	self.masks.cop_mega_gage_blade.pcs = {}
+	self.masks.cop_mega_gage_blade.value = 0
+	self.masks.cop_mega_gage_blade.texture_bundle_folder = "fab"
+	self.masks.cop_mega_gage_blade.dlc = "complete_overkill_pack"
+	self.masks.fab_mega_mark = {}
+	self.masks.fab_mega_mark.unit = "units/pd2_dlc_fab/masks/mega_bear/msk_fab_mega_mark"
+	self.masks.fab_mega_mark.name_id = "bm_msk_mega_mark"
+	self.masks.fab_mega_mark.pcs = {}
+	self.masks.fab_mega_mark.value = 0
+	self.masks.fab_mega_mark.texture_bundle_folder = "fab"
+	self.masks.fab_mega_mark.dlc = "complete_overkill_pack"
 	self.masks.solus = {}
 	self.masks.solus.unit = "units/pd2_dlc_solus/masks/msk_solus"
 	self.masks.solus.name_id = "bm_msk_solus"
@@ -2742,5 +2769,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.solus.texture_bundle_folder = "solus"
 	self.masks.solus.sort_number = 32
 	self.masks.solus.dlc = "solus_clan"
+	self:give_free_dlcs(self.masks)
 	self:_add_desc_from_name_macro(self.masks)
 end

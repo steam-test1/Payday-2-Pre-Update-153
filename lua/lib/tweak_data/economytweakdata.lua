@@ -416,6 +416,36 @@ function EconomyTweakData:init()
 		weapon_skins = {"judge_burn"}
 	}
 	self.contents.burn_01_legendary.rarity = "legendary"
+	self.contents.buck_01 = {}
+	self.contents.buck_01.def_id = 10022
+	self.contents.buck_01.contains = {
+		weapon_skins = {
+			"wa2000_buck",
+			"akmsu_buck",
+			"x_1911_buck",
+			"rpk_buck",
+			"x_b92fs_buck",
+			"ksg_buck",
+			"m249_buck",
+			"g22c_buck",
+			"saw_buck",
+			"winchester1874_buck",
+			"m45_buck",
+			"saiga_buck",
+			"p226_buck",
+			"new_mp5_buck",
+			"m1928_buck"
+		},
+		contents = {
+			"buck_01_legendary"
+		}
+	}
+	self.contents.buck_01_legendary = {}
+	self.contents.buck_01_legendary.def_id = 10023
+	self.contents.buck_01_legendary.contains = {
+		weapon_skins = {"boot_buck"}
+	}
+	self.contents.buck_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -510,6 +540,14 @@ function EconomyTweakData:init()
 	self.safes.burn_01.unit_name = "units/payday2_cash/safes/burn/safe/eco_safe_burn"
 	self.safes.burn_01.texture_bundle_folder = "cash/safes/burn"
 	self.safes.burn_01.market_link = "https://steamcommunity.com/market/listings/218620/Sydney%20Safe"
+	self.safes.buck_01 = {}
+	self.safes.buck_01.free = true
+	self.safes.buck_01.drill = "buck_01"
+	self.safes.buck_01.content = "buck_01"
+	self.safes.buck_01.name_id = "bm_menu_safe_buck_01"
+	self.safes.buck_01.unit_name = "units/payday2_cash/safes/buck/safe/eco_safe_buck"
+	self.safes.buck_01.texture_bundle_folder = "cash/safes/buck"
+	self.safes.buck_01.market_link = "https://steamcommunity.com/market/listings/218620/Biker%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -611,6 +649,11 @@ function EconomyTweakData:init()
 	self.drills.burn_01.desc_id = "bm_menu_drill_burn_01_desc"
 	self.drills.burn_01.unit_name = "units/payday2_cash/safes/burn/drill/eco_drill_burn"
 	self.drills.burn_01.texture_bundle_folder = "cash/safes/burn"
+	self.drills.buck_01 = {}
+	self.drills.buck_01.safe = "buck_01"
+	self.drills.buck_01.name_id = "bm_menu_drill_buck_01"
+	self.drills.buck_01.desc_id = "bm_menu_drill_buck_01_desc"
+	self.drills.buck_01.unit_name = "units/payday2_cash/safes/buck/drill/eco_drill_buck"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

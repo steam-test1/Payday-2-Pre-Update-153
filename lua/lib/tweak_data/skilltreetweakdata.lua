@@ -778,8 +778,7 @@ function SkillTreeTweakData:init()
 		icon_xy = {6, 5},
 		[1] = {
 			upgrades = {
-				"assault_rifle_enter_steelsight_speed_multiplier",
-				"snp_enter_steelsight_speed_multiplier",
+				"weapon_enter_steelsight_speed_multiplier",
 				"player_steelsight_normal_movement_speed"
 			},
 			cost = self.costs.default
@@ -788,8 +787,10 @@ function SkillTreeTweakData:init()
 			upgrades = {
 				"assault_rifle_zoom_increase",
 				"snp_zoom_increase",
+				"smg_zoom_increase",
 				"assault_rifle_move_spread_index_addend",
-				"snp_move_spread_index_addend"
+				"snp_move_spread_index_addend",
+				"smg_move_spread_index_addend"
 			},
 			cost = self.costs.pro
 		}
@@ -1757,7 +1758,9 @@ function SkillTreeTweakData:init()
 		icon_xy = {8, 3},
 		[1] = {
 			upgrades = {
-				"assault_rifle_reload_speed_multiplier"
+				"assault_rifle_reload_speed_multiplier",
+				"smg_reload_speed_multiplier",
+				"snp_reload_speed_multiplier"
 			},
 			cost = self.costs.hightier
 		},

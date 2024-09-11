@@ -24561,6 +24561,54 @@ function WeaponFactoryTweakData:_init_legendary()
 	}
 	self.parts.wpn_fps_pis_judge_b_legend.third_unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_b_legend/wpn_third_pis_judge_b_legend"
 	self.parts.wpn_fps_pis_judge_g_legend.third_unit = "units/payday2_cash/safes/burn/weapons/wpn_fps_pis_judge_g_legend/wpn_third_pis_judge_g_legend"
+	self.parts.wpn_fps_sho_boot_b_legendary = {
+		type = "barrel",
+		name_id = "bm_wp_boot_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/buck/weapons/wpn_fps_sho_boot_legendary/wpn_fps_sho_boot_b_legendary",
+		stats = {
+			value = 1,
+			spread = -3,
+			recoil = 6,
+			total_ammo_mod = 2
+		},
+		unatainable = true,
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_sho_boot_fg_legendary = {
+		type = "foregrip",
+		name_id = "bm_wp_boot_fg_legend",
+		a_obj = "a_fg",
+		unit = "units/payday2_cash/safes/buck/weapons/wpn_fps_sho_boot_legendary/wpn_fps_sho_boot_fg_legendary",
+		stats = {value = 1, damage = 20},
+		unatainable = true
+	}
+	self.parts.wpn_fps_sho_boot_o_legendary = {
+		type = "sight",
+		name_id = "bm_wp_boot_o_legend",
+		a_obj = "a_o",
+		unit = "units/payday2_cash/safes/buck/weapons/wpn_fps_sho_boot_legendary/wpn_fps_sho_boot_o_legendary",
+		stats = {value = 1, zoom = 1},
+		perks = {"scope"},
+		unatainable = true,
+		stance_mod = {
+			wpn_fps_sho_boot = {
+				translation = Vector3(0, -5, -1.5)
+			}
+		}
+	}
+	self.parts.wpn_fps_sho_boot_s_legendary = {
+		type = "stock",
+		name_id = "bm_wp_boot_s_legend",
+		a_obj = "a_s",
+		unit = "units/payday2_cash/safes/buck/weapons/wpn_fps_sho_boot_legendary/wpn_fps_sho_boot_s_legendary",
+		stats = {value = 1},
+		unatainable = true
+	}
+	self.parts.wpn_fps_sho_boot_b_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_b_legendary"
+	self.parts.wpn_fps_sho_boot_fg_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_fg_legendary"
+	self.parts.wpn_fps_sho_boot_o_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_o_legendary"
+	self.parts.wpn_fps_sho_boot_s_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_s_legendary"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()
@@ -26116,6 +26164,10 @@ function WeaponFactoryTweakData:_init_boot()
 		"wpn_fps_sho_boot_body_exotic",
 		"wpn_fps_sho_boot_m_standard",
 		"wpn_fps_sho_boot_em_extra",
+		"wpn_fps_sho_boot_b_legendary",
+		"wpn_fps_sho_boot_fg_legendary",
+		"wpn_fps_sho_boot_o_legendary",
+		"wpn_fps_sho_boot_s_legendary",
 		"wpn_fps_upg_fl_ass_peq15",
 		"wpn_fps_upg_fl_ass_laser",
 		"wpn_fps_upg_fl_ass_utg",

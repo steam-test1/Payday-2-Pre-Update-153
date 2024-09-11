@@ -156,7 +156,6 @@ function SentryGunBrain:_upd_detection(t)
 					local vis_ray = World:raycast("ray", my_pos, attention_pos, "ignore_unit", ignore_units, "slot_mask", self._visibility_slotmask, "ray_type", "ai_vision")
 					if not vis_ray or vis_ray.unit:key() == u_key then
 						detected_objects[u_key] = CopLogicBase._create_detected_attention_object_data(t, self._unit, u_key, attention_info, settings)
-						print("ADDED TARGET")
 					end
 				end
 			end
@@ -346,8 +345,6 @@ function SentryGunBrain:_destroy_detected_attention_object_data(attention_info)
 	if attention_info.uncover_progress then
 		attention_info.unit:movement():on_suspicion(self._unit, false)
 	end
-	print("REMOVING TARGET")
-	Application:stack_dump()
 	self._detected_attention_objects[attention_info.u_key] = nil
 end
 

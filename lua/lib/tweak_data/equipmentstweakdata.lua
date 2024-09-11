@@ -217,9 +217,9 @@ function EquipmentsTweakData:init()
 		sync_possession = true
 	}
 	self.specials.chavez_key = {
-		text_id = "debug_equipment_chavez_key",
+		text_id = "hud_int_equipment_chavez_keys",
 		icon = "equipment_chavez_key",
-		action_message = "chavez_key_obtained",
+		action_message = "chavez_keys_obtained",
 		sync_possession = true
 	}
 	self.specials.drill = {

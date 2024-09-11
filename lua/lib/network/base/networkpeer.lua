@@ -159,7 +159,7 @@ function NetworkPeer:verify_job(job)
 		return
 	end
 	local dlc_data = Global.dlc_manager.all_dlc_data[job_tweak.dlc]
-	if not dlc_data or not dlc_data.app_id then
+	if not (dlc_data and dlc_data.app_id) or dlc_data.external then
 		return
 	end
 	if SystemInfo:distribution() == Idstring("STEAM") and not Steam:is_user_product_owned(self._user_id, dlc_data.app_id) then

@@ -420,6 +420,20 @@ function NetworkAccount:inventory_reward_unlock(safe, safe_instance_id, drill_in
 	Steam:inventory_reward_unlock(safe_instance_id, drill_instance_id, content_tweak.def_id, reward_unlock_callback)
 end
 
+function NetworkAccount:inventory_reward_open(safe, safe_instance_id, reward_unlock_callback)
+	local safe_tweak = tweak_data.economy.safes[safe]
+	local content_tweak = safe_tweak and tweak_data.economy.contents[safe_tweak.content]
+	safe_instance_id = safe_instance_id or managers.blackmarket:tradable_instance_id("safes", safe)
+	if not safe_instance_id then
+		if reward_unlock_callback then
+			reward_unlock_callback("invalid_open")
+		end
+		return
+	end
+	managers.blackmarket:tradable_receive_item_by_instance_id(safe_instance_id)
+	Steam:inventory_reward_open(safe_instance_id, content_tweak.def_id, reward_unlock_callback)
+end
+
 function NetworkAccountSTEAM:inventory_reward_dlc(def_id, reward_promo_callback)
 	Steam:inventory_reward_promo(def_id, reward_promo_callback)
 end

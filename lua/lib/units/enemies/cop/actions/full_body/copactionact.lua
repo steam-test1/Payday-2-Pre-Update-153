@@ -801,6 +801,7 @@ CopActionAct._act_redirects.SO = {
 	"sstash_sit_tied_wakeup",
 	"so_enter_ejectionchair",
 	"so_ejectionchair_idle",
+	"civ_face_scan",
 	"cm_sp_blowtorch_work",
 	"cm_sp_saw",
 	"spawn_prisonvan_var1",

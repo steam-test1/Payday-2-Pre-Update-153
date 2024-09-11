@@ -272,6 +272,7 @@ function SentryGunDamage:die()
 	managers.groupai:state():on_criminal_neutralized(self._unit)
 	self._unit:base():on_death()
 	self._unit:sound_source():post_event(self._breakdown_snd_event)
+	self._shield_smoke_level = 0
 	if self._unit:base():has_shield() and self._death_with_shield_sequence_name then
 		self._unit:damage():run_sequence_simple(self._death_with_shield_sequence_name)
 	elseif self._death_sequence_name then

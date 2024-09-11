@@ -147,6 +147,25 @@ function PlayerParachuting:_check_action_interact(t, input)
 	return new_action
 end
 
+local tmp_ground_from_vec = Vector3()
+local tmp_ground_to_vec = Vector3()
+local up_offset_vec = math.UP * 30
+local down_offset_vec = math.UP * -40
+
+function PlayerParachuting:_update_ground_ray()
+	local hips_pos = tmp_ground_from_vec
+	local down_pos = tmp_ground_to_vec
+	mvector3.set(hips_pos, self._pos)
+	mvector3.add(hips_pos, up_offset_vec)
+	mvector3.set(down_pos, hips_pos)
+	mvector3.add(down_pos, down_offset_vec)
+	self._gnd_ray = World:raycast("ray", hips_pos, down_pos, "slot_mask", self._slotmask_gnd_ray, "ray_type", "body mover", "sphere_cast_radius", 29)
+	self._gnd_ray_chk = true
+	if self._gnd_ray and self._gnd_ray.unit:name() == Idstring("units/pd2_dlc_jerry/props/jry_equipment_parachute/jry_equipment_parachute") then
+		self._gnd_ray = nil
+	end
+end
+
 function PlayerParachuting:_update_foley(t, input)
 	if self._gnd_ray then
 		self._camera_unit:base():set_target_tilt(0)

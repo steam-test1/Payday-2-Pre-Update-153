@@ -1052,4 +1052,5 @@ function BlackMarketTweakData:_init_colors()
 		40
 	}
 	self.colors.dark_red_orange.value = 3
+	self:give_free_dlcs(self.colors)
 end

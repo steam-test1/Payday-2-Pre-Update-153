@@ -1240,4 +1240,5 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.shiny_and_chrome.value = 0
 	self.materials.shiny_and_chrome.texture_bundle_folder = "born"
 	self.materials.shiny_and_chrome.dlc = "born"
+	self:give_free_dlcs(self.materials)
 end

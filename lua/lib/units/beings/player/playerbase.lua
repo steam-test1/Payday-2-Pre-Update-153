@@ -177,8 +177,8 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("sentry_gun", "damage_multiplier") then
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "damage_multiplier", 1)
 		end
-		if managers.player:has_category_upgrade("sentry_gun", "less_noisy") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "less_noisy", 1)
+		if managers.player:has_category_upgrade("sentry_gun", "ap_bullets") then
+			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "ap_bullets", 1)
 		end
 		if managers.player:has_category_upgrade("sentry_gun", "fire_rate_reduction") then
 			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "fire_rate_reduction", 1)

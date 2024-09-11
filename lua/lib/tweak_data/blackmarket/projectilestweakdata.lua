@@ -311,6 +311,7 @@ function BlackMarketTweakData:_init_projectiles()
 		"wpn_prj_hur",
 		"frag_com"
 	}
+	self:give_free_dlcs(self.projectiles)
 	self:_add_desc_from_name_macro(self.projectiles)
 end
 

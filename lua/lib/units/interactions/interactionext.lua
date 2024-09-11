@@ -1005,6 +1005,16 @@ end
 
 SentryGunInteractionExt = SentryGunInteractionExt or class(UseInteractionExt)
 
+function SentryGunInteractionExt:init(unit)
+	SentryGunInteractionExt.super.init(self, unit)
+	unit:event_listener():add("interaction_on_fire", {"on_fire"}, callback(self, self, "_on_weapon_fire_event"))
+end
+
+function SentryGunInteractionExt:destroy()
+	SentryGunInteractionExt.super.destroy(self)
+	self._unit:event_listener():remove("interaction_on_fire")
+end
+
 function SentryGunInteractionExt:interact(player)
 	SentryGunInteractionExt.super.super.interact(self, player)
 	local equipped_wpn = managers.player:get_current_state():get_equipped_weapon()
@@ -1024,10 +1034,44 @@ function SentryGunInteractionExt:interact(player)
 	return true
 end
 
+local sentry_gun_interaction_add_string_macros = function(macros, ammo_ratio)
+	macros.BTN_INTERACT = managers.localization:btn_macro("interact", true)
+	if ammo_ratio == 1 then
+		macros.AMMO_LEFT = 100
+	elseif 0 < ammo_ratio then
+		local ammo_left = string.format("%.2f", tostring(ammo_ratio))
+		ammo_left = string.sub(ammo_left, 3, 4)
+		macros.AMMO_LEFT = ammo_left
+	else
+		macros.AMMO_LEFT = 0
+	end
+end
+
+function SentryGunInteractionExt:_add_string_macros(macros)
+	sentry_gun_interaction_add_string_macros(macros, self._unit:base():ammo_ratio())
+end
+
+function SentryGunInteractionExt:_on_weapon_fire_event()
+	self:set_dirty(true)
+end
+
 SentryGunFireModeInteractionExt = SentryGunFireModeInteractionExt or class(UseInteractionExt)
 
 function SentryGunFireModeInteractionExt:setup(sentry_gun_weapon)
 	self._sentry_gun_weapon = sentry_gun_weapon
+	local unit = sentry_gun_weapon.unit and sentry_gun_weapon:unit()
+	if unit then
+		unit:event_listener():add("sentry_fire_mode_on_fire", {"on_fire"}, callback(self, self, "_on_weapon_fire_event"))
+	end
+end
+
+function SentryGunFireModeInteractionExt:destroy()
+	if self._sentry_gun_weapon then
+		local unit = self._sentry_gun_weapon.unit and self._sentry_gun_weapon:unit()
+		if unit and alive(unit) then
+			unit:event_listener():remove("sentry_fire_mode_on_fire")
+		end
+	end
 end
 
 function SentryGunFireModeInteractionExt:interact(player)
@@ -1036,6 +1080,15 @@ function SentryGunFireModeInteractionExt:interact(player)
 	end
 	SentryGunFireModeInteractionExt.super.super.interact(self, player)
 	self._sentry_gun_weapon:switch_fire_mode()
+end
+
+function SentryGunFireModeInteractionExt:_add_string_macros(macros)
+	local ammo_ratio = self._sentry_gun_weapon and self._sentry_gun_weapon:ammo_ratio() or 1
+	sentry_gun_interaction_add_string_macros(macros, ammo_ratio)
+end
+
+function SentryGunFireModeInteractionExt:_on_weapon_fire_event()
+	self:set_dirty(true)
 end
 
 GrenadeCrateInteractionExt = GrenadeCrateInteractionExt or class(UseInteractionExt)

@@ -1977,4 +1977,5 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.tire_fire.texture = "units/pd2_dlc_born/masks/patterns/pattern_tirefire_df"
 	self.textures.tire_fire.value = 0
 	self.textures.tire_fire.dlc = "born"
+	self:give_free_dlcs(self.textures)
 end
