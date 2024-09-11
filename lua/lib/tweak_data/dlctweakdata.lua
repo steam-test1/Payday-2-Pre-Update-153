@@ -41,6 +41,7 @@ function DLCTweakData:init(tweak_data)
 		mad = true,
 		opera = true,
 		dos = true,
+		jigg = 1,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4618,6 +4619,25 @@ function DLCTweakData:init(tweak_data)
 	self.dos.content.loot_global_value = "normal"
 	self.dos.content.loot_drops = {}
 	self.dos.content.upgrades = {}
+	self.jigg = {}
+	self.jigg.content = {}
+	self.jigg.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "jig_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "jig_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "damned",
+			amount = 1
+		}
+	}
 	self.dbd_clan = {}
 	self.dbd_clan.content = {}
 	self.dbd_clan.content.loot_drops = {}
