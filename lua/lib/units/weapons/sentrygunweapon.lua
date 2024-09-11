@@ -5,6 +5,7 @@ local tmp_rot1 = Rotation()
 function SentryGunWeapon:init(unit)
 	self._unit = unit
 	self._current_damage_mul = 1
+	self._damage_multiplier = 1
 	self._timer = TimerManager:game()
 	self._character_slotmask = managers.slot:get_mask("raycastable_characters")
 	self._next_fire_allowed = -1000
@@ -494,6 +495,7 @@ function SentryGunWeapon:save(save_data)
 	my_save_data.foe_teams = self._foe_teams
 	my_save_data.auto_reload = self._auto_reload
 	my_save_data.alert = self._alert_events and true or nil
+	my_save_data.damage_multiplier = self._damage_multiplier
 end
 
 function SentryGunWeapon:load(save_data)
@@ -504,6 +506,7 @@ function SentryGunWeapon:load(save_data)
 	self._spread_mul = my_save_data.spread_mul or 1
 	self._foe_teams = my_save_data.foe_teams
 	self._auto_reload = my_save_data.auto_reload
+	self._damage_multiplier = my_save_data.damage_multiplier
 	self._setup = {
 		ignore_units = {
 			self._unit
