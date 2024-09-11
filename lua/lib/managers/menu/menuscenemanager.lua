@@ -414,6 +414,70 @@ function MenuSceneManager:_set_up_templates()
 			specular_multiplier = 0
 		})
 	}
+	self._scene_templates.blackmarket_customize = {}
+	self._scene_templates.blackmarket_customize.fov = 40
+	self._scene_templates.blackmarket_customize.use_item_grab = true
+	self._scene_templates.blackmarket_customize.disable_rotate = true
+	self._scene_templates.blackmarket_customize.disable_item_updates = true
+	self._scene_templates.blackmarket_customize.can_change_fov = true
+	self._scene_templates.blackmarket_customize.can_move_item = true
+	self._scene_templates.blackmarket_customize.change_fov_sensitivity = 2
+	self._scene_templates.blackmarket_customize.camera_pos = Vector3(1500, -2000, 0)
+	self._scene_templates.blackmarket_customize.target_pos = self._scene_templates.blackmarket_customize.camera_pos + Vector3(0, 1, 0) * 100
+	local camera_look = (self._scene_templates.blackmarket_customize.target_pos - self._scene_templates.blackmarket_customize.camera_pos):normalized()
+	mvector3.rotate_with(camera_look, Rotation(4, 2.25, 0))
+	self._scene_templates.blackmarket_customize.item_pos = self._scene_templates.blackmarket_customize.camera_pos + camera_look * 240
+	self._scene_templates.blackmarket_customize.environment = "crafting"
+	local l_pos = self._scene_templates.blackmarket_customize.camera_pos
+	local rot = Rotation(self._scene_templates.blackmarket_customize.target_pos - l_pos, math.UP)
+	local l1_pos = l_pos + rot:x() * 50 + rot:y() * 50
+	local l2_pos = l_pos + rot:x() * -50 + rot:y() * 100
+	self._scene_templates.blackmarket_customize.lights = {}
+	self._scene_templates.blackmarket_screenshot = {}
+	self._scene_templates.blackmarket_screenshot.fov = 40
+	self._scene_templates.blackmarket_screenshot.can_change_fov = true
+	self._scene_templates.blackmarket_screenshot.use_item_grab = true
+	self._scene_templates.blackmarket_screenshot.disable_rotate = true
+	self._scene_templates.blackmarket_screenshot.disable_item_updates = true
+	self._scene_templates.blackmarket_screenshot.camera_pos = offset:rotate_with(Rotation(45)) + Vector3(0, 0, 200)
+	self._scene_templates.blackmarket_screenshot.target_pos = target_pos + Vector3(0, 50, 200)
+	self._scene_templates.blackmarket_screenshot.item_pos = self._scene_templates.blackmarket_screenshot.target_pos
+	local l_pos = self._scene_templates.blackmarket_screenshot.camera_pos
+	local rot = Rotation(self._scene_templates.blackmarket_screenshot.target_pos - l_pos, math.UP)
+	local l1_pos = l_pos + rot:x() * 50 + rot:y() * 50
+	local l2_pos = l_pos + rot:x() * -50 + rot:y() * 100
+	self._scene_templates.blackmarket_screenshot.lights = {
+		self:_create_light({
+			far_range = 270,
+			color = Vector3(0.86, 0.67, 0.31) * 3,
+			position = Vector3(160, -130, 220),
+			specular_multiplier = 155
+		}),
+		self:_create_light({
+			far_range = 270,
+			color = Vector3(0.86, 0.67, 0.41) * 2,
+			position = Vector3(50, -150, 220),
+			specular_multiplier = 155
+		}),
+		self:_create_light({
+			far_range = 270,
+			color = Vector3(0.86, 0.67, 0.41) * 2,
+			position = Vector3(160, 0, 220),
+			specular_multiplier = 155
+		}),
+		self:_create_light({
+			far_range = 250,
+			color = Vector3(0.5, 1.5, 2) * 2,
+			position = Vector3(50, -100, 280),
+			specular_multiplier = 55
+		}),
+		self:_create_light({
+			far_range = 370,
+			color = Vector3(1, 0.4, 0.04) * 1.5,
+			position = Vector3(200, 60, 180),
+			specular_multiplier = 55
+		})
+	}
 end
 
 function MenuSceneManager:_set_up_environments()
@@ -2300,8 +2364,8 @@ function MenuSceneManager:mouse_moved(o, x, y)
 		self._item_grabbed_current_y = y
 		return true, "grab"
 	elseif self._item_move_grabbed and self._item_unit and alive(self._item_unit.unit) then
-		local diff_x = (x - self._item_move_grabbed_current_x) / 4
-		local diff_y = (y - self._item_move_grabbed_current_y) / 4
+		local diff_x = (x - self._item_move_grabbed_current_x) / 10
+		local diff_y = (y - self._item_move_grabbed_current_y) / 10
 		local move_v = Vector3(diff_x, 0, -diff_y):rotate_with(self._camera_object:rotation())
 		mvector3.add(self._item_rot_pos, move_v)
 		local new_pos = self._item_rot_pos + self._item_offset:rotate_with(self._item_rot)
@@ -2327,6 +2391,14 @@ function MenuSceneManager:get_crafting_custom_data()
 		item_yaw = self._current_scene_template == "blackmarket_crafting" and self._item_yaw,
 		item_pos = self._scene_templates.blackmarket_crafting.item_pos,
 		scene_template = "blackmarket_crafting"
+	}
+end
+
+function MenuSceneManager:get_screenshot_custom_data()
+	return {
+		item_yaw = 0,
+		item_pos = self._scene_templates.blackmarket_screenshot.item_pos,
+		scene_template = "blackmarket_screenshot"
 	}
 end
 

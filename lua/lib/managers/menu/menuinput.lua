@@ -21,6 +21,7 @@ function MenuInput:init(logic, ...)
 	self._item_input_action_map[MenuItemWeaponUpgradeExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemDivider.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemInput.TYPE] = callback(self, self, "input_item")
+	self._item_input_action_map[MenuItemTextBox.TYPE] = callback(self, self, "input_item")
 	self._callback_map = {}
 	self._callback_map.mouse_moved = {}
 	self._callback_map.mouse_pressed = {}
@@ -31,6 +32,9 @@ end
 
 function MenuInput:back(...)
 	self._slider_marker = nil
+	if self._back_disabled then
+		return
+	end
 	local node_gui = managers.menu:active_menu().renderer:active_node_gui()
 	if node_gui and node_gui._listening_to_input then
 		return
@@ -39,6 +43,10 @@ function MenuInput:back(...)
 		return
 	end
 	MenuInput.super.back(self, ...)
+end
+
+function MenuInput:set_back_enabled(enabled)
+	self._back_disabled = not enabled
 end
 
 function MenuInput:activate_mouse(position, controller_activated)

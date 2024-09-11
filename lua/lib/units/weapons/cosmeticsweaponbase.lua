@@ -117,7 +117,7 @@ local material_textures = {
 	sticker = "diffuse_layer3_texture"
 }
 local material_variables = {
-	wear_and_tear = Application:production_build() and "wear_tear_value" or nil,
+	wear_and_tear = managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() and "wear_tear_value" or nil,
 	pattern_tweak = "pattern_tweak",
 	uv_scale = "uv_scale",
 	uv_offset_rot = "uv_offset_rot",
@@ -126,6 +126,7 @@ local material_variables = {
 }
 
 function NewRaycastWeaponBase:_apply_cosmetics(async_clbk)
+	material_variables.wear_and_tear = managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() and "wear_tear_value" or nil
 	self:_update_materials()
 	local cosmetics_data = self:get_cosmetics_data()
 	if not (self._parts and cosmetics_data and self._materials) or table.size(self._materials) == 0 then
@@ -161,6 +162,9 @@ function NewRaycastWeaponBase:_apply_cosmetics(async_clbk)
 						ready = false,
 						applied = false
 					}
+					if type(textures[texture_key].name) == "string" then
+						textures[texture_key].name = Idstring(textures[texture_key].name)
+					end
 				end
 			end
 		end
@@ -229,6 +233,9 @@ function NewRaycastWeaponBase:_set_material_textures()
 				type_texture = cosmetics_data.types and cosmetics_data.types[p_type] and cosmetics_data.types[p_type][key]
 				base_texture = cosmetics_data[key]
 				new_texture = mat_texture or type_texture or base_texture or material_defaults[material_texture]
+				if type(new_texture) == "string" then
+					new_texture = Idstring(new_texture)
+				end
 				if new_texture then
 					Application:set_material_texture(material, Idstring(material_texture), new_texture, Idstring("normal"))
 				end

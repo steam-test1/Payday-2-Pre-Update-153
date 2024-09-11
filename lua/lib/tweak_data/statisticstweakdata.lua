@@ -462,7 +462,16 @@ function StatisticsTweakData:statistics_table()
 		"dbd_04",
 		"jig_01",
 		"jig_02",
-		"damned"
+		"damned",
+		"mig_war",
+		"cop_mega_gage_blade",
+		"mig_famine",
+		"mig_conquest",
+		"mig_death",
+		"fab_mega_mark",
+		"fab_mega_alien",
+		"fab_mega_doctor",
+		"fab_mega_grin"
 	}
 	local weapon_list = {
 		"ak5",

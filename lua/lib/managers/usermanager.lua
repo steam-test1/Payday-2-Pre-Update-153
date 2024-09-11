@@ -101,6 +101,7 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(48, "video_ao", "aob")
 	self:setup_setting(49, "parallax_mapping", true)
 	self:setup_setting(50, "video_aa", "fxaa")
+	self:setup_setting(51, "workshop", false)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)

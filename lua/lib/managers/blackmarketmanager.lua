@@ -1,3 +1,4 @@
+require("lib/managers/workshop/SkinEditor")
 BlackMarketManager = BlackMarketManager or class()
 local INV_TO_CRAFT = Idstring("inventory_to_crafted")
 local CRAFT_TO_INV = Idstring("crafted_to_inventroy")
@@ -42,11 +43,16 @@ function BlackMarketManager:_setup()
 	self._preloading_list = {}
 	self._preloading_index = 0
 	self._category_resource_loaded = {}
+	self._skin_editor = SkinEditor:new()
 end
 
 function BlackMarketManager:init_finalize()
 	print("BlackMarketManager:init_finalize()")
 	managers.network.account:inventory_load()
+end
+
+function BlackMarketManager:skin_editor()
+	return self._skin_editor
 end
 
 function BlackMarketManager:_setup_armors()
@@ -1052,7 +1058,6 @@ function BlackMarketManager:load_economy_safe(safe_entry, safe_scene_data)
 end
 
 function BlackMarketManager:preload_weapon_blueprint(category, factory_id, blueprint, spawn_workbench)
-	Application:debug("[BlackMarketManager] preload_weapon_blueprint():", "category", category, "factory_id", factory_id, "blueprint", inspect(blueprint))
 	local parts = managers.weapon_factory:preload_blueprint(factory_id, blueprint, false, function()
 	end, true)
 	local factory_weapon = tweak_data.weapon.factory[factory_id]
