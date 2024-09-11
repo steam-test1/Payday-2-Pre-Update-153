@@ -143,6 +143,9 @@ function AnimatedVehicleBase:spawn_module(module_unit_name, align_obj_name, modu
 	if Network:is_server() then
 		managers.network:session():send_to_peers_synched("sync_unit_module", self._unit, module_unit, align_obj_name, module_id, "base")
 	end
+	if module_unit:character_damage() ~= nil then
+		module_unit:character_damage():set_parent_unit(self._unit)
+	end
 end
 
 function AnimatedVehicleBase:clbk_module_unit_destroyed(module_id, module_unit)
@@ -234,6 +237,9 @@ function AnimatedVehicleBase:save(save_data)
 				rot = self._unit:get_object(Idstring(name)):rotation()
 			}
 		end
+	end
+	if self._allow_sync and self._stored_pos ~= nil and self._stored_rot ~= nil then
+		managers.network:session():send_to_peers_synched("sync_stored_pos", self._unit, self._allow_sync, self._stored_pos, self._stored_rot)
 	end
 end
 

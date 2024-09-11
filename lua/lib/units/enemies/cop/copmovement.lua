@@ -97,6 +97,9 @@ CopMovement._gadgets = {
 	},
 	blowtorch = {
 		Idstring("units/pd2_dlc_dark/character/ene_acc_dark_blowtorch/ene_acc_dark_blowtorch")
+	},
+	blowtorch_off = {
+		Idstring("units/pd2_dlc_dark/pickups/drk_pku_blowtorch/drk_prop_blowtorch")
 	}
 }
 local action_variants = {
@@ -147,7 +150,9 @@ action_variants.tank_hw = action_variants.tank
 action_variants.spooc = security_variant
 action_variants.taser = security_variant
 action_variants.inside_man = security_variant
+action_variants.biker_boss = security_variant
 action_variants.cop_scared = security_variant
+action_variants.security_undominatable = security_variant
 action_variants.civilian = {
 	idle = CopActionIdle,
 	act = CopActionAct,

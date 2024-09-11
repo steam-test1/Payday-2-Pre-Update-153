@@ -101,6 +101,8 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_bodhi(presets)
 	self:_init_jimmy(presets)
 	self:_init_sydney(presets)
+	self:_init_wild(presets)
+	self:_init_biker_boss(presets)
 	self:_init_old_hoxton_mission(presets)
 	self._prefix_data = nil
 	self._prefix_data_p1 = nil
@@ -137,6 +139,9 @@ function CharacterTweakData:_init_security(presets)
 	self.security.has_alarm_pager = true
 	self.security.melee_weapon = "baton"
 	self.security.steal_loot = nil
+	self.security_undominatable = deep_clone(self.security)
+	self.security_undominatable.suppression = nil
+	self.security_undominatable.surrender = nil
 end
 
 function CharacterTweakData:_init_gensec(presets)
@@ -568,6 +573,125 @@ function CharacterTweakData:_init_mobster_boss(presets)
 	self.mobster_boss.chatter = presets.enemy_chatter.no_chatter
 	self.mobster_boss.use_radio = nil
 	self.mobster_boss.can_be_tased = false
+end
+
+function CharacterTweakData:_init_biker_boss(presets)
+	self.biker_boss = deep_clone(presets.base)
+	self.biker_boss.experience = {}
+	self.biker_boss.weapon = deep_clone(presets.weapon.good)
+	self.biker_boss.weapon.ak47 = {}
+	self.biker_boss.weapon.ak47.aim_delay = {0.1, 0.2}
+	self.biker_boss.weapon.ak47.focus_delay = 4
+	self.biker_boss.weapon.ak47.focus_dis = 200
+	self.biker_boss.weapon.ak47.spread = 20
+	self.biker_boss.weapon.ak47.miss_dis = 40
+	self.biker_boss.weapon.ak47.RELOAD_SPEED = 1
+	self.biker_boss.weapon.ak47.melee_speed = 1
+	self.biker_boss.weapon.ak47.melee_dmg = 25
+	self.biker_boss.weapon.ak47.melee_retry_delay = {1, 2}
+	self.biker_boss.weapon.ak47.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	self.biker_boss.weapon.ak47.autofire_rounds = {20, 30}
+	self.biker_boss.weapon.ak47.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 3,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 3,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 1.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 1,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 1,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
+	self:_process_weapon_usage_table(self.biker_boss.weapon)
+	self.biker_boss.detection = presets.detection.normal
+	self.biker_boss.HEALTH_INIT = 350
+	self.biker_boss.headshot_dmg_mul = 2
+	self.biker_boss.damage.explosion_damage_mul = 1
+	self.biker_boss.damage.hurt_severity = presets.hurt_severities.no_hurts
+	self.biker_boss.move_speed = presets.move_speed.very_slow
+	self.biker_boss.allowed_poses = {stand = true}
+	self.biker_boss.no_retreat = true
+	self.biker_boss.no_arrest = true
+	self.biker_boss.surrender = nil
+	self.biker_boss.ecm_vulnerability = 0
+	self.biker_boss.ecm_hurts = {
+		ears = {min_duration = 0, max_duration = 0}
+	}
+	self.biker_boss.weapon_voice = "3"
+	self.biker_boss.experience.cable_tie = "tie_swat"
+	self.biker_boss.access = "gangster"
+	self.biker_boss.speech_prefix_p1 = "bb"
+	self.biker_boss.speech_prefix_p2 = "n"
+	self.biker_boss.speech_prefix_count = 1
+	self.biker_boss.rescue_hostages = false
+	self.biker_boss.melee_weapon = "fists"
+	self.biker_boss.melee_weapon_dmg_multiplier = 2.5
+	self.biker_boss.steal_loot = nil
+	self.biker_boss.calls_in = nil
+	self.biker_boss.chatter = presets.enemy_chatter.no_chatter
+	self.biker_boss.use_radio = nil
+	self.biker_boss.can_be_tased = false
+	self.biker_boss.DAMAGE_CLAMP_BULLET = 80
+	self.biker_boss.DAMAGE_CLAMP_EXPLOSION = 80
+	self.biker_boss.use_animation_on_fire_damage = false
+	self.biker_boss.flammable = true
+	self.biker_boss.can_be_tased = false
+	self.biker_boss.immune_to_knock_down = true
 end
 
 function CharacterTweakData:_init_hector_boss(presets)
@@ -1843,6 +1967,27 @@ function CharacterTweakData:_init_sydney(presets)
 	self.sydney.weapon_voice = "3"
 	self.sydney.access = "teamAI1"
 	self.sydney.arrest = {
+		timeout = 240,
+		aggression_timeout = 6,
+		arrest_timeout = 240
+	}
+end
+
+function CharacterTweakData:_init_wild(presets)
+	self.wild = {}
+	self.wild.damage = presets.gang_member_damage
+	self.wild.weapon = deep_clone(presets.weapon.gang_member)
+	self.wild.weapon.weapons_of_choice = {
+		primary = Idstring("units/payday2/weapons/wpn_npc_m4/wpn_npc_m4"),
+		secondary = Idstring("units/payday2/weapons/wpn_npc_mac11/wpn_npc_mac11")
+	}
+	self.wild.detection = presets.detection.gang_member
+	self.wild.move_speed = presets.move_speed.fast
+	self.wild.crouch_move = false
+	self.wild.speech_prefix = "rb16"
+	self.wild.weapon_voice = "3"
+	self.wild.access = "teamAI1"
+	self.wild.arrest = {
 		timeout = 240,
 		aggression_timeout = 6,
 		arrest_timeout = 240
@@ -5402,6 +5547,7 @@ function CharacterTweakData:_presets(tweak_data)
 	end
 	presets.surrender = {}
 	presets.surrender.always = {base_chance = 1}
+	presets.surrender.never = {base_chance = 0}
 	presets.surrender.easy = {
 		base_chance = 0.3,
 		significant_chance = 0.35,
@@ -5700,6 +5846,7 @@ function CharacterTweakData:_set_normal()
 	}
 	self.hector_boss.HEALTH_INIT = 50
 	self.mobster_boss.HEALTH_INIT = 50
+	self.biker_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 1.5
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.2
 	self.presets.gang_member_damage.HEALTH_INIT = 125
@@ -5778,6 +5925,7 @@ function CharacterTweakData:_set_hard()
 	}
 	self.hector_boss.HEALTH_INIT = 100
 	self.mobster_boss.HEALTH_INIT = 100
+	self.biker_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.4
 	self:_set_characters_weapon_preset("normal")
@@ -5895,6 +6043,7 @@ function CharacterTweakData:_set_overkill()
 	}
 	self.hector_boss.HEALTH_INIT = 300
 	self.mobster_boss.HEALTH_INIT = 300
+	self.biker_boss.HEALTH_INIT = 300
 	self.phalanx_minion.HEALTH_INIT = 150
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 15
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
@@ -6018,6 +6167,7 @@ function CharacterTweakData:_set_overkill_145()
 	}
 	self.hector_boss.HEALTH_INIT = 600
 	self.mobster_boss.HEALTH_INIT = 600
+	self.biker_boss.HEALTH_INIT = 1800
 	self.phalanx_minion.HEALTH_INIT = 300
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 30
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
@@ -6146,6 +6296,7 @@ function CharacterTweakData:_set_overkill_290()
 	}
 	self.hector_boss.HEALTH_INIT = 900
 	self.mobster_boss.HEALTH_INIT = 900
+	self.biker_boss.HEALTH_INIT = 3000
 	self:_multiply_all_speeds(1.05, 1.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -6978,6 +7129,16 @@ function CharacterTweakData:character_map()
 				"ene_akan_cs_swat_r870",
 				"ene_akan_cs_swat_sniper_svd_snp",
 				"ene_akan_cs_tazer_ak47_ass"
+			}
+		},
+		born = {
+			path = "units/pd2_dlc_born/characters/",
+			list = {
+				"ene_gang_biker_boss",
+				"ene_biker_female_1",
+				"ene_biker_female_2",
+				"ene_biker_female_3",
+				"npc_male_mechanic"
 			}
 		}
 	}

@@ -1203,6 +1203,7 @@ function UnitNetworkHandler:from_server_sentry_gun_place_result(owner_peer_id, e
 		ignore_units = {sentry_gun_unit}
 	}
 	sentry_gun_unit:weapon():setup(setup_data, damage_mul)
+	sentry_gun_unit:event_listener():call("on_setup", sentry_gun_unit:base():is_owner())
 end
 
 function UnitNetworkHandler:sentrygun_ammo(unit, ammo_ratio, owner_id)
@@ -2189,7 +2190,9 @@ function UnitNetworkHandler:sync_run_sequence_char(unit, seq, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
 		return
 	end
-	ElementSequenceCharacter.sync_function(unit, seq)
+	if unit and alive(unit) and unit:damage() then
+		unit:damage():run_sequence_simple(seq)
+	end
 end
 
 function UnitNetworkHandler:sync_player_kill_statistic(tweak_table_name, is_headshot, weapon_unit, variant, stats_name, sender)
@@ -2643,4 +2646,13 @@ end
 
 function UnitNetworkHandler:sync_spawn_extra_ammo(unit)
 	managers.player:spawn_extra_ammo(unit)
+end
+
+function UnitNetworkHandler:sync_stored_pos(unit, sync, pos, rot)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if alive(unit) then
+		unit:base():sync_stored_pos(sync, pos, rot)
+	end
 end

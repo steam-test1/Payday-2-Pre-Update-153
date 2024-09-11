@@ -2829,7 +2829,9 @@ function PlayerStandard:_end_action_ladder(t, input)
 		return
 	end
 	self._state_data.on_ladder = false
-	self._unit:mover():set_gravity(Vector3(0, 0, -982))
+	if self._unit:mover() then
+		self._unit:mover():set_gravity(Vector3(0, 0, -982))
+	end
 	self._unit:movement():on_exit_ladder()
 end
 

@@ -3845,6 +3845,96 @@ function NarrativeTweakData:init()
 		66000,
 		66000
 	}
+	self.jobs.born = {}
+	self.jobs.born.name_id = "heist_born"
+	self.jobs.born.briefing_id = "heist_born_crimenet"
+	self.jobs.born.contact = "the_elephant"
+	self.jobs.born.region = "street"
+	self.jobs.born.jc = 30
+	self.jobs.born.dlc = "born"
+	self.jobs.born.chain = {
+		{
+			level_id = "born",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "chew",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.born.briefing_event = "elp_brn_cbf_01"
+	self.jobs.born.debrief_event = nil
+	self.jobs.born.crimenet_callouts = {
+		"elp_brn_cnc_01"
+	}
+	self.jobs.born.crimenet_videos = {
+		"cn_elcday1",
+		"cn_elcday2",
+		"cn_elcday3"
+	}
+	self.jobs.born.payout = {
+		26000,
+		37000,
+		81000,
+		101000,
+		202000
+	}
+	self.jobs.born.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.born.payout = {
+		135000,
+		275000,
+		692307,
+		1350000,
+		1800000
+	}
+	self.jobs.born.contract_visuals = {}
+	self.jobs.born.contract_visuals.min_mission_xp = {
+		10000,
+		10000,
+		10000,
+		10000,
+		10000
+	}
+	self.jobs.born.contract_visuals.max_mission_xp = {
+		14000,
+		14000,
+		14000,
+		14000,
+		14000
+	}
+	self.jobs.born_pro = deep_clone(self.jobs.born)
+	self.jobs.born_pro.jc = 70
+	self.jobs.born_pro.professional = true
+	self.jobs.born_pro.region = "professional"
+	self.jobs.born_pro.payout = {
+		25000,
+		35000,
+		50000,
+		65000,
+		100000
+	}
+	self.jobs.born_pro.contract_cost = {
+		62000,
+		124000,
+		310000,
+		620000,
+		800000
+	}
+	self.jobs.born_pro.experience_mul = {
+		1.5,
+		1.5,
+		1.5,
+		1.5,
+		1.5
+	}
 	self.jobs.short = {}
 	self.jobs.short.name_id = "heist_short"
 	self.jobs.short.briefing_id = "heist_short1_stage1_crimenet"
@@ -4035,7 +4125,9 @@ function NarrativeTweakData:init()
 		"pal",
 		"man",
 		"mad",
-		"dark"
+		"dark",
+		"born",
+		"born_pro"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")
@@ -4112,7 +4204,7 @@ function NarrativeTweakData:create_job_name(job_id, skip_professional)
 	local color_ranges = {}
 	local job_tweak = self:job_data(job_id)
 	local text_id = managers.localization:to_upper_text(job_tweak.name_id)
-	if job_tweak.dlc and tweak_data.dlc[job_tweak.dlc] and not tweak_data.dlc[job_tweak.dlc].free then
+	if job_tweak.dlc and (not tweak_data.dlc[job_tweak.dlc] or not tweak_data.dlc[job_tweak.dlc].free) then
 		local pro_text = "  " .. (job_tweak.dlc == "pd2_clan" and (SystemInfo:distribution() == Idstring("STEAM") and managers.localization:to_upper_text("cn_menu_community") or "") or managers.localization:to_upper_text("cn_menu_dlc"))
 		local s_len = utf8.len(text_id)
 		text_id = text_id .. pro_text

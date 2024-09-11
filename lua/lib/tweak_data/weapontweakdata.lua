@@ -113,6 +113,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_x_mp5_npc()
 	self:_init_data_x_akmsu_npc()
 	self:_init_data_tecci_npc()
+	self:_init_data_hajk_npc()
+	self:_init_data_boot_npc()
 	self:_precalculate_values()
 end
 
@@ -1986,6 +1988,37 @@ function WeaponTweakData:_init_data_tecci_npc()
 	self.tecci_npc.hold = "rifle"
 	self.tecci_npc.alert_size = 5000
 	self.tecci_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hajk_npc()
+	self.hajk_npc.sounds.prefix = "hajk_npc"
+	self.hajk_npc.use_data.selection_index = 1
+	self.hajk_npc.DAMAGE = 1.5
+	self.hajk_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.hajk_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.hajk_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.hajk_npc.CLIP_AMMO_MAX = 32
+	self.hajk_npc.NR_CLIPS_MAX = 5
+	self.hajk_npc.auto.fire_rate = 0.115
+	self.hajk_npc.hold = "rifle"
+	self.hajk_npc.alert_size = 1000
+	self.hajk_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_boot_npc()
+	self.boot_npc.sounds.prefix = "boot_npc"
+	self.boot_npc.use_data.selection_index = 2
+	self.boot_npc.DAMAGE = 1.5
+	self.boot_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.boot_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.boot_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.boot_npc.CLIP_AMMO_MAX = 32
+	self.boot_npc.NR_CLIPS_MAX = 5
+	self.boot_npc.auto.fire_rate = 0.115
+	self.boot_npc.hold = "rifle"
+	self.boot_npc.alert_size = 1000
+	self.boot_npc.suppression = 1
+	self.boot_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -11609,6 +11642,194 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.hajk = {}
+	self.hajk.category = "smg"
+	self.hajk.damage_melee = damage_melee_default
+	self.hajk.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.hajk.sounds = {}
+	self.hajk.sounds.fire = "hajk_fire_single"
+	self.hajk.sounds.fire_single = "hajk_fire_single"
+	self.hajk.sounds.fire_auto = "hajk_fire"
+	self.hajk.sounds.stop_fire = "hajk_stop"
+	self.hajk.sounds.dryfire = "primary_dryfire"
+	self.hajk.sounds.enter_steelsight = "m4_tighten"
+	self.hajk.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.hajk.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.hajk.timers = {}
+	self.hajk.timers.reload_not_empty = 2
+	self.hajk.timers.reload_empty = 3.5
+	self.hajk.timers.unequip = 0.6
+	self.hajk.timers.equip = 0.6
+	self.hajk.name_id = "bm_w_hajk"
+	self.hajk.desc_id = "bm_w_hajk_desc"
+	self.hajk.description_id = "des_hajk"
+	self.hajk.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.hajk.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.hajk.use_data = {}
+	self.hajk.use_data.selection_index = 1
+	self.hajk.DAMAGE = 1
+	self.hajk.CLIP_AMMO_MAX = 30
+	self.hajk.NR_CLIPS_MAX = 3
+	self.hajk.AMMO_MAX = self.hajk.CLIP_AMMO_MAX * self.hajk.NR_CLIPS_MAX
+	self.hajk.AMMO_PICKUP = self:_pickup_chance(self.hajk.AMMO_MAX, 1)
+	self.hajk.FIRE_MODE = "auto"
+	self.hajk.fire_mode_data = {}
+	self.hajk.fire_mode_data.fire_rate = 0.08
+	self.hajk.CAN_TOGGLE_FIREMODE = true
+	self.hajk.auto = {}
+	self.hajk.auto.fire_rate = 0.08
+	self.hajk.spread = {}
+	self.hajk.spread.standing = self.new_m4.spread.standing
+	self.hajk.spread.crouching = self.new_m4.spread.crouching
+	self.hajk.spread.steelsight = self.new_m4.spread.steelsight
+	self.hajk.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.hajk.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.hajk.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.hajk.kick = {}
+	self.hajk.kick.standing = {
+		-0.6,
+		1.2,
+		-1,
+		1
+	}
+	self.hajk.kick.crouching = self.hajk.kick.standing
+	self.hajk.kick.steelsight = self.hajk.kick.standing
+	self.hajk.crosshair = {}
+	self.hajk.crosshair.standing = {}
+	self.hajk.crosshair.crouching = {}
+	self.hajk.crosshair.steelsight = {}
+	self.hajk.crosshair.standing.offset = 0.4
+	self.hajk.crosshair.standing.moving_offset = 0.7
+	self.hajk.crosshair.standing.kick_offset = 0.6
+	self.hajk.crosshair.crouching.offset = 0.3
+	self.hajk.crosshair.crouching.moving_offset = 0.6
+	self.hajk.crosshair.crouching.kick_offset = 0.4
+	self.hajk.crosshair.steelsight.hidden = true
+	self.hajk.crosshair.steelsight.offset = 0
+	self.hajk.crosshair.steelsight.moving_offset = 0
+	self.hajk.crosshair.steelsight.kick_offset = 0.4
+	self.hajk.shake = {}
+	self.hajk.shake.fire_multiplier = 1
+	self.hajk.shake.fire_steelsight_multiplier = -1
+	self.hajk.autohit = autohit_smg_default
+	self.hajk.aim_assist = aim_assist_smg_default
+	self.hajk.animations = {}
+	self.hajk.animations.equip_id = "equip_hajk"
+	self.hajk.animations.recoil_steelsight = true
+	self.hajk.texture_bundle_folder = "born"
+	self.hajk.global_value = "born"
+	self.hajk.panic_suppression_chance = 0.2
+	self.hajk.stats = {
+		damage = 80,
+		spread = 19,
+		recoil = 18,
+		spread_moving = 15,
+		zoom = 3,
+		concealment = 18,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.boot = {}
+	self.boot.category = "shotgun"
+	self.boot.damage_melee = damage_melee_default
+	self.boot.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.boot.sounds = {}
+	self.boot.sounds.fire = "boot_fire"
+	self.boot.sounds.dryfire = "shotgun_dryfire"
+	self.boot.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.boot.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.boot.timers = {}
+	self.boot.timers.shotgun_reload_enter = 0.733
+	self.boot.timers.shotgun_reload_exit_empty = 1.1
+	self.boot.timers.shotgun_reload_exit_not_empty = 0.75
+	self.boot.timers.shotgun_reload_shell = 0.33
+	self.boot.timers.shotgun_reload_first_shell_offset = 0
+	self.boot.timers.unequip = 0.55
+	self.boot.timers.equip = 0.85
+	self.boot.name_id = "bm_w_boot"
+	self.boot.desc_id = "bm_w_boot_desc"
+	self.boot.description_id = "des_boot"
+	self.boot.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.boot.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.boot.use_data = {}
+	self.boot.use_data.selection_index = 2
+	self.boot.use_data.align_place = "right_hand"
+	self.boot.DAMAGE = 6
+	self.boot.damage_near = 1000
+	self.boot.damage_far = 2000
+	self.boot.rays = 12
+	self.boot.CLIP_AMMO_MAX = 7
+	self.boot.NR_CLIPS_MAX = 3
+	self.boot.AMMO_MAX = self.boot.CLIP_AMMO_MAX * self.boot.NR_CLIPS_MAX
+	self.boot.AMMO_PICKUP = self:_pickup_chance(self.boot.AMMO_MAX, 1)
+	self.boot.FIRE_MODE = "single"
+	self.boot.fire_mode_data = {}
+	self.boot.fire_mode_data.fire_rate = 0.75
+	self.boot.single = {}
+	self.boot.single.fire_rate = 0.75
+	self.boot.spread = {}
+	self.boot.spread.standing = self.r870.spread.standing
+	self.boot.spread.crouching = self.r870.spread.crouching
+	self.boot.spread.steelsight = self.r870.spread.steelsight
+	self.boot.spread.moving_standing = self.r870.spread.moving_standing
+	self.boot.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.boot.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.boot.kick = {}
+	self.boot.kick.standing = {
+		1.9,
+		2,
+		-0.2,
+		0.2
+	}
+	self.boot.kick.crouching = self.boot.kick.standing
+	self.boot.kick.steelsight = {
+		1.5,
+		1.7,
+		-0.2,
+		0.2
+	}
+	self.boot.crosshair = {}
+	self.boot.crosshair.standing = {}
+	self.boot.crosshair.crouching = {}
+	self.boot.crosshair.steelsight = {}
+	self.boot.crosshair.standing.offset = 0.7
+	self.boot.crosshair.standing.moving_offset = 0.7
+	self.boot.crosshair.standing.kick_offset = 0.8
+	self.boot.crosshair.crouching.offset = 0.65
+	self.boot.crosshair.crouching.moving_offset = 0.65
+	self.boot.crosshair.crouching.kick_offset = 0.75
+	self.boot.crosshair.steelsight.hidden = true
+	self.boot.crosshair.steelsight.offset = 0
+	self.boot.crosshair.steelsight.moving_offset = 0
+	self.boot.crosshair.steelsight.kick_offset = 0
+	self.boot.shake = {}
+	self.boot.shake.fire_multiplier = 1
+	self.boot.shake.fire_steelsight_multiplier = -1
+	self.boot.autohit = autohit_shotgun_default
+	self.boot.aim_assist = aim_assist_shotgun_default
+	self.boot.weapon_hold = "boot"
+	self.boot.animations = {}
+	self.boot.animations.equip_id = "equip_r870_shotgun"
+	self.boot.animations.recoil_steelsight = true
+	self.boot.texture_bundle_folder = "wild"
+	self.boot.global_value = "wild"
+	self.boot.panic_suppression_chance = 0.2
+	self.boot.stats = {
+		damage = 155,
+		spread = 13,
+		recoil = 8,
+		spread_moving = 12,
+		zoom = 3,
+		concealment = 20,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -12360,6 +12581,18 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.hajk_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.boot_npc = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -12480,4 +12713,6 @@ function WeaponTweakData:_precalculate_values()
 	self.x_mp5_npc.AMMO_MAX = self.x_mp5_npc.CLIP_AMMO_MAX * self.x_mp5_npc.NR_CLIPS_MAX
 	self.x_akmsu_npc.AMMO_MAX = self.x_akmsu_npc.CLIP_AMMO_MAX * self.x_akmsu_npc.NR_CLIPS_MAX
 	self.tecci_npc.AMMO_MAX = self.tecci_npc.CLIP_AMMO_MAX * self.tecci_npc.NR_CLIPS_MAX
+	self.hajk_npc.AMMO_MAX = self.hajk_npc.CLIP_AMMO_MAX * self.hajk_npc.NR_CLIPS_MAX
+	self.boot_npc.AMMO_MAX = self.boot_npc.CLIP_AMMO_MAX * self.boot_npc.NR_CLIPS_MAX
 end

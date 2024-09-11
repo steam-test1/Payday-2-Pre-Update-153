@@ -1296,6 +1296,16 @@ function MenuCallbackHandler:dlc_buy_opera_pc()
 	Steam:overlay_activate("store", 468410)
 end
 
+function MenuCallbackHandler:dlc_buy_wild_pc()
+	print("[MenuCallbackHandler:dlc_buy_wild_pc]")
+	Steam:overlay_activate("store", 450660)
+end
+
+function MenuCallbackHandler:dlc_buy_born_pc()
+	print("[MenuCallbackHandler:dlc_buy_born_pc]")
+	Steam:overlay_activate("store", 218620)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1369,6 +1379,8 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"born",
+		"wild",
 		"opera",
 		"pal",
 		"peta",
@@ -1523,6 +1535,14 @@ end
 
 function MenuCallbackHandler:visible_callback_opera()
 	return self:is_dlc_latest_locked("opera")
+end
+
+function MenuCallbackHandler:visible_callback_born()
+	return self:is_dlc_latest_locked("born")
+end
+
+function MenuCallbackHandler:visible_callback_wild()
+	return self:is_dlc_latest_locked("wild")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -2487,6 +2507,7 @@ function MenuCallbackHandler:play_safehouse(params)
 end
 
 function MenuCallbackHandler:play_short_heist(item)
+	Global.game_settings.team_ai = true
 	self:play_single_player()
 	self:start_single_player_job({
 		job_id = item and item:parameters().job or "short",
@@ -6301,8 +6322,21 @@ function MenuCrimeNetSpecialInitiator:refresh_node(node)
 end
 
 function MenuCrimeNetSpecialInitiator:setup_node(node)
-	local listed_contact = node:parameters().listed_contact or "bain"
+	local listed_contact = node:parameters().listed_contact
 	MenuCallbackHandler:chk_dlc_content_updated()
+	if not listed_contact then
+		for _, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
+			local job_tweak = tweak_data.narrative:job_data(job_id)
+			if job_tweak.contact then
+				if job_tweak.contact == "bain" then
+					listed_contact = "bain"
+					break
+				else
+					listed_contact = job_tweak.contact
+				end
+			end
+		end
+	end
 	node:clean_items()
 	if not node:item("divider_end") then
 		if self.pre_create_clbk then

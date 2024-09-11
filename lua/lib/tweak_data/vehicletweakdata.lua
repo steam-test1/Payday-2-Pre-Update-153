@@ -9,6 +9,8 @@ function VehicleTweakData:init(tweak_data)
 	self:_init_data_mower_1()
 	self:_init_data_boat_rib_1()
 	self:_init_data_blackhawk_1()
+	self:_init_data_bike_1()
+	self:_init_data_bike_2()
 end
 
 function VehicleTweakData:_init_data_falcogini()
@@ -452,4 +454,88 @@ function VehicleTweakData:_init_data_blackhawk_1()
 	self.blackhawk_1.interact_distance = 350
 	self.blackhawk_1.driver_camera_offset = Vector3(0, 0, 0)
 	self.blackhawk_1.fov = 75
+end
+
+function VehicleTweakData:_init_data_bike_1()
+	self.bike_1 = {}
+	self.bike_1.name = "Bike"
+	self.bike_1.hud_label_offset = 220
+	self.bike_1.animations = {
+		vehicle_id = "bike_1",
+		driver = "drive_bike_1_driver"
+	}
+	self.bike_1.sound = {
+		bump_treshold = 6,
+		lateral_slip_treshold = 0.25,
+		longitudal_slip_treshold = 0.95,
+		engine_sound_event = "mc_harley",
+		engine_start = "mc_harley_start",
+		slip = "mc_skid",
+		slip_stop = "mc_skid_stop",
+		bump = "mc_bumper_01",
+		bump_rtpc = "car_bump_vel",
+		hit = "mc_hit_gen_01",
+		hit_rtpc = "car_hit_vel",
+		engine_speed_rtpc = "car_falcogini_speed",
+		engine_rpm_rtpc = "car_falcogini_rpm"
+	}
+	self.bike_1.seats = {
+		driver = {name = "driver", driving = true}
+	}
+	self.bike_1.loot_points = {
+		loot_left = {name = "loot"}
+	}
+	self.bike_1.damage = {max_health = 18000000}
+	self.bike_1.max_speed = 180
+	self.bike_1.max_rpm = 3000
+	self.bike_1.loot_drop_point = "v_repair_engine"
+	self.bike_1.max_loot_bags = 0
+	self.bike_1.interact_distance = 250
+	self.bike_1.driver_camera_offset = Vector3(0, -4, 5)
+	self.bike_1.fov = 75
+	self.bike_1.camera_limits = {
+		driver = {yaw = 30, pitch = 30}
+	}
+end
+
+function VehicleTweakData:_init_data_bike_2()
+	self.bike_2 = {}
+	self.bike_2.name = "Rust's bike"
+	self.bike_2.hud_label_offset = 220
+	self.bike_2.animations = {
+		vehicle_id = "bike_1",
+		driver = "drive_bike_1_driver"
+	}
+	self.bike_2.sound = {
+		bump_treshold = 6,
+		lateral_slip_treshold = 0.25,
+		longitudal_slip_treshold = 0.95,
+		engine_sound_event = "mc_harley",
+		engine_start = "mc_harley_start",
+		slip = "mc_skid",
+		slip_stop = "mc_skid_stop",
+		bump = "mc_bumper_01",
+		bump_rtpc = "car_bump_vel",
+		hit = "mc_hit_gen_01",
+		hit_rtpc = "car_hit_vel",
+		engine_speed_rtpc = "car_falcogini_speed",
+		engine_rpm_rtpc = "car_falcogini_rpm"
+	}
+	self.bike_2.seats = {
+		driver = {name = "driver", driving = true}
+	}
+	self.bike_2.loot_points = {
+		loot_left = {name = "loot"}
+	}
+	self.bike_2.damage = {max_health = 18000000}
+	self.bike_2.max_speed = 180
+	self.bike_2.max_rpm = 3000
+	self.bike_2.loot_drop_point = "v_repair_engine"
+	self.bike_2.max_loot_bags = 0
+	self.bike_2.interact_distance = 250
+	self.bike_2.driver_camera_offset = Vector3(0, -4, 5)
+	self.bike_2.fov = 75
+	self.bike_2.camera_limits = {
+		driver = {yaw = 30, pitch = 30}
+	}
 end

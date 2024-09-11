@@ -1,5 +1,6 @@
 PlayerCarry = PlayerCarry or class(PlayerStandard)
 PlayerCarry.target_tilt = -5
+PlayerCarry.throw_limit_t = 0.5
 local armor_init = tweak_data.player.damage.ARMOR_INIT
 
 function PlayerCarry:init(unit)
@@ -131,6 +132,7 @@ function PlayerCarry:_update_check_actions(t, dt)
 	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_check_use_item(t, input)
+	self:_update_use_item_timers(t, input)
 	self:_check_action_change_equipment(input)
 	self:_find_pickups(t)
 end
@@ -143,12 +145,30 @@ end
 
 function PlayerCarry:_check_use_item(t, input)
 	local new_action
-	local action_wanted = input.btn_use_item_press
+	local action_wanted = input.btn_use_item_release and self._throw_time and t and t < self._throw_time
+	if input.btn_use_item_press then
+		self._throw_down = true
+		self._second_press = false
+		self._throw_time = t + PlayerCarry.throw_limit_t
+	end
 	if action_wanted then
 		local action_forbidden = self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:_is_throwing_projectile() or self:_on_zipline()
 		if not action_forbidden then
 			managers.player:drop_carry()
 			new_action = true
+		end
+	end
+	if self._throw_down then
+		if input.btn_use_item_release then
+			self._throw_down = false
+			self._second_press = false
+			return PlayerCarry.super._check_use_item(self, t, input)
+		elseif t > self._throw_time then
+			if not self._second_press then
+				input.btn_use_item_press = true
+				self._second_press = true
+			end
+			return PlayerCarry.super._check_use_item(self, t, input)
 		end
 	end
 	return new_action

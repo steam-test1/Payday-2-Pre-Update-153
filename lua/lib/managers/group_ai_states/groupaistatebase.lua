@@ -4112,6 +4112,7 @@ GroupAIStateBase.blame_triggers = {
 	biker_escape = "gan",
 	mobster = "gan",
 	mobster_boss = "gan",
+	biker_boss = "gan",
 	civilian = "civ",
 	civilian_female = "civ",
 	bank_manager = "civ",

@@ -1375,6 +1375,33 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.equipment_soda = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			128,
+			64,
+			32,
+			32
+		}
+	}
+	self.equipment_chrome_mask = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			128,
+			32,
+			32,
+			32
+		}
+	}
+	self.equipment_born_tool = {
+		texture = "guis/textures/pd2/hud_pickups",
+		texture_rect = {
+			96,
+			64,
+			32,
+			32
+		}
+	}
 	self.interaction_free = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {

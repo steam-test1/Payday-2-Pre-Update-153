@@ -226,6 +226,18 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_sydney.mask_on_sequence = "mask_on"
 	self.characters.ai_sydney.mask_off_sequence = "mask_off"
 	self.characters.ai_sydney.name_id = "bm_character_ai_sydney"
+	self.characters.wild = {}
+	self.characters.wild.fps_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/fps_wild_mover"
+	self.characters.wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/npc_criminal_wild_1"
+	self.characters.wild.menu_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/npc_criminal_wild_1_menu"
+	self.characters.wild.texture_bundle_folder = "wild"
+	self.characters.wild.sequence = "var_mtr_wild"
+	self.characters.wild.name_id = "bm_character_wild"
+	self.characters.wild.dlc = "wild"
+	self.characters.ai_wild = {}
+	self.characters.ai_wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/wild_1/npc_criminal_wild_1"
+	self.characters.ai_wild.sequence = "var_mtr_wild"
+	self.characters.ai_wild.name_id = "bm_character_ai_wild"
 end
 
 function BlackMarketTweakData:_init_cash()

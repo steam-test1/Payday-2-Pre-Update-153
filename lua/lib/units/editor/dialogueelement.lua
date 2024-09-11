@@ -8,10 +8,12 @@ function DialogueUnitElement:init(unit)
 	self._hed.execute_on_executed_when_done = false
 	self._hed.use_position = false
 	self._hed.force_quit_current = nil
+	self._hed.use_instigator = false
 	table.insert(self._save_values, "dialogue")
 	table.insert(self._save_values, "execute_on_executed_when_done")
 	table.insert(self._save_values, "use_position")
 	table.insert(self._save_values, "force_quit_current")
+	table.insert(self._save_values, "use_instigator")
 end
 
 function DialogueUnitElement:new_save_values(...)
@@ -48,4 +50,5 @@ function DialogueUnitElement:_build_panel(panel, panel_sizer)
 	self:_build_value_checkbox(panel, panel_sizer, "force_quit_current", "Force quits current dialog to allow this to be played immediately")
 	self:_build_value_checkbox(panel, panel_sizer, "execute_on_executed_when_done", "Execute on executed when done")
 	self:_build_value_checkbox(panel, panel_sizer, "use_position")
+	self:_build_value_checkbox(panel, panel_sizer, "use_instigator", "Play on instigator")
 end

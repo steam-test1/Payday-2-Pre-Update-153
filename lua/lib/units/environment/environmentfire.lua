@@ -26,6 +26,10 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 		sound_event_burning = data.sound_event_burning,
 		sound_event_impact_duration = data.sound_event_impact_duration
 	}
+	self._data = data
+	self._normal = normal
+	self._added_time = added_time
+	self._range_multiplier = range_multiplier
 	self._user_unit = user_unit
 	self._burn_duration = data.burn_duration + added_time
 	self._burn_tick_counter = 0
@@ -213,4 +217,44 @@ function EnvironmentFire:destroy(unit)
 	for _, damage_effect_entry in pairs(self._molotov_damage_effect_table) do
 		World:effect_manager():fade_kill(damage_effect_entry.effect_id)
 	end
+end
+
+function EnvironmentFire:save(data)
+	local state = {}
+	state.burn_duration = self._burn_duration
+	state.user_unit = self._user_unit
+	state.burn_duration = self._burn_duration
+	state.burn_tick_counter = self._burn_tick_counter
+	state.burn_tick_period = self._burn_tick_period
+	state.range = self._range
+	state.curve_pow = self._curve_pow
+	state.damage = self._damage
+	state.player_damage = self._player_damage
+	state.fire_dot_data = self._fire_dot_data
+	state.fire_alert_radius = self._fire_alert_radius
+	state.data = self._data
+	state.normal = self._normal
+	state.added_time = self._added_time
+	state.range_multiplier = self._range_multiplier
+	data.EnvironmentFire = state
+end
+
+function EnvironmentFire:load(data)
+	local state = data.EnvironmentFire
+	self._burn_duration = state.burn_duration
+	self._user_unit = state.user_unit
+	self._burn_duration = state.burn_duration
+	self._burn_tick_counter = state.burn_tick_counter
+	self._burn_tick_period = state.burn_tick_period
+	self._range = state.range
+	self._curve_pow = state.curve_pow
+	self._damage = state.damage
+	self._player_damage = state.player_damage
+	self._fire_dot_data = state.fire_dot_data
+	self._fire_alert_radius = state.fire_alert_radius
+	local data = state.data
+	local normal = state.normal
+	local added_time = state.added_time
+	local range_multiplier = state.range_multiplier
+	self:on_spawn(data, normal, self._user_unit, added_time, range_multiplier)
 end

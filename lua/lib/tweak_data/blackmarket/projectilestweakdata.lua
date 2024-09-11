@@ -244,6 +244,25 @@ function BlackMarketTweakData:_init_projectiles()
 	self.projectiles.long_arrow_exp.no_cheat_count = true
 	self.projectiles.long_arrow_exp.impact_detonation = true
 	self.projectiles.long_arrow_exp.client_authoritative = true
+	self.projectiles.wpn_prj_hur = {}
+	self.projectiles.wpn_prj_hur.name_id = "bm_wpn_prj_hur"
+	self.projectiles.wpn_prj_hur.unit = "units/pd2_dlc_born/weapons/wpn_fps_mel_hur/wpn_prj_hur"
+	self.projectiles.wpn_prj_hur.unit_dummy = "units/pd2_dlc_born/weapons/wpn_fps_mel_hur/wpn_prj_hur_husk"
+	self.projectiles.wpn_prj_hur.local_unit = "units/pd2_dlc_born/weapons/wpn_fps_mel_hur/wpn_prj_hur_local"
+	self.projectiles.wpn_prj_hur.icon = "throwing_axe"
+	self.projectiles.wpn_prj_hur.throw_shout = true
+	self.projectiles.wpn_prj_hur.no_cheat_count = true
+	self.projectiles.wpn_prj_hur.impact_detonation = true
+	self.projectiles.wpn_prj_hur.client_authoritative = true
+	self.projectiles.wpn_prj_hur.add_trail_effect = true
+	self.projectiles.wpn_prj_hur.throwable = true
+	self.projectiles.wpn_prj_hur.texture_bundle_folder = "born"
+	self.projectiles.wpn_prj_hur.dlc = "born"
+	self.projectiles.wpn_prj_hur.max_amount = 3
+	self.projectiles.wpn_prj_hur.anim_global_param = "projectile_four"
+	self.projectiles.wpn_prj_hur.throw_allowed_expire_t = 0.15
+	self.projectiles.wpn_prj_hur.expire_t = 1.1
+	self.projectiles.wpn_prj_hur.repeat_expire_t = 0.5
 	self.projectiles.frag_com = {}
 	self.projectiles.frag_com.name_id = "bm_grenade_frag_com"
 	self.projectiles.frag_com.desc_id = "bm_grenade_frag_com_desc"
@@ -289,6 +308,7 @@ function BlackMarketTweakData:_init_projectiles()
 		"launcher_incendiary_m32",
 		"launcher_frag_china",
 		"launcher_incendiary_china",
+		"wpn_prj_hur",
 		"frag_com"
 	}
 	self:_add_desc_from_name_macro(self.projectiles)

@@ -563,7 +563,7 @@ function CopDamage.is_civilian(type)
 end
 
 function CopDamage.is_gangster(type)
-	return type == "gangster" or type == "biker_escape" or type == "mobster" or type == "mobster_boss" or type == "biker"
+	return type == "gangster" or type == "biker_escape" or type == "mobster" or type == "mobster_boss" or type == "biker" or type == "biker_boss"
 end
 
 function CopDamage.is_cop(type)
@@ -1961,6 +1961,7 @@ end
 
 function CopDamage:_on_death(variant)
 	managers.player:chk_store_armor_health_kill_counter(self._unit, variant)
+	managers.player:chk_wild_kill_counter(self._unit, variant)
 end
 
 function CopDamage:_call_listeners(damage_info)

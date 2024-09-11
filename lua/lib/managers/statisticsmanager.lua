@@ -225,6 +225,13 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
+		biker_boss = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
 		other = {
 			count = 0,
 			head_shots = 0,
@@ -843,6 +850,21 @@ function StatisticsManager:publish_level_to_steam()
 		method = "set",
 		value = 1
 	}
+	managers.network.account:publish_statistics(stats)
+end
+
+function StatisticsManager:publish_custom_stat_to_steam(name, value)
+	if Application:editor() then
+		return
+	end
+	local stats = {}
+	stats[name] = {type = "int"}
+	if value then
+		stats[name].value = value
+	else
+		stats[name].method = "set"
+		stats[name].value = 1
+	end
 	managers.network.account:publish_statistics(stats)
 end
 

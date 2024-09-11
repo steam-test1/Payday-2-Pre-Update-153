@@ -3534,6 +3534,66 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck15_9",
 				desc_id = "menu_deck15_9_desc"
 			}
+		},
+		{
+			name_id = "menu_st_spec_16",
+			desc_id = "menu_st_spec_16_desc",
+			dlc = "wild",
+			{
+				upgrades = {
+					"player_wild_health_amount_1",
+					"player_wild_armor_amount_1"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				texture_bundle_folder = "wild",
+				name_id = "menu_deck16_1",
+				desc_id = "menu_deck16_1_desc"
+			},
+			deck2,
+			{
+				upgrades = {
+					"player_less_health_wild_armor_1"
+				},
+				cost = 400,
+				icon_xy = {1, 0},
+				texture_bundle_folder = "wild",
+				name_id = "menu_deck16_3",
+				desc_id = "menu_deck16_3_desc"
+			},
+			deck4,
+			{
+				upgrades = {
+					"player_less_health_wild_cooldown_1"
+				},
+				cost = 1000,
+				icon_xy = {2, 0},
+				texture_bundle_folder = "wild",
+				name_id = "menu_deck16_5",
+				desc_id = "menu_deck16_5_desc"
+			},
+			deck6,
+			{
+				upgrades = {
+					"player_less_armor_wild_health_1"
+				},
+				cost = 2400,
+				icon_xy = {3, 0},
+				texture_bundle_folder = "wild",
+				name_id = "menu_deck16_7",
+				desc_id = "menu_deck16_7_desc"
+			},
+			deck8,
+			{
+				upgrades = {
+					"player_less_armor_wild_cooldown_1"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				texture_bundle_folder = "wild",
+				name_id = "menu_deck16_9",
+				desc_id = "menu_deck16_9_desc"
+			}
 		}
 	}
 end

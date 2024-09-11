@@ -5,9 +5,11 @@ function AIRemoveUnitElement:init(unit)
 	self._hed.elements = {}
 	self._hed.use_instigator = false
 	self._hed.true_death = false
+	self._hed.force_ragdoll = false
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "use_instigator")
 	table.insert(self._save_values, "true_death")
+	table.insert(self._save_values, "force_ragdoll")
 end
 
 function AIRemoveUnitElement:draw_links(t, dt, selected_unit, all_units)
@@ -77,4 +79,11 @@ function AIRemoveUnitElement:_build_panel(panel, panel_sizer)
 	true_death:set_value(self._hed.true_death)
 	true_death:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = true_death, value = "true_death"})
 	panel_sizer:add(true_death, 0, 0, "EXPAND")
+	local force_ragdoll = EWS:CheckBox(panel, "Force Ragdoll", "")
+	force_ragdoll:set_value(self._hed.force_ragdoll)
+	force_ragdoll:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = force_ragdoll,
+		value = "force_ragdoll"
+	})
+	panel_sizer:add(force_ragdoll, 0, 0, "EXPAND")
 end

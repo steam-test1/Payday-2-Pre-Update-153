@@ -994,6 +994,32 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.dbd_deluxe.sort_number = 90
 	self.global_values.dbd_deluxe.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
 	self.global_values.dbd_deluxe.category = "collaboration"
+	self.global_values.wild = {}
+	self.global_values.wild.name_id = "bm_global_value_wild"
+	self.global_values.wild.desc_id = "menu_l_global_value_wild"
+	self.global_values.wild.unlock_id = "bm_global_value_wild_unlock"
+	self.global_values.wild.color = Color(255, 255, 212, 0) / 255
+	self.global_values.wild.dlc = true
+	self.global_values.wild.chance = 1
+	self.global_values.wild.value_multiplier = 1
+	self.global_values.wild.durability_multiplier = 1
+	self.global_values.wild.drops = true
+	self.global_values.wild.track = true
+	self.global_values.wild.sort_number = 117
+	self.global_values.wild.category = "dlc"
+	self.global_values.born = {}
+	self.global_values.born.name_id = "bm_global_value_born"
+	self.global_values.born.desc_id = "menu_l_global_value_born"
+	self.global_values.born.unlock_id = "bm_global_value_born_unlock"
+	self.global_values.born.color = Color(255, 255, 212, 0) / 255
+	self.global_values.born.dlc = true
+	self.global_values.born.chance = 1
+	self.global_values.born.value_multiplier = 1
+	self.global_values.born.durability_multiplier = 1
+	self.global_values.born.drops = true
+	self.global_values.born.track = true
+	self.global_values.born.sort_number = 118
+	self.global_values.born.category = "dlc"
 	self.global_values.solus_clan = {}
 	self.global_values.solus_clan.name_id = "bm_global_value_solus_clan"
 	self.global_values.solus_clan.desc_id = "menu_l_global_value_solus_clan"
@@ -1079,7 +1105,9 @@ function LootDropTweakData:init(tweak_data)
 		"dbd_clan",
 		"dbd_deluxe",
 		"opera",
-		"solus_clan"
+		"solus_clan",
+		"wild",
+		"born"
 	}
 	self:_create_global_value_list_map()
 end

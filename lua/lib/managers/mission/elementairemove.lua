@@ -10,7 +10,16 @@ function ElementAIRemove:on_executed(instigator)
 		return
 	end
 	if self._values.use_instigator then
-		if self._values.true_death then
+		if self._values.force_ragdoll and instigator:movement() then
+			instigator:character_damage():damage_mission({
+				damage = 1000,
+				col_ray = {},
+				forced = true
+			})
+			if instigator:movement()._active_actions and instigator:movement()._active_actions[1] and instigator:movement()._active_actions[1]:type() == "hurt" then
+				instigator:movement()._active_actions[1]:force_ragdoll()
+			end
+		elseif self._values.true_death then
 			instigator:character_damage():damage_mission({
 				damage = 1000,
 				col_ray = {},

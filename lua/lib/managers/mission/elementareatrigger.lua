@@ -177,7 +177,10 @@ function ElementAreaTrigger:project_instigators()
 					"mad_master_server_value_4",
 					"drk_bomb_part",
 					"weapon_glock",
-					"weapon_scar"
+					"weapon_scar",
+					"bike_part_light",
+					"bike_part_heavy",
+					"drone_control_helmet"
 				}
 				if table.contains(carry_list, carry_id) then
 					return true

@@ -1558,6 +1558,7 @@ function MenuManager:show_question_start_short_heist(params)
 	yes_button.callback_func = params.yes_func
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_short_heist_no")
+	no_button.callback_func = params.no_func
 	dialog_data.button_list = {yes_button, no_button}
 	managers.system_menu:show(dialog_data)
 end

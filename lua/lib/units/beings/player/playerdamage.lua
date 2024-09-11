@@ -1544,6 +1544,7 @@ function PlayerDamage:pre_destroy()
 		self._slomo_sound_instance:stop()
 		self._slomo_sound_instance = nil
 	end
+	managers.player:unregister_message(Message.RevivePlayer, self)
 	managers.environment_controller:set_last_life(false)
 	managers.environment_controller:set_downed_value(0)
 	SoundDevice:set_rtpc("downed_state_progression", 0)

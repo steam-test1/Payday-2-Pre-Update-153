@@ -2087,5 +2087,49 @@ function BlackMarketTweakData:_init_melee_weapons()
 		var4_attack = {anim = "var4"},
 		charge = {anim = "charge", loop = true}
 	}
+	self.melee_weapons.road = {}
+	self.melee_weapons.road.name_id = "bm_melee_road"
+	self.melee_weapons.road.animation = nil
+	self.melee_weapons.road.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.road.anim_global_param = "melee_road"
+	self.melee_weapons.road.dlc = "wild"
+	self.melee_weapons.road.texture_bundle_folder = "wild"
+	self.melee_weapons.road.type = "knife"
+	self.melee_weapons.road.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.road.unit = "units/pd2_dlc_wild/weapons/wpn_fps_mel_road/wpn_fps_mel_road"
+	self.melee_weapons.road.third_unit = "units/pd2_dlc_wild/weapons/wpn_fps_mel_road/wpn_third_mel_road"
+	self.melee_weapons.road.sounds = {}
+	self.melee_weapons.road.sounds.equip = "road_equip"
+	self.melee_weapons.road.sounds.hit_air = "road_hit_air"
+	self.melee_weapons.road.sounds.hit_gen = "road_hit_gen"
+	self.melee_weapons.road.sounds.hit_body = "road_hit_body"
+	self.melee_weapons.road.sounds.charge = "road_charge"
+	self.melee_weapons.road.stats = {}
+	self.melee_weapons.road.stats.weapon_type = "sharp"
+	self.melee_weapons.road.stats.min_damage = 7
+	self.melee_weapons.road.stats.max_damage = 45
+	self.melee_weapons.road.stats.min_damage_effect = 1
+	self.melee_weapons.road.stats.max_damage_effect = 1
+	self.melee_weapons.road.stats.charge_time = 4
+	self.melee_weapons.road.stats.range = 185
+	self.melee_weapons.road.stats.concealment = 29
+	self.melee_weapons.road.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.road.repeat_expire_t = 2
+	self.melee_weapons.road.expire_t = 1.2
+	self.melee_weapons.road.melee_damage_delay = 0.4
+	self.melee_weapons.road.anims = {
+		var1_attack = {anim = "var1"},
+		var2_attack = {anim = "var2"},
+		var3_attack = {anim = "var1"},
+		var4_attack = {anim = "var2"},
+		charge = {anim = "charge", loop = true}
+	}
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

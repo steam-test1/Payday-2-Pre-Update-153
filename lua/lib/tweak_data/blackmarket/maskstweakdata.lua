@@ -20,6 +20,7 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.character_locked.bodhi = "bodhi"
 	self.masks.character_locked.jimmy = "jimmy_duct"
 	self.masks.character_locked.sydney = "sydney"
+	self.masks.character_locked.wild = "rust"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1667,6 +1668,11 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.balaclava_sokol.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_sokol.type = "helmet"
 	self.masks.balaclava_sokol.inaccessible = true
+	self.masks.balaclava_wild = {}
+	self.masks.balaclava_wild.unit = "units/pd2_dlc_wild/masks/msk_balaclava_wild/msk_balaclava_wild"
+	self.masks.balaclava_wild.name_id = "bm_msk_cheat_error"
+	self.masks.balaclava_wild.type = "helmet"
+	self.masks.balaclava_wild.inaccessible = true
 	self.masks.balaclava = {}
 	self.masks.balaclava.name_id = "bm_msk_balaclava"
 	self.masks.balaclava.global_value = "infamy"
@@ -1690,7 +1696,8 @@ function BlackMarketTweakData:_init_masks()
 		dragon = "balaclava_dallas",
 		bodhi = "balaclava_dallas",
 		jimmy = "balaclava_dallas",
-		sydney = "balaclava_sokol"
+		sydney = "balaclava_sokol",
+		wild = "balaclava_wild"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -2338,7 +2345,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.invader = {}
 	self.masks.invader.unit = "units/pd2_dlc_nails/masks/invader/msk_invader"
 	self.masks.invader.name_id = "bm_msk_invader"
-	self.masks.invader.pcs = {}
 	self.masks.invader.global_value = "halloween"
 	self.masks.invader.texture_bundle_folder = "nails"
 	self.masks.invader.sort_number = 3
@@ -2346,7 +2352,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.satan = {}
 	self.masks.satan.unit = "units/pd2_dlc_nails/masks/satan/msk_satan"
 	self.masks.satan.name_id = "bm_msk_satan"
-	self.masks.satan.pcs = {}
 	self.masks.satan.global_value = "halloween"
 	self.masks.satan.texture_bundle_folder = "nails"
 	self.masks.satan.sort_number = 3
@@ -2674,6 +2679,61 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.damned.texture_bundle_folder = "jigg"
 	self.masks.damned.dlc = "jigg"
 	self.masks.damned.sort_number = 25
+	self.masks.born_biker_01 = {}
+	self.masks.born_biker_01.unit = "units/pd2_dlc_born/masks/born_01/msk_born_biker_01"
+	self.masks.born_biker_01.name_id = "bm_msk_biker_classic"
+	self.masks.born_biker_01.pcs = {}
+	self.masks.born_biker_01.value = 0
+	self.masks.born_biker_01.type = "helmet"
+	self.masks.born_biker_01.texture_bundle_folder = "born"
+	self.masks.born_biker_01.sort_number = 26
+	self.masks.born_biker_01.dlc = "born"
+	self.masks.born_biker_02 = {}
+	self.masks.born_biker_02.unit = "units/pd2_dlc_born/masks/born_02/msk_born_biker_02"
+	self.masks.born_biker_02.name_id = "bm_msk_speed_demon"
+	self.masks.born_biker_02.pcs = {}
+	self.masks.born_biker_02.value = 0
+	self.masks.born_biker_02.texture_bundle_folder = "born"
+	self.masks.born_biker_02.sort_number = 27
+	self.masks.born_biker_02.dlc = "born"
+	self.masks.born_biker_03 = {}
+	self.masks.born_biker_03.unit = "units/pd2_dlc_born/masks/born_03/msk_born_biker_03"
+	self.masks.born_biker_03.name_id = "bm_msk_rage_demon"
+	self.masks.born_biker_03.pcs = {}
+	self.masks.born_biker_03.value = 0
+	self.masks.born_biker_03.type = "helmet"
+	self.masks.born_biker_03.texture_bundle_folder = "born"
+	self.masks.born_biker_03.sort_number = 28
+	self.masks.born_biker_03.dlc = "born"
+	self.masks.brutal = {}
+	self.masks.brutal.unit = "units/pd2_dlc_born/masks/brutal/msk_brutal"
+	self.masks.brutal.name_id = "bm_msk_brutal"
+	self.masks.brutal.pcs = {}
+	self.masks.brutal.value = 0
+	self.masks.brutal.texture_bundle_folder = "born"
+	self.masks.brutal.sort_number = 29
+	self.masks.brutal.dlc = "born"
+	self.masks.rust = {}
+	self.masks.rust.unit = "units/pd2_dlc_wild/masks/rust/msk_rust"
+	self.masks.rust.name_id = "bm_msk_rust"
+	self.masks.rust.pcs = {}
+	self.masks.rust.value = 0
+	self.masks.rust.texture_bundle_folder = "wild"
+	self.masks.rust.sort_number = 30
+	self.masks.rust.dlc = "wild"
+	self.masks.rust_begins = {}
+	self.masks.rust_begins.unit = "units/pd2_dlc_wild/masks/rust_begins/msk_rust_begins"
+	self.masks.rust_begins.name_id = "bm_msk_rust_begins"
+	self.masks.rust_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.rust_begins.value = 0
+	self.masks.rust_begins.texture_bundle_folder = "wild"
+	self.masks.rust_begins.sort_number = 30
+	self.masks.rust_begins.dlc = "wild"
 	self.masks.solus = {}
 	self.masks.solus.unit = "units/pd2_dlc_solus/masks/msk_solus"
 	self.masks.solus.name_id = "bm_msk_solus"

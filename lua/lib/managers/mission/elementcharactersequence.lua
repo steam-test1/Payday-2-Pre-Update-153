@@ -12,6 +12,9 @@ function ElementCharacterSequence:on_executed(instigator)
 	
 	local function f(unit)
 		unit:damage():run_sequence_simple(self._values.sequence)
+		if Network:is_server() and managers.network:session() then
+			managers.network:session():send_to_peers_synched("sync_run_sequence_char", unit, self._values.sequence)
+		end
 	end
 	
 	if self._values.sequence == "" then

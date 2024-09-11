@@ -113,7 +113,11 @@ function AssetsTweakData:_init_gage_assets(tweak_data)
 	self.gage_assignment.exclude_stages = {
 		"safehouse",
 		"haunted",
-		"crojob1"
+		"crojob1",
+		"short1_stage1",
+		"short1_stage2",
+		"short2_stage1",
+		"short2_stage2b"
 	}
 end
 
@@ -227,7 +231,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta2",
 		"man",
 		"pal",
-		"mad"
+		"mad",
+		"born",
+		"chew"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -262,7 +268,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta2",
 		"man",
 		"pal",
-		"mad"
+		"mad",
+		"born",
+		"chew"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -294,7 +302,9 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"peta2",
 		"man",
 		"pal",
-		"mad"
+		"mad",
+		"born",
+		"chew"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -602,7 +612,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.framing_frame_2_sniper.name_id = "menu_asset_sniper"
 	self.framing_frame_2_sniper.texture = "guis/textures/pd2/mission_briefing/assets/framing_frame/day2/asset01"
 	self.framing_frame_2_sniper.stages = {
-		"framing_frame_2"
+		"framing_frame_2",
+		"born"
 	}
 	self.framing_frame_2_sniper.visible_if_locked = true
 	self.framing_frame_2_sniper.unlock_desc_id = "menu_asset_sniper_desc"
@@ -981,6 +992,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.dark_additional_cameras.unlock_desc_id = "menu_asset_dark_additional_cameras_desc"
 	self.dark_additional_cameras.no_mystery = true
 	self.dark_additional_cameras.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 8)
+	self.sniper_spot_born = {}
+	self.sniper_spot_born.name_id = "menu_asset_sniper_spot_born"
+	self.sniper_spot_born.texture = "guis/dlcs/born/textures/pd2/mission_briefing/assets/assets_born_snipernest"
+	self.sniper_spot_born.stages = {"born"}
+	self.sniper_spot_born.visible_if_locked = true
+	self.sniper_spot_born.unlock_desc_id = "menu_asset_sniper_spot_born_desc"
+	self.sniper_spot_born.no_mystery = true
+	self.sniper_spot_born.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 7)
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

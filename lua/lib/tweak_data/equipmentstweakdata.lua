@@ -530,6 +530,21 @@ function EquipmentsTweakData:init()
 		sync_possession = true,
 		transfer_quantity = 4
 	}
+	self.specials.chrome_skull = {
+		text_id = "hud_equipment_chrome_skull",
+		icon = "equipment_chrome_mask",
+		sync_possession = true
+	}
+	self.specials.soda = {
+		text_id = "hud_equipment_soda",
+		icon = "equipment_soda",
+		sync_possession = true
+	}
+	self.specials.tool = {
+		text_id = "hud_equipment_tool",
+		icon = "equipment_born_tool",
+		sync_possession = true
+	}
 	self.specials.blow_torch = {
 		text_id = "hud_int_equipment_blow_torch",
 		icon = "equipment_blow_torch",

@@ -341,9 +341,9 @@ function CoreSoundEnvironmentManager:remove_area(area)
 	table.delete(self._areas, area)
 end
 
-function CoreSoundEnvironmentManager:enable_area(unit_id, enable)
+function CoreSoundEnvironmentManager:enable_area(name, enable)
 	for _, area in pairs(self._areas) do
-		if area:unit() and area:unit():unit_data().unit_id == unit_id then
+		if area:name() == name then
 			if enable then
 				area:_add_environment()
 				area:enable(true)

@@ -241,9 +241,17 @@ end
 function FeatureManager:short_heist()
 	print("FeatureManager:short_heist()")
 	local yes_func = function()
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			managers.statistics:publish_custom_stat_to_steam("info_playing_tutorial_yes")
+		end
 		MenuCallbackHandler:play_short_heist()
 	end
-	managers.menu:show_question_start_short_heist({yes_func = yes_func})
+	local no_func = function()
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			managers.statistics:publish_custom_stat_to_steam("info_playing_tutorial_no")
+		end
+	end
+	managers.menu:show_question_start_short_heist({yes_func = yes_func, no_func = no_func})
 	return true
 end
 

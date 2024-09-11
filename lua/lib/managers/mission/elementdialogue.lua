@@ -22,7 +22,8 @@ function ElementDialogue:on_executed(instigator)
 			case = managers.criminals:character_name_by_unit(instigator),
 			done_cbk = done_cbk,
 			position = self._values.position,
-			skip_idle_check = Application:editor()
+			skip_idle_check = Application:editor(),
+			on_unit = self._values.use_instigator and instigator
 		})
 	elseif Application:editor() then
 		managers.editor:output_error("Cant start dialogue " .. self._values.dialogue .. " in element " .. self._editor_name .. ".")

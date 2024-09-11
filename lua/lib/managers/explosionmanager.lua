@@ -368,20 +368,6 @@ local decal_ray_to = Vector3()
 function ExplosionManager:spawn_sound_and_effects(position, normal, range, effect_name, sound_event, on_unit, idstr_decal, idstr_effect, molotov_damage_effect_table)
 	effect_name = effect_name or "effects/particles/explosions/explosion_grenade_launcher"
 	local effect_id
-	if effect_name ~= "none" then
-		effect_id = World:effect_manager():spawn({
-			effect = Idstring(effect_name),
-			position = position,
-			normal = normal
-		})
-	end
-	if molotov_damage_effect_table ~= nil then
-		table.insert(molotov_damage_effect_table, {
-			effect_id = effect_id,
-			detonation_position = position,
-			detonation_normal = normal
-		})
-	end
 	local slotmask_world_geometry = managers.slot:get_mask("world_geometry")
 	if on_unit then
 		mvector3.set(decal_ray_from, position)
@@ -397,6 +383,30 @@ function ExplosionManager:spawn_sound_and_effects(position, normal, range, effec
 		mvector3.add(decal_ray_to, decal_ray_from)
 	end
 	local ray = World:raycast("ray", decal_ray_from, decal_ray_to, "slot_mask", slotmask_world_geometry)
+	if effect_name ~= "none" then
+		if ray and ray.body and ray.body:root_object() then
+			local pos = ray.body:root_object():to_local(ray.position)
+			effect_id = World:effect_manager():spawn({
+				effect = Idstring(effect_name),
+				position = pos,
+				normal = normal,
+				parent = ray.body:root_object()
+			})
+		else
+			effect_id = World:effect_manager():spawn({
+				effect = Idstring(effect_name),
+				position = position,
+				normal = normal
+			})
+		end
+	end
+	if molotov_damage_effect_table ~= nil then
+		table.insert(molotov_damage_effect_table, {
+			effect_id = effect_id,
+			detonation_position = position,
+			detonation_normal = normal
+		})
+	end
 	local sound_switch_name
 	if ray then
 		local material_name, _, _ = World:pick_decal_material(ray.unit, decal_ray_from, decal_ray_to, slotmask_world_geometry)
@@ -423,18 +433,39 @@ function ExplosionManager:project_decal(ray, from, to, on_unit, idstr_decal, ids
 		local units = on_unit or World:find_units("intersect", "cylinder", from, to, 100, slotmask_world_geometry)
 		local redir_name = World:project_decal(idstr_decal or idstr_explosion_std, ray.position, ray.ray, on_unit or units, nil, ray.normal)
 		if redir_name ~= empty_idstr then
-			World:effect_manager():spawn({
-				effect = redir_name,
-				position = ray.position,
-				normal = ray.normal
-			})
+			if ray and ray.body and ray.body:root_object() then
+				local pos = ray.body:root_object():to_local(ray.position)
+				World:effect_manager():spawn({
+					effect = redir_name,
+					position = pos,
+					normal = ray.normal,
+					parent = ray.body:root_object()
+				})
+			else
+				World:effect_manager():spawn({
+					effect = redir_name,
+					position = ray.position,
+					normal = ray.normal
+				})
+			end
 		end
 		if not idstr_effect or idstr_effect ~= empty_idstr then
-			local id = World:effect_manager():spawn({
-				effect = idstr_effect or idstr_small_light_fire,
-				position = ray.position,
-				normal = ray.normal
-			})
+			local id
+			if ray and ray.body and ray.body:root_object() then
+				local pos = ray.body:root_object():to_local(ray.position)
+				id = World:effect_manager():spawn({
+					effect = idstr_effect or idstr_small_light_fire,
+					position = pos,
+					normal = ray.normal,
+					parent = ray.body:root_object()
+				})
+			else
+				id = World:effect_manager():spawn({
+					effect = idstr_effect or idstr_small_light_fire,
+					position = ray.position,
+					normal = ray.normal
+				})
+			end
 			self:add_sustain_effect(id, 2 + math.rand(3))
 		end
 	end

@@ -1235,6 +1235,8 @@ function WINDLCManager:init()
 			pal = {app_id = "441600", no_install = true},
 			opera = {app_id = "468410", no_install = true},
 			jigg = {app_id = "486610", no_install = true},
+			wild = {app_id = "450660", no_install = true},
+			born = {app_id = "487210", no_install = true},
 			dbd_deluxe = {
 				app_id = "489980",
 				no_install = true,

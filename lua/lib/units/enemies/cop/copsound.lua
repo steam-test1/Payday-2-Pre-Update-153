@@ -14,7 +14,9 @@ function CopSound:init(unit)
 end
 
 function CopSound:destroy(unit)
-	unit:base():pre_destroy(unit)
+	if alive(unit) and unit:base() then
+		unit:base():pre_destroy(unit)
+	end
 end
 
 function CopSound:set_voice_prefix(index)

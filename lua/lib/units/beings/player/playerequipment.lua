@@ -321,6 +321,7 @@ function PlayerEquipment:use_sentry_gun(selected_index, unit_idstring_index)
 				local less_noisy = managers.player:has_category_upgrade("sentry_gun", "less_noisy")
 				local fire_rate_reduction = managers.player:upgrade_value("sentry_gun", "fire_rate_reduction", 1)
 				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield, damage_multiplier)
+				sentry_gun_unit:event_listener():call("on_setup", true)
 			else
 				return false
 			end

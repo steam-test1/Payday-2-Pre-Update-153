@@ -93,6 +93,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.weapon_glock = 2000
 	self.bag_values.weapon_scar = 2000
 	self.bag_values.drk_bomb_part = 9000
+	self.bag_values.drone_control_helmet = 18000
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
@@ -211,6 +212,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.dbd_clan = 1
 	self.global_value_multipliers.dbd_deluxe = 1
 	self.global_value_multipliers.solus_clan = 1
+	self.global_value_multipliers.wild = 1
+	self.global_value_multipliers.born = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -278,6 +281,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.dbd_clan = 0
 	self.global_value_bonus_multiplier.dbd_deluxe = 0.5
 	self.global_value_bonus_multiplier.solus_clan = 0
+	self.global_value_bonus_multiplier.wild = 0.2
+	self.global_value_bonus_multiplier.born = 0.2
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)

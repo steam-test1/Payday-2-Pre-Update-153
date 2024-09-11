@@ -368,16 +368,14 @@ function TripMineBase:_explode(col_ray)
 		end
 	end
 	if managers.network:session() then
-		if player then
-			if managers.player:has_category_upgrade("trip_mine", "fire_trap") then
-				local fire_trap_data = managers.player:upgrade_value("trip_mine", "fire_trap", nil)
-				if fire_trap_data then
-					managers.network:session():send_to_peers_synched("sync_trip_mine_explode_spawn_fire", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage, fire_trap_data[1], fire_trap_data[2])
-					self:_spawn_environment_fire(player, fire_trap_data[1], fire_trap_data[2])
-				end
-			else
-				managers.network:session():send_to_peers_synched("sync_trip_mine_explode", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
+		if managers.player:has_category_upgrade("trip_mine", "fire_trap") then
+			local fire_trap_data = managers.player:upgrade_value("trip_mine", "fire_trap", nil)
+			if fire_trap_data then
+				managers.network:session():send_to_peers_synched("sync_trip_mine_explode_spawn_fire", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage, fire_trap_data[1], fire_trap_data[2])
+				self:_spawn_environment_fire(player, fire_trap_data[1], fire_trap_data[2])
 			end
+		elseif player then
+			managers.network:session():send_to_peers_synched("sync_trip_mine_explode", self._unit, player, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
 		else
 			managers.network:session():send_to_peers_synched("sync_trip_mine_explode_no_user", self._unit, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
 		end

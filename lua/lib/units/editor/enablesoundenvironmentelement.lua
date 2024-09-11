@@ -27,13 +27,12 @@ function EnableSoundEnvironmentElement:update_editing()
 end
 
 function EnableSoundEnvironmentElement:update_selected(t, dt)
-	for _, unit in ipairs(managers.editor:layer("Sound"):created_units()) do
-		local unit_id = unit:unit_data().unit_id
-		for _, id in ipairs(self._hed.elements) do
-			if unit_id == id then
+	for _, area in ipairs(managers.sound_environment:areas()) do
+		for _, name in ipairs(self._hed.elements) do
+			if area:name() == name then
 				self:_draw_link({
 					from_unit = self._unit,
-					to_unit = unit,
+					to_unit = area:unit(),
 					r = 0.9,
 					g = 0.5,
 					b = 1
@@ -44,16 +43,11 @@ function EnableSoundEnvironmentElement:update_selected(t, dt)
 end
 
 function EnableSoundEnvironmentElement:update_unselected()
-	for _, id in ipairs(self._hed.elements) do
-		local unit
-		for _, created_unit in ipairs(managers.editor:layer("Sound"):created_units()) do
-			if created_unit:unit_data().unit_id == id then
-				unit = created_unit
-				break
+	for _, name in ipairs(self._hed.elements) do
+		for _, area in ipairs(managers.sound_environment:areas()) do
+			if area:name() == name and not alive(area:unit()) then
+				self:_add_or_remove_graph(name)
 			end
-		end
-		if not alive(unit) then
-			self:_add_or_remove_graph(id)
 		end
 	end
 end
@@ -61,14 +55,23 @@ end
 function EnableSoundEnvironmentElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
 	if ray and ray.unit and string.find(ray.unit:name():s(), "core/units/sound_environment/sound_environment", 1, true) then
-		self:_add_or_remove_graph(ray.unit:unit_data().unit_id)
+		for _, area in ipairs(managers.sound_environment:areas()) do
+			if area:unit():key() == ray.unit:key() then
+				self:_add_or_remove_graph(area:name())
+				return
+			end
+		end
 	end
 end
 
 function EnableSoundEnvironmentElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
+	for _, area in ipairs(managers.sound_environment:areas()) do
+		if area:unit():key() == unit:key() then
+			for _, name in ipairs(self._hed.elements) do
+				if name == area:name() then
+					table.delete(self._hed.elements, name)
+				end
+			end
 		end
 	end
 end
@@ -84,7 +87,12 @@ function EnableSoundEnvironmentElement:add_unit_list_btn()
 	local dialog = SelectUnitByNameModal:new("Add Trigger Unit", f)
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
 	for _, unit in ipairs(dialog:selected_units()) do
-		self:_add_or_remove_graph(unit:unit_data().unit_id)
+		for _, area in ipairs(managers.sound_environment:areas()) do
+			if area:unit():key() == unit:key() then
+				self:_add_or_remove_graph(area:name())
+				return
+			end
+		end
 	end
 end
 

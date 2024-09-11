@@ -375,7 +375,8 @@ function TweakData:init()
 		"dragon",
 		"bodhi",
 		"jimmy",
-		"sydney"
+		"sydney",
+		"wild"
 	}
 	self.criminals.characters = {
 		{
@@ -540,6 +541,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb15",
 				ai_mask_id = "sydney",
+				mask_id = 4
+			}
+		},
+		{
+			name = "wild",
+			static_data = {
+				ai_character_id = "ai_wild",
+				ssuffix = "w",
+				color_id = 4,
+				voice = "rb16",
+				ai_mask_id = "rust",
 				mask_id = 4
 			}
 		}
@@ -942,6 +954,13 @@ Play the full version soon to get your full PAYDAY!]],
 		text_blend_mode = "add",
 		font = "fonts/font_large_mf",
 		font_size = 44
+	}
+	self.overlay_effects.fade_out_e3_video = {
+		blend_mode = "normal",
+		sustain = 0,
+		fade_in = 0,
+		fade_out = 0,
+		color = Color(1, 0, 0, 0)
 	}
 	self.materials = {}
 	self.materials[Idstring("concrete"):key()] = "concrete"
@@ -1724,7 +1743,8 @@ Play the full version soon to get your full PAYDAY!]],
 			melee_id = "baseballbat",
 			enemies = {
 				"mobster",
-				"mobster_boss"
+				"mobster_boss",
+				"biker_boss"
 			},
 			jobs = {"mia", "mia_prof"}
 		},
@@ -2603,6 +2623,20 @@ Play the full version soon to get your full PAYDAY!]],
 				armor = "level_1"
 			}
 		},
+		death_born = {
+			award = "born_1",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "born"
+		},
+		death_born_prof = {
+			award = "born_2",
+			difficulty = {
+				"overkill_290"
+			},
+			job = "born_pro"
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -2780,7 +2814,9 @@ Play the full version soon to get your full PAYDAY!]],
 		"framing_frame_prof",
 		"welcome_to_the_jungle_wrapper_prof",
 		"election_day",
-		"election_day_prof"
+		"election_day_prof",
+		"born",
+		"born_pro"
 	}
 	self.achievement.job_list.bain = {
 		"jewelry_store",
@@ -3394,6 +3430,9 @@ Play the full version soon to get your full PAYDAY!]],
 	self.pickups.keycard_outlined = {
 		unit = Idstring("units/pd2_dlc_red/pickups/gen_pku_keycard_outlined/gen_pku_keycard_outlined")
 	}
+	self.pickups.keycard_standard_outlined = {
+		unit = Idstring("units/payday2/pickups/gen_pku_keycard_standard_outline/gen_pku_keycard_standard_outline")
+	}
 	self.pickups.hotel_room_key = {
 		unit = Idstring("units/pd2_dlc_casino/props/cas_prop_keycard/cas_prop_keycard")
 	}
@@ -3519,6 +3558,8 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_42", lock = "pal"},
 		{track = "track_43", lock = "pal"},
 		{track = "track_44"},
+		{track = "track_45", lock = "born"},
+		{track = "track_46", lock = "born"},
 		{
 			track = "track_32_lcv"
 		},
@@ -3643,6 +3684,10 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		{
 			track = "biting_elbows_for_the_kill"
+		},
+		{
+			track = "half_passed_wicked",
+			lock = "born_wild"
 		},
 		{
 			track = "bsides_04_double_lmgs",
@@ -4092,7 +4137,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.long_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.long_arrow_exp.remove_on_impact = true
 	self.projectiles.wpn_prj_hur = {}
-	self.projectiles.wpn_prj_hur.damage = 1100
+	self.projectiles.wpn_prj_hur.damage = 110
 	self.projectiles.wpn_prj_hur.launch_speed = 1000
 	self.projectiles.wpn_prj_hur.adjust_z = 120
 	self.projectiles.wpn_prj_hur.mass_look_up_modifier = 1

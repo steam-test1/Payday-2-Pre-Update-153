@@ -1177,6 +1177,43 @@ function LevelsTweakData:init()
 	self.mad.package = "packages/lvl_mad"
 	self.mad.cube = "cube_apply_heist_bank"
 	self.mad.ai_group_type = russia
+	self.biker_train = {}
+	self.biker_train.name_id = "heist_biker_train_hl"
+	self.biker_train.briefing_id = "heist_biker_train_briefing"
+	self.biker_train.world_name = "wip/biker_train_test"
+	self.biker_train.intro_event = "Play_pln_jr2_intro_01"
+	self.biker_train.outro_event = {
+		"Play_loc_jr2_44"
+	}
+	self.biker_train.music = "heist"
+	self.biker_train.cube = "cube_apply_heist_bank"
+	self.born = {}
+	self.born.name_id = "heist_born_hl"
+	self.born.briefing_id = "heist_born_briefing"
+	self.born.briefing_dialog = "Play_elp_brn_brf_01"
+	self.born.world_name = "narratives/elephant/born"
+	self.born.intro_event = "Play_bkl_brn_intro"
+	self.born.outro_event = "Play_elp_brn_01"
+	self.born.intro_cues = {
+		"intro_firestarter_301",
+		"intro_firestarter_302",
+		"intro_firestarter_303",
+		"intro_firestarter_304"
+	}
+	self.born.music = "heist"
+	self.born.package = "packages/narr_born_1"
+	self.born.cube = "cube_apply_heist_bank"
+	self.dark.max_bags = 10
+	self.chew = {}
+	self.chew.name_id = "heist_chew_hl"
+	self.chew.briefing_id = "heist_chew_briefing"
+	self.chew.briefing_dialog = "Play_elp_chw_brf_01"
+	self.chew.world_name = "narratives/elephant/chew"
+	self.chew.intro_event = "Play_plt_chw_intro"
+	self.chew.outro_event = "Play_elp_chw_01"
+	self.chew.music = "heist"
+	self.chew.package = "packages/lvl_chew"
+	self.chew.cube = "cube_apply_heist_bank"
 	self.short1_stage1 = {}
 	self.short1_stage1.name_id = "heist_short1_stage1_hl"
 	self.short1_stage1.briefing_id = "heist_short1_stage1_briefing"
@@ -1346,7 +1383,9 @@ function LevelsTweakData:init()
 		"short1_stage1",
 		"short1_stage2",
 		"short2_stage1",
-		"short2_stage2b"
+		"short2_stage2b",
+		"born",
+		"chew"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

@@ -42,6 +42,8 @@ function DLCTweakData:init(tweak_data)
 		opera = true,
 		dos = true,
 		jigg = 1,
+		born = true,
+		wild = true,
 		rip = true,
 		pd2_goty = 1,
 		pd2_hw_boxing = true,
@@ -4731,6 +4733,107 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "dbd_slasher",
+			amount = 1
+		}
+	}
+	self.wild = {}
+	self.wild.content = {}
+	self.wild.content.loot_global_value = "wild"
+	self.wild.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "rust",
+			amount = 1
+		}
+	}
+	self.born = {}
+	self.born.content = {}
+	self.born.content.loot_drops = {}
+	self.ach_born_3 = {}
+	self.ach_born_3.dlc = "has_achievement"
+	self.ach_born_3.achievement_id = "born_3"
+	self.ach_born_3.content = {}
+	self.ach_born_3.content.loot_global_value = "born"
+	self.ach_born_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "born_biker_01",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "hotrod_red",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "skull_engine",
+			amount = 1
+		}
+	}
+	self.ach_born_4 = {}
+	self.ach_born_4.dlc = "has_achievement"
+	self.ach_born_4.achievement_id = "born_4"
+	self.ach_born_4.content = {}
+	self.ach_born_4.content.loot_global_value = "born"
+	self.ach_born_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "born_biker_03",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "shiny_and_chrome",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "tire_fire",
+			amount = 1
+		}
+	}
+	self.ach_born_5 = {}
+	self.ach_born_5.dlc = "has_achievement"
+	self.ach_born_5.achievement_id = "born_5"
+	self.ach_born_5.content = {}
+	self.ach_born_5.content.loot_global_value = "born"
+	self.ach_born_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "born_biker_02",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "devil_eye",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "skull_wing",
+			amount = 1
+		}
+	}
+	self.ach_born_6 = {}
+	self.ach_born_6.dlc = "has_achievement"
+	self.ach_born_6.achievement_id = "born_6"
+	self.ach_born_6.content = {}
+	self.ach_born_6.content.loot_global_value = "born"
+	self.ach_born_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "brutal",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "chromey",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "biker_face",
 			amount = 1
 		}
 	}

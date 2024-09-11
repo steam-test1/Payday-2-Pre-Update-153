@@ -320,7 +320,9 @@ function MusicManager:jukebox_default_tracks()
 		heist_peta2 = "all",
 		heist_man = "all",
 		heist_pal = "all",
-		heist_mad = "track_44"
+		heist_mad = "track_44",
+		heist_born1 = "all",
+		heist_born2 = "all"
 	}
 	if managers.dlc:has_dlc_or_soundtrack_or_cce("armored_transport") then
 		default_options.heist_arm_cro = "track_09"
@@ -361,6 +363,10 @@ function MusicManager:jukebox_default_tracks()
 		default_options.heist_man = "track_43"
 		default_options.heist_pal = "track_42"
 	end
+	if managers.dlc:has_dlc_or_soundtrack_or_cce("born") then
+		default_options.heist_born1 = "track_45"
+		default_options.heist_born2 = "track_46"
+	end
 	return default_options
 end
 
@@ -380,7 +386,8 @@ function MusicManager:jukebox_music_tracks()
 		payday = managers.dlc and managers.dlc:is_dlc_unlocked("pdth_soundtrack"),
 		berry = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("berry"),
 		peta = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("peta"),
-		pal = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("pal")
+		pal = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("pal"),
+		born = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("born")
 	}
 	for _, data in ipairs(tweak_data.music.track_list) do
 		table.insert(tracks, data.track)
@@ -405,7 +412,8 @@ function MusicManager:jukebox_menu_tracks()
 		payday = managers.dlc and managers.dlc:is_dlc_unlocked("pdth_soundtrack"),
 		xmas = managers.dlc and managers.dlc:is_dlc_unlocked("xmas_soundtrack"),
 		alesso = managers.dlc and managers.dlc:is_dlc_unlocked("arena"),
-		berry = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("berry")
+		berry = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("berry"),
+		born_wild = not managers.dlc or managers.dlc:has_dlc_or_soundtrack_or_cce("born") or managers.dlc:is_dlc_unlocked("wild")
 	}
 	for _, data in ipairs(tweak_data.music.track_menu_list) do
 		table.insert(tracks, data.track)

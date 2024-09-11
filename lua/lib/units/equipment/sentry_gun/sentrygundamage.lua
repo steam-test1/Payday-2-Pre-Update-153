@@ -4,6 +4,7 @@ SentryGunDamage._ATTACK_VARIANTS = CopDamage._ATTACK_VARIANTS
 
 function SentryGunDamage:init(unit)
 	self._unit = unit
+	self._parent_unit = nil
 	self._ext_movement = unit:movement()
 	unit:base():post_init()
 	unit:brain():post_init()
@@ -278,6 +279,10 @@ function SentryGunDamage:die()
 	end
 	local turret_units = managers.groupai:state():turrets()
 	if turret_units and table.contains(turret_units, self._unit) then
+		managers.mission:call_global_event("turret_destroyed")
+		if self._parent_unit ~= nil and self._parent_unit:damage():has_sequence("done_turret_destroyed") then
+			self._parent_unit:damage():run_sequence_simple("done_turret_destroyed")
+		end
 		self._unit:contour():remove("mark_unit_friendly", true)
 		self._unit:contour():remove("mark_unit_dangerous", true)
 		managers.groupai:state():unregister_turret(self._unit)
@@ -472,4 +477,8 @@ end
 
 function SentryGunDamage:shield_smoke_level()
 	return self._shield_smoke_level
+end
+
+function SentryGunDamage:set_parent_unit(unit)
+	self._parent_unit = unit
 end

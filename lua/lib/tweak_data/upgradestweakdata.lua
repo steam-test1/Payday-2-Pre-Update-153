@@ -110,7 +110,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.ecm_feedback_min_duration = 15
 	self.ecm_feedback_max_duration = 20
 	self.ecm_feedback_interval = 1.5
-	self.sentry_gun_base_ammo = 150
+	self.sentry_gun_base_ammo = 100
 	self.sentry_gun_base_armor = 10
 	self.doctor_bag_base = 2
 	self.grenade_crate_base = 3
@@ -845,9 +845,9 @@ function UpgradesTweakData:_init_pd2_values()
 			{1.5, 3},
 			{2, 4},
 			{2.5, 5},
-			{3.5, 7},
-			{4.5, 9},
-			{8.5, 17}
+			{3.5, 6},
+			{4.5, 7},
+			{8.5, 10}
 		}
 	}
 	self.values.player.health_decrease = {0.5}
@@ -916,6 +916,22 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.cocaine_stacks_decay_multiplier = {0.5}
 	self.values.player.sync_cocaine_upgrade_level = {2}
 	self.values.player.cocaine_stack_absorption_multiplier = {1.5}
+	self.wild_trigger_time = 25
+	self.wild_max_triggers_per_time = 10
+	self.values.player.wild_health_amount = {0.5}
+	self.values.player.wild_armor_amount = {0.5}
+	self.values.player.less_health_wild_armor = {
+		{0.1, 0.1}
+	}
+	self.values.player.less_health_wild_cooldown = {
+		{0.1, 1}
+	}
+	self.values.player.less_armor_wild_health = {
+		{0.1, 0.1}
+	}
+	self.values.player.less_armor_wild_cooldown = {
+		{0.1, 1}
+	}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -2068,6 +2084,35 @@ function UpgradesTweakData:_init_pd2_values()
 				"1.5",
 				"10%"
 			}
+		},
+		{
+			{
+				"5",
+				"5",
+				"10",
+				"25"
+			},
+			{"25%"},
+			{"10%", "1"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{
+				"10%",
+				"25",
+				"1"
+			},
+			{"135%"},
+			{"10%", "1"},
+			{"5%", "20%"},
+			{
+				"10%",
+				"25",
+				"1",
+				"10%"
+			}
 		}
 	}
 	self.specialization_descs = {}
@@ -2095,11 +2140,19 @@ function UpgradesTweakData:init()
 	}
 	self.level_tree[2] = {
 		name_id = "weapons",
-		upgrades = {"colt_1911", "mac10"}
+		upgrades = {
+			"colt_1911",
+			"mac10",
+			"hajk"
+		}
 	}
 	self.level_tree[3] = {
 		name_id = "weapons",
-		upgrades = {"spatula", "fork"}
+		upgrades = {
+			"spatula",
+			"fork",
+			"boot"
+		}
 	}
 	self.level_tree[4] = {
 		name_id = "weapons",
@@ -2168,7 +2221,8 @@ function UpgradesTweakData:init()
 			"msr",
 			"benelli",
 			"plainsrider",
-			"sub2000"
+			"sub2000",
+			"road"
 		}
 	}
 	self.level_tree[16] = {
@@ -2393,7 +2447,8 @@ function UpgradesTweakData:init()
 		upgrades = {
 			"gerber",
 			"fairbair",
-			"wpn_prj_jav"
+			"wpn_prj_jav",
+			"wpn_prj_hur"
 		}
 	}
 	self.level_tree[42] = {
@@ -2726,6 +2781,8 @@ function UpgradesTweakData:init()
 	self:_x_mp5_weapon_definitions()
 	self:_x_akmsu_weapon_definitions()
 	self:_tecci_weapon_definitions()
+	self:_hajk_weapon_definitions()
+	self:_boot_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -6216,6 +6273,60 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_wild_health_amount_1 = {
+		category = "feature",
+		name_id = "menu_player_wild_health_amount_1",
+		upgrade = {
+			category = "player",
+			upgrade = "wild_health_amount",
+			value = 1
+		}
+	}
+	self.definitions.player_wild_armor_amount_1 = {
+		category = "feature",
+		name_id = "menu_player_wild_armor_amount_1",
+		upgrade = {
+			category = "player",
+			upgrade = "wild_armor_amount",
+			value = 1
+		}
+	}
+	self.definitions.player_less_health_wild_armor_1 = {
+		category = "feature",
+		name_id = "menu_player_less_health_wild_armor_1",
+		upgrade = {
+			category = "player",
+			upgrade = "less_health_wild_armor",
+			value = 1
+		}
+	}
+	self.definitions.player_less_health_wild_cooldown_1 = {
+		category = "feature",
+		name_id = "menu_player_less_health_wild_cooldown_1",
+		upgrade = {
+			category = "player",
+			upgrade = "less_health_wild_cooldown",
+			value = 1
+		}
+	}
+	self.definitions.player_less_armor_wild_health_1 = {
+		category = "feature",
+		name_id = "menu_player_less_armor_wild_health_1",
+		upgrade = {
+			category = "player",
+			upgrade = "less_armor_wild_health",
+			value = 1
+		}
+	}
+	self.definitions.player_less_armor_wild_cooldown_1 = {
+		category = "feature",
+		name_id = "menu_player_less_armor_wild_cooldown_1",
+		upgrade = {
+			category = "player",
+			upgrade = "less_armor_wild_cooldown",
+			value = 1
+		}
+	}
 	self.definitions.toolset = {
 		tree = 4,
 		step = 1,
@@ -8292,6 +8403,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "opera"
 	}
+	self.definitions.road = {
+		category = "melee_weapon",
+		dlc = "wild"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -8301,6 +8416,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.wpn_prj_four = {category = "grenade", dlc = "turtles"}
 	self.definitions.wpn_prj_ace = {category = "grenade", dlc = "pd2_clan"}
 	self.definitions.wpn_prj_jav = {category = "grenade", dlc = "steel"}
+	self.definitions.wpn_prj_hur = {category = "grenade", dlc = "born"}
 	self.definitions.frag_com = {category = "grenade", dlc = "pd2_clan"}
 end
 
@@ -11195,5 +11311,23 @@ function UpgradesTweakData:_tecci_weapon_definitions()
 		weapon_id = "tecci",
 		factory_id = "wpn_fps_ass_tecci",
 		dlc = "opera"
+	}
+end
+
+function UpgradesTweakData:_hajk_weapon_definitions()
+	self.definitions.hajk = {
+		category = "weapon",
+		weapon_id = "hajk",
+		factory_id = "wpn_fps_smg_hajk",
+		dlc = "born"
+	}
+end
+
+function UpgradesTweakData:_boot_weapon_definitions()
+	self.definitions.boot = {
+		category = "weapon",
+		weapon_id = "boot",
+		factory_id = "wpn_fps_sho_boot",
+		dlc = "wild"
 	}
 end

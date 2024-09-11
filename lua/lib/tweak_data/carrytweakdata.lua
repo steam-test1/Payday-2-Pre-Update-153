@@ -533,6 +533,23 @@ function CarryTweakData:init(tweak_data)
 	self.mad_master_server_value_4.bag_value = "mad_master_server_value_4"
 	self.mad_master_server_value_4.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.mad_master_server_value_4.AI_carry = {SO_category = "enemies"}
+	self.bike_part_light = {}
+	self.bike_part_light.type = "light"
+	self.bike_part_light.name_id = "hud_carry_bike_part"
+	self.bike_part_light.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.bike_part_light.AI_carry = {SO_category = "enemies"}
+	self.bike_part_heavy = {}
+	self.bike_part_heavy.type = "heavy"
+	self.bike_part_heavy.name_id = "hud_carry_bike_part"
+	self.bike_part_heavy.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.bike_part_heavy.AI_carry = {SO_category = "enemies"}
+	self.drone_control_helmet = {}
+	self.drone_control_helmet.type = "light"
+	self.drone_control_helmet.name_id = "hud_carry_helmet"
+	self.drone_control_helmet.bag_value = "mad_master_server_value_4"
+	self.drone_control_helmet.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.drone_control_helmet.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.drone_control_helmet.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

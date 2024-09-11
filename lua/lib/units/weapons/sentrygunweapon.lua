@@ -54,10 +54,9 @@ function SentryGunWeapon:switch_fire_mode()
 	else
 		managers.hint:show_hint("sentry_normal_ammo")
 	end
-	local add_contour = self._use_armor_piercing and self._unit:base():ap_contour_id() or self._unit:base():standard_contour_id()
-	self._unit:base():set_contour(add_contour)
 	managers.network:session():send_to_peers_synched("sentrygun_sync_state", self._unit)
 	self._unit:sound_source():post_event("wp_sentrygun_swap_ammo")
+	self._unit:event_listener():call("on_switch_fire_mode", self._use_armor_piercing)
 end
 
 function SentryGunWeapon:_switch_fire_mode()
@@ -154,26 +153,10 @@ function SentryGunWeapon:set_ammo(amount)
 	self._ammo_max = math.max(self._ammo_max, amount)
 end
 
-function SentryGunWeapon:_remove_contour()
-	local remove_contour = self._use_armor_piercing and "deployable_interactable" or "deployable_active"
-	self._unit:contour():remove(remove_contour)
-end
-
-function SentryGunWeapon:_setup_contour()
-	local turret_units = managers.groupai:state():turrets()
-	if turret_units and table.contains(turret_units, self._unit) then
-		return
-	end
-	if self._unit:contour() and self:out_of_ammo() then
-		self._unit:base():set_contour("deployable_disabled")
-	end
-end
-
 function SentryGunWeapon:change_ammo(amount)
 	self._ammo_total = math.min(math.ceil(self._ammo_total + amount), self._ammo_max)
 	local ammo_percent = self._ammo_total / self._ammo_max
 	local resolution_step = math.ceil(ammo_percent / self._ammo_sync_resolution)
-	self:_setup_contour()
 	if ammo_percent == 0 or resolution_step ~= self._ammo_sync then
 		self._ammo_sync = resolution_step
 		self._unit:network():send("sentrygun_ammo", self._ammo_sync)
@@ -189,7 +172,6 @@ function SentryGunWeapon:sync_ammo(ammo_ratio)
 	if self._unit:interaction() then
 		self._unit:interaction():set_dirty(true)
 	end
-	self:_setup_contour()
 end
 
 function SentryGunWeapon:set_spread_mul(spread_mul)
@@ -213,6 +195,7 @@ function SentryGunWeapon:stop_autofire()
 	if self:out_of_ammo() then
 		self:remove_fire_mode_interaction()
 		self:_sound_autofire_end_empty()
+		self._unit:event_listener():call("on_out_of_ammo")
 	elseif self._timer:time() - self._fire_start_t > 3 then
 		self:_sound_autofire_end_cooldown()
 	else
