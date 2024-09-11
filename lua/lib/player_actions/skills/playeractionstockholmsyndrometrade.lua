@@ -13,8 +13,10 @@ function PlayerAction.StockholmSyndromeTrade.Function(pos, peer_id)
 			managers.player._has_super_syndrome = false
 			if Network:is_server() then
 				managers.player:init_auto_respawn_callback(pos, peer_id, true)
+				managers.groupai:state():set_super_syndrome(peer_id, false)
 			else
 				managers.network:session():send_to_host("auto_respawn_player", pos, peer_id)
+				managers.network:session():send_to_host("sync_set_super_syndrome", peer_id, false)
 			end
 			quit = true
 		end

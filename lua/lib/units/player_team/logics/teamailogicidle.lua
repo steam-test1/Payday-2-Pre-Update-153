@@ -472,7 +472,7 @@ function TeamAILogicIdle._find_intimidateable_civilians(criminal, use_default_sh
 end
 
 function TeamAILogicIdle.intimidate_civilians(data, criminal, play_sound, play_action, primary_target)
-	if primary_target and primary_target:unit_data().disable_shout then
+	if alive(primary_target) and primary_target:unit_data().disable_shout then
 		return false
 	end
 	if primary_target and (not alive(primary_target) or not managers.groupai:state():fleeing_civilians()[primary_target:key()]) then

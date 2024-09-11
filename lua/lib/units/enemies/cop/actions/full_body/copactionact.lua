@@ -506,6 +506,7 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_up_1m_dwn_4_5m",
 	"e_nl_run_jump_far_var2",
 	"e_nl_run_jump_far_var3",
+	"e_nl_zipline_glace",
 	"e_nl_run_jump_far_var1",
 	"e_nl_down_5_3m",
 	"e_nl_up_0_85_dwn_5_3m",

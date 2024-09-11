@@ -225,6 +225,10 @@ function RaycastWeaponBase:category()
 	return self:weapon_tweak_data().category
 end
 
+function RaycastWeaponBase:sub_category()
+	return self:weapon_tweak_data().sub_category
+end
+
 function RaycastWeaponBase:trigger_held(...)
 	local fired
 	if self._next_fire_allowed <= self._unit:timer():time() then

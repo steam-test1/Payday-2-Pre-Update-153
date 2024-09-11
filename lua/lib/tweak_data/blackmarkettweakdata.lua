@@ -238,6 +238,8 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/wild_1/npc_criminal_wild_1"
 	self.characters.ai_wild.sequence = "var_mtr_wild"
 	self.characters.ai_wild.name_id = "bm_character_ai_wild"
+	self:give_free_dlcs(self.characters)
+	self:give_free_dlcs(self.characters.locked)
 end
 
 function BlackMarketTweakData:_init_cash()

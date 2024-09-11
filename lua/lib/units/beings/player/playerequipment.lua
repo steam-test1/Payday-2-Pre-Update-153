@@ -192,7 +192,7 @@ function PlayerEquipment:use_ecm_jammer()
 	if ray then
 		managers.mission:call_global_event("player_deploy_ecmjammer")
 		managers.statistics:use_ecm_jammer()
-		local duration_multiplier = managers.player:upgrade_value("ecm_jammer", "duration_multiplier", 1) * managers.player:upgrade_value("ecm_jammer", "duration_multiplier_2", 1)
+		local duration_multiplier = managers.player:upgrade_level("ecm_jammer", "duration_multiplier", 0) + managers.player:upgrade_level("ecm_jammer", "duration_multiplier_2", 0) + 1
 		if Network:is_client() then
 			self._ecm_jammer_placement_requested = true
 			managers.network:session():send_to_host("request_place_ecm_jammer", ray.position, ray.normal, duration_multiplier)

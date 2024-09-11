@@ -415,7 +415,8 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.ecm_jammer.interaction_speed_multiplier = {0}
 	self.values.weapon.silencer_damage_multiplier = {1.15, 1.3}
 	self.values.weapon.armor_piercing_chance_silencer = {0.2, 0.4}
-	self.values.ecm_jammer.duration_multiplier = {1.25}
+	self.values.ecm_jammer.duration_multiplier = {true}
+	self.values.ecm_jammer.duration_multiplier_2 = {true}
 	self.values.ecm_jammer.can_open_sec_doors = {true}
 	self.values.player.pick_lock_easy = {true}
 	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.5}
@@ -425,7 +426,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.weapon.silencer_enter_steelsight_speed_multiplier = {2}
 	self.values.player.loot_drop_multiplier = {1.5, 3}
 	self.values.ecm_jammer.quantity = {1, 3}
-	self.values.ecm_jammer.duration_multiplier_2 = {1.25}
 	self.values.ecm_jammer.feedback_duration_boost_2 = {1.25}
 	self.values.ecm_jammer.affects_pagers = {true}
 	self.values.player.can_strafe_run = {true}

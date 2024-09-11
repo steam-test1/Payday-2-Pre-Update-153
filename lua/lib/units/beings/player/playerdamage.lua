@@ -1775,6 +1775,14 @@ function PlayerDamage:_update_regen_on_the_side(dt)
 	end
 end
 
+function PlayerDamage:get_armor_regenerate_timer()
+	return self._regenerate_timer or 0
+end
+
+function PlayerDamage:get_armor_regenerate_speed()
+	return self._regenerate_speed or 1
+end
+
 PlayerBodyDamage = PlayerBodyDamage or class()
 
 function PlayerBodyDamage:init(unit, unit_extension, body)

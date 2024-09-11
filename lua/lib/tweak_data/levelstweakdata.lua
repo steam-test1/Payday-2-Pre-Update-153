@@ -1203,7 +1203,7 @@ function LevelsTweakData:init()
 	self.born.music = "heist"
 	self.born.package = "packages/narr_born_1"
 	self.born.cube = "cube_apply_heist_bank"
-	self.dark.max_bags = 10
+	self.born.max_bags = 10
 	self.chew = {}
 	self.chew.name_id = "heist_chew_hl"
 	self.chew.briefing_id = "heist_chew_briefing"

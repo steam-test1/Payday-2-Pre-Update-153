@@ -9,11 +9,16 @@ ECMJammerBase._NET_EVENTS = {
 	feedback_flash = 6,
 	feedback_restart = 7
 }
+ECMJammerBase.battery_life_multiplier = {
+	1,
+	1.25,
+	1.5
+}
 
 function ECMJammerBase.spawn(pos, rot, battery_life_upgrade_lvl, owner, peer_id)
-	battery_life_upgrade_lvl = math.min(battery_life_upgrade_lvl, tweak_data.upgrades.values.ecm_jammer.duration_multiplier[1] * tweak_data.upgrades.values.ecm_jammer.duration_multiplier_2[1])
+	battery_life_upgrade_lvl = math.clamp(battery_life_upgrade_lvl, 1, #ECMJammerBase.battery_life_multiplier)
 	local unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_jammer/gen_equipment_jammer"), pos, rot)
-	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, battery_life_upgrade_lvl * 100, peer_id or 0)
+	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, battery_life_upgrade_lvl, peer_id or 0)
 	unit:base():setup(battery_life_upgrade_lvl, owner)
 	return unit
 end
@@ -60,8 +65,7 @@ function ECMJammerBase:sync_setup(upgrade_lvl, peer_id)
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
-	upgrade_lvl = upgrade_lvl / 100
-	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * upgrade_lvl
+	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * self.battery_life_multiplier[upgrade_lvl]
 	self._battery_life = self._max_battery_life
 	managers.player:verify_equipment(peer_id, "ecm_jammer")
 end
@@ -124,7 +128,7 @@ end
 
 function ECMJammerBase:setup(battery_life_upgrade_lvl, owner)
 	self._slotmask = managers.slot:get_mask("trip_mine_targets")
-	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * battery_life_upgrade_lvl
+	self._max_battery_life = tweak_data.upgrades.ecm_jammer_base_battery_life * self.battery_life_multiplier[battery_life_upgrade_lvl]
 	self._battery_life = self._max_battery_life
 	self._owner = owner
 	if owner then

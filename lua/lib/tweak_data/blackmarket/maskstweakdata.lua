@@ -2769,6 +2769,39 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.solus.texture_bundle_folder = "solus"
 	self.masks.solus.sort_number = 32
 	self.masks.solus.dlc = "solus_clan"
+	self.masks.mig_death = {}
+	self.masks.mig_death.unit = "units/pd2_dlc_migg/masks/migg_death/msk_mig_death"
+	self.masks.mig_death.name_id = "bm_msk_death_rider"
+	self.masks.mig_death.pcs = {}
+	self.masks.mig_death.value = 0
+	self.masks.mig_death.texture_bundle_folder = "migg"
+	self.masks.mig_death.sort_number = 33
+	self.masks.mig_death.dlc = "pd2_clan"
+	self.masks.mig_war = {}
+	self.masks.mig_war.unit = "units/pd2_dlc_migg/masks/migg_war/msk_mig_war"
+	self.masks.mig_war.name_id = "bm_msk_war"
+	self.masks.mig_war.pcs = {}
+	self.masks.mig_war.value = 0
+	self.masks.mig_war.type = "helmet"
+	self.masks.mig_war.texture_bundle_folder = "migg"
+	self.masks.mig_war.sort_number = 33
+	self.masks.mig_war.dlc = "pd2_clan"
+	self.masks.mig_conquest = {}
+	self.masks.mig_conquest.unit = "units/pd2_dlc_migg/masks/migg_conquest/msk_mig_conquest"
+	self.masks.mig_conquest.name_id = "bm_msk_conquest"
+	self.masks.mig_conquest.pcs = {}
+	self.masks.mig_conquest.value = 0
+	self.masks.mig_conquest.texture_bundle_folder = "migg"
+	self.masks.mig_conquest.sort_number = 33
+	self.masks.mig_conquest.dlc = "pd2_clan"
+	self.masks.mig_famine = {}
+	self.masks.mig_famine.unit = "units/pd2_dlc_migg/masks/migg_famine/msk_mig_famine"
+	self.masks.mig_famine.name_id = "bm_msk_famine"
+	self.masks.mig_famine.pcs = {}
+	self.masks.mig_famine.value = 0
+	self.masks.mig_famine.texture_bundle_folder = "migg"
+	self.masks.mig_famine.sort_number = 33
+	self.masks.mig_famine.dlc = "pd2_clan"
 	self:give_free_dlcs(self.masks)
 	self:_add_desc_from_name_macro(self.masks)
 end

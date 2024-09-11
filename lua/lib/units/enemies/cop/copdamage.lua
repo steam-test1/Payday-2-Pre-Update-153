@@ -264,7 +264,7 @@ function CopDamage:damage_bullet(attack_data)
 	end
 	local is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
 	if not is_civilian then
-		managers.player:send_message(Message.OnEnemyShot, nil, self._unit, "bullet")
+		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, "bullet")
 	end
 	if self._has_plate and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name and not attack_data.armor_piercing then
 		local armor_pierce_roll = math.rand(1)
@@ -612,8 +612,8 @@ function CopDamage:damage_fire(attack_data)
 	local result
 	local damage = attack_data.damage
 	local is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
-	if not is_civilian then
-		managers.player:send_message(Message.OnEnemyShot, nil, "fire")
+	if not is_civilian and attack_data.attacker_unit and alive(attack_data.attacker_unit) then
+		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, "fire")
 	end
 	if attack_data.attacker_unit == managers.player:player_unit() then
 		local critical_hit, crit_damage = self:roll_critical_hit(damage)
@@ -825,8 +825,8 @@ function CopDamage:damage_explosion(attack_data)
 		return
 	end
 	local is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
-	if not is_civilian then
-		managers.player:send_message(Message.OnEnemyShot, nil, self._unit, "explosion")
+	if not is_civilian and attack_data.attacker_unit and alive(attack_data.attacker_unit) then
+		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, "explosion")
 	end
 	local result
 	local damage = attack_data.damage

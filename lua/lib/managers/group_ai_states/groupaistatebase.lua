@@ -1365,6 +1365,11 @@ function GroupAIStateBase:is_ai_trade_possible()
 	return not ai_disabled and (self._hostage_headcount > 0 or next(self._converted_police) or managers.trade:is_trading())
 end
 
+function GroupAIStateBase:set_super_syndrome(peer_id, active)
+	self._super_syndrome_peers = self._super_syndrome_peers or {}
+	self._super_syndrome_peers[peer_id] = active
+end
+
 function GroupAIStateBase:check_gameover_conditions()
 	if not Network:is_server() or managers.platform:presence() ~= "Playing" or setup:has_queued_exec() then
 		return false
@@ -1374,6 +1379,11 @@ function GroupAIStateBase:check_gameover_conditions()
 	end
 	if Global.load_start_menu or Application:editor() then
 		return false
+	end
+	if self._super_syndrome_peers then
+		for _, active in pairs(self._super_syndrome_peers) do
+			return false
+		end
 	end
 	local plrs_alive = false
 	local plrs_disabled = true

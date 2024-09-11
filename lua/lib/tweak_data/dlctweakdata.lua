@@ -4883,6 +4883,32 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan_migg = {}
+	self.pd2_clan_migg.content = {}
+	self.pd2_clan_migg.dlc = "has_pd2_clan"
+	self.pd2_clan_migg.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_migg.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mig_death",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mig_war",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mig_conquest",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mig_famine",
+			amount = 1
+		}
+	}
 	if SystemInfo:platform() == Idstring("XB1") then
 		self.xone_bonus = {}
 		self.xone_bonus.free = true

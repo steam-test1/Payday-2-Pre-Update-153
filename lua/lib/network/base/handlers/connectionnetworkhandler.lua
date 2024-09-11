@@ -780,3 +780,7 @@ function ConnectionNetworkHandler:start_super_syndrome_trade(pos, peer_id)
 		managers.player._coroutine_mgr:add_coroutine("stockholm_syndrome_trade", PlayerAction.StockholmSyndromeTrade, pos, peer_id)
 	end
 end
+
+function ConnectionNetworkHandler:sync_set_super_syndrome(peer_id, active)
+	managers.groupai:state():set_super_syndrome(peer_id, active)
+end

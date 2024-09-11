@@ -325,6 +325,10 @@ function NewSkillTreeGui:set_skill_point_text(skill_points)
 	self._skill_points_text:set_color(color)
 end
 
+function NewSkillTreeGui:selected_page()
+	return self._selected_page
+end
+
 function NewSkillTreeGui:refresh_reset_skills_legends(trees_idx)
 	local legend_panel_reset_skills = self._panel:child("LegendPanelResetSkills")
 	legend_panel_reset_skills:clear()
@@ -816,10 +820,10 @@ function NewSkillTreeGui:special_btn_pressed(button)
 	elseif button == Idstring("menu_switch_skillset") then
 		managers.menu:open_node("skill_switch", {})
 		return
-	elseif button == Idstring("menu_respec_tree") then
+	elseif button == Idstring("menu_respec_tree") and self:has_tree_spent_points(self._selected_page:trees_idx()) then
 		self:respec_page(self._tree_items[self._active_page])
 		return
-	elseif button == Idstring("menu_respec_tree_all") then
+	elseif button == Idstring("menu_respec_tree_all") and self:has_spent_skill_points() then
 		self:respec_all()
 		return
 	end
@@ -1542,10 +1546,15 @@ end
 
 function NewSkillTreeTreeItem:_on_refresh_event()
 	self:refresh()
+	if self._page ~= self._gui:selected_page() then
+		self._progress:set_y(self._progress_pos_wanted)
+		self._progress_pos_current = self._progress_pos_wanted
+	end
 end
 
 function NewSkillTreeTreeItem:refresh()
-	self:reload_connections()
+	local tier, points_spent, points_max = self:_tree_points()
+	self._progress_pos_wanted = math.max(0, self._progress_start - self._progress_tier_height * tier - self._progress_tier_height * (points_spent / points_max))
 end
 
 function NewSkillTreeTreeItem:reload_connections()

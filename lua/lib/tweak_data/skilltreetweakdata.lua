@@ -285,25 +285,6 @@ function SkillTreeTweakData:init()
 			cost = self.costs.pro
 		}
 	}
-	self.skills.kilmer = {
-		name_id = "menu_kilmer_beta",
-		desc_id = "menu_kilmer_beta_desc",
-		icon_xy = {1, 9},
-		[1] = {
-			upgrades = {
-				"assault_rifle_reload_speed_multiplier",
-				"snp_reload_speed_multiplier"
-			},
-			cost = self.costs.hightier
-		},
-		[2] = {
-			upgrades = {
-				"assault_rifle_move_spread_index_addend",
-				"snp_move_spread_index_addend"
-			},
-			cost = self.costs.hightierpro
-		}
-	}
 	self.skills.equilibrium = {
 		name_id = "menu_equilibrium_beta",
 		desc_id = "menu_equilibrium_beta_desc",

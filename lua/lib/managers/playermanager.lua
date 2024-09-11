@@ -177,8 +177,8 @@ function PlayerManager:set_damage_absorption(value)
 	self._damage_absorption = Application:digest_value(value, true)
 end
 
-function PlayerManager:_on_enter_trigger_happy_event()
-	if not self._coroutine_mgr:is_running("trigger_happy") and self:is_current_weapon_of_category("pistol") then
+function PlayerManager:_on_enter_trigger_happy_event(attacker_unit, unit, variant)
+	if attacker_unit == self:player_unit() and not self._coroutine_mgr:is_running("trigger_happy") and self:is_current_weapon_of_category("pistol") then
 		local data = self:upgrade_value("pistol", "stacking_hit_damage_multiplier", 0)
 		if data ~= 0 then
 			self._coroutine_mgr:add_coroutine("trigger_happy", PlayerAction.TriggerHappy, self, data.damage_bonus, data.max_stacks, Application:time() + data.max_time)
@@ -667,6 +667,13 @@ end
 
 function PlayerManager:set_player_state(state)
 	state = state or self._current_state
+	if state == "bleed_out" and self._has_super_syndrome then
+		if Network:is_server() then
+			managers.groupai:state():set_super_syndrome(managers.network:session():local_peer():id(), true)
+		else
+			managers.network:session():send_to_host("sync_set_super_syndrome", managers.network:session():local_peer():id(), true)
+		end
+	end
 	if state == "standard" and self:get_my_carry_data() then
 		state = "carry"
 	end
@@ -3942,7 +3949,7 @@ function PlayerManager:clbk_super_syndrome_respawn(data)
 		local pos = best_hostage.unit:position()
 		local rot = best_hostage.unit:rotation()
 		trade_manager:criminal_respawn(pos, rot, criminal)
-		trade_manager:begin_hostage_trade(pos, rot, best_hostage, true)
+		trade_manager:begin_hostage_trade(pos, rot, best_hostage, false)
 	end
 end
 

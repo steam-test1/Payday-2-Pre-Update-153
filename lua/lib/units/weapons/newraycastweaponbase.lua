@@ -933,13 +933,74 @@ end
 
 function NewRaycastWeaponBase:_get_spread(user_unit)
 	local current_state = user_unit:movement()._current_state
-	local spread = self._spread
-	if current_state and current_state._unit_deploy_position then
-		spread = tweak_data.weapon.stats.spread[20]
+	if not current_state then
+		return 0
 	end
-	local spread_multiplier = self:spread_multiplier(current_state)
-	local spread_addend = self:spread_addend(current_state)
-	return math.max((spread + spread_addend) * spread_multiplier, 0)
+	local spread_index = self._current_stats_indices and self._current_stats_indices.spread or 1
+	local cond_spread_addend = self:conditional_accuracy_addend(current_state)
+	local spread_multiplier = 1
+	spread_multiplier = spread_multiplier - (1 - self:spread_multiplier(current_state))
+	spread_multiplier = spread_multiplier - (1 - self:conditional_accuracy_multiplier(current_state))
+	spread_multiplier = self:_convert_add_to_mul(spread_multiplier)
+	local spread_addend = self:spread_index_addend(current_state) + cond_spread_addend
+	spread_index = math.ceil((spread_index + spread_addend) * spread_multiplier)
+	spread_index = math.clamp(spread_index, 1, #tweak_data.weapon.stats.spread)
+	local spread = tweak_data.weapon.stats.spread[spread_index]
+	local stance_mul = 1
+	if current_state._state_data.ducking then
+		stance_mul = stance_mul + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_crouching" or "crouching"])
+	else
+		stance_mul = stance_mul + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_standing" or "standing"])
+	end
+	stance_mul = self:_convert_add_to_mul(stance_mul)
+	spread = spread * stance_mul
+	if current_state:in_steelsight() then
+		spread = spread * (1 + (1 - tweak_data.weapon[self._name_id].spread.steelsight))
+	end
+	return math.max(spread, 0)
+end
+
+function NewRaycastWeaponBase:conditional_accuracy_addend(current_state)
+	local index = 0
+	if not current_state then
+		return index
+	end
+	local pm = managers.player
+	if not current_state:in_steelsight() then
+		index = index + pm:upgrade_value("player", "hip_fire_accuracy_inc", 0)
+	end
+	if self:is_single_shot() and self:is_category("assault_rifle", "smg", "snp") then
+		index = index + pm:upgrade_value("weapon", "single_spread_index_addend", 0)
+	elseif not self:is_single_shot() then
+		index = index + pm:upgrade_value("weapon", "auto_spread_index_addend", 0)
+	end
+	if not current_state._moving then
+		index = index + pm:upgrade_value("player", "not_moving_accuracy_increase", 0)
+	end
+	if current_state._moving then
+		index = index + pm:upgrade_value(self:category(), "move_spread_index_addend", 0)
+	end
+	return index
+end
+
+function NewRaycastWeaponBase:conditional_accuracy_multiplier(current_state)
+	local mul = 1
+	if not current_state then
+		return mul
+	end
+	local pm = managers.player
+	if current_state:in_steelsight() and self:is_single_shot() then
+		mul = mul + (1 - pm:upgrade_value("player", "single_shot_accuracy_inc", 1))
+	end
+	if current_state:in_steelsight() and self:is_category("shotgun") then
+		mul = mul + (1 - pm:upgrade_value("shotgun", "steelsight_accuracy_inc", 1))
+		mul = mul + (1 - pm:upgrade_value("player"))
+	end
+	if current_state._moving then
+		mul = mul + (1 - pm:upgrade_value("player", "weapon_movement_stability", 1))
+	end
+	mul = mul + (1 - pm:get_property("desperado", 1))
+	return self:_convert_add_to_mul(mul)
 end
 
 function NewRaycastWeaponBase:fire_rate_multiplier()
@@ -963,7 +1024,11 @@ function NewRaycastWeaponBase:melee_damage_multiplier()
 end
 
 function NewRaycastWeaponBase:spread_addend(current_state)
-	return managers.blackmarket:accuracy_addend(self._name_id, self:weapon_tweak_data().category, self:weapon_tweak_data().sub_category, self._current_stats_indices and self._current_stats_indices.spread, self._silencer, current_state, self:fire_mode(), self._blueprint, current_state._moving, self:is_single_shot())
+	return managers.blackmarket:accuracy_addend(self._name_id, self:category(), self:sub_category(), self._current_stats_indices and self._current_stats_indices.spread, self._silencer, current_state, self:fire_mode(), self._blueprint, current_state._moving, self:is_single_shot())
+end
+
+function NewRaycastWeaponBase:spread_index_addend(current_state)
+	return managers.blackmarket:accuracy_index_addend(self._name_id, self:category(), self:sub_category(), self._silencer, current_state, self:fire_mode(), self._blueprint)
 end
 
 function NewRaycastWeaponBase:spread_multiplier(current_state)

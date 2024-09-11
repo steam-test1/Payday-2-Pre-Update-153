@@ -19,6 +19,7 @@ end
 function PlayerBipod:_enter(enter_data)
 	local player = managers.player:player_unit()
 	if player and self._unit:base().is_local_player then
+		self._bipod = true
 		local tweak_data = self._equipped_unit:base():weapon_tweak_data()
 		local speed_multiplier = self._equipped_unit:base():get_property("bipod_deploy_multiplier") or 1
 		local reload_name_id = tweak_data.animations.reload_name_id or self._equipped_unit:base().name_id
@@ -44,6 +45,7 @@ end
 
 function PlayerBipod:exit(state_data, new_state_name)
 	PlayerBipod.super.exit(self, state_data or self._state_data, new_state_name)
+	self._bipod = nil
 	local tweak_data = self._equipped_unit:base():weapon_tweak_data()
 	local speed_multiplier = self._equipped_unit:base():get_property("bipod_deploy_multiplier") or 1
 	local equipped_unit_id = self._equipped_unit:base().name_id

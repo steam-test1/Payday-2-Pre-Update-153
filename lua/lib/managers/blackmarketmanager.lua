@@ -3303,8 +3303,14 @@ function BlackMarketManager:get_weapon_icon_path(weapon_id, cosmetics)
 	local data = use_cosmetics and tweak_data.blackmarket.weapon_skins or tweak_data.weapon
 	local id = use_cosmetics and cosmetics.id or weapon_id
 	local path = use_cosmetics and "weapon_skins/" or "textures/pd2/blackmarket/icons/weapons/"
-	if use_cosmetics and data[id] and data[id].weapon_id ~= weapon_id then
-		return self:get_weapon_icon_path(weapon_id, nil)
+	if use_cosmetics and data[id] then
+		if data[id].weapon_ids then
+			if not table.contains(data[id].weapon_ids, weapon_id) then
+				return self:get_weapon_icon_path(weapon_id, nil)
+			end
+		elseif data[id].weapon_id ~= weapon_id then
+			return self:get_weapon_icon_path(weapon_id, nil)
+		end
 	end
 	local texture_path, rarity_path
 	if data and id and data[id] then
@@ -4614,6 +4620,16 @@ function BlackMarketManager:character_mask_on_sequence_by_character_name(charact
 	return tweak_data.blackmarket.characters[character].mask_on_sequence
 end
 
+function BlackMarketManager:weapon_cosmetics_type_check(weapon_id, weapon_skin_id)
+	local weapon_skin = tweak_data.blackmarket.weapon_skins[weapon_skin_id]
+	if weapon_skin then
+		if weapon_skin.weapon_ids then
+			return table.contains(weapon_skin.weapon_ids, weapon_id)
+		end
+		return weapon_skin.weapon_id and weapon_skin.weapon_id == weapon_id
+	end
+end
+
 function BlackMarketManager:get_weapon_cosmetics(category, slot)
 	if not self._global.crafted_items then
 		return
@@ -4674,10 +4690,10 @@ function BlackMarketManager:on_equip_weapon_cosmetics(category, slot, instance_i
 	if not item_data then
 		return
 	end
-	local weapon_skin = tweak_data.blackmarket.weapon_skins[item_data.entry]
-	if weapon_skin and weapon_skin.weapon_id ~= crafted.weapon_id then
+	if not self:weapon_cosmetics_type_check(crafted.weapon_id, item_data.entry) then
 		return
 	end
+	local weapon_skin = tweak_data.blackmarket.weapon_skins[item_data.entry]
 	local blueprint = weapon_skin.default_blueprint
 	local customize_locked = weapon_skin.locked
 	local bonus = item_data.bonus
@@ -4713,8 +4729,14 @@ function BlackMarketManager:get_cosmetics_instances_by_weapon_id(weapon_id)
 	local cosmetic_tweak = tweak_data.blackmarket.weapon_skins
 	local items = {}
 	for instance_id, data in pairs(self._global.inventory_tradable) do
-		if data.category == "weapon_skins" and cosmetic_tweak[data.entry] and cosmetic_tweak[data.entry].weapon_id == weapon_id then
-			table.insert(items, instance_id)
+		if data.category == "weapon_skins" and cosmetic_tweak[data.entry] then
+			if cosmetic_tweak[data.entry].weapon_ids then
+				if table.contains(cosmetic_tweak[data.entry].weapon_ids, weapon_id) then
+					table.insert(items, instance_id)
+				end
+			elseif cosmetic_tweak[data.entry].weapon_id == weapon_id then
+				table.insert(items, instance_id)
+			end
 		end
 	end
 	return items
@@ -5959,6 +5981,7 @@ function BlackMarketManager:damage_multiplier(name, category, sub_category, sile
 	if blueprint and self:is_weapon_modified(managers.weapon_factory:get_factory_id_by_weapon_id(name), blueprint) then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_damage_multiplier", 1))
 	end
+	multiplier = multiplier + (1 - managers.player:get_property("trigger_happy", 1))
 	return self:_convert_add_to_mul(multiplier)
 end
 
@@ -5974,60 +5997,44 @@ function BlackMarketManager:accuracy_addend(name, category, sub_category, spread
 	local addend = 0
 	if spread_index and 1 <= spread_index and spread_index <= (current_state and current_state._moving and #tweak_data.weapon.stats.spread_moving or #tweak_data.weapon.stats.spread) then
 		local index = spread_index
-		index = index + managers.player:upgrade_value("weapon", "spread_index_addend", 0)
-		index = index + managers.player:upgrade_value(category, "spread_index_addend", 0)
-		if not is_moving and game_state_machine:current_state_name() ~= "menu_main" then
-			index = index + managers.player:upgrade_value("player", "not_moving_accuracy_increase", 0)
-		end
-		if is_single_shot and (category == "assault_rifle" or category == "snp" or category == "smg") then
-			index = index + managers.player:upgrade_value("weapon", "single" .. "_spread_index_addend", 0)
-		elseif fire_mode ~= "single" then
-			index = index + managers.player:upgrade_value("weapon", fire_mode .. "_spread_index_addend", 0)
-		end
-		index = index + managers.player:upgrade_value(category, fire_mode .. "_spread_index_addend", 0)
 		index = index + managers.player:upgrade_value("player", "weapon_accuracy_increase", 0)
 		if silencer then
 			index = index + managers.player:upgrade_value("weapon", "silencer_spread_index_addend", 0)
 			index = index + managers.player:upgrade_value(category, "silencer_spread_index_addend", 0)
 		end
 		if current_state and current_state._moving then
-			index = index + managers.player:upgrade_value("weapon", "move_spread_index_addend", 0)
 			index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
 		end
-		if sub_category then
-			index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)
-			index = index + managers.player:upgrade_value(sub_category, fire_mode .. "_spread_index_addend", 0)
-			if silencer then
-				index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
-			end
-			if current_state and current_state._moving then
-				index = index + managers.player:upgrade_value(sub_category, "move_spread_index_addend", 0)
-			end
-		end
-		if current_state and not current_state:in_steelsight() then
-			index = index + managers.player:upgrade_value("player", "hip_fire_accuracy_inc", 0)
+		if sub_category and silencer then
+			index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
 		end
 		index = math.clamp(index, 1, #tweak_data.weapon.stats.spread)
 		if index ~= spread_index then
 			local diff = tweak_data.weapon.stats.spread[index] - tweak_data.weapon.stats.spread[spread_index]
 			addend = addend + diff
 		end
-		if managers.player:has_category_upgrade("player", "single_shot_accuracy_inc") and current_state and current_state:in_steelsight() and is_single_shot then
-			addend = addend * managers.player:upgrade_value("player", "single_shot_accuracy_inc", 1)
-		end
 	end
 	return addend
 end
 
+function BlackMarketManager:accuracy_index_addend(name, category, sub_category, silencer, current_state, fire_mode, blueprint)
+	local index = 0
+	index = index + managers.player:upgrade_value("player", "weapon_accuracy_increase", 0)
+	if silencer then
+		index = index + managers.player:upgrade_value("weapon", "silencer_spread_index_addend", 0)
+		index = index + managers.player:upgrade_value(category, "silencer_spread_index_addend", 0)
+	end
+	if current_state and current_state._moving then
+		index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
+	end
+	if sub_category and silencer then
+		index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+	end
+	return index
+end
+
 function BlackMarketManager:accuracy_multiplier(name, category, sub_category, silencer, current_state, spread_moving, fire_mode, blueprint, is_single_shot)
 	local multiplier = 1
-	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "spread_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value(category, "spread_multiplier", 1))
-	if sub_category then
-		multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "spread_multiplier", 1))
-	end
-	multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", fire_mode .. "_spread_multiplier", 1))
-	multiplier = multiplier + (1 - managers.player:upgrade_value(name, "spread_multiplier", 1))
 	if silencer then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "silencer_spread_multiplier", 1))
 		multiplier = multiplier + (1 - managers.player:upgrade_value(category, "silencer_spread_multiplier", 1))
@@ -6035,38 +6042,9 @@ function BlackMarketManager:accuracy_multiplier(name, category, sub_category, si
 			multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "silencer_spread_multiplier", 1))
 		end
 	end
-	if current_state then
-		if current_state._moving then
-			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "move_spread_multiplier", 1))
-			if sub_category then
-				multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "move_spread_multiplier", 1))
-			end
-			multiplier = multiplier + (1 - managers.player:team_upgrade_value("weapon", "move_spread_multiplier", 1))
-			spread_moving = spread_moving and spread_moving * managers.player:upgrade_value("player", "weapon_movement_stability", 1)
-			multiplier = multiplier + (1 - (spread_moving or 1))
-		end
-		if current_state:in_steelsight() then
-			multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_steelsight" or "steelsight"])
-			if is_single_shot then
-			elseif category == "shotgun" then
-				multiplier = multiplier + (1 - managers.player:upgrade_value("shotgun", "steelsight_accuracy_inc", 1))
-			end
-		else
-			multiplier = multiplier + (1 - managers.player:upgrade_value(category, "hip_fire_spread_multiplier", 1))
-			if sub_category then
-				multiplier = multiplier + (1 - managers.player:upgrade_value(sub_category, "hip_fire_spread_multiplier", 1))
-			end
-			if current_state._state_data.ducking and not current_state._unit_deploy_position then
-				multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_crouching" or "crouching"])
-			else
-				multiplier = multiplier + (1 - tweak_data.weapon[name].spread[current_state._moving and "moving_standing" or "standing"])
-			end
-		end
-	end
 	if blueprint and self:is_weapon_modified(managers.weapon_factory:get_factory_id_by_weapon_id(name), blueprint) then
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_spread_multiplier", 1))
 	end
-	multiplier = multiplier + (1 - managers.player:get_property("desperado", 1))
 	return self:_convert_add_to_mul(multiplier)
 end
 
