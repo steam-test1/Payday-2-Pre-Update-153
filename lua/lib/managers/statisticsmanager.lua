@@ -761,7 +761,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	elseif completion == "fail" then
 		stats.heist_failed = {type = "int", value = 1}
 	end
-	stats.info_playing_linux = {
+	stats.info_playing_pc = {
 		type = "int",
 		method = "set",
 		value = 1

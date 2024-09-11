@@ -1005,6 +1005,14 @@ end
 
 SentryGunInteractionExt = SentryGunInteractionExt or class(UseInteractionExt)
 
+function SentryGunInteractionExt:can_select(player)
+	local result = SentryGunInteractionExt.super.super.can_select(self, player)
+	if managers.player:selected_equipment() and managers.player:selected_equipment().equipment ~= "sentry_gun" then
+		result = false
+	end
+	return result
+end
+
 function SentryGunInteractionExt:interact(player)
 	SentryGunInteractionExt.super.super.interact(self, player)
 	local equipped_wpn = managers.player:get_current_state():get_equipped_weapon()
