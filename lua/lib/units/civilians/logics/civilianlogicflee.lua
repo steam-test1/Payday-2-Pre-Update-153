@@ -772,7 +772,7 @@ function CivilianLogicFlee.reset_actions(data)
 end
 
 function CivilianLogicFlee._chk_add_delayed_rescue_SO(data, my_data)
-	if not my_data.exiting and not data.unit:anim_data().move and managers.groupai:state():rescue_state() then
+	if not my_data.exiting and not data.unit:anim_data().move and managers.groupai:state():rescue_state() and not data.unit:brain()._dont_rescue then
 		if not my_data.rescue_active then
 			CivilianLogicFlee._add_delayed_rescue_SO(data, my_data)
 		end

@@ -63,7 +63,7 @@ function ElementTimer:update_timer(t, dt)
 		self:on_executed()
 	end
 	for id, cb_data in pairs(self._triggers) do
-		if cb_data.time >= self._timer then
+		if cb_data.time >= self._timer and not cb_data.disabled then
 			cb_data.callback()
 			self:remove_trigger(id)
 		end
@@ -142,12 +142,24 @@ function ElementTimer:_pause_digital_guis()
 	end
 end
 
-function ElementTimer:add_trigger(id, time, callback)
-	self._triggers[id] = {time = time, callback = callback}
+function ElementTimer:add_trigger(id, time, callback, disabled)
+	self._triggers[id] = {
+		time = time,
+		callback = callback,
+		disabled = disabled
+	}
 end
 
 function ElementTimer:remove_trigger(id)
-	self._triggers[id] = nil
+	if not self._triggers[id].disabled then
+		self._triggers[id] = nil
+	end
+end
+
+function ElementTimer:enable_trigger(id)
+	if self._triggers[id] then
+		self._triggers[id].disabled = false
+	end
 end
 
 ElementTimerOperator = ElementTimerOperator or class(CoreMissionScriptElement.MissionScriptElement)
@@ -208,10 +220,18 @@ end
 function ElementTimerTrigger:activate_trigger()
 	for _, id in ipairs(self._values.elements) do
 		local element = self:get_mission_element(id)
-		element:add_trigger(self._id, self._values.time, callback(self, self, "on_executed"))
+		element:add_trigger(self._id, self._values.time, callback(self, self, "on_executed"), not self:enabled())
 	end
 end
 
 function ElementTimerTrigger:operation_add()
 	self:activate_trigger()
+end
+
+function ElementTimerTrigger:set_enabled(enabled)
+	ElementTimerTrigger.super.set_enabled(self, enabled)
+	for _, id in ipairs(self._values.elements) do
+		local element = self:get_mission_element(id)
+		element:enable_trigger(self._id)
+	end
 end

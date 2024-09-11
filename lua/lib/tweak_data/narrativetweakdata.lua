@@ -3845,6 +3845,131 @@ function NarrativeTweakData:init()
 		66000,
 		66000
 	}
+	self.jobs.short = {}
+	self.jobs.short.name_id = "heist_short"
+	self.jobs.short.briefing_id = "heist_short1_stage1_crimenet"
+	self.jobs.short.contact = "bain"
+	self.jobs.short.region = "street"
+	self.jobs.short.jc = 30
+	self.jobs.short.chain = {
+		{
+			level_id = "short1_stage1",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "short1_stage2",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "short2_stage1",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "short2_stage2b",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.short.briefing_event = "pln_sh11_cbf_01"
+	self.jobs.short.debrief_event = nil
+	self.jobs.short.crimenet_callouts = {
+		"pln_cs1_cnc_01",
+		"pln_cs1_cnc_02",
+		"pln_cs1_cnc_03"
+	}
+	self.jobs.short.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.short.payout = {
+		52000,
+		74000,
+		162000,
+		202000,
+		404000
+	}
+	self.jobs.short1 = {}
+	self.jobs.short1.name_id = "heist_short1"
+	self.jobs.short1.briefing_id = "heist_short1_crimenet"
+	self.jobs.short1.contact = "bain"
+	self.jobs.short1.region = "street"
+	self.jobs.short1.jc = 30
+	self.jobs.short1.chain = {
+		{
+			level_id = "short1_stage1",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "short1_stage2",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.short1.briefing_event = "pln_sh11_cbf_01"
+	self.jobs.short1.debrief_event = nil
+	self.jobs.short1.crimenet_callouts = {
+		"pln_cs1_cnc_01",
+		"pln_cs1_cnc_02",
+		"pln_cs1_cnc_03"
+	}
+	self.jobs.short1.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.short1.payout = {
+		26000,
+		37000,
+		81000,
+		101000,
+		202000
+	}
+	self.jobs.short2 = {}
+	self.jobs.short2.name_id = "heist_short2"
+	self.jobs.short2.briefing_id = "heist_short2_crimenet"
+	self.jobs.short2.contact = "bain"
+	self.jobs.short2.region = "street"
+	self.jobs.short2.jc = 30
+	self.jobs.short2.chain = {
+		{
+			level_id = "short2_stage1",
+			type_id = "heist_type_assault",
+			type = "d"
+		},
+		{
+			level_id = "short2_stage2b",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.short2.briefing_event = "pln_sh21_cbf_01"
+	self.jobs.short2.debrief_event = nil
+	self.jobs.short2.crimenet_callouts = {
+		"pln_cs1_cnc_01",
+		"pln_cs1_cnc_02",
+		"pln_cs1_cnc_03"
+	}
+	self.jobs.short2.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.short2.payout = {
+		26000,
+		37000,
+		81000,
+		101000,
+		202000
+	}
+	self.tutorials = {
+		{job = "short1"},
+		{job = "short2"}
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",

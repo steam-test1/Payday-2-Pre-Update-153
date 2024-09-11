@@ -1241,6 +1241,11 @@ function JobManager:get_max_jc_for_player()
 	return max_jc
 end
 
+function JobManager:is_forced()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	return level_data and level_data.force_equipment
+end
+
 function JobManager:is_current_job_competitive()
 	if not self._global.current_job then
 		return

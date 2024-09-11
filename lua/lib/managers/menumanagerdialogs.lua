@@ -895,14 +895,27 @@ function MenuManager:show_confirm_skillpoints(params)
 end
 
 function MenuManager:show_confirm_respec_skilltree(params)
-	local tree_name = managers.localization:text(tweak_data.skilltree.trees[params.tree].name_id)
-	local cost = managers.money:get_skilltree_tree_respec_cost(params.tree)
+	local tree_name = managers.localization:text(tweak_data.skilltree.skilltree[params.tree].name_id)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_skills_respec_title")
-	dialog_data.text = managers.localization:text("dialog_respec_skilltree", {
-		tree = tree_name,
-		cost = managers.experience:cash_string(cost)
-	})
+	dialog_data.text = managers.localization:text("dialog_respec_skilltree", {tree = tree_name})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	dialog_data.no_upper = true
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_confirm_respec_skilltree_all(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_skills_respec_title")
+	dialog_data.text = managers.localization:text("dialog_respec_skilltree_all")
 	dialog_data.focus_button = 2
 	local yes_button = {}
 	yes_button.text = managers.localization:text("dialog_yes")
@@ -1531,6 +1544,20 @@ function MenuManager:show_question_start_tutorial(params)
 	yes_button.callback_func = params.yes_func
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_no")
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_question_start_short_heist(params)
+	local dialog_data = {}
+	dialog_data.focus_button = 1
+	dialog_data.title = managers.localization:text("dialog_short_heist_title")
+	dialog_data.text = managers.localization:text("dialog_short_heist_text")
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_short_heist_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_short_heist_no")
 	dialog_data.button_list = {yes_button, no_button}
 	managers.system_menu:show(dialog_data)
 end

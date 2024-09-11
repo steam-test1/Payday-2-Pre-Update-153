@@ -562,6 +562,7 @@ function MenuInput:update(t, dt)
 					"menu_remove_skill",
 					"menu_toggle_voice_message",
 					"menu_respec_tree",
+					"menu_respec_tree_all",
 					"menu_switch_skillset",
 					"menu_modify_item",
 					"menu_preview_item",

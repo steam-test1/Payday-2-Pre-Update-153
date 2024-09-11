@@ -284,7 +284,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.damage_shake_multiplier = {0.5}
 	self.values.player.bleed_out_health_multiplier = {1.5}
 	self.values.shotgun.recoil_multiplier = {0.75}
-	self.values.shotgun.damage_multiplier = {1.1, 1.15}
+	self.values.shotgun.damage_multiplier = {1.05, 1.15}
 	self.values.ammo_bag.quantity = {1}
 	self.values.ammo_bag.ammo_increase = {2}
 	self.values.shotgun.reload_speed_multiplier = {1.15, 1.5}
@@ -676,7 +676,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.passive_health_regen = {0.03}
 	self.values.player.healing_reduction = {0.25, 0.5}
-	self.values.player.health_damage_reduction = {0.75, 0.4}
+	self.values.player.health_damage_reduction = {0.7, 0.4}
 	self.values.player.max_health_reduction = {0.3}
 	self.values.cable_tie.quantity_2 = {4}
 	self.ecm_feedback_retrigger_interval = 240
@@ -1219,8 +1219,8 @@ function UpgradesTweakData:_init_pd2_values()
 			}
 		},
 		shotgun_impact = {
-			{"8", "10%"},
-			{"15%"}
+			{"8", "5%"},
+			{"15%", "10%"}
 		},
 		show_of_force = {
 			{"50%"},

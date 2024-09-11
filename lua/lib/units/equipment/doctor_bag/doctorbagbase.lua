@@ -123,6 +123,7 @@ function DoctorBagBase:take(unit)
 	if 0 < taken then
 		unit:sound():play("pickup_ammo")
 		managers.network:session():send_to_peers_synched("sync_doctor_bag_taken", self._unit, taken)
+		managers.mission:call_global_event("player_refill_doctorbag")
 	end
 	if 0 >= self._amount then
 		self:_set_empty()

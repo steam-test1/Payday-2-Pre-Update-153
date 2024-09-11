@@ -1854,6 +1854,10 @@ function PlayerManager:availible_equipment(slot)
 end
 
 function PlayerManager:equipment_in_slot(slot)
+	local forced_deployable = managers.blackmarket:forced_deployable()
+	if forced_deployable then
+		return slot == 1 and forced_deployable ~= "none" and forced_deployable
+	end
 	return self._global.kit.equipment_slots[slot]
 end
 
@@ -1862,6 +1866,10 @@ function PlayerManager:set_equipment_in_slot(item, slot)
 end
 
 function PlayerManager:equipment_slots()
+	local forced_deployable = managers.blackmarket:forced_deployable()
+	if forced_deployable then
+		return forced_deployable ~= "none" and {forced_deployable} or {}
+	end
 	return self._global.kit.equipment_slots
 end
 
@@ -3793,21 +3801,36 @@ function PlayerManager:equipped_weapon_unit()
 	return nil
 end
 
+function PlayerManager:_is_all_in_custody(ignored_peer_id)
+	for _, peer in pairs(managers.network:session():all_peers()) do
+		if peer and alive(peer:unit()) and peer:id() ~= ignored_peer_id then
+			return false
+		end
+	end
+	for _, ai in pairs(managers.groupai:state():all_AI_criminals()) do
+		if ai and alive(ai.unit) then
+			return false
+		end
+	end
+	return true
+end
+
 function PlayerManager:on_enter_custody(_player)
 	local player = _player or self:player_unit()
 	if not player then
 		Application:error("[PlayerManager:on_enter_custody] Unable to get player")
 		return
 	end
+	managers.mission:call_global_event("player_in_custody")
 	local peer_id = managers.network:session():local_peer():id()
-	if self._has_super_syndrome then
+	if self._has_super_syndrome and managers.groupai:state():hostage_count() > 0 then
 		local pos = player:position()
+		self._custody_position = pos
 		if Network:is_client() then
-			managers.network:session():send_to_host("auto_respawn_player", pos, peer_id)
+			managers.network:session():send_to_host("auto_init_respawn_player", pos, peer_id)
 		else
 			self:init_auto_respawn_callback(pos, peer_id)
 		end
-		self._has_super_syndrome = false
 	end
 	self:force_drop_carry()
 	managers.statistics:downed({death = true})
@@ -3820,13 +3843,33 @@ function PlayerManager:on_enter_custody(_player)
 	World:delete_unit(player)
 end
 
-function PlayerManager:init_auto_respawn_callback(position, peer_id)
-	self._clbk_super_syndrome_respawn = "PlayerManager"
-	local game_time = TimerManager:game():time()
-	local clbk_delay = game_time + 5
-	local pause_trade = 10
-	managers.enemy:add_delayed_clbk(self._clbk_super_syndrome_respawn, callback(self, self, "clbk_super_syndrome_respawn", {pos = position, peer_id = peer_id}), clbk_delay)
-	managers.trade:pause_trade(pause_trade)
+function PlayerManager:captured_hostage()
+	if game_state_machine:current_state_name() == "ingame_waiting_for_respawn" then
+		local pos = self._custody_position or Vector3(0, 0, 0)
+		local peer_id = managers.network:session():local_peer():id()
+		if Network:is_client() then
+			managers.network:session():send_to_host("auto_init_respawn_player", pos, peer_id)
+		else
+			self:init_auto_respawn_callback(pos, peer_id)
+		end
+	end
+end
+
+function PlayerManager:init_auto_respawn_callback(position, peer_id, force)
+	if not self:_is_all_in_custody(peer_id) and not force then
+		if peer_id ~= 1 then
+			managers.network:session():all_peers()[peer_id]:send("start_super_syndrome_trade", position, peer_id)
+		elseif not self._coroutine_mgr:is_running("stockholm_syndrome_trade") then
+			self._coroutine_mgr:add_coroutine("stockholm_syndrome_trade", PlayerAction.StockholmSyndromeTrade, position, peer_id)
+		end
+	else
+		self._clbk_super_syndrome_respawn = "PlayerManager"
+		local game_time = TimerManager:game():time()
+		local clbk_delay = game_time + (force and 1 or 5)
+		local pause_trade = 10
+		managers.enemy:add_delayed_clbk(self._clbk_super_syndrome_respawn, callback(self, self, "clbk_super_syndrome_respawn", {pos = position, peer_id = peer_id}), clbk_delay)
+		managers.trade:pause_trade(pause_trade)
+	end
 end
 
 function PlayerManager:clbk_super_syndrome_respawn(data)

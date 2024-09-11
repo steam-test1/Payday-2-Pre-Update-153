@@ -498,6 +498,14 @@ function GuiTweakData:init()
 		webpage = "http://www.overkillsoftware.com/games/update100/",
 		image = "guis/textures/pd2/content_updates/update100"
 	}
+	local tutorial = {
+		id = "tutorial",
+		name_id = "menu_content_tutorial",
+		desc_id = "menu_content_tutorial_desc",
+		date_id = "menu_content_tutorial_date",
+		webpage = "http://steamcommunity.com/app/218620/allnews/",
+		image = "guis/textures/pd2/content_updates/tutorial"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -564,7 +572,8 @@ function GuiTweakData:init()
 			coco,
 			mad,
 			opera,
-			update100
+			update100,
+			tutorial
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -1647,15 +1656,6 @@ function GuiTweakData:init()
 			icon = "guis/textures/pd2/crimenet_marker_codex"
 		},
 		{
-			id = "challenge",
-			name_id = "menu_cn_challenge",
-			desc_id = "menu_cn_challenge_desc",
-			menu_node = "crimenet_contract_challenge",
-			x = 347,
-			y = 716,
-			icon = "guis/textures/pd2/crimenet_challenge"
-		},
-		{
 			id = "casino",
 			name_id = "menu_cn_casino",
 			desc_id = "menu_cn_casino_desc",
@@ -1665,6 +1665,27 @@ function GuiTweakData:init()
 			icon = "guis/textures/pd2/crimenet_casino",
 			unlock = "unlock_level",
 			pulse = false,
+			pulse_color = Color(204, 255, 209, 32) / 255
+		},
+		{
+			id = "challenge",
+			name_id = "menu_cn_challenge",
+			desc_id = "menu_cn_challenge_desc",
+			menu_node = "crimenet_contract_challenge",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_challenge"
+		},
+		{
+			id = "short",
+			name_id = "menu_cn_short",
+			desc_id = "menu_cn_short_desc",
+			menu_node = "crimenet_contract_short",
+			x = 332,
+			y = 646,
+			icon = "guis/textures/pd2/crimenet_tutorial",
+			pulse = true,
+			pulse_level = 10,
 			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
@@ -1772,7 +1793,7 @@ function GuiTweakData:init()
 				}
 			},
 			{
-				id = "jimmy",
+				id = "jimmy_contact",
 				name_id = "menu_jimmy",
 				{
 					desc_id = "menu_jimmy_desc_codex",
@@ -1935,21 +1956,21 @@ function GuiTweakData:init()
 				}
 			},
 			{
-				id = "sydney",
-				name_id = "menu_sydney",
-				{
-					desc_id = "menu_sydney_desc_codex",
-					videos = {"sydney1"},
-					post_event = "pln_contact_sydney"
-				}
-			},
-			{
 				id = "jimmy",
 				name_id = "menu_jimmy",
 				{
 					desc_id = "menu_jimmy_desc_codex",
 					videos = {"jimmy1"},
 					post_event = "pln_contact_jimmy"
+				}
+			},
+			{
+				id = "sydney",
+				name_id = "menu_sydney",
+				{
+					desc_id = "menu_sydney_desc_codex",
+					videos = {"sydney1"},
+					post_event = "pln_contact_sydney"
 				}
 			}
 		}

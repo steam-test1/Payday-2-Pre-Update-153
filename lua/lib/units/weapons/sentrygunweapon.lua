@@ -43,6 +43,10 @@ function SentryGunWeapon:init(unit)
 	self._to = Vector3()
 end
 
+function SentryGunWeapon:get_damage_multiplier()
+	return self._damage_multiplier or 1
+end
+
 function SentryGunWeapon:switch_fire_mode()
 	self:_switch_fire_mode()
 	if self._use_armor_piercing then
@@ -50,6 +54,8 @@ function SentryGunWeapon:switch_fire_mode()
 	else
 		managers.hint:show_hint("sentry_normal_ammo")
 	end
+	local add_contour = self._use_armor_piercing and self._unit:base():ap_contour_id() or self._unit:base():standard_contour_id()
+	self._unit:base():set_contour(add_contour)
 	managers.network:session():send_to_peers_synched("sentrygun_sync_state", self._unit)
 	self._unit:sound_source():post_event("wp_sentrygun_swap_ammo")
 end
@@ -148,16 +154,18 @@ function SentryGunWeapon:set_ammo(amount)
 	self._ammo_max = math.max(self._ammo_max, amount)
 end
 
+function SentryGunWeapon:_remove_contour()
+	local remove_contour = self._use_armor_piercing and "deployable_interactable" or "deployable_active"
+	self._unit:contour():remove(remove_contour)
+end
+
 function SentryGunWeapon:_setup_contour()
 	local turret_units = managers.groupai:state():turrets()
 	if turret_units and table.contains(turret_units, self._unit) then
 		return
 	end
 	if self._unit:contour() and self:out_of_ammo() then
-		self._unit:contour():remove("deployable_active")
-		if managers.player:has_category_upgrade("sentry_gun", "can_reload") then
-			self._unit:contour():add("deployable_disabled")
-		end
+		self._unit:base():set_contour("deployable_disabled")
 	end
 end
 

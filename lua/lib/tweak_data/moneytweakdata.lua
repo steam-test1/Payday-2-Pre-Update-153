@@ -209,6 +209,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.pal = 1
 	self.global_value_multipliers.coco = 1
 	self.global_value_multipliers.dbd_clan = 1
+	self.global_value_multipliers.dbd_deluxe = 1
+	self.global_value_multipliers.solus_clan = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -274,6 +276,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.pal = 0.2
 	self.global_value_bonus_multiplier.coco = 0.2
 	self.global_value_bonus_multiplier.dbd_clan = 0
+	self.global_value_bonus_multiplier.dbd_deluxe = 0.5
+	self.global_value_bonus_multiplier.solus_clan = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)

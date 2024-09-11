@@ -162,7 +162,19 @@ function MissionManager:init(...)
 		"pku_warhead",
 		"enemy_killed",
 		"pku_rambo",
-		"player_damaged"
+		"player_damaged",
+		"player_deploy_bodybagsbag",
+		"player_refill_bodybagsbag",
+		"player_deploy_doctorbag",
+		"player_refill_doctorbag",
+		"player_deploy_ecmjammer",
+		"player_pickup_bodybag",
+		"player_answer_pager",
+		"blue_loot_bags",
+		"player_release_ai",
+		"player_revive_ai",
+		"player_in_custody",
+		"ai_in_custody"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

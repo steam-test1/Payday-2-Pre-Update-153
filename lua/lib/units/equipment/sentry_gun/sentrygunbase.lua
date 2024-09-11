@@ -3,6 +3,7 @@ SentryGunBase = SentryGunBase or class(UnitBase)
 function SentryGunBase:init(unit)
 	SentryGunBase.super.init(self, unit, false)
 	self._unit = unit
+	self._current_contour_id = self:standard_contour_id()
 	if self._place_snd_event then
 		self._unit:sound_source():post_event(self._place_snd_event)
 	end
@@ -32,7 +33,9 @@ end
 
 function SentryGunBase:set_owner_id(owner_id)
 	self._owner_id = owner_id
-	self._unit:interaction():set_owner_id(owner_id)
+	if self._unit:interaction() then
+		self._unit:interaction():set_owner_id(owner_id)
+	end
 	self:_setup_contour()
 end
 
@@ -45,11 +48,24 @@ function SentryGunBase:_setup_contour()
 	if turret_units and table.contains(turret_units, self._unit) then
 		return
 	end
-	if managers.player:has_category_upgrade("sentry_gun", "can_reload") then
-		self._unit:contour():add("deployable_interactable")
-	elseif self:is_owner() then
-		self._unit:contour():add("deployable_active")
+	if self:is_owner() then
+		self:set_contour(self:standard_contour_id())
 	end
+end
+
+function SentryGunBase:standard_contour_id()
+	return self._standard_contour_id or "deployable_active"
+end
+
+function SentryGunBase:ap_contour_id()
+	return self._ap_contour_id or "deployable_interactable"
+end
+
+function SentryGunBase:set_contour(contour_id)
+	local contour = self._unit:contour()
+	contour:remove(self._current_contour_id)
+	contour:add(contour_id)
+	self._current_contour_id = contour_id
 end
 
 function SentryGunBase:post_init()
@@ -124,7 +140,7 @@ function SentryGunBase:spawn_from_sequence(align_obj_name, module_id)
 		return
 	end
 	local unit
-	unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry"), pos, rot)
+	unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry_placement"), pos, rot)
 	unit:base():setup(managers.player:player_unit(), 1, 1, 1, 1, 1, false, attached_data)
 	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, 0)
 	managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), 0, unit, unit:movement()._rot_speed_mul, unit:weapon()._setup.spread_mul, false, self._damage_multiplier)
@@ -199,7 +215,9 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 		local peer = managers.network:session():peer_by_unit(owner)
 		if peer then
 			self._owner_id = peer:id()
-			self._unit:interaction():set_owner_id(self._owner_id)
+			if self._unit:interaction() then
+				self._unit:interaction():set_owner_id(self._owner_id)
+			end
 		end
 	end
 	self._unit:movement():setup(rot_speed_multiplier)
@@ -490,7 +508,7 @@ function SentryGunBase:enable_shield()
 end
 
 function SentryGunBase:has_shield()
-	return self._has_shield
+	return self._has_shield or false
 end
 
 function SentryGunBase:unregister()
@@ -537,4 +555,5 @@ function SentryGunBase:pre_destroy()
 		managers.enemy:remove_delayed_clbk(self._validate_clbk_id)
 		self._validate_clbk_id = nil
 	end
+	self._unit:event_listener():call("on_destroy_unit")
 end

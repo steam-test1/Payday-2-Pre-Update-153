@@ -4637,6 +4637,21 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.dbd_deluxe = {}
+	self.dbd_deluxe.dlc = "has_dbd_deluxe"
+	self.dbd_deluxe.content = {}
+	self.dbd_deluxe.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dbd_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "dbd_03",
+			amount = 1
+		}
+	}
 	self.pdcon_2015 = {}
 	self.pdcon_2015.content = {}
 	self.pdcon_2015.content.loot_drops = {
@@ -4696,6 +4711,20 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "dbd_slasher",
+			amount = 1
+		}
+	}
+	self.solus_clan = {}
+	self.solus_clan.content = {}
+	self.solus_clan.content.loot_drops = {}
+	self.solus_clan_award = {}
+	self.solus_clan_award.dlc = "has_solus_clan"
+	self.solus_clan_award.content = {}
+	self.solus_clan_award.content.loot_global_value = "solus_clan"
+	self.solus_clan_award.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "solus",
 			amount = 1
 		}
 	}

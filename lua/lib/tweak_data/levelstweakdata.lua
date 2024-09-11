@@ -1177,6 +1177,94 @@ function LevelsTweakData:init()
 	self.mad.package = "packages/lvl_mad"
 	self.mad.cube = "cube_apply_heist_bank"
 	self.mad.ai_group_type = russia
+	self.short1_stage1 = {}
+	self.short1_stage1.name_id = "heist_short1_stage1_hl"
+	self.short1_stage1.briefing_id = "heist_short1_stage1_briefing"
+	self.short1_stage1.briefing_dialog = "Play_pln_sh11_brf_01"
+	self.short1_stage1.world_name = "narratives/short1/stage1"
+	self.short1_stage1.intro_event = "Play_pln_sh11_intro_01"
+	self.short1_stage1.outro_event = "Play_pln_sh11_30"
+	self.short1_stage1.music = "heist"
+	self.short1_stage1.package = "packages/job_short1_stage1"
+	self.short1_stage1.cube = "cube_apply_heist_bank"
+	self.short1_stage1.force_equipment = {
+		character = "russian",
+		primary = "wpn_fps_ass_amcar",
+		primary_mods = {
+			"wpn_fps_upg_ns_ass_smg_small"
+		},
+		secondary = "wpn_fps_pis_g17",
+		secondary_mods = {
+			"wpn_fps_upg_ns_pis_medium"
+		},
+		armor = "level_1",
+		deployable = "none",
+		throwable = "none",
+		melee = "none"
+	}
+	self.short1_stage2 = {}
+	self.short1_stage2.name_id = "heist_short1_stage2_hl"
+	self.short1_stage2.briefing_id = "heist_short1_stage2_briefing"
+	self.short1_stage2.briefing_dialog = "Play_pln_sh12_brf_01"
+	self.short1_stage2.world_name = "narratives/short1/stage2"
+	self.short1_stage2.intro_event = "Play_pln_sh12_intro_01"
+	self.short1_stage2.outro_event = "Play_pln_sh12_30"
+	self.short1_stage2.music = "heist"
+	self.short1_stage2.package = "packages/job_short1_stage2"
+	self.short1_stage2.cube = "cube_apply_heist_bank"
+	self.short1_stage2.force_equipment = {
+		character = "russian",
+		primary = "wpn_fps_ass_amcar",
+		primary_mods = {
+			"wpn_fps_upg_ns_ass_smg_small"
+		},
+		secondary = "wpn_fps_pis_g17",
+		secondary_mods = {
+			"wpn_fps_upg_ns_pis_medium"
+		},
+		armor = "level_1",
+		deployable = "ecm_jammer",
+		throwable = "none",
+		melee = "none"
+	}
+	self.short2_stage1 = {}
+	self.short2_stage1.name_id = "heist_short2_stage1_hl"
+	self.short2_stage1.briefing_id = "heist_short2_stage1_briefing"
+	self.short2_stage1.briefing_dialog = "Play_pln_sh21_brf_01"
+	self.short2_stage1.world_name = "narratives/short2/stage1"
+	self.short2_stage1.intro_event = "Play_pln_sh21_intro_01"
+	self.short2_stage1.outro_event = "Play_rb4_sh21_06"
+	self.short2_stage1.music = "heist"
+	self.short2_stage1.package = "packages/job_short2_stage1"
+	self.short2_stage1.cube = "cube_apply_heist_bank"
+	self.short2_stage1.force_equipment = {
+		character = "russian",
+		primary = "wpn_fps_ass_amcar",
+		secondary = "wpn_fps_pis_g17",
+		armor = "level_4",
+		deployable = "none",
+		throwable = "none",
+		melee = "none"
+	}
+	self.short2_stage2b = {}
+	self.short2_stage2b.name_id = "heist_short2_stage2b_hl"
+	self.short2_stage2b.briefing_id = "heist_short2_stage2b_briefing"
+	self.short2_stage2b.briefing_dialog = "Play_pln_sh22_brf_01"
+	self.short2_stage2b.world_name = "narratives/short2/stage2"
+	self.short2_stage2b.intro_event = "Play_dr1_a01"
+	self.short2_stage2b.outro_event = "Play_rb4_sh22_05"
+	self.short2_stage2b.music = "heist"
+	self.short2_stage2b.package = "packages/job_short2_stage2b"
+	self.short2_stage2b.cube = "cube_apply_heist_bank"
+	self.short2_stage2b.force_equipment = {
+		character = "russian",
+		primary = "wpn_fps_ass_amcar",
+		secondary = "wpn_fps_pis_g17",
+		armor = "level_4",
+		deployable = "doctor_bag",
+		throwable = "none",
+		melee = "none"
+	}
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1254,7 +1342,11 @@ function LevelsTweakData:init()
 		"nail",
 		"man",
 		"dark",
-		"mad"
+		"mad",
+		"short1_stage1",
+		"short1_stage2",
+		"short2_stage1",
+		"short2_stage2b"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

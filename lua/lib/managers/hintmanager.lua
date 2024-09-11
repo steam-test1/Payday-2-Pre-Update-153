@@ -87,6 +87,10 @@ function HintManager:_show_hint(id, time, params)
 		self._last_shown_id = id
 		params = params or {}
 		params.BTN_INTERACT = managers.localization:btn_macro("interact")
+		params.BTN_USE_ITEM = managers.localization:btn_macro("use_item")
+		params.BTN_CROUCH = managers.localization:btn_macro("duck")
+		params.BTN_STATS_VIEW = managers.localization:btn_macro("stats_screen")
+		params.BTN_SWITCH_WEAPON = managers.localization:btn_macro("switch_weapon")
 		managers.hud:show_hint({
 			text = managers.localization:text(self:hint(id).text_id, params),
 			event = self:hint(id).event,
@@ -97,7 +101,11 @@ end
 
 function HintManager:sync_show_hint(id)
 	local buttons = {
-		BTN_INTERACT = managers.localization:btn_macro("interact")
+		BTN_INTERACT = managers.localization:btn_macro("interact"),
+		BTN_USE_ITEM = managers.localization:btn_macro("use_item"),
+		BTN_CROUCH = managers.localization:btn_macro("duck"),
+		BTN_STATS_VIEW = managers.localization:btn_macro("stats_screen"),
+		BTN_SWITCH_WEAPON = managers.localization:btn_macro("switch_weapon")
 	}
 	self:_show_hint(id, nil, buttons)
 end

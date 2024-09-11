@@ -108,6 +108,7 @@ function PlayerEquipment:use_doctor_bag()
 		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.no_we_cant.mask then
 			managers.achievment:award_progress(tweak_data.achievement.no_we_cant.stat)
 		end
+		managers.mission:call_global_event("player_deploy_doctorbag")
 		managers.statistics:use_doctor_bag()
 		local upgrade_lvl = managers.player:upgrade_level("first_aid_kit", "damage_reduction_upgrade")
 		local amount_upgrade_lvl = managers.player:upgrade_level("doctor_bag", "amount_increase")
@@ -170,6 +171,7 @@ function PlayerEquipment:use_bodybags_bag()
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
 		PlayerStandard.say_line(self, "s13")
+		managers.mission:call_global_event("player_deploy_bodybagsbag")
 		managers.statistics:use_body_bag()
 		local amount_upgrade_lvl = 0
 		if Network:is_client() then
@@ -188,6 +190,7 @@ function PlayerEquipment:use_ecm_jammer()
 	end
 	local ray = self:valid_look_at_placement()
 	if ray then
+		managers.mission:call_global_event("player_deploy_ecmjammer")
 		managers.statistics:use_ecm_jammer()
 		local duration_multiplier = managers.player:upgrade_value("ecm_jammer", "duration_multiplier", 1) * managers.player:upgrade_value("ecm_jammer", "duration_multiplier_2", 1)
 		if Network:is_client() then

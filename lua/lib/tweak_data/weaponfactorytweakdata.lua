@@ -14872,6 +14872,7 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_sho_spas12",
 		"wpn_fps_shot_b682",
 		"wpn_fps_sho_aa12",
+		"wpn_fps_sho_boot",
 		"wpn_fps_shot_m37"
 	}
 	for _, factory_id in ipairs(weapons) do

@@ -966,6 +966,35 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.dbd_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
 	self.global_values.dbd_clan.sort_number = 2
 	self.global_values.dbd_clan.category = SystemInfo:distribution() ~= Idstring("STEAM") and "normal" or "pd2_clan"
+	self.global_values.dbd_deluxe = {}
+	self.global_values.dbd_deluxe.name_id = "bm_global_value_dbd_deluxe"
+	self.global_values.dbd_deluxe.desc_id = "menu_l_global_value_dbd_deluxe"
+	self.global_values.dbd_deluxe.unlock_id = "bm_global_value_dbd_deluxe_unlock"
+	self.global_values.dbd_deluxe.color = Color(255, 255, 212, 0) / 255
+	self.global_values.dbd_deluxe.dlc = true
+	self.global_values.dbd_deluxe.chance = 1
+	self.global_values.dbd_deluxe.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "dbd_deluxe")
+	self.global_values.dbd_deluxe.durability_multiplier = 1
+	self.global_values.dbd_deluxe.drops = true
+	self.global_values.dbd_deluxe.track = true
+	self.global_values.dbd_deluxe.sort_number = 90
+	self.global_values.dbd_deluxe.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.dbd_deluxe.category = "collaboration"
+	self.global_values.solus_clan = {}
+	self.global_values.solus_clan.name_id = "bm_global_value_solus_clan"
+	self.global_values.solus_clan.desc_id = "menu_l_global_value_solus_clan"
+	self.global_values.solus_clan.unlock_id = "bm_global_value_solus_clan_unlock"
+	self.global_values.solus_clan.color = Color(255, 59, 174, 254) / 255
+	self.global_values.solus_clan.dlc = true
+	self.global_values.solus_clan.chance = 1
+	self.global_values.solus_clan.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "solus_clan")
+	self.global_values.solus_clan.durability_multiplier = 1
+	self.global_values.solus_clan.drops = true
+	self.global_values.solus_clan.track = true
+	self.global_values.solus_clan.sort_number = -100
+	self.global_values.solus_clan.unique_lock_icon = "guis/textures/pd2/lock_community"
+	self.global_values.solus_clan.sort_number = 2
+	self.global_values.solus_clan.category = SystemInfo:distribution() ~= Idstring("STEAM") and "normal" or "pd2_clan"
 	self.global_values.legendary = {}
 	self.global_values.legendary.name_id = "bm_global_value_legendary"
 	self.global_values.legendary.desc_id = "menu_l_global_value_legendary"
@@ -1034,7 +1063,9 @@ function LootDropTweakData:init(tweak_data)
 		"peta",
 		"pal",
 		"dbd_clan",
-		"opera"
+		"dbd_deluxe",
+		"opera",
+		"solus_clan"
 	}
 	self:_create_global_value_list_map()
 end

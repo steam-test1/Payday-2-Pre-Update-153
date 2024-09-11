@@ -84,6 +84,9 @@ function OverlayEffectManager:progress_effects(t, dt, paused)
 			else
 				self._ws:panel():remove(effect.rectangle)
 				self._ws:panel():remove(effect.text)
+				if effect.video then
+					self._ws:panel():remove(effect.video)
+				end
 				self._playing_effects[key] = nil
 			end
 			if new_alpha then
@@ -177,6 +180,19 @@ function OverlayEffectManager:play_effect(data)
 			current_alpha = spawn_alpha,
 			gradient_points = data.gradient_points
 		}
+		if data.video then
+			effect.video = self._ws:panel():video({
+				video = data.video,
+				width = data.video_width,
+				height = data.video_height,
+				loop = false,
+				layer = self._default_layer + 1,
+				align = "center",
+				halign = "center",
+				valign = "center",
+				vertical = "center"
+			})
+		end
 		for key, value in pairs(data) do
 			effect.data[key] = value
 		end
@@ -196,12 +212,18 @@ function OverlayEffectManager:stop_effect(id)
 		if self._playing_effects[id] then
 			self._ws:panel():remove(self._playing_effects[id].rectangle)
 			self._ws:panel():remove(self._playing_effects[id].text)
+			if self._playing_effects[id].video then
+				self._ws:panel():remove(self._playing_effects[id].video)
+			end
 			self._playing_effects[id] = nil
 		end
 	else
 		for key, effect in pairs(self._playing_effects) do
 			self._ws:panel():remove(effect.rectangle)
 			self._ws:panel():remove(effect.text)
+			if effect.video then
+				self._ws:panel():remove(effect.video)
+			end
 			self._playing_effects[key] = nil
 		end
 	end

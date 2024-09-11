@@ -122,6 +122,7 @@ function BodyBagsBagBase:take_bodybag(unit)
 		managers.player:add_body_bags_amount(1)
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", 1)
 		self._bodybag_amount = self._bodybag_amount - 1
+		managers.mission:call_global_event("player_refill_bodybagsbag")
 	end
 	if 0 >= self._bodybag_amount then
 		self:_set_empty()

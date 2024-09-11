@@ -253,6 +253,10 @@ function BlackMarketManager:equipped_item(category)
 end
 
 function BlackMarketManager:equipped_character()
+	local forced_character = self:forced_character()
+	if forced_character then
+		return forced_character
+	end
 	for character_id, data in pairs(tweak_data.blackmarket.characters) do
 		if Global.blackmarket_manager.characters[character_id].equipped then
 			return character_id
@@ -300,6 +304,10 @@ function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
 	for armor_id, data in pairs(tweak_data.blackmarket.armors) do
 		armor = Global.blackmarket_manager.armors[armor_id]
 		if armor.equipped and armor.unlocked and armor.owned then
+			local forced_armor = self:forced_armor()
+			if forced_armor then
+				return forced_armor
+			end
 			return armor_id
 		end
 	end
@@ -311,6 +319,14 @@ function BlackMarketManager:equipped_projectile()
 end
 
 function BlackMarketManager:equipped_grenade()
+	local forced_throwable = self:forced_throwable()
+	if forced_throwable then
+		if forced_throwable == "none" then
+			return self._defaults.grenade, 0
+		else
+			return forced_throwable, Global.blackmarket_manager.grenades[forced_throwable].amount
+		end
+	end
 	local grenade
 	for grenade_id, data in pairs(tweak_data.blackmarket.projectiles) do
 		grenade = Global.blackmarket_manager.grenades[grenade_id]
@@ -349,6 +365,10 @@ function BlackMarketManager:equipped_melee_weapon_damage_info(lerp_value)
 end
 
 function BlackMarketManager:equipped_secondary()
+	local forced_secondary = self:forced_secondary()
+	if forced_secondary then
+		return forced_secondary
+	end
 	if not Global.blackmarket_manager.crafted_items.secondaries then
 		self:aquire_default_weapons()
 	end
@@ -362,6 +382,10 @@ function BlackMarketManager:equipped_secondary()
 end
 
 function BlackMarketManager:equipped_primary()
+	local forced_primary = self:forced_primary()
+	if forced_primary then
+		return forced_primary
+	end
 	if not Global.blackmarket_manager.crafted_items.primaries then
 		self:aquire_default_weapons()
 	end
@@ -1691,6 +1715,17 @@ function BlackMarketManager:get_mask_name_by_category_slot(category, slot)
 end
 
 function BlackMarketManager:get_weapon_name_by_category_slot(category, slot)
+	if category == "primaries" then
+		local forced_primary = self:forced_primary()
+		if forced_primary then
+			return managers.weapon_factory:get_weapon_name_by_factory_id(forced_primary.factory_id)
+		end
+	else
+		local forced_secondary = self:forced_secondary()
+		if forced_secondary then
+			return managers.weapon_factory:get_weapon_name_by_factory_id(forced_secondary.factory_id)
+		end
+	end
 	local crafted_slot = self:get_crafted_category_slot(category, slot)
 	if crafted_slot then
 		local cosmetics = crafted_slot.cosmetics
@@ -3776,6 +3811,10 @@ function BlackMarketManager:num_preferred_characters()
 end
 
 function BlackMarketManager:get_preferred_character(index)
+	local forced_character = self:forced_character()
+	if forced_character then
+		return forced_character
+	end
 	return self._global._preferred_characters and self._global._preferred_characters[index or 1] or self._global._preferred_character or self._defaults.preferred_character
 end
 
@@ -6117,6 +6156,74 @@ function BlackMarketManager:recoil_multiplier(name, category, sub_category, sile
 		multiplier = multiplier + (1 - managers.player:upgrade_value("weapon", "modded_recoil_multiplier", 1))
 	end
 	return self:_convert_add_to_mul(multiplier)
+end
+
+function BlackMarketManager:forced_character()
+	if managers.network and managers.network:session() then
+		local level_data = tweak_data.levels[managers.job:current_level_id()]
+		if level_data and level_data.force_equipment then
+			local peer = managers.network:session():local_peer()
+			if peer and peer:character() ~= level_data.force_equipment.character then
+				peer:set_character(level_data.force_equipment.character)
+			end
+			return level_data.force_equipment.character
+		end
+	end
+end
+
+function BlackMarketManager:forced_primary()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	local items = level_data and level_data.force_equipment
+	if items and items.primary then
+		local blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(items.primary))
+		if items.primary_mods then
+			for _, mod in pairs(items.primary_mods) do
+				table.insert(blueprint, mod)
+			end
+		end
+		return {
+			factory_id = items.primary,
+			blueprint = blueprint,
+			weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(items.primary),
+			global_values = {},
+			equipped = true
+		}
+	end
+end
+
+function BlackMarketManager:forced_secondary()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	local items = level_data and level_data.force_equipment
+	if items and items.secondary then
+		local blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(items.secondary))
+		if items.secondary_mods then
+			for _, mod in pairs(items.secondary_mods) do
+				table.insert(blueprint, mod)
+			end
+		end
+		return {
+			factory_id = items.secondary,
+			blueprint = blueprint,
+			weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(items.secondary),
+			global_values = {},
+			equipped = true
+		}
+	end
+end
+
+function BlackMarketManager:forced_armor()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	return level_data and level_data.force_equipment and level_data.force_equipment.armor
+end
+
+function BlackMarketManager:forced_deployable()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	return level_data and level_data.force_equipment and level_data.force_equipment.deployable
+end
+
+function BlackMarketManager:forced_throwable()
+	local level_data = tweak_data.levels[managers.job:current_level_id()]
+	return level_data and level_data.force_equipment and level_data.force_equipment.throwable
 end
 
 function BlackMarketManager:check_frog_1()

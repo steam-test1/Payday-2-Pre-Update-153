@@ -767,6 +767,16 @@ function ConnectionNetworkHandler:set_auto_assault_ai_trade(character_name, time
 	managers.trade:sync_set_auto_assault_ai_trade(character_name, time)
 end
 
-function ConnectionNetworkHandler:auto_respawn_player(pos, peer_id)
+function ConnectionNetworkHandler:auto_init_respawn_player(pos, peer_id)
 	managers.player:init_auto_respawn_callback(pos, peer_id)
+end
+
+function ConnectionNetworkHandler:auto_respawn_player(pos, peer_id)
+	managers.player:clbk_super_syndrome_respawn({pos = pos, peer_id = peer_id})
+end
+
+function ConnectionNetworkHandler:start_super_syndrome_trade(pos, peer_id)
+	if not managers.player._coroutine_mgr:is_running("stockholm_syndrome_trade") then
+		managers.player._coroutine_mgr:add_coroutine("stockholm_syndrome_trade", PlayerAction.StockholmSyndromeTrade, pos, peer_id)
+	end
 end

@@ -2068,6 +2068,9 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 			local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
 			self._item_image:set_size(sw, sh)
 			self._item_image:set_center(self._item_panel:w() / 2, self._item_panel:h() / 2)
+			if managers.job:is_forced() then
+				self._item_image:set_color(Color.black)
+			end
 		elseif params.dual_texture_1 and params.dual_texture_2 then
 			if DB:has(Idstring("texture"), params.dual_texture_1) then
 				self._item_image1 = self._item_panel:bitmap({
@@ -2081,6 +2084,9 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 				local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
 				self._item_image1:set_size(sw * 0.5, sh * 0.5)
 				self._item_image1:set_center(self._item_panel:w() * 0.5, self._item_panel:h() * 0.35)
+				if managers.job:is_forced() then
+					self._item_image1:set_color(Color.black)
+				end
 			end
 			if DB:has(Idstring("texture"), params.dual_texture_2) then
 				self._item_image2 = self._item_panel:bitmap({
@@ -2094,6 +2100,9 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 				local sh = math.min(self._item_panel:h(), self._item_panel:w() / aspect)
 				self._item_image2:set_size(sw * 0.5, sh * 0.5)
 				self._item_image2:set_center(self._item_panel:w() * 0.5, self._item_panel:h() * 0.65)
+				if managers.job:is_forced() then
+					self._item_image2:set_color(Color.black)
+				end
 			end
 		end
 		if params.item_bg_texture and DB:has(Idstring("texture"), params.item_bg_texture) then
@@ -2148,6 +2157,17 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 			end
 		end
 		self._params = params
+	end
+	if managers.job:is_forced() then
+		local lock = self._item_panel:bitmap({
+			name = "lock",
+			texture = "guis/textures/pd2/skilltree/padlock",
+			w = 32,
+			h = 32,
+			color = tweak_data.screen_colors.text,
+			layer = 2
+		})
+		lock:set_center(self._item_panel:center_x(), self._item_panel:center_y())
 	end
 	self:deselect_item()
 end
@@ -2268,6 +2288,9 @@ function NewLoadoutTab:mouse_pressed(button, x, y)
 end
 
 function NewLoadoutTab:confirm_pressed()
+	if managers.job:is_forced() then
+		return
+	end
 	if self._item_selected then
 		self:open_node(self._item_selected)
 		return true

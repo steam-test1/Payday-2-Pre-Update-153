@@ -2598,6 +2598,22 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.dbd_01.texture_bundle_folder = "boo_1"
 	self.masks.dbd_01.dlc = "dbd_clan"
 	self.masks.dbd_01.sort_number = 19
+	self.masks.dbd_02 = {}
+	self.masks.dbd_02.unit = "units/pd2_dlc_boo_2/masks/msk_dbd_02"
+	self.masks.dbd_02.name_id = "bm_msk_dbd_02"
+	self.masks.dbd_02.pcs = {}
+	self.masks.dbd_02.value = 0
+	self.masks.dbd_02.texture_bundle_folder = "boo_2"
+	self.masks.dbd_02.dlc = "dbd_deluxe"
+	self.masks.dbd_02.sort_number = 20
+	self.masks.dbd_03 = {}
+	self.masks.dbd_03.unit = "units/pd2_dlc_boo_3/masks/msk_dbd_03"
+	self.masks.dbd_03.name_id = "bm_msk_dbd_03"
+	self.masks.dbd_03.pcs = {}
+	self.masks.dbd_03.value = 0
+	self.masks.dbd_03.texture_bundle_folder = "boo_3"
+	self.masks.dbd_03.dlc = "dbd_deluxe"
+	self.masks.dbd_03.sort_number = 21
 	self.masks.dbd_04 = {}
 	self.masks.dbd_04.unit = "units/pd2_dlc_boo/masks/dbd_04/msk_boo_dbd_04"
 	self.masks.dbd_04.name_id = "bm_msk_dbd_00"
@@ -2636,5 +2652,13 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.sydney_begins.dlc = "opera"
 	self.masks.sydney_begins.texture_bundle_folder = "opera"
 	self.masks.sydney_begins.sort_number = 19
+	self.masks.solus = {}
+	self.masks.solus.unit = "units/pd2_dlc_solus/masks/msk_solus"
+	self.masks.solus.name_id = "bm_msk_solus"
+	self.masks.solus.pcs = {}
+	self.masks.solus.value = 0
+	self.masks.solus.texture_bundle_folder = "solus"
+	self.masks.solus.sort_number = 32
+	self.masks.solus.dlc = "solus_clan"
 	self:_add_desc_from_name_macro(self.masks)
 end

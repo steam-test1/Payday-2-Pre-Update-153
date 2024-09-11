@@ -281,7 +281,10 @@ function SentryGunDamage:die()
 		self._unit:contour():remove("mark_unit_friendly", true)
 		self._unit:contour():remove("mark_unit_dangerous", true)
 		managers.groupai:state():unregister_turret(self._unit)
+	elseif alive(self._unit) then
+		self._turret_destroyed_snd = self._unit:sound_source():post_event("wp_sentrygun_broken_loop")
 	end
+	self._unit:event_listener():call("on_death")
 end
 
 function SentryGunDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit_offset_height, variant, death)
@@ -395,6 +398,7 @@ function SentryGunDamage:_apply_damage(damage, dmg_shield, dmg_body, is_local)
 		else
 			self._health = self._health - body_damage
 		end
+		self._unit:event_listener():call("on_damage_received", self:health_ratio())
 		if not tweak_data.weapon[self._unit:base():get_name_id()].AUTO_REPAIR and not self._dead and 0.75 <= previous_health_ratio and self:health_ratio() < 0.75 and self._damaged_sequence_name then
 			self._unit:damage():run_sequence_simple(self._damaged_sequence_name)
 		end

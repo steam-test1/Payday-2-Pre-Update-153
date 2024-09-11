@@ -1050,6 +1050,9 @@ function CopLogicBase._evaluate_reason_to_surrender(data, my_data, aggressor_uni
 	if not surrender_tweak then
 		return
 	end
+	if surrender_tweak.base_chance >= 1 then
+		return 0
+	end
 	local t = data.t
 	if data.surrender_window and t > data.surrender_window.window_expire_t then
 		data.unit:brain():on_surrender_chance()

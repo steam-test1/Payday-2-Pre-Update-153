@@ -1985,7 +1985,7 @@ function CrimeNetGui:add_special_contracts(no_casino)
 			gui_data.server = true
 			gui_data.special_node = special_contract.menu_node
 			gui_data.dlc = special_contract.dlc
-			if special_contract.pulse then
+			if special_contract.pulse and (not special_contract.pulse_level or special_contract.pulse_level >= managers.experience:current_level() and managers.experience:current_rank() == 0) then
 				local animate_pulse = function(o)
 					while true do
 						over(1, function(p)

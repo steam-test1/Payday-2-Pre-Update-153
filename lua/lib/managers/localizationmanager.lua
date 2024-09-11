@@ -98,6 +98,8 @@ function LocalizationManager:_setup_macros()
 	self:set_default_macro("BTN_PADLOCK", btn_padlock)
 	self:set_default_macro("BTN_STAT_BOOST", btn_stat_boost)
 	self:set_default_macro("BTN_TEAM_BOOST", btn_team_boost)
+	self:set_default_macro("BTN_SWITCH_WEAPON", btn_y)
+	self:set_default_macro("BTN_STATS_VIEW", btn_back)
 end
 
 local is_PS3 = SystemInfo:platform() == Idstring("PS3")

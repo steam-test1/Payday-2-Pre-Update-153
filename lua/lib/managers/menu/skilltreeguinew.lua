@@ -30,6 +30,7 @@ local PAGE_TAB_H = medium_font_size + 10
 NewSkillTreeGui = NewSkillTreeGui or class()
 
 function NewSkillTreeGui:init(ws, fullscreen_ws, node)
+	self._event_listener = EventListenerHolder:new()
 	self._skilltree = managers.skilltree
 	managers.menu:active_menu().renderer.ws:hide()
 	self._ws = ws
@@ -43,6 +44,11 @@ function NewSkillTreeGui:init(ws, fullscreen_ws, node)
 	managers.menu_component:close_contract_gui()
 	self:_setup()
 	self:set_layer(5)
+	self._event_listener:add(self, {"refresh"}, callback(self, self, "_on_refresh_event"))
+end
+
+function NewSkillTreeGui:event_listener()
+	return self._event_listener
 end
 
 function NewSkillTreeGui:_setup()
@@ -300,6 +306,11 @@ function NewSkillTreeGui:set_skill_point_text(skill_points)
 	local color = 0 < skill_points and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1
 	self._skill_points_title_text:set_color(color)
 	self._skill_points_text:set_color(color)
+end
+
+function NewSkillTreeGui:_on_refresh_event()
+	local points = self._skilltree:points()
+	self:set_skill_point_text(points)
 end
 
 function NewSkillTreeGui:_rec_round_object(object)
@@ -788,31 +799,50 @@ end
 function NewSkillTreeGui:on_points_spent()
 end
 
-function NewSkillTreeGui:respec_active_tree()
-	if not managers.money:can_afford_respec_skilltree(self._active_tree) or self._skilltree:points_spent(self._active_tree) == 0 then
-		return
-	end
-	self:respec_tree(self._active_tree)
+function NewSkillTreeGui:respec_page(page)
+	local params = {}
+	params.tree = page:name()
+	params.yes_func = callback(self, self, "_dialog_respec_trees_yes", page:trees_idx())
+	params.no_func = callback(self, self, "_dialog_respec_no")
+	managers.menu:show_confirm_respec_skilltree(params)
+end
+
+function NewSkillTreeGui:respec_all()
+	local params = {}
+	params.yes_func = callback(self, self, "_dialog_respec_all_yes")
+	params.no_func = callback(self, self, "_dialog_respec_no")
+	managers.menu:show_confirm_respec_skilltree_all(params)
 end
 
 function NewSkillTreeGui:respec_tree(tree)
 	local params = {}
 	params.tree = tree
-	params.yes_func = callback(self, self, "_dialog_respec_yes", tree)
-	params.no_func = callback(self, self, "_dialog_respec_no")
-	managers.menu:show_confirm_respec_skilltree(params)
 end
 
-function NewSkillTreeGui:_dialog_respec_yes(tree)
-	NewSkillTreeGui._respec_tree(self, tree)
+function NewSkillTreeGui:_dialog_respec_trees_yes(trees_idx)
+	for i = 1, #trees_idx do
+		local tree_idx = trees_idx[i]
+		if self._skilltree:points_spent(tree_idx) > 0 then
+			self._skilltree:on_respec_tree(tree_idx)
+		end
+	end
+	self._event_listener:call("refresh")
+end
+
+function NewSkillTreeGui:_dialog_respec_all_yes()
+	for i = 1, #self._tree_items do
+		local trees_idx = self._tree_items[i]:trees_idx()
+		for j = 1, #trees_idx do
+			local tree_idx = trees_idx[j]
+			if self._skilltree:points_spent(tree_idx) > 0 then
+				self._skilltree:on_respec_tree(tree_idx)
+			end
+		end
+	end
+	self._event_listener:call("refresh")
 end
 
 function NewSkillTreeGui:_dialog_respec_no()
-end
-
-function NewSkillTreeGui:_respec_tree(tree)
-	self._skilltree:on_respec_tree(tree)
-	self:on_skilltree_reset(tree)
 end
 
 function NewSkillTreeGui:on_skilltree_reset(tree)
@@ -1193,14 +1223,19 @@ function NewSkillTreePage:init(page, page_data, tree_title_panel, tree_panel, fu
 	self._selected = 0
 	self._tree_titles = {}
 	self._trees = {}
+	self._trees_idx = {}
+	self._page_name = page
 	self._tree_title_panel = tree_title_panel
 	self._tree_panel = tree_panel
+	self._event_listener = gui:event_listener()
+	self._event_listener:add(page, {"refresh"}, callback(self, self, "_on_refresh_event"))
 	local tree_space = tree_title_panel:w() / 2 * 0.015
 	local tree_width = tree_title_panel:w() / 3 - tree_space
 	tree_space = (tree_title_panel:w() - tree_width * 3) / 2
 	local panel, tree_data
 	for index, tree in ipairs(page_data) do
 		tree_data = skilltrees_tweak[tree]
+		table.insert(self._trees_idx, tree)
 		panel = tree_title_panel:panel({
 			name = "TreeTitle" .. tostring(tree),
 			w = tree_width,
@@ -1227,6 +1262,15 @@ function NewSkillTreePage:init(page, page_data, tree_title_panel, tree_panel, fu
 	for tree, tree_item in ipairs(self._trees) do
 		tree_item:link(self._trees[tree - 1], self._trees[tree + 1])
 	end
+	self:refresh()
+end
+
+function NewSkillTreePage:trees_idx()
+	local trees_idx = deep_clone(self._trees_idx)
+	return trees_idx
+end
+
+function NewSkillTreePage:_on_refresh_event()
 	self:refresh()
 end
 
@@ -1301,6 +1345,10 @@ function NewSkillTreePage:reload_connections()
 	end
 end
 
+function NewSkillTreePage:name()
+	return self._page_name
+end
+
 NewSkillTreeTreeItem = NewSkillTreeTreeItem or class(NewSkillTreeItem)
 
 function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel, gui)
@@ -1310,6 +1358,8 @@ function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel
 	self._tiers = {}
 	self._tree_panel = tree_panel
 	self._tree = tree
+	self._event_listener = gui:event_listener()
+	self._event_listener:add(tree_data, {"refresh"}, callback(self, self, "_on_refresh_event"))
 	local num_tiers = #tree_data.tiers
 	local tier_height = tree_panel:h() / num_tiers
 	local tier_panel, tier_item
@@ -1327,7 +1377,8 @@ function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel
 		tier_item:connect(self._tiers[tier + 1])
 	end
 	local tier, points_spent, points_max = self:_tree_points()
-	self._progress_start = tree_panel:h()
+	local tier_height = self._tree_panel:h() / num_tiers
+	self._progress_start = self._tree_panel:h()
 	self._progress_tier_height = tier_height
 	self._progress_pos_current = math.max(0, self._progress_start - self._progress_tier_height * tier - self._progress_tier_height * (points_spent / points_max))
 	self._progress_pos_wanted = self._progress_pos_current
@@ -1336,7 +1387,6 @@ function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel
 	})
 	self._progress:set_width(tree_panel:w())
 	self._progress:set_y(self._progress_pos_current)
-	self:refresh()
 end
 
 function NewSkillTreeTreeItem:update(t, dt)
@@ -1394,7 +1444,12 @@ function NewSkillTreeTreeItem:inside_tier_skill(x, y, tier, skill)
 	return self._tiers[tier] and self._tiers[tier]:inside_skill(x, y, skill)
 end
 
+function NewSkillTreeTreeItem:_on_refresh_event()
+	self:refresh()
+end
+
 function NewSkillTreeTreeItem:refresh()
+	self:reload_connections()
 end
 
 function NewSkillTreeTreeItem:reload_connections()
@@ -1819,6 +1874,8 @@ function NewSkillTreeSkillItem:init(skill_id, skill_data, skill_panel, tree_pane
 	self._skill_id = skill_id
 	self._selected = false
 	self._can_refund = false
+	self._event_listener = gui:event_listener()
+	self._event_listener:add(skill_id, {"refresh"}, callback(self, self, "_on_refresh_event"))
 	local skill_text = skill_panel:text({
 		name = "SkillName",
 		text = managers.localization:to_upper_text(skill_data.name_id),
@@ -1877,6 +1934,10 @@ function NewSkillTreeSkillItem:init(skill_id, skill_data, skill_panel, tree_pane
 	self._icon:set_size(self._current_size, self._current_size)
 	self._icon:set_center(skill_icon_panel:w() / 2, skill_icon_panel:h() / 2)
 	self._connection = self._connection or {}
+	self:refresh()
+end
+
+function NewSkillTreeSkillItem:_on_refresh_event()
 	self:refresh()
 end
 

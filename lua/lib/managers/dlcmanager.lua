@@ -391,6 +391,14 @@ function GenericDLCManager:has_dbd_clan()
 	return self:is_dlc_unlocked("dbd_clan")
 end
 
+function GenericDLCManager:has_dbd_deluxe()
+	return Global.dlc_manager.all_dlc_data.dbd_deluxe and Global.dlc_manager.all_dlc_data.dbd_deluxe.verified
+end
+
+function GenericDLCManager:has_solus_clan()
+	return self:is_dlc_unlocked("solus_clan")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -1226,11 +1234,19 @@ function WINDLCManager:init()
 			peta = {app_id = "433730", no_install = true},
 			pal = {app_id = "441600", no_install = true},
 			opera = {app_id = "468410", no_install = true},
+			dbd_deluxe = {
+				app_id = "489980",
+				no_install = true,
+				external = true
+			},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},
 			dbd_clan = {
 				source_id = "103582791441335905"
+			},
+			solus_clan = {
+				source_id = "103582791438562929"
 			}
 		}
 		self:_verify_dlcs()

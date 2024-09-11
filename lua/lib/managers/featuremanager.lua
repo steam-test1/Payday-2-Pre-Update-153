@@ -18,6 +18,8 @@ function FeatureManager:_setup()
 	self._default.announcements.infamy_2_0 = 1
 	self._default.announcements.thq_feature = 1
 	self._default.announcements.crimenet_hacked = 1
+	self._default.announcements.short_heist = 1
+	self._default.announcements.short_heists_available = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -28,6 +30,8 @@ function FeatureManager:_setup()
 		Global.feature_manager.announcements.dlc_gage_pack_jobs = 1
 		Global.feature_manager.announcements.join_pd2_clan = 50
 		Global.feature_manager.announcements.freed_old_hoxton = 1
+		Global.feature_manager.announcements.short_heist = 1
+		Global.feature_manager.announcements.short_heists_available = 1
 		Global.feature_manager.announced = {}
 	end
 	self._global = Global.feature_manager
@@ -231,5 +235,23 @@ end
 function FeatureManager:crimenet_hacked()
 	print("FeatureManager:crimenet_hacked()")
 	managers.crimenet:set_getting_hacked(42.16)
+	return true
+end
+
+function FeatureManager:short_heist()
+	print("FeatureManager:short_heist()")
+	local yes_func = function()
+		MenuCallbackHandler:play_short_heist()
+	end
+	managers.menu:show_question_start_short_heist({yes_func = yes_func})
+	return true
+end
+
+function FeatureManager:short_heists_available()
+	print("FeatureManager:short_heists_available()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_feature_short_heists_available",
+		text = "menu_feature_short_heists_available_desc"
+	})
 	return true
 end

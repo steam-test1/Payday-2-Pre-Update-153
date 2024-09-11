@@ -1351,7 +1351,7 @@ function BlackMarketTweakData:_init_melee_weapons()
 		"var4",
 		"var5"
 	}
-	self.melee_weapons.fight.expire_t = 1
+	self.melee_weapons.fight.expire_t = 1.1
 	self.melee_weapons.fight.repeat_expire_t = 0.55
 	self.melee_weapons.fight.melee_damage_delay = 0.1
 	self.melee_weapons.fight.melee_charge_shaker = "player_melee_charge_fist"

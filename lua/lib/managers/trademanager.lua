@@ -754,6 +754,7 @@ function TradeManager:criminal_respawn(pos, rotation, respawn_criminal)
 		spawned_unit = managers.network:session():spawn_member_by_id(peer_id, sp_id, true)
 		managers.network:unregister_spawn_point(sp_id)
 	end
+	managers.mission:call_global_event("player_release_ai")
 	self:_remove_criminal_respawn(respawn_criminal)
 end
 

@@ -997,21 +997,13 @@ function AmmoBagInteractionExt:interact(player)
 	for id, weapon in pairs(player:inventory():available_selections()) do
 		managers.hud:set_ammo_amount(id, weapon.unit:base():ammo_info())
 	end
-	if bullet_storm ~= false then
+	if bullet_storm and bullet_storm ~= false then
 		managers.player:add_to_temporary_property("bullet_storm", bullet_storm, 1)
 	end
 	return interacted
 end
 
 SentryGunInteractionExt = SentryGunInteractionExt or class(UseInteractionExt)
-
-function SentryGunInteractionExt:can_select(player)
-	local result = SentryGunInteractionExt.super.super.can_select(self, player)
-	if managers.player:selected_equipment() and managers.player:selected_equipment().equipment ~= "sentry_gun" then
-		result = false
-	end
-	return result
-end
 
 function SentryGunInteractionExt:interact(player)
 	SentryGunInteractionExt.super.super.interact(self, player)
@@ -1372,6 +1364,7 @@ function IntimitateInteractionExt:interact(player)
 			managers.network:session():send_to_host("sync_interacted_by_id", u_id, self.tweak_data)
 			player:movement():set_carry_restriction(true)
 		end
+		managers.mission:call_global_event("player_pickup_bodybag")
 	elseif self._tweak_data.dont_need_equipment and not has_equipment then
 		self:set_active(false)
 		self._unit:brain():on_tied(player, true)
@@ -1625,6 +1618,9 @@ function CarryInteractionExt:interact(player)
 		end
 	end
 	managers.player:set_carry(self._unit:carry_data():carry_id(), self._unit:carry_data():multiplier(), self._unit:carry_data():dye_pack_data())
+	if self._unit:carry_data():carry_id() == "person" then
+		managers.mission:call_global_event("player_pickup_bodybag")
+	end
 	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
 	self:sync_interacted(nil, player)
 	managers.player:register_carry(managers.network:session():local_peer(), self._unit:carry_data() and self._unit:carry_data():carry_id())

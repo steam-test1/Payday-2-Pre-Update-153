@@ -95,6 +95,10 @@ function HuskCopBrain:on_long_dis_interacted(amount, aggressor_unit)
 	self._unit:network():send_to_host("long_dis_interaction", amount, aggressor_unit)
 end
 
+function HuskCopBrain:player_ignore()
+	return false
+end
+
 function HuskCopBrain:on_team_set(team_data)
 end
 

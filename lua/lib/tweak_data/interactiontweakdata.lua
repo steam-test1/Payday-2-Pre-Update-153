@@ -3547,4 +3547,11 @@ function InteractionTweakData:init()
 	self.hold_fire_missile.timer = 1
 	self.ring_band = deep_clone(self.money_wrap_single_bundle)
 	self.ring_band.text_id = "hud_int_take"
+	self.fbi_usb_insert = {}
+	self.fbi_usb_insert.text_id = "hud_int_insert_flash_dive"
+	self.fbi_usb_insert.equipment_text_id = "hint_no_fbi_usb_key"
+	self.fbi_usb_insert.special_equipment = "cas_usb_key"
+	self.fbi_usb_insert.sound_event = "insert_usb_stick"
+	self.fbi_usb_insert.equipment_consume = true
+	self.fbi_usb_insert.interact_distance = 150
 end

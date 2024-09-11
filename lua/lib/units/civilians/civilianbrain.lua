@@ -65,6 +65,9 @@ function CivilianBrain:on_rescue_allowed_state(state)
 end
 
 function CivilianBrain:wants_rescue()
+	if self._dont_rescue then
+		return false
+	end
 	if self._current_logic.wants_rescue then
 		return self._current_logic.wants_rescue(self._logic_data)
 	end

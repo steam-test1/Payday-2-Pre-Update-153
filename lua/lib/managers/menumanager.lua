@@ -2486,6 +2486,14 @@ function MenuCallbackHandler:play_safehouse(params)
 	managers.menu:show_play_safehouse_question({yes_func = yes_func})
 end
 
+function MenuCallbackHandler:play_short_heist(item)
+	self:play_single_player()
+	self:start_single_player_job({
+		job_id = item and item:parameters().job or "short",
+		difficulty = "normal"
+	})
+end
+
 function MenuCallbackHandler:_increase_infamous(yes_clbk)
 	managers.menu_scene:destroy_infamy_card()
 	if managers.experience:current_level() < 100 or managers.experience:current_rank() >= #tweak_data.infamy.ranks then
@@ -4908,6 +4916,75 @@ function MenuCrimeNetContactInfoInitiator:create_item(node, contact)
 	}
 	local data_node = {}
 	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+MenuCrimeNetContactShortInitiator = MenuCrimeNetContactShortInitiator or class()
+
+function MenuCrimeNetContactShortInitiator:modify_node(original_node, data)
+	local node = original_node
+	node:clean_items()
+	for _, job_data in ipairs(tweak_data.narrative.tutorials) do
+		local heist_tweak = tweak_data.narrative.jobs[job_data.job]
+		local info_data = {}
+		info_data.id = job_data.job
+		info_data.text = managers.localization:to_upper_text(heist_tweak.name_id)
+		info_data.enabled = true
+		if job_data.complete_job then
+			local completed = managers.statistics:sessions_jobs()
+			info_data.enabled = completed and completed[job_data.complete_job .. "_normal_completed"]
+		end
+		self:create_item(node, info_data)
+	end
+	local params = {
+		name = "back",
+		text_id = "menu_back",
+		previous_node = "true",
+		visible_callback = "is_pc_controller",
+		align = "left",
+		last_item = "true",
+		gui_node_custom = "true",
+		pd2_corner = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	node:set_default_item_name(self.DEFAULT_ITEM)
+	node:select_item(self.DEFAULT_ITEM)
+	return node
+end
+
+function MenuCrimeNetContactShortInitiator:refresh_node(node)
+	return node
+end
+
+function MenuCrimeNetContactShortInitiator:create_divider(node, id, text_id, size, color)
+	local params = {
+		name = "divider_" .. id,
+		no_text = not text_id,
+		text_id = text_id,
+		localize = "false",
+		size = size or 8,
+		color = color
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+end
+
+function MenuCrimeNetContactShortInitiator:create_item(node, data)
+	local params = {
+		name = data.id,
+		text_id = data.text,
+		localize = "false",
+		callback = "play_short_heist",
+		job = data.id
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	new_item:set_enabled(data.enabled)
 	node:add_item(new_item)
 end
 

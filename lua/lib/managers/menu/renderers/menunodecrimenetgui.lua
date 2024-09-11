@@ -1350,6 +1350,494 @@ function MenuNodeCrimenetContactInfoGui:close()
 	managers.menu_component:enable_crimenet()
 end
 
+MenuNodeCrimenetContactShortGui = MenuNodeCrimenetContactShortGui or class(MenuNodeGui)
+MenuNodeCrimenetContactShortGui.WIDTH = 700
+MenuNodeCrimenetContactShortGui.HEIGHT = 250
+MenuNodeCrimenetContactShortGui.MENU_WIDTH = 220
+MenuNodeCrimenetContactShortGui.PADDING = 10
+
+function MenuNodeCrimenetContactShortGui:init(node, layer, parameters)
+	parameters.font = tweak_data.menu.pd2_small_font
+	parameters.font_size = tweak_data.menu.pd2_small_font_size
+	parameters.align = "left"
+	parameters.row_item_blend_mode = "add"
+	parameters.row_item_color = tweak_data.screen_colors.button_stage_3
+	parameters.row_item_hightlight_color = tweak_data.screen_colors.button_stage_2
+	parameters.marker_alpha = 1
+	parameters.to_upper = true
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(true)
+	end
+	MenuNodeCrimenetContactShortGui.super.init(self, node, layer, parameters)
+	managers.menu_component:disable_crimenet()
+	self:_setup_layout()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:deactivate_controller_mouse()
+	end
+end
+
+function MenuNodeCrimenetContactShortGui:_setup_item_panel_parent(safe_rect, shape)
+	local x = safe_rect.x + safe_rect.width / 2 - self.WIDTH / 2 + self.PADDING
+	local y = safe_rect.y + safe_rect.height / 2 - self.HEIGHT / 2 + self.PADDING
+	shape = shape or {}
+	shape.x = shape.x or x
+	shape.y = shape.y or y
+	shape.w = shape.w or self.MENU_WIDTH
+	shape.h = shape.h or self.HEIGHT - 2 * self.PADDING - tweak_data.menu.pd2_small_font_size
+	MenuNodeCrimenetContactShortGui.super._setup_item_panel_parent(self, safe_rect, shape)
+end
+
+function MenuNodeCrimenetContactShortGui:set_contact_info(id, name, files, override_file, sub_text)
+	self._files = files
+	local files_menu = self._files_menu
+	local num_files = #files
+	files_menu:clear()
+	if 1 < num_files then
+		files_menu:set_h(26)
+		local size = files_menu:h() - 4
+		for i = 1, num_files do
+			local file_icons = self._files[i] and self._files[i].icon_rect or self._file_icons
+			local is_locked = self._files[i] and self:is_file_locked(self._files[i].lock)
+			local texture_rect = is_locked and file_icons.locked or file_icons.unselected
+			files_menu:bitmap({
+				texture = self._files[i] and self._files[i].icon or self.FILE_ICONS_TEXTURE,
+				texture_rect = texture_rect,
+				x = (i - 1) * 20,
+				y = 0,
+				w = 17,
+				h = 23
+			})
+		end
+	else
+		files_menu:set_h(0)
+	end
+	local contact_desc_text = self._panel:child("contact_desc_text")
+	contact_desc_text:set_top(files_menu:bottom())
+	local contact_title_text = self._panel:child("contact_title_text")
+	make_fine_text(contact_title_text)
+	local contact_desc_title_text = self._panel:child("contact_desc_title_text")
+	make_fine_text(contact_desc_title_text)
+	self:set_file(override_file)
+	self._current_contact_info = id
+end
+
+function MenuNodeCrimenetContactShortGui:mouse_moved(o, x, y)
+	local files_menu = self._files_menu
+	local is_inside = false
+	local highlighted_file
+	if alive(files_menu) then
+		for i, file in ipairs(files_menu:children()) do
+			local file_icons = self._files[i] and self._files[i].icon_rect or self._file_icons
+			local is_locked = self._files[i] and self:is_file_locked(self._files[i].lock)
+			local texture_rect = file_icons and (is_locked and file_icons.locked or i == self._current_file and file_icons.selected or file:inside(x, y) and file_icons.selected or file_icons.unselected)
+			local texture_alpha = not self._file_alphas or is_locked and self._file_alphas.locked or i == self._current_file and self._file_alphas.selected or file:inside(x, y) and self._file_alphas.selected or self._file_alphas.unselected
+			if texture_rect then
+				file:set_texture_rect(unpack(texture_rect))
+			end
+			if texture_alpha then
+				file:set_alpha(texture_alpha)
+			end
+			if file:inside(x, y) then
+				is_inside = i
+				highlighted_file = self._current_file ~= i and i
+			end
+		end
+	end
+	if highlighted_file and self._highlighted_file ~= highlighted_file then
+		managers.menu_component:post_event("highlight")
+		self._highlighted_file = highlighted_file
+	elseif not highlighted_file then
+		self._highlighted_file = false
+	end
+	local is_locked = is_inside and self:is_file_locked(self._files[is_inside] and self._files[is_inside].lock)
+	return is_inside, self._file_pressed and (self._file_pressed == is_inside and "link" or "arrow") or not (not is_inside or is_locked) and "link" or "arrow"
+end
+
+function MenuNodeCrimenetContactShortGui:mouse_pressed(button, x, y)
+	local files_menu = self._files_menu
+	if alive(files_menu) then
+		for i, file in ipairs(files_menu:children()) do
+			if file:inside(x, y) and not self:is_file_locked(self._files[i].lock) then
+				self._file_pressed = i
+				return
+			end
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetContactShortGui:mouse_released(button, x, y)
+	if self._file_pressed and self._file_pressed ~= self._current_file then
+		local files_menu = self._files_menu
+		if alive(files_menu) then
+			local file = files_menu:children()[self._file_pressed]
+			if file and file:inside(x, y) then
+				self:set_file(self._file_pressed)
+				managers.menu_component:post_event("menu_enter")
+			end
+		end
+	end
+	self._file_pressed = false
+end
+
+function MenuNodeCrimenetContactShortGui:previous_page()
+	self:change_file(-1)
+end
+
+function MenuNodeCrimenetContactShortGui:next_page()
+	self:change_file(1)
+end
+
+function MenuNodeCrimenetContactShortGui:input_focus()
+	return false
+end
+
+function MenuNodeCrimenetContactShortGui:_setup_item_panel(safe_rect, res)
+	MenuNodeCrimenetContactShortGui.super._setup_item_panel(self, safe_rect, res)
+	self:_setup_menu()
+end
+
+function MenuNodeCrimenetContactShortGui:_setup_menu()
+	if not self._init_finish then
+		return
+	end
+	local safe_rect = managers.gui_data:scaled_size()
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("right")
+	end
+	self:_set_topic_position()
+	local y_offs = 20
+	self.item_panel:set_w(safe_rect.width * (1 - self._align_line_proportions) + 4)
+	self.item_panel:set_world_position(self._panel:world_position())
+	self.item_panel:move(self.PADDING, self.PADDING + y_offs)
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_halign("left")
+	end
+	self.item_panel:set_w(self.MENU_WIDTH)
+	self._align_data.panel:set_left(self.item_panel:left())
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+	if self._back_row_item and alive(self._back_row_item.gui_text) then
+		self._back_row_item.gui_text:set_w(self.MENU_WIDTH)
+		self._back_row_item.gui_text:set_world_left(math.round(self._panel:world_left() + self.PADDING * 2))
+		self._back_row_item.gui_text:set_world_bottom(math.round(self._panel:world_bottom() - self.PADDING))
+	end
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.gui_panel) then
+			row_item.gui_panel:set_w(self.MENU_WIDTH)
+		end
+	end
+	for _, child in ipairs(self.item_panel:children()) do
+		child:set_world_y(math.round(child:world_y()))
+	end
+	self._list_arrows.up:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.up:set_world_top(self._align_data.panel:world_top() - 1)
+	self._list_arrows.up:set_width(self._item_panel_parent:w())
+	self._list_arrows.down:set_world_left(self._align_data.panel:world_left())
+	self._list_arrows.down:set_world_bottom(self._align_data.panel:world_bottom() + 1)
+	self._list_arrows.down:set_width(self._item_panel_parent:w())
+end
+
+function MenuNodeCrimenetContactShortGui:_fade_row_item(row_item)
+	MenuNodeCrimenetContactShortGui.super._fade_row_item(self, row_item)
+	if row_item.icon then
+		row_item.icon:set_left(0)
+	end
+end
+
+function MenuNodeCrimenetContactShortGui:_highlight_row_item(row_item, mouse_over)
+	MenuNodeCrimenetContactShortGui.super._highlight_row_item(self, row_item, mouse_over)
+	if row_item.icon then
+		row_item.icon:set_left(0)
+	end
+end
+
+function MenuNodeCrimenetContactShortGui:refresh_gui(node)
+	self:update_item_icon_visibility()
+	local row_x = 0
+	for _, row_item in pairs(self.row_items) do
+		if alive(row_item.icon) then
+			row_item.icon:set_left(0)
+		end
+		if alive(row_item.gui_panel) then
+			row_x = math.max(row_x, row_item.gui_panel:world_x())
+		end
+	end
+end
+
+function MenuNodeCrimenetContactShortGui:_setup_layout()
+	local safe_rect = managers.gui_data:scaled_size()
+	local mc_full_ws = managers.menu_component:fullscreen_ws()
+	local ws = self.ws
+	if alive(self._fullscreen_panel) then
+		mc_full_ws:panel():remove(self._fullscreen_panel)
+	end
+	if alive(ws:panel():child("main_panel")) then
+		ws:panel():remove(ws:panel():child("main_panel"))
+	end
+	local panel = ws:panel():panel({name = "main_panel"})
+	self._fullscreen_panel = mc_full_ws:panel():panel({layer = 50})
+	local blur = self._fullscreen_panel:bitmap({
+		texture = "guis/textures/test_blur_df",
+		w = self._fullscreen_panel:w(),
+		h = self._fullscreen_panel:h(),
+		render_template = "VertexColorTexturedBlur3D"
+	})
+	local func = function(o)
+		local start_blur = 0
+		over(0.6, function(p)
+			o:set_alpha(math.lerp(start_blur, 1, p))
+		end)
+	end
+	blur:animate(func)
+	local width = self.WIDTH
+	local height = self.HEIGHT
+	self._panel = panel:panel({
+		h = height,
+		w = width,
+		layer = 51
+	})
+	self._panel:set_center(panel:w() / 2, panel:h() / 2)
+	self._panel:rect({
+		color = Color.black,
+		alpha = 0.6,
+		layer = 0
+	})
+	BoxGuiObject:new(self._panel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	do
+		local header_panel = self._panel:panel({
+			h = height,
+			w = width,
+			layer = 51
+		})
+		header_panel:move(self.PADDING * 0.5, self.PADDING * 0.5)
+		local header_text = header_panel:text({
+			name = "header_text",
+			text = managers.localization:to_upper_text("short_basics_header"),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			color = tweak_data.screen_colors.text,
+			layer = 51
+		})
+		make_fine_text(header_text)
+		local desc_panel = self._panel:panel({
+			h = height * 0.5,
+			w = width * 0.5,
+			layer = 51
+		})
+		desc_panel:move(self.PADDING * 2, 90)
+		local desc_text = desc_panel:text({
+			name = "desc_text",
+			wrap = true,
+			text = managers.localization:text("short_basics_desc"),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			color = tweak_data.screen_colors.text,
+			layer = 51
+		})
+		make_fine_text(header_text)
+	end
+	local reward_panel_w_offs = -50
+	local reward_panel_h_offs = 20
+	local reward_panel = self._panel:panel({
+		h = height - reward_panel_h_offs,
+		w = width / 2 + reward_panel_w_offs,
+		layer = 51
+	})
+	reward_panel:set_left(width - width / 2 - reward_panel_w_offs)
+	reward_panel:set_top(reward_panel_h_offs)
+	local reward_text = reward_panel:text({
+		name = "rewards_text",
+		text = managers.localization:to_upper_text("short_basics_rewards"),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(reward_text)
+	reward_text:set_bottom(25)
+	local x_text_offs = 65
+	local gfx_offs = 5
+	local gfx_w = 40
+	local gfx_h = 48
+	local cash_y = 78
+	local exp_y = 134
+	local loot_y = 192
+	local gfx_y_offs = 10
+	local cash_drop_text = reward_panel:text({
+		name = "cash_drop_text",
+		text = managers.localization:to_upper_text("short_basics_cash"),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(cash_drop_text)
+	cash_drop_text:set_bottom(cash_y)
+	cash_drop_text:set_left(x_text_offs)
+	local exp_text = reward_panel:text({
+		name = "exp_text",
+		text = managers.localization:to_upper_text("short_basics_experience"),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(exp_text)
+	exp_text:set_bottom(exp_y)
+	exp_text:set_left(x_text_offs)
+	local loot_drop_text = reward_panel:text({
+		name = "loot_drop_text",
+		text = managers.localization:to_upper_text("short_basics_loot"),
+		font = tweak_data.menu.pd2_small_font,
+		font_size = tweak_data.menu.pd2_small_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(loot_drop_text)
+	loot_drop_text:set_bottom(loot_y)
+	loot_drop_text:set_left(x_text_offs)
+	local texture_atlas = "guis/textures/pd2/lootscreen/loot_cards"
+	local texture_rect = {
+		384,
+		0,
+		128,
+		180
+	}
+	local cash_bitmap = reward_panel:bitmap({
+		name = "cash_bitmap",
+		texture = texture_atlas,
+		texture_rect = texture_rect,
+		w = gfx_w,
+		h = gfx_h,
+		blend_mode = "normal",
+		layer = 51
+	})
+	cash_bitmap:set_bottom(cash_y + gfx_y_offs)
+	cash_bitmap:set_left(gfx_offs)
+	local texture_rect = {
+		0,
+		180,
+		128,
+		180
+	}
+	local exp_bitmap = reward_panel:bitmap({
+		name = "cash_bitmap",
+		texture = texture_atlas,
+		texture_rect = texture_rect,
+		w = gfx_w,
+		h = gfx_h,
+		blend_mode = "normal",
+		layer = 51
+	})
+	exp_bitmap:set_bottom(exp_y + gfx_y_offs)
+	exp_bitmap:set_left(gfx_offs)
+	local texture_rect = {
+		640,
+		180,
+		128,
+		180
+	}
+	local loot_bitmap = reward_panel:bitmap({
+		name = "cash_bitmap",
+		texture = texture_atlas,
+		texture_rect = texture_rect,
+		w = gfx_w,
+		h = gfx_h,
+		blend_mode = "normal",
+		layer = 51
+	})
+	loot_bitmap:set_bottom(loot_y + gfx_y_offs)
+	loot_bitmap:set_left(gfx_offs)
+	local title_text = panel:text({
+		name = "title_text",
+		text = managers.localization:to_upper_text("menu_contact_info_short"),
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	make_fine_text(title_text)
+	title_text:set_left(self._panel:left())
+	title_text:set_bottom(self._panel:top() - 2)
+	self._init_finish = true
+	self:_setup_menu()
+end
+
+function MenuNodeCrimenetContactShortGui:gui_node_custom(row_item)
+	row_item.gui_panel = self._item_panel_parent:panel({
+		layer = self.layers.items,
+		w = 3,
+		h = 3
+	})
+	row_item.gui_pd2_panel = self.ws:panel():panel({
+		layer = self.layers.items
+	})
+	local row_item_panel = row_item.gui_pd2_panel
+	row_item.gui_text = row_item_panel:text({
+		font_size = tweak_data.menu.pd2_small_font_size,
+		x = 0,
+		y = 0,
+		align = "left",
+		vertical = "bottom",
+		font = tweak_data.menu.pd2_small_font,
+		color = tweak_data.screen_colors.button_stage_3,
+		layer = 0,
+		text = utf8.to_upper(row_item.text),
+		blend_mode = "add",
+		render_template = Idstring("VertexColorTextured")
+	})
+	local _, _, w, h = row_item.gui_text:text_rect()
+	row_item.gui_text:set_size(math.round(w), math.round(h))
+	self._back_row_item = row_item
+end
+
+function MenuNodeCrimenetContactShortGui:_align_marker(row_item)
+	MenuNodeCrimenetContactShortGui.super._align_marker(self, row_item)
+	if row_item.item:parameters().pd2_corner then
+		self._marker_data.marker:set_visible(true)
+		self._marker_data.gradient:set_visible(true)
+		self._marker_data.gradient:set_rotation(360)
+		self._marker_data.marker:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.gradient:set_height(64 * row_item.gui_text:height() / 32)
+		self._marker_data.marker:set_w(self.MENU_WIDTH)
+		self._marker_data.gradient:set_w(self._marker_data.marker:w())
+		self._marker_data.marker:set_left(row_item.menu_unselected:x())
+		self._marker_data.marker:set_world_center_y(row_item.gui_text:world_center_y())
+		self._marker_data.marker:set_y(math.round(self._marker_data.marker:y()))
+		return
+	end
+end
+
+function MenuNodeCrimenetContactShortGui:close()
+	self._fullscreen_panel:parent():remove(self._fullscreen_panel)
+	self._fullscreen_panel = nil
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.input:set_force_input(false)
+	end
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:activate_controller_mouse()
+	end
+	MenuNodeCrimenetContactShortGui.super.close(self)
+	managers.menu_component:enable_crimenet()
+end
+
 MenuNodeCrimenetGageAssignmentGui = MenuNodeCrimenetGageAssignmentGui or class(MenuNodeCrimenetContactInfoGui)
 MenuNodeCrimenetGageAssignmentGui.WIDTH = 1000
 MenuNodeCrimenetGageAssignmentGui.HEIGHT = 530

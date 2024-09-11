@@ -551,6 +551,7 @@ function SkillTreeManager:on_respec_tree(tree, forced_respec_multiplier)
 	else
 		self:_respec_tree_version6(tree, forced_respec_multiplier)
 	end
+	print("hiii")
 	MenuCallbackHandler:_update_outfit_information()
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_skills_to_steam()

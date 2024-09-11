@@ -127,6 +127,15 @@ function TeamAIDamage:force_bleedout()
 	self:_send_bullet_attack_result(attack_data)
 end
 
+function TeamAIDamage:force_custody()
+	self:force_bleedout()
+	if self._to_dead_clbk_id then
+		managers.enemy:remove_delayed_clbk(self._to_dead_clbk_id)
+		self._to_dead_clbk_id = nil
+	end
+	self:clbk_exit_to_dead()
+end
+
 function TeamAIDamage:damage_bullet(attack_data)
 	local result = {variant = "bullet", type = "none"}
 	attack_data.result = result
@@ -710,6 +719,7 @@ function TeamAIDamage:revive(reviving_unit)
 		}, "team_AI")
 		self._unit:network():send("from_server_unit_recovered")
 		managers.groupai:state():on_criminal_recovered(self._unit)
+		managers.mission:call_global_event("player_revive_ai")
 	elseif self._arrested_timer then
 		self._arrested_timer = nil
 		local action_data = {
@@ -842,6 +852,7 @@ function TeamAIDamage:_on_incapacitated()
 end
 
 function TeamAIDamage:clbk_exit_to_dead()
+	managers.mission:call_global_event("ai_in_custody")
 	self._to_dead_clbk_id = nil
 	self._to_dead_t = nil
 	self:_die()

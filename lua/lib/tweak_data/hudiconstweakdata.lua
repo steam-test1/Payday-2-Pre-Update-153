@@ -676,6 +676,15 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.pd2_bodybag = {
+		texture = "guis/textures/pd2/pd2_waypoints",
+		texture_rect = {
+			128,
+			96,
+			32,
+			32
+		}
+	}
 	self.wp_vial = {
 		texture = "guis/textures/hud_icons",
 		texture_rect = {

@@ -7,7 +7,7 @@ function ElementInstigatorRule:init(...)
 		for rule, data in pairs(rules) do
 			local restructured_data = {}
 			for _, value in ipairs(data) do
-				if rule == "enemy_names" or rule == "civilian_names" then
+				if rule == "enemy_names" or rule == "civilian_names" or rule == "vehicle_names" then
 					restructured_data[Idstring(value):key()] = true
 				else
 					restructured_data[value] = true
@@ -47,6 +47,8 @@ function ElementInstigatorRule:check_rules(instigator_type, instigator)
 		check_result = self:_check_civilians_rules(rules, instigator)
 	elseif instigator_type == "loot" then
 		check_result = self:_check_loot_rules(rules, instigator)
+	elseif instigator_type == "vehicle" then
+		check_result = self:_check_vehicle_rules(rules, instigator)
 	end
 	if self._values.invert then
 		check_result = not check_result
@@ -106,6 +108,15 @@ end
 function ElementInstigatorRule:_check_loot_rules(rules, instigator)
 	for rule, data in pairs(rules) do
 		if rule == "carry_ids" and not data[instigator:carry_data():carry_id()] then
+			return false
+		end
+	end
+	return true
+end
+
+function ElementInstigatorRule:_check_vehicle_rules(rules, instigator)
+	for rule, data in pairs(rules) do
+		if rule == "vehicle_names" and not data[instigator:name():key()] then
 			return false
 		end
 	end

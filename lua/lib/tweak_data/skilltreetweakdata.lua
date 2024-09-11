@@ -1241,13 +1241,13 @@ function SkillTreeTweakData:init()
 		icon_xy = {11, 7},
 		[1] = {
 			upgrades = {
-				"player_melee_knockdown_mul"
+				"player_melee_damage_dampener"
 			},
 			cost = self.costs.default
 		},
 		[2] = {
 			upgrades = {
-				"player_melee_damage_dampener"
+				"player_melee_knockdown_mul"
 			},
 			cost = self.costs.pro
 		}

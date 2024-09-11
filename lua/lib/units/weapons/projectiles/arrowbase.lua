@@ -242,6 +242,13 @@ function ArrowBase:_attach_to_hit_unit(is_remote, dynamic_pickup_wanted)
 	else
 		print("ArrowBase:_attach_to_hit_unit(): No parent object!!")
 	end
+	if not switch_to_dynamic_pickup then
+		local vip_unit = hit_unit and hit_unit:parent() or hit_unit
+		if vip_unit and vip_unit:base() and vip_unit:base()._tweak_table == "phalanx_vip" then
+			switch_to_pickup = true
+			switch_to_dynamic_pickup = true
+		end
+	end
 	if switch_to_pickup then
 		if switch_to_dynamic_pickup then
 			self:_set_body_enabled(true)

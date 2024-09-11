@@ -1165,8 +1165,10 @@ function UnitNetworkHandler:place_sentry_gun(pos, rot, equipment_selection_index
 	local unit = SentryGunBase.spawn(user_unit, pos, rot, peer:id(), true, unit_idstring_index)
 	if unit then
 		unit:base():set_server_information(peer:id())
+		local damage_multiplier = unit:weapon():get_damage_multiplier()
+		local has_shield = unit:base():has_shield()
+		managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", peer:id(), equipment_selection_index or 0, unit, unit:movement()._rot_speed_mul, unit:weapon()._setup.spread_mul, has_shield, damage_multiplier)
 	end
-	managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", peer:id(), unit and equipment_selection_index or 0, unit, unit and unit:movement()._rot_speed_mul, unit and unit:weapon()._setup.spread_mul, unit and unit:base():has_shield() and true or false, unit and unit:base()._damage_multiplier)
 end
 
 function UnitNetworkHandler:remove_sentry_gun(sentry_gun_unit, rpc)

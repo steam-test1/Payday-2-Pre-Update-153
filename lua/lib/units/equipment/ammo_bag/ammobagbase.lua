@@ -113,7 +113,7 @@ end
 
 function AmmoBagBase:take_ammo(unit)
 	if self._empty then
-		return
+		return false, false
 	end
 	local taken = self:_take_ammo(unit)
 	if 0 < taken then

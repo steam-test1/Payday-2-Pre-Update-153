@@ -216,7 +216,7 @@ function ElementAreaTrigger:project_amount_all()
 		end
 		return i
 	end
-	return managers.network:session():amount_of_alive_players()
+	return managers.network:session() and managers.network:session():amount_of_alive_players() or 0
 end
 
 function ElementAreaTrigger:project_amount_inside()

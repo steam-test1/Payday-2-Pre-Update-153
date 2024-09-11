@@ -141,6 +141,23 @@ function InstigatorRuleUnitElement:_update_rules_panel(panel, panel_sizer)
 			updated_callback = callback(self, self, "_rule_updated", "carry_ids")
 		}
 		local list = CoreEws.list_selector(params)
+	elseif instigator == "vehicle" then
+		local options = {}
+		for _, unit in pairs(managers.vehicle:get_all_vehicles()) do
+			if alive(unit) then
+				table.insert(options, unit:name():s())
+			end
+		end
+		local vehicle_names_params = {
+			name = "Vehicle name:",
+			panel = panel,
+			sizer = panel_sizer,
+			options = options,
+			value = self._hed.rules[instigator] and self._hed.rules[instigator].vehicle_names,
+			tooltip = "Select vehicle name rules",
+			updated_callback = callback(self, self, "_rule_updated", "vehicle_names")
+		}
+		local states = CoreEws.list_selector(vehicle_names_params)
 	end
 	self._rules_panel:layout()
 	self._panel:layout()

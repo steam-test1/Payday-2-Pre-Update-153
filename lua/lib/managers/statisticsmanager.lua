@@ -29,6 +29,13 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
+		cop_female = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
 		fbi = {
 			count = 0,
 			head_shots = 0,

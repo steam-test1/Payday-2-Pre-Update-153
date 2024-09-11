@@ -2088,8 +2088,10 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 			if not detect_only then
 				record = managers.groupai:state():all_criminals()[prime_target.unit:key()]
 				if record.ai then
-					prime_target.unit:movement():set_cool(false)
-					prime_target.unit:brain():on_long_dis_interacted(0, self._unit)
+					if not prime_target.unit:brain():player_ignore() then
+						prime_target.unit:movement():set_cool(false)
+						prime_target.unit:brain():on_long_dis_interacted(0, self._unit)
+					end
 				else
 					is_human_player = true
 				end

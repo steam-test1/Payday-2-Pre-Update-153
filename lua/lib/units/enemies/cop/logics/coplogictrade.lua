@@ -15,7 +15,6 @@ function CopLogicTrade.enter(data, new_logic_name, enter_params)
 	data.unit:network():send("hostage_trade", true, false)
 	CopLogicTrade.hostage_trade(data.unit, true, false)
 	data.unit:brain():set_update_enabled_state(true)
-	managers.groupai:state():on_hostage_state(true, data.key, managers.enemy:all_enemies()[data.key] and true or false)
 	data.unit:brain():set_attention_settings({peaceful = true})
 end
 
@@ -99,7 +98,6 @@ function CopLogicTrade.exit(data, new_logic_name, enter_params)
 		my_data._trade_enabled = false
 		data.unit:network():send("hostage_trade", false, false)
 		CopLogicTrade.hostage_trade(data.unit, false, false)
-		managers.groupai:state():on_hostage_state(false, data.key)
 	end
 	data.unit:character_damage():set_invulnerable(false)
 	data.unit:network():send("set_unit_invulnerable", false)

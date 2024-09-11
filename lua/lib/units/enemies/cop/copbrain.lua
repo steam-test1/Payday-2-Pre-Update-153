@@ -35,6 +35,7 @@ local logic_variants = {
 local security_variant = logic_variants.security
 logic_variants.gensec = security_variant
 logic_variants.cop = security_variant
+logic_variants.cop_female = security_variant
 logic_variants.fbi = security_variant
 logic_variants.swat = security_variant
 logic_variants.heavy_swat = security_variant
@@ -53,6 +54,7 @@ logic_variants.biker_escape = security_variant
 logic_variants.city_swat = security_variant
 logic_variants.old_hoxton_mission = security_variant
 logic_variants.inside_man = security_variant
+logic_variants.cop_scared = security_variant
 for _, tweak_table_name in pairs({
 	"shield",
 	"tank",
@@ -992,6 +994,7 @@ function CopBrain:on_alarm_pager_interaction(status, player)
 			end
 		end
 		self:end_alarm_pager()
+		managers.mission:call_global_event("player_answer_pager")
 		if not self:_chk_enable_bodybag_interaction() then
 			self._unit:interaction():set_active(false, true)
 		end
