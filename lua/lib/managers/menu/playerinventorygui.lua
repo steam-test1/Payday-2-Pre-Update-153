@@ -3440,7 +3440,7 @@ function PlayerInventoryGui:previous_primary()
 		local player_loadout_data = managers.blackmarket:player_loadout_data()
 		self:update_box(box, {
 			text = player_loadout_data.primary.info_text,
-			text_selected_color = player_loadout_data.primary.info_text_color,
+			text_selected_color = player_loadout_data.primary.info_text_color or false,
 			image = player_loadout_data.primary.item_texture,
 			bg_image = player_loadout_data.primary.item_bg_texture,
 			use_background = player_loadout_data.primary.item_bg_texture and true or false
@@ -3455,7 +3455,7 @@ function PlayerInventoryGui:next_primary()
 		local player_loadout_data = managers.blackmarket:player_loadout_data()
 		self:update_box(box, {
 			text = player_loadout_data.primary.info_text,
-			text_selected_color = player_loadout_data.primary.info_text_color,
+			text_selected_color = player_loadout_data.primary.info_text_color or false,
 			image = player_loadout_data.primary.item_texture,
 			bg_image = player_loadout_data.primary.item_bg_texture,
 			use_background = player_loadout_data.primary.item_bg_texture and true or false
@@ -3587,7 +3587,7 @@ function PlayerInventoryGui:open_throwable_menu()
 		category = "grenades",
 		on_create_func_name = "populate_grenades",
 		allow_preview = true,
-		override_slots = {3, 3},
+		override_slots = {4, 3},
 		identifier = BlackMarketGui.identifiers.grenade
 	})
 	new_node_data.scroll_tab_anywhere = true
@@ -4713,7 +4713,10 @@ function PlayerInventoryGui:_get_armor_stats(name)
 			local base_value = movement_penalty * base
 			base_stats[stat.name] = {value = base_value}
 			local skill_mod = managers.player:movement_speed_multiplier(false, false, upgrade_level, 1)
-			local skill_value = skill_mod * base - base_value
+			local val = base * skill_mod
+			val = Utl.round(val, 2)
+			base_value = Utl.round(base_value, 2)
+			local skill_value = val - base_value
 			skill_stats[stat.name] = {value = skill_value}
 			skill_stats[stat.name].skill_in_effect = 0 < skill_value
 		elseif stat.name == "dodge" then

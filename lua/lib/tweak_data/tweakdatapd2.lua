@@ -471,7 +471,7 @@ function TweakData:_init_pd2()
 		}
 	}
 	self.hud_icons.risk_pd = {
-		texture = "guis/textures/pd2/hud_difficultymarkers",
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
 		texture_rect = {
 			90,
 			0,
@@ -480,7 +480,7 @@ function TweakData:_init_pd2()
 		}
 	}
 	self.hud_icons.risk_swat = {
-		texture = "guis/textures/pd2/hud_difficultymarkers",
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
 		texture_rect = {
 			0,
 			0,
@@ -489,7 +489,7 @@ function TweakData:_init_pd2()
 		}
 	}
 	self.hud_icons.risk_fbi = {
-		texture = "guis/textures/pd2/hud_difficultymarkers",
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
 		texture_rect = {
 			30,
 			0,
@@ -498,7 +498,7 @@ function TweakData:_init_pd2()
 		}
 	}
 	self.hud_icons.risk_death_squad = {
-		texture = "guis/textures/pd2/hud_difficultymarkers",
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
 		texture_rect = {
 			60,
 			0,
@@ -506,11 +506,29 @@ function TweakData:_init_pd2()
 			30
 		}
 	}
-	self.hud_icons.risk_murder_squad = {
-		texture = "guis/textures/pd2/hud_difficultymarkers",
+	self.hud_icons.risk_easy_wish = {
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
 		texture_rect = {
 			90,
 			0,
+			30,
+			30
+		}
+	}
+	self.hud_icons.risk_murder_squad = {
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
+		texture_rect = {
+			0,
+			32,
+			30,
+			30
+		}
+	}
+	self.hud_icons.risk_sm_wish = {
+		texture = "guis/textures/pd2/hud_difficultymarkers_2",
+		texture_rect = {
+			30,
+			32,
 			30,
 			30
 		}
@@ -573,6 +591,24 @@ function TweakData:_init_pd2()
 		texture = "guis/textures/pd2/equipment_02",
 		texture_rect = {
 			0,
+			0,
+			32,
+			32
+		}
+	}
+	self.hud_icons.concussion_grenade = {
+		texture = "guis/textures/pd2/equipment_02",
+		texture_rect = {
+			32,
+			0,
+			32,
+			32
+		}
+	}
+	self.hud_icons.hobby_knife = {
+		texture = "guis/textures/pd2/equipment_02",
+		texture_rect = {
+			64,
 			0,
 			32,
 			32

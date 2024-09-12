@@ -2672,7 +2672,7 @@ function NewLoadoutTab:create_grenade_loadout()
 		name = "bm_menu_grenades",
 		category = "grenades",
 		on_create_func_name = "populate_grenades",
-		override_slots = {3, 3},
+		override_slots = {4, 3},
 		identifier = Idstring("grenade")
 	})
 	data.topic_id = "menu_loadout_blackmarket"
@@ -2873,7 +2873,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
 	local box_panel = self._panel:panel()
-	box_panel:set_shape(self._items[self._selected_item]:panel():shape())
+	box_panel:set_shape(self._items[1]:panel():shape())
 	BoxGuiObject:new(box_panel, {
 		sides = {
 			1,
@@ -3520,7 +3520,6 @@ function MissionBriefingGui:update_tab_positions()
 end
 
 function MissionBriefingGui:close()
-	print("[MissionBriefingGui:close]")
 	WalletGuiObject.close_wallet(self._safe_workspace:panel())
 	managers.music:track_listen_stop()
 	self:close_asset()
@@ -3535,6 +3534,12 @@ function MissionBriefingGui:close()
 	end
 	if self._fullscreen_panel and alive(self._fullscreen_panel) then
 		self._fullscreen_panel:parent():remove(self._fullscreen_panel)
+	end
+	local level_tweak = tweak_data.levels[managers.job:current_level_id()]
+	if level_tweak and level_tweak.on_enter_clbks then
+		for _, clbk in pairs(level_tweak.on_enter_clbks) do
+			clbk()
+		end
 	end
 end
 

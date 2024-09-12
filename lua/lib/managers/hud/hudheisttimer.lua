@@ -1,6 +1,6 @@
 HUDHeistTimer = HUDHeistTimer or class()
 
-function HUDHeistTimer:init(hud)
+function HUDHeistTimer:init(hud, tweak_hud)
 	self._hud_panel = hud.panel
 	if self._hud_panel:child("heist_timer_panel") then
 		self._hud_panel:remove(self._hud_panel:child("heist_timer_panel"))
@@ -26,10 +26,14 @@ function HUDHeistTimer:init(hud)
 		word_wrap = false
 	})
 	self._last_time = 0
+	self._enabled = not tweak_hud.no_timer
+	if not self._enabled then
+		self._heist_timer_panel:hide()
+	end
 end
 
 function HUDHeistTimer:set_time(time)
-	if math.floor(time) < self._last_time then
+	if not self._enabled or math.floor(time) < self._last_time then
 		return
 	end
 	self._last_time = time

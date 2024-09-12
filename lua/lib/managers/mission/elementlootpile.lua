@@ -4,12 +4,16 @@ ElementLootPile = ElementLootPile or class(CoreMissionScriptElement.MissionScrip
 function ElementLootPile:init(...)
 	ElementLootPile.super.init(self, ...)
 	local max_loot = self:value("max_loot")
-	self._remaining_loot = 0 < max_loot and max_loot or math.huge
+	self._remaining_loot = 0 < max_loot and max_loot or 10000000
 	self._steal_SO_data = {}
 end
 
 function ElementLootPile:on_script_activated()
 	ElementLootPile.super.on_script_activated(self)
+	if not self._updator and Network:is_server() then
+		self._updator = true
+		self._mission_script:add_updator(self._id, callback(self, self, "update"))
+	end
 	self:on_set_enabled()
 end
 
@@ -18,6 +22,18 @@ function ElementLootPile:on_set_enabled()
 		self:register_steal_SO()
 	else
 		self:unregister_steal_SO()
+	end
+end
+
+function ElementLootPile:update(t, dt)
+	if self._next_steal_time ~= nil then
+		self._next_steal_time = self._next_steal_time - dt
+		if self._next_steal_time <= 0 then
+			self._next_steal_time = nil
+			if self:enabled() then
+				self:register_steal_SO()
+			end
+		end
 	end
 end
 
@@ -44,6 +60,7 @@ function ElementLootPile:register_steal_SO()
 		drop_nav_seg = drop_point.nav_seg
 		drop_area = drop_point.area
 	else
+		self._next_steal_time = tonumber(self:value("retry_delay")) or 5
 		return
 	end
 	local drop_objective = {
@@ -106,6 +123,7 @@ function ElementLootPile:register_steal_SO()
 		pickup_objective = pickup_objective
 	}
 	managers.groupai:state():add_special_objective(so_id, so_descriptor)
+	self._next_steal_time = tonumber(self:value("reissue_delay")) or 30
 end
 
 function ElementLootPile:unregister_steal_SO()
@@ -128,14 +146,13 @@ function ElementLootPile:unregister_steal_SO()
 end
 
 function ElementLootPile:on_pickup_SO_completed(loot_index, thief)
-	if thief ~= self._steal_SO_data[loot_index].thief then
-		debug_pause_unit(thief, "[ElementLootPile:on_pickup_SO_completed] idiot thinks he is stealing", thief)
+	if not self._steal_SO_data[loot_index] then
 		return
 	end
 	self._steal_SO_data[loot_index].picked_up = true
 	local pos, rot = self:get_orientation()
 	local unit = managers.player:server_drop_carry(self:value("carry_id"), 1, true, false, 1, pos, rot, Vector3(0, 0, 0), 0, nil, nil)
-	if unit and unit:carry_data() then
+	if alive(unit) and unit:carry_data() then
 		unit:carry_data():link_to(thief)
 		self._steal_SO_data[loot_index].loot_unit = unit
 	end
@@ -146,11 +163,7 @@ function ElementLootPile:on_pickup_SO_completed(loot_index, thief)
 end
 
 function ElementLootPile:on_pickup_SO_failed(loot_index, thief)
-	if not self._steal_SO_data[loot_index] or not self._steal_SO_data[loot_index].thief then
-		return
-	end
-	if thief ~= self._steal_SO_data[loot_index].thief then
-		debug_pause_unit(thief, "[CarryData:on_pickup_SO_failed] idiot thinks he is stealing", thief)
+	if not self._steal_SO_data[loot_index] then
 		return
 	end
 	self._steal_SO_data[loot_index] = nil
@@ -160,15 +173,11 @@ function ElementLootPile:on_pickup_SO_failed(loot_index, thief)
 end
 
 function ElementLootPile:on_secure_SO_completed(loot_index, thief)
-	if not self._steal_SO_data[loot_index] or not self._steal_SO_data[loot_index].thief then
-		return
-	end
-	if thief ~= self._steal_SO_data[loot_index].thief then
-		debug_pause_unit(sympathy_civ, "[CarryData:on_secure_SO_completed] idiot thinks he is stealing", thief)
+	if not self._steal_SO_data[loot_index] then
 		return
 	end
 	local unit = self._steal_SO_data[loot_index].loot_unit
-	if unit and unit:carry_data() then
+	if alive(unit) and unit:carry_data() then
 		unit:carry_data():unlink()
 	end
 	managers.mission:call_global_event("loot_lost")
@@ -176,15 +185,11 @@ function ElementLootPile:on_secure_SO_completed(loot_index, thief)
 end
 
 function ElementLootPile:on_secure_SO_failed(loot_index, thief)
-	if not self._steal_SO_data[loot_index] or not self._steal_SO_data[loot_index].thief then
-		return
-	end
-	if thief ~= self._steal_SO_data[loot_index].thief then
-		debug_pause_unit(thief, "[CarryData:on_pickup_SO_failed] idiot thinks he is stealing", thief)
+	if not self._steal_SO_data[loot_index] then
 		return
 	end
 	local unit = self._steal_SO_data[loot_index].loot_unit
-	if unit and unit:carry_data() then
+	if alive(unit) and unit:carry_data() then
 		unit:carry_data():unlink()
 		unit:carry_data():_chk_register_steal_SO()
 	end
@@ -193,7 +198,6 @@ end
 
 function ElementLootPile:clbk_pickup_SO_verification(loot_index, candidate_unit)
 	if not self._steal_SO_data[loot_index] or not self._steal_SO_data[loot_index].SO_id then
-		debug_pause_unit(self._unit, "[CarryData:clbk_pickup_SO_verification] SO is not registered", self._unit, candidate_unit, inspect(self._steal_SO_data[loot_index]))
 		return
 	end
 	if candidate_unit:movement():cool() then
@@ -210,9 +214,7 @@ function ElementLootPile:clbk_pickup_SO_verification(loot_index, candidate_unit)
 end
 
 function ElementLootPile:on_pickup_SO_administered(loot_index, thief)
-	if self._steal_SO_data[loot_index].thief then
-		debug_pause("[CarryData:on_pickup_SO_administered] Already had a thief!!!!", thief, self._steal_SO_data[loot_index].thief)
+	if not self._steal_SO_data[loot_index].thief then
+		self._steal_SO_data[loot_index].SO_registered = false
 	end
-	self._steal_SO_data[loot_index].thief = thief
-	self._steal_SO_data[loot_index].SO_registered = false
 end

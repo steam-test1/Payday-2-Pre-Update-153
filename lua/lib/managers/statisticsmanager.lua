@@ -43,6 +43,13 @@ function StatisticsManager:_setup(reset)
 			explosion = 0,
 			tied = 0
 		},
+		medic = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
 		fbi_swat = {
 			count = 0,
 			head_shots = 0,
@@ -250,7 +257,13 @@ function StatisticsManager:_setup(reset)
 	self._defaults.killed_by_melee = {}
 	self._defaults.killed_by_weapon = {}
 	self._defaults.killed_by_grenade = {}
+	self._defaults.killed_by_anyone = {
+		killed_by_melee = {},
+		killed_by_weapon = {},
+		killed_by_grenade = {}
+	}
 	self._defaults.shots_by_weapon = {}
+	self._defaults.used_weapons = {}
 	self._defaults.sessions = {count = 0, time = 0}
 	self._defaults.sessions.levels = {}
 	for _, lvl in ipairs(tweak_data.levels._level_index) do
@@ -381,7 +394,8 @@ function StatisticsManager:start_session(data)
 		self._global.sessions.levels[Global.level_data.level_id].drop_in = self._global.sessions.levels[Global.level_data.level_id].drop_in + (Global.statistics_manager.playing_from_start and 0 or 1)
 	end
 	local job_id = managers.job:current_job_id()
-	if managers.job:on_first_stage() then
+	local can_record_session = managers.job:on_first_stage()
+	if can_record_session then
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
 		if Global.statistics_manager.playing_from_start then
 			self._global.sessions.jobs[job_stat .. "_started"] = (self._global.sessions.jobs[job_stat .. "_started"] or 0) + 1
@@ -395,6 +409,10 @@ function StatisticsManager:start_session(data)
 	self._start_session_from_beginning = Global.statistics_manager.playing_from_start
 	self._start_session_drop_in = data.drop_in
 	self._session_started = true
+end
+
+function StatisticsManager:has_session_started()
+	return self._session_started or false
 end
 
 function StatisticsManager:get_session_time_seconds()
@@ -428,7 +446,8 @@ function StatisticsManager:stop_session(data)
 	end
 	local completion
 	local job_id = managers.job:current_job_id()
-	if job_id and data then
+	local can_record_session = job_id and data and true or false
+	if can_record_session then
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
 		if data.type == "victory" then
 			if managers.job:on_last_stage() then
@@ -1123,12 +1142,75 @@ function StatisticsManager:_calculate_average()
 	end
 end
 
+function StatisticsManager:_get_boom_guns()
+	if not self._boom_guns then
+		self._boom_guns = {
+			"gre_m79",
+			"huntsman",
+			"r870",
+			"saiga",
+			"ksg",
+			"striker",
+			"serbu",
+			"benelli",
+			"judge",
+			"rpg7",
+			"m32",
+			"china",
+			"b682",
+			"m37",
+			"spas12",
+			"frankish",
+			"arblast",
+			"hunter",
+			"plainsrider",
+			"long"
+		}
+	end
+	return self._boom_guns
+end
+
 function StatisticsManager:killed_by_anyone(data)
-	local by_explosion = data.variant == "explosion"
 	local name_id = data.weapon_unit and data.weapon_unit:base():get_name_id()
 	managers.achievment:set_script_data("pacifist_fail", true)
 	if name_id ~= "m79" and name_id ~= "m79_npc" then
 		managers.achievment:set_script_data("blow_out_fail", true)
+	end
+	local kills_table = self._global.session.killed_by_anyone
+	local by_bullet = data.variant == "bullet"
+	local by_melee = data.variant == "melee" or (data.name_id or data.name) and tweak_data.blackmarket.melee_weapons[data.name_id or data.name]
+	local by_explosion = data.variant == "explosion"
+	local by_other_variant = not by_bullet and not by_melee and not by_explosion
+	local is_molotov = data.is_molotov
+	if by_bullet then
+		local name_id, throwable_id = self:_get_name_id_and_throwable_id(data.weapon_unit)
+		if throwable_id then
+			kills_table.killed_by_grenade[throwable_id] = (kills_table.killed_by_grenade[throwable_id] or 0) + 1
+		else
+			self:_add_to_killed_by_weapon(kills_table, name_id, data, false)
+		end
+	elseif by_melee then
+		local name_id = data.name_id or data.name or "unknown"
+		if name_id then
+			kills_table.killed_by_melee[name_id] = (kills_table.killed_by_melee[name_id] or 0) + 1
+		end
+	elseif by_explosion then
+		local name_id, throwable_id = self:_get_name_id_and_throwable_id(data.weapon_unit)
+		if throwable_id then
+			kills_table.killed_by_grenade[throwable_id] = (kills_table.killed_by_grenade[throwable_id] or 0) + 1
+		end
+		if name_id and table.contains(self:_get_boom_guns(), name_id) then
+			self:_add_to_killed_by_weapon(kills_table, name_id, data, false)
+		end
+	elseif by_other_variant then
+		local name_id, throwable_id = self:_get_name_id_and_throwable_id(data.weapon_unit)
+		if throwable_id then
+			kills_table.killed_by_grenade[throwable_id] = (kills_table.killed_by_grenade[throwable_id] or 0) + 1
+		elseif is_molotov then
+			kills_table.killed_by_grenade.molotov = (kills_table.killed_by_grenade.molotov or 0) + 1
+		else
+			self:_add_to_killed_by_weapon(kills_table, name_id, data, false)
+		end
 	end
 end
 
@@ -1140,7 +1222,7 @@ function StatisticsManager:killed(data)
 		stats_name = "other"
 	end
 	local by_bullet = data.variant == "bullet"
-	local by_melee = data.variant == "melee"
+	local by_melee = data.variant == "melee" or (data.name_id or data.name) and tweak_data.blackmarket.melee_weapons[data.name_id or data.name]
 	local by_explosion = data.variant == "explosion"
 	local by_other_variant = not by_bullet and not by_melee and not by_explosion
 	local type = self._global.killed[stats_name]
@@ -1167,7 +1249,7 @@ function StatisticsManager:killed(data)
 			self._global.session.killed_by_grenade[throwable_id] = (self._global.session.killed_by_grenade[throwable_id] or 0) + 1
 			self._global.killed_by_grenade[throwable_id] = (self._global.killed_by_grenade[throwable_id] or 0) + 1
 		else
-			self:_add_to_killed_by_weapon(name_id, data)
+			self:_add_to_killed_by_weapon(self._global.session, name_id, data, true)
 			if self._global.session.killed_by_weapon[name_id].count == tweak_data.achievement.first_blood.count then
 				local category = data.weapon_unit:base():weapon_tweak_data().category
 				if category == tweak_data.achievement.first_blood.weapon_type then
@@ -1179,7 +1261,7 @@ function StatisticsManager:killed(data)
 			end
 		end
 	elseif by_melee then
-		local name_id = data.name_id
+		local name_id = data.name or data.name_id
 		self._global.session.killed_by_melee[name_id] = (self._global.session.killed_by_melee[name_id] or 0) + 1
 		self._global.killed_by_melee[name_id] = (self._global.killed_by_melee[name_id] or 0) + 1
 	elseif by_explosion then
@@ -1188,47 +1270,32 @@ function StatisticsManager:killed(data)
 			self._global.session.killed_by_grenade[throwable_id] = (self._global.session.killed_by_grenade[throwable_id] or 0) + 1
 			self._global.killed_by_grenade[throwable_id] = (self._global.killed_by_grenade[throwable_id] or 0) + 1
 		end
-		local boom_guns = {
-			"gre_m79",
-			"huntsman",
-			"r870",
-			"saiga",
-			"ksg",
-			"striker",
-			"serbu",
-			"benelli",
-			"judge",
-			"rpg7",
-			"m32",
-			"china",
-			"b682",
-			"m37",
-			"spas12",
-			"frankish",
-			"arblast",
-			"hunter",
-			"plainsrider",
-			"long"
-		}
-		if name_id and table.contains(boom_guns, name_id) then
-			self:_add_to_killed_by_weapon(name_id, data)
+		if name_id and table.contains(self:_get_boom_guns(), name_id) then
+			self:_add_to_killed_by_weapon(self._global.session, name_id, data, true)
 		end
 	elseif by_other_variant then
 		local name_id, throwable_id = self:_get_name_id_and_throwable_id(data.weapon_unit)
-		self:_add_to_killed_by_weapon(name_id, data)
+		if throwable_id then
+			self._global.session.killed_by_grenade[throwable_id] = (self._global.session.killed_by_grenade[throwable_id] or 0) + 1
+			self._global.killed_by_grenade[throwable_id] = (self._global.killed_by_grenade[throwable_id] or 0) + 1
+		else
+			self:_add_to_killed_by_weapon(self._global.session, name_id, data, true)
+		end
 	end
 end
 
-function StatisticsManager:_add_to_killed_by_weapon(name_id, data)
+function StatisticsManager:_add_to_killed_by_weapon(kills_table, name_id, data, add_global)
 	if not name_id then
 		return
 	end
-	self._global.session.killed_by_weapon[name_id] = self._global.session.killed_by_weapon[name_id] or {count = 0, headshots = 0}
-	self._global.session.killed_by_weapon[name_id].count = self._global.session.killed_by_weapon[name_id].count + 1
-	self._global.session.killed_by_weapon[name_id].headshots = self._global.session.killed_by_weapon[name_id].headshots + (data.head_shot and 1 or 0)
-	self._global.killed_by_weapon[name_id] = self._global.killed_by_weapon[name_id] or {count = 0, headshots = 0}
-	self._global.killed_by_weapon[name_id].count = self._global.killed_by_weapon[name_id].count + 1
-	self._global.killed_by_weapon[name_id].headshots = (self._global.killed_by_weapon[name_id].headshots or 0) + (data.head_shot and 1 or 0)
+	kills_table.killed_by_weapon[name_id] = kills_table.killed_by_weapon[name_id] or {count = 0, headshots = 0}
+	kills_table.killed_by_weapon[name_id].count = kills_table.killed_by_weapon[name_id].count + 1
+	kills_table.killed_by_weapon[name_id].headshots = kills_table.killed_by_weapon[name_id].headshots + (data.head_shot and 1 or 0)
+	if add_global then
+		self._global.killed_by_weapon[name_id] = self._global.killed_by_weapon[name_id] or {count = 0, headshots = 0}
+		self._global.killed_by_weapon[name_id].count = self._global.killed_by_weapon[name_id].count + 1
+		self._global.killed_by_weapon[name_id].headshots = (self._global.killed_by_weapon[name_id].headshots or 0) + (data.head_shot and 1 or 0)
+	end
 end
 
 function StatisticsManager:_get_name_id_and_throwable_id(weapon_unit)
@@ -1323,6 +1390,13 @@ end
 
 function StatisticsManager:shot_fired(data)
 	local name_id = data.name_id or data.weapon_unit:base():get_name_id()
+	if not self._global.session.used_weapons[name_id] then
+		if Network:is_server() then
+			self:used_weapon(name_id)
+		else
+			managers.network:session():send_to_host("client_used_weapon", name_id)
+		end
+	end
 	if not data.skip_bullet_count then
 		self._global.shots_fired.total = self._global.shots_fired.total + 1
 		self._global.session.shots_fired.total = self._global.session.shots_fired.total + 1
@@ -1339,6 +1413,18 @@ function StatisticsManager:shot_fired(data)
 		self._global.shots_by_weapon[name_id] = self._global.shots_by_weapon[name_id] or {hits = 0, total = 0}
 		self._global.shots_by_weapon[name_id].hits = self._global.shots_by_weapon[name_id].hits + 1
 	end
+end
+
+function StatisticsManager:used_weapon(weapon_id)
+	if not Network:is_server() then
+		return
+	end
+	self:_used_weapon(weapon_id)
+	managers.network:session():send_to_peers("sync_used_weapon", weapon_id)
+end
+
+function StatisticsManager:_used_weapon(weapon_id)
+	self._global.session.used_weapons[weapon_id] = true
 end
 
 function StatisticsManager:downed(data)
@@ -1631,6 +1717,14 @@ function StatisticsManager:session_killed_by_grenade()
 	return count
 end
 
+function StatisticsManager:session_anyone_killed_by_grenade()
+	local count = 0
+	for projectile_id, kills in pairs(self._global.session.killed_by_anyone.killed_by_grenade) do
+		count = count + kills
+	end
+	return count
+end
+
 function StatisticsManager:session_killed_by_projectile(projectile_id)
 	return self._global.session.killed_by_grenade[projectile_id] or 0
 end
@@ -1638,6 +1732,14 @@ end
 function StatisticsManager:session_killed_by_melee()
 	local count = 0
 	for melee_id, kills in pairs(self._global.session.killed_by_melee) do
+		count = count + kills
+	end
+	return count
+end
+
+function StatisticsManager:session_anyone_killed_by_melee()
+	local count = 0
+	for melee_id, kills in pairs(self._global.session.killed_by_anyone.killed_by_melee) do
 		count = count + kills
 	end
 	return count
@@ -1653,6 +1755,100 @@ function StatisticsManager:session_killed_by_weapons()
 		count = count + data.count
 	end
 	return count
+end
+
+function StatisticsManager:session_anyone_killed_by_weapons()
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
+		count = count + data.count
+	end
+	return count
+end
+
+function StatisticsManager:session_killed_by_weapons_except(weapons_table)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
+		if not table.contains(weapons_table, weapon_id) then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_anyone_killed_by_weapons_except(weapons_table)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
+		if not table.contains(weapons_table, weapon_id) then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_killed_by_weapon_category(category)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
+		if tweak_data:get_raw_value("weapon", weapon_id, "category") == category then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_anyone_killed_by_weapon_category(category)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
+		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") == category then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_killed_by_weapon_category_except(category_table)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
+		local category = tweak_data:get_raw_value("weapon", weapon_id, "category")
+		if not table.contains(category_table, category) then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_anyone_killed_by_weapon_category_except(category_table)
+	local count = 0
+	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
+		local category = tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category")
+		if not table.contains(category_table, category) then
+			count = count + data.count
+		end
+	end
+	return count
+end
+
+function StatisticsManager:session_anyone_used_weapons()
+	return self._global.session.used_weapons
+end
+
+function StatisticsManager:session_anyone_used_weapon(weapon_id)
+	return self._global.session.used_weapons[weapon_id]
+end
+
+function StatisticsManager:session_anyone_used_weapon_category(category)
+	for weapon_id in pairs(self._global.session.used_weapons) do
+		if tweak_data:get_raw_value("weapon", weapon_id, "category") == category then
+			return true
+		end
+	end
+end
+
+function StatisticsManager:session_anyone_used_weapon_category_except(category)
+	for weapon_id in pairs(self._global.session.used_weapons) do
+		if tweak_data:get_raw_value("weapon", weapon_id, "category") ~= category then
+			return true
+		end
+	end
 end
 
 function StatisticsManager:session_enemy_killed_by_type(enemy, type)

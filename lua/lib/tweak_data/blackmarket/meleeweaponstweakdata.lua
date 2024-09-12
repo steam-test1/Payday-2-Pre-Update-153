@@ -851,6 +851,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.whiskey.stats.max_damage_effect = 2
 	self.melee_weapons.whiskey.stats.charge_time = 2
 	self.melee_weapons.whiskey.stats.range = 185
+	self.melee_weapons.whiskey.menu_scene_anim = "menu"
+	self.melee_weapons.whiskey.menu_scene_params = {loop = false, start_time = -1}
 	self.melee_weapons.whiskey.sounds = {}
 	self.melee_weapons.whiskey.sounds.equip = "whiskey_equip"
 	self.melee_weapons.whiskey.sounds.hit_air = "whiskey_hit_air"
@@ -1068,6 +1070,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.bowie.expire_t = 1.1
 	self.melee_weapons.bowie.repeat_expire_t = 0.8
 	self.melee_weapons.bowie.attack_allowed_expire_t = 0.1
+	self.melee_weapons.bowie.menu_scene_anim = "menu"
+	self.melee_weapons.bowie.menu_scene_params = {loop = false, start_time = -1}
 	self.melee_weapons.bowie.sounds = {}
 	self.melee_weapons.bowie.sounds.equip = "knife_equip"
 	self.melee_weapons.bowie.sounds.hit_air = "knife_hit_air"

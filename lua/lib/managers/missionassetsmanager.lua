@@ -168,6 +168,21 @@ function MissionAssetsManager:on_simulation_ended()
 	self:reset()
 end
 
+function MissionAssetsManager:reload_locks()
+	managers.money:refund_mission_assets()
+	local unlocked = self:get_unlocked_asset_ids()
+	self:reset()
+	self:create_asset_textures()
+	for _, id in ipairs(unlocked) do
+		if self:get_asset_can_unlock_by_id(id) then
+			self:unlock_asset(id)
+		end
+	end
+	if WalletGuiObject then
+		WalletGuiObject.refresh()
+	end
+end
+
 function MissionAssetsManager:add_trigger(id, type, asset_id, callback)
 	self._triggers[type] = self._triggers[type] or {}
 	self._triggers[type][id] = {id = asset_id, callback = callback}

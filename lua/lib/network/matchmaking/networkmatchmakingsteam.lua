@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.54.14"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.55.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -75,6 +75,42 @@ function NetworkMatchMakingSTEAM:_save_globals()
 	Global.steam.match.distance_filter = self._distance_filter
 	Global.steam.match.difficulty_filter = self._difficulty_filter
 	Global.steam.match.lobby_return_count = self._lobby_return_count
+end
+
+function NetworkMatchMakingSTEAM:load_user_filters()
+	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
+	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
+	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
+	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
+	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
+	local distance = managers.user:get_setting("crimenet_filter_distance")
+	local difficulty = managers.user:get_setting("crimenet_filter_difficulty")
+	local job_id = managers.user:get_setting("crimenet_filter_contract")
+	local kick = managers.user:get_setting("crimenet_filter_kick")
+	local tactic = managers.user:get_setting("crimenet_filter_tactic")
+	managers.network.matchmake:add_lobby_filter("state", in_lobby, "equal")
+	managers.network.matchmake:set_lobby_return_count(max_servers)
+	managers.network.matchmake:add_lobby_filter("num_players", new_servers, "equal")
+	managers.network.matchmake:set_distance_filter(managers.user:get_setting("crimenet_filter_distance"))
+	managers.network.matchmake:add_lobby_filter("difficulty", difficulty, "equal")
+	managers.network.matchmake:add_lobby_filter("job_id", job_id, "equal")
+	managers.network.matchmake:add_lobby_filter("kick_option", kick, "equal")
+	managers.network.matchmake:add_lobby_filter("job_plan", tactic, "equal")
+end
+
+function NetworkMatchMakingSTEAM:reset_filters()
+	local usr = managers.user
+	usr:set_setting("crimenet_filter_friends_only", usr:get_default_setting("crimenet_filter_friends_only"))
+	usr:set_setting("crimenet_filter_level_appopriate", usr:get_default_setting("crimenet_filter_level_appopriate"))
+	usr:set_setting("crimenet_filter_new_servers_only", usr:get_default_setting("crimenet_filter_new_servers_only"))
+	usr:set_setting("crimenet_filter_in_lobby", usr:get_default_setting("crimenet_filter_in_lobby"))
+	usr:set_setting("crimenet_filter_max_servers", usr:get_default_setting("crimenet_filter_max_servers"))
+	usr:set_setting("crimenet_filter_distance", usr:get_default_setting("crimenet_filter_distance"))
+	usr:set_setting("crimenet_filter_difficulty", usr:get_default_setting("crimenet_filter_difficulty"))
+	usr:set_setting("crimenet_filter_contract", usr:get_default_setting("crimenet_filter_contract"))
+	usr:set_setting("crimenet_filter_kick", usr:get_default_setting("crimenet_filter_kick"))
+	usr:set_setting("crimenet_filter_tactic", usr:get_default_setting("crimenet_filter_tactic"))
+	self:load_user_filters()
 end
 
 function NetworkMatchMakingSTEAM:set_join_invite_pending(lobby_id)
@@ -328,10 +364,11 @@ function NetworkMatchMakingSTEAM:game_owner_name()
 	return managers.network.matchmake.lobby_handler:get_lobby_data("owner_name")
 end
 
-function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_numbers, is_invite)
+function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_numbers, is_invite, attributes_mutators)
 	local permission = tweak_data:index_to_permission(attributes_numbers[3])
 	local level_index, job_index = self:_split_attribute_number(attributes_numbers[1], 1000)
-	if not tweak_data.levels:get_level_name_from_index(level_index) then
+	local level_name = tweak_data.levels:get_level_name_from_index(level_index)
+	if not level_name then
 		Application:error("No level data for index " .. level_index .. ". Payday1 data not compatible with Payday2.")
 		return false
 	end
@@ -346,6 +383,15 @@ function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_num
 	if not is_invite and permission == "private" then
 		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. PRIVATE GAME")
 		return false, 2
+	end
+	if attributes_mutators and not Global.game_settings.search_mutated_lobbies then
+		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. MUTATED GAME")
+		return false
+	end
+	local level_tweak = tweak_data.levels[level_name]
+	if level_tweak and level_tweak.is_safehouse and not Global.game_settings.allow_search_safehouses then
+		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. HIDE ALL SAFEHOUSES")
+		return false
 	end
 	if permission == "public" then
 		return true

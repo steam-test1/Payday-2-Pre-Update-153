@@ -77,6 +77,27 @@ function NetworkMatchMaking:_save_globals()
 	Global.empty.match.lobby_return_count = self._lobby_return_count
 end
 
+function NetworkMatchMaking:load_user_filters()
+	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
+	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
+	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
+	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
+	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
+	local distance = managers.user:get_setting("crimenet_filter_distance")
+	local difficulty = managers.user:get_setting("crimenet_filter_difficulty")
+	local job_id = managers.user:get_setting("crimenet_filter_contract")
+	local kick = managers.user:get_setting("crimenet_filter_kick")
+	local tactic = managers.user:get_setting("crimenet_filter_tactic")
+	managers.network.matchmake:add_lobby_filter("state", in_lobby, "equal")
+	managers.network.matchmake:set_lobby_return_count(max_servers)
+	managers.network.matchmake:add_lobby_filter("num_players", new_servers, "equal")
+	managers.network.matchmake:set_distance_filter(managers.user:get_setting("crimenet_filter_distance"))
+	managers.network.matchmake:add_lobby_filter("difficulty", difficulty, "equal")
+	managers.network.matchmake:add_lobby_filter("job_id", job_id, "equal")
+	managers.network.matchmake:add_lobby_filter("kick_option", kick, "equal")
+	managers.network.matchmake:add_lobby_filter("job_plan", tactic, "equal")
+end
+
 function NetworkMatchMaking:set_join_invite_pending(lobby_id)
 	self._join_invite_pending = lobby_id
 end

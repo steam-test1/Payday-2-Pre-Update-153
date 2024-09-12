@@ -1657,9 +1657,7 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 		end
 		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
 			col_ray.body:extension().damage:damage_melee(self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-			if hit_unit:id() ~= -1 then
-				managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-			end
+			managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
 		end
 		managers.rumble:play("melee_hit")
 		managers.game_play_central:physics_push(col_ray)
@@ -1750,7 +1748,7 @@ function PlayerStandard:_check_melee_dot_damage(col_ray, defense_data, melee_ent
 	end
 	local data = managers.dot:create_dot_data(dot_data.type, dot_data.custom_data)
 	local damage_class = CoreSerialize.string_to_classtable(data.damage_class)
-	damage_class:start_dot_damage(col_ray, nil, data)
+	damage_class:start_dot_damage(col_ray, nil, data, melee_entry)
 end
 
 function PlayerStandard:_play_melee_sound(melee_entry, sound_id, variation)
@@ -2346,6 +2344,9 @@ function PlayerStandard:_start_action_intimidate(t, secondary)
 	if not self._intimidate_t or t - self._intimidate_t > tweak_data.player.movement_state.interaction_delay then
 		local skip_alert = managers.groupai:state():whisper_mode()
 		local voice_type, plural, prime_target = self:_get_unit_intimidation_action(not secondary, not secondary, true, false, true, nil, nil, nil, secondary)
+		if prime_target and prime_target.unit and prime_target.unit.base and prime_target.unit:base().unintimidateable then
+			return
+		end
 		local interact_type, sound_name
 		local sound_suffix = plural and "plu" or "sin"
 		if voice_type == "stop" then
@@ -2565,7 +2566,7 @@ function PlayerStandard:_check_action_jump(t, input)
 end
 
 function PlayerStandard:_start_action_jump(t, action_start_data)
-	if self._running and not self.RUN_AND_RELOAD then
+	if self._running and not self.RUN_AND_RELOAD and not managers.player.RUN_AND_SHOOT then
 		self:_interupt_action_reload(t)
 		self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, self._equipped_unit:base():exit_run_speed_multiplier())
 	end
@@ -3020,6 +3021,9 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 								start_shooting = true
 								if fire_mode == "auto" then
 									self._unit:camera():play_redirect(self.IDS_RECOIL_ENTER)
+									if not weap_base.akimbo and (not weap_base.third_person_important or weap_base.third_person_important and not weap_base:third_person_important()) then
+										self._ext_network:send("sync_start_auto_fire_sound")
+									end
 								end
 							end
 						else
@@ -3121,7 +3125,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						local impact = not fired.hit_enemy
 						if weap_base.third_person_important and weap_base:third_person_important() then
 							self._ext_network:send("shot_blank_reliable", impact)
-						else
+						elseif fire_mode == "single" or weap_base.akimbo then
 							self._ext_network:send("shot_blank", impact)
 						end
 					elseif fire_mode == "single" then
@@ -3145,6 +3149,9 @@ function PlayerStandard:_check_stop_shooting()
 		self._equipped_unit:base():stop_shooting()
 		self._camera_unit:base():stop_shooting(self._equipped_unit:base():recoil_wait())
 		local weap_base = self._equipped_unit:base()
+		if not weap_base.akimbo then
+			self._ext_network:send("sync_stop_auto_fire_sound")
+		end
 		local fire_mode = weap_base:fire_mode()
 		if fire_mode == "auto" and not self:_is_reloading() and not self:_is_meleeing() then
 			self._unit:camera():play_redirect(self.IDS_RECOIL_EXIT)

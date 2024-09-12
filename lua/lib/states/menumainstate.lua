@@ -96,6 +96,7 @@ function MenuMainState:at_enter(old_state)
 		managers.savefile:save_progress("local_hdd")
 	end
 	managers.dyn_resource:set_file_streaming_chunk_size_mul(0.5, 3)
+	managers.achievment:check_autounlock_achievements()
 	if Global.exe_argument_level then
 		MenuCallbackHandler:start_job({
 			job_id = Global.exe_argument_level,

@@ -46,7 +46,7 @@ function HuskTeamAIDamage:damage_explosion(attack_data)
 			attacker = self._unit
 		end
 		managers.hud:set_mugshot_damage_taken(self._unit:unit_data().mugshot_id)
-		self._unit:network():send_to_host("damage_explosion_fire", attacker, damage_percent, CopDamage._get_attack_variant_index(self, "explosion"), self._dead and true or false, attack_data.col_ray.ray)
+		self._unit:network():send_to_host("damage_explosion_fire", attacker, damage_percent, CopDamage._get_attack_variant_index(self, "explosion"), self._dead and true or false, attack_data.col_ray.ray, attack_data.weapon_unit)
 		self:_send_damage_drama(attack_data, damage_abs)
 	end
 end
@@ -71,7 +71,7 @@ function HuskTeamAIDamage:damage_fire(attack_data)
 			attacker = self._unit
 		end
 		managers.hud:set_mugshot_damage_taken(self._unit:unit_data().mugshot_id)
-		self._unit:network():send_to_host("damage_explosion_fire", attacker, damage_percent, CopDamage._get_attack_variant_index(self, "fire"), self._dead and true or false, attack_data.col_ray.ray)
+		self._unit:network():send_to_host("damage_explosion_fire", attacker, damage_percent, CopDamage._get_attack_variant_index(self, "fire"), self._dead and true or false, attack_data.col_ray.ray, attack_data.weapon_unit)
 		self:_send_damage_drama(attack_data, damage_abs)
 	end
 end

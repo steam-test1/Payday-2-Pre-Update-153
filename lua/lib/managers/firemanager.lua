@@ -84,7 +84,7 @@ function FireManager:is_set_on_fire(unit)
 	return false
 end
 
-function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
+function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
 	local contains = false
 	if self._doted_enemies then
 		for _, dot_info in ipairs(self._doted_enemies) do
@@ -101,7 +101,8 @@ function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, wea
 				fire_dot_counter = 0,
 				dot_length = dot_length,
 				dot_damage = dot_damage,
-				user_unit = user_unit
+				user_unit = user_unit,
+				is_molotov = is_molotov
 			}
 			table.insert(self._doted_enemies, dot_info)
 			self:_start_enemy_fire_effect(dot_info)
@@ -111,16 +112,16 @@ function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, wea
 	end
 end
 
-function FireManager:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
+function FireManager:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
 	if enemy_unit then
 		local t = TimerManager:game():time()
-		self:_add_doted_enemy(enemy_unit, t, weapon_unit, dot_length, dot_damage, user_unit)
+		self:_add_doted_enemy(enemy_unit, t, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
 	end
 end
 
-function FireManager:add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
-	local dot_info = self:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
-	managers.network:session():send_to_peers_synched("sync_add_doted_enemy", enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
+function FireManager:add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
+	local dot_info = self:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
+	managers.network:session():send_to_peers_synched("sync_add_doted_enemy", enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov)
 end
 
 function FireManager:_remove_flame_effects_from_doted_unit(enemy_unit)
@@ -196,7 +197,8 @@ function FireManager:_damage_fire_dot(dot_info)
 		local variant = "fire"
 		local weapon_unit = dot_info.weapon_unit
 		local is_fire_dot_damage = true
-		FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_unit, damage, is_fire_dot_damage)
+		local is_molotov = dot_info.is_molotov
+		FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_unit, damage, is_fire_dot_damage, is_molotov)
 	end
 end
 
@@ -229,6 +231,7 @@ function FireManager:detect_and_give_dmg(params)
 	local fire_dot_data = params.fire_dot_data
 	local results = {}
 	local alert_radius = params.alert_radius or 3000
+	local is_molotov = params.is_molotov
 	if params.push_units ~= nil then
 		push_units = params.push_units
 	end
@@ -365,6 +368,7 @@ function FireManager:detect_and_give_dmg(params)
 				}
 				action_data.is_fire_dot_damage = false
 				action_data.fire_dot_data = fire_dot_data
+				action_data.is_molotov = is_molotov
 				local t = TimerManager:game():time()
 				hit_unit:character_damage():damage_fire(action_data)
 				if not dead_before and hit_unit:base() and hit_unit:base()._tweak_table and hit_unit:character_damage():dead() then

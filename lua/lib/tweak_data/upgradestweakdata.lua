@@ -219,7 +219,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.convert_enemies = {true}
 	self.values.player.convert_enemies_max_minions = {1, 2}
 	self.values.player.convert_enemies_health_multiplier = {0.65}
-	self.values.player.convert_enemies_damage_multiplier = {1.45}
+	self.values.player.convert_enemies_damage_multiplier = {2}
 	self.values.player.xp_multiplier = {1.15}
 	self.values.team.xp.multiplier = {1.3}
 	self.values.pistol.reload_speed_multiplier = {1.5}
@@ -323,7 +323,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.weapon.passive_damage_multiplier = {1.05}
 	self.values.weapon.knock_down = {0.05, 0.2}
-	self.values.weapon.automatic_head_shot_add = {0.1875, 0.625}
+	self.values.weapon.automatic_head_shot_add = {0.75, 1.5}
 	self.values.assault_rifle.enter_steelsight_speed_multiplier = {2}
 	self.values.assault_rifle.zoom_increase = {2}
 	self.values.player.crafting_weapon_multiplier = {0.9}
@@ -420,7 +420,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.ecm_jammer.duration_multiplier_2 = {true}
 	self.values.ecm_jammer.can_open_sec_doors = {true}
 	self.values.player.pick_lock_easy = {true}
-	self.values.player.pick_lock_easy_speed_multiplier = {0.75, 0.5}
+	self.values.player.pick_lock_easy_speed_multiplier = {0.5}
 	self.values.player.pick_lock_hard = {true}
 	self.values.weapon.silencer_recoil_multiplier = {0.5}
 	self.values.weapon.silencer_spread_multiplier = {0.5}
@@ -738,7 +738,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.7, 5}
 	}
 	self.values.player.revive_damage_reduction = {0.7}
-	self.values.player.passive_convert_enemies_health_multiplier = {0.55, 0.1}
+	self.values.player.passive_convert_enemies_health_multiplier = {0.5, 0}
 	self.values.player.automatic_faster_reload = {
 		{
 			target_enemies = 2,
@@ -1012,13 +1012,13 @@ function UpgradesTweakData:_init_pd2_values()
 			{
 				"10%",
 				"40%",
-				"45%"
+				"50%"
 			},
 			{
 				"20%",
 				"40%",
 				"30%",
-				"45%"
+				"50%"
 			}
 		},
 		discipline = {
@@ -1130,8 +1130,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{},
 			{
 				"55%",
-				"45%",
-				"65%"
+				"200%",
+				"0%"
 			}
 		},
 		juggernaut = {
@@ -5531,15 +5531,6 @@ function UpgradesTweakData:_player_definitions()
 			category = "player",
 			upgrade = "pick_lock_easy_speed_multiplier",
 			value = 1
-		}
-	}
-	self.definitions.player_pick_lock_easy_speed_multiplier_2 = {
-		category = "feature",
-		name_id = "menu_player_pick_lock_easy_speed_multiplier",
-		upgrade = {
-			category = "player",
-			upgrade = "pick_lock_easy_speed_multiplier",
-			value = 2
 		}
 	}
 	self.definitions.player_loot_drop_multiplier_1 = {

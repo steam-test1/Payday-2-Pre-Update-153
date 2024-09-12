@@ -1655,3 +1655,11 @@ function NetworkPeer:_update_equipped_armor()
 		self._unit:base():setup_hud_offset(self)
 	end
 end
+
+function NetworkPeer:set_is_dropin(is_dropin)
+	self._is_dropin = is_dropin
+end
+
+function NetworkPeer:is_dropin()
+	return self._is_dropin
+end

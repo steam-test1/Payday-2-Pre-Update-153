@@ -7,7 +7,9 @@ function FilterUnitElement:init(unit)
 	self._hed.difficulty_hard = true
 	self._hed.difficulty_overkill = true
 	self._hed.difficulty_overkill_145 = true
+	self._hed.difficulty_easy_wish = nil
 	self._hed.difficulty_overkill_290 = nil
+	self._hed.difficulty_sm_wish = nil
 	self._hed.player_1 = true
 	self._hed.player_2 = true
 	self._hed.player_3 = true
@@ -21,7 +23,9 @@ function FilterUnitElement:init(unit)
 	table.insert(self._save_values, "difficulty_hard")
 	table.insert(self._save_values, "difficulty_overkill")
 	table.insert(self._save_values, "difficulty_overkill_145")
+	table.insert(self._save_values, "difficulty_easy_wish")
 	table.insert(self._save_values, "difficulty_overkill_290")
+	table.insert(self._save_values, "difficulty_sm_wish")
 	table.insert(self._save_values, "player_1")
 	table.insert(self._save_values, "player_2")
 	table.insert(self._save_values, "player_3")
@@ -40,6 +44,12 @@ end
 function FilterUnitElement:_check_convertion()
 	if self._hed.difficulty_overkill_290 == nil then
 		self._hed.difficulty_overkill_290 = self._hed.difficulty_overkill_145
+	end
+	if self._hed.difficulty_easy_wish == nil then
+		self._hed.difficulty_easy_wish = self._hed.difficulty_overkill_290
+	end
+	if self._hed.difficulty_sm_wish == nil then
+		self._hed.difficulty_sm_wish = self._hed.difficulty_overkill_290
 	end
 end
 
@@ -87,6 +97,13 @@ function FilterUnitElement:_build_panel(panel, panel_sizer)
 		value = "difficulty_overkill_145"
 	})
 	difficulty_sizer:add(difficulty_overkill_145, 0, 0, "EXPAND")
+	local difficulty_easy_wish = EWS:CheckBox(panel, "Easy Wish", "")
+	difficulty_easy_wish:set_value(self._hed.difficulty_easy_wish)
+	difficulty_easy_wish:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = difficulty_easy_wish,
+		value = "difficulty_easy_wish"
+	})
+	difficulty_sizer:add(difficulty_easy_wish, 0, 0, "EXPAND")
 	local difficulty_overkill_290 = EWS:CheckBox(panel, "Death Wish", "")
 	difficulty_overkill_290:set_value(self._hed.difficulty_overkill_290)
 	difficulty_overkill_290:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
@@ -94,6 +111,13 @@ function FilterUnitElement:_build_panel(panel, panel_sizer)
 		value = "difficulty_overkill_290"
 	})
 	difficulty_sizer:add(difficulty_overkill_290, 0, 0, "EXPAND")
+	local difficulty_sm_wish = EWS:CheckBox(panel, "SM Wish", "")
+	difficulty_sm_wish:set_value(self._hed.difficulty_sm_wish)
+	difficulty_sm_wish:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {
+		ctrlr = difficulty_sm_wish,
+		value = "difficulty_sm_wish"
+	})
+	difficulty_sizer:add(difficulty_sm_wish, 0, 0, "EXPAND")
 	local players_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "Players")
 	h_sizer:add(players_sizer, 1, 0, "EXPAND")
 	local player_1 = EWS:CheckBox(panel, "One Player", "")

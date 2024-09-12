@@ -310,7 +310,8 @@ function GroupAIStateBase:_init_misc_data()
 		tank = true,
 		spooc = true,
 		shield = true,
-		taser = true
+		taser = true,
+		medic = true
 	}
 	self._anticipated_police_force = 0
 	self._police_force = table.size(self._police)
@@ -1065,7 +1066,8 @@ function GroupAIStateBase:on_simulation_started()
 		tank = true,
 		spooc = true,
 		shield = true,
-		taser = true
+		taser = true,
+		medic = true
 	}
 	self._listener_holder = EventListenerHolder:new()
 	self:set_drama_draw_state(Global.drama_draw_state)

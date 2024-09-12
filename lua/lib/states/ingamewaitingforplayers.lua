@@ -371,6 +371,9 @@ function IngameWaitingForPlayersState:at_exit()
 		from_beginning = self._started_from_beginning,
 		drop_in = not self._started_from_beginning
 	})
+	for _, peer in pairs(managers.network:session():all_peers()) do
+		peer:set_is_dropin(false)
+	end
 	managers.hud:hide(self.GUI_SAFERECT)
 	managers.hud:hide(self.GUI_FULLSCREEN)
 	World:delete_unit(self._cam_unit)

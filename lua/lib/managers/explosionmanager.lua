@@ -176,29 +176,31 @@ function ExplosionManager:detect_and_give_dmg(params)
 			end
 			damage = math.max(damage, 1)
 			local hit_unit = hit_body:unit()
-			hit_units[hit_unit:key()] = hit_unit
-			if character and damage_character then
-				local dead_before = hit_unit:character_damage():dead()
-				local action_data = {}
-				action_data.variant = "explosion"
-				action_data.damage = damage
-				action_data.attacker_unit = user_unit
-				action_data.weapon_unit = owner
-				action_data.col_ray = self._col_ray or {
-					position = hit_body:position(),
-					ray = dir
-				}
-				action_data.ignite_character = params.ignite_character
-				hit_unit:character_damage():damage_explosion(action_data)
-				if not dead_before and hit_unit:base() and hit_unit:base()._tweak_table and hit_unit:character_damage():dead() then
-					type = hit_unit:base()._tweak_table
-					if CopDamage.is_civilian(type) then
-						count_civilian_kills = count_civilian_kills + 1
-					elseif CopDamage.is_gangster(type) then
-						count_gangster_kills = count_gangster_kills + 1
-					elseif type == "russian" or type == "german" or type == "spanish" or type == "american" then
-					else
-						count_cop_kills = count_cop_kills + 1
+			if ignore_unit ~= hit_unit then
+				hit_units[hit_unit:key()] = hit_unit
+				if character and damage_character then
+					local dead_before = hit_unit:character_damage():dead()
+					local action_data = {}
+					action_data.variant = "explosion"
+					action_data.damage = damage
+					action_data.attacker_unit = user_unit
+					action_data.weapon_unit = owner
+					action_data.col_ray = self._col_ray or {
+						position = hit_body:position(),
+						ray = dir
+					}
+					action_data.ignite_character = params.ignite_character
+					hit_unit:character_damage():damage_explosion(action_data)
+					if not dead_before and hit_unit:base() and hit_unit:base()._tweak_table and hit_unit:character_damage():dead() then
+						type = hit_unit:base()._tweak_table
+						if CopDamage.is_civilian(type) then
+							count_civilian_kills = count_civilian_kills + 1
+						elseif CopDamage.is_gangster(type) then
+							count_gangster_kills = count_gangster_kills + 1
+						elseif type == "russian" or type == "german" or type == "spanish" or type == "american" then
+						else
+							count_cop_kills = count_cop_kills + 1
+						end
 					end
 				end
 			end

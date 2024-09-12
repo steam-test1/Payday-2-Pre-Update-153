@@ -230,7 +230,7 @@ function UnitNetworkHandler:damage_bullet(subject_unit, attacker_unit, damage, i
 	subject_unit:character_damage():sync_damage_bullet(attacker_unit, damage, i_body, height_offset, variant, death)
 end
 
-function UnitNetworkHandler:damage_explosion_fire(subject_unit, attacker_unit, damage, i_attack_variant, death, direction, sender)
+function UnitNetworkHandler:damage_explosion_fire(subject_unit, attacker_unit, damage, i_attack_variant, death, direction, weapon_unit, sender)
 	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
@@ -240,28 +240,28 @@ function UnitNetworkHandler:damage_explosion_fire(subject_unit, attacker_unit, d
 	if i_attack_variant == 3 then
 		subject_unit:character_damage():sync_damage_fire(attacker_unit, damage, i_attack_variant, death, direction)
 	else
-		subject_unit:character_damage():sync_damage_explosion(attacker_unit, damage, i_attack_variant, death, direction)
+		subject_unit:character_damage():sync_damage_explosion(attacker_unit, damage, i_attack_variant, death, direction, weapon_unit)
 	end
 end
 
-function UnitNetworkHandler:damage_fire(subject_unit, attacker_unit, damage, start_dot_dance_antimation, death, direction, weapon_type, weapon_unit, sender)
+function UnitNetworkHandler:damage_fire(subject_unit, attacker_unit, damage, start_dot_dance_antimation, death, direction, weapon_type, weapon_unit, healed, sender)
 	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
 		attacker_unit = nil
 	end
-	subject_unit:character_damage():sync_damage_fire(attacker_unit, damage, start_dot_dance_antimation, death, direction, weapon_type, weapon_unit)
+	subject_unit:character_damage():sync_damage_fire(attacker_unit, damage, start_dot_dance_antimation, death, direction, weapon_type, weapon_unit, healed)
 end
 
-function UnitNetworkHandler:damage_dot(subject_unit, attacker_unit, damage, death, variant, hurt_animation, sender)
+function UnitNetworkHandler:damage_dot(subject_unit, attacker_unit, damage, death, variant, hurt_animation, weapon_id, sender)
 	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
 	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
 		attacker_unit = nil
 	end
-	subject_unit:character_damage():sync_damage_dot(attacker_unit, damage, death, variant, hurt_animation)
+	subject_unit:character_damage():sync_damage_dot(attacker_unit, damage, death, variant, hurt_animation, weapon_id)
 end
 
 function UnitNetworkHandler:damage_tase(subject_unit, attacker_unit, damage, variant, death, sender)
@@ -353,6 +353,20 @@ function UnitNetworkHandler:shot_blank(shooting_unit, impact, sender)
 	shooting_unit:movement():sync_shot_blank(impact)
 end
 
+function UnitNetworkHandler:sync_start_auto_fire_sound(shooting_unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(shooting_unit, sender) then
+		return
+	end
+	shooting_unit:movement():sync_start_auto_fire_sound()
+end
+
+function UnitNetworkHandler:sync_stop_auto_fire_sound(shooting_unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(shooting_unit, sender) then
+		return
+	end
+	shooting_unit:movement():sync_stop_auto_fire_sound()
+end
+
 function UnitNetworkHandler:shot_blank_reliable(shooting_unit, impact, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(shooting_unit, sender) then
 		return
@@ -429,6 +443,7 @@ function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, 
 		print("[UnitNetworkHandler:sync_body_damage_bullet] body has no damage damage_bullet function", body:name(), body:unit():name())
 		return
 	end
+	print("sync")
 	local normal = Vector3()
 	mrotation.set_yaw_pitch_roll(tmp_rot1, math.lerp(-180, 180, normal_yaw / 127), math.lerp(-90, 90, normal_pitch / 63), 0)
 	mrotation.y(tmp_rot1, normal)
@@ -950,13 +965,13 @@ function UnitNetworkHandler:start_revive_player(timer, sender)
 end
 
 function UnitNetworkHandler:pause_downed_timer(unit, sender)
-	if unit.interaction then
+	if alive(unit) and unit.interaction then
 		unit:interaction():set_waypoint_paused(true)
 	end
 end
 
 function UnitNetworkHandler:unpause_downed_timer(unit, sender)
-	if unit.interaction then
+	if alive(unit) and unit.interaction then
 		unit:interaction():set_waypoint_paused(false)
 	end
 end
@@ -1884,9 +1899,9 @@ function UnitNetworkHandler:sync_detonate_molotov_grenade(unit, ext_name, event_
 	extension:sync_detonate_molotov_grenade(event_id, normal, peer)
 end
 
-function UnitNetworkHandler:sync_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, rpc)
+function UnitNetworkHandler:sync_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, is_molotov, rpc)
 	local peer = self._verify_sender(rpc)
-	managers.fire:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, peer)
+	managers.fire:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, peer, is_molotov)
 end
 
 function UnitNetworkHandler:server_secure_loot(carry_id, multiplier_level, sender)
@@ -2781,5 +2796,14 @@ function UnitNetworkHandler:sync_team_ai_stopped(unit, stopped)
 	end
 	if alive(unit) then
 		unit:movement():set_should_stay(stopped)
+	end
+end
+
+function UnitNetworkHandler:sync_damage_achievements(unit, weapon_unit, attacker_unit, distance, damage, head_shot, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if alive(unit) and unit:character_damage() then
+		unit:character_damage():client_check_damage_achievements(weapon_unit, attacker_unit, distance, damage, head_shot)
 	end
 end

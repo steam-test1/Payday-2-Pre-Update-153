@@ -9,14 +9,28 @@ function PointOfNoReturnElement:init(unit)
 	self._hed.time_hard = 120
 	self._hed.time_overkill = 60
 	self._hed.time_overkill_145 = 30
+	self._hed.time_easy_wish = nil
 	self._hed.time_overkill_290 = 15
+	self._hed.time_sm_wish = nil
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "time_easy")
 	table.insert(self._save_values, "time_normal")
 	table.insert(self._save_values, "time_hard")
 	table.insert(self._save_values, "time_overkill")
 	table.insert(self._save_values, "time_overkill_145")
+	table.insert(self._save_values, "time_easy_wish")
 	table.insert(self._save_values, "time_overkill_290")
+	table.insert(self._save_values, "time_sm_wish")
+end
+
+function PointOfNoReturnElement:post_init(...)
+	PointOfNoReturnElement.super.post_init(self, ...)
+	if self._hed.time_easy_wish == nil then
+		self._hed.time_easy_wish = self._hed.time_overkill_290
+	end
+	if self._hed.time_sm_wish == nil then
+		self._hed.time_sm_wish = self._hed.time_overkill_290
+	end
 end
 
 function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
@@ -115,6 +129,26 @@ function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
 		ctrlr = time_overkill_145,
 		value = "time_overkill_145"
 	})
+	local time_params_easy_wish = {
+		name = "Time left on easy wish:",
+		panel = panel,
+		sizer = panel_sizer,
+		value = self._hed.time_easy_wish,
+		floats = 0,
+		tooltip = "Set the time left on Easy Wish difficulty",
+		min = 1,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local time_easy_wish = CoreEWS.number_controller(time_params_easy_wish)
+	time_easy_wish:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = time_easy_wish,
+		value = "time_easy_wish"
+	})
+	time_easy_wish:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = time_easy_wish,
+		value = "time_easy_wish"
+	})
 	local time_params_overkill_290 = {
 		name = "Time left on overkill 290:",
 		panel = panel,
@@ -134,6 +168,26 @@ function PointOfNoReturnElement:_build_panel(panel, panel_sizer)
 	time_overkill_290:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
 		ctrlr = time_overkill_290,
 		value = "time_overkill_290"
+	})
+	local time_params_sm_wish = {
+		name = "Time left on sm wish:",
+		panel = panel,
+		sizer = panel_sizer,
+		value = self._hed.time_sm_wish,
+		floats = 0,
+		tooltip = "Set the time left on SM Wish difficulty",
+		min = 1,
+		name_proportions = 1,
+		ctrlr_proportions = 2
+	}
+	local time_sm_wish = CoreEWS.number_controller(time_params_sm_wish)
+	time_sm_wish:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = time_sm_wish,
+		value = "time_sm_wish"
+	})
+	time_sm_wish:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = time_sm_wish,
+		value = "time_sm_wish"
 	})
 end
 

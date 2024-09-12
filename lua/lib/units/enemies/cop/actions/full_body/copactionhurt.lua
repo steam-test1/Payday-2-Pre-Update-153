@@ -467,7 +467,7 @@ function CopActionHurt:init(action_desc, common_data)
 				m_last_pos = common_data.pos + common_data.fwd * 500
 			}
 		end
-	elseif action_type == "hurt_sick" or action_type == "poison_hurt" then
+	elseif action_type == "hurt_sick" or action_type == "poison_hurt" or action_type == "concussion" then
 		self.update = self._upd_sick
 	elseif action_desc.variant == "tase" then
 	elseif self._ragdolled then

@@ -206,7 +206,7 @@ function ElementAreaTrigger:project_instigators()
 		local all_found = World:find_units_quick("all", 14)
 		
 		local function filter_func(unit)
-			if unit:base() and unit:base():get_name_id() == self._values.instigator_name then
+			if unit:base() and unit:base().get_name_id and unit:base():get_name_id() == self._values.instigator_name then
 				return true
 			end
 		end

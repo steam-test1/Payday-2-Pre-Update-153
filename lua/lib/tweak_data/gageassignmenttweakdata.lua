@@ -7,6 +7,8 @@ function GageAssignmentTweakData:init(tweak_data)
 		4,
 		6,
 		8,
+		10,
+		10,
 		10
 	}
 	self.EXPERIENCE_MULTIPLIER = 0.05
@@ -211,6 +213,17 @@ function GageAssignmentTweakData:init(tweak_data)
 			"wpn_fps_upg_shot_ns_king"
 		}
 	}
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.assignments) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+		for _, reward in ipairs(data.rewards) do
+			if free_dlcs[reward[1]] then
+				reward[1] = "normal"
+			end
+		end
+	end
 end
 
 function GageAssignmentTweakData:get_experience_multiplier(ratio)

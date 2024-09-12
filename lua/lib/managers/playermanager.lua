@@ -1637,17 +1637,17 @@ end
 function PlayerManager:movement_speed_multiplier(speed_state, bonus_multiplier, upgrade_level, health_ratio)
 	local multiplier = 1
 	local armor_penalty = self:mod_movement_penalty(self:body_armor_value("movement", upgrade_level, 1))
-	multiplier = multiplier + armor_penalty - 1
+	multiplier = multiplier + (armor_penalty - 1)
 	if bonus_multiplier then
-		multiplier = multiplier + bonus_multiplier - 1
+		multiplier = multiplier + (bonus_multiplier - 1)
 	end
 	if speed_state then
-		multiplier = multiplier + self:upgrade_value("player", speed_state .. "_speed_multiplier", 1) - 1
+		multiplier = multiplier + (self:upgrade_value("player", speed_state .. "_speed_multiplier", 1) - 1)
 	end
-	multiplier = multiplier + self:get_hostage_bonus_multiplier("speed") - 1
-	multiplier = multiplier + self:upgrade_value("player", "movement_speed_multiplier", 1) - 1
+	multiplier = multiplier + (self:get_hostage_bonus_multiplier("speed") - 1)
+	multiplier = multiplier + (self:upgrade_value("player", "movement_speed_multiplier", 1) - 1)
 	if self:num_local_minions() > 0 then
-		multiplier = multiplier + self:upgrade_value("player", "minion_master_speed_multiplier", 1) - 1
+		multiplier = multiplier + (self:upgrade_value("player", "minion_master_speed_multiplier", 1) - 1)
 	end
 	if self:has_category_upgrade("player", "secured_bags_speed_multiplier") then
 		local bags = 0

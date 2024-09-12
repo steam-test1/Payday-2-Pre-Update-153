@@ -285,6 +285,7 @@ function BaseNetworkSession:_on_peer_removed(peer, peer_id, reason)
 		if player_character then
 			player_left = true
 			print("Player left")
+			managers.mission:call_global_event("on_peer_removed", peer_id)
 		end
 	end
 	local member_unit = peer:unit()

@@ -55,6 +55,7 @@ function MultiProfileManager:load_current()
 		mcm:close_inventory_gui()
 		mcm:create_inventory_gui(node)
 	elseif mcm._mission_briefing_gui then
+		managers.assets:reload_locks()
 		local node = mcm._mission_briefing_gui._node
 		mcm:close_mission_briefing_gui()
 		mcm:create_mission_briefing_gui(node)

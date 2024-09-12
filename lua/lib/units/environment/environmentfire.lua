@@ -16,6 +16,10 @@ function EnvironmentFire:init(unit)
 	self._molotov_damage_effect_table = {}
 end
 
+function EnvironmentFire:get_name_id()
+	return "environment_fire"
+end
+
 function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_multiplier)
 	local custom_params = {
 		effect = data.effect_name,
@@ -40,6 +44,7 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 	self._player_damage = data.player_damage
 	self._fire_dot_data = deep_clone(data.fire_dot_data)
 	self._fire_alert_radius = data.fire_alert_radius
+	self._is_molotov = data.is_molotov
 	local detonated_position = self._unit:position()
 	local range = self._range
 	local single_effect_radius = range
@@ -201,7 +206,8 @@ function EnvironmentFire:_do_damage()
 						user = self._user_unit,
 						push_units = false,
 						alert_radius = self._fire_alert_radius,
-						fire_dot_data = self._fire_dot_data
+						fire_dot_data = self._fire_dot_data,
+						is_molotov = self._is_molotov
 					})
 				end
 			end
@@ -232,6 +238,7 @@ function EnvironmentFire:save(data)
 	state.player_damage = self._player_damage
 	state.fire_dot_data = self._fire_dot_data
 	state.fire_alert_radius = self._fire_alert_radius
+	state.is_molotov = self._is_molotov
 	state.data = self._data
 	state.normal = self._normal
 	state.added_time = self._added_time
@@ -252,6 +259,7 @@ function EnvironmentFire:load(data)
 	self._player_damage = state.player_damage
 	self._fire_dot_data = state.fire_dot_data
 	self._fire_alert_radius = state.fire_alert_radius
+	self._is_molotov = state.is_molotov
 	local data = state.data
 	local normal = state.normal
 	local added_time = state.added_time

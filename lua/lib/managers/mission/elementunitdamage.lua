@@ -63,7 +63,6 @@ function ElementUnitDamage:on_executed(instigator, damage_type, damage)
 end
 
 function ElementUnitDamage:client_on_executed(...)
-	self:on_executed(...)
 end
 
 function ElementUnitDamage:save(data)

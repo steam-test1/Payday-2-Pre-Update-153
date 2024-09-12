@@ -71,6 +71,19 @@ function NewNPCRaycastWeaponBase:init(unit)
 	self._textures = {}
 	self._cosmetics_data = nil
 	self._materials = nil
+	managers.mission:add_global_event_listener(tostring(self._unit:key()), {
+		"on_peer_removed"
+	}, callback(self, self, "_on_peer_removed"))
+end
+
+function NewNPCRaycastWeaponBase:_on_peer_removed(peer_id)
+	if self._shooting then
+		local user_unit = self._setup.user_unit
+		local user_peer_id = managers.criminals:character_peer_id_by_unit(user_unit)
+		if peer_id == user_peer_id then
+			self:stop_autofire()
+		end
+	end
 end
 
 function NewNPCRaycastWeaponBase:setup(setup_data)
@@ -157,9 +170,61 @@ function NewNPCRaycastWeaponBase:trigger_held(...)
 	return fired
 end
 
+function NewNPCRaycastWeaponBase:auto_trigger_held(direction, impact)
+	local fired = false
+	if self._next_fire_allowed <= Application:time() then
+		fired = self:auto_fire_blank(direction, impact)
+		if fired then
+			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].auto and tweak_data.weapon[self._name_id].auto.fire_rate or 0.1)
+		end
+	end
+	return fired
+end
+
 local mto = Vector3()
 local mfrom = Vector3()
 local mspread = Vector3()
+
+function NewNPCRaycastWeaponBase:auto_fire_blank(direction, impact)
+	local user_unit = self._setup.user_unit
+	self._unit:m_position(mfrom)
+	local rays = {}
+	if impact then
+		mvector3.set(mspread, direction)
+		mvector3.spread(mspread, 5)
+		mvector3.set(mto, mspread)
+		mvector3.multiply(mto, 20000)
+		mvector3.add(mto, mfrom)
+		local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
+		if self._use_trails == nil or self._use_trails == true then
+			if alive(self._obj_fire) then
+				self._obj_fire:m_position(self._trail_effect_table.position)
+				mvector3.set(self._trail_effect_table.normal, mspread)
+			end
+			local trail
+			if not self:weapon_tweak_data().no_trail then
+				trail = alive(self._obj_fire) and (not col_ray or col_ray.distance > 650) and World:effect_manager():spawn(self._trail_effect_table) or nil
+			end
+			if col_ray then
+				InstantBulletBase:on_collision(col_ray, self._unit, user_unit, self._damage, true)
+				if trail then
+					World:effect_manager():set_remaining_lifetime(trail, math.clamp((col_ray.distance - 600) / 10000, 0, col_ray.distance))
+				end
+				table.insert(rays, col_ray)
+			end
+		end
+	end
+	if alive(self._obj_fire) then
+		self:_spawn_muzzle_effect(mfrom, direction)
+	end
+	if self._use_shell_ejection_effect then
+		World:effect_manager():spawn(self._shell_ejection_effect_table)
+	end
+	if self:weapon_tweak_data().has_fire_animation then
+		self:tweak_data_anim_play("fire")
+	end
+	return true
+end
 
 function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 	local user_unit = self._setup.user_unit
@@ -212,6 +277,7 @@ function NewNPCRaycastWeaponBase:destroy(unit)
 	if self._shooting then
 		self:stop_autofire()
 	end
+	managers.mission:remove_global_event_listener(tostring(self._unit:key()))
 end
 
 function NewNPCRaycastWeaponBase:_get_spread(user_unit)
@@ -220,10 +286,17 @@ end
 function NewNPCRaycastWeaponBase:_sound_autofire_start(nr_shots)
 	local tweak_sound = tweak_data.weapon[self._name_id].sounds
 	local sound_name = tweak_sound.prefix .. self._setup.user_sound_variant .. self._voice .. (nr_shots and "_" .. tostring(nr_shots) .. "shot" or "_loop")
-	local sound = self._sound_fire:post_event(sound_name)
+	self._sound_fire:stop()
+	local sound = self._sound_fire:post_event(sound_name, callback(self, self, "_on_auto_fire_stop"), nil, "end_of_event")
 	if not sound then
 		sound_name = tweak_sound.prefix .. "1" .. self._voice .. "_end"
 		sound = self._sound_fire:post_event(sound_name)
+	end
+end
+
+function NewNPCRaycastWeaponBase:_on_auto_fire_stop()
+	if self._shooting then
+		self:_sound_autofire_start()
 	end
 end
 

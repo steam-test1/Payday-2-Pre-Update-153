@@ -611,14 +611,20 @@ function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades, 
 	return true
 end
 
+function GamePlayCentralManager:get_shotgun_push_range()
+	local range = 500
+	return range
+end
+
 function GamePlayCentralManager:do_shotgun_push(unit, hit_pos, dir, distance, attacker)
-	if 500 < distance then
+	local max_range = self:get_shotgun_push_range()
+	if distance > max_range then
 		return
 	end
 	if unit:movement()._active_actions[1] and unit:movement()._active_actions[1]:type() == "hurt" then
 		unit:movement()._active_actions[1]:force_ragdoll()
 	end
-	local scale = math.clamp(1 - distance / 500, 0.5, 1)
+	local scale = math.clamp(1 - distance / max_range, 0.5, 1)
 	local height = mvector3.distance(hit_pos, unit:position()) - 100
 	local twist_dir = math.random(2) == 1 and 1 or -1
 	local rot_acc = (dir:cross(math.UP) + math.UP * (0.5 * twist_dir)) * (-1000 * math.sign(height))

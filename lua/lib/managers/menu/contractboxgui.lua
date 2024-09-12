@@ -263,12 +263,10 @@ function ContractBoxGui:create_contract_box()
 		local plvl = managers.experience:current_level()
 		local player_stars = math.max(math.ceil(plvl / 10), 1)
 		local contract_visuals = job_data.contract_visuals or {}
-		local total_xp_min, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {
-			mission_xp = contract_visuals.min_mission_xp and contract_visuals.min_mission_xp[difficulty_stars + 1]
-		})
-		local total_xp_max, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {
-			mission_xp = contract_visuals.max_mission_xp and contract_visuals.max_mission_xp[difficulty_stars + 1]
-		})
+		local xp_min = contract_visuals.min_mission_xp and (type(contract_visuals.min_mission_xp) == "table" and contract_visuals.min_mission_xp[difficulty_stars + 1] or contract_visuals.min_mission_xp) or 0
+		local xp_max = contract_visuals.max_mission_xp and (type(contract_visuals.max_mission_xp) == "table" and contract_visuals.max_mission_xp[difficulty_stars + 1] or contract_visuals.max_mission_xp) or 0
+		local total_xp_min, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {mission_xp = xp_min})
+		local total_xp_max, _ = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {mission_xp = xp_max})
 		local xp_text_min = managers.money:add_decimal_marks_to_string(tostring(math.round(total_xp_min)))
 		local xp_text_max = managers.money:add_decimal_marks_to_string(tostring(math.round(total_xp_max)))
 		local job_xp_text = total_xp_min < total_xp_max and managers.localization:text("menu_number_range", {min = xp_text_min, max = xp_text_max}) or xp_text_min

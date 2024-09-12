@@ -51,7 +51,8 @@ function FragGrenade:_detonate(tag, unit, body, other_unit, other_body, position
 		player_damage = 0,
 		ignore_unit = self._unit,
 		alert_radius = self._alert_radius,
-		user = self._unit
+		user = self._unit,
+		owner = self._unit
 	})
 	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
 	self._unit:set_slot(0)

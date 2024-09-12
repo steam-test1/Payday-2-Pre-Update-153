@@ -94,9 +94,23 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 		"mad"
 	}
 	self.risk_death_squad.risk_lock = 3
+	self.risk_easy_wish = {}
+	self.risk_easy_wish.name_id = "menu_asset_risklevel_4"
+	self.risk_easy_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_4"
+	self.risk_easy_wish.stages = "all"
+	self.risk_easy_wish.exclude_stages = {
+		"safehouse",
+		"chill",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
+		"mad"
+	}
+	self.risk_easy_wish.risk_lock = 4
 	self.risk_death_wish = {}
-	self.risk_death_wish.name_id = "menu_asset_risklevel_4"
-	self.risk_death_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_4"
+	self.risk_death_wish.name_id = "menu_asset_risklevel_5"
+	self.risk_death_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_5"
 	self.risk_death_wish.stages = "all"
 	self.risk_death_wish.exclude_stages = {
 		"safehouse",
@@ -107,7 +121,21 @@ function AssetsTweakData:_init_risk_assets(tweak_data)
 		"dark",
 		"mad"
 	}
-	self.risk_death_wish.risk_lock = 4
+	self.risk_death_wish.risk_lock = 5
+	self.risk_sm_wish = {}
+	self.risk_sm_wish.name_id = "menu_asset_risklevel_6"
+	self.risk_sm_wish.texture = "guis/textures/pd2/mission_briefing/assets/assets_risklevel_6"
+	self.risk_sm_wish.stages = "all"
+	self.risk_sm_wish.exclude_stages = {
+		"safehouse",
+		"chill",
+		"haunted",
+		"cage",
+		"kosugi",
+		"dark",
+		"mad"
+	}
+	self.risk_sm_wish.risk_lock = 6
 end
 
 function AssetsTweakData:_init_gage_assets(tweak_data)
@@ -230,8 +258,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
-		"glace",
-		"flat",
 		"dinner",
 		"cane",
 		"peta",
@@ -268,8 +294,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
-		"glace",
-		"flat",
 		"dinner",
 		"cane",
 		"peta",
@@ -303,8 +327,6 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"red2",
 		"pbr2",
 		"nail",
-		"glace",
-		"flat",
 		"dinner",
 		"cane",
 		"peta",

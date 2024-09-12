@@ -133,6 +133,11 @@ local ray_copy = function(table, ray)
 		end
 	end
 end
+
+function SawWeaponBase:third_person_important()
+	return true
+end
+
 local mvec_to = Vector3()
 local mvec_spread_direction = Vector3()
 

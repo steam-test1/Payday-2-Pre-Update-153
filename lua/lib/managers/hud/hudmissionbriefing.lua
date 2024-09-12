@@ -231,14 +231,16 @@ function HUDMissionBriefing:init(hud, workspace)
 	local risks = {
 		"risk_swat",
 		"risk_fbi",
-		"risk_death_squad"
+		"risk_death_squad",
+		"risk_easy_wish"
 	}
 	if not Global.SKIP_OVERKILL_290 then
 		table.insert(risks, "risk_murder_squad")
+		table.insert(risks, "risk_sm_wish")
 	end
 	for i, name in ipairs(risks) do
 		local texture, rect = tweak_data.hud_icons:get_icon_data(name)
-		local active = i <= difficulty_stars
+		local active = difficulty_stars >= i
 		local color = active and risk_color or tweak_data.screen_colors.text
 		local alpha = active and 1 or 0.25
 		local risk = self._paygrade_panel:bitmap({

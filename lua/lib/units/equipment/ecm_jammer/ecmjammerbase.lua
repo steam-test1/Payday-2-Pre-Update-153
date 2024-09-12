@@ -348,6 +348,7 @@ function ECMJammerBase:_set_feedback_active(state)
 		end
 	end
 	if state then
+		print("PUKE!")
 		self._g_glow_feedback_green:set_visibility(true)
 		self._g_glow_feedback_red:set_visibility(false)
 		if not self._puke_sound_event then
@@ -386,6 +387,7 @@ function ECMJammerBase:clbk_feedback()
 			self._unit
 		})
 	end
+	print("PUKING!!!!!")
 	self._detect_and_give_dmg(self._position + self._unit:rotation():y() * 15, self._unit, self:owner(), self._feedback_range)
 	if t > self._feedback_expire_t then
 		self._feedback_clbk_id = nil
@@ -456,6 +458,9 @@ function ECMJammerBase._detect_and_give_dmg(hit_pos, device_unit, user_unit, ran
 	
 	local function _chk_apply_dmg_to_char(u_data)
 		if not u_data.char_tweak.ecm_vulnerability then
+			return
+		end
+		if u_data.unit.brain and u_data.unit:brain().is_hostage and u_data.unit:brain():is_hostage() then
 			return
 		end
 		if math.random() >= u_data.char_tweak.ecm_vulnerability then

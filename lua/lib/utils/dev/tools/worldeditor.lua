@@ -141,10 +141,12 @@ function WorldEditor:_init_mission_difficulties()
 			"overkill_145",
 			"Overkill"
 		},
+		{"easy_wish", "Easy Wish"},
 		{
 			"overkill_290",
 			"Death Wish"
-		}
+		},
+		{"sm_wish", "SM Wish"}
 	}
 	self._mission_difficulty = "normal"
 end

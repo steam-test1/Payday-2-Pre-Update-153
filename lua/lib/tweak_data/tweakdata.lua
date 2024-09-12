@@ -33,6 +33,9 @@ require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
 TweakData = TweakData or class()
 
+function TweakData:_init_wip_tweak_data()
+end
+
 function TweakData:_init_wip_blackmarket(tweak_data)
 end
 
@@ -150,8 +153,12 @@ function TweakData:set_difficulty()
 		self:_set_overkill()
 	elseif Global.game_settings.difficulty == "overkill_145" then
 		self:_set_overkill_145()
+	elseif Global.game_settings.difficulty == "easy_wish" then
+		self:_set_easy_wish()
 	elseif Global.game_settings.difficulty == "overkill_290" then
 		self:_set_overkill_290()
+	elseif Global.game_settings.difficulty == "sm_wish" then
+		self:_set_sm_wish()
 	else
 		self:_set_hard()
 	end
@@ -222,6 +229,19 @@ function TweakData:_set_overkill_145()
 	self.experience_manager.total_objectives_finished = 3000
 end
 
+function TweakData:_set_easy_wish()
+	self.player:_set_easy_wish()
+	self.character:_set_easy_wish()
+	self.money_manager:init(self)
+	self.group_ai:init(self)
+	self.weapon:_set_easy_wish()
+	self.experience_manager.civilians_killed = 10000
+	self.difficulty_name_id = self.difficulty_name_ids.easy_wish
+	self.experience_manager.total_level_objectives = 5000
+	self.experience_manager.total_criminals_finished = 2000
+	self.experience_manager.total_objectives_finished = 3000
+end
+
 function TweakData:_set_overkill_290()
 	self.player:_set_overkill_290()
 	self.character:_set_overkill_290()
@@ -230,6 +250,19 @@ function TweakData:_set_overkill_290()
 	self.weapon:_set_overkill_290()
 	self.experience_manager.civilians_killed = 10000
 	self.difficulty_name_id = self.difficulty_name_ids.overkill_290
+	self.experience_manager.total_level_objectives = 5000
+	self.experience_manager.total_criminals_finished = 2000
+	self.experience_manager.total_objectives_finished = 3000
+end
+
+function TweakData:_set_sm_wish()
+	self.player:_set_sm_wish()
+	self.character:_set_sm_wish()
+	self.money_manager:init(self)
+	self.group_ai:init(self)
+	self.weapon:_set_sm_wish()
+	self.experience_manager.civilians_killed = 10000
+	self.difficulty_name_id = self.difficulty_name_ids.sm_wish
 	self.experience_manager.total_level_objectives = 5000
 	self.experience_manager.total_criminals_finished = 2000
 	self.experience_manager.total_objectives_finished = 3000
@@ -281,7 +314,9 @@ function TweakData:init()
 		"hard",
 		"overkill",
 		"overkill_145",
-		"overkill_290"
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
 	}
 	self.difficulty_level_locks = {
 		0,
@@ -289,6 +324,8 @@ function TweakData:init()
 		0,
 		0,
 		0,
+		0,
+		80,
 		80
 	}
 	self.permissions = {
@@ -318,7 +355,9 @@ function TweakData:init()
 	self.difficulty_name_ids.hard = "menu_difficulty_hard"
 	self.difficulty_name_ids.overkill = "menu_difficulty_very_hard"
 	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
+	self.difficulty_name_ids.easy_wish = "menu_difficulty_easy_wish"
 	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
+	self.difficulty_name_ids.sm_wish = "menu_difficulty_sm_wish"
 	self.criminals = {}
 	self.criminals.character_names = {
 		"russian",
@@ -1059,15 +1098,17 @@ Play the full version soon to get your full PAYDAY!]],
 		2,
 		5,
 		10,
-		13
+		11.5,
+		13,
+		14
 	}
 	self.experience_manager.alive_humans_multiplier = {
-		1,
-		1.1,
-		1.2,
-		1.3
+		[0] = 1,
+		[1] = 1,
+		[2] = 1.1,
+		[3] = 1.2,
+		[4] = 1.3
 	}
-	self.experience_manager.alive_humans_multiplier[0] = 1
 	self.experience_manager.limited_bonus_multiplier = 1
 	self.experience_manager.level_limit = {}
 	self.experience_manager.level_limit.low_cap_level = -1
@@ -1153,6 +1194,46 @@ Play the full version soon to get your full PAYDAY!]],
 			points = math.round(22000 * (exp_step * (i - exp_step_start)) - 6000) * multiplier
 		}
 	end
+	local normal_and_above = {
+		"normal",
+		"hard",
+		"overkill",
+		"overkill_145",
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}
+	local hard_and_above = {
+		"hard",
+		"overkill",
+		"overkill_145",
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}
+	local veryhard_and_above = {
+		"overkill",
+		"overkill_145",
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}
+	local overkill_and_above = {
+		"overkill_145",
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}
+	local easywish_and_above = {
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}
+	local deathwish_and_above = {
+		"overkill_290",
+		"sm_wish"
+	}
+	local sm_wish_and_above = {"sm_wish"}
 	self.achievement = {}
 	self.achievement.im_a_healer_tank_damage_dealer = 10
 	self.achievement.iron_man = "level_7"
@@ -1262,10 +1343,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.double_trouble = {
 		award = "ovk_9",
 		converted_cops = 4,
-		difficulty = {
-			"overkill_145",
-			"overkill_290"
-		}
+		difficulty = overkill_and_above
 	}
 	self.achievement.never_let_you_go = {
 		award = "ovk_3",
@@ -1307,10 +1385,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.man_5 = {
 		award = "man_5",
 		job = "man",
-		difficulty = {
-			"overkill_145",
-			"overkill_290"
-		},
+		difficulty = overkill_and_above,
 		weapon_category = "grenade_launcher"
 	}
 	self.achievement.mad_5 = "mad_5"
@@ -1716,10 +1791,7 @@ Play the full version soon to get your full PAYDAY!]],
 				"fbi_heavy_swat"
 			},
 			melee_type = "knife",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			health = 25
 		},
 		police_brutality = {
@@ -1746,7 +1818,7 @@ Play the full version soon to get your full PAYDAY!]],
 				"mobster_boss",
 				"biker_boss"
 			},
-			jobs = {"mia", "mia_prof"}
+			jobs = {"mia"}
 		},
 		special_operations = {
 			stat = "eagle_2_stats",
@@ -1816,19 +1888,13 @@ Play the full version soon to get your full PAYDAY!]],
 		in_soviet_russia = {
 			stat = "halloween_10_stats",
 			mask = "bear",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			contract = "vlad"
 		},
 		i_take_scores = {
 			stat = "armored_4_stat",
 			mask = "heat",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			jobs = {
 				"arm_cro",
 				"arm_und",
@@ -1840,109 +1906,328 @@ Play the full version soon to get your full PAYDAY!]],
 		eco_round = {
 			award = "charliesierra_7",
 			no_shots = "primaries",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			job = "roberts"
 		},
-		death_ukranian = {
-			award = "death_1",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_ukranian = {
+			award = "pick_1",
+			difficulty = easywish_and_above,
 			job = "ukrainian_job_prof"
 		},
-		death_mallcrasher = {
-			award = "death_2",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_mallcrasher = {
+			award = "pick_2",
+			difficulty = easywish_and_above,
 			job = "mallcrasher"
 		},
-		death_four_stores = {
-			award = "death_3",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_four_stores = {
+			award = "pick_3",
+			difficulty = easywish_and_above,
 			job = "four_stores"
 		},
-		death_nightclub = {
-			award = "death_4",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_nightclub = {
+			award = "pick_4",
+			difficulty = easywish_and_above,
 			job = "nightclub"
 		},
-		death_watchdogs = {
-			award = "death_34",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_watchdogs = {
+			award = "pick_5",
+			difficulty = easywish_and_above,
 			jobs = {
 				"watchdogs_wrapper",
 				"watchdogs_night",
 				"watchdogs"
 			}
 		},
-		death_watchdogs_prof = {
-			award = "death_6",
-			difficulty = {
-				"overkill_290"
-			},
+		easywish_rats = {
+			award = "pick_7",
+			difficulty = easywish_and_above,
+			job = "alex"
+		},
+		easywish_firestarter = {
+			award = "pick_9",
+			difficulty = easywish_and_above,
+			job = "firestarter"
+		},
+		easywish_framing_frame = {
+			award = "pick_11",
+			difficulty = easywish_and_above,
+			job = "framing_frame"
+		},
+		easywish_big_oil = {
+			award = "pick_13",
+			difficulty = easywish_and_above,
 			jobs = {
-				"watchdogs_wrapper_prof",
-				"watchdogs_night_prof",
-				"watchdogs_prof"
+				"welcome_to_the_jungle_wrapper_prof",
+				"welcome_to_the_jungle_night_prof",
+				"welcome_to_the_jungle_prof"
+			}
+		},
+		easywish_jewelry_store = {
+			award = "pick_14",
+			difficulty = easywish_and_above,
+			job = "jewelry_store"
+		},
+		easywish_diamond_store = {
+			award = "pick_15",
+			difficulty = easywish_and_above,
+			job = "family"
+		},
+		easywish_go_bank = {
+			award = "pick_16",
+			difficulty = easywish_and_above,
+			job = "roberts"
+		},
+		easywish_bank_heist = {
+			award = "pick_17",
+			difficulty = easywish_and_above,
+			job = "branchbank_prof"
+		},
+		easywish_bank_heist_gold = {
+			award = "pick_18",
+			difficulty = easywish_and_above,
+			job = "branchbank_gold_prof"
+		},
+		easywish_bank_heist_cash = {
+			award = "pick_19",
+			difficulty = easywish_and_above,
+			job = "branchbank_cash"
+		},
+		easywish_bank_heist_deposit = {
+			award = "pick_20",
+			difficulty = easywish_and_above,
+			job = "branchbank_deposit"
+		},
+		easywish_transport_crossroads = {
+			award = "pick_21",
+			difficulty = easywish_and_above,
+			job = "arm_cro"
+		},
+		easywish_transport_downtown = {
+			award = "pick_22",
+			difficulty = easywish_and_above,
+			job = "arm_hcm"
+		},
+		easywish_transport_harbor = {
+			award = "pick_23",
+			difficulty = easywish_and_above,
+			job = "arm_fac"
+		},
+		easywish_transport_park = {
+			award = "pick_24",
+			difficulty = easywish_and_above,
+			job = "arm_par"
+		},
+		easywish_transport_underpass = {
+			award = "pick_25",
+			difficulty = easywish_and_above,
+			job = "arm_und"
+		},
+		easywish_transport_train = {
+			award = "pick_26",
+			difficulty = easywish_and_above,
+			job = "arm_for"
+		},
+		easywish_election_day = {
+			award = "pick_27",
+			difficulty = easywish_and_above,
+			job = "election_day"
+		},
+		easywish_kosugi = {
+			award = "pick_29",
+			difficulty = easywish_and_above,
+			job = "kosugi"
+		},
+		easywish_bigbank = {
+			award = "pick_30",
+			difficulty = easywish_and_above,
+			job = "big"
+		},
+		easywish_miami = {
+			award = "pick_31",
+			difficulty = easywish_and_above,
+			job = "mia"
+		},
+		easywish_artgallery = {
+			award = "pick_33",
+			difficulty = easywish_and_above,
+			job = "gallery"
+		},
+		easywish_hoxton = {
+			award = "pick_34",
+			difficulty = easywish_and_above,
+			job = "hox"
+		},
+		easywish_mus = {
+			award = "pick_36",
+			difficulty = easywish_and_above,
+			job = "mus"
+		},
+		easywish_red = {
+			award = "pick_37",
+			difficulty = easywish_and_above,
+			job = "red2"
+		},
+		easywish_dinner = {
+			award = "pick_38",
+			difficulty = easywish_and_above,
+			job = "dinner"
+		},
+		easywish_hox_3 = {
+			award = "pick_39",
+			difficulty = easywish_and_above,
+			job = "hox_3"
+		},
+		easywish_rat = {
+			award = "pick_40",
+			difficulty = easywish_and_above,
+			job = "rat"
+		},
+		easywish_cage = {
+			award = "pick_41",
+			difficulty = easywish_and_above,
+			job = "cage"
+		},
+		easywish_shoutout = {
+			award = "pick_42",
+			difficulty = easywish_and_above,
+			job = "shoutout_raid"
+		},
+		easywish_arena = {
+			award = "pick_43",
+			difficulty = easywish_and_above,
+			job = "arena"
+		},
+		easywish_kenaz = {
+			award = "pick_44",
+			difficulty = easywish_and_above,
+			jobs = {"kenaz"}
+		},
+		easywish_sinus = {
+			award = "pick_45",
+			job = "jolly",
+			difficulty = easywish_and_above
+		},
+		easywish_nails = {
+			award = "pick_46",
+			job = "nail",
+			difficulty = easywish_and_above
+		},
+		easywish_berry = {
+			award = "pick_47",
+			difficulty = easywish_and_above,
+			job = "pbr"
+		},
+		easywish_jerry = {
+			award = "pick_48",
+			difficulty = easywish_and_above,
+			job = "pbr2"
+		},
+		easywish_peta = {
+			award = "pick_49",
+			difficulty = easywish_and_above,
+			jobs = {"peta"}
+		},
+		easywish_pal = {
+			award = "pick_51",
+			difficulty = easywish_and_above,
+			job = "pal"
+		},
+		easywish_man = {
+			award = "pick_52",
+			difficulty = easywish_and_above,
+			job = "man"
+		},
+		easywish_dark = {
+			award = "pick_53",
+			difficulty = easywish_and_above,
+			job = "dark"
+		},
+		easywish_cane = {
+			award = "pick_54",
+			difficulty = easywish_and_above,
+			job = "cane"
+		},
+		easywish_mad = {
+			award = "pick_56",
+			difficulty = easywish_and_above,
+			job = "mad"
+		},
+		easywish_born = {
+			award = "pick_57",
+			difficulty = easywish_and_above,
+			job = "born"
+		},
+		complete_pines_easywish = {
+			award = "pick_59",
+			difficulty = easywish_and_above,
+			jobs = {"pines"}
+		},
+		complete_crojob_dock_easywish = {
+			award = "pick_61",
+			difficulty = easywish_and_above,
+			jobs = {"crojob1"}
+		},
+		complete_crojob_for_easywish = {
+			award = "pick_60",
+			difficulty = easywish_and_above,
+			jobs = {
+				"crojob_wrapper",
+				"crojob2",
+				"crojob2_night"
+			}
+		},
+		death_ukranian = {
+			award = "death_1",
+			difficulty = deathwish_and_above,
+			job = "ukrainian_job_prof"
+		},
+		death_mallcrasher = {
+			award = "death_2",
+			difficulty = deathwish_and_above,
+			job = "mallcrasher"
+		},
+		death_four_stores = {
+			award = "death_3",
+			difficulty = deathwish_and_above,
+			job = "four_stores"
+		},
+		death_nightclub = {
+			award = "death_4",
+			difficulty = deathwish_and_above,
+			job = "nightclub"
+		},
+		death_watchdogs = {
+			award = "death_34",
+			difficulty = deathwish_and_above,
+			jobs = {
+				"watchdogs_wrapper",
+				"watchdogs_night",
+				"watchdogs"
 			}
 		},
 		death_rats = {
 			award = "death_33",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "alex"
-		},
-		death_rats_prof = {
-			award = "death_7",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "alex_prof"
 		},
 		death_firestarter = {
 			award = "death_32",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "firestarter"
 		},
 		death_firestarter_prof = {
 			award = "death_8",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "firestarter_prof"
 		},
 		death_framing_frame = {
 			award = "death_35",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "framing_frame"
-		},
-		death_framing_frame_prof = {
-			award = "death_10",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "framing_frame_prof"
 		},
 		death_big_oil = {
 			award = "death_11",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			jobs = {
 				"welcome_to_the_jungle_wrapper_prof",
 				"welcome_to_the_jungle_night_prof",
@@ -1951,218 +2236,512 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		death_jewelry_store = {
 			award = "death_13",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "jewelry_store"
 		},
 		death_diamond_store = {
 			award = "death_14",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "family"
 		},
 		death_go_bank = {
 			award = "death_15",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "roberts"
 		},
 		death_bank_heist = {
 			award = "death_16",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "branchbank_prof"
 		},
 		death_bank_heist_gold = {
 			award = "death_17",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "branchbank_gold_prof"
 		},
 		death_bank_heist_cash = {
 			award = "death_18",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "branchbank_cash"
 		},
 		death_bank_heist_deposit = {
 			award = "death_19",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "branchbank_deposit"
 		},
 		death_transport_crossroads = {
 			award = "death_20",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_cro"
 		},
 		death_transport_downtown = {
 			award = "death_21",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_hcm"
 		},
 		death_transport_harbor = {
 			award = "death_22",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_fac"
 		},
 		death_transport_park = {
 			award = "death_23",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_par"
 		},
 		death_transport_underpass = {
 			award = "death_24",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_und"
 		},
 		death_transport_train = {
 			award = "death_25",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "arm_for"
 		},
 		death_election_day = {
 			award = "bob_9",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "election_day"
-		},
-		death_election_day_prof = {
-			award = "bob_2",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "election_day_prof"
 		},
 		death_kosugi = {
 			award = "kosugi_6",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "kosugi"
 		},
 		death_bigbank = {
 			award = "bigbank_9",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "big"
 		},
 		death_miami = {
 			award = "pig_1",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "mia"
-		},
-		death_miami_prof = {
-			award = "pig_6",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "mia_prof"
 		},
 		death_artgallery = {
 			award = "squek",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "gallery"
 		},
 		death_hoxton = {
 			award = "bulldog_2",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "hox"
-		},
-		death_hoxton_prof = {
-			award = "bulldog_3",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "hox_prof"
 		},
 		death_mus = {
 			award = "bat_1",
-			difficulty = {
-				"overkill_290"
-			},
+			difficulty = deathwish_and_above,
 			job = "mus"
 		},
-		complete_hoxton = {
-			award = "bulldog_1",
-			jobs = {"hox", "hox_prof"}
+		death_red = {
+			award = "green_5",
+			difficulty = deathwish_and_above,
+			job = "red2"
 		},
-		complete_pines_normal = {
-			award = "deer_1",
-			difficulty = {"normal"},
-			jobs = {"pines", "pines_prof"}
+		death_dinner = {
+			award = "farm_5",
+			difficulty = deathwish_and_above,
+			job = "dinner"
 		},
-		complete_pines_hard = {
-			award = "deer_2",
-			difficulty = {"hard"},
-			jobs = {"pines", "pines_prof"}
+		death_hox_3 = {
+			award = "payback_1",
+			difficulty = deathwish_and_above,
+			job = "hox_3"
 		},
-		complete_pines_veryhard = {
-			award = "deer_3",
-			difficulty = {"overkill"},
-			jobs = {"pines", "pines_prof"}
+		death_rat = {
+			award = "djur_1",
+			difficulty = deathwish_and_above,
+			job = "rat"
 		},
-		complete_pines_overkill = {
-			award = "deer_4",
-			difficulty = {
-				"overkill_145"
-			},
-			jobs = {"pines", "pines_prof"}
+		death_cage = {
+			award = "fort_1",
+			difficulty = deathwish_and_above,
+			job = "cage"
+		},
+		death_shoutout = {
+			award = "melt_1",
+			difficulty = deathwish_and_above,
+			job = "shoutout_raid"
+		},
+		death_arena = {
+			award = "live_1",
+			difficulty = deathwish_and_above,
+			job = "arena"
+		},
+		death_kenaz = {
+			award = "kenaz_1",
+			difficulty = deathwish_and_above,
+			jobs = {"kenaz"}
+		},
+		death_sinus = {
+			award = "sinus_2",
+			job = "jolly",
+			difficulty = deathwish_and_above
+		},
+		death_nails = {
+			award = "lab_3",
+			job = "nail",
+			difficulty = deathwish_and_above
+		},
+		death_berry = {
+			award = "berry_1",
+			difficulty = deathwish_and_above,
+			job = "pbr"
+		},
+		death_jerry = {
+			award = "jerry_1",
+			difficulty = deathwish_and_above,
+			job = "pbr2"
+		},
+		death_peta = {
+			award = "peta_1",
+			difficulty = deathwish_and_above,
+			jobs = {"peta"}
+		},
+		death_pal = {
+			award = "pal_1",
+			difficulty = deathwish_and_above,
+			job = "pal"
+		},
+		death_man = {
+			award = "man_1",
+			difficulty = deathwish_and_above,
+			job = "man"
+		},
+		death_dark = {
+			award = "dark_1",
+			difficulty = deathwish_and_above,
+			job = "dark"
+		},
+		death_cane = {
+			award = "cane_1",
+			difficulty = deathwish_and_above,
+			job = "cane"
+		},
+		death_mad = {
+			award = "mad_1",
+			difficulty = deathwish_and_above,
+			job = "mad"
+		},
+		death_born = {
+			award = "born_1",
+			difficulty = deathwish_and_above,
+			job = "born"
 		},
 		complete_pines_deathwish = {
 			award = "deer_5",
-			difficulty = {
-				"overkill_290"
-			},
-			jobs = {"pines", "pines_prof"}
+			difficulty = deathwish_and_above,
+			jobs = {"pines"}
 		},
-		complete_crojob_for_all = {
-			award = "cow_1",
-			difficulty = {
-				"normal",
-				"hard",
-				"overkill",
-				"overkill_145",
-				"overkill_290"
-			},
+		complete_crojob_for_deathwish = {
+			award = "cow_2",
+			difficulty = deathwish_and_above,
 			jobs = {
 				"crojob_wrapper",
 				"crojob2",
 				"crojob2_night"
 			}
 		},
-		complete_crojob_for_deathwish = {
-			award = "cow_2",
-			difficulty = {
-				"overkill_290"
-			},
+		complete_crojob_dock_deathwish = {
+			award = "cow_7",
+			difficulty = deathwish_and_above,
+			jobs = {"crojob1"}
+		},
+		sm_wish_ukranian = {
+			award = "axe_1",
+			difficulty = sm_wish_and_above,
+			job = "ukrainian_job_prof"
+		},
+		sm_wish_mallcrasher = {
+			award = "axe_2",
+			difficulty = sm_wish_and_above,
+			job = "mallcrasher"
+		},
+		sm_wish_four_stores = {
+			award = "axe_3",
+			difficulty = sm_wish_and_above,
+			job = "four_stores"
+		},
+		sm_wish_nightclub = {
+			award = "axe_4",
+			difficulty = sm_wish_and_above,
+			job = "nightclub"
+		},
+		sm_wish_watchdogs = {
+			award = "axe_5",
+			difficulty = sm_wish_and_above,
+			jobs = {
+				"watchdogs_wrapper",
+				"watchdogs_night",
+				"watchdogs"
+			}
+		},
+		sm_wish_rats = {
+			award = "axe_7",
+			difficulty = sm_wish_and_above,
+			job = "alex"
+		},
+		sm_wish_firestarter = {
+			award = "axe_9",
+			difficulty = sm_wish_and_above,
+			job = "firestarter"
+		},
+		sm_wish_framing_frame = {
+			award = "axe_11",
+			difficulty = sm_wish_and_above,
+			job = "framing_frame"
+		},
+		sm_wish_big_oil = {
+			award = "axe_13",
+			difficulty = sm_wish_and_above,
+			jobs = {
+				"welcome_to_the_jungle_wrapper_prof",
+				"welcome_to_the_jungle_night_prof",
+				"welcome_to_the_jungle_prof"
+			}
+		},
+		sm_wish_jewelry_store = {
+			award = "axe_14",
+			difficulty = sm_wish_and_above,
+			job = "jewelry_store"
+		},
+		sm_wish_diamond_store = {
+			award = "axe_15",
+			difficulty = sm_wish_and_above,
+			job = "family"
+		},
+		sm_wish_go_bank = {
+			award = "axe_16",
+			difficulty = sm_wish_and_above,
+			job = "roberts"
+		},
+		sm_wish_bank_heist = {
+			award = "axe_17",
+			difficulty = sm_wish_and_above,
+			job = "branchbank_prof"
+		},
+		sm_wish_bank_heist_gold = {
+			award = "axe_18",
+			difficulty = sm_wish_and_above,
+			job = "branchbank_gold_prof"
+		},
+		sm_wish_bank_heist_cash = {
+			award = "axe_19",
+			difficulty = sm_wish_and_above,
+			job = "branchbank_cash"
+		},
+		sm_wish_bank_heist_deposit = {
+			award = "axe_20",
+			difficulty = sm_wish_and_above,
+			job = "branchbank_deposit"
+		},
+		sm_wish_transport_crossroads = {
+			award = "axe_21",
+			difficulty = sm_wish_and_above,
+			job = "arm_cro"
+		},
+		sm_wish_transport_downtown = {
+			award = "axe_22",
+			difficulty = sm_wish_and_above,
+			job = "arm_hcm"
+		},
+		sm_wish_transport_harbor = {
+			award = "axe_23",
+			difficulty = sm_wish_and_above,
+			job = "arm_fac"
+		},
+		sm_wish_transport_park = {
+			award = "axe_24",
+			difficulty = sm_wish_and_above,
+			job = "arm_par"
+		},
+		sm_wish_transport_underpass = {
+			award = "axe_25",
+			difficulty = sm_wish_and_above,
+			job = "arm_und"
+		},
+		sm_wish_transport_train = {
+			award = "axe_26",
+			difficulty = sm_wish_and_above,
+			job = "arm_for"
+		},
+		sm_wish_election_day = {
+			award = "axe_27",
+			difficulty = sm_wish_and_above,
+			job = "election_day"
+		},
+		sm_wish_kosugi = {
+			award = "axe_29",
+			difficulty = sm_wish_and_above,
+			job = "kosugi"
+		},
+		sm_wish_bigbank = {
+			award = "axe_30",
+			difficulty = sm_wish_and_above,
+			job = "big"
+		},
+		sm_wish_miami = {
+			award = "axe_31",
+			difficulty = sm_wish_and_above,
+			job = "mia"
+		},
+		sm_wish_artgallery = {
+			award = "axe_33",
+			difficulty = sm_wish_and_above,
+			job = "gallery"
+		},
+		sm_wish_hoxton = {
+			award = "axe_34",
+			difficulty = sm_wish_and_above,
+			job = "hox"
+		},
+		sm_wish_mus = {
+			award = "axe_36",
+			difficulty = sm_wish_and_above,
+			job = "mus"
+		},
+		sm_wish_red = {
+			award = "axe_37",
+			difficulty = sm_wish_and_above,
+			job = "red2"
+		},
+		sm_wish_dinner = {
+			award = "axe_38",
+			difficulty = sm_wish_and_above,
+			job = "dinner"
+		},
+		sm_wish_hox_3 = {
+			award = "axe_39",
+			difficulty = sm_wish_and_above,
+			job = "hox_3"
+		},
+		sm_wish_rat = {
+			award = "axe_40",
+			difficulty = sm_wish_and_above,
+			job = "rat"
+		},
+		sm_wish_cage = {
+			award = "axe_41",
+			difficulty = sm_wish_and_above,
+			job = "cage"
+		},
+		sm_wish_shoutout = {
+			award = "axe_42",
+			difficulty = sm_wish_and_above,
+			job = "shoutout_raid"
+		},
+		sm_wish_arena = {
+			award = "axe_43",
+			difficulty = sm_wish_and_above,
+			job = "arena"
+		},
+		sm_wish_kenaz = {
+			award = "axe_44",
+			difficulty = sm_wish_and_above,
+			jobs = {"kenaz"}
+		},
+		sm_wish_sinus = {
+			award = "axe_45",
+			job = "jolly",
+			difficulty = sm_wish_and_above
+		},
+		sm_wish_nails = {
+			award = "axe_46",
+			job = "nail",
+			difficulty = sm_wish_and_above
+		},
+		sm_wish_berry = {
+			award = "axe_47",
+			difficulty = sm_wish_and_above,
+			job = "pbr"
+		},
+		sm_wish_jerry = {
+			award = "axe_48",
+			difficulty = sm_wish_and_above,
+			job = "pbr2"
+		},
+		sm_wish_peta = {
+			award = "axe_49",
+			difficulty = sm_wish_and_above,
+			jobs = {"peta"}
+		},
+		sm_wish_pal = {
+			award = "axe_51",
+			difficulty = sm_wish_and_above,
+			job = "pal"
+		},
+		sm_wish_man = {
+			award = "axe_52",
+			difficulty = sm_wish_and_above,
+			job = "man"
+		},
+		sm_wish_dark = {
+			award = "axe_53",
+			difficulty = sm_wish_and_above,
+			job = "dark"
+		},
+		sm_wish_cane = {
+			award = "axe_54",
+			difficulty = sm_wish_and_above,
+			job = "cane"
+		},
+		sm_wish_mad = {
+			award = "axe_56",
+			difficulty = sm_wish_and_above,
+			job = "mad"
+		},
+		sm_wish_born = {
+			award = "axe_57",
+			difficulty = sm_wish_and_above,
+			job = "born"
+		},
+		complete_pines_sm_wish = {
+			award = "axe_59",
+			difficulty = sm_wish_and_above,
+			jobs = {"pines"}
+		},
+		complete_crojob_for_sm_wish = {
+			award = "axe_60",
+			difficulty = sm_wish_and_above,
+			jobs = {
+				"crojob_wrapper",
+				"crojob2",
+				"crojob2_night"
+			}
+		},
+		complete_crojob_dock_sm_wish = {
+			award = "axe_61",
+			difficulty = sm_wish_and_above,
+			jobs = {"crojob1"}
+		},
+		complete_hoxton = {
+			award = "bulldog_1",
+			jobs = {"hox"}
+		},
+		complete_pines_normal = {
+			award = "deer_1",
+			difficulty = normal_and_above,
+			jobs = {"pines"}
+		},
+		complete_pines_hard = {
+			award = "deer_2",
+			difficulty = hard_and_above,
+			jobs = {"pines"}
+		},
+		complete_pines_veryhard = {
+			award = "deer_3",
+			difficulty = veryhard_and_above,
+			jobs = {"pines"}
+		},
+		complete_pines_overkill = {
+			award = "deer_4",
+			difficulty = overkill_and_above,
+			jobs = {"pines"}
+		},
+		complete_crojob_for_all = {
+			award = "cow_1",
+			difficulty = normal_and_above,
 			jobs = {
 				"crojob_wrapper",
 				"crojob2",
@@ -2171,51 +2750,14 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		complete_crojob_dock_all = {
 			award = "cow_6",
-			difficulty = {
-				"normal",
-				"hard",
-				"overkill",
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = normal_and_above,
 			jobs = {"crojob1"}
-		},
-		complete_crojob_dock_deathwish = {
-			award = "cow_7",
-			difficulty = {
-				"overkill_290"
-			},
-			jobs = {"crojob1"}
-		},
-		death_red = {
-			award = "green_5",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "red2"
-		},
-		death_dinner = {
-			award = "farm_5",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "dinner"
 		},
 		farm_1 = {
 			award = "farm_1",
 			phalanx_vip_alive = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			job = "dinner"
-		},
-		death_hox_3 = {
-			award = "payback_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "hox_3"
 		},
 		hox_3_silent = {
 			award = "payback_2",
@@ -2233,15 +2775,11 @@ Play the full version soon to get your full PAYDAY!]],
 		pain_train = {
 			award = "ameno_4",
 			jobs = {
-				"firestarter",
-				"firestarter_prof"
+				"firestarter"
 			},
 			need_full_job = true,
 			num_players = 4,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			loud = true,
 			equipped_team = {
 				primaries = {
@@ -2267,13 +2805,10 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		anticimex = {
 			award = "ovk_1",
-			jobs = {"alex", "alex_prof"},
+			jobs = {"alex"},
 			need_full_job = true,
 			num_players = 4,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				primaries = {
 					"wpn_fps_lmg_m134"
@@ -2297,14 +2832,10 @@ Play the full version soon to get your full PAYDAY!]],
 		newbee = {
 			award = "ovk_4",
 			jobs = {
-				"watchdogs_wrapper",
-				"watchdogs_wrapper_prof"
+				"watchdogs_wrapper"
 			},
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				num_skills = 0,
 				primaries = {
@@ -2321,10 +2852,7 @@ Play the full version soon to get your full PAYDAY!]],
 				"welcome_to_the_jungle_1",
 				"welcome_to_the_jungle_1_night"
 			},
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			stealth = true
 		},
 		ovk_8 = {
@@ -2333,10 +2861,7 @@ Play the full version soon to get your full PAYDAY!]],
 				"welcome_to_the_jungle_wrapper_prof"
 			},
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			num_players = 2,
 			equipped_team = {
 				primaries = {
@@ -2344,41 +2869,6 @@ Play the full version soon to get your full PAYDAY!]],
 				},
 				armor = "level_1"
 			}
-		},
-		death_rat = {
-			award = "djur_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "rat"
-		},
-		death_cage = {
-			award = "fort_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "cage"
-		},
-		death_shoutout = {
-			award = "melt_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "shoutout_raid"
-		},
-		death_arena = {
-			award = "live_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "arena"
-		},
-		death_kenaz = {
-			award = "kenaz_1",
-			difficulty = {
-				"overkill_290"
-			},
-			jobs = {"kenaz"}
 		},
 		kenaz_silent = {
 			award = "kenaz_2",
@@ -2389,20 +2879,6 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "kenaz_4",
 			jobs = {"kenaz"},
 			timer = 840
-		},
-		death_sinus = {
-			award = "sinus_2",
-			job = "jolly",
-			difficulty = {
-				"overkill_290"
-			}
-		},
-		death_nails = {
-			award = "lab_3",
-			job = "nail",
-			difficulty = {
-				"overkill_290"
-			}
 		},
 		not_for_old_men = {
 			award = "gage4_11",
@@ -2442,10 +2918,7 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "steel_1",
 			need_full_job = true,
 			num_players = 4,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				primaries = {
 					"wpn_fps_bow_long",
@@ -2477,10 +2950,7 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "green_2",
 			job = "red2",
 			num_players = 4,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				primaries = {
 					"wpn_fps_shot_r870"
@@ -2496,103 +2966,30 @@ Play the full version soon to get your full PAYDAY!]],
 				}
 			}
 		},
-		death_berry = {
-			award = "berry_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "pbr"
-		},
-		death_jerry = {
-			award = "jerry_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "pbr2"
-		},
 		jerry_5 = {
 			award = "jerry_5",
 			job = "pbr2",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				primary_category = "akimbo",
 				secondary_category = "pistol",
 				armor = "level_1"
 			}
 		},
-		death_cane = {
-			award = "cane_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "cane"
-		},
 		cane_4 = {
 			award = "cane_4",
 			job = "cane",
 			equipped_team = {primary_category = "shotgun", secondary_category = "shotgun"}
 		},
-		death_peta = {
-			award = "peta_1",
-			difficulty = {
-				"overkill_290"
-			},
-			jobs = {"peta"}
-		},
-		death_peta_prof = {
-			award = "peta_1_prof",
-			difficulty = {
-				"overkill_290"
-			},
-			jobs = {"peta_prof"}
-		},
-		death_pal = {
-			award = "pal_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "pal"
-		},
-		death_man = {
-			award = "man_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "man"
-		},
-		death_dark = {
-			award = "dark_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "dark"
-		},
-		death_mad = {
-			award = "mad_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "mad"
-		},
 		mad_3 = {
 			award = "mad_3",
-			difficulty = {
-				"overkill",
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = veryhard_and_above,
 			memory = {value = true, is_shortterm = false},
 			job = "mad"
 		},
 		mad_4 = {
 			award = "mad_4",
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			job = "mad",
 			equipped_team = {
 				primaries = {
@@ -2604,14 +3001,10 @@ Play the full version soon to get your full PAYDAY!]],
 		flake_1 = {
 			award = "flake_1",
 			jobs = {
-				"framing_frame",
-				"framing_frame_prof"
+				"framing_frame"
 			},
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				num_skills = 0,
 				primaries = {
@@ -2622,20 +3015,6 @@ Play the full version soon to get your full PAYDAY!]],
 				},
 				armor = "level_1"
 			}
-		},
-		death_born = {
-			award = "born_1",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "born"
-		},
-		death_born_prof = {
-			award = "born_2",
-			difficulty = {
-				"overkill_290"
-			},
-			job = "born_pro"
 		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
@@ -2670,12 +3049,9 @@ Play the full version soon to get your full PAYDAY!]],
 		any_jobs = {challenge_stat = "any_jobs", complete_job = true},
 		monthly_rats = {
 			challenge_award = "monthly_rats",
-			jobs = {"alex", "alex_prof"},
+			jobs = {"alex"},
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				num_skills = 0,
 				primaries = {
@@ -2690,14 +3066,10 @@ Play the full version soon to get your full PAYDAY!]],
 		monthly_firestarter = {
 			challenge_award = "monthly_firestarter",
 			jobs = {
-				"firestarter",
-				"firestarter_prof"
+				"firestarter"
 			},
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				num_skills = 0,
 				primaries = {
@@ -2713,10 +3085,7 @@ Play the full version soon to get your full PAYDAY!]],
 			challenge_award = "monthly_shadowraid",
 			job = "kosugi",
 			need_full_job = true,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			equipped_team = {
 				num_skills = 0,
 				primaries = {
@@ -2739,9 +3108,7 @@ Play the full version soon to get your full PAYDAY!]],
 				"election_day_3_skip1",
 				"election_day_3_skip2"
 			},
-			difficulty = {
-				"overkill_290"
-			}
+			difficulty = deathwish_and_above
 		},
 		full_two_twenty = {
 			award = "ovk_7",
@@ -2752,10 +3119,7 @@ Play the full version soon to get your full PAYDAY!]],
 		berry_4 = {
 			award = "berry_4",
 			total_downs = 0,
-			difficulty = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulty = overkill_and_above,
 			level_id = "pbr",
 			is_dropin = false
 		}
@@ -2798,25 +3162,18 @@ Play the full version soon to get your full PAYDAY!]],
 		"shoutout_raid",
 		"jolly",
 		"cane",
-		"peta",
-		"peta_prof"
+		"peta"
 	}
 	self.achievement.job_list.hector = {
 		"watchdogs_wrapper",
-		"watchdogs_wrapper_prof",
 		"alex",
-		"alex_prof",
-		"firestarter",
-		"firestarter_prof"
+		"firestarter"
 	}
 	self.achievement.job_list.the_elephant = {
 		"framing_frame",
-		"framing_frame_prof",
 		"welcome_to_the_jungle_wrapper_prof",
 		"election_day",
-		"election_day_prof",
-		"born",
-		"born_pro"
+		"born"
 	}
 	self.achievement.job_list.bain = {
 		"jewelry_store",
@@ -2840,9 +3197,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.job_list.the_dentist = {
 		"big",
 		"mia",
-		"mia_prof",
 		"hox",
-		"hox_prof",
 		"mus",
 		"hox_3",
 		"kenaz"
@@ -2889,44 +3244,94 @@ Play the full version soon to get your full PAYDAY!]],
 		Application:debug("[TWEAKDATA:ACHIEVEMENTS] Jobs not yet in achievement 'job_list':", inspect(available_jobs))
 	end
 	self.achievement.complete_heist_stats_achievements = {
+		easywish_vlad = {
+			award = "pick_62",
+			difficulty = easywish_and_above,
+			contact = "vlad"
+		},
+		easywish_hector = {
+			award = "pick_63",
+			difficulty = easywish_and_above,
+			contact = "hector"
+		},
+		easywish_elephant = {
+			award = "pick_64",
+			difficulty = easywish_and_above,
+			contact = "the_elephant"
+		},
+		easywish_bain = {
+			award = "pick_65",
+			difficulty = easywish_and_above,
+			contact = "bain"
+		},
 		death_vlad = {
 			award = "death_5",
-			difficulty = "overkill_290",
+			difficulty = deathwish_and_above,
 			contact = "vlad"
 		},
 		death_hector = {
 			award = "death_9",
-			difficulty = "overkill_290",
+			difficulty = deathwish_and_above,
 			contact = "hector"
 		},
 		death_elephant = {
 			award = "death_12",
-			difficulty = "overkill_290",
+			difficulty = deathwish_and_above,
 			contact = "the_elephant"
 		},
 		death_bain = {
 			award = "death_26",
-			difficulty = "overkill_290",
+			difficulty = deathwish_and_above,
+			contact = "bain"
+		},
+		sm_vlad = {
+			award = "axe_62",
+			difficulty = sm_wish_and_above,
+			contact = "vlad"
+		},
+		sm_hector = {
+			award = "axe_63",
+			difficulty = sm_wish_and_above,
+			contact = "hector"
+		},
+		sm_elephant = {
+			award = "axe_64",
+			difficulty = sm_wish_and_above,
+			contact = "the_elephant"
+		},
+		sm_bain = {
+			award = "axe_65",
+			difficulty = sm_wish_and_above,
 			contact = "bain"
 		},
 		skull_hard = {
 			award = "death_27",
-			difficulty = "hard",
+			difficulty = hard_and_above,
 			contact = "all"
 		},
 		skull_very_hard = {
 			award = "death_28",
-			difficulty = "overkill",
+			difficulty = veryhard_and_above,
 			contact = "all"
 		},
 		skull_overkill = {
 			award = "death_29",
-			difficulty = "overkill_145",
+			difficulty = overkill_and_above,
+			contact = "all"
+		},
+		skull_easywish = {
+			award = "pick_66",
+			difficulty = easywish_and_above,
 			contact = "all"
 		},
 		skull_deathwish = {
 			award = "death_30",
-			difficulty = "overkill_290",
+			difficulty = deathwish_and_above,
+			contact = "all"
+		},
+		skull_smwish = {
+			award = "axe_66",
+			difficulty = sm_wish_and_above,
 			contact = "all"
 		}
 	}
@@ -2946,7 +3351,9 @@ Play the full version soon to get your full PAYDAY!]],
 				"skullhard",
 				"skullveryhard",
 				"skulloverkill",
-				"skulloverkillplus"
+				"skulloverkillplus",
+				"skulleasywish",
+				"skullsmwish"
 			}
 		},
 		funding_father = {
@@ -2960,11 +3367,8 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		go_bananas = {
 			award = "gage4_12",
-			jobs = {"alex", "alex_prof"},
-			difficulties = {
-				"overkill_145",
-				"overkill_290"
-			},
+			jobs = {"alex"},
+			difficulties = overkill_and_above,
 			masks = {
 				"silverback",
 				"mandril",
@@ -2974,13 +3378,8 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		animal_fight = {
 			award = "pig_5",
-			jobs = {"mia", "mia_prof"},
-			difficulties = {
-				"hard",
-				"overkill",
-				"overkill_145",
-				"overkill_290"
-			},
+			jobs = {"mia"},
+			difficulties = hard_and_above,
 			masks = {
 				"white_wolf",
 				"owl",
@@ -2992,16 +3391,10 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "gage5_6",
 			jobs = {
 				"watchdogs_wrapper",
-				"watchdogs_wrapper_prof",
 				"watchdogs",
-				"watchdogs_prof",
-				"watchdogs_night",
-				"watchdogs_night_prof"
+				"watchdogs_night"
 			},
-			difficulties = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulties = overkill_and_above,
 			masks = {
 				"galax",
 				"crowgoblin",
@@ -3011,12 +3404,8 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		wind_of_change = {
 			award = "eagle_3",
-			jobs = {"hox", "hox_prof"},
-			difficulties = {
-				"overkill",
-				"overkill_145",
-				"overkill_290"
-			},
+			jobs = {"hox"},
+			difficulties = veryhard_and_above,
 			masks = {
 				"churchill",
 				"red_hurricane",
@@ -3026,10 +3415,8 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		xmas_2014 = {
 			award = "deer_6",
-			jobs = {"pines", "pines_prof"},
-			difficulties = {
-				"overkill_290"
-			},
+			jobs = {"pines"},
+			difficulties = deathwish_and_above,
 			masks = {
 				"krampus",
 				"mrs_claus",
@@ -3040,10 +3427,7 @@ Play the full version soon to get your full PAYDAY!]],
 		blight = {
 			award = "bat_5",
 			jobs = {"mus"},
-			difficulties = {
-				"overkill_145",
-				"overkill_290"
-			},
+			difficulties = overkill_and_above,
 			masks = {
 				"medusa",
 				"anubis",
@@ -3952,13 +4336,13 @@ Play the full version soon to get your full PAYDAY!]],
 	self.casino.infamous_chance = 3
 	self.projectiles = {}
 	self.projectiles.frag = {}
-	self.projectiles.frag.damage = 60
+	self.projectiles.frag.damage = 90
 	self.projectiles.frag.curve_pow = 0.1
 	self.projectiles.frag.player_damage = 10
 	self.projectiles.frag.range = 500
 	self.projectiles.frag.name_id = "bm_grenade_frag"
 	self.projectiles.launcher_frag = {}
-	self.projectiles.launcher_frag.damage = 34
+	self.projectiles.launcher_frag.damage = 130
 	self.projectiles.launcher_frag.launch_speed = 1250
 	self.projectiles.launcher_frag.curve_pow = 0.1
 	self.projectiles.launcher_frag.player_damage = 8
@@ -4001,15 +4385,15 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.cs_grenade_quick.damage_tick_period = 0.25
 	self.projectiles.cs_grenade_quick.damage_per_tick = 0.75
 	self.projectiles.launcher_incendiary = {}
-	self.projectiles.launcher_incendiary.damage = 3
+	self.projectiles.launcher_incendiary.damage = 10
 	self.projectiles.launcher_incendiary.launch_speed = 1250
 	self.projectiles.launcher_incendiary.curve_pow = 0.1
 	self.projectiles.launcher_incendiary.player_damage = 2
 	self.projectiles.launcher_incendiary.fire_dot_data = {
-		dot_damage = 1,
+		dot_damage = 25,
 		dot_trigger_max_distance = 3000,
 		dot_trigger_chance = 35,
-		dot_length = 3.1,
+		dot_length = 6.1,
 		dot_tick_period = 0.5
 	}
 	self.projectiles.launcher_incendiary.range = 75
@@ -4028,18 +4412,18 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.rocket_frag.launch_speed = 2500
 	self.projectiles.rocket_frag.adjust_z = 0
 	self.projectiles.west_arrow = {}
-	self.projectiles.west_arrow.damage = 19.4
+	self.projectiles.west_arrow.damage = 150
 	self.projectiles.west_arrow.launch_speed = 2000
 	self.projectiles.west_arrow.adjust_z = 0
 	self.projectiles.west_arrow.mass_look_up_modifier = 1
 	self.projectiles.west_arrow.name_id = "bm_west_arrow"
 	self.projectiles.west_arrow.push_at_body_index = 0
 	self.projectiles.west_arrow_exp = deep_clone(self.projectiles.west_arrow)
-	self.projectiles.west_arrow_exp.damage = 26.4
+	self.projectiles.west_arrow_exp.damage = 75
 	self.projectiles.west_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.west_arrow_exp.remove_on_impact = true
 	self.projectiles.dynamite = {}
-	self.projectiles.dynamite.damage = 60
+	self.projectiles.dynamite.damage = 160
 	self.projectiles.dynamite.curve_pow = 0.1
 	self.projectiles.dynamite.player_damage = 10
 	self.projectiles.dynamite.range = 500
@@ -4049,16 +4433,16 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.bow_poison_arrow.damage = 6.6
 	self.projectiles.bow_poison_arrow.bullet_class = "PoisonBulletBase"
 	self.projectiles.crossbow_arrow = {}
-	self.projectiles.crossbow_arrow.damage = 10
+	self.projectiles.crossbow_arrow.damage = 75
 	self.projectiles.crossbow_arrow.launch_speed = 2000
 	self.projectiles.crossbow_arrow.adjust_z = 0
 	self.projectiles.crossbow_arrow.mass_look_up_modifier = 1
 	self.projectiles.crossbow_arrow.push_at_body_index = 0
 	self.projectiles.crossbow_poison_arrow = deep_clone(self.projectiles.crossbow_arrow)
-	self.projectiles.crossbow_poison_arrow.damage = 3.2
+	self.projectiles.crossbow_poison_arrow.damage = 10
 	self.projectiles.crossbow_poison_arrow.bullet_class = "PoisonBulletBase"
 	self.projectiles.crossbow_arrow_exp = deep_clone(self.projectiles.crossbow_arrow)
-	self.projectiles.crossbow_arrow_exp.damage = 15
+	self.projectiles.crossbow_arrow_exp.damage = 90
 	self.projectiles.crossbow_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.crossbow_arrow_exp.remove_on_impact = true
 	self.projectiles.wpn_prj_four = {}
@@ -4086,7 +4470,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.wpn_prj_ace.sounds.flyby_stop = "throwing_star_flyby_stop"
 	self.projectiles.wpn_prj_ace.sounds.impact = "throwables_impact_gen"
 	self.projectiles.wpn_prj_jav = {}
-	self.projectiles.wpn_prj_jav.damage = 110
+	self.projectiles.wpn_prj_jav.damage = 750
 	self.projectiles.wpn_prj_jav.launch_speed = 1500
 	self.projectiles.wpn_prj_jav.adjust_z = 30
 	self.projectiles.wpn_prj_jav.mass_look_up_modifier = 1
@@ -4097,33 +4481,33 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.wpn_prj_jav.sounds.flyby_stop = "jav_flyby_stop"
 	self.projectiles.wpn_prj_jav.sounds.impact = "jav_impact_gen"
 	self.projectiles.arblast_arrow = {}
-	self.projectiles.arblast_arrow.damage = 53
+	self.projectiles.arblast_arrow.damage = 400
 	self.projectiles.arblast_arrow.launch_speed = 3500
 	self.projectiles.arblast_arrow.adjust_z = 0
 	self.projectiles.arblast_arrow.mass_look_up_modifier = 1
 	self.projectiles.arblast_arrow.push_at_body_index = 0
 	self.projectiles.arblast_poison_arrow = deep_clone(self.projectiles.arblast_arrow)
-	self.projectiles.arblast_poison_arrow.damage = 20
+	self.projectiles.arblast_poison_arrow.damage = 30
 	self.projectiles.arblast_poison_arrow.bullet_class = "PoisonBulletBase"
 	self.projectiles.arblast_arrow_exp = deep_clone(self.projectiles.arblast_arrow)
-	self.projectiles.arblast_arrow_exp.damage = 71
+	self.projectiles.arblast_arrow_exp.damage = 140
 	self.projectiles.arblast_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.arblast_arrow_exp.remove_on_impact = true
 	self.projectiles.frankish_arrow = {}
-	self.projectiles.frankish_arrow.damage = 24
+	self.projectiles.frankish_arrow.damage = 150
 	self.projectiles.frankish_arrow.launch_speed = 2500
 	self.projectiles.frankish_arrow.adjust_z = 0
 	self.projectiles.frankish_arrow.mass_look_up_modifier = 1
 	self.projectiles.frankish_arrow.push_at_body_index = 0
 	self.projectiles.frankish_poison_arrow = deep_clone(self.projectiles.frankish_arrow)
-	self.projectiles.frankish_poison_arrow.damage = 9
+	self.projectiles.frankish_poison_arrow.damage = 10
 	self.projectiles.frankish_poison_arrow.bullet_class = "PoisonBulletBase"
 	self.projectiles.frankish_arrow_exp = deep_clone(self.projectiles.frankish_arrow)
-	self.projectiles.frankish_arrow_exp.damage = 32
+	self.projectiles.frankish_arrow_exp.damage = 70
 	self.projectiles.frankish_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.frankish_arrow_exp.remove_on_impact = true
 	self.projectiles.long_arrow = {}
-	self.projectiles.long_arrow.damage = 65
+	self.projectiles.long_arrow.damage = 400
 	self.projectiles.long_arrow.launch_speed = 3500
 	self.projectiles.long_arrow.adjust_z = -30
 	self.projectiles.long_arrow.mass_look_up_modifier = 1
@@ -4132,7 +4516,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.long_poison_arrow.damage = 30
 	self.projectiles.long_poison_arrow.bullet_class = "PoisonBulletBase"
 	self.projectiles.long_arrow_exp = deep_clone(self.projectiles.long_arrow)
-	self.projectiles.long_arrow_exp.damage = 85
+	self.projectiles.long_arrow_exp.damage = 140
 	self.projectiles.long_arrow_exp.bullet_class = "InstantExplosiveBulletBase"
 	self.projectiles.long_arrow_exp.remove_on_impact = true
 	self.projectiles.wpn_prj_hur = {}
@@ -4158,9 +4542,9 @@ Play the full version soon to get your full PAYDAY!]],
 	self.dot_types = {}
 	self.dot_types.poison = {
 		damage_class = "PoisonBulletBase",
-		dot_length = 10,
-		dot_damage = 2,
-		hurt_animation_chance = 0.5
+		dot_length = 6,
+		dot_damage = 25,
+		hurt_animation_chance = 1
 	}
 	self.quickplay = {}
 	self.quickplay.default_level_diff = {15, 15}
@@ -4173,6 +4557,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.team_ai.stop_action.delay = 0.8
 	self.team_ai.stop_action.distance = 3000
 	self.team_ai.stop_action.teleport_distance = 5000
+	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()

@@ -27,6 +27,7 @@ function AkimboWeaponBase:_create_second_gun(unit_name)
 	self._second_gun:base().SKIP_AMMO = true
 	self._second_gun:base().parent_weapon = self._unit
 	new_unit:base():setup(self._setup)
+	self.akimbo = true
 	if self._enabled then
 		self._second_gun:base():on_enabled()
 	else

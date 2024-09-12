@@ -139,7 +139,7 @@ function MoneyManager:on_mission_completed(num_winners)
 		managers.loot:set_postponed_small_loot()
 		return
 	end
-	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table = self:get_real_job_money_values(num_winners)
+	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table, payout_table = self:get_real_job_money_values(num_winners)
 	managers.loot:clear_postponed_small_loot()
 	self:_set_stage_payout(stage_value + risk_table.stage_risk)
 	self:_set_job_payout(job_value + risk_table.job_risk)
@@ -190,9 +190,11 @@ function MoneyManager:get_money_by_job(job_id, difficulty)
 		return 0, 0, 0
 	end
 	local tweak_job = tweak_data.narrative:job_data(job_id)
-	if tweak_job.payout and tweak_job.payout[difficulty] then
-		local payout = tweak_job.payout[difficulty] or 0
-		local base_payout = tweak_job.payout[1] or 0
+	if tweak_job.payout ~= nil then
+		local tweak_payout = type(tweak_job.payout) == "table" and tweak_job.payout[1] or tweak_job.payout
+		local tweak_multiplier = self:get_tweak_value("money_manager", "difficulty_multiplier_payout", difficulty) or 1
+		local payout = tweak_payout * tweak_multiplier
+		local base_payout = tweak_payout
 		local risk_payout = payout - base_payout
 		return payout, base_payout, risk_payout
 	else
@@ -355,13 +357,24 @@ function MoneyManager:get_money_by_params(params)
 		local bag_value = math.round((bonus_bag_value + mandatory_bag_value) / offshore_rate)
 		bag_risk = math.round(bag_risk / offshore_rate)
 	end
-	return stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, {
-		stage_risk = stage_risk,
-		job_risk = job_risk,
-		bag_risk = bag_risk,
-		vehicle_risk = vehicle_risk,
-		small_risk = small_risk
-	}, {job_base_payout = base_static_value, job_risk_payout = risk_static_value}
+	local ret = {
+		stage_value,
+		job_value,
+		bag_value,
+		vehicle_value,
+		small_value,
+		crew_value,
+		total_payout,
+		{
+			stage_risk = stage_risk,
+			job_risk = job_risk,
+			bag_risk = bag_risk,
+			vehicle_risk = vehicle_risk,
+			small_risk = small_risk
+		},
+		{job_base_payout = base_static_value, job_risk_payout = risk_static_value}
+	}
+	return unpack(ret)
 end
 
 function MoneyManager:get_real_job_money_values(num_winners, potential_payout)
@@ -593,6 +606,11 @@ function MoneyManager:on_buy_mission_asset(asset_id)
 	local amount = self:get_mission_asset_cost_by_id(asset_id)
 	self:_deduct_from_total(amount)
 	return amount
+end
+
+function MoneyManager:refund_mission_assets()
+	local amount = managers.assets:get_money_spent()
+	self:_add_to_total(amount, {no_offshore = true})
 end
 
 function MoneyManager:can_afford_spend_skillpoint(tree, tier, points)
@@ -946,7 +964,9 @@ function MoneyManager:get_cost_of_premium_contract(job_id, difficulty_id)
 		"hard",
 		"overkill",
 		"overkill_145",
-		"overkill_290"
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
 	}
 	local value = total_payout * self:get_tweak_value("money_manager", "buy_premium_multiplier", diffs[difficulty_id]) + self:get_tweak_value("money_manager", "buy_premium_static_fee", diffs[difficulty_id])
 	local total_value = value
@@ -1092,7 +1112,7 @@ end
 
 function MoneyManager:deduct_from_total(amount)
 	amount = math.round(amount)
-	print("MoneyManager:deduct_from_total", amount)
+	print("[MoneyManager] deduct_from_total", amount)
 	self:_deduct_from_total(amount)
 end
 
@@ -1103,16 +1123,37 @@ function MoneyManager:_deduct_from_total(amount)
 	self:_on_total_changed(-amount, -amount, 0)
 end
 
+function MoneyManager:add_to_spending(amount)
+	amount = math.round(amount)
+	print("[MoneyManager] add_to_offshore", amount)
+	self:_set_total(math.max(0, self:total() + amount))
+	self:_on_total_changed(0, amount, 0)
+	if managers.challenge then
+		managers.challenge:award_progress("earn_cash", math.max(amount, 0))
+	end
+end
+
+function MoneyManager:deduct_from_spending(amount)
+	amount = math.round(amount)
+	print("[MoneyManager] deduct_from_spending", amount)
+	amount = math.min(amount, self:total())
+	self:_set_total(math.max(0, self:total() - amount))
+	self:_on_total_changed(0, -amount, 0)
+end
+
 function MoneyManager:add_to_offshore(amount)
 	amount = math.round(amount)
-	print("MoneyManager:add_to_offshore", amount)
+	print("[MoneyManager] add_to_offshore", amount)
 	self:_set_offshore(math.max(0, self:offshore() + amount))
 	self:_on_total_changed(0, 0, amount)
+	if managers.challenge then
+		managers.challenge:award_progress("earn_offshore_cash", math.max(amount, 0))
+	end
 end
 
 function MoneyManager:deduct_from_offshore(amount)
 	amount = math.round(amount)
-	print("MoneyManager:deduct_from_offshore", amount)
+	print("[MoneyManager] deduct_from_offshore", amount)
 	self:_deduct_from_offshore(amount)
 end
 

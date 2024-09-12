@@ -7,6 +7,10 @@ PlayerDamage._ARMOR_DAMAGE_REDUCTION_STEPS = tweak_data.player.damage.ARMOR_DAMA
 PlayerDamage._UPPERS_COOLDOWN = 20
 
 function PlayerDamage:init(unit)
+	self._lives_init = tweak_data.player.damage.LIVES_INIT
+	if Global.game_settings.difficulty == "sm_wish" then
+		self._lives_init = 2
+	end
 	self._unit = unit
 	self._max_health_reduction = managers.player:upgrade_value("player", "max_health_reduction", 1)
 	self._healing_reduction = managers.player:upgrade_value("player", "healing_reduction", 1)
@@ -408,7 +412,7 @@ function PlayerDamage:band_aid_health()
 	self:change_health(self:_max_health() * self._healing_reduction)
 	self._said_hurt = false
 	if math.rand(1) < managers.player:upgrade_value("first_aid_kit", "downs_restore_chance", 0) then
-		self._revives = Application:digest_value(math.min(tweak_data.player.damage.LIVES_INIT + managers.player:upgrade_value("player", "additional_lives", 0), Application:digest_value(self._revives, false) + 1), true)
+		self._revives = Application:digest_value(math.min(self._lives_init + managers.player:upgrade_value("player", "additional_lives", 0), Application:digest_value(self._revives, false) + 1), true)
 		self._revive_health_i = math.max(self._revive_health_i - 1, 1)
 		managers.environment_controller:set_last_life(1 >= Application:digest_value(self._revives, false))
 	end
@@ -551,7 +555,7 @@ function PlayerDamage:_regenerated(no_messiah)
 	self:_send_set_health()
 	self:_set_health_effect()
 	self._said_hurt = false
-	self._revives = Application:digest_value(tweak_data.player.damage.LIVES_INIT + managers.player:upgrade_value("player", "additional_lives", 0), true)
+	self._revives = Application:digest_value(self._lives_init + managers.player:upgrade_value("player", "additional_lives", 0), true)
 	self._revive_health_i = 1
 	managers.environment_controller:set_last_life(false)
 	self._down_time = tweak_data.player.damage.DOWNED_TIME
@@ -844,7 +848,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		self:_bleed_out_damage(attack_data)
 		return
 	end
-	if not self:is_suppressed() then
+	if not attack_data.ignore_suppression and not self:is_suppressed() then
 		return
 	end
 	local armor_reduction_multiplier = 0
@@ -1082,7 +1086,7 @@ function PlayerDamage:damage_fire(attack_data)
 	elseif self:incapacitated() then
 		return
 	end
-	local distance = mvector3.distance(attack_data.position, self._unit:position())
+	local distance = mvector3.distance(attack_data.position or attack_data.col_ray.position, self._unit:position())
 	if distance > attack_data.range then
 		return
 	end

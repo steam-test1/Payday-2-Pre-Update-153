@@ -209,7 +209,7 @@ function MenuGuiComponentGeneric:_add_panels()
 	self._info_panel:set_world_top(self._page_panel:world_y())
 	self._info_panel:set_right(self._panel:w())
 	self._outline_panel = self._page_panel:panel({layer = 100})
-	BoxGuiObject:new(self._outline_panel, {
+	self._outline_box = BoxGuiObject:new(self._outline_panel, {
 		sides = {
 			1,
 			1,
@@ -246,7 +246,11 @@ function MenuGuiComponentGeneric:_add_tabs()
 		local tab_page = page_class:new(tab_data.name_id, self._page_panel, self._fullscreen_panel, self)
 		local tab_item = MenuGuiTabItem:new(index, tab_data.name_id, tab_page, self, tab_x, self._tabs_scroll_panel)
 		tab_x = tab_item:next_page_position()
-		table.insert(self._tabs, {tab = tab_item, page = tab_page})
+		table.insert(self._tabs, {
+			tab = tab_item,
+			page = tab_page,
+			width_multiplier = tab_data.width_multiplier ~= nil and tab_data.width_multiplier or WIDTH_MULTIPLIER
+		})
 	end
 	if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and #self._tabs_data > 1 then
 		local button = managers.menu:is_steam_controller() and managers.localization:steam_btn("bumper_r") or managers.localization:get_default_macro("BTN_BOTTOM_R")
@@ -298,6 +302,7 @@ function MenuGuiComponentGeneric:set_active_page(new_index, play_sound)
 	local active_tab = self._tabs[self._active_page] and self._tabs[self._active_page].tab
 	local new_page = self._tabs[new_index] and self._tabs[new_index].page
 	local new_tab = self._tabs[new_index] and self._tabs[new_index].tab
+	local tab_width = self._tabs[new_index] and self._tabs[new_index].width_multiplier
 	if active_page then
 		active_page:set_active(false)
 	end
@@ -322,6 +327,20 @@ function MenuGuiComponentGeneric:set_active_page(new_index, play_sound)
 	if play_sound then
 		managers.menu_component:post_event("highlight")
 	end
+	self._page_panel:set_w(self._panel:w() * tab_width)
+	self._info_panel:set_w(self._panel:w() * (1 - tab_width) - BOX_GAP)
+	self._outline_panel:set_w(self._page_panel:w())
+	if self._outline_box then
+		self._outline_box:close()
+	end
+	self._outline_box = BoxGuiObject:new(self._outline_panel, {
+		sides = {
+			1,
+			1,
+			2,
+			2
+		}
+	})
 	self._active_page = new_index
 	self:update_legend()
 	return true

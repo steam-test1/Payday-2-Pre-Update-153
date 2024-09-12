@@ -247,14 +247,15 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 			managers.player:activate_temporary_upgrade("temporary", "no_ammo_cost")
 		end
 	end
-	local consume_ammo = not managers.player:has_active_temporary_property("bullet_storm") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost"))
+	local is_player = self._setup.user_unit == managers.player:player_unit()
+	local consume_ammo = not managers.player:has_active_temporary_property("bullet_storm") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost")) or not is_player
 	if consume_ammo then
 		local base = self.parent_weapon and self.parent_weapon:base() or self
 		if base:get_ammo_remaining_in_clip() == 0 then
 			return
 		end
 		local ammo_usage = 1
-		if managers.player:has_category_upgrade(self:weapon_tweak_data().category, "consume_no_ammo_chance") then
+		if is_player and managers.player:has_category_upgrade(self:weapon_tweak_data().category, "consume_no_ammo_chance") then
 			local roll = math.rand(1)
 			local chance = managers.player:upgrade_value(self:weapon_tweak_data().category, "consume_no_ammo_chance", 0)
 			if roll < chance then
@@ -262,7 +263,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 				print("NO AMMO COST")
 			end
 		end
-		if managers.player:has_category_upgrade(self:weapon_tweak_data().sub_category, "consume_no_ammo_chance") then
+		if is_player and managers.player:has_category_upgrade(self:weapon_tweak_data().sub_category, "consume_no_ammo_chance") then
 			local roll = math.rand(1)
 			local chance = managers.player:upgrade_value(self:weapon_tweak_data().sub_category, "consume_no_ammo_chance", 0)
 			if roll < chance then
@@ -1140,7 +1141,8 @@ function RaycastWeaponBase:enabled()
 end
 
 function RaycastWeaponBase:play_tweak_data_sound(event, alternative_event)
-	local sounds = tweak_data.weapon[self._name_id].sounds
+	local str_name = self._name_id:gsub("_npc", "")
+	local sounds = tweak_data.weapon[str_name].sounds
 	local event = sounds and (sounds[event] or sounds[alternative_event])
 	if event then
 		self:play_sound(event)
@@ -1520,7 +1522,7 @@ function FlameBulletBase:give_fire_damage(col_ray, weapon_unit, user_unit, damag
 	return defense_data
 end
 
-function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_unit, damage, is_fire_dot_damage)
+function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_unit, damage, is_fire_dot_damage, is_molotov)
 	local action_data = {}
 	action_data.variant = "fire"
 	action_data.damage = damage
@@ -1528,6 +1530,7 @@ function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_uni
 	action_data.attacker_unit = attacker_unit
 	action_data.col_ray = col_ray
 	action_data.is_fire_dot_damage = is_fire_dot_damage
+	action_data.is_molotov = is_molotov
 	local defense_data = {}
 	if col_ray and col_ray.unit and alive(col_ray.unit) and col_ray.unit:character_damage() then
 		defense_data = col_ray.unit:character_damage():damage_fire(action_data)
@@ -1617,13 +1620,13 @@ function DOTBulletBase:_dot_data_by_weapon(weapon_unit)
 	return nil
 end
 
-function DOTBulletBase:start_dot_damage(col_ray, weapon_unit, dot_data)
+function DOTBulletBase:start_dot_damage(col_ray, weapon_unit, dot_data, weapon_id)
 	local hurt_animation = not dot_data.hurt_animation_chance or math.rand(1) < dot_data.hurt_animation_chance
 	dot_data = dot_data or self.DOT_DATA
-	managers.dot:add_doted_enemy(col_ray.unit, TimerManager:game():time(), weapon_unit, dot_data.dot_length, dot_data.dot_damage, hurt_animation, self.VARIANT)
+	managers.dot:add_doted_enemy(col_ray.unit, TimerManager:game():time(), weapon_unit, dot_data.dot_length, dot_data.dot_damage, hurt_animation, self.VARIANT, weapon_id)
 end
 
-function DOTBulletBase:give_damage_dot(col_ray, weapon_unit, attacker_unit, damage, hurt_animation)
+function DOTBulletBase:give_damage_dot(col_ray, weapon_unit, attacker_unit, damage, hurt_animation, weapon_id)
 	local action_data = {}
 	action_data.variant = self.VARIANT
 	action_data.damage = damage
@@ -1631,6 +1634,7 @@ function DOTBulletBase:give_damage_dot(col_ray, weapon_unit, attacker_unit, dama
 	action_data.attacker_unit = attacker_unit
 	action_data.col_ray = col_ray
 	action_data.hurt_animation = hurt_animation
+	action_data.name_id = weapon_id
 	local defense_data = {}
 	if col_ray and col_ray.unit and alive(col_ray.unit) and col_ray.unit:character_damage() then
 		defense_data = col_ray.unit:character_damage():damage_dot(action_data)

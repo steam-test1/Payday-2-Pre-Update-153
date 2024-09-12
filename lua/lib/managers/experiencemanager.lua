@@ -208,6 +208,7 @@ function ExperienceManager:_level_up()
 	end
 	managers.upgrades:level_up()
 	managers.skilltree:level_up()
+	managers.mission:call_global_event(Message.OnLevelUp)
 end
 
 function ExperienceManager:_check_achievements()
@@ -231,7 +232,7 @@ function ExperienceManager:_check_achievements()
 	end
 	if self._global.rank then
 		for i = 1, Application:digest_value(self._global.rank, false) do
-			managers.achievment:award("ignominy_" .. tostring(i))
+			managers.achievment:award(tweak_data.achievement.infamous[i])
 		end
 	end
 end

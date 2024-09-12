@@ -98,7 +98,7 @@ function TankCopLogicAttack.update(data)
 			local dist = focus_enemy.verified_dis
 			local run_dist = focus_enemy.verified and 1500 or 800
 			local walk = dist < run_dist
-			TankCopLogicAttack._chk_request_action_walk_to_chase_pos(data, my_data, walk and "walk" or "run")
+			TankCopLogicAttack._chk_request_action_walk_to_chase_pos(data, my_data, "run")
 		elseif my_data.chase_pos then
 			my_data.chase_path_search_id = tostring(unit:key()) .. "chase"
 			my_data.pathing_to_chase_pos = true

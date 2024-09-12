@@ -45,7 +45,7 @@ end
 
 function CopInventory:_chk_spawn_shield(weapon_unit)
 	if self._shield_unit_name and not alive(self._shield_unit) then
-		local align_name = Idstring("a_weapon_left_front")
+		local align_name = self._shield_align_name or Idstring("a_weapon_left_front")
 		local align_obj = self._unit:get_object(align_name)
 		self._shield_unit = World:spawn_unit(Idstring(self._shield_unit_name), align_obj:position(), align_obj:rotation())
 		self._unit:link(align_name, self._shield_unit, self._shield_unit:orientation_object():name())

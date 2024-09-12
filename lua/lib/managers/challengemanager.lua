@@ -287,6 +287,7 @@ function ChallengeManager:on_achievement_awarded(id)
 			if not objective.completed and objective.achievement_id == id then
 				objective.completed = true
 				self:_check_challenge_completed(active_challenge.id, key)
+				managers.mission:call_global_event(Message.OnSideJobComplete)
 				break
 			end
 		end
@@ -526,7 +527,7 @@ function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
 	else
 		pass_detection = true
 	end
-	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade
+	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade and pass_perk_deck
 end
 
 function ChallengeManager:check_equipped_team(achievement_data)

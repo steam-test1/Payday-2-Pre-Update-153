@@ -82,7 +82,6 @@ function BlackMarketManager:_setup_grenades()
 				skill_based = false,
 				amount = 0
 			}
-			print("grenade_id ", inspect(grenade_id))
 			local is_default, weapon_level = managers.upgrades:get_value(grenade_id, self._defaults.grenade)
 			grenades[grenade_id].level = weapon_level
 			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.projectiles[grenade_id].dlc
@@ -5264,6 +5263,8 @@ function BlackMarketManager:load(data)
 		end
 		self._global.new_drops = self._global.new_drops or {}
 		self._global.new_item_type_unlocked = self._global.new_item_type_unlocked or {}
+		print("self._global.new_drops ", inspect(self._global.new_drops))
+		print("self._global.new_item_type_unlocked ", inspect(self._global.new_item_type_unlocked))
 		local old_drops = {}
 		for global_value, categories in pairs(self._global.new_drops) do
 			for category, ids in pairs(categories) do
@@ -6302,7 +6303,12 @@ function BlackMarketManager:check_frog_1()
 		return false
 	end
 	local frog_1_memory = managers.job:get_memory("frog_1")
-	local is_correct_job = frog_1_memory ~= false and managers.job and managers.job:has_active_job() and (managers.job:current_real_job_id() == "hox" or managers.job:current_real_job_id() == "hox_prof") and (Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill_290" and true) or false
+	local is_correct_job = frog_1_memory ~= false and managers.job and managers.job:has_active_job() and (managers.job:current_real_job_id() == "hox" or managers.job:current_real_job_id() == "hox_prof") and table.contains({
+		"overkill_145",
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
+	}, Global.game_settings.difficulty) and true or false
 	if is_correct_job then
 		local pass_skills, pass_primary, pass_secondary, pass_armor, peer, outfit
 		local all_passed = true

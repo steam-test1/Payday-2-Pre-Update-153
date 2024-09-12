@@ -15,7 +15,8 @@ CopDamage._all_event_types = {
 CopDamage._ATTACK_VARIANTS = {
 	"explosion",
 	"stun",
-	"fire"
+	"fire",
+	"healed"
 }
 CopDamage._HEALTH_GRANULARITY = 512
 CopDamage.WEAPON_TYPE_GRANADE = 1
@@ -435,16 +436,25 @@ function CopDamage:damage_bullet(attack_data)
 			end
 		elseif attack_data.attacker_unit:in_slot(managers.slot:get_mask("criminals_no_deployables")) then
 			self:_AI_comment_death(attack_data.attacker_unit, self._unit:base()._tweak_table)
-		elseif attack_data.attacker_unit:base().sentry_gun and Network:is_server() then
-			local server_info = attack_data.weapon_unit:base():server_information()
-			if server_info and server_info.owner_peer_id ~= managers.network:session():local_peer():id() then
-				local owner_peer = managers.network:session():peer(server_info.owner_peer_id)
-				if owner_peer then
-					owner_peer:send_queued_sync("sync_player_kill_statistic", data.name, data.head_shot and true or false, data.weapon_unit, data.variant, data.stats_name)
+		elseif attack_data.attacker_unit:base().sentry_gun then
+			if Network:is_server() then
+				local server_info = attack_data.weapon_unit:base():server_information()
+				if server_info and server_info.owner_peer_id ~= managers.network:session():local_peer():id() then
+					local owner_peer = managers.network:session():peer(server_info.owner_peer_id)
+					if owner_peer then
+						owner_peer:send_queued_sync("sync_player_kill_statistic", data.name, data.head_shot and true or false, data.weapon_unit, data.variant, data.stats_name)
+					end
+				else
+					data.attacker_state = managers.player:current_state()
+					managers.statistics:killed(data)
 				end
+			end
+			local sentry_attack_data = deep_clone(attack_data)
+			sentry_attack_data.attacker_unit = attack_data.attacker_unit:base():get_owner()
+			if sentry_attack_data.attacker_unit == managers.player:player_unit() then
+				self:_check_damage_achievements(sentry_attack_data, head)
 			else
-				data.attacker_state = managers.player:current_state()
-				managers.statistics:killed(data)
+				self._unit:network():send("sync_damage_achievements", sentry_attack_data.weapon_unit, sentry_attack_data.attacker_unit, sentry_attack_data.damage, sentry_attack_data.col_ray and sentry_attack_data.col_ray.distance, head)
 			end
 		end
 	end
@@ -468,6 +478,20 @@ function CopDamage:damage_bullet(attack_data)
 	self:_send_bullet_attack_result(attack_data, attacker, damage_percent, body_index, hit_offset_height, variant)
 	self:_on_damage_received(attack_data)
 	return result
+end
+
+function CopDamage:client_check_damage_achievements(weapon_unit, attacker_unit, damage, distance, head_shot)
+	if attacker_unit ~= managers.player:player_unit() then
+		return
+	end
+	local fake_ray = {distance = distance}
+	local attack_data = {
+		weapon_unit = weapon_unit,
+		attacker_unit = attacker_unit,
+		col_ray = fake_ray,
+		damage = damage
+	}
+	self:_check_damage_achievements(attack_data, head_shot)
 end
 
 function CopDamage:_check_damage_achievements(attack_data, head)
@@ -524,9 +548,9 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 					end
 				end
 			end
-			part_pass = not achievement_data.part_id or attack_weapon:base():has_part(achievement_data.part_id)
+			part_pass = not achievement_data.part_id or attack_weapon:base().has_part and attack_weapon:base():has_part(achievement_data.part_id)
 			parts_pass = not achievement_data.parts
-			if achievement_data.parts then
+			if achievement_data.parts and attack_weapon:base().has_part then
 				for _, part_id in ipairs(achievement_data.parts) do
 					if attack_weapon:base():has_part(part_id) then
 						parts_pass = true
@@ -624,6 +648,8 @@ function CopDamage:_comment_death(unit, type, special_comment)
 		PlayerStandard.say_line(unit:sound(), "g31x_any")
 	elseif type == "sniper" then
 		PlayerStandard.say_line(unit:sound(), "g35x_any")
+	elseif type == "medic" then
+		PlayerStandard.say_line(unit:sound(), "g36x_any")
 	end
 end
 
@@ -638,6 +664,8 @@ function CopDamage:_AI_comment_death(unit, type)
 		unit:sound():say("g31x_any", true)
 	elseif type == "sniper" then
 		unit:sound():say("g35x_any", true)
+	elseif type == "medic" then
+		unit:sound():say("g36x_any", true)
 	end
 end
 
@@ -726,9 +754,10 @@ function CopDamage:damage_fire(attack_data)
 			owner = attack_data.owner,
 			weapon_unit = attack_data.weapon_unit,
 			variant = attack_data.variant,
-			head_shot = head
+			head_shot = head,
+			is_molotov = attack_data.is_molotov
 		}
-		if not attack_data.is_fire_dot_damage then
+		if not attack_data.is_fire_dot_damage or data.is_molotov then
 			managers.statistics:killed_by_anyone(data)
 		end
 		if managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and not attack_data.weapon_unit:base().thrower_unit then
@@ -781,7 +810,7 @@ function CopDamage:damage_fire(attack_data)
 		local start_dot_damage_roll = math.random(1, 100)
 		local start_dot_dance_antimation = false
 		if flammable and not attack_data.is_fire_dot_damage and distance < fire_dot_max_distance and fire_dot_trigger_chance >= start_dot_damage_roll then
-			managers.fire:add_doted_enemy(self._unit, TimerManager:game():time(), attack_data.weapon_unit, fire_dot_data.dot_length, fire_dot_data.dot_damage, attack_data.attacker_unit)
+			managers.fire:add_doted_enemy(self._unit, TimerManager:game():time(), attack_data.weapon_unit, fire_dot_data.dot_length, fire_dot_data.dot_damage, attack_data.attacker_unit, attack_data.is_molotov)
 			start_dot_dance_antimation = true
 		end
 		if fire_dot_data then
@@ -790,7 +819,7 @@ function CopDamage:damage_fire(attack_data)
 		end
 	else
 	end
-	self:_send_fire_attack_result(attack_data, attacker, damage_percent, attack_data.is_fire_dot_damage, attack_data.col_ray.ray)
+	self:_send_fire_attack_result(attack_data, attacker, damage_percent, attack_data.is_fire_dot_damage, attack_data.col_ray.ray, attack_data.result.type == "healed")
 	self:_on_damage_received(attack_data)
 end
 
@@ -831,13 +860,15 @@ function CopDamage:damage_dot(attack_data)
 	end
 	local attacker_unit = attack_data.attacker_unit
 	if result.type == "death" then
+		local variant = attack_data.name_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[attack_data.name_id] and "melee" or attack_data.variant
 		local data = {
 			name = self._unit:base()._tweak_table,
 			stats_name = self._unit:base()._stats_name,
 			owner = attack_data.owner,
 			weapon_unit = attack_data.weapon_unit,
-			variant = attack_data.variant,
-			head_shot = head
+			variant = variant,
+			head_shot = head,
+			name_id = attack_data.name_id
 		}
 		managers.statistics:killed_by_anyone(data)
 		if attacker_unit == managers.player:player_unit() then
@@ -1549,14 +1580,16 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 		if data.weapon_unit then
 			self:_check_special_death_conditions("bullet", body, attacker_unit, data.weapon_unit)
 			managers.statistics:killed_by_anyone(data)
-			if data.weapon_unit:base():weapon_tweak_data().is_shotgun and distance and distance < 500 then
+			if data.weapon_unit:base():weapon_tweak_data().is_shotgun and distance and distance < managers.game_play_central:get_shotgun_push_range() then
 				shotgun_push = true
 			end
 		end
 	else
 		local result_type = variant == 1 and "knock_down" or variant == 2 and "stagger" or self:get_damage_type(damage_percent, "bullet")
 		result = {type = result_type, variant = "bullet"}
-		self:_apply_damage_to_health(damage)
+		if result_type ~= "healed" then
+			self:_apply_damage_to_health(damage)
+		end
 	end
 	attack_data.variant = "bullet"
 	attack_data.attacker_unit = attacker_unit
@@ -1578,7 +1611,7 @@ function CopDamage:chk_killshot(attacker_unit, variant, headshot)
 	end
 end
 
-function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack_variant, death, direction)
+function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack_variant, death, direction, weapon_unit)
 	if self._dead then
 		return
 	end
@@ -1593,7 +1626,7 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 			name = self._unit:base()._tweak_table,
 			stats_name = self._unit:base()._stats_name,
 			head_shot = false,
-			weapon_unit = attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
+			weapon_unit = weapon_unit or attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
 			variant = "explosion"
 		}
 		managers.statistics:killed_by_anyone(data)
@@ -1665,7 +1698,7 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 	self:_on_damage_received(attack_data)
 end
 
-function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dance_antimation, death, direction, weapon_type, weapon_id)
+function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dance_antimation, death, direction, weapon_type, weapon_id, healed)
 	if self._dead then
 		return
 	end
@@ -1677,7 +1710,7 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dan
 	if weapon_type then
 		local fire_dot
 		if weapon_type == CopDamage.WEAPON_TYPE_GRANADE then
-			fire_dot = tweak_data.grenades[weapon_id].fire_dot_data
+			fire_dot = tweak_data.projectiles[weapon_id].fire_dot_data
 		elseif weapon_type == CopDamage.WEAPON_TYPE_BULLET then
 			if tweak_data.weapon.factory.parts[weapon_id].custom_stats then
 				fire_dot = tweak_data.weapon.factory.parts[weapon_id].custom_stats.fire_dot_data
@@ -1699,13 +1732,16 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dan
 			stats_name = self._unit:base()._stats_name,
 			head_shot = false,
 			weapon_unit = attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
-			variant = "fire"
+			variant = "fire",
+			is_molotov = weapon_id == "molotov"
 		}
 		managers.statistics:killed_by_anyone(data)
 	else
 		local result_type = variant == "stun" and "hurt_sick" or self:get_damage_type(damage_percent, "fire")
-		result = {type = result_type, variant = variant}
-		self:_apply_damage_to_health(damage)
+		result = {type = result_type, variant = "bullet"}
+		if result_type ~= "healed" then
+			self:_apply_damage_to_health(damage)
+		end
 	end
 	attack_data.result = result
 	attack_data.damage = damage
@@ -1763,7 +1799,7 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dan
 	self:_on_damage_received(attack_data)
 end
 
-function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant, hurt_animation)
+function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant, hurt_animation, weapon_id)
 	if self._dead then
 		return
 	end
@@ -1774,20 +1810,25 @@ function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant
 		result = {type = "death", variant = variant}
 		self:die(attack_data)
 		self:chk_killshot(attacker_unit, variant or "dot")
+		local real_variant = weapon_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[weapon_id] and "melee" or attack_data.variant
 		local data = {
 			name = self._unit:base()._tweak_table,
 			stats_name = self._unit:base()._stats_name,
 			head_shot = false,
-			weapon_unit = attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
-			variant = attack_data.variant
+			weapon_unit = not weapon_id and attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit(),
+			variant = real_variant,
+			name_id = weapon_id
 		}
-		if data.weapon_unit then
+		if data.weapon_unit or data.name_id then
 			managers.statistics:killed_by_anyone(data)
 		end
 	else
-		local result_type = hurt_animation and self:get_damage_type(damage_percent, variant) or "dmg_rcv"
-		result = {type = result_type, variant = variant}
-		self:_apply_damage_to_health(damage)
+		local result_type
+		result_type = hurt_animation and self:get_damage_type(damage_percent, variant) or "dmg_rcv"
+		result = {type = result_type, variant = "bullet"}
+		if result_type ~= "healed" then
+			self:_apply_damage_to_health(damage)
+		end
 	end
 	attack_data.variant = variant
 	attack_data.result = result
@@ -1909,12 +1950,12 @@ function CopDamage:_send_bullet_attack_result(attack_data, attacker, damage_perc
 end
 
 function CopDamage:_send_explosion_attack_result(attack_data, attacker, damage_percent, i_attack_variant, direction)
-	self._unit:network():send("damage_explosion_fire", attacker, damage_percent, i_attack_variant, self._dead and true or false, direction)
+	self._unit:network():send("damage_explosion_fire", attacker, damage_percent, i_attack_variant, self._dead and true or false, direction, attack_data.weapon_unit)
 end
 
-function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percent, is_fire_dot_damage, direction)
+function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percent, is_fire_dot_damage, direction, healed)
 	local weapon_type, weapon_unit
-	if attack_data.attacker_unit and alive(attack_data.attacker_unit) and attack_data.attacker_unit:base()._grenade_entry == "molotov" then
+	if attack_data.attacker_unit and alive(attack_data.attacker_unit) and attack_data.attacker_unit:base()._grenade_entry == "molotov" or attack_data.is_molotov then
 		weapon_type = CopDamage.WEAPON_TYPE_GRANADE
 		weapon_unit = "molotov"
 	elseif alive(attack_data.weapon_unit) and attack_data.weapon_unit:base()._name_id ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id] ~= nil and tweak_data.weapon[attack_data.weapon_unit:base()._name_id].fire_dot_data ~= nil then
@@ -1930,11 +1971,11 @@ function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percen
 	end
 	local start_dot_dance_antimation = attack_data.fire_dot_data and attack_data.fire_dot_data.start_dot_dance_antimation
 	damage_percent = math.clamp(damage_percent, 0, 512)
-	self._unit:network():send("damage_fire", attacker, damage_percent, start_dot_dance_antimation, self._dead and true or false, direction, weapon_type, weapon_unit)
+	self._unit:network():send("damage_fire", attacker, damage_percent, start_dot_dance_antimation, self._dead and true or false, direction, weapon_type, weapon_unit, healed)
 end
 
 function CopDamage:_send_dot_attack_result(attack_data, attacker, damage_percent, variant, direction)
-	self._unit:network():send("damage_dot", attacker, damage_percent, self._dead and true or false, variant, attack_data.hurt_animation)
+	self._unit:network():send("damage_dot", attacker, damage_percent, self._dead and true or false, variant, attack_data.hurt_animation, attack_data.name_id)
 end
 
 function CopDamage:_send_tase_attack_result(attack_data, damage_percent, variant)

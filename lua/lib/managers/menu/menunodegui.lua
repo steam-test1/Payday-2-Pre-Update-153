@@ -175,7 +175,7 @@ function MenuNodeGui:_setup_panels(node)
 		active_menu.renderer:set_bg_visible(self._bg_visible)
 		active_menu.renderer:set_bg_area(self._bg_area)
 	end
-	if self._scene_state then
+	if self._scene_state and managers.menu_scene then
 		managers.menu_scene:set_scene_template(self._scene_state)
 	end
 	local mini_info = self.safe_rect_panel:panel({
@@ -1532,7 +1532,7 @@ function MenuNodeGui:set_visible(visible)
 			active_menu.renderer:set_bg_visible(self._bg_visible)
 			active_menu.renderer:set_bg_area(self._bg_area)
 		end
-		if self._scene_state then
+		if self._scene_state and managers.menu_scene then
 			managers.menu_scene:set_scene_template(self._scene_state)
 		end
 	end

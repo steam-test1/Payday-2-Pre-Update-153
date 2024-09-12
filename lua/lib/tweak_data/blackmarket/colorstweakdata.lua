@@ -55,7 +55,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.black_solid.infamous = true
 	self.colors.black_solid.value = 10
 	self.colors.red_solid = {}
 	self.colors.red_solid.colors = {red, red}
@@ -106,7 +105,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.magenta_solid.infamous = true
 	self.colors.magenta_solid.value = 7
 	self.colors.yellow_solid = {}
 	self.colors.yellow_solid.colors = {yellow, yellow}
@@ -137,7 +135,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.dark_gray_solid.infamous = true
 	self.colors.dark_gray_solid.value = 8
 	self.colors.gray_solid = {}
 	self.colors.gray_solid.colors = {gray, gray}
@@ -158,7 +155,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.pink_solid.infamous = true
 	self.colors.pink_solid.value = 7
 	self.colors.purple_solid = {}
 	self.colors.purple_solid.colors = {purple, purple}
@@ -179,7 +175,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.blood_red_solid.infamous = true
 	self.colors.blood_red_solid.value = 9
 	self.colors.orange_solid = {}
 	self.colors.orange_solid.colors = {orange, orange}
@@ -220,7 +215,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.navy_blue_solid.infamous = true
 	self.colors.navy_blue_solid.value = 7
 	self.colors.light_blue_solid = {}
 	self.colors.light_blue_solid.colors = {light_blue, light_blue}
@@ -251,7 +245,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.warm_yellow_solid.infamous = true
 	self.colors.warm_yellow_solid.value = 6
 	self.colors.dark_red_solid = {}
 	self.colors.dark_red_solid.colors = {dark_red, dark_red}
@@ -272,7 +265,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.dark_green_solid.infamous = true
 	self.colors.dark_green_solid.value = 6
 	self.colors.nothing = {}
 	self.colors.nothing.colors = {nothing, nothing}
@@ -287,7 +279,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.black_white.infamous = true
 	self.colors.black_white.value = 3
 	self.colors.red_black = {}
 	self.colors.red_black.colors = {red, black}
@@ -729,7 +720,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.white_black.infamous = true
 	self.colors.white_black.value = 3
 	self.colors.light_gray_blood_red = {}
 	self.colors.light_gray_blood_red.colors = {light_gray, blood_red}
@@ -750,7 +740,6 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		30,
 		40
 	}
-	self.colors.blood_red_white.infamous = true
 	self.colors.blood_red_white.value = 6
 	self.colors.bone_white_navy_blue = {}
 	self.colors.bone_white_navy_blue.colors = {bone_white, navy_blue}

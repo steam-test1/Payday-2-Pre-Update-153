@@ -205,7 +205,6 @@ end
 function CivilianLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	data.unit:movement():set_cool(false, managers.groupai:state().analyse_giveaway(data.unit:base()._tweak_table, aggressor_unit))
 	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
-	print("CivilianLogicIdle.on_intimidated")
 	local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, aggressor_unit:key())
 	if not data.char_tweak.intimidateable or data.unit:base().unintimidateable or data.unit:anim_data().unintimidateable then
 		return
@@ -213,7 +212,6 @@ function CivilianLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	if not CivilianLogicIdle.is_obstructed(data, aggressor_unit) then
 		return
 	end
-	print("set objective")
 	data.unit:brain():set_objective({
 		type = "surrender",
 		amount = amount,

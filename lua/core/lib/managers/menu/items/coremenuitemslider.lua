@@ -10,12 +10,14 @@ function ItemSlider:init(data_node, parameters)
 	self._max = 1
 	self._step = 0.1
 	self._show_value = false
+	self._is_percentage = false
 	self._decimal_count = 5
 	if data_node then
 		self._min = data_node.min or self._min
 		self._max = data_node.max or self._max
 		self._step = data_node.step or self._step
 		self._show_value = data_node.show_value
+		self._is_percentage = data_node.is_percentage
 		self._show_slider_text = self._show_value or data_node.show_slider_text
 		self._decimal_count = data_node.decimal_count or self._decimal_count
 	end
@@ -23,6 +25,8 @@ function ItemSlider:init(data_node, parameters)
 	self._max = tonumber(self._max)
 	self._step = tonumber(self._step)
 	self._decimal_count = tonumber(self._decimal_count)
+	self._slider_color = _G.tweak_data.screen_colors.button_stage_3
+	self._slider_color_highlight = _G.tweak_data.screen_colors.button_stage_2
 	self._value = self._min
 end
 
@@ -68,12 +72,36 @@ function ItemSlider:decrease()
 end
 
 function ItemSlider:percentage()
-	local value = tonumber(self:value_string())
+	local value = tonumber(self:raw_value_string())
 	return (value - self._min) / (self._max - self._min) * 100
 end
 
-function ItemSlider:value_string()
+function ItemSlider:raw_value_string()
 	return string.format("%." .. self._decimal_count .. "f", self:value())
+end
+
+function ItemSlider:value_string()
+	local str = self:raw_value_string()
+	if self._is_percentage then
+		str = str .. "%"
+	end
+	return str
+end
+
+function ItemSlider:set_slider_color(color)
+	self._slider_color = color
+end
+
+function ItemSlider:set_slider_highlighted_color(color)
+	self._slider_color_highlight = color
+end
+
+function ItemSlider:slider_color()
+	return self._slider_color
+end
+
+function ItemSlider:slider_highlighted_color()
+	return self._slider_color_highlight
 end
 
 function ItemSlider:setup_gui(node, row_item)
@@ -101,9 +129,9 @@ function ItemSlider:setup_gui(node, row_item)
 		orientation = "vertical",
 		gradient_points = {
 			0,
-			_G.tweak_data.screen_colors.button_stage_3,
+			self._slider_color,
 			1,
-			_G.tweak_data.screen_colors.button_stage_3
+			self._slider_color
 		},
 		x = node._left_align(node) - bar_w + 2,
 		y = row_item.gui_slider_bg:y() + 2,
@@ -170,6 +198,12 @@ function ItemSlider:reload(row_item, node)
 	local where = row_item.gui_slider:left() + row_item.gui_slider:w() * (self:percentage() / 100)
 	row_item.gui_slider_marker:set_center_x(where)
 	row_item.gui_slider_gfx:set_w(row_item.gui_slider:w() * (self:percentage() / 100))
+	row_item.gui_slider_gfx:set_gradient_points({
+		0,
+		self:slider_color(),
+		1,
+		self:slider_color()
+	})
 	return true
 end
 
@@ -180,9 +214,9 @@ function ItemSlider:highlight_row_item(node, row_item, mouse_over)
 	row_item.gui_slider_text:set_font(row_item.font and Idstring(row_item.font) or _G.tweak_data.menu.default_font_no_outline_id)
 	row_item.gui_slider_gfx:set_gradient_points({
 		0,
-		_G.tweak_data.screen_colors.button_stage_2,
+		self:slider_highlighted_color(),
 		1,
-		_G.tweak_data.screen_colors.button_stage_2
+		self:slider_highlighted_color()
 	})
 	if row_item.gui_info_panel then
 		row_item.gui_info_panel:set_visible(true)
@@ -197,9 +231,9 @@ function ItemSlider:fade_row_item(node, row_item)
 	row_item.gui_slider_text:set_font(row_item.font and Idstring(row_item.font) or _G.tweak_data.menu.default_font_id)
 	row_item.gui_slider_gfx:set_gradient_points({
 		0,
-		_G.tweak_data.screen_colors.button_stage_3,
+		self:slider_color(),
 		1,
-		_G.tweak_data.screen_colors.button_stage_3
+		self:slider_color()
 	})
 	if row_item.gui_info_panel then
 		row_item.gui_info_panel:set_visible(false)

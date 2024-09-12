@@ -1537,33 +1537,35 @@ function MenuQuickplaySettingsInitiator:modify_node(node)
 	node:item("quickplay_settings_level_min"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_min or tweak_data.quickplay.default_level_diff[1])
 	node:item("quickplay_settings_level_max"):set_max(tweak_data.quickplay.max_level_diff[2])
 	node:item("quickplay_settings_level_max"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_max or tweak_data.quickplay.default_level_diff[2])
-	if node:item("quickplay_settings_difficulty") then
-		node:delete_item("quickplay_settings_difficulty")
-	end
-	local options = {
-		{
-			_meta = "option",
-			text_id = "menu_any",
-			value = "any"
-		}
-	}
-	for _, difficulty in ipairs(tweak_data.difficulties) do
-		if difficulty ~= "easy" then
-			table.insert(options, {
+	local difficulty_item = node:item("quickplay_settings_difficulty")
+	if not difficulty_item then
+		local options = {
+			{
 				_meta = "option",
-				text_id = tweak_data.difficulty_name_ids[difficulty],
-				value = difficulty
-			})
+				text_id = "menu_any",
+				value = "any"
+			}
+		}
+		for _, difficulty in ipairs(tweak_data.difficulties) do
+			if difficulty ~= "easy" then
+				table.insert(options, {
+					_meta = "option",
+					text_id = tweak_data.difficulty_name_ids[difficulty],
+					value = difficulty
+				})
+			end
 		end
+		difficulty_item = self:create_multichoice(node, options, {
+			name = "quickplay_settings_difficulty",
+			text_id = "menu_quickplay_settings_difficulty",
+			help_id = "menu_quickplay_settings_difficulty",
+			callback = "quickplay_difficulty"
+		}, 1)
 	end
-	local difficulty_item = self:create_multichoice(node, options, {
-		name = "quickplay_settings_difficulty",
-		text_id = "menu_quickplay_settings_difficulty",
-		help_id = "menu_quickplay_settings_difficulty",
-		callback = "quickplay_difficulty"
-	}, 1)
 	if Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.difficulty then
 		difficulty_item:set_value(Global.crimenet.quickplay.difficulty)
+	else
+		difficulty_item:set_value("any")
 	end
 	return node
 end
@@ -1608,6 +1610,18 @@ function MenuCallbackHandler:quickplay_difficulty(item)
 	else
 		Global.crimenet.quickplay.difficulty = item:value()
 	end
+end
+
+function MenuCallbackHandler:set_default_quickplay_options()
+	local params = {
+		text = managers.localization:text("dialog_default_quickplay_options_message"),
+		callback = function()
+			managers.user:reset_quickplay_setting_map()
+			Global.crimenet.quickplay = {}
+			self:refresh_node()
+		end
+	}
+	managers.menu:show_default_option_dialog(params)
 end
 
 MenuSkinEditorInitiator = MenuSkinEditorInitiator or class(MenuInitiatorBase)

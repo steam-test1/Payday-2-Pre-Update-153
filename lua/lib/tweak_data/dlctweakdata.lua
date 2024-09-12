@@ -1797,6 +1797,18 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.skull_mask_31 = {}
+	self.skull_mask_31.dlc = "has_achievement"
+	self.skull_mask_31.achievement_id = "pick_66"
+	self.skull_mask_31.content = {}
+	self.skull_mask_31.content.loot_global_value = "infamous"
+	self.skull_mask_31.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "gitgud_e_wish",
+			amount = 1
+		}
+	}
 	self.skull_mask_4 = {}
 	self.skull_mask_4.dlc = "has_achievement"
 	self.skull_mask_4.achievement_id = "death_30"
@@ -1806,6 +1818,18 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "skulloverkillplus",
+			amount = 1
+		}
+	}
+	self.skull_mask_41 = {}
+	self.skull_mask_41.dlc = "has_achievement"
+	self.skull_mask_41.achievement_id = "axe_66"
+	self.skull_mask_41.content = {}
+	self.skull_mask_41.content.loot_global_value = "infamous"
+	self.skull_mask_41.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "gitgud_sm_wish",
 			amount = 1
 		}
 	}

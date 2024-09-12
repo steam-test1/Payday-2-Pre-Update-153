@@ -105,6 +105,17 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(52, "enable_fov_based_sensitivity", false)
 	self:setup_setting(53, "quickplay_stealth", true)
 	self:setup_setting(54, "quickplay_loud", true)
+	self:setup_setting(57, "crimenet_filter_friends_only", false)
+	self:setup_setting(58, "crimenet_filter_new_servers_only", -1)
+	self:setup_setting(59, "crimenet_filter_in_lobby", -1)
+	self:setup_setting(60, "crimenet_filter_level_appopriate", true)
+	self:setup_setting(62, "crimenet_filter_tactic", -1)
+	self:setup_setting(63, "crimenet_filter_max_servers", 30)
+	self:setup_setting(64, "crimenet_filter_distance", 1)
+	self:setup_setting(65, "crimenet_filter_difficulty", -1)
+	self:setup_setting(66, "crimenet_filter_contract", -1)
+	self:setup_setting(67, "crimenet_filter_kick", -1)
+	self:setup_setting(68, "crimenet_filter_safehouses", false)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)
@@ -201,6 +212,16 @@ function GenericUserManager:reset_network_setting_map()
 		"net_packet_throttling",
 		"net_forwarding",
 		"net_use_compression"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
+function GenericUserManager:reset_quickplay_setting_map()
+	local settings = {
+		"quickplay_stealth",
+		"quickplay_loud"
 	}
 	for _, name in pairs(settings) do
 		self:set_setting(name, self:get_default_setting(name))

@@ -188,8 +188,12 @@ function IngameContractGui:init(ws, node)
 		menu_risk_id = "menu_risk_fbi"
 	elseif Global.game_settings.difficulty == "overkill_145" then
 		menu_risk_id = "menu_risk_special"
+	elseif Global.game_settings.difficulty == "easy_wish" then
+		menu_risk_id = "menu_risk_easy_wish"
 	elseif Global.game_settings.difficulty == "overkill_290" then
 		menu_risk_id = "menu_risk_elite"
+	elseif Global.game_settings.difficulty == "sm_wish" then
+		menu_risk_id = "menu_risk_sm_wish"
 	end
 	local risk_stats_panel = text_panel:panel({
 		name = "risk_stats_panel"
@@ -205,10 +209,12 @@ function IngameContractGui:init(ws, node)
 			"risk_pd",
 			"risk_swat",
 			"risk_fbi",
-			"risk_death_squad"
+			"risk_death_squad",
+			"risk_easy_wish"
 		}
 		if not Global.SKIP_OVERKILL_290 then
 			table.insert(risks, "risk_murder_squad")
+			table.insert(risks, "risk_sm_wish")
 		end
 		local max_y = 0
 		local max_x = 0
@@ -371,10 +377,10 @@ function IngameContractGui:set_potential_rewards(show_max)
 	local cy = jobpay_title:center_y()
 	local total_xp, dissected_xp, total_payout, base_payout, risk_payout
 	local contract_visuals = job_data.contract_visuals or {}
+	local xp_min = contract_visuals.min_mission_xp and (type(contract_visuals.min_mission_xp) == "table" and contract_visuals.min_mission_xp[difficulty_stars + 1] or contract_visuals.min_mission_xp) or 0
+	local xp_max = contract_visuals.max_mission_xp and (type(contract_visuals.max_mission_xp) == "table" and contract_visuals.max_mission_xp[difficulty_stars + 1] or contract_visuals.max_mission_xp) or 0
 	if show_max then
-		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {
-			mission_xp = contract_visuals.max_mission_xp and contract_visuals.max_mission_xp[difficulty_stars + 1]
-		})
+		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {mission_xp = xp_max})
 		total_payout, base_payout, risk_payout = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_chain, job_id, nil, {
 			mandatory_bags_value = contract_visuals.mandatory_bags_value and contract_visuals.mandatory_bags_value[difficulty_stars + 1],
 			bonus_bags_value = contract_visuals.bonus_bags_value and contract_visuals.bonus_bags_value[difficulty_stars + 1],
@@ -382,9 +388,7 @@ function IngameContractGui:set_potential_rewards(show_max)
 			vehicle_value = contract_visuals.vehicle_value and contract_visuals.vehicle_value[difficulty_stars + 1]
 		})
 	else
-		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {
-			mission_xp = contract_visuals.min_mission_xp and contract_visuals.min_mission_xp[difficulty_stars + 1]
-		})
+		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_id, job_stars, difficulty_stars, job_data.professional, #job_chain, {mission_xp = xp_min})
 		total_payout, base_payout, risk_payout = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #job_chain, job_id)
 	end
 	local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)

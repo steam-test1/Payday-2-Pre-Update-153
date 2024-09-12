@@ -308,8 +308,12 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		menu_risk_id = "menu_risk_fbi"
 	elseif job_data.difficulty == "overkill_145" then
 		menu_risk_id = "menu_risk_special"
+	elseif job_data.difficulty == "easy_wish" then
+		menu_risk_id = "menu_risk_easy_wish"
 	elseif job_data.difficulty == "overkill_290" then
 		menu_risk_id = "menu_risk_elite"
+	elseif job_data.difficulty == "sm_wish" then
+		menu_risk_id = "menu_risk_sm_wish"
 	end
 	local risk_stats_panel = self._contract_panel:panel({
 		name = "risk_stats_panel",
@@ -327,10 +331,12 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		"risk_pd",
 		"risk_swat",
 		"risk_fbi",
-		"risk_death_squad"
+		"risk_death_squad",
+		"risk_easy_wish"
 	}
 	if not Global.SKIP_OVERKILL_290 then
 		table.insert(risks, "risk_murder_squad")
+		table.insert(risks, "risk_sm_wish")
 	end
 	local max_x = 0
 	local max_y = 0
@@ -441,9 +447,10 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 	}
 	local contract_visuals = job_data.contract_visuals or {}
 	local cy = experience_title:center_y()
+	local xp_min = contract_visuals.min_mission_xp and (type(contract_visuals.min_mission_xp) == "table" and contract_visuals.min_mission_xp[difficulty_stars + 1] or contract_visuals.min_mission_xp) or 0
 	local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, narrative.professional, #narrative_chains, {
 		ignore_heat = 0 < job_heat_value and self._customizable,
-		mission_xp = contract_visuals.min_mission_xp and contract_visuals.min_mission_xp[difficulty_stars + 1]
+		mission_xp = xp_min
 	})
 	local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)
 	local job_xp, add_xp, heat_add_xp, ghost_add_xp = self:_create_xp_appendices(sx, cy)
@@ -582,10 +589,12 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		"risk_pd",
 		"risk_swat",
 		"risk_fbi",
-		"risk_death_squad"
+		"risk_death_squad",
+		"risk_easy_wish"
 	}
 	if not Global.SKIP_OVERKILL_290 then
 		table.insert(self._data.gui_objects.risks, "risk_murder_squad")
+		table.insert(self._data.gui_objects.risks, "risk_sm_wish")
 	end
 	self._data.gui_objects.num_stars = 10
 	self._wait_t = 0
@@ -1059,9 +1068,10 @@ function CrimeNetContractGui:set_potential_rewards(show_max)
 	local contract_visuals = job_data.contract_visuals or {}
 	local total_xp, dissected_xp, total_payout, base_payout, risk_payout
 	if show_max then
+		local xp_max = contract_visuals.max_mission_xp and (type(contract_visuals.max_mission_xp) == "table" and contract_visuals.max_mission_xp[difficulty_stars + 1] or contract_visuals.max_mission_xp) or 0
 		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, job_data.professional, #narrative_chains, {
 			ignore_heat = 0 < job_heat_value and self._customizable,
-			mission_xp = contract_visuals.max_mission_xp and contract_visuals.max_mission_xp[difficulty_stars + 1]
+			mission_xp = xp_max
 		})
 		total_payout, base_payout, risk_payout = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #narrative_chains, job_data.job_id, nil, {
 			mandatory_bags_value = contract_visuals.mandatory_bags_value and contract_visuals.mandatory_bags_value[difficulty_stars + 1],
@@ -1070,9 +1080,10 @@ function CrimeNetContractGui:set_potential_rewards(show_max)
 			vehicle_value = contract_visuals.vehicle_value and contract_visuals.vehicle_value[difficulty_stars + 1]
 		})
 	else
+		local xp_min = contract_visuals.min_mission_xp and (type(contract_visuals.min_mission_xp) == "table" and contract_visuals.min_mission_xp[difficulty_stars + 1] or contract_visuals.min_mission_xp) or 0
 		total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, job_data.professional, #narrative_chains, {
 			ignore_heat = 0 < job_heat_value and self._customizable,
-			mission_xp = contract_visuals.min_mission_xp and contract_visuals.min_mission_xp[difficulty_stars + 1]
+			mission_xp = xp_min
 		})
 		total_payout, base_payout, risk_payout = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #narrative_chains, job_data.job_id)
 	end
@@ -1123,10 +1134,12 @@ function CrimeNetContractGui:set_potential_rewards(show_max)
 	local risks = {
 		"risk_swat",
 		"risk_fbi",
-		"risk_death_squad"
+		"risk_death_squad",
+		"risk_easy_wish"
 	}
 	if not Global.SKIP_OVERKILL_290 then
 		table.insert(risks, "risk_murder_squad")
+		table.insert(risks, "risk_sm_wish")
 	end
 	for i, risk in ipairs(risks) do
 		gui_panel:child(risk):set_alpha(difficulty_stars >= i and 1 or 0.25)
@@ -1198,9 +1211,10 @@ function CrimeNetContractGui:set_all(t, dt)
 	local potential_level_up_text = gui_panel:child("potential_level_up_text")
 	local job_heat_value = managers.job:get_job_heat(job_data.job_id)
 	local contract_visuals = job_data.contract_visuals or {}
+	local xp_min = contract_visuals.min_mission_xp and (type(contract_visuals.min_mission_xp) == "table" and contract_visuals.min_mission_xp[difficulty_stars + 1] or contract_visuals.min_mission_xp) or 0
 	local total_xp, dissected_xp = managers.experience:get_contract_xp_by_stars(job_data.job_id, job_stars, difficulty_stars, job_data.professional, #narrative_chains, {
 		ignore_heat = 0 < job_heat_value and self._customizable,
-		mission_xp = contract_visuals.min_mission_xp and contract_visuals.min_mission_xp[difficulty_stars + 1]
+		mission_xp = xp_min
 	})
 	local total_payout, base_payout, risk_payout = managers.money:get_contract_money_by_stars(job_stars, difficulty_stars, #narrative_chains, job_data.job_id)
 	local base_xp, risk_xp, heat_base_xp, heat_risk_xp, ghost_base_xp, ghost_risk_xp = unpack(dissected_xp)
@@ -1250,10 +1264,12 @@ function CrimeNetContractGui:set_all(t, dt)
 	local risks = {
 		"risk_swat",
 		"risk_fbi",
-		"risk_death_squad"
+		"risk_death_squad",
+		"risk_easy_wish"
 	}
 	if not Global.SKIP_OVERKILL_290 then
 		table.insert(risks, "risk_murder_squad")
+		table.insert(risks, "risk_sm_wish")
 	end
 	for i, risk in ipairs(risks) do
 		gui_panel:child(risk):set_alpha(difficulty_stars >= i and 1 or 0.25)
@@ -1476,7 +1492,9 @@ function CrimeNetContractGui:set_difficulty_id(difficulty_id)
 		"hard",
 		"overkill",
 		"overkill_145",
-		"overkill_290"
+		"easy_wish",
+		"overkill_290",
+		"sm_wish"
 	}
 	job_data.difficulty_id = difficulty_id
 	job_data.difficulty = diffs[difficulty_id]
@@ -1487,8 +1505,12 @@ function CrimeNetContractGui:set_difficulty_id(difficulty_id)
 		menu_risk_id = "menu_risk_fbi"
 	elseif job_data.difficulty == "overkill_145" then
 		menu_risk_id = "menu_risk_special"
+	elseif job_data.difficulty == "easy_wish" then
+		menu_risk_id = "menu_risk_easy_wish"
 	elseif job_data.difficulty == "overkill_290" then
 		menu_risk_id = "menu_risk_elite"
+	elseif job_data.difficulty == "sm_wish" then
+		menu_risk_id = "menu_risk_sm_wish"
 	end
 	local stat = managers.statistics:completed_job(job_data.job_id, tweak_data:index_to_difficulty(difficulty_id))
 	local risk_text = self._contract_panel:child("risk_text")

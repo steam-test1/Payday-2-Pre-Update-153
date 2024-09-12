@@ -28,6 +28,10 @@ function EnemyManager:update(t, dt)
 	self:_update_queued_tasks(t)
 end
 
+function EnemyManager:corpse_limit()
+	return self._MAX_NR_CORPSES
+end
+
 function EnemyManager:_update_gfx_lod()
 	if self._gfx_lod_data.enabled and managers.navigation:is_data_ready() then
 		local camera_rot = managers.viewport:get_current_camera_rotation()
@@ -522,7 +526,7 @@ function EnemyManager:on_enemy_died(dead_unit, damage_info)
 	self:on_enemy_unregistered(dead_unit)
 	enemy_data.unit_data[u_key] = nil
 	managers.mission:call_global_event("enemy_killed")
-	if enemy_data.nr_corpses == 0 and self:is_corpse_disposal_enabled() then
+	if enemy_data.nr_corpses >= 0 and self:is_corpse_disposal_enabled() and not self:has_task("EnemyManager._upd_corpse_disposal") then
 		self:queue_task("EnemyManager._upd_corpse_disposal", EnemyManager._upd_corpse_disposal, self, self._t + self._corpse_disposal_upd_interval)
 	end
 	enemy_data.nr_corpses = enemy_data.nr_corpses + 1
@@ -623,7 +627,7 @@ function EnemyManager:_upd_corpse_disposal()
 	local t = TimerManager:game():time()
 	local enemy_data = self._enemy_data
 	local nr_corpses = enemy_data.nr_corpses
-	local disposals_needed = nr_corpses - self._MAX_NR_CORPSES
+	local disposals_needed = nr_corpses - self:corpse_limit()
 	local corpses = enemy_data.corpses
 	local nav_mngr = managers.navigation
 	local player = managers.player:player_unit()
@@ -683,7 +687,7 @@ function EnemyManager:_upd_corpse_disposal()
 	end
 	enemy_data.nr_corpses = nr_corpses - nr_found
 	if 0 < nr_corpses then
-		local delay = enemy_data.nr_corpses > self._MAX_NR_CORPSES and 0 or self._corpse_disposal_upd_interval
+		local delay = enemy_data.nr_corpses > self:corpse_limit() and 0 or self._corpse_disposal_upd_interval
 		self:queue_task("EnemyManager._upd_corpse_disposal", EnemyManager._upd_corpse_disposal, self, t + delay)
 	end
 end

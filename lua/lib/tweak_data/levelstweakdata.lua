@@ -1506,6 +1506,16 @@ function LevelsTweakData:get_music_switches()
 	if #switches == 0 then
 		Application:error("[LevelsTweakData:get_music_switches] Failed to find a track. JOB_ID = " .. (Global.job_manager.current_job and Global.job_manager.current_job.job_id or "[Missing]") .. ", SELECTION = " .. Global.music_manager.loadout_selection)
 	end
+	local overrides = level_data and level_data.music_overrides
+	if overrides then
+		for i, track in ipairs(switches) do
+			local override = overrides[switches[i]]
+			if override then
+				print("[LevelsTweakData:get_music_switches] override track ", switches[i], "->", override)
+				switches[i] = override
+			end
+		end
+	end
 	return switches
 end
 

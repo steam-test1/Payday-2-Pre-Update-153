@@ -215,7 +215,7 @@ function SentryGunDamage:damage_explosion(attack_data)
 			attacker = self._unit
 		end
 		local i_attack_variant = CopDamage._get_attack_variant_index(self, attack_data.variant)
-		self._unit:network():send("damage_explosion_fire", attacker, damage_sync, i_attack_variant, self._dead and true or false, attack_data.col_ray.ray)
+		self._unit:network():send("damage_explosion_fire", attacker, damage_sync, i_attack_variant, self._dead and true or false, attack_data.col_ray.ray, attack_data.weapon_unit)
 	end
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)

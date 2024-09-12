@@ -258,6 +258,8 @@ function StatisticsTweakData:statistics_table()
 		"skullveryhard",
 		"skulloverkill",
 		"skulloverkillplus",
+		"gitgud_e_wish",
+		"gitgud_sm_wish",
 		"samurai",
 		"twitch_orc",
 		"ancient",

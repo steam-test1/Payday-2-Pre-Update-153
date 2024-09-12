@@ -552,4 +552,7 @@ function NetworkManager:on_peer_added(peer, peer_id)
 			name = peer:name()
 		}))
 	end
+	if managers.statistics then
+		peer:set_is_dropin(managers.statistics:has_session_started())
+	end
 end

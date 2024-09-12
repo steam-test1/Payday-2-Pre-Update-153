@@ -476,6 +476,31 @@ function EconomyTweakData:init()
 		weapon_skins = {"ksg_same"}
 	}
 	self.contents.same_01_legendary.rarity = "legendary"
+	self.bundles.same_01 = {}
+	self.bundles.same_01.def_id = 30000
+	self.bundles.same_01.dlc_id = "518760"
+	self.bundles.same_01.quality = "mint"
+	self.bundles.same_01.bonus = false
+	self.bundles.same_01.contains = {
+		weapon_skins = {
+			"amcar_same",
+			"usp_same",
+			"gre_m79_same",
+			"deagle_same",
+			"colt_1911_same",
+			"b92fs_same",
+			"judge_same",
+			"p90_same",
+			"akm_same",
+			"ak5_same",
+			"baka_same",
+			"model70_same",
+			"new_raging_bull_same",
+			"new_m14_same",
+			"par_same",
+			"ksg_same"
+		}
+	}
 	self.contents.grunt_01 = {}
 	self.contents.grunt_01.def_id = 10026
 	self.contents.grunt_01.contains = {
@@ -508,31 +533,14 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.grunt_01_legendary.rarity = "legendary"
-	self.bundles.same_01 = {}
-	self.bundles.same_01.def_id = 30000
-	self.bundles.same_01.dlc_id = "518760"
-	self.bundles.same_01.quality = "mint"
-	self.bundles.same_01.bonus = false
-	self.bundles.same_01.contains = {
+	self.contents.lones_01_legendary = {}
+	self.contents.lones_01_legendary.def_id = 10028
+	self.contents.lones_01_legendary.contains = {
 		weapon_skins = {
-			"amcar_same",
-			"usp_same",
-			"gre_m79_same",
-			"deagle_same",
-			"colt_1911_same",
-			"b92fs_same",
-			"judge_same",
-			"p90_same",
-			"akm_same",
-			"ak5_same",
-			"baka_same",
-			"model70_same",
-			"new_raging_bull_same",
-			"new_m14_same",
-			"par_same",
-			"ksg_same"
+			"tecci_lones"
 		}
 	}
+	self.contents.lones_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true

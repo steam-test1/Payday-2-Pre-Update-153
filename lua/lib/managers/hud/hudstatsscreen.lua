@@ -769,6 +769,7 @@ function HUDStatsScreen:_create_stats_ext_inventory(ext_inventory_panel)
 			amount = managers.player:get_body_bags_amount()
 		}
 	}
+	ext_inventory_panel:set_h(#equipment * eq_h + tweak_data.hud_stats.loot_title_size + 4)
 	local y
 	for i, eq in ipairs(equipment) do
 		y = ext_inventory_panel:h() - eq_h * i - 2 * (i - 1)
@@ -846,6 +847,12 @@ function HUDStatsScreen:_create_stats_ext_inventory(ext_inventory_panel)
 	managers.hud:make_fine_text(title)
 	title:set_y(y - title:h() - 4)
 	title:set_right(math.round(ext_inventory_panel:w()))
+	local _, by = managers.gui_data:corner_safe_to_full(0, managers.gui_data:corner_scaled_size().height)
+	ext_inventory_panel:set_bottom(by)
+	ext_inventory_panel:set_valign({
+		by / managers.gui_data:full_scaled_size().h,
+		0
+	})
 end
 
 function HUDStatsScreen:_set_amount_string(text, amount)
@@ -1027,6 +1034,7 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			local _, _, _, h = day_description:text_rect()
 			day_description:set_h(h)
 			managers.hud:make_fine_text(days_title)
+			day_wrapper_panel:set_h(day_title:top() + day_description:bottom())
 			local _, _, _, h = day_description:text_rect()
 			local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id())
 			local is_whisper_mode = managers.groupai and managers.groupai:state():whisper_mode()

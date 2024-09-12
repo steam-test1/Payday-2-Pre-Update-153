@@ -358,6 +358,7 @@ function HostNetworkSession:chk_drop_in_peer(dropin_peer)
 	dropin_peer:set_expecting_dropin(nil)
 	dropin_peer:on_sync_start()
 	dropin_peer:chk_enable_queue()
+	dropin_peer:set_is_dropin(true)
 	self._dropin_peer = dropin_peer
 	Network:drop_in(dropin_peer:rpc())
 	self._dropin_peer = nil

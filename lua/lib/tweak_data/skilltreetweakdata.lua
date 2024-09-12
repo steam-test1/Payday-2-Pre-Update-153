@@ -1567,7 +1567,7 @@ function SkillTreeTweakData:init()
 		[2] = {
 			upgrades = {
 				"player_pick_lock_hard",
-				"player_pick_lock_easy_speed_multiplier_2"
+				"player_pick_lock_easy_speed_multiplier"
 			},
 			cost = self.costs.hightierpro
 		}

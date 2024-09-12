@@ -251,6 +251,11 @@ function GameSetup:load_packages()
 		self._loaded_contract_package = contract_package
 		PackageManager:load(contract_package)
 	end
+	local diff_package = "packages/" .. (Global.game_settings and Global.game_settings.difficulty or "normal")
+	if PackageManager:package_exists(diff_package) and not PackageManager:loaded(diff_package) then
+		self._loaded_diff_package = diff_package
+		PackageManager:load(diff_package)
+	end
 end
 
 function GameSetup:gather_packages_to_unload()
@@ -287,6 +292,10 @@ function GameSetup:gather_packages_to_unload()
 	if PackageManager:loaded(self._loaded_contract_package) then
 		table.insert(self._packages_to_unload, self._loaded_contract_package)
 		self._loaded_contract_package = nil
+	end
+	if PackageManager:loaded(self._loaded_diff_package) then
+		table.insert(self._packages_to_unload, self._loaded_diff_package)
+		self._loaded_diff_package = nil
 	end
 end
 

@@ -447,7 +447,7 @@ function HUDManager:_create_assault_corner()
 	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2)
 	local full_hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2)
 	full_hud.panel:clear()
-	self._hud_assault_corner = HUDAssaultCorner:new(hud, full_hud)
+	self._hud_assault_corner = HUDAssaultCorner:new(hud, full_hud, tweak_data.levels[Global.game_settings.level_id].hud or {})
 end
 
 function HUDManager:mark_cheater(peer_id)
@@ -822,7 +822,7 @@ end
 
 function HUDManager:_create_heist_timer(hud)
 	hud = hud or managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2)
-	self._hud_heist_timer = HUDHeistTimer:new(hud)
+	self._hud_heist_timer = HUDHeistTimer:new(hud, tweak_data.levels[Global.game_settings.level_id].hud or {})
 end
 
 function HUDManager:feed_heist_time(time)

@@ -806,3 +806,11 @@ end
 function ConnectionNetworkHandler:peer_joined_sound(infamous)
 	managers.menu:post_event(infamous and "infamous_player_join_stinger" or "player_join")
 end
+
+function ConnectionNetworkHandler:client_used_weapon(weapon_id)
+	managers.statistics:used_weapon(weapon_id)
+end
+
+function ConnectionNetworkHandler:sync_used_weapon(weapon_id)
+	managers.statistics:_used_weapon(weapon_id)
+end

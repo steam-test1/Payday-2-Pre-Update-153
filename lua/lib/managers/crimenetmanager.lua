@@ -44,7 +44,7 @@ function CrimeNetManager:get_jobs_by_player_stars(span)
 		if pass_all_tests then
 			local job_data = tweak_data.narrative:job_data(job_id)
 			local start_difficulty = job_data.professional and 1 or 0
-			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
+			local num_difficulties = Global.SKIP_OVERKILL_290 and 5 or job_data.professional and 6 or 6
 			for i = start_difficulty, num_difficulties do
 				local job_jc = math.clamp(job_data.jc + i * 10, 0, 100)
 				local difficulty_id = 2 + i
@@ -54,7 +54,9 @@ function CrimeNetManager:get_jobs_by_player_stars(span)
 						job_jc = job_jc,
 						job_id = job_id,
 						difficulty_id = difficulty_id,
-						difficulty = difficulty
+						difficulty = difficulty,
+						marker_dot_color = job_data.marker_dot_color or nil,
+						color_lerp = job_data.color_lerp or nil
 					})
 				end
 			end
@@ -78,7 +80,7 @@ function CrimeNetManager:_get_jobs_by_jc()
 		if pass_all_tests then
 			local job_data = tweak_data.narrative:job_data(job_id)
 			local start_difficulty = job_data.professional and 1 or 0
-			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
+			local num_difficulties = Global.SKIP_OVERKILL_290 and 5 or job_data.professional and 6 or 6
 			for i = start_difficulty, num_difficulties do
 				local job_jc = math.clamp(job_data.jc + i * 10, 0, 100)
 				local difficulty_id = 2 + i
@@ -90,7 +92,9 @@ function CrimeNetManager:_get_jobs_by_jc()
 					table.insert(t[job_jc], {
 						job_id = job_id,
 						difficulty_id = difficulty_id,
-						difficulty = difficulty
+						difficulty = difficulty,
+						marker_dot_color = job_data.marker_dot_color or nil,
+						color_lerp = job_data.color_lerp or nil
 					})
 				end
 			end
@@ -175,6 +179,30 @@ function CrimeNetManager:reset_seed()
 	end
 end
 
+function CrimeNetManager:spawn_job(name, difficulty, time_limit)
+	local count = #self._presets
+	for i = 1, count do
+		if self._presets[i].job_id == name then
+			if difficulty then
+				if self._presets[i].difficulty == difficulty then
+					self._active_jobs[i] = {
+						added = false,
+						active_timer = time_limit and self._active_job_time + math.random(5) or nil
+					}
+					return true
+				end
+			else
+				self._active_jobs[i] = {
+					added = false,
+					active_timer = time_limit and self._active_job_time + math.random(5) or nil
+				}
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function CrimeNetManager:set_getting_hacked(hacked)
 	self._getting_hacked = hacked and true or false
 	managers.menu_component:set_crimenet_gui_getting_hacked(hacked)
@@ -193,12 +221,14 @@ function CrimeNetManager:update(t, dt)
 			job.added = true
 			managers.menu_component:add_crimenet_gui_preset_job(id)
 		end
-		job.active_timer = job.active_timer - dt
 		managers.menu_component:update_crimenet_job(id, t, dt)
-		managers.menu_component:feed_crimenet_job_timer(id, job.active_timer, self._active_job_time)
-		if job.active_timer < 0 then
-			managers.menu_component:remove_crimenet_gui_job(id)
-			self._active_jobs[id] = nil
+		if job.active_timer then
+			job.active_timer = job.active_timer - dt
+			managers.menu_component:feed_crimenet_job_timer(id, job.active_timer, self._active_job_time)
+			if job.active_timer < 0 then
+				managers.menu_component:remove_crimenet_gui_job(id)
+				self._active_jobs[id] = nil
+			end
 		end
 	end
 	local max_active_jobs = math.min(self._MAX_ACTIVE_JOBS, #self._presets)
@@ -277,7 +307,7 @@ function CrimeNetManager:activate_job()
 		local roll = math.rand(1)
 		if chance >= roll then
 			local contact = tweak_data.narrative.jobs[self._presets[i].job_id].contact
-			if not self._active_jobs[i] and i ~= 0 and contact ~= "wip" and contact ~= "tests" then
+			if not self._active_jobs[i] and i ~= 0 and contact ~= "wip" and contact ~= "tests" and contact ~= "escape" and contact ~= "hoxton" then
 				print("-- activate", math.round(chance * 100) .. "%", self._presets[i].job_id, roll, chance)
 				self._active_jobs[i] = {
 					added = false,
@@ -733,7 +763,8 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 		for i, room in ipairs(room_list) do
 			local name_str = tostring(room.owner_name)
 			local attributes_numbers = attribute_list[i].numbers
-			if managers.network.matchmake:is_server_ok(friends_only, room.owner_id, attributes_numbers) then
+			local attributes_mutators = attribute_list[i].mutators
+			if managers.network.matchmake:is_server_ok(friends_only, room.owner_id, attributes_numbers, nil, attributes_mutators) then
 				dead_list[room.room_id] = nil
 				local host_name = name_str
 				local level_id = tweak_data.levels:get_level_name_from_index(attributes_numbers[1] % 1000)
@@ -808,7 +839,6 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 	managers.network.matchmake:register_callback("search_lobby", f)
 	managers.network.matchmake:search_lobby(friends_only)
 	local usrs_f = function(success, amount)
-		print("usrs_f", success, amount)
 		if success then
 			managers.menu_component:set_crimenet_players_online(amount)
 		end
@@ -1210,42 +1240,33 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			blend_mode = "add"
 		})
 		mw = math.max(mw, self:make_fine_text(risk_text))
-		local pro_text = legend_panel:text({
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			x = host_text:left(),
-			y = risk_text:bottom(),
-			text = managers.localization:to_upper_text("menu_cn_legend_pro"),
-			color = tweak_data.screen_colors.pro_color,
-			blend_mode = "add"
-		})
-		mw = math.max(mw, self:make_fine_text(pro_text))
 		local ghost_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_minighost",
 			x = 7,
-			y = pro_text:bottom() + 2 + 2,
+			y = risk_text:bottom() + 2 + 2,
 			color = tweak_data.screen_colors.ghost_color
 		})
 		local ghost_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			x = host_text:left(),
-			y = pro_text:bottom(),
+			y = risk_text:bottom(),
 			text = managers.localization:to_upper_text("menu_cn_legend_ghostable"),
 			blend_mode = "add",
 			color = tweak_data.screen_colors.ghost_color
 		})
 		mw = math.max(mw, self:make_fine_text(ghost_text))
+		local next_y = ghost_text:bottom()
 		local kick_none_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_kick_marker",
 			x = 10,
-			y = ghost_text:bottom() + 2
+			y = next_y + 2
 		})
 		local kick_none_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			x = host_text:left(),
-			y = ghost_text:bottom(),
+			y = next_y,
 			text = managers.localization:to_upper_text("menu_cn_kick_disabled"),
 			blend_mode = "add"
 		})
@@ -2070,25 +2091,33 @@ end
 
 function CrimeNetGui:add_special_contracts(no_casino, no_quickplay)
 	for index, special_contract in ipairs(tweak_data.gui.crime_net.special_contracts) do
-		local id = special_contract.id
-		if id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) and (special_contract.id ~= "quickplay" or not no_quickplay) then
-			local gui_data = self:_create_job_gui(special_contract, "special")
-			gui_data.server = true
-			gui_data.special_node = special_contract.menu_node
-			gui_data.dlc = special_contract.dlc
-			if special_contract.pulse and (not special_contract.pulse_level or special_contract.pulse_level >= managers.experience:current_level() and managers.experience:current_rank() == 0) then
-				local animate_pulse = function(o)
-					while true do
-						over(1, function(p)
-							o:set_alpha(math.sin(p * 180) * 0.4 + 0.2)
-						end)
-					end
-				end
-				gui_data.glow_panel:animate(animate_pulse)
-				gui_data.pulse = special_contract.pulse and 21
-			end
-			self._jobs[id] = gui_data
+		local skip = false
+		if not skip then
+			self:add_special_contract(special_contract, no_casino, no_quickplay)
 		end
+	end
+end
+
+function CrimeNetGui:add_special_contract(special_contract, no_casino, no_quickplay)
+	local id = special_contract.id
+	if id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) and (special_contract.id ~= "quickplay" or not no_quickplay) then
+		local gui_data = self:_create_job_gui(special_contract, "special")
+		gui_data.server = true
+		gui_data.special_node = special_contract.menu_node
+		gui_data.dlc = special_contract.dlc
+		if special_contract.pulse and (not special_contract.pulse_level or special_contract.pulse_level >= managers.experience:current_level() and managers.experience:current_rank() == 0) then
+			local animate_pulse = function(o)
+				while true do
+					over(1, function(p)
+						o:set_alpha(math.sin(p * 180) * 0.4 + 0.2)
+					end)
+				end
+			end
+			gui_data.glow_panel:animate(animate_pulse)
+			gui_data.pulse = special_contract.pulse and 21
+		end
+		self._jobs[id] = gui_data
+		table.insert(self._special_contracts_id, id)
 	end
 end
 
@@ -2250,7 +2279,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		local difficulty_stars = data.difficulty_id - 2
 		local job_and_difficulty_stars = job_stars + difficulty_stars
 		local start_difficulty = 1
-		local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or 4
+		local num_difficulties = Global.SKIP_OVERKILL_290 and 5 or 6
 		for i = start_difficulty, num_difficulties do
 			stars_panel:bitmap({
 				texture = "guis/textures/pd2/cn_miniskull",
@@ -2523,7 +2552,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	local marker_dot = marker_panel:bitmap({
 		name = "marker_dot",
 		texture = marker_dot_texture,
-		color = color,
+		color = data.marker_dot_color or color,
 		w = 32,
 		h = 64,
 		x = 2,
@@ -2721,6 +2750,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		job_plan = data.job_plan,
 		container_panel = container_panel,
 		is_friend = data.is_friend,
+		marker_dot = marker_dot,
 		timer_rect = timer_rect,
 		side_panel = side_panel,
 		icon_panel = icon_panel,
@@ -2736,7 +2766,8 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		callout = callout,
 		text_on_right = text_on_right,
 		location = location,
-		heat_glow = heat_glow
+		heat_glow = heat_glow,
+		color_lerp = data.color_lerp
 	}
 	self:update_job_gui(job, 3)
 	return job
@@ -2994,9 +3025,9 @@ function CrimeNetGui:update(t, dt)
 			end
 		end
 	end
-	for index, special_contract in ipairs(tweak_data.gui.crime_net.special_contracts) do
-		if self._jobs[special_contract.id] then
-			self:update_job(special_contract.id, t, dt)
+	for index, id in ipairs(self._special_contracts_id) do
+		if self._jobs[id] then
+			self:update_job(id, t, dt)
 		end
 	end
 end
@@ -3430,6 +3461,10 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local expand_met = false
 			local pushout_met = x == 0
 			local dt
+			if inside and job.callout and self._crimenet_enabled then
+				Application:debug(job.callout)
+				managers.menu_component:post_event(job.callout, true)
+			end
 			while not (alpha_met and glow_met and expand_met) or not pushout_met do
 				dt = coroutine.yield()
 				if not alpha_met then
@@ -3499,10 +3534,6 @@ function CrimeNetGui:update_job_gui(job, inside)
 					end
 					pushout_met = x == (inside and max_x or 0)
 				end
-			end
-			if inside and job.callout and self._crimenet_enabled then
-				Application:debug(job.callout)
-				managers.menu_component:post_event(job.callout, true)
 			end
 		end
 		

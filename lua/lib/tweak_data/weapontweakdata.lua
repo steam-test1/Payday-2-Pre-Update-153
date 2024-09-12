@@ -126,6 +126,11 @@ function WeaponTweakData:_set_normal()
 	self.swat_van_turret_module.HEALTH_INIT = 3500
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 70
 	self.swat_van_turret_module.DAMAGE = 0.2
+	self.m4_npc.DAMAGE = 0.1
+	self.g36_npc.DAMAGE = 0.15
+	self.r870_npc.DAMAGE = 0.3
+	self.c45_npc.DAMAGE = 0.1
+	self.mp9_npc.DAMAGE = 0.1
 	self.ceiling_turret_module.HEALTH_INIT = 875
 	self.ceiling_turret_module.SHIELD_HEALTH_INIT = 2
 	self.ceiling_turret_module.DAMAGE = 0.2
@@ -135,6 +140,9 @@ function WeaponTweakData:_set_hard()
 	self.swat_van_turret_module.HEALTH_INIT = 3500
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 70
 	self.swat_van_turret_module.DAMAGE = 0.5
+	self.m4_npc.DAMAGE = 0.4
+	self.g36_npc.DAMAGE = 0.6
+	self.r870_npc.DAMAGE = 1
 	self.ceiling_turret_module.HEALTH_INIT = 875
 	self.ceiling_turret_module.SHIELD_HEALTH_INIT = 70
 	self.ceiling_turret_module.DAMAGE = 0.5
@@ -158,7 +166,32 @@ function WeaponTweakData:_set_overkill_145()
 	self.ceiling_turret_module.DAMAGE = 2
 end
 
+function WeaponTweakData:_set_easy_wish()
+	self.swat_van_turret_module.HEALTH_INIT = 40000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 700
+	self.swat_van_turret_module.DAMAGE = 3.5
+	self.swat_van_turret_module.CLIP_SIZE = 800
+	self.ceiling_turret_module.HEALTH_INIT = 20000
+	self.ceiling_turret_module.SHIELD_HEALTH_INIT = 350
+	self.ceiling_turret_module.DAMAGE = 3.5
+	self.ceiling_turret_module.CLIP_SIZE = 800
+end
+
 function WeaponTweakData:_set_overkill_290()
+	self.swat_van_turret_module.HEALTH_INIT = 40000
+	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 700
+	self.swat_van_turret_module.DAMAGE = 3.5
+	self.swat_van_turret_module.CLIP_SIZE = 800
+	self.ceiling_turret_module.HEALTH_INIT = 20000
+	self.ceiling_turret_module.SHIELD_HEALTH_INIT = 350
+	self.ceiling_turret_module.DAMAGE = 3.5
+	self.ceiling_turret_module.CLIP_SIZE = 800
+end
+
+function WeaponTweakData:_set_sm_wish()
+	self.m4_npc.DAMAGE = 3
+	self.g36_npc.DAMAGE = 5
+	self.r870_npc.DAMAGE = 7
 	self.swat_van_turret_module.HEALTH_INIT = 40000
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 700
 	self.swat_van_turret_module.DAMAGE = 3.5
@@ -255,6 +288,8 @@ function WeaponTweakData:_init_data_glock_18_npc()
 	self.glock_18_npc.CLIP_AMMO_MAX = 20
 	self.glock_18_npc.NR_CLIPS_MAX = 8
 	self.glock_18_npc.hold = "pistol"
+	self.glock_18_npc.auto = {}
+	self.glock_18_npc.auto.fire_rate = 0.092
 	self.glock_18_npc.alert_size = 2500
 	self.glock_18_npc.suppression = 0.45
 	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
@@ -1438,7 +1473,7 @@ function WeaponTweakData:_init_data_m1928_npc()
 	self.m1928_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.m1928_npc.CLIP_AMMO_MAX = 50
 	self.m1928_npc.NR_CLIPS_MAX = 3
-	self.m1928_npc.auto.fire_rate = 20
+	self.m1928_npc.auto.fire_rate = 0.083
 	self.m1928_npc.hold = "rifle"
 	self.m1928_npc.alert_size = 5000
 	self.m1928_npc.suppression = 1
@@ -1453,7 +1488,7 @@ function WeaponTweakData:_init_data_l85a2_npc()
 	self.l85a2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.l85a2_npc.CLIP_AMMO_MAX = 30
 	self.l85a2_npc.NR_CLIPS_MAX = 5
-	self.l85a2_npc.auto.fire_rate = 20
+	self.l85a2_npc.auto.fire_rate = 0.083
 	self.l85a2_npc.hold = "rifle"
 	self.l85a2_npc.alert_size = 5000
 	self.l85a2_npc.suppression = 1
@@ -1468,7 +1503,7 @@ function WeaponTweakData:_init_data_vhs_npc()
 	self.vhs_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.vhs_npc.CLIP_AMMO_MAX = 30
 	self.vhs_npc.NR_CLIPS_MAX = 5
-	self.vhs_npc.auto.fire_rate = 20
+	self.vhs_npc.auto.fire_rate = 0.07
 	self.vhs_npc.hold = "rifle"
 	self.vhs_npc.alert_size = 5000
 	self.vhs_npc.suppression = 1
@@ -1533,7 +1568,7 @@ function WeaponTweakData:_init_data_cobray_npc()
 	self.cobray_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.cobray_npc.CLIP_AMMO_MAX = 30
 	self.cobray_npc.NR_CLIPS_MAX = 5
-	self.cobray_npc.auto.fire_rate = 20
+	self.cobray_npc.auto.fire_rate = 0.05
 	self.cobray_npc.hold = "pistol"
 	self.cobray_npc.alert_size = 5000
 	self.cobray_npc.suppression = 1
@@ -1743,7 +1778,7 @@ function WeaponTweakData:_init_data_wa2000_npc()
 	self.wa2000_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.wa2000_npc.CLIP_AMMO_MAX = 30
 	self.wa2000_npc.NR_CLIPS_MAX = 5
-	self.wa2000_npc.auto.fire_rate = 20
+	self.wa2000_npc.auto.fire_rate = 0.5
 	self.wa2000_npc.hold = "rifle"
 	self.wa2000_npc.alert_size = 5000
 	self.wa2000_npc.suppression = 1
@@ -1758,7 +1793,7 @@ function WeaponTweakData:_init_data_polymer_npc()
 	self.polymer_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.polymer_npc.CLIP_AMMO_MAX = 30
 	self.polymer_npc.NR_CLIPS_MAX = 5
-	self.polymer_npc.auto.fire_rate = 20
+	self.polymer_npc.auto.fire_rate = 0.05
 	self.polymer_npc.hold = "pistol"
 	self.polymer_npc.alert_size = 5000
 	self.polymer_npc.suppression = 1
@@ -1788,7 +1823,7 @@ function WeaponTweakData:_init_data_baka_npc()
 	self.baka_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.baka_npc.CLIP_AMMO_MAX = 30
 	self.baka_npc.NR_CLIPS_MAX = 5
-	self.baka_npc.auto.fire_rate = 20
+	self.baka_npc.auto.fire_rate = 0.05
 	self.baka_npc.hold = "pistol"
 	self.baka_npc.alert_size = 5000
 	self.baka_npc.suppression = 1
@@ -1929,7 +1964,7 @@ function WeaponTweakData:_init_data_sr2_npc()
 	self.sr2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
 	self.sr2_npc.CLIP_AMMO_MAX = 30
 	self.sr2_npc.NR_CLIPS_MAX = 5
-	self.sr2_npc.auto.fire_rate = 20
+	self.sr2_npc.auto.fire_rate = 0.08
 	self.sr2_npc.hold = "pistol"
 	self.sr2_npc.alert_size = 5000
 	self.sr2_npc.suppression = 1
@@ -2677,6 +2712,20 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.new_m4.kick.crouching = self.new_m4.kick.standing
 	self.new_m4.kick.steelsight = self.new_m4.kick.standing
+	self.new_m4.crosshair = {}
+	self.new_m4.crosshair.standing = {}
+	self.new_m4.crosshair.crouching = {}
+	self.new_m4.crosshair.steelsight = {}
+	self.new_m4.crosshair.standing.offset = 0.16
+	self.new_m4.crosshair.standing.moving_offset = 0.7
+	self.new_m4.crosshair.standing.kick_offset = 0.5
+	self.new_m4.crosshair.crouching.offset = 0.07
+	self.new_m4.crosshair.crouching.moving_offset = 0.7
+	self.new_m4.crosshair.crouching.kick_offset = 0.3
+	self.new_m4.crosshair.steelsight.hidden = true
+	self.new_m4.crosshair.steelsight.offset = 0
+	self.new_m4.crosshair.steelsight.moving_offset = 0
+	self.new_m4.crosshair.steelsight.kick_offset = 0.1
 	self.new_m4.shake = {}
 	self.new_m4.shake.fire_multiplier = 1
 	self.new_m4.shake.fire_steelsight_multiplier = -1
@@ -2898,8 +2947,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r870.use_data.selection_index = 2
 	self.r870.use_data.align_place = "right_hand"
 	self.r870.DAMAGE = 6
-	self.r870.damage_near = 1000
-	self.r870.damage_far = 2000
+	self.r870.damage_near = 2000
+	self.r870.damage_far = 3000
 	self.r870.rays = 12
 	self.r870.CLIP_AMMO_MAX = 6
 	self.r870.NR_CLIPS_MAX = 7
@@ -3687,8 +3736,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.use_data.selection_index = 2
 	self.saiga.use_data.align_place = "right_hand"
 	self.saiga.DAMAGE = 6
-	self.saiga.damage_near = 1000
-	self.saiga.damage_far = 2000
+	self.saiga.damage_near = 2000
+	self.saiga.damage_far = 3000
 	self.saiga.rays = 12
 	self.saiga.CLIP_AMMO_MAX = 7
 	self.saiga.NR_CLIPS_MAX = 10
@@ -4513,8 +4562,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.serbu.use_data.selection_index = 1
 	self.serbu.use_data.align_place = "right_hand"
 	self.serbu.DAMAGE = 6
-	self.serbu.damage_near = 1000
-	self.serbu.damage_far = 2000
+	self.serbu.damage_near = 2000
+	self.serbu.damage_far = 3000
 	self.serbu.rays = 12
 	self.serbu.CLIP_AMMO_MAX = 6
 	self.serbu.NR_CLIPS_MAX = 7
@@ -4601,8 +4650,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.huntsman.use_data.selection_index = 2
 	self.huntsman.use_data.align_place = "right_hand"
 	self.huntsman.DAMAGE = 6
-	self.huntsman.damage_near = 1000
-	self.huntsman.damage_far = 2000
+	self.huntsman.damage_near = 2000
+	self.huntsman.damage_far = 3000
 	self.huntsman.rays = 12
 	self.huntsman.CLIP_AMMO_MAX = 2
 	self.huntsman.NR_CLIPS_MAX = 16
@@ -5146,8 +5195,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.judge.use_data.selection_index = 1
 	self.judge.use_data.align_place = "right_hand"
 	self.judge.DAMAGE = 6
-	self.judge.damage_near = 1000
-	self.judge.damage_far = 2000
+	self.judge.damage_near = 2000
+	self.judge.damage_far = 3000
 	self.judge.rays = 12
 	self.judge.CLIP_AMMO_MAX = 5
 	self.judge.NR_CLIPS_MAX = 5
@@ -6418,8 +6467,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.benelli.use_data.selection_index = 2
 	self.benelli.use_data.align_place = "right_hand"
 	self.benelli.DAMAGE = 6
-	self.benelli.damage_near = 1000
-	self.benelli.damage_far = 2000
+	self.benelli.damage_near = 2000
+	self.benelli.damage_far = 3000
 	self.benelli.rays = 12
 	self.benelli.CLIP_AMMO_MAX = 8
 	self.benelli.NR_CLIPS_MAX = 8
@@ -6507,8 +6556,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.striker.use_data.selection_index = 1
 	self.striker.use_data.align_place = "left_hand"
 	self.striker.DAMAGE = 6
-	self.striker.damage_near = 1000
-	self.striker.damage_far = 2000
+	self.striker.damage_near = 2000
+	self.striker.damage_far = 3000
 	self.striker.rays = 12
 	self.striker.CLIP_AMMO_MAX = 12
 	self.striker.NR_CLIPS_MAX = 6
@@ -6591,8 +6640,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ksg.use_data.selection_index = 2
 	self.ksg.use_data.align_place = "right_hand"
 	self.ksg.DAMAGE = 6
-	self.ksg.damage_near = 1000
-	self.ksg.damage_far = 2000
+	self.ksg.damage_near = 2000
+	self.ksg.damage_far = 3000
 	self.ksg.rays = 12
 	self.ksg.CLIP_AMMO_MAX = 14
 	self.ksg.NR_CLIPS_MAX = 3
@@ -6691,8 +6740,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.gre_m79.use_data.selection_index = 2
 	self.gre_m79.use_data.align_place = "right_hand"
 	self.gre_m79.DAMAGE = 6
-	self.gre_m79.damage_near = 1000
-	self.gre_m79.damage_far = 2000
+	self.gre_m79.damage_near = 2000
+	self.gre_m79.damage_far = 3000
 	self.gre_m79.rays = 6
 	self.gre_m79.CLIP_AMMO_MAX = 1
 	self.gre_m79.NR_CLIPS_MAX = math.round(total_damage_primary / 50 / self.gre_m79.CLIP_AMMO_MAX)
@@ -6748,7 +6797,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.gre_m79.panic_suppression_chance = 0.2
 	self.gre_m79.ignore_damage_upgrades = true
 	self.gre_m79.stats = {
-		damage = 170,
+		damage = 130,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 6,
@@ -6760,7 +6809,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.gre_m79.stats_modifiers = {damage = 2}
+	self.gre_m79.stats_modifiers = {damage = 10}
 	self.g3 = {}
 	self.g3.category = "assault_rifle"
 	self.g3.damage_melee = damage_melee_default
@@ -7735,8 +7784,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.spas12.use_data.selection_index = 2
 	self.spas12.use_data.align_place = "right_hand"
 	self.spas12.DAMAGE = 6
-	self.spas12.damage_near = 1000
-	self.spas12.damage_far = 2000
+	self.spas12.damage_near = 2000
+	self.spas12.damage_far = 3000
 	self.spas12.rays = 12
 	self.spas12.CLIP_AMMO_MAX = 6
 	self.spas12.NR_CLIPS_MAX = 11
@@ -8155,7 +8204,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mosin.can_shoot_through_wall = true
 	self.mosin.panic_suppression_chance = 0.2
 	self.mosin.stats = {
-		damage = 140,
+		damage = 150,
 		spread = 24,
 		recoil = 4,
 		spread_moving = 24,
@@ -8834,8 +8883,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.b682.use_data.selection_index = 2
 	self.b682.use_data.align_place = "right_hand"
 	self.b682.DAMAGE = 6
-	self.b682.damage_near = 1000
-	self.b682.damage_far = 2000
+	self.b682.damage_near = 2000
+	self.b682.damage_far = 3000
 	self.b682.rays = 12
 	self.b682.CLIP_AMMO_MAX = 2
 	self.b682.NR_CLIPS_MAX = 14
@@ -9257,10 +9306,10 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.flamethrower_mk2.global_value = "bbq"
 	self.flamethrower_mk2.texture_bundle_folder = "bbq"
 	self.flamethrower_mk2.fire_dot_data = {
-		dot_damage = 1,
+		dot_damage = 10,
 		dot_trigger_max_distance = 3000,
-		dot_trigger_chance = 30,
-		dot_length = 3.1,
+		dot_trigger_chance = 35,
+		dot_length = 6.1,
 		dot_tick_period = 0.5
 	}
 	self.flamethrower_mk2.stats = {
@@ -9309,8 +9358,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m32.use_data.selection_index = 2
 	self.m32.use_data.align_place = "right_hand"
 	self.m32.DAMAGE = 6
-	self.m32.damage_near = 1000
-	self.m32.damage_far = 2000
+	self.m32.damage_near = 2000
+	self.m32.damage_far = 3000
 	self.m32.rays = 6
 	self.m32.CLIP_AMMO_MAX = 6
 	self.m32.NR_CLIPS_MAX = 2
@@ -9366,7 +9415,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m32.panic_suppression_chance = 0.2
 	self.m32.ignore_damage_upgrades = true
 	self.m32.stats = {
-		damage = 170,
+		damage = 130,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,
@@ -9378,7 +9427,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.m32.stats_modifiers = {damage = 2}
+	self.m32.stats_modifiers = {damage = 10}
 	self.aa12 = {}
 	self.aa12.category = "shotgun"
 	self.aa12.has_magazine = true
@@ -9406,8 +9455,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aa12.use_data.selection_index = 2
 	self.aa12.use_data.align_place = "right_hand"
 	self.aa12.DAMAGE = 6
-	self.aa12.damage_near = 1000
-	self.aa12.damage_far = 2000
+	self.aa12.damage_near = 2000
+	self.aa12.damage_far = 3000
 	self.aa12.rays = 12
 	self.aa12.CLIP_AMMO_MAX = 8
 	self.aa12.NR_CLIPS_MAX = 9
@@ -9729,6 +9778,19 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.plainsrider.kick.crouching = self.plainsrider.kick.standing
 	self.plainsrider.kick.steelsight = self.plainsrider.kick.standing
+	self.plainsrider.crosshair = {}
+	self.plainsrider.crosshair.standing = {}
+	self.plainsrider.crosshair.crouching = {}
+	self.plainsrider.crosshair.steelsight = {}
+	self.plainsrider.crosshair.standing.offset = 0.16
+	self.plainsrider.crosshair.standing.moving_offset = 0.7
+	self.plainsrider.crosshair.crouching.offset = 0.07
+	self.plainsrider.crosshair.crouching.moving_offset = 0.7
+	self.plainsrider.crosshair.crouching.kick_offset = 0.3
+	self.plainsrider.crosshair.steelsight.hidden = true
+	self.plainsrider.crosshair.steelsight.offset = 0
+	self.plainsrider.crosshair.steelsight.moving_offset = 0
+	self.plainsrider.crosshair.steelsight.kick_offset = 0.1
 	self.plainsrider.shake = {}
 	self.plainsrider.shake.fire_multiplier = 2
 	self.plainsrider.shake.fire_steelsight_multiplier = 2
@@ -9742,7 +9804,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.plainsrider.panic_suppression_chance = 0.2
 	self.plainsrider.ignore_damage_upgrades = true
 	self.plainsrider.stats = {
-		damage = 97,
+		damage = 150,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 12,
@@ -9754,7 +9816,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.plainsrider.stats_modifiers = {damage = 2}
+	self.plainsrider.stats_modifiers = {damage = 10}
 	self.mateba = {}
 	self.mateba.category = "pistol"
 	self.mateba.sub_category = "revolver"
@@ -10285,7 +10347,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hunter.panic_suppression_chance = 0.2
 	self.hunter.ignore_damage_upgrades = true
 	self.hunter.stats = {
-		damage = 100,
+		damage = 75,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,
@@ -10297,7 +10359,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.hunter.stats_modifiers = {damage = 1}
+	self.hunter.stats_modifiers = {damage = 10}
 	self.baka = {}
 	self.baka.category = "smg"
 	self.baka.damage_melee = damage_melee_default
@@ -10473,7 +10535,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.arblast.panic_suppression_chance = 0.2
 	self.arblast.ignore_damage_upgrades = true
 	self.arblast.stats = {
-		damage = 53,
+		damage = 40,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,
@@ -10485,7 +10547,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.arblast.stats_modifiers = {damage = 10}
+	self.arblast.stats_modifiers = {damage = 100}
 	self.frankish = {}
 	self.frankish.category = "crossbow"
 	self.frankish.projectile_type_index = 20
@@ -10570,7 +10632,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.frankish.panic_suppression_chance = 0.2
 	self.frankish.ignore_damage_upgrades = true
 	self.frankish.stats = {
-		damage = 120,
+		damage = 150,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,
@@ -10582,7 +10644,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.frankish.stats_modifiers = {damage = 2}
+	self.frankish.stats_modifiers = {damage = 10}
 	self.long = {}
 	self.long.category = "bow"
 	self.long.upgrade_blocks = {
@@ -10642,6 +10704,19 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.long.kick.crouching = self.long.kick.standing
 	self.long.kick.steelsight = self.long.kick.standing
+	self.long.crosshair = {}
+	self.long.crosshair.standing = {}
+	self.long.crosshair.crouching = {}
+	self.long.crosshair.steelsight = {}
+	self.long.crosshair.standing.offset = 0.16
+	self.long.crosshair.standing.moving_offset = 0.7
+	self.long.crosshair.crouching.offset = 0.07
+	self.long.crosshair.crouching.moving_offset = 0.7
+	self.long.crosshair.crouching.kick_offset = 0.3
+	self.long.crosshair.steelsight.hidden = true
+	self.long.crosshair.steelsight.offset = 0
+	self.long.crosshair.steelsight.moving_offset = 0
+	self.long.crosshair.steelsight.kick_offset = 0.1
 	self.long.shake = {}
 	self.long.shake.fire_multiplier = 2
 	self.long.shake.fire_steelsight_multiplier = 2
@@ -10655,7 +10730,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.long.panic_suppression_chance = 0.2
 	self.long.ignore_damage_upgrades = true
 	self.long.stats = {
-		damage = 65,
+		damage = 40,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,
@@ -10667,7 +10742,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.long.stats_modifiers = {damage = 10}
+	self.long.stats_modifiers = {damage = 100}
 	self.par = {}
 	self.par.category = "lmg"
 	self.par.damage_melee = damage_melee_default
@@ -10974,8 +11049,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m37.use_data.selection_index = 1
 	self.m37.use_data.align_place = "right_hand"
 	self.m37.DAMAGE = 6
-	self.m37.damage_near = 1000
-	self.m37.damage_far = 2000
+	self.m37.damage_near = 2000
+	self.m37.damage_far = 3000
 	self.m37.rays = 12
 	self.m37.CLIP_AMMO_MAX = 7
 	self.m37.NR_CLIPS_MAX = 6
@@ -11079,8 +11154,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.china.use_data.selection_index = 1
 	self.china.use_data.align_place = "right_hand"
 	self.china.DAMAGE = 6
-	self.china.damage_near = 1000
-	self.china.damage_far = 2000
+	self.china.damage_near = 2000
+	self.china.damage_far = 3000
 	self.china.rays = 6
 	self.china.CLIP_AMMO_MAX = 3
 	self.china.NR_CLIPS_MAX = 2
@@ -11136,7 +11211,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.china.panic_suppression_chance = 0.2
 	self.china.ignore_damage_upgrades = true
 	self.china.stats = {
-		damage = 170,
+		damage = 130,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 6,
@@ -11148,7 +11223,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
-	self.china.stats_modifiers = {damage = 2}
+	self.china.stats_modifiers = {damage = 10}
 	self.sr2 = {}
 	self.sr2.category = "smg"
 	self.sr2.damage_melee = damage_melee_default
@@ -11648,6 +11723,20 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.tecci.kick.crouching = self.tecci.kick.standing
 	self.tecci.kick.steelsight = self.tecci.kick.standing
+	self.tecci.crosshair = {}
+	self.tecci.crosshair.standing = {}
+	self.tecci.crosshair.crouching = {}
+	self.tecci.crosshair.steelsight = {}
+	self.tecci.crosshair.standing.offset = 0.16
+	self.tecci.crosshair.standing.moving_offset = 0.7
+	self.tecci.crosshair.standing.kick_offset = 0.5
+	self.tecci.crosshair.crouching.offset = 0.07
+	self.tecci.crosshair.crouching.moving_offset = 0.7
+	self.tecci.crosshair.crouching.kick_offset = 0.3
+	self.tecci.crosshair.steelsight.hidden = true
+	self.tecci.crosshair.steelsight.offset = 0
+	self.tecci.crosshair.steelsight.moving_offset = 0
+	self.tecci.crosshair.steelsight.kick_offset = 0.1
 	self.tecci.shake = {}
 	self.tecci.shake.fire_multiplier = 0.6
 	self.tecci.shake.fire_steelsight_multiplier = -0.6
@@ -11790,8 +11879,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.boot.use_data.selection_index = 2
 	self.boot.use_data.align_place = "right_hand"
 	self.boot.DAMAGE = 6
-	self.boot.damage_near = 1000
-	self.boot.damage_far = 2000
+	self.boot.damage_near = 2000
+	self.boot.damage_far = 3000
 	self.boot.rays = 12
 	self.boot.CLIP_AMMO_MAX = 7
 	self.boot.NR_CLIPS_MAX = 3

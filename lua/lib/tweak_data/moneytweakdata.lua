@@ -24,20 +24,6 @@ function MoneyTweakData._create_value_table(min, max, table_size, round, curve)
 	return t
 end
 
-function MoneyTweakData._test_curves(pay, bags, alive_players, diff, days)
-	local v
-	local loot_bags = tweak_data:get_value("money_manager", "bag_value_multiplier", pay) * tweak_data:get_value("money_manager", "bag_values", "default")
-	local diff_multiplier = 0
-	if 0 < diff then
-		diff_multiplier = tweak_data:get_value("money_manager", "difficulty_multiplier", diff + 1)
-	end
-	v = tweak_data:get_value("money_manager", "stage_completion", pay) + tweak_data:get_value("money_manager", "job_completion", pay) + loot_bags * bags + tweak_data:get_value("money_manager", "flat_stage_completion") + tweak_data:get_value("money_manager", "flat_job_completion")
-	v = v * days
-	v = v + v * diff_multiplier
-	v = v * tweak_data:get_value("money_manager", "alive_humans_multiplier", alive_players)
-	print(v, v * tweak_data:get_value("money_manager", "offshore_rate"))
-end
-
 function MoneyTweakData:init(tweak_data)
 	local difficulty = Global.game_settings and Global.game_settings.difficulty or "normal"
 	local difficulty_index = tweak_data:difficulty_to_index(difficulty)
@@ -120,9 +106,20 @@ function MoneyTweakData:init(tweak_data)
 		9,
 		12,
 		20,
-		40
+		35,
+		40,
+		45
 	}
-	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 4, false, 1)
+	self.difficulty_multiplier_payout = {
+		1,
+		2,
+		5,
+		10,
+		11,
+		13,
+		14
+	}
+	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 6, false, 1)
 	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, 4, false, 1)
 	self.alive_humans_multiplier[0] = 1
 	self.limited_bonus_multiplier = 1
@@ -135,7 +132,9 @@ function MoneyTweakData:init(tweak_data)
 		hard = 0,
 		overkill = 0,
 		overkill_145 = 0,
-		overkill_290 = 0
+		easy_wish = 0,
+		overkill_290 = 0,
+		sm_wish = 0
 	}
 	self.buy_premium_static_fee = {
 		easy = 0,
@@ -143,7 +142,9 @@ function MoneyTweakData:init(tweak_data)
 		hard = 0,
 		overkill = 0,
 		overkill_145 = 0,
-		overkill_290 = 0
+		easy_wish = 0,
+		overkill_290 = 0,
+		sm_wish = 0
 	}
 	self.global_value_multipliers = {}
 	self.global_value_multipliers.normal = 1
@@ -333,6 +334,7 @@ function MoneyTweakData:init(tweak_data)
 		2,
 		5,
 		10,
+		13,
 		13
 	}
 	self.preplaning_asset_cost_thermite = 15000
@@ -475,6 +477,56 @@ function MoneyTweakData:init(tweak_data)
 		self.small_loot.vault_loot_coins = 8000
 		self.small_loot.vault_loot_ring = 3500
 		self.small_loot.vault_loot_jewels = 5775
+		self.small_loot.vault_loot_macka = 1
+	elseif difficulty_index == 6 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.ring_band = 1954
+		self.small_loot.diamondheist_vault_bust = 12000
+		self.small_loot.diamondheist_vault_diamond = 15000
+		self.small_loot.diamondheist_big_diamond = 15000
+		self.small_loot.mus_small_artifact = 9500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 300000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.slot_machine_payout = 325000
+		self.small_loot.vault_loot_chest = 7500
+		self.small_loot.vault_loot_diamond_chest = 8000
+		self.small_loot.vault_loot_banknotes = 6500
+		self.small_loot.vault_loot_silver = 7000
+		self.small_loot.vault_loot_diamond_collection = 8500
+		self.small_loot.vault_loot_trophy = 9000
+		self.small_loot.money_wrap_single_bundle_vscaled = 5000
+		self.small_loot.spawn_bucket_of_money = 260000
+		self.small_loot.vault_loot_gold = 30000
+		self.small_loot.vault_loot_cash = 15000
+		self.small_loot.vault_loot_coins = 10500
+		self.small_loot.vault_loot_ring = 4500
+		self.small_loot.vault_loot_jewels = 7500
+		self.small_loot.vault_loot_macka = 1
+	elseif difficulty_index == 7 then
+		self.small_loot.money_bundle = 1000
+		self.small_loot.ring_band = 1954
+		self.small_loot.diamondheist_vault_bust = 12000
+		self.small_loot.diamondheist_vault_diamond = 15000
+		self.small_loot.diamondheist_big_diamond = 15000
+		self.small_loot.mus_small_artifact = 9500
+		self.small_loot.value_gold = 3000
+		self.small_loot.gen_atm = 300000
+		self.small_loot.special_deposit_box = 3500
+		self.small_loot.slot_machine_payout = 325000
+		self.small_loot.vault_loot_chest = 7500
+		self.small_loot.vault_loot_diamond_chest = 8000
+		self.small_loot.vault_loot_banknotes = 6500
+		self.small_loot.vault_loot_silver = 7000
+		self.small_loot.vault_loot_diamond_collection = 8500
+		self.small_loot.vault_loot_trophy = 9000
+		self.small_loot.money_wrap_single_bundle_vscaled = 5000
+		self.small_loot.spawn_bucket_of_money = 260000
+		self.small_loot.vault_loot_gold = 30000
+		self.small_loot.vault_loot_cash = 15000
+		self.small_loot.vault_loot_coins = 10500
+		self.small_loot.vault_loot_ring = 4500
+		self.small_loot.vault_loot_jewels = 7500
 		self.small_loot.vault_loot_macka = 1
 	else
 		self.small_loot.money_bundle = 1000

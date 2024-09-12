@@ -246,6 +246,7 @@ function HuskPlayerMovement:init(unit)
 	self._crouch_detection_offset_z = mvec3_z(tweak_data.player.stances.default.crouched.head.translation)
 	self._m_pos = unit:position()
 	self._m_rot = unit:rotation()
+	self._auto_firing = 0
 	self._look_dir = self._m_rot:y()
 	self._sync_look_dir = nil
 	self._look_ang_vel = 0
@@ -442,6 +443,13 @@ function HuskPlayerMovement:update(unit, t, dt)
 			self._peer_weapon_spawned = inventory:check_peer_weapon_spawn()
 		else
 			self._peer_weapon_spawned = true
+		end
+	end
+	if self._auto_firing >= 2 then
+		local equipped_weapon = self._unit:inventory():equipped_unit()
+		if equipped_weapon:base().auto_trigger_held then
+			equipped_weapon:base():auto_trigger_held(self._look_dir, true)
+			self._aim_up_expire_t = TimerManager:game():time() + 2
 		end
 	end
 end
@@ -1207,7 +1215,7 @@ function HuskPlayerMovement:_upd_stance(t)
 					values[i] = v
 				end
 				if transition.delayed_shot then
-					self:_shoot_blank(transition.delayed_shot.impact)
+					transition:delayed_shot(true)
 				end
 				stance.transition = nil
 			end
@@ -1962,11 +1970,83 @@ function HuskPlayerMovement:sync_shot_blank(impact)
 		return
 	end
 	local delay = self._stance.values[3] < 0.7
+	local f = false
 	if not delay then
 		self:_shoot_blank(impact)
 		self._aim_up_expire_t = TimerManager:game():time() + 2
+	else
+		function f(impact)
+			self:_shoot_blank(impact)
+		end
 	end
-	self:_change_stance(3, delay and {impact = impact})
+	self:_change_stance(3, f)
+end
+
+function HuskPlayerMovement:sync_start_auto_fire_sound()
+	if self._state == "mask_off" or self._state == "clean" or self._state == "civilian" then
+		return
+	end
+	if self._auto_firing <= 0 then
+		local delay = self._stance.values[3] < 0.7
+		if delay then
+			self._auto_firing = 1
+			
+			local function f(t)
+				local equipped_weapon = self._unit:inventory():equipped_unit()
+				equipped_weapon:base():start_autofire()
+				self:play_redirect("recoil_auto_enter")
+				self._auto_firing = 2
+			end
+			
+			self:_change_stance(3, f)
+		else
+			local equipped_weapon = self._unit:inventory():equipped_unit()
+			equipped_weapon:base():start_autofire()
+			self:play_redirect("recoil_auto_enter")
+			self:_change_stance(3, false)
+			self._auto_firing = 2
+		end
+		self._aim_up_expire_t = TimerManager:game():time() + 2
+	end
+end
+
+function HuskPlayerMovement:sync_raise_weapon()
+	if self._state == "mask_off" or self._state == "clean" or self._state == "civilian" then
+		return
+	end
+	if self._auto_firing <= 0 then
+		local delay = self._stance.values[3] < 0.7
+		if delay then
+			self._auto_firing = 1
+			self:play_redirect("recoil_auto_enter")
+			
+			local function f(t)
+				self._auto_firing = 2
+			end
+			
+			self:_change_stance(3, f)
+		else
+			self:_change_stance(3, false)
+			self._auto_firing = 2
+		end
+		self._aim_up_expire_t = TimerManager:game():time() + 2
+	end
+end
+
+function HuskPlayerMovement:sync_stop_auto_fire_sound()
+	if self._state == "mask_off" or self._state == "clean" or self._state == "civilian" then
+		return
+	end
+	if self._auto_firing > 0 then
+		local equipped_weapon = self._unit:inventory():equipped_unit()
+		equipped_weapon:base():stop_autofire()
+		self._auto_firing = 0
+		self:play_redirect("recoil_auto_exit")
+		local stance = self._stance
+		if stance.transition then
+			stance.transition.delayed_shot = nil
+		end
+	end
 end
 
 function HuskPlayerMovement:set_cbt_permanent(on)
@@ -1997,6 +2077,9 @@ function HuskPlayerMovement:sync_pose(pose_code)
 end
 
 function HuskPlayerMovement:_change_stance(stance_code, delayed_shot)
+	if self._stance.code and self._stance.code == stance_code then
+		return
+	end
 	local stance = self._stance
 	local end_values = {
 		0,

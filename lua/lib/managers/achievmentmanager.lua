@@ -200,7 +200,7 @@ end
 
 function AchievmentManager:award(id)
 	if not self:exists(id) then
-		Application:debug("[AchievmentManager:award] Awarding non-existing achievement", "id", id)
+		Application:error("[AchievmentManager:award] Awarding non-existing achievement", "id", id)
 		return
 	end
 	managers.challenge:on_achievement_awarded(id)
@@ -212,6 +212,7 @@ function AchievmentManager:award(id)
 	elseif id == "golden_boy" then
 		managers.network.account._masks.gold = true
 	end
+	managers.mission:call_global_event(Message.OnAchievement, id)
 	self:do_award(id)
 end
 
@@ -345,5 +346,89 @@ function AchievmentManager:clbk_install_trophies(result)
 	if result then
 		self._trophies_installed = true
 		self:fetch_trophies()
+	end
+end
+
+function AchievmentManager:check_autounlock_achievements()
+	self:_check_autounlock_complete_heist()
+	self:_check_autounlock_difficulties()
+	self:_check_autounlock_infamy()
+end
+
+function AchievmentManager:_check_autounlock_complete_heist()
+	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
+		if table.size(achievement_data) == 3 and achievement_data.award and achievement_data.difficulty and (achievement_data.job or achievement_data.jobs) then
+			local jobs = achievement_data.jobs or {
+				achievement_data.job
+			}
+			for i, job in pairs(jobs) do
+				for _, difficulty in ipairs(achievement_data.difficulty) do
+					if managers.statistics:completed_job(job, difficulty) > 0 then
+						self:_award_achievement(achievement_data)
+						break
+					end
+				end
+			end
+		end
+	end
+end
+
+function AchievmentManager:_check_autounlock_difficulties()
+	local job
+	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_stats_achievements) do
+		local available_jobs
+		if achievement_data.contact == "all" then
+			available_jobs = {}
+			for _, list in pairs(tweak_data.achievement.job_list) do
+				for _, job in pairs(list) do
+					table.insert(available_jobs, job)
+				end
+			end
+		else
+			available_jobs = deep_clone(tweak_data.achievement.job_list[achievement_data.contact])
+		end
+		for id = #available_jobs, 1, -1 do
+			job = available_jobs[id]
+			if type(job) == "table" then
+				for _, job_id in ipairs(job) do
+					local break_outer = false
+					for _, difficulty in ipairs(achievement_data.difficulty) do
+						if managers.statistics:completed_job(job_id, difficulty) > 0 then
+							table.remove(available_jobs, id)
+							break_outer = true
+							break
+						end
+					end
+					if break_outer then
+						break
+					end
+				end
+			else
+				for _, difficulty in ipairs(achievement_data.difficulty) do
+					if managers.statistics:completed_job(job, difficulty) > 0 then
+						table.remove(available_jobs, id)
+					end
+				end
+			end
+		end
+		if table.size(available_jobs) == 0 then
+			self:_award_achievement(achievement_data)
+		end
+	end
+end
+
+function AchievmentManager:_check_autounlock_infamy()
+	managers.experience:_check_achievements()
+end
+
+function AchievmentManager:_award_achievement(achievement_data)
+	if achievement_data.stat then
+		managers.achievment:award_progress(achievement_data.stat)
+	elseif achievement_data.award then
+		managers.achievment:award(achievement_data.award)
+	elseif achievement_data.challenge_stat then
+		managers.challenge:award_progress(achievement_data.challenge_stat)
+	elseif achievement_data.challenge_award then
+		managers.challenge:award(achievement_data.challenge_award)
 	end
 end

@@ -974,6 +974,10 @@ function InteractionTweakData:init(tweak_data)
 	self.test_interactive_door.icon = "develop"
 	self.test_interactive_door.text_id = "debug_interact_temp_interact_box"
 	self.test_interactive_door.sound_event = "ammo_bag_drop"
+	self.press_to_interact = {}
+	self.press_to_interact.icon = "develop"
+	self.press_to_interact.text_id = "hud_press_to_interact"
+	self.press_to_interact.sound_event = "ammo_bag_drop"
 	self.test_interactive_door_one_direction = {}
 	self.test_interactive_door_one_direction.icon = "develop"
 	self.test_interactive_door_one_direction.text_id = "debug_interact_temp_interact_box"
