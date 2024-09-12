@@ -1343,8 +1343,10 @@ function CharacterTweakData:_init_phalanx_minion(presets)
 	self.phalanx_minion.damage.shield_knocked = false
 	self.phalanx_minion.damage.immune_to_knockback = true
 	self.phalanx_minion.immune_to_knock_down = true
-	self.phalanx_minion.ecm_vulnerability = nil
-	self.phalanx_minion.ecm_hurts = {}
+	self.phalanx_minion.ecm_vulnerability = 1
+	self.phalanx_minion.ecm_hurts = {
+		ears = {min_duration = 2, max_duration = 3}
+	}
 	self.phalanx_minion.priority_shout = "f45"
 end
 
@@ -1499,6 +1501,10 @@ function CharacterTweakData:_init_inside_man(presets)
 	self.inside_man.surrender_break_time = {10, 15}
 	self.inside_man.suppression = presets.suppression.no_supress
 	self.inside_man.surrender = nil
+	self.inside_man.ecm_vulnerability = 1
+	self.inside_man.ecm_hurts = {
+		ears = {min_duration = 8, max_duration = 10}
+	}
 	self.inside_man.weapon_voice = "1"
 	self.inside_man.experience.cable_tie = "tie_swat"
 	self.inside_man.speech_prefix_p1 = "l"
@@ -1527,7 +1533,10 @@ function CharacterTweakData:_init_civilian(presets)
 	self.civilian.submission_intimidate = 120
 	self.civilian.run_away_delay = {5, 20}
 	self.civilian.damage = presets.hurt_severities.no_hurts
-	self.civilian.ecm_hurts = {}
+	self.civilian.ecm_vulnerability = 1
+	self.civilian.ecm_hurts = {
+		ears = {min_duration = 8, max_duration = 10}
+	}
 	self.civilian.experience.cable_tie = "tie_civ"
 	self.civilian.speech_prefix_p1 = "cm"
 	self.civilian.speech_prefix_count = 2
@@ -1541,6 +1550,11 @@ function CharacterTweakData:_init_civilian(presets)
 	self.civilian_female.speech_prefix_count = 5
 	self.civilian_female.female = true
 	self.civilian_female.access = "civ_female"
+	self.robbers_safehouse = deep_clone(self.civilian)
+	self.robbers_safehouse.scare_shot = 0
+	self.robbers_safehouse.scare_intimidate = 0
+	self.robbers_safehouse.intimidateable = false
+	self.robbers_safehouse.ignores_aggression = true
 end
 
 function CharacterTweakData:_init_bank_manager(presets)
@@ -1559,6 +1573,10 @@ function CharacterTweakData:_init_bank_manager(presets)
 	self.bank_manager.submission_max = {60, 120}
 	self.bank_manager.submission_intimidate = 120
 	self.bank_manager.damage = presets.hurt_severities.no_hurts
+	self.bank_manager.ecm_vulnerability = 1
+	self.bank_manager.ecm_hurts = {
+		ears = {min_duration = 8, max_duration = 10}
+	}
 	self.bank_manager.experience.cable_tie = "tie_civ"
 	self.bank_manager.speech_prefix_p1 = "cm"
 	self.bank_manager.speech_prefix_count = 2

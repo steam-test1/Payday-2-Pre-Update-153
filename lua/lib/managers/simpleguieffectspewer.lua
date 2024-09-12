@@ -651,9 +651,9 @@ function SimpleGUIEffectSpewer.lootdrop_safe_drop_show_item(panel)
 	managers.menu_component:post_event("cash_loot_drop_reveal")
 end
 
-function SimpleGUIEffectSpewer.sample_boom()
+function SimpleGUIEffectSpewer.get_sample_boom()
 	local ws = managers.menu_component:fullscreen_ws()
-	SimpleGUIEffectSpewer:new({
+	return {
 		spew_time = 0.5,
 		min_plive_time = 0.6,
 		max_plive_time = 1,
@@ -671,8 +671,7 @@ function SimpleGUIEffectSpewer.sample_boom()
 		},
 		particle_sway_distance = 0.5,
 		particle_sway_speed = 360
-	})
-	SimpleGUIEffectSpewer:new({
+	}, {
 		spew_time = 0.6,
 		min_plive_time = 0.4,
 		max_plive_time = 0.6,
@@ -690,8 +689,7 @@ function SimpleGUIEffectSpewer.sample_boom()
 		},
 		particle_w = 16,
 		particle_h = 16
-	})
-	SimpleGUIEffectSpewer:new({
+	}, {
 		spew_time = 0,
 		spew_at_start = true,
 		plive_time = 1.6,
@@ -710,8 +708,7 @@ function SimpleGUIEffectSpewer.sample_boom()
 		},
 		particle_alpha = 0.8,
 		layer = 1
-	})
-	SimpleGUIEffectSpewer:new({
+	}, {
 		spew_time = 0,
 		spew_at_start = true,
 		plive_time = 1.5,
@@ -730,8 +727,7 @@ function SimpleGUIEffectSpewer.sample_boom()
 		},
 		particle_alpha = 0.8,
 		layer = 1
-	})
-	SimpleGUIEffectSpewer:new({
+	}, {
 		spew_time = 0,
 		spew_at_start = true,
 		plive_time = 0.8,
@@ -750,12 +746,21 @@ function SimpleGUIEffectSpewer.sample_boom()
 		},
 		particle_alpha = 0.8,
 		layer = 1
-	})
+	}
 end
 
-function SimpleGUIEffectSpewer.get_skill_spewers(x, y, panel)
+function SimpleGUIEffectSpewer.sample_boom()
+	local spewers = {
+		SimpleGUIEffectSpewer.get_sample_boom()
+	}
+	for i, spewer in ipairs(spewers) do
+		SimpleGUIEffectSpewer:new(spewer)
+	end
+end
+
+function SimpleGUIEffectSpewer.get_skill_spewers(x, y, panel, color)
 	local ws = managers.menu_component:fullscreen_ws()
-	local skill_color = tweak_data.screen_colors.button_stage_3
+	local skill_color = color or tweak_data.screen_colors.button_stage_3
 	local colors = {
 		red = {
 			skill_color.red - 0.1,
@@ -937,6 +942,137 @@ end
 function SimpleGUIEffectSpewer.infamous_up(x, y, panel)
 	local spewers = {
 		SimpleGUIEffectSpewer.get_skill_spewers(x, y, panel)
+	}
+	for i, spewer in ipairs(spewers) do
+		spewer.particle_w = spewer.particle_w and math.floor(spewer.particle_w * 1.4)
+		spewer.particle_h = spewer.particle_h and math.floor(spewer.particle_h * 1.4)
+		SimpleGUIEffectSpewer:new(spewer)
+	end
+end
+
+function SimpleGUIEffectSpewer.get_daily_reward_spewers(x, y, panel, color)
+	local ws = managers.menu_component:fullscreen_ws()
+	local skill_color = color or tweak_data.screen_colors.button_stage_3
+	local colors = {
+		red = {
+			skill_color.red - 0.1,
+			skill_color.red + 0.1
+		},
+		green = {
+			skill_color.green - 0.1,
+			skill_color.green + 0.1
+		},
+		blue = {
+			skill_color.blue - 0.1,
+			skill_color.blue + 0.1
+		}
+	}
+	return {
+		spew_time = 0.6,
+		min_plive_time = 0.8,
+		max_plive_time = 1.4,
+		spawn_interval = 0.02,
+		min_particle_speed = 250,
+		max_particle_speed = 300,
+		max_num_particles = 60,
+		particle_colors = colors,
+		particle_alpha = skill_color.alpha,
+		particle_textures = {
+			"guis/textures/pd2/particles/bulb"
+		},
+		min_spew_angle = -120,
+		max_spew_angle = -60,
+		particle_w = 12,
+		particle_h = 12,
+		x = x,
+		y = y,
+		parent_panel = panel,
+		layer = (panel and panel:layer() or 0) + 2,
+		ws_converter = "safe_to_full_16_9",
+		gravity = 500
+	}, {
+		spew_time = 0.4,
+		min_plive_time = 0.2,
+		max_plive_time = 0.3,
+		spawn_interval = 0.05,
+		min_particle_speed = 255,
+		max_particle_speed = 305,
+		max_num_particles = 35,
+		particle_colors = colors,
+		particle_alpha = skill_color.alpha,
+		particle_textures = {
+			"guis/textures/pd2/particles/spark"
+		},
+		particle_w = 4,
+		particle_h = 4,
+		x = x,
+		y = y,
+		parent_panel = panel,
+		layer = (panel and panel:layer() or 0) + 2,
+		ws_converter = "safe_to_full_16_9"
+	}, {
+		spew_time = 0,
+		spew_at_start = true,
+		plive_time = 1.6,
+		particle_speed = 0,
+		max_num_particles = 1,
+		spawn_interval = 0.1,
+		particle_colors = colors,
+		particle_w = ws:panel():h() * 0.25,
+		particle_h = ws:panel():h() * 0.25,
+		particle_alpha = skill_color.alpha * 0.8,
+		particle_textures = {
+			"guis/textures/pd2/particles/fill"
+		},
+		x = x,
+		y = y,
+		parent_panel = panel,
+		layer = (panel and panel:layer() or 0) + 3,
+		ws_converter = "safe_to_full_16_9"
+	}, {
+		spew_time = 0,
+		spew_at_start = true,
+		plive_time = 1.5,
+		particle_speed = 0,
+		max_num_particles = 1,
+		spawn_interval = 0.1,
+		particle_colors = colors,
+		particle_alpha = skill_color.alpha * 0.8,
+		particle_w = ws:panel():h() * 0.35,
+		particle_h = ws:panel():h() * 0.35,
+		particle_textures = {
+			"guis/textures/pd2/particles/fill"
+		},
+		x = x,
+		y = y,
+		parent_panel = panel,
+		layer = (panel and panel:layer() or 0) + 3,
+		ws_converter = "safe_to_full_16_9"
+	}, {
+		spew_time = 0,
+		spew_at_start = true,
+		plive_time = 0.8,
+		particle_speed = 0,
+		max_num_particles = 1,
+		spawn_interval = 0.1,
+		particle_colors = colors,
+		particle_alpha = skill_color.alpha * 0.8,
+		particle_w = ws:panel():h() * 0.45,
+		particle_h = ws:panel():h() * 0.45,
+		particle_textures = {
+			"guis/textures/pd2/particles/fill"
+		},
+		x = x,
+		y = y,
+		parent_panel = panel,
+		layer = (panel and panel:layer() or 0) + 3,
+		ws_converter = "safe_to_full_16_9"
+	}
+end
+
+function SimpleGUIEffectSpewer.claim_daily_reward(x, y, panel)
+	local spewers = {
+		SimpleGUIEffectSpewer.get_daily_reward_spewers(x, y, panel, Color(255, 255, 168, 0) / 255 * 0.8)
 	}
 	for i, spewer in ipairs(spewers) do
 		spewer.particle_w = spewer.particle_w and math.floor(spewer.particle_w * 1.4)

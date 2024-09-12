@@ -65,3 +65,11 @@ end
 function ElementUnitDamage:client_on_executed(...)
 	self:on_executed(...)
 end
+
+function ElementUnitDamage:save(data)
+	data.enabled = self._values.enabled
+end
+
+function ElementUnitDamage:load(data)
+	self:set_enabled(data.enabled)
+end

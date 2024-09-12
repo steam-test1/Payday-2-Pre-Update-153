@@ -464,6 +464,13 @@ function MenuManager:set_mouse_sensitivity(zoomed)
 		return
 	end
 	local sens = zoomed and managers.user:get_setting("enable_camera_zoom_sensitivity") and managers.user:get_setting("camera_zoom_sensitivity") or managers.user:get_setting("camera_sensitivity")
+	if zoomed and managers.user:get_setting("enable_fov_based_sensitivity") and alive(managers.player:player_unit()) then
+		local state = managers.player:player_unit():movement():current_state()
+		if alive(state._equipped_unit) then
+			local fov = managers.user:get_setting("fov_multiplier")
+			sens = sens * (state._equipped_unit:base():zoom() or 65) * (fov + 1) / 2 / (65 * fov)
+		end
+	end
 	self._controller:get_setup():get_connection("look"):set_multiplier(sens * self._look_multiplier)
 	managers.controller:rebind_connections()
 end
@@ -2833,6 +2840,8 @@ function MenuCallbackHandler:connect_to_host_rpc(item)
 			managers.network:session():load_level(item:parameters().level_name, nil, nil, nil, level_id, nil)
 		elseif res == "KICKED" then
 			managers.menu:show_peer_kicked_dialog()
+		elseif res == "BANNED" then
+			managers.menu:show_peer_banned_dialog()
 		else
 			Application:error("[MenuCallbackHandler:connect_to_host_rpc] FAILED TO START MULTIPLAYER!")
 		end
@@ -3175,6 +3184,11 @@ function MenuCallbackHandler:toggle_zoom_sensitivity(item)
 		item_sens_zoom:set_value(item_sens:value())
 		item_sens_zoom:trigger()
 	end
+end
+
+function MenuCallbackHandler:toggle_fov_based_zoom(item)
+	local value = item:value() == "on"
+	managers.user:set_setting("enable_fov_based_sensitivity", value)
 end
 
 function MenuCallbackHandler:is_current_resolution(item)
@@ -4541,11 +4555,13 @@ MenuCustomizeControllerCreator.CONTROLS = {
 	"duck",
 	"melee",
 	"interact",
+	"interact_secondary",
 	"use_item",
 	"toggle_chat",
 	"push_to_talk",
 	"cash_inspect",
 	"deploy_bipod",
+	"change_equipment",
 	"drive",
 	"hand_brake",
 	"vehicle_change_camera",
@@ -4633,6 +4649,10 @@ MenuCustomizeControllerCreator.CONTROLS_INFO.interact = {
 	text_id = "menu_button_shout",
 	category = "normal"
 }
+MenuCustomizeControllerCreator.CONTROLS_INFO.interact_secondary = {
+	text_id = "menu_button_shout_secondary",
+	category = "normal"
+}
 MenuCustomizeControllerCreator.CONTROLS_INFO.use_item = {
 	text_id = "menu_button_deploy",
 	category = "normal"
@@ -4663,6 +4683,10 @@ MenuCustomizeControllerCreator.CONTROLS_INFO.cash_inspect = {
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.deploy_bipod = {
 	text_id = "menu_button_deploy_bipod",
+	category = "normal"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.change_equipment = {
+	text_id = "menu_button_change_equipment",
 	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.drive = {hidden = true, category = "vehicle"}
@@ -7397,6 +7421,10 @@ function MenuOptionInitiator:modify_adv_video(node)
 	if node:item("toggle_use_thq_weapon_parts") then
 		node:item("toggle_use_thq_weapon_parts"):set_value(managers.user:get_setting("use_thq_weapon_parts") and "on" or "off")
 	end
+	local toggle_hide_huds = node:item("toggle_hide_huds") or node:item("toggle_hide_huds_xb1") or node:item("toggle_hide_huds_ps4")
+	if toggle_hide_huds then
+		toggle_hide_huds:set_value(Global.hud_disabled and "on" or "off")
+	end
 	local option_value = "off"
 	local dof_setting_item = node:item("toggle_dof")
 	if dof_setting_item then
@@ -7478,6 +7506,10 @@ function MenuOptionInitiator:modify_video(node)
 	if effect_quality_item then
 		option_value = managers.user:get_setting("effect_quality")
 		effect_quality_item:set_value(option_value)
+	end
+	local toggle_hide_huds = node:item("toggle_hide_huds") or node:item("toggle_hide_huds_xb1") or node:item("toggle_hide_huds_ps4")
+	if toggle_hide_huds then
+		toggle_hide_huds:set_value(Global.hud_disabled and "on" or "off")
 	end
 	return node
 end
@@ -7562,6 +7594,7 @@ function MenuOptionInitiator:modify_controls(node)
 		czs_item:set_value(managers.user:get_setting("camera_zoom_sensitivity"))
 	end
 	node:item("toggle_zoom_sensitivity"):set_value(managers.user:get_setting("enable_camera_zoom_sensitivity") and "on" or "off")
+	node:item("toggle_fov_based_zoom"):set_value(managers.user:get_setting("enable_fov_based_sensitivity") and "on" or "off")
 	return node
 end
 

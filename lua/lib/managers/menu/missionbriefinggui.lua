@@ -2053,10 +2053,54 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 		rotation = 360
 	})
 	if params then
-		if params.info_text then
+		if params.secondary then
+			local info_text = " / "
+			if params.info_text then
+				info_text = params.info_text .. info_text
+			end
+			if params.secondary.info_text then
+				info_text = info_text .. params.secondary.info_text
+			end
+			self:set_info_text(info_text, params.info_text_color)
+		elseif params.info_text then
 			self:set_info_text(params.info_text, params.info_text_color)
 		end
-		if params.item_texture and DB:has(Idstring("texture"), params.item_texture) then
+		if params.secondary then
+			if params.item_texture and DB:has(Idstring("texture"), params.item_texture) then
+				self._item_image1 = self._item_panel:bitmap({
+					texture = params.item_texture,
+					layer = 1
+				})
+				local texture_width = self._item_image1:texture_width()
+				local texture_height = self._item_image1:texture_height()
+				local aspect = texture_width / texture_height
+				local half_w, half_h = self._item_panel:w() / 2, self._item_panel:h() / 2
+				local sw = math.min(half_w, self._item_panel:h() * aspect)
+				local sh = math.min(self._item_panel:h(), half_w / aspect)
+				self._item_image1:set_size(sw, sh)
+				self._item_image1:set_center(half_w / 2, half_h)
+				if managers.job:is_forced() then
+					self._item_image1:set_color(Color.black)
+				end
+			end
+			if params.secondary.item_texture and DB:has(Idstring("texture"), params.secondary.item_texture) then
+				self._item_image2 = self._item_panel:bitmap({
+					texture = params.secondary.item_texture,
+					layer = 1
+				})
+				local texture_width = self._item_image2:texture_width()
+				local texture_height = self._item_image2:texture_height()
+				local aspect = texture_width / texture_height
+				local half_w, half_h = self._item_panel:w() / 2, self._item_panel:h() / 2
+				local sw = math.min(half_w, self._item_panel:h() * aspect)
+				local sh = math.min(self._item_panel:h(), half_w / aspect)
+				self._item_image2:set_size(sw, sh)
+				self._item_image2:set_center(half_w / 2 * 3, half_h)
+				if managers.job:is_forced() then
+					self._item_image2:set_color(Color.black)
+				end
+			end
+		elseif params.item_texture and DB:has(Idstring("texture"), params.item_texture) then
 			self._item_image = self._item_panel:bitmap({
 				texture = params.item_texture,
 				layer = 1
@@ -2839,6 +2883,10 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	if managers.job:is_current_job_competitive() then
 		self:set_description_text_id("menu_competitive_rules")
 	end
+	self._multi_profile_item = MultiProfileItemGui:new(self._safe_workspace, self._panel)
+	self._multi_profile_item:panel():set_bottom(self._panel:h())
+	self._multi_profile_item:panel():set_left(0)
+	self._multi_profile_item:set_name_editing_enabled(false)
 	self._enabled = true
 	self:flash_ready()
 end
@@ -3137,6 +3185,9 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 	if self._ready_button:inside(x, y) or self._ready_tick_box:inside(x, y) then
 		self:on_ready_pressed()
 	end
+	if not self._ready then
+		self._multi_profile_item:mouse_pressed(button, x, y)
+	end
 	return self._selected_item
 end
 
@@ -3187,7 +3238,8 @@ function MissionBriefingGui:mouse_moved(x, y)
 	if managers.hud._hud_mission_briefing and managers.hud._hud_mission_briefing._backdrop then
 		managers.hud._hud_mission_briefing._backdrop:mouse_moved(x, y)
 	end
-	return false, "arrow"
+	local u, p = self._multi_profile_item:mouse_moved(x, y)
+	return u or false, p or "arrow"
 end
 
 function MissionBriefingGui:set_description_text_id(text_id)

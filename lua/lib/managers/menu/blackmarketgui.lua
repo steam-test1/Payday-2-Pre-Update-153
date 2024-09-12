@@ -2378,7 +2378,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			bw_buy_dlc = {
 				prio = 4,
 				btn = "BTN_X",
-				pc_btn = "menu_modify_item",
+				pc_btn = "menu_remove_item",
 				name = "bm_menu_buy_dlc",
 				callback = callback(self, self, "show_buy_dlc_callback")
 			},
@@ -7369,6 +7369,7 @@ function BlackMarketGui:populate_grenades(data)
 	local index = 0
 	local guis_catalog, m_tweak_data, grenade_id
 	for i, grenades_data in ipairs(sort_data) do
+		print(inspect(grenades_data))
 		grenade_id = grenades_data[1]
 		m_tweak_data = tweak_data.blackmarket.projectiles[grenades_data[1]] or {}
 		guis_catalog = "guis/"
@@ -7655,10 +7656,10 @@ function BlackMarketGui:populate_deployables(data)
 		new_data.equipped = slot ~= 0
 		if new_data.equipped and second_deployable and new_data.unlocked then
 			if slot == 1 then
-				new_data.equipped_text = "PRIMARY"
+				new_data.equipped_text = managers.localization:to_upper_text("bm_menu_primaries")
 			end
 			if slot == 2 then
-				new_data.equipped_text = "SECONDARY"
+				new_data.equipped_text = managers.localization:to_upper_text("bm_menu_secondaries")
 			end
 		end
 		if not new_data.unlocked then

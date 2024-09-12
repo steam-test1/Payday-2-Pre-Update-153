@@ -103,8 +103,8 @@ function WeaponLaser:update(unit, t, dt)
 	end
 end
 
-function WeaponLaser:_check_state()
-	WeaponLaser.super._check_state(self)
+function WeaponLaser:_check_state(current_state)
+	WeaponLaser.super._check_state(self, current_state)
 	self._light:set_enable(self._on)
 	self._light_glow:set_enable(self._on)
 	self._g_laser:set_visibility(self._on)

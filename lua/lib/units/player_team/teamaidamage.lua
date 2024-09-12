@@ -165,6 +165,10 @@ function TeamAIDamage:damage_bullet(attack_data)
 	return result
 end
 
+function TeamAIDamage:accuracy_multiplier()
+	return 1
+end
+
 function TeamAIDamage:damage_explosion(attack_data)
 	if self:_cannot_take_damage() then
 		return

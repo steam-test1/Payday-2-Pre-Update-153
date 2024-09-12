@@ -11,7 +11,8 @@ function Drill.get_upgrades(drill_unit, player)
 	if is_drill or is_saw then
 		local player_skill = PlayerSkill
 		upgrades = {}
-		upgrades.auto_repair_level = player_skill.skill_level("player", "drill_autorepair", 0, player)
+		upgrades.auto_repair_level_1 = player_skill.skill_level("player", "drill_autorepair_1", 0, player)
+		upgrades.auto_repair_level_2 = player_skill.skill_level("player", "drill_autorepair_2", 0, player)
 		upgrades.speed_upgrade_level = player_skill.skill_level("player", "drill_speed_multiplier", 0, player)
 		upgrades.silent_drill = player_skill.has_skill("player", "silent_drill", player)
 		upgrades.reduced_alert = player_skill.has_skill("player", "drill_alert_rad", player)
@@ -19,9 +20,10 @@ function Drill.get_upgrades(drill_unit, player)
 	return upgrades
 end
 
-function Drill.create_upgrades(auto_repair_level, speed_upgrade_level, silent_drill, reduced_alert)
+function Drill.create_upgrades(auto_repair_level_1, auto_repair_level_2, speed_upgrade_level, silent_drill, reduced_alert)
 	return {
-		auto_repair_level = auto_repair_level,
+		auto_repair_level_1 = auto_repair_level_1,
+		auto_repair_level_2 = auto_repair_level_2,
 		speed_upgrade_level = speed_upgrade_level,
 		silent_drill = silent_drill,
 		reduced_alert = reduced_alert
@@ -444,8 +446,10 @@ function Drill:set_skill_upgrades(upgrades)
 		local current_reduced_alert = self._skill_upgrades.reduced_alert or false
 		local got_silent_drill = upgrades.silent_drill or false
 		local current_silent_drill = self._skill_upgrades.silent_drill or false
-		local auto_repair_level = upgrades.auto_repair_level or 0
-		local current_auto_repair_level = self._skill_upgrades.auto_repair_level or 0
+		local auto_repair_level_1 = upgrades.auto_repair_level_1 or 0
+		local auto_repair_level_2 = upgrades.auto_repair_level_2 or 0
+		local current_auto_repair_level_1 = self._skill_upgrades.auto_repair_level_1 or 0
+		local current_auto_repair_level_2 = self._skill_upgrades.auto_repair_level_2 or 0
 		timer_gui_ext:set_timer_multiplier(timer_multiplier)
 		if got_silent_drill or current_silent_drill then
 			self:set_alert_radius(nil)
@@ -463,14 +467,23 @@ function Drill:set_skill_upgrades(upgrades)
 			timer_gui_ext:set_skill(BaseInteractionExt.SKILL_IDS.none)
 			add_bg_icon_func(background_icons, "drillgui_icon_silent", timer_gui_ext:get_upgrade_icon_color("upgrade_color_0"))
 		end
-		if 0 < auto_repair_level or 0 < current_auto_repair_level then
+		if 0 < auto_repair_level_1 or 0 < current_auto_repair_level_1 or 0 < auto_repair_level_2 or 0 < current_auto_repair_level_2 then
+			upgrades.auto_repair_level_1 = current_auto_repair_level_1
+			upgrades.auto_repair_level_2 = current_auto_repair_level_2
 			local drill_autorepair_chance = 0
-			if auto_repair_level > current_auto_repair_level then
-				drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[auto_repair_level]
-				upgrades.auto_repair_level = auto_repair_level
-			else
-				drill_autorepair_chance = tweak_data.upgrades.values.player.drill_autorepair[current_auto_repair_level]
-				upgrades.auto_repair_level = current_auto_repair_level
+			if auto_repair_level_1 > current_auto_repair_level_1 then
+				current_auto_repair_level_1 = auto_repair_level_1
+				upgrades.auto_repair_level_1 = auto_repair_level_1
+			end
+			if auto_repair_level_2 > current_auto_repair_level_2 then
+				current_auto_repair_level_2 = auto_repair_level_2
+				upgrades.auto_repair_level_2 = auto_repair_level_2
+			end
+			if 0 < current_auto_repair_level_1 then
+				drill_autorepair_chance = drill_autorepair_chance + tweak_data.upgrades.values.player.drill_autorepair_2[1]
+			end
+			if 0 < current_auto_repair_level_2 then
+				drill_autorepair_chance = drill_autorepair_chance + tweak_data.upgrades.values.player.drill_autorepair_1[1]
 			end
 			if Network:is_server() and drill_autorepair_chance > math.random() then
 				self:set_autorepair(true)
@@ -490,7 +503,7 @@ function Drill:get_skill_upgrades()
 end
 
 function Drill:set_autorepair(state)
-	if self._skill_upgrades.auto_repair_level and self._skill_upgrades.auto_repair_level > 0 then
+	if self._skill_upgrades.auto_repair_level_1 and self._skill_upgrades.auto_repair_level_1 > 0 or self._skill_upgrades.auto_repair_level_2 and 0 < self._skill_upgrades.auto_repair_level_2 then
 		return
 	end
 	self._autorepair = state
@@ -726,5 +739,5 @@ function Drill:compare_skill_upgrades(skill_upgrades)
 	if self._disable_upgrades then
 		return false
 	end
-	return skill_upgrades.auto_repair_level > self._skill_upgrades.auto_repair_level or skill_upgrades.speed_upgrade_level > self._skill_upgrades.speed_upgrade_level or skill_upgrades.silent_drill and not self._skill_upgrades.silent_drill or skill_upgrades.reduced_alert and not self._skill_upgrades.reduced_alert
+	return skill_upgrades.auto_repair_level_1 > self._skill_upgrades.auto_repair_level_1 or skill_upgrades.auto_repair_level_2 > self._skill_upgrades.auto_repair_level_2 or skill_upgrades.speed_upgrade_level > self._skill_upgrades.speed_upgrade_level or skill_upgrades.silent_drill and not self._skill_upgrades.silent_drill or skill_upgrades.reduced_alert and not self._skill_upgrades.reduced_alert
 end

@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.54.10"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.54.11"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -262,7 +262,8 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 						table.insert(info.room_list, {
 							owner_id = lobby:key_value("owner_id"),
 							owner_name = lobby:key_value("owner_name"),
-							room_id = lobby:id()
+							room_id = lobby:id(),
+							owner_level = lobby:key_value("owner_level")
 						})
 						table.insert(info.attribute_list, {
 							numbers = self:_lobby_to_numbers(lobby)
@@ -523,6 +524,11 @@ function NetworkMatchMakingSTEAM:join_server(room_id, skip_showing_dialog)
 					managers.network:queue_stop_network()
 					Global.on_remove_peer_message = res == "AUTH_HOST_FAILED" and "dialog_authentication_host_fail" or "dialog_authentication_fail"
 					managers.menu:show_peer_kicked_dialog()
+				elseif res == "BANNED" then
+					managers.network.matchmake:leave_game()
+					managers.network.voice_chat:destroy_voice()
+					managers.network:queue_stop_network()
+					managers.menu:show_peer_banned_dialog()
 				else
 					Application:error("[NetworkMatchMakingSTEAM:join_server] FAILED TO START MULTIPLAYER!", res)
 				end
@@ -634,6 +640,7 @@ function NetworkMatchMakingSTEAM:set_attributes(settings)
 	local lobby_attributes = {
 		owner_name = managers.network.account:username_id(),
 		owner_id = managers.network.account:player_id(),
+		owner_level = managers.experience:current_level(),
 		level = level_index,
 		difficulty = settings.numbers[2],
 		permission = settings.numbers[3],

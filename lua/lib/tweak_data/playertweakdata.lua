@@ -98,7 +98,8 @@ function PlayerTweakData:init()
 		intimidate_strength = 0.5,
 		highlight_range = 3000,
 		intimidate_range_enemies = 1000,
-		intimidate_range_civilians = 1000
+		intimidate_range_civilians = 1000,
+		intimidate_range_teammates = 100000
 	}
 	self.suppression = {
 		max_value = 20,

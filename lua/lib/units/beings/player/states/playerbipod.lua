@@ -61,7 +61,6 @@ function PlayerBipod:exit(state_data, new_state_name)
 	self._equipped_unit:base():tweak_data_anim_stop("deploy")
 	local result = self._ext_camera:play_redirect(Idstring(tweak_data.animations.bipod_exit .. "_" .. equipped_unit_id), speed_multiplier)
 	local result_deploy = self._equipped_unit:base():tweak_data_anim_play("undeploy", speed_multiplier)
-	self._unit:camera():camera_unit():base():set_target_tilt(0)
 	self._unit:camera():camera_unit():base():remove_limits()
 	self._unit:camera():camera_unit():base().bipod_location = nil
 	local exit_data = {}

@@ -123,6 +123,9 @@ function CoreEditor:build_menubar()
 		self._snap_rotations_axis_menu:set_checked("TB_SNAPROTATE_Z", true)
 	end
 	self._edit_menu:append_menu("SNAP_ROTATION_AIXS_MENU", "Snap Rotation Axis\t(" .. self:ctrl_binding("change_snaprot_axis") .. ")", self._snap_rotations_axis_menu, "Snap Rotation Axis")
+	self._edit_menu:append_separator()
+	self._edit_menu:append_item("BREAK_SELECTED_UNIT_LINKS", "Break Links", "Removes all on executed and insert links from the selected units")
+	Global.frame:connect("BREAK_SELECTED_UNIT_LINKS", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "on_break_unit_links"), nil)
 	menu_bar:append(self._edit_menu, "Edit")
 	self._group_menu = EWS:Menu("")
 	self._group_menu:append_item("SELECT_GROUP_BY_NAME", "Select Group By Name", "Shows a list with all groups")
@@ -556,6 +559,12 @@ end
 
 function CoreEditor:on_change_layer(index)
 	self._notebook:set_page(index)
+end
+
+function CoreEditor:on_break_unit_links()
+	if self._current_layer == self:layer("Mission") then
+		self:layer("Mission"):break_links()
+	end
 end
 
 function CoreEditor:on_select_group_by_name()

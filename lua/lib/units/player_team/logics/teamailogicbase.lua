@@ -1,7 +1,7 @@
 require("lib/units/enemies/cop/logics/CopLogicBase")
 TeamAILogicBase = TeamAILogicBase or class(CopLogicBase)
 
-function TeamAILogicBase.on_long_dis_interacted(data, other_unit)
+function TeamAILogicBase.on_long_dis_interacted(data, other_unit, secondary)
 end
 
 function TeamAILogicBase.on_cop_neutralized(data, cop_key)

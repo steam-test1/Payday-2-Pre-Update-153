@@ -117,7 +117,7 @@ local material_textures = {
 	sticker = "diffuse_layer3_texture"
 }
 local material_variables = {
-	wear_and_tear = managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() and "wear_tear_value" or nil,
+	wear_and_tear = (managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() or Application:production_build()) and "wear_tear_value" or nil,
 	pattern_tweak = "pattern_tweak",
 	uv_scale = "uv_scale",
 	uv_offset_rot = "uv_offset_rot",
@@ -126,7 +126,7 @@ local material_variables = {
 }
 
 function NewRaycastWeaponBase:_apply_cosmetics(async_clbk)
-	material_variables.wear_and_tear = managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() and "wear_tear_value" or nil
+	material_variables.wear_and_tear = (managers.blackmarket and managers.blackmarket:skin_editor() and managers.blackmarket:skin_editor():active() or Application:production_build()) and "wear_tear_value" or nil
 	self:_update_materials()
 	local cosmetics_data = self:get_cosmetics_data()
 	if not (self._parts and cosmetics_data and self._materials) or table.size(self._materials) == 0 then

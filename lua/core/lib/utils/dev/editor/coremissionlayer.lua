@@ -5,6 +5,7 @@ core:import("CoreEditorUtils")
 core:import("CoreTable")
 core:import("CoreEws")
 core:import("CoreClass")
+core:import("CoreEditorCommand")
 MissionLayer = MissionLayer or class(CoreStaticLayer.StaticLayer)
 
 function MissionLayer:init(owner)
@@ -110,7 +111,7 @@ function MissionLayer:save_mission(params)
 	return scripts
 end
 
-function MissionLayer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_undo)
+function MissionLayer:do_spawn_unit(...)
 	if not self:current_script() then
 		managers.editor:output_warning("You need to create a mission script first.")
 		return
@@ -119,7 +120,7 @@ function MissionLayer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_u
 		managers.editor:output_warning("Can't create mission element because the current script doesn't belong to current continent.")
 		return
 	end
-	return MissionLayer.super.do_spawn_unit(self, name, pos, rot, to_continent_name, prevent_undo)
+	return MissionLayer.super.do_spawn_unit(self, ...)
 end
 
 function MissionLayer:_on_unit_created(unit, ...)
@@ -180,10 +181,30 @@ function MissionLayer:_add_on_executed(unit)
 	return false
 end
 
+function MissionLayer:delete_selected_unit(btn, pressed)
+	managers.editor:freeze_gui_lists()
+	if self._selected_unit and not self:condition() then
+		local to_delete = CoreTable.clone(self._selected_units)
+		table.sort(to_delete, function(a, b)
+			return a:unit_data().unit_id > b:unit_data().unit_id
+		end)
+		for _, unit in ipairs(to_delete) do
+			unit:mission_element():delete_unit(self._created_units)
+			unit:mission_element():clear()
+		end
+		for _, unit in ipairs(to_delete) do
+			if table.contains(self._created_units, unit) then
+				self:delete_unit(unit)
+			else
+				managers.editor:output_warning("" .. tostring(unit:unit_data().name_id) .. " belongs to " .. tostring(managers.editor:unit_in_layer_name(unit)) .. " and cannot be deleted from here.")
+			end
+		end
+	end
+	managers.editor:thaw_gui_lists()
+end
+
 function MissionLayer:delete_unit(del_unit, prevent_undo)
 	if not self._editing_mission_element then
-		del_unit:mission_element():delete_unit(self._created_units)
-		del_unit:mission_element():clear()
 		MissionLayer.super.delete_unit(self, del_unit, prevent_undo)
 	end
 	if self._list_flow then
@@ -399,7 +420,7 @@ end
 
 function MissionLayer:_on_gui_mission_element_help()
 	local short_name = self:_stripped_unit_name(self._selected_unit:name():s())
-	EWS:launch_url("http://serben01/wiki/index.php/" .. short_name)
+	EWS:launch_url("https://intranet.starbreeze.com/wiki/index.php/" .. short_name)
 end
 
 function MissionLayer:toolbar_toggle(data, event)
@@ -874,4 +895,19 @@ function MissionLayer:add_triggers()
 		self._selected_unit:mission_element():add_triggers(vc)
 		return
 	end
+end
+
+function MissionLayer:break_links()
+	managers.editor:freeze_gui_lists()
+	if self._selected_unit and not self:condition() then
+		local to_delete = CoreTable.clone(self._selected_units)
+		table.sort(to_delete, function(a, b)
+			return a:unit_data().unit_id > b:unit_data().unit_id
+		end)
+		for _, unit in ipairs(to_delete) do
+			unit:mission_element():delete_unit(self._created_units)
+			unit:mission_element():clear()
+		end
+	end
+	managers.editor:thaw_gui_lists()
 end

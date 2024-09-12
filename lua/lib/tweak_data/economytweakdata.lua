@@ -446,6 +446,61 @@ function EconomyTweakData:init()
 		weapon_skins = {"boot_buck"}
 	}
 	self.contents.buck_01_legendary.rarity = "legendary"
+	self.contents.same_01 = {}
+	self.contents.same_01.def_id = 10024
+	self.contents.same_01.contains = {
+		weapon_skins = {
+			"amcar_same",
+			"usp_same",
+			"gre_m79_same",
+			"deagle_same",
+			"colt_1911_same",
+			"b92fs_same",
+			"judge_same",
+			"p90_same",
+			"akm_same",
+			"ak5_same",
+			"baka_same",
+			"model70_same",
+			"new_raging_bull_same",
+			"new_m14_same",
+			"par_same"
+		},
+		contents = {
+			"same_01_legendary"
+		}
+	}
+	self.contents.same_01_legendary = {}
+	self.contents.same_01_legendary.def_id = 10025
+	self.contents.same_01_legendary.contains = {
+		weapon_skins = {"ksg_same"}
+	}
+	self.contents.same_01_legendary.rarity = "legendary"
+	self.bundles.same_01 = {}
+	self.bundles.same_01.def_id = 30000
+	self.bundles.same_01.dlc_id = "518760"
+	self.bundles.same_01.quality = "mint"
+	self.bundles.same_01.bonus = false
+	self.bundles.same_01.contains = {
+		weapon_skins = {
+			"amcar_same",
+			"usp_same",
+			"gre_m79_same",
+			"deagle_same",
+			"colt_1911_same",
+			"b92fs_same",
+			"judge_same",
+			"p90_same",
+			"akm_same",
+			"ak5_same",
+			"baka_same",
+			"model70_same",
+			"new_raging_bull_same",
+			"new_m14_same",
+			"par_same",
+			"ksg_same"
+		}
+	}
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -548,6 +603,15 @@ function EconomyTweakData:init()
 	self.safes.buck_01.unit_name = "units/payday2_cash/safes/buck/safe/eco_safe_buck"
 	self.safes.buck_01.texture_bundle_folder = "cash/safes/buck"
 	self.safes.buck_01.market_link = "https://steamcommunity.com/market/listings/218620/Biker%20Safe"
+	self.safes.same_01 = {}
+	self.safes.same_01.free = true
+	self.safes.same_01.drill = "same_01"
+	self.safes.same_01.content = "same_01"
+	self.safes.same_01.bundle = "same_01"
+	self.safes.same_01.name_id = "bm_menu_safe_same_01"
+	self.safes.same_01.unit_name = "units/payday2_cash/safes/same/safe/eco_safe_same"
+	self.safes.same_01.texture_bundle_folder = "cash/safes/same"
+	self.safes.same_01.market_link = "https://steamcommunity.com/market/listings/218620/Community%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -651,9 +715,10 @@ function EconomyTweakData:init()
 	self.drills.burn_01.texture_bundle_folder = "cash/safes/burn"
 	self.drills.buck_01 = {}
 	self.drills.buck_01.safe = "buck_01"
-	self.drills.buck_01.name_id = "bm_menu_drill_buck_01"
-	self.drills.buck_01.desc_id = "bm_menu_drill_buck_01_desc"
 	self.drills.buck_01.unit_name = "units/payday2_cash/safes/buck/drill/eco_drill_buck"
+	self.drills.same_01 = {}
+	self.drills.same_01.safe = "same_01"
+	self.drills.same_01.unit_name = "units/payday2_cash/safes/same/drill/eco_drill_same"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

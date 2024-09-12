@@ -497,28 +497,7 @@ end
 
 function VehicleDamage:_hit_direction(col_ray)
 	local local_player_vehicle = managers.player:get_vehicle()
-	if local_player_vehicle and self._unit == local_player_vehicle.vehicle_unit and col_ray then
-		local dir = col_ray.ray
-		local infront = math.dot(managers.player:local_player():camera():forward(), dir)
-		if infront < -0.9 then
-		elseif 0.9 < infront then
-			managers.hud:on_hit_direction("right", HUDHitDirection.UNIT_TYPE_HIT_VEHICLE)
-		else
-			local polar = managers.player:local_player():camera():forward():to_polar_with_reference(-dir, Vector3(0, 0, 1))
-			local direction = Vector3(polar.spin, polar.pitch, 0):normalized()
-			if math.abs(direction.x) > math.abs(direction.y) then
-				if 0 > direction.x then
-					managers.hud:on_hit_direction("left", HUDHitDirection.UNIT_TYPE_HIT_VEHICLE)
-				else
-					managers.hud:on_hit_direction("right", HUDHitDirection.UNIT_TYPE_HIT_VEHICLE)
-				end
-			elseif 0 > direction.y then
-				managers.hud:on_hit_direction("up", HUDHitDirection.UNIT_TYPE_HIT_VEHICLE)
-			else
-				managers.hud:on_hit_direction("down", HUDHitDirection.UNIT_TYPE_HIT_VEHICLE)
-			end
-		end
-	else
+	if not local_player_vehicle or self._unit ~= local_player_vehicle.vehicle_unit or col_ray then
 	end
 end
 

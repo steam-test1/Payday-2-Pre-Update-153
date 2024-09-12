@@ -23,6 +23,11 @@ end
 function PlayerDriving:enter(state_data, enter_data)
 	print("PlayerDriving:enter( enter_data )")
 	PlayerDriving.super.enter(self, state_data, enter_data)
+	for _, ai in pairs(managers.groupai:state():all_AI_criminals()) do
+		if ai.unit:movement() and ai.unit:movement()._should_stay then
+			ai.unit:movement():set_should_stay(false)
+		end
+	end
 end
 
 function PlayerDriving:_enter(enter_data)

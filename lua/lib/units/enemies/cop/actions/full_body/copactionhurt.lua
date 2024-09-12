@@ -708,6 +708,9 @@ function CopActionHurt:on_exit()
 	if self._hurt_type == "fatal" or self._variant == "tase" then
 		managers.hud:set_mugshot_normal(self._unit:unit_data().mugshot_id)
 	end
+	if self._unit and alive(self._unit) and self._unit.character_damage and self._unit:character_damage().call_listener then
+		self._unit:character_damage():call_listener("on_exit_hurt")
+	end
 end
 
 function CopActionHurt:_get_pos_clamped_to_graph(test_head)

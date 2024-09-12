@@ -1,95 +1,92 @@
 HUDHitDirection = HUDHitDirection or class()
 HUDHitDirection.UNIT_TYPE_HIT_PLAYER = 1
 HUDHitDirection.UNIT_TYPE_HIT_VEHICLE = 2
+HUDHitDirection.DAMAGE_TYPES = {}
+HUDHitDirection.DAMAGE_TYPES.HEALTH = 1
+HUDHitDirection.DAMAGE_TYPES.ARMOUR = 2
+HUDHitDirection.DAMAGE_TYPES.VEHICLE = 3
+HUDHitDirection.PANEL_SIZE = 300
 
 function HUDHitDirection:init(hud)
 	self._hud_panel = hud.panel
+	self._unit_type_hit = HUDHitDirection.UNIT_TYPE_HIT_PLAYER
 	if self._hud_panel:child("hit_direction_panel") then
 		self._hud_panel:remove(self._hud_panel:child("hit_direction_panel"))
 	end
 	self._hit_direction_panel = self._hud_panel:panel({
 		visible = true,
 		name = "hit_direction_panel",
-		w = 256,
-		h = 256,
+		w = HUDHitDirection.PANEL_SIZE,
+		h = HUDHitDirection.PANEL_SIZE,
 		valign = "center",
 		halign = "center",
 		layer = -5
 	})
-	self._hit_direction_panel:set_center(self._hit_direction_panel:parent():w() / 2, self._hit_direction_panel:parent():h() / 2)
-	local right = self._hit_direction_panel:bitmap({
-		name = "right",
-		visible = true,
-		texture = "guis/textures/pd2/hitdirection",
-		color = Color.white,
-		blend_mode = "add",
-		alpha = 0,
-		halign = "right"
-	})
-	right:set_right(right:parent():w())
-	local tw = right:texture_width()
-	local th = right:texture_height()
-	local left = self._hit_direction_panel:bitmap({
-		name = "left",
-		rotation = 180,
-		visible = true,
-		texture = "guis/textures/pd2/hitdirection",
-		color = Color.white,
-		blend_mode = "add",
-		alpha = 0,
-		halign = "right"
-	})
-	left:set_left(0)
-	local up = self._hit_direction_panel:bitmap({
-		name = "up",
-		rotation = -90,
-		visible = true,
-		texture = "guis/textures/pd2/hitdirection",
-		color = Color.white,
-		blend_mode = "add",
-		alpha = 0,
-		halign = "right"
-	})
-	up:set_top(-tw * 1.5)
-	up:set_center_x(up:parent():w() / 2)
-	local down = self._hit_direction_panel:bitmap({
-		name = "down",
-		rotation = 90,
-		visible = true,
-		texture = "guis/textures/pd2/hitdirection",
-		color = Color.white,
-		blend_mode = "add",
-		alpha = 0,
-		halign = "right"
-	})
-	down:set_y(tw * 1.5)
-	down:set_center_x(down:parent():w() / 2)
-	self._unit_type_hit = HUDHitDirection.UNIT_TYPE_HIT_PLAYER
+	self._hit_direction_panel:set_center(self._hit_direction_panel:parent():w() * 0.5, self._hit_direction_panel:parent():h() * 0.5)
 end
 
-function HUDHitDirection:on_hit_direction(dir, unit_type_hit)
-	self._unit_type_hit = unit_type_hit
-	local direction = self._hit_direction_panel:child(dir)
-	direction:stop()
-	direction:animate(callback(self, self, "_animate_hit_direction"))
+function HUDHitDirection:on_hit_direction(origin, damage_type)
+	self:_add_hit_indicator(origin or Vector3(0, 0, 0), damage_type)
 end
 
-function HUDHitDirection:_animate_hit_direction(direction)
-	direction:set_alpha(1)
-	local st = 0.6
-	local t = st
-	local st_red_t = 0.4
-	local red_t = st_red_t
-	while 0 < t do
-		local dt = coroutine.yield()
-		t = t - dt
-		red_t = math.clamp(red_t - dt, 0, 1)
-		if self._unit_type_hit == HUDHitDirection.UNIT_TYPE_HIT_VEHICLE then
-			direction:set_color(Color(1, 1, red_t / st_red_t))
-		else
-			direction:set_color(Color(1, red_t / st_red_t, red_t / st_red_t))
-		end
-		direction:set_alpha(t / st)
+function HUDHitDirection:_add_hit_indicator(damage_origin, damage_type)
+	damage_type = damage_type or HUDHitDirection.DAMAGE_TYPES.HEALTH
+	local hit = self._hit_direction_panel:bitmap({
+		rotation = 0,
+		visible = true,
+		texture = "guis/textures/pd2/hitdirection",
+		color = Color.white,
+		blend_mode = "add",
+		alpha = 1
+	})
+	hit:set_center(HUDHitDirection.PANEL_SIZE * 0.5, HUDHitDirection.PANEL_SIZE * 0.5)
+	local data = {
+		origin = damage_origin,
+		duration = 0.8,
+		damage_type = damage_type,
+		bitmap = hit
+	}
+	hit:animate(callback(self, self, "_animate"), data, callback(self, self, "_remove"))
+end
+
+function HUDHitDirection:_get_indicator_color(damage_type, t)
+	if damage_type == HUDHitDirection.DAMAGE_TYPES.HEALTH then
+		return Color(1, t, t)
+	elseif damage_type == HUDHitDirection.DAMAGE_TYPES.ARMOUR then
+		return Color(t, 0.8, 1)
+	elseif damage_type == HUDHitDirection.DAMAGE_TYPES.VEHICLE then
+		return Color(1, 0.8, t)
+	else
+		return Color(1, t, t)
 	end
-	direction:set_alpha(0)
+end
+
+function HUDHitDirection:_animate(indicator, data, remove_func)
+	data.t = data.duration
+	data.col_start = 0.7
+	data.col = 0.4
+	while data.t > 0 do
+		local dt = coroutine.yield()
+		data.t = data.t - dt
+		data.col = math.clamp(data.col - dt, 0, 1)
+		if alive(indicator) then
+			indicator:set_color(self:_get_indicator_color(data.damage_type, data.col / data.col_start))
+			indicator:set_alpha(data.t / data.duration)
+			if managers.player:player_unit() then
+				local ply_camera = managers.player:player_unit():camera()
+				if ply_camera then
+					local target_vec = data.origin - ply_camera:position()
+					local angle = target_vec:to_polar_with_reference(ply_camera:forward(), math.UP).spin
+					local r = HUDHitDirection.PANEL_SIZE * 0.4
+					indicator:set_rotation(90 - angle)
+					indicator:set_center(HUDHitDirection.PANEL_SIZE * 0.5 - math.sin(angle + 180) * r, HUDHitDirection.PANEL_SIZE * 0.5 - math.cos(angle + 180) * r)
+				end
+			end
+		end
+	end
+	remove_func(indicator, data)
+end
+
+function HUDHitDirection:_remove(indicator, data)
+	self._hit_direction_panel:remove(indicator)
 end

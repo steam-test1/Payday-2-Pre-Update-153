@@ -205,6 +205,7 @@ end
 function CivilianLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	data.unit:movement():set_cool(false, managers.groupai:state().analyse_giveaway(data.unit:base()._tweak_table, aggressor_unit))
 	data.unit:movement():set_stance(data.is_tied and "cbt" or "hos")
+	print("CivilianLogicIdle.on_intimidated")
 	local att_obj_data, is_new = CopLogicBase.identify_attention_obj_instant(data, aggressor_unit:key())
 	if not data.char_tweak.intimidateable or data.unit:base().unintimidateable or data.unit:anim_data().unintimidateable then
 		return
@@ -212,6 +213,7 @@ function CivilianLogicIdle.on_intimidated(data, amount, aggressor_unit)
 	if not CivilianLogicIdle.is_obstructed(data, aggressor_unit) then
 		return
 	end
+	print("set objective")
 	data.unit:brain():set_objective({
 		type = "surrender",
 		amount = amount,
@@ -232,7 +234,7 @@ function CivilianLogicIdle.damage_clbk(data, damage_info)
 	})
 end
 
-function CivilianLogicIdle.on_new_objective(data, old_objective)
+function CivilianLogicIdle.on_new_objective(data, old_objective, params)
 	local new_objective = data.objective
 	CivilianLogicIdle.super.on_new_objective(data, old_objective)
 	local my_data = data.internal_data
@@ -244,7 +246,7 @@ function CivilianLogicIdle.on_new_objective(data, old_objective)
 		elseif new_objective.type == "act" then
 			CopLogicBase._exit(data.unit, "idle")
 		elseif data.is_tied then
-			CopLogicBase._exit(data.unit, "surrender")
+			CopLogicBase._exit(data.unit, "surrender", params)
 		elseif new_objective.type == "free" then
 			if data.unit:movement():cool() or not new_objective.is_default then
 				CopLogicBase._exit(data.unit, "idle")
@@ -252,12 +254,12 @@ function CivilianLogicIdle.on_new_objective(data, old_objective)
 				CopLogicBase._exit(data.unit, "flee")
 			end
 		elseif new_objective.type == "surrender" then
-			CopLogicBase._exit(data.unit, "surrender")
+			CopLogicBase._exit(data.unit, "surrender", params)
 		end
 	elseif data.unit:movement():cool() then
 		CopLogicBase._exit(data.unit, "idle")
 	elseif data.is_tied then
-		CopLogicBase._exit(data.unit, "surrender")
+		CopLogicBase._exit(data.unit, "surrender", params)
 	else
 		CopLogicBase._exit(data.unit, "flee")
 	end

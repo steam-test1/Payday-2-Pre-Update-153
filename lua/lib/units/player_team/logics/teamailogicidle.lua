@@ -252,29 +252,38 @@ function TeamAILogicIdle.on_alert(data, alert_data)
 	end
 end
 
-function TeamAILogicIdle.on_long_dis_interacted(data, other_unit)
+function TeamAILogicIdle.on_long_dis_interacted(data, other_unit, secondary)
 	local objective_type, objective_action, interrupt
 	if other_unit:base().is_local_player then
-		if other_unit:character_damage():need_revive() then
+		if not secondary then
+			if other_unit:character_damage():need_revive() then
+				objective_type = "revive"
+				objective_action = "revive"
+			elseif other_unit:character_damage():arrested() then
+				objective_type = "revive"
+				objective_action = "untie"
+			else
+				objective_type = "follow"
+			end
+		else
+			objective_type = "stop"
+		end
+	elseif not secondary then
+		if other_unit:movement():need_revive() then
 			objective_type = "revive"
-			objective_action = "revive"
-		elseif other_unit:character_damage():arrested() then
-			objective_type = "revive"
-			objective_action = "untie"
+			if other_unit:movement():current_state_name() == "arrested" then
+				objective_action = "untie"
+			else
+				objective_action = "revive"
+			end
 		else
 			objective_type = "follow"
 		end
-	elseif other_unit:movement():need_revive() then
-		objective_type = "revive"
-		if other_unit:movement():current_state_name() == "arrested" then
-			objective_action = "untie"
-		else
-			objective_action = "revive"
-		end
 	else
-		objective_type = "follow"
+		objective_type = "stop"
 	end
 	local objective
+	local should_stay = false
 	if objective_type == "follow" then
 		objective = {
 			type = objective_type,
@@ -284,6 +293,15 @@ function TeamAILogicIdle.on_long_dis_interacted(data, other_unit)
 			scan = true
 		}
 		data.unit:sound():say("r01x_sin", true)
+	elseif objective_type == "stop" then
+		objective = {
+			type = "follow",
+			follow_unit = other_unit,
+			called = true,
+			destroy_clbk_key = false,
+			scan = true
+		}
+		should_stay = true
 	else
 		local followup_objective = {
 			type = "act",
@@ -327,6 +345,7 @@ function TeamAILogicIdle.on_long_dis_interacted(data, other_unit)
 		}
 		data.unit:sound():say("r02a_sin", true)
 	end
+	data.unit:movement():set_should_stay(should_stay)
 	data.unit:brain():set_objective(objective)
 end
 
@@ -370,7 +389,7 @@ function TeamAILogicIdle._upd_enemy_detection(data)
 	local delay = CopLogicBase._upd_attention_obj_detection(data, nil, max_reaction)
 	local new_attention, new_prio_slot, new_reaction = TeamAILogicIdle._get_priority_attention(data, data.detected_attention_objects, nil)
 	if (not my_data._intimidate_t or my_data._intimidate_t + 2 < data.t) and not data.cool and not my_data._turning_to_intimidate and not my_data.acting and (not new_attention or not (new_reaction >= AIAttentionObject.REACT_SCARED)) then
-		local can_turn = not data.unit:movement():chk_action_forbidden("walk")
+		local can_turn = not data.unit:movement():chk_action_forbidden("turn")
 		local civ = TeamAILogicIdle.find_civilian_to_intimidate(data.unit, can_turn and 180 or 90, 1200)
 		if civ then
 			my_data._intimidate_t = data.t

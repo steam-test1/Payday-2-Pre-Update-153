@@ -58,7 +58,8 @@ function TeamAIMovement:_upd_location()
 end
 
 function TeamAIMovement:get_location_id()
-	return managers.navigation:get_nav_seg_metadata(self._standing_nav_seg_id).location_id
+	local metadata = managers.navigation:get_nav_seg_metadata(self._standing_nav_seg_id)
+	return metadata and metadata.location_id
 end
 
 function TeamAIMovement:on_cuffed()
@@ -212,4 +213,41 @@ function TeamAIMovement:pre_destroy()
 		self._attention.unit:base():remove_destroy_listener(self._attention.destroy_listener_key)
 		self._attention.destroy_listener_key = nil
 	end
+end
+
+function TeamAIMovement:save(save_data)
+	TeamAIMovement.super.save(self, save_data)
+	save_data.should_stay = self._should_stay
+end
+
+function TeamAIMovement:load(load_data)
+	TeamAIMovement.super.load(self, load_data)
+	if load_data.should_stay then
+		self:set_should_stay(true)
+	end
+end
+
+function TeamAIMovement:set_should_stay(should_stay)
+	if self._should_stay ~= should_stay then
+		self._move_for_revive = true
+		managers.hud:set_ai_stopped(managers.criminals:character_data_by_unit(self._unit).panel_id, should_stay)
+		self._should_stay = should_stay
+		managers.network:session():send_to_peers_synched("sync_team_ai_stopped", self._unit, should_stay)
+		if should_stay then
+			managers.groupai:state():upd_team_AI_distance()
+		end
+	end
+	if Network:is_server() and should_stay and self._unit:brain():objective() and self._unit:brain():objective().type == "revive" and self._move_for_revive then
+		self._move_for_revive = false
+	end
+end
+
+function TeamAIMovement:chk_action_forbidden(action_type)
+	if action_type == "walk" and self._should_stay then
+		if Network:is_server() and self._unit:brain():objective() and self._unit:brain():objective().type == "revive" and self._move_for_revive then
+			return false
+		end
+		return true
+	end
+	return TeamAIMovement.super.chk_action_forbidden(self, action_type)
 end

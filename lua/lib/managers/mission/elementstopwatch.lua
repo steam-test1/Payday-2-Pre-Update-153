@@ -8,7 +8,7 @@ function ElementStopwatch:init(...)
 end
 
 function ElementStopwatch:on_script_activated()
-	self._timer = self:get_random_table_value_float(self:value("timer"))
+	self._timer = 0
 	if not Network:is_server() then
 		return
 	end
@@ -57,10 +57,6 @@ end
 
 function ElementStopwatch:update_timer(t, dt)
 	self._timer = self._timer + dt
-	if self._timer <= 0 then
-		self:remove_updator()
-		self:on_executed()
-	end
 	for id, cb_data in pairs(self._triggers) do
 		if cb_data.time <= self._timer and not cb_data.disabled then
 			cb_data.callback()
@@ -105,7 +101,7 @@ function ElementStopwatch:stopwatch_operation_subtract_time(time)
 end
 
 function ElementStopwatch:stopwatch_operation_reset()
-	self._timer = self:get_random_table_value_float(self:value("timer"))
+	self._timer = 0
 	self:_update_digital_guis_timer()
 end
 
@@ -184,18 +180,27 @@ function ElementStopwatchOperator:on_executed(instigator)
 			elseif self._values.operation == "subtract_time" then
 				element:stopwatch_operation_subtract_time(time)
 			elseif self._values.operation == "reset" then
-				element:stopwatch_operation_reset(time)
+				element:stopwatch_operation_reset()
 			elseif self._values.operation == "set_time" then
 				element:stopwatch_operation_set_time(time)
 			elseif self._values.operation == "save_time" then
 				local time = element:get_time() or 0
-				local saved_time = managers.mission:get_saved_job_value(self:value("save_key")) or time
+				local saved_time = managers.mission:get_saved_job_value(self:value("save_key"))
+				print("[stopwatch] saving stopwatch time", self:value("save_key"), time, saved_time, self:_save_value_ok(time, saved_time))
 				if self:_save_value_ok(time, saved_time) then
-					managers.mission:set_saved_job_value(self:value("save_key"), time)
+					Global.mission_manager.saved_job_values[self:value("save_key")] = time
 				end
 			elseif self._values.operation == "load_time" then
-				local saved_time = managers.mission:get_saved_job_value(self:value("save_key")) or time
-				element:stopwatch_operation_set_time(saved_time)
+				print("[stopwatch] loading stopwatch time", self:value("save_key"), Global.mission_manager.saved_job_values[self:value("save_key")])
+				local saved_time = Global.mission_manager.saved_job_values[self:value("save_key")]
+				if saved_time ~= nil then
+					if type(saved_time) ~= "number" then
+						saved_time = tonumber(saved_time)
+					end
+					if saved_time ~= nil then
+						element:stopwatch_operation_set_time(saved_time)
+					end
+				end
 			end
 		end
 	end
@@ -204,7 +209,7 @@ end
 
 function ElementStopwatchOperator:_save_value_ok(new_time, saved_time)
 	local condition = self:value("condition")
-	if condition == "always" then
+	if condition == "always" or saved_time == nil then
 		return true
 	elseif condition == "equal" then
 		return new_time == saved_time
@@ -291,7 +296,7 @@ end
 
 function ElementStopwatchFilter:_all_elements_ok()
 	for _, id in ipairs(self._values.elements) do
-		if not self:_check_type(self:get_mission_element(id)) then
+		if not self:_check_time(self:get_mission_element(id), self:_get_time()) then
 			return false
 		end
 	end
@@ -300,27 +305,35 @@ end
 
 function ElementStopwatchFilter:_any_elements_ok()
 	for _, id in ipairs(self._values.elements) do
-		if self:_check_type(self:get_mission_element(id)) then
+		if self:_check_time(self:get_mission_element(id), self:_get_time()) then
 			return true
 		end
 	end
 	return false
 end
 
-function ElementStopwatchFilter:_check_type(element)
+function ElementStopwatchFilter:_get_time()
+	local time = self._values.value
+	if self._values.stopwatch_value_ids and #self._values.stopwatch_value_ids > 0 then
+		local element = self:get_mission_element(self._values.stopwatch_value_ids[1])
+		if element then
+			time = element:get_time()
+		end
+	end
+	return time
+end
+
+function ElementStopwatchFilter:_check_time(element, value)
 	if not self._values.check_type or self._values.check_type == "equal" then
-		return element:get_time() == self._values.value
+		return element:get_time() == value
+	elseif self._values.check_type == "less_or_equal" then
+		return value >= element:get_time()
+	elseif self._values.check_type == "greater_or_equal" then
+		return value <= element:get_time()
+	elseif self._values.check_type == "less_than" then
+		return value > element:get_time()
+	elseif self._values.check_type == "greater_than" then
+		return value < element:get_time()
 	end
-	if self._values.check_type == "less_or_equal" then
-		return element:get_time() <= self._values.value
-	end
-	if self._values.check_type == "greater_or_equal" then
-		return element:get_time() >= self._values.value
-	end
-	if self._values.check_type == "less_than" then
-		return element:get_time() < self._values.value
-	end
-	if self._values.check_type == "greater_than" then
-		return element:get_time() > self._values.value
-	end
+	return false
 end

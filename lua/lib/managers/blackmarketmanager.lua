@@ -82,6 +82,7 @@ function BlackMarketManager:_setup_grenades()
 				skill_based = false,
 				amount = 0
 			}
+			print("grenade_id ", inspect(grenade_id))
 			local is_default, weapon_level = managers.upgrades:get_value(grenade_id, self._defaults.grenade)
 			grenades[grenade_id].level = weapon_level
 			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.projectiles[grenade_id].dlc
@@ -313,7 +314,7 @@ function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
 	end
 	if chk_armor_kit then
 		local equipped_deployable = self:equipped_deployable()
-		if managers.player:has_equipment_in_any_slot("armor_kit") and managers.player:get_equipment_amount("armor_kit") > 0 then
+		if managers.player:has_equipment_in_any_slot("armor_kit") and (managers.player:get_equipment_amount("armor_kit") > 0 or game_state_machine and game_state_machine:current_state_name() == "ingame_waiting_for_players") then
 			return self._defaults.armor
 		end
 	end
@@ -3660,6 +3661,7 @@ function BlackMarketManager:get_sorted_grenades(hide_locked)
 	local m_tweak_data = tweak_data.blackmarket.projectiles
 	local l_tweak_data = tweak_data.lootdrop.global_values
 	for id, d in pairs(Global.blackmarket_manager.grenades) do
+		print("id ", inspect(id))
 		if not hide_locked or d.unlocked then
 			table.insert(sort_data, {id, d})
 		end
@@ -3777,7 +3779,9 @@ function BlackMarketManager:on_unaquired_armor(upgrade, id)
 		self._global.armors[self._defaults.armor].owned = true
 		self._global.armors[self._defaults.armor].equipped = true
 		self._global.armors[self._defaults.armor].unlocked = true
-		managers.menu_scene:set_character_armor(self._defaults.armor)
+		if managers.menu_scene then
+			managers.menu_scene:set_character_armor(self._defaults.armor)
+		end
 		MenuCallbackHandler:_update_outfit_information()
 	end
 end
@@ -5005,7 +5009,7 @@ function BlackMarketManager:tradable_dlcs()
 			if item_data.def_id then
 				if item_data.achievement then
 					self:tradable_achievement(category, entry)
-				elseif item_data.dlc and not self._global.tradable_dlcs[category .. "_" .. entry] then
+				elseif (item_data.dlc or item_data.dlc_id) and not self._global.tradable_dlcs[category .. "_" .. entry] then
 					managers.network.account:inventory_reward_dlc(item_data.def_id, callback(self, self, "_clbk_tradable_dlcs"))
 				end
 			end
@@ -6097,7 +6101,6 @@ end
 
 function BlackMarketManager:recoil_addend(name, category, sub_category, recoil_index, silencer, blueprint, current_state, is_single_shot)
 	local addend = 0
-	Application:stack_dump()
 	if recoil_index and 1 <= recoil_index and recoil_index <= #tweak_data.weapon.stats.recoil then
 		local index = recoil_index
 		index = index + managers.player:upgrade_value("weapon", "recoil_index_addend", 0)

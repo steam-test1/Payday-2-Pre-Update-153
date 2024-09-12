@@ -273,7 +273,11 @@ function IngameWaitingForPlayersState:at_enter()
 	managers.music:check_music_switch()
 	managers.music:post_event(managers.music:jukebox_menu_track("loadout"))
 	managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 2)
-	if managers.dyn_resource:is_file_streamer_idle() then
+	local textures_loaded = true
+	if TextureCache.check_textures_loaded then
+		textures_loaded = TextureCache:check_textures_loaded()
+	end
+	if managers.dyn_resource:is_file_streamer_idle() and textures_loaded then
 		managers.network:session():send_to_peers_loaded("set_member_ready", managers.network:session():local_peer():id(), 100, 2, "")
 	else
 		self._last_sent_streaming_status = 0
@@ -303,6 +307,10 @@ function IngameWaitingForPlayersState:clbk_file_streamer_status(workload)
 	self._file_streamer_max_workload = math.max(self._file_streamer_max_workload, workload)
 	local progress = self._file_streamer_max_workload > 0 and 1 - workload / self._file_streamer_max_workload or 1
 	progress = math.ceil(progress * 100)
+	if 99 < progress and (workload ~= 0 or TextureCache.check_textures_loaded and not TextureCache:check_textures_loaded()) then
+		progress = 99
+		workload = math.max(workload, 1)
+	end
 	local local_peer = managers.network:session():local_peer()
 	local_peer:set_streaming_status(progress)
 	managers.network:session():on_streaming_progress_received(local_peer, progress)

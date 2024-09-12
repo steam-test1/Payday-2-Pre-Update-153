@@ -39,17 +39,10 @@ function NewRaycastWeaponBase:init(unit)
 		
 		managers.player:register_message(Message.SetWeaponStagger, self, clbk)
 	end
-	self._temp_reload_mul = 1
 	if self:weapon_tweak_data().bipod_deploy_multiplier then
 		self._property_mgr:set_property("bipod_deploy_multiplier", self:weapon_tweak_data().bipod_deploy_multiplier)
 	end
 	self._bloodthist_value_during_reload = 0
-end
-
-function NewRaycastWeaponBase:get_temp_reload_mul()
-	local mul = self._temp_reload_mul
-	self._temp_reload_mul = 1
-	return mul
 end
 
 function NewRaycastWeaponBase:set_stagger(value)
@@ -58,10 +51,6 @@ end
 
 function NewRaycastWeaponBase:get_property(prop)
 	return self._property_mgr:get_property(prop)
-end
-
-function NewRaycastWeaponBase:set_temp_reload_multiplier(mul)
-	self._temp_reload_mul = mul
 end
 
 function NewRaycastWeaponBase:is_npc()
@@ -280,6 +269,9 @@ function NewRaycastWeaponBase:check_highlight_unit(unit)
 	end
 	unit = unit:in_slot(8) and alive(unit:parent()) and unit:parent() or unit
 	if not unit or not unit:base() then
+		return
+	end
+	if unit:character_damage() and unit:character_damage().dead and unit:character_damage():dead() then
 		return
 	end
 	if unit:base().can_be_marked then
@@ -784,10 +776,10 @@ function NewRaycastWeaponBase:was_gadget_on()
 end
 
 function NewRaycastWeaponBase:gadget_off()
-	self:set_gadget_on(0, true, nil, true)
+	self:set_gadget_on(0, true, nil)
 end
 
-function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
+function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets, current_state)
 	if not ignore_enable and not self._enabled then
 		return
 	end
@@ -814,13 +806,13 @@ function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
 		for i, id in ipairs(gadgets) do
 			gadget = self._parts[id]
 			if gadget then
-				gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
+				gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire, current_state)
 			end
 		end
 	end
 end
 
-function NewRaycastWeaponBase:toggle_gadget()
+function NewRaycastWeaponBase:toggle_gadget(current_state)
 	if not self._enabled then
 		return false
 	end
@@ -828,7 +820,7 @@ function NewRaycastWeaponBase:toggle_gadget()
 	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	if gadgets then
 		gadget_on = (gadget_on + 1) % (#gadgets + 1)
-		self:set_gadget_on(gadget_on, false, gadgets)
+		self:set_gadget_on(gadget_on, false, gadgets, current_state)
 		return true
 	end
 	return false
@@ -1061,6 +1053,9 @@ function NewRaycastWeaponBase:enter_steelsight_speed_multiplier()
 end
 
 function NewRaycastWeaponBase:reload_speed_multiplier()
+	if self._current_reload_speed_multiplier then
+		return self._current_reload_speed_multiplier
+	end
 	local multiplier = 1
 	multiplier = multiplier + (1 - managers.player:upgrade_value(self:weapon_tweak_data().category, "reload_speed_multiplier", 1))
 	if self:weapon_tweak_data().sub_category then
@@ -1163,6 +1158,7 @@ function NewRaycastWeaponBase:start_reload(...)
 		self._started_reload_empty = self:clip_empty()
 		local speed_multiplier = self:reload_speed_multiplier()
 		self._next_shell_reloded_t = managers.player:player_timer():time() + self:_first_shell_reload_expire_t() / speed_multiplier
+		self._current_reload_speed_multiplier = speed_multiplier
 	end
 end
 
@@ -1202,6 +1198,7 @@ end
 
 function NewRaycastWeaponBase:on_reload_stop()
 	self._bloodthist_value_during_reload = 0
+	self._current_reload_speed_multiplier = nil
 end
 
 function NewRaycastWeaponBase:set_timer(timer, ...)

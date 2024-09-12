@@ -103,7 +103,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.melee_damage_stacking = {
 		{melee_multiplier = 1, max_multiplier = 3}
 	}
-	self.ammo_bag_base = 3
+	self.ammo_bag_base = 4
 	self.ecm_jammer_base_battery_life = 20
 	self.ecm_jammer_base_low_battery_life = 8
 	self.ecm_jammer_base_range = 2500
@@ -116,7 +116,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.first_aid_kit = {}
 	self.first_aid_kit.revived_damage_reduction = {
 		{0.7, 5},
-		{0.5, 5}
+		{0.2, 5}
 	}
 	self.grenade_crate_base = 3
 	self.max_grenade_amount = 3
@@ -180,10 +180,10 @@ function UpgradesTweakData:_init_pd2_values()
 		{1.3, 10}
 	}
 	self.values.temporary.swap_weapon_faster = {
-		{1.8, 10}
+		{2, 10}
 	}
 	self.values.temporary.reload_weapon_faster = {
-		{1.8, 10}
+		{2, 10}
 	}
 	self.values.player.melee_kill_increase_reload_speed = {
 		{1.5, 10}
@@ -339,7 +339,8 @@ function UpgradesTweakData:_init_pd2_values()
 		{10, 1.5}
 	}
 	self.values.player.drill_fix_interaction_speed_multiplier = {0.75}
-	self.values.player.drill_autorepair = {0.1, 0.3}
+	self.values.player.drill_autorepair_1 = {0.1}
+	self.values.player.drill_autorepair_2 = {0.2}
 	self.values.player.sentry_gun_deploy_time_multiplier = {0.5}
 	self.values.sentry_gun.armor_multiplier = {2.5}
 	self.values.weapon.single_spread_multiplier = {0.8}
@@ -734,9 +735,9 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.2, 5}
 	}
 	self.values.temporary.revive_damage_reduction = {
-		{0.3, 5}
+		{0.7, 5}
 	}
-	self.values.player.revive_damage_reduction = {0.3}
+	self.values.player.revive_damage_reduction = {0.7}
 	self.values.player.passive_convert_enemies_health_multiplier = {0.55, 0.1}
 	self.values.player.automatic_faster_reload = {
 		{
@@ -942,7 +943,7 @@ function UpgradesTweakData:_init_pd2_values()
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
-			{"200%"}
+			{"50%"}
 		},
 		ammo_reservoir = {
 			{"5"},
@@ -1442,7 +1443,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"75%", "250%"}
 		},
 		jack_of_all_trades = {
-			{"50%"},
+			{"100%"},
 			{"50%"}
 		},
 		tower_defense = {
@@ -1500,7 +1501,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"2", "7"}
 		},
 		fire_trap = {
-			{"10", "7.5"},
+			{"10", "4"},
 			{"10", "50%"}
 		},
 		combat_engineering = {
@@ -1738,6 +1739,20 @@ function UpgradesTweakData:_init_pd2_values()
 			for i, desc in ipairs(skill_version) do
 				self.skill_descs[skill_id][version .. (i == 1 and "" or tostring(i))] = desc
 			end
+		end
+	end
+	local editable_skill_btns = {
+		jack_of_all_trades = {
+			BTN_CHANGE_EQ = function()
+				return managers.localization:btn_macro("change_equipment")
+			end
+		}
+	}
+	self.skill_btns = {}
+	for skill_id, skill_btns in pairs(editable_skill_btns) do
+		self.skill_btns[skill_id] = {}
+		for i, desc in pairs(skill_btns) do
+			self.skill_btns[skill_id][tostring(i)] = desc
 		end
 	end
 	local editable_specialization_descs = {
@@ -5361,7 +5376,7 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_drill_autorepair",
 		upgrade = {
 			category = "player",
-			upgrade = "drill_autorepair",
+			upgrade = "drill_autorepair_1",
 			value = 1
 		}
 	}
@@ -5370,8 +5385,8 @@ function UpgradesTweakData:_player_definitions()
 		name_id = "menu_player_drill_autorepair",
 		upgrade = {
 			category = "player",
-			upgrade = "drill_autorepair",
-			value = 2
+			upgrade = "drill_autorepair_2",
+			value = 1
 		}
 	}
 	self.definitions.player_hostage_trade = {

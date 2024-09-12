@@ -102,6 +102,9 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(49, "parallax_mapping", true)
 	self:setup_setting(50, "video_aa", "fxaa")
 	self:setup_setting(51, "workshop", false)
+	self:setup_setting(52, "enable_fov_based_sensitivity", false)
+	self:setup_setting(53, "quickplay_stealth", true)
+	self:setup_setting(54, "quickplay_loud", true)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)

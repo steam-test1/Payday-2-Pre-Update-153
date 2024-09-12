@@ -475,3 +475,45 @@ function ChallengeManager:mission_set_value(variable, activated)
 		self._global.mission_values[variable] = activated or nil
 	end
 end
+
+function ChallengeManager:check_equipped_team(achievement_data)
+	if achievement_data.equipped_team then
+		local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters
+		local ad = achievement_data.equipped_team
+		local oufit, num_skills
+		for _, peer in pairs(managers.network:session():all_peers()) do
+			oufit = peer:blackmarket_outfit()
+			pass_deployable = not ad.deployable or ad.deployable == oufit.deployable
+			pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
+			pass_armors = not ad.armors or table.contains(ad.armors, oufit.armor) and table.contains(ad.armors, oufit.armor_current)
+			pass_mask = not ad.mask or ad.mask == oufit.mask.mask_id
+			pass_masks = not ad.masks or table.contains(ad.masks, oufit.mask.mask_id)
+			pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == oufit.melee_weapon
+			pass_melee_weapons = not ad.melee_weapons or table.contains(ad.melee_weapons, oufit.melee_weapon)
+			pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
+			pass_primaries = not ad.primaries or table.contains(ad.primaries, oufit.primary.factory_id)
+			pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
+			pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.primary.factory_id), "category")
+			pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
+			pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
+			pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
+			pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.secondary.factory_id), "category")
+			pass_characters = not ad.characters or table.contains(ad.characters, peer:character())
+			pass_skills = not ad.num_skills
+			if not pass_skills then
+				num_skills = 0
+				for tree, points in ipairs(oufit.skills.skills or {0}) do
+					num_skills = num_skills + (tonumber(points) or 0)
+				end
+				pass_skills = num_skills <= ad.num_skills
+			end
+			if ad.reverse_deployable then
+				pass_deployable = not pass_deployable
+			end
+			if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category) or not pass_secondary_category then
+				return false
+			end
+		end
+	end
+	return true
+end

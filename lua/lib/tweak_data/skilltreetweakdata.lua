@@ -220,8 +220,7 @@ function SkillTreeTweakData:init()
 		icon_xy = {3, 8},
 		[1] = {
 			upgrades = {
-				"player_civ_calming_alerts",
-				"player_civ_intimidation_mul"
+				"player_civ_calming_alerts"
 			},
 			cost = self.costs.hightier
 		},
@@ -239,7 +238,8 @@ function SkillTreeTweakData:init()
 		[1] = {
 			upgrades = {
 				"player_intimidate_range_mul",
-				"player_intimidate_aura"
+				"player_intimidate_aura",
+				"player_civ_intimidation_mul"
 			},
 			cost = self.costs.default
 		},

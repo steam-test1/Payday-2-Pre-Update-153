@@ -37,6 +37,7 @@ function DigitalGui:init(unit)
 	if self.BG_COLOR_TYPE then
 		self.BG_COLOR = DigitalGui.COLORS[self.BG_COLOR_TYPE]
 	end
+	self.display_format = self.display_format or "{minutes}:{seconds}"
 	self._number = self._number or 0
 	self._timer = self._timer or 0
 	self._floored_last_timer = self._timer + 1
@@ -263,10 +264,13 @@ function DigitalGui:_update_timer_text()
 	end
 	local minutes_str = minutes < 10 and string.format("0%i", minutes) or tostring(minutes)
 	local seconds_str = seconds < 10 and string.format("0%i", seconds) or tostring(seconds)
-	local text = string.format("%s:%s", minutes_str, seconds_str)
+	local text = self.display_format
+	text = string.gsub(text, "{minutes}", minutes_str)
+	text = string.gsub(text, "{seconds}", seconds_str)
 	if is_precision then
 		local format_str = "%0" .. precision .. "i"
-		text = string.format("%s:%s", text, string.format(format_str, milliseconds))
+		local ms_str = string.format(format_str, milliseconds)
+		text = string.gsub(text, "{milliseconds}", ms_str)
 	end
 	self._title_text:set_text(text)
 end

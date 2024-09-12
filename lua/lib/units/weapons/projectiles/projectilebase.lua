@@ -79,6 +79,7 @@ function ProjectileBase:create_sweep_data()
 end
 
 function ProjectileBase:throw(params)
+	Application:stack_dump()
 	self._owner = params.owner
 	local velocity = params.dir
 	local adjust_z = 50
@@ -113,11 +114,12 @@ function ProjectileBase:throw(params)
 		end
 		local unit_name = tweak_entry.sprint_unit
 		if unit_name then
-			local sprint = World:spawn_unit(Idstring(unit_name), self._unit:position(), self._unit:rotation())
+			local new_dir = Vector3(params.dir.y * -1, params.dir.x, params.dir.z)
+			local sprint = World:spawn_unit(Idstring(unit_name), self._unit:position() + new_dir * 50, self._unit:rotation())
 			local rot = Rotation(params.dir, math.UP)
 			mrotation.x(rot, mvec1)
-			mvector3.multiply(mvec1, 0.25)
-			mvector3.add(mvec1, params.dir)
+			mvector3.multiply(mvec1, 0.15)
+			mvector3.add(mvec1, new_dir)
 			mvector3.add(mvec1, math.UP / 2)
 			mvector3.multiply(mvec1, 100)
 			sprint:push_at(mass, mvec1, sprint:position())

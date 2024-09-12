@@ -20,6 +20,7 @@ function MenuInput:init(logic, ...)
 	self._item_input_action_map[MenuItemWeaponExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemWeaponUpgradeExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemDivider.TYPE] = callback(self, self, "input_item")
+	self._item_input_action_map[MenuItemColoredDivider.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemInput.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemTextBox.TYPE] = callback(self, self, "input_item")
 	self._callback_map = {}
@@ -154,8 +155,10 @@ function MenuInput:mouse_moved(o, x, y, mouse_ws)
 		if alive(row_item.gui_slider) then
 			local where = (x - row_item.gui_slider:world_left()) / (row_item.gui_slider:world_right() - row_item.gui_slider:world_left())
 			local item = self._slider_marker.item
-			item:set_value_by_percentage(where * 100)
-			self._logic:trigger_item(true, item)
+			if item:enabled() then
+				item:set_value_by_percentage(where * 100)
+				self._logic:trigger_item(true, item)
+			end
 			managers.mouse_pointer:set_pointer_image("grab")
 		end
 		return
@@ -361,13 +364,15 @@ function MenuInput:mouse_pressed(o, button, x, y)
 					elseif row_item.gui_slider:inside(x, y) then
 						local where = (x - row_item.gui_slider:world_left()) / (row_item.gui_slider:world_right() - row_item.gui_slider:world_left())
 						local item = row_item.item
-						item:set_value_by_percentage(where * 100)
-						self._logic:trigger_item(true, item)
-						self._slider_marker = {
-							button = button,
-							item = row_item.item,
-							row_item = row_item
-						}
+						if item:enabled() then
+							item:set_value_by_percentage(where * 100)
+							self._logic:trigger_item(true, item)
+							self._slider_marker = {
+								button = button,
+								item = row_item.item,
+								row_item = row_item
+							}
+						end
 					end
 				elseif row_item.type == "kitslot" then
 					local item = self._logic:selected_item()
@@ -588,7 +593,7 @@ function MenuInput:update(t, dt)
 					"menu_edit_skin"
 				}
 				for _, button in ipairs(special_btns) do
-					if self._accept_input and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
+					if self._accept_input and self._controller and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
 						managers.menu:active_menu().renderer:disable_input(0.2)
 						break
 					end

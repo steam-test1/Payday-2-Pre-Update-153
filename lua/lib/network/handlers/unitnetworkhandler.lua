@@ -713,7 +713,7 @@ function UnitNetworkHandler:set_pose(unit, pose_code, sender)
 	unit:movement():sync_pose(pose_code)
 end
 
-function UnitNetworkHandler:long_dis_interaction(target_unit, amount, aggressor_unit)
+function UnitNetworkHandler:long_dis_interaction(target_unit, amount, aggressor_unit, secondary)
 	if not (self._verify_gamestate(self._gamestate_filter.any_ingame) and self._verify_character(target_unit)) or not self._verify_character(aggressor_unit) then
 		return
 	end
@@ -725,7 +725,7 @@ function UnitNetworkHandler:long_dis_interaction(target_unit, amount, aggressor_
 			if target_unit:brain() then
 				if target_unit:brain().on_long_dis_interacted then
 					target_unit:movement():set_cool(false)
-					target_unit:brain():on_long_dis_interacted(amount, aggressor_unit)
+					target_unit:brain():on_long_dis_interacted(amount, aggressor_unit, secondary)
 				end
 			elseif amount == 1 then
 				target_unit:movement():on_morale_boost(aggressor_unit)
@@ -946,6 +946,18 @@ function UnitNetworkHandler:start_revive_player(timer, sender)
 	local player = managers.player:player_unit()
 	if alive(player) then
 		player:character_damage():pause_downed_timer(timer, peer:id())
+	end
+end
+
+function UnitNetworkHandler:pause_downed_timer(unit, sender)
+	if unit.interaction then
+		unit:interaction():set_waypoint_paused(true)
+	end
+end
+
+function UnitNetworkHandler:unpause_downed_timer(unit, sender)
+	if unit.interaction then
+		unit:interaction():set_waypoint_paused(false)
 	end
 end
 
@@ -1809,9 +1821,11 @@ function UnitNetworkHandler:sync_throw_projectile(unit, pos, dir, projectile_typ
 	end
 	local member = managers.network:session():peer(peer_id)
 	local thrower_unit = member and member:unit()
-	unit:base():set_thrower_unit(thrower_unit)
-	if not tweak_entry.throwable and thrower_unit:movement() and thrower_unit:movement():current_state() then
-		unit:base():set_weapon_unit(thrower_unit:movement():current_state()._equipped_unit)
+	if alive(thrower_unit) then
+		unit:base():set_thrower_unit(thrower_unit)
+		if not tweak_entry.throwable and thrower_unit:movement() and thrower_unit:movement():current_state() then
+			unit:base():set_weapon_unit(thrower_unit:movement():current_state()._equipped_unit)
+		end
 	end
 	unit:base():sync_throw_projectile(dir, projectile_type)
 end
@@ -1870,9 +1884,9 @@ function UnitNetworkHandler:sync_detonate_molotov_grenade(unit, ext_name, event_
 	extension:sync_detonate_molotov_grenade(event_id, normal, peer)
 end
 
-function UnitNetworkHandler:sync_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, rpc)
+function UnitNetworkHandler:sync_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, rpc)
 	local peer = self._verify_sender(rpc)
-	managers.fire:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, peer)
+	managers.fire:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit, peer)
 end
 
 function UnitNetworkHandler:server_secure_loot(carry_id, multiplier_level, sender)
@@ -2492,8 +2506,8 @@ function UnitNetworkHandler:sync_char_team(unit, team_index, sender)
 	unit:movement():set_team(team_data)
 end
 
-function UnitNetworkHandler:sync_drill_upgrades(unit, autorepair_level, drill_speed_level, silent, reduced_alert)
-	unit:base():set_skill_upgrades(Drill.create_upgrades(autorepair_level, drill_speed_level, silent, reduced_alert))
+function UnitNetworkHandler:sync_drill_upgrades(unit, autorepair_level_1, autorepair_level_2, drill_speed_level, silent, reduced_alert)
+	unit:base():set_skill_upgrades(Drill.create_upgrades(autorepair_level_1, autorepair_level_2, drill_speed_level, silent, reduced_alert))
 end
 
 function UnitNetworkHandler:sync_vehicle_driving(action, unit, player)
@@ -2746,5 +2760,14 @@ function UnitNetworkHandler:sync_stored_pos(unit, sync, pos, rot)
 	end
 	if alive(unit) then
 		unit:base():sync_stored_pos(sync, pos, rot)
+	end
+end
+
+function UnitNetworkHandler:sync_team_ai_stopped(unit, stopped)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if alive(unit) then
+		unit:movement():set_should_stay(stopped)
 	end
 end

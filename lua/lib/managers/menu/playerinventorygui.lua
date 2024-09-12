@@ -1230,6 +1230,7 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 			}
 		end
 	end
+	self._multi_profile_item = MultiProfileItemGui:new(self._ws, self._panel)
 	self:_round_everything()
 	local box = self:_get_selected_box()
 	if box then
@@ -3275,7 +3276,9 @@ function PlayerInventoryGui:_update_loadout_boxes()
 				dual_image = not player_loadout_data[entry].item_texture and {
 					player_loadout_data[entry].dual_texture_1,
 					player_loadout_data[entry].dual_texture_2
-				}
+				},
+				bg_image = player_loadout_data[entry].item_bg_texture or false,
+				use_background = player_loadout_data[entry].item_bg_texture or false
 			}, true)
 		end
 	end
@@ -3984,7 +3987,7 @@ function PlayerInventoryGui:_update_box_status(box, selected)
 	for i, object_name in ipairs(list) do
 		if box[object_name] then
 			local object = box[object_name]
-			if object.selected_color and object.unselected_color then
+			if object.selected_color and object.unselected_color and alive(object.gui) then
 				if object.gui.children then
 					for _, child in ipairs(object.gui:children()) do
 						if child.children then
@@ -3995,7 +3998,7 @@ function PlayerInventoryGui:_update_box_status(box, selected)
 							child:set_color(selected and object.selected_color or object.unselected_color)
 						end
 					end
-				else
+				elseif object.gui.set_color then
 					object.gui:set_color(selected and object.selected_color or object.unselected_color)
 				end
 			end
@@ -4015,7 +4018,7 @@ function PlayerInventoryGui:_update_box_status(box, selected)
 		end
 	end
 	local text_object = box.text_object
-	if text_object and text_object.selected_text and text_object.unselected_text then
+	if text_object and text_object.selected_text and text_object.unselected_text and alive(text_object.gui) then
 		local panel = box.panel
 		local align = box.params and box.params.text_align or "left"
 		local vertical = box.params and box.params.text_vertical or "top"
@@ -4231,7 +4234,7 @@ function PlayerInventoryGui:mouse_moved(o, x, y)
 				self:_update_stats(box.name)
 				self:_update_box_status(box, true)
 				managers.menu_component:post_event("highlight")
-				if box.select_anim then
+				if alive(box.panel) and box.select_anim then
 					box.panel:stop()
 					box.panel:animate(box.select_anim, box)
 				end
@@ -4239,7 +4242,7 @@ function PlayerInventoryGui:mouse_moved(o, x, y)
 		elseif box.selected then
 			box.selected = false
 			self:_update_box_status(box, false)
-			if box.unselect_anim then
+			if alive(box.panel) and box.unselect_anim then
 				box.panel:stop()
 				box.panel:animate(box.unselect_anim, box)
 			end
@@ -4249,6 +4252,9 @@ function PlayerInventoryGui:mouse_moved(o, x, y)
 		self._mouse_over_selected_box = mouse_over_selected_box
 		self:_update_legends(mouse_over_selected_box)
 	end
+	local u, p = self._multi_profile_item:mouse_moved(x, y)
+	used = u or used
+	pointer = p or pointer
 	self._input_focus = pointer == "arrow" and 2 or 1
 	return used, pointer
 end
@@ -4291,6 +4297,7 @@ function PlayerInventoryGui:mouse_pressed(button, x, y)
 			box.clbks.down(box)
 		end
 	end
+	self._multi_profile_item:mouse_pressed(button, x, y)
 end
 
 function PlayerInventoryGui:unretrieve_box_textures(box)

@@ -456,7 +456,8 @@ function PlayerStandard:_get_input(t, dt)
 		btn_weapon_firemode_press = pressed and self._controller:get_input_pressed("weapon_firemode"),
 		btn_cash_inspect_press = pressed and self._controller:get_input_pressed("cash_inspect"),
 		btn_deploy_bipod = pressed and self._controller:get_input_pressed("deploy_bipod"),
-		btn_change_equipment = pressed and self._controller:get_input_pressed("change_equipment")
+		btn_change_equipment = pressed and self._controller:get_input_pressed("change_equipment"),
+		btn_interact_secondary_press = pressed and self._controller:get_input_pressed("interact_secondary")
 	}
 	if win32 then
 		local i = 1
@@ -1280,6 +1281,7 @@ function PlayerStandard:_is_throwing_grenade()
 end
 
 function PlayerStandard:_check_action_interact(t, input)
+	local keyboard = self._controller.TYPE == "pc" or managers.controller:get_default_wrapper_type() == "pc"
 	local new_action, timer, interact_object
 	if input.btn_interact_press and not self:_action_interact_forbidden() then
 		new_action, timer, interact_object = self._interaction:interact(self._unit, input.data)
@@ -1291,10 +1293,29 @@ function PlayerStandard:_check_action_interact(t, input)
 			self._ext_camera:camera_unit():base():set_limits(80, 50)
 			self:_start_action_interact(t, input, timer, interact_object)
 		end
-		new_action = new_action or self:_start_action_intimidate(t)
+		if not new_action then
+			self._start_intimidate = true
+			self._start_intimidate_t = t
+		end
+	end
+	local secondary_delay = tweak_data.team_ai.stop_action.delay
+	local force_secondary_intimidate = false
+	if not new_action and keyboard and input.btn_interact_secondary_press then
+		force_secondary_intimidate = true
 	end
 	if input.btn_interact_release then
-		self:_interupt_action_interact()
+		if self._start_intimidate then
+			if t < self._start_intimidate_t + secondary_delay then
+				self:_start_action_intimidate(t)
+				self._start_intimidate = false
+			end
+		else
+			self:_interupt_action_interact()
+		end
+	end
+	if (self._start_intimidate or force_secondary_intimidate) and (not keyboard and t > self._start_intimidate_t + secondary_delay or force_secondary_intimidate) then
+		self:_start_action_intimidate(t, true)
+		self._start_intimidate = false
 	end
 	return new_action
 end
@@ -1392,7 +1413,7 @@ function PlayerStandard:_check_action_weapon_firemode(t, input)
 end
 
 function PlayerStandard:_check_action_weapon_gadget(t, input)
-	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() and self._equipped_unit:base():toggle_gadget() then
+	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() and self._equipped_unit:base():toggle_gadget(self) then
 		self._unit:network():send("set_weapon_gadget_state", self._equipped_unit:base()._gadget_on)
 	end
 end
@@ -2066,7 +2087,7 @@ function PlayerStandard:_get_interaction_target(char_table, my_head_pos, cam_fwd
 	return prime_target
 end
 
-function PlayerStandard:_get_intimidation_action(prime_target, char_table, amount, primary_only, detect_only)
+function PlayerStandard:_get_intimidation_action(prime_target, char_table, amount, primary_only, detect_only, secondary)
 	local voice_type, new_action, plural
 	local unit_type_enemy = 0
 	local unit_type_civilian = 1
@@ -2082,7 +2103,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 				if record.ai then
 					if not prime_target.unit:brain():player_ignore() then
 						prime_target.unit:movement():set_cool(false)
-						prime_target.unit:brain():on_long_dis_interacted(0, self._unit)
+						prime_target.unit:brain():on_long_dis_interacted(0, self._unit, secondary)
 					end
 				else
 					is_human_player = true
@@ -2091,20 +2112,22 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 			local amount = 0
 			local rally_skill_data = self._ext_movement:rally_skill_data()
 			if rally_skill_data and rally_skill_data.range_sq > mvector3.distance_sq(self._pos, record.m_pos) then
-				local needs_revive, is_arrested
-				if prime_target.unit:base().is_husk_player then
-					is_arrested = prime_target.unit:movement():current_state_name() == "arrested"
-					needs_revive = prime_target.unit:interaction():active() and prime_target.unit:movement():need_revive() and not is_arrested
-				else
-					is_arrested = prime_target.unit:character_damage():arrested()
-					needs_revive = prime_target.unit:character_damage():need_revive()
-				end
-				if needs_revive and managers.player:has_enabled_cooldown_upgrade("cooldown", "long_dis_revive") then
-					voice_type = "revive"
-					managers.player:disable_cooldown_upgrade("cooldown", "long_dis_revive")
-				elseif not is_arrested and not needs_revive and rally_skill_data.morale_boost_delay_t and managers.player:player_timer():time() > rally_skill_data.morale_boost_delay_t then
-					voice_type = "boost"
-					amount = 1
+				local needs_revive, is_arrested, action_stop
+				if not secondary then
+					if prime_target.unit:base().is_husk_player then
+						is_arrested = prime_target.unit:movement():current_state_name() == "arrested"
+						needs_revive = prime_target.unit:interaction():active() and prime_target.unit:movement():need_revive() and not is_arrested
+					else
+						is_arrested = prime_target.unit:character_damage():arrested()
+						needs_revive = prime_target.unit:character_damage():need_revive()
+					end
+					if needs_revive and managers.player:has_enabled_cooldown_upgrade("cooldown", "long_dis_revive") then
+						voice_type = "revive"
+						managers.player:disable_cooldown_upgrade("cooldown", "long_dis_revive")
+					elseif not is_arrested and not needs_revive and rally_skill_data.morale_boost_delay_t and managers.player:player_timer():time() > rally_skill_data.morale_boost_delay_t then
+						voice_type = "boost"
+						amount = 1
+					end
 				end
 			end
 			if is_human_player then
@@ -2112,10 +2135,11 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 					"long_dis_interaction",
 					prime_target.unit,
 					amount,
-					self._unit
+					self._unit,
+					secondary or false
 				})
 			end
-			voice_type = voice_type or "come"
+			voice_type = voice_type or secondary and "ai_stay" or "come"
 			plural = false
 		else
 			local prime_target_key = prime_target.unit:key()
@@ -2202,7 +2226,7 @@ function PlayerStandard:_get_intimidation_action(prime_target, char_table, amoun
 	return voice_type, plural, prime_target
 end
 
-function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimidate_civilians, intimidate_teammates, only_special_enemies, intimidate_escorts, intimidation_amount, primary_only, detect_only)
+function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimidate_civilians, intimidate_teammates, only_special_enemies, intimidate_escorts, intimidation_amount, primary_only, detect_only, secondary)
 	local char_table = {}
 	local unit_type_enemy = 0
 	local unit_type_civilian = 1
@@ -2215,6 +2239,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	local intimidate_range_civ = tweak_data.player.long_dis_interaction.intimidate_range_civilians * range_mul
 	local intimidate_range_ene = tweak_data.player.long_dis_interaction.intimidate_range_enemies * range_mul
 	local highlight_range = tweak_data.player.long_dis_interaction.highlight_range * range_mul
+	local intimidate_range_teammates = tweak_data.player.long_dis_interaction.intimidate_range_teammates
 	if intimidate_enemies then
 		local enemies = managers.enemy:all_enemies()
 		for u_key, u_data in pairs(enemies) do
@@ -2261,12 +2286,12 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 					end
 					if needs_revive then
 						added = true
-						self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_teammate, 100000, true, true, 5000, my_head_pos, cam_fwd)
+						self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_teammate, intimidate_range_teammates, true, true, 5000, my_head_pos, cam_fwd)
 					end
 				end
 			end
 			if not added and not u_data.is_deployable and not u_data.unit:movement():downed() and not u_data.unit:base().is_local_player and not u_data.unit:anim_data().long_dis_interact_disabled then
-				self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_teammate, 100000, true, true, 0.01, my_head_pos, cam_fwd)
+				self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_teammate, intimidate_range_teammates, true, not secondary, 0.01, my_head_pos, cam_fwd)
 			end
 		end
 	end
@@ -2290,13 +2315,13 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 		end
 	end
 	local prime_target = self:_get_interaction_target(char_table, my_head_pos, cam_fwd)
-	return self:_get_intimidation_action(prime_target, char_table, intimidation_amount, primary_only, detect_only)
+	return self:_get_intimidation_action(prime_target, char_table, intimidation_amount, primary_only, detect_only, secondary)
 end
 
-function PlayerStandard:_start_action_intimidate(t)
+function PlayerStandard:_start_action_intimidate(t, secondary)
 	if not self._intimidate_t or t - self._intimidate_t > tweak_data.player.movement_state.interaction_delay then
 		local skip_alert = managers.groupai:state():whisper_mode()
-		local voice_type, plural, prime_target = self:_get_unit_intimidation_action(true, true, true, false, true, nil, nil, nil)
+		local voice_type, plural, prime_target = self:_get_unit_intimidation_action(not secondary, not secondary, true, false, true, nil, nil, nil, secondary)
 		local interact_type, sound_name
 		local sound_suffix = plural and "plu" or "sin"
 		if voice_type == "stop" then
@@ -2389,6 +2414,9 @@ function PlayerStandard:_start_action_intimidate(t)
 			sound_name = "f44x_any"
 			interact_type = "cmd_point"
 			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_unit_dangerous_damage_bonus" or "mark_unit_dangerous", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
+		elseif voice_type == "ai_stay" then
+			sound_name = "f03a_" .. sound_suffix
+			interact_type = "cmd_stop"
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
 	end
@@ -2513,6 +2541,9 @@ function PlayerStandard:_check_action_jump(t, input)
 end
 
 function PlayerStandard:_start_action_jump(t, action_start_data)
+	if self._running then
+		self:_interupt_action_reload(t)
+	end
 	self:_interupt_action_running(t)
 	self._jump_t = t
 	local jump_vec = action_start_data.jump_vel_z * math.UP
@@ -3029,7 +3060,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						end
 						if fire_mode == "single" and weap_base:get_name_id() ~= "saw" then
 							if not self._state_data.in_steelsight then
-								self._ext_camera:play_redirect(self.IDS_RECOIL, 1)
+								self._ext_camera:play_redirect(self.IDS_RECOIL, weap_base:fire_rate_multiplier())
 							elseif weap_tweak_data.animations.recoil_steelsight then
 								self._ext_camera:play_redirect(weap_base:is_second_sight_on() and self.IDS_RECOIL or self.IDS_RECOIL_STEELSIGHT, 1)
 							end

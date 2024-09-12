@@ -99,6 +99,14 @@ function HostStateBase:_is_kicked(data, peer_name, peer_rpc)
 	end
 end
 
+function HostStateBase:_is_banned(peer_name, peer_rpc)
+	local ident = SystemInfo:platform() == Idstring("WIN32") and peer_rpc:ip_at_index(0) or peer_name
+	Application:error("CHECKING USER:", ident)
+	if managers.ban_list and managers.ban_list:banned(ident) then
+		return true
+	end
+end
+
 function HostStateBase:_chk_peer_owns_current_dlc(data, peer_dlcs)
 	local requires_dlc = tweak_data.levels[Global.game_settings.level_id].dlc
 	if requires_dlc then

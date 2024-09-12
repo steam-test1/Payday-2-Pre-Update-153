@@ -45,8 +45,9 @@ function ScrollablePanel:init(parent_panel, name, data)
 		name = "scroll_down_indicator_shade",
 		layer = layer,
 		x = self:padding(),
-		y = self:panel():h() - self:padding(),
+		y = self:padding(),
 		w = self:canvas():w(),
+		h = self:panel():h() - self:padding() * 2,
 		halign = "right",
 		valign = "bottom",
 		alpha = 0
@@ -55,8 +56,8 @@ function ScrollablePanel:init(parent_panel, name, data)
 		sides = {
 			0,
 			0,
-			2,
-			0
+			0,
+			2
 		}
 	}):set_aligns("scale", "scale")
 	local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
@@ -133,19 +134,24 @@ function ScrollablePanel:scrollbar_padding()
 end
 
 function ScrollablePanel:set_pos(x, y)
-	self:panel():set_pos(x, y)
+	if x ~= nil then
+		self:panel():set_x(x)
+	end
+	if y ~= nil then
+		self:panel():set_y(y)
+	end
 end
 
 function ScrollablePanel:set_size(w, h)
 	self:panel():set_size(w, h)
 	self:scroll_panel():set_size(w - self:padding() * 2, h - self:padding() * 2)
-	self:scroll_panel():set_pos(self:padding(), self:padding())
-	local scroll_up_indicator_arrow = self:scroll_panel():child("scroll_up_indicator_arrow")
-	scroll_up_indicator_arrow:set_top(self:scroll_panel():top() + self:padding())
-	scroll_up_indicator_arrow:set_right(self:scroll_panel():right() - self:scrollbar_padding())
-	local scroll_down_indicator_arrow = self:scroll_panel():child("scroll_down_indicator_arrow")
-	scroll_down_indicator_arrow:set_bottom(self:scroll_panel():bottom() - self:padding())
-	scroll_down_indicator_arrow:set_right(self:scroll_panel():right() - self:scrollbar_padding())
+	self:scroll_panel():set_position(self:padding(), self:padding())
+	local scroll_up_indicator_arrow = self:panel():child("scroll_up_indicator_arrow")
+	scroll_up_indicator_arrow:set_top(self:panel():top() + self:padding() + 6)
+	scroll_up_indicator_arrow:set_right(self:panel():right() - self:scrollbar_padding())
+	local scroll_down_indicator_arrow = self:panel():child("scroll_down_indicator_arrow")
+	scroll_down_indicator_arrow:set_bottom(self:panel():bottom() - self:padding() - 6)
+	scroll_down_indicator_arrow:set_right(self:panel():right() - self:scrollbar_padding())
 	self._scroll_bar:set_bottom(scroll_down_indicator_arrow:top())
 	self._scroll_bar:set_center_x(scroll_down_indicator_arrow:center_x())
 end
@@ -209,6 +215,7 @@ function ScrollablePanel:set_canvas_size(w, h)
 	local show_scrollbar = h > self:scroll_panel():h()
 	if not show_scrollbar then
 		self._scroll_bar:set_alpha(0)
+		self._scroll_bar:set_visible(false)
 		self._scroll_bar_box_class:hide()
 		self:set_element_alpha_target("scroll_up_indicator_arrow", 0, 100)
 		self:set_element_alpha_target("scroll_down_indicator_arrow", 0, 100)
@@ -216,6 +223,7 @@ function ScrollablePanel:set_canvas_size(w, h)
 		self:set_element_alpha_target("scroll_down_indicator_shade", 0, 100)
 	else
 		self._scroll_bar:set_alpha(1)
+		self._scroll_bar:set_visible(true)
 		self._scroll_bar_box_class:show()
 		self:_set_scroll_indicator()
 		self:_check_scroll_indicator_states()

@@ -80,8 +80,10 @@ function BaseInteractionExt:set_tweak_data(id)
 		self._unit:contour():remove_by_id(selected_contour_id)
 		self._selected_contour_id = nil
 	end
-	self.tweak_data = id
-	self._tweak_data = tweak_data.interaction[id]
+	if id then
+		self.tweak_data = id
+		self._tweak_data = tweak_data.interaction[id]
+	end
 	if self._active and self._tweak_data.contour_preset then
 		self._contour_id = self._unit:contour():add(self._tweak_data.contour_preset)
 	end
@@ -1659,7 +1661,7 @@ end
 
 function CarryInteractionExt:interact(player)
 	CarryInteractionExt.super.super.interact(self, player)
-	local peer_id = managers.network:session():local_peer()
+	local peer_id = managers.network:session():local_peer():id()
 	if self._has_modified_timer then
 		managers.achievment:award("murphys_laws")
 		if self._unit:carry_data():latest_peer_id() == peer_id then
@@ -1915,7 +1917,7 @@ function MissionDoorDeviceInteractionExt:server_place_mission_door_device(player
 		end
 		local upgrades = Drill.get_upgrades(self._unit, user_unit)
 		self._unit:base():set_skill_upgrades(upgrades)
-		network_session:send_to_peers_synched("sync_drill_upgrades", self._unit, upgrades.auto_repair_level, upgrades.speed_upgrade_level, upgrades.silent_drill, upgrades.reduced_alert)
+		network_session:send_to_peers_synched("sync_drill_upgrades", self._unit, upgrades.auto_repair_level_1, upgrades.auto_repair_level_2, upgrades.speed_upgrade_level, upgrades.silent_drill, upgrades.reduced_alert)
 	end
 	if self._unit:damage() then
 		self._unit:damage():run_sequence_simple("interact", {unit = player})
@@ -1978,10 +1980,6 @@ function SpecialEquipmentInteractionExt:interact(player)
 		return
 	end
 	SpecialEquipmentInteractionExt.super.super.interact(self, player)
-	managers.player:add_special({
-		name = self._special_equipment
-	})
-	print("self._special_equipment ", inspect(self._special_equipment))
 	if self._remove_on_interact then
 		self:remove_interact()
 		self:set_active(false)

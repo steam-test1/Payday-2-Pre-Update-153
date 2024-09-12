@@ -115,7 +115,7 @@ function WeaponLionGadget1:_is_deployable()
 end
 
 function WeaponLionGadget1:get_offsets()
-	if not self:_get_bipod_obj() then
+	if not self:_get_bipod_obj() or not self:_get_bipod_alignment_obj() then
 		return false
 	end
 	self._bipod_offsets = self._bipod_offsets or {}

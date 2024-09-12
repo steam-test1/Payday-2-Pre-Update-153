@@ -18,6 +18,7 @@ function CivilianBase:post_init()
 	self._ext_movement:post_init()
 	self._unit:brain():post_init()
 	managers.enemy:register_civilian(self._unit)
+	self:enable_leg_arm_hitbox()
 end
 
 function CivilianBase:default_weapon_name()

@@ -11,14 +11,8 @@ function IngameIncapacitatedState:update(t, dt)
 		return
 	end
 	if player:character_damage():update_incapacitated(t, dt) then
-		managers.player:force_drop_carry()
-		managers.statistics:downed({death = true})
 		IngameFatalState.on_local_player_dead()
-		game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
-		player:character_damage():set_invulnerable(true)
-		player:character_damage():set_health(0)
-		player:base():_unregister()
-		World:delete_unit(player)
+		managers.player:on_enter_custody(player, true)
 	end
 end
 

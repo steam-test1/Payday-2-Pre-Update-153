@@ -201,7 +201,7 @@ function MenuNodeEconomySafe:_build_raffle_panel(safe_entry)
 	})
 	local title = managers.localization:text("menu_cash_safe_overdrill_title", {
 		SAFE = managers.localization:text(safe_data.name_id),
-		DRILL = managers.localization:text(drill_data.name_id)
+		DRILL = managers.localization:text(drill_data.name_id or "")
 	})
 	self._raffle_panel:text({
 		name = "title",

@@ -227,7 +227,7 @@ function MenuNodeTableGui:_create_menu_item(row_item)
 		})
 		row_item.difficulty_text = row_item.gui_info_panel:text({
 			name = "difficulty_text",
-			text = utf8.to_upper(managers.localization:text("menu_difficulty_" .. row_item.item:parameters().difficulty)),
+			text = utf8.to_upper(row_item.item:parameters().difficulty and managers.localization:text("menu_difficulty_" .. row_item.item:parameters().difficulty) or "Unknown"),
 			font = tweak_data.menu.pd2_small_font,
 			color = tweak_data.hud.prime_color,
 			font_size = font_size,

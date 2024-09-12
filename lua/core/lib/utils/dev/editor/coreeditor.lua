@@ -15,6 +15,9 @@ core:import("CoreInput")
 core:import("CoreEditorUtils")
 core:import("CoreEditorSave")
 core:import("CoreUnit")
+core:import("CoreStack")
+core:import("CoreEditorCommand")
+core:import("CoreEditorCommandBlock")
 require("core/lib/utils/dev/editor/ews_classes/CoreEditorEwsClasses")
 require("core/lib/utils/dev/editor/ews_classes/UnitByName")
 require("core/lib/utils/dev/editor/ews_classes/SelectByName")
@@ -132,6 +135,8 @@ function CoreEditor:init(game_state_machine, session_state)
 	self._markers = {}
 	self._recent_files_limit = 10
 	self._recent_files = {}
+	self._undo_stack = CoreStack.Stack:new()
+	self._redo_stack = CoreStack.Stack:new()
 	self:_init_slot_masks()
 	self:_init_layer_values()
 	self:_init_edit_setting_values()
@@ -794,6 +799,7 @@ function CoreEditor:run_simulation(with_mission)
 		self:toggle()
 		managers.editor:output("Simulation ended successfully.", nil, Vector3(0, 0, 255))
 	end
+	self._undo_block = nil
 end
 
 function CoreEditor:_simulation_disable_continents()
@@ -902,6 +908,7 @@ function CoreEditor:stop_simulation()
 		self._dialogs.select_by_name:reset()
 	end
 	self:on_enable_all_layers()
+	self._undo_block = nil
 	self:_show_error_log()
 end
 
@@ -1479,6 +1486,12 @@ function CoreEditor:hide_dialog(name)
 	end
 end
 
+function CoreEditor:dialog_visible(name)
+	if self._dialogs[name] then
+		return self._dialogs[name]:visible()
+	end
+end
+
 function CoreEditor:save_configuration()
 	local f = SystemFS:open(managers.database:base_path() .. self._configuration_path .. ".xml", "w")
 	f:puts("<editor_configuration>")
@@ -1973,12 +1986,6 @@ function CoreEditor:get_world_holder_path()
 	return self._world_holder:get_world_file()
 end
 
-function CoreEditor:undo()
-	if self._current_layer and ctrl() then
-		self._current_layer:undo()
-	end
-end
-
 function CoreEditor:list_terminated()
 	local units = {}
 	for _, unit in ipairs(World:find_units_quick("all")) do
@@ -1996,11 +2003,11 @@ function CoreEditor:step_id()
 	return self._STEP_ID
 end
 
-function CoreEditor:get_unit_id(unit)
+function CoreEditor:get_unit_id(unit, start_id)
 	if unit:unit_data().continent then
-		return unit:unit_data().continent:get_unit_id(unit)
+		return unit:unit_data().continent:get_unit_id(unit, start_id)
 	end
-	local i = self._max_id
+	local i = start_id or self._max_id
 	while self._unit_ids[i] do
 		i = i + 1
 	end
@@ -2269,6 +2276,13 @@ function CoreEditor:update(time, rel_time)
 			self._dialogs.edit_unit:update(time, rel_time)
 		end
 		self:_tick_generate_dome_occlusion(time, rel_time)
+	end
+	if self._undo_block then
+		self:_register_undo_command_block(self._undo_block)
+		if managers.editor:undo_debug() then
+			print("[Undo] Saved undo command block: ", self._undo_block)
+		end
+		self._undo_block = nil
 	end
 	self:_update_mute_state(time, rel_time)
 end
@@ -3247,6 +3261,7 @@ function CoreEditor:do_load()
 	for name, dialog in pairs(self._layer_replace_dialogs) do
 		dialog:reset()
 	end
+	self:clear_undo_stack()
 	self._loading = false
 end
 
@@ -3259,6 +3274,7 @@ function CoreEditor:clear_all()
 		self._camera_controller:set_camera_pos(Vector3(0, 0, 0))
 		self._camera_controller:set_camera_rot(Rotation())
 	end
+	self._unit_ids = {}
 	self._continents = {}
 	self._continents_panel:destroy_all_continents()
 	self:create_continent("world", {})
@@ -3749,8 +3765,8 @@ function CoreEditorContinent:base_id()
 	return self._values.base_id
 end
 
-function CoreEditorContinent:get_unit_id(unit)
-	local i = self._values.base_id
+function CoreEditorContinent:get_unit_id(unit, start_id)
+	local i = start_id or self._values.base_id
 	while self._unit_ids[i] do
 		i = i + 1
 	end
@@ -3933,4 +3949,80 @@ end
 
 function CoreEditor:send_message_now(message, uid, ...)
 	self._message_system:notify_now(message, uid, ...)
+end
+
+function CoreEditor:undo()
+	if not ctrl() or not managers.editor:use_beta_undo() then
+		return false
+	end
+	if alt() then
+		if shift() then
+			if managers.editor:undo_debug() and not Input:keyboard():down(Idstring("right shift")) then
+				self:_print_undo_stacks()
+			else
+				self:clear_undo_stack()
+			end
+		end
+		return
+	end
+	if shift() then
+		self:_redo()
+	else
+		self:_undo()
+	end
+end
+
+function CoreEditor:_undo()
+	if not self._undo_stack:is_empty() then
+		local command = self._undo_stack:pop()
+		command:undo()
+		self._redo_stack:push(command)
+	end
+end
+
+function CoreEditor:_redo()
+	if not self._redo_stack:is_empty() then
+		local command = self._redo_stack:pop()
+		command:execute()
+		self._undo_stack:push(command)
+	end
+end
+
+function CoreEditor:register_undo_command(command)
+	if managers.editor:undo_debug() then
+		print("[Undo] Register undo command ", command)
+	end
+	self._undo_block = self._undo_block or CoreEditorCommandBlock.CoreEditorCommandBlock:new()
+	self._undo_block:add_command(command)
+end
+
+function CoreEditor:_register_undo_command_block(block)
+	self._undo_stack:push(block)
+	if self._undo_stack:size() > managers.editor:undo_history_size() then
+		local dif = self._undo_stack:size() - managers.editor:undo_history_size()
+		table.remove(self._undo_stack:stack_table(), 1, dif)
+		self._undo_stack._last = self._undo_stack._last - dif
+	end
+	if not self._redo_stack:is_empty() then
+		self._redo_stack:clear()
+	end
+end
+
+function CoreEditor:clear_undo_stack()
+	self._undo_block = nil
+	self._undo_stack:clear()
+	self._redo_stack:clear()
+	print("[Undo] Undo/Redo stack cleared!")
+end
+
+function CoreEditor:_print_undo_stacks()
+	print("[Undo] undo stack: ")
+	for i, command in pairs(self._undo_stack:stack_table()) do
+		print(string.format("[Undo] %i: %s", i, tostring(command)))
+	end
+	print("[Undo] redo stack: ")
+	for i, command in pairs(self._redo_stack:stack_table()) do
+		print(string.format("[Undo] %i: %s", #self._undo_stack:stack_table() + i, tostring(command)))
+	end
+	print("[Undo] ------")
 end

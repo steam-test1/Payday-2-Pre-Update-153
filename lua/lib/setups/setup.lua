@@ -81,9 +81,12 @@ require("lib/units/UnitDamage")
 require("lib/units/props/DigitalGui")
 require("lib/units/props/TextGui")
 require("lib/units/props/MaterialControl")
+require("lib/managers/MultiProfileManager")
+require("lib/managers/BanListManager")
 require("lib/managers/WorkshopManager")
 require("lib/utils/StatisticsGenerator")
 require("lib/utils/Bitwise")
+require("lib/utils/WeightedSelector")
 require("lib/units/MaskExt")
 script_data = script_data or {}
 game_state_machine = game_state_machine or nil
@@ -190,7 +193,9 @@ function Setup:init_managers(managers)
 	managers.vote = VoteManager:new()
 	managers.vehicle = VehicleManager:new()
 	managers.fire = FireManager:new()
+	managers.multi_profile = MultiProfileManager:new()
 	managers.workshop = WorkshopManager:new()
+	managers.ban_list = BanListManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 

@@ -84,7 +84,7 @@ function FireManager:is_set_on_fire(unit)
 	return false
 end
 
-function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
+function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
 	local contains = false
 	if self._doted_enemies then
 		for _, dot_info in ipairs(self._doted_enemies) do
@@ -100,7 +100,8 @@ function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, wea
 				weapon_unit = weapon_unit,
 				fire_dot_counter = 0,
 				dot_length = dot_length,
-				dot_damage = dot_damage
+				dot_damage = dot_damage,
+				user_unit = user_unit
 			}
 			table.insert(self._doted_enemies, dot_info)
 			self:_start_enemy_fire_effect(dot_info)
@@ -110,16 +111,16 @@ function FireManager:_add_doted_enemy(enemy_unit, fire_damage_received_time, wea
 	end
 end
 
-function FireManager:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
+function FireManager:sync_add_fire_dot(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
 	if enemy_unit then
 		local t = TimerManager:game():time()
-		self:_add_doted_enemy(enemy_unit, t, weapon_unit, dot_length, dot_damage)
+		self:_add_doted_enemy(enemy_unit, t, weapon_unit, dot_length, dot_damage, user_unit)
 	end
 end
 
-function FireManager:add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
-	local dot_info = self:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
-	managers.network:session():send_to_peers_synched("sync_add_doted_enemy", enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage)
+function FireManager:add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
+	local dot_info = self:_add_doted_enemy(enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
+	managers.network:session():send_to_peers_synched("sync_add_doted_enemy", enemy_unit, fire_damage_received_time, weapon_unit, dot_length, dot_damage, user_unit)
 end
 
 function FireManager:_remove_flame_effects_from_doted_unit(enemy_unit)
@@ -185,7 +186,7 @@ function FireManager:_start_enemy_fire_effect(dot_info)
 end
 
 function FireManager:_damage_fire_dot(dot_info)
-	if Network:is_server() then
+	if dot_info.user_unit and dot_info.user_unit == managers.player:player_unit() or not dot_info.user_unit and Network:is_server() then
 		local attacker_unit = managers.player:player_unit()
 		local col_ray = {
 			unit = dot_info.enemy_unit

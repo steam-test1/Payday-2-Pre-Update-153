@@ -56,6 +56,15 @@ function CopBase:post_init()
 	managers.enemy:register_enemy(self._unit)
 	self._allow_invisible = true
 	self:_chk_spawn_gear()
+	self:enable_leg_arm_hitbox()
+end
+
+function CopBase:enable_leg_arm_hitbox()
+	if self._unit:damage() and self._unit:damage():has_sequence("leg_arm_hitbox") then
+		self._unit:damage():run_sequence_simple("leg_arm_hitbox")
+	else
+		Application:error("Unit " .. tostring(self._unit) .. " has no 'leg_arm_hitbox' sequence! Leg and arm hitboxes will not be enabled.")
+	end
 end
 
 function CopBase:_chk_spawn_gear()

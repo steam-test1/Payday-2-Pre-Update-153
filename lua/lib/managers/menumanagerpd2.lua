@@ -9,6 +9,7 @@ require("lib/managers/menu/items/MenuItemMaskExpand")
 require("lib/managers/menu/items/MenuItemArmorExpand")
 require("lib/managers/menu/items/MenuItemCharacterExpand")
 require("lib/managers/menu/items/MenuItemDivider")
+require("lib/managers/menu/items/MenuItemColoredDivider")
 core:import("CoreEvent")
 
 function MenuManager:update(t, dt, ...)
@@ -1050,7 +1051,7 @@ function MenuInitiatorBase:create_divider(node, id, text_id, size, color)
 	return new_item
 end
 
-function MenuInitiatorBase:create_toggle(node, params)
+function MenuInitiatorBase:create_toggle(node, params, index)
 	local data_node = {
 		type = "CoreMenuItemToggle.ItemToggle",
 		{
@@ -1084,7 +1085,11 @@ function MenuInitiatorBase:create_toggle(node, params)
 	}
 	local new_item = node:create_item(data_node, params)
 	new_item:set_enabled(params.enabled)
-	node:add_item(new_item)
+	if index then
+		node:insert_item(new_item, index)
+	else
+		node:add_item(new_item)
+	end
 	return new_item
 end
 
@@ -1398,6 +1403,211 @@ MenuEconomySafeInitiator = MenuEconomySafeInitiator or class()
 function MenuEconomySafeInitiator:modify_node(node, safe_entry)
 	node:parameters().safe_entry = safe_entry
 	return node
+end
+
+MenuBanListInitiator = MenuBanListInitiator or class(MenuInitiatorBase)
+
+function MenuBanListInitiator:modify_node(node)
+	node:clean_items()
+	local added = false
+	local get_identifier = function(peer)
+		return SystemInfo:platform() == Idstring("WIN32") and peer:user_id() or peer:name()
+	end
+	if managers.network:session() then
+		for _, user in pairs(managers.network:session():peers()) do
+			if not managers.ban_list:banned(get_identifier(user)) then
+				self:create_item(node, {
+					enabled = true,
+					name = user:name(),
+					text_id = user:name(),
+					localize = false,
+					align = "left",
+					identifier = get_identifier(user),
+					callback = "ban_player"
+				})
+				added = true
+			end
+		end
+	end
+	if not added then
+		self:create_item(node, {
+			enabled = false,
+			name = "no_ban_items",
+			text_id = "bm_menu_no_items",
+			align = "left"
+		})
+	end
+	added = false
+	for _, user in ipairs(managers.ban_list:ban_list()) do
+		self:create_item(node, {
+			enabled = true,
+			name = user.name,
+			text_id = user.name,
+			localize = false,
+			align = "left",
+			left_column = true,
+			identifier = user.identifier,
+			callback = "unban_player"
+		})
+		added = true
+	end
+	if not added then
+		self:create_item(node, {
+			enabled = false,
+			name = "no_unban_items",
+			text_id = "bm_menu_no_items",
+			align = "left",
+			left_column = true
+		})
+	end
+	self:add_back_button(node)
+	return node
+end
+
+function MenuBanListInitiator:refresh_node(node)
+	self:modify_node(node)
+end
+
+function MenuCallbackHandler:ban_player(item, force)
+	if item:parameters().identifier and item:parameters().name then
+		if not force then
+			local dialog_data = {}
+			dialog_data.title = managers.localization:text("dialog_sure_to_ban_title")
+			dialog_data.text = managers.localization:text("dialog_sure_to_ban_body", {
+				USER = item:parameters().name
+			})
+			local yes_button = {}
+			yes_button.text = managers.localization:text("dialog_yes")
+			yes_button.callback_func = callback(self, self, "ban_player", item, force)
+			local no_button = {}
+			no_button.text = managers.localization:text("dialog_no")
+			no_button.cancel_button = true
+			dialog_data.button_list = {yes_button, no_button}
+			managers.system_menu:show(dialog_data)
+			return
+		else
+			managers.ban_list:ban(item:parameters().identifier, item:parameters().name)
+		end
+	end
+	local node = managers.menu:active_menu().logic:get_node("ban_list")
+	managers.menu:active_menu().renderer:active_node_gui():refresh_gui(node)
+end
+
+function MenuCallbackHandler:unban_player(item, force)
+	if item:parameters().identifier and item:parameters().name then
+		if not force then
+			local dialog_data = {}
+			dialog_data.title = managers.localization:text("dialog_sure_to_unban_title")
+			dialog_data.text = managers.localization:text("dialog_sure_to_unban_body", {
+				USER = item:parameters().name
+			})
+			local yes_button = {}
+			yes_button.text = managers.localization:text("dialog_yes")
+			yes_button.callback_func = callback(self, self, "unban_player", item, force)
+			local no_button = {}
+			no_button.text = managers.localization:text("dialog_no")
+			no_button.cancel_button = true
+			dialog_data.button_list = {yes_button, no_button}
+			managers.system_menu:show(dialog_data)
+			return
+		else
+			managers.ban_list:unban(item:parameters().identifier)
+		end
+	end
+	local node = managers.menu:active_menu().logic:get_node("ban_list")
+	managers.menu:active_menu().renderer:active_node_gui():refresh_gui(node)
+end
+
+function MenuCallbackHandler:start_quickplay_game(item)
+	managers.crimenet:join_quick_play_game()
+end
+
+MenuQuickplaySettingsInitiator = MenuQuickplaySettingsInitiator or class(MenuInitiatorBase)
+
+function MenuQuickplaySettingsInitiator:modify_node(node)
+	local stealth_item = node:item("quickplay_settings_stealth")
+	local loud_item = node:item("quickplay_settings_loud")
+	local stealth_on = managers.user:get_setting("quickplay_stealth")
+	local loud_on = managers.user:get_setting("quickplay_loud")
+	stealth_item:set_value(stealth_on and "on" or "off")
+	loud_item:set_value(loud_on and "on" or "off")
+	stealth_item:set_parameter("loud", loud_item)
+	loud_item:set_parameter("stealth", stealth_item)
+	node:item("quickplay_settings_level_min"):set_max(tweak_data.quickplay.max_level_diff[1])
+	node:item("quickplay_settings_level_min"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_min or tweak_data.quickplay.default_level_diff[1])
+	node:item("quickplay_settings_level_max"):set_max(tweak_data.quickplay.max_level_diff[2])
+	node:item("quickplay_settings_level_max"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_max or tweak_data.quickplay.default_level_diff[2])
+	if node:item("quickplay_settings_difficulty") then
+		node:delete_item("quickplay_settings_difficulty")
+	end
+	local options = {
+		{
+			_meta = "option",
+			text_id = "menu_any",
+			value = "any"
+		}
+	}
+	for _, difficulty in ipairs(tweak_data.difficulties) do
+		if difficulty ~= "easy" then
+			table.insert(options, {
+				_meta = "option",
+				text_id = tweak_data.difficulty_name_ids[difficulty],
+				value = difficulty
+			})
+		end
+	end
+	local difficulty_item = self:create_multichoice(node, options, {
+		name = "quickplay_settings_difficulty",
+		text_id = "menu_quickplay_settings_difficulty",
+		help_id = "menu_quickplay_settings_difficulty",
+		callback = "quickplay_difficulty"
+	}, 1)
+	if Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.difficulty then
+		difficulty_item:set_value(Global.crimenet.quickplay.difficulty)
+	end
+	return node
+end
+
+function MenuQuickplaySettingsInitiator:refresh_node(node)
+	self:modify_node(node)
+end
+
+function MenuCallbackHandler:quickplay_stealth_toggle(item)
+	local on = item:value() == "on"
+	managers.user:set_setting("quickplay_stealth", on)
+	if not on and item:parameter("loud"):value() == "off" then
+		item:parameter("loud"):set_value("on")
+		managers.user:set_setting("quickplay_loud", true)
+	end
+end
+
+function MenuCallbackHandler:quickplay_loud_toggle(item)
+	local on = item:value() == "on"
+	managers.user:set_setting("quickplay_loud", on)
+	if not on and item:parameter("stealth"):value() == "off" then
+		item:parameter("stealth"):set_value("on")
+		managers.user:set_setting("quickplay_stealth", true)
+	end
+end
+
+function MenuCallbackHandler:quickplay_level_min(item)
+	Global.crimenet.quickplay.level_diff_min = math.floor(item:value() + 0.5)
+end
+
+function MenuCallbackHandler:quickplay_level_max(item)
+	Global.crimenet.quickplay.level_diff_max = math.floor(item:value() + 0.5)
+end
+
+function MenuCallbackHandler:save_crimenet()
+	managers.savefile:save_progress()
+end
+
+function MenuCallbackHandler:quickplay_difficulty(item)
+	if item:value() == "any" then
+		Global.crimenet.quickplay.difficulty = nil
+	else
+		Global.crimenet.quickplay.difficulty = item:value()
+	end
 end
 
 MenuSkinEditorInitiator = MenuSkinEditorInitiator or class(MenuInitiatorBase)

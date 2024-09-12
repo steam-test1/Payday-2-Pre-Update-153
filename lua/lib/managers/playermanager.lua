@@ -138,7 +138,7 @@ function PlayerManager:init()
 			if variant ~= "melee" and not self._coroutine_mgr:is_running(PlayerAction.BloodthirstBase) then
 				local data = self:upgrade_value("player", "melee_damage_stacking", nil)
 				
-				if data then
+				if data and type(data) ~= "number" then
 					self._coroutine_mgr:add_coroutine(PlayerAction.BloodthirstBase, PlayerAction.BloodthirstBase, self, data.melee_multiplier, data.max_multiplier)
 				end
 			end
@@ -159,7 +159,7 @@ function PlayerManager:init()
 		self._message_system:register(Message.OnEnemyKilled, "double_ammo_drop", callback(self, self, "_on_spawn_extra_ammo_event"))
 	end
 	if self:has_category_upgrade("temporary", "single_shot_fast_reload") then
-		self._message_system:register(Message.OnHeadShot, "activate_aggressive_reload", callback(self, self, "_on_activate_aggressive_reload_event"))
+		self._message_system:register(Message.OnLethalHeadShot, "activate_aggressive_reload", callback(self, self, "_on_activate_aggressive_reload_event"))
 	end
 	if self:has_category_upgrade("player", "head_shot_ammo_return") then
 		self._ammo_efficiency = self:upgrade_value("player", "head_shot_ammo_return", nil)
@@ -1099,6 +1099,13 @@ function PlayerManager:on_headshot_dealt()
 	if damage_ext and 0 < regen_armor_bonus then
 		damage_ext:restore_armor(regen_armor_bonus)
 	end
+end
+
+function PlayerManager:on_lethal_headshot_dealt()
+	if not self:player_unit() then
+		return
+	end
+	self._message_system:notify(Message.OnLethalHeadShot, nil, nil)
 end
 
 function PlayerManager:_check_damage_to_hot(t, unit, damage_info)
@@ -3918,7 +3925,7 @@ function PlayerManager:_is_all_in_custody(ignored_peer_id)
 	return true
 end
 
-function PlayerManager:on_enter_custody(_player)
+function PlayerManager:on_enter_custody(_player, already_dead)
 	local player = _player or self:player_unit()
 	if not player then
 		Application:error("[PlayerManager:on_enter_custody] Unable to get player")
@@ -3931,8 +3938,10 @@ function PlayerManager:on_enter_custody(_player)
 	end
 	self:force_drop_carry()
 	managers.statistics:downed({death = true})
-	player:network():send("sync_player_movement_state", "dead", player:character_damage():down_time(), player:id())
-	managers.groupai:state():on_player_criminal_death(peer_id)
+	if not already_dead then
+		player:network():send("sync_player_movement_state", "dead", player:character_damage():down_time(), player:id())
+		managers.groupai:state():on_player_criminal_death(peer_id)
+	end
 	game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
 	player:character_damage():set_invulnerable(true)
 	player:character_damage():set_health(0)

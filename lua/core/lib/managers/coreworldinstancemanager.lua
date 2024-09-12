@@ -374,7 +374,7 @@ function CoreWorldInstanceManager:get_mission_outputs(instance)
 		for _, element in ipairs(script_data.elements) do
 			if element.class == "ElementInstanceOutput" then
 				local id = element.id + self._start_offset_index + start_index
-				table.insert(mission_inputs, element.values.event)
+				table.insert(mission_inputs, tostring(element.values.event))
 			end
 		end
 	end

@@ -828,7 +828,7 @@ function CopLogicTravel._set_verified_paths(data, verified_paths)
 end
 
 function CopLogicTravel.chk_should_turn(data, my_data)
-	return not my_data.advancing and not my_data.turning and not my_data.has_old_action and not data.unit:movement():chk_action_forbidden("walk") and (not my_data.coarse_path or not (my_data.coarse_path_index >= #my_data.coarse_path - 1) or not data.objective.rot)
+	return not my_data.advancing and not my_data.turning and not my_data.has_old_action and not data.unit:movement():chk_action_forbidden("turn") and (not my_data.coarse_path or not (my_data.coarse_path_index >= #my_data.coarse_path - 1) or not data.objective.rot)
 end
 
 function CopLogicTravel.complete_coarse_path(data, my_data, coarse_path)

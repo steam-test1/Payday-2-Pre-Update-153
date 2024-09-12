@@ -127,6 +127,9 @@ function PlayerDamage:init(unit)
 	managers.mission:add_global_event_listener("player_regenerate_armor", {
 		"player_regenerate_armor"
 	}, callback(self, self, "_regenerate_armor"))
+	managers.mission:add_global_event_listener("player_force_bleedout", {
+		"player_force_bleedout"
+	}, callback(self, self, "force_into_bleedout", false))
 end
 
 function PlayerDamage:_init_standard_listeners()
@@ -384,8 +387,8 @@ function PlayerDamage:_update_armor_hud(t, dt)
 end
 
 function PlayerDamage:_update_regenerate_timer(t, dt)
-	self._regenerate_timer = self._regenerate_timer - dt * (self._regenerate_speed or 1)
-	if self._regenerate_timer < 0 then
+	self._regenerate_timer = math.max(self._regenerate_timer - dt * (self._regenerate_speed or 1), 0)
+	if self._regenerate_timer <= 0 then
 		self:_regenerate_armor()
 	end
 end
@@ -987,7 +990,7 @@ function PlayerDamage:damage_fall(data)
 	local die = death_limit < data.height
 	self._unit:sound():play("player_hit")
 	managers.environment_controller:hit_feedback_down()
-	managers.hud:on_hit_direction("down")
+	managers.hud:on_hit_direction(self._unit:position(), die and HUDHitDirection.DAMAGE_TYPES.HEALTH or HUDHitDirection.DAMAGE_TYPES.ARMOUR)
 	if self._bleed_out and self._unit:movement():current_state_name() ~= "jerry1" then
 		return
 	end
@@ -1255,6 +1258,9 @@ function PlayerDamage:pause_downed_timer(timer, peer_id)
 		managers.hud:pd_pause_timer()
 		managers.hud:pd_start_progress(0, timer or tweak_data.interaction.revive.timer, "debug_interact_being_revived", "interaction_help")
 	end
+	if Network:is_server() then
+		managers.network:session():send_to_peers("pause_downed_timer", self._unit)
+	end
 end
 
 function PlayerDamage:unpause_downed_timer(peer_id)
@@ -1263,6 +1269,9 @@ function PlayerDamage:unpause_downed_timer(peer_id)
 	if self._downed_paused_counter == 0 then
 		managers.hud:pd_unpause_timer()
 		managers.hud:pd_stop_progress()
+	end
+	if Network:is_server() then
+		managers.network:session():send_to_peers("unpause_downed_timer", self._unit)
 	end
 end
 
@@ -1350,32 +1359,7 @@ end
 
 function PlayerDamage:_hit_direction(col_ray)
 	if col_ray then
-		local dir = col_ray.ray
-		local infront = math.dot(self._unit:camera():forward(), dir)
-		if infront < -0.9 then
-			managers.environment_controller:hit_feedback_front()
-		elseif 0.9 < infront then
-			managers.environment_controller:hit_feedback_back()
-			managers.hud:on_hit_direction("right")
-		else
-			local polar = self._unit:camera():forward():to_polar_with_reference(-dir, Vector3(0, 0, 1))
-			local direction = Vector3(polar.spin, polar.pitch, 0):normalized()
-			if math.abs(direction.x) > math.abs(direction.y) then
-				if 0 > direction.x then
-					managers.environment_controller:hit_feedback_left()
-					managers.hud:on_hit_direction("left")
-				else
-					managers.environment_controller:hit_feedback_right()
-					managers.hud:on_hit_direction("right")
-				end
-			elseif 0 > direction.y then
-				managers.environment_controller:hit_feedback_up()
-				managers.hud:on_hit_direction("up")
-			else
-				managers.environment_controller:hit_feedback_down()
-				managers.hud:on_hit_direction("down")
-			end
-		end
+		managers.hud:on_hit_direction(col_ray.position, self:get_real_armor() > 0 and HUDHitDirection.DAMAGE_TYPES.ARMOUR or HUDHitDirection.DAMAGE_TYPES.HEALTH)
 	end
 end
 
@@ -1576,6 +1560,7 @@ function PlayerDamage:pre_destroy()
 	managers.sequence:remove_inflict_updator_body("fire", self._unit:key(), self._inflict_damage_body:key())
 	CopDamage.unregister_listener("on_damage")
 	managers.mission:remove_global_event_listener("player_regenerate_armor")
+	managers.mission:remove_global_event_listener("player_force_bleedout")
 end
 
 function PlayerDamage:_call_listeners(damage_info)
@@ -1742,7 +1727,7 @@ function PlayerDamage:on_flashbanged(sound_eff_mul)
 	self:_start_tinnitus(sound_eff_mul)
 end
 
-function PlayerDamage:_start_tinnitus(sound_eff_mul)
+function PlayerDamage:_start_tinnitus(sound_eff_mul, skip_explosion_sfx)
 	if self._tinnitus_data then
 		if sound_eff_mul < self._tinnitus_data.intensity then
 			return
@@ -1765,7 +1750,9 @@ function PlayerDamage:_start_tinnitus(sound_eff_mul)
 			snd_event = self._unit:sound():play("tinnitus_beep")
 		}
 	end
-	self._unit:sound():play("flashbang_explode_sfx_player")
+	if not skip_explosion_sfx then
+		self._unit:sound():play("flashbang_explode_sfx_player")
+	end
 end
 
 function PlayerDamage:_stop_tinnitus()

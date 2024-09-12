@@ -4165,6 +4165,17 @@ Play the full version soon to get your full PAYDAY!]],
 		dot_damage = 2,
 		hurt_animation_chance = 0.5
 	}
+	self.quickplay = {}
+	self.quickplay.default_level_diff = {15, 15}
+	self.quickplay.max_level_diff = {40, 40}
+	self.quickplay.stealth_levels = {}
+	self.quickplay.stealth_levels.dark = true
+	self.quickplay.stealth_levels.kosugi = true
+	self.team_ai = {}
+	self.team_ai.stop_action = {}
+	self.team_ai.stop_action.delay = 0.8
+	self.team_ai.stop_action.distance = 3000
+	self.team_ai.stop_action.teleport_distance = 5000
 	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()
@@ -4757,7 +4768,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.vehicle.r2_trigger = {
-			id = "menu_button_unassigned",
+			id = "menu_button_vehicle_exit",
 			x = 511,
 			y = 8,
 			align = "left"
@@ -4986,7 +4997,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.vehicle.r2_trigger = {
-			id = "menu_button_unassigned",
+			id = "menu_button_vehicle_exit",
 			x = 511,
 			y = 55,
 			align = "left"
@@ -5203,7 +5214,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.vehicle.right_shoulder = {
-			id = "menu_button_unassigned",
+			id = "menu_button_vehicle_exit",
 			x = 390,
 			y = -10,
 			align = "center"
@@ -5435,7 +5446,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.vehicle.right_shoulder = {
-			id = "menu_button_unassigned",
+			id = "menu_button_vehicle_exit",
 			x = 512,
 			y = 49,
 			align = "left"

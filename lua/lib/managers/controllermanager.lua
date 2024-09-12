@@ -21,9 +21,20 @@ function ControllerManager:_poll_reconnected_controller()
 		local nr_controllers = Input:num_controllers()
 		for i_controller = 0, nr_controllers - 1 do
 			local controller = Input:controller(i_controller)
-			if controller:type() == "xb1_controller" and (controller:down(12) or controller:pressed(12)) and controller:user_xuid() == active_xuid then
-				self:_close_controller_changed_dialog()
-				self:replace_active_controller(i_controller, controller)
+			if controller:type() == "xb1_controller" and (controller:down(12) or controller:pressed(12)) then
+				print("[ControllerManager:_poll_reconnected_controller] A pressed. controller", controller, i_controller)
+				if controller:user_xuid() == active_xuid then
+					print(" right user")
+					self:_close_controller_changed_dialog()
+					self:replace_active_controller(i_controller, controller)
+				else
+					print(" wrong user. Lets show the account picker! ")
+					self:_close_controller_changed_dialog()
+					local f = function(...)
+						print("result", ...)
+					end
+					managers.system_menu:show_select_user({count = 1, callback_func = f})
+				end
 			end
 		end
 	end

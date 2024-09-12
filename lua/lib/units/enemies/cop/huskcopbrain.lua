@@ -26,7 +26,7 @@ end
 
 function HuskCopBrain:on_intimidated(amount, aggressor_unit)
 	amount = math.clamp(math.ceil(amount * 10), 0, 10)
-	self._unit:network():send_to_host("long_dis_interaction", amount, aggressor_unit)
+	self._unit:network():send_to_host("long_dis_interaction", amount, aggressor_unit, false)
 	return self._interaction_voice
 end
 
@@ -90,9 +90,10 @@ function HuskCopBrain:on_alert(alert_data)
 	self._last_alert_t = TimerManager:game():time()
 end
 
-function HuskCopBrain:on_long_dis_interacted(amount, aggressor_unit)
+function HuskCopBrain:on_long_dis_interacted(amount, aggressor_unit, secondary)
+	secondary = secondary or false
 	amount = math.clamp(math.ceil(amount * 10), 0, 10)
-	self._unit:network():send_to_host("long_dis_interaction", amount, aggressor_unit)
+	self._unit:network():send_to_host("long_dis_interaction", amount, aggressor_unit, secondary)
 end
 
 function HuskCopBrain:player_ignore()

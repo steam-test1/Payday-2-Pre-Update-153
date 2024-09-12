@@ -18,6 +18,7 @@ require("lib/managers/menu/GameInstallingGui")
 require("lib/managers/menu/PlayerInventoryGui")
 require("lib/managers/hud/HUDLootScreen")
 require("lib/managers/menu/SkillTreeGuiNew")
+require("lib/managers/menu/MultiProfileItemGui")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()

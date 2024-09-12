@@ -29,14 +29,12 @@ end
 function StopwatchUnitElement:update_selected()
 	for _, id in pairs(self._hed.digital_gui_unit_ids) do
 		if not alive(self._digital_gui_units[id]) then
-			table.delete(self._hed.digital_gui_unit_ids, id)
-			self._digital_gui_units[id] = nil
+			self:_remove_unit(managers.editor:unit_with_id(id))
 		end
 	end
 	for id, unit in pairs(self._digital_gui_units) do
 		if not alive(unit) then
-			table.delete(self._hed.digital_gui_unit_ids, id)
-			self._digital_gui_units[id] = nil
+			self:_remove_unit(managers.editor:unit_with_id(id))
 		else
 			local params = {
 				from_unit = self._unit,
@@ -54,14 +52,12 @@ end
 function StopwatchUnitElement:update_unselected(t, dt, selected_unit, all_units)
 	for _, id in pairs(self._hed.digital_gui_unit_ids) do
 		if not alive(self._digital_gui_units[id]) then
-			table.delete(self._hed.digital_gui_unit_ids, id)
-			self._digital_gui_units[id] = nil
+			self:_remove_unit(managers.editor:unit_with_id(id))
 		end
 	end
 	for id, unit in pairs(self._digital_gui_units) do
 		if not alive(unit) then
-			table.delete(self._hed.digital_gui_unit_ids, id)
-			self._digital_gui_units[id] = nil
+			self:_remove_unit(managers.editor:unit_with_id(id))
 		end
 	end
 end
@@ -109,13 +105,19 @@ function StopwatchUnitElement:select_unit()
 end
 
 function StopwatchUnitElement:_remove_unit(unit)
-	self._digital_gui_units[unit:unit_data().unit_id] = nil
-	table.delete(self._hed.digital_gui_unit_ids, unit:unit_data().unit_id)
+	self:remove_link_element("digital_gui_unit_ids", unit:unit_data().unit_id)
 end
 
 function StopwatchUnitElement:_add_unit(unit)
-	self._digital_gui_units[unit:unit_data().unit_id] = unit
-	table.insert(self._hed.digital_gui_unit_ids, unit:unit_data().unit_id)
+	self:add_link_element("digital_gui_unit_ids", unit:unit_data().unit_id)
+end
+
+function StopwatchUnitElement:on_added_link_element(element_name, unit_id)
+	self._digital_gui_units[unit_id] = managers.editor:unit_with_id(unit_id)
+end
+
+function StopwatchUnitElement:on_removed_link_element(element_name, unit_id)
+	self._digital_gui_units[unit_id] = nil
 end
 
 function StopwatchUnitElement:add_triggers(vc)
@@ -143,7 +145,7 @@ function StopwatchUnitElement:_build_panel(panel, panel_sizer)
 		remove_filter = callback(self, self, "_remove_unit_filter"),
 		remove_result = callback(self, self, "_remove_unit")
 	})
-	self:_add_help_text("Creates a stopwatch element. Coutinuously counts up once started until stopped or paused. Can be operated on using the logic_stopwatch_operator. Can be displayed on a digital gui.")
+	self:_add_help_text("Creates a stopwatch element. Continuously counts up once started until stopped or paused. Can be operated on using the logic_stopwatch_operator. Can be displayed on a digital gui.")
 end
 
 StopwatchOperatorUnitElement = StopwatchOperatorUnitElement or class(MissionElement)
@@ -168,15 +170,19 @@ function StopwatchOperatorUnitElement:draw_links(t, dt, selected_unit, all_units
 	StopwatchOperatorUnitElement.super.draw_links(self, t, dt, selected_unit)
 	for _, id in ipairs(self._hed.elements) do
 		local unit = all_units[id]
-		local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
-		if draw then
-			self:_draw_link({
-				from_unit = self._unit,
-				to_unit = unit,
-				r = 0.75,
-				g = 0.75,
-				b = 0.25
-			})
+		if alive(unit) then
+			local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
+			if draw then
+				self:_draw_link({
+					from_unit = self._unit,
+					to_unit = unit,
+					r = 0.75,
+					g = 0.75,
+					b = 0.25
+				})
+			end
+		else
+			self:remove_link_element("elements", id)
 		end
 	end
 end
@@ -195,14 +201,51 @@ function StopwatchOperatorUnitElement:add_element()
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
 			table.delete(self._hed.elements, id)
+			self:remove_link_element("elements", id)
 		else
 			table.insert(self._hed.elements, id)
+			self:add_link_element("elements", id)
 		end
 	end
 end
 
 function StopwatchOperatorUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
+end
+
+function StopwatchOperatorUnitElement:set_element_data(data)
+	StopwatchOperatorUnitElement.super.set_element_data(self, data)
+	self._value_time:set_enabled(false)
+	self._combo_save_condition:set_enabled(false)
+	self._text_save_key:set_enabled(false)
+	local value = self._combo_operation:get_value()
+	if value == "none" then
+		self._help_text:set_value(self._default_help_text)
+	elseif value == "pause" then
+		self._help_text:set_value(self._default_help_text .. "Pauses the stopwatch.")
+	elseif value == "start" then
+		self._help_text:set_value(self._default_help_text .. "Starts the stopwatch counting up.")
+	elseif value == "add_time" then
+		self._help_text:set_value(self._default_help_text .. "Adds the time (+random) to the stopwatch's running time.")
+		self._value_time:set_enabled(true)
+	elseif value == "subtract_time" then
+		self._help_text:set_value(self._default_help_text .. "Subtracts the time (+random) from the stopwatch's running time.")
+		self._value_time:set_enabled(true)
+	elseif value == "reset" then
+		self._help_text:set_value(self._default_help_text .. "Resets the stopwatch to 0 seconds.")
+	elseif value == "set_time" then
+		self._help_text:set_value(self._default_help_text .. "Sets the stopwatch's running time to time (+random).")
+		self._value_time:set_enabled(true)
+	elseif value == "save_time" then
+		self._help_text:set_value(self._default_help_text .. [[
+Saves the running time of the stopwatch to a mission value defined in 'Save/Load Key.'
+The time will only be saved if it's operator is always or equal to/less than/greater than the saved value (if a saved value exists).]])
+		self._combo_save_condition:set_enabled(true)
+		self._text_save_key:set_enabled(true)
+	elseif value == "load_time" then
+		self._help_text:set_value(self._default_help_text .. "Loads the stopwatch time from the mission value defined in 'Save/Load Key.' The time will not be changed if no time was loaded.")
+		self._text_save_key:set_enabled(true)
+	end
 end
 
 function StopwatchOperatorUnitElement:_build_panel(panel, panel_sizer)
@@ -213,7 +256,7 @@ function StopwatchOperatorUnitElement:_build_panel(panel, panel_sizer)
 		"logic_stopwatch/logic_stopwatch"
 	}
 	self:_build_add_remove_unit_from_list(panel, panel_sizer, self._hed.elements, names)
-	self:_build_value_combobox(panel, panel_sizer, "operation", {
+	self._combo_operation = self:_build_value_combobox(panel, panel_sizer, "operation", {
 		"none",
 		"pause",
 		"start",
@@ -224,16 +267,22 @@ function StopwatchOperatorUnitElement:_build_panel(panel, panel_sizer)
 		"save_time",
 		"load_time"
 	}, "Select an operation for the selected elements")
-	self:_build_value_random_number(panel, panel_sizer, "time", {floats = 1, min = 0}, "Amount of time to add, subtract or set to the stopwatch. Used as the default time if can not load the stopwatch.")
+	self._value_time = self:_build_value_random_number(panel, panel_sizer, "time", {floats = 1, min = 0}, "Amount of time to add, subtract or set to the stopwatch. Used as the default time if can not load the stopwatch.")
 	local key_sizer = EWS:BoxSizer("HORIZONTAL")
 	panel_sizer:add(key_sizer, 0, 0, "EXPAND")
 	local key_name = EWS:StaticText(panel, "Save/Load Key:", 0, "")
 	key_sizer:add(key_name, 1, 0, "ALIGN_CENTER_VERTICAL")
-	local key = EWS:TextCtrl(panel, self._hed.save_key, "", "TE_PROCESS_ENTER")
-	key_sizer:add(key, 2, 0, "ALIGN_CENTER_VERTICAL")
-	key:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = key, value = "save_key"})
-	key:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = key, value = "save_key"})
-	self:_build_value_combobox(panel, panel_sizer, "condition", {
+	self._text_save_key = EWS:TextCtrl(panel, self._hed.save_key, "", "TE_PROCESS_ENTER")
+	key_sizer:add(self._text_save_key, 2, 0, "ALIGN_CENTER_VERTICAL")
+	self._text_save_key:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = self._text_save_key,
+		value = "save_key"
+	})
+	self._text_save_key:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = self._text_save_key,
+		value = "save_key"
+	})
+	self._combo_save_condition = self:_build_value_combobox(panel, panel_sizer, "condition", {
 		"always",
 		"equal",
 		"less_than",
@@ -241,7 +290,12 @@ function StopwatchOperatorUnitElement:_build_panel(panel, panel_sizer)
 		"less_or_equal",
 		"greater_or_equal"
 	}, "Select a condition for which the stopwatch value will be saved if a value for the stopwatch is already saved. eg. save if less than the saved value.", "Save Condition")
-	self:_add_help_text("This element can modify logic_stopwatch element. Select stopwatch to modify using insert and clicking on the elements.")
+	self._default_help_text = [[
+This element can modify logic_stopwatch element. Select stopwatch to modify by inserting it.
+
+]]
+	self._help_text = self:_add_help_text(self._default_help_text)
+	self:set_element_data({})
 end
 
 StopwatchTriggerUnitElement = StopwatchTriggerUnitElement or class(MissionElement)
@@ -259,15 +313,19 @@ function StopwatchTriggerUnitElement:draw_links(t, dt, selected_unit, all_units)
 	StopwatchTriggerUnitElement.super.draw_links(self, t, dt, selected_unit)
 	for _, id in ipairs(self._hed.elements) do
 		local unit = all_units[id]
-		local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
-		if draw then
-			self:_draw_link({
-				from_unit = unit,
-				to_unit = self._unit,
-				r = 0.85,
-				g = 0.85,
-				b = 0.25
-			})
+		if alive(unit) then
+			local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
+			if draw then
+				self:_draw_link({
+					from_unit = unit,
+					to_unit = self._unit,
+					r = 0.85,
+					g = 0.85,
+					b = 0.25
+				})
+			end
+		else
+			self:remove_link_element("elements", id)
 		end
 	end
 end
@@ -286,9 +344,9 @@ function StopwatchTriggerUnitElement:add_element()
 		if ray.unit:name() == Idstring(StopwatchUnitElement.ELEMENT_NAME) then
 			local id = ray.unit:unit_data().unit_id
 			if table.contains(self._hed.elements, id) then
-				table.delete(self._hed.elements, id)
+				self:remove_link_element("elements", id)
 			else
-				table.insert(self._hed.elements, id)
+				self:add_link_element("elements", id)
 			end
 		else
 			self:add_on_executed(ray.unit)
@@ -321,28 +379,42 @@ function StopwatchFilterUnitElement:init(unit)
 	StopwatchFilterUnitElement.super.init(self, unit)
 	self._hed.needed_to_execute = "all"
 	self._hed.value = 0
+	self._hed.stopwatch_value_ids = {}
 	self._hed.elements = {}
 	self._hed.check_type = "equal"
 	table.insert(self._save_values, "needed_to_execute")
 	table.insert(self._save_values, "value")
+	table.insert(self._save_values, "stopwatch_value_ids")
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "check_type")
 end
 
 function StopwatchFilterUnitElement:draw_links(t, dt, selected_unit, all_units)
 	StopwatchFilterUnitElement.super.draw_links(self, t, dt, selected_unit)
-	for _, id in ipairs(self._hed.elements) do
+	
+	local function draw_link_element(element_name, id, r, g, b)
 		local unit = all_units[id]
-		local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
-		if draw then
-			self:_draw_link({
-				from_unit = unit,
-				to_unit = self._unit,
-				r = 0.85,
-				g = 0.85,
-				b = 0.25
-			})
+		if alive(unit) then
+			local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
+			if draw then
+				self:_draw_link({
+					from_unit = unit,
+					to_unit = self._unit,
+					r = r or 0.85,
+					g = g or 0.85,
+					b = b or 0.25
+				})
+			end
+		else
+			self:remove_link_element(element_name, id)
 		end
+	end
+	
+	for _, id in ipairs(self._hed.elements) do
+		draw_link_element("elements", id)
+	end
+	for _, id in ipairs(self._hed.stopwatch_value_ids) do
+		draw_link_element("stopwatch_value_ids", id, 0.01, 0.85, 0.85)
 	end
 end
 
@@ -359,15 +431,44 @@ function StopwatchFilterUnitElement:add_element()
 	if ray and ray.unit and ray.unit:name() == Idstring(StopwatchUnitElement.ELEMENT_NAME) then
 		local id = ray.unit:unit_data().unit_id
 		if table.contains(self._hed.elements, id) then
-			table.delete(self._hed.elements, id)
+			self:remove_link_element("elements", id)
 		else
-			table.insert(self._hed.elements, id)
+			self:add_link_element("elements", id)
 		end
 	end
 end
 
 function StopwatchFilterUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
+end
+
+function StopwatchFilterUnitElement:_add_stopwatch_value_unit(params)
+	local dialog = (params.single and SingleSelectUnitByNameModal or SelectUnitByNameModal):new("Add Stopwatch Unit", params.add_filter)
+	for _, unit in ipairs(dialog:selected_units()) do
+		local id = unit:unit_data().unit_id
+		params.add_result(unit)
+	end
+end
+
+function StopwatchFilterUnitElement:_add_unit(unit)
+	if #self._hed.stopwatch_value_ids > 0 then
+		self:_clear_connected_stopwatch_value()
+	end
+	self:add_link_element("stopwatch_value_ids", unit:unit_data().unit_id)
+	self._value_ctrl:set_enabled(false)
+	self._value_ctrl:set_value(string.format("Using stopwatch time from '%s' as value", unit:unit_data().name_id))
+end
+
+function StopwatchFilterUnitElement:_add_unit_filter(unit)
+	return unit:name() == Idstring(StopwatchUnitElement.ELEMENT_NAME)
+end
+
+function StopwatchFilterUnitElement:_clear_connected_stopwatch_value(params)
+	for idx, unit_id in ipairs(self._hed.stopwatch_value_ids) do
+		self:remove_link_element("stopwatch_value_ids", unit_id)
+	end
+	self._value_ctrl:set_enabled(true)
+	self._value_ctrl:set_value(self._hed.value)
 end
 
 function StopwatchFilterUnitElement:_build_panel(panel, panel_sizer)
@@ -379,7 +480,39 @@ function StopwatchFilterUnitElement:_build_panel(panel, panel_sizer)
 	}
 	self:_build_add_remove_unit_from_list(panel, panel_sizer, self._hed.elements, names)
 	self:_build_value_combobox(panel, panel_sizer, "needed_to_execute", {"all", "any"}, "Select how many elements are needed to execute")
-	self:_build_value_number(panel, panel_sizer, "value", {floats = 0}, "Specify value to trigger on.")
+	local horizontal_sizer = EWS:BoxSizer("HORIZONTAL")
+	panel_sizer:add(horizontal_sizer, 0, 1, "EXPAND,LEFT")
+	local number_params = {
+		name = "Value:",
+		panel = panel,
+		sizer = horizontal_sizer,
+		value = self._hed.value,
+		tooltip = "Specify value to trigger on.",
+		name_proportions = 1,
+		ctrlr_proportions = 2,
+		sizer_proportions = 1
+	}
+	local ctrlr = CoreEws.number_controller(number_params)
+	ctrlr:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = "value"})
+	ctrlr:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {ctrlr = ctrlr, value = "value"})
+	self._value_ctrl = ctrlr
+	if 0 < #self._hed.stopwatch_value_ids then
+		local unit = managers.editor:unit_with_id(self._hed.stopwatch_value_ids[1])
+		if unit then
+			self._value_ctrl:set_enabled(false)
+			self._value_ctrl:set_value(string.format("Using stopwatch time from '%s' as value", unit:unit_data().name_id))
+		end
+	end
+	local toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	toolbar:add_tool("SELECT_NAME_LIST", "Select stopwatch unit to use as value", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	toolbar:connect("SELECT_NAME_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_add_stopwatch_value_unit"), {
+		add_filter = callback(self, self, "_add_unit_filter"),
+		add_result = callback(self, self, "_add_unit")
+	})
+	toolbar:add_tool("REMOVE_NAME_LIST", "Remove stopwatch unit being used as value", CoreEws.image_path("toolbar\\delete_16x16.png"), nil)
+	toolbar:connect("REMOVE_NAME_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_clear_connected_stopwatch_value"), {})
+	toolbar:realize()
+	horizontal_sizer:add(toolbar, 0, 1, "EXPAND,LEFT")
 	self:_build_value_combobox(panel, panel_sizer, "check_type", {
 		"equal",
 		"less_than",

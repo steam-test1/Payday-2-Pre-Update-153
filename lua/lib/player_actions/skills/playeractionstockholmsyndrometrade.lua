@@ -9,7 +9,7 @@ function PlayerAction.StockholmSyndromeTrade.Function(pos, peer_id)
 	local previous_state = game_state_machine:current_state_name()
 	local co = coroutine.running()
 	while not quit do
-		if controller:get_input_pressed("jump") then
+		if controller:get_input_pressed("jump") and not managers.hud:chat_focus() then
 			if Network:is_server() then
 				managers.player:init_auto_respawn_callback(pos, peer_id, true)
 				managers.player:change_stockholm_syndrome_count(-1)
@@ -69,7 +69,7 @@ function StockholmSyndromeTradeAction:update(t, dt)
 	if allowed and not self._last_can_use then
 		managers.hint:show_hint("stockholm_syndrome_hint")
 	end
-	if not self._request_hostage_trade and (self._controller:get_input_pressed("jump") or auto_activate) then
+	if not self._request_hostage_trade and (not (not self._controller:get_input_pressed("jump") or managers.hud:chat_focus()) or auto_activate) then
 		local pm = managers.player
 		if Network:is_server() then
 			if allowed then

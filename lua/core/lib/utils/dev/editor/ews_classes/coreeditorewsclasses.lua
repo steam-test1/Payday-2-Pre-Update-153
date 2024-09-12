@@ -746,7 +746,9 @@ function GlobalSelectUnit:init(...)
 	self._units:append_column("Name")
 	list_sizer:add(self._units, 1, 0, "EXPAND")
 	self._units:connect("EVT_COMMAND_LIST_ITEM_SELECTED", callback(self, self, "on_select_unit_dialog"), self._units)
-	self._units:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
+	self._units:connect("EVT_KEY_DOWN", callback(self, self, "key_down"), "")
+	self._units:connect("EVT_KEY_UP", callback(self, self, "key_up"), "")
+	self._units:connect("EVT_KILL_FOCUS", callback(self, self, "_on_units_focus_lost"), "")
 	self._short_name:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "update_list"), nil)
 	self._filter:connect("EVT_COMMAND_TEXT_UPDATED", callback(self, self, "update_list"), nil)
 	self._filter:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
@@ -795,6 +797,111 @@ function GlobalSelectUnit:init(...)
 	self._panel_sizer:add(btn_sizer, 0, 0, "ALIGN_RIGHT")
 	self._dialog_sizer:add(self._panel, 1, 0, "EXPAND")
 	self:set_visible(true)
+end
+
+function GlobalSelectUnit:key_down(ctrlr, event)
+	event:skip()
+	if EWS:name_to_key_code("K_ESCAPE") == event:key_code() then
+		Application:trace("GlobalSelectUnit:key_down(ctrlr, event): ESCAPE")
+		self:on_cancel()
+	elseif EWS:name_to_key_code("K_SPACE") == event:key_code() then
+		self:_show_unit_preview()
+	end
+end
+
+function GlobalSelectUnit:key_up(ctrlr, event)
+	event:skip()
+	if EWS:name_to_key_code("K_ESCAPE") == event:key_code() then
+		Application:trace("GlobalSelectUnit:key_up(ctrlr, event): ESCAPE")
+		self:on_cancel()
+	elseif EWS:name_to_key_code("K_SPACE") == event:key_code() then
+		self:_on_unit_preview_end()
+	end
+end
+
+function GlobalSelectUnit:_show_unit_preview()
+	if self:_is_unit_being_previewed() then
+		self:_on_unit_preview_update()
+		return
+	end
+	self:_on_unit_preview_start(self:_get_selected_unit())
+end
+
+function GlobalSelectUnit:_on_units_focus_lost(ctrlr, event)
+	self:_on_unit_preview_end()
+end
+
+function GlobalSelectUnit:_on_unit_preview_start(unit_to_preview)
+	self._preview_unit = unit_to_preview
+	local previewed_unit_height = self:_calculate_bounding_sphere_radius(unit_to_preview)
+	local desired_distance_to_camera = previewed_unit_height
+	self:_setup_preview_camera(previewed_unit_height, desired_distance_to_camera)
+	local position_in_front_camera = self._new_cam_pos + Application:last_camera_rotation():y() * desired_distance_to_camera
+	unit_to_preview:set_position(position_in_front_camera + (unit_to_preview:position() - unit_to_preview:oobb():center()))
+	self._rotation_point_for_preview = Vector3(unit_to_preview:oobb():center().x, unit_to_preview:oobb():center().y, unit_to_preview:oobb():center().z)
+end
+
+function GlobalSelectUnit:_on_unit_preview_update()
+	local degrees_per_second = 45
+	local time = Application:time()
+	local dt
+	if self._last_preview_update_time == nil then
+		dt = 0.01667
+	else
+		dt = time - self._last_preview_update_time
+	end
+	if 0.01667 <= dt then
+		self:_rotate_around_point(self._preview_unit, self._rotation_point_for_preview, math.UP, dt, degrees_per_second)
+		self._last_preview_update_time = time
+	end
+end
+
+function GlobalSelectUnit:_on_unit_preview_end()
+	if not self:_is_unit_being_previewed() then
+		return
+	end
+	World:delete_unit(self._preview_unit)
+	self._preview_unit = nil
+	managers.viewport:get_current_camera():set_fov(self._old_fov)
+	managers.viewport:get_current_camera():set_position(self._old_cam_pos)
+	self._old_cam_pos = nil
+	self._old_fov = nil
+	self._rotation_point_for_preview = nil
+	self._last_preview_update_time = nil
+end
+
+function GlobalSelectUnit:_is_unit_being_previewed()
+	return self._preview_unit
+end
+
+function GlobalSelectUnit:_get_selected_unit()
+	if self._units:selected_item() == -1 then
+		return
+	end
+	local selected_item_index = self._units:selected_item()
+	local name = managers.editor:get_real_name(self._units:get_item_data(selected_item_index))
+	return CoreUnit.safe_spawn_unit(name, Application:last_camera_position() + Application:last_camera_rotation():y(), Rotation(0, 0, 0))
+end
+
+function GlobalSelectUnit:_setup_preview_camera(previewed_unit_height, desired_distance_to_camera)
+	local one_km = 10000
+	self._old_cam_pos = managers.viewport:get_current_camera():position()
+	self._new_cam_pos = Application:last_camera_position() + math.UP * one_km
+	self._old_fov = managers.viewport:get_current_camera():fov()
+	local new_fov = math.deg(math.atan(previewed_unit_height / (2 * desired_distance_to_camera)))
+	managers.viewport:get_current_camera():set_fov(new_fov)
+	managers.viewport:get_current_camera():set_position(self._new_cam_pos)
+end
+
+function GlobalSelectUnit:_calculate_bounding_sphere_radius(unit)
+	local oobb_diagonal_length = math.sqrt(unit:oobb():size().x * unit:oobb():size().x + unit:oobb():size().y * unit:oobb():size().y + unit:oobb():size().z * unit:oobb():size().z)
+	return oobb_diagonal_length * 2
+end
+
+function GlobalSelectUnit:_rotate_around_point(unit, point_to_rotate_around, axis, dt, speed)
+	unit:set_position(unit:position() - point_to_rotate_around * dt)
+	unit:set_rotation(unit:rotation() * Rotation(axis, speed * dt))
+	unit:set_position(unit:position() + point_to_rotate_around * dt)
 end
 
 function GlobalSelectUnit:_stripped_unit_name(name)

@@ -1,6 +1,6 @@
 InteractionTweakData = InteractionTweakData or class()
 
-function InteractionTweakData:init()
+function InteractionTweakData:init(tweak_data)
 	self.CULLING_DISTANCE = 2000
 	self.INTERACT_DISTANCE = 200
 	self.MAX_INTERACT_DISTANCE = 0

@@ -113,9 +113,7 @@ function MoneyManager:get_civilian_deduction()
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
 	local multiplier = 1
-	if managers.groupai and managers.groupai:state():whisper_mode() then
-		multiplier = multiplier * managers.player:upgrade_value("player", "cleaner_cost_multiplier", 1)
-	end
+	multiplier = multiplier * managers.player:upgrade_value("player", "cleaner_cost_multiplier", 1)
 	return math.round(self:get_tweak_value("money_manager", "killing_civilian_deduction", job_and_difficulty_stars) * multiplier)
 end
 

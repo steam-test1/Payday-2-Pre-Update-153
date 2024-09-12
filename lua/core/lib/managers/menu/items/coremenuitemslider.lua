@@ -10,16 +10,19 @@ function ItemSlider:init(data_node, parameters)
 	self._max = 1
 	self._step = 0.1
 	self._show_value = false
+	self._decimal_count = 5
 	if data_node then
 		self._min = data_node.min or self._min
 		self._max = data_node.max or self._max
 		self._step = data_node.step or self._step
 		self._show_value = data_node.show_value
 		self._show_slider_text = self._show_value or data_node.show_slider_text
+		self._decimal_count = data_node.decimal_count or self._decimal_count
 	end
 	self._min = tonumber(self._min)
 	self._max = tonumber(self._max)
 	self._step = tonumber(self._step)
+	self._decimal_count = tonumber(self._decimal_count)
 	self._value = self._min
 end
 
@@ -52,6 +55,10 @@ function ItemSlider:set_step(value)
 	self._step = value
 end
 
+function ItemSlider:set_decimal_count(value)
+	self._decimal_count = value
+end
+
 function ItemSlider:increase()
 	self:set_value(self._value + self._step)
 end
@@ -61,7 +68,12 @@ function ItemSlider:decrease()
 end
 
 function ItemSlider:percentage()
-	return (self._value - self._min) / (self._max - self._min) * 100
+	local value = tonumber(self:value_string())
+	return (value - self._min) / (self._max - self._min) * 100
+end
+
+function ItemSlider:value_string()
+	return string.format("%." .. self._decimal_count .. "f", self:value())
 end
 
 function ItemSlider:setup_gui(node, row_item)
@@ -152,7 +164,7 @@ function ItemSlider:reload(row_item, node)
 	if not row_item then
 		return
 	end
-	local value = self:show_value() and string.format("%.5f", self:value()) or string.format("%.0f", self:percentage()) .. "%"
+	local value = self:show_value() and self:value_string() or string.format("%.0f", self:percentage()) .. "%"
 	row_item.gui_slider_text:set_text(value)
 	row_item.gui_slider_text:set_visible(self._show_slider_text)
 	local where = row_item.gui_slider:left() + row_item.gui_slider:w() * (self:percentage() / 100)

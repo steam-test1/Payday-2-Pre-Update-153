@@ -2099,7 +2099,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.road.anim_global_param = "melee_road"
 	self.melee_weapons.road.dlc = "wild"
 	self.melee_weapons.road.texture_bundle_folder = "wild"
-	self.melee_weapons.road.type = "knife"
+	self.melee_weapons.road.type = "fists"
 	self.melee_weapons.road.align_objects = {
 		"a_weapon_right"
 	}
@@ -2112,7 +2112,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.road.sounds.hit_body = "road_hit_body"
 	self.melee_weapons.road.sounds.charge = "road_charge"
 	self.melee_weapons.road.stats = {}
-	self.melee_weapons.road.stats.weapon_type = "sharp"
+	self.melee_weapons.road.stats.weapon_type = "blunt"
 	self.melee_weapons.road.stats.min_damage = 7
 	self.melee_weapons.road.stats.max_damage = 45
 	self.melee_weapons.road.stats.min_damage_effect = 1

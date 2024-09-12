@@ -224,6 +224,9 @@ function HUDManager:set_cable_ties_amount(i, amount)
 end
 
 function HUDManager:set_teammate_state(i, state)
+	if state == "player" then
+		self:set_ai_stopped(i, false)
+	end
 	self._teammate_panels[i]:set_state(state)
 end
 
@@ -1664,4 +1667,48 @@ end
 
 function HUDManager:set_custody_respawn_type(is_ai_trade)
 	self._hud_player_custody:set_respawn_type(is_ai_trade)
+end
+
+function HUDManager:set_ai_stopped(ai_id, stopped)
+	local teammate_panel = self._teammate_panels[ai_id]
+	if not teammate_panel or stopped and not teammate_panel._ai then
+		return
+	end
+	local panel = teammate_panel._panel
+	local name = panel:child("name") and string.gsub(panel:child("name"):text(), "%W", "")
+	local label
+	for _, lbl in ipairs(self._hud.name_labels) do
+		if string.gsub(lbl.character_name, "%W", "") == name then
+			label = lbl
+			break
+		end
+	end
+	if stopped then
+		local name_text = panel:child("name")
+		local stop_icon = panel:bitmap({
+			name = "stopped",
+			texture = tweak_data.hud_icons.ai_stopped.texture,
+			texture_rect = tweak_data.hud_icons.ai_stopped.texture_rect
+		})
+		stop_icon:set_w(name_text:h() / 2)
+		stop_icon:set_h(name_text:h())
+		stop_icon:set_left(name_text:right() + 5)
+		stop_icon:set_y(name_text:y())
+		if label then
+			local label_stop_icon = label.panel:bitmap({
+				name = "stopped",
+				texture = tweak_data.hud_icons.ai_stopped.texture,
+				texture_rect = tweak_data.hud_icons.ai_stopped.texture_rect
+			})
+			label_stop_icon:set_right(label.text:left())
+			label_stop_icon:set_center_y(label.text:center_y())
+		end
+	else
+		if panel:child("stopped") then
+			panel:remove(panel:child("stopped"))
+		end
+		if label and label.panel:child("stopped") then
+			label.panel:remove(label.panel:child("stopped"))
+		end
+	end
 end

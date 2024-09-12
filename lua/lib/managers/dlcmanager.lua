@@ -683,160 +683,83 @@ function PS4DLCManager:init()
 	if not Global.dlc_manager then
 		Global.dlc_manager = {}
 		Global.dlc_manager.all_dlc_data = {
-			full_game = {
-				filename = "full_game_key.edat",
-				app_id = "218620",
-				verified = true
-			},
+			full_game = {verified = true, verified_for_TheBigScore = true},
 			preorder = {
-				filename = "preorder.edat",
-				app_id = "247450",
 				product_id = "PAYDAYLOOTBAGDLC",
-				no_install = true
+				verified_for_TheBigScore = false
 			},
-			career_criminal_edition = {
-				filename = "career_criminal_edition.edat",
-				app_id = "218630",
-				verified = true,
-				no_install = true
+			career_criminal_edition = {verified = true, verified_for_TheBigScore = true},
+			alienware_alpha = {verified = true, verified_for_TheBigScore = true},
+			alienware_alpha_promo = {verified = true, verified_for_TheBigScore = true},
+			soundtrack = {verified = true, verified_for_TheBigScore = true},
+			pdth_soundtrack = {verified = true, verified_for_TheBigScore = true},
+			armored_transport = {verified = true, verified_for_TheBigScore = true},
+			gage_pack = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_lmg = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_jobs = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_snp = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_shotgun = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_assault = {verified = true, verified_for_TheBigScore = true},
+			big_bank = {verified = true, verified_for_TheBigScore = true},
+			hl_miami = {verified = true, verified_for_TheBigScore = true},
+			hlm_game = {verified = true, verified_for_TheBigScore = true},
+			character_pack_clover = {verified = true, verified_for_TheBigScore = true},
+			character_pack_dragan = {verified = true, verified_for_TheBigScore = true},
+			hope_diamond = {verified = true, verified_for_TheBigScore = true},
+			the_bomb = {verified = true, verified_for_TheBigScore = true},
+			xmas_soundtrack = {verified = true, verified_for_TheBigScore = true},
+			twitch_pack = {verified = true, verified_for_TheBigScore = true},
+			humble_pack2 = {verified = true, verified_for_TheBigScore = true},
+			gage_pack_historical = {verified = true, verified_for_TheBigScore = true},
+			akm4_pack = {
+				product_id = "PD2DLCBUTCHCAR01",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			alienware_alpha = {
-				filename = "alienware_alpha.edat",
-				app_id = "328861",
-				verified = true,
-				no_install = true
+			character_pack_sokol = {
+				product_id = "PD2DLCSOKOLCHR06",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			alienware_alpha_promo = {
-				filename = "alienware_alpha_promo.edat",
-				app_id = "318720",
-				verified = true,
-				no_install = true
+			bbq = {
+				product_id = "PD2DLCBUTCHBBQ02",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			soundtrack = {
-				filename = "soundtrack.edat",
-				app_id = "254260",
-				verified = true,
-				no_install = true
+			west = {
+				product_id = "PD2DLCBUTCHWES03",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			pdth_soundtrack = {
-				filename = "pdth_soundtrack.edat",
-				app_id = "207816",
-				verified = true,
-				no_install = true
+			arena = {
+				product_id = "PD2DLCALESSOHT04",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			armored_transport = {
-				filename = "armored_transport.edat",
-				app_id = "264610",
-				verified = true,
-				no_install = true
+			kenaz = {
+				product_id = "PD2DLCGOLDENGC05",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			gage_pack = {
-				filename = "gage_pack.edat",
-				app_id = "267380",
-				verified = true,
-				no_install = true
+			turtles = {
+				product_id = "PD2DLCGAGENINJ07",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			gage_pack_lmg = {
-				filename = "gage_pack_lmg.edat",
-				app_id = "275590",
-				verified = true,
-				no_install = true
+			dragon = {
+				product_id = "PD2DLCYAKUZACH08",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			gage_pack_jobs = {
-				filename = "gage_pack_jobs.edat",
-				app_id = "259381",
-				verified = true,
-				no_install = true
+			berry = {
+				product_id = "PD2DLCPOINTBRK10",
+				verified = false,
+				verified_for_TheBigScore = true
 			},
-			gage_pack_snp = {
-				filename = "gage_pack_snp.edat",
-				app_id = "259380",
-				verified = true,
-				no_install = true
-			},
-			gage_pack_shotgun = {
-				filename = "gage_pack_shotgun.edat",
-				app_id = "311050",
-				verified = true,
-				no_install = true
-			},
-			gage_pack_assault = {
-				filename = "gage_pack_assault.edat",
-				app_id = "320030",
-				verified = true,
-				no_install = true
-			},
-			big_bank = {
-				filename = "big_bank.edat",
-				app_id = "306690",
-				verified = true,
-				no_install = true
-			},
-			hl_miami = {
-				filename = "hi_miami.edat",
-				app_id = "323500",
-				verified = true,
-				no_install = true
-			},
-			hlm_game = {
-				filename = "hlm_game.edat",
-				app_id = "219150",
-				no_install = true,
-				verified = true,
-				external = true
-			},
-			character_pack_clover = {
-				filename = "character_pack_clover.edat",
-				app_id = "337661",
-				verified = true,
-				no_install = true
-			},
-			character_pack_dragan = {
-				filename = "character_pack_dragan.edat",
-				app_id = "344140",
-				verified = true,
-				no_install = true
-			},
-			hope_diamond = {
-				filename = "hope_diamond.edat",
-				app_id = "337660",
-				verified = true,
-				no_install = true
-			},
-			the_bomb = {
-				filename = "the_bomb.edat",
-				app_id = "339480",
-				verified = true,
-				no_install = true
-			},
-			xmas_soundtrack = {
-				filename = "xmas_soundtrack.edat",
-				app_id = "267381",
-				verified = true,
-				no_install = true
-			},
-			twitch_pack = {
-				filename = "twitch_pack.edat",
-				app_id = "306110",
-				verified = true,
-				no_install = true
-			},
-			humble_pack2 = {
-				filename = "humble_pack2.edat",
-				app_id = "331040",
-				verified = true,
-				no_install = true
-			},
-			gage_pack_historical = {
-				filename = "gage_pack_historical.edat",
-				app_id = "331900",
-				verified = true,
-				no_install = true
-			},
-			pd2_clan = {
-				filename = "pd2_clan.edat",
-				verified = true,
-				source_id = "103582791433980119"
+			steel = {
+				product_id = "PD2DLCGAGECHIV09",
+				verified = false,
+				verified_for_TheBigScore = true
 			}
 		}
 		self:_verify_dlcs()
@@ -844,11 +767,17 @@ function PS4DLCManager:init()
 end
 
 function PS4DLCManager:_verify_dlcs()
+	if PS3:has_entitlement("PD2WITHBUNDLED01") then
+		local owns_TheBigScore = true
+	end
 	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
 		if dlc_data.is_default or dlc_data.verified == true then
 			dlc_data.verified = true
 		else
 			dlc_data.verified = PS3:has_entitlement(dlc_data.product_id)
+		end
+		if owns_TheBigScore and dlc_data.verified_for_TheBigScore == true then
+			dlc_data.verified = true
 		end
 	end
 end

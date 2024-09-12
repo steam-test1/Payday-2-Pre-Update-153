@@ -129,6 +129,34 @@ function GroupAIStateBase:update(t, dt)
 		self:_debug_draw_drama(t)
 	end
 	self:_upd_debug_draw_attentions()
+	self:upd_team_AI_distance()
+end
+
+function GroupAIStateBase:upd_team_AI_distance()
+	if self:team_ai_enabled() then
+		for _, ai in pairs(self:all_AI_criminals()) do
+			local ai_pos = ai.unit:movement()._m_pos
+			local closest_unit
+			local closest_distance = tweak_data.team_ai.stop_action.teleport_distance * tweak_data.team_ai.stop_action.teleport_distance
+			for _, player in pairs(self:all_player_criminals()) do
+				local distance = mvector3.distance_sq(ai_pos, player.pos)
+				if closest_distance > distance then
+					closest_unit = player.unit
+					closest_distance = distance
+				end
+			end
+			if closest_unit then
+				if ai.unit:movement() and ai.unit:movement()._should_stay and closest_distance > tweak_data.team_ai.stop_action.distance * tweak_data.team_ai.stop_action.distance then
+					ai.unit:movement():set_should_stay(false)
+					print("[GroupAIStateBase:update] team ai is too far away, started moving again")
+				end
+				if closest_distance > tweak_data.team_ai.stop_action.teleport_distance * tweak_data.team_ai.stop_action.teleport_distance then
+					ai.unit:movement():set_position(unit:position())
+					print("[GroupAIStateBase:update] team ai is too far away, teleported to player")
+				end
+			end
+		end
+	end
 end
 
 function GroupAIStateBase:paused_update(t, dt)
@@ -2739,6 +2767,7 @@ function GroupAIStateBase:on_AI_criminal_death(criminal_name, unit)
 	end
 	local respawn_penalty = self._criminals[unit:key()].respawn_penalty or tweak_data.character[unit:base()._tweak_table].damage.base_respawn_time_penalty
 	managers.trade:on_AI_criminal_death(criminal_name, respawn_penalty, self._criminals[unit:key()].hostages_killed or 0)
+	managers.hud:set_ai_stopped(managers.criminals:character_data_by_unit(unit).panel_id, false)
 end
 
 function GroupAIStateBase:on_player_criminal_death(peer_id)

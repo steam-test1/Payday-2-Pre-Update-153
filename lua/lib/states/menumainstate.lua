@@ -69,9 +69,14 @@ function MenuMainState:at_enter(old_state)
 			Global.boot_invite = nil
 			managers.network.matchmake:join_server_with_check(lobby)
 		end
-	elseif (SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1")) and Global.boot_invite and next(Global.boot_invite) then
-		has_invite = true
-		managers.network.matchmake:join_boot_invite()
+	elseif SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1") then
+		if XboxLive:has_boot_invite() then
+			has_invite = true
+		end
+		if Global.boot_invite and next(Global.boot_invite) then
+			has_invite = true
+			managers.network.matchmake:join_boot_invite()
+		end
 	end
 	if Global.open_trial_buy then
 		Global.open_trial_buy = nil

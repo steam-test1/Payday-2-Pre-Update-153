@@ -473,6 +473,7 @@ function CopActionShoot:_get_unit_shoot_pos(t, pos, dis, w_tweak, falloff, i_ran
 	if self._common_data.active_actions[2] and self._common_data.active_actions[2]:type() == "dodge" then
 		hit_chance = hit_chance * self._common_data.active_actions[2]:accuracy_multiplier()
 	end
+	hit_chance = hit_chance * self._unit:character_damage():accuracy_multiplier()
 	if hit_chance > math.random() then
 		mvec3_set(shoot_hist.m_last_pos, pos)
 	else

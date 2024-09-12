@@ -50,6 +50,16 @@ function CriminalsManager.convert_old_to_new_character_workname(workname)
 	return t[workname] or workname
 end
 
+function CriminalsManager.convert_new_to_old_character_workname(workname)
+	local t = {
+		hoxton = "american",
+		wolf = "german",
+		dallas = "russian",
+		chains = "spanish"
+	}
+	return t[workname] or workname
+end
+
 function CriminalsManager.character_names()
 	return tweak_data.criminals.character_names
 end
@@ -508,6 +518,14 @@ function CriminalsManager:is_character_as_AI_level_blocked(name)
 end
 
 function CriminalsManager:get_team_ai_character(index)
-	local char_name = self:get_free_character_name()
+	Global.team_ai = Global.team_ai or {}
+	index = index or 1
+	local char_name
+	if not (not (managers.job and managers.job:on_first_stage()) or managers.job:interupt_stage()) or not Global.team_ai[index] then
+		char_name = self:get_free_character_name()
+		Global.team_ai[index] = char_name
+	else
+		char_name = Global.team_ai[index]
+	end
 	return char_name
 end

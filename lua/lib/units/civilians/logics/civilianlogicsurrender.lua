@@ -7,6 +7,7 @@ CivilianLogicSurrender.wants_rescue = CivilianLogicFlee.wants_rescue
 function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 	CopLogicBase.enter(data, new_logic_name, enter_params)
 	data.unit:brain():cancel_all_pathing_searches()
+	local force_lie_down = enter_params and enter_params.force_lie_down or false
 	local old_internal_data = data.internal_data
 	local my_data = {
 		unit = data.unit
@@ -57,14 +58,37 @@ function CivilianLogicSurrender.enter(data, new_logic_name, enter_params)
 		my_data.outline_detection_task_key = "CivilianLogicIdle._upd_outline_detection" .. tostring(data.key)
 		CopLogicBase.queue_task(my_data, my_data.outline_detection_task_key, CivilianLogicIdle._upd_outline_detection, data, data.t + 2)
 	end
-	if data.objective and data.objective.aggressor_unit then
-		if not data.objective.initial_act then
-			CivilianLogicSurrender.on_intimidated(data, data.objective.amount, data.objective.aggressor_unit, true)
-		else
-			if data.objective.initial_act == "halt" then
-				managers.groupai:state():register_fleeing_civilian(data.key, data.unit)
+	if data.objective and not force_lie_down then
+		if data.objective.aggressor_unit then
+			if not data.objective.initial_act then
+				CivilianLogicSurrender.on_intimidated(data, data.objective.amount, data.objective.aggressor_unit, true)
+			else
+				if data.objective.initial_act == "halt" then
+					managers.groupai:state():register_fleeing_civilian(data.key, data.unit)
+				end
+				CivilianLogicSurrender._do_initial_act(data, data.objective.amount, data.objective.aggressor_unit, data.objective.initial_act)
 			end
-			CivilianLogicSurrender._do_initial_act(data, data.objective.amount, data.objective.aggressor_unit, data.objective.initial_act)
+		end
+	elseif force_lie_down then
+		local anim_data = data.unit:anim_data()
+		if not anim_data.drop then
+			local action_data
+			if not anim_data.panic then
+				action_data = {
+					type = "act",
+					body_part = 1,
+					variant = "panic",
+					clamp_to_graph = true
+				}
+				data.unit:brain():action_request(action_data)
+			end
+			action_data = {
+				type = "act",
+				body_part = 1,
+				clamp_to_graph = true,
+				variant = "drop"
+			}
+			local action_res = data.unit:brain():action_request(action_data)
 		end
 	end
 end

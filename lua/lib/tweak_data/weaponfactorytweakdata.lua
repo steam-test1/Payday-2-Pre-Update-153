@@ -12227,6 +12227,7 @@ function WeaponFactoryTweakData:_init_ksg()
 	self.wpn_fps_sho_ksg.default_blueprint = {
 		"wpn_fps_sho_ksg_b_standard",
 		"wpn_fps_sho_ksg_body_standard",
+		"wpn_fps_sho_ksg_fg_standard",
 		"wpn_fps_upg_o_dd_rear"
 	}
 	self.wpn_fps_sho_ksg.uses_parts = {
@@ -12258,7 +12259,8 @@ function WeaponFactoryTweakData:_init_ksg()
 		"wpn_fps_upg_o_rx30",
 		"wpn_fps_upg_o_cs",
 		"wpn_fps_upg_fl_ass_utg",
-		"wpn_fps_upg_ns_sho_salvo_large"
+		"wpn_fps_upg_ns_sho_salvo_large",
+		"wpn_fps_sho_ksg_b_legendary"
 	}
 	self.wpn_fps_sho_ksg_npc = deep_clone(self.wpn_fps_sho_ksg)
 	self.wpn_fps_sho_ksg_npc.unit = "units/pd2_dlc_gage_shot/weapons/wpn_fps_sho_ksg/wpn_fps_sho_ksg_npc"
@@ -24612,6 +24614,22 @@ function WeaponFactoryTweakData:_init_legendary()
 	self.parts.wpn_fps_sho_boot_fg_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_fg_legendary"
 	self.parts.wpn_fps_sho_boot_o_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_o_legendary"
 	self.parts.wpn_fps_sho_boot_s_legendary.third_unit = "units/payday2_cash/safes/buck/weapons/wpn_third_sho_boot_legendary/wpn_third_sho_boot_s_legendary"
+	self.parts.wpn_fps_sho_ksg_b_legendary = {
+		type = "barrel",
+		name_id = "bm_wp_ksg_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/same/weapons/wpn_fps_sho_ksg_b_legendary/wpn_fps_sho_ksg_b_legendary",
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 6,
+			total_ammo_mod = 2,
+			extra_ammo = 2
+		},
+		unatainable = true,
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_sho_ksg_b_legendary.third_unit = "units/payday2_cash/safes/same/weapons/wpn_third_sho_ksg_b_legendary/wpn_third_sho_ksg_b_legendary"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()

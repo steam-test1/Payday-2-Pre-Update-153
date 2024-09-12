@@ -12,11 +12,19 @@ function SentryGunBrain:init(unit)
 	self._unit:set_extension_update_enabled(Idstring("brain"), false)
 	self._tweak_data = tweak_data.weapon.sentry_gun
 	self._visibility_slotmask = managers.slot:get_mask("AI_visibility_sentry_gun")
+	self._shield_check = managers.slot:get_mask("enemy_shield_check")
 	self._detected_attention_objects = {}
 	self._next_detection_upd_t = 0
 	self._firing = false
 	self._SO_access_str = "teamAI1"
 	self._SO_access = managers.navigation:convert_access_flag(self._SO_access_str)
+	unit:event_listener():add("Brain_on_switch_fire_mode_event", {
+		"on_switch_fire_mode"
+	}, callback(self, self, "_on_switch_fire_mode_event"))
+end
+
+function SentryGunBrain:_on_switch_fire_mode_event(ap_bullets)
+	self._ap_bullets = ap_bullets
 end
 
 function SentryGunBrain:post_init()
@@ -311,6 +319,11 @@ function SentryGunBrain:_select_focus_attention(t)
 		local dot_weight = 1 + mvec3_dot(tmp_vec1, current_fwd)
 		dot_weight = dot_weight * dot_weight * dot_weight
 		total_weight = total_weight * dot_weight
+		if self:_ignore_shield({
+			self._unit
+		}, current_pos, attention_info) then
+			total_weight = total_weight * 0.01
+		end
 		return total_weight
 	end
 	
@@ -377,7 +390,9 @@ function SentryGunBrain:_upd_fire(t)
 		end
 	elseif self._ext_movement:rearming() then
 		self._ext_movement:complete_rearming()
-	elseif attention and attention.reaction and attention.reaction >= AIAttentionObject.REACT_SHOOT and not self._ext_movement:warming_up(t) then
+	elseif attention and attention.reaction and attention.reaction >= AIAttentionObject.REACT_SHOOT and not self._ext_movement:warming_up(t) and not self:_ignore_shield({
+		self._unit
+	}, self._ext_movement:m_head_pos(), self._attention_obj) then
 		local expend_ammo = Network:is_server()
 		local damage_player = attention.unit:base() and attention.unit:base().is_local_player
 		if self._firing then
@@ -622,6 +637,21 @@ function SentryGunBrain:_attention_objective(attention)
 		return attention.unit:brain():objective()
 	end
 	return "unknown"
+end
+
+local up_offs = math.UP * 50
+
+function SentryGunBrain:_ignore_shield(ignore_units, my_pos, attention)
+	if self._ap_bullets then
+		return false
+	end
+	if attention and attention.unit then
+		local hit_shield = World:raycast("ray", my_pos, attention.unit:position() + up_offs, "ignore_unit", ignore_units, "slot_mask", self._shield_check)
+		if hit_shield then
+			return true
+		end
+	end
+	return false
 end
 
 function SentryGunBrain:save(save_data)

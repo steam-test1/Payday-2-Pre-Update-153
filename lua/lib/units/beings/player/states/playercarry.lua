@@ -16,7 +16,6 @@ function PlayerCarry:_enter(enter_data)
 	local my_carry_data = managers.player:get_my_carry_data()
 	if my_carry_data then
 		local carry_data = tweak_data.carry[my_carry_data.carry_id]
-		print("SET CARRY TYPE ON ENTER", carry_data.type)
 		self._tweak_data_name = carry_data.type
 	else
 		self._tweak_data_name = "light"

@@ -82,41 +82,6 @@ function CoreUnitDamage:init(unit, default_body_extension_class, body_extension_
 			self._editor_startup_sequence_callback_id = managers.sequence:add_startup_callback(callback(self, self, "run_editor_startup_sequences"))
 		end
 	end
-	if managers.editor then
-		managers.editor:register_message(EditorMessage.OnUnitRemoved, nil, callback(self, self, "on_unit_removed"))
-		managers.editor:register_message(EditorMessage.OnUnitRestored, nil, callback(self, self, "on_unit_restored"))
-	end
-end
-
-function CoreUnitDamage:on_unit_removed(unit)
-	if not self._trigger_data_map then
-		return
-	end
-	for i, map in pairs(self._trigger_data_map) do
-		for index = #map, 1, -1 do
-			local trigger_data = map[index]
-			if trigger_data.notify_unit == unit then
-				print("CoreUnitDamage marking unit as requiring restore", unit:unit_data().unit_id)
-				trigger_data.notify_unit_restore_id = unit:unit_data().unit_id
-			end
-		end
-	end
-end
-
-function CoreUnitDamage:on_unit_restored(old_id, new_unit)
-	if not self._trigger_data_map then
-		return
-	end
-	for i, map in pairs(self._trigger_data_map) do
-		for index = #map, 1, -1 do
-			local trigger_data = map[index]
-			if trigger_data.notify_unit_restore_id == old_id then
-				print("CoreUnitDamage restoring unit", trigger_data.notify_unit_restore_id, new_unit)
-				trigger_data.notify_unit = new_unit
-				trigger_data.notify_unit_restore_id = nil
-			end
-		end
-	end
 end
 
 function CoreUnitDamage:get_sound_source(object)

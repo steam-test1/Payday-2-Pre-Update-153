@@ -89,7 +89,7 @@ function GenericDialog:update(t, dt)
 	if self._fade_in_time then
 		local alpha = math.clamp((t - self._fade_in_time) / self.FADE_IN_DURATION, 0, 1)
 		self._panel_script:set_fade(alpha)
-		if alpha == 1 then
+		if alpha == 1 and not self._data.delay_input then
 			self:set_input_enabled(true)
 			self._fade_in_time = nil
 		end
@@ -100,6 +100,13 @@ function GenericDialog:update(t, dt)
 		if alpha == 0 then
 			self._fade_out_time = nil
 			self:close()
+		end
+	end
+	if self._data.delay_input then
+		self._data.delay_input = self._data.delay_input - dt
+		if 0 > self._data.delay_input then
+			self:set_input_enabled(true)
+			self._data.delay_input = nil
 		end
 	end
 	if self._input_enabled then

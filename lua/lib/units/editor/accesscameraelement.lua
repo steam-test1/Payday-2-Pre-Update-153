@@ -142,6 +142,7 @@ function AccessCameraUnitElement:_build_panel(panel, panel_sizer)
 end
 
 AccessCameraOperatorUnitElement = AccessCameraOperatorUnitElement or class(MissionElement)
+AccessCameraOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 
 function AccessCameraOperatorUnitElement:init(unit)
 	AccessCameraOperatorUnitElement.super.init(self, unit)
@@ -183,14 +184,6 @@ function AccessCameraOperatorUnitElement:add_element()
 	end
 end
 
-function AccessCameraOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
-		end
-	end
-end
-
 function AccessCameraOperatorUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
 end
@@ -209,6 +202,7 @@ function AccessCameraOperatorUnitElement:_build_panel(panel, panel_sizer)
 end
 
 AccessCameraTriggerUnitElement = AccessCameraTriggerUnitElement or class(MissionElement)
+AccessCameraTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 
 function AccessCameraTriggerUnitElement:init(unit)
 	AccessCameraTriggerUnitElement.super.init(self, unit)
@@ -246,14 +240,6 @@ function AccessCameraTriggerUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function AccessCameraTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

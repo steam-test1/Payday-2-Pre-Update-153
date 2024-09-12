@@ -203,31 +203,37 @@ function InstancesLayer:click_select_unit()
 	managers.editor:click_select_unit(self)
 end
 
-function InstancesLayer:select_instance(instance_name, force_select)
+function InstancesLayer:select_instance(instance_name_or_table, force_select)
 	local multiselect = self:ctrl() or force_select
+	if type(instance_name_or_table) ~= "table" then
+		instance_name_or_table = {instance_name_or_table}
+	end
 	self._selected_instances = self._selected_instances or {}
 	if multiselect then
 		for i, instance_data in pairs(self._selected_instances) do
-			if instance_data.name == instance_name then
-				return
+			for idx = #instance_name_or_table, 1, -1 do
+				if instance_data.name == instance_name_or_table[idx] then
+					table.remove(instance_name_or_table, idx)
+				end
 			end
 		end
 	else
 		self._selected_instances = {}
 	end
-	self._mission_placed_ctrlr:set_enabled(instance_name and true or false)
-	self:_set_selection_instances_listbox(instance_name)
-	if instance_name then
-		local instance_data = {
-			name = instance_name,
-			instance = Instance:new(managers.world_instance:get_instance_data_by_name(instance_name)),
-			data = managers.world_instance:get_instance_data_by_name(instance_name)
-		}
-		table.insert(self._selected_instances, instance_data)
-		managers.editor:set_grid_altitude(instance_data.instance:data().position.z)
-		if #self._selected_instances == 1 then
-			self._selected_instance = instance_data.instance
-			self._selected_instance_data = instance_data.data
+	self._mission_placed_ctrlr:set_enabled(instance_name_or_table[#instance_name_or_table] and true or false)
+	if 0 < #instance_name_or_table then
+		for idx, instance_name in ipairs(instance_name_or_table) do
+			local instance_data = {
+				name = instance_name,
+				instance = Instance:new(managers.world_instance:get_instance_data_by_name(instance_name)),
+				data = managers.world_instance:get_instance_data_by_name(instance_name)
+			}
+			table.insert(self._selected_instances, instance_data)
+			managers.editor:set_grid_altitude(instance_data.instance:data().position.z)
+			if #self._selected_instances == 1 then
+				self._selected_instance = instance_data.instance
+				self._selected_instance_data = instance_data.data
+			end
 		end
 	elseif not multiselect then
 		self._selected_instances = {}
@@ -259,6 +265,11 @@ function InstancesLayer:select_instance(instance_name, force_select)
 		self._instance_info_guis.start_index:set_label("N/A")
 		self._instance_info_guis.end_index:set_label("N/A")
 	end
+	local instance_names = {}
+	for i, instance in ipairs(self._selected_instances) do
+		table.insert(instance_names, instance.name)
+	end
+	self:_set_selection_instances_listbox(instance_names)
 	self:update_unit_settings()
 	self:_update_overlay_gui()
 end
@@ -886,10 +897,11 @@ end
 
 function InstancesLayer:_on_gui_select_instance()
 	local indices = self._instances_listbox:selected_indices()
+	local names = {}
 	for i, index in ipairs(indices) do
-		local name = self._instances_listbox:get_string(index)
-		self:select_instance(name, 1 < #indices)
+		table.insert(names, self._instances_listbox:get_string(index))
 	end
+	self:select_instance(names, 1 < #indices)
 end
 
 function InstancesLayer:_get_selection_instances_listbox()
@@ -909,13 +921,15 @@ function InstancesLayer:_update_instances_listbox()
 end
 
 function InstancesLayer:_set_selection_instances_listbox(name)
-	if not name then
-		for i, index in ipairs(self._instances_listbox:selected_indices()) do
-			self._instances_listbox:deselect_index(index)
+	for i, index in ipairs(self._instances_listbox:selected_indices()) do
+		self._instances_listbox:deselect_index(index)
+	end
+	if name then
+		if type(name) ~= "table" then
+			name = {name}
 		end
-	else
 		for i = 0, self._instances_listbox:nr_items() - 1 do
-			if name == self._instances_listbox:get_string(i) then
+			if table.contains(name, self._instances_listbox:get_string(i)) then
 				self._instances_listbox:select_index(i)
 			end
 		end

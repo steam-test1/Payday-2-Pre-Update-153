@@ -72,13 +72,15 @@ function _triggers_data_table(unit)
 				local trigger_data = unit:damage():get_trigger_data_list(trigger_name)
 				if trigger_data and 0 < #trigger_data then
 					for _, data in ipairs(trigger_data) do
-						table.insert(t, {
-							name = data.trigger_name,
-							id = data.id,
-							notify_unit_id = data.notify_unit:unit_data().unit_id,
-							time = data.time,
-							notify_unit_sequence = data.notify_unit_sequence
-						})
+						if alive(data.notify_unit) then
+							table.insert(t, {
+								name = data.trigger_name,
+								id = data.id,
+								notify_unit_id = data.notify_unit:unit_data().unit_id,
+								time = data.time,
+								notify_unit_sequence = data.notify_unit_sequence
+							})
+						end
 					end
 				end
 			end

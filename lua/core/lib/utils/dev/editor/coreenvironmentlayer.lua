@@ -241,6 +241,7 @@ function EnvironmentLayer:save()
 		elseif unit:name() == Idstring(self._environment_area_unit) then
 			local area = unit:unit_data().environment_area
 			local environment_path = area:environment()
+			self:_update_filter_list(area)
 			table.insert(environment_areas, area:save_level_data())
 			table.insert(environment_paths, environment_path)
 			if area:permanent() or table.contains(area:filter_list(), CoreEnvironmentFeeder.UnderlayPathFeeder.DATA_PATH_KEY) then
@@ -660,6 +661,27 @@ function EnvironmentLayer:set_env_filter(name)
 		end
 	end
 	area:set_filter_list(filter_list)
+end
+
+function EnvironmentLayer:_update_filter_list(area)
+	local filter_list = area:filter_list()
+	local filter_map = managers.viewport:get_predefined_environment_filter_map()
+	local categories = {}
+	for _, key in ipairs(filter_list) do
+		for category, filters in pairs(filter_map) do
+			for _, filter in ipairs(filters) do
+				if filter == key then
+					categories[category] = true
+				end
+			end
+		end
+	end
+	local new_list = {}
+	for c, _ in pairs(categories) do
+		table.list_append(new_list, filter_map[c])
+	end
+	new_list = table.list_union(new_list, filter_list)
+	area:set_filter_list(new_list)
 end
 
 function EnvironmentLayer:generate_dome_occ()

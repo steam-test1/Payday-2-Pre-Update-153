@@ -11,6 +11,7 @@ core:import("CoreTable")
 core:import("CoreStack")
 core:import("CoreUnit")
 core:import("CoreEditorCommand")
+core:import("CoreEditorCommandBlock")
 Layer = Layer or CoreClass.class()
 
 function Layer:init(owner, save_name)
@@ -29,8 +30,6 @@ function Layer:init(owner, save_name)
 	self._notebook_units_lists = {}
 	self._editor_data = self._owner._editor_data
 	self._ctrl = self._editor_data.virtual_controller
-	self._undo_stack = CoreStack.Stack:new()
-	self._redo_stack = CoreStack.Stack:new()
 	self._move_widget = CoreEditorWidgets.MoveWidget:new(self)
 	self._rotate_widget = CoreEditorWidgets.RotationWidget:new(self)
 	self._layer_enabled = true
@@ -80,7 +79,6 @@ function Layer:load(world_holder, offset)
 			self:add_unit_to_created_units(unit)
 		end
 	end
-	self:clear_undo_stack()
 	return world_units
 end
 
@@ -1149,7 +1147,25 @@ function Layer:selected_unit()
 	return self._selected_unit
 end
 
-function Layer:create_unit(name, pos, rot, to_continent_name)
+function Layer:verify_selected_unit()
+	return alive(self._selected_unit)
+end
+
+function Layer:verify_selected_units()
+	for i = #self._selected_units, 1, -1 do
+		if not alive(self._selected_units[i]) then
+			table.remove(self._selected_units, i)
+		end
+	end
+	local i = 1
+	while not alive(self._selected_unit) and i < #self._selected_units do
+		self._selected_unit = self._selected_units[i]
+		i = i + 1
+	end
+	return alive(self._selected_unit)
+end
+
+function Layer:create_unit(name, pos, rot, to_continent_name, prefered_id)
 	local unit = CoreUnit.safe_spawn_unit(name, pos, rot)
 	if self:uses_continents() then
 		local continent = to_continent_name and managers.editor:continent(to_continent_name) or managers.editor:current_continent()
@@ -1158,37 +1174,36 @@ function Layer:create_unit(name, pos, rot, to_continent_name)
 		end
 	end
 	unit:unit_data().world_pos = pos
-	unit:unit_data().unit_id = self._owner:get_unit_id(unit)
+	unit:unit_data().unit_id = self._owner:get_unit_id(unit, prefered_id)
 	unit:unit_data().name_id = self:get_name_id(unit)
 	managers.editor:spawned_unit(unit)
 	self:_on_unit_created(unit)
 	return unit
 end
 
-function Layer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_undo)
-	if prevent_undo == nil and managers.editor:undo_debug() then
-		Application:stack_dump()
-		print("[Undo] WARNING: Called do_spawn_unit without setting 'prevent_undo'! This can create unit delete-spawn recursion, so fix it!")
-	end
+function Layer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_undo, prefered_id)
 	local continent = to_continent_name and managers.editor:continent(to_continent_name) or managers.editor:current_continent()
 	if continent:value("locked") and not self._continent_locked_picked then
 		managers.editor:output_warning("Can't create units in continent " .. managers.editor:current_continent():name() .. " because it is locked!")
 		return
 	end
 	if name:s() ~= "" then
+		if prevent_undo == nil and managers.editor:undo_debug() then
+			Application:stack_dump()
+			print("[Undo] WARNING: Called do_spawn_unit without setting 'prevent_undo'! This can create unit delete-spawn recursion, so fix it!")
+		end
 		pos = pos or self:current_pos()
 		rot = rot or Rotation(Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1))
 		local command = CoreEditorCommand.SpawnUnitCommand:new(self)
-		local unit = command:execute(name, pos, rot, to_continent_name)
+		local unit = command:execute(name, pos, rot, to_continent_name, prefered_id)
 		if not prevent_undo then
-			self:register_undo_command(command)
+			managers.editor:register_undo_command(command)
 		end
 		return unit
 	end
 end
 
 function Layer:remove_unit(unit)
-	self:on_unit_removed(unit)
 	table.delete(self._selected_units, unit)
 	self:remove_highlighted_unit(unit)
 	self:remove_name_id(unit)
@@ -1201,29 +1216,11 @@ function Layer:remove_unit(unit)
 	World:delete_unit(unit)
 end
 
-function Layer:on_unit_removed(unit)
-	for i, command in pairs(self._undo_stack:stack_table()) do
-		command:delete_unit(unit:unit_data().unit_id)
-	end
-	for i, command in pairs(self._redo_stack:stack_table()) do
-		command:delete_unit(unit:unit_data().unit_id)
-	end
-end
-
 function Layer:delete_unit(unit, prevent_undo)
 	local command = CoreEditorCommand.DeleteStaticUnitCommand:new(self)
 	command:execute(unit)
 	if not prevent_undo then
-		self:register_undo_command(command)
-	end
-end
-
-function Layer:on_unit_restored(old_id, new_unit)
-	for i, command in pairs(self._undo_stack:stack_table()) do
-		command:restore_unit(old_id, new_unit)
-	end
-	for i, command in pairs(self._redo_stack:stack_table()) do
-		command:restore_unit(old_id, new_unit)
+		managers.editor:register_undo_command(command)
 	end
 end
 
@@ -1269,76 +1266,6 @@ end
 
 function Layer:get_help(text)
 	return text .. "No help Available"
-end
-
-function Layer:undo()
-	if not managers.editor:use_beta_undo() then
-		return false
-	end
-	if self:alt() then
-		if self:shift() then
-			if managers.editor:undo_debug() and not Input:keyboard():down(Idstring("right shift")) then
-				self:_print_undo_stacks()
-			else
-				self:clear_undo_stack()
-			end
-		end
-		return
-	end
-	if self:shift() then
-		self:_redo()
-	else
-		self:_undo()
-	end
-end
-
-function Layer:_undo()
-	if not self._undo_stack:is_empty() then
-		local command = self._undo_stack:pop()
-		command:undo()
-		self._redo_stack:push(command)
-	end
-end
-
-function Layer:_redo()
-	if not self._redo_stack:is_empty() then
-		local command = self._redo_stack:pop()
-		command:execute()
-		self._undo_stack:push(command)
-	end
-end
-
-function Layer:register_undo_command(command)
-	if managers.editor:undo_debug() then
-		print("[Undo] register undo ", command)
-	end
-	self._undo_stack:push(command)
-	if self._undo_stack:size() > managers.editor:undo_history_size() then
-		local dif = self._undo_stack:size() - managers.editor:undo_history_size()
-		table.remove(self._undo_stack:stack_table(), 1, dif)
-		self._undo_stack._last = self._undo_stack._last - dif
-	end
-	if not self._redo_stack:is_empty() then
-		self._redo_stack:clear()
-	end
-end
-
-function Layer:clear_undo_stack()
-	self._undo_stack:clear()
-	self._redo_stack:clear()
-	print("[Undo] Undo/Redo stack cleared!")
-end
-
-function Layer:_print_undo_stacks()
-	print("[Undo] undo stack: ")
-	for i, command in pairs(self._undo_stack:stack_table()) do
-		print(string.format("[Undo] %i: %s", i, tostring(command)))
-	end
-	print("[Undo] redo stack: ")
-	for i, command in pairs(self._redo_stack:stack_table()) do
-		print(string.format("[Undo] %i: %s", #self._undo_stack:stack_table() + i, tostring(command)))
-	end
-	print("[Undo] ------")
 end
 
 function Layer:clone()
@@ -1457,7 +1384,7 @@ end
 function Layer:_hide_units(units, hide)
 	local hide_command = CoreEditorCommand.HideUnitsCommand:new(self)
 	hide_command:execute(units, hide)
-	self:register_undo_command(hide_command)
+	managers.editor:register_undo_command(hide_command)
 end
 
 function Layer:clear()

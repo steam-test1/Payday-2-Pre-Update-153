@@ -489,6 +489,12 @@ function NewSkillTreeGui:_update_description(item)
 	for i, d in pairs(skill_descs) do
 		macroes[i] = d
 	end
+	local skill_btns = tweak_data.upgrades.skill_btns[skill_id]
+	if skill_btns then
+		for i, d in pairs(skill_btns) do
+			macroes[i] = d()
+		end
+	end
 	local basic_cost = managers.skilltree:skill_cost(tier, 1)
 	local aced_cost = managers.skilltree:skill_cost(tier, 2)
 	local skill_string = managers.localization:to_upper_text(tweak_data_skill.name_id)

@@ -250,6 +250,19 @@ function MenuManager:show_peer_kicked_dialog(params)
 	Global.on_remove_peer_message = nil
 end
 
+function MenuManager:show_peer_banned_dialog(params)
+	local title = "dialog_mp_banned_title"
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text(title)
+	dialog_data.text = managers.localization:text("dialog_mp_banned_body")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	ok_button.callback_func = params and params.ok_func
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+	Global.on_remove_peer_message = nil
+end
+
 function MenuManager:show_default_option_dialog(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_default_options_title")

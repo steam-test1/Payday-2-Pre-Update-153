@@ -104,9 +104,11 @@ function PlayerBase:_chk_set_unit_upgrades()
 		if managers.player:has_category_upgrade("player", "drill_alert_rad") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "drill_alert_rad", 1)
 		end
-		if managers.player:has_category_upgrade("player", "drill_autorepair") then
-			local level = managers.player:upgrade_level("player", "drill_autorepair")
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair", level)
+		if managers.player:has_category_upgrade("player", "drill_autorepair_1") then
+			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair_1", 1)
+		end
+		if managers.player:has_category_upgrade("player", "drill_autorepair_2") then
+			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair_2", 1)
 		end
 		if managers.player:has_category_upgrade("player", "intimidate_enemies") then
 			managers.network:session():send_to_host("sync_upgrade", "player", "intimidate_enemies", 1)

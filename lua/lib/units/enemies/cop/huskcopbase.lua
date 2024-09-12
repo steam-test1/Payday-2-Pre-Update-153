@@ -9,6 +9,7 @@ function HuskCopBase:post_init()
 	self._lod_stage = 1
 	managers.enemy:register_enemy(self._unit)
 	self:_chk_spawn_gear()
+	self:enable_leg_arm_hitbox()
 end
 
 function HuskCopBase:pre_destroy(unit)
