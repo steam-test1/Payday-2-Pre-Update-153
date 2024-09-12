@@ -4990,6 +4990,31 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.nyck_bundle = {}
+	self.nyck_bundle.content = {}
+	self.nyck_bundle.content.loot_global_value = "normal"
+	self.nyck_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "nyck_cap",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "nyck_ace",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "nyck_beret",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "nyck_pickle",
+			amount = 1
+		}
+	}
 	self.fez1 = {}
 	self.fez1.dlc = "has_fez1"
 	self.fez1.content = {}

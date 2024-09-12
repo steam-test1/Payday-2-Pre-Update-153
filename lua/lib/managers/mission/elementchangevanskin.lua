@@ -46,7 +46,9 @@ function ElementChangeVanSkin:on_executed(instigator)
 	if Network:is_server() and van_data.dlc and not managers.dlc:is_dlc_unlocked(van_data.dlc) then
 		return
 	end
-	managers.blackmarket:equip_van_skin(self._values.target_skin)
+	if Network:is_server() then
+		managers.blackmarket:equip_van_skin(self._values.target_skin)
+	end
 	for i, unit in pairs(self._units) do
 		if unit:damage() and unit:damage():has_sequence(van_data.sequence_name) then
 			unit:damage():run_sequence_simple(van_data.sequence_name)

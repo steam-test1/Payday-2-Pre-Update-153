@@ -5201,7 +5201,6 @@ function MenuCrimeNetContactChillInitiator:modify_node(original_node, data)
 		name = "difficulty",
 		text_id = "menu_lobby_difficulty_title",
 		help_id = "menu_diff_help",
-		visible_callback = "is_pc_controller",
 		callback = "_on_chill_change_difficulty",
 		filter = true
 	}

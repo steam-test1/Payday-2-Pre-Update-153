@@ -27,4 +27,7 @@ function VanSkinsTweakData:init(tweak_data)
 	self.skins.yellow = {}
 	self.skins.yellow.dlc = nil
 	self.skins.yellow.sequence_name = "mat_chill_yellow"
+	self.skins.icecream = {}
+	self.skins.icecream.dlc = nil
+	self.skins.icecream.sequence_name = "mat_chill_icecream"
 end

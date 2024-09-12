@@ -24,7 +24,6 @@ function ElementCheckDLC:on_executed(instigator)
 end
 
 function ElementCheckDLC:client_on_executed(...)
-	self:on_executed(...)
 end
 
 function ElementCheckDLC:check_any_dlc_owned(dlc_list)

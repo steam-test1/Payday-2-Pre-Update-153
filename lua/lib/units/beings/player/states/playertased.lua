@@ -27,6 +27,7 @@ function PlayerTased:enter(state_data, enter_data)
 	if Network:is_server() then
 		self:_register_revive_SO()
 	end
+	self._equipped_unit:base():on_reload()
 	local projectile_entry = managers.blackmarket:equipped_projectile()
 	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
 		self:_interupt_action_throw_grenade()

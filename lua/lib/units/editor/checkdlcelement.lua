@@ -48,7 +48,7 @@ function CheckDLCUnitElement:_build_panel(panel, panel_sizer)
 	end
 	panel_sizer:add(EWS:StaticText(panel, "DLCs", "", "ALIGN_LEFT"), 0, 0, "EXPAND")
 	local dlcs_alphabetical = {}
-	for dlc_name, packaged in pairs(tweak_data.BUNDLED_DLC_PACKAGES) do
+	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
 		table.insert(dlcs_alphabetical, dlc_name)
 	end
 	table.sort(dlcs_alphabetical, function(a, b)
