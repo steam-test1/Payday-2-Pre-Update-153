@@ -533,14 +533,6 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.grunt_01_legendary.rarity = "legendary"
-	self.contents.lones_01_legendary = {}
-	self.contents.lones_01_legendary.def_id = 10028
-	self.contents.lones_01_legendary.contains = {
-		weapon_skins = {
-			"tecci_lones"
-		}
-	}
-	self.contents.lones_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true

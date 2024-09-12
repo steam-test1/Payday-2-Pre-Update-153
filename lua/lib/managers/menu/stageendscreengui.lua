@@ -620,13 +620,15 @@ function StageEndScreenGui:play_bain_debrief()
 	local outro_event = level_data and (variant == 0 and level_data.outro_event or level_data.outro_event[variant])
 	Application:debug("StageEndScreenGui:play_bain_debrief()", outro_event)
 	if outro_event then
-		managers.briefing:post_event(outro_event, {
-			show_subtitle = false,
-			listener = {
-				end_of_event = true,
-				clbk = callback(self, self, "bain_debrief_end_callback")
-			}
-		})
+		if outro_event ~= "---" then
+			managers.briefing:post_event(outro_event, {
+				show_subtitle = false,
+				listener = {
+					end_of_event = true,
+					clbk = callback(self, self, "bain_debrief_end_callback")
+				}
+			})
+		end
 		if managers.menu:is_console() then
 			managers.briefing:add_listener({
 				marker = true,

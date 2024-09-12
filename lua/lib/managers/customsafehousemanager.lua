@@ -616,15 +616,15 @@ function CustomSafehouseManager:_get_random_daily()
 end
 
 function CustomSafehouseManager:set_active_daily(id)
+	if tweak_data.safehouse.daily_redirects[id] then
+		id = tweak_data.safehouse.daily_redirects[id]
+	end
 	if self:get_daily_challenge() and self:get_daily_challenge().id ~= id then
 		self:generate_daily(id)
 	end
 end
 
 function CustomSafehouseManager:generate_daily(id)
-	if tweak_data.safehouse.daily_redirects[id] then
-		id = tweak_data.safehouse.daily_redirects[id]
-	end
 	local daily, contractor = self:_get_random_daily()
 	if id then
 		for _, daily_data in ipairs(tweak_data.safehouse.dailies) do

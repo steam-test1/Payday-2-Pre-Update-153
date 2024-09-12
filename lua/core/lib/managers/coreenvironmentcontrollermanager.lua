@@ -33,6 +33,9 @@ function CoreEnvironmentControllerManager:init()
 	self._current_flashbang_flash = 0
 	self._flashbang_multiplier = 1
 	self._flashbang_duration = 1
+	self._current_concussion = 0
+	self._concussion_multiplier = 1
+	self._concussion_duration = 1
 	self._HE_blinding = 0
 	self._downed_value = 0
 	self._last_life = false
@@ -424,6 +427,11 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 		self._current_flashbang_flash = math.max(self._current_flashbang_flash - dt * 0.9, 0)
 		flashbang_flash = math.min(self._current_flashbang_flash, 1)
 	end
+	local concussion = 0
+	if 0 < self._current_concussion then
+		self._current_concussion = math.max(self._current_concussion - dt * 0.08 * self._concussion_multiplier * self._concussion_duration, 0)
+		concussion = math.min(self._current_concussion, 1)
+	end
 	local hit_some_mod = 1 - self._hit_some
 	hit_some_mod = hit_some_mod * hit_some_mod * hit_some_mod
 	hit_some_mod = 1 - hit_some_mod
@@ -431,6 +439,7 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 	local death_mod = math.max(1 - self._health_effect_value - 0.5, 0) * 2
 	local blur_zone_flashbang = blur_zone_val + flashbang
 	local flash_1 = math.pow(flashbang, 0.4)
+	flash_1 = flash_1 + math.pow(concussion, 0.4)
 	local flash_2 = math.pow(flashbang, 16) + flashbang_flash
 	if self._custom_dof_settings then
 		self._material:set_variable(ids_dof_settings, self._custom_dof_settings)
@@ -709,6 +718,14 @@ function CoreEnvironmentControllerManager:set_flashbang(flashbang_pos, line_of_s
 		position = flashbang_pos,
 		normal = Vector3(0, 0, 1)
 	})
+end
+
+function CoreEnvironmentControllerManager:set_concussion_grenade(flashbang_pos, line_of_sight, travel_dis, linear_dis, duration)
+	local concussion = self:test_line_of_sight(flashbang_pos + flashbang_test_offset, 200, 1000, 3000)
+	self._concussion_duration = duration
+	if 0 < concussion then
+		self._current_concussion = math.min(self._current_concussion + concussion, 1.5) * self._concussion_duration
+	end
 end
 
 function CoreEnvironmentControllerManager:set_flashbang_multiplier(multiplier)

@@ -1457,7 +1457,7 @@ function HUDStageEndScreen:safehouse_currency_init(t, dt)
 end
 
 function HUDStageEndScreen:display_as_coins(amount)
-	return managers.experience:cash_string(amount, "")
+	return managers.experience:cash_string(math.floor(amount), "")
 end
 
 function HUDStageEndScreen:safehouse_currency_count(t, dt)

@@ -208,6 +208,7 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 		end
 	end
 	self:event_listener():call("on_criminal_added", name, unit, peer_id, ai)
+	managers.sync:send_all_synced_units_to(peer_id)
 end
 
 function CriminalsManager:set_unit(name, unit)

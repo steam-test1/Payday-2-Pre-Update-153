@@ -103,7 +103,7 @@ function IngameWaitingForPlayersState:_start_audio()
 	local event_started
 	local job_data = managers.job:current_job_data()
 	if job_data and managers.job:current_job_id() == "safehouse" and Global.mission_manager.saved_job_values.playedSafeHouseBefore then
-	else
+	elseif self._intro_event ~= "---" then
 		event_started = managers.briefing:post_event(self._intro_event, {
 			show_subtitle = true,
 			listener = {
@@ -170,7 +170,7 @@ function IngameWaitingForPlayersState:update(t, dt)
 			end
 			local job_data = managers.job:current_job_data()
 			if job_data and managers.job:current_job_id() == "safehouse" and Global.mission_manager.saved_job_values.playedSafeHouseBefore then
-			elseif not managers.menu_component:is_preplanning_enabled() then
+			elseif not managers.menu_component:is_preplanning_enabled() and briefing_dialog ~= "---" then
 				managers.briefing:post_event(briefing_dialog, {
 					show_subtitle = false,
 					listener = {

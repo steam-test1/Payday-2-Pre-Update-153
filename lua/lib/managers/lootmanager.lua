@@ -213,7 +213,7 @@ function LootManager:check_achievements(carry_id, multiplier)
 			elseif achievement_data.challenge_stat then
 				managers.challenge:award_progress(achievement_data.challenge_stat)
 			elseif achievement_data.trophy_stat then
-				managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
+				managers.custom_safehouse:award(achievement_data.trophy_stat)
 			elseif achievement_data.challenge_award then
 				managers.challenge:award(achievement_data.challenge_award)
 			end

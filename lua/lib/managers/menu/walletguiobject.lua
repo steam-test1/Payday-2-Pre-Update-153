@@ -64,7 +64,7 @@ function WalletGuiObject.set_wallet(panel, layer)
 	})
 	local coins_text = Global.wallet_panel:text({
 		name = "wallet_coins_text",
-		text = managers.experience:cash_string(managers.custom_safehouse:coins(), ""),
+		text = managers.experience:cash_string(math.floor(managers.custom_safehouse:coins()), ""),
 		font_size = tweak_data.menu.pd2_small_font_size,
 		font = tweak_data.menu.pd2_small_font,
 		color = tweak_data.screen_colors.text
@@ -124,7 +124,7 @@ function WalletGuiObject.refresh()
 		if managers.custom_safehouse:unlocked() then
 			local coins_icon = Global.wallet_panel:child("wallet_coins_icon")
 			local coins_text = Global.wallet_panel:child("wallet_coins_text")
-			coins_text:set_text(managers.experience:cash_string(managers.custom_safehouse:coins(), ""))
+			coins_text:set_text(managers.experience:cash_string(math.floor(managers.custom_safehouse:coins()), ""))
 			WalletGuiObject.make_fine_text(coins_text)
 			local align = managers.skilltree:points() > 0 and skillpoint_text or level_text
 			coins_icon:set_leftbottom(align:right() + 10, Global.wallet_panel:h() - 2)

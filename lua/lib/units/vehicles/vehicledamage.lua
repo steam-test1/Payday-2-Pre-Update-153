@@ -178,6 +178,10 @@ end
 function VehicleDamage:_send_sync_bullet_attack_result(attack_data, hit_offset_height)
 end
 
+function VehicleDamage:stun_hit(attack_data)
+	return nil
+end
+
 function VehicleDamage:damage_explosion(attack_data)
 	if not self._unit:vehicle_driving():is_vulnerable() then
 		return

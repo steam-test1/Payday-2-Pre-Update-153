@@ -165,6 +165,10 @@ function TeamAIDamage:damage_bullet(attack_data)
 	return result
 end
 
+function TeamAIDamage:stun_hit(attack_data)
+	return nil
+end
+
 function TeamAIDamage:accuracy_multiplier()
 	return 1
 end

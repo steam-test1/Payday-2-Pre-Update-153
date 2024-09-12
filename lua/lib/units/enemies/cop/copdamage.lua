@@ -22,6 +22,8 @@ CopDamage._HEALTH_GRANULARITY = 512
 CopDamage.WEAPON_TYPE_GRANADE = 1
 CopDamage.WEAPON_TYPE_BULLET = 2
 CopDamage.WEAPON_TYPE_FLAMER = 3
+CopDamage._ON_STUN_ACCURACY_DECREASE = 0.5
+CopDamage._ON_STUN_ACCURACY_DECREASE_TIME = 5
 CopDamage.EVENT_IDS = {FINAL_LOWER_HEALTH_PERCENTAGE_LIMIT = 1}
 CopDamage.DEBUG_HP = CopDamage.DEBUG_HP or false
 CopDamage._event_listeners = EventListenerHolder:new()
@@ -599,7 +601,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 				elseif achievement_data.challenge_stat then
 					managers.challenge:award_progress(achievement_data.challenge_stat)
 				elseif achievement_data.trophy_stat then
-					managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
+					managers.custom_safehouse:award(achievement_data.trophy_stat)
 				elseif achievement_data.challenge_award then
 					managers.challenge:award(achievement_data.challenge_award)
 				end
@@ -998,6 +1000,44 @@ function CopDamage:damage_explosion(attack_data)
 	return result
 end
 
+function CopDamage:stun_hit(attack_data)
+	if self._dead or self._invulnerable then
+		return
+	end
+	local result = {
+		type = "concussion",
+		variant = attack_data.variant
+	}
+	attack_data.result = result
+	attack_data.pos = attack_data.col_ray.position
+	local damage_percent = 0
+	local attacker = attack_data.attacker_unit
+	self:_send_stun_attack_result(attacker, damage_percent, self:_get_attack_variant_index(attack_data.result.variant), attack_data.col_ray.ray)
+	self:_on_damage_received(attack_data)
+	self:_create_stun_exit_clbk()
+end
+
+function CopDamage:_create_stun_exit_clbk()
+	if not self._stun_exit_clbk then
+		self._stun_exit_clbk = true
+		self._listener_holder:add("after_stun_accuracy", {
+			"on_exit_hurt"
+		}, callback(self, self, "_on_stun_hit_exit"))
+	end
+end
+
+function CopDamage:_on_stun_hit_exit()
+	self:set_accuracy_multiplier(self._ON_STUN_ACCURACY_DECREASE)
+	
+	local function f()
+		self:set_accuracy_multiplier(1)
+	end
+	
+	managers.enemy:add_delayed_clbk("ResetAccuracy", f, TimerManager:game():time() + self._ON_STUN_ACCURACY_DECREASE_TIME)
+	self._stun_exit_clbk = nil
+	self._listener_holder:remove("after_stun_accuracy")
+end
+
 function CopDamage:roll_critical_hit(damage)
 	local critical_hits = self._char_tweak.critical_hits or {}
 	local critical_hit = false
@@ -1269,7 +1309,7 @@ function CopDamage:damage_melee(attack_data)
 						elseif achievement_data.challenge_stat then
 							managers.challenge:award_progress(achievement_data.challenge_stat)
 						elseif achievement_data.trophy_stat then
-							managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
+							managers.custom_safehouse:award(achievement_data.trophy_stat)
 						elseif achievement_data.challenge_award then
 							managers.challenge:award(achievement_data.challenge_award)
 						end
@@ -1702,6 +1742,37 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 	self:_on_damage_received(attack_data)
 end
 
+function CopDamage:sync_damage_stun(attacker_unit, damage_percent, i_attack_variant, death, direction)
+	if self._dead then
+		return
+	end
+	local variant = CopDamage._ATTACK_VARIANTS[i_attack_variant]
+	local damage = damage_percent * self._HEALTH_INIT_PRECENT
+	local attack_data = {variant = variant, attacker_unit = attacker_unit}
+	local result
+	local result_type = "concussion"
+	result = {type = result_type, variant = variant}
+	attack_data.result = result
+	attack_data.damage = damage
+	local attack_dir
+	if direction then
+		attack_dir = direction
+	elseif attacker_unit then
+		attack_dir = self._unit:position() - attacker_unit:position()
+		mvector3.normalize(attack_dir)
+	else
+		attack_dir = self._unit:rotation():y()
+	end
+	attack_data.attack_dir = attack_dir
+	if attack_data.attacker_unit and attack_data.attacker_unit == managers.player:player_unit() then
+		managers.hud:on_hit_confirmed()
+	end
+	attack_data.pos = self._unit:position()
+	mvector3.set_z(attack_data.pos, attack_data.pos.z + math.random() * 180)
+	self:_on_damage_received(attack_data)
+	self:_create_stun_exit_clbk()
+end
+
 function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dance_antimation, death, direction, weapon_type, weapon_id, healed)
 	if self._dead then
 		return
@@ -1955,6 +2026,10 @@ end
 
 function CopDamage:_send_explosion_attack_result(attack_data, attacker, damage_percent, i_attack_variant, direction)
 	self._unit:network():send("damage_explosion_fire", attacker, damage_percent, i_attack_variant, self._dead and true or false, direction, attack_data.weapon_unit)
+end
+
+function CopDamage:_send_stun_attack_result(attacker, damage_percent, i_attack_variant, direction)
+	self._unit:network():send("damage_explosion_stun", attacker, damage_percent, i_attack_variant, self._dead and true or false, direction)
 end
 
 function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percent, is_fire_dot_damage, direction, healed)

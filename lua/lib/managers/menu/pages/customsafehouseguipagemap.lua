@@ -505,7 +505,7 @@ end
 
 function CustomSafehouseGuiPageMap:update_coins_value()
 	local coins_value = self._coins_panel:child("CoinsValue")
-	coins_value:set_text(managers.experience:cash_string(managers.custom_safehouse:coins(), ""))
+	coins_value:set_text(managers.experience:cash_string(math.floor(managers.custom_safehouse:coins()), ""))
 	self:_right_align(coins_value, self._coins_panel)
 end
 

@@ -335,6 +335,14 @@ function PlayerDamage:update(unit, t, dt)
 			SoundDevice:set_rtpc("downed_state_progression", math.max(self._downed_progression or 0, self._tinnitus_data.intensity * 100))
 		end
 	end
+	if self._concussion_data then
+		self._concussion_data.intensity = (self._concussion_data.end_t - t) / self._concussion_data.duration
+		if 0 >= self._concussion_data.intensity then
+			self:_stop_concussion()
+		else
+			SoundDevice:set_rtpc("concussion_effect", self._concussion_data.intensity * 100)
+		end
+	end
 	if not self._downed_timer and self._downed_progression then
 		self._downed_progression = math.max(0, self._downed_progression - dt * 50)
 		managers.environment_controller:set_downed_value(self._downed_progression)
@@ -1238,6 +1246,7 @@ function PlayerDamage:on_downed()
 	})
 	managers.hud:on_downed()
 	self:_stop_tinnitus()
+	self:_stop_concussion()
 	self:clear_armor_stored_health()
 	self._listener_holder:call("on_enter_bleedout")
 end
@@ -1566,6 +1575,7 @@ function PlayerDamage:pre_destroy()
 	CopDamage.unregister_listener("on_damage")
 	managers.mission:remove_global_event_listener("player_regenerate_armor")
 	managers.mission:remove_global_event_listener("player_force_bleedout")
+	self._unit:sound():play("concussion_effect_off")
 end
 
 function PlayerDamage:_call_listeners(damage_info)
@@ -1723,6 +1733,40 @@ end
 function PlayerDamage:reset_suppression()
 	self._supperssion_data.value = nil
 	self._supperssion_data.decay_start_t = nil
+end
+
+function PlayerDamage:on_concussion(mul)
+	if self._downed_timer then
+		return
+	end
+	self:_start_concussion(mul)
+end
+
+function PlayerDamage:_start_concussion(mul)
+	if self._concussion_data then
+		self._concussion_data.intensity = mul
+		local duration_tweak = tweak_data.projectiles.concussion.duration
+		self._concussion_data.duration = duration_tweak.min + mul * math.lerp(duration_tweak.additional - 2, duration_tweak.additional + 2, math.random())
+		self._concussion_data.end_t = managers.player:player_timer():time() + self._concussion_data.duration
+		SoundDevice:set_rtpc("concussion_effect", self._concussion_data.intensity * 100)
+	else
+		local duration = 4 + mul * math.lerp(8, 12, math.random())
+		self._concussion_data = {
+			intensity = mul,
+			duration = duration,
+			end_t = managers.player:player_timer():time() + duration
+		}
+	end
+	self._unit:sound():play("concussion_player_disoriented_sfx")
+	self._unit:sound():play("concussion_effect_on")
+end
+
+function PlayerDamage:_stop_concussion()
+	if not self._concussion_data then
+		return
+	end
+	self._unit:sound():play("concussion_effect_off")
+	self._concussion_data = nil
 end
 
 function PlayerDamage:on_flashbanged(sound_eff_mul)

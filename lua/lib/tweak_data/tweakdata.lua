@@ -1280,8 +1280,12 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.heat_around_the_corner = "heat"
 	self.achievement.fire_in_the_hole = {
-		grenade = {"frag", "frag_com"},
-		stat = "gage_9_stats"
+		stat = "gage_9_stats",
+		grenade = {
+			"frag",
+			"frag_com",
+			"concussion"
+		}
 	}
 	self.achievement.infamous = {
 		"ignominy_1",
@@ -3586,7 +3590,12 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		daily_candy = {
 			trophy_stat = "daily_candy",
-			secured = {carry_id = "coke", amount = 1}
+			secured = {
+				{carry_id = "coke", amount = 1},
+				{carry_id = "coke_light", total_amount = 1},
+				{carry_id = "coke_pure", total_amount = 1},
+				{carry_id = "present", total_amount = 1}
+			}
 		},
 		daily_art = {
 			trophy_stat = "daily_art",
@@ -3621,6 +3630,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.job_list.bain = {
 		"jewelry_store",
 		"family",
+		"roberts",
 		"branchbank_prof",
 		"branchbank_gold_prof",
 		"branchbank_cash",
@@ -4984,6 +4994,13 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.frag_com.curve_pow = 0.1
 	self.projectiles.frag_com.range = 1000
 	self.projectiles.frag_com.name_id = "bm_grenade_frag_com"
+	self.projectiles.concussion = {}
+	self.projectiles.concussion.damage = 0
+	self.projectiles.concussion.curve_pow = 0.1
+	self.projectiles.concussion.range = 1500
+	self.projectiles.concussion.name_id = "bm_concussion"
+	self.projectiles.concussion.sound_event = "concussion_explosion"
+	self.projectiles.concussion.duration = {min = 4, additional = 10}
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

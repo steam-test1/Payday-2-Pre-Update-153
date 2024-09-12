@@ -2160,7 +2160,8 @@ function UpgradesTweakData:init(tweak_data)
 			"frag_com",
 			"frag",
 			"dynamite",
-			"molotov"
+			"molotov",
+			"concussion"
 		}
 	}
 	self.level_tree[2] = {
@@ -8410,6 +8411,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.wpn_prj_jav = {category = "grenade", dlc = "steel"}
 	self.definitions.wpn_prj_hur = {category = "grenade", dlc = "born"}
 	self.definitions.frag_com = {category = "grenade", dlc = "pd2_clan"}
+	self.definitions.concussion = {category = "grenade", dlc = "fez1"}
 end
 
 function UpgradesTweakData:_weapon_definitions()

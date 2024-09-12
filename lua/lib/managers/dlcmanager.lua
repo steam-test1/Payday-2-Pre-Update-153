@@ -1176,6 +1176,7 @@ function WINDLCManager:init()
 				no_install = true,
 				external = true
 			},
+			fez1 = {app_id = "218620", no_install = true},
 			sparkle = {app_id = "532810", no_install = true},
 			gotti_bundle = {app_id = "218620", no_install = true},
 			pd2_clan = {

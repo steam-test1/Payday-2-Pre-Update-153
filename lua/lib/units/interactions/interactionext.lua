@@ -25,6 +25,7 @@ function BaseInteractionExt:init(unit)
 		print("[BaseInteractionExt:init] - Missing Interaction Tweak Data: ", self.tweak_data)
 	end
 	self:set_tweak_data(self.tweak_data)
+	self:set_host_only(self.is_host_only)
 	self:set_active(self._tweak_data.start_active or self._tweak_data.start_active == nil and true)
 	self:_upd_interaction_topology()
 end
@@ -408,6 +409,9 @@ function BaseInteractionExt:interact(player)
 end
 
 function BaseInteractionExt:can_interact(player)
+	if self._host_only and not Network:is_server() then
+		return false
+	end
 	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
@@ -434,7 +438,14 @@ function BaseInteractionExt:active()
 	return self._active
 end
 
+function BaseInteractionExt:set_host_only(host_only)
+	self._host_only = host_only
+end
+
 function BaseInteractionExt:set_active(active, sync)
+	if self._host_only and not Network:is_server() then
+		active = false
+	end
 	if not active and self._active then
 		managers.interaction:remove_unit(self._unit)
 		if self._tweak_data.contour_preset or self._tweak_data.contour_preset_selected then
@@ -465,7 +476,7 @@ function BaseInteractionExt:set_active(active, sync)
 		local opacity_value = self:_set_active_contour_opacity()
 		self:set_contour("standard_color", opacity_value)
 	end
-	if sync and managers.network:session() then
+	if not self._host_only and sync and managers.network:session() then
 		local u_id = self._unit:id()
 		if u_id == -1 then
 			local u_data = managers.enemy:get_corpse_unit_data_from_key(self._unit:key())

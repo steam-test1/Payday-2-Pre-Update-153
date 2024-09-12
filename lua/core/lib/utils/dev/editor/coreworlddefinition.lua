@@ -1057,8 +1057,8 @@ function WorldDefinition:get_unit(id)
 	return self._all_units[id]
 end
 
-function WorldDefinition:add_mission_element_unit(unit)
-	self._mission_element_units[unit:unit_data().unit_id] = unit
+function WorldDefinition:add_mission_element_unit(unit, id)
+	self._mission_element_units[id or unit:unit_data().unit_id] = unit
 end
 
 function WorldDefinition:get_mission_element_unit(id)

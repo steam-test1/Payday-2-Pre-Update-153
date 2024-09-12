@@ -78,6 +78,26 @@ function CivilianDamage:damage_fire(attack_data)
 	return CopDamage.damage_fire(self, attack_data)
 end
 
+function CivilianDamage:stun_hit(attack_data)
+	if self._dead or self._invulnerable then
+		return
+	end
+	if not self._lie_down_clbk_id then
+		self._lie_down_clbk_id = "lie_down_" .. tostring(self._unit:key())
+		local rnd = math.random()
+		local t = TimerManager:game():time()
+		if not self._char_tweak.is_escort then
+			managers.enemy:add_delayed_clbk(self._lie_down_clbk_id, callback(self, self, "_lie_down_clbk", attack_data.attacker_unit), t + rnd)
+		end
+	end
+end
+
+function CivilianDamage:_lie_down_clbk(attacker_unit)
+	local params = {force_lie_down = true}
+	self._unit:brain():set_logic("surrender", params)
+	self._lie_down_clbk_id = nil
+end
+
 function CivilianDamage:damage_melee(attack_data)
 	if managers.player:has_category_upgrade("player", "civ_harmless_melee") and not self._unit:anim_data().no_intimidation_by_dmg and (not self._survive_shot_t or TimerManager:game():time() > self._survive_shot_t) then
 		self._survive_shot_t = TimerManager:game():time() + 2.5

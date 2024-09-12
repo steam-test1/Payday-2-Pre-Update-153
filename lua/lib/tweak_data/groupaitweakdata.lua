@@ -3254,6 +3254,22 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 			max = 1,
 			respawn_delay = 300000
 		}
+	elseif difficulty_index == 7 then
+		self.phalanx.spawn_chance = {
+			start = 0.05,
+			increase = 0.09,
+			decrease = 1,
+			max = 1,
+			respawn_delay = 300000
+		}
+	elseif difficulty_index == 8 then
+		self.phalanx.spawn_chance = {
+			start = 0.05,
+			increase = 0.09,
+			decrease = 1,
+			max = 1,
+			respawn_delay = 300000
+		}
 	else
 		self.phalanx.spawn_chance = {
 			start = 0,

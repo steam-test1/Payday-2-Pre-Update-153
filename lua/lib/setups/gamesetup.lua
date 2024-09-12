@@ -135,6 +135,7 @@ require("lib/units/weapons/projectiles/ProjectileBase")
 require("lib/units/weapons/projectiles/ArrowBase")
 require("lib/units/weapons/grenades/GrenadeBase")
 require("lib/units/weapons/grenades/FragGrenade")
+require("lib/units/weapons/grenades/ConcussionGrenade")
 require("lib/units/weapons/grenades/MolotovGrenade")
 require("lib/units/weapons/grenades/IncendiaryGrenade")
 require("lib/units/weapons/grenades/FlashGrenade")
@@ -254,10 +255,23 @@ function GameSetup:load_packages()
 		self._loaded_contract_package = contract_package
 		PackageManager:load(contract_package)
 	end
-	local diff_package = "packages/" .. (Global.game_settings and Global.game_settings.difficulty or "normal")
-	if PackageManager:package_exists(diff_package) and not PackageManager:loaded(diff_package) then
-		self._loaded_diff_package = diff_package
-		PackageManager:load(diff_package)
+	self._loaded_diff_packages = {}
+	
+	local function load_difficulty_package(package_name)
+		if PackageManager:package_exists(package_name) and not PackageManager:loaded(package_name) then
+			table.insert(self._loaded_diff_packages, package_name)
+			PackageManager:load(package_name)
+		end
+	end
+	
+	if job_tweak_package_data and job_tweak_package_data.load_all_difficulty_packages then
+		for i, difficulty in ipairs(tweak_data.difficulties) do
+			local diff_package = "packages/" .. (difficulty or "normal")
+			load_difficulty_package(diff_package)
+		end
+	else
+		local diff_package = "packages/" .. (Global.game_settings and Global.game_settings.difficulty or "normal")
+		load_difficulty_package(diff_package)
 	end
 end
 
@@ -296,9 +310,13 @@ function GameSetup:gather_packages_to_unload()
 		table.insert(self._packages_to_unload, self._loaded_contract_package)
 		self._loaded_contract_package = nil
 	end
-	if PackageManager:loaded(self._loaded_diff_package) then
-		table.insert(self._packages_to_unload, self._loaded_diff_package)
-		self._loaded_diff_package = nil
+	if self._loaded_diff_packages then
+		for i, package in ipairs(self._loaded_diff_packages) do
+			if PackageManager:loaded(package) then
+				table.insert(self._packages_to_unload, package)
+			end
+		end
+		self._loaded_diff_packages = {}
 	end
 end
 

@@ -47,6 +47,7 @@ function DLCTweakData:init(tweak_data)
 			jigg = 1,
 			born = true,
 			wild = true,
+			fez1 = true,
 			chill = 1,
 			rip = true,
 			pd2_goty = 1,
@@ -4989,6 +4990,10 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.fez1 = {}
+	self.fez1.dlc = "has_fez1"
+	self.fez1.content = {}
+	self.fez1.content.loot_drops = {}
 	self.sparkle = {}
 	self.sparkle.content = {}
 	self.sparkle.content.loot_drops = {

@@ -16,6 +16,22 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.frag.expire_t = 1.1
 	self.projectiles.frag.repeat_expire_t = 1.5
 	self.projectiles.frag.is_a_grenade = true
+	self.projectiles.concussion = {}
+	self.projectiles.concussion.name_id = "bm_concussion"
+	self.projectiles.concussion.unit = "units/pd2_crimefest_2016/fez1/weapons/wpn_fps_gre_pressure/wpn_third_gre_pressure"
+	self.projectiles.concussion.unit_dummy = "units/pd2_crimefest_2016/fez1/weapons/wpn_fps_gre_pressure/wpn_fps_gre_pressure_husk"
+	self.projectiles.concussion.sprint_unit = "units/pd2_crimefest_2016/fez1/weapons/wpn_fps_gre_pressure/wpn_third_gre_pressure_sprint"
+	self.projectiles.concussion.icon = "concussion_grenade"
+	self.projectiles.concussion.dlc = "fez1"
+	self.projectiles.concussion.throwable = true
+	self.projectiles.concussion.max_amount = 6
+	self.projectiles.concussion.animation = "throw_concussion"
+	self.projectiles.concussion.anim_global_param = "projectile_frag"
+	self.projectiles.concussion.texture_bundle_folder = "fez1"
+	self.projectiles.concussion.throw_allowed_expire_t = 0.1
+	self.projectiles.concussion.expire_t = 1.1
+	self.projectiles.concussion.repeat_expire_t = 1.5
+	self.projectiles.concussion.is_a_grenade = true
 	self.projectiles.molotov = {}
 	self.projectiles.molotov.name_id = "bm_grenade_molotov"
 	self.projectiles.molotov.unit = "units/pd2_dlc_bbq/weapons/molotov_cocktail/wpn_molotov_third"
@@ -309,7 +325,8 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"launcher_frag_china",
 		"launcher_incendiary_china",
 		"wpn_prj_hur",
-		"frag_com"
+		"frag_com",
+		"concussion"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do

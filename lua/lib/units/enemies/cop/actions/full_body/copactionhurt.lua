@@ -243,6 +243,13 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 		self._expired = true
 		return true
+	elseif action_type == "concussion" then
+		redir_res = self._ext_movement:play_redirect("concussion_stun")
+		local rnd_max = 9
+		local rnd_anim = math.random(1, rnd_max)
+		local rnd_anim_str = "var" .. tostring(rnd_anim)
+		self._machine:set_parameter(redir_res, rnd_anim_str, 1)
+		self._sick_time = t + 3
 	elseif action_type == "hurt_sick" then
 		local ecm_hurts_table = self._common_data.char_tweak.ecm_hurts
 		if not ecm_hurts_table then

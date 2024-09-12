@@ -244,6 +244,18 @@ function UnitNetworkHandler:damage_explosion_fire(subject_unit, attacker_unit, d
 	end
 end
 
+function UnitNetworkHandler:damage_explosion_stun(subject_unit, attacker_unit, damage, i_attack_variant, death, direction, sender)
+	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(attacker_unit) or attacker_unit:key() == subject_unit:key() then
+		attacker_unit = nil
+	end
+	if i_attack_variant then
+		subject_unit:character_damage():sync_damage_stun(attacker_unit, damage, i_attack_variant, death, direction)
+	end
+end
+
 function UnitNetworkHandler:damage_fire(subject_unit, attacker_unit, damage, start_dot_dance_antimation, death, direction, weapon_type, weapon_unit, healed, sender)
 	if not self._verify_character_and_sender(subject_unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
@@ -443,7 +455,6 @@ function UnitNetworkHandler:sync_body_damage_bullet(body, attacker, normal_yaw, 
 		print("[UnitNetworkHandler:sync_body_damage_bullet] body has no damage damage_bullet function", body:name(), body:unit():name())
 		return
 	end
-	print("sync")
 	local normal = Vector3()
 	mrotation.set_yaw_pitch_roll(tmp_rot1, math.lerp(-180, 180, normal_yaw / 127), math.lerp(-90, 90, normal_pitch / 63), 0)
 	mrotation.y(tmp_rot1, normal)
