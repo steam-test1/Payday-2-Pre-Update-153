@@ -229,7 +229,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 	end
 	local bodies = World:find_bodies("intersect", "sphere", hit_pos, range, slotmask)
 	local alert_unit = user_unit
-	if alert_unit and alert_unit:base() and alert_unit:base().thrower_unit then
+	if alive(alert_unit) and alert_unit:base() and alert_unit:base().thrower_unit then
 		alert_unit = alert_unit:base():thrower_unit()
 	end
 	managers.groupai:state():propagate_alert({

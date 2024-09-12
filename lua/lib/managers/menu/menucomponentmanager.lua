@@ -1147,6 +1147,15 @@ function MenuComponentManager:mouse_pressed(o, button, x, y)
 	if self._player_inventory_gui and self._player_inventory_gui:mouse_pressed(button, x, y) then
 		return true
 	end
+	if self._crimenet_contract_gui then
+		if button == Idstring("mouse wheel down") then
+			if self._crimenet_contract_gui:mouse_wheel_down(x, y) then
+				return true
+			end
+		elseif button == Idstring("mouse wheel up") and self._crimenet_contract_gui:mouse_wheel_up(x, y) then
+			return true
+		end
+	end
 	local used, values
 	if button == Idstring("mouse wheel down") then
 		used, values = self:run_return_on_all_live_components("mouse_wheel_down", x, y)

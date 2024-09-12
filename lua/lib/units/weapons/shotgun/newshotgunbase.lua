@@ -204,6 +204,7 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 			else
 				my_result = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
 			end
+			my_result = managers.mutators:modify_value("NewShotgunBase:_fire_raycast", my_result)
 			if my_result and my_result.type == "death" then
 				managers.game_play_central:do_shotgun_push(col_ray.unit, col_ray.position, col_ray.ray, col_ray.distance, user_unit)
 			end

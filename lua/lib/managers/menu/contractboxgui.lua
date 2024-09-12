@@ -500,22 +500,29 @@ function ContractBoxGui:create_mutators_tooltip()
 		h = tweak_data.menu.pd2_medium_font_size
 	})
 	local _y = mutators_title:bottom() + 5
+	local mutators_list = {}
 	self._mutators_data = deep_clone(managers.mutators:get_mutators_from_lobby_data())
 	for mutator_id, mutator_data in pairs(self._mutators_data) do
 		local mutator = managers.mutators:get_mutator_from_id(mutator_id)
 		if mutator then
-			local mutator_text = self._mutators_tooltip:text({
-				name = "mutator_text_" .. tostring(mutator_id),
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				text = mutator:name(),
-				x = 10,
-				y = _y,
-				h = tweak_data.menu.pd2_small_font_size,
-				layer = 1
-			})
-			_y = mutator_text:bottom() + 2
+			table.insert(mutators_list, mutator)
 		end
+	end
+	table.sort(mutators_list, function(a, b)
+		return a:name() < b:name()
+	end)
+	for i, mutator in ipairs(mutators_list) do
+		local mutator_text = self._mutators_tooltip:text({
+			name = "mutator_text_" .. tostring(mutator:id()),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			text = mutator:name(),
+			x = 10,
+			y = _y,
+			h = tweak_data.menu.pd2_small_font_size,
+			layer = 1
+		})
+		_y = mutator_text:bottom() + 2
 	end
 	self._mutators_tooltip:set_h(_y + 10)
 	self._mutators_tooltip:rect({

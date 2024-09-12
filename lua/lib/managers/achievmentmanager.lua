@@ -205,7 +205,7 @@ function AchievmentManager:award(id)
 	end
 	managers.challenge:on_achievement_awarded(id)
 	managers.custom_safehouse:on_achievement_awarded(id)
-	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
+	if managers.mutators:are_achievements_disabled() then
 		return
 	end
 	if self:get_info(id).awarded then

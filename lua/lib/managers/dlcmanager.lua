@@ -1178,6 +1178,7 @@ function WINDLCManager:init()
 			},
 			fez1 = {app_id = "218620", no_install = true},
 			sparkle = {app_id = "532810", no_install = true},
+			rota = {app_id = "218620", no_install = true},
 			gotti_bundle = {app_id = "218620", no_install = true},
 			nyck_bundle = {app_id = "218620", no_install = true},
 			urf_bundle = {app_id = "218620", no_install = true},

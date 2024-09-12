@@ -168,7 +168,8 @@ end
 
 function MutatorExplodingEnemies:_detonate(cop_damage, attack_data)
 	if Network:is_server() then
-		local pos = not attack_data.pos and alive(cop_damage._unit) and cop_damage._unit:get_object(Idstring("Spine2")):position()
+		local pos = attack_data.pos
+		pos = (self:explosion_delay() > 0 or not pos) and alive(cop_damage._unit) and cop_damage._unit:get_object(Idstring("Spine2")):position() or pos
 		local range = self:get_explosion_size() * 100
 		local damage = attack_data.raw_damage or attack_data.damage or cop_damage._HEALTH_INIT
 		local ply_damage = damage * 0.5

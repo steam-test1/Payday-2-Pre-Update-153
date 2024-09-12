@@ -281,6 +281,26 @@ function MutatorsManager:get_experience_reduction()
 	return self:_get_reduction("get_experience_reduction")
 end
 
+function MutatorsManager:are_achievements_disabled()
+	if game_state_machine:current_state_name() ~= "menu_main" then
+		for _, mutator in pairs(self:mutators()) do
+			if (mutator:is_enabled() or mutator:is_active()) and mutator.disables_achievements then
+				return true
+			end
+		end
+	else
+		return false
+	end
+end
+
+function MutatorsManager:are_challenges_disabled()
+	return self:are_achievements_disabled()
+end
+
+function MutatorsManager:are_trophies_disabled()
+	return self:are_achievements_disabled()
+end
+
 function MutatorsManager:should_disable_statistics()
 	return self:get_cash_reduction() > 0 or 0 < self:get_experience_reduction()
 end

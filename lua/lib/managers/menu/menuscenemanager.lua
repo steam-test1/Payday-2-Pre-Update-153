@@ -113,6 +113,9 @@ function MenuSceneManager:init()
 		"husk_akimbo1",
 		"husk_akimbo2"
 	}
+	self._global_poses.rota = {
+		"husk_bullpup"
+	}
 	self:_init_lobby_poses()
 	self._mask_units = {}
 	self._weapon_units = {}

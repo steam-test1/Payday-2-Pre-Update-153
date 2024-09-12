@@ -562,7 +562,8 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 				1
 			}
 		})
-		local mutators_title = mutators_panel:text({
+		self._mutators_scroll = ScrollablePanel:new(mutators_panel, "mutators_scroll", {padding = 0})
+		local mutators_title = self._mutators_scroll:canvas():text({
 			name = "mutators_title",
 			font = tweak_data.menu.pd2_medium_font,
 			font_size = tweak_data.menu.pd2_medium_font_size,
@@ -572,21 +573,32 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 			h = tweak_data.menu.pd2_medium_font_size
 		})
 		local _y = mutators_title:bottom() + 5
+		local mutators_list = {}
+		local last_item
 		for mutator_id, mutator_data in pairs(job_data.mutators) do
 			local mutator = managers.mutators:get_mutator_from_id(mutator_id)
 			if mutator then
-				local mutator_text = mutators_panel:text({
-					name = "mutator_text_" .. tostring(mutator_id),
-					font = tweak_data.menu.pd2_small_font,
-					font_size = tweak_data.menu.pd2_small_font_size,
-					text = mutator:name(),
-					x = 10,
-					y = _y,
-					h = tweak_data.menu.pd2_small_font_size
-				})
-				_y = mutator_text:bottom() + 2
+				table.insert(mutators_list, mutator)
 			end
 		end
+		table.sort(mutators_list, function(a, b)
+			return a:name() < b:name()
+		end)
+		for i, mutator in ipairs(mutators_list) do
+			local mutator_text = self._mutators_scroll:canvas():text({
+				name = "mutator_text_" .. tostring(i),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				text = mutator:name(),
+				x = 10,
+				y = _y,
+				h = tweak_data.menu.pd2_small_font_size
+			})
+			_y = mutator_text:bottom() + 2
+			last_item = mutator_text
+		end
+		last_item:set_h(last_item:h() + 10)
+		self._mutators_scroll:update_canvas_size()
 		managers.mutators:set_crimenet_lobby_data(nil)
 	end
 	local days_multiplier = 0
@@ -1494,6 +1506,18 @@ function CrimeNetContractGui:mouse_pressed(o, button, x, y)
 	end
 	if alive(self._potential_rewards_title) and self._potential_rewards_title:visible() and self._potential_rewards_title:inside(x, y) then
 		self:_toggle_potential_rewards()
+	end
+end
+
+function CrimeNetContractGui:mouse_wheel_up(x, y)
+	if self._mutators_scroll then
+		self._mutators_scroll:scroll(x, y, 1)
+	end
+end
+
+function CrimeNetContractGui:mouse_wheel_down(x, y)
+	if self._mutators_scroll then
+		self._mutators_scroll:scroll(x, y, -1)
 	end
 end
 

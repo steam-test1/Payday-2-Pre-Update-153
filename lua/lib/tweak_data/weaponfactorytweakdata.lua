@@ -206,6 +206,7 @@ function WeaponFactoryTweakData:init()
 	self:_init_tecci()
 	self:_init_hajk()
 	self:_init_boot()
+	self:_init_rota()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -820,6 +821,10 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_smg_hajk = {
 				translation = Vector3(0, 5, -0.5),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_sho_rota = {
+				translation = Vector3(0, 0, -0.4),
 				rotation = Rotation(0, 0, 0)
 			}
 		},
@@ -1514,6 +1519,10 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_smg_hajk = {
 				translation = Vector3(0, 8, -0.5),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_sho_rota = {
+				translation = Vector3(0, 0, -0.42),
 				rotation = Rotation(0, 0, 0)
 			}
 		},
@@ -14905,7 +14914,8 @@ function WeaponFactoryTweakData:create_ammunition()
 		"wpn_fps_shot_b682",
 		"wpn_fps_sho_aa12",
 		"wpn_fps_sho_boot",
-		"wpn_fps_shot_m37"
+		"wpn_fps_shot_m37",
+		"wpn_fps_sho_rota"
 	}
 	for _, factory_id in ipairs(weapons) do
 		if self[factory_id] and self[factory_id].uses_parts then
@@ -26339,4 +26349,178 @@ function WeaponFactoryTweakData:_init_boot()
 	}
 	self.wpn_fps_sho_boot_npc = deep_clone(self.wpn_fps_sho_boot)
 	self.wpn_fps_sho_boot_npc.unit = "units/pd2_dlc_wild/weapons/wpn_fps_sho_boot/wpn_fps_sho_boot_npc"
+end
+
+function WeaponFactoryTweakData:_init_rota()
+	self.parts.wpn_fps_sho_rota_b_long = {
+		type = "barrel",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_b_long",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_b_short = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_b_short",
+		stats = {
+			value = 1,
+			spread = -2,
+			concealment = 3
+		},
+		dlc = "rota",
+		texture_bundle_folder = "rota"
+	}
+	self.parts.wpn_fps_sho_rota_b_silencer = {
+		pcs = {},
+		type = "barrel",
+		name_id = "bm_wp_rota_b_silenced",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_b_silencer",
+		stats = {
+			value = 6,
+			suppression = 12,
+			alert_size = 12,
+			spread = -1,
+			damage = -2,
+			recoil = 1,
+			spread_moving = 1,
+			concealment = -1
+		},
+		perks = {"silencer"},
+		sound_switch = {
+			suppressed = "suppressed_c"
+		},
+		forbids = {
+			"wpn_fps_upg_shot_ns_king",
+			"wpn_fps_upg_ns_shot_thick",
+			"wpn_fps_upg_ns_shot_shark",
+			"wpn_fps_upg_ns_sho_salvo_large",
+			"wpn_fps_upg_a_dragons_breath"
+		},
+		dlc = "rota",
+		texture_bundle_folder = "rota"
+	}
+	self.parts.wpn_fps_sho_rota_body_lower = {
+		type = "lower_receiver",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_body_lower",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_body_upper = {
+		type = "upper_reciever",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_body_upper",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_fg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_m",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_mag_realese = {
+		type = "extra",
+		name_id = "bm_wp_rota_b_standard",
+		a_obj = "a_extra",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_mag_realese",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_o_standard = {
+		type = "sight",
+		name_id = "bm_wp_hajk_o_sight",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_fps_sho_rota_o_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_sho_rota_b_long.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_b_long"
+	self.parts.wpn_fps_sho_rota_b_short.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_b_short"
+	self.parts.wpn_fps_sho_rota_b_silencer.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_b_silencer"
+	self.parts.wpn_fps_sho_rota_body_lower.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_body_lower"
+	self.parts.wpn_fps_sho_rota_body_upper.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_body_upper"
+	self.parts.wpn_fps_sho_rota_fg_standard.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_fg_standard"
+	self.parts.wpn_fps_sho_rota_g_standard.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_g_standard"
+	self.parts.wpn_fps_sho_rota_m_standard.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_m_standard"
+	self.parts.wpn_fps_sho_rota_mag_realese.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_mag_realese"
+	self.parts.wpn_fps_sho_rota_o_standard.third_unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota_pts/wpn_third_sho_rota_o_standard"
+	self.wpn_fps_sho_rota = {}
+	self.wpn_fps_sho_rota.unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota/wpn_fps_sho_rota"
+	self.wpn_fps_sho_rota.animations = {
+		fire = "recoil",
+		reload = "reload",
+		reload_not_empty = "reload",
+		fire_steelsight = "recoil"
+	}
+	self.wpn_fps_sho_rota.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"vertical_grip"
+	}
+	self.wpn_fps_sho_rota.default_blueprint = {
+		"wpn_fps_sho_rota_b_long",
+		"wpn_fps_sho_rota_body_lower",
+		"wpn_fps_sho_rota_body_upper",
+		"wpn_fps_sho_rota_fg_standard",
+		"wpn_fps_sho_rota_g_standard",
+		"wpn_fps_sho_rota_m_standard",
+		"wpn_fps_sho_rota_mag_realese",
+		"wpn_fps_sho_rota_o_standard",
+		"wpn_fps_smg_hajk_vg_moe"
+	}
+	self.wpn_fps_sho_rota.uses_parts = {
+		"wpn_fps_sho_rota_b_long",
+		"wpn_fps_sho_rota_b_short",
+		"wpn_fps_sho_rota_b_silencer",
+		"wpn_fps_sho_rota_body_lower",
+		"wpn_fps_sho_rota_body_upper",
+		"wpn_fps_sho_rota_fg_standard",
+		"wpn_fps_sho_rota_g_standard",
+		"wpn_fps_sho_rota_m_standard",
+		"wpn_fps_sho_rota_mag_realese",
+		"wpn_fps_sho_rota_o_standard",
+		"wpn_fps_smg_hajk_vg_moe",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_ns_shot_thick",
+		"wpn_fps_upg_ns_shot_shark",
+		"wpn_fps_upg_shot_ns_king",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_upg_ns_sho_salvo_large"
+	}
+	self.wpn_fps_sho_rota_npc = deep_clone(self.wpn_fps_sho_rota)
+	self.wpn_fps_sho_rota_npc.unit = "units/pd2_dlc_rota/weapons/wpn_fps_sho_rota/wpn_fps_sho_rota_npc"
 end

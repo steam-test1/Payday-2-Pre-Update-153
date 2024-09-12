@@ -76,6 +76,20 @@ function MutatorShotgunTweak:modify_value(id, value)
 		else
 			return math.min(value, 16)
 		end
+	elseif id == "NewShotgunBase:_fire_raycast" then
+		if value and value.hit_enemy and value.hit_enemy.type == "death" then
+			value.type = "death"
+		end
+		if value and value.variant == "explosion" then
+			value.type = "death"
+		end
+		return value
+	end
+end
+
+function MutatorShotgunTweak:OnEnemyKilledByExplosion(unit, was_shotgun)
+	if was_shotgun then
+		self:_on_shotgun_push(unit, nil, nil, nil, managers.player:player_unit())
 	end
 end
 

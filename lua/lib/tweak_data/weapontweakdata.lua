@@ -116,6 +116,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_tecci_npc()
 	self:_init_data_hajk_npc()
 	self:_init_data_boot_npc()
+	self:_init_data_rota_npc()
 	self:_precalculate_values()
 end
 
@@ -2075,6 +2076,21 @@ function WeaponTweakData:_init_data_boot_npc()
 	self.boot_npc.alert_size = 1000
 	self.boot_npc.suppression = 1
 	self.boot_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_rota_npc()
+	self.rota_npc.sounds.prefix = "rota_npc"
+	self.rota_npc.use_data.selection_index = 2
+	self.rota_npc.DAMAGE = 5
+	self.rota_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.rota_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.rota_npc.auto.fire_rate = 0.14
+	self.rota_npc.CLIP_AMMO_MAX = 7
+	self.rota_npc.NR_CLIPS_MAX = 6
+	self.rota_npc.hold = "rifle"
+	self.rota_npc.alert_size = 4500
+	self.rota_npc.suppression = 1.8
+	self.rota_npc.is_shotgun = true
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -11957,6 +11973,93 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.rota = {}
+	self.rota.category = "shotgun"
+	self.rota.has_magazine = true
+	self.rota.damage_melee = damage_melee_default
+	self.rota.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.rota.sounds = {}
+	self.rota.sounds.fire = "rota_fire"
+	self.rota.sounds.dryfire = "shotgun_dryfire"
+	self.rota.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.rota.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.rota.timers = {}
+	self.rota.timers.reload_not_empty = 2.55
+	self.rota.timers.reload_empty = 2.55
+	self.rota.timers.unequip = 0.6
+	self.rota.timers.equip = 0.6
+	self.rota.name_id = "bm_w_rota"
+	self.rota.desc_id = "bm_w_rota_desc"
+	self.rota.description_id = "des_rota"
+	self.rota.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.rota.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.rota.use_data = {}
+	self.rota.use_data.selection_index = 1
+	self.rota.use_data.align_place = "right_hand"
+	self.rota.DAMAGE = 6
+	self.rota.damage_near = 1000
+	self.rota.damage_far = 2000
+	self.rota.rays = 12
+	self.rota.CLIP_AMMO_MAX = 6
+	self.rota.NR_CLIPS_MAX = 9
+	self.rota.AMMO_MAX = self.rota.CLIP_AMMO_MAX * self.rota.NR_CLIPS_MAX
+	self.rota.AMMO_PICKUP = self:_pickup_chance(self.rota.AMMO_MAX, 1)
+	self.rota.FIRE_MODE = "single"
+	self.rota.fire_mode_data = {}
+	self.rota.fire_mode_data.fire_rate = 0.18
+	self.rota.CAN_TOGGLE_FIREMODE = false
+	self.rota.single = {}
+	self.rota.single.fire_rate = 0.18
+	self.rota.spread = {}
+	self.rota.spread.standing = self.r870.spread.standing
+	self.rota.spread.crouching = self.r870.spread.crouching
+	self.rota.spread.steelsight = self.r870.spread.steelsight
+	self.rota.spread.moving_standing = self.r870.spread.moving_standing
+	self.rota.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.rota.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.rota.kick = {}
+	self.rota.kick.standing = self.r870.kick.standing
+	self.rota.kick.crouching = self.rota.kick.standing
+	self.rota.kick.steelsight = self.r870.kick.steelsight
+	self.rota.crosshair = {}
+	self.rota.crosshair.standing = {}
+	self.rota.crosshair.crouching = {}
+	self.rota.crosshair.steelsight = {}
+	self.rota.crosshair.standing.offset = 0.7
+	self.rota.crosshair.standing.moving_offset = 0.7
+	self.rota.crosshair.standing.kick_offset = 0.8
+	self.rota.crosshair.crouching.offset = 0.65
+	self.rota.crosshair.crouching.moving_offset = 0.65
+	self.rota.crosshair.crouching.kick_offset = 0.75
+	self.rota.crosshair.steelsight.hidden = true
+	self.rota.crosshair.steelsight.offset = 0
+	self.rota.crosshair.steelsight.moving_offset = 0
+	self.rota.crosshair.steelsight.kick_offset = 0
+	self.rota.shake = {}
+	self.rota.shake.fire_multiplier = 2
+	self.rota.shake.fire_steelsight_multiplier = 1.25
+	self.rota.autohit = autohit_shotgun_default
+	self.rota.aim_assist = aim_assist_shotgun_default
+	self.rota.weapon_hold = "rota"
+	self.rota.animations = {}
+	self.rota.animations.equip_id = "equip_rota"
+	self.rota.animations.recoil_steelsight = true
+	self.rota.texture_bundle_folder = "rota"
+	self.rota.global_value = "rota"
+	self.rota.panic_suppression_chance = 0.2
+	self.rota.stats = {
+		damage = 42,
+		spread = 15,
+		recoil = 12,
+		spread_moving = 8,
+		zoom = 3,
+		concealment = 13,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -12725,6 +12828,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.rota_npc = {
+		usage = "saiga",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -12848,4 +12957,5 @@ function WeaponTweakData:_precalculate_values()
 	self.tecci_npc.AMMO_MAX = self.tecci_npc.CLIP_AMMO_MAX * self.tecci_npc.NR_CLIPS_MAX
 	self.hajk_npc.AMMO_MAX = self.hajk_npc.CLIP_AMMO_MAX * self.hajk_npc.NR_CLIPS_MAX
 	self.boot_npc.AMMO_MAX = self.boot_npc.CLIP_AMMO_MAX * self.boot_npc.NR_CLIPS_MAX
+	self.rota_npc.AMMO_MAX = self.rota_npc.CLIP_AMMO_MAX * self.rota_npc.NR_CLIPS_MAX
 end

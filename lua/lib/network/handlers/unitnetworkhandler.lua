@@ -2847,7 +2847,7 @@ function UnitNetworkHandler:sync_friendly_fire_damage(peer_id, unit, damage, var
 	end
 	if managers.network:session():local_peer():id() == peer_id then
 		local player_unit = managers.player:player_unit()
-		if alive(player_unit) then
+		if alive(player_unit) and alive(unit) then
 			local attack_info = {
 				attacker_unit = unit,
 				damage = damage,

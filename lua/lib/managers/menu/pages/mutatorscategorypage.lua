@@ -24,6 +24,7 @@ end
 function MutatorsCategoryPage:_setup_mutators_list()
 	self._items = {}
 	self._buttons = {}
+	local mutators_list = {}
 	local scroll = ScrollablePanel:new(self:panel(), "MutatorsPanel", {padding = 0})
 	scroll:on_canvas_updated_callback(callback(self, self, "_on_mutators_panel_updated"))
 	BoxGuiObject:new(scroll:panel(), {
@@ -36,13 +37,19 @@ function MutatorsCategoryPage:_setup_mutators_list()
 	})
 	table.insert(self._scrollable_panels, scroll)
 	self._mutators_scroll = scroll
-	local index = 0
 	for i, mutator in ipairs(managers.mutators:mutators()) do
 		if self.category == "all" or table.contains(mutator.categories, self.category) then
-			local item = MutatorItem:new(scroll:canvas(), mutator, index)
-			table.insert(self._items, item)
-			index = index + 1
+			table.insert(mutators_list, mutator)
 		end
+	end
+	table.sort(mutators_list, function(a, b)
+		return a:name() < b:name()
+	end)
+	local index = 0
+	for i, mutator in ipairs(mutators_list) do
+		local item = MutatorItem:new(scroll:canvas(), mutator, index)
+		table.insert(self._items, item)
+		index = index + 1
 	end
 	for i = 1, #self._items do
 		if 1 < i then

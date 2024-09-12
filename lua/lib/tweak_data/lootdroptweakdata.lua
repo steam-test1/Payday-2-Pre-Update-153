@@ -1060,6 +1060,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.sparkle.sort_number = 71
 	self.global_values.sparkle.hide_unavailable = true
 	self.global_values.sparkle.category = "global_event"
+	self.global_values.rota = {}
+	self.global_values.rota.name_id = "bm_global_value_rota"
+	self.global_values.rota.desc_id = "menu_l_global_value_rota"
+	self.global_values.rota.unlock_id = "bm_global_value_rota_unlock"
+	self.global_values.rota.color = Color(255, 255, 212, 0) / 255
+	self.global_values.rota.dlc = true
+	self.global_values.rota.chance = 1
+	self.global_values.rota.value_multiplier = 1
+	self.global_values.rota.durability_multiplier = 1
+	self.global_values.rota.drops = true
+	self.global_values.rota.track = true
+	self.global_values.rota.sort_number = 115
+	self.global_values.rota.category = "dlc"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1115,7 +1128,8 @@ function LootDropTweakData:init(tweak_data)
 		"solus_clan",
 		"wild",
 		"born",
-		"sparkle"
+		"sparkle",
+		"rota"
 	}
 	self:_create_global_value_list_map()
 end

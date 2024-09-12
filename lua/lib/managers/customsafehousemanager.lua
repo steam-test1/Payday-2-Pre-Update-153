@@ -376,14 +376,26 @@ function CustomSafehouseManager:run_trophy_unlocked_callbacks(trophy_id)
 	end
 end
 
+CustomSafehouseManager._mutator_achievement_categories = {
+	"complete_heist_achievements",
+	"grenade_achievements",
+	"enemy_kill_achievements",
+	"enemy_melee_kill_achievements"
+}
+
 function CustomSafehouseManager:can_progress_trophies(id)
 	if not self:unlocked() then
 		return false
 	end
-	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
-		for _, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
-			if achievement_data.trophy_stat == id then
-				return achievement_data.mutators
+	if managers.mutators:are_trophies_disabled() then
+		for i, achivement_category in ipairs(self._mutator_achievement_categories) do
+			local achievements = tweak_data.achievement[achivement_category]
+			if achievements then
+				for _, achievement_data in pairs(achievements) do
+					if achievement_data.trophy_stat == id then
+						return achievement_data.mutators
+					end
+				end
 			end
 		end
 		return false

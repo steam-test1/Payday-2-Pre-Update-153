@@ -216,6 +216,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.wild = 1
 	self.global_value_multipliers.born = 1
 	self.global_value_multipliers.sparkle = 0
+	self.global_value_multipliers.rota = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -286,6 +287,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.wild = 0.2
 	self.global_value_bonus_multiplier.born = 0.2
 	self.global_value_bonus_multiplier.sparkle = 0
+	self.global_value_bonus_multiplier.rota = 1
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)

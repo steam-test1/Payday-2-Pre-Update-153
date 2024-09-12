@@ -3,11 +3,12 @@ BaseMutator._type = "BaseMutator"
 BaseMutator.name_id = ""
 BaseMutator.desc_id = ""
 BaseMutator.has_options = false
-BaseMutator.reductions = {money = 0, exp = 0}
 BaseMutator.categories = {}
 BaseMutator.incompatiblities = {}
 BaseMutator.incompatibility_tags = {}
 BaseMutator.icon_coords = {1, 1}
+BaseMutator.reductions = {money = 0, exp = 0}
+BaseMutator.disables_achievements = true
 
 function BaseMutator:init(mutator_manager)
 	self._enabled = false

@@ -2761,21 +2761,33 @@ function MutatorsItem:init(panel, text, i)
 	title_text:set_size(w, h)
 	title_text:set_position(math.round(title_text:x()), math.round(title_text:y()))
 	local _y = title_text:bottom() + 5
+	local mutators_list = {}
 	for i, active_mutator in pairs(managers.mutators:active_mutators()) do
 		local mutator = active_mutator.mutator
 		if mutator then
-			local text = string.format("%s - %s", mutator:name(), mutator:desc())
-			local mutator_text = self._panel:text({
-				name = "mutator_text_" .. tostring(mutator:id()),
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				text = text,
-				x = 10,
-				y = _y,
-				h = tweak_data.menu.pd2_small_font_size
-			})
-			_y = mutator_text:bottom() + 2
+			table.insert(mutators_list, mutator)
 		end
+	end
+	table.sort(mutators_list, function(a, b)
+		return a:name() < b:name()
+	end)
+	for i, mutator in ipairs(mutators_list) do
+		local text = string.format("%s - %s", mutator:name(), mutator:desc())
+		local mutator_text = self._panel:text({
+			name = "mutator_text_" .. tostring(mutator:id()),
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			text = text,
+			x = 10,
+			y = _y,
+			w = self._panel:w(),
+			h = tweak_data.menu.pd2_small_font_size,
+			wrap = true,
+			word_wrap = true
+		})
+		local _, _, w, h = mutator_text:text_rect()
+		mutator_text:set_size(w, h)
+		_y = mutator_text:bottom() + 2
 	end
 end
 
@@ -3568,14 +3580,18 @@ function MissionBriefingGui:hide()
 	self:close_asset()
 	self._panel:set_alpha(0.5)
 	self._fullscreen_panel:set_alpha(0.5)
-	self._lobby_mutators_text:set_visible(false)
+	if self._lobby_mutators_text then
+		self._lobby_mutators_text:set_visible(false)
+	end
 end
 
 function MissionBriefingGui:show()
 	self._enabled = true
 	self._panel:set_alpha(1)
 	self._fullscreen_panel:set_alpha(1)
-	self._lobby_mutators_text:set_visible(managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id()))
+	if self._lobby_mutators_text then
+		self._lobby_mutators_text:set_visible(managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id()))
+	end
 end
 
 function MissionBriefingGui:update_tab_positions()
