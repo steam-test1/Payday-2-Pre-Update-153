@@ -496,6 +496,21 @@ function HUDStatsScreen:init()
 		by / managers.gui_data:full_scaled_size().h,
 		0
 	})
+	local mutators_panel = right_panel:panel({
+		layer = 1,
+		valign = {0.5, 0.5},
+		name = "mutators_panel",
+		x = 20,
+		y = y + math.round(managers.gui_data:scaled_size().height / 2),
+		h = 0,
+		w = left_panel:w()
+	})
+	mutators_panel:set_w(right_panel:w() - x - mutators_panel:x())
+	mutators_panel:set_bottom(ext_inventory_panel:top())
+	mutators_panel:set_valign({
+		by / managers.gui_data:full_scaled_size().h,
+		0
+	})
 	local profile_wrapper_panel = bottom_panel:panel({
 		layer = 1,
 		valign = {0.5, 0.5},
@@ -531,6 +546,7 @@ function HUDStatsScreen:show()
 	self:_create_stats_screen_profile(bottom_panel:child("profile_wrapper_panel"))
 	self:_create_stats_screen_objectives(left_panel:child("objectives_panel"))
 	self:_create_stats_ext_inventory(right_panel:child("ext_inventory_panel"))
+	self:_create_mutators_list(right_panel:child("mutators_panel"))
 	self:_update_stats_screen_loot(left_panel:child("loot_wrapper_panel"))
 	self:_update_stats_screen_day(right_panel)
 	local teammates_panel = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2).panel:child("teammates_panel")
@@ -861,6 +877,57 @@ function HUDStatsScreen:_set_amount_string(text, amount)
 	text:set_range_color(0, string.len(amount == 0 and text:text() or zero), Color.white:with_alpha(0.5))
 end
 
+function HUDStatsScreen:_create_mutators_list(mutators_panel)
+	mutators_panel:clear()
+	if not managers.mutators:are_mutators_active() then
+		return
+	end
+	local y = 2
+	local title = mutators_panel:text({
+		name = "title",
+		visible = true,
+		text = managers.localization:to_upper_text("menu_mutators"),
+		font_size = tweak_data.hud_stats.loot_title_size,
+		font = tweak_data.hud_stats.objectives_font,
+		color = Color.white,
+		align = "right",
+		vertical = "center",
+		layer = 2,
+		x = -2,
+		y = y,
+		w = mutators_panel:w(),
+		h = tweak_data.hud_stats.loot_title_size
+	})
+	managers.hud:make_fine_text(title)
+	title:set_right(math.round(mutators_panel:w()))
+	y = y + title:h()
+	for i, active_mutator in ipairs(managers.mutators:active_mutators()) do
+		local mutator_text = mutators_panel:text({
+			layer = 1,
+			name = "mutator_" .. tostring(i),
+			color = Color.white,
+			font_size = tweak_data.hud_stats.day_description_size,
+			font = tweak_data.hud_stats.objectives_font,
+			text = active_mutator.mutator:name(),
+			align = "right",
+			vertical = "top",
+			w = mutators_panel:w(),
+			h = tweak_data.hud_stats.day_description_size,
+			x = 0,
+			y = y
+		})
+		y = y + mutator_text:h() + 2
+	end
+	mutators_panel:set_h(y)
+	local right_panel = self._full_hud_panel:child("right_panel")
+	if alive(right_panel) then
+		local ext_inventory_panel = right_panel:child("ext_inventory_panel")
+		if alive(ext_inventory_panel) then
+			mutators_panel:set_bottom(ext_inventory_panel:top() - 10)
+		end
+	end
+end
+
 function HUDStatsScreen:_animate_text_pulse(text, exp_gain_ring, exp_ring)
 	local t = 0
 	local c = text:color()
@@ -1035,6 +1102,21 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			day_description:set_h(h)
 			managers.hud:make_fine_text(days_title)
 			day_wrapper_panel:set_h(day_title:top() + day_description:bottom())
+			local mutators_panel = right_panel:child("mutators_panel")
+			if mutators_panel then
+				local diff = day_wrapper_panel:bottom() - mutators_panel:top()
+				if 0 < diff then
+					day_description:set_h(day_description:h() - diff)
+					day_wrapper_panel:set_h(day_wrapper_panel:h() - diff)
+					local line_breaks = day_description:line_breaks()
+					for i, bh in ipairs(line_breaks) do
+						if day_description:top() + (line_breaks[i + 1] or bh) >= day_wrapper_panel:h() then
+							day_description:set_h(line_breaks[i - 1])
+							break
+						end
+					end
+				end
+			end
 			local _, _, _, h = day_description:text_rect()
 			local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id())
 			local is_whisper_mode = managers.groupai and managers.groupai:state():whisper_mode()

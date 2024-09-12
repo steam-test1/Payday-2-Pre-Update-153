@@ -1180,6 +1180,7 @@ function WINDLCManager:init()
 			sparkle = {app_id = "532810", no_install = true},
 			gotti_bundle = {app_id = "218620", no_install = true},
 			nyck_bundle = {app_id = "218620", no_install = true},
+			urf_bundle = {app_id = "218620", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

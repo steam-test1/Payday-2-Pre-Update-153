@@ -1572,6 +1572,7 @@ function CopDamage:die(attack_data)
 		self._unit:sound():play(self._unit:base():char_tweak().die_sound_event, nil, nil)
 	end
 	self:_on_death()
+	managers.mutators:notify(Message.OnCopDamageDeath, self, attack_data)
 end
 
 function CopDamage:set_mover_collision_state(state)

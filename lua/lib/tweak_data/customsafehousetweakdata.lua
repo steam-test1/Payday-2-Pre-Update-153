@@ -1015,6 +1015,26 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		image_id = "safehouse_trophies_preview_courtesy"
 	})
 	table.insert(self.trophies, {
+		id = "trophy_evolution",
+		name_id = "trophy_evolution",
+		desc_id = "trophy_evolution_desc",
+		objective_id = "trophy_evolution_objective",
+		objectives = {
+			self:_progress("trophy_evolution", 1)
+		},
+		image_id = "safehouse_trophies_preview_evolution"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_flawless",
+		name_id = "trophy_flawless",
+		desc_id = "trophy_flawless_desc",
+		objective_id = "trophy_flawless_objective",
+		objectives = {
+			self:_progress("trophy_flawless", 1)
+		},
+		image_id = "safehouse_trophies_preview_flawless"
+	})
+	table.insert(self.trophies, {
 		id = "trophy_defender",
 		name_id = "trophy_defender",
 		desc_id = "trophy_defender_desc",

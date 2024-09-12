@@ -2741,6 +2741,44 @@ function NewLoadoutTab:open_node(node)
 	managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
 end
 
+MutatorsItem = MutatorsItem or class(MissionBriefingTabItem)
+
+function MutatorsItem:init(panel, text, i)
+	MissionBriefingTabItem.init(self, panel, text, i)
+	if not managers.mutators:are_mutators_active() then
+		return
+	end
+	local title_text = self._panel:text({
+		name = "title_text",
+		text = managers.localization:to_upper_text("menu_cn_mutators_active"),
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		font = tweak_data.menu.pd2_medium_font,
+		x = 10,
+		y = 10,
+		color = tweak_data.screen_colors.text
+	})
+	local x, y, w, h = title_text:text_rect()
+	title_text:set_size(w, h)
+	title_text:set_position(math.round(title_text:x()), math.round(title_text:y()))
+	local _y = title_text:bottom() + 5
+	for i, active_mutator in pairs(managers.mutators:active_mutators()) do
+		local mutator = active_mutator.mutator
+		if mutator then
+			local text = string.format("%s - %s", mutator:name(), mutator:desc())
+			local mutator_text = self._panel:text({
+				name = "mutator_text_" .. tostring(mutator:id()),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				text = text,
+				x = 10,
+				y = _y,
+				h = tweak_data.menu.pd2_small_font_size
+			})
+			_y = mutator_text:bottom() + 2
+		end
+	end
+end
+
 MissionBriefingGui = MissionBriefingGui or class()
 
 function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
@@ -2844,6 +2882,11 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		table.insert(self._items, self._team_loadout_item)
 		index = index + 1
 	end
+	if managers.mutators and managers.mutators:are_mutators_active() then
+		self._mutators_item = MutatorsItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_mutators")), index)
+		table.insert(self._items, self._mutators_item)
+		index = index + 1
+	end
 	if tweak_data.levels[Global.level_data.level_id].music ~= "no_music" then
 		self._jukebox_item = JukeboxItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), index)
 		table.insert(self._items, self._jukebox_item)
@@ -2893,6 +2936,22 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._multi_profile_item:panel():set_bottom(self._panel:h())
 	self._multi_profile_item:panel():set_left(0)
 	self._multi_profile_item:set_name_editing_enabled(false)
+	local mutators_panel = self._safe_workspace:panel()
+	self._lobby_mutators_text = mutators_panel:text({
+		name = "mutated_text",
+		text = managers.localization:to_upper_text("menu_mutators_lobby_wait_title"),
+		align = "right",
+		vertical = "top",
+		font_size = tweak_data.menu.pd2_large_font_size * 0.8,
+		font = tweak_data.menu.pd2_large_font,
+		color = tweak_data.screen_colors.mutators_color_text,
+		layer = self._ready_button:layer()
+	})
+	local _, _, w, h = self._lobby_mutators_text:text_rect()
+	self._lobby_mutators_text:set_size(w, h)
+	self._lobby_mutators_text:set_top(tweak_data.menu.pd2_large_font_size)
+	local mutators_active = managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id())
+	self._lobby_mutators_text:set_visible(mutators_active)
 	self._enabled = true
 	self:flash_ready()
 end
@@ -2919,6 +2978,10 @@ function MissionBriefingGui:update(t, dt)
 	end
 	if self._items[self._selected_item] then
 		self._items[self._selected_item]:update(t, dt)
+	end
+	if alive(self._lobby_mutators_text) then
+		local a = 0.75 + math.abs(math.sin(t * 120) * 0.25)
+		self._lobby_mutators_text:set_alpha(a)
 	end
 end
 
@@ -3505,12 +3568,14 @@ function MissionBriefingGui:hide()
 	self:close_asset()
 	self._panel:set_alpha(0.5)
 	self._fullscreen_panel:set_alpha(0.5)
+	self._lobby_mutators_text:set_visible(false)
 end
 
 function MissionBriefingGui:show()
 	self._enabled = true
 	self._panel:set_alpha(1)
 	self._fullscreen_panel:set_alpha(1)
+	self._lobby_mutators_text:set_visible(managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id()))
 end
 
 function MissionBriefingGui:update_tab_positions()

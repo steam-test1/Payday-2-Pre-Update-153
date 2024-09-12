@@ -19,6 +19,9 @@ function EnemyManager:init()
 	self:_init_enemy_data()
 	self._unit_clbk_key = "EnemyManager"
 	self._corpse_disposal_upd_interval = 5
+	self._shield_disposal_upd_interval = 15
+	self._shield_disposal_lifetime = 60
+	self._MAX_NR_SHIELDS = 8
 end
 
 function EnemyManager:update(t, dt)
@@ -29,7 +32,13 @@ function EnemyManager:update(t, dt)
 end
 
 function EnemyManager:corpse_limit()
-	return self._MAX_NR_CORPSES
+	local limit = managers.user:get_setting("corpse_limit") or self._MAX_NR_CORPSES
+	limit = managers.mutators:modify_value("EnemyManager:corpse_limit", limit)
+	return limit
+end
+
+function EnemyManager:shield_limit()
+	return self._MAX_NR_SHIELDS
 end
 
 function EnemyManager:_update_gfx_lod()
@@ -278,6 +287,8 @@ function EnemyManager:_init_enemy_data()
 	enemy_data.max_nr_active_units = 20
 	enemy_data.corpses = {}
 	enemy_data.nr_corpses = 0
+	enemy_data.shields = {}
+	enemy_data.nr_shields = 0
 	self._civilian_data = {
 		unit_data = {}
 	}
@@ -575,6 +586,31 @@ function EnemyManager:on_enemy_unregistered(unit)
 	managers.groupai:state():on_enemy_unregistered(unit)
 end
 
+function EnemyManager:register_shield(shield_unit)
+	local enemy_data = self._enemy_data
+	if enemy_data.nr_shields >= 0 and self:is_corpse_disposal_enabled() and not self:has_task("EnemyManager._upd_shield_disposal") then
+		self:queue_task("EnemyManager._upd_shield_disposal", EnemyManager._upd_shield_disposal, self, self._t + self._shield_disposal_upd_interval)
+	end
+	enemy_data.nr_shields = enemy_data.nr_shields + 1
+	enemy_data.shields[shield_unit:key()] = {
+		unit = shield_unit,
+		death_t = TimerManager:game():time()
+	}
+end
+
+function EnemyManager:unregister_shield(shield_unit)
+	local enemy_data = self._enemy_data
+	local u_key = shield_unit:key()
+	local u_data = enemy_data.shields[u_key]
+	if u_data then
+		enemy_data.shields[u_key] = nil
+		enemy_data.nr_shields = enemy_data.nr_shields - 1
+		if enemy_data.nr_shields == 0 then
+			self:unqueue_task("EnemyManager._upd_shield_disposal")
+		end
+	end
+end
+
 function EnemyManager:register_civilian(unit)
 	unit:base():add_destroy_listener(self._unit_clbk_key, callback(self, self, "on_civilian_destroyed"))
 	self:_create_unit_gfx_lod_data(unit, true)
@@ -703,13 +739,82 @@ function EnemyManager:_upd_corpse_disposal()
 	end
 end
 
+function EnemyManager:_upd_shield_disposal()
+	local t = TimerManager:game():time()
+	local enemy_data = self._enemy_data
+	local nr_shields = enemy_data.nr_shields
+	local disposals_needed = nr_shields - self:shield_limit()
+	local shields = enemy_data.shields
+	local player = managers.player:player_unit()
+	local cam_pos, cam_fwd
+	if player then
+		cam_pos = player:movement():m_head_pos()
+		cam_fwd = player:camera():forward()
+	elseif managers.viewport:get_current_camera() then
+		cam_pos = managers.viewport:get_current_camera_position()
+		cam_fwd = managers.viewport:get_current_camera_rotation():y()
+	end
+	local to_dispose = {}
+	local nr_found = 0
+	if disposals_needed > #to_dispose then
+		if cam_pos then
+			for u_key, u_data in pairs(shields) do
+				local dispose = false
+				if alive(u_data.unit) then
+					local u_pos = u_data.unit:position()
+					if not to_dispose[u_key] and 300 < mvec3_dis(cam_pos, u_pos) and 0 > mvector3.dot(cam_fwd, u_pos - cam_pos) and t > u_data.death_t + self._shield_disposal_lifetime then
+						dispose = true
+					end
+				else
+					dispose = true
+				end
+				if dispose then
+					to_dispose[u_key] = true
+					nr_found = nr_found + 1
+					if nr_found == disposals_needed then
+						break
+					end
+				end
+			end
+		end
+		if disposals_needed > nr_found then
+			local oldest_u_key, oldest_t
+			for u_key, u_data in pairs(shields) do
+				if (not oldest_t or oldest_t > u_data.death_t) and not to_dispose[u_key] then
+					oldest_u_key = u_key
+					oldest_t = u_data.death_t
+				end
+			end
+			if oldest_u_key then
+				to_dispose[oldest_u_key] = true
+				nr_found = nr_found + 1
+			end
+		end
+	end
+	for u_key, _ in pairs(to_dispose) do
+		local u_data = shields[u_key]
+		if alive(u_data.unit) then
+			self:unregister_shield(u_data.unit)
+			u_data.unit:set_slot(0)
+		end
+		shields[u_key] = nil
+	end
+	enemy_data.nr_shields = nr_shields - nr_found
+	if enemy_data.nr_shields > 0 then
+		local delay = enemy_data.nr_shields > self:corpse_limit() and 0 or self._shield_disposal_upd_interval
+		self:queue_task("EnemyManager._upd_shield_disposal", EnemyManager._upd_shield_disposal, self, t + delay)
+	end
+end
+
 function EnemyManager:set_corpse_disposal_enabled(state)
 	local was_enabled = self._corpse_disposal_enabled > 0
 	self._corpse_disposal_enabled = self._corpse_disposal_enabled + (state and 1 or 0)
 	if was_enabled and self._corpse_disposal_enabled < 0 then
 		self:unqueue_task("EnemyManager._upd_corpse_disposal")
+		self:unqueue_task("EnemyManager._upd_shield_disposal")
 	elseif not was_enabled and self._corpse_disposal_enabled > 0 and 0 < self._enemy_data.nr_corpses then
 		self:queue_task("EnemyManager._upd_corpse_disposal", EnemyManager._upd_corpse_disposal, self, TimerManager:game():time() + self._corpse_disposal_upd_interval)
+		self:queue_task("EnemyManager._upd_shield_disposal", EnemyManager._upd_shield_disposal, self, TimerManager:game():time() + self._shield_disposal_upd_interval)
 	end
 end
 

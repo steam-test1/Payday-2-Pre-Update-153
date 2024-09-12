@@ -2180,6 +2180,13 @@ function MenuCallbackHandler:choice_allow_safehouses_filter(item)
 	managers.user:set_setting("crimenet_filter_safehouses", allow_safehouses)
 end
 
+function MenuCallbackHandler:choice_mutated_lobbies_filter(item)
+	local allow_mutators = item:value() == "on" and true or false
+	Global.game_settings.search_mutated_lobbies = allow_mutators
+	managers.user:set_setting("crimenet_filter_mutators", allow_mutators)
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+end
+
 function MenuCallbackHandler:choice_server_state_lobby(item)
 	local state_filter = item:value()
 	if managers.network.matchmake:get_lobby_filter("state") == state_filter then
@@ -2738,6 +2745,11 @@ function MenuCallbackHandler:choice_choose_menu_theme(item)
 	managers.menu:change_theme(item:value())
 end
 
+function MenuCallbackHandler:choice_corpse_limit(item)
+	print("corpse limit set to: ", item:value())
+	managers.user:set_setting("corpse_limit", item:value())
+end
+
 function MenuCallbackHandler:choice_choose_ao(item)
 	managers.user:set_setting("video_ao", item:value())
 end
@@ -3133,6 +3145,15 @@ function MenuCallbackHandler:save_game_callback()
 end
 
 function MenuCallbackHandler:start_the_game()
+	local mutators_manager = managers.mutators
+	if mutators_manager and mutators_manager:should_delay_game_start() then
+		if not mutators_manager:_check_all_peers_are_ready() then
+			mutators_manager:use_start_the_game_initial_delay()
+		end
+		mutators_manager:send_mutators_notification_to_clients(mutators_manager:delay_lobby_time())
+		managers.menu:open_node("start_the_game_countdown")
+		return
+	end
 	if self._game_started then
 		return
 	end
@@ -3146,6 +3167,10 @@ function MenuCallbackHandler:start_the_game()
 	local mission = Global.game_settings.mission ~= "none" and Global.game_settings.mission or nil
 	local world_setting = Global.game_settings.world_setting
 	managers.network:session():load_level(level_name, mission, world_setting, nil, level_id)
+end
+
+function MenuCallbackHandler:cancel_start_the_game_countdown()
+	managers.mutators:start_the_game_countdown_cancelled()
 end
 
 function MenuCallbackHandler:restart_game(item)
@@ -3352,6 +3377,7 @@ function MenuCallbackHandler:set_default_options()
 			if Global.crimenet then
 				Global.crimenet.quickplay = {}
 			end
+			managers.mutators:reset_all_mutators()
 		end
 	}
 	managers.menu:show_default_option_dialog(params)
@@ -7327,6 +7353,7 @@ function MenuCrimeNetFiltersInitiator:modify_node(original_node, data)
 		node:item("toggle_server_state_lobby"):set_value(matchmake_filters.state and matchmake_filters.state.value or -1)
 		node:item("toggle_job_appropriate_lobby"):set_value(Global.game_settings.search_appropriate_jobs and "on" or "off")
 		node:item("toggle_allow_safehouses"):set_value(Global.game_settings.allow_search_safehouses and "on" or "off")
+		node:item("toggle_mutated_lobby"):set_value(Global.game_settings.search_mutated_lobbies and "on" or "off")
 		node:item("max_lobbies_filter"):set_value(managers.network.matchmake:get_lobby_return_count())
 		node:item("server_filter"):set_value(managers.network.matchmake:distance_filter())
 		node:item("difficulty_filter"):set_value(matchmake_filters.difficulty and matchmake_filters.difficulty.value or -1)
@@ -7355,6 +7382,7 @@ function MenuCrimeNetFiltersInitiator:update_node(node)
 		node:item("toggle_new_servers_only"):set_enabled(not_friends_only)
 		node:item("toggle_server_state_lobby"):set_enabled(not_friends_only)
 		node:item("toggle_job_appropriate_lobby"):set_enabled(not_friends_only)
+		node:item("toggle_mutated_lobby"):set_enabled(not_friends_only)
 		node:item("max_lobbies_filter"):set_enabled(not_friends_only)
 		node:item("server_filter"):set_enabled(not_friends_only)
 		node:item("difficulty_filter"):set_enabled(not_friends_only)
@@ -7475,6 +7503,98 @@ function MenuCallbackHandler:_reset_filters(item)
 		managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 		self:refresh_node(item)
 	end
+end
+
+MenuMutatorOptionsInitiator = MenuMutatorOptionsInitiator or class(MenuCrimeNetSpecialInitiator)
+
+function MenuMutatorOptionsInitiator:modify_node(original_node, data)
+	local node = original_node
+	return self:setup_node(node, data)
+end
+
+function MenuMutatorOptionsInitiator:setup_node(node, mutator)
+	node:clean_items()
+	mutator = mutator or node:parameters()._mutator
+	local default_item = mutator:setup_options_gui(node)
+	self:create_divider(node, "end", nil, 16)
+	local params = {
+		name = "reset",
+		text_id = "menu_mutators_reset",
+		callback = "reset_mutator",
+		align = "right",
+		disabled_color = tweak_data.screen_colors.important_1,
+		mutator = mutator
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	local params = {
+		name = "back",
+		text_id = "dialog_accept",
+		callback = "save_mutator_options",
+		align = "right",
+		last_item = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	node:parameters()._mutator = mutator
+	if default_item then
+		node:set_default_item_name(default_item:parameters().name)
+		node:select_item(default_item:parameters().name)
+	end
+	return node
+end
+
+function MenuMutatorOptionsInitiator:refresh_node(node, data)
+end
+
+function MenuCallbackHandler:reset_mutator(item)
+	item:parameters().mutator:reset_to_default()
+end
+
+function MenuCallbackHandler:save_mutator_options(item)
+	local mutator = item:parameters().gui_node.node:parameters()._mutator
+	if mutator then
+		managers.mutators:set_enabled(mutator, true)
+	end
+	managers.menu:back()
+	managers.menu_component:mutators_list_gui():refresh()
+	self:_update_mutators_info()
+end
+
+function MenuCallbackHandler:_update_mutators_info()
+	if Network:is_server() then
+		managers.network.matchmake:set_server_attributes(self:get_matchmake_attributes())
+		managers.mutators:update_lobby_info()
+	end
+end
+
+MenuLobbyCountdownInitiator = MenuLobbyCountdownInitiator or class(MenuCrimeNetSpecialInitiator)
+
+function MenuLobbyCountdownInitiator:modify_node(original_node, data)
+	local node = original_node
+	return self:setup_node(node, data)
+end
+
+function MenuLobbyCountdownInitiator:setup_node(node, mutator)
+	node:clean_items()
+	local params = {
+		name = "back",
+		text_id = "dialog_cancel",
+		previous_node = "true",
+		align = "right",
+		last_item = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	node:set_default_item_name("back")
+	node:select_item("back")
+	return node
+end
+
+function MenuLobbyCountdownInitiator:refresh_node(node, data)
 end
 
 MenuCrimeNetSmartmatchmakeInitiator = MenuCrimeNetSmartmatchmakeInitiator or class()
@@ -7668,6 +7788,7 @@ function MenuOptionInitiator:modify_adv_video(node)
 	if node:item("choose_aa") then
 		node:item("choose_aa"):set_value(managers.user:get_setting("video_aa"))
 	end
+	node:item("choose_corpse_limit"):set_value(managers.user:get_setting("corpse_limit"))
 	return node
 end
 

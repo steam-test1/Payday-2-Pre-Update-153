@@ -45,6 +45,7 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 	self._fire_dot_data = deep_clone(data.fire_dot_data)
 	self._fire_alert_radius = data.fire_alert_radius
 	self._is_molotov = data.is_molotov
+	self._hexes = data.hexes or 6
 	local detonated_position = self._unit:position()
 	local range = self._range
 	local single_effect_radius = range
@@ -97,7 +98,7 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 			self._molotov_damage_effect_table[1].effect_initial_normal = ray_cast2.normal
 		end
 	end
-	for i = 1, 6 do
+	for i = 1, self._hexes do
 		vector = position + offset
 		raycast = World:raycast("ray", position, vector, "slot_mask", slotmask)
 		local ray_cast, fake_ball_outline
@@ -239,6 +240,7 @@ function EnvironmentFire:save(data)
 	state.fire_dot_data = self._fire_dot_data
 	state.fire_alert_radius = self._fire_alert_radius
 	state.is_molotov = self._is_molotov
+	state.hexes = self._hexes or 6
 	state.data = self._data
 	state.normal = self._normal
 	state.added_time = self._added_time
@@ -260,6 +262,7 @@ function EnvironmentFire:load(data)
 	self._fire_dot_data = state.fire_dot_data
 	self._fire_alert_radius = state.fire_alert_radius
 	self._is_molotov = state.is_molotov
+	self._hexes = state.hexes or 6
 	local data = state.data
 	local normal = state.normal
 	local added_time = state.added_time

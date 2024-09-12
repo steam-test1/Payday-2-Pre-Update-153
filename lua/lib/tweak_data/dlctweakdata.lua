@@ -5015,6 +5015,16 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.urf_bundle = {}
+	self.urf_bundle.content = {}
+	self.urf_bundle.content.loot_global_value = "normal"
+	self.urf_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "urf_seal",
+			amount = 1
+		}
+	}
 	self.fez1 = {}
 	self.fez1.dlc = "has_fez1"
 	self.fez1.content = {}

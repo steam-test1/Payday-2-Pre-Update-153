@@ -380,6 +380,14 @@ function CustomSafehouseManager:can_progress_trophies(id)
 	if not self:unlocked() then
 		return false
 	end
+	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
+		for _, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
+			if achievement_data.trophy_stat == id then
+				return achievement_data.mutators
+			end
+		end
+		return false
+	end
 	return true
 end
 

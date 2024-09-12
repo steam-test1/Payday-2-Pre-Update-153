@@ -807,7 +807,8 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 								job_id = job_id,
 								is_friend = is_friend,
 								kick_option = kick_option,
-								job_plan = job_plan
+								job_plan = job_plan,
+								mutators = attribute_list[i].mutators
 							})
 						end
 					else
@@ -825,7 +826,8 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 							job_id = job_id,
 							is_friend = is_friend,
 							kick_option = kick_option,
-							job_plan = job_plan
+							job_plan = job_plan,
+							mutators = attribute_list[i].mutators
 						})
 					end
 				end
@@ -879,6 +881,7 @@ function CrimeNetManager:join_quick_play_game()
 		local min_level, max_level = math.max(player_level - level_diff_min, 0), math.min(player_level + level_diff_max, 100)
 		local stealth_enabled = managers.user:get_setting("quickplay_stealth")
 		local loud_enabled = managers.user:get_setting("quickplay_loud")
+		local mutators_only_games = managers.user:get_setting("quickplay_mutators")
 		local difficulty = self._global.quickplay.difficulty
 		for i, room in ipairs(room_list) do
 			local name_str = tostring(room.owner_name)
@@ -894,6 +897,14 @@ function CrimeNetManager:join_quick_play_game()
 			end
 			if not skip_level and managers.ban_list:banned(room.owner_id) then
 				skip_level = true
+			end
+			if not skip_level then
+				local attributes_mutators = attribute_list[i].mutators
+				if mutators_only_games then
+					skip_level = not attributes_mutators
+				else
+					skip_level = attributes_mutators
+				end
 			end
 			if not skip_level and managers.network.matchmake:is_server_ok(false, room.owner_id, attributes_numbers) then
 				local owner_level = room.owner_level and tonumber(room.owner_level)
@@ -1258,6 +1269,17 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		})
 		mw = math.max(mw, self:make_fine_text(ghost_text))
 		local next_y = ghost_text:bottom()
+		local mutated_text = legend_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			x = host_text:left(),
+			y = ghost_text:bottom(),
+			text = managers.localization:to_upper_text("menu_cn_legend_mutated"),
+			blend_mode = "add",
+			color = tweak_data.screen_colors.mutators_color_text
+		})
+		mw = math.max(mw, self:make_fine_text(mutated_text))
+		next_y = mutated_text:bottom()
 		local kick_none_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_kick_marker",
 			x = 10,
@@ -2120,6 +2142,12 @@ function CrimeNetGui:add_special_contract(special_contract, no_casino, no_quickp
 			gui_data.glow_panel:animate(special_contract.pulse_func or animate_pulse)
 			gui_data.pulse = special_contract.pulse and 21
 		end
+		if special_contract.mutators_color and (managers.mutators:are_mutators_enabled() or managers.mutators:are_mutators_active()) then
+			gui_data.side_panel:child("job_name"):set_color(tweak_data.screen_colors.mutators_color_text)
+			gui_data.side_panel:child("contact_name"):set_color(tweak_data.screen_colors.mutators_color_text)
+			gui_data.side_panel:child("info_name"):set_color(tweak_data.screen_colors.mutators_color_text)
+			gui_data.marker_panel:child("marker_dot"):set_color(tweak_data.screen_colors.mutators_color_text)
+		end
 		self._jobs[id] = gui_data
 		table.insert(self._special_contracts_id, id)
 	end
@@ -2412,6 +2440,11 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		blend_mode = "normal",
 		layer = 0
 	})
+	if data.mutators then
+		job_name:set_color(tweak_data.screen_colors.mutators_color_text)
+		contact_name:set_color(tweak_data.screen_colors.mutators_color_text)
+		info_name:set_color(tweak_data.screen_colors.mutators_color_text)
+	end
 	stars_panel:set_w(star_size * math.min(11, #stars_panel:children()))
 	stars_panel:set_h(star_size)
 	local focus = self._pan_panel:bitmap({
@@ -2581,6 +2614,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			blend_mode = "add"
 		})
 	end
+	if data.mutators then
+		marker_dot:set_color(tweak_data.screen_colors.mutators_color)
+	end
 	local timer_rect, peers_panel
 	local icon_panel = self._pan_panel:panel({
 		layer = 26,
@@ -2625,6 +2661,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 				visible = i <= data.num_plrs
 			})
 			player_marker:set_position(cx, cy)
+			if data.mutators then
+				player_marker:set_color(tweak_data.screen_colors.mutators_color)
+			end
 		end
 		local kick_none_icon = icon_panel:bitmap({
 			name = "kick_none_icon",
@@ -2775,6 +2814,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		text_on_right = text_on_right,
 		location = location,
 		heat_glow = heat_glow,
+		mutators = data.mutators,
 		color_lerp = data.color_lerp
 	}
 	self:update_job_gui(job, 3)
@@ -2909,6 +2949,21 @@ function CrimeNetGui:update_server_job(data, i)
 		for i, peer_icon in ipairs(job.peers_panel:children()) do
 			peer_icon:set_visible(i <= job.num_plrs)
 		end
+	end
+	local new_color = data.mutators and tweak_data.screen_colors.mutators_color or Color.white
+	local new_text_color = data.mutators and tweak_data.screen_colors.mutators_color_text or Color.white
+	if job.peers_panel then
+		for i, peer_icon in ipairs(job.peers_panel:children()) do
+			peer_icon:set_color(new_color)
+		end
+	end
+	if job.marker_panel then
+		job.marker_panel:child("marker_dot"):set_color(new_color)
+	end
+	if job.side_panel then
+		job.side_panel:child("job_name"):set_color(new_text_color)
+		job.side_panel:child("contact_name"):set_color(new_text_color)
+		job.side_panel:child("info_name"):set_color(new_text_color)
 	end
 	if recreate_job then
 		print("[CrimeNetGui] update_server_job", "job_index", job_index)
@@ -3169,7 +3224,8 @@ function CrimeNetGui:check_job_pressed(x, y)
 				special_node = job.special_node,
 				dlc = job.dlc,
 				contract_visuals = job_data and job_data.contract_visuals,
-				info = job.info
+				info = job.info,
+				mutators = job.mutators
 			}
 			managers.menu_component:post_event("menu_enter")
 			if not data.dlc or managers.dlc:is_dlc_unlocked(data.dlc) then

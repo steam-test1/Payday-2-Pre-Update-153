@@ -1143,6 +1143,7 @@ function HUDStageEndScreen:create_money_counter(t, dt)
 	local vehicle_payout = payouts.vehicle_payout
 	local small_loot_payout = payouts.small_loot_payout
 	local crew_payout = payouts.crew_payout
+	local mutators_reduction = -payouts.mutators_reduction
 	local check_if_clear = function(data)
 		for _, d in ipairs(data) do
 			if d[2] and d[2] > 0 then
@@ -1176,6 +1177,10 @@ function HUDStageEndScreen:create_money_counter(t, dt)
 		{
 			"hud_instant_cash",
 			math.round(small_loot_payout or 0)
+		},
+		{
+			"menu_mutators_reduction_cash",
+			math.round(mutators_reduction or 0)
 		},
 		name_id = managers.localization:to_upper_text("menu_cash_income", {money = ""})
 	}
@@ -1560,7 +1565,8 @@ function HUDStageEndScreen:stage_init(t, dt)
 		"bonus_gage_assignment",
 		"bonus_extra",
 		"bonus_ghost",
-		"heat_xp"
+		"heat_xp",
+		"bonus_mutators"
 	}
 	local bonuses_params = {}
 	bonuses_params.bonus_mission_xp = {
@@ -1618,6 +1624,10 @@ function HUDStageEndScreen:stage_init(t, dt)
 	bonuses_params.heat_xp = {
 		color = heat_color,
 		title = managers.localization:to_upper_text(0 <= heat and "menu_es_heat_bonus" or "menu_es_heat_reduction")
+	}
+	bonuses_params.bonus_mutators = {
+		color = tweak_data.screen_colors.important_1,
+		title = managers.localization:to_upper_text("menu_mutators_reduction_exp")
 	}
 	for i, func_name in ipairs(bonuses_list) do
 		local bonus = data.bonuses[func_name] or 0

@@ -738,7 +738,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.7, 5}
 	}
 	self.values.player.revive_damage_reduction = {0.7}
-	self.values.player.passive_convert_enemies_health_multiplier = {0.5, 0}
+	self.values.player.passive_convert_enemies_health_multiplier = {0.45, 0.99}
 	self.values.player.automatic_faster_reload = {
 		{
 			target_enemies = 2,
@@ -1012,13 +1012,13 @@ function UpgradesTweakData:_init_pd2_values()
 			{
 				"10%",
 				"40%",
-				"50%"
+				"45%"
 			},
 			{
 				"20%",
 				"40%",
 				"30%",
-				"50%"
+				"54%"
 			}
 		},
 		discipline = {

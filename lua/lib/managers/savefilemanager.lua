@@ -429,6 +429,7 @@ function SavefileManager:_save_cache(slot)
 		managers.crimenet:save(cache)
 		managers.custom_safehouse:save(cache)
 		managers.butler_mirroring:save(cache)
+		managers.mutators:save(cache)
 	end
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		cache.user_id = self._USER_ID_OVERRRIDE or Steam:userid()
@@ -719,6 +720,7 @@ function SavefileManager:_load_cache(slot)
 			managers.crimenet:load(cache, version)
 			managers.custom_safehouse:load(cache, version)
 			managers.butler_mirroring:load(cache, version)
+			managers.mutators:load(cache, version)
 		end
 	else
 		Application:error("[SavefileManager] Unable to load savefile from slot \"" .. tostring(slot) .. "\".")

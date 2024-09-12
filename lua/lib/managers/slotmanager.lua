@@ -81,6 +81,7 @@ function SlotManager:init()
 	self._masks.editor_all = self._masks.editor_all + 36 + 38 + 39
 	self._masks.statics_layer = self._masks.statics_layer + 36 + 38 + 39
 	self._masks.arrow_impact_targets = World:make_slot_mask(1, 2, 8, 11, 12, 16, 17, 18, 21, 22, 25, 26, 33, 34, 35, 39)
+	self._masks.bullet_impact_targets_ff = World:make_slot_mask(1, 2, 3, 8, 11, 12, 14, 16, 17, 18, 21, 22, 25, 26, 33, 34, 35, 39)
 end
 
 CoreClass.override_class(CoreSlotManager.SlotManager, SlotManager)

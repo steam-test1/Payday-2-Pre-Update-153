@@ -125,7 +125,13 @@ function FreeFlight:_setup_modifiers()
 		60,
 		65,
 		70,
-		75
+		75,
+		80,
+		85,
+		90,
+		90,
+		100,
+		110
 	}, 13, callback(self, self, "_set_fov"))
 	self._modifiers = {
 		ms,

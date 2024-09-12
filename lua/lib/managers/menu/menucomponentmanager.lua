@@ -26,6 +26,8 @@ require("lib/managers/menu/items/CustomSafehouseHeisterInteractionDaily")
 require("lib/managers/menu/pages/CustomSafehouseGuiPageMap")
 require("lib/managers/menu/pages/CustomSafehouseGuiPageDaily")
 require("lib/managers/menu/pages/CustomSafehouseGuiPageTrophies")
+require("lib/managers/menu/MutatorsListGui")
+require("lib/managers/menu/pages/MutatorsCategoryPage")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -177,6 +179,10 @@ function MenuComponentManager:init()
 	self._active_components.custom_safehouse_no_input = {
 		create = callback(self, self, "disable_custom_safehouse_input"),
 		close = callback(self, self, "enable_custom_safehouse_input")
+	}
+	self._active_components.mutators_list = {
+		create = callback(self, self, "create_mutators_list_gui"),
+		close = callback(self, self, "close_mutators_list_gui")
 	}
 	self._alive_components = {}
 end
@@ -2181,6 +2187,26 @@ function MenuComponentManager:enable_custom_safehouse_input()
 		return
 	end
 	self._custom_safehouse_gui:set_active_page(self._custom_safehouse_page or 1)
+end
+
+function MenuComponentManager:mutators_list_gui()
+	return self._mutators_list_gui
+end
+
+function MenuComponentManager:create_mutators_list_gui(node)
+	if not node then
+		return
+	end
+	self._mutators_list_gui = self._mutators_list_gui or MutatorsListGui:new(self._ws, self._fullscreen_ws, node)
+	self:register_component("mutators_list_gui", self._mutators_list_gui)
+end
+
+function MenuComponentManager:close_mutators_list_gui()
+	if self._mutators_list_gui then
+		self._mutators_list_gui:close()
+		self._mutators_list_gui = nil
+		self:unregister_component("mutators_list_gui")
+	end
 end
 
 function MenuComponentManager:_create_server_info_gui()

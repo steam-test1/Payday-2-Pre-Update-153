@@ -18,6 +18,10 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 	self._assault_mode = "normal"
 	self._assault_color = Color(1, 1, 1, 0)
 	self._vip_assault_color = Color(1, 1, 0.5019608, 0)
+	if managers.mutators:are_mutators_active() then
+		self._assault_color = Color(255, 211, 133, 255) / 255
+		self._vip_assault_color = Color(255, 255, 133, 225) / 255
+	end
 	self._assault_survived_color = Color(1, 0.1254902, 0.9019608, 0.1254902)
 	self._current_assault_color = self._assault_color
 	local icon_assaultbox = assault_panel:bitmap({

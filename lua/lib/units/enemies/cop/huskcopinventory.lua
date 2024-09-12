@@ -10,6 +10,7 @@ end
 
 function HuskCopInventory:add_unit_by_name(new_unit_name, equip)
 	local new_unit = World:spawn_unit(new_unit_name, Vector3(), Rotation())
+	managers.mutators:modify_value("CopInventory:add_unit_by_name", self)
 	CopInventory._chk_spawn_shield(self, new_unit)
 	local setup_data = {}
 	setup_data.user_unit = self._unit

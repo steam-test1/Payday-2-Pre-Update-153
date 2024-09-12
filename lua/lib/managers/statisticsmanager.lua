@@ -395,6 +395,7 @@ function StatisticsManager:start_session(data)
 	end
 	local job_id = managers.job:current_job_id()
 	local can_record_session = managers.job:on_first_stage()
+	can_record_session = can_record_session and not managers.mutators:should_disable_statistics()
 	if can_record_session then
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
 		if Global.statistics_manager.playing_from_start then
@@ -447,6 +448,7 @@ function StatisticsManager:stop_session(data)
 	local completion
 	local job_id = managers.job:current_job_id()
 	local can_record_session = job_id and data and true or false
+	can_record_session = can_record_session and not managers.mutators:should_disable_statistics()
 	if can_record_session then
 		local job_stat = tostring(job_id) .. "_" .. tostring(Global.game_settings.difficulty)
 		if data.type == "victory" then

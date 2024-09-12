@@ -545,6 +545,50 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		})
 		self._briefing_len_panel:set_position(contact_text:left(), contact_text:bottom() + 10)
 	end
+	if job_data.mutators then
+		managers.mutators:set_crimenet_lobby_data(job_data.mutators)
+		local mutators_panel = self._contract_panel:panel({
+			w = contact_w,
+			h = contact_h,
+			x = text_w + 20,
+			y = 10
+		})
+		mutators_panel:set_top((self._briefing_len_panel and self._briefing_len_panel:bottom() or contact_text:bottom()) + 10)
+		BoxGuiObject:new(mutators_panel, {
+			sides = {
+				1,
+				1,
+				1,
+				1
+			}
+		})
+		local mutators_title = mutators_panel:text({
+			name = "mutators_title",
+			font = tweak_data.menu.pd2_medium_font,
+			font_size = tweak_data.menu.pd2_medium_font_size,
+			text = managers.localization:to_upper_text("menu_cn_mutators_active"),
+			x = 10,
+			y = 10,
+			h = tweak_data.menu.pd2_medium_font_size
+		})
+		local _y = mutators_title:bottom() + 5
+		for mutator_id, mutator_data in pairs(job_data.mutators) do
+			local mutator = managers.mutators:get_mutator_from_id(mutator_id)
+			if mutator then
+				local mutator_text = mutators_panel:text({
+					name = "mutator_text_" .. tostring(mutator_id),
+					font = tweak_data.menu.pd2_small_font,
+					font_size = tweak_data.menu.pd2_small_font_size,
+					text = mutator:name(),
+					x = 10,
+					y = _y,
+					h = tweak_data.menu.pd2_small_font_size
+				})
+				_y = mutator_text:bottom() + 2
+			end
+		end
+		managers.mutators:set_crimenet_lobby_data(nil)
+	end
 	local days_multiplier = 0
 	for i = 1, #narrative_chains do
 		local day_mul = narrative.professional and tweak_data:get_value("experience_manager", "pro_day_multiplier", i) or tweak_data:get_value("experience_manager", "day_multiplier", i)

@@ -103,6 +103,11 @@ function GroupAIStateBesiege:assign_enemy_to_group_ai(unit, team_id)
 	self:set_enemy_assigned(area, unit:key())
 end
 
+function GroupAIStateBesiege:assign_enemy_to_existing_group(unit, group)
+	self:_add_group_member(group, unit:key())
+	self:set_enemy_assigned(group.objective.area, unit:key())
+end
+
 function GroupAIStateBesiege:on_enemy_unregistered(unit)
 	GroupAIStateBesiege.super.on_enemy_unregistered(self, unit)
 	if self._is_server then

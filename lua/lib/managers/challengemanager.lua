@@ -267,6 +267,9 @@ function ChallengeManager:_check_challenge_completed(id, key)
 end
 
 function ChallengeManager:can_progress_challenges()
+	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
+		return false
+	end
 	return true
 end
 

@@ -2832,3 +2832,41 @@ function UnitNetworkHandler:sync_medic_heal(unit, sender)
 		unit:movement():action_request(action_data)
 	end
 end
+
+function UnitNetworkHandler:sync_explosion_to_client(unit, position, normal, damage, range, curve_pow, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	managers.explosion:give_local_player_dmg(position, range, damage)
+	managers.explosion:explode_on_client(position, normal, unit, damage, range, curve_pow)
+end
+
+function UnitNetworkHandler:sync_friendly_fire_damage(peer_id, unit, damage, variant, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if managers.network:session():local_peer():id() == peer_id then
+		local player_unit = managers.player:player_unit()
+		if alive(player_unit) then
+			local attack_info = {
+				attacker_unit = unit,
+				damage = damage,
+				variant = variant,
+				col_ray = {
+					position = unit:position()
+				},
+				ignore_suppression = true,
+				push_vel = Vector3(),
+				range = 1000
+			}
+			if variant == "bullet" or variant == "projectile" then
+				player_unit:character_damage():damage_bullet(attack_info)
+			elseif variant == "melee" then
+				player_unit:character_damage():damage_melee(attack_info)
+			elseif variant == "fire" then
+				player_unit:character_damage():damage_fire(attack_info)
+			end
+		end
+	end
+	managers.job:set_memory("trophy_flawless", true, false)
+end

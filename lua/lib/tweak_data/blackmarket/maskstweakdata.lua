@@ -2924,6 +2924,13 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.gti_lucky_luciano.value = 0
 	self.masks.gti_lucky_luciano.texture_bundle_folder = "gotti"
 	self.masks.gti_lucky_luciano.sort_number = 29
+	self.masks.urf_seal = {}
+	self.masks.urf_seal.unit = "units/pd2_dlc_urf/masks/msk_urf_seal"
+	self.masks.urf_seal.name_id = "bm_sad_seal"
+	self.masks.urf_seal.pcs = {}
+	self.masks.urf_seal.value = 0
+	self.masks.urf_seal.texture_bundle_folder = "urf"
+	self.masks.urf_seal.sort_number = 31
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

@@ -275,6 +275,10 @@ function GameSetup:load_packages()
 		local diff_package = "packages/" .. (Global.game_settings and Global.game_settings.difficulty or "normal")
 		load_difficulty_package(diff_package)
 	end
+	if Global.mutators and Global.mutators.active_on_load and table.size(Global.mutators.active_on_load) > 0 and PackageManager:package_exists(MutatorsManager.package) and not PackageManager:loaded(MutatorsManager.package) then
+		self._mutators_package = MutatorsManager.package
+		PackageManager:load(MutatorsManager.package)
+	end
 end
 
 function GameSetup:gather_packages_to_unload()
@@ -319,6 +323,10 @@ function GameSetup:gather_packages_to_unload()
 			end
 		end
 		self._loaded_diff_packages = {}
+	end
+	if self._mutators_package and PackageManager:loaded(self._mutators_package) then
+		table.insert(self._packages_to_unload, self._mutators_package)
+		self._mutators_package = nil
 	end
 end
 

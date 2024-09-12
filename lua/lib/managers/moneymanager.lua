@@ -23,6 +23,7 @@ function MoneyManager:_setup()
 	self._small_loot_payout = 0
 	self._crew_payout = 0
 	self._vehicle_payout = 0
+	self._mutators_reduction = 0
 	self._cash_tousand_separator = managers.localization:text("cash_tousand_separator")
 	self._cash_sign = managers.localization:text("cash_sign")
 end
@@ -110,6 +111,9 @@ function MoneyManager:perform_action_money_wrap(amount)
 end
 
 function MoneyManager:get_civilian_deduction()
+	if managers.mutators:should_disable_statistics() then
+		return 0
+	end
 	local has_active_job = managers.job:has_active_job()
 	local job_and_difficulty_stars = has_active_job and managers.job:current_job_and_difficulty_stars() or 1
 	local multiplier = 1
@@ -139,7 +143,7 @@ function MoneyManager:on_mission_completed(num_winners)
 		managers.loot:set_postponed_small_loot()
 		return
 	end
-	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table, payout_table = self:get_real_job_money_values(num_winners)
+	local stage_value, job_value, bag_value, vehicle_value, small_value, crew_value, total_payout, risk_table, payout_table, mutators_reduction = self:get_real_job_money_values(num_winners)
 	managers.loot:clear_postponed_small_loot()
 	self:_set_stage_payout(stage_value + risk_table.stage_risk)
 	self:_set_job_payout(job_value + risk_table.job_risk)
@@ -147,6 +151,7 @@ function MoneyManager:on_mission_completed(num_winners)
 	self:_set_vehicle_payout(vehicle_value + risk_table.vehicle_risk)
 	self:_set_small_loot_payout(small_value + risk_table.small_risk)
 	self:_set_crew_payout(crew_value)
+	self._mutators_reduction = mutators_reduction
 	self:_add_to_total(total_payout)
 end
 
@@ -357,6 +362,21 @@ function MoneyManager:get_money_by_params(params)
 		local bag_value = math.round((bonus_bag_value + mandatory_bag_value) / offshore_rate)
 		bag_risk = math.round(bag_risk / offshore_rate)
 	end
+	local mutators_multiplier = managers.mutators:get_cash_multiplier()
+	local original_total_payout = total_payout
+	total_payout = total_payout * mutators_multiplier
+	stage_value = stage_value * mutators_multiplier
+	job_value = job_value * mutators_multiplier
+	bag_value = bag_value * mutators_multiplier
+	vehicle_value = vehicle_value * mutators_multiplier
+	small_value = small_value * mutators_multiplier
+	crew_value = crew_value * mutators_multiplier
+	stage_risk = stage_risk * mutators_multiplier
+	job_risk = job_risk * mutators_multiplier
+	bag_risk = bag_risk * mutators_multiplier
+	vehicle_risk = vehicle_risk * mutators_multiplier
+	small_risk = small_risk * mutators_multiplier
+	local mutators_reduction = original_total_payout - total_payout
 	local ret = {
 		stage_value,
 		job_value,
@@ -372,7 +392,8 @@ function MoneyManager:get_money_by_params(params)
 			vehicle_risk = vehicle_risk,
 			small_risk = small_risk
 		},
-		{job_base_payout = base_static_value, job_risk_payout = risk_static_value}
+		{job_base_payout = base_static_value, job_risk_payout = risk_static_value},
+		mutators_reduction
 	}
 	return unpack(ret)
 end
@@ -1196,7 +1217,8 @@ function MoneyManager:get_payouts()
 		bag_payout = self._bag_payout,
 		vehicle_payout = self._vehicle_payout,
 		small_loot_payout = self._small_loot_payout,
-		crew_payout = self._crew_payout
+		crew_payout = self._crew_payout,
+		mutators_reduction = self._mutators_reduction or 0
 	}
 end
 

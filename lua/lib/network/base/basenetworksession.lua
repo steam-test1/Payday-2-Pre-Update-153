@@ -265,6 +265,9 @@ function BaseNetworkSession:_on_peer_removed(peer, peer_id, reason)
 	if managers.menu_component then
 		managers.menu_component:on_peer_removed(peer, reason)
 	end
+	if managers.mutators then
+		managers.mutators:on_peer_removed(peer, peer_id, reason)
+	end
 	if managers.chat then
 		if reason == "left" then
 			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("menu_chat_peer_left", {

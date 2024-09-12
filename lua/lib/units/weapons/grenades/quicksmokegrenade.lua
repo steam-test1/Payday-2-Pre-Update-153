@@ -26,8 +26,17 @@ function QuickSmokeGrenade:update(unit, t, dt)
 end
 
 function QuickSmokeGrenade:activate(position, duration)
-	self._state = 1
-	self._timer = 0.5
+	self:_activate(1, 0.5, position, duration)
+end
+
+function QuickSmokeGrenade:activate_immediately(position, duration)
+	self:_activate(3, 0, position, duration)
+	self._remove_t = TimerManager:game():time() + self._duration
+end
+
+function QuickSmokeGrenade:_activate(state, timer, position, duration)
+	self._state = state
+	self._timer = timer
 	self._shoot_position = position
 	self._duration = duration
 	self:_play_sound_and_effects()

@@ -571,6 +571,7 @@ function ExperienceManager:get_xp_by_params(params)
 	local mission_xp_dissect = 0
 	local pro_job_xp_dissect = 0
 	local bonus_xp = 0
+	local bonus_mutators_dissect = 0
 	if success and on_last_stage then
 		job_xp_dissect = managers.experience:get_job_xp_by_stars(total_stars) * job_mul
 		level_limit_dissect = level_limit_dissect + managers.experience:get_job_xp_by_stars(job_stars) * job_mul
@@ -630,6 +631,8 @@ function ExperienceManager:get_xp_by_params(params)
 	local heat_xp_mul = ignore_heat and 1 or math.max(managers.job:get_job_heat_multipliers(job_id), 0)
 	job_heat_dissect = math.round(total_xp * heat_xp_mul - total_xp)
 	total_xp = total_xp + job_heat_dissect
+	local bonus_mutators_dissect = total_xp * managers.mutators:get_experience_reduction() * -1
+	total_xp = total_xp + bonus_mutators_dissect
 	local dissection_table = {
 		bonus_risk = math.round(risk_dissect),
 		bonus_num_players = math.round(alive_crew_dissect),
@@ -645,6 +648,7 @@ function ExperienceManager:get_xp_by_params(params)
 		bonus_ghost = math.round(ghost_dissect),
 		bonus_gage_assignment = math.round(gage_assignment_dissect),
 		bonus_mission_xp = math.round(mission_xp_dissect),
+		bonus_mutators = math.round(bonus_mutators_dissect),
 		stage_xp = math.round(stage_xp_dissect),
 		job_xp = math.round(job_xp_dissect),
 		base = math.round(base_xp),

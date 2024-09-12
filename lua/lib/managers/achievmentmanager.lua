@@ -205,6 +205,9 @@ function AchievmentManager:award(id)
 	end
 	managers.challenge:on_achievement_awarded(id)
 	managers.custom_safehouse:on_achievement_awarded(id)
+	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
+		return
+	end
 	if self:get_info(id).awarded then
 		return
 	end
@@ -232,6 +235,9 @@ function AchievmentManager:award_progress(stat, value)
 	end
 	managers.challenge:on_achievement_progressed(stat)
 	managers.custom_safehouse:on_achievement_progressed(stat, value)
+	if managers.mutators:are_mutators_active() and game_state_machine:current_state_name() ~= "menu_main" then
+		return
+	end
 	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.handler:achievement_store_callback(AchievmentManager.steam_unlock_result)

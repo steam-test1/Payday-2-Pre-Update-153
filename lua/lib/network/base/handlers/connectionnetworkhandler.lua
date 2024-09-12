@@ -815,6 +815,26 @@ function ConnectionNetworkHandler:sync_used_weapon(weapon_id)
 	managers.statistics:_used_weapon(weapon_id)
 end
 
+function ConnectionNetworkHandler:sync_mutators_launch(countdown, sender)
+	managers.mutators:show_mutators_launch_countdown(countdown)
+end
+
+function ConnectionNetworkHandler:sync_mutators_launch_ready(peer_id, is_ready, sender)
+	local peer = managers.network:session():peer(peer_id)
+	if not peer then
+		return
+	end
+	managers.mutators:set_peer_is_ready(peer_id, is_ready)
+end
+
+function ConnectionNetworkHandler:sync_mutator_hydra_split(position, sender)
+	local peer = self._verify_sender(sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then
+		return
+	end
+	MutatorHydra.play_split_particle(position, Rotation())
+end
+
 function ConnectionNetworkHandler:sync_synced_unit_outfit(unit_id, outfit_type, outfit_string, sender)
 	local peer = self._verify_sender(sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not peer then

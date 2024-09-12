@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.55.37"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.55.40"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -81,6 +81,7 @@ function NetworkMatchMakingSTEAM:load_user_filters()
 	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
 	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
 	Global.game_settings.allow_search_safehouses = managers.user:get_setting("crimenet_filter_safehouses")
+	Global.game_settings.search_mutated_lobbies = managers.user:get_setting("crimenet_filter_mutators")
 	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
 	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
 	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
@@ -104,6 +105,7 @@ function NetworkMatchMakingSTEAM:reset_filters()
 	usr:set_setting("crimenet_filter_friends_only", usr:get_default_setting("crimenet_filter_friends_only"))
 	usr:set_setting("crimenet_filter_level_appopriate", usr:get_default_setting("crimenet_filter_level_appopriate"))
 	usr:set_setting("crimenet_filter_safehouses", usr:get_default_setting("crimenet_filter_safehouses"))
+	usr:set_setting("crimenet_filter_mutators", usr:get_default_setting("crimenet_filter_mutators"))
 	usr:set_setting("crimenet_filter_new_servers_only", usr:get_default_setting("crimenet_filter_new_servers_only"))
 	usr:set_setting("crimenet_filter_in_lobby", usr:get_default_setting("crimenet_filter_in_lobby"))
 	usr:set_setting("crimenet_filter_max_servers", usr:get_default_setting("crimenet_filter_max_servers"))
@@ -168,6 +170,10 @@ function NetworkMatchMakingSTEAM:leave_game()
 	print("NetworkMatchMakingSTEAM:leave_game()")
 end
 
+function NetworkMatchMakingSTEAM:_get_mutators_from_lobby(lobby)
+	return managers.mutators:get_mutators_from_lobby(lobby)
+end
+
 function NetworkMatchMakingSTEAM:get_friends_lobbies()
 	local lobbies = {}
 	local num_updated_lobbies = 0
@@ -195,6 +201,7 @@ function NetworkMatchMakingSTEAM:get_friends_lobbies()
 						local attributes_data = {
 							numbers = self:_lobby_to_numbers(lobby)
 						}
+						attributes_data.mutators = self:_get_mutators_from_lobby(lobby)
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -307,6 +314,7 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 						local attributes_data = {
 							numbers = self:_lobby_to_numbers(lobby)
 						}
+						attributes_data.mutators = self:_get_mutators_from_lobby(lobby)
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -706,6 +714,7 @@ function NetworkMatchMakingSTEAM:set_attributes(settings)
 	if self._BUILD_SEARCH_INTEREST_KEY then
 		lobby_attributes[self._BUILD_SEARCH_INTEREST_KEY] = "true"
 	end
+	managers.mutators:apply_matchmake_attributes(lobby_attributes)
 	self._lobby_attributes = lobby_attributes
 	self.lobby_handler:set_lobby_data(lobby_attributes)
 	self.lobby_handler:set_lobby_type(permissions[settings.numbers[3]])

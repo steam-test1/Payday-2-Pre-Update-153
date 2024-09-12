@@ -80,6 +80,7 @@ end
 function NetworkMatchMaking:load_user_filters()
 	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
 	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
+	Global.game_settings.search_mutated_lobbies = managers.user:get_setting("crimenet_filter_mutators")
 	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
 	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
 	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
@@ -173,7 +174,8 @@ function NetworkMatchMaking:get_friends_lobbies()
 							room_id = lobby:id()
 						})
 						local attributes_data = {
-							numbers = self:_lobby_to_numbers(lobby)
+							numbers = self:_lobby_to_numbers(lobby),
+							mutators = lobby:key_value("mutators")
 						}
 						table.insert(info.attribute_list, attributes_data)
 					end
@@ -276,7 +278,8 @@ function NetworkMatchMaking:search_lobby(friends_only)
 							room_id = lobby:id()
 						})
 						local attributes_data = {
-							numbers = self:_lobby_to_numbers(lobby)
+							numbers = self:_lobby_to_numbers(lobby),
+							mutators = lobby:key_value("mutators")
 						}
 						table.insert(info.attribute_list, attributes_data)
 					end
@@ -617,6 +620,7 @@ function NetworkMatchMaking:set_attributes(settings)
 	if self._BUILD_SEARCH_INTEREST_KEY then
 		lobby_attributes[self._BUILD_SEARCH_INTEREST_KEY] = "true"
 	end
+	managers.mutators:apply_matchmake_attributes(lobby_attributes)
 	self._lobby_attributes = lobby_attributes
 	self.lobby_handler:set_lobby_data(lobby_attributes)
 	self.lobby_handler:set_lobby_type(permissions[settings.numbers[3]])

@@ -129,6 +129,7 @@ function MenuCallbackHandler:start_job(job_data)
 		local difficulty_index = tweak_data:difficulty_to_index(Global.game_settings.difficulty)
 		managers.network:session():send_to_peers("sync_game_settings", job_id_index, level_id_index, difficulty_index)
 		managers.network.matchmake:set_server_attributes(matchmake_attributes)
+		managers.mutators:update_lobby_info()
 		managers.menu_component:on_job_updated()
 		managers.menu:open_node("lobby")
 		managers.menu:active_menu().logic:refresh_node("lobby", true)
@@ -1549,6 +1550,9 @@ function MenuQuickplaySettingsInitiator:modify_node(node)
 	node:item("quickplay_settings_level_min"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_min or tweak_data.quickplay.default_level_diff[1])
 	node:item("quickplay_settings_level_max"):set_max(tweak_data.quickplay.max_level_diff[2])
 	node:item("quickplay_settings_level_max"):set_value(Global.crimenet and Global.crimenet.quickplay and Global.crimenet.quickplay.level_diff_max or tweak_data.quickplay.default_level_diff[2])
+	local mutators_item = node:item("quickplay_settings_mutators")
+	local mutators_on = managers.user:get_setting("quickplay_mutators")
+	mutators_item:set_value(mutators_on and "on" or "off")
 	local difficulty_item = node:item("quickplay_settings_difficulty")
 	if not difficulty_item then
 		local options = {
@@ -1604,6 +1608,11 @@ function MenuCallbackHandler:quickplay_loud_toggle(item)
 	end
 end
 
+function MenuCallbackHandler:quickplay_mutators_toggle(item)
+	local on = item:value() == "on"
+	managers.user:set_setting("quickplay_mutators", on)
+end
+
 function MenuCallbackHandler:quickplay_level_min(item)
 	Global.crimenet.quickplay.level_diff_min = math.floor(item:value() + 0.5)
 end
@@ -1634,6 +1643,105 @@ function MenuCallbackHandler:set_default_quickplay_options()
 		end
 	}
 	managers.menu:show_default_option_dialog(params)
+end
+
+MenuMutatorsInitiator = MenuMutatorsInitiator or class(MenuInitiatorBase)
+
+function MenuMutatorsInitiator:modify_node(node)
+	node:clean_items()
+	local get_identifier = function(peer)
+		return SystemInfo:platform() == Idstring("WIN32") and peer:user_id() or peer:name()
+	end
+	if #managers.mutators:mutators() < 1 then
+		self:create_item(node, {
+			enabled = false,
+			name = "no_mutators",
+			text_id = "bm_menu_no_items",
+			align = "left"
+		})
+	else
+		self:populate_mutators_list(node)
+	end
+	self:add_back_button(node)
+	return node
+end
+
+function MenuMutatorsInitiator:populate_mutators_list(node)
+	self:create_item(node, {
+		enabled = false,
+		name = "header_active",
+		text_id = "menu_mutators_active",
+		align = "left",
+		both_column = true
+	})
+	for i, mutator in ipairs(managers.mutators:active_mutators()) do
+		self:_create_mutator_node(node, mutator)
+	end
+	local params = {
+		name = "divider_mutators_list",
+		no_text = true,
+		size = 16,
+		both_column = true
+	}
+	local data_node = {
+		type = "MenuItemDivider"
+	}
+	local new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	self:create_item(node, {
+		enabled = false,
+		name = "header_inactive",
+		text_id = "menu_mutators_inactive",
+		align = "left",
+		both_column = true
+	})
+	for i, mutator in ipairs(managers.mutators:inactive_mutators()) do
+		self:_create_mutator_node(node, mutator)
+	end
+end
+
+function MenuMutatorsInitiator:_create_mutator_node(node, mutator)
+	self:create_item(node, {
+		enabled = true,
+		name = mutator:id(),
+		text_id = mutator:name(),
+		localize = false,
+		align = "left",
+		left_column = true,
+		mutator = mutator
+	})
+	if mutator:show_options() then
+		self:create_item(node, {
+			enabled = true,
+			name = mutator:id() .. "_options",
+			text_id = "menu_mutators_option",
+			align = "left",
+			callback = "_open_mutator_options",
+			mutator = mutator,
+			options = true
+		})
+	end
+end
+
+function MenuMutatorsInitiator:refresh_node(node)
+	for i, item in ipairs(node:items()) do
+		if item:parameters().mutator and not item:parameters().options then
+			item:set_parameter("text_id", item:parameters().mutator:name())
+			item:dirty()
+		end
+	end
+end
+
+function MenuCallbackHandler:_open_mutator_options(item)
+	managers.menu:open_node("mutators_options", {
+		item:parameters().mutator
+	})
+end
+
+function MenuCallbackHandler:_update_mutator_value(item)
+	if item:parameters().update_callback then
+		item:parameters().update_callback(item)
+	end
 end
 
 MenuSkinEditorInitiator = MenuSkinEditorInitiator or class(MenuInitiatorBase)

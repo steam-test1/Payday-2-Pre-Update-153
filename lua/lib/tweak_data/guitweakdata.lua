@@ -1698,6 +1698,19 @@ function GuiTweakData:init()
 			pulse = true,
 			pulse_level = 10,
 			pulse_color = Color(204, 255, 209, 32) / 255
+		},
+		{
+			id = "mutators",
+			name_id = "menu_mutators",
+			desc_id = "menu_mutators_help",
+			menu_node = "mutators",
+			x = 675,
+			y = 910,
+			icon = "guis/textures/pd2/crimenet_marker_mutators",
+			pulse = true,
+			pulse_level = 10,
+			pulse_color = Color(255, 255, 0, 255) / 255,
+			mutators_color = Color(255, 255, 0, 255) / 255
 		}
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then

@@ -123,6 +123,12 @@ function TweakData:get_raw_value(...)
 	return value
 end
 
+function TweakData:get_mutatable_value(id, ...)
+	local value = self:get_raw_value(...)
+	managers.mutators:modify_tweak_data(id, value)
+	return value
+end
+
 function TweakData:set_mode()
 	if not Global.game_settings then
 		return
@@ -741,6 +747,8 @@ function TweakData:init()
 	self.screen_colors.challenge_completed_color = Color(255, 255, 168, 0) / 255
 	self.screen_colors.stat_maxed = Color("FF00FF")
 	self.screen_colors.competitive_color = Color(255, 41, 204, 122) / 255
+	self.screen_colors.mutators_color = Color(255, 211, 133, 255) / 255
+	self.screen_colors.mutators_color_text = Color(255, 211, 133, 255) / 255
 	self.screen_colors.heat_cold_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.heat_warm_color = Color("ff7f00")
 	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
@@ -3410,6 +3418,21 @@ Play the full version soon to get your full PAYDAY!]],
 			job = "pbr",
 			complete_job = true,
 			killed = {medic = 0}
+		},
+		trophy_evolution = {
+			trophy_stat = "trophy_evolution",
+			complete_job = true,
+			mutators = true
+		},
+		trophy_flawless = {
+			trophy_stat = "trophy_flawless",
+			difficulty = deathwish_and_above,
+			complete_job = true,
+			mutators = {
+				"MutatorFriendlyFire"
+			},
+			memory = {value = nil, is_shortterm = false},
+			num_players = 4
 		},
 		trophy_defender = {
 			trophy_stat = "trophy_defender",

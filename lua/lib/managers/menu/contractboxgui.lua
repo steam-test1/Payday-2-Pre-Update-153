@@ -96,6 +96,22 @@ function ContractBoxGui:init(ws, fullscreen_ws)
 		end
 	end
 	self:create_contract_box()
+	self:create_mutators_tooltip()
+	self._lobby_mutators_text = self._panel:text({
+		name = "mutated_text",
+		text = managers.localization:to_upper_text("menu_mutators_lobby_wait_title"),
+		align = "left",
+		vertical = "top",
+		font_size = tweak_data.menu.pd2_large_font_size * 0.75,
+		font = tweak_data.menu.pd2_large_font,
+		color = tweak_data.screen_colors.mutators_color_text
+	})
+	local _, _, w, h = self._lobby_mutators_text:text_rect()
+	self._lobby_mutators_text:set_size(w, h)
+	self._lobby_mutators_text:set_top(crewpage_text:bottom())
+	local job_chain = managers.job:current_job_chain_data()
+	local mutators_active = managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(job_chain and job_chain[1] and job_chain[1].level_id)
+	self._lobby_mutators_text:set_visible(mutators_active)
 end
 
 function ContractBoxGui:create_contract_box()
@@ -378,6 +394,31 @@ function ContractBoxGui:create_contract_box()
 		risk_money:set_position(math.round(job_money:right()), job_money:top())
 		risk_money:hide()
 		self._contract_panel:set_h(payout_text_header:bottom() + 10)
+		if managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(job_chain and job_chain[1] and job_chain[1].level_id) then
+			local mutators_text_header = self._contract_panel:text({
+				name = "mutators_text_header",
+				text = managers.localization:to_upper_text("cn_menu_contract_mutators_header"),
+				font_size = font_size,
+				font = font,
+				color = tweak_data.screen_colors.text
+			})
+			local _, _, tw, th = mutators_text_header:text_rect()
+			w = math.max(w, tw)
+			mutators_text_header:set_size(tw, th)
+			mutators_text_header:set_right(w)
+			mutators_text_header:set_top(payout_text_header:bottom())
+			local mutators_text = self._contract_panel:text({
+				name = "mutators_text",
+				font = font,
+				font_size = font_size,
+				text = managers.localization:to_upper_text("cn_menu_contract_mutators_active"),
+				color = tweak_data.screen_colors.mutators_color_text
+			})
+			local _, _, tw, th = mutators_text:text_rect()
+			mutators_text:set_size(tw, th)
+			mutators_text:set_position(math.round(mutators_text_header:right() + 5), math.round(mutators_text_header:top()))
+			self._contract_panel:set_h(mutators_text:bottom() + 10)
+		end
 	elseif managers.menu:debug_menu_enabled() then
 		local debug_start = self._contract_panel:text({
 			text = "Use DEBUG START to start your level",
@@ -434,13 +475,151 @@ function ContractBoxGui:create_contract_box()
 	self._enabled = true
 end
 
+function ContractBoxGui:create_mutators_tooltip()
+	if self._mutators_tooltip and alive(self._mutators_tooltip) then
+		self._fullscreen_panel:remove(self._mutators_tooltip)
+		self._mutators_tooltip = nil
+		self._mutators_data = nil
+	end
+	if not managers.network:session() or not managers.mutators:are_mutators_enabled() then
+		return
+	end
+	self._mutators_tooltip = self._fullscreen_panel:panel({
+		name = "mutator_tooltip",
+		w = self._panel:w() * 0.25,
+		h = 100,
+		layer = 10
+	})
+	local mutators_title = self._mutators_tooltip:text({
+		name = "mutators_title",
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = tweak_data.menu.pd2_medium_font_size,
+		text = managers.localization:to_upper_text("menu_cn_mutators_active"),
+		x = 10,
+		y = 10,
+		h = tweak_data.menu.pd2_medium_font_size
+	})
+	local _y = mutators_title:bottom() + 5
+	self._mutators_data = deep_clone(managers.mutators:get_mutators_from_lobby_data())
+	for mutator_id, mutator_data in pairs(self._mutators_data) do
+		local mutator = managers.mutators:get_mutator_from_id(mutator_id)
+		if mutator then
+			local mutator_text = self._mutators_tooltip:text({
+				name = "mutator_text_" .. tostring(mutator_id),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				text = mutator:name(),
+				x = 10,
+				y = _y,
+				h = tweak_data.menu.pd2_small_font_size,
+				layer = 1
+			})
+			_y = mutator_text:bottom() + 2
+		end
+	end
+	self._mutators_tooltip:set_h(_y + 10)
+	self._mutators_tooltip:rect({
+		color = Color.black,
+		alpha = 0.8,
+		layer = -1
+	})
+	BoxGuiObject:new(self._mutators_tooltip, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	self._mutators_tooltip:set_alpha(0)
+end
+
+function ContractBoxGui:check_update_mutators_tooltip()
+	local refresh_contract, refresh_tooltip
+	if alive(self._lobby_mutators_text) then
+		self._lobby_mutators_text:set_visible(managers.mutators:are_mutators_enabled())
+	end
+	if not managers.mutators:are_mutators_enabled() then
+		if self._mutators_tooltip then
+			refresh_contract = true
+			refresh_tooltip = true
+		end
+	else
+		local lobby_data = managers.mutators:get_mutators_from_lobby_data()
+		if self._mutators_data then
+			refresh_contract = self._contract_panel:child("mutators_text") == nil
+			for mutator_id, mutator_data in pairs(lobby_data) do
+				if self._mutators_data[mutator_id] then
+					for key, value in pairs(mutator_data) do
+						if self._mutators_data[mutator_id][key] ~= value then
+							refresh_tooltip = true
+							break
+						end
+					end
+				else
+					refresh_tooltip = true
+				end
+			end
+			if not refresh_tooltip then
+				for mutator_id, mutator_data in pairs(self._mutators_data) do
+					if not lobby_data[mutator_id] then
+						refresh_tooltip = true
+						break
+					else
+						for key, value in pairs(mutator_data) do
+							if lobby_data[mutator_id][key] ~= value then
+								refresh_tooltip = true
+								break
+							end
+						end
+					end
+				end
+			end
+		elseif lobby_data then
+			refresh_tooltip = true
+			refresh_contract = self._contract_panel:child("mutators_text") == nil
+		elseif not lobby_data then
+			refresh_contract = self._contract_panel:child("mutators_text") ~= nil
+		end
+	end
+	if refresh_contract then
+		self:create_contract_box()
+	end
+	if refresh_tooltip then
+		self:create_mutators_tooltip()
+	end
+end
+
 function ContractBoxGui:refresh()
 	self:create_contract_box()
+	self:create_mutators_tooltip()
 end
 
 function ContractBoxGui:update(t, dt)
 	for i = 1, 4 do
 		self:update_character(i)
+	end
+	if managers.job:current_contact_data() then
+		self._update_tooltip_t = (self._update_tooltip_t or 1) - dt
+		if self._update_tooltip_t < 0 then
+			self:check_update_mutators_tooltip()
+			self._update_tooltip_t = 1
+		end
+	end
+	if self._mutators_tooltip then
+		local mutators_text_header = self._contract_panel:child("mutators_text_header")
+		local mutators_text = self._contract_panel:child("mutators_text")
+		local speed = 6
+		local x, y = managers.mouse_pointer:modified_mouse_pos()
+		if mutators_text_header and mutators_text_header:inside(x, y) or mutators_text and mutators_text:inside(x, y) then
+			self._mutators_tooltip:set_alpha(math.clamp(self._mutators_tooltip:alpha() + speed * TimerManager:main():delta_time(), 0, 1))
+		else
+			self._mutators_tooltip:set_alpha(math.clamp(self._mutators_tooltip:alpha() - speed * TimerManager:main():delta_time(), 0, 1))
+		end
+	end
+	if alive(self._lobby_mutators_text) then
+		local a = 0.75 + math.abs(math.sin(t * 120) * 0.25)
+		self._lobby_mutators_text:set_alpha(a)
 	end
 end
 
@@ -591,6 +770,16 @@ function ContractBoxGui:mouse_moved(x, y)
 				used = true
 				pointer = "link"
 			end
+		end
+	end
+	if self._mutators_tooltip then
+		local mutators_text_header = self._contract_panel:child("mutators_text_header")
+		local mutators_text = self._contract_panel:child("mutators_text")
+		local speed = 6
+		if mutators_text_header and mutators_text_header:inside(x, y) or mutators_text and mutators_text:inside(x, y) then
+			self._mutators_tooltip:set_world_left(x)
+			self._mutators_tooltip:set_world_bottom(y)
+			return true, "link"
 		end
 	end
 	return used, pointer

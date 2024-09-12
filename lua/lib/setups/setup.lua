@@ -88,6 +88,7 @@ require("lib/managers/MultiProfileManager")
 require("lib/managers/BanListManager")
 require("lib/managers/WorkshopManager")
 require("lib/managers/CustomSafehouseManager")
+require("lib/managers/MutatorsManager")
 require("lib/utils/StatisticsGenerator")
 require("lib/utils/Bitwise")
 require("lib/utils/WeightedSelector")
@@ -202,6 +203,7 @@ function Setup:init_managers(managers)
 	managers.workshop = WorkshopManager:new()
 	managers.custom_safehouse = CustomSafehouseManager:new()
 	managers.ban_list = BanListManager:new()
+	managers.mutators = MutatorsManager:new()
 	managers.butler_mirroring = ButlerMirroringManager:new()
 	game_state_machine = GameStateMachine:new()
 end
@@ -402,6 +404,7 @@ function Setup:update(t, dt)
 	managers.blackmarket:update(t, dt)
 	managers.vote:update(t, dt)
 	managers.vehicle:update(t, dt)
+	managers.mutators:update(t, dt)
 	game_state_machine:update(t, dt)
 	if self._main_thread_loading_screen_gui_visible then
 		self._main_thread_loading_screen_gui_script:update(-1, dt)
@@ -473,6 +476,7 @@ function Setup:load_level(level, mission, world_setting, level_class_name, level
 	Global.level_data.world_setting = world_setting
 	Global.level_data.level_class_name = level_class_name
 	Global.level_data.level_id = level_id
+	managers.mutators:globalize_active_mutators()
 	self:exec(level)
 end
 
@@ -496,6 +500,7 @@ function Setup:load_start_menu()
 	Global.level_data.world_setting = nil
 	Global.level_data.level_class_name = nil
 	Global.level_data.level_id = nil
+	managers.mutators:clear_global_mutators()
 	self:exec(nil)
 	managers.butler_mirroring = ButlerMirroringManager:new()
 end
