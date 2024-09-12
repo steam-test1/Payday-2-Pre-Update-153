@@ -2594,7 +2594,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.dbd_01.type = "helmet"
 	self.masks.dbd_01.texture_bundle_folder = "boo_1"
 	self.masks.dbd_01.dlc = "dbd_clan"
-	self.masks.dbd_01.sort_number = 19
+	self.masks.dbd_01.sort_number = 18
 	self.masks.dbd_02 = {}
 	self.masks.dbd_02.unit = "units/pd2_dlc_boo_2/masks/msk_dbd_02"
 	self.masks.dbd_02.name_id = "bm_msk_dbd_02"
@@ -2602,7 +2602,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.dbd_02.value = 0
 	self.masks.dbd_02.texture_bundle_folder = "boo_2"
 	self.masks.dbd_02.dlc = "dbd_deluxe"
-	self.masks.dbd_02.sort_number = 20
+	self.masks.dbd_02.sort_number = 18
 	self.masks.dbd_03 = {}
 	self.masks.dbd_03.unit = "units/pd2_dlc_boo_3/masks/msk_dbd_03"
 	self.masks.dbd_03.name_id = "bm_msk_dbd_03"
@@ -2610,7 +2610,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.dbd_03.value = 0
 	self.masks.dbd_03.texture_bundle_folder = "boo_3"
 	self.masks.dbd_03.dlc = "dbd_deluxe"
-	self.masks.dbd_03.sort_number = 21
+	self.masks.dbd_03.sort_number = 18
 	self.masks.dbd_04 = {}
 	self.masks.dbd_04.unit = "units/pd2_dlc_boo/masks/dbd_04/msk_boo_dbd_04"
 	self.masks.dbd_04.name_id = "bm_msk_dbd_00"
@@ -2627,7 +2627,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.dbd_slasher.type = "helmet"
 	self.masks.dbd_slasher.texture_bundle_folder = "boo_4"
 	self.masks.dbd_slasher.dlc = "dbd_clan"
-	self.masks.dbd_slasher.sort_number = 22
+	self.masks.dbd_slasher.sort_number = 18
 	self.masks.sydney = {}
 	self.masks.sydney.unit = "units/pd2_dlc_opera/masks/sydney/msk_sydney"
 	self.masks.sydney.name_id = "bm_msk_sydney"
@@ -2655,7 +2655,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.jig_01.value = 0
 	self.masks.jig_01.texture_bundle_folder = "jigg"
 	self.masks.jig_01.dlc = "jigg"
-	self.masks.jig_01.sort_number = 23
+	self.masks.jig_01.sort_number = 20
 	self.masks.jig_02 = {}
 	self.masks.jig_02.unit = "units/pd2_dlc_jigg/masks/mask_jigg_02/msk_jig_02"
 	self.masks.jig_02.name_id = "bm_msk_jig_02"
@@ -2663,14 +2663,14 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.jig_02.texture_bundle_folder = "jigg"
 	self.masks.jig_02.type = "helmet"
 	self.masks.jig_02.dlc = "jigg"
-	self.masks.jig_02.sort_number = 24
+	self.masks.jig_02.sort_number = 20
 	self.masks.damned = {}
 	self.masks.damned.unit = "units/pd2_dlc_jigg/masks/damned/msk_damned"
 	self.masks.damned.name_id = "bm_msk_damned"
 	self.masks.damned.value = 0
 	self.masks.damned.texture_bundle_folder = "jigg"
 	self.masks.damned.dlc = "jigg"
-	self.masks.damned.sort_number = 25
+	self.masks.damned.sort_number = 20
 	self.masks.born_biker_01 = {}
 	self.masks.born_biker_01.unit = "units/pd2_dlc_born/masks/born_01/msk_born_biker_01"
 	self.masks.born_biker_01.name_id = "bm_msk_biker_classic"
@@ -2678,7 +2678,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.born_biker_01.value = 0
 	self.masks.born_biker_01.type = "helmet"
 	self.masks.born_biker_01.texture_bundle_folder = "born"
-	self.masks.born_biker_01.sort_number = 26
+	self.masks.born_biker_01.sort_number = 21
 	self.masks.born_biker_01.dlc = "born"
 	self.masks.born_biker_02 = {}
 	self.masks.born_biker_02.unit = "units/pd2_dlc_born/masks/born_02/msk_born_biker_02"
@@ -2686,7 +2686,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.born_biker_02.pcs = {}
 	self.masks.born_biker_02.value = 0
 	self.masks.born_biker_02.texture_bundle_folder = "born"
-	self.masks.born_biker_02.sort_number = 27
+	self.masks.born_biker_02.sort_number = 21
 	self.masks.born_biker_02.dlc = "born"
 	self.masks.born_biker_03 = {}
 	self.masks.born_biker_03.unit = "units/pd2_dlc_born/masks/born_03/msk_born_biker_03"
@@ -2695,7 +2695,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.born_biker_03.value = 0
 	self.masks.born_biker_03.type = "helmet"
 	self.masks.born_biker_03.texture_bundle_folder = "born"
-	self.masks.born_biker_03.sort_number = 28
+	self.masks.born_biker_03.sort_number = 21
 	self.masks.born_biker_03.dlc = "born"
 	self.masks.brutal = {}
 	self.masks.brutal.unit = "units/pd2_dlc_born/masks/brutal/msk_brutal"
@@ -2703,7 +2703,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.brutal.pcs = {}
 	self.masks.brutal.value = 0
 	self.masks.brutal.texture_bundle_folder = "born"
-	self.masks.brutal.sort_number = 29
+	self.masks.brutal.sort_number = 21
 	self.masks.brutal.dlc = "born"
 	self.masks.rust = {}
 	self.masks.rust.unit = "units/pd2_dlc_wild/masks/rust/msk_rust"
@@ -2711,7 +2711,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.rust.pcs = {}
 	self.masks.rust.value = 0
 	self.masks.rust.texture_bundle_folder = "wild"
-	self.masks.rust.sort_number = 30
+	self.masks.rust.sort_number = 22
 	self.masks.rust.dlc = "wild"
 	self.masks.rust_begins = {}
 	self.masks.rust_begins.unit = "units/pd2_dlc_wild/masks/rust_begins/msk_rust_begins"
@@ -2724,7 +2724,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	}
 	self.masks.rust_begins.value = 0
 	self.masks.rust_begins.texture_bundle_folder = "wild"
-	self.masks.rust_begins.sort_number = 30
+	self.masks.rust_begins.sort_number = 22
 	self.masks.rust_begins.dlc = "wild"
 	self.masks.fab_mega_grin = {}
 	self.masks.fab_mega_grin.unit = "units/pd2_dlc_fab/masks/mega_grin/msk_fab_mega_grin"
@@ -2767,7 +2767,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.solus.pcs = {}
 	self.masks.solus.value = 0
 	self.masks.solus.texture_bundle_folder = "solus"
-	self.masks.solus.sort_number = 32
+	self.masks.solus.sort_number = 23
 	self.masks.solus.dlc = "solus_clan"
 	self.masks.mig_death = {}
 	self.masks.mig_death.unit = "units/pd2_dlc_migg/masks/migg_death/msk_mig_death"
@@ -2775,7 +2775,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.mig_death.pcs = {}
 	self.masks.mig_death.value = 0
 	self.masks.mig_death.texture_bundle_folder = "migg"
-	self.masks.mig_death.sort_number = 33
+	self.masks.mig_death.sort_number = 24
 	self.masks.mig_death.dlc = "pd2_clan"
 	self.masks.mig_war = {}
 	self.masks.mig_war.unit = "units/pd2_dlc_migg/masks/migg_war/msk_mig_war"
@@ -2784,7 +2784,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.mig_war.value = 0
 	self.masks.mig_war.type = "helmet"
 	self.masks.mig_war.texture_bundle_folder = "migg"
-	self.masks.mig_war.sort_number = 33
+	self.masks.mig_war.sort_number = 24
 	self.masks.mig_war.dlc = "pd2_clan"
 	self.masks.mig_conquest = {}
 	self.masks.mig_conquest.unit = "units/pd2_dlc_migg/masks/migg_conquest/msk_mig_conquest"
@@ -2792,7 +2792,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.mig_conquest.pcs = {}
 	self.masks.mig_conquest.value = 0
 	self.masks.mig_conquest.texture_bundle_folder = "migg"
-	self.masks.mig_conquest.sort_number = 33
+	self.masks.mig_conquest.sort_number = 24
 	self.masks.mig_conquest.dlc = "pd2_clan"
 	self.masks.mig_famine = {}
 	self.masks.mig_famine.unit = "units/pd2_dlc_migg/masks/migg_famine/msk_mig_famine"
@@ -2800,8 +2800,40 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.mig_famine.pcs = {}
 	self.masks.mig_famine.value = 0
 	self.masks.mig_famine.texture_bundle_folder = "migg"
-	self.masks.mig_famine.sort_number = 33
+	self.masks.mig_famine.sort_number = 24
 	self.masks.mig_famine.dlc = "pd2_clan"
+	self.masks.fib_fox = {}
+	self.masks.fib_fox.unit = "units/pd2_dlc_fibb/masks/fib_fox_mask/msk_fib_fox"
+	self.masks.fib_fox.name_id = "bm_msk_fable_fox"
+	self.masks.fib_fox.pcs = {}
+	self.masks.fib_fox.value = 0
+	self.masks.fib_fox.texture_bundle_folder = "fibb"
+	self.masks.fib_fox.sort_number = 25
+	self.masks.fib_fox.dlc = "pd2_clan"
+	self.masks.fib_cat = {}
+	self.masks.fib_cat.unit = "units/pd2_dlc_fibb/masks/fib_cat_mask/msk_fib_cat"
+	self.masks.fib_cat.name_id = "bm_msk_fable_cat"
+	self.masks.fib_cat.pcs = {}
+	self.masks.fib_cat.value = 0
+	self.masks.fib_cat.texture_bundle_folder = "fibb"
+	self.masks.fib_cat.sort_number = 25
+	self.masks.fib_cat.dlc = "pd2_clan"
+	self.masks.fib_mouse = {}
+	self.masks.fib_mouse.unit = "units/pd2_dlc_fibb/masks/fib_mouse_mask/msk_fib_mouse"
+	self.masks.fib_mouse.name_id = "bm_msk_fable_mouse"
+	self.masks.fib_mouse.pcs = {}
+	self.masks.fib_mouse.value = 0
+	self.masks.fib_mouse.texture_bundle_folder = "fibb"
+	self.masks.fib_mouse.sort_number = 25
+	self.masks.fib_mouse.dlc = "pd2_clan"
+	self.masks.fib_hare = {}
+	self.masks.fib_hare.unit = "units/pd2_dlc_fibb/masks/fib_hare_mask/msk_fib_hare"
+	self.masks.fib_hare.name_id = "bm_msk_fable_hare"
+	self.masks.fib_hare.pcs = {}
+	self.masks.fib_hare.value = 0
+	self.masks.fib_hare.texture_bundle_folder = "fibb"
+	self.masks.fib_hare.sort_number = 25
+	self.masks.fib_hare.dlc = "pd2_clan"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

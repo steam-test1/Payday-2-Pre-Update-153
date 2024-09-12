@@ -4909,6 +4909,32 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pd2_clan_fibb = {}
+	self.pd2_clan_fibb.content = {}
+	self.pd2_clan_fibb.dlc = "has_pd2_clan"
+	self.pd2_clan_fibb.content.loot_global_value = "pd2_clan"
+	self.pd2_clan_fibb.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "fib_fox",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fib_cat",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fib_mouse",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "fib_hare",
+			amount = 1
+		}
+	}
 	if SystemInfo:platform() == Idstring("XB1") or SystemInfo:platform() == Idstring("PS4") then
 		self.xone_bonus = {}
 		self.xone_bonus.free = true
