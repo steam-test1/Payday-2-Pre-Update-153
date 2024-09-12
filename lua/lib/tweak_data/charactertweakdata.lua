@@ -1188,6 +1188,9 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank.deathguard = true
 	self.tank.melee_weapon = "fists"
 	self.tank.melee_weapon_dmg_multiplier = 2.5
+	self.tank.melee_anims = {
+		"cbt_std_melee"
+	}
 	self.tank.critical_hits = {
 		damage_mul = self.tank.headshot_dmg_mul * 1
 	}
@@ -7103,6 +7106,7 @@ function CharacterTweakData:_set_normal()
 	self.hector_boss.HEALTH_INIT = 50
 	self.mobster_boss.HEALTH_INIT = 50
 	self.biker_boss.HEALTH_INIT = 100
+	self.chavez_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 1.5
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.2
 	self.presets.gang_member_damage.HEALTH_INIT = 125
@@ -7184,6 +7188,7 @@ function CharacterTweakData:_set_hard()
 	self.hector_boss.HEALTH_INIT = 100
 	self.mobster_boss.HEALTH_INIT = 100
 	self.biker_boss.HEALTH_INIT = 100
+	self.chavez_boss.HEALTH_INIT = 100
 	self.presets.gang_member_damage.REGENERATE_TIME = 2
 	self.presets.gang_member_damage.REGENERATE_TIME_AWAY = 0.4
 	self:_set_characters_weapon_preset("normal")
@@ -7304,6 +7309,7 @@ function CharacterTweakData:_set_overkill()
 	self.hector_boss.HEALTH_INIT = 300
 	self.mobster_boss.HEALTH_INIT = 300
 	self.biker_boss.HEALTH_INIT = 300
+	self.chavez_boss.HEALTH_INIT = 300
 	self.phalanx_minion.HEALTH_INIT = 150
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 15
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
@@ -7431,6 +7437,7 @@ function CharacterTweakData:_set_overkill_145()
 	self.hector_boss.HEALTH_INIT = 600
 	self.mobster_boss.HEALTH_INIT = 600
 	self.biker_boss.HEALTH_INIT = 1800
+	self.chavez_boss.HEALTH_INIT = 600
 	self.phalanx_minion.HEALTH_INIT = 300
 	self.phalanx_minion.DAMAGE_CLAMP_BULLET = 30
 	self.phalanx_minion.DAMAGE_CLAMP_EXPLOSION = self.phalanx_minion.DAMAGE_CLAMP_BULLET
@@ -7500,6 +7507,7 @@ function CharacterTweakData:_set_easy_wish()
 	self.hector_boss.HEALTH_INIT = 900
 	self.mobster_boss.HEALTH_INIT = 900
 	self.biker_boss.HEALTH_INIT = 3000
+	self.chavez_boss.HEALTH_INIT = 900
 	self:_multiply_all_speeds(2.05, 2.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -7704,6 +7712,7 @@ function CharacterTweakData:_set_overkill_290()
 	self.hector_boss.HEALTH_INIT = 900
 	self.mobster_boss.HEALTH_INIT = 900
 	self.biker_boss.HEALTH_INIT = 3000
+	self.chavez_boss.HEALTH_INIT = 900
 	self:_multiply_all_speeds(2.05, 2.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)
@@ -8161,6 +8170,7 @@ function CharacterTweakData:_set_sm_wish()
 	self.hector_boss.HEALTH_INIT = 900
 	self.mobster_boss.HEALTH_INIT = 900
 	self.biker_boss.HEALTH_INIT = 3000
+	self.chavez_boss.HEALTH_INIT = 900
 	self:_multiply_all_speeds(2.05, 2.1)
 	self:_multiply_weapon_delay(self.presets.weapon.normal, 0)
 	self:_multiply_weapon_delay(self.presets.weapon.good, 0)

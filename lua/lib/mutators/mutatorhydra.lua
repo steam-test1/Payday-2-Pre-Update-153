@@ -266,6 +266,12 @@ MutatorHydra.raw_enemy_list = {
 	["units/pd2_dlc_berry/characters/ene_murkywater_no_light/ene_murkywater_no_light"] = {
 		"units/pd2_dlc_berry/characters/ene_murkywater_no_light/ene_murkywater_no_light"
 	},
+	["units/pd2_mcmansion/characters/ene_male_hector_1/ene_male_hector_1"] = {
+		"units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3"
+	},
+	["units/pd2_mcmansion/characters/ene_male_hector_2/ene_male_hector_2"] = {
+		"units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3"
+	},
 	["units/pd2_dlc_born/characters/ene_gang_biker_boss/ene_gang_biker_boss"] = {
 		"units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3"
 	},

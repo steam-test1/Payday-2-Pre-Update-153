@@ -26360,7 +26360,12 @@ function WeaponFactoryTweakData:_init_rota()
 		stats = {value = 1}
 	}
 	self.parts.wpn_fps_sho_rota_b_short = {
-		pcs = {},
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
 		type = "barrel",
 		name_id = "bm_wp_rota_b_standard",
 		a_obj = "a_b",
@@ -26374,7 +26379,12 @@ function WeaponFactoryTweakData:_init_rota()
 		texture_bundle_folder = "rota"
 	}
 	self.parts.wpn_fps_sho_rota_b_silencer = {
-		pcs = {},
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
 		type = "barrel",
 		name_id = "bm_wp_rota_b_silenced",
 		a_obj = "a_b",

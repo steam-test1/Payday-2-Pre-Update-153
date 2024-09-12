@@ -20,6 +20,6 @@ function ElementEnvironmentOperator:on_executed(instigator)
 		return
 	end
 	self._old_default_environment = managers.viewport:default_environment()
-	managers.viewport:set_default_environment(self._values.environment, nil, nil)
+	managers.viewport:set_default_environment(self._values.environment, self:value("blend_time"), nil)
 	ElementEnvironmentOperator.super.on_executed(self, instigator)
 end

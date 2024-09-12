@@ -1559,8 +1559,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		trophy_washington = {
 			trophy_stat = "trophy_washington",
-			kill = true,
-			mutators = {}
+			kill = true
 		},
 		trophy_medic = {
 			trophy_stat = "trophy_medic",
@@ -1829,8 +1828,7 @@ Play the full version soon to get your full PAYDAY!]],
 			in_head = true
 		},
 		trophy_washington = {
-			trophy_stat = "trophy_washington",
-			mutators = {}
+			trophy_stat = "trophy_washington"
 		},
 		trophy_smg = {
 			trophy_stat = "trophy_smg",
@@ -1972,8 +1970,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		trophy_washington = {
 			trophy_stat = "trophy_washington",
-			is_not_civilian = true,
-			mutators = {}
+			is_not_civilian = true
 		},
 		trophy_medic = {
 			trophy_stat = "trophy_medic",

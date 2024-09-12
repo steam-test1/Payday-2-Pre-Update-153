@@ -689,7 +689,7 @@ function CopActionShoot:_chk_start_melee(target_vec, target_dis, autotarget, tar
 	local state = self._ext_movement:play_redirect(is_weapon and "melee" or "melee_item")
 	if state then
 		if not is_weapon then
-			local anim_attack_vars = {"var1", "var2"}
+			local anim_attack_vars = self._common_data.char_tweak.melee_anims or {"var1", "var2"}
 			self._common_data.machine:set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
 			local param = tweak_data.weapon.npc_melee[melee_weapon].animation_param
 			self._common_data.machine:set_parameter(state, param, 1)

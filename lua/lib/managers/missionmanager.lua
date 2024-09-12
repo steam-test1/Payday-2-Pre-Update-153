@@ -102,6 +102,7 @@ require("lib/managers/mission/ElementCheckDLC")
 require("lib/managers/mission/ElementUnitDamage")
 require("lib/managers/mission/ElementStopwatch")
 require("lib/managers/mission/ElementPlayerCharacter")
+require("lib/managers/mission/ElementRandomInstance")
 require("lib/managers/mission/ElementChangeVanSkin")
 require("lib/managers/mission/ElementCustomSafehouse")
 require("lib/managers/mission/ElementLootPile")
@@ -171,6 +172,7 @@ function MissionManager:init(...)
 		"enemy_killed",
 		"pku_rambo",
 		"player_damaged",
+		"key",
 		"player_deploy_bodybagsbag",
 		"player_refill_bodybagsbag",
 		"player_deploy_doctorbag",

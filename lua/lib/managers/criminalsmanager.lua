@@ -527,6 +527,15 @@ function CriminalsManager:get_team_ai_character(index)
 		Global.team_ai[index] = char_name
 	else
 		char_name = Global.team_ai[index]
+		if self:character_taken_by_name(char_name) then
+			if Global.team_ai[index + 1] then
+				Global.team_ai[index] = Global.team_ai[index + 1]
+				Global.team_ai[index + 1] = nil
+			else
+				Global.team_ai[index] = self:get_free_character_name()
+			end
+			char_name = Global.team_ai[index]
+		end
 	end
 	return char_name
 end

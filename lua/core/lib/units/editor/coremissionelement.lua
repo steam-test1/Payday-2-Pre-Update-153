@@ -570,6 +570,16 @@ function CoreMissionElement:get_color(type)
 	return 0, 1, 0
 end
 
+function CoreMissionElement:get_element_color()
+	local r, g, b = 1, 1, 1
+	if self._iconcolor and managers.editor:layer("Mission"):use_colored_links() then
+		r = self._iconcolor_c.r
+		g = self._iconcolor_c.g
+		b = self._iconcolor_c.b
+	end
+	return r, g, b
+end
+
 function CoreMissionElement:draw_links_selected(t, dt, selected_unit)
 	local unit = self:_current_element_unit()
 	if alive(unit) then

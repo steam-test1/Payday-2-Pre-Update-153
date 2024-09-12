@@ -2685,8 +2685,8 @@ function InteractionTweakData:init(tweak_data)
 	self.money_wrap_updating.force_update_position = true
 	self.panic_room_key = {}
 	self.panic_room_key.icon = "equipment_chavez_key"
-	self.panic_room_key.text_id = "debug_interact_chavez_key_key"
-	self.panic_room_key.equipment_text_id = "debug_interact_equiptment_chavez_key"
+	self.panic_room_key.text_id = "hud_int_take_chavez_keys"
+	self.panic_room_key.equipment_text_id = "hud_int_take_chavez_keys"
 	self.panic_room_key.special_equipment = "chavez_key"
 	self.panic_room_key.equipment_consume = true
 	self.panic_room_key.interact_distance = 150

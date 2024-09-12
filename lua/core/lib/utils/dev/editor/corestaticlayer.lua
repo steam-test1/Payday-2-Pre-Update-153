@@ -323,9 +323,15 @@ function StaticLayer:update(t, dt)
 	end
 	self:update_move_triggers(t, dt)
 	self:update_rotate_triggers(t, dt)
-	if self._grab_cancelled and self._move_command then
-		self._move_command:undo()
+	if self._grab_cancelled then
+		if self._move_command then
+			self._move_command:undo()
+		end
+		if self._rotate_command then
+			self._rotate_command:undo()
+		end
 		self._move_command = nil
+		self._rotate_command = nil
 		self:reset_grab_info()
 	end
 end

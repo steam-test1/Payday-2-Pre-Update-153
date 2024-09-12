@@ -6369,7 +6369,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.r93.can_shoot_through_wall = true
 	self.r93.panic_suppression_chance = 0.2
 	self.r93.stats = {
-		damage = 140,
+		damage = 150,
 		spread = 24,
 		recoil = 4,
 		spread_moving = 24,
@@ -8716,8 +8716,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpg7.use_data.selection_index = 1
 	self.rpg7.use_data.align_place = "right_hand"
 	self.rpg7.DAMAGE = 6
-	self.rpg7.damage_near = 2000
-	self.rpg7.damage_far = 3000
+	self.rpg7.damage_near = 1000
+	self.rpg7.damage_far = 2000
 	self.rpg7.rays = 6
 	self.rpg7.CLIP_AMMO_MAX = 1
 	self.rpg7.NR_CLIPS_MAX = 4
@@ -11031,7 +11031,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.model70.can_shoot_through_wall = true
 	self.model70.panic_suppression_chance = 0.2
 	self.model70.stats = {
-		damage = 140,
+		damage = 150,
 		spread = 24,
 		recoil = 4,
 		spread_moving = 24,
@@ -11997,8 +11997,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rota.use_data.selection_index = 1
 	self.rota.use_data.align_place = "right_hand"
 	self.rota.DAMAGE = 6
-	self.rota.damage_near = 1000
-	self.rota.damage_far = 2000
+	self.rota.damage_near = 2000
+	self.rota.damage_far = 3000
 	self.rota.rays = 12
 	self.rota.CLIP_AMMO_MAX = 6
 	self.rota.NR_CLIPS_MAX = 9
