@@ -183,7 +183,7 @@ function CoreUnitSequenceTriggerUnitElement:_remove_by_unit_id(unit_id)
 		self:remove_entry(id)
 	end
 	for i, data in ipairs(clone(self._hed.sequence_list)) do
-		if data.unit_id == unit_id then
+		if type(data) == "table" and data.unit_id == unit_id or data == unit_id then
 			table.remove(self._hed.sequence_list, i)
 		end
 	end
@@ -199,7 +199,7 @@ function CoreUnitSequenceTriggerUnitElement:remove_entry(id)
 	self._guis[id] = nil
 	self._panel:layout()
 	for i, entry in pairs(clone(self._hed.sequence_list)) do
-		if entry.guis_id == id then
+		if type(entry) == "table" and entry.guis_id == id or entry.guis_id == id then
 			table.remove(self._hed.sequence_list, i)
 		end
 	end

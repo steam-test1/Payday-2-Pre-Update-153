@@ -130,6 +130,7 @@ function MissionManager:init(...)
 	self:add_area_instigator_categories("vehicle_with_players")
 	self:add_area_instigator_categories("player_not_in_vehicle")
 	self:add_area_instigator_categories("hostages")
+	self:add_area_instigator_categories("equipment")
 	self:set_default_area_instigator("player")
 	self:set_global_event_list({
 		"bankmanager_key",

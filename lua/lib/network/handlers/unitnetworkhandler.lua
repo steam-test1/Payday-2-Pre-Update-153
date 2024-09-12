@@ -2105,6 +2105,16 @@ function UnitNetworkHandler:mark_minion(unit, minion_owner_peer_id, convert_enem
 	end
 end
 
+function UnitNetworkHandler:remove_minion(unit, sender)
+	if not self._verify_sender(sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if unit then
+		local u_key = unit:key()
+		managers.groupai:state():_set_converted_police(u_key, nil)
+	end
+end
+
 function UnitNetworkHandler:spot_enemy(unit)
 end
 

@@ -9,10 +9,12 @@ local massive_font = tweak_data.menu.pd2_massive_font
 local large_font = tweak_data.menu.pd2_large_font
 local medium_font = tweak_data.menu.pd2_medium_font
 local small_font = tweak_data.menu.pd2_small_font
+local tiny_font = tweak_data.menu.tiny_font
 local massive_font_size = tweak_data.menu.pd2_massive_font_size
 local large_font_size = tweak_data.menu.pd2_large_font_size
 local medium_font_size = tweak_data.menu.pd2_medium_font_size
 local small_font_size = tweak_data.menu.pd2_small_font_size
+local tiny_font_size = tweak_data.menu.pd2_tiny_font_size
 local format_round = function(num, round_value)
 	return round_value and tostring(math.round(num)) or string.format("%.1f", num):gsub("%.?0+$", "")
 end
@@ -3142,7 +3144,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				text = utf8.to_upper(managers.localization:text("bm_menu_stats_mod"))
 			})
 			self._stats_titles.skill = self._stats_panel:text({
-				x = 255,
+				x = 260,
 				font_size = small_font_size,
 				font = small_font,
 				alpha = 0.75,
@@ -3186,6 +3188,16 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 					color = tweak_data.screen_colors.stats_mods
 				},
 				{
+					name = "removed",
+					size = 45,
+					offset = -40,
+					align = "right",
+					alpha = 0.75,
+					blend = "add",
+					color = tweak_data.screen_colors.important_1,
+					font_size = tiny_font_size
+				},
+				{
 					name = "skill",
 					size = 45,
 					align = "right",
@@ -3222,20 +3234,21 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				for _, column in ipairs(text_columns) do
 					text_panel = panel:panel({
 						layer = 0,
-						x = x,
+						x = x + (column.offset or 0),
 						w = column.size,
 						h = panel:h()
 					})
 					self._stats_texts[stat.name][column.name] = text_panel:text({
-						font_size = small_font_size,
-						font = small_font,
+						font_size = column.font_size or small_font_size,
+						font = column.font or small_font,
 						align = column.align,
 						layer = 1,
 						alpha = column.alpha,
 						blend_mode = column.blend,
-						color = column.color or tweak_data.screen_colors.text
+						color = column.color or tweak_data.screen_colors.text,
+						y = panel:h() - (column.font_size or small_font_size)
 					})
-					x = x + column.size
+					x = x + column.size + (column.offset or 0)
 					if column.name == "total" then
 						text_panel:set_x(190)
 					end
@@ -4692,6 +4705,17 @@ function BlackMarketGui:show_stats()
 		local total_base_stats, total_mods_stats, total_skill_stats = WeaponDescription._get_stats(name, category, slot, blueprint)
 		local mod_stats = WeaponDescription.get_stats_for_mod(self._slot_data.name, name, category, slot)
 		local hide_equip = mod_stats.equip.name == mod_stats.chosen.name
+		local remove_stats = {}
+		if self._slot_data.removes then
+			for _, part_id in ipairs(self._slot_data.removes) do
+				local part_stats = WeaponDescription.get_stats_for_mod(part_id, name, category, slot)
+				for category, value in pairs(part_stats.chosen or {}) do
+					if type(value) == "number" then
+						remove_stats[category] = (remove_stats[category] or 0) + value
+					end
+				end
+			end
+		end
 		self._rweapon_stats_panel:show()
 		self:hide_armor_stats()
 		self:hide_melee_weapon_stats()
@@ -4714,6 +4738,12 @@ function BlackMarketGui:show_stats()
 			alpha = 0.75,
 			x = 170
 		}, {
+			name = "removed",
+			show = true,
+			color = tweak_data.screen_colors.text,
+			alpha = 0.75,
+			x = 200
+		}, {
 			name = "mod",
 			show = true,
 			color = tweak_data.screen_colors.text,
@@ -4727,21 +4757,30 @@ function BlackMarketGui:show_stats()
 			value = mod_stats.chosen[stat.name]
 			equip = mod_stats.equip[stat.name]
 			total_value = math.max(total_base_stats[stat.name].value + total_mods_stats[stat.name].value + total_skill_stats[stat.name].value, 0)
-			stat_changed = tweak_parts and tweak_parts.stats and tweak_parts.stats[stat.stat_name or stat.name] and value ~= 0 and 1 or 0.5
+			stat_changed = tweak_parts and tweak_parts.stats and tweak_parts.stats[stat.stat_name or stat.name] and value ~= 0
+			stat_changed = stat_changed or remove_stats[stat.name] and remove_stats[stat.name] ~= 0
 			for stat_name, stat_text in pairs(self._stats_texts[stat.name]) do
 				if stat_name ~= "name" then
 					stat_text:set_text("")
 				end
 			end
 			for name, column in pairs(self._stats_texts[stat.name]) do
-				column:set_alpha(stat_changed)
+				column:set_alpha(stat_changed and 1 or 0.5)
 			end
-			self._stats_texts[stat.name].base:set_text(equip == 0 and "" or (0 < equip and "+" or "") .. format_round(equip, stat.round_value))
+			local equip_text = equip == 0 and "" or (0 < equip and "+" or "") .. format_round(equip, stat.round_value)
+			self._stats_texts[stat.name].base:set_text(equip_text)
 			self._stats_texts[stat.name].base:set_alpha(0.75)
 			self._stats_texts[stat.name].equip:set_alpha(1)
 			self._stats_texts[stat.name].equip:set_text(format_round(total_value, stat.round_value))
 			self._stats_texts[stat.name].skill:set_alpha(1)
 			self._stats_texts[stat.name].skill:set_text(value == 0 and "" or (0 < value and "+" or "") .. format_round(value, stat.round_value))
+			if remove_stats[stat.name] and remove_stats[stat.name] ~= 0 then
+				local stat_str = remove_stats[stat.name] == 0 and "" or (remove_stats[stat.name] > 0 and "+" or "") .. format_round(remove_stats[stat.name], stat.round_value)
+				self._stats_texts[stat.name].removed:set_text("(" .. tostring(stat_str) .. ")")
+			else
+				self._stats_texts[stat.name].removed:set_text("")
+			end
+			equip = equip + math.round(remove_stats[stat.name] or 0)
 			if value > equip then
 				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.stats_positive)
 				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
@@ -5273,12 +5312,13 @@ function BlackMarketGui:update_info_text()
 			})
 		end
 		local part_id = slot_data.name
-		local perks = part_id and tweak_data.weapon.factory.parts[part_id].perks
-		local is_gadget = part_id and tweak_data.weapon.factory.parts[part_id].type == "gadget" or perks and table.contains(perks, "gadget")
-		local is_ammo = part_id and tweak_data.weapon.factory.parts[part_id].type == "ammo" or perks and table.contains(perks, "ammo")
-		local is_bayonet = part_id and tweak_data.weapon.factory.parts[part_id].type == "bayonet" or perks and table.contains(perks, "bayonet")
-		local is_bipod = part_id and tweak_data.weapon.factory.parts[part_id].type == "bipod" or perks and table.contains(perks, "bipod")
-		local has_desc = part_id and tweak_data.weapon.factory.parts[part_id].has_description == true
+		local part_data = part_id and tweak_data.weapon.factory.parts[part_id]
+		local perks = part_data and part_data.perks
+		local is_gadget = part_data and part_data.type == "gadget" or perks and table.contains(perks, "gadget")
+		local is_ammo = part_data and part_data.type == "ammo" or perks and table.contains(perks, "ammo")
+		local is_bayonet = part_data and part_data.type == "bayonet" or perks and table.contains(perks, "bayonet")
+		local is_bipod = part_data and part_data.type == "bipod" or perks and table.contains(perks, "bipod")
+		local has_desc = part_data and part_data.has_description == true
 		updated_texts[4].resource_color = {}
 		if is_gadget or is_ammo or is_bayonet or is_bipod or has_desc then
 			local crafted = managers.blackmarket:get_crafted_category_slot(prev_data.category, prev_data.slot)
@@ -5301,6 +5341,83 @@ function BlackMarketGui:update_info_text()
 			table.insert(updated_texts[4].resource_color, tweak_data.screen_colors.text)
 		end
 		updated_texts[4].below_stats = true
+		local weapon_id = managers.weapon_factory:get_factory_id_by_weapon_id(prev_data.name)
+		local get_forbids = function(weapon_id, part_id)
+			local weapon_data = tweak_data.weapon.factory[weapon_id]
+			if not weapon_data then
+				return {}
+			end
+			local default_parts = {}
+			for _, part in ipairs(weapon_data.default_blueprint) do
+				table.insert(default_parts, part)
+				local part_data = tweak_data.weapon.factory.parts[part]
+				if part_data and part_data.adds then
+					for _, part in ipairs(part_data.adds) do
+						table.insert(default_parts, part)
+					end
+				end
+			end
+			local weapon_mods = {}
+			for _, part in ipairs(weapon_data.uses_parts) do
+				if not table.contains(default_parts, part) then
+					local part_data = tweak_data.weapon.factory.parts[part]
+					if part_data and not part_data.unatainable then
+						weapon_mods[part] = {}
+					end
+				end
+			end
+			for part, _ in pairs(weapon_mods) do
+				local part_data = tweak_data.weapon.factory.parts[part]
+				if part_data.forbids then
+					for other_part, _ in pairs(weapon_mods) do
+						local other_part_data = tweak_data.weapon.factory.parts[part]
+						if table.contains(part_data.forbids, other_part) then
+							table.insert(weapon_mods[part], other_part)
+							table.insert(weapon_mods[other_part], part)
+						end
+					end
+				end
+			end
+			return weapon_mods[part_id]
+		end
+		local forbidden_parts = get_forbids(weapon_id, part_id)
+		if slot_data.removes and 0 < #slot_data.removes then
+			local removed_mods = ""
+			for i, name in ipairs(slot_data.removes) do
+				local mod_name = tweak_data.weapon.factory.parts[name] and tweak_data.weapon.factory.parts[name].name_id or name
+				mod_name = managers.localization:text(mod_name)
+				removed_mods = string.format("%s%s%s", removed_mods, 1 < i and ", " or "", mod_name)
+			end
+			updated_texts[5].text = managers.localization:to_upper_text("bm_mod_equip_remove", {mod = removed_mods})
+		elseif forbidden_parts and 0 < #forbidden_parts then
+			local forbids = {}
+			for i, forbidden_part in ipairs(forbidden_parts) do
+				local data = tweak_data.weapon.factory.parts[forbidden_part]
+				if data then
+					forbids[data.type] = (forbids[data.type] or 0) + 1
+				end
+			end
+			local text = ""
+			for category, amount in pairs(forbids) do
+				if text ~= "" then
+					text = text .. "\n"
+				end
+				local category_count = 0
+				local weapon_data = tweak_data.weapon.factory[weapon_id]
+				for _, part_name in ipairs(weapon_data.uses_parts) do
+					local part_data = tweak_data.weapon.factory.parts[part_name]
+					if part_data and not part_data.unatainable and part_data.type == category and not table.contains(weapon_data.default_blueprint, part_name) then
+						category_count = category_count + 1
+					end
+				end
+				local percent_forbidden = amount / category_count
+				local category = managers.localization:text("bm_menu_" .. tostring(category) .. "_plural")
+				local quantifier = percent_forbidden == 1 and "all" or 0.66 < percent_forbidden and "most" or "some"
+				quantifier = managers.localization:text("bm_mod_incompatibility_" .. tostring(quantifier))
+				text = managers.localization:to_upper_text("bm_mod_incompatibilities", {quantifier = quantifier, category = category})
+			end
+			updated_texts[5].text = text
+		end
 	elseif identifier == self.identifiers.mask_mod then
 		if not managers.blackmarket:currently_customizing_mask() then
 			return
@@ -9002,6 +9119,8 @@ function BlackMarketGui:populate_mods(data)
 					new_data.mid_text = nil
 					new_data.conflict = managers.localization:text("bm_menu_" .. tostring(tweak_data.weapon.factory.parts[forbid] and tweak_data.weapon.factory.parts[forbid].type or forbid))
 				end
+				local replaces, removes = managers.blackmarket:get_modify_weapon_consequence(new_data.category, new_data.slot, new_data.name)
+				new_data.removes = removes or {}
 				local weapon = managers.blackmarket:get_crafted_category_slot(data.prev_node_data.category, data.prev_node_data.slot) or {}
 				local gadget
 				local mod_type = tweak_data.weapon.factory.parts[new_data.name].type

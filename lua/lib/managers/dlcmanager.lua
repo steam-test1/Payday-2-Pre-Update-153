@@ -767,8 +767,9 @@ function PS4DLCManager:init()
 end
 
 function PS4DLCManager:_verify_dlcs()
-	if PS3:has_entitlement("PD2WITHBUNDLED01") then
-		local owns_TheBigScore = true
+	local owns_TheBigScore = false
+	if PS3:has_theBigScore() then
+		owns_TheBigScore = true
 	end
 	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
 		if dlc_data.is_default or dlc_data.verified == true then
@@ -1175,6 +1176,7 @@ function WINDLCManager:init()
 				no_install = true,
 				external = true
 			},
+			sparkle = {app_id = "532810", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

@@ -25,11 +25,11 @@ function HUDHitDirection:init(hud)
 	self._hit_direction_panel:set_center(self._hit_direction_panel:parent():w() * 0.5, self._hit_direction_panel:parent():h() * 0.5)
 end
 
-function HUDHitDirection:on_hit_direction(origin, damage_type)
-	self:_add_hit_indicator(origin or Vector3(0, 0, 0), damage_type)
+function HUDHitDirection:on_hit_direction(origin, damage_type, fixed_angle)
+	self:_add_hit_indicator(origin or Vector3(0, 0, 0), damage_type, fixed_angle)
 end
 
-function HUDHitDirection:_add_hit_indicator(damage_origin, damage_type)
+function HUDHitDirection:_add_hit_indicator(damage_origin, damage_type, fixed_angle)
 	damage_type = damage_type or HUDHitDirection.DAMAGE_TYPES.HEALTH
 	local hit = self._hit_direction_panel:bitmap({
 		rotation = 0,
@@ -44,7 +44,8 @@ function HUDHitDirection:_add_hit_indicator(damage_origin, damage_type)
 		origin = damage_origin,
 		duration = 0.8,
 		damage_type = damage_type,
-		bitmap = hit
+		bitmap = hit,
+		fixed_angle = fixed_angle
 	}
 	hit:animate(callback(self, self, "_animate"), data, callback(self, self, "_remove"))
 end
@@ -75,9 +76,12 @@ function HUDHitDirection:_animate(indicator, data, remove_func)
 			if managers.player:player_unit() then
 				local ply_camera = managers.player:player_unit():camera()
 				if ply_camera then
-					local target_vec = data.origin - ply_camera:position()
+					local target_vec = ply_camera:position() - data.origin
 					local angle = target_vec:to_polar_with_reference(ply_camera:forward(), math.UP).spin
 					local r = HUDHitDirection.PANEL_SIZE * 0.4
+					if data.fixed_angle ~= nil then
+						angle = data.fixed_angle
+					end
 					indicator:set_rotation(90 - angle)
 					indicator:set_center(HUDHitDirection.PANEL_SIZE * 0.5 - math.sin(angle + 180) * r, HUDHitDirection.PANEL_SIZE * 0.5 - math.cos(angle + 180) * r)
 				end

@@ -61,7 +61,7 @@ function ReferenceUnitCommand:save_unit_values()
 end
 
 function ReferenceUnitCommand:get_saved_units()
-	local reference_unit = managers.editor:unit_with_id(self:value("reference_unit"))
+	local reference_unit = managers.editor:unit_with_id(self:value("reference_unit")) or managers.editor:get_special_unit_with_id(self:value("reference_unit"))
 	local units = {}
 	for _, id in ipairs(self:value("selected_units")) do
 		local unit = managers.editor:unit_with_id(id)
@@ -89,7 +89,9 @@ end
 function MoveUnitCommand:save_unit_values()
 	MoveUnitCommand.super.save_unit_values(self)
 	local reference_unit, units = self:get_saved_units()
-	self._values.original_pos = reference_unit:unit_data().world_pos
+	if alive(reference_unit) then
+		self._values.original_pos = reference_unit:unit_data().world_pos
+	end
 end
 
 function MoveUnitCommand:execute(pos)
@@ -121,9 +123,11 @@ function MoveUnitCommand:perform_move(pos, reference, units)
 			self:layer():set_unit_position(unit, pos, reference:rotation())
 		end
 	end
-	reference:set_position(pos)
-	reference:unit_data().world_pos = pos
-	self:layer():_on_unit_moved(reference, pos)
+	if alive(reference) then
+		reference:set_position(pos)
+		reference:unit_data().world_pos = pos
+		self:layer():_on_unit_moved(reference, pos)
+	end
 end
 
 function MoveUnitCommand:__tostring()

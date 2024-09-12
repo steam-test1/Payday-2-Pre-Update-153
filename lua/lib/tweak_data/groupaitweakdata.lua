@@ -1940,6 +1940,7 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 			respawn_delay = 120
 		}
 	end
+	self.safehouse = deep_clone(self.besiege)
 end
 
 function GroupAITweakData:_read_mission_preset(tweak_data)
@@ -1953,6 +1954,16 @@ end
 function GroupAITweakData:_create_table_structure()
 	self.enemy_spawn_groups = {}
 	self.besiege = {
+		regroup = {},
+		assault = {
+			force = {}
+		},
+		reenforce = {},
+		recon = {},
+		rescue = {},
+		cloaker = {}
+	}
+	self.safehouse = {
 		regroup = {},
 		assault = {
 			force = {}

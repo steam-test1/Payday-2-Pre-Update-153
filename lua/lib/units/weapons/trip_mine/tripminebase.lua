@@ -73,7 +73,11 @@ function TripMineBase:setup(sensor_upgrade)
 	self._slotmask = managers.slot:get_mask("trip_mine_targets")
 	self._first_armed = false
 	self._armed = false
-	self._startup_armed = true
+	if sensor_upgrade then
+		self._startup_armed = not managers.groupai:state():whisper_mode()
+	else
+		self._startup_armed = true
+	end
 	self._sensor_upgrade = sensor_upgrade
 	self:set_active(false)
 	self._unit:sound_source():post_event("trip_mine_attach")

@@ -496,9 +496,6 @@ function VehicleDamage:_chk_dmg_too_soon(damage)
 end
 
 function VehicleDamage:_hit_direction(col_ray)
-	local local_player_vehicle = managers.player:get_vehicle()
-	if not local_player_vehicle or self._unit ~= local_player_vehicle.vehicle_unit or col_ray then
-	end
 end
 
 function VehicleDamage:_call_listeners(damage_info)

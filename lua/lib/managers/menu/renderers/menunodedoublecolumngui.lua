@@ -4,16 +4,31 @@ function MenuNodeDoubleColumnGui:init(node, layer, parameters)
 	MenuNodeDoubleColumnGui.super.init(self, node, layer, parameters)
 end
 
-function MenuNodeDoubleColumnGui:_setup_size()
+function MenuNodeDoubleColumnGui:_setup_size(node)
 	MenuNodeDoubleColumnGui.super._setup_size(self)
-	self._split_pos = self:_scaled_size().width * 0.85
+	local safe_width = self:_scaled_size().width
+	local item_width = safe_width * (1 - self._align_line_proportions)
+	local column_ratio = tonumber(node:parameters().column_ratio) or 0.5
+	self._split_size = 10
+	self._width_primary = item_width * (1 - column_ratio) - self._split_size * 0.5
+	self._width_secondary = item_width * column_ratio - self._split_size * 0.5
 	for _, row_item in pairs(self.primary_row_items) do
-		row_item.gui_panel:set_width(self:_scaled_size().width - self._split_pos)
-		row_item.menu_unselected:set_width(self:_scaled_size().width - self._split_pos)
+		if row_item.item:parameters().both_column then
+			row_item.gui_panel:set_width(item_width)
+			row_item.menu_unselected:set_width(item_width)
+		elseif not row_item.item:parameters().back then
+			row_item.gui_panel:set_width(self._width_primary)
+			row_item.menu_unselected:set_width(self._width_primary)
+		end
 	end
 	for _, row_item in pairs(self.secondary_row_items) do
-		row_item.gui_panel:set_width(self:_scaled_size().width - self._split_pos)
-		row_item.menu_unselected:set_width(self:_scaled_size().width - self._split_pos)
+		if row_item.item:parameters().both_column then
+			row_item.gui_panel:set_width(item_width)
+			row_item.menu_unselected:set_width(item_width)
+		elseif not row_item.item:parameters().back then
+			row_item.gui_panel:set_width(self._width_secondary)
+			row_item.menu_unselected:set_width(self._width_secondary)
+		end
 	end
 end
 
@@ -22,14 +37,21 @@ function MenuNodeDoubleColumnGui:_set_item_positions()
 	local current_y = self.height_padding
 	local current_item_height = 0
 	local scaled_size = managers.gui_data:scaled_size()
+	local start_x = scaled_size.width * self._align_line_proportions
 	for _, row_item in pairs(self.primary_row_items) do
+		local item_width = self._width_primary
+		local item_left = start_x + self._width_secondary + self._split_size * 0.5
+		if row_item.item:parameters().both_column then
+			item_width = scaled_size.width * (1 - self._align_line_proportions)
+			item_left = start_x
+		end
 		if not row_item.item:parameters().back then
 			row_item.position.y = current_y
 			row_item.gui_panel:set_y(row_item.position.y)
-			row_item.menu_unselected:set_left(self._split_pos + 10)
+			row_item.menu_unselected:set_left(item_left)
 			row_item.menu_unselected:set_h(64 * row_item.gui_panel:h() / 32)
 			row_item.menu_unselected:set_center_y(row_item.gui_panel:center_y())
-			row_item.menu_unselected:set_width(self:_scaled_size().width - self._split_pos)
+			row_item.menu_unselected:set_width(item_width)
 			row_item.gui_panel:set_right(row_item.menu_unselected:right())
 			if row_item.current_of_total then
 				row_item.current_of_total:set_w(200)
@@ -50,27 +72,35 @@ function MenuNodeDoubleColumnGui:_set_item_positions()
 	current_y = self.height_padding
 	current_item_height = 0
 	for _, row_item in pairs(self.secondary_row_items) do
-		row_item.position.y = current_y
-		row_item.gui_panel:set_y(row_item.position.y)
-		row_item.menu_unselected:set_right(self._split_pos - 10)
-		row_item.menu_unselected:set_h(64 * row_item.gui_panel:h() / 32)
-		row_item.menu_unselected:set_center_y(row_item.gui_panel:center_y())
-		row_item.menu_unselected:set_width(self:_scaled_size().width - self._split_pos)
-		row_item.gui_panel:set_right(row_item.menu_unselected:right())
-		if row_item.current_of_total then
-			row_item.current_of_total:set_w(200)
-			row_item.current_of_total:set_center_y(row_item.menu_unselected:center_y())
-			row_item.current_of_total:set_right(row_item.menu_unselected:right() - self._align_line_padding)
+		local item_width = self._width_secondary
+		local item_left = start_x
+		if row_item.item:parameters().both_column then
+			item_width = scaled_size.width * (1 - self._align_line_proportions)
+			item_left = start_x
 		end
-		row_item.item:on_item_position(row_item, self)
-		if alive(row_item.icon) then
-			row_item.icon:set_left(row_item.gui_panel:right())
-			row_item.icon:set_center_y(row_item.gui_panel:center_y())
-			row_item.icon:set_color(row_item.gui_panel:color())
+		if not row_item.item:parameters().back then
+			row_item.position.y = current_y
+			row_item.gui_panel:set_y(row_item.position.y)
+			row_item.menu_unselected:set_left(item_left)
+			row_item.menu_unselected:set_h(64 * row_item.gui_panel:h() / 32)
+			row_item.menu_unselected:set_center_y(row_item.gui_panel:center_y())
+			row_item.menu_unselected:set_width(item_width)
+			row_item.gui_panel:set_right(row_item.menu_unselected:right())
+			if row_item.current_of_total then
+				row_item.current_of_total:set_w(200)
+				row_item.current_of_total:set_center_y(row_item.menu_unselected:center_y())
+				row_item.current_of_total:set_right(row_item.menu_unselected:right() - self._align_line_padding)
+			end
+			row_item.item:on_item_position(row_item, self)
+			if alive(row_item.icon) then
+				row_item.icon:set_left(row_item.gui_panel:right())
+				row_item.icon:set_center_y(row_item.gui_panel:center_y())
+				row_item.icon:set_color(row_item.gui_panel:color())
+			end
+			local x, y, w, h = row_item.gui_panel:shape()
+			current_item_height = h + self.spacing
+			current_y = current_y + current_item_height
 		end
-		local x, y, w, h = row_item.gui_panel:shape()
-		current_item_height = h + self.spacing
-		current_y = current_y + current_item_height
 	end
 	for _, row_item in pairs(self.primary_row_items) do
 		if not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
@@ -78,15 +108,17 @@ function MenuNodeDoubleColumnGui:_set_item_positions()
 		end
 	end
 	for _, row_item in pairs(self.secondary_row_items) do
-		row_item.item:on_item_positions_done(row_item, self)
+		if not row_item.item:parameters().back and not row_item.item:parameters().pd2_corner then
+			row_item.item:on_item_positions_done(row_item, self)
+		end
 	end
 	if self._primary_title then
-		self._primary_title:set_width(self:_scaled_size().width - self._split_pos)
-		self._primary_title:set_left(self._split_pos + 10)
+		self._primary_title:set_width(self._width_primary)
+		self._primary_title:set_left(start_x + self._width_secondary + self._split_size * 0.5)
 	end
 	if self._secondary_title then
-		self._secondary_title:set_width(self:_scaled_size().width - self._split_pos)
-		self._secondary_title:set_right(self._split_pos - 10)
+		self._secondary_title:set_width(self._width_secondary)
+		self._secondary_title:set_left(start_x)
 	end
 end
 
@@ -138,7 +170,10 @@ function MenuNodeDoubleColumnGui:_setup_item_rows(node)
 				end
 			end
 			local row_item = {}
-			if params.left_column and params.left_column ~= "false" then
+			if params.both_column and params.both_column ~= "false" or params.back then
+				table.insert(self.secondary_row_items, row_item)
+				table.insert(self.primary_row_items, row_item)
+			elseif params.left_column and params.left_column ~= "false" then
 				table.insert(self.secondary_row_items, row_item)
 			else
 				table.insert(self.primary_row_items, row_item)
@@ -174,8 +209,14 @@ function MenuNodeDoubleColumnGui:_setup_item_rows(node)
 	end
 	node:select_item()
 	self._highlighted_item = node:selected_item()
-	self.row_items = self:left_active() and self.secondary_row_items or self.primary_row_items
-	self:_setup_size()
+	self.row_items = {}
+	for _, v in ipairs(self.primary_row_items) do
+		table.insert(self.row_items, v)
+	end
+	for _, v in ipairs(self.secondary_row_items) do
+		table.insert(self.row_items, v)
+	end
+	self:_setup_size(node)
 	self:scroll_setup()
 	self:_set_item_positions()
 	self:highlight_item(node:selected_item())
@@ -262,7 +303,6 @@ end
 
 function MenuNodeDoubleColumnGui:highlight_item(item, mouse_over)
 	local column = self:get_item_index(item)
-	self.row_items = column == "primary" and self.primary_row_items or self.secondary_row_items
 	MenuNodeDoubleColumnGui.super.highlight_item(self, item, mouse_over)
 end
 
@@ -273,11 +313,15 @@ end
 function MenuNodeDoubleColumnGui:update(t, dt)
 	MenuNodeDoubleColumnGui.super.update(self, t, dt)
 	if managers.menu:is_pc_controller() then
+		local scaled_size = managers.gui_data:scaled_size()
+		local start_x = scaled_size.width * self._align_line_proportions
+		local width_primary = self._width_primary - self._split_size * 0.5
+		local split = start_x + self._width_secondary
 		local mouse_x = managers.mouse_pointer:modified_mouse_pos()
-		if not self._left_active and mouse_x < self._split_pos then
+		if not self._left_active and split >= mouse_x then
 			self.row_items = self.secondary_row_items
 			self._left_active = true
-		elseif self._left_active and mouse_x > self._split_pos then
+		elseif self._left_active and split < mouse_x then
 			self.row_items = self.primary_row_items
 			self._left_active = false
 		end

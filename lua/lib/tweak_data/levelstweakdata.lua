@@ -763,7 +763,7 @@ function LevelsTweakData:init()
 	self.mia_2.music = "heist"
 	self.mia_2.package = "packages/narr_mia_2"
 	self.mia_2.cube = "cube_apply_heist_bank"
-	self.mia_2.max_bags = 20
+	self.mia_2.max_bags = 28
 	self.mia_2.ai_group_type = america
 	self.mia_2.teams = {
 		criminal1 = {

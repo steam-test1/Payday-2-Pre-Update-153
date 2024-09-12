@@ -131,31 +131,51 @@ function LootManager:sync_secure_loot(carry_id, multiplier_level, silent)
 	self:check_achievements(carry_id, multiplier)
 end
 
+function LootManager:_check_secured(achievement, secured_data)
+	local amount = 0
+	local total_amount = 0
+	local value = 0
+	for _, data in ipairs(self._global.secured) do
+		if data.carry_id == secured_data.carry_id then
+			if not data[achievement] then
+				amount = amount + 1
+				data[achievement] = true
+			end
+			total_amount = total_amount + 1
+			local is_small_loot = not not tweak_data.carry.small_loot[data.carry_id]
+			if is_small_loot then
+				value = value + self:get_real_value(data.carry_id, data.multiplier)
+			else
+				value = value + managers.money:get_secured_bonus_bag_value(data.carry_id, data.multiplier)
+			end
+		end
+	end
+	return secured_data.total_amount and total_amount >= secured_data.total_amount or secured_data.amount and amount >= secured_data.amount or secured_data.value and value >= secured_data.value
+end
+
 function LootManager:check_achievements(carry_id, multiplier)
 	local real_total_value = self:get_real_total_value()
-	local memory, total_memory_value, all_pass, total_value_pass, jobs_pass, difficulties_pass, total_time_pass, no_assets_pass, no_deployable_pass, secured_pass
+	local memory, total_memory_value, all_pass, total_value_pass, jobs_pass, levels_pass, difficulties_pass, total_time_pass, no_assets_pass, no_deployable_pass, secured_pass, is_dropin_pass
 	for achievement, achievement_data in pairs(tweak_data.achievement.loot_cash_achievements or {}) do
 		jobs_pass = not achievement_data.jobs or table.contains(achievement_data.jobs, managers.job:current_real_job_id())
+		levels_pass = not achievement_data.levels or table.contains(achievement_data.levels, managers.job:current_level_id())
 		difficulties_pass = not achievement_data.difficulties or table.contains(achievement_data.difficulties, Global.game_settings.difficulty)
 		total_time_pass = not achievement_data.total_time or managers.game_play_central and managers.game_play_central:get_heist_timer() <= achievement_data.total_time
 		no_assets_pass = not achievement_data.no_assets or #managers.assets:get_unlocked_asset_ids(true) == 0
 		no_deployable_pass = not achievement_data.no_deployable or not managers.player:has_deployable_been_used()
+		is_dropin_pass = achievement_data.is_dropin == nil or achievement_data.is_dropin == managers.statistics:is_dropin()
 		secured_pass = not achievement_data.secured
 		if achievement_data.secured then
-			local amount = 0
-			local value = 0
-			for _, data in ipairs(self._global.secured) do
-				if data.carry_id == achievement_data.secured.carry_id then
-					amount = amount + 1
-					local is_small_loot = not not tweak_data.carry.small_loot[data.carry_id]
-					if is_small_loot then
-						value = value + self:get_real_value(data.carry_id, data.multiplier)
-					else
-						value = value + managers.money:get_secured_bonus_bag_value(data.carry_id, data.multiplier)
+			if achievement_data.secured[1] ~= nil then
+				for i, secured_data in ipairs(achievement_data.secured) do
+					secured_pass = self:_check_secured(achievement, secured_data)
+					if not secured_pass then
+						break
 					end
 				end
+			else
+				secured_pass = self:_check_secured(achievement, achievement_data.secured)
 			end
-			secured_pass = achievement_data.secured.amount and amount >= achievement_data.secured.amount or achievement_data.secured.value and value >= achievement_data.secured.value
 		end
 		if not achievement_data.timer then
 			total_value_pass = not achievement_data.total_value or real_total_value >= achievement_data.total_value
@@ -184,7 +204,7 @@ function LootManager:check_achievements(carry_id, multiplier)
 			end
 			total_value_pass = not achievement_data.total_value or total_memory_value >= achievement_data.total_value
 		end
-		all_pass = total_value_pass and jobs_pass and difficulties_pass and total_time_pass and no_assets_pass and no_deployable_pass and secured_pass
+		all_pass = total_value_pass and jobs_pass and levels_pass and difficulties_pass and total_time_pass and no_assets_pass and no_deployable_pass and secured_pass and is_dropin_pass
 		if all_pass then
 			if achievement_data.stat then
 				managers.achievment:award_progress(achievement_data.stat)

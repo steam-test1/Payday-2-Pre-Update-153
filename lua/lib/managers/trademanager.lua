@@ -773,6 +773,11 @@ function TradeManager:clbk_respawn_criminal(pos, rotation)
 	end
 	print("Found criminal to respawn ", respawn_criminal and inspect(respawn_criminal))
 	self:criminal_respawn(pos, rotation, respawn_criminal)
+	local player_unit = managers.player:player_unit()
+	if player_unit then
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 1, player_unit:inventory():unit_by_selection(1):base():fire_mode())
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 2, player_unit:inventory():unit_by_selection(2):base():fire_mode())
+	end
 end
 
 function TradeManager:criminal_respawn(pos, rotation, respawn_criminal)

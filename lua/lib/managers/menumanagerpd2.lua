@@ -1764,7 +1764,7 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 				cdata = cdata.types[data.mod_type]
 			end
 			skin_editor:reload_current_skin()
-			local textures = skin_editor:get_texture_list(skin)
+			local base_gradient_textures = skin_editor:get_texture_list_by_type(skin, "base_gradient")
 			local multichoice_list = {
 				{
 					_meta = "option",
@@ -1773,7 +1773,7 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 					value = nil
 				}
 			}
-			for id, texture in ipairs(textures) do
+			for id, texture in ipairs(base_gradient_textures) do
 				table.insert(multichoice_list, {
 					_meta = "option",
 					localize = false,
@@ -1791,6 +1791,23 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 				mod_type = data.mod_type
 			})
 			base_gradient_item:set_value(cdata.base_gradient_name)
+			local pattern_gradient_textures = skin_editor:get_texture_list_by_type(skin, "pattern_gradient")
+			multichoice_list = {
+				{
+					_meta = "option",
+					localize = false,
+					text_id = "DEFAULT",
+					value = nil
+				}
+			}
+			for id, texture in ipairs(pattern_gradient_textures) do
+				table.insert(multichoice_list, {
+					_meta = "option",
+					localize = false,
+					text_id = texture,
+					value = texture
+				})
+			end
 			local pattern_gradient_item = self:create_multichoice(node, multichoice_list, {
 				text_offset = 50,
 				callback = "weapon_skin_changed",
@@ -1801,6 +1818,23 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 				mod_type = data.mod_type
 			})
 			pattern_gradient_item:set_value(cdata.pattern_gradient_name)
+			local pattern_textures = skin_editor:get_texture_list_by_type(skin, "pattern")
+			multichoice_list = {
+				{
+					_meta = "option",
+					localize = false,
+					text_id = "DEFAULT",
+					value = nil
+				}
+			}
+			for id, texture in ipairs(pattern_textures) do
+				table.insert(multichoice_list, {
+					_meta = "option",
+					localize = false,
+					text_id = texture,
+					value = texture
+				})
+			end
 			local pattern_item = self:create_multichoice(node, multichoice_list, {
 				text_offset = 50,
 				callback = "weapon_skin_changed",
@@ -1934,6 +1968,23 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 			cubemap_pattern_control_y_item:set_value(cdata.cubemap_pattern_control and mvector3.y(cdata.cubemap_pattern_control) or 0)
 			self:create_divider(node, "sticker")
 			self:create_divider(node, "sticker2")
+			local sticker_textures = skin_editor:get_texture_list_by_type(skin, "sticker")
+			multichoice_list = {
+				{
+					_meta = "option",
+					localize = false,
+					text_id = "DEFAULT",
+					value = nil
+				}
+			}
+			for id, texture in ipairs(sticker_textures) do
+				table.insert(multichoice_list, {
+					_meta = "option",
+					localize = false,
+					text_id = texture,
+					value = texture
+				})
+			end
 			local sticker_item = self:create_multichoice(node, multichoice_list, {
 				text_offset = 50,
 				callback = "weapon_skin_changed",
@@ -2170,6 +2221,19 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 		self:add_back_button(node)
 	end
 	return node
+end
+
+function MenuCallbackHandler:convert_skin(item)
+	local skin_editor = managers.blackmarket:skin_editor()
+	local skin = skin_editor:get_current_skin()
+	skin_editor:convert_file_layout(skin)
+	item:set_enabled(false)
+end
+
+function MenuCallbackHandler:need_convert_skin(item)
+	local skin_editor = managers.blackmarket:skin_editor()
+	local skin = skin_editor:get_current_skin()
+	return skin and not skin_editor:has_texture_folders(skin)
 end
 
 function MenuCallbackHandler:should_add_changelog(item)
@@ -2540,7 +2604,7 @@ function MenuCallbackHandler:weapon_skin_changed(item)
 			end
 		elseif item:parameters().type ~= "CoreMenuItemSlider.ItemSlider" then
 			local orig_value = value
-			value = skin_editor:get_texture_string(skin, orig_value)
+			value = skin_editor:get_texture_string(skin, orig_value, key)
 			data[key .. "_name"] = orig_value
 			skin_editor:load_textures(skin)
 			if not skin_editor:check_texture_db(value) then
@@ -2560,7 +2624,7 @@ function MenuCallbackHandler:weapon_skin_changed(item)
 					value = nil
 				}))
 				skin_editor:load_textures(skin)
-				local textures = skin_editor:get_texture_list(skin)
+				local textures = skin_editor:get_texture_list_by_type(skin, key)
 				for _, texture in ipairs(textures) do
 					item:add_option(CoreMenuItemOption.ItemOption:new({
 						_meta = "option",

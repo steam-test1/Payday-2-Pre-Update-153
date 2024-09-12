@@ -1248,7 +1248,7 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
 		local is_alive = not hit_unit:character_damage():dead()
 		local knock_down = weapon_unit:base()._knock_down and 0 < weapon_unit:base()._knock_down and math.random() < weapon_unit:base()._knock_down
-		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage, weapon_unit:base()._use_armor_piercing, false, knock_down, weapon_unit:base()._stagger)
+		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage, weapon_unit:base()._use_armor_piercing, false, knock_down, weapon_unit:base()._stagger, weapon_unit:base()._variant)
 		if result ~= "friendly_fire" then
 			local is_dead = hit_unit:character_damage():dead()
 			local push_multiplier = self:_get_character_push_multiplier(weapon_unit, is_alive and is_dead)
@@ -1291,9 +1291,9 @@ function InstantBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
 	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_sound = no_sound})
 end
 
-function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing, shield_knock, knock_down, stagger)
+function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing, shield_knock, knock_down, stagger, variant)
 	local action_data = {}
-	action_data.variant = "bullet"
+	action_data.variant = variant or "bullet"
 	action_data.damage = damage
 	action_data.weapon_unit = weapon_unit
 	action_data.attacker_unit = user_unit

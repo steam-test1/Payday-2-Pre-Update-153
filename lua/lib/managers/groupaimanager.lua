@@ -22,7 +22,8 @@ function GroupAIManager:set_state(name)
 	elseif name == "street" then
 		self._state = GroupAIStateStreet:new()
 	elseif name == "besiege" or name == "airport" or name == "zombie_apocalypse" then
-		self._state = GroupAIStateBesiege:new()
+		local level_tweak = tweak_data.levels[managers.job:current_level_id()]
+		self._state = GroupAIStateBesiege:new(level_tweak and level_tweak.group_ai_state or "besiege")
 	else
 		Application:error("[GroupAIManager:set_state] inexistent state name", name)
 		return

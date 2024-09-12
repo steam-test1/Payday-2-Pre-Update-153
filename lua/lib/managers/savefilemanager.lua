@@ -450,6 +450,15 @@ function SavefileManager:_save_done(slot, cache_only, task_data, slot_data, succ
 		self:_set_setting_changed(true)
 	end
 	self._save_done_callback_handler:dispatch(slot, success, is_setting_slot, cache_only)
+	if not success then
+		local dialog_data = {}
+		dialog_data.title = managers.localization:text("dialog_error_title")
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+		dialog_data.text = managers.localization:text("dialog_fail_save_game_corrupt")
+		managers.system_menu:show(dialog_data)
+	end
 end
 
 function SavefileManager:_load(slot, cache_only, save_system)

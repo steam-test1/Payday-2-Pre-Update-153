@@ -2053,7 +2053,7 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 		rotation = 360
 	})
 	if params then
-		if params.secondary then
+		if params.secondary and managers.player:has_category_upgrade("player", "second_deployable") then
 			local info_text = " / "
 			if params.info_text then
 				info_text = params.info_text .. info_text
@@ -2065,7 +2065,7 @@ function NewLoadoutItem:init(panel, columns, rows, x, y, params)
 		elseif params.info_text then
 			self:set_info_text(params.info_text, params.info_text_color)
 		end
-		if params.secondary then
+		if params.secondary and managers.player:has_category_upgrade("player", "second_deployable") then
 			if params.item_texture and DB:has(Idstring("texture"), params.item_texture) then
 				self._item_image1 = self._item_panel:bitmap({
 					texture = params.item_texture,
@@ -2829,19 +2829,25 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		self._prev_page = prev_page
 	end
 	self._items = {}
-	self._description_item = DescriptionItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_description")), 1, self._node:parameters().menu_component_data.saved_descriptions)
+	local index = 1
+	self._description_item = DescriptionItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_description")), index, self._node:parameters().menu_component_data.saved_descriptions)
 	table.insert(self._items, self._description_item)
-	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), 2, {}, nil, asset_data)
+	index = index + 1
+	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
 	table.insert(self._items, self._assets_item)
-	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
+	index = index + 1
+	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), index, loadout_data)
 	table.insert(self._items, self._new_loadout_item)
+	index = index + 1
 	if not Global.game_settings.single_player then
-		self._team_loadout_item = TeamLoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_team_loadout")), 4)
+		self._team_loadout_item = TeamLoadoutItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_team_loadout")), index)
 		table.insert(self._items, self._team_loadout_item)
+		index = index + 1
 	end
 	if tweak_data.levels[Global.level_data.level_id].music ~= "no_music" then
-		self._jukebox_item = JukeboxItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), Global.game_settings.single_player and 4 or 5)
+		self._jukebox_item = JukeboxItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), index)
 		table.insert(self._items, self._jukebox_item)
+		index = index + 1
 	end
 	local max_x = self._panel:w()
 	if not managers.menu:is_pc_controller() then
@@ -2897,6 +2903,7 @@ function MissionBriefingGui:chk_reduce_to_small_font()
 		for i, tab in ipairs(self._items) do
 			tab:reduce_to_small_font()
 		end
+		self._reduced_to_small_font = true
 	end
 end
 

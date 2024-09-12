@@ -1573,7 +1573,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		second_chances = {
 			{"1", "25"},
-			{"2", "50%"}
+			{"2", "100%"}
 		},
 		trigger_happy = {
 			{
@@ -4937,7 +4937,7 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
-	self.definitions.player_melee_knockdown_mul_1 = {
+	self.definitions.player_melee_knockdown_mul = {
 		category = "feature",
 		name_id = "menu_player_melee_knockdown_mul",
 		upgrade = {

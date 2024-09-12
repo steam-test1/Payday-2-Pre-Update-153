@@ -746,7 +746,7 @@ function SecurityCamera:_clbk_tape_loop_expired(...)
 	if self._destroyed then
 		return
 	end
-	self:_activate_tape_loop_restart(6)
+	self:_activate_tape_loop_restart(5)
 	SecurityCamera.active_tape_loop_unit = nil
 end
 

@@ -373,36 +373,43 @@ end
 function SpecialObjectiveUnitElement:_enable_all_nav_link_filters()
 	for name, ctrlr in pairs(self._nav_link_filter_check_boxes) do
 		ctrlr:set_value(true)
-		self:_toggle_nav_link_filter_value({ctrlr = ctrlr, name = name})
+		self:set_element_data({ctrlr = ctrlr, name = name})
 	end
 end
 
 function SpecialObjectiveUnitElement:_clear_all_nav_link_filters()
 	for name, ctrlr in pairs(self._nav_link_filter_check_boxes) do
 		ctrlr:set_value(false)
-		self:_toggle_nav_link_filter_value({ctrlr = ctrlr, name = name})
+		self:set_element_data({ctrlr = ctrlr, name = name})
 	end
 end
 
-function SpecialObjectiveUnitElement:_toggle_nav_link_filter_value(params)
-	local value = params.ctrlr:get_value()
-	if value then
-		for i, k in ipairs(self._nav_link_filter) do
-			if k == params.name then
-				return
-			end
+function SpecialObjectiveUnitElement:_toggle_nav_link_filter_value(data)
+	local adding = data.ctrlr:get_value()
+	if adding then
+		if table.contains(self._nav_link_filter, data.value) then
+			return
 		end
-		table.insert(self._nav_link_filter, params.name)
+		table.insert(self._nav_link_filter, data.value)
 	else
-		table.delete(self._nav_link_filter, params.name)
+		table.delete(self._nav_link_filter, data.value)
 	end
 	self._hed.SO_access = managers.navigation:convert_access_filter_to_string(self._nav_link_filter)
+end
+
+function SpecialObjectiveUnitElement:set_element_data(data)
+	SpecialObjectiveUnitElement.super.set_element_data(self, data)
+	if table.contains(self._filters, data.value) then
+		self:_toggle_nav_link_filter_value(data)
+		self:check_apply_func_to_all_elements("_toggle_nav_link_filter_value", data)
+	end
 end
 
 function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	self._filters = {}
 	self._nav_link_filter = managers.navigation:convert_access_filter_to_table(self._hed.SO_access)
 	local opt_sizer = EWS:StaticBoxSizer(panel, "VERTICAL", "Filter")
 	local filter_preset_params = {
@@ -425,7 +432,7 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	for i, o in ipairs(opt) do
 		local check = EWS:CheckBox(panel, o, "")
 		check:set_value(table.contains(self._nav_link_filter, o))
-		check:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "_toggle_nav_link_filter_value"), {ctrlr = check, name = o})
+		check:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = check, value = o})
 		self._nav_link_filter_check_boxes[o] = check
 		if i <= math.round(#opt / 3) then
 			opt1_sizer:add(check, 0, 0, "EXPAND")
@@ -434,6 +441,7 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		else
 			opt3_sizer:add(check, 0, 0, "EXPAND")
 		end
+		table.insert(self._filters, o)
 	end
 	filter_sizer:add(opt1_sizer, 1, 0, "EXPAND")
 	filter_sizer:add(opt2_sizer, 1, 0, "EXPAND")

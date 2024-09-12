@@ -121,3 +121,11 @@ end
 function CopSound:anim_clbk_play_sound(unit, queue_name)
 	self:_play(queue_name)
 end
+
+function CopSound:anim_clbk_stop_sound(unit, source_name)
+	if source_name and source_name == Idstring("") then
+		self:stop()
+		return
+	end
+	self:stop(source_name)
+end

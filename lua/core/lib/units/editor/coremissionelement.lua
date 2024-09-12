@@ -441,12 +441,30 @@ function CoreMissionElement:set_element_data(data)
 		if data.value == "base_delay_rand" then
 			self._hed[data.value] = self._hed[data.value] > 0 and self._hed[data.value] or nil
 		end
-		if EWS:get_key_state("K_CONTROL") then
-			local value = tonumber(self._hed[data.value]) or self._hed[data.value]
-			for _, unit in ipairs(managers.editor:layer("Mission"):selected_units()) do
-				if unit ~= self._unit and unit:mission_element_data() then
-					unit:mission_element_data()[data.value] = value
-					unit:mission_element():set_panel_dirty()
+		self:check_apply_value_to_all_elements(data)
+	end
+end
+
+function CoreMissionElement:check_apply_value_to_all_elements(data)
+	if EWS:get_key_state("K_CONTROL") then
+		local value = tonumber(self._hed[data.value]) or self._hed[data.value]
+		for _, unit in ipairs(managers.editor:layer("Mission"):selected_units()) do
+			if unit ~= self._unit and unit:mission_element_data() then
+				unit:mission_element_data()[data.value] = value
+				unit:mission_element():set_panel_dirty()
+			end
+		end
+	end
+end
+
+function CoreMissionElement:check_apply_func_to_all_elements(func_name, data)
+	if EWS:get_key_state("K_CONTROL") then
+		for _, unit in ipairs(managers.editor:layer("Mission"):selected_units()) do
+			if unit ~= self._unit then
+				local mission_element = unit:mission_element()
+				if mission_element and mission_element[func_name] then
+					mission_element[func_name](mission_element, data)
+					mission_element:set_panel_dirty()
 				end
 			end
 		end

@@ -13,7 +13,9 @@ function PlayerSound:init(unit)
 end
 
 function PlayerSound:destroy(unit)
-	unit:base():pre_destroy(unit)
+	if unit:base() then
+		unit:base():pre_destroy(unit)
+	end
 end
 
 function PlayerSound:_play(sound_name, source_name)

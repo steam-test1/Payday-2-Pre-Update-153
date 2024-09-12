@@ -32,6 +32,10 @@ function DoctorBagBase:init(unit)
 	self._damage_reduction_upgrade = false
 end
 
+function DoctorBagBase:get_name_id()
+	return "doctor_bag"
+end
+
 function DoctorBagBase:_clbk_validate()
 	self._validate_clbk_id = nil
 	if not self._was_dropin then

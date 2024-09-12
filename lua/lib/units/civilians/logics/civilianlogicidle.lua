@@ -138,7 +138,7 @@ function CivilianLogicIdle.on_alert(data, alert_data)
 	if CopLogicBase._chk_alert_obstructed(data.unit:movement():m_head_pos(), alert_data) then
 		return
 	end
-	if CopLogicBase.is_alert_aggressive(alert_data[1]) then
+	if CopLogicBase.is_alert_aggressive(alert_data[1]) and not data.unit:base().unintimidateable then
 		if not data.unit:movement():cool() then
 			local aggressor = alert_data[5]
 			if aggressor and aggressor:base() then

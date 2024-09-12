@@ -135,6 +135,11 @@ function IngameWaitingForRespawnState.request_player_spawn(peer_to_spawn)
 			managers.network:unregister_spawn_point(sp_id)
 		end
 	end
+	local player_unit = managers.player:player_unit()
+	if player_unit then
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 1, player_unit:inventory():unit_by_selection(1):base():fire_mode())
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 2, player_unit:inventory():unit_by_selection(2):base():fire_mode())
+	end
 end
 
 function IngameWaitingForRespawnState:update(t, dt)

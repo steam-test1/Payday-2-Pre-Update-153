@@ -4939,4 +4939,13 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.sparkle = {}
+	self.sparkle.content = {}
+	self.sparkle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spk_party",
+			amount = 1
+		}
+	}
 end

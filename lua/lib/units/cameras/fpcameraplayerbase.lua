@@ -53,6 +53,7 @@ function FPCameraPlayerBase:init(unit)
 	self._camera_properties.current_tilt = 0
 	self._recoil_kick = {}
 	self._recoil_kick.h = {}
+	self._episilon = 1.0E-5
 	self:check_flashlight_enabled()
 	self:load_fps_mask_units()
 end
@@ -485,11 +486,15 @@ function FPCameraPlayerBase:_vertical_recoil_kick(t, dt)
 		return 0
 	end
 	local r_value = 0
-	if self._recoil_kick.current and self._recoil_kick.current ~= self._recoil_kick.accumulated then
+	if self._recoil_kick.current and self._recoil_kick.accumulated - self._recoil_kick.current > self._episilon then
 		local n = math.step(self._recoil_kick.current, self._recoil_kick.accumulated, 40 * dt)
 		r_value = n - self._recoil_kick.current
 		self._recoil_kick.current = n
 	elseif self._recoil_wait then
+		self._recoil_wait = self._recoil_wait - dt
+		if 0 > self._recoil_wait then
+			self._recoil_wait = nil
+		end
 	elseif self._recoil_kick.to_reduce then
 		self._recoil_kick.current = nil
 		local n = math.lerp(self._recoil_kick.to_reduce, 0, 9 * dt)
@@ -508,7 +513,7 @@ function FPCameraPlayerBase:_horizonatal_recoil_kick(t, dt)
 		return 0
 	end
 	local r_value = 0
-	if self._recoil_kick.h.current and self._recoil_kick.h.current ~= self._recoil_kick.h.accumulated then
+	if self._recoil_kick.h.current and math.abs(self._recoil_kick.h.accumulated - self._recoil_kick.h.current) > self._episilon then
 		local n = math.step(self._recoil_kick.h.current, self._recoil_kick.h.accumulated, 40 * dt)
 		r_value = n - self._recoil_kick.h.current
 		self._recoil_kick.h.current = n

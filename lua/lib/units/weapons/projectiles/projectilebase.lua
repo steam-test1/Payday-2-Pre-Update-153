@@ -17,6 +17,7 @@ function ProjectileBase:init(unit)
 	if self._setup_server_data and Network:is_server() then
 		self:_setup_server_data()
 	end
+	self._variant = "projectile"
 end
 
 function ProjectileBase:set_thrower_unit_by_peer_id(peer_id)

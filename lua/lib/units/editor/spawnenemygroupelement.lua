@@ -104,21 +104,21 @@ function SpawnEnemyGroupUnitElement:_build_panel(panel, panel_sizer)
 	local opt1_sizer = EWS:BoxSizer("VERTICAL")
 	local opt2_sizer = EWS:BoxSizer("VERTICAL")
 	local opt3_sizer = EWS:BoxSizer("VERTICAL")
-	local opt = {}
+	self._spawn_groups = {}
 	for cat_name, team in pairs(tweak_data.group_ai.enemy_spawn_groups) do
-		table.insert(opt, cat_name)
+		table.insert(self._spawn_groups, cat_name)
 	end
-	for i, o in ipairs(opt) do
+	for i, o in ipairs(self._spawn_groups) do
 		local check = EWS:CheckBox(panel, o, "")
 		if self._hed.preferred_spawn_groups and table.contains(self._hed.preferred_spawn_groups, o) then
 			check:set_value(true)
 		else
 			check:set_value(false)
 		end
-		check:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "on_preferred_spawn_groups_checkbox_changed"), {ctrlr = check, name = o})
-		if i <= math.round(#opt / 3) then
+		check:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_element_data"), {ctrlr = check, value = o})
+		if i <= math.round(#self._spawn_groups / 3) then
 			opt1_sizer:add(check, 0, 0, "EXPAND")
-		elseif i <= math.round(#opt / 3) * 2 then
+		elseif i <= math.round(#self._spawn_groups / 3) * 2 then
 			opt2_sizer:add(check, 0, 0, "EXPAND")
 		else
 			opt3_sizer:add(check, 0, 0, "EXPAND")
@@ -130,16 +130,24 @@ function SpawnEnemyGroupUnitElement:_build_panel(panel, panel_sizer)
 	opt_sizer:add(filter_sizer, 1, 0, "EXPAND")
 end
 
+function SpawnEnemyGroupUnitElement:set_element_data(data)
+	SpecialObjectiveUnitElement.super.set_element_data(self, data)
+	if table.contains(self._spawn_groups, data.value) then
+		self:on_preferred_spawn_groups_checkbox_changed(data)
+		self:check_apply_func_to_all_elements("on_preferred_spawn_groups_checkbox_changed", data)
+	end
+end
+
 function SpawnEnemyGroupUnitElement:on_preferred_spawn_groups_checkbox_changed(params)
 	local value = params.ctrlr:get_value()
 	if value then
 		self._hed.preferred_spawn_groups = self._hed.preferred_spawn_groups or {}
-		if table.contains(self._hed.preferred_spawn_groups, params.name) then
+		if table.contains(self._hed.preferred_spawn_groups, params.value) then
 			return
 		end
-		table.insert(self._hed.preferred_spawn_groups, params.name)
+		table.insert(self._hed.preferred_spawn_groups, params.value)
 	elseif self._hed.preferred_spawn_groups then
-		table.delete(self._hed.preferred_spawn_groups, params.name)
+		table.delete(self._hed.preferred_spawn_groups, params.value)
 		if not next(self._hed.preferred_spawn_groups) then
 			self._hed.preferred_spawn_groups = nil
 		end

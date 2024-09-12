@@ -95,6 +95,7 @@ function CoreEditor:init(game_state_machine, session_state)
 	self._skipped_freeflight_frames = 1
 	self._editor_name = "Bringer of Worlds"
 	self._max_id = 1
+	self._special_ids = -1
 	self._STEP_ID = 1
 	self._unit_ids = {}
 	self._gui_id = 0
@@ -225,6 +226,7 @@ end
 function CoreEditor:_init_layer_classes()
 	self._layers = {}
 	self._current_layer = nil
+	print("Creating layers! If you're starting up the editor for the first time this could take a long time!")
 	self._mission_layer_name = "Mission"
 	self:add_layer("Brush", CoreBrushLayer.BrushLayer)
 	self:add_layer("Sound", CoreSoundLayer.SoundLayer)
@@ -2568,7 +2570,7 @@ function CoreEditor:click_select_unit(layer)
 			elseif is_instance_layer or layer == self:unit_in_layer(unit) and not is_instance_unit then
 				layer:set_select_unit(unit)
 				return
-			elseif self._special_units[unit:key()] == self:layer_name(layer) then
+			elseif self._special_units[unit:key()] and self._special_units[unit:key()].layer == self:layer_name(layer) then
 				layer:set_select_unit(unit)
 				return
 			end
@@ -3695,7 +3697,26 @@ function CoreEditor:set_ruler_points()
 end
 
 function CoreEditor:add_special_unit(unit, for_layer)
-	self._special_units[unit:key()] = for_layer
+	unit:unit_data().unit_id = self._special_ids or -1
+	self._special_units[unit:key()] = {unit = unit, layer = for_layer}
+	self._special_ids = (self._special_ids or -1) - 1
+end
+
+function CoreEditor:remove_special_unit(unit)
+	for _, data in pairs(self._special_units) do
+		if data.unit:key() == unit:key() then
+			table.delete(self._special_units, unit:key())
+			return
+		end
+	end
+end
+
+function CoreEditor:get_special_unit_with_id(id)
+	for _, data in pairs(self._special_units) do
+		if data.unit:unit_data().unit_id == id then
+			return data.unit
+		end
+	end
 end
 
 function CoreEditor:dump_mesh(...)

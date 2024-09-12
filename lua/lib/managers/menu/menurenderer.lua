@@ -42,6 +42,10 @@ function MenuRenderer:show_node(node)
 		to_upper = true
 	}
 	MenuRenderer.super.show_node(self, node, parameters)
+	local previous_node_gui = self._node_gui_stack[#self._node_gui_stack - 1]
+	if previous_node_gui and (node:parameters().hide_previous == false or node:parameters().hide_previous == "false") then
+		previous_node_gui:set_visible(true)
+	end
 end
 
 function MenuRenderer:open(...)

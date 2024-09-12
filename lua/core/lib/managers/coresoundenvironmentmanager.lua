@@ -970,6 +970,7 @@ function SoundEnvironmentEmitter:play_sound()
 		self._soundsource:link(self._unit:orientation_object())
 	else
 		self._soundsource:set_position(self:position())
+		self._soundsource:set_orientation(self:rotation())
 	end
 	self._sound_event = self._soundsource:post_event(self._emitter_event)
 end

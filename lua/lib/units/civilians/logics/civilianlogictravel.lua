@@ -41,6 +41,11 @@ function CivilianLogicTravel.enter(data, new_logic_name, enter_params)
 		data.unit:movement():set_stance(data.objective.stance)
 	end
 	CivilianLogicTravel._chk_has_old_action(data, my_data)
+	local objective = data.objective
+	local path_data = objective.path_data
+	if objective.path_style == "warp" then
+		my_data.warp_pos = objective.pos
+	end
 	local attention_settings
 	if is_cool then
 		attention_settings = {
@@ -85,6 +90,16 @@ function CivilianLogicTravel.update(data)
 	local t = data.t
 	if my_data.has_old_action then
 		CivilianLogicTravel._upd_stop_old_action(data, my_data)
+	elseif my_data.warp_pos then
+		local action_desc = {
+			type = "warp",
+			body_part = 1,
+			position = mvector3.copy(objective.pos),
+			rotation = objective.rot
+		}
+		if unit:movement():action_request(action_desc) then
+			CivilianLogicTravel._on_destination_reached(data)
+		end
 	elseif my_data.processing_advance_path or my_data.processing_coarse_path then
 		CivilianLogicEscort._upd_pathing(data, my_data)
 	elseif my_data.advancing then
@@ -147,6 +162,30 @@ function CivilianLogicTravel.update(data)
 	else
 		CopLogicBase._exit(data.unit, "idle")
 	end
+end
+
+function CivilianLogicTravel._on_destination_reached(data)
+	local objective = data.objective
+	objective.in_place = true
+	if objective.type == "free" then
+		if not objective.action_duration then
+			data.objective_complete_clbk(data.unit, objective)
+			return
+		end
+	elseif objective.type == "flee" then
+		data.unit:brain():set_active(false)
+		data.unit:base():set_slot(data.unit, 0)
+		return
+	elseif objective.type == "defend_area" then
+		if objective.grp_objective and objective.grp_objective.type == "retire" then
+			data.unit:brain():set_active(false)
+			data.unit:base():set_slot(data.unit, 0)
+			return
+		else
+			managers.groupai:state():on_defend_travel_end(data.unit, objective)
+		end
+	end
+	data.logic.on_new_objective(data)
 end
 
 function CivilianLogicTravel.on_intimidated(data, amount, aggressor_unit)

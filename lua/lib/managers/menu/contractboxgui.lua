@@ -410,7 +410,7 @@ function ContractBoxGui:create_contract_box()
 		wfs:set_world_rightbottom(self._contract_panel:world_right() - 5, self._contract_panel:world_bottom())
 	end
 	if self._contract_text_header and managers.job:is_current_job_professional() then
-		local pro_text = self._panel:text({
+		self._contract_pro_text = self._panel:text({
 			name = "pro_text",
 			text = managers.localization:to_upper_text("cn_menu_pro_job"),
 			font_size = tweak_data.menu.pd2_medium_font_size,
@@ -418,9 +418,9 @@ function ContractBoxGui:create_contract_box()
 			color = tweak_data.screen_colors.pro_color,
 			blend_mode = "add"
 		})
-		local x, y, w, h = pro_text:text_rect()
-		pro_text:set_size(w, h)
-		pro_text:set_position(self._contract_text_header:right() + 10, self._contract_text_header:y())
+		local x, y, w, h = self._contract_pro_text:text_rect()
+		self._contract_pro_text:set_size(w, h)
+		self._contract_pro_text:set_position(self._contract_text_header:right() + 10, self._contract_text_header:y())
 	end
 	BoxGuiObject:new(self._contract_panel, {
 		sides = {
@@ -640,6 +640,9 @@ function ContractBoxGui:set_enabled(enabled)
 	end
 	if self._contract_text_header then
 		self._contract_text_header:set_visible(enabled)
+	end
+	if self._contract_pro_text then
+		self._contract_pro_text:set_visible(enabled)
 	end
 	if self._panel:child("wfs") then
 		self._panel:child("wfs"):set_visible(enabled)

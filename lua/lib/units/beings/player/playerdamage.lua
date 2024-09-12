@@ -752,7 +752,8 @@ function PlayerDamage:is_friendly_fire(unit)
 	if unit:movement():team() ~= self._unit:movement():team() and unit:movement():friendly_fire() then
 		return false
 	end
-	return not unit:movement():team().foes[self._unit:movement():team().id]
+	local friendly_fire = not unit:movement():team().foes[self._unit:movement():team().id]
+	return friendly_fire
 end
 
 function PlayerDamage:play_whizby(position)
@@ -798,7 +799,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		end
 		self:_call_listeners(damage_info)
 		self:play_whizby(attack_data.col_ray.position)
-		self:_hit_direction(attack_data.col_ray)
+		self:_hit_direction(attack_data.attacker_unit:position())
 		self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
 		self._last_received_dmg = attack_data.damage
 		return
@@ -837,7 +838,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	local shake_multiplier = math.clamp(attack_data.damage, 0.2, 2) * shake_armor_multiplier
 	self._unit:camera():play_shaker("player_bullet_damage", 1 * shake_multiplier)
 	managers.rumble:play("damage_bullet")
-	self:_hit_direction(attack_data.col_ray)
+	self:_hit_direction(attack_data.attacker_unit:position())
 	pm:check_damage_carry(attack_data)
 	if self._bleed_out then
 		self:_bleed_out_damage(attack_data)
@@ -956,7 +957,7 @@ function PlayerDamage:damage_killzone(attack_data)
 		return
 	end
 	self._unit:sound():play("player_hit")
-	self:_hit_direction(attack_data.col_ray)
+	self:_hit_direction(attack_data.col_ray.origin)
 	if self._bleed_out then
 		return
 	end
@@ -990,7 +991,7 @@ function PlayerDamage:damage_fall(data)
 	local die = death_limit < data.height
 	self._unit:sound():play("player_hit")
 	managers.environment_controller:hit_feedback_down()
-	managers.hud:on_hit_direction(self._unit:position(), die and HUDHitDirection.DAMAGE_TYPES.HEALTH or HUDHitDirection.DAMAGE_TYPES.ARMOUR)
+	managers.hud:on_hit_direction(Vector3(0, 0, 0), die and HUDHitDirection.DAMAGE_TYPES.HEALTH or HUDHitDirection.DAMAGE_TYPES.ARMOUR, 0)
 	if self._bleed_out and self._unit:movement():current_state_name() ~= "jerry1" then
 		return
 	end
@@ -1357,9 +1358,9 @@ function PlayerDamage:_bleed_out_damage(attack_data)
 	end
 end
 
-function PlayerDamage:_hit_direction(col_ray)
-	if col_ray then
-		managers.hud:on_hit_direction(col_ray.position, self:get_real_armor() > 0 and HUDHitDirection.DAMAGE_TYPES.ARMOUR or HUDHitDirection.DAMAGE_TYPES.HEALTH)
+function PlayerDamage:_hit_direction(position_vector)
+	if position_vector then
+		managers.hud:on_hit_direction(position_vector, self:get_real_armor() > 0 and HUDHitDirection.DAMAGE_TYPES.ARMOUR or HUDHitDirection.DAMAGE_TYPES.HEALTH)
 	end
 end
 

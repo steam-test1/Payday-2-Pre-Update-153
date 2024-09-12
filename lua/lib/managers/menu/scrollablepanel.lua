@@ -263,6 +263,19 @@ function ScrollablePanel:perform_scroll(speed, direction)
 	self:_check_scroll_indicator_states()
 end
 
+function ScrollablePanel:scroll_to(y)
+	if self:canvas():h() <= self:scroll_panel():h() then
+		return
+	end
+	local scroll_amount = -y
+	local max_h = self:canvas():h() - self:scroll_panel():h()
+	max_h = max_h * -1
+	local new_y = math.clamp(scroll_amount, max_h, 0)
+	self:canvas():set_y(new_y)
+	self:_set_scroll_indicator()
+	self:_check_scroll_indicator_states()
+end
+
 function ScrollablePanel:scroll_with_bar(target_y, current_y)
 	local arrow_size = self:panel():child("scroll_up_indicator_arrow"):size()
 	local scroll_panel = self:scroll_panel()

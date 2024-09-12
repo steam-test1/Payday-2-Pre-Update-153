@@ -33,9 +33,6 @@ require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
 TweakData = TweakData or class()
 
-function TweakData:_init_wip_tweak_data()
-end
-
 function TweakData:_init_wip_blackmarket(tweak_data)
 end
 
@@ -2778,7 +2775,7 @@ Play the full version soon to get your full PAYDAY!]],
 		cane_5 = {
 			award = "cane_5",
 			job = "cane",
-			secured = {carry_id = "present", amount = 10},
+			secured = {carry_id = "present", total_amount = 10},
 			no_assets = true,
 			no_deployable = true
 		},
@@ -4176,7 +4173,6 @@ Play the full version soon to get your full PAYDAY!]],
 	self.team_ai.stop_action.delay = 0.8
 	self.team_ai.stop_action.distance = 3000
 	self.team_ai.stop_action.teleport_distance = 5000
-	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()
@@ -4463,6 +4459,9 @@ function TweakData:set_menu_scale()
 	self.menu.pd2_small_font = "fonts/font_small_mf"
 	self.menu.pd2_small_font_id = Idstring(self.menu.pd2_small_font)
 	self.menu.pd2_small_font_size = 20
+	self.menu.pd2_tiny_font = "fonts/font_small_mf"
+	self.menu.pd2_tiny_font_id = Idstring(self.menu.pd2_tiny_font)
+	self.menu.pd2_tiny_font_size = 16
 	self.menu.default_font_size = 24 * scale_multiplier
 	self.menu.default_font_row_item_color = Color.white
 	self.menu.default_hightlight_row_item_color = Color(1, 0, 0, 0)

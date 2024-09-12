@@ -36,6 +36,7 @@ function SkinEditor:create_new_skin(data)
 	local new_skin = managers.workshop:create_item()
 	self:_append_skin(data.weapon_id, new_skin)
 	self:save_skin(new_skin, "New Skin " .. local_skin_id, data)
+	self:setup_texture_folders(new_skin)
 	return local_skin_id
 end
 
@@ -154,7 +155,17 @@ function SkinEditor:publish_skin(skin, title, desc, changelog, callb)
 	skin:set_description(desc)
 	self:save_skin(skin)
 	local staging = managers.workshop:create_staging_directory()
-	local files = self:get_all_applied_textures(skin)
+	for _, type in ipairs(self:get_texture_types()) do
+		if not SystemFS:exists(Application:nice_path(staging, true) .. type) then
+			SystemFS:make_dir(Application:nice_path(staging, true) .. type)
+		end
+	end
+	local textures = self:get_all_applied_textures(skin)
+	local files = {}
+	for _, texture in ipairs(textures) do
+		local path = texture.type .. "/" .. texture.name
+		table.insert(files, path)
+	end
 	table.insert(files, "info.xml")
 	table.insert(files, "item.xml")
 	table.insert(files, "preview.png")
@@ -369,16 +380,34 @@ function SkinEditor:get_texture_list(skin, path)
 	return texture_list
 end
 
-function SkinEditor:load_textures(skin, path)
-	local textures = self:get_texture_list(skin, path)
+function SkinEditor:get_texture_list_by_type(skin, tex_type)
+	if not tex_type or not self:has_texture_folders(skin) then
+		Application:error("[SkinEditor:get_texture_list_by_type] called without a type")
+		return self:get_texture_list(skin)
+	end
+	return self:get_texture_list(skin, self:get_texture_path_by_type(skin, tex_type))
+end
+
+function SkinEditor:load_textures(skin, path_or_tex_type)
+	if not path_or_tex_type and self:has_texture_folders(skin) then
+		self:_load_textures_by_types(skin)
+		return
+	end
+	local is_path = path_or_tex_type and string.find(path_or_tex_type, "[/\\]")
+	local path = is_path and path_or_tex_type
+	local tex_type = not is_path and path_or_tex_type
+	local textures = tex_type and self:get_texture_list_by_type(skin, tex_type) or self:get_texture_list(skin, path)
 	local new_textures = {}
 	local type_texture_id = Idstring("texture")
 	path = path or skin:path()
 	for _, texture in ipairs(textures) do
-		local texture_id = self:get_texture_idstring(skin, texture)
+		local texture_id = self:get_texture_idstring(skin, texture, tex_type)
 		local rel_path = Application:nice_path(path, true)
 		rel_path = string.sub(rel_path, string.len(Application:base_path()) + 1)
 		rel_path = string.gsub(rel_path, "\\", "/")
+		if tex_type then
+			rel_path = rel_path .. tex_type .. "/"
+		end
 		print("Creating texture entry: " .. tostring(texture_id) .. " pointing at " .. rel_path .. texture)
 		DB:create_entry(type_texture_id, texture_id, rel_path .. texture)
 		table.insert(new_textures, texture_id)
@@ -388,12 +417,30 @@ function SkinEditor:load_textures(skin, path)
 	end
 end
 
-function SkinEditor:get_texture_string(skin, texture_name)
-	return string.lower(WorkshopManager.PATH .. string.match(skin:path(), "/(.*)/$") .. "/" .. texture_name)
+function SkinEditor:_load_textures_by_types(skin)
+	for _, tex_type in ipairs(self:get_texture_types()) do
+		self:load_textures(skin, tex_type)
+	end
 end
 
-function SkinEditor:get_texture_idstring(skin, texture_name)
-	return Idstring(self:get_texture_string(skin, texture_name))
+function SkinEditor:get_texture_path_by_type(skin, tex_type)
+	if not tex_type then
+		Application:error("[SkinEditor:get_texture_path_by_type] called without a type")
+		return skin:path()
+	end
+	return Application:nice_path(skin:path() .. "/" .. tex_type, false)
+end
+
+function SkinEditor:get_texture_string(skin, texture_name, texture_type)
+	if self:has_texture_folders(skin) and texture_type then
+		return string.lower(WorkshopManager.PATH .. string.match(skin:path(), "/(.*)/$") .. "/" .. texture_type .. "/" .. texture_name)
+	else
+		return string.lower(WorkshopManager.PATH .. string.match(skin:path(), "/(.*)/$") .. "/" .. texture_name)
+	end
+end
+
+function SkinEditor:get_texture_idstring(skin, texture_name, texture_type)
+	return Idstring(self:get_texture_string(skin, texture_name, texture_type))
 end
 
 function SkinEditor:check_texture_db(texture)
@@ -439,7 +486,7 @@ function SkinEditor:apply_changes(cosmetics_data)
 	end
 	local textures = self:get_all_applied_textures(skin)
 	for _, texture in ipairs(textures) do
-		local texture_string = self:get_texture_string(skin, texture)
+		local texture_string = self:get_texture_string(skin, texture.name, texture.type)
 		if not self:check_texture(texture_string) then
 			self:remove_texture_by_name(skin, texture)
 		end
@@ -510,7 +557,10 @@ function SkinEditor:get_all_applied_textures(skin)
 		for k, v in pairs(data) do
 			if type(k) == "string" and string.find(k, "_name$") and type(v) == "string" and string.find(v, "%..+$") then
 				if not table.contains(textures, v) then
-					table.insert(textures, v)
+					table.insert(textures, {
+						name = v,
+						type = string.gsub(k, "_name$", "")
+					})
 				end
 			elseif type(v) == "table" then
 				table.insert(to_process, v)
@@ -539,6 +589,7 @@ function SkinEditor:remove_literal_paths(skin)
 end
 
 function SkinEditor:add_literal_paths(skin)
+	local add_type = self:has_texture_folders(skin)
 	local to_process = {
 		skin:config().data
 	}
@@ -548,13 +599,46 @@ function SkinEditor:add_literal_paths(skin)
 		for k, v in pairs(it_data) do
 			if type(k) == "string" and string.find(k, "_name$") and type(v) == "string" and string.find(v, "%..+$") then
 				local new_key = string.gsub(k, "_name$", "")
-				local path = self:get_texture_string(skin, v)
+				local path = self:get_texture_string(skin, v, add_type and new_key)
 				data[new_key] = path
 			elseif type(v) == "table" then
 				table.insert(to_process, data[k])
 			end
 		end
 	end
+end
+
+function SkinEditor:get_texture_types()
+	return {
+		"base_gradient",
+		"pattern_gradient",
+		"pattern",
+		"sticker"
+	}
+end
+
+function SkinEditor:setup_texture_folders(skin)
+	local texture_types = self:get_texture_types()
+	for _, texture_type in ipairs(texture_types) do
+		local tex_path = self:get_texture_path_by_type(skin, texture_type)
+		if not SystemFS:exists(tex_path) and not SystemFS:make_dir(tex_path) then
+			Application:error("Failed to create dir:", tex_path)
+			return
+		end
+	end
+end
+
+function SkinEditor:has_texture_folders(skin)
+	local has_folders = true
+	local texture_types = self:get_texture_types()
+	for _, texture_type in ipairs(texture_types) do
+		local tex_path = self:get_texture_path_by_type(skin, texture_type)
+		if not SystemFS:exists(tex_path) or not SystemFS:is_dir(tex_path) then
+			has_folders = false
+			break
+		end
+	end
+	return has_folders
 end
 
 function SkinEditor:clear_current_skin()
@@ -609,33 +693,26 @@ end
 
 function SkinEditor:get_excluded_weapons()
 	return {
-		"aa12",
 		"akm_gold",
 		"akmsu",
 		"arblast",
 		"boot",
-		"c96",
 		"china",
 		"cobray",
 		"famas",
 		"flamethrower_mk2",
 		"frankish",
-		"g26",
 		"g36",
-		"galil",
 		"glock_18c",
 		"hajk",
 		"hk21",
-		"jowi",
 		"l85a2",
 		"long",
 		"m134",
 		"m32",
 		"m45",
 		"m95",
-		"mateba",
 		"mg42",
-		"mp7",
 		"mp9",
 		"msr",
 		"peacemaker",
@@ -654,10 +731,8 @@ function SkinEditor:get_excluded_weapons()
 		"sub2000",
 		"tec9",
 		"tecci",
-		"vhs",
 		"winchester1874",
 		"x_akmsu",
-		"x_g17",
 		"x_mp5",
 		"x_sr2"
 	}

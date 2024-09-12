@@ -615,6 +615,9 @@ end
 
 function BlackMarketManager:equip_armor(armor_id)
 	for s, data in pairs(Global.blackmarket_manager.armors) do
+		if s == armor_id and not data.unlocked then
+			return
+		end
 		data.equipped = s == armor_id
 	end
 	self:_check_achievements("armors")
@@ -5458,19 +5461,21 @@ function BlackMarketManager:_cleanup_blackmarket()
 		end
 	end
 	local crafted_masks = crafted_items.masks
-	local chk_global_value_func = function(global_value)
+	local chk_global_value_func = function(global_value, data, real_global_value)
 		return tweak_data.lootdrop.global_values[global_value or "normal"] and true or false
 	end
 	local cleanup_mask = false
 	for i, mask in pairs(crafted_masks) do
-		cleanup_mask = not tweak_data.blackmarket.masks[mask.mask_id] or tweak_data.blackmarket.masks[mask.mask_id].inaccessible
-		cleanup_mask = cleanup_mask or not chk_global_value_func(mask.global_value)
+		local mask_data = tweak_data.blackmarket.masks[mask.mask_id]
+		cleanup_mask = not mask_data or mask_data.inaccessible
+		cleanup_mask = cleanup_mask or not chk_global_value_func(mask.global_value, mask, mask_data.infamous and "infamous" or mask_data.dlc or mask_data.global_value)
 		local blueprint = mask.blueprint or {}
 		if not cleanup_mask then
 			for part_type, data in pairs(blueprint) do
 				local converted_category = part_type == "color" and "colors" or part_type == "material" and "materials" or part_type == "pattern" and "textures" or part_type
-				cleanup_mask = not tweak_data.blackmarket[converted_category][data.id]
-				cleanup_mask = cleanup_mask or not chk_global_value_func(data.global_value)
+				local part_data = tweak_data.blackmarket[converted_category][data.id]
+				cleanup_mask = not part_data
+				cleanup_mask = cleanup_mask or not chk_global_value_func(data.global_value, data, part_data.infamous and "infamous" or part_data.dlc or part_data.global_value)
 				if cleanup_mask then
 					break
 				end
@@ -5644,6 +5649,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 	end
 	local bm_tweak_data = tweak_data.blackmarket
 	local invalid_items = {}
+	local changed_items = {}
 	
 	local function add_invalid_global_value_func(global_value)
 		invalid_items[global_value] = true
@@ -5747,6 +5753,12 @@ function BlackMarketManager:_cleanup_blackmarket()
 				end
 			end
 		end
+	end
+	for _, item in pairs(changed_items) do
+		self._global.inventory[item.global_value] = self._global.inventory[item.global_value] or {}
+		self._global.inventory[item.global_value][item.category] = self._global.inventory[item.global_value][item.category] or {}
+		self._global.inventory[item.global_value][item.category][item.id] = (self._global.inventory[item.global_value][item.category][item.id] or 0) + 1
+		Application:error("[BlackMarketManager] Inventory item changed global value: ", item.category, item.id, item.global_value)
 	end
 	if self._global.inventory_tradable then
 		local invalid_tradable_items = {}

@@ -132,6 +132,11 @@ function PlayerStandard:enter(state_data, enter_data)
 			selection_wanted = enter_data.equip_weapon
 		})
 	end
+	if enter_data then
+		self._change_weapon_data = enter_data.change_weapon_data
+		self._unequip_weapon_expire_t = enter_data.unequip_weapon_expire_t
+		self._equip_weapon_expire_t = enter_data.equip_weapon_expire_t
+	end
 	self:_reset_delay_action()
 	self._last_velocity_xy = Vector3()
 	self._last_sent_pos_t = enter_data and enter_data.last_sent_pos_t or managers.player:player_timer():time()
@@ -203,7 +208,10 @@ function PlayerStandard:exit(state_data, new_state_name)
 		last_sent_pos_t = self._last_sent_pos_t,
 		last_sent_pos = self._last_sent_pos,
 		ducking = self._state_data.ducking,
-		skip_equip = true
+		skip_equip = true,
+		change_weapon_data = self._change_weapon_data,
+		unequip_weapon_expire_t = self._unequip_weapon_expire_t,
+		equip_weapon_expire_t = self._equip_weapon_expire_t
 	}
 	self._state_data.using_bipod = managers.player:current_state() == "bipod"
 	self:_update_network_jump(nil, true)
@@ -964,7 +972,7 @@ function PlayerStandard:_end_action_running(t)
 	if not self._end_running_expire_t then
 		local speed_multiplier = self._equipped_unit:base():exit_run_speed_multiplier()
 		self._end_running_expire_t = t + 0.4 / speed_multiplier
-		if not managers.player.RUN_AND_SHOOT and (not managers.player.RUN_AND_RELOAD or not self:_is_reloading()) then
+		if not managers.player.RUN_AND_SHOOT and (not self.RUN_AND_RELOAD or not self:_is_reloading()) then
 			self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, speed_multiplier)
 		end
 	end
@@ -1879,7 +1887,7 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 				managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 				if input.btn_steelsight_state then
 					self._steelsight_wanted = true
-				elseif managers.player.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
+				elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
 					self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 				end
 			end
@@ -1892,7 +1900,7 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 			managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 			if input.btn_steelsight_state then
 				self._steelsight_wanted = true
-			elseif managers.player.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
+			elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
 				self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 			end
 			if self._equipped_unit:base().on_reload_stop then
@@ -2065,12 +2073,28 @@ end
 
 function PlayerStandard:_get_interaction_target(char_table, my_head_pos, cam_fwd)
 	local prime_target
-	local ray = World:raycast("ray", my_head_pos, my_head_pos + cam_fwd * 100 * 100, "slot_mask", self._slotmask_long_distance_interaction)
-	if ray then
-		for _, char in pairs(char_table) do
-			if ray.unit == char.unit then
+	local has_inspire = managers.player:has_enabled_cooldown_upgrade("cooldown", "long_dis_revive")
+	for _, char in pairs(char_table) do
+		if char.unit_type == 2 then
+			if char.unit:base().is_husk_player then
+				if char.unit:interaction():active() and char.unit:movement():need_revive() then
+					prime_target = char
+					break
+				end
+			elseif char.unit:character_damage():need_revive() then
 				prime_target = char
 				break
+			end
+		end
+	end
+	if not prime_target then
+		local ray = World:raycast("ray", my_head_pos, my_head_pos + cam_fwd * 100 * 100, "slot_mask", self._slotmask_long_distance_interaction)
+		if ray then
+			for _, char in pairs(char_table) do
+				if ray.unit == char.unit then
+					prime_target = char
+					break
+				end
 			end
 		end
 	end
@@ -2541,8 +2565,9 @@ function PlayerStandard:_check_action_jump(t, input)
 end
 
 function PlayerStandard:_start_action_jump(t, action_start_data)
-	if self._running then
+	if self._running and not self.RUN_AND_RELOAD then
 		self:_interupt_action_reload(t)
+		self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, self._equipped_unit:base():exit_run_speed_multiplier())
 	end
 	self:_interupt_action_running(t)
 	self._jump_t = t

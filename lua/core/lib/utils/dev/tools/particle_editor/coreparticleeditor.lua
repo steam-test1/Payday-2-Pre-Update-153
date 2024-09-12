@@ -160,7 +160,7 @@ function CoreParticleEditor:create_main_frame()
 	menu_bar:append(effect_menu, "Effect")
 	local gizmo_menu = EWS:Menu("")
 	self._gizmo_menu = gizmo_menu
-	gizmo_menu:append_item("MOVE_TO_ORIGO", "Move Effect Gizmo To Origo")
+	gizmo_menu:append_item("MOVE_TO_ORIGO", "Move Effect Gizmo To Origin")
 	gizmo_menu:append_item("MOVE_TO_CAMERA", "Move Effect Gizmo In Front Of Camera")
 	gizmo_menu:append_item("MOVE_TO_PLAYER", "Move Effect Gizmo To Player")
 	gizmo_menu:append_separator()
@@ -510,6 +510,7 @@ function CoreParticleEditor:on_close_effect()
 		self._effects_notebook:delete_page(curi - 1)
 		table.remove(self._effects, curi)
 	end
+	self:remove_gizmo()
 end
 
 function CoreParticleEditor:on_close()
@@ -518,9 +519,17 @@ function CoreParticleEditor:on_close()
 			return
 		end
 	end
+	self:remove_gizmo()
 	managers.toolhub:close("Particle Editor")
 	if managers.editor then
 		managers.editor:set_listener_enabled(false)
+	end
+end
+
+function CoreParticleEditor:remove_gizmo()
+	if alive(self._effect_gizmo) then
+		managers.editor:remove_special_unit(self._effect_gizmo)
+		World:delete_unit(self._effect_gizmo)
 	end
 end
 

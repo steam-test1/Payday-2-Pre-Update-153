@@ -1,4 +1,5 @@
 require("lib/managers/menu/MenuGuiComponent")
+require("lib/managers/menu/MenuGuiComponentGeneric")
 require("lib/managers/menu/SkillTreeGui")
 require("lib/managers/menu/InfamyTreeGui")
 require("lib/managers/menu/BlackMarketGui")
@@ -174,6 +175,11 @@ function MenuComponentManager:load(data)
 end
 
 function MenuComponentManager:register_component(id, component, priority)
+	for i, comp_data in ipairs(self._alive_components) do
+		if comp_data.id == id then
+			return false
+		end
+	end
 	table.insert(self._alive_components, {
 		id = id,
 		component = component,

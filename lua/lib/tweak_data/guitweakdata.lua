@@ -683,7 +683,7 @@ function GuiTweakData:init()
 	self.crime_net.job_vars.active_job_time = 25
 	self.crime_net.job_vars.new_job_min_time = 1.5
 	self.crime_net.job_vars.new_job_max_time = 3.5
-	self.crime_net.job_vars.refresh_servers_time = SystemInfo:platform() == Idstring("XB1") and 5 or 5
+	self.crime_net.job_vars.refresh_servers_time = SystemInfo:platform() == Idstring("PS4") and 10 or 5
 	self.crime_net.job_vars.total_active_jobs = 40
 	self.crime_net.job_vars.max_active_server_jobs = 100
 	self.crime_net.debug_options = {}

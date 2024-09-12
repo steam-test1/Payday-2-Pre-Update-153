@@ -266,16 +266,26 @@ function CopDamage:_check_special_death_conditions(variant, body, attacker_unit,
 	end
 end
 
+function CopDamage:is_friendly_fire(unit)
+	if not unit then
+		return false
+	end
+	if unit:movement():team() ~= self._unit:movement():team() and unit:movement():friendly_fire() then
+		return false
+	end
+	return not unit:movement():team().foes[self._unit:movement():team().id]
+end
+
 function CopDamage:damage_bullet(attack_data)
 	if self._dead or self._invulnerable then
 		return
 	end
-	if PlayerDamage.is_friendly_fire(self, attack_data.attacker_unit) then
+	if self:is_friendly_fire(attack_data.attacker_unit) then
 		return "friendly_fire"
 	end
 	local is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
 	if not is_civilian then
-		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, "bullet")
+		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, attack_data and attack_data.variant or "bullet")
 	end
 	if self._has_plate and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_plate_name and not attack_data.armor_piercing then
 		local armor_pierce_roll = math.rand(1)
@@ -362,6 +372,7 @@ function CopDamage:damage_bullet(attack_data)
 		damage = damage * mul
 	end
 	damage = self:_apply_damage_reduction(damage)
+	attack_data.raw_damage = damage
 	local damage_percent = math.ceil(math.clamp(damage / self._HEALTH_INIT_PRECENT, 1, self._HEALTH_GRANULARITY))
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
@@ -474,7 +485,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		local unit_anim = self._unit.anim_data and self._unit:anim_data()
 		local achievements = tweak_data.achievement.enemy_kill_achievements or {}
 		local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, all_pass, memory
+		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, diff_pass, all_pass, memory
 		local kill_count_no_reload = managers.job:get_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), true)
 		kill_count_no_reload = (kill_count_no_reload or 0) + 1
 		managers.job:set_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), kill_count_no_reload, true)
@@ -483,7 +494,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		managers.job:set_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), kill_count_carry_or_not, true)
 		local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
 		for achievement, achievement_data in pairs(achievements) do
-			weapon_type_pass = not achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().category == achievement_data.weapon_type
+			weapon_type_pass = not achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().category == achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().sub_category == achievement_data.weapon_type
 			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base()._name_id)
 			weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
 			fire_mode_pass = not achievement_data.fire_mode or attack_weapon:base():fire_mode() == achievement_data.fire_mode
@@ -501,6 +512,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 			steelsight_pass = achievement_data.in_steelsight == nil or attack_data.attacker_unit and attack_data.attacker_unit:movement() and not not attack_data.attacker_unit:movement():current_state():in_steelsight() == not not achievement_data.in_steelsight
 			count_no_reload_pass = not achievement_data.count_no_reload or kill_count_no_reload >= achievement_data.count_no_reload
 			count_pass = not achievement_data.kill_count or achievement_data.weapon and managers.statistics:session_killed_by_weapon(achievement_data.weapon) == achievement_data.kill_count
+			diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 			cop_pass = not achievement_data.is_cop or is_cop
 			local enemy_type = self._unit:base()._tweak_table
 			if achievement_data.enemies then
@@ -522,7 +534,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 					end
 				end
 			end
-			all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass
+			all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass and diff_pass
 			timer_pass = not achievement_data.timer
 			if all_pass and achievement_data.timer then
 				memory = managers.job:get_memory(achievement, true)
@@ -885,7 +897,6 @@ function CopDamage:damage_explosion(attack_data)
 	else
 		attack_data.damage = damage
 		local result_type = attack_data.variant == "stun" and "hurt_sick" or self:get_damage_type(damage_percent, "explosion")
-		print("result_type ", result_type)
 		result = {
 			type = result_type,
 			variant = attack_data.variant
@@ -949,7 +960,6 @@ function CopDamage:damage_explosion(attack_data)
 	if not self._no_blood then
 		managers.game_play_central:sync_play_impact_flesh(attack_data.pos, attack_data.col_ray.ray)
 	end
-	print("attack_data ", inspect(attack_data))
 	self:_send_explosion_attack_result(attack_data, attacker, damage_percent, self:_get_attack_variant_index(attack_data.result.variant), attack_data.col_ray.ray)
 	self:_on_damage_received(attack_data)
 	return result
@@ -2359,4 +2369,8 @@ end
 
 function CopDamage:destroy(...)
 	self:_remove_debug_gui()
+end
+
+function CopDamage:can_kill()
+	return not self._char_tweak.permanently_invulnerable and not self.immortal or not self._invulnerable
 end

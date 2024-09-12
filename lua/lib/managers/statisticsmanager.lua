@@ -1631,6 +1631,10 @@ function StatisticsManager:session_killed_by_grenade()
 	return count
 end
 
+function StatisticsManager:session_killed_by_projectile(projectile_id)
+	return self._global.session.killed_by_grenade[projectile_id] or 0
+end
+
 function StatisticsManager:session_killed_by_melee()
 	local count = 0
 	for melee_id, kills in pairs(self._global.session.killed_by_melee) do

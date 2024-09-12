@@ -122,7 +122,6 @@ function BootupState:setup()
 	})
 	if not Application:production_build() then
 		table.insert(self._play_data_list, {
-			visible = is_win32,
 			layer = intro_trailer_layer,
 			video = "movies/intro_trailer",
 			width = res.x,

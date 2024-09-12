@@ -2834,6 +2834,15 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.fib_hare.texture_bundle_folder = "fibb"
 	self.masks.fib_hare.sort_number = 25
 	self.masks.fib_hare.dlc = "pd2_clan"
+	self.masks.spk_party = {}
+	self.masks.spk_party.unit = "units/pd2_dlc_sparkle/masks/sparkle_party/msk_spk_party"
+	self.masks.spk_party.name_id = "bm_sparkle_party"
+	self.masks.spk_party.pcs = {}
+	self.masks.spk_party.value = 0
+	self.masks.spk_party.type = "tiara"
+	self.masks.spk_party.texture_bundle_folder = "sparkle"
+	self.masks.spk_party.sort_number = 28
+	self.masks.spk_party.dlc = "sparkle"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

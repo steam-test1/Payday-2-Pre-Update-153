@@ -24,6 +24,7 @@ function CoreAreaTriggerUnitElement:init(unit)
 	self._hed.radius = 250
 	self._hed.spawn_unit_elements = {}
 	self._hed.amount = "1"
+	self._hed.instigator_name = ""
 	self._hed.use_shape_element_ids = nil
 	self._hed.use_disabled_shapes = false
 	self._hed.rules_element_ids = nil
@@ -38,6 +39,7 @@ function CoreAreaTriggerUnitElement:init(unit)
 	table.insert(self._save_values, "radius")
 	table.insert(self._save_values, "spawn_unit_elements")
 	table.insert(self._save_values, "amount")
+	table.insert(self._save_values, "instigator_name")
 	table.insert(self._save_values, "use_shape_element_ids")
 	table.insert(self._save_values, "use_disabled_shapes")
 	table.insert(self._save_values, "rules_element_ids")
@@ -300,6 +302,15 @@ function CoreAreaTriggerUnitElement:create_values_ctrlrs(panel, panel_sizer, dis
 			"4",
 			"all"
 		}, "Select how many are required to trigger area")
+	end
+	if not disable or not disable.instigator_name then
+		self:_build_value_combobox(panel, panel_sizer, "instigator_name", {
+			"trip_mine",
+			"ecm_jammer",
+			"ammo_bag",
+			"doctor_bag",
+			"bodybags_bag"
+		}, "Select which units will trigger the area (equipment only)")
 	end
 	self._use_disabled_shapes = self:_build_value_checkbox(panel, panel_sizer, "use_disabled_shapes")
 end

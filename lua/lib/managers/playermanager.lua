@@ -122,7 +122,7 @@ function PlayerManager:init()
 			if self:is_current_weapon_of_category("pistol") and not self._coroutine_mgr:is_running(PlayerAction.ExpertHandling) then
 				local data = self:upgrade_value("pistol", "stacked_accuracy_bonus", nil)
 				
-				if data then
+				if data and type(data) ~= "number" then
 					self._coroutine_mgr:add_coroutine(PlayerAction.ExpertHandling, PlayerAction.ExpertHandling, self, data.accuracy_bonus, data.max_stacks, Application:time() + data.max_time)
 				end
 			end
@@ -185,7 +185,7 @@ function PlayerManager:set_damage_absorption(value)
 end
 
 function PlayerManager:_on_enter_trigger_happy_event(attacker_unit, unit, variant)
-	if attacker_unit == self:player_unit() and not self._coroutine_mgr:is_running("trigger_happy") and self:is_current_weapon_of_category("pistol") then
+	if attacker_unit == self:player_unit() and variant == "bullet" and not self._coroutine_mgr:is_running("trigger_happy") and self:is_current_weapon_of_category("pistol") then
 		local data = self:upgrade_value("pistol", "stacking_hit_damage_multiplier", 0)
 		if data ~= 0 then
 			self._coroutine_mgr:add_coroutine("trigger_happy", PlayerAction.TriggerHappy, self, data.damage_bonus, data.max_stacks, Application:time() + data.max_time)
@@ -466,8 +466,8 @@ function PlayerManager:update(t, dt)
 	self._coroutine_mgr:update(t, dt)
 	self._action_mgr:update(t, dt)
 	if self._unseen_strike and not self._coroutine_mgr:is_running(PlayerAction.UnseenStrike) and not self._coroutine_mgr:is_running(PlayerAction.UnseenStrikeStart) then
-		local data = self:upgrade_value("player", "unseen_increased_crit_chance", nil)
-		if data then
+		local data = self:upgrade_value("player", "unseen_increased_crit_chance", 0)
+		if data ~= 0 then
 			self._coroutine_mgr:add_coroutine(PlayerAction.UnseenStrike, PlayerAction.UnseenStrike, self, data.min_time, data.max_duration, data.crit_chance)
 		end
 	end
@@ -901,13 +901,15 @@ function PlayerManager:on_killshot(killed_unit, variant, headshot)
 		if equipped_unit:weapon_tweak_data().category == "saw" then
 			local pos = player_unit:position()
 			local skill = self:upgrade_value("saw", "panic_when_kill")
-			local area = skill.area
-			local chance = skill.chance
-			local amount = skill.amount
-			local enemies = World:find_units_quick("sphere", pos, area, 12, 21)
-			for i, unit in ipairs(enemies) do
-				if unit:character_damage() then
-					unit:character_damage():build_suppression(amount, chance)
+			if skill and type(skill) ~= "number" then
+				local area = skill.area
+				local chance = skill.chance
+				local amount = skill.amount
+				local enemies = World:find_units_quick("sphere", pos, area, 12, 21)
+				for i, unit in ipairs(enemies) do
+					if unit:character_damage() then
+						unit:character_damage():build_suppression(amount, chance)
+					end
 				end
 			end
 		end
@@ -3947,6 +3949,7 @@ function PlayerManager:on_enter_custody(_player, already_dead)
 	player:character_damage():set_health(0)
 	player:base():_unregister()
 	World:delete_unit(player)
+	managers.hud:remove_interact()
 end
 
 function PlayerManager:captured_hostage()

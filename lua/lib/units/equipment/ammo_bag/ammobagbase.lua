@@ -32,6 +32,10 @@ function AmmoBagBase:init(unit)
 	end
 end
 
+function AmmoBagBase:get_name_id()
+	return "ammo_bag"
+end
+
 function AmmoBagBase:_clbk_validate()
 	self._validate_clbk_id = nil
 	if not self._was_dropin then

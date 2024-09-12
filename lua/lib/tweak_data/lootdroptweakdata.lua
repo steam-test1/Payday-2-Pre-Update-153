@@ -1046,6 +1046,20 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.legendary.track = false
 	self.global_values.legendary.sort_number = 201
 	self.global_values.legendary.category = nil
+	self.global_values.sparkle = {}
+	self.global_values.sparkle.name_id = "bm_global_value_sparkle"
+	self.global_values.sparkle.desc_id = "menu_l_global_value_sparkle"
+	self.global_values.sparkle.unlock_id = "bm_global_value_sparkle_unlock"
+	self.global_values.sparkle.color = Color(255, 255, 145, 0) / 255
+	self.global_values.sparkle.dlc = true
+	self.global_values.sparkle.chance = 1
+	self.global_values.sparkle.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "sparkle")
+	self.global_values.sparkle.durability_multiplier = 1
+	self.global_values.sparkle.drops = true
+	self.global_values.sparkle.track = true
+	self.global_values.sparkle.sort_number = 71
+	self.global_values.sparkle.hide_unavailable = true
+	self.global_values.sparkle.category = "global_event"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1100,7 +1114,8 @@ function LootDropTweakData:init(tweak_data)
 		"opera",
 		"solus_clan",
 		"wild",
-		"born"
+		"born",
+		"sparkle"
 	}
 	self:_create_global_value_list_map()
 end

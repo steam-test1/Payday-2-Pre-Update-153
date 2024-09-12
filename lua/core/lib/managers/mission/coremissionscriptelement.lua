@@ -129,7 +129,7 @@ function MissionScriptElement:_reduce_trigger_times()
 	if self._values.trigger_times > 0 then
 		self._values.trigger_times = self._values.trigger_times - 1
 		if self._values.trigger_times <= 0 then
-			self._values.enabled = false
+			self:set_enabled(false)
 		end
 	end
 end
@@ -182,6 +182,10 @@ end
 
 function MissionScriptElement:set_enabled(enabled)
 	self._values.enabled = enabled
+	self:on_set_enabled()
+end
+
+function MissionScriptElement:on_set_enabled()
 end
 
 function MissionScriptElement:on_toggle(value)

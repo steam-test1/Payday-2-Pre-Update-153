@@ -206,7 +206,7 @@ function ArrowBase:_attach_to_hit_unit(is_remote, dynamic_pickup_wanted)
 					local_pos = (global_pos - parent_pos):rotate_with(parent_obj:rotation():inverse())
 				end
 			end
-			if not hit_unit:character_damage():dead() then
+			if not hit_unit:character_damage():dead() and damage_ext:can_kill() then
 				switch_to_pickup = false
 			end
 		elseif damage_ext and damage_ext.can_attach_projectiles and not damage_ext:can_attach_projectiles() then

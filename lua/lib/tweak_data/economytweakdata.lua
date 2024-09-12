@@ -476,6 +476,38 @@ function EconomyTweakData:init()
 		weapon_skins = {"ksg_same"}
 	}
 	self.contents.same_01_legendary.rarity = "legendary"
+	self.contents.grunt_01 = {}
+	self.contents.grunt_01.def_id = 10026
+	self.contents.grunt_01.contains = {
+		weapon_skins = {
+			"saiga_grunt",
+			"m1928_grunt",
+			"m45_grunt",
+			"p226_grunt",
+			"new_mp5_grunt",
+			"wa2000_grunt",
+			"boot_grunt",
+			"g22c_grunt",
+			"m249_grunt",
+			"ksg_grunt",
+			"winchester1874_grunt",
+			"rpk_grunt",
+			"x_b92fs_grunt",
+			"akmsu_grunt",
+			"x_1911_grunt"
+		},
+		contents = {
+			"grunt_01_legendary"
+		}
+	}
+	self.contents.grunt_01_legendary = {}
+	self.contents.grunt_01_legendary.def_id = 10027
+	self.contents.grunt_01_legendary.contains = {
+		weapon_skins = {
+			"tecci_grunt"
+		}
+	}
+	self.contents.grunt_01_legendary.rarity = "legendary"
 	self.bundles.same_01 = {}
 	self.bundles.same_01.def_id = 30000
 	self.bundles.same_01.dlc_id = "518760"
@@ -612,6 +644,14 @@ function EconomyTweakData:init()
 	self.safes.same_01.unit_name = "units/payday2_cash/safes/same/safe/eco_safe_same"
 	self.safes.same_01.texture_bundle_folder = "cash/safes/same"
 	self.safes.same_01.market_link = "https://steamcommunity.com/market/listings/218620/Community%20Safe"
+	self.safes.grunt_01 = {}
+	self.safes.grunt_01.free = true
+	self.safes.grunt_01.drill = "grunt_01"
+	self.safes.grunt_01.content = "grunt_01"
+	self.safes.grunt_01.name_id = "bm_menu_safe_grunt_01"
+	self.safes.grunt_01.unit_name = "units/payday2_cash/safes/grunt/safe/eco_safe_grunt"
+	self.safes.grunt_01.texture_bundle_folder = "cash/safes/grunt"
+	self.safes.grunt_01.market_link = "https://steamcommunity.com/market/listings/218620/Chains%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -719,6 +759,9 @@ function EconomyTweakData:init()
 	self.drills.same_01 = {}
 	self.drills.same_01.safe = "same_01"
 	self.drills.same_01.unit_name = "units/payday2_cash/safes/same/drill/eco_drill_same"
+	self.drills.grunt_01 = {}
+	self.drills.grunt_01.safe = "grunt_01"
+	self.drills.grunt_01.unit_name = "units/payday2_cash/safes/grunt/drill/eco_drill_grunt"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

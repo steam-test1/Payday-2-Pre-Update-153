@@ -1084,6 +1084,7 @@ function CopActionAct:update(t)
 		self._expired = true
 		CopActionWalk._chk_correct_pose(self)
 	end
+	self._ext_movement:spawn_wanted_items()
 end
 
 function CopActionAct:type()

@@ -62,8 +62,10 @@ end
 function ChallengeManager:_fetch_challenges()
 	local done_clbk = callback(self, self, "_fetch_done_clbk")
 	self._global.retrieving = true
+	self._missionsURL = "http://www.overkillsoftware.com/ovk-media/stats/missions.json"
 	if SystemInfo:distribution() == Idstring("STEAM") then
-		Steam:http_request("http://media.overkillsoftware.com/stats/missions.json", done_clbk, Idstring("ChallengeManager:_fetch_challenges()"):key())
+		print("Getting Missions from: ", self._missionsURL)
+		Steam:http_request(self._missionsURL, done_clbk, Idstring("ChallengeManager:_fetch_challenges()"):key())
 	else
 	end
 end
@@ -260,12 +262,20 @@ function ChallengeManager:_check_challenge_completed(id, key)
 	return false
 end
 
+function ChallengeManager:can_progress_challenges()
+	return true
+end
+
 function ChallengeManager:award(id)
-	self:on_achievement_awarded(id)
+	if self:can_progress_challenges() then
+		self:on_achievement_awarded(id)
+	end
 end
 
 function ChallengeManager:award_progress(progress_id, amount)
-	self:on_achievement_progressed(progress_id, amount)
+	if self:can_progress_challenges() then
+		self:on_achievement_progressed(progress_id, amount)
+	end
 end
 
 function ChallengeManager:on_achievement_awarded(id)
@@ -476,44 +486,66 @@ function ChallengeManager:mission_set_value(variable, activated)
 	end
 end
 
+function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
+	local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters, pass_detection, pass_perk_deck, pass_grenade
+	local ad = equip_data
+	local num_skills
+	pass_deployable = not ad.deployable or ad.deployable == outfit.deployable
+	pass_armor = not ad.armor or ad.armor == outfit.armor and ad.armor == outfit.armor_current
+	pass_armors = not ad.armors or table.contains(ad.armors, outfit.armor) and table.contains(ad.armors, outfit.armor_current)
+	pass_mask = not ad.mask or ad.mask == outfit.mask.mask_id
+	pass_masks = not ad.masks or table.contains(ad.masks, outfit.mask.mask_id)
+	pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == outfit.melee_weapon
+	pass_melee_weapons = not ad.melee_weapons or table.contains(ad.melee_weapons, outfit.melee_weapon)
+	pass_grenade = not ad.grenade or table.contains(ad.grenade, outfit.grenade)
+	pass_primary = not ad.primary or ad.primary == outfit.primary.factory_id
+	pass_primaries = not ad.primaries or table.contains(ad.primaries, outfit.primary.factory_id)
+	pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(outfit.primary.factory_id, outfit.primary.blueprint)
+	pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id), "category")
+	pass_secondary = not ad.secondary or ad.secondary == outfit.secondary.factory_id
+	pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, outfit.secondary.factory_id)
+	pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(outfit.secondary.factory_id, outfit.secondary.blueprint)
+	pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.secondary.factory_id), "category")
+	pass_characters = not ad.characters or table.contains(ad.characters, character)
+	pass_skills = not ad.num_skills
+	pass_perk_deck = not ad.perk_deck or outfit.skills.specializations[1] == tostring(ad.perk_deck)
+	if not pass_skills then
+		num_skills = 0
+		for tree, points in ipairs(outfit.skills.skills or {0}) do
+			num_skills = num_skills + (tonumber(points) or 0)
+		end
+		pass_skills = num_skills <= ad.num_skills
+	end
+	if ad.reverse_deployable then
+		pass_deployable = not pass_deployable
+	end
+	if ad.detection then
+		local detection = managers.blackmarket:get_suspicion_offset_of_outfit_string(outfit, tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
+		detection = math.round(detection * 100)
+		pass_detection = detection >= ad.detection.min and detection <= ad.detection.max
+	else
+		pass_detection = true
+	end
+	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade
+end
+
 function ChallengeManager:check_equipped_team(achievement_data)
 	if achievement_data.equipped_team then
-		local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters
 		local ad = achievement_data.equipped_team
-		local oufit, num_skills
+		local num_skills
 		for _, peer in pairs(managers.network:session():all_peers()) do
-			oufit = peer:blackmarket_outfit()
-			pass_deployable = not ad.deployable or ad.deployable == oufit.deployable
-			pass_armor = not ad.armor or ad.armor == oufit.armor and ad.armor == oufit.armor_current
-			pass_armors = not ad.armors or table.contains(ad.armors, oufit.armor) and table.contains(ad.armors, oufit.armor_current)
-			pass_mask = not ad.mask or ad.mask == oufit.mask.mask_id
-			pass_masks = not ad.masks or table.contains(ad.masks, oufit.mask.mask_id)
-			pass_melee_weapon = not ad.melee_weapon or ad.melee_weapon == oufit.melee_weapon
-			pass_melee_weapons = not ad.melee_weapons or table.contains(ad.melee_weapons, oufit.melee_weapon)
-			pass_primary = not ad.primary or ad.primary == oufit.primary.factory_id
-			pass_primaries = not ad.primaries or table.contains(ad.primaries, oufit.primary.factory_id)
-			pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.primary.factory_id, oufit.primary.blueprint)
-			pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.primary.factory_id), "category")
-			pass_secondary = not ad.secondary or ad.secondary == oufit.secondary.factory_id
-			pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, oufit.secondary.factory_id)
-			pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(oufit.secondary.factory_id, oufit.secondary.blueprint)
-			pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(oufit.secondary.factory_id), "category")
-			pass_characters = not ad.characters or table.contains(ad.characters, peer:character())
-			pass_skills = not ad.num_skills
-			if not pass_skills then
-				num_skills = 0
-				for tree, points in ipairs(oufit.skills.skills or {0}) do
-					num_skills = num_skills + (tonumber(points) or 0)
-				end
-				pass_skills = num_skills <= ad.num_skills
-			end
-			if ad.reverse_deployable then
-				pass_deployable = not pass_deployable
-			end
-			if not (pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category) or not pass_secondary_category then
+			if not self:check_equipped_outfit(achievement_data.equipped_team, peer:blackmarket_outfit(), peer:character()) then
 				return false
 			end
 		end
+	end
+	return true
+end
+
+function ChallengeManager:check_equipped(achievement_data)
+	if achievement_data.equipped_outfit then
+		local peer = managers.network:session():local_peer()
+		return self:check_equipped_outfit(achievement_data.equipped_outfit, peer:blackmarket_outfit(), peer:character())
 	end
 	return true
 end

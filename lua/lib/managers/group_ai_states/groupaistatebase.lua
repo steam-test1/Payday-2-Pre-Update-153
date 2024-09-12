@@ -204,6 +204,7 @@ function GroupAIStateBase:set_AI_enabled(state)
 	end
 	managers.enemy:dispose_all_corpses()
 	if not state then
+		self._num_converted_police = table.size(self._converted_police)
 		for u_key, unit in pairs(self._security_cameras) do
 			unit:base():set_detection_enabled(false)
 		end
@@ -3870,6 +3871,9 @@ function GroupAIStateBase:remove_minion(minion_key, player_key)
 	if not minion_unit then
 		return
 	end
+	if Network:is_server() then
+		managers.network:session():send_to_peers("remove_minion", minion_unit)
+	end
 	if not player_key then
 		for u_key, u_data in pairs(self._player_criminals) do
 			if u_data.minions and u_data.minions[minion_key] then
@@ -4772,7 +4776,11 @@ function GroupAIStateBase:is_enemy_converted_to_criminal(unit)
 end
 
 function GroupAIStateBase:get_amount_enemies_converted_to_criminals()
-	return self._converted_police and table.size(self._converted_police)
+	local num = self._converted_police and table.size(self._converted_police)
+	if num == 0 and self._num_converted_police ~= nil then
+		num = self._num_converted_police
+	end
+	return num
 end
 
 function GroupAIStateBase:all_converted_enemies()

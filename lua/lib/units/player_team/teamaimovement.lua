@@ -229,7 +229,6 @@ end
 
 function TeamAIMovement:set_should_stay(should_stay)
 	if self._should_stay ~= should_stay then
-		self._move_for_revive = true
 		managers.hud:set_ai_stopped(managers.criminals:character_data_by_unit(self._unit).panel_id, should_stay)
 		self._should_stay = should_stay
 		managers.network:session():send_to_peers_synched("sync_team_ai_stopped", self._unit, should_stay)
@@ -237,14 +236,11 @@ function TeamAIMovement:set_should_stay(should_stay)
 			managers.groupai:state():upd_team_AI_distance()
 		end
 	end
-	if Network:is_server() and should_stay and self._unit:brain():objective() and self._unit:brain():objective().type == "revive" and self._move_for_revive then
-		self._move_for_revive = false
-	end
 end
 
 function TeamAIMovement:chk_action_forbidden(action_type)
 	if action_type == "walk" and self._should_stay then
-		if Network:is_server() and self._unit:brain():objective() and self._unit:brain():objective().type == "revive" and self._move_for_revive then
+		if Network:is_server() and self._unit:brain():objective() and self._unit:brain():objective().type == "revive" then
 			return false
 		end
 		return true

@@ -38,13 +38,14 @@ function ElementAreaTrigger:project_instigators()
 			table.insert(instigators, v)
 		end
 	elseif self._values.instigator == "enemies" then
-		if managers.groupai:state():police_hostage_count() <= 0 then
+		local state = managers.groupai:state()
+		if state:police_hostage_count() <= 0 and 0 >= state:get_amount_enemies_converted_to_criminals() then
 			for _, data in pairs(managers.enemy:all_enemies()) do
 				table.insert(instigators, data.unit)
 			end
 		else
 			for _, data in pairs(managers.enemy:all_enemies()) do
-				if not data.unit:anim_data().surrender then
+				if not data.unit:anim_data().surrender and not data.is_converted then
 					table.insert(instigators, data.unit)
 				end
 			end
@@ -198,6 +199,20 @@ function ElementAreaTrigger:project_instigators()
 		for _, unit in ipairs(all_found) do
 			local carry_data = unit:carry_data()
 			if carry_data and filter_func(carry_data) then
+				table.insert(instigators, unit)
+			end
+		end
+	elseif self._values.instigator == "equipment" and self._values.instigator_name ~= nil then
+		local all_found = World:find_units_quick("all", 14)
+		
+		local function filter_func(unit)
+			if unit:base() and unit:base():get_name_id() == self._values.instigator_name then
+				return true
+			end
+		end
+		
+		for _, unit in ipairs(all_found) do
+			if filter_func(unit) then
 				table.insert(instigators, unit)
 			end
 		end

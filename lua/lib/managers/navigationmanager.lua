@@ -1794,6 +1794,7 @@ function NavigationManager:send_nav_field_to_engine()
 	local t_ins = table.insert
 	local send_data = {}
 	send_data.rooms = self._rooms
+	local nr_rooms = #send_data.rooms
 	send_data.doors = self._room_doors
 	send_data.nav_segments = self._nav_segments
 	send_data.quad_grid_size = self._grid_size
@@ -1809,7 +1810,11 @@ function NavigationManager:send_nav_field_to_engine()
 		}
 		local rooms = {}
 		for i_room, _ in pairs(vis_group.rooms) do
-			t_ins(rooms, i_room)
+			if i_room <= nr_rooms then
+				t_ins(rooms, i_room)
+			else
+				Application:error("[NavigationManager:send_nav_field_to_engine] Navgraph needs to be rebuilt!")
+			end
 		end
 		new_vis_group.rooms = rooms
 		local visible_groups = {}
@@ -1825,7 +1830,11 @@ function NavigationManager:send_nav_field_to_engine()
 		local rooms = {}
 		local new_sector = {rooms = rooms}
 		for i_room, _ in pairs(sector.rooms) do
-			t_ins(rooms, i_room)
+			if i_room <= nr_rooms then
+				t_ins(rooms, i_room)
+			else
+				Application:error("[NavigationManager:send_nav_field_to_engine] Navgraph needs to be rebuilt!")
+			end
 		end
 		nav_sectors[sector_id] = new_sector
 	end

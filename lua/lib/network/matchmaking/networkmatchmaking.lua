@@ -151,9 +151,10 @@ function NetworkMatchMaking:get_friends_lobbies()
 							owner_name = lobby:key_value("owner_name"),
 							room_id = lobby:id()
 						})
-						table.insert(info.attribute_list, {
+						local attributes_data = {
 							numbers = self:_lobby_to_numbers(lobby)
-						})
+						}
+						table.insert(info.attribute_list, attributes_data)
 					end
 				end
 			end
@@ -253,9 +254,10 @@ function NetworkMatchMaking:search_lobby(friends_only)
 							owner_name = lobby:key_value("owner_name"),
 							room_id = lobby:id()
 						})
-						table.insert(info.attribute_list, {
+						local attributes_data = {
 							numbers = self:_lobby_to_numbers(lobby)
-						})
+						}
+						table.insert(info.attribute_list, attributes_data)
 					end
 				end
 			end

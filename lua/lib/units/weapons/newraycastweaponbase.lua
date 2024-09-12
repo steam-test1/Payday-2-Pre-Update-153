@@ -1170,7 +1170,7 @@ function NewRaycastWeaponBase:started_reload_empty()
 end
 
 function NewRaycastWeaponBase:update_reloading(t, dt, time_left)
-	if self._use_shotgun_reload and t > self._next_shell_reloded_t then
+	if self._use_shotgun_reload and self._next_shell_reloded_t and t > self._next_shell_reloded_t then
 		local speed_multiplier = self:reload_speed_multiplier()
 		self._next_shell_reloded_t = self._next_shell_reloded_t + self:reload_shell_expire_t() / speed_multiplier
 		self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), self:get_ammo_remaining_in_clip() + 1))

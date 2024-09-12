@@ -228,8 +228,8 @@ function AchievmentManager:award_progress(stat, value)
 	if Application:editor() then
 		return
 	end
-	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
 	managers.challenge:on_achievement_progressed(stat)
+	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.handler:achievement_store_callback(AchievmentManager.steam_unlock_result)
 	end

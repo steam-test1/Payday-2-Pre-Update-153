@@ -14,6 +14,7 @@ require("lib/managers/menu/items/MenuItemUpgrade")
 require("lib/managers/menu/items/MenuItemMultiChoice")
 require("lib/managers/menu/items/MenuItemToggle")
 require("lib/managers/menu/items/MenuItemChat")
+require("lib/managers/menu/items/MenuItemGenerics")
 require("lib/managers/menu/items/MenuItemFriend")
 require("lib/managers/menu/items/MenuItemCustomizeController")
 require("lib/managers/menu/items/MenuItemInput")
@@ -2498,6 +2499,9 @@ function MenuCallbackHandler:get_matchmake_attributes()
 		local job_class = managers.job:calculate_job_class(managers.job:current_real_job_id(), difficulty_id)
 		attributes.numbers[9] = job_class
 		local job_plan = Global.game_settings.job_plan
+		if tweak_data.quickplay.stealth_levels[managers.job:current_real_job_id()] then
+			job_plan = 2
+		end
 		attributes.numbers[10] = job_plan
 	end
 	return attributes
@@ -4527,6 +4531,17 @@ function LobbyOptionInitiator:modify_node(node)
 	local item_lobby_job_plan = node:item("lobby_job_plan")
 	if item_lobby_job_plan then
 		item_lobby_job_plan:set_value(Global.game_settings.job_plan or -1)
+		if tweak_data.quickplay.stealth_levels[managers.job:current_real_job_id()] then
+			local stealth_option
+			for _, option in ipairs(item_lobby_job_plan:options()) do
+				if option:value() == 2 then
+					stealth_option = option
+					break
+				end
+			end
+			item_lobby_job_plan:clear_options()
+			item_lobby_job_plan:add_option(stealth_option)
+		end
 	end
 	return node
 end
@@ -4840,6 +4855,18 @@ function MenuCrimeNetContractInitiator:modify_node(original_node, data)
 		node:item("toggle_drop_in"):set_value(Global.game_settings.drop_in_allowed and "on" or "off")
 		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
 		node:item("toggle_auto_kick"):set_value(Global.game_settings.auto_kick and "on" or "off")
+		if tweak_data.quickplay.stealth_levels[data.job_id] then
+			local job_plan_item = node:item("lobby_job_plan")
+			local stealth_option
+			for _, option in ipairs(job_plan_item:options()) do
+				if option:value() == 2 then
+					stealth_option = option
+					break
+				end
+			end
+			job_plan_item:clear_options()
+			job_plan_item:add_option(stealth_option)
+		end
 	end
 	if data.customize_contract then
 		node:set_default_item_name("buy_contract")

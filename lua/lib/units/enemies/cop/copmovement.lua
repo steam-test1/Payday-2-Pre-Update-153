@@ -158,7 +158,8 @@ action_variants.civilian = {
 	act = CopActionAct,
 	walk = CivilianActionWalk,
 	turn = CopActionTurn,
-	hurt = CopActionHurt
+	hurt = CopActionHurt,
+	warp = CopActionWarp
 }
 action_variants.civilian_female = action_variants.civilian
 action_variants.robbers_safehouse = action_variants.civilian
@@ -1151,6 +1152,16 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 			end
 		end
 		return
+	end
+	if damage_info.variant == "stun" and alive(self._ext_inventory and self._ext_inventory._shield_unit) then
+		hurt_type = "shield_knock"
+		block_type = "shield_knock"
+		damage_info.variant = "melee"
+		damage_info.result = {
+			type = "shield_knock",
+			variant = "melee"
+		}
+		damage_info.shield_knock = true
 	end
 	if hurt_type == "death" then
 		if self._rope then

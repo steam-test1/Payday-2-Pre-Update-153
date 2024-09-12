@@ -1482,12 +1482,7 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.spartan.dlc = "big_bank"
 	self.textures.ruler = {}
 	self.textures.ruler.name_id = "bm_txt_ruler"
-	self.textures.ruler.pcs = {
-		10,
-		20,
-		30,
-		40
-	}
+	self.textures.ruler.pcs = {}
 	self.textures.ruler.texture = "units/pd2_dlc_big/masks/patterns/pattern_ruler_df"
 	self.textures.ruler.value = 0
 	self.textures.ruler.dlc = "big_bank"

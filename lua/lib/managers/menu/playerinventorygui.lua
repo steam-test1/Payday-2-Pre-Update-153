@@ -1080,7 +1080,9 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 				end
 			end
 			for _, box in ipairs(self._boxes_by_layer[3]) do
-				box.panel:hide()
+				if alive(box.panel) then
+					box.panel:hide()
+				end
 			end
 		end
 		
@@ -1112,7 +1114,9 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 				end
 			end
 			for _, box in ipairs(self._boxes_by_layer[3]) do
-				box.panel:show()
+				if alive(box.panel) then
+					box.panel:show()
+				end
 			end
 		end
 		
@@ -2695,7 +2699,7 @@ function PlayerInventoryGui:_update_deployable_box()
 			select_anim = select_anim,
 			unselect_anim = unselect_anim,
 			bg_blend_mode = "normal",
-			layer = 2,
+			layer = 3,
 			clbks = clbks
 		})
 		icon_box:set_center(box.panel:x() + box.panel:w() - 40, box.panel:y() + box.panel:h() / 2)
@@ -2882,6 +2886,7 @@ function PlayerInventoryGui:_update_mod_boxes()
 		})
 		icon_box:set_lefttop(math.round(x), math.round(y))
 		x = x + w + 2
+		icon_box:set_visible(skilltree_box:visible())
 	end
 end
 

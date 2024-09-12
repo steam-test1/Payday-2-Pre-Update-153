@@ -44,6 +44,7 @@ end
 
 function BanListManager:load(data)
 	if data.ban_list then
-		self._global = data.ban_list
+		Global.ban_list = data.ban_list
+		self._global = Global.ban_list
 	end
 end
