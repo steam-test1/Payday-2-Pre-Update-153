@@ -114,6 +114,8 @@ function NavigationManager:_init_draw_data()
 	brush.room_diag_obstructed = Draw:brush(Color(0.5, 0.5, 0, 0.5), duration)
 	brush.room_border = Draw:brush(Color(0, 0.3, 0.3, 0.8), duration)
 	brush.room_fill = Draw:brush(Color(0.3, 0.3, 0.3, 0.8), duration)
+	brush.room_fill_disabled = Draw:brush(Color(0.3, 0.8, 0.3, 0.3), duration)
+	brush.room_fill_obstructed = Draw:brush(Color(0.3, 0.8, 0, 0.8), duration)
 	brush.coarse_graph = Draw:brush(Color(0.2, 0.05, 0.2, 0.9))
 	brush.vis_graph_rooms = Draw:brush(Color(0.6, 0.5, 0.2, 0.9), duration)
 	brush.vis_graph_node = Draw:brush(Color(1, 0.6, 0, 0.9), duration)
@@ -641,7 +643,6 @@ function NavigationManager:_draw_room(room, instant)
 		brush:line(xn_yp_draw, xn_yn_draw)
 		brush:line(xp_yp_draw, xn_yp_draw)
 		brush:line(xp_yn_draw, xn_yn_draw)
-		brushes.room_fill:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
 		local nsi = room.vis_group and self:get_nav_seg_from_i_vis_group(room.vis_group)
 		local ns = nsi and self._nav_segments[nsi]
 		if ns and ns.disabled then
@@ -654,6 +655,13 @@ function NavigationManager:_draw_room(room, instant)
 		end
 		brush:line(xp_yp_draw, xn_yn_draw)
 		brush:line(xn_yp_draw, xp_yn_draw)
+		if ns and ns.disabled then
+			brushes.room_fill_disabled:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		elseif room.obstructed then
+			brushes.room_fill_obstructed:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		else
+			brushes.room_fill:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		end
 	end
 	local expansion = room.expansion
 	if expansion then

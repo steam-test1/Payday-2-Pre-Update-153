@@ -2328,11 +2328,7 @@ function CivilianHeisterInteractionExt:is_daily_contractor()
 end
 
 function CivilianHeisterInteractionExt:is_daily_accepted()
-	if self._accepted then
-		return true
-	end
-	local challenge = managers.custom_safehouse:get_daily_challenge()
-	return managers.custom_safehouse:has_daily_been_accepted_from_heister() and challenge and challenge.contractor == CriminalsManager.convert_new_to_old_character_workname(self.character)
+	return self._accepted
 end
 
 function CivilianHeisterInteractionExt:update_character()
@@ -2397,13 +2393,11 @@ function CivilianHeisterInteractionExt:interact(player)
 	self._unit:sound():set_interactor_voice(player_voice)
 	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
 	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
-	if self:is_daily_contractor() and (not managers.custom_safehouse:has_daily_been_accepted_from_heister() or managers.custom_safehouse:has_completed_daily()) then
+	if self:is_daily_contractor() and not self:is_daily_accepted() then
 		managers.menu:on_heister_interaction()
-		if not self:is_daily_accepted() then
-			managers.custom_safehouse:accept_daily()
-			self:hide_waypoint()
-			self._accepted = true
-		end
+		managers.custom_safehouse:accept_daily()
+		self:hide_waypoint()
+		self._accepted = true
 		self:_play_voice_line(self._lines.answering)
 	else
 		self:_play_voice_line(self._lines.answering)

@@ -376,31 +376,7 @@ function AchievmentManager:clbk_install_trophies(result)
 	end
 end
 
-function AchievmentManager:check_autounlock_achievements()
-	self:_check_autounlock_complete_heist()
-	self:_check_autounlock_difficulties()
-	self:_check_autounlock_infamy()
-end
-
-function AchievmentManager:_check_autounlock_complete_heist()
-	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
-		if table.size(achievement_data) == 3 and achievement_data.award and achievement_data.difficulty and (achievement_data.job or achievement_data.jobs) then
-			local jobs = achievement_data.jobs or {
-				achievement_data.job
-			}
-			for i, job in pairs(jobs) do
-				for _, difficulty in ipairs(achievement_data.difficulty) do
-					if managers.statistics:completed_job(job, difficulty) > 0 then
-						self:_award_achievement(achievement_data)
-						break
-					end
-				end
-			end
-		end
-	end
-end
-
-function AchievmentManager:_check_autounlock_difficulties()
+function AchievmentManager:check_complete_heist_stats_achivements()
 	local job
 	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_stats_achievements) do
 		local available_jobs
@@ -442,6 +418,34 @@ function AchievmentManager:_check_autounlock_difficulties()
 			self:_award_achievement(achievement_data)
 		end
 	end
+end
+
+function AchievmentManager:check_autounlock_achievements()
+	self:_check_autounlock_complete_heist()
+	self:_check_autounlock_difficulties()
+	self:_check_autounlock_infamy()
+end
+
+function AchievmentManager:_check_autounlock_complete_heist()
+	for achievement, achievement_data in pairs(tweak_data.achievement.complete_heist_achievements) do
+		if table.size(achievement_data) == 3 and achievement_data.award and achievement_data.difficulty and (achievement_data.job or achievement_data.jobs) then
+			local jobs = achievement_data.jobs or {
+				achievement_data.job
+			}
+			for i, job in pairs(jobs) do
+				for _, difficulty in ipairs(achievement_data.difficulty) do
+					if managers.statistics:completed_job(job, difficulty) > 0 then
+						self:_award_achievement(achievement_data)
+						break
+					end
+				end
+			end
+		end
+	end
+end
+
+function AchievmentManager:_check_autounlock_difficulties()
+	self:check_complete_heist_stats_achivements()
 end
 
 function AchievmentManager:_check_autounlock_infamy()

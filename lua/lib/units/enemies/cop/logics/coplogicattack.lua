@@ -849,6 +849,8 @@ function CopLogicAttack._upd_aim(data, my_data)
 							local time_since_verification = focus_enemy.verified_t and data.t - focus_enemy.verified_t
 							if my_data.firing and time_since_verification and time_since_verification < 3.5 then
 								shoot = true
+							else
+								data.brain:search_for_path_to_unit("hunt" .. tostring(my_data.key), focus_enemy.unit)
 							end
 						end
 					end

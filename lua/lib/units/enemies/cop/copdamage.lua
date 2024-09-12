@@ -2070,7 +2070,13 @@ function CopDamage:sync_damage_tase(attacker_unit, damage_percent, variant, deat
 	self:_on_damage_received(attack_data)
 end
 
+CopDamage.BODY_INDEX_MAX = 23
+
 function CopDamage:_send_bullet_attack_result(attack_data, attacker, damage_percent, body_index, hit_offset_height, variant)
+	if body_index > CopDamage.BODY_INDEX_MAX then
+		Application:error(string.format("Attempted to send a bullet attack body index higher than %i, clamping! (was %i)", CopDamage.BODY_INDEX_MAX, body_index))
+		body_index = CopDamage.BODY_INDEX_MAX
+	end
 	self._unit:network():send("damage_bullet", attacker, damage_percent, body_index, hit_offset_height, variant, self._dead and true or false)
 end
 

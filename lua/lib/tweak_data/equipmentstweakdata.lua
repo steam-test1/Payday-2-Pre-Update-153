@@ -206,6 +206,13 @@ function EquipmentsTweakData:init()
 		sync_possession = true,
 		transfer_quantity = 4
 	}
+	self.specials.help_keycard = {
+		text_id = "hud_int_equipment_pickup_keycard",
+		icon = "equipment_bank_manager_key",
+		action_message = "bank_manager_key_obtained",
+		sync_possession = true,
+		avoid_tranfer = true
+	}
 	self.specials.c_keys = {
 		text_id = "hud_int_equipment_c_keys",
 		icon = "equipment_generic_key",

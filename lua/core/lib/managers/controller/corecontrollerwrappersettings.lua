@@ -240,6 +240,9 @@ function ControllerWrapperConnection:init(node)
 		if node.any_input == false then
 			self._single_input = true
 		end
+		if node.unique == true then
+			self._unique = true
+		end
 		self._delay = tonumber(node.delay)
 		self._min_src_range = tonumber(node.min_src_range)
 		self._max_src_range = tonumber(node.max_src_range)
@@ -436,6 +439,10 @@ function ControllerWrapperConnection:populate_data_attributes(sub_data)
 			sub_data[attribute] = input_name
 		end
 	end
+end
+
+function ControllerWrapperConnection:get_unique()
+	return self._unique
 end
 
 function ControllerWrapperConnection:__tostring(additional_info)

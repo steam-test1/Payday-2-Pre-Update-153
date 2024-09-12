@@ -81,9 +81,10 @@ function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_coun
 	local unit_type = unit:base()._tweak_table
 	local is_gangster = unit:character_damage().is_gangster(unit_type)
 	local is_cop = unit:character_damage().is_cop(unit_type)
+	local is_civilian = unit:character_damage().is_civilian(unit_type)
 	local weapon_id = tweak_data.blackmarket.projectiles[self:projectile_entry()].weapon_id
 	local is_crouching = alive(managers.player:player_unit()) and managers.player:player_unit():movement() and managers.player:player_unit():movement():crouching()
-	local count_pass, grenade_type_pass, kill_pass, distance_pass, enemy_pass, enemies_pass, flying_strike_pass, timer_pass, difficulty_pass, job_pass, crouching_pass, session_kill_pass, all_pass, memory
+	local count_pass, grenade_type_pass, kill_pass, distance_pass, enemy_pass, enemies_pass, flying_strike_pass, timer_pass, difficulty_pass, job_pass, crouching_pass, session_kill_pass, is_civilian_pass, all_pass, memory
 	for achievement, achievement_data in pairs(tweak_data.achievement.grenade_achievements) do
 		count_pass = not achievement_data.count or (achievement_data.kill and kill_count or hit_count) >= achievement_data.count
 		grenade_type_pass = not achievement_data.grenade_type or achievement_data.grenade_type == self:projectile_entry()
@@ -94,6 +95,7 @@ function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_coun
 		job_pass = not achievement_data.job or managers.job:current_real_job_id() == achievement_data.job
 		crouching_pass = not achievement_data.crouching or is_crouching
 		session_kill_pass = not achievement_data.session_kills or managers.statistics:session_killed_by_projectile(achievement_data.grenade_type) >= achievement_data.session_kills
+		is_civilian_pass = achievement_data.is_civilian == nil and true or achievement_data.is_civilian == is_civilian
 		flying_strike_pass = not achievement_data.flying_strike
 		if unit_type == "spooc" then
 			local spooc_action = unit:movement()._active_actions[1]
@@ -126,7 +128,7 @@ function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_coun
 				managers.job:set_memory(memory_name, {t}, true)
 			end
 		end
-		all_pass = count_pass and grenade_type_pass and kill_pass and distance_pass and enemy_pass and enemies_pass and flying_strike_pass and timer_pass and difficulty_pass and job_pass and crouching_pass and session_kill_pass
+		all_pass = count_pass and grenade_type_pass and kill_pass and distance_pass and enemy_pass and enemies_pass and flying_strike_pass and timer_pass and difficulty_pass and job_pass and crouching_pass and session_kill_pass and is_civilian_pass
 		if all_pass then
 			if achievement_data.success then
 				if achievement_data.stat then

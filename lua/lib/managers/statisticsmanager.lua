@@ -1821,7 +1821,7 @@ end
 function StatisticsManager:session_killed_by_weapon_category_except(category_table)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
-		local category = tweak_data:get_raw_value("weapon", weapon_id, "category")
+		local category = tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category")
 		if not table.contains(category_table, category) then
 			count = count + data.count
 		end
@@ -1845,20 +1845,37 @@ function StatisticsManager:session_anyone_used_weapons()
 end
 
 function StatisticsManager:session_anyone_used_weapon(weapon_id)
-	return self._global.session.used_weapons[weapon_id]
+	return self._global.session.used_weapons[string.gsub(weapon_id, "_npc", "")]
+end
+
+function StatisticsManager:_session_anyone_used_weapon_except(weapon_id)
+	for id in pairs(self._global.session.used_weapons) do
+		if string.gsub(id, "_npc", "") ~= string.gsub(weapon_id, "_npc", "") then
+			return true
+		end
+	end
 end
 
 function StatisticsManager:session_anyone_used_weapon_except(weapon_id)
-	for id in pairs(self._global.session.used_weapons) do
-		if id ~= weapon_id then
-			return true
+	if type(weapon_id) == "table" then
+		for id in pairs(self._global.session.used_weapons) do
+			if not table.contains(weapon_id, string.gsub(id, "_npc", "")) then
+				return true
+			end
+		end
+		return false
+	else
+		for id in pairs(self._global.session.used_weapons) do
+			if id ~= string.gsub(weapon_id, "_npc", "") then
+				return true
+			end
 		end
 	end
 end
 
 function StatisticsManager:session_anyone_used_weapon_category(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", weapon_id, "category") == category then
+		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") == category then
 			return true
 		end
 	end
@@ -1866,7 +1883,7 @@ end
 
 function StatisticsManager:session_anyone_used_weapon_category_except(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", weapon_id, "category") ~= category then
+		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") ~= category then
 			return true
 		end
 	end

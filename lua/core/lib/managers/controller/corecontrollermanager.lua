@@ -568,10 +568,10 @@ function ControllerManager:verify_parsed_controller_setup_map(parsed_controller_
 	local last_wrapper_type
 	for wrapper_type, setup in pairs(parsed_controller_setup_map) do
 		local current_connection_map = setup:get_connection_map()
-		for connection_name in pairs(current_connection_map) do
+		for connection_name, connection in pairs(current_connection_map) do
 			if not last_wrapper_type then
 				connection_map[connection_name] = wrapper_type
-			elseif not connection_map[connection_name] then
+			elseif not connection:get_unique() and not connection_map[connection_name] then
 				Application:error("Controller settings for \"" .. tostring(last_wrapper_type) .. "\" doesn't have a connection called \"" .. tostring(connection_name) .. "\" in \"" .. tostring(path) .. "." .. tostring(self.CONTROLLER_SETTINGS_TYPE) .. "\". It was last specified in \"" .. tostring(wrapper_type) .. "\".")
 				connection_map[connection_name] = wrapper_type
 				result = false

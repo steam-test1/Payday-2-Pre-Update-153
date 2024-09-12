@@ -1519,7 +1519,8 @@ Play the full version soon to get your full PAYDAY!]],
 			grenade_type = "wpn_prj_target",
 			crouching = true,
 			kill = true,
-			success = true
+			success = true,
+			is_civilian = false
 		},
 		any_kills = {challenge_stat = "any_kills", kill = true},
 		any_sniper_kills = {
@@ -1869,7 +1870,15 @@ Play the full version soon to get your full PAYDAY!]],
 			stat = "pim_3_stats",
 			weapon = "schakal",
 			difficulty = overkill_and_above,
-			level_id = "mad"
+			level_id = "mad",
+			enemies = {
+				"sniper",
+				"shield",
+				"taser",
+				"tank",
+				"spooc",
+				"medic"
+			}
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -3167,7 +3176,7 @@ Play the full version soon to get your full PAYDAY!]],
 			job = "firestarter",
 			need_full_job = true,
 			difficulty = overkill_and_above,
-			shots_by_weapon = "packrat",
+			shots_by_weapon = {"packrat", "x_packrat"},
 			everyone_killed_by_melee = 0,
 			everyone_killed_by_grenade = 0
 		},
@@ -3420,7 +3429,7 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "trophy_jfk",
 			job = "man",
 			difficulty = overkill_and_above,
-			everyone_killed_by_weapon_category = {"snp"},
+			everyone_used_weapon_category = "snp",
 			everyone_killed_by_melee = 0,
 			everyone_killed_by_grenade = 0,
 			equipped_team = {
@@ -5038,7 +5047,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.wpn_prj_ace.sounds.flyby_stop = "throwing_star_flyby_stop"
 	self.projectiles.wpn_prj_ace.sounds.impact = "throwables_impact_gen"
 	self.projectiles.wpn_prj_jav = {}
-	self.projectiles.wpn_prj_jav.damage = 750
+	self.projectiles.wpn_prj_jav.damage = 325
 	self.projectiles.wpn_prj_jav.launch_speed = 1500
 	self.projectiles.wpn_prj_jav.adjust_z = 30
 	self.projectiles.wpn_prj_jav.mass_look_up_modifier = 1
