@@ -38,14 +38,6 @@ function PlayerCarry:_enter(enter_data)
 			self:_start_action_equip(self.IDS_EQUIP)
 		end
 	end
-	if not self._state_data.ducking then
-		self._ext_movement:set_attention_settings({
-			"pl_friend_combatant_cbt",
-			"pl_friend_non_combatant_cbt",
-			"pl_foe_combatant_cbt_stand",
-			"pl_foe_non_combatant_cbt_stand"
-		})
-	end
 	managers.job:set_memory("kill_count_carry", nil, true)
 	managers.job:set_memory("kill_count_no_carry", nil, true)
 end
@@ -119,10 +111,12 @@ function PlayerCarry:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_equip(t, input)
 	if not new_action then
 		new_action = self:_check_action_primary_attack(t, input)
+		if not new_action then
+			self:_check_stop_shooting()
+		end
 		self._shooting = new_action
 	end
 	new_action = new_action or self:_check_action_throw_projectile(t, input)
-	new_action = new_action or self:_check_action_pickup_sentry(t, input)
 	self:_check_action_interact(t, input)
 	self:_check_action_jump(t, input)
 	self:_check_action_run(t, input)

@@ -9,17 +9,17 @@ require("lib/tweak_data/blackmarket/WeaponSkinsTweakData")
 local is_nextgen_console = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
 
 function BlackMarketTweakData:init(tweak_data)
-	self:_init_colors()
-	self:_init_materials()
-	self:_init_textures()
-	self:_init_masks()
-	self:_init_characters()
+	self:_init_colors(tweak_data)
+	self:_init_materials(tweak_data)
+	self:_init_textures(tweak_data)
+	self:_init_masks(tweak_data)
+	self:_init_characters(tweak_data)
 	self:_init_cash()
 	self:_init_xp()
 	self:_init_armors()
 	self:_init_deployables(tweak_data)
-	self:_init_projectiles()
-	self:_init_melee_weapons()
+	self:_init_projectiles(tweak_data)
+	self:_init_melee_weapons(tweak_data)
 	self:_init_weapon_skins()
 	self:_init_weapon_mods(tweak_data)
 end
@@ -66,7 +66,7 @@ function BlackMarketTweakData:_init_weapon_mods(tweak_data)
 	self:_add_desc_from_name_macro(self.weapon_mods)
 end
 
-function BlackMarketTweakData:_init_characters()
+function BlackMarketTweakData:_init_characters(tweak_data)
 	self.characters = {}
 	self.characters.locked = {}
 	self.characters.locked.fps_unit = "units/payday2/characters/fps_mover/fps_mover"
@@ -238,8 +238,17 @@ function BlackMarketTweakData:_init_characters()
 	self.characters.ai_wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/wild_1/npc_criminal_wild_1"
 	self.characters.ai_wild.sequence = "var_mtr_wild"
 	self.characters.ai_wild.name_id = "bm_character_ai_wild"
-	self:give_free_dlcs(self.characters)
-	self:give_free_dlcs(self.characters.locked)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.characters) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
+	for _, data in pairs(self.characters.locked) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end
 
 function BlackMarketTweakData:_init_cash()
@@ -471,13 +480,4 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.bodybags_bag = {}
 	self.deployables.bodybags_bag.name_id = "bm_equipment_bodybags_bag"
 	self:_add_desc_from_name_macro(self.deployables)
-end
-
-function BlackMarketTweakData:give_free_dlcs(data_list)
-	local free_dlcs = {}
-	for _, data in pairs(data_list) do
-		if free_dlcs[data.dlc] then
-			data.dlc = nil
-		end
-	end
 end

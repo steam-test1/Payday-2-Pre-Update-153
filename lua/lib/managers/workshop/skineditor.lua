@@ -114,32 +114,35 @@ function SkinEditor:save_skin(skin, name, data)
 	self._unsaved = false
 end
 
-function SkinEditor:publish_skin(skin, title, desc, changelog, callback)
+function SkinEditor:publish_skin(skin, title, desc, changelog, callb)
+	if skin:is_submitting() then
+		return
+	end
+	
 	local function cb(result)
 		if result == "success" then
 			local id = managers.blackmarket:skin_editor():get_current_skin():id()
-			
 			if id then
 				Steam:overlay_activate("url", "steam://url/CommunityFilePage/" .. id)
 			end
 		else
 			local dialog_data = {}
 			dialog_data.title = managers.localization:text("dialog_error_title")
-			dialog_data.text = managers.localization:text("debug_wskn_submit_failed") .. "\n" .. result
+			local result_text = managers.localization:exists(result) and managers.localization:text(result) or result
+			dialog_data.text = managers.localization:text("debug_wskn_submit_failed") .. "\n" .. result_text
 			local ok_button = {}
 			ok_button.text = managers.localization:text("dialog_ok")
-			ok_button.callback_func = callback(self, self, "_dialog_ok")
 			dialog_data.button_list = {ok_button}
 			managers.system_menu:show(dialog_data)
 		end
-		if SystemFS:exists(Application:nice_path(skin:staging_path(), false)) then
+		if SystemFS:exists(Application:nice_path(skin:staging_path(), false)) and Application:nice_path(skin:staging_path(), false) ~= Application:nice_path(skin:path(), false) then
 			SystemFS:delete_file(Application:nice_path(skin:staging_path(), false))
 		end
 		if SystemFS:exists(Application:nice_path(skin:path(), true) .. "preview.png") then
 			SystemFS:delete_file(Application:nice_path(skin:path(), true) .. "preview.png")
 		end
-		if callback then
-			callback(result)
+		if callb then
+			callb(result)
 		end
 		if self._publish_bar then
 			self._publish_bar:remove()
@@ -567,7 +570,7 @@ end
 function SkinEditor:get_current_weapon_tags()
 	local tags = {}
 	table.insert(tags, "Weapon")
-	if self._category == "primary" then
+	if self._category == "primaries" then
 		table.insert(tags, "Primary")
 	else
 		table.insert(tags, "Secondary")
@@ -582,7 +585,7 @@ function SkinEditor:get_current_weapon_tags()
 	elseif sub_category == "akimbo" then
 		table.insert(tags, "AKIMBO")
 	elseif sub_category == "shotgun" then
-		if self._category == "primary" then
+		if self._category == "primaries" then
 			table.insert(tags, "Shotgun")
 		else
 			table.insert(tags, "Shotgun - Secondary")
@@ -595,7 +598,7 @@ function SkinEditor:get_current_weapon_tags()
 		table.insert(tags, "Submachine Gun")
 	elseif sub_category == "pistol" then
 		table.insert(tags, "Pistol")
-	elseif self._category == "primary" then
+	elseif self._category == "primaries" then
 		table.insert(tags, "Special")
 	else
 		table.insert(tags, "Special - Secondary")

@@ -1,12 +1,33 @@
 function CoreEditor:build_configuration()
 	self._config = {}
 	
-	local frame_size_height = 200
-	local frame_size_width = 300
+	local frame_size_height = 400
+	local frame_size_width = 500
 	self._configuration = EWS:Dialog(nil, "Configuration", "_configuration", Vector3(-1, -1, 0), Vector3(frame_size_width, frame_size_height), "")
 	local main_sizer = EWS:BoxSizer("VERTICAL")
 	self._configuration:set_sizer(main_sizer)
 	local notebook = EWS:Notebook(self._configuration, "_notebook", "NB_TOP,NB_MULTILINE")
+	self:_add_general_page(notebook)
+	self:_add_backup_page(notebook)
+	self:_add_edit_page(notebook)
+	self:_add_notes_page(notebook)
+	self:_add_slave_page(notebook)
+	main_sizer:add(notebook, 1, 0, "EXPAND")
+	local buttons_sizer = EWS:BoxSizer("HORIZONTAL")
+	local ok_button = EWS:Button(self._configuration, "OK", "", "")
+	ok_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_ok"), self._configuration)
+	buttons_sizer:add(ok_button, 0, 0, "EXPAND")
+	local cancel_button = EWS:Button(self._configuration, "Cancel", "", "")
+	cancel_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_cancel"), self._configuration)
+	buttons_sizer:add(cancel_button, 0, 0, "EXPAND")
+	local apply_button = EWS:Button(self._configuration, "Apply", "", "")
+	apply_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_apply"), self._configuration)
+	buttons_sizer:add(apply_button, 0, 0, "EXPAND")
+	main_sizer:add(buttons_sizer, 0, 0, "ALIGN_RIGHT")
+	notebook:fit()
+end
+
+function CoreEditor:_add_general_page(notebook)
 	local page_general = EWS:Panel(notebook, "_general", "")
 	local general_sizer = EWS:StaticBoxSizer(page_general, "VERTICAL", "")
 	page_general:set_sizer(general_sizer)
@@ -18,11 +39,26 @@ function CoreEditor:build_configuration()
 	reset_camera_on_new:set_value(self._reset_camera_on_new)
 	self._config._reset_camera_on_new = reset_camera_on_new
 	general_sizer:add(reset_camera_on_new, 0, 0, "EXPAND")
-	local use_bet_undo = EWS:CheckBox(page_general, "Use Beta Undo", "")
-	use_bet_undo:set_value(self._use_beta_undo)
-	self._config._use_beta_undo = use_bet_undo
-	general_sizer:add(use_bet_undo, 0, 0, "EXPAND")
+	local undo_sizer = EWS:StaticBoxSizer(page_general, "VERTICAL", "Undo [Beta]:")
+	local use_beta_undo = EWS:CheckBox(page_general, "Enable Undo", "")
+	use_beta_undo:set_value(self._use_beta_undo)
+	self._config._use_beta_undo = use_beta_undo
+	undo_sizer:add(use_beta_undo, 0, 0, "EXPAND")
+	local undo_debug_mode = EWS:CheckBox(page_general, "Verbose Undo", "")
+	undo_debug_mode:set_value(self._undo_debug)
+	self._config._undo_debug = undo_debug_mode
+	undo_sizer:add(undo_debug_mode, 0, 0, "EXPAND")
+	local undo_history_spinner = EWS:StaticBoxSizer(page_general, "VERTICAL", "Undo History Size:")
+	local undo_history_spin = EWS:SpinCtrl(page_general, self._undo_history, "_undo_history_spin", "")
+	undo_history_spin:set_range(1, 1000)
+	self._config._undo_history = undo_history_spin
+	undo_history_spinner:add(undo_history_spin, 0, 0, "ALIGN_RIGHT")
+	undo_sizer:add(undo_history_spinner, 0, 0, "EXPAND")
+	general_sizer:add(undo_sizer, 1, 0, "EXPAND")
 	notebook:add_page(page_general, "General", true)
+end
+
+function CoreEditor:_add_backup_page(notebook)
 	local page_backup = EWS:Panel(notebook, "_backup", "")
 	local backup_sizer = EWS:BoxSizer("VERTICAL")
 	page_backup:set_sizer(backup_sizer)
@@ -35,6 +71,9 @@ function CoreEditor:build_configuration()
 	autosave_sizer:add(autosave_spin_sizer, 0, 0, "EXPAND")
 	backup_sizer:add(autosave_sizer, 1, 0, "EXPAND")
 	notebook:add_page(page_backup, "Backup", false)
+end
+
+function CoreEditor:_add_edit_page(notebook)
 	local page_edit = EWS:Panel(notebook, "_edit", "")
 	local edit_sizer = EWS:StaticBoxSizer(page_edit, "VERTICAL", "")
 	page_edit:set_sizer(edit_sizer)
@@ -59,6 +98,9 @@ function CoreEditor:build_configuration()
 	self._config._save_dialog_states = save_dialog_states
 	edit_sizer:add(save_dialog_states, 0, 0, "EXPAND")
 	notebook:add_page(page_edit, "Edit", false)
+end
+
+function CoreEditor:_add_notes_page(notebook)
 	local page_notes = EWS:Panel(notebook, "_notes", "")
 	local notes_sizer = EWS:StaticBoxSizer(page_notes, "VERTICAL", "")
 	page_notes:set_sizer(notes_sizer)
@@ -66,6 +108,9 @@ function CoreEditor:build_configuration()
 	self._config._notes = note_text
 	notes_sizer:add(note_text, 1, 0, "EXPAND")
 	notebook:add_page(page_notes, "Notes", false)
+end
+
+function CoreEditor:_add_slave_page(notebook)
 	local page_slave = EWS:Panel(notebook, "_slave", "")
 	local slave_page_sizer = EWS:BoxSizer("VERTICAL")
 	page_slave:set_sizer(slave_page_sizer)
@@ -91,19 +136,6 @@ function CoreEditor:build_configuration()
 	slave_sizer:add(slave_batches_sizer, 0, 0, "EXPAND")
 	slave_page_sizer:add(slave_sizer, 1, 0, "EXPAND")
 	notebook:add_page(page_slave, "Slave System", false)
-	main_sizer:add(notebook, 1, 0, "EXPAND")
-	local buttons_sizer = EWS:BoxSizer("HORIZONTAL")
-	local ok_button = EWS:Button(self._configuration, "OK", "", "")
-	ok_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_ok"), self._configuration)
-	buttons_sizer:add(ok_button, 0, 0, "EXPAND")
-	local cancel_button = EWS:Button(self._configuration, "Cancel", "", "")
-	cancel_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_cancel"), self._configuration)
-	buttons_sizer:add(cancel_button, 0, 0, "EXPAND")
-	local apply_button = EWS:Button(self._configuration, "Apply", "", "")
-	apply_button:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_configuration_apply"), self._configuration)
-	buttons_sizer:add(apply_button, 0, 0, "EXPAND")
-	main_sizer:add(buttons_sizer, 0, 0, "ALIGN_RIGHT")
-	notebook:fit()
 end
 
 function CoreEditor:on_configuration_ok()

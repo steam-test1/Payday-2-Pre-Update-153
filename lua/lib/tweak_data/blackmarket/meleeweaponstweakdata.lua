@@ -1,4 +1,4 @@
-function BlackMarketTweakData:_init_melee_weapons()
+function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons = {}
 	
 	self.melee_weapons.weapon = {}
@@ -2131,6 +2131,11 @@ function BlackMarketTweakData:_init_melee_weapons()
 		var4_attack = {anim = "var2"},
 		charge = {anim = "charge", loop = true}
 	}
-	self:give_free_dlcs(self.melee_weapons)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.melee_weapons) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 	self:_add_desc_from_name_macro(self.melee_weapons)
 end

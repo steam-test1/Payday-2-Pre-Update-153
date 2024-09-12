@@ -227,6 +227,13 @@ function LootManager:check_secured_mandatory_bags()
 	return amount >= self._global.mandatory_bags.amount
 end
 
+function LootManager:add_saved_bags_to_secured()
+	for _, data in ipairs(self._global.distribute) do
+		table.insert(self._global.secured, data)
+	end
+	self._global.distribute = {}
+end
+
 function LootManager:get_secured_mandatory_bags_amount(is_vehicle)
 	local mandatory_bags_amount = self._global.mandatory_bags.amount or 0
 	if mandatory_bags_amount == 0 then

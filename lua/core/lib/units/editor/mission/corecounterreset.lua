@@ -1,4 +1,5 @@
 CoreCounterResetUnitElement = CoreCounterResetUnitElement or class(MissionElement)
+CoreCounterResetUnitElement.LINK_ELEMENTS = {"elements"}
 CounterResetUnitElement = CounterResetUnitElement or class(CoreCounterResetUnitElement)
 
 function CounterResetUnitElement:init(...)
@@ -41,15 +42,6 @@ function CoreCounterResetUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreCounterResetUnitElement:remove_links(unit)
-	MissionElement.remove_links(self, unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

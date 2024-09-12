@@ -6,7 +6,7 @@ function AkimboWeaponBase:init(...)
 	self._manual_fire_second_gun = self:weapon_tweak_data().manual_fire_second_gun
 end
 
-function AkimboWeaponBase:_create_second_gun()
+function AkimboWeaponBase:_create_second_gun(unit_name)
 	local factory_weapon = tweak_data.weapon.factory[self._factory_id]
 	local ids_unit_name = Idstring(factory_weapon.unit)
 	local new_unit = World:spawn_unit(ids_unit_name, Vector3(), Rotation())
@@ -20,7 +20,7 @@ function AkimboWeaponBase:_create_second_gun()
 	end
 	if self._blueprint then
 		new_unit:base():assemble_from_blueprint(self._factory_id, self._blueprint)
-	else
+	elseif not unit_name then
 		new_unit:base():assemble(self._factory_id)
 	end
 	self._second_gun = new_unit
@@ -45,8 +45,8 @@ function AkimboWeaponBase:toggle_firemode(skip_post_event)
 	return false
 end
 
-function AkimboWeaponBase:create_second_gun()
-	self:_create_second_gun()
+function AkimboWeaponBase:create_second_gun(create_second_gun)
+	self:_create_second_gun(create_second_gun)
 	self._setup.user_unit:camera()._camera_unit:link(Idstring("a_weapon_left"), self._second_gun, self._second_gun:orientation_object():name())
 end
 
@@ -161,8 +161,8 @@ function NPCAkimboWeaponBase:init(...)
 	self._manual_fire_second_gun = self:weapon_tweak_data().manual_fire_second_gun
 end
 
-function NPCAkimboWeaponBase:create_second_gun()
-	AkimboWeaponBase._create_second_gun(self)
+function NPCAkimboWeaponBase:create_second_gun(create_second_gun)
+	AkimboWeaponBase._create_second_gun(self, create_second_gun)
 	self._setup.user_unit:link(Idstring("a_weapon_left_front"), self._second_gun, self._second_gun:orientation_object():name())
 end
 
@@ -233,4 +233,73 @@ function NPCAkimboWeaponBase:destroy(...)
 	if alive(self._second_gun) then
 		self._second_gun:set_slot(0)
 	end
+end
+
+EnemyAkimboWeaponBase = EnemyAkimboWeaponBase or class(NPCRaycastWeaponBase)
+EnemyAkimboWeaponBase.AKIMBO = true
+
+function EnemyAkimboWeaponBase:init(...)
+	NPCRaycastWeaponBase.init(self, ...)
+end
+
+function EnemyAkimboWeaponBase:create_second_gun(unit_name)
+	local new_unit = World:spawn_unit(unit_name, Vector3(), Rotation())
+	if self._cosmetics_id then
+		new_unit:base():set_cosmetics_data({
+			id = self._cosmetics_id,
+			quality = self._cosmetics_quality,
+			bonus = self._cosmetics_bonus
+		})
+	end
+	self._second_gun = new_unit
+	self._second_gun:base().SKIP_AMMO = true
+	self._second_gun:base().parent_weapon = self._unit
+	new_unit:base():setup(self._setup)
+	if self._enabled then
+		self._second_gun:base():on_enabled()
+	else
+		self._second_gun:base():on_disabled()
+	end
+	self._setup.user_unit:link(Idstring("a_weapon_left_front"), self._second_gun, self._second_gun:orientation_object():name())
+	self._muzzle_effect_table_second = {}
+	self._muzzle_effect_table_second.effect = self._muzzle_effect_table.effect
+	self._muzzle_effect_table_second.force_synch = self._muzzle_effect_table.force_synch
+	self._muzzle_effect_table_second.parent = self._second_gun:get_object(Idstring("fire"))
+end
+
+function EnemyAkimboWeaponBase:_spawn_muzzle_effect(from_pos, direction)
+	World:effect_manager():spawn(self._muzzle_effect_table_second)
+	RaycastWeaponBase._spawn_muzzle_effect(self, from_pos, direction)
+end
+
+function EnemyAkimboWeaponBase:tweak_data_anim_play(anim, ...)
+	local animations = self:weapon_tweak_data().animations
+	if animations and animations[anim] then
+		self:anim_play(animations[anim], ...)
+		return RaycastWeaponBase.tweak_data_anim_play(self, anim, ...)
+	end
+	return RaycastWeaponBase.tweak_data_anim_play(self, anim, ...)
+end
+
+function EnemyAkimboWeaponBase:anim_play(anim, speed_multiplier)
+	print("anim oookay ", anim)
+	if anim then
+		local length = self._unit:anim_length(Idstring(anim))
+		speed_multiplier = speed_multiplier or 1
+		self._second_gun:anim_stop(Idstring(anim))
+		self._second_gun:anim_play_to(Idstring(anim), length, speed_multiplier)
+	end
+end
+
+function EnemyAkimboWeaponBase:tweak_data_anim_stop(anim, ...)
+	local animations = self:weapon_tweak_data().animations
+	if animations and animations[anim] then
+		self:anim_stop(self:weapon_tweak_data().animations[anim], ...)
+		return RaycastWeaponBase.tweak_data_anim_stop(self, anim, ...)
+	end
+	return RaycastWeaponBase.tweak_data_anim_stop(self, anim, ...)
+end
+
+function EnemyAkimboWeaponBase:anim_stop(anim)
+	self._second_gun:anim_stop(Idstring(anim))
 end

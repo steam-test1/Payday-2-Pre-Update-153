@@ -1,8 +1,13 @@
 CriminalsManager = CriminalsManager or class()
 CriminalsManager.MAX_NR_TEAM_AI = 2
 CriminalsManager.MAX_NR_CRIMINALS = 4
+CriminalsManager.EVENTS = {
+	"on_criminal_added",
+	"on_criminal_removed"
+}
 
 function CriminalsManager:init()
+	self._listener_holder = EventListenerHolder:new()
 	self:_create_characters()
 end
 
@@ -20,6 +25,19 @@ function CriminalsManager:_create_characters()
 		}
 		table.insert(self._characters, character_data)
 	end
+end
+
+function CriminalsManager:event_listener()
+	self._listener_holder = self._listener_holder or EventListenerHolder:new()
+	return self._listener_holder
+end
+
+function CriminalsManager:add_listener(key, events, clbk)
+	self:event_listener():add(key, events, clbk)
+end
+
+function CriminalsManager:remove_listener(key)
+	self:event_listener():remove(key)
 end
 
 function CriminalsManager.convert_old_to_new_character_workname(workname)
@@ -48,6 +66,7 @@ function CriminalsManager:on_simulation_ended()
 	for id, data in pairs(self._characters) do
 		self:_remove(id)
 	end
+	self._listener_holder = EventListenerHolder:new()
 end
 
 function CriminalsManager:local_character_name()
@@ -138,6 +157,7 @@ function CriminalsManager:_remove(id)
 	data.unit = nil
 	data.peer_id = 0
 	data.data = {}
+	self:event_listener():call("on_criminal_removed", data)
 end
 
 function CriminalsManager:add_character(name, unit, peer_id, ai)
@@ -177,6 +197,7 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 			break
 		end
 	end
+	self:event_listener():call("on_criminal_added", name, unit, peer_id, ai)
 end
 
 function CriminalsManager:set_unit(name, unit)
@@ -484,4 +505,9 @@ function CriminalsManager:is_character_as_AI_level_blocked(name)
 	end
 	local block_AIs = tweak_data.levels[Global.game_settings.level_id].block_AIs
 	return block_AIs and block_AIs[name] or false
+end
+
+function CriminalsManager:get_team_ai_character(index)
+	local char_name = self:get_free_character_name()
+	return char_name
 end

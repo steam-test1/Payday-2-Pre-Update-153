@@ -533,6 +533,7 @@ function NetworkMatchMakingXBL:_join_by_smartmatch(job_id_filter, difficulty_fil
 		XboxLive:delete_session(self._session)
 		self._session = nil
 	end
+	XboxLive:clear_sessions()
 	XboxLive:set_context("GAME_TYPE", "STANDARD")
 	XboxLive:set_context("game_mode", "ONLINE")
 	self._hopper_variables = {
@@ -631,7 +632,7 @@ function NetworkMatchMakingXBL:clbk_join_session_result(status)
 		end
 		return
 	end
-	self._server_rpc = Network:handshake(self._session:ip(), managers.network.DEFAULT_PORT, "TCP_IP")
+	self._server_rpc = self._session and Network:handshake(self._session:ip(), managers.network.DEFAULT_PORT, "TCP_IP")
 	print(" Server RPC:", self._server_rpc and self._server_rpc:ip_at_index(0))
 	if not self._server_rpc then
 		self:leave_game()
@@ -719,6 +720,7 @@ function NetworkMatchMakingXBL:join_server(session_id, server, skip_showing_dial
 		XboxLive:leave_local(self._session, player_index)
 		XboxLive:delete_session(self._session)
 	end
+	XboxLive:clear_sessions()
 	XboxLive:set_context("GAME_TYPE", "STANDARD")
 	XboxLive:set_context("game_mode", "ONLINE")
 	local permission = server.open_private_slots > 0 and "private" or "public"

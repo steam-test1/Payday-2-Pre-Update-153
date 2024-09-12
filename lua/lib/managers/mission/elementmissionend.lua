@@ -12,19 +12,19 @@ function ElementMissionEnd:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	if self._values.state ~= "none" then
+	if self._values.state ~= "none" and managers.platform:presence() == "Playing" then
 		if self._values.state == "success" then
-			if managers.platform:presence() == "Playing" then
-				local num_winners = managers.network:session():amount_of_alive_players()
-				managers.network:session():send_to_peers("mission_ended", true, num_winners)
-				game_state_machine:change_state_by_name("victoryscreen", {
-					num_winners = num_winners,
-					personal_win = alive(managers.player:player_unit())
-				})
-			end
+			local num_winners = managers.network:session():amount_of_alive_players()
+			managers.network:session():send_to_peers("mission_ended", true, num_winners)
+			game_state_machine:change_state_by_name("victoryscreen", {
+				num_winners = num_winners,
+				personal_win = alive(managers.player:player_unit())
+			})
 		elseif self._values.state == "failed" then
 			print("No fail state yet")
-		elseif self._values.state == "leave_safehouse" and managers.platform:presence() == "Playing" then
+		elseif self._values.state == "leave" then
+			MenuCallbackHandler:leave_mission()
+		elseif self._values.state == "leave_safehouse" then
 			MenuCallbackHandler:leave_safehouse()
 		end
 	elseif Application:editor() then

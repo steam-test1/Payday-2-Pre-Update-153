@@ -312,7 +312,11 @@ end
 
 function CoreSetup:__paused_update(t, dt)
 	managers.viewport:paused_update(t, dt)
-	managers.controller:paused_update(t, dt)
+	if SystemInfo:platform() == Idstring("XB1") then
+		managers.controller:update(t, dt)
+	else
+		managers.controller:paused_update(t, dt)
+	end
 	managers.cutscene:paused_update(t, dt)
 	managers.overlay_effect:paused_update(t, dt)
 	managers.slave:paused_update(t, dt)

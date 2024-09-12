@@ -1709,6 +1709,17 @@ function GuiTweakData:init()
 			icon = "guis/textures/pd2/crimenet_challenge"
 		})
 	end
+	if SystemInfo:platform() == Idstring("WIN32") then
+		table.insert(self.crime_net.special_contracts, {
+			id = "challenge",
+			name_id = "menu_cn_challenge",
+			desc_id = "menu_cn_challenge_desc",
+			menu_node = "crimenet_contract_challenge",
+			x = 347,
+			y = 716,
+			icon = "guis/textures/pd2/crimenet_challenge"
+		})
+	end
 	self.crime_net.codex = {
 		{
 			id = "contacts",

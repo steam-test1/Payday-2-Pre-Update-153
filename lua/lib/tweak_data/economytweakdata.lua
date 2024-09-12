@@ -576,7 +576,7 @@ function EconomyTweakData:init()
 	self.drills.event_red = {}
 	self.drills.event_red.safe = "event_red"
 	self.drills.event_red.def_id = 70003
-	self.drills.event_red.promo = true
+	self.drills.event_red.force_include = true
 	self.drills.event_red.unit_name = "units/payday2_cash/safes/red/drill/eco_drill_event_red"
 	self.drills.event_red.name_id = "bm_menu_drill_event_red"
 	self.drills.event_red.desc_id = "bm_menu_drill_event_red_desc"
@@ -585,7 +585,7 @@ function EconomyTweakData:init()
 	self.drills.event_dinner = {}
 	self.drills.event_dinner.def_id = 70004
 	self.drills.event_dinner.safe = "event_dinner"
-	self.drills.event_dinner.promo = true
+	self.drills.event_dinner.force_include = true
 	self.drills.event_dinner.unit_name = "units/payday2_cash/safes/dinner/drill/eco_drill_event_dinner"
 	self.drills.event_dinner.name_id = "bm_menu_drill_event_dinner"
 	self.drills.event_dinner.desc_id = "bm_menu_drill_event_dinner_desc"
@@ -610,7 +610,7 @@ function EconomyTweakData:init()
 	self.drills.event_flake = {}
 	self.drills.event_flake.def_id = 70007
 	self.drills.event_flake.safe = "event_flake"
-	self.drills.event_flake.promo = true
+	self.drills.event_flake.force_include = true
 	self.drills.event_flake.unit_name = "units/payday2_cash/safes/flake/drill/eco_drill_flake"
 	self.drills.event_flake.name_id = "bm_menu_drill_event_flake"
 	self.drills.event_flake.desc_id = "bm_menu_drill_event_flake_desc"
@@ -619,7 +619,7 @@ function EconomyTweakData:init()
 	self.drills.event_bah = {}
 	self.drills.event_bah.def_id = 70008
 	self.drills.event_bah.safe = "event_bah"
-	self.drills.event_bah.promo = true
+	self.drills.event_bah.force_include = true
 	self.drills.event_bah.unit_name = "units/payday2_cash/safes/bah/drill/eco_drill_bah"
 	self.drills.event_bah.name_id = "bm_menu_drill_event_bah"
 	self.drills.event_bah.desc_id = "bm_menu_drill_event_bah_desc"

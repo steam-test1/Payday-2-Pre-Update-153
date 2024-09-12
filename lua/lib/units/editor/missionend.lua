@@ -14,6 +14,7 @@ function MissionEndUnitElement:_build_panel(panel, panel_sizer)
 		"none",
 		"success",
 		"failed",
+		"leave",
 		"leave_safehouse"
 	})
 end

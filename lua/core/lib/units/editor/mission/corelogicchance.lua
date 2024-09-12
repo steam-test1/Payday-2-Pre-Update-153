@@ -23,6 +23,7 @@ function CoreLogicChanceUnitElement:_build_panel(panel, panel_sizer)
 end
 
 CoreLogicChanceOperatorUnitElement = CoreLogicChanceOperatorUnitElement or class(MissionElement)
+CoreLogicChanceOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 LogicChanceOperatorUnitElement = LogicChanceOperatorUnitElement or class(CoreLogicChanceOperatorUnitElement)
 
 function LogicChanceOperatorUnitElement:init(...)
@@ -76,14 +77,6 @@ function CoreLogicChanceOperatorUnitElement:add_element()
 	end
 end
 
-function CoreLogicChanceOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
-		end
-	end
-end
-
 function CoreLogicChanceOperatorUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
 end
@@ -112,6 +105,7 @@ function CoreLogicChanceOperatorUnitElement:_build_panel(panel, panel_sizer)
 end
 
 CoreLogicChanceTriggerUnitElement = CoreLogicChanceTriggerUnitElement or class(MissionElement)
+CoreLogicChanceTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 LogicChanceTriggerUnitElement = LogicChanceTriggerUnitElement or class(CoreLogicChanceTriggerUnitElement)
 
 function LogicChanceTriggerUnitElement:init(...)
@@ -159,14 +153,6 @@ function CoreLogicChanceTriggerUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreLogicChanceTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

@@ -37,6 +37,9 @@ function CopInventory:add_unit_by_name(new_unit_name, equip)
 	setup_data.alert_AI = true
 	setup_data.alert_filter = self._unit:brain():SO_access()
 	new_unit:base():setup(setup_data)
+	if new_unit:base().AKIMBO then
+		new_unit:base():create_second_gun(new_unit_name)
+	end
 	self:add_unit(new_unit, equip)
 end
 
@@ -52,6 +55,8 @@ end
 
 function CopInventory:add_unit(new_unit, equip)
 	CopInventory.super.add_unit(self, new_unit, equip)
+	new_unit:set_enabled(true)
+	new_unit:set_visible(true)
 end
 
 function CopInventory:get_sync_data(sync_data)
@@ -72,6 +77,14 @@ function CopInventory:drop_weapon()
 		unit:damage():run_sequence_simple("enable_body")
 		self:_call_listeners("unequip")
 		managers.game_play_central:weapon_dropped(unit)
+		if unit:base() and unit:base()._second_gun then
+			local second_gun = unit:base()._second_gun
+			second_gun:unlink()
+			if second_gun:damage() then
+				second_gun:damage():run_sequence_simple("enable_body")
+				managers.game_play_central:weapon_dropped(second_gun)
+			end
+		end
 	end
 end
 

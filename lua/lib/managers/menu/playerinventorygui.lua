@@ -498,7 +498,7 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 		x = 0,
 		y = TOP_ADJUSTMENT + tweak_data.menu.pd2_small_font_size,
 		w = 320,
-		h = 310
+		h = 290
 	})
 	self._player_panel = player_panel
 	self._player_box_panel = self._panel:panel()
@@ -1245,6 +1245,7 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 	self:update_detection()
 	self:_update_player_stats()
 	self:_update_mod_boxes()
+	self:_update_deployable_box()
 end
 
 function PlayerInventoryGui:_update_legends(name)
@@ -2088,6 +2089,8 @@ function PlayerInventoryGui:_update_stats(name)
 		self:_update_info_throwable(name)
 	elseif name == "deployable" then
 		self:_update_info_deployable(name)
+	elseif name == "deployable_secondary" then
+		self:_update_info_deployable(name, 2)
 	else
 		local box = self._boxes_by_name[name]
 		if box and box.params and box.params.mod_data then
@@ -2279,13 +2282,16 @@ function PlayerInventoryGui:_update_info_throwable(name)
 	self:set_info_text(text_string)
 end
 
-function PlayerInventoryGui:_update_info_deployable(name)
-	local deployable_id = managers.blackmarket:equipped_deployable()
+function PlayerInventoryGui:_update_info_deployable(name, slot)
+	local deployable_id = managers.blackmarket:equipped_deployable(slot)
 	local equipment_data = deployable_id and tweak_data.equipments[deployable_id]
 	local deployable_data = deployable_id and tweak_data.blackmarket.deployables[deployable_id]
 	local text_string = ""
 	if deployable_data and equipment_data then
 		local amount = equipment_data.quantity[1] or 1
+		if deployable_id == "sentry_gun_silent" then
+			deployable_id = "sentry_gun"
+		end
 		amount = amount + (managers.player:equiptment_upgrade_value(deployable_id, "quantity") or 0)
 		text_string = text_string .. managers.localization:text(deployable_data.name_id) .. " (x" .. tostring(amount) .. ")" .. [[
 
@@ -2643,6 +2649,57 @@ function PlayerInventoryGui:create_grid_links(grid_x, grid_y)
 			left = left and left.name,
 			right = right and right.name
 		}
+	end
+end
+
+function PlayerInventoryGui:_update_deployable_box()
+	do
+		local box = self._boxes_by_name.deployable_secondary
+		if box then
+			self:unretrieve_box_textures(box)
+			box.panel:parent():remove(box.panel)
+			box.dead = true
+			self._boxes_by_name.deployable_secondary = nil
+		end
+		for index, box in pairs(self._boxes) do
+			if box.dead then
+				table.remove(self._boxes, index)
+				break
+			end
+		end
+	end
+	local box = self._boxes_by_name.deployable
+	local deployable_data = managers.blackmarket:player_loadout_data().deployable
+	if deployable_data and deployable_data.secondary and managers.player:has_category_upgrade("player", "second_deployable") then
+		local sec_data = deployable_data.secondary
+		local clbks = {
+			left = callback(self, self, "open_deployable_menu"),
+			up = callback(self, self, "previous_deployable_secondary"),
+			down = callback(self, self, "next_deployable_secondary")
+		}
+		local icon_box = self:create_box({
+			name = "deployable_secondary",
+			use_borders = false,
+			w = box.panel:w() / 2,
+			h = box.panel:h(),
+			padding = 5,
+			text = sec_data.info_text,
+			unselected_text = "",
+			image = sec_data.item_texture,
+			image_size_mul = 1,
+			alpha = 1,
+			select_anim = select_anim,
+			unselect_anim = unselect_anim,
+			bg_blend_mode = "normal",
+			layer = 2,
+			clbks = clbks
+		})
+		icon_box:set_center(box.panel:x() + box.panel:w() - 40, box.panel:y() + box.panel:h() / 2)
+		icon_box:set_visible(box.panel:visible())
+		if box.image_object then
+			box.image_object.gui:set_center_x(50)
+			self._boxes_by_name.deployable_secondary.image_object.gui:set_center_y(box.image_object.gui:center_y())
+		end
 	end
 end
 
@@ -3184,6 +3241,7 @@ function PlayerInventoryGui:update_box(box, params, skip_update_other)
 		self:update_detection()
 		self:_update_player_stats()
 		self:_update_mod_boxes()
+		self:_update_deployable_box()
 	end
 	if selected then
 		new_box.selected = true
@@ -3632,6 +3690,7 @@ function PlayerInventoryGui:previous_deployable()
 			image = player_loadout_data.deployable.item_texture
 		})
 		self:_update_info_deployable("deployable")
+		self:_update_deployable_box()
 	end
 end
 
@@ -3644,6 +3703,23 @@ function PlayerInventoryGui:next_deployable()
 			image = player_loadout_data.deployable.item_texture
 		})
 		self:_update_info_deployable("deployable")
+		self:_update_deployable_box()
+	end
+end
+
+function PlayerInventoryGui:previous_deployable_secondary()
+	local box = self._boxes_by_name.deployable_secondary
+	if box and managers.blackmarket:equip_previous_deployable(2) then
+		self:_update_deployable_box()
+		self:_update_info_deployable("deployable", 2)
+	end
+end
+
+function PlayerInventoryGui:next_deployable_secondary()
+	local box = self._boxes_by_name.deployable_secondary
+	if box and managers.blackmarket:equip_next_deployable(2) then
+		self:_update_deployable_box()
+		self:_update_info_deployable("deployable", 2)
 	end
 end
 
@@ -3809,6 +3885,7 @@ function PlayerInventoryGui:previous_skilltree()
 		self:_update_specialization_box()
 		self:_update_loadout_boxes()
 		self:_update_info_skilltree("skilltree")
+		self:_update_deployable_box()
 	end
 end
 
@@ -3828,6 +3905,7 @@ function PlayerInventoryGui:next_skilltree()
 		self:_update_specialization_box()
 		self:_update_loadout_boxes()
 		self:_update_info_skilltree("skilltree")
+		self:_update_deployable_box()
 	end
 end
 
@@ -3882,6 +3960,7 @@ function PlayerInventoryGui:previous_specialization()
 		self:_update_specialization_box()
 		self:_update_loadout_boxes()
 		self:_update_info_specialization("specialization")
+		self:_update_deployable_box()
 	end
 end
 
@@ -3891,6 +3970,7 @@ function PlayerInventoryGui:next_specialization()
 		self:_update_specialization_box()
 		self:_update_loadout_boxes()
 		self:_update_info_specialization("specialization")
+		self:_update_deployable_box()
 	end
 end
 

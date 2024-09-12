@@ -216,6 +216,12 @@ function AnimatedVehicleBase:clbk_request_anim_redirect(redirect_name)
 	end
 end
 
+function AnimatedVehicleBase:anim_clbk_run_seq(unit, seq_name)
+	if self._unit:damage():has_sequence(seq_name) then
+		self._unit:damage():run_sequence_simple(seq_name)
+	end
+end
+
 function AnimatedVehicleBase:save(save_data)
 	if self._modules then
 		local module_units_to_sync = {}

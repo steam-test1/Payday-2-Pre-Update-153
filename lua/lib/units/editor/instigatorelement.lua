@@ -16,6 +16,7 @@ end
 InstigatorOperatorUnitElement = InstigatorOperatorUnitElement or class(MissionElement)
 InstigatorOperatorUnitElement.SAVE_UNIT_POSITION = false
 InstigatorOperatorUnitElement.SAVE_UNIT_ROTATION = false
+InstigatorOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 
 function InstigatorOperatorUnitElement:init(unit)
 	InstigatorOperatorUnitElement.super.init(self, unit)
@@ -64,14 +65,6 @@ function InstigatorOperatorUnitElement:add_element()
 	end
 end
 
-function InstigatorOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
-		end
-	end
-end
-
 function InstigatorOperatorUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
 end
@@ -102,6 +95,7 @@ end
 InstigatorTriggerUnitElement = InstigatorTriggerUnitElement or class(MissionElement)
 InstigatorTriggerUnitElement.SAVE_UNIT_POSITION = false
 InstigatorTriggerUnitElement.SAVE_UNIT_ROTATION = false
+InstigatorTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 
 function InstigatorTriggerUnitElement:init(unit)
 	InstigatorTriggerUnitElement.super.init(self, unit)
@@ -144,14 +138,6 @@ function InstigatorTriggerUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function InstigatorTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

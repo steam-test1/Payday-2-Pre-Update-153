@@ -457,10 +457,8 @@ function CopLogicIdle.on_intimidated(data, amount, aggressor_unit)
 			aggressor_can_intimidate = aggressor_unit:base():upgrade_value("player", required_skill)
 			aggressor_intimidation_mul = aggressor_intimidation_mul * (aggressor_unit:base():upgrade_value("player", "empowered_intimidation_mul") or 1) * (aggressor_unit:base():upgrade_value("player", "intimidation_multiplier") or 1)
 		end
-		print("aggressor_can_intimidate", aggressor_can_intimidate, "required_skill", required_skill, "is_local_player", aggressor_unit:base().is_local_player)
 		if aggressor_can_intimidate then
 			local hold_chance = CopLogicBase._evaluate_reason_to_surrender(data, my_data, aggressor_unit)
-			print("hold_chance", hold_chance)
 			if hold_chance then
 				hold_chance = hold_chance ^ aggressor_intimidation_mul
 				if 1 <= hold_chance then

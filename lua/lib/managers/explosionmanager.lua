@@ -120,7 +120,16 @@ function ExplosionManager:detect_and_give_dmg(params)
 	local characters_hit = {}
 	local units_to_push = {}
 	local hit_units = {}
+	local ignore_units = {ignore_unit}
 	local type
+	if not params.no_raycast_check_characters then
+		for _, hit_body in ipairs(bodies) do
+			local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion and not hit_body:unit():character_damage():dead()
+			if character then
+				table.insert(ignore_units, hit_body:unit())
+			end
+		end
+	end
 	for _, hit_body in ipairs(bodies) do
 		local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_explosion and not hit_body:unit():character_damage():dead()
 		local apply_dmg = hit_body:extension() and hit_body:extension().damage
@@ -133,10 +142,7 @@ function ExplosionManager:detect_and_give_dmg(params)
 				characters_hit[hit_body:unit():key()] = true
 			else
 				for i_splinter, s_pos in ipairs(splinters) do
-					ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask - 17, "ignore_unit", {
-						hit_body:unit(),
-						ignore_unit
-					}, "report")
+					ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask - 17, "ignore_unit", ignore_units, "report")
 					if ray_hit then
 						characters_hit[hit_body:unit():key()] = true
 						damage_character = true

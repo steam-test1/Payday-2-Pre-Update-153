@@ -614,7 +614,7 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 	}
 	for i = 1, max_specializations do
 		local specialization = managers.skilltree:get_specialization_value(i)
-		if specialization and specialization.tiers and specialization.tiers.current_tier then
+		if specialization and type(specialization) == "table" and specialization.tiers and specialization.tiers.current_tier then
 			stats["player_specialization_" .. i] = {
 				type = "int",
 				method = "set",

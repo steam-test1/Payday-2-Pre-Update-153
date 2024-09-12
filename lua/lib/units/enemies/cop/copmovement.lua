@@ -1155,6 +1155,7 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 		if self._rope then
 			self._rope:base():retract()
 			self._rope = nil
+			self._rope_death = true
 			if self._unit:sound().anim_clbk_play_sound then
 				self._unit:sound():anim_clbk_play_sound(self._unit, "repel_end")
 			end
@@ -1303,6 +1304,10 @@ end
 
 function CopMovement:rope_unit()
 	return self._rope
+end
+
+function CopMovement:died_on_rope()
+	return self._rope_death
 end
 
 function CopMovement:pos_rsrv_id()
@@ -2025,6 +2030,7 @@ function CopMovement:pre_destroy()
 			self._unit:sound():anim_clbk_play_sound(self._unit, "repel_end")
 		end
 	end
+	self._rope_death = false
 	if self._nav_tracker then
 		managers.navigation:destroy_nav_tracker(self._nav_tracker)
 		self._nav_tracker = nil

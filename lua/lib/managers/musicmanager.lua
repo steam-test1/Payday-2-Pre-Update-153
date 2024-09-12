@@ -407,8 +407,8 @@ function MusicManager:jukebox_menu_tracks()
 	local tracks = {}
 	local tracks_locked = {}
 	local lock_data = {
-		soundtrack = managers.dlc and managers.dlc:has_soundtrack_or_cce(),
 		bsides = managers.dlc and managers.dlc:is_dlc_unlocked("bsides_soundtrack"),
+		soundtrack = managers.dlc and managers.dlc:has_soundtrack_or_cce(),
 		payday = managers.dlc and managers.dlc:is_dlc_unlocked("pdth_soundtrack"),
 		xmas = managers.dlc and managers.dlc:is_dlc_unlocked("xmas_soundtrack"),
 		alesso = managers.dlc and managers.dlc:is_dlc_unlocked("arena"),

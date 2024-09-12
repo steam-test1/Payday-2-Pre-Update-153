@@ -3,6 +3,7 @@ MissionElement = MissionElement or class(CoreMissionElement)
 MissionElement.SAVE_UNIT_POSITION = true
 MissionElement.SAVE_UNIT_ROTATION = true
 MissionElement.RANDOMS = nil
+MissionElement.LINK_ELEMENTS = {}
 
 function MissionElement:init(...)
 	CoreMissionElement.init(self, ...)
@@ -829,6 +830,18 @@ function CoreMissionElement:add_on_executed(unit)
 end
 
 function CoreMissionElement:remove_links(unit)
+	if not self.LINK_ELEMENTS then
+		return
+	end
+	for i, element_name in ipairs(self.LINK_ELEMENTS) do
+		if self._hed[element_name] then
+			for _, id in ipairs(self._hed[element_name]) do
+				if id == unit:unit_data().unit_id then
+					table.delete(self._hed[element_name], id)
+				end
+			end
+		end
+	end
 end
 
 function CoreMissionElement:remove_on_execute(unit)

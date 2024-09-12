@@ -1,4 +1,5 @@
 AIGraphUnitElement = AIGraphUnitElement or class(MissionElement)
+AIGraphUnitElement.LINK_ELEMENTS = {"elements"}
 
 function AIGraphUnitElement:init(unit)
 	EnemyPreferedRemoveUnitElement.super.init(self, unit)
@@ -72,14 +73,6 @@ function AIGraphUnitElement:add_unit_list_btn()
 	local dialog = SelectUnitByNameModal:new("Add Trigger Unit", f)
 	for _, unit in ipairs(dialog:selected_units()) do
 		self:_add_or_remove_graph(unit:unit_data().unit_id)
-	end
-end
-
-function AIGraphUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.graph_ids) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.graph_ids, id)
-		end
 	end
 end
 

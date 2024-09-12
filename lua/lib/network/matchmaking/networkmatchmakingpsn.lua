@@ -1389,6 +1389,12 @@ function NetworkMatchMakingPSN:_error_message_solver(info)
 	if info.error == "8002232c" then
 		return
 	end
+	if info.error == "ffffffff80550c3a" then
+		return
+	end
+	if info.error == "ffffffff80550c34" then
+		return
+	end
 	if info.error == "8002233a" and self._testing_connection then
 		self._testing_connection = nil
 		return
@@ -1399,6 +1405,7 @@ function NetworkMatchMakingPSN:_error_message_solver(info)
 		["80022328"] = "dialog_err_room_allready_joined",
 		["80022b13"] = "dialog_err_room_no_longer_exists",
 		["80022b15"] = "dialog_err_room_no_longer_exists",
+		ffffffff80550c36 = "dialog_err_failed_creating_lobby",
 		["8002233a"] = self._creating_lobby and "dialog_err_failed_creating_lobby" or self._searching_lobbys and "dialog_err_failed_searching_lobbys" or self._joining_lobby and "dialog_err_failed_joining_lobby" or nil,
 		["8002231d"] = self._creating_lobby and "dialog_err_failed_creating_lobby" or self._searching_lobbys and "dialog_err_failed_searching_lobbys" or self._joining_lobby and "dialog_err_failed_joining_lobby" or nil
 	}

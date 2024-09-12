@@ -488,6 +488,16 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 			count_no_reload_pass = not achievement_data.count_no_reload or kill_count_no_reload >= achievement_data.count_no_reload
 			count_pass = not achievement_data.kill_count or achievement_data.weapon and managers.statistics:session_killed_by_weapon(achievement_data.weapon) == achievement_data.kill_count
 			cop_pass = not achievement_data.is_cop or is_cop
+			local enemy_type = self._unit:base()._tweak_table
+			if achievement_data.enemies then
+				enemy_pass = false
+				for _, enemy in pairs(achievement_data.enemies) do
+					if enemy == enemy_type then
+						enemy_pass = true
+						break
+					end
+				end
+			end
 			part_pass = not achievement_data.part_id or attack_weapon:base():has_part(achievement_data.part_id)
 			parts_pass = not achievement_data.parts
 			if achievement_data.parts then
@@ -1893,6 +1903,7 @@ function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percen
 		end
 	end
 	local start_dot_dance_antimation = attack_data.fire_dot_data and attack_data.fire_dot_data.start_dot_dance_antimation
+	damage_percent = math.clamp(damage_percent, 0, 512)
 	self._unit:network():send("damage_fire", attacker, damage_percent, start_dot_dance_antimation, self._dead and true or false, direction, weapon_type, weapon_unit)
 end
 
@@ -2310,6 +2321,10 @@ function CopDamage:_apply_min_health_limit(damage, damage_percent)
 		end
 	end
 	return damage, damage_percent
+end
+
+function CopDamage:melee_hit_sfx()
+	return "hit_body"
 end
 
 function CopDamage:_apply_damage_reduction(damage)

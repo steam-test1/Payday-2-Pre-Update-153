@@ -1667,7 +1667,6 @@ end
 function NavigationManager:add_pos_reservation(desc)
 	if self._debug and not desc.filter then
 		print("[NavigationManager:add_pos_reservation] No filter added")
-		Application:stack_dump()
 	end
 	desc.id = self._quad_field:add_position_reservation(desc)
 	if self._debug then

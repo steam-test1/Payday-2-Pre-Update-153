@@ -1,8 +1,21 @@
 SentryGunBase = SentryGunBase or class(UnitBase)
+SentryGunBase.DEPLOYEMENT_COST = {
+	0.7,
+	0.75,
+	0.8
+}
+SentryGunBase.MIN_DEPLOYEMENT_COST = 0.2
+SentryGunBase.AMMO_MUL = {1, 1.5}
+SentryGunBase.ROTATION_SPEED_MUL = {1, 1.5}
+SentryGunBase.SPREAD_MUL = {1, 0.5}
+local sentry_uid = 1
 
 function SentryGunBase:init(unit)
 	SentryGunBase.super.init(self, unit, false)
 	self._unit = unit
+	self._frame_callbacks = FrameCallback:new()
+	self._frame_callbacks:add("check_body", callback(self, self, "_check_body"), 15)
+	self._damage_multiplier = 1
 	if self._place_snd_event then
 		self._unit:sound_source():post_event(self._place_snd_event)
 	end
@@ -70,9 +83,8 @@ function SentryGunBase.spawn(owner, pos, rot, peer_id, verify_equipment, unit_id
 	local player_skill = PlayerSkill
 	local ammo_multiplier = player_skill.skill_data("sentry_gun", "extra_ammo_multiplier", 1, sentry_owner)
 	local armor_multiplier = 1 + (player_skill.skill_data("sentry_gun", "armor_multiplier", 1, sentry_owner) - 1) + (player_skill.skill_data("sentry_gun", "armor_multiplier2", 1, sentry_owner) - 1)
-	local damage_multiplier = player_skill.skill_data("sentry_gun", "damage_multiplier", 1, sentry_owner)
-	local spread_multiplier = player_skill.skill_data("sentry_gun", "spread_multiplier", 1, sentry_owner)
-	local rot_speed_multiplier = player_skill.skill_data("sentry_gun", "rot_speed_multiplier", 1, sentry_owner)
+	local spread_level = player_skill.skill_data("sentry_gun", "spread_multiplier", 1, sentry_owner)
+	local rot_speed_level = player_skill.skill_data("sentry_gun", "rot_speed_multiplier", 1, sentry_owner)
 	local ap_bullets = player_skill.has_skill("sentry_gun", "ap_bullets", sentry_owner)
 	local has_shield = player_skill.has_skill("sentry_gun", "shield", sentry_owner)
 	local id_string = Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry")
@@ -80,8 +92,11 @@ function SentryGunBase.spawn(owner, pos, rot, peer_id, verify_equipment, unit_id
 		id_string = tweak_data.equipments.sentry_id_strings[unit_idstring_index]
 	end
 	local unit = World:spawn_unit(id_string, pos, rot)
+	local spread_multiplier = SentryGunBase.SPREAD_MUL[spread_level]
+	local rot_speed_multiplier = SentryGunBase.ROTATION_SPEED_MUL[rot_speed_level]
 	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, peer_id or 0)
-	unit:base():setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
+	ammo_multiplier = SentryGunBase.AMMO_MUL[ammo_multiplier]
+	unit:base():setup(owner, ammo_multiplier, armor_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
 	local owner_id = unit:base():get_owner_id()
 	if ap_bullets and owner_id then
 		local fire_mode_unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry_fire_mode"), unit:position(), unit:rotation())
@@ -97,7 +112,7 @@ function SentryGunBase.spawn(owner, pos, rot, peer_id, verify_equipment, unit_id
 	unit:movement():set_team(team)
 	unit:brain():set_active(true)
 	SentryGunBase.deployed = (SentryGunBase.deployed or 0) + 1
-	return unit
+	return unit, spread_level, rot_speed_level
 end
 
 function SentryGunBase:spawn_from_sequence(align_obj_name, module_id)
@@ -113,9 +128,12 @@ function SentryGunBase:spawn_from_sequence(align_obj_name, module_id)
 	end
 	local unit
 	unit = World:spawn_unit(Idstring("units/payday2/equipment/gen_equipment_sentry/gen_equipment_sentry_placement"), pos, rot)
-	unit:base():setup(managers.player:player_unit(), 1, 1, 1, 1, 1, false, attached_data)
+	local rot_mul = SentryGunBase.ROTATION_SPEED_MUL[2]
+	local spread_mul = SentryGunBase.SPREAD_MUL[2]
+	local ammo_mul = SentryGunBase.AMMO_MUL[2]
+	unit:base():setup(managers.player:player_unit(), ammo_mul, 1, spread_mul, rot_mul, 1, true, attached_data)
 	managers.network:session():send_to_peers_synched("sync_equipment_setup", unit, 0, 0)
-	managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), 0, unit, unit:movement()._rot_speed_mul, unit:weapon()._setup.spread_mul, false, self._damage_multiplier)
+	managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), 0, unit, 2, 2, true, 2)
 	local team = managers.groupai:state():team_data(tweak_data.levels:get_default_team_ID("player"))
 	unit:movement():set_team(team)
 	unit:brain():set_active(true)
@@ -164,7 +182,7 @@ function SentryGunBase:server_information()
 	return self._server_information
 end
 
-function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
+function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, spread_multiplier, rot_speed_multiplier, has_shield, attached_data)
 	if Network:is_client() and not self._skip_authentication then
 		self._validate_clbk_id = "sentry_gun_validate" .. tostring(unit:key())
 		managers.enemy:add_delayed_clbk(self._validate_clbk_id, callback(self, self, "_clbk_validate"), Application:time() + 60)
@@ -172,7 +190,6 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 	self._attached_data = attached_data
 	self._ammo_multiplier = ammo_multiplier
 	self._armor_multiplier = armor_multiplier
-	self._damage_multiplier = damage_multiplier
 	self._spread_multiplier = spread_multiplier
 	self._rot_speed_multiplier = rot_speed_multiplier
 	if has_shield then
@@ -209,9 +226,28 @@ function SentryGunBase:setup(owner, ammo_multiplier, armor_multiplier, damage_mu
 		spread_mul = spread_multiplier,
 		creates_alerts = true
 	}
-	self._unit:weapon():setup(setup_data, damage_multiplier)
+	self._unit:weapon():setup(setup_data)
 	self._unit:set_extension_update_enabled(Idstring("base"), true)
+	self:post_setup()
 	return true
+end
+
+function SentryGunBase:post_setup()
+	self._sentry_uid = "sentry_" .. tostring(sentry_uid)
+	managers.mission:add_global_event_listener(self._sentry_uid, {
+		"on_picked_up_carry"
+	}, callback(self, self, "_on_picked_up_cash"))
+	sentry_uid = sentry_uid + 1
+	self._attached_data = self._attach(nil, nil, self._unit)
+end
+
+function SentryGunBase:_on_picked_up_cash(unit)
+	if unit and self._attached_data and self._attached_data.unit and self._attached_data.position and unit == self._attached_data.unit then
+		local new_pos = self._unit:position()
+		mvector3.set_z(new_pos, mvector3.z(self._attached_data.position))
+		self._unit:set_position(new_pos)
+		self._frame_callbacks:reset_counter("check_body")
+	end
 end
 
 function SentryGunBase:get_owner()
@@ -227,12 +263,41 @@ function SentryGunBase:get_type()
 end
 
 function SentryGunBase:update(unit, t, dt)
-	self:_check_body()
+	self._frame_callbacks:update()
+end
+
+function SentryGunBase:on_interaction()
+	if Network:is_server() then
+		SentryGunBase.on_picked_up(self:get_type(), self._unit:weapon():ammo_ratio(), self._unit:id())
+		self:remove()
+	else
+		managers.network:session():send_to_host("picked_up_sentry_gun", self._unit)
+	end
+end
+
+function SentryGunBase.on_picked_up(sentry_type, ammo_ratio, sentry_uid)
+	local pm = managers.player
+	pm:add_sentry_gun(1, sentry_type)
+	local player_unit = pm:player_unit()
+	local ammo = 1 + SentryGunBase.DEPLOYEMENT_COST[pm:upgrade_value("sentry_gun", "cost_reduction", 1)] * ammo_ratio
+	local hud = managers.hud
+	if player_unit then
+		local deployement_cost = player_unit:equipment() and player_unit:equipment():get_sentry_deployement_cost(sentry_uid)
+		local inventory = player_unit:inventory()
+		if inventory and deployement_cost then
+			for index, weapon in pairs(inventory:available_selections()) do
+				local refund = math.ceil(deployement_cost[index] * ammo_ratio)
+				weapon.unit:base():add_ammo_in_bullets(refund)
+				hud:set_ammo_amount(index, weapon.unit:base():ammo_info())
+			end
+			player_unit:equipment():remove_sentry_deployement_cost(sentry_uid)
+		end
+	end
 end
 
 function SentryGunBase:_check_body()
 	if self._attached_data.index == 1 then
-		if not self._attached_data.body:enabled() then
+		if alive(self._attached_data.body) and not self._attached_data.body:enabled() then
 			self._attached_data = self._attach(nil, nil, self._unit)
 			if not self._attached_data then
 				self:remove()
@@ -266,7 +331,7 @@ function SentryGunBase._attach(pos, rot, sentrygun_unit)
 	pos = pos or sentrygun_unit:position()
 	rot = rot or sentrygun_unit:rotation()
 	local from_pos = pos + rot:z() * 10
-	local to_pos = pos + rot:z() * -10
+	local to_pos = pos + rot:z() * -20
 	local ray
 	if sentrygun_unit then
 		ray = sentrygun_unit:raycast("ray", from_pos, to_pos, "slot_mask", managers.slot:get_mask("world_geometry"))
@@ -279,7 +344,8 @@ function SentryGunBase._attach(pos, rot, sentrygun_unit)
 			position = ray.body:position(),
 			rotation = ray.body:rotation(),
 			index = 1,
-			max_index = 3
+			max_index = 3,
+			unit = ray.unit
 		}
 		return attached_data
 	end
@@ -308,7 +374,6 @@ function SentryGunBase:can_interact(player)
 end
 
 function SentryGunBase:show_blocked_hint(interaction_tweak_data, player, skip_hint)
-	print("SentryGunBase:show_blocked_hint", interaction_tweak_data, player, skip_hint)
 	local event_id, wanted, possible = self:get_net_event_id(player)
 	if self._unit:weapon():ammo_ratio() == 1 or not wanted then
 		managers.hint:show_hint("hint_full_sentry_gun")
@@ -506,6 +571,7 @@ end
 
 function SentryGunBase:pre_destroy()
 	SentryGunBase.super.pre_destroy(self, self._unit)
+	managers.mission:remove_global_event_listener(self._sentry_uid)
 	self:unregister()
 	self._removed = true
 	if self._validate_clbk_id then

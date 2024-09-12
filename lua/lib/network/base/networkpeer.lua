@@ -909,7 +909,7 @@ function NetworkPeer:on_lost()
 end
 
 function NetworkPeer:_ping_timedout()
-	managers.network:session():on_peer_lost(self, self._id)
+	managers.network:session():on_peer_kicked(self, self._id, 1)
 end
 
 function NetworkPeer:set_ip(my_ip)

@@ -45,20 +45,16 @@ function NewShotgunBase:fire_rate_multiplier()
 end
 
 function NewShotgunBase:on_equip(user_unit)
+	NewShotgunBase.super.on_equip(self, user_unit)
 	if user_unit and not self._player_run_and_shoot then
-		local current_state = user_unit:movement()._current_state
-		if current_state then
-			current_state.RUN_AND_SHOOT = self._run_and_shoot
-		end
+		managers.player.RUN_AND_SHOOT = self._run_and_shoot
 	end
 end
 
 function NewShotgunBase:on_unequip(user_unit)
-	if user_unit and not self._player_run_and_shoot then
-		local current_state = user_unit:movement()._current_state
-		if current_state then
-			current_state.RUN_AND_SHOOT = false
-		end
+	NewShotgunBase.super.on_unequip(self, user_unit)
+	if user_unit and not self._player_run_and_shoot and not managers.player:has_category_upgrade("player", "run_and_shoot") then
+		managers.player.RUN_AND_SHOOT = false
 	end
 end
 

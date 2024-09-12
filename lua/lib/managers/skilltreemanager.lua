@@ -159,7 +159,6 @@ end
 function SkillTreeManager:spend_points(points)
 	local p = self:points() - points
 	self:_set_points(p)
-	self:_check_achievements()
 	MenuCallbackHandler:_update_outfit_information()
 	return p
 end
@@ -167,7 +166,6 @@ end
 function SkillTreeManager:refund_points(points)
 	local p = self:points() + points
 	self:_set_points(p)
-	self:_check_achievements()
 	MenuCallbackHandler:_update_outfit_information()
 	return p
 end
@@ -199,8 +197,19 @@ function SkillTreeManager:points_spent(tree, switch_data)
 	return Application:digest_value((switch_data or self._global).trees[tree].points_spent, false)
 end
 
+function SkillTreeManager:points_spent_in_skilltree(tree_name, switch_data)
+	local points = 0
+	for tree, data in pairs(tweak_data.skilltree.trees) do
+		if data.skill == tree_name then
+			points = points + self:points_spent(tree, switch_data)
+		end
+	end
+	return points
+end
+
 function SkillTreeManager:_set_points_spent(tree, value)
 	self._global.trees[tree].points_spent = Application:digest_value(value, true)
+	self:_check_achievements()
 end
 
 function SkillTreeManager:tier_cost(tree, tier)
@@ -446,8 +455,8 @@ function SkillTreeManager:_on_points_spent(tree, points)
 end
 
 function SkillTreeManager:_check_achievements()
-	for tree, data in pairs(self._global.trees) do
-		if self:points_spent(tree) < tweak_data.achievement.im_a_healer_tank_damage_dealer then
+	for tree, data in pairs(tweak_data.skilltree.skilltree) do
+		if self:points_spent_in_skilltree(tree) < tweak_data.achievement.im_a_healer_tank_damage_dealer then
 			return
 		end
 	end
@@ -551,7 +560,6 @@ function SkillTreeManager:on_respec_tree(tree, forced_respec_multiplier)
 	else
 		self:_respec_tree_version6(tree, forced_respec_multiplier)
 	end
-	print("hiii")
 	MenuCallbackHandler:_update_outfit_information()
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_skills_to_steam()
@@ -1313,6 +1321,9 @@ function SkillTreeManager:_verify_loaded_data(points_aquired_during_load)
 end
 
 function SkillTreeManager:digest_value(value, digest, default)
+	if value == nil then
+		return default or 0
+	end
 	if type(value) == "boolean" then
 		return default or 0
 	end

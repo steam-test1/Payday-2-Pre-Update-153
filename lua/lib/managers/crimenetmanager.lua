@@ -70,7 +70,7 @@ function CrimeNetManager:_get_jobs_by_jc()
 		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got
 		if pass_all_tests then
 			local job_data = tweak_data.narrative:job_data(job_id)
-			local start_difficulty = job_data.competitive and 4 or job_data.professional and 1 or 0
+			local start_difficulty = job_data.professional and 1 or 0
 			local num_difficulties = Global.SKIP_OVERKILL_290 and 3 or job_data.professional and 4 or 4
 			for i = start_difficulty, num_difficulties do
 				local job_jc = math.clamp(job_data.jc + i * 10, 0, 100)
@@ -1432,7 +1432,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			}),
 			font_size = tweak_data.menu.pd2_large_font_size,
 			font = tweak_data.menu.pd2_large_font,
-			color = Color(0.9764706, 0.92941177, 0.105882354),
+			color = tweak_data.screen_colors.button_stage_3,
 			layer = 40,
 			blend_mode = "add"
 		})
@@ -1595,7 +1595,7 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 			self:_goto_map_position(start_position.x, start_position.y)
 		end
 		self._special_contracts_id = {}
-		self:add_special_contracts(node:parameters().no_casino)
+		self:add_special_contracts(node:parameters().no_casino, no_servers)
 	else
 		if managers.features:can_announce("crimenet_hacked") then
 	end
@@ -1977,13 +1977,14 @@ function CrimeNetGui:set_getting_hacked(hacked)
 	self._hacked_t = self._start_hacked_t
 end
 
-function CrimeNetGui:add_special_contracts(no_casino)
+function CrimeNetGui:add_special_contracts(no_casino, no_quickplay)
 	for index, special_contract in ipairs(tweak_data.gui.crime_net.special_contracts) do
 		local id = special_contract.id
-		if id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) then
+		if id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) and (special_contract.id ~= "quickplay" or not no_quickplay) then
 			local gui_data = self:_create_job_gui(special_contract, "special")
 			gui_data.server = true
 			gui_data.special_node = special_contract.menu_node
+			gui_data.special_callback = special_contract.callback
 			gui_data.dlc = special_contract.dlc
 			if special_contract.pulse and (not special_contract.pulse_level or special_contract.pulse_level >= managers.experience:current_level() and managers.experience:current_rank() == 0) then
 				local animate_pulse = function(o)
@@ -3020,6 +3021,10 @@ function CrimeNetGui:check_job_pressed(x, y)
 	for id, job in pairs(self._jobs) do
 		if job.mouse_over == 1 then
 			job.expanded = not job.expanded
+			if job.special_callback then
+				job.special_callback()
+				return
+			end
 			local job_data = tweak_data.narrative:job_data(job.job_id)
 			local data = {
 				difficulty = job.difficulty,

@@ -45,18 +45,20 @@ PlayerStandard.IDS_BASE = Idstring("base")
 PlayerStandard.IDS_CASH_INSPECT = Idstring("cash_inspect")
 PlayerStandard.IDS_FALLING = Idstring("falling")
 PlayerStandard.debug_bipod = nil
-PlayerStandard.SENTRY_PICKUP_T = 0.5
 
 function PlayerStandard:init(unit)
 	PlayerMovementState.init(self, unit)
 	self._tweak_data = tweak_data.player.movement_state.standard
 	self._obj_com = self._unit:get_object(Idstring("rp_mover"))
-	self._slotmask_gnd_ray = managers.slot:get_mask("player_ground_check")
-	self._slotmask_fwd_ray = managers.slot:get_mask("bullet_impact_targets")
-	self._slotmask_bullet_impact_targets = managers.slot:get_mask("bullet_impact_targets")
-	self._slotmask_pickups = managers.slot:get_mask("pickups")
-	self._slotmask_AI_visibility = managers.slot:get_mask("AI_visibility")
-	self._slotmask_long_distance_interaction = managers.slot:get_mask("long_distance_interaction")
+	do
+		local slot_manager = managers.slot
+		self._slotmask_gnd_ray = slot_manager:get_mask("player_ground_check")
+		self._slotmask_fwd_ray = slot_manager:get_mask("bullet_impact_targets")
+		self._slotmask_bullet_impact_targets = slot_manager:get_mask("bullet_impact_targets")
+		self._slotmask_pickups = slot_manager:get_mask("pickups")
+		self._slotmask_AI_visibility = slot_manager:get_mask("AI_visibility")
+		self._slotmask_long_distance_interaction = slot_manager:get_mask("long_distance_interaction")
+	end
 	self._ext_camera = unit:camera()
 	self._ext_movement = unit:movement()
 	self._ext_damage = unit:character_damage()
@@ -76,19 +78,16 @@ function PlayerStandard:init(unit)
 	self._last_sent_pos = unit:position()
 	self._last_sent_pos_t = 0
 	self._state_data = unit:movement()._state_data
-	self.RUN_AND_SHOOT = managers.player:has_category_upgrade("player", "run_and_shoot")
-	self.RUN_AND_RELOAD = managers.player:has_category_upgrade("player", "run_and_reload")
-	self._pickup_area = 200 * managers.player:upgrade_value("player", "increased_pickup_area", 1)
-	self._second_deployable = managers.player:has_category_upgrade("player", "second_deployable")
-	self._sentry_current_t = 0
-	self._sentry_btn_down = false
+	local pm = managers.player
+	self.RUN_AND_RELOAD = pm:has_category_upgrade("player", "run_and_reload")
+	self._pickup_area = 200 * pm:upgrade_value("player", "increased_pickup_area", 1)
 	self._interaction = managers.interaction
-	self._on_melee_restart_drill = managers.player:has_category_upgrade("player", "drill_melee_hit_restart_chance")
-	self._input = {}
+	self._on_melee_restart_drill = pm:has_category_upgrade("player", "drill_melee_hit_restart_chance")
 	local controller = unit:base():controller()
 	if controller:get_type() ~= "pc" then
+		self._input = {}
 		table.insert(self._input, BipodDeployControllerInput:new())
-		if self._second_deployable then
+		if pm:has_category_upgrade("player", "second_deployable") then
 			table.insert(self._input, SecondDeployableControllerInput:new())
 		end
 	end
@@ -459,23 +458,6 @@ function PlayerStandard:_get_input(t, dt)
 		btn_deploy_bipod = pressed and self._controller:get_input_pressed("deploy_bipod"),
 		btn_change_equipment = pressed and self._controller:get_input_pressed("change_equipment")
 	}
-	if input.btn_interact_press then
-		self._sentry_btn_down = true
-	elseif input.btn_interact_release and self._sentry_btn_down then
-		if self._sentry_current_t <= PlayerStandard.SENTRY_PICKUP_T then
-			input.data.switch_bullet_type = true
-		end
-		self._sentry_btn_down = false
-		self._sentry_current_t = 0
-	end
-	if self._sentry_btn_down and dt ~= nil then
-		self._sentry_current_t = self._sentry_current_t + dt
-		if self._sentry_current_t >= PlayerStandard.SENTRY_PICKUP_T then
-			self._sentry_btn_down = false
-			self._sentry_current_t = 0
-			input.data.pickup_sentry = true
-		end
-	end
 	if win32 then
 		local i = 1
 		while i < 3 do
@@ -485,8 +467,10 @@ function PlayerStandard:_get_input(t, dt)
 			end
 			i = i + 1
 		end
-		for i = 1, #self._input do
-			self._input[i]:update(t, dt, self._controller, input)
+		if self._input then
+			for i = 1, #self._input do
+				self._input[i]:update(t, dt, self._controller, input)
+			end
 		end
 	end
 	return input
@@ -562,7 +546,12 @@ function PlayerStandard:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_melee(t, input)
 	new_action = new_action or self:_check_action_reload(t, input)
 	new_action = new_action or self:_check_change_weapon(t, input)
-	new_action = new_action or self:_check_action_primary_attack(t, input)
+	if not new_action then
+		new_action = self:_check_action_primary_attack(t, input)
+		if not new_action then
+			self:_check_stop_shooting()
+		end
+	end
 	new_action = new_action or self:_check_action_equip(t, input)
 	new_action = new_action or self:_check_use_item(t, input)
 	new_action = new_action or self:_check_action_throw_projectile(t, input)
@@ -692,7 +681,7 @@ function PlayerStandard:_get_walk_headbob()
 	elseif self._state_data.ducking then
 		return 0.0125
 	elseif self._running then
-		return 0.1 * (self.RUN_AND_SHOOT and 0.5 or 1)
+		return 0.1 * (managers.player.RUN_AND_SHOOT and 0.5 or 1)
 	end
 	return 0.025
 end
@@ -932,7 +921,7 @@ function PlayerStandard:_start_action_running(t)
 	if self:on_ladder() or self:_on_zipline() then
 		return
 	end
-	if not (not self._shooting or self.RUN_AND_SHOOT) or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self._state_data.in_air or self:_is_throwing_projectile() or self:_is_charging_weapon() then
+	if not (not self._shooting or managers.player.RUN_AND_SHOOT) or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self._state_data.in_air or self:_is_throwing_projectile() or self:_is_charging_weapon() then
 		self._running_wanted = true
 		return
 	end
@@ -957,7 +946,7 @@ function PlayerStandard:_start_action_running(t)
 	self._end_running_expire_t = nil
 	self._start_running_t = t
 	if not self:_is_reloading() or not self.RUN_AND_RELOAD then
-		if not self.RUN_AND_SHOOT then
+		if not managers.player.RUN_AND_SHOOT then
 			self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 		else
 			self._ext_camera:play_redirect(self.IDS_IDLE)
@@ -974,7 +963,7 @@ function PlayerStandard:_end_action_running(t)
 	if not self._end_running_expire_t then
 		local speed_multiplier = self._equipped_unit:base():exit_run_speed_multiplier()
 		self._end_running_expire_t = t + 0.4 / speed_multiplier
-		if not self.RUN_AND_SHOOT and (not self.RUN_AND_RELOAD or not self:_is_reloading()) then
+		if not managers.player.RUN_AND_SHOOT and (not managers.player.RUN_AND_RELOAD or not self:_is_reloading()) then
 			self._ext_camera:play_redirect(self.IDS_STOP_RUNNING, speed_multiplier)
 		end
 	end
@@ -1315,14 +1304,6 @@ function PlayerStandard:_action_interact_forbidden()
 	return action_forbidden
 end
 
-function PlayerStandard:_action_interact_forbidden_sentry()
-	local action_forbidden = self:chk_action_forbidden("interact") or self._unit:base():stats_screen_visible() or self:_interacting() or self:is_deploying() or self:_changing_weapon() or self:_is_throwing_projectile() or self:_is_meleeing() or self:_on_zipline()
-	return action_forbidden
-end
-
-function PlayerStandard:_check_action_pickup_sentry(t, input)
-end
-
 function PlayerStandard:_check_action_change_equipment(input)
 	if input.btn_change_equipment and managers.player:has_category_upgrade("player", "second_deployable") then
 		self:_switch_equipment()
@@ -1412,9 +1393,6 @@ end
 
 function PlayerStandard:_check_action_weapon_gadget(t, input)
 	if input.btn_weapon_gadget_press and self._equipped_unit:base().toggle_gadget and self._equipped_unit:base():has_gadget() and self._equipped_unit:base():toggle_gadget() then
-		if self._equipped_unit:base():gadget_toggle_requires_stance_update() then
-			self:_stance_entered()
-		end
 		self._unit:network():send("set_weapon_gadget_state", self._equipped_unit:base()._gadget_on)
 	end
 end
@@ -1617,7 +1595,11 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 			if bayonet_melee then
 				self._unit:sound():play("fairbairn_hit_body", nil, false)
 			else
-				self:_play_melee_sound(melee_entry, "hit_body", self._melee_attack_var)
+				local hit_sfx = "hit_body"
+				if hit_unit:character_damage() and hit_unit:character_damage().melee_hit_sfx then
+					hit_sfx = hit_unit:character_damage():melee_hit_sfx()
+				end
+				self:_play_melee_sound(melee_entry, hit_sfx, self._melee_attack_var)
 			end
 			if not hit_unit:character_damage()._no_blood then
 				managers.game_play_central:play_impact_flesh({col_ray = col_ray})
@@ -1876,7 +1858,7 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 				managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 				if input.btn_steelsight_state then
 					self._steelsight_wanted = true
-				elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not self.RUN_AND_SHOOT then
+				elseif managers.player.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
 					self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 				end
 			end
@@ -1889,7 +1871,7 @@ function PlayerStandard:_update_reload_timers(t, dt, input)
 			managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
 			if input.btn_steelsight_state then
 				self._steelsight_wanted = true
-			elseif self.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not self.RUN_AND_SHOOT then
+			elseif managers.player.RUN_AND_RELOAD and self._running and not self._end_running_expire_t and not managers.player.RUN_AND_SHOOT then
 				self._ext_camera:play_redirect(self.IDS_START_RUNNING)
 			end
 			if self._equipped_unit:base().on_reload_stop then
@@ -2724,6 +2706,7 @@ function PlayerStandard:_check_action_cash_inspect(t, input)
 		return
 	end
 	self._ext_camera:play_redirect(self.IDS_CASH_INSPECT)
+	managers.player:send_message(Message.OnCashInspectWeapon)
 end
 
 function PlayerStandard:_is_cash_inspecting(t)
@@ -2940,6 +2923,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 		local action_forbidden = self:_is_reloading() or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self:_interacting() or self:_is_throwing_projectile() or self:_is_deploying_bipod()
 		if not action_forbidden then
 			self._queue_reload_interupt = nil
+			local start_shooting = false
 			self._ext_inventory:equip_selected_primary(false)
 			if self._equipped_unit then
 				local weap_base = self._equipped_unit:base()
@@ -2963,7 +2947,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						new_action = true
 						self:_start_action_reload_enter(t)
 					end
-				elseif self._running and not self.RUN_AND_SHOOT then
+				elseif self._running and not managers.player.RUN_AND_SHOOT then
 					self:_interupt_action_running(t)
 				else
 					if not self._shooting then
@@ -2977,6 +2961,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 								self._camera_unit:base():start_shooting()
 								self._shooting = true
 								self._shooting_t = t
+								start_shooting = true
 								if fire_mode == "auto" then
 									self._unit:camera():play_redirect(self.IDS_RECOIL_ENTER)
 								end
@@ -3005,7 +2990,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 					dmg_mul = dmg_mul * managers.player:get_property("trigger_happy", 1)
 					local fired
 					if fire_mode == "single" then
-						if input.btn_primary_attack_press then
+						if input.btn_primary_attack_press and start_shooting then
 							fired = weap_base:trigger_pressed(self:get_fire_weapon_position(), self:get_fire_weapon_direction(), dmg_mul, nil, spread_mul, autohit_mul, suppression_mul)
 						elseif fire_on_release then
 							if input.btn_primary_attack_release then
@@ -3362,6 +3347,14 @@ function PlayerStandard:_get_dir_str_from_vec(fwd, dir_vec)
 		return "right"
 	else
 		return "left"
+	end
+end
+
+function PlayerStandard:get_movement_modifier(weapon_spread)
+	if self._state_data.ducking then
+		return 1 - weapon_spread[self._moving and "moving_crouching" or "crouching"]
+	else
+		return 1 - weapon_spread[self._moving and "moving_standing" or "standing"]
 	end
 end
 

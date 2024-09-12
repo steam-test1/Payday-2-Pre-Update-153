@@ -2010,6 +2010,10 @@ function CopActionWalk:_upd_walk_turn_first_frame(t)
 	local pos1 = self._last_pos
 	local pos2 = self._curve_path[self._curve_path_index + 1]
 	local pos3 = self._curve_path[self._curve_path_index + 2]
+	if not pos2 or not pos3 then
+		debug_pause_unit(self._unit, "[CopActionWalk:_upd_walk_turn_first_frame] Invalid Vector type", self._unit)
+		return
+	end
 	mvec3_set(tmp_vec2, pos3)
 	mvec3_sub(tmp_vec2, pos2)
 	local right_dot = mvec3_dot(self._common_data.right, tmp_vec2)

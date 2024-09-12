@@ -494,7 +494,7 @@ function NewSkillTreeGui:_update_description(item)
 	local skill_string = managers.localization:to_upper_text(tweak_data_skill.name_id)
 	local cost_string = managers.localization:to_upper_text(basic_cost == 1 and "st_menu_skill_cost_singular" or "st_menu_skill_cost", {basic = basic_cost, aced = aced_cost})
 	local desc_string = managers.localization:text(tweak_data.skilltree.skills[skill_id].desc_id, macroes)
-	local full_string = skill_string .. "\n" .. cost_string .. [[
+	local full_string = skill_string .. [[
 
 
 ]] .. desc_string

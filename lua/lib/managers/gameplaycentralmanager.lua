@@ -319,7 +319,7 @@ local zero_vector = Vector3()
 
 function GamePlayCentralManager:_play_bullet_hit(params)
 	local hit_pos = params.col_ray.position
-	local need_sound = not params.no_sound and World:in_view_with_options(hit_pos, 2000, 0, 0)
+	local need_sound = not params.no_sound and World:in_view_with_options(hit_pos, 4000, 0, 0)
 	local need_effect = World:in_view_with_options(hit_pos, 20, 100, 5000)
 	local need_decal = not self._block_bullet_decals and not params.no_decal and need_effect and World:in_view_with_options(hit_pos, 3000, 0, 0)
 	if not need_sound and not need_effect and not need_decal then
@@ -601,6 +601,9 @@ function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades, 
 	elseif use_player_upgrades then
 		contour_type = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
 		time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
+		if unit:base().get_type and unit:base():get_type() == "swat_turret" then
+			contour_type = "mark_unit_dangerous_damage_bonus"
+		end
 	else
 		contour_type = use_trip_mine_upgrades and managers.player:has_category_upgrade("trip_mine", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
 	end

@@ -4,7 +4,7 @@ function HostStateInGame:enter(data, enter_params)
 	print("[HostStateInGame:enter]", data, inspect(enter_params))
 end
 
-function HostStateInGame:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
+function HostStateInGame:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, peer_rank, gameversion, join_attempt_identifier, auth_ticket, sender)
 	print("[HostStateInGame:on_join_request_received]", data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, sender:ip_at_index(0))
 	local my_user_id = data.local_peer:user_id() or ""
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -104,6 +104,7 @@ function HostStateInGame:on_join_request_received(data, peer_name, client_prefer
 	managers.vote:sync_server_kick_option(new_peer)
 	data.session:send_ok_to_load_level()
 	self:on_handshake_confirmation(data, new_peer, 1)
+	new_peer:set_rank(peer_rank)
 end
 
 function HostStateInGame:on_peer_finished_loading(data, peer)

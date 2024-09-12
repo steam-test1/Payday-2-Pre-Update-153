@@ -361,7 +361,7 @@ function PlayerMovement:on_SPOOCed(enemy_unit)
 end
 
 function PlayerMovement:is_SPOOC_attack_allowed()
-	if self._unit:character_damage():get_mission_blocker("invulnerable") then
+	if self._unit:character_damage():get_mission_blocker("invulnerable") or self._unit:character_damage().swansong then
 		return false
 	end
 	if self._current_state_name == "driving" then

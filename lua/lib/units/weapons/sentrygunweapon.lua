@@ -116,11 +116,10 @@ function SentryGunWeapon:_init()
 	self._suppression = my_tweak_data.SUPPRESSION
 end
 
-function SentryGunWeapon:setup(setup_data, damage_multiplier)
+function SentryGunWeapon:setup(setup_data)
 	self:_init()
 	self._setup = setup_data
 	self._default_alert_size = self._alert_size
-	self._damage_multiplier = damage_multiplier
 	self._current_damage_mul = 1
 	self._owner = setup_data.user_unit
 	self._spread_mul = setup_data.spread_mul
@@ -176,6 +175,7 @@ function SentryGunWeapon:sync_ammo(ammo_ratio)
 	if self._unit:interaction() then
 		self._unit:interaction():set_dirty(true)
 	end
+	self._unit:event_listener():call("on_sync_ammo")
 end
 
 function SentryGunWeapon:set_spread_mul(spread_mul)
@@ -522,5 +522,35 @@ function SentryGunWeapon:remove_fire_mode_interaction()
 	if self._fire_mode_unit and alive(self._fire_mode_unit) then
 		self._fire_mode_unit:set_slot(0)
 		self._fire_mode_unit = nil
+	end
+end
+
+function SentryGunWeapon:setup_virtual_ammo(mul)
+	local ammo_amount = tweak_data.upgrades.sentry_gun_base_ammo * mul
+	self._virtual_max_ammo = ammo_amount
+	self._virtual_ammo = ammo_amount
+	local event_listener = self._unit:event_listener()
+	event_listener:add("virtual_ammo_on_fire", {"on_fire"}, callback(self, self, "_on_fire_virtual_shoot"))
+	event_listener:add("virtual_ammo_on_sync", {
+		"on_sync_ammo"
+	}, callback(self, self, "_sync_virtual_ammo"))
+end
+
+function SentryGunWeapon:get_virtual_ammo_ratio()
+	if self._virtual_max_ammo and self._virtual_ammo then
+		return self._virtual_ammo / self._virtual_max_ammo
+	end
+	return 1
+end
+
+function SentryGunWeapon:_on_fire_virtual_shoot()
+	if self._virtual_ammo then
+		self._virtual_ammo = self._virtual_ammo - 1
+	end
+end
+
+function SentryGunWeapon:_sync_virtual_ammo()
+	if self._virtual_max_ammo and self._virtual_ammo then
+		self._virtual_ammo = self._virtual_max_ammo * self:ammo_ratio()
 	end
 end

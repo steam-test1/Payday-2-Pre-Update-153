@@ -1,4 +1,5 @@
 SpecialObjectiveTriggerUnitElement = SpecialObjectiveTriggerUnitElement or class(MissionElement)
+SpecialObjectiveTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 
 function SpecialObjectiveTriggerUnitElement:init(unit)
 	MissionElement.init(self, unit)
@@ -68,14 +69,6 @@ function SpecialObjectiveTriggerUnitElement:_correct_unit(u_name)
 		end
 	end
 	return false
-end
-
-function SpecialObjectiveTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
-		end
-	end
 end
 
 function SpecialObjectiveTriggerUnitElement:add_triggers(vc)

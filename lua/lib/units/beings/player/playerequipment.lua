@@ -14,7 +14,7 @@ end
 function PlayerEquipment:valid_look_at_placement(equipment_data)
 	local from = self._unit:movement():m_head_pos()
 	local to = from + self._unit:movement():m_head_rot():y() * 200
-	local ray = self._unit:raycast("ray", from, to, "slot_mask", managers.slot:get_mask("trip_mine_placeables"), "ignore_unit", {})
+	local ray = self._unit:raycast("ray", from, to, "slot_mask", managers.slot:get_mask("trip_mine_placeables"), "ignore_unit", {}, "ray_type", "equipment_placement")
 	if ray and equipment_data and equipment_data.dummy_unit then
 		local pos = ray.position
 		local rot = Rotation(ray.normal, math.UP)
@@ -147,7 +147,7 @@ function PlayerEquipment:use_first_aid_kit()
 end
 
 function PlayerEquipment:use_armor_kit()
-	local redirect = function()
+	local function redirect()
 		if Network:is_client() then
 			managers.network:session():send_to_host("used_deployable")
 		else
@@ -155,7 +155,9 @@ function PlayerEquipment:use_armor_kit()
 		end
 		managers.statistics:use_armor_bag()
 		MenuCallbackHandler:_update_outfit_information()
+		self._unit:event_listener():call("on_use_armor_bag")
 	end
+	
 	return true, redirect
 end
 
@@ -224,7 +226,7 @@ end
 function PlayerEquipment:valid_shape_placement(equipment_id, equipment_data)
 	local from = self._unit:movement():m_head_pos()
 	local to = from + self._unit:movement():m_head_rot():y() * 220
-	local ray = self._unit:raycast("ray", from, to, "slot_mask", managers.slot:get_mask("trip_mine_placeables"), "ignore_unit", {})
+	local ray = self._unit:raycast("ray", from, to, "slot_mask", managers.slot:get_mask("trip_mine_placeables"), "ignore_unit", {}, "ray_type", "equipment_placement")
 	local valid = ray and true or false
 	if ray then
 		local pos = ray.position
@@ -271,20 +273,19 @@ function PlayerEquipment:_can_place(eq_id)
 		if not equipment_data then
 			return false
 		end
-		local equipment_tweak_data = tweak_data.equipments[equipment_data.equipment]
-		if not equipment_tweak_data.min_ammo_cost then
-			return true
-		end
-		local current_weapon = managers.player:get_current_state():get_equipped_weapon()
-		if current_weapon:get_ammo_ratio_excluding_clip() < equipment_tweak_data.min_ammo_cost then
-			managers.hint:show_hint("sentry_not_enough_ammo_to_place")
-			return false
+		local min_ammo_cost = SentryGunBase.MIN_DEPLOYEMENT_COST
+		local inventory = self._unit:inventory()
+		for _, weapon in pairs(inventory:available_selections()) do
+			if min_ammo_cost > weapon.unit:base():get_ammo_ratio() then
+				managers.hint:show_hint("sentry_not_enough_ammo_to_place")
+				return false
+			end
 		end
 	end
 	return true
 end
 
-function PlayerEquipment:_sentry_gun_ammo_cost()
+function PlayerEquipment:_sentry_gun_ammo_cost(sentry_uid)
 	local equipment_data = managers.player:selected_equipment()
 	if not equipment_data then
 		return
@@ -293,7 +294,32 @@ function PlayerEquipment:_sentry_gun_ammo_cost()
 	if not equipment_tweak_data.ammo_cost then
 		return
 	end
-	managers.player:remove_ammo_from_pool(math.min(equipment_tweak_data.ammo_cost * managers.player:upgrade_value("sentry_gun", "cost_reduction", 1), 0.99))
+	local deployement_cost = SentryGunBase.DEPLOYEMENT_COST[managers.player:upgrade_value("sentry_gun", "cost_reduction", 1)]
+	local inventory = self._unit:inventory()
+	local hud = managers.hud
+	self._sentry_ammo_cost = self._sentry_ammo_cost or {}
+	self._sentry_ammo_cost[sentry_uid] = self._sentry_ammo_cost[sentry_uid] or {
+		{},
+		{}
+	}
+	for index, weapon in pairs(inventory:available_selections()) do
+		local percent_taken = weapon.unit:base():remove_ammo(deployement_cost)
+		self._sentry_ammo_cost[sentry_uid][index] = percent_taken
+		hud:set_ammo_amount(index, weapon.unit:base():ammo_info())
+	end
+end
+
+function PlayerEquipment:get_sentry_deployement_cost(sentry_uid)
+	if self._sentry_ammo_cost and self._sentry_ammo_cost[sentry_uid] then
+		return self._sentry_ammo_cost[sentry_uid]
+	end
+	return nil
+end
+
+function PlayerEquipment:remove_sentry_deployement_cost(sentry_uid)
+	if self._sentry_ammo_cost and self._sentry_ammo_cost[sentry_uid] then
+		self._sentry_ammo_cost[sentry_uid] = nil
+	end
 end
 
 function PlayerEquipment:use_sentry_gun(selected_index, unit_idstring_index)
@@ -306,21 +332,19 @@ function PlayerEquipment:use_sentry_gun(selected_index, unit_idstring_index)
 		local rot = self._unit:movement():m_head_rot()
 		rot = Rotation(rot:yaw(), 0, 0)
 		managers.statistics:use_sentry_gun()
-		local ammo_multiplier = managers.player:upgrade_value("sentry_gun", "extra_ammo_multiplier", 1)
+		local ammo_level = managers.player:upgrade_value("sentry_gun", "extra_ammo_multiplier", 1)
 		local armor_multiplier = 1 + (managers.player:upgrade_value("sentry_gun", "armor_multiplier", 1) - 1) + (managers.player:upgrade_value("sentry_gun", "armor_multiplier2", 1) - 1)
-		local damage_multiplier = managers.player:upgrade_value("sentry_gun", "damage_multiplier", 1)
 		if Network:is_client() then
-			managers.network:session():send_to_host("place_sentry_gun", pos, rot, selected_index, self._unit, unit_idstring_index)
+			managers.network:session():send_to_host("place_sentry_gun", pos, rot, selected_index, self._unit, unit_idstring_index, ammo_level)
 			self._sentrygun_placement_requested = true
 			return false
 		else
 			local shield = managers.player:has_category_upgrade("sentry_gun", "shield")
-			local sentry_gun_unit = SentryGunBase.spawn(self._unit, pos, rot, managers.network:session():local_peer():id(), false, unit_idstring_index)
+			local sentry_gun_unit, spread_level, rot_level = SentryGunBase.spawn(self._unit, pos, rot, managers.network:session():local_peer():id(), false, unit_idstring_index)
 			if sentry_gun_unit then
-				self:_sentry_gun_ammo_cost()
-				local less_noisy = managers.player:has_category_upgrade("sentry_gun", "less_noisy")
+				self:_sentry_gun_ammo_cost(sentry_gun_unit:id())
 				local fire_rate_reduction = managers.player:upgrade_value("sentry_gun", "fire_rate_reduction", 1)
-				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, sentry_gun_unit:movement()._rot_speed_mul, sentry_gun_unit:weapon()._setup.spread_mul, shield, damage_multiplier)
+				managers.network:session():send_to_peers_synched("from_server_sentry_gun_place_result", managers.network:session():local_peer():id(), selected_index, sentry_gun_unit, rot_level, spread_level, shield, ammo_level)
 				sentry_gun_unit:event_listener():call("on_setup", true)
 			else
 				return false
@@ -406,9 +430,9 @@ function PlayerEquipment:use_duck()
 	return true
 end
 
-function PlayerEquipment:from_server_sentry_gun_place_result()
+function PlayerEquipment:from_server_sentry_gun_place_result(sentry_gun_id)
 	if self._sentrygun_placement_requested then
-		self:_sentry_gun_ammo_cost()
+		self:_sentry_gun_ammo_cost(sentry_gun_id)
 	end
 	self._sentrygun_placement_requested = nil
 end

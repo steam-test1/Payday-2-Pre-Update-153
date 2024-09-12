@@ -27,6 +27,9 @@ function InventoryDescription._find_item_in_content(entry, category, content)
 end
 
 local is_weapon_category = function(weapon_tweak, ...)
+	local arg = {
+		...
+	}
 	local category = weapon_tweak.category
 	for i = 1, #arg do
 		if category == arg[i] then

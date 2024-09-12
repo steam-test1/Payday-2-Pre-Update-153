@@ -1,5 +1,8 @@
 core:import("CoreShapeManager")
 CoreAreaTriggerUnitElement = CoreAreaTriggerUnitElement or class(MissionElement)
+CoreAreaTriggerUnitElement.LINK_ELEMENTS = {
+	"spawn_unit_elements"
+}
 AreaTriggerUnitElement = AreaTriggerUnitElement or class(CoreAreaTriggerUnitElement)
 
 function AreaTriggerUnitElement:init(...)
@@ -190,14 +193,6 @@ function CoreAreaTriggerUnitElement:_remove_unit_id(id)
 	self._hed.unit_ids = #self._hed.unit_ids > 0 and self._hed.unit_ids or nil
 	if alive(self._instigator_ctrlr) then
 		self._instigator_ctrlr:set_enabled(not self._hed.unit_ids)
-	end
-end
-
-function CoreAreaTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.spawn_unit_elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.spawn_unit_elements, id)
-		end
 	end
 end
 
@@ -396,6 +391,7 @@ end
 CoreAreaOperatorUnitElement = CoreAreaOperatorUnitElement or class(MissionElement)
 CoreAreaOperatorUnitElement.SAVE_UNIT_POSITION = false
 CoreAreaOperatorUnitElement.SAVE_UNIT_ROTATION = false
+CoreAreaOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 AreaOperatorUnitElement = AreaOperatorUnitElement or class(CoreAreaOperatorUnitElement)
 
 function AreaOperatorUnitElement:init(...)
@@ -453,14 +449,6 @@ function CoreAreaOperatorUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreAreaOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

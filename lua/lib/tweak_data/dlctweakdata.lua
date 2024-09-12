@@ -4909,7 +4909,7 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	if SystemInfo:platform() == Idstring("XB1") then
+	if SystemInfo:platform() == Idstring("XB1") or SystemInfo:platform() == Idstring("PS4") then
 		self.xone_bonus = {}
 		self.xone_bonus.free = true
 		self.xone_bonus.content = {}

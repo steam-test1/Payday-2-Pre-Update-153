@@ -295,6 +295,15 @@ function FireManager:detect_and_give_dmg(params)
 	local characters_hit = {}
 	local units_to_push = {}
 	local hit_units = {}
+	local ignore_units = {}
+	if not params.no_raycast_check_characters then
+		for _, hit_body in ipairs(bodies) do
+			local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_fire
+			if character then
+				table.insert(ignore_units, hit_body:unit())
+			end
+		end
+	end
 	local type
 	for _, hit_body in ipairs(bodies) do
 		local character = hit_body:unit():character_damage() and hit_body:unit():character_damage().damage_fire
@@ -307,9 +316,7 @@ function FireManager:detect_and_give_dmg(params)
 				characters_hit[hit_body:unit():key()] = true
 			else
 				for i_splinter, s_pos in ipairs(splinters) do
-					ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask, "ignore_unit", {
-						hit_body:unit()
-					}, "report")
+					ray_hit = not World:raycast("ray", s_pos, hit_body:center_of_mass(), "slot_mask", slotmask, "ignore_unit", ignore_units, "report")
 					if ray_hit then
 						characters_hit[hit_body:unit():key()] = true
 						break

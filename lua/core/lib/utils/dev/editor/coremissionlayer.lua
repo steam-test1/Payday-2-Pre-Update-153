@@ -110,7 +110,7 @@ function MissionLayer:save_mission(params)
 	return scripts
 end
 
-function MissionLayer:do_spawn_unit(name, pos, rot)
+function MissionLayer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_undo)
 	if not self:current_script() then
 		managers.editor:output_warning("You need to create a mission script first.")
 		return
@@ -119,7 +119,7 @@ function MissionLayer:do_spawn_unit(name, pos, rot)
 		managers.editor:output_warning("Can't create mission element because the current script doesn't belong to current continent.")
 		return
 	end
-	return MissionLayer.super.do_spawn_unit(self, name, pos, rot)
+	return MissionLayer.super.do_spawn_unit(self, name, pos, rot, to_continent_name, prevent_undo)
 end
 
 function MissionLayer:_on_unit_created(unit, ...)
@@ -180,11 +180,11 @@ function MissionLayer:_add_on_executed(unit)
 	return false
 end
 
-function MissionLayer:delete_unit(del_unit)
+function MissionLayer:delete_unit(del_unit, prevent_undo)
 	if not self._editing_mission_element then
 		del_unit:mission_element():delete_unit(self._created_units)
 		del_unit:mission_element():clear()
-		MissionLayer.super.delete_unit(self, del_unit)
+		MissionLayer.super.delete_unit(self, del_unit, prevent_undo)
 	end
 	if self._list_flow then
 		self._list_flow:on_unit_selected(self._selected_unit)

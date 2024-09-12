@@ -560,6 +560,7 @@ function PlayerDriving:on_inventory_event(unit, event)
 		table.delete(self._current_weapon:base()._setup.ignore_units, self._vehicle_unit)
 	end
 	self._current_weapon = weapon
+	weapon:base():set_visibility_state(true)
 end
 
 function PlayerDriving:smoothstep(a, b, step, n)

@@ -42,7 +42,7 @@ function PlayerDamage:init(unit)
 	self._armor_regen_mul = managers.player:upgrade_value("player", "armor_regen_time_mul", 1)
 	self._dire_need = managers.player:has_category_upgrade("player", "armor_depleted_stagger_shot")
 	self._has_damage_speed = managers.player:has_inactivate_temporary_upgrade("temporary", "damage_speed_multiplier")
-	self._has_damage_speed_team = managers.player:upgrade_value("player", "team_damage_speed_multiplier_send")
+	self._has_damage_speed_team = managers.player:upgrade_value("player", "team_damage_speed_multiplier_send", 0) ~= 0
 	
 	local function revive_player()
 		self:revive(true)
@@ -50,6 +50,7 @@ function PlayerDamage:init(unit)
 	
 	managers.player:register_message(Message.RevivePlayer, self, revive_player)
 	self._current_armor_fill = 0
+	local has_swansong_skill = player_manager:has_category_upgrade("temporary", "berserker_damage_multiplier")
 	self._current_state = nil
 	self._listener_holder = unit:event_listener()
 	if player_manager:has_category_upgrade("player", "damage_to_armor") then
@@ -75,6 +76,9 @@ function PlayerDamage:init(unit)
 			CopDamage.register_listener("on_damage", {"on_damage"}, on_damage)
 		end
 	end
+	self._listener_holder:add("on_use_armor_bag", {
+		"on_use_armor_bag"
+	}, callback(self, self, "_on_use_armor_bag_event"))
 	if self:_init_armor_grinding_data() then
 		function self._on_damage_callback_func()
 			return callback(self, self, "_on_damage_armor_grinding")
@@ -84,13 +88,15 @@ function PlayerDamage:init(unit)
 		self._listener_holder:add("on_enter_bleedout", {
 			"on_enter_bleedout"
 		}, callback(self, self, "_on_enter_bleedout_event"))
-		self._listener_holder:add("on_enter_swansong", {
-			"on_enter_swansong"
-		}, callback(self, self, "_on_enter_swansong_event"))
+		if has_swansong_skill then
+			self._listener_holder:add("on_enter_swansong", {
+				"on_enter_swansong"
+			}, callback(self, self, "_on_enter_swansong_event"))
+			self._listener_holder:add("on_exit_swansong", {
+				"on_enter_bleedout"
+			}, callback(self, self, "_on_exit_swansong_event"))
+		end
 		self._listener_holder:add("on_revive", {"on_revive"}, callback(self, self, "_on_revive_event"))
-		self._listener_holder:add("on_use_armor_bag", {
-			"on_use_armor_bag"
-		}, callback(self, self, "_on_use_armor_bag_event"))
 	else
 		self:_init_standard_listeners()
 	end
@@ -118,6 +124,9 @@ function PlayerDamage:init(unit)
 			"on_revive_interaction_success"
 		}, on_revive_interaction_success)
 	end
+	managers.mission:add_global_event_listener("player_regenerate_armor", {
+		"player_regenerate_armor"
+	}, callback(self, self, "_regenerate_armor"))
 end
 
 function PlayerDamage:_init_standard_listeners()
@@ -129,14 +138,20 @@ function PlayerDamage:_init_standard_listeners()
 	self._listener_holder:add("on_enter_bleedout", {
 		"on_enter_bleedout"
 	}, callback(self, self, "_on_enter_bleedout_event"))
-	self._listener_holder:add("on_enter_swansong", {
-		"on_enter_swansong"
-	}, callback(self, self, "_on_enter_swansong_event"))
 	self._listener_holder:add("on_revive", {"on_revive"}, callback(self, self, "_on_revive_event"))
+	if managers.player:has_category_upgrade("temporary", "berserker_damage_multiplier") then
+		self._listener_holder:add("on_enter_swansong", {
+			"on_enter_swansong"
+		}, callback(self, self, "_on_enter_swansong_event"))
+		self._listener_holder:add("on_exit_swansong", {
+			"on_enter_bleedout"
+		}, callback(self, self, "_on_exit_swansong_event"))
+	end
 end
 
 function PlayerDamage:_on_use_armor_bag_event()
 	self:_init_armor_grinding_data()
+	self:_regenerate_armor()
 end
 
 function PlayerDamage:_on_damage_event()
@@ -174,6 +189,19 @@ end
 function PlayerDamage:_on_enter_swansong_event()
 	self:_remove_on_damage_event()
 	self._block_medkit_auto_revive = true
+	self.swansong = true
+	if Network:is_client() then
+		managers.network:session():send_to_host("sync_player_swansong", self._unit, true)
+	else
+		managers.network:session():send_to_peers("sync_swansong_hud", self._unit, managers.network:session():local_peer():id())
+	end
+end
+
+function PlayerDamage:_on_exit_swansong_event()
+	self.swansong = nil
+	if Network:is_client() then
+		managers.network:session():send_to_host("sync_player_swansong", self._unit, false)
+	end
 end
 
 function PlayerDamage:_activate_combat_medic_damage_reduction()
@@ -183,6 +211,7 @@ end
 function PlayerDamage:_on_revive_event()
 	self:_add_on_damage_event()
 	self._block_medkit_auto_revive = false
+	self.swansong = nil
 end
 
 function PlayerDamage:_remove_on_damage_event()
@@ -272,6 +301,7 @@ function PlayerDamage:update(unit, t, dt)
 				total = max_health,
 				revives = Application:digest_value(self._revives, false)
 			})
+			managers.network:session():send_to_peers("sync_swansong_timer", self._unit, delta * max_health, max_health, Application:digest_value(self._revives, false), managers.network:session():local_peer():id())
 		end
 	end
 	if self._bleed_out_blocked_by_zipline and not self._unit:movement():zipline_unit() then
@@ -329,6 +359,13 @@ function PlayerDamage:update(unit, t, dt)
 	if not self._dead and not self._bleed_out and not self._check_berserker_done then
 		self:_upd_health_regen(t, dt)
 	end
+end
+
+function PlayerDamage:get_revives()
+	if self._revives then
+		return Application:digest_value(self._revives, false)
+	end
+	return 0
 end
 
 function PlayerDamage:_update_armor_hud(t, dt)
@@ -401,8 +438,8 @@ function PlayerDamage:replenish()
 	SoundDevice:set_rtpc("downed_state_progression", 0)
 end
 
-function PlayerDamage:_regenerate_armor()
-	if self._unit:sound() then
+function PlayerDamage:_regenerate_armor(no_sound)
+	if self._unit:sound() and not no_sound then
 		self._unit:sound():play("shield_full_indicator")
 	end
 	self._regenerate_speed = nil
@@ -668,7 +705,8 @@ function PlayerDamage:damage_melee(attack_data)
 	if not self:_chk_can_take_dmg() then
 		return
 	end
-	local can_counter_strike = managers.player:has_category_upgrade("player", "counter_strike_melee")
+	local pm = managers.player
+	local can_counter_strike = pm:has_category_upgrade("player", "counter_strike_melee")
 	if can_counter_strike and self._unit:movement():current_state().in_melee and self._unit:movement():current_state():in_melee() then
 		self._unit:movement():current_state():discharge_melee()
 		return "countered"
@@ -687,9 +725,8 @@ function PlayerDamage:damage_melee(attack_data)
 			normal = rot
 		})
 	end
-	local dmg_mul = managers.player:damage_reduction_skill_multiplier("melee", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
+	local dmg_mul = pm:damage_reduction_skill_multiplier("melee")
 	attack_data.damage = attack_data.damage * dmg_mul
-	self:_damage_reduction(attack_data)
 	self._unit:sound():play("melee_hit_body", nil, nil)
 	local result = self:damage_bullet(attack_data)
 	local vars = {
@@ -697,9 +734,9 @@ function PlayerDamage:damage_melee(attack_data)
 		"melee_hit_var2"
 	}
 	self._unit:camera():play_shaker(vars[math.random(#vars)], 1)
-	if managers.player:current_state() == "bipod" then
+	if pm:current_state() == "bipod" then
 		self._unit:movement()._current_state:exit(nil, "standard")
-		managers.player:set_player_state("standard")
+		pm:set_player_state("standard")
 	end
 	self._unit:movement():push(attack_data.push_vel)
 	return result
@@ -736,20 +773,21 @@ function PlayerDamage:damage_bullet(attack_data)
 		result = {type = "hurt", variant = "bullet"},
 		attacker_unit = attack_data.attacker_unit
 	}
-	local dmg_mul = managers.player:damage_reduction_skill_multiplier("bullet", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
+	local pm = managers.player
+	local dmg_mul = pm:damage_reduction_skill_multiplier("bullet")
 	attack_data.damage = attack_data.damage * dmg_mul
-	local damage_absorption = managers.player:get_best_cocaine_damage_absorption()
+	local damage_absorption = pm:get_best_cocaine_damage_absorption()
 	if 0 < damage_absorption then
 		attack_data.damage = math.max(0, attack_data.damage - damage_absorption)
 	end
-	local hostage_absorption = managers.player:damage_absorption()
+	local hostage_absorption = pm:damage_absorption()
 	if 0 < hostage_absorption then
 		attack_data.damage = math.max(0, attack_data.damage - hostage_absorption)
 	end
 	local dodge_roll = math.rand(1)
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
-	local armor_dodge_chance = managers.player:body_armor_value("dodge")
-	local skill_dodge_chance = managers.player:skill_dodge_chance(self._unit:movement():running(), self._unit:movement():crouching(), self._unit:movement():zipline_unit())
+	local armor_dodge_chance = pm:body_armor_value("dodge")
+	local skill_dodge_chance = pm:skill_dodge_chance(self._unit:movement():running(), self._unit:movement():crouching(), self._unit:movement():zipline_unit())
 	dodge_value = dodge_value + armor_dodge_chance + skill_dodge_chance
 	if dodge_roll < dodge_value then
 		if attack_data.damage > 0 then
@@ -758,11 +796,10 @@ function PlayerDamage:damage_bullet(attack_data)
 		self:_call_listeners(damage_info)
 		self:play_whizby(attack_data.col_ray.position)
 		self:_hit_direction(attack_data.col_ray)
-		self._next_allowed_dmg_t = Application:digest_value(managers.player:player_timer():time() + self._dmg_interval, true)
+		self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
 		self._last_received_dmg = attack_data.damage
 		return
 	end
-	self:_damage_reduction(attack_data)
 	if self._god_mode then
 		if attack_data.damage > 0 then
 			self:_send_damage_drama(attack_data, attack_data.damage)
@@ -790,15 +827,15 @@ function PlayerDamage:damage_bullet(attack_data)
 	else
 		self._unit:sound():play("player_hit_permadamage")
 	end
-	local shake_armor_multiplier = managers.player:body_armor_value("damage_shake") * managers.player:upgrade_value("player", "damage_shake_multiplier", 1)
+	local shake_armor_multiplier = pm:body_armor_value("damage_shake") * pm:upgrade_value("player", "damage_shake_multiplier", 1)
 	local gui_shake_number = tweak_data.gui.armor_damage_shake_base / shake_armor_multiplier
-	gui_shake_number = gui_shake_number + managers.player:upgrade_value("player", "damage_shake_addend", 0)
+	gui_shake_number = gui_shake_number + pm:upgrade_value("player", "damage_shake_addend", 0)
 	shake_armor_multiplier = tweak_data.gui.armor_damage_shake_base / gui_shake_number
 	local shake_multiplier = math.clamp(attack_data.damage, 0.2, 2) * shake_armor_multiplier
 	self._unit:camera():play_shaker("player_bullet_damage", 1 * shake_multiplier)
 	managers.rumble:play("damage_bullet")
 	self:_hit_direction(attack_data.col_ray)
-	managers.player:check_damage_carry(attack_data)
+	pm:check_damage_carry(attack_data)
 	if self._bleed_out then
 		self:_bleed_out_damage(attack_data)
 		return
@@ -817,8 +854,7 @@ function PlayerDamage:damage_bullet(attack_data)
 		attack_data.damage = attack_data.damage * armor_reduction_multiplier
 	end
 	health_subtracted = health_subtracted + self:_calc_health_damage(attack_data)
-	managers.player:activate_temporary_upgrade("temporary", "wolverine_health_regen")
-	self._next_allowed_dmg_t = Application:digest_value(managers.player:player_timer():time() + self._dmg_interval, true)
+	self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
 	self._last_received_dmg = health_subtracted
 	if not self._bleed_out and 0 < health_subtracted then
 		self:_send_damage_drama(attack_data, health_subtracted)
@@ -826,14 +862,8 @@ function PlayerDamage:damage_bullet(attack_data)
 		self._kill_taunt_clbk_id = "kill_taunt" .. tostring(self._unit:key())
 		managers.enemy:add_delayed_clbk(self._kill_taunt_clbk_id, callback(self, self, "clbk_kill_taunt", attack_data), TimerManager:game():time() + tweak_data.timespeed.downed.fade_in + tweak_data.timespeed.downed.sustain + tweak_data.timespeed.downed.fade_out)
 	end
-	managers.player:send_message(Message.OnPlayerDamage, nil, nil)
+	pm:send_message(Message.OnPlayerDamage, nil, nil)
 	self:_call_listeners(damage_info)
-end
-
-function PlayerDamage:_damage_reduction(attack_data)
-	if managers.player:has_activate_temporary_upgrade("temporary", "revived_damage_resist") then
-		attack_data.damage = attack_data.damage * managers.player:temporary_upgrade_value("temporary", "revived_damage_resist", 1)
-	end
 end
 
 function PlayerDamage:_calc_armor_damage(attack_data)
@@ -850,10 +880,11 @@ function PlayerDamage:_calc_armor_damage(attack_data)
 			if attack_data.armor_piercing then
 				self._unit:sound():play("player_sniper_hit_armor_gone")
 			end
-			self:_start_regen_on_the_side(managers.player:upgrade_value("player", "passive_always_regen_armor", 0))
-			if managers.player:has_inactivate_temporary_upgrade("temporary", "armor_break_invulnerable") then
-				managers.player:activate_temporary_upgrade("temporary", "armor_break_invulnerable")
-				self._can_take_dmg_timer = managers.player:temporary_upgrade_value("temporary", "armor_break_invulnerable", 0)
+			local pm = managers.player
+			self:_start_regen_on_the_side(pm:upgrade_value("player", "passive_always_regen_armor", 0))
+			if pm:has_inactivate_temporary_upgrade("temporary", "armor_break_invulnerable") then
+				pm:activate_temporary_upgrade("temporary", "armor_break_invulnerable")
+				self._can_take_dmg_timer = pm:temporary_upgrade_value("temporary", "armor_break_invulnerable", 0)
 			end
 		end
 	end
@@ -1025,8 +1056,7 @@ function PlayerDamage:damage_explosion(attack_data)
 	if self._bleed_out then
 		return
 	end
-	local dmg_mul = managers.player:damage_reduction_skill_multiplier("explosion", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
-	self:_damage_reduction(attack_data)
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("explosion")
 	attack_data.damage = damage * dmg_mul
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)
@@ -1061,8 +1091,7 @@ function PlayerDamage:damage_fire(attack_data)
 	if self._bleed_out then
 		return
 	end
-	self:_damage_reduction(attack_data)
-	local dmg_mul = managers.player:damage_reduction_skill_multiplier("fire", self._unit:movement()._current_state, attack_data.attacker_unit and attack_data.attacker_unit:base()._tweak_table)
+	local dmg_mul = managers.player:damage_reduction_skill_multiplier("fire")
 	attack_data.damage = damage * dmg_mul
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)
@@ -1139,14 +1168,6 @@ function PlayerDamage:_check_bleed_out(can_activate_berserker, ignore_movement_s
 			self._critical_state_heart_loop_instance = self._unit:sound():play("critical_state_heart_loop")
 			self._slomo_sound_instance = self._unit:sound():play("downed_slomo_fx")
 			self._bleed_out_health = Application:digest_value(tweak_data.player.damage.BLEED_OUT_HEALTH_INIT * managers.player:upgrade_value("player", "bleed_out_health_multiplier", 1), true)
-			if managers.player:has_category_upgrade("temporary", "pistol_revive_from_bleed_out") then
-				local upgrade_value = managers.player:upgrade_value("temporary", "pistol_revive_from_bleed_out")
-				if upgrade_value == 0 then
-				else
-					local time = upgrade_value[2]
-					managers.player:activate_temporary_upgrade("temporary", "pistol_revive_from_bleed_out")
-				end
-			end
 			self:_drop_blood_sample()
 			self:on_downed()
 		end
@@ -1554,6 +1575,7 @@ function PlayerDamage:pre_destroy()
 	managers.environment_controller:set_suppression_value(0)
 	managers.sequence:remove_inflict_updator_body("fire", self._unit:key(), self._inflict_damage_body:key())
 	CopDamage.unregister_listener("on_damage")
+	managers.mission:remove_global_event_listener("player_regenerate_armor")
 end
 
 function PlayerDamage:_call_listeners(damage_info)
@@ -1689,6 +1711,10 @@ function PlayerDamage:_upd_health_regen(t, dt)
 			end
 		until done
 	end
+end
+
+function PlayerDamage:melee_hit_sfx()
+	return "hit_body"
 end
 
 function PlayerDamage:suppression_ratio()

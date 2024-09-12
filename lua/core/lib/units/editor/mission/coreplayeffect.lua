@@ -82,6 +82,7 @@ function CorePlayEffectUnitElement:add_to_mission_package()
 end
 
 CoreStopEffectUnitElement = CoreStopEffectUnitElement or class(MissionElement)
+CoreStopEffectUnitElement.LINK_ELEMENTS = {"elements"}
 StopEffectUnitElement = StopEffectUnitElement or class(CoreStopEffectUnitElement)
 
 function StopEffectUnitElement:init(...)
@@ -129,15 +130,6 @@ function CoreStopEffectUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreStopEffectUnitElement:remove_links(unit)
-	MissionElement.remove_links(self, unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

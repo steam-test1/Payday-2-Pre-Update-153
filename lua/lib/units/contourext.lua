@@ -120,6 +120,7 @@ ContourExt.indexed_types = {}
 for name, preset in pairs(ContourExt._types) do
 	table.insert(ContourExt.indexed_types, name)
 end
+table.sort(ContourExt.indexed_types)
 if #ContourExt.indexed_types > 32 then
 	Application:error("[ContourExt] max # contour presets exceeded!")
 end

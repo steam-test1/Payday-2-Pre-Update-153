@@ -35,6 +35,7 @@ require("core/lib/utils/dev/editor/ews_classes/UnhideByName")
 require("core/lib/utils/dev/editor/ews_classes/CreateWorldSettingFile")
 require("core/lib/utils/dev/editor/ews_classes/SelectNameModal")
 require("core/lib/utils/dev/editor/ews_classes/MissionElementListFlow")
+require("core/lib/utils/dev/editor/ews_classes/UnitBreakdownView")
 require("core/lib/utils/dev/SettingsHandling")
 require("core/lib/units/editor/CoreMissionElement")
 require("core/lib/units/data/CoreMissionElementData")
@@ -78,6 +79,8 @@ require("core/lib/utils/dev/editor/CoreEditorGroups")
 require("core/lib/utils/dev/editor/CoreEditorCubeMap")
 require("core/lib/utils/dev/editor/CoreEditorDomeOcclusion")
 require("core/lib/utils/dev/editor/utils/CoreFCCEditorController")
+require("core/lib/utils/dev/editor/utils/CoreEditorMessages")
+require("core/lib/utils/dev/editor/utils/CoreEditorMessageSystem")
 
 function CoreEditor:init(game_state_machine, session_state)
 	assert(game_state_machine)
@@ -141,6 +144,7 @@ function CoreEditor:init(game_state_machine, session_state)
 	self:_init_mission_players()
 	self:_init_mission_platforms()
 	self:_init_title_messages()
+	self._message_system = EditorMessageSystem:new()
 end
 
 function CoreEditor:_load_packages()
@@ -228,7 +232,11 @@ function CoreEditor:_init_layer_classes()
 	self:add_layer("Dynamics", CoreDynamicsLayer.DynamicsLayer)
 	self:add_layer("Level Settings", CoreLevelSettingsLayer.LevelSettingsLayer)
 	self:add_layer("Instances", CoreInstancesLayer.InstancesLayer)
-	self._layer_load_order = {
+	self:_project_init_layer_classes()
+end
+
+function CoreEditor:layer_load_order()
+	self._layer_load_order = self._layer_load_order or {
 		"Ai",
 		"Heatmap",
 		"WorldCamera",
@@ -243,7 +251,7 @@ function CoreEditor:_init_layer_classes()
 		"Sound",
 		"Mission"
 	}
-	self:_project_init_layer_classes()
+	return self._layer_load_order
 end
 
 function CoreEditor:_project_init_layer_classes()
@@ -263,11 +271,13 @@ function CoreEditor:_init_configuration_values()
 	self._always_global_select_unit = false
 	self._use_timestamp = false
 	self._reset_camera_on_new = false
-	self._use_beta_undo = false
 	self._dialogs_stay_on_top = false
 	self._save_edit_setting_values = false
 	self._save_dialog_states = false
 	self._use_edit_light_dialog = false
+	self._use_beta_undo = false
+	self._undo_history = 100
+	self._undo_debug = false
 end
 
 function CoreEditor:_init_slot_masks()
@@ -650,6 +660,10 @@ function CoreEditor:close()
 	end
 end
 
+function CoreEditor:is_simulating()
+	return self._current
+end
+
 function CoreEditor:pickup_tool()
 	cat_print("editor", "CoreEditor:pickup_tool")
 	Global.render_debug.draw_enabled = true
@@ -833,6 +847,17 @@ function CoreEditor:go_through_all_units(mask)
 			end
 			if unit:unit_data().helper_type and unit:unit_data().helper_type ~= "none" then
 				managers.helper_unit:add_unit(unit, unit:unit_data().helper_type)
+			end
+			if unit:unit_data().disable_collision then
+				local disable_collision = unit:unit_data().disable_collision
+				for index = 0, unit:num_bodies() - 1 do
+					local body = unit:body(index)
+					if body then
+						body:set_collisions_enabled(not disable_collision)
+						body:set_collides_with_mover(not disable_collision)
+						body:set_enabled(not disable_collision)
+					end
+				end
 			end
 			self:_project_check_unit(unit)
 		end
@@ -2127,7 +2152,9 @@ end
 
 function CoreEditor:update(time, rel_time)
 	if self._enabled then
-		self:update_title_bar(time, rel_time)
+		if self._message_system then
+			self._message_system:update()
+		end
 		if self._in_window then
 			entering_window()
 		end
@@ -3202,7 +3229,7 @@ function CoreEditor:do_load()
 	self:load_values(self._world_holder, offset)
 	local progress_i = 50
 	local layers_amount = table.size(self._layers)
-	for _, name in ipairs(self._layer_load_order) do
+	for _, name in ipairs(self:layer_load_order()) do
 		local layer = self._layers[name]
 		progress_i = progress_i + 50 / layers_amount
 		self:update_load_progress(progress_i, "Create Layer: " .. name)
@@ -3243,6 +3270,7 @@ function CoreEditor:clear_all()
 	self:has_editables()
 	self:_clear_values()
 	self:_recreate_dialogs()
+	self._message_system = EditorMessageSystem:new()
 end
 
 function CoreEditor:load_markers(world_holder, offset)
@@ -3684,6 +3712,14 @@ function CoreEditor:use_beta_undo()
 	return self._use_beta_undo
 end
 
+function CoreEditor:undo_history_size()
+	return self._undo_history
+end
+
+function CoreEditor:undo_debug()
+	return self._undo_debug
+end
+
 CoreEditorContinent = CoreEditorContinent or class()
 
 function CoreEditorContinent:init(name, values)
@@ -3881,4 +3917,20 @@ function CoreEditor:update_post_effects()
 			self._post_processor_effects_menu:set_checked(id, pe.enable)
 		end
 	end
+end
+
+function CoreEditor:register_message(message, uid, func)
+	return self._message_system:register(message, uid, func)
+end
+
+function CoreEditor:unregister_message(message, uid)
+	self._message_system:unregister(message, uid)
+end
+
+function CoreEditor:send_message(message, uid, ...)
+	self._message_system:notify(message, uid, ...)
+end
+
+function CoreEditor:send_message_now(message, uid, ...)
+	self._message_system:notify_now(message, uid, ...)
 end

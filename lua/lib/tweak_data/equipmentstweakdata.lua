@@ -76,8 +76,8 @@ function EquipmentsTweakData:init()
 			upgrade = "sentry_gun_deploy_time_multiplier"
 		},
 		visual_object = "g_sentrybag",
-		ammo_cost = 0.2,
-		min_ammo_cost = 0.33
+		ammo_cost = 0.7,
+		min_ammo_cost = 0.8
 	}
 	self.sentry_gun_silent = {
 		icon = "equipment_sentry_silent",
@@ -93,7 +93,7 @@ function EquipmentsTweakData:init()
 			upgrade = "sentry_gun_deploy_time_multiplier"
 		},
 		visual_object = "g_sentrybag",
-		ammo_cost = 0.2,
+		ammo_cost = 0.46,
 		min_ammo_cost = 0.33,
 		upgrade_name = {"sentry_gun"}
 	}
@@ -219,7 +219,7 @@ function EquipmentsTweakData:init()
 	self.specials.chavez_key = {
 		text_id = "hud_int_equipment_chavez_keys",
 		icon = "equipment_chavez_key",
-		action_message = "chavez_keys_obtained",
+		action_message = "bank_manager_key_obtained",
 		sync_possession = true
 	}
 	self.specials.drill = {

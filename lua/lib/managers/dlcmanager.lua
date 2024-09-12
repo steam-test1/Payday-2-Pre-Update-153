@@ -1125,7 +1125,7 @@ function XB1DLCManager:_verify_dlcs()
 		if dlc_data.is_default then
 			dlc_data.verified = true
 		else
-			dlc_data.verified = XboxLive:check_dlc(dlc_data.product_id)
+			dlc_data.verified = XboxLive and XboxLive:check_dlc(dlc_data.product_id)
 		end
 		dlc_content_updated = dlc_content_updated or old_verified ~= dlc_data.verified
 	end

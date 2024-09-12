@@ -8,7 +8,9 @@ core:import("CoreClass")
 core:import("CoreCode")
 core:import("CoreInput")
 core:import("CoreTable")
+core:import("CoreStack")
 core:import("CoreUnit")
+core:import("CoreEditorCommand")
 Layer = Layer or CoreClass.class()
 
 function Layer:init(owner, save_name)
@@ -27,6 +29,8 @@ function Layer:init(owner, save_name)
 	self._notebook_units_lists = {}
 	self._editor_data = self._owner._editor_data
 	self._ctrl = self._editor_data.virtual_controller
+	self._undo_stack = CoreStack.Stack:new()
+	self._redo_stack = CoreStack.Stack:new()
 	self._move_widget = CoreEditorWidgets.MoveWidget:new(self)
 	self._rotate_widget = CoreEditorWidgets.RotationWidget:new(self)
 	self._layer_enabled = true
@@ -65,6 +69,10 @@ function Layer:uses_continents()
 	return self._uses_continents
 end
 
+function Layer:owner()
+	return self._owner
+end
+
 function Layer:load(world_holder, offset)
 	local world_units = world_holder:create_world("world", self._save_name, offset)
 	if world_units then
@@ -72,6 +80,7 @@ function Layer:load(world_holder, offset)
 			self:add_unit_to_created_units(unit)
 		end
 	end
+	self:clear_undo_stack()
 	return world_units
 end
 
@@ -202,11 +211,27 @@ function Layer:_update_widget_affect_object(t, dt)
 			if self._using_widget then
 				if self._move_widget:enabled() then
 					local result_pos = self._move_widget:calculate(self:widget_affect_object(), widget_rot, widget_pos, widget_screen_pos)
-					self:use_widget_position(result_pos)
+					if self._last_pos ~= result_pos then
+						self:use_widget_position(result_pos)
+					end
+					self._last_pos = result_pos
 				end
 				if self._rotate_widget:enabled() then
 					local result_rot = self._rotate_widget:calculate(self:widget_affect_object(), widget_rot, widget_pos, widget_screen_pos)
-					self:use_widget_rotation(result_rot)
+					if self._last_rot ~= result_rot then
+						self:use_widget_rotation(result_rot)
+					end
+					self._last_rot = result_rot
+				end
+			end
+			if not self._using_widget and (self._move_widget:enabled() or self._rotate_widget:enabled()) then
+				if self._move_widget:enabled() and self._last_pos ~= nil then
+					self:use_widget_position(self._last_pos)
+					self._last_pos = nil
+				end
+				if self._rotate_widget:enabled() and self._last_rot ~= nil then
+					self:use_widget_rotation(self._last_rot)
+					self._last_rot = nil
 				end
 			end
 			if self._move_widget:enabled() then
@@ -637,6 +662,9 @@ function Layer:widget_rot()
 end
 
 function Layer:click_widget()
+	if not self:widget_affect_object() or not alive(self:widget_affect_object()) then
+		return
+	end
 	local from = managers.editor:get_cursor_look_point(0)
 	local to = managers.editor:get_cursor_look_point(100000)
 	if self._move_widget:enabled() then
@@ -1137,24 +1165,30 @@ function Layer:create_unit(name, pos, rot, to_continent_name)
 	return unit
 end
 
-function Layer:do_spawn_unit(name, pos, rot, to_continent_name)
+function Layer:do_spawn_unit(name, pos, rot, to_continent_name, prevent_undo)
+	if prevent_undo == nil and managers.editor:undo_debug() then
+		Application:stack_dump()
+		print("[Undo] WARNING: Called do_spawn_unit without setting 'prevent_undo'! This can create unit delete-spawn recursion, so fix it!")
+	end
 	local continent = to_continent_name and managers.editor:continent(to_continent_name) or managers.editor:current_continent()
 	if continent:value("locked") and not self._continent_locked_picked then
 		managers.editor:output_warning("Can't create units in continent " .. managers.editor:current_continent():name() .. " because it is locked!")
 		return
 	end
 	if name:s() ~= "" then
-		pos = pos or self._current_pos
+		pos = pos or self:current_pos()
 		rot = rot or Rotation(Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1))
-		local unit = self:create_unit(name, pos, rot, to_continent_name)
-		table.insert(self._created_units, unit)
-		self._created_units_pairs[unit:unit_data().unit_id] = unit
-		self:set_select_unit(unit)
+		local command = CoreEditorCommand.SpawnUnitCommand:new(self)
+		local unit = command:execute(name, pos, rot, to_continent_name)
+		if not prevent_undo then
+			self:register_undo_command(command)
+		end
 		return unit
 	end
 end
 
 function Layer:remove_unit(unit)
+	self:on_unit_removed(unit)
 	table.delete(self._selected_units, unit)
 	self:remove_highlighted_unit(unit)
 	self:remove_name_id(unit)
@@ -1167,14 +1201,30 @@ function Layer:remove_unit(unit)
 	World:delete_unit(unit)
 end
 
-function Layer:delete_unit(unit)
-	if self._selected_unit == unit then
-		self:set_reference_unit(nil)
-		self:update_unit_settings()
+function Layer:on_unit_removed(unit)
+	for i, command in pairs(self._undo_stack:stack_table()) do
+		command:delete_unit(unit:unit_data().unit_id)
 	end
-	table.delete(self._created_units, unit)
-	self._created_units_pairs[unit:unit_data().unit_id] = nil
-	self:remove_unit(unit)
+	for i, command in pairs(self._redo_stack:stack_table()) do
+		command:delete_unit(unit:unit_data().unit_id)
+	end
+end
+
+function Layer:delete_unit(unit, prevent_undo)
+	local command = CoreEditorCommand.DeleteStaticUnitCommand:new(self)
+	command:execute(unit)
+	if not prevent_undo then
+		self:register_undo_command(command)
+	end
+end
+
+function Layer:on_unit_restored(old_id, new_unit)
+	for i, command in pairs(self._undo_stack:stack_table()) do
+		command:restore_unit(old_id, new_unit)
+	end
+	for i, command in pairs(self._redo_stack:stack_table()) do
+		command:restore_unit(old_id, new_unit)
+	end
 end
 
 function Layer:_on_unit_created(unit)
@@ -1222,7 +1272,73 @@ function Layer:get_help(text)
 end
 
 function Layer:undo()
-	cat_debug("editor", "No undo implemented in current layer")
+	if not managers.editor:use_beta_undo() then
+		return false
+	end
+	if self:alt() then
+		if self:shift() then
+			if managers.editor:undo_debug() and not Input:keyboard():down(Idstring("right shift")) then
+				self:_print_undo_stacks()
+			else
+				self:clear_undo_stack()
+			end
+		end
+		return
+	end
+	if self:shift() then
+		self:_redo()
+	else
+		self:_undo()
+	end
+end
+
+function Layer:_undo()
+	if not self._undo_stack:is_empty() then
+		local command = self._undo_stack:pop()
+		command:undo()
+		self._redo_stack:push(command)
+	end
+end
+
+function Layer:_redo()
+	if not self._redo_stack:is_empty() then
+		local command = self._redo_stack:pop()
+		command:execute()
+		self._undo_stack:push(command)
+	end
+end
+
+function Layer:register_undo_command(command)
+	if managers.editor:undo_debug() then
+		print("[Undo] register undo ", command)
+	end
+	self._undo_stack:push(command)
+	if self._undo_stack:size() > managers.editor:undo_history_size() then
+		local dif = self._undo_stack:size() - managers.editor:undo_history_size()
+		table.remove(self._undo_stack:stack_table(), 1, dif)
+		self._undo_stack._last = self._undo_stack._last - dif
+	end
+	if not self._redo_stack:is_empty() then
+		self._redo_stack:clear()
+	end
+end
+
+function Layer:clear_undo_stack()
+	self._undo_stack:clear()
+	self._redo_stack:clear()
+	print("[Undo] Undo/Redo stack cleared!")
+end
+
+function Layer:_print_undo_stacks()
+	print("[Undo] undo stack: ")
+	for i, command in pairs(self._undo_stack:stack_table()) do
+		print(string.format("[Undo] %i: %s", i, tostring(command)))
+	end
+	print("[Undo] redo stack: ")
+	for i, command in pairs(self._redo_stack:stack_table()) do
+		print(string.format("[Undo] %i: %s", #self._undo_stack:stack_table() + i, tostring(command)))
+	end
+	print("[Undo] ------")
 end
 
 function Layer:clone()
@@ -1327,20 +1443,21 @@ function Layer:set_enabled(enabled)
 end
 
 function Layer:hide_all()
-	local units_in_layer = self._created_units
-	for _, unit in ipairs(units_in_layer) do
-		if unit:enabled() then
-			managers.editor:set_unit_visible(unit, false)
-		end
-	end
+	self:_hide_units(self._created_units, true)
 end
 
 function Layer:unhide_all()
-	for _, unit in ipairs(self._created_units) do
-		if unit:enabled() then
-			managers.editor:set_unit_visible(unit, true)
-		end
-	end
+	self:_hide_units(self._created_units, false)
+end
+
+function Layer:on_hide_selected()
+	self:_hide_units(_G.clone(self:selected_units()), true)
+end
+
+function Layer:_hide_units(units, hide)
+	local hide_command = CoreEditorCommand.HideUnitsCommand:new(self)
+	hide_command:execute(units, hide)
+	self:register_undo_command(hide_command)
 end
 
 function Layer:clear()
@@ -1401,10 +1518,10 @@ end
 function Layer:on_continent_changed()
 end
 
-function Layer:set_unit_rotations()
+function Layer:set_unit_rotations(rot, finalize)
 end
 
-function Layer:set_unit_positions()
+function Layer:set_unit_positions(pos, finalize)
 end
 
 function Layer:_add_project_save_data(data)

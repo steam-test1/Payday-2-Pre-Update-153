@@ -170,8 +170,11 @@ function SentryGunBrain:_upd_detection(t)
 			attention_info.next_verify_t = t + (attention_info.identified and attention_info.verified and attention_info.settings.verification_interval or attention_info.settings.notice_interval or attention_info.settings.verification_interval)
 			update_delay = math.min(update_delay, attention_info.settings.verification_interval)
 			if not attention_info.identified then
+				local health_ratio = self:_attention_health_ratio(attention_info)
+				local objective = self:_attention_objective(attention_info)
 				local noticable
 				local distance = _distance_chk(attention_info.handler, attention_info.settings, nil)
+				local skip = objective == "surrender" or health_ratio <= 0
 				if distance then
 					local attention_pos = attention_info.handler:get_detection_m_pos()
 					local vis_ray = World:raycast("ray", my_pos, attention_pos, "ignore_unit", ignore_units, "slot_mask", self._visibility_slotmask, "ray_type", "ai_vision", "report")
@@ -181,7 +184,7 @@ function SentryGunBrain:_upd_detection(t)
 				end
 				local delta_prog
 				local dt = t - attention_info.prev_notice_chk_t
-				if noticable then
+				if noticable and not skip then
 					local min_delay = self._tweak_data.DETECTION_DELAY[1][2]
 					local max_delay = self._tweak_data.DETECTION_DELAY[2][2]
 					local dis_ratio = (distance - self._tweak_data.DETECTION_DELAY[1][1]) / (self._tweak_data.DETECTION_DELAY[2][1] - self._tweak_data.DETECTION_DELAY[1][1])
@@ -196,14 +199,14 @@ function SentryGunBrain:_upd_detection(t)
 					delta_prog = dt * -0.125
 				end
 				attention_info.notice_progress = attention_info.notice_progress + delta_prog
-				if 1 < attention_info.notice_progress then
+				if 1 < attention_info.notice_progress and not skip then
 					attention_info.notice_progress = nil
 					attention_info.prev_notice_chk_t = nil
 					attention_info.identified = true
 					attention_info.release_t = t + attention_info.settings.release_delay
 					attention_info.identified_t = t
 					noticable = true
-				elseif 0 > attention_info.notice_progress then
+				elseif 0 > attention_info.notice_progress or skip then
 					self:_destroy_detected_attention_object_data(attention_info)
 					noticable = false
 				else
@@ -237,7 +240,9 @@ function SentryGunBrain:_upd_detection(t)
 				end
 				attention_info.dis = dis
 				attention_info.vis_ray = vis_ray and vis_ray.dis or nil
-				if verified then
+				if self:_attention_health_ratio(attention_info) <= 0 or self:_attention_objective(attention_info) == "surrender" then
+					self:_destroy_detected_attention_object_data(attention_info)
+				elseif verified then
 					attention_info.release_t = nil
 					attention_info.verified_t = t
 					mvector3.set(attention_info.verified_pos, attention_pos)
@@ -288,13 +293,14 @@ function SentryGunBrain:_select_focus_attention(t)
 			return
 		end
 		local total_weight = 1
-		if attention_info.verified then
+		if attention_info.health_ratio and attention_info.unit:character_damage():health_ratio() <= 0 then
+			return 0
 		elseif attention_info.verified_t and t - attention_info.verified_t < 3 then
 			local max_duration = 3
 			local elapsed_t = t - attention_info.verified_t
 			total_weight = total_weight * math.lerp(1, 0.6, elapsed_t / max_duration)
 		else
-			return
+			return 0
 		end
 		if attention_info.settings.weight_mul then
 			total_weight = total_weight * attention_info.settings.weight_mul
@@ -602,6 +608,20 @@ function SentryGunBrain:on_hacked_end()
 	PlayerMovement.set_attention_settings(self, {
 		"sentry_gun_enemy_cbt"
 	})
+end
+
+function SentryGunBrain:_attention_health_ratio(attention)
+	if attention and attention.health_ratio then
+		return attention.unit:character_damage():health_ratio()
+	end
+	return 1
+end
+
+function SentryGunBrain:_attention_objective(attention)
+	if attention and attention.objective then
+		return attention.unit:brain():objective()
+	end
+	return "unknown"
 end
 
 function SentryGunBrain:save(save_data)

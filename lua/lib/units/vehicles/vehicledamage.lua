@@ -23,6 +23,10 @@ function VehicleDamage:set_tweak_data(data)
 	self._HEALTH_INIT_PRECENT = self._current_max_health / self._HEALTH_GRANULARITY
 end
 
+function VehicleDamage:melee_hit_sfx()
+	return "hit_gen"
+end
+
 function VehicleDamage:is_invulnerable()
 	local result = false
 	local players_count_inside_vehicle = self._unit:vehicle_driving():num_players_inside()

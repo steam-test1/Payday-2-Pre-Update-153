@@ -259,7 +259,7 @@ function PlayerInventory:_send_equipped_weapon()
 		debug_pause("[PlayerInventory:_send_equipped_weapon] cannot sync weapon", eq_weap_name, self._unit)
 		return
 	end
-	local blueprint_string = self:equipped_unit():base().blueprint_to_string and self:equipped_unit():base():blueprint_to_string() or ""
+	local blueprint_string = self:equipped_unit():base()._blueprint and self:equipped_unit():base().blueprint_to_string and self:equipped_unit():base():blueprint_to_string() or ""
 	local cosmetics_string = ""
 	local cosmetics_id = self:equipped_unit():base().get_cosmetics_id and self:equipped_unit():base():get_cosmetics_id() or nil
 	if cosmetics_id then
@@ -395,7 +395,7 @@ end
 function PlayerInventory:hide_equipped_unit()
 	local unit = self._equipped_selection and self._available_selections[self._equipped_selection].unit
 	if unit then
-		self._was_gadget_on = unit:base().is_gadget_on and unit:base():is_gadget_on() or false
+		self._was_gadget_on = unit:base().is_gadget_on and unit:base()._gadget_on or false
 		unit:set_visible(false)
 		unit:base():on_disabled()
 	end

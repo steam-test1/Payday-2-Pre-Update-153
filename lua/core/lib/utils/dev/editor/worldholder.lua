@@ -1377,6 +1377,7 @@ function CoreOldWorldDefinition:make_generic_data(in_data)
 	local triggers = in_data.triggers
 	local cutscene_actor = in_data.cutscene_actor
 	local disable_shadows = in_data.disable_shadows
+	local disable_collision = in_data.disable_collision
 	if generic then
 		data._unit_id = generic.unit_id
 		data._name_id = generic.name_id
@@ -1402,6 +1403,9 @@ function CoreOldWorldDefinition:make_generic_data(in_data)
 	if disable_shadows then
 		data.disable_shadows = disable_shadows.value
 	end
+	if disable_collision then
+		data.disable_collision = disable_collision.value
+	end
 	data._editable_gui = in_data.editable_gui
 	return data
 end
@@ -1425,6 +1429,7 @@ function Generic:init(node)
 	node:for_each("exists_in_stage", callback(self, self, "parse_exists_in_stage"))
 	node:for_each("cutscene_actor", callback(self, self, "cutscene_actor_settings"))
 	node:for_each("disable_shadows", callback(self, self, "parse_disable_shadows"))
+	node:for_each("disable_collision", callback(self, self, "parse_disable_collision"))
 end
 
 function Generic:parse_orientation(node)
@@ -1507,6 +1512,10 @@ end
 
 function Generic:parse_disable_shadows(node)
 	self.disable_shadows = toboolean(node:parameter("value"))
+end
+
+function Generic:parse_disable_collision(node)
+	self.disable_collision = toboolean(node:parameter("value"))
 end
 
 function Generic:parse_exists_in_stage(node)

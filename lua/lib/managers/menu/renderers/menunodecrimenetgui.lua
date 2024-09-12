@@ -3479,12 +3479,12 @@ function MenuNodeOpenContainerGui:setup(half_fade)
 	}))
 	local content_height = w / 2
 	local drill_safe_size = h - content_height - padding
-	local drill_panel = panel:panel({
-		name = "drill",
-		w = drill_safe_size,
-		h = drill_safe_size
-	})
-	do
+	if not tweak_data.economy.safes[container_data.safe].free then
+		local drill_panel = panel:panel({
+			name = "drill",
+			w = drill_safe_size,
+			h = drill_safe_size
+		})
 		local td = tweak_data.economy.drills[container_data.drill]
 		local guis_catalog = "guis/"
 		local bundle_folder = td.texture_bundle_folder

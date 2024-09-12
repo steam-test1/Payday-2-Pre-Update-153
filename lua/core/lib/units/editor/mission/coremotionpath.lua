@@ -1,4 +1,5 @@
 CoreMotionPathOperatorUnitElement = CoreMotionPathOperatorUnitElement or class(MissionElement)
+CoreMotionPathOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 MotionPathOperatorUnitElement = MotionPathOperatorUnitElement or class(CoreMotionPathOperatorUnitElement)
 
 function MotionPathOperatorUnitElement:init(...)
@@ -82,14 +83,6 @@ function CoreMotionPathOperatorUnitElement:add_element()
 	end
 end
 
-function CoreMotionPathOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
-		end
-	end
-end
-
 function CoreMotionPathOperatorUnitElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "add_element"))
 end
@@ -135,6 +128,7 @@ function CoreMotionPathOperatorUnitElement:on_executed_marker_selected()
 end
 
 CoreMotionPathTriggerUnitElement = CoreMotionPathTriggerUnitElement or class(MissionElement)
+CoreMotionPathTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 MotionPathTriggerUnitElement = MotionPathTriggerUnitElement or class(CoreMotionPathTriggerUnitElement)
 
 function MotionPathTriggerUnitElement:init(...)
@@ -193,14 +187,6 @@ function CoreMotionPathTriggerUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreMotionPathTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

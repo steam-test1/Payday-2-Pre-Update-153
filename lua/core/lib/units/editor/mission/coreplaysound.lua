@@ -1,4 +1,5 @@
 CorePlaySoundUnitElement = CorePlaySoundUnitElement or class(MissionElement)
+CorePlaySoundUnitElement.LINK_ELEMENTS = {"elements"}
 PlaySoundUnitElement = PlaySoundUnitElement or class(CorePlaySoundUnitElement)
 
 function PlaySoundUnitElement:init(...)
@@ -47,14 +48,6 @@ function CorePlaySoundUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CorePlaySoundUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

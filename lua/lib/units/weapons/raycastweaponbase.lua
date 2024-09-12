@@ -779,6 +779,17 @@ function RaycastWeaponBase:remove_ammo_from_pool(percent)
 	end
 end
 
+function RaycastWeaponBase:remove_ammo(percent)
+	local total_ammo = self:get_ammo_total()
+	local ammo = math.floor(total_ammo * percent)
+	self:set_ammo_total(ammo)
+	local ammo_in_clip = self:get_ammo_remaining_in_clip()
+	if ammo_in_clip > self:get_ammo_total() then
+		self:set_ammo_remaining_in_clip(ammo)
+	end
+	return total_ammo - ammo
+end
+
 function RaycastWeaponBase:set_ammo_remaining_in_clip(ammo_remaining_in_clip)
 	if self._ammo_remaining_in_clip then
 		if self._ammo_remaining_in_clip2 then
@@ -935,6 +946,7 @@ function RaycastWeaponBase:enter_steelsight_speed_multiplier()
 end
 
 function RaycastWeaponBase:fire_rate_multiplier()
+	return 1
 end
 
 function RaycastWeaponBase:upgrade_value(value, default)
@@ -1034,6 +1046,13 @@ function RaycastWeaponBase:can_reload()
 	return self:get_ammo_total() > self:get_ammo_remaining_in_clip()
 end
 
+function RaycastWeaponBase:add_ammo_in_bullets(bullets)
+	local ammo_max = self:get_ammo_max()
+	local ammo_total = self:get_ammo_total()
+	local ammo = math.clamp(ammo_total + bullets, 0, ammo_max)
+	self:set_ammo_total(ammo)
+end
+
 function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
 	if self:ammo_max() then
 		return false, 0
@@ -1062,6 +1081,17 @@ function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
 	add_amount = math.floor(add_amount * (ratio or 1))
 	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
 	return picked_up, add_amount
+end
+
+function RaycastWeaponBase:add_ammo_ratio(ammo_ratio_increase)
+	if self:ammo_max() then
+		return
+	end
+	local ammo_max = self:get_ammo_max()
+	local ammo_total = self:get_ammo_total()
+	ammo_total = math.ceil(ammo_total * ammo_ratio_increase)
+	ammo_total = math.clamp(ammo_total, 0, ammo_max)
+	self:set_ammo_total(ammo_total)
 end
 
 function RaycastWeaponBase:add_ammo_from_bag(available)

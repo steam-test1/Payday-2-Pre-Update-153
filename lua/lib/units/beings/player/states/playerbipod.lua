@@ -2,6 +2,7 @@ PlayerBipod = PlayerBipod or class(PlayerStandard)
 PlayerBipod.target_tilt = -5
 PlayerBipod._shoulder_pos = nil
 PlayerBipod._camera_pos = nil
+PlayerBipod._default_spread_modifier = 1.6
 
 function PlayerBipod:init(unit)
 	PlayerBipod.super.init(self, unit)
@@ -41,6 +42,14 @@ function PlayerBipod:_enter(enter_data)
 		self:_stance_entered()
 		self:_husk_bipod_data()
 	end
+end
+
+function PlayerBipod:get_movement_modifier(weapon_spread)
+	if not weapon_spread.bipod then
+		Application:debug("[PlayerBipod:get_movement_modifier] Unable to get bipod spread modifier, did you forget to add this value for the current weapon? Returning default spread modifier")
+		return self._spread_modifier or 1
+	end
+	return weapon_spread.bipod
 end
 
 function PlayerBipod:exit(state_data, new_state_name)
@@ -124,6 +133,9 @@ function PlayerBipod:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_weapon_gadget(t, input)
 	if not new_action then
 		new_action = self:_check_action_primary_attack(t, input)
+		if not new_action then
+			self:_check_stop_shooting()
+		end
 		self._shooting = new_action
 	end
 	new_action = new_action or self:_check_action_jump(t, input)

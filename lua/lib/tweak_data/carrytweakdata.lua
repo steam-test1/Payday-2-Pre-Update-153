@@ -166,73 +166,73 @@ function CarryTweakData:init(tweak_data)
 	self.circuit.bag_value = "circuit"
 	self.circuit.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_01 = {}
-	self.engine_01.type = "mega_heavy"
+	self.engine_01.type = "heavy"
 	self.engine_01.name_id = "hud_carry_engine_1"
 	self.engine_01.skip_exit_secure = true
 	self.engine_01.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_01.AI_carry = {SO_category = "enemies"}
 	self.engine_02 = {}
-	self.engine_02.type = "mega_heavy"
+	self.engine_02.type = "heavy"
 	self.engine_02.name_id = "hud_carry_engine_2"
 	self.engine_02.skip_exit_secure = true
 	self.engine_02.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_02.AI_carry = {SO_category = "enemies"}
 	self.engine_03 = {}
-	self.engine_03.type = "mega_heavy"
+	self.engine_03.type = "heavy"
 	self.engine_03.name_id = "hud_carry_engine_3"
 	self.engine_03.skip_exit_secure = true
 	self.engine_03.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_03.AI_carry = {SO_category = "enemies"}
 	self.engine_04 = {}
-	self.engine_04.type = "mega_heavy"
+	self.engine_04.type = "heavy"
 	self.engine_04.name_id = "hud_carry_engine_4"
 	self.engine_04.skip_exit_secure = true
 	self.engine_04.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_04.AI_carry = {SO_category = "enemies"}
 	self.engine_05 = {}
-	self.engine_05.type = "mega_heavy"
+	self.engine_05.type = "heavy"
 	self.engine_05.name_id = "hud_carry_engine_5"
 	self.engine_05.skip_exit_secure = true
 	self.engine_05.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_05.AI_carry = {SO_category = "enemies"}
 	self.engine_06 = {}
-	self.engine_06.type = "mega_heavy"
+	self.engine_06.type = "heavy"
 	self.engine_06.name_id = "hud_carry_engine_6"
 	self.engine_06.skip_exit_secure = true
 	self.engine_06.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_06.AI_carry = {SO_category = "enemies"}
 	self.engine_07 = {}
-	self.engine_07.type = "mega_heavy"
+	self.engine_07.type = "heavy"
 	self.engine_07.name_id = "hud_carry_engine_7"
 	self.engine_07.skip_exit_secure = true
 	self.engine_07.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_07.AI_carry = {SO_category = "enemies"}
 	self.engine_08 = {}
-	self.engine_08.type = "mega_heavy"
+	self.engine_08.type = "heavy"
 	self.engine_08.name_id = "hud_carry_engine_8"
 	self.engine_08.skip_exit_secure = true
 	self.engine_08.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_08.AI_carry = {SO_category = "enemies"}
 	self.engine_09 = {}
-	self.engine_09.type = "mega_heavy"
+	self.engine_09.type = "heavy"
 	self.engine_09.name_id = "hud_carry_engine_9"
 	self.engine_09.skip_exit_secure = true
 	self.engine_09.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_09.AI_carry = {SO_category = "enemies"}
 	self.engine_10 = {}
-	self.engine_10.type = "mega_heavy"
+	self.engine_10.type = "heavy"
 	self.engine_10.name_id = "hud_carry_engine_10"
 	self.engine_10.skip_exit_secure = true
 	self.engine_10.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_10.AI_carry = {SO_category = "enemies"}
 	self.engine_11 = {}
-	self.engine_11.type = "mega_heavy"
+	self.engine_11.type = "heavy"
 	self.engine_11.name_id = "hud_carry_engine_11"
 	self.engine_11.skip_exit_secure = true
 	self.engine_11.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.engine_11.AI_carry = {SO_category = "enemies"}
 	self.engine_12 = {}
-	self.engine_12.type = "mega_heavy"
+	self.engine_12.type = "heavy"
 	self.engine_12.name_id = "hud_carry_engine_12"
 	self.engine_12.skip_exit_secure = true
 	self.engine_12.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"

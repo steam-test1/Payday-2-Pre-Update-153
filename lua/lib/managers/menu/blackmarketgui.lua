@@ -527,7 +527,7 @@ function BlackMarketGuiTabItem:mouse_pressed(button, x, y)
 			end
 		end
 	end
-	if button ~= Idstring("0") then
+	if button ~= Idstring("0") or button == Idstring("1") then
 		return
 	end
 	if not self._slots[self._slot_highlighted] then
@@ -6085,6 +6085,9 @@ function BlackMarketGui:mouse_moved(o, x, y)
 end
 
 function BlackMarketGui:mouse_pressed(button, x, y)
+	if button == Idstring("1") and managers.player:has_category_upgrade("player", "second_deployable") and self._data[1].category == "deployables" then
+		self:mouse_pressed(Idstring("0"), x, y)
+	end
 	if managers.menu_scene and managers.menu_scene:input_focus() then
 		return false
 	end
@@ -6104,7 +6107,7 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 			selected_slot = math.min(self._extra_options_data.selected + 1, self._extra_options_data.num_panels)
 		elseif button == Idstring("mouse wheel up") then
 			selected_slot = math.max(self._extra_options_data.selected - 1, 1)
-		elseif button == Idstring("0") then
+		elseif button == Idstring("0") or button == Idstring("1") then
 			self._extra_options_data.selected = self._extra_options_data.selected or 1
 			for i = 1, self._extra_options_data.num_panels do
 				local option = self._extra_options_data[i]
@@ -6179,7 +6182,7 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 			return
 		end
 	end
-	if button ~= Idstring("0") then
+	if button ~= Idstring("0") or button == Idstring("1") then
 		return
 	end
 	if self._panel:child("back_button"):inside(x, y) then
@@ -6321,13 +6324,23 @@ function BlackMarketGui:mouse_double_click(o, button, x, y)
 	if not self._slot_data or self._mouse_click[0].selected_slot ~= self._mouse_click[1].selected_slot then
 		return
 	end
-	if not self._selected_slot._panel:inside(x, y) then
-		return
+	if button == Idstring("0") then
+		if not self._selected_slot._panel:inside(x, y) then
+			return
+		end
+		if managers.system_menu and managers.system_menu:is_active() and not managers.system_menu:is_closing() then
+			return
+		end
+		self:press_first_btn(button)
+	elseif button == Idstring("1") then
+		if not self._selected_slot._panel:inside(x, y) then
+			return
+		end
+		if managers.system_menu and managers.system_menu:is_active() and not managers.system_menu:is_closing() then
+			return
+		end
+		self:press_second_btn(Idstring("0"))
 	end
-	if managers.system_menu and managers.system_menu:is_active() and not managers.system_menu:is_closing() then
-		return
-	end
-	self:press_first_btn(button)
 end
 
 function BlackMarketGui:update(t, dt)
@@ -6375,6 +6388,49 @@ function BlackMarketGui:press_first_btn(button)
 		if first_btn_visible and first_btn_callback then
 			managers.menu_component:post_event("menu_enter")
 			first_btn_callback(self._slot_data, self._data.topic_params)
+			return true
+		else
+			self:flash()
+		end
+	elseif button == Idstring("1") then
+	end
+	return false
+end
+
+function BlackMarketGui:press_second_btn(button)
+	local second_btn_callback
+	local second_btn_prio = 999
+	local second_btn_visible = false
+	local first_btn_callback
+	local first_btn_prio = 999
+	local first_btn_visible = false
+	if button == Idstring("0") then
+		if self._slot_data.double_click_btn then
+			local btn = self._btns[self._slot_data.double_click_btn]
+			if btn then
+				second_btn_prio = btn._data.prio
+				second_btn_callback = btn._data.callback
+				second_btn_visible = btn:visible()
+			end
+		else
+			for _, btn in pairs(self._btns) do
+				if btn:visible() and first_btn_prio >= btn._data.prio then
+					second_btn_prio = first_btn_prio
+					second_btn_callback = first_btn_callback
+					second_btn_visible = first_btn_visible
+					first_btn_prio = btn._data.prio
+					first_btn_callback = btn._data.callback
+					first_btn_visible = btn:visible()
+				elseif btn:visible() and second_btn_prio >= btn._data.prio and first_btn_prio < btn._data.prio then
+					second_btn_prio = btn._data.prio
+					second_btn_callback = btn._data.callback
+					second_btn_visible = btn:visible()
+				end
+			end
+		end
+		if second_btn_visible and second_btn_callback then
+			managers.menu_component:post_event("menu_enter")
+			second_btn_callback(self._slot_data, self._data.topic_params)
 			return true
 		else
 			self:flash()

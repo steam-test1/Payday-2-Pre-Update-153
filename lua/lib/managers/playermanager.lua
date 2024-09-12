@@ -1,3 +1,4 @@
+require("lib/player_actions/PlayerActionManager")
 PlayerManager = PlayerManager or class()
 PlayerManager.WEAPON_SLOTS = 2
 PlayerManager.TARGET_COCAINE_AMOUNT = 1500
@@ -40,6 +41,7 @@ function PlayerManager:init()
 	self._coroutine_mgr = CoroutineManager:new()
 	self._message_system = MessageSystem:new()
 	self._properties = PropertyManager:new()
+	self._action_mgr = PlayerActionManager:new()
 	self._temporary_properties = TemporaryPropertyManager:new()
 	self._player_name = Idstring("units/multiplayer/mp_fps_mover/mp_fps_mover")
 	self._players = {}
@@ -166,7 +168,12 @@ function PlayerManager:init()
 	if self:has_category_upgrade("player", "melee_kill_increase_reload_speed") then
 		self._message_system:register(Message.OnEnemyKilled, "bloodthirst_reload_speed", callback(self, self, "_on_enemy_killed_bloodthirst"))
 	end
-	self._has_super_syndrome = self:has_category_upgrade("player", "super_syndrome")
+	if self:has_category_upgrade("player", "super_syndrome") then
+		self._super_syndrome_count = self:upgrade_value("player", "super_syndrome")
+	end
+	if self:has_category_upgrade("player", "run_and_shoot") then
+		self.RUN_AND_SHOOT = true
+	end
 end
 
 function PlayerManager:damage_absorption()
@@ -218,7 +225,8 @@ function PlayerManager:_on_enter_shock_and_awe_event()
 	if not self._coroutine_mgr:is_running("automatic_faster_reload") then
 		local equipped_unit = self:get_current_state()._equipped_unit
 		local data = self:upgrade_value("player", "automatic_faster_reload", nil)
-		if data and equipped_unit and (equipped_unit:base():fire_mode() == "auto" or equipped_unit:base():is_category("grenade_launcher", "bow", "flamethrower")) then
+		local is_grenade_launcher = equipped_unit:base():is_category("grenade_launcher")
+		if data and equipped_unit and not is_grenade_launcher and (equipped_unit:base():fire_mode() == "auto" or equipped_unit:base():is_category("bow", "flamethrower")) then
 			self._coroutine_mgr:add_and_run_coroutine("automatic_faster_reload", PlayerAction.ShockAndAwe, self, data.target_enemies, data.max_reload_increase, data.min_reload_increase, data.penalty, data.min_bullets, equipped_unit)
 		end
 	end
@@ -243,6 +251,21 @@ end
 function PlayerManager:_on_messiah_recharge_event()
 	if self._messiah_charges and self._max_messiah_charges then
 		self._messiah_charges = math.min(self._messiah_charges + 1, self._max_messiah_charges)
+	end
+end
+
+function PlayerManager:stockholm_syndrome_count()
+	return self._super_syndrome_count
+end
+
+function PlayerManager:change_stockholm_syndrome_count(value)
+	self._super_syndrome_count = math.max(self._super_syndrome_count + value, 0)
+	if self._super_syndrome_count <= 0 then
+		if Network:is_server() then
+			managers.groupai:state():set_super_syndrome(managers.network:session():local_peer():id(), false)
+		else
+			managers.network:session():send_to_host("sync_set_super_syndrome", managers.network:session():local_peer():id(), false)
+		end
 	end
 end
 
@@ -441,6 +464,7 @@ function PlayerManager:update(t, dt)
 		end
 	end
 	self._coroutine_mgr:update(t, dt)
+	self._action_mgr:update(t, dt)
 	if self._unseen_strike and not self._coroutine_mgr:is_running(PlayerAction.UnseenStrike) and not self._coroutine_mgr:is_running(PlayerAction.UnseenStrikeStart) then
 		local data = self:upgrade_value("player", "unseen_increased_crit_chance", nil)
 		if data then
@@ -546,6 +570,9 @@ function PlayerManager:_internal_load()
 	local equipment = self:selected_equipment()
 	if equipment then
 		add_hud_item(get_as_digested(equipment.amount), equipment.icon)
+	end
+	if self:has_equipment("armor_kit") then
+		managers.mission:call_global_event("player_regenerate_armor", true)
 	end
 end
 
@@ -667,7 +694,7 @@ end
 
 function PlayerManager:set_player_state(state)
 	state = state or self._current_state
-	if state == "bleed_out" and self._has_super_syndrome then
+	if state == "bleed_out" and self._super_syndrome_count and self._super_syndrome_count > 0 then
 		if Network:is_server() then
 			managers.groupai:state():set_super_syndrome(managers.network:session():local_peer():id(), true)
 		else
@@ -1772,11 +1799,12 @@ function PlayerManager:max_health()
 	return health
 end
 
-function PlayerManager:damage_reduction_skill_multiplier(damage_type, current_state, enemy_type)
+function PlayerManager:damage_reduction_skill_multiplier(damage_type)
 	local multiplier = 1
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "dmg_dampener_outnumbered_strong", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "dmg_dampener_close_contact", 1)
+	multiplier = multiplier * self:temporary_upgrade_value("temporary", "revived_damage_resist", 1)
 	multiplier = multiplier * self:upgrade_value("player", "damage_dampener", 1)
 	multiplier = multiplier * self:upgrade_value("player", "health_damage_reduction", 1)
 	multiplier = multiplier * self:temporary_upgrade_value("temporary", "first_aid_damage_reduction", 1)
@@ -1796,11 +1824,9 @@ function PlayerManager:damage_reduction_skill_multiplier(damage_type, current_st
 	if damage_type == "melee" then
 		multiplier = multiplier * managers.player:upgrade_value("player", "melee_damage_dampener", 1)
 	end
+	local current_state = self:get_current_state()
 	if current_state and current_state:_interacting() then
 		multiplier = multiplier * managers.player:upgrade_value("player", "interacting_damage_multiplier", 1)
-	end
-	if CopDamage and CopDamage.is_gangster(enemy_type) then
-		multiplier = multiplier * managers.player:upgrade_value("player", "gangster_damage_dampener", 1)
 	end
 	return multiplier
 end
@@ -1941,6 +1967,15 @@ function PlayerManager:equipment_slots()
 		return forced_deployable ~= "none" and {forced_deployable} or {}
 	end
 	return self._global.kit.equipment_slots
+end
+
+function PlayerManager:has_equipment_in_any_slot(equipment)
+	for i = 1, #self._global.kit.equipment_slots do
+		if self._global.kit.equipment_slots[i] == equipment then
+			return true
+		end
+	end
+	return false
 end
 
 function PlayerManager:toggle_player_rule(rule)
@@ -2723,9 +2758,9 @@ function PlayerManager:clear_equipment()
 	end
 end
 
-function PlayerManager:from_server_equipment_place_result(selected_index, unit)
+function PlayerManager:from_server_equipment_place_result(selected_index, unit, sentry_gun_unit)
 	if alive(unit) then
-		unit:equipment():from_server_sentry_gun_place_result(selected_index ~= 0)
+		unit:equipment():from_server_sentry_gun_place_result(sentry_gun_unit:id())
 	end
 	local equipment = self._equipment.selections[selected_index]
 	if not equipment then
@@ -3271,7 +3306,7 @@ end
 function PlayerManager:on_throw_grenade()
 	self:add_grenade_amount(-1)
 	local peer_id = managers.network:session():local_peer():id()
-	if tweak_data.achievement.fire_in_the_hole.grenade == self:get_synced_grenades(peer_id).grenade then
+	if table.contains(tweak_data.achievement.fire_in_the_hole.grenade, self:get_synced_grenades(peer_id).grenade) then
 		managers.achievment:award_progress(tweak_data.achievement.fire_in_the_hole.stat)
 	end
 end
@@ -3437,7 +3472,7 @@ end
 
 function PlayerManager:get_current_state()
 	local player = self:player_unit()
-	if alive(player) then
+	if player and alive(player) then
 		return player:movement()._current_state
 	end
 	return nil
@@ -3891,14 +3926,8 @@ function PlayerManager:on_enter_custody(_player)
 	end
 	managers.mission:call_global_event("player_in_custody")
 	local peer_id = managers.network:session():local_peer():id()
-	if self._has_super_syndrome and managers.groupai:state():hostage_count() > 0 then
-		local pos = player:position()
-		self._custody_position = pos
-		if Network:is_client() then
-			managers.network:session():send_to_host("auto_init_respawn_player", pos, peer_id)
-		else
-			self:init_auto_respawn_callback(pos, peer_id)
-		end
+	if self._super_syndrome_count and self._super_syndrome_count > 0 and not self._action_mgr:is_running("stockholm_syndrome_trade") then
+		self._action_mgr:add_action("stockholm_syndrome_trade", StockholmSyndromeTradeAction:new(player:position(), peer_id))
 	end
 	self:force_drop_carry()
 	managers.statistics:downed({death = true})
@@ -3912,44 +3941,28 @@ function PlayerManager:on_enter_custody(_player)
 end
 
 function PlayerManager:captured_hostage()
-	if game_state_machine:current_state_name() == "ingame_waiting_for_respawn" then
-		local pos = self._custody_position or Vector3(0, 0, 0)
-		local peer_id = managers.network:session():local_peer():id()
-		if Network:is_client() then
-			managers.network:session():send_to_host("auto_init_respawn_player", pos, peer_id)
-		else
-			self:init_auto_respawn_callback(pos, peer_id)
-		end
-	end
 end
 
 function PlayerManager:init_auto_respawn_callback(position, peer_id, force)
-	if not self:_is_all_in_custody(peer_id) and not force then
-		if peer_id ~= 1 then
-			managers.network:session():all_peers()[peer_id]:send("start_super_syndrome_trade", position, peer_id)
-		elseif not self._coroutine_mgr:is_running("stockholm_syndrome_trade") then
-			self._coroutine_mgr:add_coroutine("stockholm_syndrome_trade", PlayerAction.StockholmSyndromeTrade, position, peer_id)
-		end
-	else
-		self._clbk_super_syndrome_respawn = "PlayerManager"
-		local game_time = TimerManager:game():time()
-		local clbk_delay = game_time + (force and 1 or 5)
-		local pause_trade = 10
-		managers.enemy:add_delayed_clbk(self._clbk_super_syndrome_respawn, callback(self, self, "clbk_super_syndrome_respawn", {pos = position, peer_id = peer_id}), clbk_delay)
-		managers.trade:pause_trade(pause_trade)
-	end
+	self._clbk_super_syndrome_respawn = "PlayerManager"
+	local game_time = TimerManager:game():time()
+	local clbk_delay = game_time + 1
+	local pause_trade = 10
+	managers.trade:start_stockholm_syndrome()
+	managers.enemy:add_delayed_clbk(self._clbk_super_syndrome_respawn, callback(self, self, "clbk_super_syndrome_respawn", {pos = position, peer_id = peer_id}), clbk_delay)
+	managers.trade:pause_trade(pause_trade)
 end
 
 function PlayerManager:clbk_super_syndrome_respawn(data)
 	local trade_manager = managers.trade
 	self._clbk_super_syndrome_respawn = nil
-	local best_hostage = trade_manager:get_best_hostage(data.pos)
+	local best_hostage = trade_manager:get_best_hostage(data.pos, true)
 	local criminal = trade_manager:get_criminal_by_peer(data.peer_id)
 	if criminal and best_hostage then
 		local pos = best_hostage.unit:position()
 		local rot = best_hostage.unit:rotation()
 		trade_manager:criminal_respawn(pos, rot, criminal)
-		trade_manager:begin_hostage_trade(pos, rot, best_hostage, false)
+		trade_manager:begin_hostage_trade(pos, rot, best_hostage, true, true, true)
 	end
 end
 

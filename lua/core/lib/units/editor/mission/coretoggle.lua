@@ -1,6 +1,7 @@
 CoreToggleUnitElement = CoreToggleUnitElement or class(MissionElement)
 CoreToggleUnitElement.SAVE_UNIT_POSITION = false
 CoreToggleUnitElement.SAVE_UNIT_ROTATION = false
+CoreToggleUnitElement.LINK_ELEMENTS = {"elements"}
 ToggleUnitElement = ToggleUnitElement or class(CoreToggleUnitElement)
 
 function ToggleUnitElement:init(...)
@@ -50,14 +51,6 @@ function CoreToggleUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreToggleUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

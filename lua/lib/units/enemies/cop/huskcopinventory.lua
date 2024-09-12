@@ -23,6 +23,9 @@ function HuskCopInventory:add_unit_by_name(new_unit_name, equip)
 	setup_data.hit_player = true
 	setup_data.user_sound_variant = tweak_data.character[self._unit:base()._tweak_table].weapon_voice
 	new_unit:base():setup(setup_data)
+	if new_unit:base().AKIMBO then
+		new_unit:base():create_second_gun(new_unit_name)
+	end
 	CopInventory.add_unit(self, new_unit, equip)
 end
 

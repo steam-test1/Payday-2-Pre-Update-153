@@ -95,7 +95,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.sec_camera_highlight = {true}
 	self.values.player.sec_camera_highlight_mask_off = {true}
 	self.values.player.special_enemy_highlight_mask_off = {true}
-	self.values.player.super_syndrome = {true}
+	self.values.player.super_syndrome = {1}
 	self.values.player.stability_increase_bonus_1 = {2}
 	self.values.player.stability_increase_bonus_2 = {4}
 	self.values.player.not_moving_accuracy_increase = {4}
@@ -348,13 +348,13 @@ function UpgradesTweakData:_init_pd2_values()
 		{interval = 1, chance_to_trigger = 0.3}
 	}
 	self.values.player.taser_self_shock = {true}
-	self.values.sentry_gun.spread_multiplier = {0.5}
-	self.values.sentry_gun.rot_speed_multiplier = {2.5}
+	self.values.sentry_gun.spread_multiplier = {2}
+	self.values.sentry_gun.rot_speed_multiplier = {2}
 	self.values.player.interacting_damage_multiplier = {0.5}
 	self.values.player.steelsight_when_downed = {true}
 	self.values.player.drill_alert_rad = {900}
 	self.values.player.silent_drill = {true}
-	self.values.sentry_gun.extra_ammo_multiplier = {1.5, 2.5}
+	self.values.sentry_gun.extra_ammo_multiplier = {2}
 	self.values.sentry_gun.shield = {true}
 	self.values.trip_mine.explosion_size_multiplier_1 = {1.3}
 	self.values.trip_mine.explosion_size_multiplier_2 = {1.7}
@@ -485,7 +485,7 @@ function UpgradesTweakData:_init_pd2_values()
 		15
 	}
 	self.values.sentry_gun.armor_multiplier2 = {1.25}
-	self.values.sentry_gun.cost_reduction = {1.5, 2}
+	self.values.sentry_gun.cost_reduction = {2, 3}
 	self.values.sentry_gun.less_noisy = {true}
 	self.values.sentry_gun.ap_bullets = {true}
 	self.values.sentry_gun.fire_rate_reduction = {4}
@@ -634,7 +634,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.trip_mine.sensor_highlight = {true}
 	self.values.player.on_zipline_dodge_chance = {0.15}
 	self.values.player.movement_speed_multiplier = {1.1}
-	self.values.player.gangster_damage_dampener = {0.9, 0.65}
 	self.values.player.level_2_armor_addend = {2}
 	self.values.player.level_3_armor_addend = {2}
 	self.values.player.level_4_armor_addend = {2}
@@ -682,8 +681,8 @@ function UpgradesTweakData:_init_pd2_values()
 		1.65
 	}
 	self.values.player.passive_health_regen = {0.03}
-	self.values.player.healing_reduction = {0.25, 0.5}
-	self.values.player.health_damage_reduction = {0.7, 0.4}
+	self.values.player.healing_reduction = {0.25, 1}
+	self.values.player.health_damage_reduction = {0.9, 0.75}
 	self.values.player.max_health_reduction = {0.3}
 	self.values.cable_tie.quantity_2 = {4}
 	self.ecm_feedback_retrigger_interval = 240
@@ -1112,7 +1111,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		inspire = {
 			{
-				"50%",
+				"100%",
 				"20%",
 				"10"
 			},
@@ -1425,17 +1424,17 @@ function UpgradesTweakData:_init_pd2_values()
 		frenzy = {
 			{
 				"30%",
-				"30%",
+				"10%",
 				"75%"
 			},
-			{"60%", "50%"}
+			{"25%", "0%"}
 		},
 		defense_up = {
-			{"56%"},
+			{"5%"},
 			{}
 		},
 		eco_sentry = {
-			{"48%"},
+			{"5%"},
 			{"150%"}
 		},
 		engineering = {
@@ -2052,7 +2051,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		{
 			{
-				"40%",
+				"100%",
 				"240",
 				"4",
 				"600",
@@ -2135,7 +2134,7 @@ function UpgradesTweakData:_init_pd2_values()
 	end
 end
 
-function UpgradesTweakData:init()
+function UpgradesTweakData:init(tweak_data)
 	self.level_tree = {}
 	self.level_tree[1] = {
 		name_id = "body_armor",
@@ -2837,6 +2836,12 @@ function UpgradesTweakData:init()
 	self.progress[2][49] = "mr_nice_guy"
 	self.progress[3][49] = "mr_nice_guy"
 	self.progress[4][49] = "mr_nice_guy"
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.definitions) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end
 
 function UpgradesTweakData:_init_value_tables()
@@ -2899,9 +2904,6 @@ function UpgradesTweakData:_init_values()
 	self.values.temporary = self.values.temporary or {}
 	self.values.temporary.combat_medic_enter_steelsight_speed_multiplier = {
 		{1.2, 15}
-	}
-	self.values.temporary.wolverine_health_regen = {
-		{0.002, 1}
 	}
 	self.values.temporary.pistol_revive_from_bleed_out = {
 		{true, 1}
@@ -4307,15 +4309,6 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "armor_regen_timer_stand_still_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.player_wolverine_health_regen = {
-		category = "temporary",
-		name_id = "menu_player_wolverine_health_regen",
-		upgrade = {
-			category = "temporary",
-			upgrade = "wolverine_health_regen",
 			value = 1
 		}
 	}
@@ -6013,24 +6006,6 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
-	self.definitions.player_gangster_damage_dampener_1 = {
-		category = "feature",
-		name_id = "menu_player_gangster_damage_dampener",
-		upgrade = {
-			category = "player",
-			upgrade = "gangster_damage_dampener",
-			value = 1
-		}
-	}
-	self.definitions.player_gangster_damage_dampener_2 = {
-		category = "feature",
-		name_id = "menu_player_gangster_damage_dampener",
-		upgrade = {
-			category = "player",
-			upgrade = "gangster_damage_dampener",
-			value = 2
-		}
-	}
 	self.definitions.player_ballistic_vest_concealment_1 = {
 		category = "feature",
 		name_id = "menu_player_ballistic_vest_concealment",
@@ -6895,7 +6870,7 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		step = 6,
 		category = "equipment",
 		equipment_id = "sentry_gun_silent",
-		name_id = "debug_sentry_gun",
+		name_id = "debug_silent_sentry_gun",
 		title_id = "debug_upgrade_new_equipment",
 		subtitle_id = "debug_sentry_gun",
 		icon = "equipment_sentry",

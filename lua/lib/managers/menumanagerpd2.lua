@@ -37,7 +37,7 @@ function MenuManager:on_enter_lobby()
 	managers.menu_component:pre_set_game_chat_leftbottom(0, 50)
 	managers.network:session():on_entered_lobby()
 	self:setup_local_lobby_character()
-	if Global.exe_argument_level then
+	if Global.exe_argument_level or self._lobby_autoplay then
 		MenuCallbackHandler:start_the_game()
 	end
 end
@@ -53,6 +53,10 @@ function MenuManager:on_leave_active_job()
 	self._sound_source:post_event("menu_exit")
 	managers.menu:close_menu("lobby_menu")
 	managers.menu:close_menu("menu_pause")
+end
+
+function MenuManager:set_lobby_autoplay(autoplay)
+	self._lobby_autoplay = autoplay
 end
 
 function MenuManager:setup_local_lobby_character()
@@ -2093,14 +2097,9 @@ function MenuCallbackHandler:publish_weapon_skin(item)
 		ok_button.callback_func = callback(self, self, "_dialog_ok")
 		dialog_data.button_list = {ok_button}
 		managers.system_menu:show(dialog_data)
+		return
 	end
-	
-	local function cb(result)
-		item:set_enabled(true)
-	end
-	
-	skin_editor:publish_skin(skin, title, desc, changelog, cb)
-	item:set_enabled(false)
+	skin_editor:publish_skin(skin, title, desc, changelog)
 end
 
 function MenuCallbackHandler:_dialog_ok()
@@ -2121,9 +2120,15 @@ function MenuCallbackHandler:take_screenshot_skin(item)
 	local name = managers.blackmarket:skin_editor():get_screenshot_name()
 	local x, y, w, h = managers.blackmarket:skin_editor():get_screenshot_rect()
 	item:set_enabled(false)
-	managers.menu_scene:add_one_frame_delayed_clbk(function()
+	
+	local function co_screenshot(o)
+		for i = 0, 5 do
+			coroutine.yield()
+		end
 		Application:screenshot(name, x, y, w, h, true, screenshot_done, 1024, 576)
-	end)
+	end
+	
+	managers.menu:active_menu().renderer.ws:panel():animate(co_screenshot)
 end
 
 function MenuCallbackHandler:new_weapon_skin(item)

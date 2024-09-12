@@ -1,6 +1,6 @@
 NarrativeTweakData = NarrativeTweakData or class()
 
-function NarrativeTweakData:init()
+function NarrativeTweakData:init(tweak_data)
 	self.STARS = {}
 	self.STARS[1] = {
 		jcs = {
@@ -2614,9 +2614,13 @@ function NarrativeTweakData:init()
 		"dentist_hd1_cnc_01_01"
 	}
 	self.jobs.mus.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"cn_hox1",
+		"cn_hox2",
+		"cn_hox3",
+		"cn_hox4",
+		"cn_big1",
+		"cn_big2",
+		"cn_big3"
 	}
 	self.jobs.mus.payout = {
 		8000,
@@ -2771,9 +2775,13 @@ function NarrativeTweakData:init()
 		"hoxton_hb3_cnc_01_01"
 	}
 	self.jobs.hox_3.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"cn_hox1",
+		"cn_hox2",
+		"cn_hox3",
+		"cn_hox4",
+		"cn_big1",
+		"cn_big2",
+		"cn_big3"
 	}
 	self.jobs.hox_3.payout = {
 		8000,
@@ -2974,9 +2982,9 @@ function NarrativeTweakData:init()
 		"vld_ko1b_cnc_01_01"
 	}
 	self.jobs.shoutout_raid.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
 	}
 	self.jobs.shoutout_raid.payout = {
 		26000,
@@ -3212,9 +3220,9 @@ function NarrativeTweakData:init()
 		"vld_as1_cnc_01"
 	}
 	self.jobs.jolly.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
 	}
 	self.jobs.jolly.payout = {
 		124000,
@@ -3370,9 +3378,7 @@ function NarrativeTweakData:init()
 		"loc_jr1_cnc_01"
 	}
 	self.jobs.pbr.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"contact_locke1"
 	}
 	self.jobs.pbr.payout = {
 		60000,
@@ -3424,9 +3430,7 @@ function NarrativeTweakData:init()
 		"loc_jr2_cnc_01"
 	}
 	self.jobs.pbr2.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"contact_locke1"
 	}
 	self.jobs.pbr2.payout = {
 		115000,
@@ -3531,9 +3535,9 @@ function NarrativeTweakData:init()
 		"vld_can_cnc_01"
 	}
 	self.jobs.cane.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
 	}
 	self.jobs.cane.contract_cost = {
 		24000,
@@ -3645,9 +3649,9 @@ function NarrativeTweakData:init()
 		"vld_pt1_cnc_01"
 	}
 	self.jobs.peta.crimenet_videos = {
-		"cn_jewel1",
-		"cn_jewel2",
-		"cn_jewel3"
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
 	}
 	self.jobs.peta.contract_cost = {
 		62000,
@@ -4133,6 +4137,12 @@ function NarrativeTweakData:init()
 		table.insert(self._jobs_index, "roberts")
 	end
 	self:set_job_wrappers()
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.jobs) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end
 
 function NarrativeTweakData:set_job_wrappers()

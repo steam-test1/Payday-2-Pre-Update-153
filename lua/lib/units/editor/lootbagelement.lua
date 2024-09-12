@@ -85,6 +85,7 @@ end
 LootBagTriggerUnitElement = LootBagTriggerUnitElement or class(MissionElement)
 LootBagTriggerUnitElement.SAVE_UNIT_POSITION = false
 LootBagTriggerUnitElement.SAVE_UNIT_ROTATION = false
+LootBagTriggerUnitElement.LINK_ELEMENTS = {"elements"}
 
 function LootBagTriggerUnitElement:init(unit)
 	LootBagTriggerUnitElement.super.init(self, unit)
@@ -122,14 +123,6 @@ function LootBagTriggerUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function LootBagTriggerUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

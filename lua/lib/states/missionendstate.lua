@@ -762,6 +762,29 @@ function MissionEndState:chk_complete_heist_achievements()
 									end
 								end
 							end
+							if data.blueprint_part_data and weapon_data.blueprint then
+								for key, req_value in pairs(data.blueprint_part_data) do
+									local found_one = false
+									for i, part_id in ipairs(weapon_data.blueprint) do
+										local part_data = tweak_data.weapon.factory.parts[part_id]
+										if part_data then
+											if type(req_value) == "table" then
+												if table.contains(req_value, part_data[key]) then
+													found_one = true
+													break
+												end
+											elseif part_data[key] == req_value then
+												found_one = true
+												break
+											end
+										end
+									end
+									if not found_one then
+										equipped_pass = false
+										break
+									end
+								end
+							end
 						end
 					end
 				end

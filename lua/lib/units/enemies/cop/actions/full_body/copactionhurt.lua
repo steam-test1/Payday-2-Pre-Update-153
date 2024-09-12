@@ -282,22 +282,26 @@ function CopActionHurt:init(action_desc, common_data)
 			return
 		end
 	elseif action_type == "death" and action_desc.variant == "fire" then
-		redir_res = self._ext_movement:play_redirect("death_fire")
-		if not redir_res then
-			debug_pause("[CopActionHurt:init] death_fire redirect failed in", self._machine:segment_state(Idstring("base")))
-			return
-		end
-		local variant_count = #CopActionHurt.fire_death_anim_variants_length or 5
 		local variant = 1
+		local variant_count = #CopActionHurt.fire_death_anim_variants_length or 5
 		if 1 < variant_count then
 			variant = math.random(variant_count)
 		end
-		for i = 1, variant_count do
-			local state_value = 0
-			if i == variant then
-				state_value = 1
+		if not self._ext_movement:died_on_rope() then
+			redir_res = self._ext_movement:play_redirect("death_fire")
+			if not redir_res then
+				debug_pause("[CopActionHurt:init] death_fire redirect failed in", self._machine:segment_state(Idstring("base")))
+				return
 			end
-			self._machine:set_parameter(redir_res, "var" .. tostring(i), state_value)
+			for i = 1, variant_count do
+				local state_value = 0
+				if i == variant then
+					state_value = 1
+				end
+				self._machine:set_parameter(redir_res, "var" .. tostring(i), state_value)
+			end
+		else
+			self:force_ragdoll()
 		end
 		self:_start_enemy_fire_effect_on_death(variant)
 		managers.fire:check_achievemnts(self._unit, t)

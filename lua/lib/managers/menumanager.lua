@@ -714,7 +714,11 @@ function MenuManager:open_sign_in_menu(cb)
 		managers.network.matchmake:register_callback("found_game", callback(self, self, "_cb_matchmake_found_game"))
 		managers.network.matchmake:register_callback("player_joined", callback(self, self, "_cb_matchmake_player_joined"))
 		if PSN:is_fetching_status() then
-			self:show_fetching_status_dialog()
+			self:show_fetching_status_dialog({
+				cancel_func = function()
+					PSN:fetch_cancel()
+				end
+			})
 			
 			local function f()
 				self:open_ps4_sign_in_menu(cb)
@@ -736,7 +740,11 @@ function MenuManager:open_sign_in_menu(cb)
 		managers.system_menu:close("fetching_status")
 		if managers.network.account:signin_state() == "signed in" then
 			if managers.user:check_privilege(nil, "multiplayer_sessions", callback(self, self, "_check_privilege_callback")) then
-				self:show_fetching_status_dialog()
+				self:show_fetching_status_dialog({
+					cancel_func = function()
+						self._queued_privilege_check_cb = nil
+					end
+				})
 				self._queued_privilege_check_cb = cb
 			else
 				self:show_err_not_signed_in_dialog()
@@ -1345,6 +1353,9 @@ function MenuCallbackHandler:has_all_dlcs()
 end
 
 function MenuCallbackHandler:is_overlay_enabled()
+	if SystemInfo:platform() ~= Idstring("WIN32") then
+		return false
+	end
 	return true
 end
 
@@ -1868,7 +1879,13 @@ function MenuCallbackHandler:_dialog_save_progress_backup_no()
 end
 
 function MenuCallbackHandler:chk_dlc_content_updated()
-	if managers.dlc then
+	if SystemInfo:platform() ~= Idstring("XB1") and managers.dlc then
+		managers.dlc:chk_content_updated()
+	end
+end
+
+function MenuCallbackHandler:chk_dlc_content_updated_xb1()
+	if SystemInfo:platform() == Idstring("XB1") and managers.dlc then
 		managers.dlc:chk_content_updated()
 	end
 end
@@ -2142,8 +2159,8 @@ function MenuCallbackHandler:open_contract_node(item)
 	managers.menu:open_node(Global.game_settings.single_player and "crimenet_contract_singleplayer" or "crimenet_contract_host", {
 		{
 			job_id = item:parameters().id,
-			difficulty = is_competitive and "overkill_290" or is_professional and "hard" or "normal",
-			difficulty_id = is_competitive and 6 or is_professional and 3 or 2,
+			difficulty = is_professional and "hard" or "normal",
+			difficulty_id = is_professional and 3 or 2,
 			professional = is_professional,
 			competitive = is_competitive,
 			customize_contract = true,
@@ -2167,9 +2184,6 @@ function MenuCallbackHandler:is_contract_difficulty_allowed(item)
 	end
 	local job_data = managers.menu:active_menu().logic:selected_node():parameters().menu_component_data
 	if not job_data.job_id then
-		return false
-	end
-	if job_data.competitive and item:value() < 6 then
 		return false
 	end
 	if job_data.professional and item:value() < 3 then
@@ -2473,11 +2487,11 @@ function MenuCallbackHandler:get_matchmake_attributes()
 	}
 	if self:is_win32() then
 		local kick_option = Global.game_settings.kick_option
-		table.insert(attributes.numbers, kick_option)
+		attributes.numbers[8] = kick_option
 		local job_class = managers.job:calculate_job_class(managers.job:current_real_job_id(), difficulty_id)
-		table.insert(attributes.numbers, job_class)
+		attributes.numbers[9] = job_class
 		local job_plan = Global.game_settings.job_plan
-		table.insert(attributes.numbers, job_plan)
+		attributes.numbers[10] = job_plan
 	end
 	return attributes
 end
@@ -2944,8 +2958,10 @@ function MenuCallbackHandler:invite_friends_X360()
 end
 
 function MenuCallbackHandler:invite_friends_XB1()
-	local platform_id = managers.user:get_platform_id()
-	XboxLive:invite_friends_ui(platform_id, managers.network.matchmake._session)
+	if managers.network.matchmake._session then
+		local platform_id = managers.user:get_platform_id()
+		XboxLive:invite_friends_ui(platform_id, managers.network.matchmake._session)
+	end
 end
 
 function MenuCallbackHandler:invite_xbox_live_party()
@@ -3206,6 +3222,16 @@ function MenuCallbackHandler:leave_safehouse()
 	end
 	
 	managers.menu:show_leave_safehouse_dialog({yes_func = yes_func})
+end
+
+function MenuCallbackHandler:leave_mission()
+	if game_state_machine:current_state_name() ~= "disconnected" then
+		if self:is_singleplayer() then
+			setup:load_start_menu()
+		else
+			self:load_start_menu_lobby()
+		end
+	end
 end
 
 function MenuCallbackHandler:abort_mission()
@@ -6355,19 +6381,16 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		if self.pre_create_clbk then
 			self:pre_create_clbk(node)
 		end
-		local contacts = {}
-		for contact in pairs(tweak_data.narrative.contacts) do
-			table.insert(contacts, contact)
-		end
-		table.sort(contacts, function(x, y)
-			return x < y
-		end)
 		local max_jc = managers.job:get_max_jc_for_player()
 		local jobs = {}
+		local contacts = {}
 		for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 			local job_tweak = tweak_data.narrative:job_data(job_id)
 			local contact = job_tweak.contact
-			if table.contains(contacts, contact) then
+			if contact then
+				if not table.contains(contacts, contact) then
+					table.insert(contacts, contact)
+				end
 				jobs[contact] = jobs[contact] or {}
 				local dlc = job_tweak.dlc
 				dlc = not dlc or managers.dlc:is_dlc_unlocked(dlc)
@@ -6379,6 +6402,9 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 				end
 			end
 		end
+		table.sort(contacts, function(x, y)
+			return x < y
+		end)
 		for _, contracts in pairs(jobs) do
 			table.sort(contracts, function(x, y)
 				if x.enabled ~= y.enabled then
@@ -6499,7 +6525,7 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 		local player_stars = managers.experience:level_to_stars()
 		local max_jc = managers.job:get_max_jc_for_player()
 		local job_tweak = tweak_data.narrative:job_data(id)
-		local jc_lock = math.clamp(job_tweak.jc + (job_tweak.competitive and 40 or job_tweak.professional and 10 or 0), 0, 100)
+		local jc_lock = math.clamp(job_tweak.jc + (job_tweak.professional and 10 or 0), 0, 100)
 		local min_stars = #tweak_data.narrative.STARS
 		for i, d in ipairs(tweak_data.narrative.STARS) do
 			if jc_lock <= d.jcs[1] then

@@ -1,4 +1,5 @@
 DisableShoutElement = DisableShoutElement or class(MissionElement)
+DisableShoutElement.LINK_ELEMENTS = {"elements"}
 
 function DisableShoutElement:init(unit)
 	DisableShoutElement.super.init(self, unit)
@@ -53,14 +54,6 @@ function DisableShoutElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function DisableShoutElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

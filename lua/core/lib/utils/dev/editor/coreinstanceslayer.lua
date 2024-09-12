@@ -292,29 +292,36 @@ end
 function InstancesLayer:_delete_instance_by_name(name)
 	managers.editor:freeze_gui_lists()
 	if #self._selected_instances > 0 and not self:condition() then
-		local instance_units = self:get_instance_units_by_name(name)
-		for name, units in pairs(instance_units) do
-			for _, unit in ipairs(units) do
-				managers.editor:layer(name):delete_unit(unit)
+		if not self:condition() then
+			local instance_units = self:get_instance_units_by_name(name)
+			for name, units in pairs(instance_units) do
+				for _, unit in ipairs(units) do
+					managers.editor:layer(name):delete_unit(unit)
+				end
+			end
+			for i, instance in ipairs(managers.world_instance:instance_data()) do
+				if instance.name == name then
+					table.remove(managers.world_instance:instance_data(), i)
+					self._stashed_instance_units[name] = nil
+					local mission_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
+						"func_instance_input_event",
+						"func_instance_output_event",
+						"func_instance_point",
+						"func_instance_set_params"
+					})
+					for _, mission_unit in ipairs(mission_units) do
+						if mission_unit:mission_element().on_instance_deleted then
+							mission_unit:mission_element():on_instance_deleted(name)
+						end
+					end
+					self:_update_instances_listbox()
+					break
+				end
 			end
 		end
-		for i, instance in ipairs(managers.world_instance:instance_data()) do
-			if instance.name == name then
-				table.remove(managers.world_instance:instance_data(), i)
-				self._stashed_instance_units[name] = nil
-				local mission_units = managers.editor:layer("Mission"):get_created_unit_by_pattern({
-					"func_instance_input_event",
-					"func_instance_output_event",
-					"func_instance_point",
-					"func_instance_set_params"
-				})
-				for _, mission_unit in ipairs(mission_units) do
-					if mission_unit:mission_element().on_instance_deleted then
-						mission_unit:mission_element():on_instance_deleted(name)
-					end
-				end
-				self:_update_instances_listbox()
-				break
+		for i = #self._selected_instances, 1, -1 do
+			if self._selected_instances[i].name == name then
+				table.remove(self._selected_instances, i)
 			end
 		end
 	end
@@ -325,13 +332,17 @@ end
 
 function InstancesLayer:delete_selected_unit(btn, pressed)
 	if #self._selected_instances > 0 then
-		for idx, instance_data in pairs(self._selected_instances) do
-			self:_delete_instance_by_name(instance_data.name)
-		end
-		self._selected_instances = {}
-		self._selected_instance = nil
-		self._selected_instance_data = nil
+		self:delete_all_selected_instances()
 	end
+end
+
+function InstancesLayer:delete_all_selected_instances()
+	for i = #self._selected_instances, 1, -1 do
+		self:_delete_instance_by_name(self._selected_instances[i].name)
+	end
+	self._selected_instances = {}
+	self._selected_instance = nil
+	self._selected_instance_data = nil
 end
 
 function InstancesLayer:reset_rotation()
@@ -812,9 +823,8 @@ function InstancesLayer:_on_gui_rename_instance()
 end
 
 function InstancesLayer:_on_gui_delete_instance()
-	local name = self:_get_selection_instances_listbox()
-	if name then
-		self:_delete_instance_by_name(name)
+	if #self._selected_instances > 0 then
+		self:delete_all_selected_instances()
 	end
 end
 
@@ -968,17 +978,37 @@ function InstancesLayer:on_continent_changed(...)
 	self:_update_overlay_gui()
 end
 
+function InstancesLayer:hide_all()
+	for continent_name, _ in pairs(managers.editor:continents()) do
+		for _, name in ipairs(managers.world_instance:instance_names(continent_name)) do
+			self:set_instance_visible(name, false)
+		end
+	end
+end
+
+function InstancesLayer:unhide_all()
+	for continent_name, _ in pairs(managers.editor:continents()) do
+		for _, name in ipairs(managers.world_instance:instance_names(continent_name)) do
+			self:set_instance_visible(name, true)
+		end
+	end
+end
+
 function InstancesLayer:on_hide_selected()
 	if #self._selected_instances > 0 then
 		for i, instance_data in ipairs(self._selected_instances) do
-			for name, units in pairs(self:get_instance_units_by_name(instance_data.name)) do
-				for _, unit in ipairs(units) do
-					managers.editor:set_unit_visible(unit, false)
-				end
-			end
+			self:set_instance_visible(instance_data.name, false)
 		end
 	end
 	self:select_instance(nil)
+end
+
+function InstancesLayer:set_instance_visible(instance_name, visible)
+	for name, units in pairs(self:get_instance_units_by_name(instance_name)) do
+		for _, unit in ipairs(units) do
+			managers.editor:set_unit_visible(unit, visible)
+		end
+	end
 end
 
 function InstancesLayer:_create_overlay_gui()

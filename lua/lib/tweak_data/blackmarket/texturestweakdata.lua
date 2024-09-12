@@ -1,6 +1,6 @@
 local is_nextgen_console = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
 
-function BlackMarketTweakData:_init_textures()
+function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures = {}
 	self.textures.no_color_no_material = {}
 	self.textures.no_color_no_material.name_id = "bm_txt_no_color_no_material"
@@ -1977,5 +1977,10 @@ function BlackMarketTweakData:_init_textures()
 	self.textures.tire_fire.texture = "units/pd2_dlc_born/masks/patterns/pattern_tirefire_df"
 	self.textures.tire_fire.value = 0
 	self.textures.tire_fire.dlc = "born"
-	self:give_free_dlcs(self.textures)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.textures) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end

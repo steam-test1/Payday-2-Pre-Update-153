@@ -652,7 +652,9 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 		dis = dis,
 		verified = false,
 		verified_t = false,
-		has_team = att_unit:movement() and att_unit:movement().team
+		has_team = att_unit:movement() and att_unit:movement().team,
+		health_ratio = att_unit:character_damage() and att_unit:character_damage().health_ratio,
+		objective = att_unit:brain() and att_unit:brain().objective
 	}
 	return new_entry
 end

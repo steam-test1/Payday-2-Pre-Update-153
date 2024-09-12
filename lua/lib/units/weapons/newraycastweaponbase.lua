@@ -279,11 +279,10 @@ function NewRaycastWeaponBase:check_highlight_unit(unit)
 		return
 	end
 	unit = unit:in_slot(8) and alive(unit:parent()) and unit:parent() or unit
-	if not unit:in_slot(managers.slot:get_mask("enemies")) and (not unit:base() or not unit:base().is_security_camera) then
+	if not unit or not unit:base() then
 		return
 	end
-	local highlight = not (not unit:base().is_security_camera and unit:base()._tweak_table) or managers.groupai:state():whisper_mode() and tweak_data.character[unit:base()._tweak_table].silent_priority_shout or tweak_data.character[unit:base()._tweak_table].priority_shout
-	if highlight then
+	if unit:base().can_be_marked then
 		managers.game_play_central:auto_highlight_enemy(unit, true)
 	end
 end
@@ -668,6 +667,7 @@ end
 
 function NewRaycastWeaponBase:on_disabled(...)
 	NewRaycastWeaponBase.super.on_disabled(self, ...)
+	self._last_gadget_idx = self._gadget_on
 	self:gadget_off()
 	self:_set_parts_enabled(false)
 end
@@ -754,23 +754,40 @@ function NewRaycastWeaponBase:has_part(part_id)
 	return self._blueprint and table.contains(self._blueprint, part_id)
 end
 
+function NewRaycastWeaponBase:on_equip(user_unit)
+	if self:was_gadget_on() then
+		local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
+		if gadgets then
+			self:set_gadget_on(self._last_gadget_idx, false, gadgets)
+			user_unit:network():send("set_weapon_gadget_state", self._gadget_on)
+		end
+	end
+end
+
+function NewRaycastWeaponBase:on_unequip(user_unit)
+end
+
 function NewRaycastWeaponBase:has_gadget()
 	return self._has_gadget
 end
 
 function NewRaycastWeaponBase:is_gadget_on()
-	return self._gadget_on and self._gadget_on > 0 and self._gadget_on or false
+	return self._gadget_on and self._gadget_on > 0
 end
 
 function NewRaycastWeaponBase:gadget_on()
 	self:set_gadget_on(1, true)
 end
 
+function NewRaycastWeaponBase:was_gadget_on()
+	return self._last_gadget_idx and self._last_gadget_idx > 0 or false
+end
+
 function NewRaycastWeaponBase:gadget_off()
 	self:set_gadget_on(0, true, nil, true)
 end
 
-function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets, ignore_bipod)
+function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets)
 	if not ignore_enable and not self._enabled then
 		return
 	end
@@ -797,17 +814,7 @@ function NewRaycastWeaponBase:set_gadget_on(gadget_on, ignore_enable, gadgets, i
 		for i, id in ipairs(gadgets) do
 			gadget = self._parts[id]
 			if gadget then
-				local is_bipod = ignore_bipod and gadget.unit:base():is_bipod()
-				if not is_bipod then
-					gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
-				end
-				if gadget.unit:base():is_bipod() then
-					if gadget.unit:base():bipod_state() then
-						self._gadget_on = i
-					else
-						self._gadget_on = 0
-					end
-				end
+				gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
 			end
 		end
 	end
@@ -824,20 +831,7 @@ function NewRaycastWeaponBase:toggle_gadget()
 		self:set_gadget_on(gadget_on, false, gadgets)
 		return true
 	end
-	do return false end
-	if not self._enabled then
-		return
-	end
-	self._gadget_on = self._gadget_on or 0
-	local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
-	if gadgets then
-		self._gadget_on = ((self._gadget_on or 0) + 1) % (#gadgets + 1)
-		local gadget
-		for _, i in ipairs(gadgets) do
-			gadget = self._parts[i]
-			gadget.unit:base():set_state(self._gadget_on == i, self._sound_fire)
-		end
-	end
+	return false
 end
 
 function NewRaycastWeaponBase:gadget_update()
@@ -858,6 +852,9 @@ function NewRaycastWeaponBase:is_bipod_usable()
 end
 
 function NewRaycastWeaponBase:is_category(...)
+	local arg = {
+		...
+	}
 	local weapon_tweak_data = self:weapon_tweak_data()
 	local category = weapon_tweak_data.category
 	for i = 1, #arg do
@@ -946,12 +943,7 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 	spread_index = math.ceil((spread_index + spread_addend) * spread_multiplier)
 	spread_index = math.clamp(spread_index, 1, #tweak_data.weapon.stats.spread)
 	local spread = tweak_data.weapon.stats.spread[spread_index]
-	local stance_mul = 1
-	if current_state._state_data.ducking then
-		stance_mul = stance_mul + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_crouching" or "crouching"])
-	else
-		stance_mul = stance_mul + (1 - tweak_data.weapon[self._name_id].spread[current_state._moving and "moving_standing" or "standing"])
-	end
+	local stance_mul = current_state:get_movement_modifier(tweak_data.weapon[self._name_id].spread)
 	stance_mul = self:_convert_add_to_mul(stance_mul)
 	spread = spread * stance_mul
 	if current_state:in_steelsight() then
@@ -992,9 +984,8 @@ function NewRaycastWeaponBase:conditional_accuracy_multiplier(current_state)
 	if current_state:in_steelsight() and self:is_single_shot() then
 		mul = mul + (1 - pm:upgrade_value("player", "single_shot_accuracy_inc", 1))
 	end
-	if current_state:in_steelsight() and self:is_category("shotgun") then
-		mul = mul + (1 - pm:upgrade_value("shotgun", "steelsight_accuracy_inc", 1))
-		mul = mul + (1 - pm:upgrade_value("player"))
+	if current_state:in_steelsight() then
+		mul = mul + (1 - managers.player:upgrade_value(self:category(), "steelsight_accuracy_inc", 1))
 	end
 	if current_state._moving then
 		mul = mul + (1 - pm:upgrade_value("player", "weapon_movement_stability", 1))

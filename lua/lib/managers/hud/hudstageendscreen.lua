@@ -1207,12 +1207,7 @@ function HUDStageEndScreen:create_money_counter(t, dt)
 		"costs",
 		"balance"
 	}
-	self._money_stage_index = 1
-	self._money_index = 0
-	self._money_text_y = 10
-	self._start_count_money = false
-	self._counting_money = false
-	self._money_counting_amount = 0
+	self:reset_income_count()
 	self._wait_t = t + 1
 	self:step_stage_up()
 	self._debug_m = nil
@@ -1227,17 +1222,49 @@ function HUDStageEndScreen:set_debug_m(name)
 end
 
 function HUDStageEndScreen:count_money(t, dt)
-	local money_stage = self._money_stage[self._money_stage_index]
-	if money_stage then
-		local money_data = self._money[money_stage]
-		if money_data then
-			local money_specific = money_data[self._money_index]
-			if (money_specific or self._money_index == 0) and money_data.name_id then
-				if self._money_index == 0 then
-					local text_object = self._money_panel:text({
+	if self:perform_income_count(t, dt, self._money_panel, self._money_stage, self._money, self.get_count_speed_fast, self.display_as_cash) then
+		WalletGuiObject.refresh()
+		WalletGuiObject.set_object_visible("wallet_money_icon", true)
+		WalletGuiObject.set_object_visible("wallet_money_text", true)
+		managers.menu_component:show_endscreen_cash_summary()
+		self._wait_t = t + 1.25
+		self:step_stage_up()
+	end
+end
+
+function HUDStageEndScreen:reset_income_count()
+	self._money_text_y = 10
+	self._start_count_money = false
+	self._counting_money = false
+	self._money_counting_amount = 0
+	self._income_stage_index = 1
+	self._income_index = 0
+end
+
+function HUDStageEndScreen:get_count_speed_fast(dt, data)
+	return dt * math.max(20000, data[2] / 1.5)
+end
+
+function HUDStageEndScreen:get_count_speed_slow(dt, data)
+	return dt * math.max(200, data[2] / 1.5)
+end
+
+function HUDStageEndScreen:display_as_cash(amount)
+	return managers.experience:cash_string(amount)
+end
+
+function HUDStageEndScreen:perform_income_count(t, dt, parent_panel, stage_table, income_table, count_func, display_func)
+	local income_stage = stage_table[self._income_stage_index]
+	if income_stage then
+		local income_data = income_table[income_stage]
+		if income_data then
+			local income_specific = income_data[self._income_index]
+			if (income_specific or self._income_index == 0) and income_data.name_id then
+				if self._income_index == 0 then
+					local text_object = parent_panel:text({
 						x = 0,
 						y = self._money_text_y,
-						text = money_data.name_id,
+						text = income_data.name_id,
 						font = tweak_data.menu.pd2_medium_font,
 						font_size = tweak_data.menu.pd2_medium_font_size
 					})
@@ -1246,21 +1273,21 @@ function HUDStageEndScreen:count_money(t, dt)
 					managers.menu_component:post_event("box_tick")
 					self._money_text_y = text_object:bottom()
 					self._wait_t = t + 0.65
-					self._money_index = 1
+					self._income_index = 1
 				elseif self._start_count_money then
-					local text_object = self._money_panel:text({
-						name = "text" .. tostring(self._money_stage_index) .. tostring(self._money_index),
-						x = self._money_panel:w() * 0.5,
+					local text_object = parent_panel:text({
+						name = "text" .. tostring(self._income_stage_index) .. tostring(self._income_index),
+						x = parent_panel:w() * 0.5,
 						y = self._money_text_y,
-						text = managers.experience:cash_string(0),
+						text = display_func(self, 0),
 						font = tweak_data.menu.pd2_small_font,
 						font_size = tweak_data.menu.pd2_small_font_size
 					})
 					managers.hud:make_fine_text(text_object)
-					local dir_object = self._money_panel:text({
-						name = "dir" .. tostring(self._money_stage_index) .. tostring(self._money_index),
+					local dir_object = parent_panel:text({
+						name = "dir" .. tostring(self._income_stage_index) .. tostring(self._income_index),
 						y = self._money_text_y,
-						text = (0 > money_specific[2] or money_stage == "costs") and "-" or "+",
+						text = 0 > income_specific[2] and "-" or "+",
 						font = tweak_data.menu.pd2_small_font,
 						font_size = tweak_data.menu.pd2_small_font_size
 					})
@@ -1273,33 +1300,32 @@ function HUDStageEndScreen:count_money(t, dt)
 					self._money_counting_amount = 0
 					self._set_count_first = true
 				elseif self._counting_money then
-					local text_object = self._money_panel:child("text" .. tostring(self._money_stage_index) .. tostring(self._money_index))
-					local dir_object = self._money_panel:child("dir" .. tostring(self._money_stage_index) .. tostring(self._money_index))
+					local text_object = parent_panel:child("text" .. tostring(self._income_stage_index) .. tostring(self._income_index))
+					local dir_object = parent_panel:child("dir" .. tostring(self._income_stage_index) .. tostring(self._income_index))
 					if self._set_count_first then
 						self._set_count_first = nil
 						managers.menu_component:post_event("count_1")
 						dir_object:show()
 					end
-					self._money_counting_amount = math.round(math.step(self._money_counting_amount, money_specific[2], dt * math.max(20000, money_specific[2] / 1.5)))
-					text_object:set_text(managers.experience:cash_string(math.abs(self._money_counting_amount)))
+					self._money_counting_amount = math.round(math.step(self._money_counting_amount, income_specific[2], count_func(self, dt, income_specific)))
+					text_object:set_text(display_func(self, math.abs(self._money_counting_amount)))
 					managers.hud:make_fine_text(text_object)
-					if self._money_counting_amount == money_specific[2] then
+					if self._money_counting_amount == income_specific[2] then
 						self._counting_money = false
-						self._money_index = self._money_index + 1
+						self._income_index = self._income_index + 1
 						self._money_text_y = text_object:bottom()
 						self._wait_t = t + 0.45
 						managers.menu_component:post_event("count_1_finished")
-						text_object:set_color(money_specific[3] or tweak_data.screen_colors.text)
-						dir_object:set_color(money_specific[3] or tweak_data.screen_colors.text)
-					else
+						text_object:set_color(income_specific[3] or tweak_data.screen_colors.text)
+						dir_object:set_color(income_specific[3] or tweak_data.screen_colors.text)
 					end
-				elseif not money_specific[2] or money_specific[2] == 0 then
-					self._money_index = self._money_index + 1
+				elseif not income_specific[2] or income_specific[2] == 0 then
+					self._income_index = self._income_index + 1
 				else
-					local text_object = self._money_panel:text({
+					local text_object = parent_panel:text({
 						x = 10,
 						y = self._money_text_y,
-						text = managers.localization:to_upper_text(money_specific[1], {money = ""}),
+						text = managers.localization:to_upper_text(income_specific[1], {money = ""}),
 						font = tweak_data.menu.pd2_small_font,
 						font_size = tweak_data.menu.pd2_small_font_size
 					})
@@ -1308,20 +1334,15 @@ function HUDStageEndScreen:count_money(t, dt)
 					self._start_count_money = true
 				end
 			else
-				self._money_index = 0
-				self._money_stage_index = self._money_stage_index + 1
+				self._income_index = 0
+				self._income_stage_index = self._income_stage_index + 1
 				self._money_text_y = self._money_text_y + 15
-				self._wait_t = t + (money_data and 0 or 1)
+				self._wait_t = t + (income_data and 0 or 1)
 			end
-			return
+			return false
 		end
 	end
-	WalletGuiObject.refresh()
-	WalletGuiObject.set_object_visible("wallet_money_icon", true)
-	WalletGuiObject.set_object_visible("wallet_money_text", true)
-	managers.menu_component:show_endscreen_cash_summary()
-	self._wait_t = t + 1.25
-	self:step_stage_up()
+	return true
 end
 
 function HUDStageEndScreen:hide_money(t, dt)

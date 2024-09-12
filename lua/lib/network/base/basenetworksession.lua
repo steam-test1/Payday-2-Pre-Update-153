@@ -447,6 +447,10 @@ function BaseNetworkSession:on_peer_kicked(peer, peer_id, message_id)
 		local reason = "kicked"
 		if message_id == 1 then
 			reason = "removed_dead"
+			if peer:is_host() and game_state_machine:current_state().on_server_left then
+				Global.on_server_left_message = "dialog_connection_to_host_lost"
+				game_state_machine:current_state():on_server_left()
+			end
 		elseif message_id == 2 or message_id == 3 then
 			reason = "auth_fail"
 		end

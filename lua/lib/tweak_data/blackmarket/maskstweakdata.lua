@@ -1,6 +1,6 @@
 local is_nextgen_console = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
 
-function BlackMarketTweakData:_init_masks()
+function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks = {}
 	self.masks.character_locked = {}
 	self.masks.character_locked.name_id = "bm_msk_character_locked"
@@ -2012,6 +2012,13 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.card_joker.texture_bundle_folder = "humble_summer_2015"
 	self.masks.card_joker.value = 0
 	self.masks.card_joker.sort_number = 8
+	self.masks.king_of_jesters = {}
+	self.masks.king_of_jesters.unit = "units/pd2_dlc_paydaycon2015/masks/king_of_jesters/msk_king_of_jesters"
+	self.masks.king_of_jesters.name_id = "bm_msk_king_of_jesters"
+	self.masks.king_of_jesters.pcs = {}
+	self.masks.king_of_jesters.dlc = "pdcon_2015"
+	self.masks.king_of_jesters.value = 0
+	self.masks.king_of_jesters.sort_number = 9
 	self.masks.sokol = {}
 	self.masks.sokol.unit = "units/pd2_dlc_character_sokol/masks/sokol/msk_sokol"
 	self.masks.sokol.name_id = "bm_msk_sokol"
@@ -2129,13 +2136,6 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.bobblehead_dozer.dlc = "bobblehead"
 	self.masks.bobblehead_dozer.type = "helmet"
 	self.masks.bobblehead_dozer.sort_number = 9
-	self.masks.king_of_jesters = {}
-	self.masks.king_of_jesters.unit = "units/pd2_dlc_paydaycon2015/masks/king_of_jesters/msk_king_of_jesters"
-	self.masks.king_of_jesters.name_id = "bm_msk_king_of_jesters"
-	self.masks.king_of_jesters.pcs = {}
-	self.masks.king_of_jesters.dlc = "pdcon_2015"
-	self.masks.king_of_jesters.value = 0
-	self.masks.king_of_jesters.sort_number = 9
 	self.masks.mason_knight_veteran = {}
 	self.masks.mason_knight_veteran.unit = "units/pd2_dlc_steel/masks/mason_knight_veteran/msk_mason_knight_veteran"
 	self.masks.mason_knight_veteran.name_id = "bm_msk_mason_knight_veteran"
@@ -2802,6 +2802,11 @@ function BlackMarketTweakData:_init_masks()
 	self.masks.mig_famine.texture_bundle_folder = "migg"
 	self.masks.mig_famine.sort_number = 33
 	self.masks.mig_famine.dlc = "pd2_clan"
-	self:give_free_dlcs(self.masks)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.masks) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 	self:_add_desc_from_name_macro(self.masks)
 end

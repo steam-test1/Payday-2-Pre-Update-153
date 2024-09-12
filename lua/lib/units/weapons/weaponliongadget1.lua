@@ -6,6 +6,12 @@ WeaponLionGadget1.bipod_length = nil
 function WeaponLionGadget1:init(unit)
 	self._unit = unit
 	self._is_npc = false
+	
+	local function on_cash_inspect_weapon()
+		self:get_offsets()
+	end
+	
+	managers.player:register_message(Message.OnCashInspectWeapon, self, on_cash_inspect_weapon)
 	self._deployed = false
 end
 
@@ -53,10 +59,7 @@ function WeaponLionGadget1:_unmount()
 	self._deployed = false
 end
 
-function WeaponLionGadget1:_is_deployable()
-	if self._is_npc then
-		return false
-	end
+function WeaponLionGadget1:_get_bipod_obj()
 	if not self._bipod_obj and self._unit:parent() then
 		print("No Bipod object. Trying to recover.")
 		self._bipod_obj = self._unit:parent():get_object(Idstring("a_bp"))
@@ -66,11 +69,29 @@ function WeaponLionGadget1:_is_deployable()
 		end
 		print("Success.")
 	end
+	return self._bipod_obj
+end
+
+function WeaponLionGadget1:_get_bipod_alignment_obj()
+	if not self._bipod_align_obj and self._unit:parent() and self._unit:parent():parent() then
+		self._bipod_align_obj = self._unit:parent():parent()
+	end
+	return self._bipod_align_obj
+end
+
+function WeaponLionGadget1:_is_in_blocked_deployable_state()
 	local is_reloading = false
 	if managers.player:current_state() == "standard" and managers.player:player_unit():movement()._current_state then
 		is_reloading = managers.player:player_unit():movement()._current_state:_is_reloading()
 	end
-	if not managers.player:player_unit():mover():standing() or managers.player:current_state() ~= "standard" and managers.player:current_state() ~= "carry" and managers.player:current_state() ~= "bipod" or managers.player:player_unit():inventory():equipped_unit():base():selection_index() ~= 2 or is_reloading then
+	return not managers.player:player_unit():mover():standing() or managers.player:current_state() ~= "standard" and managers.player:current_state() ~= "carry" and managers.player:current_state() ~= "bipod" or managers.player:player_unit():inventory():equipped_unit():base():selection_index() ~= 2 or is_reloading
+end
+
+function WeaponLionGadget1:_is_deployable()
+	if self._is_npc or not self:_get_bipod_obj() then
+		return false
+	end
+	if self:_is_in_blocked_deployable_state() then
 		return false
 	end
 	local bipod_rays = self:_shoot_bipod_rays()
@@ -93,6 +114,17 @@ function WeaponLionGadget1:_is_deployable()
 	return false
 end
 
+function WeaponLionGadget1:get_offsets()
+	if not self:_get_bipod_obj() then
+		return false
+	end
+	self._bipod_offsets = self._bipod_offsets or {}
+	local dir = Vector3()
+	self._bipod_offsets.distance = mvector3.direction(dir, self._bipod_obj:position(), self:_get_bipod_alignment_obj():position())
+	mvector3.rotate_with(dir, self:_get_bipod_alignment_obj():rotation():inverse())
+	self._bipod_offsets.direction = dir
+end
+
 function WeaponLionGadget1:_shoot_bipod_rays(debug_draw)
 	local mvec1 = Vector3()
 	local mvec2 = Vector3()
@@ -106,12 +138,37 @@ function WeaponLionGadget1:_shoot_bipod_rays(debug_draw)
 	if not self._bipod_obj then
 		return nil
 	end
-	mrotation.y(self._bipod_obj:rotation(), mvec_look_dir)
-	mrotation.x(self._bipod_obj:rotation(), mvec_gun_down_dir)
+	if not self._bipod_offsets then
+		self:get_offsets()
+	end
+	mrotation.y(self:_get_bipod_alignment_obj():rotation(), mvec_look_dir)
+	mrotation.x(self:_get_bipod_alignment_obj():rotation(), mvec_gun_down_dir)
+	local bipod_position = Vector3()
+	mvector3.set(bipod_position, self._bipod_offsets.direction)
+	mvector3.rotate_with(bipod_position, self:_get_bipod_alignment_obj():rotation())
+	mvector3.multiply(bipod_position, (self._bipod_offsets.distance or bipod_max_length) * -1)
+	mvector3.add(bipod_position, self:_get_bipod_alignment_obj():position())
+	if debug_draw then
+		Application:draw_line(bipod_position, bipod_position + Vector3(10, 0, 0), unpack({
+			1,
+			0,
+			0
+		}))
+		Application:draw_line(bipod_position, bipod_position + Vector3(0, 10, 0), unpack({
+			0,
+			1,
+			0
+		}))
+		Application:draw_line(bipod_position, bipod_position + Vector3(0, 0, 10), unpack({
+			0,
+			0,
+			1
+		}))
+	end
 	if mvec_look_dir:to_polar().pitch > 60 then
 		return nil
 	end
-	mvector3.set(from, self._bipod_obj:position())
+	mvector3.set(from, bipod_position)
 	mvector3.set(to, mvec_gun_down_dir)
 	mvector3.multiply(to, bipod_max_length)
 	mvector3.rotate_with(to, Rotation(mvec_look_dir, 120))
@@ -173,7 +230,7 @@ function WeaponLionGadget1:_shoot_bipod_rays(debug_draw)
 		Application:draw_line(from, to, unpack(color))
 	end
 	mvector3.set(from_offset, Vector3(0, -100, 0))
-	mvector3.rotate_with(from_offset, self._bipod_obj:rotation())
+	mvector3.rotate_with(from_offset, self:_get_bipod_alignment_obj():rotation())
 	mvector3.add(from, from_offset)
 	mvector3.set(to, mvec_look_dir)
 	mvector3.multiply(to, 500)
@@ -224,4 +281,5 @@ function WeaponLionGadget1:check_state()
 end
 
 function WeaponLionGadget1:destroy(unit)
+	managers.player:unregister_message(Message.OnCashInspectWeapon, self)
 end

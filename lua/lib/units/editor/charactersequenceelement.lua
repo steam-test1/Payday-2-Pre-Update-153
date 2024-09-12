@@ -1,6 +1,7 @@
 CharacterSequenceElement = SequenceCharacterElement or class(MissionElement)
 CharacterSequenceElement.SAVE_UNIT_POSITION = false
 CharacterSequenceElement.SAVE_UNIT_ROTATION = false
+CharacterSequenceElement.LINK_ELEMENTS = {"elements"}
 
 function CharacterSequenceElement:init(unit)
 	CharacterSequenceElement.super.init(self, unit)
@@ -40,14 +41,6 @@ function CharacterSequenceElement:draw_links(t, dt, selected_unit, all_units)
 				g = 0.75,
 				b = 0
 			})
-		end
-	end
-end
-
-function CharacterSequenceElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end

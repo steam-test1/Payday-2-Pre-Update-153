@@ -21,6 +21,9 @@ function BaseInteractionExt:init(unit)
 	self._unit = unit
 	self._unit:set_extension_update_enabled(Idstring("interaction"), false)
 	self:refresh_material()
+	if not tweak_data.interaction[self.tweak_data] then
+		print("[BaseInteractionExt:init] - Missing Interaction Tweak Data: ", self.tweak_data)
+	end
 	self:set_tweak_data(self.tweak_data)
 	self:set_active(self._tweak_data.start_active or self._tweak_data.start_active == nil and true)
 	self:_upd_interaction_topology()
@@ -554,6 +557,10 @@ function BaseInteractionExt:destroy()
 	end
 end
 
+function BaseInteractionExt:can_remove_item()
+	return true
+end
+
 UseInteractionExt = UseInteractionExt or class(BaseInteractionExt)
 
 function UseInteractionExt:unselect()
@@ -1018,20 +1025,7 @@ end
 
 function SentryGunInteractionExt:interact(player)
 	SentryGunInteractionExt.super.super.interact(self, player)
-	local equipped_wpn = managers.player:get_current_state():get_equipped_weapon()
-	if equipped_wpn then
-		local ammo_ratio = self._unit:base():ammo_ratio()
-		local ammo = equipped_wpn:get_max_ammo_excluding_clip() * 0.2 * ammo_ratio
-		ammo = math.floor(ammo)
-		local index = managers.player:equipped_weapon_index()
-		equipped_wpn:add_ammo_to_pool(ammo, index)
-		managers.player:add_sentry_gun(1, self._unit:base():get_type())
-		if Network:is_client() then
-			managers.network:session():send_to_peers_synched("remove_sentry_gun", self._unit)
-		else
-			World:delete_unit(self._unit)
-		end
-	end
+	self._unit:base():on_interaction()
 	return true
 end
 
@@ -1053,7 +1047,8 @@ local sentry_gun_interaction_add_string_macros = function(macros, ammo_ratio)
 end
 
 function SentryGunInteractionExt:_add_string_macros(macros)
-	sentry_gun_interaction_add_string_macros(macros, self._unit:base():ammo_ratio())
+	local ammo_ratio = Network:is_server() and self._unit:weapon():ammo_ratio() or self._unit:weapon():get_virtual_ammo_ratio()
+	sentry_gun_interaction_add_string_macros(macros, ammo_ratio)
 end
 
 function SentryGunInteractionExt:_on_weapon_fire_event()
@@ -1088,7 +1083,7 @@ function SentryGunFireModeInteractionExt:interact(player)
 end
 
 function SentryGunFireModeInteractionExt:_add_string_macros(macros)
-	local ammo_ratio = self._sentry_gun_weapon and self._sentry_gun_weapon:ammo_ratio() or 1
+	local ammo_ratio = Network:is_server() and self._sentry_gun_weapon:ammo_ratio() or self._sentry_gun_weapon:get_virtual_ammo_ratio()
 	sentry_gun_interaction_add_string_macros(macros, ammo_ratio)
 end
 
@@ -1121,9 +1116,8 @@ end
 DoctorBagBaseInteractionExt = DoctorBagBaseInteractionExt or class(UseInteractionExt)
 
 function DoctorBagBaseInteractionExt:_interact_blocked(player)
-	local full_health = player:character_damage():full_health()
 	local is_berserker = player:character_damage():is_berserker()
-	return full_health or is_berserker, false, is_berserker and "hint_health_berserking" or false
+	return is_berserker, false, is_berserker and "hint_health_berserking" or false
 end
 
 function DoctorBagBaseInteractionExt:interact(player)
@@ -1665,9 +1659,10 @@ end
 
 function CarryInteractionExt:interact(player)
 	CarryInteractionExt.super.super.interact(self, player)
+	local peer_id = managers.network:session():local_peer()
 	if self._has_modified_timer then
 		managers.achievment:award("murphys_laws")
-		if self._unit:carry_data():latest_peer_id() == managers.network:session():local_peer():id() then
+		if self._unit:carry_data():latest_peer_id() == peer_id then
 			local kill_count_no_carry = managers.job:get_memory("kill_count_no_carry", true) or 0
 			local peta_4_data = tweak_data.achievement.peta_4
 			if peta_4_data and self._unit:carry_data():carry_id() == peta_4_data.carry_id and kill_count_no_carry >= peta_4_data.count then
@@ -1679,16 +1674,18 @@ function CarryInteractionExt:interact(player)
 	if self._unit:carry_data():carry_id() == "person" then
 		managers.mission:call_global_event("player_pickup_bodybag")
 	end
-	managers.network:session():send_to_peers_synched("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
+	managers.network:session():send_to_peers_synched_except(peer_id, "sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
 	self:sync_interacted(nil, player)
 	managers.player:register_carry(managers.network:session():local_peer(), self._unit:carry_data() and self._unit:carry_data():carry_id())
 	if Network:is_client() then
 		player:movement():set_carry_restriction(true)
 	end
+	managers.mission:call_global_event("on_picked_up_carry", self._unit)
 	return true
 end
 
 function CarryInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
+	local no_player = player == nil
 	player = player or peer:unit()
 	if peer and not managers.player:register_carry(peer, self._unit:carry_data() and self._unit:carry_data():carry_id()) then
 		return
@@ -1717,6 +1714,9 @@ function CarryInteractionExt:sync_interacted(peer, player, status, skip_alive_ch
 		if peer then
 			managers.player:set_carry_approved(peer)
 		end
+	end
+	if no_player then
+		managers.mission:call_global_event("on_picked_up_carry", self._unit)
 	end
 end
 
@@ -1974,10 +1974,14 @@ function SpecialEquipmentInteractionExt:_interact_blocked(player)
 end
 
 function SpecialEquipmentInteractionExt:interact(player)
+	if not alive(self._unit) then
+		return
+	end
 	SpecialEquipmentInteractionExt.super.super.interact(self, player)
 	managers.player:add_special({
 		name = self._special_equipment
 	})
+	print("self._special_equipment ", inspect(self._special_equipment))
 	if self._remove_on_interact then
 		self:remove_interact()
 		self:set_active(false)
@@ -1986,6 +1990,7 @@ function SpecialEquipmentInteractionExt:interact(player)
 		managers.network:session():send_to_host("sync_interacted", self._unit, -2, self.tweak_data, 1)
 	else
 		self:sync_interacted(nil, player)
+		self:apply_item_pickup()
 	end
 	return true
 end
@@ -2001,6 +2006,16 @@ function SpecialEquipmentInteractionExt:sync_interacted(peer, player, status, sk
 	if self._remove_on_interact then
 		self._unit:set_slot(0)
 	end
+end
+
+function SpecialEquipmentInteractionExt:apply_item_pickup()
+	managers.player:add_special({
+		name = self._special_equipment
+	})
+end
+
+function SpecialEquipmentInteractionExt:can_remove_item()
+	return self._remove_on_interact
 end
 
 AccessCameraInteractionExt = AccessCameraInteractionExt or class(UseInteractionExt)

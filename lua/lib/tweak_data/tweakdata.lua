@@ -29,6 +29,7 @@ require("lib/tweak_data/PrePlanningTweakData")
 require("lib/tweak_data/InteractionTweakData")
 require("lib/tweak_data/VehicleTweakData")
 require("lib/tweak_data/EconomyTweakData")
+require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
 TweakData = TweakData or class()
 
@@ -311,7 +312,8 @@ function TweakData:init()
 		"blackmarket",
 		"blackmarket_weapon",
 		"blackmarket_mask",
-		"payday"
+		"payday",
+		"custom_safehouse"
 	}
 	self.difficulty_name_ids = {}
 	self.difficulty_name_ids.easy = "menu_difficulty_easy"
@@ -320,45 +322,6 @@ function TweakData:init()
 	self.difficulty_name_ids.overkill = "menu_difficulty_very_hard"
 	self.difficulty_name_ids.overkill_145 = "menu_difficulty_overkill"
 	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
-	self.hud_icons = HudIconsTweakData:new()
-	self.weapon = WeaponTweakData:new(self)
-	self.equipments = EquipmentsTweakData:new()
-	self.player = PlayerTweakData:new()
-	self.levels = LevelsTweakData:new()
-	self._init_wip_levels(self.levels)
-	self.character = CharacterTweakData:new(self)
-	self.statistics = StatisticsTweakData:new()
-	self.narrative = NarrativeTweakData:new()
-	self._init_wip_narrative(self.narrative)
-	self.group_ai = GroupAITweakData:new(self)
-	self.drama = DramaTweakData:new()
-	self.upgrades = UpgradesTweakData:new()
-	self._init_wip_upgrades(self.upgrades)
-	self.skilltree = SkillTreeTweakData:new()
-	self._init_wip_skilltree(self.skilltree)
-	self.upgrades.visual = UpgradesVisualTweakData:new()
-	self.tips = TipsTweakData:new()
-	self.money_manager = MoneyTweakData:new(self)
-	self.blackmarket = BlackMarketTweakData:new(self)
-	self._init_wip_blackmarket(self.blackmarket, self)
-	self.carry = CarryTweakData:new(self)
-	self.mission_door = MissionDoorTweakData:new()
-	self.attention = AttentionTweakData:new()
-	self.timespeed = TimeSpeedEffectTweakData:new()
-	self.sound = SoundTweakData:new()
-	self.lootdrop = LootDropTweakData:new(self)
-	self.gui = GuiTweakData:new()
-	self.assets = AssetsTweakData:new(self)
-	self._init_wip_assets(self.assets, self)
-	self.dlc = DLCTweakData:new(self)
-	self.infamy = InfamyTweakData:new(self)
-	self.gage_assignment = GageAssignmentTweakData:new(self)
-	self.preplanning = PrePlanningTweakData:new(self)
-	self.interaction = InteractionTweakData:new(self)
-	self.vehicle = VehicleTweakData:new(self)
-	self.economy = EconomyTweakData:new(self)
-	self._init_wip_economy(self.economy, self)
-	self.env_effect = EnvEffectTweakData:new()
 	self.criminals = {}
 	self.criminals.character_names = {
 		"russian",
@@ -556,6 +519,46 @@ function TweakData:init()
 			}
 		}
 	}
+	self.hud_icons = HudIconsTweakData:new()
+	self.weapon = WeaponTweakData:new(self)
+	self.equipments = EquipmentsTweakData:new()
+	self.player = PlayerTweakData:new()
+	self.levels = LevelsTweakData:new()
+	self._init_wip_levels(self.levels)
+	self.character = CharacterTweakData:new(self)
+	self.statistics = StatisticsTweakData:new()
+	self.narrative = NarrativeTweakData:new(self)
+	self._init_wip_narrative(self.narrative)
+	self.group_ai = GroupAITweakData:new(self)
+	self.drama = DramaTweakData:new()
+	self.upgrades = UpgradesTweakData:new(self)
+	self._init_wip_upgrades(self.upgrades)
+	self.skilltree = SkillTreeTweakData:new()
+	self._init_wip_skilltree(self.skilltree)
+	self.upgrades.visual = UpgradesVisualTweakData:new()
+	self.tips = TipsTweakData:new()
+	self.money_manager = MoneyTweakData:new(self)
+	self.blackmarket = BlackMarketTweakData:new(self)
+	self._init_wip_blackmarket(self.blackmarket, self)
+	self.carry = CarryTweakData:new(self)
+	self.mission_door = MissionDoorTweakData:new()
+	self.attention = AttentionTweakData:new()
+	self.timespeed = TimeSpeedEffectTweakData:new()
+	self.sound = SoundTweakData:new()
+	self.lootdrop = LootDropTweakData:new(self)
+	self.gui = GuiTweakData:new()
+	self.assets = AssetsTweakData:new(self)
+	self._init_wip_assets(self.assets, self)
+	self.dlc = DLCTweakData:new(self)
+	self.infamy = InfamyTweakData:new(self)
+	self.gage_assignment = GageAssignmentTweakData:new(self)
+	self.preplanning = PrePlanningTweakData:new(self)
+	self.interaction = InteractionTweakData:new(self)
+	self.vehicle = VehicleTweakData:new(self)
+	self.economy = EconomyTweakData:new(self)
+	self._init_wip_economy(self.economy, self)
+	self.van = VanSkinsTweakData:new(self)
+	self.env_effect = EnvEffectTweakData:new()
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -1197,7 +1200,7 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.heat_around_the_corner = "heat"
 	self.achievement.fire_in_the_hole = {
-		grenade = "frag",
+		grenade = {"frag", "frag_com"},
 		stat = "gage_9_stats"
 	}
 	self.achievement.infamous = {
@@ -2859,7 +2862,6 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
-	self.achievement.job_list.events = {"nail"}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self.achievement.job_list.bain, "roberts")
 	end
@@ -4167,6 +4169,11 @@ Play the full version soon to get your full PAYDAY!]],
 	self:set_difficulty()
 	self:set_mode()
 	self:digest_tweak_data()
+end
+
+function TweakData:free_dlc_list()
+	local free_dlcs = {}
+	return free_dlcs
 end
 
 function TweakData:get_dot_type_data(type)

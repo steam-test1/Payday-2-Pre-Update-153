@@ -1,4 +1,4 @@
-function BlackMarketTweakData:_init_materials()
+function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials = {}
 	
 	self.materials.plastic = {}
@@ -1240,5 +1240,10 @@ function BlackMarketTweakData:_init_materials()
 	self.materials.shiny_and_chrome.value = 0
 	self.materials.shiny_and_chrome.texture_bundle_folder = "born"
 	self.materials.shiny_and_chrome.dlc = "born"
-	self:give_free_dlcs(self.materials)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.materials) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end

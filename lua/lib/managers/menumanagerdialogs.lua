@@ -179,13 +179,16 @@ function MenuManager:show_searching_match_dialog(params)
 	managers.system_menu:show(dialog_data)
 end
 
-function MenuManager:show_fetching_status_dialog()
+function MenuManager:show_fetching_status_dialog(params)
 	local dialog_data = {}
 	dialog_data.title = managers.localization:text("dialog_fetching_status_title")
 	dialog_data.text = managers.localization:text("dialog_wait")
 	dialog_data.id = "fetching_status"
-	dialog_data.no_buttons = true
 	dialog_data.indicator = true
+	local cancel_button = {}
+	cancel_button.text = managers.localization:text("dialog_cancel")
+	cancel_button.callback_func = params.cancel_func
+	dialog_data.button_list = {cancel_button}
 	managers.system_menu:show(dialog_data)
 end
 

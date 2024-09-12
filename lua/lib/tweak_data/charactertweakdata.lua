@@ -233,6 +233,7 @@ function CharacterTweakData:_init_fbi(presets)
 	self.fbi.speech_prefix_p1 = "l"
 	self.fbi.speech_prefix_p2 = "n"
 	self.fbi.speech_prefix_count = 4
+	self.fbi.silent_priority_shout = "f37"
 	self.fbi.access = "fbi"
 	self.fbi.dodge = presets.dodge.athletic
 	self.fbi.deathguard = true
@@ -1341,6 +1342,7 @@ function CharacterTweakData:_init_phalanx_minion(presets)
 	self.phalanx_minion.damage.hurt_severity = presets.hurt_severities.no_hurts_no_tase
 	self.phalanx_minion.damage.shield_knocked = false
 	self.phalanx_minion.damage.immune_to_knockback = true
+	self.phalanx_minion.immune_to_knock_down = true
 	self.phalanx_minion.ecm_vulnerability = nil
 	self.phalanx_minion.ecm_hurts = {}
 	self.phalanx_minion.priority_shout = "f45"
@@ -1354,6 +1356,7 @@ function CharacterTweakData:_init_phalanx_vip(presets)
 	self.phalanx_vip.DAMAGE_CLAMP_BULLET = 100
 	self.phalanx_vip.DAMAGE_CLAMP_EXPLOSION = self.phalanx_vip.DAMAGE_CLAMP_BULLET
 	self.phalanx_vip.can_be_tased = false
+	self.phalanx_vip.immune_to_knock_down = true
 end
 
 function CharacterTweakData:_init_taser(presets)
@@ -2346,7 +2349,8 @@ function CharacterTweakData:_presets(tweak_data)
 		mossberg = {},
 		mp5 = {},
 		mac11 = {},
-		raging_bull = {}
+		raging_bull = {},
+		akimbo_pistol = {}
 	}
 	presets.weapon.normal.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.normal.beretta92.focus_delay = 10
@@ -2439,6 +2443,82 @@ function CharacterTweakData:_presets(tweak_data)
 		far = 5000
 	}
 	presets.weapon.normal.c45.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 3,
+			recoil = {0.15, 0.25},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 500,
+			acc = {0.4, 0.85},
+			dmg_mul = 1.5,
+			recoil = {0.15, 0.25},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.375, 0.55},
+			dmg_mul = 1,
+			recoil = {0.15, 0.3},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.25, 0.45},
+			dmg_mul = 1,
+			recoil = {0.3, 0.7},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.01, 0.35},
+			dmg_mul = 1,
+			recoil = {0.4, 1},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		}
+	}
+	presets.weapon.normal.akimbo_pistol.aim_delay = {0.1, 0.1}
+	presets.weapon.normal.akimbo_pistol.focus_delay = 10
+	presets.weapon.normal.akimbo_pistol.focus_dis = 200
+	presets.weapon.normal.akimbo_pistol.spread = 20
+	presets.weapon.normal.akimbo_pistol.miss_dis = 50
+	presets.weapon.normal.akimbo_pistol.RELOAD_SPEED = 0.9
+	presets.weapon.normal.akimbo_pistol.melee_speed = 1
+	presets.weapon.normal.akimbo_pistol.melee_dmg = 8
+	presets.weapon.normal.akimbo_pistol.melee_retry_delay = {1, 2}
+	presets.weapon.normal.akimbo_pistol.range = {
+		close = 1000,
+		optimal = 2000,
+		far = 5000
+	}
+	presets.weapon.normal.akimbo_pistol.FALLOFF = {
 		{
 			r = 100,
 			acc = {0.6, 0.9},
@@ -2894,7 +2974,8 @@ function CharacterTweakData:_presets(tweak_data)
 		r870 = {},
 		mossberg = {},
 		mp5 = {},
-		mac11 = {}
+		mac11 = {},
+		akimbo_pistol = {}
 	}
 	presets.weapon.good.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.good.beretta92.focus_delay = 2
@@ -2979,6 +3060,78 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.weapon.good.c45.melee_retry_delay = presets.weapon.normal.c45.melee_retry_delay
 	presets.weapon.good.c45.range = presets.weapon.normal.c45.range
 	presets.weapon.good.c45.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 4,
+			recoil = {0.15, 0.25},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.85},
+			dmg_mul = 2,
+			recoil = {0.15, 0.25},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.375, 0.55},
+			dmg_mul = 1.5,
+			recoil = {0.15, 0.4},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.25, 0.45},
+			dmg_mul = 1.25,
+			recoil = {0.4, 0.9},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.01, 0.35},
+			dmg_mul = 1,
+			recoil = {0.4, 1},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		}
+	}
+	presets.weapon.good.akimbo_pistol.aim_delay = {0.1, 0.1}
+	presets.weapon.good.akimbo_pistol.focus_delay = 2
+	presets.weapon.good.akimbo_pistol.focus_dis = 200
+	presets.weapon.good.akimbo_pistol.spread = 20
+	presets.weapon.good.akimbo_pistol.miss_dis = 50
+	presets.weapon.good.akimbo_pistol.RELOAD_SPEED = 1
+	presets.weapon.good.akimbo_pistol.melee_speed = presets.weapon.normal.c45.melee_speed
+	presets.weapon.good.akimbo_pistol.melee_dmg = presets.weapon.normal.c45.melee_dmg
+	presets.weapon.good.akimbo_pistol.melee_retry_delay = presets.weapon.normal.c45.melee_retry_delay
+	presets.weapon.good.akimbo_pistol.range = presets.weapon.normal.c45.range
+	presets.weapon.good.akimbo_pistol.FALLOFF = {
 		{
 			r = 100,
 			acc = {0.6, 0.9},
@@ -3426,7 +3579,8 @@ function CharacterTweakData:_presets(tweak_data)
 		r870 = {},
 		mossberg = {},
 		mp5 = {},
-		mac11 = {}
+		mac11 = {},
+		akimbo_pistol = {}
 	}
 	presets.weapon.expert.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.expert.beretta92.focus_delay = 1
@@ -3499,6 +3653,78 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.weapon.expert.c45.melee_retry_delay = presets.weapon.normal.c45.melee_retry_delay
 	presets.weapon.expert.c45.range = presets.weapon.normal.c45.range
 	presets.weapon.expert.c45.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.15, 0.25},
+			mode = {
+				0,
+				3,
+				3,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.9},
+			dmg_mul = 4,
+			recoil = {0.15, 0.3},
+			mode = {
+				1,
+				0,
+				1,
+				0
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.65},
+			dmg_mul = 3.5,
+			recoil = {0.15, 0.3},
+			mode = {
+				1,
+				0,
+				1,
+				0
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.3, 0.5},
+			dmg_mul = 3,
+			recoil = {0.4, 0.9},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.25},
+			dmg_mul = 2.5,
+			recoil = {0.4, 1.4},
+			mode = {
+				1,
+				0,
+				0,
+				0
+			}
+		}
+	}
+	presets.weapon.expert.akimbo_pistol.aim_delay = {0.1, 0.1}
+	presets.weapon.expert.akimbo_pistol.focus_delay = 1
+	presets.weapon.expert.akimbo_pistol.focus_dis = 300
+	presets.weapon.expert.akimbo_pistol.spread = 20
+	presets.weapon.expert.akimbo_pistol.miss_dis = 50
+	presets.weapon.expert.akimbo_pistol.RELOAD_SPEED = 1.2
+	presets.weapon.expert.akimbo_pistol.melee_speed = presets.weapon.normal.c45.melee_speed
+	presets.weapon.expert.akimbo_pistol.melee_dmg = 20
+	presets.weapon.expert.akimbo_pistol.melee_retry_delay = presets.weapon.normal.c45.melee_retry_delay
+	presets.weapon.expert.akimbo_pistol.range = presets.weapon.normal.c45.range
+	presets.weapon.expert.akimbo_pistol.FALLOFF = {
 		{
 			r = 100,
 			acc = {0.6, 0.9},

@@ -1,6 +1,6 @@
 HostStateInLobby = HostStateInLobby or class(HostStateBase)
 
-function HostStateInLobby:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
+function HostStateInLobby:on_join_request_received(data, peer_name, client_preferred_character, dlcs, xuid, peer_level, peer_rank, gameversion, join_attempt_identifier, auth_ticket, sender)
 	print("HostStateInLobby:on_join_request_received peer_level", peer_level, join_attempt_identifier, gameversion)
 	if SystemInfo:platform() == Idstring("WIN32") then
 		peer_name = managers.network.account:username_by_id(sender:ip_at_index(0))

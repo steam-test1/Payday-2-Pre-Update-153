@@ -313,7 +313,7 @@ function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
 	end
 	if chk_armor_kit then
 		local equipped_deployable = self:equipped_deployable()
-		if equipped_deployable == "armor_kit" and (not managers.player:has_equipment(equipped_deployable) or managers.player:has_deployable_left(equipped_deployable)) then
+		if managers.player:has_equipment_in_any_slot("armor_kit") and managers.player:get_equipment_amount("armor_kit") > 0 then
 			return self._defaults.armor
 		end
 	end
@@ -910,6 +910,9 @@ function BlackMarketManager:outfit_string()
 	if equipped_deployable then
 		s = s .. " " .. tostring(equipped_deployable)
 		local deployable_tweak_data = tweak_data.equipments[equipped_deployable]
+		if equipped_deployable == "sentry_gun_silent" then
+			equipped_deployable = "sentry_gun"
+		end
 		local amount = (deployable_tweak_data.quantity[1] or 0) + managers.player:equiptment_upgrade_value(equipped_deployable, "quantity")
 		s = s .. " " .. tostring(amount)
 	else
@@ -2003,8 +2006,6 @@ function BlackMarketManager:visibility_modifiers()
 	if armor_data.upgrade_level == 2 or armor_data.upgrade_level == 3 or armor_data.upgrade_level == 4 then
 		skill_bonuses = skill_bonuses - managers.player:upgrade_value("player", "ballistic_vest_concealment", 0)
 	end
-	skill_bonuses = skill_bonuses - managers.player:upgrade_value("player", "silencer_concealment_increase", 0)
-	skill_bonuses = skill_bonuses - managers.player:upgrade_value("player", "silencer_concealment_penalty_decrease", 0)
 	local silencer_bonus = 0
 	silencer_bonus = silencer_bonus + self:get_silencer_concealment_modifiers(self:equipped_primary())
 	silencer_bonus = silencer_bonus + self:get_silencer_concealment_modifiers(self:equipped_secondary())
@@ -2445,6 +2446,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 	local deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local mask_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local character_texture = "guis/textures/pd2/endscreen/what_is_this"
+	local secondary_deployable_texture = "guis/textures/pd2/endscreen/what_is_this"
 	local empty_string = managers.localization:to_upper_text("menu_loadout_empty")
 	local primary_string = empty_string
 	local secondary_string = empty_string
@@ -2454,6 +2456,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 	local deployable_string = empty_string
 	local mask_string = empty_string
 	local character_string = empty_string
+	local secondary_deployable_string = empty_string
 	local primary_color, secondary_color
 	local primary_perks = {}
 	local secondary_perks = {}
@@ -2465,6 +2468,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 	local deployable = self:equipped_deployable()
 	local mask = self:equipped_mask()
 	local character = self:get_preferred_character()
+	local secondary_deployable = self:equipped_deployable(2)
 	if primary then
 		primary_texture, primary_bg_texture = managers.blackmarket:get_weapon_icon_path(primary.weapon_id, primary.cosmetics)
 		local equipped_weapon = self:equipped_primary()
@@ -2558,6 +2562,15 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		character_texture = guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. tostring(character_name)
 		character_string = managers.localization:text("menu_" .. character)
 	end
+	if secondary_deployable then
+		local guis_catalog = "guis/"
+		local bundle_folder = tweak_data.blackmarket.deployables[secondary_deployable] and tweak_data.blackmarket.deployables[secondary_deployable].texture_bundle_folder
+		if bundle_folder then
+			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		end
+		secondary_deployable_texture = guis_catalog .. "textures/pd2/blackmarket/icons/deployables/" .. tostring(secondary_deployable)
+		secondary_deployable_string = managers.localization:text(tweak_data.upgrades.definitions[secondary_deployable].name_id)
+	end
 	local primary = {
 		item_texture = primary_texture or false,
 		item_bg_texture = primary_bg_texture,
@@ -2598,6 +2611,13 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		item_texture = character_texture or false,
 		info_text = character_string
 	}
+	if secondary_deployable then
+		local secondary_deployable = {
+			item_texture = secondary_deployable_texture or false,
+			info_text = secondary_deployable_string
+		}
+		deployable.secondary = secondary_deployable
+	end
 	local data = {
 		primary = primary,
 		secondary = secondary,
@@ -2876,9 +2896,11 @@ function BlackMarketManager:equip_next_armor()
 	end
 end
 
-function BlackMarketManager:equip_previous_deployable()
+function BlackMarketManager:equip_previous_deployable(slot)
+	slot = slot or 1
 	local sort_data = self:get_sorted_deployables(true)
-	local equipped_deployable = self:equipped_deployable()
+	local equipped_deployable = self:equipped_deployable(slot)
+	local other_deployable = self:equipped_deployable(slot == 1 and 2 or 1)
 	local equipped_index
 	for index, data in ipairs(sort_data or {}) do
 		if data[1] == equipped_deployable then
@@ -2887,18 +2909,25 @@ function BlackMarketManager:equip_previous_deployable()
 		end
 	end
 	if equipped_index then
-		local previous_deployable = sort_data[equipped_index == 1 and #sort_data or equipped_index - 1][1]
+		local index = equipped_index == 1 and #sort_data or equipped_index - 1
+		local previous_deployable = sort_data[index][1]
+		if previous_deployable == other_deployable then
+			index = index == 1 and #sort_data or index - 1
+			previous_deployable = sort_data[index][1]
+		end
 		if previous_deployable and previous_deployable ~= equipped_deployable then
-			local data = {name = previous_deployable, target_slot = 1}
+			local data = {name = previous_deployable, target_slot = slot}
 			self:equip_deployable(data)
 			return true
 		end
 	end
 end
 
-function BlackMarketManager:equip_next_deployable()
+function BlackMarketManager:equip_next_deployable(slot)
+	slot = slot or 1
 	local sort_data = self:get_sorted_deployables(true)
-	local equipped_deployable = self:equipped_deployable()
+	local equipped_deployable = self:equipped_deployable(slot)
+	local other_deployable = self:equipped_deployable(slot == 1 and 2 or 1)
 	local equipped_index
 	for index, data in ipairs(sort_data or {}) do
 		if data[1] == equipped_deployable then
@@ -2907,9 +2936,14 @@ function BlackMarketManager:equip_next_deployable()
 		end
 	end
 	if equipped_index then
-		local next_deployable = sort_data[equipped_index % #sort_data + 1][1]
+		local index = equipped_index % #sort_data + 1
+		local next_deployable = sort_data[index][1]
+		if next_deployable == other_deployable then
+			index = index % #sort_data + 1
+			next_deployable = sort_data[index][1]
+		end
 		if next_deployable and next_deployable ~= equipped_deployable then
-			local data = {name = next_deployable, target_slot = 1}
+			local data = {name = next_deployable, target_slot = slot}
 			self:equip_deployable(data)
 			return true
 		end
@@ -6003,6 +6037,7 @@ function BlackMarketManager:accuracy_addend(name, category, sub_category, spread
 	if spread_index and 1 <= spread_index and spread_index <= (current_state and current_state._moving and #tweak_data.weapon.stats.spread_moving or #tweak_data.weapon.stats.spread) then
 		local index = spread_index
 		index = index + managers.player:upgrade_value("player", "weapon_accuracy_increase", 0)
+		index = index + managers.player:upgrade_value(category, "spread_index_addend", 0)
 		if silencer then
 			index = index + managers.player:upgrade_value("weapon", "silencer_spread_index_addend", 0)
 			index = index + managers.player:upgrade_value(category, "silencer_spread_index_addend", 0)
@@ -6010,8 +6045,11 @@ function BlackMarketManager:accuracy_addend(name, category, sub_category, spread
 		if current_state and current_state._moving then
 			index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
 		end
-		if sub_category and silencer then
-			index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+		if sub_category then
+			index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)
+			if silencer then
+				index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+			end
 		end
 		index = math.clamp(index, 1, #tweak_data.weapon.stats.spread)
 		if index ~= spread_index then
@@ -6025,6 +6063,7 @@ end
 function BlackMarketManager:accuracy_index_addend(name, category, sub_category, silencer, current_state, fire_mode, blueprint)
 	local index = 0
 	index = index + managers.player:upgrade_value("player", "weapon_accuracy_increase", 0)
+	index = index + managers.player:upgrade_value(category, "spread_index_addend", 0)
 	if silencer then
 		index = index + managers.player:upgrade_value("weapon", "silencer_spread_index_addend", 0)
 		index = index + managers.player:upgrade_value(category, "silencer_spread_index_addend", 0)
@@ -6032,8 +6071,11 @@ function BlackMarketManager:accuracy_index_addend(name, category, sub_category, 
 	if current_state and current_state._moving then
 		index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
 	end
-	if sub_category and silencer then
-		index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+	if sub_category then
+		index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)
+		if silencer then
+			index = index + managers.player:upgrade_value(sub_category, "silencer_spread_index_addend", 0)
+		end
 	end
 	return index
 end
@@ -6055,6 +6097,7 @@ end
 
 function BlackMarketManager:recoil_addend(name, category, sub_category, recoil_index, silencer, blueprint, current_state, is_single_shot)
 	local addend = 0
+	Application:stack_dump()
 	if recoil_index and 1 <= recoil_index and recoil_index <= #tweak_data.weapon.stats.recoil then
 		local index = recoil_index
 		index = index + managers.player:upgrade_value("weapon", "recoil_index_addend", 0)

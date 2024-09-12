@@ -39,3 +39,7 @@ function Stack:clear()
 	self._last = 0
 	self._table = {}
 end
+
+function Stack:stack_table()
+	return self._table
+end

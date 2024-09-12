@@ -1060,12 +1060,6 @@ function LootDropTweakData:init(tweak_data)
 		self.global_values.sweettooth.track = true
 		self.global_values.sweettooth.sort_number = 200
 		self.global_values.sweettooth.category = nil
-	elseif SystemInfo:platform() == Idstring("X360") then
-	elseif SystemInfo:platform() == Idstring("PS4") then
-	else
-		if SystemInfo:platform() == Idstring("XB1") then
-		else
-		end
 	end
 	self.global_value_list_index = {
 		"normal",

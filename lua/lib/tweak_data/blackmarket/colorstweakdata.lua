@@ -1,4 +1,4 @@
-function BlackMarketTweakData:_init_colors()
+function BlackMarketTweakData:_init_colors(tweak_data)
 	self.colors = {}
 	
 	local white = Color.white
@@ -1052,5 +1052,10 @@ function BlackMarketTweakData:_init_colors()
 		40
 	}
 	self.colors.dark_red_orange.value = 3
-	self:give_free_dlcs(self.colors)
+	local free_dlcs = tweak_data:free_dlc_list()
+	for _, data in pairs(self.colors) do
+		if free_dlcs[data.dlc] then
+			data.dlc = nil
+		end
+	end
 end

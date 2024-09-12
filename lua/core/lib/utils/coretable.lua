@@ -537,3 +537,13 @@ if Application:ews_enabled() then
 		return script and loadstring(script)() or {}
 	end
 end
+local default_unpack = default_unpack or unpack
+
+function _G.unpack(t, i, n)
+	if i == nil and n == nil then
+		return default_unpack(t, 1, table.maxn(t))
+	elseif n == nil then
+		return default_unpack(t, i, table.maxn(t))
+	end
+	return default_unpack(t, i, n)
+end

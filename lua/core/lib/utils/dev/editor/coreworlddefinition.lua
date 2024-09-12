@@ -762,6 +762,7 @@ function WorldDefinition:assign_unit_data(unit, data)
 	self:_set_only_visible_in_editor(unit, data)
 	self:_setup_cutscene_actor(unit, data)
 	self:_setup_disable_shadow(unit, data)
+	self:_setup_disable_collision(unit, data)
 	self:_setup_hide_on_projection_light(unit, data)
 	self:_setup_disable_on_ai_graph(unit, data)
 	self:_add_to_portal(unit, data)
@@ -920,6 +921,26 @@ function WorldDefinition:_setup_disable_shadow(unit, data)
 		unit:unit_data().disable_shadows = data.disable_shadows
 	end
 	unit:set_shadows_disabled(data.disable_shadows)
+end
+
+function WorldDefinition:_setup_disable_collision(unit, data)
+	if not data.disable_collision then
+		return
+	end
+	if Application:editor() then
+		unit:unit_data().disable_collision = data.disable_collision
+		if managers.editor:is_simulating() then
+			return
+		end
+	end
+	for index = 0, unit:num_bodies() - 1 do
+		local body = unit:body(index)
+		if body then
+			body:set_collisions_enabled(not data.disable_collision)
+			body:set_collides_with_mover(not data.disable_collision)
+			body:set_enabled(not data.disable_collision)
+		end
+	end
 end
 
 function WorldDefinition:_setup_hide_on_projection_light(unit, data)

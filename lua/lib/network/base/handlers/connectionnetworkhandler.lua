@@ -35,11 +35,11 @@ function ConnectionNetworkHandler:discover_host_reply(sender_name, level_id, lev
 	managers.network:on_discover_host_reply(sender, sender_name, level_name, my_ip, state, difficulty)
 end
 
-function ConnectionNetworkHandler:request_join(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
+function ConnectionNetworkHandler:request_join(peer_name, preferred_character, dlcs, xuid, peer_level, peer_rank, gameversion, join_attempt_identifier, auth_ticket, sender)
 	if not self._verify_in_server_session() then
 		return
 	end
-	managers.network:session():on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, gameversion, join_attempt_identifier, auth_ticket, sender)
+	managers.network:session():on_join_request_received(peer_name, preferred_character, dlcs, xuid, peer_level, peer_rank, gameversion, join_attempt_identifier, auth_ticket, sender)
 end
 
 function ConnectionNetworkHandler:join_request_reply(reply_id, my_peer_id, my_character, level_index, difficulty_index, state, server_character, user_id, mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, xuid, auth_ticket, sender)
@@ -781,6 +781,28 @@ function ConnectionNetworkHandler:start_super_syndrome_trade(pos, peer_id)
 	end
 end
 
+function ConnectionNetworkHandler:request_stockholm_syndrome(pos, peer_id, auto_activate)
+	local peer = managers.network:session():peer(peer_id)
+	local allowed, feedback_idx = StockholmSyndromeTradeAction.is_allowed()
+	if auto_activate then
+		feedback_idx = 0
+	end
+	if allowed then
+		managers.player:init_auto_respawn_callback(pos, peer_id, true)
+		managers.network:session():send_to_peer(peer, "stockholm_syndrome_results", true, feedback_idx)
+	else
+		managers.network:session():send_to_peer(peer, "stockholm_syndrome_results", false, feedback_idx)
+	end
+end
+
+function ConnectionNetworkHandler:stockholm_syndrome_results(can_trade, feedback_idx)
+	managers.player:send_message(Message.CanTradeHostage, nil, can_trade, feedback_idx)
+end
+
 function ConnectionNetworkHandler:sync_set_super_syndrome(peer_id, active)
 	managers.groupai:state():set_super_syndrome(peer_id, active)
+end
+
+function ConnectionNetworkHandler:peer_joined_sound(infamous)
+	managers.menu:post_event(infamous and "infamous_player_join_stinger" or "player_join")
 end

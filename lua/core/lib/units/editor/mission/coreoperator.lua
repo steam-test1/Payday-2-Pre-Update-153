@@ -1,6 +1,7 @@
 CoreOperatorUnitElement = CoreOperatorUnitElement or class(MissionElement)
 CoreOperatorUnitElement.SAVE_UNIT_POSITION = false
 CoreOperatorUnitElement.SAVE_UNIT_ROTATION = false
+CoreOperatorUnitElement.LINK_ELEMENTS = {"elements"}
 OperatorUnitElement = OperatorUnitElement or class(CoreOperatorUnitElement)
 
 function OperatorUnitElement:init(...)
@@ -52,14 +53,6 @@ function CoreOperatorUnitElement:add_element()
 			table.delete(self._hed.elements, id)
 		else
 			table.insert(self._hed.elements, id)
-		end
-	end
-end
-
-function CoreOperatorUnitElement:remove_links(unit)
-	for _, id in ipairs(self._hed.elements) do
-		if id == unit:unit_data().unit_id then
-			table.delete(self._hed.elements, id)
 		end
 	end
 end
