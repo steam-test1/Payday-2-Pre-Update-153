@@ -50,6 +50,8 @@ function LocalizationManager:_setup_macros()
 	local btn_reload = btn_x
 	local btn_jump = btn_a
 	local btn_change_equipment = btn_top_l
+	local btn_change_profile_right = btn_top_r
+	local btn_change_profile_left = btn_top_l
 	local swap_accept = false
 	if SystemInfo:platform() == Idstring("PS3") and PS3:pad_cross_circle_inverted() then
 		swap_accept = true
@@ -104,6 +106,8 @@ function LocalizationManager:_setup_macros()
 	self:set_default_macro("BTN_RESET_SKILLS", btn_back)
 	self:set_default_macro("BTN_RESET_ALL_SKILLS", btn_start)
 	self:set_default_macro("BTN_CHANGE_EQ", btn_change_equipment)
+	self:set_default_macro("BTN_CHANGE_PROFILE_RIGHT", btn_change_profile_right)
+	self:set_default_macro("BTN_CHANGE_PROFILE_LEFT", btn_change_profile_left)
 end
 
 local is_PS3 = SystemInfo:platform() == Idstring("PS3")

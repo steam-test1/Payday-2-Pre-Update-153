@@ -215,6 +215,9 @@ end
 
 function BlackMarketManager:weapon_unlocked_by_crafted(category, slot)
 	local crafted = self._global.crafted_items[category][slot]
+	if not crafted then
+		return false
+	end
 	local weapon_id = crafted.weapon_id
 	local cosmetics = crafted.cosmetics
 	local cosmetic_blueprint = cosmetics and cosmetics.id and tweak_data.blackmarket.weapon_skins[cosmetics.id] and tweak_data.blackmarket.weapon_skins[cosmetics.id].default_blueprint or {}
@@ -395,6 +398,10 @@ function BlackMarketManager:equipped_secondary()
 			return data
 		end
 	end
+	for slot, data in pairs(Global.blackmarket_manager.crafted_items.secondaries) do
+		data.equipped = true
+		return data
+	end
 	self:aquire_default_weapons()
 	return Global.blackmarket_manager.crafted_items.secondaries[1]
 end
@@ -411,6 +418,10 @@ function BlackMarketManager:equipped_primary()
 		if data.equipped then
 			return data
 		end
+	end
+	for slot, data in pairs(Global.blackmarket_manager.crafted_items.primaries) do
+		data.equipped = true
+		return data
 	end
 	self:aquire_default_weapons()
 	return Global.blackmarket_manager.crafted_items.primaries[1]
@@ -500,15 +511,15 @@ function BlackMarketManager:_check_achievements(category)
 	local cat_ids = Idstring(category)
 	if cat_ids == Idstring("primaries") then
 		local equipped = self:equipped_primary()
-		if equipped.weapon_id == tweak_data.achievement.steam_500k then
+		if equipped and equipped.weapon_id == tweak_data.achievement.steam_500k then
 			managers.achievment:award("gage3_1")
 		end
 	elseif cat_ids == Idstring("secondaries") then
 		local equipped = self:equipped_secondary()
-		if equipped.weapon_id == tweak_data.achievement.unique_selling_point then
+		if equipped and equipped.weapon_id == tweak_data.achievement.unique_selling_point then
 			managers.achievment:award("halloween_9")
 		end
-		if equipped.weapon_id == tweak_data.achievement.vote_for_change then
+		if equipped and equipped.weapon_id == tweak_data.achievement.vote_for_change then
 			managers.achievment:award("bob_1")
 		end
 	elseif cat_ids == Idstring("melee_weapons") then
@@ -526,13 +537,13 @@ function BlackMarketManager:_check_achievements(category)
 		end
 	elseif cat_ids == Idstring("masks") then
 		local equipped = managers.blackmarket:equipped_mask()
-		if equipped.mask_id == tweak_data.achievement.like_an_angry_bear then
+		if equipped and equipped.mask_id == tweak_data.achievement.like_an_angry_bear then
 			managers.achievment:award("like_an_angry_bear")
 		end
-		if equipped.mask_id == tweak_data.achievement.merry_christmas then
+		if equipped and equipped.mask_id == tweak_data.achievement.merry_christmas then
 			managers.achievment:award("charliesierra_3")
 		end
-		if equipped.mask_id == tweak_data.achievement.heat_around_the_corner then
+		if equipped and equipped.mask_id == tweak_data.achievement.heat_around_the_corner then
 			managers.achievment:award("armored_11")
 		end
 	end
@@ -541,7 +552,7 @@ function BlackMarketManager:_check_achievements(category)
 		local equipped_secondary = self:equipped_secondary()
 		local equipped_armor = self:equipped_armor()
 		local achievement = tweak_data.achievement.one_man_army
-		if equipped_primary.weapon_id == achievement.equipped.primary and equipped_secondary.weapon_id == achievement.equipped.secondary and equipped_armor == achievement.equipped.armor then
+		if equipped_primary and equipped_secondary and equipped_primary.weapon_id == achievement.equipped.primary and equipped_secondary.weapon_id == achievement.equipped.secondary and equipped_armor == achievement.equipped.armor then
 			managers.achievment:award(achievement.award)
 		end
 	end
@@ -552,7 +563,9 @@ function BlackMarketManager:equip_weapon(category, slot)
 		return false
 	end
 	for s, data in pairs(Global.blackmarket_manager.crafted_items[category]) do
-		data.equipped = s == slot
+		if self:weapon_unlocked_by_crafted(category, slot) then
+			data.equipped = s == slot
+		end
 	end
 	self:_check_achievements(category)
 	if managers.menu_scene then
@@ -572,6 +585,9 @@ end
 function BlackMarketManager:equip_deployable(data, loading)
 	local deployable_id = data.name
 	local slot = data.target_slot
+	if not table.contains(managers.player:availible_equipment(1), deployable_id) then
+		return
+	end
 	Global.player_manager.kit.equipment_slots[slot] = deployable_id
 	if managers.menu_scene then
 		managers.menu_scene:set_character_deployable(deployable_id, false, 0)
@@ -656,6 +672,9 @@ function BlackMarketManager:equip_mask(slot)
 	local category = "masks"
 	if not Global.blackmarket_manager.crafted_items[category] then
 		return nil
+	end
+	if not Global.blackmarket_manager.crafted_items[category][slot] then
+		slot = 1
 	end
 	for s, data in pairs(Global.blackmarket_manager.crafted_items[category]) do
 		data.equipped = s == slot

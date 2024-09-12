@@ -862,7 +862,7 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 		panel:set_w(text:right())
 		self._legends.hide_all = panel
 	else
-		self._legends_panel:set_rightbottom(self._panel:w(), self._panel:h())
+		self._legends_panel:set_righttop(self._panel:w(), 0)
 		self._legends_panel:text({
 			name = "text",
 			text = "",
@@ -1290,6 +1290,9 @@ function PlayerInventoryGui:_update_legends(name)
 					string_id = "menu_legend_preview"
 				}
 			end
+			legends[#legends + 1] = {
+				string_id = "menu_ctrl_change_profile"
+			}
 			if show_switch then
 				legends[#legends + 1] = {
 					string_id = "menu_legend_switch"
@@ -4150,6 +4153,10 @@ function PlayerInventoryGui:special_btn_pressed(button)
 			self._panel:hide()
 			self._fullscreen_panel:hide()
 		end
+	elseif button == Idstring("menu_change_profile_right") and managers.multi_profile:has_next() then
+		managers.multi_profile:next_profile()
+	elseif button == Idstring("menu_change_profile_left") and managers.multi_profile:has_previous() then
+		managers.multi_profile:previous_profile()
 	end
 end
 

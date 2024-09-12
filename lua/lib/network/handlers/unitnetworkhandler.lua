@@ -554,7 +554,7 @@ function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, status
 		end
 	end
 	if alive(unit) then
-		if unit:interaction()._special_equipment then
+		if unit:interaction()._special_equipment and unit:interaction().apply_item_pickup then
 			managers.network:session():send_to_peer(peer, "special_eq_response", unit)
 			if unit:interaction():can_remove_item() then
 				unit:set_slot(0)
@@ -2698,7 +2698,9 @@ function UnitNetworkHandler:sync_player_swansong(unit, active, sender)
 end
 
 function UnitNetworkHandler:special_eq_response(unit, sender)
-	unit:interaction():apply_item_pickup()
+	if unit:interaction().apply_item_pickup then
+		unit:interaction():apply_item_pickup()
+	end
 end
 
 function UnitNetworkHandler:sync_swansong_hud(unit, peer_id)
