@@ -259,6 +259,7 @@ function CrimeNetManager:update(t, dt)
 	elseif self._refresh_server_t < Application:time() then
 		self._refresh_server_t = Application:time() + self._REFRESH_SERVERS_TIME
 	end
+	managers.custom_safehouse:tick_safehouse_spawn()
 end
 
 function CrimeNetManager:start_no_servers()
@@ -2092,6 +2093,9 @@ end
 function CrimeNetGui:add_special_contracts(no_casino, no_quickplay)
 	for index, special_contract in ipairs(tweak_data.gui.crime_net.special_contracts) do
 		local skip = false
+		if managers.custom_safehouse:unlocked() and special_contract.id == "challenge" or not managers.custom_safehouse:unlocked() and special_contract.id == "safehouse" then
+			skip = true
+		end
 		if not skip then
 			self:add_special_contract(special_contract, no_casino, no_quickplay)
 		end
@@ -3760,4 +3764,5 @@ function CrimeNetGui:close()
 		self._ps3_invites_controller:destroy()
 		self._ps3_invites_controller = nil
 	end
+	managers.custom_safehouse:on_exit_crimenet()
 end

@@ -317,6 +317,7 @@ function CopActionWalk:init(action_desc, common_data)
 	self._ext_base = common_data.ext_base
 	self._ext_network = common_data.ext_network
 	self._body_part = action_desc.body_part
+	self:_init_ik()
 	self._machine = common_data.machine
 	self:on_attention(common_data.attention)
 	self._stance = common_data.stance
@@ -350,6 +351,41 @@ function CopActionWalk:init(action_desc, common_data)
 	self._ext_movement:enable_update()
 	self._is_civilian = CopDamage.is_civilian(self._unit:base()._tweak_table)
 	return true
+end
+
+function CopActionWalk:_init_ik()
+	if managers.job:current_level_id() == "chill" then
+		self._look_vec = mvector3.copy(self._common_data.fwd)
+		self._ik_update = callback(self, self, "_ik_update_func")
+		self._m_head_pos = self._ext_movement:m_head_pos()
+		local player_unit = managers.player:player_unit()
+		self._ik_data = player_unit
+	end
+end
+
+function CopActionWalk:_ik_update_func(t)
+	CopActionAct._ik_update_func(self, t)
+end
+
+function CopActionWalk:_update_ik_type()
+	local new_ik_type = self._ext_anim.ik_type
+	if self._ik_type ~= new_ik_type then
+		if self._modifier_on then
+			self._machine:forbid_modifier(self._modifier_name)
+			self._modifier_on = nil
+		end
+		if new_ik_type == "head" then
+			self._ik_type = new_ik_type
+			self._modifier_name = Idstring("look_head")
+			self._modifier = self._machine:get_modifier(self._modifier_name)
+		elseif new_ik_type == "upper_body" then
+			self._ik_type = new_ik_type
+			self._modifier_name = Idstring("look_upper_body")
+			self._modifier = self._machine:get_modifier(self._modifier_name)
+		else
+			self._ik_type = nil
+		end
+	end
 end
 
 function CopActionWalk:_init()
@@ -814,6 +850,9 @@ function CopActionWalk:_upd_wait_for_full_blend(t)
 end
 
 function CopActionWalk:update(t)
+	if self._ik_update then
+		self._ik_update(t)
+	end
 	local dt
 	local vis_state = self._ext_base:lod_stage()
 	vis_state = vis_state or 4
@@ -1151,6 +1190,7 @@ end
 
 function CopActionWalk:on_attention(attention)
 	if attention then
+		self._attention = attention
 		if attention.handler then
 			if attention.reaction >= AIAttentionObject.REACT_SURPRISED then
 				self._attention_pos = attention.handler:get_attention_m_pos()

@@ -79,8 +79,12 @@ function ChallengeManager:_fetch_done_clbk(success, s)
 		for category, ids in string.gmatch(s, "\"([^,:\"]+)\":\"([^:\"]+)\"") do
 			currently_active_challenges[category] = currently_active_challenges[category] or {}
 			for active_id in string.gmatch(ids, "'([^,]+)'") do
-				table.insert(currently_active_challenges[category], active_id)
-				table.insert(all_currently_active_challenges, active_id)
+				if category == "safehouse_daily" then
+					managers.custom_safehouse:set_active_daily(active_id)
+				else
+					table.insert(currently_active_challenges[category], active_id)
+					table.insert(all_currently_active_challenges, active_id)
+				end
 			end
 		end
 		local inactive_challenges = {}

@@ -20,6 +20,7 @@ function FeatureManager:_setup()
 	self._default.announcements.crimenet_hacked = 1
 	self._default.announcements.short_heist = 1
 	self._default.announcements.short_heists_available = 1
+	self._default.announcements.safehouse_dailies = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -260,6 +261,15 @@ function FeatureManager:short_heists_available()
 	managers.menu:show_new_message_dialog({
 		title = "menu_feature_short_heists_available",
 		text = "menu_feature_short_heists_available_desc"
+	})
+	return true
+end
+
+function FeatureManager:safehouse_dailies()
+	print("FeatureManager:safehouse_dailies()")
+	managers.menu:show_new_message_dialog({
+		title = "menu_cs_daily_title",
+		text = "menu_cs_daily_desc"
 	})
 	return true
 end

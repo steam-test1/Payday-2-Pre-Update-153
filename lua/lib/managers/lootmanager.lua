@@ -212,6 +212,8 @@ function LootManager:check_achievements(carry_id, multiplier)
 				managers.achievment:award(achievement_data.award)
 			elseif achievement_data.challenge_stat then
 				managers.challenge:award_progress(achievement_data.challenge_stat)
+			elseif achievement_data.trophy_stat then
+				managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 			elseif achievement_data.challenge_award then
 				managers.challenge:award(achievement_data.challenge_award)
 			end

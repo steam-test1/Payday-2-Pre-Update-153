@@ -1225,10 +1225,13 @@ end
 
 function HUDStageEndScreen:count_money(t, dt)
 	if self:perform_income_count(t, dt, self._money_panel, self._money_stage, self._money, self.get_count_speed_fast, self.display_as_cash) then
-		WalletGuiObject.refresh()
-		WalletGuiObject.set_object_visible("wallet_money_icon", true)
-		WalletGuiObject.set_object_visible("wallet_money_text", true)
-		managers.menu_component:show_endscreen_cash_summary()
+		repeat
+			WalletGuiObject.refresh()
+			WalletGuiObject.set_object_visible("wallet_money_icon", true)
+			WalletGuiObject.set_object_visible("wallet_money_text", true)
+			do break end -- pseudo-goto
+			managers.menu_component:show_endscreen_cash_summary()
+		until true
 		self._wait_t = t + 1.25
 		self:step_stage_up()
 	end
@@ -1348,16 +1351,133 @@ function HUDStageEndScreen:perform_income_count(t, dt, parent_panel, stage_table
 end
 
 function HUDStageEndScreen:hide_money(t, dt)
-	Application:debug("HUDStageEndScreen:hide_money")
+	repeat
+		Application:debug("HUDStageEndScreen:hide_money")
+		do break end -- pseudo-goto
+		if not self._is_fail_video then
+			local video = self._background_layer_full:child("money_video")
+			if video then
+				video:animate(callback(self, self, "destroy_animation"))
+			end
+		end
+	until true
+	if alive(self._money_panel) then
+		self._money_panel:animate(callback(self, self, "destroy_animation"))
+		self._money_panel = nil
+	end
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:safehouse_currency_init(t, dt)
+	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
+	local safehouse_income = managers.custom_safehouse:get_coins_income()
+	if safehouse_income < 1 and 1 > #managers.custom_safehouse:completed_trophies() then
+		self:step_stage_up()
+		self:step_stage_up()
+		return
+	end
+	self._safehouse_panel = self._lp_forepanel:panel({
+		name = "safehouse_panel",
+		x = 10,
+		y = 10
+	})
+	self._safehouse_panel:grow(-20, -20)
+	local check_if_clear = function(data)
+		for _, d in ipairs(data) do
+			if d[2] and d[2] > 0 then
+				return false
+			end
+		end
+		return true
+	end
+	local has_completed_daily = managers.custom_safehouse:has_completed_daily() and not managers.custom_safehouse:has_rewarded_daily()
+	local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
+	local exp_income = safehouse_income
+	local challenges_income = 0
+	local daily_income = 0
+	local raid_income = was_safehouse_raid and tweak_data.safehouse.rewards.raid or 0
+	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
+		if trophy_data.type == "trophy" then
+			challenges_income = challenges_income + trophy_data.reward
+		end
+		exp_income = exp_income - trophy_data.reward
+	end
+	exp_income = exp_income - raid_income
+	if has_completed_daily then
+		daily_income = tweak_data.safehouse.rewards.daily_complete
+		exp_income = exp_income - daily_income
+	end
+	self._safehouse = {}
+	self._safehouse.income = {
+		{
+			"menu_es_safehouse_income",
+			math.floor(exp_income)
+		},
+		name_id = managers.localization:to_upper_text("menu_custom_safehouse_income")
+	}
+	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
+		if trophy_data.type == "trophy" then
+			table.insert(self._safehouse.income, {
+				trophy_data.name,
+				trophy_data.reward
+			})
+		end
+	end
+	if has_completed_daily then
+		table.insert(self._safehouse.income, {
+			"menu_es_safehouse_income_daily",
+			daily_income
+		})
+	end
+	if was_safehouse_raid then
+		table.insert(self._safehouse.income, {
+			"menu_es_safehouse_raid",
+			raid_income
+		})
+	end
+	if check_if_clear(self._safehouse.income) then
+		self._safehouse.income = {}
+	end
+	local spending_earned = managers.money:heist_spending()
+	self._safehouse.balance = {
+		{
+			"menu_es_safehouse_total",
+			math.floor(managers.custom_safehouse:coins()),
+			managers.custom_safehouse:can_afford_any_upgrade() and tweak_data.screen_colors.friend_color
+		},
+		name_id = managers.localization:to_upper_text("menu_cash_balance")
+	}
+	if check_if_clear(self._safehouse.balance) then
+		self._safehouse.balance = {}
+	end
+	self._safehouse_stage = {"income", "balance"}
+	self:reset_income_count()
+	self._wait_t = t + 1
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:display_as_coins(amount)
+	return managers.experience:cash_string(amount, "")
+end
+
+function HUDStageEndScreen:safehouse_currency_count(t, dt)
+	if self:perform_income_count(t, dt, self._safehouse_panel, self._safehouse_stage, self._safehouse, self.get_count_speed_slow, self.display_as_coins) then
+		managers.menu_component:show_endscreen_cash_summary()
+		self._wait_t = t + 1.25
+		self:step_stage_up()
+	end
+end
+
+function HUDStageEndScreen:safehouse_currency_hide(t, dt)
 	if not self._is_fail_video then
 		local video = self._background_layer_full:child("money_video")
 		if video then
 			video:animate(callback(self, self, "destroy_animation"))
 		end
 	end
-	if alive(self._money_panel) then
-		self._money_panel:animate(callback(self, self, "destroy_animation"))
-		self._money_panel = nil
+	if alive(self._safehouse_panel) then
+		self._safehouse_panel:animate(callback(self, self, "destroy_animation"))
+		self._safehouse_panel = nil
 	end
 	self:step_stage_up()
 end
@@ -1982,6 +2102,9 @@ HUDStageEndScreen.stages = {
 	"create_money_counter",
 	"count_money",
 	"hide_money",
+	"safehouse_currency_init",
+	"safehouse_currency_count",
+	"safehouse_currency_hide",
 	"stage_init",
 	"stage_count_exp",
 	"stage_spin_up",

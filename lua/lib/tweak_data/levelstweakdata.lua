@@ -1302,6 +1302,41 @@ function LevelsTweakData:init()
 		throwable = "none",
 		melee = "none"
 	}
+	self.chill = {}
+	self.chill.name_id = "heist_chill_hl"
+	self.chill.briefing_id = "heist_chill_hl_briefing"
+	self.chill.briefing_dialog = "Play_rb5_sfh_brf"
+	self.chill.world_name = "narratives/chill"
+	self.chill.intro_event = "Play_pln_bb1_intro_01"
+	self.chill.outro_event = {
+		"Play_pln_bb1_end_01",
+		"Play_pln_bb1_end_02"
+	}
+	self.chill.package = "packages/narr_chill"
+	self.chill.cube = "cube_apply_heist_bank"
+	self.chill.max_bags = 28
+	self.chill.team_ai_off = true
+	self.chill.on_enter_clbks = {
+		function()
+			managers.mission:call_global_event(Message.OnEnterSafeHouse)
+		end
+	}
+	self.chill.hud = {no_timer = true, no_hostages = true}
+	self.chill.is_safehouse = true
+	self.chill_combat = {}
+	self.chill_combat.name_id = "heist_chill_combat_hl"
+	self.chill_combat.briefing_id = "heist_chill_combat_hl_briefing"
+	self.chill_combat.briefing_dialog = "Play_pln_sfr_brf"
+	self.chill_combat.world_name = "narratives/chill"
+	self.chill_combat.intro_event = "Play_pln_sfr_intro"
+	self.chill_combat.outro_event = "Play_pln_sfr_end"
+	self.chill_combat.package = "packages/narr_chill"
+	self.chill_combat.cube = "cube_apply_heist_bank"
+	self.chill_combat.max_bags = 28
+	self.chill_combat.team_ai_off = false
+	self.chill_combat.group_ai_state = "safehouse"
+	self.chill_combat.is_safehouse = true
+	self.chill_combat.is_safehouse_combat = true
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1385,7 +1420,9 @@ function LevelsTweakData:init()
 		"short2_stage1",
 		"short2_stage2b",
 		"born",
-		"chew"
+		"chew",
+		"chill",
+		"chill_combat"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

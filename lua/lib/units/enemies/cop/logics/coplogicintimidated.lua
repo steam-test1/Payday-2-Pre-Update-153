@@ -73,6 +73,10 @@ end
 
 function CopLogicIntimidated.death_clbk(data, damage_info)
 	CopLogicIntimidated.super.death_clbk(data, damage_info)
+	local my_data = data.internal_data
+	if my_data and my_data.tied and damage_info.variant == "melee" then
+		managers.custom_safehouse:award("daily_honorable")
+	end
 end
 
 function CopLogicIntimidated.queued_update(rubbish, data)

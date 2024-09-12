@@ -134,6 +134,8 @@ function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_coun
 				managers.achievment:award(achievement_data.award)
 			elseif achievement_data.challenge_stat then
 				managers.challenge:award_progress(achievement_data.challenge_stat)
+			elseif achievement_data.trophy_stat then
+				managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 			elseif achievement_data.challenge_award then
 				managers.challenge:award(achievement_data.challenge_award)
 			end

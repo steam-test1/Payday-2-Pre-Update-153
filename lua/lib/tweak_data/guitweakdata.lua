@@ -1680,8 +1680,8 @@ function GuiTweakData:init()
 			name_id = "menu_cn_casino",
 			desc_id = "menu_cn_casino_desc",
 			menu_node = "crimenet_contract_casino",
-			x = 125,
-			y = 790,
+			x = 385,
+			y = 775,
 			icon = "guis/textures/pd2/crimenet_casino",
 			unlock = "unlock_level",
 			pulse = false,
@@ -1693,8 +1693,20 @@ function GuiTweakData:init()
 			desc_id = "menu_cn_short_desc",
 			menu_node = "crimenet_contract_short",
 			x = 332,
-			y = 646,
+			y = 626,
 			icon = "guis/textures/pd2/crimenet_tutorial",
+			pulse = true,
+			pulse_level = 10,
+			pulse_color = Color(204, 255, 209, 32) / 255
+		},
+		{
+			id = "safehouse",
+			name_id = "menu_cn_chill",
+			desc_id = "menu_cn_chill_desc",
+			menu_node = "custom_safehouse",
+			x = 362,
+			y = 696,
+			icon = "guis/dlcs/chill/textures/pd2/safehouse/crimenet_marker_safehouse",
 			pulse = true,
 			pulse_level = 10,
 			pulse_color = Color(204, 255, 209, 32) / 255
@@ -1707,7 +1719,7 @@ function GuiTweakData:init()
 			desc_id = "menu_cn_challenge_desc",
 			menu_node = "crimenet_contract_challenge",
 			x = 362,
-			y = 746,
+			y = 696,
 			icon = "guis/textures/pd2/crimenet_challenge"
 		})
 	end
@@ -1718,7 +1730,7 @@ function GuiTweakData:init()
 			desc_id = "menu_cn_challenge_desc",
 			menu_node = "crimenet_contract_challenge",
 			x = 362,
-			y = 746,
+			y = 696,
 			icon = "guis/textures/pd2/crimenet_challenge"
 		})
 	end

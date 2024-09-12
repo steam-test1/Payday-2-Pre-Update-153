@@ -368,6 +368,11 @@ function MenuGuiComponentGeneric:update_legend()
 				string_id = "menu_legend_select"
 			}
 		end
+		if table.contains(legend_items, "claim_reward") then
+			legends[#legends + 1] = {
+				string_id = "menu_legend_claim_reward"
+			}
+		end
 		if table.contains(legend_items, "back") then
 			legends[#legends + 1] = {
 				string_id = "menu_legend_back"
@@ -384,7 +389,9 @@ function MenuGuiComponentGeneric:update_legend()
 			local macros = {}
 			legend_text = legend_text .. spacing .. managers.localization:to_upper_text(legend.string_id, macros)
 		end
-		self._legends_panel:child("text"):set_text(legend_text)
+		if self._legends_panel then
+			self._legends_panel:child("text"):set_text(legend_text)
+		end
 	end
 end
 

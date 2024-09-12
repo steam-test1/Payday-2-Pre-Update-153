@@ -63,7 +63,43 @@ function CopActionIdle:init(action_desc, common_data)
 		self._common_data.ext_network:send("action_idle_start", self._body_part)
 	end
 	CopActionAct._create_blocks_table(self, action_desc.blocks)
+	self:_init_ik()
 	return true
+end
+
+function CopActionIdle:_init_ik()
+	if managers.job:current_level_id() == "chill" then
+		self._look_vec = mvector3.copy(self._common_data.fwd)
+		self._ik_update = callback(self, self, "_ik_update_func")
+		self._m_head_pos = self._ext_movement:m_head_pos()
+		local player_unit = managers.player:player_unit()
+		self._ik_data = player_unit
+	end
+end
+
+function CopActionIdle:_ik_update_func(t)
+	CopActionAct._ik_update_func(self, t)
+end
+
+function CopActionIdle:_update_ik_type()
+	local new_ik_type = self._ext_anim.ik_type
+	if self._ik_type ~= new_ik_type then
+		if self._modifier_on then
+			self._machine:forbid_modifier(self._modifier_name)
+			self._modifier_on = nil
+		end
+		if new_ik_type == "head" then
+			self._ik_type = new_ik_type
+			self._modifier_name = Idstring("look_head")
+			self._modifier = self._machine:get_modifier(self._modifier_name)
+		elseif new_ik_type == "upper_body" then
+			self._ik_type = new_ik_type
+			self._modifier_name = Idstring("look_upper_body")
+			self._modifier = self._machine:get_modifier(self._modifier_name)
+		else
+			self._ik_type = nil
+		end
+	end
 end
 
 function CopActionIdle:on_exit()
@@ -77,6 +113,9 @@ function CopActionIdle:on_exit()
 end
 
 function CopActionIdle:update(t)
+	if self._ik_update then
+		self._ik_update(t)
+	end
 	if self._attention then
 		local ik_enable = true
 		local look_from_pos = self._ext_movement:m_head_pos()
@@ -159,6 +198,7 @@ function CopActionIdle:on_attention(attention)
 		return
 	end
 	if attention then
+		self._m_attention_head_pos = attention and (not attention.handler or not attention.handler:get_attention_m_pos()) and attention.unit and attention.unit:movement():m_head_pos()
 		local shoot_from_pos = self._ext_movement:m_head_pos()
 		local target_vec = Vector3()
 		if attention then

@@ -2,7 +2,7 @@ VanSkinExt = VanSkinExt or class()
 
 function VanSkinExt:init(unit)
 	self._unit = unit
-	local skin_id = managers.dlc:is_dlc_unlocked("overkill_pack") and "overkill" or "default"
+	local skin_id = managers.blackmarket:equipped_van_skin()
 	if Network:is_server() and skin_id then
 		local van_data = tweak_data.van.skins[skin_id]
 		if van_data.dlc and not managers.dlc:is_dlc_unlocked(van_data.dlc) then

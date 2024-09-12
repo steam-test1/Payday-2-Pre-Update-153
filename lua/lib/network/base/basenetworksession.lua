@@ -228,6 +228,14 @@ function BaseNetworkSession:remove_peer(peer, peer_id, reason)
 	if peer_id == 1 then
 		self._server_peer = nil
 	end
+	for i, achievement_data in pairs(tweak_data.achievement.check_equipment_memory_on_leave) do
+		if achievement_data.memory then
+			local pass = managers.challenge:check_equipped_team(achievement_data)
+			if not pass then
+				managers.job:set_memory(achievement_data.trophy_stat, not achievement_data.memory.value, achievement_data.memory.is_shortterm)
+			end
+		end
+	end
 	self._peers[peer_id] = nil
 	self._peers_all[peer_id] = nil
 	self._connection_established_results[peer:name()] = nil

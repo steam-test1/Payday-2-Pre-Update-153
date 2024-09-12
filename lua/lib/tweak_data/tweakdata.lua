@@ -31,6 +31,7 @@ require("lib/tweak_data/VehicleTweakData")
 require("lib/tweak_data/EconomyTweakData")
 require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
+require("lib/tweak_data/CustomSafehouseTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -589,6 +590,7 @@ function TweakData:init()
 	self.infamy = InfamyTweakData:new(self)
 	self.gage_assignment = GageAssignmentTweakData:new(self)
 	self.preplanning = PrePlanningTweakData:new(self)
+	self.safehouse = CustomSafehouseTweakData:new(self)
 	self.interaction = InteractionTweakData:new(self)
 	self.vehicle = VehicleTweakData:new(self)
 	self.economy = EconomyTweakData:new(self)
@@ -1524,6 +1526,37 @@ Play the full version soon to get your full PAYDAY!]],
 			challenge_stat = "any_spooc_kills",
 			kill = true,
 			enemy = "spooc"
+		},
+		trophy_special_kills = {
+			trophy_stat = "trophy_special_kills",
+			enemies = {
+				"sniper",
+				"shield",
+				"taser",
+				"tank",
+				"spooc"
+			},
+			kill = true
+		},
+		trophy_ace = {
+			trophy_stat = "trophy_ace",
+			kill = true,
+			grenade_type = "wpn_prj_ace",
+			difficulties = overkill_and_above
+		},
+		trophy_washington = {
+			trophy_stat = "trophy_washington",
+			kill = true
+		},
+		daily_grenades = {
+			trophy_stat = "daily_grenades",
+			grenade_type = "frag",
+			kill = true
+		},
+		daily_grenades_community = {
+			trophy_stat = "daily_grenades",
+			grenade_type = "frag_com",
+			kill = true
 		}
 	}
 	self.achievement.enemy_kill_achievements = {
@@ -1771,6 +1804,29 @@ Play the full version soon to get your full PAYDAY!]],
 		any_spooc_kills = {
 			challenge_stat = "any_spooc_kills",
 			enemy = "spooc"
+		},
+		trophy_headshots = {
+			trophy_stat = "trophy_headshots",
+			in_head = true
+		},
+		trophy_washington = {
+			trophy_stat = "trophy_washington"
+		},
+		trophy_smg = {
+			trophy_stat = "trophy_smg",
+			weapon_type = "smg",
+			timer = 25,
+			count = 25
+		},
+		trophy_special_kills = {
+			trophy_stat = "trophy_special_kills",
+			enemies = {
+				"sniper",
+				"shield",
+				"taser",
+				"tank",
+				"spooc"
+			}
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -1881,6 +1937,32 @@ Play the full version soon to get your full PAYDAY!]],
 		any_spooc_kills = {
 			challenge_stat = "any_spooc_kills",
 			enemy = "spooc",
+			is_not_civilian = true
+		},
+		trophy_knockouts = {
+			trophy_stat = "trophy_knockouts",
+			enemy = "tank",
+			melee_id = "boxing_gloves",
+			is_not_civilian = true
+		},
+		trophy_washington = {
+			trophy_stat = "trophy_washington",
+			is_not_civilian = true
+		},
+		trophy_special_kills = {
+			trophy_stat = "trophy_special_kills",
+			enemies = {
+				"sniper",
+				"shield",
+				"taser",
+				"tank",
+				"spooc"
+			},
+			is_not_civilian = true
+		},
+		daily_hangover = {
+			trophy_stat = "daily_hangover",
+			melee_id = "whiskey",
 			is_not_civilian = true
 		}
 	}
@@ -3096,7 +3178,312 @@ Play the full version soon to get your full PAYDAY!]],
 				},
 				armor = "level_1"
 			}
+		},
+		trophy_transport_crossroads = {
+			trophy_stat = "trophy_transport_crossroads",
+			difficulty = overkill_and_above,
+			job = "arm_cro"
+		},
+		trophy_transport_downtown = {
+			trophy_stat = "trophy_transport_downtown",
+			difficulty = overkill_and_above,
+			job = "arm_hcm"
+		},
+		trophy_transport_harbor = {
+			trophy_stat = "trophy_transport_harbor",
+			difficulty = overkill_and_above,
+			job = "arm_fac"
+		},
+		trophy_transport_park = {
+			trophy_stat = "trophy_transport_park",
+			difficulty = overkill_and_above,
+			job = "arm_par"
+		},
+		trophy_transport_underpass = {
+			trophy_stat = "trophy_transport_underpass",
+			difficulty = overkill_and_above,
+			job = "arm_und"
+		},
+		trophy_transport_train = {
+			trophy_stat = "trophy_transport_train",
+			difficulty = overkill_and_above,
+			job = "arm_for"
+		},
+		trophy_escapes = {
+			trophy_stat = "trophy_escapes",
+			levels = {
+				"escape_cafe",
+				"escape_cafe_day",
+				"escape_park",
+				"escape_park_day",
+				"escape_street",
+				"escape_overpass",
+				"escape_garage"
+			}
+		},
+		trophy_basics_stealth = {
+			trophy_stat = "trophy_basics_stealth",
+			job = "short1"
+		},
+		trophy_basics_loud = {
+			trophy_stat = "trophy_basics_loud",
+			job = "short2"
+		},
+		trophy_car_shop = {
+			trophy_stat = "trophy_car_shop",
+			job = "cage"
+		},
+		trophy_stealth_grin_dw = {
+			trophy_stat = "trophy_stealth_grin_dw",
+			difficulty = deathwish_and_above,
+			jobs = {"kenaz"},
+			stealth = true,
+			used_weapon_category = "pistol",
+			equipped = {
+				secondaries = {
+					category = "pistol",
+					blueprint_part_data = {sub_type = "silencer"}
+				}
+			}
+		},
+		trophy_nightclub_dw = {
+			trophy_stat = "trophy_nightclub_dw",
+			difficulty = deathwish_and_above,
+			job = "nightclub",
+			stealth = true
+		},
+		trophy_ukranian_dw = {
+			trophy_stat = "trophy_ukranian_dw",
+			difficulty = deathwish_and_above,
+			job = "ukrainian_job_prof",
+			stealth = true,
+			equipped_team = {deployable = "ecm_jammer", reverse_deployable = true}
+		},
+		trophy_train_bomb = {
+			trophy_stat = "trophy_train_bomb",
+			difficulty = deathwish_and_above,
+			jobs = {
+				"crojob_wrapper",
+				"crojob2",
+				"crojob2_night"
+			}
+		},
+		trophy_shoutout = {
+			trophy_stat = "trophy_shoutout",
+			difficulty = overkill_and_above,
+			job = "shoutout_raid",
+			timer = 600
+		},
+		trophy_stealth = {
+			trophy_stat = "trophy_stealth",
+			difficulty = overkill_and_above,
+			stealth = true,
+			jobs = {
+				"gallery",
+				"nightclub",
+				"ukrainian_job_prof",
+				"four_stores",
+				"jewelry_store",
+				"family",
+				"roberts",
+				"branchbank_prof",
+				"branchbank_gold_prof",
+				"branchbank_cash",
+				"branchbank_deposit",
+				"arm_for",
+				"election_day",
+				"kosugi",
+				"big",
+				"hox_3",
+				"arena",
+				"red2",
+				"crojob1",
+				"firestarter",
+				"kenaz",
+				"mus",
+				"framing_frame"
+			}
+		},
+		trophy_bank_heists = {
+			trophy_stat = "trophy_bank_heists",
+			difficulty = overkill_and_above,
+			jobs = {
+				"branchbank_prof",
+				"branchbank_gold_prof",
+				"branchbank_cash",
+				"branchbank_deposit"
+			}
+		},
+		trophy_carshop_stealth = {
+			trophy_stat = "trophy_carshop_stealth",
+			job = "cage",
+			equipped_team = {
+				detection = {min = 70, max = 100},
+				deployable = "ecm_jammer",
+				reverse_deployable = true
+			}
+		},
+		trophy_watchout = {
+			trophy_stat = "trophy_watchout",
+			jobs = {
+				"watchdogs_wrapper",
+				"watchdogs_night",
+				"watchdogs"
+			},
+			need_full_job = true,
+			used_weapon_category = "snp",
+			equipped = {
+				primaries = {category = "snp"}
+			}
+		},
+		trophy_piggy_bank = {
+			trophy_stat = "trophy_piggy_bank",
+			job = "big",
+			difficulty = overkill_and_above,
+			equipped_team = {num_skills = 0}
+		},
+		trophy_jfk = {
+			trophy_stat = "trophy_jfk",
+			job = "man",
+			difficulty = overkill_and_above,
+			everyone_killed_by_weapon_category = {"snp"},
+			everyone_killed_by_melee = 0,
+			everyone_killed_by_grenade = 0,
+			equipped_team = {
+				num_skills = 0,
+				primary_category = "snp",
+				armor = "level_1"
+			}
+		},
+		trophy_dance = {
+			trophy_stat = "trophy_dance",
+			job = "nightclub",
+			killed_by_weapons = 0,
+			killed_by_melee = 0,
+			equipped_team = {deployable = "trip_mine"}
+		},
+		trophy_fbi = {
+			trophy_stat = "trophy_fbi",
+			levels = {
+				"firestarter_2"
+			},
+			stealth = true
+		},
+		trophy_host = {
+			trophy_stat = "trophy_host",
+			need_full_job = true,
+			is_host = true
+		},
+		trophy_framing_frame = {
+			trophy_stat = "trophy_framing_frame",
+			difficulty = overkill_and_above,
+			jobs = {
+				"framing_frame"
+			},
+			need_full_job = true,
+			need_full_stealth = true
+		},
+		daily_classics = {
+			trophy_stat = "daily_classics",
+			jobs = {
+				"red2",
+				"dinner",
+				"pal",
+				"man"
+			}
+		},
+		daily_discord = {
+			trophy_stat = "daily_discord",
+			converted_cops = 1
+		},
+		daily_fwtd = {
+			trophy_stat = "daily_fwtd",
+			everyone_weapons_used = {
+				"sentry_gun",
+				"swat_van_turret_module"
+			},
+			everyone_killed_by_melee = 0,
+			everyone_killed_by_grenade = 0,
+			job = "red2"
+		},
+		daily_gears = {
+			trophy_stat = "daily_gears",
+			difficulty = overkill_and_above,
+			jobs = {
+				"arm_cro",
+				"arm_und",
+				"arm_hcm",
+				"arm_fac",
+				"arm_par",
+				"arm_for"
+			},
+			equipped_team = {
+				primaries = {
+					"wpn_fps_saw"
+				},
+				secondaries = {
+					"wpn_fps_saw_secondary"
+				}
+			},
+			memory = {value = nil, is_shortterm = true}
+		},
+		daily_spacetime = {
+			trophy_stat = "daily_spacetime",
+			jobs = {"hox"},
+			need_full_job = true,
+			characters = {"old_hoxton"}
+		},
+		daily_night_out = {
+			trophy_stat = "daily_night_out",
+			everyone_killed_by_weapons = 0,
+			job = "nightclub"
+		},
+		daily_naked = {
+			trophy_stat = "daily_naked",
+			difficulty = overkill_and_above,
+			jobs = {"pbr", "pbr2"},
+			equipped_team = {
+				armor = "level_1",
+				num_skills = 0,
+				perk_deck = 3
+			}
+		},
+		daily_ninja = {
+			trophy_stat = "daily_ninja",
+			killed_by_weapons = 0,
+			job = "arm_cro",
+			equipped_outfit = {
+				grenade = {
+					"wpn_prj_ace",
+					"wpn_prj_four",
+					"wpn_prj_jav",
+					"wpn_prj_hur"
+				}
+			}
+		},
+		daily_whats_stealth = {
+			trophy_stat = "daily_whats_stealth",
+			job = "kosugi",
+			difficulty = deathwish_and_above,
+			equipped_team = {armor = "level_7"},
+			need_full_job = true,
+			memory = {value = nil, is_shortterm = true}
+		},
+		daily_akimbo = {
+			trophy_stat = "daily_akimbo",
+			total_accuracy = 80,
+			equipped_outfit = {primary_category = "akimbo"},
+			equipped = {
+				secondaries = {
+					category = "pistol",
+					blueprint_part_data = {sub_type = "silencer"}
+				}
+			}
 		}
+	}
+	self.achievement.check_equipment_memory_on_leave = {
+		self.achievement.complete_heist_achievements.daily_whats_stealth,
+		self.achievement.complete_heist_achievements.daily_gears
 	}
 	self.achievement.complete_heist_statistics_achievements = {
 		immortal_ballot = {
@@ -3122,6 +3509,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = overkill_and_above,
 			level_id = "pbr",
 			is_dropin = false
+		},
+		daily_professional = {
+			trophy_stat = "daily_professional",
+			difficulty = overkill_and_above,
+			total_headshots = {amount = 0, invert = true}
 		}
 	}
 	self.achievement.loot_cash_achievements = {
@@ -3150,6 +3542,57 @@ Play the full version soon to get your full PAYDAY!]],
 				carry_id = "counterfeit_money",
 				value = 1000000
 			}
+		},
+		trophy_goats_extracted = {
+			trophy_stat = "trophy_goats_extracted",
+			jobs = {"peta"},
+			levels = {"peta2"},
+			secured = {carry_id = "goat", amount = 1}
+		},
+		trophy_tfturret = {
+			trophy_stat = "trophy_tfturret",
+			jobs = {"arm_for"},
+			difficulties = overkill_and_above,
+			secured = {
+				{carry_id = "ammo", total_amount = 20},
+				{carry_id = "turret", total_amount = 3}
+			},
+			is_dropin = false
+		},
+		daily_mortage = {
+			trophy_stat = "daily_mortage",
+			jobs = {"family"},
+			secured = {carry_id = "diamonds", total_amount = 16},
+			is_dropin = false
+		},
+		daily_toast = {
+			trophy_stat = "daily_toast",
+			jobs = {"pines"},
+			secured = {carry_id = "sandwich", amount = 1},
+			is_dropin = false
+		},
+		daily_lodsofemone = {
+			trophy_stat = "daily_lodsofemone",
+			secured = {carry_id = "money", amount = 1}
+		},
+		daily_heirloom = {
+			trophy_stat = "daily_heirloom",
+			jobs = {"kosugi"},
+			secured = {
+				carry_id = "samurai_suit",
+				total_amount = 4
+			},
+			is_dropin = false
+		},
+		daily_candy = {
+			trophy_stat = "daily_candy",
+			secured = {carry_id = "coke", amount = 1}
+		},
+		daily_art = {
+			trophy_stat = "daily_art",
+			jobs = {"gallery"},
+			secured = {carry_id = "painting", total_amount = 9},
+			is_dropin = false
 		}
 	}
 	self.achievement.job_list = {}
@@ -3214,6 +3657,7 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
+	self.achievement.job_list.events = {"nail"}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self.achievement.job_list.bain, "roberts")
 	end
@@ -3331,6 +3775,11 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		skull_smwish = {
 			award = "axe_66",
+			difficulty = sm_wish_and_above,
+			contact = "all"
+		},
+		trophy_smwish = {
+			trophy_stat = "trophy_smwish",
 			difficulty = sm_wish_and_above,
 			contact = "all"
 		}

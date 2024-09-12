@@ -550,6 +550,12 @@ function CarryTweakData:init(tweak_data)
 	self.drone_control_helmet.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 	self.drone_control_helmet.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
 	self.drone_control_helmet.AI_carry = {SO_category = "enemies"}
+	self.chl_puck = {}
+	self.chl_puck.type = "light"
+	self.chl_puck.name_id = "hud_carry_lance_bag"
+	self.chl_puck.skip_exit_secure = true
+	self.chl_puck.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
+	self.chl_puck.visual_unit_name = "units/payday2/characters/npc_acc_tools_bag_1/npc_acc_tools_bag_1"
 end
 
 function CarryTweakData:get_carry_ids()

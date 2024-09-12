@@ -272,8 +272,8 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.carry.movement_speed_multiplier = {1.5}
 	self.values.carry.throw_distance_multiplier = {1.5}
 	self.values.player.no_ammo_cost = {true, true}
-	self.values.player.non_special_melee_multiplier = {1.5}
-	self.values.player.melee_damage_multiplier = {1.5}
+	self.values.player.non_special_melee_multiplier = {2}
+	self.values.player.melee_damage_multiplier = {2}
 	self.values.player.primary_weapon_when_downed = {true}
 	self.values.player.armor_regen_timer_multiplier = {0.85}
 	self.values.temporary.dmg_multiplier_outnumbered = {
@@ -323,7 +323,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.weapon.passive_damage_multiplier = {1.05}
 	self.values.weapon.knock_down = {0.05, 0.2}
-	self.values.weapon.automatic_head_shot_add = {0.75, 1.5}
+	self.values.weapon.automatic_head_shot_add = {0.25, 0.75}
 	self.values.assault_rifle.enter_steelsight_speed_multiplier = {2}
 	self.values.assault_rifle.zoom_increase = {2}
 	self.values.player.crafting_weapon_multiplier = {0.9}
@@ -1283,8 +1283,8 @@ function UpgradesTweakData:_init_pd2_values()
 			}
 		},
 		steroids = {
-			{"50%"},
-			{"50%"}
+			{"100%"},
+			{"100%"}
 		},
 		stockholm_syndrome = {
 			{"50%"},
@@ -1477,8 +1477,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{}
 		},
 		body_expertise = {
-			{"18.75%"},
-			{"62.5%"}
+			{"33%"},
+			{"100%"}
 		},
 		kick_starter = {
 			{"20%"},

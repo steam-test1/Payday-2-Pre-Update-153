@@ -100,6 +100,36 @@ CopMovement._gadgets = {
 	},
 	blowtorch_off = {
 		Idstring("units/pd2_dlc_dark/pickups/drk_pku_blowtorch/drk_prop_blowtorch")
+	},
+	weapon_wick = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_weapon_wick/npc_acc_weapon_wick")
+	},
+	hockey_puck = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_hockey_gear_puck/npc_acc_hockey_gear_puck")
+	},
+	hockey_stick = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_hockey_gear_stick/npc_acc_hockey_gear_stick")
+	},
+	sake_cup = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_sake_cup/npc_acc_sake_cup")
+	},
+	chips_stack = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_gambling_chips_stack/npc_acc_gambling_chips_stack")
+	},
+	whiskey_glass = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_whiskey_glass/npc_acc_whiskey_glass")
+	},
+	surf_wax = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_wax_cube/npc_acc_wax_cube")
+	},
+	lmg_m249 = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_lmg_m249/npc_acc_lmg_m249")
+	},
+	sandpaper_block = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_sandpaper_block/npc_acc_sandpaper_block")
+	},
+	muzzle_flash = {
+		Idstring("units/pd2_dlc_chill/characters/npc_acc_muzzle_flash/muzzle_flash")
 	}
 }
 local action_variants = {

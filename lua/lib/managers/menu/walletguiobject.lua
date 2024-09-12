@@ -58,7 +58,24 @@ function WalletGuiObject.set_wallet(panel, layer)
 	skillpoint_text:set_left(skillpoint_icon:right() + 2)
 	skillpoint_text:set_center_y(skillpoint_icon:center_y())
 	skillpoint_text:set_y(math.round(skillpoint_text:y()))
-	local max_w = skillpoint_text:right()
+	local coins_icon = Global.wallet_panel:bitmap({
+		name = "wallet_coins_icon",
+		texture = "guis/dlcs/chill/textures/pd2/safehouse/continental_coins_symbol"
+	})
+	local coins_text = Global.wallet_panel:text({
+		name = "wallet_coins_text",
+		text = managers.experience:cash_string(managers.custom_safehouse:coins(), ""),
+		font_size = tweak_data.menu.pd2_small_font_size,
+		font = tweak_data.menu.pd2_small_font,
+		color = tweak_data.screen_colors.text
+	})
+	local cw, ch = WalletGuiObject.make_fine_text(coins_text)
+	local align = 0 < managers.skilltree:points() and skillpoint_text or level_text
+	coins_icon:set_leftbottom(align:right() + 10, Global.wallet_panel:h() - 2)
+	coins_text:set_left(coins_icon:right() + 2)
+	coins_text:set_center_y(coins_icon:center_y())
+	coins_text:set_y(math.round(coins_text:y()))
+	local max_w = coins_text:right()
 	local bg_blur = Global.wallet_panel:bitmap({
 		name = "bg_blur",
 		texture = "guis/textures/test_blur_df",
@@ -72,6 +89,8 @@ function WalletGuiObject.set_wallet(panel, layer)
 	bg_blur:set_h(Global.wallet_panel:h() - money_icon:top())
 	WalletGuiObject.set_object_visible("wallet_skillpoint_icon", 0 < managers.skilltree:points())
 	WalletGuiObject.set_object_visible("wallet_skillpoint_text", 0 < managers.skilltree:points())
+	WalletGuiObject.set_object_visible("wallet_coins_icon", managers.custom_safehouse:unlocked() and 0 < managers.custom_safehouse:coins())
+	WalletGuiObject.set_object_visible("wallet_coins_text", managers.custom_safehouse:unlocked() and 0 < managers.custom_safehouse:coins())
 end
 
 function WalletGuiObject.refresh()
@@ -102,6 +121,17 @@ function WalletGuiObject.refresh()
 		skillpoint_text:set_y(math.round(skillpoint_text:y()))
 		WalletGuiObject.set_object_visible("wallet_skillpoint_icon", managers.skilltree:points() > 0)
 		WalletGuiObject.set_object_visible("wallet_skillpoint_text", managers.skilltree:points() > 0)
+		if managers.custom_safehouse:unlocked() then
+			local coins_icon = Global.wallet_panel:child("wallet_coins_icon")
+			local coins_text = Global.wallet_panel:child("wallet_coins_text")
+			coins_text:set_text(managers.experience:cash_string(managers.custom_safehouse:coins(), ""))
+			WalletGuiObject.make_fine_text(coins_text)
+			local align = managers.skilltree:points() > 0 and skillpoint_text or level_text
+			coins_icon:set_leftbottom(align:right() + 10, Global.wallet_panel:h() - 2)
+			coins_text:set_left(coins_icon:right() + 2)
+			coins_text:set_center_y(coins_icon:center_y())
+			coins_text:set_y(math.round(coins_text:y()))
+		end
 	end
 end
 
@@ -138,6 +168,8 @@ function WalletGuiObject.set_object_visible(object, visible)
 		bg_blur:set_w(Global.wallet_panel:child("wallet_level_text"):right())
 	elseif Global.wallet_panel:child("wallet_money_icon"):visible() then
 		bg_blur:set_w(Global.wallet_panel:child("wallet_money_text"):right())
+	elseif Global.wallet_panel:child("wallet_coins_icon"):visible() then
+		bg_blur:set_w(Global.wallet_panel:child("wallet_coins_text"):right())
 	else
 		bg_blur:set_w(0)
 	end

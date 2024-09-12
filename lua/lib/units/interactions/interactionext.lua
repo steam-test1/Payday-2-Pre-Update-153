@@ -1419,6 +1419,7 @@ function IntimitateInteractionExt:interact(player)
 			player:movement():set_carry_restriction(true)
 		end
 		managers.mission:call_global_event("player_pickup_bodybag")
+		managers.custom_safehouse:award("corpse_dispose")
 	elseif self._tweak_data.dont_need_equipment and not has_equipment then
 		self:set_active(false)
 		self._unit:brain():on_tied(player, true)
@@ -2256,6 +2257,273 @@ function DrivingInteractionExt:_setup_ray_objects()
 			table.insert(self._ray_objects, self._unit:get_object(Idstring(object_name)))
 		end
 	end
+end
+
+CivilianHeisterInteractionExt = CivilianHeisterInteractionExt or class(UseInteractionExt)
+
+function CivilianHeisterInteractionExt:init(unit)
+	self.character = self.character or "dallas"
+	self.tweak_data = string.format("%s_%s", self.tweak_data, self.character)
+	self.heister_data = tweak_data.safehouse.heisters[self.character]
+	if self:is_daily_contractor() then
+		tweak_data.interaction[self.tweak_data].contour = "interactable"
+	end
+	CivilianHeisterInteractionExt.super.init(self, unit)
+	self._idle_time = 0
+	self._visible_check_slotmask = managers.slot:get_mask("world_geometry")
+	self._unit:set_extension_update_enabled(Idstring("interaction"), self:active())
+	managers.mission:add_global_event_listener(tostring(unit:key()) .. "_on_daily_generated", {
+		Message.OnDailyGenerated
+	}, callback(self, self, "_on_daily_generated"))
+	managers.mission:add_global_event_listener(tostring(unit:key()) .. "_on_daily_completed", {
+		Message.OnDailyCompleted
+	}, callback(self, self, "_on_daily_completed"))
+	managers.mission:add_global_event_listener(tostring(unit:key()) .. "_on_daily_reward_collected", {
+		Message.OnDailyRewardCollected
+	}, callback(self, self, "_on_daily_reward_collected"))
+end
+
+function CivilianHeisterInteractionExt:_on_daily_generated(daily_info)
+	if self:is_daily_contractor() then
+		tweak_data.interaction[self.tweak_data].contour = "interactable"
+		self:show_waypoint()
+	else
+		self:hide_waypoint()
+	end
+end
+
+function CivilianHeisterInteractionExt:_on_daily_completed()
+	if self:is_daily_contractor() then
+		self:show_waypoint()
+	else
+		self:hide_waypoint()
+	end
+end
+
+function CivilianHeisterInteractionExt:_on_daily_reward_collected()
+	self:hide_waypoint()
+end
+
+function CivilianHeisterInteractionExt:can_select(player)
+	if managers.menu:is_open("heister_interact_menu") then
+		return false
+	end
+	return CivilianHeisterInteractionExt.super.can_select(self, player)
+end
+
+function CivilianHeisterInteractionExt:is_daily_contractor()
+	local challenge = managers.custom_safehouse:get_daily_challenge()
+	return challenge and challenge.contractor == CriminalsManager.convert_new_to_old_character_workname(self.character)
+end
+
+function CivilianHeisterInteractionExt:is_daily_accepted()
+	if self._accepted then
+		return true
+	end
+	local challenge = managers.custom_safehouse:get_daily_challenge()
+	return managers.custom_safehouse:has_daily_been_accepted_from_heister() and challenge and challenge.contractor == CriminalsManager.convert_new_to_old_character_workname(self.character)
+end
+
+function CivilianHeisterInteractionExt:update_character()
+	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
+	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
+	if self._unit:damage() and self.heister_data.character_material then
+		print("Switching material to", self.heister_data.character_material)
+		self._unit:damage():run_sequence_simple(self.heister_data.character_material)
+	end
+	self._unit:sound():set_voice(self.heister_data.voice)
+	self._unit:sound():set_room_level(character_tier)
+	self._lines = {}
+	self._lines.answering = self:get_character_voice_line("answer_lines", character_tier)
+	self._lines.idle = self:get_character_voice_line("idle_lines", character_tier)
+end
+
+function CivilianHeisterInteractionExt:get_character_voice_line(key, character_tier)
+	local voice_lines = self.heister_data[key] or {}
+	if #voice_lines == 0 then
+		return nil
+	end
+	local current_line = voice_lines[1]
+	for idx, data in ipairs(voice_lines) do
+		local use = not data.requirements
+		if not use then
+			local pass_tier, pass_trophy
+			pass_tier = not data.requirements.tiers or table.contains(data.requirements.tiers, character_tier)
+			pass_trophy = not data.requirements.trophies
+			if not pass_trophy then
+				pass_trophy = true
+				for _, trophy_id in ipairs(data.requirements.trophies) do
+					local trophy = managers.custom_safehouse:get_trophy(trophy_id)
+					if not trophy or not trophy.completed then
+						pass_trophy = false
+						break
+					end
+				end
+			end
+			use = pass_tier and pass_trophy
+		end
+		if use and current_line.priority <= data.priority then
+			current_line = data
+		end
+	end
+	return string.gsub(current_line.sound_event, "{voice}", tostring(self.heister_data.voice))
+end
+
+function CivilianHeisterInteractionExt:_interact_blocked(player)
+	return self._unit:sound():speaking(TimerManager:game():time())
+end
+
+function CivilianHeisterInteractionExt:interact(player)
+	CivilianHeisterInteractionExt.super.super.interact(self, player)
+	local player_character = managers.criminals:character_name_by_unit(player)
+	local player_voice = "rb1"
+	for idx, data in ipairs(tweak_data.criminals.characters) do
+		if data.name == player_character then
+			player_voice = data.static_data.voice
+			break
+		end
+	end
+	self._unit:sound():set_interactor_voice(player_voice)
+	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
+	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
+	if self:is_daily_contractor() and (not managers.custom_safehouse:has_daily_been_accepted_from_heister() or managers.custom_safehouse:has_completed_daily()) then
+		managers.menu:on_heister_interaction()
+		if not self:is_daily_accepted() then
+			managers.custom_safehouse:accept_daily()
+			self:hide_waypoint()
+			self._accepted = true
+		end
+		self:_play_voice_line(self._lines.answering)
+	else
+		self:_play_voice_line(self._lines.answering)
+	end
+	return true
+end
+
+function CivilianHeisterInteractionExt:_play_idle_line()
+	self:_play_voice_line(self._lines.idle)
+end
+
+function CivilianHeisterInteractionExt:_play_voice_line(snd_event)
+	self._unit:sound():say(snd_event)
+	self:set_active(false)
+	self._is_speaking = true
+	local unit_id = self._unit:unit_data().unit_id
+	local delay = 2
+	managers.enemy:add_delayed_clbk(string.format("civilian_heister_%s", tostring(unit_id)), callback(self, self, "_reenable_ext"), TimerManager:game():time() + delay)
+end
+
+function CivilianHeisterInteractionExt:_reenable_ext()
+	self:set_active(true)
+	self._is_speaking = false
+end
+
+function CivilianHeisterInteractionExt:update(unit, t, dt)
+	if not self._has_set_skin then
+		self:update_character()
+		if self:is_daily_contractor() and not self:is_daily_accepted() then
+			self:show_waypoint()
+		end
+		self._has_set_skin = true
+	end
+	if self._unit.inventory and self._unit:inventory() then
+		self._unit:inventory():set_visibility_state(false)
+	end
+	local can_play_idle_line = false
+	local closest_unit
+	for id, data in pairs(managers.criminals:characters()) do
+		if data.taken and alive(data.unit) and data.unit:id() ~= -1 then
+			local dist = (data.unit:position() - unit:position()):length()
+			if dist < self.heister_data.idle_line_dist then
+				can_play_idle_line = true
+				closest_unit = data.unit
+				break
+			end
+		end
+	end
+	if alive(closest_unit) then
+		local hit_geometry = World:raycast("ray", unit:get_object(Idstring("Spine2")):position(), closest_unit:position(), "ignore_unit", unit, "slot_mask", self._visible_check_slotmask)
+		if hit_geometry and hit_geometry.unit ~= closest_unit then
+			can_play_idle_line = false
+		end
+	end
+	if can_play_idle_line and not self._is_speaking then
+		self._next_idle_time = self._next_idle_time or t + math.rand(self.heister_data.idle_line_time[1], self.heister_data.idle_line_time[2])
+		if self._next_idle_time and t >= self._next_idle_time then
+			self._next_idle_time = nil
+			self:_play_idle_line()
+		end
+	else
+		self._next_idle_time = nil
+	end
+end
+
+function CivilianHeisterInteractionExt:show_waypoint()
+	self._unit:contour():add("highlight", true)
+end
+
+function CivilianHeisterInteractionExt:hide_waypoint()
+	self._unit:contour():remove("highlight")
+end
+
+function CivilianHeisterInteractionExt:play_minigame_vo(state)
+	self._unit:sound():set_minigame_response(state)
+	self:_play_voice_line("Play_" .. tostring(self.heister_data.voice) .. "_minigame")
+end
+
+ButlerInteractionExt = ButlerInteractionExt or class(UseInteractionExt)
+
+function ButlerInteractionExt:init(unit)
+	self.character = self.character or "dallas"
+	self.tweak_data = string.format("%s_%s", self.tweak_data, self.character)
+	self.heister_data = tweak_data.safehouse.heisters[self.character]
+	ButlerInteractionExt.super.init(self, unit)
+end
+
+function ButlerInteractionExt:_interact_blocked(player)
+	return self._unit:sound():speaking(TimerManager:game():time())
+end
+
+function ButlerInteractionExt:interact(player)
+	ButlerInteractionExt.super.super.interact(self, player)
+	self._unit:sound():say("Play_btl_answering", false, true)
+	return true
+end
+
+AccessFBIFilesInteractionExt = AccessFBIFilesInteractionExt or class(UseInteractionExt)
+
+function AccessFBIFilesInteractionExt:_interact_blocked(player)
+	return false
+end
+
+function AccessFBIFilesInteractionExt:interact(player)
+	AccessFBIFilesInteractionExt.super.super.interact(self, player)
+	Steam:overlay_activate("url", tweak_data.gui.fbi_files_webpage .. "/suspect/" .. Steam:userid() .. "/")
+	return true
+end
+
+AccessPD2StashInteractionExt = AccessPD2StashInteractionExt or class(UseInteractionExt)
+
+function AccessPD2StashInteractionExt:_interact_blocked(player)
+	return false
+end
+
+function AccessPD2StashInteractionExt:interact(player)
+	AccessPD2StashInteractionExt.super.super.interact(self, player)
+	Steam:overlay_activate("url", "http://pd2stash.com/")
+	return true
+end
+
+AccessSideJobsInteractionExt = AccessSideJobsInteractionExt or class(UseInteractionExt)
+
+function AccessSideJobsInteractionExt:_interact_blocked(player)
+	return false
+end
+
+function AccessSideJobsInteractionExt:interact(player)
+	AccessSideJobsInteractionExt.super.super.interact(self, player)
+	managers.custom_safehouse:enable_in_game_menu()
+	return true
 end
 
 AccessCrimeNetInteractionExt = AccessCrimeNetInteractionExt or class(UseInteractionExt)

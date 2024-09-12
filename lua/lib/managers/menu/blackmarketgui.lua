@@ -2447,6 +2447,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_btn_switch_reticle",
 				callback = callback(self, self, "open_reticle_switch_menu")
 			},
+			wm_buy_mod = {
+				prio = 4,
+				btn = "BTN_BACK",
+				pc_btn = "toggle_chat",
+				name = "bm_menu_btn_buy_mod",
+				callback = callback(self, self, "purchase_weapon_mod_callback")
+			},
 			wcc_equip = {
 				prio = 1,
 				btn = "BTN_A",
@@ -9180,6 +9187,10 @@ function BlackMarketGui:populate_mods(data)
 				if managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), weapon_id) then
 					table.insert(new_data, "w_skin")
 				end
+				local weapon_mod_tweak = tweak_data.weapon.factory.parts[mod_name]
+				if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true then
+					table.insert(new_data, "wm_buy_mod")
+				end
 			end
 			data[index] = new_data
 		end
@@ -9225,6 +9236,10 @@ function BlackMarketGui:populate_mods(data)
 				end
 				if managers.workshop and managers.workshop:enabled() and data.prev_node_data and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), data.prev_node_data.name) then
 					table.insert(data[equipped], "w_skin")
+				end
+				local weapon_mod_tweak = tweak_data.weapon.factory.parts[data[equipped].name]
+				if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true then
+					table.insert(data[equipped], "wm_buy_mod")
 				end
 			end
 			local factory = tweak_data.weapon.factory.parts[data[equipped].name]
@@ -10656,6 +10671,34 @@ end
 function BlackMarketGui:_sell_weapon_mod_callback(data)
 	managers.menu_component:post_event("item_sell")
 	managers.blackmarket:on_sell_weapon_part(data.name, data.global_value)
+	self:reload()
+end
+
+function BlackMarketGui:purchase_weapon_mod_callback(data)
+	local params = {}
+	params.name = data.name_localized or data.name
+	params.category = data.category
+	params.slot = data.slot
+	params.money = managers.experience:cash_string(tweak_data.safehouse.prices.weapon_mod, "")
+	if managers.custom_safehouse:coins() >= tweak_data.safehouse.prices.weapon_mod then
+		params.yes_func = callback(self, self, "_dialog_yes", callback(self, self, "_confirm_purchase_weapon_mod_callback", data))
+		params.no_func = callback(self, self, "_dialog_no")
+		managers.menu:show_confirm_blackmarket_weapon_mod_purchase(params)
+	else
+		local dialog_data = {}
+		dialog_data.title = managers.localization:text("dialog_bm_purchase_mod_cant_afford_title")
+		dialog_data.text = managers.localization:text("dialog_bm_purchase_mod_cant_afford", params)
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+		managers.system_menu:show(dialog_data)
+	end
+end
+
+function BlackMarketGui:_confirm_purchase_weapon_mod_callback(data)
+	managers.menu_component:post_event("item_sell")
+	managers.blackmarket:add_to_inventory(data.global_value, "weapon_mods", data.name, true)
+	managers.custom_safehouse:deduct_coins(tweak_data.safehouse.prices.weapon_mod)
 	self:reload()
 end
 

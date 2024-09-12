@@ -9,6 +9,7 @@ function MissionEndState:init(name, game_state_machine, setup)
 	self._continue_cb = callback(self, self, "_continue")
 	self._controller = nil
 	self._continue_block_timer = 0
+	managers.custom_safehouse:register_trophy_unlocked_callback(callback(self, self, "_on_safehouse_trophy_unlocked"))
 end
 
 function MissionEndState:setup_controller()
@@ -161,6 +162,8 @@ function MissionEndState:at_enter(old_state, params)
 						managers.achievment:award(achievement_data.award)
 					elseif achievement_data.challenge_stat then
 						managers.challenge:award_progress(achievement_data.challenge_stat)
+					elseif achievement_data.trophy_stat then
+						managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 					elseif achievement_data.challenge_award then
 						managers.challenge:award(achievement_data.challenge_award)
 					end
@@ -468,12 +471,96 @@ function MissionEndState:on_statistics_result(best_kills_peer_id, best_kills_sco
 				managers.achievment:award(achievement_data.award)
 			elseif achievement_data.challenge_stat then
 				managers.challenge:award_progress(achievement_data.challenge_stat)
+			elseif achievement_data.trophy_stat then
+				managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 			elseif achievement_data.challenge_award then
 				managers.challenge:award(achievement_data.challenge_award)
 			else
 				Application:debug("[MissionEndState] complete_heist_achievements:", achievement)
 			end
 		end
+	end
+end
+
+function MissionEndState:generate_safehouse_statistics()
+	if not managers.custom_safehouse:unlocked() then
+		return
+	end
+	self._trophies_list = self._trophies_list or {}
+	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
+		if not table.contains(self._trophies_list, trophy_data) then
+			table.insert(self._trophies_list, trophy_data)
+		end
+	end
+	local has_completed_daily = managers.custom_safehouse:has_completed_daily() and not managers.custom_safehouse:has_rewarded_daily()
+	if has_completed_daily then
+		managers.custom_safehouse:reward_daily()
+	end
+	local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
+	if was_safehouse_raid then
+		managers.custom_safehouse:add_coins(tweak_data.safehouse.rewards.raid)
+	end
+	local stage_safehouse_summary_string = ""
+	local total_income = managers.custom_safehouse:get_coins_income()
+	local exp_income = total_income
+	local trophies_income = 0
+	local daily_income = 0
+	local raid_income = was_safehouse_raid and tweak_data.safehouse.rewards.raid or 0
+	for idx, trophy_data in ipairs(self._trophies_list) do
+		if trophy_data.type == "trophy" then
+			trophies_income = trophies_income + trophy_data.reward
+		end
+		exp_income = exp_income - trophy_data.reward
+	end
+	if has_completed_daily then
+		daily_income = tweak_data.safehouse.rewards.daily_complete
+		exp_income = exp_income - daily_income
+	end
+	if was_safehouse_raid then
+		exp_income = exp_income - raid_income
+	end
+	stage_safehouse_summary_string = managers.localization:text("menu_es_safehouse_earned", {
+		amount = tostring(total_income)
+	})
+	stage_safehouse_summary_string = stage_safehouse_summary_string .. "\n"
+	if 0 < exp_income then
+		stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_safehouse_earned_income", {
+			amount = tostring(exp_income)
+		}) .. "\n"
+	end
+	if #self._trophies_list > 0 or has_completed_daily or was_safehouse_raid then
+		stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_safehouse_earned_challenges", {
+			amount = tostring(trophies_income + daily_income)
+		}) .. "\n"
+		for idx, trophy_data in ipairs(self._trophies_list) do
+			if trophy_data.type == "trophy" then
+				local trophy = managers.localization:text(trophy_data.name)
+				stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_safehouse_challenge_complete", {challenge = trophy}) .. "\n"
+			end
+		end
+		if has_completed_daily then
+			stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_safehouse_daily_challenge_complete") .. "\n"
+		end
+		if was_safehouse_raid then
+			stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_earned_safehouse_raid", {
+				amount = tostring(raid_income)
+			}) .. "\n"
+		end
+	end
+	stage_safehouse_summary_string = stage_safehouse_summary_string .. "\n" .. managers.localization:text("menu_es_safehouse_total_coins", {
+		amount = tostring(math.floor(managers.custom_safehouse:coins()))
+	})
+	if managers.custom_safehouse:can_afford_any_upgrade() then
+		stage_safehouse_summary_string = stage_safehouse_summary_string .. " " .. managers.localization:text("menu_es_safehouse_upgrade_available")
+	end
+	self._statistics_data.stage_safehouse_summary = stage_safehouse_summary_string
+	managers.custom_safehouse:flush_completed_trophies()
+end
+
+function MissionEndState:_on_safehouse_trophy_unlocked(trophy_id)
+	if self._statistics_feeded then
+		self:generate_safehouse_statistics()
+		managers.menu_component:feed_endscreen_statistics(self._statistics_data)
 	end
 end
 
@@ -580,6 +667,7 @@ function MissionEndState:update(t, dt)
 		self._statistics_feeded = nil
 	end
 	if not self._statistics_feeded and self._statistics_data then
+		self:generate_safehouse_statistics()
 		self._statistics_data.success = self._success
 		self._statistics_data.criminals_finished = self._criminals_completed
 		managers.menu_component:feed_endscreen_statistics(self._statistics_data)
@@ -953,6 +1041,8 @@ function MissionEndState:chk_complete_heist_achievements()
 						managers.achievment:award(achievement_data.award)
 					elseif achievement_data.challenge_stat then
 						managers.challenge:award_progress(achievement_data.challenge_stat)
+					elseif achievement_data.trophy_stat then
+						managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 					elseif achievement_data.challenge_award then
 						managers.challenge:award(achievement_data.challenge_award)
 					else
@@ -992,6 +1082,8 @@ function MissionEndState:chk_complete_heist_achievements()
 						managers.achievment:award(achievement_data.award)
 					elseif achievement_data.challenge_stat then
 						managers.challenge:award_progress(achievement_data.challenge_stat)
+					elseif achievement_data.trophy_stat then
+						managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 					elseif achievement_data.challenge_award then
 						managers.challenge:award(achievement_data.challenge_award)
 					end

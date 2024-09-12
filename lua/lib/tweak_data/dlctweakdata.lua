@@ -47,6 +47,7 @@ function DLCTweakData:init(tweak_data)
 			jigg = 1,
 			born = true,
 			wild = true,
+			chill = 1,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,

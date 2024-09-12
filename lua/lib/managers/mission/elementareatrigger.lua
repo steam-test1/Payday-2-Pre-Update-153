@@ -181,7 +181,8 @@ function ElementAreaTrigger:project_instigators()
 					"weapon_scar",
 					"bike_part_light",
 					"bike_part_heavy",
-					"drone_control_helmet"
+					"drone_control_helmet",
+					"chl_puck"
 				}
 				if table.contains(carry_list, carry_id) then
 					return true

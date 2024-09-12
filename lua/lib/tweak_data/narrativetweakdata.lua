@@ -225,6 +225,12 @@ function NarrativeTweakData:init(tweak_data)
 	self.contacts.jimmy.description_id = "heist_contact_jimmy_description"
 	self.contacts.jimmy.package = "packages/contact_jimmy"
 	self.contacts.jimmy.assets_gui = Idstring("guis/dlcs/mad/guis/preload_contact_jimmy")
+	self.contacts.hoxton = {}
+	self.contacts.hoxton.name_id = "heist_contact_hoxton"
+	self.contacts.hoxton.description_id = "heist_contact_hoxton_description"
+	self.contacts.hoxton.package = "packages/contact_hoxton"
+	self.contacts.hoxton.assets_gui = Idstring("guis/mission_briefing/preload_contact_hoxton")
+	self.contacts.hoxton.hidden = true
 	self.jobs = {}
 	self.jobs.firestarter = {}
 	self.jobs.firestarter.name_id = "heist_firestarter"
@@ -3970,6 +3976,80 @@ function NarrativeTweakData:init(tweak_data)
 		{job = "short1"},
 		{job = "short2"}
 	}
+	self.jobs.chill = {}
+	self.jobs.chill.name_id = "heist_chill"
+	self.jobs.chill.briefing_id = "heist_chill_crimenet"
+	self.jobs.chill.contact = "hoxton"
+	self.jobs.chill.region = "street"
+	self.jobs.chill.jc = 30
+	self.jobs.chill.chain = {
+		{
+			level_id = "chill",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {1}
+		}
+	}
+	self.jobs.chill.briefing_event = "pln_sh21_cbf_01"
+	self.jobs.chill.debrief_event = nil
+	self.jobs.chill.crimenet_callouts = {
+		"pln_cs1_cnc_01",
+		"pln_cs1_cnc_02",
+		"pln_cs1_cnc_03"
+	}
+	self.jobs.chill.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.chill.payout = {
+		26000,
+		37000,
+		81000,
+		101000,
+		202000,
+		202000,
+		202000
+	}
+	local chill_combat_marker_dot_color = Color(1, 0, 0)
+	local chill_combat_marker_dot_color_to = Color(0.2, 0, 0)
+	self.jobs.chill_combat = {}
+	self.jobs.chill_combat.name_id = "heist_chill_combat"
+	self.jobs.chill_combat.briefing_id = "heist_chill_combat_crimenet"
+	self.jobs.chill_combat.contact = "hoxton"
+	self.jobs.chill_combat.region = "street"
+	self.jobs.chill_combat.jc = 30
+	self.jobs.chill_combat.chain = {
+		{
+			level_id = "chill_combat",
+			type_id = "heist_type_assault",
+			type = "d",
+			mission_filter = {2}
+		}
+	}
+	self.jobs.chill_combat.briefing_event = "pln_sfr_cbf_01"
+	self.jobs.chill_combat.debrief_event = nil
+	self.jobs.chill_combat.crimenet_callouts = {
+		"pln_sfr_cnc_01_01"
+	}
+	self.jobs.chill_combat.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.chill_combat.payout = {
+		26000,
+		37000,
+		81000,
+		101000,
+		202000
+	}
+	self.jobs.chill_combat.marker_dot_color = chill_combat_marker_dot_color
+	self.jobs.chill_combat.color_lerp = {
+		from = chill_combat_marker_dot_color,
+		to = chill_combat_marker_dot_color_to,
+		speed = 10
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4026,7 +4106,9 @@ function NarrativeTweakData:init(tweak_data)
 		"man",
 		"mad",
 		"dark",
-		"born"
+		"born",
+		"chill",
+		"chill_combat"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

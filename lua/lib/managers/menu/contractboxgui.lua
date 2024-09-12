@@ -117,6 +117,7 @@ function ContractBoxGui:create_contract_box()
 	local job_data = managers.job:current_job_data()
 	local job_chain = managers.job:current_job_chain_data()
 	local job_id = managers.job:current_job_id()
+	local job_tweak = tweak_data.levels[job_id]
 	self._contract_panel = self._panel:panel({
 		name = "contract_box_panel",
 		w = self._panel:w() * 0.35,
@@ -134,6 +135,7 @@ function ContractBoxGui:create_contract_box()
 	if contact_data then
 		self._contract_text_header = self._panel:text({
 			text = utf8.to_upper(managers.localization:text(contact_data.name_id) .. ": " .. managers.localization:text(job_data.name_id)),
+			h = tweak_data.menu.pd2_medium_font_size,
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			font = tweak_data.menu.pd2_medium_font,
 			color = tweak_data.screen_colors.text,
@@ -407,18 +409,9 @@ function ContractBoxGui:create_contract_box()
 		end
 		wfs:set_world_rightbottom(self._contract_panel:world_right() - 5, self._contract_panel:world_bottom())
 	end
-	if self._contract_text_header and managers.job:is_current_job_professional() then
-		self._contract_pro_text = self._panel:text({
-			name = "pro_text",
-			text = managers.localization:to_upper_text("cn_menu_pro_job"),
-			font_size = tweak_data.menu.pd2_medium_font_size,
-			font = tweak_data.menu.pd2_medium_font,
-			color = tweak_data.screen_colors.pro_color,
-			blend_mode = "add"
-		})
-		local x, y, w, h = self._contract_pro_text:text_rect()
-		self._contract_pro_text:set_size(w, h)
-		self._contract_pro_text:set_position(self._contract_text_header:right() + 10, self._contract_text_header:y())
+	if job_tweak and job_tweak.is_safehouse and not job_tweak.is_safehouse_combat then
+		self._contract_text_header:set_bottom(self._contract_panel:bottom())
+		self._contract_panel:set_h(0)
 	end
 	BoxGuiObject:new(self._contract_panel, {
 		sides = {

@@ -59,8 +59,12 @@ function ElementChangeVanSkin:client_on_executed(...)
 	self:on_executed(...)
 end
 
+function ElementChangeVanSkin:save(data)
+	data.enabled = self._values.enabled
+end
+
 function ElementChangeVanSkin:load(data)
-	if not self._has_fetched_units then
+	if not self._has_fetched_units and managers.blackmarket:equipped_van_skin() == self._values.target_skin then
 		self:on_script_activated()
 	end
 	self:set_enabled(data.enabled)

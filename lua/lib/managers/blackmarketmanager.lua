@@ -179,6 +179,32 @@ function BlackMarketManager:_setup_unlocked_weapon_slots()
 	end
 end
 
+function BlackMarketManager:_give_infamy_colors()
+	local clrs = {
+		"black_solid",
+		"magenta_solid",
+		"dark_gray_solid",
+		"pink_solid",
+		"blood_red_solid",
+		"navy_blue_solid",
+		"warm_yellow_solid",
+		"dark_green_solid",
+		"black_white",
+		"white_black",
+		"blood_red_white"
+	}
+	local my_clrs = self._global.inventory.normal.colors
+	if not my_clrs then
+		self._global.inventory.normal.colors = {}
+		my_clrs = self._global.inventory.normal.colors
+	end
+	for idx, clr in ipairs(clrs) do
+		if not my_clrs[clr] then
+			my_clrs[clr] = 1
+		end
+	end
+end
+
 function BlackMarketManager:_setup_weapons()
 	local weapons = {}
 	Global.blackmarket_manager.weapons = weapons
@@ -258,6 +284,8 @@ function BlackMarketManager:equipped_item(category)
 		return self:equipped_melee_weapon()
 	elseif category == "grenades" then
 		return self:equipped_grenade()
+	elseif category == "van_skin" then
+		return self:equipped_van_skin()
 	end
 end
 
@@ -506,6 +534,14 @@ function BlackMarketManager:equipped_bipod(weapon_id)
 	return nil
 end
 
+function BlackMarketManager:equipped_van_skin()
+	if Global.blackmarket_manager.equipped_van_skin then
+		return Global.blackmarket_manager.equipped_van_skin
+	else
+		return managers.dlc:is_dlc_unlocked("overkill_pack") and "overkill" or tweak_data.van.default_skin_id
+	end
+end
+
 function BlackMarketManager:_check_achievements(category)
 	local cat_ids = Idstring(category)
 	if cat_ids == Idstring("primaries") then
@@ -718,6 +754,15 @@ function BlackMarketManager:equip_mask(slot)
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_equipped_to_steam()
 	end
+	return true
+end
+
+function BlackMarketManager:equip_van_skin(van_skin)
+	local van_tweak = tweak_data.van.skins[van_skin]
+	if not (van_skin and van_tweak) or van_tweak.dlc and not managers.dlc:is_dlc_unlocked(van_tweak.dlc) then
+		return false
+	end
+	Global.blackmarket_manager.equipped_van_skin = van_skin
 	return true
 end
 
@@ -5112,6 +5157,7 @@ function BlackMarketManager:save(data)
 	save_data.equipped_armor = self:equipped_armor()
 	save_data.equipped_grenade = self:equipped_grenade()
 	save_data.equipped_melee_weapon = self:equipped_melee_weapon()
+	save_data.equipped_van_skin = self:equipped_van_skin()
 	save_data.armors = nil
 	save_data.grenades = nil
 	save_data.melee_weapons = nil
@@ -5224,6 +5270,7 @@ function BlackMarketManager:load(data)
 		if not self:equipped_character() then
 			self._global.characters[self._defaults.character].equipped = true
 		end
+		self._global.equipped_van_skin = self._global.equipped_van_skin or tweak_data.van.default_skin_id
 		self._global.inventory = self._global.inventory or {}
 		self._global.new_tradable_items = self._global.new_tradable_items or {}
 		self._global.inventory_tradable = self._global.inventory_tradable or {}
@@ -5335,6 +5382,10 @@ function BlackMarketManager:load(data)
 			end
 		end
 		self._refill_global_values = self:_setup_track_global_values() or nil
+		if not self._global._has_given_infamy_clrs then
+			self:_give_infamy_colors()
+		end
+		self._global._has_given_infamy_clrs = true
 	end
 end
 

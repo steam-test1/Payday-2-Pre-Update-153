@@ -120,6 +120,7 @@ function ExperienceManager:give_experience(xp)
 	local return_data = deep_clone(self._experience_progress_data)
 	self._experience_progress_data = nil
 	managers.skilltree:give_specialization_points(xp)
+	managers.custom_safehouse:give_upgrade_points(xp)
 	return return_data
 end
 

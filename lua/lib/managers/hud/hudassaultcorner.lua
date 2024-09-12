@@ -18,6 +18,7 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 	self._assault_mode = "normal"
 	self._assault_color = Color(1, 1, 1, 0)
 	self._vip_assault_color = Color(1, 1, 0.5019608, 0)
+	self._assault_survived_color = Color(1, 0.1254902, 0.9019608, 0.1254902)
 	self._current_assault_color = self._assault_color
 	local icon_assaultbox = assault_panel:bitmap({
 		halign = "right",
@@ -104,6 +105,62 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 	})
 	if tweak_hud.no_hostages then
 		hostages_panel:hide()
+	end
+	if self._hud_panel:child("wave_panel") then
+		self._hud_panel:remove(self._hud_panel:child("wave_panel"))
+	end
+	self._completed_waves = 0
+	if self:is_safehouse_raid() then
+		self._wave_panel_size = {250, 38}
+		local wave_w, wave_h = 38, 38
+		local wave_panel = self._hud_panel:panel({
+			name = "wave_panel",
+			w = self._wave_panel_size[1],
+			h = self._wave_panel_size[2]
+		})
+		wave_panel:set_top(0)
+		wave_panel:set_right(hostages_panel:left() - 3)
+		local waves_icon = wave_panel:bitmap({
+			name = "hostages_icon",
+			texture = "guis/textures/pd2/specialization/icons_atlas",
+			texture_rect = {
+				192,
+				64,
+				64,
+				64
+			},
+			valign = "top",
+			layer = 1,
+			x = 0,
+			y = 0,
+			w = wave_w,
+			h = wave_h
+		})
+		self._wave_bg_box = HUDBGBox_create(wave_panel, {
+			w = wave_w,
+			h = wave_h,
+			x = 0,
+			y = 0
+		}, {blend_mode = "add"})
+		waves_icon:set_right(wave_panel:w())
+		waves_icon:set_center_y(self._wave_bg_box:h() * 0.5)
+		self._wave_bg_box:set_right(waves_icon:left())
+		local num_waves = self._wave_bg_box:text({
+			name = "num_waves",
+			text = tostring(self._completed_waves),
+			valign = "center",
+			vertical = "center",
+			align = "center",
+			halign = "right",
+			w = self._wave_bg_box:w(),
+			h = self._wave_bg_box:h(),
+			layer = 1,
+			x = 0,
+			y = 0,
+			color = Color.white,
+			font = tweak_data.hud_corner.assault_font,
+			font_size = tweak_data.hud_corner.numhostages_size
+		})
 	end
 	if self._hud_panel:child("point_of_no_return_panel") then
 		self._hud_panel:remove(self._hud_panel:child("point_of_no_return_panel"))
@@ -259,6 +316,10 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 		h = 38
 	})
 	vip_icon:set_center(self._vip_bg_box:w() / 2, self._vip_bg_box:h() / 2)
+end
+
+function HUDAssaultCorner:is_safehouse_raid()
+	return managers.job:current_level_id() == "chill_combat"
 end
 
 function HUDAssaultCorner:_animate_text(text_panel, bg_box, color, color_function)
@@ -443,6 +504,31 @@ function HUDAssaultCorner:_get_assault_strings()
 	end
 end
 
+function HUDAssaultCorner:_get_survived_assault_strings()
+	if managers.job:current_difficulty_stars() > 0 then
+		local ids_risk = Idstring("risk")
+		return {
+			"hud_assault_survived",
+			"hud_assault_end_line",
+			ids_risk,
+			"hud_assault_end_line",
+			"hud_assault_survived",
+			"hud_assault_end_line",
+			ids_risk,
+			"hud_assault_end_line"
+		}
+	else
+		return {
+			"hud_assault_survived",
+			"hud_assault_end_line",
+			"hud_assault_survived",
+			"hud_assault_end_line",
+			"hud_assault_survived",
+			"hud_assault_end_line"
+		}
+	end
+end
+
 function HUDAssaultCorner:sync_end_assault(result)
 	if self._point_of_no_return or self._casing then
 		return
@@ -516,7 +602,16 @@ function HUDAssaultCorner:_end_assault()
 	self._start_assault_after_hostage_offset = nil
 	local icon_assaultbox = self._hud_panel:child("assault_panel"):child("icon_assaultbox")
 	icon_assaultbox:stop()
-	self:_close_assault_box()
+	if self:is_safehouse_raid() then
+		self:_update_assault_hud_color(self._assault_survived_color)
+		self:_set_text_list(self:_get_survived_assault_strings())
+		box_text_panel:animate(callback(self, self, "_animate_text"), nil, nil, callback(self, self, "assault_attention_color_function"))
+		self._completed_waves = self._completed_waves + 1
+		self._wave_bg_box:stop()
+		self._wave_bg_box:animate(callback(self, self, "_animate_wave_completed"), self)
+	else
+		self:_close_assault_box()
+	end
 end
 
 function HUDAssaultCorner:_close_assault_box()
@@ -850,4 +945,15 @@ function HUDAssaultCorner:_update_feedback_alpha(t, dt)
 		end
 	end
 	managers.platform:set_feedback_color(color:with_alpha(alpha))
+end
+
+function HUDAssaultCorner:_animate_wave_completed(panel, assault_hud)
+	local wave_text = panel:child("num_waves")
+	local bg = panel:child("bg")
+	wait(1.4)
+	wave_text:set_text(tostring(self._completed_waves))
+	bg:stop()
+	bg:animate(callback(nil, _G, "HUDBGBox_animate_bg_attention"), {})
+	wait(7.2)
+	assault_hud:_close_assault_box()
 end

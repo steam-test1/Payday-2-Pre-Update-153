@@ -198,6 +198,7 @@ CopActionAct._act_redirects.civilian_spawn = {
 	"cm_sp_sit_with_wounded",
 	"cm_sp_recieving_cpr",
 	"cm_sp_wounded_lying2",
+	"cm_sp_butler_talk_loop",
 	"cm_sp_gives_cpr",
 	"cm_sp_wounded_lying",
 	"cm_sp_accident_scene",
@@ -787,6 +788,79 @@ CopActionAct._act_redirects.SO = {
 	"cm_idle_3_disco",
 	"cmf_so_lean_1m",
 	"cm_so_impersonator",
+	"so_butler_pick_up",
+	"so_butler_silly_walk",
+	"so_butler_write",
+	"so_butler_brush_shoe",
+	"so_butler_scratches_chin",
+	"so_butler_restless",
+	"so_butler_talk_loop",
+	"so_butler_talk_calm_gestures",
+	"so_butler_talk_arm_gestures",
+	"so_butler_angry",
+	"so_butler_idle_stand",
+	"so_butler_look_around",
+	"so_butler_look_behind",
+	"so_butler_stretch_shoulders",
+	"so_butler_jawn",
+	"so_butler_talk_loop_var2",
+	"so_butler_talk_loop_var3",
+	"so_butler_talk_loop_var4",
+	"so_butler_talk_loop_upset",
+	"so_butler_clear_throat",
+	"so_butler_watch_look_calm",
+	"so_butler_look_up",
+	"so_butler_brush_jacket",
+	"so_chains_write",
+	"so_jacket_stand",
+	"so_jacket_sit",
+	"so_jacket_bat",
+	"so_bonnie_sit_read",
+	"so_dallas_sit_feet_up",
+	"so_wick_picture",
+	"so_sydney_mask",
+	"so_bodhi_lean_table",
+	"so_houston_under_car",
+	"so_jimmy_sleep",
+	"so_rust_sleep",
+	"so_bonnie_chips",
+	"so_houston_blueprint",
+	"cm_so_croupier_idle",
+	"cm_so_croupier_wheel",
+	"cm_so_croupier_win",
+	"cm_so_croupier_loose",
+	"so_wick_gun",
+	"so_sokol_stick",
+	"so_sokol_lean",
+	"so_sokol_juggle_leaning",
+	"so_bartender",
+	"so_wolf_drill",
+	"so_keyboard_sit",
+	"so_keyboard_stand",
+	"so_hoxton_look",
+	"so_wick_amo_box",
+	"so_jiro_practice",
+	"so_dragan_pushups",
+	"so_dragan_pushups_exit",
+	"so_houston_wash_car",
+	"so_chains_lmg",
+	"so_sydney_draw",
+	"so_dragan_stretch",
+	"so_wolf_shelves",
+	"so_hoxton_box",
+	"so_dragan_situps_exit",
+	"so_dallas_look",
+	"so_clover_look",
+	"so_bodhi_wax",
+	"so_chains_inspect",
+	"so_bodhi_planks",
+	"so_jimmy_sit_sleep",
+	"so_rust_drink_sit",
+	"so_jiro_sake",
+	"so_jiro_meditate",
+	"so_dragan_situps",
+	"so_bonnie_drink",
+	"so_jimmy_restless",
 	"sstash_stand_enter",
 	"sstash_stand_loop",
 	"sstash_sit_enter",
@@ -900,23 +974,23 @@ function CopActionAct:on_exit()
 end
 
 function CopActionAct:_init_ik()
-	self._look_vec = mvector3.copy(self._common_data.fwd)
-	self._ik_update = callback(self, self, "_ik_update_func")
-	self._m_head_pos = self._ext_movement:m_head_pos()
-	self:on_attention(self._common_data.attention)
+	if managers.job:current_level_id() == "chill" then
+		self._look_vec = mvector3.copy(self._common_data.fwd)
+		self._ik_update = callback(self, self, "_ik_update_func")
+		self._m_head_pos = self._ext_movement:m_head_pos()
+		local player_unit = managers.player:player_unit()
+		self._ik_data = player_unit
+	end
 end
 
 function CopActionAct:_ik_update_func(t)
 	self:_update_ik_type()
-	if self._attention and self._ik_type then
+	if self._ik_data and alive(self._ik_data) and self._ik_type then
 		local look_from_pos = self._m_head_pos
 		self._look_vec = self._look_vec or mvector3.copy(self._common_data.fwd)
 		local target_vec = self._look_vec
-		if self._attention.handler or self._attention.unit then
-			mvec3_set(target_vec, self._m_attention_head_pos)
-			mvec3_sub(target_vec, look_from_pos)
-		else
-			mvec3_set(target_vec, self._attention.pos)
+		if self._ik_data then
+			mvec3_set(target_vec, self._ik_data:movement():m_head_pos())
 			mvec3_sub(target_vec, look_from_pos)
 		end
 		mvec3_set(tmp_vec1, target_vec)

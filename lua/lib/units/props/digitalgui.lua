@@ -20,6 +20,7 @@ DigitalGui.GUI_EVENT_IDS.timer_start_count_down = 4
 DigitalGui.GUI_EVENT_IDS.timer_pause = 5
 DigitalGui.GUI_EVENT_IDS.timer_resume = 6
 DigitalGui.GUI_EVENT_IDS.number_set = 7
+DigitalGui.NUMBER_CLAMP = 99999
 
 function DigitalGui:init(unit)
 	self._unit = unit
@@ -142,8 +143,12 @@ function DigitalGui:set_bg_color_type(type)
 	end
 end
 
+function DigitalGui:_set_number(new)
+	self._number = math.clamp(new, 0, DigitalGui.NUMBER_CLAMP)
+end
+
 function DigitalGui:number_set(number, sync)
-	self._number = number
+	self:_set_number(number)
 	self:_update_number_text()
 	if sync and Network:is_server() then
 		managers.network:session():send_to_peers_synched("sync_gui_net_event", self._unit, DigitalGui.GUI_EVENT_IDS.number_set, self._number)
@@ -151,18 +156,18 @@ function DigitalGui:number_set(number, sync)
 end
 
 function DigitalGui:number_increase()
-	self._number = self._number + 1
+	self:_set_number(self._number + 1)
 	self:_update_number_text()
 end
 
 function DigitalGui:number_decrease()
-	self._number = self._number - 1
+	self:_set_number(self._number - 1)
 	self:_update_number_text()
 end
 
 function DigitalGui:_update_number_text()
 	if self._number then
-		self._number = self._number < 0 and 0 or self._number
+		self:_set_number(self._number < 0 and 0 or self._number)
 		local zero = ""
 		for i = 1, self.NUMBER_DIGITS - 1 do
 			zero = zero .. (self._number < math.pow(10, i) and "0" or "")

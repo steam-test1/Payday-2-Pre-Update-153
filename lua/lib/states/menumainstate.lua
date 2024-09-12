@@ -85,11 +85,23 @@ function MenuMainState:at_enter(old_state)
 		if managers.statistics:get_play_time() < 300 then
 			managers.features:announce_feature("short_heist")
 		end
-		if not Global.mission_manager.has_played_tutorial then
-			local yes_func = function()
-				MenuCallbackHandler:play_safehouse({skip_question = true})
+		if not managers.custom_safehouse:unlocked() then
+			if not Global.mission_manager.has_played_tutorial then
+				local yes_func = function()
+					MenuCallbackHandler:play_safehouse({skip_question = true})
+				end
+				managers.menu:show_question_start_tutorial({yes_func = yes_func})
 			end
-			managers.menu:show_question_start_tutorial({yes_func = yes_func})
+		elseif not managers.custom_safehouse:has_entered_safehouse() then
+			local yes_func = function()
+				MenuCallbackHandler:play_single_player()
+				MenuCallbackHandler:start_single_player_job({job_id = "chill", difficulty = "normal"})
+			end
+			if managers.custom_safehouse:is_new_player() then
+				managers.menu:show_question_new_safehouse_new_player({yes_func = yes_func})
+			else
+				managers.menu:show_question_new_safehouse({yes_func = yes_func})
+			end
 		end
 	end
 	if Global.savefile_manager.backup_save_enabled then

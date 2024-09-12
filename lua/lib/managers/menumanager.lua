@@ -84,6 +84,24 @@ function MenuManager:init(is_start_menu)
 			renderer = "MenuHiddenRenderer"
 		}
 		self:register_menu(loot_menu)
+		local custom_safehouse_menu = {
+			name = "custom_safehouse_menu",
+			id = "custom_safehouse_menu",
+			content_file = "gamedata/menus/custom_safehouse_menu",
+			callback_handler = MenuCallbackHandler:new(),
+			input = "MenuInput",
+			renderer = "MenuHiddenRenderer"
+		}
+		self:register_menu(custom_safehouse_menu)
+		local heister_interact_menu = {
+			name = "heister_interact_menu",
+			id = "heister_interact_menu",
+			content_file = "gamedata/menus/heister_interact_menu",
+			callback_handler = MenuCallbackHandler:new(),
+			input = "MenuInput",
+			renderer = "MenuHiddenRenderer"
+		}
+		self:register_menu(heister_interact_menu)
 	end
 	self._controller:add_trigger("toggle_menu", callback(self, self, "toggle_menu_state"))
 	if MenuCallbackHandler:is_pc_controller() and MenuCallbackHandler:is_not_steam_controller() then
@@ -300,6 +318,9 @@ end
 
 function MenuManager:toggle_menu_state()
 	if self._is_start_menu then
+		return
+	end
+	if self._heister_interaction then
 		return
 	end
 	if managers.hud:chat_focus() then
@@ -1133,6 +1154,7 @@ function MenuManager:do_clear_progress()
 	managers.infamy:reset()
 	managers.gage_assignment:reset()
 	managers.crimenet:reset_seed()
+	managers.custom_safehouse:reset()
 	if Global.game_settings.difficulty == "overkill_145" then
 		Global.game_settings.difficulty = "overkill"
 	end
@@ -2149,6 +2171,13 @@ function MenuCallbackHandler:choice_job_appropriate_filter(item)
 	Global.game_settings.search_appropriate_jobs = diff_appropriate == "on" and true or false
 	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
 	managers.user:set_setting("crimenet_filter_level_appopriate", diff_appropriate == "on" and true or false)
+end
+
+function MenuCallbackHandler:choice_allow_safehouses_filter(item)
+	local allow_safehouses = item:value() == "on" and true or false
+	Global.game_settings.allow_search_safehouses = allow_safehouses
+	managers.network.matchmake:search_lobby(managers.network.matchmake:search_friends_only())
+	managers.user:set_setting("crimenet_filter_safehouses", allow_safehouses)
 end
 
 function MenuCallbackHandler:choice_server_state_lobby(item)
@@ -3376,6 +3405,24 @@ end
 
 function MenuCallbackHandler:resume_game()
 	managers.menu:close_menu("menu_pause")
+end
+
+function MenuManager:on_heister_interaction()
+	self:open_menu("heister_interact_menu")
+	self._heister_interaction = true
+end
+
+function MenuManager:on_resume_heister_interaction()
+	self:close_menu("heister_interact_menu")
+	self._heister_interaction = false
+	local player_unit = managers.player:player_unit()
+	if alive(player_unit) and player_unit:movement():current_state().update_check_actions_paused then
+		player_unit:movement():current_state():update_check_actions_paused()
+	end
+end
+
+function MenuCallbackHandler:heister_interaction_resume_game()
+	managers.menu:on_resume_heister_interaction()
 end
 
 function MenuCallbackHandler:change_upgrade(menu_item)
@@ -5122,6 +5169,114 @@ function MenuCrimeNetContactShortInitiator:create_item(node, data)
 	node:add_item(new_item)
 end
 
+function MenuCallbackHandler:play_chill_combat(item)
+	item:parameters().gui_node:remove_blur()
+	local job_data = {
+		job_id = "chill_combat",
+		difficulty = item:parameters().gui_node:get_difficulty()
+	}
+	if Global.game_settings.single_player then
+		MenuCallbackHandler:start_single_player_job(job_data)
+	else
+		MenuCallbackHandler:start_job(job_data)
+	end
+end
+
+function MenuCallbackHandler:_on_chill_change_difficulty(item)
+	item:parameters().gui_node:set_difficulty(item._options[item._current_index]:value())
+end
+
+MenuCrimeNetContactChillInitiator = MenuCrimeNetContactChillInitiator or class()
+
+function MenuCrimeNetContactChillInitiator:modify_node(original_node, data)
+	local node = original_node
+	node:clean_items()
+	local params = {
+		name = "difficulty",
+		text_id = "menu_lobby_difficulty_title",
+		help_id = "menu_diff_help",
+		visible_callback = "is_pc_controller",
+		callback = "_on_chill_change_difficulty",
+		filter = true
+	}
+	local data_node = {
+		type = "MenuItemMultiChoice",
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_normal",
+			value = "normal"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_hard",
+			value = "hard"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_very_hard",
+			value = "overkill"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_overkill",
+			value = "overkill_145"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_easy_wish",
+			value = "easy_wish"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_apocalypse",
+			value = "overkill_290"
+		},
+		{
+			_meta = "option",
+			text_id = "menu_difficulty_sm_wish",
+			value = "sm_wish"
+		}
+	}
+	local new_item = node:create_item(data_node, params)
+	new_item:set_enabled(true)
+	node:add_item(new_item)
+	params = {
+		name = "CustomSafeHouseDefendBtn",
+		text_id = managers.localization:to_upper_text("menu_cn_chill_combat_defend"),
+		localize = false,
+		callback = "play_chill_combat",
+		align = "left"
+	}
+	data_node = {}
+	new_item = node:create_item(data_node, params)
+	new_item:set_enabled(true)
+	node:add_item(new_item)
+	params = {
+		name = "back",
+		text_id = "menu_back",
+		previous_node = "true",
+		visible_callback = "is_pc_controller",
+		align = "left",
+		last_item = "true"
+	}
+	data_node = {}
+	new_item = node:create_item(data_node, params)
+	node:add_item(new_item)
+	node:set_default_item_name(self.DEFAULT_ITEM)
+	node:select_item(self.DEFAULT_ITEM)
+	return node
+end
+
+function MenuCrimeNetContactChillInitiator:refresh_node(node)
+	return node
+end
+
+function MenuCrimeNetContactChillInitiator:create_divider(node, id, text_id, size, color)
+end
+
+function MenuCrimeNetContactChillInitiator:create_item(node, data)
+end
+
 MenuJukeboxInitiator = MenuJukeboxInitiator or class()
 
 function MenuJukeboxInitiator:modify_node(node, data)
@@ -6461,8 +6616,9 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 		for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 			local job_tweak = tweak_data.narrative:job_data(job_id)
 			local contact = job_tweak.contact
+			local contact_tweak = tweak_data.narrative.contacts[contact]
 			if contact then
-				if not table.contains(contacts, contact) and contact ~= "hoxton" then
+				if not table.contains(contacts, contact) and (not contact_tweak or not contact_tweak.hidden) then
 					table.insert(contacts, contact)
 				end
 				jobs[contact] = jobs[contact] or {}
@@ -7156,6 +7312,7 @@ function MenuCrimeNetFiltersInitiator:modify_node(original_node, data)
 		node:item("toggle_new_servers_only"):set_value(matchmake_filters.num_players and matchmake_filters.num_players.value or -1)
 		node:item("toggle_server_state_lobby"):set_value(matchmake_filters.state and matchmake_filters.state.value or -1)
 		node:item("toggle_job_appropriate_lobby"):set_value(Global.game_settings.search_appropriate_jobs and "on" or "off")
+		node:item("toggle_allow_safehouses"):set_value(Global.game_settings.allow_search_safehouses and "on" or "off")
 		node:item("max_lobbies_filter"):set_value(managers.network.matchmake:get_lobby_return_count())
 		node:item("server_filter"):set_value(managers.network.matchmake:distance_filter())
 		node:item("difficulty_filter"):set_value(matchmake_filters.difficulty and matchmake_filters.difficulty.value or -1)
@@ -7219,19 +7376,22 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 	}
 	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "tests" then
-			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
-			local params = {
-				_meta = "option",
-				text_id = text_id,
-				value = index,
-				localize = false
-			}
-			for count, color in ipairs(color_data) do
-				params["color" .. count] = color.color
-				params["color_start" .. count] = color.start
-				params["color_stop" .. count] = color.stop
+			local contact_tweak = tweak_data.narrative.contacts[tweak_data.narrative.jobs[job_id].contact]
+			if not contact_tweak or not contact_tweak.hidden then
+				local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
+				local params = {
+					_meta = "option",
+					text_id = text_id,
+					value = index,
+					localize = false
+				}
+				for count, color in ipairs(color_data) do
+					params["color" .. count] = color.color
+					params["color_start" .. count] = color.start
+					params["color_stop" .. count] = color.stop
+				end
+				table.insert(data_node, params)
 			end
-			table.insert(data_node, params)
 		end
 	end
 	local new_item = node:create_item(data_node, params)

@@ -82,9 +82,11 @@ require("lib/units/UnitDamage")
 require("lib/units/props/DigitalGui")
 require("lib/units/props/TextGui")
 require("lib/units/props/MaterialControl")
+require("lib/managers/ButlerMirroringManager")
 require("lib/managers/MultiProfileManager")
 require("lib/managers/BanListManager")
 require("lib/managers/WorkshopManager")
+require("lib/managers/CustomSafehouseManager")
 require("lib/utils/StatisticsGenerator")
 require("lib/utils/Bitwise")
 require("lib/utils/WeightedSelector")
@@ -196,7 +198,9 @@ function Setup:init_managers(managers)
 	managers.fire = FireManager:new()
 	managers.multi_profile = MultiProfileManager:new()
 	managers.workshop = WorkshopManager:new()
+	managers.custom_safehouse = CustomSafehouseManager:new()
 	managers.ban_list = BanListManager:new()
+	managers.butler_mirroring = ButlerMirroringManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 
@@ -491,6 +495,7 @@ function Setup:load_start_menu()
 	Global.level_data.level_class_name = nil
 	Global.level_data.level_id = nil
 	self:exec(nil)
+	managers.butler_mirroring = ButlerMirroringManager:new()
 end
 
 function Setup:exec(context)

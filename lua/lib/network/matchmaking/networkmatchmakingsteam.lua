@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.55.0"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.55.14"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -80,6 +80,7 @@ end
 function NetworkMatchMakingSTEAM:load_user_filters()
 	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
 	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
+	Global.game_settings.allow_search_safehouses = managers.user:get_setting("crimenet_filter_safehouses")
 	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
 	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
 	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
@@ -102,6 +103,7 @@ function NetworkMatchMakingSTEAM:reset_filters()
 	local usr = managers.user
 	usr:set_setting("crimenet_filter_friends_only", usr:get_default_setting("crimenet_filter_friends_only"))
 	usr:set_setting("crimenet_filter_level_appopriate", usr:get_default_setting("crimenet_filter_level_appopriate"))
+	usr:set_setting("crimenet_filter_safehouses", usr:get_default_setting("crimenet_filter_safehouses"))
 	usr:set_setting("crimenet_filter_new_servers_only", usr:get_default_setting("crimenet_filter_new_servers_only"))
 	usr:set_setting("crimenet_filter_in_lobby", usr:get_default_setting("crimenet_filter_in_lobby"))
 	usr:set_setting("crimenet_filter_max_servers", usr:get_default_setting("crimenet_filter_max_servers"))
@@ -384,12 +386,12 @@ function NetworkMatchMakingSTEAM:is_server_ok(friends_only, room, attributes_num
 		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. PRIVATE GAME")
 		return false, 2
 	end
-	if attributes_mutators and not Global.game_settings.search_mutated_lobbies then
+	if not is_invite and attributes_mutators and not Global.game_settings.search_mutated_lobbies then
 		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. MUTATED GAME")
 		return false
 	end
 	local level_tweak = tweak_data.levels[level_name]
-	if level_tweak and level_tweak.is_safehouse and not Global.game_settings.allow_search_safehouses then
+	if not is_invite and level_tweak and level_tweak.is_safehouse and not Global.game_settings.allow_search_safehouses then
 		Application:debug("NetworkMatchMakingSTEAM:is_server_ok() server rejected. HIDE ALL SAFEHOUSES")
 		return false
 	end
@@ -418,7 +420,6 @@ function NetworkMatchMakingSTEAM:join_server_with_check(room_id, is_invite)
 				return
 			end
 		end
-		print(inspect(attributes))
 		local server_ok, ok_error = self:is_server_ok(nil, room_id, attributes, is_invite)
 		if server_ok then
 			self:join_server(room_id, true)

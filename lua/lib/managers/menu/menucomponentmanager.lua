@@ -20,6 +20,12 @@ require("lib/managers/menu/PlayerInventoryGui")
 require("lib/managers/hud/HUDLootScreen")
 require("lib/managers/menu/SkillTreeGuiNew")
 require("lib/managers/menu/MultiProfileItemGui")
+require("lib/managers/menu/CustomSafehouseGui")
+require("lib/managers/menu/items/CustomSafehouseGuiItem")
+require("lib/managers/menu/items/CustomSafehouseHeisterInteractionDaily")
+require("lib/managers/menu/pages/CustomSafehouseGuiPageMap")
+require("lib/managers/menu/pages/CustomSafehouseGuiPageDaily")
+require("lib/managers/menu/pages/CustomSafehouseGuiPageTrophies")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -163,6 +169,14 @@ function MenuComponentManager:init()
 	self._active_components.skilltree_new = {
 		create = callback(self, self, "_create_skilltree_new_gui"),
 		close = callback(self, self, "close_skilltree_new_gui")
+	}
+	self._active_components.custom_safehouse = {
+		create = callback(self, self, "create_custom_safehouse_gui"),
+		close = callback(self, self, "close_custom_safehouse_gui")
+	}
+	self._active_components.custom_safehouse_no_input = {
+		create = callback(self, self, "disable_custom_safehouse_input"),
+		close = callback(self, self, "enable_custom_safehouse_input")
 	}
 	self._alive_components = {}
 end
@@ -2132,6 +2146,41 @@ function MenuComponentManager:get_bonus_stats_blackmarket_gui(cosmetic_id, weapo
 	if self._blackmarket_gui then
 		return self._blackmarket_gui:get_bonus_stats(cosmetic_id, weapon_id, bonus)
 	end
+end
+
+function MenuComponentManager:custom_safehouse_gui()
+	return self._custom_safehouse_gui
+end
+
+function MenuComponentManager:create_custom_safehouse_gui(node)
+	if not node then
+		return
+	end
+	self._custom_safehouse_gui = self._custom_safehouse_gui or CustomSafehouseGui:new(self._ws, self._fullscreen_ws, node)
+	self:register_component("custom_safehouse_gui", self._custom_safehouse_gui)
+end
+
+function MenuComponentManager:close_custom_safehouse_gui()
+	if self._custom_safehouse_gui then
+		self._custom_safehouse_gui:close()
+		self._custom_safehouse_gui = nil
+		self:unregister_component("custom_safehouse_gui")
+	end
+end
+
+function MenuComponentManager:disable_custom_safehouse_input(node)
+	if not self._custom_safehouse_gui then
+		return
+	end
+	self._custom_safehouse_page = self._custom_safehouse_gui._active_page
+	self._custom_safehouse_gui._selected_page = nil
+end
+
+function MenuComponentManager:enable_custom_safehouse_input()
+	if not self._custom_safehouse_gui then
+		return
+	end
+	self._custom_safehouse_gui:set_active_page(self._custom_safehouse_page or 1)
 end
 
 function MenuComponentManager:_create_server_info_gui()

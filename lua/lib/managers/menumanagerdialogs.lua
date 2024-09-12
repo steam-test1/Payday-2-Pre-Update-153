@@ -1410,6 +1410,30 @@ function MenuManager:show_confirm_blackmarket_finalize(params)
 	managers.system_menu:show(dialog_data)
 end
 
+function MenuManager:show_confirm_blackmarket_weapon_mod_purchase(params)
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_bm_crafted_sell_title")
+	dialog_data.text = managers.localization:text("dialog_bm_purchase_mod", {
+		slot = params.slot,
+		item = params.name
+	}) .. [[
+
+
+]] .. managers.localization:text("dialog_bm_purchase_coins", {
+		money = params.money
+	})
+	dialog_data.focus_button = 2
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	no_button.callback_func = params.no_func
+	no_button.cancel_button = true
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
 function MenuManager:show_confirm_mission_asset_buy(params)
 	local asset_tweak_data = managers.assets:get_asset_tweak_data_by_id(params.asset_id)
 	local dialog_data = {}
@@ -1562,6 +1586,36 @@ function MenuManager:show_question_start_tutorial(params)
 	no_button.text = managers.localization:text("dialog_no")
 	dialog_data.button_list = {yes_button, no_button}
 	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_question_new_safehouse(params)
+	local dialog_data = {}
+	dialog_data.focus_button = 1
+	dialog_data.title = managers.localization:text("dialog_new_safehouse_title")
+	dialog_data.text = managers.localization:text("dialog_new_safehouse")
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	dialog_data.button_list = {yes_button, no_button}
+	managers.system_menu:show(dialog_data)
+end
+
+function MenuManager:show_question_new_safehouse_new_player(params)
+	local dialog_data = {}
+	dialog_data.focus_button = 1
+	dialog_data.title = "dialog_new_safehouse_title"
+	dialog_data.text = "dialog_new_safehouse_new_player"
+	dialog_data.texture = false
+	local yes_button = {}
+	yes_button.text = managers.localization:text("dialog_yes")
+	yes_button.callback_func = params.yes_func
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_no")
+	dialog_data.button_list = {yes_button, no_button}
+	dialog_data.video = "movies/new_safehouse"
+	managers.menu:show_video_message_dialog(dialog_data)
 end
 
 function MenuManager:show_question_start_short_heist(params)

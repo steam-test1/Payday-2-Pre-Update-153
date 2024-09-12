@@ -204,6 +204,7 @@ function AchievmentManager:award(id)
 		return
 	end
 	managers.challenge:on_achievement_awarded(id)
+	managers.custom_safehouse:on_achievement_awarded(id)
 	if self:get_info(id).awarded then
 		return
 	end
@@ -230,6 +231,7 @@ function AchievmentManager:award_progress(stat, value)
 		return
 	end
 	managers.challenge:on_achievement_progressed(stat)
+	managers.custom_safehouse:on_achievement_progressed(stat, value)
 	print("[AchievmentManager:award_progress]: ", stat .. " increased by " .. tostring(value or 1))
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.handler:achievement_store_callback(AchievmentManager.steam_unlock_result)
@@ -428,6 +430,8 @@ function AchievmentManager:_award_achievement(achievement_data)
 		managers.achievment:award(achievement_data.award)
 	elseif achievement_data.challenge_stat then
 		managers.challenge:award_progress(achievement_data.challenge_stat)
+	elseif achievement_data.trophy_stat then
+		managers.custom_safehouse:award_progress(achievement_data.trophy_stat)
 	elseif achievement_data.challenge_award then
 		managers.challenge:award(achievement_data.challenge_award)
 	end

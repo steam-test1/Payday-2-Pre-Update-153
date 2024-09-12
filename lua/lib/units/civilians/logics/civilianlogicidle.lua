@@ -398,17 +398,13 @@ function CivilianLogicIdle._get_priority_attention(data, attention_objects)
 		local att_unit = attention_data.unit
 		if not attention_data.identified then
 		elseif attention_data.pause_expire_t then
-			if data.t > attention_data.pause_expire_t then
-				if not attention_data.settings.attract_chance or math.random() < attention_data.settings.attract_chance then
-					attention_data.pause_expire_t = nil
-				else
-					attention_data.pause_expire_t = data.t + math.lerp(attention_data.settings.pause[1], attention_data.settings.pause[2], math.random())
-				end
+			if data.t > attention_data.pause_expire_t and (not attention_data.settings.attract_chance or math.random() < attention_data.settings.attract_chance) then
+				attention_data.pause_expire_t = nil
+			else
 			end
 		elseif attention_data.stare_expire_t and data.t > attention_data.stare_expire_t then
 			if attention_data.settings.pause then
 				attention_data.stare_expire_t = nil
-				attention_data.pause_expire_t = data.t + math.lerp(attention_data.settings.pause[1], attention_data.settings.pause[2], math.random())
 			end
 		else
 			local distance = attention_data.dis
@@ -447,20 +443,16 @@ function CivilianLogicIdle._set_attention_obj(data, new_att_obj, new_reaction)
 			if new_att_obj.stare_expire_t and data.t > new_att_obj.stare_expire_t then
 				if new_att_obj.settings.pause then
 					new_att_obj.stare_expire_t = nil
-					new_att_obj.pause_expire_t = data.t + math.lerp(new_att_obj.settings.pause[1], new_att_obj.settings.pause[2], math.random())
 				end
 			elseif new_att_obj.pause_expire_t and data.t > new_att_obj.pause_expire_t then
 				if not new_att_obj.settings.attract_chance or math.random() < new_att_obj.settings.attract_chance then
 					new_att_obj.pause_expire_t = nil
-					new_att_obj.stare_expire_t = data.t + math.lerp(new_att_obj.settings.duration[1], new_att_obj.settings.duration[2], math.random())
 				else
 					debug_pause_unit(data.unit, "[CivilianLogicIdle._set_attention_obj] skipping attraction")
-					new_att_obj.pause_expire_t = data.t + math.lerp(new_att_obj.settings.pause[1], new_att_obj.settings.pause[2], math.random())
 				end
 			end
 		end
 		if not is_same_obj and new_att_obj.settings.duration then
-			new_att_obj.stare_expire_t = data.t + math.lerp(new_att_obj.settings.duration[1], new_att_obj.settings.duration[2], math.random())
 			new_att_obj.pause_expire_t = nil
 		end
 	end

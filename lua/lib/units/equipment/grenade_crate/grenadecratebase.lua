@@ -90,7 +90,9 @@ end
 
 function GrenadeCrateBase:_set_dynamic()
 	self._is_dynamic = true
-	self._unit:body("dynamic"):set_enabled(true)
+	if alive(self._unit) and alive(self._unit:body("dynamic")) then
+		self._unit:body("dynamic"):set_enabled(true)
+	end
 end
 
 function GrenadeCrateBase:take_grenade(unit)
