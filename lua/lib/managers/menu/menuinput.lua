@@ -584,7 +584,8 @@ function MenuInput:update(t, dt)
 					"menu_toggle_pp_breakdown",
 					"trigger_left",
 					"trigger_right",
-					"menu_challenge_claim"
+					"menu_challenge_claim",
+					"menu_edit_skin"
 				}
 				for _, button in ipairs(special_btns) do
 					if self._accept_input and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then

@@ -228,6 +228,21 @@ function CoreEditor:_init_layer_classes()
 	self:add_layer("Dynamics", CoreDynamicsLayer.DynamicsLayer)
 	self:add_layer("Level Settings", CoreLevelSettingsLayer.LevelSettingsLayer)
 	self:add_layer("Instances", CoreInstancesLayer.InstancesLayer)
+	self._layer_load_order = {
+		"Ai",
+		"Heatmap",
+		"WorldCamera",
+		"Dynamics",
+		"Wires",
+		"Level Settings",
+		"Portals",
+		"Brush",
+		"Environment",
+		"Instances",
+		"Statics",
+		"Sound",
+		"Mission"
+	}
 	self:_project_init_layer_classes()
 end
 
@@ -3187,7 +3202,8 @@ function CoreEditor:do_load()
 	self:load_values(self._world_holder, offset)
 	local progress_i = 50
 	local layers_amount = table.size(self._layers)
-	for name, layer in pairs(self._layers) do
+	for _, name in ipairs(self._layer_load_order) do
+		local layer = self._layers[name]
 		progress_i = progress_i + 50 / layers_amount
 		self:update_load_progress(progress_i, "Create Layer: " .. name)
 		layer:load(self._world_holder, offset)

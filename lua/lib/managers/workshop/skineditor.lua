@@ -165,31 +165,35 @@ function SkinEditor:publish_skin(skin, title, desc, changelog, callback)
 	
 	local function copy_cb(success, message)
 		if success then
-			skin:submit(changelog, cb)
-			local bar_radius = 20
-			local panel = managers.menu:active_menu().renderer.ws:panel()
-			self._publish_bar = CircleBitmapGuiObject:new(panel, {
-				use_bg = true,
-				radius = bar_radius,
-				sides = bar_radius,
-				current = 0,
-				total = bar_radius,
-				color = Color.white:with_alpha(1),
-				blend_mode = "add",
-				layer = 2
-			})
-			self._publish_bar:set_position(0, panel:h() - bar_radius * 2)
-			local update_publish = function(o)
-				local current = 0
-				local skin_editor = managers.blackmarket:skin_editor()
-				local bar = skin_editor._publish_bar
-				while current < 1 do
-					current = current + skin_editor:get_current_skin():get_update_progress()
-					bar:set_current(current)
-					coroutine.yield()
+			if skin:submit(changelog, cb) then
+				local bar_radius = 20
+				local panel = managers.menu:active_menu().renderer.ws:panel()
+				self._publish_bar = CircleBitmapGuiObject:new(panel, {
+					use_bg = true,
+					radius = bar_radius,
+					sides = bar_radius,
+					current = 0,
+					total = bar_radius,
+					color = Color.white:with_alpha(1),
+					blend_mode = "add",
+					layer = 2
+				})
+				self._publish_bar:set_position(0, panel:h() - bar_radius * 2)
+				local update_publish = function(o)
+					local current = 0
+					local skin_editor = managers.blackmarket:skin_editor()
+					while current < 1 do
+						local bar = skin_editor._publish_bar
+						if not bar then
+							break
+						end
+						current = current + skin_editor:get_current_skin():get_update_progress()
+						bar:set_current(current)
+						coroutine.yield()
+					end
 				end
+				panel:animate(update_publish)
 			end
-			panel:animate(update_publish)
 		else
 			cb("copy_failed:" .. message)
 		end
@@ -253,12 +257,14 @@ function SkinEditor:_spawn_screenshot_background()
 	local gui = World:newgui()
 	local offset_x = Vector3(0, 500, 0):rotate_with(self._weapon_unit:rotation())
 	local offset_y = Vector3(0, 0, 500):rotate_with(self._weapon_unit:rotation())
-	local pos_offset = Vector3(50, 250, 250):rotate_with(self._weapon_unit:rotation())
+	local pos_offset = Vector3(-50, 250, 250):rotate_with(self._weapon_unit:rotation())
 	self._screenshot_ws = gui:create_world_workspace(500, 500, self._weapon_unit:position() - pos_offset, offset_x, offset_y)
 	self._screenshot_ws:panel():rect({
 		name = "bg",
-		color = Color(0, 1, 0)
+		color = Color(0, 1, 0),
+		layer = 20000
 	})
+	self._screenshot_ws:set_billboard(Workspace.BILLBOARD_BOTH)
 	self:hide_screenshot_bg()
 end
 

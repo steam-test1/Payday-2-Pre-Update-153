@@ -471,7 +471,7 @@ function EconomyTweakData:init()
 	self.safes.weapon_01.market_link = "https://steamcommunity.com/market/listings/218620/Sputnik%20Safe"
 	self.safes.event_red = {}
 	self.safes.event_red.def_id = 50003
-	self.safes.event_red.promo = true
+	self.safes.event_red.free = true
 	self.safes.event_red.drill = "event_red"
 	self.safes.event_red.content = "event_red"
 	self.safes.event_red.unit_name = "units/payday2_cash/safes/red/safe/eco_safe_event_red"
@@ -480,7 +480,7 @@ function EconomyTweakData:init()
 	self.safes.event_red.achievement = "green_7"
 	self.safes.event_dinner = {}
 	self.safes.event_dinner.def_id = 50004
-	self.safes.event_dinner.promo = true
+	self.safes.event_dinner.free = true
 	self.safes.event_dinner.drill = "event_dinner"
 	self.safes.event_dinner.content = "event_dinner"
 	self.safes.event_dinner.unit_name = "units/payday2_cash/safes/dinner/safe/eco_safe_event_dinner"
@@ -503,7 +503,7 @@ function EconomyTweakData:init()
 	self.safes.surf_01.market_link = "https://steamcommunity.com/market/listings/218620/Bodhi%20Safe"
 	self.safes.event_flake = {}
 	self.safes.event_flake.def_id = 50007
-	self.safes.event_flake.promo = true
+	self.safes.event_flake.free = true
 	self.safes.event_flake.drill = "event_flake"
 	self.safes.event_flake.content = "event_flake"
 	self.safes.event_flake.name_id = "bm_menu_safe_event_flake"
@@ -512,7 +512,7 @@ function EconomyTweakData:init()
 	self.safes.event_flake.achievement = "flake_1"
 	self.safes.event_bah = {}
 	self.safes.event_bah.def_id = 50008
-	self.safes.event_bah.promo = true
+	self.safes.event_bah.free = true
 	self.safes.event_bah.drill = "event_bah"
 	self.safes.event_bah.content = "event_bah"
 	self.safes.event_bah.unit_name = "units/payday2_cash/safes/bah/safe/eco_safe_bah"

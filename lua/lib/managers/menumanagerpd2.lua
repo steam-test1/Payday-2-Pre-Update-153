@@ -1092,7 +1092,7 @@ function MenuInitiatorBase:create_item(node, params)
 	return new_item
 end
 
-function MenuInitiatorBase:create_multichoice(node, choices, params)
+function MenuInitiatorBase:create_multichoice(node, choices, params, index)
 	if #choices == 0 then
 		return
 	end
@@ -1104,7 +1104,11 @@ function MenuInitiatorBase:create_multichoice(node, choices, params)
 	end
 	local new_item = node:create_item(data_node, params)
 	new_item:set_value(choices[1].value)
-	node:add_item(new_item)
+	if index then
+		node:insert_item(new_item, index)
+	else
+		node:add_item(new_item)
+	end
 	return new_item
 end
 
@@ -1938,12 +1942,13 @@ function MenuSkinEditorInitiator:modify_node(node, data)
 				})
 			end
 		end
+		local item_index = table.index_of(node:items(), node:item("divider_publish"))
 		local screenshot_item = self:create_multichoice(node, multichoice_list, {
 			text_offset = 50,
 			callback = "screenshot_chosen",
 			text_id = "debug_wskn_screenshot_skin",
 			name = "screenshot"
-		})
+		}, item_index)
 		screenshot_item:set_value(nil)
 	end
 	if not node:item("divider_end") then
