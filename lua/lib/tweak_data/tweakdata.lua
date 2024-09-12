@@ -2261,6 +2261,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = easywish_and_above,
 			job = "cane"
 		},
+		easywish_flat = {
+			award = "pick_55",
+			difficulty = easywish_and_above,
+			job = "flat"
+		},
 		easywish_mad = {
 			award = "pick_56",
 			difficulty = easywish_and_above,
@@ -2533,6 +2538,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = deathwish_and_above,
 			job = "cane"
 		},
+		death_flat = {
+			award = "flat_1",
+			difficulty = deathwish_and_above,
+			job = "flat"
+		},
 		death_mad = {
 			award = "mad_1",
 			difficulty = deathwish_and_above,
@@ -2799,6 +2809,11 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "axe_54",
 			difficulty = sm_wish_and_above,
 			job = "cane"
+		},
+		sm_wish_flat = {
+			award = "axe_55",
+			difficulty = sm_wish_and_above,
+			job = "flat"
 		},
 		sm_wish_mad = {
 			award = "axe_56",
@@ -3449,6 +3464,7 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "daily_classics",
 			jobs = {
 				"red2",
+				"flat",
 				"dinner",
 				"pal",
 				"man"
@@ -3571,6 +3587,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = overkill_and_above,
 			level_id = "pbr",
 			is_dropin = false
+		},
+		flat_5 = {
+			award = "flat_5",
+			total_accuracy = 200,
+			level_id = "flat"
 		},
 		daily_professional = {
 			trophy_stat = "daily_professional",
@@ -3721,7 +3742,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"red2",
 		"dinner",
 		"pal",
-		"man"
+		"man",
+		"flat"
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
@@ -4458,6 +4480,9 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_44"},
 		{track = "track_45", lock = "born"},
 		{track = "track_46", lock = "born"},
+		{
+			track = "track_47_gen"
+		},
 		{
 			track = "track_32_lcv"
 		},

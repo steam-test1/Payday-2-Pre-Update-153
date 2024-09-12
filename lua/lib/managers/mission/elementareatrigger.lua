@@ -181,6 +181,7 @@ function ElementAreaTrigger:project_instigators()
 					"weapon_scar",
 					"bike_part_light",
 					"bike_part_heavy",
+					"toothbrush",
 					"drone_control_helmet",
 					"chl_puck"
 				}

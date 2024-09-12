@@ -183,7 +183,9 @@ function MissionManager:init(...)
 		"player_revive_ai",
 		"player_in_custody",
 		"ai_in_custody",
-		"turret_destroyed"
+		"turret_destroyed",
+		"pku_toothbrush",
+		"tripmine_exploded"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

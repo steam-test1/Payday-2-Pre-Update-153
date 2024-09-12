@@ -3736,4 +3736,11 @@ function InteractionTweakData:init(tweak_data)
 			self[id].text_id = "hud_int_talk_" .. name
 		end
 	end
+	self.pku_toothbrush = {}
+	self.pku_toothbrush.text_id = "hud_int_hold_take_toothbrush"
+	self.pku_toothbrush.action_text_id = "hud_action_taking_toothbrush"
+	self.pku_toothbrush.timer = 3
+	self.pku_toothbrush.interact_distance = 130
+	self.pku_toothbrush.start_active = false
+	self.pku_toothbrush.blocked_hint = "carry_block"
 end

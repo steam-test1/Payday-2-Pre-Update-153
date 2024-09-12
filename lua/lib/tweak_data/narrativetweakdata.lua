@@ -4050,6 +4050,66 @@ function NarrativeTweakData:init(tweak_data)
 		to = chill_combat_marker_dot_color_to,
 		speed = 10
 	}
+	self.jobs.flat = {}
+	self.jobs.flat.name_id = "heist_flat"
+	self.jobs.flat.briefing_id = "heist_flat_crimenet"
+	self.jobs.flat.contact = "classic"
+	self.jobs.flat.region = "street"
+	self.jobs.flat.jc = 30
+	self.jobs.flat.chain = {
+		{
+			level_id = "flat",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.flat.briefing_event = "pln_flt_cbf_01"
+	self.jobs.flat.debrief_event = nil
+	self.jobs.flat.crimenet_callouts = {
+		"pln_flt_cnc_01"
+	}
+	self.jobs.flat.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.flat.payout = {
+		118000,
+		236000,
+		826000,
+		1180000,
+		1357000,
+		1534000,
+		1652000
+	}
+	self.jobs.flat.contract_cost = {
+		70000,
+		150000,
+		350307,
+		700000,
+		900000,
+		900000,
+		900000
+	}
+	self.jobs.flat.contract_visuals = {}
+	self.jobs.flat.contract_visuals.min_mission_xp = {
+		25000,
+		25000,
+		25000,
+		25000,
+		25000,
+		25000,
+		25000
+	}
+	self.jobs.flat.contract_visuals.max_mission_xp = {
+		30500,
+		30500,
+		30500,
+		30500,
+		30500,
+		30500,
+		30500
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4108,7 +4168,8 @@ function NarrativeTweakData:init(tweak_data)
 		"dark",
 		"born",
 		"chill",
-		"chill_combat"
+		"chill_combat",
+		"flat"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

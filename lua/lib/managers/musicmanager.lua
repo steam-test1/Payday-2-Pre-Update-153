@@ -322,7 +322,8 @@ function MusicManager:jukebox_default_tracks()
 		heist_pal = "all",
 		heist_mad = "track_44",
 		heist_born1 = "all",
-		heist_born2 = "all"
+		heist_born2 = "all",
+		heist_flat = "track_47_gen"
 	}
 	if managers.dlc:has_dlc_or_soundtrack_or_cce("armored_transport") then
 		default_options.heist_arm_cro = "track_09"

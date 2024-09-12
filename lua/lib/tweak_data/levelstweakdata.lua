@@ -1343,6 +1343,19 @@ function LevelsTweakData:init()
 	self.chill_combat.is_safehouse = false
 	self.chill_combat.is_safehouse_combat = true
 	self.chill_combat.disable_mutators = true
+	self.flat = {}
+	self.flat.name_id = "heist_flat_hl"
+	self.flat.briefing_id = "heist_flat_hl_briefing"
+	self.flat.briefing_dialog = "Play_pln_flt_brf_01"
+	self.flat.world_name = "narratives/classics/flat"
+	self.flat.intro_event = "Play_pln_flt_intro_01"
+	self.flat.outro_event = "Play_pln_flt_50"
+	self.flat.package = "packages/narr_flat"
+	self.flat.cube = "cube_apply_heist_bank"
+	self.flat.max_bags = 8
+	self.flat.music_overrides = {
+		track_47_gen = "track_47_flat"
+	}
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1428,7 +1441,8 @@ function LevelsTweakData:init()
 		"born",
 		"chew",
 		"chill",
-		"chill_combat"
+		"chill_combat",
+		"flat"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

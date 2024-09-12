@@ -1044,6 +1044,16 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		},
 		image_id = "safehouse_trophies_preview_barbwire"
 	})
+	table.insert(self.trophies, {
+		id = "trophy_tooth",
+		name_id = "trophy_tooth",
+		desc_id = "trophy_tooth_desc",
+		objective_id = "trophy_tooth_objective",
+		objectives = {
+			self:_achievement("flat_3")
+		},
+		image_id = "safehouse_trophies_preview_toothbrush"
+	})
 end
 
 function CustomSafehouseTweakData:get_trophy_data(id)

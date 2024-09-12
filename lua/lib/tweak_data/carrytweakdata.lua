@@ -556,6 +556,13 @@ function CarryTweakData:init(tweak_data)
 	self.chl_puck.skip_exit_secure = true
 	self.chl_puck.unit = "units/payday2/pickups/gen_pku_toolbag/gen_pku_toolbag"
 	self.chl_puck.visual_unit_name = "units/payday2/characters/npc_acc_tools_bag_1/npc_acc_tools_bag_1"
+	self.toothbrush = {}
+	self.toothbrush.type = "heavy"
+	self.toothbrush.name_id = "hud_carry_giant_toothbrush"
+	self.toothbrush.bag_value = "toothbrush"
+	self.toothbrush.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.toothbrush.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.toothbrush.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

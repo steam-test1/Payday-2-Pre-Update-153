@@ -2822,9 +2822,9 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.19
 			},
 			tac_swat_rifle = {
-				0.19,
-				0.19,
-				0.19
+				0.2,
+				0.2,
+				0.2
 			},
 			tac_swat_rifle_flank = {
 				0.19,
@@ -2857,14 +2857,14 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.045
 			},
 			FBI_spoocs = {
-				0.005,
-				0.005,
-				0.005
+				0.02,
+				0.02,
+				0.02
 			},
 			tac_bull_rush = {
-				0.01,
-				0.01,
-				0.01
+				0.04,
+				0.04,
+				0.04
 			}
 		}
 	elseif difficulty_index == 5 then
@@ -2880,9 +2880,9 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.19
 			},
 			tac_swat_rifle = {
-				0.19,
-				0.19,
-				0.19
+				0.2,
+				0.2,
+				0.2
 			},
 			tac_swat_rifle_flank = {
 				0.19,
@@ -2915,14 +2915,14 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.045
 			},
 			FBI_spoocs = {
-				0.005,
-				0.005,
-				0.005
+				0.02,
+				0.02,
+				0.02
 			},
 			tac_bull_rush = {
-				0.01,
-				0.01,
-				0.01
+				0.04,
+				0.04,
+				0.04
 			}
 		}
 	elseif difficulty_index == 6 then
@@ -2973,14 +2973,14 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.05
 			},
 			FBI_spoocs = {
-				0.005,
-				0.005,
-				0.005
+				0.03,
+				0.03,
+				0.03
 			},
 			tac_bull_rush = {
-				0.015,
-				0.015,
-				0.015
+				0.05,
+				0.05,
+				0.05
 			}
 		}
 	elseif difficulty_index == 7 then
@@ -3031,14 +3031,14 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 				0.05
 			},
 			FBI_spoocs = {
-				0.005,
-				0.005,
-				0.005
+				0.03,
+				0.03,
+				0.03
 			},
 			tac_bull_rush = {
-				0.015,
-				0.015,
-				0.015
+				0.05,
+				0.05,
+				0.05
 			}
 		}
 	elseif difficulty_index == 8 then

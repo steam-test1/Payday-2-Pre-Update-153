@@ -267,7 +267,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"pal",
 		"mad",
 		"born",
-		"chew"
+		"chew",
+		"flat"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -303,7 +304,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"pal",
 		"mad",
 		"born",
-		"chew"
+		"chew",
+		"flat"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -336,7 +338,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"pal",
 		"mad",
 		"born",
-		"chew"
+		"chew",
+		"flat"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -1032,6 +1035,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.sniper_spot_born.unlock_desc_id = "menu_asset_sniper_spot_born_desc"
 	self.sniper_spot_born.no_mystery = true
 	self.sniper_spot_born.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 7)
+	self.flat_chavez = {}
+	self.flat_chavez.name_id = "menu_asset_flat_chavez"
+	self.flat_chavez.texture = "guis/dlcs/flat/textures/pd2/mission_briefing/assets/flat_chavez"
+	self.flat_chavez.stages = {"flat"}
+	self.flat_panic_room_blueprint = {}
+	self.flat_panic_room_blueprint.name_id = "menu_asset_flat_panic_room_blueprint"
+	self.flat_panic_room_blueprint.texture = "guis/dlcs/flat/textures/pd2/mission_briefing/assets/flat_panic_room_blueprint"
+	self.flat_panic_room_blueprint.stages = {"flat"}
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

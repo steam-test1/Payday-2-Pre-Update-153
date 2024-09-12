@@ -186,6 +186,7 @@ action_variants.inside_man = security_variant
 action_variants.medic = clone(security_variant)
 action_variants.medic.heal = MedicActionHeal
 action_variants.biker_boss = security_variant
+action_variants.chavez_boss = security_variant
 action_variants.cop_scared = security_variant
 action_variants.security_undominatable = security_variant
 action_variants.civilian = {

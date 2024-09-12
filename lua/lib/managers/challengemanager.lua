@@ -495,10 +495,11 @@ function ChallengeManager:mission_set_value(variable, activated)
 end
 
 function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
-	local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters, pass_detection, pass_perk_deck, pass_grenade
+	local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters, pass_detection, pass_perk_deck, pass_grenade, pass_single_deployable
 	local ad = equip_data
 	local num_skills
 	pass_deployable = not ad.deployable or ad.deployable == outfit.deployable
+	pass_single_deployable = not ad.single_deployable or not outfit.secondary_deployable or outfit.secondary_deployable == "nil"
 	pass_armor = not ad.armor or ad.armor == outfit.armor and ad.armor == outfit.armor_current
 	pass_armors = not ad.armors or table.contains(ad.armors, outfit.armor) and table.contains(ad.armors, outfit.armor_current)
 	pass_mask = not ad.mask or ad.mask == outfit.mask.mask_id
@@ -534,7 +535,7 @@ function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
 	else
 		pass_detection = true
 	end
-	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade and pass_perk_deck
+	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade and pass_perk_deck and pass_single_deployable
 end
 
 function ChallengeManager:check_equipped_team(achievement_data)

@@ -8716,8 +8716,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rpg7.use_data.selection_index = 1
 	self.rpg7.use_data.align_place = "right_hand"
 	self.rpg7.DAMAGE = 6
-	self.rpg7.damage_near = 1000
-	self.rpg7.damage_far = 2000
+	self.rpg7.damage_near = 2000
+	self.rpg7.damage_far = 3000
 	self.rpg7.rays = 6
 	self.rpg7.CLIP_AMMO_MAX = 1
 	self.rpg7.NR_CLIPS_MAX = 4
