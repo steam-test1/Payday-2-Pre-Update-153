@@ -64,6 +64,10 @@ function CustomSafehouseGuiPageMap:init(page_id, page_panel, fullscreen_panel, g
 	self:_setup_help_text()
 end
 
+function CustomSafehouseGuiPageMap:is_being_raided()
+	return managers.custom_safehouse:is_being_raided()
+end
+
 function CustomSafehouseGuiPageMap:_setup_map()
 	self._scanline = self:panel():bitmap({
 		name = "scanline",
@@ -208,6 +212,52 @@ function CustomSafehouseGuiPageMap:_setup_map()
 	self._floor_control_panel:set_h(title:h() + button_panel:h() + PANEL_PADDING)
 	self._floor_control_panel:set_left(PANEL_PADDING)
 	self._floor_control_panel:set_bottom(self._panel:h() - PANEL_PADDING)
+	if self:is_being_raided() then
+		local raid_panel = self:panel():panel({})
+		local raid_layer = 50
+		self._raid_colour_panel = raid_panel:rect({
+			color = Color(255, 196, 0, 0) / 255,
+			alpha = 0.4,
+			layer = raid_layer
+		})
+		raid_panel:rect({
+			color = Color.black,
+			alpha = 0.4,
+			layer = raid_layer + 1
+		})
+		local title_size = large_font_size * 0.8
+		local title = raid_panel:text({
+			name = "raid_title",
+			text = managers.localization:to_upper_text("menu_chill_combat_under_attack"),
+			y = self:panel():h() * 0.4 - title_size,
+			w = self:panel():w(),
+			h = large_font_size,
+			font = large_font,
+			font_size = title_size,
+			align = "center",
+			layer = raid_layer + 10
+		})
+		raid_panel:rect({
+			color = Color.black,
+			alpha = 0.4,
+			layer = raid_layer + 9,
+			h = large_font_size,
+			y = title:top() - large_font_size * 0.15
+		})
+		local text = raid_panel:text({
+			name = "raid_desc",
+			text = managers.localization:text("menu_chill_combat_under_attack_desc"),
+			y = self:panel():h() * 0.4 + PANEL_PADDING,
+			w = self:panel():w(),
+			h = medium_font_size * 3,
+			font = medium_font,
+			font_size = medium_font_size,
+			align = "center",
+			layer = raid_layer + 10
+		})
+		local new_button = CustomSafehouseGuiRaidButton:new(raid_panel, raid_layer + 10, text:bottom() + PANEL_PADDING * 2, callback(self, self, "defend_safehouse"))
+		table.insert(self._buttons, new_button)
+	end
 	BoxGuiObject:new(self._floor_control_panel, {
 		sides = {
 			1,
@@ -314,12 +364,21 @@ function CustomSafehouseGuiPageMap:_setup_info_panel()
 	end
 	local show_play_safehouse_btn = Global.game_settings.single_player or Network:is_server() or not managers.network:session()
 	if show_play_safehouse_btn then
-		table.insert(buttons, {
-			btn = "BTN_X",
-			pc_btn = "menu_remove_item",
-			name_id = "menu_cs_enter_safehouse",
-			callback = callback(self, self, "go_to_safehouse")
-		})
+		if managers.custom_safehouse:is_being_raided() then
+			table.insert(buttons, {
+				btn = "BTN_X",
+				pc_btn = "menu_remove_item",
+				name_id = "menu_cn_chill_combat_defend",
+				callback = callback(self, self, "defend_safehouse")
+			})
+		else
+			table.insert(buttons, {
+				btn = "BTN_X",
+				pc_btn = "menu_remove_item",
+				name_id = "menu_cs_enter_safehouse",
+				callback = callback(self, self, "go_to_safehouse")
+			})
+		end
 	end
 	local remaining_height = self:info_panel():h()
 	
@@ -550,6 +609,10 @@ function CustomSafehouseGuiPageMap:go_to_safehouse(params)
 	no_button.text = managers.localization:text("dialog_no")
 	dialog_data.button_list = {yes_button, no_button}
 	managers.system_menu:show(dialog_data)
+end
+
+function CustomSafehouseGuiPage:defend_safehouse()
+	managers.menu:open_node("crimenet_contract_chill")
 end
 
 function CustomSafehouseGuiPageMap:_setup_help_text()
@@ -905,6 +968,11 @@ function CustomSafehouseGuiPageMap:update(t, dt)
 		end
 	end
 	self._one_frame_input_delay = false
+	if alive(self._raid_colour_panel) then
+		local ct = (math.sin(t * 200) + 1) * 0.5
+		local color = math.lerp(Color(255, 128, 0, 0) / 255, Color(255, 0, 0, 128) / 255, ct)
+		self._raid_colour_panel:set_color(color)
+	end
 	self:current_floor():set_zoom_value(self._map_zoom)
 end
 
@@ -942,6 +1010,9 @@ function CustomSafehouseGuiPageMap:mouse_moved(o, x, y)
 		end
 	end
 	if not self:panel():inside(x, y) then
+		return used, pointer
+	end
+	if self:is_being_raided() then
 		return used, pointer
 	end
 	for i, button in ipairs(self._floor_control_buttons) do
@@ -993,6 +1064,9 @@ function CustomSafehouseGuiPageMap:mouse_pressed(button, x, y)
 		end
 	end
 	if not self:panel():inside(x, y) then
+		return ret
+	end
+	if self:is_being_raided() then
 		return ret
 	end
 	for i, button in ipairs(self._floor_control_buttons) do
@@ -1563,4 +1637,89 @@ end
 function CustomSafehouseMapPoint:set_zoom_value(zoom, alpha_limit)
 	self._alpha = math.clamp((zoom - alpha_limit) * 10, 0, 1)
 	self._title:set_alpha(self._alpha)
+end
+
+CustomSafehouseGuiRaidButton = CustomSafehouseGuiRaidButton or class(CustomSafehouseGuiItem)
+
+function CustomSafehouseGuiRaidButton:init(panel, layer, y, callback)
+	CustomSafehouseGuiRaidButton.super.init(self)
+	self._color = tweak_data.screen_colors.button_stage_3
+	self._selected_color = tweak_data.screen_colors.button_stage_2
+	self._callback = callback
+	self._panel = panel:panel({
+		h = medium_font_size + 8,
+		y = y,
+		layer = layer
+	})
+	self._background_panel = self._panel:rect({
+		color = Color.black,
+		alpha = 0.4
+	})
+	self._text = self._panel:text({
+		name = "defend_text",
+		text = managers.localization:to_upper_text("menu_cn_chill_combat_defend"),
+		y = 4,
+		w = panel:w(),
+		h = medium_font_size,
+		font = medium_font,
+		font_size = medium_font_size,
+		color = self._color,
+		align = "center",
+		layer = 10
+	})
+end
+
+function CustomSafehouseGuiRaidButton:set_text(text)
+	self._text:set_text(utf8.to_upper(text))
+	local _, _, w, h = self._text:text_rect()
+	self._text:set_h(h)
+	self._background_panel:set_h(h)
+end
+
+function CustomSafehouseGuiRaidButton:text()
+	return self._text:text()
+end
+
+function CustomSafehouseGuiRaidButton:inside(x, y)
+	return self._background_panel:inside(x, y)
+end
+
+function CustomSafehouseGuiRaidButton:show()
+	self:set_selected(true, true)
+end
+
+function CustomSafehouseGuiRaidButton:hide()
+	self:set_selected(false)
+end
+
+function CustomSafehouseGuiRaidButton:visible()
+	return self._panel:visible()
+end
+
+function CustomSafehouseGuiRaidButton:refresh()
+	if self._selected then
+		self:show()
+	else
+		self:hide()
+	end
+end
+
+function CustomSafehouseGuiRaidButton:trigger()
+	CustomSafehouseGuiRaidButton.super.trigger(self)
+	self._callback()
+end
+
+function CustomSafehouseGuiRaidButton:set_color(color, selected_color)
+	self._color = color or self._color
+	self._selected_color = selected_color or color or self._selected_color
+	self:set_selected(self._selected, false)
+end
+
+function CustomSafehouseGuiRaidButton:set_selected(selected, play_sound)
+	CustomSafehouseGuiRaidButton.super.set_selected(self, selected, play_sound)
+	if selected then
+		self._text:set_color(self._selected_color)
+	else
+		self._text:set_color(self._color)
+	end
 end

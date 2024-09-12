@@ -2117,7 +2117,7 @@ function CrimeNetGui:add_special_contract(special_contract, no_casino, no_quickp
 					end)
 				end
 			end
-			gui_data.glow_panel:animate(animate_pulse)
+			gui_data.glow_panel:animate(special_contract.pulse_func or animate_pulse)
 			gui_data.pulse = special_contract.pulse and 21
 		end
 		self._jobs[id] = gui_data
@@ -2515,6 +2515,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		alpha = 0
 	})
 	local glow_center = glow_panel:bitmap({
+		name = "glow_center",
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 192,
 		h = 192,
@@ -2523,6 +2524,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		color = data.pulse_color or is_professional and pro_color or regular_color
 	})
 	local glow_stretch = glow_panel:bitmap({
+		name = "glow_stretch",
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 960,
 		h = 75,
@@ -2531,6 +2533,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		color = data.pulse_color or is_professional and pro_color or regular_color
 	})
 	local glow_center_dark = glow_panel:bitmap({
+		name = "glow_center_dark",
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 175,
 		h = 175,
@@ -2540,6 +2543,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		layer = -1
 	})
 	local glow_stretch_dark = glow_panel:bitmap({
+		name = "glow_stretch_dark",
 		texture = "guis/textures/pd2/crimenet_marker_glow",
 		w = 990,
 		h = 75,
@@ -2775,6 +2779,10 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	}
 	self:update_job_gui(job, 3)
 	return job
+end
+
+function CrimeNetGui:does_job_exist(id)
+	return self._jobs and self._jobs[id] ~= nil
 end
 
 function CrimeNetGui:remove_job(id, instant)

@@ -1335,7 +1335,7 @@ function LevelsTweakData:init()
 	self.chill_combat.max_bags = 28
 	self.chill_combat.team_ai_off = false
 	self.chill_combat.group_ai_state = "safehouse"
-	self.chill_combat.is_safehouse = true
+	self.chill_combat.is_safehouse = false
 	self.chill_combat.is_safehouse_combat = true
 	self._level_index = {
 		"welcome_to_the_jungle_1",

@@ -5182,6 +5182,12 @@ function MenuCallbackHandler:play_chill_combat(item)
 	end
 end
 
+function MenuCallbackHandler:ignore_chill_combat(item)
+	item:parameters().gui_node:remove_blur()
+	managers.custom_safehouse:ignore_raid()
+	managers.menu:back()
+end
+
 function MenuCallbackHandler:_on_chill_change_difficulty(item)
 	item:parameters().gui_node:set_difficulty(item._options[item._current_index]:value())
 end
@@ -5242,9 +5248,18 @@ function MenuCrimeNetContactChillInitiator:modify_node(original_node, data)
 	node:add_item(new_item)
 	params = {
 		name = "CustomSafeHouseDefendBtn",
-		text_id = managers.localization:to_upper_text("menu_cn_chill_combat_defend"),
-		localize = false,
+		text_id = "menu_cn_chill_combat_defend",
 		callback = "play_chill_combat",
+		align = "left"
+	}
+	data_node = {}
+	new_item = node:create_item(data_node, params)
+	new_item:set_enabled(true)
+	node:add_item(new_item)
+	params = {
+		name = "CustomSafeHouseIgnoreBtn",
+		text_id = "menu_cn_chill_combat_ignore_defend",
+		callback = "ignore_chill_combat",
 		align = "left"
 	}
 	data_node = {}

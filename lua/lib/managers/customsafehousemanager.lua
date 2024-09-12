@@ -1,6 +1,8 @@
+local one_day_seconds = 86400
 CustomSafehouseManager = CustomSafehouseManager or class()
 CustomSafehouseManager.SAVE_DATA_VERSION = 2
-CustomSafehouseManager.SPAWN_COOLDOWN = 259200
+CustomSafehouseManager.SPAWN_COOLDOWN = one_day_seconds * 3
+CustomSafehouseManager.IGNORE_SPAWN_COOLDOWN = one_day_seconds * 0.5
 CustomSafehouseManager.SERVER_TICK = 256
 
 function CustomSafehouseManager:init()
@@ -699,18 +701,21 @@ function CustomSafehouseManager:_on_heist_completed(job_id)
 	end
 end
 
+function CustomSafehouseManager:is_being_raided()
+	local server_time = self:_get_server_time() or 0
+	return server_time - (self._global._spawn_cooldown or 0) >= self.SPAWN_COOLDOWN
+end
+
 function CustomSafehouseManager:tick_safehouse_spawn()
+	self:spawn_safehouse_contract()
 	if not self._global._spawn_cooldown then
 		if self._global._has_entered_safehouse then
 			self._global._spawn_cooldown = 1
 		end
 	elseif self._global._spawn_cooldown == 0 then
 		self:_set_safehouse_cooldown()
-	else
-		local server_time = self:_get_server_time()
-		if server_time - self._global._spawn_cooldown >= self.SPAWN_COOLDOWN then
-			self:spawn_safehouse_contract()
-		end
+	elseif self:is_being_raided() then
+		self:spawn_safehouse_combat_contract()
 	end
 end
 
@@ -722,6 +727,12 @@ function CustomSafehouseManager:_set_safehouse_cooldown()
 	self._global._spawn_cooldown = Steam:server_time()
 end
 
+function CustomSafehouseManager:ignore_raid()
+	self:remove_combat_contract()
+	self:spawn_safehouse_contract()
+	self._global._spawn_cooldown = Steam:server_time() - (self.SPAWN_COOLDOWN - self.IGNORE_SPAWN_COOLDOWN)
+end
+
 function CustomSafehouseManager:_get_server_time()
 	self._tick = self._tick and self._tick + 1 or 0
 	if self._tick % self.SERVER_TICK == 0 then
@@ -731,6 +742,28 @@ function CustomSafehouseManager:_get_server_time()
 end
 
 function CustomSafehouseManager:spawn_safehouse_contract()
+	if self._has_spawned_safehouse_contract or managers.menu_component._crimenet_gui and managers.menu_component._crimenet_gui:does_job_exist("safehouse") then
+		return
+	end
+	local contract_data = {
+		id = "safehouse",
+		name_id = "menu_cn_chill",
+		desc_id = "menu_cn_chill_desc",
+		menu_node = "custom_safehouse",
+		x = 362,
+		y = 696,
+		icon = "guis/dlcs/chill/textures/pd2/safehouse/crimenet_marker_safehouse",
+		pulse = true,
+		pulse_level = 10,
+		pulse_color = Color(204, 255, 209, 32) / 255
+	}
+	if managers.menu_component._crimenet_gui then
+		managers.menu_component._crimenet_gui:remove_job("safehouse_combat", true)
+		managers.menu_component._crimenet_gui:add_special_contract(contract_data)
+	end
+end
+
+function CustomSafehouseManager:spawn_safehouse_combat_contract()
 	if self._has_spawned_safehouse_contract or not self._global._has_entered_safehouse then
 		return
 	end
@@ -750,6 +783,13 @@ function CustomSafehouseManager:spawn_safehouse_contract()
 		managers.menu_component._crimenet_gui:add_special_contract(contract_data)
 		managers.menu_component._crimenet_gui:remove_job("safehouse", true)
 		self._has_spawned_safehouse_contract = true
+	end
+end
+
+function CustomSafehouseManager:remove_combat_contract()
+	if managers.menu_component._crimenet_gui then
+		managers.menu_component._crimenet_gui:remove_job("safehouse_combat", true)
+		self._has_spawned_safehouse_contract = false
 	end
 end
 

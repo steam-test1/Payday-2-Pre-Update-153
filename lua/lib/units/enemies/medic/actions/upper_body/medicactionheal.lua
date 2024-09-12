@@ -17,6 +17,9 @@ function MedicActionHeal:init(action_desc, common_data)
 end
 
 function MedicActionHeal:on_exit()
+	if self._unit:contour() then
+		self._unit:contour():remove("medic_healing", true)
+	end
 end
 
 function MedicActionHeal:update(t)

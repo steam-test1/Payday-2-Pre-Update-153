@@ -2818,3 +2818,17 @@ function UnitNetworkHandler:sync_damage_achievements(unit, weapon_unit, attacker
 		unit:character_damage():client_check_damage_achievements(weapon_unit, attacker_unit, distance, damage, head_shot)
 	end
 end
+
+function UnitNetworkHandler:sync_medic_heal(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if alive(unit) and unit:movement() then
+		local action_data = {
+			type = "heal",
+			body_part = 3,
+			client_interrupt = Network:is_client()
+		}
+		unit:movement():action_request(action_data)
+	end
+end

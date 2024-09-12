@@ -380,23 +380,31 @@ function CopDamage:damage_bullet(attack_data)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
 	if damage >= self._health then
-		if head then
-			managers.player:on_lethal_headshot_dealt()
-			if damage > math.random(10) then
-				self:_spawn_head_gadget({
-					position = attack_data.col_ray.body:position(),
-					rotation = attack_data.col_ray.body:rotation(),
-					dir = attack_data.col_ray.ray
-				})
+		local medic = managers.enemy:get_nearby_medic(self._unit)
+		if medic and medic:character_damage():heal_unit(self._unit) then
+			result = {
+				type = "healed",
+				variant = attack_data.variant
+			}
+		else
+			if head then
+				managers.player:on_lethal_headshot_dealt()
+				if damage > math.random(10) then
+					self:_spawn_head_gadget({
+						position = attack_data.col_ray.body:position(),
+						rotation = attack_data.col_ray.body:rotation(),
+						dir = attack_data.col_ray.ray
+					})
+				end
 			end
+			attack_data.damage = self._health
+			result = {
+				type = "death",
+				variant = attack_data.variant
+			}
+			self:die(attack_data)
+			self:chk_killshot(attack_data.attacker_unit, "bullet", headshot)
 		end
-		attack_data.damage = self._health
-		result = {
-			type = "death",
-			variant = attack_data.variant
-		}
-		self:die(attack_data)
-		self:chk_killshot(attack_data.attacker_unit, "bullet", headshot)
 	else
 		attack_data.damage = damage
 		local result_type = not self._char_tweak.immune_to_knock_down and (attack_data.knock_down and "knock_down" or not (not attack_data.stagger or self._has_been_staggered) and "stagger") or self:get_damage_type(damage_percent, "bullet")
@@ -474,6 +482,8 @@ function CopDamage:damage_bullet(attack_data)
 	elseif result.type == "stagger" then
 		variant = 2
 		self._has_been_staggered = true
+	elseif result.type == "healed" then
+		variant = 3
 	else
 		variant = 0
 	end
@@ -700,13 +710,21 @@ function CopDamage:damage_fire(attack_data)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
 	if damage >= self._health then
-		attack_data.damage = self._health
-		result = {
-			type = "death",
-			variant = attack_data.variant
-		}
-		self:die(attack_data)
-		self:chk_killshot(attack_data.attacker_unit, "fire")
+		local medic = managers.enemy:get_nearby_medic(self._unit)
+		if medic and medic:character_damage():heal_unit(self._unit) then
+			result = {
+				type = "healed",
+				variant = attack_data.variant
+			}
+		else
+			attack_data.damage = self._health
+			result = {
+				type = "death",
+				variant = attack_data.variant
+			}
+			self:die(attack_data)
+			self:chk_killshot(attack_data.attacker_unit, "fire")
+		end
 	else
 		attack_data.damage = damage
 		local result_type = attack_data.variant == "stun" and "hurt_sick" or self:get_damage_type(damage_percent, "fire")
@@ -839,13 +857,22 @@ function CopDamage:damage_dot(attack_data)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
 	if damage >= self._health then
-		attack_data.damage = self._health
-		result = {
-			type = "death",
-			variant = attack_data.variant
-		}
-		self:die(attack_data)
-		self:chk_killshot(attack_data.attacker_unit, attack_data.variant or "dot")
+		local medic = managers.enemy:get_nearby_medic(self._unit)
+		if medic and medic:character_damage():heal_unit(self._unit) then
+			attack_data.variant = "healed"
+			result = {
+				type = "healed",
+				variant = attack_data.variant
+			}
+		else
+			attack_data.damage = self._health
+			result = {
+				type = "death",
+				variant = attack_data.variant
+			}
+			self:die(attack_data)
+			self:chk_killshot(attack_data.attacker_unit, attack_data.variant or "dot")
+		end
 	else
 		attack_data.damage = damage
 		local result_type = attack_data.hurt_animation and self:get_damage_type(damage_percent, attack_data.variant) or "dmg_rcv"
@@ -923,12 +950,21 @@ function CopDamage:damage_explosion(attack_data)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
 	if damage >= self._health then
-		attack_data.damage = self._health
-		result = {
-			type = "death",
-			variant = attack_data.variant
-		}
-		self:die(attack_data)
+		local medic = managers.enemy:get_nearby_medic(self._unit)
+		if medic and medic:character_damage():heal_unit(self._unit) then
+			attack_data.variant = "healed"
+			result = {
+				type = "healed",
+				variant = attack_data.variant
+			}
+		else
+			attack_data.damage = self._health
+			result = {
+				type = "death",
+				variant = attack_data.variant
+			}
+			self:die(attack_data)
+		end
 	else
 		attack_data.damage = damage
 		local result_type = attack_data.variant == "stun" and "hurt_sick" or self:get_damage_type(damage_percent, "explosion")
@@ -1213,14 +1249,22 @@ function CopDamage:damage_melee(attack_data)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
 	if damage >= self._health then
-		damage_effect_percent = 1
-		attack_data.damage = self._health
-		result = {
-			type = "death",
-			variant = attack_data.variant
-		}
-		self:die(attack_data)
-		self:chk_killshot(attack_data.attacker_unit, "melee")
+		local medic = managers.enemy:get_nearby_medic(self._unit)
+		if medic and medic:character_damage():heal_unit(self._unit) then
+			result = {
+				type = "healed",
+				variant = attack_data.variant
+			}
+		else
+			damage_effect_percent = 1
+			attack_data.damage = self._health
+			result = {
+				type = "death",
+				variant = attack_data.variant
+			}
+			self:die(attack_data)
+			self:chk_killshot(attack_data.attacker_unit, "melee")
+		end
 	else
 		attack_data.damage = damage
 		damage_effect = math.clamp(damage_effect, self._HEALTH_INIT_PRECENT, self._HEALTH_INIT)
@@ -1341,6 +1385,8 @@ function CopDamage:damage_melee(attack_data)
 		variant = 5
 	elseif dismember_victim then
 		variant = 6
+	elseif result.type == "healed" then
+		variant = 7
 	else
 		variant = 0
 	end
@@ -1630,6 +1676,9 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 		end
 	else
 		local result_type = variant == 1 and "knock_down" or variant == 2 and "stagger" or self:get_damage_type(damage_percent, "bullet")
+		if variant == 3 then
+			result_type = "healed"
+		end
 		result = {type = result_type, variant = "bullet"}
 		if result_type ~= "healed" then
 			self:_apply_damage_to_health(damage)
@@ -1813,6 +1862,9 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dan
 		managers.statistics:killed_by_anyone(data)
 	else
 		local result_type = variant == "stun" and "hurt_sick" or self:get_damage_type(damage_percent, "fire")
+		if healed then
+			result_type = "healed"
+		end
 		result = {type = result_type, variant = "bullet"}
 		if result_type ~= "healed" then
 			self:_apply_damage_to_health(damage)
@@ -1899,7 +1951,11 @@ function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant
 		end
 	else
 		local result_type
-		result_type = hurt_animation and self:get_damage_type(damage_percent, variant) or "dmg_rcv"
+		if variant == "healed" then
+			result_type = "healed"
+		else
+			result_type = hurt_animation and self:get_damage_type(damage_percent, variant) or "dmg_rcv"
+		end
 		result = {type = result_type, variant = "bullet"}
 		if result_type ~= "healed" then
 			self:_apply_damage_to_health(damage)

@@ -1,4 +1,5 @@
 CopActionHealed = CopActionHealed or class()
+local tmp_vec1 = Vector3()
 
 function CopActionHealed:init(action_desc, common_data)
 	self._common_data = common_data
@@ -15,6 +16,10 @@ function CopActionHealed:init(action_desc, common_data)
 	end
 	self._unit:sound():say("hr01")
 	self._healed = false
+	if self._unit:contour() then
+		self._unit:contour():add("medic_heal", true)
+		self._unit:contour():flash("medic_heal", 0.2)
+	end
 	return true
 end
 

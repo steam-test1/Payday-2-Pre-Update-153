@@ -1698,18 +1698,6 @@ function GuiTweakData:init()
 			pulse = true,
 			pulse_level = 10,
 			pulse_color = Color(204, 255, 209, 32) / 255
-		},
-		{
-			id = "safehouse",
-			name_id = "menu_cn_chill",
-			desc_id = "menu_cn_chill_desc",
-			menu_node = "custom_safehouse",
-			x = 362,
-			y = 696,
-			icon = "guis/dlcs/chill/textures/pd2/safehouse/crimenet_marker_safehouse",
-			pulse = true,
-			pulse_level = 10,
-			pulse_color = Color(204, 255, 209, 32) / 255
 		}
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then

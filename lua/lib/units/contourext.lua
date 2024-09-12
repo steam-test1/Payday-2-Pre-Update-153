@@ -114,6 +114,12 @@ ContourExt._types = {
 		priority = 4,
 		color = tweak_data.contour.deployable.interact_color,
 		unique = true
+	},
+	medic_heal = {
+		priority = 1,
+		color = tweak_data.contour.character.heal_color,
+		material_swap_required = true,
+		fadeout = 2
 	}
 }
 ContourExt.indexed_types = {}

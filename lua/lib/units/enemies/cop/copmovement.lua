@@ -15,6 +15,8 @@ require("lib/units/civilians/actions/lower_body/CivilianActionWalk")
 require("lib/units/civilians/actions/lower_body/EscortWithSuitcaseActionWalk")
 require("lib/units/enemies/tank/actions/lower_body/TankCopActionWalk")
 require("lib/units/player_team/actions/lower_body/CriminalActionWalk")
+require("lib/units/enemies/cop/actions/upper_body/CopActionHealed")
+require("lib/units/enemies/medic/actions/upper_body/MedicActionHeal")
 local ids_movement = Idstring("movement")
 local mvec3_set = mvector3.set
 local mvec3_set_z = mvector3.set_z
@@ -146,7 +148,8 @@ local action_variants = {
 		spooc = ActionSpooc,
 		tase = CopActionTase,
 		dodge = CopActionDodge,
-		warp = CopActionWarp
+		warp = CopActionWarp,
+		healed = CopActionHealed
 	}
 }
 local security_variant = action_variants.security
@@ -180,6 +183,8 @@ action_variants.tank_hw = action_variants.tank
 action_variants.spooc = security_variant
 action_variants.taser = security_variant
 action_variants.inside_man = security_variant
+action_variants.medic = clone(security_variant)
+action_variants.medic.heal = MedicActionHeal
 action_variants.biker_boss = security_variant
 action_variants.cop_scared = security_variant
 action_variants.security_undominatable = security_variant
@@ -309,6 +314,7 @@ function CopMovement:post_init()
 		"poison_hurt",
 		"concussion"
 	}
+	table.insert(event_list, "healed")
 	self._unit:character_damage():add_listener("movement", event_list, callback(self, self, "damage_clbk"))
 	self._unit:inventory():add_listener("movement", {"equip", "unequip"}, callback(self, self, "clbk_inventory"))
 	local prim_weap_name = self._ext_base:default_weapon_name("primary")
@@ -1250,23 +1256,34 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 	end
 	local tweak = self._tweak_data
 	local action_data
-	action_data = {
-		type = "hurt",
-		block_type = block_type,
-		hurt_type = hurt_type,
-		variant = damage_info.variant,
-		direction_vec = attack_dir,
-		hit_pos = hit_pos,
-		body_part = body_part,
-		blocks = blocks,
-		client_interrupt = client_interrupt,
-		attacker_unit = damage_info.attacker_unit,
-		death_type = tweak.damage.death_severity and (damage_info.damage / tweak.HEALTH_INIT > tweak.damage.death_severity and "heavy" or "normal") or "normal",
-		ignite_character = damage_info.ignite_character,
-		start_dot_damage_roll = damage_info.start_dot_damage_roll,
-		is_fire_dot_damage = damage_info.is_fire_dot_damage,
-		fire_dot_data = damage_info.fire_dot_data
-	}
+	if hurt_type == "healed" then
+		if Network:is_client() then
+			client_interrupt = true
+		end
+		action_data = {
+			type = "healed",
+			body_part = 3,
+			client_interrupt = client_interrupt
+		}
+	else
+		action_data = {
+			type = "hurt",
+			block_type = block_type,
+			hurt_type = hurt_type,
+			variant = damage_info.variant,
+			direction_vec = attack_dir,
+			hit_pos = hit_pos,
+			body_part = body_part,
+			blocks = blocks,
+			client_interrupt = client_interrupt,
+			attacker_unit = damage_info.attacker_unit,
+			death_type = tweak.damage.death_severity and (damage_info.damage / tweak.HEALTH_INIT > tweak.damage.death_severity and "heavy" or "normal") or "normal",
+			ignite_character = damage_info.ignite_character,
+			start_dot_damage_roll = damage_info.start_dot_damage_roll,
+			is_fire_dot_damage = damage_info.is_fire_dot_damage,
+			fire_dot_data = damage_info.fire_dot_data
+		}
+	end
 	if Network:is_server() or not self:chk_action_forbidden(action_data) then
 		self:action_request(action_data)
 		if hurt_type == "death" and self._queued_actions then

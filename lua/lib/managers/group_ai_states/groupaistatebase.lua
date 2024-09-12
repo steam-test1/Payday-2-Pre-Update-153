@@ -4161,6 +4161,7 @@ GroupAIStateBase.blame_triggers = {
 	spooc = "cop",
 	shield = "cop",
 	taser = "cop",
+	medic = "cop",
 	gangster = "gan",
 	dealer = "gan",
 	biker_escape = "gan",

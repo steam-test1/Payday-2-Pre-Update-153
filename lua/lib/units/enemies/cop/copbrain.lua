@@ -54,6 +54,7 @@ logic_variants.biker_escape = security_variant
 logic_variants.city_swat = security_variant
 logic_variants.old_hoxton_mission = security_variant
 logic_variants.inside_man = security_variant
+logic_variants.medic = security_variant
 logic_variants.biker_boss = security_variant
 logic_variants.cop_scared = security_variant
 logic_variants.security_undominatable = security_variant

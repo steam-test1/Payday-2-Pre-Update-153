@@ -146,6 +146,7 @@ function AssetsTweakData:_init_gage_assets(tweak_data)
 	self.gage_assignment.exclude_stages = {
 		"safehouse",
 		"chill",
+		"chill_combat",
 		"haunted",
 		"crojob1",
 		"short1_stage1",

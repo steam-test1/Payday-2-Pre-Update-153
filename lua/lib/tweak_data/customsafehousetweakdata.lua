@@ -991,6 +991,39 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		},
 		image_id = "safehouse_trophies_preview_dallas_statue"
 	})
+	table.insert(self.trophies, {
+		id = "trophy_medic",
+		name_id = "trophy_medic",
+		desc_id = "trophy_medic_desc",
+		objective_id = "trophy_medic_objective",
+		objectives = {
+			self:_progress("trophy_medic", 100, {
+				name_id = "trophy_medic_progress"
+			})
+		},
+		show_progress = true,
+		image_id = "safehouse_trophies_preview_medic"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_courtesy",
+		name_id = "trophy_courtesy",
+		desc_id = "trophy_courtesy_desc",
+		objective_id = "trophy_courtesy_objective",
+		objectives = {
+			self:_progress("trophy_courtesy", 1)
+		},
+		image_id = "safehouse_trophies_preview_courtesy"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_defender",
+		name_id = "trophy_defender",
+		desc_id = "trophy_defender_desc",
+		objective_id = "trophy_defender_objective",
+		objectives = {
+			self:_progress("trophy_defender", 1)
+		},
+		image_id = "safehouse_trophies_preview_barbwire"
+	})
 end
 
 function CustomSafehouseTweakData:get_trophy_data(id)

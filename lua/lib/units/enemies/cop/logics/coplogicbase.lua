@@ -799,7 +799,11 @@ function CopLogicBase._set_attention_obj(data, new_att_obj, new_reaction)
 			new_att_obj.acquire_t = data.t
 		end
 		if new_reaction >= AIAttentionObject.REACT_SHOOT and new_att_obj.verified and contact_chatter_time_ok and (data.unit:anim_data().idle or data.unit:anim_data().move) and new_att_obj.is_person and data.char_tweak.chatter.contact then
-			data.unit:sound():say("c01", true)
+			if data.unit:base()._tweak_table == "medic" then
+				data.unit:sound():say("contact", true)
+			else
+				data.unit:sound():say("c01", true)
+			end
 		end
 	elseif old_att_obj and old_att_obj.criminal_record then
 		managers.groupai:state():on_enemy_disengaging(data.unit, old_att_obj.u_key)

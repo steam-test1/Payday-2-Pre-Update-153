@@ -584,8 +584,10 @@ function HUDAssaultCorner:_start_assault(text_list)
 	box_text_panel:animate(callback(self, self, "_animate_text"), nil, nil, callback(self, self, "assault_attention_color_function"))
 	self:_set_feedback_color(self._assault_color)
 	self._completed_waves = self._completed_waves + 1
-	self._wave_bg_box:stop()
-	self._wave_bg_box:animate(callback(self, self, "_animate_wave_started"), self)
+	if alive(self._wave_bg_box) then
+		self._wave_bg_box:stop()
+		self._wave_bg_box:animate(callback(self, self, "_animate_wave_started"), self)
+	end
 end
 
 function HUDAssaultCorner:assault_attention_color_function()

@@ -1538,7 +1538,8 @@ Play the full version soon to get your full PAYDAY!]],
 				"shield",
 				"taser",
 				"tank",
-				"spooc"
+				"spooc",
+				"medic"
 			},
 			kill = true
 		},
@@ -1550,6 +1551,11 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		trophy_washington = {
 			trophy_stat = "trophy_washington",
+			kill = true
+		},
+		trophy_medic = {
+			trophy_stat = "trophy_medic",
+			enemies = {"medic"},
 			kill = true
 		},
 		daily_grenades = {
@@ -1829,8 +1835,13 @@ Play the full version soon to get your full PAYDAY!]],
 				"shield",
 				"taser",
 				"tank",
-				"spooc"
+				"spooc",
+				"medic"
 			}
+		},
+		trophy_medic = {
+			trophy_stat = "trophy_medic",
+			enemies = {"medic"}
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -1953,6 +1964,11 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "trophy_washington",
 			is_not_civilian = true
 		},
+		trophy_medic = {
+			trophy_stat = "trophy_medic",
+			enemy = "medic",
+			is_not_civilian = true
+		},
 		trophy_special_kills = {
 			trophy_stat = "trophy_special_kills",
 			enemies = {
@@ -1960,7 +1976,8 @@ Play the full version soon to get your full PAYDAY!]],
 				"shield",
 				"taser",
 				"tank",
-				"spooc"
+				"spooc",
+				"medic"
 			},
 			is_not_civilian = true
 		},
@@ -3387,6 +3404,21 @@ Play the full version soon to get your full PAYDAY!]],
 			need_full_job = true,
 			need_full_stealth = true
 		},
+		trophy_courtesy = {
+			trophy_stat = "trophy_courtesy",
+			difficulty = easywish_and_above,
+			job = "pbr",
+			complete_job = true,
+			killed = {medic = 0}
+		},
+		trophy_defender = {
+			trophy_stat = "trophy_defender",
+			complete_job = true,
+			difficulty = overkill_and_above,
+			jobs = {
+				"chill_combat"
+			}
+		},
 		daily_classics = {
 			trophy_stat = "daily_classics",
 			jobs = {
@@ -3668,9 +3700,6 @@ Play the full version soon to get your full PAYDAY!]],
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
 	self.achievement.job_list.events = {"nail"}
-	if SystemInfo:distribution() == Idstring("STEAM") then
-		table.insert(self.achievement.job_list.bain, "roberts")
-	end
 	local jobs = {}
 	local job_data
 	local available_jobs = {}
@@ -4296,6 +4325,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.contour.character.dangerous_color = Vector3(0.6, 0.2, 0.2)
 	self.contour.character.more_dangerous_color = Vector3(1, 0.1, 0.1)
 	self.contour.character.standard_opacity = 0
+	self.contour.character.heal_color = Vector3(0, 1, 0)
 	self.contour.character_interactable = {}
 	self.contour.character_interactable.standard_color = Vector3(1, 0.5, 0)
 	self.contour.character_interactable.selected_color = Vector3(1, 1, 1)
@@ -5023,6 +5053,15 @@ Play the full version soon to get your full PAYDAY!]],
 	self.team_ai.stop_action.delay = 0.8
 	self.team_ai.stop_action.distance = 3000
 	self.team_ai.stop_action.teleport_distance = 5000
+	self.medic = {}
+	self.medic.radius = 400
+	self.medic.cooldown = 3
+	self.medic.debug_drawing = false
+	self.medic.disabled_units = {
+		"spooc",
+		"biker",
+		"gangster"
+	}
 	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()

@@ -1924,6 +1924,15 @@ function HudIconsTweakData:init()
 			32
 		}
 	}
+	self.unit_heal = {
+		texture = "guis/textures/unit_heal",
+		texture_rect = {
+			0,
+			0,
+			32,
+			32
+		}
+	}
 end
 
 function HudIconsTweakData:get_icon_data(icon_id, default_rect)

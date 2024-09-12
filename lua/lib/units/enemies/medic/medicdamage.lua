@@ -17,6 +17,9 @@ function MedicDamage:heal_unit(unit)
 	if table.contains(tweak_data.medic.disabled_units, tweak_table) then
 		return false
 	end
+	if unit:brain() and unit:brain()._logic_data and unit:brain()._logic_data.is_converted then
+		return false
+	end
 	local cop_dmg = unit:character_damage()
 	cop_dmg._health = cop_dmg._HEALTH_INIT
 	cop_dmg._health_ratio = 1
