@@ -2582,6 +2582,7 @@ function GroupAIStateBase:set_assault_mode(enabled)
 		self:set_ambience_flag()
 		SoundDevice:set_state("wave_flag", enabled and "assault" or "control")
 		managers.network:session():send_to_peers_synched("sync_assault_mode", enabled)
+		managers.hud:sync_assault_number(self._assault_number)
 		if not enabled then
 			self._warned_about_deploy_this_control = nil
 			self._warned_about_freed_this_control = nil

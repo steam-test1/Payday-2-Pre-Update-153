@@ -1029,7 +1029,7 @@ function GroupAIStateBesiege:_spawn_in_group(spawn_group, spawn_group_type, grp_
 			end
 		end
 		local cat_data = unit_categories[rand_entry.unit]
-		if cat_data.special_type and tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] and _get_special_unit_type_count(cat_data.special_type) >= tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] then
+		if cat_data.special_type and not cat_data.is_captain and tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] and _get_special_unit_type_count(cat_data.special_type) >= tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] then
 			table.remove(valid_unit_types, rand_i)
 			total_wgt = total_wgt - rand_entry.freq
 		else

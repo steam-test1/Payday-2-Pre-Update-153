@@ -64,6 +64,7 @@ function CustomSafehouseManager:save(data)
 		trophy_data.id = trophy.id
 		trophy_data.objectives = {}
 		trophy_data.completed = trophy.completed
+		trophy_data.displayed = trophy.displayed
 		for _, objective in ipairs(trophy.objectives) do
 			local objective_data = {}
 			for _, save_value in ipairs(objective.save_values) do
@@ -121,6 +122,11 @@ function CustomSafehouseManager:load(data, version)
 					end
 				end
 				trophy.completed = objectives_complete
+				if saved_trophy.displayed ~= nil then
+					trophy.displayed = saved_trophy.displayed
+				else
+					trophy.displayed = true
+				end
 			end
 		end
 		if state.daily then
@@ -145,6 +151,10 @@ end
 
 function CustomSafehouseManager:coins()
 	return Application:digest_value(self._global.total, false)
+end
+
+function CustomSafehouseManager:previous_coins()
+	return Application:digest_value(self._global.prev_total, false)
 end
 
 function CustomSafehouseManager:total_coins_earned()
@@ -358,6 +368,21 @@ function CustomSafehouseManager:is_trophy_unlocked(id)
 	return trophy and trophy.completed or false
 end
 
+function CustomSafehouseManager:is_trophy_displayed(id)
+	local trophy = self:get_trophy(id)
+	return trophy and trophy.completed and trophy.displayed or false
+end
+
+function CustomSafehouseManager:set_trophy_displayed(id, displayed)
+	if self:is_trophy_unlocked(id) then
+		if displayed == nil then
+			displayed = true
+		end
+		local trophy = self:get_trophy(id)
+		trophy.displayed = displayed
+	end
+end
+
 function CustomSafehouseManager:get_daily(id)
 	for idx, daily in pairs(tweak_data.safehouse.dailies) do
 		if daily.id == id then
@@ -566,7 +591,6 @@ function CustomSafehouseManager:mark_daily_as_seen()
 	if not self:has_daily_been_accepted_from_heister() then
 		print("CustomSafehouseManager:mark_daily_as_seen()")
 		self:_set_daily_state("seen")
-		self._global.daily.timestamp = self:get_timestamp()
 	end
 end
 
@@ -574,7 +598,6 @@ function CustomSafehouseManager:accept_daily()
 	if not self:has_daily_been_accepted_from_heister() then
 		print("CustomSafehouseManager:accept_daily()")
 		self:_set_daily_state("accepted")
-		self._global.daily.timestamp = self:get_timestamp()
 	end
 end
 
@@ -722,6 +745,9 @@ function CustomSafehouseManager:_on_heist_completed(job_id)
 end
 
 function CustomSafehouseManager:is_being_raided()
+	if not self:unlocked() or not self:has_entered_safehouse() then
+		return false
+	end
 	local server_time = self:_get_server_time() or 0
 	return server_time - (self._global._spawn_cooldown or 0) >= self.SPAWN_COOLDOWN
 end

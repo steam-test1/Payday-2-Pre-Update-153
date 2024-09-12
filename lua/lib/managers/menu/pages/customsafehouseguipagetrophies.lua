@@ -62,9 +62,66 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_list()
 end
 
 function CustomSafehouseGuiPageTrophies:_setup_trophies_info()
-	local scroll = ScrollablePanel:new(self:info_panel(), "TrophyInfoPanel")
+	local buttons_panel = self:info_panel():panel({
+		name = "buttons_panel"
+	})
+	local trophy_panel = self:info_panel():panel({
+		name = "trophy_panel"
+	})
+	local buttons = {}
+	local button_panel_h
+	if not Global.game_settings.is_playing then
+		if not managers.menu:is_pc_controller() then
+			table.insert(buttons, {
+				btn = "BTN_A",
+				name_id = "menu_trophy_change_display_to_off"
+			})
+		end
+		table.insert(buttons, {
+			btn = "BTN_X",
+			pc_btn = "menu_remove_item",
+			name_id = "menu_trophy_display_all",
+			callback = callback(self, self, "_show_all_trophies")
+		})
+		table.insert(buttons, {
+			btn = "BTN_Y",
+			pc_btn = "menu_modify_item",
+			name_id = "menu_trophy_hide_all",
+			callback = callback(self, self, "_hide_all_trophies")
+		})
+		button_panel_h = 10 + #buttons * medium_font_size
+	else
+		button_panel_h = 0
+	end
+	self._buttons = {}
+	self._controllers_pc_mapping = {}
+	self._controllers_mapping = {}
+	local btn_x = 10
+	for idx, btn_data in pairs(buttons) do
+		local new_button = CustomSafehouseGuiButtonItem:new(buttons_panel, btn_data, btn_x, idx)
+		self._buttons[idx] = new_button
+		if btn_data.pc_btn then
+			self._controllers_mapping[btn_data.pc_btn:key()] = new_button
+		end
+	end
+	if 0 < button_panel_h then
+		trophy_panel:set_h(self:info_panel():h() - button_panel_h - PANEL_PADDING)
+	else
+		trophy_panel:set_h(self:info_panel():h())
+	end
+	buttons_panel:set_h(button_panel_h)
+	buttons_panel:set_bottom(self:info_panel():bottom())
+	self._buttons_box_panel = BoxGuiObject:new(buttons_panel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	local scroll = ScrollablePanel:new(trophy_panel, "TrophyInfoPanel")
 	scroll:on_canvas_updated_callback(callback(self, self, "update_info_panel_width"))
-	BoxGuiObject:new(scroll:panel(), {
+	self._trophy_box_panel = BoxGuiObject:new(scroll:panel(), {
 		sides = {
 			1,
 			1,
@@ -140,7 +197,9 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_info()
 	})
 	complete_banner:set_top(image_panel:bottom() + PANEL_PADDING)
 	complete_banner:rect({
-		color = tweak_data.screen_colors.challenge_completed_color:with_alpha(0.4)
+		name = "CompleteBannerFill",
+		color = tweak_data.screen_colors.challenge_completed_color,
+		alpha = 0.4
 	})
 	local complete_text = complete_banner:text({
 		name = "CompleteText",
@@ -149,7 +208,7 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_info()
 		layer = 1,
 		blend_mode = "add",
 		color = tweak_data.screen_colors.challenge_completed_color:with_alpha(0.8),
-		text = managers.localization:to_upper_text("menu_trophy_unlocked"),
+		text = managers.localization:to_upper_text("menu_trophy_displayed"),
 		align = "center",
 		vertical = "top",
 		halign = "scale",
@@ -289,6 +348,8 @@ function CustomSafehouseGuiPageTrophies:set_trophy_info(trophy, update_size)
 	local image_panel = info_panel:child("TrophyImagePanel")
 	local trophy_image = image_panel:child("TrophyImage")
 	local complete_banner = info_panel:child("CompleteBannerPanel")
+	local complete_text = complete_banner:child("CompleteText")
+	local complete_fill = complete_banner:child("CompleteBannerFill")
 	local desc_text = info_panel:child("DescText")
 	local objective_header = info_panel:child("ObjectiveHeader")
 	local objective_text = info_panel:child("ObjectiveText")
@@ -303,6 +364,15 @@ function CustomSafehouseGuiPageTrophies:set_trophy_info(trophy, update_size)
 	else
 		complete_banner:set_visible(false)
 		desc_text:set_top(image_panel:bottom() + PANEL_PADDING)
+	end
+	if data.displayed then
+		complete_text:set_text(managers.localization:to_upper_text("menu_trophy_displayed"))
+		complete_text:set_color(tweak_data.screen_colors.challenge_completed_color)
+		complete_fill:set_color(tweak_data.screen_colors.challenge_completed_color)
+	else
+		complete_text:set_text(managers.localization:to_upper_text("menu_trophy_not_displayed"))
+		complete_text:set_color(tweak_data.screen_colors.important_1)
+		complete_fill:set_color(tweak_data.screen_colors.important_1)
 	end
 	local _, _, _, h = desc_text:text_rect()
 	desc_text:set_h(h)
@@ -343,6 +413,22 @@ function CustomSafehouseGuiPageTrophies:set_trophy_info(trophy, update_size)
 	end
 end
 
+function CustomSafehouseGuiPageTrophies:_show_all_trophies()
+	for i, trophy in ipairs(self._trophies) do
+		managers.custom_safehouse:set_trophy_displayed(trophy:trophy_data().id, true)
+		trophy:refresh()
+	end
+	self:refresh()
+end
+
+function CustomSafehouseGuiPageTrophies:_hide_all_trophies()
+	for i, trophy in ipairs(self._trophies) do
+		managers.custom_safehouse:set_trophy_displayed(trophy:trophy_data().id, false)
+		trophy:refresh()
+	end
+	self:refresh()
+end
+
 function CustomSafehouseGuiPageTrophies:_set_selected(trophy)
 	if not trophy then
 		return false
@@ -363,6 +449,69 @@ function CustomSafehouseGuiPageTrophies:_set_selected(trophy)
 			self._trophies_scroll:perform_scroll(math.abs(y), 1)
 		end
 	end
+	if self._buttons[1] and self._buttons[1]:button_data().btn == "BTN_A" then
+		self._buttons[1]:set_hidden(false)
+		if trophy:trophy_data().completed then
+			local text_id = trophy:trophy_data().displayed and "menu_trophy_change_display_to_off" or "menu_trophy_change_display_to_on"
+			self._buttons[1]:set_text(managers.localization:to_upper_text(text_id))
+		else
+			self._buttons[1]:set_hidden(true)
+		end
+		self:update_info_panel_size()
+	end
+end
+
+function CustomSafehouseGuiPageTrophies:refresh()
+	CustomSafehouseGuiPageTrophies.super.refresh(self)
+	self:_set_selected(self._selected_trophy)
+end
+
+function CustomSafehouseGuiPageTrophies:update_info_panel_size()
+	local active_buttons = 0
+	local button_panel_h = 0
+	if not Global.game_settings.is_playing then
+		for i, button in ipairs(self._buttons) do
+			if not button:hidden() then
+				active_buttons = active_buttons + 1
+				button:reorder(active_buttons)
+			end
+		end
+		button_panel_h = 10 + active_buttons * medium_font_size
+	end
+	local trophy_panel = self:info_panel():child("trophy_panel")
+	local buttons_panel = self:info_panel():child("buttons_panel")
+	if 0 < button_panel_h then
+		trophy_panel:set_h(self:info_panel():h() - button_panel_h - PANEL_PADDING)
+	else
+		trophy_panel:set_h(self:info_panel():h())
+	end
+	self._info_scroll:set_size(self._info_scroll:panel():w(), trophy_panel:h())
+	buttons_panel:set_h(button_panel_h)
+	buttons_panel:set_bottom(self:info_panel():bottom())
+	if self._buttons_box_panel then
+		self._buttons_box_panel:close()
+		self._buttons_box_panel = nil
+	end
+	if self._trophy_box_panel then
+		self._trophy_box_panel:close()
+		self._trophy_box_panel = nil
+	end
+	self._buttons_box_panel = BoxGuiObject:new(buttons_panel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	self._trophy_box_panel = BoxGuiObject:new(self._info_scroll:panel(), {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
 end
 
 function CustomSafehouseGuiPageTrophies:update(t, dt)
@@ -403,6 +552,33 @@ function CustomSafehouseGuiPageTrophies:mouse_moved(button, x, y)
 			end
 		end
 	end
+	local used, pointer
+	for _, button in ipairs(self._buttons) do
+		if button:inside(x, y) and not used then
+			button:set_selected(true)
+			used, pointer = true, "link"
+		else
+			button:set_selected(false)
+		end
+	end
+	return used, pointer
+end
+
+function CustomSafehouseGuiPageTrophies:confirm_pressed()
+	if Global.game_settings.is_playing then
+		return
+	end
+	if managers.menu:is_pc_controller() then
+		for _, button in ipairs(self._buttons) do
+			if button:is_selected() then
+				button:trigger(self)
+				return
+			end
+		end
+	end
+	if self._selected_trophy then
+		self._selected_trophy:trigger(self)
+	end
 end
 
 function CustomSafehouseGuiPageTrophies:mouse_pressed(button, x, y)
@@ -417,6 +593,20 @@ function CustomSafehouseGuiPageTrophies:mouse_pressed(button, x, y)
 			if values[1] ~= nil then
 				return unpack(values)
 			end
+		end
+	end
+	if self:panel():inside(x, y) then
+		for idx, trophy in ipairs(self._trophies or {}) do
+			if trophy:inside(x, y) and button == Idstring("0") then
+				trophy:trigger(self)
+				return true
+			end
+		end
+	end
+	for _, button in ipairs(self._buttons) do
+		if button:inside(x, y) then
+			button:trigger()
+			return true
 		end
 	end
 end
@@ -548,6 +738,7 @@ function CustomSafehouseGuiTrophyItem:init(panel, data, x, priority)
 	if data.completed then
 		self:complete()
 	end
+	self:refresh()
 end
 
 function CustomSafehouseGuiTrophyItem:trophy_data()
@@ -568,14 +759,25 @@ end
 
 function CustomSafehouseGuiTrophyItem:show()
 	self._select_rect:set_visible(true)
-	self._btn_text:set_color(tweak_data.screen_colors.button_stage_2)
 	self._complete_checkbox_highlight:set_visible(true)
+	self._btn_text:set_alpha(1)
+	if not self:trophy_data().displayed then
+		self._btn_text:set_color(tweak_data.screen_colors.important_1)
+	else
+		self._btn_text:set_color(tweak_data.screen_colors.button_stage_2)
+	end
 end
 
 function CustomSafehouseGuiTrophyItem:hide()
 	self._select_rect:set_visible(false)
-	self._btn_text:set_color(tweak_data.screen_colors.button_stage_3)
 	self._complete_checkbox_highlight:set_visible(false)
+	self._btn_text:set_alpha(1)
+	if not self:trophy_data().displayed then
+		self._btn_text:set_color(tweak_data.screen_colors.important_1)
+		self._btn_text:set_alpha(0.8)
+	else
+		self._btn_text:set_color(tweak_data.screen_colors.button_stage_3)
+	end
 end
 
 function CustomSafehouseGuiTrophyItem:top()
@@ -635,6 +837,16 @@ end
 
 function CustomSafehouseGuiTrophyItem:get_linked(link)
 	return self._links and self._links[link]
+end
+
+function CustomSafehouseGuiTrophyItem:trigger(parent)
+	if not Global.game_settings.is_playing then
+		managers.custom_safehouse:set_trophy_displayed(self:trophy_data().id, not self:trophy_data().displayed)
+		self:refresh()
+		if parent then
+			parent:refresh()
+		end
+	end
 end
 
 CustomSafehouseGuiProgressItem = CustomSafehouseGuiProgressItem or class(CustomSafehouseGuiItem)

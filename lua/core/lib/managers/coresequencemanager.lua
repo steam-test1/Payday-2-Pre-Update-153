@@ -3602,13 +3602,15 @@ AlertElement.NAME = "alert"
 
 function AlertElement:init(node, unit_element)
 	BaseElement.init(self, node, unit_element)
+	self._range = self:get("range")
 end
 
 function AlertElement:activate_callback(env)
+	local range = self:run_parsed_func(env, self._range) or 1200
 	local new_alert = {
 		"aggression",
 		env.pos,
-		1200,
+		range,
 		managers.groupai:state():get_unit_type_filter("civilians_enemies"),
 		env.dest_unit
 	}

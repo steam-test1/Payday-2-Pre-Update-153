@@ -381,6 +381,14 @@ function GageAssignmentManager:_present_progress(assignment, collected, to_aquir
 	managers.hint:show_hint(self._tweak_data:get_value(assignment, "progress_id"), nil, nil, {collected = collected, aquire = to_aquire})
 end
 
+function GageAssignmentManager:get_stinger_id()
+	local job_tweak = tweak_data.narrative.jobs[managers.job:current_real_job_id()]
+	if job_tweak and job_tweak.objective_stinger then
+		return job_tweak.objective_stinger
+	end
+	return "stinger_objectivecomplete"
+end
+
 function GageAssignmentManager:_present_completed(assignment, collected, to_aquire)
 	local title_id = self._tweak_data:get_value(assignment, "present_id")
 	local title = managers.localization:text(title_id, {})
@@ -392,7 +400,7 @@ function GageAssignmentManager:_present_completed(assignment, collected, to_aqui
 		title = title,
 		icon = icon,
 		time = 4,
-		event = "stinger_objectivecomplete"
+		event = self:get_stinger_id()
 	})
 end
 

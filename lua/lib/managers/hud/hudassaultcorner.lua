@@ -455,6 +455,14 @@ function HUDAssaultCorner:sync_start_assault(assault_number)
 	self._completed_waves = (assault_number or 1) - 1
 end
 
+function HUDAssaultCorner:set_assault_wave_number(assault_number)
+	self._completed_waves = (assault_number or 1) - 1
+	if alive(self._wave_bg_box) then
+		local wave_text = panel:child("num_waves")
+		wave_text:set_text(self:get_completed_waves_string())
+	end
+end
+
 function HUDAssaultCorner:start_assault_callback()
 	self:_start_assault(self:_get_assault_strings())
 end

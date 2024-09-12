@@ -116,7 +116,7 @@ function NavigationManager:_init_draw_data()
 	brush.room_fill = Draw:brush(Color(0.3, 0.3, 0.3, 0.8), duration)
 	brush.room_fill_disabled = Draw:brush(Color(0.3, 0.8, 0.3, 0.3), duration)
 	brush.room_fill_obstructed = Draw:brush(Color(0.3, 0.8, 0, 0.8), duration)
-	brush.coarse_graph = Draw:brush(Color(0.2, 0.05, 0.2, 0.9))
+	brush.coarse_graph = Draw:brush(Color(0.2, 0.9, 0.9, 0.2))
 	brush.vis_graph_rooms = Draw:brush(Color(0.6, 0.5, 0.2, 0.9), duration)
 	brush.vis_graph_node = Draw:brush(Color(1, 0.6, 0, 0.9), duration)
 	brush.vis_graph_links = Draw:brush(Color(0.2, 0.8, 0.1, 0.6), duration)
@@ -773,17 +773,22 @@ end
 
 function NavigationManager:_draw_covers()
 	local reserved = self.COVER_RESERVED
+	local cone_height = Vector3(0, 0, 80)
+	local arrow_height = Vector3(0, 0, 1)
 	for i_cover, cover in ipairs(self._covers) do
 		local draw_pos = cover[1]
-		Application:draw_rotation(draw_pos, Rotation(cover[2], math.UP))
-		if cover[reserved] then
-			Application:draw_sphere(draw_pos, 18, 0, 0, 0)
-		end
 		local tracker = cover[3]
 		if tracker:lost() then
+			Application:draw_cone(draw_pos, draw_pos + cone_height, 30, 1, 0, 0)
 			local placed_pos = tracker:position()
 			Application:draw_sphere(placed_pos, 20, 1, 0, 0)
 			Application:draw_line(placed_pos, draw_pos, 1, 0, 0)
+		else
+			Application:draw_cone(draw_pos, draw_pos + cone_height, 30, 0, 1, 0)
+		end
+		Application:draw_rotation(draw_pos + arrow_height, Rotation(cover[2], math.UP))
+		if cover[reserved] then
+			Application:draw_sphere(draw_pos, 18, 0, 0, 0)
 		end
 	end
 end
@@ -866,10 +871,13 @@ function NavigationManager:_draw_coarse_graph()
 	local all_doors = self._room_doors
 	local all_vis_groups = self._visibility_groups
 	local brush = self._draw_data.brush.coarse_graph
+	local cone_height = Vector3(0, 0, 50)
 	for seg_id, seg_data in pairs(all_nav_segments) do
 		local neighbours = seg_data.neighbours
 		for neigh_i_seg, door_list in pairs(neighbours) do
-			brush:cone(all_nav_segments[neigh_i_seg].pos, seg_data.pos, 12)
+			local pos = all_nav_segments[neigh_i_seg].pos
+			brush:cone(pos, seg_data.pos, 12)
+			Application:draw_cone(pos, pos + cone_height, 40, 1, 1, 0)
 		end
 	end
 end

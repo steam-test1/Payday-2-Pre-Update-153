@@ -61,8 +61,8 @@ function ElementCustomSafehouseTrophyFilter:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	print("ElementCustomSafehouseTrophyFilter:on_executed has trophy? ", self:value("trophy"), managers.custom_safehouse:is_trophy_unlocked(self:value("trophy")))
-	local unlocked = managers.custom_safehouse:is_trophy_unlocked(self:value("trophy"))
+	print("ElementCustomSafehouseTrophyFilter:on_executed is displaying trophy? ", self:value("trophy"), managers.custom_safehouse:is_trophy_displayed(self:value("trophy")))
+	local unlocked = managers.custom_safehouse:is_trophy_displayed(self:value("trophy"))
 	local pass = true
 	if self:value("check_type") == "unlocked" then
 		pass = unlocked

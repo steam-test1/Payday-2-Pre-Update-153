@@ -1,3 +1,9 @@
+local access_type_walk_only = {walk = true}
+local access_type_all = {walk = true, acrobatic = true}
+local ignored_groups = {
+	"Phalanx_minion",
+	"Phalanx_vip"
+}
 MutatorEnemyReplacer = MutatorEnemyReplacer or class(BaseMutator)
 MutatorEnemyReplacer._type = "MutatorEnemyReplacer"
 MutatorEnemyReplacer.name_id = "mutator_specials_override"
@@ -94,13 +100,6 @@ function MutatorEnemyReplacer:reset_to_default()
 		end
 	end
 end
-
-local access_type_walk_only = {walk = true}
-local access_type_all = {walk = true, acrobatic = true}
-local ignored_groups = {
-	"Phalanx_minion",
-	"Phalanx_vip"
-}
 
 function MutatorEnemyReplacer:modify_unit_categories(group_ai_tweak, difficulty_index)
 	for key, value in pairs(group_ai_tweak.special_unit_spawn_limits) do
@@ -299,9 +298,6 @@ function MutatorMediDozer:setup()
 	self:modify_unit_categories(tweak_data.group_ai, difficulty_index)
 end
 
-local access_type_walk_only = {walk = true}
-local access_type_all = {walk = true, acrobatic = true}
-
 function MutatorMediDozer:modify_unit_categories(group_ai_tweak, difficulty_index)
 	group_ai_tweak.special_unit_spawn_limits = {
 		tank = math.huge,
@@ -339,14 +335,16 @@ function MutatorMediDozer:modify_unit_categories(group_ai_tweak, difficulty_inde
 		special_type = "medic"
 	}
 	for group, units_data in pairs(group_ai_tweak.unit_categories) do
-		if units_data.special_type then
-			if units_data.special_type ~= "tank" and units_data.special_type ~= "medic" then
-				group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.FBI_tank
+		if not table.contains(ignored_groups, group) then
+			if units_data.special_type then
+				if units_data.special_type ~= "tank" and units_data.special_type ~= "medic" then
+					group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.FBI_tank
+				end
+			elseif string.find(group, "r870") then
+				group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.medic_R870
+			else
+				group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.medic_M4
 			end
-		elseif string.find(group, "r870") then
-			group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.medic_R870
-		else
-			group_ai_tweak.unit_categories[group] = group_ai_tweak.unit_categories.medic_M4
 		end
 	end
 end

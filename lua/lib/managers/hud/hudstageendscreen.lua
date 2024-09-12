@@ -183,6 +183,24 @@ function HUDPackageUnlockedItem:close()
 end
 
 HUDStageEndScreen = HUDStageEndScreen or class()
+HUDStageEndScreen.stages = {
+	"stage_money_counter_init",
+	"stage_money_counter_count",
+	"stage_money_counter_hide",
+	"safehouse_currency_init",
+	"safehouse_currency_fade_in",
+	"safehouse_currency_count",
+	"safehouse_currency_trophies",
+	"safehouse_currency_hide",
+	"stage_experience_init",
+	"stage_experience_count_exp",
+	"stage_experience_spin_up",
+	"stage_experience_show_all",
+	"stage_experience_spin_levels",
+	"stage_experience_spin_slowdown",
+	"stage_experience_end",
+	"stage_done"
+}
 
 function HUDStageEndScreen:init(hud, workspace)
 	self._backdrop = MenuBackdropGUI:new(workspace)
@@ -309,6 +327,73 @@ function HUDStageEndScreen:init(hud, workspace)
 	bg_text:set_world_x(self._foreground_layer_safe:child("stage_text"):world_x())
 	bg_text:move(-13, 9)
 	self._backdrop:animate_bg_text(bg_text)
+	self._coins_backpanel = self._background_layer_safe:panel({
+		name = "coins_backpanel",
+		w = self._background_layer_safe:w() / 2 - 10,
+		h = self._background_layer_safe:h() / 2,
+		y = 70
+	})
+	self._coins_forepanel = self._foreground_layer_safe:panel({
+		name = "coins_forepanel",
+		w = self._foreground_layer_safe:w() / 2 - 10,
+		h = self._foreground_layer_safe:h() / 2,
+		y = 70
+	})
+	local level_progress_text = self._coins_forepanel:text({
+		name = "coin_progress_text",
+		text = managers.localization:to_upper_text("menu_es_coins_progress"),
+		align = "left",
+		vertical = "top",
+		h = content_font_size + 2,
+		font_size = content_font_size,
+		font = content_font,
+		color = tweak_data.screen_colors.text,
+		x = 10,
+		y = 10
+	})
+	local _, _, lw, lh = level_progress_text:text_rect()
+	level_progress_text:set_size(lw, lh)
+	local coins_bg_circle = self._coins_backpanel:bitmap({
+		name = "bg_progress_circle",
+		texture = "guis/textures/pd2/endscreen/exp_ring",
+		h = self._coins_backpanel:h() - content_font_size,
+		w = self._coins_backpanel:h() - content_font_size,
+		y = content_font_size,
+		color = Color.black,
+		alpha = 0.6,
+		blend_mode = "normal"
+	})
+	self._coins_circle = self._coins_backpanel:bitmap({
+		name = "progress_circle",
+		texture = "guis/textures/pd2/endscreen/exp_ring",
+		h = self._coins_backpanel:h() - content_font_size,
+		w = self._coins_backpanel:h() - content_font_size,
+		y = content_font_size,
+		color = Color(0, 1, 1),
+		render_template = "VertexColorTexturedRadial",
+		blend_mode = "add",
+		layer = 1
+	})
+	self._coins_text = self._coins_forepanel:text({
+		name = "coins_text",
+		text = "",
+		align = "center",
+		vertical = "center",
+		font_size = bg_font_size,
+		font = bg_font,
+		h = self._coins_backpanel:h() - content_font_size,
+		w = self._coins_backpanel:h() - content_font_size,
+		y = content_font_size,
+		color = tweak_data.screen_colors.text
+	})
+	self._coins_box = BoxGuiObject:new(self._coins_backpanel, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
 	self._lp_backpanel = self._background_layer_safe:panel({
 		name = "lp_backpanel",
 		w = self._background_layer_safe:w() / 2 - 10,
@@ -978,6 +1063,8 @@ function HUDStageEndScreen:clear_stage()
 	self._csl = nil
 	self._all_done = nil
 	self._playing_sound = nil
+	self._coins_backpanel:child("bg_progress_circle"):hide()
+	self._coins_forepanel:child("coin_progress_text"):hide()
 	self._lp_text:hide()
 	self._lp_circle:hide()
 	self._lp_backpanel:child("bg_progress_circle"):hide()
@@ -1008,6 +1095,8 @@ function HUDStageEndScreen:clear_stage()
 	WalletGuiObject.set_object_visible("wallet_money_text", false)
 	WalletGuiObject.set_object_visible("wallet_skillpoint_icon", false)
 	WalletGuiObject.set_object_visible("wallet_skillpoint_text", false)
+	WalletGuiObject.set_object_visible("wallet_coins_icon", false)
+	WalletGuiObject.set_object_visible("wallet_coins_text", false)
 end
 
 function HUDStageEndScreen:_check_special_packages()
@@ -1099,7 +1188,7 @@ function HUDStageEndScreen:_wait_for_video()
 	end
 end
 
-function HUDStageEndScreen:create_money_counter(t, dt)
+function HUDStageEndScreen:stage_money_counter_init(t, dt)
 	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
 	self:_check_special_packages()
 	self._is_fail_video = not is_success
@@ -1228,7 +1317,7 @@ function HUDStageEndScreen:set_debug_m(name)
 	end
 end
 
-function HUDStageEndScreen:count_money(t, dt)
+function HUDStageEndScreen:stage_money_counter_count(t, dt)
 	if self:perform_income_count(t, dt, self._money_panel, self._money_stage, self._money, self.get_count_speed_fast, self.display_as_cash) then
 		repeat
 			WalletGuiObject.refresh()
@@ -1355,9 +1444,9 @@ function HUDStageEndScreen:perform_income_count(t, dt, parent_panel, stage_table
 	return true
 end
 
-function HUDStageEndScreen:hide_money(t, dt)
+function HUDStageEndScreen:stage_money_counter_hide(t, dt)
 	repeat
-		Application:debug("HUDStageEndScreen:hide_money")
+		Application:debug("HUDStageEndScreen:stage_money_counter_hide")
 		do break end -- pseudo-goto
 		if not self._is_fail_video then
 			local video = self._background_layer_full:child("money_video")
@@ -1374,90 +1463,282 @@ function HUDStageEndScreen:hide_money(t, dt)
 end
 
 function HUDStageEndScreen:safehouse_currency_init(t, dt)
-	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
-	local safehouse_income = managers.custom_safehouse:get_coins_income()
-	if safehouse_income < 1 and 1 > #managers.custom_safehouse:completed_trophies() then
-		self:step_stage_up()
-		self:step_stage_up()
-		return
-	end
-	self._safehouse_panel = self._lp_forepanel:panel({
-		name = "safehouse_panel",
-		x = 10,
-		y = 10
-	})
-	self._safehouse_panel:grow(-20, -20)
-	local check_if_clear = function(data)
-		for _, d in ipairs(data) do
-			if d[2] and d[2] > 0 then
-				return false
-			end
-		end
-		return true
-	end
-	local has_completed_daily = managers.custom_safehouse:has_completed_daily() and not managers.custom_safehouse:has_rewarded_daily()
-	local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
-	local exp_income = safehouse_income
-	local challenges_income = 0
-	local daily_income = 0
-	local raid_income = was_safehouse_raid and tweak_data.safehouse.rewards.raid or 0
-	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
-		if trophy_data.type == "trophy" then
-			challenges_income = challenges_income + trophy_data.reward
-		end
-		exp_income = exp_income - trophy_data.reward
-	end
-	exp_income = exp_income - raid_income
-	if has_completed_daily then
-		daily_income = tweak_data.safehouse.rewards.daily_complete
-		exp_income = exp_income - daily_income
-	end
-	self._safehouse = {}
-	self._safehouse.income = {
-		{
-			"menu_es_safehouse_income",
-			math.floor(exp_income)
-		},
-		name_id = managers.localization:to_upper_text("menu_custom_safehouse_income")
+	self._coins_text:show()
+	self._coins_circle:show()
+	self._coins_backpanel:child("bg_progress_circle"):show()
+	self._coins_forepanel:child("coin_progress_text"):show()
+	self._coins_circle:set_alpha(0)
+	self._coins_backpanel:child("bg_progress_circle"):set_alpha(0)
+	self._coins_text:set_alpha(0)
+	local income = managers.custom_safehouse:coins() - managers.custom_safehouse:previous_coins()
+	self._safehouse_data = {
+		income = income,
+		remaining_income = income,
+		current = managers.custom_safehouse:coins(),
+		trophies = {}
 	}
 	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
 		if trophy_data.type == "trophy" then
-			table.insert(self._safehouse.income, {
+			table.insert(self._safehouse_data.trophies, {
 				trophy_data.name,
-				trophy_data.reward
+				trophy_data.reward,
+				tweak_data.screen_colors.challenge_completed_color
 			})
 		end
 	end
+	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
+	local has_completed_daily = managers.custom_safehouse:has_completed_daily() and not managers.custom_safehouse:has_rewarded_daily()
+	local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
 	if has_completed_daily then
-		table.insert(self._safehouse.income, {
+		table.insert(self._safehouse_data.trophies, {
 			"menu_es_safehouse_income_daily",
-			daily_income
+			tweak_data.safehouse.rewards.daily_complete,
+			tweak_data.screen_colors.heat_warm_color
 		})
 	end
-	if was_safehouse_raid then
-		table.insert(self._safehouse.income, {
+	if was_safehouse_raid and is_success then
+		table.insert(self._safehouse_data.trophies, {
 			"menu_es_safehouse_raid",
-			raid_income
+			tweak_data.safehouse.rewards.raid,
+			tweak_data.screen_colors.important_1
 		})
 	end
-	if check_if_clear(self._safehouse.income) then
-		self._safehouse.income = {}
+	local partial_coins = self._safehouse_data.current % 1
+	self._coins_circle:set_color(Color(partial_coins, 1, 1))
+	self:set_coin_text(managers.custom_safehouse:coins())
+	self._bonuses_panel = self._lp_forepanel:panel({
+		x = self._lp_xp_gained:x(),
+		y = 10,
+		w = self._lp_forepanel:w() - self._lp_xp_gained:left() - 10,
+		h = self._lp_xp_gained:top() - 10
+	})
+	self._wait_t = t + 0.5
+	self._start_ramp_up_t = 1
+	self._ramp_up_timer = 0
+	managers.menu_component:post_event("box_tick")
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:set_coin_text(coins)
+	self._coins_text:set_text(managers.experience:cash_string(math.floor(coins), ""))
+	local fs = tweak_data.menu.pd2_massive_font_size
+	if 99999 < coins then
+		fs = tweak_data.menu.pd2_large_font_size
+	elseif 9999 < coins then
+		fs = tweak_data.menu.pd2_massive_font_size * 0.65
+	elseif 999 < coins then
+		fs = tweak_data.menu.pd2_massive_font_size * 0.85
 	end
-	local spending_earned = managers.money:heist_spending()
-	self._safehouse.balance = {
-		{
-			"menu_es_safehouse_total",
-			math.floor(managers.custom_safehouse:coins()),
-			managers.custom_safehouse:can_afford_any_upgrade() and tweak_data.screen_colors.friend_color
-		},
-		name_id = managers.localization:to_upper_text("menu_cash_balance")
-	}
-	if check_if_clear(self._safehouse.balance) then
-		self._safehouse.balance = {}
+	self._coins_text:set_font_size(fs)
+end
+
+function HUDStageEndScreen:coin_up(new_coins, alpha_multi)
+	if alpha_multi == nil then
+		alpha_multi = 1
 	end
-	self._safehouse_stage = {"income", "balance"}
-	self:reset_income_count()
+	local level_text_func = function(o, ding_scale, new_coins)
+		local center_x, center_y = o:center()
+		local size = tweak_data.menu.pd2_massive_font_size
+		local ding_size = size * (1 + ding_scale)
+		wait(0.1)
+		o:set_text(tostring(new_coins))
+	end
+	
+	local function text_ding_func(o)
+		local TOTAL_T = 0.4
+		local t = TOTAL_T
+		local mul = 1
+		local size = o:font_size()
+		while 0 < t do
+			local dt = coroutine.yield()
+			t = t - dt
+			local ratio = math.max(t / TOTAL_T, 0)
+			mul = mul + dt * 4
+			o:set_font_size(size * mul)
+			o:set_alpha(ratio * alpha_multi)
+			o:set_color(math.lerp(Color.white, tweak_data.screen_colors.challenge_completed_color, 1 - ratio))
+		end
+		o:parent():remove(o)
+	end
+	
+	local function circle_ding_func(o)
+		wait(0.15)
+		local TOTAL_T = 0.6
+		local t = TOTAL_T
+		local mul = 1
+		local c_x, c_y = o:center()
+		local size = o:w()
+		while 0 < t do
+			local dt = coroutine.yield()
+			t = t - dt
+			local ratio = math.max(t / TOTAL_T, 0)
+			mul = mul + dt * 0.75
+			o:set_size(size * mul, size * mul)
+			o:set_center(c_x, c_y)
+			o:set_alpha(ratio * alpha_multi)
+			o:set_color(math.lerp(Color.white, tweak_data.screen_colors.challenge_completed_color, 1 - ratio))
+		end
+		o:parent():remove(o)
+	end
+	
+	managers.menu_component:post_event("stinger_levelup")
+	local ding_circle = self._coins_backpanel:bitmap({
+		texture = "guis/textures/pd2/endscreen/exp_ring",
+		w = self._coins_circle:w(),
+		h = self._coins_circle:h(),
+		x = self._coins_circle:x(),
+		y = self._coins_circle:y(),
+		color = Color.white,
+		blend_mode = "add",
+		layer = 0,
+		rotation = 360
+	})
+	ding_circle:animate(circle_ding_func)
+	local ding_text = self._coins_forepanel:text({
+		w = self._coins_text:w(),
+		h = self._coins_text:h(),
+		x = self._coins_text:x(),
+		y = self._coins_text:y(),
+		color = Color.white,
+		blend_mode = "add",
+		font_size = tweak_data.menu.pd2_massive_font_size,
+		font = tweak_data.menu.pd2_massive_font,
+		text = self._coins_text:text(),
+		align = "center",
+		vertical = "center",
+		layer = 0,
+		rotation = 360
+	})
+	ding_text:animate(text_ding_func)
+	self._coins_text:stop()
+	self._coins_text:animate(level_text_func, 1, tostring(math.floor(new_coins)))
+end
+
+function HUDStageEndScreen:safehouse_currency_fade_in(t, dt)
+	if self._start_ramp_up_t then
+		self._ramp_up_timer = math.min(self._ramp_up_timer + dt, self._start_ramp_up_t)
+		local ratio = self._ramp_up_timer / self._start_ramp_up_t
+		self._coins_circle:set_alpha(ratio)
+		self._coins_backpanel:child("bg_progress_circle"):set_alpha(ratio * 0.6)
+		self._coins_text:set_alpha(ratio)
+		if self._ramp_up_timer == self._start_ramp_up_t then
+			self._start_ramp_up_t = 1
+			self:step_stage_up()
+		end
+		return
+	end
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:safehouse_currency_count(t, dt)
+	local data = self._safehouse_data
+	if not self._last_trophy_bonus then
+		local bonus = self:_create_bonus({
+			panel = self._bonuses_panel,
+			color = tweak_data.screen_colors.text,
+			title = managers.localization:to_upper_text("menu_experience"),
+			bonus = math.floor(self._safehouse_data.current + data.remaining_income) - math.floor(self._safehouse_data.current)
+		})
+		bonus:child("sign"):hide()
+		self._last_trophy_bonus = bonus
+	end
+	if not self._playing_sound then
+		self._playing_sound = true
+		managers.menu_component:post_event("count_1")
+	end
+	if data.remaining_income > 0 then
+		local initial_xp = self._safehouse_data.current % 1
+		local total_next_coin_xp = math.min(data.remaining_income, 1 - initial_xp)
+		if self._next_coin_xp == nil then
+			self._next_coin_xp = total_next_coin_xp
+		end
+		local coin_xp_gained = dt * math.max(0.66, self._next_coin_xp)
+		self._next_coin_xp = self._next_coin_xp - coin_xp_gained
+		if 0 >= self._next_coin_xp then
+			coin_xp_gained = coin_xp_gained + self._next_coin_xp
+			self._next_coin_xp = 0
+		end
+		local ratio = initial_xp + (total_next_coin_xp - self._next_coin_xp)
+		self._coins_circle:set_color(Color(ratio, 1, 1))
+		if self._next_coin_xp == 0 then
+			local is_coin_up = 1 < self._safehouse_data.current % 1 + data.remaining_income
+			if is_coin_up then
+				self._safehouse_data.current = math.floor(self._safehouse_data.current + 1)
+				self:set_coin_text(self._safehouse_data.current)
+				self:coin_up(self._safehouse_data.current, 0.66)
+				self._wait_t = t + 0.65
+			else
+				self._safehouse_data.current = self._safehouse_data.current + data.remaining_income
+				self._wait_t = t + 0.4
+			end
+			data.remaining_income = data.remaining_income - total_next_coin_xp
+			self._next_coin_xp = nil
+			managers.menu_component:post_event("count_1_finished")
+			self._playing_sound = nil
+		end
+	else
+		self._wait_t = t + 0.5
+		self:step_stage_up()
+	end
+end
+
+function HUDStageEndScreen:safehouse_currency_trophies(t, dt)
+	local data = self._safehouse_data
+	self._trophy_bonuses = self._trophy_bonuses or {}
+	if #data.trophies > 0 then
+		local trophy = data.trophies[1]
+		if not self._trophy_bonuses[trophy[1]] then
+			local bonus = self:_create_bonus({
+				panel = self._bonuses_panel,
+				color = trophy[3],
+				title = managers.localization:to_upper_text(trophy[1]),
+				bonus = trophy[2]
+			})
+			bonus:child("sign"):hide()
+			self._trophy_bonuses[trophy[1]] = bonus
+			if self._last_trophy_bonus then
+				bonus:set_top(self._last_trophy_bonus:bottom())
+			end
+			self._last_trophy_bonus = bonus
+			self._wait_t = t + 0.5
+			return
+		end
+		if 0 < trophy[2] then
+			self._safehouse_data.current = self._safehouse_data.current + 1
+			trophy[2] = trophy[2] - 1
+			self:set_coin_text(self._safehouse_data.current)
+			self:coin_up(self._safehouse_data.current)
+			self._wait_t = t + 0.16
+			if 0 >= trophy[2] then
+				table.remove(data.trophies, 1)
+				self._wait_t = t + 1
+			end
+		end
+		return
+	end
+	WalletGuiObject.set_object_visible("wallet_coins_icon", true)
+	WalletGuiObject.set_object_visible("wallet_coins_text", true)
 	self._wait_t = t + 1
+	self._start_ramp_up_t = 0.35
+	self._ramp_up_timer = 0
+	self:step_stage_up()
+end
+
+function HUDStageEndScreen:safehouse_currency_hide(t, dt)
+	if self._start_ramp_up_t then
+		self._ramp_up_timer = math.min(self._ramp_up_timer + dt, self._start_ramp_up_t)
+		local ratio = 1 - self._ramp_up_timer / self._start_ramp_up_t
+		self._coins_circle:set_alpha(ratio)
+		self._coins_forepanel:child("coin_progress_text"):set_alpha(ratio)
+		self._coins_backpanel:child("bg_progress_circle"):set_alpha(ratio * 0.6)
+		self._coins_text:set_alpha(ratio)
+		self._bonuses_panel:set_alpha(ratio)
+		if self._ramp_up_timer == self._start_ramp_up_t then
+			self._start_ramp_up_t = nil
+		end
+		return
+	end
+	self._start_ramp_up_t = 1
 	self:step_stage_up()
 end
 
@@ -1465,29 +1746,7 @@ function HUDStageEndScreen:display_as_coins(amount)
 	return managers.experience:cash_string(math.floor(amount), "")
 end
 
-function HUDStageEndScreen:safehouse_currency_count(t, dt)
-	if self:perform_income_count(t, dt, self._safehouse_panel, self._safehouse_stage, self._safehouse, self.get_count_speed_slow, self.display_as_coins) then
-		managers.menu_component:show_endscreen_cash_summary()
-		self._wait_t = t + 1.25
-		self:step_stage_up()
-	end
-end
-
-function HUDStageEndScreen:safehouse_currency_hide(t, dt)
-	if not self._is_fail_video then
-		local video = self._background_layer_full:child("money_video")
-		if video then
-			video:animate(callback(self, self, "destroy_animation"))
-		end
-	end
-	if alive(self._safehouse_panel) then
-		self._safehouse_panel:animate(callback(self, self, "destroy_animation"))
-		self._safehouse_panel = nil
-	end
-	self:step_stage_up()
-end
-
-function HUDStageEndScreen:stage_init(t, dt)
+function HUDStageEndScreen:stage_experience_init(t, dt)
 	local data = self._data
 	repeat
 		self._lp_text:show()
@@ -1646,8 +1905,6 @@ function HUDStageEndScreen:stage_init(t, dt)
 	end
 	local delay = 0.8
 	local y = 0
-	if SystemInfo:platform() == Idstring("WIN32") then
-	end
 	local sum_text = self._lp_forepanel:text({
 		name = "sum_text",
 		font = tweak_data.menu.pd2_small_font,
@@ -1714,7 +1971,7 @@ function HUDStageEndScreen:anim_count_experience(o, stat)
 	o:parent():remove(o)
 end
 
-function HUDStageEndScreen:stage_count_exp(t, dt)
+function HUDStageEndScreen:stage_experience_count_exp(t, dt)
 	local data = self._data
 	if self._start_ramp_up_t then
 		self._ramp_up_timer = math.min(self._ramp_up_timer + dt, self._start_ramp_up_t)
@@ -1744,7 +2001,7 @@ function HUDStageEndScreen:stage_count_exp(t, dt)
 	self:step_stage_up()
 end
 
-function HUDStageEndScreen:stage_spin_up(t, dt)
+function HUDStageEndScreen:stage_experience_spin_up(t, dt)
 	local data = self._data
 	if self._start_ramp_up_t then
 		local ratio = 0
@@ -1789,7 +2046,7 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 	self:step_stage_up()
 end
 
-function HUDStageEndScreen:stage_show_all(t, dt)
+function HUDStageEndScreen:stage_experience_show_all(t, dt)
 	local start_max_level = data.start_t.level == managers.experience:level_cap()
 	self._lp_xp_gained:show()
 	self._lp_curr_xp:set_visible(not start_max_level)
@@ -1801,7 +2058,7 @@ function HUDStageEndScreen:stage_show_all(t, dt)
 	self:step_stage_up()
 end
 
-function HUDStageEndScreen:stage_spin_levels(t, dt)
+function HUDStageEndScreen:stage_experience_spin_levels(t, dt)
 	local data = self._data
 	if not self._playing_sound then
 		self._playing_sound = true
@@ -1863,7 +2120,7 @@ function HUDStageEndScreen:stage_spin_levels(t, dt)
 	end
 end
 
-function HUDStageEndScreen:stage_spin_slowdown(t, dt)
+function HUDStageEndScreen:stage_experience_spin_slowdown(t, dt)
 	local data = self._data
 	local level_cap = data.end_t.level == managers.experience:level_cap()
 	local xp_gained_frame = dt * self._speed * math.max(data.end_t.total * 0.1, 450, (level_cap and self._experience_added or 0) * 0.075)
@@ -1919,7 +2176,7 @@ function HUDStageEndScreen:stage_spin_slowdown(t, dt)
 	end
 end
 
-function HUDStageEndScreen:stage_end(t, dt)
+function HUDStageEndScreen:stage_experience_end(t, dt)
 	local data = self._data
 	local ratio = data.end_t.current / data.end_t.total
 	self._static_current_xp = data.end_t.xp
@@ -2107,23 +2364,6 @@ end
 function HUDStageEndScreen:set_speed_up(multiplier)
 	self._speed_up = multiplier
 end
-
-HUDStageEndScreen.stages = {
-	"create_money_counter",
-	"count_money",
-	"hide_money",
-	"safehouse_currency_init",
-	"safehouse_currency_count",
-	"safehouse_currency_hide",
-	"stage_init",
-	"stage_count_exp",
-	"stage_spin_up",
-	"stage_show_all",
-	"stage_spin_levels",
-	"stage_spin_slowdown",
-	"stage_end",
-	"stage_done"
-}
 
 function HUDStageEndScreen:update(t, dt)
 	if self._wait_t then

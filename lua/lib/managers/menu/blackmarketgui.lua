@@ -4707,6 +4707,7 @@ function BlackMarketGui:show_stats()
 		local equip, stat_changed
 		local tweak_parts = tweak_data.weapon.factory.parts[self._slot_data.name]
 		local blueprint = clone(managers.blackmarket:get_weapon_blueprint(category, slot))
+		local unaltered_total_base_stats, unaltered_total_mods_stats, unaltered_total_skill_stats = WeaponDescription._get_stats(name, category, slot, blueprint)
 		managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, self._slot_data.name, blueprint, false)
 		local total_base_stats, total_mods_stats, total_skill_stats = WeaponDescription._get_stats(name, category, slot, blueprint)
 		local mod_stats = WeaponDescription.get_stats_for_mod(self._slot_data.name, name, category, slot)
@@ -4757,12 +4758,13 @@ function BlackMarketGui:show_stats()
 			alpha = 1,
 			x = 245
 		})
-		local total_value, total_index
+		local total_value, total_index, unaltered_total_value
 		for _, stat in ipairs(self._stats_shown) do
 			self._stats_texts[stat.name].name:set_text(utf8.to_upper(managers.localization:text("bm_menu_" .. stat.name)))
 			value = mod_stats.chosen[stat.name]
 			equip = mod_stats.equip[stat.name]
 			total_value = math.max(total_base_stats[stat.name].value + total_mods_stats[stat.name].value + total_skill_stats[stat.name].value, 0)
+			unaltered_total_value = math.max(unaltered_total_base_stats[stat.name].value + unaltered_total_mods_stats[stat.name].value + unaltered_total_skill_stats[stat.name].value, 0)
 			stat_changed = tweak_parts and tweak_parts.stats and tweak_parts.stats[stat.stat_name or stat.name] and value ~= 0
 			stat_changed = stat_changed or remove_stats[stat.name] and remove_stats[stat.name] ~= 0
 			for stat_name, stat_text in pairs(self._stats_texts[stat.name]) do
@@ -4787,10 +4789,10 @@ function BlackMarketGui:show_stats()
 				self._stats_texts[stat.name].removed:set_text("")
 			end
 			equip = equip + math.round(remove_stats[stat.name] or 0)
-			if value > equip then
+			if total_value > unaltered_total_value then
 				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.stats_positive)
 				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
-			elseif value < equip then
+			elseif total_value < unaltered_total_value then
 				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.stats_negative)
 				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_negative)
 			else
@@ -9112,6 +9114,15 @@ function BlackMarketGui:populate_mods(data)
 				new_data.mid_text.font_size = font_size
 				new_data.mid_text.no_upper = no_upper
 				new_data.lock_texture = true
+			elseif new_data.unlocked and not new_data.can_afford then
+				new_data.mid_text = {}
+				new_data.mid_text.selected_text = managers.localization:text("bm_menu_not_enough_cash")
+				new_data.mid_text.selected_color = tweak_data.screen_colors.text
+				new_data.mid_text.noselected_text = new_data.mid_text.selected_text
+				new_data.mid_text.noselected_color = tweak_data.screen_colors.text
+				new_data.mid_text.vertical = "center"
+				new_data.mid_text.font = small_font
+				new_data.mid_text.font_size = small_font_size
 			end
 			if mod_name then
 				local forbid = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)

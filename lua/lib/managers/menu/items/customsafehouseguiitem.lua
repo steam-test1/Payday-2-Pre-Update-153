@@ -233,12 +233,13 @@ CustomSafehouseGuiButtonItem = CustomSafehouseGuiButtonItem or class(CustomSafeh
 
 function CustomSafehouseGuiButtonItem:init(panel, data, x, priority)
 	CustomSafehouseGuiButtonItem.super.init(self, panel, data)
+	self._btn_data = data
 	self._callback = data.callback
-	local prefix = not managers.menu:is_pc_controller() and data.btn and managers.localization:get_default_macro(data.btn) or ""
 	local up_font_size = NOT_WIN_32 and RenderSettings.resolution.y < 720 and data.btn == "BTN_STICK_R" and 2 or 0
 	self._color = data.color or tweak_data.screen_colors.button_stage_3
 	self._selected_color = data.selected_color or tweak_data.screen_colors.button_stage_2
 	self._custom_data = data.custom
+	self._hidden = false
 	self._panel = panel:panel({
 		x = x,
 		y = data.y or x + (priority - 1) * small_font_size,
@@ -257,7 +258,7 @@ function CustomSafehouseGuiButtonItem:init(panel, data, x, priority)
 		blend_mode = "add",
 		layer = 1
 	})
-	self:set_text(prefix .. managers.localization:text(data.name_id))
+	self:set_text(managers.localization:text(data.name_id))
 	self._select_rect = self._panel:rect({
 		name = "select_rect",
 		blend_mode = "add",
@@ -272,12 +273,21 @@ function CustomSafehouseGuiButtonItem:init(panel, data, x, priority)
 	end
 end
 
+function CustomSafehouseGuiButtonItem:button_data()
+	return self._btn_data
+end
+
 function CustomSafehouseGuiButtonItem:get_custom_data()
 	return self._custom_data
 end
 
+function CustomSafehouseGuiButtonItem:reorder(new_prio)
+	self._panel:set_y(self._panel:x() + (new_prio - 1) * small_font_size)
+end
+
 function CustomSafehouseGuiButtonItem:set_text(text)
-	self._btn_text:set_text(utf8.to_upper(text))
+	local prefix = not managers.menu:is_pc_controller() and self._btn_data.btn and managers.localization:get_default_macro(self._btn_data.btn) or ""
+	self._btn_text:set_text(prefix .. utf8.to_upper(text))
 	local _, _, w, h = self._btn_text:text_rect()
 	self._panel:set_h(h)
 	self._btn_text:set_h(h)
@@ -288,6 +298,9 @@ function CustomSafehouseGuiButtonItem:text()
 end
 
 function CustomSafehouseGuiButtonItem:inside(x, y)
+	if self._hidden then
+		return false
+	end
 	return self._panel:inside(x, y)
 end
 
@@ -300,6 +313,9 @@ function CustomSafehouseGuiButtonItem:hide()
 end
 
 function CustomSafehouseGuiButtonItem:visible()
+	if self._hidden then
+		return false
+	end
 	return self._select_rect:visible()
 end
 
@@ -331,6 +347,15 @@ function CustomSafehouseGuiButtonItem:set_selected(selected, play_sound)
 		self._btn_text:set_color(self._color)
 		self._select_rect:set_color(self._color)
 	end
+end
+
+function CustomSafehouseGuiButtonItem:hidden()
+	return self._hidden
+end
+
+function CustomSafehouseGuiButtonItem:set_hidden(hidden)
+	self._hidden = hidden
+	self._panel:set_visible(not hidden)
 end
 
 CustomSafehouseGuiButtonItemWithIcon = CustomSafehouseGuiButtonItemWithIcon or class(CustomSafehouseGuiButtonItem)

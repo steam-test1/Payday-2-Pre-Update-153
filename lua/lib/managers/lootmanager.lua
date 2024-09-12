@@ -443,6 +443,14 @@ function LootManager:total_value_by_type(type)
 	return value
 end
 
+function LootManager:get_loot_stinger()
+	local job_tweak = tweak_data.narrative.jobs[managers.job:current_real_job_id()]
+	if job_tweak and job_tweak.objective_stinger then
+		return job_tweak.objective_stinger
+	end
+	return "stinger_objectivecomplete"
+end
+
 function LootManager:_present(carry_id, multiplier)
 	local real_value = 0
 	local is_small_loot = not not tweak_data.carry.small_loot[carry_id]
@@ -464,7 +472,7 @@ function LootManager:_present(carry_id, multiplier)
 		title = title,
 		icon = icon,
 		time = 4,
-		event = "stinger_objectivecomplete"
+		event = self:get_loot_stinger()
 	})
 end
 

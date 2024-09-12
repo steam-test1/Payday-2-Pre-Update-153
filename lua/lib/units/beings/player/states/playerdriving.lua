@@ -85,16 +85,20 @@ function PlayerDriving:exit(state_data, new_state_name)
 	self:_interupt_action_charging_weapon()
 	self:_interupt_action_melee()
 	local exit_position = self._vehicle_ext:find_exit_position(self._unit)
-	local exit_rot = exit_position:rotation()
-	self._unit:set_rotation(exit_rot)
-	self._unit:camera():set_rotation(exit_rot)
-	local pos = exit_position:position() + Vector3(0, 0, 30)
-	self._unit:set_position(pos)
-	self._unit:camera():set_position(pos)
-	self._unit:camera():camera_unit():base():set_spin(exit_rot:y():to_polar().spin)
-	self._unit:camera():camera_unit():base():set_pitch(0)
-	self._unit:camera():camera_unit():base():set_target_tilt(0)
-	self._unit:camera():camera_unit():base().bipod_location = nil
+	if exit_position then
+		local exit_rot = exit_position:rotation()
+		self._unit:set_rotation(exit_rot)
+		self._unit:camera():set_rotation(exit_rot)
+		local pos = exit_position:position() + Vector3(0, 0, 30)
+		self._unit:set_position(pos)
+		self._unit:camera():set_position(pos)
+		self._unit:camera():camera_unit():base():set_spin(exit_rot:y():to_polar().spin)
+		self._unit:camera():camera_unit():base():set_pitch(0)
+		self._unit:camera():camera_unit():base():set_target_tilt(0)
+		self._unit:camera():camera_unit():base().bipod_location = nil
+	else
+		Application:error("[PlayerDriving:exit] No vehicle exit position")
+	end
 	if self._vehicle_unit:damage():has_sequence("local_driving_exit") then
 		self._vehicle_unit:damage():run_sequence("local_driving_exit")
 	end

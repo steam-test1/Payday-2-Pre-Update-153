@@ -10432,7 +10432,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hunter.panic_suppression_chance = 0.2
 	self.hunter.ignore_damage_upgrades = true
 	self.hunter.stats = {
-		damage = 75,
+		damage = 35,
 		spread = 25,
 		recoil = 25,
 		spread_moving = 25,

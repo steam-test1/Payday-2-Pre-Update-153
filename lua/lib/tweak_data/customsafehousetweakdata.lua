@@ -541,6 +541,7 @@ function CustomSafehouseTweakData:_create_objective(data)
 		name_id = data.name_id,
 		desc_id = data.desc_id,
 		completed = false,
+		displayed = true,
 		progress_id = data.progress_id,
 		max_progress = data.progress_id and data.max_progress or 1,
 		progress = 0,

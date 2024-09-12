@@ -30,4 +30,7 @@ function VanSkinsTweakData:init(tweak_data)
 	self.skins.icecream = {}
 	self.skins.icecream.dlc = nil
 	self.skins.icecream.sequence_name = "mat_chill_icecream"
+	self.skins.spooky = {}
+	self.skins.spooky.dlc = nil
+	self.skins.spooky.sequence_name = "mat_chill_halloween"
 end
