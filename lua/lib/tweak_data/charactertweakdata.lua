@@ -1586,6 +1586,7 @@ function CharacterTweakData:_init_civilian(presets)
 	self.robbers_safehouse.scare_intimidate = 0
 	self.robbers_safehouse.intimidateable = false
 	self.robbers_safehouse.ignores_aggression = true
+	self.robbers_safehouse.ignores_contours = true
 end
 
 function CharacterTweakData:_init_bank_manager(presets)

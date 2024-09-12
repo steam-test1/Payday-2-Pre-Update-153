@@ -2865,6 +2865,34 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.spk_party.texture_bundle_folder = "sparkle"
 	self.masks.spk_party.sort_number = 28
 	self.masks.spk_party.dlc = "sparkle"
+	self.masks.gti_al_capone = {}
+	self.masks.gti_al_capone.unit = "units/pd2_dlc_gotti/masks/al_capone/msk_gti_al_capone"
+	self.masks.gti_al_capone.name_id = "bm_al_pacino"
+	self.masks.gti_al_capone.pcs = {}
+	self.masks.gti_al_capone.value = 0
+	self.masks.gti_al_capone.texture_bundle_folder = "gotti"
+	self.masks.gti_al_capone.sort_number = 29
+	self.masks.gti_bugsy = {}
+	self.masks.gti_bugsy.unit = "units/pd2_dlc_gotti/masks/bugsy/msk_gti_bugsy"
+	self.masks.gti_bugsy.name_id = "bm_bugsy"
+	self.masks.gti_bugsy.pcs = {}
+	self.masks.gti_bugsy.value = 0
+	self.masks.gti_bugsy.texture_bundle_folder = "gotti"
+	self.masks.gti_bugsy.sort_number = 29
+	self.masks.gti_madame_st_claire = {}
+	self.masks.gti_madame_st_claire.unit = "units/pd2_dlc_gotti/masks/madame/msk_gti_madame_st_claire"
+	self.masks.gti_madame_st_claire.name_id = "bm_madame_st_claire"
+	self.masks.gti_madame_st_claire.pcs = {}
+	self.masks.gti_madame_st_claire.value = 0
+	self.masks.gti_madame_st_claire.texture_bundle_folder = "gotti"
+	self.masks.gti_madame_st_claire.sort_number = 29
+	self.masks.gti_lucky_luciano = {}
+	self.masks.gti_lucky_luciano.unit = "units/pd2_dlc_gotti/masks/lucky_luciano/msk_gti_lucky_luciano"
+	self.masks.gti_lucky_luciano.name_id = "bm_lucky_luciano"
+	self.masks.gti_lucky_luciano.pcs = {}
+	self.masks.gti_lucky_luciano.value = 0
+	self.masks.gti_lucky_luciano.texture_bundle_folder = "gotti"
+	self.masks.gti_lucky_luciano.sort_number = 29
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

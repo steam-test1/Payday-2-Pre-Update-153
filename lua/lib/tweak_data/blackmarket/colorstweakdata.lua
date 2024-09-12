@@ -36,6 +36,10 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 	local cobalt_blue = Color(255, 0, 93, 199) / 255
 	local toxic_green = Color(255, 167, 248, 87) / 255
 	local nothing = Color(0, 0, 0, 0) / 255
+	local skin_pink = Color(255, 230, 147, 140) / 255
+	local sea_blue = Color(255, 6, 55, 56) / 255
+	local dark_purple = Color(255, 107, 0, 74) / 255
+	local scary_green = Color(255, 92, 255, 117) / 255
 	self.colors.white_solid = {}
 	self.colors.white_solid.colors = {white, white}
 	self.colors.white_solid.name_id = "bm_clr_white_solid"
@@ -1041,6 +1045,456 @@ function BlackMarketTweakData:_init_colors(tweak_data)
 		40
 	}
 	self.colors.dark_red_orange.value = 3
+	self.colors.scary_green_solid = {}
+	self.colors.scary_green_solid.colors = {scary_green, scary_green}
+	self.colors.scary_green_solid.name_id = "bm_clr_scary_green"
+	self.colors.scary_green_solid.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_solid.value = 5
+	self.colors.dark_purple_solid = {}
+	self.colors.dark_purple_solid.colors = {dark_purple, dark_purple}
+	self.colors.dark_purple_solid.name_id = "bm_clr_dark_purple"
+	self.colors.dark_purple_solid.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_solid.value = 5
+	self.colors.sea_blue_solid = {}
+	self.colors.sea_blue_solid.colors = {sea_blue, sea_blue}
+	self.colors.sea_blue_solid.name_id = "bm_clr_sea_blue"
+	self.colors.sea_blue_solid.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_solid.value = 5
+	self.colors.skin_pink_solid = {}
+	self.colors.skin_pink_solid.colors = {skin_pink, skin_pink}
+	self.colors.skin_pink_solid.name_id = "bm_clr_skin_pink"
+	self.colors.skin_pink_solid.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_solid.value = 5
+	self.colors.black_red = {}
+	self.colors.black_red.colors = {black, red}
+	self.colors.black_red.name_id = "bm_clr_black_red"
+	self.colors.black_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.black_red.value = 1
+	self.colors.blue_yellow = {}
+	self.colors.blue_yellow.colors = {blue, yellow}
+	self.colors.blue_yellow.name_id = "bm_clr_blue_yellow"
+	self.colors.blue_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.blue_yellow.value = 5
+	self.colors.blue_red = {}
+	self.colors.blue_red.colors = {blue, red}
+	self.colors.blue_red.name_id = "bm_clr_blue_red"
+	self.colors.blue_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.blue_red.value = 2
+	self.colors.dark_grey_light_gray = {}
+	self.colors.dark_grey_light_gray.colors = {dark_gray, light_gray}
+	self.colors.dark_grey_light_gray.name_id = "bm_clr_dark_grey_light_gray"
+	self.colors.dark_grey_light_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_grey_light_gray.value = 3
+	self.colors.orange_yellow = {}
+	self.colors.orange_yellow.colors = {orange, yellow}
+	self.colors.orange_yellow.name_id = "bm_clr_orange_yellow"
+	self.colors.orange_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.orange_yellow.value = 6
+	self.colors.black_gray = {}
+	self.colors.black_gray.colors = {black, gray}
+	self.colors.black_gray.name_id = "bm_clr_black_gray"
+	self.colors.black_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.black_gray.value = 3
+	self.colors.orange_black = {}
+	self.colors.orange_black.colors = {orange, black}
+	self.colors.orange_black.name_id = "bm_clr_orange_black"
+	self.colors.orange_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.orange_black.value = 4
+	self.colors.white_red = {}
+	self.colors.white_red.colors = {white, red}
+	self.colors.white_red.name_id = "bm_clr_white_red"
+	self.colors.white_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.white_red.value = 4
+	self.colors.bright_yellow_black = {}
+	self.colors.bright_yellow_black.colors = {bright_yellow, black}
+	self.colors.bright_yellow_black.name_id = "bm_clr_bright_yellow_black"
+	self.colors.bright_yellow_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.bright_yellow_black.value = 2
+	self.colors.scary_green_black = {}
+	self.colors.scary_green_black.colors = {scary_green, black}
+	self.colors.scary_green_black.name_id = "bm_clr_scary_green_black"
+	self.colors.scary_green_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_black.value = 3
+	self.colors.skin_pink_black = {}
+	self.colors.skin_pink_black.colors = {skin_pink, black}
+	self.colors.skin_pink_black.name_id = "bm_clr_skin_pink_black"
+	self.colors.skin_pink_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_black.value = 3
+	self.colors.sea_blue_black = {}
+	self.colors.sea_blue_black.colors = {sea_blue, black}
+	self.colors.sea_blue_black.name_id = "bm_clr_sea_blue_black"
+	self.colors.sea_blue_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_black.value = 3
+	self.colors.dark_purple_black = {}
+	self.colors.dark_purple_black.colors = {dark_purple, black}
+	self.colors.dark_purple_black.name_id = "bm_clr_dark_purple_black"
+	self.colors.dark_purple_black.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_black.value = 3
+	self.colors.scary_green_white = {}
+	self.colors.scary_green_white.colors = {scary_green, white}
+	self.colors.scary_green_white.name_id = "bm_clr_scary_green_white"
+	self.colors.scary_green_white.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_white.value = 3
+	self.colors.skin_pink_white = {}
+	self.colors.skin_pink_white.colors = {skin_pink, white}
+	self.colors.skin_pink_white.name_id = "bm_clr_skin_pink_white"
+	self.colors.skin_pink_white.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_white.value = 3
+	self.colors.sea_blue_white = {}
+	self.colors.sea_blue_white.colors = {sea_blue, white}
+	self.colors.sea_blue_white.name_id = "bm_clr_sea_blue_white"
+	self.colors.sea_blue_white.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_white.value = 3
+	self.colors.dark_purple_white = {}
+	self.colors.dark_purple_white.colors = {dark_purple, white}
+	self.colors.dark_purple_white.name_id = "bm_clr_dark_purple_white"
+	self.colors.dark_purple_white.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_white.value = 3
+	self.colors.scary_green_red = {}
+	self.colors.scary_green_red.colors = {scary_green, red}
+	self.colors.scary_green_red.name_id = "bm_clr_scary_green_red"
+	self.colors.scary_green_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_red.value = 3
+	self.colors.skin_pink_red = {}
+	self.colors.skin_pink_red.colors = {skin_pink, red}
+	self.colors.skin_pink_red.name_id = "bm_clr_skin_pink_red"
+	self.colors.skin_pink_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_red.value = 3
+	self.colors.sea_blue_red = {}
+	self.colors.sea_blue_red.colors = {sea_blue, red}
+	self.colors.sea_blue_red.name_id = "bm_clr_sea_blue_red"
+	self.colors.sea_blue_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_red.value = 3
+	self.colors.dark_purple_red = {}
+	self.colors.dark_purple_red.colors = {dark_purple, red}
+	self.colors.dark_purple_red.name_id = "bm_clr_dark_purple_red"
+	self.colors.dark_purple_red.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_red.value = 3
+	self.colors.scary_green_green = {}
+	self.colors.scary_green_green.colors = {scary_green, green}
+	self.colors.scary_green_green.name_id = "bm_clr_scary_green_green"
+	self.colors.scary_green_green.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_green.value = 3
+	self.colors.skin_pink_green = {}
+	self.colors.skin_pink_green.colors = {skin_pink, green}
+	self.colors.skin_pink_green.name_id = "bm_clr_skin_pink_green"
+	self.colors.skin_pink_green.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_green.value = 3
+	self.colors.sea_blue_green = {}
+	self.colors.sea_blue_green.colors = {sea_blue, green}
+	self.colors.sea_blue_green.name_id = "bm_clr_sea_blue_green"
+	self.colors.sea_blue_green.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_green.value = 3
+	self.colors.dark_purple_green = {}
+	self.colors.dark_purple_green.colors = {dark_purple, green}
+	self.colors.dark_purple_green.name_id = "bm_clr_dark_purple_green"
+	self.colors.dark_purple_green.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_green.value = 3
+	self.colors.scary_green_blue = {}
+	self.colors.scary_green_blue.colors = {scary_green, blue}
+	self.colors.scary_green_blue.name_id = "bm_clr_scary_green_blue"
+	self.colors.scary_green_blue.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_blue.value = 3
+	self.colors.skin_pink_blue = {}
+	self.colors.skin_pink_blue.colors = {skin_pink, blue}
+	self.colors.skin_pink_blue.name_id = "bm_clr_skin_pink_blue"
+	self.colors.skin_pink_blue.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_blue.value = 3
+	self.colors.sea_blue_blue = {}
+	self.colors.sea_blue_blue.colors = {sea_blue, blue}
+	self.colors.sea_blue_blue.name_id = "bm_clr_sea_blue_blue"
+	self.colors.sea_blue_blue.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_blue.value = 3
+	self.colors.dark_purple_blue = {}
+	self.colors.dark_purple_blue.colors = {dark_purple, blue}
+	self.colors.dark_purple_blue.name_id = "bm_clr_dark_purple_blue"
+	self.colors.dark_purple_blue.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_blue.value = 3
+	self.colors.scary_green_yellow = {}
+	self.colors.scary_green_yellow.colors = {scary_green, yellow}
+	self.colors.scary_green_yellow.name_id = "bm_clr_scary_green_yellow"
+	self.colors.scary_green_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_yellow.value = 3
+	self.colors.skin_pink_yellow = {}
+	self.colors.skin_pink_yellow.colors = {skin_pink, yellow}
+	self.colors.skin_pink_yellow.name_id = "bm_clr_skin_pink_yellow"
+	self.colors.skin_pink_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_yellow.value = 3
+	self.colors.sea_blue_yellow = {}
+	self.colors.sea_blue_yellow.colors = {sea_blue, yellow}
+	self.colors.sea_blue_yellow.name_id = "bm_clr_sea_blue_yellow"
+	self.colors.sea_blue_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_yellow.value = 3
+	self.colors.dark_purple_yellow = {}
+	self.colors.dark_purple_yellow.colors = {dark_purple, yellow}
+	self.colors.dark_purple_yellow.name_id = "bm_clr_dark_purple_yellow"
+	self.colors.dark_purple_yellow.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_yellow.value = 3
+	self.colors.scary_green_gray = {}
+	self.colors.scary_green_gray.colors = {scary_green, gray}
+	self.colors.scary_green_gray.name_id = "bm_clr_scary_green_gray"
+	self.colors.scary_green_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_gray.value = 3
+	self.colors.skin_pink_gray = {}
+	self.colors.skin_pink_gray.colors = {skin_pink, gray}
+	self.colors.skin_pink_gray.name_id = "bm_clr_skin_pink_gray"
+	self.colors.skin_pink_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_gray.value = 3
+	self.colors.sea_blue_gray = {}
+	self.colors.sea_blue_gray.colors = {sea_blue, gray}
+	self.colors.sea_blue_gray.name_id = "bm_clr_sea_blue_gray"
+	self.colors.sea_blue_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_gray.value = 3
+	self.colors.dark_purple_gray = {}
+	self.colors.dark_purple_gray.colors = {dark_purple, gray}
+	self.colors.dark_purple_gray.name_id = "bm_clr_dark_purple_gray"
+	self.colors.dark_purple_gray.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_gray.value = 3
+	self.colors.scary_green_orange = {}
+	self.colors.scary_green_orange.colors = {scary_green, orange}
+	self.colors.scary_green_orange.name_id = "bm_clr_scary_green_orange"
+	self.colors.scary_green_orange.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.scary_green_orange.value = 3
+	self.colors.skin_pink_orange = {}
+	self.colors.skin_pink_orange.colors = {skin_pink, orange}
+	self.colors.skin_pink_orange.name_id = "bm_clr_skin_pink_orange"
+	self.colors.skin_pink_orange.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.skin_pink_orange.value = 3
+	self.colors.sea_blue_orange = {}
+	self.colors.sea_blue_orange.colors = {sea_blue, orange}
+	self.colors.sea_blue_orange.name_id = "bm_clr_sea_blue_orange"
+	self.colors.sea_blue_orange.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.sea_blue_orange.value = 3
+	self.colors.dark_purple_orange = {}
+	self.colors.dark_purple_orange.colors = {dark_purple, orange}
+	self.colors.dark_purple_orange.name_id = "bm_clr_dark_purple_orange"
+	self.colors.dark_purple_orange.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.colors.dark_purple_orange.value = 3
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.colors) do
 		if free_dlcs[data.dlc] then

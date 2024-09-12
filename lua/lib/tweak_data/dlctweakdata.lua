@@ -4964,6 +4964,31 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.gotti_bundle = {}
+	self.gotti_bundle.content = {}
+	self.gotti_bundle.content.loot_global_value = "normal"
+	self.gotti_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "gti_al_capone",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "gti_bugsy",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "gti_madame_st_claire",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "gti_lucky_luciano",
+			amount = 1
+		}
+	}
 	self.sparkle = {}
 	self.sparkle.content = {}
 	self.sparkle.content.loot_drops = {

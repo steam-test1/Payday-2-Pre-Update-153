@@ -2358,7 +2358,17 @@ function CopDamage:load(data)
 	if data.char_dmg.is_converted then
 		self._unit:set_slot(16)
 		managers.groupai:state():sync_converted_enemy(self._unit)
-		self._unit:contour():add("friendly", false)
+		local add_contour = true
+		local tweak_name = alive(self._unit) and self._unit:base() and self._unit:base()._tweak_table
+		if tweak_name then
+			local char_tweak_data = tweak_data.character[tweak_name]
+			if char_tweak_data then
+				add_contour = not char_tweak_data.ignores_contours
+			end
+		end
+		if add_contour then
+			self._unit:contour():add("friendly", false)
+		end
 	end
 	if data.char_dmg.lower_health_percentage_limit then
 		self:_set_lower_health_percentage_limit(data.char_dmg.lower_health_percentage_limit)

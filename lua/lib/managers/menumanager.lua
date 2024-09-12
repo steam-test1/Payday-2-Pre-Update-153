@@ -7092,7 +7092,7 @@ function MenuCrimeNetCasinoInitiator:_create_items(node, options)
 		masks = true,
 		materials = true,
 		textures = true,
-		colors = true
+		colors = false
 	}
 	local preferred_value = preferred_item:value()
 	local infamous_item = node:create_item(infamous_data, infamous_params)
