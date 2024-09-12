@@ -14,7 +14,7 @@ function ElementPlaySound:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	if self._source then
+	if self._source and self:value("interrupt") ~= false then
 		self._source:stop()
 	end
 	if self._values.use_instigator then

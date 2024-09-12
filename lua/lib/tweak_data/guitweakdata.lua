@@ -522,6 +522,14 @@ function GuiTweakData:init()
 		store = 487210,
 		image = "guis/dlcs/born/textures/pd2/content_updates/born"
 	}
+	local pim = {
+		id = "pim",
+		name_id = "menu_content_pim",
+		desc_id = "menu_content_pim_desc",
+		date_id = "menu_content_pim_date",
+		store = 545100,
+		image = "guis/dlcs/pim/textures/pd2/content_updates/pim"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -591,7 +599,8 @@ function GuiTweakData:init()
 			update100,
 			tutorial,
 			wild,
-			born
+			born,
+			pim
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {

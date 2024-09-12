@@ -36,9 +36,14 @@ function EnvironmentHandler:destroy()
 end
 
 function EnvironmentHandler:set_environment(path, blend_duration, blend_bezier_curve, filter_list, unfiltered_environment_path)
+	if self._override_environment ~= path then
+		self._path = path
+	end
+	if self._override_environment then
+		path = self._override_environment
+	end
 	local env_data = self._env_manager:_get_data(path)
 	local filtered_env_data
-	self._path = path
 	if filter_list then
 		filtered_env_data = {}
 		for _, data_path_key in ipairs(filter_list) do
@@ -244,6 +249,11 @@ function EnvironmentHandler:on_default_environment_changed(default_environment_p
 	if not self._current_area then
 		self:set_environment(default_environment_path, blend_duration, blend_bezier_curve, nil, nil)
 	end
+end
+
+function EnvironmentHandler:on_override_environment_changed(override_environment_path, blend_duration, blend_bezier_curve)
+	self._override_environment = override_environment_path
+	self:set_environment(self._override_environment or self._path, blend_duration, blend_bezier_curve, nil, nil)
 end
 
 function EnvironmentHandler:set_first_viewport(is_first_viewport)

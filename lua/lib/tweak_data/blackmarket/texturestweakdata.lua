@@ -1972,6 +1972,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.tire_fire.texture = "units/pd2_dlc_born/masks/patterns/pattern_tirefire_df"
 	self.textures.tire_fire.value = 0
 	self.textures.tire_fire.dlc = "born"
+	self.textures.oneshot = {}
+	self.textures.oneshot.name_id = "bm_txt_oneshot"
+	self.textures.oneshot.pcs = {}
+	self.textures.oneshot.texture = "units/pd2_dlc_pim/masks/patterns/pattern_oneshot_df"
+	self.textures.oneshot.value = 0
+	self.textures.oneshot.dlc = "pim"
+	self.textures.daisy = {}
+	self.textures.daisy.name_id = "bm_txt_daisy"
+	self.textures.daisy.pcs = {}
+	self.textures.daisy.texture = "units/pd2_dlc_pim/masks/patterns/pattern_daisy_df"
+	self.textures.daisy.value = 0
+	self.textures.daisy.dlc = "pim"
+	self.textures.warface = {}
+	self.textures.warface.name_id = "bm_txt_warface"
+	self.textures.warface.pcs = {}
+	self.textures.warface.texture = "units/pd2_dlc_pim/masks/patterns/pattern_warface_df"
+	self.textures.warface.value = 0
+	self.textures.warface.dlc = "pim"
+	self.textures.piety = {}
+	self.textures.piety.name_id = "bm_txt_piety"
+	self.textures.piety.pcs = {}
+	self.textures.piety.texture = "units/pd2_dlc_pim/masks/patterns/pattern_piety_df"
+	self.textures.piety.value = 0
+	self.textures.piety.dlc = "pim"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then

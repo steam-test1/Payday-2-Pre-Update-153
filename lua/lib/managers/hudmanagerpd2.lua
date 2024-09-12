@@ -677,12 +677,12 @@ function HUDManager:set_control_info(data)
 	self._hud_assault_corner:set_control_info(data)
 end
 
-function HUDManager:sync_start_assault(data)
+function HUDManager:sync_start_assault(assault_number)
 	managers.music:post_event(tweak_data.levels:get_music_event("assault"))
 	if not managers.groupai:state():get_hunt_mode() then
 		managers.dialog:queue_dialog("gen_ban_b02c", {})
 	end
-	self._hud_assault_corner:sync_start_assault(data)
+	self._hud_assault_corner:sync_start_assault(assault_number)
 end
 
 function HUDManager:sync_end_assault(result)

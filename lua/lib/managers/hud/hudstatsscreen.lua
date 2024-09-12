@@ -1102,20 +1102,27 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			day_description:set_h(h)
 			managers.hud:make_fine_text(days_title)
 			day_wrapper_panel:set_h(day_title:top() + day_description:bottom())
-			local mutators_panel = right_panel:child("mutators_panel")
-			if mutators_panel then
-				local diff = day_wrapper_panel:bottom() - mutators_panel:top()
-				if 0 < diff then
-					day_description:set_h(day_description:h() - diff)
-					day_wrapper_panel:set_h(day_wrapper_panel:h() - diff)
-					local line_breaks = day_description:line_breaks()
-					for i, bh in ipairs(line_breaks) do
-						if day_description:top() + (line_breaks[i + 1] or bh) >= day_wrapper_panel:h() then
-							day_description:set_h(line_breaks[i - 1])
-							break
-						end
+			if managers.mutators:are_mutators_active() then
+				local mutators_panel = right_panel:child("mutators_panel")
+				if mutators_panel then
+					local diff = day_wrapper_panel:bottom() - mutators_panel:top()
+					if 0 < diff then
+						day_description:set_h(day_description:h() - diff)
+						day_wrapper_panel:set_h(day_wrapper_panel:h() - diff)
 					end
 				end
+				if self._box_gui then
+					self._box_gui:close()
+					self._box_gui = nil
+				end
+				self._box_gui = BoxGuiObject:new(day_wrapper_panel, {
+					sides = {
+						0,
+						0,
+						0,
+						2
+					}
+				})
 			end
 			local _, _, _, h = day_description:text_rect()
 			local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id())

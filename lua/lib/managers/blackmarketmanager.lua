@@ -6431,3 +6431,22 @@ function BlackMarketManager:is_single_shot(blueprint, category)
 	end
 	return false
 end
+
+function BlackMarketManager:player_owns_silenced_weapon()
+	local factory_parts = tweak_data.weapon.factory.parts
+	local categories = {
+		"primaries",
+		"secondaries"
+	}
+	for _, category in ipairs(categories) do
+		for _, crafted_item in pairs(self._global.crafted_items[category]) do
+			for _, part_id in ipairs(crafted_item.blueprint) do
+				local part_tweak_data = factory_parts[part_id]
+				if part_tweak_data and part_tweak_data.sub_type == "silencer" then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end

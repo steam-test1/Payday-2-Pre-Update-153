@@ -16,6 +16,7 @@ HUDManager.ASSAULT_DIALOGS = {
 	"gen_ban_b11",
 	"gen_ban_b12"
 }
+HUDManager.ASSAULTS_MAX = 1024
 core:import("CoreEvent")
 
 function HUDManager:init()
@@ -1137,10 +1138,10 @@ function HUDManager:sync_start_anticipation_music()
 	managers.music:post_event(tweak_data.levels:get_music_event("anticipation"))
 end
 
-function HUDManager:start_assault(data)
+function HUDManager:start_assault(assault_number)
 	self._hud.in_assault = true
-	managers.network:session():send_to_peers_synched("sync_start_assault")
-	self:sync_start_assault(data)
+	managers.network:session():send_to_peers_synched("sync_start_assault", math.min(assault_number, HUDManager.ASSAULTS_MAX))
+	self:sync_start_assault(assault_number)
 end
 
 function HUDManager:end_assault(result)
@@ -1539,6 +1540,7 @@ function HUDManager:save(data)
 	local state = {
 		waypoints = {},
 		in_assault = self._hud.in_assault,
+		assault_number = managers.groupai:state().get_assault_number and managers.groupai:state():get_assault_number() or 1,
 		assault_mode = self._hud_assault_corner:get_assault_mode()
 	}
 	for id, data in pairs(self._hud.waypoints) do
@@ -1558,7 +1560,7 @@ function HUDManager:load(data)
 		self:add_waypoint(id, init_data)
 	end
 	if state.in_assault then
-		self:sync_start_assault()
+		self:sync_start_assault(state.assault_number ~= nil and state.assault_number or 1)
 		if state.assault_mode then
 			managers.hud:sync_set_assault_mode(state.assault_mode)
 		end

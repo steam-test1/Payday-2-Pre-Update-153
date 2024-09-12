@@ -128,7 +128,13 @@ function GrenadeBase:_check_achievements(unit, is_dead, damage_percent, hit_coun
 		end
 		all_pass = count_pass and grenade_type_pass and kill_pass and distance_pass and enemy_pass and enemies_pass and flying_strike_pass and timer_pass and difficulty_pass and job_pass and crouching_pass and session_kill_pass
 		if all_pass then
-			if achievement_data.stat then
+			if achievement_data.success then
+				if achievement_data.stat then
+					managers.achievment:add_heist_success_award_progress(achievement_data.stat)
+				elseif achievement_data.award then
+					managers.achievment:add_heist_success_award(achievement_data.award)
+				end
+			elseif achievement_data.stat then
 				managers.achievment:award_progress(achievement_data.stat)
 			elseif achievement_data.award then
 				managers.achievment:award(achievement_data.award)

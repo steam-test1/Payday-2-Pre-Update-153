@@ -1352,7 +1352,7 @@ function LevelsTweakData:init()
 	self.flat.outro_event = "Play_pln_flt_50"
 	self.flat.package = "packages/narr_flat"
 	self.flat.cube = "cube_apply_heist_bank"
-	self.flat.max_bags = 8
+	self.flat.max_bags = 11
 	self.flat.music_overrides = {
 		track_47_gen = "track_47_flat"
 	}

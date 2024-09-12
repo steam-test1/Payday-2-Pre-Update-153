@@ -184,6 +184,13 @@ function ViewportManager:editor_reset_environment()
 	end
 end
 
+function ViewportManager:set_override_environment(environment_path, blend_duration, blend_bezier_curve)
+	self._env_manager:set_override_environment(environment_path)
+	for _, viewport in ipairs(self:viewports()) do
+		viewport:on_override_environment_changed(environment_path, blend_duration, blend_bezier_curve)
+	end
+end
+
 function ViewportManager:_viewport_destroyed(vp)
 	self:_del_accessobj(vp)
 	self._current_camera = nil

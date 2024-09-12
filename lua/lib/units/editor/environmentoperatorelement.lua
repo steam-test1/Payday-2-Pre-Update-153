@@ -1,5 +1,9 @@
 EnvironmentOperatorElement = EnvironmentOperatorElement or class(MissionElement)
-EnvironmentOperatorElement.ACTIONS = {"set"}
+EnvironmentOperatorElement.ACTIONS = {
+	"set",
+	"enable_global_override",
+	"disable_global_override"
+}
 
 function EnvironmentOperatorElement:init(unit)
 	EnvironmentOperatorElement.super.init(self, unit)

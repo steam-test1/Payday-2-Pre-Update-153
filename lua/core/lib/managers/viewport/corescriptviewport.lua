@@ -93,6 +93,10 @@ function _ScriptViewport:on_default_environment_changed(environment_path, blend_
 	self._env_handler:on_default_environment_changed(environment_path, blend_duration, blend_bezier_curve)
 end
 
+function _ScriptViewport:on_override_environment_changed(environment_path, blend_duration, blend_bezier_curve)
+	self._env_handler:on_override_environment_changed(environment_path, blend_duration, blend_bezier_curve)
+end
+
 function _ScriptViewport:create_environment_modifier(data_path_key, is_override, modifier_func)
 	return self._env_handler:create_modifier(data_path_key, is_override, modifier_func)
 end

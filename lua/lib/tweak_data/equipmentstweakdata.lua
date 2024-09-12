@@ -219,7 +219,7 @@ function EquipmentsTweakData:init()
 	self.specials.chavez_key = {
 		text_id = "hud_int_equipment_chavez_keys",
 		icon = "equipment_chavez_key",
-		action_message = "bank_manager_key_obtained",
+		action_message = "chavez_key_obtained",
 		sync_possession = true
 	}
 	self.specials.drill = {

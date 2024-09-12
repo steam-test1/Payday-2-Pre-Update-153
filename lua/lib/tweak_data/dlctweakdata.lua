@@ -42,6 +42,7 @@ function DLCTweakData:init(tweak_data)
 			coco = true,
 			super = 1,
 			mad = true,
+			pim = true,
 			opera = true,
 			dos = true,
 			jigg = 1,
@@ -4654,6 +4655,158 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "squares",
+			amount = 1
+		}
+	}
+	self.pim = {}
+	self.pim.content = {}
+	self.pim.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_packrat_m_extended",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_packrat_ns_wick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_packrat_o_expert",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_b_civil",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_m_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_m_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_ns_silencer",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_s_civil",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_s_folded",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_schakal_vg_surefire",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_desertfox_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_snp_desertfox_b_silencer",
+			amount = 1
+		}
+	}
+	self.ach_pim_1 = {}
+	self.ach_pim_1.dlc = "has_achievement"
+	self.ach_pim_1.achievement_id = "pim_1"
+	self.ach_pim_1.content = {}
+	self.ach_pim_1.content.loot_global_value = "pim"
+	self.ach_pim_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pim_mustang",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "wheel",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "oneshot",
+			amount = 1
+		}
+	}
+	self.ach_pim_2 = {}
+	self.ach_pim_2.dlc = "has_achievement"
+	self.ach_pim_2.achievement_id = "pim_2"
+	self.ach_pim_2.content = {}
+	self.ach_pim_2.content.loot_global_value = "pim"
+	self.ach_pim_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pim_hotelier",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "club",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "piety",
+			amount = 1
+		}
+	}
+	self.ach_pim_3 = {}
+	self.ach_pim_3.dlc = "has_achievement"
+	self.ach_pim_3.achievement_id = "pim_3"
+	self.ach_pim_3.content = {}
+	self.ach_pim_3.content.loot_global_value = "pim"
+	self.ach_pim_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pim_russian_ballistic",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "mist",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "warface",
+			amount = 1
+		}
+	}
+	self.ach_pim_4 = {}
+	self.ach_pim_4.dlc = "has_achievement"
+	self.ach_pim_4.achievement_id = "pim_4"
+	self.ach_pim_4.content = {}
+	self.ach_pim_4.content.loot_global_value = "pim"
+	self.ach_pim_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pim_dog",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "dog",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "daisy",
 			amount = 1
 		}
 	}

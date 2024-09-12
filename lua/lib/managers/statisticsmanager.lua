@@ -1738,6 +1738,10 @@ function StatisticsManager:session_killed_by_projectile(projectile_id)
 	return self._global.session.killed_by_grenade[projectile_id] or 0
 end
 
+function StatisticsManager:session_anyone_killed_by_projectile(projectile_id)
+	return self._global.session.killed_by_anyone.killed_by_grenade[projectile_id] or 0
+end
+
 function StatisticsManager:session_killed_by_melee()
 	local count = 0
 	for melee_id, kills in pairs(self._global.session.killed_by_melee) do
@@ -1844,6 +1848,14 @@ function StatisticsManager:session_anyone_used_weapon(weapon_id)
 	return self._global.session.used_weapons[weapon_id]
 end
 
+function StatisticsManager:session_anyone_used_weapon_except(weapon_id)
+	for id in pairs(self._global.session.used_weapons) do
+		if id ~= weapon_id then
+			return true
+		end
+	end
+end
+
 function StatisticsManager:session_anyone_used_weapon_category(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
 		if tweak_data:get_raw_value("weapon", weapon_id, "category") == category then
@@ -1876,6 +1888,20 @@ function StatisticsManager:session_total_killed()
 	return self._global.session.killed.total
 end
 
+function StatisticsManager:session_total_kills_by_anyone()
+	local total_kills = 0
+	for _, kills in pairs(self._global.session.killed_by_anyone.killed_by_grenade) do
+		total_kills = total_kills + kills
+	end
+	for _, kills in pairs(self._global.session.killed_by_anyone.killed_by_melee) do
+		total_kills = total_kills + kills
+	end
+	for _, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
+		total_kills = total_kills + data.count
+	end
+	return total_kills
+end
+
 function StatisticsManager:session_total_shots(weapon_type)
 	local weapon = weapon_type == "primaries" and managers.blackmarket:equipped_primary() or managers.blackmarket:equipped_secondary()
 	local weapon_data = weapon and self._global.session.shots_by_weapon[weapon.weapon_id]
@@ -1883,7 +1909,7 @@ function StatisticsManager:session_total_shots(weapon_type)
 end
 
 function StatisticsManager:session_total_specials_kills()
-	return self._global.session.killed.shield.count + self._global.session.killed.spooc.count + self._global.session.killed.tank.count + self._global.session.killed.taser.count
+	return self._global.session.killed.shield.count + self._global.session.killed.spooc.count + self._global.session.killed.tank.count + self._global.session.killed.taser.count + self._global.session.killed.medic.count
 end
 
 function StatisticsManager:session_total_head_shots()

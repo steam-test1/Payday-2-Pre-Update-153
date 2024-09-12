@@ -4,6 +4,19 @@ AkimboWeaponBase.AKIMBO = true
 function AkimboWeaponBase:init(...)
 	AkimboWeaponBase.super.init(self, ...)
 	self._manual_fire_second_gun = self:weapon_tweak_data().manual_fire_second_gun
+	self._unit:set_extension_update_enabled(Idstring("base"), true)
+	self._fire_callbacks = {}
+end
+
+function AkimboWeaponBase:update(unit, t, dt)
+	for i = #self._fire_callbacks, 1, -1 do
+		local data = self._fire_callbacks[i]
+		data.t = data.t - dt
+		if data.t <= 0 then
+			data.callback(self)
+			table.remove(self._fire_callbacks, i)
+		end
+	end
 end
 
 function AkimboWeaponBase:_create_second_gun(unit_name)
@@ -60,9 +73,12 @@ function AkimboWeaponBase:fire(...)
 	if not self._manual_fire_second_gun then
 		local result = AkimboWeaponBase.super.fire(self, ...)
 		if alive(self._second_gun) then
-			managers.enemy:add_delayed_clbk("AkimboWeaponBase", callback(self, self, "_fire_second", {
-				...
-			}), TimerManager:game():time() + 0.025 + math.rand(0.075))
+			table.insert(self._fire_callbacks, {
+				t = 0.025 + math.rand(0.075),
+				callback = callback(self, self, "_fire_second", {
+					...
+				})
+			})
 		end
 		return result
 	else

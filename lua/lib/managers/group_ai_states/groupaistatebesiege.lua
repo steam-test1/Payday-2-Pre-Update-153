@@ -372,8 +372,9 @@ function GroupAIStateBesiege:_upd_assault_task()
 			task_data.phase = "fade"
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
 		elseif t > task_data.phase_end_t or self._drama_data.zone == "high" then
+			self._assault_number = self._assault_number + 1
 			managers.mission:call_global_event("start_assault")
-			managers.hud:start_assault()
+			managers.hud:start_assault(self._assault_number)
 			self:_set_rescue_state(false)
 			task_data.phase = "build"
 			task_data.phase_end_t = self._t + self._tweak_data.assault.build_duration
@@ -969,7 +970,7 @@ function GroupAIStateBesiege:_spawn_in_group(spawn_group, spawn_group_type, grp_
 		if not cat_data then
 			debug_pause("[GroupAIStateBesiege:_spawn_in_group] unit category doesn't exist:", spawn_entry.unit)
 			return
-		elseif cat_data.special_type and tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] and _get_special_unit_type_count(cat_data.special_type) + (spawn_entry.amount_min or 0) > tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] then
+		elseif cat_data.special_type and not cat_data.is_captain and tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] and _get_special_unit_type_count(cat_data.special_type) + (spawn_entry.amount_min or 0) > tweak_data.group_ai.special_unit_spawn_limits[cat_data.special_type] then
 			spawn_group.delay_t = self._t + 10
 			return
 		else
@@ -1909,7 +1910,7 @@ function GroupAIStateBesiege:set_wave_mode(flag)
 	if flag == "hunt" then
 		self._hunt_mode = true
 		self._wave_mode = "besiege"
-		managers.hud:start_assault()
+		managers.hud:start_assault(self._assault_number)
 		self:_set_rescue_state(false)
 		self:set_assault_mode(true)
 		managers.trade:set_trade_countdown(false)
@@ -3300,4 +3301,8 @@ function GroupAIStateBesiege:force_end_assault_phase()
 		task_data.force_end = true
 	end
 	self:set_assault_endless(false)
+end
+
+function GroupAIStateBesiege:get_assault_number()
+	return self._assault_number
 end

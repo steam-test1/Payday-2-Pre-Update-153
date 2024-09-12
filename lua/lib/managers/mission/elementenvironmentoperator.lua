@@ -20,6 +20,13 @@ function ElementEnvironmentOperator:on_executed(instigator)
 		return
 	end
 	self._old_default_environment = managers.viewport:default_environment()
-	managers.viewport:set_default_environment(self._values.environment, self:value("blend_time"), nil)
+	local operation = self:value("operation")
+	if not operation or operation == "set" then
+		managers.viewport:set_default_environment(self._values.environment, self:value("blend_time"), nil)
+	elseif operation == "enable_global_override" then
+		managers.viewport:set_override_environment(self._values.environment, self:value("blend_time"), nil)
+	elseif operation == "disable_global_override" then
+		managers.viewport:set_override_environment(nil, self:value("blend_time"), nil)
+	end
 	ElementEnvironmentOperator.super.on_executed(self, instigator)
 end

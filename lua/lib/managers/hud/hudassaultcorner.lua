@@ -452,6 +452,7 @@ function HUDAssaultCorner:sync_start_assault(assault_number)
 	self:_update_assault_hud_color(color)
 	self._start_assault_after_hostage_offset = true
 	self:_set_hostage_offseted(true)
+	self._completed_waves = (assault_number or 1) - 1
 end
 
 function HUDAssaultCorner:start_assault_callback()

@@ -46,6 +46,7 @@ function SpecialObjectiveUnitElement:init(unit)
 	self._hed.interaction_voice = "none"
 	self._hed.SO_access = "0"
 	self._hed.test_unit = "default"
+	self._hed.interrupt_objective = false
 	table.insert(self._save_values, "ai_group")
 	table.insert(self._save_values, "align_rotation")
 	table.insert(self._save_values, "align_position")
@@ -78,6 +79,7 @@ function SpecialObjectiveUnitElement:init(unit)
 	table.insert(self._save_values, "interaction_voice")
 	table.insert(self._save_values, "SO_access")
 	table.insert(self._save_values, "is_navigation_link")
+	table.insert(self._save_values, "interrupt_objective")
 end
 
 function SpecialObjectiveUnitElement:post_init(...)
@@ -459,6 +461,7 @@ function SpecialObjectiveUnitElement:_build_panel(panel, panel_sizer)
 	self:_build_value_checkbox(panel, panel_sizer, "no_arrest", "No Arrest")
 	self:_build_value_checkbox(panel, panel_sizer, "scan", "Idle scan", "Idle scan")
 	self:_build_value_checkbox(panel, panel_sizer, "allow_followup_self", "Allow self-followup", "Allow self-followup")
+	self:_build_value_checkbox(panel, panel_sizer, "interrupt_objective", "Allow interrupting of objectives if the element is disabled or removed", "Interrupt objectives when disabled")
 	self:_build_value_number(panel, panel_sizer, "search_distance", {floats = 0, min = 0}, "Used to specify the distance to use when searching for an AI")
 	local options = table.list_add({"none"}, clone(CopActionAct._act_redirects.SO))
 	self:_build_value_combobox(panel, panel_sizer, "so_action", table.list_add(options, self._AI_SO_types), "Select a action that the unit should start with.")

@@ -488,7 +488,7 @@ function SkinEditor:apply_changes(cosmetics_data)
 	for _, texture in ipairs(textures) do
 		local texture_string = self:get_texture_string(skin, texture.name, texture.type)
 		if not self:check_texture(texture_string) then
-			self:remove_texture_by_name(skin, texture)
+			self:remove_texture_by_name(skin, texture.name)
 		end
 	end
 	self:weapon_unit():base()._cosmetics_data = self:get_current_skin():config().data

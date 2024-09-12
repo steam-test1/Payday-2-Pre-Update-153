@@ -313,7 +313,7 @@ function ElementSpecialObjective:operation_remove()
 		if self._receiver_units then
 			local cpy = clone(self._receiver_units)
 			for u_key, unit in pairs(cpy) do
-				if self._receiver_units[u_key] and alive(unit) and unit:brain():is_available_for_assignment() then
+				if self._receiver_units[u_key] and alive(unit) and unit:brain() and (unit:brain():is_available_for_assignment() or self:value("interrupt_objective")) then
 					unit:brain():set_objective(nil)
 				end
 				if not self._receiver_units then

@@ -710,7 +710,8 @@ function GroupAITweakData:_init_unit_categories(difficulty_index)
 			}
 		},
 		access = access_type_walk_only,
-		special_type = "shield"
+		special_type = "shield",
+		is_captain = true
 	}
 	self.unit_categories.Phalanx_vip = {
 		unit_types = {
@@ -722,7 +723,8 @@ function GroupAITweakData:_init_unit_categories(difficulty_index)
 			}
 		},
 		access = access_type_walk_only,
-		special_type = "shield"
+		special_type = "shield",
+		is_captain = true
 	}
 end
 

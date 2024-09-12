@@ -8655,7 +8655,8 @@ function CharacterTweakData:_multiply_all_speeds(walk_mul, run_mul)
 		"spooc",
 		"shield",
 		"taser",
-		"city_swat"
+		"city_swat",
+		"fbi_swat"
 	}
 	for _, name in ipairs(all_units) do
 		local speed_table = self[name].SPEED_WALK
@@ -8677,6 +8678,7 @@ function CharacterTweakData:_multiply_all_speeds(walk_mul, run_mul)
 	self.taser.SPEED_RUN = self.taser.SPEED_RUN * run_mul
 	self.city_swat.SPEED_RUN = self.city_swat.SPEED_RUN * run_mul
 	self.biker_escape.SPEED_RUN = self.biker_escape.SPEED_RUN * run_mul
+	self.fbi_swat.SPEED_RUN = self.fbi_swat.SPEED_RUN * run_mul
 end
 
 function CharacterTweakData:_set_characters_weapon_preset(preset)

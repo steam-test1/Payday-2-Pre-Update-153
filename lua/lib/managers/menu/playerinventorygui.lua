@@ -4585,9 +4585,8 @@ function PlayerInventoryGui:_get_melee_weapon_stats(name)
 				value = (base_min + base_max) / 2
 			}
 			local dmg_mul = managers.player:upgrade_value("player", "melee_" .. tostring(tweak_data.blackmarket.melee_weapons[name].stats.weapon_type) .. "_damage_multiplier", 1) - 1
-			local enf_skill = has_non_special and has_special and math.max(non_special, special) or 0
 			local gst_skill = managers.player:upgrade_value("player", "melee_knockdown_mul", 1) - 1
-			local skill_mul = (1 + dmg_mul) * (1 + enf_skill) * (1 + gst_skill) - 1
+			local skill_mul = (1 + dmg_mul) * (1 + gst_skill) - 1
 			local skill_min = skill_mul
 			local skill_max = skill_mul
 			skill_stats[stat.name] = {

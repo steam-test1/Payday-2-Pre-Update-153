@@ -218,6 +218,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.born = 1
 	self.global_value_multipliers.sparkle = 0
 	self.global_value_multipliers.rota = 1
+	self.global_value_multipliers.pim = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -337,6 +338,7 @@ function MoneyTweakData:init(tweak_data)
 		2,
 		5,
 		10,
+		13,
 		13,
 		13
 	}

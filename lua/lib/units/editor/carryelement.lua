@@ -15,13 +15,14 @@ function CarryUnitElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
-	self:_build_value_combobox(panel, panel_sizer, "operation", {
+	local operations = {
 		"remove",
 		"freeze",
 		"secure",
 		"secure_silent",
 		"add_to_respawn",
 		"filter_only"
-	})
+	}
+	self:_build_value_combobox(panel, panel_sizer, "operation", operations)
 	self:_build_value_combobox(panel, panel_sizer, "type_filter", table.list_add({"none"}, tweak_data.carry:get_carry_ids()))
 end

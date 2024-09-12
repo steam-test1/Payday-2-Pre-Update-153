@@ -278,6 +278,7 @@ function GroupAIStateBase:_init_misc_data()
 	self._suspicion_hud_data = {}
 	self._nr_successful_alarm_pager_bluffs = 0
 	self._enemy_loot_drop_points = {}
+	self._assault_number = 0
 	local drama_tweak = tweak_data.drama
 	self._drama_data = {
 		decay_period = tweak_data.drama.decay_period,
@@ -791,7 +792,9 @@ function GroupAIStateBase:on_hostage_state(state, key, police, skip_announcement
 	else
 	end
 	if state and self._hstg_hint_clbk then
-		managers.enemy:remove_delayed_clbk("_hostage_hint_clbk")
+		if managers.enemy:is_clbk_registered("_hostage_hint_clbk") then
+			managers.enemy:remove_delayed_clbk("_hostage_hint_clbk")
+		end
 		self._hstg_hint_clbk = nil
 	end
 	if self._hostage_headcount ~= #self._hostage_keys then
@@ -2125,6 +2128,7 @@ function GroupAIStateBase:save(save_data)
 	end
 	my_save_data.teams = self._teams
 	my_save_data.endscreen_variant = self._endscreen_variant
+	my_save_data.assault_number = self._assault_number
 end
 
 function GroupAIStateBase:load(load_data)
@@ -2132,6 +2136,7 @@ function GroupAIStateBase:load(load_data)
 	self._control_value = my_load_data.control_value
 	self:_calculate_difficulty_ratio()
 	self._hunt_mode = my_load_data._hunt_mode
+	self._assault_number = my_load_data.assault_number
 	self:sync_assault_mode(my_load_data._assault_mode)
 	self:set_fake_assault_mode(my_load_data._fake_assault_mode)
 	self:set_whisper_mode(my_load_data._whisper_mode)

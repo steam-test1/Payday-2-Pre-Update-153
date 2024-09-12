@@ -101,7 +101,7 @@ function CarryData:can_explode()
 	return tweak_data.carry.types[tweak_info.type].can_explode
 end
 
-function CarryData:start_explosion()
+function CarryData:start_explosion(instant)
 	if self._explode_t then
 		return
 	end
@@ -110,8 +110,12 @@ function CarryData:start_explosion()
 	end
 	self:_unregister_steal_SO()
 	self:_start_explosion()
-	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "carry_data", CarryData.EVENT_IDS.will_explode)
-	self._explode_t = Application:time() + 1 + math.rand(3)
+	if not instant then
+		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "carry_data", CarryData.EVENT_IDS.will_explode)
+		self._explode_t = Application:time() + 1 + math.rand(3)
+	else
+		self:_explode()
+	end
 end
 
 function CarryData:_start_explosion()

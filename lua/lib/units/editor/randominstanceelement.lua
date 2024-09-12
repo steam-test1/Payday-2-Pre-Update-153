@@ -14,7 +14,11 @@ function RandomInstanceElement:init(unit)
 	table.insert(self._save_values, "instances")
 end
 
-function RandomInstanceElement:update_editing()
+function RandomInstanceElement:update_editing(t, dt)
+	local instance_name = self:_instance_name_raycast()
+	if instance_name then
+		self:_draw_instance_link(t, dt, instance_name)
+	end
 end
 
 function RandomInstanceElement:draw_links_selected(t, dt, selected_unit)
@@ -23,9 +27,7 @@ function RandomInstanceElement:draw_links_selected(t, dt, selected_unit)
 	for i, instance_data in ipairs(self._hed.instances) do
 		local inst_data = managers.world_instance:get_instance_data_by_name(instance_data.instance)
 		if inst_data then
-			local r, g, b = self:get_element_color()
-			Application:draw_arrow(self._unit:position(), inst_data.position, r, g, b, 0.2)
-			instance_layer:external_draw_instance(t, dt, instance_data.instance, r, g, b)
+			self:_draw_instance_link(t, dt, instance_data.instance)
 		else
 			table.remove(self._hed.instances, i)
 		end
@@ -38,12 +40,43 @@ function RandomInstanceElement:draw_links_unselected(t, dt, selected_unit)
 	for i, instance_data in ipairs(self._hed.instances) do
 		local inst_data = managers.world_instance:get_instance_data_by_name(instance_data.instance)
 		if inst_data then
-			local r, g, b = self:get_element_color()
-			Application:draw_arrow(self._unit:position(), inst_data.position, r * 0.8, g * 0.8, b * 0.8, 0.2)
+			self:_draw_instance_link(t, dt, instance_data.instance, 0.8)
 		else
 			table.remove(self._hed.instances, i)
 		end
 	end
+end
+
+function RandomInstanceElement:_draw_instance_link(t, dt, instance_name, color_multiplier)
+	local r, g, b = self:get_link_color()
+	if color_multiplier then
+		r = r * color_multiplier
+		g = g * color_multiplier
+		b = b * color_multiplier
+	end
+	managers.editor:layer("Instances"):external_draw_instance(t, dt, instance_name, r, g, b)
+	if self._type == "input" then
+		Application:draw_arrow(self._unit:position(), managers.world_instance:get_instance_data_by_name(instance_name).position, r, g, b, 0.2)
+	else
+		Application:draw_arrow(managers.world_instance:get_instance_data_by_name(instance_name).position, self._unit:position(), r, g, b, 0.2)
+	end
+end
+
+function RandomInstanceElement:_instance_name_raycast()
+	local ray = managers.editor:unit_by_raycast({
+		mask = 1,
+		ray_type = "body editor",
+		skip_instance_check = true
+	})
+	if not ray or not ray.unit then
+		return nil
+	end
+	local instance_name = ray.unit:unit_data().instance
+	if not instance_name then
+		return nil
+	end
+	local instance_data = managers.world_instance:get_instance_data_by_name(instance_name)
+	return instance_data.script == self._unit:mission_element_data().script and instance_name or nil
 end
 
 function RandomInstanceElement:has_element(instance_name)
@@ -64,13 +97,17 @@ function RandomInstanceElement:add_element()
 	local instance_name = ray and ray.unit and ray.unit:unit_data().instance
 	if instance_name then
 		if not self:has_element(instance_name) then
-			local data = {instance = instance_name, event = ""}
-			self:add_link_element("instances", data)
-			self:_add_instance_item(data)
+			self:insert_element(instance_name)
 		else
 			self:remove_element(instance_name)
 		end
 	end
+end
+
+function RandomInstanceElement:insert_element(instance_name)
+	local data = {instance = instance_name, event = ""}
+	self:add_link_element("instances", data)
+	self:_add_instance_item(data)
 end
 
 function RandomInstanceElement:remove_element(instance_name)
@@ -79,6 +116,14 @@ function RandomInstanceElement:remove_element(instance_name)
 			self:remove_link_element("instances", instance_data)
 			self:_remove_instance_item(i)
 			return
+		end
+	end
+end
+
+function RandomInstanceElement:on_instance_changed_name(old_name, new_name)
+	for i, instance_data in ipairs(self._hed.instances) do
+		if instance_data.instance == old_name then
+			instance_data.instance = new_name
 		end
 	end
 end
@@ -103,10 +148,28 @@ function RandomInstanceElement:_remove_counter_id(unit)
 	self._hed.counter_id = nil
 end
 
+function RandomInstanceElement:_on_gui_select_instance_list()
+	local settings = {}
+	settings.list_style = "LC_REPORT,LC_NO_HEADER,LC_SORT_ASCENDING"
+	local names = managers.world_instance:instance_names_by_script(self._unit:mission_element_data().script)
+	local dialog = SelectNameModal:new("Select instances", names, settings)
+	if dialog:cancelled() then
+		return
+	end
+	for _, instance_name in ipairs(dialog:_selected_item_assets()) do
+		self:insert_element(instance_name)
+	end
+end
+
 function RandomInstanceElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
+	local btn_toolbar = EWS:ToolBar(panel, "", "TB_FLAT,TB_NODIVIDER")
+	btn_toolbar:add_tool("SELECT_UNIT_LIST", "Select unit from unit list", CoreEws.image_path("world_editor\\unit_by_name_list.png"), nil)
+	btn_toolbar:connect("SELECT_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "_on_gui_select_instance_list"), nil)
+	btn_toolbar:realize()
+	panel_sizer:add(btn_toolbar, 0, 1, "EXPAND,LEFT")
 	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0, min = 1}, "Specifies the amount of instances to be executed")
 	self:_build_value_number(panel, panel_sizer, "amount_random", {floats = 0, min = 0}, "Add a random amount to amount")
 	self:_add_help_text("Use 'Amount' only to specify an exact amount of instances to execute. Use 'Amount Random' to add a random amount to 'Amount' ('Amount' + random('Amount Random').")

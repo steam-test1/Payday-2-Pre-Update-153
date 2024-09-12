@@ -218,7 +218,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.doctor_bag.amount_increase = {2}
 	self.values.player.convert_enemies = {true}
 	self.values.player.convert_enemies_max_minions = {1, 2}
-	self.values.player.convert_enemies_health_multiplier = {0.65}
+	self.values.player.convert_enemies_health_multiplier = {0.45}
 	self.values.player.convert_enemies_damage_multiplier = {2}
 	self.values.player.xp_multiplier = {1.15}
 	self.values.team.xp.multiplier = {1.3}
@@ -738,7 +738,7 @@ function UpgradesTweakData:_init_pd2_values()
 		{0.7, 5}
 	}
 	self.values.player.revive_damage_reduction = {0.7}
-	self.values.player.passive_convert_enemies_health_multiplier = {0.45, 0.99}
+	self.values.player.passive_convert_enemies_health_multiplier = {0.55, 0.01}
 	self.values.player.automatic_faster_reload = {
 		{
 			target_enemies = 2,
@@ -2292,7 +2292,8 @@ function UpgradesTweakData:init(tweak_data)
 	self.level_tree[20] = {
 		name_id = "lvl_20",
 		upgrades = {
-			"rep_upgrade2"
+			"rep_upgrade2",
+			"schakal"
 		}
 	}
 	self.level_tree[21] = {
@@ -2348,7 +2349,8 @@ function UpgradesTweakData:init(tweak_data)
 		upgrades = {
 			"new_m14",
 			"saiga",
-			"sandsteel"
+			"sandsteel",
+			"packrat"
 		}
 	}
 	self.level_tree[27] = {
@@ -2417,7 +2419,9 @@ function UpgradesTweakData:init(tweak_data)
 			"galil",
 			"cleaver",
 			"mateba",
-			"taser"
+			"taser",
+			"desertfox",
+			"wpn_prj_target"
 		}
 	}
 	self.level_tree[35] = {
@@ -2810,6 +2814,10 @@ function UpgradesTweakData:init(tweak_data)
 	self:_tecci_weapon_definitions()
 	self:_hajk_weapon_definitions()
 	self:_boot_weapon_definitions()
+	self:_packrat_weapon_definitions()
+	self:_schakal_weapon_definitions()
+	self:_desertfox_weapon_definitions()
+	self:_x_packrat_weapon_definitions()
 	self:_rota_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
@@ -8412,6 +8420,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.wpn_prj_ace = {category = "grenade", dlc = "pd2_clan"}
 	self.definitions.wpn_prj_jav = {category = "grenade", dlc = "steel"}
 	self.definitions.wpn_prj_hur = {category = "grenade", dlc = "born"}
+	self.definitions.wpn_prj_target = {category = "grenade", dlc = "pim"}
 	self.definitions.frag_com = {category = "grenade", dlc = "pd2_clan"}
 	self.definitions.concussion = {category = "grenade", dlc = "fez1"}
 end
@@ -11352,6 +11361,42 @@ function UpgradesTweakData:_boot_weapon_definitions()
 		weapon_id = "boot",
 		factory_id = "wpn_fps_sho_boot",
 		dlc = "wild"
+	}
+end
+
+function UpgradesTweakData:_packrat_weapon_definitions()
+	self.definitions.packrat = {
+		category = "weapon",
+		weapon_id = "packrat",
+		factory_id = "wpn_fps_pis_packrat",
+		dlc = "pim"
+	}
+end
+
+function UpgradesTweakData:_schakal_weapon_definitions()
+	self.definitions.schakal = {
+		category = "weapon",
+		weapon_id = "schakal",
+		factory_id = "wpn_fps_smg_schakal",
+		dlc = "pim"
+	}
+end
+
+function UpgradesTweakData:_desertfox_weapon_definitions()
+	self.definitions.desertfox = {
+		category = "weapon",
+		weapon_id = "desertfox",
+		factory_id = "wpn_fps_snp_desertfox",
+		dlc = "pim"
+	}
+end
+
+function UpgradesTweakData:_x_packrat_weapon_definitions()
+	self.definitions.x_packrat = {
+		category = "weapon",
+		weapon_id = "x_packrat",
+		factory_id = "wpn_fps_x_packrat",
+		dlc = "pim"
 	}
 end
 

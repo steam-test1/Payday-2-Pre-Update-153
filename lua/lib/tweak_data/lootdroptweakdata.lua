@@ -951,6 +951,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.mad.track = true
 	self.global_values.mad.sort_number = 114
 	self.global_values.mad.category = "dlc"
+	self.global_values.pim = {}
+	self.global_values.pim.name_id = "bm_global_value_pim"
+	self.global_values.pim.desc_id = "menu_l_global_value_pim"
+	self.global_values.pim.unlock_id = "bm_global_value_pim_unlock"
+	self.global_values.pim.color = Color(255, 255, 212, 0) / 255
+	self.global_values.pim.dlc = true
+	self.global_values.pim.chance = 1
+	self.global_values.pim.value_multiplier = 1
+	self.global_values.pim.durability_multiplier = 1
+	self.global_values.pim.drops = true
+	self.global_values.pim.track = true
+	self.global_values.pim.sort_number = 115
+	self.global_values.pim.category = "dlc"
 	self.global_values.opera = {}
 	self.global_values.opera.name_id = "bm_global_value_opera"
 	self.global_values.opera.desc_id = "menu_l_global_value_opera"
@@ -1124,6 +1137,7 @@ function LootDropTweakData:init(tweak_data)
 		"pal",
 		"dbd_clan",
 		"dbd_deluxe",
+		"pim",
 		"opera",
 		"solus_clan",
 		"wild",

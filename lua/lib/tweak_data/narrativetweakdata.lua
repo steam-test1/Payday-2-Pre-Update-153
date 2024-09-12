@@ -4042,7 +4042,9 @@ function NarrativeTweakData:init(tweak_data)
 		37000,
 		81000,
 		101000,
-		202000
+		180000,
+		202000,
+		220000
 	}
 	self.jobs.chill_combat.marker_dot_color = chill_combat_marker_dot_color
 	self.jobs.chill_combat.color_lerp = {

@@ -279,6 +279,25 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.wpn_prj_hur.throw_allowed_expire_t = 0.15
 	self.projectiles.wpn_prj_hur.expire_t = 1.1
 	self.projectiles.wpn_prj_hur.repeat_expire_t = 0.5
+	self.projectiles.wpn_prj_target = {}
+	self.projectiles.wpn_prj_target.name_id = "bm_wpn_prj_target"
+	self.projectiles.wpn_prj_target.unit = "units/pd2_dlc_pim/weapons/wpn_prj_target/wpn_prj_target"
+	self.projectiles.wpn_prj_target.unit_dummy = "units/pd2_dlc_pim/weapons/wpn_prj_target/wpn_prj_target_husk"
+	self.projectiles.wpn_prj_target.local_unit = "units/pd2_dlc_pim/weapons/wpn_prj_target/wpn_prj_target_husk_local"
+	self.projectiles.wpn_prj_target.icon = "hobby_knife"
+	self.projectiles.wpn_prj_target.throw_shout = true
+	self.projectiles.wpn_prj_target.no_cheat_count = true
+	self.projectiles.wpn_prj_target.impact_detonation = true
+	self.projectiles.wpn_prj_target.client_authoritative = true
+	self.projectiles.wpn_prj_target.add_trail_effect = true
+	self.projectiles.wpn_prj_target.throwable = true
+	self.projectiles.wpn_prj_target.texture_bundle_folder = "pim"
+	self.projectiles.wpn_prj_target.dlc = "pim"
+	self.projectiles.wpn_prj_target.max_amount = 6
+	self.projectiles.wpn_prj_target.anim_global_param = "projectile_target"
+	self.projectiles.wpn_prj_target.throw_allowed_expire_t = 0.4
+	self.projectiles.wpn_prj_target.expire_t = 0.8
+	self.projectiles.wpn_prj_target.repeat_expire_t = 0.6
 	self.projectiles.frag_com = {}
 	self.projectiles.frag_com.name_id = "bm_grenade_frag_com"
 	self.projectiles.frag_com.desc_id = "bm_grenade_frag_com_desc"
@@ -325,6 +344,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"launcher_frag_china",
 		"launcher_incendiary_china",
 		"wpn_prj_hur",
+		"wpn_prj_target",
 		"frag_com",
 		"concussion"
 	}

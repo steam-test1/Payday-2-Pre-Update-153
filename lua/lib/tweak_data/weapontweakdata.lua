@@ -116,6 +116,10 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_tecci_npc()
 	self:_init_data_hajk_npc()
 	self:_init_data_boot_npc()
+	self:_init_data_packrat_npc()
+	self:_init_data_schakal_npc()
+	self:_init_data_desertfox_npc()
+	self:_init_data_x_packrat_npc()
 	self:_init_data_rota_npc()
 	self:_precalculate_values()
 end
@@ -2076,6 +2080,65 @@ function WeaponTweakData:_init_data_boot_npc()
 	self.boot_npc.alert_size = 1000
 	self.boot_npc.suppression = 1
 	self.boot_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_packrat_npc()
+	self.packrat_npc.sounds.prefix = "packrat_npc"
+	self.packrat_npc.use_data.selection_index = 1
+	self.packrat_npc.DAMAGE = 1
+	self.packrat_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.packrat_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.packrat_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.packrat_npc.CLIP_AMMO_MAX = 10
+	self.packrat_npc.NR_CLIPS_MAX = 5
+	self.packrat_npc.hold = "pistol"
+	self.packrat_npc.alert_size = 2500
+	self.packrat_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_schakal_npc()
+	self.schakal_npc.sounds.prefix = "schakal_npc"
+	self.schakal_npc.use_data.selection_index = 1
+	self.schakal_npc.DAMAGE = 2
+	self.schakal_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.schakal_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.schakal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.schakal_npc.CLIP_AMMO_MAX = 30
+	self.schakal_npc.NR_CLIPS_MAX = 5
+	self.schakal_npc.auto.fire_rate = 0.092
+	self.schakal_npc.hold = "rifle"
+	self.schakal_npc.alert_size = 5000
+	self.schakal_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_desertfox_npc()
+	self.desertfox_npc.sounds.prefix = "desertfox_npc"
+	self.desertfox_npc.use_data.selection_index = 2
+	self.desertfox_npc.DAMAGE = 2
+	self.desertfox_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.desertfox_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.desertfox_npc.CLIP_AMMO_MAX = 5
+	self.desertfox_npc.NR_CLIPS_MAX = 8
+	self.desertfox_npc.auto.fire_rate = 20
+	self.desertfox_npc.hold = "rifle"
+	self.desertfox_npc.alert_size = 5000
+	self.desertfox_npc.suppression = 1
+	self.desertfox_secondary_npc = deep_clone(self.desertfox_npc)
+	self.desertfox_secondary_npc.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_x_packrat_npc()
+	self.x_packrat_npc.sounds.prefix = "packrat_npc"
+	self.x_packrat_npc.use_data.selection_index = 2
+	self.x_packrat_npc.DAMAGE = 1
+	self.x_packrat_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_packrat_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_packrat_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_packrat_npc.CLIP_AMMO_MAX = 10
+	self.x_packrat_npc.NR_CLIPS_MAX = 5
+	self.x_packrat_npc.hold = "akimbo_pistol"
+	self.x_packrat_npc.alert_size = 2500
+	self.x_packrat_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_rota_npc()
@@ -10852,7 +10915,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.par.animations.bipod_recoil_loop = "bipod_recoil_loop"
 	self.par.animations.bipod_recoil_exit = "bipod_recoil_exit"
 	self.par.texture_bundle_folder = "par"
-	self.par.panic_suppression_chance = 0.1
+	self.par.panic_suppression_chance = 0.2
 	self.par.stats = {
 		damage = 37,
 		spread = 9,
@@ -11973,6 +12036,369 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		total_ammo_mod = 21,
 		value = 1
 	}
+	self.packrat = {}
+	self.packrat.category = "pistol"
+	self.packrat.damage_melee = damage_melee_default
+	self.packrat.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.packrat.sounds = {}
+	self.packrat.sounds.fire = "packrat_fire"
+	self.packrat.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.packrat.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.packrat.sounds.dryfire = "secondary_dryfire"
+	self.packrat.timers = {}
+	self.packrat.timers.reload_not_empty = 1.52
+	self.packrat.timers.reload_empty = 2.32
+	self.packrat.timers.unequip = 0.5
+	self.packrat.timers.equip = 0.35
+	self.packrat.name_id = "bm_w_packrat"
+	self.packrat.desc_id = "bm_w_packrat_desc"
+	self.packrat.description_id = "des_packrat"
+	self.packrat.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.packrat.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.packrat.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.packrat.use_data = {}
+	self.packrat.use_data.selection_index = 1
+	self.packrat.DAMAGE = 1
+	self.packrat.CLIP_AMMO_MAX = 15
+	self.packrat.NR_CLIPS_MAX = 6
+	self.packrat.AMMO_MAX = self.packrat.CLIP_AMMO_MAX * self.packrat.NR_CLIPS_MAX
+	self.packrat.AMMO_PICKUP = self:_pickup_chance(self.packrat.AMMO_MAX, 1)
+	self.packrat.FIRE_MODE = "single"
+	self.packrat.fire_mode_data = {}
+	self.packrat.fire_mode_data.fire_rate = 0.166
+	self.packrat.single = {}
+	self.packrat.single.fire_rate = 0.166
+	self.packrat.spread = {}
+	self.packrat.spread.standing = self.new_m4.spread.standing
+	self.packrat.spread.crouching = self.new_m4.spread.crouching
+	self.packrat.spread.steelsight = self.new_m4.spread.steelsight
+	self.packrat.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.packrat.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.packrat.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.packrat.kick = {}
+	self.packrat.kick.standing = self.glock_17.kick.standing
+	self.packrat.kick.crouching = self.packrat.kick.standing
+	self.packrat.kick.steelsight = self.packrat.kick.standing
+	self.packrat.crosshair = {}
+	self.packrat.crosshair.standing = {}
+	self.packrat.crosshair.crouching = {}
+	self.packrat.crosshair.steelsight = {}
+	self.packrat.crosshair.standing.offset = 0.1
+	self.packrat.crosshair.standing.moving_offset = 0.4
+	self.packrat.crosshair.standing.kick_offset = 0.3
+	self.packrat.crosshair.crouching.offset = 0.1
+	self.packrat.crosshair.crouching.moving_offset = 0.5
+	self.packrat.crosshair.crouching.kick_offset = 0.2
+	self.packrat.crosshair.steelsight.hidden = true
+	self.packrat.crosshair.steelsight.offset = 0
+	self.packrat.crosshair.steelsight.moving_offset = 0
+	self.packrat.crosshair.steelsight.kick_offset = 0.1
+	self.packrat.shake = {}
+	self.packrat.shake.fire_multiplier = 1
+	self.packrat.shake.fire_steelsight_multiplier = -1
+	self.packrat.autohit = autohit_pistol_default
+	self.packrat.aim_assist = aim_assist_pistol_default
+	self.packrat.weapon_hold = "packrat"
+	self.packrat.animations = {}
+	self.packrat.animations.equip_id = "equip_packrat"
+	self.packrat.animations.recoil_steelsight = true
+	self.packrat.global_value = "pim"
+	self.packrat.texture_bundle_folder = "pim"
+	self.packrat.panic_suppression_chance = 0.2
+	self.packrat.stats = {
+		damage = 66,
+		spread = 18,
+		recoil = 16,
+		spread_moving = 18,
+		zoom = 3,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
+	self.schakal = {}
+	self.schakal.category = "smg"
+	self.schakal.damage_melee = damage_melee_default
+	self.schakal.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.schakal.sounds = {}
+	self.schakal.sounds.fire = "schakal_fire_single"
+	self.schakal.sounds.fire_single = "schakal_fire_single"
+	self.schakal.sounds.fire_auto = "schakal_fire"
+	self.schakal.sounds.stop_fire = "schakal_stop"
+	self.schakal.sounds.dryfire = "secondary_dryfire"
+	self.schakal.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.schakal.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.schakal.timers = {}
+	self.schakal.timers.reload_not_empty = 2.36
+	self.schakal.timers.reload_empty = 3.62
+	self.schakal.timers.unequip = 0.6
+	self.schakal.timers.equip = 0.5
+	self.schakal.name_id = "bm_w_schakal"
+	self.schakal.desc_id = "bm_w_schakal_desc"
+	self.schakal.description_id = "des_schakal"
+	self.schakal.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.schakal.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.schakal.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.schakal.use_data = {}
+	self.schakal.use_data.selection_index = 1
+	self.schakal.DAMAGE = 1
+	self.schakal.CLIP_AMMO_MAX = 30
+	self.schakal.NR_CLIPS_MAX = 3
+	self.schakal.AMMO_MAX = self.schakal.CLIP_AMMO_MAX * self.schakal.NR_CLIPS_MAX
+	self.schakal.AMMO_PICKUP = self:_pickup_chance(self.schakal.AMMO_MAX, 1)
+	self.schakal.FIRE_MODE = "auto"
+	self.schakal.fire_mode_data = {}
+	self.schakal.fire_mode_data.fire_rate = 0.092
+	self.schakal.CAN_TOGGLE_FIREMODE = true
+	self.schakal.auto = {}
+	self.schakal.auto.fire_rate = 0.092
+	self.schakal.spread = {}
+	self.schakal.spread.standing = self.new_m4.spread.standing
+	self.schakal.spread.crouching = self.new_m4.spread.crouching
+	self.schakal.spread.steelsight = self.new_m4.spread.steelsight
+	self.schakal.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.schakal.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.schakal.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.schakal.kick = {}
+	self.schakal.kick.standing = {
+		-0.2,
+		0.4,
+		-1,
+		1
+	}
+	self.schakal.kick.crouching = self.schakal.kick.standing
+	self.schakal.kick.steelsight = self.schakal.kick.standing
+	self.schakal.crosshair = {}
+	self.schakal.crosshair.standing = {}
+	self.schakal.crosshair.crouching = {}
+	self.schakal.crosshair.steelsight = {}
+	self.schakal.crosshair.standing.offset = 0.4
+	self.schakal.crosshair.standing.moving_offset = 0.7
+	self.schakal.crosshair.standing.kick_offset = 0.6
+	self.schakal.crosshair.crouching.offset = 0.3
+	self.schakal.crosshair.crouching.moving_offset = 0.6
+	self.schakal.crosshair.crouching.kick_offset = 0.4
+	self.schakal.crosshair.steelsight.hidden = true
+	self.schakal.crosshair.steelsight.offset = 0
+	self.schakal.crosshair.steelsight.moving_offset = 0
+	self.schakal.crosshair.steelsight.kick_offset = 0.4
+	self.schakal.shake = {}
+	self.schakal.shake.fire_multiplier = 1
+	self.schakal.shake.fire_steelsight_multiplier = -1
+	self.schakal.autohit = autohit_smg_default
+	self.schakal.aim_assist = aim_assist_smg_default
+	self.schakal.weapon_hold = "schakal"
+	self.schakal.animations = {}
+	self.schakal.animations.equip_id = "equip_schakal"
+	self.schakal.animations.recoil_steelsight = true
+	self.schakal.global_value = "pim"
+	self.schakal.texture_bundle_folder = "pim"
+	self.schakal.panic_suppression_chance = 0.2
+	self.schakal.stats = {
+		damage = 80,
+		spread = 16,
+		recoil = 14,
+		spread_moving = 14,
+		zoom = 3,
+		concealment = 24,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1
+	}
+	self.desertfox = {}
+	self.desertfox.category = "snp"
+	self.desertfox.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.desertfox.damage_melee = damage_melee_default
+	self.desertfox.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.desertfox.sounds = {}
+	self.desertfox.sounds.fire = "desertfox_fire"
+	self.desertfox.sounds.dryfire = "primary_dryfire"
+	self.desertfox.sounds.enter_steelsight = "lmg_steelsight_enter"
+	self.desertfox.sounds.leave_steelsight = "lmg_steelsight_exit"
+	self.desertfox.timers = {}
+	self.desertfox.timers.reload_not_empty = 2.72
+	self.desertfox.timers.reload_empty = 3.86
+	self.desertfox.timers.unequip = 0.45
+	self.desertfox.timers.equip = 0.75
+	self.desertfox.name_id = "bm_w_desertfox"
+	self.desertfox.desc_id = "bm_w_desertfox_desc"
+	self.desertfox.description_id = "des_desertfox"
+	self.desertfox.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.desertfox.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.desertfox.use_data = {}
+	self.desertfox.use_data.selection_index = 2
+	self.desertfox.use_data.align_place = "right_hand"
+	self.desertfox.DAMAGE = 1
+	self.desertfox.CLIP_AMMO_MAX = 5
+	self.desertfox.NR_CLIPS_MAX = 6
+	self.desertfox.AMMO_MAX = self.desertfox.CLIP_AMMO_MAX * self.desertfox.NR_CLIPS_MAX
+	self.desertfox.AMMO_PICKUP = {0.7, 1}
+	self.desertfox.FIRE_MODE = "single"
+	self.desertfox.fire_mode_data = {}
+	self.desertfox.fire_mode_data.fire_rate = 1
+	self.desertfox.CAN_TOGGLE_FIREMODE = false
+	self.desertfox.single = {}
+	self.desertfox.single.fire_rate = 20
+	self.desertfox.spread = {}
+	self.desertfox.spread.standing = self.new_m4.spread.standing
+	self.desertfox.spread.crouching = self.new_m4.spread.crouching
+	self.desertfox.spread.steelsight = self.new_m4.spread.steelsight
+	self.desertfox.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.desertfox.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.desertfox.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.desertfox.kick = {}
+	self.desertfox.kick.standing = {
+		3,
+		4.8,
+		-0.3,
+		0.3
+	}
+	self.desertfox.kick.crouching = self.desertfox.kick.standing
+	self.desertfox.kick.steelsight = self.desertfox.kick.standing
+	self.desertfox.crosshair = {}
+	self.desertfox.crosshair.standing = {}
+	self.desertfox.crosshair.crouching = {}
+	self.desertfox.crosshair.steelsight = {}
+	self.desertfox.crosshair.standing.offset = 1.14
+	self.desertfox.crosshair.standing.moving_offset = 1.8
+	self.desertfox.crosshair.standing.kick_offset = 1.6
+	self.desertfox.crosshair.crouching.offset = 1.1
+	self.desertfox.crosshair.crouching.moving_offset = 1.6
+	self.desertfox.crosshair.crouching.kick_offset = 1.4
+	self.desertfox.crosshair.steelsight.hidden = true
+	self.desertfox.crosshair.steelsight.offset = 1
+	self.desertfox.crosshair.steelsight.moving_offset = 1
+	self.desertfox.crosshair.steelsight.kick_offset = 1.14
+	self.desertfox.shake = {}
+	self.desertfox.shake.fire_multiplier = 3.5
+	self.desertfox.shake.fire_steelsight_multiplier = -3.5
+	self.desertfox.autohit = autohit_snp_default
+	self.desertfox.aim_assist = aim_assist_snp_default
+	self.desertfox.weapon_hold = "desertfox"
+	self.desertfox.animations = {}
+	self.desertfox.animations.equip_id = "equip_desertfox"
+	self.desertfox.animations.recoil_steelsight = true
+	self.desertfox.global_value = "pim"
+	self.desertfox.texture_bundle_folder = "pim"
+	self.desertfox.can_shoot_through_enemy = true
+	self.desertfox.can_shoot_through_shield = true
+	self.desertfox.can_shoot_through_wall = true
+	self.desertfox.panic_suppression_chance = 0.2
+	self.desertfox.stats = {
+		damage = 150,
+		spread = 20,
+		recoil = 4,
+		spread_moving = 24,
+		zoom = 1,
+		concealment = 19,
+		suppression = 5,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 10
+	}
+	self.desertfox.armor_piercing_chance = 1
+	self.desertfox.stats_modifiers = {damage = 2}
+	self.x_packrat = {}
+	self.x_packrat.category = "akimbo"
+	self.x_packrat.sub_category = "pistol"
+	self.x_packrat.damage_melee = damage_melee_default
+	self.x_packrat.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_packrat.sounds = {}
+	self.x_packrat.sounds.fire = "packrat_fire"
+	self.x_packrat.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_packrat.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_packrat.sounds.dryfire = "secondary_dryfire"
+	self.x_packrat.timers = {}
+	self.x_packrat.timers.reload_not_empty = 3.17
+	self.x_packrat.timers.reload_empty = 4
+	self.x_packrat.timers.unequip = 0.5
+	self.x_packrat.timers.equip = 0.5
+	self.x_packrat.name_id = "bm_w_x_packrat"
+	self.x_packrat.desc_id = "bm_w_x_packrat_desc"
+	self.x_packrat.description_id = "des_x_packrat"
+	self.x_packrat.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_packrat.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.x_packrat.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_packrat.use_data = {}
+	self.x_packrat.use_data.selection_index = 2
+	self.x_packrat.DAMAGE = 1
+	self.x_packrat.CLIP_AMMO_MAX = 30
+	self.x_packrat.NR_CLIPS_MAX = 3
+	self.x_packrat.AMMO_MAX = self.x_packrat.CLIP_AMMO_MAX * self.x_packrat.NR_CLIPS_MAX
+	self.x_packrat.AMMO_PICKUP = self:_pickup_chance(self.x_packrat.AMMO_MAX, 1)
+	self.x_packrat.FIRE_MODE = "single"
+	self.x_packrat.fire_mode_data = {}
+	self.x_packrat.fire_mode_data.fire_rate = 0.166
+	self.x_packrat.single = {}
+	self.x_packrat.single.fire_rate = 0.166
+	self.x_packrat.spread = {}
+	self.x_packrat.spread.standing = self.colt_1911.spread.standing
+	self.x_packrat.spread.crouching = self.colt_1911.spread.crouching
+	self.x_packrat.spread.steelsight = self.colt_1911.spread.steelsight
+	self.x_packrat.spread.moving_standing = self.colt_1911.spread.moving_standing
+	self.x_packrat.spread.moving_crouching = self.colt_1911.spread.moving_crouching
+	self.x_packrat.spread.moving_steelsight = self.colt_1911.spread.moving_steelsight
+	self.x_packrat.kick = {}
+	self.x_packrat.kick.standing = {
+		1.6,
+		1.3,
+		-0.3,
+		0.3
+	}
+	self.x_packrat.kick.crouching = self.x_packrat.kick.standing
+	self.x_packrat.kick.steelsight = self.x_packrat.kick.standing
+	self.x_packrat.crosshair = {}
+	self.x_packrat.crosshair.standing = {}
+	self.x_packrat.crosshair.crouching = {}
+	self.x_packrat.crosshair.steelsight = {}
+	self.x_packrat.crosshair.standing.offset = 0.2
+	self.x_packrat.crosshair.standing.moving_offset = 0.6
+	self.x_packrat.crosshair.standing.kick_offset = 0.4
+	self.x_packrat.crosshair.crouching.offset = 0.1
+	self.x_packrat.crosshair.crouching.moving_offset = 0.6
+	self.x_packrat.crosshair.crouching.kick_offset = 0.3
+	self.x_packrat.crosshair.steelsight.hidden = true
+	self.x_packrat.crosshair.steelsight.offset = 0
+	self.x_packrat.crosshair.steelsight.moving_offset = 0
+	self.x_packrat.crosshair.steelsight.kick_offset = 0.1
+	self.x_packrat.shake = {}
+	self.x_packrat.shake.fire_multiplier = 1
+	self.x_packrat.shake.fire_steelsight_multiplier = -1
+	self.x_packrat.autohit = autohit_pistol_default
+	self.x_packrat.aim_assist = aim_assist_pistol_default
+	self.x_packrat.weapon_hold = "jowi_pistol"
+	self.x_packrat.animations = {}
+	self.x_packrat.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_packrat.animations.has_steelsight_stance = true
+	self.x_packrat.animations.recoil_steelsight = true
+	self.x_packrat.global_value = "pim"
+	self.x_packrat.texture_bundle_folder = "pim"
+	self.x_packrat.panic_suppression_chance = 0.2
+	self.x_packrat.stats = {
+		damage = 66,
+		spread = 18,
+		recoil = 16,
+		spread_moving = 18,
+		zoom = 3,
+		concealment = 27,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4
+	}
 	self.rota = {}
 	self.rota.category = "shotgun"
 	self.rota.has_magazine = true
@@ -12828,6 +13254,30 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.packrat_npc = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.schakal_npc = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.desertfox_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_packrat_npc = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 	self.rota_npc = {
 		usage = "saiga",
 		sounds = {},
@@ -12957,5 +13407,9 @@ function WeaponTweakData:_precalculate_values()
 	self.tecci_npc.AMMO_MAX = self.tecci_npc.CLIP_AMMO_MAX * self.tecci_npc.NR_CLIPS_MAX
 	self.hajk_npc.AMMO_MAX = self.hajk_npc.CLIP_AMMO_MAX * self.hajk_npc.NR_CLIPS_MAX
 	self.boot_npc.AMMO_MAX = self.boot_npc.CLIP_AMMO_MAX * self.boot_npc.NR_CLIPS_MAX
+	self.packrat_npc.AMMO_MAX = self.packrat_npc.CLIP_AMMO_MAX * self.packrat_npc.NR_CLIPS_MAX
+	self.schakal_npc.AMMO_MAX = self.schakal_npc.CLIP_AMMO_MAX * self.schakal_npc.NR_CLIPS_MAX
+	self.desertfox_npc.AMMO_MAX = self.desertfox_npc.CLIP_AMMO_MAX * self.desertfox_npc.NR_CLIPS_MAX
+	self.x_packrat_npc.AMMO_MAX = self.x_packrat_npc.CLIP_AMMO_MAX * self.x_packrat_npc.NR_CLIPS_MAX
 	self.rota_npc.AMMO_MAX = self.rota_npc.CLIP_AMMO_MAX * self.rota_npc.NR_CLIPS_MAX
 end

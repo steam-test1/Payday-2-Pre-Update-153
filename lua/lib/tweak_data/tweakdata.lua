@@ -1513,6 +1513,14 @@ Play the full version soon to get your full PAYDAY!]],
 			kill = true,
 			enemy = "spooc"
 		},
+		pim_2 = {
+			stat = "pim_2_stats",
+			job = "dark",
+			grenade_type = "wpn_prj_target",
+			crouching = true,
+			kill = true,
+			success = true
+		},
 		any_kills = {challenge_stat = "any_kills", kill = true},
 		any_sniper_kills = {
 			challenge_stat = "any_sniper_kills",
@@ -1850,6 +1858,18 @@ Play the full version soon to get your full PAYDAY!]],
 		trophy_medic = {
 			trophy_stat = "trophy_medic",
 			enemies = {"medic"}
+		},
+		pim_1 = {
+			stat = "pim_1_stats",
+			weapon = "desertfox",
+			difficulty = overkill_and_above,
+			enemies = {"sniper"}
+		},
+		pim_3 = {
+			stat = "pim_3_stats",
+			weapon = "schakal",
+			difficulty = overkill_and_above,
+			level_id = "mad"
 		}
 	}
 	self.achievement.enemy_melee_kill_achievements = {
@@ -3142,6 +3162,15 @@ Play the full version soon to get your full PAYDAY!]],
 				armor = "level_1"
 			}
 		},
+		pim_4 = {
+			award = "pim_4",
+			job = "firestarter",
+			need_full_job = true,
+			difficulty = overkill_and_above,
+			shots_by_weapon = "packrat",
+			everyone_killed_by_melee = 0,
+			everyone_killed_by_grenade = 0
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -3369,6 +3398,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		trophy_watchout = {
 			trophy_stat = "trophy_watchout",
+			total_accuracy = 100,
 			jobs = {
 				"watchdogs_wrapper",
 				"watchdogs_night",
@@ -3588,7 +3618,8 @@ Play the full version soon to get your full PAYDAY!]],
 		flat_5 = {
 			award = "flat_5",
 			total_accuracy = 200,
-			level_id = "flat"
+			level_id = "flat",
+			success = true
 		},
 		daily_professional = {
 			trophy_stat = "daily_professional",
@@ -5067,6 +5098,17 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.wpn_prj_hur.sounds.flyby = "hur_flyby"
 	self.projectiles.wpn_prj_hur.sounds.flyby_stop = "hur_flyby_stop"
 	self.projectiles.wpn_prj_hur.sounds.impact = "hur_impact_gen"
+	self.projectiles.wpn_prj_target = {}
+	self.projectiles.wpn_prj_target.damage = 110
+	self.projectiles.wpn_prj_target.launch_speed = 1000
+	self.projectiles.wpn_prj_target.adjust_z = 120
+	self.projectiles.wpn_prj_target.mass_look_up_modifier = 1
+	self.projectiles.wpn_prj_target.name_id = "bm_prj_target"
+	self.projectiles.wpn_prj_target.push_at_body_index = "dynamic_body_spinn"
+	self.projectiles.wpn_prj_target.sounds = {}
+	self.projectiles.wpn_prj_target.sounds.flyby = "target_flyby"
+	self.projectiles.wpn_prj_target.sounds.flyby_stop = "target_flyby_stop"
+	self.projectiles.wpn_prj_target.sounds.impact = "target_impact_gen"
 	self.projectiles.frag_com = {}
 	self.projectiles.frag_com.damage = 60
 	self.projectiles.frag_com.curve_pow = 0.1

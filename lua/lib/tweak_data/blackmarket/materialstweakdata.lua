@@ -1240,6 +1240,32 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.shiny_and_chrome.value = 0
 	self.materials.shiny_and_chrome.texture_bundle_folder = "born"
 	self.materials.shiny_and_chrome.dlc = "born"
+	self.materials.club = {}
+	self.materials.club.name_id = "bm_mtl_club"
+	self.materials.club.pcs = {}
+	self.materials.club.texture = "units/pd2_dlc_pim/masks/materials/matcap_club_df"
+	self.materials.club.value = 0
+	self.materials.club.dlc = "pim"
+	self.materials.mist = {}
+	self.materials.mist.name_id = "bm_mtl_mist"
+	self.materials.mist.pcs = {}
+	self.materials.mist.texture = "units/pd2_dlc_pim/masks/materials/matcap_mist_df"
+	self.materials.mist.value = 0
+	self.materials.mist.dlc = "pim"
+	self.materials.dog = {}
+	self.materials.dog.material_amount = 0
+	self.materials.dog.name_id = "bm_mtl_dog"
+	self.materials.dog.pcs = {}
+	self.materials.dog.texture = "units/pd2_dlc_pim/masks/materials/matcap_dog_df"
+	self.materials.dog.value = 0
+	self.materials.dog.dlc = "pim"
+	self.materials.wheel = {}
+	self.materials.wheel.material_amount = 0
+	self.materials.wheel.name_id = "bm_mtl_wheel"
+	self.materials.wheel.pcs = {}
+	self.materials.wheel.texture = "units/pd2_dlc_pim/masks/materials/matcap_wheel_df"
+	self.materials.wheel.value = 0
+	self.materials.wheel.dlc = "pim"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

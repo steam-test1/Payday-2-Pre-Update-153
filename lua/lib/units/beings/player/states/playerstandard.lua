@@ -406,7 +406,7 @@ end
 
 local win32 = SystemInfo:platform() == Idstring("WIN32")
 
-function PlayerStandard:_get_input(t, dt)
+function PlayerStandard:_get_input(t, dt, paused)
 	if self._state_data.controller_enabled ~= self._controller:enabled() then
 		if self._state_data.controller_enabled then
 			self._state_data.controller_enabled = self._controller:enabled()
@@ -423,7 +423,12 @@ function PlayerStandard:_get_input(t, dt)
 	local pressed = self._controller:get_any_input_pressed()
 	local released = self._controller:get_any_input_released()
 	local downed = self._controller:get_any_input()
-	if not pressed and not released and not downed then
+	if paused then
+		self._input_paused = true
+	elseif not downed then
+		self._input_paused = false
+	end
+	if not (pressed or released or downed) or self._input_paused then
 		return {}
 	end
 	local input = {
@@ -520,11 +525,11 @@ function PlayerStandard:_determine_move_direction()
 end
 
 function PlayerStandard:update_check_actions_paused(t, dt)
-	self:_update_check_actions(Application:time(), 0.1)
+	self:_update_check_actions(Application:time(), 0.1, true)
 end
 
-function PlayerStandard:_update_check_actions(t, dt)
-	local input = self:_get_input(t, dt)
+function PlayerStandard:_update_check_actions(t, dt, paused)
+	local input = self:_get_input(t, dt, paused)
 	self:_determine_move_direction()
 	self:_update_interaction_timers(t)
 	self:_update_throw_projectile_timers(t, input)

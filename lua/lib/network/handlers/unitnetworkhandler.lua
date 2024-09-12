@@ -2067,11 +2067,11 @@ function UnitNetworkHandler:sync_start_anticipation_music()
 	managers.hud:sync_start_anticipation_music()
 end
 
-function UnitNetworkHandler:sync_start_assault()
+function UnitNetworkHandler:sync_start_assault(assault_number)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
-	managers.hud:sync_start_assault()
+	managers.hud:sync_start_assault(assault_number)
 end
 
 function UnitNetworkHandler:sync_end_assault(result)

@@ -879,9 +879,13 @@ function CrimeNetManager:join_quick_play_game()
 		local level_diff_min = self._global.quickplay.level_diff_min or tweak_data.quickplay.default_level_diff[1]
 		local level_diff_max = self._global.quickplay.level_diff_max or tweak_data.quickplay.default_level_diff[2]
 		local min_level, max_level = math.max(player_level - level_diff_min, 0), math.min(player_level + level_diff_max, 100)
-		local stealth_enabled = managers.user:get_setting("quickplay_stealth")
+		local was_stealth_enabled = managers.user:get_setting("quickplay_stealth")
+		local stealth_enabled = was_stealth_enabled
 		local loud_enabled = managers.user:get_setting("quickplay_loud")
 		local mutators_only_games = managers.user:get_setting("quickplay_mutators")
+		if stealth_enabled and not managers.blackmarket:player_owns_silenced_weapon() then
+			stealth_enabled = false
+		end
 		local difficulty = self._global.quickplay.difficulty
 		for i, room in ipairs(room_list) do
 			local name_str = tostring(room.owner_name)
@@ -891,6 +895,9 @@ function CrimeNetManager:join_quick_play_game()
 			if not stealth_enabled or not loud_enabled then
 				local is_stealth = tweak_data.quickplay.stealth_levels[level_id] or attributes_numbers[10] == 2 or false
 				skip_level = is_stealth ~= stealth_enabled
+			end
+			if not stealth_enabled and not loud_enabled then
+				skip_level = true
 			end
 			if not skip_level and difficulty and difficulty ~= tweak_data:index_to_difficulty(attributes_numbers[2]) then
 				skip_level = true
@@ -935,6 +942,14 @@ function CrimeNetManager:join_quick_play_game()
 		end
 		if selected_game then
 			managers.network.matchmake:join_server(selected_game, true)
+		elseif was_stealth_enabled and not loud_enabled and not managers.blackmarket:player_owns_silenced_weapon() then
+			local dialog_data = {}
+			dialog_data.title = managers.localization:text("menu_cn_quickplay_not_found_stealth_title")
+			dialog_data.text = managers.localization:text("menu_cn_quickplay_not_found_stealth_body")
+			local ok_button = {}
+			ok_button.text = managers.localization:text("dialog_ok")
+			dialog_data.button_list = {ok_button}
+			managers.system_menu:show(dialog_data)
 		else
 			local dialog_data = {}
 			dialog_data.title = managers.localization:text("menu_cn_quickplay_not_found_title")

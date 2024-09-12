@@ -250,6 +250,14 @@ function EnvironmentManager:game_default_environment()
 	return self._game_default_environment_path
 end
 
+function EnvironmentManager:set_override_environment(override_environment_path)
+	self._override_environment_path = override_environment_path
+end
+
+function EnvironmentManager:override_environment()
+	return self._override_environment_path
+end
+
 function EnvironmentManager:_set_global_feeder(feeder)
 	local old_feeder = self._global_feeder_map[feeder.DATA_PATH_KEY]
 	self._global_feeder_map[feeder.DATA_PATH_KEY] = feeder
