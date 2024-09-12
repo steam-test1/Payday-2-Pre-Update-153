@@ -8,7 +8,6 @@ function CustomSafehouseManager:init()
 end
 
 function CustomSafehouseManager:_setup()
-	self._disabled_r = true
 	self._server_tick = 0
 	self._highest_tier = #tweak_data.safehouse.prices.rooms
 	if not Global.custom_safehouse_manager then
@@ -701,7 +700,11 @@ function CustomSafehouseManager:_on_heist_completed(job_id)
 end
 
 function CustomSafehouseManager:tick_safehouse_spawn()
-	if not self._global._spawn_cooldown or self._global._spawn_cooldown == 0 then
+	if not self._global._spawn_cooldown then
+		if self._global._has_entered_safehouse then
+			self._global._spawn_cooldown = 1
+		end
+	elseif self._global._spawn_cooldown == 0 then
 		self:_set_safehouse_cooldown()
 	else
 		local server_time = self:_get_server_time()
@@ -722,15 +725,12 @@ end
 function CustomSafehouseManager:_get_server_time()
 	self._tick = self._tick and self._tick + 1 or 0
 	if self._tick % self.SERVER_TICK == 0 then
-		return Steam:server_time()
+		self._server_time_cache = Steam:server_time()
 	end
-	return 0
+	return self._server_time_cache or 0
 end
 
 function CustomSafehouseManager:spawn_safehouse_contract()
-	if self._disabled_r then
-		return
-	end
 	if self._has_spawned_safehouse_contract or not self._global._has_entered_safehouse then
 		return
 	end
@@ -739,8 +739,8 @@ function CustomSafehouseManager:spawn_safehouse_contract()
 		name_id = "menu_cn_chill_combat",
 		desc_id = "menu_cn_chill_combat_desc",
 		menu_node = "crimenet_contract_chill",
-		x = 332,
-		y = 626,
+		x = 362,
+		y = 696,
 		icon = "guis/dlcs/chill/textures/pd2/safehouse/crimenet_marker_safehouse",
 		pulse = true,
 		pulse_color = Color(204, 255, 32, 32) / 255

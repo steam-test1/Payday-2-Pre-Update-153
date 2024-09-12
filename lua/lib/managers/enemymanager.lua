@@ -431,6 +431,17 @@ function EnemyManager:add_delayed_clbk(id, clbk, execute_t)
 	table.insert(all_clbks, i + 1, clbk_data)
 end
 
+function EnemyManager:is_clbk_registered(id)
+	if self._delayed_clbks then
+		for i, clbk_data in ipairs(self._delayed_clbks) do
+			if clbk_data[1] == id then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function EnemyManager:remove_delayed_clbk(id)
 	local all_clbks = self._delayed_clbks
 	for i, clbk_data in ipairs(all_clbks) do

@@ -21,7 +21,8 @@ function ElementMissionEnd:on_executed(instigator)
 				personal_win = alive(managers.player:player_unit())
 			})
 		elseif self._values.state == "failed" then
-			print("No fail state yet")
+			managers.network:session():send_to_peers("mission_ended", false, 0)
+			game_state_machine:change_state_by_name("gameoverscreen")
 		elseif self._values.state == "leave" then
 			MenuCallbackHandler:leave_mission()
 		elseif self._values.state == "leave_safehouse" then

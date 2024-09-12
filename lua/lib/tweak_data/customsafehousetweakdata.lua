@@ -15,6 +15,17 @@ function CustomSafehouseTweakData:init(tweak_data)
 	self.rewards.raid = 6
 	self.rewards.experience_ratio = 1000000
 	self.level_limit = 25
+	self.combat = {}
+	self.combat.waves = {
+		easy = 3,
+		normal = 3,
+		hard = 3,
+		overkill = 3,
+		overkill_145 = 3,
+		easy_wish = 3,
+		overkill_290 = 3,
+		sm_wish = 3
+	}
 	self:_init_heisters(tweak_data)
 	self:_init_safehouse_contractors(tweak_data)
 	self:_init_safehouse_rooms(tweak_data)

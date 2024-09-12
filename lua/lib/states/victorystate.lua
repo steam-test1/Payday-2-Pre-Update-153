@@ -9,6 +9,13 @@ end
 function VictoryState:at_enter(...)
 	self._success = true
 	VictoryState.super.at_enter(self, ...)
+	if not self._safehouse_raid_rewarded then
+		local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
+		if was_safehouse_raid then
+			managers.custom_safehouse:add_coins(tweak_data.safehouse.rewards.raid)
+			self._safehouse_raid_rewarded = true
+		end
+	end
 end
 
 function VictoryState:at_exit(...)

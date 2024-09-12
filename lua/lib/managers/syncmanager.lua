@@ -46,16 +46,16 @@ function SyncManager:send_all_synced_units_to(peer)
 	end
 end
 
+SyncManager.sync_functions = {
+	weapon = "handle_synced_weapon_blueprint",
+	mask = "handle_synced_mask_blueprint",
+	offshore_gui = "handle_synced_offshore_gui",
+	vault_cash = "handle_synced_vault_cash"
+}
+
 function SyncManager:on_received_synced_outfit(unit_id, type, outfit_string)
 	print("[SyncManager] received synced blueprint", type, outfit_string)
-	local callback
-	if type == "weapon" then
-		callback = self.handle_synced_weapon_blueprint
-	elseif type == "mask" then
-		callback = self.handle_synced_mask_blueprint
-	elseif type == "offshore_gui" then
-		callback = self.handle_synced_offshore_gui
-	end
+	local callback = self[SyncManager.sync_functions[type]]
 	if callback then
 		callback(self, unit_id, outfit_string)
 	else
@@ -128,5 +128,19 @@ function SyncManager:handle_synced_offshore_gui(unit_id, data_string)
 	if unit_element then
 		unit_element:set_visible(toboolean(data[1]))
 		unit_element:update_offshore(tonumber(data[2]))
+	end
+end
+
+function SyncManager:add_synced_vault_cash(unit_id, tier)
+	local blueprint = string.format("%s", tostring(tier))
+	self:add_synced_outfit_unit(unit_id, "vault_cash", blueprint)
+	print("[SyncManager] added synced vault: ", unit_id, blueprint)
+end
+
+function SyncManager:handle_synced_vault_cash(unit_id, data_string)
+	local target_tier = tonumber(data_string)
+	local unit_element = self:get_managed_unit(unit_id)
+	if unit_element and target_tier then
+		unit_element:set_active_tier(target_tier)
 	end
 end

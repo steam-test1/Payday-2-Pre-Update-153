@@ -110,6 +110,7 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 		self._hud_panel:remove(self._hud_panel:child("wave_panel"))
 	end
 	self._completed_waves = 0
+	self._max_waves = tweak_data.safehouse.combat.waves[Global.game_settings.difficulty or "normal"]
 	if self:is_safehouse_raid() then
 		self._wave_panel_size = {250, 38}
 		local wave_w, wave_h = 38, 38
@@ -137,7 +138,7 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 			h = wave_h
 		})
 		self._wave_bg_box = HUDBGBox_create(wave_panel, {
-			w = wave_w,
+			w = 100,
 			h = wave_h,
 			x = 0,
 			y = 0
@@ -147,7 +148,7 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 		self._wave_bg_box:set_right(waves_icon:left())
 		local num_waves = self._wave_bg_box:text({
 			name = "num_waves",
-			text = tostring(self._completed_waves),
+			text = self:get_completed_waves_string(),
 			valign = "center",
 			vertical = "center",
 			align = "center",
@@ -436,7 +437,7 @@ function HUDAssaultCorner:_update_assault_hud_color(color)
 	icon_assaultbox:set_color(color)
 end
 
-function HUDAssaultCorner:sync_start_assault(data)
+function HUDAssaultCorner:sync_start_assault(assault_number)
 	if self._point_of_no_return or self._casing then
 		return
 	end
@@ -582,6 +583,9 @@ function HUDAssaultCorner:_start_assault(text_list)
 	box_text_panel:stop()
 	box_text_panel:animate(callback(self, self, "_animate_text"), nil, nil, callback(self, self, "assault_attention_color_function"))
 	self:_set_feedback_color(self._assault_color)
+	self._completed_waves = self._completed_waves + 1
+	self._wave_bg_box:stop()
+	self._wave_bg_box:animate(callback(self, self, "_animate_wave_started"), self)
 end
 
 function HUDAssaultCorner:assault_attention_color_function()
@@ -606,7 +610,8 @@ function HUDAssaultCorner:_end_assault()
 		self:_update_assault_hud_color(self._assault_survived_color)
 		self:_set_text_list(self:_get_survived_assault_strings())
 		box_text_panel:animate(callback(self, self, "_animate_text"), nil, nil, callback(self, self, "assault_attention_color_function"))
-		self._completed_waves = self._completed_waves + 1
+		icon_assaultbox:stop()
+		icon_assaultbox:animate(callback(self, self, "_show_icon_assaultbox"))
 		self._wave_bg_box:stop()
 		self._wave_bg_box:animate(callback(self, self, "_animate_wave_completed"), self)
 	else
@@ -947,13 +952,29 @@ function HUDAssaultCorner:_update_feedback_alpha(t, dt)
 	managers.platform:set_feedback_color(color:with_alpha(alpha))
 end
 
+function HUDAssaultCorner:_animate_wave_started(panel, assault_hud)
+	local wave_text = panel:child("num_waves")
+	local bg = panel:child("bg")
+	wave_text:set_text(self:get_completed_waves_string())
+	bg:stop()
+	bg:animate(callback(nil, _G, "HUDBGBox_animate_bg_attention"), {})
+end
+
 function HUDAssaultCorner:_animate_wave_completed(panel, assault_hud)
 	local wave_text = panel:child("num_waves")
 	local bg = panel:child("bg")
 	wait(1.4)
-	wave_text:set_text(tostring(self._completed_waves))
+	wave_text:set_text(self:get_completed_waves_string())
 	bg:stop()
 	bg:animate(callback(nil, _G, "HUDBGBox_animate_bg_attention"), {})
 	wait(7.2)
 	assault_hud:_close_assault_box()
+end
+
+function HUDAssaultCorner:get_completed_waves_string()
+	local macro = {
+		current = self._completed_waves or 0,
+		max = self._max_waves or 0
+	}
+	return managers.localization:to_upper_text("hud_assault_waves", macro)
 end

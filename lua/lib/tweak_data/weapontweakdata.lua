@@ -126,6 +126,7 @@ function WeaponTweakData:_set_normal()
 	self.swat_van_turret_module.HEALTH_INIT = 3500
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 70
 	self.swat_van_turret_module.DAMAGE = 0.2
+	self.ak47_ass_npc.DAMAGE = 0.1
 	self.m4_npc.DAMAGE = 0.1
 	self.g36_npc.DAMAGE = 0.15
 	self.r870_npc.DAMAGE = 0.3
@@ -140,6 +141,7 @@ function WeaponTweakData:_set_hard()
 	self.swat_van_turret_module.HEALTH_INIT = 3500
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 70
 	self.swat_van_turret_module.DAMAGE = 0.5
+	self.ak47_ass_npc.DAMAGE = 0.4
 	self.m4_npc.DAMAGE = 0.4
 	self.g36_npc.DAMAGE = 0.6
 	self.r870_npc.DAMAGE = 1
@@ -158,6 +160,7 @@ function WeaponTweakData:_set_overkill()
 end
 
 function WeaponTweakData:_set_overkill_145()
+	self.ak47_ass_npc.DAMAGE = 2
 	self.swat_van_turret_module.HEALTH_INIT = 25000
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 500
 	self.swat_van_turret_module.DAMAGE = 2
@@ -167,6 +170,7 @@ function WeaponTweakData:_set_overkill_145()
 end
 
 function WeaponTweakData:_set_easy_wish()
+	self.ak47_ass_npc.DAMAGE = 2.5
 	self.swat_van_turret_module.HEALTH_INIT = 40000
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 700
 	self.swat_van_turret_module.DAMAGE = 3.5
@@ -178,6 +182,7 @@ function WeaponTweakData:_set_easy_wish()
 end
 
 function WeaponTweakData:_set_overkill_290()
+	self.ak47_ass_npc.DAMAGE = 3
 	self.swat_van_turret_module.HEALTH_INIT = 40000
 	self.swat_van_turret_module.SHIELD_HEALTH_INIT = 700
 	self.swat_van_turret_module.DAMAGE = 3.5
@@ -189,6 +194,7 @@ function WeaponTweakData:_set_overkill_290()
 end
 
 function WeaponTweakData:_set_sm_wish()
+	self.ak47_ass_npc.DAMAGE = 3
 	self.m4_npc.DAMAGE = 3
 	self.g36_npc.DAMAGE = 5
 	self.r870_npc.DAMAGE = 7

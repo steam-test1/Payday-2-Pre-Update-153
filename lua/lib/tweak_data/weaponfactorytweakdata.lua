@@ -5584,7 +5584,11 @@ function WeaponFactoryTweakData:_init_m14()
 		"wpn_fps_upg_fl_ass_laser",
 		"wpn_fps_upg_o_m14_scopemount",
 		"wpn_fps_upg_ass_ns_battle",
-		"wpn_fps_upg_fl_ass_utg"
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_ass_m14_b_legendary",
+		"wpn_fps_ass_m14_body_legendary",
+		"wpn_fps_ass_m14_body_upper_legendary",
+		"wpn_fps_ass_m14_body_lower_legendary"
 	}
 	self.wpn_fps_ass_m14_npc = deep_clone(self.wpn_fps_ass_m14)
 	self.wpn_fps_ass_m14_npc.unit = "units/payday2/weapons/wpn_fps_ass_m14/wpn_fps_ass_m14_npc"
@@ -7596,6 +7600,9 @@ function WeaponFactoryTweakData:_init_serbu()
 		"wpn_fps_upg_fl_ass_smg_sho_surefire",
 		"wpn_fps_upg_m4_g_hgrip",
 		"wpn_fps_upg_m4_g_mgrip",
+		"wpn_fps_shot_shorty_b_legendary",
+		"wpn_fps_shot_shorty_s_legendary",
+		"wpn_fps_shot_shorty_fg_legendary",
 		"wpn_fps_upg_shot_ns_king",
 		"wpn_fps_upg_o_eotech_xps",
 		"wpn_fps_upg_o_reflex",
@@ -24674,6 +24681,88 @@ function WeaponFactoryTweakData:_init_legendary()
 	self.parts.wpn_fps_ass_tecci_b_legend.third_unit = "units/payday2_cash/safes/grunt/weapons/wpn_third_ass_tecci_legendary/wpn_third_ass_tecci_b_legend"
 	self.parts.wpn_fps_ass_tecci_fg_legend.third_unit = "units/payday2_cash/safes/grunt/weapons/wpn_third_ass_tecci_legendary/wpn_third_ass_tecci_fg_legend"
 	self.parts.wpn_fps_ass_tecci_s_legend.third_unit = "units/payday2_cash/safes/grunt/weapons/wpn_third_ass_tecci_legendary/wpn_third_ass_tecci_s_legend"
+	self.parts.wpn_fps_shot_shorty_b_legendary = {
+		type = "barrel",
+		name_id = "bm_wp_shorty_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_fps_shot_shorty_b_legendary",
+		stats = {
+			value = 1,
+			spread = -1,
+			recoil = 5,
+			extra_ammo = 2
+		},
+		unatainable = true,
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_shot_shorty_fg_legendary = {
+		type = "foregrip",
+		name_id = "bm_wp_shorty_fg_legend",
+		a_obj = "a_fg",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_fps_shot_shorty_fg_legendary",
+		stats = {value = 1, damage = 15},
+		unatainable = true,
+		animations = {
+			reload_exit = "reload_exit",
+			fire = "recoil",
+			fire_steelsight = "recoil_zoom"
+		}
+	}
+	self.parts.wpn_fps_shot_shorty_s_legendary = {
+		type = "stock",
+		name_id = "bm_wp_shorty_s_legend",
+		a_obj = "a_s",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_fps_shot_shorty_s_legendary",
+		stats = {value = 1},
+		unatainable = true
+	}
+	self.parts.wpn_fps_shot_shorty_b_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_third_shot_shorty_b_legendary"
+	self.parts.wpn_fps_shot_shorty_fg_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_third_shot_shorty_fg_legendary"
+	self.parts.wpn_fps_shot_shorty_s_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_shot_shorty_legendary_pts/wpn_third_shot_shorty_s_legendary"
+	self.parts.wpn_fps_ass_m14_b_legendary = {
+		type = "barrel",
+		name_id = "bm_wp_m14_b_legend",
+		a_obj = "a_b",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_fps_ass_m14_b_legendary",
+		stats = {
+			value = 1,
+			spread = 5,
+			recoil = 2
+		},
+		unatainable = true,
+		perks = {"gadget"}
+	}
+	self.parts.wpn_fps_ass_m14_body_legendary = {
+		type = "stock",
+		name_id = "bm_wp_m14_body_legend",
+		a_obj = "a_body",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_fps_ass_m14_body_legendary",
+		stats = {value = 1, damage = 3},
+		unatainable = true
+	}
+	self.parts.wpn_fps_ass_m14_body_upper_legendary = {
+		type = "upper_body",
+		name_id = "bm_wp_m14_upper_legend",
+		a_obj = "a_body",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_fps_ass_m14_body_upper_legendary",
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			fire = "recoil",
+			fire_steelsight = "recoil"
+		}
+	}
+	self.parts.wpn_fps_ass_m14_body_lower_legendary = {
+		type = "lower_body",
+		name_id = "bm_wp_m14_body_lower_legend",
+		a_obj = "a_body",
+		unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_fps_ass_m14_body_lower_legendary",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_m14_b_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_third_ass_m14_b_legendary"
+	self.parts.wpn_fps_ass_m14_body_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_third_ass_m14_body_legendary"
+	self.parts.wpn_fps_ass_m14_body_upper_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_third_ass_m14_body_upper_legendary"
+	self.parts.wpn_fps_ass_m14_body_lower_legendary.third_unit = "units/payday2_cash/safes/lones/weapons/wpn_fps_ass_m14_legendary_pts/wpn_third_ass_m14_body_lower_legendary"
 end
 
 function WeaponFactoryTweakData:_init_cc_material_config()

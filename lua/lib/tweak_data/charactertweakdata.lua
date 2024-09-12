@@ -5,6 +5,7 @@ function CharacterTweakData:init(tweak_data)
 	local r = LevelsTweakData.LevelType.Russia
 	local ai_type = tweak_data.levels:get_ai_group_type()
 	self.flashbang_multiplier = 1
+	self.concussion_multiplier = 1
 	self._default_chatter = "dispatch_generic_message"
 	if ai_type == r then
 		self._default_chatter = "dsp_radio_russian"
@@ -5513,7 +5514,7 @@ function CharacterTweakData:_presets(tweak_data)
 		{
 			r = 300,
 			acc = {0.7, 1},
-			dmg_mul = 3.5,
+			dmg_mul = 5,
 			recoil = {0.25, 0.45},
 			mode = {
 				0.1,
@@ -5524,8 +5525,8 @@ function CharacterTweakData:_presets(tweak_data)
 		},
 		{
 			r = 2000,
-			acc = {0.1, 0.6},
-			dmg_mul = 0.5,
+			acc = {0.5, 0.6},
+			dmg_mul = 3,
 			recoil = {0.25, 2},
 			mode = {
 				2,
@@ -5536,8 +5537,8 @@ function CharacterTweakData:_presets(tweak_data)
 		},
 		{
 			r = 10000,
-			acc = {0, 0.15},
-			dmg_mul = 0.5,
+			acc = {0.2, 0.4},
+			dmg_mul = 2,
 			recoil = {2, 3},
 			mode = {
 				2,

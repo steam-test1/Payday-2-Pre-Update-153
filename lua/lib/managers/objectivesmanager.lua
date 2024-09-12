@@ -182,6 +182,59 @@ function ObjectivesManager:activate_objective(id, load_data, data)
 	}
 end
 
+function ObjectivesManager:activate_objective_countdown(id, load_data, data)
+	if not id or not self._objectives[id] then
+		Application:stack_dump_error("Bad id to activate objective, " .. tostring(id) .. ".")
+		return
+	end
+	local objective = self._objectives[id]
+	for _, sub_objective in pairs(objective.sub_objectives) do
+		sub_objective.completed = false
+	end
+	objective.current_amount = load_data and load_data.current_amount or data and data.amount and 0 or objective.current_amount
+	objective.amount = load_data and load_data.amount or data and data.amount or objective.amount
+	objective.countdown = true
+	local activate_params = {
+		id = id,
+		text = objective.text,
+		sub_objectives = objective.sub_objectives,
+		amount = objective.amount,
+		current_amount = objective.amount - objective.current_amount,
+		amount_text = objective.amount_text
+	}
+	self._delayed_presentation = nil
+	if data and data.delay_presentation then
+		self._delayed_presentation = {t = 1, activate_params = activate_params}
+	else
+		managers.hud:activate_objective(activate_params)
+	end
+	if not load_data then
+		local title_message = data and data.title_message or managers.localization:text("mission_objective_activated")
+		local text = objective.text
+		if self._delayed_presentation then
+			self._delayed_presentation.mid_text_params = {
+				text = text,
+				title = title_message,
+				time = 4,
+				icon = nil,
+				event = "stinger_objectivecomplete"
+			}
+		else
+			managers.hud:present_mid_text({
+				text = text,
+				title = title_message,
+				time = 4,
+				icon = nil,
+				event = "stinger_objectivecomplete"
+			})
+		end
+	end
+	self._active_objectives[id] = objective
+	self._remind_objectives[id] = {
+		next_t = Application:time() + self.REMINDER_INTERVAL
+	}
+end
+
 function ObjectivesManager:remove_objective(id, load_data)
 	if not load_data then
 		if not id or not self._objectives[id] then
@@ -285,6 +338,51 @@ function ObjectivesManager:complete_sub_objective(id, sub_id, load_data)
 	end
 	if completed then
 		self:complete_objective(id)
+	end
+end
+
+function ObjectivesManager:complete_objective_countdown(id, load_data)
+	if not load_data then
+		if not id or not self._objectives[id] then
+			Application:stack_dump_error("Bad id to complete objective, " .. tostring(id) .. ".")
+			return
+		end
+		if not self._active_objectives[id] then
+			if not self._completed_objectives[id] then
+				self._completed_objectives[id] = self._objectives[id]
+				table.insert(self._completed_objectives_ordered, 1, id)
+			end
+			Application:error("Tried to complete objective " .. tostring(id) .. ". This objective has never been given to the player.")
+			return
+		end
+	end
+	local objective = self._objectives[id]
+	if objective.amount then
+		objective.current_amount = objective.current_amount + 1
+		managers.hud:update_amount_objective({
+			id = id,
+			text = objective.text,
+			amount_text = objective.amount_text,
+			amount = objective.amount,
+			current_amount = objective.amount - objective.current_amount
+		})
+		if objective.current_amount < objective.amount then
+			self:_remind_objetive(id, "mission_objective_updated")
+			return
+		end
+		objective.current_amount = 0
+	end
+	managers.hud:complete_objective({
+		id = id,
+		text = objective.text
+	})
+	managers.statistics:objective_completed()
+	self._completed_objectives[id] = objective
+	table.insert(self._completed_objectives_ordered, 1, id)
+	self._active_objectives[id] = nil
+	self._remind_objectives[id] = nil
+	if self._delayed_presentation and self._delayed_presentation.activate_params.id == id then
+		self._delayed_presentation = nil
 	end
 end
 
@@ -401,6 +499,7 @@ function ObjectivesManager:save(data)
 				save_data.active = true
 				save_data.current_amount = self._active_objectives[name].current_amount
 				save_data.amount = self._active_objectives[name].amount
+				save_data.countdown = self._active_objectives[name].countdown
 				save_data.sub_objective = {}
 				for sub_id, sub_objective in pairs(self._active_objectives[name].sub_objectives) do
 					save_data.sub_objective[sub_id] = sub_objective.completed
@@ -431,10 +530,17 @@ function ObjectivesManager:load(data)
 		for name, save_data in pairs(state.objective_map) do
 			local objective_data = self._objectives[name]
 			if save_data.active then
-				self:activate_objective(name, {
-					current_amount = save_data.current_amount,
-					amount = save_data.amount
-				})
+				if save_data.countdown then
+					self:activate_objective_countdown(name, {
+						current_amount = save_data.current_amount,
+						amount = save_data.amount
+					})
+				else
+					self:activate_objective(name, {
+						current_amount = save_data.current_amount,
+						amount = save_data.amount
+					})
+				end
 				for sub_id, completed in pairs(save_data.sub_objective) do
 					if completed then
 						self:complete_sub_objective(name, sub_id, {})

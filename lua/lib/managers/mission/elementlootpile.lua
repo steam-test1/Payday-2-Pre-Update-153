@@ -70,8 +70,8 @@ function ElementLootPile:register_steal_SO()
 		nav_seg = drop_nav_seg,
 		pos = drop_pos,
 		area = drop_area,
-		interrupt_dis = 700,
-		interrupt_health = 0.9,
+		interrupt_dis = 400,
+		interrupt_health = 0.5,
 		fail_clbk = callback(self, self, "on_secure_SO_failed", loot_index),
 		complete_clbk = callback(self, self, "on_secure_SO_completed", loot_index),
 		action = {
@@ -90,8 +90,8 @@ function ElementLootPile:register_steal_SO()
 		nav_seg = pickup_nav_seg,
 		area = pickup_area,
 		pos = pickup_pos,
-		interrupt_dis = 700,
-		interrupt_health = 0.9,
+		interrupt_dis = 100,
+		interrupt_health = 0.5,
 		fail_clbk = callback(self, self, "on_pickup_SO_failed", loot_index),
 		complete_clbk = callback(self, self, "on_pickup_SO_completed", loot_index),
 		action = {

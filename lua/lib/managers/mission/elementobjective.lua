@@ -22,12 +22,18 @@ function ElementObjective:on_executed(instigator)
 	amount = amount and 0 < amount and amount or nil
 	if objective ~= "none" then
 		if self._values.state == "activate" then
-			managers.objectives:activate_objective(objective, nil, {amount = amount})
+			if self._values.countdown then
+				managers.objectives:activate_objective_countdown(objective, nil, {amount = amount})
+			else
+				managers.objectives:activate_objective(objective, nil, {amount = amount})
+			end
 		elseif self._values.state == "complete_and_activate" then
 			managers.objectives:complete_and_activate_objective(objective, nil, {amount = amount})
 		elseif self._values.state == "complete" then
 			if self._values.sub_objective and self._values.sub_objective ~= "none" then
 				managers.objectives:complete_sub_objective(objective, self._values.sub_objective)
+			elseif self._values.countdown then
+				managers.objectives:complete_objective_countdown(objective)
 			else
 				managers.objectives:complete_objective(objective)
 			end

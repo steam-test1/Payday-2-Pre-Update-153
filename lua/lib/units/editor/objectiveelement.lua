@@ -10,10 +10,12 @@ function ObjectiveUnitElement:init(unit)
 	self._hed.objective = "none"
 	self._hed.sub_objective = "none"
 	self._hed.amount = 0
+	self._hed.countdown = false
 	table.insert(self._save_values, "state")
 	table.insert(self._save_values, "objective")
 	table.insert(self._save_values, "sub_objective")
 	table.insert(self._save_values, "amount")
+	table.insert(self._save_values, "countdown")
 end
 
 function ObjectiveUnitElement:update_sub_objectives()
@@ -51,6 +53,7 @@ function ObjectiveUnitElement:_build_panel(panel, panel_sizer)
 		min = 0,
 		max = 100
 	}, "Overrides objective amount counter with this value.")
+	self:_build_value_checkbox(panel, panel_sizer, "countdown", "Sets whether this objective should be a countdown instead.")
 	local help = {panel = panel, sizer = panel_sizer}
 	help.text = "State complete_and_activate will complete any previous objective and activate the selected objective. Note that it might not function well with objectives using amount"
 	self:add_help_text(help)

@@ -7376,22 +7376,19 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 	}
 	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
 		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "tests" then
-			local contact_tweak = tweak_data.narrative.contacts[tweak_data.narrative.jobs[job_id].contact]
-			if not contact_tweak or not contact_tweak.hidden then
-				local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
-				local params = {
-					_meta = "option",
-					text_id = text_id,
-					value = index,
-					localize = false
-				}
-				for count, color in ipairs(color_data) do
-					params["color" .. count] = color.color
-					params["color_start" .. count] = color.start
-					params["color_stop" .. count] = color.stop
-				end
-				table.insert(data_node, params)
+			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
+			local params = {
+				_meta = "option",
+				text_id = text_id,
+				value = index,
+				localize = false
+			}
+			for count, color in ipairs(color_data) do
+				params["color" .. count] = color.color
+				params["color_start" .. count] = color.start
+				params["color_stop" .. count] = color.stop
 			end
+			table.insert(data_node, params)
 		end
 	end
 	local new_item = node:create_item(data_node, params)

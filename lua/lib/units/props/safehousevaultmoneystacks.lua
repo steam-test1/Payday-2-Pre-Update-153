@@ -21,6 +21,10 @@ SafehouseVaultMoneyStacks.MONEY_STEPS = {
 function SafehouseVaultMoneyStacks:init(unit)
 	UnitBase.init(self, unit, false)
 	self._unit = unit
+	self._active_tier = 1
+	if managers.sync then
+		managers.sync:add_managed_unit(self._unit:id(), self)
+	end
 	self:_setup()
 end
 
@@ -43,23 +47,34 @@ function SafehouseVaultMoneyStacks:_setup()
 		end
 	end
 	local total = managers.money:total()
-	local found_body = false
+	local target_tier
 	for i = #self._tiers, 1, -1 do
 		local data = self._tiers[i]
-		if total < data.cash then
-			self:_set_tier_enabled(data, false)
-		elseif not found_body then
-			self:_set_tier_enabled(data, true)
-			found_body = true
-		else
-			self:_set_tier_enabled(data, false)
+		if total > data.cash then
+			target_tier = i
+			break
 		end
 	end
+	self:set_active_tier(target_tier)
+end
+
+function SafehouseVaultMoneyStacks:set_active_tier(target_tier)
+	self._active_tier = target_tier
+	for i = #self._tiers, 1, -1 do
+		self:_set_tier_enabled(self._tiers[i], target_tier == i)
+	end
+	self:perform_sync()
 end
 
 function SafehouseVaultMoneyStacks:_set_tier_enabled(tier_data, enable)
 	tier_data.body:set_enabled(enable)
 	for i, obj in ipairs(tier_data.objects) do
 		obj:set_visibility(enable)
+	end
+end
+
+function SafehouseVaultMoneyStacks:perform_sync()
+	if managers.sync and Network:is_server() then
+		managers.sync:add_synced_vault_cash(self._unit:id(), self._active_tier)
 	end
 end

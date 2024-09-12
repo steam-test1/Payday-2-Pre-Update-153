@@ -26,7 +26,7 @@ function JobManager:reset_ghost_bonus()
 end
 
 function JobManager:clear_saved_ghost_bonus()
-	if self:current_job_id() == "safehouse" or self:is_job_finished() or self:stage_success() and self:on_last_stage() then
+	if self:current_job_id() == "safehouse" or self:current_job_id() == "chill" or self:is_job_finished() or self:stage_success() and self:on_last_stage() then
 		return
 	end
 	self._global.saved_ghost_bonus = Application:digest_value(0, true)
@@ -46,7 +46,7 @@ function JobManager:start_accumulate_ghost_bonus(job_id)
 end
 
 function JobManager:accumulate_ghost_bonus()
-	if self:has_active_job() and self:current_job_id() ~= "safehouse" then
+	if self:has_active_job() and self:current_job_id() ~= "safehouse" and self:current_job_id() ~= "chill" then
 		local stage_data = self:current_stage_data()
 		local level_data = self:current_level_data()
 		local stage = self:current_stage()
@@ -82,7 +82,7 @@ function JobManager:accumulate_ghost_bonus()
 end
 
 function JobManager:activate_accumulated_ghost_bonus()
-	if self:current_job_id() ~= "safehouse" then
+	if self:current_job_id() ~= "safehouse" and self:current_job_id() ~= "chill" then
 		local agb = self._global.accumulated_ghost_bonus
 		local job_id = self:current_job_id()
 		if not (agb and job_id) or agb.job_id ~= job_id then
@@ -119,7 +119,7 @@ function JobManager:get_accumulated_ghost_bonus()
 end
 
 function JobManager:get_saved_ghost_bonus()
-	if self:current_job_id() ~= "safehouse" then
+	if self:current_job_id() ~= "safehouse" and self:current_job_id() ~= "chill" then
 		return self._global.saved_ghost_bonus and Application:digest_value(self._global.saved_ghost_bonus, false) or 0
 	end
 	return 0
@@ -537,7 +537,7 @@ function JobManager:_check_add_heat_to_jobs(debug_job_id, ignore_debug_prints)
 		Application:error("[JobManager:_check_add_heat_to_jobs] No current job.")
 		return
 	end
-	if current_job == "safehouse" then
+	if current_job == "safehouse" or self:current_job_id() == "chill" then
 		return
 	end
 	local current_job_heat = self._global.heat[current_job]
