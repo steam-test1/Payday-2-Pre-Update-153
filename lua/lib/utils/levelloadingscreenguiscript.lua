@@ -11,6 +11,45 @@ function Idstring(str)
 	return str
 end
 
+local make_fine_text = function(text_obj)
+	local x, y, w, h = text_obj:text_rect()
+	text_obj:set_size(w, h)
+	text_obj:set_position(math.round(text_obj:x()), math.round(text_obj:y()))
+end
+local shrinkwrap = function(panel, padding)
+	padding = padding or {}
+	padding[1] = padding[1] or 0
+	padding[2] = padding[2] or 0
+	padding[3] = padding[3] or padding[1]
+	padding[4] = padding[4] or padding[2]
+	local children = panel:children()
+	local min_x, max_x = math.huge, -math.huge
+	local min_y, max_y = math.huge, -math.huge
+	for _, child in ipairs(children) do
+		if min_x > child:world_left() then
+			min_x = child:world_left()
+		end
+		if max_x < child:world_right() then
+			max_x = child:world_right()
+		end
+		if min_y > child:world_top() then
+			min_y = child:world_top()
+		end
+		if max_y < child:world_bottom() then
+			max_y = child:world_bottom()
+		end
+	end
+	local offset_x = min_x - panel:world_x()
+	local offset_y = min_y - panel:world_y()
+	if min_x ~= 0 or min_y ~= 0 then
+		for _, child in ipairs(children) do
+			child:set_x(child:x() - offset_x + padding[4])
+			child:set_y(child:y() - offset_y + padding[1])
+		end
+	end
+	panel:set_world_position(min_x, min_y)
+	panel:set_size(max_x - min_x + padding[2] + padding[4], max_y - min_y + padding[1] + padding[3])
+end
 LevelLoadingScreenGuiScript = LevelLoadingScreenGuiScript or class()
 
 function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)

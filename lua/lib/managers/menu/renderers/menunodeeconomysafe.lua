@@ -310,6 +310,12 @@ function MenuNodeEconomySafe:_create_raffle_panel(x, data, index)
 		if data.bonus and entry_data.bonus then
 			bonuses = tweak_data.economy:get_bonus_icons(entry_data.bonus)
 		end
+	elseif tweak_data.economy[data.category] then
+		local entry_data = tweak_data.economy[data.category][data.entry]
+		name_id = entry_data.name_id
+		texture_name = "guis/dlcs/" .. entry_data.texture_bundle_folder .. "/" .. data.category .. "/" .. data.entry
+		rarity_color = tweak_data.economy.rarities[entry_data.rarity].color
+		texture_rarity_name = tweak_data.economy.rarities[entry_data.rarity].header_col
 	end
 	local name = managers.localization:text(name_id)
 	if is_legendary then
@@ -490,6 +496,9 @@ function MenuNodeEconomySafe:_build_result_panel()
 	})
 	local name_text = managers.localization:text(item_data.name_id)
 	local quality_text = managers.localization:text(quality_data.name_id)
+	if self._result.category == "armor_skins" then
+		quality_text = ""
+	end
 	local result_text = managers.localization:to_upper_text("menu_cash_safe_result", {quality = quality_text, name = name_text})
 	local name = self._result_panel:text({
 		name = "name",

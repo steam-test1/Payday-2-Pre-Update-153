@@ -21,7 +21,8 @@ function MenuInput:init(logic, ...)
 	self._item_input_action_map[MenuItemColoredDivider.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemInput.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemTextBox.TYPE] = callback(self, self, "input_item")
-	self._item_input_action_map[MenuItemDummy.TYPE] = callback(self, self, "input_item")
+	self._item_input_action_map[MenuItemCrimeSpreeItem.TYPE] = callback(self, self, "input_crime_spree_item")
+	self._item_input_action_map[MenuItemDummy.TYPE] = callback(self, self, "input_crime_spree_item")
 	self._callback_map = {}
 	self._callback_map.mouse_moved = {}
 	self._callback_map.mouse_pressed = {}
@@ -802,5 +803,26 @@ function MenuInput:_update_axis_scroll_status()
 		self._axis_status.y = self.AXIS_STATUS_RELEASED
 	else
 		self._axis_status.y = self.AXIS_STATUS_UP
+	end
+end
+
+function MenuInput:input_crime_spree_item(item, controller, mouse_click)
+	if controller:get_input_pressed("confirm") or mouse_click then
+		local node_gui = managers.menu:active_menu().renderer:active_node_gui()
+		if node_gui and node_gui._listening_to_input then
+			return
+		end
+		self._logic:trigger_item(true, item)
+		self:select_node()
+	elseif self:menu_left_pressed() then
+		managers.menu_component:move_left()
+	elseif self:menu_right_pressed() then
+		managers.menu_component:move_right()
+	elseif self._controller and managers.menu:active_menu().renderer.special_btn_pressed then
+		if self._controller:get_input_pressed("next_page") then
+			managers.menu_component:next_page()
+		elseif self._controller:get_input_pressed("previous_page") then
+			managers.menu_component:previous_page()
+		end
 	end
 end

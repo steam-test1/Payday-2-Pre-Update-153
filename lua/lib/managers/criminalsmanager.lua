@@ -233,6 +233,12 @@ function CriminalsManager:set_unit(name, unit)
 				data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, data.peer_id)
 				data.data.mask_id = managers.blackmarket:get_real_mask_id(mask_id, data.peer_id)
 				data.data.mask_blueprint = peer:mask_blueprint()
+				if unit:armor_skin() then
+					local outfit = managers.blackmarket:unpack_outfit_from_string(peer:profile().outfit_string)
+					if outfit.armor_skin then
+						unit:armor_skin():set_cosmetics_data(outfit.armor_skin, true)
+					end
+				end
 			end
 			if unit:base().is_local_player then
 				self._local_character = name

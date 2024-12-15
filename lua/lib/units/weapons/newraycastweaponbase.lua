@@ -448,7 +448,7 @@ function NewRaycastWeaponBase:_update_stats_values(disallow_replenish)
 end
 
 function NewRaycastWeaponBase:get_add_head_shot_mul()
-	if self:is_category("smg", "lmg", "assault_rifle", "minigun") and self._fire_mode == ids_auto or self:is_category("bow", "crossbow", "saw") then
+	if self:is_category("smg", "lmg", "assault_rifle", "minigun") and self._fire_mode == ids_auto or self:is_category("bow", "saw") then
 		return managers.player:upgrade_value("weapon", "automatic_head_shot_add", nil)
 	end
 	return nil
@@ -523,6 +523,7 @@ function NewRaycastWeaponBase:replenish()
 	if managers.player:has_category_upgrade("player", "add_armor_stat_skill_ammo_mul") then
 		ammo_max_multiplier = ammo_max_multiplier * managers.player:body_armor_value("skill_ammo_mul", nil, 1)
 	end
+	ammo_max_multiplier = managers.crime_spree:modify_value("WeaponBase:GetMaxAmmoMultiplier", ammo_max_multiplier)
 	local ammo_max_per_clip = self:calculate_ammo_max_per_clip()
 	local ammo_max = math.round((tweak_data.weapon[self._name_id].AMMO_MAX + managers.player:upgrade_value(self._name_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
 	ammo_max_per_clip = math.min(ammo_max_per_clip, ammo_max)
@@ -1186,6 +1187,7 @@ function NewRaycastWeaponBase:reload_speed_multiplier()
 	multiplier = multiplier + (1 - managers.player:get_temporary_property("bloodthirst_reload_speed", 1))
 	multiplier = self:_convert_add_to_mul(multiplier)
 	multiplier = multiplier * self:reload_speed_stat()
+	multiplier = managers.crime_spree:modify_value("WeaponBase:GetReloadSpeedMultiplier", multiplier)
 	return multiplier
 end
 

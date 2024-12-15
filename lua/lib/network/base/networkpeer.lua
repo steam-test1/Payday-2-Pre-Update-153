@@ -291,6 +291,7 @@ end
 function NetworkPeer:verify_grenade(value)
 	local grenade_id = self:grenade_id()
 	local max_amount = grenade_id and tweak_data.blackmarket.projectiles[grenade_id] and tweak_data.blackmarket.projectiles[grenade_id].max_amount or tweak_data.equipments.max_amount.grenades
+	max_amount = managers.crime_spree:modify_value("PlayerManager:GetThrowablesMaxAmount", max_amount)
 	if self._grenades and max_amount < self._grenades + value then
 		if Network:is_server() then
 			self:mark_cheater(VoteManager.REASON.many_grenades, true)
@@ -330,6 +331,7 @@ end
 function NetworkPeer:verify_deployable(id)
 	local max_amount = tweak_data.equipments.max_amount[id]
 	if max_amount then
+		max_amount = managers.crime_spree:modify_value("PlayerManager:GetEquipmentMaxAmount", max_amount)
 		if max_amount < 0 then
 			return true
 		elseif not self._deployable or not self._deployable[id] and table.size(self._deployable) < 2 then
@@ -1552,6 +1554,12 @@ function NetworkPeer:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 			managers.player:spawn_dropin_penalty(spawn_in_custody, spawn_in_custody, health, used_deployable, used_cable_ties, used_body_bags)
 		else
 			self:send_queued_sync("spawn_dropin_penalty", spawn_in_custody, spawn_in_custody, health, used_deployable, used_cable_ties, used_body_bags)
+		end
+	end
+	if unit:armor_skin() then
+		local outfit = managers.blackmarket:unpack_outfit_from_string(self:profile().outfit_string)
+		if outfit.armor_skin then
+			unit:armor_skin():set_cosmetics_data(outfit.armor_skin, true)
 		end
 	end
 	local vehicle = managers.vehicle:find_active_vehicle_with_player()

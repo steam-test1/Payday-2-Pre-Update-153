@@ -1299,7 +1299,7 @@ function StatisticsManager:_get_boom_guns()
 end
 
 function StatisticsManager:killed_by_anyone(data)
-	local name_id = data.weapon_unit and data.weapon_unit:base():get_name_id()
+	local name_id = alive(data.weapon_unit) and data.weapon_unit:base():get_name_id()
 	managers.achievment:set_script_data("pacifist_fail", true)
 	if name_id ~= "m79" and name_id ~= "m79_npc" then
 		managers.achievment:set_script_data("blow_out_fail", true)

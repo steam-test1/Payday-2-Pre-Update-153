@@ -22,10 +22,12 @@ require("lib/managers/menu/items/MenuItemTextBox")
 require("lib/managers/menu/items/MenuItemDummy")
 require("lib/managers/menu/nodes/MenuNodeTable")
 require("lib/managers/menu/nodes/MenuNodeServerList")
+require("lib/managers/menu/items/MenuItemCrimeSpreeItem")
 core:import("CoreEvent")
 MenuManager = MenuManager or class(CoreMenuManager.Manager)
 MenuCallbackHandler = MenuCallbackHandler or class(CoreMenuCallbackHandler.CallbackHandler)
 require("lib/managers/MenuManagerPD2")
+require("lib/managers/menu/MenuManagerCrimeSpreeCallbacks")
 MenuManager.IS_NORTH_AMERICA = SystemInfo:platform() == Idstring("WIN32") or Application:is_northamerica()
 MenuManager.ONLINE_AGE = (SystemInfo:platform() == Idstring("PS3") or SystemInfo:platform() == Idstring("PS4")) and MenuManager.IS_NORTH_AMERICA and 17 or 18
 require("lib/managers/MenuManagerDialogs")
@@ -1114,6 +1116,7 @@ function MenuManager:on_leave_lobby()
 	end
 	managers.job:deactivate_current_job()
 	managers.gage_assignment:deactivate_assignments()
+	managers.crime_spree:on_left_lobby()
 end
 
 function MenuManager:show_global_success(node)
@@ -2652,6 +2655,7 @@ function MenuCallbackHandler:accept_crimenet_contract(item, node)
 	managers.menu:active_menu().logic:navigate_back(true)
 	local job_data = item:parameters().gui_node.node:parameters().menu_component_data
 	if job_data.server then
+		managers.crime_spree:join_server(job_data)
 		managers.network.matchmake:join_server_with_check(job_data.room_id, false, job_data)
 	elseif Global.game_settings.single_player then
 		MenuCallbackHandler:start_single_player_job(job_data)
@@ -3033,6 +3037,7 @@ function MenuCallbackHandler:_dialog_leave_lobby_yes()
 		managers.network:session():local_peer():set_in_lobby(false)
 		managers.network:session():send_to_peers("set_peer_left")
 	end
+	managers.crime_spree:disable_crime_spree_gamemode()
 	managers.menu:on_leave_lobby()
 end
 
@@ -3510,6 +3515,7 @@ function MenuCallbackHandler:_dialog_end_game_yes()
 	managers.job:deactivate_current_job()
 	managers.gage_assignment:deactivate_assignments()
 	managers.custom_safehouse:flush_completed_trophies()
+	managers.crime_spree:on_left_lobby()
 	if Network:multiplayer() then
 		Network:set_multiplayer(false)
 		managers.network:session():send_to_peers("set_peer_left")
@@ -7585,6 +7591,8 @@ function MenuCrimeNetFiltersInitiator:modify_node(original_node, data)
 		node:item("server_filter"):set_value(managers.network.matchmake:distance_filter())
 		node:item("difficulty_filter"):set_value(matchmake_filters.difficulty and matchmake_filters.difficulty.value or -1)
 		node:item("job_plan_filter"):set_value(matchmake_filters.job_plan and matchmake_filters.job_plan.value or -1)
+		node:item("gamemode_filter"):set_value(Global.game_settings.gamemode_filter or GamemodeStandard.id)
+		node:item("max_spree_difference_filter"):set_value(Global.game_settings.crime_spree_max_lobby_diff or -1)
 		local job_id_filter = node:item("job_id_filter")
 		if job_id_filter then
 			job_id_filter:set_value(managers.network.matchmake:get_lobby_filter("job_id") or -1)
@@ -7616,7 +7624,21 @@ function MenuCrimeNetFiltersInitiator:update_node(node)
 		node:item("kick_option_filter"):set_enabled(not_friends_only)
 		node:item("job_id_filter"):set_enabled(not_friends_only)
 		node:item("job_plan_filter"):set_enabled(not_friends_only)
+		node:item("toggle_job_appropriate_lobby"):set_visible(self:is_standard())
+		node:item("toggle_allow_safehouses"):set_visible(self:is_standard())
+		node:item("toggle_mutated_lobby"):set_visible(self:is_standard())
+		node:item("difficulty_filter"):set_visible(self:is_standard())
+		node:item("job_id_filter"):set_visible(self:is_standard())
+		node:item("max_spree_difference_filter"):set_visible(self:is_crime_spree())
 	end
+end
+
+function MenuCrimeNetFiltersInitiator:is_standard()
+	return not Global.game_settings or not Global.game_settings.gamemode_filter or Global.game_settings.gamemode_filter == GamemodeStandard.id
+end
+
+function MenuCrimeNetFiltersInitiator:is_crime_spree()
+	return Global.game_settings and Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id
 end
 
 function MenuCrimeNetFiltersInitiator:refresh_node(node)
@@ -8023,6 +8045,16 @@ function MenuOptionInitiator:modify_adv_video(node)
 		node:item("choose_aa"):set_value(managers.user:get_setting("video_aa"))
 	end
 	node:item("choose_corpse_limit"):set_value(managers.user:get_setting("corpse_limit"))
+	local color_grading_item = node:item("choose_color_grading")
+	if color_grading_item then
+		if #color_grading_item:options() == 0 then
+			for id, data in ipairs(tweak_data.color_grading) do
+				local option = CoreMenuItemOption.ItemOption:new(data)
+				color_grading_item:add_option(option)
+			end
+		end
+		color_grading_item:set_value(managers.user:get_setting("video_color_grading"))
+	end
 	return node
 end
 

@@ -391,6 +391,12 @@ function HUDStatsScreen:init()
 		local difficulty_string_id = tweak_data.difficulty_name_ids[difficulty]
 		local difficulty_string = managers.localization:to_upper_text(difficulty_string_id)
 		local difficulty_color = tweak_data.screen_colors.risk
+		if managers.crime_spree:_is_active() then
+			difficulty_string = managers.localization:text("menu_cs_level", {
+				level = managers.experience:cash_string(managers.crime_spree:server_spree_level(), "")
+			})
+			difficulty_color = tweak_data.screen_colors.crime_spree_risk
+		end
 		local risk_text = day_wrapper_panel:text({
 			name = "risk_text",
 			font = tweak_data.menu.pd2_medium_font,
@@ -1142,6 +1148,19 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			ghost_icon:set_color(is_whisper_mode and Color.white or tweak_data.screen_colors.important_1)
 			ghostable_text:set_visible(is_level_ghostable and is_whisper_mode)
 		end
+	end
+	if managers.crime_spree:_is_active() then
+		local day_payout = day_wrapper_panel:child("day_payout")
+		local day_description = day_wrapper_panel:child("day_description")
+		local bains_plan = day_wrapper_panel:child("bains_plan")
+		local ghost_icon = right_panel:child("ghost_icon")
+		local ghostable_text = day_wrapper_panel:child("ghostable_text")
+		days_title:set_visible(false)
+		day_payout:set_visible(false)
+		ghost_icon:set_visible(false)
+		ghostable_text:set_visible(false)
+		bains_plan:set_top(day_payout:top() + padding)
+		day_description:set_top(day_payout:bottom() + padding)
 	end
 end
 

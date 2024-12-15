@@ -16,6 +16,7 @@ function EconomyTweakData:init()
 	self.rarities.common.header_col = "guis/dlcs/cash/textures/pd2/safe_raffle/header_col_common"
 	self.rarities.common.bg_texture = "guis/dlcs/cash/textures/pd2/blackmarket/icons/rarity_common"
 	self.rarities.common.name_id = "bm_menu_rarity_common"
+	self.rarities.common.armor_sequence = "cvc_var1"
 	self.rarities.uncommon = {}
 	self.rarities.uncommon.index = 2
 	self.rarities.uncommon.fake_chance = 20
@@ -24,6 +25,7 @@ function EconomyTweakData:init()
 	self.rarities.uncommon.header_col = "guis/dlcs/cash/textures/pd2/safe_raffle/header_col_uncommon"
 	self.rarities.uncommon.bg_texture = "guis/dlcs/cash/textures/pd2/blackmarket/icons/rarity_uncommon"
 	self.rarities.uncommon.name_id = "bm_menu_rarity_uncommon"
+	self.rarities.uncommon.armor_sequence = "cvc_var2"
 	self.rarities.rare = {}
 	self.rarities.rare.index = 3
 	self.rarities.rare.fake_chance = 4
@@ -32,6 +34,7 @@ function EconomyTweakData:init()
 	self.rarities.rare.header_col = "guis/dlcs/cash/textures/pd2/safe_raffle/header_col_rare"
 	self.rarities.rare.bg_texture = "guis/dlcs/cash/textures/pd2/blackmarket/icons/rarity_rare"
 	self.rarities.rare.name_id = "bm_menu_rarity_rare"
+	self.rarities.rare.armor_sequence = "cvc_var3"
 	self.rarities.epic = {}
 	self.rarities.epic.index = 4
 	self.rarities.epic.fake_chance = 1
@@ -40,6 +43,7 @@ function EconomyTweakData:init()
 	self.rarities.epic.header_col = "guis/dlcs/cash/textures/pd2/safe_raffle/header_col_epic"
 	self.rarities.epic.bg_texture = "guis/dlcs/cash/textures/pd2/blackmarket/icons/rarity_epic"
 	self.rarities.epic.name_id = "bm_menu_rarity_epic"
+	self.rarities.epic.armor_sequence = "cvc_var3"
 	self.rarities.legendary = {}
 	self.rarities.legendary.index = 5
 	self.rarities.legendary.fake_chance = 0
@@ -48,6 +52,7 @@ function EconomyTweakData:init()
 	self.rarities.legendary.header_col = "guis/dlcs/cash/textures/pd2/safe_raffle/header_col_legendary"
 	self.rarities.legendary.bg_texture = "guis/dlcs/cash/textures/pd2/blackmarket/icons/rarity_legendary"
 	self.rarities.legendary.name_id = "bm_menu_rarity_legendary"
+	self.rarities.legendary.armor_sequence = "cvc_var3"
 	self.qualities.poor = {}
 	self.qualities.poor.index = 1
 	self.qualities.poor.wear_tear_value = 0.3
@@ -688,6 +693,19 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.wac_01_legendary.rarity = "legendary"
+	self.contents.cvc_01 = {}
+	self.contents.cvc_01.def_id = 10039
+	self.contents.cvc_01.contains = {
+		armor_skins = {
+			"cvc_woodland_camo",
+			"cvc_city_camo",
+			"cvc_desert_camo",
+			"cvc_avenger",
+			"cvc_swat",
+			"cvc_bone"
+		},
+		contents = {}
+	}
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -844,6 +862,14 @@ function EconomyTweakData:init()
 	self.safes.wac_01.unit_name = "units/payday2_cash/safes/wac/safe/eco_safe_wac"
 	self.safes.wac_01.texture_bundle_folder = "cash/safes/wac"
 	self.safes.wac_01.market_link = "https://steamcommunity.com/market/listings/218620/John%20Wick%20Safe"
+	self.safes.cvc_01 = {}
+	self.safes.cvc_01.free = true
+	self.safes.cvc_01.drill = "cvc_01"
+	self.safes.cvc_01.content = "cvc_01"
+	self.safes.cvc_01.name_id = "bm_menu_safe_cvc_01"
+	self.safes.cvc_01.unit_name = "units/payday2_cash/safes/cvc/safe/eco_safe_cvc"
+	self.safes.cvc_01.texture_bundle_folder = "cash/safes/cvc"
+	self.safes.cvc_01.market_link = "https://steamcommunity.com/market/listings/218620/Armor%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -966,6 +992,9 @@ function EconomyTweakData:init()
 	self.drills.wac_01 = {}
 	self.drills.wac_01.safe = "wac_01"
 	self.drills.wac_01.unit_name = "units/payday2_cash/safes/wac/drill/eco_drill_wac"
+	self.drills.cvc_01 = {}
+	self.drills.cvc_01.safe = "cvc_01"
+	self.drills.cvc_01.unit_name = "units/payday2_cash/safes/cvc/drill/eco_drill_cvc"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"
@@ -1059,6 +1088,7 @@ function EconomyTweakData:init()
 	self.bonuses.team_exp_money_p3.name_id = "bm_menu_bonus_team_exp_money"
 	self.bonuses.team_exp_money_p3.exp_multiplier = 1.03
 	self.bonuses.team_exp_money_p3.money_multiplier = 1.03
+	self:_init_armor_skins()
 end
 
 function EconomyTweakData:get_entry_from_index(category, index)

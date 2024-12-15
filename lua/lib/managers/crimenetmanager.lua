@@ -808,7 +808,10 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 								is_friend = is_friend,
 								kick_option = kick_option,
 								job_plan = job_plan,
-								mutators = attribute_list[i].mutators
+								mutators = attribute_list[i].mutators,
+								is_crime_spree = attribute_list[i].crime_spree and 0 <= attribute_list[i].crime_spree,
+								crime_spree = attribute_list[i].crime_spree,
+								crime_spree_mission = attribute_list[i].crime_spree_mission
 							})
 						end
 					else
@@ -827,7 +830,10 @@ function CrimeNetManager:_find_online_games_win32(friends_only)
 							is_friend = is_friend,
 							kick_option = kick_option,
 							job_plan = job_plan,
-							mutators = attribute_list[i].mutators
+							mutators = attribute_list[i].mutators,
+							is_crime_spree = attribute_list[i].crime_spree and 0 <= attribute_list[i].crime_spree,
+							crime_spree = attribute_list[i].crime_spree,
+							crime_spree_mission = attribute_list[i].crime_spree_mission
 						})
 					end
 				end
@@ -2458,6 +2464,11 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		contact_name:set_color(tweak_data.screen_colors.mutators_color_text)
 		info_name:set_color(tweak_data.screen_colors.mutators_color_text)
 	end
+	if data.is_crime_spree then
+		job_name:set_color(tweak_data.screen_colors.crime_spree_risk)
+		contact_name:set_color(tweak_data.screen_colors.crime_spree_risk)
+		info_name:set_color(tweak_data.screen_colors.crime_spree_risk)
+	end
 	stars_panel:set_w(star_size * math.min(11, #stars_panel:children()))
 	stars_panel:set_h(star_size)
 	local focus = self._pan_panel:bitmap({
@@ -2513,6 +2524,35 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		contact_name:set_text(" ")
 		contact_name:set_size(0, 0)
 		contact_name:set_position(0, host_name:bottom())
+		difficulty_name:set_text(" ")
+		difficulty_name:set_w(0, 0)
+		difficulty_name:set_position(0, host_name:bottom())
+		heat_name:set_text(" ")
+		heat_name:set_w(0, 0)
+		heat_name:set_position(0, host_name:bottom())
+	elseif data.is_crime_spree then
+		local text = ""
+		if data.state == 2 or data.state == 3 then
+			local mission_data = managers.crime_spree:get_mission(data.crime_spree_mission)
+			if mission_data then
+				local tweak = tweak_data.levels[mission_data.level.level_id]
+				text = managers.localization:text(tweak and tweak.name_id or "No level")
+			else
+				text = "No mission ID"
+			end
+		else
+			text = managers.localization:text("menu_lobby_server_state_in_lobby")
+		end
+		job_name:set_text(utf8.to_upper(text))
+		local _, _, w, h = job_name:text_rect()
+		job_name:set_size(w, h)
+		job_name:set_position(0, host_name:bottom())
+		contact_name:set_text(" ")
+		contact_name:set_w(0, 0)
+		contact_name:set_position(0, host_name:bottom())
+		info_name:set_text(" ")
+		info_name:set_size(0, 0)
+		info_name:set_position(0, host_name:bottom())
 		difficulty_name:set_text(" ")
 		difficulty_name:set_w(0, 0)
 		difficulty_name:set_position(0, host_name:bottom())
@@ -2630,6 +2670,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	if data.mutators then
 		marker_dot:set_color(tweak_data.screen_colors.mutators_color)
 	end
+	if data.is_crime_spree then
+		marker_dot:set_color(tweak_data.screen_colors.crime_spree_risk)
+	end
 	local timer_rect, peers_panel
 	local icon_panel = self._pan_panel:panel({
 		layer = 26,
@@ -2676,6 +2719,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			player_marker:set_position(cx, cy)
 			if data.mutators then
 				player_marker:set_color(tweak_data.screen_colors.mutators_color)
+			end
+			if data.is_crime_spree then
+				player_marker:set_color(tweak_data.screen_colors.crime_spree_risk)
 			end
 		end
 		local kick_none_icon = icon_panel:bitmap({
@@ -2828,8 +2874,34 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		location = location,
 		heat_glow = heat_glow,
 		mutators = data.mutators,
+		is_crime_spree = data.crime_spree and data.crime_spree >= 0,
+		crime_spree = data.crime_spree,
+		crime_spree_mission = data.crime_spree_mission,
 		color_lerp = data.color_lerp
 	}
+	if data.is_crime_spree then
+		stars_panel:set_visible(false)
+		local spree_panel = side_panel:panel({
+			name = "spree_panel",
+			layer = -1,
+			visible = true,
+			h = tweak_data.menu.pd2_small_font_size
+		})
+		spree_panel:set_bottom(side_panel:h())
+		local spree_level = spree_panel:text({
+			text = managers.experience:cash_string(tonumber(data.crime_spree), "") .. managers.localization:get_default_macro("BTN_SPREE_TICKET"),
+			valign = "center",
+			vertical = "center",
+			align = "left",
+			halign = "left",
+			layer = 1,
+			x = 0,
+			y = 0,
+			color = tweak_data.screen_colors.crime_spree_risk,
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size
+		})
+	end
 	self:update_job_gui(job, 3)
 	return job
 end
@@ -2967,6 +3039,8 @@ function CrimeNetGui:update_server_job(data, i)
 	local new_text_color = Color.white
 	new_color = data.mutators and tweak_data.screen_colors.mutators_color or new_color
 	new_text_color = data.mutators and tweak_data.screen_colors.mutators_color_text or new_text_color
+	new_color = data.is_crime_spree and tweak_data.screen_colors.crime_spree_risk or new_color
+	new_text_color = data.is_crime_spree and tweak_data.screen_colors.crime_spree_risk or new_text_color
 	if job.peers_panel then
 		for i, peer_icon in ipairs(job.peers_panel:children()) do
 			peer_icon:set_color(new_color)
@@ -3240,7 +3314,10 @@ function CrimeNetGui:check_job_pressed(x, y)
 				dlc = job.dlc,
 				contract_visuals = job_data and job_data.contract_visuals,
 				info = job.info,
-				mutators = job.mutators
+				mutators = job.mutators,
+				is_crime_spree = job.crime_spree and 0 <= job.crime_spree,
+				crime_spree = job.crime_spree,
+				crime_spree_mission = job.crime_spree_mission
 			}
 			managers.menu_component:post_event("menu_enter")
 			if not data.dlc or managers.dlc:is_dlc_unlocked(data.dlc) then
@@ -3249,7 +3326,11 @@ function CrimeNetGui:check_job_pressed(x, y)
 					if Global.game_settings.single_player then
 						node = "crimenet_contract_singleplayer"
 					elseif job.server then
-						node = "crimenet_contract_join"
+						if job.is_crime_spree then
+							node = "crimenet_contract_crime_spree_join"
+						else
+							node = "crimenet_contract_join"
+						end
 					else
 						node = "crimenet_contract_host"
 					end

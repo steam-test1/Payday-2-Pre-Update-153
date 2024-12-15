@@ -848,3 +848,35 @@ function ConnectionNetworkHandler:sync_safehouse_room_tier(room_name, room_tier)
 		managers.custom_safehouse:set_host_room_tier(room_name, room_tier)
 	end
 end
+
+function ConnectionNetworkHandler:sync_crime_spree_level(peer_id, spree_level, has_failed, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.crime_spree:set_peer_spree_level(peer_id, spree_level, has_failed)
+end
+
+function ConnectionNetworkHandler:sync_crime_spree_mission(mission_slot, mission_id, selected, perform_randomize, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.crime_spree:set_server_mission(mission_slot, mission_id, selected, perform_randomize)
+end
+
+function ConnectionNetworkHandler:sync_crime_spree_modifier(modifier_id, modifier_level, announce, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.crime_spree:set_server_modifier(modifier_id, modifier_level, announce)
+end
+
+function ConnectionNetworkHandler:sync_crime_spree_gage_asset_event(event_id, asset_id, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.crime_spree:on_gage_asset_event(event_id, asset_id, peer)
+end

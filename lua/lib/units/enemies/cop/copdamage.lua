@@ -375,7 +375,7 @@ function CopDamage:damage_bullet(attack_data)
 	end
 	if attack_data.weapon_unit:base().get_add_head_shot_mul then
 		local add_head_shot_mul = attack_data.weapon_unit:base():get_add_head_shot_mul()
-		if not head and add_head_shot_mul and self._char_tweak then
+		if not head and add_head_shot_mul and self._char_tweak and self._char_tweak.access ~= "tank" then
 			local tweak_headshot_mul = math.max(0, self._char_tweak.headshot_dmg_mul - 1)
 			local mul = tweak_headshot_mul * add_head_shot_mul + 1
 			damage = damage * mul
@@ -796,7 +796,7 @@ function CopDamage:damage_fire(attack_data)
 		if not attack_data.is_fire_dot_damage or data.is_molotov then
 			managers.statistics:killed_by_anyone(data)
 		end
-		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and not attack_data.weapon_unit:base().thrower_unit then
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and alive(attack_data.weapon_unit) and not attack_data.weapon_unit:base().thrower_unit then
 			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
 			if weapon_category == "shotgun" or weapon_category == "saw" then
 				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
@@ -945,6 +945,7 @@ function CopDamage:damage_explosion(attack_data)
 	end
 	local result
 	local damage = attack_data.damage
+	damage = managers.crime_spree:modify_value("CopDamage:DamageExplosion", damage, self._unit:base()._tweak_table)
 	if self._unit:base():char_tweak().DAMAGE_CLAMP_EXPLOSION then
 		damage = math.min(damage, self._unit:base():char_tweak().DAMAGE_CLAMP_EXPLOSION)
 	end

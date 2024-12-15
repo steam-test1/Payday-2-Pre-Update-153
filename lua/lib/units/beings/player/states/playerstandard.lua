@@ -914,6 +914,7 @@ function PlayerStandard:_get_max_walk_speed(t)
 		movement_speed = speed_tweak.RUNNING_MAX
 		speed_state = "run"
 	end
+	movement_speed = managers.crime_spree:modify_value("PlayerStandard:GetMaxWalkSpeed", movement_speed, self._state_data, speed_tweak)
 	local morale_boost_bonus = self._ext_movement:morale_boost()
 	local multiplier = managers.player:movement_speed_multiplier(speed_state, speed_state and morale_boost_bonus and morale_boost_bonus.move_speed_bonus, nil, self._ext_damage:health_ratio())
 	local apply_weapon_penalty = true
@@ -1455,6 +1456,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self:_interupt_action_running(t)
 	self:_interupt_action_charging_weapon(t)
 	local final_timer = timer
+	final_timer = managers.crime_spree:modify_value("PlayerStandard:OnStartInteraction", final_timer, interact_object)
 	self._interact_expire_t = t + final_timer
 	self._interact_params = {
 		object = interact_object,
@@ -3531,6 +3533,7 @@ function PlayerStandard:_get_swap_speed_multiplier()
 	if managers.player:has_activate_temporary_upgrade("temporary", "swap_weapon_faster") then
 		multiplier = multiplier * managers.player:temporary_upgrade_value("temporary", "swap_weapon_faster", 1)
 	end
+	multiplier = managers.crime_spree:modify_value("PlayerStandard:GetSwapSpeedMultiplier", multiplier)
 	return multiplier
 end
 

@@ -190,7 +190,6 @@ require("lib/units/vehicles/SimpleVehicle")
 require("lib/units/props/ZipLine")
 require("lib/units/props/TextTemplateBase")
 require("lib/units/props/ExplodingProp")
-require("lib/units/props/ManageSpawnedUnits")
 require("lib/units/props/SafehouseVaultMoneyStacks")
 require("lib/managers/menu/FadeoutGuiObject")
 require("lib/units/cameras/CinematicStateCamera")
@@ -266,6 +265,22 @@ function GameSetup:load_packages()
 		self._loaded_contract_package = contract_package
 		PackageManager:load(contract_package)
 	end
+	if Global.level_data and Global.level_data.level_id and Global.game_settings and Global.game_settings.gamemode == "crime_spree" then
+		self._loaded_job_packages = {}
+		for job_id, data in pairs(tweak_data.narrative.jobs) do
+			for _, level_data in ipairs(data.chain or {}) do
+				if level_data.level_id == Global.level_data.level_id then
+					local package = data.package
+					if package and PackageManager:package_exists(package) and not PackageManager:loaded(package) and not table.contains(self._loaded_job_packages, package) then
+						table.insert(self._loaded_job_packages, package)
+					end
+				end
+			end
+		end
+		for _, package in ipairs(self._loaded_job_packages) do
+			PackageManager:load(package)
+		end
+	end
 	self._loaded_diff_packages = {}
 	
 	local function load_difficulty_package(package_name)
@@ -324,6 +339,13 @@ function GameSetup:gather_packages_to_unload()
 	if PackageManager:loaded(self._loaded_contract_package) then
 		table.insert(self._packages_to_unload, self._loaded_contract_package)
 		self._loaded_contract_package = nil
+	end
+	if self._loaded_job_packages then
+		for _, package in ipairs(self._loaded_job_packages) do
+			if PackageManager:loaded(package) then
+				table.insert(self._packages_to_unload, package)
+			end
+		end
 	end
 	if self._loaded_diff_packages then
 		for i, package in ipairs(self._loaded_diff_packages) do
@@ -513,6 +535,7 @@ function GameSetup:save(data)
 	managers.sequence:save(data)
 	managers.world_instance:sync_save(data)
 	managers.motion_path:save(data)
+	managers.crime_spree:sync_save(data)
 end
 
 function GameSetup:load(data)
@@ -537,6 +560,7 @@ function GameSetup:load(data)
 	managers.sequence:load(data)
 	managers.world_instance:sync_load(data)
 	managers.motion_path:load(data)
+	managers.crime_spree:sync_load(data)
 end
 
 function GameSetup:_update_debug_input()

@@ -1207,6 +1207,7 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 	if hurt_type == "knock_down" or hurt_type == "stagger" then
 		hurt_type = "heavy_hurt"
 	end
+	hurt_type = managers.crime_spree:modify_value("CopMovement:HurtType", hurt_type)
 	local block_type = hurt_type
 	if hurt_type == "expl_hurt" or hurt_type == "fire_hurt" or hurt_type == "poison_hurt" or hurt_type == "taser_tased" then
 		block_type = "heavy_hurt"

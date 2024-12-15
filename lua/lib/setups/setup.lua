@@ -85,6 +85,7 @@ require("lib/units/UnitDamage")
 require("lib/units/props/DigitalGui")
 require("lib/units/props/TextGui")
 require("lib/units/props/MaterialControl")
+require("lib/units/props/ManageSpawnedUnits")
 require("lib/managers/ButlerMirroringManager")
 require("lib/managers/MultiProfileManager")
 require("lib/managers/BanListManager")
@@ -92,6 +93,7 @@ require("lib/managers/WorkshopManager")
 require("lib/managers/CustomSafehouseManager")
 require("lib/managers/MutatorsManager")
 require("lib/managers/TangoManager")
+require("lib/managers/CrimeSpreeManager")
 require("lib/managers/CommunityChallengesManager")
 require("lib/utils/StatisticsGenerator")
 require("lib/utils/Bitwise")
@@ -187,7 +189,8 @@ function Setup:init_managers(managers)
 		job_plan = -1,
 		search_appropriate_jobs = true,
 		auto_kick = true,
-		is_playing = false
+		is_playing = false,
+		gamemode = "standard"
 	}
 	managers.dlc:setup()
 	managers.dyn_resource = DynamicResourceManager:new()
@@ -232,6 +235,7 @@ function Setup:init_managers(managers)
 	managers.mutators = MutatorsManager:new()
 	managers.butler_mirroring = ButlerMirroringManager:new()
 	managers.tango = TangoManager:new()
+	managers.crime_spree = CrimeSpreeManager:new()
 	managers.community_challenges = CommunityChallengesManager:new()
 	game_state_machine = GameStateMachine:new()
 end
@@ -286,7 +290,6 @@ function Setup:_start_loading_screen()
 		load_level_data.gui_tweak_data = tweak_data.load_level
 		load_level_data.menu_tweak_data = tweak_data.menu
 		load_level_data.scale_tweak_data = tweak_data.scale
-		load_level_data.tip_id = tweak_data.tips:get_a_tip()
 		if using_steam_controller then
 		else
 			local coords = tweak_data:get_controller_help_coords()
@@ -434,6 +437,7 @@ function Setup:update(t, dt)
 	managers.vote:update(t, dt)
 	managers.vehicle:update(t, dt)
 	managers.mutators:update(t, dt)
+	managers.crime_spree:update(t, dt)
 	managers.community_challenges:update(t, dt)
 	game_state_machine:update(t, dt)
 	if self._main_thread_loading_screen_gui_visible then

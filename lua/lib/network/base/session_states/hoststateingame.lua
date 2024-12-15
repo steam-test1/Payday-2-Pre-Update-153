@@ -143,6 +143,7 @@ function HostStateInGame:on_peer_finished_loading(data, peer)
 			managers.menu:post_event("player_join")
 		end
 		managers.network:session():send_to_peers_except(peer:id(), "peer_joined_sound", peer:rank() > 0)
+		managers.crime_spree:on_peer_finished_loading(peer)
 	end
 end
 

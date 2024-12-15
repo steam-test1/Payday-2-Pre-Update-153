@@ -3,7 +3,7 @@ ManageSpawnedUnits = ManageSpawnedUnits or class()
 function ManageSpawnedUnits:init(unit)
 	self._unit = unit
 	self._spawned_units = {}
-	unit:set_extension_update_enabled(Idstring("spawn_manager"), true)
+	unit:set_extension_update_enabled(Idstring("spawn_manager"), false)
 end
 
 function ManageSpawnedUnits:update(unit, t, dt)
@@ -26,16 +26,19 @@ function ManageSpawnedUnits:spawn_unit(unit_id, align_obj_name, unit)
 	if not spawn_unit then
 		return
 	end
-	self._unit:link(Idstring(align_obj_name), spawn_unit, spawn_unit:orientation_object():name(), true)
+	self._unit:link(Idstring(align_obj_name), spawn_unit, spawn_unit:orientation_object():name())
 	local unit_entry = {align_obj_name = align_obj_name, unit = spawn_unit}
 	self._spawned_units[unit_id] = unit_entry
-	if Network:is_server() then
+	if Network:is_server() and not self.local_only then
 		managers.network:session():send_to_peers_synched("sync_unit_spawn", self._unit, spawn_unit, align_obj_name, unit_id, "spawn_manager")
 	end
 end
 
 function ManageSpawnedUnits:spawn_and_link_unit(joint_table, unit_id, unit)
-	if not Network:is_server() and not self._loaded then
+	if self._spawned_units[unit_id] then
+		return
+	end
+	if not Network:is_server() and not self._loaded and not self.allow_client_spawn then
 		self._link_after_load = self._link_after_load or {}
 		table.insert(self._link_after_load, {
 			joint_table,
@@ -63,18 +66,23 @@ function ManageSpawnedUnits:spawn_and_link_unit(joint_table, unit_id, unit)
 	self:spawn_unit(unit_id, self[joint_table][1], unit)
 	self._sync_spawn_and_link = self._sync_spawn_and_link or {}
 	self._sync_spawn_and_link[unit_id] = {unit = unit, joint_table = joint_table}
-	if Network:is_server() then
+	if Network:is_server() or self.allow_client_spawn then
 		self:_link_joints(unit_id, joint_table)
+	end
+	if Network:is_server() and not self.local_only then
+		managers.network:session():send_to_peers_synched("sync_link_spawned_unit", self._unit, unit_id, joint_table, "spawn_manager")
 	end
 end
 
 function ManageSpawnedUnits:spawn_run_sequence(unit_id, sequence_name)
 	local entry = self._spawned_units[unit_id]
-	if not entry then
-		return
-	end
-	if not alive(entry.unit) then
-		return
+	if unit_id ~= "self" then
+		if not entry then
+			return
+		end
+		if not alive(entry.unit) then
+			return
+		end
 	end
 	if Network:is_server() then
 		managers.network:session():send_to_peers_synched("run_spawn_unit_sequence", self._unit, "spawn_manager", unit_id, sequence_name)
@@ -175,20 +183,23 @@ end
 
 function ManageSpawnedUnits:_spawn_run_sequence(unit_id, sequence_name)
 	local entry = self._spawned_units[unit_id]
-	if not entry then
-		return
-	end
-	if not alive(entry.unit) then
-		return
+	if unit_id ~= "self" then
+		if not entry then
+			return
+		end
+		if not alive(entry.unit) then
+			return
+		end
 	end
 	if not sequence_name then
 		Application:error("No sequence_name param passed\n", self._unit:name(), "\n")
 		return
 	end
-	if self._spawned_units[unit_id].unit:damage():has_sequence(sequence_name) then
-		self._spawned_units[unit_id].unit:damage():run_sequence_simple(sequence_name)
+	local unit = unit_id == "self" and self._unit or entry and entry.unit
+	if unit:damage():has_sequence(sequence_name) then
+		unit:damage():run_sequence_simple(sequence_name)
 	else
-		Application:error(sequence_name, "sequence does not exist in:\n", self._spawned_units[unit_id].unit:name())
+		Application:error(sequence_name, "sequence does not exist in:\n", unit:name())
 	end
 end
 
@@ -205,9 +216,13 @@ function ManageSpawnedUnits:_link_joints(unit_id, joint_table)
 	self._unit:set_moving()
 end
 
-function ManageSpawnedUnits:sync_unit_spawn(unit_id)
-	if self._sync_spawn_and_link and self._sync_spawn_and_link[unit_id] then
-		self:_link_joints(unit_id, self._sync_spawn_and_link[unit_id].joint_table)
-		self._sync_spawn_and_link[unit_id] = nil
+function ManageSpawnedUnits:get_unit(unit_id)
+	local entry = self._spawned_units[unit_id]
+	if not entry then
+		return
 	end
+	if not alive(entry.unit) then
+		return
+	end
+	return entry.unit
 end

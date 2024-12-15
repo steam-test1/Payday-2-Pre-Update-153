@@ -443,15 +443,25 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._full_workspace = fullrect_ws
 	self._fullscreen_panel = self._full_workspace:panel():panel({layer = 1})
 	local w = self._safe_workspace:panel():w() / 2 - padding
+	if managers.crime_spree:_is_active() then
+		w = w - padding + 1
+	end
 	self._panel = self._safe_workspace:panel():panel({
 		w = w,
 		h = self._safe_workspace:panel():h() * 0.5 - padding,
 		layer = 6
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
-	self._panel:set_bottom(self._safe_workspace:panel():h())
+	if managers.crime_spree:_is_active() then
+		self._panel:set_bottom(self._safe_workspace:panel():h() - CrimeSpreeMissionsMenuComponent.button_size.h - padding)
+	else
+		self._panel:set_bottom(self._safe_workspace:panel():h())
+	end
 	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
 	local continue_text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button}))
+	if managers.crime_spree:_is_active() then
+		continue_text = ""
+	end
 	self._continue_button = self._panel:text({
 		name = "ready_button",
 		text = continue_text,
@@ -516,6 +526,11 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	local item
 	local tab_height = 0
 	local show_summary = true
+	if managers.crime_spree:_is_active() then
+		show_summary = false
+		item = CrimeSpreeResultTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_crime_spree_summary")), 1)
+		table.insert(self._items, item)
+	end
 	if show_summary then
 		item = StatsTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_summary")), 1)
 		item:set_stats({
@@ -607,6 +622,18 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._enabled = true
 	if managers.job:stage_success() then
 		self._bain_debrief_t = TimerManager:main():time() + 2.5
+	end
+	self._reduced_to_small_font = managers.crime_spree:_is_active()
+	self:chk_reduce_to_small_font()
+end
+
+function StageEndScreenGui:chk_reduce_to_small_font()
+	local max_x = alive(self._next_page) and self._next_page:left() - 5 or self._panel:w()
+	if self._reduced_to_small_font or self._items[#self._items] and alive(self._items[#self._items]._tab_text) and max_x < self._items[#self._items]._tab_text:right() then
+		for i, tab in ipairs(self._items) do
+			tab:reduce_to_small_font()
+		end
+		self._reduced_to_small_font = true
 	end
 end
 
@@ -751,6 +778,9 @@ function StageEndScreenGui:show_cash_summary()
 end
 
 function StageEndScreenGui:set_continue_button_text(text, not_clickable)
+	if managers.crime_spree:_is_active() then
+		return
+	end
 	self._continue_button:set_text(text)
 	self._fullscreen_panel:child("continue_big_text"):set_text(text)
 	self._button_not_clickable = not_clickable
@@ -894,7 +924,11 @@ function StageEndScreenGui:mouse_moved(x, y)
 end
 
 function StageEndScreenGui:input_focus()
-	return self._enabled
+	if managers.crime_spree:_is_active() then
+		return nil
+	else
+		return self._enabled
+	end
 end
 
 function StageEndScreenGui:scroll_up()

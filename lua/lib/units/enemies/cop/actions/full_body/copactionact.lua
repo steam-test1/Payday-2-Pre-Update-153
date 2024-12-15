@@ -954,6 +954,8 @@ CopActionAct._act_redirects.SO = {
 	"so_sit_wheelchair",
 	"so_hurt_hit_react",
 	"so_hurt_idle",
+	"so_sit_hurt_hit_react",
+	"so_sit_hurt_idle",
 	"so_butler_pick_up",
 	"so_butler_silly_walk",
 	"so_butler_write",

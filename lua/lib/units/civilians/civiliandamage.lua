@@ -15,6 +15,7 @@ function CivilianDamage:die(variant)
 			self._unit:unit_data().mission_element:event("alerted", self._unit)
 		end
 	end
+	managers.crime_spree:run_func("OnCivilianKilled", self._unit)
 	if alive(managers.interaction:active_unit()) then
 		managers.interaction:active_unit():interaction():selected()
 	end

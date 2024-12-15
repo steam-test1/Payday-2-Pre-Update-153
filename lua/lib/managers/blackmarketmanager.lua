@@ -16,6 +16,8 @@ function BlackMarketManager:_setup()
 	self._defaults.mask = "character_locked"
 	self._defaults.character = "locked"
 	self._defaults.armor = "level_1"
+	self._defaults.armor_skins = {}
+	self._defaults.armor_skin = "none"
 	self._defaults.preferred_character = "russian"
 	self._defaults.grenade = "frag"
 	self._defaults.melee_weapon = "weapon"
@@ -29,6 +31,7 @@ function BlackMarketManager:_setup()
 		self:_setup_unlocked_weapon_slots()
 		self:_setup_grenades()
 		self:_setup_melee_weapons()
+		self:_setup_armor_skins()
 		Global.blackmarket_manager.inventory = {}
 		Global.blackmarket_manager.crafted_items = {}
 		Global.blackmarket_manager.new_drops = {}
@@ -68,6 +71,15 @@ function BlackMarketManager:_setup_armors()
 	armors[self._defaults.armor].owned = true
 	armors[self._defaults.armor].equipped = true
 	armors[self._defaults.armor].unlocked = true
+end
+
+function BlackMarketManager:_setup_armor_skins()
+	local armor_skins = {}
+	Global.blackmarket_manager.armor_skins = armor_skins
+	for id, skin in pairs(tweak_data.economy.armor_skins) do
+		armor_skins[id] = {unlocked = false}
+	end
+	armor_skins[self._defaults.armor_skin].unlocked = true
 end
 
 function BlackMarketManager:_setup_grenades()
@@ -382,6 +394,27 @@ function BlackMarketManager:equipped_armor(chk_armor_kit, chk_player_state)
 		end
 	end
 	return self._defaults.armor
+end
+
+function BlackMarketManager:set_equipped_armor_skin(skin_id)
+	local skin_data = tweak_data.economy.armor_skins[skin_id]
+	if not skin_data then
+		Application:error("Attempting to equip armor skin that doesn't exist:", skin_id)
+		return
+	end
+	Global.blackmarket_manager.equipped_armor_skin = skin_id
+	if managers.menu_scene and alive(managers.menu_scene._character_unit) then
+		managers.menu_scene._character_unit:base():set_cosmetics_data(skin_id)
+		managers.menu_scene._character_unit:base():_apply_cosmetics({})
+	end
+	MenuCallbackHandler:_update_outfit_information()
+end
+
+function BlackMarketManager:equipped_armor_skin()
+	if Global.blackmarket_manager.equipped_armor_skin then
+		return Global.blackmarket_manager.equipped_armor_skin
+	end
+	return self._defaults.armor_skin
 end
 
 function BlackMarketManager:equipped_projectile()
@@ -872,6 +905,7 @@ function BlackMarketManager:unpack_outfit_from_string(outfit_string)
 	outfit.armor = armor_data[1]
 	outfit.armor_current = armor_data[2] or outfit.armor
 	outfit.armor_current_state = armor_data[3] or outfit.armor_current
+	outfit.armor_skin = armor_data[4] or "none"
 	outfit.primary = {}
 	outfit.primary.factory_id = data[self:outfit_string_index("primary")] or "wpn_fps_ass_amcar"
 	local primary_blueprint_string = data[self:outfit_string_index("primary_blueprint")]
@@ -962,6 +996,7 @@ function BlackMarketManager:outfit_string()
 	local current_armor_id = tostring(self:equipped_armor(true))
 	local current_state_armor_id = tostring(self:equipped_armor(true, true))
 	s = s .. " " .. armor_id .. "-" .. current_armor_id .. "-" .. current_state_armor_id
+	s = s .. "-" .. tostring(self:equipped_armor_skin())
 	for character_id, data in pairs(tweak_data.blackmarket.characters) do
 		if Global.blackmarket_manager.characters[character_id].equipped then
 			s = s .. " " .. character_id
@@ -2020,6 +2055,7 @@ function BlackMarketManager:_get_concealment(primary, secondary, armor, melee_we
 	local melee_weapon_visibility = self:calculate_melee_weapon_visibility(melee_weapon)
 	local modifier = modifier or 0
 	local total_visibility = math.clamp(primary_visibility + secondary_visibility + armor_visibility + melee_weapon_visibility + modifier, 1, #stats_tweak_data.concealment)
+	total_visibility = managers.crime_spree:modify_value("BlackMarketManager:GetConcealment", total_visibility)
 	local total_concealment = math.clamp(#stats_tweak_data.concealment - total_visibility, 1, #stats_tweak_data.concealment)
 	return stats_tweak_data.concealment[total_concealment], total_concealment
 end
@@ -3502,6 +3538,10 @@ function BlackMarketManager:get_weapon_icon_path(weapon_id, cosmetics)
 	return texture_path, rarity_path
 end
 
+function BlackMarketManager:get_cosmetic_rarity_bg(rarity)
+	return tweak_data.economy.rarities[rarity] and tweak_data.economy.rarities[rarity].bg_texture
+end
+
 function BlackMarketManager:get_modify_weapon_consequence(category, slot, part_id, remove_part)
 	if not self._global.crafted_items[category] or not self._global.crafted_items[category][slot] then
 		Application:error("[BlackMarketManager:get_modify_weapon_consequence] Weapon doesn't exist", category, slot)
@@ -3942,6 +3982,53 @@ function BlackMarketManager:on_unaquired_armor(upgrade, id)
 			managers.menu_scene:set_character_armor(self._defaults.armor)
 		end
 		MenuCallbackHandler:_update_outfit_information()
+	end
+end
+
+function BlackMarketManager:_is_armor_skin_valid(skin_id)
+	return tweak_data.economy.armor_skins[skin_id] and true or false
+end
+
+function BlackMarketManager:_get_default_armor_skin()
+	for id, skin in pairs(tweak_data.economy.armor_skins) do
+		if skin.default then
+			return id
+		end
+	end
+	return nil
+end
+
+function BlackMarketManager:armor_skin_unlocked(skin_id)
+	if not self:_is_armor_skin_valid(skin_id) then
+		Application:stack_dump_error("Attempting to check if invalid armor skin is unlocked.", skin_id)
+		return false
+	end
+	local td = tweak_data.economy.armor_skins[skin_id]
+	if td.unlocked then
+		return true
+	end
+	if self._global.armor_skins and self._global.armor_skins[skin_id] then
+		return self._global.armor_skins[skin_id].unlocked
+	end
+	return false
+end
+
+function BlackMarketManager:on_aquired_armor_skin(skin_id)
+	if not self:_is_armor_skin_valid(skin_id) then
+		Application:stack_dump_error("Attempting to aquire invalid armor skin.", skin_id)
+		return
+	end
+	self._global.armor_skins[skin_id].unlocked = true
+end
+
+function BlackMarketManager:on_unaquired_armor_skin(skin_id)
+	if not self:_is_armor_skin_valid(skin_id) then
+		Application:stack_dump_error("Attempting to unaquire invalid armor skin.", skin_id)
+		return
+	end
+	self._global.armor_skins[skin_id].unlocked = false
+	if self:equipped_armor_skin() == skin_id then
+		self:set_equipped_armor_skin(self:_get_default_armor_skin())
 	end
 end
 
@@ -4734,10 +4821,36 @@ function BlackMarketManager:character_sequence_by_character_id(character_id, pee
 	end
 	character = CriminalsManager.convert_old_to_new_character_workname(character)
 	print("character_sequence_by_character_id", "character", character, "character_id", character_id)
+	local shared_char_seq
 	if tweak_data.blackmarket.characters.locked[character] then
-		return tweak_data.blackmarket.characters.locked[character].sequence
+		shared_char_seq = tweak_data.blackmarket.characters.locked[character].sequence
+	else
+		shared_char_seq = tweak_data.blackmarket.characters[character].sequence
 	end
-	return tweak_data.blackmarket.characters[character].sequence
+	local cc_sequences = {
+		"var_mtr_chains",
+		"var_mtr_dallas",
+		"var_mtr_hoxton",
+		"var_mtr_dragan",
+		"var_mtr_jacket",
+		"var_mtr_old_hoxton",
+		"var_mtr_wolf",
+		"var_mtr_john_wick",
+		"var_mtr_sokol",
+		"var_mtr_jiro",
+		"var_mtr_bodhi",
+		"var_mtr_jimmy"
+	}
+	local skin_id = managers.blackmarket:equipped_armor_skin()
+	if managers.network and managers.network:session() and peer_id then
+		local peer = managers.network:session():peer(peer_id)
+		local outfit = managers.blackmarket:unpack_outfit_from_string(peer:profile().outfit_string)
+		skin_id = outfit and outfit.armor_skin
+	end
+	if table.contains(cc_sequences, shared_char_seq) and skin_id ~= "none" then
+		shared_char_seq = shared_char_seq .. "_cc"
+	end
+	return shared_char_seq
 end
 
 function BlackMarketManager:character_sequence_by_character_name(character, peer_id)
@@ -5255,6 +5368,7 @@ function BlackMarketManager:save(data)
 	save_data.equipped_grenade = self:equipped_grenade()
 	save_data.equipped_melee_weapon = self:equipped_melee_weapon()
 	save_data.equipped_van_skin = self:equipped_van_skin()
+	save_data.equipped_armor_skin = self:equipped_armor_skin()
 	save_data.armors = nil
 	save_data.grenades = nil
 	save_data.melee_weapons = nil
@@ -5370,6 +5484,8 @@ function BlackMarketManager:load(data)
 			self._global.characters[self._defaults.character].equipped = true
 		end
 		self._global.equipped_van_skin = self._global.equipped_van_skin or tweak_data.van.default_skin_id
+		self._global.armor_skins = self._global.armor_skins or default_global.armor_skins or {}
+		self._global.equipped_armor_skin = self._global.equipped_armor_skin or self._defaults.armor_skin
 		self._global.inventory = self._global.inventory or {}
 		self._global.new_tradable_items = self._global.new_tradable_items or {}
 		self._global.inventory_tradable = self._global.inventory_tradable or {}
@@ -5563,6 +5679,7 @@ function BlackMarketManager:_load_done()
 			managers.menu_scene:set_character_mask(tweak_data.blackmarket.masks[equipped_mask].unit)
 		end
 		managers.menu_scene:set_character_armor(self:equipped_armor())
+		managers.menu_scene:set_character_armor_skin(self:equipped_armor_skin())
 		local rank = managers.experience:current_rank()
 		if 0 < rank then
 			managers.menu_scene:set_character_equipped_card(nil, rank - 1)

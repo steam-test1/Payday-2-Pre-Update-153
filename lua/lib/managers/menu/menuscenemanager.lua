@@ -375,6 +375,7 @@ function MenuSceneManager:_set_up_templates()
 	self._scene_templates.inventory.use_character_grab2 = true
 	self._scene_templates.inventory.use_character_pan = true
 	self._scene_templates.inventory.character_visible = true
+	self._scene_templates.inventory.recreate_character = true
 	self._scene_templates.inventory.lobby_characters_visible = false
 	self._scene_templates.inventory.hide_menu_logo = true
 	self._scene_templates.inventory.camera_pos = ref:position()
@@ -392,6 +393,7 @@ function MenuSceneManager:_set_up_templates()
 	self._scene_templates.blackmarket_crafting.can_change_fov = true
 	self._scene_templates.blackmarket_crafting.disable_rotate = true
 	self._scene_templates.blackmarket_crafting.environment = "crafting"
+	self._scene_templates.blackmarket_crafting.use_workbench_room = true
 	self._scene_templates.blackmarket_crafting.lights = {}
 	if not managers.menu:is_pc_controller() then
 	end
@@ -438,11 +440,59 @@ function MenuSceneManager:_set_up_templates()
 	mvector3.rotate_with(camera_look, Rotation(4, 2.25, 0))
 	self._scene_templates.blackmarket_customize.item_pos = self._scene_templates.blackmarket_customize.camera_pos + camera_look * 240
 	self._scene_templates.blackmarket_customize.environment = "crafting"
+	self._scene_templates.blackmarket_customize.use_workbench_room = true
 	local l_pos = self._scene_templates.blackmarket_customize.camera_pos
 	local rot = Rotation(self._scene_templates.blackmarket_customize.target_pos - l_pos, math.UP)
 	local l1_pos = l_pos + rot:x() * 50 + rot:y() * 50
 	local l2_pos = l_pos + rot:x() * -50 + rot:y() * 100
 	self._scene_templates.blackmarket_customize.lights = {}
+	self._scene_templates.blackmarket_character = deep_clone(self._scene_templates.inventory)
+	self._scene_templates.blackmarket_character.character_pos = c_ref:position() + Vector3(-10, 100, 20)
+	self._scene_templates.blackmarket_customize_armour = deep_clone(self._scene_templates.inventory)
+	self._scene_templates.blackmarket_customize_armour.environment = "crafting"
+	self._scene_templates.blackmarket_customize_armour.camera_pos = ref:position() - Vector3(0, 200, 0)
+	self._scene_templates.blackmarket_customize_armour.lights = {
+		self:_create_light({
+			far_range = 600,
+			color = Vector3(1, 1, 1) * 2,
+			position = Vector3(-20, -80, 0)
+		}),
+		self:_create_light({
+			far_range = 400,
+			color = Vector3(1, 1, 1) * 2,
+			position = Vector3(80, 33, 20)
+		}),
+		self:_create_light({
+			far_range = 180,
+			color = Vector3(1, 1, 1) * 3,
+			position = Vector3(-120, -6, 32),
+			specular_multiplier = 8
+		})
+	}
+	self._scene_templates.blackmarket_armor = {}
+	self._scene_templates.blackmarket_armor.fov = 20
+	self._scene_templates.blackmarket_armor.can_change_fov = false
+	self._scene_templates.blackmarket_armor.use_character_grab2 = true
+	self._scene_templates.blackmarket_armor.use_character_pan = false
+	self._scene_templates.blackmarket_armor.character_visible = true
+	self._scene_templates.blackmarket_armor.recreate_character = true
+	self._scene_templates.blackmarket_armor.lobby_characters_visible = false
+	self._scene_templates.blackmarket_armor.hide_menu_logo = true
+	self._scene_templates.blackmarket_armor.camera_pos = Vector3(1420, -2200, 0)
+	self._scene_templates.blackmarket_armor.target_pos = self._scene_templates.blackmarket_armor.camera_pos + Vector3(0.15, 1, -0.105) * 100
+	local camera_look = (self._scene_templates.blackmarket_armor.target_pos - self._scene_templates.blackmarket_armor.camera_pos):normalized()
+	mvector3.rotate_with(camera_look, Rotation(6, 2.75, 0))
+	self._scene_templates.blackmarket_armor.character_pos = self._scene_templates.blackmarket_armor.camera_pos + camera_look * 600 + Vector3(80, 0, -150)
+	self._scene_templates.blackmarket_armor.environment = "crafting"
+	self._scene_templates.blackmarket_armor.use_workbench_room = true
+	self._scene_templates.blackmarket_armor.remove_infamy_card = true
+	self._scene_templates.blackmarket_armor.lights = {
+		self:_create_light({
+			far_range = 400,
+			color = Vector3(1, 1, 1) * 0.8,
+			position = Vector3(1600, -1750, -25)
+		})
+	}
 	self._scene_templates.blackmarket_screenshot = {}
 	self._scene_templates.blackmarket_screenshot.fov = 40
 	self._scene_templates.blackmarket_screenshot.can_change_fov = true
@@ -486,6 +536,32 @@ function MenuSceneManager:_set_up_templates()
 			color = Vector3(1, 0.4, 0.04) * 1.5,
 			position = Vector3(200, 60, 180),
 			specular_multiplier = 55
+		})
+	}
+	self._scene_templates.crime_spree_lobby = {}
+	self._scene_templates.crime_spree_lobby.use_character_grab = false
+	self._scene_templates.crime_spree_lobby.camera_pos = offset:rotate_with(Rotation(90))
+	self._scene_templates.crime_spree_lobby.target_pos = target_pos
+	self._scene_templates.crime_spree_lobby.character_pos = c_ref:position() + Vector3(0, 500, 0)
+	self._scene_templates.crime_spree_lobby.lobby_characters_visible = true
+	self._scene_templates.crime_spree_lobby.fov = 40
+	self._scene_templates.crime_spree_lobby.lights = {
+		self:_create_light({
+			far_range = 300,
+			color = Vector3(0.86, 0.57, 0.31) * 3,
+			position = Vector3(56, 100, -10)
+		}),
+		self:_create_light({
+			far_range = 3000,
+			color = Vector3(1, 2.5, 4.5) * 3,
+			position = Vector3(-1000, -300, 800),
+			specular_multiplier = 6
+		}),
+		self:_create_light({
+			far_range = 800,
+			color = Vector3(1, 1, 1) * 0.35,
+			position = Vector3(300, 100, 0),
+			specular_multiplier = 0
 		})
 	}
 end
@@ -669,7 +745,7 @@ function MenuSceneManager:_setup_bg()
 end
 
 function MenuSceneManager:_set_player_character_unit(unit_name)
-	self._character_unit = self:_set_character_unit(unit_name, self._character_unit)
+	self._character_unit = self:_set_character_unit(unit_name, self._character_unit, self._character_values and self._character_values.pos_target)
 	self:_setup_character_dynamic_bodies(self._character_unit)
 	self._character_visibilities[self._character_unit:key()] = true
 	self:_set_character_equipment()
@@ -693,7 +769,7 @@ function MenuSceneManager:_set_character_dynamic_bodies_state(state)
 	end
 end
 
-function MenuSceneManager:_set_character_unit(unit_name, unit)
+function MenuSceneManager:_set_character_unit(unit_name, unit, pos_override)
 	local pos, rot
 	if alive(unit) then
 		pos = unit:position()
@@ -703,7 +779,7 @@ function MenuSceneManager:_set_character_unit(unit_name, unit)
 		World:delete_unit(unit)
 	end
 	local a = self._bg_unit:get_object(Idstring("a_reference"))
-	unit = World:spawn_unit(Idstring(unit_name), pos or a:position(), rot or a:rotation() * Rotation(-30, 0, 0))
+	unit = World:spawn_unit(Idstring(unit_name), pos_override or pos or a:position(), rot or a:rotation() * Rotation(-30, 0, 0))
 	self._character_yaw = (rot or a:rotation()):yaw()
 	self._character_pitch = (rot or a:rotation()):pitch()
 	self:_set_character_unit_pose("husk_rifle1", unit)
@@ -828,6 +904,7 @@ function MenuSceneManager:_set_character_equipment()
 			break
 		end
 	end
+	self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin())
 	local rank = managers.experience:current_rank()
 	local ignore_infamy_card = self._scene_templates and self._scene_templates[self._current_scene_template] and self._scene_templates[self._current_scene_template].remove_infamy_card and true or false
 	local ignore_weapons = self._scene_templates and self._scene_templates[self._current_scene_template] and self._scene_templates[self._current_scene_template].remove_weapons and true or false
@@ -966,6 +1043,7 @@ function MenuSceneManager:test_show_all_lobby_characters(enable_card)
 			unit = self._lobby_characters[i]
 			self:set_character_mask_by_id(managers.blackmarket:equipped_mask().mask_id, mask_blueprint, unit, i)
 			self:set_character_armor(managers.blackmarket:equipped_armor(), unit)
+			self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin(), unit)
 			self:set_lobby_character_visible(i, true)
 		end
 	end
@@ -1017,6 +1095,7 @@ function MenuSceneManager:set_lobby_character_out_fit(i, outfit_string, rank)
 	self:set_character_mask_by_id(outfit.mask.mask_id, outfit.mask.blueprint, unit, i)
 	self:set_character_armor(outfit.armor, unit)
 	self:set_character_deployable(outfit.deployable, unit, i)
+	self:set_character_armor_skin(outfit.armor_skin or managers.blackmarket:equipped_armor_skin(), unit)
 	self:_delete_character_weapon(unit, "all")
 	local prio_item = self:_get_lobby_character_prio_item(rank, outfit)
 	if prio_item == "rank" then
@@ -1196,6 +1275,15 @@ function MenuSceneManager:set_character_armor(armor_id, unit)
 	unit = unit or self._character_unit
 	local sequence = tweak_data.blackmarket.armors[armor_id].sequence
 	unit:damage():run_sequence_simple(sequence)
+	self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin())
+end
+
+function MenuSceneManager:set_character_armor_skin(skin_id, unit)
+	unit = unit or self._character_unit
+	if not unit or not unit:base() then
+		return
+	end
+	unit:base():set_cosmetics_data(skin_id, true)
 end
 
 function MenuSceneManager:set_character_card(peer_id, rank, unit)
@@ -1447,23 +1535,42 @@ function MenuSceneManager:on_set_preferred_character()
 		self:set_character_mask_by_id(equipped_mask.mask_id, equipped_mask.blueprint)
 		self:_check_character_mask_sequence(self._character_unit, equipped_mask.mask_id, nil)
 	end
+	self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin(), self._character_unit)
 	local mask_data = self._mask_units[self._character_unit:key()]
 	if mask_data then
 		self:update_mask_offset(mask_data)
 	end
 end
 
-function MenuSceneManager:set_character(character_id)
+function MenuSceneManager:set_character(character_id, force_recreate)
 	local unit_name = tweak_data.blackmarket.characters[character_id].menu_unit
-	if not alive(self._character_unit) or Idstring(unit_name) ~= self._character_unit:name() then
+	self._player_character_name = character_id
+	if not (not force_recreate and alive(self._character_unit)) or Idstring(unit_name) ~= self._character_unit:name() then
 		self:_set_player_character_unit(unit_name, self._character_unit)
 	end
 	local sequence = managers.blackmarket:character_sequence_by_character_id(character_id)
+	local cc_sequences = {
+		"var_mtr_chains",
+		"var_mtr_dallas",
+		"var_mtr_hoxton",
+		"var_mtr_dragan",
+		"var_mtr_jacket",
+		"var_mtr_old_hoxton",
+		"var_mtr_wolf",
+		"var_mtr_john_wick",
+		"var_mtr_sokol",
+		"var_mtr_jiro",
+		"var_mtr_bodhi"
+	}
+	if table.contains(cc_sequences, sequence) and managers.blackmarket:equipped_armor_skin() ~= "none" then
+		sequence = sequence .. "_cc"
+	end
 	self._character_unit:damage():run_sequence_simple(sequence)
 	local equipped_mask = managers.blackmarket:equipped_mask()
 	if equipped_mask.mask_id then
 		self:_check_character_mask_sequence(self._character_unit, equipped_mask.mask_id, nil)
 	end
+	self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin(), self._character_unit)
 end
 
 function MenuSceneManager:_create_light(params)
@@ -1621,6 +1728,9 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 		if set_character_position and self._character_values.pos_target then
 			self._character_unit:set_position(self._character_values.pos_target)
 		end
+		if template_data and template_data.recreate_character and self._player_character_name then
+			self:set_character(self._player_character_name, true)
+		end
 		self:_chk_character_visibility(self._character_unit)
 		if self._lobby_characters then
 			for _, unit in pairs(self._lobby_characters) do
@@ -1695,6 +1805,13 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 				light:set_enable(true)
 				table.insert(self._active_lights, light)
 			end
+		end
+	end
+	if template_data then
+		if template_data.use_workbench_room then
+			self:spawn_workbench_room()
+		else
+			self:delete_workbench_room()
 		end
 	end
 	managers.network.account:inventory_load()
@@ -2405,6 +2522,18 @@ function MenuSceneManager:mouse_moved(o, x, y)
 			self._item_unit.unit:set_position(new_pos)
 			self._item_unit.unit:set_moving(2)
 		end
+		if alive(self._economy_character) then
+			local diff = (y - self._item_grabbed_current_y) / 4
+			self._item_yaw = (self._item_yaw + (x - self._item_grabbed_current_x) / 4) % 360
+			self._item_pitch = 0
+			self._item_roll = 0
+			mrotation.set_yaw_pitch_roll(self._item_rot_temp, self._item_yaw, self._item_pitch, self._item_roll)
+			mrotation.set_zero(self._item_rot)
+			mrotation.multiply(self._item_rot, self._camera_object:rotation())
+			mrotation.multiply(self._item_rot, self._item_rot_temp)
+			mrotation.multiply(self._item_rot, self._item_rot_mod)
+			self._economy_character:set_rotation(self._item_rot)
+		end
 		self._item_grabbed_current_x = x
 		self._item_grabbed_current_y = y
 		return true, "grab"
@@ -2722,6 +2851,26 @@ function MenuSceneManager:load_safe_result_content(result, ready_clbk)
 		self._safe_result_content_data.ready_flags.weapon_ready = false
 		managers.dyn_resource:load(ids_unit, weapon_name, DynamicResourceManager.DYN_RESOURCES_PACKAGE, callback(self, self, "_set_safe_result_ready_flag", "weapon_ready"))
 		local parts = managers.weapon_factory:preload_blueprint(factory_id, blueprint, false, callback(self, self, "_safe_result_parts_loaded"), false)
+	elseif result.category == "armor_skins" then
+		self._safe_result_content_data.armor_id = result.entry
+		self:_check_safe_result_content_loaded()
+		local rarity_data = tweak_data.economy.rarities[item_data.rarity] or {}
+		local random_ang = 15
+		local pos = self._scene_templates.safe.camera_pos + (self._scene_templates.safe.target_pos - self._scene_templates.safe.camera_pos):normalized() * 310 + math.UP * -120
+		local ang = Rotation(180 + math.random(-random_ang, random_ang), 0, 0)
+		local unit_name = tweak_data.blackmarket.characters[managers.blackmarket:equipped_character()].menu_unit
+		local unit = World:spawn_unit(Idstring(unit_name), pos, ang)
+		self:_set_character_unit_pose(rarity_data.armor_sequence or "cvc_var1", unit)
+		local sequence = managers.blackmarket:character_sequence_by_character_id(managers.blackmarket:equipped_character())
+		unit:damage():run_sequence_simple(sequence)
+		unit:set_visible(false)
+		self._economy_character = unit
+		self._safe_result_content_data.ready_flags.armor_ready = false
+		local armors = managers.blackmarket:get_sorted_armors()
+		self:set_character_armor(armors[#armors], unit)
+		managers.menu_scene:preview_character_skin(result.entry, self._economy_character, {
+			done = callback(self, self, "_set_safe_result_ready_flag", "armor_ready")
+		})
 	end
 end
 
@@ -2785,6 +2934,14 @@ function MenuSceneManager:_create_safe_result(created_clbk)
 			quality = self._safe_result_content_data.result.quality
 		}
 		local weapon_unit = self:spawn_item_weapon(self._safe_result_content_data.factory_id, self._safe_result_content_data.blueprint, cosmetics, nil, custom_data)
+	elseif self._safe_result_content_data.armor_id and alive(self._economy_character) then
+		self._economy_character:set_visible(true)
+		local equipped_mask = managers.blackmarket:equipped_mask()
+		if equipped_mask.mask_id then
+			self:set_character_mask_by_id(equipped_mask.mask_id, equipped_mask.blueprint, self._economy_character)
+			self:_check_character_mask_sequence(self._economy_character, equipped_mask.mask_id, nil)
+		end
+		self:_set_character_and_outfit_visibility(self._economy_character, true)
 	end
 	self._can_change_fov = true
 	if created_clbk then
@@ -2836,6 +2993,13 @@ function MenuSceneManager:_destroy_economy_safe()
 		World:delete_unit(self._economy_saferoom)
 		self._economy_saferoom = nil
 	end
+	if alive(self._economy_character) then
+		if self._mask_units[self._economy_character:key()] and alive(self._mask_units[self._economy_character:key()].unit) then
+			self:_delete_character_mask(self._economy_character)
+		end
+		World:delete_unit(self._economy_character)
+		self._economy_character = nil
+	end
 	if self._safe_shake then
 		self._shaker:stop(self._safe_shake)
 		self._safe_shake = nil
@@ -2844,6 +3008,12 @@ function MenuSceneManager:_destroy_economy_safe()
 end
 
 function MenuSceneManager:set_blackmarket_tradable_loaded()
+end
+
+function MenuSceneManager:preview_character_skin(skin_id, unit, clbks)
+	unit = unit or self._character_unit
+	self:set_character_armor_skin(skin_id, unit)
+	unit:base():_apply_cosmetics(clbks)
 end
 
 function MenuSceneManager:destroy()

@@ -61,6 +61,7 @@ function DLCTweakData:init(tweak_data)
 			fish = true,
 			lxy = true,
 			grv = true,
+			mrm = 1,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5768,6 +5769,18 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "bny_04",
+			amount = 1
+		}
+	}
+	self.ach_cee_3 = {}
+	self.ach_cee_3.dlc = "has_achievement"
+	self.ach_cee_3.achievement_id = "cee_3"
+	self.ach_cee_3.content = {}
+	self.ach_cee_3.content.loot_global_value = "normal"
+	self.ach_cee_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mrm",
 			amount = 1
 		}
 	}

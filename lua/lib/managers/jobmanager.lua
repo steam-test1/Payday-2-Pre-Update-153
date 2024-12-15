@@ -571,7 +571,8 @@ function JobManager:_check_add_heat_to_jobs(debug_job_id, ignore_debug_prints)
 		local is_cooldown_ok = self:check_ok_with_cooldown(job_id)
 		local is_not_wrapped = not job_tweak_data.wrapped_to_job
 		local is_not_dlc_or_got = not job_tweak_data.dlc or managers.dlc:is_dlc_unlocked(job_tweak_data.dlc)
-		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got and is_not_this_job
+		local is_not_ignore_heat = not tweak_data.narrative.jobs[job_id].ignore_heat
+		local pass_all_tests = is_cooldown_ok and is_not_wrapped and is_not_dlc_or_got and is_not_this_job and is_not_ignore_heat
 		if pass_all_tests then
 			table.insert(all_jobs, job_id)
 		end
@@ -612,6 +613,9 @@ function JobManager:_change_job_heat(job_id, heat, cap_heat)
 end
 
 function JobManager:set_job_heat(job_id, new_heat, cap_heat)
+	if tweak_data.narrative.jobs[job_id].ignore_heat then
+		return
+	end
 	self._global.heat[job_id] = new_heat
 	if cap_heat then
 		self._global.heat[job_id] = math.min(self._global.heat[job_id], 0)
@@ -622,6 +626,9 @@ end
 function JobManager:_get_job_heat(job_id)
 	if tweak_data.narrative:is_wrapped_to_job(job_id) then
 		return self:_get_job_heat(tweak_data.narrative.jobs[job_id].wrapped_to_job)
+	end
+	if tweak_data.narrative.jobs[job_id] and tweak_data.narrative.jobs[job_id].ignore_heat then
+		return 0
 	end
 	return self._global.heat[job_id]
 end
@@ -922,6 +929,24 @@ function JobManager:activate_job(job_id, current_stage)
 		current_stage = current_stage or 1,
 		last_completed_stage = 0,
 		stages = job.chain and #job.chain or math.huge - 1
+	}
+	self._global.start_time = TimerManager:wall_running():time()
+	self:start_accumulate_ghost_bonus(job_id)
+	managers.experience:mission_xp_clear()
+	self:stop_sounds()
+	self._global.memory = {}
+	self._global.shortterm_memory = {}
+	return true
+end
+
+function JobManager:activate_temporary_job(job_id, level_id)
+	self._global.current_job = {
+		job_id = job_id,
+		level_id = level_id,
+		current_stage = 1,
+		last_completed_stage = 0,
+		stages = 1,
+		temporary = true
 	}
 	self._global.start_time = TimerManager:wall_running():time()
 	self:start_accumulate_ghost_bonus(job_id)

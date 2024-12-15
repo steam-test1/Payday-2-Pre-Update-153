@@ -135,7 +135,11 @@ function HUDBlackScreen:skip_circle_done()
 end
 
 function HUDBlackScreen:set_job_data()
-	self:_set_job_data()
+	if managers.crime_spree:_is_active() then
+		self:_set_job_data_crime_spree()
+	else
+		self:_set_job_data()
+	end
 end
 
 function HUDBlackScreen:_set_job_data()
@@ -184,6 +188,39 @@ function HUDBlackScreen:_set_job_data()
 		risk_text:set_bottom(risk_panel:top())
 		risk_text:set_center_x(risk_panel:center_x())
 	end
+end
+
+function HUDBlackScreen:_set_job_data_crime_spree()
+	local job_panel = self._blackscreen_panel:panel({
+		visible = true,
+		name = "job_panel",
+		y = 0,
+		valign = "grow",
+		halign = "grow",
+		layer = 1
+	})
+	local job_text = job_panel:text({
+		text = managers.localization:to_upper_text("cn_crime_spree"),
+		font = tweak_data.menu.pd2_large_font,
+		font_size = tweak_data.menu.pd2_large_font_size,
+		align = "center",
+		vertical = "bottom",
+		color = tweak_data.screen_colors.crime_spree_risk
+	})
+	job_text:set_bottom(job_panel:h() * 0.5)
+	job_text:set_center_x(job_panel:center_x())
+	local risk_text = job_panel:text({
+		text = managers.localization:to_upper_text("menu_cs_level", {
+			level = managers.experience:cash_string(managers.crime_spree:server_spree_level(), "")
+		}),
+		font = tweak_data.menu.pd2_large_font,
+		font_size = tweak_data.menu.pd2_large_font_size,
+		align = "center",
+		vertical = "top",
+		color = tweak_data.screen_colors.crime_spree_risk
+	})
+	risk_text:set_top(job_panel:h() * 0.5)
+	risk_text:set_center_x(job_panel:center_x())
 end
 
 function HUDBlackScreen:_create_stages()

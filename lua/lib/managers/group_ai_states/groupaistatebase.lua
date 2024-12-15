@@ -20,6 +20,7 @@ GroupAIStateBase.BLAME_SYNC = {
 	"alarm_pager_bluff_failed",
 	"alarm_pager_not_answered",
 	"alarm_pager_hang_up",
+	"civ_too_many_killed",
 	"civ_alarm",
 	"cop_alarm",
 	"gan_alarm",

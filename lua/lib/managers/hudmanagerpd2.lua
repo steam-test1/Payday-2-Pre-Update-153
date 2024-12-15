@@ -21,6 +21,7 @@ require("lib/managers/hud/HUDHitConfirm")
 require("lib/managers/hud/HUDHitDirection")
 require("lib/managers/hud/HUDPlayerDowned")
 require("lib/managers/hud/HUDPlayerCustody")
+require("lib/managers/hud/HUDStageEndCrimeSpreeScreen")
 HUDManager.disabled = {}
 HUDManager.disabled[Idstring("guis/player_hud"):key()] = true
 HUDManager.disabled[Idstring("guis/experience_hud"):key()] = true
@@ -1538,7 +1539,11 @@ end
 
 function HUDManager:setup_endscreen_hud()
 	local hud = managers.hud:script(MissionEndState.GUI_ENDSCREEN)
-	self._hud_stage_endscreen = HUDStageEndScreen:new(hud, self._fullscreen_workspace)
+	if game_state_machine:gamemode().id == GamemodeCrimeSpree.id then
+		self._hud_stage_endscreen = HUDStageEndCrimeSpreeScreen:new(hud, self._fullscreen_workspace)
+	else
+		self._hud_stage_endscreen = HUDStageEndScreen:new(hud, self._fullscreen_workspace)
+	end
 end
 
 function HUDManager:hide_endscreen_hud()

@@ -1807,6 +1807,33 @@ function HudIconsTweakData:init()
 			180
 		}
 	}
+	self.upcard_random = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			640,
+			180,
+			128,
+			180
+		}
+	}
+	self.upcard_coins = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			768,
+			0,
+			128,
+			180
+		}
+	}
+	self.upcard_cosmetic = {
+		texture = "guis/textures/pd2/lootscreen/loot_cards",
+		texture_rect = {
+			768,
+			180,
+			128,
+			180
+		}
+	}
 	self.ace_of_spade = {
 		texture = "guis/textures/pd2/lootscreen/loot_cards",
 		texture_rect = {
@@ -1931,6 +1958,739 @@ function HudIconsTweakData:init()
 			0,
 			32,
 			32
+		}
+	}
+	local crime_spree_atlas_size = 128
+	self.crime_spree_health = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_damage = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_cloaker_smoke = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_shield_reflect = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_more_medics = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_more_dozers = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_no_hurt = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_medic_speed = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_heavies = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_dozer_explosion = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_dozer_lmg = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_pager = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_civs_killed = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_concealment = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/modifiers_atlas",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	local csm_w = 280
+	local csm_h = 140
+	self.csm_biker_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_biker_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_carshop = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_branchbank = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_shadow_raid = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_crossroads = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_downtown = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 0,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_park = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_overpass = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_harbor = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_murky = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_prison = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_fs_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_fs_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 1,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_santas_workshop = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_hoxvenge = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_election_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_election_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_election_3 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_bigoil_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_bigoil_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 2,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_framing_3 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_train_forest = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_yacht = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_counterfeit = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_undercover = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_panic_room = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_watchdogs_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 3,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_docks = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_white_xmas = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_aftershock = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_stealing_xmas = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_friend = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_brooklyn = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_rats_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 4,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_fwb = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_slaughterhouse = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_big = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_miami_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_miami_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_hoxout_1 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_hoxout_2 = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 5,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_diamond = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 0,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_mountain = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 1,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_go = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 2,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_sky = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 3,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_labrats = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 4,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_run = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 5,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	self.csm_glace = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/missions_atlas",
+		texture_rect = {
+			csm_w * 6,
+			csm_h * 6,
+			csm_w,
+			csm_h
+		}
+	}
+	local csb_size = 128
+	self.csb_reload = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 0,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_stamina = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 1,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_ammo = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 2,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_lifesteal = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 3,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_armor = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 4,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_absorb = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 5,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_health = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 6,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_switch = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 7,
+			csb_size * 0,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_lives = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 0,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_throwables = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 1,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_deployables = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 2,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_panic = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 3,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_melee = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 4,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_explosion = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 5,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_pagers = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 6,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_bodybags = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 7,
+			csb_size * 1,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_crouch = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 0,
+			csb_size * 2,
+			csb_size,
+			csb_size
+		}
+	}
+	self.csb_locks = {
+		texture = "guis/dlcs/cee/textures/pd2/crime_spree/boosts_atlas",
+		texture_rect = {
+			csb_size * 1,
+			csb_size * 2,
+			csb_size,
+			csb_size
 		}
 	}
 end

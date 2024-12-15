@@ -3521,6 +3521,14 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 			Rotation(0, 0, 0)
 		}
 	}
+	self.masks.mrm = {}
+	self.masks.mrm.unit = "units/pd2_dlc_mrm/masks/msk_mrm"
+	self.masks.mrm.name_id = "bm_msk_mrm"
+	self.masks.mrm.pcs = {}
+	self.masks.mrm.value = 0
+	self.masks.mrm.texture_bundle_folder = "mrm"
+	self.masks.mrm.sort_number = 45
+	self.masks.mrm.infamous = true
 	self.masks.bny_01_bonnie = {}
 	self.masks.bny_01_bonnie.unit = "units/pd2_dlc_bny/masks/bny_01/msk_bny_01_bonnie"
 	self.masks.bny_01_bonnie.name_id = "bm_msk_bny_01a"

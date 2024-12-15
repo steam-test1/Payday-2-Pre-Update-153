@@ -4584,6 +4584,66 @@ function NarrativeTweakData:init(tweak_data)
 		26000,
 		26000
 	}
+	self.jobs.crime_spree = {}
+	self.jobs.crime_spree.name_id = "heist_crime_spree"
+	self.jobs.crime_spree.briefing_id = "heist_crime_spree_brief"
+	self.jobs.crime_spree.contact = "hoxton"
+	self.jobs.crime_spree.region = "street"
+	self.jobs.crime_spree.jc = 0
+	self.jobs.crime_spree.chain = {}
+	self.jobs.crime_spree.briefing_event = nil
+	self.jobs.crime_spree.debrief_event = nil
+	self.jobs.crime_spree.crimenet_callouts = {}
+	self.jobs.crime_spree.crimenet_videos = {
+		"cn_branchbank1"
+	}
+	self.jobs.crime_spree.payout = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	}
+	self.jobs.crime_spree.experience_mul = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	}
+	self.jobs.crime_spree.contract_cost = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	}
+	self.jobs.crime_spree.contract_visuals = {}
+	self.jobs.crime_spree.contract_visuals.min_mission_xp = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	}
+	self.jobs.crime_spree.contract_visuals.max_mission_xp = {
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	}
+	self.jobs.crime_spree.ignore_heat = true
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4649,7 +4709,8 @@ function NarrativeTweakData:init(tweak_data)
 		"spa",
 		"fish",
 		"moon",
-		"run"
+		"run",
+		"crime_spree"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

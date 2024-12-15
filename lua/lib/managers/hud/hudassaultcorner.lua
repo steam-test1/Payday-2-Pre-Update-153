@@ -344,6 +344,12 @@ function HUDAssaultCorner:_animate_text(text_panel, bg_box, color, color_functio
 			text_string = managers.localization:to_upper_text(text_id)
 		elseif text_id == Idstring("risk") then
 			local use_stars = true
+			if managers.crime_spree:_is_active() then
+				text_string = text_string .. managers.localization:to_upper_text("menu_cs_level", {
+					level = managers.experience:cash_string(managers.crime_spree:server_spree_level(), "")
+				})
+				use_stars = false
+			end
 			if use_stars then
 				for i = 1, managers.job:current_difficulty_stars() do
 					text_string = text_string .. managers.localization:get_default_macro("BTN_SKULL")

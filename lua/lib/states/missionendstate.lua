@@ -60,6 +60,13 @@ function MissionEndState:at_enter(old_state, params)
 		end
 		managers.criminals:save_current_character_names()
 	end
+	if not self._server_left and not self._kicked then
+		if self._success then
+			managers.crime_spree:on_mission_completed(managers.crime_spree:current_mission())
+		else
+			managers.crime_spree:on_mission_failed(managers.crime_spree:current_mission())
+		end
+	end
 	local player = managers.player:player_unit()
 	if player then
 		player:camera():remove_sound_listener()
@@ -484,9 +491,11 @@ function MissionEndState:generate_safehouse_statistics()
 	if was_safehouse_raid then
 		exp_income = exp_income - raid_income
 	end
-	stage_safehouse_summary_string = managers.localization:text("menu_es_safehouse_earned", {
-		amount = tostring(total_income)
-	})
+	if managers.crime_spree:_is_active() and 0 < total_income then
+		stage_safehouse_summary_string = managers.localization:text("menu_es_safehouse_earned", {
+			amount = tostring(total_income)
+		})
+	end
 	stage_safehouse_summary_string = stage_safehouse_summary_string .. "\n"
 	if 0 < exp_income then
 		exp_income = managers.experience:cash_string(math.floor(exp_income), "")
@@ -603,6 +612,9 @@ function MissionEndState:update(t, dt)
 		Application:debug("managers.mission:pre_destroy()")
 		managers.mission:pre_destroy()
 		self._mission_destroy_t = nil
+	end
+	if managers.crime_spree:_is_active() then
+		self._total_xp_bonus = false
 	end
 	if self._total_xp_bonus then
 		if self._total_xp_bonus >= 0 then

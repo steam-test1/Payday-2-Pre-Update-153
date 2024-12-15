@@ -35,6 +35,8 @@ require("lib/tweak_data/CustomSafehouseTweakData")
 require("lib/tweak_data/TangoTweakData")
 require("lib/tweak_data/SubtitleTweakData")
 require("lib/tweak_data/InputTweakData")
+require("lib/tweak_data/ArmorSkinsTweakData")
+require("lib/tweak_data/CrimeSpreeTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -621,6 +623,7 @@ function TweakData:init()
 	self.tango = TangoTweakData:new(self)
 	self.subtitles = SubtitleTweakData:new(self)
 	self.input = InputTweakData:new(self)
+	self.crime_spree = CrimeSpreeTweakData:new(self)
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
@@ -770,6 +773,7 @@ function TweakData:init()
 	self.screen_colors.competitive_color = Color(255, 41, 204, 122) / 255
 	self.screen_colors.mutators_color = Color(255, 211, 133, 255) / 255
 	self.screen_colors.mutators_color_text = Color(255, 211, 133, 255) / 255
+	self.screen_colors.crime_spree_risk = Color(255, 255, 255, 0) / 255
 	self.screen_colors.heat_cold_color = Color(255, 255, 51, 51) / 255
 	self.screen_colors.heat_warm_color = Color("ff7f00")
 	self.screen_colors.heat_standard_color = Color(255, 255, 255, 255) / 255
@@ -845,6 +849,60 @@ function TweakData:init()
 	self.gui.DIALOG_LAYER = 1100
 	self.gui.MOUSE_LAYER = 1200
 	self.gui.SAVEFILE_LAYER = 1400
+	self.color_grading = {
+		{
+			text_id = "menu_color_off",
+			value = "color_payday"
+		},
+		{
+			text_id = "menu_color_default",
+			value = nil
+		},
+		{
+			text_id = "menu_color_heat",
+			value = "color_heat"
+		},
+		{
+			text_id = "menu_color_nice",
+			value = "color_nice"
+		},
+		{
+			text_id = "menu_color_bhd",
+			value = "color_bhd"
+		},
+		{
+			text_id = "menu_color_xgen",
+			value = "color_xgen"
+		},
+		{
+			text_id = "menu_color_xxxgen",
+			value = "color_xxxgen"
+		},
+		{
+			text_id = "menu_color_matrix_classic",
+			value = "color_matrix_classic"
+		},
+		{
+			text_id = "menu_color_sin_classic",
+			value = "color_sin_classic"
+		},
+		{
+			text_id = "menu_color_sepia",
+			value = "color_sepia"
+		},
+		{
+			text_id = "menu_color_sunsetstrip",
+			value = "color_sunsetstrip"
+		},
+		{
+			text_id = "menu_color_colorful",
+			value = "color_colorful"
+		},
+		{
+			text_id = "menu_color_madplanet",
+			value = "color_madplanet"
+		}
+	}
 	self.community_challenges_stage_multiplier = 1.5
 	self.community_challenges = {
 		{
@@ -5202,6 +5260,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.blame.alarm_pager_bluff_failed = "hint_alarm_pager_bluff_failed"
 	self.blame.alarm_pager_not_answered = "hint_alarm_pager_not_answered"
 	self.blame.alarm_pager_hang_up = "hint_alarm_pager_hang_up"
+	self.blame.civ_too_many_killed = "hint_civ_too_many_killed"
 	self.blame.civ_alarm = "hint_alarm_civ"
 	self.blame.cop_alarm = "hint_alarm_cop"
 	self.blame.gan_alarm = "hint_alarm_cop"

@@ -680,6 +680,32 @@ function ContractBoxGui:create_character_text(peer_id, x, y, text, icon)
 		self._panel:remove(self._peers_icon[peer_id])
 		self._peers_icon[peer_id] = nil
 	end
+	self._peers_spree = self._peers_spree or {}
+	if self._peers[peer_id]:visible() and self._peers[peer_id]:text() ~= "" then
+		local level = managers.crime_spree:get_peer_spree_level(peer_id)
+		local text = managers.experience:cash_string(level, "") .. managers.localization:get_default_macro("BTN_SPREE_TICKET")
+		self._peers_spree[peer_id] = self._peers_spree[peer_id] or self._panel:text({
+			name = tostring(peer_id) .. "_spree",
+			text = text,
+			align = "center",
+			vertical = "top",
+			font_size = tweak_data.menu.pd2_medium_font_size,
+			font = tweak_data.menu.pd2_medium_font,
+			layer = 0,
+			color = tweak_data.screen_colors.crime_spree_risk,
+			blend_mode = "add",
+			rotation = 360
+		})
+		self._peers_spree[peer_id]:set_text(text)
+		local _, _, w, h = self._peers_spree[peer_id]:text_rect()
+		self._peers_spree[peer_id]:set_size(w, h)
+		self._peers_spree[peer_id]:set_bottom(self._peers[peer_id]:top())
+		self._peers_spree[peer_id]:set_center_x(self._peers[peer_id]:center_x())
+		self._peers_spree[peer_id]:set_visible(self._enabled and game_state_machine:gamemode().id == GamemodeCrimeSpree.id and 0 <= level)
+	elseif self._peers_spree and self._peers_spree[peer_id] then
+		self._panel:remove(self._peers_spree[peer_id])
+		self._peers_spree[peer_id] = nil
+	end
 end
 
 function ContractBoxGui:update_character(peer_id)

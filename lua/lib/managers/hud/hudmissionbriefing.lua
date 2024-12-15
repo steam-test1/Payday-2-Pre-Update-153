@@ -183,6 +183,10 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
 	local show_contact_gui = true
+	if managers.crime_spree:_is_active() then
+		self._backdrop:set_pattern("guis/textures/pd2/mission_briefing/bain/bd_pattern", 0.1, "add")
+		show_contact_gui = false
+	end
 	if show_contact_gui then
 		local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
 		local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
@@ -404,6 +408,17 @@ function HUDMissionBriefing:init(hud, workspace)
 		self._paygrade_panel:move(0, -pg_text:h())
 	end
 	local text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id))
+	local text_len
+	if managers.crime_spree:_is_active() then
+		local level_id = Global.game_settings.level_id
+		local name_id = level_id and tweak_data.levels[level_id] and tweak_data.levels[level_id].name_id
+		local mission = managers.crime_spree:get_mission()
+		text = managers.localization:to_upper_text(name_id) .. ": "
+		text_len = utf8.len(text)
+		text = text .. "+" .. managers.localization:text("menu_cs_level", {
+			level = mission and mission.add or 0
+		})
+	end
 	local job_text = self._foreground_layer_one:text({
 		name = "job_text",
 		text = text,
@@ -415,6 +430,9 @@ function HUDMissionBriefing:init(hud, workspace)
 	})
 	local _, _, w, h = job_text:text_rect()
 	job_text:set_size(w, h)
+	if managers.crime_spree:_is_active() then
+		job_text:set_range_color(text_len, utf8.len(text), tweak_data.screen_colors.crime_spree_risk)
+	end
 	local big_text = self._background_layer_three:text({
 		name = "job_text",
 		text = text,
@@ -431,6 +449,12 @@ function HUDMissionBriefing:init(hud, workspace)
 	big_text:set_world_x(self._foreground_layer_one:child("job_text"):world_x())
 	big_text:move(-13, 9)
 	self._backdrop:animate_bg_text(big_text)
+	if managers.crime_spree:_is_active() then
+		self._paygrade_panel:set_visible(false)
+		self._job_schedule_panel:set_visible(false)
+		self._paygrade_text:set_visible(false)
+		self._job_overview_text:set_visible(false)
+	end
 end
 
 function HUDMissionBriefing:_apply_ghost_color(ghost, i, is_unknown)

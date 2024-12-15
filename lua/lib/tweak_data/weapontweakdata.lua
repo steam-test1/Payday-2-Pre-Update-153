@@ -10613,7 +10613,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.hunter.NR_CLIPS_MAX = 25
 	self.hunter.AMMO_MAX = self.hunter.CLIP_AMMO_MAX * self.hunter.NR_CLIPS_MAX
 	self.hunter.AMMO_PICKUP = self:_pickup_chance(0, 1)
-	self.hunter.FIRE_MODE = "auto"
+	self.hunter.FIRE_MODE = "single"
 	self.hunter.fire_mode_data = {}
 	self.hunter.fire_mode_data.fire_rate = 1.2
 	self.hunter.CAN_TOGGLE_FIREMODE = false
@@ -10803,7 +10803,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.arblast.NR_CLIPS_MAX = 35
 	self.arblast.AMMO_MAX = self.arblast.CLIP_AMMO_MAX * self.arblast.NR_CLIPS_MAX
 	self.arblast.AMMO_PICKUP = self:_pickup_chance(0, 1)
-	self.arblast.FIRE_MODE = "auto"
+	self.arblast.FIRE_MODE = "single"
 	self.arblast.fire_mode_data = {}
 	self.arblast.fire_mode_data.fire_rate = 2.9
 	self.arblast.CAN_TOGGLE_FIREMODE = false
@@ -10901,7 +10901,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.frankish.NR_CLIPS_MAX = 50
 	self.frankish.AMMO_MAX = self.frankish.CLIP_AMMO_MAX * self.frankish.NR_CLIPS_MAX
 	self.frankish.AMMO_PICKUP = self:_pickup_chance(0, 1)
-	self.frankish.FIRE_MODE = "auto"
+	self.frankish.FIRE_MODE = "single"
 	self.frankish.fire_mode_data = {}
 	self.frankish.fire_mode_data.fire_rate = 1.5
 	self.frankish.CAN_TOGGLE_FIREMODE = false

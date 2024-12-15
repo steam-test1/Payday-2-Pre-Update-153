@@ -291,7 +291,7 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_counter()
 	local completed = 0
 	for _, trophy in ipairs(managers.custom_safehouse:trophies()) do
 		total = total + 1
-		if trophy.completed then
+		if trophy.completed and not trophy.hidden_in_list then
 			completed = completed + 1
 		end
 	end

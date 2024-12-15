@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.187"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.193"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -82,6 +82,8 @@ function NetworkMatchMakingSTEAM:load_user_filters()
 	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
 	Global.game_settings.allow_search_safehouses = managers.user:get_setting("crimenet_filter_safehouses")
 	Global.game_settings.search_mutated_lobbies = managers.user:get_setting("crimenet_filter_mutators")
+	Global.game_settings.gamemode_filter = managers.user:get_setting("crimenet_gamemode_filter")
+	Global.game_settings.crime_spree_max_lobby_diff = managers.user:get_setting("crime_spree_lobby_diff")
 	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
 	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
 	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
@@ -106,6 +108,8 @@ function NetworkMatchMakingSTEAM:reset_filters()
 	usr:set_setting("crimenet_filter_level_appopriate", usr:get_default_setting("crimenet_filter_level_appopriate"))
 	usr:set_setting("crimenet_filter_safehouses", usr:get_default_setting("crimenet_filter_safehouses"))
 	usr:set_setting("crimenet_filter_mutators", usr:get_default_setting("crimenet_filter_mutators"))
+	usr:set_setting("crimenet_gamemode_filter", usr:get_default_setting("crimenet_gamemode_filter"))
+	usr:set_setting("crime_spree_lobby_diff", usr:get_default_setting("crime_spree_lobby_diff"))
 	usr:set_setting("crimenet_filter_new_servers_only", usr:get_default_setting("crimenet_filter_new_servers_only"))
 	usr:set_setting("crimenet_filter_in_lobby", usr:get_default_setting("crimenet_filter_in_lobby"))
 	usr:set_setting("crimenet_filter_max_servers", usr:get_default_setting("crimenet_filter_max_servers"))
@@ -205,6 +209,11 @@ function NetworkMatchMakingSTEAM:get_friends_lobbies()
 							numbers = self:_lobby_to_numbers(lobby)
 						}
 						attributes_data.mutators = self:_get_mutators_from_lobby(lobby)
+						local crime_spree_key = lobby:key_value("crime_spree")
+						if is_key_valid(crime_spree_key) then
+							attributes_data.crime_spree = tonumber(crime_spree_key)
+							attributes_data.crime_spree_mission = lobby:key_value("crime_spree_mission")
+						end
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -321,6 +330,11 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 							numbers = self:_lobby_to_numbers(lobby)
 						}
 						attributes_data.mutators = self:_get_mutators_from_lobby(lobby)
+						local crime_spree_key = lobby:key_value("crime_spree")
+						if is_key_valid(crime_spree_key) then
+							attributes_data.crime_spree = tonumber(crime_spree_key)
+							attributes_data.crime_spree_mission = lobby:key_value("crime_spree_mission")
+						end
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -356,6 +370,16 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 			local max_ply_jc = managers.job:get_max_jc_for_player()
 			self.browser:set_lobby_filter("job_class_min", min_ply_jc, "equalto_or_greater_than")
 			self.browser:set_lobby_filter("job_class_max", max_ply_jc, "equalto_less_than")
+		end
+		if Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id then
+			local min_level = 0
+			if 0 <= Global.game_settings.crime_spree_max_lobby_diff then
+				min_level = managers.crime_spree:spree_level() - (Global.game_settings.crime_spree_max_lobby_diff or 0)
+				min_level = math.max(min_level, 0)
+			end
+			self.browser:set_lobby_filter("crime_spree", min_level, "equalto_or_greater_than")
+		elseif Global.game_settings.gamemode_filter == GamemodeStandard.id then
+			self.browser:set_lobby_filter("crime_spree", -1, "equalto_less_than")
 		end
 		if not no_filters then
 			for key, data in pairs(self._lobby_filters) do
@@ -530,7 +554,20 @@ function NetworkMatchMakingSTEAM:join_server(room_id, skip_showing_dialog)
 					managers.network:session():on_join_request_cancelled()
 				end
 			})
+			local lobby_data = self.lobby_handler:get_lobby_data()
+			if lobby_data then
+				local spree_level = tonumber(lobby_data.crime_spree)
+				if spree_level and 0 <= spree_level then
+					managers.crime_spree:enable_crime_spree_gamemode()
+					if lobby_data.crime_spree_mission then
+						managers.crime_spree:set_temporary_mission(lobby_data.crime_spree_mission)
+					end
+				end
+			end
 			local joined_game = function(res, level_index, difficulty_index, state_index)
+				if res ~= "JOINED_LOBBY" and res ~= "JOINED_GAME" then
+					managers.crime_spree:disable_crime_spree_gamemode()
+				end
 				managers.system_menu:close("waiting_for_server_response")
 				print("[NetworkMatchMakingSTEAM:join_server:joined_game]", res, level_index, difficulty_index, state_index)
 				if res == "JOINED_LOBBY" then
@@ -724,6 +761,7 @@ function NetworkMatchMakingSTEAM:set_attributes(settings)
 		lobby_attributes[self._BUILD_SEARCH_INTEREST_KEY] = "true"
 	end
 	managers.mutators:apply_matchmake_attributes(lobby_attributes)
+	managers.crime_spree:apply_matchmake_attributes(lobby_attributes)
 	self._lobby_attributes = lobby_attributes
 	self.lobby_handler:set_lobby_data(lobby_attributes)
 	self.lobby_handler:set_lobby_type(permissions[settings.numbers[3]])

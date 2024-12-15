@@ -94,7 +94,7 @@ function ExperienceManager:debug_add_points(points, present_xp)
 	self:add_points(points, present_xp, true)
 end
 
-function ExperienceManager:give_experience(xp)
+function ExperienceManager:give_experience(xp, force_or_debug)
 	self._experience_progress_data = {}
 	self._experience_progress_data.gained = xp
 	self._experience_progress_data.start_t = {}
@@ -107,7 +107,7 @@ function ExperienceManager:give_experience(xp)
 		current = self:next_level_data_current_points(),
 		total = self:next_level_data_points()
 	})
-	local level_cap_xp_leftover = self:add_points(xp, true, false)
+	local level_cap_xp_leftover = self:add_points(xp, true, force_or_debug or false)
 	if level_cap_xp_leftover then
 		self._experience_progress_data.gained = self._experience_progress_data.gained - level_cap_xp_leftover
 	end

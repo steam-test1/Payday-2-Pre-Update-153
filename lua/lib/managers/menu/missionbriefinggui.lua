@@ -2903,6 +2903,12 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
 	table.insert(self._items, self._assets_item)
 	index = index + 1
+	if managers.crime_spree:_is_active() then
+		local gage_assets_data = {}
+		self._gage_assets_item = GageAssetsItem:new(self._panel, managers.localization:to_upper_text("menu_cs_gage_assets"), index)
+		table.insert(self._items, self._gage_assets_item)
+		index = index + 1
+	end
 	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), index, loadout_data)
 	table.insert(self._items, self._new_loadout_item)
 	index = index + 1
@@ -2941,6 +2947,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		max_x = next_page:left() - 5
 	end
 	self._reduced_to_small_font = not managers.menu:is_pc_controller()
+	self._reduced_to_small_font = self._reduced_to_small_font or managers.crime_spree:_is_active()
 	self:chk_reduce_to_small_font()
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
@@ -3056,11 +3063,28 @@ function MissionBriefingGui:flash_ready()
 	self._ready_button:animate(animate_flash_ready)
 end
 
-function MissionBriefingGui:open_asset_buy(i, id)
+function MissionBriefingGui:open_asset_buy(i, id, is_gage_asset)
 	local params = {}
 	params.asset_id = id
-	params.yes_func = callback(self, self, "_buy_asset_callback", id)
-	managers.menu:show_confirm_mission_asset_buy(params)
+	if is_gage_asset then
+		if managers.crime_spree:can_unlock_asset() then
+			params.yes_func = callback(self, self, "_buy_gage_asset_callback", id)
+			managers.menu:show_confirm_mission_gage_asset_buy(params)
+		else
+			managers.menu:show_gage_assets_unlock_prevented({})
+		end
+	else
+		params.yes_func = callback(self, self, "_buy_asset_callback", id)
+		managers.menu:show_confirm_mission_asset_buy(params)
+	end
+end
+
+function MissionBriefingGui:_buy_gage_asset_callback(asset_id)
+	managers.crime_spree:unlock_gage_asset(asset_id)
+end
+
+function MissionBriefingGui:unlock_gage_asset(asset_id)
+	self._gage_assets_item:unlock_asset_by_id(asset_id)
 end
 
 function MissionBriefingGui:_buy_asset_callback(asset_id)
@@ -3159,6 +3183,12 @@ function MissionBriefingGui:open_asset(asset_index)
 	end
 end
 
+function MissionBriefingGui:open_gage_asset(asset_id)
+	local params = {}
+	params.asset_id = asset_id
+	managers.menu:show_gage_asset_desc(params)
+end
+
 function MissionBriefingGui:close_asset()
 	if not self._fullscreen_assets_list then
 		return
@@ -3247,6 +3277,12 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 	end
 	local mwheel_down = button == Idstring("mouse wheel down")
 	local mwheel_up = button == Idstring("mouse wheel up")
+	if (mwheel_down or mwheel_up) and managers.menu:is_pc_controller() then
+		local mouse_pos_x, mouse_pos_y = managers.mouse_pointer:modified_mouse_pos()
+		if mouse_pos_x < self._panel:x() then
+			return
+		end
+	end
 	if mwheel_down then
 		self:next_tab(true)
 		return
@@ -3276,10 +3312,20 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 		elseif type(pressed) == "number" then
 			if cost then
 				if type(cost) == "number" then
-					self:open_asset_buy(pressed, tab:get_asset_id(pressed))
+					local asset_id, is_gage_asset, locked = tab:get_asset_id(pressed)
+					if is_gage_asset and not locked then
+						self:open_gage_asset(asset_id)
+					else
+						self:open_asset_buy(pressed, asset_id, is_gage_asset)
+					end
 				end
 			else
-				self:open_asset(pressed)
+				local asset_id, is_gage_asset, locked = tab:get_asset_id(pressed)
+				if is_gage_asset then
+					self:open_gage_asset(asset_id)
+				else
+					self:open_asset(pressed)
+				end
 			end
 		end
 	end
@@ -3512,11 +3558,21 @@ function MissionBriefingGui:confirm_pressed()
 		if selected and type(selected) == "number" then
 			if cost then
 				if type(cost) == "number" then
-					self:open_asset_buy(selected, self._items[self._selected_item]:get_asset_id(selected))
+					local asset_id, is_gage_asset, locked = self._items[self._selected_item]:get_asset_id(selected)
+					if is_gage_asset and not locked then
+						self:open_gage_asset(asset_id)
+					else
+						self:open_asset_buy(selected, asset_id, is_gage_asset)
+					end
 					return true
 				end
 			else
-				self:open_asset(selected)
+				local asset_id, is_gage_asset, locked = self._items[self._selected_item]:get_asset_id(selected)
+				if is_gage_asset then
+					self:open_gage_asset(asset_id)
+				else
+					self:open_asset(selected)
+				end
 				return true
 			end
 		elseif selected then

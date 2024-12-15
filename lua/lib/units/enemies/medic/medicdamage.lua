@@ -11,6 +11,7 @@ end
 function MedicDamage:heal_unit(unit)
 	local t = Application:time()
 	local cooldown = tweak_data.medic.cooldown
+	cooldown = managers.crime_spree:modify_value("MedicDamage:CooldownTime", cooldown)
 	if t < self._heal_cooldown_t + cooldown then
 		return false
 	end

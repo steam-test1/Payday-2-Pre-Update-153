@@ -3627,12 +3627,15 @@ function PlayerInventoryGui:open_armor_menu()
 		name = "bm_menu_armors",
 		category = "armors",
 		on_create_func_name = "populate_armors",
-		override_slots = {4, 2},
+		override_slots = {3, 3},
 		identifier = BlackMarketGui.identifiers.armor
 	})
 	new_node_data.topic_id = "bm_menu_armors"
 	new_node_data.scroll_tab_anywhere = true
-	managers.menu:open_node("blackmarket_node", {new_node_data})
+	new_node_data.skip_blur = true
+	new_node_data.use_bgs = true
+	new_node_data.panel_grid_w_mul = 0.6
+	managers.menu:open_node("blackmarket_armor_node", {new_node_data})
 end
 
 function PlayerInventoryGui:preview_armor()

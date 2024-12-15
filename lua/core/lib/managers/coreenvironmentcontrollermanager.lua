@@ -368,6 +368,9 @@ function CoreEnvironmentControllerManager:refresh_render_settings(vp)
 	local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	local cubemap_name = lvl_tweak_data and lvl_tweak_data.cube or "cube_apply_empty"
 	local color_grading = self._default_color_grading
+	if not self._ignore_user_color_grading then
+		color_grading = managers.user:get_setting("video_color_grading") or self._default_color_grading
+	end
 	self._vp:vp():set_post_processor_effect("World", Idstring("color_grading_post"), Idstring(color_grading))
 	self._vp:vp():set_post_processor_effect("World", ids_hdr_post_processor, Idstring(managers.user:get_setting("light_adaption") and "default" or "no_light_adaption"))
 end

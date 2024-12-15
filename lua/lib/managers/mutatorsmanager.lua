@@ -37,7 +37,11 @@ function MutatorsManager:init()
 		MutatorShieldDozers:new(self)
 	}
 	self._active_mutators = {}
-	if Global.mutators and Global.mutators.active_on_load then
+	local activate = Global.mutators and Global.mutators.active_on_load
+	if not self:can_mutators_be_active() then
+		activate = false
+	end
+	if activate then
 		for id, data in pairs(Global.mutators.active_on_load) do
 			print("[Mutators] Attempting to activate mutator: ", id)
 			local mutator = self:get_mutator_from_id(id)
@@ -105,7 +109,17 @@ function MutatorsManager:load(data, version)
 	print("[Mutators] Loading finished!")
 end
 
+function MutatorsManager:can_mutators_be_active()
+	if Global.game_settings.gamemode ~= GamemodeStandard.id then
+		return false
+	end
+	return true
+end
+
 function MutatorsManager:are_mutators_active()
+	if not self:can_mutators_be_active() then
+		return false
+	end
 	if Network:is_server() then
 		return #self:active_mutators() > 0
 	elseif Network:is_client() then
@@ -116,6 +130,9 @@ function MutatorsManager:are_mutators_active()
 end
 
 function MutatorsManager:are_mutators_enabled()
+	if not self:can_mutators_be_active() then
+		return false
+	end
 	if Network:is_client() then
 		return self:are_mutators_active()
 	else

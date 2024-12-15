@@ -152,13 +152,19 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 	end
 end
 
+function ClientNetworkSession:_cancel_crime_spree()
+	managers.crime_spree:disable_crime_spree_gamemode()
+end
+
 function ClientNetworkSession:on_join_request_timed_out()
+	self:_cancel_crime_spree()
 	local cb = self._cb_find_game
 	self._cb_find_game = nil
 	cb("TIMED_OUT")
 end
 
 function ClientNetworkSession:on_join_request_cancelled()
+	self:_cancel_crime_spree()
 	local cb = self._cb_find_game
 	if cb then
 		self._cb_find_game = nil

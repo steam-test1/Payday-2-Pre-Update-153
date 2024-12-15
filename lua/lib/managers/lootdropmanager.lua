@@ -307,6 +307,73 @@ function LootDropManager:_new_make_drop(debug, add_to_inventory, debug_stars, re
 	return global_value, pc_type, entry, pc
 end
 
+function LootDropManager:new_make_mass_drop(amount, item_pc, return_data, setup_data)
+	local plvl = managers.experience:current_level()
+	local pstars = managers.experience:level_to_stars()
+	local stars = pstars
+	local pc = stars * 10
+	local pcs = tweak_data.lootdrop.STARS[stars].pcs
+	local chance_curve = tweak_data.lootdrop.STARS_CURVES[stars]
+	local start_chance = tweak_data.lootdrop.PC_CHANCE[stars]
+	return_data = return_data or {}
+	return_data.job_stars = stars
+	return_data.total_stars = stars
+	return_data.player_level = plvl
+	return_data.player_stars = pstars
+	return_data.payclass = pc
+	local infamous_chance, infamous_base_chance, infamous_base_multiplier = self:infamous_chance(setup_data)
+	local infamous_success = false
+	for i = 1, amount do
+		if infamous_chance > math.rand(1) then
+			infamous_success = true
+			break
+		end
+	end
+	local droppable_items, maxed_inventory_items = self:droppable_items(item_pc or 40, infamous_success, setup_data and setup_data.skip_types)
+	local global_value, entry
+	return_data.items = {}
+	for i = 1, amount do
+		local weighted_type_chance = {}
+		local sum = 0
+		for type, items in pairs(droppable_items) do
+			weighted_type_chance[type] = tweak_data.lootdrop.WEIGHTED_TYPE_CHANCE[pc][type]
+			sum = sum + weighted_type_chance[type]
+		end
+		if setup_data and setup_data.preferred_type and setup_data.preferred_chance then
+			local increase = setup_data.preferred_chance * sum
+			weighted_type_chance[setup_data.preferred_type] = (weighted_type_chance[setup_data.preferred_type] or 0) + increase
+			sum = sum + increase
+		end
+		local normalized_chance = {}
+		for type, items in pairs(droppable_items) do
+			normalized_chance[type] = 0 < weighted_type_chance[type] and weighted_type_chance[type] / sum or 0
+		end
+		local pc_type = setup_data and setup_data.preferred_type_drop or self:_get_type_items(normalized_chance, true)
+		local drop_table = droppable_items[pc_type] or maxed_inventory_items[pc_type]
+		if drop_table then
+			sum = 0
+			for index, item_data in ipairs(drop_table) do
+				sum = sum + item_data.weight
+			end
+			normalized_chance = {}
+			for index, item_data in ipairs(drop_table) do
+				normalized_chance[index] = item_data.weight / sum
+			end
+			local dropped_index = self:_get_type_items(normalized_chance, true)
+			local dropped_item = drop_table[dropped_index]
+			managers.blackmarket:add_to_inventory(dropped_item.global_value, pc_type, dropped_item.entry)
+			global_value = dropped_item.global_value
+			entry = dropped_item.entry
+		end
+		local item = {
+			global_value = global_value,
+			type_items = pc_type,
+			item_entry = entry
+		}
+		table.insert(return_data.items, item)
+	end
+end
+
 function LootDropManager:debug_drop(amount, add_to_inventory, stars)
 	amount = amount or 10
 	add_to_inventory = add_to_inventory or false

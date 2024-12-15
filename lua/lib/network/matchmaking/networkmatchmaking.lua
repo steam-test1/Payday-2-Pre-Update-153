@@ -81,6 +81,8 @@ function NetworkMatchMaking:load_user_filters()
 	Global.game_settings.search_friends_only = managers.user:get_setting("crimenet_filter_friends_only")
 	Global.game_settings.search_appropriate_jobs = managers.user:get_setting("crimenet_filter_level_appopriate")
 	Global.game_settings.search_mutated_lobbies = managers.user:get_setting("crimenet_filter_mutators")
+	Global.game_settings.gamemode_filter = managers.user:get_setting("crimenet_gamemode_filter")
+	Global.game_settings.crime_spree_max_lobby_diff = managers.user:get_setting("crime_spree_lobby_diff")
 	local new_servers = managers.user:get_setting("crimenet_filter_new_servers_only")
 	local in_lobby = managers.user:get_setting("crimenet_filter_in_lobby")
 	local max_servers = managers.user:get_setting("crimenet_filter_max_servers")
@@ -180,6 +182,10 @@ function NetworkMatchMaking:get_friends_lobbies()
 							numbers = self:_lobby_to_numbers(lobby),
 							mutators = lobby:key_value("mutators")
 						}
+						local crime_spree_key = lobby:key_value("crime_spree")
+						if is_key_valid(crime_spree_key) then
+							attributes_data.crime_spree = crime_spree_key
+						end
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -288,6 +294,10 @@ function NetworkMatchMaking:search_lobby(friends_only)
 							numbers = self:_lobby_to_numbers(lobby),
 							mutators = lobby:key_value("mutators")
 						}
+						local crime_spree_key = lobby:key_value("crime_spree")
+						if is_key_valid(crime_spree_key) then
+							attributes_data.crime_spree = crime_spree_key
+						end
 						table.insert(info.attribute_list, attributes_data)
 					end
 				end
@@ -628,6 +638,7 @@ function NetworkMatchMaking:set_attributes(settings)
 		lobby_attributes[self._BUILD_SEARCH_INTEREST_KEY] = "true"
 	end
 	managers.mutators:apply_matchmake_attributes(lobby_attributes)
+	managers.crime_spree:apply_matchmake_attributes(lobby_attributes)
 	self._lobby_attributes = lobby_attributes
 	self.lobby_handler:set_lobby_data(lobby_attributes)
 	self.lobby_handler:set_lobby_type(permissions[settings.numbers[3]])

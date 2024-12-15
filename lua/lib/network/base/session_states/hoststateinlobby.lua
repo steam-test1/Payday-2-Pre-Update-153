@@ -127,6 +127,7 @@ function HostStateInLobby:on_join_request_received(data, peer_name, client_prefe
 		managers.menu:post_event("player_join")
 	end
 	managers.network:session():send_to_peers_except(new_peer_id, "peer_joined_sound", 0 < peer_rank)
+	managers.crime_spree:on_peer_finished_loading(new_peer)
 end
 
 function HostStateInLobby:is_joinable(data)

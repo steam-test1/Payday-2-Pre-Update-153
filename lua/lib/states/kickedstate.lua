@@ -17,7 +17,11 @@ function KickedState:at_enter(...)
 end
 
 function KickedState:_create_kicked_dialog()
-	managers.menu:show_peer_kicked_dialog()
+	if managers.crime_spree:_is_active() then
+		MenuCallbackHandler:show_peer_kicked_crime_spree_dialog()
+	else
+		managers.menu:show_peer_kicked_dialog()
+	end
 end
 
 function KickedState:on_kicked_ok_pressed()

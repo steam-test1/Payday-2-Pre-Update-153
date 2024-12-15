@@ -1424,7 +1424,7 @@ function GroupAIStateBesiege:_draw_enemy_activity(t)
 		if l_data.objective then
 			text_str = text_str .. ":" .. l_data.objective.type
 		end
-		if not l_data.group then
+		if not l_data.group and l_data.team then
 			text_str = l_data.team.id .. ":" .. text_str
 		end
 		if logic_name_text then
